@@ -17,7 +17,7 @@ implicit none
     
         integer, intent(in) :: unitRapport
         
-        real(DP) :: compac
+        real(DP) :: compac, densite
         character(len=20) :: init
         integer :: longueur, statut
         
@@ -40,10 +40,14 @@ implicit none
                 stop
         end select
         
+        densite = real(Ncol1, DP) / product(Lsize)
+        write(*, *) "    Densité = ", densite
+        write(unitRapport, *) "    	Densité = ", densite
+        
         compac = 4._DP/3._DP*PI*rayon1**3 * Ncol1 / product(Lsize)
         write(*, *) "    Compacité = ", compac
         write(unitRapport, *) "    Compacité = ", compac
-    
+        
     end subroutine condIni
     
     subroutine iniPosCub()

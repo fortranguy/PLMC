@@ -32,3 +32,5 @@
 			ce soit un problème de taille. Mais je devrais peut-être revoir
 			mes scripts.
 		[except] Git ignorera certains fichiers.
+	17:09 : Je suis parti voire le Sage. Je dois maintenir rho constant.
+		Attention !
