@@ -5,14 +5,20 @@ binFold="Binaries"
 outFold="Out"
 
 # Préparation
-ls ${srcFold} ${binFold} ${outFold}
+ls ${binFold}
 if test $? -ne 0
 then
-	echo "Il manque quelque chose..."
-	exit
+	mkdir ${binFold}
 fi
 
-rm -f ${outFold}/*.out
+ls ${outFold}
+if test $? -ne 0
+then
+	mkdir ${outFold}
+else
+	rm -f ${outFold}/*.out
+fi
+
 rm -f ${binFold}/*.out # si problème
 
 # Compilation
