@@ -8,7 +8,7 @@ exec2="xBunching"
 
 condIni="cube"
 binFold_i="Bin"
-outFold_i="Bin"
+outFold_i="Out"
 editeur="gedit"
 exec1NewCore="xMC_Cano"
 
@@ -131,8 +131,23 @@ cd ${outFold}
 	iSimu=0
 	until test ${iSimu} -eq ${nSimus}
 	do
+		
 		iSimu=$(expr ${iSimu} \+ 1)
-	
+		
+		exec1New=${exec1NewCore}"_"${param}${iSimu}
+		
+		statut=0
+		
+		until test ${statut} -ne 0
+			# fin du programme
+		do
+			
+			# attente
+			ps -Af | grep ${exec1New} | grep ${condIni} > /dev/null		
+			statut=$(echo $?)
+		
+		done
+		
 		mkdir ${outFold_i}${iSimu}
 		cd ${outFold_i}${iSimu}
 
