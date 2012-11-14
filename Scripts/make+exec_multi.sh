@@ -26,7 +26,7 @@ if test $? -ne 0
 then
 	mkdir ${outFold}
 else
-	rm -f ${outFold}/*.out
+	rm -rf ${outFold}/*
 fi
 
 rm -rf ${binFold}/* # si problème
@@ -151,21 +151,23 @@ cd ${outFold}
 		mkdir ${outFold_i}${iSimu}
 		cd ${outFold_i}${iSimu}
 
-		mv ../../${binFold}/${binFold_i}${iSimu}/*.out .
+			mv ../../${binFold}/${binFold_i}${iSimu}/*.out .
 
-		echo " Date : " >> rapport.out
-		echo "     Début : " ${dateIni[${iSimu}]} >> rapport.out
+			echo " Date : " >> rapport.out
+			echo "     Début : " ${dateIni[${iSimu}]} >> rapport.out
 
-		# Bunching
-		cp ../../${binFold}/${binFold_i}${iSimu}/xBunching .
-		./xBunching 14
-		rm xBunching
+			# Bunching
+			cp ../../${binFold}/${binFold_i}${iSimu}/xBunching .
+			./xBunching 14
+			rm xBunching
 
-		# Rapport	
-		cp ../../Scripts/avgRms.sh .
-		./avgRms.sh
-		rm avgRms.sh
-		cat rapport.out
+			# Rapport	
+			cp ../../Scripts/avgRms.sh .
+			./avgRms.sh
+			rm avgRms.sh
+			cat rapport.out
+		
+		cd ..
 	
 	done
 	
