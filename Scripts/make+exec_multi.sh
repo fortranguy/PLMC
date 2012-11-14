@@ -79,6 +79,10 @@ cd ${srcFold}
 		done
 		
 		make
+		if test $? -ne 0
+		then
+			exit
+		fi
 		
 		exec1New=${exec1}"_"${param}${iSimu}
 		mv -i ${exec1} ../${binFold}/${execFold}${iSimu}/${exec1New}
@@ -98,10 +102,21 @@ cd ${binFold}
 
 		iSimu=$(expr ${iSimu} \+ 1)
 		
-		cd ${execFold}${iSimu}		
+		cd ${execFold}${iSimu}
+			
+			echo
 			exec1New=${exec1}"_"${param}${iSimu}
-			./${exec1New} ${condIni} &
-			echo "Exécution de "${exec1New}			
+			echo "Exécution de "${exec1New}
+			
+			dateIni[${iSimu}]=$(date)
+			time ./${exec1New} ${condIni} &
+			if test $? -ne 0
+			then
+				exit
+			fi
+			
+			echo "     Début : " ${dateIni[${iSimu}]}
+			
 		cd ..
 
 	done
