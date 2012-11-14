@@ -27,7 +27,7 @@ else
 	rm -f ${outFold}/*.out
 fi
 
-rm -f ${binFold}/*.out # si problème
+rm -rf ${binFold}/* # si problème
 
 # ---------------------------------------------------------
 

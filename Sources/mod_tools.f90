@@ -62,20 +62,6 @@ use data_constants
         write(unitRapport, *) "    rcut11 = ", rcut11
         write(unitRapport, *) "    surpas11 = ", surpas11
         
-        write(*, *) "Simulation MC_C :"
-        write(* ,*) "    Lsize(:) = ", Lsize(:)
-        write(* ,*) "    Ncol1 = ", Ncol1
-        write(* ,*) "    nWidom = ", nWidom
-        write(* ,*) "    Lratio = ", Lratio
-        write(*, *) "    Nstep = ", Nstep
-        write(*, *) "    Ntherm = ", Ntherm
-        write(*, *) "    Nmove = ", Nmove
-        write(*, *) "    dx(:) = ", dx(:)
-        write(*, *) "    epsilon11 = ", epsilon11
-        write(*, *) "    alpha11 = ", alpha11
-        write(*, *) "    rcut11 = ", rcut11
-        write(*, *) "    surpas11 = ", surpas11
-        
     end subroutine rapport
     
 end module mod_tools
