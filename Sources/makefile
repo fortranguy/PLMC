@@ -3,7 +3,7 @@ FFLAGS =  # -warn all -check all # -W -Wall -fbounds-check
 LDFLAGS = # -warn all -check all # -W -Wall -fbounds-check
 EXEC1 = xMC_Canonique
 EXEC2 = xBunching
-BIN = Binaries
+#BIN = Binaries
 
 all: $(EXEC1) $(EXEC2)
 
@@ -32,7 +32,7 @@ mc_canonique.o: mc_canonique.f90
 
 xMC_Canonique: data.o mod_tools.o mod_physique.o mc_canonique.o
 	$(FC) $(LDFLAGS) $^ -o $@
-	mv $@ ../$(BIN)
+	#mv $@ ../$(BIN)
 	
 # ---------------------------
 
@@ -43,7 +43,7 @@ bunching.o: bunching.f90
 	
 xBunching: data.o bunching.o
 	$(FC) $^ $(LDFLAGS) -o $@
-	mv $@ ../$(BIN)
+	#mv $@ ../$(BIN)
 	
 # ---------------------------------------------------------
 	
@@ -53,4 +53,4 @@ clean:
 	
 mrproper: clean
 	rm -rf *.mod
-	rm -rf ../$(BIN)/$(EXEC1) ../$(BIN)/$(EXEC2) 
+	#rm -rf ../$(BIN)/$(EXEC1) ../$(BIN)/$(EXEC2) 

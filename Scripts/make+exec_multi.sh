@@ -3,9 +3,31 @@
 srcFold="Sources"
 binFold="Binaries"
 outFold="Out"
+exec1="xMC_Canonique"
+exec2="xBunching"
 
+condIni="cube"
 execFold="Bin"
 editeur="gedit"
+
+# ---------------------------------------------------------
+
+# Préparation
+ls ${binFold}
+if test $? -ne 0
+then
+	mkdir ${binFold}
+fi
+
+ls ${outFold}
+if test $? -ne 0
+then
+	mkdir ${outFold}
+else
+	rm -f ${outFold}/*.out
+fi
+
+rm -f ${binFold}/*.out # si problème
 
 # ---------------------------------------------------------
 
@@ -17,7 +39,7 @@ echo "Paramètre qui varie : "
 read param
 echo ${param}
 
-#Création des dossiers pour exécutables :
+# Création des dossiers pour exécutables :
 
 cd ${binFold}
 
@@ -34,7 +56,7 @@ cd ${binFold}
 
 cd ..
 
-#Modification des données d'entrée :
+# Modification des données d'entrée :
 
 cd ${srcFold}
 
@@ -56,8 +78,34 @@ cd ${srcFold}
 		
 		done
 		
-		make		
+		make
+		
+		exec1New=${exec1}"_"${param}${iSimu}
+		mv -i ${exec1} ../${binFold}/${execFold}${iSimu}/${exec1New}
+		mv -i ${exec2} ../${binFold}/${execFold}${iSimu}
 
 	done
 
 cd ..
+
+# Exécution
+
+cd ${binFold}
+
+	iSimu=0
+	until test ${iSimu} -eq ${nSimus}
+	do
+
+		iSimu=$(expr ${iSimu} \+ 1)
+		
+		cd ${execFold}${iSimu}		
+			exec1New=${exec1}"_"${param}${iSimu}
+			./${exec1New} ${condIni} &
+			echo "Exécution de "${exec1New}			
+		cd ..
+
+	done
+
+cd ..
+
+
