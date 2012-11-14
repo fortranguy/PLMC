@@ -34,3 +34,6 @@
 		[except] Git ignorera certains fichiers.
 	17:09 : Je suis parti voire le Sage. Je dois maintenir rho constant.
 		Attention !
+	18:42 : Le sage avait raison ! Sur des petites simulations imprécises,
+		en maintenant rho constante, on observe bien la constance de 
+		\braket{E}/N.
