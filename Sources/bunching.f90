@@ -31,8 +31,8 @@ implicit none
     
     write(*,*)
     
-    open(unit=11, file="Out/bunching_eTot.out")
-    open(unit=12, file="Out/bunching_activInv.out")
+    open(unit=11, file="bunching_eTot.out")
+    open(unit=12, file="bunching_activInv.out")
     
     do iBunching = 1, nBunching
     
@@ -43,7 +43,7 @@ implicit none
         
         if (iBunching == 1) then
         
-            open(unit=10, file="Out/obs.out")
+            open(unit=10, file="obs.out")
             do iStep = 1, 2*NstepVar
                 read(10, *) iStepIn, dataIn(1, iStep), dataIn(2, iStep)
             end do

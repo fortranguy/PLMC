@@ -37,18 +37,20 @@ cd ..
 	
 # Données
 cd ${outFold}
-	mv ../${binFold}*.out .
+	mv ../${binFold}/*.out .
 
 	echo " Dates : " >> rapport.out
 	echo "     Début : " ${dateIni} >> rapport.out
 	echo "     Fin : " ${dateFin} >> rapport.out	
 
 	# Bunching
-
+	cp ../${binFold}/xBunching .
 	./xBunching 14
+	rm xBunching
 
-	# Rapport
-
+	# Rapport	
+	cp ../Scripts/avgRms.sh .
 	./avgRms.sh
+	rm avgRms.sh
 	cat rapport.out
 cd ..
