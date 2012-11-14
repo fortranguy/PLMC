@@ -10,7 +10,7 @@
     11:05 : Changer ePot : fonction à subroutine pour gagner en vitesse ?
         cf. Stage de Master / petite comparaison.
             Test effectué : aucun changement. On revient en fonction.
-    Redéfinition(ortho) du système : L=8, Ncol=80, Nwid=800
+    	Redéfinition(ortho) du système : L=8, Ncol=80, Nwid=800
         
 09 11 12
     12:36 : Bunching : Nmove = 2**14
@@ -18,3 +18,17 @@
 13 11 12
 	14:47 : Définition des HS : Ep(r) = 0 si r >= sigma 
 		et non r > sigma ?
+		
+14 11 12
+	16:18 : JG a installé git sur gauss ce matin. You hou !
+		Ce fichier mettra donc l'accent sur l'aspect physique.
+	-	: Le but était de tester les lois pour la moyenne
+		et l'écart-type de l'énergie d'abord. Les résultats
+		sont mauvais. e.g. \braket{E}/N croît au lieu de rester
+		constant.
+			J'ai lancé des simulations pour N plus grand (jusqu'à 320)
+			et plus petit (jusqu'à 60). Mais les résultats restent mauvais.
+			J'ai relancé des programmes avec L=16 en espérant que
+			ce soit un problème de taille. Mais je devrais peut-être revoir
+			mes scripts.
+		
