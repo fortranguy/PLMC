@@ -31,4 +31,4 @@
 			J'ai relancé des programmes avec L=16 en espérant que
 			ce soit un problème de taille. Mais je devrais peut-être revoir
 			mes scripts.
-		
+		[except] Git ignorera certains fichiers.
