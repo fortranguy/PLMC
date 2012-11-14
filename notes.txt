@@ -1,0 +1,20 @@
+07 11 12
+    11:12 : Changement de dx pour que le taux de rejets approche 0.5.
+        Avant : dx=0.5 -> tauxRej = 0.09
+        avec dx=4. -> tauxRej = 0.43 -> bunching : 2**12 : OK
+    14:26 : nWidom = 4096 semble nécessaire, cf. L_ratio_var/L_1_nWid_...
+        Non : plus nWidom est grand, meilleure sera la précision.
+        Il faut se donner une limite.
+        
+08 11 12
+    11:05 : Changer ePot : fonction à subroutine pour gagner en vitesse ?
+        cf. Stage de Master / petite comparaison.
+            Test effectué : aucun changement. On revient en fonction.
+    Redéfinition(ortho) du système : L=8, Ncol=80, Nwid=800
+        
+09 11 12
+    12:36 : Bunching : Nmove = 2**14
+    
+13 11 12
+	14:47 : Définition des HS : Ep(r) = 0 si r >= sigma 
+		et non r > sigma ?
