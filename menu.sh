@@ -14,7 +14,7 @@ read choix
 case ${choix} in
 	
 	go!)
-		echo "	go! : compilation et exécution."
+		echo "	go! : compilation et exécution de programme(s)."
 		Scripts/make+exec.sh ;;
 	#b)
 		#echo "	b : bunching pour obtenir l'erreur."
