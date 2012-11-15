@@ -42,7 +42,7 @@ cd ${outFold}
 			fi
 			
 			# Date
-			echo "Date de lancement : " $(cat dateIni.out) >> rapport.out
+			echo " Date de lancement : " $(cat dateIni.out) >> rapport.out
 
 			# Bunching
 			pwd

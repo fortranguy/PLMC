@@ -42,7 +42,7 @@ implicit none
         
         densite = real(Ncol1, DP) / product(Lsize)
         write(*, *) "    Densité = ", densite
-        write(unitRapport, *) "    	Densité = ", densite
+        write(unitRapport, *) "    Densité = ", densite
         
         compac = 4._DP/3._DP*PI*rayon1**3 * Ncol1 / product(Lsize)
         write(*, *) "    Compacité = ", compac

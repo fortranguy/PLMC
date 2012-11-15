@@ -20,6 +20,13 @@ ls ${binFold}
 if test $? -ne 0
 then
 	mkdir ${binFold}
+else
+	ls ${binFold}/${binFold_i}*
+	if test $? -eq 0
+	then
+		echo "Nettoyer d'abord "${binFold}"."
+		exit
+	fi
 fi
 
 ls ${outFold}
@@ -27,17 +34,25 @@ if test $? -ne 0
 then
 	mkdir ${outFold}
 else
-	rm -rf ${outFold}/*
+	ls ${outFold}/${outFold_i}*
+	if test $? -eq 0
+	then
+		echo "Nettoyer d'abord "${outFold}"."
+		exit
+	fi
 fi
-
-rm -rf ${binFold}/* # si problème
 
 ls ${tmpFold}
 if test $? -ne 0
 then
 	mkdir ${tmpFold}
 else
-	rm -rf ${tmpFold}/*
+	ls ${tmpFold}/*
+	if test $? -eq 0
+	then
+		echo "Nettoyer d'abord "${tmpFold}"."
+		exit
+	fi
 fi
 
 # ---------------------------------------------------------
