@@ -4,6 +4,7 @@ binFold="Binaries"
 outFold="Out"
 
 binFold_i="Bin"
+outFold_i="Out"
 
 nSimus=$(cat Temp/nSimus.in)
 
@@ -30,9 +31,9 @@ cd ${outFold}
 
 		cd ${outFold_i}${iSimu}
 		
-			pwd
+			#pwd
 		
-			ls *.out
+			ls *.out > \dev\null
 			if test $? -ne 0
 			then
 				echo "Pas de données."
@@ -40,9 +41,9 @@ cd ${outFold}
 			fi			
 
 			# Bunching
-			#cp ../../${binFold}/${binFold_i}${iSimu}/xBunching .
-			#./xBunching ${nSimus}
-			#rm xBunching
+			cp ../../${binFold}/${binFold_i}${iSimu}/xBunching .
+			./xBunching ${nBunching}
+			rm xBunching
 
 			# Rapport	
 			#cp ../../Scripts/avgRms.sh .
