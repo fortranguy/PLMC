@@ -1,6 +1,6 @@
 #! /bin/bash
 
-listOut=$(find . -name "Out" -type d)
+listOut=$(find . -name "Out*" -type d)
 NcolFil="Ncol.out"
 eMoyFil="eMoy.out"
 eMoyErreurFil="eMoyErreur.out"

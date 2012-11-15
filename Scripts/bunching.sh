@@ -36,7 +36,7 @@ cd ${outFold}
 			then
 				echo "Pas de données."
 				exit
-			fi			
+			fi
 
 			# Bunching
 			cp ../../${binFold}/${binFold_i}${iSimu}/xBunching .
