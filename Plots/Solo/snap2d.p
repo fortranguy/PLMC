@@ -5,5 +5,5 @@ set xlabel "x"
 set ylabel "y"
 #set zlabel "z"
 
-splot "Out/snapShotIni.out" t "Initial", \
-	"Out/snapShotFin.out" t "Final"
+plot "snapShotIni.out" u 1:2 t "Initial", \
+	"snapShotFin.out" u 1:2 t "Final"
