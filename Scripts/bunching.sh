@@ -31,8 +31,6 @@ cd ${outFold}
 
 		cd ${outFold_i}${iSimu}
 		
-			#pwd
-		
 			ls *.out > \dev\null
 			if test $? -ne 0
 			then
@@ -46,10 +44,10 @@ cd ${outFold}
 			rm xBunching
 
 			# Rapport	
-			#cp ../../Scripts/avgRms.sh .
-			#./avgRms.sh
-			#rm avgRms.sh
-			#cat rapport.out
+			cp ../../Scripts/avgRms.sh .
+			./avgRms.sh
+			rm avgRms.sh
+			cat rapport.out
 		
 		cd ..
 	
