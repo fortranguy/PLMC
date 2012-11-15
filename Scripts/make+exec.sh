@@ -5,6 +5,7 @@ binFold="Binaries"
 outFold="Out"
 tmpFold="Temp"
 exec1="xMC_Canonique"
+exec2="xBunching"
 
 condIni="cube"
 binFold_i="Bin"
@@ -117,7 +118,7 @@ cd ${binFold}
 			exec1New=${exec1NewCore}"_"${param}${iSimu}
 			echo "Exécution de "${exec1New}
 			
-			date > rapport.out
+			date >> dateIni.out
 			time ./${exec1New} ${condIni} &
 			if test $? -ne 0
 			then

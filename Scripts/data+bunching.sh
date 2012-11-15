@@ -3,6 +3,7 @@
 binFold="Binaries"
 outFold="Out"
 exec2="xBunching"
+statScript="avgRms.sh"
 
 binFold_i="Bin"
 outFold_i="Out"
@@ -25,28 +26,34 @@ cd ${outFold}
 		if test $? -ne 0
 		then
 			mkdir ${outFold_i}${iSimu}
+		else
+			echo "Retraitement des données."
 		fi 
 		
 		cd ${outFold_i}${iSimu}
 		
-			mv ../../${binFold}/${binFold_i}${iSimu}/*.out .
+			cp ../../${binFold}/${binFold_i}${iSimu}/*.out . # sécurité ?
 		
-			ls *.out > /dev/null
+			ls *.out
 			if test $? -ne 0
 			then
 				echo "Pas de données."
 				exit
 			fi
+			
+			# Date
+			echo "Date de lancement : " $(cat dateIni.out) >> rapport.out
 
 			# Bunching
+			pwd
 			cp ../../${binFold}/${binFold_i}${iSimu}/${exec2} .
 			./${exec2} ${nBunching}
 			rm ${exec2}
 
 			# Rapport	
-			cp ../../Scripts/avgRms.sh .
-			./avgRms.sh
-			rm avgRms.sh
+			cp ../../Scripts/${statScript} .
+			./${statScript}
+			rm ${statScript}
 			cat rapport.out
 
 		cd ..

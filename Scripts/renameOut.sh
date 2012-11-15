@@ -42,7 +42,7 @@ cd Out
 	until test ${iSimuDecal} -eq ${nSimusDecal}
 	do
 	
-		ls ${outBin_i}${iSimuDecal} 2&> /dev/null
+		ls ${outBin_i}${iSimuDecal}
 		if test $? -eq 0
 		then
 			echo "Le dossier n°"${iSimuDecal}" existe."
