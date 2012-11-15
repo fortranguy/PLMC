@@ -1,4 +1,4 @@
-load "location.p"
+load "Plots/Multi/location.p"
 out="moy_eTot_var.out"
 file=dataFold."/".dataFold_i."/".outFold."/".out
 
