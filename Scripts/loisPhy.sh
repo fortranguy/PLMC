@@ -1,21 +1,26 @@
 #! /bin/bash
 
-subj="Rho_cst"
-outFold=${subj}
+dataFold="Data"
 
-inFold="Data/Rho_cst_LNcol_var"
-cd ${inFold}
+cd ${dataFold}
 
-mkdir ${outFold}
-if test $? -ne 0
-then
-	rm -f ${outFold}/*.out
-fi
+	inFold="Rho_cst_LNcol_var"
+	outFold="Rho_cst"	
+	
+	cd ${inFold}
 
-cp ../../Scripts/Plots/moy_eTot_var.sh .
-./moy_eTot_var.sh
-rm ./moy_eTot_var.sh
+		mkdir ${outFold}
+		if test $? -ne 0
+		then
+			rm -f ${outFold}/*.out
+		fi
 
-mv *.out ${outFold}
+		cp ../../Scripts/Plots/moy_eTot_var.sh .
+		./moy_eTot_var.sh
+		rm ./moy_eTot_var.sh
 
-cd ../..
+		mv *.out ${outFold}
+		
+	cd ..
+
+cd ..

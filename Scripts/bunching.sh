@@ -31,7 +31,7 @@ cd ${outFold}
 
 		cd ${outFold_i}${iSimu}
 		
-			ls *.out > \dev\null
+			ls *.out > /dev/null
 			if test $? -ne 0
 			then
 				echo "Pas de données."

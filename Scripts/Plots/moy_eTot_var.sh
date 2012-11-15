@@ -1,36 +1,27 @@
 #! /bin/bash
 
-listOut=$(find . -name "Out*" -type d)
-NcolFil="Ncol.out"
-eMoyFil="eMoy.out"
-eMoyErreurFil="eMoyErreur.out"
+outFold_i="Out"
 
-rm -f ${NcolFil} ${eMoyFil} ${eMoyErreurFil} moy_eTot_var*.out
+nSimus=$(cat ../../Temp/nSimus.in)
 
-for out in ${listOut}
-
+iSimu=0
+until test ${iSimu} -eq ${nSimus}
 do
-	echo ${out}
 
-	# Energie moyenne
+	iSimu=$(expr ${iSimu} \+ 1)
+
+	cd ${outFold_i}${iSimu}
+	
+		Ncol=$(grep "Ncol1" rapport.out | cut -d = -f 2)
+		eMoy=$(grep "Energie moyenne" rapport.out | head -n1 | cut -d = -f 2)
 		
-	cat ${out}"/rapport.out" | head -n4 | tail -n1 > ${NcolFil} # fragile
-	cat ${out}"/rapport.out" | tail -n5 | head -n1 > ${eMoyFil} # fragile
-
-	Ncol=$(cut -d = -f 2 ${NcolFil})
-	eMoy=$(cut -d = -f 2 ${eMoyFil})
-	
-	# Erreur
-	
-	cat ${out}"/bunching_eTot.out" | head -n1 > ${eMoyErreurFil}
-	
-	eMoyErreur=$(awk '{print $NF}' ${eMoyErreurFil})
-	
-	# Ecriture
-	
-	echo ${Ncol}"	"${eMoy}"	"${eMoyErreur} >> moy_eTot_var.out
-	
+		eMoyErreur=$(cat bunching_eTot.out | head -n1 | awk '{print $NF}')
+		# premier : suffisant ?
+		
+		echo ${Ncol}"	"${eMoy}"	"${eMoyErreur} >> ../moy_eTot_var.out
+		
+		echo "Rapport n°"${iSimu}" lu."
+		
+	cd ..
 
 done
-
-sort -n moy_eTot_var.out > moy_eTot_var_sorted.out
