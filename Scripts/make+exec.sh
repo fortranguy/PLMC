@@ -155,7 +155,7 @@ cd ${outFold}
 			statut=$(echo $?)
 		
 		done
-		
+
 		mkdir ${outFold_i}${iSimu}
 		cd ${outFold_i}${iSimu}
 
@@ -163,11 +163,15 @@ cd ${outFold}
 
 			echo " Date : " >> rapport.out
 			echo "     Début : " ${dateIni[${iSimu}]} >> rapport.out
+			
+			pwd
+			
+			#exit
 
 			# Bunching
-			cp ../../${binFold}/${binFold_i}${iSimu}/xBunching .
-			./xBunching 14
-			rm xBunching
+			cp ../../${binFold}/${binFold_i}${iSimu}/${exec2} .
+			./${exec2} 14
+			rm ${exec2}
 
 			# Rapport	
 			cp ../../Scripts/avgRms.sh .

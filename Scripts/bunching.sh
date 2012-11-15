@@ -11,15 +11,6 @@ nSimus=$(cat Temp/nSimus.in)
 echo "Entrez le nombre d'itérations :"
 read nBunching
 
-cd ${outFold}
-
-	# Bunching
-	#cp ../${binFold}/xBunching .
-	#./xBunching ${nBunching}
-	#rm xBunching
-	
-cd ..
-
 # Données
 cd ${outFold}
 
