@@ -3,6 +3,7 @@
 outFold_i="Out"
 
 nSimus=$(cat ../../Temp/nSimus.in)
+nSimus=6 # sale
 
 iSimu=0
 until test ${iSimu} -eq ${nSimus}

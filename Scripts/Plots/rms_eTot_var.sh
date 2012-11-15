@@ -1,23 +1,25 @@
 #! /bin/bash
 
-listOut=$(find . -name "Out" -type d)
-NcolFil="NcolFil.out"
-eRmsFil="eRmsFil.out"
+outFold_i="Out"
 
-rm -f ${NcolFil} ${eRmsFil} rms_eTot_var*.out
+nSimus=$(cat ../../Temp/nSimus.in)
+nSimus=6 # sale
 
-for out in ${listOut}
-
+iSimu=0
+until test ${iSimu} -eq ${nSimus}
 do
-	echo ${out}
-	cat ${out}"/rapport.out" | head -n4 | tail -n1 > ${NcolFil} # fragile
-	cat ${out}"/rapport.out" | tail -n4 | head -n1 > ${eRmsFil} # fragile
 
-	Ncol=$(cut -d = -f 2 ${NcolFil})
-	eRms=$(cut -d = -f 2 ${eRmsFil})
+	iSimu=$(expr ${iSimu} \+ 1)
+
+	cd ${outFold_i}${iSimu}
 	
-	echo ${Ncol}"	"${eRms} >> rms_eTot_var.out
+		Ncol=$(grep "Ncol1" rapport.out | cut -d = -f 2)
+		eRms=$(grep "écart-type" rapport.out | head -n1 | cut -d = -f 2)
+		
+		echo ${Ncol}"	"${eRms} >> ../rms_eTot_var.out
+		
+		echo "Rapport n°"${iSimu}" lu."
+		
+	cd ..
 
 done
-
-sort -n rms_eTot_var.out > rms_eTot_var_sorted.out
