@@ -37,3 +37,6 @@
 	18:42 : Le sage avait raison ! Sur des petites simulations imprécises,
 		en maintenant rho constante, on observe bien la constance de 
 		\braket{E}/N.
+		
+15 11 12
+	Les résultats sont satisfaisants pour E. Reste à voir pour mu_ex.

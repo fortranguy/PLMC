@@ -5,7 +5,6 @@ binFold="Binaries"
 outFold="Out"
 tmpFold="Temp"
 exec1="xMC_Canonique"
-exec2="xBunching"
 
 condIni="cube"
 binFold_i="Bin"
@@ -118,69 +117,15 @@ cd ${binFold}
 			exec1New=${exec1NewCore}"_"${param}${iSimu}
 			echo "Exécution de "${exec1New}
 			
-			dateIni[${iSimu}]=$(date)
+			date > rapport.out
 			time ./${exec1New} ${condIni} &
 			if test $? -ne 0
 			then
 				exit
 			fi
 			
-			echo "     Début : " ${dateIni[${iSimu}]}
-			
 		cd ..
 
 	done
 
-cd ..
-
-# Données
-cd ${outFold}
-
-	iSimu=0
-	until test ${iSimu} -eq ${nSimus}
-	do
-		
-		iSimu=$(expr ${iSimu} \+ 1)
-		
-		exec1New=${exec1NewCore}"_"${param}${iSimu}
-		
-		statut=0
-		
-		until test ${statut} -ne 0
-			# fin du programme
-		do
-			
-			# attente
-			ps -Af | grep ${exec1New} | grep ${condIni} > /dev/null		
-			statut=$(echo $?)
-		
-		done
-
-		mkdir ${outFold_i}${iSimu}
-		cd ${outFold_i}${iSimu}
-
-			mv ../../${binFold}/${binFold_i}${iSimu}/*.out .
-
-			echo " Date : " >> rapport.out
-			echo "     Début : " ${dateIni[${iSimu}]} >> rapport.out
-			
-			pwd
-			
-			#exit
-
-			# Bunching
-			cp ../../${binFold}/${binFold_i}${iSimu}/${exec2} .
-			./${exec2} 14
-			rm ${exec2}
-
-			# Rapport	
-			cp ../../Scripts/avgRms.sh .
-			./avgRms.sh
-			rm avgRms.sh
-			cat rapport.out
-		
-		cd ..
-	
-	done
-	
 cd ..
