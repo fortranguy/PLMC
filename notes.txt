@@ -40,3 +40,5 @@
 		
 15 11 12
 	Les résultats sont satisfaisants pour E. Reste à voir pour mu_ex.
+	20:59 : les rapports sont à modifier pour trouver facilement
+		les informations sur le potentiel chimique.
