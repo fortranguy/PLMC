@@ -24,7 +24,7 @@ cd ${dataFold}
 		./${eTot_stat_script}
 		rm ./${eTot_stat_script}
 		
-		echo "Potentiel chimque d'excès : statistiques"
+		echo "Potentiel chimque : statistiques"
 		
 		cp ../../Scripts/Plots/${potChi_stat_script} .
 		./${potChi_stat_script}

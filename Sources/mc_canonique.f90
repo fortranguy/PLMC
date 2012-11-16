@@ -30,7 +30,8 @@ implicit none
     call ePotIni()
     call init_random_seed()
     
-    open(unit=unitRapport, file="rapport.out", status='new', action='write')
+    open(unit=unitRapport, recl=4096, file="rapport.out", status='new', &
+    	action='write')			! contre line folding
     call rapport(nWidom, Lratio, unitRapport)
     
     ! Condition initiale
@@ -46,7 +47,7 @@ implicit none
 
     write(*, *) "Début des cycles"
     open(unit=unitObs, recl=4096, file="obs.out", status='new', &
-        action='write') ! contre line folding
+    	action='write')
     
     do iStep = 1, Ntherm + Nstep
     

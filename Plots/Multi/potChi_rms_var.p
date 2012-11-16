@@ -2,7 +2,7 @@ load "Plots/Multi/location.p"
 out="potChi_rms_var.out"
 file=dataFold."/".dataFold_i."/".outFold."/".out
 
-set title "Statistiques : Potentiel chimique (excès) : écart-type"
+set title "Statistiques : Potentiel chimique : écart-type"
 set xlabel "Ncol"
 set xrange[log(80-10):log(130+10)]
 set ylabel "rms(E)/Ncol"

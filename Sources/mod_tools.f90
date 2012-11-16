@@ -50,6 +50,7 @@ use data_constants
         
         write(unitRapport, *) "Simulation MC_C :"
         write(unitRapport ,*) "    Lsize(:) = ", Lsize(:)
+        write(unitRapport ,*) "    Vol = ", product(Lsize(:))
         write(unitRapport ,*) "    Ncol1 = ", Ncol1
         write(unitRapport ,*) "    nWidom = ", nWidom
         write(unitRapport ,*) "    Lratio = ", Lratio
