@@ -2,9 +2,12 @@
 
 dataFold="Data"
 
+eTot_stat_script="eTot_stats_var.sh"
+potChi_stat_script="potChi_stats_var.sh"
+
 cd ${dataFold}
 
-	inFold="[approx]Rho_cst_LNcol_var"
+	inFold="Rho_cst_LNcol_var"
 	outFold="Rho_cst"	
 	
 	cd ${inFold}
@@ -15,17 +18,17 @@ cd ${dataFold}
 			rm -f ${outFold}/*.out
 		fi
 		
-		echo "Energie moy"
+		echo "Energie : statistiques"
 		
-		cp ../../Scripts/Plots/eTot_moy_var.sh .
-		./eTot_moy_var.sh
-		rm ./eTot_moy_var.sh
+		cp ../../Scripts/Plots/${eTot_stat_script} .
+		./${eTot_stat_script}
+		rm ./${eTot_stat_script}
 		
-		echo "Energie rms"
+		echo "Potentiel chimque d'excès : statistiques"
 		
-		cp ../../Scripts/Plots/eTot_rms_var.sh .
-		./eTot_rms_var.sh
-		rm ./eTot_rms_var.sh
+		cp ../../Scripts/Plots/${potChi_stat_script} .
+		./${potChi_stat_script}
+		rm ./${potChi_stat_script}
 
 		mv *.out ${outFold}
 		
