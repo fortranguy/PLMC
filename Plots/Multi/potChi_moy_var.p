@@ -4,8 +4,8 @@ file=dataFold."/".dataFold_i."/".outFold."/".out
 
 set title "Statistique : Potentiel chimque : moyenne"
 set xlabel "Ncol"
-set xrange[80-10:130+10]
+set xrange[Ndeb:Nfin]
 set ylabel "Moyenne/Ncol"
-set yrange[1.285:1.295]
+#set yrange[:]
 
 plot file u 1:2:(2.*$3/$1) with errorbars

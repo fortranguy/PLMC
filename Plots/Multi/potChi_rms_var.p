@@ -4,7 +4,7 @@ file=dataFold."/".dataFold_i."/".outFold."/".out
 
 set title "Statistiques : Potentiel chimique : écart-type"
 set xlabel "Ncol"
-set xrange[log(80-10):log(130+10)]
+set xrange[log(Ndeb):log(Nfin)]
 set ylabel "rms(E)/Ncol"
 #set yrange[:]
 

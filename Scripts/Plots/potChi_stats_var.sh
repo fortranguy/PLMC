@@ -21,7 +21,7 @@ do
 		#Delta potChi = Delta activInv / activInv
 			# premier : suffisant ?
 		
-		echo ${Ncol}"	"${potChiExMoy}"	"${potChiErreur} >> ../potChi_moy_var.out
+		echo ${Ncol}"	"${potChiMoy}"	"${potChiErreur} >> ../potChi_moy_var.out
 		echo ${Ncol}"	"${potChiRms} >> ../potChi_rms_var.out
 		
 		echo "Rapport n°"${iSimu}" lu."
