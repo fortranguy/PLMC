@@ -29,11 +29,11 @@ END{
 	for (i=0; i<NR; i++)
 		avg += x[i]
 	avg /= NR
-	print "	 potExChi.moy = ", -log(avg)
+	print "	 potChiEx.moy = ", -log(avg)
 		
 	for (i=0; i<NR; i++)
 		deltaSqr += x[i]*x[i]
 	deltaSqr = deltaSqr/NR - avg*avg
-	print "	 potExChi.rms = ", sqrt(deltaSqr) / (-log(avg))
+	print "	 potChiEx.rms = ", sqrt(deltaSqr) / (-log(avg))
 	
 }' obs.out >> rapport.out

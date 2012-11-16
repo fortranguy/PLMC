@@ -49,16 +49,19 @@ use data_constants
         integer, intent(in) :: unitRapport
         
         real(DP) :: realNstep = real(Nstep, DP)
+        real(DP) :: potChiId, potChiEx
     
         write(unitRapport, *) "Résultats :"
         write(unitRapport, *) "    Energie moyenne = ", &
             enTotSum/realNstep
         write(unitRapport, *) "    Energie moyenne par particule = ", &
             enTotSum/realNstep/real(Ncol1, DP)
-		write(unitRapport, *) "    Potentiel chimique idéal = ", &
-            -Tstar*log( product(Lsize)/real(Ncol1+1,DP) )
+		potChiId = -Tstar*log( product(Lsize)/real(Ncol1+1,DP) )
+		write(unitRapport, *) "    Potentiel chimique idéal = ", potChiId
+		potChiEx = -Tstar*log( activExInvSum/realNstep )
         write(unitRapport, *) "    Potentiel chimique (excès) moyen = ", &
-            -Tstar*log( activExInvSum/realNstep )
+        	potChiEx           
+		write(unitRapport, *) "    potChi.moy = ", potChiId + potChiEx
         write(unitRapport, *) "    Taux rejets = ", &
             tauxRejects/real(Nstep+Ntherm, DP)
     

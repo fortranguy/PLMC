@@ -14,8 +14,8 @@ do
 	cd ${outFold_i}${iSimu}
 	
 		Ncol=$(grep "Ncol1" rapport.out | cut -d = -f 2)
-		potChiExMoy=$(grep "potExChi.moy" rapport.out | cut -d = -f 2)
-		potChiRms=$(grep "potExChi.rms" rapport.out | cut -d = -f 2)
+		potChiMoy=$(grep "potChi.moy" rapport.out | cut -d = -f 2)
+		potChiRms=$(grep "potChiEx.rms" rapport.out | cut -d = -f 2)
 		
 		potChiErreur=$(awk 'NR==1 {print $3/$2}' bunching_activInv.out)
 		#Delta potChi = Delta activInv / activInv
