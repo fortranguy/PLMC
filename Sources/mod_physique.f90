@@ -413,25 +413,4 @@ implicit none
     
     end subroutine consisTest
 
-    ! Résultats ---------------------------------------------------------------    
-    subroutine mcResults(enTotSum, activExInvSum, tauxRejects, unitRapport)
-
-        real(DP), intent(in) :: enTotSum, activExInvSum     
-        real(DP), intent(in) :: tauxRejects
-        integer, intent(in) :: unitRapport
-        
-        real(DP) :: realNstep = real(Nstep, DP)
-    
-        write(unitRapport, *) "Résultats :"
-        write(unitRapport, *) "    Energie moyenne = ", &
-            enTotSum/realNstep
-        write(unitRapport, *) "    Energie moyenne par particule = ", &
-            enTotSum/realNstep/real(Ncol1, DP)
-        write(unitRapport, *) "    Potentiel chimique (excès) moyen = ", &
-            -Tstar*log( activExInvSum/realNstep )
-        write(unitRapport, *) "    Taux rejets = ", &
-            tauxRejects/real(Nstep+Ntherm, DP)
-    
-    end subroutine mcResults
-
 end module mod_physique
