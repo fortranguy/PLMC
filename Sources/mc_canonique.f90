@@ -57,13 +57,12 @@ implicit none
             call mcMove(enTot, Nrejects)    
         end do
         
+		call widom(nWidom, Lratio, activExInv)
+        
         if (iStep > Ntherm) then
         
-            enTotSum = enTotSum + enTot
-            
-            call widom(nWidom, Lratio, activExInv)                    
-            activExInvSum = activExInvSum + activExInv
-            
+            enTotSum = enTotSum + enTot                 
+            activExInvSum = activExInvSum + activExInv            
             write(unitObs, *) iStep, enTot, activExInv
             
 		else
