@@ -35,6 +35,7 @@ cd ${outFold}
 		
 			cp ../../${binFold}/${binFold_i}${iSimu}/*.out . # sécurité ?
 		
+			echo "Test : présence de fichiers .out ?"
 			ls *.out
 			if test $? -ne 0
 			then

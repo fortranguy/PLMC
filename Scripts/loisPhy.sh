@@ -7,7 +7,7 @@ potChi_stat_script="potChi_stats_var.sh"
 
 cd ${dataFold}
 
-	inFold="Rho_cst_LNcol_var"
+	inFold="[approx]Rho_cst_LNCol_var_grand"
 	outFold="Rho_cst"	
 	
 	cd ${inFold}
@@ -24,7 +24,7 @@ cd ${dataFold}
 		./${eTot_stat_script}
 		rm ./${eTot_stat_script}
 		
-		echo "Potentiel chimque : statistiques"
+		echo "Potentiel chimique : statistiques"
 		
 		cp ../../Scripts/Plots/${potChi_stat_script} .
 		./${potChi_stat_script}
