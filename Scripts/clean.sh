@@ -22,7 +22,11 @@ then
 
 	rm -rf ${binFold}/${binFold_i}*
 	rm -rf ${outFold}/${outFold_i}*
-	rm -rf ${tmpFold}/*.out
+	rm -rf ${tmpFold}/*.in
+	#rm -rf ${tmpFold}/*.out
+	
+	echo "Les fichiers ont été effacés."
+	
 else
 	echo "Rien n'a été effacé."
 fi

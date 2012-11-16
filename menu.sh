@@ -3,7 +3,7 @@
 echo "Monte-Carlo Canonique : Menu"
 echo "	n : nettoyage (binaires et données)."
 echo "	go! : compilation et exécution de programme(s)."
-echo "	b : bunching pour obtenir l'erreur."
+echo "	d : traitement des données (inclut bunching)."
 #echo "	p : trace les graphes."
 echo "	l : lois physiques." # pompeux
 echo "	q : quitter le menu."
@@ -20,9 +20,9 @@ case ${choix} in
 	go!)
 		echo "	go! : compilation et exécution de programme(s)."
 		Scripts/make+exec.sh ;;
-	b)
-		echo "	b : bunching pour obtenir l'erreur."
-		Scripts/bunching.sh ;;
+	d)
+		echo "	d : traitement des données (inclut bunching)."
+		Scripts/data+bunching.sh ;;
 
 	#p)
 		#echo "	p : trace les graphes."
