@@ -42,3 +42,8 @@
 	Les résultats sont satisfaisants pour E. Reste à voir pour mu_ex.
 	20:59 : les rapports sont à modifier pour trouver facilement
 		les informations sur le potentiel chimique.
+
+16 11 12
+	10:57 Pour le potentiel chimique, je vais coller les morceaux :
+		potChi = potChi_id + potChi_ex
+	

@@ -17,7 +17,7 @@ do
 		eMoy=$(grep "eTot.moy" rapport.out | cut -d = -f 2)
 		eRms=$(grep "eTot.rms" rapport.out | cut -d = -f 2)
 		
-		eMoyErreur=$(cat bunching_eTot.out | head -n1 | awk '{print $NF}')
+		eMoyErreur=$(awk 'NR==1 {print $3}' bunching_eTot.out)
 		# premier : suffisant ?
 		
 		echo ${Ncol}"	"${eMoy}"	"${eMoyErreur} >> ../eTot_moy_var.out
