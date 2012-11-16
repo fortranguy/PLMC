@@ -14,7 +14,7 @@ do
 	cd ${outFold_i}${iSimu}
 	
 		Ncol=$(grep "Ncol1" rapport.out | cut -d = -f 2)
-		eMoy=$(grep "Energie moyenne" rapport.out | head -n1 | cut -d = -f 2)
+		eMoy=$(grep "eTot.moy" rapport.out | head -n1 | cut -d = -f 2)
 		
 		eMoyErreur=$(cat bunching_eTot.out | head -n1 | awk '{print $NF}')
 		# premier : suffisant ?

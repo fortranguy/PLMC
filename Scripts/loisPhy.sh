@@ -4,7 +4,7 @@ dataFold="Data"
 
 cd ${dataFold}
 
-	inFold="Rho_cst_LNcol_var"
+	inFold="[approx]Rho_cst_LNcol_var"
 	outFold="Rho_cst"	
 	
 	cd ${inFold}

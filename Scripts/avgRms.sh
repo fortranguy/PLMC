@@ -11,12 +11,12 @@ END{
 	for (i=0; i<NR; i++)
 		avg += x[i]
 	avg /= NR
-	print "	 Energ.moy = ", avg
+	print "	 eTot.moy = ", avg
 		
 	for (i=0; i<NR; i++)
 		deltaSqr += x[i]*x[i]
 	deltaSqr = deltaSqr/NR - avg*avg
-	print "	 Energ.rms = " , sqrt(deltaSqr)
+	print "	 eTot.rms = " , sqrt(deltaSqr)
 	
 }' obs.out >> rapport.out
 
