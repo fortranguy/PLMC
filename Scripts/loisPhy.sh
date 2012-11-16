@@ -17,15 +17,15 @@ cd ${dataFold}
 		
 		echo "Energie moy"
 		
-		cp ../../Scripts/Plots/moy_eTot_var.sh .
-		./moy_eTot_var.sh
-		rm ./moy_eTot_var.sh
+		cp ../../Scripts/Plots/eTot_moy_var.sh .
+		./eTot_moy_var.sh
+		rm ./eTot_moy_var.sh
 		
 		echo "Energie rms"
 		
-		cp ../../Scripts/Plots/rms_eTot_var.sh .
-		./rms_eTot_var.sh
-		rm ./rms_eTot_var.sh
+		cp ../../Scripts/Plots/eTot_rms_var.sh .
+		./eTot_rms_var.sh
+		rm ./eTot_rms_var.sh
 
 		mv *.out ${outFold}
 		
