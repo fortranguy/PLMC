@@ -1,1 +1,2 @@
-print "Entrez le n° du run : i = "
+print "Initialisation i = 1"
+i = 1
