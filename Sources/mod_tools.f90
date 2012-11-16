@@ -55,6 +55,8 @@ use data_constants
             enTotSum/realNstep
         write(unitRapport, *) "    Energie moyenne par particule = ", &
             enTotSum/realNstep/real(Ncol1, DP)
+		write(unitRapport, *) "    Potentiel chimique idéal = ", &
+            -Tstar*log( product(Lsize)/real(Ncol1+1,DP) )
         write(unitRapport, *) "    Potentiel chimique (excès) moyen = ", &
             -Tstar*log( activExInvSum/realNstep )
         write(unitRapport, *) "    Taux rejets = ", &
@@ -72,7 +74,7 @@ use data_constants
         
         write(unitRapport, *) "Simulation MC_C :"
         write(unitRapport ,*) "    Lsize(:) = ", Lsize(:)
-        write(unitRapport ,*) "    Vol = ", product(Lsize(:))
+        write(unitRapport ,*) "    Vol = ", product(Lsize)
         write(unitRapport ,*) "    Ncol1 = ", Ncol1
         write(unitRapport ,*) "    nWidom = ", nWidom
         write(unitRapport ,*) "    Lratio = ", Lratio
