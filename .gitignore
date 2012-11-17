@@ -2,3 +2,11 @@ Binraries
 Out
 Plots/Solo/*.p~
 Plots/Multi/*.p~
+Plots/Multi/location.p
+Scripts/*.sh~
+Scripts/Plots/*.sh~
+Sources/data.f90
+Sources/*.f90~
+Sources/*.mod
+Sources/*.o
+Temp/*.out
