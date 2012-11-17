@@ -9,4 +9,4 @@ Sources/data.f90
 Sources/*.f90~
 Sources/*.mod
 Sources/*.o
-Temp/*.out
+Temp/*.in
