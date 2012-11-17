@@ -11,7 +11,7 @@ END{
 	for (i=0; i<NR; i++)
 		avg += x[i]
 	avg /= NR
-	print "	 eTot.moy = ", avg
+	printf("	 eTot.moy = %18g", avg)
 		
 	for (i=0; i<NR; i++)
 		deltaSqr += x[i]*x[i]

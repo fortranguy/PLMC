@@ -191,49 +191,48 @@ implicit none
     
     end subroutine pbc_dif
     
-    ! Energie potentielle -----------------------------------------------------
-    
+	! Energie potentielle -----------------------------------------------------
+   
     subroutine ePotIni()
-    
+   
         integer :: i
         real(DP) :: r
-        
+       
         do i = iMin, Ntab11
-        
+       
             r = rcut11*real(i, DP)/real(Ntab11, DP)
+            rTab11(i) = r
             ! Yukawa :
             Vtab11(i) = epsilon11*exp(-alpha11*(r-rmin))/r
-            
+           
         end do
-    
+   
     end subroutine ePotIni
-    
+   
     ! ---------------------------------
-    
+   
     function ePot(r)
-    
+   
         real(DP), intent(in) :: r
-        
+       
         integer :: i
-        real(DP) :: ri, riPlus
+        real(DP) :: coeff
         real(DP) :: ePot
-        
-        if (r < rcut11) then
-        
+       
+        if (r <= rcut11) then
+       
             i = int(r/rcut11*real(Ntab11, DP))
-            ri = rcut11*real(i, DP)/real(Ntab11, DP)
-            riPlus = rcut11*real(i+1, DP)/real(Ntab11, DP)
-            
-            ePot = Vtab11(i) + (r-ri)/(riPlus-ri)*(Vtab11(i+1)-Vtab11(i))
-            
+            coeff = (r-rTab11(i))/(rTab11(i+1)-rTab11(i))
+            ePot = Vtab11(i) + coeff*(Vtab11(i+1)-Vtab11(i))
+           
         else
-        
+       
             ePot = 0._DP
-            
+           
         end if
-    
-    end function ePot    
-    
+   
+    end function ePot   
+   
     ! ---------------------------------
     
     subroutine ePotDif(iOld, xNew, overlap, dEn)

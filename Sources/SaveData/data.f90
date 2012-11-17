@@ -15,7 +15,7 @@
     use data_constants
     integer, parameter :: Dim = 3
     real(DP), parameter :: Lsize1 = 8._DP
-    real(DP), parameter :: Lsize2 = 8._DP
+    real(DP), parameter :: Lsize2 = Lsize1 ! 8._DP
     real(DP), dimension(Dim), parameter :: Lsize = &
         [Lsize1, Lsize1, Lsize2]
     real(DP), dimension(Dim), parameter :: LsizeMi = 0.5_DP * Lsize
@@ -45,9 +45,9 @@
     module data_mc
     use data_constants
     use data_particles
-    integer, parameter :: Nstep = 10000 ! 10000
-    integer, parameter :: Ntherm = 10 ! 1
-    integer, parameter :: Nmove = 1000 ! 2**14 ! new
+    integer, parameter :: Nstep = 10**4
+    integer, parameter :: Ntherm = 1
+    integer, parameter :: Nmove = 40*Ncol1 ! new
     real(DP), dimension(Dim) :: dx = 2._DP ! new, à tester ?
     end module data_mc
 !***********************************************************************
@@ -66,8 +66,8 @@
     real(DP), parameter :: surpas11 = 1._DP/pas11 ! new
     ! comprendre : surpas ? juste la subdivision ?
     integer, parameter :: Ntab11 = int(rcut11*surpas11) ! new
-    real(DP), dimension(Ntab11) :: Vtab11 ! new 
-    real(DP), parameter :: epsilon11=1._DP, alpha11=5._DP ! new
+    real(DP), dimension(Ntab11) :: rTab11, Vtab11 ! attention : modifiable
+    real(DP), parameter :: epsilon11 = 1._DP, alpha11 = 5._DP ! new
     integer, parameter :: iMin = int( rmin/rcut11*real(Ntab11, DP) ) + 1 ! new
     end module data_potentiel
 !***********************************************************************
