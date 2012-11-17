@@ -202,7 +202,6 @@ implicit none
        
             r = rcut11*real(i, DP)/real(Ntab11, DP)
             rTab11(i) = r
-            ! Yukawa :
             Vtab11(i) = epsilon11*exp(-alpha11*(r-rmin))/r
            
         end do
