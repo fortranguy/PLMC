@@ -2,6 +2,7 @@
 
 binFold="Binaries"
 outFold="Out"
+plotFold="Plots"
 exec2="xBunching"
 statScript="avgRms.sh"
 
@@ -34,6 +35,7 @@ cd ${outFold}
 		
 			cp ../../${binFold}/${binFold_i}${iSimu}/*.out . # sécurité ?
 		
+			echo "Test : présence de fichiers .out ?"
 			ls *.out
 			if test $? -ne 0
 			then
@@ -60,4 +62,16 @@ cd ${outFold}
 
 	done
 
+cd ..
+
+# Plot : mauvais endroit ?
+
+cd ${plotFold}
+	cd Solo
+		ls location.p
+		if test $? -ne 0
+		then
+			cp SaveLoc/location.p .
+		fi
+	cd ..
 cd ..

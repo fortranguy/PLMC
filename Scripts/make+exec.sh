@@ -85,6 +85,12 @@ cd ..
 
 cd ${srcFold}
 
+	ls data.f90
+	if test $? -ne 0
+	then
+		cp SaveData/data.f90 .
+	fi
+
 	iSimu=0
 	until test ${iSimu} -eq ${nSimus}
 	do

@@ -21,7 +21,7 @@ implicit none
     real(DP), parameter :: Lratio = 1._DP ! pour le volume du tirage cf. widom
     
     integer, parameter :: unitObs = 10, unitSnapIni = 11, unitSnapFin = 12, &
-    	unitRapport = 13
+    	unitRapport = 13, unitObsTherm = 14
     
     Nrejects = 0
     tauxRejects = 0._DP
@@ -48,6 +48,8 @@ implicit none
     write(*, *) "Début des cycles"
     open(unit=unitObs, recl=4096, file="obs.out", status='new', &
     	action='write')
+	open(unit=unitObsTherm, recl=4096, file="obsTherm.out", status='new', &
+		action='write')
     
     do iStep = 1, Ntherm + Nstep
     
@@ -55,14 +57,17 @@ implicit none
             call mcMove(enTot, Nrejects)    
         end do
         
+		call widom(nWidom, Lratio, activExInv)
+        
         if (iStep > Ntherm) then
         
-            enTotSum = enTotSum + enTot
-            
-            call widom(nWidom, Lratio, activExInv)                    
-            activExInvSum = activExInvSum + activExInv
-            
+            enTotSum = enTotSum + enTot                 
+            activExInvSum = activExInvSum + activExInv            
             write(unitObs, *) iStep, enTot, activExInv
+            
+		else
+			
+			write(unitObsTherm, *) iStep, enTot, activExInv
             
         end if
         
@@ -71,6 +76,7 @@ implicit none
     
     end do
     
+    close(unitObsTherm)
     close(unitObs)
     write(*, *) "Fin des cycles"
 
