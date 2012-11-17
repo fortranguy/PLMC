@@ -88,6 +88,7 @@ cd ${srcFold}
 	ls data.f90
 	if test $? -ne 0
 	then
+		echo "Fichier data par défaut."
 		cp data_save.f90 data.f90
 	fi
 
