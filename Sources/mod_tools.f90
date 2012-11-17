@@ -56,12 +56,12 @@ use data_constants
             enTotSum/realNstep
         write(unitRapport, *) "    Energie moyenne par particule = ", &
             enTotSum/realNstep/real(Ncol1, DP)
-		potChiId = -Tstar*log( product(Lsize)/real(Ncol1+1,DP) )
-		write(unitRapport, *) "    Potentiel chimique idéal = ", potChiId
-		potChiEx = -Tstar*log( activExInvSum/realNstep )
+        potChiId = -Tstar*log( product(Lsize)/real(Ncol1+1,DP) )
+        write(unitRapport, *) "    Potentiel chimique idéal = ", potChiId
+        potChiEx = -Tstar*log( activExInvSum/realNstep )
         write(unitRapport, *) "    Potentiel chimique (excès) moyen = ", &
-        	potChiEx           
-		write(unitRapport, *) "    potChi.moy = ", potChiId + potChiEx
+            potChiEx           
+        write(unitRapport, *) "    potChi.moy = ", potChiId + potChiEx
         write(unitRapport, *) "    Taux rejets = ", &
             tauxRejects/real(Nstep+Ntherm, DP)
     

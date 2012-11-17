@@ -22,9 +22,9 @@ implicit none
         integer :: longueur, statut
         
         call get_command_argument(1, init, longueur, statut)
-		if (statut /= 0) stop "erreur get_command_argument"
-		if (command_argument_count() > 1) stop "Trop d'arguments"
-		    
+        if (statut /= 0) stop "erreur get_command_argument"
+        if (command_argument_count() > 1) stop "Trop d'arguments"
+            
         write(unitRapport, *) "Condition initiale :"
         
         select case (init)
@@ -70,8 +70,8 @@ implicit none
         
         iDir = 1
         do while (product(nParts)<Ncol1)
-        	nParts(iDir) = nParts(iDir) + 1
-        	iDir = iDir + 1
+            nParts(iDir) = nParts(iDir) + 1
+            iDir = iDir + 1
         end do
         
         ratio(:) = Lsize(:)/real(nParts(:), DP) ! A vérifier
@@ -99,7 +99,7 @@ implicit none
             end do
         end do
     
-    	do iDir = 1, Dim
+        do iDir = 1, Dim
             x(iDir, :) = x(iDir, :) - 0.5_DP*ratio(iDir) ! nécessaire ? tradition
         end do
     
@@ -191,7 +191,7 @@ implicit none
     
     end subroutine pbc_dif
     
-	! Energie potentielle -----------------------------------------------------
+    ! Energie potentielle -----------------------------------------------------
    
     subroutine ePotIni()
    
