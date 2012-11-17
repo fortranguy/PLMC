@@ -7,6 +7,7 @@ Scripts/*.sh~
 Scripts/Plots/*.sh~
 Sources/data.f90
 Sources/*.f90~
+Sources/makefile~
 Sources/*.mod
 Sources/*.o
 Temp/*.in
