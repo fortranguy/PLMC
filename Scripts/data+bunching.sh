@@ -33,7 +33,14 @@ cd ${outFold}
 		
 		cd ${outFold_i}${iSimu}
 		
-			cp ../../${binFold}/${binFold_i}${iSimu}/*.out . # sécurité ?
+			ls -l ../../${binFold}/${binFold_i}${iSimu} | \
+				grep "snapShotIni.out" > snapIni_date.out
+			ls -l ../../${binFold}/${binFold_i}${iSimu} | \
+				grep "snapShotFin.out" > snapFin_date.out
+		
+			cp ../../${binFold}/${binFold_i}${iSimu}/*.out . # sécurité
+			
+			cp rapport.out rapportSave.out # sécurité bis
 		
 			echo "Test : présence de fichiers .out ?"
 			ls *.out
@@ -44,7 +51,14 @@ cd ${outFold}
 			fi
 			
 			# Date
-			echo " Date de lancement : " $(cat dateIni.out) >> rapport.out
+			echo " Date de lancement : $(cat dateIni.out)" >> rapport.out
+			rm dateIni.out
+			echo " Dates des snapshots : " >> rapport.out
+				cat snapIni_date.out >> rapport.out
+				rm	snapIni_date.out
+				cat snapFin_date.out >> rapport.out
+				rm snapFin_date.out
+
 
 			# Bunching
 			pwd
@@ -56,7 +70,7 @@ cd ${outFold}
 			cp ../../Scripts/${statScript} .
 			./${statScript}
 			rm ${statScript}
-			cat rapport.out
+			head rapport.out
 
 		cd ..
 

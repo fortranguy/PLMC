@@ -139,7 +139,7 @@ cd ${binFold}
 			exec1New=${exec1NewCore}"_"${param}${iSimu}
 			echo "Exécution de "${exec1New}
 			
-			date >> dateIni.out
+			date > dateIni.out
 			time ./${exec1New} ${condIni} &
 			if test $? -ne 0
 			then
