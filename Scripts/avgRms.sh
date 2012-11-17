@@ -11,12 +11,12 @@ END{
 	for (i=0; i<NR; i++)
 		avg += x[i]
 	avg /= NR
-	printf("	 eTot.moy = %18g", avg)
+	printf("	 eTot.moy = %.15g\n", avg)
 		
 	for (i=0; i<NR; i++)
 		deltaSqr += x[i]*x[i]
 	deltaSqr = deltaSqr/NR - avg*avg
-	print "	 eTot.rms = " , sqrt(deltaSqr)
+	printf("	 eTot.rms = %.15g\n" , sqrt(deltaSqr))
 	
 }' obs.out >> rapport.out
 
@@ -29,11 +29,11 @@ END{
 	for (i=0; i<NR; i++)
 		avg += x[i]
 	avg /= NR
-	print "	 potChiEx.moy = ", -log(avg)
+	printf("	 potChiEx.moy = %.15g\n ", -log(avg))
 		
 	for (i=0; i<NR; i++)
 		deltaSqr += x[i]*x[i]
 	deltaSqr = deltaSqr/NR - avg*avg
-	print "	 potChiEx.rms = ", sqrt(deltaSqr) / (-log(avg))
+	printf("	 potChiEx.rms = %.15g\n ", sqrt(deltaSqr) / (-log(avg)))
 	
 }' obs.out >> rapport.out
