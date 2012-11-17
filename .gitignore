@@ -1,4 +1,4 @@
-Binraries
+Binaries/
 Out
 Plots/Solo/*.p~
 Plots/Multi/*.p~
@@ -10,3 +10,5 @@ Sources/*.f90~
 Sources/*.mod
 Sources/*.o
 Temp/*.in
+.gitignore~
+.gitignore.swp
