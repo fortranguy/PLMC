@@ -46,4 +46,5 @@
 16 11 12
 	10:57 Pour le potentiel chimique, je vais coller les morceaux :
 		potChi = potChi_id + potChi_ex
+	18:17 : Pour le programme attractif, je n'ai aucune garanti sur le bunching.
 	
