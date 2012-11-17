@@ -48,3 +48,5 @@
 		potChi = potChi_id + potChi_ex
 	18:17 : Pour le programme attractif, je n'ai aucune garanti sur le bunching.
 	
+17 11 12
+	13:24 : Je vais lancer les runs des sphères dures + attract/repuls pour N=400.
