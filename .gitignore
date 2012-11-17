@@ -12,3 +12,4 @@ Sources/*.o
 Temp/*.in
 .gitignore~
 .gitignore.swp
+menu.sh~

@@ -13,7 +13,7 @@ read plot_choix
 		s) echo "s : solo"
 			echo "	Pour y accéder : load Plots/Solo."
 			echo "	Initialiser avec load Plots/Solo/init.p"
-			echo "	Appuyez sur une touche."
+			echo "	Appuyez sur Entrée."
 			read
 			gnuplot ;;
 			
@@ -21,9 +21,12 @@ read plot_choix
 			echo "	Pour y accéder : load Plots/Multi."
 			echo "	Modifier le chemin d'accès : Plots/Multi/location.p"
 			${editeur} Plots/Multi/location.p&
-			echo "	Appuyez sur une touche."
-			read
-			gnuplot ;;
+			echo "Avez-vous spécifier le chemin ? (oui/non)"
+			read answer
+			if [ ${answer} = "oui" ]
+			then
+				gnuplot
+			fi ;;
 			
 		*) echo "		Je n'ai pas compris." ;;
 	
