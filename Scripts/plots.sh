@@ -1,16 +1,30 @@
 #! /bin/bash
 
+editeur="gedit"
 
-echo "		e : énergie : observable et bunching"
-	echo "		a : inverse de l'activité : observable et bunching"
-	echo "		s : snapshot : 2D et 3D"
-	read plot_choix
+echo "		s : solo"
+echo "		m : multi"
+
+
+read plot_choix
 	
 	case ${plot_choix} in
 	
-		e) Scripts/Plots/plot_eTot.sh ;;
-		a) Scripts/Plots/plot_activInv.sh ;;
-		s) Scripts/Plots/plot_snaps.sh ;;
+		s) echo "s : solo"
+			echo "	Pour y accéder : load Plots/Solo."
+			echo "	Initialiser avec load Plots/Solo/init.p"
+			echo "	Appuyez sur une touche."
+			read
+			gnuplot ;;
+			
+		m) echo "m : multi"
+			echo "	Pour y accéder : load Plots/Multi."
+			echo "	Modifier le chemin d'accès : Plots/Multi/location.p"
+			${editeur} Plots/Multi/location.p&
+			echo "	Appuyez sur une touche."
+			read
+			gnuplot ;;
+			
 		*) echo "		Je n'ai pas compris." ;;
 	
 esac

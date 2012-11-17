@@ -8,7 +8,7 @@ potChi_stat_script="potChi_stats_var.sh"
 cd ${dataFold}
 
 	inFold="[approx]Rho_cst_LNCol_var_grand"
-	outFold="Rho_cst"	
+	outFold="Rho_cst"
 	
 	cd ${inFold}
 
