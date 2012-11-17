@@ -50,3 +50,7 @@
 	
 17 11 12
 	13:24 : Je vais lancer les runs des sphères dures + attract/repuls pour N=400.
+	14:25 : Attention : 
+		xMC_Cano_N1->5 : HS
+		xMC_Cano_N6 : repuls
+		xMC_Cano_N7 : attract
