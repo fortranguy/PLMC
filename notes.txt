@@ -54,3 +54,7 @@
 		xMC_Cano_N1->5 : HS
 		xMC_Cano_N6 : repuls
 		xMC_Cano_N7 : attract
+
+18 11 12
+	1:04 : Un problème de bord de tableau (rTab11) a été réglé. Cela a peut-être
+		biaisé les résultats précédents.
