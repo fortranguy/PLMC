@@ -218,7 +218,7 @@ implicit none
         real(DP) :: coeff
         real(DP) :: ePot
        
-        if (r <= rcut11) then
+        if (r < rcut11) then
        
             i = int(r/rcut11*real(Ntab11, DP))
             coeff = (r-rTab11(i))/(rTab11(i+1)-rTab11(i))
