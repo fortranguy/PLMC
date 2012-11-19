@@ -1,0 +1,14 @@
+*~
+fit.log
+Binaries/
+Out/
+Data/
+Plots/*~
+Plots/Solo/location.p
+Scripts/*~
+Scripts/Plots/*~
+Sources/data.f90
+Sources/*~
+Sources/*.mod
+Sources/*.o
+Temp
