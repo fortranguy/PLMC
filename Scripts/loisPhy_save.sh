@@ -1,12 +1,21 @@
 #! /bin/bash
 
 dataFold="Data"
-inFold="Rho_cst_Ncol_80-400_nMove1000"
+inFold="Rho_cst_Ncol_80-400_"
 outFold="Rho_cst"
 
 plotFold="Plots"
 Ndeb=80
 Nfin=400
+
+# Vérification
+
+ls ${dataFold}/${inFold}
+if test $? -ne 0
+then
+	echo "Le dossier ${inFold} n'existe pas dans ${dataFold}."
+	exit
+fi
 
 # Statistiques
 
@@ -47,9 +56,9 @@ cd ${plotFold}
 	
 	cd Multi
 	
-		echo "dataFold='"${dataFold}"'" > location.p
-		echo "dataFold_i='"${inFold}"'" >> location.p
-		echo "outFold='"${outFold}"'" >> location.p
+		echo "dataFold='${dataFold}'" > location.p
+		echo "dataFold_i='${inFold}'" >> location.p
+		echo "outFold='${outFold}'" >> location.p
 		echo "Ndeb="${Ndeb} >> location.p
 		echo "Nfin="${Nfin} >> location.p
 	

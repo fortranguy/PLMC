@@ -1,12 +1,24 @@
 #! /bin/bash
 
+dataFold="Data"
+scriptFold="Scripts"
 editeur="gedit"
 
+# Préparation
+
+cd ${scriptFold}
+	cp loisPhy_save.sh loisPhy.sh
+cd ..
+
+# Modification
+
+echo Contenu de ${dataFold} :
+ls -lrt ${dataFold}
 echo "Modifier le script pour spécifier le chemin des données."
-${editeur} Scripts/loisPhy.sh &
+${editeur} ${scriptFold}/loisPhy.sh &
 echo "Avez-vous spécifier le chemin et le domaine ? (oui/non)"
 read answer
 if [ ${answer} = "oui" ]
 then
-	Scripts/loisPhy.sh
+	${scriptFold}/loisPhy.sh
 fi
