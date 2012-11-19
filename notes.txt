@@ -64,3 +64,8 @@
 		et non |V(rCut)| > 0. Comme, plus de problème de bords ?
 	10:53 : Plus de problème de bords (petites simulations) et même valeurs
 	pour E.* et potChiEx.*
+	11:00 : Ici (labo PLMC) : valeur hors Ntab donne :
+		 size(tab)+1        8001
+ 		tab(size(tab)+1)  2.121995790965272E-314
+ 		aïe et non 0. Dois-je refaire les simulations ? Je ne pense pas.
+
