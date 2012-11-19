@@ -45,7 +45,7 @@
     module data_mc
     use data_constants
     use data_particles
-    integer, parameter :: Nstep = 10**3
+    integer, parameter :: Nstep = 10**5
     integer, parameter :: Ntherm = 4
     integer, parameter :: Nmove = 40*Ncol1 ! new
     real(DP), dimension(Dim) :: dx = 2._DP ! new, à tester ?
