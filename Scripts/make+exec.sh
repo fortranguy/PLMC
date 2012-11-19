@@ -67,6 +67,9 @@ echo ${nSimus} > Temp/nSimus.in
 echo "Paramètre qui varie : "
 read param
 
+echo "Dans combien d'heures voulez-vous lancer les simulations ?"
+read delai
+
 # Création des dossiers pour exécutables :
 
 cd ${binFold}
@@ -143,15 +146,19 @@ cd ${binFold}
 			exec1New=${exec1NewCore}"_"${param}${iSimu}
 			echo "Exécution de "${exec1New}
 			
-			date > dateIni.out
-			time ./${exec1New} ${condIni} &
+			echo "time ./${exec1New} ${condIni}" > exeCmd.out
+		    at -f exeCmd.out now + ${delai} hours
 			if test $? -ne 0
 			then
 				exit
 			fi
+			#utile ?
 			
 		cd ..
 
 	done
 
 cd ..
+
+echo "Liste des simulations en cours : "
+at -l

@@ -50,9 +50,7 @@ cd ${outFold}
 				exit
 			fi
 			
-			# Date
-			echo " Date de lancement : $(cat dateIni.out)" >> rapport.out
-			rm dateIni.out
+			# Dates
 			echo " Dates des snapshots : " >> rapport.out
 				cat snapIni_date.out >> rapport.out
 				rm	snapIni_date.out
