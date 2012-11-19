@@ -12,7 +12,8 @@ Sources/makefile~
 Sources/*.mod
 Sources/*.o
 Temp/
-Data
+Data/
+DataBof/
 menu.sh~
 notes.txt~
 fit.log
