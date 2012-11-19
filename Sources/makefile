@@ -8,7 +8,7 @@ all: $(EXEC1) $(EXEC2)
 
 #----------------------------------------------------------
 
-data.o data_constants.mod data_cell.mod data_particles.mod data_mc.mod \
+data_copy.o data_constants.mod data_cell.mod data_particles.mod data_mc.mod \
 	data_potentiel.mod: data_copy.f90
 	$(FC) $(FFLAGS) -c $<
 	touch $*.o $*.mod
@@ -29,7 +29,7 @@ mod_physique.o: mod_physique.f90
 mc_canonique.o: mc_canonique.f90
 	$(FC) $(LDFLAGS) -c $<
 
-xMC_Canonique: data.o mod_tools.o mod_physique.o mc_canonique.o
+xMC_Canonique: data_copy.o mod_tools.o mod_physique.o mc_canonique.o
 	$(FC) $(LDFLAGS) $^ -o $@
 	
 # ---------------------------
@@ -39,7 +39,7 @@ bunching.o: data_mc.mod data_constants.mod
 bunching.o: bunching.f90
 	$(FC) $(FFLAGS) -c $<
 	
-xBunching: data.o bunching.o
+xBunching: data_copy.o bunching.o
 	$(FC) $^ $(LDFLAGS) -o $@
 
 # ---------------------------------------------------------
