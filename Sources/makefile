@@ -1,5 +1,5 @@
 FC = ifort # gfortran #
-FFLAGS = # -warn all -check all # -W -Wall -fbounds-check #
+FFLAGS =  # -warn all -check all # -W -Wall -fbounds-check #
 LDFLAGS = # -warn all -check all # -W -Wall -fbounds-check #
 EXEC1 = xMC_Canonique
 EXEC2 = xBunching

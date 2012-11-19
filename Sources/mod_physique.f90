@@ -37,7 +37,6 @@ implicit none
             case default
                 write(*, *) "Préciser la condition initiale : "
                 write(*, *) "   'cube' ou 'alea'."
-                stop
         end select
         
         densite = real(Ncol1, DP) / product(Lsize)
@@ -196,13 +195,12 @@ implicit none
     subroutine ePotIni()
    
         integer :: i
-        real(DP) :: r
+        real(DP) :: r_i
        
         do i = iMin, Ntab11
        
-            r = rcut11*real(i, DP)/real(Ntab11, DP)
-            rTab11(i) = r
-            Vtab11(i) = epsilon11*exp(-alpha11*(r-rmin))/r
+            r_i = rcut11*real(i, DP)/real(Ntab11, DP)
+            Vtab11(i) = epsilon11*exp(-alpha11*(r_i-rmin))/r_i
            
         end do
    
@@ -215,14 +213,13 @@ implicit none
         real(DP), intent(in) :: r
        
         integer :: i
-        real(DP) :: coeff
-        real(DP) :: ePot
+        real(DP) :: r_i, ePot
        
         if (r < rcut11) then
        
             i = int(r/rcut11*real(Ntab11, DP))
-            coeff = (r-rTab11(i))/(rTab11(i+1)-rTab11(i))
-            ePot = Vtab11(i) + coeff*(Vtab11(i+1)-Vtab11(i))
+            r_i = rcut11*real(i, DP)/real(Ntab11, DP)
+            ePot = Vtab11(i) + (r-r_i)/pas11 * (Vtab11(i+1)-Vtab11(i))
            
         else
        
