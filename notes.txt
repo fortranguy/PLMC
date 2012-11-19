@@ -68,4 +68,5 @@
 		 size(tab)+1        8001
  		tab(size(tab)+1)  2.121995790965272E-314
  		aïe et non 0. Dois-je refaire les simulations ? Je ne pense pas.
+	14:57 : Réponse de JG : oui !
 

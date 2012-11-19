@@ -16,7 +16,7 @@ echo Contenu de ${dataFold} :
 ls -lrt ${dataFold}
 echo "Modifier le script pour spécifier le chemin des données."
 ${editeur} ${scriptFold}/loisPhy.sh &
-echo "Avez-vous spécifier le chemin et le domaine ? (oui/non)"
+echo "Avez-vous spécifié le chemin et le domaine ? (oui/non)"
 read answer
 if [ ${answer} = "oui" ]
 then
