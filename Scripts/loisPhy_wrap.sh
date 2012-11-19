@@ -7,7 +7,12 @@ editeur="gedit"
 # Préparation
 
 cd ${scriptFold}
-	cp loisPhy_save.sh loisPhy.sh
+	ls loisPhy_copy.sh
+	if test $? -ne 0
+	then
+		echo "loisPhy.sh par défaut."
+		cp loisPhy.sh loisPhy_copy.sh
+	fi
 cd ..
 
 # Modification

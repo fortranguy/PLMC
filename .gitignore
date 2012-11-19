@@ -2,11 +2,11 @@ Binaries/
 Out
 Plots/Solo/*.p~
 Plots/Multi/*.p~
-Plots/Multi/location.p
+Plots/Multi/location_copy.p
 Scripts/*.sh~
-Scripts/loisPhy.sh
+Scripts/loisPhy_copy.sh
 Scripts/Plots/*.sh~
-Sources/data.f90
+Sources/data_copy.f90
 Sources/*.f90~
 Sources/makefile~
 Sources/*.mod

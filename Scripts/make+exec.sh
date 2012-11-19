@@ -88,20 +88,20 @@ cd ..
 
 cd ${srcFold}
 
-	ls data.f90
+	ls data_copy.f90
 	if test $? -ne 0
 	then
 		echo "Fichier data par défaut."
-		cp data_save.f90 data.f90
+		cp data.f90 data_copy.f90
 	fi
 
 	iSimu=0
 	until test ${iSimu} -eq ${nSimus}
 	do
 	
-		${editeur} data.f90&
-		
 		iSimu=$(expr ${iSimu} \+ 1)
+	
+		${editeur} data_copy.f90&
 		
 		status="non"
 		

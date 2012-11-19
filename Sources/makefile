@@ -9,7 +9,7 @@ all: $(EXEC1) $(EXEC2)
 #----------------------------------------------------------
 
 data.o data_constants.mod data_cell.mod data_particles.mod data_mc.mod \
-	data_potentiel.mod: data.f90
+	data_potentiel.mod: data_copy.f90
 	$(FC) $(FFLAGS) -c $<
 	touch $*.o $*.mod
 
