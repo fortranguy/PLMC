@@ -11,6 +11,7 @@ Sources/makefile~
 Sources/*.mod
 Sources/*.o
 Temp/
+Data
 menu.sh~
 notes.txt~
 fit.log
