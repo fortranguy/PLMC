@@ -62,3 +62,5 @@
 19 11 12
 	10:04 : Je vais peut-être changé la définition de rCut : V(rCut) = 0
 		et non |V(rCut)| > 0. Comme, plus de problème de bords ?
+	10:53 : Plus de problème de bords (petites simulations) et même valeurs
+	pour E.* et potChiEx.*
