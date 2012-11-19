@@ -20,10 +20,10 @@ cd ..
 echo Contenu de ${dataFold} :
 ls -lrt ${dataFold}
 echo "Modifier le script pour spécifier le chemin des données."
-${editeur} ${scriptFold}/loisPhy.sh &
+${editeur} ${scriptFold}/loisPhy_copy.sh &
 echo "Avez-vous spécifié le chemin et le domaine ? (oui/non)"
 read answer
 if [ ${answer} = "oui" ]
 then
-	${scriptFold}/loisPhy.sh
+	${scriptFold}/loisPhy_copy.sh
 fi
