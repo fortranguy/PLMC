@@ -19,14 +19,7 @@ read plot_choix
 			
 		m) echo "m : multi"
 			echo "	Pour y accéder : load Plots/Multi."
-			echo "	Modifier le chemin d'accès : Plots/Multi/location.p"
-			${editeur} Plots/Multi/location.p&
-			echo "Avez-vous spécifier le chemin ? (oui/non)"
-			read answer
-			if [ ${answer} = "oui" ]
-			then
-				gnuplot
-			fi ;;
+			gnuplot ;;
 			
 		*) echo "		Je n'ai pas compris." ;;
 	
