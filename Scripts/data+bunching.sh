@@ -81,11 +81,14 @@ cd ..
 # Plot : mauvais endroit ?
 
 cd ${plotFold}
-	cd Solo
+	
+	cd Multi
+	
 		ls location.p
 		if test $? -ne 0
 		then
-			cp SaveLoc/location.p .
+			cp location_save.p location.p
 		fi
+	
 	cd ..
 cd ..

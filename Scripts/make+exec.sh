@@ -16,6 +16,9 @@ exec1NewCore="xMC_Cano"
 # ---------------------------------------------------------
 
 # Préparation
+
+echo "Vérification des données d'une simulation précédente :"
+
 ls ${binFold}
 if test $? -ne 0
 then
@@ -24,7 +27,7 @@ else
 	ls ${binFold}/${binFold_i}*
 	if test $? -eq 0
 	then
-		echo "Nettoyer d'abord "${binFold}"."
+		echo "	Nettoyer d'abord "${binFold}"."
 		exit
 	fi
 fi
@@ -37,7 +40,7 @@ else
 	ls ${outFold}/${outFold_i}*
 	if test $? -eq 0
 	then
-		echo "Nettoyer d'abord "${outFold}"."
+		echo "	Nettoyer d'abord "${outFold}"."
 		exit
 	fi
 fi
@@ -50,7 +53,7 @@ else
 	ls ${tmpFold}/*
 	if test $? -eq 0
 	then
-		echo "Nettoyer d'abord "${tmpFold}"."
+		echo "	Nettoyer d'abord "${tmpFold}"."
 		exit
 	fi
 fi
@@ -88,7 +91,8 @@ cd ${srcFold}
 	ls data.f90
 	if test $? -ne 0
 	then
-		cp SaveData/data.f90 .
+		echo "Fichier data par défaut."
+		cp data_save.f90 data.f90
 	fi
 
 	iSimu=0
