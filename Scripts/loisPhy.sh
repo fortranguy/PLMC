@@ -1,14 +1,13 @@
 #! /bin/bash
 
 dataFold="Data"
+inFold="Rho_cst_Ncol_80-400_nMove1000"
+outFold="Rho_cst"
 
 eTot_stat_script="eTot_stats_var.sh"
 potChi_stat_script="potChi_stats_var.sh"
 
-cd ${dataFold}
-
-	inFold="[approx]Rho_cst_LNCol_var_grand"
-	outFold="Rho_cst"
+cd ${dataFold}	
 	
 	cd ${inFold}
 
