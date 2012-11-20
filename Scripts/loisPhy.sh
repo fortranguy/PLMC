@@ -19,9 +19,6 @@ fi
 
 # Statistiques
 
-eTot_stat_script="eTot_stats_var.sh"
-potChi_stat_script="potChi_stats_var.sh"
-
 cd ${dataFold}	
 	
 	cd ${inFold}
@@ -34,17 +31,24 @@ cd ${dataFold}
 		
 		echo "Energie : statistiques"
 		
-		cp ../../Scripts/Plots/${eTot_stat_script} .
-		./${eTot_stat_script}
-		rm ./${eTot_stat_script}
+		cp ../../Scripts/Plots/eTot_stats_var.sh .
+		./eTot_stats_var.sh
+		rm ./eTot_stats_var.sh
 		
 		echo "Potentiel chimique : statistiques"
 		
-		cp ../../Scripts/Plots/${potChi_stat_script} .
-		./${potChi_stat_script}
-		rm ./${potChi_stat_script}
+		cp ../../Scripts/Plots/eTot_stats_var.sh .
+		./eTot_stats_var.sh
+		rm ./eTot_stats_var.sh
 
 		mv *.out ${outFold}
+		
+		echo "Temps de calcul"
+		
+		cp ../../Scripts/Plots/temps_calc_var.sh .
+		./temps_calc_var.sh
+		rm ./temps_calc_var.sh
+		
 		
 	cd ..
 
