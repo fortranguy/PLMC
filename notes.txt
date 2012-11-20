@@ -72,6 +72,12 @@
 
 20 11 12
     9:54 : Les résultats sont mauvais pour repuls: l'énergie croît et semble 
-        saturer. J'attends encore pour N=400. Hum... c'est aussi mauvair pour
+        saturer. J'attends encore pour N=400. 
+    ?:? : Hum... c'est aussi mauvair pour
         attract : là, l'énergie baisse mais semble toujours converger.
         Les dernières simulations se font attendre.
+    10:57 : Les 3 derniers runs vont bientôt donner leur verdict, j'espère.
+        La redéfinition simple (et normal) de r_i : r_i = i * delta r
+        donne une parfaite superposition entre le potentiel "initial"
+        et celui "en cours". Il est donc valider. J'espère que cela va
+        accélérer les résultats.
