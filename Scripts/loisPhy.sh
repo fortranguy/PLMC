@@ -35,11 +35,19 @@ cd ${dataFold}
 		./eTot_stats_var.sh
 		rm ./eTot_stats_var.sh
 		
-		echo "Potentiel chimique : statistiques"
+		echo "Potentiel chimique : "
 		
-		cp ../../Scripts/Plots/potChi_stats_var.sh .
-		./potChi_stats_var.sh
-		rm ./potChi_stats_var.sh
+		    echo "statistiques"
+		
+		    cp ../../Scripts/Plots/potChi_stats_var.sh .
+		    ./potChi_stats_var.sh
+		    rm ./potChi_stats_var.sh
+		    
+		    echo "HS"
+		    
+		    cp ../../Scripts/Plots/potChi_hs_var.sh .
+		    ./potChi_hs_var.sh
+		    rm ./potChi_hs_var.sh
 		
 		echo "Temps de calcul"
 		
@@ -64,7 +72,7 @@ cd ${plotFold}
 		echo "outFold='${outFold}'" >> location.p
 		echo "Ndeb="${Ndeb} >> location.p
 		echo "Nfin="${Nfin} >> location.p
-	
+	 
 	cd ..
 
 cd ..
