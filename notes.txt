@@ -84,3 +84,9 @@
     15:31 : Les résultats pour HS concordent pas trop mal avec la formule
         théorique (Carnahan et Starling). La décroissance doit être due
         au potentiel chimique idéal : mu_id = ln(rho + 1/volume).
+    16:31 : Je pourrais peut-être récupérer les sorties :
+            Exécution de xMC_Cano_N1
+            warning: commands will be executed using /bin/sh
+            job 319 at 2012-11-20 16:22
+        pour un meilleur contrôle.
+

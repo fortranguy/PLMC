@@ -18,6 +18,9 @@ echo "Copies :"
 find . -name "*copy.f90"
 find . -name "*copy.sh"
 
+echo "Fit :"
+ls fit.log
+
 echo "Etes-vous sûr de vouloir effacer les fichiers ? (oui/non)"
 read status
 	
@@ -29,6 +32,7 @@ then
 	rm -rf ${tmpFold}/*.in
 	find . -name "*copy.f90" -exec rm {} \;
 	find . -name "*copy.sh" -exec rm {} \;
+	rm fit.log
 	
 	echo "Les fichiers ont été effacés."
 	
