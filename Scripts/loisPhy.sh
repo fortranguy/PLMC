@@ -1,7 +1,7 @@
 #! /bin/bash
 
 dataFold="Data"
-inFold="Rho_cst_Ncol_80-400_"
+inFold="RhoCst_N_80-400_"
 outFold="Rho_cst"
 
 plotFold="Plots"
@@ -37,11 +37,9 @@ cd ${dataFold}
 		
 		echo "Potentiel chimique : statistiques"
 		
-		cp ../../Scripts/Plots/eTot_stats_var.sh .
-		./eTot_stats_var.sh
-		rm ./eTot_stats_var.sh
-
-		mv *.out ${outFold}
+		cp ../../Scripts/Plots/potChi_stats_var.sh .
+		./potChi_stats_var.sh
+		rm ./potChi_stats_var.sh
 		
 		echo "Temps de calcul"
 		
@@ -49,6 +47,7 @@ cd ${dataFold}
 		./temps_calc_var.sh
 		rm ./temps_calc_var.sh
 		
+		mv *.out ${outFold}		
 		
 	cd ..
 

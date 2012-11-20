@@ -32,11 +32,8 @@ do
         
         total_heure=$(expr ${delta_jour} \* 24 \+ ${delta_heure})
         total_minute=$(expr ${total_heure} \* 60 \+ ${delta_minute})
-        
-		echo "Ini :" ${jour_ini} ${heure_ini} ${minute_ini}
-		echo "Fin :" ${jour_fin} ${heure_fin} ${minute_fin}
-		echo "Delta" : ${delta_jour} ${delta_heure} ${delta_minute}
-		echo "Total ":  "(${total_heure})" ${total_minute}
+ 
+        echo ${Ncol}"   "${total_minute} >> ../temps_calc.out
 		
 		echo "Rapport n°"${iSimu}" lu."
 		
