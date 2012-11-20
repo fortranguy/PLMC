@@ -13,7 +13,5 @@ a1 = -0.5
 b1 = -1.
 
 plot file u (log($1)):(log($2/$1)) w l, f1(x) w l
-
 fit f1(x) file u (log($1)):(log($2/$1)) via a1, b1
-
 plot file u (log($1)):(log($2/$1)) w l, f1(x) w l
