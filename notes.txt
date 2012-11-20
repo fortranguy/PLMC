@@ -81,3 +81,6 @@
         donne une parfaite superposition entre le potentiel "initial"
         et celui "en cours". Il est donc valider. J'espère que cela va
         accélérer les résultats.
+    15:31 : Les résultats pour HS concordent pas trop mal avec la formule
+        théorique (Carnahan et Starling). La décroissance doit être due
+        au potentiel chimique idéal : mu_id = ln(rho + 1/volume).
