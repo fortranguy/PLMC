@@ -70,3 +70,8 @@
  		aïe et non 0. Dois-je refaire les simulations ? Je ne pense pas.
 	14:57 : Réponse de JG : oui !
 
+20 11 12
+    9:54 : Les résultats sont mauvais pour repuls: l'énergie croît et semble 
+        saturer. J'attends encore pour N=400. Hum... c'est aussi mauvair pour
+        attract : là, l'énergie baisse mais semble toujours converger.
+        Les dernières simulations se font attendre.

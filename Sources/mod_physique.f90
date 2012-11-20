@@ -199,7 +199,7 @@ implicit none
        
         do i = iMin, Ntab11
        
-            r_i = rcut11*real(i, DP)/real(Ntab11, DP)
+            r_i = real(i, DP)*pas11
             Vtab11(i) = epsilon11*exp(-alpha11*(r_i-rmin))/r_i
            
         end do
@@ -218,7 +218,7 @@ implicit none
         if (r < rcut11) then
        
             i = int(r/rcut11*real(Ntab11, DP))
-            r_i = rcut11*real(i, DP)/real(Ntab11, DP)
+            r_i = real(i, DP)*pas11
             ePot = Vtab11(i) + (r-r_i)/pas11 * (Vtab11(i+1)-Vtab11(i))
            
         else
