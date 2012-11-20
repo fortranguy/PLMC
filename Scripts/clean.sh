@@ -14,6 +14,10 @@ ls ${outFold}
 echo ${tmpFold}":" 
 ls ${tmpFold}
 
+echo "Copies :"
+find . -name "*copy.f90"
+find . -name "*copy.sh"
+
 echo "Etes-vous sûr de vouloir effacer les fichiers ? (oui/non)"
 read status
 	
@@ -23,7 +27,8 @@ then
 	rm -rf ${binFold}/${binFold_i}*
 	rm -rf ${outFold}/${outFold_i}*
 	rm -rf ${tmpFold}/*.in
-	#rm -rf ${tmpFold}/*.out
+	find . -name "*copy.f90" -exec rm {} \;
+	find . -name "*copy.sh" -exec rm {} \;
 	
 	echo "Les fichiers ont été effacés."
 	
