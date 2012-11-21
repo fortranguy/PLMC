@@ -75,18 +75,3 @@ cd ${outFold}
 	done
 
 cd ..
-
-# Plot : mauvais endroit ?
-
-cd ${plotFold}
-	
-	cd Multi
-		
-		ls potChi_moy_var_copy.p
-		if test $? -ne 0
-		then
-			cp potChi_moy_var.p potChi_moy_var_copy.p
-		fi
-	
-	cd ..
-cd ..
