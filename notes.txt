@@ -90,3 +90,12 @@
             job 319 at 2012-11-20 16:22
         pour un meilleur contrôle.
 
+21 11 12
+    12:22 : Les résultats pour Ncol in {80, 800} confirme la saturation.
+        Mais le compromis se ressent : il n'y a pas de droite qui passe
+        par toutes les barres d'erreur pour l'énergie.
+        Mais est-qu'on attendrait enfin la limite thermo à Ncol >= 400 ?
+        
+        Je suis étonné que l'erreur sur l'inverse de l'activité d'excès
+        soit aussi petite (1e-4). Dans un branche, j'ai inversé les valeurs
+        dans le programme de bunching. J'ai les <<mêmes>> valeurs. Donc OK.
