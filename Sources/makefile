@@ -8,6 +8,9 @@ all: $(EXEC1) $(EXEC2)
 
 #----------------------------------------------------------
 
+data_copy.f90:
+	cp data.f90 data_copy.f90
+
 data_copy.o data_constants.mod data_cell.mod data_particles.mod data_mc.mod \
 	data_potentiel.mod: data_copy.f90
 	$(FC) $(FFLAGS) -c $<
@@ -45,8 +48,8 @@ xBunching: data_copy.o bunching.o
 # ---------------------------------------------------------
 	
 clean:
-	rm -rf *.o data_cell.mod data_particles.mod data_mc.mod \
+	rm -f *.o data_cell.mod data_particles.mod data_mc.mod \
 		data_potentiel.mod data_constants.mod
 	
 mrproper: clean
-	rm -rf *.mod
+	rm -f data_copy.f90 *.mod $(EXEC1) $(EXEC2) 
