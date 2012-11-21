@@ -81,11 +81,11 @@ cd ..
 cd ${plotFold}
 	
 	cd Multi
-	
-		ls location.p
+		
+		ls potChi_moy_var_copy.p
 		if test $? -ne 0
 		then
-			cp location_save.p location.p
+			cp potChi_moy_var.p potChi_moy_var_copy.p
 		fi
 	
 	cd ..

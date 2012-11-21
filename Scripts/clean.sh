@@ -15,8 +15,10 @@ echo ${tmpFold}":"
 ls ${tmpFold}
 
 echo "Copies :"
-find . -name "*copy.f90"
-find . -name "*copy.sh"
+find Sources -name "*copy.f90"
+find Scripts -name "*copy.sh"
+find Plots -name "*copy.p"
+find Plots/Multi -name "location.p"
 
 echo "Fit :"
 ls fit.log
@@ -30,8 +32,12 @@ then
 	rm -rf ${binFold}/${binFold_i}*
 	rm -rf ${outFold}/${outFold_i}*
 	rm -rf ${tmpFold}/*.in
-	find . -name "*copy.f90" -exec rm {} \;
-	find . -name "*copy.sh" -exec rm {} \;
+
+	find Sources -name "*copy.f90" -exec rm {} \;
+    find Scripts -name "*copy.sh" -exec rm {} \;
+    find Plots -name "*copy.p" -exec rm {} \;
+    find Plots/Multi -name "location.p" -exec rm {} \;
+    
 	rm fit.log
 	
 	echo "Les fichiers ont été effacés."
