@@ -2,6 +2,7 @@ Binaries/
 Out
 Plots/Solo/*.p~
 Plots/Multi/*.p~
+Plots/Multi/potChi_moy_var_copy.p
 Plots/Multi/location.p
 Scripts/*.sh~
 Scripts/loisPhy_copy.sh
