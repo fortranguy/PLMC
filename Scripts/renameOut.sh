@@ -4,6 +4,10 @@ outBin_i="Out"
 
 echo "Décalage : Out1 -> Outi, i entier"
 
+echo "Création d'une sauvegarde :"
+cp -r Out SaveOut_$(date +%F)
+ls SaveOut_$(date +%F)
+
 cd Out
 
 	listOut=$(ls |sort -n)
@@ -65,5 +69,5 @@ cd Out
 		iSimuDecal=$(expr ${iSimuDecal} \+ 1)
 	
 	done
-
+	
 cd ..
