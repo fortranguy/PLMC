@@ -192,27 +192,6 @@ implicit none
     
     ! Energie potentielle -----------------------------------------------------
    
-    subroutine ePotIni()
-   
-        integer :: i
-        real(DP) :: r_i
-       
-		! cut
-        do i = iMin, Ntab11
-       
-            r_i = real(i, DP)*pas11
-            Vtab11(i) = epsilon11*exp(-alpha11*(r_i-rmin))/r_i
-           
-        end do
-        
-        ! shift
-        
-        Vtab11(:) = Vtab11(:) - epsilon11*exp(-alpha11*(rcut11-rmin))/rcut11
-   
-    end subroutine ePotIni
-   
-    ! ---------------------------------
-   
     function ePot(r)
    
         real(DP), intent(in) :: r
