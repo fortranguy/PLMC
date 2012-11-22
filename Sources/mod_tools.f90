@@ -4,7 +4,9 @@ use data_particles
 use data_mc
 use data_potentiel
 use data_constants
-    
+
+implicit none
+
     contains
 
     ! Générateurs de nombres aléatoires : graine ------------------------------
