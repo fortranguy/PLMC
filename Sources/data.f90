@@ -170,7 +170,7 @@ use data_constants
     integer, parameter :: Ntab11 = int(rcut11*surpas11) ! new
     integer, parameter :: iMin = int( rmin/rcut11*real(Ntab11, DP) ) ! new
     real(DP), dimension(iMin:Ntab11), protected :: Vtab11
-    real(DP), parameter :: epsilon11 = 0._DP, alpha11 = 5._DP ! new
+    real(DP), parameter :: epsilon11 = 1._DP, alpha11 = 5._DP ! new
     
 contains
     
