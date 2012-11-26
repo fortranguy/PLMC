@@ -220,22 +220,87 @@ implicit none
     
         integer, intent(in) :: iOld
         real(DP), dimension(Dim), intent(in) :: xNew
-        logical, intent(inout) :: overlap
-        real(DP), intent(inout) :: dEn
+        logical, intent(out) :: overlap
+        real(DP), intent(out) :: dEn
         
         integer :: jPart
         real(DP), dimension(Dim) :: DeltaXnew, DeltaXold
         real(DP) rNew, rOld
-        integer :: iOld_cell
+        integer :: iCell_old, iCell_new, iCell_neigh
+        integer :: iNeigh
+        type(Particle), pointer :: courant => null(), suivant => null()
+        real(DP) :: eNew, eOld
         
         overlap = .false.
         dEn = 0._DP
         
         !---
-        iOld_cell = col_to_cell(iOld)
+        !New
+        
+        eNew = 0._DP
+        
+        iCell_new = position_to_cell(xNew)
         
         do iNeigh = 1, cell_neighs_nb
         
+            iCell_neigh = cell_neighs(iCell_new, neigh)
+            
+            courant => cellsBegin(iCell_neigh)%particle
+            
+            do
+            
+                suivant => courant%next
+            
+                if (courant%iCol /= 0 .and. courant%iCol /= iCol) then
+                    DeltaXnew(:) = X(:, courant%iCol) - xNew(:)
+                    call pbc_dif(DeltaXnew)
+                    rNew = sqrt(dot_product(DeltaXnew, DeltaXnew))
+                    if (rNew < rmin) then
+                        overlap = .true.
+                        return
+                    end if
+                    eNew = eNew + ePot(rNew)
+       
+                end if
+                    
+                courant => suivant
+
+                if (.not. associated(suivant%next)) exit
+            
+            end do            
+            
+        end do
+        
+        ! Old
+        
+        eOld = 0._DP
+        
+        iCell_old = col_to_cell(iOld)
+        
+        do iNeigh = 1, cell_neighs_nb
+        
+            iCell_neigh = cell_neighs(iCell_old, neigh)
+            
+            courant => cellsBegin(iCell_neigh)%particle
+            
+            do
+            
+                suivant => courant%next
+            
+                if (courant%iCol /= 0 .and. courant%iCol /= iCol) then
+                    DeltaXold(:) = X(:, courant%iCol) - X(:, iOld)
+                    call pbc_dif(DeltaXold)
+                    rOld = sqrt(dot_product(DeltaXold, DeltaXold))
+                    eOld = eOld + ePot(rOld)
+       
+                end if
+                    
+                courant => suivant
+
+                if (.not. associated(suivant%next)) exit
+            
+            end do            
+            
         end do
         
         !---

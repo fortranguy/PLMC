@@ -22,6 +22,18 @@ contains
     
     end function col_to_cell
     
+    function position_to_cell(pos)
+    
+        real(DP), dimension(Dim), intent(in) :: pos
+        integer, dimension(Dim) :: cell_coord
+        integer :: position_to_cell
+    
+        cell_coord = int( pos(:)/cell_Lsize(:) ) + 1
+        position_to_cell = cell_coord(1) + cell_coordMax(1) * (cell_coord(2)-1)&
+            + cell_coordMax(1)*cell_coordMax(2)*(cell_coord(3)-1)
+    
+    end function position_to_cell
+    
     subroutine all_col_to_cell()
     
         integer :: iCol
@@ -168,7 +180,6 @@ contains
         integer :: i, j, k, ind
         integer :: neigh_i, neigh_j, neigh_k, neigh_ind, neigh_center_ind
         integer, dimension(dim) :: coord, neigh_coord
-        integer, dimension(product(cell_coordMax)) :: local_neighs
         
         do i = 1, cell_iMax
         do j = 1, cell_jMax
@@ -192,20 +203,11 @@ contains
                 
                 coord(:) = [i, j, k] + neigh_coord(:)
                 
-                local_neighs(neigh_ind) = cell_coord_to_ind( cell_period(&
+                cell_neighs(ind, neigh_ind) = cell_coord_to_ind( cell_period(&
                     coord(:)) )
                     
             end do
             end do
-            end do
- 
-            do neigh_ind = 1, neigh_center_ind-1
-                cell_neighs(ind, neigh_ind) = local_neighs(neigh_ind)
-            end do
-            
-            do neigh_ind = neigh_center_ind+1, cell_neigh_iMax*cell_neigh_jMax*&
-                cell_neigh_kMax
-                cell_neighs(ind, neigh_ind-1) = local_neighs(neigh_ind)
             end do
         
         end do

@@ -62,7 +62,7 @@ use data_cell
     integer, dimension(dim), parameter :: cell_neigh_coordMax = &
         [cell_neigh_iMax, cell_neigh_jMax, cell_neigh_kMax]
     integer, parameter :: cell_neighs_nb = &
-        cell_neigh_iMax*cell_neigh_jMax*cell_neigh_kMax - 1
+        cell_neigh_iMax*cell_neigh_jMax*cell_neigh_kMax ! inclus soi-mêm
     integer, dimension(cell_iMax*cell_jMax*cell_kMax, cell_neighs_nb) :: &
         cell_neighs
     
