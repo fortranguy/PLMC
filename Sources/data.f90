@@ -132,7 +132,7 @@ module data_particles
     use data_constants
     real(DP), parameter :: rayon1 = .5_DP
     real(DP), parameter :: rmin = 1._DP
-    integer, parameter ::  Ncol1 = 64 ! Vs Ncolmax
+    integer, parameter ::  Ncol1 = 80 ! Vs Ncolmax
     integer, parameter :: Ncolmax = 5000 
     real(DP), dimension(Dim, Ncolmax) :: X
 end module data_particles
@@ -146,10 +146,10 @@ end module data_particles
 module data_mc
     use data_constants
     use data_particles
-    integer, parameter :: Nstep = 10**1
-    integer, parameter :: Ntherm = 0
-    integer, parameter :: Nmove = 1 !4*Ncol1 ! new
-    real(DP), dimension(Dim) :: dx = 3._DP ! new, à tester ?
+    integer, parameter :: Nstep = 10**5
+    integer, parameter :: Ntherm = 4
+    integer, parameter :: Nmove = 40*Ncol1 ! new
+    real(DP), dimension(Dim) :: dx = 2._DP ! new, à tester ?
 end module data_mc
 !***********************************************************************
 
