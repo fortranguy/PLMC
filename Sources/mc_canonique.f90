@@ -99,4 +99,6 @@ implicit none
         call snapShot(unitSnapFin)
     close(unitSnapFin)
     
+    call deallocCells()
+    
 end program mc_cano
