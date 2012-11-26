@@ -234,6 +234,10 @@ implicit none
         !---
         iOld_cell = col_to_cell(iOld)
         
+        do iNeigh = 1, cell_neighs_nb
+        
+        end do
+        
         !---
         
         do jPart = 1, Ncol1
