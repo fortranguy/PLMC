@@ -281,8 +281,7 @@ implicit none
         call ePotNeigh(iOld, xNew, iCell, overlap, eNew)
         if (overlap) then
             return !!!
-        end if
-        
+        end if        
         
         ! Old
         
