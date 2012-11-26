@@ -171,7 +171,7 @@ contains
     
     end function cell_period
     
-    subroutine cell_neighs_ini()
+    subroutine ini_cell_neighs()
     
         integer :: i, j, k, ind
         integer :: neigh_i, neigh_j, neigh_k, neigh_ind, neigh_center_ind
@@ -210,6 +210,6 @@ contains
         end do
         end do
             
-    end subroutine cell_neighs_ini
+    end subroutine ini_cell_neighs
 
 end module mod_neighbours

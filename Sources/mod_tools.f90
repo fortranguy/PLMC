@@ -1,5 +1,6 @@
 module mod_tools
 
+use data_neighbours
 use data_particles
 use data_mc
 use data_potentiel
@@ -42,6 +43,54 @@ implicit none
 
     end subroutine
     
+    ! Vérification de la taille des cellules (voisines)
+    
+    subroutine check_CellsSize()
+        
+        integer :: iDir
+        
+        do iDir = 1, Dim
+        
+            if (cell_Lsize(iDir) < rcut11) then
+                write(*, *) "Cellule trop petite dans la direction", iDir, "."
+                stop
+            end if
+            
+            if (cell_coordMax(iDir) < cell_neigh_coordMax(iDir)) then
+                write(*, *) "Trop peu de cellules dans la direction", iDir, "."
+            end if
+            
+        end do
+        
+    end subroutine check_CellsSize
+    
+    ! Rapport -----------------------------------------------------------------
+    
+    subroutine rapport(nWidom, Lratio, unitRapport)
+    
+        integer, intent(in) :: nWidom
+        real(DP), intent(in) :: Lratio
+        integer, intent(in) :: unitRapport    
+        
+        write(unitRapport, *) "Simulation MC_C :"
+        write(unitRapport ,*) "    Lsize(:) = ", Lsize(:)
+        write(unitRapport ,*) "    Vol = ", product(Lsize)
+        write(unitRapport ,*) "    Ncol1 = ", Ncol1
+        write(unitRapport ,*) "    nWidom = ", nWidom
+        write(unitRapport ,*) "    Lratio = ", Lratio
+        write(unitRapport, *) "    Nstep = ", Nstep
+        write(unitRapport, *) "    Ntherm = ", Ntherm
+        write(unitRapport, *) "    Nmove = ", Nmove
+        write(unitRapport, *) "    dx(:) = ", dx(:)
+        write(unitRapport, *) "    epsilon11 = ", epsilon11
+        write(unitRapport, *) "    alpha11 = ", alpha11
+        write(unitRapport, *) "    rcut11 = ", rcut11
+        write(unitRapport, *) "    surpas11 = ", surpas11
+        write(unitRapport, *) "    cell_coordMax(:) = ", cell_coordMax(:)
+        write(unitRapport, *) "    cell_Lsize(:) = ", cell_Lsize(:)
+        
+    end subroutine rapport
+    
     ! Résultats ---------------------------------------------------------------
         
     subroutine mcResults(enTotSum, activExInvSum, tauxRejects, unitRapport)
@@ -68,31 +117,6 @@ implicit none
             tauxRejects/real(Nstep+Ntherm, DP)
     
     end subroutine mcResults
-    
-    ! Rapport -----------------------------------------------------------------
-    
-    subroutine rapport(nWidom, Lratio, unitRapport)
-    
-        integer, intent(in) :: nWidom
-        real(DP), intent(in) :: Lratio
-        integer, intent(in) :: unitRapport    
-        
-        write(unitRapport, *) "Simulation MC_C :"
-        write(unitRapport ,*) "    Lsize(:) = ", Lsize(:)
-        write(unitRapport ,*) "    Vol = ", product(Lsize)
-        write(unitRapport ,*) "    Ncol1 = ", Ncol1
-        write(unitRapport ,*) "    nWidom = ", nWidom
-        write(unitRapport ,*) "    Lratio = ", Lratio
-        write(unitRapport, *) "    Nstep = ", Nstep
-        write(unitRapport, *) "    Ntherm = ", Ntherm
-        write(unitRapport, *) "    Nmove = ", Nmove
-        write(unitRapport, *) "    dx(:) = ", dx(:)
-        write(unitRapport, *) "    epsilon11 = ", epsilon11
-        write(unitRapport, *) "    alpha11 = ", alpha11
-        write(unitRapport, *) "    rcut11 = ", rcut11
-        write(unitRapport, *) "    surpas11 = ", surpas11
-        
-    end subroutine rapport
     
 end module mod_tools
     

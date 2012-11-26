@@ -28,7 +28,7 @@ use data_constants
     
 end module data_cell
 !***********************************************************************
-!* MODULE: Constants                                                   *
+!* MODULE: Neighbours                                                  *
 !***********************************************************************
 module data_neighbours
 
@@ -58,7 +58,8 @@ use data_cell
                                             !Attention : ne pas déplacer.
     ! Voisins
     integer, parameter :: cell_neigh_iMax = 3, &
-        cell_neigh_jMax = cell_neigh_iMax, cell_neigh_kMax = 3 ! évident
+        cell_neigh_jMax = cell_neigh_iMax, &
+        cell_neigh_kMax = cell_neigh_iMax ! évident
     integer, dimension(dim), parameter :: cell_neigh_coordMax = &
         [cell_neigh_iMax, cell_neigh_jMax, cell_neigh_kMax]
     integer, parameter :: cell_neighs_nb = &
@@ -70,7 +71,7 @@ contains
     
     ! Allocation
     
-    subroutine allocCells()
+    subroutine alloc_Cells()
     
         integer :: iCell, nCells
         
@@ -93,7 +94,7 @@ contains
     
         end do
         
-    end subroutine allocCells
+    end subroutine alloc_Cells
     
     ! Libération
     
@@ -108,7 +109,7 @@ contains
         
     end subroutine libere_chaine
     
-    subroutine deallocCells()
+    subroutine dealloc_Cells()
     
         integer :: iCell
         integer :: nCells = cell_coordMax(1)*cell_coordMax(2)*cell_coordMax(3)
@@ -119,7 +120,7 @@ contains
             end if
         end do
     
-    end subroutine deallocCells
+    end subroutine dealloc_Cells
     
 end module data_neighbours
 !***********************************************************************
@@ -183,6 +184,7 @@ contains
             r_i = real(i, DP)*pas11
             Vtab11(i) = epsilon11*exp(-alpha11*(r_i-rmin))/r_i           
         end do
+            ! problème pour V(rcut) ?
         
         ! shift        
         Vtab11(:) = Vtab11(:) - epsilon11*exp(-alpha11*(rcut11-rmin))/rcut11

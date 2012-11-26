@@ -44,9 +44,10 @@ implicit none
     enTot = enTotCalc()
     
     ! Table des voisins
-    call allocCells()
+    call check_CellsSize()
+    call alloc_Cells()
     call all_col_to_cell()
-    call cell_neighs_ini()
+    call ini_cell_neighs()
     
 ! Milieu --------------------------------------------------
 
@@ -99,6 +100,6 @@ implicit none
         call snapShot(unitSnapFin)
     close(unitSnapFin)
     
-    call deallocCells()
+    call dealloc_Cells()
     
 end program mc_cano
