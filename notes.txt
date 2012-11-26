@@ -99,3 +99,6 @@
         Je suis étonné que l'erreur sur l'inverse de l'activité d'excès
         soit aussi petite (1e-4). Dans un branche, j'ai inversé les valeurs
         dans le programme de bunching. J'ai les <<mêmes>> valeurs. Donc OK.
+        
+26 11 12
+    12:15 : Sources : if old et new dans la même cellule ?

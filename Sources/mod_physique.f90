@@ -212,7 +212,55 @@ implicit none
            
         end if
    
-    end function ePot   
+    end function ePot
+    
+    subroutine ePotNeigh(iCol, pos, iCell, overlap, energ)
+        
+        integer, intent(in) :: iCol, iCell
+        real(DP), dimension(Dim), intent(in) :: pos
+        logical, intent(out) :: overlap
+        real(DP), intent(out) :: energ
+    
+        integer :: iNeigh,  iCell_neigh
+        real(DP), dimension(Dim) :: DeltaX
+        real(DP) :: r
+    
+        type(Particle), pointer :: courant => null(), suivant => null()
+        
+        overlap = .false.
+        energ = 0._DP
+    
+        do iNeigh = 1, cell_neighs_nb
+        
+            iCell_neigh = cell_neighs(iCell, iNeigh)
+            
+            courant => cellsBegin(iCell_neigh)%particle
+            
+            do
+            
+                suivant => courant%next
+            
+                if (courant%iCol /= 0 .and. courant%iCol /= iCol) then
+                    DeltaX(:) = X(:, courant%iCol) - pos(:)
+                    call pbc_dif(DeltaX)
+                    r = sqrt(dot_product(DeltaX, DeltaX))
+                    if (r < rmin) then
+                        overlap = .true.
+                        return
+                    end if
+                    energ = energ + ePot(r)
+       
+                end if
+                    
+                courant => suivant
+
+                if (.not. associated(suivant%next)) exit
+            
+            end do            
+            
+        end do
+    
+    end subroutine ePotNeigh
    
     ! ---------------------------------
     
@@ -223,107 +271,25 @@ implicit none
         logical, intent(out) :: overlap
         real(DP), intent(out) :: dEn
         
-        integer :: jPart
-        real(DP), dimension(Dim) :: DeltaXnew, DeltaXold
-        real(DP) rNew, rOld
-        integer :: iCell_old, iCell_new, iCell_neigh
-        integer :: iNeigh
-        type(Particle), pointer :: courant => null(), suivant => null()
-        real(DP) :: eNew, eOld
-        
-        overlap = .false.
-        dEn = 0._DP
+        integer :: iCell       
+        real(DP) :: eNew, eOld        
         
         !---
         !New
+   
+        iCell = position_to_cell(xNew)
+        call ePotNeigh(iOld, xNew, iCell, overlap, eNew)
+        if (overlap) then
+            return !!!
+        end if
         
-        eNew = 0._DP
-        
-        iCell_new = position_to_cell(xNew)
-        
-        do iNeigh = 1, cell_neighs_nb
-        
-            iCell_neigh = cell_neighs(iCell_new, neigh)
-            
-            courant => cellsBegin(iCell_neigh)%particle
-            
-            do
-            
-                suivant => courant%next
-            
-                if (courant%iCol /= 0 .and. courant%iCol /= iCol) then
-                    DeltaXnew(:) = X(:, courant%iCol) - xNew(:)
-                    call pbc_dif(DeltaXnew)
-                    rNew = sqrt(dot_product(DeltaXnew, DeltaXnew))
-                    if (rNew < rmin) then
-                        overlap = .true.
-                        return
-                    end if
-                    eNew = eNew + ePot(rNew)
-       
-                end if
-                    
-                courant => suivant
-
-                if (.not. associated(suivant%next)) exit
-            
-            end do            
-            
-        end do
         
         ! Old
         
-        eOld = 0._DP
+        iCell = col_to_cell(iOld)
+        call ePotNeigh(iOld, x(:, iOld), iCell, overlap, eOld)
         
-        iCell_old = col_to_cell(iOld)
-        
-        do iNeigh = 1, cell_neighs_nb
-        
-            iCell_neigh = cell_neighs(iCell_old, neigh)
-            
-            courant => cellsBegin(iCell_neigh)%particle
-            
-            do
-            
-                suivant => courant%next
-            
-                if (courant%iCol /= 0 .and. courant%iCol /= iCol) then
-                    DeltaXold(:) = X(:, courant%iCol) - X(:, iOld)
-                    call pbc_dif(DeltaXold)
-                    rOld = sqrt(dot_product(DeltaXold, DeltaXold))
-                    eOld = eOld + ePot(rOld)
-       
-                end if
-                    
-                courant => suivant
-
-                if (.not. associated(suivant%next)) exit
-            
-            end do            
-            
-        end do
-        
-        !---
-        
-        do jPart = 1, Ncol1
-            if (jPart /= iOld) then
-            
-                DeltaXnew(:) = X(:, jPart) - xNew(:)
-                call pbc_dif(DeltaXnew)
-                DeltaXold(:) = X(:, jPart) - X(:, iOld)
-                call pbc_dif(DeltaXold)
-                
-                rNew = sqrt(dot_product(DeltaXnew, DeltaXnew))
-                if (rNew < rmin) then
-                    overlap = .true.
-                    return
-                end if                
-                rOld = sqrt(dot_product(DeltaXold, DeltaXold))
-                
-                dEn = dEn + ePot(rNew) - ePot(rOld)    
-            
-            end if
-        end do
+        dEn = eNew - eOld
     
     end subroutine ePotDif
     
