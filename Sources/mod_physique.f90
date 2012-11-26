@@ -273,9 +273,8 @@ implicit none
         integer :: iOld
         real(DP) :: rand
         real(DP), dimension(Dim) :: xNew
-        real(DP) :: dEn
-        integer :: iCellBefore, iCellAfter    
-        real(DP) :: eNew, eOld
+        integer :: iCellBefore, iCellAfter
+        real(DP) :: eNew, eOld, dEn
         
         call random_number(rand)
         iOld = int(rand*Ncol1) + 1
@@ -310,39 +309,7 @@ implicit none
     end subroutine mcMove
     
     ! Méthode de Widom --------------------------------------------------------
-    
-    subroutine ePotTest(xTest, overlap, enTest)
 
-        real(DP), dimension(Dim), intent(in) :: xTest
-        real(DP), intent(inout) :: enTest
-        logical, intent(inout) :: overlap
-        
-        integer :: iPart
-        real(DP), dimension(Dim) :: DeltaXtest
-        real(DP) :: rTest
-        
-        overlap = .false.
-        enTest = 0._DP
-        
-            do iPart = 1, Ncol1
-                
-                DeltaXtest(:) = X(:, iPart) - xTest(:)
-                call pbc_dif(DeltaXtest)
-                        
-                rTest = sqrt(dot_product(DeltaXtest, DeltaXtest))
-                if (rTest < rmin) then
-                    overlap = .true.
-                    return
-                end if
-                
-                enTest = enTest + ePot(rTest)   
-                
-            end do
-        
-    end subroutine ePotTest
-        
-    ! ---------------------------------
-    
     subroutine widom(nWidom, Lratio, activExInv)
         
         integer, intent(in) :: nWidom
@@ -352,6 +319,7 @@ implicit none
         integer :: iWid
         real(DP) :: widTestSum
         real(DP), dimension(Dim) :: xTest
+        integer :: iCellTest
         logical :: overlap        
         real(DP) :: enTest
         
@@ -360,8 +328,9 @@ implicit none
         do iWid = 1, nWidom           
             
             call random_number(xTest)
-            xTest(:) = Lratio*Lsize(:) * xTest(:)            
-            call ePotTest(xTest, overlap, enTest)
+            xTest(:) = Lratio*Lsize(:) * xTest(:)    
+            iCellTest = position_to_cell(xTest)
+            call ePotNeigh(0, xTest, iCellTest, overlap, enTest) 
             
             if (.not. overlap) then
                 widTestSum = widTestSum + exp(-enTest/Tstar)
