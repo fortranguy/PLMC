@@ -18,9 +18,9 @@ module data_cell
 use data_constants
     
     integer, parameter :: Dim = 3
-    real(DP), parameter :: Lsize1 = 8._DP
+    real(DP), parameter :: Lsize1 = 12._DP
     real(DP), parameter :: Lsize2 = Lsize1
-    real(DP), parameter :: Lsize3 = 8._DP
+    real(DP), parameter :: Lsize3 = 12._DP
     real(DP), dimension(Dim), parameter :: Lsize = &
         [Lsize1, Lsize2, Lsize3]
     real(DP), dimension(Dim), parameter :: LsizeMi = 0.5_DP * Lsize
@@ -45,7 +45,7 @@ use data_cell
     end type ContainerParticle
     
     ! Cellules
-    integer, parameter :: cell_iMax = 8, cell_jMax = cell_iMax, cell_kMax = 8
+    integer, parameter :: cell_iMax = 3, cell_jMax = cell_iMax, cell_kMax = 3
     integer, dimension(dim), parameter :: cell_coordMax = &
         [cell_iMax, cell_jMax, cell_kMax]
     real, parameter :: cell_Lsize1 = Lsize1/real(cell_iMax), &
@@ -148,9 +148,9 @@ module data_mc
     use data_constants
     use data_particles
     integer, parameter :: Nstep = 10**5
-    integer, parameter :: Ntherm = 4
-    integer, parameter :: Nmove = 40*Ncol1 ! new
-    real(DP), dimension(Dim) :: dx = 2._DP ! new, à tester ?
+    integer, parameter :: Ntherm = 40
+    integer, parameter :: Nmove = 4*Ncol1 ! new
+    real(DP), dimension(Dim) :: dx = 3._DP ! new, à tester ?
 end module data_mc
 !***********************************************************************
 

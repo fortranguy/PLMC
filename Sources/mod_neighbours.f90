@@ -3,10 +3,35 @@ module mod_neighbours
 use data_cell
 use data_neighbours
 use data_particles
+use data_potentiel
 
 implicit none
 
 contains
+
+    ! Vérification de la taille des cellules (voisines)
+    
+    subroutine check_CellsSize()
+        
+        integer :: iDir
+        
+        do iDir = 1, Dim
+        
+            if (cell_Lsize(iDir) < rcut11) then
+                write(*, *) "Cellule trop petite dans la direction", iDir, ":"
+                write(*, *) cell_Lsize(iDir), "<", rcut11
+                stop
+            end if
+            
+            if (cell_coordMax(iDir) < cell_neigh_coordMax(iDir)) then
+                write(*, *) "Trop peu de cellules dans la direction", iDir, ":"
+                write(*, *) cell_coordMax(iDir), "<", cell_neigh_coordMax(iDir)
+                stop
+            end if
+            
+        end do
+        
+    end subroutine check_CellsSize
     
     ! Assignation : particule -> cellule
     

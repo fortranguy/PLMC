@@ -43,27 +43,6 @@ implicit none
 
     end subroutine
     
-    ! Vérification de la taille des cellules (voisines)
-    
-    subroutine check_CellsSize()
-        
-        integer :: iDir
-        
-        do iDir = 1, Dim
-        
-            if (cell_Lsize(iDir) < rcut11) then
-                write(*, *) "Cellule trop petite dans la direction", iDir, "."
-                stop
-            end if
-            
-            if (cell_coordMax(iDir) < cell_neigh_coordMax(iDir)) then
-                write(*, *) "Trop peu de cellules dans la direction", iDir, "."
-            end if
-            
-        end do
-        
-    end subroutine check_CellsSize
-    
     ! Rapport -----------------------------------------------------------------
     
     subroutine rapport(nWidom, Lratio, unitRapport)
