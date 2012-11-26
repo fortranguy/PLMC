@@ -68,7 +68,7 @@ use data_cell
     
 contains
     
-    ! Initialisation : ! Bien ici ? Libération ?
+    ! Allocation
     
     subroutine allocCells()
     
@@ -94,6 +94,32 @@ contains
         end do
         
     end subroutine allocCells
+    
+    ! Libération
+    
+    recursive subroutine libere_chaine(courant)
+    
+        type(Particle), pointer :: courant
+        
+        if (associated(courant%next)) then
+            call libere_chaine(courant%next)
+        end if
+        deallocate(courant)
+        
+    end subroutine libere_chaine
+    
+    subroutine deallocCells()
+    
+        integer :: iCell
+        integer :: nCells = cell_coordMax(1)*cell_coordMax(2)*cell_coordMax(3)
+    
+        do iCell = 1, nCells
+            if (associated(cellsBegin(iCell)%particle)) then
+                call libere_chaine(cellsBegin(iCell)%particle)
+            end if
+        end do
+    
+    end subroutine deallocCells
     
 end module data_neighbours
 !***********************************************************************

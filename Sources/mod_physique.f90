@@ -226,9 +226,14 @@ implicit none
         integer :: jPart
         real(DP), dimension(Dim) :: DeltaXnew, DeltaXold
         real(DP) rNew, rOld
+        integer :: iCell, cell_iCol
         
         overlap = .false.
         dEn = 0._DP
+        
+        !---
+        call locate_cell_iCol(iOld, iCell, cell_iCol)
+        !---
         
         do jPart = 1, Ncol1
             if (jPart /= iOld) then

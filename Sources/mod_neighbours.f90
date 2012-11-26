@@ -153,20 +153,6 @@ contains
    
     end subroutine update_cell
     
-    ! Libération
-    
-    recursive subroutine libere_chaine(courant)
-    
-        type(Particle), pointer :: courant
-        
-        if (associated(courant%next)) then
-            call libere_chaine(courant%next)
-        end if
-        !write(*, *) "libération de la particule", courant%iCol
-        deallocate(courant)
-        
-    end subroutine libere_chaine
-    
 ! -----------------------------------------------------------------------------
 ! VOISINS :
 ! -----------------------------------------------------------------------------

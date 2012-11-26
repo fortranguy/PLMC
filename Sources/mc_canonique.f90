@@ -43,6 +43,11 @@ implicit none
     call overlapTest()
     enTot = enTotCalc()
     
+    ! Table des voisins
+    call allocCells()
+    call all_col_to_cell()
+    call cell_neighs_ini()
+    
 ! Milieu --------------------------------------------------
 
     write(*, *) "Début des cycles"
