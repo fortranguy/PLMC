@@ -308,25 +308,37 @@ implicit none
         real(DP) :: rand
         real(DP), dimension(Dim) :: xNew
         real(DP) :: dEn
+        integer :: iCellBefore, iCellAfter    
+        real(DP) :: eNew, eOld
         
         call random_number(rand)
         iOld = int(rand*Ncol1) + 1
         call random_number(xNew)
         xNew(:) = X(:, iOld) + (xNew(:)-0.5_DP)*dx(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
-
-        call ePotDif(iOld, xNew, overlap, dEn)
+   
+        iCellBefore = col_to_cell(iOld)
+        call ePotNeigh(iOld, x(:, iOld), iCellBefore, overlap, eOld)
+        iCellAfter = position_to_cell(xNew)
+        call ePotNeigh(iOld, xNew, iCellAfter, overlap, eNew) 
+        
+        dEn = eNew - eOld
         
         if (.not. overlap) then
+        
             call random_number(rand)
             if ( rand < exp(-dEn/Tstar) ) then
                 X(:, iOld) = xNew(:)
                 enTot = enTot + dEn
+                call update_cell(iOld, iCellBefore, iCellAfter)
             else
                 Nrejects = Nrejects + 1
             end if
+            
         else
+        
             Nrejects = Nrejects + 1
+            
         end if
     
     end subroutine mcMove

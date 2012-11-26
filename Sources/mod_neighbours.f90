@@ -62,16 +62,12 @@ contains
     
     ! Mise à jour des TV
     
-    subroutine update_cell(iCol, iCellBefore)
+    subroutine update_cell(iCol, iCellBefore, iCellAfter)
     
-        integer, intent(in) :: iCol, iCellBefore
-        
-        integer :: iCellAfter
+        integer, intent(in) :: iCol, iCellBefore, iCellAfter
     
         type(Particle), pointer :: courant => null(), nouveau => null()
         type(Particle), pointer :: suivant => null(), precedent => null()
-        
-         iCellAfter = col_to_cell(iCol)
         
         if ( iCellBefore /= iCellAfter ) then
             
