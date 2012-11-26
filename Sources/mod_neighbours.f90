@@ -48,40 +48,6 @@ contains
         
     end subroutine all_col_to_cell
     
-    ! Repérage d'une particule dans une cellule :
-    
-    subroutine locate_cell_iCol(iCol, iCell, cell_iCol)
-    
-        integer, intent(in) :: iCol
-        integer, intent(out) :: iCell, cell_iCol
-
-        type(Particle), pointer :: courant => null(), suivant => null()
-        
-        iCell = col_to_cell(iCol)
-        
-        courant => cellsBegin(iCell)%particle
-        cell_iCol = 0
-        
-        do
-        
-            suivant => courant%next
-        
-            if ( courant%iCol == iCol ) then
-            
-                return                
-                
-            end if
-            
-            courant => suivant            
-            
-            cell_iCol = cell_iCol + 1
-            
-            if (.not. associated(suivant%next)) exit
-        
-        end do
-    
-    end subroutine locate_cell_iCol
-    
     ! Mise à jour des TV
     
     subroutine update_cell(iCol, iCellBefore)
