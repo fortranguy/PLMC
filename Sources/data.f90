@@ -9,6 +9,8 @@ module data_constants
         
 end module data_constants
 !***********************************************************************
+
+!***********************************************************************
 !* MODULE : Cell                                                       *
 !* PURPOSE : declaration of the cell parameters                        *   
 !* COMMENT : size1,2=x, y; size3=z                                     *
