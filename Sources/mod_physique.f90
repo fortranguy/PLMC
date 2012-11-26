@@ -261,40 +261,6 @@ implicit none
         end do
     
     end subroutine ePotNeigh
-   
-    ! ---------------------------------
-    
-    subroutine ePotDif(iOld, xNew, overlap, dEn)
-    
-        integer, intent(in) :: iOld
-        real(DP), dimension(Dim), intent(in) :: xNew
-        logical, intent(out) :: overlap
-        real(DP), intent(out) :: dEn
-        
-        integer :: iCell       
-        real(DP) :: eNew, eOld        
-        
-        !---
-        !New
-   
-        iCell = position_to_cell(xNew)
-        call ePotNeigh(iOld, xNew, iCell, overlap, eNew)
-        if (overlap) then
-            return !!!
-        end if        
-        
-        ! Old
-        
-        iCell = col_to_cell(iOld)
-        call ePotNeigh(iOld, x(:, iOld), iCell, overlap, eOld)
-        if (overlap) then
-            write(*, *) "problème old"
-            stop
-        end if
-        
-        dEn = eNew - eOld
-    
-    end subroutine ePotDif
     
     ! Déplacement d'une particule ---------------------------------------------
     
