@@ -1,4 +1,4 @@
-module neighbours
+module mod_neighbours
 
 use data_cell
 use data_neighbours
@@ -262,4 +262,4 @@ contains
             
     end subroutine cell_neighs_ini
 
-end module neighbours
+end module mod_neighbours
