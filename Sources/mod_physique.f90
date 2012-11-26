@@ -287,6 +287,10 @@ implicit none
         
         iCell = col_to_cell(iOld)
         call ePotNeigh(iOld, x(:, iOld), iCell, overlap, eOld)
+        if (overlap) then
+            write(*, *) "problème old"
+            stop
+        end if
         
         dEn = eNew - eOld
     
