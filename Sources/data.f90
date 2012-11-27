@@ -58,7 +58,7 @@ module data_mc
     integer, parameter :: Nstep = 10**5
     integer, parameter :: Ntherm = 40
     integer, parameter :: Nmove = 4*Ncol1 ! new
-    real(DP), dimension(Dim) :: dx = 3._DP ! new, à tester ?
+    real(DP), dimension(Dim), parameter :: dx = 3._DP ! new, à tester ?
 end module data_mc
 !***********************************************************************
 
