@@ -239,6 +239,8 @@ implicit none
             do
             
                 suivant => courant%next
+                
+                if (.not. associated(suivant%next)) exit
             
                 if (courant%iCol /= iCol) then
                     DeltaX(:) = X(:, courant%iCol) - pos(:)
@@ -253,8 +255,6 @@ implicit none
                 end if
                 
                 courant => suivant
-
-                if (.not. associated(suivant%next)) exit
             
             end do            
             
