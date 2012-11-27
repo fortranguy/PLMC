@@ -251,10 +251,10 @@ implicit none
                     energ = energ + ePot(r)
        
                 end if
-                    
-                courant => suivant
 
                 if (.not. associated(suivant%next)) exit
+                
+                courant => suivant
             
             end do            
             
