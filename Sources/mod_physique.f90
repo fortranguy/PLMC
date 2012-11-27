@@ -287,10 +287,10 @@ implicit none
         
         if (.not. overlap) then
         
-        	iCellBefore = col_to_cell(iOld)
-        	call ePotNeigh(iOld, x(:, iOld), iCellBefore, overlap, eOld)
+            iCellBefore = col_to_cell(iOld)
+            call ePotNeigh(iOld, x(:, iOld), iCellBefore, overlap, eOld)
         	
-        	dEn = eNew - eOld
+            dEn = eNew - eOld
         
             call random_number(rand)
             if ( rand < exp(-dEn/Tstar) ) then

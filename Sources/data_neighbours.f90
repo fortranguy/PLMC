@@ -17,7 +17,7 @@ use data_potentiel
     
     ! Cellules
     real(DP), parameter :: cell_Lsize1 = rcut11, cell_Lsize2 = rcut11, &
-    	cell_Lsize3 = rcut11
+        cell_Lsize3 = rcut11
     real(DP), dimension(Dim), parameter :: cell_Lsize = &
         [cell_Lsize1, cell_Lsize2, cell_Lsize3]
     integer, parameter :: cell_iMax = int(Lsize1/cell_Lsize1), &
