@@ -282,14 +282,15 @@ implicit none
         xNew(:) = X(:, iOld) + (xNew(:)-0.5_DP)*dx(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
    
-        iCellBefore = col_to_cell(iOld)
-        call ePotNeigh(iOld, x(:, iOld), iCellBefore, overlap, eOld)
         iCellAfter = position_to_cell(xNew)
         call ePotNeigh(iOld, xNew, iCellAfter, overlap, eNew) 
         
-        dEn = eNew - eOld
-        
         if (.not. overlap) then
+        
+        	iCellBefore = col_to_cell(iOld)
+        	call ePotNeigh(iOld, x(:, iOld), iCellBefore, overlap, eOld)
+        	
+        	dEn = eNew - eOld
         
             call random_number(rand)
             if ( rand < exp(-dEn/Tstar) ) then
