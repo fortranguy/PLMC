@@ -14,7 +14,7 @@ implicit none
     ! Initialisation
     integer :: iStep, iMove
     integer :: Nrejects
-    real(DP) :: tauxRejects
+    real(DP) :: tauxRejectsSum
     real(DP) :: enTot, enTotSum
     real(DP) :: activExInv, activExInvSum ! inverse de l'activité
     integer, parameter :: nWidom = 800 ! nombre de particules test
@@ -24,7 +24,7 @@ implicit none
         unitRapport = 13, unitObsTherm = 14
     
     Nrejects = 0
-    tauxRejects = 0._DP
+    tauxRejectsSum = 0._DP
     enTotSum = 0._DP
     activExInvSum = 0._DP
     call ePotIni()
@@ -65,19 +65,20 @@ implicit none
         
         call widom(nWidom, Lratio, activExInv)
         
-        if (iStep > Ntherm) then
+        if (iStep <= Ntherm) then
         
+            call adapt_dx(iStep, tauxRejectsSum, unitRapport)
+            write(unitObsTherm, *) iStep, enTot, activExInv
+        
+        else
+            
             enTotSum = enTotSum + enTot                 
             activExInvSum = activExInvSum + activExInv            
             write(unitObs, *) iStep, enTot, activExInv
             
-        else
-            
-            write(unitObsTherm, *) iStep, enTot, activExInv
-            
         end if
         
-        tauxRejects = tauxRejects + real(Nrejects, DP)/real(Nmove, DP)
+        tauxRejectsSum = tauxRejectsSum + real(Nrejects, DP)/real(Nmove, DP)
         Nrejects = 0
     
     end do
@@ -91,7 +92,7 @@ implicit none
     call overlapTest()
     
     call consisTest(enTot, unitRapport)
-    call mcResults(enTotSum, activExInvSum, tauxRejects,&
+    call mcResults(enTotSum, activExInvSum, tauxRejectsSum,&
         unitRapport)
     close(unitRapport)
     

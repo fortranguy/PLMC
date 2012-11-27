@@ -72,10 +72,10 @@ implicit none
     
     ! Résultats ---------------------------------------------------------------
         
-    subroutine mcResults(enTotSum, activExInvSum, tauxRejects, unitRapport)
+    subroutine mcResults(enTotSum, activExInvSum, tauxRejectsSum, unitRapport)
 
         real(DP), intent(in) :: enTotSum, activExInvSum     
-        real(DP), intent(in) :: tauxRejects
+        real(DP), intent(in) :: tauxRejectsSum
         integer, intent(in) :: unitRapport
         
         real(DP) :: realNstep = real(Nstep, DP)
@@ -93,7 +93,7 @@ implicit none
             potChiEx           
         write(unitRapport, *) "    potChi.moy = ", potChiId + potChiEx
         write(unitRapport, *) "    Taux rejets = ", &
-            tauxRejects/real(Nstep+Ntherm, DP)
+            tauxRejectsSum/real(Nstep+Ntherm, DP)
     
     end subroutine mcResults
     
