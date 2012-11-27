@@ -236,11 +236,11 @@ implicit none
             
             courant => cellsBegin(iCell_neigh)%particle%next
             
+            if (.not. associated(courant%next)) exit
+            
             do
             
                 suivant => courant%next
-                
-                if (.not. associated(suivant%next)) exit
             
                 if (courant%iCol /= iCol) then
                     DeltaX(:) = X(:, courant%iCol) - pos(:)
@@ -253,6 +253,8 @@ implicit none
                     energ = energ + ePot(r)
        
                 end if
+                
+                if (.not. associated(suivant%next)) exit
                 
                 courant => suivant
             
