@@ -35,10 +35,10 @@ implicit none
         
         integer, intent(in) :: unitSnap
     
-        integer :: iPart
+        integer :: iCol
         
-        do iPart = 1, Ncol1
-            write(unitSnap, *) X(:, iPart)
+        do iCol = 1, Ncol1
+            write(unitSnap, *) X(:, iCol), iCol
         end do    
 
     end subroutine
