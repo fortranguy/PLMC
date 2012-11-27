@@ -236,6 +236,8 @@ implicit none
             
             courant => cellsBegin(iCell_neigh)%particle%next
             
+            if (.not. associated(courant%next)) cycle
+            
             do
             
                 suivant => courant%next
@@ -252,9 +254,9 @@ implicit none
        
                 end if
                 
-                courant => suivant
-
                 if (.not. associated(suivant%next)) exit
+                
+                courant => suivant
             
             end do            
             
