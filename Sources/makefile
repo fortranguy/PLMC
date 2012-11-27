@@ -1,6 +1,6 @@
-FC =  gfortran # ifort #
-FFLAGS = -g -W -Wall -fbounds-check # -warn all -check noarg_temp_created -g # 
-LDFLAGS = -g -W -Wall -fbounds-check # -warn all -check noarg_temp_created -g # 
+FC = ifort # gfortran # 
+FFLAGS = # -warn all -check noarg_temp_created -g # W -Wall -fbounds-check -g
+LDFLAGS =  # -warn all -check noarg_temp_created  -g # -W -Wall -fbounds-check -g
 EXEC1 = xMC_Canonique
 EXEC2 = xBunching
 
