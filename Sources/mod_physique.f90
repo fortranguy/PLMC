@@ -283,7 +283,7 @@ implicit none
         xNew(:) = modulo(xNew(:), Lsize(:))
    
         iCellAfter = position_to_cell(xNew)
-        call ePotNeigh(iOld, xNew, iCellAfter, overlap, eNew) 
+        call ePotNeigh(iOld, xNew, iCellAfter, overlap, eNew)
         
         if (.not. overlap) then
         
