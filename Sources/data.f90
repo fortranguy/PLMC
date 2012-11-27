@@ -41,7 +41,7 @@ module data_particles
     use data_constants
     real(DP), parameter :: rayon1 = .5_DP
     real(DP), parameter :: rmin = 1._DP
-    integer, parameter ::  Ncol1 = 1 ! Vs Ncolmax
+    integer, parameter ::  Ncol1 = 270 ! Vs Ncolmax
     integer, parameter :: Ncolmax = 5000 
     real(DP), dimension(Dim, Ncolmax) :: X
 end module data_particles

@@ -236,7 +236,7 @@ implicit none
             
             courant => cellsBegin(iCell_neigh)%particle%next
             
-            if (.not. associated(courant%next)) exit
+            if (.not. associated(courant%next)) cycle
             
             do
             

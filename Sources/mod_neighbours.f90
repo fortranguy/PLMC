@@ -132,18 +132,17 @@ contains
             
                 suivant => precedent%next
                 
-                if (suivant%iCol == 0) then
+                if (.not. associated(suivant%next)) then
                 
                     allocate(nouveau)
                     nouveau%next => precedent%next
                     precedent%next => nouveau
                     nouveau%iCol = iCol
+                    exit
                     
                 end if
                 
                 precedent => suivant
-                
-                if (.not. associated(suivant%next)) exit
                 
             end do
         
