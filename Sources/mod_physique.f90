@@ -234,13 +234,13 @@ implicit none
         
             iCell_neigh = cell_neighs(iCell, iNeigh)
             
-            courant => cellsBegin(iCell_neigh)%particle
+            courant => cellsBegin(iCell_neigh)%particle%next
             
             do
             
                 suivant => courant%next
             
-                if (courant%iCol /= 0 .and. courant%iCol /= iCol) then
+                if (courant%iCol /= iCol) then
                     DeltaX(:) = X(:, courant%iCol) - pos(:)
                     call pbc_dif(DeltaX)
                     r = sqrt(dot_product(DeltaX, DeltaX))
