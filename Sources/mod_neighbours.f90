@@ -117,10 +117,10 @@ contains
                     precedent => courant
                     
                 end if
-        
-                courant => suivant
                 
                 if (.not. associated(suivant%next)) exit
+                
+                courant => suivant
             
             end do
             
