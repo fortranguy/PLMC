@@ -94,6 +94,8 @@ contains
             
             write(unitRapport, *) "Déplacement :"
             write(unitRapport, *) "    dx(:) = ", dx(:)
+            write(unitRapport, *) "    écart rejet = ", &
+                abs(tauxRejects - tauxRejectsFix)/tauxRejectsFix
             
         end if
     
