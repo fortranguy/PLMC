@@ -36,7 +36,7 @@ implicit none
     
     ! Condition initiale
     call condIni(unitRapport)
-    open(unit=unitSnapIni, file="snapShotIni.out", status='new', &
+    open(unit=unitSnapIni, recl=4096, file="snapShotIni.out", status='new', &
         action='write')
         call snapShot(unitSnapIni)
     close(unitSnapIni)
@@ -95,7 +95,7 @@ implicit none
         unitRapport)
     close(unitRapport)
     
-    open(unit=unitSnapFin, file="snapShotFin.out", status='new', &
+    open(unit=unitSnapFin, recl=4096, file="snapShotFin.out", status='new', &
         action='write')
         call snapShot(unitSnapFin)
     close(unitSnapFin)
