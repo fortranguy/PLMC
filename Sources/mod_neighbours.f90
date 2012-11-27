@@ -198,7 +198,7 @@ contains
     subroutine ini_cell_neighs()
     
         integer :: i, j, k, ind
-        integer :: neigh_i, neigh_j, neigh_k, neigh_ind, neigh_center_ind
+        integer :: neigh_i, neigh_j, neigh_k, neigh_ind!, neigh_center_ind
         integer, dimension(dim) :: coord, neigh_coord
         
         do i = 1, cell_iMax
@@ -216,10 +216,10 @@ contains
                 neigh_coord(:) = neigh_coord(:) - cell_neigh_coordMax(:) + 1
                     ! Par rapport au centre (i, j, k)
                 
-                if ( neigh_coord(1)==0 .and. neigh_coord(2)==0 .and. &
-                    neigh_coord(3)==0 ) then            
-                     neigh_center_ind = neigh_ind
-                end if
+                !if ( neigh_coord(1)==0 .and. neigh_coord(2)==0 .and. &
+                    !neigh_coord(3)==0 ) then            
+                     !neigh_center_ind = neigh_ind
+                !end if
                 
                 coord(:) = [i, j, k] + neigh_coord(:)
                 
