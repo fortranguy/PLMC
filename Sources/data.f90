@@ -37,6 +37,7 @@ end module data_cell
 !* COMMENT : 1=big particles ; 2=small particles                       *
 !***********************************************************************
 module data_particles
+
     use data_cell
     use data_constants
     real(DP), parameter :: rayon1 = .5_DP
@@ -44,6 +45,7 @@ module data_particles
     integer, parameter ::  Ncol1 = 270 ! Vs Ncolmax
     integer, parameter :: Ncolmax = 5000 
     real(DP), dimension(Dim, Ncolmax) :: X
+    
 end module data_particles
 !***********************************************************************
     
@@ -56,9 +58,47 @@ module data_mc
     use data_constants
     use data_particles
     integer, parameter :: Nstep = 10**5
-    integer, parameter :: Ntherm = 40
+    integer, parameter :: Ntherm = 10**2
     integer, parameter :: Nmove = 4*Ncol1 ! new
-    real(DP), dimension(Dim), parameter :: dx = 3._DP ! new, à tester ?
+    real(DP), dimension(Dim), protected :: dx = 2._DP ! new, à modifier.
+    
+contains
+
+    subroutine adapt_dx(iStep, tauxRejectsSum, unitRapport)
+    
+        integer, intent(in) :: iStep, unitRapport
+        real(DP), intent(in) :: tauxRejectsSum    
+        
+        integer, parameter :: multiple = 10
+        real(DP) :: tauxRejects
+        real(DP), parameter :: tauxRejectsFix = 0.5_DP
+        real(DP), parameter :: more = 1.05, less = 0.95
+        
+        if (mod(iStep, multiple) == 0) then
+        
+            tauxRejects = tauxRejectsSum/real(iStep, DP)
+        
+            if (tauxRejects < tauxRejectsFix) then
+            
+                dx(:) = dx(:) * more
+                
+            else
+            
+                dx(:) = dx(:) * less
+            
+            end if
+        
+        end if
+        
+        if (iStep == Ntherm) then
+            
+            write(unitRapport, *) "Déplacement :"
+            write(unitRapport, *) "    dx(:) = ", dx(:)
+            
+        end if
+    
+    end subroutine adapt_dx
+
 end module data_mc
 !***********************************************************************
 
