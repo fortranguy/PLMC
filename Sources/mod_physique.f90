@@ -44,7 +44,7 @@ implicit none
         write(*, *) "    Densité = ", densite
         write(unitRapport, *) "    Densité = ", densite
         
-        compac = 4._DP/3._DP*PI*rayon1**3 * Ncol1 / product(Lsize)
+        compac = 4._DP/3._DP*PI*rayon1**3 * densite
         write(*, *) "    Compacité = ", compac
         write(unitRapport, *) "    Compacité = ", compac
         
