@@ -77,8 +77,6 @@ implicit none
         
         ! Résultats
         
-        !write(*, *) "moyennes = ", sumVal(:)/real(2*NstepVar, DP)
-        !write(*, *) "erreurs = ", error(:)
         write(11, *) iBunching, sumVal(1)/real(2*NstepVar, DP), error(1)
         write(12, *) iBunching, sumVal(2)/real(2*NstepVar, DP), error(2)
         

@@ -78,14 +78,10 @@ contains
         
             tauxRejects = tauxRejectsSum/real(iStep, DP)
         
-            if (tauxRejects < tauxRejectsFix) then
-            
-                dx(:) = dx(:) * more
-                
-            else
-            
-                dx(:) = dx(:) * less
-            
+            if (tauxRejects < tauxRejectsFix) then            
+                dx(:) = dx(:) * more                
+            else            
+                dx(:) = dx(:) * less            
             end if
         
         end if
@@ -130,11 +126,10 @@ contains
         real(DP) :: r_i
        
 	    ! cut
-        do i = iMin, Ntab11       
+        do i = iMin, Ntab11        
             r_i = real(i, DP)*pas11
-            Vtab11(i) = epsilon11*exp(-alpha11*(r_i-rmin))/r_i           
+            Vtab11(i) = epsilon11*exp(-alpha11*(r_i-rmin))/r_i                 
         end do
-            ! problème pour V(rcut) ?
         
         ! shift        
         Vtab11(:) = Vtab11(:) - epsilon11*exp(-alpha11*(rcut11-rmin))/rcut11

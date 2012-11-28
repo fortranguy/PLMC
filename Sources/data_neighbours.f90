@@ -26,7 +26,7 @@ use data_potentiel
         [cell_iMax, cell_jMax, cell_kMax]
     type(ContainerParticle), allocatable, dimension(:) :: cells, cellsNext
     type(ContainerParticle), allocatable, dimension(:), protected :: cellsBegin
-                                            !Attention : ne pas déplacer.
+
     ! Voisins
     integer, parameter :: cell_neigh_iMax = 3, &
         cell_neigh_jMax = cell_neigh_iMax, &
@@ -34,7 +34,7 @@ use data_potentiel
     integer, dimension(dim), parameter :: cell_neigh_coordMax = &
         [cell_neigh_iMax, cell_neigh_jMax, cell_neigh_kMax]
     integer, parameter :: cell_neighs_nb = &
-        cell_neigh_iMax*cell_neigh_jMax*cell_neigh_kMax ! inclus soi-mêm
+        cell_neigh_iMax*cell_neigh_jMax*cell_neigh_kMax ! inclus soi-même
     integer, dimension(cell_iMax*cell_jMax*cell_kMax, cell_neighs_nb) :: &
         cell_neighs
     

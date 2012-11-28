@@ -232,10 +232,8 @@ implicit none
     
         do iNeigh = 1, cell_neighs_nb
         
-            iCell_neigh = cell_neighs(iCell, iNeigh)
-            
-            courant => cellsBegin(iCell_neigh)%particle%next
-            
+            iCell_neigh = cell_neighs(iCell, iNeigh)            
+            courant => cellsBegin(iCell_neigh)%particle%next            
             if (.not. associated(courant%next)) cycle
             
             do
@@ -243,6 +241,7 @@ implicit none
                 suivant => courant%next
             
                 if (courant%iCol /= iCol) then
+                
                     DeltaX(:) = X(:, courant%iCol) - pos(:)
                     call pbc_dif(DeltaX)
                     r = sqrt(dot_product(DeltaX, DeltaX))
