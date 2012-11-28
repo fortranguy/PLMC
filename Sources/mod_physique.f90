@@ -283,7 +283,6 @@ implicit none
         call random_number(xNew)
         xNew(:) = X(:, iOld) + (xNew(:)-0.5_DP)*dx(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
-   
         iCellAfter = position_to_cell(xNew)
         call ePotNeigh(iOld, xNew, iCellAfter, overlap, eNew)
         
