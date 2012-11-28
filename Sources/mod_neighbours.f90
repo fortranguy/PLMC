@@ -88,69 +88,70 @@ contains
     
     ! Mise à jour des TV
     
-    subroutine update_cell(iCol, iCellBefore, iCellAfter)
+    subroutine remove_cell_col(iCol, iCellBefore)
     
-        integer, intent(in) :: iCol, iCellBefore, iCellAfter
+        integer, intent(in) :: iCol, iCellBefore
+        
+        type(Particle), pointer :: courant => null()
+        type(Particle), pointer :: suivant => null(), precedent => null()
+    
+        precedent => cellsBegin(iCellBefore)%particle
+        courant => precedent%next
+        
+        do
+        
+            suivant => courant%next
+        
+            if ( courant%iCol == iCol ) then
+            
+                precedent%next => courant%next
+                deallocate(courant)
+                courant => suivant
+                exit
+                
+            else
+            
+                precedent => courant
+                
+            end if
+            
+            if (.not. associated(suivant%next)) exit
+            
+            courant => suivant
+        
+        end do
+            
+    end subroutine remove_cell_col   
+    
+    subroutine add_cell_col(iCol, iCellAfter)
+    
+        integer, intent(in) :: iCol, iCellAfter
     
         type(Particle), pointer :: courant => null(), nouveau => null()
-        type(Particle), pointer :: suivant => null(), precedent => null()
+        type(Particle), pointer :: suivant => null(), precedent => null()           
+          
         
-        if ( iCellBefore /= iCellAfter ) then
-            
-            ! remove
+        precedent => cellsBegin(iCellAfter)%particle
         
-            precedent => cellsBegin(iCellBefore)%particle
-            courant => precedent%next
-            
-            do
-            
-                suivant => courant%next
-            
-                if ( courant%iCol == iCol ) then
-                
-                    precedent%next => courant%next
-                    deallocate(courant)
-                    courant => suivant
-                    exit
-                    
-                else
-                
-                    precedent => courant
-                    
-                end if
-                
-                if (.not. associated(suivant%next)) exit
-                
-                courant => suivant
-            
-            end do
-            
-            ! add        
-            
-            precedent => cellsBegin(iCellAfter)%particle
-            
-            do
-            
-                suivant => precedent%next
-                
-                if (.not. associated(suivant%next)) then
-                
-                    allocate(nouveau)
-                    nouveau%next => precedent%next
-                    precedent%next => nouveau
-                    nouveau%iCol = iCol
-                    exit
-                    
-                end if
-                
-                precedent => suivant
-                
-            end do
+        do
         
-        end if
-                   
-   
-    end subroutine update_cell
+            suivant => precedent%next
+            
+            if (.not. associated(suivant%next)) then
+            
+                allocate(nouveau)
+                nouveau%next => precedent%next
+                precedent%next => nouveau
+                nouveau%iCol = iCol
+                exit
+                
+            end if
+            
+            precedent => suivant
+            
+        end do
+            
+    end  subroutine add_cell_col
     
 ! -----------------------------------------------------------------------------
 ! VOISINS :

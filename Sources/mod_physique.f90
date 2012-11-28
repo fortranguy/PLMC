@@ -297,7 +297,12 @@ implicit none
             if ( rand < exp(-dEn/Tstar) ) then
                 X(:, iOld) = xNew(:)
                 enTot = enTot + dEn
-                call update_cell(iOld, iCellBefore, iCellAfter)
+                
+                if ( iCellBefore /= iCellAfter ) then                
+                    call remove_cell_col(iOld, iCellBefore)
+                    call add_cell_col(iOld, iCellAfter)
+                end if
+                
             else
                 Nrejects = Nrejects + 1
             end if
