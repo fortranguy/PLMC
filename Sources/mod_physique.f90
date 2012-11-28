@@ -279,6 +279,7 @@ implicit none
         
         call random_number(rand)
         iOld = int(rand*Ncol1) + 1
+        
         call random_number(xNew)
         xNew(:) = X(:, iOld) + (xNew(:)-0.5_DP)*dx(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
