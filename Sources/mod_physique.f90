@@ -53,8 +53,8 @@ implicit none
     subroutine iniPosCub()
     
         integer :: iDir
-        integer :: i, j, k, iPart
-        integer, dimension(Dim) :: nParts
+        integer :: i, j, k, iCol
+        integer, dimension(Dim) :: nCols
         real(DP), dimension(Dim) :: ratio
         real(DP) :: oneThird = 1._DP/3._DP
         
@@ -62,21 +62,21 @@ implicit none
         
         ! Proportion selon la direction
         
-        nParts(1) = int( (Ncol1*Lsize(1)**2/Lsize(2)/Lsize(3))**oneThird )
-        nParts(2) = int( (Ncol1*Lsize(2)**2/Lsize(3)/Lsize(1))**oneThird )
-        nParts(3) = int( (Ncol1*Lsize(3)**2/Lsize(1)/Lsize(2))**oneThird )
+        nCols(1) = int( (Ncol1*Lsize(1)**2/Lsize(2)/Lsize(3))**oneThird )
+        nCols(2) = int( (Ncol1*Lsize(2)**2/Lsize(3)/Lsize(1))**oneThird )
+        nCols(3) = int( (Ncol1*Lsize(3)**2/Lsize(1)/Lsize(2))**oneThird )
         
         ! Vérification
         
         iDir = 1
-        do while (product(nParts)<Ncol1)
-            nParts(iDir) = nParts(iDir) + 1
+        do while (product(nCols)<Ncol1)
+            nCols(iDir) = nCols(iDir) + 1
             iDir = iDir + 1
         end do
         
-        ratio(:) = Lsize(:)/real(nParts(:), DP) ! A vérifier
+        ratio(:) = Lsize(:)/real(nCols(:), DP) ! A vérifier
         do iDir = 1, Dim
-            if ( rmin*real(nParts(iDir), DP) > Lsize(iDir) ) then
+            if ( rmin*real(nCols(iDir), DP) > Lsize(iDir) ) then
                 write(*, *) "    Problème : trop dense dans la direction ",&
                 iDir
                 stop
@@ -85,14 +85,14 @@ implicit none
         
         ! Remplissage
         
-        do k = 1, nParts(3)
-            do j = 1, nParts(2)
-                do i = 1, nParts(1)
+        do k = 1, nCols(3)
+            do j = 1, nCols(2)
+                do i = 1, nCols(1)
                     if (i*j*k <= Ncol1) then
-                        iPart = i + nParts(1)*(j-1) + nParts(1)*nParts(2)*(k-1)
-                        X(1, iPart) = ratio(1)*real(i, DP)
-                        X(2, iPart) = ratio(2)*real(j, DP)
-                        X(3, iPart) = ratio(3)*real(k, DP)
+                        iCol = i + nCols(1)*(j-1) + nCols(1)*nCols(2)*(k-1)
+                        X(1, iCol) = ratio(1)*real(i, DP)
+                        X(2, iCol) = ratio(2)*real(j, DP)
+                        X(3, iCol) = ratio(3)*real(k, DP)
                         ! A vérifier
                     end if
                 end do
@@ -109,23 +109,23 @@ implicit none
     
     subroutine iniPosAlea()
     
-        integer :: iPart, Nparts, nOK
+        integer :: iCol, Ncols, nOK
         real(DP), dimension(Dim) :: xTest, DeltaX
     
         write(*, *) "Déposition aléatoire"
     
         call random_number(X(:, 1))
         X(:, 1) = X(:, 1)*(Lsize(:)-2*Rayon1)
-        Nparts = 1        
+        Ncols = 1        
         
-        do while (Nparts<Ncol1)
+        do while (Ncols<Ncol1)
         
             call random_number(xTest)
             xTest(:) = xTest(:)*(Lsize(:)-2._DP*Rayon1)
             
             nOK = 0
-            do iPart = 1, Nparts
-                DeltaX(:) = X(:, iPart) - xTest(:)
+            do iCol = 1, Ncols
+                DeltaX(:) = X(:, iCol) - xTest(:)
                 call pbc_dif(DeltaX)
                 if( sqrt(dot_product(DeltaX, DeltaX)) >= rmin) then
                     nOK = nOK + 1
@@ -134,16 +134,16 @@ implicit none
                 end if
             end do
             
-            if (nOK == Nparts) then
-                Nparts = Nparts + 1
-                X(:, Nparts) = xTest(:)
-                write(*, *) "    Particule", Nparts, "OK"
+            if (nOK == Ncols) then
+                Ncols = Ncols + 1
+                X(:, Ncols) = xTest(:)
+                write(*, *) "    Particule", Ncols, "OK"
             end if
             
         end do
         
-        do iPart = 1, Ncol1
-            X(:, iPart) = X(:, iPart) + Rayon1
+        do iCol = 1, Ncol1
+            X(:, iCol) = X(:, iCol) + Rayon1
         end do
     
     end subroutine iniPosAlea
@@ -152,18 +152,18 @@ implicit none
     
     subroutine overlapTest()
     
-        integer :: jPart, iPart
+        integer :: jCol, iCol
         real(DP), dimension(Dim) :: DeltaX
     
-        do jPart = 1, Ncol1
-            do iPart = 1, Ncol1
-                if (iPart /= jPart) then
+        do jCol = 1, Ncol1
+            do iCol = 1, Ncol1
+                if (iCol /= jCol) then
                     
-                    DeltaX(:) = X(:, iPart) - X(:, jPart)
+                    DeltaX(:) = X(:, iCol) - X(:, jCol)
                     call pbc_dif(DeltaX)
                     
                     if (sqrt(dot_product(DeltaX, DeltaX)) < rmin) then
-                        write(*, *) "    Overlap !", iPart, jPart
+                        write(*, *) "    Overlap !", iCol, jCol
                         write(*, * ) "    r_ij = ", &
                         sqrt(dot_product(DeltaX, DeltaX))
                         stop
@@ -348,18 +348,18 @@ implicit none
     
     function enTotCalc()
     
-        integer :: iPart, jPart
+        integer :: iCol, jCol
         real(DP) :: r_ij
         real(DP), dimension(Dim) :: DeltaX
         real(DP) :: enTotCalc
     
         enTotCalc = 0._DP
         
-        do jPart = 1, Ncol1
-            do iPart = 1, Ncol1
-                if (iPart /= jPart) then
+        do jCol = 1, Ncol1
+            do iCol = 1, Ncol1
+                if (iCol /= jCol) then
                 
-                    DeltaX(:) = X(:, jPart) - X(:, iPart)
+                    DeltaX(:) = X(:, jCol) - X(:, iCol)
                     call pbc_dif(DeltaX)
                     r_ij = sqrt(dot_product(DeltaX, DeltaX))
                     
