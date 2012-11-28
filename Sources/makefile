@@ -40,7 +40,7 @@ mod_physique.o: mod_physique.f90
 mc_canonique.o: mc_canonique.f90
 	$(FC) $(LDFLAGS) -c $<
 
-xMC_Canonique: data_copy.o data_neighbours.o mod_tools.o mod_neighbours.o \
+xMC_Canonique: data_copy.o data_neighbours.o mod_neighbours.o mod_tools.o \
 	mod_physique.o  mc_canonique.o
 	$(FC) $(LDFLAGS) $^ -o $@
 	
