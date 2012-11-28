@@ -60,7 +60,6 @@ implicit none
         write(unitRapport, *) "    Nstep = ", Nstep
         write(unitRapport, *) "    Ntherm = ", Ntherm
         write(unitRapport, *) "    Nmove = ", Nmove
-        write(unitRapport, *) "    dx(:) = ", dx(:)
         write(unitRapport, *) "    epsilon11 = ", epsilon11
         write(unitRapport, *) "    alpha11 = ", alpha11
         write(unitRapport, *) "    rcut11 = ", rcut11
