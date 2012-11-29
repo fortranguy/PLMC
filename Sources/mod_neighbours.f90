@@ -115,8 +115,6 @@ contains
                 
             end if
             
-            if (.not. associated(suivant%next)) exit
-            
             courant => suivant
         
         end do
