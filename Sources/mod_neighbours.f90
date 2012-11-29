@@ -127,7 +127,7 @@ contains
     
         integer, intent(in) :: iCol, iCellAfter
     
-        type(Particle), pointer :: courant => null(), nouveau => null()
+        type(Particle), pointer :: nouveau => null()
         type(Particle), pointer :: suivant => null(), precedent => null()           
           
         
