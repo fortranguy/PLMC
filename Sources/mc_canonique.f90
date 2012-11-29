@@ -28,11 +28,11 @@ implicit none
     enTotSum = 0._DP
     activExInvSum = 0._DP
     call ePotIni()
-    call init_random_seed()
     
     open(unit=unitRapport, recl=4096, file="rapport.out", status='new', &
         action='write')         ! contre line folding
     call rapport(nWidom, Lratio, unitRapport)
+    call init_random_seed(unitRapport)
     
     ! Condition initiale
     call condIni(unitRapport)
