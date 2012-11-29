@@ -12,7 +12,9 @@ implicit none
 
     ! Générateurs de nombres aléatoires : graine ------------------------------
     
-    subroutine init_random_seed()
+    subroutine init_random_seed(unitRapport)
+    
+        integer, intent(in) :: unitRapport
     
         integer :: i, n, clock
         integer, dimension(:), allocatable :: seed
@@ -22,8 +24,12 @@ implicit none
 
         call system_clock(count=clock)
 
-        seed = clock + 37 * [ (i - 1, i = 1, n) ]
+        seed(:) = clock + 37 * [ (i - 1, i = 1, n) ]
         call random_seed(put = seed)
+        
+        write(unitRapport, *) "Graine :"
+        write(unitRapport ,*) "    n = ", n
+        write(unitRapport ,*) "    seed(:) = ", seed(:)
 
         deallocate(seed)
         
