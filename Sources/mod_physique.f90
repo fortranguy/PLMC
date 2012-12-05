@@ -232,7 +232,7 @@ implicit none
     
         do iNeigh = 1, cell_neighs_nb
         
-            iCell_neigh = cell_neighs(iCell, iNeigh)            
+            iCell_neigh = cell_neighs(iNeigh, iCell)
             courant => cellsBegin(iCell_neigh)%particle%next            
             if (.not. associated(courant%next)) cycle
             

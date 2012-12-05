@@ -218,7 +218,7 @@ contains
                 
                 coord(:) = [i, j, k] + neigh_coord(:)
                 
-                cell_neighs(ind, neigh_ind) = cell_coord_to_ind( cell_period(&
+                cell_neighs(neigh_ind, ind) = cell_coord_to_ind( cell_period(&
                     coord(:)) )
                     
             end do

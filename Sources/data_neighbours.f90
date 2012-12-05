@@ -35,7 +35,7 @@ use data_potentiel
         [cell_neigh_iMax, cell_neigh_jMax, cell_neigh_kMax]
     integer, parameter :: cell_neighs_nb = &
         cell_neigh_iMax*cell_neigh_jMax*cell_neigh_kMax ! inclus soi-même
-    integer, dimension(cell_iMax*cell_jMax*cell_kMax, cell_neighs_nb) :: &
+    integer, dimension(cell_neighs_nb, cell_iMax*cell_jMax*cell_kMax) :: &
         cell_neighs
     
 contains
