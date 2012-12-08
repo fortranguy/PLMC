@@ -17,7 +17,7 @@ implicit none
     real(DP) :: tauxRejectsSum
     real(DP) :: enTot, enTotSum
     real(DP) :: activExInv, activExInvSum ! inverse de l'activité
-    integer, parameter :: nWidom = 800 ! nombre de particules test
+    integer, parameter :: nWidom = Ncol1 ! nombre de particules test
     real(DP), parameter :: Lratio = 1._DP ! pour le volume du tirage cf. widom
     
     integer, parameter :: unitObs = 10, unitSnapIni = 11, unitSnapFin = 12, &
