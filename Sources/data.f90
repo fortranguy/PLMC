@@ -20,9 +20,9 @@ module data_cell
 use data_constants
     
     integer, parameter :: Dim = 3
-    real(DP), parameter :: Lsize1 = 12._DP
+    real(DP), parameter :: Lsize1 = 8._DP
     real(DP), parameter :: Lsize2 = Lsize1
-    real(DP), parameter :: Lsize3 = 12._DP
+    real(DP), parameter :: Lsize3 = Lsize1
     real(DP), dimension(Dim), parameter :: Lsize = &
         [Lsize1, Lsize2, Lsize3]
     real(DP), dimension(Dim), parameter :: LsizeMi = 0.5_DP * Lsize
@@ -37,15 +37,13 @@ end module data_cell
 !* COMMENT : 1=big particles ; 2=small particles                       *
 !***********************************************************************
 module data_particles
-
     use data_cell
     use data_constants
     real(DP), parameter :: rayon1 = .5_DP
     real(DP), parameter :: rmin = 1._DP
-    integer, parameter ::  Ncol1 = 270 ! Vs Ncolmax
-    integer, parameter :: Ncolmax = 5000 
+    integer, parameter ::  Ncol1 = 240 ! Vs Ncolmax
+    integer, parameter :: Ncolmax = 2 * Ncol1 
     real(DP), dimension(Dim, Ncolmax) :: X
-    
 end module data_particles
 !***********************************************************************
     
@@ -57,10 +55,10 @@ end module data_particles
 module data_mc
     use data_constants
     use data_particles
-    integer, parameter :: Nstep = 10**5
+    integer, parameter :: Nstep = 2**16
     integer, parameter :: Ntherm = 10**2
-    integer, parameter :: Nmove = 4*Ncol1 ! new
-    real(DP), dimension(Dim), protected :: dx = 2._DP ! new, à modifier.
+    integer, parameter :: Nmove = 2**5 * Ncol1 ! new
+    real(DP), dimension(Dim), protected :: dx = 0.5_DP ! new, à modifier.
     
 contains
 
@@ -126,9 +124,9 @@ contains
         real(DP) :: r_i
        
 	    ! cut
-        do i = iMin, Ntab11        
+        do i = iMin, Ntab11       
             r_i = real(i, DP)*pas11
-            Vtab11(i) = epsilon11*exp(-alpha11*(r_i-rmin))/r_i                 
+            Vtab11(i) = epsilon11*exp(-alpha11*(r_i-rmin))/r_i           
         end do
         
         ! shift        
