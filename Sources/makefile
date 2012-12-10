@@ -22,8 +22,8 @@ data_neighbours.o data_neighbours.mod : data_neighbours.f90 data_copy.f90
 
 # ---------------------------
 
-mod_neighbours.o : data_cell.mod data_particles.mod data_mc.mod \
-    data_potentiel.mod data_constants.mod data_neighbours.mod
+mod_neighbours.o : data_constants.mod data_cell.mod data_potentiel.mod \
+	data_neighbours.mod
 mod_tools.o: data_constants.mod data_particles.mod data_mc.mod \
 	data_potentiel.mod data_neighbours.mod
 mod_physique.o: data_constants.mod data_cell.mod data_particles.mod \
