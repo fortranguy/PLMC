@@ -37,13 +37,16 @@ end module data_cell
 !* COMMENT : 1=big particles ; 2=small particles                       *
 !***********************************************************************
 module data_particles
-    use data_cell
-    use data_constants
+
+use data_constants
+use data_cell
+    
     real(DP), parameter :: rayon1 = .5_DP
     real(DP), parameter :: rmin = 1._DP
-    integer, parameter ::  Ncol1 = 240 ! Vs Ncolmax
+    integer, parameter ::  Ncol1 = 240
     integer, parameter :: Ncolmax = 2 * Ncol1 
     real(DP), dimension(Dim, Ncolmax) :: X
+    
 end module data_particles
 !***********************************************************************
     
@@ -53,10 +56,13 @@ end module data_particles
 !* COMMENT : Field-induced layer formation in dipolar nanofilms        *
 !***********************************************************************
 module data_mc
-    use data_constants
-    use data_particles
+
+use data_constants
+use data_particles
+use data_cell
+
     integer, parameter :: Nstep = 2**16
-    integer, parameter :: Ntherm = 10**2
+    integer, parameter :: Ntherm = 2**8
     integer, parameter :: Nmove = 2**5 * Ncol1 ! new
     real(DP), dimension(Dim), protected :: dx = 0.5_DP ! new, à modifier.
     
@@ -67,14 +73,14 @@ contains
         integer, intent(in) :: iStep, unitRapport
         real(DP), intent(in) :: tauxRejectsSum    
         
-        integer, parameter :: multiple = 10
+        integer, parameter :: multiple = 2**3
         real(DP) :: tauxRejects
         real(DP), parameter :: tauxRejectsFix = 0.5_DP
         real(DP), parameter :: more = 1.05, less = 0.95
         
-        if (mod(iStep, multiple) == 0) then
+        tauxRejects = tauxRejectsSum/real(iStep, DP)
         
-            tauxRejects = tauxRejectsSum/real(iStep, DP)
+        if (mod(iStep, multiple) == 0) then
         
             if (tauxRejects < tauxRejectsFix) then            
                 dx(:) = dx(:) * more                
@@ -104,10 +110,9 @@ end module data_mc
 !***********************************************************************
 module data_potentiel
 
-use data_cell
-use data_particles
-use data_mc
 use data_constants
+use data_particles
+
     real(DP), parameter :: rcut11 = 4._DP ! new
     real(DP), parameter :: pas11 = 5.E-5_DP ! new
     real(DP), parameter :: surpas11 = 1._DP/pas11 ! new
