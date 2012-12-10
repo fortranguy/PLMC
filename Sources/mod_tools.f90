@@ -1,10 +1,10 @@
 module mod_tools
 
-use data_neighbours
+use data_constants
 use data_particles
 use data_mc
 use data_potentiel
-use data_constants
+use data_neighbours
 
 implicit none
 
