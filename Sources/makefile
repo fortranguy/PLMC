@@ -48,7 +48,7 @@ xMC_Canonique: data_copy.o data_neighbours.o mod_neighbours.o mod_physique.o \
 	
 # ---------------------------
 
-bunching.o: data_mc.mod data_constants.mod
+bunching.o: data_constants.mod data_mc.mod
 
 bunching.o: bunching.f90
 	$(FC) $(FFLAGS) -c $<
