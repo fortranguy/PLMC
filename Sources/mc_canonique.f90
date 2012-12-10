@@ -1,11 +1,9 @@
 program mc_cano
 
-use data_cell
-use data_particles    
-use data_mc
-use mod_tools
-use mod_physique
 use data_constants
+use data_mc
+use mod_physique
+use mod_tools
 
 implicit none
 
