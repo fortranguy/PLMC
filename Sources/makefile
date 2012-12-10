@@ -1,6 +1,6 @@
 FC = ifort
-FFLAGS = -warn all -check all
-LDFLAGS = -warn all -check all
+FFLAGS = # -warn all -check all
+LDFLAGS = # -warn all -check all
 #FC = gfortran
 #FFLAGS = -W -Wall -fbounds-check
 #LDFLAGS = -W -Wall -fbounds-check
