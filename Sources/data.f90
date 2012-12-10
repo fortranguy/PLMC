@@ -20,7 +20,7 @@ module data_cell
 use data_constants
     
     integer, parameter :: Dim = 3
-    real(DP), parameter :: Lsize1 = 8._DP
+    real(DP), parameter :: Lsize1 = 12._DP
     real(DP), parameter :: Lsize2 = Lsize1
     real(DP), parameter :: Lsize3 = Lsize1
     real(DP), dimension(Dim), parameter :: Lsize = &
@@ -43,7 +43,7 @@ use data_cell
     
     real(DP), parameter :: rayon1 = .5_DP
     real(DP), parameter :: rmin = 1._DP
-    integer, parameter ::  Ncol1 = 240
+    integer, parameter ::  Ncol1 = 270
     integer, parameter :: Ncolmax = 2 * Ncol1 
     real(DP), dimension(Dim, Ncolmax) :: X
     
@@ -61,9 +61,9 @@ use data_constants
 use data_particles
 use data_cell
 
-    integer, parameter :: Nstep = 2**16
-    integer, parameter :: Ntherm = 2**8
-    integer, parameter :: Nmove = 2**5 * Ncol1 ! new
+    integer, parameter :: Nstep = 2**10
+    integer, parameter :: Ntherm = 2**6
+    integer, parameter :: Nmove = 2**2 * Ncol1 ! new
     real(DP), dimension(Dim), protected :: dx = 0.5_DP ! new, à modifier.
     
 contains
