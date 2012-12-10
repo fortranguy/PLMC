@@ -26,7 +26,6 @@ use data_constants
     real(DP), dimension(Dim), parameter :: Lsize = &
         [Lsize1, Lsize2, Lsize3]
     real(DP), dimension(Dim), parameter :: LsizeMi = 0.5_DP * Lsize
-    real(DP), parameter::Tstar = 1._DP
     
 end module data_cell
 !***********************************************************************
@@ -61,6 +60,7 @@ use data_constants
 use data_particles
 use data_cell
 
+    real(DP), parameter::Tstar = 1._DP
     integer, parameter :: Nstep = 2**10
     integer, parameter :: Ntherm = 2**6
     integer, parameter :: Nmove = 2**2 * Ncol1 ! new
