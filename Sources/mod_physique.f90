@@ -1,11 +1,10 @@
 module mod_physique
 
+use data_constants
 use data_cell
 use data_particles
 use data_mc
 use data_potentiel
-use data_constants
-use mod_tools
 use mod_neighbours
 
 implicit none
