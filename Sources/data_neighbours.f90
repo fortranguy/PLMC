@@ -3,6 +3,7 @@
 !***********************************************************************
 module data_neighbours
 
+use data_constants
 use data_potentiel
 
     ! Type
