@@ -60,7 +60,7 @@ use data_constants
 use data_particles
 use data_cell
 
-    real(DP), parameter::Tstar = 1._DP
+    real(DP), parameter :: Tstar = 1._DP
     integer, parameter :: Nstep = 2**10
     integer, parameter :: Ntherm = 2**6
     integer, parameter :: Nmove = 2**2 * Ncol1 ! new
