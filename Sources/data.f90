@@ -43,7 +43,7 @@ use data_cell
     real(DP), parameter :: rayon1 = .5_DP
     real(DP), parameter :: rmin = 1._DP
     integer, parameter ::  Ncol1 = 270
-    integer, parameter :: Ncolmax = 2 * Ncol1 
+    integer, parameter :: Ncolmax = 2*Ncol1 
     real(DP), dimension(Dim, Ncolmax) :: X
     
 end module data_particles
