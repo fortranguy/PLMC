@@ -62,7 +62,7 @@ use data_cell
 
     real(DP), parameter :: Tstar = 1._DP
     integer, parameter :: Nstep = 2**10
-    integer, parameter :: Ntherm = 2**6
+    integer, parameter :: Ntherm = 2**8
     integer, parameter :: Nmove = 2**2 * Ncol1 ! new
     real(DP), dimension(Dim), protected :: dx = 0.5_DP ! new, à modifier.
     
@@ -73,24 +73,34 @@ contains
         integer, intent(in) :: iStep, unitRapport
         real(DP), intent(in) :: tauxRejectsSum    
         
-        integer, parameter :: multiple = 2**3
+        integer, parameter :: multiple = 2**2
         real(DP) :: tauxRejects
         real(DP), parameter :: tauxRejectsFix = 0.5_DP
-        real(DP), parameter :: more = 1.05, less = 0.95
+        real(DP), parameter :: dx_eps = 0.05_DP, taux_eps = 0.005_DP
+        real(DP), parameter :: more = 1._DP+dx_eps, less = 1._DP-dx_eps
         
-        tauxRejects = tauxRejectsSum/real(iStep, DP)
+        tauxRejects = 0._DP
         
-        if (mod(iStep, multiple) == 0) then
+        if (mod(iStep, multiple) == 0 .and. iStep>2) then
         
-            if (tauxRejects < tauxRejectsFix) then            
-                dx(:) = dx(:) * more                
-            else            
-                dx(:) = dx(:) * less            
+            tauxRejects = tauxRejectsSum/real(iStep-1, DP)
+        
+            if (tauxRejects < tauxRejectsFix - taux_eps) then            
+                dx(:) = dx(:) * more
+                dx(:) = modulo(dx(:), Lsize(:))
+            else if (tauxRejects > tauxRejectsFix + taux_eps) then
+                dx(:) = dx(:) * less
+                dx(:) = modulo(dx(:), Lsize(:))
             end if
-        
+
         end if
         
         if (iStep == Ntherm) then
+        
+            if (tauxRejects == 0._DP) then
+                write(*, *) "Problème adaptation dx."
+                stop
+            end if
             
             write(unitRapport, *) "Déplacement :"
             write(unitRapport, *) "    dx(:) = ", dx(:)

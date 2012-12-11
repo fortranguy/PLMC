@@ -19,7 +19,7 @@ implicit none
     real(DP), parameter :: Lratio = 1._DP ! pour le volume du tirage cf. widom
     
     integer, parameter :: unitObs = 10, unitSnapIni = 11, unitSnapFin = 12, &
-        unitRapport = 13, unitObsTherm = 14
+        unitRapport = 13, unitObsTherm = 14, unit_dx = 15
     
     Nrejects = 0
     tauxRejectsSum = 0._DP
@@ -54,6 +54,8 @@ implicit none
         action='write')
     open(unit=unitObsTherm, recl=4096, file="obsTherm.out", status='new', &
         action='write')
+    open(unit=unit_dx, recl=4096, file="dx.out", status='new', &
+        action='write')
     
     do iStep = 1, Ntherm + Nstep
     
@@ -66,6 +68,7 @@ implicit none
         if (iStep <= Ntherm) then
         
             call adapt_dx(iStep, tauxRejectsSum, unitRapport)
+            write(unit_dx, *) iStep, dx(1), tauxRejectsSum/real(iStep, DP)
             write(unitObsTherm, *) iStep, enTot, activExInv
         
         else
@@ -81,6 +84,7 @@ implicit none
     
     end do
     
+    close(unit_dx)
     close(unitObsTherm)
     close(unitObs)
     write(*, *) "Fin des cycles"
