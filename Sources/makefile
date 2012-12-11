@@ -11,7 +11,7 @@ all: $(EXEC1) $(EXEC2)
 
 #----------------------------------------------------------
 
-data_copy.f90:
+data_copy.f90: data.f90
 	cp data.f90 data_copy.f90
 
 data_copy.o data_constants.mod data_cell.mod data_particles.mod data_mc.mod \
