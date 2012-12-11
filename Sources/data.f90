@@ -64,7 +64,7 @@ use data_cell
     integer, parameter :: Nstep = 2**10
     integer, parameter :: Ntherm = 2**8
     integer, parameter :: Nmove = 2**2 * Ncol1 ! new
-    real(DP), dimension(Dim), protected :: dx = 0.5_DP ! new, à modifier.
+    real(DP), dimension(Dim), protected :: dx = 2._DP ! new, à modifier.
     
 contains
 
