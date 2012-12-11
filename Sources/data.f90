@@ -3,9 +3,9 @@
 !***********************************************************************
 module data_constants
 
-        integer, parameter :: DP = selected_real_kind(15, 307)
-            ! double precision
-        real(DP), parameter :: PI = acos(-1._DP)
+    integer, parameter :: DP = selected_real_kind(15, 307)
+        ! double precision
+    real(DP), parameter :: PI = acos(-1._DP)
         
 end module data_constants
 !***********************************************************************
