@@ -5,8 +5,10 @@ inFold="RhoCst_N_80-400_"
 outFold="Rho_cst"
 
 plotFold="Plots"
-Ndeb=80
-Nfin=400
+VolDeb=64
+VolFin=4096
+
+densite=0.46875
 
 # Vérification
 
@@ -70,8 +72,9 @@ cd ${plotFold}
 		echo "dataFold='${dataFold}'" > location.p
 		echo "dataFold_i='${inFold}'" >> location.p
 		echo "outFold='${outFold}'" >> location.p
-		echo "Ndeb="${Ndeb} >> location.p
-		echo "Nfin="${Nfin} >> location.p
+		echo "VolDeb="${VolDeb} >> location.p
+		echo "VolFin="${VolFin} >> location.p
+		echo "densite="${densite} >> location.p
 	 
 	cd ..
 

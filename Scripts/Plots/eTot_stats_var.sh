@@ -12,15 +12,26 @@ do
 
 	cd ${outFold_i}${iSimu}
 	
-		Ncol=$(grep "Ncol1" rapport.out | cut -d = -f 2)
+		nCol=$(grep "Ncol1" rapport.out | cut -d = -f 2)
+		vol=$(grep "Vol" rapport.out | cut -d = -f 2)
 		eMoy=$(grep "eTot.moy" rapport.out | cut -d = -f 2)
+		eMoyPart=$(grep "Energie moyenne par particule" rapport.out |\
+			cut -d = -f 2)
 		eRms=$(grep "eTot.rms" rapport.out | cut -d = -f 2)
 		
-		eMoyErreur=$(awk 'NR==1 {print $3}' bunching_eTot.out)
-		# premier : suffisant ?
+		N=$(echo ${nCol})
+		# Etrange entourloupe
 		
-		echo ${Ncol}"	"${eMoy}"	"${eMoyErreur} >> ../eTot_moy_var.out
-		echo ${Ncol}"	"${eRms} >> ../eTot_rms_var.out
+		# six : assez général ?
+		iBunch=6
+		eMoyErreur=$(awk -v i=${iBunch} 'NR==i {print $3}' bunching_eTot.out)		
+		eMoyErreurPart=$(awk -v i=${iBunch} -v x=${N} 'NR==i {print $3/x}' \
+			bunching_eTot.out)
+		
+		echo ${vol}"	"${eMoy}"	"${eMoyErreur} >> ../eTot_moy_var.out
+		echo ${vol}"	"${eMoyPart}"	"${eMoyErreurPart} >> \
+			../epp_moy_var.out
+		echo ${vol}"	"${eRms} >> ../eTot_rms_var.out
 		
 		echo "Rapport n°"${iSimu}" lu."
 		

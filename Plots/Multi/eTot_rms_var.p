@@ -3,8 +3,8 @@ out="eTot_rms_var.out"
 file=dataFold."/".dataFold_i."/".outFold."/".out
 
 set title "Statistiques : Energie : écart-type"
-set xlabel "Ncol"
-set xrange[log(Ndeb):log(Nfin)]
+set xlabel "Volume"
+set xrange[log(VolDeb-10):log(VolDeb+10)]
 set ylabel "rms(E)/Ncol"
 #set yrange[:]
 

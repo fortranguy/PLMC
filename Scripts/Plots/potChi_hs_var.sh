@@ -12,12 +12,12 @@ do
 
 	cd ${outFold_i}${iSimu}
 	
-	    Ncol=$(grep "Ncol1" rapport.out | cut -d = -f 2)
+	    vol=$(grep "Vol" rapport.out | cut -d = -f 2)
 		eta=$(grep "Compacité" rapport.out | cut -d = -f 2)
 		potChiId=$(grep "Potentiel chimique idéal " rapport.out | \
 		    cut -d = -f 2)
 		
-		echo "${Ncol}    ${eta}  ${potChiId}" >> ../potChi_hs_var.out
+		echo "${vol}    ${eta}  ${potChiId}" >> ../potChi_hs_var.out
 		
 		echo "Rapport n°"${iSimu}" lu."
 		

@@ -12,7 +12,7 @@ do
 
 	cd ${outFold_i}${iSimu}
 	
-		Ncol=$(grep "Ncol1" rapport.out | cut -d = -f 2)
+		vol=$(grep "Vol" rapport.out | cut -d = -f 2)
               
         jour_ini=$(awk '$NF=="snapShotIni.out" {print $(NF-2)}' rapport.out)
         jour_fin=$(awk '$NF=="snapShotFin.out" {print $(NF-2)}' rapport.out)
@@ -33,7 +33,7 @@ do
         total_heure=$(expr ${delta_jour} \* 24 \+ ${delta_heure})
         total_minute=$(expr ${total_heure} \* 60 \+ ${delta_minute})
  
-        echo ${Ncol}"   "${total_minute} >> ../temps_calc.out
+        echo ${vol}"   "${total_minute} >> ../temps_calc.out
 		
 		echo "Rapport n°"${iSimu}" lu."
 		

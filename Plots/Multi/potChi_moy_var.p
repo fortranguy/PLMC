@@ -10,8 +10,8 @@ ex = 3
 y=ex
 
 set title "Statistique : Potentiel chimque : moyenne"
-set xlabel "Ncol"
-set xrange[Ndeb:Nfin]
+set xlabel "Volume"
+set xrange[VolDeb-100:VolFin+100]
 set ylabel "Moyenne"
 #set yrange[-1:0]
 

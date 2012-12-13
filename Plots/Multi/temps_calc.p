@@ -3,8 +3,8 @@ out="temps_calc.out"
 file=dataFold."/".dataFold_i."/".outFold."/".out
 
 set title "Temps de calcul"
-set xlabel "Ncol"
-set xrange[Ndeb:Nfin]
+set xlabel "Volume"
+set xrange[VolDeb-100:VolFin+100]
 set ylabel "heures"
 #set yrange[:]
 
