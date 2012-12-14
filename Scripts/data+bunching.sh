@@ -14,6 +14,37 @@ nSimus=$(cat Temp/nSimus.in)
 echo "Entrez le nombre d'itérations :"
 read nBunching
 
+# Préparation
+
+cd ${binFold}
+
+	iSimu=0
+	until test ${iSimu} -eq ${nSimus}
+	do
+	
+	    iSimu=$(expr ${iSimu} \+ 1)
+	
+	    cd ${binFold_i}${iSimu}
+	    
+	    	ls snapShotFin.out
+	    	if test $? -ne 0
+			then
+				echo "Simulation pas encore finie ?"
+				exit
+			fi
+	    
+			ls -l | grep "snapShotIni.out" > snapIni_date.out
+			ls -l | grep "snapShotFin.out" > snapFin_date.out
+			#snapList=$(ls | grep "snap[0-9][0-9]*.out")
+			#tar cvf snap.tar ${snapList} > /dev/null
+			#rm ${snapList}	     
+	    
+	    cd ..
+	
+	done
+
+cd ..
+
 # Données
 cd ${outFold}
 
@@ -33,13 +64,9 @@ cd ${outFold}
 		
 		cd ${outFold_i}${iSimu}
 		
-			ls -l ../../${binFold}/${binFold_i}${iSimu} | \
-				grep "snapShotIni.out" > snapIni_date.out
-			ls -l ../../${binFold}/${binFold_i}${iSimu} | \
-				grep "snapShotFin.out" > snapFin_date.out
-		
-			cp ../../${binFold}/${binFold_i}${iSimu}/*.out . # sécurité
 			cp ../../${binFold}/${binFold_i}${iSimu}/data_copy.f90 .
+			cp ../../${binFold}/${binFold_i}${iSimu}/*.out . 
+			#cp ../../${binFold}/${binFold_i}${iSimu}/snap.tar .
 			
 			cp rapport.out rapportSave.out # sécurité bis
 		
