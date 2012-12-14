@@ -39,6 +39,7 @@ cd ${outFold}
 				grep "snapShotFin.out" > snapFin_date.out
 		
 			cp ../../${binFold}/${binFold_i}${iSimu}/*.out . # sécurité
+			cp ../../${binFold}/${binFold_i}${iSimu}/data_copy.f90 .
 			
 			cp rapport.out rapportSave.out # sécurité bis
 		
