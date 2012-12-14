@@ -123,6 +123,7 @@ cd ${srcFold}
 		fi
 		
 		exec1New=${exec1NewCore}"_"${param}${iSimu}
+		cp data_copy.f90 ../${binFold}/${binFold_i}${iSimu}
 		mv -i ${exec1} ../${binFold}/${binFold_i}${iSimu}/${exec1New}
 		mv -i ${exec2} ../${binFold}/${binFold_i}${iSimu}
 
