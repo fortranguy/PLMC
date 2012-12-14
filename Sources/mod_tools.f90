@@ -51,10 +51,9 @@ implicit none
     
     ! Rapport -----------------------------------------------------------------
     
-    subroutine rapport(nWidom, Lratio, unitRapport)
+    subroutine rapport(nWidom, unitRapport)
     
         integer, intent(in) :: nWidom
-        real(DP), intent(in) :: Lratio
         integer, intent(in) :: unitRapport    
         
         write(unitRapport, *) "Simulation MC_C :"
@@ -62,7 +61,6 @@ implicit none
         write(unitRapport ,*) "    Vol = ", product(Lsize)
         write(unitRapport ,*) "    Ncol1 = ", Ncol1
         write(unitRapport ,*) "    nWidom = ", nWidom
-        write(unitRapport ,*) "    Lratio = ", Lratio
         write(unitRapport, *) "    Nstep = ", Nstep
         write(unitRapport, *) "    Ntherm = ", Ntherm
         write(unitRapport, *) "    Nmove = ", Nmove

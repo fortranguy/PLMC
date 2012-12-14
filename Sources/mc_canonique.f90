@@ -16,7 +16,6 @@ implicit none
     real(DP) :: enTot, enTotSum
     real(DP) :: activExInv, activExInvSum ! inverse de l'activité
     integer, parameter :: nWidom = Ncol1 ! nombre de particules test
-    real(DP), parameter :: Lratio = 1._DP ! pour le volume du tirage cf. widom
     
     integer, parameter :: unitObs = 10, unitSnapIni = 11, unitSnapFin = 12, &
         unitRapport = 13, unitObsTherm = 14, unit_dx = 15
@@ -29,7 +28,7 @@ implicit none
     
     open(unit=unitRapport, recl=4096, file="rapport.out", status='new', &
         action='write')         ! contre line folding
-    call rapport(nWidom, Lratio, unitRapport)
+    call rapport(nWidom, unitRapport)
     call init_random_seed(unitRapport)
     
     ! Condition initiale
@@ -63,7 +62,7 @@ implicit none
             call mcMove(enTot, Nrejects)    
         end do
         
-        call widom(nWidom, Lratio, activExInv)
+        call widom(nWidom, activExInv)
         
         if (iStep <= Ntherm) then
         

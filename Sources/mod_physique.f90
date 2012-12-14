@@ -317,10 +317,9 @@ implicit none
     
     ! Méthode de Widom --------------------------------------------------------
 
-    subroutine widom(nWidom, Lratio, activExInv)
+    subroutine widom(nWidom, activExInv)
         
         integer, intent(in) :: nWidom
-        real(DP), intent(in) :: Lratio
         real(DP), intent(inOut) :: activExInv 
         
         integer :: iWid
@@ -335,7 +334,7 @@ implicit none
         do iWid = 1, nWidom           
             
             call random_number(xTest)
-            xTest(:) = Lratio*Lsize(:) * xTest(:)    
+            xTest(:) = Lsize(:) * xTest(:)    
             iCellTest = position_to_cell(xTest)
             call ePotNeigh(0, xTest, iCellTest, overlap, enTest) 
             
