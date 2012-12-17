@@ -17,7 +17,7 @@ set ylabel "Moyenne"
 
 mu(eta) = (eta * (8 - 9*eta + 4*eta**2))/(1-eta)**3
 
-#plot file u 1:y w l, "" u 1:y:(2.*$4/$1) with errorbars\
+plot file u 1:y:(2.*$4) with errorlines#\
     , fileHs u 1:(mu($2)) w l t "HS"
-plot file u 1:($2 + $3) w l t "Total", "" u 1:($2 + $3):(2.*$4/$1) with errorbars\
+#plot file "" u 1:($2 + $3):(2.*$4/$1) with errorbars t "Total"\
     , fileHs u 1:(mu($2) + ($3)) w l t "HS"
