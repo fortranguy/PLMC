@@ -32,9 +32,7 @@ cd ${binFold}
 				echo "Simulation pas encore finie ?"
 				exit
 			fi
-	    
-			ls -l | grep "snapShotIni.out" > snapIni_date.out
-			ls -l | grep "snapShotFin.out" > snapFin_date.out
+
 			#snapList=$(ls | grep "snap[0-9][0-9]*.out")
 			#tar cvf snap.tar ${snapList} > /dev/null
 			#rm ${snapList}	     
@@ -77,14 +75,6 @@ cd ${outFold}
 				echo "Pas de données."
 				exit
 			fi
-			
-			# Dates
-			echo " Dates des snapshots : " >> rapport.out
-				cat snapIni_date.out >> rapport.out
-				rm	snapIni_date.out
-				cat snapFin_date.out >> rapport.out
-				rm snapFin_date.out
-
 
 			# Bunching
 			pwd
