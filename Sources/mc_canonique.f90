@@ -16,9 +16,12 @@ implicit none
     real(DP) :: enTot, enTotSum
     real(DP) :: activExInv, activExInvSum ! inverse de l'activité
     integer, parameter :: nWidom = Ncol1 ! nombre de particules test
+    real(DP) :: tIni, tFin
     
     integer, parameter :: unitObs = 10, unitSnapIni = 11, unitSnapFin = 12, &
         unitRapport = 13, unitObsTherm = 14, unit_dx = 15
+        
+    write(*, *) "MC_C+Neigh : Vol =", product(Lsize)
     
     Nrejects = 0
     tauxRejectsSum = 0._DP
@@ -56,6 +59,7 @@ implicit none
     open(unit=unit_dx, recl=4096, file="dx.out", status='new', &
         action='write')
     
+    call cpu_time(tIni)
     do iStep = 1, Ntherm + Nstep
     
         do iMove = 1, Nmove        
@@ -82,6 +86,7 @@ implicit none
         Nrejects = 0
     
     end do
+    call cpu_time(tFin)
     
     close(unit_dx)
     close(unitObsTherm)
@@ -93,7 +98,7 @@ implicit none
     call overlapTest()
     
     call consisTest(enTot, unitRapport)
-    call mcResults(enTotSum, activExInvSum, tauxRejectsSum,&
+    call mcResults(enTotSum, activExInvSum, tauxRejectsSum, tFin-tIni,&
         unitRapport)
     close(unitRapport)
     
