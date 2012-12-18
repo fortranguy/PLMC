@@ -6,6 +6,7 @@ outFold="Out"
 tmpFold="Temp"
 exec1="xMC_Canonique"
 exec2="xBunching"
+exec3="xDistrib"
 
 condIni="cube"
 binFold_i="Bin"
@@ -126,6 +127,7 @@ cd ${srcFold}
 		cp data_copy.f90 ../${binFold}/${binFold_i}${iSimu}
 		mv -i ${exec1} ../${binFold}/${binFold_i}${iSimu}/${exec1New}
 		mv -i ${exec2} ../${binFold}/${binFold_i}${iSimu}
+		mv -i ${exec3} ../${binFold}/${binFold_i}${iSimu}
 
 	done
 
