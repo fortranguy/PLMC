@@ -39,7 +39,7 @@ cd ${binFold}
 			then
 				snapList=$(ls | grep "snap[0-9][0-9]*.out")
 				tar cvf snap.tar ${snapList} > /dev/null
-				./${exec3}
+				./${exec3} >> rapport.out
 				rm ${snapList}	
 			fi 
 	    
