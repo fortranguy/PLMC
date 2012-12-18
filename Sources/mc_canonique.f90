@@ -2,6 +2,7 @@ program mc_cano
 
 use data_constants
 use data_mc
+use data_distrib
 use mod_physique
 use mod_tools
 
@@ -19,7 +20,8 @@ implicit none
     real(DP) :: tIni, tFin
     
     integer, parameter :: unitObs = 10, unitSnapIni = 11, unitSnapFin = 12, &
-        unitRapport = 13, unitObsTherm = 14, unit_dx = 15
+        unitRapport = 13, unitObsTherm = 14, unit_dx = 15, unitSnapEnCours = 16
+    character(len=20) :: fileSnap, iSnap
         
     write(*, *) "MC_C+Neigh : Vol =", product(Lsize)
     
@@ -84,6 +86,15 @@ implicit none
         
         tauxRejectsSum = tauxRejectsSum + real(Nrejects, DP)/real(Nmove, DP)
         Nrejects = 0
+        
+        if (snap) then        
+		    write(iSnap, "(i)") iStep
+		    fileSnap = trim("snap"//adjustl(iSnap))//".out"
+		    open(unit=unitSnapEnCours, recl=4096, file=fileSnap, &
+		    	status='new', action='write')
+		        call snapShot(unitSnapEnCours)
+		    close(unitSnapEnCours)
+	    end if
     
     end do
     call cpu_time(tFin)
