@@ -4,6 +4,7 @@ binFold="Binaries"
 outFold="Out"
 plotFold="Plots"
 exec2="xBunching"
+exec3="xDistrib"
 statScript="avgRms.sh"
 
 binFold_i="Bin"
@@ -32,10 +33,15 @@ cd ${binFold}
 				echo "Simulation pas encore finie ?"
 				exit
 			fi
-
-			#snapList=$(ls | grep "snap[0-9][0-9]*.out")
-			#tar cvf snap.tar ${snapList} > /dev/null
-			#rm ${snapList}	     
+			
+			ls snap1.out
+	    	if test $? -e 0
+			then
+				snapList=$(ls | grep "snap[0-9][0-9]*.out")
+				tar cvf snap.tar ${snapList} > /dev/null
+				./${exec3}
+				rm ${snapList}	
+			fi 
 	    
 	    cd ..
 	
@@ -63,8 +69,13 @@ cd ${outFold}
 		cd ${outFold_i}${iSimu}
 		
 			cp ../../${binFold}/${binFold_i}${iSimu}/data_copy.f90 .
-			cp ../../${binFold}/${binFold_i}${iSimu}/*.out . 
-			#cp ../../${binFold}/${binFold_i}${iSimu}/snap.tar .
+			cp ../../${binFold}/${binFold_i}${iSimu}/*.out .
+			
+			ls ../../${binFold}/${binFold_i}${iSimu}/snap.tar
+	    	if test $? -e 0
+			then
+				cp ../../${binFold}/${binFold_i}${iSimu}/snap.tar .
+			end if
 			
 			cp rapport.out rapportSave.out # sécurité bis
 		
