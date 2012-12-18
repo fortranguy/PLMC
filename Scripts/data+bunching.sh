@@ -35,7 +35,7 @@ cd ${binFold}
 			fi
 			
 			ls snap1.out
-	    	if test $? -e 0
+	    	if test $? -eq 0
 			then
 				snapList=$(ls | grep "snap[0-9][0-9]*.out")
 				tar cvf snap.tar ${snapList} > /dev/null
@@ -72,7 +72,7 @@ cd ${outFold}
 			cp ../../${binFold}/${binFold_i}${iSimu}/*.out .
 			
 			ls ../../${binFold}/${binFold_i}${iSimu}/snap.tar
-	    	if test $? -e 0
+	    	if test $? -eq 0
 			then
 				cp ../../${binFold}/${binFold_i}${iSimu}/snap.tar .
 			end if
