@@ -151,3 +151,39 @@ contains
         
 end module data_potentiel
 !***********************************************************************
+
+!***********************************************************************
+!* MODULE: Distribution function                                       *
+!***********************************************************************
+module data_distrib
+
+use data_constants
+use data_cell
+
+	logical, parameter :: snap = .false.
+	real(DP), parameter :: deltaDist = 0.01_DP
+	real(DP), protected :: rMax
+	integer, protected :: Ndist
+	
+contains
+	
+	subroutine initDistriParams()
+	
+	implicit none
+	
+		rMax = sqrt(dot_product(LsizeMi, LsizeMi))
+		Ndist = int(rMax/deltaDist)
+	
+	end subroutine initDistriParams
+	
+	function sphereVol(iDist)
+	
+		integer, intent(in) :: iDist	
+		real(DP) :: sphereVol
+		
+		sphereVol = 4._DP/3._DP * PI * ( real(iDist+1, DP)*deltaDist )**3
+												! pourquoi +1 ?	
+	end function sphereVol
+
+end module data_distrib
+!***********************************************************************
