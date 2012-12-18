@@ -74,7 +74,7 @@ cd ${outFold}
 			ls ../../${binFold}/${binFold_i}${iSimu}/snap.tar
 	    	if test $? -eq 0
 			then
-				cp ../../${binFold}/${binFold_i}${iSimu}/snap.tar .
+				mv ../../${binFold}/${binFold_i}${iSimu}/snap.tar .
 			fi
 			
 			cp rapport.out rapportSave.out # sécurité bis

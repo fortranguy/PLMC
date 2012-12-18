@@ -19,6 +19,7 @@ implicit none
 	integer :: iDist
 	real(DP) :: r
 	real(DP) :: numerat, denomin
+	real(DP) :: energSum 
 	
 	if (.not.snap) stop "Snap désactivé."
 	
@@ -63,18 +64,29 @@ implicit none
 	
 	end do
 	
-	! Ecriture
+	! Ecriture et Energie par particule
+	
+	energSum = 0._DP
+	call ePotIni()
 	
 	open(unit=unitdistrib, file="fct_distrib.out", action="write")	
 		do iDist = 1, Ndist
+		
 			r = (real(iDist, DP) + 0.5_DP) * deltaDist
 			numerat = real(sum(distrib(iDist, :)), DP)
 			numerat = numerat / real(Nstep, DP)
 			denomin = real(Ncol1, DP) * (sphereVol(iDist+1) - sphereVol(iDist))
 			denomin = denomin * densite
-			write(unitdistrib, *) r, numerat / denomin				
+			write(unitdistrib, *) r, numerat / denomin
+			
+			if (r>=rmin .and. r<=rcut11) then
+				energSum = energSum + ePot(r) * numerat/denomin * 4._DP*PI*r**2
+			end if
+			
 		end do
 	close(unitdistrib)
+	
+	write(*, *) "Energie par particule =", densite/2._DP * energSum * deltaDist
 	
 	deallocate(distrib)
 
