@@ -181,7 +181,7 @@ contains
 		integer, intent(in) :: iDist	
 		real(DP) :: sphereVol
 		
-		sphereVol = 4._DP/3._DP * PI * ( real(iDist+1, DP)*deltaDist )**3
+		sphereVol = 4._DP/3._DP * PI * ( real(iDist, DP)*deltaDist )**3
 												! pourquoi +1 ?	
 	end function sphereVol
 
