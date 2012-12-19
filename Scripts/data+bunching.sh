@@ -72,7 +72,11 @@ cd ${outFold}
 			
 						
 			cp rapport.out rapportSave.out # sécurité
-			cat epp_dist.out >> rapport.out
+			
+			ls epp_dist.out
+	    	if test $? -eq 0
+				cat epp_dist.out >> rapport.out
+			fi
 
 			# Bunching
 			pwd
