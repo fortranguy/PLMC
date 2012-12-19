@@ -12,7 +12,6 @@ implicit none
 	integer, parameter :: unitSnapEnCours = 10, unitdistrib = 11
 
 	integer :: iStep
-	character(len=20) :: fileSnap, iSnap
 	integer :: iCol, jCol
 	real(DP), dimension(Dim) :: DeltaX
 	real(DP) :: r_ij
@@ -28,20 +27,17 @@ implicit none
 	
 	distrib(:, :) = 0
 	
-	do iStep = Ntherm-1, Nstep + Ntherm
+	
+	open(unit=unitSnapEnCours, recl=4096, file="snap.shot", status='old', &
+		action='read')
+	
+	do iStep = 1, Nstep
 	
 		! Lecture :
-	
-		write(iSnap, "(i)") iStep
-		fileSnap = trim("snap"//adjustl(iSnap))//".out"
-		open(unit=unitSnapEnCours, recl=4096, file=fileSnap, &
-			status='old', action='read')
 			
 			do iCol = 1, Ncol1
 			    read(unitSnapEnCours, *) X(:, iCol)
 		    end do
-		    
-		close(unitSnapEnCours)
     
 		! Traitement
 	
@@ -63,6 +59,8 @@ implicit none
 		end do
 	
 	end do
+	
+	close(unitSnapEnCours)
 	
 	! Ecriture et Energie par particule
 	

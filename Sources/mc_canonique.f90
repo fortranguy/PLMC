@@ -21,7 +21,6 @@ implicit none
     
     integer, parameter :: unitObs = 10, unitSnapIni = 11, unitSnapFin = 12, &
         unitRapport = 13, unitObsTherm = 14, unit_dx = 15, unitSnapEnCours = 16
-    character(len=20) :: fileSnap, iSnap
         
     write(*, *) "MC_C+Neigh : Vol =", product(Lsize)
     
@@ -60,6 +59,8 @@ implicit none
         action='write')
     open(unit=unit_dx, recl=4096, file="dx.out", status='new', &
         action='write')
+    open(unit=unitSnapEnCours, recl=4096, file="snap.shot", status='new', &
+    	action='write')
     
     call cpu_time(tIni)
     do iStep = 1, Ntherm + Nstep
@@ -82,23 +83,19 @@ implicit none
             activExInvSum = activExInvSum + activExInv            
             write(unitObs, *) iStep, enTot, activExInv
             
+            if (snap) then        
+			    call snapShot(unitSnapEnCours)
+			end if
+            
         end if
         
         tauxRejectsSum = tauxRejectsSum + real(Nrejects, DP)/real(Nmove, DP)
         Nrejects = 0
-        
-        if (snap) then        
-		    write(iSnap, "(i)") iStep
-		    fileSnap = trim("snap"//adjustl(iSnap))//".out"
-		    open(unit=unitSnapEnCours, recl=4096, file=fileSnap, &
-		    	status='new', action='write')
-		        call snapShot(unitSnapEnCours)
-		    close(unitSnapEnCours)
-	    end if
     
     end do
     call cpu_time(tFin)
     
+    close(unitSnapEnCours)
     close(unit_dx)
     close(unitObsTherm)
     close(unitObs)
