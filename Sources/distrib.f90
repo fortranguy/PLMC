@@ -16,15 +16,17 @@ implicit none
 	integer :: iCol, jCol
 	real(DP), dimension(Dim) :: DeltaX
 	real(DP) :: r_ij
-	integer :: iDist
+	integer :: iDist, iDistMin, iDistMax
 	real(DP) :: r
 	real(DP) :: numerat, denomin
-	real(DP) :: energSum 
+	real(DP), dimension(:), allocatable :: fct_dist
+	real(DP) :: energSum
 	
 	if (.not.snap) stop "Snap désactivé."
 	
 	call initDistriParams()
 	allocate(distrib(Ndist, Ncol1))
+	allocate(fct_dist(Ndist))
 	
 	distrib(:, :) = 0
 	
@@ -63,33 +65,47 @@ implicit none
 	
 	close(unitSnapEnCours)
 	
-	! Ecriture et Energie par particule
+	! Ecriture
 	
-	energSum = 0._DP
-	call ePotIni()
+	iDistMin = 0
+	iDistMax = 0
 	
 	open(unit=unitDistrib, file="fct_distrib.out", action="write")	
 		do iDist = 1, Ndist
 		
 			r = (real(iDist, DP) + 0.5_DP) * deltaDist
-			numerat = real(sum(distrib(iDist, :)), DP)
-			numerat = numerat / real(Nstep, DP)
+			numerat = real(sum(distrib(iDist, :)), DP) / real(Nstep, DP)
 			denomin = real(Ncol1, DP) * (sphereVol(iDist+1) - sphereVol(iDist))
-			denomin = denomin * densite
-			write(unitDistrib, *) r, numerat / denomin
+			fct_dist(iDist) = numerat / denomin / densite
+			write(unitDistrib, *) r, fct_dist(iDist)
 			
 			if (r>=rmin .and. r<=rcut11) then
-				energSum = energSum + ePot(r) * numerat/denomin * 4._DP*PI*r**2
+				if (iDistMin == 0) then
+					iDistMin = iDist
+				end if
+				iDistMax = iDist
 			end if
 			
 		end do
 	close(unitDistrib)
 	
+	! Energie par particule
+
+	call ePotIni()
+	
+	energSum = 0._DP
+	
+	do iDist = iDistMin, iDistMax
+		r = (real(iDist, DP) + 0.5_DP) * deltaDist
+		energSum = energSum + ePot(r) * fct_dist(iDist) * 4._DP*PI*r**2	
+	end do
+
 	open(unit=unitEnerg, file="epp_dist.out", action="write")
 		write(unitEnerg, *) "epp_dist =", &
 			densite/2._DP * energSum * deltaDist
 	close(unitEnerg)
 	
+	deallocate(fct_dist)
 	deallocate(distrib)
 
 end program distribution
