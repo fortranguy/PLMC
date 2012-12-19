@@ -33,18 +33,7 @@ cd ${binFold}
 				echo "Simulation pas encore finie ?"
 				exit
 			fi
-			
-			ls snap1.out
-	    	if test $? -eq 0
-			then
-				snapList=$(ls | grep "snap[0-9][0-9]*.out")
-				./${exec3} > epp.out
-				echo "Début tar"
-				tar cvf snap.tar ${snapList} > /dev/null
-				echo "Fin tar"
-				rm ${snapList}	
-			fi 
-	    
+
 	    cd ..
 	
 	done
@@ -72,15 +61,6 @@ cd ${outFold}
 		
 			cp ../../${binFold}/${binFold_i}${iSimu}/data_copy.f90 .
 			cp ../../${binFold}/${binFold_i}${iSimu}/*.out .
-			
-			cp rapport.out rapportSave.out # sécurité
-			
-			ls ../../${binFold}/${binFold_i}${iSimu}/snap.tar
-	    	if test $? -eq 0
-			then
-				mv ../../${binFold}/${binFold_i}${iSimu}/snap.tar .
-				cat epp.tot >> rapport.out
-			fi
 		
 			echo "Test : présence de fichiers .out ?"
 			ls *.out
@@ -89,6 +69,10 @@ cd ${outFold}
 				echo "Pas de données."
 				exit
 			fi
+			
+						
+			cp rapport.out rapportSave.out # sécurité
+			cat epp_dist.out >> rapport.out
 
 			# Bunching
 			pwd
