@@ -38,8 +38,10 @@ cd ${binFold}
 	    	if test $? -eq 0
 			then
 				snapList=$(ls | grep "snap[0-9][0-9]*.out")
+				./${exec3} > epp.out
+				echo "Début tar"
 				tar cvf snap.tar ${snapList} > /dev/null
-				./${exec3} >> rapport.out
+				echo "Fin tar"
 				rm ${snapList}	
 			fi 
 	    
@@ -71,13 +73,14 @@ cd ${outFold}
 			cp ../../${binFold}/${binFold_i}${iSimu}/data_copy.f90 .
 			cp ../../${binFold}/${binFold_i}${iSimu}/*.out .
 			
+			cp rapport.out rapportSave.out # sécurité
+			
 			ls ../../${binFold}/${binFold_i}${iSimu}/snap.tar
 	    	if test $? -eq 0
 			then
 				mv ../../${binFold}/${binFold_i}${iSimu}/snap.tar .
+				cat epp.tot >> rapport.out
 			fi
-			
-			cp rapport.out rapportSave.out # sécurité bis
 		
 			echo "Test : présence de fichiers .out ?"
 			ls *.out
