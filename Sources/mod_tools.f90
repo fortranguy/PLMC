@@ -44,7 +44,7 @@ implicit none
         integer :: iCol
         
         do iCol = 1, Ncol1
-            write(unitSnap, *) X(:, iCol), iCol
+            write(unitSnap, *) X(:, iCol)
         end do    
 
     end subroutine
