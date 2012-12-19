@@ -9,7 +9,8 @@ implicit none
 
 	real(DP), parameter :: densite = real(Ncol1, DP) / (Lsize1*Lsize2*Lsize3)
 	integer, dimension(:, :), allocatable :: distrib
-	integer, parameter :: unitSnapEnCours = 10, unitdistrib = 11
+	integer, parameter :: unitSnapEnCours = 10, unitDistrib = 11, &
+		unitEnerg = 12
 
 	integer :: iStep
 	integer :: iCol, jCol
@@ -67,7 +68,7 @@ implicit none
 	energSum = 0._DP
 	call ePotIni()
 	
-	open(unit=unitdistrib, file="fct_distrib.out", action="write")	
+	open(unit=unitDistrib, file="fct_distrib.out", action="write")	
 		do iDist = 1, Ndist
 		
 			r = (real(iDist, DP) + 0.5_DP) * deltaDist
@@ -75,16 +76,19 @@ implicit none
 			numerat = numerat / real(Nstep, DP)
 			denomin = real(Ncol1, DP) * (sphereVol(iDist+1) - sphereVol(iDist))
 			denomin = denomin * densite
-			write(unitdistrib, *) r, numerat / denomin
+			write(unitDistrib, *) r, numerat / denomin
 			
 			if (r>=rmin .and. r<=rcut11) then
 				energSum = energSum + ePot(r) * numerat/denomin * 4._DP*PI*r**2
 			end if
 			
 		end do
-	close(unitdistrib)
+	close(unitDistrib)
 	
-	write(*, *) "Energie par particule =", densite/2._DP * energSum * deltaDist
+	open(unit=unitEnerg, file="epp_dist.out", action="write")
+		write(unitEnerg, *) "epp_dist =", &
+			densite/2._DP * energSum * deltaDist
+	close(unitEnerg)
 	
 	deallocate(distrib)
 
