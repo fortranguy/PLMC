@@ -66,16 +66,16 @@ implicit none
 		! Traitement
 	
 		do iCol = 1, Ncol1
-		do jCol = iCol + 1, Ncol1
+			do jCol = iCol + 1, Ncol1
 		
-			DeltaX(:) = X(:, jCol) - X(:, iCol)
-            call pbc_dif(DeltaX)
-            r_ij = sqrt(dot_product(DeltaX, DeltaX))
-            
-            iDist =  int( r_ij/deltaDist )
-            distrib(iDist, iCol) = distrib(iDist, iCol) + 1
+				DeltaX(:) = X(:, jCol) - X(:, iCol)
+		        call pbc_dif(DeltaX)
+		        r_ij = sqrt(dot_product(DeltaX, DeltaX))
+		        
+		        iDist =  int( r_ij/deltaDist )
+		        distrib(iDist, iCol) = distrib(iDist, iCol) + 1
 		
-		end do		
+			end do		
 		end do
 	
 	end do
