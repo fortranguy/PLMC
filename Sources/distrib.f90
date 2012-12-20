@@ -91,7 +91,7 @@ implicit none
 		do iDist = 1, Ndist
 		
 			r = (real(iDist, DP) + 0.5_DP) * deltaDist
-			numerat = real(sum(distrib(:)), DP) / real(Nstep, DP)
+			numerat = real(distrib(iDist), DP) / real(Nstep, DP)
 			denomin = real(Ncol1, DP) * (sphereVol(iDist+1) - sphereVol(iDist))
 			fct_dist(iDist) = 2._DP * numerat / denomin / densite
 			write(unitDistrib, *) r, fct_dist(iDist)
