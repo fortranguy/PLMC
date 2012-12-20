@@ -58,10 +58,10 @@ implicit none
 	do iStep = 1, Nstep
 	
 		! Lecture :
-			
-			do iCol = 1, Ncol1
-			    read(unitSnapEnCours, *) X(:, iCol)
-		    end do
+		
+		do iCol = 1, Ncol1
+		    read(unitSnapEnCours, *) X(:, iCol)
+	    end do
     
 		! Traitement
 	
