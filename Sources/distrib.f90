@@ -29,7 +29,7 @@ use mod_physique
 implicit none
 
 	real(DP), parameter :: densite = real(Ncol1, DP) / (Lsize1*Lsize2*Lsize3)
-	integer, dimension(:, :), allocatable :: distrib
+	integer, dimension(:), allocatable :: distrib
 	integer, parameter :: unitSnapEnCours = 10, unitDistrib = 11, &
 		unitEnerg = 12
 
@@ -46,10 +46,10 @@ implicit none
 	if (.not.snap) stop "Snap désactivé."
 	
 	call initDistriParams()
-	allocate(distrib(Ndist, Ncol1))
+	allocate(distrib(Ndist))
 	allocate(fct_dist(Ndist))
 	
-	distrib(:, :) = 0
+	distrib(:) = 0
 	
 	
 	open(unit=unitSnapEnCours, recl=4096, file="snap.shot", status='old', &
@@ -73,7 +73,7 @@ implicit none
 		        r_ij = sqrt(dot_product(DeltaX, DeltaX))
 		        
 		        iDist =  int( r_ij/deltaDist )
-		        distrib(iDist, iCol) = distrib(iDist, iCol) + 1
+		        distrib(iDist) = distrib(iDist) + 1
 		
 			end do		
 		end do
@@ -91,7 +91,7 @@ implicit none
 		do iDist = 1, Ndist
 		
 			r = (real(iDist, DP) + 0.5_DP) * deltaDist
-			numerat = real(sum(distrib(iDist, :)), DP) / real(Nstep, DP)
+			numerat = real(sum(distrib(:)), DP) / real(Nstep, DP)
 			denomin = real(Ncol1, DP) * (sphereVol(iDist+1) - sphereVol(iDist))
 			fct_dist(iDist) = 2._DP * numerat / denomin / densite
 			write(unitDistrib, *) r, fct_dist(iDist)
