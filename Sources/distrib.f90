@@ -1,8 +1,29 @@
+module mod_dist
+
+use data_constants
+use data_distrib
+
+implicit none
+
+contains
+
+    function sphereVol(iDist)
+    
+        integer, intent(in) :: iDist    
+        real(DP) :: sphereVol
+        
+        sphereVol = 4._DP/3._DP * PI * ( real(iDist, DP)*deltaDist )**3
+        
+    end function sphereVol
+    
+end module mod_dist
+
 program distribution
 
 use data_constants
 use data_distrib
 use data_particles
+use mod_dist
 use mod_physique
 
 implicit none
@@ -45,18 +66,14 @@ implicit none
 		! Traitement
 	
 		do iCol = 1, Ncol1
-		do jCol = 1, Ncol1
-	
-			if (jCol/=iCol) then
-			
-				DeltaX(:) = X(:, jCol) - X(:, iCol)
-	            call pbc_dif(DeltaX)
-	            r_ij = sqrt(dot_product(DeltaX, DeltaX))
-	            
-	            iDist =  int( r_ij/deltaDist )
-	            distrib(iDist, iCol) = distrib(iDist, iCol) + 1
-			
-			end if
+		do jCol = iCol + 1, Ncol1
+		
+			DeltaX(:) = X(:, jCol) - X(:, iCol)
+            call pbc_dif(DeltaX)
+            r_ij = sqrt(dot_product(DeltaX, DeltaX))
+            
+            iDist =  int( r_ij/deltaDist )
+            distrib(iDist, iCol) = distrib(iDist, iCol) + 1
 		
 		end do		
 		end do
@@ -76,7 +93,7 @@ implicit none
 			r = (real(iDist, DP) + 0.5_DP) * deltaDist
 			numerat = real(sum(distrib(iDist, :)), DP) / real(Nstep, DP)
 			denomin = real(Ncol1, DP) * (sphereVol(iDist+1) - sphereVol(iDist))
-			fct_dist(iDist) = numerat / denomin / densite
+			fct_dist(iDist) = 2._DP * numerat / denomin / densite
 			write(unitDistrib, *) r, fct_dist(iDist)
 			
 			if (r>=rmin .and. r<=rcut11) then

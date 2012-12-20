@@ -175,15 +175,6 @@ contains
 		Ndist = int(rMax/deltaDist)
 	
 	end subroutine initDistriParams
-	
-	function sphereVol(iDist)
-	
-		integer, intent(in) :: iDist	
-		real(DP) :: sphereVol
-		
-		sphereVol = 4._DP/3._DP * PI * ( real(iDist, DP)*deltaDist )**3
-												! pourquoi +1 ?	
-	end function sphereVol
 
 end module data_distrib
 !***********************************************************************
