@@ -76,4 +76,4 @@ clean:
 	data_potentiel.mod data_neighbours.mod
 	
 mrproper: clean
-	rm -f data_copy.f90 *.mod $(EXEC1) $(EXEC2) $(EXEC3) 
+	rm -f *.mod $(EXEC1) $(EXEC2) $(EXEC3) data_copy.f90
