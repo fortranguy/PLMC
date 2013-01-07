@@ -25,6 +25,7 @@ use data_distrib
 use data_particles
 use mod_dist
 use mod_physique
+!$ use omp_lib
 
 implicit none
 
@@ -43,6 +44,10 @@ implicit none
 	real(DP), dimension(:), allocatable :: fct_dist
 	real(DP) :: energSum
 	
+	!$ integer :: nb_taches = 4 ! changer ?
+	real(DP) :: tIni, tFin
+	!$ real(DP) :: tIni_para, tFin_para
+	
 	if (.not.snap) stop "Snap désactivé."
 	
 	call initDistriParams()
@@ -51,20 +56,24 @@ implicit none
 	
 	distrib(:) = 0
 	
-	
 	open(unit=unitSnapEnCours, recl=4096, file="snap.shot", status='old', &
 		action='read')
 	
+	call cpu_time(tIni)
+	!$ tIni_para = omp_get_wtime()	
+	!$omp parallel private(X, iCol, jCol, DeltaX, r_ij, iDist)
+		!$omp do schedule(static, Nstep/nb_taches) reduction(+:distrib)
 	do iStep = 1, Nstep
 	
 		! Lecture :
-			
+		!$omp critical
 		do iCol = 1, Ncol1
 		    read(unitSnapEnCours, *) X(:, iCol)
 	    end do
+    	!$omp end critical
     
 		! Traitement
-	
+		 
 		do iCol = 1, Ncol1
 			do jCol = iCol + 1, Ncol1
 		
@@ -72,13 +81,25 @@ implicit none
 		        call pbc_dif(DeltaX)
 		        r_ij = sqrt(dot_product(DeltaX, DeltaX))
 		        
-		        iDist =  int( r_ij/deltaDist )
+		        iDist =  int(r_ij/deltaDist)
 		        distrib(iDist) = distrib(iDist) + 1
 		
 			end do		
 		end do
-	
+		
 	end do
+	!$omp end do nowait
+	!$omp end parallel
+	call cpu_time(tFin)
+	!$ tFin_para = omp_get_wtime()	
+	
+	open(unit=100, file="dist_duree.out")
+		write(100, *) "DuréeSérie", tFin - tIni
+		!$ write(100, *) "DuréeParallèle", tFin_para - tIni_para
+		!$ write(100, *) "nb_taches =", nb_taches
+		!$ write(100, *) "Rapport =", (tFin-tIni)/(tFin_para-tIni_para)
+			! trompeur ?
+	close(100)
 	
 	close(unitSnapEnCours)
 	
