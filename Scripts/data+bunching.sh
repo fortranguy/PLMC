@@ -75,6 +75,7 @@ cd ${outFold}
 			
 			ls epp_dist.out
 	    	if test $? -eq 0
+	    	then
 				cat epp_dist.out >> rapport.out
 			fi
 
