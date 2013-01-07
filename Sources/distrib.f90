@@ -62,12 +62,12 @@ implicit none
 	call cpu_time(tIni)
 	!$ tIni_para = omp_get_wtime()	
 	!$omp parallel private(X, iCol, jCol, DeltaX, r_ij, iDist)
-		!$omp do schedule(static, Nstep/nb_taches) reduction(+:distrib)
-	do iStep = 1, Nstep
+		!$omp do schedule(static, Nstep/nSauts**3/nb_taches) reduction(+:distrib)
+	do iStep = 1, Nstep/nSauts**3
 	
 		! Lecture :
 		!$omp critical
-		do iSaut = 1, dist_saut
+		do iSaut = 1, nSauts**3
 			do iCol = 1, Ncol1
 				read(unitSnapEnCours, *) X(:, iCol)
 			end do
@@ -114,7 +114,7 @@ implicit none
 		do iDist = 1, Ndist
 		
 			r = (real(iDist, DP) + 0.5_DP) * deltaDist
-			numerat = real(distrib(iDist), DP) / real(Nstep, DP)
+			numerat = real(distrib(iDist), DP) / real(Nstep/nSauts**3, DP)
 			denomin = real(Ncol1, DP) * (sphereVol(iDist+1) - sphereVol(iDist))
 			fct_dist(iDist) = 2._DP * numerat / denomin / densite
 			write(unitDistrib, *) r, fct_dist(iDist)
