@@ -94,7 +94,7 @@ implicit none
 	!$ tFin_para = omp_get_wtime()	
 	
 	open(unit=100, file="dist_duree.out")
-		write(100, *) "DuréeSérie", tFin - tIni
+		write(100, *) "DuréeSérie_pseudo", tFin - tIni
 		!$ write(100, *) "DuréeParallèle", tFin_para - tIni_para
 		!$ write(100, *) "nb_taches =", nb_taches
 		!$ write(100, *) "Rapport =", (tFin-tIni)/(tFin_para-tIni_para)
