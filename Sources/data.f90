@@ -161,7 +161,8 @@ use data_constants
 use data_cell
 
 	logical, parameter :: snap = .false.
-	real(DP), parameter :: deltaDist = 0.01_DP
+	integer, parameter :: dist_saut = 1
+	real(DP), parameter :: deltaDist = real(dist_saut, DP) * 0.01_DP
 	real(DP), protected :: rMax
 	integer, protected :: Ndist
 	

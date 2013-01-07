@@ -34,7 +34,7 @@ implicit none
 	integer, parameter :: unitSnapEnCours = 10, unitDistrib = 11, &
 		unitEnerg = 12
 
-	integer :: iStep
+	integer :: iStep, iSaut
 	integer :: iCol, jCol
 	real(DP), dimension(Dim) :: DeltaX
 	real(DP) :: r_ij
@@ -67,9 +67,11 @@ implicit none
 	
 		! Lecture :
 		!$omp critical
-		do iCol = 1, Ncol1
-		    read(unitSnapEnCours, *) X(:, iCol)
-	    end do
+		do iSaut = 1, dist_saut
+			do iCol = 1, Ncol1
+				read(unitSnapEnCours, *) X(:, iCol)
+			end do
+		end do
     	!$omp end critical
     
 		! Traitement
