@@ -1,6 +1,8 @@
 FC = ifort
 FFLAGS = # -warn all -check all -check noarg_temp_created
 LDFLAGS = # -warn all -check all -check noarg_temp_created
+FFLAGS_OMP = $(FFLAGS) -openmp 
+LDFLAGS_OMP = $(LDFLAGS) -openmp
 #FC = gfortran
 #FFLAGS = -W -Wall -fbounds-check
 #LDFLAGS = -W -Wall -fbounds-check
@@ -64,10 +66,10 @@ distrib.o: data_constants.mod data_distrib.mod data_particles.mod \
 	mod_physique.mod
 
 distrib.o: distrib.f90
-	$(FC) $(FFLAGS) -c $<
+	$(FC) $(FFLAGS_OMP) -c $<
 
 xDistrib: data_copy.o data_neighbours.o mod_neighbours.o mod_physique.o distrib.o
-	$(FC) $^ $(LDFLAGS) -o $@
+	$(FC) $^ $(LDFLAGS_OMP) -o $@
 
 # ---------------------------------------------------------
 	
