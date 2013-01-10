@@ -14,6 +14,8 @@ outFold_i="Out"
 editeur="gedit"
 exec1NewCore="xMC_Cano"
 
+intelLib="/opt/intel/composer_xe_2011_sp1.7.256/bin/compilervars.sh"
+
 # ---------------------------------------------------------
 
 # Préparation
@@ -149,7 +151,8 @@ cd ${binFold}
 			exec1New=${exec1NewCore}"_"${param}${iSimu}
 			echo "Exécution de "${exec1New}
 			
-			echo "time ./${exec1New} ${condIni} && time ./${exec3}" > exeCmd.out
+			echo "source ${intelLib} intel64" > exeCmd.out
+			echo "time ./${exec1New} ${condIni} && time ./${exec3}" >> exeCmd.out
 		    at -f exeCmd.out now + ${delai} hours
 			if test $? -ne 0
 			then
