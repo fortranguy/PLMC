@@ -60,6 +60,8 @@ use data_constants
 use data_particles
 use data_cell
 
+implicit none
+
     real(DP), parameter :: Tstar = 1._DP
     integer, parameter :: Nstep = 2**10
     integer, parameter :: Ntherm = 2**8
@@ -123,6 +125,8 @@ module data_potentiel
 use data_constants
 use data_particles
 
+implicit none
+
     real(DP), parameter :: rcut11 = 4._DP ! new
     real(DP), parameter :: pas11 = 5.E-5_DP ! new
     real(DP), parameter :: surpas11 = 1._DP/pas11 ! new
@@ -159,6 +163,8 @@ module data_distrib
 
 use data_constants
 use data_cell
+
+implicit none
 
 	logical, parameter :: snap = .false.
 	integer, parameter :: nSauts = 1
