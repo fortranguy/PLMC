@@ -34,7 +34,7 @@ implicit none
 	integer, parameter :: unitSnapEnCours = 10, unitDistrib = 11, &
 		unitEnerg = 12
 
-	integer :: iStep, iSaut
+	integer :: iStep
 	integer :: iCol, jCol
 	real(DP), dimension(Dim) :: DeltaX
 	real(DP) :: r_ij
@@ -62,15 +62,13 @@ implicit none
 	call cpu_time(tIni)
 	!$ tIni_para = omp_get_wtime()	
 	!$omp parallel private(X, iCol, jCol, DeltaX, r_ij, iDist)
-		!$omp do schedule(static, Nstep/nSauts**3/nb_taches) reduction(+:distrib)
-	do iStep = 1, Nstep/nSauts**3
+		!$omp do schedule(static, Nstep/nb_taches) reduction(+:distrib)
+	do iStep = 1, Nstep
 	
 		! Lecture :
 		!$omp critical
-		do iSaut = 1, nSauts**3
-			do iCol = 1, Ncol1
-				read(unitSnapEnCours, *) X(:, iCol)
-			end do
+		do iCol = 1, Ncol1
+			read(unitSnapEnCours, *) X(:, iCol)
 		end do
     	!$omp end critical
     
@@ -114,7 +112,7 @@ implicit none
 		do iDist = 1, Ndist
 		
 			r = (real(iDist, DP) + 0.5_DP) * deltaDist
-			numerat = real(distrib(iDist), DP) / real(Nstep/nSauts**3, DP)
+			numerat = real(distrib(iDist), DP) / real(Nstep, DP)
 			denomin = real(Ncol1, DP) * (sphereVol(iDist+1) - sphereVol(iDist))
 			fct_dist(iDist) = 2._DP * numerat / denomin / densite
 			write(unitDistrib, *) r, fct_dist(iDist)

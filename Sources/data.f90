@@ -167,8 +167,7 @@ use data_cell
 implicit none
 
 	logical, parameter :: snap = .false.
-	integer, parameter :: nSauts = 1
-	real(DP), parameter :: deltaDist = real(nSauts, DP) * 0.01_DP
+	real(DP), parameter :: deltaDist = 0.01_DP
 	real(DP), protected :: rMax
 	integer, protected :: Ndist
 	
