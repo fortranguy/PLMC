@@ -44,7 +44,7 @@ implicit none
 	real(DP), dimension(:), allocatable :: fct_dist
 	real(DP) :: energSum
 	
-	!$ integer :: nb_taches = 4 ! changer ?
+	!$ integer :: nb_taches
 	real(DP) :: tIni, tFin
 	!$ real(DP) :: tIni_para, tFin_para
 	
@@ -60,7 +60,8 @@ implicit none
 		action='read')
 	
 	call cpu_time(tIni)
-	!$ tIni_para = omp_get_wtime()	
+	!$ tIni_para = omp_get_wtime()
+	!$ nb_taches = omp_get_num_threads()
 	!$omp parallel private(X, iCol, jCol, DeltaX, r_ij, iDist)
 		!$omp do schedule(static, Nstep/nb_taches) reduction(+:distrib)
 	do iStep = 1, Nstep
