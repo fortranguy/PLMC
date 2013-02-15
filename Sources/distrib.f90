@@ -61,9 +61,9 @@ implicit none
 	
 	call cpu_time(tIni)
 	!$ tIni_para = omp_get_wtime()
-	!$ nb_taches = omp_get_num_threads()
 	!$omp parallel private(X, iCol, jCol, DeltaX, r_ij, iDist)
-		!$omp do schedule(static, Nstep/nb_taches) reduction(+:distrib)
+	!$ nb_taches = omp_get_num_threads()
+	!$omp do schedule(static, Nstep/nb_taches) reduction(+:distrib)
 	do iStep = 1, Nstep
 	
 		! Lecture :
