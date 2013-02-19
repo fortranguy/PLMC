@@ -36,7 +36,6 @@ implicit none
 
 	integer :: iStep
 	integer :: iCol, jCol
-	real(DP), dimension(Dim) :: DeltaX
 	real(DP) :: r_ij
 	integer :: iDist, iDistMin, iDistMax
 	real(DP) :: r
@@ -61,7 +60,7 @@ implicit none
 	
 	call cpu_time(tIni)
 	!$ tIni_para = omp_get_wtime()
-	!$omp parallel private(X, iCol, jCol, DeltaX, r_ij, iDist)
+	!$omp parallel private(X, iCol, jCol, r_ij, iDist)
 	!$ nb_taches = omp_get_num_threads()
 	!$omp do schedule(static, Nstep/nb_taches) reduction(+:distrib)
 	do iStep = 1, Nstep
@@ -78,10 +77,7 @@ implicit none
 		do iCol = 1, Ncol1
 			do jCol = iCol + 1, Ncol1
 		
-				DeltaX(:) = X(:, jCol) - X(:, iCol)
-		        call pbc_dif(DeltaX)
-		        r_ij = sqrt(dot_product(DeltaX, DeltaX))
-		        
+				r_ij = dist(X(:, iCol), X(:, jCol))		        
 		        iDist =  int(r_ij/deltaDist)
 		        distrib(iDist) = distrib(iDist) + 1
 		

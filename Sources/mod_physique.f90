@@ -110,7 +110,8 @@ implicit none
     subroutine iniPosAlea()
     
         integer :: iCol, Ncols, nOK
-        real(DP), dimension(Dim) :: xTest, DeltaX
+        real(DP), dimension(Dim) :: xTest
+        real(DP) :: rTest
     
         write(*, *) "Déposition aléatoire"
     
@@ -125,9 +126,8 @@ implicit none
             
             nOK = 0
             do iCol = 1, Ncols
-                DeltaX(:) = X(:, iCol) - xTest(:)
-                call pbc_dif(DeltaX)
-                if( sqrt(dot_product(DeltaX, DeltaX)) >= rmin) then
+                rTest = dist(X(:, iCol), xTest(:))
+                if (rTest >= rmin) then
                     nOK = nOK + 1
                 else
                     exit
@@ -153,19 +153,16 @@ implicit none
     subroutine overlapTest()
     
         integer :: jCol, iCol
-        real(DP), dimension(Dim) :: DeltaX
+        real(DP) :: r_ij
     
         do jCol = 1, Ncol1
             do iCol = 1, Ncol1
                 if (iCol /= jCol) then
                     
-                    DeltaX(:) = X(:, iCol) - X(:, jCol)
-                    call pbc_dif(DeltaX)
-                    
-                    if (sqrt(dot_product(DeltaX, DeltaX)) < rmin) then
+                    r_ij = dist(X(:, iCol), X(:, jCol))
+                    if (r_ij < rmin) then
                         write(*, *) "    Overlap !", iCol, jCol
-                        write(*, * ) "    r_ij = ", &
-                        sqrt(dot_product(DeltaX, DeltaX))
+                        write(*, * ) "    r_ij = ", r_ij
                         stop
                     end if
                     
@@ -177,19 +174,24 @@ implicit none
     
     end subroutine overlapTest
     
-    ! Conditions aux limites périodiques (PBC) --------------------------------
+    ! Distance entre 2 particules (CLP) ---------------------------------------
     
-    subroutine pbc_dif(DeltaX)
+    function dist(X1, X2)
     
-        real(DP), dimension(Dim), intent(inout) :: DeltaX
+        real(DP), dimension(Dim), intent(in) :: X1, X2
+        real(DP), dimension(Dim) :: DeltaX
+        real(DP) :: dist
         
+        DeltaX(:) = X2(:) - X1(:)
         DeltaX(:) = modulo(DeltaX(:), Lsize(:))
         
         where( DeltaX(:) > LsizeMi(:) )
             DeltaX(:) = DeltaX(:) - Lsize(:)
         end where
+        
+        dist = sqrt(dot_product(DeltaX, DeltaX))
     
-    end subroutine pbc_dif
+    end function dist
     
     ! Energie potentielle -----------------------------------------------------
    
@@ -214,10 +216,10 @@ implicit none
    
     end function ePot
     
-    subroutine ePotNeigh(iCol, pos, iCell, overlap, energ)
+    subroutine ePotNeigh(iCol, xCol, iCell, overlap, energ)
         
         integer, intent(in) :: iCol, iCell
-        real(DP), dimension(Dim), intent(in) :: pos
+        real(DP), dimension(Dim), intent(in) :: xCol
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energ
     
@@ -242,9 +244,7 @@ implicit none
             
                 if (courant%iCol /= iCol) then
                 
-                    DeltaX(:) = X(:, courant%iCol) - pos(:)
-                    call pbc_dif(DeltaX)
-                    r = sqrt(dot_product(DeltaX, DeltaX))
+                    r = dist(xCol(:), X(:, courant%iCol))
                     if (r < rmin) then
                         overlap = .true.
                         return
@@ -354,7 +354,6 @@ implicit none
     
         integer :: iCol, jCol
         real(DP) :: r_ij
-        real(DP), dimension(Dim) :: DeltaX
         real(DP) :: enTotCalc
     
         enTotCalc = 0._DP
@@ -363,10 +362,7 @@ implicit none
             do iCol = 1, Ncol1
                 if (iCol /= jCol) then
                 
-                    DeltaX(:) = X(:, jCol) - X(:, iCol)
-                    call pbc_dif(DeltaX)
-                    r_ij = sqrt(dot_product(DeltaX, DeltaX))
-                    
+                    r_ij = dist(X(:, iCol), X(:, jCol))
                     enTotCalc = enTotCalc + ePot(r_ij)
                     
                 end if
