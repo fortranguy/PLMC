@@ -289,8 +289,8 @@ implicit none
         
         if (.not. overlap) then
         
-            iCellBefore = col_to_cell(iOld)
-            call ePotNeigh(iOld, x(:, iOld), iCellBefore, overlap, eOld)
+            iCellBefore = position_to_cell(X(:, iOld))
+            call ePotNeigh(iOld, X(:, iOld), iCellBefore, overlap, eOld)
         	
             dEn = eNew - eOld
         

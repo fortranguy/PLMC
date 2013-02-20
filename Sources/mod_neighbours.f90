@@ -2,6 +2,7 @@ module mod_neighbours
 
 use data_constants
 use data_cell
+use data_particles
 use data_potentiel
 use data_neighbours
 
@@ -35,25 +36,13 @@ contains
     
     ! Assignation : particule -> cellule
     
-    function col_to_cell(iCol)
+    function position_to_cell(xCol)
     
-        integer, intent(in) :: iCol
-        integer, dimension(Dim) :: cell_coord
-        integer :: col_to_cell
-    
-        cell_coord = int( x(:, iCol)/cell_Lsize(:) ) + 1
-        col_to_cell = cell_coord(1) + cell_coordMax(1) * (cell_coord(2)-1) + &
-            cell_coordMax(1)*cell_coordMax(2)*(cell_coord(3)-1)
-    
-    end function col_to_cell
-    
-    function position_to_cell(pos)
-    
-        real(DP), dimension(Dim), intent(in) :: pos
+        real(DP), dimension(Dim), intent(in) :: xCol
         integer, dimension(Dim) :: cell_coord
         integer :: position_to_cell
     
-        cell_coord = int( pos(:)/cell_Lsize(:) ) + 1
+        cell_coord = int( xCol(:)/cell_Lsize(:) ) + 1
         position_to_cell = cell_coord(1) + cell_coordMax(1) * (cell_coord(2)-1)&
             + cell_coordMax(1)*cell_coordMax(2)*(cell_coord(3)-1)
     
@@ -67,7 +56,7 @@ contains
     
         do iCol = 1, Ncol1
     
-            iCell = col_to_cell(iCol)            
+            iCell = position_to_cell(X(:,iCol))
             cells(iCell)%particle%iCol = iCol
             
             allocate(cellsNext(iCell)%particle)
