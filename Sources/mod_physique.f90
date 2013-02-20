@@ -38,6 +38,7 @@ implicit none
             case default
                 write(*, *) "Préciser la condition initiale : "
                 write(*, *) "   'cube' ou 'alea'."
+                stop
         end select
         
         densite = real(Ncol1, DP) / product(Lsize)
