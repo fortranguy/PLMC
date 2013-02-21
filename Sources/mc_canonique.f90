@@ -70,10 +70,10 @@ implicit none
     do iStep = 1, Ntherm + Nstep
     
         do iMove = 1, Nmove        
-            call mcMove(enTot, Nrejects)    
+            call sph%mcMove(enTot, Nrejects)    
         end do
         
-        call widom(nWidom, activExInv)
+        call sph%widom(nWidom, activExInv)
         
         if (iStep <= Ntherm) then
         
