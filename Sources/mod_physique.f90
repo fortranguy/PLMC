@@ -194,7 +194,7 @@ implicit none
     
     end function dist
     
-    ! Energie potentielle -----------------------------------------------------
+!=== Energie potentielle -----------------------------------------------------
     
     function ePot(r)
 
@@ -263,7 +263,7 @@ implicit none
     
     end subroutine ePotNeigh
     
-    ! Déplacement d'une particule ---------------------------------------------
+!=== Déplacement d'une particule ---------------------------------------------
     
     subroutine mcMove(enTot, Nrejects)
     
@@ -315,7 +315,7 @@ implicit none
     
     end subroutine mcMove
     
-    ! Méthode de Widom --------------------------------------------------------
+!=== Méthode de Widom --------------------------------------------------------
 
     subroutine widom(nWidom, activExInv)
         

@@ -10,7 +10,7 @@ EXEC1 = xMC_Canonique
 EXEC2 = xBunching
 EXEC3 = xDistrib
 
-all: $(EXEC1) $(EXEC2) $(EXEC3)
+all: $(EXEC1) # $(EXEC2) $(EXEC3)
 
 #----------------------------------------------------------
 
