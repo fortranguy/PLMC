@@ -12,7 +12,7 @@ use mod_physique
 implicit none
 
 private
-public :: sph, component_init
+public :: sph, sph_init
 
     type, public :: Component
 
@@ -40,7 +40,7 @@ public :: sph, component_init
         real(DP), dimension(:), allocatable :: Vtab
         
     contains
-    
+
         procedure :: ePot => component_ePot
         procedure :: ePotNeigh => component_ePotNeigh
         procedure :: mcMove => component_mcMove
@@ -53,7 +53,7 @@ public :: sph, component_init
     
 contains
 
-    subroutine component_init()
+    subroutine sph_init()
     
         ! Component initializarion
         
@@ -75,7 +75,7 @@ contains
                     Vtab = Vtab &
                 )
         
-    end subroutine component_init
+    end subroutine sph_init
 
     ! Energie potentielle -----------------------------------------------------
 

@@ -26,7 +26,7 @@ implicit none
     write(*, *) "MC_C+Neigh : Vol =", product(Lsize)
     
     ! Component init
-    call component_init()
+    call sph_init()
     
     Nrejects = 0
     tauxRejectsSum = 0._DP
