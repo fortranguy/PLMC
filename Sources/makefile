@@ -20,7 +20,7 @@ data_copy.f90 : data.f90
 # ---------------------------
 
 $(EXEC1) : data.f90 data_neighbours.f90 mod_neighbours.f90 mod_physique.f90 \
-	mod_tools.f90 class_particle.f90 obj_particles.f90  mc_canonique.f90
+	mod_tools.f90 class_component.f90 obj_components.f90 mc_canonique.f90
 	$(FC) $(LDFLAGS) $^ -o $@
 	
 # ---------------------------

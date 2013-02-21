@@ -5,7 +5,7 @@ use data_mc
 use data_distrib
 use mod_physique
 use mod_tools
-use obj_particles
+use obj_components
 
 implicit none
 
@@ -51,8 +51,8 @@ implicit none
     call all_col_to_cell()
     call ini_cell_neighs()
     
-    ! Particle init
-    call particle_init()
+    ! Component init
+    call component_init()
     
 ! Milieu --------------------------------------------------
 
