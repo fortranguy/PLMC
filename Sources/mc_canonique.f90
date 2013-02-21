@@ -109,7 +109,6 @@ implicit none
 
     call overlapTest()
     
-    !call consisTest(enTot, unitRapport)
     write(unitRapport, *) "Test de consistence :"
     write(unitRapport, *) "    enTot_mc_c = ", enTot
     write(unitRapport, *) "    enTot_calc = ", sph%enTotCalc()
