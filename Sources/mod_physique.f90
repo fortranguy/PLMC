@@ -7,8 +7,6 @@ use data_mc
 use data_potentiel
 use data_neighbours
 use mod_neighbours
-use class_particle
-use obj_particles
 
 implicit none
 
@@ -198,6 +196,27 @@ implicit none
     
     ! Energie potentielle -----------------------------------------------------
     
+    function ePot(r)
+
+        real(DP), intent(in) :: r
+        
+        integer :: i
+        real(DP) :: r_i, ePot
+       
+        if (r < rcut) then
+       
+            i = int(r/pas)
+            r_i = real(i, DP)*pas
+            ePot = Vtab(i) + (r-r_i)/pas * (Vtab(i+1)-Vtab(i))
+           
+        else
+       
+            ePot = 0.
+           
+        end if
+        
+    end function ePot
+    
     subroutine ePotNeigh(iCol, xCol, iCell, overlap, energ)
         
         integer, intent(in) :: iCol, iCell
@@ -230,7 +249,7 @@ implicit none
                         overlap = .true.
                         return
                     end if
-                    energ = energ + sph%ePot(r)
+                    energ = energ + ePot(r)
        
                 end if
                 
@@ -344,7 +363,7 @@ implicit none
                 if (iCol /= jCol) then
                 
                     r_ij = dist(X(:, iCol), X(:, jCol))
-                    enTotCalc = enTotCalc + sph%ePot(r_ij)
+                    enTotCalc = enTotCalc + ePot(r_ij)
                     
                 end if
             end do

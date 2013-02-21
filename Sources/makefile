@@ -14,76 +14,30 @@ all: $(EXEC1) $(EXEC2) $(EXEC3)
 
 #----------------------------------------------------------
 
-data_copy.f90: data.f90
+data_copy.f90 : data.f90	
 	cp data.f90 data_copy.f90
-
-data_copy.o data_constants.mod data_cell.mod data_particles.mod data_mc.mod \
-	data_potentiel.mod data_distrib.mod: data_copy.f90
-	$(FC) $(FFLAGS) -c $<
-	touch $*.o $*.mod
-	
-data_neighbours.o data_neighbours.mod : data_neighbours.f90 data_copy.f90
-	$(FC) $(FFLAGS) -c $<
-	touch $*.o $*.mod
 
 # ---------------------------
 
-class.o class_particle.mod obj_particles.mod : class.f90 data_copy.f90
-	$(FC) $(FFLAGS) -c $<
-	touch $*.o $*.mod
-	
-#----------------------------
-
-mod_neighbours.o : data_constants.mod data_cell.mod data_potentiel.mod \
-	data_neighbours.mod
-mod_tools.o: data_constants.mod data_particles.mod data_mc.mod \
-	data_potentiel.mod data_neighbours.mod
-mod_physique.o: data_constants.mod data_cell.mod data_particles.mod \
-	data_mc.mod data_potentiel.mod data_neighbours.mod mod_neighbours.mod \
-	class_particle.mod obj_particles.mod
-mc_canonique.o: data_constants.mod data_mc.mod data_distrib.mod \
-	mod_physique.mod mod_tools.mod class_particle.mod obj_particles.mod
-
-mod_neighbours.o: mod_neighbours.f90
-	$(FC) $(LDFLAGS) -c $<
-mod_tools.o: mod_tools.f90
-	$(FC) $(LDFLAGS) -c $<
-mod_physique.o: mod_physique.f90
-	$(FC) $(LDFLAGS) -c $<
-mc_canonique.o: mc_canonique.f90
-	$(FC) $(LDFLAGS) -c $<
-
-xMC_Canonique: data_copy.o data_neighbours.o mod_neighbours.o mod_physique.o \
-	mod_tools.o mc_canonique.o class.o
+$(EXEC1) : data.f90 data_neighbours.f90 mod_neighbours.f90 mod_physique.f90 \
+	mod_tools.f90 class_particle.f90 obj_particles.f90  mc_canonique.f90
 	$(FC) $(LDFLAGS) $^ -o $@
 	
 # ---------------------------
 
-bunching.o: data_constants.mod data_mc.mod
-
-bunching.o: bunching.f90
-	$(FC) $(FFLAGS) -c $<
-	
-xBunching: data_copy.o bunching.o
+$(EXEC2) : data_copy.f90 bunching.f90
 	$(FC) $^ $(LDFLAGS) -o $@
 
 # ---------------------------
 
-distrib.o: data_constants.mod data_distrib.mod data_particles.mod \
-	mod_physique.mod
-
-distrib.o: distrib.f90
-	$(FC) $(FFLAGS_OMP) -c $<
-
-xDistrib: data_copy.o data_neighbours.o mod_neighbours.o mod_physique.o class.o\
-	distrib.o
+$(EXEC3) : data.f90 data_neighbours.f90 mod_neighbours.f90 mod_physique.f90 \
+	distrib.f90
 	$(FC) $^ $(LDFLAGS_OMP) -o $@
 
 # ---------------------------------------------------------
 	
 clean:
-	rm -f *.o data_constants.mod data_cell.mod data_particles.mod data_mc.mod \
-	data_potentiel.mod data_neighbours.mod
+	rm -f *.o *.mod
 	
 mrproper: clean
-	rm -f *.mod $(EXEC1) $(EXEC2) $(EXEC3) data_copy.f90
+	rm -f $(EXEC1) $(EXEC2) $(EXEC3) data_copy.f90
