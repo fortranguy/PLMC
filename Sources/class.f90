@@ -22,33 +22,49 @@ private
         
         real(DP), dimension(Dim) :: dx
 
-        ! Potential
+        ! Potential domain
 
         real(DP) :: rcut
-        !real(DP) :: pas
-        !real(DP) :: surpas
-        !integer :: Ntab
-        !integer :: iMin
+        real(DP) :: pas
+        integer :: iMin
+        integer :: Ntab
+        
+        ! Potential shape
+        
+        real(DP) :: epsilon
+        real(DP) :: alpha
         real(DP), dimension(:), allocatable :: Vtab
-        !real(DP) :: epsilon
-        !real(DP) :: alpha
         
     contains
     
-        procedure :: rapport => Particle_rapport
+        procedure :: ePot
         
     end type Particle
     
 contains
 
-    function Particle_rapport(this) result(rapport)
-    
+    function ePot(this, r)
+        
         class(Particle), intent(in) :: this
-        real :: rapport        
+        real, intent(in) :: r
         
-        rapport = Lsize(1)/this%rayon
+        integer :: i
+        real :: r_i, ePot
+       
+        if (r < this%rcut) then
+       
+            i = int(r/this%pas)
+            r_i = real(i, DP)*this%pas
+            ePot = this%Vtab(i) + (r-r_i)/this%pas * &
+                (this%Vtab(i+1)-this%Vtab(i))
+           
+        else
+       
+            ePot = 0.
+           
+        end if
         
-    end function Particle_rapport
+    end function ePot
 
 end module class_particle
 
@@ -63,28 +79,28 @@ use data_particles
 
 implicit none
 
-    type(Particle), protected :: dip, sph
+    type(Particle), protected :: sph
     
 contains
 
     subroutine init()
-
-        dip =   Particle(&
-                    radius = ,&
-                    rmin = ,&
-                    Ncol = ,&
-                    dx = ,&
-                    rcut = ,&
-                    Vtab = ,&
-                )
+    
+        ! Potential initializarion
+        
+        call ePotIni()
                 
-        sph =   Particle(&
-                    radius = ,&
-                    rmin = ,&
-                    Ncol = ,&
-                    dx = ,&
-                    rcut = ,&
-                    Vtab = ,&
+        sph =   Particle(&        
+                    radius = radius, &
+                    rmin = rmin, &
+                    Ncol = Ncol, &
+                    dx = dx, &
+                    rcut = rcut, &
+                    pas = pas, &
+                    iMin = iMin, &
+                    Ntab = Ntab, &
+                    epsilon = epsilon, &
+                    alpha = alpha, &
+                    Vtab = Vtab &
                 )
         
     end subroutine init

@@ -16,7 +16,7 @@ implicit none
     real(DP) :: tauxRejectsSum
     real(DP) :: enTot, enTotSum
     real(DP) :: activExInv, activExInvSum ! inverse de l'activité
-    integer, parameter :: nWidom = Ncol1 ! nombre de particules test
+    integer, parameter :: nWidom = Ncol ! nombre de particules test
     real(DP) :: tIni, tFin
     
     integer, parameter :: unitObs = 10, unitSnapIni = 11, unitSnapFin = 12, &

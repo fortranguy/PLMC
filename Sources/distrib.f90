@@ -29,7 +29,7 @@ use mod_physique
 
 implicit none
 
-	real(DP), parameter :: densite = real(Ncol1, DP) / (Lsize1*Lsize2*Lsize3)
+	real(DP), parameter :: densite = real(Ncol, DP) / (Lsize1*Lsize2*Lsize3)
 	integer, dimension(:), allocatable :: distrib
 	integer, parameter :: unitSnapEnCours = 10, unitDistrib = 11, &
 		unitEnerg = 12
@@ -67,15 +67,15 @@ implicit none
 	
 		! Lecture :
 		!$omp critical
-		do iCol = 1, Ncol1
+		do iCol = 1, Ncol
 			read(unitSnapEnCours, *) X(:, iCol)
 		end do
     	!$omp end critical
     
 		! Traitement
 		 
-		do iCol = 1, Ncol1
-			do jCol = iCol + 1, Ncol1
+		do iCol = 1, Ncol
+			do jCol = iCol + 1, Ncol
 		
 				r_ij = dist(X(:, iCol), X(:, jCol))		        
 		        iDist =  int(r_ij/deltaDist)
@@ -110,7 +110,7 @@ implicit none
 		
 			r = (real(iDist, DP) + 0.5_DP) * deltaDist
 			numerat = real(distrib(iDist), DP) / real(Nstep, DP)
-			denomin = real(Ncol1, DP) * (sphereVol(iDist+1) - sphereVol(iDist))
+			denomin = real(Ncol, DP) * (sphereVol(iDist+1) - sphereVol(iDist))
 			fct_dist(iDist) = 2._DP * numerat / denomin / densite
 			write(unitDistrib, *) r, fct_dist(iDist)
 			

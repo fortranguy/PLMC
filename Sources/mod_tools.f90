@@ -43,7 +43,7 @@ implicit none
     
         integer :: iCol
         
-        do iCol = 1, Ncol1
+        do iCol = 1, Ncol
             write(unitSnap, *) X(:, iCol)
         end do    
 
@@ -59,7 +59,7 @@ implicit none
         write(unitRapport, *) "Simulation MC_C :"
         write(unitRapport ,*) "    Lsize(:) = ", Lsize(:)
         write(unitRapport ,*) "    Vol = ", product(Lsize)
-        write(unitRapport ,*) "    Ncol1 = ", Ncol1
+        write(unitRapport ,*) "    Ncol = ", Ncol
         write(unitRapport ,*) "    nWidom = ", nWidom
         write(unitRapport, *) "    Nstep = ", Nstep
         write(unitRapport, *) "    Ntherm = ", Ntherm
@@ -90,8 +90,8 @@ implicit none
         write(unitRapport, *) "    Energie moyenne = ", &
             enTotSum/realNstep
         write(unitRapport, *) "    Energie moyenne par particule = ", &
-            enTotSum/realNstep/real(Ncol1, DP)
-        potChiId = -Tstar*log( product(Lsize)/real(Ncol1+1,DP) )
+            enTotSum/realNstep/real(Ncol, DP)
+        potChiId = -Tstar*log( product(Lsize)/real(Ncol+1,DP) )
         write(unitRapport, *) "    Potentiel chimique idéal = ", potChiId
         potChiEx = -Tstar*log( activExInvSum/realNstep )
         write(unitRapport, *) "    Potentiel chimique (excès) moyen = ", &

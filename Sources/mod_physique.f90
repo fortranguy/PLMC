@@ -41,11 +41,11 @@ implicit none
                 stop
         end select
         
-        densite = real(Ncol1, DP) / product(Lsize)
+        densite = real(Ncol, DP) / product(Lsize)
         write(*, *) "    Densité = ", densite
         write(unitRapport, *) "    Densité = ", densite
         
-        compac = 4._DP/3._DP*PI*rayon1**3 * densite
+        compac = 4._DP/3._DP*PI*radius**3 * densite
         write(*, *) "    Compacité = ", compac
         write(unitRapport, *) "    Compacité = ", compac
         
@@ -63,14 +63,14 @@ implicit none
         
         ! Proportion selon la direction
         
-        nCols(1) = int( (Ncol1*Lsize(1)**2/Lsize(2)/Lsize(3))**oneThird )
-        nCols(2) = int( (Ncol1*Lsize(2)**2/Lsize(3)/Lsize(1))**oneThird )
-        nCols(3) = int( (Ncol1*Lsize(3)**2/Lsize(1)/Lsize(2))**oneThird )
+        nCols(1) = int( (Ncol*Lsize(1)**2/Lsize(2)/Lsize(3))**oneThird )
+        nCols(2) = int( (Ncol*Lsize(2)**2/Lsize(3)/Lsize(1))**oneThird )
+        nCols(3) = int( (Ncol*Lsize(3)**2/Lsize(1)/Lsize(2))**oneThird )
         
         ! Vérification
         
         iDir = 1
-        do while (product(nCols)<Ncol1)
+        do while (product(nCols)<Ncol)
             nCols(iDir) = nCols(iDir) + 1
             iDir = iDir + 1
         end do
@@ -89,7 +89,7 @@ implicit none
         do k = 1, nCols(3)
             do j = 1, nCols(2)
                 do i = 1, nCols(1)
-                    if (i*j*k <= Ncol1) then
+                    if (i*j*k <= Ncol) then
                         iCol = i + nCols(1)*(j-1) + nCols(1)*nCols(2)*(k-1)
                         X(1, iCol) = ratio(1)*real(i, DP)
                         X(2, iCol) = ratio(2)*real(j, DP)
@@ -117,13 +117,13 @@ implicit none
         write(*, *) "Déposition aléatoire"
     
         call random_number(X(:, 1))
-        X(:, 1) = X(:, 1)*(Lsize(:)-2*Rayon1)
+        X(:, 1) = X(:, 1)*(Lsize(:)-2*radius)
         Ncols = 1        
         
-        do while (Ncols<Ncol1)
+        do while (Ncols<Ncol)
         
             call random_number(xTest)
-            xTest(:) = xTest(:)*(Lsize(:)-2._DP*Rayon1)
+            xTest(:) = xTest(:)*(Lsize(:)-2._DP*radius)
             
             nOK = 0
             do iCol = 1, Ncols
@@ -143,8 +143,8 @@ implicit none
             
         end do
         
-        do iCol = 1, Ncol1
-            X(:, iCol) = X(:, iCol) + Rayon1
+        do iCol = 1, Ncol
+            X(:, iCol) = X(:, iCol) + radius
         end do
     
     end subroutine iniPosAlea
@@ -156,8 +156,8 @@ implicit none
         integer :: jCol, iCol
         real(DP) :: r_ij
     
-        do jCol = 1, Ncol1
-            do iCol = 1, Ncol1
+        do jCol = 1, Ncol
+            do iCol = 1, Ncol
                 if (iCol /= jCol) then
                     
                     r_ij = dist(X(:, iCol), X(:, jCol))
@@ -279,7 +279,7 @@ implicit none
         real(DP) :: eNew, eOld, dEn
         
         call random_number(rand)
-        iOld = int(rand*Ncol1) + 1
+        iOld = int(rand*Ncol) + 1
         
         call random_number(xNew)
         xNew(:) = X(:, iOld) + (xNew(:)-0.5_DP)*dx(:)
@@ -359,8 +359,8 @@ implicit none
     
         enTotCalc = 0._DP
         
-        do jCol = 1, Ncol1
-            do iCol = 1, Ncol1
+        do jCol = 1, Ncol
+            do iCol = 1, Ncol
                 if (iCol /= jCol) then
                 
                     r_ij = dist(X(:, iCol), X(:, jCol))

@@ -54,7 +54,7 @@ contains
         integer :: iCell, nCells = cell_coordMax(1)*cell_coordMax(2)*&
             cell_coordMax(3)
     
-        do iCol = 1, Ncol1
+        do iCol = 1, Ncol
     
             iCell = position_to_cell(X(:,iCol))
             cells(iCell)%particle%iCol = iCol

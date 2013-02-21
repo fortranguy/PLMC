@@ -40,10 +40,10 @@ module data_particles
 use data_constants
 use data_cell
     
-    real(DP), parameter :: rayon1 = .5_DP
+    real(DP), parameter :: radius = .5_DP
     real(DP), parameter :: rmin = 1._DP
-    integer, parameter ::  Ncol1 = 270
-    integer, parameter :: Ncolmax = 2*Ncol1
+    integer, parameter ::  Ncol = 270
+    integer, parameter :: Ncolmax = 2*Ncol
     real(DP), dimension(Dim, Ncolmax) :: X ! in glob
     
 end module data_particles
@@ -65,7 +65,7 @@ implicit none
     real(DP), parameter :: Tstar = 1._DP
     integer, parameter :: Nstep = 2**10
     integer, parameter :: Ntherm = 2**8
-    integer, parameter :: Nmove = 2**2 * Ncol1 ! new
+    integer, parameter :: Nmove = 2**2 * Ncol ! new
     real(DP), dimension(Dim), protected :: dx = 2._DP ! new, à modifier.
     
 contains
