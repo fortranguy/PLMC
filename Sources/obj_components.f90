@@ -22,7 +22,7 @@ contains
         call ePotIni()
         
         ! Construction
-        
+                
         sph =   Component(&        
                     radius = radius, &
                     rmin = rmin, &

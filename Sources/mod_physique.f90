@@ -7,7 +7,6 @@ use data_mc
 use data_potentiel
 use data_neighbours
 use mod_neighbours
-!use obj_components
 
 implicit none
 

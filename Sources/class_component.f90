@@ -43,6 +43,7 @@ private
         procedure :: ePot => component_ePot
         procedure :: ePotNeigh => component_ePotNeigh
         procedure :: mcMove => component_mcMove
+        procedure :: widom => component_widom
         
     end type Component
     
