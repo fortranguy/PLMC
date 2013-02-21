@@ -64,7 +64,7 @@ implicit none
 
     real(DP), parameter :: Tstar = 1._DP
     integer, parameter :: Nstep = 2**10
-    integer, parameter :: Ntherm = 2**8
+    integer, parameter :: Ntherm = 2**5
     integer, parameter :: Nmove = 2**2 * Ncol ! new
     real(DP), dimension(Dim), protected :: dx = 2._DP ! new, à modifier.
     

@@ -5,6 +5,7 @@ use data_mc
 use data_distrib
 use mod_physique
 use mod_tools
+use obj_particles
 
 implicit none
 
@@ -23,6 +24,9 @@ implicit none
         unitRapport = 13, unitObsTherm = 14, unit_dx = 15, unitSnapEnCours = 16
         
     write(*, *) "MC_C+Neigh : Vol =", product(Lsize)
+    
+    ! Particle init
+    call particle_init()
     
     Nrejects = 0
     tauxRejectsSum = 0._DP

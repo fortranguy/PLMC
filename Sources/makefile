@@ -28,14 +28,21 @@ data_neighbours.o data_neighbours.mod : data_neighbours.f90 data_copy.f90
 
 # ---------------------------
 
+class.o class_particle.mod obj_particles.mod: class.f90 data_copy.f90
+	$(FC) $(FFLAGS) -c $<
+	touch $*.o $*.mod
+	
+#----------------------------
+
 mod_neighbours.o : data_constants.mod data_cell.mod data_potentiel.mod \
 	data_neighbours.mod
 mod_tools.o: data_constants.mod data_particles.mod data_mc.mod \
 	data_potentiel.mod data_neighbours.mod
 mod_physique.o: data_constants.mod data_cell.mod data_particles.mod \
-	data_mc.mod data_potentiel.mod data_neighbours.mod mod_neighbours.mod
-mc_canonique.o: data_constants.mod data_mc.mod data_distrib.mod\
-	mod_physique.mod mod_tools.mod
+	data_mc.mod data_potentiel.mod data_neighbours.mod mod_neighbours.mod \
+	obj_particles.mod
+mc_canonique.o: data_constants.mod data_mc.mod data_distrib.mod \
+	obj_particles.mod mod_physique.mod mod_tools.mod
 
 mod_neighbours.o: mod_neighbours.f90
 	$(FC) $(LDFLAGS) -c $<

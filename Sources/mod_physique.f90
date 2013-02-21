@@ -7,6 +7,7 @@ use data_mc
 use data_potentiel
 use data_neighbours
 use mod_neighbours
+use obj_particles
 
 implicit none
 
@@ -250,7 +251,7 @@ implicit none
                         overlap = .true.
                         return
                     end if
-                    energ = energ + ePot(r)
+                    energ = energ + sph%ePot(r)
        
                 end if
                 

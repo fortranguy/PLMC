@@ -76,6 +76,8 @@ module obj_particles
 
 use class_particle
 use data_particles
+use data_mc
+use data_potentiel
 
 implicit none
 
@@ -83,11 +85,13 @@ implicit none
     
 contains
 
-    subroutine init()
+    subroutine particle_init()
     
         ! Potential initializarion
         
         call ePotIni()
+        
+        ! Construction
                 
         sph =   Particle(&        
                     radius = radius, &
@@ -103,6 +107,6 @@ contains
                     Vtab = Vtab &
                 )
         
-    end subroutine init
+    end subroutine particle_init
 
 end module obj_particles
