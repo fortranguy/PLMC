@@ -24,8 +24,7 @@ implicit none
 
         call system_clock(count=clock)
 
-        !seed(:) = clock + 37 * [ (i - 1, i = 1, n) ]
-        seed(:) = [1669714713,  1669714750]
+        seed(:) = clock + 37 * [ (i - 1, i = 1, n) ]
         call random_seed(put = seed)
         
         write(unitRapport, *) "Graine :"
