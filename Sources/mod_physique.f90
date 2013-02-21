@@ -88,13 +88,12 @@ implicit none
         
         do k = 1, nCols(3)
             do j = 1, nCols(2)
-                do i = 1, nCols(1)
-                    if (i*j*k <= Ncol) then
-                        iCol = i + nCols(1)*(j-1) + nCols(1)*nCols(2)*(k-1)
+                do i = 1, nCols(1)            
+                    iCol = i + nCols(1)*(j-1) + nCols(1)*nCols(2)*(k-1)
+                    if (iCol <= Ncol) then
                         X(1, iCol) = ratio(1)*real(i, DP)
                         X(2, iCol) = ratio(2)*real(j, DP)
                         X(3, iCol) = ratio(3)*real(k, DP)
-                        ! A vérifier
                     end if
                 end do
             end do
