@@ -29,13 +29,8 @@ use data_potentiel
     type(LinkedList), allocatable, dimension(:), protected :: cellsBegin
 
     ! Voisins
-    integer, parameter :: cell_neigh_iMax = 3, &
-        cell_neigh_jMax = cell_neigh_iMax, &
-        cell_neigh_kMax = cell_neigh_iMax ! évident
-    integer, dimension(dim), parameter :: cell_neigh_coordMax = &
-        [cell_neigh_iMax, cell_neigh_jMax, cell_neigh_kMax]
-    integer, parameter :: cell_neighs_nb = &
-        cell_neigh_iMax*cell_neigh_jMax*cell_neigh_kMax ! inclus soi-même
+    integer, dimension(dim), parameter :: cell_neigh_coordMax = [3, 3, 3]
+    integer, parameter :: cell_neighs_nb = 3**3 ! inclus soi-même
     integer, dimension(cell_neighs_nb, cell_iMax*cell_jMax*cell_kMax) :: &
         cell_neighs
     

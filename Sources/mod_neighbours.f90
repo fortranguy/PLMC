@@ -189,15 +189,15 @@ contains
         integer :: neigh_i, neigh_j, neigh_k, neigh_ind
         integer, dimension(dim) :: coord, neigh_coord
         
-        do i = 1, cell_iMax
-        do j = 1, cell_jMax
-        do k = 1, cell_kMax
+        do i = 1, cell_coordMax(1)
+        do j = 1, cell_coordMax(2)
+        do k = 1, cell_coordMax(3)
             
             ind = cell_coord_to_ind([i, j, k])
 
-            do neigh_i = 1, cell_neigh_iMax
-            do neigh_j = 1, cell_neigh_jMax
-            do neigh_k = 1, cell_neigh_kMax
+            do neigh_i = 1, cell_neigh_coordMax(1)
+            do neigh_j = 1, cell_neigh_coordMax(2)
+            do neigh_k = 1, cell_neigh_coordMax(3)
             
                 neigh_coord(:) = [neigh_i, neigh_j, neigh_k]                
                 neigh_ind = cell_neigh_coord_to_ind(neigh_coord(:))          
