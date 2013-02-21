@@ -64,10 +64,10 @@ implicit none
         write(unitRapport, *) "    Nstep = ", Nstep
         write(unitRapport, *) "    Ntherm = ", Ntherm
         write(unitRapport, *) "    Nmove = ", Nmove
-        write(unitRapport, *) "    epsilon11 = ", epsilon11
-        write(unitRapport, *) "    alpha11 = ", alpha11
-        write(unitRapport, *) "    rcut11 = ", rcut11
-        write(unitRapport, *) "    surpas11 = ", surpas11
+        write(unitRapport, *) "    epsilon = ", epsilon
+        write(unitRapport, *) "    alpha = ", alpha
+        write(unitRapport, *) "    rcut = ", rcut
+        write(unitRapport, *) "    pas = ", pas
         write(unitRapport, *) "    cell_coordMax(:) = ", cell_coordMax(:)
         write(unitRapport, *) "    cell_Lsize(:) = ", cell_Lsize(:)
         

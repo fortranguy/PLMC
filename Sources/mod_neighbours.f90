@@ -18,9 +18,9 @@ contains
         
         do iDir = 1, Dim
         
-            if (cell_Lsize(iDir) < rcut11) then
+            if (cell_Lsize(iDir) < rcut) then
                 write(*, *) "Cellule trop petite dans la direction", iDir, ":"
-                write(*, *) cell_Lsize(iDir), "<", rcut11
+                write(*, *) cell_Lsize(iDir), "<", rcut
                 stop
             end if
             

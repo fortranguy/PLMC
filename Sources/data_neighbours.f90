@@ -17,8 +17,8 @@ use data_potentiel
     end type ContainerParticle
     
     ! Cellules
-    real(DP), parameter :: cell_Lsize1 = rcut11, cell_Lsize2 = rcut11, &
-        cell_Lsize3 = rcut11
+    real(DP), parameter :: cell_Lsize1 = rcut, cell_Lsize2 = rcut, &
+        cell_Lsize3 = rcut
     real(DP), dimension(Dim), parameter :: cell_Lsize = &
         [cell_Lsize1, cell_Lsize2, cell_Lsize3]
     integer, parameter :: cell_iMax = int(Lsize1/cell_Lsize1), &

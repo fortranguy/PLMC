@@ -127,13 +127,12 @@ use data_particles
 
 implicit none
 
-    real(DP), parameter :: rcut11 = 4._DP ! new
-    real(DP), parameter :: pas11 = 5.E-5_DP ! new
-    real(DP), parameter :: surpas11 = 1._DP/pas11 ! new
-    integer, parameter :: Ntab11 = int(rcut11*surpas11) ! new
-    integer, parameter :: iMin = int( rmin/rcut11*real(Ntab11, DP) ) ! new
-    real(DP), dimension(iMin:Ntab11), protected :: Vtab11
-    real(DP), parameter :: epsilon11 = 1._DP, alpha11 = 5._DP ! new
+    real(DP), parameter :: rcut = 4._DP
+    real(DP), parameter :: pas = 5.E-5_DP
+    integer, parameter :: Ntab = int(rcut/pas)
+    integer, parameter :: iMin = int(rmin/pas)
+    real(DP), dimension(iMin:Ntab), protected :: Vtab
+    real(DP), parameter :: epsilon = 1._DP, alpha = 5._DP
     
 contains
     
@@ -143,13 +142,13 @@ contains
         real(DP) :: r_i
        
 	    ! cut
-        do i = iMin, Ntab11       
-            r_i = real(i, DP)*pas11
-            Vtab11(i) = epsilon11*exp(-alpha11*(r_i-rmin))/r_i           
+        do i = iMin, Ntab       
+            r_i = real(i, DP)*pas
+            Vtab(i) = epsilon*exp(-alpha*(r_i-rmin))/r_i           
         end do
         
         ! shift        
-        Vtab11(:) = Vtab11(:) - epsilon11*exp(-alpha11*(rcut11-rmin))/rcut11
+        Vtab(:) = Vtab(:) - epsilon*exp(-alpha*(rcut-rmin))/rcut
 
     end subroutine ePotIni
         

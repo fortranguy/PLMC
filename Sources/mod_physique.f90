@@ -203,11 +203,11 @@ implicit none
         integer :: i
         real(DP) :: r_i, ePot
        
-        if (r < rcut11) then
+        if (r < rcut) then
        
-            i = int(r/rcut11*real(Ntab11, DP))
-            r_i = real(i, DP)*pas11
-            ePot = Vtab11(i) + (r-r_i)/pas11 * (Vtab11(i+1)-Vtab11(i))
+            i = int(r/rcut*real(Ntab, DP))
+            r_i = real(i, DP)*pas
+            ePot = Vtab(i) + (r-r_i)/pas * (Vtab(i+1)-Vtab(i))
            
         else
        
