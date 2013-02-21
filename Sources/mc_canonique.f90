@@ -5,6 +5,7 @@ use data_mc
 use data_distrib
 use mod_physique
 use mod_tools
+use class_particle
 use obj_particles
 
 implicit none

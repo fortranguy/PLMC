@@ -80,8 +80,8 @@ contains
     
         integer, intent(in) :: iCol, iCellBefore
         
-        type(Particle), pointer :: courant => null()
-        type(Particle), pointer :: suivant => null(), precedent => null()
+        type(Link), pointer :: courant => null()
+        type(Link), pointer :: suivant => null(), precedent => null()
     
         precedent => cellsBegin(iCellBefore)%particle
         courant => precedent%next
@@ -113,8 +113,8 @@ contains
     
         integer, intent(in) :: iCol, iCellAfter
     
-        type(Particle), pointer :: nouveau => null()
-        type(Particle), pointer :: suivant => null(), precedent => null()           
+        type(Link), pointer :: nouveau => null()
+        type(Link), pointer :: suivant => null(), precedent => null()           
           
         
         precedent => cellsBegin(iCellAfter)%particle

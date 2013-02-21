@@ -46,10 +46,10 @@ contains
     function ePot(this, r)
         
         class(Particle), intent(in) :: this
-        real, intent(in) :: r
+        real(DP), intent(in) :: r
         
         integer :: i
-        real :: r_i, ePot
+        real(DP) :: r_i, ePot
        
         if (r < this%rcut) then
        

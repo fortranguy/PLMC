@@ -1,6 +1,6 @@
 FC = ifort
-FFLAGS = # -warn all -check all -check noarg_temp_created
-LDFLAGS = # -warn all -check all -check noarg_temp_created
+FFLAGS = -warn all -check all -check noarg_temp_created
+LDFLAGS = -warn all -check all -check noarg_temp_created
 FFLAGS_OMP = $(FFLAGS) -openmp 
 LDFLAGS_OMP = $(LDFLAGS) -openmp
 #FC = gfortran
@@ -40,9 +40,9 @@ mod_tools.o: data_constants.mod data_particles.mod data_mc.mod \
 	data_potentiel.mod data_neighbours.mod
 mod_physique.o: data_constants.mod data_cell.mod data_particles.mod \
 	data_mc.mod data_potentiel.mod data_neighbours.mod mod_neighbours.mod \
-	obj_particles.mod
+	class_particle.mod obj_particles.mod
 mc_canonique.o: data_constants.mod data_mc.mod data_distrib.mod \
-	obj_particles.mod mod_physique.mod mod_tools.mod
+	mod_physique.mod mod_tools.mod obj_particles.mod class_particle.mod 
 
 mod_neighbours.o: mod_neighbours.f90
 	$(FC) $(LDFLAGS) -c $<

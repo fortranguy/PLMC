@@ -7,14 +7,14 @@ use data_constants
 use data_potentiel
 
     ! Type
-    type Particle
+    type Link
         integer :: iCol
-        type(Particle), pointer :: next => null()
-    end type Particle
+        type(Link), pointer :: next => null()
+    end type Link
     
-    type ContainerParticle
-        type(Particle), pointer :: particle => null()
-    end type ContainerParticle
+    type LinkedList
+        type(Link), pointer :: particle => null()
+    end type LinkedList
     
     ! Cellules
     real(DP), parameter :: cell_Lsize1 = rcut, cell_Lsize2 = rcut, &
@@ -25,8 +25,8 @@ use data_potentiel
     cell_jMax = int(Lsize2/cell_Lsize2), cell_kMax = int(Lsize3/cell_Lsize3)
     integer, dimension(dim), parameter :: cell_coordMax = &
         [cell_iMax, cell_jMax, cell_kMax]
-    type(ContainerParticle), allocatable, dimension(:) :: cells, cellsNext
-    type(ContainerParticle), allocatable, dimension(:), protected :: cellsBegin
+    type(LinkedList), allocatable, dimension(:) :: cells, cellsNext
+    type(LinkedList), allocatable, dimension(:), protected :: cellsBegin
 
     ! Voisins
     integer, parameter :: cell_neigh_iMax = 3, &
@@ -72,7 +72,7 @@ contains
     
     recursive subroutine libere_chaine(courant)
     
-        type(Particle), pointer :: courant
+        type(Link), pointer :: courant
         
         if (associated(courant%next)) then
             call libere_chaine(courant%next)

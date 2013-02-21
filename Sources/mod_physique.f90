@@ -7,6 +7,7 @@ use data_mc
 use data_potentiel
 use data_neighbours
 use mod_neighbours
+use class_particle
 use obj_particles
 
 implicit none
@@ -226,10 +227,9 @@ implicit none
         real(DP), intent(out) :: energ
     
         integer :: iNeigh,  iCell_neigh
-        real(DP), dimension(Dim) :: DeltaX
         real(DP) :: r
     
-        type(Particle), pointer :: courant => null(), suivant => null()
+        type(Link), pointer :: courant => null(), suivant => null()
         
         overlap = .false.
         energ = 0._DP
