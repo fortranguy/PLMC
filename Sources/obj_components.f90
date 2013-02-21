@@ -22,8 +22,8 @@ contains
         call ePotIni()
         
         ! Construction
-                
-        sph =   Particle(&        
+        
+        sph =   Component(&        
                     radius = radius, &
                     rmin = rmin, &
                     Ncol = Ncol, &
