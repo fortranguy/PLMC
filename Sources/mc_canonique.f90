@@ -5,7 +5,7 @@ use data_mc
 use data_distrib
 use mod_physique
 use mod_tools
-use obj_components
+use class_component
 
 implicit none
 
@@ -25,6 +25,9 @@ implicit none
         
     write(*, *) "MC_C+Neigh : Vol =", product(Lsize)
     
+    ! Component init
+    call component_init()
+    
     Nrejects = 0
     tauxRejectsSum = 0._DP
     enTotSum = 0._DP
@@ -43,16 +46,13 @@ implicit none
         call snapShot(unitSnapIni)
     close(unitSnapIni)
     call overlapTest()
-    enTot = enTotCalc()
+    enTot = sph%enTotCalc()
     
     ! Table des voisins
     call check_CellsSize()
     call alloc_Cells()
     call all_col_to_cell()
     call ini_cell_neighs()
-    
-    ! Component init
-    call component_init()
     
 ! Milieu --------------------------------------------------
 
@@ -109,7 +109,11 @@ implicit none
 
     call overlapTest()
     
-    call consisTest(enTot, unitRapport)
+    !call consisTest(enTot, unitRapport)
+    write(unitRapport, *) "Test de consistence :"
+    write(unitRapport, *) "    enTot_mc_c = ", enTot
+    write(unitRapport, *) "    enTot_calc = ", sph%enTotCalc()
+    
     call mcResults(enTotSum, activExInvSum, tauxRejectsSum, tFin-tIni,&
         unitRapport)
     close(unitRapport)

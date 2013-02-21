@@ -12,6 +12,7 @@ use mod_physique
 implicit none
 
 private
+public :: sph, component_init
 
     type, public :: Component
 
@@ -44,10 +45,37 @@ private
         procedure :: ePotNeigh => component_ePotNeigh
         procedure :: mcMove => component_mcMove
         procedure :: widom => component_widom
+        procedure :: enTotCalc => component_enTotCalc
         
     end type Component
     
+    type(Component), protected :: sph
+    
 contains
+
+    subroutine component_init()
+    
+        ! Component initializarion
+        
+        call ePotIni()
+        
+        ! Construction
+                
+        sph =   Component(&        
+                    radius = radius, &
+                    rmin = rmin, &
+                    Ncol = Ncol, &
+                    dx = dx, &
+                    rcut = rcut, &
+                    pas = pas, &
+                    iMin = iMin, &
+                    Ntab = Ntab, &
+                    epsilon = epsilon, &
+                    alpha = alpha, &
+                    Vtab = Vtab &
+                )
+        
+    end subroutine component_init
 
     ! Energie potentielle -----------------------------------------------------
 
@@ -209,5 +237,31 @@ contains
         activExInv = widTestSum/real(nWidom, DP)
         
     end subroutine component_widom
+
+	! Energie potentielle totale
+    
+    function component_enTotCalc(this) result(enTotCalc)
+    
+    	class(Component), intent(in) :: this
+        integer :: iCol, jCol
+        real(DP) :: r_ij
+        real(DP) :: enTotCalc
+    
+        enTotCalc = 0._DP
+        
+        do jCol = 1, this%Ncol
+            do iCol = 1, this%Ncol
+                if (iCol /= jCol) then
+                
+                    r_ij = dist(X(:, iCol), X(:, jCol))
+                    enTotCalc = enTotCalc + this%ePot(r_ij)
+                    
+                end if
+            end do
+        end do
+        
+        enTotCalc = 0.5_DP*enTotCalc
+    
+    end function component_enTotCalc
 
 end module class_component

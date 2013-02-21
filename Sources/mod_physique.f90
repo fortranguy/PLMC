@@ -193,43 +193,5 @@ implicit none
         dist = sqrt(dot_product(DeltaX, DeltaX))
     
     end function dist
-        
-    ! Test de consistance -----------------------------------------------------
-    
-    function enTotCalc()
-    
-        integer :: iCol, jCol
-        real(DP) :: r_ij
-        real(DP) :: enTotCalc
-    
-        enTotCalc = 0._DP
-        
-        do jCol = 1, Ncol
-            do iCol = 1, Ncol
-                if (iCol /= jCol) then
-                
-                    r_ij = dist(X(:, iCol), X(:, jCol))
-                    enTotCalc = enTotCalc + sph%ePot(r_ij)
-                    
-                end if
-            end do
-        end do
-        
-        enTotCalc = 0.5_DP*enTotCalc
-    
-    end function enTotCalc
-    
-    ! ---------------------------------
-    
-    subroutine consisTest(enTot, unitRapport)
-    
-        real(DP), intent(in) :: enTot
-        integer, intent(in) :: unitRapport
-        
-        write(unitRapport, *) "Test de consistence :"
-        write(unitRapport, *) "    enTot_mc_c = ", enTot
-        write(unitRapport, *) "    enTot_calc = ", enTotCalc()
-    
-    end subroutine consisTest
 
 end module mod_physique
