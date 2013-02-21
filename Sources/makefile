@@ -28,7 +28,7 @@ data_neighbours.o data_neighbours.mod : data_neighbours.f90 data_copy.f90
 
 # ---------------------------
 
-class.o class_particle.mod obj_particles. : class.f90 data_copy.f90
+class.o class_particle.mod obj_particles.mod : class.f90 data_copy.f90
 	$(FC) $(FFLAGS) -c $<
 	touch $*.o $*.mod
 	
@@ -40,9 +40,9 @@ mod_tools.o: data_constants.mod data_particles.mod data_mc.mod \
 	data_potentiel.mod data_neighbours.mod
 mod_physique.o: data_constants.mod data_cell.mod data_particles.mod \
 	data_mc.mod data_potentiel.mod data_neighbours.mod mod_neighbours.mod \
-	object.mod
+	obj_particles.mod
 mc_canonique.o: data_constants.mod data_mc.mod data_distrib.mod \
-	mod_physique.mod mod_tools.mod object.mod 
+	mod_physique.mod mod_tools.mod obj_particles.mod
 
 mod_neighbours.o: mod_neighbours.f90
 	$(FC) $(LDFLAGS) -c $<
@@ -54,7 +54,7 @@ mc_canonique.o: mc_canonique.f90
 	$(FC) $(LDFLAGS) -c $<
 
 xMC_Canonique: data_copy.o data_neighbours.o mod_neighbours.o mod_physique.o \
-	mod_tools.o mc_canonique.o
+	mod_tools.o mc_canonique.o class.o
 	$(FC) $(LDFLAGS) $^ -o $@
 	
 # ---------------------------
