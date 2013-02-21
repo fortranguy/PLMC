@@ -197,27 +197,6 @@ implicit none
     end function dist
     
     ! Energie potentielle -----------------------------------------------------
-   
-    function ePot(r)
-   
-        real(DP), intent(in) :: r
-       
-        integer :: i
-        real(DP) :: r_i, ePot
-       
-        if (r < rcut) then
-       
-            i = int(r/rcut*real(Ntab, DP))
-            r_i = real(i, DP)*pas
-            ePot = Vtab(i) + (r-r_i)/pas * (Vtab(i+1)-Vtab(i))
-           
-        else
-       
-            ePot = 0._DP
-           
-        end if
-   
-    end function ePot
     
     subroutine ePotNeigh(iCol, xCol, iCell, overlap, energ)
         
@@ -365,7 +344,7 @@ implicit none
                 if (iCol /= jCol) then
                 
                     r_ij = dist(X(:, iCol), X(:, jCol))
-                    enTotCalc = enTotCalc + ePot(r_ij)
+                    enTotCalc = enTotCalc + sph%ePot(r_ij)
                     
                 end if
             end do

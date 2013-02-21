@@ -132,7 +132,7 @@ implicit none
 	
 	do iDist = iDistMin, iDistMax
 		r = (real(iDist, DP) + 0.5_DP) * deltaDist
-		energSum = energSum + ePot(r) * fct_dist(iDist) * 4._DP*PI*r**2	
+		energSum = energSum + sph%ePot(r) * fct_dist(iDist) * 4._DP*PI*r**2	
 	end do
 
 	open(unit=unitEnerg, file="epp_dist.out", action="write")
