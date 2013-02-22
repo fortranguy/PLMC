@@ -65,6 +65,8 @@ public :: sph, sph_init
         procedure :: check_CellsSize => component_check_CellsSize
         procedure :: position_to_cell => component_position_to_cell
         procedure :: all_col_to_cell => component_all_col_to_cell
+        procedure :: remove_cell_col => component_remove_cell_col
+        procedure :: add_cell_col => component_add_cell_col
         
         procedure :: ePot => component_ePot
         procedure :: ePotNeigh => component_ePotNeigh
@@ -266,6 +268,75 @@ contains
         end do
         
     end subroutine component_all_col_to_cell
+    
+    ! Mise à jour des TV
+    
+    subroutine component_remove_cell_col(this, iCol, iCellBefore)
+    
+        class(Component), intent(in) :: this
+    
+        integer, intent(in) :: iCol, iCellBefore
+        
+        type(Link), pointer :: courant => null()
+        type(Link), pointer :: suivant => null(), precedent => null()
+    
+        precedent => this%cellsBegin(iCellBefore)%particle
+        courant => this%precedent%next
+        
+        do
+        
+            suivant => courant%next
+        
+            if ( courant%iCol == iCol ) then
+            
+                precedent%next => courant%next
+                deallocate(courant)
+                courant => suivant
+                exit
+                
+            else
+            
+                precedent => courant
+                
+            end if
+            
+            courant => suivant
+        
+        end do
+            
+    end subroutine component_remove_cell_col   
+    
+    subroutine component_add_cell_col(this, iCol, iCellAfter)
+    
+        class(Component), intent(in) :: this
+    
+        integer, intent(in) :: iCol, iCellAfter
+    
+        type(Link), pointer :: nouveau => null()
+        type(Link), pointer :: suivant => null(), precedent => null()           
+          
+        
+        precedent => this%cellsBegin(iCellAfter)%particle
+        
+        do
+        
+            suivant => precedent%next
+            
+            if (.not. associated(suivant%next)) then
+            
+                allocate(nouveau)
+                nouveau%next => precedent%next
+                precedent%next => nouveau
+                nouveau%iCol = iCol
+                exit
+                
+            end if
+            
+            precedent => suivant
+            
+        end do
+            
+    end  subroutine component_add_cell_col
 
     ! Energie potentielle -------------------------------------------------
 

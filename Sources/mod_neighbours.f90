@@ -10,70 +10,7 @@ implicit none
 
 contains
     
-    ! Mise à jour des TV
     
-    subroutine remove_cell_col(iCol, iCellBefore)
-    
-        integer, intent(in) :: iCol, iCellBefore
-        
-        type(Link), pointer :: courant => null()
-        type(Link), pointer :: suivant => null(), precedent => null()
-    
-        precedent => cellsBegin(iCellBefore)%particle
-        courant => precedent%next
-        
-        do
-        
-            suivant => courant%next
-        
-            if ( courant%iCol == iCol ) then
-            
-                precedent%next => courant%next
-                deallocate(courant)
-                courant => suivant
-                exit
-                
-            else
-            
-                precedent => courant
-                
-            end if
-            
-            courant => suivant
-        
-        end do
-            
-    end subroutine remove_cell_col   
-    
-    subroutine add_cell_col(iCol, iCellAfter)
-    
-        integer, intent(in) :: iCol, iCellAfter
-    
-        type(Link), pointer :: nouveau => null()
-        type(Link), pointer :: suivant => null(), precedent => null()           
-          
-        
-        precedent => cellsBegin(iCellAfter)%particle
-        
-        do
-        
-            suivant => precedent%next
-            
-            if (.not. associated(suivant%next)) then
-            
-                allocate(nouveau)
-                nouveau%next => precedent%next
-                precedent%next => nouveau
-                nouveau%iCol = iCol
-                exit
-                
-            end if
-            
-            precedent => suivant
-            
-        end do
-            
-    end  subroutine add_cell_col
     
 ! -----------------------------------------------------------------------------
 ! VOISINS :
