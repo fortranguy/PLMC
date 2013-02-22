@@ -19,8 +19,6 @@ implicit none
         
         call ePotIni()
         
-        write(*, *) "test", Vtab(iMin)
-        
         ! Construction                
 
         sph_constructor%radius = radius
@@ -39,11 +37,6 @@ implicit none
         sph_constructor%cell_coordMax(:) = int(Lsize(:)/rcut)
         allocate(sph_constructor%cell_neighs(cell_neighs_nb, &
             product( int(Lsize(:)/rcut) )))
-        
-        call sph_constructor%check_CellsSize()
-        call sph_constructor%alloc_Cells()
-        call sph_constructor%all_col_to_cell()
-        call sph_constructor%ini_cell_neighs()
     
     end function sph_constructor
 

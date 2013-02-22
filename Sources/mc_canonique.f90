@@ -48,6 +48,12 @@ implicit none
     call sph%overlapTest()
     enTot = sph%enTotCalc()
     
+    ! Table des voisins
+    call sph%check_CellsSize()
+    call sph%alloc_Cells()
+    call sph%all_col_to_cell()
+    call sph%ini_cell_neighs()
+    
 ! Milieu --------------------------------------------------
 
     write(*, *) "Début des cycles"
