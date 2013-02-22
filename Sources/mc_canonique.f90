@@ -36,7 +36,7 @@ implicit none
     
     open(unit=unitRapport, recl=4096, file="rapport.out", status='new', &
         action='write')         ! contre line folding
-    call rapport(nWidom, unitRapport)
+    call rapport(sph, nWidom, unitRapport)
     call init_random_seed(unitRapport)
     
     ! Condition initiale
