@@ -200,7 +200,7 @@ contains
             this%cell_coordMax(3)
         do iCell = 1, nCells
             if (associated(this%cellsBegin(iCell)%particle)) then
-                call libere_chaine(this%cellsBegin(iCell)%particle)
+                call this%libere_chaine(this%cellsBegin(iCell)%particle)
             end if
         end do
     
@@ -517,7 +517,7 @@ contains
     
     subroutine component_mcMove(this, enTot, Nrejects)
     
-    	class(Component), intent(in) :: this
+    	class(Component), intent(inout) :: this
         real(DP), intent(inout) :: enTot
         integer, intent(inout) :: Nrejects
         
@@ -550,8 +550,8 @@ contains
                 enTot = enTot + dEn
                 
                 if ( iCellBefore /= iCellAfter ) then                
-                    call remove_cell_col(iOld, iCellBefore)
-                    call add_cell_col(iOld, iCellAfter)
+                    call this%remove_cell_col(iOld, iCellBefore)
+                    call this%add_cell_col(iOld, iCellAfter)
                 end if
                 
             else

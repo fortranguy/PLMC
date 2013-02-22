@@ -48,10 +48,10 @@ implicit none
     enTot = sph%enTotCalc()
     
     ! Table des voisins
-    call check_CellsSize()
-    call alloc_Cells()
-    call all_col_to_cell()
-    call ini_cell_neighs()
+    call sph%check_CellsSize()
+    call sph%alloc_Cells()
+    call sph%all_col_to_cell()
+    call sph%ini_cell_neighs()
     
 ! Milieu --------------------------------------------------
 
@@ -121,6 +121,6 @@ implicit none
         call snapShot(unitSnapFin)
     close(unitSnapFin)
     
-    call dealloc_Cells()
+    call sph%dealloc_Cells()
     
 end program mc_cano
