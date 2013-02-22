@@ -4,17 +4,46 @@ use data_constants
 use data_particles
 use data_mc
 use data_potentiel
+use data_neighbours
 use class_component
 
 implicit none
 
     contains
     
-    function bla
+    function sph_constructor
     
-        type(Component) :: bla
+        type(Component) :: sph_constructor
     
-    end function bla
+        integer, dimension(:, :), allocatable :: sph_cell_neighs
+        
+        allocate(sph_cell_neighs(cell_neighs_nb, int(Lsize(1)/rcut) * &
+            int(Lsize(2)/rcut) * int(Lsize(3)/rcut)))
+    
+        ! Component initialization
+        
+        call ePotIni()
+        
+        ! Construction                
+
+        sph_constructor%radius = radius
+        sph_constructor%rmin = rmin
+        sph_constructor%Ncol = Ncol
+        sph_constructor%dx = dx
+        sph_constructor%rcut = rcut
+        sph_constructor%pas = pas
+        sph_constructor%iMin = iMin
+        sph_constructor%Ntab = Ntab
+        sph_constructor%epsilon = epsilon
+        sph_constructor%alpha = alpha
+        sph_constructor%Vtab = Vtab
+        sph_constructor%cell_Lsize = [rcut, rcut, rcut]
+        sph_constructor%cell_coordMax = [int(Lsize(1)/rcut), &
+            int(Lsize(2)/rcut), int(Lsize(3)/rcut)]
+        sph_constructor%cell_neighs = sph_cell_neighs
+        call sph_constructor%alloc_Cells()
+    
+    end function sph_constructor
 
     ! Générateurs de nombres aléatoires : graine ------------------------------
     
