@@ -60,6 +60,7 @@ public :: sph, sph_init
         procedure :: overlapTest => component_overlapTest
         
         procedure :: alloc_Cells => component_alloc_Cells
+        procedure :: libere_chaine => component_libere_chaine
         procedure :: dealloc_Cells => component_dealloc_Cells
         procedure :: check_CellsSize => component_check_CellsSize
         
@@ -162,16 +163,17 @@ contains
     
     ! Libération
     
-    recursive subroutine libere_chaine(courant)
-        
+    recursive subroutine component_libere_chaine(this, courant)
+    
+        class(Component), intent(in) :: this
         type(Link), pointer :: courant
         
         if (associated(courant%next)) then
-            call libere_chaine(courant%next)
+            call this%libere_chaine(courant%next)
         end if
         deallocate(courant)
         
-    end subroutine libere_chaine
+    end subroutine component_libere_chaine
     
     subroutine component_dealloc_Cells(this)
     
