@@ -51,8 +51,9 @@ implicit none
     
     ! Rapport -----------------------------------------------------------------
     
-    subroutine rapport(nWidom, unitRapport)
+    subroutine rapport(comp, nWidom, unitRapport)
     
+        type(Component), intent(in) :: comp
         integer, intent(in) :: nWidom
         integer, intent(in) :: unitRapport    
         
@@ -68,8 +69,8 @@ implicit none
         write(unitRapport, *) "    alpha = ", alpha
         write(unitRapport, *) "    rcut = ", rcut
         write(unitRapport, *) "    pas = ", pas
-        write(unitRapport, *) "    cell_coordMax(:) = ", cell_coordMax(:)
-        write(unitRapport, *) "    cell_Lsize(:) = ", cell_Lsize(:)
+        write(unitRapport, *) "    cell_coordMax(:) = ", comp%cell_coordMax(:)
+        write(unitRapport, *) "    cell_Lsize(:) = ", comp%cell_Lsize(:)
         
     end subroutine rapport
     
