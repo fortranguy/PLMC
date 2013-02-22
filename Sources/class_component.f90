@@ -89,8 +89,8 @@ contains
         integer :: jCol, iCol
         real(DP) :: r_ij
     
-        do jCol = 1, Ncol
-            do iCol = 1, Ncol
+        do jCol = 1, this%Ncol
+            do iCol = 1, this%Ncol
                 if (iCol /= jCol) then
                     
                     r_ij = dist(X(:, iCol), X(:, jCol))
