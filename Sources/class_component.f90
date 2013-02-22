@@ -14,6 +14,15 @@ implicit none
 private
 public :: sph, sph_init
 
+    type Link
+        integer :: iCol
+        type(Link), pointer :: next => null()
+    end type Link
+    
+    type LinkedList
+        type(Link), pointer :: particle => null()
+    end type LinkedList
+
     type, public :: Component
 
         ! Particles
@@ -42,15 +51,23 @@ public :: sph, sph_init
         ! Neighbours
         
         real(DP), dimension(Dim) :: cell_Lsize
+        integer, dimension(dim) :: cell_coordMax
+        type(LinkedList), allocatable, dimension(:) :: cells, cellsNext
+        type(LinkedList), allocatable, dimension(:) :: cellsBegin
         
     contains
 
         procedure :: overlapTest => component_overlapTest
+        
+        procedure :: alloc_Cells => component_alloc_Cells
+        procedure :: dealloc_Cells => component_dealloc_Cells
+        
         procedure :: ePot => component_ePot
         procedure :: ePotNeigh => component_ePotNeigh
+        procedure :: enTotCalc => component_enTotCalc
+        
         procedure :: mcMove => component_mcMove
         procedure :: widom => component_widom
-        procedure :: enTotCalc => component_enTotCalc
         
     end type Component
     
@@ -78,7 +95,9 @@ contains
                     epsilon = epsilon, &
                     alpha = alpha, &
                     Vtab = Vtab, &
-                    cell_Lsize = [rcut, rcut, rcut]
+                    cell_Lsize = [rcut, rcut, rcut], &
+                    cell_coordMax = [int(Lsize(1)/rcut), &
+                        int(Lsize(2)/rcut), int(Lsize(3)/rcut)], &
                 )
         
     end subroutine sph_init
@@ -110,6 +129,64 @@ contains
         write(*, *) "    Overlap test : OK !"
     
     end subroutine component_overlapTest
+    
+    ! Linked-list allocation
+    
+    subroutine component_alloc_Cells(this)
+    
+        class(Component), intent(in) :: this
+    
+        integer :: iCell, nCells
+        
+        nCells = product(this%cell_coordMax)
+
+        allocate(this%cellsBegin(nCells))
+        allocate(this%cells(nCells))
+        allocate(this%cellsNext(nCells))
+        
+        do iCell = 1, nCells
+
+            allocate(this%cellsBegin(iCell)%particle)
+            this%cells(iCell)%particle => this%cellsBegin(iCell)%particle
+            this%cells(iCell)%particle%iCol = 0
+            
+            allocate(this%cellsNext(iCell)%particle)
+            this%cellsNext(iCell)%particle%iCol = 0            
+            this%cells(iCell)%particle%next => this%cellsNext(iCell)%particle
+            this%cells(iCell)%particle => this%cellsNext(iCell)%particle     
+    
+        end do
+        
+    end subroutine component_alloc_Cells
+    
+    ! Libération
+    
+    recursive subroutine libere_chaine(courant)
+        
+        type(Link), pointer :: courant
+        
+        if (associated(courant%next)) then
+            call libere_chaine(courant%next)
+        end if
+        deallocate(courant)
+        
+    end subroutine libere_chaine
+    
+    subroutine component_dealloc_Cells(this)
+    
+        class(Component), intent(in) :: this
+    
+        integer :: iCell
+        integer :: nCells = this%cell_coordMax(1) * this%cell_coordMax(2) * &
+            this%cell_coordMax(3)
+    
+        do iCell = 1, nCells
+            if (associated(this%cellsBegin(iCell)%particle)) then
+                call libere_chaine(this%cellsBegin(iCell)%particle)
+            end if
+        end do
+    
+    end subroutine component_dealloc_Cells
 
     ! Energie potentielle -----------------------------------------------------
 
