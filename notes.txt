@@ -102,3 +102,6 @@
         
 26 11 12
     12:15 : Sources : if old et new dans la même cellule ?
+    
+22 02 13
+    04:41 : Sources : données : in classe, mais modifiable. Grave ?
