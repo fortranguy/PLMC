@@ -15,14 +15,11 @@ implicit none
     
         type(Component) :: sph_constructor
     
-        integer, dimension(:, :), allocatable :: sph_cell_neighs
-        
-        allocate(sph_cell_neighs(cell_neighs_nb, int(Lsize(1)/rcut) * &
-            int(Lsize(2)/rcut) * int(Lsize(3)/rcut)))
-    
         ! Component initialization
         
         call ePotIni()
+        
+        write(*, *) "test", Vtab(iMin)
         
         ! Construction                
 
@@ -35,13 +32,18 @@ implicit none
         sph_constructor%iMin = iMin
         sph_constructor%Ntab = Ntab
         sph_constructor%epsilon = epsilon
-        sph_constructor%alpha = alpha
-        sph_constructor%Vtab = Vtab
-        sph_constructor%cell_Lsize = [rcut, rcut, rcut]
-        sph_constructor%cell_coordMax = [int(Lsize(1)/rcut), &
-            int(Lsize(2)/rcut), int(Lsize(3)/rcut)]
-        sph_constructor%cell_neighs = sph_cell_neighs
+        sph_constructor%alpha = alpha        
+        allocate(sph_constructor%Vtab(iMin:Ntab))
+        sph_constructor%Vtab(:) = Vtab(:)
+        sph_constructor%cell_Lsize(:) = [rcut, rcut, rcut]
+        sph_constructor%cell_coordMax(:) = int(Lsize(:)/rcut)
+        allocate(sph_constructor%cell_neighs(cell_neighs_nb, &
+            product( int(Lsize(:)/rcut) )))
+        
+        call sph_constructor%check_CellsSize()
         call sph_constructor%alloc_Cells()
+        call sph_constructor%all_col_to_cell()
+        call sph_constructor%ini_cell_neighs()
     
     end function sph_constructor
 

@@ -23,12 +23,11 @@ implicit none
     integer, parameter :: unitObs = 10, unitSnapIni = 11, unitSnapFin = 12, &
         unitRapport = 13, unitObsTherm = 14, unit_dx = 15, unitSnapEnCours = 16
         
-    type(Component) :: test
+    type(Component) :: sph
+    
+    sph = sph_constructor()
         
     write(*, *) "MC_C+Neigh : Vol =", product(Lsize)
-    
-    ! Component init
-    call sph_init()
     
     Nrejects = 0
     tauxRejectsSum = 0._DP
@@ -48,12 +47,6 @@ implicit none
     close(unitSnapIni)
     call sph%overlapTest()
     enTot = sph%enTotCalc()
-    
-    ! Table des voisins
-    call sph%check_CellsSize()
-    call sph%alloc_Cells()
-    call sph%all_col_to_cell()
-    call sph%ini_cell_neighs()
     
 ! Milieu --------------------------------------------------
 
