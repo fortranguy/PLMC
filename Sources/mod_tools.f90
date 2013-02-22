@@ -4,11 +4,44 @@ use data_constants
 use data_particles
 use data_mc
 use data_potentiel
-!use class_component
+use class_component
 
 implicit none
 
     contains
+    
+    function test()
+    
+        type(Component) :: test
+    
+        integer, dimension(:, :), allocatable :: sph_cell_neighs
+        
+        allocate(sph_cell_neighs(cell_neighs_nb, int(Lsize(1)/rcut) * &
+            int(Lsize(2)/rcut) * int(Lsize(3)/rcut)))
+    
+        ! Component initialization
+        
+        call ePotIni()
+        
+        ! Construction
+                
+        test%radius = radius
+        test%rmin = rmin
+        test%Ncol = Ncol
+        test%dx = dx
+        test%rcut = rcut
+        test%pas = pas
+        test%iMin = iMin
+        test%Ntab = Ntab
+        test%epsilon = epsilon
+        test%alpha = alpha
+        test%Vtab = Vtab
+        test%cell_Lsize = [rcut, rcut, rcut]
+        test%cell_coordMax = [int(Lsize(1)/rcut), &
+            int(Lsize(2)/rcut), int(Lsize(3)/rcut)]
+        test%cell_neighs = sph_cell_neighs
+        
+    end function test
 
     ! Générateurs de nombres aléatoires : graine ------------------------------
     
