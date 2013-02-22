@@ -61,6 +61,7 @@ public :: sph, sph_init
         
         procedure :: alloc_Cells => component_alloc_Cells
         procedure :: dealloc_Cells => component_dealloc_Cells
+        procedure :: check_CellsSize => component_check_CellsSize
         
         procedure :: ePot => component_ePot
         procedure :: ePotNeigh => component_ePotNeigh
@@ -187,6 +188,74 @@ contains
         end do
     
     end subroutine component_dealloc_Cells
+    
+    ! Vérification de la taille des cellules (voisines)
+    
+    subroutine component_check_CellsSize(this)
+    
+        class(Component), intent(in) :: this
+        
+        integer :: iDir
+        
+        do iDir = 1, Dim
+        
+            if (this%cell_Lsize(iDir) < this%rcut) then
+                write(*, *) "Cellule trop petite dans la direction", iDir, ":"
+                write(*, *) this%cell_Lsize(iDir), "<", this%rcut
+                stop
+            end if
+            
+            if (this%cell_coordMax(iDir) < cell_neigh_coordMax(iDir)) then
+                write(*, *) "Trop peu de cellules dans la direction", iDir, ":"
+                write(*, *) this%cell_coordMax(iDir), "<",&
+                    cell_neigh_coordMax(iDir)
+                stop
+            end if
+            
+        end do
+        
+    end subroutine component_check_CellsSize
+    
+    ! Assignation : particule -> cellule
+    
+    function position_to_cell(xCol)
+    
+        real(DP), dimension(Dim), intent(in) :: xCol
+        integer, dimension(Dim) :: cell_coord
+        integer :: position_to_cell
+    
+        cell_coord(:) = int( xCol(:)/this%cell_Lsize(:) ) + 1
+        position_to_cell = cell_coord(1) + this%cell_coordMax(1) * &
+            (cell_coord(2)-1) + this%cell_coordMax(1) * this%cell_coordMax(2)*
+            (cell_coord(3)-1)
+    
+    end function position_to_cell
+    
+    subroutine all_col_to_cell()
+    
+        integer :: iCol
+        integer :: iCell, nCells = cell_coordMax(1)*cell_coordMax(2)*&
+            cell_coordMax(3)
+    
+        do iCol = 1, Ncol
+    
+            iCell = position_to_cell(X(:,iCol))
+            cells(iCell)%particle%iCol = iCol
+            
+            allocate(cellsNext(iCell)%particle)
+            cellsNext(iCell)%particle%iCol = 0
+            cells(iCell)%particle%next => cellsNext(iCell)%particle
+            cells(iCell)%particle => cellsNext(iCell)%particle
+            
+        end do
+        
+        do iCell = 1, nCells
+            
+            cells(iCell)%particle%next => null()
+            
+        end do
+        
+    end subroutine all_col_to_cell
 
     ! Energie potentielle -----------------------------------------------------
 
