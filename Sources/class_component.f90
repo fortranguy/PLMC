@@ -68,7 +68,6 @@ public :: sph, sph_init
         procedure :: remove_cell_col => component_remove_cell_col
         procedure :: add_cell_col => component_add_cell_col
         procedure :: cell_coord_to_ind => component_cell_coord_to_ind
-        procedure :: cell_neigh_coord_to_ind => component_cell_neigh_coord_to_ind
         procedure :: cell_period => component_cell_period
         procedure :: ini_cell_neighs => component_ini_cell_neighs
         
@@ -367,10 +366,8 @@ contains
     
     end function component_cell_coord_to_ind
     
-    function component_cell_neigh_coord_to_ind(this, neigh_coord) &
-        result(cell_neigh_coord_to_ind)
+    function cell_neigh_coord_to_ind(neigh_coord)
     
-        class(Component), intent(in) :: this
         integer, dimension(Dim), intent(in) :: neigh_coord
         
         integer :: cell_neigh_coord_to_ind
@@ -380,7 +377,7 @@ contains
             + cell_neigh_coordMax(1) * cell_neigh_coordMax(2) * &
             (neigh_coord(3)-1)
     
-    end function component_cell_neigh_coord_to_ind
+    end function cell_neigh_coord_to_ind
     
     function component_cell_period(this, coord) result(cell_period)
     
@@ -420,7 +417,7 @@ contains
             do neigh_k = 1, cell_neigh_coordMax(3)
             
                 neigh_coord(:) = [neigh_i, neigh_j, neigh_k]                
-                neigh_ind = this%cell_neigh_coord_to_ind(neigh_coord(:))          
+                neigh_ind = cell_neigh_coord_to_ind(neigh_coord(:))          
                 neigh_coord(:) = neigh_coord(:) - cell_neigh_coordMax(:) + 1
                     ! Par rapport au centre [i, j, k]
                 
