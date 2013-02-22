@@ -5,7 +5,7 @@
     subroutine iniPosCub()
     subroutine iniPosAlea()
     
-    ! Test d'overlap : global
+    ! Test d'overlap : (each) local -----------------------
     
     subroutine overlapTest()
     

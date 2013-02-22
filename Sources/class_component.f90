@@ -41,6 +41,7 @@ public :: sph, sph_init
         
     contains
 
+        procedure :: overlapTest => component_overlapTest
         procedure :: ePot => component_ePot
         procedure :: ePotNeigh => component_ePotNeigh
         procedure :: mcMove => component_mcMove
@@ -76,6 +77,34 @@ contains
                 )
         
     end subroutine sph_init
+    
+    ! Test d'overlap ----------------------------------------------------------
+    
+    subroutine component_overlapTest(this)
+    
+        class(Component), intent(in) :: this
+    
+        integer :: jCol, iCol
+        real(DP) :: r_ij
+    
+        do jCol = 1, Ncol
+            do iCol = 1, Ncol
+                if (iCol /= jCol) then
+                    
+                    r_ij = dist(X(:, iCol), X(:, jCol))
+                    if (r_ij < this%rmin) then
+                        write(*, *) "    Overlap !", iCol, jCol
+                        write(*, * ) "    r_ij = ", r_ij
+                        stop
+                    end if
+                    
+                end if
+            end do
+        end do
+        
+        write(*, *) "    Overlap test : OK !"
+    
+    end subroutine component_overlapTest
 
     ! Energie potentielle -----------------------------------------------------
 
@@ -243,6 +272,7 @@ contains
     function component_enTotCalc(this) result(enTotCalc)
     
     	class(Component), intent(in) :: this
+    	
         integer :: iCol, jCol
         real(DP) :: r_ij
         real(DP) :: enTotCalc

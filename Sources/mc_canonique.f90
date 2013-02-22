@@ -45,7 +45,7 @@ implicit none
         action='write')
         call snapShot(unitSnapIni)
     close(unitSnapIni)
-    call overlapTest()
+    call sph%overlapTest()
     enTot = sph%enTotCalc()
     
     ! Table des voisins
@@ -107,7 +107,7 @@ implicit none
 
 ! Fin -----------------------------------------------------
 
-    call overlapTest()
+    call sph%overlapTest()
     
     write(unitRapport, *) "Test de consistence :"
     write(unitRapport, *) "    enTot_mc_c = ", enTot

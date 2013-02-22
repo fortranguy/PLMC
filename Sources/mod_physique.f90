@@ -148,32 +148,6 @@ implicit none
     
     end subroutine iniPosAlea
     
-    ! Test d'overlap ----------------------------------------------------------
-    
-    subroutine overlapTest()
-    
-        integer :: jCol, iCol
-        real(DP) :: r_ij
-    
-        do jCol = 1, Ncol
-            do iCol = 1, Ncol
-                if (iCol /= jCol) then
-                    
-                    r_ij = dist(X(:, iCol), X(:, jCol))
-                    if (r_ij < rmin) then
-                        write(*, *) "    Overlap !", iCol, jCol
-                        write(*, * ) "    r_ij = ", r_ij
-                        stop
-                    end if
-                    
-                end if
-            end do
-        end do
-        
-        write(*, *) "    Overlap test : OK !"
-    
-    end subroutine overlapTest
-    
     ! Distance entre 2 particules (CLP) ---------------------------------------
     
     function dist(X1, X2)
