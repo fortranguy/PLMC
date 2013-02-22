@@ -23,14 +23,12 @@ implicit none
     integer, parameter :: unitObs = 10, unitSnapIni = 11, unitSnapFin = 12, &
         unitRapport = 13, unitObsTherm = 14, unit_dx = 15, unitSnapEnCours = 16
         
-    type(Component) :: sph
-    
-    sph = test()
+    type(Component) :: test
         
     write(*, *) "MC_C+Neigh : Vol =", product(Lsize)
     
     ! Component init
-    !call sph_init()
+    call sph_init()
     
     Nrejects = 0
     tauxRejectsSum = 0._DP

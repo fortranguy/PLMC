@@ -10,38 +10,11 @@ implicit none
 
     contains
     
-    function test()
+    function bla
     
-        type(Component) :: test
+        type(Component) :: bla
     
-        integer, dimension(:, :), allocatable :: sph_cell_neighs
-        
-        allocate(sph_cell_neighs(cell_neighs_nb, int(Lsize(1)/rcut) * &
-            int(Lsize(2)/rcut) * int(Lsize(3)/rcut)))
-    
-        ! Component initialization
-        
-        call ePotIni()
-        
-        ! Construction
-                
-        test%radius = radius
-        test%rmin = rmin
-        test%Ncol = Ncol
-        test%dx = dx
-        test%rcut = rcut
-        test%pas = pas
-        test%iMin = iMin
-        test%Ntab = Ntab
-        test%epsilon = epsilon
-        test%alpha = alpha
-        test%Vtab = Vtab
-        test%cell_Lsize = [rcut, rcut, rcut]
-        test%cell_coordMax = [int(Lsize(1)/rcut), &
-            int(Lsize(2)/rcut), int(Lsize(3)/rcut)]
-        test%cell_neighs = sph_cell_neighs
-        
-    end function test
+    end function bla
 
     ! Générateurs de nombres aléatoires : graine ------------------------------
     

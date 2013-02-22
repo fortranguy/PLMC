@@ -79,7 +79,42 @@ public :: sph, sph_init
         
     end type Component
     
+    type(Component), protected :: sph
+    
 contains
+
+    subroutine sph_init()
+    
+        integer, dimension(:, :), allocatable :: sph_cell_neighs
+        
+        allocate(sph_cell_neighs(cell_neighs_nb, int(Lsize(1)/rcut) * &
+            int(Lsize(2)/rcut) * int(Lsize(3)/rcut)))
+    
+        ! Component initialization
+        
+        call ePotIni()
+        
+        ! Construction
+                
+        sph =   Component(&        
+                    radius = radius, &
+                    rmin = rmin, &
+                    Ncol = Ncol, &
+                    dx = dx, &
+                    rcut = rcut, &
+                    pas = pas, &
+                    iMin = iMin, &
+                    Ntab = Ntab, &
+                    epsilon = epsilon, &
+                    alpha = alpha, &
+                    Vtab = Vtab, &
+                    cell_Lsize = [rcut, rcut, rcut], &
+                    cell_coordMax = [int(Lsize(1)/rcut), &
+                        int(Lsize(2)/rcut), int(Lsize(3)/rcut)], &
+                    cell_neighs = sph_cell_neighs &
+                )
+        
+    end subroutine sph_init
     
     ! Test d'overlap ----------------------------------------------------------
     
