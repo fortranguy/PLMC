@@ -2,6 +2,9 @@ module mod_dist
 
 use data_constants
 use data_distrib
+use mod_physique
+use mod_tools
+use class_component
 
 implicit none
 
@@ -41,13 +44,16 @@ implicit none
 	real(DP) :: r
 	real(DP) :: numerat, denomin
 	real(DP), dimension(:), allocatable :: fct_dist
-	real(DP) :: energSum
+	real(DP) :: energSum	
+	type(Component) :: sph
 	
 	!$ integer :: nb_taches
 	real(DP) :: tIni, tFin
 	!$ real(DP) :: tIni_para, tFin_para
 	
 	if (.not.snap) stop "Snap désactivé."
+	
+	sph = sph_constructor()
 	
 	call initDistriParams()
 	allocate(distrib(Ndist))
@@ -114,7 +120,7 @@ implicit none
 			fct_dist(iDist) = 2._DP * numerat / denomin / densite
 			write(unitDistrib, *) r, fct_dist(iDist)
 			
-			if (r>=rmin .and. r<=rcut) then
+			if (r>=sph%rmin .and. r<=sph%rcut) then
 				if (iDistMin == 0) then
 					iDistMin = iDist
 				end if
@@ -132,7 +138,7 @@ implicit none
 	
 	do iDist = iDistMin, iDistMax
 		r = (real(iDist, DP) + 0.5_DP) * deltaDist
-		energSum = energSum + ePot(r) * fct_dist(iDist) * 4._DP*PI*r**2	
+		energSum = energSum + sph%ePot(r) * fct_dist(iDist) * 4._DP*PI*r**2	
 	end do
 
 	open(unit=unitEnerg, file="epp_dist.out", action="write")

@@ -10,7 +10,7 @@ EXEC1 = xMC_Canonique
 EXEC2 = xBunching
 EXEC3 = xDistrib
 
-all: $(EXEC1) # $(EXEC2) $(EXEC3)
+all: $(EXEC1) $(EXEC2) $(EXEC3)
 
 #----------------------------------------------------------
 
@@ -30,7 +30,8 @@ $(EXEC2) : data_copy.f90 bunching.f90
 
 # ---------------------------
 
-$(EXEC3) : data.f90 mod_physique.f90 distrib.f90
+$(EXEC3) : data.f90 mod_physique.f90 class_component.f90 mod_tools.f90 \
+	distrib.f90
 	$(FC) $^ $(LDFLAGS_OMP) -o $@
 
 # ---------------------------------------------------------
