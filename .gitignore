@@ -12,6 +12,7 @@ Sources/*.f90~
 Sources/makefile~
 Sources/*.mod
 Sources/*.o
+Sources/procedures.txt~
 Temp/
 Data/
 DataBof/
