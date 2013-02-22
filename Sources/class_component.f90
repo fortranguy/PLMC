@@ -267,7 +267,7 @@ contains
         
     end subroutine component_all_col_to_cell
 
-    ! Energie potentielle -----------------------------------------------------
+    ! Energie potentielle -------------------------------------------------
 
     function component_ePot(this, r) result(ePot)
         
@@ -341,7 +341,7 @@ contains
     
     end subroutine component_ePotNeigh
     
-    ! Déplacement d'une particule ---------------------------------------------
+    ! Déplacement d'une particule -----------------------------------------
     
     subroutine component_mcMove(this, enTot, Nrejects)
     
@@ -394,7 +394,7 @@ contains
     
     end subroutine component_mcMove
     
-    ! Méthode de Widom --------------------------------------------------------
+    ! Méthode de Widom ----------------------------------------------------
 
     subroutine component_widom(this, nWidom, activExInv)
         
