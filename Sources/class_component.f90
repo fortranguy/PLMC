@@ -63,6 +63,8 @@ public :: sph, sph_init
         procedure :: libere_chaine => component_libere_chaine
         procedure :: dealloc_Cells => component_dealloc_Cells
         procedure :: check_CellsSize => component_check_CellsSize
+        procedure :: position_to_cell => component_position_to_cell
+        procedure :: all_col_to_cell => component_all_col_to_cell
         
         procedure :: ePot => component_ePot
         procedure :: ePotNeigh => component_ePotNeigh
@@ -220,44 +222,50 @@ contains
     
     ! Assignation : particule -> cellule
     
-    function position_to_cell(xCol)
+    function component_position_to_cell(this, xCol) &
+        result(position_to_cell)
     
+        class(Component), intent(in) :: this
         real(DP), dimension(Dim), intent(in) :: xCol
+        
         integer, dimension(Dim) :: cell_coord
         integer :: position_to_cell
     
         cell_coord(:) = int( xCol(:)/this%cell_Lsize(:) ) + 1
         position_to_cell = cell_coord(1) + this%cell_coordMax(1) * &
-            (cell_coord(2)-1) + this%cell_coordMax(1) * this%cell_coordMax(2)*
-            (cell_coord(3)-1)
+            (cell_coord(2)-1) + this%cell_coordMax(1) *
+            this%cell_coordMax(2) * (cell_coord(3)-1)
     
-    end function position_to_cell
+    end function component_position_to_cell
     
-    subroutine all_col_to_cell()
+    subroutine component_all_col_to_cell(this)
+    
+        class(Component), intent(in) :: this
     
         integer :: iCol
-        integer :: iCell, nCells = cell_coordMax(1)*cell_coordMax(2)*&
-            cell_coordMax(3)
+        integer :: iCell, nCells = this%cell_coordMax(1) *
+        this%cell_coordMax(2) * this%cell_coordMax(3)
     
-        do iCol = 1, Ncol
+        do iCol = 1, this%Ncol
     
-            iCell = position_to_cell(X(:,iCol))
-            cells(iCell)%particle%iCol = iCol
+            iCell = this%position_to_cell(X(:,iCol))
+            this%cells(iCell)%particle%iCol = iCol
             
-            allocate(cellsNext(iCell)%particle)
-            cellsNext(iCell)%particle%iCol = 0
-            cells(iCell)%particle%next => cellsNext(iCell)%particle
-            cells(iCell)%particle => cellsNext(iCell)%particle
+            allocate(this%cellsNext(iCell)%particle)
+            this%cellsNext(iCell)%particle%iCol = 0
+            this%cells(iCell)%particle%next => &
+                this%cellsNext(iCell)%particle
+            this%cells(iCell)%particle => this%cellsNext(iCell)%particle
             
         end do
         
         do iCell = 1, nCells
             
-            cells(iCell)%particle%next => null()
+            this%cells(iCell)%particle%next => null()
             
         end do
         
-    end subroutine all_col_to_cell
+    end subroutine component_all_col_to_cell
 
     ! Energie potentielle -----------------------------------------------------
 
