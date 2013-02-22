@@ -165,8 +165,6 @@ use data_potentiel
     ! Voisins
     integer, dimension(dim), parameter :: cell_neigh_coordMax = [3, 3, 3]
     integer, parameter :: cell_neighs_nb = 3**3 ! inclus soi-même
-    integer, dimension(cell_neighs_nb, cell_iMax*cell_jMax*cell_kMax) :: &
-        cell_neighs ! problème !!!!!!!!!!!!!
 
 end module data_neighbours
 !***********************************************************************

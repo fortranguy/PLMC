@@ -51,7 +51,8 @@ public :: sph, sph_init
         ! Neighbours
         
         real(DP), dimension(Dim) :: cell_Lsize
-        integer, dimension(dim) :: cell_coordMax
+        integer, dimension(Dim) :: cell_coordMax
+        integer, dimension(:, :), allocatable :: cell_neighs
         type(LinkedList), allocatable, dimension(:) :: cells, cellsNext
         type(LinkedList), allocatable, dimension(:) :: cellsBegin
         
@@ -67,6 +68,10 @@ public :: sph, sph_init
         procedure :: all_col_to_cell => component_all_col_to_cell
         procedure :: remove_cell_col => component_remove_cell_col
         procedure :: add_cell_col => component_add_cell_col
+        procedure :: cell_coord_to_ind => component_cell_coord_to_ind
+        procedure :: cell_neigh_coord_to_ind => component_cell_neigh_coord_to_ind
+        procedure :: cell_period => component_cell_period
+        procedure :: ini_cell_neighs => component_ini_cell_neighs
         
         procedure :: ePot => component_ePot
         procedure :: ePotNeigh => component_ePotNeigh
@@ -83,7 +88,12 @@ contains
 
     subroutine sph_init()
     
-        ! Component initializarion
+        integer, dimension(:, :), allocatable :: sph_cell_neighs
+        
+        allocate(sph_cell_neighs(cell_neighs_nb, int(Lsize(1)/rcut) *
+            int(Lsize(2)/rcut) * int(Lsize(3)/rcut)))
+    
+        ! Component initialization
         
         call ePotIni()
         
@@ -104,6 +114,7 @@ contains
                     cell_Lsize = [rcut, rcut, rcut], &
                     cell_coordMax = [int(Lsize(1)/rcut), &
                         int(Lsize(2)/rcut), int(Lsize(3)/rcut)], &
+                    cell_neighs = sph_cell_neighs &
                 )
         
     end subroutine sph_init
@@ -337,6 +348,94 @@ contains
         end do
             
     end  subroutine component_add_cell_col
+    
+! -----------------------------------------------------------------------------
+! VOISINS :
+! -----------------------------------------------------------------------------
+    
+    function component_cell_coord_to_ind(this, coord) result(cell_coord_to_ind)
+        
+        class(Component), intent(in) :: this    
+        integer, dimension(Dim), intent(in) :: coord
+        
+        integer :: cell_coord_to_ind
+        
+        cell_coord_to_ind = coord(1) + this%cell_coordMax(1)*(coord(2)-1) + &
+            this%cell_coordMax(1)*this%cell_coordMax(2)*(coord(3)-1)
+    
+    end function component_cell_coord_to_ind
+    
+    function component_cell_neigh_coord_to_ind(this, neigh_coord) &
+        result(cell_neigh_coord_to_ind)
+    
+        class(Component), intent(in) :: this
+        integer, dimension(Dim), intent(in) :: neigh_coord
+        
+        integer :: cell_neigh_coord_to_ind
+        
+        cell_neigh_coord_to_ind = neigh_coord(1) + &
+            cell_neigh_coordMax(1) * (neigh_coord(2)-1) &
+            + cell_neigh_coordMax(1) * cell_neigh_coordMax(2) * &
+            (neigh_coord(3)-1)
+    
+    end function component_cell_neigh_coord_to_ind
+    
+    function component_cell_period(this, coord) result(cell_period)
+    
+        class(Component), intent(in) :: this    
+        integer, dimension(Dim), intent(in) :: coord
+        
+        integer, dimension(Dim) :: cell_period
+        
+        cell_period(:) = coord(:)
+        
+        where (cell_period(:) < 1)
+            cell_period(:) = cell_period(:) + this%cell_coordMax(:)
+        end where
+        
+        where (cell_period(:) > this%cell_coordMax(:))
+            cell_period(:) = cell_period(:) - this%cell_coordMax(:)
+        end where
+    
+    end function component_cell_period
+    
+    subroutine component_ini_cell_neighs(this)
+    
+        class(Component), intent(in) :: this 
+    
+        integer :: i, j, k, ind
+        integer :: neigh_i, neigh_j, neigh_k, neigh_ind
+        integer, dimension(Dim) :: coord, neigh_coord
+        
+        do i = 1, this%cell_coordMax(1)
+        do j = 1, this%cell_coordMax(2)
+        do k = 1, this%cell_coordMax(3)
+            
+            ind = this%cell_coord_to_ind([i, j, k])
+
+            do neigh_i = 1, cell_neigh_coordMax(1)
+            do neigh_j = 1, cell_neigh_coordMax(2)
+            do neigh_k = 1, cell_neigh_coordMax(3)
+            
+                neigh_coord(:) = [neigh_i, neigh_j, neigh_k]                
+                neigh_ind = this%cell_neigh_coord_to_ind(neigh_coord(:))          
+                neigh_coord(:) = neigh_coord(:) - cell_neigh_coordMax(:) + 1
+                    ! Par rapport au centre [i, j, k]
+                
+                coord(:) = [i, j, k] + neigh_coord(:)
+                
+                this%cell_neighs(neigh_ind, ind) = &
+                    this%cell_coord_to_ind( cell_period(coord(:)) )
+                    
+            end do
+            end do
+            end do
+        
+        end do
+        end do
+        end do
+            
+    end subroutine component_ini_cell_neighs
 
     ! Energie potentielle -------------------------------------------------
 
