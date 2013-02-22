@@ -6,7 +6,6 @@ module class_component
 
 use data_cell
 use data_neighbours
-use mod_neighbours
 use mod_physique
 
 implicit none
@@ -90,7 +89,7 @@ contains
     
         integer, dimension(:, :), allocatable :: sph_cell_neighs
         
-        allocate(sph_cell_neighs(cell_neighs_nb, int(Lsize(1)/rcut) *
+        allocate(sph_cell_neighs(cell_neighs_nb, int(Lsize(1)/rcut) * &
             int(Lsize(2)/rcut) * int(Lsize(3)/rcut)))
     
         ! Component initialization
@@ -151,7 +150,7 @@ contains
     
     subroutine component_alloc_Cells(this)
     
-        class(Component), intent(in) :: this
+        class(Component), intent(inout) :: this
     
         integer :: iCell, nCells
         
@@ -180,7 +179,7 @@ contains
     
     recursive subroutine component_libere_chaine(this, courant)
     
-        class(Component), intent(in) :: this
+        class(Component), intent(inout) :: this
         type(Link), pointer :: courant
         
         if (associated(courant%next)) then
@@ -192,12 +191,13 @@ contains
     
     subroutine component_dealloc_Cells(this)
     
-        class(Component), intent(in) :: this
+        class(Component), intent(inout) :: this
     
         integer :: iCell
-        integer :: nCells = this%cell_coordMax(1) * this%cell_coordMax(2) * &
-            this%cell_coordMax(3)
+        integer :: nCells
     
+        nCells = this%cell_coordMax(1) * this%cell_coordMax(2) * &
+            this%cell_coordMax(3)
         do iCell = 1, nCells
             if (associated(this%cellsBegin(iCell)%particle)) then
                 call libere_chaine(this%cellsBegin(iCell)%particle)
@@ -246,18 +246,20 @@ contains
     
         cell_coord(:) = int( xCol(:)/this%cell_Lsize(:) ) + 1
         position_to_cell = cell_coord(1) + this%cell_coordMax(1) * &
-            (cell_coord(2)-1) + this%cell_coordMax(1) *
+            (cell_coord(2)-1) + this%cell_coordMax(1) * &
             this%cell_coordMax(2) * (cell_coord(3)-1)
     
     end function component_position_to_cell
     
     subroutine component_all_col_to_cell(this)
     
-        class(Component), intent(in) :: this
+        class(Component), intent(inout) :: this
     
         integer :: iCol
-        integer :: iCell, nCells = this%cell_coordMax(1) *
-        this%cell_coordMax(2) * this%cell_coordMax(3)
+        integer :: iCell, nCells
+        
+        nCells = this%cell_coordMax(1) * this%cell_coordMax(2) * &
+            this%cell_coordMax(3)
     
         do iCol = 1, this%Ncol
     
@@ -284,7 +286,7 @@ contains
     
     subroutine component_remove_cell_col(this, iCol, iCellBefore)
     
-        class(Component), intent(in) :: this
+        class(Component), intent(inout) :: this
     
         integer, intent(in) :: iCol, iCellBefore
         
@@ -292,7 +294,7 @@ contains
         type(Link), pointer :: suivant => null(), precedent => null()
     
         precedent => this%cellsBegin(iCellBefore)%particle
-        courant => this%precedent%next
+        courant => precedent%next
         
         do
         
@@ -319,7 +321,7 @@ contains
     
     subroutine component_add_cell_col(this, iCol, iCellAfter)
     
-        class(Component), intent(in) :: this
+        class(Component), intent(inout) :: this
     
         integer, intent(in) :: iCol, iCellAfter
     
@@ -401,7 +403,7 @@ contains
     
     subroutine component_ini_cell_neighs(this)
     
-        class(Component), intent(in) :: this 
+        class(Component), intent(inout) :: this 
     
         integer :: i, j, k, ind
         integer :: neigh_i, neigh_j, neigh_k, neigh_ind
@@ -425,7 +427,7 @@ contains
                 coord(:) = [i, j, k] + neigh_coord(:)
                 
                 this%cell_neighs(neigh_ind, ind) = &
-                    this%cell_coord_to_ind( cell_period(coord(:)) )
+                    this%cell_coord_to_ind( this%cell_period(coord(:)) )
                     
             end do
             end do
@@ -482,8 +484,8 @@ contains
     
         do iNeigh = 1, cell_neighs_nb
         
-            iCell_neigh = cell_neighs(iNeigh, iCell)
-            courant => cellsBegin(iCell_neigh)%particle%next            
+            iCell_neigh = this%cell_neighs(iNeigh, iCell)
+            courant => this%cellsBegin(iCell_neigh)%particle%next            
             if (.not. associated(courant%next)) cycle
             
             do
@@ -532,12 +534,12 @@ contains
         call random_number(xNew)
         xNew(:) = X(:, iOld) + (xNew(:)-0.5_DP)*this%dx(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
-        iCellAfter = position_to_cell(xNew)
+        iCellAfter = this%position_to_cell(xNew)
         call this%ePotNeigh(iOld, xNew, iCellAfter, overlap, eNew)
         
         if (.not. overlap) then
         
-            iCellBefore = position_to_cell(X(:, iOld))
+            iCellBefore = this%position_to_cell(X(:, iOld))
             call this%ePotNeigh(iOld, X(:, iOld), iCellBefore, overlap, eOld)
         	
             dEn = eNew - eOld
@@ -585,7 +587,7 @@ contains
             
             call random_number(xTest)
             xTest(:) = Lsize(:) * xTest(:)    
-            iCellTest = position_to_cell(xTest)
+            iCellTest = this%position_to_cell(xTest)
             call this%ePotNeigh(0, xTest, iCellTest, overlap, enTest) 
             
             if (.not. overlap) then

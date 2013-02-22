@@ -159,11 +159,11 @@ end module data_potentiel
 !***********************************************************************
 module data_neighbours
 
-use data_constants
-use data_potentiel
+use data_cell
 
-    ! Voisins
-    integer, dimension(dim), parameter :: cell_neigh_coordMax = [3, 3, 3]
+implicit none
+
+    integer, dimension(Dim), parameter :: cell_neigh_coordMax = [3, 3, 3]
     integer, parameter :: cell_neighs_nb = 3**3 ! inclus soi-même
 
 end module data_neighbours

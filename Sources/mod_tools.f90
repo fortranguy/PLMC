@@ -4,7 +4,7 @@ use data_constants
 use data_particles
 use data_mc
 use data_potentiel
-use data_neighbours
+!use class_component
 
 implicit none
 
@@ -51,9 +51,9 @@ implicit none
     
     ! Rapport -----------------------------------------------------------------
     
-    subroutine rapport(comp, nWidom, unitRapport)
+    subroutine rapport(nWidom, unitRapport)
     
-        type(Component), intent(in) :: comp
+        !type(Component), intent(in) :: comp
         integer, intent(in) :: nWidom
         integer, intent(in) :: unitRapport    
         
@@ -69,8 +69,8 @@ implicit none
         write(unitRapport, *) "    alpha = ", alpha
         write(unitRapport, *) "    rcut = ", rcut
         write(unitRapport, *) "    pas = ", pas
-        write(unitRapport, *) "    cell_coordMax(:) = ", comp%cell_coordMax(:)
-        write(unitRapport, *) "    cell_Lsize(:) = ", comp%cell_Lsize(:)
+        !write(unitRapport, *) "    cell_coordMax(:) = ", comp%cell_coordMax(:)
+        !write(unitRapport, *) "    cell_Lsize(:) = ", comp%cell_Lsize(:)
         
     end subroutine rapport
     
