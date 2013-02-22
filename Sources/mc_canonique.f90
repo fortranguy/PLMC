@@ -32,7 +32,6 @@ implicit none
     tauxRejectsSum = 0._DP
     enTotSum = 0._DP
     activExInvSum = 0._DP
-    call ePotIni()
     
     open(unit=unitRapport, recl=4096, file="rapport.out", status='new', &
         action='write')         ! contre line folding
