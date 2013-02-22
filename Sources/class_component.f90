@@ -39,6 +39,10 @@ public :: sph, sph_init
         real(DP) :: alpha
         real(DP), dimension(:), allocatable :: Vtab
         
+        ! Neighbours
+        
+        real(DP), dimension(Dim) :: cell_Lsize
+        
     contains
 
         procedure :: overlapTest => component_overlapTest
@@ -73,7 +77,8 @@ contains
                     Ntab = Ntab, &
                     epsilon = epsilon, &
                     alpha = alpha, &
-                    Vtab = Vtab &
+                    Vtab = Vtab, &
+                    cell_Lsize = [rcut, rcut, rcut]
                 )
         
     end subroutine sph_init

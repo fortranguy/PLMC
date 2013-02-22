@@ -155,6 +155,33 @@ end module data_potentiel
 !***********************************************************************
 
 !***********************************************************************
+!* MODULE: Neighbours                                                  *
+!***********************************************************************
+module data_neighbours
+
+use data_constants
+use data_potentiel
+
+    ! Cellules
+    !real(DP), parameter :: cell_Lsize1 = rcut, cell_Lsize2 = rcut, &
+        !cell_Lsize3 = rcut
+    !real(DP), dimension(Dim), parameter :: cell_Lsize = &
+        ![cell_Lsize1, cell_Lsize2, cell_Lsize3]
+    integer, parameter :: cell_iMax = int(Lsize1/cell_Lsize1), &
+    cell_jMax = int(Lsize2/cell_Lsize2), cell_kMax = int(Lsize3/cell_Lsize3)
+    integer, dimension(dim), parameter :: cell_coordMax = &
+        [cell_iMax, cell_jMax, cell_kMax]
+        
+    ! Voisins
+    integer, dimension(dim), parameter :: cell_neigh_coordMax = [3, 3, 3]
+    integer, parameter :: cell_neighs_nb = 3**3 ! inclus soi-même
+    integer, dimension(cell_neighs_nb, cell_iMax*cell_jMax*cell_kMax) :: &
+        cell_neighs
+
+end module data_neighbours
+!***********************************************************************
+
+!***********************************************************************
 !* MODULE: Distribution function                                       *
 !***********************************************************************
 module data_distrib
