@@ -25,6 +25,8 @@ use data_potentiel
     cell_jMax = int(Lsize2/cell_Lsize2), cell_kMax = int(Lsize3/cell_Lsize3)
     integer, dimension(dim), parameter :: cell_coordMax = &
         [cell_iMax, cell_jMax, cell_kMax]
+        
+    ! LinkedList
     type(LinkedList), allocatable, dimension(:) :: cells, cellsNext
     type(LinkedList), allocatable, dimension(:), protected :: cellsBegin
 
