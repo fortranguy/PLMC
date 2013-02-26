@@ -3,7 +3,6 @@ program mc_cano
 use data_constants
 use data_mc
 use data_distrib
-use mod_physique
 use mod_tools
 use class_component
 

@@ -5,7 +5,7 @@ use data_particles
 use data_mc
 use data_potentiel
 use data_neighbours
-use m_test
+use mod_pbc
 use class_component
 
 implicit none

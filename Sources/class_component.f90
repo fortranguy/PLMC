@@ -1,10 +1,7 @@
-module m_test
+module mod_pbc
 
 use data_constants
 use data_cell
-use data_particles
-use data_mc
-use data_potentiel
 
 implicit none
 
@@ -29,7 +26,7 @@ implicit none
     
     end function dist
 
-end module m_test
+end module mod_pbc
 
 !***********************************************************************
 !* MODULE: Component class                                              *
@@ -38,8 +35,10 @@ end module m_test
 module class_component
 
 use data_cell
+use data_particles
 use data_neighbours
-use m_test
+use data_mc
+use mod_pbc
 
 implicit none
 

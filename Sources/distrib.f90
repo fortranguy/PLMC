@@ -2,9 +2,6 @@ module mod_dist
 
 use data_constants
 use data_distrib
-use mod_physique
-use mod_tools
-use class_component
 
 implicit none
 
@@ -27,7 +24,9 @@ use data_constants
 use data_distrib
 use data_particles
 use mod_dist
-use mod_physique
+use mod_pbc
+use class_component
+use mod_tools
 !$ use omp_lib
 
 implicit none
