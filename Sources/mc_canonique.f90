@@ -40,10 +40,10 @@ implicit none
     call init_random_seed(unitRapport)
     
     ! Condition initiale
-    call condIni(unitRapport)
+    call condIni(unitRapport, sph)
     open(unit=unitSnapIni, recl=4096, file="snapShotIni.out", status='new', &
         action='write')
-        call snapShot(unitSnapIni)
+        call snapShot(unitSnapIni, sph)
     close(unitSnapIni)
     call sph%overlapTest()
     enTot = sph%enTotCalc()
@@ -88,7 +88,7 @@ implicit none
             write(unitObs, *) iStep, enTot, activExInv
             
             if (snap) then        
-			    call snapShot(unitSnapEnCours)
+			    call snapShot(unitSnapEnCours, sph)
 			end if
             
         end if
@@ -119,7 +119,7 @@ implicit none
     
     open(unit=unitSnapFin, recl=4096, file="snapShotFin.out", status='new', &
         action='write')
-        call snapShot(unitSnapFin)
+        call snapShot(unitSnapFin, sph)
     close(unitSnapFin)
     
     call sph%dealloc_Cells()

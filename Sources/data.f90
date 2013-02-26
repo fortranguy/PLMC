@@ -43,7 +43,7 @@ use data_cell
     real(DP), parameter :: radius = .5_DP
     real(DP), parameter :: rmin = 1._DP
     integer, parameter ::  Ncol = 270
-    real(DP), dimension(Dim, Ncol) :: X ! in glob
+    !real(DP), dimension(Dim, Ncol) :: X ! in glob
     
 end module data_particles
 !***********************************************************************

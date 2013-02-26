@@ -1,3 +1,36 @@
+module m_test
+
+use data_constants
+use data_cell
+use data_particles
+use data_mc
+use data_potentiel
+
+implicit none
+
+    contains
+
+! Distance entre 2 particules (CLP) ---------------------------------------
+    
+    function dist(X1, X2)
+    
+        real(DP), dimension(Dim), intent(in) :: X1, X2
+        real(DP), dimension(Dim) :: DeltaX
+        real(DP) :: dist
+        
+        DeltaX(:) = X2(:) - X1(:)
+        DeltaX(:) = modulo(DeltaX(:), Lsize(:))
+        
+        where( DeltaX(:) > LsizeMi(:) )
+            DeltaX(:) = DeltaX(:) - Lsize(:)
+        end where
+        
+        dist = sqrt(dot_product(DeltaX, DeltaX))
+    
+    end function dist
+
+end module m_test
+
 !***********************************************************************
 !* MODULE: Component class                                              *
 !***********************************************************************
@@ -6,7 +39,7 @@ module class_component
 
 use data_cell
 use data_neighbours
-use mod_physique
+use m_test
 
 implicit none
 
@@ -28,6 +61,7 @@ private
         real(DP) :: radius
         real(DP) :: rmin
         integer ::  Ncol
+        real(DP), dimension(Dim, Ncol) :: X
 
         ! Monte-Carlo
         
@@ -93,7 +127,7 @@ contains
             do iCol = 1, this%Ncol
                 if (iCol /= jCol) then
                     
-                    r_ij = dist(X(:, iCol), X(:, jCol))
+                    r_ij = dist(this%X(:, iCol), this%X(:, jCol))
                     if (r_ij < this%rmin) then
                         write(*, *) "    Overlap !", iCol, jCol
                         write(*, * ) "    r_ij = ", r_ij
@@ -224,7 +258,7 @@ contains
     
         do iCol = 1, this%Ncol
     
-            iCell = this%position_to_cell(X(:,iCol))
+            iCell = this%position_to_cell(this%X(:,iCol))
             this%cells(iCell)%particle%iCol = iCol
             
             allocate(this%cellsNext(iCell)%particle)
@@ -453,7 +487,7 @@ contains
             
                 if (courant%iCol /= iCol) then
                 
-                    r = dist(xCol(:), X(:, courant%iCol))
+                    r = dist(xCol(:), this%X(:, courant%iCol))
                     if (r < this%rmin) then
                         overlap = .true.
                         return
@@ -491,21 +525,21 @@ contains
         iOld = int(rand*Ncol) + 1
         
         call random_number(xNew)
-        xNew(:) = X(:, iOld) + (xNew(:)-0.5_DP)*this%dx(:)
+        xNew(:) = this%X(:, iOld) + (xNew(:)-0.5_DP)*this%dx(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
         iCellAfter = this%position_to_cell(xNew)
         call this%ePotNeigh(iOld, xNew, iCellAfter, overlap, eNew)
         
         if (.not. overlap) then
         
-            iCellBefore = this%position_to_cell(X(:, iOld))
-            call this%ePotNeigh(iOld, X(:, iOld), iCellBefore, overlap, eOld)
+            iCellBefore = this%position_to_cell(this%X(:, iOld))
+            call this%ePotNeigh(iOld, this%X(:, iOld), iCellBefore, overlap, eOld)
         	
             dEn = eNew - eOld
         
             call random_number(rand)
             if ( rand < exp(-dEn/Tstar) ) then
-                X(:, iOld) = xNew(:)
+                this%X(:, iOld) = xNew(:)
                 enTot = enTot + dEn
                 
                 if ( iCellBefore /= iCellAfter ) then                
@@ -575,7 +609,7 @@ contains
             do iCol = 1, this%Ncol
                 if (iCol /= jCol) then
                 
-                    r_ij = dist(X(:, iCol), X(:, jCol))
+                    r_ij = dist(this%X(:, iCol), this%X(:, jCol))
                     enTotCalc = enTotCalc + this%ePot(r_ij)
                     
                 end if
