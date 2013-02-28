@@ -102,6 +102,8 @@ private
         procedure :: cell_period => component_cell_period
         procedure :: ini_cell_neighs => component_ini_cell_neighs
         
+        procedure :: adapt_dx => component_adapt_dx
+        
         procedure :: ePot => component_ePot
         procedure :: ePotNeigh => component_ePotNeigh
         procedure :: enTotCalc => component_enTotCalc
@@ -430,7 +432,53 @@ contains
         end do
             
     end subroutine component_ini_cell_neighs
+    
+    ! Adaptation de dx durant la thermalisation -------------------------------
+    
+    subroutine component_adapt_dx(this, iStep, tauxRejectsSum, unitRapport)
+    
+    	 class(Component), intent(inout) :: this 
+        integer, intent(in) :: iStep, unitRapport
+        real(DP), intent(in) :: tauxRejectsSum    
+        
+        integer, parameter :: multiple = 2**2
+        real(DP) :: tauxRejects
+        real(DP), parameter :: tauxRejectsFix = 0.5_DP
+        real(DP), parameter :: dx_eps = 0.05_DP, taux_eps = 0.05_DP
+        real(DP), parameter :: more = 1._DP+dx_eps, less = 1._DP-dx_eps
+        
+        tauxRejects = 0._DP
+        
+        if (mod(iStep, multiple) == 0 .and. iStep>2) then
+        
+            tauxRejects = tauxRejectsSum/real(iStep-1, DP)
+        
+            if (tauxRejects < tauxRejectsFix - taux_eps) then            
+                this%dx(:) = this%dx(:) * more
+                this%dx(:) = modulo(this%dx(:), Lsize(:))
+            else if (tauxRejects > tauxRejectsFix + taux_eps) then
+                this%dx(:) = this%dx(:) * less
+                this%dx(:) = modulo(this%dx(:), Lsize(:))
+            end if
 
+        end if
+        
+        if (iStep == Ntherm) then
+        
+            if (tauxRejects == 0._DP) then
+                write(*, *) "Problème adaptation dx."
+                stop
+            end if
+            
+            write(unitRapport, *) "Déplacement :"
+            write(unitRapport, *) "    dx(:) = ", this%dx(:)
+            write(unitRapport, *) "    écart relatif rejet = ", &
+                abs(tauxRejects - tauxRejectsFix)/tauxRejectsFix
+            
+        end if
+    
+    end subroutine component_adapt_dx
+    
     ! Energie potentielle -------------------------------------------------
 
     function component_ePot(this, r) result(ePot)

@@ -234,15 +234,15 @@ implicit none
         write(unitRapport, *) "Simulation MC_C :"
         write(unitRapport ,*) "    Lsize(:) = ", Lsize(:)
         write(unitRapport ,*) "    Vol = ", product(Lsize)
-        write(unitRapport ,*) "    Ncol = ", Ncol
+        write(unitRapport ,*) "    Ncol = ", comp%Ncol
         write(unitRapport ,*) "    nWidom = ", nWidom
         write(unitRapport, *) "    Nstep = ", Nstep
         write(unitRapport, *) "    Ntherm = ", Ntherm
         write(unitRapport, *) "    Nmove = ", Nmove
-        write(unitRapport, *) "    epsilon = ", epsilon
-        write(unitRapport, *) "    alpha = ", alpha
-        write(unitRapport, *) "    rcut = ", rcut
-        write(unitRapport, *) "    pas = ", pas
+        write(unitRapport, *) "    epsilon = ", comp%epsilon
+        write(unitRapport, *) "    alpha = ", comp%alpha
+        write(unitRapport, *) "    rcut = ", comp%rcut
+        write(unitRapport, *) "    pas = ", comp%pas
         write(unitRapport, *) "    cell_coordMax(:) = ", comp%cell_coordMax(:)
         write(unitRapport, *) "    cell_Lsize(:) = ", comp%cell_Lsize(:)
         
