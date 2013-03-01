@@ -90,6 +90,8 @@ public :: sph_constructor
         type(LinkedList), allocatable, dimension(:) :: cellsBegin
         
     contains
+    
+    	procedure :: destructor => component_destructor
 
         procedure :: overlapTest => component_overlapTest
         
@@ -117,7 +119,7 @@ public :: sph_constructor
     
 contains
 
-    function sph_constructor
+    function sph_constructor()
     
         type(Component) :: sph_constructor
     
@@ -146,6 +148,15 @@ contains
             product( int(Lsize(:)/rcut) )))
     
     end function sph_constructor
+    
+    subroutine component_destructor(this)
+    
+    	class(Component), intent(inout) :: this
+    	
+    	deallocate(this%X)
+    	deallocate(this%Vtab)
+    
+    end subroutine component_destructor
     
     ! Test d'overlap ----------------------------------------------------------
     

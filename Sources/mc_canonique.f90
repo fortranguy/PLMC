@@ -122,5 +122,6 @@ implicit none
     close(unitSnapFin)
     
     call sph%dealloc_Cells()
+    call sph%destructor()
     
 end program mc_cano
