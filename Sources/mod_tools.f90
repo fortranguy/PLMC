@@ -11,36 +11,6 @@ use class_component
 implicit none
 
     contains
-    
-    function sph_constructor
-    
-        type(Component) :: sph_constructor
-    
-        ! Component initialization
-        
-        call ePotIni()
-        
-        ! Construction                
-
-        sph_constructor%radius = radius
-        sph_constructor%rmin = rmin
-        sph_constructor%Ncol = Ncol
-        sph_constructor%dx = dx
-        sph_constructor%X(:, :) = 0._DP
-        sph_constructor%rcut = rcut
-        sph_constructor%pas = pas
-        sph_constructor%iMin = iMin
-        sph_constructor%Ntab = Ntab
-        sph_constructor%epsilon = epsilon
-        sph_constructor%alpha = alpha        
-        allocate(sph_constructor%Vtab(iMin:Ntab))
-        sph_constructor%Vtab(:) = Vtab(:)
-        sph_constructor%cell_Lsize(:) = [rcut, rcut, rcut]
-        sph_constructor%cell_coordMax(:) = int(Lsize(:)/rcut)
-        allocate(sph_constructor%cell_neighs(cell_neighs_nb, &
-            product( int(Lsize(:)/rcut) )))
-    
-    end function sph_constructor
 
     ! Générateurs de nombres aléatoires : graine ------------------------------
     
@@ -69,10 +39,10 @@ implicit none
     
     ! Condition initiale ------------------------------------------------------
     
-    subroutine condIni(unitRapport, comp)
+    subroutine condIni(unitRapport, sph)
     
         integer, intent(in) :: unitRapport
-        type(Component), intent(inout) :: comp
+        type(Component), intent(inout) :: sph
         
         real(DP) :: compac, densite
         character(len=20) :: init
@@ -86,10 +56,10 @@ implicit none
         
         select case (init)
             case ("cube")
-                call iniPosCub(comp)
+                call iniPosCub(sph)
                 write(unitRapport, *) "    Cubique simple"
             case ("alea")
-                call iniPosAlea(comp)
+                call iniPosAlea(sph)
                 write(unitRapport, *) "    Déposition aléatoire"
             case default
                 write(*, *) "Préciser la condition initiale : "
@@ -97,19 +67,19 @@ implicit none
                 stop
         end select
         
-        densite = real(comp%Ncol, DP) / product(Lsize)
+        densite = real(sph%Ncol, DP) / product(Lsize)
         write(*, *) "    Densité = ", densite
         write(unitRapport, *) "    Densité = ", densite
         
-        compac = 4._DP/3._DP*PI*comp%radius**3 * densite
+        compac = 4._DP/3._DP*PI*sph_radius**3 * densite
         write(*, *) "    Compacité = ", compac
         write(unitRapport, *) "    Compacité = ", compac
         
     end subroutine condIni
     
-    subroutine iniPosCub(comp)
+    subroutine iniPosCub(sph)
     
-    	type(Component), intent(inout) :: comp
+    	type(Component), intent(inout) :: sph
     
         integer :: iDir
         integer :: i, j, k, iCol
@@ -121,14 +91,14 @@ implicit none
         
         ! Proportion selon la direction
         
-        nCols(1) = int( (comp%Ncol*Lsize(1)**2/Lsize(2)/Lsize(3))**oneThird )
-        nCols(2) = int( (comp%Ncol*Lsize(2)**2/Lsize(3)/Lsize(1))**oneThird )
-        nCols(3) = int( (comp%Ncol*Lsize(3)**2/Lsize(1)/Lsize(2))**oneThird )
+        nCols(1) = int( (sph%Ncol*Lsize(1)**2/Lsize(2)/Lsize(3))**oneThird )
+        nCols(2) = int( (sph%Ncol*Lsize(2)**2/Lsize(3)/Lsize(1))**oneThird )
+        nCols(3) = int( (sph%Ncol*Lsize(3)**2/Lsize(1)/Lsize(2))**oneThird )
         
         ! Vérification
         
         iDir = 1
-        do while (product(nCols)<comp%Ncol)
+        do while (product(nCols)<sph%Ncol)
             nCols(iDir) = nCols(iDir) + 1
             iDir = iDir + 1
         end do
@@ -148,26 +118,26 @@ implicit none
             do j = 1, nCols(2)
                 do i = 1, nCols(1)            
                     iCol = i + nCols(1)*(j-1) + nCols(1)*nCols(2)*(k-1)
-                    if (iCol <= comp%Ncol) then
-                        comp%X(1, iCol) = ratio(1)*real(i, DP)
-                        comp%X(2, iCol) = ratio(2)*real(j, DP)
-                        comp%X(3, iCol) = ratio(3)*real(k, DP)
+                    if (iCol <= sph%Ncol) then
+                        sph%X(1, iCol) = ratio(1)*real(i, DP)
+                        sph%X(2, iCol) = ratio(2)*real(j, DP)
+                        sph%X(3, iCol) = ratio(3)*real(k, DP)
                     end if
                 end do
             end do
         end do
     
         do iDir = 1, Dim
-            comp%X(iDir, :) = comp%X(iDir, :) - 0.5_DP*ratio(iDir) ! nécessaire ? tradition
+            sph%X(iDir, :) = sph%X(iDir, :) - 0.5_DP*ratio(iDir) ! nécessaire ? tradition
         end do
     
     end subroutine iniPosCub
     
     ! ---------------------------------
     
-    subroutine iniPosAlea(comp)
+    subroutine iniPosAlea(sph)
     
-    	type(Component), intent(inout) :: comp
+    	type(Component), intent(inout) :: sph
     
         integer :: iCol, Ncols, nOK
         real(DP), dimension(Dim) :: xTest
@@ -175,18 +145,18 @@ implicit none
     
         write(*, *) "Déposition aléatoire"
     
-        call random_number(comp%X(:, 1))
-        comp%X(:, 1) = comp%X(:, 1)*(Lsize(:)-2*comp%radius)
+        call random_number(sph%X(:, 1))
+        sph%X(:, 1) = sph%X(:, 1)*(Lsize(:)-2*sph_radius)
         Ncols = 1        
         
-        do while (Ncols<comp%Ncol)
+        do while (Ncols<sph%Ncol)
         
             call random_number(xTest)
-            xTest(:) = xTest(:)*(Lsize(:)-2._DP*comp%radius)
+            xTest(:) = xTest(:)*(Lsize(:)-2._DP*sph_radius)
             
             nOK = 0
             do iCol = 1, Ncols
-                rTest = dist(comp%X(:, iCol), xTest(:))
+                rTest = dist(sph%X(:, iCol), xTest(:))
                 if (rTest >= rmin) then
                     nOK = nOK + 1
                 else
@@ -196,55 +166,55 @@ implicit none
             
             if (nOK == Ncols) then
                 Ncols = Ncols + 1
-                comp%X(:, Ncols) = xTest(:)
+                sph%X(:, Ncols) = xTest(:)
                 write(*, *) "    Particule", Ncols, "OK"
             end if
             
         end do
         
-        do iCol = 1, comp%Ncol
-            comp%X(:, iCol) = comp%X(:, iCol) + comp%radius
+        do iCol = 1, sph%Ncol
+            sph%X(:, iCol) = sph%X(:, iCol) + sph_radius
         end do
     
     end subroutine iniPosAlea
     
     ! Etat de la configuration ------------------------------------------------
       
-    subroutine snapShot(unitSnap, comp)
+    subroutine snapShot(unitSnap, sph)
         
         integer, intent(in) :: unitSnap
-        type(Component), intent(in) :: comp
+        type(Component), intent(in) :: sph
     
         integer :: iCol
         
-        do iCol = 1, comp%Ncol
-            write(unitSnap, *) comp%X(:, iCol)
+        do iCol = 1, sph%Ncol
+            write(unitSnap, *) sph%X(:, iCol)
         end do    
 
     end subroutine
     
     ! Rapport -----------------------------------------------------------------
     
-    subroutine rapport(comp, nWidom, unitRapport)
+    subroutine rapport(sph, nWidom, unitRapport)
     
-        type(Component), intent(in) :: comp
+        type(Component), intent(in) :: sph
         integer, intent(in) :: nWidom
         integer, intent(in) :: unitRapport    
         
         write(unitRapport, *) "Simulation MC_C :"
         write(unitRapport ,*) "    Lsize(:) = ", Lsize(:)
         write(unitRapport ,*) "    Vol = ", product(Lsize)
-        write(unitRapport ,*) "    Ncol = ", comp%Ncol
+        write(unitRapport ,*) "    Ncol = ", sph%Ncol
         write(unitRapport ,*) "    nWidom = ", nWidom
         write(unitRapport, *) "    Nstep = ", Nstep
         write(unitRapport, *) "    Ntherm = ", Ntherm
         write(unitRapport, *) "    Nmove = ", Nmove
-        write(unitRapport, *) "    epsilon = ", comp%epsilon
-        write(unitRapport, *) "    alpha = ", comp%alpha
-        write(unitRapport, *) "    rcut = ", comp%rcut
-        write(unitRapport, *) "    pas = ", comp%pas
-        write(unitRapport, *) "    cell_coordMax(:) = ", comp%cell_coordMax(:)
-        write(unitRapport, *) "    cell_Lsize(:) = ", comp%cell_Lsize(:)
+        write(unitRapport, *) "    epsilon = ", sph%epsilon
+        write(unitRapport, *) "    alpha = ", sph%alpha
+        write(unitRapport, *) "    rcut = ", sph%rcut
+        write(unitRapport, *) "    pas = ", sph%pas
+        write(unitRapport, *) "    cell_coordMax(:) = ", sph%cell_coordMax(:)
+        write(unitRapport, *) "    cell_Lsize(:) = ", sph%cell_Lsize(:)
         
     end subroutine rapport
     

@@ -36,6 +36,7 @@ module class_component
 
 use data_cell
 use data_particles
+use data_potentiel
 use data_neighbours
 use data_mc
 use mod_pbc
@@ -43,6 +44,7 @@ use mod_pbc
 implicit none
 
 private
+public :: sph_constructor
 
     type Link
         integer :: iCol
@@ -57,7 +59,7 @@ private
 
         ! Particles
 
-        real(DP) :: radius
+        real(DP), private :: radius
         real(DP) :: rmin
         integer ::  Ncol
         real(DP), dimension(Dim, Ncol) :: X
@@ -114,6 +116,36 @@ private
     end type Component
     
 contains
+
+    function sph_constructor
+    
+        type(Component) :: sph_constructor
+    
+        ! Component initialization
+        
+        call ePotIni()
+        
+        ! Construction                
+
+        sph_constructor%radius = sph_radius
+        sph_constructor%rmin = rmin
+        sph_constructor%Ncol = Ncol
+        sph_constructor%dx = dx
+        sph_constructor%X(:, :) = 0._DP
+        sph_constructor%rcut = rcut
+        sph_constructor%pas = pas
+        sph_constructor%iMin = iMin
+        sph_constructor%Ntab = Ntab
+        sph_constructor%epsilon = epsilon
+        sph_constructor%alpha = alpha        
+        allocate(sph_constructor%Vtab(iMin:Ntab))
+        sph_constructor%Vtab(:) = Vtab(:)
+        sph_constructor%cell_Lsize(:) = [rcut, rcut, rcut]
+        sph_constructor%cell_coordMax(:) = int(Lsize(:)/rcut)
+        allocate(sph_constructor%cell_neighs(cell_neighs_nb, &
+            product( int(Lsize(:)/rcut) )))
+    
+    end function sph_constructor
     
     ! Test d'overlap ----------------------------------------------------------
     

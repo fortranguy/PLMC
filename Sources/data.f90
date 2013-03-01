@@ -40,7 +40,7 @@ module data_particles
 use data_constants
 use data_cell
     
-    real(DP), parameter :: radius = .5_DP
+    real(DP), parameter :: sph_radius = .5_DP
     real(DP), parameter :: rmin = 1._DP
     integer, parameter ::  Ncol = 270
     
