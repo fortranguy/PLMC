@@ -41,8 +41,8 @@ use data_constants
 use data_cell
     
     real(DP), parameter :: sph_radius = .5_DP
-    real(DP), parameter :: rmin = 1._DP
-    integer, parameter ::  Ncol = 270
+    real(DP), parameter :: sph_rmin = 1._DP
+    integer, parameter :: sph_Ncol = 270
     
 end module data_particles
 !***********************************************************************
@@ -63,7 +63,7 @@ implicit none
     real(DP), parameter :: Tstar = 1._DP
     integer, parameter :: Nstep = 2**10
     integer, parameter :: Ntherm = 2**8
-    integer, parameter :: Nmove = 2**2 * Ncol ! new
+    integer, parameter :: Nmove = 2**2 * sph_Ncol ! new
     real(DP), dimension(Dim), parameter :: dx = 2._DP ! new, à modifier.
 
 end module data_mc
@@ -83,7 +83,7 @@ implicit none
     real(DP), parameter :: rcut = 4._DP
     real(DP), parameter :: pas = 5.E-5_DP
     integer, parameter :: Ntab = int(rcut/pas)
-    integer, parameter :: iMin = int(rmin/pas)
+    integer, parameter :: iMin = int(sph_rmin/pas)
     real(DP), dimension(iMin:Ntab), protected :: Vtab
     real(DP), parameter :: epsilon = 1._DP, alpha = 5._DP
     
@@ -97,11 +97,11 @@ contains
 	    ! cut
         do i = iMin, Ntab       
             r_i = real(i, DP)*pas
-            Vtab(i) = epsilon*exp(-alpha*(r_i-rmin))/r_i           
+            Vtab(i) = epsilon*exp(-alpha*(r_i-sph_rmin))/r_i           
         end do
         
         ! shift        
-        Vtab(:) = Vtab(:) - epsilon*exp(-alpha*(rcut-rmin))/rcut
+        Vtab(:) = Vtab(:) - epsilon*exp(-alpha*(rcut-sph_rmin))/rcut
 
     end subroutine ePotIni
         

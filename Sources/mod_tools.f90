@@ -67,7 +67,7 @@ implicit none
                 stop
         end select
         
-        densite = real(sph%Ncol, DP) / product(Lsize)
+        densite = real(sph_Ncol, DP) / product(Lsize)
         write(*, *) "    Densité = ", densite
         write(unitRapport, *) "    Densité = ", densite
         
@@ -91,21 +91,21 @@ implicit none
         
         ! Proportion selon la direction
         
-        nCols(1) = int( (sph%Ncol*Lsize(1)**2/Lsize(2)/Lsize(3))**oneThird )
-        nCols(2) = int( (sph%Ncol*Lsize(2)**2/Lsize(3)/Lsize(1))**oneThird )
-        nCols(3) = int( (sph%Ncol*Lsize(3)**2/Lsize(1)/Lsize(2))**oneThird )
+        nCols(1) = int( (sph_Ncol*Lsize(1)**2/Lsize(2)/Lsize(3))**oneThird )
+        nCols(2) = int( (sph_Ncol*Lsize(2)**2/Lsize(3)/Lsize(1))**oneThird )
+        nCols(3) = int( (sph_Ncol*Lsize(3)**2/Lsize(1)/Lsize(2))**oneThird )
         
         ! Vérification
         
         iDir = 1
-        do while (product(nCols)<sph%Ncol)
+        do while (product(nCols)<sph_Ncol)
             nCols(iDir) = nCols(iDir) + 1
             iDir = iDir + 1
         end do
         
         ratio(:) = Lsize(:)/real(nCols(:), DP) ! A vérifier
         do iDir = 1, Dim
-            if ( rmin*real(nCols(iDir), DP) > Lsize(iDir) ) then
+            if ( sph_rmin*real(nCols(iDir), DP) > Lsize(iDir) ) then
                 write(*, *) "    Problème : trop dense dans la direction ",&
                 iDir
                 stop
@@ -118,7 +118,7 @@ implicit none
             do j = 1, nCols(2)
                 do i = 1, nCols(1)            
                     iCol = i + nCols(1)*(j-1) + nCols(1)*nCols(2)*(k-1)
-                    if (iCol <= sph%Ncol) then
+                    if (iCol <= sph_Ncol) then
                         sph%X(1, iCol) = ratio(1)*real(i, DP)
                         sph%X(2, iCol) = ratio(2)*real(j, DP)
                         sph%X(3, iCol) = ratio(3)*real(k, DP)
@@ -149,7 +149,7 @@ implicit none
         sph%X(:, 1) = sph%X(:, 1)*(Lsize(:)-2*sph_radius)
         Ncols = 1        
         
-        do while (Ncols<sph%Ncol)
+        do while (Ncols<sph_Ncol)
         
             call random_number(xTest)
             xTest(:) = xTest(:)*(Lsize(:)-2._DP*sph_radius)
@@ -157,7 +157,7 @@ implicit none
             nOK = 0
             do iCol = 1, Ncols
                 rTest = dist(sph%X(:, iCol), xTest(:))
-                if (rTest >= rmin) then
+                if (rTest >= sph_rmin) then
                     nOK = nOK + 1
                 else
                     exit
@@ -172,7 +172,7 @@ implicit none
             
         end do
         
-        do iCol = 1, sph%Ncol
+        do iCol = 1, sph_Ncol
             sph%X(:, iCol) = sph%X(:, iCol) + sph_radius
         end do
     
@@ -187,7 +187,7 @@ implicit none
     
         integer :: iCol
         
-        do iCol = 1, sph%Ncol
+        do iCol = 1, sph_Ncol
             write(unitSnap, *) sph%X(:, iCol)
         end do    
 
@@ -204,7 +204,7 @@ implicit none
         write(unitRapport, *) "Simulation MC_C :"
         write(unitRapport ,*) "    Lsize(:) = ", Lsize(:)
         write(unitRapport ,*) "    Vol = ", product(Lsize)
-        write(unitRapport ,*) "    Ncol = ", sph%Ncol
+        write(unitRapport ,*) "    Ncol = ", sph_Ncol
         write(unitRapport ,*) "    nWidom = ", nWidom
         write(unitRapport, *) "    Nstep = ", Nstep
         write(unitRapport, *) "    Ntherm = ", Ntherm
@@ -235,8 +235,8 @@ implicit none
         write(unitRapport, *) "    Energie moyenne = ", &
             enTotSum/realNstep
         write(unitRapport, *) "    Energie moyenne par particule = ", &
-            enTotSum/realNstep/real(Ncol, DP)
-        potChiId = -Tstar*log( product(Lsize)/real(Ncol+1,DP) )
+            enTotSum/realNstep/real(sph_Ncol, DP)
+        potChiId = -Tstar*log( product(Lsize)/real(sph_Ncol+1,DP) )
         write(unitRapport, *) "    Potentiel chimique idéal = ", potChiId
         potChiEx = -Tstar*log( activExInvSum/realNstep )
         write(unitRapport, *) "    Potentiel chimique (excès) moyen = ", &

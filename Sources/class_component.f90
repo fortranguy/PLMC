@@ -60,9 +60,9 @@ public :: sph_constructor
         ! Particles
 
         real(DP), private :: radius
-        real(DP) :: rmin
-        integer ::  Ncol
-        real(DP), dimension(Dim, Ncol) :: X
+        real(DP), private :: rmin
+        integer, private ::  Ncol
+        real(DP), dimension(:, :), allocatable :: X
 
         ! Monte-Carlo
         
@@ -128,10 +128,10 @@ contains
         ! Construction                
 
         sph_constructor%radius = sph_radius
-        sph_constructor%rmin = rmin
-        sph_constructor%Ncol = Ncol
+        sph_constructor%rmin = sph_rmin
+        sph_constructor%Ncol = sph_Ncol
         sph_constructor%dx = dx
-        sph_constructor%X(:, :) = 0._DP
+        allocate(sph_constructor%X(Dim, sph_Ncol))
         sph_constructor%rcut = rcut
         sph_constructor%pas = pas
         sph_constructor%iMin = iMin
@@ -601,7 +601,7 @@ contains
         real(DP) :: eNew, eOld, dEn
         
         call random_number(rand)
-        iOld = int(rand*Ncol) + 1
+        iOld = int(rand*this%Ncol) + 1
         
         call random_number(xNew)
         xNew(:) = this%X(:, iOld) + (xNew(:)-0.5_DP)*this%dx(:)

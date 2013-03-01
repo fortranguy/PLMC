@@ -31,7 +31,7 @@ use mod_tools
 
 implicit none
 
-	real(DP), parameter :: densite = real(Ncol, DP) / (Lsize1*Lsize2*Lsize3)
+	real(DP), parameter :: densite = real(sph_Ncol, DP) / (Lsize1*Lsize2*Lsize3)
 	integer, dimension(:), allocatable :: distrib
 	integer, parameter :: unitSnapEnCours = 10, unitDistrib = 11, &
 		unitEnerg = 12
@@ -45,7 +45,7 @@ implicit none
 	real(DP), dimension(:), allocatable :: fct_dist
 	real(DP) :: energSum	
 	type(Component) :: sph
-	real(DP), dimension(Dim, Ncol) :: X
+	real(DP), dimension(Dim, sph_Ncol) :: X
 	
 	!$ integer :: nb_taches
 	real(DP) :: tIni, tFin
@@ -73,15 +73,15 @@ implicit none
 	
 		! Lecture :
 		!$omp critical
-		do iCol = 1, sph%Ncol
+		do iCol = 1, sph_Ncol
 			read(unitSnapEnCours, *) X(:, iCol)
 		end do
     	!$omp end critical
     
 		! Traitement
 		 
-		do iCol = 1, sph%Ncol
-			do jCol = iCol + 1, sph%Ncol
+		do iCol = 1, sph_Ncol
+			do jCol = iCol + 1, sph_Ncol
 		
 				r_ij = dist(X(:, iCol), X(:, jCol))		        
 		        iDist =  int(r_ij/deltaDist)
@@ -116,11 +116,11 @@ implicit none
 		
 			r = (real(iDist, DP) + 0.5_DP) * deltaDist
 			numerat = real(distrib(iDist), DP) / real(Nstep, DP)
-			denomin = real(sph%Ncol, DP) * (sphereVol(iDist+1) - sphereVol(iDist))
+			denomin = real(sph_Ncol, DP) * (sphereVol(iDist+1) - sphereVol(iDist))
 			fct_dist(iDist) = 2._DP * numerat / denomin / densite
 			write(unitDistrib, *) r, fct_dist(iDist)
 			
-			if (r>=sph%rmin .and. r<=sph%rcut) then
+			if (r>=sph_rmin .and. r<=sph%rcut) then
 				if (iDistMin == 0) then
 					iDistMin = iDist
 				end if
