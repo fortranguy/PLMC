@@ -20,17 +20,17 @@ data_copy.f90 : data.f90
 # ---------------------------
 
 $(EXEC1) : data_copy.f90 class_component.f90 mod_tools.f90 mc_canonique.f90
-	$(FC) $(LDFLAGS) $^ -o $@
+	$(FC) $(LDFLAGS) $(FFLAGS) $^ -o $@
 	
 # ---------------------------
 
 $(EXEC2) : data_copy.f90 bunching.f90
-	$(FC) $^ $(LDFLAGS) -o $@
+	$(FC) $^ $(LDFLAGS) $(FFLAGS) -o $@
 
 # ---------------------------
 
 $(EXEC3) : data_copy.f90 class_component.f90 mod_tools.f90 distrib.f90
-	$(FC) $^ $(LDFLAGS_OMP) -o $@
+	$(FC) $^ $(LDFLAGS_OMP) $(FFLAGS_OMP) -o $@
 
 # ---------------------------------------------------------
 	
