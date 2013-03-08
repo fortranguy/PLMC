@@ -72,8 +72,8 @@ public :: sph_constructor
 
         real(DP), private :: rcut
         real(DP), private :: pas
-        integer :: iMin
-        integer :: Ntab
+        integer, private :: iMin
+        integer, private :: Ntab
         
         ! Potential shape
         
@@ -137,11 +137,11 @@ contains
         allocate(sph_constructor%X(Dim, sph_Ncol))
         sph_constructor%rcut = sph_rcut
         sph_constructor%pas = sph_pas
-        sph_constructor%iMin = iMin
-        sph_constructor%Ntab = Ntab
+        sph_constructor%iMin = sph_iMin
+        sph_constructor%Ntab = sph_Ntab
         sph_constructor%epsilon = epsilon
         sph_constructor%alpha = alpha        
-        allocate(sph_constructor%Vtab(iMin:Ntab))
+        allocate(sph_constructor%Vtab(sph_iMin:sph_Ntab))
         sph_constructor%Vtab(:) = Vtab(:)
         sph_constructor%cell_Lsize(:) = [sph_rcut, sph_rcut, sph_rcut]
         sph_constructor%cell_coordMax(:) = int(Lsize(:)/sph_rcut)

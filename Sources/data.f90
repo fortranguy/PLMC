@@ -82,9 +82,9 @@ implicit none
 
     real(DP), parameter :: sph_rcut = 4._DP
     real(DP), parameter :: sph_pas = 5.E-5_DP
-    integer, parameter :: Ntab = int(sph_rcut/sph_pas)
-    integer, parameter :: iMin = int(sph_rmin/sph_pas)
-    real(DP), dimension(iMin:Ntab), protected :: Vtab
+    integer, parameter :: sph_iMin = int(sph_rmin/sph_pas)
+    integer, parameter :: sph_Ntab = int(sph_rcut/sph_pas)
+    real(DP), dimension(sph_iMin:sph_Ntab), protected :: Vtab
     real(DP), parameter :: epsilon = 1._DP, alpha = 5._DP
     
 contains
@@ -95,7 +95,7 @@ contains
         real(DP) :: r_i
        
 	    ! cut
-        do i = iMin, Ntab       
+        do i = sph_iMin, sph_Ntab       
             r_i = real(i, DP)*sph_pas
             Vtab(i) = epsilon*exp(-alpha*(r_i-sph_rmin))/r_i           
         end do
