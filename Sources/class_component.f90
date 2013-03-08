@@ -66,7 +66,7 @@ public :: sph_constructor
 
         ! Monte-Carlo
         
-        real(DP), dimension(Dim) :: dx
+        real(DP), dimension(Dim), private :: dx
 
         ! Potential domain
 
@@ -107,6 +107,7 @@ public :: sph_constructor
         procedure :: ini_cell_neighs => component_ini_cell_neighs
         
         procedure :: adapt_dx => component_adapt_dx
+        procedure :: getDx => component_getDx
         
         procedure :: ePot => component_ePot
         procedure :: ePotNeigh => component_ePotNeigh
@@ -132,7 +133,7 @@ contains
         sph_constructor%radius = sph_radius
         sph_constructor%rmin = sph_rmin
         sph_constructor%Ncol = sph_Ncol
-        sph_constructor%dx = dx
+        sph_constructor%dx = sph_dx
         allocate(sph_constructor%X(Dim, sph_Ncol))
         sph_constructor%rcut = sph_rcut
         sph_constructor%pas = pas
@@ -480,7 +481,7 @@ contains
     
     subroutine component_adapt_dx(this, iStep, tauxRejectsSum, unitRapport)
     
-    	 class(Component), intent(inout) :: this 
+ 		class(Component), intent(inout) :: this 
         integer, intent(in) :: iStep, unitRapport
         real(DP), intent(in) :: tauxRejectsSum    
         
@@ -521,6 +522,17 @@ contains
         end if
     
     end subroutine component_adapt_dx
+    
+    ! -----------------------
+    
+    function component_getDx(this)
+    	
+    	class(Component), intent(in) :: this
+    	real(DP) :: component_getDx
+    	
+    	component_getDx = sqrt(dot_product(this%dx, this%dx))
+    	
+    end function component_getDx
     
     ! Energie potentielle -------------------------------------------------
 

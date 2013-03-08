@@ -77,7 +77,7 @@ implicit none
         if (iStep <= Ntherm) then
         
             call sph%adapt_dx(iStep, tauxRejectsSum, unitRapport)
-            write(unit_dx, *) iStep, sph%dx(1), tauxRejectsSum/real(iStep, DP)
+            write(unit_dx, *) iStep, sph%getDx(), tauxRejectsSum/real(iStep, DP)
             write(unitObsTherm, *) iStep, enTot, activExInv
         
         else
