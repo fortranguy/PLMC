@@ -71,7 +71,7 @@ public :: sph_constructor
         ! Potential domain
 
         real(DP), private :: rcut
-        real(DP) :: pas
+        real(DP), private :: pas
         integer :: iMin
         integer :: Ntab
         
@@ -136,7 +136,7 @@ contains
         sph_constructor%dx = sph_dx
         allocate(sph_constructor%X(Dim, sph_Ncol))
         sph_constructor%rcut = sph_rcut
-        sph_constructor%pas = pas
+        sph_constructor%pas = sph_pas
         sph_constructor%iMin = iMin
         sph_constructor%Ntab = Ntab
         sph_constructor%epsilon = epsilon

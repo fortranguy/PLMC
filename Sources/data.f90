@@ -81,9 +81,9 @@ use data_particles
 implicit none
 
     real(DP), parameter :: sph_rcut = 4._DP
-    real(DP), parameter :: pas = 5.E-5_DP
-    integer, parameter :: Ntab = int(sph_rcut/pas)
-    integer, parameter :: iMin = int(sph_rmin/pas)
+    real(DP), parameter :: sph_pas = 5.E-5_DP
+    integer, parameter :: Ntab = int(sph_rcut/sph_pas)
+    integer, parameter :: iMin = int(sph_rmin/sph_pas)
     real(DP), dimension(iMin:Ntab), protected :: Vtab
     real(DP), parameter :: epsilon = 1._DP, alpha = 5._DP
     
@@ -96,7 +96,7 @@ contains
        
 	    ! cut
         do i = iMin, Ntab       
-            r_i = real(i, DP)*pas
+            r_i = real(i, DP)*sph_pas
             Vtab(i) = epsilon*exp(-alpha*(r_i-sph_rmin))/r_i           
         end do
         
