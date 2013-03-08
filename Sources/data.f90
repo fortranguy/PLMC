@@ -80,9 +80,9 @@ use data_particles
 
 implicit none
 
-    real(DP), parameter :: rcut = 4._DP
+    real(DP), parameter :: sph_rcut = 4._DP
     real(DP), parameter :: pas = 5.E-5_DP
-    integer, parameter :: Ntab = int(rcut/pas)
+    integer, parameter :: Ntab = int(sph_rcut/pas)
     integer, parameter :: iMin = int(sph_rmin/pas)
     real(DP), dimension(iMin:Ntab), protected :: Vtab
     real(DP), parameter :: epsilon = 1._DP, alpha = 5._DP
@@ -101,7 +101,7 @@ contains
         end do
         
         ! shift        
-        Vtab(:) = Vtab(:) - epsilon*exp(-alpha*(rcut-sph_rmin))/rcut
+        Vtab(:) = Vtab(:) - epsilon*exp(-alpha*(sph_rcut-sph_rmin))/sph_rcut
 
     end subroutine ePotIni
         

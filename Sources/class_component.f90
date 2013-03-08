@@ -134,7 +134,7 @@ contains
         sph_constructor%Ncol = sph_Ncol
         sph_constructor%dx = dx
         allocate(sph_constructor%X(Dim, sph_Ncol))
-        sph_constructor%rcut = rcut
+        sph_constructor%rcut = sph_rcut
         sph_constructor%pas = pas
         sph_constructor%iMin = iMin
         sph_constructor%Ntab = Ntab
@@ -142,10 +142,10 @@ contains
         sph_constructor%alpha = alpha        
         allocate(sph_constructor%Vtab(iMin:Ntab))
         sph_constructor%Vtab(:) = Vtab(:)
-        sph_constructor%cell_Lsize(:) = [rcut, rcut, rcut]
-        sph_constructor%cell_coordMax(:) = int(Lsize(:)/rcut)
+        sph_constructor%cell_Lsize(:) = [sph_rcut, sph_rcut, sph_rcut]
+        sph_constructor%cell_coordMax(:) = int(Lsize(:)/sph_rcut)
         allocate(sph_constructor%cell_neighs(cell_neighs_nb, &
-            product( int(Lsize(:)/rcut) )))
+            product( int(Lsize(:)/sph_rcut) )))
     
     end function sph_constructor
     
