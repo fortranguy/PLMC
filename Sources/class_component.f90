@@ -109,6 +109,7 @@ public :: sph_constructor
         procedure :: adapt_dx => component_adapt_dx
         procedure :: getDx => component_getDx
         
+        procedure :: ePotIni => component_ePotIni
         procedure :: ePot => component_ePot
         procedure :: ePotNeigh => component_ePotNeigh
         procedure :: enTotCalc => component_enTotCalc
@@ -124,10 +125,6 @@ contains
     
         type(Component) :: sph_constructor
     
-        ! Component initialization
-        
-        call ePotIni()
-        
         ! Construction                
 
         sph_constructor%radius = sph_radius
@@ -142,7 +139,7 @@ contains
         sph_constructor%epsilon = sph_epsilon
         sph_constructor%alpha = sph_alpha        
         allocate(sph_constructor%Vtab(sph_iMin:sph_Ntab))
-        sph_constructor%Vtab(:) = sph_Vtab(:)
+        call sph_constructor%ePotIni()
         sph_constructor%cell_Lsize(:) = [sph_rcut, sph_rcut, sph_rcut]
         sph_constructor%cell_coordMax(:) = int(Lsize(:)/sph_rcut)
         allocate(sph_constructor%cell_neighs(cell_neighs_nb, &
@@ -528,6 +525,7 @@ contains
     function component_getDx(this)
     	
     	class(Component), intent(in) :: this
+    	
     	real(DP) :: component_getDx
     	
     	component_getDx = sqrt(dot_product(this%dx, this%dx))
@@ -535,6 +533,25 @@ contains
     end function component_getDx
     
     ! Energie potentielle -------------------------------------------------
+    
+    subroutine component_ePotIni(this)
+    
+    	class(Component), intent(inout) :: this
+
+        integer :: i
+        real(DP) :: r_i
+       
+	    ! cut
+        do i = this%iMin, this%Ntab       
+            r_i = real(i, DP)*this%pas
+            this%Vtab(i) = this%epsilon * exp(-this%alpha*(r_i-this%rmin))/r_i           
+        end do
+        
+        ! shift        
+        this%Vtab(:) = this%Vtab(:) - this%epsilon * &
+        	exp(-this%alpha*(this%rcut-this%rmin)) / this%rcut
+
+    end subroutine component_ePotIni
 
     function component_ePot(this, r) result(ePot)
         

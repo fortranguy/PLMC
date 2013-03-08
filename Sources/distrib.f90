@@ -132,7 +132,7 @@ implicit none
 	
 	! Energie par particule
 
-	call ePotIni()
+	call sph%ePotIni()
 	
 	energSum = 0._DP
 	
