@@ -86,8 +86,9 @@ public :: sph_constructor
         real(DP), dimension(Dim), private :: cell_Lsize
         integer, dimension(Dim), private :: cell_coordMax
         integer, dimension(:, :), allocatable :: cell_neighs
-        type(LinkedList), allocatable, dimension(:) :: cells, cellsNext
-        type(LinkedList), allocatable, dimension(:) :: cellsBegin
+        type(LinkedList), allocatable, dimension(:), private :: cells
+        type(LinkedList), allocatable, dimension(:), private :: cellsNext
+        type(LinkedList), allocatable, dimension(:), private :: cellsBegin
         
     contains
     
