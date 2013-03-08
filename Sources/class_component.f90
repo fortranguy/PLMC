@@ -79,7 +79,7 @@ public :: sph_constructor
         
         real(DP) :: epsilon
         real(DP) :: alpha
-        real(DP), dimension(:), allocatable :: Vtab
+        real(DP), dimension(:), allocatable, private :: Vtab
         
         ! Neighbours
         
@@ -142,7 +142,7 @@ contains
         sph_constructor%epsilon = epsilon
         sph_constructor%alpha = alpha        
         allocate(sph_constructor%Vtab(sph_iMin:sph_Ntab))
-        sph_constructor%Vtab(:) = Vtab(:)
+        sph_constructor%Vtab(:) = sph_Vtab(:)
         sph_constructor%cell_Lsize(:) = [sph_rcut, sph_rcut, sph_rcut]
         sph_constructor%cell_coordMax(:) = int(Lsize(:)/sph_rcut)
         allocate(sph_constructor%cell_neighs(cell_neighs_nb, &
