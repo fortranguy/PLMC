@@ -68,15 +68,12 @@ public :: sph_constructor
         
         real(DP), dimension(Dim), private :: dx
 
-        ! Potential domain
+        ! Potential
 
         real(DP), private :: rcut
         real(DP), private :: pas
         integer, private :: iMin
         integer, private :: Ntab
-        
-        ! Potential shape
-        
         real(DP), private :: epsilon
         real(DP), private :: alpha
         real(DP), dimension(:), allocatable, private :: Vtab
@@ -132,16 +129,19 @@ contains
         sph_constructor%radius = sph_radius
         sph_constructor%rmin = sph_rmin
         sph_constructor%Ncol = sph_Ncol
-        sph_constructor%dx = sph_dx
         allocate(sph_constructor%X(Dim, sph_Ncol))
+        
+        sph_constructor%dx = sph_dx
+        
         sph_constructor%rcut = sph_rcut
         sph_constructor%pas = sph_pas
         sph_constructor%iMin = sph_iMin
-        sph_constructor%Ntab = sph_Ntab
+        sph_constructor%Ntab = sph_Ntab        
         sph_constructor%epsilon = sph_epsilon
         sph_constructor%alpha = sph_alpha        
         allocate(sph_constructor%Vtab(sph_iMin:sph_Ntab))
         call sph_constructor%ePotIni()
+        
         sph_constructor%cell_Lsize(:) = [sph_rcut, sph_rcut, sph_rcut]
         sph_constructor%cell_coordMax(:) = int(Lsize(:)/sph_rcut)
         allocate(sph_constructor%cell_neighs(cell_neighs_nb, &
