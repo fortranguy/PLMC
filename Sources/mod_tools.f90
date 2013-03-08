@@ -178,21 +178,6 @@ implicit none
     
     end subroutine iniPosAlea
     
-    ! Etat de la configuration ------------------------------------------------
-      
-    subroutine snapShot(unitSnap, sph)
-        
-        integer, intent(in) :: unitSnap
-        type(Component), intent(in) :: sph
-    
-        integer :: iCol
-        
-        do iCol = 1, sph_Ncol
-            write(unitSnap, *) sph%X(:, iCol)
-        end do    
-
-    end subroutine
-    
     ! Résultats ---------------------------------------------------------------
         
     subroutine mcResults(enTotSum, activExInvSum, tauxRejectsSum, duree,&

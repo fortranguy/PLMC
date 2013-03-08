@@ -93,7 +93,7 @@ public :: sph_constructor
     
     	procedure :: rapport => component_rapport
     	procedure :: destructor => component_destructor
-
+		procedure :: snapShot => component_snapShot
         procedure :: overlapTest => component_overlapTest
         
         procedure :: alloc_Cells => component_alloc_Cells
@@ -181,6 +181,21 @@ contains
     	deallocate(this%Vtab)
     
     end subroutine component_destructor
+    
+    ! Etat de la configuration ------------------------------------------------
+      
+    subroutine component_snapShot(this, unitSnap)
+        
+        class(Component), intent(in) :: this
+        integer, intent(in) :: unitSnap
+    
+        integer :: iCol
+        
+        do iCol = 1, this%Ncol
+            write(unitSnap, *) this%X(:, iCol)
+        end do    
+
+    end subroutine component_snapShot
     
     ! Test d'overlap ----------------------------------------------------------
     

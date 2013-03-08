@@ -42,7 +42,7 @@ implicit none
     call condIni(unitRapport, sph)
     open(unit=unitSnapIni, recl=4096, file="snapShotIni.out", status='new', &
         action='write')
-        call snapShot(unitSnapIni, sph)
+        call sph%snapShot(unitSnapIni)
     close(unitSnapIni)
     call sph%overlapTest()
     enTot = sph%enTotCalc()
@@ -87,7 +87,7 @@ implicit none
             write(unitObs, *) iStep, enTot, activExInv
             
             if (snap) then        
-			    call snapShot(unitSnapEnCours, sph)
+			    call sph%snapShot(unitSnapEnCours)
 			end if
             
         end if
@@ -118,7 +118,7 @@ implicit none
     
     open(unit=unitSnapFin, recl=4096, file="snapShotFin.out", status='new', &
         action='write')
-        call snapShot(unitSnapFin, sph)
+        call sph%snapShot(unitSnapFin)
     close(unitSnapFin)
     
     call sph%dealloc_Cells()
