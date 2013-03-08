@@ -209,8 +209,8 @@ implicit none
         write(unitRapport, *) "    Nstep = ", Nstep
         write(unitRapport, *) "    Ntherm = ", Ntherm
         write(unitRapport, *) "    Nmove = ", Nmove
-        write(unitRapport, *) "    epsilon = ", sph%epsilon
-        write(unitRapport, *) "    alpha = ", sph%alpha
+        write(unitRapport, *) "    epsilon = ", sph_epsilon
+        write(unitRapport, *) "    alpha = ", sph_alpha
         write(unitRapport, *) "    rcut = ", sph_rcut
         write(unitRapport, *) "    pas = ", sph_pas
         write(unitRapport, *) "    cell_coordMax(:) = ", sph%cell_coordMax(:)

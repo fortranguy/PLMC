@@ -77,8 +77,8 @@ public :: sph_constructor
         
         ! Potential shape
         
-        real(DP) :: epsilon
-        real(DP) :: alpha
+        real(DP), private :: epsilon
+        real(DP), private :: alpha
         real(DP), dimension(:), allocatable, private :: Vtab
         
         ! Neighbours
@@ -139,8 +139,8 @@ contains
         sph_constructor%pas = sph_pas
         sph_constructor%iMin = sph_iMin
         sph_constructor%Ntab = sph_Ntab
-        sph_constructor%epsilon = epsilon
-        sph_constructor%alpha = alpha        
+        sph_constructor%epsilon = sph_epsilon
+        sph_constructor%alpha = sph_alpha        
         allocate(sph_constructor%Vtab(sph_iMin:sph_Ntab))
         sph_constructor%Vtab(:) = sph_Vtab(:)
         sph_constructor%cell_Lsize(:) = [sph_rcut, sph_rcut, sph_rcut]

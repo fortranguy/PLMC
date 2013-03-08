@@ -85,8 +85,8 @@ implicit none
     integer, parameter :: sph_iMin = int(sph_rmin/sph_pas)
     integer, parameter :: sph_Ntab = int(sph_rcut/sph_pas)
     real(DP), dimension(sph_iMin:sph_Ntab), protected :: sph_Vtab
-    real(DP), parameter :: epsilon = 1._DP
-    real(DP), parameter :: alpha = 5._DP
+    real(DP), parameter :: sph_epsilon = 1._DP
+    real(DP), parameter :: sph_alpha = 5._DP
     
 contains
     
@@ -98,12 +98,12 @@ contains
 	    ! cut
         do i = sph_iMin, sph_Ntab       
             r_i = real(i, DP)*sph_pas
-            sph_Vtab(i) = epsilon*exp(-alpha*(r_i-sph_rmin))/r_i           
+            sph_Vtab(i) = sph_epsilon*exp(-sph_alpha*(r_i-sph_rmin))/r_i           
         end do
         
         ! shift        
-        sph_Vtab(:) = sph_Vtab(:) - epsilon*exp(-alpha*(sph_rcut-sph_rmin)) / &
-        	sph_rcut
+        sph_Vtab(:) = sph_Vtab(:) - sph_epsilon * &
+        	exp(-sph_alpha*(sph_rcut-sph_rmin)) / sph_rcut
 
     end subroutine ePotIni
         
