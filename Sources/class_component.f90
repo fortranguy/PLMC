@@ -91,6 +91,7 @@ public :: sph_constructor
         
     contains
     
+    	procedure :: rapport => component_rapport
     	procedure :: destructor => component_destructor
 
         procedure :: overlapTest => component_overlapTest
@@ -146,6 +147,31 @@ contains
             product( int(Lsize(:)/sph_rcut) )))
     
     end function sph_constructor
+    
+    ! Rapport -----------------------------------------------------------------
+    
+    subroutine component_rapport(this, nWidom, unitRapport)
+    
+    	class(Component), intent(in) :: this
+        integer, intent(in) :: nWidom
+        integer, intent(in) :: unitRapport    
+        
+        write(unitRapport, *) "Simulation MC_C :"
+        write(unitRapport ,*) "    Lsize(:) = ", Lsize(:)
+        write(unitRapport ,*) "    Vol = ", product(Lsize)
+        write(unitRapport ,*) "    Ncol = ", this%Ncol
+        write(unitRapport ,*) "    nWidom = ", nWidom
+        write(unitRapport, *) "    Nstep = ", Nstep
+        write(unitRapport, *) "    Ntherm = ", Ntherm
+        write(unitRapport, *) "    Nmove = ", Nmove
+        write(unitRapport, *) "    epsilon = ", this%epsilon
+        write(unitRapport, *) "    alpha = ", this%alpha
+        write(unitRapport, *) "    rcut = ", this%rcut
+        write(unitRapport, *) "    pas = ", this%pas
+        write(unitRapport, *) "    cell_coordMax(:) = ", this%cell_coordMax(:)
+        write(unitRapport, *) "    cell_Lsize(:) = ", this%cell_Lsize(:)
+        
+    end subroutine component_rapport
     
     subroutine component_destructor(this)
     

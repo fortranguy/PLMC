@@ -193,31 +193,6 @@ implicit none
 
     end subroutine
     
-    ! Rapport -----------------------------------------------------------------
-    
-    subroutine rapport(nWidom, unitRapport)
-
-        integer, intent(in) :: nWidom
-        integer, intent(in) :: unitRapport    
-        
-        write(unitRapport, *) "Simulation MC_C :"
-        write(unitRapport ,*) "    Lsize(:) = ", Lsize(:)
-        write(unitRapport ,*) "    Vol = ", product(Lsize)
-        write(unitRapport ,*) "    Ncol = ", sph_Ncol
-        write(unitRapport ,*) "    nWidom = ", nWidom
-        write(unitRapport, *) "    Nstep = ", Nstep
-        write(unitRapport, *) "    Ntherm = ", Ntherm
-        write(unitRapport, *) "    Nmove = ", Nmove
-        write(unitRapport, *) "    epsilon = ", sph_epsilon
-        write(unitRapport, *) "    alpha = ", sph_alpha
-        write(unitRapport, *) "    rcut = ", sph_rcut
-        write(unitRapport, *) "    pas = ", sph_pas
-        write(unitRapport, *) "    cell_coordMax(:) = ", int(Lsize(:)/sph_rcut)
-        write(unitRapport, *) "    cell_Lsize(:) = ", &
-        	[sph_rcut, sph_rcut, sph_rcut]
-        
-    end subroutine rapport
-    
     ! Résultats ---------------------------------------------------------------
         
     subroutine mcResults(enTotSum, activExInvSum, tauxRejectsSum, duree,&
