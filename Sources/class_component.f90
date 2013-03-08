@@ -70,7 +70,7 @@ public :: sph_constructor
 
         ! Potential domain
 
-        real(DP) :: rcut
+        real(DP), private :: rcut
         real(DP) :: pas
         integer :: iMin
         integer :: Ntab

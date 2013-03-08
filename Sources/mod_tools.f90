@@ -211,7 +211,7 @@ implicit none
         write(unitRapport, *) "    Nmove = ", Nmove
         write(unitRapport, *) "    epsilon = ", sph%epsilon
         write(unitRapport, *) "    alpha = ", sph%alpha
-        write(unitRapport, *) "    rcut = ", sph%rcut
+        write(unitRapport, *) "    rcut = ", sph_rcut
         write(unitRapport, *) "    pas = ", sph%pas
         write(unitRapport, *) "    cell_coordMax(:) = ", sph%cell_coordMax(:)
         write(unitRapport, *) "    cell_Lsize(:) = ", sph%cell_Lsize(:)
