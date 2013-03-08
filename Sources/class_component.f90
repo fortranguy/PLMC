@@ -83,8 +83,8 @@ public :: sph_constructor
         
         ! Neighbours
         
-        real(DP), dimension(Dim) :: cell_Lsize
-        integer, dimension(Dim) :: cell_coordMax
+        real(DP), dimension(Dim), private :: cell_Lsize
+        integer, dimension(Dim), private :: cell_coordMax
         integer, dimension(:, :), allocatable :: cell_neighs
         type(LinkedList), allocatable, dimension(:) :: cells, cellsNext
         type(LinkedList), allocatable, dimension(:) :: cellsBegin

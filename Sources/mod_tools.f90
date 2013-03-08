@@ -195,9 +195,8 @@ implicit none
     
     ! Rapport -----------------------------------------------------------------
     
-    subroutine rapport(sph, nWidom, unitRapport)
-    
-        type(Component), intent(in) :: sph
+    subroutine rapport(nWidom, unitRapport)
+
         integer, intent(in) :: nWidom
         integer, intent(in) :: unitRapport    
         
@@ -213,8 +212,9 @@ implicit none
         write(unitRapport, *) "    alpha = ", sph_alpha
         write(unitRapport, *) "    rcut = ", sph_rcut
         write(unitRapport, *) "    pas = ", sph_pas
-        write(unitRapport, *) "    cell_coordMax(:) = ", sph%cell_coordMax(:)
-        write(unitRapport, *) "    cell_Lsize(:) = ", sph%cell_Lsize(:)
+        write(unitRapport, *) "    cell_coordMax(:) = ", int(Lsize(:)/sph_rcut)
+        write(unitRapport, *) "    cell_Lsize(:) = ", &
+        	[sph_rcut, sph_rcut, sph_rcut]
         
     end subroutine rapport
     
