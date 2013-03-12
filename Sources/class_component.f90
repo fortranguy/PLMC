@@ -7,7 +7,7 @@ implicit none
 
     contains
 
-! Distance entre 2 particules (CLP) ---------------------------------------
+! Distance between 2 positions : PBC ------------------------------------------
     
     function dist(X1, X2)
     
@@ -149,7 +149,7 @@ contains
     
     end function sph_constructor
     
-    ! Rapport -----------------------------------------------------------------
+    ! Report ------------------------------------------------------------------
     
     subroutine component_rapport(this, nWidom, unitRapport)
     
@@ -183,7 +183,7 @@ contains
     
     end subroutine component_destructor
     
-    ! Etat de la configuration ------------------------------------------------
+    ! Configuration state -----------------------------------------------------
       
     subroutine component_snapShot(this, unitSnap)
         
@@ -198,7 +198,7 @@ contains
 
     end subroutine component_snapShot
     
-    ! Test d'overlap ----------------------------------------------------------
+    ! Overlapt test -----------------------------------------------------------
     
     subroutine component_overlapTest(this)
     
@@ -255,7 +255,7 @@ contains
         
     end subroutine component_alloc_Cells
     
-    ! Libération
+    ! Linked-list deallocation
     
     recursive subroutine libere_chaine(courant)
 
@@ -285,7 +285,7 @@ contains
     
     end subroutine component_dealloc_Cells
     
-    ! Vérification de la taille des cellules (voisines)
+    ! Neighbours cells size check
     
     subroutine component_check_CellsSize(this)
     
@@ -312,7 +312,7 @@ contains
         
     end subroutine component_check_CellsSize
     
-    ! Assignation : particule -> cellule
+    ! Assignment : particle -> cell
     
     function component_position_to_cell(this, xCol) &
         result(position_to_cell)
@@ -361,7 +361,7 @@ contains
         
     end subroutine component_all_col_to_cell
     
-    ! Mise à jour des TV
+    ! Neighbours cells update
     
     subroutine component_remove_cell_col(this, iCol, iCellBefore)
     
@@ -431,7 +431,7 @@ contains
     end  subroutine component_add_cell_col
     
 ! -----------------------------------------------------------------------------
-! VOISINS :
+! Neighbours :
 ! -----------------------------------------------------------------------------
     
     function component_cell_coord_to_ind(this, coord) result(cell_coord_to_ind)
@@ -516,7 +516,7 @@ contains
             
     end subroutine component_ini_cell_neighs
     
-    ! Adaptation de dx durant la thermalisation -------------------------------
+    ! Adaptation of dx during the thermalisation ------------------------------
     
     subroutine component_adapt_dx(this, iStep, tauxRejectsSum, unitRapport)
     
@@ -574,7 +574,7 @@ contains
         
     end function component_getDx
     
-    ! Energie potentielle -------------------------------------------------
+    ! Potential energy --------------------------------------------------------
     
     subroutine component_ePotIni(this)
     
@@ -667,7 +667,7 @@ contains
     
     end subroutine component_ePotNeigh
     
-    ! Déplacement d'une particule -----------------------------------------
+    ! Particle move -----------------------------------------------------------
     
     subroutine component_mcMove(this, enTot, Nrejects)
     
@@ -694,7 +694,8 @@ contains
         if (.not. overlap) then
         
             iCellBefore = this%position_to_cell(this%X(:, iOld))
-            call this%ePotNeigh(iOld, this%X(:, iOld), iCellBefore, overlap, eOld)
+            call this%ePotNeigh(iOld, this%X(:, iOld), iCellBefore, overlap, &
+                eOld)
             
             dEn = eNew - eOld
         
@@ -720,7 +721,7 @@ contains
     
     end subroutine component_mcMove
     
-    ! Méthode de Widom ----------------------------------------------------
+    ! Widom's method -----------------------------------------------------------
 
     subroutine component_widom(this, nWidom, activExInv)
         
@@ -754,7 +755,7 @@ contains
         
     end subroutine component_widom
 
-    ! Energie potentielle totale
+    ! Total potential energy
     
     function component_enTotCalc(this) result(enTotCalc)
     
