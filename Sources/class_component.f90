@@ -29,7 +29,7 @@ implicit none
 end module mod_pbc
 
 !***********************************************************************
-!* MODULE: Component class                                              *
+!* MODULE: Component class                                             *
 !***********************************************************************
 
 module class_component
