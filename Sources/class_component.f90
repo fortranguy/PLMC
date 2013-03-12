@@ -89,9 +89,9 @@ public :: sph_constructor
         
     contains
     
-    	procedure :: rapport => component_rapport
-    	procedure :: destructor => component_destructor
-		procedure :: snapShot => component_snapShot
+        procedure :: rapport => component_rapport
+        procedure :: destructor => component_destructor
+        procedure :: snapShot => component_snapShot
         procedure :: overlapTest => component_overlapTest
         
         procedure :: alloc_Cells => component_alloc_Cells
@@ -153,7 +153,7 @@ contains
     
     subroutine component_rapport(this, nWidom, unitRapport)
     
-    	class(Component), intent(in) :: this
+        class(Component), intent(in) :: this
         integer, intent(in) :: nWidom
         integer, intent(in) :: unitRapport    
         
@@ -176,10 +176,10 @@ contains
     
     subroutine component_destructor(this)
     
-    	class(Component), intent(inout) :: this
-    	
-    	deallocate(this%X)
-    	deallocate(this%Vtab)
+        class(Component), intent(inout) :: this
+        
+        deallocate(this%X)
+        deallocate(this%Vtab)
     
     end subroutine component_destructor
     
@@ -520,7 +520,7 @@ contains
     
     subroutine component_adapt_dx(this, iStep, tauxRejectsSum, unitRapport)
     
- 		class(Component), intent(inout) :: this 
+         class(Component), intent(inout) :: this 
         integer, intent(in) :: iStep, unitRapport
         real(DP), intent(in) :: tauxRejectsSum    
         
@@ -565,25 +565,25 @@ contains
     ! -----------------------
     
     function component_getDx(this)
-    	
-    	class(Component), intent(in) :: this
-    	
-    	real(DP) :: component_getDx
-    	
-    	component_getDx = sqrt(dot_product(this%dx, this%dx))
-    	
+        
+        class(Component), intent(in) :: this
+        
+        real(DP) :: component_getDx
+        
+        component_getDx = sqrt(dot_product(this%dx, this%dx))
+        
     end function component_getDx
     
     ! Energie potentielle -------------------------------------------------
     
     subroutine component_ePotIni(this)
     
-    	class(Component), intent(inout) :: this
+        class(Component), intent(inout) :: this
 
         integer :: i
         real(DP) :: r_i
        
-	    ! cut
+        ! cut
         do i = this%iMin, this%Ntab       
             r_i = real(i, DP)*this%pas
             this%Vtab(i) = this%epsilon * exp(-this%alpha*(r_i-this%rmin))/r_i           
@@ -591,7 +591,7 @@ contains
         
         ! shift        
         this%Vtab(:) = this%Vtab(:) - this%epsilon * &
-        	exp(-this%alpha*(this%rcut-this%rmin)) / this%rcut
+            exp(-this%alpha*(this%rcut-this%rmin)) / this%rcut
 
     end subroutine component_ePotIni
 
@@ -671,7 +671,7 @@ contains
     
     subroutine component_mcMove(this, enTot, Nrejects)
     
-    	class(Component), intent(inout) :: this
+        class(Component), intent(inout) :: this
         real(DP), intent(inout) :: enTot
         integer, intent(inout) :: Nrejects
         
@@ -695,7 +695,7 @@ contains
         
             iCellBefore = this%position_to_cell(this%X(:, iOld))
             call this%ePotNeigh(iOld, this%X(:, iOld), iCellBefore, overlap, eOld)
-        	
+            
             dEn = eNew - eOld
         
             call random_number(rand)
@@ -754,12 +754,12 @@ contains
         
     end subroutine component_widom
 
-	! Energie potentielle totale
+    ! Energie potentielle totale
     
     function component_enTotCalc(this) result(enTotCalc)
     
-    	class(Component), intent(in) :: this
-    	
+        class(Component), intent(in) :: this
+        
         integer :: iCol, jCol
         real(DP) :: r_ij
         real(DP) :: enTotCalc
