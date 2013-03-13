@@ -39,7 +39,7 @@ implicit none
     call init_random_seed(unitRapport)
     
     ! Condition initiale
-    call condIni(unitRapport, sph)
+    call condIni(unitRapport, sph%X)
     open(unit=unitSnapIni, recl=4096, file="snapShotIni.out", status='new', &
         action='write')
         call sph%snapShot(unitSnapIni)
@@ -63,7 +63,7 @@ implicit none
     open(unit=unit_dx, recl=4096, file="dx.out", status='new', &
         action='write')
     open(unit=unitSnapEnCours, recl=4096, file="snap.shot", status='new', &
-    	action='write')
+        action='write')
     
     call cpu_time(tIni)
     do iStep = 1, Ntherm + Nstep
@@ -87,8 +87,8 @@ implicit none
             write(unitObs, *) iStep, enTot, activExInv
             
             if (snap) then        
-			    call sph%snapShot(unitSnapEnCours)
-			end if
+                call sph%snapShot(unitSnapEnCours)
+            end if
             
         end if
         

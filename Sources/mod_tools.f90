@@ -39,10 +39,10 @@ implicit none
     
     ! Condition initiale ------------------------------------------------------
     
-    subroutine condIni(unitRapport, sph)
+    subroutine condIni(unitRapport, sph_X)
     
         integer, intent(in) :: unitRapport
-        type(Component), intent(inout) :: sph
+        real(DP), dimension(:, :), intent(inout) :: sph_X
         
         real(DP) :: compac, densite
         character(len=20) :: init
@@ -56,10 +56,10 @@ implicit none
         
         select case (init)
             case ("cube")
-                call iniPosCub(sph)
+                call iniPosCub(sph_X)
                 write(unitRapport, *) "    Cubique simple"
             case ("alea")
-                call iniPosAlea(sph)
+                call iniPosAlea(sph_X)
                 write(unitRapport, *) "    Déposition aléatoire"
             case default
                 write(*, *) "Préciser la condition initiale : "
@@ -77,9 +77,9 @@ implicit none
         
     end subroutine condIni
     
-    subroutine iniPosCub(sph)
+    subroutine iniPosCub(sph_X)
     
-    	type(Component), intent(inout) :: sph
+        real(DP), dimension(:, :), intent(inout) :: sph_X
     
         integer :: iDir
         integer :: i, j, k, iCol
@@ -119,25 +119,25 @@ implicit none
                 do i = 1, nCols(1)            
                     iCol = i + nCols(1)*(j-1) + nCols(1)*nCols(2)*(k-1)
                     if (iCol <= sph_Ncol) then
-                        sph%X(1, iCol) = ratio(1)*real(i, DP)
-                        sph%X(2, iCol) = ratio(2)*real(j, DP)
-                        sph%X(3, iCol) = ratio(3)*real(k, DP)
+                        sph_X(1, iCol) = ratio(1)*real(i, DP)
+                        sph_X(2, iCol) = ratio(2)*real(j, DP)
+                        sph_X(3, iCol) = ratio(3)*real(k, DP)
                     end if
                 end do
             end do
         end do
     
         do iDir = 1, Dim
-            sph%X(iDir, :) = sph%X(iDir, :) - 0.5_DP*ratio(iDir) ! nécessaire ? tradition
+            sph_X(iDir, :) = sph_X(iDir, :) - 0.5_DP*ratio(iDir) ! nécessaire ? tradition
         end do
     
     end subroutine iniPosCub
     
     ! ---------------------------------
     
-    subroutine iniPosAlea(sph)
+    subroutine iniPosAlea(sph_X)
     
-    	type(Component), intent(inout) :: sph
+        real(DP), dimension(:, :), intent(inout) :: sph_X
     
         integer :: iCol, Ncols, nOK
         real(DP), dimension(Dim) :: xTest
@@ -145,8 +145,8 @@ implicit none
     
         write(*, *) "Déposition aléatoire"
     
-        call random_number(sph%X(:, 1))
-        sph%X(:, 1) = sph%X(:, 1)*(Lsize(:)-2*sph_radius)
+        call random_number(sph_X(:, 1))
+        sph_X(:, 1) = sph_X(:, 1)*(Lsize(:)-2*sph_radius)
         Ncols = 1        
         
         do while (Ncols<sph_Ncol)
@@ -156,7 +156,7 @@ implicit none
             
             nOK = 0
             do iCol = 1, Ncols
-                rTest = dist(sph%X(:, iCol), xTest(:))
+                rTest = dist(sph_X(:, iCol), xTest(:))
                 if (rTest >= sph_rmin) then
                     nOK = nOK + 1
                 else
@@ -166,14 +166,14 @@ implicit none
             
             if (nOK == Ncols) then
                 Ncols = Ncols + 1
-                sph%X(:, Ncols) = xTest(:)
+                sph_X(:, Ncols) = xTest(:)
                 write(*, *) "    Particule", Ncols, "OK"
             end if
             
         end do
         
         do iCol = 1, sph_Ncol
-            sph%X(:, iCol) = sph%X(:, iCol) + sph_radius
+            sph_X(:, iCol) = sph_X(:, iCol) + sph_radius
         end do
     
     end subroutine iniPosAlea
