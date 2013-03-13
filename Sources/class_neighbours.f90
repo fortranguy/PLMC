@@ -107,17 +107,18 @@ contains
     
     ! Neighbours cells size check
     
-    subroutine component_check_CellsSize(this)
+    subroutine component_check_CellsSize(this, rcut)
     
         class(Component), intent(in) :: this
+        real(DP), intent(in) :: rcut
         
         integer :: iDir
         
         do iDir = 1, Dim
         
-            if (this%cell_Lsize(iDir) < this%rcut) then
+            if (this%cell_Lsize(iDir) < rcut) then
                 write(*, *) "Cellule trop petite dans la direction", iDir, ":"
-                write(*, *) this%cell_Lsize(iDir), "<", this%rcut
+                write(*, *) this%cell_Lsize(iDir), "<", rcut
                 stop
             end if
             
@@ -150,9 +151,11 @@ contains
     
     end function component_position_to_cell
     
-    subroutine component_all_col_to_cell(this)
+    subroutine component_all_col_to_cell(this, Ncol, X)
     
         class(Component), intent(inout) :: this
+        integer, intent(in) :: Ncol
+        real(DP), dimension(:, :), intent(inout) :: X
     
         integer :: iCol
         integer :: iCell, nCells
@@ -160,9 +163,9 @@ contains
         nCells = this%cell_coordMax(1) * this%cell_coordMax(2) * &
             this%cell_coordMax(3)
     
-        do iCol = 1, this%Ncol
+        do iCol = 1, Ncol
     
-            iCell = this%position_to_cell(this%X(:,iCol))
+            iCell = this%position_to_cell(X(:,iCol))
             this%cells(iCell)%particle%iCol = iCol
             
             allocate(this%cellsNext(iCell)%particle)
