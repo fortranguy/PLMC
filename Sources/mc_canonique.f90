@@ -48,9 +48,9 @@ implicit none
     enTot = sph%enTotCalc()
     
     ! Table des voisins
-    call sph%check_CellsSize()
+    call sph%check_CellsSize(sph%rcut)
     call sph%alloc_Cells()
-    call sph%all_col_to_cell()
+    call sph%all_col_to_cell(sph%Ncol, sph%X)
     call sph%ini_cell_neighs()
     
 ! Milieu --------------------------------------------------

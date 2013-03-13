@@ -53,8 +53,8 @@ public :: sph_constructor
 
         real(DP), private :: radius
         real(DP), private :: rmin
-        integer, private ::  Ncol !!!
-        real(DP), dimension(:, :), allocatable :: X !!!
+        integer, private ::  Ncol
+        real(DP), dimension(:, :), allocatable :: X
 
         ! Monte-Carlo
         
@@ -62,7 +62,7 @@ public :: sph_constructor
 
         ! Potential
 
-        real(DP), private :: rcut !!!
+        real(DP), private :: rcut
         real(DP), private :: pas
         integer, private :: iMin
         integer, private :: Ntab
