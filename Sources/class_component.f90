@@ -72,8 +72,8 @@ public :: sph_constructor
         
     contains
     
-        procedure :: rapport => Component_rapport
         procedure :: destructor => Component_destructor
+        procedure :: rapport => Component_rapport
         procedure :: snapShot => Component_snapShot
         procedure :: overlapTest => Component_overlapTest
         
@@ -113,8 +113,25 @@ contains
         sph_constructor%alpha = sph_alpha        
         allocate(sph_constructor%Vtab(sph_iMin:sph_Ntab))
         call sph_constructor%ePotIni()
+        
+        ! Table des voisins
+        call sph%check_CellsSize(sph%rcut)
+        call sph%alloc_Cells()
+        call sph%all_col_to_cell(sph%Ncol, sph%X)
+        call sph%ini_cell_neighs()
     
     end function sph_constructor
+    
+    subroutine Component_destructor(this)
+    
+    end subroutine Neighbours_destructor
+    
+        class(Component), intent(inout) :: this
+        
+        deallocate(this%X)
+        deallocate(this%Vtab)
+    
+    end subroutine Component_destructor
     
     ! Report ------------------------------------------------------------------
     
@@ -140,15 +157,6 @@ contains
         write(unitRapport, *) "    cell_Lsize(:) = ", this%cell_Lsize(:)
         
     end subroutine Component_rapport
-    
-    subroutine Component_destructor(this)
-    
-        class(Component), intent(inout) :: this
-        
-        deallocate(this%X)
-        deallocate(this%Vtab)
-    
-    end subroutine Component_destructor
     
     ! Configuration state -----------------------------------------------------
       

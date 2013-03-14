@@ -47,12 +47,6 @@ implicit none
     call sph%overlapTest()
     enTot = sph%enTotCalc()
     
-    ! Table des voisins
-    call sph%check_CellsSize(sph%rcut)
-    call sph%alloc_Cells()
-    call sph%all_col_to_cell(sph%Ncol, sph%X)
-    call sph%ini_cell_neighs()
-    
 ! Milieu --------------------------------------------------
 
     write(*, *) "Début des cycles"
@@ -121,7 +115,6 @@ implicit none
         call sph%snapShot(unitSnapFin)
     close(unitSnapFin)
     
-    call sph%dealloc_Cells()
     call sph%destructor()
     
 end program mc_cano

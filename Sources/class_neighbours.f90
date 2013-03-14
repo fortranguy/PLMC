@@ -32,6 +32,7 @@ public :: neigh_constructor
         
     contains
     
+        procedure :: destructor => Neighbours_destructor
         procedure :: alloc_Cells => Neighbours_alloc_Cells
         procedure :: dealloc_Cells => Neighbours_dealloc_Cells
         procedure :: check_CellsSize => Neighbours_check_CellsSize
@@ -58,6 +59,15 @@ contains
             product( int(Lsize(:)/rcut) )))
     
     end function neigh_constructor
+    
+    subroutine Neighbours_destructor(this)
+    
+        class(Neighbours), intent(inout) :: this
+        
+        deallocate(this%cell_neighs)
+        call this%dealloc_Cells()
+        
+    end subroutine Neighbours_destructor
 
     ! Linked-list allocation
     
