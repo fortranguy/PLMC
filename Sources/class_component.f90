@@ -70,6 +70,10 @@ public :: sph_constructor
         real(DP), private :: alpha
         real(DP), dimension(:), allocatable, private :: Vtab
         
+        ! Neighbours (cell/grid scheme)
+        
+        type(Neighbours) :: same
+        
     contains
     
         procedure :: destructor => Component_destructor
@@ -115,10 +119,11 @@ contains
         call sph_constructor%ePotIni()
         
         ! Table des voisins
-        call sph%check_CellsSize(sph%rcut)
-        call sph%alloc_cells()
-        call sph%all_col_to_cell(sph%Ncol, sph%X)
-        call sph%ini_cell_neighs()
+        
+        sph_constructor%same = neigh_constructor(sph%rcut)
+        call sph%same%alloc_cells()
+        call sph%same%all_col_to_cell(sph%Ncol, sph%X)
+        call sph%same%ini_cell_neighs()
     
     end function sph_constructor
     
@@ -130,6 +135,7 @@ contains
         
         deallocate(this%X)
         deallocate(this%Vtab)
+        this%same%destructor()
     
     end subroutine Component_destructor
     
@@ -153,8 +159,8 @@ contains
         write(unitRapport, *) "    alpha = ", this%alpha
         write(unitRapport, *) "    rcut = ", this%rcut
         write(unitRapport, *) "    pas = ", this%pas
-        write(unitRapport, *) "    cell_coordMax(:) = ", this%cell_coordMax(:)
-        write(unitRapport, *) "    cell_Lsize(:) = ", this%cell_Lsize(:)
+        write(unitRapport, *) "    cell_coordMax(:) = ", this%same%cell_coordMax(:)
+        write(unitRapport, *) "    cell_Lsize(:) = ", this%same%cell_Lsize(:)
         
     end subroutine Component_rapport
     
@@ -323,8 +329,8 @@ contains
     
         do iNeigh = 1, cell_neighs_nb
         
-            iCell_neigh = this%cell_neighs(iNeigh, iCell)
-            courant => this%cellsBegin(iCell_neigh)%particle%next            
+            iCell_neigh = this%same%cell_neighs(iNeigh, iCell)
+            courant => this%same%cellsBegin(iCell_neigh)%particle%next            
             if (.not. associated(courant%next)) cycle
             
             do
@@ -373,12 +379,12 @@ contains
         call random_number(xNew)
         xNew(:) = this%X(:, iOld) + (xNew(:)-0.5_DP)*this%dx(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
-        iCellAfter = this%position_to_cell(xNew)
+        iCellAfter = this%same%position_to_cell(xNew)
         call this%ePotNeigh(iOld, xNew, iCellAfter, overlap, eNew)
         
         if (.not. overlap) then
         
-            iCellBefore = this%position_to_cell(this%X(:, iOld))
+            iCellBefore = this%same%position_to_cell(this%X(:, iOld))
             call this%ePotNeigh(iOld, this%X(:, iOld), iCellBefore, overlap, &
                 eOld)
             
@@ -390,8 +396,8 @@ contains
                 enTot = enTot + dEn
                 
                 if ( iCellBefore /= iCellAfter ) then                
-                    call this%remove_cell_col(iOld, iCellBefore)
-                    call this%add_cell_col(iOld, iCellAfter)
+                    call this%same%remove_cell_col(iOld, iCellBefore)
+                    call this%same%add_cell_col(iOld, iCellAfter)
                 end if
                 
             else
@@ -427,7 +433,7 @@ contains
             
             call random_number(xTest)
             xTest(:) = Lsize(:) * xTest(:)    
-            iCellTest = this%position_to_cell(xTest)
+            iCellTest = this%same%position_to_cell(xTest)
             call this%ePotNeigh(0, xTest, iCellTest, overlap, enTest) 
             
             if (.not. overlap) then

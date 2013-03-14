@@ -57,6 +57,8 @@ contains
         neigh_constructor%cell_coordMax(:) = int(Lsize(:)/rcut)
         allocate(neigh_constructor%cell_neighs(cell_neighs_nb, &
             product( int(Lsize(:)/rcut) )))
+            
+        call neigh_constructor%check_CellsSize(rcut)
     
     end function neigh_constructor
     
