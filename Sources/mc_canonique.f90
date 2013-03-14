@@ -46,6 +46,7 @@ implicit none
     close(unitSnapIni)
     call sph%overlapTest()
     enTot = sph%enTotCalc()
+    call sph%cols_to_cells()
     
 ! Milieu --------------------------------------------------
 

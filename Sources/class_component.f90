@@ -80,6 +80,7 @@ public :: sph_constructor
         procedure :: rapport => Component_rapport
         procedure :: snapShot => Component_snapShot
         procedure :: overlapTest => Component_overlapTest
+        procedure :: cols_to_cells => Component_cols_to_cells
         
         procedure :: adapt_dx => Component_adapt_dx
         procedure :: getDx => Component_getDx
@@ -122,7 +123,6 @@ contains
         
         sph_constructor%same = neigh_constructor(sph_rcut)
         call sph_constructor%same%alloc_cells()
-        call sph_constructor%same%all_col_to_cell(sph_Ncol, sph_constructor%X)
         call sph_constructor%same%ini_cell_neighs()
     
     end function sph_constructor
@@ -205,11 +205,21 @@ contains
     
     end subroutine Component_overlapTest
     
+    ! Fill cells with colloids ------------------------------------------------
+    
+    subroutine Component_cols_to_cells(this)
+    
+        class(Component), intent(inout) :: this
+        
+        call this%same%all_col_to_cell(this%Ncol, this%X)
+    
+    end subroutine Component_cols_to_cells
+    
     ! Adaptation of dx during the thermalisation ------------------------------
     
     subroutine Component_adapt_dx(this, iStep, tauxRejectsSum, unitRapport)
     
-         class(Component), intent(inout) :: this 
+        class(Component), intent(inout) :: this 
         integer, intent(in) :: iStep, unitRapport
         real(DP), intent(in) :: tauxRejectsSum    
         
