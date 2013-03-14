@@ -5,7 +5,7 @@ use data_cell
 
 implicit none
 
-    contains
+contains
 
 ! Distance between 2 positions : PBC ------------------------------------------
     
