@@ -177,13 +177,12 @@ contains
     
         class(Neighbours), intent(inout) :: this
         integer, intent(in) :: Ncol
-        real(DP), dimension(:, :), intent(inout) :: X
+        real(DP), dimension(:, :), intent(in) :: X
     
         integer :: iCol
         integer :: iCell, nCells
         
-        nCells = this%cell_coordMax(1) * this%cell_coordMax(2) * &
-            this%cell_coordMax(3)
+        nCells = product(this%cell_coordMax)
     
         do iCol = 1, Ncol
     
