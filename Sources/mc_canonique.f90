@@ -34,7 +34,7 @@ implicit none
     activExInvSum = 0._DP
     
     open(unit=unitRapport, recl=4096, file="rapport.out", status='new', &
-        action='write')         ! contre line folding
+        action='write')
     call sph%rapport(nWidom, unitRapport)
     call init_random_seed(unitRapport)
     
@@ -63,8 +63,8 @@ implicit none
     call cpu_time(tIni)
     do iStep = 1, Ntherm + Nstep
     
-        do iMove = 1, Nmove        
-            call sph%mcMove(enTot, Nrejects)    
+        do iMove = 1, Nmove   
+            call sph%mcMove(enTot, Nrejects)
         end do
         
         call sph%widom(nWidom, activExInv)
@@ -77,11 +77,11 @@ implicit none
         
         else
             
-            enTotSum = enTotSum + enTot                 
-            activExInvSum = activExInvSum + activExInv            
+            enTotSum = enTotSum + enTot
+            activExInvSum = activExInvSum + activExInv
             write(unitObs, *) iStep, enTot, activExInv
             
-            if (snap) then        
+            if (snap) then
                 call sph%snapShot(unitSnapEnCours)
             end if
             
