@@ -22,12 +22,12 @@ public :: neigh_constructor, Link
 
     type, public :: Neighbours
         
-        real(DP), dimension(Dim), private :: cell_Lsize
-        integer, dimension(Dim), private :: cell_coordMax
+        real(DP), dimension(Dim) :: cell_Lsize
+        integer, dimension(Dim) :: cell_coordMax
         integer, dimension(:, :), allocatable :: cell_neighs
-        type(LinkedList), dimension(:), allocatable, private :: cells
-        type(LinkedList), dimension(:), allocatable, private :: cellsNext
-        type(LinkedList), dimension(:), allocatable, private :: cellsBegin
+        type(LinkedList), dimension(:), allocatable :: cells
+        type(LinkedList), dimension(:), allocatable :: cellsNext
+        type(LinkedList), dimension(:), allocatable :: cellsBegin
         
     contains
     
