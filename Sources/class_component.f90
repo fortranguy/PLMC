@@ -129,8 +129,6 @@ contains
     
     subroutine Component_destructor(this)
     
-    end subroutine Neighbours_destructor
-    
         class(Component), intent(inout) :: this
         
         deallocate(this%X)
