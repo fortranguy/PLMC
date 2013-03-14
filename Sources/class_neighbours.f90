@@ -118,8 +118,7 @@ contains
         integer :: iCell
         integer :: ncells
     
-        ncells = this%cell_coordMax(1) * this%cell_coordMax(2) * &
-            this%cell_coordMax(3)
+        ncells = product(this%cell_coordMax)
         do iCell = 1, ncells
             if (associated(this%cellsBegin(iCell)%particle)) then
                 call libere_chaine(this%cellsBegin(iCell)%particle)
