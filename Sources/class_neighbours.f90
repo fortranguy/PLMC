@@ -25,9 +25,9 @@ private
         real(DP), dimension(Dim), private :: cell_Lsize
         integer, dimension(Dim), private :: cell_coordMax
         integer, dimension(:, :), allocatable :: cell_neighs
-        type(LinkedList), allocatable, dimension(:), private :: cells
-        type(LinkedList), allocatable, dimension(:), private :: cellsNext
-        type(LinkedList), allocatable, dimension(:), private :: cellsBegin
+        type(LinkedList), dimension(:), allocatable, private :: cells
+        type(LinkedList), dimension(:), allocatable, private :: cellsNext
+        type(LinkedList), dimension(:), allocatable, private :: cellsBegin
         
     contains
     
