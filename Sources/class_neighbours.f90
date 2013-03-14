@@ -33,9 +33,9 @@ public :: neigh_constructor
     contains
     
         procedure :: destructor => Neighbours_destructor
-        procedure :: alloc_Cells => Neighbours_alloc_Cells
-        procedure :: dealloc_Cells => Neighbours_dealloc_Cells
-        procedure :: check_CellsSize => Neighbours_check_CellsSize
+        procedure :: alloc_cells => Neighbours_alloc_cells
+        procedure :: dealloc_cells => Neighbours_dealloc_cells
+        procedure :: check_cellsSize => Neighbours_check_cellsSize
         procedure :: position_to_cell => Neighbours_position_to_cell
         procedure :: all_col_to_cell => Neighbours_all_col_to_cell
         procedure :: remove_cell_col => Neighbours_remove_cell_col
@@ -65,25 +65,25 @@ contains
         class(Neighbours), intent(inout) :: this
         
         deallocate(this%cell_neighs)
-        call this%dealloc_Cells()
+        call this%dealloc_cells()
         
     end subroutine Neighbours_destructor
 
     ! Linked-list allocation
     
-    subroutine Neighbours_alloc_Cells(this)
+    subroutine Neighbours_alloc_cells(this)
     
         class(Neighbours), intent(inout) :: this
     
-        integer :: iCell, nCells
+        integer :: iCell, ncells
         
-        nCells = product(this%cell_coordMax)
+        ncells = product(this%cell_coordMax)
 
-        allocate(this%cellsBegin(nCells))
-        allocate(this%cells(nCells))
-        allocate(this%cellsNext(nCells))
+        allocate(this%cellsBegin(ncells))
+        allocate(this%cells(ncells))
+        allocate(this%cellsNext(ncells))
         
-        do iCell = 1, nCells
+        do iCell = 1, ncells
 
             allocate(this%cellsBegin(iCell)%particle)
             this%cells(iCell)%particle => this%cellsBegin(iCell)%particle
@@ -96,7 +96,7 @@ contains
     
         end do
         
-    end subroutine Neighbours_alloc_Cells
+    end subroutine Neighbours_alloc_cells
     
     ! Linked-list deallocation
     
@@ -111,26 +111,26 @@ contains
         
     end subroutine libere_chaine
     
-    subroutine Neighbours_dealloc_Cells(this)
+    subroutine Neighbours_dealloc_cells(this)
     
         class(Neighbours), intent(inout) :: this
     
         integer :: iCell
-        integer :: nCells
+        integer :: ncells
     
-        nCells = this%cell_coordMax(1) * this%cell_coordMax(2) * &
+        ncells = this%cell_coordMax(1) * this%cell_coordMax(2) * &
             this%cell_coordMax(3)
-        do iCell = 1, nCells
+        do iCell = 1, ncells
             if (associated(this%cellsBegin(iCell)%particle)) then
                 call libere_chaine(this%cellsBegin(iCell)%particle)
             end if
         end do
     
-    end subroutine Neighbours_dealloc_Cells
+    end subroutine Neighbours_dealloc_cells
     
     ! Neighbours cells size check
     
-    subroutine Neighbours_check_CellsSize(this, rcut)
+    subroutine Neighbours_check_cellsSize(this, rcut)
     
         class(Neighbours), intent(in) :: this
         real(DP), intent(in) :: rcut
@@ -154,7 +154,7 @@ contains
             
         end do
         
-    end subroutine Neighbours_check_CellsSize
+    end subroutine Neighbours_check_cellsSize
     
     ! Assignment : particle -> cell
     
@@ -181,9 +181,9 @@ contains
         real(DP), dimension(:, :), intent(inout) :: X
     
         integer :: iCol
-        integer :: iCell, nCells
+        integer :: iCell, ncells
         
-        nCells = this%cell_coordMax(1) * this%cell_coordMax(2) * &
+        ncells = this%cell_coordMax(1) * this%cell_coordMax(2) * &
             this%cell_coordMax(3)
     
         do iCol = 1, Ncol
@@ -199,7 +199,7 @@ contains
             
         end do
         
-        do iCell = 1, nCells
+        do iCell = 1, ncells
             
             this%cells(iCell)%particle%next => null()
             

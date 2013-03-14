@@ -116,7 +116,7 @@ contains
         
         ! Table des voisins
         call sph%check_CellsSize(sph%rcut)
-        call sph%alloc_Cells()
+        call sph%alloc_cells()
         call sph%all_col_to_cell(sph%Ncol, sph%X)
         call sph%ini_cell_neighs()
     
