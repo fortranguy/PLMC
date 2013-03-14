@@ -12,8 +12,8 @@ private
 public :: neigh_constructor, Link
 
     type Link
-    integer :: iCol
-    type(Link), pointer :: next => null()
+        integer :: iCol
+        type(Link), pointer :: next => null()
     end type Link
     
     type LinkedList
