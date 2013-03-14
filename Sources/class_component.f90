@@ -113,11 +113,6 @@ contains
         sph_constructor%alpha = sph_alpha        
         allocate(sph_constructor%Vtab(sph_iMin:sph_Ntab))
         call sph_constructor%ePotIni()
-        
-        sph_constructor%cell_Lsize(:) = [sph_rcut, sph_rcut, sph_rcut]
-        sph_constructor%cell_coordMax(:) = int(Lsize(:)/sph_rcut)
-        allocate(sph_constructor%cell_neighs(cell_neighs_nb, &
-            product( int(Lsize(:)/sph_rcut) )))
     
     end function sph_constructor
     

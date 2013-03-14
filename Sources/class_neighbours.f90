@@ -10,6 +10,7 @@ use mod_pbc
 implicit none
 
 private
+public :: neigh_constructor
 
     type Link
     integer :: iCol
@@ -45,6 +46,18 @@ private
     end type Neighbours
     
 contains
+
+    function neigh_constructor(rcut)
+    
+        real(DP), intent(in) :: rcut    
+        type(Neighbours) :: neigh_constructor
+        
+        neigh_constructor%cell_Lsize(:) = [rcut, rcut, rcut]
+        neigh_constructor%cell_coordMax(:) = int(Lsize(:)/rcut)
+        allocate(neigh_constructor%cell_neighs(cell_neighs_nb, &
+            product( int(Lsize(:)/rcut) )))
+    
+    end function neigh_constructor
 
     ! Linked-list allocation
     
