@@ -3,8 +3,8 @@
 !***********************************************************************
 module data_constants
 
+    ! double precision
     integer, parameter :: DP = selected_real_kind(15, 307)
-        ! double precision
     real(DP), parameter :: PI = acos(-1._DP)
         
 end module data_constants
@@ -12,8 +12,7 @@ end module data_constants
 
 !***********************************************************************
 !* MODULE : Cell                                                       *
-!* PURPOSE : declaration of the cell parameters                        *   
-!* COMMENT : size1,2=x, y; size3=z                                     *
+!* PURPOSE : declaration of the cell parameters                        *
 !***********************************************************************
 module data_cell
 
@@ -33,7 +32,6 @@ end module data_cell
 !***********************************************************************
 !* MODULE : Particles                                                  *
 !* PURPOSE : declaration of the particles parameters                   *
-!* COMMENT : 1=big particles ; 2=small particles                       *
 !***********************************************************************
 module data_particles
 
@@ -50,7 +48,6 @@ end module data_particles
 !***********************************************************************
 !* MODULE : MC                                                         *
 !* PURPOSE : declaration of the MC parameters                          *
-!* COMMENT : Field-induced layer formation in dipolar nanofilms        *
 !***********************************************************************
 module data_mc
 
@@ -100,7 +97,7 @@ use data_cell
 implicit none
 
     integer, dimension(Dim), parameter :: cell_neigh_coordMax = [3, 3, 3]
-    integer, parameter :: cell_neighs_nb = 3**3 ! inclus soi-même
+    integer, parameter :: cell_neighs_nb = 3**3 ! including itself
 
 end module data_neighbours
 !***********************************************************************
