@@ -5,12 +5,11 @@ use data_particles
 use data_potentiel
 use data_neighbours
 use data_mc
-use mod_pbc
 
 implicit none
 
 private
-public :: neigh_constructor
+public :: neigh_constructor, Link
 
     type Link
     integer :: iCol

@@ -120,10 +120,10 @@ contains
         
         ! Table des voisins
         
-        sph_constructor%same = neigh_constructor(sph%rcut)
-        call sph%same%alloc_cells()
-        call sph%same%all_col_to_cell(sph%Ncol, sph%X)
-        call sph%same%ini_cell_neighs()
+        sph_constructor%same = neigh_constructor(sph_rcut)
+        call sph_constructor%same%alloc_cells()
+        call sph_constructor%same%all_col_to_cell(sph_Ncol, sph_constructor%X)
+        call sph_constructor%same%ini_cell_neighs()
     
     end function sph_constructor
     
@@ -133,7 +133,7 @@ contains
         
         deallocate(this%X)
         deallocate(this%Vtab)
-        this%same%destructor()
+        call this%same%destructor()
     
     end subroutine Component_destructor
     
