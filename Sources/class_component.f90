@@ -37,8 +37,8 @@ module class_component
 use data_cell
 use data_particles
 use data_potentiel
-use data_neighbours
 use data_mc
+use data_neighbours
 use mod_pbc
 use class_neighbours
 
@@ -72,7 +72,7 @@ public :: sph_constructor
         
         ! Neighbours (cell/grid scheme)
         
-        type(Neighbours) :: same
+        type(Neighbours), private :: same
         
     contains
     

@@ -1,15 +1,12 @@
 module class_neighbours
 
 use data_cell
-use data_particles
-use data_potentiel
 use data_neighbours
-use data_mc
 
 implicit none
 
 private
-public :: neigh_constructor, Link
+public :: Link, neigh_constructor
 
     type Link
         integer :: iCol
