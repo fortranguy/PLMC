@@ -8,7 +8,7 @@ use class_component
 
 implicit none
 
-! Début ---------------------------------------------------
+! Beginning ---------------------------------------------------
 
     ! Initialisation
     integer :: iStep, iMove
@@ -38,7 +38,7 @@ implicit none
     call sph%rapport(nWidom, unitRapport)
     call init_random_seed(unitRapport)
     
-    ! Condition initiale
+    ! Initial condition
     call condIni(unitRapport, sph%X)
     open(unit=unitSnapIni, recl=4096, file="snapShotIni.out", status='new', &
         action='write')
@@ -48,7 +48,7 @@ implicit none
     enTot = sph%enTotCalc()
     call sph%cols_to_cells()
     
-! Milieu --------------------------------------------------
+! Middle --------------------------------------------------
 
     write(*, *) "Début des cycles"
     open(unit=unitObs, recl=4096, file="obs.out", status='new', &
@@ -99,7 +99,7 @@ implicit none
     close(unitObs)
     write(*, *) "Fin des cycles"
 
-! Fin -----------------------------------------------------
+! End -----------------------------------------------------
 
     call sph%overlapTest()
     
