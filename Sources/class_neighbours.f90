@@ -50,7 +50,7 @@ contains
     
     subroutine Neighbours_alloc_Cells(this)
     
-        class(Component), intent(inout) :: this
+        class(Neighbours), intent(inout) :: this
     
         integer :: iCell, nCells
         
@@ -90,7 +90,7 @@ contains
     
     subroutine Neighbours_dealloc_Cells(this)
     
-        class(Component), intent(inout) :: this
+        class(Neighbours), intent(inout) :: this
     
         integer :: iCell
         integer :: nCells
@@ -109,7 +109,7 @@ contains
     
     subroutine Neighbours_check_CellsSize(this, rcut)
     
-        class(Component), intent(in) :: this
+        class(Neighbours), intent(in) :: this
         real(DP), intent(in) :: rcut
         
         integer :: iDir
@@ -138,7 +138,7 @@ contains
     function Neighbours_position_to_cell(this, xCol) &
         result(position_to_cell)
     
-        class(Component), intent(in) :: this
+        class(Neighbours), intent(in) :: this
         real(DP), dimension(Dim), intent(in) :: xCol
         
         integer, dimension(Dim) :: cell_coord
@@ -153,7 +153,7 @@ contains
     
     subroutine Neighbours_all_col_to_cell(this, Ncol, X)
     
-        class(Component), intent(inout) :: this
+        class(Neighbours), intent(inout) :: this
         integer, intent(in) :: Ncol
         real(DP), dimension(:, :), intent(inout) :: X
     
@@ -188,7 +188,7 @@ contains
     
     subroutine Neighbours_remove_cell_col(this, iCol, iCellBefore)
     
-        class(Component), intent(inout) :: this
+        class(Neighbours), intent(inout) :: this
     
         integer, intent(in) :: iCol, iCellBefore
         
@@ -223,7 +223,7 @@ contains
     
     subroutine Neighbours_add_cell_col(this, iCol, iCellAfter)
     
-        class(Component), intent(inout) :: this
+        class(Neighbours), intent(inout) :: this
     
         integer, intent(in) :: iCol, iCellAfter
     
@@ -259,7 +259,7 @@ contains
     
     function Neighbours_cell_coord_to_ind(this, coord) result(cell_coord_to_ind)
         
-        class(Component), intent(in) :: this    
+        class(Neighbours), intent(in) :: this    
         integer, dimension(Dim), intent(in) :: coord
         
         integer :: cell_coord_to_ind
@@ -284,7 +284,7 @@ contains
     
     function Neighbours_cell_period(this, coord) result(cell_period)
     
-        class(Component), intent(in) :: this    
+        class(Neighbours), intent(in) :: this    
         integer, dimension(Dim), intent(in) :: coord
         
         integer, dimension(Dim) :: cell_period
@@ -303,7 +303,7 @@ contains
     
     subroutine Neighbours_ini_cell_neighs(this)
     
-        class(Component), intent(inout) :: this 
+        class(Neighbours), intent(inout) :: this 
     
         integer :: i, j, k, ind
         integer :: neigh_i, neigh_j, neigh_k, neigh_ind
