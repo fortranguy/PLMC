@@ -10,7 +10,7 @@ use class_component
 
 implicit none
 
-    contains
+contains
 
     ! Générateurs de nombres aléatoires : graine ------------------------------
     
