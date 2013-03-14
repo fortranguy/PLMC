@@ -72,21 +72,21 @@ public :: sph_constructor
         
     contains
     
-        procedure :: rapport => component_rapport
-        procedure :: destructor => component_destructor
-        procedure :: snapShot => component_snapShot
-        procedure :: overlapTest => component_overlapTest
+        procedure :: rapport => Component_rapport
+        procedure :: destructor => Component_destructor
+        procedure :: snapShot => Component_snapShot
+        procedure :: overlapTest => Component_overlapTest
         
-        procedure :: adapt_dx => component_adapt_dx
-        procedure :: getDx => component_getDx
+        procedure :: adapt_dx => Component_adapt_dx
+        procedure :: getDx => Component_getDx
         
-        procedure :: ePotIni => component_ePotIni
-        procedure :: ePot => component_ePot
-        procedure :: ePotNeigh => component_ePotNeigh
-        procedure :: enTotCalc => component_enTotCalc
+        procedure :: ePotIni => Component_ePotIni
+        procedure :: ePot => Component_ePot
+        procedure :: ePotNeigh => Component_ePotNeigh
+        procedure :: enTotCalc => Component_enTotCalc
         
-        procedure :: mcMove => component_mcMove
-        procedure :: widom => component_widom
+        procedure :: mcMove => Component_mcMove
+        procedure :: widom => Component_widom
         
     end type Component
     
@@ -123,7 +123,7 @@ contains
     
     ! Report ------------------------------------------------------------------
     
-    subroutine component_rapport(this, nWidom, unitRapport)
+    subroutine Component_rapport(this, nWidom, unitRapport)
     
         class(Component), intent(in) :: this
         integer, intent(in) :: nWidom
@@ -144,20 +144,20 @@ contains
         write(unitRapport, *) "    cell_coordMax(:) = ", this%cell_coordMax(:)
         write(unitRapport, *) "    cell_Lsize(:) = ", this%cell_Lsize(:)
         
-    end subroutine component_rapport
+    end subroutine Component_rapport
     
-    subroutine component_destructor(this)
+    subroutine Component_destructor(this)
     
         class(Component), intent(inout) :: this
         
         deallocate(this%X)
         deallocate(this%Vtab)
     
-    end subroutine component_destructor
+    end subroutine Component_destructor
     
     ! Configuration state -----------------------------------------------------
       
-    subroutine component_snapShot(this, unitSnap)
+    subroutine Component_snapShot(this, unitSnap)
         
         class(Component), intent(in) :: this
         integer, intent(in) :: unitSnap
@@ -168,11 +168,11 @@ contains
             write(unitSnap, *) this%X(:, iCol)
         end do    
 
-    end subroutine component_snapShot
+    end subroutine Component_snapShot
     
     ! Overlapt test -----------------------------------------------------------
     
-    subroutine component_overlapTest(this)
+    subroutine Component_overlapTest(this)
     
         class(Component), intent(in) :: this
     
@@ -196,11 +196,11 @@ contains
         
         write(*, *) "    Overlap test : OK !"
     
-    end subroutine component_overlapTest
+    end subroutine Component_overlapTest
     
     ! Adaptation of dx during the thermalisation ------------------------------
     
-    subroutine component_adapt_dx(this, iStep, tauxRejectsSum, unitRapport)
+    subroutine Component_adapt_dx(this, iStep, tauxRejectsSum, unitRapport)
     
          class(Component), intent(inout) :: this 
         integer, intent(in) :: iStep, unitRapport
@@ -242,23 +242,23 @@ contains
             
         end if
     
-    end subroutine component_adapt_dx
+    end subroutine Component_adapt_dx
     
     ! -----------------------
     
-    function component_getDx(this)
+    function Component_getDx(this)
         
         class(Component), intent(in) :: this
         
-        real(DP) :: component_getDx
+        real(DP) :: Component_getDx
         
-        component_getDx = sqrt(dot_product(this%dx, this%dx))
+        Component_getDx = sqrt(dot_product(this%dx, this%dx))
         
-    end function component_getDx
+    end function Component_getDx
     
     ! Potential energy --------------------------------------------------------
     
-    subroutine component_ePotIni(this)
+    subroutine Component_ePotIni(this)
     
         class(Component), intent(inout) :: this
 
@@ -275,9 +275,9 @@ contains
         this%Vtab(:) = this%Vtab(:) - this%epsilon * &
             exp(-this%alpha*(this%rcut-this%rmin)) / this%rcut
 
-    end subroutine component_ePotIni
+    end subroutine Component_ePotIni
 
-    function component_ePot(this, r) result(ePot)
+    function Component_ePot(this, r) result(ePot)
         
         class(Component), intent(in) :: this
         real(DP), intent(in) :: r
@@ -298,11 +298,11 @@ contains
            
         end if
         
-    end function component_ePot
+    end function Component_ePot
     
     ! -----------------------
     
-    subroutine component_ePotNeigh(this, iCol, xCol, iCell, overlap, energ)
+    subroutine Component_ePotNeigh(this, iCol, xCol, iCell, overlap, energ)
         
         class(Component), intent(in) :: this        
         integer, intent(in) :: iCol, iCell
@@ -347,11 +347,11 @@ contains
             
         end do
     
-    end subroutine component_ePotNeigh
+    end subroutine Component_ePotNeigh
     
     ! Particle move -----------------------------------------------------------
     
-    subroutine component_mcMove(this, enTot, Nrejects)
+    subroutine Component_mcMove(this, enTot, Nrejects)
     
         class(Component), intent(inout) :: this
         real(DP), intent(inout) :: enTot
@@ -401,11 +401,11 @@ contains
             
         end if
     
-    end subroutine component_mcMove
+    end subroutine Component_mcMove
     
     ! Widom's method -----------------------------------------------------------
 
-    subroutine component_widom(this, nWidom, activExInv)
+    subroutine Component_widom(this, nWidom, activExInv)
         
         class(Component), intent(in) :: this
         integer, intent(in) :: nWidom
@@ -435,11 +435,11 @@ contains
         
         activExInv = widTestSum/real(nWidom, DP)
         
-    end subroutine component_widom
+    end subroutine Component_widom
 
     ! Total potential energy
     
-    function component_enTotCalc(this) result(enTotCalc)
+    function Component_enTotCalc(this) result(enTotCalc)
     
         class(Component), intent(in) :: this
         
@@ -462,6 +462,6 @@ contains
         
         enTotCalc = 0.5_DP*enTotCalc
     
-    end function component_enTotCalc
+    end function Component_enTotCalc
 
 end module class_component
