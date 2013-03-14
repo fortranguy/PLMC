@@ -50,7 +50,7 @@ contains
 
     function neigh_constructor(rcut)
     
-        real(DP), intent(in) :: rcut    
+        real(DP), intent(in) :: rcut
         type(Neighbours) :: neigh_constructor
         
         neigh_constructor%cell_Lsize(:) = [rcut, rcut, rcut]
