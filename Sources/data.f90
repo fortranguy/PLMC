@@ -60,8 +60,8 @@ implicit none
     real(DP), parameter :: Tstar = 1._DP
     integer, parameter :: Nstep = 2**10
     integer, parameter :: Ntherm = 2**8
-    integer, parameter :: Nmove = 2**2 * sph_Ncol ! new
-    real(DP), dimension(Dim), parameter :: sph_dx = 2._DP ! new, à modifier.
+    integer, parameter :: Nmove = 2**2 * sph_Ncol
+    real(DP), dimension(Dim), parameter :: sph_dx = 2._DP
 
 end module data_mc
 !***********************************************************************
