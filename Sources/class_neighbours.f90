@@ -75,15 +75,15 @@ contains
     
         class(Neighbours), intent(inout) :: this
     
-        integer :: iCell, ncells
+        integer :: iCell, nCells
         
-        ncells = product(this%cell_coordMax)
+        nCells = product(this%cell_coordMax)
 
-        allocate(this%cellsBegin(ncells))
-        allocate(this%cells(ncells))
-        allocate(this%cellsNext(ncells))
+        allocate(this%cellsBegin(nCells))
+        allocate(this%cells(nCells))
+        allocate(this%cellsNext(nCells))
         
-        do iCell = 1, ncells
+        do iCell = 1, nCells
 
             allocate(this%cellsBegin(iCell)%particle)
             this%cells(iCell)%particle => this%cellsBegin(iCell)%particle
@@ -116,10 +116,10 @@ contains
         class(Neighbours), intent(inout) :: this
     
         integer :: iCell
-        integer :: ncells
+        integer :: nCells
     
-        ncells = product(this%cell_coordMax)
-        do iCell = 1, ncells
+        nCells = product(this%cell_coordMax)
+        do iCell = 1, nCells
             if (associated(this%cellsBegin(iCell)%particle)) then
                 call libere_chaine(this%cellsBegin(iCell)%particle)
             end if
@@ -180,9 +180,9 @@ contains
         real(DP), dimension(:, :), intent(inout) :: X
     
         integer :: iCol
-        integer :: iCell, ncells
+        integer :: iCell, nCells
         
-        ncells = this%cell_coordMax(1) * this%cell_coordMax(2) * &
+        nCells = this%cell_coordMax(1) * this%cell_coordMax(2) * &
             this%cell_coordMax(3)
     
         do iCol = 1, Ncol
@@ -198,7 +198,7 @@ contains
             
         end do
         
-        do iCell = 1, ncells
+        do iCell = 1, nCells
             
             this%cells(iCell)%particle%next => null()
             
