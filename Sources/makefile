@@ -1,6 +1,6 @@
 FC = ifort
-FFLAGS = -warn all -check all -check noarg_temp_created
-LDFLAGS = -warn all -check all -check noarg_temp_created
+FFLAGS = #-warn all -check all -check noarg_temp_created
+LDFLAGS = #-warn all -check all -check noarg_temp_created
 FFLAGS_OMP = $(FFLAGS) -openmp 
 LDFLAGS_OMP = $(LDFLAGS) -openmp
 #FC = gfortran
@@ -16,23 +16,40 @@ all: $(EXEC1) $(EXEC2) $(EXEC3)
 
 data_copy.f90 : data.f90	
 	cp data.f90 data_copy.f90
-
-# ---------------------------
-
-$(EXEC1) : data.f90 class_neighbours.f90 class_component.f90 mod_tools.f90 \
-	mc_canonique.f90
-	$(FC) $(FFLAGS) $(LDFLAGS) $^ -o $@
 	
 # ---------------------------
 
-$(EXEC2) : data_copy.f90 bunching.f90
-	$(FC) $^ $(FFLAGS) $(LDFLAGS) -o $@
+data.o: data_copy.f90
+	$(FC) -c $(FFLAGS) $< -o $@
+class_neighbours.o: class_neighbours.f90
+	$(FC) -c $(FFLAGS) $< -o $@
+class_component.o: class_component.f90
+	$(FC) -c $(FFLAGS) $< -o $@
+mod_tools.o: mod_tools.f90
+	$(FC) -c $(FFLAGS) $< -o $@
 
 # ---------------------------
 
-$(EXEC3) : data_copy.f90 class_neighbours.f90 class_component.f90 mod_tools.f90 \
-	distrib.f90
-	$(FC) $^ $(FFLAGS_OMP) $(LDFLAGS_OMP) -o $@
+mc_canonique.o: mc_canonique.f90
+	$(FC) -c $(FFLAGS) $< -o $@
+$(EXEC1) : data.o class_neighbours.o class_component.o mod_tools.o \
+	mc_canonique.o
+	$(FC) $^ $(LDFLAGS) -o $@
+	
+# ---------------------------
+
+bunching.o: bunching.f90
+	$(FC) -c $(FFLAGS) $< -o $@
+$(EXEC2) : data.o bunching.o
+	$(FC) $^ $(LDFLAGS) -o $@
+
+# ---------------------------
+
+distrib.o: distrib.f90
+	$(FC) -c $(FFLAGS_OMP) $< -o $@
+$(EXEC3) : data.o class_neighbours.o class_component.o mod_tools.o \
+	distrib.o
+	$(FC) $^ $(LDFLAGS_OMP) -o $@
 
 # ---------------------------------------------------------
 	
