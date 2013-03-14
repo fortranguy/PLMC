@@ -31,16 +31,16 @@ private
         
     contains
     
-        procedure :: alloc_Cells => component_alloc_Cells
-        procedure :: dealloc_Cells => component_dealloc_Cells
-        procedure :: check_CellsSize => component_check_CellsSize
-        procedure :: position_to_cell => component_position_to_cell
-        procedure :: all_col_to_cell => component_all_col_to_cell
-        procedure :: remove_cell_col => component_remove_cell_col
-        procedure :: add_cell_col => component_add_cell_col
-        procedure :: cell_coord_to_ind => component_cell_coord_to_ind
-        procedure :: cell_period => component_cell_period
-        procedure :: ini_cell_neighs => component_ini_cell_neighs
+        procedure :: alloc_Cells => Neighbours_alloc_Cells
+        procedure :: dealloc_Cells => Neighbours_dealloc_Cells
+        procedure :: check_CellsSize => Neighbours_check_CellsSize
+        procedure :: position_to_cell => Neighbours_position_to_cell
+        procedure :: all_col_to_cell => Neighbours_all_col_to_cell
+        procedure :: remove_cell_col => Neighbours_remove_cell_col
+        procedure :: add_cell_col => Neighbours_add_cell_col
+        procedure :: cell_coord_to_ind => Neighbours_cell_coord_to_ind
+        procedure :: cell_period => Neighbours_cell_period
+        procedure :: ini_cell_neighs => Neighbours_ini_cell_neighs
         
     end type Neighbours
     
@@ -48,7 +48,7 @@ contains
 
     ! Linked-list allocation
     
-    subroutine component_alloc_Cells(this)
+    subroutine Neighbours_alloc_Cells(this)
     
         class(Component), intent(inout) :: this
     
@@ -73,7 +73,7 @@ contains
     
         end do
         
-    end subroutine component_alloc_Cells
+    end subroutine Neighbours_alloc_Cells
     
     ! Linked-list deallocation
     
@@ -88,7 +88,7 @@ contains
         
     end subroutine libere_chaine
     
-    subroutine component_dealloc_Cells(this)
+    subroutine Neighbours_dealloc_Cells(this)
     
         class(Component), intent(inout) :: this
     
@@ -103,11 +103,11 @@ contains
             end if
         end do
     
-    end subroutine component_dealloc_Cells
+    end subroutine Neighbours_dealloc_Cells
     
     ! Neighbours cells size check
     
-    subroutine component_check_CellsSize(this, rcut)
+    subroutine Neighbours_check_CellsSize(this, rcut)
     
         class(Component), intent(in) :: this
         real(DP), intent(in) :: rcut
@@ -131,11 +131,11 @@ contains
             
         end do
         
-    end subroutine component_check_CellsSize
+    end subroutine Neighbours_check_CellsSize
     
     ! Assignment : particle -> cell
     
-    function component_position_to_cell(this, xCol) &
+    function Neighbours_position_to_cell(this, xCol) &
         result(position_to_cell)
     
         class(Component), intent(in) :: this
@@ -149,9 +149,9 @@ contains
             (cell_coord(2)-1) + this%cell_coordMax(1) * &
             this%cell_coordMax(2) * (cell_coord(3)-1)
     
-    end function component_position_to_cell
+    end function Neighbours_position_to_cell
     
-    subroutine component_all_col_to_cell(this, Ncol, X)
+    subroutine Neighbours_all_col_to_cell(this, Ncol, X)
     
         class(Component), intent(inout) :: this
         integer, intent(in) :: Ncol
@@ -182,11 +182,11 @@ contains
             
         end do
         
-    end subroutine component_all_col_to_cell
+    end subroutine Neighbours_all_col_to_cell
     
     ! Neighbours cells update
     
-    subroutine component_remove_cell_col(this, iCol, iCellBefore)
+    subroutine Neighbours_remove_cell_col(this, iCol, iCellBefore)
     
         class(Component), intent(inout) :: this
     
@@ -219,9 +219,9 @@ contains
         
         end do
             
-    end subroutine component_remove_cell_col   
+    end subroutine Neighbours_remove_cell_col   
     
-    subroutine component_add_cell_col(this, iCol, iCellAfter)
+    subroutine Neighbours_add_cell_col(this, iCol, iCellAfter)
     
         class(Component), intent(inout) :: this
     
@@ -251,13 +251,13 @@ contains
             
         end do
             
-    end  subroutine component_add_cell_col
+    end  subroutine Neighbours_add_cell_col
     
 ! -----------------------------------------------------------------------------
 ! Neighbours :
 ! -----------------------------------------------------------------------------
     
-    function component_cell_coord_to_ind(this, coord) result(cell_coord_to_ind)
+    function Neighbours_cell_coord_to_ind(this, coord) result(cell_coord_to_ind)
         
         class(Component), intent(in) :: this    
         integer, dimension(Dim), intent(in) :: coord
@@ -267,7 +267,7 @@ contains
         cell_coord_to_ind = coord(1) + this%cell_coordMax(1)*(coord(2)-1) + &
             this%cell_coordMax(1)*this%cell_coordMax(2)*(coord(3)-1)
     
-    end function component_cell_coord_to_ind
+    end function Neighbours_cell_coord_to_ind
     
     function cell_neigh_coord_to_ind(neigh_coord)
     
@@ -282,7 +282,7 @@ contains
     
     end function cell_neigh_coord_to_ind
     
-    function component_cell_period(this, coord) result(cell_period)
+    function Neighbours_cell_period(this, coord) result(cell_period)
     
         class(Component), intent(in) :: this    
         integer, dimension(Dim), intent(in) :: coord
@@ -299,9 +299,9 @@ contains
             cell_period(:) = cell_period(:) - this%cell_coordMax(:)
         end where
     
-    end function component_cell_period
+    end function Neighbours_cell_period
     
-    subroutine component_ini_cell_neighs(this)
+    subroutine Neighbours_ini_cell_neighs(this)
     
         class(Component), intent(inout) :: this 
     
@@ -337,6 +337,6 @@ contains
         end do
         end do
             
-    end subroutine component_ini_cell_neighs
+    end subroutine Neighbours_ini_cell_neighs
 
 end module class_neighbours
