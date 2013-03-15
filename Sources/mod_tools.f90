@@ -9,7 +9,7 @@ implicit none
 
 contains
 
-    ! Générateurs de nombres aléatoires : graine ------------------------------
+    ! Random number generator : seed ------------------------------
     
     subroutine init_random_seed(unitRapport)
     
@@ -26,7 +26,7 @@ contains
         seed(:) = clock + 37 * [ (i - 1, i = 1, n) ]
         call random_seed(put = seed)
         
-        write(unitRapport, *) "Graine :"
+        write(unitRapport, *) "RNG :"
         write(unitRapport ,*) "    n = ", n
         write(unitRapport ,*) "    seed(:) = ", seed(:)
 
@@ -34,7 +34,7 @@ contains
         
     end subroutine init_random_seed
     
-    ! Condition initiale ------------------------------------------------------
+    ! Initial condition ------------------------------------------------------
     
     subroutine condIni(unitRapport, sph_X)
     
@@ -46,31 +46,31 @@ contains
         integer :: longueur, statut
         
         call get_command_argument(1, init, longueur, statut)
-        if (statut /= 0) stop "erreur get_command_argument"
-        if (command_argument_count() > 1) stop "Trop d'arguments"
+        if (statut /= 0) stop "error get_command_argument"
+        if (command_argument_count() > 1) stop "Too many arguments"
             
-        write(unitRapport, *) "Condition initiale :"
+        write(unitRapport, *) "Initial condition :"
         
         select case (init)
             case ("cube")
                 call iniPosCub(sph_X)
-                write(unitRapport, *) "    Cubique simple"
-            case ("alea")
+                write(unitRapport, *) "    Primitive cubic"
+            case ("rand")
                 call iniPosAlea(sph_X)
-                write(unitRapport, *) "    Déposition aléatoire"
+                write(unitRapport, *) "    Random deposition"
             case default
-                write(*, *) "Préciser la condition initiale : "
-                write(*, *) "   'cube' ou 'alea'."
+                write(*, *) "Enter the initial condition : "
+                write(*, *) "   'cube' or 'rand'."
                 stop
         end select
         
         densite = real(sph_Ncol, DP) / product(Lsize)
-        write(*, *) "    Densité = ", densite
-        write(unitRapport, *) "    Densité = ", densite
+        write(*, *) "    Density = ", densite
+        write(unitRapport, *) "    Density = ", densite
         
         compac = 4._DP/3._DP*PI*sph_radius**3 * densite
-        write(*, *) "    Compacité = ", compac
-        write(unitRapport, *) "    Compacité = ", compac
+        write(*, *) "    Compacity = ", compac
+        write(unitRapport, *) "    Compacity = ", compac
         
     end subroutine condIni
     
@@ -84,7 +84,7 @@ contains
         real(DP), dimension(Dim) :: ratio
         real(DP) :: oneThird = 1._DP/3._DP
         
-        write(*, *) "Cubique simple"
+        write(*, *) "Primitive cubic"
         
         ! Proportion selon la direction
         
@@ -103,8 +103,7 @@ contains
         ratio(:) = Lsize(:)/real(nCols(:), DP) ! A vérifier
         do iDir = 1, Dim
             if ( sph_rmin*real(nCols(iDir), DP) > Lsize(iDir) ) then
-                write(*, *) "    Problème : trop dense dans la direction ",&
-                iDir
+                write(*, *) "    Error : too dense in the direction", iDir
                 stop
             end if
         end do
@@ -140,7 +139,7 @@ contains
         real(DP), dimension(Dim) :: xTest
         real(DP) :: rTest
     
-        write(*, *) "Déposition aléatoire"
+        write(*, *) "Random deposition"
     
         call random_number(sph_X(:, 1))
         sph_X(:, 1) = sph_X(:, 1)*(Lsize(:)-2*sph_radius)
@@ -177,31 +176,31 @@ contains
     
     ! Résultats ---------------------------------------------------------------
         
-    subroutine mcResults(enTotSum, activExInvSum, tauxRejectsSum, duree,&
+    subroutine mcResults(enTotSum, activExInvSum, tauxRejectsSum, duration, &
     	unitRapport)
 
         real(DP), intent(in) :: enTotSum, activExInvSum     
         real(DP), intent(in) :: tauxRejectsSum
-        real(DP), intent(in) :: duree
+        real(DP), intent(in) :: duration
         integer, intent(in) :: unitRapport
         
         real(DP) :: realNstep = real(Nstep, DP)
         real(DP) :: potChiId, potChiEx
     
-        write(unitRapport, *) "Résultats :"
-        write(unitRapport, *) "    Energie moyenne = ", &
+        write(unitRapport, *) "Results :"
+        write(unitRapport, *) "    average energy = ", &
             enTotSum/realNstep
-        write(unitRapport, *) "    Energie moyenne par particule = ", &
+        write(unitRapport, *) "    average energy per particule = ", &
             enTotSum/realNstep/real(sph_Ncol, DP)
         potChiId = -Tstar*log( product(Lsize)/real(sph_Ncol+1,DP) )
-        write(unitRapport, *) "    Potentiel chimique idéal = ", potChiId
+        write(unitRapport, *) "    ideal chemical potential = ", potChiId
         potChiEx = -Tstar*log( activExInvSum/realNstep )
-        write(unitRapport, *) "    Potentiel chimique (excès) moyen = ", &
+        write(unitRapport, *) "    average excess chemical potential = ", &
             potChiEx           
-        write(unitRapport, *) "    potChi.moy = ", potChiId + potChiEx
-        write(unitRapport, *) "    Taux rejets = ", &
+        write(unitRapport, *) "    potChi.avg = ", potChiId + potChiEx
+        write(unitRapport, *) "    Rejection rate = ", &
             tauxRejectsSum/real(Nstep+Ntherm, DP)
-        write(unitRapport, *) "    Durée =", duree/60._DP, "min"        
+        write(unitRapport, *) "    duration =", duration/60._DP, "min"        
     
     end subroutine mcResults
     
