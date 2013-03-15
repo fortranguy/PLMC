@@ -98,14 +98,14 @@ contains
     
     ! Linked-list deallocation
     
-    recursive subroutine libere_chaine(courant)
+    recursive subroutine libere_chaine(current)
 
-        type(Link), pointer :: courant
+        type(Link), pointer :: current
         
-        if (associated(courant%next)) then
-            call libere_chaine(courant%next)
+        if (associated(current%next)) then
+            call libere_chaine(current%next)
         end if
-        deallocate(courant)
+        deallocate(current)
         
     end subroutine libere_chaine
     
@@ -211,30 +211,30 @@ contains
     
         integer, intent(in) :: iCol, iCellBefore
         
-        type(Link), pointer :: courant => null()
-        type(Link), pointer :: suivant => null(), precedent => null()
+        type(Link), pointer :: current => null()
+        type(Link), pointer :: next => null(), previous => null()
     
-        precedent => this%cellsBegin(iCellBefore)%particle
-        courant => precedent%next
+        previous => this%cellsBegin(iCellBefore)%particle
+        current => previous%next
         
         do
         
-            suivant => courant%next
+            next => current%next
         
-            if ( courant%iCol == iCol ) then
+            if ( current%iCol == iCol ) then
             
-                precedent%next => courant%next
-                deallocate(courant)
-                courant => suivant
+                previous%next => current%next
+                deallocate(current)
+                current => next
                 exit
                 
             else
             
-                precedent => courant
+                previous => current
                 
             end if
             
-            courant => suivant
+            current => next
         
         end do
             
@@ -246,27 +246,27 @@ contains
     
         integer, intent(in) :: iCol, iCellAfter
     
-        type(Link), pointer :: nouveau => null()
-        type(Link), pointer :: suivant => null(), precedent => null()           
+        type(Link), pointer :: new => null()
+        type(Link), pointer :: next => null(), previous => null()           
           
         
-        precedent => this%cellsBegin(iCellAfter)%particle
+        previous => this%cellsBegin(iCellAfter)%particle
         
         do
         
-            suivant => precedent%next
+            next => previous%next
             
-            if (.not. associated(suivant%next)) then
+            if (.not. associated(next%next)) then
             
-                allocate(nouveau)
-                nouveau%next => precedent%next
-                precedent%next => nouveau
-                nouveau%iCol = iCol
+                allocate(new)
+                new%next => previous%next
+                previous%next => new
+                new%iCol = iCol
                 exit
                 
             end if
             
-            precedent => suivant
+            previous => next
             
         end do
             

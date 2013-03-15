@@ -298,7 +298,7 @@ contains
         integer :: iNeigh,  iCell_neigh
         real(DP) :: r
     
-        type(Link), pointer :: courant => null(), suivant => null()
+        type(Link), pointer :: current => null(), next => null()
         
         overlap = .false.
         energ = 0._DP
@@ -306,16 +306,16 @@ contains
         do iNeigh = 1, cell_neighs_nb
         
             iCell_neigh = this%same%cell_neighs(iNeigh, iCell)
-            courant => this%same%cellsBegin(iCell_neigh)%particle%next            
-            if (.not. associated(courant%next)) cycle
+            current => this%same%cellsBegin(iCell_neigh)%particle%next            
+            if (.not. associated(current%next)) cycle
             
             do
             
-                suivant => courant%next
+                next => current%next
             
-                if (courant%iCol /= iCol) then
+                if (current%iCol /= iCol) then
                 
-                    r = dist(xCol(:), this%X(:, courant%iCol))
+                    r = dist(xCol(:), this%X(:, current%iCol))
                     if (r < this%rmin) then
                         overlap = .true.
                         return
@@ -324,9 +324,9 @@ contains
        
                 end if
                 
-                if (.not. associated(suivant%next)) exit
+                if (.not. associated(next%next)) exit
                 
-                courant => suivant
+                current => next
             
             end do            
             
