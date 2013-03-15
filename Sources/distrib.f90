@@ -33,7 +33,7 @@ implicit none
 
 	real(DP), parameter :: densite = real(sph_Ncol, DP) / (Lsize1*Lsize2*Lsize3)
 	integer, dimension(:), allocatable :: distrib
-	integer, parameter :: unitSnapEnCours = 10, unitDistrib = 11, &
+	integer, parameter :: unitSnapShots = 10, unitDistrib = 11, &
 		unitEnerg = 12
 
 	integer :: iStep
@@ -61,7 +61,7 @@ implicit none
 	
 	distrib(:) = 0
 	
-	open(unit=unitSnapEnCours, recl=4096, file="snap.shot", status='old', &
+	open(unit=unitSnapShots, recl=4096, file="snap.shot", status='old', &
 		action='read')
 	
 	call cpu_time(tIni)
@@ -74,7 +74,7 @@ implicit none
 		! Lecture :
 		!$omp critical
 		do iCol = 1, sph_Ncol
-			read(unitSnapEnCours, *) X(:, iCol)
+			read(unitSnapShots, *) X(:, iCol)
 		end do
     	!$omp end critical
     
@@ -104,7 +104,7 @@ implicit none
 			! trompeur ?
 	close(100)
 	
-	close(unitSnapEnCours)
+	close(unitSnapShots)
 	
 	! Ecriture
 	

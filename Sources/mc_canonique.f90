@@ -24,7 +24,7 @@ implicit none
     type(Component) :: sph
     
     integer, parameter :: unitObs = 10, unitSnapIni = 11, unitSnapFin = 12, &
-        unitReport = 13, unitObsTherm = 14, unit_dx = 15, unitSnapEnCours = 16
+        unitReport = 13, unitObsTherm = 14, unit_dx = 15, unitSnapShots = 16
         
     sph = sph_constructor()
     
@@ -61,7 +61,7 @@ implicit none
         action='write')
     open(unit=unit_dx, recl=4096, file="dx.out", status='new', &
         action='write')
-    open(unit=unitSnapEnCours, recl=4096, file="snap.shot", status='new', &
+    open(unit=unitSnapShots, recl=4096, file="snap.shot", status='new', &
         action='write')
     
     call cpu_time(tIni)
@@ -86,7 +86,7 @@ implicit none
             write(unitObs, *) iStep, enTot, activExInv
             
             if (snap) then
-                call sph%snapShot(unitSnapEnCours)
+                call sph%snapShot(unitSnapShots)
             end if
             
         end if
@@ -97,7 +97,7 @@ implicit none
     end do
     call cpu_time(tFin)
     
-    close(unitSnapEnCours)
+    close(unitSnapShots)
     close(unit_dx)
     close(unitObsTherm)
     close(unitObs)

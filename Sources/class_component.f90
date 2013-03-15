@@ -242,7 +242,7 @@ contains
     end function Component_get_dx
     
     ! Potential energy --------------------------------------------------------
-    
+    !	Tabulation(?) of Yukawa potential
     subroutine Component_ePotIni(this)
     
         class(Component), intent(inout) :: this
