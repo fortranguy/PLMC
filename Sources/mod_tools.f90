@@ -86,13 +86,13 @@ contains
         
         write(*, *) "Primitive cubic"
         
-        ! Proportion selon la direction
+        ! Proportion according to the direction
         
         nCols(1) = int( (sph_Ncol*Lsize(1)**2/Lsize(2)/Lsize(3))**oneThird )
         nCols(2) = int( (sph_Ncol*Lsize(2)**2/Lsize(3)/Lsize(1))**oneThird )
         nCols(3) = int( (sph_Ncol*Lsize(3)**2/Lsize(1)/Lsize(2))**oneThird )
         
-        ! Vérification
+        ! Check
         
         iDir = 1
         do while (product(nCols)<sph_Ncol)
@@ -108,7 +108,7 @@ contains
             end if
         end do
         
-        ! Remplissage
+        ! Filling
         
         do k = 1, nCols(3)
             do j = 1, nCols(2)
@@ -124,7 +124,7 @@ contains
         end do
     
         do iDir = 1, Dim
-            sph_X(iDir, :) = sph_X(iDir, :) - 0.5_DP*ratio(iDir) ! nécessaire ? tradition
+            sph_X(iDir, :) = sph_X(iDir, :) - 0.5_DP*ratio(iDir) ! just inside
         end do
     
     end subroutine iniPosCub
@@ -174,7 +174,7 @@ contains
     
     end subroutine iniPosAlea
     
-    ! Résultats ---------------------------------------------------------------
+    ! Results ---------------------------------------------------------------
         
     subroutine mcResults(enTotSum, activExInvSum, tauxRejectsSum, duration, &
     	unitRapport)

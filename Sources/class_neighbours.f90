@@ -272,7 +272,7 @@ contains
             
     end  subroutine Neighbours_add_cell_col
     
-	! Neighbours cells --------------------------------------------------------
+	! Neighbour cells --------------------------------------------------------
     
     function Neighbours_cell_coord_to_ind(this, coord) &
     	result(cell_coord_to_ind)
