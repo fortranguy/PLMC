@@ -24,7 +24,7 @@ use data_constants
 use data_distrib
 use data_particles
 use mod_dist
-use mod_pbc
+use mod_physics
 use class_component
 use mod_tools
 !$ use omp_lib
