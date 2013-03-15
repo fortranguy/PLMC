@@ -105,3 +105,6 @@
     
 22 02 13
     04:41 : Sources : données : in classe, mais modifiable. Grave ?
+    
+15 03 13
+	17:29 : Attention : traduction anglaise -> cassure dans scripts.
