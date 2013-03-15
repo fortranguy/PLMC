@@ -11,27 +11,29 @@ implicit none
 ! Beginning ---------------------------------------------------
 
     ! Initialisation
+    
     integer :: iStep, iMove
     integer :: Nrejects
     real(DP) :: tauxRejectsSum
     real(DP) :: enTot, enTotSum
-    real(DP) :: activExInv, activExInvSum ! inverse de l'activité
-    integer, parameter :: nWidom = sph_Ncol ! nombre de particules test
+    !	inverse of activity :
+    real(DP) :: activExInv, activExInvSum
+    !	number of test particles :
+    integer, parameter :: nWidom = sph_Ncol
     real(DP) :: tIni, tFin
+    type(Component) :: sph
     
     integer, parameter :: unitObs = 10, unitSnapIni = 11, unitSnapFin = 12, &
         unitRapport = 13, unitObsTherm = 14, unit_dx = 15, unitSnapEnCours = 16
         
-    type(Component) :: sph
-    
     sph = sph_constructor()
-        
-    write(*, *) "MC_C+Neigh : Vol =", product(Lsize)
     
     Nrejects = 0
     tauxRejectsSum = 0._DP
     enTotSum = 0._DP
     activExInvSum = 0._DP
+    
+    write(*, *) "Monte-Carlo - Canonical : Volume =", product(Lsize)
     
     open(unit=unitRapport, recl=4096, file="rapport.out", status='new', &
         action='write')
@@ -39,18 +41,20 @@ implicit none
     call init_random_seed(unitRapport)
     
     ! Initial condition
+    
     call condIni(unitRapport, sph%X)
     open(unit=unitSnapIni, recl=4096, file="snapShotIni.out", status='new', &
         action='write')
         call sph%snapShot(unitSnapIni)
     close(unitSnapIni)
+    
     call sph%overlapTest()
     enTot = sph%enTotCalc()
     call sph%cols_to_cells()
     
 ! Middle --------------------------------------------------
 
-    write(*, *) "Début des cycles"
+    write(*, *) "Beginning of cycles"
     open(unit=unitObs, recl=4096, file="obs.out", status='new', &
         action='write')
     open(unit=unitObsTherm, recl=4096, file="obsTherm.out", status='new', &
@@ -97,13 +101,13 @@ implicit none
     close(unit_dx)
     close(unitObsTherm)
     close(unitObs)
-    write(*, *) "Fin des cycles"
+    write(*, *) "End of cycles"
 
 ! End -----------------------------------------------------
 
     call sph%overlapTest()
     
-    write(unitRapport, *) "Test de consistence :"
+    write(unitRapport, *) "Consistency test:"
     write(unitRapport, *) "    enTot_mc_c = ", enTot
     write(unitRapport, *) "    enTot_calc = ", sph%enTotCalc()
     
