@@ -23,10 +23,11 @@ program distribution
 use data_constants
 use data_distrib
 use data_particles
+use data_mc
+use data_potentiel
 use mod_dist
 use mod_physics
 use class_component
-use mod_tools
 !$ use omp_lib
 
 implicit none
@@ -70,26 +71,26 @@ implicit none
 	!$ nb_taches = omp_get_num_threads()
 	!$omp do schedule(static, Nstep/nb_taches) reduction(+:distrib)
 	do iStep = 1, Nstep
-	
+
 		! Lecture :
 		!$omp critical
 		do iCol = 1, sph_Ncol
 			read(unitSnapShots, *) X(:, iCol)
 		end do
-    	!$omp end critical
-    
+		!$omp end critical
+	
 		! Traitement
 		 
 		do iCol = 1, sph_Ncol
 			do jCol = iCol + 1, sph_Ncol
-		
+	
 				r_ij = dist(X(:, iCol), X(:, jCol))		        
-		        iDist =  int(r_ij/deltaDist)
-		        distrib(iDist) = distrib(iDist) + 1
-		
+			    iDist =  int(r_ij/deltaDist)
+			    distrib(iDist) = distrib(iDist) + 1
+	
 			end do		
 		end do
-		
+	
 	end do
 	!$omp end do nowait
 	!$omp end parallel
