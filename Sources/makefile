@@ -22,7 +22,7 @@ data_copy.f90 : data.f90
 data.o: data_copy.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 mod_physics.o: mod_physics.f90
-	$(FC) -c $(FFLAGS) $< -o $@
+	$(FC) -c $(FFLAGS_OMP) $< -o $@
 class_neighbours.o: class_neighbours.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_component.o: class_component.f90
