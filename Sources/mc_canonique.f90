@@ -24,7 +24,7 @@ implicit none
     type(Component) :: sph
     
     integer, parameter :: unitObs = 10, unitSnapIni = 11, unitSnapFin = 12, &
-        unitRapport = 13, unitObsTherm = 14, unit_dx = 15, unitSnapEnCours = 16
+        unitReport = 13, unitObsTherm = 14, unit_dx = 15, unitSnapEnCours = 16
         
     sph = sph_constructor()
     
@@ -35,14 +35,14 @@ implicit none
     
     write(*, *) "Monte-Carlo - Canonical : Volume =", product(Lsize)
     
-    open(unit=unitRapport, recl=4096, file="rapport.out", status='new', &
+    open(unit=unitReport, recl=4096, file="report.out", status='new', &
         action='write')
-    call sph%rapport(nWidom, unitRapport)
-    call init_random_seed(unitRapport)
+    call sph%report(nWidom, unitReport)
+    call init_random_seed(unitReport)
     
     ! Initial condition
     
-    call condIni(unitRapport, sph%X)
+    call condIni(unitReport, sph%X)
     open(unit=unitSnapIni, recl=4096, file="snapShotIni.out", status='new', &
         action='write')
         call sph%snapShot(unitSnapIni)
@@ -75,8 +75,8 @@ implicit none
         
         if (iStep <= Ntherm) then
         
-            call sph%adapt_dx(iStep, tauxRejectsSum, unitRapport)
-            write(unit_dx, *) iStep, sph%getDx(), tauxRejectsSum/real(iStep, DP)
+            call sph%adapt_dx(iStep, tauxRejectsSum, unitReport)
+            write(unit_dx, *) iStep, sph%get_dx(), tauxRejectsSum/real(iStep, DP)
             write(unitObsTherm, *) iStep, enTot, activExInv
         
         else
@@ -107,13 +107,13 @@ implicit none
 
     call sph%overlapTest()
     
-    write(unitRapport, *) "Consistency test:"
-    write(unitRapport, *) "    enTot_mc_c = ", enTot
-    write(unitRapport, *) "    enTot_calc = ", sph%enTotCalc()
+    write(unitReport, *) "Consistency test:"
+    write(unitReport, *) "    enTot_mc_c = ", enTot
+    write(unitReport, *) "    enTot_calc = ", sph%enTotCalc()
     
     call mcResults(enTotSum, activExInvSum, tauxRejectsSum, tFin-tIni,&
-        unitRapport)
-    close(unitRapport)
+        unitReport)
+    close(unitReport)
     
     open(unit=unitSnapFin, recl=4096, file="snapShotFin.out", status='new', &
         action='write')

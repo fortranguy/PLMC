@@ -37,19 +37,19 @@ public :: sph_constructor
         real(DP), dimension(:), allocatable, private :: Vtab
         
         ! Neighbours (cell/grid scheme)
-        
+        !	same kind
         type(Neighbours), private :: same
         
     contains
     
         procedure :: destructor => Component_destructor
-        procedure :: rapport => Component_rapport
+        procedure :: report => Component_report
         procedure :: snapShot => Component_snapShot
         procedure :: overlapTest => Component_overlapTest
         procedure :: cols_to_cells => Component_cols_to_cells
         
         procedure :: adapt_dx => Component_adapt_dx
-        procedure :: getDx => Component_getDx
+        procedure :: get_dx => Component_get_dx
         
         procedure :: ePotIni => Component_ePotIni
         procedure :: ePot => Component_ePot
@@ -105,28 +105,29 @@ contains
     
     ! Report ------------------------------------------------------------------
     
-    subroutine Component_rapport(this, nWidom, unitRapport)
+    subroutine Component_report(this, nWidom, unitReport)
     
         class(Component), intent(in) :: this
         integer, intent(in) :: nWidom
-        integer, intent(in) :: unitRapport    
+        integer, intent(in) :: unitReport    
         
-        write(unitRapport, *) "Simulation MC_C :"
-        write(unitRapport ,*) "    Lsize(:) = ", Lsize(:)
-        write(unitRapport ,*) "    Vol = ", product(Lsize)
-        write(unitRapport ,*) "    Ncol = ", this%Ncol
-        write(unitRapport ,*) "    nWidom = ", nWidom
-        write(unitRapport, *) "    Nstep = ", Nstep
-        write(unitRapport, *) "    Ntherm = ", Ntherm
-        write(unitRapport, *) "    Nmove = ", Nmove
-        write(unitRapport, *) "    epsilon = ", this%epsilon
-        write(unitRapport, *) "    alpha = ", this%alpha
-        write(unitRapport, *) "    rcut = ", this%rcut
-        write(unitRapport, *) "    pas = ", this%pas
-        write(unitRapport, *) "    cell_coordMax(:) = ", this%same%cell_coordMax(:)
-        write(unitRapport, *) "    cell_Lsize(:) = ", this%same%cell_Lsize(:)
+        write(unitReport, *) "Simulation MC_C :"
+        write(unitReport ,*) "    Lsize(:) = ", Lsize(:)
+        write(unitReport ,*) "    Vol = ", product(Lsize)
+        write(unitReport ,*) "    Ncol = ", this%Ncol
+        write(unitReport ,*) "    nWidom = ", nWidom
+        write(unitReport, *) "    Nstep = ", Nstep
+        write(unitReport, *) "    Ntherm = ", Ntherm
+        write(unitReport, *) "    Nmove = ", Nmove
+        write(unitReport, *) "    epsilon = ", this%epsilon
+        write(unitReport, *) "    alpha = ", this%alpha
+        write(unitReport, *) "    rcut = ", this%rcut
+        write(unitReport, *) "    pas = ", this%pas
+        write(unitReport, *) "    cell_coordMax(:) = ", &
+        	this%same%cell_coordMax(:)
+        write(unitReport, *) "    cell_Lsize(:) = ", this%same%cell_Lsize(:)
         
-    end subroutine Component_rapport
+    end subroutine Component_report
     
     ! Configuration state -----------------------------------------------------
       
@@ -183,10 +184,10 @@ contains
     
     ! Adaptation of dx during the thermalisation ------------------------------
     
-    subroutine Component_adapt_dx(this, iStep, tauxRejectsSum, unitRapport)
+    subroutine Component_adapt_dx(this, iStep, tauxRejectsSum, unitReport)
     
         class(Component), intent(inout) :: this 
-        integer, intent(in) :: iStep, unitRapport
+        integer, intent(in) :: iStep, unitReport
         real(DP), intent(in) :: tauxRejectsSum    
         
         integer, parameter :: multiple = 2**2
@@ -214,13 +215,14 @@ contains
         if (iStep == Ntherm) then
         
             if (tauxRejects == 0._DP) then
-                write(*, *) "Problème adaptation dx."
+                write(*, *) "Error : dx adaptation problem"
                 stop
             end if
             
-            write(unitRapport, *) "Déplacement :"
-            write(unitRapport, *) "    dx(:) = ", this%dx(:)
-            write(unitRapport, *) "    écart relatif rejet = ", &
+            write(unitReport, *) "Displacement :"
+            write(unitReport, *) "    dx(:) = ", this%dx(:)
+            write(unitReport, *) "    rejection relative difference = ", &
+            							! wrong translation ?
                 abs(tauxRejects - tauxRejectsFix)/tauxRejectsFix
             
         end if
@@ -229,15 +231,15 @@ contains
     
     ! -----------------------
     
-    function Component_getDx(this)
+    function Component_get_dx(this)
         
         class(Component), intent(in) :: this
         
-        real(DP) :: Component_getDx
+        real(DP) :: Component_get_dx
+        ! average dx of 3 vector components
+        Component_get_dx = sum(this%dx)/size(this%dx)
         
-        Component_getDx = sqrt(dot_product(this%dx, this%dx))
-        
-    end function Component_getDx
+    end function Component_get_dx
     
     ! Potential energy --------------------------------------------------------
     
