@@ -98,16 +98,16 @@ contains
     
     ! Linked-list deallocation
     
-    recursive subroutine libere_chaine(current)
+    recursive subroutine free_link(current)
 
         type(Link), pointer :: current
         
         if (associated(current%next)) then
-            call libere_chaine(current%next)
+            call free_link(current%next)
         end if
         deallocate(current)
         
-    end subroutine libere_chaine
+    end subroutine free_link
     
     subroutine Neighbours_dealloc_cells(this)
     
@@ -119,7 +119,7 @@ contains
         nCells = product(this%cell_coordMax)
         do iCell = 1, nCells
             if (associated(this%cellsBegin(iCell)%particle)) then
-                call libere_chaine(this%cellsBegin(iCell)%particle)
+                call free_link(this%cellsBegin(iCell)%particle)
             end if
         end do
     
@@ -137,13 +137,13 @@ contains
         do iDir = 1, Dim
         
             if (this%cell_Lsize(iDir) < rcut) then
-                write(*, *) "Cellule trop petite dans la direction", iDir, ":"
+            	write(*, *) "Too small cell in the direction", iDir, ":"
                 write(*, *) this%cell_Lsize(iDir), "<", rcut
                 stop
             end if
             
             if (this%cell_coordMax(iDir) < cell_neigh_coordMax(iDir)) then
-                write(*, *) "Trop peu de cellules dans la direction", iDir, ":"
+                write(*, *) "Too few cells in the direction", iDir, ":"
                 write(*, *) this%cell_coordMax(iDir), "<",&
                     cell_neigh_coordMax(iDir)
                 stop
@@ -273,7 +273,7 @@ contains
     end  subroutine Neighbours_add_cell_col
     
 ! -----------------------------------------------------------------------------
-! Neighbours :
+! Neighbours cells
 ! -----------------------------------------------------------------------------
     
     function Neighbours_cell_coord_to_ind(this, coord) result(cell_coord_to_ind)
@@ -341,7 +341,7 @@ contains
                 neigh_coord(:) = [neigh_i, neigh_j, neigh_k]                
                 neigh_ind = cell_neigh_coord_to_ind(neigh_coord(:))          
                 neigh_coord(:) = neigh_coord(:) - cell_neigh_coordMax(:) + 1
-                    ! Par rapport au centre [i, j, k]
+                    ! with respect to the center (?) [i, j, k]
                 
                 coord(:) = [i, j, k] + neigh_coord(:)
                 
