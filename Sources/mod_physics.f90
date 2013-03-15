@@ -7,7 +7,7 @@ implicit none
 
 contains
 
-	! Distance between 2 positions : PBC --------------------------------------
+	! Distance between 2 positions with Periodic Boundary Condition ------------
     
     function dist(X1, X2)
     
