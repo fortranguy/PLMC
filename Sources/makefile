@@ -6,7 +6,7 @@ LDFLAGS_OMP = $(LDFLAGS) -openmp
 #FC = gfortran
 #FFLAGS = -W -Wall -fbounds-check
 #LDFLAGS = -W -Wall -fbounds-check
-EXEC1 = xMC_Canonique
+EXEC1 = xMC_Canonical
 EXEC2 = xBunching
 EXEC3 = xDistrib
 
@@ -32,10 +32,10 @@ mod_tools.o: mod_tools.f90
 
 # ---------------------------
 
-mc_canonique.o: mc_canonique.f90
+mc_canonical.o: mc_canonical.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 $(EXEC1) : data.o mod_physics.o class_neighbours.o class_component.o \
-	mod_tools.o mc_canonique.o
+	mod_tools.o mc_canonical.o
 	$(FC) $^ $(LDFLAGS) -o $@
 	
 # ---------------------------

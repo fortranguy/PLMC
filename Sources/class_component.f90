@@ -85,8 +85,7 @@ contains
         allocate(sph_constructor%Vtab(sph_iMin:sph_Ntab))
         call sph_constructor%ePotIni()
         
-        ! Table des voisins
-        
+        !	Neighbours        
         sph_constructor%same = neigh_constructor(sph_rcut)
         call sph_constructor%same%alloc_cells()
         call sph_constructor%same%ini_cell_neighs()
