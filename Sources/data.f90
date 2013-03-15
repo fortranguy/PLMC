@@ -112,7 +112,7 @@ use data_cell
 
 implicit none
 
-	logical, parameter :: snap = .false.
+	logical, parameter :: snap = .true.
 	real(DP), parameter :: deltaDist = 0.01_DP
 	real(DP), protected :: rMax
 	integer, protected :: Ndist
