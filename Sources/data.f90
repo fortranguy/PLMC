@@ -1,5 +1,6 @@
 !***********************************************************************
-!* MODULE: Constants                                                   *
+!> \brief Constants data :
+!> declaration of constants
 !***********************************************************************
 module data_constants
 
@@ -11,8 +12,8 @@ end module data_constants
 !***********************************************************************
 
 !***********************************************************************
-!* MODULE : Cell                                                       *
-!* PURPOSE : declaration of the cell parameters                        *
+!> \brief Cell data :
+!> declaration of the cell parameters
 !***********************************************************************
 module data_cell
 
@@ -30,8 +31,8 @@ end module data_cell
 !***********************************************************************
 
 !***********************************************************************
-!* MODULE : Particles                                                  *
-!* PURPOSE : declaration of the particles parameters                   *
+!> \brief Particles data :
+!> declaration of the particles parameters
 !***********************************************************************
 module data_particles
 
@@ -46,8 +47,8 @@ end module data_particles
 !***********************************************************************
     
 !***********************************************************************
-!* MODULE : MC                                                         *
-!* PURPOSE : declaration of the MC parameters                          *
+!> \brief Monte-Carlo data :
+!> declaration of the MC parameters
 !***********************************************************************
 module data_mc
 
@@ -67,8 +68,11 @@ end module data_mc
 !***********************************************************************
 
 !***********************************************************************
-!* MODULE : Potentiel                                                  *
-!* COMMENT : HS + Yukawa + cut                                         *
+!> \brief Potential data :
+!> declaration of the potential energy parameters
+
+!> The short potential is composed of 3 elements :
+!> hard sphere (HS) + Yukawa + cut
 !***********************************************************************
 module data_potentiel
 
@@ -88,7 +92,8 @@ end module data_potentiel
 !***********************************************************************
 
 !***********************************************************************
-!* MODULE: Neighbours                                                  *
+!> \brief Neighbours data :
+!> declaration of the grid/cell scheme parameters
 !***********************************************************************
 module data_neighbours
 
@@ -97,13 +102,14 @@ use data_cell
 implicit none
 
     integer, dimension(Dim), parameter :: cell_neigh_coordMax = [3, 3, 3]
-    integer, parameter :: cell_neighs_nb = 3**3 ! including itself
+    integer, parameter :: cell_neighs_nb = 3**3 !< including itself
 
 end module data_neighbours
 !***********************************************************************
 
 !***********************************************************************
-!* MODULE: Distribution function                                       *
+!> \brief Distribution data :
+!> declaration of the distribution function parameters
 !***********************************************************************
 module data_distrib
 
