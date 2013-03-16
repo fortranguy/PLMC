@@ -59,6 +59,7 @@ public :: sph_constructor
         procedure :: adapt_dx => Component_adapt_dx
         procedure :: get_dx => Component_get_dx
         
+        !> Tabulate the potential
         procedure :: ePotIni => Component_ePotIni
         procedure :: ePot => Component_ePot
         procedure :: ePotNeigh => Component_ePotNeigh
@@ -249,7 +250,8 @@ contains
     end function Component_get_dx
     
     ! Potential energy --------------------------------------------------------
-    !	Tabulation(?) of Yukawa potential
+    !> Tabulation of Yukawa potential
+    !> \f[ \epsilon \frac{e^{-\alpha r}}{r} \f]
     subroutine Component_ePotIni(this)
     
         class(Component), intent(inout) :: this
