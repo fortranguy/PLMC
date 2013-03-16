@@ -1,3 +1,5 @@
+!> \brief Description of the neighbours class
+
 module class_neighbours
 
 use data_cell
