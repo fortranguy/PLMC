@@ -13,6 +13,8 @@ Sources/makefile~
 Sources/*.mod
 Sources/*.o
 Sources/procedures.txt~
+Sources/Doxyfile~
+Documentation
 Temp/
 Data/
 DataBof/
