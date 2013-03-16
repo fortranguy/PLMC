@@ -1,3 +1,5 @@
+!> Subroutines for physical purposes
+
 module mod_physics
 
 use data_constants
@@ -8,7 +10,7 @@ implicit none
 
 contains
 
-	! Distance between 2 positions with Periodic Boundary Condition ------------
+    !> Distance between 2 positions with Periodic Boundary Conditions
     
     function dist(X1, X2)
     
