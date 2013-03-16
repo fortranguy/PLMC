@@ -53,10 +53,10 @@ contains
         
         select case (init)
             case ("cube")
-                call iniPosCub(sph_X)
+                call primitiveCubic(sph_X)
                 write(unitRapport, *) "    Primitive cubic"
             case ("rand")
-                call iniPosAlea(sph_X)
+                call randomDeposition(sph_X)
                 write(unitRapport, *) "    Random deposition"
             case default
                 write(*, *) "Enter the initial condition : "
@@ -74,7 +74,7 @@ contains
         
     end subroutine initialCondition
     
-    subroutine iniPosCub(sph_X)
+    subroutine primitiveCubic(sph_X)
     
         real(DP), dimension(:, :), intent(inout) :: sph_X
     
@@ -127,11 +127,11 @@ contains
             sph_X(iDir, :) = sph_X(iDir, :) - 0.5_DP*ratio(iDir) ! just inside
         end do
     
-    end subroutine iniPosCub
+    end subroutine primitiveCubic
     
     ! ---------------------------------
     
-    subroutine iniPosAlea(sph_X)
+    subroutine randomDeposition(sph_X)
     
         real(DP), dimension(:, :), intent(inout) :: sph_X
     
@@ -172,7 +172,7 @@ contains
             sph_X(:, iCol) = sph_X(:, iCol) + sph_radius
         end do
     
-    end subroutine iniPosAlea
+    end subroutine randomDeposition
     
     ! Results ---------------------------------------------------------------
         
