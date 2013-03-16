@@ -1,4 +1,6 @@
-module mod_dist
+!> \brief Distribution module
+
+module mod_distrib
 
 use data_constants
 use data_distrib
@@ -7,6 +9,8 @@ implicit none
 
 contains
 
+    !> Calculate the volume of the sphere
+    
     function sphereVol(iDist)
     
         integer, intent(in) :: iDist    
@@ -16,7 +20,9 @@ contains
         
     end function sphereVol
     
-end module mod_dist
+end module mod_distrib
+
+!> \brief Calculate and print the distribution function
 
 program distribution
 
@@ -25,7 +31,7 @@ use data_distrib
 use data_particles
 use data_mc
 use data_potentiel
-use mod_dist
+use mod_distrib
 use mod_physics
 use class_component
 !$ use omp_lib

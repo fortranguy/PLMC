@@ -10,7 +10,7 @@ use class_component
 
 implicit none
 
-! Beginning ---------------------------------------------------
+! Beginning
 
     ! Initialisation
     
