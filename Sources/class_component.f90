@@ -278,7 +278,7 @@ contains
            
         else
        
-            ePot = 0.
+            ePot = 0._DP
            
         end if
         
