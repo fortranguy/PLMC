@@ -1,3 +1,5 @@
+!> \brief Bunching program to assess the error of an observable
+
 program bunching
 
 use data_constants
