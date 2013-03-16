@@ -36,7 +36,7 @@ contains
     
     ! Initial condition ------------------------------------------------------
     
-    subroutine condIni(unitRapport, sph_X)
+    subroutine initialCondition(unitRapport, sph_X)
     
         integer, intent(in) :: unitRapport
         real(DP), dimension(:, :), intent(inout) :: sph_X
@@ -72,7 +72,7 @@ contains
         write(*, *) "    Compacity = ", compac
         write(unitRapport, *) "    Compacity = ", compac
         
-    end subroutine condIni
+    end subroutine initialCondition
     
     subroutine iniPosCub(sph_X)
     

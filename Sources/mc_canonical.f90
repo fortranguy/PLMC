@@ -44,7 +44,7 @@ implicit none
     
     ! Initial condition
     
-    call condIni(unitReport, sph%X)
+    call initialCondition(unitReport, sph%X)
     open(unit=unitSnapIni, recl=4096, file="snapShotIni.out", status='new', &
         action='write')
         call sph%snapShot(unitSnapIni)
