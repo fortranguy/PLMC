@@ -1,7 +1,5 @@
 !> \brief Monte Carlo simulation in canonical ensemble for a mixture
 
-!> \file mc_canonical.f90
-
 program mc_canonical
 
 use data_constants

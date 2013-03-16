@@ -1,4 +1,4 @@
-!> Description of the components class
+!> \brief Description of the components class
 
 module class_component
 

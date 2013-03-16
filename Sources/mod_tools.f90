@@ -1,3 +1,5 @@
+!> \brief Subroutines as tools for the main program
+
 module mod_tools
 
 use data_constants
@@ -9,7 +11,7 @@ implicit none
 
 contains
 
-    ! Random number generator : seed ------------------------------
+    !> Random number generator : seed
     
     subroutine init_random_seed(unitRapport)
     
@@ -34,7 +36,7 @@ contains
         
     end subroutine init_random_seed
     
-    ! Initial condition ------------------------------------------------------
+    !> Initial condition
     
     subroutine initialCondition(unitRapport, sph_X)
     
@@ -74,6 +76,8 @@ contains
         
     end subroutine initialCondition
     
+    !> Primitive cubic configuration
+    
     subroutine primitiveCubic(sph_X)
     
         real(DP), dimension(:, :), intent(inout) :: sph_X
@@ -86,14 +90,12 @@ contains
         
         write(*, *) "Primitive cubic"
         
-        ! Proportion according to the direction
-        
+        ! Proportion according to the direction       
         nCols(1) = int( (sph_Ncol*Lsize(1)**2/Lsize(2)/Lsize(3))**oneThird )
         nCols(2) = int( (sph_Ncol*Lsize(2)**2/Lsize(3)/Lsize(1))**oneThird )
         nCols(3) = int( (sph_Ncol*Lsize(3)**2/Lsize(1)/Lsize(2))**oneThird )
         
         ! Check
-        
         iDir = 1
         do while (product(nCols)<sph_Ncol)
             nCols(iDir) = nCols(iDir) + 1
@@ -109,7 +111,6 @@ contains
         end do
         
         ! Filling
-        
         do k = 1, nCols(3)
             do j = 1, nCols(2)
                 do i = 1, nCols(1)            
@@ -129,7 +130,7 @@ contains
     
     end subroutine primitiveCubic
     
-    ! ---------------------------------
+    !> Random deposition configuration
     
     subroutine randomDeposition(sph_X)
     
@@ -174,8 +175,8 @@ contains
     
     end subroutine randomDeposition
     
-    ! Results ---------------------------------------------------------------
-        
+    !> Results
+    
     subroutine mcResults(enTotSum, activExInvSum, tauxRejectsSum, duration, &
     	unitRapport)
 
