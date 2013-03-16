@@ -26,21 +26,20 @@ public :: sph_constructor
 
         ! Monte-Carlo
         
-        real(DP), dimension(Dim), private :: dx
+        real(DP), dimension(Dim), private :: dx !< displacement
 
         ! Potential
 
-        real(DP), private :: rcut
-        real(DP), private :: pas
-        integer, private :: iMin
-        integer, private :: Ntab
-        real(DP), private :: epsilon
-        real(DP), private :: alpha
-        real(DP), dimension(:), allocatable, private :: Vtab
+        real(DP), private :: rcut !< short-range cut
+        real(DP), private :: pas !< discretisation step
+        integer, private :: iMin !< minimum index of tabulation
+        integer, private :: Ntab !< maximum index of tabulation
+        real(DP), private :: epsilon !< factor in Yukawa
+        real(DP), private :: alpha !< coefficient in Yukawa
+        real(DP), dimension(:), allocatable, private :: Vtab !< tabulation
         
         ! Neighbours (cell/grid scheme)
-        !	same kind
-        type(Neighbours), private :: same
+        type(Neighbours), private :: same !< same kind
         
     contains
         
