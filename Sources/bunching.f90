@@ -10,7 +10,6 @@ implicit none
     ! Physique 
     
     integer, parameter :: nObs = 2
-    character(len=20) :: nBunchingStr
     integer :: iBunching, nBunching
     integer :: iStep, iStepIn, NstepVar
     real(DP), dimension(nObs) :: sumVal, sumValSqr
@@ -19,14 +18,11 @@ implicit none
     ! Numérique    
     
     integer :: longueur, statut
-    integer, parameter :: nDataMi = 2**22 ! Attention
+    integer, parameter :: nDataMi = Nstep/2
     real(DP), dimension(nObs, 2*nDataMi) :: dataIn
     real(DP), dimension(nObs, nDataMi) :: dataOut
     
-    call get_command_argument(1, nBunchingStr, longueur, statut)
-    if (statut /= 0) stop "erreur get_command_argument"
-    if (command_argument_count() > 1) stop "Trop d'arguments"
-    read(nBunchingStr, *) nBunching
+    nBunching = int(log(real(Nstep, DP))/log(2._DP))
     write(*, *) "nBunching = ", nBunching
 
     NstepVar = Nstep
