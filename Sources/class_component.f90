@@ -1,3 +1,5 @@
+!> Description of the components class
+
 module class_component
 
 use data_cell
@@ -17,10 +19,10 @@ public :: sph_constructor
 
         ! Particles
 
-        real(DP), private :: radius
-        real(DP), private :: rmin
-        integer, private ::  Ncol
-        real(DP), dimension(:, :), allocatable :: X
+        real(DP), private :: radius !< radius of a particle
+        real(DP), private :: rmin !< minimum distance between two particles
+        integer, private ::  Ncol !< number of a component particles
+        real(DP), dimension(:, :), allocatable :: X !< position of a particle
 
         ! Monte-Carlo
         
@@ -41,13 +43,19 @@ public :: sph_constructor
         type(Neighbours), private :: same
         
     contains
-    
+        
+        !> Destructor of the class
         procedure :: destructor => Component_destructor
+        !> Print a report of the component in a file
         procedure :: report => Component_report
+        !> Take a snap shot of the configuration
         procedure :: snapShot => Component_snapShot
+        !> Do an overlap test
         procedure :: overlapTest => Component_overlapTest
+        !> Assign all particles to cells
         procedure :: cols_to_cells => Component_cols_to_cells
         
+        !> Adapt the displacement dx during thermalisation
         procedure :: adapt_dx => Component_adapt_dx
         procedure :: get_dx => Component_get_dx
         

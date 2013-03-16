@@ -1,7 +1,8 @@
 !> \brief Monte Carlo simulation in canonical ensemble for a mixture
-!>
 
-program mc_cano
+!> \file mc_canonical.f90
+
+program mc_canonical
 
 use data_constants
 use data_mc
@@ -19,10 +20,8 @@ implicit none
     integer :: Nrejects
     real(DP) :: tauxRejectsSum
     real(DP) :: enTot, enTotSum
-    !	inverse of activity :
-    real(DP) :: activExInv, activExInvSum
-    !	number of test particles :
-    integer, parameter :: nWidom = sph_Ncol
+    real(DP) :: activExInv, activExInvSum !< inverse of activity
+    integer, parameter :: nWidom = sph_Ncol !< number of test particles
     real(DP) :: tIni, tFin
     type(Component) :: sph
     
@@ -125,4 +124,4 @@ implicit none
     
     call sph%destructor()
     
-end program mc_cano
+end program mc_canonical
