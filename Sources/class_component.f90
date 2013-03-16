@@ -249,7 +249,7 @@ contains
     !> Potential energy
     !> Tabulation of Yukawa potential
     
-    !> \f[ \epsilon \frac{e^{-\alpha (r-r_\text{min})}}{r} \f]
+    !> \f[ \epsilon \frac{e^{-\alpha (r-r_{min})}}{r} \f]
     subroutine Component_ePotIni(this)
     
         class(Component), intent(inout) :: this
