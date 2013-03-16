@@ -1,3 +1,6 @@
+!> \brief Monte Carlo simulation in canonical ensemble for a mixture
+!>
+
 program mc_cano
 
 use data_constants
