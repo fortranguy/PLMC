@@ -110,7 +110,7 @@ contains
     
     end subroutine Component_destructor
     
-    ! Report ------------------------------------------------------------------
+    !> Report
     
     subroutine Component_report(this, nWidom, unitReport)
     
@@ -136,7 +136,7 @@ contains
         
     end subroutine Component_report
     
-    ! Configuration state -----------------------------------------------------
+    !> Configuration state
       
     subroutine Component_snapShot(this, unitSnap)
         
@@ -151,7 +151,7 @@ contains
 
     end subroutine Component_snapShot
     
-    ! Overlapt test -----------------------------------------------------------
+    !> Overlapt test
     
     subroutine Component_overlapTest(this)
     
@@ -179,7 +179,7 @@ contains
     
     end subroutine Component_overlapTest
     
-    ! Fill cells with colloids ------------------------------------------------
+    !> Fill cells with colloids
     
     subroutine Component_cols_to_cells(this)
     
@@ -189,7 +189,7 @@ contains
     
     end subroutine Component_cols_to_cells
     
-    ! Adaptation of dx during the thermalisation ------------------------------
+    !> Adaptation of dx during the thermalisation
     
     subroutine Component_adapt_dx(this, iStep, tauxRejectsSum, unitReport)
     
@@ -236,8 +236,6 @@ contains
     
     end subroutine Component_adapt_dx
     
-    ! -----------------------
-    
     function Component_get_dx(this)
         
         class(Component), intent(in) :: this
@@ -248,9 +246,10 @@ contains
         
     end function Component_get_dx
     
-    ! Potential energy --------------------------------------------------------
+    !> Potential energy
     !> Tabulation of Yukawa potential
-    !> \f[ \epsilon \frac{e^{-\alpha r}}{r} \f]
+    
+    !> \f[ \epsilon \frac{e^{-\alpha (r-r_\text{min})}}{r} \f]
     subroutine Component_ePotIni(this)
     
         class(Component), intent(inout) :: this
@@ -292,8 +291,6 @@ contains
         end if
         
     end function Component_ePot
-    
-    ! -----------------------
     
     subroutine Component_ePotNeigh(this, iCol, xCol, iCell, overlap, energ)
         
@@ -342,7 +339,7 @@ contains
     
     end subroutine Component_ePotNeigh
     
-    ! Particle move -----------------------------------------------------------
+    !> Particle move
     
     subroutine Component_mcMove(this, enTot, Nrejects)
     
@@ -396,7 +393,7 @@ contains
     
     end subroutine Component_mcMove
     
-    ! Widom's method -----------------------------------------------------------
+    !> Widom's method
 
     subroutine Component_widom(this, nWidom, activExInv)
         
@@ -430,7 +427,7 @@ contains
         
     end subroutine Component_widom
 
-    ! Total potential energy
+    !> Total potential energy
     
     function Component_enTotCalc(this) result(enTotCalc)
     
