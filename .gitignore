@@ -1,5 +1,5 @@
 Binaries/
-Out
+Out/
 Plots/Solo/*.p~
 Plots/Multi/*.p~
 Plots/Multi/potChi_moy_var_copy.p
@@ -14,7 +14,7 @@ Sources/*.mod
 Sources/*.o
 Sources/procedures.txt~
 Sources/Doxyfile~
-Documentation
+Documentation/
 Temp/
 Data/
 DataBof/
