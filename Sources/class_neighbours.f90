@@ -151,6 +151,16 @@ contains
                 stop
             end if
             
+            if (modulo(Lsize(iDir), this%cell_Lsize(iDir)) /= 0) then
+                write(*, *) "Cell size is not a divisor of the system system"
+                write(*, *) "in the direction", iDir, ":"
+                write(*, *) "Lsize", Lsize(iDir)
+                write(*, *) "cell_Lsize", this%cell_Lsize(iDir)
+                write(*, *) "modulo(Lsize, cell_Lsize) = ", &
+                    modulo(Lsize(iDir), this%cell_Lsize(iDir))
+                stop
+            end if
+            
         end do
         
     end subroutine Neighbours_check_cellsSize
