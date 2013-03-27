@@ -350,15 +350,15 @@ contains
         logical :: overlap
         integer :: iOld
         real(DP) :: rand
-        real(DP), dimension(Dim) :: xNew
+        real(DP), dimension(Dim) :: xRand, xNew
         integer :: iCellBefore, iCellAfter
         real(DP) :: eNew, eOld, dEn
         
         call random_number(rand)
         iOld = int(rand*this%Ncol) + 1
         
-        call random_number(xNew)
-        xNew(:) = this%X(:, iOld) + (xNew(:)-0.5_DP)*this%dx(:)
+        call random_number(xRand)
+        xNew(:) = this%X(:, iOld) + (xRand(:)-0.5_DP)*this%dx(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
         iCellAfter = this%same%position_to_cell(xNew)
         call this%ePotNeigh(iOld, xNew, iCellAfter, overlap, eNew)
@@ -403,7 +403,7 @@ contains
         
         integer :: iWid
         real(DP) :: widTestSum
-        real(DP), dimension(Dim) :: xTest
+        real(DP), dimension(Dim) :: xRand, xTest
         integer :: iCellTest
         logical :: overlap        
         real(DP) :: enTest
@@ -412,8 +412,8 @@ contains
         
         do iWid = 1, nWidom           
             
-            call random_number(xTest)
-            xTest(:) = Lsize(:) * xTest(:)    
+            call random_number(xRand)
+            xTest(:) = Lsize(:) * xRand(:)    
             iCellTest = this%same%position_to_cell(xTest)
             call this%ePotNeigh(0, xTest, iCellTest, overlap, enTest) 
             
