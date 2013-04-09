@@ -13,8 +13,7 @@ type, public :: HardSpheres
 
     ! Potential
 
-    real(DP), private :: rcut !< short-range cut
-    
+    real(DP), private :: rcut !< short-range cut    
     
     ! Neighbours (cell/grid scheme)
     
