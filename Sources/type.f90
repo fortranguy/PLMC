@@ -1,4 +1,4 @@
-type, public :: HardSpheres
+type, public :: Spheres
 
     ! Particles
 
@@ -21,29 +21,20 @@ type, public :: HardSpheres
     
 contains
     
-    !> Destructor of the class
-    procedure :: destructor => HardSpheres_destructor
-    !> Print a report of the component in a file
-    procedure :: report => HardSpheres_report
     !> Take a snap shot of the configuration
-    procedure :: snapShot => HardSpheres_snapShot
+    procedure :: snapShot => Spheres_snapShot
     !> Do an overlap test
-    procedure :: overlapTest => HardSpheres_overlapTest
+    procedure :: overlapTest => Spheres_overlapTest
     !> Assign all particles to cells
-    procedure :: cols_to_cells => HardSpheres_cols_to_cells
+    procedure :: cols_to_cells => Spheres_cols_to_cells
     
     !> Adapt the displacement dx during thermalisation
-    procedure :: adapt_dx => HardSpheres_adapt_dx
-    procedure :: get_dx => HardSpheres_get_dx
+    procedure :: adapt_dx => Spheres_adapt_dx
+    procedure :: get_dx => Spheres_get_dx
     
-    procedure :: ePotNeigh => HardSpheres_ePotNeigh
-    
-    procedure :: mcMove => HardSpheres_mcMove
-    procedure :: widom => HardSpheres_widom
-    
-end type HardSpheres
+end type Spheres
 
-type, public, extends(HardSphere) :: SphericalCharges
+type, extends(Spheres), public :: ChargedSpheres
 
     ! Potential
 
@@ -55,11 +46,19 @@ type, public, extends(HardSphere) :: SphericalCharges
     real(DP), dimension(:), allocatable, private :: Vtab !< tabulation
     
 contains
+
+    !> Destructor of the class
+    procedure :: destructor => ChargedSpheres_destructor
+    !> Print a report of the component in a file
+    procedure :: report => ChargedSpheres_report
     
     !> Tabulate the potential
-    procedure :: ePotIni => SphericalCharges_ePotIni
-    procedure :: ePot => SphericalCharges_ePot
-    procedure :: ePotNeigh => SphericalCharges_ePotNeigh
-    procedure :: enTotCalc => SphericalCharges_enTotCalc
+    procedure :: ePotIni => ChargedSpheres_ePotIni
+    procedure :: ePot => ChargedSpheres_ePot
+    procedure :: ePotNeigh => ChargedSpheres_ePotNeigh
+    procedure :: enTotCalc => ChargedSpheres_enTotCalc
+
+    procedure :: mcMove => ChargedSpheres_mcMove
+    procedure :: widom => ChargedSpheres_widom
     
-end type SphericalCharges
+end type ChargedSpheres
