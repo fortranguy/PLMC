@@ -15,22 +15,24 @@ implicit none
 private
 public :: intr_constructor
 
-    type, public :: Spheres
+    type :: Spheres
+
+        private
 
         ! Particles
-        real(DP), private :: radius !< radius of a particle
-        real(DP), private :: rmin !< minimum distance between two particles
-        integer, private ::  Ncol !< number of a component particles
-        real(DP), dimension(:, :), allocatable :: X !< position of a particle
+        real(DP) :: radius !< radius of a particle
+        real(DP) :: rmin !< minimum distance between two particles
+        integer ::  Ncol !< number of a component particles
+        real(DP), dimension(:, :), allocatable, public :: X !< position of a particle
 
         ! Monte-Carlo
-        real(DP), dimension(Dim), private :: dx !< displacement
+        real(DP), dimension(Dim) :: dx !< displacement
 
         ! Potential
-        real(DP), private :: rcut !< short-range cut    
+        real(DP) :: rcut !< short-range cut    
         
         ! Neighbours (cell/grid scheme)   
-        type(Neighbours), private :: same !< same kind
+        type(Neighbours) :: same !< same kind
         
     contains
         
@@ -49,15 +51,17 @@ public :: intr_constructor
         
     end type Spheres
 
-    type, extends(Spheres), public :: InteractingSpheres
+    type, extends(Spheres), public :: Interacting
+
+        private
 
         ! Potential :
-        real(DP), private :: pas !< discretisation step
-        integer, private :: iMin !< minimum index of tabulation
-        integer, private :: Ntab !< maximum index of tabulation
-        real(DP), private :: epsilon !< factor in Yukawa
-        real(DP), private :: alpha !< coefficient in Yukawa
-        real(DP), dimension(:), allocatable, private :: Vtab !< tabulation
+        real(DP)  :: pas !< discretisation step
+        integer :: iMin !< minimum index of tabulation
+        integer :: Ntab !< maximum index of tabulation
+        real(DP) :: epsilon !< factor in Yukawa
+        real(DP) :: alpha !< coefficient in Yukawa
+        real(DP), dimension(:), allocatable :: Vtab !< tabulation
         
     contains
 
@@ -77,13 +81,13 @@ public :: intr_constructor
         procedure :: mcMove => Interacting_mcMove
         procedure :: widom => Interacting_widom
         
-    end type InteractingSpheres
+    end type Interacting
     
 contains
 
     function intr_constructor()
     
-        type(InteractingSpheres) :: intr_constructor
+        type(Interacting) :: intr_constructor
     
         ! Construction                
 
@@ -112,7 +116,7 @@ contains
     
     subroutine Interacting_destructor(this)
     
-        class(Component), intent(inout) :: this
+        class(Interacting), intent(inout) :: this
         
         deallocate(this%X)
         deallocate(this%Vtab)
@@ -124,7 +128,7 @@ contains
     
     subroutine Interacting_report(this, nWidom, unitReport)
     
-        class(Component), intent(in) :: this
+        class(Interacting), intent(in) :: this
         integer, intent(in) :: nWidom
         integer, intent(in) :: unitReport    
         
@@ -150,7 +154,7 @@ contains
       
     subroutine Spheres_snapShot(this, unitSnap)
         
-        class(Component), intent(in) :: this
+        class(Spheres), intent(in) :: this
         integer, intent(in) :: unitSnap
     
         integer :: iCol
@@ -165,7 +169,7 @@ contains
     
     subroutine Spheres_overlapTest(this)
     
-        class(Component), intent(in) :: this
+        class(Spheres), intent(in) :: this
     
         integer :: jCol, iCol
         real(DP) :: r_ij
@@ -193,7 +197,7 @@ contains
     
     subroutine Spheres_cols_to_cells(this)
     
-        class(Component), intent(inout) :: this
+        class(Spheres), intent(inout) :: this
         
         call this%same%all_col_to_cell(this%Ncol, this%X)
     
@@ -203,7 +207,7 @@ contains
     
     subroutine Spheres_adapt_dx(this, iStep, tauxRejectsSum, unitReport)
     
-        class(Component), intent(inout) :: this 
+        class(Spheres), intent(inout) :: this 
         integer, intent(in) :: iStep, unitReport
         real(DP), intent(in) :: tauxRejectsSum    
         
@@ -248,7 +252,7 @@ contains
     
     function Spheres_get_dx(this)
         
-        class(Component), intent(in) :: this
+        class(Spheres), intent(in) :: this
         
         real(DP) :: Spheres_get_dx
         ! average dx of 3 vector components
@@ -257,12 +261,12 @@ contains
     end function Spheres_get_dx
     
     !> Potential energy
-    !> Tabulation of Yukawa potential
-    
+    !> Tabulation of Yukawa potential    
     !> \f[ \epsilon \frac{e^{-\alpha (r-r_{min})}}{r} \f]
+    
     subroutine Interacting_ePotIni(this)
     
-        class(Component), intent(inout) :: this
+        class(Interacting), intent(inout) :: this
 
         integer :: i
         real(DP) :: r_i
@@ -281,7 +285,7 @@ contains
 
     function Interacting_ePot(this, r) result(ePot)
         
-        class(Component), intent(in) :: this
+        class(Interacting), intent(in) :: this
         real(DP), intent(in) :: r
         
         integer :: i
@@ -304,7 +308,7 @@ contains
     
     subroutine Interacting_ePotNeigh(this, iCol, xCol, iCell, overlap, energ)
         
-        class(Component), intent(in) :: this        
+        class(Interacting), intent(in) :: this        
         integer, intent(in) :: iCol, iCell
         real(DP), dimension(Dim), intent(in) :: xCol
         logical, intent(out) :: overlap
@@ -353,7 +357,7 @@ contains
     
     subroutine Interacting_mcMove(this, enTot, Nrejects)
     
-        class(Component), intent(inout) :: this
+        class(Interacting), intent(inout) :: this
         real(DP), intent(inout) :: enTot
         integer, intent(inout) :: Nrejects
         
@@ -407,7 +411,7 @@ contains
 
     subroutine Interacting_widom(this, nWidom, activExInv)
         
-        class(Component), intent(in) :: this
+        class(Interacting), intent(in) :: this
         integer, intent(in) :: nWidom
         real(DP), intent(inOut) :: activExInv 
         
@@ -441,7 +445,7 @@ contains
     
     function Interacting_enTotCalc(this) result(enTotCalc)
     
-        class(Component), intent(in) :: this
+        class(Interacting), intent(in) :: this
         
         integer :: iCol, jCol
         real(DP) :: r_ij
