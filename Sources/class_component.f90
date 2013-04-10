@@ -15,22 +15,43 @@ implicit none
 private
 public :: sph_constructor
 
-    type, public :: Component
+    type, public :: Spheres
 
         ! Particles
-
         real(DP), private :: radius !< radius of a particle
         real(DP), private :: rmin !< minimum distance between two particles
         integer, private ::  Ncol !< number of a component particles
         real(DP), dimension(:, :), allocatable :: X !< position of a particle
 
         ! Monte-Carlo
-        
         real(DP), dimension(Dim), private :: dx !< displacement
 
         ! Potential
+        real(DP), private :: rcut !< short-range cut    
+        
+        ! Neighbours (cell/grid scheme)   
+        type(Neighbours), private :: same !< same kind
+        
+    contains
+        
+        !> Take a snap shot of the configuration
+        procedure :: snapShot => Spheres_snapShot
+        
+        !> Do an overlap test
+        procedure :: overlapTest => Spheres_overlapTest
+        
+        !> Assign all particles to cells
+        procedure :: cols_to_cells => Spheres_cols_to_cells
+                
+        !> Adapt the displacement dx during thermalisation
+        procedure :: adapt_dx => Spheres_adapt_dx
+        procedure :: get_dx => Spheres_get_dx
+        
+    end type Spheres
 
-        real(DP), private :: rcut !< short-range cut
+    type, extends(Spheres), public :: InteractingSpheres
+
+        ! Potential :
         real(DP), private :: pas !< discretisation step
         integer, private :: iMin !< minimum index of tabulation
         integer, private :: Ntab !< maximum index of tabulation
@@ -38,36 +59,25 @@ public :: sph_constructor
         real(DP), private :: alpha !< coefficient in Yukawa
         real(DP), dimension(:), allocatable, private :: Vtab !< tabulation
         
-        ! Neighbours (cell/grid scheme)
-        type(Neighbours), private :: same !< same kind
-        
     contains
-        
+
         !> Destructor of the class
-        procedure :: destructor => Component_destructor
+        procedure :: destructor => InteractingSpheres_destructor
+        
         !> Print a report of the component in a file
-        procedure :: report => Component_report
-        !> Take a snap shot of the configuration
-        procedure :: snapShot => Component_snapShot
-        !> Do an overlap test
-        procedure :: overlapTest => Component_overlapTest
-        !> Assign all particles to cells
-        procedure :: cols_to_cells => Component_cols_to_cells
+        procedure :: report => InteractingSpheres_report  
+              
+        !> Potential energy
+        procedure :: ePotIni => InteractingSpheres_ePotIni
+        procedure :: ePot => InteractingSpheres_ePot
+        procedure :: ePotNeigh => InteractingSpheres_ePotNeigh
+        procedure :: enTotCalc => InteractingSpheres_enTotCalc
         
-        !> Adapt the displacement dx during thermalisation
-        procedure :: adapt_dx => Component_adapt_dx
-        procedure :: get_dx => Component_get_dx
+        !> Monte-Carlo
+        procedure :: mcMove => InteractingSpheres_mcMove
+        procedure :: widom => InteractingSpheres_widom
         
-        !> Tabulate the potential
-        procedure :: ePotIni => Component_ePotIni
-        procedure :: ePot => Component_ePot
-        procedure :: ePotNeigh => Component_ePotNeigh
-        procedure :: enTotCalc => Component_enTotCalc
-        
-        procedure :: mcMove => Component_mcMove
-        procedure :: widom => Component_widom
-        
-    end type Component
+    end type InteractingSpheres
     
 contains
 
