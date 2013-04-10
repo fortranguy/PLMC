@@ -33,7 +33,7 @@ use data_mc
 use data_potentiel
 use mod_distrib
 use mod_physics
-use class_component
+use class_interacting
 !$ use omp_lib
 
 implicit none

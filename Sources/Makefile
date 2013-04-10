@@ -25,7 +25,9 @@ mod_physics.o: mod_physics.f90
 	$(FC) -c $(FFLAGS_OMP) $< -o $@
 class_neighbours.o: class_neighbours.f90
 	$(FC) -c $(FFLAGS) $< -o $@
-class_component.o: class_component.f90
+class_spheres.o: class_spheres.f90
+	$(FC) -c $(FFLAGS) $< -o $@
+class_interacting.o: class_interacting.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 mod_tools.o: mod_tools.f90
 	$(FC) -c $(FFLAGS) $< -o $@
@@ -34,8 +36,8 @@ mod_tools.o: mod_tools.f90
 
 mc_canonical.o: mc_canonical.f90
 	$(FC) -c $(FFLAGS) $< -o $@
-$(EXEC1) : data.o mod_physics.o class_neighbours.o class_component.o \
-	mod_tools.o mc_canonical.o
+$(EXEC1) : data.o mod_physics.o class_neighbours.o class_spheres.o \
+	class_interacting.o mod_tools.o mc_canonical.o
 	$(FC) $^ $(LDFLAGS) -o $@
 	
 # ---------------------------
@@ -49,8 +51,8 @@ $(EXEC2) : data.o bunching.o
 
 distrib.o: distrib.f90
 	$(FC) -c $(FFLAGS_OMP) $< -o $@
-$(EXEC3) : data.o mod_physics.o class_neighbours.o class_component.o \
-	mod_tools.o distrib.o
+$(EXEC3) : data.o mod_physics.o class_neighbours.o class_spheres.o \
+	class_interacting.o mod_tools.o distrib.o
 	$(FC) $^ $(LDFLAGS_OMP) -o $@
 
 # ---------------------------------------------------------

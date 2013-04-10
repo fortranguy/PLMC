@@ -12,15 +12,13 @@ implicit none
 
 private
 
-    type :: Spheres
-
-        private
+    type, public :: Spheres
 
         ! Particles
         real(DP) :: radius !< radius of a particle
         real(DP) :: rmin !< minimum distance between two particles
         integer ::  Ncol !< number of a component particles
-        real(DP), dimension(:, :), allocatable, public :: X !< position of a particle
+        real(DP), dimension(:, :), allocatable :: X !< position of a particle
 
         ! Monte-Carlo
         real(DP), dimension(Dim) :: dx !< displacement

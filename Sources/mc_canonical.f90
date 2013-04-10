@@ -6,7 +6,7 @@ use data_constants
 use data_mc
 use data_distrib
 use mod_tools
-use class_component
+use class_interacting
 
 implicit none
 
