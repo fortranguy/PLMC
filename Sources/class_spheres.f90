@@ -13,6 +13,8 @@ implicit none
 private
 
     type, public :: Spheres
+    
+        !private
 
         ! Particles
         real(DP) :: radius !< radius of a particle
