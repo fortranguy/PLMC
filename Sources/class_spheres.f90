@@ -3,8 +3,6 @@
 module class_spheres
 
 use data_cell
-use data_particles
-use data_potentiel
 use data_mc
 use data_neighbours
 use mod_physics

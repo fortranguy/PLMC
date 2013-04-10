@@ -2,13 +2,8 @@
 
 module class_interacting
 
-use data_cell
 use data_particles
 use data_potentiel
-use data_mc
-use data_neighbours
-use mod_physics
-use class_neighbours
 use class_spheres
 
 implicit none
