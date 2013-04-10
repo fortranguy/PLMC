@@ -13,7 +13,7 @@ use class_neighbours
 implicit none
 
 private
-public :: sph_constructor
+public :: intr_constructor
 
     type, public :: Spheres
 
@@ -81,34 +81,34 @@ public :: sph_constructor
     
 contains
 
-    function sph_constructor()
+    function intr_constructor()
     
-        type(Component) :: sph_constructor
+        type(InteractingSpheres) :: intr_constructor
     
         ! Construction                
 
-        sph_constructor%radius = sph_radius
-        sph_constructor%rmin = sph_rmin
-        sph_constructor%Ncol = sph_Ncol
-        allocate(sph_constructor%X(Dim, sph_Ncol))
+        intr_constructor%radius = intr_radius
+        intr_constructor%rmin = intr_rmin
+        intr_constructor%Ncol = intr_Ncol
+        allocate(intr_constructor%X(Dim, intr_Ncol))
         
-        sph_constructor%dx = sph_dx
+        intr_constructor%dx = intr_dx
         
-        sph_constructor%rcut = sph_rcut
-        sph_constructor%pas = sph_pas
-        sph_constructor%iMin = sph_iMin
-        sph_constructor%Ntab = sph_Ntab        
-        sph_constructor%epsilon = sph_epsilon
-        sph_constructor%alpha = sph_alpha        
-        allocate(sph_constructor%Vtab(sph_iMin:sph_Ntab))
-        call sph_constructor%ePotIni()
+        intr_constructor%rcut = intr_rcut
+        intr_constructor%pas = intr_pas
+        intr_constructor%iMin = intr_iMin
+        intr_constructor%Ntab = intr_Ntab        
+        intr_constructor%epsilon = intr_epsilon
+        intr_constructor%alpha = intr_alpha        
+        allocate(intr_constructor%Vtab(intr_iMin:intr_Ntab))
+        call intr_constructor%ePotIni()
         
         !	Neighbours        
-        sph_constructor%same = neigh_constructor(sph_rcut)
-        call sph_constructor%same%alloc_cells()
-        call sph_constructor%same%ini_cell_neighs()
+        intr_constructor%same = neigh_constructor(intr_rcut)
+        call intr_constructor%same%alloc_cells()
+        call intr_constructor%same%ini_cell_neighs()
     
-    end function sph_constructor
+    end function intr_constructor
     
     subroutine Component_destructor(this)
     
@@ -148,7 +148,7 @@ contains
     
     !> Configuration state
       
-    subroutine Component_snapShot(this, unitSnap)
+    subroutine Spheres_snapShot(this, unitSnap)
         
         class(Component), intent(in) :: this
         integer, intent(in) :: unitSnap
@@ -159,11 +159,11 @@ contains
             write(unitSnap, *) this%X(:, iCol)
         end do    
 
-    end subroutine Component_snapShot
+    end subroutine Spheres_snapShot
     
     !> Overlapt test
     
-    subroutine Component_overlapTest(this)
+    subroutine Spheres_overlapTest(this)
     
         class(Component), intent(in) :: this
     
@@ -187,21 +187,21 @@ contains
         
         write(*, *) "    Overlap test : OK !"
     
-    end subroutine Component_overlapTest
+    end subroutine Spheres_overlapTest
     
     !> Fill cells with colloids
     
-    subroutine Component_cols_to_cells(this)
+    subroutine Spheres_cols_to_cells(this)
     
         class(Component), intent(inout) :: this
         
         call this%same%all_col_to_cell(this%Ncol, this%X)
     
-    end subroutine Component_cols_to_cells
+    end subroutine Spheres_cols_to_cells
     
     !> Adaptation of dx during the thermalisation
     
-    subroutine Component_adapt_dx(this, iStep, tauxRejectsSum, unitReport)
+    subroutine Spheres_adapt_dx(this, iStep, tauxRejectsSum, unitReport)
     
         class(Component), intent(inout) :: this 
         integer, intent(in) :: iStep, unitReport
@@ -244,17 +244,17 @@ contains
             
         end if
     
-    end subroutine Component_adapt_dx
+    end subroutine Spheres_adapt_dx
     
-    function Component_get_dx(this)
+    function Spheres_get_dx(this)
         
         class(Component), intent(in) :: this
         
-        real(DP) :: Component_get_dx
+        real(DP) :: Spheres_get_dx
         ! average dx of 3 vector components
-        Component_get_dx = sum(this%dx)/size(this%dx)
+        Spheres_get_dx = sum(this%dx)/size(this%dx)
         
-    end function Component_get_dx
+    end function Spheres_get_dx
     
     !> Potential energy
     !> Tabulation of Yukawa potential

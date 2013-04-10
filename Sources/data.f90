@@ -39,9 +39,9 @@ module data_particles
 use data_constants
 use data_cell
     
-    real(DP), parameter :: sph_radius = .5_DP
-    real(DP), parameter :: sph_rmin = 1._DP
-    integer, parameter :: sph_Ncol = 270
+    real(DP), parameter :: intr_radius = .5_DP
+    real(DP), parameter :: intr_rmin = 1._DP
+    integer, parameter :: intr_Ncol = 270
     
 end module data_particles
 !***********************************************************************
@@ -61,8 +61,8 @@ implicit none
     real(DP), parameter :: Tstar = 1._DP
     integer, parameter :: Nstep = 2**10
     integer, parameter :: Ntherm = 2**8
-    integer, parameter :: Nmove = 2**2 * sph_Ncol
-    real(DP), dimension(Dim), parameter :: sph_dx = 2._DP
+    integer, parameter :: Nmove = 2**2 * intr_Ncol
+    real(DP), dimension(Dim), parameter :: intr_dx = 2._DP
 
 end module data_mc
 !***********************************************************************
@@ -81,12 +81,12 @@ use data_particles
 
 implicit none
 
-    real(DP), parameter :: sph_rcut = 4._DP
-    real(DP), parameter :: sph_pas = 5.E-5_DP
-    integer, parameter :: sph_iMin = int(sph_rmin/sph_pas)
-    integer, parameter :: sph_Ntab = int(sph_rcut/sph_pas)
-    real(DP), parameter :: sph_epsilon = 1._DP
-    real(DP), parameter :: sph_alpha = 5._DP
+    real(DP), parameter :: intr_rcut = 4._DP
+    real(DP), parameter :: intr_pas = 5.E-5_DP
+    integer, parameter :: intr_iMin = int(intr_rmin/intr_pas)
+    integer, parameter :: intr_Ntab = int(intr_rcut/intr_pas)
+    real(DP), parameter :: intr_epsilon = 1._DP
+    real(DP), parameter :: intr_alpha = 5._DP
         
 end module data_potentiel
 !***********************************************************************
