@@ -34,7 +34,7 @@ contains
     
 end type Spheres
 
-type, extends(Spheres), public :: ChargedSpheres
+type, extends(Spheres), public :: InteractingSpheres
 
     ! Potential
 
@@ -48,17 +48,17 @@ type, extends(Spheres), public :: ChargedSpheres
 contains
 
     !> Destructor of the class
-    procedure :: destructor => ChargedSpheres_destructor
+    procedure :: destructor => InteractingSpheres_destructor
     !> Print a report of the component in a file
-    procedure :: report => ChargedSpheres_report
+    procedure :: report => InteractingSpheres_report
     
     !> Tabulate the potential
-    procedure :: ePotIni => ChargedSpheres_ePotIni
-    procedure :: ePot => ChargedSpheres_ePot
-    procedure :: ePotNeigh => ChargedSpheres_ePotNeigh
-    procedure :: enTotCalc => ChargedSpheres_enTotCalc
+    procedure :: ePotIni => InteractingSpheres_ePotIni
+    procedure :: ePot => InteractingSpheres_ePot
+    procedure :: ePotNeigh => InteractingSpheres_ePotNeigh
+    procedure :: enTotCalc => InteractingSpheres_enTotCalc
 
-    procedure :: mcMove => ChargedSpheres_mcMove
-    procedure :: widom => ChargedSpheres_widom
+    procedure :: mcMove => InteractingSpheres_mcMove
+    procedure :: widom => InteractingSpheres_widom
     
-end type ChargedSpheres
+end type InteractingSpheres
