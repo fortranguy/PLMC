@@ -19,14 +19,14 @@ implicit none
     real(DP) :: tauxRejectsSum
     real(DP) :: enTot, enTotSum
     real(DP) :: activExInv, activExInvSum !< inverse of activity
-    integer, parameter :: nWidom = sph_Ncol !< number of test particles
+    integer, parameter :: nWidom = inter_Ncol !< number of test particles
     real(DP) :: tIni, tFin
-    type(Component) :: sph
+    type(Interacting) :: inter
     
     integer, parameter :: unitObs = 10, unitSnapIni = 11, unitSnapFin = 12, &
         unitReport = 13, unitObsTherm = 14, unit_dx = 15, unitSnapShots = 16
         
-    sph = sph_constructor()
+    inter = inter_constructor()
     
     Nrejects = 0
     tauxRejectsSum = 0._DP
@@ -37,20 +37,20 @@ implicit none
     
     open(unit=unitReport, recl=4096, file="report.out", status='new', &
         action='write')
-    call sph%report(nWidom, unitReport)
+    call intr%report(nWidom, unitReport)
     call init_random_seed(unitReport)
     
     ! Initial condition
     
-    call initialCondition(unitReport, sph%X)
+    call initialCondition(unitReport, intr%X)
     open(unit=unitSnapIni, recl=4096, file="snapShotIni.out", status='new', &
         action='write')
-        call sph%snapShot(unitSnapIni)
+        call intr%snapShot(unitSnapIni)
     close(unitSnapIni)
     
-    call sph%overlapTest()
-    enTot = sph%enTotCalc()
-    call sph%cols_to_cells()
+    call intr%overlapTest()
+    enTot = intr%enTotCalc()
+    call intr%cols_to_cells()
     
 ! Middle --------------------------------------------------
 
@@ -68,15 +68,15 @@ implicit none
     do iStep = 1, Ntherm + Nstep
     
         do iMove = 1, Nmove   
-            call sph%mcMove(enTot, Nrejects)
+            call intr%mcMove(enTot, Nrejects)
         end do
         
-        call sph%widom(nWidom, activExInv)
+        call intr%widom(nWidom, activExInv)
         
         if (iStep <= Ntherm) then
         
-            call sph%adapt_dx(iStep, tauxRejectsSum, unitReport)
-            write(unit_dx, *) iStep, sph%get_dx(), tauxRejectsSum/real(iStep, DP)
+            call intr%adapt_dx(iStep, tauxRejectsSum, unitReport)
+            write(unit_dx, *) iStep, intr%get_dx(), tauxRejectsSum/real(iStep, DP)
             write(unitObsTherm, *) iStep, enTot, activExInv
         
         else
@@ -86,7 +86,7 @@ implicit none
             write(unitObs, *) iStep, enTot, activExInv
             
             if (snap) then
-                call sph%snapShot(unitSnapShots)
+                call intr%snapShot(unitSnapShots)
             end if
             
         end if
@@ -105,11 +105,11 @@ implicit none
 
 ! End -----------------------------------------------------
 
-    call sph%overlapTest()
+    call intr%overlapTest()
     
     write(unitReport, *) "Consistency test:"
     write(unitReport, *) "    enTot_mc_c = ", enTot
-    write(unitReport, *) "    enTot_calc = ", sph%enTotCalc()
+    write(unitReport, *) "    enTot_calc = ", intr%enTotCalc()
     
     call mcResults(enTotSum, activExInvSum, tauxRejectsSum, tFin-tIni,&
         unitReport)
@@ -117,9 +117,9 @@ implicit none
     
     open(unit=unitSnapFin, recl=4096, file="snapShotFin.out", status='new', &
         action='write')
-        call sph%snapShot(unitSnapFin)
+        call intr%snapShot(unitSnapFin)
     close(unitSnapFin)
     
-    call sph%destructor()
+    call intr%destructor()
     
 end program mc_canonical

@@ -13,7 +13,7 @@ use class_neighbours
 implicit none
 
 private
-public :: intr_constructor
+public :: inter_constructor
 
     type :: Spheres
 
@@ -85,34 +85,34 @@ public :: intr_constructor
     
 contains
 
-    function intr_constructor()
+    function inter_constructor()
     
-        type(Interacting) :: intr_constructor
+        type(Interacting) :: inter_constructor
     
         ! Construction                
 
-        intr_constructor%radius = intr_radius
-        intr_constructor%rmin = intr_rmin
-        intr_constructor%Ncol = intr_Ncol
-        allocate(intr_constructor%X(Dim, intr_Ncol))
+        inter_constructor%radius = inter_radius
+        inter_constructor%rmin = inter_rmin
+        inter_constructor%Ncol = inter_Ncol
+        allocate(inter_constructor%X(Dim, inter_Ncol))
         
-        intr_constructor%dx = intr_dx
+        inter_constructor%dx = inter_dx
         
-        intr_constructor%rcut = intr_rcut
-        intr_constructor%pas = intr_pas
-        intr_constructor%iMin = intr_iMin
-        intr_constructor%Ntab = intr_Ntab        
-        intr_constructor%epsilon = intr_epsilon
-        intr_constructor%alpha = intr_alpha        
-        allocate(intr_constructor%Vtab(intr_iMin:intr_Ntab))
-        call intr_constructor%ePotIni()
+        inter_constructor%rcut = inter_rcut
+        inter_constructor%pas = inter_pas
+        inter_constructor%iMin = inter_iMin
+        inter_constructor%Ntab = inter_Ntab        
+        inter_constructor%epsilon = inter_epsilon
+        inter_constructor%alpha = inter_alpha        
+        allocate(inter_constructor%Vtab(inter_iMin:inter_Ntab))
+        call inter_constructor%ePotIni()
         
         !	Neighbours        
-        intr_constructor%same = neigh_constructor(intr_rcut)
-        call intr_constructor%same%alloc_cells()
-        call intr_constructor%same%ini_cell_neighs()
+        inter_constructor%same = neigh_constructor(inter_rcut)
+        call inter_constructor%same%alloc_cells()
+        call inter_constructor%same%ini_cell_neighs()
     
-    end function intr_constructor
+    end function inter_constructor
     
     subroutine Interacting_destructor(this)
     

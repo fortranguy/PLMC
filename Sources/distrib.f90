@@ -38,7 +38,7 @@ use class_component
 
 implicit none
 
-	real(DP), parameter :: densite = real(sph_Ncol, DP) / (Lsize1*Lsize2*Lsize3)
+	real(DP), parameter :: densite = real(inter_Ncol, DP) / (Lsize1*Lsize2*Lsize3)
 	integer, dimension(:), allocatable :: distrib
 	integer, parameter :: unitSnapShots = 10, unitDistrib = 11, &
 		unitEnerg = 12
@@ -51,8 +51,8 @@ implicit none
 	real(DP) :: numerat, denomin
 	real(DP), dimension(:), allocatable :: fct_dist
 	real(DP) :: energSum	
-	type(Component) :: sph
-	real(DP), dimension(Dim, sph_Ncol) :: X
+	type(Interacting) :: inter
+	real(DP), dimension(Dim, inter_Ncol) :: X
 	
 	!$ integer :: nb_taches
 	real(DP) :: tIni, tFin
@@ -60,7 +60,7 @@ implicit none
 	
 	if (.not.snap) stop "Snap désactivé."
 	
-	sph = sph_constructor()
+	inter = inter_constructor()
 	
 	call initDistriParams()
 	allocate(distrib(Ndist))
@@ -80,15 +80,15 @@ implicit none
 
 		! Lecture :
 		!$omp critical
-		do iCol = 1, sph_Ncol
+		do iCol = 1, inter_Ncol
 			read(unitSnapShots, *) X(:, iCol)
 		end do
 		!$omp end critical
 	
 		! Traitement
 		 
-		do iCol = 1, sph_Ncol
-			do jCol = iCol + 1, sph_Ncol
+		do iCol = 1, inter_Ncol
+			do jCol = iCol + 1, inter_Ncol
 	
 				r_ij = dist(X(:, iCol), X(:, jCol))		        
 			    iDist =  int(r_ij/deltaDist)
@@ -123,11 +123,11 @@ implicit none
 		
 			r = (real(iDist, DP) + 0.5_DP) * deltaDist
 			numerat = real(distrib(iDist), DP) / real(Nstep, DP)
-			denomin = real(sph_Ncol, DP) * (sphereVol(iDist+1) - sphereVol(iDist))
+			denomin = real(inter_Ncol, DP) * (sphereVol(iDist+1) - sphereVol(iDist))
 			fct_dist(iDist) = 2._DP * numerat / denomin / densite
 			write(unitDistrib, *) r, fct_dist(iDist)
 			
-			if (r>=sph_rmin .and. r<=sph_rcut) then
+			if (r>=inter_rmin .and. r<=inter_rcut) then
 				if (iDistMin == 0) then
 					iDistMin = iDist
 				end if
@@ -139,13 +139,13 @@ implicit none
 	
 	! Energie par particule
 
-	call sph%ePotIni()
+	call inter%ePotIni()
 	
 	energSum = 0._DP
 	
 	do iDist = iDistMin, iDistMax
 		r = (real(iDist, DP) + 0.5_DP) * deltaDist
-		energSum = energSum + sph%ePot(r) * fct_dist(iDist) * 4._DP*PI*r**2	
+		energSum = energSum + inter%ePot(r) * fct_dist(iDist) * 4._DP*PI*r**2	
 	end do
 
 	open(unit=unitEnerg, file="epp_dist.out", action="write")
