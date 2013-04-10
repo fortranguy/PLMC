@@ -65,7 +65,7 @@ public :: intr_constructor
         procedure :: destructor => InteractingSpheres_destructor
         
         !> Print a report of the component in a file
-        procedure :: report => InteractingSpheres_report  
+        procedure :: report => InteractingSpheres_report
               
         !> Potential energy
         procedure :: ePotIni => InteractingSpheres_ePotIni
@@ -110,7 +110,7 @@ contains
     
     end function intr_constructor
     
-    subroutine Component_destructor(this)
+    subroutine InteractingSpheres_destructor(this)
     
         class(Component), intent(inout) :: this
         
@@ -118,11 +118,11 @@ contains
         deallocate(this%Vtab)
         call this%same%destructor()
     
-    end subroutine Component_destructor
+    end subroutine InteractingSpheres_destructor
     
     !> Report
     
-    subroutine Component_report(this, nWidom, unitReport)
+    subroutine InteractingSpheres_report(this, nWidom, unitReport)
     
         class(Component), intent(in) :: this
         integer, intent(in) :: nWidom
@@ -144,7 +144,7 @@ contains
         	this%same%cell_coordMax(:)
         write(unitReport, *) "    cell_Lsize(:) = ", this%same%cell_Lsize(:)
         
-    end subroutine Component_report
+    end subroutine InteractingSpheres_report
     
     !> Configuration state
       
@@ -260,7 +260,7 @@ contains
     !> Tabulation of Yukawa potential
     
     !> \f[ \epsilon \frac{e^{-\alpha (r-r_{min})}}{r} \f]
-    subroutine Component_ePotIni(this)
+    subroutine InteractingSpheres_ePotIni(this)
     
         class(Component), intent(inout) :: this
 
@@ -277,9 +277,9 @@ contains
         this%Vtab(:) = this%Vtab(:) - this%epsilon * &
             exp(-this%alpha*(this%rcut-this%rmin)) / this%rcut
 
-    end subroutine Component_ePotIni
+    end subroutine InteractingSpheres_ePotIni
 
-    function Component_ePot(this, r) result(ePot)
+    function InteractingSpheres_ePot(this, r) result(ePot)
         
         class(Component), intent(in) :: this
         real(DP), intent(in) :: r
@@ -300,9 +300,9 @@ contains
            
         end if
         
-    end function Component_ePot
+    end function InteractingSpheres_ePot
     
-    subroutine Component_ePotNeigh(this, iCol, xCol, iCell, overlap, energ)
+    subroutine InteractingSpheres_ePotNeigh(this, iCol, xCol, iCell, overlap, energ)
         
         class(Component), intent(in) :: this        
         integer, intent(in) :: iCol, iCell
@@ -347,11 +347,11 @@ contains
             
         end do
     
-    end subroutine Component_ePotNeigh
+    end subroutine InteractingSpheres_ePotNeigh
     
     !> Particle move
     
-    subroutine Component_mcMove(this, enTot, Nrejects)
+    subroutine InteractingSpheres_mcMove(this, enTot, Nrejects)
     
         class(Component), intent(inout) :: this
         real(DP), intent(inout) :: enTot
@@ -401,11 +401,11 @@ contains
             
         end if
     
-    end subroutine Component_mcMove
+    end subroutine InteractingSpheres_mcMove
     
     !> Widom's method
 
-    subroutine Component_widom(this, nWidom, activExInv)
+    subroutine InteractingSpheres_widom(this, nWidom, activExInv)
         
         class(Component), intent(in) :: this
         integer, intent(in) :: nWidom
@@ -435,11 +435,11 @@ contains
         
         activExInv = widTestSum/real(nWidom, DP)
         
-    end subroutine Component_widom
+    end subroutine InteractingSpheres_widom
 
     !> Total potential energy
     
-    function Component_enTotCalc(this) result(enTotCalc)
+    function InteractingSpheres_enTotCalc(this) result(enTotCalc)
     
         class(Component), intent(in) :: this
         
@@ -462,6 +462,6 @@ contains
         
         enTotCalc = 0.5_DP*enTotCalc
     
-    end function Component_enTotCalc
+    end function InteractingSpheres_enTotCalc
 
 end module class_component
