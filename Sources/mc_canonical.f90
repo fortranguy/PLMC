@@ -37,20 +37,20 @@ implicit none
     
     open(unit=unitReport, recl=4096, file="report.out", status='new', &
         action='write')
-    call intr%report(nWidom, unitReport)
+    call inter%report(nWidom, unitReport)
     call init_random_seed(unitReport)
     
     ! Initial condition
     
-    call initialCondition(unitReport, intr%X)
+    call initialCondition(unitReport, inter%X)
     open(unit=unitSnapIni, recl=4096, file="snapShotIni.out", status='new', &
         action='write')
-        call intr%snapShot(unitSnapIni)
+        call inter%snapShot(unitSnapIni)
     close(unitSnapIni)
     
-    call intr%overlapTest()
-    enTot = intr%enTotCalc()
-    call intr%cols_to_cells()
+    call inter%overlapTest()
+    enTot = inter%enTotCalc()
+    call inter%cols_to_cells()
     
 ! Middle --------------------------------------------------
 
@@ -68,15 +68,15 @@ implicit none
     do iStep = 1, Ntherm + Nstep
     
         do iMove = 1, Nmove   
-            call intr%mcMove(enTot, Nrejects)
+            call inter%mcMove(enTot, Nrejects)
         end do
         
-        call intr%widom(nWidom, activExInv)
+        call inter%widom(nWidom, activExInv)
         
         if (iStep <= Ntherm) then
         
-            call intr%adapt_dx(iStep, tauxRejectsSum, unitReport)
-            write(unit_dx, *) iStep, intr%get_dx(), tauxRejectsSum/real(iStep, DP)
+            call inter%adapt_dx(iStep, tauxRejectsSum, unitReport)
+            write(unit_dx, *) iStep, inter%get_dx(), tauxRejectsSum/real(iStep, DP)
             write(unitObsTherm, *) iStep, enTot, activExInv
         
         else
@@ -86,7 +86,7 @@ implicit none
             write(unitObs, *) iStep, enTot, activExInv
             
             if (snap) then
-                call intr%snapShot(unitSnapShots)
+                call inter%snapShot(unitSnapShots)
             end if
             
         end if
@@ -105,11 +105,11 @@ implicit none
 
 ! End -----------------------------------------------------
 
-    call intr%overlapTest()
+    call inter%overlapTest()
     
     write(unitReport, *) "Consistency test:"
     write(unitReport, *) "    enTot_mc_c = ", enTot
-    write(unitReport, *) "    enTot_calc = ", intr%enTotCalc()
+    write(unitReport, *) "    enTot_calc = ", inter%enTotCalc()
     
     call mcResults(enTotSum, activExInvSum, tauxRejectsSum, tFin-tIni,&
         unitReport)
@@ -117,9 +117,9 @@ implicit none
     
     open(unit=unitSnapFin, recl=4096, file="snapShotFin.out", status='new', &
         action='write')
-        call intr%snapShot(unitSnapFin)
+        call inter%snapShot(unitSnapFin)
     close(unitSnapFin)
     
-    call intr%destructor()
+    call inter%destructor()
     
 end program mc_canonical
