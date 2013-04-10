@@ -125,7 +125,8 @@ contains
         end do
     
         do iDir = 1, Dim
-            inter_X(iDir, :) = inter_X(iDir, :) - 0.5_DP*ratio(iDir) ! just inside
+            inter_X(iDir, :) = inter_X(iDir, :) - 0.5_DP*ratio(iDir) 
+            ! just inside
         end do
     
     end subroutine primitiveCubic

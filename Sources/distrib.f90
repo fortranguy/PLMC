@@ -38,7 +38,8 @@ use class_component
 
 implicit none
 
-	real(DP), parameter :: densite = real(inter_Ncol, DP) / (Lsize1*Lsize2*Lsize3)
+	real(DP), parameter :: densite = real(inter_Ncol, DP) / &
+	    (Lsize1*Lsize2*Lsize3)
 	integer, dimension(:), allocatable :: distrib
 	integer, parameter :: unitSnapShots = 10, unitDistrib = 11, &
 		unitEnerg = 12
