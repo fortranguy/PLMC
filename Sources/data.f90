@@ -101,7 +101,7 @@ use data_cell
 
 implicit none
 
-    integer, dimension(Dim), parameter :: cell_neigh_coordMax = [3, 3, 3]
+    integer, dimension(Dim), parameter :: cell_neigh_coordMax = 3
     integer, parameter :: cell_neighs_nb = 3**3 !< including itself
 
 end module data_neighbours
