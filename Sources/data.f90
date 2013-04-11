@@ -81,10 +81,10 @@ use data_particles
 
 implicit none
 
-    real(DP), parameter :: inter_rcut = 4._DP
+    real(DP), parameter :: inter_rCut = 4._DP
     real(DP), parameter :: inter_pas = 5.E-5_DP
     integer, parameter :: inter_iMin = int(inter_rMin/inter_pas)
-    integer, parameter :: inter_Ntab = int(inter_rcut/inter_pas)
+    integer, parameter :: inter_Ntab = int(inter_rCut/inter_pas)
     real(DP), parameter :: inter_epsilon = 1._DP
     real(DP), parameter :: inter_alpha = 5._DP
         

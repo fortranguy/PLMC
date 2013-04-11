@@ -46,17 +46,17 @@ public :: Link, neigh_constructor
     
 contains
 
-    function neigh_constructor(rcut)
+    function neigh_constructor(rCut)
     
-        real(DP), intent(in) :: rcut
+        real(DP), intent(in) :: rCut
         type(Neighbours) :: neigh_constructor
         
-        neigh_constructor%cell_Lsize(:) = [rcut, rcut, rcut]
-        neigh_constructor%cell_coordMax(:) = int(Lsize(:)/rcut)
+        neigh_constructor%cell_Lsize(:) = [rCut, rCut, rCut]
+        neigh_constructor%cell_coordMax(:) = int(Lsize(:)/rCut)
         allocate(neigh_constructor%cell_neighs(cell_neighs_nb, &
-            product( int(Lsize(:)/rcut) )))
+            product( int(Lsize(:)/rCut) )))
             
-        call neigh_constructor%check_CellsSize(rcut)
+        call neigh_constructor%check_CellsSize(rCut)
     
     end function neigh_constructor
     
@@ -129,18 +129,18 @@ contains
     
     ! Neighbours cells size check
     
-    subroutine Neighbours_check_cellsSize(this, rcut)
+    subroutine Neighbours_check_cellsSize(this, rCut)
     
         class(Neighbours), intent(in) :: this
-        real(DP), intent(in) :: rcut
+        real(DP), intent(in) :: rCut
         
         integer :: iDir
         
         do iDir = 1, Dim
         
-            if (this%cell_Lsize(iDir) < rcut) then
+            if (this%cell_Lsize(iDir) < rCut) then
             	write(*, *) "Too small cell in the direction", iDir, ":"
-                write(*, *) this%cell_Lsize(iDir), "<", rcut
+                write(*, *) this%cell_Lsize(iDir), "<", rCut
                 stop
             end if
             

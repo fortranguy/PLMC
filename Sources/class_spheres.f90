@@ -26,7 +26,7 @@ private
         real(DP), dimension(Dim) :: dx !< displacement
 
         ! Potential
-        real(DP) :: rcut !< short-range cut    
+        real(DP) :: rCut !< short-range cut    
         
         ! Neighbours (cell/grid scheme)   
         type(Neighbours) :: same !< same kind

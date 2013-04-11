@@ -63,7 +63,7 @@ contains
         
         inter_constructor%dx = inter_dx
         
-        inter_constructor%rcut = inter_rcut
+        inter_constructor%rCut = inter_rCut
         inter_constructor%pas = inter_pas
         inter_constructor%iMin = inter_iMin
         inter_constructor%Ntab = inter_Ntab        
@@ -73,7 +73,7 @@ contains
         call inter_constructor%ePotIni()
         
         !	Neighbours        
-        inter_constructor%same = neigh_constructor(inter_rcut)
+        inter_constructor%same = neigh_constructor(inter_rCut)
         call inter_constructor%same%alloc_cells()
         call inter_constructor%same%ini_cell_neighs()
     
@@ -107,7 +107,7 @@ contains
         write(unitReport, *) "    Nmove = ", Nmove
         write(unitReport, *) "    epsilon = ", this%epsilon
         write(unitReport, *) "    alpha = ", this%alpha
-        write(unitReport, *) "    rcut = ", this%rcut
+        write(unitReport, *) "    rCut = ", this%rCut
         write(unitReport, *) "    pas = ", this%pas
         write(unitReport, *) "    cell_coordMax(:) = ", &
         	this%same%cell_coordMax(:)
@@ -134,7 +134,7 @@ contains
         
         ! shift        
         this%Vtab(:) = this%Vtab(:) - this%epsilon * &
-            exp(-this%alpha*(this%rcut-this%rMin)) / this%rcut
+            exp(-this%alpha*(this%rCut-this%rMin)) / this%rCut
 
     end subroutine Interacting_ePotIni
 
@@ -146,7 +146,7 @@ contains
         integer :: i
         real(DP) :: r_i, ePot
        
-        if (r < this%rcut) then
+        if (r < this%rCut) then
        
             i = int(r/this%pas)
             r_i = real(i, DP)*this%pas
