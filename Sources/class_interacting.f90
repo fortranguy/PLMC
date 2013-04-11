@@ -57,7 +57,7 @@ contains
         ! Construction                
 
         inter_constructor%radius = inter_radius
-        inter_constructor%rmin = inter_rmin
+        inter_constructor%rMin = inter_rMin
         inter_constructor%Ncol = inter_Ncol
         allocate(inter_constructor%X(Dim, inter_Ncol))
         
@@ -129,12 +129,12 @@ contains
         ! cut
         do i = this%iMin, this%Ntab       
             r_i = real(i, DP)*this%pas
-            this%Vtab(i) = this%epsilon * exp(-this%alpha*(r_i-this%rmin))/r_i           
+            this%Vtab(i) = this%epsilon * exp(-this%alpha*(r_i-this%rMin))/r_i           
         end do
         
         ! shift        
         this%Vtab(:) = this%Vtab(:) - this%epsilon * &
-            exp(-this%alpha*(this%rcut-this%rmin)) / this%rcut
+            exp(-this%alpha*(this%rcut-this%rMin)) / this%rcut
 
     end subroutine Interacting_ePotIni
 
@@ -190,7 +190,7 @@ contains
                 if (current%iCol /= iCol) then
                 
                     r = dist(xCol(:), this%X(:, current%iCol))
-                    if (r < this%rmin) then
+                    if (r < this%rMin) then
                         overlap = .true.
                         return
                     end if

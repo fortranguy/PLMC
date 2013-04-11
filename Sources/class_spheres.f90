@@ -18,7 +18,7 @@ private
 
         ! Particles
         real(DP) :: radius !< radius of a particle
-        real(DP) :: rmin !< minimum distance between two particles
+        real(DP) :: rMin !< minimum distance between two particles
         integer ::  Ncol !< number of a component particles
         real(DP), dimension(:, :), allocatable :: X !< position of a particle
 
@@ -79,7 +79,7 @@ contains
                 if (iCol /= jCol) then
                     
                     r_ij = dist(this%X(:, iCol), this%X(:, jCol))
-                    if (r_ij < this%rmin) then
+                    if (r_ij < this%rMin) then
                         write(*, *) "    Overlap !", iCol, jCol
                         write(*, * ) "    r_ij = ", r_ij
                         stop

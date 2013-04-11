@@ -104,7 +104,7 @@ contains
         
         ratio(:) = Lsize(:)/real(nCols(:), DP) ! A vérifier
         do iDir = 1, Dim
-            if ( inter_rmin*real(nCols(iDir), DP) > Lsize(iDir) ) then
+            if ( inter_rMin*real(nCols(iDir), DP) > Lsize(iDir) ) then
                 write(*, *) "    Error : too dense in the direction", iDir
                 stop
             end if
@@ -155,7 +155,7 @@ contains
             nOK = 0
             do iCol = 1, Ncols
                 rTest = dist(inter_X(:, iCol), xTest(:))
-                if (rTest >= inter_rmin) then
+                if (rTest >= inter_rMin) then
                     nOK = nOK + 1
                 else
                     exit
