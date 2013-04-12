@@ -14,11 +14,11 @@ implicit none
 
     ! Initialisation
     
-    integer :: iStep, iMove
     integer :: Nrejects
     real(DP) :: rejectsRateSum
     real(DP) :: ePot_total, ePot_totalSum
     real(DP) :: activExInv, activExInvSum !< inverse of activity
+    integer :: iStep, iMove
     integer, parameter :: nWidom = inter_Ncol !< number of test particles
     real(DP) :: tIni, tFin
     type(Interacting) :: inter

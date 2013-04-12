@@ -2,6 +2,7 @@
 
 module class_spheres
 
+use data_constants
 use data_cell
 use data_mc
 use data_neighbours
