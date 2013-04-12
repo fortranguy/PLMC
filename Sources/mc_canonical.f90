@@ -17,7 +17,7 @@ implicit none
     
     integer :: iStep, iMove
     type(Interacting) :: inter
-    type(Obversables) :: interObs
+    type(Observables) :: interObs
     
     real(DP) :: tIni, tFin
     
@@ -25,11 +25,7 @@ implicit none
         unitReport = 13, unitObsTherm = 14, unit_dx = 15, unitSnapShots = 16
         
     inter = inter_constructor()
-    
-    Nrejects = 0
-    rejectsRateSum = 0._DP
-    ePot_totalSum = 0._DP
-    activExInvSum = 0._DP
+    call interObs%init()
     
     write(*, *) "Monte-Carlo - Canonical : Volume =", product(Lsize)
     
@@ -47,7 +43,7 @@ implicit none
     close(unitSnapIni)
     
     call inter%overlapTest()
-    ePot_total = inter%ePot_total()
+    interObs%ePot_total = inter%ePot_total()
     call inter%cols_to_cells()
     
 ! Middle --------------------------------------------------
@@ -65,24 +61,24 @@ implicit none
     call cpu_time(tIni)
     do iStep = 1, Ntherm + Nstep
     
-        do iMove = 1, Nmove   
-            call inter%mcMove(ePot_total, Nrejects)
+        do iMove = 1, Nmove
+            call inter%mcMove(interObs%ePot_total, interObs%Nrejects)
         end do
         
-        call inter%widom(activExInv)
+        call inter%widom(interObs%activExInv)
         
         if (iStep <= Ntherm) then
         
-            call inter%adapt_dx(iStep, rejectsRateSum, unitReport)
+            call inter%adapt_dx(iStep, interObs%rejectsRateSum, unitReport)
             write(unit_dx, *) iStep, inter%get_dx(), &
-                rejectsRateSum/real(iStep, DP)
-            write(unitObsTherm, *) iStep, ePot_total, activExInv
+                interObs%rejectsRateSum/real(iStep, DP)
+            write(unitObsTherm, *) iStep, interObs%ePot_total, &
+                interObs%activExInv
         
         else
             
-            ePot_totalSum = ePot_totalSum + ePot_total
-            activExInvSum = activExInvSum + activExInv
-            write(unitObs, *) iStep, ePot_total, activExInv
+            call interObs%add()
+            write(unitObs, *) iStep, interObs%ePot_total, interObs%activExInv
             
             if (snap) then
                 call inter%snapShot(unitSnapShots)
@@ -90,8 +86,7 @@ implicit none
             
         end if
         
-        rejectsRateSum = rejectsRateSum + real(Nrejects, DP)/real(Nmove, DP)
-        Nrejects = 0
+        call interObs%addRej()
     
     end do
     call cpu_time(tFin)
@@ -105,10 +100,9 @@ implicit none
 ! End -----------------------------------------------------
 
     call inter%overlapTest()
-    call inter%consistTest(ePot_total, unitReport)
+    call inter%consistTest(interObs%ePot_total, unitReport)
     
-    call mcResults(ePot_totalSum, activExInvSum, rejectsRateSum, tFin-tIni,&
-        unitReport)
+    call mcResults(interObs, tFin-tIni, unitReport)
     close(unitReport)
     
     open(unit=unitSnapFin, recl=4096, file="snapShotFin.out", status='new', &

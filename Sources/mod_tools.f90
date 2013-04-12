@@ -6,6 +6,7 @@ use data_constants
 use data_particles
 use data_mc
 use mod_physics
+use class_observables
 
 implicit none
 
@@ -178,11 +179,9 @@ contains
     
     !> Results
     
-    subroutine mcResults(enTotSum, activExInvSum, rejectsRateSum, duration, &
-    	unitRapport)
+    subroutine mcResults(obs, duration, unitRapport)
 
-        real(DP), intent(in) :: enTotSum, activExInvSum     
-        real(DP), intent(in) :: rejectsRateSum
+        type(Observables), intent(in) :: obs
         real(DP), intent(in) :: duration
         integer, intent(in) :: unitRapport
         
@@ -190,18 +189,21 @@ contains
         real(DP) :: potChiId, potChiEx
     
         write(unitRapport, *) "Results :"
+        
         write(unitRapport, *) "    average energy = ", &
-            enTotSum/realNstep
+            obs%ePot_totalSum/realNstep
         write(unitRapport, *) "    average energy per particule = ", &
-            enTotSum/realNstep/real(inter_Ncol, DP)
+            obs%ePot_totalSum/realNstep/real(inter_Ncol, DP)
+            
         potChiId = -Tstar*log( product(Lsize)/real(inter_Ncol+1,DP) )
         write(unitRapport, *) "    ideal chemical potential = ", potChiId
-        potChiEx = -Tstar*log( activExInvSum/realNstep )
+        potChiEx = -Tstar*log( obs%activExInvSum/realNstep )
         write(unitRapport, *) "    average excess chemical potential = ", &
             potChiEx           
         write(unitRapport, *) "    potChi.avg = ", potChiId + potChiEx
+        
         write(unitRapport, *) "    Rejection rate = ", &
-            rejectsRateSum/real(Nstep+Ntherm, DP)
+            obs%rejectsRateSum/real(Nstep+Ntherm, DP)
         write(unitRapport, *) "    duration =", duration/60._DP, "min"        
     
     end subroutine mcResults
