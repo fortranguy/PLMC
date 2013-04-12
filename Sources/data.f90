@@ -39,6 +39,10 @@ module data_particles
 use data_constants
 use data_cell
     
+    real(DP), parameter :: hard_radius = .5_DP
+    real(DP), parameter :: hard_rMin = 1._DP
+    integer, parameter :: hard_Ncol = 270
+    
     real(DP), parameter :: inter_radius = .5_DP
     real(DP), parameter :: inter_rMin = 1._DP
     integer, parameter :: inter_Ncol = 270
@@ -61,7 +65,9 @@ implicit none
     real(DP), parameter :: Tstar = 1._DP
     integer, parameter :: Nstep = 2**10
     integer, parameter :: Ntherm = 2**8
-    integer, parameter :: Nmove = 2**2 * inter_Ncol
+    
+    integer, parameter :: Nmove = 2**2 * (hard_Ncol + inter_Ncol)
+    real(DP), dimension(Dim), parameter :: hard_dx = 2._DP    
     real(DP), dimension(Dim), parameter :: inter_dx = 2._DP
 
 end module data_mc
@@ -80,6 +86,8 @@ use data_constants
 use data_particles
 
 implicit none
+
+    real(DP), parameter :: hard_rCut = 4._DP
 
     real(DP), parameter :: inter_rCut = 4._DP
     real(DP), parameter :: inter_dr = 5.E-5_DP

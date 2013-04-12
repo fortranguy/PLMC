@@ -1,6 +1,6 @@
-!> \brief Description of the Interacting Sphere class
+!> \brief Description of the Hard Sphere class
 
-module class_interacting
+module class_hard
 
 use data_constants
 use data_cell
@@ -17,7 +17,7 @@ implicit none
 private
 public :: inter_constructor
 
-    type, extends(Spheres), public :: Interacting
+    type, extends(Spheres), public :: Hard
 
         private
 
@@ -32,29 +32,29 @@ public :: inter_constructor
     contains
 
         !> Destructor of the class
-        procedure :: destructor => Interacting_destructor
+        procedure :: destructor => Hard_destructor
         
         !> Print a report of the component in a file
-        procedure :: report => Interacting_report
+        procedure :: report => Hard_report
               
         !> Potential energy
-        procedure :: ePot_init => Interacting_ePot_init
-        procedure :: ePot => Interacting_ePot
-        procedure :: ePot_neigh => Interacting_ePot_neigh
-        procedure :: ePot_total => Interacting_ePot_total
-        procedure :: consistTest => Interacting_consistTest
+        procedure :: ePot_init => Hard_ePot_init
+        procedure :: ePot => Hard_ePot
+        procedure :: ePot_neigh => Hard_ePot_neigh
+        procedure :: ePot_total => Hard_ePot_total
+        procedure :: consistTest => Hard_consistTest
         
         !> Monte-Carlo
-        procedure :: mcMove => Interacting_mcMove
-        procedure :: widom => Interacting_widom
+        procedure :: mcMove => Hard_mcMove
+        procedure :: widom => Hard_widom
         
-    end type Interacting
+    end type Hard
     
 contains
 
     function inter_constructor()
     
-        type(Interacting) :: inter_constructor
+        type(Hard) :: inter_constructor
     
         ! Construction                
 
@@ -81,21 +81,21 @@ contains
     
     end function inter_constructor
     
-    subroutine Interacting_destructor(this)
+    subroutine Hard_destructor(this)
     
-        class(Interacting), intent(inout) :: this
+        class(Hard), intent(inout) :: this
         
         deallocate(this%X)
         deallocate(this%ePot_tab)
         call this%same%destructor()
     
-    end subroutine Interacting_destructor
+    end subroutine Hard_destructor
     
     !> Report
     
-    subroutine Interacting_report(this, nWidom, unitReport)
+    subroutine Hard_report(this, nWidom, unitReport)
     
-        class(Interacting), intent(in) :: this
+        class(Hard), intent(in) :: this
         integer, intent(in) :: nWidom
         integer, intent(in) :: unitReport    
         
@@ -115,15 +115,15 @@ contains
         	this%same%cell_coordMax(:)
         write(unitReport, *) "    cell_Lsize(:) = ", this%same%cell_Lsize(:)
         
-    end subroutine Interacting_report
+    end subroutine Hard_report
     
     !> Potential energy
     !> Tabulation of Yukawa potential    
     !> \f[ \epsilon \frac{e^{-\alpha (r-r_{min})}}{r} \f]
     
-    subroutine Interacting_ePot_init(this)
+    subroutine Hard_ePot_init(this)
     
-        class(Interacting), intent(inout) :: this
+        class(Hard), intent(inout) :: this
 
         integer :: i
         real(DP) :: r_i
@@ -139,11 +139,11 @@ contains
         this%ePot_tab(:) = this%ePot_tab(:) - this%epsilon * &
             exp(-this%alpha*(this%rCut-this%rMin)) / this%rCut
 
-    end subroutine Interacting_ePot_init
+    end subroutine Hard_ePot_init
 
-    function Interacting_ePot(this, r) result(ePot)
+    function Hard_ePot(this, r) result(ePot)
         
-        class(Interacting), intent(in) :: this
+        class(Hard), intent(in) :: this
         real(DP), intent(in) :: r
         
         integer :: i
@@ -162,11 +162,11 @@ contains
            
         end if
         
-    end function Interacting_ePot
+    end function Hard_ePot
     
-    subroutine Interacting_ePot_neigh(this, iCol, xCol, iCell, overlap, energ)
+    subroutine Hard_ePot_neigh(this, iCol, xCol, iCell, overlap, energ)
         
-        class(Interacting), intent(in) :: this        
+        class(Hard), intent(in) :: this        
         integer, intent(in) :: iCol, iCell
         real(DP), dimension(Dim), intent(in) :: xCol
         logical, intent(out) :: overlap
@@ -209,13 +209,13 @@ contains
             
         end do
     
-    end subroutine Interacting_ePot_neigh
+    end subroutine Hard_ePot_neigh
     
     !> Particle move
     
-    subroutine Interacting_mcMove(this, ePot_total, Nrejects)
+    subroutine Hard_mcMove(this, ePot_total, Nrejects)
     
-        class(Interacting), intent(inout) :: this
+        class(Hard), intent(inout) :: this
         real(DP), intent(inout) :: ePot_total
         integer, intent(inout) :: Nrejects
         
@@ -263,13 +263,13 @@ contains
             
         end if
     
-    end subroutine Interacting_mcMove
+    end subroutine Hard_mcMove
     
     !> Widom's method
 
-    subroutine Interacting_widom(this, nWidom, activExInv)
+    subroutine Hard_widom(this, nWidom, activExInv)
         
-        class(Interacting), intent(in) :: this
+        class(Hard), intent(in) :: this
         integer, intent(in) :: nWidom
         real(DP), intent(inOut) :: activExInv 
         
@@ -297,13 +297,13 @@ contains
         
         activExInv = widTestSum/real(nWidom, DP)
         
-    end subroutine Interacting_widom
+    end subroutine Hard_widom
 
     !> Total potential energy
     
-    function Interacting_ePot_total(this) result(ePot_total)
+    function Hard_ePot_total(this) result(ePot_total)
     
-        class(Interacting), intent(in) :: this
+        class(Hard), intent(in) :: this
         
         integer :: iCol, jCol
         real(DP) :: r_ij
@@ -324,13 +324,13 @@ contains
         
         ePot_total = 0.5_DP*ePot_total
     
-    end function Interacting_ePot_total
+    end function Hard_ePot_total
     
     !> Consistency test 
     
-    subroutine Interacting_consistTest(this, ePot_total_mc, unitReport)
+    subroutine Hard_consistTest(this, ePot_total_mc, unitReport)
     
-        class(Interacting), intent(in) :: this
+        class(Hard), intent(in) :: this
         real(DP), intent(in) :: ePot_total_mc
         integer, intent(in) :: unitReport
         
@@ -343,6 +343,6 @@ contains
         write(unitReport, *) "    relative difference = ", &
             abs(ePot_total-ePot_total_mc)/ePot_total
     
-    end subroutine Interacting_consistTest
+    end subroutine Hard_consistTest
 
-end module class_interacting
+end module class_hard
