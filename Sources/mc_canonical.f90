@@ -86,7 +86,7 @@ implicit none
             
         end if
         
-        call interObs%addRej()
+        call interObs%addReject()
     
     end do
     call cpu_time(tFin)
@@ -102,7 +102,7 @@ implicit none
     call inter%overlapTest()
     call inter%consistTest(interObs%ePot_total, unitReport)
     
-    call mcResults(interObs, tFin-tIni, unitReport)
+    call interObs%results(tFin-tIni, unitReport)
     close(unitReport)
     
     open(unit=unitSnapFin, recl=4096, file="snapShotFin.out", status='new', &

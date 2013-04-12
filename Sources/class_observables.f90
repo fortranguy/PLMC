@@ -27,7 +27,8 @@ private
     
         procedure :: init => Observables_init
         procedure :: add => Observables_add
-        procedure :: addRej => Observables_addRej
+        procedure :: addReject => Observables_addReject
+        procedure :: results => Observables_results
     
     end type Observables
     
@@ -54,7 +55,7 @@ contains
             
     end subroutine Observables_add
     
-    subroutine Observables_addRej(this)
+    subroutine Observables_addReject(this)
     
         class(Observables), intent(inout) :: this
         
@@ -62,6 +63,37 @@ contains
             real(Nmove, DP)
         this%Nrejects = 0
     
-    end subroutine Observables_addRej
+    end subroutine Observables_addReject
+    
+    !> Results
+    
+    subroutine Observables_results(this, duration, unitRapport)
+
+        class(Observables), intent(inout) :: this
+        real(DP), intent(in) :: duration
+        integer, intent(in) :: unitRapport
+        
+        real(DP) :: realNstep = real(Nstep, DP)
+        real(DP) :: potChiId, potChiEx
+    
+        write(unitRapport, *) "Results :"
+        
+        write(unitRapport, *) "    average energy = ", &
+            this%ePot_totalSum/realNstep
+        write(unitRapport, *) "    average energy per particule = ", &
+            this%ePot_totalSum/realNstep/real(inter_Ncol, DP)
+            
+        potChiId = -Tstar*log( product(Lsize)/real(inter_Ncol+1,DP) )
+        write(unitRapport, *) "    ideal chemical potential = ", potChiId
+        potChiEx = -Tstar*log( this%activExInvSum/realNstep )
+        write(unitRapport, *) "    average excess chemical potential = ", &
+            potChiEx           
+        write(unitRapport, *) "    potChi.avg = ", potChiId + potChiEx
+        
+        write(unitRapport, *) "    Rejection rate = ", &
+            this%rejectsRateSum/real(Nstep+Ntherm, DP)
+        write(unitRapport, *) "    duration =", duration/60._DP, "min"        
+    
+    end subroutine Observables_results
 
 end module class_observables

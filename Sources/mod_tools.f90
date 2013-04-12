@@ -177,35 +177,4 @@ contains
     
     end subroutine randomDeposition
     
-    !> Results
-    
-    subroutine mcResults(obs, duration, unitRapport)
-
-        type(Observables), intent(in) :: obs
-        real(DP), intent(in) :: duration
-        integer, intent(in) :: unitRapport
-        
-        real(DP) :: realNstep = real(Nstep, DP)
-        real(DP) :: potChiId, potChiEx
-    
-        write(unitRapport, *) "Results :"
-        
-        write(unitRapport, *) "    average energy = ", &
-            obs%ePot_totalSum/realNstep
-        write(unitRapport, *) "    average energy per particule = ", &
-            obs%ePot_totalSum/realNstep/real(inter_Ncol, DP)
-            
-        potChiId = -Tstar*log( product(Lsize)/real(inter_Ncol+1,DP) )
-        write(unitRapport, *) "    ideal chemical potential = ", potChiId
-        potChiEx = -Tstar*log( obs%activExInvSum/realNstep )
-        write(unitRapport, *) "    average excess chemical potential = ", &
-            potChiEx           
-        write(unitRapport, *) "    potChi.avg = ", potChiId + potChiEx
-        
-        write(unitRapport, *) "    Rejection rate = ", &
-            obs%rejectsRateSum/real(Nstep+Ntherm, DP)
-        write(unitRapport, *) "    duration =", duration/60._DP, "min"        
-    
-    end subroutine mcResults
-    
 end module mod_tools
