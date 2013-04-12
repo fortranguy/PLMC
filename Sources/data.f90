@@ -69,10 +69,10 @@ implicit none
     integer, parameter :: Nmove = 2**2 * (hard_Ncol + inter_Ncol)
     
     real(DP), dimension(Dim), parameter :: hard_dx = 2._DP
-    integer, parameter :: hard_nWidom = hard_Ncol
+    integer, parameter :: hard_Nwidom = hard_Ncol
     
     real(DP), dimension(Dim), parameter :: inter_dx = 2._DP
-    integer, parameter :: inter_nWidom = inter_Ncol
+    integer, parameter :: inter_Nwidom = inter_Ncol
 
 end module data_mc
 !***********************************************************************

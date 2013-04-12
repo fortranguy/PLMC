@@ -22,7 +22,7 @@ public :: inter_constructor
         private
         
         ! Monte-Carlo
-        integer :: nWidom        
+        integer :: Nwidom        
 
         ! Potential :
         real(DP)  :: dr !< discretisation step
@@ -66,7 +66,7 @@ contains
         inter_constructor%Ncol = inter_Ncol
         allocate(inter_constructor%X(Dim, inter_Ncol))
         
-        inter_constructor%nWidom = inter_nWidom
+        inter_constructor%Nwidom = inter_Nwidom
         inter_constructor%dx = inter_dx
         
         inter_constructor%rCut = inter_rCut
@@ -106,7 +106,7 @@ contains
         write(unitReport ,*) "    Lsize(:) = ", Lsize(:)
         write(unitReport ,*) "    Vol = ", product(Lsize)
         write(unitReport ,*) "    Ncol = ", this%Ncol
-        write(unitReport ,*) "    nWidom = ", this%nWidom
+        write(unitReport ,*) "    Nwidom = ", this%Nwidom
         write(unitReport, *) "    Nstep = ", Nstep
         write(unitReport, *) "    Ntherm = ", Ntherm
         write(unitReport, *) "    Nmove = ", Nmove
@@ -284,7 +284,7 @@ contains
         
         widTestSum = 0._DP
         
-        do iWid = 1, this%nWidom
+        do iWid = 1, this%Nwidom
             
             call random_number(xRand)
             xTest(:) = Lsize(:) * xRand(:)    
@@ -297,7 +297,7 @@ contains
             
         end do
         
-        activExInv = widTestSum/real(this%nWidom, DP)
+        activExInv = widTestSum/real(this%Nwidom, DP)
         
     end subroutine Interacting_widom
 

@@ -71,17 +71,17 @@ contains
     
     !> Report
     
-    subroutine Hard_report(this, nWidom, unitReport)
+    subroutine Hard_report(this, Nwidom, unitReport)
     
         class(Hard), intent(in) :: this
-        integer, intent(in) :: nWidom
+        integer, intent(in) :: Nwidom
         integer, intent(in) :: unitReport    
         
         write(unitReport, *) "Simulation MC_C :"
         write(unitReport ,*) "    Lsize(:) = ", Lsize(:)
         write(unitReport ,*) "    Vol = ", product(Lsize)
         write(unitReport ,*) "    Ncol = ", this%Ncol
-        write(unitReport ,*) "    nWidom = ", nWidom
+        write(unitReport ,*) "    Nwidom = ", Nwidom
         write(unitReport, *) "    Nstep = ", Nstep
         write(unitReport, *) "    Ntherm = ", Ntherm
         write(unitReport, *) "    Nmove = ", Nmove
@@ -180,10 +180,10 @@ contains
     
     !> Widom's method
 
-    subroutine Hard_widom(this, nWidom, activExInv)
+    subroutine Hard_widom(this, Nwidom, activExInv)
         
         class(Hard), intent(in) :: this
-        integer, intent(in) :: nWidom
+        integer, intent(in) :: Nwidom
         real(DP), intent(inOut) :: activExInv 
         
         integer :: iWid
@@ -194,7 +194,7 @@ contains
         
         widTestSum = 0._DP
         
-        do iWid = 1, nWidom           
+        do iWid = 1, Nwidom           
             
             call random_number(xRand)
             xTest(:) = Lsize(:) * xRand(:)    
@@ -207,7 +207,7 @@ contains
             
         end do
         
-        activExInv = widTestSum/real(nWidom, DP)
+        activExInv = widTestSum/real(Nwidom, DP)
         
     end subroutine Hard_widom
 
