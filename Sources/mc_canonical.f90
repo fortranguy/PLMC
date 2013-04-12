@@ -17,7 +17,7 @@ implicit none
     integer :: iStep, iMove
     integer :: Nrejects
     real(DP) :: tauxRejectsSum
-    real(DP) :: enTot, enTotSum
+    real(DP) :: ePot_total, ePot_totalSum
     real(DP) :: activExInv, activExInvSum !< inverse of activity
     integer, parameter :: nWidom = inter_Ncol !< number of test particles
     real(DP) :: tIni, tFin
@@ -30,7 +30,7 @@ implicit none
     
     Nrejects = 0
     tauxRejectsSum = 0._DP
-    enTotSum = 0._DP
+    ePot_totalSum = 0._DP
     activExInvSum = 0._DP
     
     write(*, *) "Monte-Carlo - Canonical : Volume =", product(Lsize)
@@ -49,7 +49,7 @@ implicit none
     close(unitSnapIni)
     
     call inter%overlapTest()
-    enTot = inter%ePot_total()
+    ePot_total = inter%ePot_total()
     call inter%cols_to_cells()
     
 ! Middle --------------------------------------------------
@@ -68,7 +68,7 @@ implicit none
     do iStep = 1, Ntherm + Nstep
     
         do iMove = 1, Nmove   
-            call inter%mcMove(enTot, Nrejects)
+            call inter%mcMove(ePot_total, Nrejects)
         end do
         
         call inter%widom(nWidom, activExInv)
@@ -78,13 +78,13 @@ implicit none
             call inter%adapt_dx(iStep, tauxRejectsSum, unitReport)
             write(unit_dx, *) iStep, inter%get_dx(), &
                 tauxRejectsSum/real(iStep, DP)
-            write(unitObsTherm, *) iStep, enTot, activExInv
+            write(unitObsTherm, *) iStep, ePot_total, activExInv
         
         else
             
-            enTotSum = enTotSum + enTot
+            ePot_totalSum = ePot_totalSum + ePot_total
             activExInvSum = activExInvSum + activExInv
-            write(unitObs, *) iStep, enTot, activExInv
+            write(unitObs, *) iStep, ePot_total, activExInv
             
             if (snap) then
                 call inter%snapShot(unitSnapShots)
@@ -107,12 +107,9 @@ implicit none
 ! End -----------------------------------------------------
 
     call inter%overlapTest()
+    call inter%consistTest(ePot_total, unitReport)
     
-    write(unitReport, *) "Consistency test:"
-    write(unitReport, *) "    enTot_mc_c = ", enTot
-    write(unitReport, *) "    enTot_calc = ", inter%ePot_total()
-    
-    call mcResults(enTotSum, activExInvSum, tauxRejectsSum, tFin-tIni,&
+    call mcResults(ePot_totalSum, activExInvSum, tauxRejectsSum, tFin-tIni,&
         unitReport)
     close(unitReport)
     

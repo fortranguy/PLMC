@@ -41,6 +41,7 @@ public :: inter_constructor
         procedure :: ePot => Interacting_ePot
         procedure :: ePot_neigh => Interacting_ePot_neigh
         procedure :: ePot_total => Interacting_ePot_total
+        procedure :: consistTest => Interacting_consistTest
         
         !> Monte-Carlo
         procedure :: mcMove => Interacting_mcMove
@@ -210,10 +211,10 @@ contains
     
     !> Particle move
     
-    subroutine Interacting_mcMove(this, enTot, Nrejects)
+    subroutine Interacting_mcMove(this, ePot_total, Nrejects)
     
         class(Interacting), intent(inout) :: this
-        real(DP), intent(inout) :: enTot
+        real(DP), intent(inout) :: ePot_total
         integer, intent(inout) :: Nrejects
         
         logical :: overlap
@@ -243,7 +244,7 @@ contains
             call random_number(rand)
             if ( rand < exp(-dEn/Tstar) ) then
                 this%X(:, iOld) = xNew(:)
-                enTot = enTot + dEn
+                ePot_total = ePot_total + dEn
                 
                 if ( iCellBefore /= iCellAfter ) then                
                     call this%same%remove_cell_col(iOld, iCellBefore)
@@ -322,5 +323,24 @@ contains
         ePot_total = 0.5_DP*ePot_total
     
     end function Interacting_ePot_total
+    
+    !> Consistency test 
+    
+    subroutine Interacting_consistTest(this, ePot_total_mc, unitReport)
+    
+        class(Interacting), intent(in) :: this
+        real(DP), intent(in) :: ePot_total_mc
+        integer, intent(in) :: unitReport
+        
+        real(DP) :: ePot_total
+    
+        ePot_total = this%ePot_total()
+        write(unitReport, *) "Consistency test:"
+        write(unitReport, *) "    ePot_total_mc = ", ePot_total_mc
+        write(unitReport, *) "    ePot_total() = ", ePot_total
+        write(unitReport, *) "    relative difference = ", &
+            abs(ePot_total-ePot_total_mc)/ePot_total
+    
+    end subroutine Interacting_consistTest
 
 end module class_interacting
