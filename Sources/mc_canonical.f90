@@ -21,8 +21,7 @@ implicit none
     
     real(DP) :: tIni, tFin
     
-    integer, parameter :: unitObs = 10, unitSnapIni = 11, unitSnapFin = 12, &
-        unitReport = 13, unitObsTherm = 14, unit_dx = 15, unitSnapShots = 16
+    type(FileUnits) :: units
         
     inter = inter_constructor()
     call inter_obs%init()
