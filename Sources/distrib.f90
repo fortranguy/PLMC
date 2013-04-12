@@ -139,8 +139,6 @@ implicit none
 	close(unitDistrib)
 	
 	! Energie par particule
-
-	call inter%ePotIni()
 	
 	energSum = 0._DP
 	

@@ -49,7 +49,7 @@ implicit none
     close(unitSnapIni)
     
     call inter%overlapTest()
-    enTot = inter%enTotCalc()
+    enTot = inter%ePot_total()
     call inter%cols_to_cells()
     
 ! Middle --------------------------------------------------
@@ -110,7 +110,7 @@ implicit none
     
     write(unitReport, *) "Consistency test:"
     write(unitReport, *) "    enTot_mc_c = ", enTot
-    write(unitReport, *) "    enTot_calc = ", inter%enTotCalc()
+    write(unitReport, *) "    enTot_calc = ", inter%ePot_total()
     
     call mcResults(enTotSum, activExInvSum, tauxRejectsSum, tFin-tIni,&
         unitReport)

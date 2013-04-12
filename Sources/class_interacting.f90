@@ -37,10 +37,10 @@ public :: inter_constructor
         procedure :: report => Interacting_report
               
         !> Potential energy
-        procedure :: ePotIni => Interacting_ePotIni
+        procedure :: ePot_init => Interacting_ePot_init
         procedure :: ePot => Interacting_ePot
-        procedure :: ePotNeigh => Interacting_ePotNeigh
-        procedure :: enTotCalc => Interacting_enTotCalc
+        procedure :: ePot_neigh => Interacting_ePot_neigh
+        procedure :: ePot_total => Interacting_ePot_total
         
         !> Monte-Carlo
         procedure :: mcMove => Interacting_mcMove
@@ -70,7 +70,7 @@ contains
         inter_constructor%epsilon = inter_epsilon
         inter_constructor%alpha = inter_alpha        
         allocate(inter_constructor%Vtab(inter_iMin:inter_iCut))
-        call inter_constructor%ePotIni()
+        call inter_constructor%ePot_init()
         
         !	Neighbours        
         inter_constructor%same = neigh_constructor(inter_rCut)
@@ -119,7 +119,7 @@ contains
     !> Tabulation of Yukawa potential    
     !> \f[ \epsilon \frac{e^{-\alpha (r-r_{min})}}{r} \f]
     
-    subroutine Interacting_ePotIni(this)
+    subroutine Interacting_ePot_init(this)
     
         class(Interacting), intent(inout) :: this
 
@@ -136,7 +136,7 @@ contains
         this%Vtab(:) = this%Vtab(:) - this%epsilon * &
             exp(-this%alpha*(this%rCut-this%rMin)) / this%rCut
 
-    end subroutine Interacting_ePotIni
+    end subroutine Interacting_ePot_init
 
     function Interacting_ePot(this, r) result(ePot)
         
@@ -161,7 +161,7 @@ contains
         
     end function Interacting_ePot
     
-    subroutine Interacting_ePotNeigh(this, iCol, xCol, iCell, overlap, energ)
+    subroutine Interacting_ePot_neigh(this, iCol, xCol, iCell, overlap, energ)
         
         class(Interacting), intent(in) :: this        
         integer, intent(in) :: iCol, iCell
@@ -206,7 +206,7 @@ contains
             
         end do
     
-    end subroutine Interacting_ePotNeigh
+    end subroutine Interacting_ePot_neigh
     
     !> Particle move
     
@@ -230,12 +230,12 @@ contains
         xNew(:) = this%X(:, iOld) + (xRand(:)-0.5_DP)*this%dx(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
         iCellAfter = this%same%position_to_cell(xNew)
-        call this%ePotNeigh(iOld, xNew, iCellAfter, overlap, eNew)
+        call this%ePot_neigh(iOld, xNew, iCellAfter, overlap, eNew)
         
         if (.not. overlap) then
         
             iCellBefore = this%same%position_to_cell(this%X(:, iOld))
-            call this%ePotNeigh(iOld, this%X(:, iOld), iCellBefore, overlap, &
+            call this%ePot_neigh(iOld, this%X(:, iOld), iCellBefore, overlap, &
                 eOld)
             
             dEn = eNew - eOld
@@ -284,7 +284,7 @@ contains
             call random_number(xRand)
             xTest(:) = Lsize(:) * xRand(:)    
             iCellTest = this%same%position_to_cell(xTest)
-            call this%ePotNeigh(0, xTest, iCellTest, overlap, enTest) 
+            call this%ePot_neigh(0, xTest, iCellTest, overlap, enTest) 
             
             if (.not. overlap) then
                 widTestSum = widTestSum + exp(-enTest/Tstar)
@@ -298,29 +298,29 @@ contains
 
     !> Total potential energy
     
-    function Interacting_enTotCalc(this) result(enTotCalc)
+    function Interacting_ePot_total(this) result(ePot_total)
     
         class(Interacting), intent(in) :: this
         
         integer :: iCol, jCol
         real(DP) :: r_ij
-        real(DP) :: enTotCalc
+        real(DP) :: ePot_total
     
-        enTotCalc = 0._DP
+        ePot_total = 0._DP
         
         do jCol = 1, this%Ncol
             do iCol = 1, this%Ncol
                 if (iCol /= jCol) then
                 
                     r_ij = dist(this%X(:, iCol), this%X(:, jCol))
-                    enTotCalc = enTotCalc + this%ePot(r_ij)
+                    ePot_total = ePot_total + this%ePot(r_ij)
                     
                 end if
             end do
         end do
         
-        enTotCalc = 0.5_DP*enTotCalc
+        ePot_total = 0.5_DP*ePot_total
     
-    end function Interacting_enTotCalc
+    end function Interacting_ePot_total
 
 end module class_interacting
