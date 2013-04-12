@@ -138,10 +138,9 @@ contains
     
     !> Particle move
     
-    subroutine Hard_mcMove(this, ePot_total, Nrejects)
+    subroutine Hard_mcMove(this, Nrejects)
     
         class(Hard), intent(inout) :: this
-        real(DP), intent(inout) :: ePot_total
         integer, intent(inout) :: Nrejects
         
         logical :: overlap
@@ -149,7 +148,6 @@ contains
         real(DP) :: rand
         real(DP), dimension(Dim) :: xRand, xNew
         integer :: iCellBefore, iCellAfter
-        real(DP) :: eNew, eOld, dEn
         
         call random_number(rand)
         iOld = int(rand*this%Ncol) + 1
@@ -158,28 +156,18 @@ contains
         xNew(:) = this%X(:, iOld) + (xRand(:)-0.5_DP)*this%dx(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
         iCellAfter = this%same%position_to_cell(xNew)
-        call this%ePot_neigh(iOld, xNew, iCellAfter, overlap, eNew)
+        call this%ePot_neigh(iOld, xNew, iCellAfter, overlap)
         
         if (.not. overlap) then
         
             iCellBefore = this%same%position_to_cell(this%X(:, iOld))
-            call this%ePot_neigh(iOld, this%X(:, iOld), iCellBefore, overlap, &
-                eOld)
-            
-            dEn = eNew - eOld
+            call this%ePot_neigh(iOld, this%X(:, iOld), iCellBefore, overlap)
         
-            call random_number(rand)
-            if ( rand < exp(-dEn/Tstar) ) then
-                this%X(:, iOld) = xNew(:)
-                ePot_total = ePot_total + dEn
+            this%X(:, iOld) = xNew(:)
                 
-                if ( iCellBefore /= iCellAfter ) then                
-                    call this%same%remove_cell_col(iOld, iCellBefore)
-                    call this%same%add_cell_col(iOld, iCellAfter)
-                end if
-                
-            else
-                Nrejects = Nrejects + 1
+            if ( iCellBefore /= iCellAfter ) then                
+                call this%same%remove_cell_col(iOld, iCellBefore)
+                call this%same%add_cell_col(iOld, iCellAfter)
             end if
             
         else
@@ -203,7 +191,6 @@ contains
         real(DP), dimension(Dim) :: xRand, xTest
         integer :: iCellTest
         logical :: overlap        
-        real(DP) :: enTest
         
         widTestSum = 0._DP
         
@@ -212,10 +199,10 @@ contains
             call random_number(xRand)
             xTest(:) = Lsize(:) * xRand(:)    
             iCellTest = this%same%position_to_cell(xTest)
-            call this%ePot_neigh(0, xTest, iCellTest, overlap, enTest) 
+            call this%ePot_neigh(0, xTest, iCellTest, overlap) 
             
             if (.not. overlap) then
-                widTestSum = widTestSum + exp(-enTest/Tstar)
+                widTestSum = widTestSum + 1._DP
             end if
             
         end do
@@ -223,51 +210,5 @@ contains
         activExInv = widTestSum/real(nWidom, DP)
         
     end subroutine Hard_widom
-
-    !> Total potential energy
-    
-    function Hard_ePot_total(this) result(ePot_total)
-    
-        class(Hard), intent(in) :: this
-        
-        integer :: iCol, jCol
-        real(DP) :: r_ij
-        real(DP) :: ePot_total
-    
-        ePot_total = 0._DP
-        
-        do jCol = 1, this%Ncol
-            do iCol = 1, this%Ncol
-                if (iCol /= jCol) then
-                
-                    r_ij = dist(this%X(:, iCol), this%X(:, jCol))
-                    ePot_total = ePot_total + this%ePot(r_ij)
-                    
-                end if
-            end do
-        end do
-        
-        ePot_total = 0.5_DP*ePot_total
-    
-    end function Hard_ePot_total
-    
-    !> Consistency test 
-    
-    subroutine Hard_consistTest(this, ePot_total_mc, unitReport)
-    
-        class(Hard), intent(in) :: this
-        real(DP), intent(in) :: ePot_total_mc
-        integer, intent(in) :: unitReport
-        
-        real(DP) :: ePot_total
-    
-        ePot_total = this%ePot_total()
-        write(unitReport, *) "Consistency test:"
-        write(unitReport, *) "    ePot_total_mc = ", ePot_total_mc
-        write(unitReport, *) "    ePot_total_final = ", ePot_total
-        write(unitReport, *) "    relative difference = ", &
-            abs(ePot_total-ePot_total_mc)/ePot_total
-    
-    end subroutine Hard_consistTest
 
 end module class_hard
