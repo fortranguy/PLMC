@@ -7,6 +7,7 @@ use data_mc
 use data_distrib
 use mod_tools
 use class_interacting
+use class_observables
 
 implicit none
 
@@ -14,13 +15,11 @@ implicit none
 
     ! Initialisation
     
-    integer :: Nrejects
-    real(DP) :: rejectsRateSum
-    real(DP) :: ePot_total, ePot_totalSum
-    real(DP) :: activExInv, activExInvSum !< inverse of activity
     integer :: iStep, iMove
-    real(DP) :: tIni, tFin
     type(Interacting) :: inter
+    type(Obversables) :: interObs
+    
+    real(DP) :: tIni, tFin
     
     integer, parameter :: unitObs = 10, unitSnapIni = 11, unitSnapFin = 12, &
         unitReport = 13, unitObsTherm = 14, unit_dx = 15, unitSnapShots = 16

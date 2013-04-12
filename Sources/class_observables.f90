@@ -10,6 +10,18 @@ private
 
     type, public :: Obversables
     
+        !Rejection
+        integer :: Nrejects
+        real(DP) :: rejectsRateSum
+        
+        ! Potential energy
+        real(DP) :: ePot_total
+        real(DP) :: ePot_totalSum
+        
+        ! Inverse of activity
+        real(DP) :: activExInv
+        real(DP) :: activExInvSum
+    
     contains
     
     end type Obversables
