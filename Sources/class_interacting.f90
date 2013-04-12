@@ -22,8 +22,8 @@ public :: inter_constructor
 
         ! Potential :
         real(DP)  :: dr !< discretisation step
-        integer :: iMin !< minimum index of tabulation
-        integer :: Ntab !< maximum index of tabulation
+        integer :: iMin !< minimum index of tabulation : minimum distance
+        integer :: iCut !< maximum index of tabulation : until potential cut
         real(DP) :: epsilon !< factor in Yukawa
         real(DP) :: alpha !< coefficient in Yukawa
         real(DP), dimension(:), allocatable :: Vtab !< tabulation
@@ -66,10 +66,10 @@ contains
         inter_constructor%rCut = inter_rCut
         inter_constructor%dr = inter_dr
         inter_constructor%iMin = inter_iMin
-        inter_constructor%Ntab = inter_Ntab        
+        inter_constructor%iCut = inter_iCut        
         inter_constructor%epsilon = inter_epsilon
         inter_constructor%alpha = inter_alpha        
-        allocate(inter_constructor%Vtab(inter_iMin:inter_Ntab))
+        allocate(inter_constructor%Vtab(inter_iMin:inter_iCut))
         call inter_constructor%ePotIni()
         
         !	Neighbours        
@@ -127,7 +127,7 @@ contains
         real(DP) :: r_i
        
         ! cut
-        do i = this%iMin, this%Ntab       
+        do i = this%iMin, this%iCut       
             r_i = real(i, DP)*this%dr
             this%Vtab(i) = this%epsilon * exp(-this%alpha*(r_i-this%rMin))/r_i           
         end do
