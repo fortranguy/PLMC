@@ -87,7 +87,7 @@ use data_particles
 
 implicit none
 
-    real(DP), parameter :: hard_rCut = 4._DP
+    real(DP), parameter :: hard_rCut = hard_rMin
 
     real(DP), parameter :: inter_rCut = 4._DP
     real(DP), parameter :: inter_dr = 5.E-5_DP

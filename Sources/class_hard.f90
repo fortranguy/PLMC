@@ -18,16 +18,6 @@ private
 public :: inter_constructor
 
     type, extends(Spheres), public :: Hard
-
-        private
-
-        ! Potential :
-        real(DP)  :: dr !< discretisation step
-        integer :: iMin !< minimum index of tabulation : minimum distance
-        integer :: iCut !< maximum index of tabulation : until potential cut
-        real(DP) :: epsilon !< factor in Yukawa
-        real(DP) :: alpha !< coefficient in Yukawa
-        real(DP), dimension(:), allocatable :: ePot_tab !< tabulation
         
     contains
 
@@ -38,11 +28,7 @@ public :: inter_constructor
         procedure :: report => Hard_report
               
         !> Potential energy
-        procedure :: ePot_init => Hard_ePot_init
-        procedure :: ePot => Hard_ePot
         procedure :: ePot_neigh => Hard_ePot_neigh
-        procedure :: ePot_total => Hard_ePot_total
-        procedure :: consistTest => Hard_consistTest
         
         !> Monte-Carlo
         procedure :: mcMove => Hard_mcMove
@@ -66,13 +52,6 @@ contains
         inter_constructor%dx = inter_dx
         
         inter_constructor%rCut = inter_rCut
-        inter_constructor%dr = inter_dr
-        inter_constructor%iMin = inter_iMin
-        inter_constructor%iCut = inter_iCut 
-        inter_constructor%epsilon = inter_epsilon
-        inter_constructor%alpha = inter_alpha        
-        allocate(inter_constructor%ePot_tab(inter_iMin:inter_iCut))
-        call inter_constructor%ePot_init()
         
         !	Neighbours        
         inter_constructor%same = neigh_constructor(inter_rCut)
@@ -86,7 +65,6 @@ contains
         class(Hard), intent(inout) :: this
         
         deallocate(this%X)
-        deallocate(this%ePot_tab)
         call this%same%destructor()
     
     end subroutine Hard_destructor
@@ -107,70 +85,19 @@ contains
         write(unitReport, *) "    Nstep = ", Nstep
         write(unitReport, *) "    Ntherm = ", Ntherm
         write(unitReport, *) "    Nmove = ", Nmove
-        write(unitReport, *) "    epsilon = ", this%epsilon
-        write(unitReport, *) "    alpha = ", this%alpha
         write(unitReport, *) "    rCut = ", this%rCut
-        write(unitReport, *) "    dr = ", this%dr
         write(unitReport, *) "    cell_coordMax(:) = ", &
         	this%same%cell_coordMax(:)
         write(unitReport, *) "    cell_Lsize(:) = ", this%same%cell_Lsize(:)
         
     end subroutine Hard_report
     
-    !> Potential energy
-    !> Tabulation of Yukawa potential    
-    !> \f[ \epsilon \frac{e^{-\alpha (r-r_{min})}}{r} \f]
-    
-    subroutine Hard_ePot_init(this)
-    
-        class(Hard), intent(inout) :: this
-
-        integer :: i
-        real(DP) :: r_i
-       
-        ! cut
-        do i = this%iMin, this%iCut       
-            r_i = real(i, DP)*this%dr
-            this%ePot_tab(i) = this%epsilon * exp(-this%alpha*(r_i-this%rMin))&
-            /r_i
-        end do
-        
-        ! shift        
-        this%ePot_tab(:) = this%ePot_tab(:) - this%epsilon * &
-            exp(-this%alpha*(this%rCut-this%rMin)) / this%rCut
-
-    end subroutine Hard_ePot_init
-
-    function Hard_ePot(this, r) result(ePot)
-        
-        class(Hard), intent(in) :: this
-        real(DP), intent(in) :: r
-        
-        integer :: i
-        real(DP) :: r_i, ePot
-       
-        if (r < this%rCut) then
-       
-            i = int(r/this%dr)
-            r_i = real(i, DP)*this%dr
-            ePot = this%ePot_tab(i) + (r-r_i)/this%dr * &
-                (this%ePot_tab(i+1)-this%ePot_tab(i))
-           
-        else
-       
-            ePot = 0._DP
-           
-        end if
-        
-    end function Hard_ePot
-    
-    subroutine Hard_ePot_neigh(this, iCol, xCol, iCell, overlap, energ)
+    subroutine Hard_ePot_neigh(this, iCol, xCol, iCell, overlap)
         
         class(Hard), intent(in) :: this        
         integer, intent(in) :: iCol, iCell
         real(DP), dimension(Dim), intent(in) :: xCol
         logical, intent(out) :: overlap
-        real(DP), intent(out) :: energ
     
         integer :: iNeigh,  iCell_neigh
         real(DP) :: r
@@ -178,7 +105,6 @@ contains
         type(Link), pointer :: current => null(), next => null()
         
         overlap = .false.
-        energ = 0._DP
     
         do iNeigh = 1, cell_neighs_nb
         
@@ -197,7 +123,6 @@ contains
                         overlap = .true.
                         return
                     end if
-                    energ = energ + this%ePot(r)
        
                 end if
                 
