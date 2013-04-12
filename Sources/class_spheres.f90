@@ -105,28 +105,28 @@ contains
     
     !> Adaptation of dx during the thermalisation
     
-    subroutine Spheres_adapt_dx(this, iStep, tauxRejectsSum, unitReport)
+    subroutine Spheres_adapt_dx(this, iStep, rejectsRateSum, unitReport)
     
         class(Spheres), intent(inout) :: this 
         integer, intent(in) :: iStep, unitReport
-        real(DP), intent(in) :: tauxRejectsSum    
+        real(DP), intent(in) :: rejectsRateSum    
         
         integer, parameter :: multiple = 2**2
-        real(DP) :: tauxRejects
-        real(DP), parameter :: tauxRejectsFix = 0.5_DP
+        real(DP) :: rejectsRate
+        real(DP), parameter :: rejectsRateFix = 0.5_DP
         real(DP), parameter :: dx_eps = 0.05_DP, taux_eps = 0.05_DP
         real(DP), parameter :: more = 1._DP+dx_eps, less = 1._DP-dx_eps
         
-        tauxRejects = 0._DP
+        rejectsRate = 0._DP
         
         if (mod(iStep, multiple) == 0 .and. iStep>2) then
         
-            tauxRejects = tauxRejectsSum/real(iStep-1, DP)
+            rejectsRate = rejectsRateSum/real(iStep-1, DP)
         
-            if (tauxRejects < tauxRejectsFix - taux_eps) then            
+            if (rejectsRate < rejectsRateFix - taux_eps) then            
                 this%dx(:) = this%dx(:) * more
                 this%dx(:) = modulo(this%dx(:), Lsize(:))
-            else if (tauxRejects > tauxRejectsFix + taux_eps) then
+            else if (rejectsRate > rejectsRateFix + taux_eps) then
                 this%dx(:) = this%dx(:) * less
                 this%dx(:) = modulo(this%dx(:), Lsize(:))
             end if
@@ -135,7 +135,7 @@ contains
         
         if (iStep == Ntherm) then
         
-            if (tauxRejects == 0._DP) then
+            if (rejectsRate == 0._DP) then
                 write(*, *) "Error : dx adaptation problem"
                 stop
             end if
@@ -144,7 +144,7 @@ contains
             write(unitReport, *) "    dx(:) = ", this%dx(:)
             write(unitReport, *) "    rejection relative difference = ", &
             							! wrong translation ?
-                abs(tauxRejects - tauxRejectsFix)/tauxRejectsFix
+                abs(rejectsRate - rejectsRateFix)/rejectsRateFix
             
         end if
     

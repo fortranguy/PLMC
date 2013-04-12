@@ -178,11 +178,11 @@ contains
     
     !> Results
     
-    subroutine mcResults(enTotSum, activExInvSum, tauxRejectsSum, duration, &
+    subroutine mcResults(enTotSum, activExInvSum, rejectsRateSum, duration, &
     	unitRapport)
 
         real(DP), intent(in) :: enTotSum, activExInvSum     
-        real(DP), intent(in) :: tauxRejectsSum
+        real(DP), intent(in) :: rejectsRateSum
         real(DP), intent(in) :: duration
         integer, intent(in) :: unitRapport
         
@@ -201,7 +201,7 @@ contains
             potChiEx           
         write(unitRapport, *) "    potChi.avg = ", potChiId + potChiEx
         write(unitRapport, *) "    Rejection rate = ", &
-            tauxRejectsSum/real(Nstep+Ntherm, DP)
+            rejectsRateSum/real(Nstep+Ntherm, DP)
         write(unitRapport, *) "    duration =", duration/60._DP, "min"        
     
     end subroutine mcResults

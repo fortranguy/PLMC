@@ -16,7 +16,7 @@ implicit none
     
     integer :: iStep, iMove
     integer :: Nrejects
-    real(DP) :: tauxRejectsSum
+    real(DP) :: rejectsRateSum
     real(DP) :: ePot_total, ePot_totalSum
     real(DP) :: activExInv, activExInvSum !< inverse of activity
     integer, parameter :: nWidom = inter_Ncol !< number of test particles
@@ -29,7 +29,7 @@ implicit none
     inter = inter_constructor()
     
     Nrejects = 0
-    tauxRejectsSum = 0._DP
+    rejectsRateSum = 0._DP
     ePot_totalSum = 0._DP
     activExInvSum = 0._DP
     
@@ -75,9 +75,9 @@ implicit none
         
         if (iStep <= Ntherm) then
         
-            call inter%adapt_dx(iStep, tauxRejectsSum, unitReport)
+            call inter%adapt_dx(iStep, rejectsRateSum, unitReport)
             write(unit_dx, *) iStep, inter%get_dx(), &
-                tauxRejectsSum/real(iStep, DP)
+                rejectsRateSum/real(iStep, DP)
             write(unitObsTherm, *) iStep, ePot_total, activExInv
         
         else
@@ -92,7 +92,7 @@ implicit none
             
         end if
         
-        tauxRejectsSum = tauxRejectsSum + real(Nrejects, DP)/real(Nmove, DP)
+        rejectsRateSum = rejectsRateSum + real(Nrejects, DP)/real(Nmove, DP)
         Nrejects = 0
     
     end do
@@ -109,7 +109,7 @@ implicit none
     call inter%overlapTest()
     call inter%consistTest(ePot_total, unitReport)
     
-    call mcResults(ePot_totalSum, activExInvSum, tauxRejectsSum, tFin-tIni,&
+    call mcResults(ePot_totalSum, activExInvSum, rejectsRateSum, tFin-tIni,&
         unitReport)
     close(unitReport)
     
