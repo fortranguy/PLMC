@@ -41,7 +41,7 @@ use data_cell
     
     real(DP), parameter :: hard_radius = .5_DP
     real(DP), parameter :: hard_rMin = 1._DP
-    integer, parameter :: hard_Ncol = 270
+    integer, parameter :: hard_Ncol = 0
     
     real(DP), parameter :: inter_radius = .5_DP
     real(DP), parameter :: inter_rMin = 1._DP
