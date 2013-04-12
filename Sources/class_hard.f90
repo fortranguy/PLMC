@@ -15,7 +15,7 @@ use class_spheres
 implicit none
 
 private
-public :: inter_constructor
+public :: hard_constructor
 
     type, extends(Spheres), public :: Hard
         
@@ -38,27 +38,27 @@ public :: inter_constructor
     
 contains
 
-    function inter_constructor()
+    function hard_constructor()
     
-        type(Hard) :: inter_constructor
+        type(Hard) :: hard_constructor
     
         ! Construction                
 
-        inter_constructor%radius = inter_radius
-        inter_constructor%rMin = inter_rMin
-        inter_constructor%Ncol = inter_Ncol
-        allocate(inter_constructor%X(Dim, inter_Ncol))
+        hard_constructor%radius = hard_radius
+        hard_constructor%rMin = hard_rMin
+        hard_constructor%Ncol = hard_Ncol
+        allocate(hard_constructor%X(Dim, hard_Ncol))
         
-        inter_constructor%dx = inter_dx
+        hard_constructor%dx = hard_dx
         
-        inter_constructor%rCut = inter_rCut
+        hard_constructor%rCut = hard_rCut
         
         !	Neighbours        
-        inter_constructor%same = neigh_constructor(inter_rCut)
-        call inter_constructor%same%alloc_cells()
-        call inter_constructor%same%ini_cell_neighs()
+        hard_constructor%same = neigh_constructor(hard_rCut)
+        call hard_constructor%same%alloc_cells()
+        call hard_constructor%same%ini_cell_neighs()
     
-    end function inter_constructor
+    end function hard_constructor
     
     subroutine Hard_destructor(this)
     
