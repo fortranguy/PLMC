@@ -26,7 +26,7 @@ public :: inter_constructor
         integer :: iCut !< maximum index of tabulation : until potential cut
         real(DP) :: epsilon !< factor in Yukawa
         real(DP) :: alpha !< coefficient in Yukawa
-        real(DP), dimension(:), allocatable :: Vtab !< tabulation
+        real(DP), dimension(:), allocatable :: ePot_tab !< tabulation
         
     contains
 
@@ -70,7 +70,7 @@ contains
         inter_constructor%iCut = inter_iCut 
         inter_constructor%epsilon = inter_epsilon
         inter_constructor%alpha = inter_alpha        
-        allocate(inter_constructor%Vtab(inter_iMin:inter_iCut))
+        allocate(inter_constructor%ePot_tab(inter_iMin:inter_iCut))
         call inter_constructor%ePot_init()
         
         !	Neighbours        
@@ -85,7 +85,7 @@ contains
         class(Interacting), intent(inout) :: this
         
         deallocate(this%X)
-        deallocate(this%Vtab)
+        deallocate(this%ePot_tab)
         call this%same%destructor()
     
     end subroutine Interacting_destructor
@@ -130,11 +130,12 @@ contains
         ! cut
         do i = this%iMin, this%iCut       
             r_i = real(i, DP)*this%dr
-            this%Vtab(i) = this%epsilon * exp(-this%alpha*(r_i-this%rMin))/r_i           
+            this%ePot_tab(i) = this%epsilon * exp(-this%alpha*(r_i-this%rMin))&
+            /r_i
         end do
         
         ! shift        
-        this%Vtab(:) = this%Vtab(:) - this%epsilon * &
+        this%ePot_tab(:) = this%ePot_tab(:) - this%epsilon * &
             exp(-this%alpha*(this%rCut-this%rMin)) / this%rCut
 
     end subroutine Interacting_ePot_init
@@ -151,8 +152,8 @@ contains
        
             i = int(r/this%dr)
             r_i = real(i, DP)*this%dr
-            ePot = this%Vtab(i) + (r-r_i)/this%dr * &
-                (this%Vtab(i+1)-this%Vtab(i))
+            ePot = this%ePot_tab(i) + (r-r_i)/this%dr * &
+                (this%ePot_tab(i+1)-this%ePot_tab(i))
            
         else
        
