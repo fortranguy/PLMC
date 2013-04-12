@@ -337,7 +337,7 @@ contains
         ePot_total = this%ePot_total()
         write(unitReport, *) "Consistency test:"
         write(unitReport, *) "    ePot_total_mc = ", ePot_total_mc
-        write(unitReport, *) "    ePot_total() = ", ePot_total
+        write(unitReport, *) "    ePot_total_final = ", ePot_total
         write(unitReport, *) "    relative difference = ", &
             abs(ePot_total-ePot_total_mc)/ePot_total
     
