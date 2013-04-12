@@ -66,7 +66,7 @@ contains
         inter_constructor%rCut = inter_rCut
         inter_constructor%dr = inter_dr
         inter_constructor%iMin = inter_iMin
-        inter_constructor%iCut = inter_iCut        
+        inter_constructor%iCut = inter_iCut 
         inter_constructor%epsilon = inter_epsilon
         inter_constructor%alpha = inter_alpha        
         allocate(inter_constructor%Vtab(inter_iMin:inter_iCut))
