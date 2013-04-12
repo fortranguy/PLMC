@@ -21,7 +21,7 @@ public :: inter_constructor
         private
 
         ! Potential :
-        real(DP)  :: pas !< discretisation step
+        real(DP)  :: dr !< discretisation step
         integer :: iMin !< minimum index of tabulation
         integer :: Ntab !< maximum index of tabulation
         real(DP) :: epsilon !< factor in Yukawa
@@ -64,7 +64,7 @@ contains
         inter_constructor%dx = inter_dx
         
         inter_constructor%rCut = inter_rCut
-        inter_constructor%pas = inter_pas
+        inter_constructor%dr = inter_dr
         inter_constructor%iMin = inter_iMin
         inter_constructor%Ntab = inter_Ntab        
         inter_constructor%epsilon = inter_epsilon
@@ -108,7 +108,7 @@ contains
         write(unitReport, *) "    epsilon = ", this%epsilon
         write(unitReport, *) "    alpha = ", this%alpha
         write(unitReport, *) "    rCut = ", this%rCut
-        write(unitReport, *) "    pas = ", this%pas
+        write(unitReport, *) "    dr = ", this%dr
         write(unitReport, *) "    cell_coordMax(:) = ", &
         	this%same%cell_coordMax(:)
         write(unitReport, *) "    cell_Lsize(:) = ", this%same%cell_Lsize(:)
@@ -128,7 +128,7 @@ contains
        
         ! cut
         do i = this%iMin, this%Ntab       
-            r_i = real(i, DP)*this%pas
+            r_i = real(i, DP)*this%dr
             this%Vtab(i) = this%epsilon * exp(-this%alpha*(r_i-this%rMin))/r_i           
         end do
         
@@ -148,9 +148,9 @@ contains
        
         if (r < this%rCut) then
        
-            i = int(r/this%pas)
-            r_i = real(i, DP)*this%pas
-            ePot = this%Vtab(i) + (r-r_i)/this%pas * &
+            i = int(r/this%dr)
+            r_i = real(i, DP)*this%dr
+            ePot = this%Vtab(i) + (r-r_i)/this%dr * &
                 (this%Vtab(i+1)-this%Vtab(i))
            
         else
