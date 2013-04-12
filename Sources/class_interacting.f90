@@ -20,6 +20,9 @@ public :: inter_constructor
     type, extends(Spheres), public :: Interacting
 
         private
+        
+        ! Monte-Carlo
+        integer :: nWidom        
 
         ! Potential :
         real(DP)  :: dr !< discretisation step
@@ -63,6 +66,7 @@ contains
         inter_constructor%Ncol = inter_Ncol
         allocate(inter_constructor%X(Dim, inter_Ncol))
         
+        inter_constructor%nWidom = inter_nWidom
         inter_constructor%dx = inter_dx
         
         inter_constructor%rCut = inter_rCut
@@ -93,17 +97,16 @@ contains
     
     !> Report
     
-    subroutine Interacting_report(this, nWidom, unitReport)
+    subroutine Interacting_report(this, unitReport)
     
         class(Interacting), intent(in) :: this
-        integer, intent(in) :: nWidom
         integer, intent(in) :: unitReport    
         
         write(unitReport, *) "Simulation MC_C :"
         write(unitReport ,*) "    Lsize(:) = ", Lsize(:)
         write(unitReport ,*) "    Vol = ", product(Lsize)
         write(unitReport ,*) "    Ncol = ", this%Ncol
-        write(unitReport ,*) "    nWidom = ", nWidom
+        write(unitReport ,*) "    nWidom = ", this%nWidom
         write(unitReport, *) "    Nstep = ", Nstep
         write(unitReport, *) "    Ntherm = ", Ntherm
         write(unitReport, *) "    Nmove = ", Nmove
@@ -267,10 +270,9 @@ contains
     
     !> Widom's method
 
-    subroutine Interacting_widom(this, nWidom, activExInv)
+    subroutine Interacting_widom(this, activExInv)
         
         class(Interacting), intent(in) :: this
-        integer, intent(in) :: nWidom
         real(DP), intent(inOut) :: activExInv 
         
         integer :: iWid
@@ -282,7 +284,7 @@ contains
         
         widTestSum = 0._DP
         
-        do iWid = 1, nWidom           
+        do iWid = 1, this%nWidom
             
             call random_number(xRand)
             xTest(:) = Lsize(:) * xRand(:)    
@@ -295,7 +297,7 @@ contains
             
         end do
         
-        activExInv = widTestSum/real(nWidom, DP)
+        activExInv = widTestSum/real(this%nWidom, DP)
         
     end subroutine Interacting_widom
 

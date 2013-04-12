@@ -19,7 +19,6 @@ implicit none
     real(DP) :: ePot_total, ePot_totalSum
     real(DP) :: activExInv, activExInvSum !< inverse of activity
     integer :: iStep, iMove
-    integer, parameter :: nWidom = inter_Ncol !< number of test particles
     real(DP) :: tIni, tFin
     type(Interacting) :: inter
     
@@ -37,7 +36,7 @@ implicit none
     
     open(unit=unitReport, recl=4096, file="report.out", status='new', &
         action='write')
-    call inter%report(nWidom, unitReport)
+    call inter%report(unitReport)
     call init_random_seed(unitReport)
     
     ! Initial condition
@@ -71,7 +70,7 @@ implicit none
             call inter%mcMove(ePot_total, Nrejects)
         end do
         
-        call inter%widom(nWidom, activExInv)
+        call inter%widom(activExInv)
         
         if (iStep <= Ntherm) then
         

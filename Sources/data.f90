@@ -67,8 +67,12 @@ implicit none
     integer, parameter :: Ntherm = 2**8
     
     integer, parameter :: Nmove = 2**2 * (hard_Ncol + inter_Ncol)
-    real(DP), dimension(Dim), parameter :: hard_dx = 2._DP    
+    
+    real(DP), dimension(Dim), parameter :: hard_dx = 2._DP
+    integer, parameter :: hard_nWidom = hard_Ncol
+    
     real(DP), dimension(Dim), parameter :: inter_dx = 2._DP
+    integer, parameter :: inter_nWidom = inter_Ncol
 
 end module data_mc
 !***********************************************************************
