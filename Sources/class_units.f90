@@ -1,10 +1,12 @@
-!> \brief Description of the Units class
+!> \brief File unit counter
 
 module unitsCounter
 
     integer :: iUnit = 10
 
 end module unitsCounter
+
+!> \brief Description of the Units class
 
 module class_Units
 
