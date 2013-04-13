@@ -31,6 +31,8 @@ class_interacting.o: class_interacting.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_observables.o: class_observables.f90
 	$(FC) -c $(FFLAGS) $< -o $@
+class_units.o: class_units.f90
+	$(FC) -c $(FFLAGS) $< -o $@
 mod_tools.o: mod_tools.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 
@@ -39,7 +41,8 @@ mod_tools.o: mod_tools.f90
 mc_canonical.o: mc_canonical.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 $(EXEC1) : data.o mod_physics.o class_neighbours.o class_spheres.o \
-	class_interacting.o class_observables.o mod_tools.o mc_canonical.o
+	class_interacting.o class_observables.o class_units.o mod_tools.o \
+		mc_canonical.o
 	$(FC) $^ $(LDFLAGS) -o $@
 	
 # ---------------------------

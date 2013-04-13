@@ -3,10 +3,10 @@
 module unitsCounter
 
     integer :: iUnit = 10
-    
-end firstUnit
 
-module unitsCounter
+end module unitsCounter
+
+module class_Units
 
 use unitsCounter
 
@@ -28,13 +28,14 @@ private
     
     contains
     
-        procedure :: init => Units_init
+        procedure :: open => Units_open
+        procedure :: close => Units_close
     
     end type Units
     
 contains
 
-    subroutine Units_init(this)
+    subroutine Units_open(this)
     
         class(Units), intent(out) :: this
         
@@ -47,7 +48,40 @@ contains
         this%snapShots = iUnit ;iUnit = iUnit + 1
         
         this%report = iUnit ;   iUnit = iUnit + 1
+        
+        open(unit=this%obs, recl=4096, file="obs.out", status='new', &
+            action='write')
+        open(unit=this%obsTherm, recl=4096, file="obsTherm.out", status='new', &
+            action='write')
+        open(unit=this%dx, recl=4096, file="dx.out", status='new', &
+            action='write')
+        
+        open(unit=this%snapIni, recl=4096, file="snapShotIni.out", &
+            status='new', action='write')
+        open(unit=this%snapFin, recl=4096, file="snapShotFin.out", &
+            status='new', action='write')
+        open(unit=this%snapShots, recl=4096, file="snap.shot", status='new', &
+            action='write')
+            
+        open(unit=this%report, recl=4096, file="report.out", status='new', &
+            action='write')
+        
+    end subroutine Units_open
     
-    end subroutine Units_init
+    subroutine Units_close(this)
+    
+        class(Units), intent(inout) :: this
+        
+        close(this%obs)
+        close(this%obsTherm)
+        close(this%dx)
+        
+        close(this%snapIni)
+        close(this%snapFin)
+        close(this%snapShots)
+        
+        close(this%report)
+    
+    end subroutine Units_close
 
 end module class_Units

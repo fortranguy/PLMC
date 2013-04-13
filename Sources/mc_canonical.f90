@@ -8,6 +8,7 @@ use data_distrib
 use mod_tools
 use class_interacting
 use class_observables
+use class_units
 
 implicit none
 
@@ -18,29 +19,23 @@ implicit none
     integer :: iStep, iMove
     type(Interacting) :: inter_sph
     type(Observables) :: inter_obs
-    type(Units) :: inter_unit
+    type(Units) :: inter_io
     
     real(DP) :: tIni, tFin
-    
-    type(FileUnits) :: units
         
     inter_sph = inter_constructor()
     call inter_obs%init()
+    call inter_io%open()
     
-    write(*, *) "Monte-Carlo - Canonical : Volume =", product(Lsize)
+    write(*, *) "Monte-Carlo - Canonical : Volume =", product(Lsize)    
     
-    open(unit=unitReport, recl=4096, file="report.out", status='new', &
-        action='write')
-    call inter_sph%report(unitReport)
-    call init_random_seed(unitReport)
+    call inter_sph%report(inter_io%report)
+    call init_random_seed(inter_io%report)
     
     ! Initial condition
     
-    call initialCondition(unitReport, inter_sph%X)
-    open(unit=unitSnapIni, recl=4096, file="snapShotIni.out", status='new', &
-        action='write')
-        call inter_sph%snapShot(unitSnapIni)
-    close(unitSnapIni)
+    call initialCondition(inter_io%report, inter_sph%X)
+    call inter_sph%snapShot(inter_io%snapIni)
     
     call inter_sph%overlapTest()
     inter_obs%ePot_total = inter_sph%ePot_total()
@@ -49,14 +44,6 @@ implicit none
 ! Middle --------------------------------------------------
 
     write(*, *) "Beginning of cycles"
-    open(unit=unitObs, recl=4096, file="obs.out", status='new', &
-        action='write')
-    open(unit=unitObsTherm, recl=4096, file="obsTherm.out", status='new', &
-        action='write')
-    open(unit=unit_dx, recl=4096, file="dx.out", status='new', &
-        action='write')
-    open(unit=unitSnapShots, recl=4096, file="snap.shot", status='new', &
-        action='write')
     
     call cpu_time(tIni)
     do iStep = 1, Ntherm + Nstep
@@ -69,19 +56,20 @@ implicit none
         
         if (iStep <= Ntherm) then
         
-            call inter_sph%adapt_dx(iStep, inter_obs%rejectsRateSum, unitReport)
-            write(unit_dx, *) iStep, inter_sph%get_dx(), &
+            call inter_sph%adapt_dx(iStep, inter_obs%rejectsRateSum, inter_io%report)
+            write(inter_io%dx, *) iStep, inter_sph%get_dx(), &
                 inter_obs%rejectsRateSum/real(iStep, DP)
-            write(unitObsTherm, *) iStep, inter_obs%ePot_total, &
+            write(inter_io%obsTherm, *) iStep, inter_obs%ePot_total, &
                 inter_obs%activExInv
         
         else
             
             call inter_obs%add()
-            write(unitObs, *) iStep, inter_obs%ePot_total, inter_obs%activExInv
+            write(inter_io%obs, *) iStep, inter_obs%ePot_total, &
+                inter_obs%activExInv
             
             if (snap) then
-                call inter_sph%snapShot(unitSnapShots)
+                call inter_sph%snapShot(inter_io%snapShots)
             end if
             
         end if
@@ -90,26 +78,18 @@ implicit none
     
     end do
     call cpu_time(tFin)
-    
-    close(unitSnapShots)
-    close(unit_dx)
-    close(unitObsTherm)
-    close(unitObs)
+
     write(*, *) "End of cycles"
 
 ! End -----------------------------------------------------
 
     call inter_sph%overlapTest()
-    call inter_sph%consistTest(inter_obs%ePot_total, unitReport)
     
-    call inter_obs%results(tFin-tIni, unitReport)
-    close(unitReport)
-    
-    open(unit=unitSnapFin, recl=4096, file="snapShotFin.out", status='new', &
-        action='write')
-        call inter_sph%snapShot(unitSnapFin)
-    close(unitSnapFin)
+    call inter_sph%consistTest(inter_obs%ePot_total, inter_io%report)    
+    call inter_obs%results(tFin-tIni, inter_io%report)    
+    call inter_sph%snapShot(inter_io%snapFin)
     
     call inter_sph%destructor()
+    call inter_io%close()
     
 end program mc_canonical
