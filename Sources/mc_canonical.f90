@@ -25,7 +25,7 @@ implicit none
         
     inter_sph = inter_constructor()
     call inter_obs%init()
-    call inter_io%open()
+    call inter_io%open("inter")
     
     write(*, *) "Monte-Carlo - Canonical : Volume =", product(Lsize)    
     

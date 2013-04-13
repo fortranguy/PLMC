@@ -35,9 +35,10 @@ private
     
 contains
 
-    subroutine Units_open(this)
+    subroutine Units_open(this, name)
     
         class(Units), intent(out) :: this
+        character(len=*), intent(in) :: name
         
         this%obs = iUnit ;      iUnit = iUnit + 1
         this%obsTherm = iUnit ; iUnit = iUnit + 1
@@ -49,22 +50,22 @@ contains
         
         this%report = iUnit ;   iUnit = iUnit + 1
         
-        open(unit=this%obs, recl=4096, file="obs.out", status='new', &
+        open(unit=this%obs, recl=4096, file=name//"_obs.out", status='new', &
             action='write')
-        open(unit=this%obsTherm, recl=4096, file="obsTherm.out", status='new', &
-            action='write')
-        open(unit=this%dx, recl=4096, file="dx.out", status='new', &
+        open(unit=this%obsTherm, recl=4096, file=name//"_obsTherm.out", &
+            status='new', action='write')
+        open(unit=this%dx, recl=4096, file=name//"_dx.out", status='new', &
             action='write')
         
-        open(unit=this%snapIni, recl=4096, file="snapShotIni.out", &
+        open(unit=this%snapIni, recl=4096, file=name//"_snapShotIni.out", &
             status='new', action='write')
-        open(unit=this%snapFin, recl=4096, file="snapShotFin.out", &
+        open(unit=this%snapFin, recl=4096, file=name//"_snapShotFin.out", &
             status='new', action='write')
-        open(unit=this%snapShots, recl=4096, file="snap.shot", status='new', &
-            action='write')
+        open(unit=this%snapShots, recl=4096, file=name//"_snap.shot", &
+            status='new', action='write')
             
-        open(unit=this%report, recl=4096, file="report.out", status='new', &
-            action='write')
+        open(unit=this%report, recl=4096, file=name//"_report.out", &
+            status='new', action='write')
         
     end subroutine Units_open
     
