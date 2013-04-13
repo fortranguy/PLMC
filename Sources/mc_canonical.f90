@@ -17,9 +17,9 @@ implicit none
     ! Initialisation
     
     integer :: iStep, iMove
-    type(Interacting) :: inter_sph
-    type(Observables) :: inter_obs
-    type(Units) :: inter_io
+    type(Interacting) :: inter_sph !< Interacting spheres
+    type(Observables) :: inter_obs !<   e.g. Energy
+    type(Units) :: inter_io        !<   input/output files
     
     real(DP) :: tIni, tFin
         
