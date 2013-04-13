@@ -42,15 +42,22 @@ contains
         class(Units), intent(out) :: this
         character(len=*), intent(in) :: name
         
-        this%obs = iUnit ;      iUnit = iUnit + 1
-        this%obsTherm = iUnit ; iUnit = iUnit + 1
-        this%dx = iUnit ;       iUnit = iUnit + 1
+        this%obs = iUnit
+        iUnit = iUnit + 1
+        this%obsTherm = iUnit
+        iUnit = iUnit + 1
+        this%dx = iUnit
+        iUnit = iUnit + 1
         
-        this%snapIni = iUnit ;  iUnit = iUnit + 1
-        this%snapFin = iUnit ;  iUnit = iUnit + 1
-        this%snapShots = iUnit ;iUnit = iUnit + 1
+        this%snapIni = iUnit
+        iUnit = iUnit + 1
+        this%snapFin = iUnit
+        iUnit = iUnit + 1
+        this%snapShots = iUnit
+        iUnit = iUnit + 1
         
-        this%report = iUnit ;   iUnit = iUnit + 1
+        this%report = iUnit
+        iUnit = iUnit + 1
         
         open(unit=this%obs, recl=4096, file=name//"_obs.out", status='new', &
             action='write')
