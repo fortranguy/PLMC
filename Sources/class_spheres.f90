@@ -44,8 +44,8 @@ private
         procedure :: cols_to_cells => Spheres_cols_to_cells
                 
         !> Adapt the displacement dx during thermalisation
-        procedure :: adapt_dx => Spheres_adapt_dx
-        procedure :: get_dx => Spheres_get_dx
+        procedure :: adaptDx => Spheres_adaptDx
+        procedure :: getDx => Spheres_getDx
         
     end type Spheres
     
@@ -106,7 +106,7 @@ contains
     
     !> Adaptation of dx during the thermalisation
     
-    subroutine Spheres_adapt_dx(this, iStep, rejectsRateSum, unitReport)
+    subroutine Spheres_adaptDx(this, iStep, rejectsRateSum, unitReport)
     
         class(Spheres), intent(inout) :: this 
         integer, intent(in) :: iStep, unitReport
@@ -149,16 +149,16 @@ contains
             
         end if
     
-    end subroutine Spheres_adapt_dx
+    end subroutine Spheres_adaptDx
     
-    function Spheres_get_dx(this)
+    function Spheres_getDx(this)
         
         class(Spheres), intent(in) :: this
         
-        real(DP) :: Spheres_get_dx
+        real(DP) :: Spheres_getDx
         ! average dx of 3 vector components
-        Spheres_get_dx = sum(this%dx)/size(this%dx)
+        Spheres_getDx = sum(this%dx)/size(this%dx)
         
-    end function Spheres_get_dx    
+    end function Spheres_getDx    
 
 end module class_spheres
