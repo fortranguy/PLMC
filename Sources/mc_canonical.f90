@@ -16,11 +16,12 @@ implicit none
 
     ! Initialisation
     
-    integer :: iStep, iMove
-    type(Interacting) :: inter_sph !< Interacting spheres
-    type(Observables) :: inter_obs !<   e.g. Energy
-    type(Units) :: inter_io        !<   input/output files
+    !   Interacting spheres
+    type(Interacting) :: inter_sph !< Monte-Carlo subroutines
+    type(Observables) :: inter_obs !< e.g. Energy
+    type(Units) :: inter_io        !< input/output files
     
+    integer :: iStep, iMove
     real(DP) :: tIni, tFin
         
     inter_sph = inter_constructor()
