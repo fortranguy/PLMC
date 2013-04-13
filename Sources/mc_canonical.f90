@@ -35,7 +35,7 @@ implicit none
     
     ! Initial condition
     
-    call initialCondition(inter_io%report, inter_sph%X)
+    call initialCondition(inter_sph%X, inter_io%report)
     call inter_sph%snapShot(inter_io%snapIni)
     
     call inter_sph%overlapTest()

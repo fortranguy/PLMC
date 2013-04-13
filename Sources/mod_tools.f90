@@ -38,10 +38,10 @@ contains
     
     !> Initial condition
     
-    subroutine initialCondition(unitRapport, inter_X)
+    subroutine initialCondition(inter_X, unitRapport)
     
-        integer, intent(in) :: unitRapport
         real(DP), dimension(:, :), intent(inout) :: inter_X
+        integer, intent(in) :: unitRapport
         
         real(DP) :: compac, densite
         character(len=20) :: init
