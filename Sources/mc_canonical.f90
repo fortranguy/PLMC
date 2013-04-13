@@ -56,7 +56,7 @@ implicit none
         
         if (iStep <= Ntherm) then
         
-            call inter_sph%adapt_dx(iStep, inter_obs%rejectsRateSum,
+            call inter_sph%adapt_dx(iStep, inter_obs%rejectsRateSum, &
                 inter_io%report)
             write(inter_io%dx, *) iStep, inter_sph%get_dx(), &
                 inter_obs%rejectsRateSum/real(iStep, DP)

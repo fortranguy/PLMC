@@ -6,7 +6,6 @@ use data_constants
 use data_particles
 use data_mc
 use mod_physics
-use class_observables
 
 implicit none
 
