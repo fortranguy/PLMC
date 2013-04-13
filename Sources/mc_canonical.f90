@@ -56,7 +56,8 @@ implicit none
         
         if (iStep <= Ntherm) then
         
-            call inter_sph%adapt_dx(iStep, inter_obs%rejectsRateSum, inter_io%report)
+            call inter_sph%adapt_dx(iStep, inter_obs%rejectsRateSum,
+                inter_io%report)
             write(inter_io%dx, *) iStep, inter_sph%get_dx(), &
                 inter_obs%rejectsRateSum/real(iStep, DP)
             write(inter_io%obsTherm, *) iStep, inter_obs%ePot_total, &
@@ -83,8 +84,7 @@ implicit none
 
 ! End -----------------------------------------------------
 
-    call inter_sph%overlapTest()
-    
+    call inter_sph%overlapTest()    
     call inter_sph%consistTest(inter_obs%ePot_total, inter_io%report)    
     call inter_obs%results(tFin-tIni, inter_io%report)    
     call inter_sph%snapShot(inter_io%snapFin)
