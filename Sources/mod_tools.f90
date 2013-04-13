@@ -13,9 +13,9 @@ contains
 
     !> Random number generator : seed
     
-    subroutine init_random_seed(unitRapport)
+    subroutine init_random_seed(unitReport)
     
-        integer, intent(in) :: unitRapport
+        integer, intent(in) :: unitReport
     
         integer :: i, n, clock
         integer, dimension(:), allocatable :: seed
@@ -28,9 +28,9 @@ contains
         seed(:) = clock + 37 * [ (i - 1, i = 1, n) ]
         call random_seed(put = seed)
         
-        write(unitRapport, *) "RNG :"
-        write(unitRapport ,*) "    n = ", n
-        write(unitRapport ,*) "    seed(:) = ", seed(:)
+        write(unitReport, *) "RNG :"
+        write(unitReport ,*) "    n = ", n
+        write(unitReport ,*) "    seed(:) = ", seed(:)
 
         deallocate(seed)
         
@@ -38,10 +38,10 @@ contains
     
     !> Initial condition
     
-    subroutine initialCondition(inter_X, unitRapport)
+    subroutine initialCondition(inter_X, unitReport)
     
         real(DP), dimension(:, :), intent(inout) :: inter_X
-        integer, intent(in) :: unitRapport
+        integer, intent(in) :: unitReport
         
         real(DP) :: compac, densite
         character(len=20) :: init
@@ -51,15 +51,15 @@ contains
         if (statut /= 0) stop "error get_command_argument"
         if (command_argument_count() > 1) stop "Too many arguments"
             
-        write(unitRapport, *) "Initial condition :"
+        write(unitReport, *) "Initial condition :"
         
         select case (init)
             case ("cube")
                 call primitiveCubic(inter_X)
-                write(unitRapport, *) "    Primitive cubic"
+                write(unitReport, *) "    Primitive cubic"
             case ("rand")
                 call randomDeposition(inter_X)
-                write(unitRapport, *) "    Random deposition"
+                write(unitReport, *) "    Random deposition"
             case default
                 write(*, *) "Enter the initial condition : "
                 write(*, *) "   'cube' or 'rand'."
@@ -68,11 +68,11 @@ contains
         
         densite = real(inter_Ncol, DP) / product(Lsize)
         write(*, *) "    Density = ", densite
-        write(unitRapport, *) "    Density = ", densite
+        write(unitReport, *) "    Density = ", densite
         
         compac = 4._DP/3._DP*PI*inter_radius**3 * densite
         write(*, *) "    Compacity = ", compac
-        write(unitRapport, *) "    Compacity = ", compac
+        write(unitReport, *) "    Compacity = ", compac
         
     end subroutine initialCondition
     

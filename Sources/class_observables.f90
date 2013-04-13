@@ -67,32 +67,32 @@ contains
     
     !> Results
     
-    subroutine Observables_results(this, duration, unitRapport)
+    subroutine Observables_results(this, duration, unitReport)
 
         class(Observables), intent(inout) :: this
         real(DP), intent(in) :: duration
-        integer, intent(in) :: unitRapport
+        integer, intent(in) :: unitReport
         
         real(DP) :: realNstep = real(Nstep, DP)
         real(DP) :: potChiId, potChiEx
     
-        write(unitRapport, *) "Results :"
+        write(unitReport, *) "Results :"
         
-        write(unitRapport, *) "    average energy = ", &
+        write(unitReport, *) "    average energy = ", &
             this%ePot_totalSum/realNstep
-        write(unitRapport, *) "    average energy per particule = ", &
+        write(unitReport, *) "    average energy per particule = ", &
             this%ePot_totalSum/realNstep/real(inter_Ncol, DP)
             
         potChiId = -Tstar*log( product(Lsize)/real(inter_Ncol+1,DP) )
-        write(unitRapport, *) "    ideal chemical potential = ", potChiId
+        write(unitReport, *) "    ideal chemical potential = ", potChiId
         potChiEx = -Tstar*log( this%activExInvSum/realNstep )
-        write(unitRapport, *) "    average excess chemical potential = ", &
+        write(unitReport, *) "    average excess chemical potential = ", &
             potChiEx           
-        write(unitRapport, *) "    potChi.avg = ", potChiId + potChiEx
+        write(unitReport, *) "    potChi.avg = ", potChiId + potChiEx
         
-        write(unitRapport, *) "    Rejection rate = ", &
+        write(unitReport, *) "    Rejection rate = ", &
             this%rejectsRateSum/real(Nstep+Ntherm, DP)
-        write(unitRapport, *) "    duration =", duration/60._DP, "min"        
+        write(unitReport, *) "    duration =", duration/60._DP, "min"        
     
     end subroutine Observables_results
 
