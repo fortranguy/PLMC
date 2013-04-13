@@ -50,7 +50,7 @@ implicit none
     do iStep = 1, Ntherm + Nstep
     
         do iMove = 1, Nmove
-            call inter_sph%mcMove(inter_obs%ePot_total, inter_obs%Nrejects)
+            call inter_sph%move(inter_obs%ePot_total, inter_obs%Nrejects)
         end do
         
         call inter_sph%widom(inter_obs%activExInv)

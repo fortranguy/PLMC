@@ -48,7 +48,7 @@ public :: inter_constructor
         procedure :: consistTest => Interacting_consistTest
         
         !> Monte-Carlo
-        procedure :: mcMove => Interacting_mcMove
+        procedure :: move => Interacting_move
         procedure :: widom => Interacting_widom
         
     end type Interacting
@@ -216,7 +216,7 @@ contains
     
     !> Particle move
     
-    subroutine Interacting_mcMove(this, ePot_total, Nrejects)
+    subroutine Interacting_move(this, ePot_total, Nrejects)
     
         class(Interacting), intent(inout) :: this
         real(DP), intent(inout) :: ePot_total
@@ -266,7 +266,7 @@ contains
             
         end if
     
-    end subroutine Interacting_mcMove
+    end subroutine Interacting_move
     
     !> Widom's method
 

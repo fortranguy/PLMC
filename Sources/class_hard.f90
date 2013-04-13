@@ -31,7 +31,7 @@ public :: hard_constructor
         procedure :: ePot_neigh => Hard_ePot_neigh
         
         !> Monte-Carlo
-        procedure :: mcMove => Hard_mcMove
+        procedure :: move => Hard_move
         procedure :: widom => Hard_widom
         
     end type Hard
@@ -138,7 +138,7 @@ contains
     
     !> Particle move
     
-    subroutine Hard_mcMove(this, Nrejects)
+    subroutine Hard_move(this, Nrejects)
     
         class(Hard), intent(inout) :: this
         integer, intent(inout) :: Nrejects
@@ -176,7 +176,7 @@ contains
             
         end if
     
-    end subroutine Hard_mcMove
+    end subroutine Hard_move
     
     !> Widom's method
 
