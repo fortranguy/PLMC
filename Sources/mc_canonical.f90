@@ -66,7 +66,7 @@ implicit none
         
         else
             
-            call inter_obs%add()
+            call inter_obs%addPhysical()
             write(inter_io%obs, *) iStep, inter_obs%ePot_total, &
                 inter_obs%activExInv
             

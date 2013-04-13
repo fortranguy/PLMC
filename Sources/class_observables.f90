@@ -11,7 +11,7 @@ private
 
     type, public :: Observables
     
-        !Rejection
+        ! Rejection
         integer :: Nrejects
         real(DP) :: rejectsRateSum
         
@@ -26,7 +26,7 @@ private
     contains
     
         procedure :: init => Observables_init
-        procedure :: add => Observables_add
+        procedure :: addPhysical => Observables_addPhysical
         procedure :: addReject => Observables_addReject
         procedure :: results => Observables_results
     
@@ -46,14 +46,14 @@ contains
         
     end subroutine Observables_init
     
-    subroutine Observables_add(this)
+    subroutine Observables_addPhysical(this)
     
         class(Observables), intent(inout) :: this
     
         this%ePot_totalSum = this%ePot_totalSum + this%ePot_total
         this%activExInvSum = this%activExInvSum + this%activExInv
             
-    end subroutine Observables_add
+    end subroutine Observables_addPhysical
     
     subroutine Observables_addReject(this)
     
