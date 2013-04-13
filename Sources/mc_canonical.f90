@@ -18,6 +18,7 @@ implicit none
     integer :: iStep, iMove
     type(Interacting) :: inter_sph
     type(Observables) :: inter_obs
+    type(Units) :: inter_unit
     
     real(DP) :: tIni, tFin
     

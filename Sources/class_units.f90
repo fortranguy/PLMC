@@ -38,15 +38,15 @@ contains
     
         class(Units), intent(out) :: this
         
-        this%obs = iUnit
-        this%obsTherm = iUnit
-        this%dx = iUnit
+        this%obs = iUnit ;      iUnit = iUnit + 1
+        this%obsTherm = iUnit ; iUnit = iUnit + 1
+        this%dx = iUnit ;       iUnit = iUnit + 1
         
-        this%snapIni = iUnit
-        this%snapFin = iUnit
-        this%snapShots = iUnit
+        this%snapIni = iUnit ;  iUnit = iUnit + 1
+        this%snapFin = iUnit ;  iUnit = iUnit + 1
+        this%snapShots = iUnit ;iUnit = iUnit + 1
         
-        this%report = iUnit
+        this%report = iUnit ;   iUnit = iUnit + 1
     
     end subroutine Units_init
 
