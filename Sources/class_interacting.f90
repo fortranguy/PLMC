@@ -18,10 +18,7 @@ private
 
     type, extends(Spheres), public :: Interacting
 
-        private
-        
-        ! Monte-Carlo
-        integer :: Nwidom        
+        private 
 
         ! Potential :
         real(DP)  :: dr !< discretisation step
@@ -66,8 +63,8 @@ contains
         allocate(this%X(Dim, inter_Ncol))
         
         ! Monte-Carlo
-        this%Nwidom = inter_Nwidom
         this%dx = inter_dx
+        this%Nwidom = inter_Nwidom
         
         ! Potential
         this%rCut = inter_rCut

@@ -15,14 +15,14 @@ use class_spheres
 implicit none
 
 private
-public :: hard_constructor
 
     type, extends(Spheres), public :: Hard
         
     contains
 
-        !> Destructor of the class
-        procedure :: destructor => Hard_destructor
+        !> Construction and destruction of the class
+        procedure :: construct => Hard_construct
+        procedure :: destroy => Hard_destroy
         
         !> Print a report of the component in a file
         procedure :: report => Hard_report
@@ -38,36 +38,38 @@ public :: hard_constructor
     
 contains
 
-    function hard_constructor()
+    subroutine Hard_construct(this)
     
-        type(Hard) :: hard_constructor
+        class(Hard), intent(out) :: this
     
-        ! Construction                
-
-        hard_constructor%radius = hard_radius
-        hard_constructor%rMin = hard_rMin
-        hard_constructor%Ncol = hard_Ncol
-        allocate(hard_constructor%X(Dim, hard_Ncol))
+        ! Particles
+        this%radius = hard_radius
+        this%rMin = hard_rMin
+        this%Ncol = hard_Ncol
+        allocate(this%X(Dim, hard_Ncol))
         
-        hard_constructor%dx = hard_dx
+        ! Monte-Carlo
+        this%dx = hard_dx
+        this%Nwidom = hard_Nwidom
+                
+        ! Potential
+        this%rCut = hard_rCut
         
-        hard_constructor%rCut = hard_rCut
-        
-        !	Neighbours        
-        hard_constructor%same = neigh_constructor(hard_rCut)
-        call hard_constructor%same%alloc_cells()
-        call hard_constructor%same%ini_cell_neighs()
+        ! Neighbours        
+        this%same = neigh_constructor(hard_rCut)
+        call this%same%alloc_cells()
+        call this%same%ini_cell_neighs()
     
-    end function hard_constructor
+    end subroutine Hard_construct
     
-    subroutine Hard_destructor(this)
+    subroutine Hard_destroy(this)
     
         class(Hard), intent(inout) :: this
         
         deallocate(this%X)
         call this%same%destructor()
     
-    end subroutine Hard_destructor
+    end subroutine Hard_destroy
     
     !> Report
     
@@ -81,7 +83,7 @@ contains
         write(unitReport ,*) "    Lsize(:) = ", Lsize(:)
         write(unitReport ,*) "    Vol = ", product(Lsize)
         write(unitReport ,*) "    Ncol = ", this%Ncol
-        write(unitReport ,*) "    Nwidom = ", Nwidom
+        write(unitReport ,*) "    Nwidom = ", this%Nwidom
         write(unitReport, *) "    Nstep = ", Nstep
         write(unitReport, *) "    Ntherm = ", Ntherm
         write(unitReport, *) "    Nmove = ", Nmove

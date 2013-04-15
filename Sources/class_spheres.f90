@@ -25,6 +25,7 @@ private
 
         ! Monte-Carlo
         real(DP), dimension(Dim) :: dx !< displacement
+        integer :: Nwidom
 
         ! Potential
         real(DP) :: rCut !< short-range cut    
