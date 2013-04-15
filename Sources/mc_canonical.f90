@@ -24,7 +24,7 @@ implicit none
     integer :: iStep, iMove
     real(DP) :: tIni, tFin
         
-    inter_sph = inter_constructor()
+    call inter_sph%construct()
     call inter_obs%init()
     call inter_io%open("inter")
     
@@ -90,7 +90,7 @@ implicit none
     call inter_obs%results(tFin-tIni, inter_io%report)    
     call inter_sph%snapShot(inter_io%snapFin)
     
-    call inter_sph%destructor()
+    call inter_sph%destroy()
     call inter_io%close()
     
 end program mc_canonical

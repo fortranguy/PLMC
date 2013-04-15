@@ -15,7 +15,6 @@ use class_spheres
 implicit none
 
 private
-public :: inter_constructor
 
     type, extends(Spheres), public :: Interacting
 
@@ -34,8 +33,9 @@ public :: inter_constructor
         
     contains
 
-        !> Destructor of the class
-        procedure :: destructor => Interacting_destructor
+        !> Construction and destruction of the class
+        procedure :: construct => Interacting_construct
+        procedure :: destroy => Interacting_destroy
         
         !> Print a report of the component in a file
         procedure :: report => Interacting_report
@@ -55,37 +55,38 @@ public :: inter_constructor
     
 contains
 
-    function inter_constructor()
+    subroutine Interacting_construct(this)
     
-        type(Interacting) :: inter_constructor
+        class(Interacting), intent(out) :: this
     
-        ! Construction                
-
-        inter_constructor%radius = inter_radius
-        inter_constructor%rMin = inter_rMin
-        inter_constructor%Ncol = inter_Ncol
-        allocate(inter_constructor%X(Dim, inter_Ncol))
+        ! Particles
+        this%radius = inter_radius
+        this%rMin = inter_rMin
+        this%Ncol = inter_Ncol
+        allocate(this%X(Dim, inter_Ncol))
         
-        inter_constructor%Nwidom = inter_Nwidom
-        inter_constructor%dx = inter_dx
+        ! Monte-Carlo
+        this%Nwidom = inter_Nwidom
+        this%dx = inter_dx
         
-        inter_constructor%rCut = inter_rCut
-        inter_constructor%dr = inter_dr
-        inter_constructor%iMin = inter_iMin
-        inter_constructor%iCut = inter_iCut 
-        inter_constructor%epsilon = inter_epsilon
-        inter_constructor%alpha = inter_alpha        
-        allocate(inter_constructor%ePot_tab(inter_iMin:inter_iCut))
-        call inter_constructor%ePot_init()
+        ! Potential
+        this%rCut = inter_rCut
+        this%dr = inter_dr
+        this%iMin = inter_iMin
+        this%iCut = inter_iCut 
+        this%epsilon = inter_epsilon
+        this%alpha = inter_alpha        
+        allocate(this%ePot_tab(inter_iMin:inter_iCut))
+        call this%ePot_init()
         
-        !	Neighbours        
-        inter_constructor%same = neigh_constructor(inter_rCut)
-        call inter_constructor%same%alloc_cells()
-        call inter_constructor%same%ini_cell_neighs()
+        ! Neighbours        
+        this%same = neigh_constructor(inter_rCut)
+        call this%same%alloc_cells()
+        call this%same%ini_cell_neighs()
     
-    end function inter_constructor
+    end subroutine Interacting_construct
     
-    subroutine Interacting_destructor(this)
+    subroutine Interacting_destroy(this)
     
         class(Interacting), intent(inout) :: this
         
@@ -93,7 +94,7 @@ contains
         deallocate(this%ePot_tab)
         call this%same%destructor()
     
-    end subroutine Interacting_destructor
+    end subroutine Interacting_destroy
     
     !> Report
     
