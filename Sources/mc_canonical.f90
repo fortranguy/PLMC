@@ -16,13 +16,13 @@ implicit none
 
     ! Initialisation
     
+    integer :: iStep, iMove
+    real(DP) :: tIni, tFin
+    
     !   Interacting spheres
     type(Interacting) :: inter_sph !< Monte-Carlo subroutines
     type(Observables) :: inter_obs !< e.g. Energy
     type(Units) :: inter_io        !< input/output files
-    
-    integer :: iStep, iMove
-    real(DP) :: tIni, tFin
         
     call inter_sph%construct()
     call inter_obs%init()
@@ -35,11 +35,10 @@ implicit none
     
     ! Initial condition
     
-    call initialCondition(inter_sph%X, inter_io%report)
-    call inter_sph%snapShot(inter_io%snapIni)
-    
+    call initialCondition(inter_sph%X, inter_io%report)  
     call inter_sph%overlapTest()
     inter_obs%ePot_total = inter_sph%ePot_total()
+    call inter_sph%snapShot(inter_io%snapIni)
     call inter_sph%cols_to_cells()
     
 ! Middle --------------------------------------------------
@@ -85,10 +84,10 @@ implicit none
 
 ! End -----------------------------------------------------
 
-    call inter_sph%overlapTest()    
-    call inter_sph%consistTest(inter_obs%ePot_total, inter_io%report)    
-    call inter_obs%results(tFin-tIni, inter_io%report)    
+    call inter_sph%overlapTest()
+    call inter_sph%consistTest(inter_obs%ePot_total, inter_io%report)
     call inter_sph%snapShot(inter_io%snapFin)
+    call inter_obs%results(tFin-tIni, inter_io%report)
     
     call inter_sph%destroy()
     call inter_io%close()
