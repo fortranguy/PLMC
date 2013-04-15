@@ -6,6 +6,7 @@ use data_constants
 use data_mc
 use data_distrib
 use mod_tools
+use class_hard
 use class_interacting
 use class_observables
 use class_units
@@ -19,10 +20,19 @@ implicit none
     integer :: iStep, iMove
     real(DP) :: tIni, tFin
     
-    !   Interacting spheres
+    ! Hard spheres
+    type(Hard) :: hard_sph
+    type(Observables) :: hard_obs
+    type(Units) :: hard_io
+    
+    ! Interacting spheres
     type(Interacting) :: inter_sph !< Monte-Carlo subroutines
     type(Observables) :: inter_obs !< e.g. Energy
     type(Units) :: inter_io        !< input/output files
+    
+    call hard_sph%construct()
+    call hard_obs%init()
+    call hard_io%open("hard")
         
     call inter_sph%construct()
     call inter_obs%init()
@@ -30,12 +40,20 @@ implicit none
     
     write(*, *) "Monte-Carlo - Canonical : Volume =", product(Lsize)    
     
+    call hard_sph%report(hard_io%report)
     call inter_sph%report(inter_io%report)
+    
     call init_random_seed(inter_io%report)
     
     ! Initial condition
     
-    call initialCondition(inter_sph%X, inter_io%report)  
+    call initialCondition(hard_sph%X, hard_io%report)
+    call hard_sph%overlapTest()
+    hard_obs%ePot_total = 0._DP
+    call hard_sph%snapShot(hard_io%snapIni)
+    call hard_sph%cols_to_cells()
+    
+    call initialCondition(inter_sph%X, inter_io%report)
     call inter_sph%overlapTest()
     inter_obs%ePot_total = inter_sph%ePot_total()
     call inter_sph%snapShot(inter_io%snapIni)
@@ -49,12 +67,21 @@ implicit none
     do iStep = 1, Ntherm + Nstep
     
         do iMove = 1, Nmove
+            call hard_sph%move(hard_obs%Nrejects)
             call inter_sph%move(inter_obs%ePot_total, inter_obs%Nrejects)
         end do
         
+        call hard_sph%widom(hard_obs%activExInv)
         call inter_sph%widom(inter_obs%activExInv)
         
         if (iStep <= Ntherm) then
+        
+            call hard_sph%adaptDx(iStep, hard_obs%rejectsRateSum, &
+                hard_io%report)
+            write(hard_io%dx, *) iStep, hard_sph%getDx(), &
+                hard_obs%rejectsRateSum/real(iStep, DP)
+            write(hard_io%obsTherm, *) iStep, hard_obs%ePot_total, &
+                hard_obs%activExInv
         
             call inter_sph%adaptDx(iStep, inter_obs%rejectsRateSum, &
                 inter_io%report)
@@ -64,17 +91,23 @@ implicit none
                 inter_obs%activExInv
         
         else
+        
+            call hard_obs%addPhysical()
+            write(hard_io%obs, *) iStep, hard_obs%ePot_total, &
+                hard_obs%activExInv
             
             call inter_obs%addPhysical()
             write(inter_io%obs, *) iStep, inter_obs%ePot_total, &
                 inter_obs%activExInv
             
             if (snap) then
+                call hard_sph%snapShot(hard_io%snapShots)
                 call inter_sph%snapShot(inter_io%snapShots)
             end if
             
         end if
         
+        call hard_obs%addReject()
         call inter_obs%addReject()
     
     end do
@@ -84,10 +117,17 @@ implicit none
 
 ! End -----------------------------------------------------
 
+    call hard_sph%overlapTest()
+    call hard_sph%snapShot(hard_io%snapFin)
+    call hard_obs%results(tFin-tIni, hard_io%report)
+
     call inter_sph%overlapTest()
     call inter_sph%consistTest(inter_obs%ePot_total, inter_io%report)
     call inter_sph%snapShot(inter_io%snapFin)
     call inter_obs%results(tFin-tIni, inter_io%report)
+    
+    call hard_sph%destroy()
+    call hard_io%close()
     
     call inter_sph%destroy()
     call inter_io%close()
