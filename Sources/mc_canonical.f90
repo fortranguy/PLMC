@@ -20,6 +20,8 @@ implicit none
     integer :: iStep, iMove
     real(DP) :: tIni, tFin
     
+    integer, parameter :: unitReport = 10
+    
     ! Hard spheres
     type(Hard) :: hard_sph
     type(Observables) :: hard_obs
@@ -40,10 +42,13 @@ implicit none
     
     write(*, *) "Monte-Carlo - Canonical : Volume =", product(Lsize)    
     
+    open(unit=unitReport, recl=4096, file="report.out", status='new', &
+    	action='write')
+	call report(unitReport)
     call hard_sph%report(hard_io%report)
     call inter_sph%report(inter_io%report)
     
-    call init_random_seed(inter_io%report)
+    call init_random_seed(unitReport)
     
     ! Initial condition
     
@@ -125,6 +130,8 @@ implicit none
     call inter_sph%consistTest(inter_obs%ePot_total, inter_io%report)
     call inter_sph%snapShot(inter_io%snapFin)
     call inter_obs%results(tFin-tIni, inter_io%report)
+    
+    close(unitReport)
     
     call hard_sph%destroy()
     call hard_io%close()

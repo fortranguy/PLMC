@@ -176,4 +176,17 @@ contains
     
     end subroutine randomDeposition
     
+    subroutine report(unitReport)
+    
+    	integer, intent(in) :: unitReport
+    
+    	write(unitReport, *) "Simulation MC_C :"
+        write(unitReport ,*) "    Lsize(:) = ", Lsize(:)
+        write(unitReport ,*) "    Vol = ", product(Lsize)
+        write(unitReport, *) "    Nstep = ", Nstep
+        write(unitReport, *) "    Ntherm = ", Ntherm
+        write(unitReport, *) "    Nmove = ", Nmove
+    
+    end subroutine report
+    
 end module mod_tools

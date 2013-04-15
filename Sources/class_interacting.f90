@@ -101,13 +101,8 @@ contains
         integer, intent(in) :: unitReport    
         
         write(unitReport, *) "Simulation MC_C :"
-        write(unitReport ,*) "    Lsize(:) = ", Lsize(:)
-        write(unitReport ,*) "    Vol = ", product(Lsize)
         write(unitReport ,*) "    Ncol = ", this%Ncol
         write(unitReport ,*) "    Nwidom = ", this%Nwidom
-        write(unitReport, *) "    Nstep = ", Nstep
-        write(unitReport, *) "    Ntherm = ", Ntherm
-        write(unitReport, *) "    Nmove = ", Nmove
         write(unitReport, *) "    epsilon = ", this%epsilon
         write(unitReport, *) "    alpha = ", this%alpha
         write(unitReport, *) "    rCut = ", this%rCut
