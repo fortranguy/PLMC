@@ -56,7 +56,7 @@ contains
         this%rCut = hard_rCut
         
         ! Neighbours        
-        this%same = neigh_constructor(hard_rCut)
+        call this%same%construct(hard_rCut)
         call this%same%alloc_cells()
         call this%same%ini_cell_neighs()
     
@@ -67,7 +67,7 @@ contains
         class(Hard), intent(inout) :: this
         
         deallocate(this%X)
-        call this%same%destructor()
+        call this%same%destroy()
     
     end subroutine Hard_destroy
     

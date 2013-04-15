@@ -77,7 +77,7 @@ contains
         call this%ePot_init()
         
         ! Neighbours        
-        this%same = neigh_constructor(inter_rCut)
+        call this%same%construct(inter_rCut)
         call this%same%alloc_cells()
         call this%same%ini_cell_neighs()
     
@@ -89,7 +89,7 @@ contains
         
         deallocate(this%X)
         deallocate(this%ePot_tab)
-        call this%same%destructor()
+        call this%same%destroy()
     
     end subroutine Interacting_destroy
     

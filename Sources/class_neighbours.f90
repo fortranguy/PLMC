@@ -8,7 +8,7 @@ use data_neighbours
 implicit none
 
 private
-public :: Link, neigh_constructor
+public :: Link
 
     type Link
         integer :: iCol
@@ -30,7 +30,9 @@ public :: Link, neigh_constructor
         
     contains
     
-        procedure :: destructor => Neighbours_destructor
+        procedure :: construct => Neighbours_construct
+        procedure :: destroy => Neighbours_destroy
+        
         procedure :: alloc_cells => Neighbours_alloc_cells
         procedure :: dealloc_cells => Neighbours_dealloc_cells
         procedure :: check_cellsSize => Neighbours_check_cellsSize
@@ -46,28 +48,27 @@ public :: Link, neigh_constructor
     
 contains
 
-    function neigh_constructor(rCut)
+    subroutine Neighbours_construct(this, rCut)
     
+        class(Neighbours), intent(out) :: this
         real(DP), intent(in) :: rCut
-        type(Neighbours) :: neigh_constructor
         
-        neigh_constructor%cell_Lsize(:) = [rCut, rCut, rCut]
-        neigh_constructor%cell_coordMax(:) = int(Lsize(:)/rCut)
-        allocate(neigh_constructor%cell_neighs(cell_neighs_nb, &
-            product( int(Lsize(:)/rCut) )))
+        this%cell_Lsize(:) = rCut
+        this%cell_coordMax(:) = int(Lsize(:)/rCut)
+        allocate(this%cell_neighs(cell_neighs_nb, product(this%cell_coordMax)))
             
-        call neigh_constructor%check_CellsSize(rCut)
+        call this%check_CellsSize(rCut)
     
-    end function neigh_constructor
+    end subroutine Neighbours_construct
     
-    subroutine Neighbours_destructor(this)
+    subroutine Neighbours_destroy(this)
     
         class(Neighbours), intent(inout) :: this
         
         deallocate(this%cell_neighs)
         call this%dealloc_cells()
         
-    end subroutine Neighbours_destructor
+    end subroutine Neighbours_destroy
 
     ! Linked-list allocation
     
