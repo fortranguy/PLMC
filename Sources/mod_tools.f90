@@ -38,11 +38,12 @@ contains
     
     !> Initial condition
     
-    subroutine initialCondition(inter_X, unitReport)
+    subroutine initialCondition(sph_X, unitReport)
     
-        real(DP), dimension(:, :), intent(inout) :: inter_X
+        real(DP), dimension(:, :), intent(inout) :: sph_X
         integer, intent(in) :: unitReport
         
+        integer :: sph_Ncol
         real(DP) :: compac, densite
         character(len=20) :: init
         integer :: longueur, statut
@@ -55,10 +56,10 @@ contains
         
         select case (init)
             case ("cube")
-                call primitiveCubic(inter_X)
+                call primitiveCubic(sph_X)
                 write(unitReport, *) "    Primitive cubic"
             case ("rand")
-                call randomDeposition(inter_X)
+                call randomDeposition(sph_X)
                 write(unitReport, *) "    Random deposition"
             case default
                 write(*, *) "Enter the initial condition : "
@@ -66,7 +67,8 @@ contains
                 stop
         end select
         
-        densite = real(inter_Ncol, DP) / product(Lsize)
+        sph_Ncol = size(sph_X, 2)
+        densite = real(sph_Ncol, DP) / product(Lsize)
         write(*, *) "    Density = ", densite
         write(unitReport, *) "    Density = ", densite
         
@@ -78,26 +80,28 @@ contains
     
     !> Primitive cubic configuration
     
-    subroutine primitiveCubic(inter_X)
+    subroutine primitiveCubic(sph_X)
     
-        real(DP), dimension(:, :), intent(inout) :: inter_X
+        real(DP), dimension(:, :), intent(inout) :: sph_X
     
         integer :: iDir
         integer :: i, j, k, iCol
+        integer :: sph_Ncol
         integer, dimension(Dim) :: nCols
         real(DP), dimension(Dim) :: ratio
         real(DP) :: oneThird = 1._DP/3._DP
         
         write(*, *) "Primitive cubic"
         
-        ! Proportion according to the direction       
-        nCols(1) = int( (inter_Ncol*Lsize(1)**2/Lsize(2)/Lsize(3))**oneThird )
-        nCols(2) = int( (inter_Ncol*Lsize(2)**2/Lsize(3)/Lsize(1))**oneThird )
-        nCols(3) = int( (inter_Ncol*Lsize(3)**2/Lsize(1)/Lsize(2))**oneThird )
+        ! Proportion according to the direction
+        sph_Ncol = size(sph_X, 2)
+        nCols(1) = int( (sph_Ncol*Lsize(1)**2/Lsize(2)/Lsize(3))**oneThird )
+        nCols(2) = int( (sph_Ncol*Lsize(2)**2/Lsize(3)/Lsize(1))**oneThird )
+        nCols(3) = int( (sph_Ncol*Lsize(3)**2/Lsize(1)/Lsize(2))**oneThird )
         
         ! Check
         iDir = 1
-        do while (product(nCols)<inter_Ncol)
+        do while (product(nCols)<sph_Ncol)
             nCols(iDir) = nCols(iDir) + 1
             iDir = iDir + 1
         end do
@@ -115,17 +119,17 @@ contains
             do j = 1, nCols(2)
                 do i = 1, nCols(1)            
                     iCol = i + nCols(1)*(j-1) + nCols(1)*nCols(2)*(k-1)
-                    if (iCol <= inter_Ncol) then
-                        inter_X(1, iCol) = ratio(1)*real(i, DP)
-                        inter_X(2, iCol) = ratio(2)*real(j, DP)
-                        inter_X(3, iCol) = ratio(3)*real(k, DP)
+                    if (iCol <= sph_Ncol) then
+                        sph_X(1, iCol) = ratio(1)*real(i, DP)
+                        sph_X(2, iCol) = ratio(2)*real(j, DP)
+                        sph_X(3, iCol) = ratio(3)*real(k, DP)
                     end if
                 end do
             end do
         end do
     
         do iDir = 1, Dim
-            inter_X(iDir, :) = inter_X(iDir, :) - 0.5_DP*ratio(iDir) 
+            sph_X(iDir, :) = sph_X(iDir, :) - 0.5_DP*ratio(iDir) 
             ! just inside
         end do
     
@@ -133,28 +137,30 @@ contains
     
     !> Random deposition configuration
     
-    subroutine randomDeposition(inter_X)
+    subroutine randomDeposition(sph_X)
     
-        real(DP), dimension(:, :), intent(inout) :: inter_X
+        real(DP), dimension(:, :), intent(inout) :: sph_X
     
         integer :: iCol, Ncols, nOK
+        integer :: sph_Ncol
         real(DP), dimension(Dim) :: xTest
         real(DP) :: rTest
-    
+        
         write(*, *) "Random deposition"
     
-        call random_number(inter_X(:, 1))
-        inter_X(:, 1) = inter_X(:, 1)*(Lsize(:)-2*inter_radius)
+        call random_number(sph_X(:, 1))
+        sph_X(:, 1) = sph_X(:, 1)*(Lsize(:)-2*inter_radius)
         Ncols = 1        
         
-        do while (Ncols<inter_Ncol)
+        sph_Ncol = size(sph_X, 2)
+        do while (Ncols<sph_Ncol)
         
             call random_number(xTest)
             xTest(:) = xTest(:)*(Lsize(:)-2._DP*inter_radius)
             
             nOK = 0
             do iCol = 1, Ncols
-                rTest = dist(inter_X(:, iCol), xTest(:))
+                rTest = dist(sph_X(:, iCol), xTest(:))
                 if (rTest >= inter_rMin) then
                     nOK = nOK + 1
                 else
@@ -164,14 +170,14 @@ contains
             
             if (nOK == Ncols) then
                 Ncols = Ncols + 1
-                inter_X(:, Ncols) = xTest(:)
+                sph_X(:, Ncols) = xTest(:)
                 write(*, *) "    Particule", Ncols, "OK"
             end if
             
         end do
         
-        do iCol = 1, inter_Ncol
-            inter_X(:, iCol) = inter_X(:, iCol) + inter_radius
+        do iCol = 1, sph_Ncol
+            sph_X(:, iCol) = sph_X(:, iCol) + inter_radius
         end do
     
     end subroutine randomDeposition
