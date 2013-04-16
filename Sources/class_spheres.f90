@@ -26,6 +26,7 @@ private
 
         ! Monte-Carlo
         real(DP), dimension(Dim) :: dx !< displacement
+        real(DP), dimension(Dim) :: dx_save
         integer :: Nwidom
 
         ! Potential
@@ -116,14 +117,12 @@ contains
         integer, intent(in) :: iStep, unitReport
         real(DP), intent(in) :: rejectsRateSum    
         
-        real(DP), dimension(Dim) :: dx_save
         integer, parameter :: multiple = 2**2
         real(DP) :: rejectsRate
         real(DP), parameter :: rejectsRateFix = 0.5_DP
         real(DP), parameter :: dx_eps = 0.05_DP, taux_eps = 0.05_DP
         real(DP), parameter :: more = 1._DP+dx_eps, less = 1._DP-dx_eps
         
-        dx_save(:) = this%dx(:)
         rejectsRate = 0._DP
         
         if (mod(iStep, multiple) == 0 .and. iStep>2) then
@@ -145,7 +144,7 @@ contains
             if (rejectsRate == 0._DP) then
                 write(*, *) this%name
                 write(*, *) "Warning : dx adaptation problem."
-                this%dx(:) = dx_save(:)
+                this%dx(:) = this%dx_save(:)
                 write(*, *) "default dx :", this%dx(:)
                 write(*, *)
             end if

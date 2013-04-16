@@ -66,6 +66,7 @@ contains
         
         ! Monte-Carlo
         this%dx = inter_dx
+        this%dx_save = inter_dx
         this%Nwidom = inter_Nwidom
         
         ! Potential
