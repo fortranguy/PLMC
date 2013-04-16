@@ -16,6 +16,7 @@ private
     type, public :: Spheres
     
         !private
+        character(len=5) :: name
 
         ! Particles
         real(DP) :: radius !< radius of a particle
@@ -82,6 +83,7 @@ contains
                     
                     r_ij = dist(this%X(:, iCol), this%X(:, jCol))
                     if (r_ij < this%rMin) then
+                        write(*, *) this%name
                         write(*, *) "    Overlap !", iCol, jCol
                         write(*, * ) "    r_ij = ", r_ij
                         stop
@@ -91,6 +93,7 @@ contains
             end do
         end do
         
+        write(*, *) this%name
         write(*, *) "    Overlap test : OK !"
     
     end subroutine Spheres_overlapTest
@@ -140,6 +143,7 @@ contains
         if (iStep == Ntherm) then
         
             if (rejectsRate == 0._DP) then
+                write(*, *) this%name
                 write(*, *) "Warning : dx adaptation problem."
                 this%dx(:) = dx_save(:)
                 write(*, *) "default dx :", this%dx(:)

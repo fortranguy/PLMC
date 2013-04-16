@@ -41,6 +41,8 @@ contains
     subroutine Hard_construct(this)
     
         class(Hard), intent(out) :: this
+        
+        this%name = "hard"
     
         ! Particles
         this%radius = hard_radius

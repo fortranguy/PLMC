@@ -55,6 +55,8 @@ contains
     subroutine Interacting_construct(this)
     
         class(Interacting), intent(out) :: this
+        
+        this%name = "inter"
     
         ! Particles
         this%radius = inter_radius
