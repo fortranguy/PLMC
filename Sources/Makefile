@@ -17,10 +17,28 @@ all: $(EXEC1) $(EXEC2) $(EXEC3)
 data_copy.f90 : data.f90
 	cp data.f90 data_copy.f90
 	
+data_copy.o data_constants.mod data_cell.mod data_particles.mod data_mc.mod \
+	data_potentiel.mod data_neighbours.mod data_distrib.mod: data_copy.f90
+	$(FC) $(FFLAGS) -c $<
+	touch $*.o $*.mod
+	
 # ---------------------------
 
 data.o: data_copy.f90
 	$(FC) -c $(FFLAGS) $< -o $@
+
+mod_physics.o : data_constants.mod data_cell.mod
+class_neighbours.o : data_constants.mod data_cell.mod data_neighbours.mod
+class_spheres.o : data_constants.mod data_cell.mod data_mc.mod \
+	data_neighbours.mod
+class_hard.o :data_constants.mod data_cell.mod data_particles.mod \
+	data_potentiel.mod data_mc.mod data_neighbours.mod
+class_interacting.o : data_constants.mod data_cell.mod data_particles.mod \
+	data_potentiel.mod data_mc.mod data_neighbours.mod
+class_observables.o : data_constants.mod data_mc.mod
+mod_tools.o : data_constants.mod data_particles.mod data_mc.mod
+
+# ---------------------------
 mod_physics.o: mod_physics.f90
 	$(FC) -c $(FFLAGS_OMP) $< -o $@
 class_neighbours.o: class_neighbours.f90
