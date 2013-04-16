@@ -18,6 +18,8 @@ implicit none
     ! Initialisation
     
     integer :: iStep, iMove
+    integer :: iColRand
+    real(DP) :: rand
     real(DP) :: tIni, tFin
     
     integer, parameter :: unitReport = 10
@@ -72,8 +74,15 @@ implicit none
     do iStep = 1, Ntherm + Nstep
     
         do iMove = 1, Nmove
-            call hard_sph%move(hard_obs%Nrejects)
-            call inter_sph%move(inter_obs%ePot_total, inter_obs%Nrejects)
+        
+            call random_number(rand)
+            iColRand = int(rand*real(hard_Ncol+inter_Ncol, DP)) + 1            
+            if (iColRand<=hard_Ncol) then
+                call hard_sph%move(hard_obs%Nrejects)
+            else
+                call inter_sph%move(inter_obs%ePot_total, inter_obs%Nrejects)
+            end if            
+            
         end do
         
         call hard_sph%widom(hard_obs%activExInv)
