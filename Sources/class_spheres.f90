@@ -113,12 +113,14 @@ contains
         integer, intent(in) :: iStep, unitReport
         real(DP), intent(in) :: rejectsRateSum    
         
+        real(DP), dimension(Dim) :: dx_save
         integer, parameter :: multiple = 2**2
         real(DP) :: rejectsRate
         real(DP), parameter :: rejectsRateFix = 0.5_DP
         real(DP), parameter :: dx_eps = 0.05_DP, taux_eps = 0.05_DP
         real(DP), parameter :: more = 1._DP+dx_eps, less = 1._DP-dx_eps
         
+        dx_save(:) = this%dx(:)
         rejectsRate = 0._DP
         
         if (mod(iStep, multiple) == 0 .and. iStep>2) then
@@ -138,8 +140,10 @@ contains
         if (iStep == Ntherm) then
         
             if (rejectsRate == 0._DP) then
-                write(*, *) "Error : dx adaptation problem"
-                stop
+                write(*, *) "Warning : dx adaptation problem."
+                this%dx(:) = dx_save(:)
+                write(*, *) "default dx :", this%dx(:)
+                write(*, *)
             end if
             
             write(unitReport, *) "Displacement :"
