@@ -25,7 +25,7 @@ implicit none
     integer, parameter :: unitReport = 10
     
     ! Hard spheres
-    type(HardSphere) :: hard_sph
+    type(HardSpheres) :: hard_sph
     type(Observables) :: hard_obs
     type(Units) :: hard_io
     

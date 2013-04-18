@@ -31,10 +31,10 @@ mod_physics.o : data_constants.mod data_cell.mod
 class_neighbours.o : data_constants.mod data_cell.mod data_neighbours.mod
 class_spheres.o : data_constants.mod data_cell.mod data_mc.mod \
 	data_neighbours.mod
-class_hard.o :data_constants.mod data_cell.mod data_particles.mod \
+class_hardSpheres.o :data_constants.mod data_cell.mod data_particles.mod \
 	data_potentiel.mod data_mc.mod data_neighbours.mod
-class_interacting.o : data_constants.mod data_cell.mod data_particles.mod \
-	data_potentiel.mod data_mc.mod data_neighbours.mod
+class_interactingSpheres.o : data_constants.mod data_cell.mod \
+	data_particles.mod data_potentiel.mod data_mc.mod data_neighbours.mod
 class_observables.o : data_constants.mod data_mc.mod
 mod_tools.o : data_constants.mod data_particles.mod data_mc.mod
 
@@ -45,9 +45,9 @@ class_neighbours.o : class_neighbours.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_spheres.o : class_spheres.f90
 	$(FC) -c $(FFLAGS) $< -o $@
-class_hard.o : class_hard.f90
+class_hardSpheres.o : class_hardSpheres.f90
 	$(FC) -c $(FFLAGS) $< -o $@
-class_interacting.o : class_interacting.f90
+class_interactingSpheres.o : class_interactingSpheres.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_observables.o : class_observables.f90
 	$(FC) -c $(FFLAGS) $< -o $@
@@ -61,8 +61,8 @@ mod_tools.o : mod_tools.f90
 mc_canonical.o : mc_canonical.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 $(EXEC1) : data.o mod_physics.o class_neighbours.o class_spheres.o \
-	class_hard.o class_interacting.o class_observables.o class_units.o \
-	mod_tools.o mc_canonical.o
+	class_hardSpheres.o class_interactingSpheres.o class_observables.o \
+	class_units.o mod_tools.o mc_canonical.o
 	$(FC) $^ $(LDFLAGS) -o $@
 	
 # ---------------------------
@@ -77,7 +77,7 @@ $(EXEC2) : data.o bunching.o
 distrib.o : distrib.f90
 	$(FC) -c $(FFLAGS_OMP) $< -o $@
 $(EXEC3) : data.o mod_physics.o class_neighbours.o class_spheres.o \
-	class_interacting.o mod_tools.o distrib.o
+	class_interactingSpheres.o mod_tools.o distrib.o
 	$(FC) $^ $(LDFLAGS_OMP) -o $@
 
 # ---------------------------------------------------------

@@ -33,7 +33,7 @@ use data_mc
 use data_potentiel
 use mod_distrib
 use mod_physics
-use class_interacting
+use class_interactingSpheres
 !$ use omp_lib
 
 implicit none
@@ -52,7 +52,7 @@ implicit none
 	real(DP) :: numerat, denomin
 	real(DP), dimension(:), allocatable :: fct_dist
 	real(DP) :: energSum	
-	type(Interacting) :: inter
+	type(InteractingSpheres) :: inter
 	real(DP), dimension(Dim, inter_Ncol) :: X
 	
 	!$ integer :: nb_taches
