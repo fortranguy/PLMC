@@ -219,16 +219,16 @@ contains
     
     ! Neighbours cells update
     
-    subroutine Neighbours_remove_cell_col(this, iCol, iCellBefore)
+    subroutine Neighbours_remove_cell_col(this, iCol, iCellOld)
     
         class(Neighbours), intent(inout) :: this
     
-        integer, intent(in) :: iCol, iCellBefore
+        integer, intent(in) :: iCol, iCellOld
         
         type(Link), pointer :: current => null()
         type(Link), pointer :: next => null(), previous => null()
     
-        previous => this%cellsBegin(iCellBefore)%particle
+        previous => this%cellsBegin(iCellOld)%particle
         current => previous%next
         
         do
@@ -254,17 +254,17 @@ contains
             
     end subroutine Neighbours_remove_cell_col   
     
-    subroutine Neighbours_add_cell_col(this, iCol, iCellAfter)
+    subroutine Neighbours_add_cell_col(this, iCol, iCellNew)
     
         class(Neighbours), intent(inout) :: this
     
-        integer, intent(in) :: iCol, iCellAfter
+        integer, intent(in) :: iCol, iCellNew
     
         type(Link), pointer :: new => null()
         type(Link), pointer :: next => null(), previous => null()           
           
         
-        previous => this%cellsBegin(iCellAfter)%particle
+        previous => this%cellsBegin(iCellNew)%particle
         
         do
         

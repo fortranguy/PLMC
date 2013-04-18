@@ -146,7 +146,7 @@ contains
         integer :: iOld
         real(DP) :: rand
         real(DP), dimension(Dim) :: xRand, xNew
-        integer :: iCellBefore, iCellAfter
+        integer :: iCellOld, iCellNew
         
         call random_number(rand)
         iOld = int(rand*this%Ncol) + 1
@@ -154,19 +154,19 @@ contains
         call random_number(xRand)
         xNew(:) = this%X(:, iOld) + (xRand(:)-0.5_DP)*this%dx(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
-        iCellAfter = this%same%position_to_cell(xNew)
-        call this%ePot_neigh(iOld, xNew, iCellAfter, overlap)
+        iCellNew = this%same%position_to_cell(xNew)
+        call this%ePot_neigh(iOld, xNew, iCellNew, overlap)
         
         if (.not. overlap) then
         
-            iCellBefore = this%same%position_to_cell(this%X(:, iOld))
-            call this%ePot_neigh(iOld, this%X(:, iOld), iCellBefore, overlap)
+            iCellOld = this%same%position_to_cell(this%X(:, iOld))
+            call this%ePot_neigh(iOld, this%X(:, iOld), iCellOld, overlap)
         
             this%X(:, iOld) = xNew(:)
                 
-            if ( iCellBefore /= iCellAfter ) then                
-                call this%same%remove_cell_col(iOld, iCellBefore)
-                call this%same%add_cell_col(iOld, iCellAfter)
+            if ( iCellOld /= iCellNew ) then                
+                call this%same%remove_cell_col(iOld, iCellOld)
+                call this%same%add_cell_col(iOld, iCellNew)
             end if
             
         else

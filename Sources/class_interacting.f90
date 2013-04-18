@@ -222,7 +222,7 @@ contains
         integer :: iOld
         real(DP) :: rand
         real(DP), dimension(Dim) :: xRand, xNew
-        integer :: iCellBefore, iCellAfter
+        integer :: iCellOld, iCellAfter
         real(DP) :: eNew, eOld, dEn
         
         call random_number(rand)
@@ -236,8 +236,8 @@ contains
         
         if (.not. overlap) then
         
-            iCellBefore = this%same%position_to_cell(this%X(:, iOld))
-            call this%ePot_neigh(iOld, this%X(:, iOld), iCellBefore, overlap, &
+            iCellOld = this%same%position_to_cell(this%X(:, iOld))
+            call this%ePot_neigh(iOld, this%X(:, iOld), iCellOld, overlap, &
                 eOld)
             
             dEn = eNew - eOld
@@ -247,8 +247,8 @@ contains
                 this%X(:, iOld) = xNew(:)
                 ePot_total = ePot_total + dEn
                 
-                if ( iCellBefore /= iCellAfter ) then                
-                    call this%same%remove_cell_col(iOld, iCellBefore)
+                if ( iCellOld /= iCellAfter ) then                
+                    call this%same%remove_cell_col(iOld, iCellOld)
                     call this%same%add_cell_col(iOld, iCellAfter)
                 end if
                 
