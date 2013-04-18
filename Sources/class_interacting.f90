@@ -1,6 +1,6 @@
-!> \brief Description of the Interacting Sphere class
+!> \brief Description of the InteractingSpheres class
 
-module class_interacting
+module class_interactingSpheres
 
 use data_constants
 use data_cell
@@ -16,7 +16,7 @@ implicit none
 
 private
 
-    type, extends(Spheres), public :: Interacting
+    type, extends(Spheres), public :: interactingSpheres
 
         private 
 
@@ -31,30 +31,30 @@ private
     contains
 
         !> Construction and destruction of the class
-        procedure :: construct => Interacting_construct
-        procedure :: destroy => Interacting_destroy
+        procedure :: construct => interactingSpheres_construct
+        procedure :: destroy => interactingSpheres_destroy
         
         !> Print a report of the component in a file
-        procedure :: report => Interacting_report
+        procedure :: report => interactingSpheres_report
               
         !> Potential energy
-        procedure :: ePot_init => Interacting_ePot_init
-        procedure :: ePot => Interacting_ePot
-        procedure :: ePot_neigh => Interacting_ePot_neigh
-        procedure :: ePot_total => Interacting_ePot_total
-        procedure :: consistTest => Interacting_consistTest
+        procedure :: ePot_init => interactingSpheres_ePot_init
+        procedure :: ePot => interactingSpheres_ePot
+        procedure :: ePot_neigh => interactingSpheres_ePot_neigh
+        procedure :: ePot_total => interactingSpheres_ePot_total
+        procedure :: consistTest => interactingSpheres_consistTest
         
         !> Monte-Carlo
-        procedure :: move => Interacting_move
-        procedure :: widom => Interacting_widom
+        procedure :: move => interactingSpheres_move
+        procedure :: widom => interactingSpheres_widom
         
-    end type Interacting
+    end type interactingSpheres
     
 contains
 
-    subroutine Interacting_construct(this)
+    subroutine interactingSpheres_construct(this)
     
-        class(Interacting), intent(out) :: this
+        class(interactingSpheres), intent(out) :: this
         
         this%name = "inter"
     
@@ -84,23 +84,23 @@ contains
         call this%same%alloc_cells()
         call this%same%ini_cell_neighs()
     
-    end subroutine Interacting_construct
+    end subroutine interactingSpheres_construct
     
-    subroutine Interacting_destroy(this)
+    subroutine interactingSpheres_destroy(this)
     
-        class(Interacting), intent(inout) :: this
+        class(interactingSpheres), intent(inout) :: this
         
         deallocate(this%X)
         deallocate(this%ePot_tab)
         call this%same%destroy()
     
-    end subroutine Interacting_destroy
+    end subroutine interactingSpheres_destroy
     
     !> Report
     
-    subroutine Interacting_report(this, unitReport)
+    subroutine interactingSpheres_report(this, unitReport)
     
-        class(Interacting), intent(in) :: this
+        class(interactingSpheres), intent(in) :: this
         integer, intent(in) :: unitReport    
         
         write(unitReport, *) "Simulation MC_C :"
@@ -114,15 +114,15 @@ contains
         	this%same%cell_coordMax(:)
         write(unitReport, *) "    cell_Lsize(:) = ", this%same%cell_Lsize(:)
         
-    end subroutine Interacting_report
+    end subroutine interactingSpheres_report
     
     !> Potential energy
     !> Tabulation of Yukawa potential    
     !> \f[ \epsilon \frac{e^{-\alpha (r-r_{min})}}{r} \f]
     
-    subroutine Interacting_ePot_init(this)
+    subroutine interactingSpheres_ePot_init(this)
     
-        class(Interacting), intent(inout) :: this
+        class(interactingSpheres), intent(inout) :: this
 
         integer :: i
         real(DP) :: r_i
@@ -138,11 +138,11 @@ contains
         this%ePot_tab(:) = this%ePot_tab(:) - this%epsilon * &
             exp(-this%alpha*(this%rCut-this%rMin)) / this%rCut
 
-    end subroutine Interacting_ePot_init
+    end subroutine interactingSpheres_ePot_init
 
-    function Interacting_ePot(this, r) result(ePot)
+    function interactingSpheres_ePot(this, r) result(ePot)
         
-        class(Interacting), intent(in) :: this
+        class(interactingSpheres), intent(in) :: this
         real(DP), intent(in) :: r
         
         integer :: i
@@ -161,11 +161,12 @@ contains
            
         end if
         
-    end function Interacting_ePot
+    end function interactingSpheres_ePot
     
-    subroutine Interacting_ePot_neigh(this, iCol, xCol, iCell, overlap, energ)
+    subroutine interactingSpheres_ePot_neigh(this, iCol, xCol, iCell, overlap, &
+    	energ)
         
-        class(Interacting), intent(in) :: this        
+        class(interactingSpheres), intent(in) :: this        
         integer, intent(in) :: iCol, iCell
         real(DP), dimension(Dim), intent(in) :: xCol
         logical, intent(out) :: overlap
@@ -208,13 +209,13 @@ contains
             
         end do
     
-    end subroutine Interacting_ePot_neigh
+    end subroutine interactingSpheres_ePot_neigh
     
     !> Particle move
     
-    subroutine Interacting_move(this, ePot_total, Nrejects)
+    subroutine interactingSpheres_move(this, ePot_total, Nrejects)
     
-        class(Interacting), intent(inout) :: this
+        class(interactingSpheres), intent(inout) :: this
         real(DP), intent(inout) :: ePot_total
         integer, intent(inout) :: Nrejects
         
@@ -262,13 +263,13 @@ contains
             
         end if
     
-    end subroutine Interacting_move
+    end subroutine interactingSpheres_move
     
     !> Widom's method
 
-    subroutine Interacting_widom(this, activExInv)
+    subroutine interactingSpheres_widom(this, activExInv)
         
-        class(Interacting), intent(in) :: this
+        class(interactingSpheres), intent(in) :: this
         real(DP), intent(inOut) :: activExInv 
         
         integer :: iWid
@@ -295,13 +296,13 @@ contains
         
         activExInv = widTestSum/real(this%Nwidom, DP)
         
-    end subroutine Interacting_widom
+    end subroutine interactingSpheres_widom
 
     !> Total potential energy
     
-    function Interacting_ePot_total(this) result(ePot_total)
+    function interactingSpheres_ePot_total(this) result(ePot_total)
     
-        class(Interacting), intent(in) :: this
+        class(interactingSpheres), intent(in) :: this
         
         integer :: iCol, jCol
         real(DP) :: r_ij
@@ -322,13 +323,13 @@ contains
         
         ePot_total = 0.5_DP*ePot_total
     
-    end function Interacting_ePot_total
+    end function interactingSpheres_ePot_total
     
     !> Consistency test 
     
-    subroutine Interacting_consistTest(this, ePot_total_mc, unitReport)
+    subroutine interactingSpheres_consistTest(this, ePot_total_mc, unitReport)
     
-        class(Interacting), intent(in) :: this
+        class(interactingSpheres), intent(in) :: this
         real(DP), intent(in) :: ePot_total_mc
         integer, intent(in) :: unitReport
         
@@ -341,6 +342,6 @@ contains
         write(unitReport, *) "    relative difference = ", &
             abs(ePot_total-ePot_total_mc)/ePot_total
     
-    end subroutine Interacting_consistTest
+    end subroutine interactingSpheres_consistTest
 
-end module class_interacting
+end module class_interactingSpheres

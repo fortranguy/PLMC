@@ -6,8 +6,8 @@ use data_constants
 use data_mc
 use data_distrib
 use mod_tools
-use class_hard
-use class_interacting
+use class_hardSpheres
+use class_interactingSpheres
 use class_observables
 use class_units
 
@@ -25,12 +25,12 @@ implicit none
     integer, parameter :: unitReport = 10
     
     ! Hard spheres
-    type(Hard) :: hard_sph
+    type(HardSphere) :: hard_sph
     type(Observables) :: hard_obs
     type(Units) :: hard_io
     
     ! Interacting spheres
-    type(Interacting) :: inter_sph !< Monte-Carlo subroutines
+    type(InteractingSpheres) :: inter_sph !< Monte-Carlo subroutines
     type(Observables) :: inter_obs !< e.g. Energy
     type(Units) :: inter_io        !< input/output files
     

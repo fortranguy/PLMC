@@ -1,6 +1,6 @@
-!> \brief Description of the Hard Sphere class
+!> \brief Description of the Hard Spheres class
 
-module class_hard
+module class_hardSpheres
 
 use data_constants
 use data_cell
@@ -16,31 +16,31 @@ implicit none
 
 private
 
-    type, extends(Spheres), public :: Hard
+    type, extends(Spheres), public :: HardSpheres
         
     contains
 
         !> Construction and destruction of the class
-        procedure :: construct => Hard_construct
-        procedure :: destroy => Hard_destroy
+        procedure :: construct => HardSpheres_construct
+        procedure :: destroy => HardSpheres_destroy
         
         !> Print a report of the component in a file
-        procedure :: report => Hard_report
+        procedure :: report => HardSpheres_report
               
         !> Potential energy
-        procedure :: ePot_neigh => Hard_ePot_neigh
+        procedure :: ePot_neigh => HardSpheres_ePot_neigh
         
         !> Monte-Carlo
-        procedure :: move => Hard_move
-        procedure :: widom => Hard_widom
+        procedure :: move => HardSpheres_move
+        procedure :: widom => HardSpheres_widom
         
-    end type Hard
+    end type HardSpheres
     
 contains
 
-    subroutine Hard_construct(this)
+    subroutine HardSpheres_construct(this)
     
-        class(Hard), intent(out) :: this
+        class(HardSpheres), intent(out) :: this
         
         this%name = "hard"
     
@@ -63,22 +63,22 @@ contains
         call this%same%alloc_cells()
         call this%same%ini_cell_neighs()
     
-    end subroutine Hard_construct
+    end subroutine HardSpheres_construct
     
-    subroutine Hard_destroy(this)
+    subroutine HardSpheres_destroy(this)
     
-        class(Hard), intent(inout) :: this
+        class(HardSpheres), intent(inout) :: this
         
         deallocate(this%X)
         call this%same%destroy()
     
-    end subroutine Hard_destroy
+    end subroutine HardSpheres_destroy
     
     !> Report
     
-    subroutine Hard_report(this, unitReport)
+    subroutine HardSpheres_report(this, unitReport)
     
-        class(Hard), intent(in) :: this
+        class(HardSpheres), intent(in) :: this
         integer, intent(in) :: unitReport    
         
         write(unitReport, *) "Simulation MC_C :"
@@ -89,11 +89,11 @@ contains
         	this%same%cell_coordMax(:)
         write(unitReport, *) "    cell_Lsize(:) = ", this%same%cell_Lsize(:)
         
-    end subroutine Hard_report
+    end subroutine HardSpheres_report
     
-    subroutine Hard_ePot_neigh(this, iCol, xCol, iCell, overlap)
+    subroutine HardSpheres_ePot_neigh(this, iCol, xCol, iCell, overlap)
         
-        class(Hard), intent(in) :: this        
+        class(HardSpheres), intent(in) :: this        
         integer, intent(in) :: iCol, iCell
         real(DP), dimension(Dim), intent(in) :: xCol
         logical, intent(out) :: overlap
@@ -133,13 +133,13 @@ contains
             
         end do
     
-    end subroutine Hard_ePot_neigh
+    end subroutine HardSpheres_ePot_neigh
     
     !> Particle move
     
-    subroutine Hard_move(this, Nrejects)
+    subroutine HardSpheres_move(this, Nrejects)
     
-        class(Hard), intent(inout) :: this
+        class(HardSpheres), intent(inout) :: this
         integer, intent(inout) :: Nrejects
         
         logical :: overlap
@@ -175,13 +175,13 @@ contains
             
         end if
     
-    end subroutine Hard_move
+    end subroutine HardSpheres_move
     
     !> Widom's method
 
-    subroutine Hard_widom(this, activExInv)
+    subroutine HardSpheres_widom(this, activExInv)
         
-        class(Hard), intent(in) :: this
+        class(HardSpheres), intent(in) :: this
         real(DP), intent(inOut) :: activExInv 
         
         integer :: iWid
@@ -207,6 +207,6 @@ contains
         
         activExInv = widTestSum/real(this%Nwidom, DP)
         
-    end subroutine Hard_widom
+    end subroutine HardSpheres_widom
 
-end module class_hard
+end module class_hardSpheres
