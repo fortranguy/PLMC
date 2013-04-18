@@ -30,7 +30,7 @@ private
         integer :: Nwidom
 
         ! Potential
-        real(DP) :: rCut !< short-range cut    
+        real(DP) :: rCut !< short-range cut
         
         ! Neighbours (cell/grid scheme)   
         type(Neighbours) :: same !< same kind
