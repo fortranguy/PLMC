@@ -44,11 +44,11 @@ contains
 		! Potential
         this%rCut = mix_rCut
         this%dr = mix_dr
-        this%iMin = mix_iMin
-        this%iCut = mix_iCut
+        this%iMin = int(this%rMin/this%dr)
+        this%iCut = int(this%rCut/this%dr)
         this%epsilon = mix_epsilon
         this%alpha = mix_alpha
-        allocate(this%ePot_tab(mix_iMin:mix_iCut))
+        allocate(this%ePot_tab(this%iMin:this%iCut))
         call this%ePot_init()
 	
 	end subroutine Potential_construct
