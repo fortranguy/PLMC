@@ -67,7 +67,7 @@ contains
     end subroutine Potential_destroy
 
 !> Potential energy
-    !> Tabulation of Yukawa potential    
+    !> Tabulation of Yukawa potential
     !> \f[ \epsilon \frac{e^{-\alpha (r-r_{min})}}{r} \f]
     
     subroutine Potential_ePot_init(this)
