@@ -60,7 +60,9 @@ contains
     
         class(interactingSpheres), intent(inout) :: this
         
-        deallocate(this%ePot_tab)
+        if (allocated(this%ePot_tab)) then
+	        deallocate(this%ePot_tab)
+        end if
     
     end subroutine Potential_destroy
 
