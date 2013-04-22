@@ -31,7 +31,7 @@ private
 		procedure :: ePot_init => Potential_ePot_init
         procedure :: ePot => Potential_ePot
         procedure :: ePot_neigh => Potential_ePot_neigh
-        procedure :: ePot_total => Potential_ePot_total
+        !procedure :: ePot_total => Potential_ePot_total
 	
 	end type
 	
@@ -66,7 +66,7 @@ contains
     
     end subroutine Potential_destroy
 
-!> Potential energy
+	!> Potential energy
     !> Tabulation of Yukawa potential
     !> \f[ \epsilon \frac{e^{-\alpha (r-r_{min})}}{r} \f]
     
@@ -113,12 +113,14 @@ contains
         
     end function Potential_ePot
     
-    subroutine Potential_ePot_neigh(this, iCol, xCol, iCell, overlap, &
-    	energ)
+    subroutine Potential_ePot_neigh(this, xCol, iCell, other_neigh, other_X, 
+    	overlap, energ)
         
-        class(Potential), intent(in) :: this        
-        integer, intent(in) :: iCol, iCell
-        real(DP), dimension(Dim), intent(in) :: xCol
+        class(Potential), intent(in) :: this
+        real(DP), dimension(Dim), intent(in) :: xCol !< type A
+        integer, intent(in) :: iCell < ! type A in mix grid
+        type(Neighbours), intent(in) :: other_neigh
+        real(DP), dimension(Dim, :) :: other_X
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energ
     
@@ -132,24 +134,20 @@ contains
     
         do iNeigh = 1, cell_neighs_nb
         
-            iCell_neigh = this%same%cell_neighs(iNeigh, iCell)
-            current => this%same%cellsBegin(iCell_neigh)%particle%next            
+            iCell_neigh = other%cell_neighs(iNeigh, iCell)
+            current => other%cellsBegin(iCell_neigh)%particle%next            
             if (.not. associated(current%next)) cycle
             
             do
             
                 next => current%next
-            
-                if (current%iCol /= iCol) then
                 
-                    r = dist(xCol(:), this%X(:, current%iCol))
-                    if (r < this%rMin) then
-                        overlap = .true.
-                        return
-                    end if
-                    energ = energ + this%ePot(r)
-       
+                r = dist(xCol(:), other_X(:, current%iCol))
+                if (r < this%rMin) then
+                    overlap = .true.
+                    return
                 end if
+                energ = energ + this%ePot(r)
                 
                 if (.not. associated(next%next)) exit
                 
@@ -162,30 +160,5 @@ contains
     end subroutine Potential_ePot_neigh
     
     !> Total potential energy
-    
-    function Potential_ePot_total(this) result(ePot_total)
-    
-        class(Potential), intent(in) :: this
-        
-        integer :: iCol, jCol
-        real(DP) :: r_ij
-        real(DP) :: ePot_total
-    
-        ePot_total = 0._DP
-        
-        do jCol = 1, this%Ncol
-            do iCol = 1, this%Ncol
-                if (iCol /= jCol) then
-                
-                    r_ij = dist(this%X(:, iCol), this%X(:, jCol))
-                    ePot_total = ePot_total + this%ePot(r_ij)
-                    
-                end if
-            end do
-        end do
-        
-        ePot_total = 0.5_DP*ePot_total
-    
-    end function Potential_ePot_total
 
 end module class_potential
