@@ -40,12 +40,15 @@ use data_constants
 use data_cell
     
     real(DP), parameter :: hard_radius = .5_DP
-    real(DP), parameter :: hard_rMin = 1._DP
+    real(DP), parameter :: hard_rMin = 2._DP * hard_radius
     integer, parameter :: hard_Ncol = 270
     
     real(DP), parameter :: inter_radius = .5_DP
-    real(DP), parameter :: inter_rMin = 1._DP
+    real(DP), parameter :: inter_rMin = 2._DP * inter_radius
     integer, parameter :: inter_Ncol = 270
+    
+    real(DP), parameter :: mix_delta = 0._DP
+    real(DP), parameter :: mix_rMin = hard_radius + hard_radius + mix_delta
     
 end module data_particles
 !***********************************************************************
@@ -97,6 +100,11 @@ implicit none
     real(DP), parameter :: inter_dr = 5.E-5_DP
     real(DP), parameter :: inter_epsilon = 1._DP
     real(DP), parameter :: inter_alpha = 5._DP
+    
+    real(DP), parameter :: mix_rCut = 4._DP
+    real(DP), parameter :: mix_dr = 5.E-5_DP
+    real(DP), parameter :: mix_epsilon = 1._DP
+    real(DP), parameter :: mix_alpha = 5._DP
         
 end module data_potentiel
 !***********************************************************************

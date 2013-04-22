@@ -8,6 +8,7 @@ use data_distrib
 use mod_tools
 use class_hardSpheres
 use class_interactingSpheres
+use class_mixingPotential
 use class_observables
 use class_units
 

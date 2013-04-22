@@ -35,6 +35,8 @@ class_hardSpheres.o :data_constants.mod data_cell.mod data_particles.mod \
 	data_potentiel.mod data_mc.mod data_neighbours.mod
 class_interactingSpheres.o : data_constants.mod data_cell.mod \
 	data_particles.mod data_potentiel.mod data_mc.mod data_neighbours.mod
+class_mixingPotential.o : data_constants.mod data_particles.mod \
+	data_potentiel.mod
 class_observables.o : data_constants.mod data_mc.mod
 mod_tools.o : data_constants.mod data_particles.mod data_mc.mod
 
@@ -49,6 +51,8 @@ class_hardSpheres.o : class_hardSpheres.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_interactingSpheres.o : class_interactingSpheres.f90
 	$(FC) -c $(FFLAGS) $< -o $@
+class_mixingPotential.o : class_mixingPotential.f90
+	$(FC) -c $(FFLAGS) $< -o $@
 class_observables.o : class_observables.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_units.o : class_units.f90
@@ -61,8 +65,8 @@ mod_tools.o : mod_tools.f90
 mc_canonical.o : mc_canonical.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 $(EXEC1) : data.o mod_physics.o class_neighbours.o class_spheres.o \
-	class_hardSpheres.o class_interactingSpheres.o class_observables.o \
-	class_units.o mod_tools.o mc_canonical.o
+	class_hardSpheres.o class_interactingSpheres.o class_mixingPotential.o \
+	class_observables.o class_units.o mod_tools.o mc_canonical.o
 	$(FC) $^ $(LDFLAGS) -o $@
 	
 # ---------------------------
