@@ -25,6 +25,9 @@ private
 	
 	contains
 	
+		procedure :: construct => MixingPotential_construct
+		procedure :: destroy => MixingPotential_destroy
+	
 		procedure :: ePot_init => MixingPotential_ePot_init
         procedure :: ePot => MixingPotential_ePot
         procedure :: ePot_neigh => MixingPotential_ePot_neigh
@@ -33,6 +36,30 @@ private
 	end type
 	
 contains
+
+	subroutine MixingPotential_construct(this)
+	
+		class(MixingPotential), intent(out) :: this
+		
+		! Potential
+        this%rCut = mix_rCut
+        this%dr = mix_dr
+        this%iMin = mix_iMin
+        this%iCut = mix_iCut
+        this%epsilon = mix_epsilon
+        this%alpha = mix_alpha
+        allocate(this%ePot_tab(mix_iMin:mix_iCut))
+        call this%ePot_init()
+	
+	end subroutine MixingPotential_construct
+	
+	subroutine MixingPotential_destroy(this)
+    
+        class(interactingSpheres), intent(inout) :: this
+        
+        deallocate(this%ePot_tab)
+    
+    end subroutine MixingPotential_destroy
 
 !> Potential energy
     !> Tabulation of Yukawa potential    
