@@ -72,11 +72,11 @@ contains
         ! Potential
         this%rCut = inter_rCut
         this%dr = inter_dr
-        this%iMin = inter_iMin
-        this%iCut = inter_iCut 
+        this%iMin = int(this%rMin/this%dr)
+        this%iCut = int(this%rCut/this%dr)
         this%epsilon = inter_epsilon
         this%alpha = inter_alpha        
-        allocate(this%ePot_tab(inter_iMin:inter_iCut))
+        allocate(this%ePot_tab(this%iMin:this%iCut))
         call this%ePot_init()
         
         ! Neighbours        
