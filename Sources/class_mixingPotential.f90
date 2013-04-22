@@ -5,6 +5,9 @@ module class_mixingPotential
 use data_constants
 use data_particles
 use data_potentiel
+use data_neighbours
+use mod_physics
+use class_neighbours
 
 implicit none
 
@@ -58,7 +61,7 @@ contains
 	
 	subroutine MixingPotential_destroy(this)
     
-        class(interactingSpheres), intent(inout) :: this
+        class(MixingPotential), intent(inout) :: this
         
         if (allocated(this%ePot_tab)) then
 	        deallocate(this%ePot_tab)
@@ -113,14 +116,14 @@ contains
         
     end function MixingPotential_ePot
     
-    subroutine MixingPotential_ePot_neigh(this, xCol, iCell, other_neigh, other_X, 
-    	overlap, energ)
+    subroutine MixingPotential_ePot_neigh(this, xCol, iCell, other_neigh, &
+    	other_X, overlap, energ)
         
         class(MixingPotential), intent(in) :: this
-        real(DP), dimension(Dim), intent(in) :: xCol !< type A
-        integer, intent(in) :: iCell < ! type A in mix grid
+        real(DP), dimension(:), intent(in) :: xCol !< type A
+        integer, intent(in) :: iCell !< type A in mix grid
         type(Neighbours), intent(in) :: other_neigh
-        real(DP), dimension(Dim, :) :: other_X
+        real(DP), dimension(:, :) :: other_X
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energ
     
@@ -134,8 +137,8 @@ contains
     
         do iNeigh = 1, cell_neighs_nb
         
-            iCell_neigh = other%cell_neighs(iNeigh, iCell)
-            current => other%cellsBegin(iCell_neigh)%particle%next            
+            iCell_neigh = other_neigh%cell_neighs(iNeigh, iCell)
+            current => other_neigh%cellsBegin(iCell_neigh)%particle%next            
             if (.not. associated(current%next)) cycle
             
             do
