@@ -1,6 +1,6 @@
-!> \brief Description of the Mixing Potential class
+!> \brief Description of the Potential class
 
-module class_mixingPotential
+module class_potential
 
 use data_constants
 use data_particles
@@ -10,7 +10,7 @@ implicit none
 
 private
 
-	type, public :: MixingPotential
+	type, public :: Potential
 	
 		private
 		
@@ -25,21 +25,21 @@ private
 	
 	contains
 	
-		procedure :: construct => MixingPotential_construct
-		procedure :: destroy => MixingPotential_destroy
+		procedure :: construct => Potential_construct
+		procedure :: destroy => Potential_destroy
 	
-		procedure :: ePot_init => MixingPotential_ePot_init
-        procedure :: ePot => MixingPotential_ePot
-        procedure :: ePot_neigh => MixingPotential_ePot_neigh
-        procedure :: ePot_total => MixingPotential_ePot_total
+		procedure :: ePot_init => Potential_ePot_init
+        procedure :: ePot => Potential_ePot
+        procedure :: ePot_neigh => Potential_ePot_neigh
+        procedure :: ePot_total => Potential_ePot_total
 	
 	end type
 	
 contains
 
-	subroutine MixingPotential_construct(this)
+	subroutine Potential_construct(this)
 	
-		class(MixingPotential), intent(out) :: this
+		class(Potential), intent(out) :: this
 		
 		! Potential
         this%rCut = mix_rCut
@@ -51,23 +51,23 @@ contains
         allocate(this%ePot_tab(mix_iMin:mix_iCut))
         call this%ePot_init()
 	
-	end subroutine MixingPotential_construct
+	end subroutine Potential_construct
 	
-	subroutine MixingPotential_destroy(this)
+	subroutine Potential_destroy(this)
     
         class(interactingSpheres), intent(inout) :: this
         
         deallocate(this%ePot_tab)
     
-    end subroutine MixingPotential_destroy
+    end subroutine Potential_destroy
 
 !> Potential energy
     !> Tabulation of Yukawa potential    
     !> \f[ \epsilon \frac{e^{-\alpha (r-r_{min})}}{r} \f]
     
-    subroutine MixingPotential_ePot_init(this)
+    subroutine Potential_ePot_init(this)
     
-        class(MixingPotential), intent(inout) :: this
+        class(Potential), intent(inout) :: this
 
         integer :: i
         real(DP) :: r_i
@@ -83,11 +83,11 @@ contains
         this%ePot_tab(:) = this%ePot_tab(:) - this%epsilon * &
             exp(-this%alpha*(this%rCut-this%rMin)) / this%rCut
 
-    end subroutine MixingPotential_ePot_init
+    end subroutine Potential_ePot_init
 
-    function MixingPotential_ePot(this, r) result(ePot)
+    function Potential_ePot(this, r) result(ePot)
         
-        class(MixingPotential), intent(in) :: this
+        class(Potential), intent(in) :: this
         real(DP), intent(in) :: r
         
         integer :: i
@@ -106,12 +106,12 @@ contains
            
         end if
         
-    end function MixingPotential_ePot
+    end function Potential_ePot
     
-    subroutine MixingPotential_ePot_neigh(this, iCol, xCol, iCell, overlap, &
+    subroutine Potential_ePot_neigh(this, iCol, xCol, iCell, overlap, &
     	energ)
         
-        class(MixingPotential), intent(in) :: this        
+        class(Potential), intent(in) :: this        
         integer, intent(in) :: iCol, iCell
         real(DP), dimension(Dim), intent(in) :: xCol
         logical, intent(out) :: overlap
@@ -154,13 +154,13 @@ contains
             
         end do
     
-    end subroutine MixingPotential_ePot_neigh
+    end subroutine Potential_ePot_neigh
     
     !> Total potential energy
     
-    function MixingPotential_ePot_total(this) result(ePot_total)
+    function Potential_ePot_total(this) result(ePot_total)
     
-        class(MixingPotential), intent(in) :: this
+        class(Potential), intent(in) :: this
         
         integer :: iCol, jCol
         real(DP) :: r_ij
@@ -181,6 +181,6 @@ contains
         
         ePot_total = 0.5_DP*ePot_total
     
-    end function MixingPotential_ePot_total
+    end function Potential_ePot_total
 
-end module class_mixingPotential
+end module class_potential
