@@ -41,6 +41,9 @@ contains
 	
 		class(Potential), intent(out) :: this
 		
+		! Particles
+        this%rMin = mix_rMin
+		
 		! Potential
         this%rCut = mix_rCut
         this%dr = mix_dr

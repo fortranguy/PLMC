@@ -48,7 +48,7 @@ contains
         this%radius = hard_radius
         this%rMin = hard_rMin
         this%Ncol = hard_Ncol
-        allocate(this%X(Dim, hard_Ncol))
+        allocate(this%X(Dim, this%Ncol))
         
         ! Monte-Carlo
         this%dx = hard_dx

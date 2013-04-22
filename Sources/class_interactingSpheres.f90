@@ -62,7 +62,7 @@ contains
         this%radius = inter_radius
         this%rMin = inter_rMin
         this%Ncol = inter_Ncol
-        allocate(this%X(Dim, inter_Ncol))
+        allocate(this%X(Dim, this%Ncol))
         
         ! Monte-Carlo
         this%dx = inter_dx
