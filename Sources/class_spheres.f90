@@ -39,6 +39,7 @@ private
     contains
     
         !> Accessors
+        procedure :: getName => Spheres_getName
         procedure :: getNcol => Spheres_getNcol
         procedure :: getRmin => Spheres_getRmin
         
@@ -58,6 +59,18 @@ private
     end type Spheres
     
 contains
+
+    !> Accessor : name
+
+    function Spheres_getName(this) result(getName)
+    
+        class(Spheres), intent(in) :: this
+        
+        character(len=5) :: getName
+        
+        getName = this%name
+    
+    end function Spheres_getName
 
     !> Accessor : Ncol
 

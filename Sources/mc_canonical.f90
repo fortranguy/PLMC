@@ -37,11 +37,11 @@ implicit none
     
     call type1_sph%construct()
     call type1_obs%init()
-    call type1_io%open("inter")
+    call type1_io%open(type1_sph%getName())
     
     call type2_sph%construct()
     call type2_obs%init()
-    call type2_io%open("hard")
+    call type2_io%open(type2_sph%getName())
 
     write(*, *) "Monte-Carlo - Canonical : Volume =", product(Lsize)    
     
