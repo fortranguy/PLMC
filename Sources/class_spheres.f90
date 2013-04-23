@@ -35,6 +35,7 @@ private
         
         ! Neighbours (cell/grid scheme)   
         type(Neighbours) :: same !< same kind
+        type(Neighbours) :: other !< other kind
         
     contains
     

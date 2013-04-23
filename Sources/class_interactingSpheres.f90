@@ -80,10 +80,14 @@ contains
         allocate(this%ePot_tab(this%iMin:this%iCut))
         call this%ePot_init()
         
-        ! Neighbours        
-        call this%same%construct(inter_rCut)
+        ! Neighbours : same kind    
+        call this%same%construct(this%rCut)
         call this%same%alloc_cells()
         call this%same%ini_cell_neighs()
+        ! Neighbours : other kind
+        call this%other%construct(mix_rCut)
+        call this%other%alloc_cells()
+        call this%other%ini_cell_neighs()
     
     end subroutine InteractingSpheres_construct
     
@@ -91,9 +95,16 @@ contains
     
         class(InteractingSpheres), intent(inout) :: this
         
-        deallocate(this%X)
-        deallocate(this%ePot_tab)
+        if (allocated(this%X)) then
+            deallocate(this%X)
+        end if
+        
+        if (allocated(this%ePot_tab)) then
+            deallocate(this%ePot_tab)
+        endif
+        
         call this%same%destroy()
+        call this%other%destroy()
     
     end subroutine InteractingSpheres_destroy
     

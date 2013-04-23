@@ -59,10 +59,14 @@ contains
         ! Potential
         this%rCut = hard_rCut
         
-        ! Neighbours        
-        call this%same%construct(hard_rCut)
+        ! Neighbours : same kind
+        call this%same%construct(this%rCut)
         call this%same%alloc_cells()
         call this%same%ini_cell_neighs()
+        ! Neighbours : other kind
+        call this%other%construct(mix_rCut)
+        call this%other%alloc_cells()
+        call this%other%ini_cell_neighs()
     
     end subroutine HardSpheres_construct
     
@@ -70,8 +74,12 @@ contains
     
         class(HardSpheres), intent(inout) :: this
         
-        deallocate(this%X)
+        if (allocated(this%X)) then
+            deallocate(this%X)
+        end if
+        
         call this%same%destroy()
+        call this%other%destroy()
     
     end subroutine HardSpheres_destroy
     
