@@ -80,10 +80,10 @@ implicit none
             iColRand = int(rand*real(hard_Ncol+inter_Ncol, DP)) + 1            
             if (iColRand<=hard_Ncol) then
                 call hard_sph%move(hard_obs%Nrej)
-                hard_obs%NrandMove = hard_obs%NrandMove + 1
+                hard_obs%Nmove = hard_obs%Nmove + 1
             else
                 call inter_sph%move(inter_obs%ePot_total, inter_obs%Nrej)
-                inter_obs%NrandMove = inter_obs%NrandMove + 1
+                inter_obs%Nmove = inter_obs%Nmove + 1
             end if            
             
         end do

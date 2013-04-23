@@ -11,9 +11,8 @@ private
 
     type, public :: Observables
     
-        ! Randomly chosen
-        
-        integer :: NrandMove
+        ! Move
+        integer :: Nmove
     
         ! Rejection
         integer :: Nrej
@@ -42,7 +41,7 @@ contains
         
         class(Observables), intent(out) :: this
         
-        this%NrandMove = 0
+        this%Nmove = 0
         
         this%Nrej = 0
         this%rejRateSum = 0._DP
@@ -66,8 +65,9 @@ contains
         class(Observables), intent(inout) :: this
         
         this%rejRateSum = this%rejRateSum + real(this%Nrej, DP) / &
-            real(Nmove, DP)
+            real(this%Nmove, DP)
         this%Nrej = 0
+        this%Nmove = 0
     
     end subroutine Observables_addReject
     
