@@ -25,23 +25,23 @@ implicit none
     
     integer, parameter :: unitReport = 10
     
-    ! Hard spheres
-    type(HardSpheres) :: hard_sph
-    type(Observables) :: hard_obs
-    type(Units) :: hard_io
-    
     ! Interacting spheres
     type(InteractingSpheres) :: inter_sph !< Monte-Carlo subroutines
     type(Observables) :: inter_obs !< e.g. Energy
     type(Units) :: inter_io        !< input/output files
     
-    call hard_sph%construct()
-    call hard_obs%init()
-    call hard_io%open("hard")
-        
+    ! Hard spheres
+    type(HardSpheres) :: hard_sph
+    type(Observables) :: hard_obs
+    type(Units) :: hard_io
+    
     call inter_sph%construct()
     call inter_obs%init()
     call inter_io%open("inter")
+    
+    call hard_sph%construct()
+    call hard_obs%init()
+    call hard_io%open("hard")
     
     write(*, *) "Monte-Carlo - Canonical : Volume =", product(Lsize)    
     
@@ -55,17 +55,17 @@ implicit none
     
     ! Initial condition
     
-    call initialCondition(hard_sph%X, hard_io%report)
-    call hard_sph%overlapTest()
-    hard_obs%ePot_total = 0._DP
-    call hard_sph%snapShot(hard_io%snapIni)
-    call hard_sph%cols_to_cells()
-    
     call initialCondition(inter_sph%X, inter_io%report)
     call inter_sph%overlapTest()
     inter_obs%ePot_total = inter_sph%ePot_total()
     call inter_sph%snapShot(inter_io%snapIni)
     call inter_sph%cols_to_cells()
+    
+    call initialCondition(hard_sph%X, hard_io%report)
+    call hard_sph%overlapTest()
+    hard_obs%ePot_total = 0._DP
+    call hard_sph%snapShot(hard_io%snapIni)
+    call hard_sph%cols_to_cells()
     
 ! Middle --------------------------------------------------
 
