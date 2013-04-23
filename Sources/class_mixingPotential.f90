@@ -75,7 +75,7 @@ contains
     
     function MixingPotential_getRmin(this) result(getRmin)
     
-        class(Spheres), intent(in) :: this
+        class(MixingPotential), intent(in) :: this
         
         real(DP) :: getRmin
         

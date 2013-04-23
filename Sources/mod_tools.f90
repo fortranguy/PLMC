@@ -139,7 +139,7 @@ contains
         
         !   Others
         type2_Ncol = size(type2_X, 2)
-        do while (NcolOK < type1_Ncol)
+        do while (sub_NcolOK < type2_Ncol)
         
             call random_number(xRand)
             xTest(:) = xRand(:)*Lsize(:)
@@ -154,11 +154,11 @@ contains
                 end if
             end do
             
-            if (iColOK == NcolOK) then
+            if (iColOK == NcolOK) then    
             
                 sub_iColOK = 0
-                do iCol = 1, sub_NcolOK
-                    rTest = dist(type1_X(:, iCol), xTest(:))
+                do sub_iCol = 1, sub_NcolOK
+                    rTest = dist(type1_X(:, sub_iCol), xTest(:))
                     if (rTest >= type2_rMin) then
                         sub_iColOK = sub_iColOK + 1
                     else
@@ -166,12 +166,10 @@ contains
                     end if
                 end do
                 
-                if (sub_iColOK == sub_NcolOK) then
-            
+                if (sub_iColOK == sub_NcolOK) then            
                     sub_NcolOK = sub_NcolOK + 1
                     type2_X(:, sub_NcolOK) = xTest(:)
-                    write(*, *) "    Type 2 particle n°", sub_NcolOK, "OK"
-                    
+                    write(*, *) "    Type 2 particle n°", sub_NcolOK, "OK"                    
                 end if
                 
             end if
