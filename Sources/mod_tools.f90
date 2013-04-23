@@ -75,7 +75,7 @@ contains
         real(DP), dimension(:, :), intent(inout) :: type1_X, type2_X
         real(DP), intent(in) :: type1_rMin, type2_rMin, mix_rMin
     
-        integer :: iCol, NcolOK, test_nOK
+        integer :: iCol, NcolOK, iColOK
         integer :: type1_Ncol, type2_Ncol
         real(DP), dimension(Dim) :: xRand, xTest
         real(DP) :: rTest
@@ -96,17 +96,17 @@ contains
             call random_number(xRand)
             xTest(:) = xRand(:)*Lsize(:)
             
-            test_nOK = 0
+            iColOK = 0
             do iCol = 1, NcolOK
                 rTest = dist(type1_X(:, iCol), xTest(:))
                 if (rTest >= type1_rMin) then
-                    test_nOK = test_nOK + 1
+                    iColOK = iColOK + 1
                 else
                     exit
                 end if
             end do
             
-            if (test_nOK == NcolOK) then
+            if (iColOK == NcolOK) then
                 NcolOK = NcolOK + 1
                 type1_X(:, NcolOK) = xTest(:)
                 write(*, *) "    Type 1 particle n°", NcolOK, "OK"
@@ -117,8 +117,8 @@ contains
         ! Type 2
         
         !   First
-        test_nOK = 0
-        do while (test_nOK == type1_Ncol)
+        iColOK = 0
+        do while (iColOK == type1_Ncol)
         
             call random_number(xRand)
             xTest = xRand*Lsize(:)
@@ -126,7 +126,7 @@ contains
             do iCol = 1, type1_Ncol
                 rTest = dist(type1_X(:, iCol), xTest(:))
                 if (rTest >= mix_rMin) then
-                    test_nOK = test_nOK + 1
+                    iOK = iColOK + 1
                 else
                     exit
                 end if
@@ -143,11 +143,11 @@ contains
             call random_number(xRand)
             xTest(:) = xRand(:)*Lsize(:)
             
-            nOK = 0
+            iColOK = 0
             do iCol = 1, NcolOK
                 rTest = dist(type1_X(:, iCol), xTest(:))
                 if (rTest >= mix_rMin) then
-                    test_nOK = test_nOK + 1
+                    iColOK = iColOK + 1
                 else
                     exit
                 end if
@@ -156,13 +156,13 @@ contains
             do iCol = 1, NcolOK
                 rTest = dist(type2_X(:, iCol), xTest(:))
                 if (rTest >= mix_rMin) then
-                    test_nOK = test_nOK + 1
+                    iColOK = iColOK + 1
                 else
                     exit
                 end if
             end do
             
-            if (test_nOK == NcolOK) then
+            if (iColOK == NcolOK) then
                 NcolOK = NcolOK + 1
                 type2_X(:, NcolOK) = xTest(:)
                 write(*, *) "    Type 2 particle n°", NcolOK, "OK"
