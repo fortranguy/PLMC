@@ -77,7 +77,7 @@ implicit none
         do iMove = 1, Nmove
         
             call random_number(rand)
-            iColRand = int(rand*real(hard_Ncol+inter_Ncol, DP)) + 1            
+            iColRand = int(rand*real(Ncol, DP)) + 1            
             if (iColRand<=hard_Ncol) then
                 call hard_sph%move(hard_obs%Nrej)
                 hard_obs%Nmove = hard_obs%Nmove + 1

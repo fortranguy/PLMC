@@ -38,14 +38,16 @@ module data_particles
 
 use data_constants
 use data_cell
+
+    real(DP), parameter :: inter_radius = .5_DP
+    real(DP), parameter :: inter_rMin = 2._DP * inter_radius
+    integer, parameter :: inter_Ncol = 270
     
     real(DP), parameter :: hard_radius = .5_DP
     real(DP), parameter :: hard_rMin = 2._DP * hard_radius
     integer, parameter :: hard_Ncol = 270
     
-    real(DP), parameter :: inter_radius = .5_DP
-    real(DP), parameter :: inter_rMin = 2._DP * inter_radius
-    integer, parameter :: inter_Ncol = 270
+    integer, parameter :: Ncol = inter_Ncol + hard_Ncol
     
     real(DP), parameter :: mix_delta = 0._DP
     real(DP), parameter :: mix_rMin = hard_radius + hard_radius + mix_delta
@@ -71,13 +73,13 @@ implicit none
     
     integer, parameter :: Nmove = 2**2 * (hard_Ncol + inter_Ncol)
     
-    real(DP), dimension(Dim), parameter :: hard_dx = 2._DP
-    integer, parameter :: hard_Nadapt = 2**2
-    integer, parameter :: hard_Nwidom = hard_Ncol
-    
     real(DP), dimension(Dim), parameter :: inter_dx = 2._DP
     integer, parameter :: inter_Nadapt = 2**2
     integer, parameter :: inter_Nwidom = inter_Ncol
+    
+    real(DP), dimension(Dim), parameter :: hard_dx = 2._DP
+    integer, parameter :: hard_Nadapt = 2**2
+    integer, parameter :: hard_Nwidom = hard_Ncol
 
 end module data_mc
 !***********************************************************************
@@ -96,12 +98,12 @@ use data_particles
 
 implicit none
 
-    real(DP), parameter :: hard_rCut = hard_rMin
-
     real(DP), parameter :: inter_rCut = 4._DP
     real(DP), parameter :: inter_dr = 5.E-5_DP
     real(DP), parameter :: inter_epsilon = 1._DP
     real(DP), parameter :: inter_alpha = 5._DP
+    
+    real(DP), parameter :: hard_rCut = hard_rMin
     
     real(DP), parameter :: mix_rCut = 4._DP
     real(DP), parameter :: mix_dr = 5.E-5_DP
