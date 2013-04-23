@@ -132,7 +132,7 @@ contains
                 end if
             end do
         
-        end do        
+        end do
         type2_X(:, 1) = xTest(:)        
         NcolOK = 1
         
