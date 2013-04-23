@@ -50,7 +50,7 @@ use data_cell
     integer, parameter :: Ncol = inter_Ncol + hard_Ncol
     
     real(DP), parameter :: mix_delta = 0._DP
-    real(DP), parameter :: mix_rMin = hard_radius + hard_radius + mix_delta
+    real(DP), parameter :: mix_rMin = inter_radius + hard_radius + mix_delta
     
 end module data_particles
 !***********************************************************************
@@ -71,7 +71,7 @@ implicit none
     integer, parameter :: Nstep = 2**10
     integer, parameter :: Ntherm = 2**8
     
-    integer, parameter :: Nmove = 2**2 * (hard_Ncol + inter_Ncol)
+    integer, parameter :: Nmove = 2**2 * Ncol
     
     real(DP), dimension(Dim), parameter :: inter_dx = 2._DP
     integer, parameter :: inter_Nadapt = 2**2
