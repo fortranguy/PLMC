@@ -6,9 +6,9 @@ use data_constants
 use data_mc
 use data_distrib
 use mod_tools
+use class_mixingPotential
 use class_interactingSpheres
 use class_hardSpheres
-use class_mixingPotential
 use class_observables
 use class_units
 
@@ -84,7 +84,8 @@ implicit none
             call random_number(rand)
             iColRand = int(rand*real(Ncol, DP)) + 1            
             if (iColRand <= type1_sph%getNcol()) then
-                call type1_sph%move(type1_obs%ePot_total, type1_obs%Nrej)
+                call type1_sph%move(type1_obs%ePot_total, mix, type2_sph%X, &
+                    type1_obs%Nrej)
                 type1_obs%Nmove = type1_obs%Nmove + 1
             else
                 call type2_sph%move(type2_obs%Nrej)
