@@ -37,6 +37,9 @@ private
         type(Neighbours) :: same !< same kind
         
     contains
+    
+        !> Get the Ncol
+        procedure :: getNcol => Spheres_getNcol
         
         !> Take a snap shot of the configuration
         procedure :: snapShot => Spheres_snapShot
@@ -54,6 +57,16 @@ private
     end type Spheres
     
 contains
+
+    function Spheres_getNcol(this) result(getNcol)
+    
+        class(Spheres), intent(in) :: this
+        
+        real(DP) :: getNcol
+        
+        getNcol = this%Ncol
+    
+    end function Spheres_getNcol
     
     !> Configuration state
       

@@ -25,47 +25,47 @@ implicit none
     
     integer, parameter :: unitReport = 10
     
-    ! Interacting spheres
-    type(InteractingSpheres) :: inter_sph !< Monte-Carlo subroutines
-    type(Observables) :: inter_obs !< e.g. Energy
-    type(Units) :: inter_io        !< input/output files
+    ! Interacting spheres : type 1
+    type(InteractingSpheres) :: type1_sph !< Monte-Carlo subroutines
+    type(Observables) :: type1_obs !< e.g. Energy
+    type(Units) :: type1_io        !< input/output files
     
-    ! Hard spheres
-    type(HardSpheres) :: hard_sph
-    type(Observables) :: hard_obs
-    type(Units) :: hard_io
+    ! Hard spheres : type 2
+    type(HardSpheres) :: type2_sph
+    type(Observables) :: type2_obs
+    type(Units) :: type2_io
     
-    call inter_sph%construct()
-    call inter_obs%init()
-    call inter_io%open("inter")
+    call type1_sph%construct()
+    call type1_obs%init()
+    call type1_io%open("inter")
     
-    call hard_sph%construct()
-    call hard_obs%init()
-    call hard_io%open("hard")
-    
+    call type2_sph%construct()
+    call type2_obs%init()
+    call type2_io%open("hard")
+
     write(*, *) "Monte-Carlo - Canonical : Volume =", product(Lsize)    
     
     open(unit=unitReport, recl=4096, file="report.out", status='new', &
     	action='write')
 	call report(unitReport)
-    call hard_sph%report(hard_io%report)
-    call inter_sph%report(inter_io%report)
+    call type1_sph%report(type1_io%report)
+    call type2_sph%report(type2_io%report)
     
     call init_random_seed(unitReport)
     
     ! Initial condition
     
-    call initialCondition(inter_sph%X, inter_io%report)
-    call inter_sph%overlapTest()
-    inter_obs%ePot_total = inter_sph%ePot_total()
-    call inter_sph%snapShot(inter_io%snapIni)
-    call inter_sph%cols_to_cells()
+    call initialCondition(type1_sph%X, type1_io%report)
+    call type1_sph%overlapTest()
+    type1_obs%ePot_total = type1_sph%ePot_total()
+    call type1_sph%snapShot(type1_io%snapIni)
+    call type1_sph%cols_to_cells()
     
-    call initialCondition(hard_sph%X, hard_io%report)
-    call hard_sph%overlapTest()
-    hard_obs%ePot_total = 0._DP
-    call hard_sph%snapShot(hard_io%snapIni)
-    call hard_sph%cols_to_cells()
+    call initialCondition(type2_sph%X, type2_io%report)
+    call type2_sph%overlapTest()
+    type2_obs%ePot_total = 0._DP
+    call type2_sph%snapShot(type2_io%snapIni)
+    call type2_sph%cols_to_cells()
     
 ! Middle --------------------------------------------------
 
@@ -78,51 +78,51 @@ implicit none
         
             call random_number(rand)
             iColRand = int(rand*real(Ncol, DP)) + 1            
-            if (iColRand<=hard_Ncol) then
-                call hard_sph%move(hard_obs%Nrej)
-                hard_obs%Nmove = hard_obs%Nmove + 1
+            if (iColRand <= type1_sph%getNcol()) then
+                call type1_sph%move(type1_obs%ePot_total, type1_obs%Nrej)
+                type1_obs%Nmove = type1_obs%Nmove + 1
             else
-                call inter_sph%move(inter_obs%ePot_total, inter_obs%Nrej)
-                inter_obs%Nmove = inter_obs%Nmove + 1
+                call type2_sph%move(type2_obs%Nrej)
+                type2_obs%Nmove = type2_obs%Nmove + 1
             end if            
             
         end do
         
-        call hard_sph%widom(hard_obs%activExInv)
-        call inter_sph%widom(inter_obs%activExInv)
+        call type1_sph%widom(type1_obs%activExInv)
+        call type2_sph%widom(type2_obs%activExInv)
         
-        call hard_obs%addReject()
-        call inter_obs%addReject()
+        call type1_obs%addReject()
+        call type2_obs%addReject()
         
         if (iStep <= Ntherm) then
         
-            call hard_sph%adaptDx(iStep, hard_obs%rejRateSum, &
-                hard_io%report)
-            write(hard_io%dx, *) iStep, hard_sph%getDx(), &
-                hard_obs%rejRateSum/real(iStep, DP)
-            write(hard_io%obsTherm, *) iStep, hard_obs%ePot_total, &
-                hard_obs%activExInv
+            call type1_sph%adaptDx(iStep, type1_obs%rejRateSum, &
+                type1_io%report)
+            write(type1_io%dx, *) iStep, type1_sph%getDx(), &
+                type1_obs%rejRateSum/real(iStep, DP)
+            write(type1_io%obsTherm, *) iStep, type1_obs%ePot_total, &
+                type1_obs%activExInv
         
-            call inter_sph%adaptDx(iStep, inter_obs%rejRateSum, &
-                inter_io%report)
-            write(inter_io%dx, *) iStep, inter_sph%getDx(), &
-                inter_obs%rejRateSum/real(iStep, DP)
-            write(inter_io%obsTherm, *) iStep, inter_obs%ePot_total, &
-                inter_obs%activExInv
+            call type2_sph%adaptDx(iStep, type2_obs%rejRateSum, &
+                type2_io%report)
+            write(type2_io%dx, *) iStep, type2_sph%getDx(), &
+                type2_obs%rejRateSum/real(iStep, DP)
+            write(type2_io%obsTherm, *) iStep, type2_obs%ePot_total, &
+                type2_obs%activExInv
         
         else
         
-            call hard_obs%addPhysical()
-            write(hard_io%obs, *) iStep, hard_obs%ePot_total, &
-                hard_obs%activExInv
-            
-            call inter_obs%addPhysical()
-            write(inter_io%obs, *) iStep, inter_obs%ePot_total, &
-                inter_obs%activExInv
-            
+            call type1_obs%addPhysical()
+            write(type1_io%obs, *) iStep, type1_obs%ePot_total, &
+                type1_obs%activExInv
+        
+            call type2_obs%addPhysical()
+            write(type2_io%obs, *) iStep, type2_obs%ePot_total, &
+                type2_obs%activExInv
+
             if (snap) then
-                call hard_sph%snapShot(hard_io%snapShots)
-                call inter_sph%snapShot(inter_io%snapShots)
+                call type1_sph%snapShot(type1_io%snapShots)
+                call type2_sph%snapShot(type2_io%snapShots)
             end if
             
         end if
@@ -134,21 +134,21 @@ implicit none
 
 ! End -----------------------------------------------------
 
-    call hard_sph%overlapTest()
-    call hard_sph%snapShot(hard_io%snapFin)
-    call hard_obs%results(tFin-tIni, hard_io%report)
+    call type1_sph%overlapTest()
+    call type1_sph%consistTest(type1_obs%ePot_total, type1_io%report)
+    call type1_sph%snapShot(type1_io%snapFin)
+    call type1_obs%results(tFin-tIni, type1_io%report)
 
-    call inter_sph%overlapTest()
-    call inter_sph%consistTest(inter_obs%ePot_total, inter_io%report)
-    call inter_sph%snapShot(inter_io%snapFin)
-    call inter_obs%results(tFin-tIni, inter_io%report)
-    
+    call type2_sph%overlapTest()
+    call type2_sph%snapShot(type2_io%snapFin)
+    call type2_obs%results(tFin-tIni, type2_io%report)
+
     close(unitReport)
     
-    call hard_sph%destroy()
-    call hard_io%close()
+    call type1_sph%destroy()
+    call type1_io%close()
     
-    call inter_sph%destroy()
-    call inter_io%close()
+    call type2_sph%destroy()
+    call type2_io%close()
     
 end program mc_canonical
