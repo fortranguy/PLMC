@@ -27,6 +27,7 @@ private
         ! Monte-Carlo
         real(DP), dimension(Dim) :: dx !< displacement
         real(DP), dimension(Dim) :: dx_save
+        integer :: Nadapt
         integer :: Nwidom
 
         ! Potential
@@ -117,7 +118,6 @@ contains
         integer, intent(in) :: iStep, unitReport
         real(DP), intent(in) :: rejRateSum    
         
-        integer, parameter :: multiple = 2**2
         real(DP) :: rejRate
         real(DP), parameter :: rejRateFix = 0.5_DP
         real(DP), parameter :: dx_eps = 0.05_DP, taux_eps = 0.05_DP
@@ -125,7 +125,7 @@ contains
         
         rejRate = 0._DP
         
-        if (mod(iStep, multiple) == 0 .and. iStep>2) then
+        if (mod(iStep, this%Nadapt) == 0 .and. iStep>2) then
         
             rejRate = rejRateSum/real(iStep-1, DP)
         

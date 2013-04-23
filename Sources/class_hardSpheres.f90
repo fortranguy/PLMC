@@ -53,6 +53,7 @@ contains
         ! Monte-Carlo
         this%dx = hard_dx
         this%dx_save = hard_dx
+        this%Nadapt = hard_Nadapt
         this%Nwidom = hard_Nwidom
                 
         ! Potential
