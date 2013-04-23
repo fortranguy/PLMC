@@ -79,10 +79,10 @@ implicit none
             call random_number(rand)
             iColRand = int(rand*real(hard_Ncol+inter_Ncol, DP)) + 1            
             if (iColRand<=hard_Ncol) then
-                call hard_sph%move(hard_obs%Nrejects)
+                call hard_sph%move(hard_obs%Nrej)
                 hard_obs%NrandMove = hard_obs%NrandMove + 1
             else
-                call inter_sph%move(inter_obs%ePot_total, inter_obs%Nrejects)
+                call inter_sph%move(inter_obs%ePot_total, inter_obs%Nrej)
                 inter_obs%NrandMove = inter_obs%NrandMove + 1
             end if            
             
@@ -93,17 +93,17 @@ implicit none
         
         if (iStep <= Ntherm) then
         
-            call hard_sph%adaptDx(iStep, hard_obs%rejectsRateSum, &
+            call hard_sph%adaptDx(iStep, hard_obs%rejRateSum, &
                 hard_io%report)
             write(hard_io%dx, *) iStep, hard_sph%getDx(), &
-                hard_obs%rejectsRateSum/real(iStep, DP)
+                hard_obs%rejRateSum/real(iStep, DP)
             write(hard_io%obsTherm, *) iStep, hard_obs%ePot_total, &
                 hard_obs%activExInv
         
-            call inter_sph%adaptDx(iStep, inter_obs%rejectsRateSum, &
+            call inter_sph%adaptDx(iStep, inter_obs%rejRateSum, &
                 inter_io%report)
             write(inter_io%dx, *) iStep, inter_sph%getDx(), &
-                inter_obs%rejectsRateSum/real(iStep, DP)
+                inter_obs%rejRateSum/real(iStep, DP)
             write(inter_io%obsTherm, *) iStep, inter_obs%ePot_total, &
                 inter_obs%activExInv
         

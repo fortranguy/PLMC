@@ -213,11 +213,11 @@ contains
     
     !> Particle move
     
-    subroutine InteractingSpheres_move(this, ePot_total, Nrejects)
+    subroutine InteractingSpheres_move(this, ePot_total, Nrej)
     
         class(InteractingSpheres), intent(inout) :: this
         real(DP), intent(inout) :: ePot_total
-        integer, intent(inout) :: Nrejects
+        integer, intent(inout) :: Nrej
         
         logical :: overlap
         integer :: iOld
@@ -254,12 +254,12 @@ contains
                 end if
                 
             else
-                Nrejects = Nrejects + 1
+                Nrej = Nrej + 1
             end if
             
         else
         
-            Nrejects = Nrejects + 1
+            Nrej = Nrej + 1
             
         end if
     

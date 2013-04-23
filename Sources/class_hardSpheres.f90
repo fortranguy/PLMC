@@ -137,10 +137,10 @@ contains
     
     !> Particle move
     
-    subroutine HardSpheres_move(this, Nrejects)
+    subroutine HardSpheres_move(this, Nrej)
     
         class(HardSpheres), intent(inout) :: this
-        integer, intent(inout) :: Nrejects
+        integer, intent(inout) :: Nrej
         
         logical :: overlap
         integer :: iOld
@@ -171,7 +171,7 @@ contains
             
         else
         
-            Nrejects = Nrejects + 1
+            Nrej = Nrej + 1
             
         end if
     

@@ -16,8 +16,8 @@ private
         integer :: NrandMove
     
         ! Rejection
-        integer :: Nrejects
-        real(DP) :: rejectsRateSum
+        integer :: Nrej
+        real(DP) :: rejRateSum
         
         ! Potential energy
         real(DP) :: ePot_total
@@ -44,8 +44,8 @@ contains
         
         this%NrandMove = 0
         
-        this%Nrejects = 0
-        this%rejectsRateSum = 0._DP
+        this%Nrej = 0
+        this%rejRateSum = 0._DP
         
         this%ePot_totalSum = 0._DP        
         this%activExInvSum = 0._DP
@@ -65,9 +65,9 @@ contains
     
         class(Observables), intent(inout) :: this
         
-        this%rejectsRateSum = this%rejectsRateSum + real(this%Nrejects, DP) / &
+        this%rejRateSum = this%rejRateSum + real(this%Nrej, DP) / &
             real(Nmove, DP)
-        this%Nrejects = 0
+        this%Nrej = 0
     
     end subroutine Observables_addReject
     
@@ -97,7 +97,7 @@ contains
         write(unitReport, *) "    potChi.avg = ", potChiId + potChiEx
         
         write(unitReport, *) "    Rejection rate = ", &
-            this%rejectsRateSum/real(Nstep+Ntherm, DP)
+            this%rejRateSum/real(Nstep+Ntherm, DP)
         write(unitReport, *) "    duration =", duration/60._DP, "min"        
     
     end subroutine Observables_results

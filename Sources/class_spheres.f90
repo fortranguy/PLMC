@@ -111,28 +111,28 @@ contains
     
     !> Adaptation of dx during the thermalisation
     
-    subroutine Spheres_adaptDx(this, iStep, rejectsRateSum, unitReport)
+    subroutine Spheres_adaptDx(this, iStep, rejRateSum, unitReport)
     
         class(Spheres), intent(inout) :: this 
         integer, intent(in) :: iStep, unitReport
-        real(DP), intent(in) :: rejectsRateSum    
+        real(DP), intent(in) :: rejRateSum    
         
         integer, parameter :: multiple = 2**2
-        real(DP) :: rejectsRate
-        real(DP), parameter :: rejectsRateFix = 0.5_DP
+        real(DP) :: rejRate
+        real(DP), parameter :: rejRateFix = 0.5_DP
         real(DP), parameter :: dx_eps = 0.05_DP, taux_eps = 0.05_DP
         real(DP), parameter :: more = 1._DP+dx_eps, less = 1._DP-dx_eps
         
-        rejectsRate = 0._DP
+        rejRate = 0._DP
         
         if (mod(iStep, multiple) == 0 .and. iStep>2) then
         
-            rejectsRate = rejectsRateSum/real(iStep-1, DP)
+            rejRate = rejRateSum/real(iStep-1, DP)
         
-            if (rejectsRate < rejectsRateFix - taux_eps) then            
+            if (rejRate < rejRateFix - taux_eps) then            
                 this%dx(:) = this%dx(:) * more
                 this%dx(:) = modulo(this%dx(:), Lsize(:))
-            else if (rejectsRate > rejectsRateFix + taux_eps) then
+            else if (rejRate > rejRateFix + taux_eps) then
                 this%dx(:) = this%dx(:) * less
                 this%dx(:) = modulo(this%dx(:), Lsize(:))
             end if
@@ -141,7 +141,7 @@ contains
         
         if (iStep == Ntherm) then
         
-            if (rejectsRate == 0._DP) then
+            if (rejRate == 0._DP) then
                 write(*, *) this%name
                 write(*, *) "Warning : dx adaptation problem."
                 this%dx(:) = this%dx_save(:)
@@ -153,7 +153,7 @@ contains
             write(unitReport, *) "    dx(:) = ", this%dx(:)
             write(unitReport, *) "    rejection relative difference = ", &
             							! wrong translation ?
-                abs(rejectsRate - rejectsRateFix)/rejectsRateFix
+                abs(rejRate - rejRateFix)/rejRateFix
             
         end if
     
