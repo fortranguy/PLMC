@@ -38,9 +38,10 @@ contains
     
     !> Initial condition
     
-    subroutine initialCondition(sph_X, unitReport)
+    subroutine initialCondition(sph_X, sph_rMin, unitReport)
     
         real(DP), dimension(:, :), intent(inout) :: sph_X
+        real(DP), intent(in) :: sph_rMin
         integer, intent(in) :: unitReport
         
         integer :: sph_Ncol
@@ -56,10 +57,10 @@ contains
         
         select case (init)
             case ("cube")
-                call primitiveCubic(sph_X)
+                call primitiveCubic(sph_X, sph_rMin)
                 write(unitReport, *) "    Primitive cubic"
             case ("rand")
-                call randomDeposition(sph_X)
+                call randomDeposition(sph_X, sph_rMin)
                 write(unitReport, *) "    Random deposition"
             case default
                 write(*, *) "Enter the initial condition : "
@@ -80,9 +81,10 @@ contains
     
     !> Primitive cubic configuration
     
-    subroutine primitiveCubic(sph_X)
+    subroutine primitiveCubic(sph_X, sph_rMin)
     
         real(DP), dimension(:, :), intent(inout) :: sph_X
+        real(DP), intent(in) :: sph_rMin
     
         integer :: iDir
         integer :: i, j, k, iCol
@@ -108,7 +110,7 @@ contains
         
         ratio(:) = Lsize(:)/real(nCols(:), DP) ! A vérifier
         do iDir = 1, Dim
-            if ( inter_rMin*real(nCols(iDir), DP) > Lsize(iDir) ) then
+            if ( sph_rMin*real(nCols(iDir), DP) > Lsize(iDir) ) then
                 write(*, *) "    Error : too dense in the direction", iDir
                 stop
             end if
@@ -137,9 +139,10 @@ contains
     
     !> Random deposition configuration
     
-    subroutine randomDeposition(sph_X)
+    subroutine randomDeposition(sph_X, sph_rMin)
     
         real(DP), dimension(:, :), intent(inout) :: sph_X
+        real(DP), intent(in) :: sph_rMin
     
         integer :: iCol, Ncols, nOK
         integer :: sph_Ncol
@@ -149,19 +152,19 @@ contains
         write(*, *) "Random deposition"
     
         call random_number(sph_X(:, 1))
-        sph_X(:, 1) = sph_X(:, 1)*(Lsize(:)-inter_rMin)
+        sph_X(:, 1) = sph_X(:, 1)*(Lsize(:)-sph_rMin)
         Ncols = 1        
         
         sph_Ncol = size(sph_X, 2)
         do while (Ncols<sph_Ncol)
         
             call random_number(xTest)
-            xTest(:) = xTest(:)*(Lsize(:)-inter_rMin)
+            xTest(:) = xTest(:)*(Lsize(:)-sph_rMin)
             
             nOK = 0
             do iCol = 1, Ncols
                 rTest = dist(sph_X(:, iCol), xTest(:))
-                if (rTest >= inter_rMin) then
+                if (rTest >= sph_rMin) then
                     nOK = nOK + 1
                 else
                     exit

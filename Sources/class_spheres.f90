@@ -38,8 +38,9 @@ private
         
     contains
     
-        !> Get the Ncol
+        !> Accessors
         procedure :: getNcol => Spheres_getNcol
+        procedure :: getRmin => Spheres_getRmin
         
         !> Take a snap shot of the configuration
         procedure :: snapShot => Spheres_snapShot
@@ -58,6 +59,8 @@ private
     
 contains
 
+    !> Accessors : Ncol
+
     function Spheres_getNcol(this) result(getNcol)
     
         class(Spheres), intent(in) :: this
@@ -67,6 +70,18 @@ contains
         getNcol = this%Ncol
     
     end function Spheres_getNcol
+    
+    !> Accessors : rMin
+    
+    function Spheres_getRmin(this) result(getRmin)
+    
+        class(Spheres), intent(in) :: this
+        
+        real(DP) :: getRmin
+        
+        getRmin = this%rMin
+    
+    end function Spheres_getRmin
     
     !> Configuration state
       

@@ -55,13 +55,13 @@ implicit none
     
     ! Initial condition
     
-    call initialCondition(type1_sph%X, type1_io%report)
+    call initialCondition(type1_sph%X, type1_sph%getRmin(), type1_io%report)
     call type1_sph%overlapTest()
     type1_obs%ePot_total = type1_sph%ePot_total()
     call type1_sph%snapShot(type1_io%snapIni)
     call type1_sph%cols_to_cells()
     
-    call initialCondition(type2_sph%X, type2_io%report)
+    call initialCondition(type2_sph%X, type2_sph%getRmin(), type2_io%report)
     call type2_sph%overlapTest()
     type2_obs%ePot_total = 0._DP
     call type2_sph%snapShot(type2_io%snapIni)
