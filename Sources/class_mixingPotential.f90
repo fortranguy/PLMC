@@ -1,4 +1,4 @@
-!> \brief Description of the  Mixing MPotential class
+!> \brief Description of the  Mixing Potential class
 
 module class_mixingPotential
 
