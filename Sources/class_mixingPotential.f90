@@ -1,4 +1,4 @@
-!> \brief Description of the  Mixing MixingPotential class
+!> \brief Description of the  Mixing MPotential class
 
 module class_mixingPotential
 
@@ -116,14 +116,14 @@ contains
         
     end function MixingPotential_ePot
     
-    subroutine MixingPotential_ePot_neigh(this, xCol, iCell, other_neigh, &
-    	other_X, overlap, energ)
+    subroutine MixingPotential_ePot_neigh(this, xCol, iCell, neigh, X, &
+        overlap, energ)
         
         class(MixingPotential), intent(in) :: this
         real(DP), dimension(:), intent(in) :: xCol !< type A
         integer, intent(in) :: iCell !< type A in mix grid
-        type(Neighbours), intent(in) :: other_neigh
-        real(DP), dimension(:, :) :: other_X
+        type(Neighbours), intent(in) :: neigh
+        real(DP), dimension(:, :), intent(in) :: X
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energ
     
@@ -137,15 +137,15 @@ contains
     
         do iNeigh = 1, cell_neighs_nb
         
-            iCell_neigh = other_neigh%cell_neighs(iNeigh, iCell)
-            current => other_neigh%cellsBegin(iCell_neigh)%particle%next            
+            iCell_neigh = neigh%cell_neighs(iNeigh, iCell)
+            current => neigh%cellsBegin(iCell_neigh)%particle%next            
             if (.not. associated(current%next)) cycle
             
             do
             
                 next => current%next
                 
-                r = dist(xCol(:), other_X(:, current%iCol))
+                r = dist(xCol(:), X(:, current%iCol))
                 if (r < this%rMin) then
                     overlap = .true.
                     return

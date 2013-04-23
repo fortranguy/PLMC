@@ -224,7 +224,8 @@ contains
         integer :: iOld
         real(DP) :: rand
         real(DP), dimension(Dim) :: xRand, xNew
-        integer :: iCellOld, iCellNew
+        integer :: same_iCellOld, same_iCellNew
+        integer :: other_iCellNew
         real(DP) :: eNew, eOld, dEn
         
         call random_number(rand)
@@ -233,30 +234,45 @@ contains
         call random_number(xRand)
         xNew(:) = this%X(:, iOld) + (xRand(:)-0.5_DP)*this%dx(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
-        iCellNew = this%same%position_to_cell(xNew)
-        call this%ePot_neigh(iOld, xNew, iCellNew, overlap, eNew)
+        same_iCellNew = this%same%position_to_cell(xNew)
+        call this%ePot_neigh(iOld, xNew, same_iCellNew, overlap, eNew)
         
         if (.not. overlap) then
         
-            iCellOld = this%same%position_to_cell(this%X(:, iOld))
-            call this%ePot_neigh(iOld, this%X(:, iOld), iCellOld, overlap, &
-                eOld)
+            other_iCellNew = this%other%position_to_cell(xNew)
+            call mix%ePot_neigh(xNew, other_iCellNew, this%other, other_X, &
+                overlap, other_eNew)
+                        
+            if (.not. overlap) then
+    
+                same_iCellOld = this%same%position_to_cell(this%X(:, iOld))
+                call this%ePot_neigh(iOld, this%X(:, iOld), same_iCellOld, &
+                    overlap, eOld)
+                    
+                other_iCellOld = this%other%position_to_cell(this%X(:, iOld))
+                call mix%ePot_neigh(this%X(:, iOld), other_iCellNew, &
+                    overlap, other_eOld)
+                
+                dEn = eNew - eOld
             
-            dEn = eNew - eOld
-        
-            call random_number(rand)
-            if ( rand < exp(-dEn/Tstar) ) then
-                this%X(:, iOld) = xNew(:)
-                ePot_total = ePot_total + dEn
-                
-                if ( iCellOld /= iCellNew ) then                
-                    call this%same%remove_cell_col(iOld, iCellOld)
-                    call this%same%add_cell_col(iOld, iCellNew)
+                call random_number(rand)
+                if ( rand < exp(-dEn/Tstar) ) then
+                    this%X(:, iOld) = xNew(:)
+                    ePot_total = ePot_total + dEn
+                    
+                    if ( same_iCellOld /= same_iCellNew ) then                
+                        call this%same%remove_cell_col(iOld, same_iCellOld)
+                        call this%same%add_cell_col(iOld, same_iCellNew)
+                    end if
+                    
+                else
+                    Nrej = Nrej + 1
                 end if
-                
+         
             else
-                Nrej = Nrej + 1
+                Nrej = Nrej + 1                
             end if
+            
             
         else
         
