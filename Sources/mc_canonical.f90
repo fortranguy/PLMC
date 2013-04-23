@@ -25,12 +25,12 @@ implicit none
     
     integer, parameter :: unitReport = 10
     
-    ! Interacting spheres : type 1
+    ! Type 1 : Interacting spheres
     type(InteractingSpheres) :: type1_sph !< Monte-Carlo subroutines
     type(Observables) :: type1_obs !< e.g. Energy
     type(Units) :: type1_io        !< input/output files
     
-    ! Hard spheres : type 2
+    ! Type 2 : Hard spheres
     type(HardSpheres) :: type2_sph
     type(Observables) :: type2_obs
     type(Units) :: type2_io
