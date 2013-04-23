@@ -59,7 +59,7 @@ private
     
 contains
 
-    !> Accessors : Ncol
+    !> Accessor : Ncol
 
     function Spheres_getNcol(this) result(getNcol)
     
@@ -71,7 +71,7 @@ contains
     
     end function Spheres_getNcol
     
-    !> Accessors : rMin
+    !> Accessor : rMin
     
     function Spheres_getRmin(this) result(getRmin)
     
@@ -176,6 +176,8 @@ contains
                 write(*, *) "default dx :", this%dx(:)
                 write(*, *)
             end if
+            
+            write(*, *) this%name, "    Thermalisation : over"
             
             write(unitReport, *) "Displacement :"
             write(unitReport, *) "    dx(:) = ", this%dx(:)
