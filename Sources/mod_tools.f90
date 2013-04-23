@@ -149,14 +149,14 @@ contains
         write(*, *) "Random deposition"
     
         call random_number(sph_X(:, 1))
-        sph_X(:, 1) = sph_X(:, 1)*(Lsize(:)-2*inter_radius)
+        sph_X(:, 1) = sph_X(:, 1)*(Lsize(:)-inter_rMin)
         Ncols = 1        
         
         sph_Ncol = size(sph_X, 2)
         do while (Ncols<sph_Ncol)
         
             call random_number(xTest)
-            xTest(:) = xTest(:)*(Lsize(:)-2._DP*inter_radius)
+            xTest(:) = xTest(:)*(Lsize(:)-inter_rMin)
             
             nOK = 0
             do iCol = 1, Ncols
