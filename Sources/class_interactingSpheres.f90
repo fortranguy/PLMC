@@ -255,9 +255,9 @@ contains
         
         if (.not. overlap) then
         
-            other_iCellNew = this%other%position_to_cell(xNew)
-            call mix%ePot_neigh(xNew, other_iCellNew, this%other, other_X, &
-                overlap, other_eNew)
+            !other_iCellNew = this%other%position_to_cell(xNew)
+            !call mix%ePot_neigh(xNew, other_iCellNew, this%other, other_X, &
+                !overlap, other_eNew)
                         
             if (.not. overlap) then
     
