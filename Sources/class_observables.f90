@@ -11,6 +11,10 @@ private
 
     type, public :: Observables
     
+        ! Randomly chosen
+        
+        integer :: NrandMove
+    
         ! Rejection
         integer :: Nrejects
         real(DP) :: rejectsRateSum
@@ -37,6 +41,8 @@ contains
     subroutine Observables_init(this)
         
         class(Observables), intent(out) :: this
+        
+        this%NrandMove = 0
         
         this%Nrejects = 0
         this%rejectsRateSum = 0._DP
