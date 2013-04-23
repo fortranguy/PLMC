@@ -144,11 +144,17 @@ contains
     
     !> Fill cells with colloids
     
-    subroutine Spheres_cols_to_cells(this)
+    subroutine Spheres_cols_to_cells(this, other_X)
     
         class(Spheres), intent(inout) :: this
+        real(DP), dimension(:, :), intent(in) :: other_X
+        
+        integer :: other_Ncol 
         
         call this%same%all_col_to_cell(this%Ncol, this%X)
+        
+        other_Ncol = size(other_X, 2)
+        call this%other%all_col_to_cell(other_Ncol, other_X)
     
     end subroutine Spheres_cols_to_cells
     
