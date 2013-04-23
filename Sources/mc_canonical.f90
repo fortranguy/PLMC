@@ -15,8 +15,6 @@ use class_units
 implicit none
 
 ! Beginning
-
-    ! Initialisation
     
     integer :: iStep, iMove
     integer :: iColRand
@@ -35,6 +33,11 @@ implicit none
     type(Observables) :: type2_obs
     type(Units) :: type2_io
     
+    ! Mixing between 2 types
+    type(MixingPotential) :: mix
+
+    ! Initialisation
+    
     call type1_sph%construct()
     call type1_obs%init()
     call type1_io%open(type1_sph%getName())
@@ -42,6 +45,8 @@ implicit none
     call type2_sph%construct()
     call type2_obs%init()
     call type2_io%open(type2_sph%getName())
+    
+    call mix%construct()
 
     write(*, *) "Monte-Carlo - Canonical : Volume =", product(Lsize)    
     
@@ -150,5 +155,7 @@ implicit none
     
     call type2_sph%destroy()
     call type2_io%close()
+    
+    call mix%destroy()
     
 end program mc_canonical
