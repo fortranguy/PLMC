@@ -91,6 +91,9 @@ implicit none
         call hard_sph%widom(hard_obs%activExInv)
         call inter_sph%widom(inter_obs%activExInv)
         
+        call hard_obs%addReject()
+        call inter_obs%addReject()
+        
         if (iStep <= Ntherm) then
         
             call hard_sph%adaptDx(iStep, hard_obs%rejRateSum, &
@@ -123,9 +126,6 @@ implicit none
             end if
             
         end if
-        
-        call hard_obs%addReject()
-        call inter_obs%addReject()
     
     end do
     call cpu_time(tFin)
