@@ -38,14 +38,14 @@ contains
     
     !> Initial condition
     
-    subroutine initialCondition(sph_X, sph_rMin, unitReport)
+    subroutine initialCondition(type1_X, type1_rMin, type2_X, type2_rMin, 
+        mix_rMin, unitReport)
     
-        real(DP), dimension(:, :), intent(inout) :: sph_X
-        real(DP), intent(in) :: sph_rMin
+        real(DP), dimension(:, :), intent(inout) :: type1_X, type2_X
+        real(DP), intent(in) :: type1_rMin, type2_rMin, mix_rMin
         integer, intent(in) :: unitReport
         
-        integer :: sph_Ncol
-        real(DP) :: compac, densite
+
         character(len=20) :: init
         integer :: longueur, statut
         
@@ -56,26 +56,14 @@ contains
         write(unitReport, *) "Initial condition :"
         
         select case (init)
-            case ("cube")
-                call primitiveCubic(sph_X, sph_rMin)
-                write(unitReport, *) "    Primitive cubic"
             case ("rand")
                 call randomDeposition(sph_X, sph_rMin)
                 write(unitReport, *) "    Random deposition"
             case default
                 write(*, *) "Enter the initial condition : "
-                write(*, *) "   'cube' or 'rand'."
+                write(*, *) "   'rand'."
                 stop
         end select
-        
-        sph_Ncol = size(sph_X, 2)
-        densite = real(sph_Ncol, DP) / product(Lsize)
-        write(*, *) "    Density = ", densite
-        write(unitReport, *) "    Density = ", densite
-        
-        compac = 4._DP/3._DP*PI*inter_radius**3 * densite
-        write(*, *) "    Compacity = ", compac
-        write(unitReport, *) "    Compacity = ", compac
         
     end subroutine initialCondition
     

@@ -30,6 +30,8 @@ private
 	
 		procedure :: construct => MixingPotential_construct
 		procedure :: destroy => MixingPotential_destroy
+		
+		procedure ::getRmin => MixingPotential_getRmin
 	
 		procedure :: ePot_init => MixingPotential_ePot_init
         procedure :: ePot => MixingPotential_ePot
@@ -68,6 +70,18 @@ contains
         end if
     
     end subroutine MixingPotential_destroy
+    
+    !> Accessor : rMin
+    
+    function MixingPotential_getRmin(this) result(getRmin)
+    
+        class(Spheres), intent(in) :: this
+        
+        real(DP) :: getRmin
+        
+        getRmin = this%rMin
+    
+    end function MixingPotential_getRmin
 
 	!> MixingPotential energy
     !> Tabulation of Yukawa potential

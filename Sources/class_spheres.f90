@@ -44,6 +44,8 @@ private
         procedure :: getNcol => Spheres_getNcol
         procedure :: getRmin => Spheres_getRmin
         
+        procedure :: printInfos => Spheres_printInfos
+        
         !> Take a snap shot of the configuration
         procedure :: snapShot => Spheres_snapShot
         
@@ -96,6 +98,25 @@ contains
         getRmin = this%rMin
     
     end function Spheres_getRmin
+    
+    !> Print density and compacity
+    
+    subroutine Spheres_printInfos(this, unitReport)
+    
+        class(Spheres), intent(in) :: this
+        integer, intent(in) :: unitReport
+        
+        real(DP) :: density, compac
+        
+        density = real(this%Ncol, DP) / product(Lsize)
+        write(*, *) "    density = ", density
+        write(unitReport, *) "    density = ", density
+        
+        compac = 4._DP/3._DP*PI*this%radius**3 * density
+        write(*, *) "    compacity = ", compac
+        write(unitReport, *) "    compacity = ", compac
+    
+    end subroutine Spheres_printInfos
     
     !> Configuration state
       

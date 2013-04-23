@@ -35,6 +35,8 @@ implicit none
     
     ! Mixing between 2 types
     type(MixingPotential) :: mix
+    
+    write(*, *) "Monte-Carlo - Canonical : Volume =", product(Lsize)
 
     ! Initialisation
     
@@ -47,26 +49,27 @@ implicit none
     call type2_io%open(type2_sph%getName())
     
     call mix%construct()
-
-    write(*, *) "Monte-Carlo - Canonical : Volume =", product(Lsize)    
     
     open(unit=unitReport, recl=4096, file="report.out", status='new', &
     	action='write')
 	call report(unitReport)
     call type1_sph%report(type1_io%report)
+    call type1_sph%printInfos(type1_io%report)
     call type2_sph%report(type2_io%report)
+    call type2_sph%printInfos(type2_io%report)
     
     call init_random_seed(unitReport)
     
     ! Initial condition
     
-    call initialCondition(type1_sph%X, type1_sph%getRmin(), type1_io%report)
+    call initialCondition(type1_sph%X, type1_sph%getRmin(), &
+        type2_sph%X, type2_sph%getRmin(), mix%getRmin(), unitReport)
+    
     call type1_sph%overlapTest()
     type1_obs%ePot_total = type1_sph%ePot_total()
     call type1_sph%snapShot(type1_io%snapIni)
     call type1_sph%cols_to_cells(type2_sph%X)
     
-    call initialCondition(type2_sph%X, type2_sph%getRmin(), type2_io%report)
     call type2_sph%overlapTest()
     type2_obs%ePot_total = 0._DP
     call type2_sph%snapShot(type2_io%snapIni)
