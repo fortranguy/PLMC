@@ -67,108 +67,115 @@ contains
         
     end subroutine initialCondition
     
-    !> Primitive cubic configuration
-    
-    subroutine primitiveCubic(sph_X, sph_rMin)
-    
-        real(DP), dimension(:, :), intent(inout) :: sph_X
-        real(DP), intent(in) :: sph_rMin
-    
-        integer :: iDir
-        integer :: i, j, k, iCol
-        integer :: sph_Ncol
-        integer, dimension(Dim) :: nCols
-        real(DP), dimension(Dim) :: ratio
-        real(DP) :: oneThird = 1._DP/3._DP
-        
-        write(*, *) "Primitive cubic"
-        
-        ! Proportion according to the direction
-        sph_Ncol = size(sph_X, 2)
-        nCols(1) = int( (sph_Ncol*Lsize(1)**2/Lsize(2)/Lsize(3))**oneThird )
-        nCols(2) = int( (sph_Ncol*Lsize(2)**2/Lsize(3)/Lsize(1))**oneThird )
-        nCols(3) = int( (sph_Ncol*Lsize(3)**2/Lsize(1)/Lsize(2))**oneThird )
-        
-        ! Check
-        iDir = 1
-        do while (product(nCols)<sph_Ncol)
-            nCols(iDir) = nCols(iDir) + 1
-            iDir = iDir + 1
-        end do
-        
-        ratio(:) = Lsize(:)/real(nCols(:), DP) ! A vérifier
-        do iDir = 1, Dim
-            if ( sph_rMin*real(nCols(iDir), DP) > Lsize(iDir) ) then
-                write(*, *) "    Error : too dense in the direction", iDir
-                stop
-            end if
-        end do
-        
-        ! Filling
-        do k = 1, nCols(3)
-            do j = 1, nCols(2)
-                do i = 1, nCols(1)            
-                    iCol = i + nCols(1)*(j-1) + nCols(1)*nCols(2)*(k-1)
-                    if (iCol <= sph_Ncol) then
-                        sph_X(1, iCol) = ratio(1)*real(i, DP)
-                        sph_X(2, iCol) = ratio(2)*real(j, DP)
-                        sph_X(3, iCol) = ratio(3)*real(k, DP)
-                    end if
-                end do
-            end do
-        end do
-    
-        do iDir = 1, Dim
-            sph_X(iDir, :) = sph_X(iDir, :) - 0.5_DP*ratio(iDir) 
-            ! just inside
-        end do
-    
-    end subroutine primitiveCubic
-    
     !> Random deposition configuration
     
-    subroutine randomDeposition(sph_X, sph_rMin)
+    subroutine randomDeposition(type1_X, type1_rMin, type2_X, type2_rMin, 
+        mix_rMin)
     
-        real(DP), dimension(:, :), intent(inout) :: sph_X
-        real(DP), intent(in) :: sph_rMin
+        real(DP), dimension(:, :), intent(inout) :: type1_X, type2_X
+        real(DP), intent(in) :: type1_rMin, type2_rMin, mix_rMin
     
-        integer :: iCol, Ncols, nOK
-        integer :: sph_Ncol
-        real(DP), dimension(Dim) :: xTest
+        integer :: iCol, NcolOK, test_nOK
+        integer :: type1_Ncol, type2_Ncol
+        real(DP), dimension(Dim) :: xRand, xTest
         real(DP) :: rTest
         
         write(*, *) "Random deposition"
-    
-        call random_number(sph_X(:, 1))
-        sph_X(:, 1) = sph_X(:, 1)*(Lsize(:)-sph_rMin)
-        Ncols = 1        
         
-        sph_Ncol = size(sph_X, 2)
-        do while (Ncols<sph_Ncol)
+        ! Type 1
         
-            call random_number(xTest)
-            xTest(:) = xTest(:)*(Lsize(:)-sph_rMin)
+        !   First
+        call random_number(xRand)
+        type1_X(:, 1) = xRand*Lsize(:)
+        NcolOK = 1
+        
+        !   Others
+        type1_Ncol = size(type1_X, 2)
+        do while (NcolOK < type1_Ncol)
+        
+            call random_number(xRand)
+            xTest(:) = xRand(:)*Lsize(:)
             
-            nOK = 0
-            do iCol = 1, Ncols
-                rTest = dist(sph_X(:, iCol), xTest(:))
-                if (rTest >= sph_rMin) then
-                    nOK = nOK + 1
+            test_nOK = 0
+            do iCol = 1, NcolOK
+                rTest = dist(type1_X(:, iCol), xTest(:))
+                if (rTest >= type1_rMin) then
+                    test_nOK = test_nOK + 1
                 else
                     exit
                 end if
             end do
             
-            if (nOK == Ncols) then
-                Ncols = Ncols + 1
-                sph_X(:, Ncols) = xTest(:)
-                write(*, *) "    Particule", Ncols, "OK"
+            if (test_nOK == NcolOK) then
+                NcolOK = NcolOK + 1
+                type1_X(:, NcolOK) = xTest(:)
+                write(*, *) "    Type 1 particle n°", NcolOK, "OK"
             end if
             
         end do
         
-        do iCol = 1, sph_Ncol
-            sph_X(:, iCol) = sph_X(:, iCol) + inter_radius
+        ! Type 2
+        
+        !   First
+        test_nOK = 0
+        do while (test_nOK == type1_Ncol)
+        
+            call random_number(xRand)
+            xTest = xRand*Lsize(:)
+            
+            do iCol = 1, type1_Ncol
+                rTest = dist(type1_X(:, iCol), xTest(:))
+                if (rTest >= mix_rMin) then
+                    test_nOK = test_nOK + 1
+                else
+                    exit
+                end if
+            end do
+        
+        end do        
+        type2_X(:, 1) = xTest(:)        
+        NcolOK = 1
+        
+        !   Others
+        type2_Ncol = size(type2_X, 2)
+        do while (NcolOK < type2_Ncol)
+        
+            call random_number(xRand)
+            xTest(:) = xRand(:)*Lsize(:)
+            
+            nOK = 0
+            do iCol = 1, NcolOK
+                rTest = dist(type1_X(:, iCol), xTest(:))
+                if (rTest >= mix_rMin) then
+                    test_nOK = test_nOK + 1
+                else
+                    exit
+                end if
+            end do
+            
+            do iCol = 1, NcolOK
+                rTest = dist(type2_X(:, iCol), xTest(:))
+                if (rTest >= mix_rMin) then
+                    test_nOK = test_nOK + 1
+                else
+                    exit
+                end if
+            end do
+            
+            if (test_nOK == NcolOK) then
+                NcolOK = NcolOK + 1
+                type2_X(:, NcolOK) = xTest(:)
+                write(*, *) "    Type 2 particle n°", NcolOK, "OK"
+            end if
+            
+        end do
+        
+        do iCol = 1, type1_Ncol
+            type1_X(:, iCol) = type1_X(:, iCol) + type1_rMin/2._DP
+        end do
+        
+        do iCol = 1, type2_Ncol
+            type2_X(:, iCol) = type2_X(:, iCol) + type2_rMin/2._DP
         end do
     
     end subroutine randomDeposition
