@@ -93,17 +93,18 @@ contains
         
         !   Others
         type1_Ncol = size(type1_X, 2)
+        iColOK = 0
         do while (NcolOK < type1_Ncol)
         
             call random_number(xRand)
             xTest(:) = xRand(:)*Lsize(:)
             
-            iColOK = 0
             do iCol = 1, NcolOK
                 rTest = dist(type1_X(:, iCol), xTest(:))
                 if (rTest >= type1_rMin) then
                     iColOK = iColOK + 1
                 else
+                    iColOK = 0
                     exit
                 end if
             end do
@@ -123,7 +124,7 @@ contains
         do while (iColOK == type1_Ncol)
         
             call random_number(xRand)
-            xTest = xRand*Lsize(:)
+            xTest(:) = xRand*Lsize(:)
             
             do iCol = 1, type1_Ncol
                 rTest = dist(type1_X(:, iCol), xTest(:))
@@ -142,17 +143,19 @@ contains
         
         !   Others
         type2_Ncol = size(type2_X, 2)
+        iColOK = 0
+        sub_iColOK = 0
         do while (sub_NcolOK < type2_Ncol)
         
             call random_number(xRand)
             xTest(:) = xRand(:)*Lsize(:)
             
-            iColOK = 0
             do iCol = 1, NcolOK
                 rTest = dist(type1_X(:, iCol), xTest(:))
                 if (rTest >= mix_rMin) then
                     iColOK = iColOK + 1
                 else
+                    iColOK = 0
                     exit
                 end if
             end do
@@ -161,13 +164,13 @@ contains
             
                 NcolOK = NcolOK + 1
             
-                sub_iColOK = 0
                 do iCol = 1, sub_NcolOK
                     rTest = dist(type2_X(:, iCol), xTest(:))
                     if (rTest >= type2_rMin) then
                         sub_iColOK = sub_iColOK + 1
                     else
                         NcolOK = 1
+                        sub_iColOK = 0
                         exit
                     end if
                 end do
