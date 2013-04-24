@@ -148,8 +148,6 @@ implicit none
         
         else
         
-            mix_ePotSum = mix_ePotSum + mix_ePot
-        
             call type1_obs%addPhysical()
             write(type1_io%obs, *) iStep, type1_obs%ePot, &
                 type1_obs%activExInv
@@ -157,7 +155,8 @@ implicit none
             call type2_obs%addPhysical()
             write(type2_io%obs, *) iStep, type2_obs%ePot, &
                 type2_obs%activExInv                
-            
+                
+            mix_ePotSum = mix_ePotSum + mix_ePot            
             write(unitObs, *) iStep, type1_obs%ePot + type2_obs%ePot + mix_ePot
             write(mix_unitObs, *) iStep, mix_ePot
 
