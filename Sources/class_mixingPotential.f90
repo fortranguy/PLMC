@@ -37,6 +37,8 @@ private
         procedure :: ePot => MixingPotential_ePot
         procedure :: ePot_neigh => MixingPotential_ePot_neigh
         !procedure :: ePot_total => MixingPotential_ePot_total
+        
+        procedure :: overlapTest => MixingPotential_overlapTest
 	
 	end type
 	
@@ -177,5 +179,32 @@ contains
     end subroutine MixingPotential_ePot_neigh
     
     !> Total potential energy
+    
+    !> Overlapt test
+    
+    subroutine MixingPotential_overlapTest(this, type1_X, type2_X)
+    
+        class(MixingPotential), intent(in) :: this
+        real(DP), dimension(:, :), intent(in) :: type1_X, type2_X
+    
+        integer :: iCol1, iCol2
+        real(DP) :: r_mix
+    
+        do iCol1 = 1, size(type1_X, 2)
+            do iCol2 = 1, size(type2_X, 2)
+                    
+                r_mix = dist(type1_X(:, iCol1), type2_X(:, iCol2))
+                if (r_mix < this%rMin) then
+                    write(*, *) "    Overlap !", iCol1, iCol2
+                    write(*, * ) "    r_mix = ", r_mix
+                    stop
+                end if
+
+            end do
+        end do
+
+        write(*, *) "    Overlap test : OK !"
+    
+    end subroutine MixingPotential_overlapTest
 
 end module class_mixingPotential

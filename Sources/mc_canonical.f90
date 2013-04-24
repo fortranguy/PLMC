@@ -63,6 +63,7 @@ implicit none
     ! Initial condition
     
     call initialCondition(type1_sph, type2_sph, mix%getRmin(), unitReport)
+    call mix%overlapTest(type1_sph%X, type2_sph%X)
     
     call type1_sph%overlapTest()
     type1_obs%ePot_total = type1_sph%ePot_total()
@@ -141,6 +142,8 @@ implicit none
     write(*, *) "End of cycles"
 
 ! End -----------------------------------------------------
+
+    call mix%overlapTest(type1_sph%X, type2_sph%X)
 
     call type1_sph%overlapTest()
     call type1_sph%consistTest(type1_obs%ePot_total, type1_io%report)
