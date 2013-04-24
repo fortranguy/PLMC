@@ -87,9 +87,9 @@ contains
         write(unitReport, *) "    average energy = ", &
             this%ePotSum/realNstep
         write(unitReport, *) "    average energy per particule = ", &
-            this%ePotSum/realNstep/real(inter_Ncol, DP)
+            this%ePotSum/realNstep/real(Ncol, DP)
             
-        potChiId = -Tstar*log( product(Lsize)/real(inter_Ncol+1,DP) )
+        potChiId = -Tstar*log( product(Lsize)/real(Ncol+1,DP) )
         write(unitReport, *) "    ideal chemical potential = ", potChiId
         potChiEx = -Tstar*log( this%activExInvSum/realNstep )
         write(unitReport, *) "    average excess chemical potential = ", &
