@@ -38,7 +38,7 @@ private
 		procedure :: ePot_init => MixingPotential_ePot_init
         procedure :: ePot => MixingPotential_ePot
         procedure :: ePot_neigh => MixingPotential_ePot_neigh
-        !procedure :: ePot_total => MixingPotential_ePot_total
+        procedure :: ePot_total => MixingPotential_ePot_total
         
         procedure :: overlapTest => MixingPotential_overlapTest
 	
@@ -184,18 +184,50 @@ contains
     
     !> Total potential energy
     
+    function MixingPotential_ePot_total(this, type1_X, type2_X) result(ePot_total)
+    
+        class(MixingPotential), intent(in) :: this
+        real(DP), dimension(:, :), intent(in) :: type1_X, type2_X
+        
+        integer :: Ncol1, Ncol2
+        integer :: iCol1, iCol2
+        real(DP) :: r_mix
+        real(DP) :: ePot_total
+        
+        Ncol1 = size(type1_X, 2)
+        Ncol2 = size(type2_X, 2)
+        
+        ePot_total = 0._DP
+        
+        do iCol1 = 1, Ncol1
+            do iCol2 = 1, Ncol2
+                
+                r_mix = dist(type1_X(:, iCol1), type2_X(:, iCol2))
+                ePot_total = ePot_total + this%ePot(r_mix)
+
+            end do
+        end do
+        
+        ePot_total = 0.5_DP*ePot_total
+    
+    end function MixingPotential_ePot_total
+    
     !> Overlapt test
     
     subroutine MixingPotential_overlapTest(this, type1_X, type2_X)
     
         class(MixingPotential), intent(in) :: this
         real(DP), dimension(:, :), intent(in) :: type1_X, type2_X
-    
+        
+        integer :: Ncol1, Ncol2
         integer :: iCol1, iCol2
         real(DP) :: r_mix
-    
-        do iCol1 = 1, size(type1_X, 2)
-            do iCol2 = 1, size(type2_X, 2)
+        
+        Ncol1 = size(type1_X, 2)
+        Ncol2 = size(type2_X, 2)
+        
+        do iCol1 = 1, Ncol1
+            do iCol2 = 1, Ncol2
                     
                 r_mix = dist(type1_X(:, iCol1), type2_X(:, iCol2))
                 if (r_mix < this%rMin) then
