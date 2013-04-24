@@ -21,11 +21,11 @@ data_copy.o data_constants.mod data_cell.mod data_particles.mod data_mc.mod \
 	data_potentiel.mod data_neighbours.mod data_distrib.mod : data_copy.f90
 	$(FC) $(FFLAGS) -c $<
 	touch $*.o $*.mod
-	
-# ---------------------------
 
 data.o: data_copy.f90
 	$(FC) -c $(FFLAGS) $< -o $@
+	
+# ---------------------------
 
 mod_physics.o : data_constants.mod data_cell.mod
 class_neighbours.o : data_constants.mod data_cell.mod data_neighbours.mod
