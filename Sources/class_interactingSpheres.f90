@@ -226,13 +226,13 @@ contains
     
     !> Particle move
     
-    subroutine InteractingSpheres_move(this, mixPot, other, Nrej, ePot, &
-        ePot_total)
+    subroutine InteractingSpheres_move(this, mixPot, other, same_ePot, &
+        ePot_total, Nrej)
     
         class(InteractingSpheres), intent(inout) :: this
         class(MixingPotential), intent(in) :: mixPot
-        class(InteractingSpheres), intent(inout) :: other
-        real(DP), intent(inout) :: ePot, ePot_total
+        class(Spheres), intent(inout) :: other
+        real(DP), intent(inout) :: same_ePot, ePot_total
         integer, intent(inout) :: Nrej
         
         logical :: overlap
@@ -258,7 +258,7 @@ contains
         if (.not. overlap) then
         
             mix_iCellNew = this%mix%position_to_cell(xNew)
-            call mix%ePot_neigh(xNew, mix_iCellNew, this%mix, other%X, &
+            call mixPot%ePot_neigh(xNew, mix_iCellNew, this%mix, other%X, &
                 overlap, mix_eNew)
                         
             if (.not. overlap) then
@@ -269,7 +269,7 @@ contains
                 same_dEpot = same_eNew - same_eOld
                     
                 mix_iCellOld = this%mix%position_to_cell(this%X(:, iOld))
-                call mix%ePot_neigh(this%X(:, iOld), mix_iCellOld, &
+                call mixPot%ePot_neigh(this%X(:, iOld), mix_iCellOld, &
                     this%mix, other%X, overlap, mix_eOld)                
                 mix_dEpot = mix_eNew - mix_eOld
                 
@@ -278,16 +278,17 @@ contains
                 call random_number(rand)
                 if ( rand < exp(-dEpot/Tstar) ) then
                     this%X(:, iOld) = xNew(:)
-                    ePot_total = ePot_total + dEn
+                    ePot_total = ePot_total + dEpot
+                    same_ePot = same_ePot + same_dEpot
                     
                     if ( same_iCellOld /= same_iCellNew ) then                
                         call this%same%remove_cell_col(iOld, same_iCellOld)
                         call this%same%add_cell_col(iOld, same_iCellNew)
                     end if
                     
-                    if ( same_iCellOld /= same_iCellNew ) then                
-                        call this%same%remove_cell_col(iOld, same_iCellOld)
-                        call this%same%add_cell_col(iOld, same_iCellNew)
+                    if ( mix_iCellOld /= mix_iCellNew ) then                
+                        call other%mix%remove_cell_col(iOld, mix_iCellOld)
+                        call other%mix%add_cell_col(iOld, mix_iCellNew)
                     end if
                     
                 else
