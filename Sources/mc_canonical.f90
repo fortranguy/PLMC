@@ -47,7 +47,7 @@ implicit none
     
     open(unit=unitReport, recl=4096, file="report.out", status='new', &
         action='write')
-    open(unit=unitObsTherm, recl=4096, file="obsThmer.out", status='new', &
+    open(unit=unitObsTherm, recl=4096, file="obsTherm.out", status='new', &
         action='write')
     open(unit=unitObs, recl=4096, file="obs.out", status='new', &
         action='write')
