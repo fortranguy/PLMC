@@ -62,8 +62,7 @@ implicit none
     
     ! Initial condition
     
-    call initialCondition(type1_sph%X, type1_sph%getRmin(), &
-        type2_sph%X, type2_sph%getRmin(), mix%getRmin(), unitReport)
+    call initialCondition(type1_sph, type2_sph, mix%getRmin(), unitReport)
     
     call type1_sph%overlapTest()
     type1_obs%ePot_total = type1_sph%ePot_total()

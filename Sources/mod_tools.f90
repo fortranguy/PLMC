@@ -6,6 +6,7 @@ use data_constants
 use data_particles
 use data_mc
 use mod_physics
+use class_spheres
 
 implicit none
 
@@ -38,13 +39,11 @@ contains
     
     !> Initial condition
     
-    subroutine initialCondition(type1_X, type1_rMin, type2_X, type2_rMin, &
-        mix_rMin, unitReport)
+    subroutine initialCondition(type1, type2, mix_rMin, unitReport)
     
-        real(DP), dimension(:, :), intent(inout) :: type1_X, type2_X
-        real(DP), intent(in) :: type1_rMin, type2_rMin, mix_rMin
-        integer, intent(in) :: unitReport
-        
+        class(Spheres), intent(inout) :: type1, type2
+        real(DP), intent(in) :: mix_rMin
+        integer, intent(in) :: unitReport        
 
         character(len=20) :: init
         integer :: longueur, statut
@@ -57,8 +56,8 @@ contains
         
         select case (init)
             case ("rand")
-                call randomDeposition(type1_X, type1_rMin, type2_X, &
-                    type2_rMin, mix_rMin)
+                call randomDeposition(type1%X, type1%getRMin(), type2%X, &
+                    type2%getRmin(), mix_rMin)
                 write(unitReport, *) "    Random deposition"
             case default
                 write(*, *) "Enter the initial condition : "

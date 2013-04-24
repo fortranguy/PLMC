@@ -38,7 +38,8 @@ class_hardSpheres.o :data_constants.mod data_cell.mod data_particles.mod \
 class_interactingSpheres.o : data_constants.mod data_cell.mod \
 	data_particles.mod data_potentiel.mod data_mc.mod data_neighbours.mod
 class_observables.o : data_constants.mod data_mc.mod
-mod_tools.o : data_constants.mod data_particles.mod data_mc.mod
+mod_tools.o : data_constants.mod data_particles.mod data_mc.mod mod_physics.o \
+	class_spheres.o
 
 # ---------------------------
 mod_physics.o : mod_physics.f90
