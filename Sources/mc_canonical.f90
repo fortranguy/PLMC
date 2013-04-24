@@ -72,7 +72,7 @@ implicit none
     call type1_sph%cols_to_cells(type2_sph%X)
     
     call type2_sph%overlapTest()
-    type2_obs%ePot = 0._DP
+    type2_obs%ePot = type2_sph%ePot_total()
     call type2_sph%snapShot(type2_io%snapIni)
     call type2_sph%cols_to_cells(type1_sph%X)
     
@@ -156,6 +156,7 @@ implicit none
     call type1_obs%results(type1_io%report)
 
     call type2_sph%overlapTest()
+    call type2_sph%consistTest(type2_obs%ePot, type2_io%report)
     call type2_sph%snapShot(type2_io%snapFin)
     call type2_obs%results(type2_io%report)
     

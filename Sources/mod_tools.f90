@@ -136,20 +136,23 @@ contains
     
     end subroutine report
     
-    subroutine results(duration, unitReport)
+    subroutine results(ePot_mc, duration, unitReport)
     
-        integer, intent(in) :: unitReport
+        real(DP), intent(in) :: ePot_mc
         real(DP), intent(in) :: duration
+        integer, intent(in) :: unitReport
         
-        write(unitReport, *) "Results :"
-        write(unitReport, *) "    duration =", duration/60._DP, "min"
+        real(DP) :: ePot_total
         
-        ePot_total = this%ePot_total()
+        ePot_total = 0._DP ! this%ePot_total()
         write(unitReport, *) "Consistency test:"
         write(unitReport, *) "    ePot_mc = ", ePot_mc
         write(unitReport, *) "    ePot_final = ", ePot_total
         write(unitReport, *) "    relative difference = ", &
             abs(ePot_total-ePot_mc)/ePot_total
+            
+        write(unitReport, *) "Results :"
+        write(unitReport, *) "    duration =", duration/60._DP, "min"
     
     end subroutine results
     

@@ -30,6 +30,8 @@ private
               
         !> Potential energy
         procedure :: ePot_neigh => HardSpheres_ePot_neigh
+        procedure :: ePot_total => HardSpheres_ePot_total
+        procedure :: consistTest => HardSpheres_consistTest
         
         !> Monte-Carlo
         procedure :: move => HardSpheres_move
@@ -237,5 +239,36 @@ contains
         activExInv = widTestSum/real(this%Nwidom, DP)
         
     end subroutine HardSpheres_widom
+    
+    !> Total potential energy
+    
+    function HardSpheres_ePot_total(this) result(ePot_total)
+    
+        class(HardSpheres), intent(in) :: this
+        
+        real(DP) :: ePot_total
+    
+        ePot_total = 0._DP
+        
+    end function HardSpheres_ePot_total
+    
+    !> Consistency test 
+    
+    subroutine HardSpheres_consistTest(this, ePot_mc, unitReport)
+    
+        class(HardSpheres), intent(in) :: this
+        real(DP), intent(in) :: ePot_mc
+        integer, intent(in) :: unitReport
+        
+        real(DP) :: ePot_total
+    
+        ePot_total = this%ePot_total()
+        write(unitReport, *) "Consistency test:"
+        write(unitReport, *) "    ePot_mc = ", ePot_mc
+        write(unitReport, *) "    ePot_final = ", ePot_total
+        write(unitReport, *) "    absolute difference = ", &
+            abs(ePot_total-ePot_mc)
+    
+    end subroutine HardSpheres_consistTest
 
 end module class_hardSpheres
