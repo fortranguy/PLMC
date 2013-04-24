@@ -42,7 +42,7 @@ contains
     
         class(HardSpheres), intent(out) :: this
         
-        this%name = "hard_"
+        this%name = "hardS"
     
         ! Particles
         this%radius = hard_radius
