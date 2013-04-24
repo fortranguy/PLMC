@@ -168,8 +168,7 @@ implicit none
     call type2_sph%overlapTest()
     call type2_sph%consistTest(type2_obs%ePot, type2_io%report)
     call type2_sph%snapShot(type2_io%snapFin)
-    call type2_obs%results(type2_sph%getNcol(), type2_io%report)
-    
+    call type2_obs%results(type2_sph%getNcol(), type2_io%report)    
     
     ePot_mc = type1_obs%ePot + type2_obs%ePot + mix_ePot
     ePot_total = type1_sph%ePot_total() + type2_sph%ePot_total() + &
