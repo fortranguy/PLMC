@@ -170,6 +170,7 @@ contains
                         sub_iColOK = sub_iColOK + 1
                     else
                         NcolOK = 1
+                        iColOK = 0
                         sub_iColOK = 0
                         exit
                     end if
