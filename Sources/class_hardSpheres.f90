@@ -149,11 +149,12 @@ contains
     
     !> Particle move
     
-    subroutine HardSpheres_move(this, mix, other_X, Nrej)
+    subroutine HardSpheres_move(this, mix, other, mix_ePot, Nrej)
     
         class(HardSpheres), intent(inout) :: this
         class(MixingPotential), intent(in) :: mix
-        real(DP), dimension(:, :) :: other_X
+        class(Spheres), intent(inout) :: other
+        real(DP), intent(inout) :: mix_ePot
         integer, intent(inout) :: Nrej
         
         logical :: overlap
@@ -161,8 +162,9 @@ contains
         real(DP) :: rand
         real(DP), dimension(Dim) :: xRand, xNew
         integer :: same_iCellOld, same_iCellNew
-        integer :: other_iCellOld, other_iCellNew
-        real(DP) :: other_eNew, other_eOld
+        integer :: mix_iCellOld, mix_iCellNew
+        real(DP) :: mix_dEpot
+        real(DP) :: mix_eNew, mix_eOld
         
         call random_number(rand)
         iOld = int(rand*this%Ncol) + 1
@@ -175,35 +177,48 @@ contains
         
         if (.not. overlap) then
         
-            other_iCellNew = this%mix%position_to_cell(xNew)
-            call mix%ePot_neigh(xNew, other_iCellNew, this%mix, other_X, &
-                overlap, other_eNew)
-        
+            mix_iCellNew = this%mix%position_to_cell(xNew)
+            call mix%ePot_neigh(xNew, mix_iCellNew, this%mix, other%X, &
+                overlap, mix_eNew)
+                        
             if (.not. overlap) then
-        
+    
                 same_iCellOld = this%same%position_to_cell(this%X(:, iOld))
                 call this%ePot_neigh(iOld, this%X(:, iOld), same_iCellOld, &
                     overlap)
                     
-                other_iCellOld = this%mix%position_to_cell(this%X(:, iOld))
-                call mix%ePot_neigh(this%X(:, iOld), other_iCellOld, &
-                    this%mix, other_X, overlap, other_eOld)
-            
-                this%X(:, iOld) = xNew(:)
-                    
-                if ( same_iCellOld /= same_iCellNew ) then                
-                    call this%same%remove_cell_col(iOld, same_iCellOld)
-                    call this%same%add_cell_col(iOld, same_iCellNew)
-                end if
+                mix_iCellOld = this%mix%position_to_cell(this%X(:, iOld))
+                call mix%ePot_neigh(this%X(:, iOld), mix_iCellOld, &
+                    this%mix, other%X, overlap, mix_eOld)
                 
+                mix_dEpot = mix_eNew - mix_eOld
+            
+                call random_number(rand)
+                if ( rand < exp(-mix_dEpot/Tstar) ) then
+                
+                    this%X(:, iOld) = xNew(:)
+                    mix_ePot = mix_ePot + mix_dEpot
+                    
+                    if ( same_iCellOld /= same_iCellNew ) then                
+                        call this%same%remove_cell_col(iOld, same_iCellOld)
+                        call this%same%add_cell_col(iOld, same_iCellNew)
+                    end if
+                    
+                    if ( mix_iCellOld /= mix_iCellNew ) then                
+                        call other%mix%remove_cell_col(iOld, mix_iCellOld)
+                        call other%mix%add_cell_col(iOld, mix_iCellNew)
+                    end if
+                    
+                else
+                    Nrej = Nrej + 1
+                end if
+         
             else
-                Nrej = Nrej + 1
-            end if
+                Nrej = Nrej + 1                
+            end if            
             
-        else
-        
-            Nrej = Nrej + 1
-            
+        else        
+            Nrej = Nrej + 1            
         end if
     
     end subroutine HardSpheres_move
