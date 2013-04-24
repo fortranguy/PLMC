@@ -71,7 +71,7 @@ implicit none
     integer, parameter :: Nstep = 2**10
     integer, parameter :: Ntherm = 2**8
     
-    integer, parameter :: Nmove = 2**2 * Ncol
+    integer, parameter :: Nmove = 2**1 * Ncol
     
     real(DP), dimension(Dim), parameter :: inter_dx = 2._DP
     integer, parameter :: inter_Nadapt = 2**2
