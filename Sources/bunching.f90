@@ -17,7 +17,6 @@ implicit none
 
     ! Numérique    
     
-    integer :: longueur, statut
     integer, parameter :: nDataMi = Nstep/2
     real(DP), dimension(nObs, 2*nDataMi) :: dataIn
     real(DP), dimension(nObs, nDataMi) :: dataOut
