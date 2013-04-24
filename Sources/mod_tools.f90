@@ -143,6 +143,13 @@ contains
         
         write(unitReport, *) "Results :"
         write(unitReport, *) "    duration =", duration/60._DP, "min"
+        
+        ePot_total = this%ePot_total()
+        write(unitReport, *) "Consistency test:"
+        write(unitReport, *) "    ePot_mc = ", ePot_mc
+        write(unitReport, *) "    ePot_final = ", ePot_total
+        write(unitReport, *) "    relative difference = ", &
+            abs(ePot_total-ePot_mc)/ePot_total
     
     end subroutine results
     
