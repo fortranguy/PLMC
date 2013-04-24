@@ -81,7 +81,7 @@ contains
     
         class(Spheres), intent(in) :: this
         
-        real(DP) :: getNcol
+        integer :: getNcol
         
         getNcol = this%Ncol
     

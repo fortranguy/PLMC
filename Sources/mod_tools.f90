@@ -136,15 +136,12 @@ contains
     
     end subroutine report
     
-    subroutine results(ePot_mc, duration, unitReport)
+    subroutine results(ePot_mc, ePot_total, ePot_mcSum, duration, unitReport)
     
-        real(DP), intent(in) :: ePot_mc
+        real(DP), intent(in) :: ePot_mc, ePot_total, ePot_mcSum
         real(DP), intent(in) :: duration
         integer, intent(in) :: unitReport
         
-        real(DP) :: ePot_total
-        
-        ePot_total = 0._DP ! this%ePot_total()
         write(unitReport, *) "Consistency test:"
         write(unitReport, *) "    ePot_mc = ", ePot_mc
         write(unitReport, *) "    ePot_final = ", ePot_total
@@ -152,6 +149,8 @@ contains
             abs(ePot_total-ePot_mc)/ePot_total
             
         write(unitReport, *) "Results :"
+        write(unitReport, *) "    average energy = ", &
+            ePot_mcSum/real(Nstep, DP)
         write(unitReport, *) "    duration =", duration/60._DP, "min"
     
     end subroutine results

@@ -184,7 +184,8 @@ contains
     
     !> Total potential energy
     
-    function MixingPotential_ePot_total(this, type1_X, type2_X) result(ePot_total)
+    function MixingPotential_ePot_total(this, type1_X, type2_X) &
+        result(ePot_total)
     
         class(MixingPotential), intent(in) :: this
         real(DP), dimension(:, :), intent(in) :: type1_X, type2_X

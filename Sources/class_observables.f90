@@ -73,9 +73,10 @@ contains
     
     !> Results
     
-    subroutine Observables_results(this, unitReport)
+    subroutine Observables_results(this, Ncol, unitReport)
 
-        class(Observables), intent(inout) :: this
+        class(Observables), intent(in) :: this
+        integer, intent(in) :: Ncol
         integer, intent(in) :: unitReport
         
         real(DP) :: realNstep = real(Nstep, DP)

@@ -21,6 +21,8 @@ implicit none
     real(DP) :: rand
     real(DP) :: tIni, tFin
     
+    real(DP) :: ePot_mc, ePot_mcSum, ePot_total
+    
     integer, parameter :: unitReport = 10, unitObs = 11
     
     ! Mixing between 2 types
@@ -76,6 +78,9 @@ implicit none
     call type2_sph%snapShot(type2_io%snapIni)
     call type2_sph%cols_to_cells(type1_sph%X)
     
+    ePot_total = type1_sph%ePot_total() + type2_sph%ePot_total() + &
+        mix%ePot_total(type1_sph%X, type2_sph%X)
+    
 ! Middle --------------------------------------------------
 
     write(*, *) "Beginning of cycles"
@@ -106,8 +111,6 @@ implicit none
         
         if (iStep <= Ntherm) then
         
-            write(unitObs, *) iStep, type1_obs%ePot + type2_obs%ePot + mix_ePot
-        
             call type1_sph%adaptDx(iStep, type1_obs%rejRateSum, &
                 type1_io%report)
             write(type1_io%dx, *) iStep, type1_sph%getDx(), &
@@ -121,6 +124,8 @@ implicit none
                 type2_obs%rejRateSum/real(iStep, DP)
             write(type2_io%obsTherm, *) iStep, type2_obs%ePot, &
                 type2_obs%activExInv
+                
+            write(unitObs, *) iStep, type1_obs%ePot + type2_obs%ePot + mix_ePot
         
         else
         
@@ -132,7 +137,9 @@ implicit none
         
             call type2_obs%addPhysical()
             write(type2_io%obs, *) iStep, type2_obs%ePot, &
-                type2_obs%activExInv
+                type2_obs%activExInv                
+            
+            write(unitObs, *) iStep, type1_obs%ePot + type2_obs%ePot + mix_ePot
 
             if (snap) then
                 call type1_sph%snapShot(type1_io%snapShots)
@@ -153,14 +160,19 @@ implicit none
     call type1_sph%overlapTest()
     call type1_sph%consistTest(type1_obs%ePot, type1_io%report)
     call type1_sph%snapShot(type1_io%snapFin)
-    call type1_obs%results(type1_io%report)
+    call type1_obs%results(type1_sph%getNcol(), type1_io%report)
 
     call type2_sph%overlapTest()
     call type2_sph%consistTest(type2_obs%ePot, type2_io%report)
     call type2_sph%snapShot(type2_io%snapFin)
-    call type2_obs%results(type2_io%report)
+    call type2_obs%results(type2_sph%getNcol(), type2_io%report)
     
-    call results(tFin-tIni, unitReport)    
+    
+    ePot_mc = type1_obs%ePot + type2_obs%ePot + mix_ePot
+    ePot_total = type1_sph%ePot_total() + type2_sph%ePot_total() + &
+        mix%ePot_total(type1_sph%X, type2_sph%X)
+    ePot_mcSum = type1_obs%ePotSum + type2_obs%ePotSum + mix_ePotSum
+    call results(ePot_mc, ePot_total, ePot_mcSum, tFin-tIni, unitReport)
     close(unitReport)
     
     call mix%destroy()
