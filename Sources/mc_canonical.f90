@@ -40,6 +40,8 @@ implicit none
 
     ! Initialisation
     
+    call mix%construct()
+    
     call type1_sph%construct()
     call type1_obs%init()
     call type1_io%open(type1_sph%getName())
@@ -48,15 +50,13 @@ implicit none
     call type2_obs%init()
     call type2_io%open(type2_sph%getName())
     
-    call mix%construct()
-    
     open(unit=unitReport, recl=4096, file="report.out", status='new', &
     	action='write')
 	call report(unitReport)
     call type1_sph%report(type1_io%report)
-    call type1_sph%printInfos(type1_io%report)
+    call type1_sph%printInfo(type1_io%report)
     call type2_sph%report(type2_io%report)
-    call type2_sph%printInfos(type2_io%report)
+    call type2_sph%printInfo(type2_io%report)
     
     call init_random_seed(unitReport)
     

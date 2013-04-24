@@ -17,6 +17,8 @@ private
 	
 		private
 		
+		character(len=5) :: name
+		
 		real(DP) :: rMin !< minimum distance between two particles
 		real(DP) :: rCut !< short-range cut
 		real(DP) :: dr !< discretisation step
@@ -47,6 +49,8 @@ contains
 	subroutine MixingPotential_construct(this)
 	
 		class(MixingPotential), intent(out) :: this
+		
+		this%name = "[mix]"
 		
 		! Particles
         this%rMin = mix_rMin
@@ -195,7 +199,7 @@ contains
                     
                 r_mix = dist(type1_X(:, iCol1), type2_X(:, iCol2))
                 if (r_mix < this%rMin) then
-                    write(*, *) "    Overlap !", iCol1, iCol2
+                    write(*, *) this%name, " :    Overlap !", iCol1, iCol2
                     write(*, * ) "    r_mix = ", r_mix
                     stop
                 end if
@@ -203,7 +207,7 @@ contains
             end do
         end do
 
-        write(*, *) "    Overlap test : OK !"
+        write(*, *) this%name, " :    Overlap test : OK !"
     
     end subroutine MixingPotential_overlapTest
 

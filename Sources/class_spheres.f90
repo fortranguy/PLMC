@@ -44,7 +44,7 @@ private
         procedure :: getNcol => Spheres_getNcol
         procedure :: getRmin => Spheres_getRmin
         
-        procedure :: printInfos => Spheres_printInfos
+        procedure :: printInfo => Spheres_printInfo
         
         !> Take a snap shot of the configuration
         procedure :: snapShot => Spheres_snapShot
@@ -101,12 +101,14 @@ contains
     
     !> Print density and compacity
     
-    subroutine Spheres_printInfos(this, unitReport)
+    subroutine Spheres_printInfo(this, unitReport)
     
         class(Spheres), intent(in) :: this
         integer, intent(in) :: unitReport
         
         real(DP) :: density, compac
+        
+        write(*, *) this%name, " :"
         
         density = real(this%Ncol, DP) / product(Lsize)
         write(*, *) "    density = ", density
@@ -116,7 +118,7 @@ contains
         write(*, *) "    compacity = ", compac
         write(unitReport, *) "    compacity = ", compac
     
-    end subroutine Spheres_printInfos
+    end subroutine Spheres_printInfo
     
     !> Configuration state
       
@@ -148,8 +150,7 @@ contains
                     
                     r_ij = dist(this%X(:, iCol), this%X(:, jCol))
                     if (r_ij < this%rMin) then
-                        write(*, *) this%name
-                        write(*, *) "    Overlap !", iCol, jCol
+                        write(*, *) this%name, "    Overlap !", iCol, jCol
                         write(*, * ) "    r_ij = ", r_ij
                         stop
                     end if
@@ -158,8 +159,7 @@ contains
             end do
         end do
         
-        write(*, *) this%name
-        write(*, *) "    Overlap test : OK !"
+        write(*, *) this%name, " :    Overlap test : OK !"
     
     end subroutine Spheres_overlapTest
     
@@ -211,14 +211,13 @@ contains
         if (iStep == Ntherm) then
         
             if (rejRate == 0._DP) then
-                write(*, *) this%name
-                write(*, *) "Warning : dx adaptation problem."
+                write(*, *) this%name, "    Warning : dx adaptation problem."
                 this%dx(:) = this%dx_save(:)
                 write(*, *) "default dx :", this%dx(:)
                 write(*, *)
             end if
             
-            write(*, *) this%name, "    Thermalisation : over"
+            write(*, *) this%name, " :    Thermalisation : over"
             
             write(unitReport, *) "Displacement :"
             write(unitReport, *) "    dx(:) = ", this%dx(:)
