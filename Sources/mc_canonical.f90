@@ -73,9 +73,9 @@ implicit none
     ! Initial condition
     
     call initialCondition(type1_sph, type2_sph, mix%getRmin(), unitReport)
+    
     call mix%overlapTest(type1_sph%X, type2_sph%X)
-    mix_ePot_total = mix%ePot_total(type1_sph%X, type2_sph%X)
-    mix_ePot = mix_ePot_total
+    mix_ePot = mix%ePot_total(type1_sph%X, type2_sph%X)
     
     call type1_sph%overlapTest()
     type1_obs%ePot = type1_sph%ePot_total()
@@ -87,8 +87,7 @@ implicit none
     call type2_sph%snapShot(type2_io%snapIni)
     call type2_sph%cols_to_cells(type1_sph%X)
     
-    ePot_total = type1_sph%ePot_total() + type2_sph%ePot_total() + &
-        mix_ePot_total
+    ePot_total = mix_ePot + type1_obs%ePot + type2_obs%ePot
     
 ! Middle --------------------------------------------------
 
@@ -196,7 +195,7 @@ implicit none
     
     ePot_mc = type1_obs%ePot + type2_obs%ePot + mix_ePot
     ePot_total = type1_sph%ePot_total() + type2_sph%ePot_total() + &
-        mix_ePot_total        
+        mix_ePot_total
     ePot_mcSum = type1_obs%ePotSum + type2_obs%ePotSum + mix_ePotSum
     call results(ePot_mc, ePot_total, ePot_mcSum, tFin-tIni, unitReport)
     
