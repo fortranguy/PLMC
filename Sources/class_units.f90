@@ -2,7 +2,7 @@
 
 module unitsCounter
 
-    integer :: iUnit = 12
+    integer :: iUnit = 15
 
 end module unitsCounter
 
@@ -66,9 +66,9 @@ contains
         open(unit=this%dx, recl=4096, file=name//"_dx.out", status='new', &
             action='write')
         
-        open(unit=this%snapIni, recl=4096, file=name//"_snapShotIni.out", &
+        open(unit=this%snapIni, recl=4096, file=name//"_snapIni.out", &
             status='new', action='write')
-        open(unit=this%snapFin, recl=4096, file=name//"_snapShotFin.out", &
+        open(unit=this%snapFin, recl=4096, file=name//"_snapFin.out", &
             status='new', action='write')
         open(unit=this%snapShots, recl=4096, file=name//"_snap.shot", &
             status='new', action='write')

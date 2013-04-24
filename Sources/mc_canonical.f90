@@ -23,11 +23,13 @@ implicit none
     
     real(DP) :: ePot_mc, ePot_mcSum, ePot_total
     
-    integer, parameter :: unitReport = 10, unitObs = 11
+    integer, parameter :: unitReport = 10
+    integer, parameter :: unitObsTherm = 11, unitObs = 12
+    integer, parameter :: mix_unitObsTherm = 13, mix_unitObs = 14
     
     ! Mixing between 2 types
     type(MixingPotential) :: mix
-    real(DP) :: mix_ePot, mix_ePotSum
+    real(DP) :: mix_ePot, mix_ePotSum, mix_ePot_total
     
     ! Type 1 : Interacting spheres
     type(InteractingSpheres) :: type1_sph !< Monte-Carlo subroutines
@@ -67,6 +69,8 @@ implicit none
     
     call initialCondition(type1_sph, type2_sph, mix%getRmin(), unitReport)
     call mix%overlapTest(type1_sph%X, type2_sph%X)
+    mix_ePot_total = mix%ePot_total(type1_sph%X, type2_sph%X)
+    mix_ePot = mix_ePot_total
     
     call type1_sph%overlapTest()
     type1_obs%ePot = type1_sph%ePot_total()
@@ -79,13 +83,20 @@ implicit none
     call type2_sph%cols_to_cells(type1_sph%X)
     
     ePot_total = type1_sph%ePot_total() + type2_sph%ePot_total() + &
-        mix%ePot_total(type1_sph%X, type2_sph%X)
+        mix_ePot_total
     
 ! Middle --------------------------------------------------
 
-    write(*, *) "Beginning of cycles"    
+    open(unit=unitObsTherm, recl=4096, file="obsThmer.out", status='new', &
+        action='write')
     open(unit=unitObs, recl=4096, file="obs.out", status='new', &
         action='write')
+    open(unit=mix_unitObsTherm, recl=4096, file="mix_obsTherm.out", &
+        status='new', action='write')
+    open(unit=mix_unitObs, recl=4096, file="mix_obs.out", status='new', &
+        action='write')
+        
+    write(*, *) "Beginning of cycles"    
     
     call cpu_time(tIni)
     do iStep = 1, Ntherm + Nstep
@@ -127,7 +138,9 @@ implicit none
             write(type2_io%obsTherm, *) iStep, type2_obs%ePot, &
                 type2_obs%activExInv
                 
-            write(unitObs, *) iStep, type1_obs%ePot + type2_obs%ePot + mix_ePot
+            write(unitObsTherm, *) iStep, type1_obs%ePot + type2_obs%ePot + &
+                mix_ePot
+            write(mix_unitObsTherm, *) iStep, mix_ePot
         
         else
         
@@ -142,6 +155,7 @@ implicit none
                 type2_obs%activExInv                
             
             write(unitObs, *) iStep, type1_obs%ePot + type2_obs%ePot + mix_ePot
+            write(mix_unitObs, *) iStep, mix_ePot
 
             if (snap) then
                 call type1_sph%snapShot(type1_io%snapShots)
@@ -154,11 +168,17 @@ implicit none
     call cpu_time(tFin)
 
     write(*, *) "End of cycles"
+    close(unitObsTherm)
     close(unitObs)
+    close(mix_unitObsTherm)
+    close(mix_unitObs)
 
 ! End -----------------------------------------------------
 
     call mix%overlapTest(type1_sph%X, type2_sph%X)
+    mix_ePot_total = mix%ePot_total(type1_sph%X, type2_sph%X)
+    ePot_total = type1_sph%ePot_total() + type2_sph%ePot_total() + &
+        mix_ePot_total
 
     call type1_sph%overlapTest()
     call type1_sph%consistTest(type1_obs%ePot, type1_io%report)
@@ -172,7 +192,7 @@ implicit none
     
     ePot_mc = type1_obs%ePot + type2_obs%ePot + mix_ePot
     ePot_total = type1_sph%ePot_total() + type2_sph%ePot_total() + &
-        mix%ePot_total(type1_sph%X, type2_sph%X)
+        mix_ePot_total        
     ePot_mcSum = type1_obs%ePotSum + type2_obs%ePotSum + mix_ePotSum
     call results(ePot_mc, ePot_total, ePot_mcSum, tFin-tIni, unitReport)
     close(unitReport)
