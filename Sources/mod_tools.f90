@@ -38,7 +38,7 @@ contains
     
     !> Initial condition
     
-    subroutine initialCondition(type1_X, type1_rMin, type2_X, type2_rMin, 
+    subroutine initialCondition(type1_X, type1_rMin, type2_X, type2_rMin, &
         mix_rMin, unitReport)
     
         real(DP), dimension(:, :), intent(inout) :: type1_X, type2_X
@@ -57,7 +57,8 @@ contains
         
         select case (init)
             case ("rand")
-                call randomDeposition(sph_X, sph_rMin)
+                call randomDeposition(type1_X, type1_rMin, type2_X, &
+                    type2_rMin, mix_rMin)
                 write(unitReport, *) "    Random deposition"
             case default
                 write(*, *) "Enter the initial condition : "
@@ -69,14 +70,16 @@ contains
     
     !> Random deposition configuration
     
-    subroutine randomDeposition(type1_X, type1_rMin, type2_X, type2_rMin, 
+    subroutine randomDeposition(type1_X, type1_rMin, type2_X, type2_rMin, &
         mix_rMin)
     
         real(DP), dimension(:, :), intent(inout) :: type1_X, type2_X
         real(DP), intent(in) :: type1_rMin, type2_rMin, mix_rMin
     
-        integer :: iCol, NcolOK, iColOK
         integer :: type1_Ncol, type2_Ncol
+        integer :: iCol
+        integer :: NcolOK, iColOK
+        integer :: sub_NcolOK, sub_iColOK
         real(DP), dimension(Dim) :: xRand, xTest
         real(DP) :: rTest
         
@@ -126,7 +129,7 @@ contains
             do iCol = 1, type1_Ncol
                 rTest = dist(type1_X(:, iCol), xTest(:))
                 if (rTest >= mix_rMin) then
-                    iOK = iColOK + 1
+                    iColOK = iColOK + 1
                 else
                     exit
                 end if
@@ -157,8 +160,8 @@ contains
             if (iColOK == NcolOK) then    
             
                 sub_iColOK = 0
-                do sub_iCol = 1, sub_NcolOK
-                    rTest = dist(type1_X(:, sub_iCol), xTest(:))
+                do iCol = 1, sub_NcolOK
+                    rTest = dist(type2_X(:, iCol), xTest(:))
                     if (rTest >= type2_rMin) then
                         sub_iColOK = sub_iColOK + 1
                     else
@@ -174,14 +177,6 @@ contains
                 
             end if
             
-        end do
-        
-        do iCol = 1, type1_Ncol
-            type1_X(:, iCol) = type1_X(:, iCol) + type1_rMin/2._DP
-        end do
-        
-        do iCol = 1, type2_Ncol
-            type2_X(:, iCol) = type2_X(:, iCol) + type2_rMin/2._DP
         end do
     
     end subroutine randomDeposition
