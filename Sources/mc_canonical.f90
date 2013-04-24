@@ -70,6 +70,7 @@ implicit none
         action='write')
         
     call report(unitReport)
+    call init_random_seed(unitReport)
     
     call type1_sph%report(type1_io%report)
     call type1_sph%printInfo(type1_io%report)
@@ -78,8 +79,6 @@ implicit none
     call type2_sph%printInfo(type2_io%report)
     
     call mix%report(mix_unitReport)
-    
-    call init_random_seed(unitReport)
     
     ! Initial condition
     
