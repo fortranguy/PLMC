@@ -36,14 +36,14 @@ private
         procedure :: report => MixingPotential_report
 
         procedure ::getRmin => MixingPotential_getRmin
+        
+        procedure :: overlapTest => MixingPotential_overlapTest
 
         procedure :: ePot_init => MixingPotential_ePot_init
         procedure :: ePot => MixingPotential_ePot
         procedure :: ePot_neigh => MixingPotential_ePot_neigh
         procedure :: ePot_total => MixingPotential_ePot_total
         procedure :: consistTest => MixingPotential_consistTest
-        
-        procedure :: overlapTest => MixingPotential_overlapTest
 
     end type
 
@@ -106,8 +106,39 @@ contains
         getRmin = this%rMin
     
     end function MixingPotential_getRmin
+    
+    !> Overlapt test
+    
+    subroutine MixingPotential_overlapTest(this, type1_X, type2_X)
+    
+        class(MixingPotential), intent(in) :: this
+        real(DP), dimension(:, :), intent(in) :: type1_X, type2_X
+        
+        integer :: Ncol1, Ncol2
+        integer :: iCol1, iCol2
+        real(DP) :: r_mix
+        
+        Ncol1 = size(type1_X, 2)
+        Ncol2 = size(type2_X, 2)
+        
+        do iCol1 = 1, Ncol1
+            do iCol2 = 1, Ncol2
+                    
+                r_mix = dist(type1_X(:, iCol1), type2_X(:, iCol2))
+                if (r_mix < this%rMin) then
+                    write(*, *) this%name, " :    Overlap !", iCol1, iCol2
+                    write(*, * ) "    r_mix = ", r_mix
+                    stop
+                end if
 
-	!> MixingPotential energy
+            end do
+        end do
+
+        write(*, *) this%name, " :    Overlap test : OK !"
+    
+    end subroutine MixingPotential_overlapTest
+
+    !> MixingPotential energy
     !> Tabulation of Yukawa potential
     !> \f[ \epsilon \frac{e^{-\alpha (r-r_{min})}}{r} \f]
     
@@ -247,36 +278,5 @@ contains
             abs(ePot_total-ePot_mc)/ePot_total
     
     end subroutine MixingPotential_consistTest
-    
-    !> Overlapt test
-    
-    subroutine MixingPotential_overlapTest(this, type1_X, type2_X)
-    
-        class(MixingPotential), intent(in) :: this
-        real(DP), dimension(:, :), intent(in) :: type1_X, type2_X
-        
-        integer :: Ncol1, Ncol2
-        integer :: iCol1, iCol2
-        real(DP) :: r_mix
-        
-        Ncol1 = size(type1_X, 2)
-        Ncol2 = size(type2_X, 2)
-        
-        do iCol1 = 1, Ncol1
-            do iCol2 = 1, Ncol2
-                    
-                r_mix = dist(type1_X(:, iCol1), type2_X(:, iCol2))
-                if (r_mix < this%rMin) then
-                    write(*, *) this%name, " :    Overlap !", iCol1, iCol2
-                    write(*, * ) "    r_mix = ", r_mix
-                    stop
-                end if
-
-            end do
-        end do
-
-        write(*, *) this%name, " :    Overlap test : OK !"
-    
-    end subroutine MixingPotential_overlapTest
 
 end module class_mixingPotential
