@@ -54,8 +54,8 @@ implicit none
     call type2_io%open(type2_sph%getName())
     
     open(unit=unitReport, recl=4096, file="report.out", status='new', &
-    	action='write')
-	call report(unitReport)
+        action='write')
+    call report(unitReport)
     call type1_sph%report(type1_io%report)
     call type1_sph%printInfo(type1_io%report)
     call type2_sph%report(type2_io%report)
@@ -83,7 +83,9 @@ implicit none
     
 ! Middle --------------------------------------------------
 
-    write(*, *) "Beginning of cycles"
+    write(*, *) "Beginning of cycles"    
+    open(unit=unitObs, recl=4096, file="obs.out", status='new', &
+        action='write')
     
     call cpu_time(tIni)
     do iStep = 1, Ntherm + Nstep
@@ -152,6 +154,7 @@ implicit none
     call cpu_time(tFin)
 
     write(*, *) "End of cycles"
+    close(unitObs)
 
 ! End -----------------------------------------------------
 
