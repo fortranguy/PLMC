@@ -15,6 +15,7 @@ contains
     function dist(X1, X2)
     
         real(DP), dimension(Dim), intent(in) :: X1, X2
+        
         real(DP), dimension(Dim) :: DeltaX
         real(DP) :: dist
         
