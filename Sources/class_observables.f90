@@ -19,8 +19,8 @@ private
         real(DP) :: rejRateSum
         
         ! Potential energy
-        real(DP) :: ePot_total
-        real(DP) :: ePot_totalSum
+        real(DP) :: ePot
+        real(DP) :: ePotSum
         
         ! Inverse of activity
         real(DP) :: activExInv
@@ -46,7 +46,7 @@ contains
         this%Nrej = 0
         this%rejRateSum = 0._DP
         
-        this%ePot_totalSum = 0._DP        
+        this%ePotSum = 0._DP        
         this%activExInvSum = 0._DP
         
     end subroutine Observables_init
@@ -55,7 +55,7 @@ contains
     
         class(Observables), intent(inout) :: this
     
-        this%ePot_totalSum = this%ePot_totalSum + this%ePot_total
+        this%ePotSum = this%ePotSum + this%ePot
         this%activExInvSum = this%activExInvSum + this%activExInv
             
     end subroutine Observables_addPhysical
@@ -84,9 +84,9 @@ contains
         write(unitReport, *) "Results :"
         
         write(unitReport, *) "    average energy = ", &
-            this%ePot_totalSum/realNstep
+            this%ePotSum/realNstep
         write(unitReport, *) "    average energy per particule = ", &
-            this%ePot_totalSum/realNstep/real(inter_Ncol, DP)
+            this%ePotSum/realNstep/real(inter_Ncol, DP)
             
         potChiId = -Tstar*log( product(Lsize)/real(inter_Ncol+1,DP) )
         write(unitReport, *) "    ideal chemical potential = ", potChiId

@@ -40,7 +40,7 @@ private
               
         !> Potential energy
         procedure :: ePot_init => InteractingSpheres_ePot_init
-        procedure :: ePot => InteractingSpheres_ePot
+        procedure :: ePot_pair => InteractingSpheres_ePot_pair
         procedure :: ePot_neigh => InteractingSpheres_ePot_neigh
         procedure :: ePot_total => InteractingSpheres_ePot_total
         procedure :: consistTest => InteractingSpheres_consistTest
@@ -153,28 +153,28 @@ contains
 
     end subroutine InteractingSpheres_ePot_init
 
-    function InteractingSpheres_ePot(this, r) result(ePot)
+    function InteractingSpheres_ePot_pair(this, r) result(ePot_pair)
         
         class(InteractingSpheres), intent(in) :: this
         real(DP), intent(in) :: r
         
         integer :: i
-        real(DP) :: r_i, ePot
+        real(DP) :: r_i, ePot_pair
        
         if (r < this%rCut) then
        
             i = int(r/this%dr)
             r_i = real(i, DP)*this%dr
-            ePot = this%ePot_tab(i) + (r-r_i)/this%dr * &
+            ePot_pair = this%ePot_tab(i) + (r-r_i)/this%dr * &
                 (this%ePot_tab(i+1)-this%ePot_tab(i))
            
         else
        
-            ePot = 0._DP
+            ePot_pair = 0._DP
            
         end if
         
-    end function InteractingSpheres_ePot
+    end function InteractingSpheres_ePot_pair
     
     subroutine InteractingSpheres_ePot_neigh(this, iCol, xCol, iCell, overlap, &
     	energ)
@@ -210,7 +210,7 @@ contains
                         overlap = .true.
                         return
                     end if
-                    energ = energ + this%ePot(r)
+                    energ = energ + this%ePot_pair(r)
        
                 end if
                 
@@ -356,7 +356,7 @@ contains
                 if (iCol /= jCol) then
                 
                     r_ij = dist(this%X(:, iCol), this%X(:, jCol))
-                    ePot_total = ePot_total + this%ePot(r_ij)
+                    ePot_total = ePot_total + this%ePot_pair(r_ij)
                     
                 end if
             end do
@@ -368,20 +368,20 @@ contains
     
     !> Consistency test 
     
-    subroutine InteractingSpheres_consistTest(this, ePot_total_mc, unitReport)
+    subroutine InteractingSpheres_consistTest(this, ePot_mc, unitReport)
     
         class(InteractingSpheres), intent(in) :: this
-        real(DP), intent(in) :: ePot_total_mc
+        real(DP), intent(in) :: ePot_mc
         integer, intent(in) :: unitReport
         
         real(DP) :: ePot_total
     
         ePot_total = this%ePot_total()
         write(unitReport, *) "Consistency test:"
-        write(unitReport, *) "    ePot_total_mc = ", ePot_total_mc
-        write(unitReport, *) "    ePot_total_final = ", ePot_total
+        write(unitReport, *) "    ePot_mc = ", ePot_mc
+        write(unitReport, *) "    ePot_final = ", ePot_total
         write(unitReport, *) "    relative difference = ", &
-            abs(ePot_total-ePot_total_mc)/ePot_total
+            abs(ePot_total-ePot_mc)/ePot_total
     
     end subroutine InteractingSpheres_consistTest
 

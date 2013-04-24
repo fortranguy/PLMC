@@ -25,7 +25,7 @@ implicit none
     
     ! Mixing between 2 types
     type(MixingPotential) :: mix
-    real(DP) :: mix_ePot_total
+    real(DP) :: mix_ePot, mix_ePotSum
     
     ! Type 1 : Interacting spheres
     type(InteractingSpheres) :: type1_sph !< Monte-Carlo subroutines
@@ -67,12 +67,12 @@ implicit none
     call mix%overlapTest(type1_sph%X, type2_sph%X)
     
     call type1_sph%overlapTest()
-    type1_obs%ePot_total = type1_sph%ePot_total()
+    type1_obs%ePot = type1_sph%ePot_total()
     call type1_sph%snapShot(type1_io%snapIni)
     call type1_sph%cols_to_cells(type2_sph%X)
     
     call type2_sph%overlapTest()
-    type2_obs%ePot_total = 0._DP
+    type2_obs%ePot = 0._DP
     call type2_sph%snapShot(type2_io%snapIni)
     call type2_sph%cols_to_cells(type1_sph%X)
     
@@ -88,8 +88,8 @@ implicit none
             call random_number(rand)
             iColRand = int(rand*real(Ncol, DP)) + 1            
             if (iColRand <= type1_sph%getNcol()) then
-                call type1_sph%move(mix, type2_sph, type1_obs%ePot_total, &
-                    mix_ePot_total, type1_obs%Nrej)                    
+                call type1_sph%move(mix, type2_sph, type1_obs%ePot, &
+                    mix_ePot, type1_obs%Nrej)                    
                 type1_obs%Nmove = type1_obs%Nmove + 1
             else
                 call type2_sph%move(mix, type1_sph%X, type2_obs%Nrej)
@@ -106,31 +106,32 @@ implicit none
         
         if (iStep <= Ntherm) then
         
-            ePotTotal = type1_obs%ePot_total + type2_obs%ePot_total + mix_ePot_total
-            write(unitObs, *) iStep, 
+            write(unitObs, *) iStep, type1_obs%ePot + type2_obs%ePot + mix_ePot
         
             call type1_sph%adaptDx(iStep, type1_obs%rejRateSum, &
                 type1_io%report)
             write(type1_io%dx, *) iStep, type1_sph%getDx(), &
                 type1_obs%rejRateSum/real(iStep, DP)
-            write(type1_io%obsTherm, *) iStep, type1_obs%ePot_total, &
+            write(type1_io%obsTherm, *) iStep, type1_obs%ePot, &
                 type1_obs%activExInv
         
             call type2_sph%adaptDx(iStep, type2_obs%rejRateSum, &
                 type2_io%report)
             write(type2_io%dx, *) iStep, type2_sph%getDx(), &
                 type2_obs%rejRateSum/real(iStep, DP)
-            write(type2_io%obsTherm, *) iStep, type2_obs%ePot_total, &
+            write(type2_io%obsTherm, *) iStep, type2_obs%ePot, &
                 type2_obs%activExInv
         
         else
         
+            mix_ePotSum = mix_ePotSum + mix_ePot
+        
             call type1_obs%addPhysical()
-            write(type1_io%obs, *) iStep, type1_obs%ePot_total, &
+            write(type1_io%obs, *) iStep, type1_obs%ePot, &
                 type1_obs%activExInv
         
             call type2_obs%addPhysical()
-            write(type2_io%obs, *) iStep, type2_obs%ePot_total, &
+            write(type2_io%obs, *) iStep, type2_obs%ePot, &
                 type2_obs%activExInv
 
             if (snap) then
@@ -150,7 +151,7 @@ implicit none
     call mix%overlapTest(type1_sph%X, type2_sph%X)
 
     call type1_sph%overlapTest()
-    call type1_sph%consistTest(type1_obs%ePot_total, type1_io%report)
+    call type1_sph%consistTest(type1_obs%ePot, type1_io%report)
     call type1_sph%snapShot(type1_io%snapFin)
     call type1_obs%results(type1_io%report)
 
@@ -161,12 +162,12 @@ implicit none
     call results(tFin-tIni, unitReport)    
     close(unitReport)
     
+    call mix%destroy()
+    
     call type1_sph%destroy()
     call type1_io%close()
     
     call type2_sph%destroy()
     call type2_io%close()
-    
-    call mix%destroy()
     
 end program mc_canonical
