@@ -8,8 +8,8 @@ use data_particles
 use data_potentiel
 use data_mc
 use data_neighbours
-use class_neighbours
 use mod_physics
+use class_neighbours
 use class_mixingPotential
 use class_spheres
 
