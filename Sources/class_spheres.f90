@@ -35,7 +35,7 @@ private
         
         ! Neighbours (cell/grid scheme)   
         type(Neighbours) :: same !< same kind
-        type(Neighbours) :: other !< other kind
+        type(Neighbours) :: mix !< other kind
         
     contains
     
@@ -175,7 +175,7 @@ contains
         call this%same%all_col_to_cell(this%Ncol, this%X)
         
         other_Ncol = size(other_X, 2)
-        call this%other%all_col_to_cell(other_Ncol, other_X)
+        call this%mix%all_col_to_cell(other_Ncol, other_X)
     
     end subroutine Spheres_cols_to_cells
     

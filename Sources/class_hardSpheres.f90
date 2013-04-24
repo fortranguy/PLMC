@@ -65,9 +65,9 @@ contains
         call this%same%alloc_cells()
         call this%same%ini_cell_neighs()
         ! Neighbours : other kind
-        call this%other%construct(mix_rCut)
-        call this%other%alloc_cells()
-        call this%other%ini_cell_neighs()
+        call this%mix%construct(mix_rCut)
+        call this%mix%alloc_cells()
+        call this%mix%ini_cell_neighs()
     
     end subroutine HardSpheres_construct
     
@@ -80,7 +80,7 @@ contains
         end if
         
         call this%same%destroy()
-        call this%other%destroy()
+        call this%mix%destroy()
     
     end subroutine HardSpheres_destroy
     
@@ -173,8 +173,8 @@ contains
         
         if (.not. overlap) then
         
-            other_iCellNew = this%other%position_to_cell(xNew)
-            call mix%ePot_neigh(xNew, other_iCellNew, this%other, other_X, &
+            other_iCellNew = this%mix%position_to_cell(xNew)
+            call mix%ePot_neigh(xNew, other_iCellNew, this%mix, other_X, &
                 overlap, other_eNew)
         
             if (.not. overlap) then
@@ -183,9 +183,9 @@ contains
                 call this%ePot_neigh(iOld, this%X(:, iOld), same_iCellOld, &
                     overlap)
                     
-                other_iCellOld = this%other%position_to_cell(this%X(:, iOld))
+                other_iCellOld = this%mix%position_to_cell(this%X(:, iOld))
                 call mix%ePot_neigh(this%X(:, iOld), other_iCellOld, &
-                    this%other, other_X, overlap, other_eOld)
+                    this%mix, other_X, overlap, other_eOld)
             
                 this%X(:, iOld) = xNew(:)
                     

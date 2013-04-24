@@ -86,9 +86,9 @@ contains
         call this%same%alloc_cells()
         call this%same%ini_cell_neighs()
         ! Neighbours : other kind
-        call this%other%construct(mix_rCut)
-        call this%other%alloc_cells()
-        call this%other%ini_cell_neighs()
+        call this%mix%construct(mix_rCut)
+        call this%mix%alloc_cells()
+        call this%mix%ini_cell_neighs()
     
     end subroutine InteractingSpheres_construct
     
@@ -105,7 +105,7 @@ contains
         endif
         
         call this%same%destroy()
-        call this%other%destroy()
+        call this%mix%destroy()
     
     end subroutine InteractingSpheres_destroy
     
@@ -226,12 +226,13 @@ contains
     
     !> Particle move
     
-    subroutine InteractingSpheres_move(this, ePot_total, mix, other_X, Nrej)
+    subroutine InteractingSpheres_move(this, mixPot, other, Nrej, ePot, &
+        ePot_total)
     
         class(InteractingSpheres), intent(inout) :: this
-        real(DP), intent(inout) :: ePot_total
-        class(MixingPotential), intent(in) :: mix
-        real(DP), dimension(:, :) :: other_X
+        class(MixingPotential), intent(in) :: mixPot
+        class(InteractingSpheres), intent(inout) :: other
+        real(DP), intent(inout) :: ePot, ePot_total
         integer, intent(inout) :: Nrej
         
         logical :: overlap
@@ -239,10 +240,11 @@ contains
         real(DP) :: rand
         real(DP), dimension(Dim) :: xRand, xNew
         integer :: same_iCellOld, same_iCellNew
-        integer :: other_iCellOld, other_iCellNew
-        real(DP) :: dEn
+        integer :: mix_iCellOld, mix_iCellNew
+        real(DP) :: dEpot
+        real(DP) :: same_dEpot, mix_dEpot
         real(DP) :: same_eNew, same_eOld
-        real(DP) :: other_eNew, other_eOld
+        real(DP) :: mix_eNew, mix_eOld
         
         call random_number(rand)
         iOld = int(rand*this%Ncol) + 1
@@ -255,26 +257,33 @@ contains
         
         if (.not. overlap) then
         
-            other_iCellNew = this%other%position_to_cell(xNew)
-            call mix%ePot_neigh(xNew, other_iCellNew, this%other, other_X, &
-                overlap, other_eNew)
+            mix_iCellNew = this%mix%position_to_cell(xNew)
+            call mix%ePot_neigh(xNew, mix_iCellNew, this%mix, other%X, &
+                overlap, mix_eNew)
                         
             if (.not. overlap) then
     
                 same_iCellOld = this%same%position_to_cell(this%X(:, iOld))
                 call this%ePot_neigh(iOld, this%X(:, iOld), same_iCellOld, &
-                    overlap, same_eOld)
+                    overlap, same_eOld)                    
+                same_dEpot = same_eNew - same_eOld
                     
-                other_iCellOld = this%other%position_to_cell(this%X(:, iOld))
-                call mix%ePot_neigh(this%X(:, iOld), other_iCellOld, &
-                    this%other, other_X, overlap, other_eOld)
+                mix_iCellOld = this%mix%position_to_cell(this%X(:, iOld))
+                call mix%ePot_neigh(this%X(:, iOld), mix_iCellOld, &
+                    this%mix, other%X, overlap, mix_eOld)                
+                mix_dEpot = mix_eNew - mix_eOld
                 
-                dEn = same_eNew - same_eOld
+                dEpot = same_dEpot + mix_dEpot
             
                 call random_number(rand)
-                if ( rand < exp(-dEn/Tstar) ) then
+                if ( rand < exp(-dEpot/Tstar) ) then
                     this%X(:, iOld) = xNew(:)
                     ePot_total = ePot_total + dEn
+                    
+                    if ( same_iCellOld /= same_iCellNew ) then                
+                        call this%same%remove_cell_col(iOld, same_iCellOld)
+                        call this%same%add_cell_col(iOld, same_iCellNew)
+                    end if
                     
                     if ( same_iCellOld /= same_iCellNew ) then                
                         call this%same%remove_cell_col(iOld, same_iCellOld)
