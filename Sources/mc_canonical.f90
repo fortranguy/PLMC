@@ -23,6 +23,9 @@ implicit none
     
     integer, parameter :: unitReport = 10
     
+    ! Mixing between 2 types
+    type(MixingPotential) :: mix
+    
     ! Type 1 : Interacting spheres
     type(InteractingSpheres) :: type1_sph !< Monte-Carlo subroutines
     type(Observables) :: type1_obs !< e.g. Energy
@@ -32,9 +35,6 @@ implicit none
     type(HardSpheres) :: type2_sph
     type(Observables) :: type2_obs
     type(Units) :: type2_io
-    
-    ! Mixing between 2 types
-    type(MixingPotential) :: mix
     
     write(*, *) "Monte-Carlo - Canonical : Volume =", product(Lsize)
 
