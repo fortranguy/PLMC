@@ -74,116 +74,51 @@ contains
     
         real(DP), dimension(:, :), intent(inout) :: type1_X, type2_X
         real(DP), intent(in) :: type1_rMin, type2_rMin, mix_rMin
-    
+        
         integer :: type1_Ncol, type2_Ncol
-        integer :: iCol
-        integer :: NcolOK, iColOK
-        integer :: sub_NcolOK, sub_iColOK
-        real(DP), dimension(Dim) :: xRand, xTest
+        integer :: iCol, iColTest
+        real(DP), dimension(Dim) :: xRand
         real(DP) :: rTest
         
         write(*, *) "Random deposition"
         
         ! Type 1
-        
-        !   First
-        call random_number(xRand)
-        type1_X(:, 1) = xRand*Lsize(:)
-        NcolOK = 1
-        
-        !   Others
         type1_Ncol = size(type1_X, 2)
-        iColOK = 0
-        do while (NcolOK < type1_Ncol)
+        do iCol = 1, type1_Ncol
         
-            call random_number(xRand)
-            xTest(:) = xRand(:)*Lsize(:)
+7101        call random_number(xRand)
+            type1_X(:, iCol) = xRand*Lsize(:)
             
-            do iCol = 1, NcolOK
-                rTest = dist(type1_X(:, iCol), xTest(:))
-                if (rTest >= type1_rMin) then
-                    iColOK = iColOK + 1
-                else
-                    iColOK = 0
-                    exit
-                end if
+            do iColTest = 1, iCol-1            
+                rTest = dist(type1_X(:, iColTest), type1_X(:, iCol))
+                if (rTest < type1_rMin) then
+                    goto 7101
+                end if            
             end do
-            
-            if (iColOK == NcolOK) then
-                NcolOK = NcolOK + 1
-                type1_X(:, NcolOK) = xTest(:)
-                write(*, *) "    Type 1 particle n°", NcolOK, "OK"
-            end if
-            
+        
         end do
         
         ! Type 2
-        
-        !   First
-        iColOK = 0
-        do while (iColOK == type1_Ncol)
-        
-            call random_number(xRand)
-            xTest(:) = xRand*Lsize(:)
-            
-            do iCol = 1, type1_Ncol
-                rTest = dist(type1_X(:, iCol), xTest(:))
-                if (rTest >= mix_rMin) then
-                    iColOK = iColOK + 1
-                else
-                    iColOK = 0
-                    exit
-                end if
-            end do
-        
-        end do
-        type2_X(:, 1) = xTest(:)        
-        NcolOK = 1
-        sub_NcolOK = 1
-        
-        !   Others
         type2_Ncol = size(type2_X, 2)
-        iColOK = 0
-        sub_iColOK = 0
-        do while (sub_NcolOK < type2_Ncol)
+        do iCol = 1, type2_Ncol
         
-            call random_number(xRand)
-            xTest(:) = xRand(:)*Lsize(:)
+7102        call random_number(xRand)
+            type2_X(:, iCol) = xRand*Lsize(:)
             
-            do iCol = 1, NcolOK
-                rTest = dist(type1_X(:, iCol), xTest(:))
-                if (rTest >= mix_rMin) then
-                    iColOK = iColOK + 1
-                else
-                    iColOK = 0
-                    exit
-                end if
+            do iColTest = 1, type1_Ncol
+                rTest = dist(type1_X(:, iColTest), type2_X(:, iCol))
+                if (rTest < mix_rMin) then
+                    goto 7102
+                end if            
             end do
             
-            if (iColOK == NcolOK) then
-            
-                NcolOK = NcolOK + 1
-            
-                do iCol = 1, sub_NcolOK
-                    rTest = dist(type2_X(:, iCol), xTest(:))
-                    if (rTest >= type2_rMin) then
-                        sub_iColOK = sub_iColOK + 1
-                    else
-                        NcolOK = 1
-                        iColOK = 0
-                        sub_iColOK = 0
-                        exit
-                    end if
-                end do
-                
-                if (sub_iColOK == sub_NcolOK) then            
-                    sub_NcolOK = sub_NcolOK + 1
-                    type2_X(:, sub_NcolOK) = xTest(:)
-                    write(*, *) "    Type 2 particle n°", sub_NcolOK, "OK"                    
-                end if
-                
-            end if
-            
+            do iColTest = 1, iCol-1            
+                rTest = dist(type2_X(:, iColTest), type2_X(:, iCol))
+                if (rTest < type2_rMin) then
+                    goto 7102
+                end if            
+            end do
+        
         end do
     
     end subroutine randomDeposition
