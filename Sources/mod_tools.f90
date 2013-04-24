@@ -130,6 +130,7 @@ contains
                 if (rTest >= mix_rMin) then
                     iColOK = iColOK + 1
                 else
+                    iColOK = 0
                     exit
                 end if
             end do
@@ -156,7 +157,9 @@ contains
                 end if
             end do
             
-            if (iColOK == NcolOK) then    
+            if (iColOK == NcolOK) then
+            
+                NcolOK = NcolOK + 1
             
                 sub_iColOK = 0
                 do iCol = 1, sub_NcolOK
@@ -164,6 +167,7 @@ contains
                     if (rTest >= type2_rMin) then
                         sub_iColOK = sub_iColOK + 1
                     else
+                        NcolOK = 1
                         exit
                     end if
                 end do
