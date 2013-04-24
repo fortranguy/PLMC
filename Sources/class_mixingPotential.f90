@@ -13,49 +13,52 @@ implicit none
 
 private
 
-	type, public :: MixingPotential
-	
-		private
-		
-		character(len=5) :: name
-		
-		real(DP) :: rMin !< minimum distance between two particles
-		real(DP) :: rCut !< short-range cut
-		real(DP) :: dr !< discretisation step
+    type, public :: MixingPotential
+
+        private
+        
+        character(len=5) :: name
+        
+        real(DP) :: rMin !< minimum distance between two particles
+        real(DP) :: rCut !< short-range cut
+        real(DP) :: dr !< discretisation step
         integer :: iMin !< minimum index of tabulation : minimum distance
         integer :: iCut !< maximum index of tabulation : until potential cut
         real(DP) :: epsilon !< factor in Yukawa
         real(DP) :: alpha !< coefficient in Yukawa
         real(DP), dimension(:), allocatable :: ePot_tab !< tabulation
-	
-	contains
-	
-		procedure :: construct => MixingPotential_construct
-		procedure :: destroy => MixingPotential_destroy
-		
-		procedure ::getRmin => MixingPotential_getRmin
-	
-		procedure :: ePot_init => MixingPotential_ePot_init
+
+    contains
+
+        procedure :: construct => MixingPotential_construct
+        procedure :: destroy => MixingPotential_destroy
+
+        procedure :: report => MixingPotential_report
+
+        procedure ::getRmin => MixingPotential_getRmin
+
+        procedure :: ePot_init => MixingPotential_ePot_init
         procedure :: ePot => MixingPotential_ePot
         procedure :: ePot_neigh => MixingPotential_ePot_neigh
         procedure :: ePot_total => MixingPotential_ePot_total
+        procedure :: consistTest => MixingPotential_consistTest
         
         procedure :: overlapTest => MixingPotential_overlapTest
-	
-	end type
-	
+
+    end type
+
 contains
 
-	subroutine MixingPotential_construct(this)
-	
-		class(MixingPotential), intent(out) :: this
-		
-		this%name = "[mix]"
-		
-		! Particles
+    subroutine MixingPotential_construct(this)
+
+        class(MixingPotential), intent(out) :: this
+        
+        this%name = "[mix]"
+        
+        ! Particles
         this%rMin = mix_rMin
-		
-		! MixingPotential
+        
+        ! MixingPotential
         this%rCut = mix_rCut
         this%dr = mix_dr
         this%iMin = int(this%rMin/this%dr)
@@ -76,6 +79,21 @@ contains
         end if
     
     end subroutine MixingPotential_destroy
+    
+    !> Report
+    
+    subroutine MixingPotential_report(this, unitReport)
+    
+        class(MixingPotential), intent(in) :: this
+        integer, intent(in) :: unitReport    
+        
+        write(unitReport, *) "Simulation MC_C :"
+        write(unitReport, *) "    epsilon = ", this%epsilon
+        write(unitReport, *) "    alpha = ", this%alpha
+        write(unitReport, *) "    rCut = ", this%rCut
+        write(unitReport, *) "    dr = ", this%dr
+        
+    end subroutine MixingPotential_report
     
     !> Accessor : rMin
     
@@ -212,6 +230,23 @@ contains
         ePot_total = 0.5_DP*ePot_total
     
     end function MixingPotential_ePot_total
+    
+    !> Consistency test 
+    
+    subroutine MixingPotential_consistTest(this, ePot_mc, ePot_total, &
+        unitReport)
+    
+        class(MixingPotential), intent(in) :: this
+        real(DP), intent(in) :: ePot_mc, ePot_total
+        integer, intent(in) :: unitReport
+
+        write(unitReport, *) "Consistency test:"
+        write(unitReport, *) "    ePot_mc = ", ePot_mc
+        write(unitReport, *) "    ePot_final = ", ePot_total
+        write(unitReport, *) "    relative difference = ", &
+            abs(ePot_total-ePot_mc)/ePot_total
+    
+    end subroutine MixingPotential_consistTest
     
     !> Overlapt test
     

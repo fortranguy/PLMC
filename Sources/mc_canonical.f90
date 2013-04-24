@@ -23,9 +23,9 @@ implicit none
     
     real(DP) :: ePot_mc, ePot_mcSum, ePot_total
     
-    integer, parameter :: unitReport = 10
-    integer, parameter :: unitObsTherm = 11, unitObs = 12
-    integer, parameter :: mix_unitObsTherm = 13, mix_unitObs = 14
+    integer, parameter :: unitReport = 10, mix_unitReport = 11
+    integer, parameter :: unitObsTherm = 12, unitObs = 13
+    integer, parameter :: mix_unitObsTherm = 14, mix_unitObs = 15
     
     ! Mixing between 2 types
     type(MixingPotential) :: mix
@@ -58,6 +58,10 @@ implicit none
     open(unit=unitReport, recl=4096, file="report.out", status='new', &
         action='write')
     call report(unitReport)
+    open(unit=mix_unitReport, recl=4096, file="mix_report.out", status='new', &
+        action='write')
+    call mix%report(mix_unitReport)
+    
     call type1_sph%report(type1_io%report)
     call type1_sph%printInfo(type1_io%report)
     call type2_sph%report(type2_io%report)
@@ -177,6 +181,7 @@ implicit none
 
     call mix%overlapTest(type1_sph%X, type2_sph%X)
     mix_ePot_total = mix%ePot_total(type1_sph%X, type2_sph%X)
+    call mix%consistTest(mix_ePot, mix_ePot_total, mix_unitReport)
 
     call type1_sph%overlapTest()
     call type1_sph%consistTest(type1_obs%ePot, type1_io%report)
@@ -193,7 +198,9 @@ implicit none
         mix_ePot_total        
     ePot_mcSum = type1_obs%ePotSum + type2_obs%ePotSum + mix_ePotSum
     call results(ePot_mc, ePot_total, ePot_mcSum, tFin-tIni, unitReport)
+    
     close(unitReport)
+    close(mix_unitReport)
     
     call mix%destroy()
     
