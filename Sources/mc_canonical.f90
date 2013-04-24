@@ -21,12 +21,11 @@ implicit none
     real(DP) :: rand
     real(DP) :: tIni, tFin
     
-    real(DP) :: ePot_total
-    
-    integer, parameter :: unitReport = 10
+    integer, parameter :: unitReport = 10, unitObs = 11
     
     ! Mixing between 2 types
-    type(MixingPotential) :: mixPot
+    type(MixingPotential) :: mix
+    real(DP) :: mix_ePot_total
     
     ! Type 1 : Interacting spheres
     type(InteractingSpheres) :: type1_sph !< Monte-Carlo subroutines
@@ -42,7 +41,7 @@ implicit none
 
     ! Initialisation
     
-    call mixPot%construct()
+    call mix%construct()
     
     call type1_sph%construct()
     call type1_obs%init()
@@ -64,8 +63,8 @@ implicit none
     
     ! Initial condition
     
-    call initialCondition(type1_sph, type2_sph, mixPot%getRmin(), unitReport)
-    call mixPot%overlapTest(type1_sph%X, type2_sph%X)
+    call initialCondition(type1_sph, type2_sph, mix%getRmin(), unitReport)
+    call mix%overlapTest(type1_sph%X, type2_sph%X)
     
     call type1_sph%overlapTest()
     type1_obs%ePot_total = type1_sph%ePot_total()
@@ -89,12 +88,11 @@ implicit none
             call random_number(rand)
             iColRand = int(rand*real(Ncol, DP)) + 1            
             if (iColRand <= type1_sph%getNcol()) then
-                call type1_sph%move(mixPot, type2_sph, type1_obs%ePot_total, &
-                    ePot_total, type1_obs%Nrej)
-                    
+                call type1_sph%move(mix, type2_sph, type1_obs%ePot_total, &
+                    mix_ePot_total, type1_obs%Nrej)                    
                 type1_obs%Nmove = type1_obs%Nmove + 1
             else
-                call type2_sph%move(mixPot, type1_sph%X, type2_obs%Nrej)
+                call type2_sph%move(mix, type1_sph%X, type2_obs%Nrej)
                 type2_obs%Nmove = type2_obs%Nmove + 1
             end if            
             
@@ -107,6 +105,9 @@ implicit none
         call type2_obs%addReject()
         
         if (iStep <= Ntherm) then
+        
+            ePotTotal = type1_obs%ePot_total + type2_obs%ePot_total + mix_ePot_total
+            write(unitObs, *) iStep, 
         
             call type1_sph%adaptDx(iStep, type1_obs%rejRateSum, &
                 type1_io%report)
@@ -146,7 +147,7 @@ implicit none
 
 ! End -----------------------------------------------------
 
-    call mixPot%overlapTest(type1_sph%X, type2_sph%X)
+    call mix%overlapTest(type1_sph%X, type2_sph%X)
 
     call type1_sph%overlapTest()
     call type1_sph%consistTest(type1_obs%ePot_total, type1_io%report)
@@ -166,6 +167,6 @@ implicit none
     call type2_sph%destroy()
     call type2_io%close()
     
-    call mixPot%destroy()
+    call mix%destroy()
     
 end program mc_canonical

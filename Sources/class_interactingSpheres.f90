@@ -226,13 +226,13 @@ contains
     
     !> Particle move
     
-    subroutine InteractingSpheres_move(this, mixPot, other, same_ePot, &
-        ePot_total, Nrej)
+    subroutine InteractingSpheres_move(this, mix, other, same_ePot, &
+        mix_ePot, Nrej)
     
         class(InteractingSpheres), intent(inout) :: this
-        class(MixingPotential), intent(in) :: mixPot
+        class(MixingPotential), intent(in) :: mix
         class(Spheres), intent(inout) :: other
-        real(DP), intent(inout) :: same_ePot, ePot_total
+        real(DP), intent(inout) :: same_ePot, mix_ePot
         integer, intent(inout) :: Nrej
         
         logical :: overlap
@@ -258,7 +258,7 @@ contains
         if (.not. overlap) then
         
             mix_iCellNew = this%mix%position_to_cell(xNew)
-            call mixPot%ePot_neigh(xNew, mix_iCellNew, this%mix, other%X, &
+            call mix%ePot_neigh(xNew, mix_iCellNew, this%mix, other%X, &
                 overlap, mix_eNew)
                         
             if (.not. overlap) then
@@ -269,7 +269,7 @@ contains
                 same_dEpot = same_eNew - same_eOld
                     
                 mix_iCellOld = this%mix%position_to_cell(this%X(:, iOld))
-                call mixPot%ePot_neigh(this%X(:, iOld), mix_iCellOld, &
+                call mix%ePot_neigh(this%X(:, iOld), mix_iCellOld, &
                     this%mix, other%X, overlap, mix_eOld)                
                 mix_dEpot = mix_eNew - mix_eOld
                 
@@ -277,8 +277,9 @@ contains
             
                 call random_number(rand)
                 if ( rand < exp(-dEpot/Tstar) ) then
+                
                     this%X(:, iOld) = xNew(:)
-                    ePot_total = ePot_total + dEpot
+                    mix_ePot = mix_ePot + mix_dEpot
                     same_ePot = same_ePot + same_dEpot
                     
                     if ( same_iCellOld /= same_iCellNew ) then                
@@ -297,13 +298,10 @@ contains
          
             else
                 Nrej = Nrej + 1                
-            end if
+            end if            
             
-            
-        else
-        
-            Nrej = Nrej + 1
-            
+        else        
+            Nrej = Nrej + 1            
         end if
     
     end subroutine InteractingSpheres_move
