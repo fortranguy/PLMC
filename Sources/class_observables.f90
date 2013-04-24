@@ -73,10 +73,9 @@ contains
     
     !> Results
     
-    subroutine Observables_results(this, duration, unitReport)
+    subroutine Observables_results(this, unitReport)
 
         class(Observables), intent(inout) :: this
-        real(DP), intent(in) :: duration
         integer, intent(in) :: unitReport
         
         real(DP) :: realNstep = real(Nstep, DP)
@@ -98,7 +97,6 @@ contains
         
         write(unitReport, *) "    Rejection rate = ", &
             this%rejRateSum/real(Nstep+Ntherm, DP)
-        write(unitReport, *) "    duration =", duration/60._DP, "min"        
     
     end subroutine Observables_results
 

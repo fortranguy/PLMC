@@ -136,4 +136,14 @@ contains
     
     end subroutine report
     
+    subroutine results(duration, unitReport)
+    
+        integer, intent(in) :: unitReport
+        real(DP), intent(in) :: duration
+        
+        write(unitReport, *) "Results :"
+        write(unitReport, *) "    duration =", duration/60._DP, "min"
+    
+    end subroutine results
+    
 end module mod_tools

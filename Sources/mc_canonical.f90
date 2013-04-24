@@ -36,7 +36,7 @@ implicit none
     type(Observables) :: type2_obs
     type(Units) :: type2_io
     
-    write(*, *) "Monte-Carlo - Canonical : Volume =", product(Lsize)
+    write(*, *) "Monte-Carlo Mix - Canonical : Volume =", product(Lsize)
 
     ! Initialisation
     
@@ -148,12 +148,13 @@ implicit none
     call type1_sph%overlapTest()
     call type1_sph%consistTest(type1_obs%ePot_total, type1_io%report)
     call type1_sph%snapShot(type1_io%snapFin)
-    call type1_obs%results(tFin-tIni, type1_io%report)
+    call type1_obs%results(type1_io%report)
 
     call type2_sph%overlapTest()
     call type2_sph%snapShot(type2_io%snapFin)
-    call type2_obs%results(tFin-tIni, type2_io%report)
-
+    call type2_obs%results(type2_io%report)
+    
+    call results(tFin-tIni, unitReport)    
     close(unitReport)
     
     call type1_sph%destroy()
