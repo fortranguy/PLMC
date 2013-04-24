@@ -46,6 +46,7 @@ implicit none
     ! Initialisation
     
     call mix%construct()
+    mix_ePotSum = 0._DP
     
     call type1_sph%construct()
     call type1_obs%init()
@@ -200,9 +201,9 @@ implicit none
     call results(ePot_mc, ePot_total, ePot_mcSum, tFin-tIni, unitReport)
     
     close(unitReport)
-    close(mix_unitReport)
     
     call mix%destroy()
+    close(mix_unitReport)
     
     call type1_sph%destroy()
     call type1_io%close()
