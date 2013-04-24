@@ -177,8 +177,6 @@ implicit none
 
     call mix%overlapTest(type1_sph%X, type2_sph%X)
     mix_ePot_total = mix%ePot_total(type1_sph%X, type2_sph%X)
-    ePot_total = type1_sph%ePot_total() + type2_sph%ePot_total() + &
-        mix_ePot_total
 
     call type1_sph%overlapTest()
     call type1_sph%consistTest(type1_obs%ePot, type1_io%report)
