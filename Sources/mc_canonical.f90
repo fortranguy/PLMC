@@ -91,7 +91,7 @@ implicit none
                     type1_obs%Nrej)
                 type1_obs%Nmove = type1_obs%Nmove + 1
             else
-                call type2_sph%move(type2_obs%Nrej)
+                call type2_sph%move(mix, type1_sph%X, type2_obs%Nrej)
                 type2_obs%Nmove = type2_obs%Nmove + 1
             end if            
             

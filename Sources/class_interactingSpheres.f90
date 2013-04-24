@@ -230,7 +230,7 @@ contains
     
         class(InteractingSpheres), intent(inout) :: this
         real(DP), intent(inout) :: ePot_total
-        class(MixingPotential) :: mix
+        class(MixingPotential), intent(in) :: mix
         real(DP), dimension(:, :) :: other_X
         integer, intent(inout) :: Nrej
         
@@ -239,7 +239,7 @@ contains
         real(DP) :: rand
         real(DP), dimension(Dim) :: xRand, xNew
         integer :: same_iCellOld, same_iCellNew
-        integer :: other_iCellNew
+        integer :: other_iCellOld, other_iCellNew
         real(DP) :: dEn
         real(DP) :: same_eNew, same_eOld
         real(DP) :: other_eNew, other_eOld
@@ -265,9 +265,9 @@ contains
                 call this%ePot_neigh(iOld, this%X(:, iOld), same_iCellOld, &
                     overlap, same_eOld)
                     
-                !other_iCellOld = this%other%position_to_cell(this%X(:, iOld))
-                !call mix%ePot_neigh(this%X(:, iOld), other_iCellNew, &
-                    !overlap, other_eOld)
+                other_iCellOld = this%other%position_to_cell(this%X(:, iOld))
+                call mix%ePot_neigh(this%X(:, iOld), other_iCellOld, &
+                    this%other, other_X, overlap, other_eOld)
                 
                 dEn = same_eNew - same_eOld
             
