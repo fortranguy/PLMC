@@ -4,6 +4,7 @@ module class_mixingPotential
 
 use data_constants
 use data_particles
+use data_mc
 use data_potentiel
 use data_neighbours
 use mod_physics
@@ -44,6 +45,8 @@ private
         procedure :: ePot_neigh => MixingPotential_ePot_neigh
         procedure :: ePot_total => MixingPotential_ePot_total
         procedure :: consistTest => MixingPotential_consistTest
+        
+        procedure :: results => MixingPotential_results
 
     end type
 
@@ -278,5 +281,18 @@ contains
             abs(ePot_total-ePot_mc)/ePot_total
     
     end subroutine MixingPotential_consistTest
+    
+    !> Results
+    
+    subroutine MixingPotential_results(this, ePotSum, unitReport)
+
+        class(MixingPotential), intent(in) :: this
+        integer, intent(in) :: unitReport
+        real(DP), intent(in) :: ePotSum
+    
+        write(unitReport, *) "Results :"        
+        write(unitReport, *) "    average energy = ", ePotSum/real(Nstep, DP)
+    
+    end subroutine MixingPotential_results
 
 end module class_mixingPotential

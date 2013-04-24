@@ -29,7 +29,7 @@ data.o: data_copy.f90
 
 mod_physics.o : data_constants.mod data_cell.mod
 class_neighbours.o : data_constants.mod data_cell.mod data_neighbours.mod
-class_mixingPotential.o : data_constants.mod data_particles.mod \
+class_mixingPotential.o : data_constants.mod data_particles.mod data_mc.mod \
 	data_potentiel.mod data_neighbours.mod \
 	mod_physics.o class_neighbours.o
 class_spheres.o : data_constants.mod data_cell.mod data_mc.mod \
