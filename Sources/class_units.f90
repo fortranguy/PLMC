@@ -1,20 +1,12 @@
-!> \brief File unit counter
-
-module unitsCounter
-
-    integer :: iUnit = 16
-
-end module unitsCounter
-
 !> \brief Description of the Units class
 
 module class_Units
 
-use unitsCounter
-
 implicit none
 
 private
+
+    integer :: iUnit = 16
 
     type, public :: Units
     
