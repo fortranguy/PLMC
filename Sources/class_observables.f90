@@ -73,30 +73,30 @@ contains
     
     !> Results
     
-    subroutine Observables_results(this, Ncol, unitReport)
+    subroutine Observables_results(this, Ncol, report_unit)
 
         class(Observables), intent(in) :: this
         integer, intent(in) :: Ncol
-        integer, intent(in) :: unitReport
+        integer, intent(in) :: report_unit
         
         real(DP) :: realNstep = real(Nstep, DP)
         real(DP) :: potChiId, potChiEx
     
-        write(unitReport, *) "Results :"
+        write(report_unit, *) "Results :"
         
-        write(unitReport, *) "    average energy = ", &
+        write(report_unit, *) "    average energy = ", &
             this%ePotSum/realNstep
-        write(unitReport, *) "    average energy per particule = ", &
+        write(report_unit, *) "    average energy per particule = ", &
             this%ePotSum/realNstep/real(Ncol, DP)
             
         potChiId = -Tstar*log( product(Lsize)/real(Ncol+1,DP) )
-        write(unitReport, *) "    ideal chemical potential = ", potChiId
+        write(report_unit, *) "    ideal chemical potential = ", potChiId
         potChiEx = -Tstar*log( this%activSum/realNstep )
-        write(unitReport, *) "    average excess chemical potential = ", &
+        write(report_unit, *) "    average excess chemical potential = ", &
             potChiEx           
-        write(unitReport, *) "    potChi.avg = ", potChiId + potChiEx
+        write(report_unit, *) "    potChi.avg = ", potChiId + potChiEx
         
-        write(unitReport, *) "    Rejection rate = ", &
+        write(report_unit, *) "    Rejection rate = ", &
             this%rejRateSum/real(Nstep+Ntherm, DP)
     
     end subroutine Observables_results
