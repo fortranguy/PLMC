@@ -18,6 +18,8 @@ implicit none
 private
 
     type, extends(Spheres), public :: HardSpheres
+    
+        real(DP) :: ePot
         
     contains
 
@@ -60,6 +62,7 @@ contains
         this%Nwidom = hard_Nwidom
                 
         ! Potential
+        this%ePot = 0._DP
         this%rCut = hard_rCut
         
         ! Neighbours : same kind
@@ -263,7 +266,7 @@ contains
         
         real(DP) :: ePot_total
     
-        ePot_total = 0._DP
+        ePot_total = this%ePot
         
     end function HardSpheres_ePot_total
     

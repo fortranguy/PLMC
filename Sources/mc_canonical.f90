@@ -191,8 +191,7 @@ implicit none
     
     call mix%overlapTest(type1_sph%X, type2_sph%X)
     mix_ePot_total = mix%ePot_total(type1_sph%X, type2_sph%X)
-    call mix%consistTest(mix_ePot, mix_ePot_total, mix_unitReport)
-    call mix%results(mix_ePotSum, mix_unitReport)
+    call mix_results(mix_ePot, mix_ePot_total, mix_ePotSum, mix_unitReport)
     
     ePot_mc = type1_obs%ePot + type2_obs%ePot + mix_ePot
     ePot_total = type1_sph%ePot_total() + type2_sph%ePot_total() + &

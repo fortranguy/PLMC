@@ -44,9 +44,6 @@ private
         procedure :: ePot => MixingPotential_ePot
         procedure :: ePot_neigh => MixingPotential_ePot_neigh
         procedure :: ePot_total => MixingPotential_ePot_total
-        procedure :: consistTest => MixingPotential_consistTest
-        
-        procedure :: results => MixingPotential_results
 
     end type
 
@@ -264,35 +261,5 @@ contains
         ePot_total = 0.5_DP*ePot_total
     
     end function MixingPotential_ePot_total
-    
-    !> Consistency test 
-    
-    subroutine MixingPotential_consistTest(this, ePot_mc, ePot_total, &
-        unitReport)
-    
-        class(MixingPotential), intent(in) :: this
-        real(DP), intent(in) :: ePot_mc, ePot_total
-        integer, intent(in) :: unitReport
-
-        write(unitReport, *) "Consistency test:"
-        write(unitReport, *) "    ePot_mc = ", ePot_mc
-        write(unitReport, *) "    ePot_final = ", ePot_total
-        write(unitReport, *) "    relative difference = ", &
-            abs(ePot_total-ePot_mc)/ePot_total
-    
-    end subroutine MixingPotential_consistTest
-    
-    !> Results
-    
-    subroutine MixingPotential_results(this, ePotSum, unitReport)
-
-        class(MixingPotential), intent(in) :: this
-        integer, intent(in) :: unitReport
-        real(DP), intent(in) :: ePotSum
-    
-        write(unitReport, *) "Results :"        
-        write(unitReport, *) "    average energy = ", ePotSum/real(Nstep, DP)
-    
-    end subroutine MixingPotential_results
 
 end module class_mixingPotential

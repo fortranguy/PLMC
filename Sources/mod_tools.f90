@@ -155,4 +155,22 @@ contains
     
     end subroutine results
     
+    !> Results
+    
+    subroutine mix_results(ePot_mc, ePot_total, ePot_mcSum, unitReport)
+    
+        real(DP), intent(in) :: ePot_mc, ePot_total, ePot_mcSum
+        integer, intent(in) :: unitReport
+
+        write(unitReport, *) "Consistency test:"
+        write(unitReport, *) "    ePot_mc = ", ePot_mc
+        write(unitReport, *) "    ePot_final = ", ePot_total
+        write(unitReport, *) "    relative difference = ", &
+            abs(ePot_total-ePot_mc)/ePot_total
+    
+        write(unitReport, *) "Results :"        
+        write(unitReport, *) "    average energy = ", ePot_mcSum/real(Nstep, DP)
+    
+    end subroutine mix_results
+    
 end module mod_tools
