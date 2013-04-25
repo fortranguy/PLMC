@@ -41,7 +41,7 @@ private
         procedure :: overlapTest => MixingPotential_overlapTest
 
         procedure :: ePot_init => MixingPotential_ePot_init
-        procedure :: ePot => MixingPotential_ePot
+        procedure :: ePot_pair => MixingPotential_ePot_pair
         procedure :: ePot_neigh => MixingPotential_ePot_neigh
         procedure :: ePot_total => MixingPotential_ePot_total
 
@@ -162,28 +162,28 @@ contains
 
     end subroutine MixingPotential_ePot_init
 
-    function MixingPotential_ePot(this, r) result(ePot)
+    function MixingPotential_ePot_pair(this, r) result(ePot_pair)
         
         class(MixingPotential), intent(in) :: this
         real(DP), intent(in) :: r
         
         integer :: i
-        real(DP) :: r_i, ePot
+        real(DP) :: r_i, ePot_pair
        
         if (r < this%rCut) then
        
             i = int(r/this%dr)
             r_i = real(i, DP)*this%dr
-            ePot = this%ePot_tab(i) + (r-r_i)/this%dr * &
+            ePot_pair = this%ePot_tab(i) + (r-r_i)/this%dr * &
                 (this%ePot_tab(i+1)-this%ePot_tab(i))
            
         else
        
-            ePot = 0._DP
+            ePot_pair = 0._DP
            
         end if
         
-    end function MixingPotential_ePot
+    end function MixingPotential_ePot_pair
     
     subroutine MixingPotential_ePot_neigh(this, xCol, iCell, neigh, X, &
         overlap, energ)
@@ -219,7 +219,7 @@ contains
                     overlap = .true.
                     return
                 end if
-                energ = energ + this%ePot(r)
+                energ = energ + this%ePot_pair(r)
                 
                 if (.not. associated(next%next)) exit
                 
@@ -253,7 +253,7 @@ contains
             do iCol2 = 1, Ncol2
                 
                 r_mix = dist(type1_X(:, iCol1), type2_X(:, iCol2))
-                ePot_total = ePot_total + this%ePot(r_mix)
+                ePot_total = ePot_total + this%ePot_pair(r_mix)
 
             end do
         end do
