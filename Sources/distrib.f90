@@ -41,8 +41,8 @@ implicit none
     real(DP), parameter :: densite = real(inter_Ncol, DP) / &
         (Lsize1*Lsize2*Lsize3)
     integer, dimension(:), allocatable :: distrib
-    integer, parameter :: unitSnapShots = 10, unitDistrib = 11, &
-        unitEnerg = 12
+    integer, parameter :: snaps_unit = 10, distrib_unit = 11, &
+        energ_unit = 12
 
     integer :: iStep
     integer :: iCol, jCol
@@ -69,7 +69,7 @@ implicit none
 
     distrib(:) = 0
 
-    open(unit=unitSnapShots, recl=4096, file="snap.shot", status='old', &
+    open(unit=snaps_unit, recl=4096, file="snap.shot", status='old', &
         action='read')
 
     call cpu_time(tIni)
@@ -82,7 +82,7 @@ implicit none
         ! Lecture :
         !$omp critical
         do iCol = 1, inter_Ncol
-            read(unitSnapShots, *) X(:, iCol)
+            read(snaps_unit, *) X(:, iCol)
         end do
         !$omp end critical
 
@@ -112,21 +112,22 @@ implicit none
             ! trompeur ?
     close(100)
 
-    close(unitSnapShots)
+    close(snaps_unit)
 
     ! Ecriture
 
     iDistMin = 0
     iDistMax = 0
 
-    open(unit=unitDistrib, file="fct_distrib.out", action="write")	
+    open(unit=distrib_unit, file="fct_distrib.out", action="write")	
         do iDist = 1, Ndist
         
             r = (real(iDist, DP) + 0.5_DP) * deltaDist
             numerat = real(distrib(iDist), DP) / real(Nstep, DP)
-            denomin = real(inter_Ncol, DP) * (sphereVol(iDist+1) - sphereVol(iDist))
+            denomin = real(inter_Ncol, DP) * &
+                (sphereVol(iDist+1) - sphereVol(iDist))
             fct_dist(iDist) = 2._DP * numerat / denomin / densite
-            write(unitDistrib, *) r, fct_dist(iDist)
+            write(distrib_unit, *) r, fct_dist(iDist)
             
             if (r>=inter_rMin .and. r<=inter_rCut) then
                 if (iDistMin == 0) then
@@ -136,7 +137,7 @@ implicit none
             end if
             
         end do
-    close(unitDistrib)
+    close(distrib_unit)
 
     ! Energie par particule
 
@@ -144,13 +145,14 @@ implicit none
 
     do iDist = iDistMin, iDistMax
         r = (real(iDist, DP) + 0.5_DP) * deltaDist
-        energSum = energSum + inter%ePot_pair(r) * fct_dist(iDist) * 4._DP*PI*r**2	
+        energSum = energSum + inter%ePot_pair(r) * fct_dist(iDist) * &
+            4._DP*PI*r**2	
     end do
 
-    open(unit=unitEnerg, file="epp_dist.out", action="write")
-        write(unitEnerg, *) "epp_dist =", &
+    open(unit=energ_unit, file="epp_dist.out", action="write")
+        write(energ_unit, *) "epp_dist =", &
             densite/2._DP * energSum * deltaDist
-    close(unitEnerg)
+    close(energ_unit)
 
     deallocate(fct_dist)
     deallocate(distrib)
