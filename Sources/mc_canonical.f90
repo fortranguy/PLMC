@@ -2,6 +2,7 @@
 
 program mc_canonical
 
+use iso_fortran_env
 use data_constants
 use data_mc
 use data_distrib
@@ -41,7 +42,8 @@ implicit none
     integer, parameter :: mix_unitReport = 13
     integer, parameter :: mix_unitObsTherm = 14, mix_unitObs = 15
     
-    write(*, *) "Monte-Carlo Mix - Canonical : Volume =", product(Lsize)
+    write(output_unit, *) "Monte-Carlo Mix - Canonical : Volume =", &
+        product(Lsize)
 
     ! Initialisation
     
@@ -101,7 +103,7 @@ implicit none
     
 ! Middle ----------------------------------------------------------------------
         
-    write(*, *) "Beginning of cycles"    
+    write(output_unit, *) "Beginning of cycles"    
     
     call cpu_time(tIni)
     do iStep = 1, Ntherm + Nstep
@@ -172,7 +174,7 @@ implicit none
     end do
     call cpu_time(tFin)
 
-    write(*, *) "End of cycles"
+    write(output_unit, *) "End of cycles"
 
 ! End -------------------------------------------------------------------------
 

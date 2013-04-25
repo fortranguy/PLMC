@@ -2,6 +2,7 @@
 
 module class_spheres
 
+use iso_fortran_env
 use data_constants
 use data_cell
 use data_mc
@@ -108,14 +109,14 @@ contains
         
         real(DP) :: density, compac
         
-        write(*, *) this%name, " :"
+        write(output_unit, *) this%name, " :"
         
         density = real(this%Ncol, DP) / product(Lsize)
-        write(*, *) "    density = ", density
+        write(output_unit, *) "    density = ", density
         write(unitReport, *) "    density = ", density
         
         compac = 4._DP/3._DP*PI*this%radius**3 * density
-        write(*, *) "    compacity = ", compac
+        write(output_unit, *) "    compacity = ", compac
         write(unitReport, *) "    compacity = ", compac
     
     end subroutine Spheres_printInfo
@@ -150,8 +151,9 @@ contains
                     
                     r_ij = dist(this%X(:, iCol), this%X(:, jCol))
                     if (r_ij < this%rMin) then
-                        write(*, *) this%name, "    Overlap !", iCol, jCol
-                        write(*, * ) "    r_ij = ", r_ij
+                        write(output_unit, *) this%name, "    Overlap !", &
+                            iCol, jCol
+                        write(output_unit, *) "    r_ij = ", r_ij
                         stop
                     end if
                     
@@ -159,7 +161,7 @@ contains
             end do
         end do
         
-        write(*, *) this%name, " :    Overlap test : OK !"
+        write(output_unit, *) this%name, " :    Overlap test : OK !"
     
     end subroutine Spheres_overlapTest
     
@@ -211,13 +213,14 @@ contains
         if (iStep == Ntherm) then
         
             if (rejRate == 0._DP) then
-                write(*, *) this%name, "    Warning : dx adaptation problem."
+                write(output_unit, *) this%name, &
+                    "    Warning : dx adaptation problem."
                 this%dx(:) = this%dx_save(:)
-                write(*, *) "default dx :", this%dx(:)
-                write(*, *)
+                write(output_unit, *) "default dx :", this%dx(:)
+                write(output_unit, *)
             end if
             
-            write(*, *) this%name, " :    Thermalisation : over"
+            write(output_unit, *) this%name, " :    Thermalisation : over"
             
             write(unitReport, *) "Displacement :"
             write(unitReport, *) "    dx(:) = ", this%dx(:)

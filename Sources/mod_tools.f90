@@ -2,6 +2,7 @@
 
 module mod_tools
 
+use iso_fortran_env
 use data_constants
 use data_particles
 use data_mc
@@ -60,8 +61,8 @@ contains
                     type2%getRmin(), mix_rMin)
                 write(unitReport, *) "    Random deposition"
             case default
-                write(*, *) "Enter the initial condition : "
-                write(*, *) "   'rand'."
+                write(output_unit, *) "Enter the initial condition : "
+                write(output_unit, *) "   'rand'."
                 stop
         end select
         
@@ -80,7 +81,7 @@ contains
         real(DP), dimension(Dim) :: xRand
         real(DP) :: rTest
         
-        write(*, *) "Random deposition"
+        write(output_unit, *) "Random deposition"
         
         ! Type 1
         type1_Ncol = size(type1_X, 2)

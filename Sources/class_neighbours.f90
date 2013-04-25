@@ -2,6 +2,7 @@
 
 module class_neighbours
 
+use iso_fortran_env
 use data_constants
 use data_cell
 use data_neighbours
@@ -141,24 +142,27 @@ contains
         do iDir = 1, Dim
         
             if (this%cell_Lsize(iDir) < rCut) then
-            	write(*, *) "Too small cell in the direction", iDir, ":"
-                write(*, *) this%cell_Lsize(iDir), "<", rCut
+                write(output_unit, *) "Too small cell in the direction", &
+                    iDir, ":"
+                write(output_unit, *) this%cell_Lsize(iDir), "<", rCut
                 stop
             end if
             
             if (this%cell_coordMax(iDir) < cell_neigh_coordMax(iDir)) then
-                write(*, *) "Too few cells in the direction", iDir, ":"
-                write(*, *) this%cell_coordMax(iDir), "<",&
+                write(output_unit, *) "Too few cells in the direction", &
+                    iDir, ":"
+                write(output_unit, *) this%cell_coordMax(iDir), "<", &
                     cell_neigh_coordMax(iDir)
                 stop
             end if
             
             if (modulo(Lsize(iDir), this%cell_Lsize(iDir)) /= 0) then
-                write(*, *) "Cell size is not a divisor of the system system"
-                write(*, *) "in the direction", iDir, ":"
-                write(*, *) "Lsize", Lsize(iDir)
-                write(*, *) "cell_Lsize", this%cell_Lsize(iDir)
-                write(*, *) "modulo(Lsize, cell_Lsize) = ", &
+                write(output_unit, *) &
+                    "Cell size is not a divisor of the system system"
+                write(output_unit, *) "in the direction", iDir, ":"
+                write(output_unit, *) "Lsize", Lsize(iDir)
+                write(output_unit, *) "cell_Lsize", this%cell_Lsize(iDir)
+                write(output_unit, *) "modulo(Lsize, cell_Lsize) = ", &
                     modulo(Lsize(iDir), this%cell_Lsize(iDir))
                 stop
             end if

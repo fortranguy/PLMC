@@ -2,6 +2,7 @@
 
 module class_mixingPotential
 
+use iso_fortran_env
 use data_constants
 use data_particles
 use data_mc
@@ -67,15 +68,15 @@ contains
         this%alpha = mix_alpha
         allocate(this%ePot_tab(this%iMin:this%iCut))
         call this%ePot_init()
-	
-	end subroutine MixingPotential_construct
-	
-	subroutine MixingPotential_destroy(this)
+
+    end subroutine MixingPotential_construct
+
+    subroutine MixingPotential_destroy(this)
     
         class(MixingPotential), intent(inout) :: this
         
         if (allocated(this%ePot_tab)) then
-	        deallocate(this%ePot_tab)
+            deallocate(this%ePot_tab)
         end if
     
     end subroutine MixingPotential_destroy
@@ -126,15 +127,16 @@ contains
                     
                 r_mix = dist(type1_X(:, iCol1), type2_X(:, iCol2))
                 if (r_mix < this%rMin) then
-                    write(*, *) this%name, " :    Overlap !", iCol1, iCol2
-                    write(*, * ) "    r_mix = ", r_mix
+                    write(output_unit, *) this%name, " :    Overlap !", &
+                        iCol1, iCol2
+                    write(output_unit, *) "    r_mix = ", r_mix
                     stop
                 end if
 
             end do
         end do
 
-        write(*, *) this%name, " :    Overlap test : OK !"
+        write(output_unit, *) this%name, " :    Overlap test : OK !"
     
     end subroutine MixingPotential_overlapTest
 

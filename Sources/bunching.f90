@@ -27,7 +27,7 @@ implicit none
 
     NstepVar = Nstep
     
-    write(*,*)
+    write(output_unit, *)
     
     open(unit=11, file="bunching_eTot.out")
     open(unit=12, file="bunching_activInv.out")
