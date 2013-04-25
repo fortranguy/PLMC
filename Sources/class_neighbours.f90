@@ -290,10 +290,10 @@ contains
             
     end  subroutine Neighbours_add_cell_col
     
-	! Neighbour cells --------------------------------------------------------
-    
+    ! Neighbour cells --------------------------------------------------------
+
     function Neighbours_cell_coord_to_ind(this, coord) &
-    	result(cell_coord_to_ind)
+        result(cell_coord_to_ind)
         
         class(Neighbours), intent(in) :: this    
         integer, dimension(Dim), intent(in) :: coord

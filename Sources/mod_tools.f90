@@ -124,11 +124,13 @@ contains
     
     end subroutine randomDeposition
     
+    !> Report : general
+    
     subroutine report(unitReport)
     
-    	integer, intent(in) :: unitReport
-    
-    	write(unitReport, *) "Simulation MC_C :"
+        integer, intent(in) :: unitReport
+
+        write(unitReport, *) "Simulation MC_C :"
         write(unitReport ,*) "    Lsize(:) = ", Lsize(:)
         write(unitReport ,*) "    Vol = ", product(Lsize)
         write(unitReport, *) "    Nstep = ", Nstep
@@ -136,6 +138,8 @@ contains
         write(unitReport, *) "    Nmove = ", Nmove
     
     end subroutine report
+    
+    !> Results : general
     
     subroutine results(ePot_mc, ePot_total, ePot_mcSum, duration, unitReport)
     
@@ -156,7 +160,7 @@ contains
     
     end subroutine results
     
-    !> Results
+    !> Results : mix
     
     subroutine mix_results(ePot_mc, ePot_total, ePot_mcSum, unitReport)
     
