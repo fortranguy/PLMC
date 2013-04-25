@@ -2,6 +2,7 @@
 
 program bunching
 
+use iso_fortran_env
 use data_constants
 use data_mc
 
@@ -22,7 +23,7 @@ implicit none
     real(DP), dimension(nObs, nDataMi) :: dataOut
     
     nBunching = int(log(real(Nstep, DP))/log(2._DP))
-    write(*, *) "nBunching = ", nBunching
+    write(output_unit, *) "nBunching = ", nBunching
 
     NstepVar = Nstep
     
@@ -33,7 +34,7 @@ implicit none
     
     do iBunching = 1, nBunching
     
-        write(*,*) "iBunching = ", iBunching, "NstepVar = ", NstepVar    
+        write(output_unit, *) "iBunching = ", iBunching, "NstepVar = ", NstepVar    
         NstepVar = NstepVar/2
         
         ! Lecture
