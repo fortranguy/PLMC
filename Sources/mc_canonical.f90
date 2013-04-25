@@ -6,12 +6,12 @@ use iso_fortran_env
 use data_constants
 use data_mc
 use data_distrib
-use mod_tools
 use class_mixingPotential
 use class_interactingSpheres
 use class_hardSpheres
 use class_observables
 use class_units
+use mod_tools
 
 implicit none
 
