@@ -34,7 +34,8 @@ implicit none
     
     do iBunching = 1, nBunching
     
-        write(output_unit, *) "iBunching = ", iBunching, "NstepVar = ", NstepVar    
+        write(output_unit, *) "iBunching = ", iBunching, &
+            "NstepVar = ", NstepVar
         NstepVar = NstepVar/2
         
         ! Lecture
