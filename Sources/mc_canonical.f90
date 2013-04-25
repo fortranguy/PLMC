@@ -62,8 +62,8 @@ implicit none
     
     call mix%construct()
     mix_ePotSum = 0._DP
-    open(unit=mix_unitReport, recl=4096, file="mix_report.out", status='new', &
-        action='write')
+    open(unit=mix_unitReport, recl=4096, file="mix_report.out", &
+        status='new', action='write')
     open(unit=mix_unitObsTherm, recl=4096, file="mix_obsTherm.out", &
         status='new', action='write')
     open(unit=mix_unitObs, recl=4096, file="mix_obs.out", status='new', &
@@ -172,10 +172,6 @@ implicit none
     call cpu_time(tFin)
 
     write(*, *) "End of cycles"
-    close(unitObsTherm)
-    close(unitObs)
-    close(mix_unitObsTherm)
-    close(mix_unitObs)
 
 ! End -----------------------------------------------------
 
@@ -200,6 +196,8 @@ implicit none
     call results(ePot_mc, ePot_total, ePot_mcSum, tFin-tIni, unitReport)
     
     close(unitReport)
+    close(unitObsTherm)
+    close(unitObs)
     
     call type1_sph%destroy()
     call type1_io%close()
@@ -209,5 +207,7 @@ implicit none
     
     call mix%destroy()
     close(mix_unitReport)
+    close(mix_unitObsTherm)
+    close(mix_unitObs)
     
 end program mc_canonical
