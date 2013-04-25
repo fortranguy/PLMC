@@ -14,7 +14,7 @@ use class_units
 
 implicit none
 
-! Beginning
+! Beginning -------------------------------------------------------------------
     
     integer :: iStep, iMove
     integer :: iColRand
@@ -99,7 +99,7 @@ implicit none
     
     ePot_total = type1_obs%ePot + type2_obs%ePot + mix_ePot
     
-! Middle --------------------------------------------------
+! Middle ----------------------------------------------------------------------
         
     write(*, *) "Beginning of cycles"    
     
@@ -174,7 +174,7 @@ implicit none
 
     write(*, *) "End of cycles"
 
-! End -----------------------------------------------------
+! End -------------------------------------------------------------------------
 
     call type1_sph%overlapTest()
     call type1_sph%consistTest(type1_obs%ePot, type1_io%report)
