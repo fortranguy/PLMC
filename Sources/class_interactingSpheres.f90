@@ -308,10 +308,10 @@ contains
     
     !> Widom's method
 
-    subroutine InteractingSpheres_widom(this, activExInv)
+    subroutine InteractingSpheres_widom(this, activ)
         
         class(InteractingSpheres), intent(in) :: this
-        real(DP), intent(inOut) :: activExInv 
+        real(DP), intent(inOut) :: activ 
         
         integer :: iWid
         real(DP) :: widTestSum
@@ -335,7 +335,7 @@ contains
             
         end do
         
-        activExInv = widTestSum/real(this%Nwidom, DP)
+        activ = widTestSum/real(this%Nwidom, DP)
         
     end subroutine InteractingSpheres_widom
 

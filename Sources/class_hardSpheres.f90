@@ -229,10 +229,10 @@ contains
     
     !> Widom's method
 
-    subroutine HardSpheres_widom(this, activExInv)
+    subroutine HardSpheres_widom(this, activ)
         
         class(HardSpheres), intent(in) :: this
-        real(DP), intent(inOut) :: activExInv 
+        real(DP), intent(inOut) :: activ 
         
         integer :: iWid
         real(DP) :: widTestSum
@@ -255,7 +255,7 @@ contains
             
         end do
         
-        activExInv = widTestSum/real(this%Nwidom, DP)
+        activ = widTestSum/real(this%Nwidom, DP)
         
     end subroutine HardSpheres_widom
     

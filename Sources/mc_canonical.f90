@@ -121,8 +121,8 @@ implicit none
             
         end do
         
-        call type1_sph%widom(type1_obs%activExInv)
-        call type2_sph%widom(type2_obs%activExInv)
+        call type1_sph%widom(type1_obs%activ)
+        call type2_sph%widom(type2_obs%activ)
         
         call type1_obs%addReject()
         call type2_obs%addReject()
@@ -134,14 +134,14 @@ implicit none
             write(type1_io%dx, *) iStep, type1_sph%getDx(), &
                 type1_obs%rejRateSum/real(iStep, DP)
             write(type1_io%obsTherm, *) iStep, type1_obs%ePot, &
-                type1_obs%activExInv
+                type1_obs%activ
         
             call type2_sph%adaptDx(iStep, type2_obs%rejRateSum, &
                 type2_io%report)
             write(type2_io%dx, *) iStep, type2_sph%getDx(), &
                 type2_obs%rejRateSum/real(iStep, DP)
             write(type2_io%obsTherm, *) iStep, type2_obs%ePot, &
-                type2_obs%activExInv
+                type2_obs%activ
                 
             write(unitObsTherm, *) iStep, type1_obs%ePot + type2_obs%ePot + &
                 mix_ePot
@@ -151,11 +151,11 @@ implicit none
         
             call type1_obs%addPhysical()
             write(type1_io%obs, *) iStep, type1_obs%ePot, &
-                type1_obs%activExInv
+                type1_obs%activ
         
             call type2_obs%addPhysical()
             write(type2_io%obs, *) iStep, type2_obs%ePot, &
-                type2_obs%activExInv                
+                type2_obs%activ                
                 
             mix_ePotSum = mix_ePotSum + mix_ePot            
             write(unitObs, *) iStep, type1_obs%ePot + type2_obs%ePot + mix_ePot
