@@ -198,17 +198,17 @@ contains
                 mix_dEpot = mix_eNew - mix_eOld
                     
                 call random_number(rand)
-                if ( rand < exp(-mix_dEpot/Tstar) ) then
+                if (rand < exp(-mix_dEpot/Tstar)) then
                 
                     this%X(:, iOld) = xNew(:)
                     mix_ePot = mix_ePot + mix_dEpot
                     
-                    if ( same_iCellOld /= same_iCellNew ) then                
+                    if (same_iCellOld /= same_iCellNew) then                
                         call this%same%remove_cell_col(iOld, same_iCellOld)
                         call this%same%add_cell_col(iOld, same_iCellNew)
                     end if
                     
-                    if ( mix_iCellOld /= mix_iCellNew ) then                
+                    if (mix_iCellOld /= mix_iCellNew) then                
                         call other%mix%remove_cell_col(iOld, mix_iCellOld)
                         call other%mix%add_cell_col(iOld, mix_iCellNew)
                     end if
