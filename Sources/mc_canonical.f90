@@ -22,7 +22,7 @@ implicit none
     real(DP) :: rand
     real(DP) :: tIni, tFin
     
-    real(DP) :: ePot, ePotSum, ePot_total    
+    real(DP) :: ePot, ePotSum, ePot_total
     integer, parameter :: report_unit = 10
     integer, parameter :: obsTherm_unit = 11, obs_unit = 12
     
