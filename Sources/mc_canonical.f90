@@ -23,8 +23,8 @@ implicit none
     real(DP) :: tIni, tFin
     
     real(DP) :: ePot, ePotSum, ePot_total    
-    integer, parameter :: unitReport = 10
-    integer, parameter :: unitObsTherm = 11, unitObs = 12
+    integer, parameter :: report_unit = 10
+    integer, parameter :: obsTherm_unit = 11, obs_unit = 12
     
     ! Type 1 : Interacting spheres
     type(InteractingSpheres) :: type1_sph !< Monte-Carlo subroutines
@@ -39,19 +39,19 @@ implicit none
     ! Mixing between 2 types
     type(MixingPotential) :: mix
     real(DP) :: mix_ePot, mix_ePotSum, mix_ePot_total
-    integer, parameter :: mix_unitReport = 13
-    integer, parameter :: mix_unitObsTherm = 14, mix_unitObs = 15
+    integer, parameter :: mix_report_unit = 13
+    integer, parameter :: mix_obsTherm_unit = 14, mix_obs_unit = 15
     
     write(output_unit, *) "Monte-Carlo Mix - Canonical : Volume =", &
         product(Lsize)
 
     ! Initialisation
     
-    open(unit=unitReport, recl=4096, file="report.out", status='new', &
+    open(unit=report_unit, recl=4096, file="report.out", status='new', &
         action='write')
-    open(unit=unitObsTherm, recl=4096, file="obsTherm.out", status='new', &
+    open(unit=obsTherm_unit, recl=4096, file="obsTherm.out", status='new', &
         action='write')
-    open(unit=unitObs, recl=4096, file="obs.out", status='new', &
+    open(unit=obs_unit, recl=4096, file="obs.out", status='new', &
         action='write')
     
     call type1_sph%construct()
@@ -64,15 +64,15 @@ implicit none
     
     call mix%construct()
     mix_ePotSum = 0._DP
-    open(unit=mix_unitReport, recl=4096, file="mix_report.out", &
+    open(unit=mix_report_unit, recl=4096, file="mix_report.out", &
         status='new', action='write')
-    open(unit=mix_unitObsTherm, recl=4096, file="mix_obsTherm.out", &
+    open(unit=mix_obsTherm_unit, recl=4096, file="mix_obsTherm.out", &
         status='new', action='write')
-    open(unit=mix_unitObs, recl=4096, file="mix_obs.out", status='new', &
+    open(unit=mix_obs_unit, recl=4096, file="mix_obs.out", status='new', &
         action='write')
         
-    call report(unitReport)
-    call init_random_seed(unitReport)
+    call report(report_unit)
+    call init_random_seed(report_unit)
     
     call type1_sph%report(type1_io%report)
     call type1_sph%printInfo(type1_io%report)
@@ -80,11 +80,11 @@ implicit none
     call type2_sph%report(type2_io%report)
     call type2_sph%printInfo(type2_io%report)
     
-    call mix%report(mix_unitReport)
+    call mix%report(mix_report_unit)
     
     ! Initial condition
     
-    call initialCondition(type1_sph, type2_sph, mix%getRmin(), unitReport)
+    call initialCondition(type1_sph, type2_sph, mix%getRmin(), report_unit)
     
     call type1_sph%overlapTest()
     type1_obs%ePot = type1_sph%ePot_total()
@@ -146,9 +146,9 @@ implicit none
             write(type2_io%obsTherm, *) iStep, type2_obs%ePot, &
                 type2_obs%activ
                 
-            write(unitObsTherm, *) iStep, type1_obs%ePot + type2_obs%ePot + &
+            write(obsTherm_unit, *) iStep, type1_obs%ePot + type2_obs%ePot + &
                 mix_ePot
-            write(mix_unitObsTherm, *) iStep, mix_ePot
+            write(mix_obsTherm_unit, *) iStep, mix_ePot
         
         else
         
@@ -161,8 +161,8 @@ implicit none
                 type2_obs%activ                
                 
             mix_ePotSum = mix_ePotSum + mix_ePot            
-            write(unitObs, *) iStep, type1_obs%ePot + type2_obs%ePot + mix_ePot
-            write(mix_unitObs, *) iStep, mix_ePot
+            write(obs_unit, *) iStep, type1_obs%ePot + type2_obs%ePot + mix_ePot
+            write(mix_obs_unit, *) iStep, mix_ePot
 
             if (snap) then
                 call type1_sph%snapShot(type1_io%snapShots)
@@ -190,17 +190,17 @@ implicit none
     
     call mix%overlapTest(type1_sph%X, type2_sph%X)
     mix_ePot_total = mix%ePot_total(type1_sph%X, type2_sph%X)
-    call mix_results(mix_ePot, mix_ePot_total, mix_ePotSum, mix_unitReport)
+    call mix_results(mix_ePot, mix_ePot_total, mix_ePotSum, mix_report_unit)
     
     ePot = type1_obs%ePot + type2_obs%ePot + mix_ePot
     ePot_total = type1_sph%ePot_total() + type2_sph%ePot_total() + &
         mix_ePot_total
     ePotSum = type1_obs%ePotSum + type2_obs%ePotSum + mix_ePotSum
-    call results(ePot, ePot_total, ePotSum, tFin-tIni, unitReport)
+    call results(ePot, ePot_total, ePotSum, tFin-tIni, report_unit)
     
-    close(unitReport)
-    close(unitObsTherm)
-    close(unitObs)
+    close(report_unit)
+    close(obsTherm_unit)
+    close(obs_unit)
     
     call type1_sph%destroy()
     call type1_io%close()
@@ -209,8 +209,8 @@ implicit none
     call type2_io%close()
     
     call mix%destroy()
-    close(mix_unitReport)
-    close(mix_unitObsTherm)
-    close(mix_unitObs)
+    close(mix_report_unit)
+    close(mix_obsTherm_unit)
+    close(mix_obs_unit)
     
 end program mc_canonical
