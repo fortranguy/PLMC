@@ -151,7 +151,7 @@ contains
         write(unitReport, *) "    ePot_mc = ", ePot_mc
         write(unitReport, *) "    ePot_final = ", ePot_total
         write(unitReport, *) "    relative difference = ", &
-            abs(ePot_total-ePot_mc)/ePot_total
+            abs((ePot_total-ePot_mc)/ePot_total)
             
         write(unitReport, *) "Results :"
         write(unitReport, *) "    average energy = ", &
@@ -171,7 +171,7 @@ contains
         write(unitReport, *) "    ePot_mc = ", ePot_mc
         write(unitReport, *) "    ePot_final = ", ePot_total
         write(unitReport, *) "    relative difference = ", &
-            abs(ePot_total-ePot_mc)/ePot_total
+            abs((ePot_total-ePot_mc)/ePot_total)
     
         write(unitReport, *) "Results :"        
         write(unitReport, *) "    average energy = ", ePot_mcSum/real(Nstep, DP)
