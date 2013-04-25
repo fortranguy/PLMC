@@ -102,10 +102,10 @@ contains
     
     !> Print density and compacity
     
-    subroutine Spheres_printInfo(this, unitReport)
+    subroutine Spheres_printInfo(this, report_unit)
     
         class(Spheres), intent(in) :: this
-        integer, intent(in) :: unitReport
+        integer, intent(in) :: report_unit
         
         real(DP) :: density, compac
         
@@ -113,25 +113,25 @@ contains
         
         density = real(this%Ncol, DP) / product(Lsize)
         write(output_unit, *) "    density = ", density
-        write(unitReport, *) "    density = ", density
+        write(report_unit, *) "    density = ", density
         
         compac = 4._DP/3._DP*PI*this%radius**3 * density
         write(output_unit, *) "    compacity = ", compac
-        write(unitReport, *) "    compacity = ", compac
+        write(report_unit, *) "    compacity = ", compac
     
     end subroutine Spheres_printInfo
     
     !> Configuration state
       
-    subroutine Spheres_snapShot(this, unitSnap)
+    subroutine Spheres_snapShot(this, snap_unit)
         
         class(Spheres), intent(in) :: this
-        integer, intent(in) :: unitSnap
+        integer, intent(in) :: snap_unit
     
         integer :: iCol
         
         do iCol = 1, this%Ncol
-            write(unitSnap, *) this%X(:, iCol)
+            write(snap_unit, *) this%X(:, iCol)
         end do    
 
     end subroutine Spheres_snapShot
@@ -183,10 +183,10 @@ contains
     
     !> Adaptation of dx during the thermalisation
     
-    subroutine Spheres_adaptDx(this, iStep, rejRateSum, unitReport)
+    subroutine Spheres_adaptDx(this, iStep, rejRateSum, report_unit)
     
         class(Spheres), intent(inout) :: this 
-        integer, intent(in) :: iStep, unitReport
+        integer, intent(in) :: iStep, report_unit
         real(DP), intent(in) :: rejRateSum    
         
         real(DP) :: rejRate
@@ -222,10 +222,10 @@ contains
             
             write(output_unit, *) this%name, " :    Thermalisation : over"
             
-            write(unitReport, *) "Displacement :"
-            write(unitReport, *) "    dx(:) = ", this%dx(:)
-            write(unitReport, *) "    rejection relative difference = ", &
-            							! wrong translation ?
+            write(report_unit, *) "Displacement :"
+            write(report_unit, *) "    dx(:) = ", this%dx(:)
+            write(report_unit, *) "    rejection relative difference = ", &
+                                        ! wrong translation ?
                 abs(rejRate - rejRateFix)/rejRateFix
             
         end if
