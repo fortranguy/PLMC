@@ -274,13 +274,13 @@ contains
                 mix_dEpot = mix_eNew - mix_eOld
                 
                 dEpot = same_dEpot + mix_dEpot
-            
+                
                 call random_number(rand)
                 if (rand < exp(-dEpot/Tstar)) then
                 
                     this%X(:, iOld) = xNew(:)
-                    mix_ePot = mix_ePot + mix_dEpot
                     same_ePot = same_ePot + same_dEpot
+                    mix_ePot = mix_ePot + mix_dEpot
                     
                     if (same_iCellOld /= same_iCellNew) then
                         call this%same%remove_cell_col(iOld, same_iCellOld)

@@ -196,7 +196,7 @@ contains
                     this%mix, other%X, overlap, mix_eOld)
                 
                 mix_dEpot = mix_eNew - mix_eOld
-                
+                    
                 call random_number(rand)
                 if ( rand < exp(-mix_dEpot/Tstar) ) then
                 

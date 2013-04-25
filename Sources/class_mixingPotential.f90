@@ -257,8 +257,6 @@ contains
 
             end do
         end do
-        
-        ePot_total = 0.5_DP*ePot_total
     
     end function MixingPotential_ePot_total
 
