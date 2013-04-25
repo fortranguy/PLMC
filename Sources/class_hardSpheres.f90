@@ -259,7 +259,7 @@ contains
         
     end subroutine HardSpheres_widom
     
-    !> Total potential energy
+    !> Total potential energy : dummy
     
     function HardSpheres_ePot_total(this) result(ePot_total)
     
@@ -271,7 +271,7 @@ contains
         
     end function HardSpheres_ePot_total
     
-    !> Consistency test 
+    !> Consistency test : dummy
     
     subroutine HardSpheres_consistTest(this, ePot_mc, unitReport)
     
