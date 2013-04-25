@@ -153,12 +153,12 @@ contains
     
     !> Particle move
     
-    subroutine HardSpheres_move(this, other, mix, mix_ePot, Nrej)
+    subroutine HardSpheres_move(this, other, mix, same_ePot, mix_ePot, Nrej)
     
         class(HardSpheres), intent(inout) :: this
         class(Spheres), intent(inout) :: other
         class(MixingPotential), intent(in) :: mix
-        real(DP), intent(inout) :: mix_ePot
+        real(DP), intent(inout) :: same_ePot, mix_ePot
         integer, intent(inout) :: Nrej
         
         logical :: overlap
@@ -201,6 +201,7 @@ contains
                 if (rand < exp(-mix_dEpot/Tstar)) then
                 
                     this%X(:, iOld) = xNew(:)
+                    same_ePot = same_ePot + 0._DP
                     mix_ePot = mix_ePot + mix_dEpot
                     
                     if (same_iCellOld /= same_iCellNew) then                
