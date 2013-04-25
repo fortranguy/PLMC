@@ -19,6 +19,7 @@ private
 
     type, extends(Spheres), public :: HardSpheres
     
+        ! Potential
         real(DP) :: ePot
         
     contains
