@@ -17,14 +17,14 @@ implicit none
 
 ! Beginning -------------------------------------------------------------------
     
-    integer :: iStep, iMove
-    integer :: iColRand
-    real(DP) :: rand
-    real(DP) :: tIni, tFin
+    integer :: iStep, iMove !< Monte-Carlo counters
+    integer :: iColRand !< random choice of a particle
+    real(DP) :: rand !< random number in between 0 and 1
+    real(DP) :: tIni, tFin !< initial and final time
     
-    real(DP) :: ePot, ePotSum, ePot_total
+    real(DP) :: ePot, ePotSum, ePot_total !< potential energy
     integer, parameter :: report_unit = 10
-    integer, parameter :: obsTherm_unit = 11, obs_unit = 12
+    integer, parameter :: obsTherm_unit = 11, obs_unit = 12 !< observable(s)
     
     ! Type 1 : Interacting spheres
     type(InteractingSpheres) :: type1_sph !< Monte-Carlo subroutines
