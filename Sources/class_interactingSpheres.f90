@@ -111,21 +111,21 @@ contains
     
     !> Report
     
-    subroutine InteractingSpheres_report(this, unitReport)
+    subroutine InteractingSpheres_report(this, report_unit)
     
         class(InteractingSpheres), intent(in) :: this
-        integer, intent(in) :: unitReport    
+        integer, intent(in) :: report_unit    
         
-        write(unitReport, *) "Simulation MC_C :"
-        write(unitReport ,*) "    Ncol = ", this%Ncol
-        write(unitReport ,*) "    Nwidom = ", this%Nwidom
-        write(unitReport, *) "    epsilon = ", this%epsilon
-        write(unitReport, *) "    alpha = ", this%alpha
-        write(unitReport, *) "    rCut = ", this%rCut
-        write(unitReport, *) "    dr = ", this%dr
-        write(unitReport, *) "    cell_coordMax(:) = ", &
+        write(report_unit, *) "Simulation MC_C :"
+        write(report_unit ,*) "    Ncol = ", this%Ncol
+        write(report_unit ,*) "    Nwidom = ", this%Nwidom
+        write(report_unit, *) "    epsilon = ", this%epsilon
+        write(report_unit, *) "    alpha = ", this%alpha
+        write(report_unit, *) "    rCut = ", this%rCut
+        write(report_unit, *) "    dr = ", this%dr
+        write(report_unit, *) "    cell_coordMax(:) = ", &
         	this%same%cell_coordMax(:)
-        write(unitReport, *) "    cell_Lsize(:) = ", this%same%cell_Lsize(:)
+        write(report_unit, *) "    cell_Lsize(:) = ", this%same%cell_Lsize(:)
         
     end subroutine InteractingSpheres_report
     
@@ -368,19 +368,19 @@ contains
     
     !> Consistency test 
     
-    subroutine InteractingSpheres_consistTest(this, ePot_mc, unitReport)
+    subroutine InteractingSpheres_consistTest(this, ePot_mc, report_unit)
     
         class(InteractingSpheres), intent(in) :: this
         real(DP), intent(in) :: ePot_mc
-        integer, intent(in) :: unitReport
+        integer, intent(in) :: report_unit
         
         real(DP) :: ePot_total
     
         ePot_total = this%ePot_total()
-        write(unitReport, *) "Consistency test:"
-        write(unitReport, *) "    ePot_mc = ", ePot_mc
-        write(unitReport, *) "    ePot_final = ", ePot_total
-        write(unitReport, *) "    relative difference = ", &
+        write(report_unit, *) "Consistency test:"
+        write(report_unit, *) "    ePot_mc = ", ePot_mc
+        write(report_unit, *) "    ePot_final = ", ePot_total
+        write(report_unit, *) "    relative difference = ", &
             abs(ePot_total-ePot_mc)/ePot_total
     
     end subroutine InteractingSpheres_consistTest

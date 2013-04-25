@@ -83,16 +83,16 @@ contains
     
     !> Report
     
-    subroutine MixingPotential_report(this, unitReport)
+    subroutine MixingPotential_report(this, report_unit)
     
         class(MixingPotential), intent(in) :: this
-        integer, intent(in) :: unitReport    
+        integer, intent(in) :: report_unit    
         
-        write(unitReport, *) "Simulation MC_C :"
-        write(unitReport, *) "    epsilon = ", this%epsilon
-        write(unitReport, *) "    alpha = ", this%alpha
-        write(unitReport, *) "    rCut = ", this%rCut
-        write(unitReport, *) "    dr = ", this%dr
+        write(report_unit, *) "Simulation MC_C :"
+        write(report_unit, *) "    epsilon = ", this%epsilon
+        write(report_unit, *) "    alpha = ", this%alpha
+        write(report_unit, *) "    rCut = ", this%rCut
+        write(report_unit, *) "    dr = ", this%dr
         
     end subroutine MixingPotential_report
     
