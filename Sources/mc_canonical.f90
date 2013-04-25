@@ -111,11 +111,11 @@ implicit none
             call random_number(rand)
             iColRand = int(rand*real(Ncol, DP)) + 1            
             if (iColRand <= type1_sph%getNcol()) then
-                call type1_sph%move(mix, type2_sph, type1_obs%ePot, &
+                call type1_sph%move(type2_sph, mix, type1_obs%ePot, &
                     mix_ePot, type1_obs%Nrej)                    
                 type1_obs%Nmove = type1_obs%Nmove + 1
             else
-                call type2_sph%move(mix, type1_sph, mix_ePot, type2_obs%Nrej)
+                call type2_sph%move(type1_sph, mix, mix_ePot, type2_obs%Nrej)
                 type2_obs%Nmove = type2_obs%Nmove + 1
             end if            
             

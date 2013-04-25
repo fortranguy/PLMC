@@ -153,11 +153,11 @@ contains
     
     !> Particle move
     
-    subroutine HardSpheres_move(this, mix, other, mix_ePot, Nrej)
+    subroutine HardSpheres_move(this, other, mix, mix_ePot, Nrej)
     
         class(HardSpheres), intent(inout) :: this
-        class(MixingPotential), intent(in) :: mix
         class(Spheres), intent(inout) :: other
+        class(MixingPotential), intent(in) :: mix
         real(DP), intent(inout) :: mix_ePot
         integer, intent(inout) :: Nrej
         

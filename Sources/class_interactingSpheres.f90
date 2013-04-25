@@ -226,12 +226,12 @@ contains
     
     !> Particle move
     
-    subroutine InteractingSpheres_move(this, mix, other, same_ePot, &
+    subroutine InteractingSpheres_move(this, other, mix, same_ePot, &
         mix_ePot, Nrej)
     
         class(InteractingSpheres), intent(inout) :: this
-        class(MixingPotential), intent(in) :: mix
         class(Spheres), intent(inout) :: other
+        class(MixingPotential), intent(in) :: mix        
         real(DP), intent(inout) :: same_ePot, mix_ePot
         integer, intent(inout) :: Nrej
         
