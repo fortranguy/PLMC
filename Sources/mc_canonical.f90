@@ -21,7 +21,7 @@ implicit none
     real(DP) :: rand
     real(DP) :: tIni, tFin
     
-    real(DP) :: ePot_mc, ePot_mcSum, ePot_total    
+    real(DP) :: ePot, ePotSum, ePot_total    
     integer, parameter :: unitReport = 10
     integer, parameter :: unitObsTherm = 11, unitObs = 12
     
@@ -189,11 +189,11 @@ implicit none
     mix_ePot_total = mix%ePot_total(type1_sph%X, type2_sph%X)
     call mix_results(mix_ePot, mix_ePot_total, mix_ePotSum, mix_unitReport)
     
-    ePot_mc = type1_obs%ePot + type2_obs%ePot + mix_ePot
+    ePot = type1_obs%ePot + type2_obs%ePot + mix_ePot
     ePot_total = type1_sph%ePot_total() + type2_sph%ePot_total() + &
         mix_ePot_total
-    ePot_mcSum = type1_obs%ePotSum + type2_obs%ePotSum + mix_ePotSum
-    call results(ePot_mc, ePot_total, ePot_mcSum, tFin-tIni, unitReport)
+    ePotSum = type1_obs%ePotSum + type2_obs%ePotSum + mix_ePotSum
+    call results(ePot, ePot_total, ePotSum, tFin-tIni, unitReport)
     
     close(unitReport)
     close(unitObsTherm)
