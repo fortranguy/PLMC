@@ -129,13 +129,11 @@ implicit none
         
         type1_obs%rejSum = type1_obs%rejSum + &
             real(type1_obs%Nrej, DP)/real(type1_obs%Nmove, DP)
-        type1_obs%Nrej = 0
-        type1_obs%Nmove = 0
+        type1_obs%Nrej = 0; type1_obs%Nmove = 0
         
         type2_obs%rejSum = type2_obs%rejSum + &
             real(type2_obs%Nrej, DP)/real(type2_obs%Nmove, DP)
-        type2_obs%Nrej = 0
-        type2_obs%Nmove = 0
+        type2_obs%Nrej = 0; type2_obs%Nmove = 0
         
         if (iStep <= Ntherm) then
         
