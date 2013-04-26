@@ -120,7 +120,7 @@ implicit none
                 call type2_sph%move(type1_sph, mix, type2_obs%ePot, &
                     mix_ePot, type2_obs%Nrej)
                 type2_obs%Nmove = type2_obs%Nmove + 1
-            end if            
+            end if
             
         end do
         
