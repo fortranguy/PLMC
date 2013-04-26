@@ -81,7 +81,7 @@ implicit none
     call type2_sph%report(type2_io%report)
     call type2_sph%printInfo(type2_io%report)
     
-    call mix%report(mix_report_unit)
+    call mix%report(mix_report_unit)    
     call report(report_unit)
     
     call initRandomSeed(report_unit)
@@ -101,8 +101,7 @@ implicit none
     call type2_sph%cols_to_cells(type1_sph%X)
     
     call mix%overlapTest(type1_sph%X, type2_sph%X)
-    mix_ePot = mix%ePot_conf(type1_sph%X, type2_sph%X)
-    
+    mix_ePot = mix%ePot_conf(type1_sph%X, type2_sph%X)    
     ePot_conf = type1_obs%ePot + type2_obs%ePot + mix_ePot
     
 ! Middle -----------------------------------------------------------------------
