@@ -22,7 +22,7 @@ implicit none
     real(DP) :: rand !< random number in between 0 and 1
     real(DP) :: tIni, tFin !< initial and final time
     
-    real(DP) :: ePot, ePotSum, ePot_total !< potential energy
+    real(DP) :: ePot, ePotSum, ePot_conf !< potential energy
     integer, parameter :: report_unit = 10
     integer, parameter :: obsTherm_unit = 11, obs_unit = 12 !< observable(s)
     
@@ -87,19 +87,19 @@ implicit none
     call initialCondition(type1_sph, type2_sph, mix%getRmin(), report_unit)
     
     call type1_sph%overlapTest()
-    type1_obs%ePot = type1_sph%ePot_total()
+    type1_obs%ePot = type1_sph%ePot_conf()
     call type1_sph%snapShot(type1_io%snapIni)
     call type1_sph%cols_to_cells(type2_sph%X)
     
     call type2_sph%overlapTest()
-    type2_obs%ePot = type2_sph%ePot_total()
+    type2_obs%ePot = type2_sph%ePot_conf()
     call type2_sph%snapShot(type2_io%snapIni)
     call type2_sph%cols_to_cells(type1_sph%X)
     
     call mix%overlapTest(type1_sph%X, type2_sph%X)
-    mix_ePot = mix%ePot_total(type1_sph%X, type2_sph%X)
+    mix_ePot = mix%ePot_conf(type1_sph%X, type2_sph%X)
     
-    ePot_total = type1_obs%ePot + type2_obs%ePot + mix_ePot
+    ePot_conf = type1_obs%ePot + type2_obs%ePot + mix_ePot
     
 ! Middle ----------------------------------------------------------------------
         
@@ -189,14 +189,14 @@ implicit none
     call type2_obs%results(type2_sph%getNcol(), type2_io%report)
     
     call mix%overlapTest(type1_sph%X, type2_sph%X)
-    mix_ePot_total = mix%ePot_total(type1_sph%X, type2_sph%X)
+    mix_ePot_total = mix%ePot_conf(type1_sph%X, type2_sph%X)
     call mix_results(mix_ePot, mix_ePot_total, mix_ePotSum, mix_report_unit)
     
     ePot = type1_obs%ePot + type2_obs%ePot + mix_ePot
-    ePot_total = type1_sph%ePot_total() + type2_sph%ePot_total() + &
+    ePot_conf = type1_sph%ePot_conf() + type2_sph%ePot_conf() + &
         mix_ePot_total
     ePotSum = type1_obs%ePotSum + type2_obs%ePotSum + mix_ePotSum
-    call results(ePot, ePot_total, ePotSum, tFin-tIni, report_unit)
+    call results(ePot, ePot_conf, ePotSum, tFin-tIni, report_unit)
     
     close(report_unit)
     close(obsTherm_unit)

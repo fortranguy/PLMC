@@ -44,7 +44,7 @@ private
         procedure :: ePot_init => MixingPotential_ePot_init
         procedure :: ePot_pair => MixingPotential_ePot_pair
         procedure :: ePot_neigh => MixingPotential_ePot_neigh
-        procedure :: ePot_total => MixingPotential_ePot_total
+        procedure :: ePot_conf => MixingPotential_ePot_total
 
     end type
 
@@ -236,7 +236,7 @@ contains
     !> Total potential energy
     
     function MixingPotential_ePot_total(this, type1_X, type2_X) &
-        result(ePot_total)
+        result(ePot_conf)
     
         class(MixingPotential), intent(in) :: this
         real(DP), dimension(:, :), intent(in) :: type1_X, type2_X
@@ -244,18 +244,18 @@ contains
         integer :: Ncol1, Ncol2
         integer :: iCol1, iCol2
         real(DP) :: r_mix
-        real(DP) :: ePot_total
+        real(DP) :: ePot_conf
         
         Ncol1 = size(type1_X, 2)
         Ncol2 = size(type2_X, 2)
         
-        ePot_total = 0._DP
+        ePot_conf = 0._DP
         
         do iCol1 = 1, Ncol1
             do iCol2 = 1, Ncol2
                 
                 r_mix = dist(type1_X(:, iCol1), type2_X(:, iCol2))
-                ePot_total = ePot_total + this%ePot_pair(r_mix)
+                ePot_conf = ePot_conf + this%ePot_pair(r_mix)
 
             end do
         end do

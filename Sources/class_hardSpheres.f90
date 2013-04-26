@@ -33,7 +33,7 @@ private
               
         !> Potential energy
         procedure :: ePot_neigh => HardSpheres_ePot_neigh
-        procedure :: ePot_total => HardSpheres_ePot_total
+        procedure :: ePot_conf => HardSpheres_ePot_total
         procedure :: consistTest => HardSpheres_consistTest
         
         !> Monte-Carlo
@@ -262,13 +262,13 @@ contains
     
     !> Total potential energy : dummy
     
-    function HardSpheres_ePot_total(this) result(ePot_total)
+    function HardSpheres_ePot_total(this) result(ePot_conf)
     
         class(HardSpheres), intent(in) :: this
         
-        real(DP) :: ePot_total
+        real(DP) :: ePot_conf
     
-        ePot_total = this%ePot
+        ePot_conf = this%ePot
         
     end function HardSpheres_ePot_total
     
@@ -280,14 +280,14 @@ contains
         real(DP), intent(in) :: ePot_mc
         integer, intent(in) :: report_unit
         
-        real(DP) :: ePot_total
+        real(DP) :: ePot_conf
     
-        ePot_total = this%ePot_total()
+        ePot_conf = this%ePot_conf()
         write(report_unit, *) "Consistency test:"
         write(report_unit, *) "    ePot_mc = ", ePot_mc
-        write(report_unit, *) "    ePot_final = ", ePot_total
+        write(report_unit, *) "    ePot_final = ", ePot_conf
         write(report_unit, *) "    absolute difference = ", &
-            abs(ePot_total-ePot_mc)
+            abs(ePot_conf-ePot_mc)
     
     end subroutine HardSpheres_consistTest
 

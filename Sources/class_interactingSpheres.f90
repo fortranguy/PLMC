@@ -42,7 +42,7 @@ private
         procedure :: ePot_init => InteractingSpheres_ePot_init
         procedure :: ePot_pair => InteractingSpheres_ePot_pair
         procedure :: ePot_neigh => InteractingSpheres_ePot_neigh
-        procedure :: ePot_total => InteractingSpheres_ePot_total
+        procedure :: ePot_conf => InteractingSpheres_ePot_total
         procedure :: consistTest => InteractingSpheres_consistTest
         
         !> Monte-Carlo
@@ -341,47 +341,47 @@ contains
 
     !> Total potential energy
     
-    function InteractingSpheres_ePot_total(this) result(ePot_total)
+    function InteractingSpheres_ePot_total(this) result(ePot_conf)
     
         class(InteractingSpheres), intent(in) :: this
         
         integer :: iCol, jCol
         real(DP) :: r_ij
-        real(DP) :: ePot_total
+        real(DP) :: ePot_conf
     
-        ePot_total = 0._DP
+        ePot_conf = 0._DP
         
         do jCol = 1, this%Ncol
             do iCol = 1, this%Ncol
                 if (iCol /= jCol) then
                 
                     r_ij = dist(this%X(:, iCol), this%X(:, jCol))
-                    ePot_total = ePot_total + this%ePot_pair(r_ij)
+                    ePot_conf = ePot_conf + this%ePot_pair(r_ij)
                     
                 end if
             end do
         end do
         
-        ePot_total = 0.5_DP*ePot_total
+        ePot_conf = 0.5_DP*ePot_conf
     
     end function InteractingSpheres_ePot_total
     
     !> Consistency test 
     
-    subroutine InteractingSpheres_consistTest(this, ePot_mc, report_unit)
+    subroutine InteractingSpheres_consistTest(this, ePot, report_unit)
     
         class(InteractingSpheres), intent(in) :: this
-        real(DP), intent(in) :: ePot_mc
+        real(DP), intent(in) :: ePot
         integer, intent(in) :: report_unit
         
-        real(DP) :: ePot_total
+        real(DP) :: ePot_conf
     
-        ePot_total = this%ePot_total()
+        ePot_conf = this%ePot_conf()
         write(report_unit, *) "Consistency test:"
-        write(report_unit, *) "    ePot_mc = ", ePot_mc
-        write(report_unit, *) "    ePot_final = ", ePot_total
+        write(report_unit, *) "    ePot = ", ePot
+        write(report_unit, *) "    ePot_con = ", ePot_conf
         write(report_unit, *) "    relative difference = ", &
-            abs(ePot_total-ePot_mc)/ePot_total
+            abs(ePot_conf-ePot)/ePot_conf
     
     end subroutine InteractingSpheres_consistTest
 
