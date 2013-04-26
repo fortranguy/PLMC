@@ -19,10 +19,11 @@ implicit none
 
     ! Declarations
     
-    !   System variables    
-    real(DP) :: ePot, ePotSum, ePot_conf !< potential energy
-    integer, parameter :: report_unit = 10 !< data & results
-    integer, parameter :: obsTherm_unit = 11, obs_unit = 12 !< observable(s)
+    !   Monte-Carlo variables
+    integer :: iStep, iMove !< Monte-Carlo counters
+    integer :: iColRand !< random choice of a particle
+    real(DP) :: rand !< random number in between 0 and 1
+    real(DP) :: tIni, tFin !< initial and final time
     
     !   Type 1 : Interacting spheres
     type(InteractingSpheres) :: type1_sph !< Monte-Carlo subroutines
@@ -40,23 +41,15 @@ implicit none
     integer, parameter :: mix_report_unit = 13
     integer, parameter :: mix_obsTherm_unit = 14, mix_obs_unit = 15
     
-    !   Monte-Carlo variables
-    integer :: iStep, iMove !< Monte-Carlo counters
-    integer :: iColRand !< random choice of a particle
-    real(DP) :: rand !< random number in between 0 and 1
-    real(DP) :: tIni, tFin !< initial and final time
+    !   System variables    
+    real(DP) :: ePot, ePotSum, ePot_conf !< potential energy
+    integer, parameter :: report_unit = 10 !< data & results
+    integer, parameter :: obsTherm_unit = 11, obs_unit = 12 !< observable(s)
     
     write(output_unit, *) "Monte-Carlo Mix - Canonical : Volume =", &
         product(Lsize)
 
     ! Initialisations & reports
-    
-    open(unit=report_unit, recl=4096, file="report.out", status='new', &
-        action='write')
-    open(unit=obsTherm_unit, recl=4096, file="obsTherm.out", status='new', &
-        action='write')
-    open(unit=obs_unit, recl=4096, file="obs.out", status='new', &
-        action='write')
     
     call type1_sph%construct()
     call type1_obs%init()
@@ -75,8 +68,12 @@ implicit none
     open(unit=mix_obs_unit, recl=4096, file="mix_obs.out", status='new', &
         action='write')
         
-    call report(report_unit)
-    call initRandomSeed(report_unit)
+    open(unit=report_unit, recl=4096, file="report.out", status='new', &
+        action='write')
+    open(unit=obsTherm_unit, recl=4096, file="obsTherm.out", status='new', &
+        action='write')
+    open(unit=obs_unit, recl=4096, file="obs.out", status='new', &
+        action='write')
     
     call type1_sph%report(type1_io%report)
     call type1_sph%printInfo(type1_io%report)
@@ -85,6 +82,9 @@ implicit none
     call type2_sph%printInfo(type2_io%report)
     
     call mix%report(mix_report_unit)
+    call report(report_unit)
+    
+    call initRandomSeed(report_unit)
     
     ! Initial condition
     
@@ -156,9 +156,9 @@ implicit none
             write(type2_io%obsTherm, *) iStep, type2_obs%ePot, type2_obs%activ
             
             ! Observables writing
+            write(mix_obsTherm_unit, *) iStep, mix_ePot
             write(obsTherm_unit, *) iStep, type1_obs%ePot + type2_obs%ePot + &
                 mix_ePot
-            write(mix_obsTherm_unit, *) iStep, mix_ePot
         
         else ! Observables accumulations & writing
         
@@ -170,9 +170,9 @@ implicit none
             type2_obs%activSum = type2_obs%activSum + type2_obs%activ  
             write(type2_io%obs, *) iStep, type2_obs%ePot, type2_obs%activ                
                 
-            mix_ePotSum = mix_ePotSum + mix_ePot            
-            write(obs_unit, *) iStep, type1_obs%ePot + type2_obs%ePot + mix_ePot
+            mix_ePotSum = mix_ePotSum + mix_ePot
             write(mix_obs_unit, *) iStep, mix_ePot
+            write(obs_unit, *) iStep, type1_obs%ePot + type2_obs%ePot + mix_ePot
 
             if (snap) then ! snap shots of the configuration
                 call type1_sph%snapShot(type1_io%snapShots)
@@ -211,10 +211,6 @@ implicit none
     
     ! Finalisations
     
-    close(report_unit)
-    close(obsTherm_unit)
-    close(obs_unit)
-    
     call type1_sph%destroy()
     call type1_io%close()
     
@@ -225,5 +221,9 @@ implicit none
     close(mix_report_unit)
     close(mix_obsTherm_unit)
     close(mix_obs_unit)
+    
+    close(report_unit)
+    close(obsTherm_unit)
+    close(obs_unit)
     
 end program mc_canonical
