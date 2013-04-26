@@ -113,12 +113,12 @@ implicit none
             call random_number(rand)
             iColRand = int(rand*real(Ncol, DP)) + 1            
             if (iColRand <= type1_sph%getNcol()) then
-                call type1_sph%move(type2_sph, mix, type1_obs%ePot, &
-                    mix_ePot, type1_obs%Nrej)                    
+                call type1_sph%move(type2_sph, mix, type1_obs%ePot, mix_ePot, &
+                    type1_obs%Nrej)                    
                 type1_obs%Nmove = type1_obs%Nmove + 1
             else
-                call type2_sph%move(type1_sph, mix, type2_obs%ePot, &
-                    mix_ePot, type2_obs%Nrej)
+                call type2_sph%move(type1_sph, mix, type2_obs%ePot, mix_ePot, &
+                    type2_obs%Nrej)
                 type2_obs%Nmove = type2_obs%Nmove + 1
             end if
             
@@ -127,31 +127,27 @@ implicit none
         call type1_sph%widom(type1_obs%activ)
         call type2_sph%widom(type2_obs%activ)
         
-        type1_obs%rejRateSum = type1_obs%rejRateSum + &
+        type1_obs%rejSum = type1_obs%rejSum + &
             real(type1_obs%Nrej, DP)/real(type1_obs%Nmove, DP)
         type1_obs%Nrej = 0
         type1_obs%Nmove = 0
         
-        type2_obs%rejRateSum = type2_obs%rejRateSum + &
+        type2_obs%rejSum = type2_obs%rejSum + &
             real(type2_obs%Nrej, DP)/real(type2_obs%Nmove, DP)
         type2_obs%Nrej = 0
         type2_obs%Nmove = 0
         
         if (iStep <= Ntherm) then
         
-            call type1_sph%adaptDx(iStep, type1_obs%rejRateSum, &
-                type1_io%report)
+            call type1_sph%adaptDx(iStep, type1_obs%rejSum, type1_io%report)
             write(type1_io%dx, *) iStep, type1_sph%getDx(), &
-                type1_obs%rejRateSum/real(iStep, DP)
-            write(type1_io%obsTherm, *) iStep, type1_obs%ePot, &
-                type1_obs%activ
+                type1_obs%rejSum/real(iStep, DP)
+            write(type1_io%obsTherm, *) iStep, type1_obs%ePot, type1_obs%activ
         
-            call type2_sph%adaptDx(iStep, type2_obs%rejRateSum, &
-                type2_io%report)
+            call type2_sph%adaptDx(iStep, type2_obs%rejSum, type2_io%report)
             write(type2_io%dx, *) iStep, type2_sph%getDx(), &
-                type2_obs%rejRateSum/real(iStep, DP)
-            write(type2_io%obsTherm, *) iStep, type2_obs%ePot, &
-                type2_obs%activ
+                type2_obs%rejSum/real(iStep, DP)
+            write(type2_io%obsTherm, *) iStep, type2_obs%ePot, type2_obs%activ
                 
             write(obsTherm_unit, *) iStep, type1_obs%ePot + type2_obs%ePot + &
                 mix_ePot
@@ -170,7 +166,8 @@ implicit none
                 type2_obs%activ                
                 
             mix_ePotSum = mix_ePotSum + mix_ePot            
-            write(obs_unit, *) iStep, type1_obs%ePot + type2_obs%ePot + mix_ePot
+            write(obs_unit, *) iStep, type1_obs%ePot + type2_obs%ePot + &
+                mix_ePot
             write(mix_obs_unit, *) iStep, mix_ePot
 
             if (snap) then

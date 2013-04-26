@@ -16,7 +16,7 @@ private
     
         ! Rejection
         integer :: Nrej
-        real(DP) :: rejRateSum
+        real(DP) :: rejSum
         
         ! Potential energy
         real(DP) :: ePot
@@ -42,7 +42,7 @@ contains
         this%Nmove = 0
         
         this%Nrej = 0
-        this%rejRateSum = 0._DP
+        this%rejSum = 0._DP
         
         this%ePotSum = 0._DP        
         this%activSum = 0._DP
@@ -75,7 +75,7 @@ contains
         write(report_unit, *) "    potChi.avg = ", potChiId + potChiEx
         
         write(report_unit, *) "    Rejection rate = ", &
-            this%rejRateSum/real(Nstep+Ntherm, DP)
+            this%rejSum/real(Nstep+Ntherm, DP)
     
     end subroutine Observables_results
 

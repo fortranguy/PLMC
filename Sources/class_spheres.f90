@@ -183,27 +183,27 @@ contains
     
     !> Adaptation of dx during the thermalisation
     
-    subroutine Spheres_adaptDx(this, iStep, rejRateSum, report_unit)
+    subroutine Spheres_adaptDx(this, iStep, rejSum, report_unit)
     
         class(Spheres), intent(inout) :: this 
         integer, intent(in) :: iStep, report_unit
-        real(DP), intent(in) :: rejRateSum    
+        real(DP), intent(in) :: rejSum    
         
-        real(DP) :: rejRate
-        real(DP), parameter :: rejRateFix = 0.5_DP
+        real(DP) :: rej
+        real(DP), parameter :: rejFix = 0.5_DP
         real(DP), parameter :: dx_eps = 0.05_DP, taux_eps = 0.05_DP
         real(DP), parameter :: more = 1._DP+dx_eps, less = 1._DP-dx_eps
         
-        rejRate = 0._DP
+        rej = 0._DP
         
         if (mod(iStep, this%Nadapt) == 0 .and. iStep>2) then
         
-            rejRate = rejRateSum/real(iStep-1, DP)
+            rej = rejSum/real(iStep-1, DP)
         
-            if (rejRate < rejRateFix - taux_eps) then            
+            if (rej < rejFix - taux_eps) then            
                 this%dx(:) = this%dx(:) * more
                 this%dx(:) = modulo(this%dx(:), Lsize(:))
-            else if (rejRate > rejRateFix + taux_eps) then
+            else if (rej > rejFix + taux_eps) then
                 this%dx(:) = this%dx(:) * less
                 this%dx(:) = modulo(this%dx(:), Lsize(:))
             end if
@@ -212,7 +212,7 @@ contains
         
         if (iStep == Ntherm) then
         
-            if (rejRate == 0._DP) then
+            if (rej == 0._DP) then
                 write(output_unit, *) this%name, &
                     "    Warning : dx adaptation problem."
                 this%dx(:) = this%dx_save(:)
@@ -226,7 +226,7 @@ contains
             write(report_unit, *) "    dx(:) = ", this%dx(:)
             write(report_unit, *) "    rejection relative difference = ", &
                                         ! wrong translation ?
-                abs(rejRate - rejRateFix)/rejRateFix
+                abs(rej - rejFix)/rejFix
             
         end if
     
