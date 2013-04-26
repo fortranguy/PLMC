@@ -62,7 +62,7 @@ contains
             status='new', action='write')
         open(unit=this%snapFin, recl=4096, file=name//"_snapFin.out", &
             status='new', action='write')
-        open(unit=this%snapShots, recl=4096, file=name//"_snap.shot", &
+        open(unit=this%snapShots, recl=4096, file=name//"_snap.shots", &
             status='new', action='write')
             
         open(unit=this%report, recl=4096, file=name//"_report.out", &

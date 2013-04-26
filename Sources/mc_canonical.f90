@@ -64,8 +64,8 @@ implicit none
     
     call mix%construct()
     mix_ePotSum = 0._DP
-    open(unit=mix_report_unit, recl=4096, file="mix_report.out", &
-        status='new', action='write')
+    open(unit=mix_report_unit, recl=4096, file="mix_report.out", status='new', &
+        action='write')
     open(unit=mix_obsTherm_unit, recl=4096, file="mix_obsTherm.out", &
         status='new', action='write')
     open(unit=mix_obs_unit, recl=4096, file="mix_obs.out", status='new', &
@@ -157,17 +157,14 @@ implicit none
         
             type1_obs%ePotSum = type1_obs%ePotSum + type1_obs%ePot
             type1_obs%activSum = type1_obs%activSum + type1_obs%activ            
-            write(type1_io%obs, *) iStep, type1_obs%ePot, &
-                type1_obs%activ
+            write(type1_io%obs, *) iStep, type1_obs%ePot, type1_obs%activ
         
             type2_obs%ePotSum = type2_obs%ePotSum + type2_obs%ePot
             type2_obs%activSum = type2_obs%activSum + type2_obs%activ  
-            write(type2_io%obs, *) iStep, type2_obs%ePot, &
-                type2_obs%activ                
+            write(type2_io%obs, *) iStep, type2_obs%ePot, type2_obs%activ                
                 
             mix_ePotSum = mix_ePotSum + mix_ePot            
-            write(obs_unit, *) iStep, type1_obs%ePot + type2_obs%ePot + &
-                mix_ePot
+            write(obs_unit, *) iStep, type1_obs%ePot + type2_obs%ePot + mix_ePot
             write(mix_obs_unit, *) iStep, mix_ePot
 
             if (snap) then
@@ -199,8 +196,7 @@ implicit none
     call mix_results(mix_ePot, mix_ePot_conf, mix_ePotSum, mix_report_unit)
     
     ePot = type1_obs%ePot + type2_obs%ePot + mix_ePot
-    ePot_conf = type1_sph%ePot_conf() + type2_sph%ePot_conf() + &
-        mix_ePot_conf
+    ePot_conf = type1_sph%ePot_conf() + type2_sph%ePot_conf() + mix_ePot_conf
     ePotSum = type1_obs%ePotSum + type2_obs%ePotSum + mix_ePotSum
     call results(ePot, ePot_conf, ePotSum, tFin-tIni, report_unit)
     
