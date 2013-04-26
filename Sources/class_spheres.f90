@@ -174,10 +174,10 @@ contains
         
         integer :: other_Ncol 
         
-        call this%same%all_col_to_cell(this%Ncol, this%X)
+        call this%same%cols_to_cells(this%Ncol, this%X)
         
         other_Ncol = size(other_X, 2)
-        call this%mix%all_col_to_cell(other_Ncol, other_X)
+        call this%mix%cols_to_cells(other_Ncol, other_X)
     
     end subroutine Spheres_cols_to_cells
     
