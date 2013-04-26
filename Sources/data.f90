@@ -4,6 +4,8 @@
 !*******************************************************************************
 module data_constants
 
+implicit none
+
     ! double precision
     integer, parameter :: DP = selected_real_kind(15, 307)
     real(DP), parameter :: PI = acos(-1._DP)
@@ -18,6 +20,8 @@ end module data_constants
 module data_cell
 
 use data_constants
+
+implicit none
     
     integer, parameter :: Dim = 3
     real(DP), parameter :: Lsize1 = 12._DP
@@ -38,6 +42,8 @@ module data_particles
 
 use data_constants
 use data_cell
+
+implicit none
 
     real(DP), parameter :: inter_radius = .5_DP
     real(DP), parameter :: inter_rMin = 2._DP * inter_radius
