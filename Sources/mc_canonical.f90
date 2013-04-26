@@ -133,6 +133,7 @@ implicit none
         call type1_sph%widom(type1_obs%activ)
         call type2_sph%widom(type2_obs%activ)
         
+        ! Rejections accumulations
         type1_obs%rejSum = type1_obs%rejSum + &
             real(type1_obs%Nrej, DP)/real(type1_obs%Nmove, DP)
         type1_obs%Nrej = 0; type1_obs%Nmove = 0
@@ -143,7 +144,7 @@ implicit none
         
         if (iStep <= Ntherm) then ! Thermalisation
             
-            ! Displacement optimisations
+            ! Displacements optimisations
             call type1_sph%adaptDx(iStep, type1_obs%rejSum, type1_io%report)
             write(type1_io%dx, *) iStep, type1_sph%getDx(), &
                 type1_obs%rejSum/real(iStep, DP)
@@ -154,12 +155,12 @@ implicit none
                 type2_obs%rejSum/real(iStep, DP)
             write(type2_io%obsTherm, *) iStep, type2_obs%ePot, type2_obs%activ
             
-            ! Write observables
+            ! Observables writing
             write(obsTherm_unit, *) iStep, type1_obs%ePot + type2_obs%ePot + &
                 mix_ePot
             write(mix_obsTherm_unit, *) iStep, mix_ePot
         
-        else ! Accumulations & write observables
+        else ! Observables accumulations & writing
         
             type1_obs%ePotSum = type1_obs%ePotSum + type1_obs%ePot
             type1_obs%activSum = type1_obs%activSum + type1_obs%activ            
@@ -173,7 +174,7 @@ implicit none
             write(obs_unit, *) iStep, type1_obs%ePot + type2_obs%ePot + mix_ePot
             write(mix_obs_unit, *) iStep, mix_ePot
 
-            if (snap) then ! snap shots
+            if (snap) then ! snap shots of the configuration
                 call type1_sph%snapShot(type1_io%snapShots)
                 call type2_sph%snapShot(type2_io%snapShots)
             end if
