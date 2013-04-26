@@ -98,12 +98,20 @@ contains
         integer, intent(in) :: report_unit    
         
         write(report_unit, *) "Data :"
+        
         write(report_unit ,*) "    Ncol = ", this%Ncol
         write(report_unit ,*) "    Nwidom = ", this%Nwidom
+        
         write(report_unit, *) "    rCut = ", this%rCut
-        write(report_unit, *) "    cell_coordMax(:) = ", &
+        
+        write(report_unit, *) "    same_cell_coordMax(:) = ", &
         	this%same%cell_coordMax(:)
-        write(report_unit, *) "    cell_Lsize(:) = ", this%same%cell_Lsize(:)
+        write(report_unit, *) "    same_cell_Lsize(:) = ", &
+            this%same%cell_Lsize(:)        
+        write(report_unit, *) "    mix_cell_coordMax(:) = ", &
+        	this%mix%cell_coordMax(:)
+        write(report_unit, *) "    mix_cell_Lsize(:) = ", &
+            this%mix%cell_Lsize(:)
         
     end subroutine HardSpheres_report
     
