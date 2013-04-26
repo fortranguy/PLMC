@@ -16,27 +16,31 @@ use mod_tools
 implicit none
 
 ! Beginning --------------------------------------------------------------------
+
+    ! Declarations
     
+    !   Monte-Carlo variables
     integer :: iStep, iMove !< Monte-Carlo counters
     integer :: iColRand !< random choice of a particle
     real(DP) :: rand !< random number in between 0 and 1
     real(DP) :: tIni, tFin !< initial and final time
     
+    !   System variables    
     real(DP) :: ePot, ePotSum, ePot_conf !< potential energy
     integer, parameter :: report_unit = 10
     integer, parameter :: obsTherm_unit = 11, obs_unit = 12 !< observable(s)
     
-    ! Type 1 : Interacting spheres
+    !   Type 1 : Interacting spheres
     type(InteractingSpheres) :: type1_sph !< Monte-Carlo subroutines
     type(Observables) :: type1_obs !< e.g. Energy
     type(Units) :: type1_io        !< input/output files
     
-    ! Type 2 : Hard spheres
+    !   Type 2 : Hard spheres
     type(HardSpheres) :: type2_sph
     type(Observables) :: type2_obs
     type(Units) :: type2_io
     
-    ! Mixing between 2 types
+    !   Mixing between 2 types
     type(MixingPotential) :: mix
     real(DP) :: mix_ePot, mix_ePotSum, mix_ePot_conf
     integer, parameter :: mix_report_unit = 13
@@ -45,7 +49,7 @@ implicit none
     write(output_unit, *) "Monte-Carlo Mix - Canonical : Volume =", &
         product(Lsize)
 
-    ! Initialisation
+    ! Initialisations & reports
     
     open(unit=report_unit, recl=4096, file="report.out", status='new', &
         action='write')
@@ -108,6 +112,7 @@ implicit none
     call cpu_time(tIni)
     do iStep = 1, Ntherm + Nstep
     
+        ! Moving a particle : Metropolis algorithm
         do iMove = 1, Nmove
         
             call random_number(rand)
@@ -124,6 +129,7 @@ implicit none
             
         end do
         
+        ! Widom method : chemical potentials
         call type1_sph%widom(type1_obs%activ)
         call type2_sph%widom(type2_obs%activ)
         
@@ -135,8 +141,9 @@ implicit none
             real(type2_obs%Nrej, DP)/real(type2_obs%Nmove, DP)
         type2_obs%Nrej = 0; type2_obs%Nmove = 0
         
-        if (iStep <= Ntherm) then
-        
+        if (iStep <= Ntherm) then ! Thermalisation
+            
+            ! Displacement optimisations
             call type1_sph%adaptDx(iStep, type1_obs%rejSum, type1_io%report)
             write(type1_io%dx, *) iStep, type1_sph%getDx(), &
                 type1_obs%rejSum/real(iStep, DP)
@@ -146,12 +153,13 @@ implicit none
             write(type2_io%dx, *) iStep, type2_sph%getDx(), &
                 type2_obs%rejSum/real(iStep, DP)
             write(type2_io%obsTherm, *) iStep, type2_obs%ePot, type2_obs%activ
-                
+            
+            ! Write observables
             write(obsTherm_unit, *) iStep, type1_obs%ePot + type2_obs%ePot + &
                 mix_ePot
             write(mix_obsTherm_unit, *) iStep, mix_ePot
         
-        else
+        else ! Accumulations & write observables
         
             type1_obs%ePotSum = type1_obs%ePotSum + type1_obs%ePot
             type1_obs%activSum = type1_obs%activSum + type1_obs%activ            
@@ -165,7 +173,7 @@ implicit none
             write(obs_unit, *) iStep, type1_obs%ePot + type2_obs%ePot + mix_ePot
             write(mix_obs_unit, *) iStep, mix_ePot
 
-            if (snap) then
+            if (snap) then ! snap shots
                 call type1_sph%snapShot(type1_io%snapShots)
                 call type2_sph%snapShot(type2_io%snapShots)
             end if
@@ -178,6 +186,8 @@ implicit none
     write(output_unit, *) "End of cycles"
 
 ! End --------------------------------------------------------------------------
+
+    ! Tests & results
 
     call type1_sph%overlapTest()
     call type1_sph%consistTest(type1_obs%ePot, type1_io%report)
@@ -197,6 +207,8 @@ implicit none
     ePot_conf = type1_sph%ePot_conf() + type2_sph%ePot_conf() + mix_ePot_conf
     ePotSum = type1_obs%ePotSum + type2_obs%ePotSum + mix_ePotSum
     call results(ePot, ePot_conf, ePotSum, tFin-tIni, report_unit)
+    
+    ! Finalisations
     
     close(report_unit)
     close(obsTherm_unit)
