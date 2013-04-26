@@ -131,8 +131,12 @@ contains
         integer, intent(in) :: report_unit
 
         write(report_unit, *) "Data :"
+        
         write(report_unit ,*) "    Lsize(:) = ", Lsize(:)
         write(report_unit ,*) "    Vol = ", product(Lsize)
+        write(report_unit ,*) "    Ncol = ", Ncol
+        write(report_unit ,*) "    Tstar = ", Tstar
+        
         write(report_unit, *) "    Nstep = ", Nstep
         write(report_unit, *) "    Ntherm = ", Ntherm
         write(report_unit, *) "    Nmove = ", Nmove
