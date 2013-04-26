@@ -72,7 +72,7 @@ implicit none
         action='write')
         
     call report(report_unit)
-    call init_random_seed(report_unit)
+    call initRandomSeed(report_unit)
     
     call type1_sph%report(type1_io%report)
     call type1_sph%printInfo(type1_io%report)

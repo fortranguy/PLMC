@@ -15,7 +15,7 @@ contains
 
     !> Random number generator : seed
     
-    subroutine init_random_seed(report_unit)
+    subroutine initRandomSeed(report_unit)
     
         integer, intent(in) :: report_unit
     
@@ -36,7 +36,7 @@ contains
 
         deallocate(seed)
         
-    end subroutine init_random_seed
+    end subroutine initRandomSeed
     
     !> Initial condition
     
