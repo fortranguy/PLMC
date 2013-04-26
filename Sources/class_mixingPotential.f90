@@ -44,7 +44,7 @@ private
         procedure :: ePot_init => MixingPotential_ePot_init
         procedure :: ePot_pair => MixingPotential_ePot_pair
         procedure :: ePot_neigh => MixingPotential_ePot_neigh
-        procedure :: ePot_conf => MixingPotential_ePot_total
+        procedure :: ePot_conf => MixingPotential_ePot_conf
 
     end type
 
@@ -235,7 +235,7 @@ contains
     
     !> Total potential energy
     
-    function MixingPotential_ePot_total(this, type1_X, type2_X) &
+    function MixingPotential_ePot_conf(this, type1_X, type2_X) &
         result(ePot_conf)
     
         class(MixingPotential), intent(in) :: this
@@ -260,6 +260,6 @@ contains
             end do
         end do
     
-    end function MixingPotential_ePot_total
+    end function MixingPotential_ePot_conf
 
 end module class_mixingPotential

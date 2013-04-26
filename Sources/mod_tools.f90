@@ -141,17 +141,17 @@ contains
     
     !> Results : general
     
-    subroutine results(ePot_mc, ePot_total, ePot_mcSum, duration, report_unit)
+    subroutine results(ePot_mc, ePot_conf, ePot_mcSum, duration, report_unit)
     
-        real(DP), intent(in) :: ePot_mc, ePot_total, ePot_mcSum
+        real(DP), intent(in) :: ePot_mc, ePot_conf, ePot_mcSum
         real(DP), intent(in) :: duration
         integer, intent(in) :: report_unit
         
         write(report_unit, *) "Consistency test:"
         write(report_unit, *) "    ePot_mc = ", ePot_mc
-        write(report_unit, *) "    ePot_final = ", ePot_total
+        write(report_unit, *) "    ePot_final = ", ePot_conf
         write(report_unit, *) "    relative difference = ", &
-            abs((ePot_total-ePot_mc)/ePot_total)
+            abs((ePot_conf-ePot_mc)/ePot_conf)
             
         write(report_unit, *) "Results :"
         write(report_unit, *) "    average energy = ", &
@@ -162,16 +162,16 @@ contains
     
     !> Results : mix
     
-    subroutine mix_results(ePot_mc, ePot_total, ePot_mcSum, report_unit)
+    subroutine mix_results(ePot_mc, ePot_conf, ePot_mcSum, report_unit)
     
-        real(DP), intent(in) :: ePot_mc, ePot_total, ePot_mcSum
+        real(DP), intent(in) :: ePot_mc, ePot_conf, ePot_mcSum
         integer, intent(in) :: report_unit
 
         write(report_unit, *) "Consistency test:"
         write(report_unit, *) "    ePot_mc = ", ePot_mc
-        write(report_unit, *) "    ePot_final = ", ePot_total
+        write(report_unit, *) "    ePot_final = ", ePot_conf
         write(report_unit, *) "    relative difference = ", &
-            abs((ePot_total-ePot_mc)/ePot_total)
+            abs((ePot_conf-ePot_mc)/ePot_conf)
     
         write(report_unit, *) "Results :"        
         write(report_unit, *) "    average energy = ", ePot_mcSum/real(Nstep, DP)

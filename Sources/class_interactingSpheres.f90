@@ -42,7 +42,7 @@ private
         procedure :: ePot_init => InteractingSpheres_ePot_init
         procedure :: ePot_pair => InteractingSpheres_ePot_pair
         procedure :: ePot_neigh => InteractingSpheres_ePot_neigh
-        procedure :: ePot_conf => InteractingSpheres_ePot_total
+        procedure :: ePot_conf => InteractingSpheres_ePot_conf
         procedure :: consistTest => InteractingSpheres_consistTest
         
         !> Monte-Carlo
@@ -341,7 +341,7 @@ contains
 
     !> Total potential energy
     
-    function InteractingSpheres_ePot_total(this) result(ePot_conf)
+    function InteractingSpheres_ePot_conf(this) result(ePot_conf)
     
         class(InteractingSpheres), intent(in) :: this
         
@@ -364,7 +364,7 @@ contains
         
         ePot_conf = 0.5_DP*ePot_conf
     
-    end function InteractingSpheres_ePot_total
+    end function InteractingSpheres_ePot_conf
     
     !> Consistency test 
     

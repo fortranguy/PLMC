@@ -33,7 +33,7 @@ private
               
         !> Potential energy
         procedure :: ePot_neigh => HardSpheres_ePot_neigh
-        procedure :: ePot_conf => HardSpheres_ePot_total
+        procedure :: ePot_conf => HardSpheres_ePot_conf
         procedure :: consistTest => HardSpheres_consistTest
         
         !> Monte-Carlo
@@ -262,7 +262,7 @@ contains
     
     !> Total potential energy : dummy
     
-    function HardSpheres_ePot_total(this) result(ePot_conf)
+    function HardSpheres_ePot_conf(this) result(ePot_conf)
     
         class(HardSpheres), intent(in) :: this
         
@@ -270,7 +270,7 @@ contains
     
         ePot_conf = this%ePot
         
-    end function HardSpheres_ePot_total
+    end function HardSpheres_ePot_conf
     
     !> Consistency test : dummy
     

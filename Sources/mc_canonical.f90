@@ -38,7 +38,7 @@ implicit none
     
     ! Mixing between 2 types
     type(MixingPotential) :: mix
-    real(DP) :: mix_ePot, mix_ePotSum, mix_ePot_total
+    real(DP) :: mix_ePot, mix_ePotSum, mix_ePot_conf
     integer, parameter :: mix_report_unit = 13
     integer, parameter :: mix_obsTherm_unit = 14, mix_obs_unit = 15
     
@@ -189,12 +189,12 @@ implicit none
     call type2_obs%results(type2_sph%getNcol(), type2_io%report)
     
     call mix%overlapTest(type1_sph%X, type2_sph%X)
-    mix_ePot_total = mix%ePot_conf(type1_sph%X, type2_sph%X)
-    call mix_results(mix_ePot, mix_ePot_total, mix_ePotSum, mix_report_unit)
+    mix_ePot_conf = mix%ePot_conf(type1_sph%X, type2_sph%X)
+    call mix_results(mix_ePot, mix_ePot_conf, mix_ePotSum, mix_report_unit)
     
     ePot = type1_obs%ePot + type2_obs%ePot + mix_ePot
     ePot_conf = type1_sph%ePot_conf() + type2_sph%ePot_conf() + &
-        mix_ePot_total
+        mix_ePot_conf
     ePotSum = type1_obs%ePotSum + type2_obs%ePotSum + mix_ePotSum
     call results(ePot, ePot_conf, ePotSum, tFin-tIni, report_unit)
     
