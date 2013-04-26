@@ -274,20 +274,20 @@ contains
     
     !> Consistency test : dummy
     
-    subroutine HardSpheres_consistTest(this, ePot_mc, report_unit)
+    subroutine HardSpheres_consistTest(this, ePot, report_unit)
     
         class(HardSpheres), intent(in) :: this
-        real(DP), intent(in) :: ePot_mc
+        real(DP), intent(in) :: ePot
         integer, intent(in) :: report_unit
         
         real(DP) :: ePot_conf
     
         ePot_conf = this%ePot_conf()
         write(report_unit, *) "Consistency test:"
-        write(report_unit, *) "    ePot_mc = ", ePot_mc
-        write(report_unit, *) "    ePot_final = ", ePot_conf
+        write(report_unit, *) "    ePot = ", ePot
+        write(report_unit, *) "    ePot_conf = ", ePot_conf
         write(report_unit, *) "    absolute difference = ", &
-            abs(ePot_conf-ePot_mc)
+            abs(ePot_conf-ePot)
     
     end subroutine HardSpheres_consistTest
 
