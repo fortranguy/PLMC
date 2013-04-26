@@ -15,7 +15,7 @@ use mod_tools
 
 implicit none
 
-! Beginning -------------------------------------------------------------------
+! Beginning --------------------------------------------------------------------
     
     integer :: iStep, iMove !< Monte-Carlo counters
     integer :: iColRand !< random choice of a particle
@@ -101,7 +101,7 @@ implicit none
     
     ePot_conf = type1_obs%ePot + type2_obs%ePot + mix_ePot
     
-! Middle ----------------------------------------------------------------------
+! Middle -----------------------------------------------------------------------
         
     write(output_unit, *) "Beginning of cycles"    
     
@@ -177,7 +177,7 @@ implicit none
 
     write(output_unit, *) "End of cycles"
 
-! End -------------------------------------------------------------------------
+! End --------------------------------------------------------------------------
 
     call type1_sph%overlapTest()
     call type1_sph%consistTest(type1_obs%ePot, type1_io%report)
