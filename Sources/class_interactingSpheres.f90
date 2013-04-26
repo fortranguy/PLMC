@@ -379,7 +379,7 @@ contains
         ePot_conf = this%ePot_conf()
         write(report_unit, *) "Consistency test:"
         write(report_unit, *) "    ePot = ", ePot
-        write(report_unit, *) "    ePot_con = ", ePot_conf
+        write(report_unit, *) "    ePot_conf = ", ePot_conf
         write(report_unit, *) "    relative difference = ", &
             abs(ePot_conf-ePot)/ePot_conf
     
