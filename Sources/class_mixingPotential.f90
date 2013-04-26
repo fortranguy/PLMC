@@ -88,7 +88,7 @@ contains
         class(MixingPotential), intent(in) :: this
         integer, intent(in) :: report_unit    
         
-        write(report_unit, *) "Simulation MC_C :"
+        write(report_unit, *) "Data :"
         write(report_unit, *) "    epsilon = ", this%epsilon
         write(report_unit, *) "    alpha = ", this%alpha
         write(report_unit, *) "    rCut = ", this%rCut

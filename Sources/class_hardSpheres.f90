@@ -97,7 +97,7 @@ contains
         class(HardSpheres), intent(in) :: this
         integer, intent(in) :: report_unit    
         
-        write(report_unit, *) "Simulation MC_C :"
+        write(report_unit, *) "Data :"
         write(report_unit ,*) "    Ncol = ", this%Ncol
         write(report_unit ,*) "    Nwidom = ", this%Nwidom
         write(report_unit, *) "    rCut = ", this%rCut

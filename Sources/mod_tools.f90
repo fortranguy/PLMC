@@ -30,7 +30,7 @@ contains
         seed(:) = clock + 37 * [ (i - 1, i = 1, n) ]
         call random_seed(put = seed)
         
-        write(report_unit, *) "RNG :"
+        write(report_unit, *) "Random number generator :"
         write(report_unit ,*) "    n = ", n
         write(report_unit ,*) "    seed(:) = ", seed(:)
 
@@ -130,7 +130,7 @@ contains
     
         integer, intent(in) :: report_unit
 
-        write(report_unit, *) "Simulation MC_C :"
+        write(report_unit, *) "Data :"
         write(report_unit ,*) "    Lsize(:) = ", Lsize(:)
         write(report_unit ,*) "    Vol = ", product(Lsize)
         write(report_unit, *) "    Nstep = ", Nstep
