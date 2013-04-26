@@ -29,8 +29,6 @@ private
     contains
     
         procedure :: init => Observables_init
-        procedure :: addPhysical => Observables_addPhysical
-        procedure :: addReject => Observables_addReject
         procedure :: results => Observables_results
     
     end type Observables
@@ -50,26 +48,6 @@ contains
         this%activSum = 0._DP
         
     end subroutine Observables_init
-    
-    subroutine Observables_addPhysical(this)
-    
-        class(Observables), intent(inout) :: this
-    
-        this%ePotSum = this%ePotSum + this%ePot
-        this%activSum = this%activSum + this%activ
-            
-    end subroutine Observables_addPhysical
-    
-    subroutine Observables_addReject(this)
-    
-        class(Observables), intent(inout) :: this
-        
-        this%rejRateSum = this%rejRateSum + real(this%Nrej, DP) / &
-            real(this%Nmove, DP)
-        this%Nrej = 0
-        this%Nmove = 0
-    
-    end subroutine Observables_addReject
     
     !> Results
     

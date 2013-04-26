@@ -127,8 +127,15 @@ implicit none
         call type1_sph%widom(type1_obs%activ)
         call type2_sph%widom(type2_obs%activ)
         
-        call type1_obs%addReject()
-        call type2_obs%addReject()
+        type1_obs%rejRateSum = type1_obs%rejRateSum + &
+            real(type1_obs%Nrej, DP)/real(type1_obs%Nmove, DP)
+        type1_obs%Nrej = 0
+        type1_obs%Nmove = 0
+        
+        type2_obs%rejRateSum = type2_obs%rejRateSum + &
+            real(type2_obs%Nrej, DP)/real(type2_obs%Nmove, DP)
+        type2_obs%Nrej = 0
+        type2_obs%Nmove = 0
         
         if (iStep <= Ntherm) then
         
@@ -152,11 +159,13 @@ implicit none
         
         else
         
-            call type1_obs%addPhysical()
+            type1_obs%ePotSum = type1_obs%ePotSum + type1_obs%ePot
+            type1_obs%activSum = type1_obs%activSum + type1_obs%activ            
             write(type1_io%obs, *) iStep, type1_obs%ePot, &
                 type1_obs%activ
         
-            call type2_obs%addPhysical()
+            type2_obs%ePotSum = type2_obs%ePotSum + type2_obs%ePot
+            type2_obs%activSum = type2_obs%activSum + type2_obs%activ  
             write(type2_io%obs, *) iStep, type2_obs%ePot, &
                 type2_obs%activ                
                 
