@@ -190,15 +190,15 @@ contains
         integer, intent(in) :: report_unit
         
         real(DP), parameter :: rejFix = 0.5_DP
-        real(DP), parameter :: dx_eps = 0.05_DP, taux_eps = 0.05_DP
-        real(DP), parameter :: more = 1._DP+dx_eps, less = 1._DP-dx_eps
+        real(DP), parameter :: eps_dx = 0.05_DP, eps_taux = 0._DP
+        real(DP), parameter :: more = 1._DP+eps_dx, less = 1._DP-eps_dx
         
         if (mod(iStep, this%Nadapt) == 0 .and. iStep>2) then
         
-            if (rej < rejFix - taux_eps) then            
+            if (rej < rejFix - eps_taux) then            
                 this%dx(:) = this%dx(:) * more
                 this%dx(:) = modulo(this%dx(:), Lsize(:))
-            else if (rej > rejFix + taux_eps) then
+            else if (rej > rejFix + eps_taux) then
                 this%dx(:) = this%dx(:) * less
                 this%dx(:) = modulo(this%dx(:), Lsize(:))
             end if
