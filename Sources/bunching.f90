@@ -34,8 +34,7 @@ implicit none
     
     do iBunching = 1, nBunching
     
-        write(output_unit, *) "iBunching = ", iBunching, &
-            "NstepVar = ", NstepVar
+        write(output_unit, *) "iBunching = ", iBunching, "NstepVar = ", NstepVar
         NstepVar = NstepVar/2
         
         ! Lecture
@@ -64,14 +63,12 @@ implicit none
         do iStep = 1, NstepVar
         
             sumVal(:) = sumVal(:) + dataIn(:, 2*iStep-1) + dataIn(:, 2*iStep)
-            sumValSqr(:) = sumValSqr(:) + dataIn(:, 2*iStep-1)**2 + &
-                dataIn(:, 2*iStep)**2
+            sumValSqr(:) = sumValSqr(:) + dataIn(:, 2*iStep-1)**2 + dataIn(:, 2*iStep)**2
             dataOut(:, iStep) = (dataIn(:, 2*iStep-1) + dataIn(:, 2*iStep))/2.
             
         end do
         
-        error(:) = sumValSqr(:)/real(2*NstepVar, DP) - &
-            (sumVal(:)/real(2*NstepVar, DP))**2
+        error(:) = sumValSqr(:)/real(2*NstepVar, DP) - (sumVal(:)/real(2*NstepVar, DP))**2
         error(:) = sqrt(error(:)/real(2*NstepVar, DP))
         
         ! Résultats
