@@ -59,6 +59,7 @@ contains
         ! Monte-Carlo
         this%dx = hard_dx
         this%dx_save = hard_dx
+        this%rejFix = hard_rejFix
         this%Nadapt = hard_Nadapt
         this%Nwidom = hard_Nwidom
                 

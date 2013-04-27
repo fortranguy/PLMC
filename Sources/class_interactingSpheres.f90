@@ -68,6 +68,7 @@ contains
         ! Monte-Carlo
         this%dx = inter_dx
         this%dx_save = inter_dx
+        this%rejFix = inter_rejFix
         this%Nadapt = inter_Nadapt
         this%Nwidom = inter_Nwidom
         

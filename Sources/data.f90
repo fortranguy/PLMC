@@ -79,10 +79,12 @@ implicit none
     integer, parameter :: Nmove = 2**1 * Ncol
     
     real(DP), dimension(Dim), parameter :: inter_dx = 1._DP
+    real(DP), parameter :: inter_rejFix = 0.5_DP
     integer, parameter :: inter_Nadapt = Ntherm/8
     integer, parameter :: inter_Nwidom = inter_Ncol
     
     real(DP), dimension(Dim), parameter :: hard_dx = 1._DP
+    real(DP), parameter :: hard_rejFix = 0.5_DP
     integer, parameter :: hard_Nadapt = Ntherm/8
     integer, parameter :: hard_Nwidom = hard_Ncol
 

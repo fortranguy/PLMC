@@ -28,6 +28,7 @@ private
         ! Monte-Carlo
         real(DP), dimension(Dim) :: dx !< displacement
         real(DP), dimension(Dim) :: dx_save
+        real(DP) :: rejFix
         integer :: Nadapt
         integer :: Nwidom
 
@@ -58,6 +59,7 @@ private
                 
         !> Adapt the displacement dx during thermalisation
         procedure :: adaptDx => Spheres_adaptDx
+        procedure :: definiteDx => Spheres_definiteDx
         procedure :: getDx => Spheres_getDx
         
     end type Spheres
@@ -182,30 +184,34 @@ contains
     
     !> Adaptation of dx during the thermalisation
     
-    subroutine Spheres_adaptDx(this, iStep, rej, report_unit)
+    subroutine Spheres_adaptDx(this, iStep, rej)
     
-        class(Spheres), intent(inout) :: this 
+        class(Spheres), intent(inout) :: this
         integer, intent(in) :: iStep
         real(DP), intent(in) :: rej
-        integer, intent(in) :: report_unit
         
-        real(DP), parameter :: rejFix = 0.5_DP
-        real(DP), parameter :: eps_dx = 0.05_DP, eps_taux = 0._DP
+        real(DP), parameter :: eps_dx = 0.05_DP
         real(DP), parameter :: more = 1._DP+eps_dx, less = 1._DP-eps_dx
         
         if (mod(iStep, this%Nadapt) == 0 .and. iStep>2) then
         
-            if (rej < rejFix - eps_taux) then
+            if (rej < this%rejFix) then
                 this%dx(:) = this%dx(:) * more
                 this%dx(:) = modulo(this%dx(:), Lsize(:))
-            else if (rej > rejFix + eps_taux) then
+            else if (rej > this%rejFix) then
                 this%dx(:) = this%dx(:) * less
                 this%dx(:) = modulo(this%dx(:), Lsize(:))
             end if
 
         end if
-        
-        if (iStep == Ntherm) then
+    
+    end subroutine Spheres_adaptDx
+    
+    subroutine Spheres_definiteDx(this, rej, report_unit)
+    
+        class(Spheres), intent(inout) :: this    
+        real(DP), intent(in) :: rej
+        integer, intent(in) :: report_unit
         
             if (rej == 0._DP) then
                 write(output_unit, *) this%name, "    Warning : dx adaptation problem."
@@ -218,12 +224,10 @@ contains
             
             write(report_unit, *) "Displacement :"
             write(report_unit, *) "    dx(:) = ", this%dx(:)
-            write(report_unit, *) "    rejection relative difference = ", abs(rej-rejFix)/rejFix
-                                       ! wrong translation ?
-                                       
-        end if
+            write(report_unit, *) "    rejection relative difference = ", &
+                                       abs(rej-this%rejFix)/this%rejFix
     
-    end subroutine Spheres_adaptDx
+    end subroutine Spheres_definiteDx
     
     function Spheres_getDx(this)
         
