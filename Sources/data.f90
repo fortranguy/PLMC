@@ -79,11 +79,11 @@ implicit none
     integer, parameter :: Nmove = 2**1 * Ncol
     
     real(DP), dimension(Dim), parameter :: inter_dx = 1._DP
-    integer, parameter :: inter_Nadapt = 2**2
+    integer, parameter :: inter_Nadapt = Ntherm/8
     integer, parameter :: inter_Nwidom = inter_Ncol
     
     real(DP), dimension(Dim), parameter :: hard_dx = 1._DP
-    integer, parameter :: hard_Nadapt = 2**2
+    integer, parameter :: hard_Nadapt = Ntherm/8
     integer, parameter :: hard_Nwidom = hard_Ncol
 
 end module data_mc
