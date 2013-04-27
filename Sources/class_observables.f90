@@ -62,20 +62,17 @@ contains
     
         write(report_unit, *) "Results :"
         
-        write(report_unit, *) "    average energy = ", &
-            this%ePotSum/realNstep
+        write(report_unit, *) "    average energy = ", this%ePotSum/realNstep
         write(report_unit, *) "    average energy per particule = ", &
-            this%ePotSum/realNstep/real(Ncol, DP)
+                                   this%ePotSum/realNstep/real(Ncol, DP)
             
         potChiId = -Tstar*log( product(Lsize)/real(Ncol+1,DP) )
         write(report_unit, *) "    ideal chemical potential = ", potChiId
         potChiEx = -Tstar*log( this%activSum/realNstep )
-        write(report_unit, *) "    average excess chemical potential = ", &
-            potChiEx           
+        write(report_unit, *) "    average excess chemical potential = ", potChiEx           
         write(report_unit, *) "    potChi.avg = ", potChiId + potChiEx
         
-        write(report_unit, *) "    Rejection rate = ", &
-            this%rejSum/real(Nstep+Ntherm, DP)
+        write(report_unit, *) "    Rejection rate = ", this%rejSum/real(Nstep+Ntherm, DP)
     
     end subroutine Observables_results
 
