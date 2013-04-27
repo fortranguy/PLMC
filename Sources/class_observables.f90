@@ -16,6 +16,7 @@ private
     
         ! Rejection
         integer :: Nrej
+        real(DP) :: rej
         real(DP) :: rejSum
         
         ! Potential energy
@@ -42,6 +43,7 @@ contains
         this%Nmove = 0
         
         this%Nrej = 0
+        this%rej = 0._DP
         this%rejSum = 0._DP
         
         this%ePotSum = 0._DP        
@@ -59,7 +61,7 @@ contains
         
         real(DP) :: realNstep = real(Nstep, DP)
         real(DP) :: potChiId, potChiEx
-    
+            
         write(report_unit, *) "Results :"
         
         write(report_unit, *) "    average energy = ", this%ePotSum/realNstep

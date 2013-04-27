@@ -182,22 +182,18 @@ contains
     
     !> Adaptation of dx during the thermalisation
     
-    subroutine Spheres_adaptDx(this, iStep, rejSum, report_unit)
+    subroutine Spheres_adaptDx(this, iStep, rej, report_unit)
     
         class(Spheres), intent(inout) :: this 
-        integer, intent(in) :: iStep, report_unit
-        real(DP), intent(in) :: rejSum    
+        integer, intent(in) :: iStep
+        real(DP), intent(in) :: rej
+        integer, intent(in) :: report_unit
         
-        real(DP) :: rej
         real(DP), parameter :: rejFix = 0.5_DP
         real(DP), parameter :: dx_eps = 0.05_DP, taux_eps = 0.05_DP
         real(DP), parameter :: more = 1._DP+dx_eps, less = 1._DP-dx_eps
         
-        rej = 0._DP
-        
         if (mod(iStep, this%Nadapt) == 0 .and. iStep>2) then
-        
-            rej = rejSum/real(iStep-1, DP)
         
             if (rej < rejFix - taux_eps) then            
                 this%dx(:) = this%dx(:) * more

@@ -124,21 +124,23 @@ implicit none
         call type2_sph%widom(type2_obs%activ)
         
         ! Rejections accumulations
-        type1_obs%rejSum = type1_obs%rejSum + real(type1_obs%Nrej, DP)/real(type1_obs%Nmove, DP)
+        type1_obs%rej = real(type1_obs%Nrej, DP)/real(type1_obs%Nmove, DP)
+        type1_obs%rejSum = type1_obs%rejSum + type1_obs%rej
         type1_obs%Nrej = 0; type1_obs%Nmove = 0
         
-        type2_obs%rejSum = type2_obs%rejSum + real(type2_obs%Nrej, DP)/real(type2_obs%Nmove, DP)
+        type2_obs%rej = real(type2_obs%Nrej, DP)/real(type2_obs%Nmove, DP)
+        type2_obs%rejSum = type2_obs%rejSum + type2_obs%rej
         type2_obs%Nrej = 0; type2_obs%Nmove = 0
         
         if (iStep <= Ntherm) then ! Thermalisation
             
             ! Displacements optimisations
-            call type1_sph%adaptDx(iStep, type1_obs%rejSum, type1_io%report)
-            write(type1_io%dx, *) iStep, type1_sph%getDx(), type1_obs%rejSum/real(iStep, DP)
+            call type1_sph%adaptDx(iStep, type1_obs%rej, type1_io%report)
+            write(type1_io%dx, *) iStep, type1_sph%getDx(), type1_obs%rej
             write(type1_io%obsTherm, *) iStep, type1_obs%ePot, type1_obs%activ
         
-            call type2_sph%adaptDx(iStep, type2_obs%rejSum, type2_io%report)
-            write(type2_io%dx, *) iStep, type2_sph%getDx(), type2_obs%rejSum/real(iStep, DP)
+            call type2_sph%adaptDx(iStep, type2_obs%rej, type2_io%report)
+            write(type2_io%dx, *) iStep, type2_sph%getDx(), type2_obs%rej
             write(type2_io%obsTherm, *) iStep, type2_obs%ePot, type2_obs%activ
             
             ! Observables writing
