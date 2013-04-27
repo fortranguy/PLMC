@@ -151,8 +151,7 @@ contains
                     
                     r_ij = dist(this%X(:, iCol), this%X(:, jCol))
                     if (r_ij < this%rMin) then
-                        write(output_unit, *) this%name, "    Overlap !", &
-                            iCol, jCol
+                        write(output_unit, *) this%name, "    Overlap !", iCol, jCol
                         write(output_unit, *) "    r_ij = ", r_ij
                         stop
                     end if
@@ -213,8 +212,7 @@ contains
         if (iStep == Ntherm) then
         
             if (rej == 0._DP) then
-                write(output_unit, *) this%name, &
-                    "    Warning : dx adaptation problem."
+                write(output_unit, *) this%name, "    Warning : dx adaptation problem."
                 this%dx(:) = this%dx_save(:)
                 write(output_unit, *) "default dx :", this%dx(:)
                 write(output_unit, *)
@@ -224,10 +222,9 @@ contains
             
             write(report_unit, *) "Displacement :"
             write(report_unit, *) "    dx(:) = ", this%dx(:)
-            write(report_unit, *) "    rejection relative difference = ", &
-                                        ! wrong translation ?
-                abs(rej - rejFix)/rejFix
-            
+            write(report_unit, *) "    rejection relative difference = ", abs(rej-rejFix)/rejFix
+                                       ! wrong translation ?
+                                       
         end if
     
     end subroutine Spheres_adaptDx
