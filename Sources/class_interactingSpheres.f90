@@ -27,7 +27,7 @@ private
         integer :: iCut !< maximum index of tabulation : until potential cut
         real(DP) :: epsilon !< factor in Yukawa
         real(DP) :: alpha !< coefficient in Yukawa
-        real(DP), dimension(:), allocatable :: ePot_tab !< tabulation
+        real(DP), dimension(:), allocatable :: Epot_tab !< tabulation
         
     contains
 
@@ -39,10 +39,10 @@ private
         procedure :: report => InteractingSpheres_report
               
         !> Potential energy
-        procedure :: ePot_init => InteractingSpheres_ePot_init
-        procedure :: ePot_pair => InteractingSpheres_ePot_pair
-        procedure :: ePot_neigh => InteractingSpheres_ePot_neigh
-        procedure :: ePot_conf => InteractingSpheres_ePot_conf
+        procedure :: Epot_init => InteractingSpheres_Epot_init
+        procedure :: Epot_pair => InteractingSpheres_Epot_pair
+        procedure :: Epot_neigh => InteractingSpheres_Epot_neigh
+        procedure :: Epot_conf => InteractingSpheres_Epot_conf
         procedure :: consistTest => InteractingSpheres_consistTest
         
         !> Monte-Carlo
@@ -79,8 +79,8 @@ contains
         this%iCut = int(this%rCut/this%dr)
         this%epsilon = inter_epsilon
         this%alpha = inter_alpha        
-        allocate(this%ePot_tab(this%iMin:this%iCut))
-        call this%ePot_init()
+        allocate(this%Epot_tab(this%iMin:this%iCut))
+        call this%Epot_init()
         
         ! Neighbours : same kind    
         call this%same%construct(this%rCut)
@@ -101,8 +101,8 @@ contains
             deallocate(this%X)
         end if
         
-        if (allocated(this%ePot_tab)) then
-            deallocate(this%ePot_tab)
+        if (allocated(this%Epot_tab)) then
+            deallocate(this%Epot_tab)
         endif
         
         call this%same%destroy()
@@ -139,7 +139,7 @@ contains
     !> Tabulation of Yukawa potential    
     !> \f[ \epsilon \frac{e^{-\alpha (r-r_{min})}}{r} \f]
     
-    subroutine InteractingSpheres_ePot_init(this)
+    subroutine InteractingSpheres_Epot_init(this)
     
         class(InteractingSpheres), intent(inout) :: this
 
@@ -149,38 +149,38 @@ contains
         ! cut
         do i = this%iMin, this%iCut       
             r_i = real(i, DP)*this%dr
-            this%ePot_tab(i) = this%epsilon * exp(-this%alpha*(r_i-this%rMin)) / r_i
+            this%Epot_tab(i) = this%epsilon * exp(-this%alpha*(r_i-this%rMin)) / r_i
         end do
         
         ! shift        
-        this%ePot_tab(:) = this%ePot_tab(:) - &
+        this%Epot_tab(:) = this%Epot_tab(:) - &
                            this%epsilon * exp(-this%alpha*(this%rCut-this%rMin)) / this%rCut
 
-    end subroutine InteractingSpheres_ePot_init
+    end subroutine InteractingSpheres_Epot_init
 
-    function InteractingSpheres_ePot_pair(this, r) result(ePot_pair)
+    function InteractingSpheres_Epot_pair(this, r) result(Epot_pair)
         
         class(InteractingSpheres), intent(in) :: this
         real(DP), intent(in) :: r
         
         integer :: i
-        real(DP) :: r_i, ePot_pair
+        real(DP) :: r_i, Epot_pair
        
         if (r < this%rCut) then
        
             i = int(r/this%dr)
             r_i = real(i, DP)*this%dr
-            ePot_pair = this%ePot_tab(i) + (r-r_i)/this%dr * (this%ePot_tab(i+1)-this%ePot_tab(i))
+            Epot_pair = this%Epot_tab(i) + (r-r_i)/this%dr * (this%Epot_tab(i+1)-this%Epot_tab(i))
            
         else
        
-            ePot_pair = 0._DP
+            Epot_pair = 0._DP
            
         end if
         
-    end function InteractingSpheres_ePot_pair
+    end function InteractingSpheres_Epot_pair
     
-    subroutine InteractingSpheres_ePot_neigh(this, iCol, xCol, iCell, overlap, energ)
+    subroutine InteractingSpheres_Epot_neigh(this, iCol, xCol, iCell, overlap, energ)
         
         class(InteractingSpheres), intent(in) :: this        
         integer, intent(in) :: iCol, iCell
@@ -213,7 +213,7 @@ contains
                         overlap = .true.
                         return
                     end if
-                    energ = energ + this%ePot_pair(r)
+                    energ = energ + this%Epot_pair(r)
        
                 end if
                 
@@ -225,16 +225,16 @@ contains
             
         end do
     
-    end subroutine InteractingSpheres_ePot_neigh
+    end subroutine InteractingSpheres_Epot_neigh
     
     !> Particle move
     
-    subroutine InteractingSpheres_move(this, other, mix, same_ePot, mix_ePot, Nrej)
+    subroutine InteractingSpheres_move(this, other, mix, same_Epot, mix_Epot, Nrej)
     
         class(InteractingSpheres), intent(inout) :: this
         class(Spheres), intent(inout) :: other
         class(MixingPotential), intent(in) :: mix        
-        real(DP), intent(inout) :: same_ePot, mix_ePot
+        real(DP), intent(inout) :: same_Epot, mix_Epot
         integer, intent(inout) :: Nrej
         
         logical :: overlap
@@ -255,21 +255,21 @@ contains
         xNew(:) = this%X(:, iOld) + (xRand(:)-0.5_DP)*this%dx(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
         same_iCellNew = this%same%position_to_cell(xNew)
-        call this%ePot_neigh(iOld, xNew, same_iCellNew, overlap, same_eNew)
+        call this%Epot_neigh(iOld, xNew, same_iCellNew, overlap, same_eNew)
         
         if (.not. overlap) then
         
             mix_iCellNew = this%mix%position_to_cell(xNew)
-            call mix%ePot_neigh(xNew, mix_iCellNew, this%mix, other%X, overlap, mix_eNew)
+            call mix%Epot_neigh(xNew, mix_iCellNew, this%mix, other%X, overlap, mix_eNew)
                         
             if (.not. overlap) then
     
                 same_iCellOld = this%same%position_to_cell(this%X(:, iOld))
-                call this%ePot_neigh(iOld, this%X(:, iOld), same_iCellOld, overlap, same_eOld)                    
+                call this%Epot_neigh(iOld, this%X(:, iOld), same_iCellOld, overlap, same_eOld)                    
                 same_dEpot = same_eNew - same_eOld
                     
                 mix_iCellOld = this%mix%position_to_cell(this%X(:, iOld))
-                call mix%ePot_neigh(this%X(:, iOld), mix_iCellOld, this%mix, other%X, overlap, mix_eOld)
+                call mix%Epot_neigh(this%X(:, iOld), mix_iCellOld, this%mix, other%X, overlap, mix_eOld)
                 mix_dEpot = mix_eNew - mix_eOld
                 
                 dEpot = same_dEpot + mix_dEpot
@@ -278,8 +278,8 @@ contains
                 if (rand < exp(-dEpot/Tstar)) then
                 
                     this%X(:, iOld) = xNew(:)
-                    same_ePot = same_ePot + same_dEpot
-                    mix_ePot = mix_ePot + mix_dEpot
+                    same_Epot = same_Epot + same_dEpot
+                    mix_Epot = mix_Epot + mix_dEpot
                     
                     if (same_iCellOld /= same_iCellNew) then
                         call this%same%remove_cell_col(iOld, same_iCellOld)
@@ -326,7 +326,7 @@ contains
             call random_number(xRand)
             xTest(:) = Lsize(:) * xRand(:)    
             iCellTest = this%same%position_to_cell(xTest)
-            call this%ePot_neigh(0, xTest, iCellTest, overlap, enTest) 
+            call this%Epot_neigh(0, xTest, iCellTest, overlap, enTest) 
             
             if (.not. overlap) then
                 widTestSum = widTestSum + exp(-enTest/Tstar)
@@ -340,46 +340,46 @@ contains
 
     !> Total potential energy
     
-    function InteractingSpheres_ePot_conf(this) result(ePot_conf)
+    function InteractingSpheres_Epot_conf(this) result(Epot_conf)
     
         class(InteractingSpheres), intent(in) :: this
         
         integer :: iCol, jCol
         real(DP) :: r_ij
-        real(DP) :: ePot_conf
+        real(DP) :: Epot_conf
     
-        ePot_conf = 0._DP
+        Epot_conf = 0._DP
         
         do jCol = 1, this%Ncol
             do iCol = 1, this%Ncol
                 if (iCol /= jCol) then
                 
                     r_ij = dist(this%X(:, iCol), this%X(:, jCol))
-                    ePot_conf = ePot_conf + this%ePot_pair(r_ij)
+                    Epot_conf = Epot_conf + this%Epot_pair(r_ij)
                     
                 end if
             end do
         end do
         
-        ePot_conf = 0.5_DP*ePot_conf
+        Epot_conf = 0.5_DP*Epot_conf
     
-    end function InteractingSpheres_ePot_conf
+    end function InteractingSpheres_Epot_conf
     
     !> Consistency test 
     
-    subroutine InteractingSpheres_consistTest(this, ePot, report_unit)
+    subroutine InteractingSpheres_consistTest(this, Epot, report_unit)
     
         class(InteractingSpheres), intent(in) :: this
-        real(DP), intent(in) :: ePot
+        real(DP), intent(in) :: Epot
         integer, intent(in) :: report_unit
         
-        real(DP) :: ePot_conf
+        real(DP) :: Epot_conf
     
-        ePot_conf = this%ePot_conf()
+        Epot_conf = this%Epot_conf()
         write(report_unit, *) "Consistency test:"
-        write(report_unit, *) "    ePot = ", ePot
-        write(report_unit, *) "    ePot_conf = ", ePot_conf
-        write(report_unit, *) "    relative difference = ", abs((ePot_conf-ePot)/ePot_conf)
+        write(report_unit, *) "    Epot = ", Epot
+        write(report_unit, *) "    Epot_conf = ", Epot_conf
+        write(report_unit, *) "    relative difference = ", abs((Epot_conf-Epot)/Epot_conf)
     
     end subroutine InteractingSpheres_consistTest
 

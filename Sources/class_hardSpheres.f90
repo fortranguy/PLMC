@@ -20,7 +20,7 @@ private
     type, extends(Spheres), public :: HardSpheres
     
         ! Potential
-        real(DP) :: ePot
+        real(DP) :: Epot
         
     contains
 
@@ -32,8 +32,8 @@ private
         procedure :: report => HardSpheres_report
               
         !> Potential energy
-        procedure :: ePot_neigh => HardSpheres_ePot_neigh
-        procedure :: ePot_conf => HardSpheres_ePot_conf
+        procedure :: Epot_neigh => HardSpheres_Epot_neigh
+        procedure :: Epot_conf => HardSpheres_Epot_conf
         procedure :: consistTest => HardSpheres_consistTest
         
         !> Monte-Carlo
@@ -64,7 +64,7 @@ contains
         this%Nwidom = hard_Nwidom
                 
         ! Potential
-        this%ePot = 0._DP
+        this%Epot = 0._DP
         this%rCut = hard_rCut
         
         ! Neighbours : same kind
@@ -113,7 +113,7 @@ contains
         
     end subroutine HardSpheres_report
     
-    subroutine HardSpheres_ePot_neigh(this, iCol, xCol, iCell, overlap)
+    subroutine HardSpheres_Epot_neigh(this, iCol, xCol, iCell, overlap)
         
         class(HardSpheres), intent(in) :: this        
         integer, intent(in) :: iCol, iCell
@@ -155,16 +155,16 @@ contains
             
         end do
     
-    end subroutine HardSpheres_ePot_neigh
+    end subroutine HardSpheres_Epot_neigh
     
     !> Particle move
     
-    subroutine HardSpheres_move(this, other, mix, same_ePot, mix_ePot, Nrej)
+    subroutine HardSpheres_move(this, other, mix, same_Epot, mix_Epot, Nrej)
     
         class(HardSpheres), intent(inout) :: this
         class(Spheres), intent(inout) :: other
         class(MixingPotential), intent(in) :: mix
-        real(DP), intent(inout) :: same_ePot, mix_ePot
+        real(DP), intent(inout) :: same_Epot, mix_Epot
         integer, intent(inout) :: Nrej
         
         logical :: overlap
@@ -183,20 +183,20 @@ contains
         xNew(:) = this%X(:, iOld) + (xRand(:)-0.5_DP)*this%dx(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
         same_iCellNew = this%same%position_to_cell(xNew)
-        call this%ePot_neigh(iOld, xNew, same_iCellNew, overlap)
+        call this%Epot_neigh(iOld, xNew, same_iCellNew, overlap)
         
         if (.not. overlap) then
         
             mix_iCellNew = this%mix%position_to_cell(xNew)
-            call mix%ePot_neigh(xNew, mix_iCellNew, this%mix, other%X, overlap, mix_eNew)
+            call mix%Epot_neigh(xNew, mix_iCellNew, this%mix, other%X, overlap, mix_eNew)
                         
             if (.not. overlap) then
     
                 same_iCellOld = this%same%position_to_cell(this%X(:, iOld))
-                call this%ePot_neigh(iOld, this%X(:, iOld), same_iCellOld, overlap)
+                call this%Epot_neigh(iOld, this%X(:, iOld), same_iCellOld, overlap)
                     
                 mix_iCellOld = this%mix%position_to_cell(this%X(:, iOld))
-                call mix%ePot_neigh(this%X(:, iOld), mix_iCellOld, this%mix, other%X, overlap, mix_eOld)
+                call mix%Epot_neigh(this%X(:, iOld), mix_iCellOld, this%mix, other%X, overlap, mix_eOld)
                 
                 mix_dEpot = mix_eNew - mix_eOld
                     
@@ -204,8 +204,8 @@ contains
                 if (rand < exp(-mix_dEpot/Tstar)) then
                 
                     this%X(:, iOld) = xNew(:)
-                    same_ePot = same_ePot + 0._DP
-                    mix_ePot = mix_ePot + mix_dEpot
+                    same_Epot = same_Epot + 0._DP
+                    mix_Epot = mix_Epot + mix_dEpot
                     
                     if (same_iCellOld /= same_iCellNew) then                
                         call this%same%remove_cell_col(iOld, same_iCellOld)
@@ -251,7 +251,7 @@ contains
             call random_number(xRand)
             xTest(:) = Lsize(:) * xRand(:)    
             iCellTest = this%same%position_to_cell(xTest)
-            call this%ePot_neigh(0, xTest, iCellTest, overlap) 
+            call this%Epot_neigh(0, xTest, iCellTest, overlap) 
             
             if (.not. overlap) then
                 widTestSum = widTestSum + 1._DP
@@ -265,31 +265,31 @@ contains
     
     !> Total potential energy : dummy
     
-    function HardSpheres_ePot_conf(this) result(ePot_conf)
+    function HardSpheres_Epot_conf(this) result(Epot_conf)
     
         class(HardSpheres), intent(in) :: this
         
-        real(DP) :: ePot_conf
+        real(DP) :: Epot_conf
     
-        ePot_conf = this%ePot
+        Epot_conf = this%Epot
         
-    end function HardSpheres_ePot_conf
+    end function HardSpheres_Epot_conf
     
     !> Consistency test : dummy
     
-    subroutine HardSpheres_consistTest(this, ePot, report_unit)
+    subroutine HardSpheres_consistTest(this, Epot, report_unit)
     
         class(HardSpheres), intent(in) :: this
-        real(DP), intent(in) :: ePot
+        real(DP), intent(in) :: Epot
         integer, intent(in) :: report_unit
         
-        real(DP) :: ePot_conf
+        real(DP) :: Epot_conf
     
-        ePot_conf = this%ePot_conf()
+        Epot_conf = this%Epot_conf()
         write(report_unit, *) "Consistency test:"
-        write(report_unit, *) "    ePot = ", ePot
-        write(report_unit, *) "    ePot_conf = ", ePot_conf
-        write(report_unit, *) "    absolute difference = ", abs(ePot_conf-ePot)
+        write(report_unit, *) "    Epot = ", Epot
+        write(report_unit, *) "    Epot_conf = ", Epot_conf
+        write(report_unit, *) "    absolute difference = ", abs(Epot_conf-Epot)
     
     end subroutine HardSpheres_consistTest
 

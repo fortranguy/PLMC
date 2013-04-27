@@ -28,7 +28,7 @@ private
         integer :: iCut !< maximum index of tabulation : until potential cut
         real(DP) :: epsilon !< factor in Yukawa
         real(DP) :: alpha !< coefficient in Yukawa
-        real(DP), dimension(:), allocatable :: ePot_tab !< tabulation
+        real(DP), dimension(:), allocatable :: Epot_tab !< tabulation
 
     contains
 
@@ -41,10 +41,10 @@ private
         
         procedure :: overlapTest => MixingPotential_overlapTest
 
-        procedure :: ePot_init => MixingPotential_ePot_init
-        procedure :: ePot_pair => MixingPotential_ePot_pair
-        procedure :: ePot_neigh => MixingPotential_ePot_neigh
-        procedure :: ePot_conf => MixingPotential_ePot_conf
+        procedure :: Epot_init => MixingPotential_Epot_init
+        procedure :: Epot_pair => MixingPotential_Epot_pair
+        procedure :: Epot_neigh => MixingPotential_Epot_neigh
+        procedure :: Epot_conf => MixingPotential_Epot_conf
 
     end type
 
@@ -66,8 +66,8 @@ contains
         this%iCut = int(this%rCut/this%dr)
         this%epsilon = mix_epsilon
         this%alpha = mix_alpha
-        allocate(this%ePot_tab(this%iMin:this%iCut))
-        call this%ePot_init()
+        allocate(this%Epot_tab(this%iMin:this%iCut))
+        call this%Epot_init()
 
     end subroutine MixingPotential_construct
 
@@ -75,8 +75,8 @@ contains
     
         class(MixingPotential), intent(inout) :: this
         
-        if (allocated(this%ePot_tab)) then
-            deallocate(this%ePot_tab)
+        if (allocated(this%Epot_tab)) then
+            deallocate(this%Epot_tab)
         end if
     
     end subroutine MixingPotential_destroy
@@ -143,7 +143,7 @@ contains
     !> Tabulation of Yukawa potential
     !> \f[ \epsilon \frac{e^{-\alpha (r-r_{min})}}{r} \f]
     
-    subroutine MixingPotential_ePot_init(this)
+    subroutine MixingPotential_Epot_init(this)
     
         class(MixingPotential), intent(inout) :: this
 
@@ -153,38 +153,38 @@ contains
         ! cut
         do i = this%iMin, this%iCut       
             r_i = real(i, DP)*this%dr
-            this%ePot_tab(i) = this%epsilon * exp(-this%alpha*(r_i-this%rMin)) / r_i
+            this%Epot_tab(i) = this%epsilon * exp(-this%alpha*(r_i-this%rMin)) / r_i
         end do
         
         ! shift        
-        this%ePot_tab(:) = this%ePot_tab(:) - &
+        this%Epot_tab(:) = this%Epot_tab(:) - &
                            this%epsilon * exp(-this%alpha*(this%rCut-this%rMin)) / this%rCut
 
-    end subroutine MixingPotential_ePot_init
+    end subroutine MixingPotential_Epot_init
 
-    function MixingPotential_ePot_pair(this, r) result(ePot_pair)
+    function MixingPotential_Epot_pair(this, r) result(Epot_pair)
         
         class(MixingPotential), intent(in) :: this
         real(DP), intent(in) :: r
         
         integer :: i
-        real(DP) :: r_i, ePot_pair
+        real(DP) :: r_i, Epot_pair
        
         if (r < this%rCut) then
        
             i = int(r/this%dr)
             r_i = real(i, DP)*this%dr
-            ePot_pair = this%ePot_tab(i) + (r-r_i)/this%dr * (this%ePot_tab(i+1)-this%ePot_tab(i))
+            Epot_pair = this%Epot_tab(i) + (r-r_i)/this%dr * (this%Epot_tab(i+1)-this%Epot_tab(i))
            
         else
        
-            ePot_pair = 0._DP
+            Epot_pair = 0._DP
            
         end if
         
-    end function MixingPotential_ePot_pair
+    end function MixingPotential_Epot_pair
     
-    subroutine MixingPotential_ePot_neigh(this, xCol, iCell, neigh, other_X, overlap, energ)
+    subroutine MixingPotential_Epot_neigh(this, xCol, iCell, neigh, other_X, overlap, energ)
         
         class(MixingPotential), intent(in) :: this
         real(DP), dimension(:), intent(in) :: xCol !< type A
@@ -217,7 +217,7 @@ contains
                     overlap = .true.
                     return
                 end if
-                energ = energ + this%ePot_pair(r)
+                energ = energ + this%Epot_pair(r)
                 
                 if (.not. associated(next%next)) exit
                 
@@ -227,11 +227,11 @@ contains
             
         end do
     
-    end subroutine MixingPotential_ePot_neigh
+    end subroutine MixingPotential_Epot_neigh
     
     !> Total potential energy
     
-    function MixingPotential_ePot_conf(this, type1_X, type2_X) result(ePot_conf)
+    function MixingPotential_Epot_conf(this, type1_X, type2_X) result(Epot_conf)
     
         class(MixingPotential), intent(in) :: this
         real(DP), dimension(:, :), intent(in) :: type1_X, type2_X
@@ -239,22 +239,22 @@ contains
         integer :: Ncol1, Ncol2
         integer :: iCol1, iCol2
         real(DP) :: r_mix
-        real(DP) :: ePot_conf
+        real(DP) :: Epot_conf
         
         Ncol1 = size(type1_X, 2)
         Ncol2 = size(type2_X, 2)
         
-        ePot_conf = 0._DP
+        Epot_conf = 0._DP
         
         do iCol1 = 1, Ncol1
             do iCol2 = 1, Ncol2
                 
                 r_mix = dist(type1_X(:, iCol1), type2_X(:, iCol2))
-                ePot_conf = ePot_conf + this%ePot_pair(r_mix)
+                Epot_conf = Epot_conf + this%Epot_pair(r_mix)
 
             end do
         end do
     
-    end function MixingPotential_ePot_conf
+    end function MixingPotential_Epot_conf
 
 end module class_mixingPotential
