@@ -112,10 +112,10 @@ implicit none
     
     real(DP), parameter :: hard_rCut = hard_rMin
     
-    real(DP), parameter :: mix_rCut = 4._DP
+    real(DP), parameter :: mix_rCut = 2._DP
     real(DP), parameter :: mix_dr = 5.E-5_DP
-    real(DP), parameter :: mix_epsilon = 1._DP
-    real(DP), parameter :: mix_alpha = 5._DP
+    real(DP), parameter :: mix_epsilon = 0.5_DP
+    real(DP), parameter :: mix_alpha = 10._DP
         
 end module data_potentiel
 !***************************************************************************************************
@@ -147,7 +147,7 @@ use data_cell
 
 implicit none
 
-	logical, parameter :: snap = .true.
+	logical, parameter :: snap = .false.
 	real(DP), parameter :: deltaDist = 0.01_DP
 	real(DP), protected :: rMax
 	integer, protected :: Ndist
