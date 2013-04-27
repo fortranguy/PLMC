@@ -57,8 +57,7 @@ contains
         
         select case (init)
             case ("rand")
-                call randomDeposition(type1%X, type1%getRMin(), type2%X, &
-                    type2%getRmin(), mix_rMin)
+                call randomDeposition(type1%X, type1%getRMin(), type2%X, type2%getRmin(), mix_rMin)
                 write(report_unit, *) "    Random deposition"
             case default
                 write(output_unit, *) "Enter the initial condition : "
@@ -70,8 +69,7 @@ contains
     
     !> Random deposition configuration
     
-    subroutine randomDeposition(type1_X, type1_rMin, type2_X, type2_rMin, &
-        mix_rMin)
+    subroutine randomDeposition(type1_X, type1_rMin, type2_X, type2_rMin, mix_rMin)
     
         real(DP), dimension(:, :), intent(inout) :: type1_X, type2_X
         real(DP), intent(in) :: type1_rMin, type2_rMin, mix_rMin
@@ -154,12 +152,10 @@ contains
         write(report_unit, *) "Consistency test:"
         write(report_unit, *) "    ePot = ", ePot
         write(report_unit, *) "    ePot_conf = ", ePot_conf
-        write(report_unit, *) "    relative difference = ", &
-            abs((ePot_conf-ePot)/ePot_conf)
+        write(report_unit, *) "    relative difference = ", abs((ePot_conf-ePot)/ePot_conf)
             
         write(report_unit, *) "Results :"
-        write(report_unit, *) "    average energy = ", &
-            ePotSum/real(Nstep, DP)
+        write(report_unit, *) "    average energy = ", ePotSum/real(Nstep, DP)
         write(report_unit, *) "    duration =", duration/60._DP, "min"
     
     end subroutine results
@@ -174,8 +170,7 @@ contains
         write(report_unit, *) "Consistency test:"
         write(report_unit, *) "    ePot = ", ePot
         write(report_unit, *) "    ePot_conf = ", ePot_conf
-        write(report_unit, *) "    relative difference = ", &
-            abs((ePot_conf-ePot)/ePot_conf)
+        write(report_unit, *) "    relative difference = ", abs((ePot_conf-ePot)/ePot_conf)
     
         write(report_unit, *) "Results :"        
         write(report_unit, *) "    average energy = ", ePotSum/real(Nstep, DP)
