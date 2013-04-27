@@ -142,28 +142,24 @@ contains
         do iDir = 1, Dim
         
             if (this%cell_Lsize(iDir) < rCut) then
-                write(output_unit, *) "Too small cell in the direction", &
-                    iDir, ":"
+                write(output_unit, *) "Too small cell in the direction", iDir, ":"
                 write(output_unit, *) this%cell_Lsize(iDir), "<", rCut
                 stop
             end if
             
             if (this%cell_coordMax(iDir) < cell_neigh_coordMax(iDir)) then
-                write(output_unit, *) "Too few cells in the direction", &
-                    iDir, ":"
-                write(output_unit, *) this%cell_coordMax(iDir), "<", &
-                    cell_neigh_coordMax(iDir)
+                write(output_unit, *) "Too few cells in the direction", iDir, ":"
+                write(output_unit, *) this%cell_coordMax(iDir), "<", cell_neigh_coordMax(iDir)
                 stop
             end if
             
             if (modulo(Lsize(iDir), this%cell_Lsize(iDir)) /= 0) then
-                write(output_unit, *) &
-                    "Cell size is not a divisor of the system system"
+                write(output_unit, *) "Cell size is not a divisor of the system system"
                 write(output_unit, *) "in the direction", iDir, ":"
                 write(output_unit, *) "Lsize", Lsize(iDir)
                 write(output_unit, *) "cell_Lsize", this%cell_Lsize(iDir)
                 write(output_unit, *) "modulo(Lsize, cell_Lsize) = ", &
-                    modulo(Lsize(iDir), this%cell_Lsize(iDir))
+                                       modulo(Lsize(iDir), this%cell_Lsize(iDir))
                 stop
             end if
             
@@ -173,8 +169,7 @@ contains
     
     ! Assignment : particle -> cell
     
-    function Neighbours_position_to_cell(this, xCol) &
-        result(position_to_cell)
+    function Neighbours_position_to_cell(this, xCol) result(position_to_cell)
     
         class(Neighbours), intent(in) :: this
         real(DP), dimension(Dim), intent(in) :: xCol
@@ -183,9 +178,8 @@ contains
         integer :: position_to_cell
     
         cell_coord(:) = int( xCol(:)/this%cell_Lsize(:) ) + 1
-        position_to_cell = cell_coord(1) + this%cell_coordMax(1) * &
-            (cell_coord(2)-1) + this%cell_coordMax(1) * &
-            this%cell_coordMax(2) * (cell_coord(3)-1)
+        position_to_cell = cell_coord(1) + this%cell_coordMax(1)*(cell_coord(2)-1) + &
+                           this%cell_coordMax(1)*this%cell_coordMax(2)*(cell_coord(3)-1)
     
     end function Neighbours_position_to_cell
     
@@ -207,8 +201,7 @@ contains
             
             allocate(this%cellsNext(iCell)%particle)
             this%cellsNext(iCell)%particle%iCol = 0
-            this%cells(iCell)%particle%next => &
-                this%cellsNext(iCell)%particle
+            this%cells(iCell)%particle%next => this%cellsNext(iCell)%particle
             this%cells(iCell)%particle => this%cellsNext(iCell)%particle
             
         end do
@@ -290,10 +283,9 @@ contains
             
     end  subroutine Neighbours_add_cell_col
     
-    ! Neighbour cells --------------------------------------------------------
+    ! Neighbour cells ------------------------------------------------------------------------------
 
-    function Neighbours_cell_coord_to_ind(this, coord) &
-        result(cell_coord_to_ind)
+    function Neighbours_cell_coord_to_ind(this, coord) result(cell_coord_to_ind)
         
         class(Neighbours), intent(in) :: this    
         integer, dimension(Dim), intent(in) :: coord
@@ -301,7 +293,7 @@ contains
         integer :: cell_coord_to_ind
         
         cell_coord_to_ind = coord(1) + this%cell_coordMax(1)*(coord(2)-1) + &
-            this%cell_coordMax(1)*this%cell_coordMax(2)*(coord(3)-1)
+                            this%cell_coordMax(1)*this%cell_coordMax(2)*(coord(3)-1)
     
     end function Neighbours_cell_coord_to_ind
     
@@ -311,10 +303,8 @@ contains
         
         integer :: cell_neigh_coord_to_ind
         
-        cell_neigh_coord_to_ind = neigh_coord(1) + &
-            cell_neigh_coordMax(1) * (neigh_coord(2)-1) &
-            + cell_neigh_coordMax(1) * cell_neigh_coordMax(2) * &
-            (neigh_coord(3)-1)
+        cell_neigh_coord_to_ind = neigh_coord(1) + cell_neigh_coordMax(1)*(neigh_coord(2)-1) + &
+                                  cell_neigh_coordMax(1)*cell_neigh_coordMax(2)*(neigh_coord(3)-1)
     
     end function cell_neigh_coord_to_ind
     
@@ -362,8 +352,7 @@ contains
                 
                 coord(:) = [i, j, k] + neigh_coord(:)
                 
-                this%cell_neighs(neigh_ind, ind) = &
-                    this%cell_coord_to_ind( this%cell_period(coord(:)) )
+                this%cell_neighs(neigh_ind, ind) = this%cell_coord_to_ind(this%cell_period(coord(:)))
                     
             end do
             end do
