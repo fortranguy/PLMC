@@ -83,16 +83,17 @@ implicit none
     call initialCondition(type1_sph, type2_sph, mix%getRmin(), report_unit)
     
     call type1_sph%overlapTest()
+    call type2_sph%overlapTest()
+    call mix%overlapTest(type1_sph%X, type2_sph%X)
+    
     type1_obs%ePot = type1_sph%ePot_conf()
     call type1_sph%snapShot(type1_io%snapIni)
-    call type1_sph%cols_to_cells(type2_sph%X)
+    call type1_sph%cols_to_cells(type2_sph%X)    
     
-    call type2_sph%overlapTest()
     type2_obs%ePot = type2_sph%ePot_conf()
     call type2_sph%snapShot(type2_io%snapIni)
-    call type2_sph%cols_to_cells(type1_sph%X)
+    call type2_sph%cols_to_cells(type1_sph%X)    
     
-    call mix%overlapTest(type1_sph%X, type2_sph%X)
     mix_ePot = mix%ePot_conf(type1_sph%X, type2_sph%X)    
     ePot_conf = type1_obs%ePot + type2_obs%ePot + mix_ePot
     
