@@ -18,6 +18,7 @@ private
         integer :: Nrej
         real(DP) :: rej
         real(DP) :: rejSum
+        real(DP) :: rejAdapt
         
         ! Potential energy
         real(DP) :: ePot
@@ -45,6 +46,7 @@ contains
         this%Nrej = 0
         this%rej = 0._DP
         this%rejSum = 0._DP
+        this%rejAdapt = 0._DP
         
         this%ePotSum = 0._DP        
         this%activSum = 0._DP

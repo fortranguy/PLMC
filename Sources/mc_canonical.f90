@@ -134,16 +134,21 @@ implicit none
             
             ! Displacements optimisations
             if (mod(iStep, type1_sph%getNadapt()) == 0) then
-                call type1_sph%adaptDx(iStep, type1_obs%rej)
+                type1_obs%rejAdapt = type1_obs%rejAdapt/real(type1_sph%getNadapt()-1)
+                call type1_sph%adaptDx(iStep, type1_obs%rejAdapt)
+                write(type1_io%dx, *) iStep, type1_sph%getDx(), type1_obs%rejAdapt
+            else
+                type1_obs%rejAdapt = type1_obs%rejAdapt + type1_obs%rej
             end if            
             if (mod(iStep, type2_sph%getNadapt()) == 0) then
-                call type2_sph%adaptDx(iStep, type2_obs%rej)
+                call type2_sph%adaptDx(iStep, type2_obs%rejAdapt)
+                type2_obs%rejAdapt = type2_obs%rejAdapt/real(type2_sph%getNadapt()-1)
+                write(type2_io%dx, *) iStep, type2_sph%getDx(), type2_obs%rejAdapt
+            else
+                type2_obs%rejAdapt = type2_obs%rejAdapt + type2_obs%rej
             end if
             
-            write(type1_io%dx, *) iStep, type1_sph%getDx(), type1_obs%rej
             write(type1_io%obsTherm, *) iStep, type1_obs%ePot, type1_obs%activ, type1_obs%rej
-            
-            write(type2_io%dx, *) iStep, type2_sph%getDx(), type2_obs%rej
             write(type2_io%obsTherm, *) iStep, type2_obs%ePot, type2_obs%activ, type2_obs%rej
             
             ! Observables writing
