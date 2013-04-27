@@ -104,14 +104,10 @@ contains
         
         write(report_unit, *) "    rCut = ", this%rCut
         
-        write(report_unit, *) "    same_cell_coordMax(:) = ", &
-        	this%same%cell_coordMax(:)
-        write(report_unit, *) "    same_cell_Lsize(:) = ", &
-            this%same%cell_Lsize(:)        
-        write(report_unit, *) "    mix_cell_coordMax(:) = ", &
-        	this%mix%cell_coordMax(:)
-        write(report_unit, *) "    mix_cell_Lsize(:) = ", &
-            this%mix%cell_Lsize(:)
+        write(report_unit, *) "    same_cell_coordMax(:) = ", this%same%cell_coordMax(:)
+        write(report_unit, *) "    same_cell_Lsize(:) = ", this%same%cell_Lsize(:)        
+        write(report_unit, *) "    mix_cell_coordMax(:) = ", this%mix%cell_coordMax(:)
+        write(report_unit, *) "    mix_cell_Lsize(:) = ", this%mix%cell_Lsize(:)
         
     end subroutine HardSpheres_report
     
@@ -190,18 +186,15 @@ contains
         if (.not. overlap) then
         
             mix_iCellNew = this%mix%position_to_cell(xNew)
-            call mix%ePot_neigh(xNew, mix_iCellNew, this%mix, other%X, &
-                overlap, mix_eNew)
+            call mix%ePot_neigh(xNew, mix_iCellNew, this%mix, other%X, overlap, mix_eNew)
                         
             if (.not. overlap) then
     
                 same_iCellOld = this%same%position_to_cell(this%X(:, iOld))
-                call this%ePot_neigh(iOld, this%X(:, iOld), same_iCellOld, &
-                    overlap)
+                call this%ePot_neigh(iOld, this%X(:, iOld), same_iCellOld, overlap)
                     
                 mix_iCellOld = this%mix%position_to_cell(this%X(:, iOld))
-                call mix%ePot_neigh(this%X(:, iOld), mix_iCellOld, &
-                    this%mix, other%X, overlap, mix_eOld)
+                call mix%ePot_neigh(this%X(:, iOld), mix_iCellOld, this%mix, other%X, overlap, mix_eOld)
                 
                 mix_dEpot = mix_eNew - mix_eOld
                     
@@ -294,8 +287,7 @@ contains
         write(report_unit, *) "Consistency test:"
         write(report_unit, *) "    ePot = ", ePot
         write(report_unit, *) "    ePot_conf = ", ePot_conf
-        write(report_unit, *) "    absolute difference = ", &
-            abs(ePot_conf-ePot)
+        write(report_unit, *) "    absolute difference = ", abs(ePot_conf-ePot)
     
     end subroutine HardSpheres_consistTest
 
