@@ -195,7 +195,7 @@ contains
         
         if (mod(iStep, this%Nadapt) == 0 .and. iStep>2) then
         
-            if (rej < rejFix - eps_taux) then            
+            if (rej < rejFix - eps_taux) then
                 this%dx(:) = this%dx(:) * more
                 this%dx(:) = modulo(this%dx(:), Lsize(:))
             else if (rej > rejFix + eps_taux) then
