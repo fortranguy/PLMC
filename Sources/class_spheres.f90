@@ -204,12 +204,14 @@ contains
         real(DP), intent(in) :: rej
         
         real(DP), parameter :: eps_dx = 0.05_DP
-        real(DP), parameter :: more = 1._DP+eps_dx, less = 1._DP-eps_dx
+        real(DP), parameter :: eps_rej = 0.1_DP * eps_dx
+        real(DP), parameter :: more = 1._DP+eps_dx
+        real(DP), parameter :: less = 1._DP-eps_dx
         
-        if (rej < this%rejFix) then
+        if (rej < this%rejFix - eps_rej) then
             this%dx(:) = this%dx(:) * more
             this%dx(:) = modulo(this%dx(:), Lsize(:))
-        else if (rej > this%rejFix) then
+        else if (rej > this%rejFix + eps_rej) then
             this%dx(:) = this%dx(:) * less
             this%dx(:) = modulo(this%dx(:), Lsize(:))
         end if
