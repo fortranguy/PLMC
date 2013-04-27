@@ -37,13 +37,13 @@ implicit none
     !   Mixing between 2 types
     type(MixingPotential) :: mix
     real(DP) :: mix_ePot, mix_ePotSum, mix_ePot_conf !< potential energy
-    integer, parameter :: mix_report_unit = 13 !< data & results
-    integer, parameter :: mix_obsTherm_unit = 14, mix_obs_unit = 15 !< observable(s)
+    integer, parameter :: mix_report_unit = 10 !< data & results
+    integer, parameter :: mix_obsTherm_unit = 11, mix_obs_unit = 12 !< observable(s)
     
     !   Whole system variables
     real(DP) :: ePot, ePotSum, ePot_conf
-    integer, parameter :: report_unit = 10
-    integer, parameter :: obsTherm_unit = 11, obs_unit = 12
+    integer, parameter :: report_unit = 13
+    integer, parameter :: obsTherm_unit = 14, obs_unit = 15
     
     write(output_unit, *) "Monte-Carlo Mix - Canonical : Volume =", product(Lsize)
 
