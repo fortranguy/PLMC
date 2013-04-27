@@ -126,14 +126,10 @@ contains
         write(report_unit, *) "    rCut = ", this%rCut
         write(report_unit, *) "    dr = ", this%dr
         
-        write(report_unit, *) "    same_cell_coordMax(:) = ", &
-        	this%same%cell_coordMax(:)
-        write(report_unit, *) "    same_cell_Lsize(:) = ", &
-            this%same%cell_Lsize(:)        
-        write(report_unit, *) "    mix_cell_coordMax(:) = ", &
-        	this%mix%cell_coordMax(:)
-        write(report_unit, *) "    mix_cell_Lsize(:) = ", &
-            this%mix%cell_Lsize(:)
+        write(report_unit, *) "    same_cell_coordMax(:) = ", this%same%cell_coordMax(:)
+        write(report_unit, *) "    same_cell_Lsize(:) = ", this%same%cell_Lsize(:)
+        write(report_unit, *) "    mix_cell_coordMax(:) = ", this%mix%cell_coordMax(:)
+        write(report_unit, *) "    mix_cell_Lsize(:) = ", this%mix%cell_Lsize(:)
         
     end subroutine InteractingSpheres_report
     
@@ -151,13 +147,12 @@ contains
         ! cut
         do i = this%iMin, this%iCut       
             r_i = real(i, DP)*this%dr
-            this%ePot_tab(i) = this%epsilon * exp(-this%alpha*(r_i-this%rMin))&
-            /r_i
+            this%ePot_tab(i) = this%epsilon * exp(-this%alpha*(r_i-this%rMin)) / r_i
         end do
         
         ! shift        
-        this%ePot_tab(:) = this%ePot_tab(:) - this%epsilon * &
-            exp(-this%alpha*(this%rCut-this%rMin)) / this%rCut
+        this%ePot_tab(:) = this%ePot_tab(:) - &
+                           this%epsilon * exp(-this%alpha*(this%rCut-this%rMin)) / this%rCut
 
     end subroutine InteractingSpheres_ePot_init
 
@@ -173,8 +168,7 @@ contains
        
             i = int(r/this%dr)
             r_i = real(i, DP)*this%dr
-            ePot_pair = this%ePot_tab(i) + (r-r_i)/this%dr * &
-                (this%ePot_tab(i+1)-this%ePot_tab(i))
+            ePot_pair = this%ePot_tab(i) + (r-r_i)/this%dr * (this%ePot_tab(i+1)-this%ePot_tab(i))
            
         else
        
@@ -184,8 +178,7 @@ contains
         
     end function InteractingSpheres_ePot_pair
     
-    subroutine InteractingSpheres_ePot_neigh(this, iCol, xCol, iCell, overlap, &
-    	energ)
+    subroutine InteractingSpheres_ePot_neigh(this, iCol, xCol, iCell, overlap, energ)
         
         class(InteractingSpheres), intent(in) :: this        
         integer, intent(in) :: iCol, iCell
@@ -234,8 +227,7 @@ contains
     
     !> Particle move
     
-    subroutine InteractingSpheres_move(this, other, mix, same_ePot, mix_ePot, &
-        Nrej)
+    subroutine InteractingSpheres_move(this, other, mix, same_ePot, mix_ePot, Nrej)
     
         class(InteractingSpheres), intent(inout) :: this
         class(Spheres), intent(inout) :: other
@@ -266,19 +258,16 @@ contains
         if (.not. overlap) then
         
             mix_iCellNew = this%mix%position_to_cell(xNew)
-            call mix%ePot_neigh(xNew, mix_iCellNew, this%mix, other%X, &
-                overlap, mix_eNew)
+            call mix%ePot_neigh(xNew, mix_iCellNew, this%mix, other%X, overlap, mix_eNew)
                         
             if (.not. overlap) then
     
                 same_iCellOld = this%same%position_to_cell(this%X(:, iOld))
-                call this%ePot_neigh(iOld, this%X(:, iOld), same_iCellOld, &
-                    overlap, same_eOld)                    
+                call this%ePot_neigh(iOld, this%X(:, iOld), same_iCellOld, overlap, same_eOld)                    
                 same_dEpot = same_eNew - same_eOld
                     
                 mix_iCellOld = this%mix%position_to_cell(this%X(:, iOld))
-                call mix%ePot_neigh(this%X(:, iOld), mix_iCellOld, &
-                    this%mix, other%X, overlap, mix_eOld)                
+                call mix%ePot_neigh(this%X(:, iOld), mix_iCellOld, this%mix, other%X, overlap, mix_eOld)
                 mix_dEpot = mix_eNew - mix_eOld
                 
                 dEpot = same_dEpot + mix_dEpot
@@ -388,8 +377,7 @@ contains
         write(report_unit, *) "Consistency test:"
         write(report_unit, *) "    ePot = ", ePot
         write(report_unit, *) "    ePot_conf = ", ePot_conf
-        write(report_unit, *) "    relative difference = ", &
-            abs(ePot_conf-ePot)/ePot_conf
+        write(report_unit, *) "    relative difference = ", abs((ePot_conf-ePot)/ePot_conf)
     
     end subroutine InteractingSpheres_consistTest
 
