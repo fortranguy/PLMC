@@ -15,7 +15,7 @@ use mod_tools
 
 implicit none
 
-! Beginning --------------------------------------------------------------------
+! Beginning ----------------------------------------------------------------------------------------
 
     ! Declarations
     
@@ -46,8 +46,7 @@ implicit none
     integer, parameter :: report_unit = 10 !< data & results
     integer, parameter :: obsTherm_unit = 11, obs_unit = 12 !< observable(s)
     
-    write(output_unit, *) "Monte-Carlo Mix - Canonical : Volume =", &
-        product(Lsize)
+    write(output_unit, *) "Monte-Carlo Mix - Canonical : Volume =", product(Lsize)
 
     ! Initialisations & reports
     
@@ -61,19 +60,13 @@ implicit none
     
     call mix%construct()
     mix_ePotSum = 0._DP
-    open(unit=mix_report_unit, recl=4096, file="mix_report.out", status='new', &
-        action='write')
-    open(unit=mix_obsTherm_unit, recl=4096, file="mix_obsTherm.out", &
-        status='new', action='write')
-    open(unit=mix_obs_unit, recl=4096, file="mix_obs.out", status='new', &
-        action='write')
+    open(unit=mix_report_unit, recl=4096, file="mix_report.out", status='new', action='write')
+    open(unit=mix_obsTherm_unit, recl=4096, file="mix_obsTherm.out", status='new', action='write')
+    open(unit=mix_obs_unit, recl=4096, file="mix_obs.out", status='new', action='write')
         
-    open(unit=report_unit, recl=4096, file="report.out", status='new', &
-        action='write')
-    open(unit=obsTherm_unit, recl=4096, file="obsTherm.out", status='new', &
-        action='write')
-    open(unit=obs_unit, recl=4096, file="obs.out", status='new', &
-        action='write')
+    open(unit=report_unit, recl=4096, file="report.out", status='new', action='write')
+    open(unit=obsTherm_unit, recl=4096, file="obsTherm.out", status='new', action='write')
+    open(unit=obs_unit, recl=4096, file="obs.out", status='new', action='write')
     
     call type1_sph%report(type1_io%report)
     call type1_sph%printInfo(type1_io%report)
@@ -104,7 +97,7 @@ implicit none
     mix_ePot = mix%ePot_conf(type1_sph%X, type2_sph%X)    
     ePot_conf = type1_obs%ePot + type2_obs%ePot + mix_ePot
     
-! Middle -----------------------------------------------------------------------
+! Middle -------------------------------------------------------------------------------------------
         
     write(output_unit, *) "Beginning of cycles"    
     
@@ -117,12 +110,10 @@ implicit none
             call random_number(rand)
             iColRand = int(rand*real(Ncol, DP)) + 1            
             if (iColRand <= type1_sph%getNcol()) then
-                call type1_sph%move(type2_sph, mix, type1_obs%ePot, mix_ePot, &
-                    type1_obs%Nrej)                    
+                call type1_sph%move(type2_sph, mix, type1_obs%ePot, mix_ePot, type1_obs%Nrej)
                 type1_obs%Nmove = type1_obs%Nmove + 1
             else
-                call type2_sph%move(type1_sph, mix, type2_obs%ePot, mix_ePot, &
-                    type2_obs%Nrej)
+                call type2_sph%move(type1_sph, mix, type2_obs%ePot, mix_ePot, type2_obs%Nrej)
                 type2_obs%Nmove = type2_obs%Nmove + 1
             end if
             
@@ -133,31 +124,26 @@ implicit none
         call type2_sph%widom(type2_obs%activ)
         
         ! Rejections accumulations
-        type1_obs%rejSum = type1_obs%rejSum + &
-            real(type1_obs%Nrej, DP)/real(type1_obs%Nmove, DP)
+        type1_obs%rejSum = type1_obs%rejSum + real(type1_obs%Nrej, DP)/real(type1_obs%Nmove, DP)
         type1_obs%Nrej = 0; type1_obs%Nmove = 0
         
-        type2_obs%rejSum = type2_obs%rejSum + &
-            real(type2_obs%Nrej, DP)/real(type2_obs%Nmove, DP)
+        type2_obs%rejSum = type2_obs%rejSum + real(type2_obs%Nrej, DP)/real(type2_obs%Nmove, DP)
         type2_obs%Nrej = 0; type2_obs%Nmove = 0
         
         if (iStep <= Ntherm) then ! Thermalisation
             
             ! Displacements optimisations
             call type1_sph%adaptDx(iStep, type1_obs%rejSum, type1_io%report)
-            write(type1_io%dx, *) iStep, type1_sph%getDx(), &
-                type1_obs%rejSum/real(iStep, DP)
+            write(type1_io%dx, *) iStep, type1_sph%getDx(), type1_obs%rejSum/real(iStep, DP)
             write(type1_io%obsTherm, *) iStep, type1_obs%ePot, type1_obs%activ
         
             call type2_sph%adaptDx(iStep, type2_obs%rejSum, type2_io%report)
-            write(type2_io%dx, *) iStep, type2_sph%getDx(), &
-                type2_obs%rejSum/real(iStep, DP)
+            write(type2_io%dx, *) iStep, type2_sph%getDx(), type2_obs%rejSum/real(iStep, DP)
             write(type2_io%obsTherm, *) iStep, type2_obs%ePot, type2_obs%activ
             
             ! Observables writing
             write(mix_obsTherm_unit, *) iStep, mix_ePot
-            write(obsTherm_unit, *) iStep, type1_obs%ePot + type2_obs%ePot + &
-                mix_ePot
+            write(obsTherm_unit, *) iStep, type1_obs%ePot + type2_obs%ePot + mix_ePot
         
         else ! Observables accumulations & writing
         
@@ -185,7 +171,7 @@ implicit none
 
     write(output_unit, *) "End of cycles"
 
-! End --------------------------------------------------------------------------
+! End ----------------------------------------------------------------------------------------------
 
     ! Tests & results
 
