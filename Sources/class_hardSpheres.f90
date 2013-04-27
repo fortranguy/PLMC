@@ -102,6 +102,7 @@ contains
         
         write(report_unit ,*) "    Ncol = ", this%Ncol
         write(report_unit ,*) "    Nwidom = ", this%Nwidom
+        write(report_unit ,*) "    Nadapt = ", this%Nadapt
         
         write(report_unit, *) "    rCut = ", this%rCut
         
