@@ -127,8 +127,7 @@ contains
                     
                 r_mix = dist(type1_X(:, iCol1), type2_X(:, iCol2))
                 if (r_mix < this%rMin) then
-                    write(output_unit, *) this%name, " :    Overlap !", &
-                        iCol1, iCol2
+                    write(output_unit, *) this%name, " :    Overlap !", iCol1, iCol2
                     write(output_unit, *) "    r_mix = ", r_mix
                     stop
                 end if
@@ -154,13 +153,12 @@ contains
         ! cut
         do i = this%iMin, this%iCut       
             r_i = real(i, DP)*this%dr
-            this%ePot_tab(i) = this%epsilon * exp(-this%alpha*(r_i-this%rMin))&
-            /r_i
+            this%ePot_tab(i) = this%epsilon * exp(-this%alpha*(r_i-this%rMin)) / r_i
         end do
         
         ! shift        
-        this%ePot_tab(:) = this%ePot_tab(:) - this%epsilon * &
-            exp(-this%alpha*(this%rCut-this%rMin)) / this%rCut
+        this%ePot_tab(:) = this%ePot_tab(:) - &
+                           this%epsilon * exp(-this%alpha*(this%rCut-this%rMin)) / this%rCut
 
     end subroutine MixingPotential_ePot_init
 
@@ -176,8 +174,7 @@ contains
        
             i = int(r/this%dr)
             r_i = real(i, DP)*this%dr
-            ePot_pair = this%ePot_tab(i) + (r-r_i)/this%dr * &
-                (this%ePot_tab(i+1)-this%ePot_tab(i))
+            ePot_pair = this%ePot_tab(i) + (r-r_i)/this%dr * (this%ePot_tab(i+1)-this%ePot_tab(i))
            
         else
        
@@ -187,8 +184,7 @@ contains
         
     end function MixingPotential_ePot_pair
     
-    subroutine MixingPotential_ePot_neigh(this, xCol, iCell, neigh, other_X, &
-        overlap, energ)
+    subroutine MixingPotential_ePot_neigh(this, xCol, iCell, neigh, other_X, overlap, energ)
         
         class(MixingPotential), intent(in) :: this
         real(DP), dimension(:), intent(in) :: xCol !< type A
@@ -235,8 +231,7 @@ contains
     
     !> Total potential energy
     
-    function MixingPotential_ePot_conf(this, type1_X, type2_X) &
-        result(ePot_conf)
+    function MixingPotential_ePot_conf(this, type1_X, type2_X) result(ePot_conf)
     
         class(MixingPotential), intent(in) :: this
         real(DP), dimension(:, :), intent(in) :: type1_X, type2_X
