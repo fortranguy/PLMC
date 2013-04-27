@@ -45,6 +45,7 @@ private
         procedure :: getName => Spheres_getName
         procedure :: getNcol => Spheres_getNcol
         procedure :: getRmin => Spheres_getRmin
+        procedure :: getNadapt => Spheres_getNadapt
         
         procedure :: printInfo => Spheres_printInfo
         
@@ -101,6 +102,18 @@ contains
         getRmin = this%rMin
     
     end function Spheres_getRmin
+    
+    !> Accessor : Nadapt
+    
+    function Spheres_getNadapt(this) result(getNadapt)
+    
+        class(Spheres), intent(in) :: this
+        
+        integer :: getNadapt
+        
+        getNadapt = this%Nadapt
+        
+    end function Spheres_getNadapt
     
     !> Print density and compacity
     
@@ -193,16 +206,12 @@ contains
         real(DP), parameter :: eps_dx = 0.05_DP
         real(DP), parameter :: more = 1._DP+eps_dx, less = 1._DP-eps_dx
         
-        if (mod(iStep, this%Nadapt) == 0 .and. iStep>2) then
-        
-            if (rej < this%rejFix) then
-                this%dx(:) = this%dx(:) * more
-                this%dx(:) = modulo(this%dx(:), Lsize(:))
-            else if (rej > this%rejFix) then
-                this%dx(:) = this%dx(:) * less
-                this%dx(:) = modulo(this%dx(:), Lsize(:))
-            end if
-
+        if (rej < this%rejFix) then
+            this%dx(:) = this%dx(:) * more
+            this%dx(:) = modulo(this%dx(:), Lsize(:))
+        else if (rej > this%rejFix) then
+            this%dx(:) = this%dx(:) * less
+            this%dx(:) = modulo(this%dx(:), Lsize(:))
         end if
     
     end subroutine Spheres_adaptDx

@@ -135,11 +135,15 @@ implicit none
         if (iStep < Ntherm) then ! Thermalisation
             
             ! Displacements optimisations
-            call type1_sph%adaptDx(iStep, type1_obs%rej)
+            if (mod(iStep, type1_sph%getNadapt()) == 0) then
+                call type1_sph%adaptDx(iStep, type1_obs%rej)
+            end if            
+            if (mod(iStep, type2_sph%getNadapt()) == 0) then
+                call type2_sph%adaptDx(iStep, type2_obs%rej)
+            end if
+            
             write(type1_io%dx, *) iStep, type1_sph%getDx(), type1_obs%rej
             write(type1_io%obsTherm, *) iStep, type1_obs%ePot, type1_obs%activ
-        
-            call type2_sph%adaptDx(iStep, type2_obs%rej)
             write(type2_io%dx, *) iStep, type2_sph%getDx(), type2_obs%rej
             write(type2_io%obsTherm, *) iStep, type2_obs%ePot, type2_obs%activ
             
