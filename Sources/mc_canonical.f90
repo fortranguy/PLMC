@@ -68,8 +68,7 @@ implicit none
     open(unit=obs_unit, recl=4096, file="obs.out", status='new', action='write')
     
     call type1_sph%report(type1_io%report)
-    call type1_sph%printInfo(type1_io%report)
-    
+    call type1_sph%printInfo(type1_io%report)    
     call type2_sph%report(type2_io%report)
     call type2_sph%printInfo(type2_io%report)
     
@@ -123,10 +122,9 @@ implicit none
         call type1_sph%widom(type1_obs%activ)
         call type2_sph%widom(type2_obs%activ)
         
-        ! Rejections accumulations
+        ! Rejections rate
         type1_obs%rej = real(type1_obs%Nrej, DP)/real(type1_obs%Nmove, DP)
-        type1_obs%Nrej = 0; type1_obs%Nmove = 0
-        
+        type1_obs%Nrej = 0; type1_obs%Nmove = 0        
         type2_obs%rej = real(type2_obs%Nrej, DP)/real(type2_obs%Nmove, DP)
         type2_obs%Nrej = 0; type2_obs%Nmove = 0
         
@@ -150,10 +148,9 @@ implicit none
                 type2_obs%rejAdapt = type2_obs%rejAdapt + type2_obs%rej
             end if
             
+            ! Observables writing
             write(type1_io%obsTherm, *) iStep, type1_obs%ePot, type1_obs%activ, type1_obs%rej
             write(type2_io%obsTherm, *) iStep, type2_obs%ePot, type2_obs%activ, type2_obs%rej
-            
-            ! Observables writing
             write(mix_obsTherm_unit, *) iStep, mix_ePot
             write(obsTherm_unit, *) iStep, type1_obs%ePot + type2_obs%ePot + mix_ePot
             
@@ -216,8 +213,7 @@ implicit none
     ! Finalisations
     
     call type1_sph%destroy()
-    call type1_io%close()
-    
+    call type1_io%close()    
     call type2_sph%destroy()
     call type2_io%close()
     
