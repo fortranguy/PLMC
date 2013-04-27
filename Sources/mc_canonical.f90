@@ -125,11 +125,9 @@ implicit none
         
         ! Rejections accumulations
         type1_obs%rej = real(type1_obs%Nrej, DP)/real(type1_obs%Nmove, DP)
-        type1_obs%rejSum = type1_obs%rejSum + type1_obs%rej
         type1_obs%Nrej = 0; type1_obs%Nmove = 0
         
         type2_obs%rej = real(type2_obs%Nrej, DP)/real(type2_obs%Nmove, DP)
-        type2_obs%rejSum = type2_obs%rejSum + type2_obs%rej
         type2_obs%Nrej = 0; type2_obs%Nmove = 0
         
         if (iStep < Ntherm) then ! Thermalisation
@@ -143,9 +141,10 @@ implicit none
             end if
             
             write(type1_io%dx, *) iStep, type1_sph%getDx(), type1_obs%rej
-            write(type1_io%obsTherm, *) iStep, type1_obs%ePot, type1_obs%activ
+            write(type1_io%obsTherm, *) iStep, type1_obs%ePot, type1_obs%activ, type1_obs%rej
+            
             write(type2_io%dx, *) iStep, type2_sph%getDx(), type2_obs%rej
-            write(type2_io%obsTherm, *) iStep, type2_obs%ePot, type2_obs%activ
+            write(type2_io%obsTherm, *) iStep, type2_obs%ePot, type2_obs%activ, type2_obs%rej
             
             ! Observables writing
             write(mix_obsTherm_unit, *) iStep, mix_ePot
@@ -159,12 +158,14 @@ implicit none
         else ! Observables accumulations & writing
         
             type1_obs%ePotSum = type1_obs%ePotSum + type1_obs%ePot
-            type1_obs%activSum = type1_obs%activSum + type1_obs%activ            
-            write(type1_io%obs, *) iStep, type1_obs%ePot, type1_obs%activ
+            type1_obs%activSum = type1_obs%activSum + type1_obs%activ
+            type1_obs%rejSum = type1_obs%rejSum + type1_obs%rej
+            write(type1_io%obs, *) iStep, type1_obs%ePot, type1_obs%activ, type1_obs%rej
         
             type2_obs%ePotSum = type2_obs%ePotSum + type2_obs%ePot
-            type2_obs%activSum = type2_obs%activSum + type2_obs%activ  
-            write(type2_io%obs, *) iStep, type2_obs%ePot, type2_obs%activ                
+            type2_obs%activSum = type2_obs%activSum + type2_obs%activ
+            type2_obs%rejSum = type2_obs%rejSum + type2_obs%rej
+            write(type2_io%obs, *) iStep, type2_obs%ePot, type2_obs%activ, type2_obs%rej
                 
             mix_ePotSum = mix_ePotSum + mix_ePot
             write(mix_obs_unit, *) iStep, mix_ePot
