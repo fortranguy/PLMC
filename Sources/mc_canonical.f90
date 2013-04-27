@@ -130,7 +130,7 @@ implicit none
         type2_obs%rej = real(type2_obs%Nrej, DP)/real(type2_obs%Nmove, DP)
         type2_obs%Nrej = 0; type2_obs%Nmove = 0
         
-        if (iStep < Ntherm) then ! Thermalisation
+        if (iStep <= Ntherm) then ! Thermalisation
             
             ! Displacements optimisations
             if (mod(iStep, type1_sph%getNadapt()) == 0) then
@@ -154,11 +154,11 @@ implicit none
             ! Observables writing
             write(mix_obsTherm_unit, *) iStep, mix_ePot
             write(obsTherm_unit, *) iStep, type1_obs%ePot + type2_obs%ePot + mix_ePot
-        
-        else if (iStep == Ntherm) then ! Definite thermalised displacement
-        
-            call type1_sph%definiteDx(type1_obs%rej, type1_io%report)
-            call type2_sph%definiteDx(type2_obs%rej, type2_io%report)
+            
+            if (iStep == Ntherm) then ! Definite thermalised displacement
+                call type1_sph%definiteDx(type1_obs%rej, type1_io%report)
+                call type2_sph%definiteDx(type2_obs%rej, type2_io%report)
+            end if       
         
         else ! Observables accumulations & writing
         
