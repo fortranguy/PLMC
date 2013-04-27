@@ -19,7 +19,6 @@ implicit none
 
     ! Declarations
     
-    !   Monte-Carlo variables
     integer :: iStep, iMove !< Monte-Carlo counters
     integer :: iColRand !< random choice of a particle
     real(DP) :: rand !< random number in between 0 and 1
@@ -37,14 +36,14 @@ implicit none
     
     !   Mixing between 2 types
     type(MixingPotential) :: mix
-    real(DP) :: mix_ePot, mix_ePotSum, mix_ePot_conf
-    integer, parameter :: mix_report_unit = 13
-    integer, parameter :: mix_obsTherm_unit = 14, mix_obs_unit = 15
+    real(DP) :: mix_ePot, mix_ePotSum, mix_ePot_conf !< potential energy
+    integer, parameter :: mix_report_unit = 13 !< data & results
+    integer, parameter :: mix_obsTherm_unit = 14, mix_obs_unit = 15 !< observable(s)
     
-    !   System variables    
-    real(DP) :: ePot, ePotSum, ePot_conf !< potential energy
-    integer, parameter :: report_unit = 10 !< data & results
-    integer, parameter :: obsTherm_unit = 11, obs_unit = 12 !< observable(s)
+    !   Whole system variables
+    real(DP) :: ePot, ePotSum, ePot_conf
+    integer, parameter :: report_unit = 10
+    integer, parameter :: obsTherm_unit = 11, obs_unit = 12
     
     write(output_unit, *) "Monte-Carlo Mix - Canonical : Volume =", product(Lsize)
 
@@ -74,7 +73,7 @@ implicit none
     call type2_sph%report(type2_io%report)
     call type2_sph%printInfo(type2_io%report)
     
-    call mix%report(mix_report_unit)    
+    call mix%report(mix_report_unit)
     call report(report_unit)
     
     call initRandomSeed(report_unit)
