@@ -137,13 +137,15 @@ implicit none
                 type1_obs%rejAdapt = type1_obs%rejAdapt/real(type1_sph%getNadapt()-1)
                 call type1_sph%adaptDx(iStep, type1_obs%rejAdapt)
                 write(type1_io%dx, *) iStep, type1_sph%getDx(), type1_obs%rejAdapt
+                type1_obs%rejAdapt = 0._DP
             else
                 type1_obs%rejAdapt = type1_obs%rejAdapt + type1_obs%rej
-            end if            
+            end if
             if (mod(iStep, type2_sph%getNadapt()) == 0) then
                 call type2_sph%adaptDx(iStep, type2_obs%rejAdapt)
                 type2_obs%rejAdapt = type2_obs%rejAdapt/real(type2_sph%getNadapt()-1)
                 write(type2_io%dx, *) iStep, type2_sph%getDx(), type2_obs%rejAdapt
+                type2_obs%rejAdapt = 0._DP
             else
                 type2_obs%rejAdapt = type2_obs%rejAdapt + type2_obs%rej
             end if
