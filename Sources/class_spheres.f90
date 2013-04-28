@@ -224,10 +224,19 @@ contains
         real(DP), intent(in) :: rej
         integer, intent(in) :: report_unit
         
+        real(DP) :: 
+        
             if (rej == 0._DP) then
                 write(output_unit, *) this%name, "    Warning : dx adaptation problem."
                 this%dx(:) = this%dx_save(:)
                 write(output_unit, *) "default dx :", this%dx(:)
+                write(output_unit, *)
+            end if
+            
+            if (this%dx(:) > LsizeMi(:)) then
+                write(output_unit, *) this%name, "    Warning : dx too big."
+                this%dx(:) = LsizeMi(:)
+                write(output_unit, *) "big dx :", this%dx(:)
                 write(output_unit, *)
             end if
             
