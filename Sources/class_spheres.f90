@@ -224,7 +224,7 @@ contains
         real(DP), intent(in) :: rej
         integer, intent(in) :: report_unit
         
-        real(DP) :: 
+        real(DP) :: dx_normSqr, Lsize_normSqr
         
             if (rej == 0._DP) then
                 write(output_unit, *) this%name, "    Warning : dx adaptation problem."
@@ -233,7 +233,9 @@ contains
                 write(output_unit, *)
             end if
             
-            if (this%dx(:) > LsizeMi(:)) then
+            dx_normSqr = dot_product(this%dx, this%dx)
+            Lsize_normSqr = dot_product(LsizeMi, LsizeMi)
+            if (dx_normSqr > Lsize_normSqr) then
                 write(output_unit, *) this%name, "    Warning : dx too big."
                 this%dx(:) = LsizeMi(:)
                 write(output_unit, *) "big dx :", this%dx(:)
