@@ -129,6 +129,11 @@ implicit none
         type2_obs%Nrej = 0; type2_obs%Nmove = 0
         
         if (iStep <= Ntherm) then ! Thermalisation
+        
+            if (iStep==1) then
+                write(type1_io%dx, *) iStep, type1_sph%getDx(), type1_obs%rej
+                write(type2_io%dx, *) iStep, type2_sph%getDx(), type2_obs%rej
+            end if
             
             ! Displacements optimisations
             if (mod(iStep, type1_sph%getNadapt()) == 0) then
