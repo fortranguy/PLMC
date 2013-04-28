@@ -208,12 +208,22 @@ contains
         real(DP), parameter :: more = 1._DP+eps_dx
         real(DP), parameter :: less = 1._DP-eps_dx
         
+        real(DP) :: dx_normSqr, Lsize_normSqr
+        
         if (rej < this%rejFix - eps_rej) then
+        
             this%dx(:) = this%dx(:) * more
-            this%dx(:) = modulo(this%dx(:), Lsize(:))
+            
+            dx_normSqr = dot_product(this%dx, this%dx)
+            Lsize_normSqr = dot_product(LsizeMi, LsizeMi)
+            if (dx_normSqr > Lsize_normSqr) then
+                this%dx(:) = LsizeMi(:)
+            end if
+            
         else if (rej > this%rejFix + eps_rej) then
+        
             this%dx(:) = this%dx(:) * less
-            this%dx(:) = modulo(this%dx(:), Lsize(:))
+            
         end if
     
     end subroutine Spheres_adaptDx
@@ -227,19 +237,16 @@ contains
         real(DP) :: dx_normSqr, Lsize_normSqr
         
             if (rej == 0._DP) then
-                write(output_unit, *) this%name, "    Warning : dx adaptation problem."
+                write(output_unit, *) this%name, " :    Warning : dx adaptation problem."
                 this%dx(:) = this%dx_save(:)
                 write(output_unit, *) "default dx :", this%dx(:)
-                write(output_unit, *)
             end if
             
             dx_normSqr = dot_product(this%dx, this%dx)
             Lsize_normSqr = dot_product(LsizeMi, LsizeMi)
-            if (dx_normSqr > Lsize_normSqr) then
-                write(output_unit, *) this%name, "    Warning : dx too big."
-                this%dx(:) = LsizeMi(:)
+            if (dx_normSqr >= Lsize_normSqr) then
+                write(output_unit, *) this%name, " :   Warning : dx too big."
                 write(output_unit, *) "big dx :", this%dx(:)
-                write(output_unit, *)
             end if
             
             write(output_unit, *) this%name, " :    Thermalisation : over"
