@@ -177,7 +177,7 @@ contains
         integer, dimension(Dim) :: cell_coord
         integer :: position_to_cell
     
-        cell_coord(:) = int( xCol(:)/this%cell_Lsize(:) ) + 1
+        cell_coord(:) = int(xCol(:)/this%cell_Lsize(:)) + 1
         position_to_cell = cell_coord(1) + this%cell_coordMax(1)*(cell_coord(2)-1) + &
                            this%cell_coordMax(1)*this%cell_coordMax(2)*(cell_coord(3)-1)
     

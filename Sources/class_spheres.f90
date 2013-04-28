@@ -197,10 +197,9 @@ contains
     
     !> Adaptation of dx during the thermalisation
     
-    subroutine Spheres_adaptDx(this, iStep, rej)
+    subroutine Spheres_adaptDx(this, rej)
     
         class(Spheres), intent(inout) :: this
-        integer, intent(in) :: iStep
         real(DP), intent(in) :: rej
         
         real(DP), parameter :: eps_dx = 0.05_DP
