@@ -21,7 +21,7 @@ implicit none
     real(DP) :: rand !< random number in between 0 and 1
     real(DP) :: tIni, tFin !< CPU initial and final time
     
-    !   Physical system variables
+    !   Total physical system variables
     real(DP) :: Epot, EpotSum, Epot_conf !< potential energy
     integer, parameter :: report_unit = 10 !< data & results
     integer, parameter :: obsTherm_unit = 11, obs_unit = 12 !< observables
@@ -90,6 +90,7 @@ implicit none
     call type2_sph%cols_to_cells(type1_sph%X)    
     
     mix_Epot = mix%Epot_conf(type1_sph%X, type2_sph%X)
+    
     Epot_conf = type1_obs%Epot + type2_obs%Epot + mix_Epot
     
 ! Middle -------------------------------------------------------------------------------------------
@@ -196,16 +197,17 @@ implicit none
     ! Tests & results
 
     call type1_sph%overlapTest()
+    call type2_sph%overlapTest()
+    call mix%overlapTest(type1_sph%X, type2_sph%X)
+    
     call type1_sph%consistTest(type1_obs%Epot, type1_io%report)
     call type1_sph%snapShot(type1_io%snapFin)
     call type1_obs%results(type1_sph%getNcol(), type1_io%report)
-
-    call type2_sph%overlapTest()
+    
     call type2_sph%consistTest(type2_obs%Epot, type2_io%report)
     call type2_sph%snapShot(type2_io%snapFin)
     call type2_obs%results(type2_sph%getNcol(), type2_io%report)
     
-    call mix%overlapTest(type1_sph%X, type2_sph%X)
     mix_Epot_conf = mix%Epot_conf(type1_sph%X, type2_sph%X)
     call mix_results(mix_Epot, mix_Epot_conf, mix_EpotSum, mix_report_unit)
     
