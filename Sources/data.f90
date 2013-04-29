@@ -62,7 +62,7 @@ end module data_particles
     
 !***************************************************************************************************
 !> \brief Monte-Carlo data :
-!> declaration of the MC parameters
+!> declaration of the Monte-Carlo parameters
 !***************************************************************************************************
 module data_mc
 
@@ -95,7 +95,10 @@ end module data_mc
 !> \brief Potential data :
 !> declaration of the potential energy parameters
 
-!> The short potential is composed of 3 elements :
+!> The interactive spheres (inter) potential is composed of 3 parts :
+!> hard sphere (HS) + Yukawa + cut
+
+!> The mixing potential (mix) is also composed of 3 parts :
 !> hard sphere (HS) + Yukawa + cut
 !***************************************************************************************************
 module data_potentiel
@@ -147,19 +150,19 @@ use data_cell
 
 implicit none
 
-	logical, parameter :: snap = .false.
-	real(DP), parameter :: deltaDist = 0.01_DP
-	real(DP), protected :: rMax
-	integer, protected :: Ndist
-	
+    logical, parameter :: snap = .false.
+    real(DP), parameter :: deltaDist = 0.01_DP
+    real(DP), protected :: rMax
+    integer, protected :: Ndist
+
 contains
-	
-	subroutine initDistriParams()
-	
-		rMax = sqrt(dot_product(LsizeMi, LsizeMi))
-		Ndist = int(rMax/deltaDist)
-	
-	end subroutine initDistriParams
+
+    subroutine initDistriParams()
+
+        rMax = sqrt(dot_product(LsizeMi, LsizeMi))
+        Ndist = int(rMax/deltaDist)
+
+    end subroutine initDistriParams
 
 end module data_distrib
 !***************************************************************************************************
