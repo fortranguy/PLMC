@@ -52,10 +52,10 @@ implicit none
     real(DP), parameter :: hard_rMin = 2._DP * hard_radius
     integer, parameter :: hard_Ncol = 270
     
-    integer, parameter :: Ncol = inter_Ncol + hard_Ncol
-    
     real(DP), parameter :: mix_delta = 0._DP
     real(DP), parameter :: mix_rMin = inter_radius + hard_radius + mix_delta
+    
+    integer, parameter :: Ncol = inter_Ncol + hard_Ncol
     
 end module data_particles
 !***************************************************************************************************
@@ -76,7 +76,7 @@ implicit none
     integer, parameter :: Nstep = 2**10
     integer, parameter :: Ntherm = 2**8
     
-    integer, parameter :: Nmove = 2**1 * Ncol
+    integer, parameter :: Nmove = 2**2 * Ncol
     
     real(DP), dimension(Dim), parameter :: inter_dx = 1._DP
     real(DP), parameter :: inter_rejFix = 0.5_DP
