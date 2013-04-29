@@ -26,7 +26,7 @@ implicit none
     integer, parameter :: report_unit = 10 !< data & results
     integer, parameter :: obsTherm_unit = 11, obs_unit = 12 !< observables
     
-    !   Mixing between 2 types
+    !   Mixing potential between 2 types
     type(MixingPotential) :: mix
     real(DP) :: mix_Epot, mix_EpotSum, mix_Epot_conf
     integer, parameter :: mix_report_unit = 13 
