@@ -107,7 +107,7 @@ implicit none
         do iMove = 1, Nmove
         
             call random_number(rand)
-            iColRand = int(rand*real(Ncol, DP)) + 1            
+            iColRand = int(rand*real(Ncol, DP)) + 1
             if (iColRand <= type1_sph%getNcol()) then
                 call type1_sph%move(type2_sph, mix, type1_obs%Epot, mix_Epot, type1_obs%Nrej)
                 type1_obs%Nmove = type1_obs%Nmove + 1
