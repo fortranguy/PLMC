@@ -135,7 +135,7 @@ implicit none
                 write(type2_io%dx, *) iStep, type2_sph%getDx(), type2_obs%rej
             end if
             
-            ! Displacements optimisations : type 1            
+            ! Displacements optimisation : type 1            
             if (mod(iStep, type1_sph%getNadapt()) == 0) then
                 type1_obs%rejAdapt = type1_obs%rejAdapt/real(type1_sph%getNadapt()-1)
                 call type1_sph%adaptDx(type1_obs%rejAdapt)
@@ -144,7 +144,7 @@ implicit none
             else
                 type1_obs%rejAdapt = type1_obs%rejAdapt + type1_obs%rej
             end if
-            ! Displacements optimisations : type 2
+            ! Displacements optimisation : type 2
             if (mod(iStep, type2_sph%getNadapt()) == 0) then
                 type2_obs%rejAdapt = type2_obs%rejAdapt/real(type2_sph%getNadapt()-1)
                 call type2_sph%adaptDx(type2_obs%rejAdapt)
