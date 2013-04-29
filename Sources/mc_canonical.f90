@@ -15,7 +15,7 @@ use mod_tools
 
 implicit none
     
-    !	Monte-Carlo variables
+    !   Monte-Carlo variables
     integer :: iStep, iMove !< Monte-Carlo counters
     integer :: iColRand !< random choice of a particle
     real(DP) :: rand !< random number in between 0 and 1
@@ -126,7 +126,7 @@ implicit none
         
         if (iStep <= Ntherm) then ! Thermalisation
         
-        	! Initial displacements & rejections
+            ! Initial displacements & rejections
             if (iStep==1) then
                 write(type1_io%dx, *) iStep, type1_sph%getDx(), type1_obs%rej
                 write(type2_io%dx, *) iStep, type2_sph%getDx(), type2_obs%rej
