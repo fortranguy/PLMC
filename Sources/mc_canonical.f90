@@ -14,11 +14,8 @@ use class_units
 use mod_tools
 
 implicit none
-
-! Beginning ----------------------------------------------------------------------------------------
-
-    ! Declarations
     
+    !	Monte-Carlo variables
     integer :: iStep, iMove !< Monte-Carlo counters
     integer :: iColRand !< random choice of a particle
     real(DP) :: rand !< random number in between 0 and 1
@@ -45,6 +42,8 @@ implicit none
     type(Observables) :: type2_obs
     type(Units) :: type2_io
     
+! Beginning ----------------------------------------------------------------------------------------
+    
     write(output_unit, *) "Monte-Carlo Mix - Canonical : Volume =", product(Lsize)
 
     ! Initialisations & reports
@@ -52,30 +51,27 @@ implicit none
     open(unit=report_unit, recl=4096, file="report.out", status='new', action='write')
     open(unit=obsTherm_unit, recl=4096, file="obsTherm.out", status='new', action='write')
     open(unit=obs_unit, recl=4096, file="obs.out", status='new', action='write')
+    call report(report_unit)
+    call initRandomSeed(report_unit)
     
     call mix%construct()
     mix_EpotSum = 0._DP
     open(unit=mix_report_unit, recl=4096, file="mix_report.out", status='new', action='write')
     open(unit=mix_obsTherm_unit, recl=4096, file="mix_obsTherm.out", status='new', action='write')
     open(unit=mix_obs_unit, recl=4096, file="mix_obs.out", status='new', action='write')
+    call mix%report(mix_report_unit)
     
     call type1_sph%construct(mix%getRcut())
     call type1_obs%init()
     call type1_io%open(type1_sph%getName())
+    call type1_sph%report(type1_io%report)
+    call type1_sph%printInfo(type1_io%report) 
     
     call type2_sph%construct(mix%getRcut())
     call type2_obs%init()
-    call type2_io%open(type2_sph%getName())   
-  
-    call type1_sph%report(type1_io%report)
-    call type1_sph%printInfo(type1_io%report)    
+    call type2_io%open(type2_sph%getName())
     call type2_sph%report(type2_io%report)
     call type2_sph%printInfo(type2_io%report)
-    
-    call mix%report(mix_report_unit)
-    call report(report_unit)
-    
-    call initRandomSeed(report_unit)
     
     ! Initial condition
     
@@ -118,11 +114,11 @@ implicit none
             
         end do
         
-        ! Widom method : chemical potentials
+        ! Chemical potentials : Widom method
         call type1_sph%widom(type1_obs%activ)
         call type2_sph%widom(type2_obs%activ)
         
-        ! Rejections rate
+        ! Rejections rates
         type1_obs%rej = real(type1_obs%Nrej, DP)/real(type1_obs%Nmove, DP)
         type1_obs%Nrej = 0; type1_obs%Nmove = 0        
         type2_obs%rej = real(type2_obs%Nrej, DP)/real(type2_obs%Nmove, DP)
@@ -130,6 +126,7 @@ implicit none
         
         if (iStep <= Ntherm) then ! Thermalisation
         
+        	! Initial displacements & rejections
             if (iStep==1) then
                 write(type1_io%dx, *) iStep, type1_sph%getDx(), type1_obs%rej
                 write(type2_io%dx, *) iStep, type2_sph%getDx(), type2_obs%rej
@@ -144,6 +141,7 @@ implicit none
             else
                 type1_obs%rejAdapt = type1_obs%rejAdapt + type1_obs%rej
             end if
+            
             ! Displacements optimisation : type 2
             if (mod(iStep, type2_sph%getNadapt()) == 0) then
                 type2_obs%rejAdapt = type2_obs%rejAdapt/real(type2_sph%getNadapt()-1)
