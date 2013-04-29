@@ -19,7 +19,7 @@ implicit none
     integer :: iStep, iMove !< Monte-Carlo counters
     integer :: iColRand !< random choice of a particle
     real(DP) :: rand !< random number in between 0 and 1
-    real(DP) :: tIni, tFin !< initial and final time
+    real(DP) :: tIni, tFin !< CPU initial and final time
     
     !   Physical system variables
     real(DP) :: Epot, EpotSum, Epot_conf !< potential energy
