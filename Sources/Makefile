@@ -85,7 +85,7 @@ $(EXEC2) : data.o bunching.o
 
 distrib.o : distrib.f90
 	$(FC) -c $(FFLAGS_OMP) $< -o $@
-$(EXEC3) : data.o mod_physics.o class_neighbours.o class_spheres.o \
+$(EXEC3) : data.o mod_physics.o class_neighbours.o class_mixingPotential.o class_spheres.o \
 	class_interactingSpheres.o mod_tools.o distrib.o
 	$(FC) $^ $(LDFLAGS_OMP) -o $@
 

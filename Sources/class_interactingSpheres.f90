@@ -53,9 +53,10 @@ private
     
 contains
 
-    subroutine InteractingSpheres_construct(this)
+    subroutine InteractingSpheres_construct(this, shared_rCut)
     
         class(InteractingSpheres), intent(out) :: this
+        real(DP), intent(in) :: shared_rCut
         
         this%name = "inter"
     
@@ -87,7 +88,7 @@ contains
         call this%same%alloc_cells()
         call this%same%ini_cell_neighs()
         ! Neighbours : other kind
-        call this%mix%construct(mix_rCut)
+        call this%mix%construct(shared_rCut)
         call this%mix%alloc_cells()
         call this%mix%ini_cell_neighs()
     

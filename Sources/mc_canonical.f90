@@ -24,6 +24,17 @@ implicit none
     real(DP) :: rand !< random number in between 0 and 1
     real(DP) :: tIni, tFin !< initial and final time
     
+    !   Physical system variables
+    real(DP) :: Epot, EpotSum, Epot_conf !< potential energy
+    integer, parameter :: report_unit = 10 !< data & results
+    integer, parameter :: obsTherm_unit = 11, obs_unit = 12 !< observables
+    
+    !   Mixing between 2 types
+    type(MixingPotential) :: mix
+    real(DP) :: mix_Epot, mix_EpotSum, mix_Epot_conf
+    integer, parameter :: mix_report_unit = 13 
+    integer, parameter :: mix_obsTherm_unit = 14, mix_obs_unit = 15 
+    
     !   Type 1 : Interacting spheres
     type(InteractingSpheres) :: type1_sph !< Monte-Carlo subroutines
     type(Observables) :: type1_obs !< e.g. Energy
@@ -34,39 +45,28 @@ implicit none
     type(Observables) :: type2_obs
     type(Units) :: type2_io
     
-    !   Mixing between 2 types
-    type(MixingPotential) :: mix
-    real(DP) :: mix_Epot, mix_EpotSum, mix_Epot_conf !< potential energy
-    integer, parameter :: mix_report_unit = 10 !< data & results
-    integer, parameter :: mix_obsTherm_unit = 11, mix_obs_unit = 12 !< observable(s)
-    
-    !   Whole system variables
-    real(DP) :: Epot, EpotSum, Epot_conf
-    integer, parameter :: report_unit = 13
-    integer, parameter :: obsTherm_unit = 14, obs_unit = 15
-    
     write(output_unit, *) "Monte-Carlo Mix - Canonical : Volume =", product(Lsize)
 
     ! Initialisations & reports
     
-    call type1_sph%construct()
-    call type1_obs%init()
-    call type1_io%open(type1_sph%getName())
-    
-    call type2_sph%construct()
-    call type2_obs%init()
-    call type2_io%open(type2_sph%getName())
+    open(unit=report_unit, recl=4096, file="report.out", status='new', action='write')
+    open(unit=obsTherm_unit, recl=4096, file="obsTherm.out", status='new', action='write')
+    open(unit=obs_unit, recl=4096, file="obs.out", status='new', action='write')
     
     call mix%construct()
     mix_EpotSum = 0._DP
     open(unit=mix_report_unit, recl=4096, file="mix_report.out", status='new', action='write')
     open(unit=mix_obsTherm_unit, recl=4096, file="mix_obsTherm.out", status='new', action='write')
     open(unit=mix_obs_unit, recl=4096, file="mix_obs.out", status='new', action='write')
-        
-    open(unit=report_unit, recl=4096, file="report.out", status='new', action='write')
-    open(unit=obsTherm_unit, recl=4096, file="obsTherm.out", status='new', action='write')
-    open(unit=obs_unit, recl=4096, file="obs.out", status='new', action='write')
     
+    call type1_sph%construct(mix%getRcut())
+    call type1_obs%init()
+    call type1_io%open(type1_sph%getName())
+    
+    call type2_sph%construct(mix%getRcut())
+    call type2_obs%init()
+    call type2_io%open(type2_sph%getName())   
+  
     call type1_sph%report(type1_io%report)
     call type1_sph%printInfo(type1_io%report)    
     call type2_sph%report(type2_io%report)
@@ -93,7 +93,7 @@ implicit none
     call type2_sph%snapShot(type2_io%snapIni)
     call type2_sph%cols_to_cells(type1_sph%X)    
     
-    mix_Epot = mix%Epot_conf(type1_sph%X, type2_sph%X)    
+    mix_Epot = mix%Epot_conf(type1_sph%X, type2_sph%X)
     Epot_conf = type1_obs%Epot + type2_obs%Epot + mix_Epot
     
 ! Middle -------------------------------------------------------------------------------------------

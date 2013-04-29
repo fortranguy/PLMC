@@ -33,6 +33,7 @@ use data_mc
 use data_potentiel
 use mod_distrib
 use mod_physics
+use class_mixingPotential
 use class_interactingSpheres
 !$ use omp_lib
 
@@ -51,6 +52,7 @@ implicit none
     real(DP), dimension(:), allocatable :: fct_dist
     real(DP) :: energSum	
     type(InteractingSpheres) :: inter
+    type(MixingPotential) :: mix
     real(DP), dimension(Dim, inter_Ncol) :: X
 
     !$ integer :: nb_taches
@@ -59,7 +61,8 @@ implicit none
 
     if (.not.snap) stop "Snap désactivé."
 
-    call inter%construct()
+	call mix%construct()
+    call inter%construct(mix%getRcut())
 
     call initDistriParams()
     allocate(distrib(Ndist))
@@ -150,5 +153,8 @@ implicit none
 
     deallocate(fct_dist)
     deallocate(distrib)
+
+	call inter%destroy()
+	call mix%destroy()
 
 end program distribution

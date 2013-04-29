@@ -37,7 +37,8 @@ private
 
         procedure :: report => MixingPotential_report
 
-        procedure ::getRmin => MixingPotential_getRmin
+        procedure :: getRmin => MixingPotential_getRmin
+        procedure :: getRcut => MixingPotential_getRcut
         
         procedure :: overlapTest => MixingPotential_overlapTest
 
@@ -107,6 +108,18 @@ contains
         getRmin = this%rMin
     
     end function MixingPotential_getRmin
+    
+    !> Accessor : rCut
+    
+    function MixingPotential_getRcut(this) result(getRcut)
+    
+        class(MixingPotential), intent(in) :: this
+        
+        real(DP) :: getRcut
+        
+        getRcut = this%rCut
+    
+    end function MixingPotential_getRcut
     
     !> Overlapt test
     
