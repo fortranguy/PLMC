@@ -212,7 +212,7 @@ implicit none
     
     call mix%overlapTest(type1_sph%X, type2_sph%X)
     mix_Epot_conf = mix%Epot_conf(type1_sph%X, type2_sph%X)
-    call mix_consistTest(mix_Epot, mix_Epot_conf, report_unit)
+    call mix_consistTest(mix_Epot, mix_Epot_conf, mix_report_unit)
     call mix_results(mix_EpotSum, mix_report_unit)
     
     Epot = type1_obs%Epot + type2_obs%Epot + mix_Epot
