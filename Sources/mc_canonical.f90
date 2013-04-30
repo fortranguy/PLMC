@@ -36,7 +36,7 @@ implicit none
     
     !   Type 1 : Interacting spheres : short-range
     type(InteractingSpheres) :: type1_sph !< Monte-Carlo subroutines
-    type(Observables) :: type1_obs !< e.g. Energy
+    type(Observables) :: type1_obs !< Energy, inverse of activity (-> chemical potential)
     type(Units) :: type1_io        !< input/output files
     
     !   Type 2 : Hard spheres
