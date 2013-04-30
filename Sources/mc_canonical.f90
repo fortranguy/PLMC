@@ -202,20 +202,23 @@ implicit none
     call mix%overlapTest(type1_sph%X, type2_sph%X)
     
     call type1_sph%consistTest(type1_obs%Epot, type1_io%report)
+    call type2_sph%consistTest(type2_obs%Epot, type2_io%report)
+    mix_Epot_conf = mix%Epot_conf(type1_sph%X, type2_sph%X)
+    call mix_consistTest(mix_Epot, mix_Epot_conf, report_unit)
+    Epot = type1_obs%Epot + type2_obs%Epot + mix_Epot
+    Epot_conf = type1_sph%Epot_conf() + type2_sph%Epot_conf() + mix_Epot_conf
+    call consistTest(Epot, Epot_conf, report_unit)    
+    
     call type1_sph%snapShot(type1_io%snapFin)
     call type1_obs%results(type1_sph%getNcol(), type1_io%report)
     
-    call type2_sph%consistTest(type2_obs%Epot, type2_io%report)
     call type2_sph%snapShot(type2_io%snapFin)
-    call type2_obs%results(type2_sph%getNcol(), type2_io%report)
+    call type2_obs%results(type2_sph%getNcol(), type2_io%report)    
     
-    mix_Epot_conf = mix%Epot_conf(type1_sph%X, type2_sph%X)
-    call mix_results(mix_Epot, mix_Epot_conf, mix_EpotSum, mix_report_unit)
+    call mix_results(mix_EpotSum, mix_report_unit)
     
-    Epot = type1_obs%Epot + type2_obs%Epot + mix_Epot
-    Epot_conf = type1_sph%Epot_conf() + type2_sph%Epot_conf() + mix_Epot_conf
     EpotSum = type1_obs%EpotSum + type2_obs%EpotSum + mix_EpotSum
-    call results(Epot, Epot_conf, EpotSum, tFin-tIni, report_unit)
+    call results(EpotSum, tFin-tIni, report_unit)
     
     ! Finalisations
     

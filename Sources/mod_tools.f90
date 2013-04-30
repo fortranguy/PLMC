@@ -122,7 +122,7 @@ contains
     
     end subroutine randomDeposition
     
-    !> Report : general
+    !> Total : report
     
     subroutine report(report_unit)
     
@@ -141,18 +141,27 @@ contains
     
     end subroutine report
     
-    !> Results : general
+    ! Total : consistency test
     
-    subroutine results(Epot, Epot_conf, EpotSum, duration, report_unit)
+    subroutine consistTest(Epot, Epot_conf, report_unit)
     
-        real(DP), intent(in) :: Epot, Epot_conf, EpotSum
-        real(DP), intent(in) :: duration
+        real(DP), intent(in) :: Epot, Epot_conf
         integer, intent(in) :: report_unit
-        
+    
         write(report_unit, *) "Consistency test:"
         write(report_unit, *) "    Epot = ", Epot
         write(report_unit, *) "    Epot_conf = ", Epot_conf
         write(report_unit, *) "    relative difference = ", abs((Epot_conf-Epot)/Epot_conf)
+    
+    end subroutine consistTest
+    
+    !> Total : Results    
+    
+    subroutine results(EpotSum, duration, report_unit)
+    
+        real(DP), intent(in) :: EpotSum
+        real(DP), intent(in) :: duration
+        integer, intent(in) :: report_unit
             
         write(report_unit, *) "Results :"
         write(report_unit, *) "    average energy = ", EpotSum/real(Nstep, DP)
@@ -160,17 +169,26 @@ contains
     
     end subroutine results
     
-    !> Results : mix
+    ! Mix : consistency test
     
-    subroutine mix_results(Epot, Epot_conf, EpotSum, report_unit)
+    subroutine mix_consistTest(Epot, Epot_conf, report_unit)
     
-        real(DP), intent(in) :: Epot, Epot_conf, EpotSum
+        real(DP), intent(in) :: Epot, Epot_conf
         integer, intent(in) :: report_unit
-
+    
         write(report_unit, *) "Consistency test:"
         write(report_unit, *) "    Epot = ", Epot
         write(report_unit, *) "    Epot_conf = ", Epot_conf
         write(report_unit, *) "    relative difference = ", abs((Epot_conf-Epot)/Epot_conf)
+    
+    end subroutine mix_consistTest
+    
+    !> Mix : Results
+    
+    subroutine mix_results(EpotSum, report_unit)
+    
+        real(DP), intent(in) :: EpotSum
+        integer, intent(in) :: report_unit
     
         write(report_unit, *) "Results :"        
         write(report_unit, *) "    average energy = ", EpotSum/real(Nstep, DP)
