@@ -118,10 +118,10 @@ implicit none
         call type1_sph%widom(type1_obs%activ)
         call type2_sph%widom(type2_obs%activ)
         
-        ! Rejections rate : type1
+        ! Rejections rates
         type1_obs%rej = real(type1_obs%Nrej, DP)/real(type1_obs%Nmove, DP)
         type1_obs%Nrej = 0; type1_obs%Nmove = 0
-        ! Rejections rate : type 2
+
         type2_obs%rej = real(type2_obs%Nrej, DP)/real(type2_obs%Nmove, DP)
         type2_obs%Nrej = 0; type2_obs%Nmove = 0
         
@@ -133,24 +133,23 @@ implicit none
                 write(type2_io%dx, *) iStep, type2_sph%getDx(), type2_obs%rej
             end if
             
-            ! Displacements optimisation : type 1            
-            if (mod(iStep, type1_sph%getNadapt()) == 0) then
+            ! Displacements optimisations           
+            if (mod(iStep, type1_sph%getNadapt()) /= 0) then
+                type1_obs%rejAdapt = type1_obs%rejAdapt + type1_obs%rej
+            else
                 type1_obs%rejAdapt = type1_obs%rejAdapt/real(type1_sph%getNadapt()-1)
                 call type1_sph%adaptDx(type1_obs%rejAdapt)
                 write(type1_io%dx, *) iStep, type1_sph%getDx(), type1_obs%rejAdapt
                 type1_obs%rejAdapt = 0._DP
-            else
-                type1_obs%rejAdapt = type1_obs%rejAdapt + type1_obs%rej
             end if
-            
-            ! Displacements optimisation : type 2
-            if (mod(iStep, type2_sph%getNadapt()) == 0) then
+
+            if (mod(iStep, type2_sph%getNadapt()) /= 0) then
+                type2_obs%rejAdapt = type2_obs%rejAdapt + type2_obs%rej
+            else                
                 type2_obs%rejAdapt = type2_obs%rejAdapt/real(type2_sph%getNadapt()-1)
                 call type2_sph%adaptDx(type2_obs%rejAdapt)
                 write(type2_io%dx, *) iStep, type2_sph%getDx(), type2_obs%rejAdapt
                 type2_obs%rejAdapt = 0._DP
-            else
-                type2_obs%rejAdapt = type2_obs%rejAdapt + type2_obs%rej
             end if
             
             ! Observables writing
