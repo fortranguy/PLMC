@@ -22,8 +22,8 @@ implicit none
     real(DP) :: tIni, tFin !< CPU initial and final time
     
     !   Total physical system variables
-    real(DP) :: Epot, EpotSum !< potential energy : Monte-Carlo
-    real(DP) :: Epot_conf !< potential energy : complete calculation of a configuration
+    real(DP) :: Epot, EpotSum !< potential energy : at a Monte-Carlo step
+    real(DP) :: Epot_conf !< potential energy : complete calculation from a configuration
     integer :: report_unit  !< data & results
     integer :: obsTherm_unit, obs_unit !< observables
     
@@ -36,7 +36,7 @@ implicit none
     
     !   Type 1 : Interacting spheres : short-range
     type(InteractingSpheres) :: type1_sph !< Monte-Carlo subroutines
-    type(Observables) :: type1_obs !< Energy, inverse of activity (-> chemical potential)
+    type(Observables) :: type1_obs !< energy & inverse of activity (-> chemical potential)
     type(Units) :: type1_io        !< input/output files
     
     !   Type 2 : Hard spheres
@@ -93,6 +93,7 @@ implicit none
     mix_Epot = mix%Epot_conf(type1_sph%X, type2_sph%X)
     
     Epot_conf = type1_obs%Epot + type2_obs%Epot + mix_Epot
+    write(*, *) "Initial potential energy =", Epot_conf
     
 ! Middle -------------------------------------------------------------------------------------------
         
