@@ -128,7 +128,7 @@ implicit none
         if (iStep <= Ntherm) then ! Thermalisation
         
             ! Initial displacements & rejections
-            if (iStep==1) then
+            if (iStep == 1) then
                 write(type1_io%dx, *) iStep, type1_sph%getDx(), type1_obs%rej
                 write(type2_io%dx, *) iStep, type2_sph%getDx(), type2_obs%rej
             end if
@@ -159,7 +159,7 @@ implicit none
             write(mix_obsTherm_unit, *) iStep, mix_Epot
             write(obsTherm_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
             
-            if (iStep == Ntherm) then ! Definite thermalised displacement
+            if (iStep == Ntherm) then ! Definite thermalised displacements
                 call type1_sph%definiteDx(type1_obs%rej, type1_io%report)
                 call type2_sph%definiteDx(type2_obs%rej, type2_io%report)
             end if       
@@ -169,14 +169,15 @@ implicit none
             type1_obs%EpotSum = type1_obs%EpotSum + type1_obs%Epot
             type1_obs%activSum = type1_obs%activSum + type1_obs%activ
             type1_obs%rejSum = type1_obs%rejSum + type1_obs%rej
-            write(type1_io%obs, *) iStep, type1_obs%Epot, type1_obs%activ, type1_obs%rej
         
             type2_obs%EpotSum = type2_obs%EpotSum + type2_obs%Epot
             type2_obs%activSum = type2_obs%activSum + type2_obs%activ
             type2_obs%rejSum = type2_obs%rejSum + type2_obs%rej
-            write(type2_io%obs, *) iStep, type2_obs%Epot, type2_obs%activ, type2_obs%rej
                 
             mix_EpotSum = mix_EpotSum + mix_Epot
+            
+            write(type1_io%obs, *) iStep, type1_obs%Epot, type1_obs%activ, type1_obs%rej
+            write(type2_io%obs, *) iStep, type2_obs%Epot, type2_obs%activ, type2_obs%rej
             write(mix_obs_unit, *) iStep, mix_Epot
             write(obs_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
 
