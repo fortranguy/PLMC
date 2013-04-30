@@ -22,17 +22,19 @@ implicit none
     real(DP) :: tIni, tFin !< CPU initial and final time
     
     !   Total physical system variables
-    real(DP) :: Epot, EpotSum, Epot_conf !< potential energy
+    real(DP) :: Epot, EpotSum !< potential energy : Monte-Carlo
+    real(DP) :: Epot_conf !< potential energy : complete calculation of a configuration
     integer :: report_unit  !< data & results
     integer :: obsTherm_unit, obs_unit !< observables
     
     !   Mixing potential between 2 types
-    type(MixingPotential) :: mix
-    real(DP) :: mix_Epot, mix_EpotSum, mix_Epot_conf
+    type(MixingPotential) :: mix ! short-range potential
+    real(DP) :: mix_Epot, mix_EpotSum
+    real(DP) :: mix_Epot_conf
     integer :: mix_report_unit
     integer :: mix_obsTherm_unit, mix_obs_unit
     
-    !   Type 1 : Interacting spheres
+    !   Type 1 : Interacting spheres : short-range
     type(InteractingSpheres) :: type1_sph !< Monte-Carlo subroutines
     type(Observables) :: type1_obs !< e.g. Energy
     type(Units) :: type1_io        !< input/output files
