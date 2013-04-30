@@ -23,14 +23,14 @@ implicit none
     
     !   Total physical system variables
     real(DP) :: Epot, EpotSum, Epot_conf !< potential energy
-    integer, parameter :: report_unit = 10 !< data & results
-    integer, parameter :: obsTherm_unit = 11, obs_unit = 12 !< observables
+    integer :: report_unit  !< data & results
+    integer :: obsTherm_unit, obs_unit !< observables
     
     !   Mixing potential between 2 types
     type(MixingPotential) :: mix
     real(DP) :: mix_Epot, mix_EpotSum, mix_Epot_conf
-    integer, parameter :: mix_report_unit = 13 
-    integer, parameter :: mix_obsTherm_unit = 14, mix_obs_unit = 15 
+    integer :: mix_report_unit
+    integer :: mix_obsTherm_unit, mix_obs_unit
     
     !   Type 1 : Interacting spheres
     type(InteractingSpheres) :: type1_sph !< Monte-Carlo subroutines
@@ -48,17 +48,17 @@ implicit none
 
     ! Initialisations & reports
     
-    open(unit=report_unit, recl=4096, file="report.out", status='new', action='write')
-    open(unit=obsTherm_unit, recl=4096, file="obsTherm.out", status='new', action='write')
-    open(unit=obs_unit, recl=4096, file="obs.out", status='new', action='write')
+    open(newunit=report_unit, recl=4096, file="report.out", status='new', action='write')
+    open(newunit=obsTherm_unit, recl=4096, file="obsTherm.out", status='new', action='write')
+    open(newunit=obs_unit, recl=4096, file="obs.out", status='new', action='write')
     call report(report_unit)
     call initRandomSeed(report_unit)
     
     call mix%construct()
     mix_EpotSum = 0._DP
-    open(unit=mix_report_unit, recl=4096, file="mix_report.out", status='new', action='write')
-    open(unit=mix_obsTherm_unit, recl=4096, file="mix_obsTherm.out", status='new', action='write')
-    open(unit=mix_obs_unit, recl=4096, file="mix_obs.out", status='new', action='write')
+    open(newunit=mix_report_unit, recl=4096, file="mix_report.out", status='new', action='write')
+    open(newunit=mix_obsTherm_unit, recl=4096, file="mix_obsTherm.out", status='new', action='write')
+    open(newunit=mix_obs_unit, recl=4096, file="mix_obs.out", status='new', action='write')
     call mix%report(mix_report_unit)
     
     call type1_sph%construct(mix%getRcut())
