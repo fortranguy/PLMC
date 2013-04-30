@@ -6,8 +6,6 @@ implicit none
 
 private
 
-    integer :: iUnit = 16
-
     type, public :: Units
     
         integer :: obs
@@ -34,32 +32,15 @@ contains
         class(Units), intent(out) :: this
         character(len=*), intent(in) :: name
         
-        this%obs = iUnit
-        iUnit = iUnit + 1
-        this%obsTherm = iUnit
-        iUnit = iUnit + 1
-        this%dx = iUnit
-        iUnit = iUnit + 1
+        open(newunit=this%obs, recl=4096, file=name//"_obs.out", status='new', action='write')
+        open(newunit=this%obsTherm, recl=4096, file=name//"_obsTherm.out", status='new', action='write')
+        open(newunit=this%dx, recl=4096, file=name//"_dx.out", status='new', action='write')
         
-        this%snapIni = iUnit
-        iUnit = iUnit + 1
-        this%snapFin = iUnit
-        iUnit = iUnit + 1
-        this%snapShots = iUnit
-        iUnit = iUnit + 1
+        open(newunit=this%snapIni, recl=4096, file=name//"_snapIni.out", status='new', action='write')
+        open(newunit=this%snapFin, recl=4096, file=name//"_snapFin.out", status='new', action='write')
+        open(newunit=this%snapShots, recl=4096, file=name//"_snap.shots", status='new', action='write')
         
-        this%report = iUnit
-        iUnit = iUnit + 1
-        
-        open(unit=this%obs, recl=4096, file=name//"_obs.out", status='new', action='write')
-        open(unit=this%obsTherm, recl=4096, file=name//"_obsTherm.out", status='new', action='write')
-        open(unit=this%dx, recl=4096, file=name//"_dx.out", status='new', action='write')
-        
-        open(unit=this%snapIni, recl=4096, file=name//"_snapIni.out", status='new', action='write')
-        open(unit=this%snapFin, recl=4096, file=name//"_snapFin.out", status='new', action='write')
-        open(unit=this%snapShots, recl=4096, file=name//"_snap.shots", status='new', action='write')
-        
-        open(unit=this%report, recl=4096, file=name//"_report.out", status='new', action='write')
+        open(newunit=this%report, recl=4096, file=name//"_report.out", status='new', action='write')
         
     end subroutine Units_open
     
