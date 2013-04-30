@@ -99,15 +99,17 @@ implicit none
     call cpu_time(tIni)
     do iStep = 1, Ntherm + Nstep
     
-        ! Moving a particle : Metropolis algorithm
         do iMove = 1, Nmove
         
+            ! Choose a particle among both types
             call random_number(rand)
             iColRand = int(rand*real(Ncol, DP)) + 1
-            if (iColRand <= type1_sph%getNcol()) then
+            
+            ! Moving a particle : Metropolis algorithm
+            if (iColRand <= type1_sph%getNcol()) then ! Test among the 1st type
                 call type1_sph%move(type2_sph, mix, type1_obs%Epot, mix_Epot, type1_obs%Nrej)
                 type1_obs%Nmove = type1_obs%Nmove + 1
-            else
+            else ! Test among the 2nd type
                 call type2_sph%move(type1_sph, mix, type2_obs%Epot, mix_Epot, type2_obs%Nrej)
                 type2_obs%Nmove = type2_obs%Nmove + 1
             end if
@@ -118,7 +120,7 @@ implicit none
         call type1_sph%widom(type1_obs%activ)
         call type2_sph%widom(type2_obs%activ)
         
-        ! Rejections rates
+        ! Rejections rates updates
         type1_obs%rej = real(type1_obs%Nrej, DP)/real(type1_obs%Nmove, DP)
         type1_obs%Nrej = 0; type1_obs%Nmove = 0
 
@@ -163,8 +165,9 @@ implicit none
                 call type2_sph%definiteDx(type2_obs%rej, type2_io%report)
             end if       
         
-        else ! Observables accumulations & writing
+        else ! Thermalisation over
         
+            ! Observables accumulations
             type1_obs%EpotSum = type1_obs%EpotSum + type1_obs%Epot
             type1_obs%activSum = type1_obs%activSum + type1_obs%activ
             type1_obs%rejSum = type1_obs%rejSum + type1_obs%rej
@@ -175,6 +178,7 @@ implicit none
                 
             mix_EpotSum = mix_EpotSum + mix_Epot
             
+            ! Observables writing
             write(type1_io%obs, *) iStep, type1_obs%Epot, type1_obs%activ, type1_obs%rej
             write(type2_io%obs, *) iStep, type2_obs%Epot, type2_obs%activ, type2_obs%rej
             write(mix_obs_unit, *) iStep, mix_Epot
