@@ -118,9 +118,10 @@ implicit none
         call type1_sph%widom(type1_obs%activ)
         call type2_sph%widom(type2_obs%activ)
         
-        ! Rejections rates
+        ! Rejections rate : type1
         type1_obs%rej = real(type1_obs%Nrej, DP)/real(type1_obs%Nmove, DP)
-        type1_obs%Nrej = 0; type1_obs%Nmove = 0        
+        type1_obs%Nrej = 0; type1_obs%Nmove = 0
+        ! Rejections rate : type 2
         type2_obs%rej = real(type2_obs%Nrej, DP)/real(type2_obs%Nmove, DP)
         type2_obs%Nrej = 0; type2_obs%Nmove = 0
         
@@ -213,14 +214,15 @@ implicit none
     
     Epot = type1_obs%Epot + type2_obs%Epot + mix_Epot
     Epot_conf = type1_sph%Epot_conf() + type2_sph%Epot_conf() + mix_Epot_conf
-    call consistTest(Epot, Epot_conf, report_unit)    
+    call consistTest(Epot, Epot_conf, report_unit)
     EpotSum = type1_obs%EpotSum + type2_obs%EpotSum + mix_EpotSum
     call results(EpotSum, tFin-tIni, report_unit)
     
     ! Finalisations
     
     call type1_sph%destroy()
-    call type1_io%close()    
+    call type1_io%close()
+    
     call type2_sph%destroy()
     call type2_io%close()
     
