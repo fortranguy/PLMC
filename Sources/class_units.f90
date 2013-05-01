@@ -11,7 +11,7 @@ private
         integer :: obs
         integer :: obsTherm
         integer :: dx
-        
+                
         integer :: snapIni
         integer :: snapFin
         integer :: snapShots

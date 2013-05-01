@@ -70,15 +70,15 @@ implicit none
     call type1_obs%init()
     call type1_io%open(type1_sph%getName())
     call type1_sph%report(type1_io%report)
+    call type1_sph%printInfo(type1_io%report)
     call type1_sph%Epot_print(type1_io%Epot)
-    call type1_sph%printInfo(type1_io%report)    
     
     call type2_sph%construct(mix%getRcut())
     call type2_obs%init()
     call type2_io%open(type2_sph%getName())
     call type2_sph%report(type2_io%report)
+    call type2_sph%printInfo(type2_io%report)
     call type2_sph%Epot_print(type2_io%Epot)
-    call type2_sph%printInfo(type2_io%report)    
     
     ! Initial condition
     
