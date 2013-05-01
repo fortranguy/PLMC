@@ -155,6 +155,7 @@ contains
         integer :: type_Ncol
         integer :: iCol
         real(DP), dimension(Dim) :: xDummy
+        real(DP) :: normSqr, normSqrMax
         
         call get_command_argument(iType, file, length, fileStat)
         if (fileStat /= 0) stop "error get_command_argument"
@@ -162,6 +163,7 @@ contains
         open(newunit=file_unit, recl=4096, file=file(1:length), status='old', action='read')
         
         type_Ncol = size(type_X, 2)
+        normSqrMax = dot_product(Lsize, Lsize)
         
         iCol = 0
         do
@@ -174,6 +176,14 @@ contains
             rewind(file_unit)
             do iCol = 1, type_Ncol
                 read(file_unit, *) type_X(:, iCol)
+                normSqr = dot_product(type_X(:, iCol), type_X(:, iCol))
+                if (normSqr > normSqrMax) then
+                    write(error_unit, *) "Size error : ", file(1:length)
+                    write(error_unit, *) "xCol ", type_X(:, iCol)
+                    write(error_unit, *) "vs"
+                    write(error_unit, *) "Lsize", Lsize(:)
+                    stop
+                end if
             end do
         else
             write(error_unit, *) "Error reading : ", file(1:length)
