@@ -19,7 +19,7 @@ private
 
     type, extends(Spheres), public :: InteractingSpheres
 
-        private 
+        private
 
         ! Potential :
         real(DP)  :: dr !< discretisation step
@@ -37,7 +37,7 @@ private
         
         !> Print a report of the component in a file
         procedure :: report => InteractingSpheres_report
-              
+        
         !> Potential energy
         procedure :: Epot_init => InteractingSpheres_Epot_init
         procedure :: Epot_print => InteractingSpheres_Epot_print
