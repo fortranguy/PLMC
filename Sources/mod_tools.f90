@@ -49,39 +49,53 @@ contains
         character(len=20) :: init, file1, file2
         integer :: longueur, longueur1, longueur2, statut
         integer :: file1_unit, file2_unit
+        logical :: error
         
         write(report_unit, *) "Initial condition :"
         
         select case (command_argument_count())
         
             case (1)
+            
                 call get_command_argument(1, init, longueur, statut)
                 if (statut /= 0) stop "error get_command_argument"
+                
                 select case (init)
                     case ("rand") 
                         call randomDeposition(type1%X, type1%getRMin(), type2%X, type2%getRmin(), mix_rMin)
                         write(report_unit, *) "    Random deposition"
                     case default
-                        write(output_unit, *) "Enter the initial condition : "
-                        write(output_unit, *) "   'rand' or '[file1] [file2]'."
+                        write(error_unit, *) "Enter the initial condition : "
+                        write(error_unit, *) "   'rand' or '[file1] [file2]'."
                         stop
                 end select
                 
             case (2)
+            
+                write(report_unit, *) "    Old configuration"
+                write(output_unit, *) "Old configuration"
+            
                 call get_command_argument(1, file1, longueur1, statut)
-                
                 if (statut /= 0) stop "error get_command_argument"
                 write(output_unit, *) type1%getName(), " <- ", file1(1:longueur1)
                 open(newunit=file1_unit, recl=4096, file=file1(1:longueur1), status='old', action='read')
-                call get_command_argument(2, file2, longueur2, statut)
-                
-                if (statut /= 0) stop "error get_command_argument"
-                write(output_unit, *) type2%getName(), " <- ",  file1(2:longueur2)
-                open(newunit=file2_unit, recl=4096, file=file2(1:longueur2), status='old', action='read')
-                call oldConfiguration(type1%X, file1_unit, type2%X, file2_unit)
-                
+                call oldConfiguration(type1%X, file1_unit, error)
                 close(file1_unit)
-                close(file2_unit)                
+                if (error) then
+                    write(error_unit, *) "Error reading", file1(1:longueur1)
+                    stop
+                end if
+                
+                call get_command_argument(2, file2, longueur2, statut)                
+                if (statut /= 0) stop "error get_command_argument"
+                write(output_unit, *) type2%getName(), " <- ",  file2(1:longueur2)
+                open(newunit=file2_unit, recl=4096, file=file2(1:longueur2), status='old', action='read')
+                call oldConfiguration(type2%X, file2_unit, error)
+                close(file2_unit)
+                if (error) then
+                    write(error_unit, *) "Error reading", file1(2:longueur2)
+                    stop
+                end if
             
             case default
                 write(output_unit, *) "Enter the initial condition : "
@@ -149,15 +163,37 @@ contains
     
     !> From an old configuration
     
-    subroutine oldConfiguration(type1_X, file1_unit, type2_X, file2_unit)
+    subroutine oldConfiguration(type_X, file_unit, error)
     
-        real(DP), dimension(:, :), intent(inout) :: type1_X, type2_X
-        integer, intent(in) :: file1_unit, file2_unit
+        real(DP), dimension(:, :), intent(inout) :: type_X
+        integer, intent(in) :: file_unit
+        logical, intent(inout) :: error
         
-        integer :: type1_Ncol, type2_Ncol
+        integer :: type_Ncol
+        integer :: iCol
+        real(DP), dimension(Dim) :: xDummy
         
-        type1_Ncol = size(type1_X, 2)
-        type2_Ncol = size(type2_X, 2)
+        integer :: type_Ncol_file
+        integer :: status
+        
+        type_Ncol = size(type_X, 2)
+        
+        iCol = 0
+        do
+            read(file_unit, fmt=*, iostat=status) xDummy(:)
+            if (status == iostat_end) exit
+            iCol = iCol + 1            
+        end do
+        
+        if (iCol == type_Ncol) then
+            rewind(file_unit)
+            do iCol = 1, type_Ncol
+                read(file_unit, *) type_X(:, iCol)
+            end do
+            error = .false.
+        else
+            error = .true.
+        end if
     
     end subroutine oldConfiguration
     
