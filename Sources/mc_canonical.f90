@@ -24,17 +24,18 @@ implicit none
     !   Total physical system variables
     real(DP) :: Epot, EpotSum !< potential energy : at a Monte-Carlo step
     real(DP) :: Epot_conf !< potential energy : complete calculation from a configuration
-    integer :: report_unit  !< data & results
-    integer :: obsTherm_unit, obs_unit !< observables
+    integer :: report_unit  !< data & results file
+    integer :: obsTherm_unit, obs_unit !< observables files
     
     !   Mixing potential between 2 types
-    type(MixingPotential) :: mix ! short-range potential
+    type(MixingPotential) :: mix !< short-range potential
     real(DP) :: mix_Epot, mix_EpotSum
     real(DP) :: mix_Epot_conf
     integer :: mix_report_unit
+    integer :: mix_Epot_unit !< tabulated potential file
     integer :: mix_obsTherm_unit, mix_obs_unit
     
-    !   Type 1 : Interacting spheres : short-range
+    !   Type 1 : Interacting spheres : short-range potential
     type(InteractingSpheres) :: type1_sph !< Monte-Carlo subroutines
     type(Observables) :: type1_obs !< energy & inverse of activity (-> chemical potential)
     type(Units) :: type1_io        !< input/output files
@@ -59,23 +60,25 @@ implicit none
     call mix%construct()
     mix_EpotSum = 0._DP
     open(newunit=mix_report_unit, recl=4096, file="mix_report.out", status='new', action='write')
+    open(newunit=mix_Epot_unit, recl=4096, file="mix_Epot.out", status='new', action='write')
     open(newunit=mix_obsTherm_unit, recl=4096, file="mix_obsTherm.out", status='new', action='write')
     open(newunit=mix_obs_unit, recl=4096, file="mix_obs.out", status='new', action='write')
     call mix%report(mix_report_unit)
+    call mix%Epot_print(mix_Epot_unit)
     
     call type1_sph%construct(mix%getRcut())
     call type1_obs%init()
     call type1_io%open(type1_sph%getName())
     call type1_sph%report(type1_io%report)
-    call type1_sph%printInfo(type1_io%report)
     call type1_sph%Epot_print(type1_io%Epot)
+    call type1_sph%printInfo(type1_io%report)    
     
     call type2_sph%construct(mix%getRcut())
     call type2_obs%init()
     call type2_io%open(type2_sph%getName())
     call type2_sph%report(type2_io%report)
-    call type2_sph%printInfo(type2_io%report)
     call type2_sph%Epot_print(type2_io%Epot)
+    call type2_sph%printInfo(type2_io%report)    
     
     ! Initial condition
     

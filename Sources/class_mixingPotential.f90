@@ -43,6 +43,7 @@ private
         procedure :: overlapTest => MixingPotential_overlapTest
 
         procedure :: Epot_init => MixingPotential_Epot_init
+        procedure :: Epot_print => MixingPotential_Epot_print
         procedure :: Epot_pair => MixingPotential_Epot_pair
         procedure :: Epot_neigh => MixingPotential_Epot_neigh
         procedure :: Epot_conf => MixingPotential_Epot_conf
@@ -174,6 +175,23 @@ contains
                            this%epsilon * exp(-this%alpha*(this%rCut-this%rMin)) / this%rCut
 
     end subroutine MixingPotential_Epot_init
+    
+    !> Print the tabulated potential
+    
+    subroutine MixingPotential_Epot_print(this, Epot_unit)
+    
+    	class(MixingPotential), intent(in) :: this
+    	integer, intent(in) :: Epot_unit
+    	
+	    integer :: i
+        real(DP) :: r_i
+    	
+    	do i = this%iMin, this%iCut
+    		r_i = real(i, DP)*this%dr
+    		write(Epot_unit, *) r_i, this%Epot_tab(i)
+    	end do
+    
+    end subroutine MixingPotential_Epot_print
 
     function MixingPotential_Epot_pair(this, r) result(Epot_pair)
         
