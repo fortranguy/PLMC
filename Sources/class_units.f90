@@ -13,10 +13,11 @@ private
         integer :: dx
         
         integer :: snapIni
-        integer :: snapFin  
-        integer :: snapShots              
+        integer :: snapFin
+        integer :: snapShots
         
-        integer :: report        
+        integer :: report
+        integer :: Epot
     
     contains
     
@@ -41,6 +42,7 @@ contains
         open(newunit=this%snapShots, recl=4096, file=name//"_snap.shots", status='new', action='write')
         
         open(newunit=this%report, recl=4096, file=name//"_report.out", status='new', action='write')
+        open(newunit=this%Epot, recl=4096, file=name//"_Epot.out", status='new', action='write')
         
     end subroutine Units_open
     
@@ -57,6 +59,7 @@ contains
         close(this%snapShots)
         
         close(this%report)
+        close(this%Epot)
     
     end subroutine Units_close
 

@@ -32,6 +32,7 @@ private
         procedure :: report => HardSpheres_report
               
         !> Potential energy
+        procedure :: Epot_print => HardSpheres_Epot_print
         procedure :: Epot_neigh => HardSpheres_Epot_neigh
         procedure :: Epot_conf => HardSpheres_Epot_conf
         procedure :: consistTest => HardSpheres_consistTest
@@ -65,8 +66,8 @@ contains
         this%Nwidom = hard_Nwidom
                 
         ! Potential
-        this%Epot = 0._DP
         this%rCut = hard_rCut
+        this%Epot = 0._DP
         
         ! Neighbours : same kind
         call this%same%construct(this%rCut)
@@ -113,6 +114,17 @@ contains
         write(report_unit, *) "    mix_cell_Lsize(:) = ", this%mix%cell_Lsize(:)
         
     end subroutine HardSpheres_report
+    
+    !> Print the potential : dummy
+    
+    subroutine HardSpheres_Epot_print(this, Epot_unit)
+    
+        class(HardSpheres), intent(in) :: this
+        integer, intent(in) :: Epot_unit
+
+        write(Epot_unit, *) this%rCut, this%Epot
+    
+    end subroutine HardSpheres_Epot_print
     
     subroutine HardSpheres_Epot_neigh(this, iCol, xCol, iCell, overlap)
         
