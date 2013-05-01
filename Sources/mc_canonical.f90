@@ -239,6 +239,7 @@ implicit none
     
     call mix%destroy()
     close(mix_report_unit)
+    close(mix_Epot_unit)
     close(mix_obsTherm_unit)
     close(mix_obs_unit)
     
