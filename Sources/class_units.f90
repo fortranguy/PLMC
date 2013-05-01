@@ -11,7 +11,8 @@ private
         integer :: obs
         integer :: obsTherm
         integer :: dx
-                
+
+        integer :: configOld
         integer :: snapIni
         integer :: snapFin
         integer :: snapShots
@@ -53,7 +54,7 @@ contains
         close(this%obs)
         close(this%obsTherm)
         close(this%dx)
-        
+
         close(this%snapIni)
         close(this%snapFin)
         close(this%snapShots)

@@ -46,23 +46,41 @@ contains
         real(DP), intent(in) :: mix_rMin
         integer, intent(in) :: report_unit        
 
-        character(len=20) :: init
-        integer :: longueur, statut
+        character(len=20) :: init, file1, file2
+        integer :: longueur, longueur1, longueur2, statut
+        integer :: file1_unit, file2_unit
         
-        call get_command_argument(1, init, longueur, statut)
-        if (statut /= 0) stop "error get_command_argument"
-        if (command_argument_count() > 1) stop "Too many arguments"
-            
         write(report_unit, *) "Initial condition :"
         
-        select case (init)
-            case ("rand")
-                call randomDeposition(type1%X, type1%getRMin(), type2%X, type2%getRmin(), mix_rMin)
-                write(report_unit, *) "    Random deposition"
+        select case (command_argument_count())
+        
+            case (1)
+                call get_command_argument(1, init, longueur, statut)
+                if (statut /= 0) stop "error get_command_argument"
+                select case (init)
+                    case ("rand") 
+                        call randomDeposition(type1%X, type1%getRMin(), type2%X, type2%getRmin(), mix_rMin)
+                        write(report_unit, *) "    Random deposition"
+                    case default
+                        write(output_unit, *) "Enter the initial condition : "
+                        write(output_unit, *) "   'rand'."
+                end select
+                
+            case (2)
+                call get_command_argument(1, file1, longueur1, statut)
+                if (statut /= 0) stop "error get_command_argument"
+                open(newunit=file1_unit, recl=4096, file=file1(1:longueur1), status='new', action='write')
+                call get_command_argument(2, file2, longueur2, statut)
+                if (statut /= 0) stop "error get_command_argument"
+                open(newunit=file2_unit, recl=4096, file=file2(1:longueur2), status='new', action='write')
+                
+                close(file1_unit)
+                close(file2_unit)                
+            
             case default
                 write(output_unit, *) "Enter the initial condition : "
-                write(output_unit, *) "   'rand'."
-                stop
+                write(output_unit, *) "   'rand' or '[file1] [file2]'."
+                
         end select
         
     end subroutine initialCondition
@@ -121,6 +139,14 @@ contains
         end do
     
     end subroutine randomDeposition
+    
+    !> From an old configuration
+    
+    subroutine oldConfiguration(type1_X, type2_X)
+    
+        real(DP), dimension(:, :), intent(inout) :: type1_X, type2_X
+    
+    end subroutine oldConfiguration
     
     !> Total : report
     
