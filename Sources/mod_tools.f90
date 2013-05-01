@@ -63,23 +63,30 @@ contains
                         write(report_unit, *) "    Random deposition"
                     case default
                         write(output_unit, *) "Enter the initial condition : "
-                        write(output_unit, *) "   'rand'."
+                        write(output_unit, *) "   'rand' or '[file1] [file2]'."
+                        stop
                 end select
                 
             case (2)
                 call get_command_argument(1, file1, longueur1, statut)
+                
                 if (statut /= 0) stop "error get_command_argument"
-                open(newunit=file1_unit, recl=4096, file=file1(1:longueur1), status='new', action='write')
+                write(output_unit, *) type1%getName(), " <- ", file1(1:longueur1)
+                open(newunit=file1_unit, recl=4096, file=file1(1:longueur1), status='old', action='read')
                 call get_command_argument(2, file2, longueur2, statut)
+                
                 if (statut /= 0) stop "error get_command_argument"
-                open(newunit=file2_unit, recl=4096, file=file2(1:longueur2), status='new', action='write')
+                write(output_unit, *) type2%getName(), " <- ",  file1(2:longueur2)
+                open(newunit=file2_unit, recl=4096, file=file2(1:longueur2), status='old', action='read')
                 call oldConfiguration(type1%X, file1_unit, type2%X, file2_unit)
+                
                 close(file1_unit)
                 close(file2_unit)                
             
             case default
                 write(output_unit, *) "Enter the initial condition : "
                 write(output_unit, *) "   'rand' or '[file1] [file2]'."
+                stop
                 
         end select
         
