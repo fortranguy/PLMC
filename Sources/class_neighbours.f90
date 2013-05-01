@@ -142,23 +142,23 @@ contains
         do iDir = 1, Dim
         
             if (this%cell_Lsize(iDir) < rCut) then
-                write(output_unit, *) "Too small cell in the direction", iDir, ":"
-                write(output_unit, *) this%cell_Lsize(iDir), "<", rCut
+                write(error_unit, *) "Too small cell in the direction", iDir, ":"
+                write(error_unit, *) this%cell_Lsize(iDir), "<", rCut
                 stop
             end if
             
             if (this%cell_coordMax(iDir) < cell_neigh_coordMax(iDir)) then
-                write(output_unit, *) "Too few cells in the direction", iDir, ":"
-                write(output_unit, *) this%cell_coordMax(iDir), "<", cell_neigh_coordMax(iDir)
+                write(error_unit, *) "Too few cells in the direction", iDir, ":"
+                write(error_unit, *) this%cell_coordMax(iDir), "<", cell_neigh_coordMax(iDir)
                 stop
             end if
             
             if (modulo(Lsize(iDir), this%cell_Lsize(iDir)) /= 0) then
-                write(output_unit, *) "Cell size is not a divisor of the system system"
-                write(output_unit, *) "in the direction", iDir, ":"
-                write(output_unit, *) "Lsize", Lsize(iDir)
-                write(output_unit, *) "cell_Lsize", this%cell_Lsize(iDir)
-                write(output_unit, *) "modulo(Lsize, cell_Lsize) = ", &
+                write(error_unit, *) "Cell size is not a divisor of the system system"
+                write(error_unit, *) "in the direction", iDir, ":"
+                write(error_unit, *) "Lsize", Lsize(iDir)
+                write(error_unit, *) "cell_Lsize", this%cell_Lsize(iDir)
+                write(error_unit, *) "modulo(Lsize, cell_Lsize) = ", &
                                        modulo(Lsize(iDir), this%cell_Lsize(iDir))
                 stop
             end if

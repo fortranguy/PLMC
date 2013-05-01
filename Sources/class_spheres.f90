@@ -166,8 +166,8 @@ contains
                     
                     r_ij = dist(this%X(:, iCol), this%X(:, jCol))
                     if (r_ij < this%rMin) then
-                        write(output_unit, *) this%name, "    Overlap !", iCol, jCol
-                        write(output_unit, *) "    r_ij = ", r_ij
+                        write(error_unit, *) this%name, "    Overlap !", iCol, jCol
+                        write(error_unit, *) "    r_ij = ", r_ij
                         stop
                     end if
                     

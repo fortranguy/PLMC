@@ -78,8 +78,8 @@ contains
                 call oldConfiguration(2, type2%getName(), type2%X)
             
             case default
-                write(output_unit, *) "Enter the initial condition : "
-                write(output_unit, *) "   'rand' or '[file1] [file2]'."
+                write(error_unit, *) "Enter the initial condition : "
+                write(error_unit, *) "   'rand' or '[file1] [file2]'."
                 stop
                 
         end select
@@ -176,7 +176,8 @@ contains
                 read(file_unit, *) type_X(:, iCol)
             end do
         else
-            write(error_unit, *) "Error reading", file(1:length)
+            write(error_unit, *) "Error reading : ", file(1:length)
+            write(error_unit, *) "iCol", iCol, " /= ", "type_Ncol", type_Ncol
             stop
         end if        
         

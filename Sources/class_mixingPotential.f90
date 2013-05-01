@@ -141,8 +141,8 @@ contains
                     
                 r_mix = dist(type1_X(:, iCol1), type2_X(:, iCol2))
                 if (r_mix < this%rMin) then
-                    write(output_unit, *) this%name, " :    Overlap !", iCol1, iCol2
-                    write(output_unit, *) "    r_mix = ", r_mix
+                    write(error_unit, *) this%name, " :    Overlap !", iCol1, iCol2
+                    write(error_unit, *) "    r_mix = ", r_mix
                     stop
                 end if
 
