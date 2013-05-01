@@ -109,10 +109,10 @@ implicit none
             iColRand = int(rand*real(Ncol, DP)) + 1
             
             ! Moving a particle : Metropolis algorithm
-            if (iColRand <= type1_sph%getNcol()) then ! Test among the 1st type
+            if (iColRand <= type1_sph%getNcol()) then
                 call type1_sph%move(type2_sph, mix, type1_obs%Epot, mix_Epot, type1_obs%Nrej)
                 type1_obs%Nmove = type1_obs%Nmove + 1
-            else ! Test among the 2nd type
+            else
                 call type2_sph%move(type1_sph, mix, type2_obs%Epot, mix_Epot, type2_obs%Nrej)
                 type2_obs%Nmove = type2_obs%Nmove + 1
             end if
@@ -187,7 +187,7 @@ implicit none
             write(mix_obs_unit, *) iStep, mix_Epot
             write(obs_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
 
-            if (snap) then ! snap shots of the configuration
+            if (snap) then ! Snap shots of the configuration
                 call type1_sph%snapShot(type1_io%snapShots)
                 call type2_sph%snapShot(type2_io%snapShots)
             end if
