@@ -15,19 +15,19 @@ use mod_tools
 
 implicit none
     
-    !   Monte-Carlo variables
+    ! Monte-Carlo variables
     integer :: iStep, iMove !< Monte-Carlo counters
-    integer :: iColRand !< random choice of a particle
+    integer :: iColRand !< random particle
     real(DP) :: rand !< random number in between 0 and 1
     real(DP) :: tIni, tFin !< CPU initial and final time
     
-    !   Total physical system variables
+    ! Total physical system variables
     real(DP) :: Epot, EpotSum !< potential energy : at a Monte-Carlo step
     real(DP) :: Epot_conf !< potential energy : complete calculation from a configuration
     integer :: report_unit  !< data & results file
     integer :: obsTherm_unit, obs_unit !< observables files
     
-    !   Mixing potential between 2 types
+    ! Mixing potential between 2 types
     type(MixingPotential) :: mix !< short-range potential
     real(DP) :: mix_Epot, mix_EpotSum
     real(DP) :: mix_Epot_conf
@@ -35,12 +35,12 @@ implicit none
     integer :: mix_Epot_unit !< tabulated potential file
     integer :: mix_obsTherm_unit, mix_obs_unit
     
-    !   Type 1 : Interacting spheres : short-range potential
+    ! Type 1 : Interacting spheres : short-range potential
     type(InteractingSpheres) :: type1_sph !< Monte-Carlo subroutines
     type(Observables) :: type1_obs !< energy & inverse of activity (-> chemical potential)
     type(Units) :: type1_io        !< input/output files
     
-    !   Type 2 : Hard spheres
+    ! Type 2 : Hard spheres
     type(HardSpheres) :: type2_sph
     type(Observables) :: type2_obs
     type(Units) :: type2_io
@@ -66,7 +66,7 @@ implicit none
     call mix%report(mix_report_unit)
     call mix%Epot_print(mix_Epot_unit)
     
-    call type1_sph%construct(mix%getRcut())
+    call type1_sph%construct(mix%getRcut()) !< type1_sph needs mix%rCut for the Cell List method
     call type1_obs%init()
     call type1_io%open(type1_sph%getName())
     call type1_sph%report(type1_io%report)
@@ -87,7 +87,7 @@ implicit none
     call type1_sph%overlapTest()
     type1_obs%Epot = type1_sph%Epot_conf()
     call type1_sph%snapShot(type1_io%snapIni)
-    call type1_sph%cols_to_cells(type2_sph%X)
+    call type1_sph%cols_to_cells(type2_sph%X) !< Cell List : filling cells with particles
     
     call type2_sph%overlapTest()
     type2_obs%Epot = type2_sph%Epot_conf()
@@ -105,11 +105,11 @@ implicit none
     write(output_unit, *) "Beginning of cycles"    
     
     call cpu_time(tIni)
-    do iStep = 1, Ntherm + Nstep
+    MC_Cycle : do iStep = 1, Ntherm + Nstep
     
-        do iMove = 1, Nmove
+        MC_Move : do iMove = 1, Nmove
         
-            ! Choose a particle among both types
+            ! Randomly choosing a particle among both types
             call random_number(rand)
             iColRand = int(rand*real(Ncol, DP)) + 1
             
@@ -122,7 +122,7 @@ implicit none
                 type2_obs%Nmove = type2_obs%Nmove + 1
             end if
             
-        end do
+        end do MC_Move
         
         ! Chemical potentials : Widom method
         call type1_sph%widom(type1_obs%activ)
@@ -135,7 +135,7 @@ implicit none
         type2_obs%rej = real(type2_obs%Nrej, DP)/real(type2_obs%Nmove, DP)
         type2_obs%Nrej = 0; type2_obs%Nmove = 0
         
-        if (iStep <= Ntherm) then ! Thermalisation
+        MC_Regime : if (iStep <= Ntherm) then ! Thermalisation
         
             ! Initial displacements & rejections
             if (iStep == 1) then
@@ -144,9 +144,9 @@ implicit none
             end if
             
             ! Displacements optimisations           
-            if (mod(iStep, type1_sph%getNadapt()) /= 0) then
+            if (mod(iStep, type1_sph%getNadapt()) /= 0) then ! Rejections accumulation
                 type1_obs%rejAdapt = type1_obs%rejAdapt + type1_obs%rej
-            else
+            else ! Displacement adaptation
                 type1_obs%rejAdapt = type1_obs%rejAdapt/real(type1_sph%getNadapt()-1)
                 call type1_sph%adaptDx(type1_obs%rejAdapt)
                 write(type1_io%dx, *) iStep, type1_sph%getDx(), type1_obs%rejAdapt
@@ -173,7 +173,7 @@ implicit none
                 call type2_sph%definiteDx(type2_obs%rej, type2_io%report)
             end if       
         
-        else ! Thermalisation over
+        else MC_Regime ! Thermalisation over -> Equilibrium
         
             ! Observables accumulations
             type1_obs%EpotSum = type1_obs%EpotSum + type1_obs%Epot
@@ -197,9 +197,9 @@ implicit none
                 call type2_sph%snapShot(type2_io%snapShots)
             end if
             
-        end if
+        end if MC_Regime
     
-    end do
+    end do MC_Cycle
     call cpu_time(tFin)
 
     write(output_unit, *) "End of cycles"
