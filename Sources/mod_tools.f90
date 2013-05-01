@@ -73,7 +73,7 @@ contains
                 call get_command_argument(2, file2, longueur2, statut)
                 if (statut /= 0) stop "error get_command_argument"
                 open(newunit=file2_unit, recl=4096, file=file2(1:longueur2), status='new', action='write')
-                
+                call oldConfiguration(type1%X, file1_unit, type2%X, file2_unit)
                 close(file1_unit)
                 close(file2_unit)                
             
@@ -142,9 +142,15 @@ contains
     
     !> From an old configuration
     
-    subroutine oldConfiguration(type1_X, type2_X)
+    subroutine oldConfiguration(type1_X, file1_unit, type2_X, file2_unit)
     
         real(DP), dimension(:, :), intent(inout) :: type1_X, type2_X
+        integer, intent(in) :: file1_unit, file2_unit
+        
+        integer :: type1_Ncol, type2_Ncol
+        
+        type1_Ncol = size(type1_X, 2)
+        type2_Ncol = size(type2_X, 2)
     
     end subroutine oldConfiguration
     
