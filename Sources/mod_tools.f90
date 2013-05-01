@@ -74,8 +74,8 @@ contains
                 write(output_unit, *) "Old configuration"
                 write(report_unit, *) "    Old configuration"
                 
-                call oldConfiguration(1, type1%X)
-                call oldConfiguration(2, type2%X)
+                call oldConfiguration(1, type1%getName(), type1%X)
+                call oldConfiguration(2, type2%getName(), type2%X)
             
             case default
                 write(output_unit, *) "Enter the initial condition : "
@@ -141,10 +141,11 @@ contains
     
     !> From an old configuration
     
-    subroutine oldConfiguration(iType, type_X)
+    subroutine oldConfiguration(iType, type_name, type_X)
     
         integer, intent(in) :: iType
-        real(DP), dimension(:, :) :: type_X
+        character(len=*), intent(in) :: type_name
+        real(DP), dimension(:, :), intent(out) :: type_X
     
         character(len=20) :: file
         integer :: length
@@ -157,7 +158,7 @@ contains
         
         call get_command_argument(iType, file, length, fileStat)
         if (fileStat /= 0) stop "error get_command_argument"
-        write(output_unit, *) "type", iType, " <- ", file(1:length)
+        write(output_unit, *) type_name, " <- ", file(1:length)
         open(newunit=file_unit, recl=4096, file=file(1:length), status='old', action='read')
         
         type_Ncol = size(type_X, 2)
