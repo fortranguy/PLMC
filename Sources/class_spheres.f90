@@ -236,16 +236,17 @@ contains
         real(DP) :: dx_normSqr, Lsize_normSqr
         
             if (rej == 0._DP) then
-                write(output_unit, *) this%name, " :    Warning : dx adaptation problem."
+                write(error_unit, *) this%name, " :    Warning : dx adaptation problem."
                 this%dx(:) = this%dx_save(:)
-                write(output_unit, *) "default dx :", this%dx(:)
+                write(error_unit, *) "default dx :", this%dx(:)
             end if
             
             dx_normSqr = dot_product(this%dx, this%dx)
             Lsize_normSqr = dot_product(LsizeMi, LsizeMi)
             if (dx_normSqr >= Lsize_normSqr) then
-                write(output_unit, *) this%name, " :   Warning : dx too big."
-                write(output_unit, *) "big dx :", this%dx(:)
+                write(error_unit, *) this%name, " :   Warning : dx too big."
+                this%dx(:) = LsizeMi(:)
+                write(error_unit, *) "big dx :", this%dx(:)
             end if
             
             write(output_unit, *) this%name, " :    Thermalisation : over"
