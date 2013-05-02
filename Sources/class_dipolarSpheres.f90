@@ -61,24 +61,24 @@ contains
         this%name = "dipol"
     
         ! Particles
-        this%radius = inter_radius
-        this%rMin = inter_rMin
-        this%Ncol = inter_Ncol
+        this%radius = dipol_radius
+        this%rMin = dipol_rMin
+        this%Ncol = dipol_Ncol
         allocate(this%X(Dim, this%Ncol))
         
         ! Monte-Carlo
-        this%dx = inter_dx
-        this%dx_save = inter_dx
-        this%rejFix = inter_rejFix
-        this%Nadapt = inter_Nadapt
-        this%Nwidom = inter_Nwidom
+        this%dx = dipol_dx
+        this%dx_save = dipol_dx
+        this%rejFix = dipol_rejFix
+        this%Nadapt = dipol_Nadapt
+        this%Nwidom = dipol_Nwidom
         
         ! Potential
-        this%rCut = inter_rCut
-        this%dr = inter_dr
+        this%rCut = dipol_rCut
+        this%dr = dipol_dr
         this%iMin = int(this%rMin/this%dr)
         this%iCut = int(this%rCut/this%dr)
-        this%alpha = inter_alpha        
+        this%alpha = dipol_alpha        
         allocate(this%Epot_tab(this%iMin:this%iCut, 2))
         call this%Epot_init()
         
@@ -243,7 +243,7 @@ contains
                         return
                     end if
                     Epot_pair(:) = this%Epot_pair(r)
-                    energ = energ + Epot_pair(1) + Epot_pair(2)
+                    energ = energ + Epot_pair(1) - Epot_pair(2)
        
                 end if
                 
@@ -388,7 +388,7 @@ contains
                 
                     r_ij = dist(this%X(:, iCol), this%X(:, jCol))
                     Epot_pair(:) = this%Epot_pair(r_ij)
-                    Epot_conf = Epot_conf + Epot_pair(1) + Epot_pair(2)
+                    Epot_conf = Epot_conf + Epot_pair(1) - Epot_pair(2)
                     
                 end if
             end do
