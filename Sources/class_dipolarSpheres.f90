@@ -58,7 +58,7 @@ contains
         class(DipolarSpheres), intent(out) :: this
         real(DP), intent(in) :: shared_rCut
         
-        this%name = "inter"
+        this%name = "dipol"
     
         ! Particles
         this%radius = inter_radius
@@ -161,7 +161,8 @@ contains
         end do
         
         ! shift        
-        this%Epot_tab(:, :) = this%Epot_tab(:, :) - this%Epot_tab_B(this%iCut, :)
+        this%Epot_tab(:, 1) = this%Epot_tab(:, 1) - this%Epot_tab(this%iCut, 1)
+        this%Epot_tab(:, 2) = this%Epot_tab(:, 2) - this%Epot_tab(this%iCut, 2)
 
     end subroutine DipolarSpheres_Epot_init
     
@@ -195,7 +196,7 @@ contains
        
             i = int(r/this%dr)
             r_i = real(i, DP)*this%dr
-            Epot_pair(:) = this%Epot_tab(i, :) + 
+            Epot_pair(:) = this%Epot_tab(i, :) + &
                            (r-r_i)/this%dr * (this%Epot_tab(i+1, :) - this%Epot_tab(i, :))
            
         else
@@ -376,6 +377,8 @@ contains
         integer :: iCol, jCol
         real(DP) :: r_ij
         real(DP) :: Epot_conf
+        
+        real(DP), dimension(2) :: Epot_pair
     
         Epot_conf = 0._DP
         
@@ -384,7 +387,8 @@ contains
                 if (iCol /= jCol) then
                 
                     r_ij = dist(this%X(:, iCol), this%X(:, jCol))
-                    Epot_conf = Epot_conf + this%Epot_pair(r_ij)
+                    Epot_pair(:) = this%Epot_pair(r_ij)
+                    Epot_conf = Epot_conf + Epot_pair(1) + Epot_pair(2)
                     
                 end if
             end do

@@ -7,7 +7,7 @@ use data_constants
 use data_mc
 use data_distrib
 use class_mixingPotential
-use class_interactingSpheres
+use class_dipolarSpheres
 use class_hardSpheres
 use class_observables
 use class_units
@@ -35,8 +35,8 @@ implicit none
     integer :: mix_Epot_unit !< tabulated potential file
     integer :: mix_obsTherm_unit, mix_obs_unit
     
-    ! Type 1 : Interacting spheres : short-range potential
-    type(InteractingSpheres) :: type1_sph !< Monte-Carlo subroutines
+    ! Type 1 : Dipolar spheres : Ewald summation
+    type(DipolarSpheres) :: type1_sph !< Monte-Carlo subroutines
     type(Observables) :: type1_obs !< energy & inverse of activity (-> chemical potential)
     type(Units) :: type1_io        !< input/output files
     
