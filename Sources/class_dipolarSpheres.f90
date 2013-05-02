@@ -23,7 +23,7 @@ private
         
         ! Particles
         
-        real(DP), dimension(:, :), allocatable :: M !< moments of all particles
+        real(DP), dimension(:, :), allocatable, public :: M !< moments of all particles
 
         ! Potential
         real(DP)  :: dr !< discretisation step

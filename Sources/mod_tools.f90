@@ -8,6 +8,8 @@ use data_particles
 use data_mc
 use mod_physics
 use class_spheres
+use class_dipolarSpheres
+use class_hardSpheres
 
 implicit none
 
@@ -42,7 +44,8 @@ contains
     
     subroutine initialCondition(type1, type2, mix_rMin, report_unit)
     
-        class(Spheres), intent(inout) :: type1, type2
+        class(DipolarSpheres), intent(inout) :: type1
+        class(Spheres), intent(inout) :: type2
         real(DP), intent(in) :: mix_rMin
         integer, intent(in) :: report_unit        
 
@@ -60,9 +63,11 @@ contains
                 
                 select case (init)
                     case ("rand") 
-                        call randomDeposition(type1%X, type1%getRMin(), type2%X, type2%getRmin(), mix_rMin)
-                        write(output_unit, *) "Random deposition"
-                        write(report_unit, *) "    Random deposition"
+                        call randomDepositions(type1%X, type1%getRMin(), type2%X, type2%getRmin(), &
+                                               mix_rMin)
+                        call randomMoments(type1%M)
+                        write(output_unit, *) "Random deposition + random orientation"
+                        write(report_unit, *) "    Random deposition + random orientation"
                     case default
                         write(error_unit, *) "Enter the initial condition : "
                         write(error_unit, *) "   'rand' or '[file1] [file2]'."
@@ -86,11 +91,11 @@ contains
         
     end subroutine initialCondition
     
-    !> Random deposition configuration
+    !> Random depositions configuration
     
-    subroutine randomDeposition(type1_X, type1_rMin, type2_X, type2_rMin, mix_rMin)
+    subroutine randomDepositions(type1_X, type1_rMin, type2_X, type2_rMin, mix_rMin)
     
-        real(DP), dimension(:, :), intent(inout) :: type1_X, type2_X
+        real(DP), dimension(:, :), intent(out) :: type1_X, type2_X
         real(DP), intent(in) :: type1_rMin, type2_rMin, mix_rMin
         
         integer :: type1_Ncol, type2_Ncol
@@ -137,7 +142,24 @@ contains
         
         end do
     
-    end subroutine randomDeposition
+    end subroutine randomDepositions
+    
+    !> Uniform (gaussian) moments
+    
+    subroutine randomMoments(type_M)
+    
+        real(DP), dimension(:, :), intent(out) :: type_M
+        
+        integer :: type_Ncol
+        integer :: iCol
+        
+        type_Ncol = size(type_M, 2)
+        
+        do iCol = 1, type_Ncol
+            type_M(:, iCol) = random_surface()
+        end do
+    
+    end subroutine randomMoments
     
     !> From an old configuration
     
