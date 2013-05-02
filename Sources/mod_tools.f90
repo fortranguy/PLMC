@@ -169,7 +169,7 @@ contains
         do
             read(file_unit, fmt=*, iostat=readStat) xDummy(:)
             if (readStat == iostat_end) exit
-            iCol = iCol + 1            
+            iCol = iCol + 1
         end do
         
         if (iCol == type_Ncol) then
