@@ -12,6 +12,19 @@ contains
 
     !> Distance between 2 positions with Periodic Boundary Conditions
     
+    function dist(X1, X2)
+    
+        real(DP), dimension(Dim), intent(in) :: X1, X2
+        
+        real(DP) :: dist
+        real(DP), dimension(Dim) :: DeltaX
+        
+        DeltaX(:) = dist_vec(X1, X2)
+        
+        dist = sqrt(dot_product(DeltaX, DeltaX))
+    
+    end function dist
+    
     function dist_vec(X1, X2)
     
         real(DP), dimension(Dim), intent(in) :: X1, X2
@@ -26,18 +39,5 @@ contains
         end where
         
     end function dist_vec
-    
-    function dist(X1, X2)
-    
-        real(DP), dimension(Dim), intent(in) :: X1, X2
-        
-        real(DP) :: dist
-        real(DP), dimension(Dim) :: DeltaX
-        
-        DeltaX(:) = dist_vec(X1, X2)
-        
-        dist = sqrt(dot_product(DeltaX, DeltaX))
-    
-    end function dist
 
 end module mod_physics
