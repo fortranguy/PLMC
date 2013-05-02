@@ -12,7 +12,6 @@ private
         integer :: obsTherm
         integer :: dx
 
-        integer :: configOld
         integer :: snapIni
         integer :: snapFin
         integer :: snapShots
@@ -26,6 +25,16 @@ private
         procedure :: close => Units_close
     
     end type Units
+    
+    type, extends(Units), public :: MoreUnits
+
+        integer :: snapIni_orient
+        integer :: snapFin_orient
+        integer :: snapShots_orient
+    
+    contains
+    
+    end type MoreUnits
     
 contains
 
