@@ -20,8 +20,12 @@ private
     type, extends(Spheres), public :: DipolarSpheres
 
         private
+        
+        ! Particles
+        
+        real(DP), dimension(:, :), allocatable :: M !< moments of all particles
 
-        ! Potential :
+        ! Potential
         real(DP)  :: dr !< discretisation step
         integer :: iMin !< minimum index of tabulation : minimum distance
         integer :: iCut !< maximum index of tabulation : until potential cut
@@ -39,7 +43,7 @@ private
         
         !> Potential energy
         procedure :: Epot_real_init => DipolarSpheres_Epot_real_init
-        procedure :: Epot_print => DipolarSpheres_Epot_print
+        procedure :: Epot_real_print => DipolarSpheres_Epot_real_print
         procedure :: Epot_real_pair => DipolarSpheres_Epot_real_pair
         procedure :: Epot_neigh => DipolarSpheres_Epot_neigh
         procedure :: Epot_conf => DipolarSpheres_Epot_conf
@@ -65,6 +69,7 @@ contains
         this%rMin = dipol_rMin
         this%Ncol = dipol_Ncol
         allocate(this%X(Dim, this%Ncol))
+        allocate(this%M(Dim, this%Ncol))
         
         ! Monte-Carlo
         this%dx = dipol_dx
@@ -99,6 +104,10 @@ contains
         
         if (allocated(this%X)) then
             deallocate(this%X)
+        end if
+        
+        if (allocated(this%M)) then
+            deallocate(this%M)
         end if
         
         if (allocated(this%Epot_real_tab)) then
@@ -168,7 +177,7 @@ contains
     
     !> Print the tabulated potential
     
-    subroutine DipolarSpheres_Epot_print(this, Epot_unit)
+    subroutine DipolarSpheres_Epot_real_print(this, Epot_unit)
 
         class(DipolarSpheres), intent(in) :: this
         integer, intent(in) :: Epot_unit
@@ -181,7 +190,7 @@ contains
             write(Epot_unit, *) r_i, this%Epot_real_tab(i, :)
         end do
 
-    end subroutine DipolarSpheres_Epot_print
+    end subroutine DipolarSpheres_Epot_real_print
 
     function DipolarSpheres_Epot_real_pair(this, r) result(Epot_real_pair)
         
@@ -216,8 +225,10 @@ contains
         real(DP), intent(out) :: energ
     
         integer :: iNeigh,  iCell_neigh
+        real(DP), dimension(Dim) :: r_vec
         real(DP) :: r
-        real(DP), dimension(2) :: Epot_real_pair
+        real(DP) :: Epot_real
+        real(DP), dimension(2) :: Epot_real_coeff
         
         type(Link), pointer :: current => null(), next => null()
         
@@ -237,13 +248,21 @@ contains
             
                 if (current%iCol /= iCol) then
                 
-                    r = dist(xCol(:), this%X(:, current%iCol))
+                    r_vec = dist_vec(xCol(:), this%X(:, current%iCol))
+                    r = dot_product(r_vec, r_vec)
+                    
                     if (r < this%rMin) then
                         overlap = .true.
                         return
                     end if
-                    Epot_real_pair(:) = this%Epot_real_pair(r)
-                    energ = energ + Epot_real_pair(1) - Epot_real_pair(2)
+                    
+                    Epot_real_coeff(1) = dot_product(this%M(:, iCol), this%M(:, current%iCol))
+                    Epot_real_coeff(2) =-dot_product(this%M(:, iCol), r_vec) * &
+                                         dot_product(this%M(:, current%iCol), r_vec)
+                    
+                    Epot_real = dot_product(Epot_real_coeff, this%Epot_real_pair(r))
+                     
+                    energ = energ + Epot_real
        
                 end if
                 
@@ -374,21 +393,30 @@ contains
     
         class(DipolarSpheres), intent(in) :: this
         
-        integer :: iCol, jCol
-        real(DP) :: r_ij
         real(DP) :: Epot_conf
         
-        real(DP), dimension(2) :: Epot_real_pair
+        integer :: iCol, jCol
+        real(DP), dimension(Dim) :: r_vec
+        real(DP) :: r_ij
+        real(DP) :: Epot_real
+        real(DP), dimension(2) :: Epot_real_coeff
     
         Epot_conf = 0._DP
         
         do jCol = 1, this%Ncol
             do iCol = 1, this%Ncol
                 if (iCol /= jCol) then
-                
-                    r_ij = dist(this%X(:, iCol), this%X(:, jCol))
-                    Epot_real_pair(:) = this%Epot_real_pair(r_ij)
-                    Epot_conf = Epot_conf + Epot_real_pair(1) - Epot_real_pair(2)
+                    
+                    r_vec = dist_vec(this%X(:, iCol), this%X(:, jCol))
+                    r_ij = dot_product(r_vec, r_vec)
+                    
+                    Epot_real_coeff(1) = dot_product(this%M(:, iCol), this%M(:, jCol))
+                    Epot_real_coeff(2) =-dot_product(this%M(:, iCol), r_vec) * &
+                                         dot_product(this%M(:, jCol), r_vec)
+                    
+                    Epot_real = dot_product(Epot_real_coeff, this%Epot_real_pair(r_ij))
+                    
+                    Epot_conf = Epot_conf + Epot_real
                     
                 end if
             end do

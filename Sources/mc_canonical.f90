@@ -71,7 +71,7 @@ implicit none
     call type1_io%open(type1_sph%getName())
     call type1_sph%report(type1_io%report)
     call type1_sph%printInfo(type1_io%report)
-    call type1_sph%Epot_print(type1_io%Epot)
+    call type1_sph%Epot_real_print(type1_io%Epot)
     
     call type2_sph%construct(mix%getRcut())
     call type2_obs%init()

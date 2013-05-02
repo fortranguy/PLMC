@@ -23,7 +23,7 @@ private
         real(DP) :: radius !< radius of a particle
         real(DP) :: rMin !< minimum distance between two particles
         integer ::  Ncol !< number of a component particles
-        real(DP), dimension(:, :), allocatable :: X !< position of a particle
+        real(DP), dimension(:, :), allocatable :: X !< positions of all particles
 
         ! Monte-Carlo
         real(DP), dimension(Dim) :: dx !< displacement
