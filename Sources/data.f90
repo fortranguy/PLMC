@@ -9,6 +9,7 @@ implicit none
     ! double precision
     integer, parameter :: DP = selected_real_kind(15, 307)
     real(DP), parameter :: PI = acos(-1._DP)
+    real(DP), parameter :: sigma3d = 1._DP/sqrt(3._DP)
         
 end module data_constants
 !***************************************************************************************************

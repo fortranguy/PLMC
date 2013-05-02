@@ -39,5 +39,43 @@ contains
         end where
         
     end function dist_vec
+    
+    !> Rotation
+    
+    function gauss()
+        
+        real(DP) :: gauss
+        real(DP) :: x, y
+        real(DP) :: normSqr, factor
+        
+        do
+        
+            call random_number(x)
+            x = 2._DP*x - 1._DP
+            call random_number(y)
+            y = 2._DP*y - 1._DP
+        
+            normSqr = x*x + y*y
+            if (normSqr <= 1._DP .and. normSqr /= 0._DP) exit
+            
+        end do
+        
+        factor = sqrt(-2._DP * log(normSqr) / normSqr)
+        gauss = sigma3d * factor * x
+        
+    end function gauss
+    
+    function random_surface()
+        
+        real(DP), dimension(Dim) :: random_surface
+        integer :: iDim
+        
+        do iDim = 1, Dim        
+            random_surface(iDim) = gauss()          
+        end do
+        
+        random_surface(:) = random_surface(:) / sqrt(dot_product(random_surface, random_surface))
+    
+    end function random_surface
 
 end module mod_physics
