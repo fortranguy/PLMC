@@ -188,17 +188,19 @@ contains
         real(DP), intent(in) :: r
         
         integer :: i
-        real(DP) :: r_i, Epot_pair
+        real(DP) :: r_i
+        real(DP), dimension(2) :: Epot_pair
        
         if (r < this%rCut) then
        
             i = int(r/this%dr)
             r_i = real(i, DP)*this%dr
-            Epot_pair = this%Epot_tab(i) + (r-r_i)/this%dr * (this%Epot_tab(i+1)-this%Epot_tab(i))
+            Epot_pair(:) = this%Epot_tab(i, :) + 
+                           (r-r_i)/this%dr * (this%Epot_tab(i+1, :) - this%Epot_tab(i, :))
            
         else
        
-            Epot_pair = 0._DP
+            Epot_pair(:) = 0._DP
            
         end if
         
@@ -214,8 +216,10 @@ contains
     
         integer :: iNeigh,  iCell_neigh
         real(DP) :: r
-    
+        real(DP), dimension(2) :: Epot_pair
+        
         type(Link), pointer :: current => null(), next => null()
+        
         
         overlap = .false.
         energ = 0._DP
@@ -237,7 +241,8 @@ contains
                         overlap = .true.
                         return
                     end if
-                    energ = energ + this%Epot_pair(r)
+                    Epot_pair(:) = this%Epot_pair(r)
+                    energ = energ + Epot_pair(1) + Epot_pair(2)
        
                 end if
                 
