@@ -26,8 +26,7 @@ private
         integer :: iMin !< minimum index of tabulation : minimum distance
         integer :: iCut !< maximum index of tabulation : until potential cut
         real(DP) :: alpha !< coefficient of Ewald summation
-        real(DP), dimension(:), allocatable :: Epot_tab_B !< tabulation
-        real(DP), dimension(:), allocatable :: Epot_tab_C !< tabulation
+        real(DP), dimension(:, :), allocatable :: Epot_tab !< tabulation : real short-range
         
     contains
 
@@ -80,8 +79,7 @@ contains
         this%iMin = int(this%rMin/this%dr)
         this%iCut = int(this%rCut/this%dr)
         this%alpha = inter_alpha        
-        allocate(this%Epot_tab_B(this%iMin:this%iCut))
-        allocate(this%Epot_tab_C(this%iMin:this%iCut))
+        allocate(this%Epot_tab(this%iMin:this%iCut, 2))
         call this%Epot_init()
         
         ! Neighbours : same kind    
@@ -144,24 +142,26 @@ contains
 
         integer :: i
         real(DP) :: r_i
+        real(DP) :: alpha
+        
+        alpha = this%alpha
        
         ! cut
         do i = this%iMin, this%iCut
         
             r_i = real(i, DP)*this%dr
             
-            this%Epot_tab_B(i) = erfc(this%alpha*r_i)/r_i**3 + &
-                                 2._DP*this%alpha/sqrt(PI) * exp(-this%alpha**2*r_i**2)/r_i**2
+            this%Epot_tab(i, 1) = erfc(alpha*r_i)/r_i**3 + &
+                                  2._DP*alpha/sqrt(PI) * exp(-alpha**2*r_i**2) / r_i**2
                                  
-            this%Epot_tab_C(i) = 3._DP*erfc(this%alpha*r_i)/r_i**5 + &
-                                 2._DP*this%alpha/sqrt(PI) * (2_DP*this%alpha**2+3._DP/r_i**2) * &
-                                 exp(-this%alpha**2*r_i**2)/r_i**2
+            this%Epot_tab(i, 2) = 3._DP*erfc(alpha*r_i)/r_i**5 + &
+                                  2._DP*alpha/sqrt(PI) * (2_DP*alpha**2+3._DP/r_i**2) * &
+                                                         exp(-alpha**2*r_i**2) / r_i**2
                                     
         end do
         
         ! shift        
-        this%Epot_tab(:) = this%Epot_tab(:) - &
-                           
+        this%Epot_tab(:, :) = this%Epot_tab(:, :) - this%Epot_tab_B(this%iCut, :)
 
     end subroutine DipolarSpheres_Epot_init
     
@@ -177,7 +177,7 @@ contains
 
         do i = this%iMin, this%iCut
             r_i = real(i, DP)*this%dr
-            write(Epot_unit, *) r_i, this%Epot_tab(i)
+            write(Epot_unit, *) r_i, this%Epot_tab(i, :)
         end do
 
     end subroutine DipolarSpheres_Epot_print
