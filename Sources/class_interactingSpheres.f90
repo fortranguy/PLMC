@@ -155,8 +155,7 @@ contains
         end do
         
         ! shift        
-        this%Epot_tab(:) = this%Epot_tab(:) - &
-                           this%epsilon * exp(-this%alpha*(this%rCut-this%rMin)) / this%rCut
+        this%Epot_tab(:) = this%Epot_tab(:) - this%Epot_tab(this%iCut)
 
     end subroutine InteractingSpheres_Epot_init
     
