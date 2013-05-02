@@ -12,19 +12,29 @@ contains
 
     !> Distance between 2 positions with Periodic Boundary Conditions
     
+    function dist_vec(X1, X2)
+    
+        real(DP), dimension(Dim), intent(in) :: X1, X2
+
+        real(DP), dimension(Dim) :: dist_vec
+        
+        dist_vec(:) = X2(:) - X1(:)
+        dist_vec(:) = modulo(dist_vec(:), Lsize(:))
+        
+        where( dist_vec(:) > LsizeMi(:) )
+            dist_vec(:) = dist_vec(:) - Lsize(:)
+        end where
+        
+    end function dist_vec
+    
     function dist(X1, X2)
     
         real(DP), dimension(Dim), intent(in) :: X1, X2
         
-        real(DP), dimension(Dim) :: DeltaX
         real(DP) :: dist
+        real(DP), dimension(Dim) :: DeltaX
         
-        DeltaX(:) = X2(:) - X1(:)
-        DeltaX(:) = modulo(DeltaX(:), Lsize(:))
-        
-        where( DeltaX(:) > LsizeMi(:) )
-            DeltaX(:) = DeltaX(:) - Lsize(:)
-        end where
+        DeltaX(:) = dist_vec(X1, X2)
         
         dist = sqrt(dot_product(DeltaX, DeltaX))
     
