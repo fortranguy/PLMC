@@ -26,7 +26,7 @@ private
         integer :: iMin !< minimum index of tabulation : minimum distance
         integer :: iCut !< maximum index of tabulation : until potential cut
         real(DP) :: alpha !< coefficient of Ewald summation
-        real(DP), dimension(:, :), allocatable :: Epot_tab !< tabulation : real short-range
+        real(DP), dimension(:, :), allocatable :: Epot_real_tab !< tabulation : real short-range
         
     contains
 
@@ -38,9 +38,9 @@ private
         procedure :: report => DipolarSpheres_report
         
         !> Potential energy
-        procedure :: Epot_init => DipolarSpheres_Epot_init
+        procedure :: Epot_real_init => DipolarSpheres_Epot_real_init
         procedure :: Epot_print => DipolarSpheres_Epot_print
-        procedure :: Epot_pair => DipolarSpheres_Epot_pair
+        procedure :: Epot_real_pair => DipolarSpheres_Epot_real_pair
         procedure :: Epot_neigh => DipolarSpheres_Epot_neigh
         procedure :: Epot_conf => DipolarSpheres_Epot_conf
         procedure :: consistTest => DipolarSpheres_consistTest
@@ -79,8 +79,8 @@ contains
         this%iMin = int(this%rMin/this%dr)
         this%iCut = int(this%rCut/this%dr)
         this%alpha = dipol_alpha        
-        allocate(this%Epot_tab(this%iMin:this%iCut, 2))
-        call this%Epot_init()
+        allocate(this%Epot_real_tab(this%iMin:this%iCut, 2))
+        call this%Epot_real_init()
         
         ! Neighbours : same kind    
         call this%same%construct(this%rCut)
@@ -101,8 +101,8 @@ contains
             deallocate(this%X)
         end if
         
-        if (allocated(this%Epot_tab)) then
-            deallocate(this%Epot_tab)
+        if (allocated(this%Epot_real_tab)) then
+            deallocate(this%Epot_real_tab)
         endif
         
         call this%same%destroy()
@@ -136,7 +136,7 @@ contains
     
     !> Potential energy
     
-    subroutine DipolarSpheres_Epot_init(this)
+    subroutine DipolarSpheres_Epot_real_init(this)
     
         class(DipolarSpheres), intent(inout) :: this
 
@@ -151,20 +151,20 @@ contains
         
             r_i = real(i, DP)*this%dr
             
-            this%Epot_tab(i, 1) = erfc(alpha*r_i)/r_i**3 + &
+            this%Epot_real_tab(i, 1) = erfc(alpha*r_i)/r_i**3 + &
                                   2._DP*alpha/sqrt(PI) * exp(-alpha**2*r_i**2) / r_i**2
                                  
-            this%Epot_tab(i, 2) = 3._DP*erfc(alpha*r_i)/r_i**5 + &
+            this%Epot_real_tab(i, 2) = 3._DP*erfc(alpha*r_i)/r_i**5 + &
                                   2._DP*alpha/sqrt(PI) * (2_DP*alpha**2+3._DP/r_i**2) * &
                                                          exp(-alpha**2*r_i**2) / r_i**2
                                     
         end do
         
         ! shift        
-        this%Epot_tab(:, 1) = this%Epot_tab(:, 1) - this%Epot_tab(this%iCut, 1)
-        this%Epot_tab(:, 2) = this%Epot_tab(:, 2) - this%Epot_tab(this%iCut, 2)
+        this%Epot_real_tab(:, 1) = this%Epot_real_tab(:, 1) - this%Epot_real_tab(this%iCut, 1)
+        this%Epot_real_tab(:, 2) = this%Epot_real_tab(:, 2) - this%Epot_real_tab(this%iCut, 2)
 
-    end subroutine DipolarSpheres_Epot_init
+    end subroutine DipolarSpheres_Epot_real_init
     
     !> Print the tabulated potential
     
@@ -178,34 +178,34 @@ contains
 
         do i = this%iMin, this%iCut
             r_i = real(i, DP)*this%dr
-            write(Epot_unit, *) r_i, this%Epot_tab(i, :)
+            write(Epot_unit, *) r_i, this%Epot_real_tab(i, :)
         end do
 
     end subroutine DipolarSpheres_Epot_print
 
-    function DipolarSpheres_Epot_pair(this, r) result(Epot_pair)
+    function DipolarSpheres_Epot_real_pair(this, r) result(Epot_real_pair)
         
         class(DipolarSpheres), intent(in) :: this
         real(DP), intent(in) :: r
         
         integer :: i
         real(DP) :: r_i
-        real(DP), dimension(2) :: Epot_pair
+        real(DP), dimension(2) :: Epot_real_pair
        
         if (r < this%rCut) then
        
             i = int(r/this%dr)
             r_i = real(i, DP)*this%dr
-            Epot_pair(:) = this%Epot_tab(i, :) + &
-                           (r-r_i)/this%dr * (this%Epot_tab(i+1, :) - this%Epot_tab(i, :))
+            Epot_real_pair(:) = this%Epot_real_tab(i, :) + &
+                           (r-r_i)/this%dr * (this%Epot_real_tab(i+1, :) - this%Epot_real_tab(i, :))
            
         else
        
-            Epot_pair(:) = 0._DP
+            Epot_real_pair(:) = 0._DP
            
         end if
         
-    end function DipolarSpheres_Epot_pair
+    end function DipolarSpheres_Epot_real_pair
     
     subroutine DipolarSpheres_Epot_neigh(this, iCol, xCol, iCell, overlap, energ)
         
@@ -217,7 +217,7 @@ contains
     
         integer :: iNeigh,  iCell_neigh
         real(DP) :: r
-        real(DP), dimension(2) :: Epot_pair
+        real(DP), dimension(2) :: Epot_real_pair
         
         type(Link), pointer :: current => null(), next => null()
         
@@ -242,8 +242,8 @@ contains
                         overlap = .true.
                         return
                     end if
-                    Epot_pair(:) = this%Epot_pair(r)
-                    energ = energ + Epot_pair(1) - Epot_pair(2)
+                    Epot_real_pair(:) = this%Epot_real_pair(r)
+                    energ = energ + Epot_real_pair(1) - Epot_real_pair(2)
        
                 end if
                 
@@ -378,7 +378,7 @@ contains
         real(DP) :: r_ij
         real(DP) :: Epot_conf
         
-        real(DP), dimension(2) :: Epot_pair
+        real(DP), dimension(2) :: Epot_real_pair
     
         Epot_conf = 0._DP
         
@@ -387,8 +387,8 @@ contains
                 if (iCol /= jCol) then
                 
                     r_ij = dist(this%X(:, iCol), this%X(:, jCol))
-                    Epot_pair(:) = this%Epot_pair(r_ij)
-                    Epot_conf = Epot_conf + Epot_pair(1) - Epot_pair(2)
+                    Epot_real_pair(:) = this%Epot_real_pair(r_ij)
+                    Epot_conf = Epot_conf + Epot_real_pair(1) - Epot_real_pair(2)
                     
                 end if
             end do
