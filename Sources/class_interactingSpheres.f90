@@ -154,10 +154,6 @@ contains
             this%Epot_tab(i) = this%epsilon * exp(-this%alpha*(r_i-this%rMin)) / r_i
         end do
         
-        write(*, *) "inter"
-        write(*, *) "cutSimple", this%Epot_tab(this%iCut)
-        write(*, *) "cutComplx", this%epsilon * exp(-this%alpha*(this%rCut-this%rMin)) / this%rCut
-        
         ! shift        
         this%Epot_tab(:) = this%Epot_tab(:) - this%Epot_tab(this%iCut)
 
