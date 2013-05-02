@@ -45,6 +45,7 @@ private
         procedure :: Epot_real_init => DipolarSpheres_Epot_real_init
         procedure :: Epot_real_print => DipolarSpheres_Epot_real_print
         procedure :: Epot_real_pair => DipolarSpheres_Epot_real_pair
+        procedure :: Epot_real => DipolarSpheres_Epot_real
         procedure :: Epot_neigh => DipolarSpheres_Epot_neigh
         procedure :: Epot_conf => DipolarSpheres_Epot_conf
         procedure :: consistTest => DipolarSpheres_consistTest
@@ -216,9 +217,26 @@ contains
         
     end function DipolarSpheres_Epot_real_pair
     
+    function DipolarSpheres_Epot_real(this, iCol, jCol, r_vec, r) result(Epot_real)
+    
+        class(DipolarSpheres), intent(in) :: this
+        integer, intent(in) :: iCol, jCol
+        real(DP), dimension(:), intent(in) :: r_vec
+        real(DP), intent(in) :: r
+        real(DP) :: Epot_real
+        
+        real(DP), dimension(2) :: Epot_real_coeff
+        
+        Epot_real_coeff(1) = dot_product(this%M(:, iCol), this%M(:, jCol))
+        Epot_real_coeff(2) =-dot_product(this%M(:, iCol), r_vec) * dot_product(this%M(:, jCol), r_vec)
+        
+        Epot_real = dot_product(Epot_real_coeff, this%Epot_real_pair(r))
+    
+    end function DipolarSpheres_Epot_real
+    
     subroutine DipolarSpheres_Epot_neigh(this, iCol, xCol, iCell, overlap, energ)
         
-        class(DipolarSpheres), intent(in) :: this        
+        class(DipolarSpheres), intent(in) :: this
         integer, intent(in) :: iCol, iCell
         real(DP), dimension(Dim), intent(in) :: xCol
         logical, intent(out) :: overlap
@@ -226,9 +244,7 @@ contains
     
         integer :: iNeigh,  iCell_neigh
         real(DP), dimension(Dim) :: r_vec
-        real(DP) :: r
-        real(DP) :: Epot_real
-        real(DP), dimension(2) :: Epot_real_coeff
+        real(DP) :: r        
         
         type(Link), pointer :: current => null(), next => null()
         
@@ -256,13 +272,7 @@ contains
                         return
                     end if
                     
-                    Epot_real_coeff(1) = dot_product(this%M(:, iCol), this%M(:, current%iCol))
-                    Epot_real_coeff(2) =-dot_product(this%M(:, iCol), r_vec) * &
-                                         dot_product(this%M(:, current%iCol), r_vec)
-                    
-                    Epot_real = dot_product(Epot_real_coeff, this%Epot_real_pair(r))
-                     
-                    energ = energ + Epot_real
+                    energ = energ + this%Epot_real(iCol, current%iCol, r_vec, r)
        
                 end if
                 
@@ -410,13 +420,7 @@ contains
                     r_vec = dist_vec(this%X(:, iCol), this%X(:, jCol))
                     r_ij = dot_product(r_vec, r_vec)
                     
-                    Epot_real_coeff(1) = dot_product(this%M(:, iCol), this%M(:, jCol))
-                    Epot_real_coeff(2) =-dot_product(this%M(:, iCol), r_vec) * &
-                                         dot_product(this%M(:, jCol), r_vec)
-                    
-                    Epot_real = dot_product(Epot_real_coeff, this%Epot_real_pair(r_ij))
-                    
-                    Epot_conf = Epot_conf + Epot_real
+                    Epot_conf = Epot_conf + this%Epot_real(iCol, jCol, r_vec, r_ij)
                     
                 end if
             end do
