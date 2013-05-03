@@ -296,12 +296,21 @@ contains
         integer, intent(in) :: report_unit
         
         real(DP) :: Epot_conf
+        real(DP) :: difference
     
         Epot_conf = this%Epot_conf()
+        difference = abs(Epot_conf-Epot)
+        
         write(report_unit, *) "Consistency test:"
         write(report_unit, *) "    Epot = ", Epot
         write(report_unit, *) "    Epot_conf = ", Epot_conf
-        write(report_unit, *) "    absolute difference = ", abs(Epot_conf-Epot)
+        write(report_unit, *) "    absolute difference = ", difference
+        
+        if (difference /= 0._DP) then
+            write(report_unit, *) "    WARNING !"
+        else
+            write(report_unit, *) "    OK !"
+        end if
     
     end subroutine HardSpheres_consistTest
 
