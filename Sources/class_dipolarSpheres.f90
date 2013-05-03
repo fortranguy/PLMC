@@ -48,8 +48,10 @@ private
         !> Potential energy
         procedure :: Epot_real_init => DipolarSpheres_Epot_real_init
         procedure :: Epot_real_print => DipolarSpheres_Epot_real_print
+        procedure :: Epot_real_interpol => DipolarSpheres_Epot_real_interpol
         procedure :: Epot_real_pair => DipolarSpheres_Epot_real_pair
         procedure :: Epot_real => DipolarSpheres_Epot_real
+        procedure :: Epot_self => DipolarSpheres_Epot_self
         procedure :: Epot_neigh => DipolarSpheres_Epot_neigh
         procedure :: Epot_conf => DipolarSpheres_Epot_conf
         procedure :: consistTest => DipolarSpheres_consistTest
@@ -212,11 +214,11 @@ contains
 
     end subroutine DipolarSpheres_Epot_real_print
 
-    function DipolarSpheres_Epot_real_pair(this, r) result(Epot_real_pair)
+    function DipolarSpheres_Epot_real_interpol(this, r) result(Epot_real_interpol)
         
         class(DipolarSpheres), intent(in) :: this
         real(DP), intent(in) :: r
-        real(DP), dimension(2) :: Epot_real_pair
+        real(DP), dimension(2) :: Epot_real_interpol
         
         integer :: i
         real(DP) :: r_i
@@ -225,33 +227,82 @@ contains
        
             i = int(r/this%dr)
             r_i = real(i, DP)*this%dr
-            Epot_real_pair(:) = this%Epot_real_tab(i, :) + (r-r_i)/this%dr * &
+            Epot_real_interpol(:) = this%Epot_real_tab(i, :) + (r-r_i)/this%dr * &
                                (this%Epot_real_tab(i+1, :) - this%Epot_real_tab(i, :))
            
         else
        
-            Epot_real_pair(:) = 0._DP
+            Epot_real_interpol(:) = 0._DP
            
         end if
         
-    end function DipolarSpheres_Epot_real_pair
+    end function DipolarSpheres_Epot_real_interpol
     
-    function DipolarSpheres_Epot_real(this, iCol, jCol, rVec, r) result(Epot_real)
+    function DipolarSpheres_Epot_real_pair(this, iCol, jCol, rVec, r) result(Epot_real_pair)
     
         class(DipolarSpheres), intent(in) :: this
         integer, intent(in) :: iCol, jCol
         real(DP), dimension(:), intent(in) :: rVec
         real(DP), intent(in) :: r
+        real(DP) :: Epot_real_pair
+        
+        real(DP), dimension(2) :: Epot_coeff
+        
+        Epot_coeff(1) = dot_product(this%M(:, iCol), this%M(:, jCol))
+        Epot_coeff(2) =-dot_product(this%M(:, iCol), rVec) * dot_product(this%M(:, jCol), rVec)
+        
+        Epot_real_pair = dot_product(Epot_coeff, this%Epot_real_interpol(r))
+    
+    end function DipolarSpheres_Epot_real_pair
+    
+    !> Total real energy
+    
+    function DipolarSpheres_Epot_real(this) result(Epot_real)
+    
+        class(DipolarSpheres), intent(in) :: this
         real(DP) :: Epot_real
         
-        real(DP), dimension(2) :: Epot_real_coeff
+        integer :: iCol, jCol
+        real(DP), dimension(Dim) :: rVec_ij
+        real(DP) :: r_ij        
+    
+        Epot_real = 0._DP
         
-        Epot_real_coeff(1) = dot_product(this%M(:, iCol), this%M(:, jCol))
-        Epot_real_coeff(2) =-dot_product(this%M(:, iCol), rVec) * dot_product(this%M(:, jCol), rVec)
+        do jCol = 1, this%Ncol
+            do iCol = 1, this%Ncol
+                if (iCol /= jCol) then
+                    
+                    rVec_ij = distVec(this%X(:, iCol), this%X(:, jCol))
+                    r_ij = dot_product(rVec_ij, rVec_ij)
+                    
+                    Epot_real = Epot_real + this%Epot_real_pair(iCol, jCol, rVec_ij, r_ij)
+                    
+                end if
+            end do
+        end do
         
-        Epot_real = dot_product(Epot_real_coeff, this%Epot_real_pair(r))
+        Epot_real = 0.5_DP*Epot_real
     
     end function DipolarSpheres_Epot_real
+    
+    !> Total self energy
+    
+    function DipolarSpheres_Epot_self(this) result(Epot_self)
+    
+        class(DipolarSpheres), intent(in) :: this
+        real(DP) :: Epot_self
+        
+        real(DP) :: momentsSum
+        integer :: iCol        
+        
+        momentsSum = 0._DP
+        do iCol = 1, this%Ncol
+            momentsSum = momentsSum + dot_product(this%M(:, iCol), this%M(:, iCol))
+        end do
+        
+        Epot_self = 2._DP/3._DP * this%alpha**3/sqrt(PI) * momentsSum
+        
+    end function DipolarSpheres_Epot_self
     
     subroutine DipolarSpheres_Epot_neigh(this, iCol, xCol, iCell, overlap, energ)
         
@@ -291,7 +342,7 @@ contains
                         return
                     end if
                     
-                    energ = energ + this%Epot_real(iCol, current%iCol, rVec, r)
+                    energ = energ + this%Epot_real_pair(iCol, current%iCol, rVec, r)
        
                 end if
                 
@@ -423,28 +474,7 @@ contains
         class(DipolarSpheres), intent(in) :: this        
         real(DP) :: Epot_conf
         
-        integer :: iCol, jCol
-        real(DP), dimension(Dim) :: rVec_ij
-        real(DP) :: r_ij
-        real(DP) :: Epot_real
-        real(DP), dimension(2) :: Epot_real_coeff
-    
-        Epot_conf = 0._DP
-        
-        do jCol = 1, this%Ncol
-            do iCol = 1, this%Ncol
-                if (iCol /= jCol) then
-                    
-                    rVec_ij = distVec(this%X(:, iCol), this%X(:, jCol))
-                    r_ij = dot_product(rVec_ij, rVec_ij)
-                    
-                    Epot_conf = Epot_conf + this%Epot_real(iCol, jCol, rVec_ij, r_ij)
-                    
-                end if
-            end do
-        end do
-        
-        Epot_conf = 0.5_DP*Epot_conf
+        Epot_conf = this%Epot_real() - this%Epot_self()
     
     end function DipolarSpheres_Epot_conf
     
