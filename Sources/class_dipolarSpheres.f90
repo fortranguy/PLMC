@@ -41,6 +41,9 @@ private
         !> Print a report of the component in a file
         procedure :: report => DipolarSpheres_report
         
+        !> Take a snap shot of the configuration : orientations
+        procedure :: snapShot_M => DipolarSpheres_snapShot_M
+        
         !> Potential energy
         procedure :: Epot_real_init => DipolarSpheres_Epot_real_init
         procedure :: Epot_real_print => DipolarSpheres_Epot_real_print
@@ -143,6 +146,21 @@ contains
         write(report_unit, *) "    mix_cell_Lsize(:) = ", this%mix%cell_Lsize(:)
         
     end subroutine DipolarSpheres_report
+    
+    !> Configuration state : orientations
+      
+    subroutine DipolarSpheres_snapShot_M(this, snap_unit)
+        
+        class(DipolarSpheres), intent(in) :: this
+        integer, intent(in) :: snap_unit
+    
+        integer :: iCol
+        
+        do iCol = 1, this%Ncol
+            write(snap_unit, *) this%M(:, iCol)
+        end do    
+
+    end subroutine DipolarSpheres_snapShot_M
     
     !> Potential energy
     

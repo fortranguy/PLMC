@@ -66,8 +66,8 @@ contains
                         call randomDepositions(type1%X, type1%getRMin(), type2%X, type2%getRmin(), &
                                                mix_rMin)
                         call randomMoments(type1%M)
-                        write(output_unit, *) "Random deposition + random orientation"
-                        write(report_unit, *) "    Random deposition + random orientation"
+                        write(output_unit, *) "Random depositions + random orientations"
+                        write(report_unit, *) "    Random depositions + random orientations"
                     case default
                         write(error_unit, *) "Enter the initial condition : "
                         write(error_unit, *) "   'rand' or '[file1] [file2]'."

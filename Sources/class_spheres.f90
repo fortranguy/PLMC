@@ -49,8 +49,8 @@ private
         
         procedure :: printInfo => Spheres_printInfo
         
-        !> Take a snap shot of the configuration
-        procedure :: snapShot => Spheres_snapShot
+        !> Take a snap shot of the configuration : positions
+        procedure :: snapShot_X => Spheres_snapShot_X
         
         !> Do an overlap test
         procedure :: overlapTest => Spheres_overlapTest
@@ -136,9 +136,9 @@ contains
     
     end subroutine Spheres_printInfo
     
-    !> Configuration state
+    !> Configuration state : positions
       
-    subroutine Spheres_snapShot(this, snap_unit)
+    subroutine Spheres_snapShot_X(this, snap_unit)
         
         class(Spheres), intent(in) :: this
         integer, intent(in) :: snap_unit
@@ -149,7 +149,7 @@ contains
             write(snap_unit, *) this%X(:, iCol)
         end do    
 
-    end subroutine Spheres_snapShot
+    end subroutine Spheres_snapShot_X
     
     !> Overlapt test
     
