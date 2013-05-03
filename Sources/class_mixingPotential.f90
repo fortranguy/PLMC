@@ -177,16 +177,16 @@ contains
     
     subroutine MixingPotential_Epot_print(this, Epot_unit)
 
-	    class(MixingPotential), intent(in) :: this
-	    integer, intent(in) :: Epot_unit
-	
+        class(MixingPotential), intent(in) :: this
+        integer, intent(in) :: Epot_unit
+
         integer :: i
         real(DP) :: r_i
-	
-	    do i = this%iMin, this%iCut
-		    r_i = real(i, DP)*this%dr
-		    write(Epot_unit, *) r_i, this%Epot_tab(i)
-	    end do
+
+        do i = this%iMin, this%iCut
+            r_i = real(i, DP)*this%dr
+            write(Epot_unit, *) r_i, this%Epot_tab(i)
+        end do
 
     end subroutine MixingPotential_Epot_print
 

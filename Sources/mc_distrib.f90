@@ -50,7 +50,7 @@ implicit none
     real(DP) :: r
     real(DP) :: numerat, denomin
     real(DP), dimension(:), allocatable :: fct_dist
-    real(DP) :: energSum	
+    real(DP) :: energSum
     type(InteractingSpheres) :: inter
     type(MixingPotential) :: mix
     real(DP), dimension(Dim, inter_Ncol) :: X
@@ -61,7 +61,7 @@ implicit none
 
     if (.not.snap) stop "Snap désactivé."
 
-	call mix%construct()
+    call mix%construct()
     call inter%construct(mix%getRcut())
 
     call initDistriParams()
@@ -91,11 +91,11 @@ implicit none
         do iCol = 1, inter_Ncol
             do jCol = iCol + 1, inter_Ncol
 
-                r_ij = dist(X(:, iCol), X(:, jCol))		        
+                r_ij = dist(X(:, iCol), X(:, jCol))      
                 iDist =  int(r_ij/deltaDist)
                 distrib(iDist) = distrib(iDist) + 1
 
-            end do		
+            end do
         end do
 
     end do
@@ -119,7 +119,7 @@ implicit none
     iDistMin = 0
     iDistMax = 0
 
-    open(unit=distrib_unit, file="fct_distrib.out", action="write")	
+    open(unit=distrib_unit, file="fct_distrib.out", action="write")
         do iDist = 1, Ndist
         
             r = (real(iDist, DP) + 0.5_DP) * deltaDist
@@ -144,7 +144,7 @@ implicit none
 
     do iDist = iDistMin, iDistMax
         r = (real(iDist, DP) + 0.5_DP) * deltaDist
-        energSum = energSum + inter%Epot_pair(r) * fct_dist(iDist) * 4._DP*PI*r**2	
+        energSum = energSum + inter%Epot_pair(r) * fct_dist(iDist) * 4._DP*PI*r**2
     end do
 
     open(unit=energ_unit, file="epp_dist.out", action="write")
@@ -154,7 +154,7 @@ implicit none
     deallocate(fct_dist)
     deallocate(distrib)
 
-	call inter%destroy()
-	call mix%destroy()
+    call inter%destroy()
+    call mix%destroy()
 
 end program distribution
