@@ -167,8 +167,11 @@ contains
     end subroutine DipolarSpheres_snapShot_M
     
     !> Potential energy
-    !> \f[ B(r) = \frac{\erfc(\alpha r)}{r^3} + 
+    !> \f[ B(r) = \frac{\mathrm{erfc}(\alpha r)}{r^3} + 
     !>           2\frac{\alpha}{\sqrt{\pi}}\frac{e^{-\alpha^2 r^2}}{r^2} \f]
+    !> \f[ C(r) = 3\frac{\mathrm{erfc}(\alpha r)}{r^5} +
+    !>            2\frac{\alpha}{\sqrt{\pi}}(2\alpha^2 + \frac{3}{r^2})
+    !>                                     \frac{e^{-\alpha^2 r^2}}{r^2} \f]
     
     subroutine DipolarSpheres_Epot_real_init(this)
     
