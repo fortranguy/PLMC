@@ -286,10 +286,17 @@ contains
     
     end function DipolarSpheres_Epot_real
     
-    function DipolarSpheres_Epot_self_delta(this) result(Epot_self_delta)
+    !> Self energy difference : rotation
+    
+    function DipolarSpheres_Epot_self_delta(this, iCol, deltaM) result(Epot_self_delta)
     
         class(DipolarSpheres), intent(in) :: this
+        integer, intent(in) :: iCol
+        real(DP), dimension(:) :: deltaM
         real(DP) :: Epot_self_delta
+        
+        Epot_self_delta = 2._DP*dot_product(deltaM, this%M(:, iCol)) + dot_product(deltaM, deltaM)
+        Epot_self_delta = Epot_self_delta * 2._DP/3._DP * this%alpha**3/sqrt(PI)
     
     end function DipolarSpheres_Epot_self_delta
     
