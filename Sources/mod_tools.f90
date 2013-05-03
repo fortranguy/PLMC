@@ -180,7 +180,6 @@ contains
         integer :: iCol
         real(DP), dimension(Dim) :: vecDummy
         real(DP) :: normSqr
-        real(DP) :: normSqr_eps = 1.E-10_DP ! Arbitrary ?
         
         call get_command_argument(iFile, file, length, fileStat)
         if (fileStat /= 0) stop "error get_command_argument"
@@ -201,7 +200,7 @@ contains
             do iCol = 1, type_Ncol
                 read(file_unit, *) type_vec(:, iCol)
                 normSqr = dot_product(type_vec(:, iCol), type_vec(:, iCol))
-                if (normSqr > normSqrMax+normSqr_eps) then
+                if (normSqr > normSqrMax+io_tiny) then
                     write(error_unit, *) "Norm error : ", file(1:length)
                     write(error_unit, *) "Vec ", type_vec(:, iCol)
                     stop
@@ -236,17 +235,28 @@ contains
     
     end subroutine report
     
-    ! Total : consistency test
+    ! Total & Mix : consistency test
     
     subroutine consistTest(Epot, Epot_conf, report_unit)
     
         real(DP), intent(in) :: Epot, Epot_conf
         integer, intent(in) :: report_unit
+        
+        real(DP) :: difference
     
+        difference = abs((Epot_conf-Epot)/Epot_conf)
+        
         write(report_unit, *) "Consistency test:"
         write(report_unit, *) "    Epot = ", Epot
         write(report_unit, *) "    Epot_conf = ", Epot_conf
-        write(report_unit, *) "    relative difference = ", abs((Epot_conf-Epot)/Epot_conf)
+        write(report_unit, *) "    relative difference = ", difference
+        
+        if (difference > consist_tiny) then
+            write(error_unit, *) "WARNING !"
+            write(report_unit, *) "WARNING !"
+        else
+            write(report_unit, *) "    OK !"
+        end if
     
     end subroutine consistTest
     
@@ -263,20 +273,6 @@ contains
         write(report_unit, *) "    duration =", duration/60._DP, "min"
     
     end subroutine results
-    
-    ! Mix : consistency test
-    
-    subroutine mix_consistTest(Epot, Epot_conf, report_unit)
-    
-        real(DP), intent(in) :: Epot, Epot_conf
-        integer, intent(in) :: report_unit
-    
-        write(report_unit, *) "Consistency test:"
-        write(report_unit, *) "    Epot = ", Epot
-        write(report_unit, *) "    Epot_conf = ", Epot_conf
-        write(report_unit, *) "    relative difference = ", abs((Epot_conf-Epot)/Epot_conf)
-    
-    end subroutine mix_consistTest
     
     !> Mix : Results
     

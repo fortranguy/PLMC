@@ -2,6 +2,7 @@
 
 module class_interactingSpheres
 
+use iso_fortran_env
 use data_constants
 use data_cell
 use data_particles
@@ -393,12 +394,22 @@ contains
         integer, intent(in) :: report_unit
         
         real(DP) :: Epot_conf
-    
+        real(DP) :: difference
+        
         Epot_conf = this%Epot_conf()
+        difference = abs((Epot_conf-Epot)/Epot_conf)
+        
         write(report_unit, *) "Consistency test:"
         write(report_unit, *) "    Epot = ", Epot
         write(report_unit, *) "    Epot_conf = ", Epot_conf
-        write(report_unit, *) "    relative difference = ", abs((Epot_conf-Epot)/Epot_conf)
+        write(report_unit, *) "    relative difference = ", difference
+        
+        if (difference > consist_tiny) then
+            write(error_unit, *) "WARNING !"
+            write(report_unit, *) "WARNING !"
+        else
+            write(report_unit, *) "    OK !"
+        end if
     
     end subroutine InteractingSpheres_consistTest
 
