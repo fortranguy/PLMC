@@ -198,7 +198,7 @@ contains
 
     end subroutine DipolarSpheres_Epot_real_init
     
-    !> Print the tabulated potential
+    !> Print the tabulated real potential
     
     subroutine DipolarSpheres_Epot_real_print(this, Epot_unit)
 
@@ -321,6 +321,8 @@ contains
         Epot_self = 2._DP/3._DP * this%alpha**3/sqrt(PI) * momentsSum
         
     end function DipolarSpheres_Epot_self
+    
+    !> Real potential energy : short-range
     
     subroutine DipolarSpheres_Epot_neigh(this, iCol, xCol, iCell, overlap, energ)
         
