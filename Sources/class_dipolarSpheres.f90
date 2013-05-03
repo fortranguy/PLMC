@@ -51,6 +51,7 @@ private
         procedure :: Epot_real_interpol => DipolarSpheres_Epot_real_interpol
         procedure :: Epot_real_pair => DipolarSpheres_Epot_real_pair
         procedure :: Epot_real => DipolarSpheres_Epot_real
+        procedure :: Epot_self_delta => DipolarSpheres_Epot_self_delta
         procedure :: Epot_self => DipolarSpheres_Epot_self
         procedure :: Epot_neigh => DipolarSpheres_Epot_neigh
         procedure :: Epot_conf => DipolarSpheres_Epot_conf
@@ -284,6 +285,13 @@ contains
         Epot_real = 0.5_DP*Epot_real
     
     end function DipolarSpheres_Epot_real
+    
+    function DipolarSpheres_Epot_self_delta(this) result(Epot_self_delta)
+    
+        class(DipolarSpheres), intent(in) :: this
+        real(DP) :: Epot_self_delta
+    
+    end function DipolarSpheres_Epot_self_delta
     
     !> Total self energy
     
