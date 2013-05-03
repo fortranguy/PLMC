@@ -130,7 +130,7 @@ contains
         
         class(HardSpheres), intent(in) :: this        
         integer, intent(in) :: iCol, iCell
-        real(DP), dimension(Dim), intent(in) :: xCol
+        real(DP), dimension(:), intent(in) :: xCol
         logical, intent(out) :: overlap
     
         integer :: iNeigh,  iCell_neigh

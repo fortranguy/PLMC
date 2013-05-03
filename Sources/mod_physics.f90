@@ -14,9 +14,9 @@ contains
     
     function dist(X1, X2)
     
-        real(DP), dimension(Dim), intent(in) :: X1, X2
-        
+        real(DP), dimension(:), intent(in) :: X1, X2        
         real(DP) :: dist
+        
         real(DP), dimension(Dim) :: DeltaX
         
         DeltaX(:) = distVec(X1, X2)
@@ -27,8 +27,7 @@ contains
     
     function distVec(X1, X2)
     
-        real(DP), dimension(Dim), intent(in) :: X1, X2
-
+        real(DP), dimension(:), intent(in) :: X1, X2
         real(DP), dimension(Dim) :: distVec
         
         distVec(:) = X2(:) - X1(:)
@@ -68,6 +67,7 @@ contains
     function random_surface()
         
         real(DP), dimension(Dim) :: random_surface
+        
         integer :: iDim
         
         do iDim = 1, Dim        

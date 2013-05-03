@@ -202,7 +202,7 @@ contains
         
         class(InteractingSpheres), intent(in) :: this        
         integer, intent(in) :: iCol, iCell
-        real(DP), dimension(Dim), intent(in) :: xCol
+        real(DP), dimension(:), intent(in) :: xCol
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energ
     

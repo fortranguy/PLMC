@@ -256,7 +256,7 @@ contains
         
         class(DipolarSpheres), intent(in) :: this
         integer, intent(in) :: iCol, iCell
-        real(DP), dimension(Dim), intent(in) :: xCol
+        real(DP), dimension(:), intent(in) :: xCol
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energ
     
@@ -419,8 +419,7 @@ contains
     
     function DipolarSpheres_Epot_conf(this) result(Epot_conf)
     
-        class(DipolarSpheres), intent(in) :: this
-        
+        class(DipolarSpheres), intent(in) :: this        
         real(DP) :: Epot_conf
         
         integer :: iCol, jCol
