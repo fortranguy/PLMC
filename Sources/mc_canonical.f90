@@ -7,7 +7,7 @@ use data_constants
 use data_mc
 use data_distrib
 use class_mixingPotential
-use class_interactingSpheres
+use class_dipolarSpheres
 use class_hardSpheres
 use class_observables
 use class_units
@@ -35,10 +35,10 @@ implicit none
     integer :: mix_Epot_unit !< tabulated potential file
     integer :: mix_obsTherm_unit, mix_obs_unit
     
-    ! Type 1 : Interacting spheres : short-range potential
-    type(InteractingSpheres) :: type1_sph !< Monte-Carlo subroutines
+    ! Type 1 : Dipolar spheres : Ewald summation
+    type(DipolarSpheres) :: type1_sph !< Monte-Carlo subroutines
     type(Observables) :: type1_obs !< energy & inverse of activity (-> chemical potential)
-    type(Units) :: type1_io        !< input/output files
+    type(MoreUnits) :: type1_io !< (input/)output files
     
     ! Type 2 : Hard spheres
     type(HardSpheres) :: type2_sph
@@ -71,7 +71,7 @@ implicit none
     call type1_io%open(type1_sph%getName())
     call type1_sph%report(type1_io%report)
     call type1_sph%printInfo(type1_io%report)
-    call type1_sph%Epot_print(type1_io%Epot)
+    call type1_sph%Epot_real_print(type1_io%Epot)
     
     call type2_sph%construct(mix%getRcut())
     call type2_obs%init()
@@ -86,12 +86,13 @@ implicit none
     
     call type1_sph%overlapTest()
     type1_obs%Epot = type1_sph%Epot_conf()
-    call type1_sph%snapShot(type1_io%snapIni)
+    call type1_sph%snapShot_X(type1_io%snapIni_X)
+    call type1_sph%snapShot_M(type1_io%snapIni_M)
     call type1_sph%cols_to_cells(type2_sph%X) !< Cell List : filling cells with particles
     
     call type2_sph%overlapTest()
     type2_obs%Epot = type2_sph%Epot_conf()
-    call type2_sph%snapShot(type2_io%snapIni)
+    call type2_sph%snapShot_X(type2_io%snapIni_X)
     call type2_sph%cols_to_cells(type1_sph%X)
     
     call mix%overlapTest(type1_sph%X, type2_sph%X)
@@ -193,8 +194,9 @@ implicit none
             write(obs_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
 
             if (snap) then ! Snap shots of the configuration
-                call type1_sph%snapShot(type1_io%snapShots)
-                call type2_sph%snapShot(type2_io%snapShots)
+                call type1_sph%snapShot_X(type1_io%snapShots_X)
+                call type1_sph%snapShot_M(type1_io%snapShots_M)
+                call type2_sph%snapShot_X(type2_io%snapShots_X)
             end if
             
         end if MC_Regime
@@ -210,17 +212,18 @@ implicit none
 
     call type1_sph%overlapTest()
     call type1_sph%consistTest(type1_obs%Epot, type1_io%report)
-    call type1_sph%snapShot(type1_io%snapFin)
+    call type1_sph%snapShot_X(type1_io%snapFin_X)
+    call type1_sph%snapShot_M(type1_io%snapFin_M)
     call type1_obs%results(type1_sph%getNcol(), type1_io%report)
     
     call type2_sph%overlapTest()
     call type2_sph%consistTest(type2_obs%Epot, type2_io%report)
-    call type2_sph%snapShot(type2_io%snapFin)
+    call type2_sph%snapShot_X(type2_io%snapFin_X)
     call type2_obs%results(type2_sph%getNcol(), type2_io%report)
     
     call mix%overlapTest(type1_sph%X, type2_sph%X)
     mix_Epot_conf = mix%Epot_conf(type1_sph%X, type2_sph%X)
-    call mix_consistTest(mix_Epot, mix_Epot_conf, mix_report_unit)
+    call consistTest(mix_Epot, mix_Epot_conf, mix_report_unit)
     call mix_results(mix_EpotSum, mix_report_unit)
     
     Epot = type1_obs%Epot + type2_obs%Epot + mix_Epot

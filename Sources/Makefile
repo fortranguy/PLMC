@@ -7,8 +7,8 @@ LDFLAGS_OMP = $(LDFLAGS) -openmp
 #FFLAGS = -W -Wall -fbounds-check
 #LDFLAGS = -W -Wall -fbounds-check
 EXEC1 = xMC_Canonical
-EXEC2 = xBunching
-EXEC3 = xDistrib
+EXEC2 = xMC_Bunching
+EXEC3 = xMC_Distrib
 
 all: $(EXEC1) $(EXEC2) $(EXEC3)
 
@@ -18,7 +18,7 @@ data_copy.f90 : data.f90
 	cp data.f90 data_copy.f90
 	
 data_copy.o data_constants.mod data_cell.mod data_particles.mod data_mc.mod data_potentiel.mod \
-	data_neighbours.mod data_distrib.mod : data_copy.f90
+	data_neighbours.mod data_mc_distrib.mod : data_copy.f90
 	$(FC) $(FFLAGS) -c $<
 	touch $*.o $*.mod
 
@@ -37,7 +37,7 @@ class_spheres.o : data_constants.mod data_cell.mod data_mc.mod data_neighbours.m
 class_hardSpheres.o : data_constants.mod data_cell.mod data_particles.mod data_potentiel.mod \
 	data_mc.mod data_neighbours.mod \
 	mod_physics.o class_neighbours.o class_mixingPotential.o class_spheres.o
-class_interactingSpheres.o : data_constants.mod data_cell.mod \
+class_dipolarSpheres.o : data_constants.mod data_cell.mod \
 	data_particles.mod data_potentiel.mod data_mc.mod data_neighbours.mod \
 	mod_physics.o class_neighbours.o class_mixingPotential.o class_spheres.o
 class_observables.o : data_constants.mod data_mc.mod
@@ -58,6 +58,8 @@ class_hardSpheres.o : class_hardSpheres.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_interactingSpheres.o : class_interactingSpheres.f90
 	$(FC) -c $(FFLAGS) $< -o $@
+class_dipolarSpheres.o : class_dipolarSpheres.f90
+	$(FC) -c $(FFLAGS) $< -o $@
 class_observables.o : class_observables.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_units.o : class_units.f90
@@ -70,23 +72,23 @@ mod_tools.o : mod_tools.f90
 mc_canonical.o : mc_canonical.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 $(EXEC1) : data.o mod_physics.o class_neighbours.o class_mixingPotential.o class_spheres.o \
-	class_hardSpheres.o class_interactingSpheres.o  class_observables.o class_units.o \
+	class_hardSpheres.o class_dipolarSpheres.o  class_observables.o class_units.o \
 	mod_tools.o mc_canonical.o
 	$(FC) $^ $(LDFLAGS) -o $@
 	
 # ------------------------------------------------------------------------
 
-bunching.o : bunching.f90
+mc_bunching.o : mc_bunching.f90
 	$(FC) -c $(FFLAGS) $< -o $@
-$(EXEC2) : data.o bunching.o
+$(EXEC2) : data.o mc_bunching.o
 	$(FC) $^ $(LDFLAGS) -o $@
 
 # ------------------------------------------------------------------------
 
-distrib.o : distrib.f90
+mc_distrib.o : mc_distrib.f90
 	$(FC) -c $(FFLAGS_OMP) $< -o $@
 $(EXEC3) : data.o mod_physics.o class_neighbours.o class_mixingPotential.o class_spheres.o \
-	class_interactingSpheres.o mod_tools.o distrib.o
+	class_interactingSpheres.o mod_tools.o mc_distrib.o
 	$(FC) $^ $(LDFLAGS_OMP) -o $@
 
 # --------------------------------------------------------------------------------------------------

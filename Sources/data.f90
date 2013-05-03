@@ -9,6 +9,9 @@ implicit none
     ! double precision
     integer, parameter :: DP = selected_real_kind(15, 307)
     real(DP), parameter :: PI = acos(-1._DP)
+    real(DP), parameter :: sigma3d = 1._DP/sqrt(3._DP)
+    real(DP), parameter :: io_tiny = 1.E-10_DP
+    real(DP), parameter :: consist_tiny = 1.E-10_DP
         
 end module data_constants
 !***************************************************************************************************
@@ -44,6 +47,10 @@ use data_cell
 
 implicit none
 
+    real(DP), parameter :: dipol_radius = .5_DP
+    real(DP), parameter :: dipol_rMin = 2._DP * dipol_radius
+    integer, parameter :: dipol_Ncol = 270
+
     real(DP), parameter :: inter_radius = .5_DP
     real(DP), parameter :: inter_rMin = 2._DP * inter_radius
     integer, parameter :: inter_Ncol = 270
@@ -78,6 +85,11 @@ implicit none
     
     integer, parameter :: Nmove = 2**2 * Ncol
     
+    real(DP), dimension(Dim), parameter :: dipol_dx = 1._DP
+    real(DP), parameter :: dipol_rejFix = 0.5_DP
+    integer, parameter :: dipol_Nadapt = Ntherm/8
+    integer, parameter :: dipol_Nwidom = inter_Ncol
+    
     real(DP), dimension(Dim), parameter :: inter_dx = 1._DP
     real(DP), parameter :: inter_rejFix = 0.5_DP
     integer, parameter :: inter_Nadapt = Ntherm/8
@@ -107,6 +119,10 @@ use data_constants
 use data_particles
 
 implicit none
+
+    real(DP), parameter :: dipol_rCut = 4._DP
+    real(DP), parameter :: dipol_dr = 5.E-5_DP
+    real(DP), parameter :: dipol_alpha = 1._DP
 
     real(DP), parameter :: inter_rCut = 4._DP
     real(DP), parameter :: inter_dr = 5.E-5_DP

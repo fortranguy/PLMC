@@ -130,7 +130,7 @@ contains
         
         class(HardSpheres), intent(in) :: this        
         integer, intent(in) :: iCol, iCell
-        real(DP), dimension(Dim), intent(in) :: xCol
+        real(DP), dimension(:), intent(in) :: xCol
         logical, intent(out) :: overlap
     
         integer :: iNeigh,  iCell_neigh
@@ -280,8 +280,7 @@ contains
     
     function HardSpheres_Epot_conf(this) result(Epot_conf)
     
-        class(HardSpheres), intent(in) :: this
-        
+        class(HardSpheres), intent(in) :: this        
         real(DP) :: Epot_conf
     
         Epot_conf = this%Epot
@@ -297,12 +296,21 @@ contains
         integer, intent(in) :: report_unit
         
         real(DP) :: Epot_conf
+        real(DP) :: difference
     
         Epot_conf = this%Epot_conf()
+        difference = abs(Epot_conf-Epot)
+        
         write(report_unit, *) "Consistency test:"
         write(report_unit, *) "    Epot = ", Epot
         write(report_unit, *) "    Epot_conf = ", Epot_conf
-        write(report_unit, *) "    absolute difference = ", abs(Epot_conf-Epot)
+        write(report_unit, *) "    absolute difference = ", difference
+        
+        if (difference /= 0._DP) then
+            write(report_unit, *) "    WARNING !"
+        else
+            write(report_unit, *) "    OK !"
+        end if
     
     end subroutine HardSpheres_consistTest
 

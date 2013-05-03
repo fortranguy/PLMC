@@ -23,7 +23,7 @@ private
         real(DP) :: radius !< radius of a particle
         real(DP) :: rMin !< minimum distance between two particles
         integer ::  Ncol !< number of a component particles
-        real(DP), dimension(:, :), allocatable :: X !< position of a particle
+        real(DP), dimension(:, :), allocatable :: X !< positions of all particles
 
         ! Monte-Carlo
         real(DP), dimension(Dim) :: dx !< displacement
@@ -49,8 +49,8 @@ private
         
         procedure :: printInfo => Spheres_printInfo
         
-        !> Take a snap shot of the configuration
-        procedure :: snapShot => Spheres_snapShot
+        !> Take a snap shot of the configuration : positions
+        procedure :: snapShot_X => Spheres_snapShot_X
         
         !> Do an overlap test
         procedure :: overlapTest => Spheres_overlapTest
@@ -71,8 +71,7 @@ contains
 
     function Spheres_getName(this) result(getName)
     
-        class(Spheres), intent(in) :: this
-        
+        class(Spheres), intent(in) :: this        
         character(len=5) :: getName
         
         getName = this%name
@@ -83,8 +82,7 @@ contains
 
     function Spheres_getNcol(this) result(getNcol)
     
-        class(Spheres), intent(in) :: this
-        
+        class(Spheres), intent(in) :: this        
         integer :: getNcol
         
         getNcol = this%Ncol
@@ -95,8 +93,7 @@ contains
     
     function Spheres_getRmin(this) result(getRmin)
     
-        class(Spheres), intent(in) :: this
-        
+        class(Spheres), intent(in) :: this        
         real(DP) :: getRmin
         
         getRmin = this%rMin
@@ -107,8 +104,7 @@ contains
     
     function Spheres_getNadapt(this) result(getNadapt)
     
-        class(Spheres), intent(in) :: this
-        
+        class(Spheres), intent(in) :: this        
         integer :: getNadapt
         
         getNadapt = this%Nadapt
@@ -124,21 +120,19 @@ contains
         
         real(DP) :: density, compac
         
-        write(output_unit, *) this%name, " :"
-        
         density = real(this%Ncol, DP) / product(Lsize)
-        write(output_unit, *) "    density = ", density
-        write(report_unit, *) "    density = ", density
-        
         compac = 4._DP/3._DP*PI*this%radius**3 * density
-        write(output_unit, *) "    compacity = ", compac
+        
+        write(output_unit, *) this%name, " : ", "density = ", density, "compacity = ", compac
+        
+        write(report_unit, *) "    density = ", density
         write(report_unit, *) "    compacity = ", compac
     
     end subroutine Spheres_printInfo
     
-    !> Configuration state
+    !> Configuration state : positions
       
-    subroutine Spheres_snapShot(this, snap_unit)
+    subroutine Spheres_snapShot_X(this, snap_unit)
         
         class(Spheres), intent(in) :: this
         integer, intent(in) :: snap_unit
@@ -149,7 +143,7 @@ contains
             write(snap_unit, *) this%X(:, iCol)
         end do    
 
-    end subroutine Spheres_snapShot
+    end subroutine Spheres_snapShot_X
     
     !> Overlapt test
     
@@ -258,13 +252,13 @@ contains
     
     end subroutine Spheres_definiteDx
     
-    function Spheres_getDx(this)
+    function Spheres_getDx(this) result(getDx)
         
-        class(Spheres), intent(in) :: this
+        class(Spheres), intent(in) :: this        
+        real(DP) :: getDx
         
-        real(DP) :: Spheres_getDx
         ! average dx of 3 vector components
-        Spheres_getDx = sum(this%dx)/size(this%dx)
+        getDx = sum(this%dx)/size(this%dx)
         
     end function Spheres_getDx    
 

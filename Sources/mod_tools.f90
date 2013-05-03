@@ -8,6 +8,8 @@ use data_particles
 use data_mc
 use mod_physics
 use class_spheres
+use class_dipolarSpheres
+use class_hardSpheres
 
 implicit none
 
@@ -42,7 +44,8 @@ contains
     
     subroutine initialCondition(type1, type2, mix_rMin, report_unit)
     
-        class(Spheres), intent(inout) :: type1, type2
+        class(DipolarSpheres), intent(inout) :: type1
+        class(Spheres), intent(inout) :: type2
         real(DP), intent(in) :: mix_rMin
         integer, intent(in) :: report_unit        
 
@@ -60,37 +63,40 @@ contains
                 
                 select case (init)
                     case ("rand") 
-                        call randomDeposition(type1%X, type1%getRMin(), type2%X, type2%getRmin(), mix_rMin)
-                        write(output_unit, *) "Random deposition"
-                        write(report_unit, *) "    Random deposition"
+                        call randomDepositions(type1%X, type1%getRMin(), type2%X, type2%getRmin(), &
+                                               mix_rMin)
+                        call randomMoments(type1%M)
+                        write(output_unit, *) "Random depositions + random orientations"
+                        write(report_unit, *) "    Random depositions + random orientations"
                     case default
                         write(error_unit, *) "Enter the initial condition : "
-                        write(error_unit, *) "   'rand' or '[file1] [file2]'."
+                        write(error_unit, *) "   'rand' or '[type1_X] [type1_M] [type2_X]'."
                         stop
                 end select
                 
-            case (2)
+            case (3)
             
                 write(output_unit, *) "Old configuration"
                 write(report_unit, *) "    Old configuration"
                 
-                call oldConfiguration(1, type1%getName(), type1%X)
-                call oldConfiguration(2, type2%getName(), type2%X)
+                call oldConfiguration(1, type1%getName()//"_X", type1%X, dot_product(Lsize, Lsize))
+                call oldConfiguration(2, type1%getName()//"_M", type1%M, 1._DP)
+                call oldConfiguration(3, type2%getName()//"_X", type2%X, dot_product(Lsize, Lsize))
             
             case default
                 write(error_unit, *) "Enter the initial condition : "
-                write(error_unit, *) "   'rand' or '[file1] [file2]'."
+                write(error_unit, *) "   'rand' or '[type1_X] [type1_M] [type2_X]'."
                 stop
                 
         end select
         
     end subroutine initialCondition
     
-    !> Random deposition configuration
+    !> Random depositions configuration
     
-    subroutine randomDeposition(type1_X, type1_rMin, type2_X, type2_rMin, mix_rMin)
+    subroutine randomDepositions(type1_X, type1_rMin, type2_X, type2_rMin, mix_rMin)
     
-        real(DP), dimension(:, :), intent(inout) :: type1_X, type2_X
+        real(DP), dimension(:, :), intent(out) :: type1_X, type2_X
         real(DP), intent(in) :: type1_rMin, type2_rMin, mix_rMin
         
         integer :: type1_Ncol, type2_Ncol
@@ -137,15 +143,33 @@ contains
         
         end do
     
-    end subroutine randomDeposition
+    end subroutine randomDepositions
+    
+    !> Uniform (gaussian) moments
+    
+    subroutine randomMoments(type_M)
+    
+        real(DP), dimension(:, :), intent(out) :: type_M
+        
+        integer :: type_Ncol
+        integer :: iCol
+        
+        type_Ncol = size(type_M, 2)
+        
+        do iCol = 1, type_Ncol
+            type_M(:, iCol) = random_surface()
+        end do
+    
+    end subroutine randomMoments
     
     !> From an old configuration
     
-    subroutine oldConfiguration(iType, type_name, type_X)
+    subroutine oldConfiguration(iFile, type_name, type_vec, normSqrMax)
     
-        integer, intent(in) :: iType
+        integer, intent(in) :: iFile
         character(len=*), intent(in) :: type_name
-        real(DP), dimension(:, :), intent(out) :: type_X
+        real(DP), dimension(:, :), intent(out) :: type_vec
+        real(DP), intent(in) :: normSqrMax
     
         character(len=20) :: file
         integer :: length
@@ -154,20 +178,19 @@ contains
 
         integer :: type_Ncol
         integer :: iCol
-        real(DP), dimension(Dim) :: xDummy
-        real(DP) :: normSqr, normSqrMax
+        real(DP), dimension(Dim) :: vecDummy
+        real(DP) :: normSqr
         
-        call get_command_argument(iType, file, length, fileStat)
+        call get_command_argument(iFile, file, length, fileStat)
         if (fileStat /= 0) stop "error get_command_argument"
         write(output_unit, *) type_name, " <- ", file(1:length)
         open(newunit=file_unit, recl=4096, file=file(1:length), status='old', action='read')
         
-        type_Ncol = size(type_X, 2)
-        normSqrMax = dot_product(Lsize, Lsize)
+        type_Ncol = size(type_vec, 2)
         
         iCol = 0
         do
-            read(file_unit, fmt=*, iostat=readStat) xDummy(:)
+            read(file_unit, fmt=*, iostat=readStat) vecDummy(:)
             if (readStat == iostat_end) exit
             iCol = iCol + 1
         end do
@@ -175,13 +198,12 @@ contains
         if (iCol == type_Ncol) then
             rewind(file_unit)
             do iCol = 1, type_Ncol
-                read(file_unit, *) type_X(:, iCol)
-                normSqr = dot_product(type_X(:, iCol), type_X(:, iCol))
-                if (normSqr > normSqrMax) then
-                    write(error_unit, *) "Size error : ", file(1:length)
-                    write(error_unit, *) "xCol ", type_X(:, iCol)
-                    write(error_unit, *) "vs"
-                    write(error_unit, *) "Lsize", Lsize(:)
+                read(file_unit, *) type_vec(:, iCol)
+                normSqr = dot_product(type_vec(:, iCol), type_vec(:, iCol))
+                if (normSqr > normSqrMax+io_tiny) then
+                    write(error_unit, *) "Norm error : ", file(1:length)
+                    write(error_unit, *) "Vec ", type_vec(:, iCol)
+                    write(error_unit, *) "NormSqr", normSqr
                     stop
                 end if
             end do
@@ -214,17 +236,27 @@ contains
     
     end subroutine report
     
-    ! Total : consistency test
+    ! Total & Mix : consistency test
     
     subroutine consistTest(Epot, Epot_conf, report_unit)
     
         real(DP), intent(in) :: Epot, Epot_conf
         integer, intent(in) :: report_unit
+        
+        real(DP) :: difference
     
+        difference = abs((Epot_conf-Epot)/Epot_conf)
+        
         write(report_unit, *) "Consistency test:"
         write(report_unit, *) "    Epot = ", Epot
         write(report_unit, *) "    Epot_conf = ", Epot_conf
-        write(report_unit, *) "    relative difference = ", abs((Epot_conf-Epot)/Epot_conf)
+        write(report_unit, *) "    relative difference = ", difference
+        
+        if (difference > consist_tiny) then
+            write(report_unit, *) "    WARNING !"
+        else
+            write(report_unit, *) "    OK !"
+        end if
     
     end subroutine consistTest
     
@@ -241,20 +273,6 @@ contains
         write(report_unit, *) "    duration =", duration/60._DP, "min"
     
     end subroutine results
-    
-    ! Mix : consistency test
-    
-    subroutine mix_consistTest(Epot, Epot_conf, report_unit)
-    
-        real(DP), intent(in) :: Epot, Epot_conf
-        integer, intent(in) :: report_unit
-    
-        write(report_unit, *) "Consistency test:"
-        write(report_unit, *) "    Epot = ", Epot
-        write(report_unit, *) "    Epot_conf = ", Epot_conf
-        write(report_unit, *) "    relative difference = ", abs((Epot_conf-Epot)/Epot_conf)
-    
-    end subroutine mix_consistTest
     
     !> Mix : Results
     

@@ -172,10 +172,10 @@ contains
     function Neighbours_position_to_cell(this, xCol) result(position_to_cell)
     
         class(Neighbours), intent(in) :: this
-        real(DP), dimension(Dim), intent(in) :: xCol
-        
-        integer, dimension(Dim) :: cell_coord
+        real(DP), dimension(:), intent(in) :: xCol
         integer :: position_to_cell
+        
+        integer, dimension(Dim) :: cell_coord        
     
         cell_coord(:) = int(xCol(:)/this%cell_Lsize(:)) + 1
         position_to_cell = cell_coord(1) + this%cell_coordMax(1)*(cell_coord(2)-1) + &
@@ -287,9 +287,8 @@ contains
 
     function Neighbours_cell_coord_to_ind(this, coord) result(cell_coord_to_ind)
         
-        class(Neighbours), intent(in) :: this    
-        integer, dimension(Dim), intent(in) :: coord
-        
+        class(Neighbours), intent(in) :: this
+        integer, dimension(:), intent(in) :: coord
         integer :: cell_coord_to_ind
         
         cell_coord_to_ind = coord(1) + this%cell_coordMax(1)*(coord(2)-1) + &
@@ -299,8 +298,7 @@ contains
     
     function cell_neigh_coord_to_ind(neigh_coord)
     
-        integer, dimension(Dim), intent(in) :: neigh_coord
-        
+        integer, dimension(:), intent(in) :: neigh_coord        
         integer :: cell_neigh_coord_to_ind
         
         cell_neigh_coord_to_ind = neigh_coord(1) + cell_neigh_coordMax(1)*(neigh_coord(2)-1) + &
@@ -311,8 +309,7 @@ contains
     function Neighbours_cell_period(this, coord) result(cell_period)
     
         class(Neighbours), intent(in) :: this    
-        integer, dimension(Dim), intent(in) :: coord
-        
+        integer, dimension(:), intent(in) :: coord        
         integer, dimension(Dim) :: cell_period
         
         cell_period(:) = coord(:)

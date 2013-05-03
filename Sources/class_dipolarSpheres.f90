@@ -1,6 +1,6 @@
-!> \brief Description of the InteractingSpheres class
+!> \brief Description of the DipolarSpheres class
 
-module class_interactingSpheres
+module class_dipolarSpheres
 
 use iso_fortran_env
 use data_constants
@@ -18,72 +18,79 @@ implicit none
 
 private
 
-    type, extends(Spheres), public :: InteractingSpheres
+    type, extends(Spheres), public :: DipolarSpheres
 
         private
+        
+        ! Particles
+        
+        real(DP), dimension(:, :), allocatable, public :: M !< moments of all particles
 
-        ! Potential :
+        ! Potential
         real(DP)  :: dr !< discretisation step
         integer :: iMin !< minimum index of tabulation : minimum distance
         integer :: iCut !< maximum index of tabulation : until potential cut
-        real(DP) :: epsilon !< factor in Yukawa
-        real(DP) :: alpha !< coefficient in Yukawa
-        real(DP), dimension(:), allocatable :: Epot_tab !< tabulation
+        real(DP) :: alpha !< coefficient of Ewald summation
+        real(DP), dimension(:, :), allocatable :: Epot_real_tab !< tabulation : real short-range
         
     contains
 
         !> Construction and destruction of the class
-        procedure :: construct => InteractingSpheres_construct
-        procedure :: destroy => InteractingSpheres_destroy
+        procedure :: construct => DipolarSpheres_construct
+        procedure :: destroy => DipolarSpheres_destroy
         
         !> Print a report of the component in a file
-        procedure :: report => InteractingSpheres_report
+        procedure :: report => DipolarSpheres_report
+        
+        !> Take a snap shot of the configuration : orientations
+        procedure :: snapShot_M => DipolarSpheres_snapShot_M
         
         !> Potential energy
-        procedure :: Epot_init => InteractingSpheres_Epot_init
-        procedure :: Epot_print => InteractingSpheres_Epot_print
-        procedure :: Epot_pair => InteractingSpheres_Epot_pair
-        procedure :: Epot_neigh => InteractingSpheres_Epot_neigh
-        procedure :: Epot_conf => InteractingSpheres_Epot_conf
-        procedure :: consistTest => InteractingSpheres_consistTest
+        procedure :: Epot_real_init => DipolarSpheres_Epot_real_init
+        procedure :: Epot_real_print => DipolarSpheres_Epot_real_print
+        procedure :: Epot_real_pair => DipolarSpheres_Epot_real_pair
+        procedure :: Epot_real => DipolarSpheres_Epot_real
+        procedure :: Epot_neigh => DipolarSpheres_Epot_neigh
+        procedure :: Epot_conf => DipolarSpheres_Epot_conf
+        procedure :: consistTest => DipolarSpheres_consistTest
         
         !> Monte-Carlo
-        procedure :: move => InteractingSpheres_move
-        procedure :: widom => InteractingSpheres_widom
+        procedure :: move => DipolarSpheres_move
+        procedure :: widom => DipolarSpheres_widom
         
-    end type InteractingSpheres
+    end type DipolarSpheres
     
 contains
 
-    subroutine InteractingSpheres_construct(this, shared_rCut)
+    subroutine DipolarSpheres_construct(this, shared_rCut)
     
-        class(InteractingSpheres), intent(out) :: this
+        class(DipolarSpheres), intent(out) :: this
         real(DP), intent(in) :: shared_rCut
         
-        this%name = "inter"
+        this%name = "dipol"
     
         ! Particles
-        this%radius = inter_radius
-        this%rMin = inter_rMin
-        this%Ncol = inter_Ncol
+        this%radius = dipol_radius
+        this%rMin = dipol_rMin
+        this%Ncol = dipol_Ncol
         allocate(this%X(Dim, this%Ncol))
+        allocate(this%M(Dim, this%Ncol))
         
         ! Monte-Carlo
-        this%dx = inter_dx
-        this%dx_save = inter_dx
-        this%rejFix = inter_rejFix
-        this%Nadapt = inter_Nadapt
-        this%Nwidom = inter_Nwidom
+        this%dx = dipol_dx
+        this%dx_save = dipol_dx
+        this%rejFix = dipol_rejFix
+        this%Nadapt = dipol_Nadapt
+        this%Nwidom = dipol_Nwidom
         
         ! Potential
-        this%rCut = inter_rCut
-        this%dr = inter_dr
+        this%rCut = dipol_rCut
+        this%dr = dipol_dr
         this%iMin = int(this%rMin/this%dr)
         this%iCut = int(this%rCut/this%dr)
-        this%epsilon = inter_epsilon
-        this%alpha = inter_alpha        
-        allocate(this%Epot_tab(this%iMin:this%iCut))
-        call this%Epot_init()
+        this%alpha = dipol_alpha        
+        allocate(this%Epot_real_tab(this%iMin:this%iCut, 2))
+        call this%Epot_real_init()
         
         ! Neighbours : same kind    
         call this%same%construct(this%rCut)
@@ -94,30 +101,34 @@ contains
         call this%mix%alloc_cells()
         call this%mix%ini_cell_neighs()
     
-    end subroutine InteractingSpheres_construct
+    end subroutine DipolarSpheres_construct
     
-    subroutine InteractingSpheres_destroy(this)
+    subroutine DipolarSpheres_destroy(this)
     
-        class(InteractingSpheres), intent(inout) :: this
+        class(DipolarSpheres), intent(inout) :: this
         
         if (allocated(this%X)) then
             deallocate(this%X)
         end if
         
-        if (allocated(this%Epot_tab)) then
-            deallocate(this%Epot_tab)
+        if (allocated(this%M)) then
+            deallocate(this%M)
+        end if
+        
+        if (allocated(this%Epot_real_tab)) then
+            deallocate(this%Epot_real_tab)
         endif
         
         call this%same%destroy()
         call this%mix%destroy()
     
-    end subroutine InteractingSpheres_destroy
+    end subroutine DipolarSpheres_destroy
     
     !> Report
     
-    subroutine InteractingSpheres_report(this, report_unit)
+    subroutine DipolarSpheres_report(this, report_unit)
     
-        class(InteractingSpheres), intent(in) :: this
+        class(DipolarSpheres), intent(in) :: this
         integer, intent(in) :: report_unit    
         
         write(report_unit, *) "Data :"
@@ -125,8 +136,7 @@ contains
         write(report_unit ,*) "    Ncol = ", this%Ncol
         write(report_unit ,*) "    Nwidom = ", this%Nwidom
         write(report_unit ,*) "    Nadapt = ", this%Nadapt
-        
-        write(report_unit, *) "    epsilon = ", this%epsilon
+
         write(report_unit, *) "    alpha = ", this%alpha
         write(report_unit, *) "    rCut = ", this%rCut
         write(report_unit, *) "    dr = ", this%dr
@@ -136,35 +146,60 @@ contains
         write(report_unit, *) "    mix_cell_coordMax(:) = ", this%mix%cell_coordMax(:)
         write(report_unit, *) "    mix_cell_Lsize(:) = ", this%mix%cell_Lsize(:)
         
-    end subroutine InteractingSpheres_report
+    end subroutine DipolarSpheres_report
+    
+    !> Configuration state : orientations
+      
+    subroutine DipolarSpheres_snapShot_M(this, snap_unit)
+        
+        class(DipolarSpheres), intent(in) :: this
+        integer, intent(in) :: snap_unit
+    
+        integer :: iCol
+        
+        do iCol = 1, this%Ncol
+            write(snap_unit, *) this%M(:, iCol)
+        end do    
+
+    end subroutine DipolarSpheres_snapShot_M
     
     !> Potential energy
-    !> Tabulation of Yukawa potential    
-    !> \f[ \epsilon \frac{e^{-\alpha (r-r_{min})}}{r} \f]
     
-    subroutine InteractingSpheres_Epot_init(this)
+    subroutine DipolarSpheres_Epot_real_init(this)
     
-        class(InteractingSpheres), intent(inout) :: this
+        class(DipolarSpheres), intent(inout) :: this
 
         integer :: i
         real(DP) :: r_i
+        real(DP) :: alpha
+        
+        alpha = this%alpha
        
         ! cut
-        do i = this%iMin, this%iCut       
+        do i = this%iMin, this%iCut
+        
             r_i = real(i, DP)*this%dr
-            this%Epot_tab(i) = this%epsilon * exp(-this%alpha*(r_i-this%rMin)) / r_i
+            
+            this%Epot_real_tab(i, 1) = erfc(alpha*r_i)/r_i**3 + &
+                                  2._DP*alpha/sqrt(PI) * exp(-alpha**2*r_i**2) / r_i**2
+                                 
+            this%Epot_real_tab(i, 2) = 3._DP*erfc(alpha*r_i)/r_i**5 + &
+                                  2._DP*alpha/sqrt(PI) * (2_DP*alpha**2+3._DP/r_i**2) * &
+                                                         exp(-alpha**2*r_i**2) / r_i**2
+                                    
         end do
         
         ! shift        
-        this%Epot_tab(:) = this%Epot_tab(:) - this%Epot_tab(this%iCut)
+        this%Epot_real_tab(:, 1) = this%Epot_real_tab(:, 1) - this%Epot_real_tab(this%iCut, 1)
+        this%Epot_real_tab(:, 2) = this%Epot_real_tab(:, 2) - this%Epot_real_tab(this%iCut, 2)
 
-    end subroutine InteractingSpheres_Epot_init
+    end subroutine DipolarSpheres_Epot_real_init
     
     !> Print the tabulated potential
     
-    subroutine InteractingSpheres_Epot_print(this, Epot_unit)
+    subroutine DipolarSpheres_Epot_real_print(this, Epot_unit)
 
-        class(InteractingSpheres), intent(in) :: this
+        class(DipolarSpheres), intent(in) :: this
         integer, intent(in) :: Epot_unit
 
         integer :: i
@@ -172,16 +207,16 @@ contains
 
         do i = this%iMin, this%iCut
             r_i = real(i, DP)*this%dr
-            write(Epot_unit, *) r_i, this%Epot_tab(i)
+            write(Epot_unit, *) r_i, this%Epot_real_tab(i, :)
         end do
 
-    end subroutine InteractingSpheres_Epot_print
+    end subroutine DipolarSpheres_Epot_real_print
 
-    function InteractingSpheres_Epot_pair(this, r) result(Epot_pair)
+    function DipolarSpheres_Epot_real_pair(this, r) result(Epot_real_pair)
         
-        class(InteractingSpheres), intent(in) :: this
+        class(DipolarSpheres), intent(in) :: this
         real(DP), intent(in) :: r
-        real(DP) :: Epot_pair
+        real(DP), dimension(2) :: Epot_real_pair
         
         integer :: i
         real(DP) :: r_i
@@ -190,28 +225,48 @@ contains
        
             i = int(r/this%dr)
             r_i = real(i, DP)*this%dr
-            Epot_pair = this%Epot_tab(i) + (r-r_i)/this%dr * (this%Epot_tab(i+1)-this%Epot_tab(i))
+            Epot_real_pair(:) = this%Epot_real_tab(i, :) + (r-r_i)/this%dr * &
+                               (this%Epot_real_tab(i+1, :) - this%Epot_real_tab(i, :))
            
         else
        
-            Epot_pair = 0._DP
+            Epot_real_pair(:) = 0._DP
            
         end if
         
-    end function InteractingSpheres_Epot_pair
+    end function DipolarSpheres_Epot_real_pair
     
-    subroutine InteractingSpheres_Epot_neigh(this, iCol, xCol, iCell, overlap, energ)
+    function DipolarSpheres_Epot_real(this, iCol, jCol, rVec, r) result(Epot_real)
+    
+        class(DipolarSpheres), intent(in) :: this
+        integer, intent(in) :: iCol, jCol
+        real(DP), dimension(:), intent(in) :: rVec
+        real(DP), intent(in) :: r
+        real(DP) :: Epot_real
         
-        class(InteractingSpheres), intent(in) :: this        
+        real(DP), dimension(2) :: Epot_real_coeff
+        
+        Epot_real_coeff(1) = dot_product(this%M(:, iCol), this%M(:, jCol))
+        Epot_real_coeff(2) =-dot_product(this%M(:, iCol), rVec) * dot_product(this%M(:, jCol), rVec)
+        
+        Epot_real = dot_product(Epot_real_coeff, this%Epot_real_pair(r))
+    
+    end function DipolarSpheres_Epot_real
+    
+    subroutine DipolarSpheres_Epot_neigh(this, iCol, xCol, iCell, overlap, energ)
+        
+        class(DipolarSpheres), intent(in) :: this
         integer, intent(in) :: iCol, iCell
         real(DP), dimension(:), intent(in) :: xCol
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energ
     
         integer :: iNeigh,  iCell_neigh
-        real(DP) :: r
-    
+        real(DP), dimension(Dim) :: rVec
+        real(DP) :: r        
+        
         type(Link), pointer :: current => null(), next => null()
+        
         
         overlap = .false.
         energ = 0._DP
@@ -228,12 +283,15 @@ contains
             
                 if (current%iCol /= iCol) then
                 
-                    r = dist(xCol(:), this%X(:, current%iCol))
+                    rVec = distVec(xCol(:), this%X(:, current%iCol))
+                    r = dot_product(rVec, rVec)
+                    
                     if (r < this%rMin) then
                         overlap = .true.
                         return
                     end if
-                    energ = energ + this%Epot_pair(r)
+                    
+                    energ = energ + this%Epot_real(iCol, current%iCol, rVec, r)
        
                 end if
                 
@@ -245,13 +303,13 @@ contains
             
         end do
     
-    end subroutine InteractingSpheres_Epot_neigh
+    end subroutine DipolarSpheres_Epot_neigh
     
     !> Particle move
     
-    subroutine InteractingSpheres_move(this, other, mix, same_Epot, mix_Epot, Nrej)
+    subroutine DipolarSpheres_move(this, other, mix, same_Epot, mix_Epot, Nrej)
     
-        class(InteractingSpheres), intent(inout) :: this
+        class(DipolarSpheres), intent(inout) :: this
         class(Spheres), intent(inout) :: other
         class(MixingPotential), intent(in) :: mix        
         real(DP), intent(inout) :: same_Epot, mix_Epot
@@ -323,13 +381,13 @@ contains
             Nrej = Nrej + 1            
         end if
     
-    end subroutine InteractingSpheres_move
+    end subroutine DipolarSpheres_move
     
     !> Widom's method
 
-    subroutine InteractingSpheres_widom(this, activ)
+    subroutine DipolarSpheres_widom(this, activ)
         
-        class(InteractingSpheres), intent(in) :: this
+        class(DipolarSpheres), intent(in) :: this
         real(DP), intent(inOut) :: activ 
         
         integer :: iWid
@@ -356,26 +414,31 @@ contains
         
         activ = widTestSum/real(this%Nwidom, DP)
         
-    end subroutine InteractingSpheres_widom
+    end subroutine DipolarSpheres_widom
 
     !> Total potential energy
     
-    function InteractingSpheres_Epot_conf(this) result(Epot_conf)
+    function DipolarSpheres_Epot_conf(this) result(Epot_conf)
     
-        class(InteractingSpheres), intent(in) :: this
+        class(DipolarSpheres), intent(in) :: this        
         real(DP) :: Epot_conf
         
         integer :: iCol, jCol
+        real(DP), dimension(Dim) :: rVec_ij
         real(DP) :: r_ij
+        real(DP) :: Epot_real
+        real(DP), dimension(2) :: Epot_real_coeff
     
         Epot_conf = 0._DP
         
         do jCol = 1, this%Ncol
             do iCol = 1, this%Ncol
                 if (iCol /= jCol) then
-                
-                    r_ij = dist(this%X(:, iCol), this%X(:, jCol))
-                    Epot_conf = Epot_conf + this%Epot_pair(r_ij)
+                    
+                    rVec_ij = distVec(this%X(:, iCol), this%X(:, jCol))
+                    r_ij = dot_product(rVec_ij, rVec_ij)
+                    
+                    Epot_conf = Epot_conf + this%Epot_real(iCol, jCol, rVec_ij, r_ij)
                     
                 end if
             end do
@@ -383,13 +446,13 @@ contains
         
         Epot_conf = 0.5_DP*Epot_conf
     
-    end function InteractingSpheres_Epot_conf
+    end function DipolarSpheres_Epot_conf
     
     !> Consistency test 
     
-    subroutine InteractingSpheres_consistTest(this, Epot, report_unit)
+    subroutine DipolarSpheres_consistTest(this, Epot, report_unit)
     
-        class(InteractingSpheres), intent(in) :: this
+        class(DipolarSpheres), intent(in) :: this
         real(DP), intent(in) :: Epot
         integer, intent(in) :: report_unit
         
@@ -410,6 +473,6 @@ contains
             write(report_unit, *) "    OK !"
         end if
     
-    end subroutine InteractingSpheres_consistTest
+    end subroutine DipolarSpheres_consistTest
 
-end module class_interactingSpheres
+end module class_dipolarSpheres
