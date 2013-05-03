@@ -224,8 +224,8 @@ contains
        
             i = int(r/this%dr)
             r_i = real(i, DP)*this%dr
-            Epot_real_pair(:) = this%Epot_real_tab(i, :) + &
-                           (r-r_i)/this%dr * (this%Epot_real_tab(i+1, :) - this%Epot_real_tab(i, :))
+            Epot_real_pair(:) = this%Epot_real_tab(i, :) + (r-r_i)/this%dr * &
+                               (this%Epot_real_tab(i+1, :) - this%Epot_real_tab(i, :))
            
         else
        
@@ -424,7 +424,7 @@ contains
         real(DP) :: Epot_conf
         
         integer :: iCol, jCol
-        real(DP), dimension(Dim) :: r_vec
+        real(DP), dimension(Dim) :: r_vec_ij
         real(DP) :: r_ij
         real(DP) :: Epot_real
         real(DP), dimension(2) :: Epot_real_coeff
@@ -435,10 +435,10 @@ contains
             do iCol = 1, this%Ncol
                 if (iCol /= jCol) then
                     
-                    r_vec = dist_vec(this%X(:, iCol), this%X(:, jCol))
-                    r_ij = dot_product(r_vec, r_vec)
+                    r_vec_ij = dist_vec(this%X(:, iCol), this%X(:, jCol))
+                    r_ij = dot_product(r_vec_ij, r_vec_ij)
                     
-                    Epot_conf = Epot_conf + this%Epot_real(iCol, jCol, r_vec, r_ij)
+                    Epot_conf = Epot_conf + this%Epot_real(iCol, jCol, r_vec_ij, r_ij)
                     
                 end if
             end do
