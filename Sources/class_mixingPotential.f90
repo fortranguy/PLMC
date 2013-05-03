@@ -102,8 +102,7 @@ contains
     
     function MixingPotential_getRmin(this) result(getRmin)
     
-        class(MixingPotential), intent(in) :: this
-        
+        class(MixingPotential), intent(in) :: this        
         real(DP) :: getRmin
         
         getRmin = this%rMin
@@ -114,8 +113,7 @@ contains
     
     function MixingPotential_getRcut(this) result(getRcut)
     
-        class(MixingPotential), intent(in) :: this
-        
+        class(MixingPotential), intent(in) :: this        
         real(DP) :: getRcut
         
         getRcut = this%rCut
@@ -196,9 +194,10 @@ contains
         
         class(MixingPotential), intent(in) :: this
         real(DP), intent(in) :: r
+        real(DP) :: Epot_pair
         
         integer :: i
-        real(DP) :: r_i, Epot_pair
+        real(DP) :: r_i
        
         if (r < this%rCut) then
        
@@ -265,11 +264,11 @@ contains
     
         class(MixingPotential), intent(in) :: this
         real(DP), dimension(:, :), intent(in) :: type1_X, type2_X
+        real(DP) :: Epot_conf
         
         integer :: Ncol1, Ncol2
         integer :: iCol1, iCol2
         real(DP) :: r_mix
-        real(DP) :: Epot_conf
         
         Ncol1 = size(type1_X, 2)
         Ncol2 = size(type2_X, 2)

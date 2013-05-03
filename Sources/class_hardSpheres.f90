@@ -280,8 +280,7 @@ contains
     
     function HardSpheres_Epot_conf(this) result(Epot_conf)
     
-        class(HardSpheres), intent(in) :: this
-        
+        class(HardSpheres), intent(in) :: this        
         real(DP) :: Epot_conf
     
         Epot_conf = this%Epot

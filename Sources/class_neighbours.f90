@@ -287,8 +287,8 @@ contains
 
     function Neighbours_cell_coord_to_ind(this, coord) result(cell_coord_to_ind)
         
-        class(Neighbours), intent(in) :: this    
-        integer, dimension(:), intent(in) :: coord        
+        class(Neighbours), intent(in) :: this
+        integer, dimension(:), intent(in) :: coord
         integer :: cell_coord_to_ind
         
         cell_coord_to_ind = coord(1) + this%cell_coordMax(1)*(coord(2)-1) + &

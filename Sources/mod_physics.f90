@@ -44,6 +44,7 @@ contains
     function gauss()
         
         real(DP) :: gauss
+        
         real(DP) :: x, y
         real(DP) :: normSqr, factor
         

@@ -71,8 +71,7 @@ contains
 
     function Spheres_getName(this) result(getName)
     
-        class(Spheres), intent(in) :: this
-        
+        class(Spheres), intent(in) :: this        
         character(len=5) :: getName
         
         getName = this%name
@@ -83,8 +82,7 @@ contains
 
     function Spheres_getNcol(this) result(getNcol)
     
-        class(Spheres), intent(in) :: this
-        
+        class(Spheres), intent(in) :: this        
         integer :: getNcol
         
         getNcol = this%Ncol
@@ -95,8 +93,7 @@ contains
     
     function Spheres_getRmin(this) result(getRmin)
     
-        class(Spheres), intent(in) :: this
-        
+        class(Spheres), intent(in) :: this        
         real(DP) :: getRmin
         
         getRmin = this%rMin
@@ -107,8 +104,7 @@ contains
     
     function Spheres_getNadapt(this) result(getNadapt)
     
-        class(Spheres), intent(in) :: this
-        
+        class(Spheres), intent(in) :: this        
         integer :: getNadapt
         
         getNadapt = this%Nadapt
@@ -258,13 +254,13 @@ contains
     
     end subroutine Spheres_definiteDx
     
-    function Spheres_getDx(this)
+    function Spheres_getDx(this) result(getDx)
         
-        class(Spheres), intent(in) :: this
+        class(Spheres), intent(in) :: this        
+        real(DP) :: getDx
         
-        real(DP) :: Spheres_getDx
         ! average dx of 3 vector components
-        Spheres_getDx = sum(this%dx)/size(this%dx)
+        getDx = sum(this%dx)/size(this%dx)
         
     end function Spheres_getDx    
 

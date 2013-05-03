@@ -180,9 +180,10 @@ contains
         
         class(InteractingSpheres), intent(in) :: this
         real(DP), intent(in) :: r
+        real(DP) :: Epot_pair
         
         integer :: i
-        real(DP) :: r_i, Epot_pair
+        real(DP) :: r_i
        
         if (r < this%rCut) then
        
@@ -361,10 +362,10 @@ contains
     function InteractingSpheres_Epot_conf(this) result(Epot_conf)
     
         class(InteractingSpheres), intent(in) :: this
+        real(DP) :: Epot_conf
         
         integer :: iCol, jCol
         real(DP) :: r_ij
-        real(DP) :: Epot_conf
     
         Epot_conf = 0._DP
         

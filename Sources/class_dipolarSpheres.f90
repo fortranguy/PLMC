@@ -215,10 +215,10 @@ contains
         
         class(DipolarSpheres), intent(in) :: this
         real(DP), intent(in) :: r
+        real(DP), dimension(2) :: Epot_real_pair
         
         integer :: i
         real(DP) :: r_i
-        real(DP), dimension(2) :: Epot_real_pair
        
         if (r < this%rCut) then
        
