@@ -19,26 +19,26 @@ contains
         real(DP) :: dist
         real(DP), dimension(Dim) :: DeltaX
         
-        DeltaX(:) = dist_vec(X1, X2)
+        DeltaX(:) = distVec(X1, X2)
         
         dist = sqrt(dot_product(DeltaX, DeltaX))
     
     end function dist
     
-    function dist_vec(X1, X2)
+    function distVec(X1, X2)
     
         real(DP), dimension(Dim), intent(in) :: X1, X2
 
-        real(DP), dimension(Dim) :: dist_vec
+        real(DP), dimension(Dim) :: distVec
         
-        dist_vec(:) = X2(:) - X1(:)
-        dist_vec(:) = modulo(dist_vec(:), Lsize(:))
+        distVec(:) = X2(:) - X1(:)
+        distVec(:) = modulo(distVec(:), Lsize(:))
         
-        where( dist_vec(:) > LsizeMi(:) )
-            dist_vec(:) = dist_vec(:) - Lsize(:)
+        where(distVec(:) > LsizeMi(:))
+            distVec(:) = distVec(:) - Lsize(:)
         end where
         
-    end function dist_vec
+    end function distVec
     
     !> Rotation
     

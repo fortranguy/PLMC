@@ -235,18 +235,18 @@ contains
         
     end function DipolarSpheres_Epot_real_pair
     
-    function DipolarSpheres_Epot_real(this, iCol, jCol, r_vec, r) result(Epot_real)
+    function DipolarSpheres_Epot_real(this, iCol, jCol, rVec, r) result(Epot_real)
     
         class(DipolarSpheres), intent(in) :: this
         integer, intent(in) :: iCol, jCol
-        real(DP), dimension(:), intent(in) :: r_vec
+        real(DP), dimension(:), intent(in) :: rVec
         real(DP), intent(in) :: r
         real(DP) :: Epot_real
         
         real(DP), dimension(2) :: Epot_real_coeff
         
         Epot_real_coeff(1) = dot_product(this%M(:, iCol), this%M(:, jCol))
-        Epot_real_coeff(2) =-dot_product(this%M(:, iCol), r_vec) * dot_product(this%M(:, jCol), r_vec)
+        Epot_real_coeff(2) =-dot_product(this%M(:, iCol), rVec) * dot_product(this%M(:, jCol), rVec)
         
         Epot_real = dot_product(Epot_real_coeff, this%Epot_real_pair(r))
     
@@ -261,7 +261,7 @@ contains
         real(DP), intent(out) :: energ
     
         integer :: iNeigh,  iCell_neigh
-        real(DP), dimension(Dim) :: r_vec
+        real(DP), dimension(Dim) :: rVec
         real(DP) :: r        
         
         type(Link), pointer :: current => null(), next => null()
@@ -282,15 +282,15 @@ contains
             
                 if (current%iCol /= iCol) then
                 
-                    r_vec = dist_vec(xCol(:), this%X(:, current%iCol))
-                    r = dot_product(r_vec, r_vec)
+                    rVec = distVec(xCol(:), this%X(:, current%iCol))
+                    r = dot_product(rVec, rVec)
                     
                     if (r < this%rMin) then
                         overlap = .true.
                         return
                     end if
                     
-                    energ = energ + this%Epot_real(iCol, current%iCol, r_vec, r)
+                    energ = energ + this%Epot_real(iCol, current%iCol, rVec, r)
        
                 end if
                 
@@ -424,7 +424,7 @@ contains
         real(DP) :: Epot_conf
         
         integer :: iCol, jCol
-        real(DP), dimension(Dim) :: r_vec_ij
+        real(DP), dimension(Dim) :: rVec_ij
         real(DP) :: r_ij
         real(DP) :: Epot_real
         real(DP), dimension(2) :: Epot_real_coeff
@@ -435,10 +435,10 @@ contains
             do iCol = 1, this%Ncol
                 if (iCol /= jCol) then
                     
-                    r_vec_ij = dist_vec(this%X(:, iCol), this%X(:, jCol))
-                    r_ij = dot_product(r_vec_ij, r_vec_ij)
+                    rVec_ij = distVec(this%X(:, iCol), this%X(:, jCol))
+                    r_ij = dot_product(rVec_ij, rVec_ij)
                     
-                    Epot_conf = Epot_conf + this%Epot_real(iCol, jCol, r_vec_ij, r_ij)
+                    Epot_conf = Epot_conf + this%Epot_real(iCol, jCol, rVec_ij, r_ij)
                     
                 end if
             end do
