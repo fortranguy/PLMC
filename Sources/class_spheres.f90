@@ -120,14 +120,12 @@ contains
         
         real(DP) :: density, compac
         
-        write(output_unit, *) this%name, " :"
-        
         density = real(this%Ncol, DP) / product(Lsize)
-        write(output_unit, *) "    density = ", density
-        write(report_unit, *) "    density = ", density
-        
         compac = 4._DP/3._DP*PI*this%radius**3 * density
-        write(output_unit, *) "    compacity = ", compac
+        
+        write(output_unit, *) this%name, " : ", "density = ", density, "compacity = ", compac
+        
+        write(report_unit, *) "    density = ", density
         write(report_unit, *) "    compacity = ", compac
     
     end subroutine Spheres_printInfo
