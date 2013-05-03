@@ -287,6 +287,8 @@ contains
     end function DipolarSpheres_Epot_real
     
     !> Self energy difference : rotation
+    !> \f[ \frac{2}{3}\frac{\alpha^3}{\sqrt(\pi)} (2\vec{\Delta\mu_i}\cdot\vec{\mu_i} + &
+    !>                                              \vec{\Delta\mu_i}\cdot\vec{\Delta\mu_i})\f]
     
     function DipolarSpheres_Epot_self_delta(this, iCol, deltaM) result(Epot_self_delta)
     
@@ -301,6 +303,7 @@ contains
     end function DipolarSpheres_Epot_self_delta
     
     !> Total self energy
+    !> \f[ \frac{2}{3}\frac{\alpha^3}{\sqrt(\pi)} \sum_i \mu_i\cdot\mu_i \f]
     
     function DipolarSpheres_Epot_self(this) result(Epot_self)
     
