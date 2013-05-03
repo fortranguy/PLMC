@@ -166,7 +166,8 @@ contains
 
     end subroutine DipolarSpheres_snapShot_M
     
-    !> Potential energy
+    !> Potential energy : real part
+    !> Initialisation
     !> \f[ B(r) = \frac{\mathrm{erfc}(\alpha r)}{r^3} + 
     !>           2\frac{\alpha}{\sqrt{\pi}}\frac{e^{-\alpha^2 r^2}}{r^2} \f]
     !> \f[ C(r) = 3\frac{\mathrm{erfc}(\alpha r)}{r^5} +
@@ -203,7 +204,8 @@ contains
 
     end subroutine DipolarSpheres_Epot_real_init
     
-    !> Print the tabulated real potential
+    !> Potential energy : real part
+    !> Print the tabulated values
     
     subroutine DipolarSpheres_Epot_real_print(this, Epot_unit)
 
@@ -219,6 +221,9 @@ contains
         end do
 
     end subroutine DipolarSpheres_Epot_real_print
+    
+    !> Potential energy : real part
+    !> Linear interpolation
 
     function DipolarSpheres_Epot_real_interpol(this, r) result(Epot_real_interpol)
         
@@ -243,6 +248,11 @@ contains
         end if
         
     end function DipolarSpheres_Epot_real_interpol
+    
+    !> Potential energy : real part
+    !> Between 2 particles
+    !> \f[ (\vec{\mu}_i\cdot\vec{\mu}_j) B(r_{ij}) - 
+    !>     (\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij}) C(r_{ij}) \f]
     
     function DipolarSpheres_Epot_real_pair(this, iCol, jCol, rVec, r) result(Epot_real_pair)
     
