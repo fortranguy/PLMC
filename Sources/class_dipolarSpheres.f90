@@ -468,8 +468,7 @@ contains
         write(report_unit, *) "    relative difference = ", difference
         
         if (difference > consist_tiny) then
-            write(error_unit, *) "WARNING !"
-            write(report_unit, *) "WARNING !"
+            write(report_unit, *) "    WARNING !"
         else
             write(report_unit, *) "    OK !"
         end if

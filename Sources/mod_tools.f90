@@ -203,6 +203,7 @@ contains
                 if (normSqr > normSqrMax+io_tiny) then
                     write(error_unit, *) "Norm error : ", file(1:length)
                     write(error_unit, *) "Vec ", type_vec(:, iCol)
+                    write(error_unit, *) "NormSqr", normSqr
                     stop
                 end if
             end do
@@ -252,8 +253,7 @@ contains
         write(report_unit, *) "    relative difference = ", difference
         
         if (difference > consist_tiny) then
-            write(error_unit, *) "WARNING !"
-            write(report_unit, *) "WARNING !"
+            write(report_unit, *) "    WARNING !"
         else
             write(report_unit, *) "    OK !"
         end if
