@@ -38,7 +38,7 @@ implicit none
     ! Type 1 : Dipolar spheres : Ewald summation
     type(DipolarSpheres) :: type1_sph !< Monte-Carlo subroutines
     type(Observables) :: type1_obs !< energy & inverse of activity (-> chemical potential)
-    type(MoreUnits) :: type1_io        !< input/output files
+    type(MoreUnits) :: type1_io !< (input/)output files
     
     ! Type 2 : Hard spheres
     type(HardSpheres) :: type2_sph
