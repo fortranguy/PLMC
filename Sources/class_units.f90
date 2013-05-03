@@ -34,11 +34,6 @@ private
         integer :: snapFin_M
         integer :: snapShots_M
     
-    contains
-    
-        procedure :: openMore => MoreUnits_openMore
-        procedure :: closeMore => MoreUnits_closeMore
-    
     end type MoreUnits
     
 contains
@@ -59,20 +54,25 @@ contains
         open(newunit=this%report, recl=4096, file=name//"_report.out", status='new', action='write')
         open(newunit=this%Epot, recl=4096, file=name//"_Epot.out", status='new', action='write')
         
+        select type (this)
+        
+            type is (Units)
+            
+            class is (MoreUnits)
+            
+                open(newunit=this%dm, recl=4096, file=name//"_dm.out", status='new', action='write')
+                
+                open(newunit=this%snapIni_M, recl=4096, file=name//"_snapIni_M.out", status='new', action='write')
+                open(newunit=this%snapFin_M, recl=4096, file=name//"_snapFin_M.out", status='new', action='write')
+                open(newunit=this%snapShots_M, recl=4096, file=name//"_snap_M.shots", status='new', action='write')
+                
+            class default
+                
+                stop "Units_open : expected type for Units object !"
+                
+        end select
+        
     end subroutine Units_open
-    
-    subroutine MoreUnits_openMore(this, name)
-    
-        class(MoreUnits), intent(inout) :: this
-        character(len=*), intent(in) :: name
-        
-        open(newunit=this%dm, recl=4096, file=name//"_dm.out", status='new', action='write')
-        
-        open(newunit=this%snapIni_M, recl=4096, file=name//"_snapIni_M.out", status='new', action='write')
-        open(newunit=this%snapFin_M, recl=4096, file=name//"_snapFin_M.out", status='new', action='write')
-        open(newunit=this%snapShots_M, recl=4096, file=name//"_snap_M.shots", status='new', action='write')
-    
-    end subroutine MoreUnits_openMore
     
     subroutine Units_close(this)
     
@@ -88,19 +88,25 @@ contains
         
         close(this%report)
         close(this%Epot)
+        
+        select type (this)
+        
+            type is (Units)
+            
+            class is (MoreUnits)
+            
+                close(this%dm)
+        
+                close(this%snapIni_M)
+                close(this%snapFin_M)
+                close(this%snapShots_M)
+                    
+            class default
+                
+                stop "Units_close : expected type for Units object !"
+                
+        end select
     
     end subroutine Units_close
-    
-    subroutine MoreUnits_closeMore(this)
-    
-        class(MoreUnits), intent(inout) :: this
-        
-        close(this%dm)
-        
-        close(this%snapIni_M)
-        close(this%snapFin_M)
-        close(this%snapShots_M)
-    
-    end subroutine MoreUnits_closeMore
 
 end module class_Units

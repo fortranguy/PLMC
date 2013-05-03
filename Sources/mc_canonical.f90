@@ -69,7 +69,6 @@ implicit none
     call type1_sph%construct(mix%getRcut()) !< type1_sph needs mix%rCut for the Cell List method
     call type1_obs%init()
     call type1_io%open(type1_sph%getName())
-    call type1_io%openMore(type1_sph%getName())
     call type1_sph%report(type1_io%report)
     call type1_sph%printInfo(type1_io%report)
     call type1_sph%Epot_real_print(type1_io%Epot)
@@ -237,7 +236,6 @@ implicit none
     
     call type1_sph%destroy()
     call type1_io%close()
-    call type1_io%closeMore()
     
     call type2_sph%destroy()
     call type2_io%close()
