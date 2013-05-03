@@ -70,7 +70,7 @@ contains
                         write(report_unit, *) "    Random depositions + random orientations"
                     case default
                         write(error_unit, *) "Enter the initial condition : "
-                        write(error_unit, *) "   'rand' or '[file1] [file2]'."
+                        write(error_unit, *) "   'rand' or '[type1_X] [type1_M] [type2_X]'."
                         stop
                 end select
                 
@@ -79,12 +79,13 @@ contains
                 write(output_unit, *) "Old configuration"
                 write(report_unit, *) "    Old configuration"
                 
-                call oldConfiguration(1, type1%getName(), type1%X)
-                call oldConfiguration(2, type2%getName(), type2%X)
+                call oldConfiguration_X(1, type1%getName(), type1%X)
+                call oldConfiguration_M(2, type1%getName(), type1%M)
+                call oldConfiguration_X(3, type2%getName(), type2%X)
             
             case default
                 write(error_unit, *) "Enter the initial condition : "
-                write(error_unit, *) "   'rand' or '[file1] [file2]'."
+                write(error_unit, *) "   'rand' or '[type1_X] [type1_M] [type2_X]'."
                 stop
                 
         end select
@@ -163,9 +164,9 @@ contains
     
     !> From an old configuration
     
-    subroutine oldConfiguration(iType, type_name, type_X)
+    subroutine oldConfiguration_X(iFile, type_name, type_X)
     
-        integer, intent(in) :: iType
+        integer, intent(in) :: iFile
         character(len=*), intent(in) :: type_name
         real(DP), dimension(:, :), intent(out) :: type_X
     
@@ -179,7 +180,7 @@ contains
         real(DP), dimension(Dim) :: xDummy
         real(DP) :: normSqr, normSqrMax
         
-        call get_command_argument(iType, file, length, fileStat)
+        call get_command_argument(iFile, file, length, fileStat)
         if (fileStat /= 0) stop "error get_command_argument"
         write(output_unit, *) type_name, " <- ", file(1:length)
         open(newunit=file_unit, recl=4096, file=file(1:length), status='old', action='read')
@@ -215,7 +216,59 @@ contains
         
         close(file_unit)
         
-    end subroutine oldConfiguration
+    end subroutine oldConfiguration_X
+    
+    subroutine oldConfiguration_M(iFile, type_name, type_M)
+    
+        integer, intent(in) :: iFile
+        character(len=*), intent(in) :: type_name
+        real(DP), dimension(:, :), intent(out) :: type_M
+    
+        character(len=20) :: file
+        integer :: length
+        integer :: fileStat, readStat
+        integer :: file_unit
+
+        integer :: type_Ncol
+        integer :: iCol
+        real(DP), dimension(Dim) :: mDummy
+        real(DP) :: normSqr, normSqrMax
+        
+        call get_command_argument(iFile, file, length, fileStat)
+        if (fileStat /= 0) stop "error get_command_argument"
+        write(output_unit, *) type_name, " <- ", file(1:length)
+        open(newunit=file_unit, recl=4096, file=file(1:length), status='old', action='read')
+        
+        type_Ncol = size(type_M, 2)
+        normSqrMax = 1._DP
+        
+        iCol = 0
+        do
+            read(file_unit, fmt=*, iostat=readStat) xDummy(:)
+            if (readStat == iostat_end) exit
+            iCol = iCol + 1
+        end do
+        
+        if (iCol == type_Ncol) then
+            rewind(file_unit)
+            do iCol = 1, type_Ncol
+                read(file_unit, *) type_M(:, iCol)
+                normSqr = dot_product(type_M(:, iCol), type_M(:, iCol))
+                if (normSqr > normSqrMax) then
+                    write(error_unit, *) "Norm error : ", file(1:length)
+                    write(error_unit, *) "mCol ", type_M(:, iCol)
+                    stop
+                end if
+            end do
+        else
+            write(error_unit, *) "Error reading : ", file(1:length)
+            write(error_unit, *) "iCol", iCol, " /= ", "type_Ncol", type_Ncol
+            stop
+        end if        
+        
+        close(file_unit)
+        
+    end subroutine oldConfiguration_X
     
     !> Total : report
     
