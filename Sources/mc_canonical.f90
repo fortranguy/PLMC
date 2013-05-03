@@ -51,7 +51,7 @@ implicit none
 
     ! Initialisations & reports
     
-    open(newunit=report_unit, recl=4096, file="report.out", status='new', action='write')
+    open(newunit=report_unit, recl=4096, file="report.txt", status='new', action='write')
     open(newunit=obsTherm_unit, recl=4096, file="obsTherm.out", status='new', action='write')
     open(newunit=obs_unit, recl=4096, file="obs.out", status='new', action='write')
     call report(report_unit)
@@ -59,7 +59,7 @@ implicit none
     
     call mix%construct()
     mix_EpotSum = 0._DP
-    open(newunit=mix_report_unit, recl=4096, file="mix_report.out", status='new', action='write')
+    open(newunit=mix_report_unit, recl=4096, file="mix_report.txt", status='new', action='write')
     open(newunit=mix_Epot_unit, recl=4096, file="mix_Epot.out", status='new', action='write')
     open(newunit=mix_obsTherm_unit, recl=4096, file="mix_obsTherm.out", status='new', action='write')
     open(newunit=mix_obs_unit, recl=4096, file="mix_obs.out", status='new', action='write')
