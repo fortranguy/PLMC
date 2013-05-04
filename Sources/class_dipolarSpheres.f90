@@ -475,7 +475,7 @@ contains
     
     end subroutine DipolarSpheres_move
     
-    !> Widom's method
+    !> Widom's method : with other type ?
 
     subroutine DipolarSpheres_widom(this, other_X, mix, activ)
         

@@ -245,7 +245,7 @@ contains
     
     end subroutine HardSpheres_move
     
-    !> Widom's method
+    !> Widom's method : with other type ?
 
     subroutine HardSpheres_widom(this, other_X, mix, activ)
         
