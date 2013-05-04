@@ -41,7 +41,7 @@ implicit none
         
         if (iBunching == 1) then
         
-            open(unit=10, file="obs.out")
+            open(unit=10, file="obsEqb.out")
             do iStep = 1, 2*NstepVar
                 read(10, *) iStepIn, dataIn(1, iStep), dataIn(2, iStep)
             end do

@@ -8,7 +8,7 @@ private
 
     type, public :: Units
     
-        integer :: obs
+        integer :: obsEqb
         integer :: obsTherm
         integer :: dx
 
@@ -43,7 +43,7 @@ contains
         class(Units), intent(out) :: this
         character(len=*), intent(in) :: name
         
-        open(newunit=this%obs, recl=4096, file=name//"_obs.out", status='new', action='write')
+        open(newunit=this%obsEqb, recl=4096, file=name//"_obsEqb.out", status='new', action='write')
         open(newunit=this%obsTherm, recl=4096, file=name//"_obsTherm.out", status='new', &
              action='write')
         open(newunit=this%dx, recl=4096, file=name//"_dx.out", status='new', action='write')
@@ -85,7 +85,7 @@ contains
     
         class(Units), intent(inout) :: this
         
-        close(this%obs)
+        close(this%obsEqb)
         close(this%obsTherm)
         close(this%dx)
 
