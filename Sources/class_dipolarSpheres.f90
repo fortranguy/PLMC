@@ -254,20 +254,20 @@ contains
     !> \f[ (\vec{\mu}_i\cdot\vec{\mu}_j) B(r_{ij}) - 
     !>     (\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij}) C(r_{ij}) \f]
     
-    function DipolarSpheres_Epot_real_pair(this, mCol_i, mCol_j, rVec, r) result(Epot_real_pair)
+    function DipolarSpheres_Epot_real_pair(this, mCol_i, mCol_j, rVec_ij, r_ij) result(Epot_real_pair)
     
         class(DipolarSpheres), intent(in) :: this
         real(DP), dimension(:), intent(in) :: mCol_i, mCol_j
-        real(DP), dimension(:), intent(in) :: rVec
-        real(DP), intent(in) :: r
+        real(DP), dimension(:), intent(in) :: rVec_ij
+        real(DP), intent(in) :: r_ij
         real(DP) :: Epot_real_pair
         
         real(DP), dimension(2) :: Epot_coeff
         
         Epot_coeff(1) = dot_product(mCol_i, mCol_j)
-        Epot_coeff(2) =-dot_product(mCol_i, rVec) * dot_product(mCol_j, rVec)
+        Epot_coeff(2) =-dot_product(mCol_i, rVec_ij) * dot_product(mCol_j, rVec_ij)
         
-        Epot_real_pair = dot_product(Epot_coeff, this%Epot_real_interpol(r))
+        Epot_real_pair = dot_product(Epot_coeff, this%Epot_real_interpol(r_ij))
     
     end function DipolarSpheres_Epot_real_pair
     
@@ -349,9 +349,8 @@ contains
         real(DP), intent(out) :: energ
     
         integer :: iNeigh,  iCell_neigh
-        real(DP), dimension(Dim) :: mCol_i, mCol_j
-        real(DP), dimension(Dim) :: rVec
-        real(DP) :: r        
+        real(DP), dimension(Dim) :: rVec_ij
+        real(DP) :: r_ij        
         
         type(Link), pointer :: current => null(), next => null()
         
@@ -371,15 +370,15 @@ contains
             
                 if (current%iCol /= iCol) then
                 
-                    rVec = distVec(xCol(:), this%X(:, current%iCol))
-                    r = dot_product(rVec, rVec)
+                    rVec_ij = distVec(xCol(:), this%X(:, current%iCol))
+                    r_ij = dot_product(rVec_ij, rVec_ij)
                     
-                    if (r < this%rMin) then
+                    if (r_ij < this%rMin) then
                         overlap = .true.
                         return
                     end if
                     
-                    energ = energ + this%Epot_real_pair(mCol, this%M(:, current%iCol), rVec, r)
+                    energ = energ + this%Epot_real_pair(mCol, this%M(:, current%iCol), rVec_ij, r_ij)
        
                 end if
                 
