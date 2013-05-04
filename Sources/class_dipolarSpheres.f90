@@ -490,7 +490,7 @@ contains
             call random_number(xRand)
             xTest(:) = Lsize(:) * xRand(:)    
             iCellTest = this%same%position_to_cell(xTest)
-            call this%Epot_neigh(0, xTest, iCellTest, overlap, enTest) 
+            call this%Epot_neigh(0, xTest, iCellTest, overlap, enTest)
             
             if (.not. overlap) then
                 widTestSum = widTestSum + exp(-enTest/Tstar)
