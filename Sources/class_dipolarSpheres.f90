@@ -254,18 +254,18 @@ contains
     !> \f[ (\vec{\mu}_i\cdot\vec{\mu}_j) B(r_{ij}) - 
     !>     (\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij}) C(r_{ij}) \f]
     
-    function DipolarSpheres_Epot_real_pair(this, iCol, jCol, rVec, r) result(Epot_real_pair)
+    function DipolarSpheres_Epot_real_pair(this, mCol_i, mCol_j, rVec, r) result(Epot_real_pair)
     
         class(DipolarSpheres), intent(in) :: this
-        integer, intent(in) :: iCol, jCol
+        real(DP), dimension(:), intent(in) :: mCol_i, mCol_j
         real(DP), dimension(:), intent(in) :: rVec
         real(DP), intent(in) :: r
         real(DP) :: Epot_real_pair
         
         real(DP), dimension(2) :: Epot_coeff
         
-        Epot_coeff(1) = dot_product(this%M(:, iCol), this%M(:, jCol))
-        Epot_coeff(2) =-dot_product(this%M(:, iCol), rVec) * dot_product(this%M(:, jCol), rVec)
+        Epot_coeff(1) = dot_product(mCol_i, mCol_j)
+        Epot_coeff(2) =-dot_product(mCol_i, rVec) * dot_product(mCol_j, rVec)
         
         Epot_real_pair = dot_product(Epot_coeff, this%Epot_real_interpol(r))
     
@@ -278,9 +278,9 @@ contains
         class(DipolarSpheres), intent(in) :: this
         real(DP) :: Epot_real
         
-        integer :: iCol, jCol
         real(DP), dimension(Dim) :: rVec_ij
-        real(DP) :: r_ij        
+        real(DP) :: r_ij
+        integer :: iCol, jCol
     
         Epot_real = 0._DP
         
@@ -291,7 +291,8 @@ contains
                     rVec_ij = distVec(this%X(:, iCol), this%X(:, jCol))
                     r_ij = dot_product(rVec_ij, rVec_ij)
                     
-                    Epot_real = Epot_real + this%Epot_real_pair(iCol, jCol, rVec_ij, r_ij)
+                    Epot_real = Epot_real + &
+                                this%Epot_real_pair(this%M(:, iCol), this%M(:, jCol), rVec_ij, r_ij)
                     
                 end if
             end do
@@ -339,15 +340,16 @@ contains
     
     !> Real potential energy : short-range
     
-    subroutine DipolarSpheres_Epot_neigh(this, iCol, xCol, iCell, overlap, energ)
+    subroutine DipolarSpheres_Epot_neigh(this, iCol, xCol, mCol, iCell, overlap, energ)
         
         class(DipolarSpheres), intent(in) :: this
         integer, intent(in) :: iCol, iCell
-        real(DP), dimension(:), intent(in) :: xCol
+        real(DP), dimension(:), intent(in) :: xCol, mCol
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energ
     
         integer :: iNeigh,  iCell_neigh
+        real(DP), dimension(Dim) :: mCol_i, mCol_j
         real(DP), dimension(Dim) :: rVec
         real(DP) :: r        
         
@@ -377,7 +379,7 @@ contains
                         return
                     end if
                     
-                    energ = energ + this%Epot_real_pair(iCol, current%iCol, rVec, r)
+                    energ = energ + this%Epot_real_pair(mCol, this%M(:, current%iCol), rVec, r)
        
                 end if
                 
@@ -419,7 +421,7 @@ contains
         xNew(:) = this%X(:, iOld) + (xRand(:)-0.5_DP)*this%dx(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
         same_iCellNew = this%same%position_to_cell(xNew)
-        call this%Epot_neigh(iOld, xNew, same_iCellNew, overlap, same_eNew)
+        call this%Epot_neigh(iOld, xNew, this%M(:, iOld), same_iCellNew, overlap, same_eNew)
         
         if (.not. overlap) then
         
@@ -429,7 +431,8 @@ contains
             if (.not. overlap) then
     
                 same_iCellOld = this%same%position_to_cell(this%X(:, iOld))
-                call this%Epot_neigh(iOld, this%X(:, iOld), same_iCellOld, overlap, same_eOld)                    
+                call this%Epot_neigh(iOld, this%X(:, iOld), this%M(:, iOld), same_iCellOld, &
+                                     overlap, same_eOld)
                 same_dEpot = same_eNew - same_eOld
                     
                 mix_iCellOld = this%mix%position_to_cell(this%X(:, iOld))
@@ -478,7 +481,7 @@ contains
         
         integer :: iWid
         real(DP) :: widTestSum
-        real(DP), dimension(Dim) :: xRand, xTest
+        real(DP), dimension(Dim) :: xRand, xTest, mTest
         integer :: iCellTest
         logical :: overlap        
         real(DP) :: enTest
@@ -488,9 +491,11 @@ contains
         do iWid = 1, this%Nwidom
             
             call random_number(xRand)
-            xTest(:) = Lsize(:) * xRand(:)    
+            xTest(:) = Lsize(:) * xRand(:)
             iCellTest = this%same%position_to_cell(xTest)
-            call this%Epot_neigh(0, xTest, iCellTest, overlap, enTest)
+            mTest(:) = random_surface()
+            
+            call this%Epot_neigh(0, xTest, mTest, iCellTest, overlap, enTest)
             
             if (.not. overlap) then
                 widTestSum = widTestSum + exp(-enTest/Tstar)
