@@ -254,7 +254,8 @@ contains
     !> \f[ (\vec{\mu}_i\cdot\vec{\mu}_j) B(r_{ij}) - 
     !>     (\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij}) C(r_{ij}) \f]
     
-    function DipolarSpheres_Epot_real_pair(this, mCol_i, mCol_j, rVec_ij, r_ij) result(Epot_real_pair)
+    function DipolarSpheres_Epot_real_pair(this, mCol_i, mCol_j, rVec_ij, r_ij) &
+                     result(Epot_real_pair)
     
         class(DipolarSpheres), intent(in) :: this
         real(DP), dimension(:), intent(in) :: mCol_i, mCol_j
@@ -378,7 +379,8 @@ contains
                         return
                     end if
                     
-                    energ = energ + this%Epot_real_pair(mCol, this%M(:, current%iCol), rVec_ij, r_ij)
+                    energ = energ + this%Epot_real_pair(mCol, this%M(:, current%iCol), &
+                                                        rVec_ij, r_ij)
        
                 end if
                 
@@ -435,7 +437,8 @@ contains
                 same_dEpot = same_eNew - same_eOld
                     
                 mix_iCellOld = this%mix%position_to_cell(this%X(:, iOld))
-                call mix%Epot_neigh(this%X(:, iOld), mix_iCellOld, this%mix, other%X, overlap, mix_eOld)
+                call mix%Epot_neigh(this%X(:, iOld), mix_iCellOld, this%mix, other%X, overlap, &
+                                    mix_eOld)
                 mix_dEpot = mix_eNew - mix_eOld
                 
                 dEpot = same_dEpot + mix_dEpot

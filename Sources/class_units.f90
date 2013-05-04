@@ -44,12 +44,16 @@ contains
         character(len=*), intent(in) :: name
         
         open(newunit=this%obs, recl=4096, file=name//"_obs.out", status='new', action='write')
-        open(newunit=this%obsTherm, recl=4096, file=name//"_obsTherm.out", status='new', action='write')
+        open(newunit=this%obsTherm, recl=4096, file=name//"_obsTherm.out", status='new', &
+             action='write')
         open(newunit=this%dx, recl=4096, file=name//"_dx.out", status='new', action='write')
         
-        open(newunit=this%snapIni_X, recl=4096, file=name//"_snapIni_X.out", status='new', action='write')
-        open(newunit=this%snapFin_X, recl=4096, file=name//"_snapFin_X.out", status='new', action='write')
-        open(newunit=this%snapShots_X, recl=4096, file=name//"_snap_X.shots", status='new', action='write')
+        open(newunit=this%snapIni_X, recl=4096, file=name//"_snapIni_X.out", status='new', &
+             action='write')
+        open(newunit=this%snapFin_X, recl=4096, file=name//"_snapFin_X.out", status='new', &
+             action='write')
+        open(newunit=this%snapShots_X, recl=4096, file=name//"_snap_X.shots", status='new', &
+             action='write')
         
         open(newunit=this%report, recl=4096, file=name//"_report.txt", status='new', action='write')
         open(newunit=this%Epot, recl=4096, file=name//"_Epot.out", status='new', action='write')
@@ -62,9 +66,12 @@ contains
             
                 open(newunit=this%dm, recl=4096, file=name//"_dm.out", status='new', action='write')
                 
-                open(newunit=this%snapIni_M, recl=4096, file=name//"_snapIni_M.out", status='new', action='write')
-                open(newunit=this%snapFin_M, recl=4096, file=name//"_snapFin_M.out", status='new', action='write')
-                open(newunit=this%snapShots_M, recl=4096, file=name//"_snap_M.shots", status='new', action='write')
+                open(newunit=this%snapIni_M, recl=4096, file=name//"_snapIni_M.out", status='new', &
+                     action='write')
+                open(newunit=this%snapFin_M, recl=4096, file=name//"_snapFin_M.out", status='new', &
+                     action='write')
+                open(newunit=this%snapShots_M, recl=4096, file=name//"_snap_M.shots", status='new', &
+                     action='write')
                 
             class default
                 

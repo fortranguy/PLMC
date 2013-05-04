@@ -289,7 +289,8 @@ contains
                 same_dEpot = same_eNew - same_eOld
                     
                 mix_iCellOld = this%mix%position_to_cell(this%X(:, iOld))
-                call mix%Epot_neigh(this%X(:, iOld), mix_iCellOld, this%mix, other%X, overlap, mix_eOld)
+                call mix%Epot_neigh(this%X(:, iOld), mix_iCellOld, this%mix, other%X, overlap, &
+                                    mix_eOld)
                 mix_dEpot = mix_eNew - mix_eOld
                 
                 dEpot = same_dEpot + mix_dEpot
