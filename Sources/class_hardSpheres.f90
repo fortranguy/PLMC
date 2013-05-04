@@ -19,6 +19,8 @@ private
 
     type, extends(Spheres), public :: HardSpheres
     
+        private
+    
         ! Potential
         real(DP) :: Epot
         
