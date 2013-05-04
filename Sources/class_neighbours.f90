@@ -67,7 +67,10 @@ contains
     
         class(Neighbours), intent(inout) :: this
         
-        deallocate(this%cell_neighs)
+        if (allocated(this%cell_neighs)) then
+            deallocate(this%cell_neighs)
+        end if
+        
         call this%dealloc_cells()
         
     end subroutine Neighbours_destroy
@@ -154,12 +157,12 @@ contains
             end if
             
             if (modulo(Lsize(iDir), this%cell_Lsize(iDir)) /= 0) then
-                write(error_unit, *) "Cell size is not a divisor of the system system"
+                write(error_unit, *) "Cell size is not a divisor of the system size"
                 write(error_unit, *) "in the direction", iDir, ":"
                 write(error_unit, *) "Lsize", Lsize(iDir)
                 write(error_unit, *) "cell_Lsize", this%cell_Lsize(iDir)
                 write(error_unit, *) "modulo(Lsize, cell_Lsize) = ", &
-                                       modulo(Lsize(iDir), this%cell_Lsize(iDir))
+                                      modulo(Lsize(iDir), this%cell_Lsize(iDir))
                 stop
             end if
             
