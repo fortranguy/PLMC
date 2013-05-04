@@ -126,7 +126,7 @@ implicit none
         end do MC_Move
         
         ! Chemical potentials : Widom method
-        call type1_sph%widom(type1_obs%activ)
+        call type1_sph%widom(type2_sph%X, mix, type1_obs%activ)
         call type2_sph%widom(type2_obs%activ)
         
         ! Rejections rates updates

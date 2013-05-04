@@ -483,16 +483,16 @@ contains
         class(MixingPotential), intent(in) :: mix
         real(DP), intent(inOut) :: activ 
         
-        integer :: iWid
+        integer :: iWidom
         real(DP) :: widTestSum
         real(DP), dimension(Dim) :: xRand, xTest, mTest
         integer :: same_iCellTest, mix_iCellTest
         logical :: overlap        
-        real(DP) :: same_enTest, mix_enTest
+        real(DP) :: enTest, same_enTest, mix_enTest
         
         widTestSum = 0._DP
         
-        do iWid = 1, this%Nwidom
+        do iWidom = 1, this%Nwidom
             
             call random_number(xRand)
             xTest(:) = Lsize(:) * xRand(:)
