@@ -70,7 +70,7 @@ contains
         
         ! Monte-Carlo
         this%dx = inter_dx
-        this%dx_save = inter_dx
+        this%dx_save = this%dx
         this%rejFix = inter_rejFix
         this%Nadapt = inter_Nadapt
         this%Nwidom = inter_Nwidom
@@ -269,7 +269,7 @@ contains
         real(DP) :: mix_eNew, mix_eOld
         
         call random_number(rand)
-        iOld = int(rand*this%Ncol) + 1
+        iOld = int(rand*real(this%Ncol, DP)) + 1
         
         call random_number(xRand)
         xNew(:) = this%X(:, iOld) + (xRand(:)-0.5_DP)*this%dx(:)

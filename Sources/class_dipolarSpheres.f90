@@ -81,7 +81,7 @@ contains
         
         ! Monte-Carlo
         this%dx = dipol_dx
-        this%dx_save = dipol_dx
+        this%dx_save = this%dx
         this%rejFix = dipol_rejFix
         this%Nadapt = dipol_Nadapt
         this%Nwidom = dipol_Nwidom
@@ -416,7 +416,7 @@ contains
         real(DP) :: mix_eNew, mix_eOld
         
         call random_number(rand)
-        iOld = int(rand*this%Ncol) + 1
+        iOld = int(rand*real(this%Ncol, DP)) + 1
         
         call random_number(xRand)
         xNew(:) = this%X(:, iOld) + (xRand(:)-0.5_DP)*this%dx(:)
