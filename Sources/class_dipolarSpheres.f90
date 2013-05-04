@@ -239,7 +239,7 @@ contains
             i = int(r/this%dr)
             r_i = real(i, DP)*this%dr
             Epot_real_interpol(:) = this%Epot_real_tab(i, :) + (r-r_i)/this%dr * &
-                               (this%Epot_real_tab(i+1, :) - this%Epot_real_tab(i, :))
+                                   (this%Epot_real_tab(i+1, :) - this%Epot_real_tab(i, :))
            
         else
        
