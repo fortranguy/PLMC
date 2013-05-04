@@ -487,7 +487,7 @@ contains
         real(DP) :: widTestSum
         real(DP), dimension(Dim) :: xRand, xTest, mTest
         integer :: same_iCellTest, mix_iCellTest
-        logical :: overlap        
+        logical :: overlap
         real(DP) :: enTest, same_enTest, mix_enTest
         
         widTestSum = 0._DP

@@ -127,7 +127,7 @@ implicit none
         
         ! Chemical potentials : Widom method
         call type1_sph%widom(type2_sph%X, mix, type1_obs%activ)
-        call type2_sph%widom(type2_obs%activ)
+        call type2_sph%widom(type1_sph%X, mix, type2_obs%activ)
         
         ! Rejections rates updates
         type1_obs%rej = real(type1_obs%Nrej, DP)/real(type1_obs%Nmove, DP)
