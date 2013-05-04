@@ -400,7 +400,7 @@ contains
     
         class(DipolarSpheres), intent(inout) :: this
         class(Spheres), intent(inout) :: other
-        class(MixingPotential), intent(in) :: mix        
+        class(MixingPotential), intent(in) :: mix
         real(DP), intent(inout) :: same_Epot, mix_Epot
         integer, intent(inout) :: Nrej
         
@@ -476,17 +476,19 @@ contains
     
     !> Widom's method
 
-    subroutine DipolarSpheres_widom(this, activ)
+    subroutine DipolarSpheres_widom(this, other_X, mix, activ)
         
         class(DipolarSpheres), intent(in) :: this
+        real(DP), dimension(:, :), intent(in) :: other_X
+        class(MixingPotential), intent(in) :: mix
         real(DP), intent(inOut) :: activ 
         
         integer :: iWid
         real(DP) :: widTestSum
         real(DP), dimension(Dim) :: xRand, xTest, mTest
-        integer :: iCellTest
+        integer :: same_iCellTest, mix_iCellTest
         logical :: overlap        
-        real(DP) :: enTest
+        real(DP) :: same_enTest, mix_enTest
         
         widTestSum = 0._DP
         
@@ -494,13 +496,23 @@ contains
             
             call random_number(xRand)
             xTest(:) = Lsize(:) * xRand(:)
-            iCellTest = this%same%position_to_cell(xTest)
+            same_iCellTest = this%same%position_to_cell(xTest)
             mTest(:) = random_surface()
             
-            call this%Epot_neigh(0, xTest, mTest, iCellTest, overlap, enTest)
+            call this%Epot_neigh(0, xTest, mTest, same_iCellTest, overlap, same_enTest)
             
             if (.not. overlap) then
-                widTestSum = widTestSum + exp(-enTest/Tstar)
+            
+                mix_iCellTest = this%mix%position_to_cell(xTest)
+                call mix%Epot_neigh(xTest, mix_iCellTest, this%mix, other_X, overlap, mix_enTest)
+                
+                if (.not. overlap) then
+                
+                    enTest = same_enTest + mix_enTest
+                    widTestSum = widTestSum + exp(-enTest/Tstar)
+                    
+                end if
+            
             end if
             
         end do
