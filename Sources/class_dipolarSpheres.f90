@@ -421,13 +421,14 @@ contains
         call random_number(xRand)
         xNew(:) = this%X(:, iOld) + (xRand(:)-0.5_DP)*this%dx(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
-        same_iCellNew = this%same%position_to_cell(xNew)
-        call this%Epot_neigh(iOld, xNew, this%M(:, iOld), same_iCellNew, overlap, same_eNew)
         
+        mix_iCellNew = this%mix%position_to_cell(xNew)
+        call mix%Epot_neigh(xNew, mix_iCellNew, this%mix, other%X, overlap, mix_eNew)
+            
         if (.not. overlap) then
         
-            mix_iCellNew = this%mix%position_to_cell(xNew)
-            call mix%Epot_neigh(xNew, mix_iCellNew, this%mix, other%X, overlap, mix_eNew)
+            same_iCellNew = this%same%position_to_cell(xNew)
+            call this%Epot_neigh(iOld, xNew, this%M(:, iOld), same_iCellNew, overlap, same_eNew)
                         
             if (.not. overlap) then
     
@@ -496,15 +497,16 @@ contains
             
             call random_number(xRand)
             xTest(:) = Lsize(:) * xRand(:)
-            same_iCellTest = this%same%position_to_cell(xTest)
-            mTest(:) = random_surface()
             
-            call this%Epot_neigh(0, xTest, mTest, same_iCellTest, overlap, same_enTest)
+            mix_iCellTest = this%mix%position_to_cell(xTest)
+            call mix%Epot_neigh(xTest, mix_iCellTest, this%mix, other_X, overlap, mix_enTest)
             
             if (.not. overlap) then
             
-                mix_iCellTest = this%mix%position_to_cell(xTest)
-                call mix%Epot_neigh(xTest, mix_iCellTest, this%mix, other_X, overlap, mix_enTest)
+                mTest(:) = random_surface()
+                
+                same_iCellTest = this%same%position_to_cell(xTest)               
+                call this%Epot_neigh(0, xTest, mTest, same_iCellTest, overlap, same_enTest)
                 
                 if (.not. overlap) then
                 
