@@ -328,29 +328,41 @@ contains
     
     !> Widom's method
 
-    subroutine InteractingSpheres_widom(this, activ)
+    subroutine InteractingSpheres_widom(this, other_X, mix, activ)
         
         class(InteractingSpheres), intent(in) :: this
-        real(DP), intent(inOut) :: activ 
+        real(DP), dimension(:, :), intent(in) :: other_X
+        class(MixingPotential), intent(in) :: mix
+        real(DP), intent(inOut) :: activ
         
-        integer :: iWid
+        integer :: iWidom
         real(DP) :: widTestSum
         real(DP), dimension(Dim) :: xRand, xTest
-        integer :: iCellTest
+        integer :: same_iCellTest, mix_iCellTest
         logical :: overlap        
-        real(DP) :: enTest
+        real(DP) :: enTest, same_enTest, mix_enTest
         
         widTestSum = 0._DP
         
-        do iWid = 1, this%Nwidom
+        do iWidom = 1, this%Nwidom
             
             call random_number(xRand)
             xTest(:) = Lsize(:) * xRand(:)    
-            iCellTest = this%same%position_to_cell(xTest)
-            call this%Epot_neigh(0, xTest, iCellTest, overlap, enTest) 
+            same_iCellTest = this%same%position_to_cell(xTest)
+            call this%Epot_neigh(0, xTest, same_iCellTest, overlap, same_enTest) 
             
             if (.not. overlap) then
-                widTestSum = widTestSum + exp(-enTest/Tstar)
+                
+                mix_iCellTest = this%mix%position_to_cell(xTest)
+                call mix%Epot_neigh(xTest, mix_iCellTest, this%mix, other_X, overlap, mix_enTest)
+                
+                if (.not. overlap) then
+                
+                    enTest = same_enTest + mix_enTest
+                    widTestSum = widTestSum + exp(-enTest/Tstar)
+                    
+                end if
+                
             end if
             
         end do
