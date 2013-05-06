@@ -86,7 +86,6 @@ implicit none
     
     call type1_sph%overlapTest()
     type1_obs%Epot = type1_sph%Epot_conf()
-    write(output_unit, *) "Epot_recit", type1_sph%Epot_reci()
     call type1_sph%snapShot_X(type1_io%snapIni_X)
     call type1_sph%snapShot_M(type1_io%snapIni_M)
     call type1_sph%cols_to_cells(type2_sph%X) !< Cell List : filling cells with particles
@@ -100,7 +99,7 @@ implicit none
     mix_Epot = mix%Epot_conf(type1_sph%X, type2_sph%X)
     
     Epot_conf = type1_obs%Epot + type2_obs%Epot + mix_Epot
-    write(*, *) "Initial potential energy =", Epot_conf
+    write(output_unit, *) "Initial potential energy =", Epot_conf
     
 ! Middle -------------------------------------------------------------------------------------------
         
