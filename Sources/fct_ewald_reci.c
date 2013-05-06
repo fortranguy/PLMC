@@ -126,7 +126,7 @@ double Epot_reci(double X[][DIM], double D[][DIM], const int Ncol, const double 
     
     int ikx, iky, ik;
     double complex scalarProductCplx;
-    double expr_Ksqr;
+    double Epot_reci_tabulated;
     
     for (int kx=-Nx; kx<Nx; kx++){
         
@@ -148,11 +148,11 @@ double Epot_reci(double X[][DIM], double D[][DIM], const int Ncol, const double 
                     potential[iComp].f_hat[ik] = scalarProductCplx;
                 }
                 
-                expr_Ksqr = Epot_reci_tab[kx+Nx][ky+Ny][kz+Nz];
+                Epot_reci_tabulated = Epot_reci_tab[kx+Nx][ky+Ny][kz+Nz];
                 
-                potential[0].f_hat[ik] *= (double)kx * expr_Ksqr;
-                potential[1].f_hat[ik] *= (double)ky * expr_Ksqr;
-                potential[2].f_hat[ik] *= (double)kz * expr_Ksqr;
+                potential[0].f_hat[ik] *= (double)kx * Epot_reci_tabulated;
+                potential[1].f_hat[ik] *= (double)ky * Epot_reci_tabulated;
+                potential[2].f_hat[ik] *= (double)kz * Epot_reci_tabulated;
             
             }            
         }        
