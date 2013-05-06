@@ -139,7 +139,7 @@ double Epot_reci_move(const double deltaX[], const double Vol){
                                     (double)kz * structure[2].f[lCol]*factor;
                
                 Epot = Epot + creal(k_dot_coefficient) * creal(k_dot_structure) *
-                                              Epot_reci_tab[kx+Nx][ky+Ny][kz+Nz];
+                              Epot_reci_tab[kx+Nx][ky+Ny][kz+Nz];
             
             }            
         }        
