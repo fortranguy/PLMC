@@ -25,7 +25,7 @@ implicit none
     real(DP) :: Epot, EpotSum !< potential energy : at a Monte-Carlo step
     real(DP) :: Epot_conf !< potential energy : complete calculation from a configuration
     integer :: report_unit  !< data & results file
-    integer :: obsTherm_unit, obs_unit !< observables files
+    integer :: obsTherm_unit, obsEqb_unit !< observables files : Thermalisation & Equilibrium
     
     ! Mixing potential between 2 types
     type(MixingPotential) :: mix !< short-range potential
@@ -33,7 +33,7 @@ implicit none
     real(DP) :: mix_Epot_conf
     integer :: mix_report_unit
     integer :: mix_Epot_unit !< tabulated potential file
-    integer :: mix_obsTherm_unit, mix_obs_unit
+    integer :: mix_obsTherm_unit, mix_obsEqb_unit
     
     ! Type 1 : Dipolar spheres : Ewald summation
     type(DipolarSpheres) :: type1_sph !< Monte-Carlo subroutines
@@ -51,18 +51,18 @@ implicit none
 
     ! Initialisations & reports
     
-    open(newunit=report_unit, recl=4096, file="report.out", status='new', action='write')
+    open(newunit=report_unit, recl=4096, file="report.txt", status='new', action='write')
     open(newunit=obsTherm_unit, recl=4096, file="obsTherm.out", status='new', action='write')
-    open(newunit=obs_unit, recl=4096, file="obs.out", status='new', action='write')
+    open(newunit=obsEqb_unit, recl=4096, file="obsEqb.out", status='new', action='write')
     call report(report_unit)
     call initRandomSeed(report_unit)
     
     call mix%construct()
     mix_EpotSum = 0._DP
-    open(newunit=mix_report_unit, recl=4096, file="mix_report.out", status='new', action='write')
+    open(newunit=mix_report_unit, recl=4096, file="mix_report.txt", status='new', action='write')
     open(newunit=mix_Epot_unit, recl=4096, file="mix_Epot.out", status='new', action='write')
     open(newunit=mix_obsTherm_unit, recl=4096, file="mix_obsTherm.out", status='new', action='write')
-    open(newunit=mix_obs_unit, recl=4096, file="mix_obs.out", status='new', action='write')
+    open(newunit=mix_obsEqb_unit, recl=4096, file="mix_obsEqb.out", status='new', action='write')
     call mix%report(mix_report_unit)
     call mix%Epot_print(mix_Epot_unit)
     
@@ -126,8 +126,8 @@ implicit none
         end do MC_Move
         
         ! Chemical potentials : Widom method
-        call type1_sph%widom(type1_obs%activ)
-        call type2_sph%widom(type2_obs%activ)
+        call type1_sph%widom(type2_sph%X, mix, type1_obs%activ)
+        call type2_sph%widom(type1_sph%X, mix, type2_obs%activ)
         
         ! Rejections rates updates
         type1_obs%rej = real(type1_obs%Nrej, DP)/real(type1_obs%Nmove, DP)
@@ -188,10 +188,10 @@ implicit none
             mix_EpotSum = mix_EpotSum + mix_Epot
             
             ! Observables writing
-            write(type1_io%obs, *) iStep, type1_obs%Epot, type1_obs%activ, type1_obs%rej
-            write(type2_io%obs, *) iStep, type2_obs%Epot, type2_obs%activ, type2_obs%rej
-            write(mix_obs_unit, *) iStep, mix_Epot
-            write(obs_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
+            write(type1_io%obsEqb, *) iStep, type1_obs%Epot, type1_obs%activ, type1_obs%rej
+            write(type2_io%obsEqb, *) iStep, type2_obs%Epot, type2_obs%activ, type2_obs%rej
+            write(mix_obsEqb_unit, *) iStep, mix_Epot
+            write(obsEqb_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
 
             if (snap) then ! Snap shots of the configuration
                 call type1_sph%snapShot_X(type1_io%snapShots_X)
@@ -244,10 +244,10 @@ implicit none
     close(mix_report_unit)
     close(mix_Epot_unit)
     close(mix_obsTherm_unit)
-    close(mix_obs_unit)
+    close(mix_obsEqb_unit)
     
     close(report_unit)
     close(obsTherm_unit)
-    close(obs_unit)
+    close(obsEqb_unit)
     
 end program mc_canonical

@@ -19,6 +19,8 @@ private
 
     type, extends(Spheres), public :: HardSpheres
     
+        private
+    
         ! Potential
         real(DP) :: Epot
         
@@ -60,7 +62,7 @@ contains
         
         ! Monte-Carlo
         this%dx = hard_dx
-        this%dx_save = hard_dx
+        this%dx_save = this%dx
         this%rejFix = hard_rejFix
         this%Nadapt = hard_Nadapt
         this%Nwidom = hard_Nwidom
@@ -190,7 +192,7 @@ contains
         real(DP) :: mix_eNew, mix_eOld
         
         call random_number(rand)
-        iOld = int(rand*this%Ncol) + 1
+        iOld = int(rand*real(this%Ncol, DP)) + 1
         
         call random_number(xRand)
         xNew(:) = this%X(:, iOld) + (xRand(:)-0.5_DP)*this%dx(:)
@@ -209,7 +211,8 @@ contains
                 call this%Epot_neigh(iOld, this%X(:, iOld), same_iCellOld, overlap)
                     
                 mix_iCellOld = this%mix%position_to_cell(this%X(:, iOld))
-                call mix%Epot_neigh(this%X(:, iOld), mix_iCellOld, this%mix, other%X, overlap, mix_eOld)
+                call mix%Epot_neigh(this%X(:, iOld), mix_iCellOld, this%mix, other%X, overlap, &
+                                    mix_eOld)
                 
                 mix_dEpot = mix_eNew - mix_eOld
                     
@@ -244,30 +247,43 @@ contains
     
     end subroutine HardSpheres_move
     
-    !> Widom's method
+    !> Widom's method : with other type ?
 
-    subroutine HardSpheres_widom(this, activ)
+    subroutine HardSpheres_widom(this, other_X, mix, activ)
         
         class(HardSpheres), intent(in) :: this
+        real(DP), dimension(:, :), intent(in) :: other_X
+        class(MixingPotential), intent(in) :: mix
         real(DP), intent(inOut) :: activ 
         
-        integer :: iWid
+        integer :: iWidom
         real(DP) :: widTestSum
         real(DP), dimension(Dim) :: xRand, xTest
-        integer :: iCellTest
-        logical :: overlap        
+        integer :: same_iCellTest, mix_iCellTest
+        logical :: overlap
+        real(DP) :: enTest, mix_enTest
         
         widTestSum = 0._DP
         
-        do iWid = 1, this%Nwidom           
+        do iWidom = 1, this%Nwidom           
             
             call random_number(xRand)
             xTest(:) = Lsize(:) * xRand(:)    
-            iCellTest = this%same%position_to_cell(xTest)
-            call this%Epot_neigh(0, xTest, iCellTest, overlap) 
+            same_iCellTest = this%same%position_to_cell(xTest)
+            call this%Epot_neigh(0, xTest, same_iCellTest, overlap) 
             
             if (.not. overlap) then
-                widTestSum = widTestSum + 1._DP
+            
+                mix_iCellTest = this%mix%position_to_cell(xTest)
+                call mix%Epot_neigh(xTest, mix_iCellTest, this%mix, other_X, overlap, mix_enTest)
+                
+                if (.not. overlap) then
+                
+                    enTest = 0._DP + mix_enTest
+                    widTestSum = widTestSum + exp(-enTest/Tstar)
+                    
+                end if
+                
             end if
             
         end do

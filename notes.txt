@@ -108,3 +108,8 @@
     
 15 03 13
 	17:29 : Attention : traduction anglaise -> cassure dans scripts.
+
+04 05 13
+    01:36 : Revoir la méthode de Widom : particule test. Si iCol = 0 : problème.
+    [nuit]: OK : mTest (moment) en argument
+    12:56 : Widom : aussi avec autre type ?

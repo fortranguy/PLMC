@@ -83,7 +83,7 @@ implicit none
     integer, parameter :: Nstep = 2**10
     integer, parameter :: Ntherm = 2**8
     
-    integer, parameter :: Nmove = 2**2 * Ncol
+    integer, parameter :: Nmove = 2**1 * Ncol
     
     real(DP), dimension(Dim), parameter :: dipol_dx = 1._DP
     real(DP), parameter :: dipol_rejFix = 0.5_DP
