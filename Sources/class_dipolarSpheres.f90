@@ -327,10 +327,22 @@ contains
         real(DP) :: Epot_reci
         
         real(C_double) :: C_Epot
+        real(c_double), dimension(:, :), allocatable :: C_X, C_M
+        integer :: iCol
         
-        C_Epot = C_Epot_reci(real(this%X, C_double), real(this%M, C_double), &
-                             int(this%Ncol, C_int), real(product(Lsize), C_double))
+        allocate(C_X(Dim, this%Ncol))
+        allocate(C_M(Dim, this%Ncol))
+        
+        do iCol = 1, this%Ncol
+            C_X(:, iCol) = C_X(:, iCol)/real(Lsize(:), c_double) - 0.5_c_double
+            C_M(:, iCol) = C_M(:, iCol)/real(Lsize(:), c_double)
+        end do
+        
+        C_Epot = C_Epot_reci(C_X, C_M, int(this%Ncol, C_int), real(product(Lsize), C_double))
         Epot_reci = real(C_Epot, DP)
+        
+        deallocate(C_X)
+        deallocate(C_M)
         
     end function DipolarSpheres_Epot_reci    
     
