@@ -2,7 +2,8 @@
 
 module class_dipolarSpheres
 
-use iso_fortran_env
+use, intrinsic :: iso_fortran_env
+use, intrinsic :: iso_c_binding, only : c_int, c_double
 use data_constants
 use data_cell
 use data_particles
@@ -46,13 +47,21 @@ private
         procedure :: snapShot_M => DipolarSpheres_snapShot_M
         
         !> Potential energy
+        !>     Real
         procedure :: Epot_real_init => DipolarSpheres_Epot_real_init
         procedure :: Epot_real_print => DipolarSpheres_Epot_real_print
         procedure :: Epot_real_interpol => DipolarSpheres_Epot_real_interpol
         procedure :: Epot_real_pair => DipolarSpheres_Epot_real_pair
         procedure :: Epot_real => DipolarSpheres_Epot_real
+        !>     Reciprocal
+        procedure :: Epot_reci_nfft_init => DipolarSpheres_Epot_reci_nfft_init
+        procedure :: Epot_reci_nfft_finalize => DipolarSpheres_Epot_reci_nfft_finalize
+        procedure :: Epot_reci_init => DipolarSpheres_Epot_reci_init
+        procedure :: Epot_reci => => DipolarSpheres_Epot_reci
+        !>     Self
         procedure :: Epot_self_delta => DipolarSpheres_Epot_self_delta
         procedure :: Epot_self => DipolarSpheres_Epot_self
+        !>     (Other)
         procedure :: Epot_neigh => DipolarSpheres_Epot_neigh
         procedure :: Epot_conf => DipolarSpheres_Epot_conf
         procedure :: consistTest => DipolarSpheres_consistTest
@@ -302,6 +311,23 @@ contains
         Epot_real = 0.5_DP*Epot_real
     
     end function DipolarSpheres_Epot_real
+    
+    subroutine DipolarSpheres_Epot_reci_nfft_init(this)
+    
+        class(DipolarSpheres), intent(in) :: this
+        
+        call C_Epot_reci_nfft_init(int(this%Ncol, C_int))
+        
+    end DipolarSpheres_Epot_reci_nfft_init
+    
+    subroutine DipolarSpheres_Epot_reci_nfft_finalize(this)
+        
+        class(DipolarSpheres), intent(in) :: this
+        
+        call C_Epot_reci_nfft_finalize()
+        
+    end subroutine
+    
     
     !> Self energy difference : rotation
     !> \f[ \frac{2}{3}\frac{\alpha^3}{\sqrt{\pi}} (2\vec{\Delta\mu}_i\cdot\vec{\mu}_i +
