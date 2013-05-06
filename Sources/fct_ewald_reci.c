@@ -78,7 +78,7 @@ void Epot_reci_init(const double Lsize[DIM], const double alpha){
     
     exp_Ksqr[Nx][Ny][Nz] = 0.;
     
-    printf("Number of wave vectors : %d\n", nb_k);    
+    printf(" Ewald Summation : Number of wave vectors : %d\n", nb_k);    
     
 }
 

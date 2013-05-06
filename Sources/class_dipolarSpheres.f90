@@ -102,6 +102,7 @@ contains
         this%alpha = dipol_alpha        
         allocate(this%Epot_real_tab(this%iMin:this%iCut, 2))
         call this%Epot_real_init()
+        call this%Epot_reci_init()
         call C_Epot_reci_nfft_init(int(this%Ncol, C_int))
         
         ! Neighbours : same kind    
