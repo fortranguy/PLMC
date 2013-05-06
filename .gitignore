@@ -9,6 +9,8 @@ Scripts/loisPhy_copy.sh
 Scripts/Plots/*.sh~
 Sources/data_copy.f90
 Sources/*.f90~
+Sources/*.c~
+Sources/*.h~
 Sources/Makefile~
 Sources/*.mod
 Sources/*.o
