@@ -1,38 +1,43 @@
 module mod_ewald_reci
 
-use, intrinsic :: iso_c_binding, only : c_int, c_double
+use, intrinsic :: iso_C_binding, only : C_int, C_double
 use data_cell
 
 implicit none
 
     interface
+    
+        subroutine C_Epot_reci_nfft_init(C_Ncol) bind(C, name="Epot_reci_nfft_init")
         
-        subroutine c_precalc_exp_ksqr(c_Lsize, c_alpha) bind(c)
+        import :: C_int
         
-            import :: Dim, c_double
-            real(c_double), intent(in), dimension(Dim) :: c_Lsize
-            real(c_double), value :: c_alpha
+            integer(C_int), value :: C_Ncol
+            
+        end subroutine C_Epot_reci_nfft_init
         
-        end subroutine c_precalc_exp_ksqr
+        subroutine C_Epot_reci_nfft_finalize() bind(C, name="Epot_reci_nfft_finalize")
         
-        subroutine c_nfft_init(Ncol) bind(c)
-            import :: c_int
-            integer(c_int), value :: Ncol
-        end subroutine c_nfft_init
+        end subroutine C_Epot_reci_nfft_finalize
         
-        subroutine c_nfft_finalize() bind(c)
-            !
-        end subroutine c_nfft_finalize
+        subroutine C_Epot_reci_init(C_Lsize, C_alpha) bind(C, name="Epot_reci_init")
         
-        function c_epot_reci(X, D, Ncol, vol) bind(c)
+        import :: Dim, C_double
         
-            import :: Dim, c_int, c_double
-            real(c_double), intent(in), dimension(Dim, *) :: X, D
-            integer(c_int), value :: Ncol
-            real(c_double), value :: Vol
-            real(c_double) :: c_epot_reci
+            real(C_double), intent(in), dimension(Dim) :: C_Lsize
+            real(C_double), value :: C_alpha
+            
+        end subroutine C_Epot_reci_init
         
-        end function c_epot_reci
+        function C_Epot_reci(C_X, C_M, C_Ncol, C_Vol) bind(C, name="Epot_reci")
+        
+        import :: Dim, C_int, C_double
+        
+            real(C_double), intent(in), dimension(Dim, *) :: C_X, C_M
+            integer(C_int), value :: C_Ncol
+            real(C_double), value :: C_Vol
+            real(C_double) :: C_Epot_reci
+            
+        end function C_Epot_reci
     
     end interface
 

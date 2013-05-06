@@ -8,31 +8,56 @@ static nfft_plan structure[DIM];
 static nfft_plan potential[DIM];
 static double exp_Ksqr[2*Nx][2*Ny][2*Nz];
 
-void c_precalc_exp_ksqr(const double c_Lsize[DIM], const double c_alpha);
-double c_epot_reci(double X[][DIM], double D[][DIM], const int Ncol, const double Vol);
-void c_nfft_init(const int Ncol);
-void c_nfft_finalize();
+void Epot_reci_nfft_init(const int Ncol);
+void Epot_reci_nfft_finalize();
+void Epot_reci_init(const double Lsize[DIM], const double alpha);
+double Epot_reci(double X[][DIM], double D[][DIM], const int Ncol, const double Vol);
 
-void c_precalc_exp_ksqr(const double c_Lsize[DIM], const double c_alpha){
+// Initialisation : phi and S
+
+void Epot_reci_nfft_init(const int Ncol){
+    
+    for(int iComp=0; iComp<DIM; iComp++){
+        
+        nfft_init_3d(&potential[iComp], 2*Nx, 2*Ny, 2*Nz, Ncol);
+        nfft_init_3d(&structure[iComp], 2*Nx, 2*Ny, 2*Nz, Ncol);
+        
+    }
+    
+}
+
+
+// Finalisation
+
+void Epot_reci_nfft_finalize(){
+ 
+    for (int iComp=0; iComp<DIM; iComp++){
+        nfft_finalize(&structure[iComp]);
+        nfft_finalize(&potential[iComp]);
+    }
+    
+}
+
+void Epot_reci_init(const double Lsize[DIM], const double alpha){
 
     int nb_k;
     double kxOverL, kyOverL, kzOverL;
     double kOverLsqr, alphaSqr;
     
     nb_k = 0;
-    alphaSqr = c_alpha*c_alpha;
+    alphaSqr = alpha*alpha;
     
     for (int kx=-Nx; kx<Nx; kx++){
     
-        kxOverL = (double)kx/c_Lsize[0];     
+        kxOverL = (double)kx/Lsize[0];     
            
         for (int ky=-Ny; ky<Ny; ky++){
         
-            kyOverL = (double)ky/c_Lsize[1];  
+            kyOverL = (double)ky/Lsize[1];  
                           
             for (int kz=-Nz; kz<Nz; kz++){
                 
-                kzOverL = (double)kz/c_Lsize[2];
+                kzOverL = (double)kz/Lsize[2];
                 
                 if (kx != 0 || ky != 0 || kz != 0){
 
@@ -57,21 +82,7 @@ void c_precalc_exp_ksqr(const double c_Lsize[DIM], const double c_alpha){
     
 }
 
-// Initialisation : phi and S
-
-void c_nfft_init(const int Ncol){
-    
-    for(int iComp=0; iComp<DIM; iComp++){
-        
-        nfft_init_3d(&potential[iComp], 2*Nx, 2*Ny, 2*Nz, Ncol);
-        nfft_init_3d(&structure[iComp], 2*Nx, 2*Ny, 2*Nz, Ncol);
-        
-    }
-    
-}
-
-double c_epot_reci(double X[][DIM], double D[][DIM], const int Ncol, 
-    const double Vol){
+double Epot_reci(double X[][DIM], double D[][DIM], const int Ncol, const double Vol){
     
     // Setting the nodes
     
@@ -171,16 +182,5 @@ double c_epot_reci(double X[][DIM], double D[][DIM], const int Ncol,
     ePot_reci *= 2.*PI/Vol;
     
     return ePot_reci;
-    
-}
-
-// Finalisation
-
-void c_nfft_finalize(){
- 
-    for (int iComp=0; iComp<DIM; iComp++){
-        nfft_finalize(&structure[iComp]);
-        nfft_finalize(&potential[iComp]);
-    }
     
 }
