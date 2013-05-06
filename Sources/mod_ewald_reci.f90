@@ -9,7 +9,7 @@ implicit none
     
         subroutine C_Epot_reci_nfft_init(C_Ncol) bind(C, name="Epot_reci_nfft_init")
         
-        import :: C_int
+            import :: C_int
         
             integer(C_int), value :: C_Ncol
             
@@ -21,7 +21,7 @@ implicit none
         
         subroutine C_Epot_reci_init(C_Lsize, C_alpha) bind(C, name="Epot_reci_init")
         
-        import :: Dim, C_double
+            import :: Dim, C_double
         
             real(C_double), intent(in), dimension(Dim) :: C_Lsize
             real(C_double), value :: C_alpha
@@ -30,7 +30,7 @@ implicit none
         
         function C_Epot_reci(C_X, C_M, C_Ncol, C_Vol) bind(C, name="Epot_reci")
         
-        import :: Dim, C_int, C_double
+            import :: Dim, C_int, C_double
         
             real(C_double), intent(in), dimension(Dim, *) :: C_X, C_M
             integer(C_int), value :: C_Ncol
