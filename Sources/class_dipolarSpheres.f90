@@ -56,7 +56,7 @@ private
         procedure :: Epot_real => DipolarSpheres_Epot_real
         !>     Reciprocal
         procedure :: Epot_reci_init => DipolarSpheres_Epot_reci_init
-        procedure :: Epot_reci => => DipolarSpheres_Epot_reci
+        procedure :: Epot_reci => DipolarSpheres_Epot_reci
         !>     Self
         procedure :: Epot_self_delta => DipolarSpheres_Epot_self_delta
         procedure :: Epot_self => DipolarSpheres_Epot_self
@@ -321,12 +321,16 @@ contains
         
     end subroutine DipolarSpheres_Epot_reci_init
     
-    function DipolarSpheres_Epot_reci(this)
+    function DipolarSpheres_Epot_reci(this) result(Epot_reci)
         
         class(DipolarSpheres), intent(in) :: this
+        real(DP) :: Epot_reci
         
-        call C_Epot_reci(real(this%X, C_double), real(this%M, C_double), &
-                         real(product(Lsize), C_double))
+        real(C_double) :: C_Epot
+        
+        C_Epot = C_Epot_reci(real(this%X, C_double), real(this%M, C_double), &
+                             int(this%Ncol, C_int), real(product(Lsize), C_double))
+        Epot_reci = real(C_Epot, DP)
         
     end function DipolarSpheres_Epot_reci    
     
