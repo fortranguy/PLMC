@@ -6,7 +6,7 @@
 
 static nfft_plan structure[DIM];
 static nfft_plan potential[DIM];
-static double exp_Ksqr[2*Nx][2*Ny][2*Nz];
+static double Epot_reci_tab[2*Nx][2*Ny][2*Nz];
 
 void Epot_reci_nfft_init(const int Ncol);
 void Epot_reci_nfft_finalize();
@@ -63,9 +63,9 @@ void Epot_reci_init(const double Lsize[DIM], const double alpha){
 
                     kOverLsqr = kxOverL*kxOverL + kyOverL*kyOverL + 
                         kzOverL*kzOverL;
-                    exp_Ksqr[kx+Nx][ky+Ny][kz+Nz] = 
+                    Epot_reci_tab[kx+Nx][ky+Ny][kz+Nz] = 
                         exp(-PI*PI/alphaSqr*kOverLsqr);
-                    exp_Ksqr[kx+Nx][ky+Ny][kz+Nz] /= kOverLsqr;
+                    Epot_reci_tab[kx+Nx][ky+Ny][kz+Nz] /= kOverLsqr;
                     nb_k++;
                 
                 }
@@ -76,7 +76,7 @@ void Epot_reci_init(const double Lsize[DIM], const double alpha){
         
     }
     
-    exp_Ksqr[Nx][Ny][Nz] = 0.;
+    Epot_reci_tab[Nx][Ny][Nz] = 0.;
     
     printf(" Ewald Summation : Number of wave vectors : %d\n", nb_k);    
     
@@ -148,7 +148,7 @@ double Epot_reci(double X[][DIM], double D[][DIM], const int Ncol, const double 
                     potential[iComp].f_hat[ik] = scalarProductCplx;
                 }
                 
-                expr_Ksqr = exp_Ksqr[kx+Nx][ky+Ny][kz+Nz];
+                expr_Ksqr = Epot_reci_tab[kx+Nx][ky+Ny][kz+Nz];
                 
                 potential[0].f_hat[ik] *= (double)kx * expr_Ksqr;
                 potential[1].f_hat[ik] *= (double)ky * expr_Ksqr;
