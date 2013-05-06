@@ -14,6 +14,7 @@ use mod_physics
 use class_neighbours
 use class_mixingPotential
 use class_spheres
+use mod_ewald_reci
 
 implicit none
 
@@ -54,8 +55,6 @@ private
         procedure :: Epot_real_pair => DipolarSpheres_Epot_real_pair
         procedure :: Epot_real => DipolarSpheres_Epot_real
         !>     Reciprocal
-        procedure :: Epot_reci_nfft_init => DipolarSpheres_Epot_reci_nfft_init
-        procedure :: Epot_reci_nfft_finalize => DipolarSpheres_Epot_reci_nfft_finalize
         procedure :: Epot_reci_init => DipolarSpheres_Epot_reci_init
         procedure :: Epot_reci => => DipolarSpheres_Epot_reci
         !>     Self
@@ -103,6 +102,7 @@ contains
         this%alpha = dipol_alpha        
         allocate(this%Epot_real_tab(this%iMin:this%iCut, 2))
         call this%Epot_real_init()
+        call C_Epot_reci_nfft_init(int(this%Ncol, C_int))
         
         ! Neighbours : same kind    
         call this%same%construct(this%rCut)
@@ -130,6 +130,7 @@ contains
         if (allocated(this%Epot_real_tab)) then
             deallocate(this%Epot_real_tab)
         endif
+        call C_Epot_reci_nfft_finalize()
         
         call this%same%destroy()
         call this%mix%destroy()
@@ -312,30 +313,22 @@ contains
     
     end function DipolarSpheres_Epot_real
     
-    subroutine DipolarSpheres_Epot_reci_nfft_init(this)
-    
-        class(DipolarSpheres), intent(in) :: this
-        
-        call C_Epot_reci_nfft_init(int(this%Ncol, C_int))
-        
-    end DipolarSpheres_Epot_reci_nfft_init
-    
-    subroutine DipolarSpheres_Epot_reci_nfft_finalize(this)
-        
-        class(DipolarSpheres), intent(in) :: this
-        
-        call C_Epot_reci_nfft_finalize()
-        
-    end subroutine
-    
     subroutine DipolarSpheres_Epot_reci_init(this)
         
         class(DipolarSpheres), intent(in) :: this
         
-        call C_Epot_reci_init
+        call C_Epot_reci_init(real(Lsize, C_double), real(this%alpha, C_double))
         
     end subroutine DipolarSpheres_Epot_reci_init
     
+    function DipolarSpheres_Epot_reci(this)
+        
+        class(DipolarSpheres), intent(in) :: this
+        
+        call C_Epot_reci(real(this%X, C_double), real(this%M, C_double), &
+                         real(product(Lsize), C_double))
+        
+    end function DipolarSpheres_Epot_reci    
     
     !> Self energy difference : rotation
     !> \f[ \frac{2}{3}\frac{\alpha^3}{\sqrt{\pi}} (2\vec{\Delta\mu}_i\cdot\vec{\mu}_i +
