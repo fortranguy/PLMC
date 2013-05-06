@@ -61,10 +61,8 @@ void Epot_reci_init(const double Lsize[DIM], const double alpha){
                 
                 if (kx != 0 || ky != 0 || kz != 0){
 
-                    kOverLsqr = kxOverL*kxOverL + kyOverL*kyOverL + 
-                        kzOverL*kzOverL;
-                    Epot_reci_tab[kx+Nx][ky+Ny][kz+Nz] = 
-                        exp(-PI*PI/alphaSqr*kOverLsqr);
+                    kOverLsqr = kxOverL*kxOverL + kyOverL*kyOverL + kzOverL*kzOverL;
+                    Epot_reci_tab[kx+Nx][ky+Ny][kz+Nz] = exp(-PI*PI/alphaSqr*kOverLsqr);
                     Epot_reci_tab[kx+Nx][ky+Ny][kz+Nz] /= kOverLsqr;
                     nb_k++;
                 
