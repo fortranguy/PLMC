@@ -328,6 +328,14 @@ contains
         
     end subroutine
     
+    subroutine DipolarSpheres_Epot_reci_init(this)
+        
+        class(DipolarSpheres), intent(in) :: this
+        
+        call C_Epot_reci_init
+        
+    end subroutine DipolarSpheres_Epot_reci_init
+    
     
     !> Self energy difference : rotation
     !> \f[ \frac{2}{3}\frac{\alpha^3}{\sqrt{\pi}} (2\vec{\Delta\mu}_i\cdot\vec{\mu}_i +
