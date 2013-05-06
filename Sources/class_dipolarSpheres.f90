@@ -573,7 +573,7 @@ contains
         class(DipolarSpheres), intent(in) :: this        
         real(DP) :: Epot_conf
         
-        Epot_conf = this%Epot_real() - this%Epot_self()
+        Epot_conf = this%Epot_real() + this%Epot_reci() - this%Epot_self()
     
     end function DipolarSpheres_Epot_conf
     
