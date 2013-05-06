@@ -334,8 +334,8 @@ contains
         allocate(C_M(Dim, this%Ncol))
         
         do iCol = 1, this%Ncol
-            C_X(:, iCol) = C_X(:, iCol)/real(Lsize(:), c_double) - 0.5_c_double
-            C_M(:, iCol) = C_M(:, iCol)/real(Lsize(:), c_double)
+            C_X(:, iCol) = real(this%X(:, iCol)/Lsize(:), c_double) - 0.5_c_double
+            C_M(:, iCol) = real(this%M(:, iCol)/Lsize(:), c_double)
         end do
         
         C_Epot = C_Epot_reci(C_X, C_M, int(this%Ncol, C_int), real(product(Lsize), C_double))
