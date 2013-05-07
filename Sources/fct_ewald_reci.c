@@ -123,7 +123,7 @@ double Epot_reci_move(const int lCol, const double deltaX[DIM], const double Vol
                 
                 ik = ikx + iky + (kz + Nz);
                 
-                k_dot_xCol = (double )kx * potential[0].x[DIM*lCol+0] +
+                k_dot_xCol = (double)kx * potential[0].x[DIM*lCol+0] +
                              (double)ky * potential[0].x[DIM*lCol+1] +
                              (double)kz * potential[0].x[DIM*lCol+2];
                              
