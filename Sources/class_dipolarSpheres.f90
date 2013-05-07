@@ -58,6 +58,7 @@ private
         procedure :: Epot_reci_init => DipolarSpheres_Epot_reci_init
         procedure :: Epot_reci_deltaX => DipolarSpheres_Epot_reci_move
         procedure :: Epot_reci => DipolarSpheres_Epot_reci
+        procedure :: Epot_reci_updateX => DipolarSpheres_Epot_reci_updateX
         !>     Self
         procedure :: Epot_self_delta => DipolarSpheres_Epot_self_delta
         procedure :: Epot_self => DipolarSpheres_Epot_self
@@ -338,6 +339,16 @@ contains
     
     end function DipolarSpheres_Epot_reci_move
     
+    subroutine DipolarSpheres_Epot_reci_updateX(this, lCol, xNew)
+    
+        class(DipolarSpheres), intent(in) :: this
+        integer, intent(in) :: lCol
+        real(DP), dimension(:), intent(in) :: xNew
+        
+        call C_Epot_reci_updateX(int(lCol, C_int), real(xNew, C_double))
+    
+    end subroutine DipolarSpheres_Epot_reci_updateX
+    
     function DipolarSpheres_Epot_reci(this) result(Epot_reci)
         
         class(DipolarSpheres), intent(in) :: this
@@ -490,11 +501,14 @@ contains
             call this%Epot_neigh(iOld, xNew, this%M(:, iOld), same_iCellNew, overlap, same_eNew)
                         
             if (.not. overlap) then
-    
+                
+                ! Real
                 same_iCellOld = this%same%position_to_cell(this%X(:, iOld))
                 call this%Epot_neigh(iOld, this%X(:, iOld), this%M(:, iOld), same_iCellOld, &
                                      overlap, same_eOld)
                 same_dEpot = same_eNew - same_eOld
+                ! Reci
+                same_dEpot = same_dEpot + this%Epot_reci_deltaX(xNew-this%X(:, iOld), product(Lsize))
                     
                 mix_iCellOld = this%mix%position_to_cell(this%X(:, iOld))
                 call mix%Epot_neigh(this%X(:, iOld), mix_iCellOld, this%mix, other%X, overlap, &
@@ -507,6 +521,8 @@ contains
                 if (rand < exp(-dEpot/Tstar)) then
                 
                     this%X(:, iOld) = xNew(:)
+                    call this%Epot_reci_updateX()
+                    
                     same_Epot = same_Epot + same_dEpot
                     mix_Epot = mix_Epot + mix_dEpot
                     

@@ -37,6 +37,13 @@ implicit none
         
         end function C_Epot_reci_move
         
+        subroutine C_Epot_reci_updateX(C_lCol, C_xNew) bind(C, name="Epot_reci_updateX")
+        
+            import :: Dim, C_int, C_double
+            
+            integer(C_int), value :: C_lCol
+            real(C_double), dimension(Dim), intent(in) :: C_xNew
+        
         function C_Epot_reci(C_X, C_M, C_Ncol, C_Vol) bind(C, name="Epot_reci")
         
             import :: Dim, C_int, C_double
