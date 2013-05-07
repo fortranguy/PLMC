@@ -55,7 +55,7 @@ implicit none
     open(newunit=obsTherm_unit, recl=4096, file="obsTherm.out", status='new', action='write')
     open(newunit=obsEqb_unit, recl=4096, file="obsEqb.out", status='new', action='write')
     call report(report_unit)
-    call initRandomSeed(report_unit)
+    !call initRandomSeed(report_unit)
     
     call mix%construct()
     mix_EpotSum = 0._DP
@@ -211,9 +211,9 @@ implicit none
     ! Tests & results
 
     call type1_sph%overlapTest()
+    call type1_sph%snapShot()
     call type1_sph%consistTest(type1_obs%Epot, type1_io%report)
     call type1_sph%snapShot_X(type1_io%snapFin_X)
-    call type1_sph%snapShot()
     call type1_sph%snapShot_M(type1_io%snapFin_M)
     call type1_obs%results(type1_sph%getNcol(), type1_io%report)
     

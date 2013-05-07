@@ -80,10 +80,10 @@ use data_cell
 implicit none
 
     real(DP), parameter :: Tstar = 1._DP
-    integer, parameter :: Nstep = 100
+    integer, parameter :: Nstep = 10
     integer, parameter :: Ntherm = 0
     
-    integer, parameter :: Nmove = 1
+    integer, parameter :: Nmove = Ncol
     
     real(DP), dimension(Dim), parameter :: dipol_dx = 1._DP
     real(DP), parameter :: dipol_rejFix = 0.5_DP

@@ -29,6 +29,7 @@ contains
 
         call system_clock(count=clock)
 
+        ! 63532437    63532474
         seed(:) = clock + 37 * [ (i - 1, i = 1, n) ]
         call random_seed(put = seed)
         
