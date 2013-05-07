@@ -79,11 +79,11 @@ use data_cell
 
 implicit none
 
-    real(DP), parameter :: Tstar = 1._DP
-    integer, parameter :: Nstep = 10
+    real(DP), parameter :: Tstar = 0.1_DP
+    integer, parameter :: Nstep = 100
     integer, parameter :: Ntherm = 0
     
-    integer, parameter :: Nmove = Ncol
+    integer, parameter :: Nmove = 1
     
     real(DP), dimension(Dim), parameter :: dipol_dx = 1._DP
     real(DP), parameter :: dipol_rejFix = 0.5_DP
