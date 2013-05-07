@@ -111,6 +111,8 @@ double Epot_reci_move(const int lCol, const double deltaX[DIM], const double Vol
     
     Epot = 0.;
     
+    /*
+    
     for (int kx=-Nx; kx<Nx; kx++){
         
         ikx = (kx + Nx)*(2*Ny * 2*Nz);
@@ -155,6 +157,10 @@ double Epot_reci_move(const int lCol, const double deltaX[DIM], const double Vol
     }
     
     return 2.*PI/Vol * Epot;
+    
+    */
+    
+    return 0.;
     
 }
 

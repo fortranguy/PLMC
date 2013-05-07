@@ -493,7 +493,7 @@ contains
                 call this%Epot_neigh(iOld, this%X(:, iOld), this%M(:, iOld), same_iCellOld, &
                                      overlap, same_eOld)
                 ! Reci
-                C_deltaX = real((xNew(:)-this%X(:, iOld))/Lsize(:), C_double) - 0.5_c_double
+                C_deltaX(:) = real((xNew(:)-this%X(:, iOld))/Lsize(:), C_double) - 0.5_c_double
                 C_Epot = C_Epot_reci_move(int(iOld, C_int), C_deltaX, real(product(Lsize), C_double))
                 
                 same_dEpot = (same_eNew - same_eOld) + real(C_Epot, DP)
@@ -509,7 +509,7 @@ contains
                 if (rand < exp(-dEpot/Tstar)) then
                 
                     this%X(:, iOld) = xNew(:)        
-                    C_xNew = real(xNew(:)/Lsize(:), C_double) - 0.5_c_double        
+                    C_xNew(:) = real(xNew(:)/Lsize(:), C_double) - 0.5_c_double        
                     call C_Epot_reci_updateX(int(iOld, C_int), C_xNew)
                     
                     same_Epot = same_Epot + same_dEpot
