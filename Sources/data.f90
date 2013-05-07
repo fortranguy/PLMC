@@ -79,7 +79,7 @@ use data_cell
 
 implicit none
 
-    real(DP), parameter :: Tstar = 0.1_DP
+    real(DP), parameter :: Tstar = 1._DP
     integer, parameter :: Nstep = 100
     integer, parameter :: Ntherm = 0
     
