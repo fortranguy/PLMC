@@ -167,7 +167,7 @@ double Epot_reci_move(const int lCol, const double deltaX[DIM], const double Vol
 void Epot_reci_updateX(const int lCol, const double xNew[DIM]){
  
     for(int iComp=0; iComp<DIM; iComp++){
-        for (int iDim=0; iDim<DIM; iDim++){        
+        for (int iDim=0; iDim<DIM; iDim++){
             
             potential[iComp].x[DIM*lCol+iDim] = xNew[iDim];            
             structure[iComp].x[DIM*lCol+iDim] = xNew[iDim];            
