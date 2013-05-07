@@ -111,8 +111,6 @@ double Epot_reci_move(const int lCol, const double deltaX[DIM], const double Vol
     
     Epot = 0.;
     
-    /*
-    
     for (int kx=-Nx; kx<Nx; kx++){
         
         ikx = (kx + Nx)*(2*Ny * 2*Nz);
@@ -158,10 +156,6 @@ double Epot_reci_move(const int lCol, const double deltaX[DIM], const double Vol
     
     return 2.*PI/Vol * Epot;
     
-    */
-    
-    return 0.;
-    
 }
 
 void Epot_reci_updateX(const int lCol, const double xNew[DIM]){
@@ -176,7 +170,7 @@ void Epot_reci_updateX(const int lCol, const double xNew[DIM]){
     }
     
     // Precompute $\psi$
-    /*
+    //*
     for(int iComp=0; iComp<DIM; iComp++){
         
         if(potential[iComp].nfft_flags & PRE_ONE_PSI)
