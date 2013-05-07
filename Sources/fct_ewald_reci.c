@@ -179,7 +179,7 @@ void Epot_reci_updateX(const int lCol, const double xNew[DIM]){
             nfft_precompute_one_psi(&structure[iComp]);
         
     }
-    */
+    //*/
     return;
     
 }
