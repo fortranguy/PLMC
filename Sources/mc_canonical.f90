@@ -55,7 +55,7 @@ implicit none
     open(newunit=obsTherm_unit, recl=4096, file="obsTherm.out", status='new', action='write')
     open(newunit=obsEqb_unit, recl=4096, file="obsEqb.out", status='new', action='write')
     call report(report_unit)
-    !call initRandomSeed(report_unit)
+    call initRandomSeed(report_unit)
     
     call mix%construct()
     mix_EpotSum = 0._DP
@@ -103,8 +103,7 @@ implicit none
     
 ! Middle -------------------------------------------------------------------------------------------
         
-    write(output_unit, *) "Beginning of cycles"    
-    write(type1_io%obsEqb, *) 0, type1_obs%Epot, type1_sph%Epot_conf()
+    write(output_unit, *) "Beginning of cycles"
     
     call cpu_time(tIni)
     MC_Cycle : do iStep = 1, Ntherm + Nstep
@@ -189,7 +188,7 @@ implicit none
             mix_EpotSum = mix_EpotSum + mix_Epot
             
             ! Observables writing
-            write(type1_io%obsEqb, *) iStep, type1_obs%Epot, type1_sph%Epot_conf() !type1_obs%activ, type1_obs%rej
+            write(type1_io%obsEqb, *) iStep, type1_obs%Epot, type1_obs%activ, type1_obs%rej
             write(type2_io%obsEqb, *) iStep, type2_obs%Epot, type2_obs%activ, type2_obs%rej
             write(mix_obsEqb_unit, *) iStep, mix_Epot
             write(obsEqb_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
