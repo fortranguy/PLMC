@@ -287,16 +287,24 @@ double Epot_reci(double X[][DIM], double D[][DIM], const int Ncol, const double 
 
 void snapShot(const int Ncol){
     
-    FILE *fp = fopen("C_snapX_0.out", "w");
+    FILE *fp0 = fopen("C_snapX_0.out", "w");
+    FILE *fp1 = fopen("C_snapX_1.out", "w");
+    FILE *fp2 = fopen("C_snapX_2.out", "w");
  
     for (int iCol=0; iCol<Ncol; iCol++){
         for (int iDim=0; iDim<DIM; iDim++){
-            fprintf(fp, "%g ", potential[0].x[DIM*iCol+iDim]);
+            fprintf(fp0, "%g ", structure[0].x[DIM*iCol+iDim]);
+            fprintf(fp1, "%g ", structure[1].x[DIM*iCol+iDim]);
+            fprintf(fp2, "%g ", structure[2].x[DIM*iCol+iDim]);
         }
-        fprintf(fp, "\n");
+        fprintf(fp0, "\n");
+        fprintf(fp1, "\n");
+        fprintf(fp2, "\n");
     }
     
-    fclose(fp);        
+    fclose(fp0);
+    fclose(fp1);
+    fclose(fp2);
     
     return;
 }
