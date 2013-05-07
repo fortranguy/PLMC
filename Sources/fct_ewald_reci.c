@@ -164,7 +164,6 @@ void Epot_reci_updateX(const int lCol, const double xNew[DIM]){
     }
     
     // Precompute $\psi$
-    //*
     for(int iComp=0; iComp<DIM; iComp++){
         
         if(potential[iComp].nfft_flags & PRE_ONE_PSI)
@@ -173,7 +172,6 @@ void Epot_reci_updateX(const int lCol, const double xNew[DIM]){
             nfft_precompute_one_psi(&structure[iComp]);
         
     }
-    //*/
     return;
     
 }
