@@ -129,23 +129,24 @@ double Epot_reci_move(const double deltaX[], const double Vol){
                 k_dot_structure_excess = (double)kx * structure[0].f[lCol] +
                                          (double)ky * structure[1].f[lCol] +
                                          (double)kz * structure[2].f[lCol];
-                k_dot_structure_excess *= exp(I*2.*PI*k_dot_xCol);
+                k_dot_structure_excess*= exp(I*2.*PI*k_dot_xCol);
                 k_dot_structure = k_dot_structure - k_dot_structure_excess;
 
-                factor = exp(-I*2.*PI*k_dot_xCol) * (exp(-I*2.*PI*k_dot_deltaXcol)- 1.);
+                factor = exp(-I*2.*PI*k_dot_xCol) * (exp(-I*2.*PI*k_dot_deltaXcol) - 1.);
                 
-                k_dot_coefficient = (double)kx * structure[0].f[lCol]*factor +
-                                    (double)ky * structure[1].f[lCol]*factor +
-                                    (double)kz * structure[2].f[lCol]*factor;
+                k_dot_coefficient = (double)kx * structure[0].f[lCol] +
+                                    (double)ky * structure[1].f[lCol] +
+                                    (double)kz * structure[2].f[lCol];
+                k_dot_coefficient*= factor;
                
-                Epot = Epot + creal(k_dot_coefficient) * creal(k_dot_structure) *
+                Epot = Epot + 2.*creal(k_dot_coefficient*k_dot_structure) *
                               Epot_reci_tab[kx+Nx][ky+Ny][kz+Nz];
             
             }            
         }        
     }
     
-    return 4.*PI/Vol * Epot;
+    return 2.*PI/Vol * Epot;
     
 }
 
@@ -246,8 +247,6 @@ double Epot_reci(double X[][DIM], double D[][DIM], const int Ncol, const double 
     
     }
     
-    Epot *= 2.*PI/Vol;
-    
-    return Epot;
+    return 2.*PI/Vol * Epot;
     
 }
