@@ -80,7 +80,7 @@ void Epot_reci_init(const double Lsize[DIM], const double alpha){
     
 }
 
-double Epot_reci_move(const double deltaX[], const double Vol){
+double Epot_reci_move(const double deltaX[DIM], const double Vol){
  
     // delta M
     
@@ -95,9 +95,9 @@ double Epot_reci_move(const double deltaX[], const double Vol){
     int ikx, iky, ik;
     int lCol;
     double complex k_dot_structure, k_dot_structure_excess;
-    double complex k_dot_xCol
-    double complex k_dot_deltaXcol
-    double complex k_dot_coefficient
+    double complex k_dot_xCol;
+    double complex k_dot_deltaXcol;
+    double complex k_dot_coefficient;
     double complex factor;
     double Epot;
     

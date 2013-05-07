@@ -23,22 +23,25 @@ implicit none
         
             import :: Dim, C_double
         
-            real(C_double), intent(in), dimension(Dim) :: C_Lsize
+            real(C_double), dimension(Dim) , intent(in) :: C_Lsize
             real(C_double), value :: C_alpha
             
         end subroutine C_Epot_reci_init
         
-        function C_Epot_reci_move(C_deltaX) bind(C, name="Epot_reci_move")
+        function C_Epot_reci_move(C_deltaX, C_Vol) bind(C, name="Epot_reci_move")
         
-            real(C_double), intent(in), dimension(Dim) :: C_deltaX
+            import :: Dim, C_double
         
-        end function C_Epot_reci_deltaX
+            real(C_double), dimension(Dim), intent(in) :: C_deltaX
+            real(C_double), value :: C_Vol
+        
+        end function C_Epot_reci_move
         
         function C_Epot_reci(C_X, C_M, C_Ncol, C_Vol) bind(C, name="Epot_reci")
         
             import :: Dim, C_int, C_double
         
-            real(C_double), intent(in), dimension(Dim, *) :: C_X, C_M
+            real(C_double), dimension(Dim, *), intent(in) :: C_X, C_M
             integer(C_int), value :: C_Ncol
             real(C_double), value :: C_Vol
             real(C_double) :: C_Epot_reci
