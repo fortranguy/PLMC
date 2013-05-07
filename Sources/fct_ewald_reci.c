@@ -130,9 +130,9 @@ double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol){
                                   (double)ky * structure[1].f_hat[ik] +
                                   (double)kz * structure[2].f_hat[ik];
                 
-                k_dot_mOld = (double)kx * structure[0].f[lCol] +
-                             (double)ky * structure[1].f[lCol] +
-                             (double)kz * structure[2].f[lCol];
+                k_dot_mOld = (double)kx * creal(structure[0].f[lCol]) +
+                             (double)ky * creal(structure[1].f[lCol]) +
+                             (double)kz * creal(structure[2].f[lCol]);
                 
                 realPart = cos(k_dot_xNew) - cos(k_dot_xOld);
                 realPart*= creal(k_dot_structure) - k_dot_mOld * cos(k_dot_xOld);
@@ -140,7 +140,7 @@ double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol){
                 imagPart =-sin(k_dot_xNew) + sin(k_dot_xOld);
                 imagPart*= cimag(k_dot_structure) - k_dot_mOld * sin(k_dot_xOld);
                 
-                Epot += 2.*k_dot_mOld * (realPart - imagPart);
+                Epot += 2.*k_dot_mOld * (realPart - imagPart) * Epot_reci_tab[kx+Nx][ky+Ny][kz+Nz];
             
             }            
         }        
