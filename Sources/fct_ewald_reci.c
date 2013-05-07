@@ -103,8 +103,8 @@ double Epot_reci_move(const int lCol, const double deltaX[DIM], const double Vol
     
     int ikx, iky, ik;
     double complex k_dot_structure, k_dot_structure_excess;
-    double complex k_dot_xCol;
-    double complex k_dot_deltaXcol;
+    double k_dot_xCol;
+    double k_dot_deltaXcol;
     double complex k_dot_coefficient;
     double complex factor;
     double Epot;
@@ -134,17 +134,17 @@ double Epot_reci_move(const int lCol, const double deltaX[DIM], const double Vol
                 k_dot_structure = (double)kx * structure[0].f_hat[ik] +
                                   (double)ky * structure[1].f_hat[ik] +
                                   (double)kz * structure[2].f_hat[ik];
-                k_dot_structure_excess = (double)kx * structure[0].f[lCol] +
-                                         (double)ky * structure[1].f[lCol] +
-                                         (double)kz * structure[2].f[lCol];
+                k_dot_structure_excess = (double)kx * creal(structure[0].f[lCol]) +
+                                         (double)ky * creal(structure[1].f[lCol]) +
+                                         (double)kz * creal(structure[2].f[lCol]);
                 k_dot_structure_excess *= exp(I*2.*PI*k_dot_xCol);
                 k_dot_structure -= k_dot_structure_excess;
 
                 factor = exp(-I*2.*PI*k_dot_xCol) * (exp(-I*2.*PI*k_dot_deltaXcol) - 1.);
                 
-                k_dot_coefficient = (double)kx * structure[0].f[lCol] +
-                                    (double)ky * structure[1].f[lCol] +
-                                    (double)kz * structure[2].f[lCol];
+                k_dot_coefficient = (double)kx * creal(structure[0].f[lCol]) +
+                                    (double)ky * creal(structure[1].f[lCol]) +
+                                    (double)kz * creal(structure[2].f[lCol]);
                 k_dot_coefficient *= factor;
                
                 Epot = Epot + 2.*creal(k_dot_coefficient*k_dot_structure) *
