@@ -11,7 +11,7 @@ static double Epot_reci_tab[2*Nx][2*Ny][2*Nz];
 void Epot_reci_nfft_init(const int Ncol);
 void Epot_reci_nfft_finalize();
 void Epot_reci_init(const double Lsize[DIM], const double alpha);
-double Epot_reci_move(const int lCol, const double xNew[DIM], const double xOld[DIM], const double Vol);
+double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol);
 void Epot_reci_updateX(const int lCol, const double xNew[DIM]);
 double Epot_reci(double X[][DIM], double D[][DIM], const int Ncol, const double Vol);
 void snapShot(const int Ncol);
@@ -132,6 +132,14 @@ double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol){
                 k_dot_mOld = (double)kx * structure[0].f[lCol] +
                              (double)ky * structure[1].f[lCol] +
                              (double)kz * structure[2].f[lCol];
+                
+                realPart = cos(k_dot_xNew) - cos(k_dot_xOld);
+                realPart*= creal(k_dot_structure) - k_dot_mOld * cos(k_dot_xOld);
+                
+                imagPart =-sin(k_dot_xNew) + sin(k_dot_xOld);
+                imagPart*= cimag(k_dot_structure) - k_dot_mOld * sin(k_dot_xOld);
+                
+                Epot += 2.*k_dot_mOld * (realPart - imagPart);
             
             }            
         }        
