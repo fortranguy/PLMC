@@ -219,7 +219,7 @@ double Epot_reci(double X[][DIM], double D[][DIM], const int Ncol, const double 
     // Setting the function potential : potential
     
     int ikx, iky, ik;
-    double complex scalarProductCplx;
+    double complex k_dot_structure;
     double Epot_tabulated;
     
     for (int kx=-Nx; kx<Nx; kx++){
@@ -234,12 +234,12 @@ double Epot_reci(double X[][DIM], double D[][DIM], const int Ncol, const double 
                 
                 ik = ikx + iky + (kz + Nz);
                 
-                scalarProductCplx  = (double)kx * structure[0].f_hat[ik] +
-                                     (double)ky * structure[1].f_hat[ik] +
-                                     (double)kz * structure[2].f_hat[ik];
+                k_dot_structure  = (double)kx * structure[0].f_hat[ik] +
+                                   (double)ky * structure[1].f_hat[ik] +
+                                   (double)kz * structure[2].f_hat[ik];
                 
                 for (int iComp=0; iComp<DIM; iComp++){
-                    potential[iComp].f_hat[ik] = scalarProductCplx;
+                    potential[iComp].f_hat[ik] = k_dot_structure;
                 }
                 
                 Epot_tabulated = Epot_reci_tab[kx+Nx][ky+Ny][kz+Nz];
@@ -261,15 +261,16 @@ double Epot_reci(double X[][DIM], double D[][DIM], const int Ncol, const double 
     // Result
     
     double Epot = 0.;
+    double complex mCol_dot_potential;
     
     for (int jCol=0; jCol<Ncol; jCol++){
     
-        scalarProductCplx = 0.;
+        mCol_dot_potential = 0.;
         for (int iComp=0; iComp<DIM; iComp++){
-            scalarProductCplx += D[jCol][iComp]*potential[iComp].f[jCol];
+            mCol_dot_potential += D[jCol][iComp]*potential[iComp].f[jCol];
         }
     
-        Epot += creal(scalarProductCplx);
+        Epot += creal(mCol_dot_potential);
     
     }
     
