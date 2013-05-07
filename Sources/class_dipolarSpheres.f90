@@ -288,7 +288,7 @@ contains
         Epot_coeff(1) = dot_product(mCol_i, mCol_j)
         Epot_coeff(2) =-dot_product(mCol_i, rVec_ij) * dot_product(mCol_j, rVec_ij)
         
-        Epot_real_pair = 0._DP ! dot_product(Epot_coeff, this%Epot_real_interpol(r_ij))
+        Epot_real_pair = dot_product(Epot_coeff, this%Epot_real_interpol(r_ij))
     
     end function DipolarSpheres_Epot_real_pair
     

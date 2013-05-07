@@ -121,10 +121,12 @@ double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol){
                 k_dot_xNew = (double)kx * xNew[0] +
                              (double)ky * xNew[1] +
                              (double)kz * xNew[2];
+                k_dot_xNew*= 2.*PI;
                 
                 k_dot_xOld = (double)kx * potential[0].x[DIM*lCol+0] +
                              (double)ky * potential[0].x[DIM*lCol+1] +
                              (double)kz * potential[0].x[DIM*lCol+2];
+                k_dot_xOld*= 2.*PI;
                 
                 k_dot_structure = (double)kx * structure[0].f_hat[ik] +
                                   (double)ky * structure[1].f_hat[ik] +
