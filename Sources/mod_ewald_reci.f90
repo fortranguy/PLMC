@@ -35,6 +35,7 @@ implicit none
             integer(C_int), value :: C_lCol
             real(C_double), dimension(Dim), intent(in) :: C_deltaX
             real(C_double), value :: C_Vol
+            real(C_double) :: C_Epot_reci_move
         
         end function C_Epot_reci_move
         

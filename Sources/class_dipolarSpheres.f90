@@ -56,9 +56,7 @@ private
         procedure :: Epot_real => DipolarSpheres_Epot_real
         !>     Reciprocal
         procedure :: Epot_reci_init => DipolarSpheres_Epot_reci_init
-        procedure :: Epot_reci_deltaX => DipolarSpheres_Epot_reci_move
         procedure :: Epot_reci => DipolarSpheres_Epot_reci
-        procedure :: Epot_reci_updateX => DipolarSpheres_Epot_reci_updateX
         !>     Self
         procedure :: Epot_self_delta => DipolarSpheres_Epot_self_delta
         procedure :: Epot_self => DipolarSpheres_Epot_self
@@ -322,38 +320,7 @@ contains
         
         call C_Epot_reci_init(real(Lsize, C_double), real(this%alpha, C_double))
         
-    end subroutine DipolarSpheres_Epot_reci_init
-    
-    function DipolarSpheres_Epot_reci_move(this, lCol, deltaX, Vol) result(Epot_reci_deltaX)
-    
-        class(DipolarSpheres), intent(in) :: this
-        integer, intent(in) :: lCol
-        real(DP), dimension(:), intent(in) :: deltaX
-        real(DP), intent(in) :: Vol
-        real(DP) :: Epot_reci_deltaX
-        
-        real(C_double) :: C_Epot
-        real(DP), dimension(Dim) :: C_deltaX
-        
-        C_deltaX = real(deltaX(:)/Lsize(:), C_double) - 0.5_c_double
-        C_Epot = C_Epot_reci_move(int(lCol, C_int), C_deltaX, real(Vol, C_double))
-        
-        Epot_reci_deltaX = real(C_Epot, DP)
-    
-    end function DipolarSpheres_Epot_reci_move
-    
-    subroutine DipolarSpheres_Epot_reci_updateX(this, lCol, xNew)
-    
-        class(DipolarSpheres), intent(in) :: this
-        integer, intent(in) :: lCol
-        real(DP), dimension(:), intent(in) :: xNew
-        
-        real(DP), dimension(Dim) :: C_xNew
-        
-        C_xNew = real(xNew(:)/Lsize(:), C_double) - 0.5_c_double        
-        call C_Epot_reci_updateX(int(lCol, C_int), C_xNew)
-    
-    end subroutine DipolarSpheres_Epot_reci_updateX
+    end subroutine DipolarSpheres_Epot_reci_init    
     
     function DipolarSpheres_Epot_reci(this) result(Epot_reci)
         
@@ -491,6 +458,10 @@ contains
         real(DP) :: same_eNew, same_eOld
         real(DP) :: mix_eNew, mix_eOld
         
+        real(C_double) :: C_Epot
+        real(C_double), dimension(Dim) :: C_deltaX
+        real(C_double), dimension(Dim) :: C_xNew
+        
         call random_number(rand)
         iOld = int(rand*real(this%Ncol, DP)) + 1
         
@@ -512,10 +483,11 @@ contains
                 same_iCellOld = this%same%position_to_cell(this%X(:, iOld))
                 call this%Epot_neigh(iOld, this%X(:, iOld), this%M(:, iOld), same_iCellOld, &
                                      overlap, same_eOld)
-                same_dEpot = same_eNew - same_eOld
                 ! Reci
-                same_dEpot = same_dEpot + &
-                             this%Epot_reci_deltaX(iOld, xNew-this%X(:, iOld), product(Lsize))
+                C_deltaX = real((xNew(:)-this%X(:, iOld))/Lsize(:), C_double) - 0.5_c_double
+                C_Epot = C_Epot_reci_move(int(iOld, C_int), C_deltaX, real(product(Lsize), C_double))
+                
+                same_dEpot = (same_eNew - same_eOld) + real(C_Epot, DP)
                     
                 mix_iCellOld = this%mix%position_to_cell(this%X(:, iOld))
                 call mix%Epot_neigh(this%X(:, iOld), mix_iCellOld, this%mix, other%X, overlap, &
@@ -527,8 +499,9 @@ contains
                 call random_number(rand)
                 if (rand < exp(-dEpot/Tstar)) then
                 
-                    this%X(:, iOld) = xNew(:)
-                    call this%Epot_reci_updateX(iOld, xNew)
+                    this%X(:, iOld) = xNew(:)        
+                    C_xNew = real(xNew(:)/Lsize(:), C_double) - 0.5_c_double        
+                    call C_Epot_reci_updateX(int(iOld, C_int), C_xNew)
                     
                     same_Epot = same_Epot + same_dEpot
                     mix_Epot = mix_Epot + mix_dEpot
