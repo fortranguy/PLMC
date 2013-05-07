@@ -102,6 +102,7 @@ double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol){
     int ikx, iky, ik;
     double k_dot_xNew, k_dot_xOld, k_dot_mOld;
     double complex k_dot_structure;
+    double realPart, imagPart;
     
     Epot = 0.;
     
