@@ -11,7 +11,7 @@ static double Epot_reci_tab[2*Nx][2*Ny][2*Nz];
 void Epot_reci_nfft_init(const int Ncol);
 void Epot_reci_nfft_finalize();
 void Epot_reci_init(const double Lsize[DIM], const double alpha);
-double Epot_reci_move(const int lCol, const double deltaX[DIM], const double Vol);
+double Epot_reci_move(const int lCol, const double xNew[DIM], const double xOld[DIM], const double Vol);
 void Epot_reci_updateX(const int lCol, const double xNew[DIM]);
 double Epot_reci(double X[][DIM], double D[][DIM], const int Ncol, const double Vol);
 void snapShot(const int Ncol);
@@ -89,25 +89,19 @@ void Epot_reci_init(const double Lsize[DIM], const double alpha){
     
 }
 
-double Epot_reci_move(const int lCol, const double deltaX[DIM], const double Vol){
- 
-    // delta M
+double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol){
+
     
     // Doing the transform : structure
     
     for (int iComp=0; iComp<DIM; iComp++){
         nfft_adjoint(&structure[iComp]);
     }
-    
-    // delta U
-    
-    int ikx, iky, ik;
-    double complex k_dot_structure, k_dot_structure_excess;
-    double k_dot_xCol;
-    double k_dot_deltaXcol;
-    double complex k_dot_coefficient;
-    double complex factor;
+
     double Epot;
+    int ikx, iky, ik;
+    double k_dot_xNew, k_dot_xOld, k_dot_mOld;
+    double complex k_dot_structure;
     
     Epot = 0.;
     
@@ -123,32 +117,21 @@ double Epot_reci_move(const int lCol, const double deltaX[DIM], const double Vol
                 
                 ik = ikx + iky + (kz + Nz);
                 
-                k_dot_xCol = (double)kx * potential[0].x[DIM*lCol+0] +
+                k_dot_xNew = (double)kx * xNew[0] +
+                             (double)ky * xNew[1] +
+                             (double)kz * xNew[2];
+                
+                k_dot_xOld = (double)kx * potential[0].x[DIM*lCol+0] +
                              (double)ky * potential[0].x[DIM*lCol+1] +
                              (double)kz * potential[0].x[DIM*lCol+2];
-                             
-                k_dot_deltaXcol = (double)kx * deltaX[0] +
-                                  (double)ky * deltaX[1] +
-                                  (double)kz * deltaX[2];
                 
                 k_dot_structure = (double)kx * structure[0].f_hat[ik] +
                                   (double)ky * structure[1].f_hat[ik] +
                                   (double)kz * structure[2].f_hat[ik];
-                k_dot_structure_excess = (double)kx * creal(structure[0].f[lCol]) +
-                                         (double)ky * creal(structure[1].f[lCol]) +
-                                         (double)kz * creal(structure[2].f[lCol]);
-                k_dot_structure_excess *= exp(I*2.*PI*k_dot_xCol);
-                k_dot_structure -= k_dot_structure_excess;
-
-                factor = exp(-I*2.*PI*k_dot_xCol) * (exp(-I*2.*PI*k_dot_deltaXcol) - 1.);
                 
-                k_dot_coefficient = (double)kx * creal(structure[0].f[lCol]) +
-                                    (double)ky * creal(structure[1].f[lCol]) +
-                                    (double)kz * creal(structure[2].f[lCol]);
-                k_dot_coefficient *= factor;
-               
-                Epot = Epot + 2.*creal(k_dot_coefficient*k_dot_structure) *
-                              Epot_reci_tab[kx+Nx][ky+Ny][kz+Nz];
+                k_dot_mOld = (double)kx * structure[0].f[lCol] +
+                             (double)ky * structure[1].f[lCol] +
+                             (double)kz * structure[2].f[lCol];
             
             }            
         }        
