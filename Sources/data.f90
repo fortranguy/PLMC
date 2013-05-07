@@ -49,7 +49,7 @@ implicit none
 
     real(DP), parameter :: dipol_radius = .5_DP
     real(DP), parameter :: dipol_rMin = 2._DP * dipol_radius
-    integer, parameter :: dipol_Ncol = 100
+    integer, parameter :: dipol_Ncol = 3
 
     real(DP), parameter :: inter_radius = .5_DP
     real(DP), parameter :: inter_rMin = 2._DP * inter_radius
