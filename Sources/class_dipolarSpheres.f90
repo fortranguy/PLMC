@@ -3,7 +3,7 @@
 module class_dipolarSpheres
 
 use, intrinsic :: iso_fortran_env
-use, intrinsic :: iso_c_binding, only : c_int, c_double
+use, intrinsic :: iso_c_binding, only : C_int, C_double
 use data_constants
 use data_cell
 use data_particles
@@ -324,16 +324,19 @@ contains
         
     end subroutine DipolarSpheres_Epot_reci_init
     
-    function DipolarSpheres_Epot_reci_move(this, deltaX, Vol) result(Epot_reci_deltaX)
+    function DipolarSpheres_Epot_reci_move(this, lCol, deltaX, Vol) result(Epot_reci_deltaX)
     
         class(DipolarSpheres), intent(in) :: this
+        integer, intent(in) :: lCol
         real(DP), dimension(:), intent(in) :: deltaX
         real(DP), intent(in) :: Vol
         real(DP) :: Epot_reci_deltaX
         
         real(C_double) :: C_Epot
+        real(DP), dimension(Dim) :: C_deltaX
         
-        C_Epot = C_Epot_reci_move(real(deltaX, C_double), real(Vol, C_double))
+        C_deltaX = real(deltaX(:)/Lsize(:), C_double) - 0.5_c_double
+        C_Epot = C_Epot_reci_move(int(lCol, C_int), C_deltaX, real(Vol, C_double))
         
         Epot_reci_deltaX = real(C_Epot, DP)
     
@@ -345,7 +348,10 @@ contains
         integer, intent(in) :: lCol
         real(DP), dimension(:), intent(in) :: xNew
         
-        call C_Epot_reci_updateX(int(lCol, C_int), real(xNew, C_double))
+        real(DP), dimension(Dim) :: C_xNew
+        
+        C_xNew = real(xNew(:)/Lsize(:), C_double) - 0.5_c_double        
+        call C_Epot_reci_updateX(int(lCol, C_int), C_xNew)
     
     end subroutine DipolarSpheres_Epot_reci_updateX
     
@@ -355,15 +361,15 @@ contains
         real(DP) :: Epot_reci
         
         real(C_double) :: C_Epot
-        real(c_double), dimension(:, :), allocatable :: C_X, C_M
+        real(C_double), dimension(:, :), allocatable :: C_X, C_M
         integer :: iCol
         
         allocate(C_X(Dim, this%Ncol))
         allocate(C_M(Dim, this%Ncol))
         
         do iCol = 1, this%Ncol
-            C_X(:, iCol) = real(this%X(:, iCol)/Lsize(:), c_double) - 0.5_c_double
-            C_M(:, iCol) = real(this%M(:, iCol)/Lsize(:), c_double)
+            C_X(:, iCol) = real(this%X(:, iCol)/Lsize(:), C_double) - 0.5_c_double
+            C_M(:, iCol) = real(this%M(:, iCol)/Lsize(:), C_double)
         end do
         
         C_Epot = C_Epot_reci(C_X, C_M, int(this%Ncol, C_int), real(product(Lsize), C_double))
@@ -508,7 +514,8 @@ contains
                                      overlap, same_eOld)
                 same_dEpot = same_eNew - same_eOld
                 ! Reci
-                same_dEpot = same_dEpot + this%Epot_reci_deltaX(xNew-this%X(:, iOld), product(Lsize))
+                same_dEpot = same_dEpot + &
+                             this%Epot_reci_deltaX(iOld, xNew-this%X(:, iOld), product(Lsize))
                     
                 mix_iCellOld = this%mix%position_to_cell(this%X(:, iOld))
                 call mix%Epot_neigh(this%X(:, iOld), mix_iCellOld, this%mix, other%X, overlap, &
@@ -521,7 +528,7 @@ contains
                 if (rand < exp(-dEpot/Tstar)) then
                 
                     this%X(:, iOld) = xNew(:)
-                    call this%Epot_reci_updateX()
+                    call this%Epot_reci_updateX(iOld, xNew)
                     
                     same_Epot = same_Epot + same_dEpot
                     mix_Epot = mix_Epot + mix_dEpot

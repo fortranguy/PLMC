@@ -28,10 +28,11 @@ implicit none
             
         end subroutine C_Epot_reci_init
         
-        function C_Epot_reci_move(C_deltaX, C_Vol) bind(C, name="Epot_reci_move")
+        function C_Epot_reci_move(C_lCol, C_deltaX, C_Vol) bind(C, name="Epot_reci_move")
         
-            import :: Dim, C_double
-        
+            import :: Dim, C_int, C_double
+            
+            integer(C_int), value :: C_lCol
             real(C_double), dimension(Dim), intent(in) :: C_deltaX
             real(C_double), value :: C_Vol
         
@@ -43,6 +44,8 @@ implicit none
             
             integer(C_int), value :: C_lCol
             real(C_double), dimension(Dim), intent(in) :: C_xNew
+            
+        end subroutine C_Epot_reci_updateX
         
         function C_Epot_reci(C_X, C_M, C_Ncol, C_Vol) bind(C, name="Epot_reci")
         
