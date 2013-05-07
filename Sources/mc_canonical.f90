@@ -213,6 +213,7 @@ implicit none
     call type1_sph%overlapTest()
     call type1_sph%consistTest(type1_obs%Epot, type1_io%report)
     call type1_sph%snapShot_X(type1_io%snapFin_X)
+    call type1_sph%snapShot()
     call type1_sph%snapShot_M(type1_io%snapFin_M)
     call type1_obs%results(type1_sph%getNcol(), type1_io%report)
     

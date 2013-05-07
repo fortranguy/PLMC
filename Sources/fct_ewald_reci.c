@@ -11,7 +11,10 @@ static double Epot_reci_tab[2*Nx][2*Ny][2*Nz];
 void Epot_reci_nfft_init(const int Ncol);
 void Epot_reci_nfft_finalize();
 void Epot_reci_init(const double Lsize[DIM], const double alpha);
+double Epot_reci_move(const int lCol, const double deltaX[DIM], const double Vol);
+void Epot_reci_updateX(const int lCol, const double xNew[DIM]);
 double Epot_reci(double X[][DIM], double D[][DIM], const int Ncol, const double Vol);
+void snapShot(const int Ncol);
 
 // Initialisation : phi and S
 
@@ -24,6 +27,8 @@ void Epot_reci_nfft_init(const int Ncol){
         
     }
     
+    return;
+    
 }
 
 
@@ -35,6 +40,8 @@ void Epot_reci_nfft_finalize(){
         nfft_finalize(&structure[iComp]);
         nfft_finalize(&potential[iComp]);
     }
+    
+    return;
     
 }
 
@@ -76,7 +83,9 @@ void Epot_reci_init(const double Lsize[DIM], const double alpha){
     
     Epot_reci_tab[Nx][Ny][Nz] = 0.;
     
-    printf(" Ewald Summation : Number of wave vectors : %d\n", nb_k);    
+    printf(" Ewald Summation : Number of wave vectors : %d\n", nb_k);
+    
+    return;
     
 }
 
@@ -170,6 +179,8 @@ void Epot_reci_updateX(const int lCol, const double xNew[DIM]){
             nfft_precompute_one_psi(&structure[iComp]);
         
     }
+    
+    return;
     
 }
 
@@ -272,4 +283,20 @@ double Epot_reci(double X[][DIM], double D[][DIM], const int Ncol, const double 
     
     return 2.*PI/Vol * Epot;
     
+}
+
+void snapShot(const int Ncol){
+    
+    FILE *fp = fopen("C_snapX_0.out", "w");
+ 
+    for (int iCol=0; iCol<Ncol; iCol++){
+        for (int iDim=0; iDim<DIM; iDim++){
+            fprintf(fp, "%g ", potential[0].x[DIM*iCol+iDim]);
+        }
+        fprintf(fp, "\n");
+    }
+    
+    fclose(fp);        
+    
+    return;
 }

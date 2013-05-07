@@ -46,6 +46,7 @@ private
         
         !> Take a snap shot of the configuration : orientations
         procedure :: snapShot_M => DipolarSpheres_snapShot_M
+        procedure :: snapShot => DipolarSpheres_snapShot
         
         !> Potential energy
         !>     Real
@@ -176,6 +177,14 @@ contains
         end do    
 
     end subroutine DipolarSpheres_snapShot_M
+    
+    subroutine DipolarSpheres_snapShot(this)
+        
+        class(DipolarSpheres), intent(in) :: this
+        
+        call C_snapShot(int(this%Ncol, C_int))
+
+    end subroutine DipolarSpheres_snapShot
     
     !> Potential energy : real part
     !> Initialisation

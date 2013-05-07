@@ -58,6 +58,14 @@ implicit none
             real(C_double) :: C_Epot_reci
             
         end function C_Epot_reci
+        
+        subroutine C_snapShot(C_Ncol) bind(C, name="snapShot")
+            
+            import :: C_int
+            
+            integer(C_int), value :: C_Ncol
+            
+        end subroutine C_snapShot
     
     end interface
 
