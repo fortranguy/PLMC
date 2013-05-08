@@ -1,15 +1,15 @@
 FC = ifort
-FFLAGS = -warn all -check all -check noarg_temp_created
-LDFLAGS = -warn all -check all -check noarg_temp_created
-#FFLAGS_OMP = $(FFLAGS) -openmp 
-#LDFLAGS_OMP = $(LDFLAGS) -openmp
+FFLAGS = #-warn all -check all -check noarg_temp_created
+LDFLAGS = #-warn all -check all -check noarg_temp_created
+FFLAGS_OMP = $(FFLAGS) -openmp 
+LDFLAGS_OMP = $(LDFLAGS) -openmp
 #FC = gfortran
 #FFLAGS = -W -Wall -fbounds-check
 #LDFLAGS = -W -Wall -fbounds-check
 
 CC = icc
 NFFT_DIR = /home/salomon/Libraries
-CFLAGS = -std=c99 -I$(NFFT_DIR)/include -Wall -W -debug all -w3 -Wcheck 
+CFLAGS = -std=c99 -I$(NFFT_DIR)/include #-Wall -W -debug all -w3 -Wcheck 
 CLDFLAGS = -L$(NFFT_DIR)/lib
 LDLIBS  = -lnfft3 -lfftw3
 

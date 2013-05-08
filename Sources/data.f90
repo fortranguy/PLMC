@@ -49,15 +49,15 @@ implicit none
 
     real(DP), parameter :: dipol_radius = .5_DP
     real(DP), parameter :: dipol_rMin = 2._DP * dipol_radius
-    integer, parameter :: dipol_Ncol = 100
+    integer, parameter :: dipol_Ncol = 270
 
     real(DP), parameter :: inter_radius = .5_DP
     real(DP), parameter :: inter_rMin = 2._DP * inter_radius
-    integer, parameter :: inter_Ncol = 0
+    integer, parameter :: inter_Ncol = 270
     
     real(DP), parameter :: hard_radius = .5_DP
     real(DP), parameter :: hard_rMin = 2._DP * hard_radius
-    integer, parameter :: hard_Ncol = 100
+    integer, parameter :: hard_Ncol = 270
     
     real(DP), parameter :: mix_delta = 0._DP
     real(DP), parameter :: mix_rMin = inter_radius + hard_radius + mix_delta
@@ -80,10 +80,10 @@ use data_cell
 implicit none
 
     real(DP), parameter :: Tstar = 1._DP
-    integer, parameter :: Nstep = 100
+    integer, parameter :: Nstep = 2**2
     integer, parameter :: Ntherm = 0
     
-    integer, parameter :: Nmove = 1
+    integer, parameter :: Nmove = Ncol
     
     real(DP), dimension(Dim), parameter :: dipol_dx = 1._DP
     real(DP), parameter :: dipol_rejFix = 0.5_DP
