@@ -163,6 +163,7 @@ void Epot_reci_updateX(const int lCol, const double xNew[DIM]){
     
     int ikx, iky, ik;
     double k_dot_xNew, k_dot_xOld;
+    double realPart, imagPart;
     
     for (int kx=-Nx; kx<Nx; kx++){
         
@@ -185,11 +186,14 @@ void Epot_reci_updateX(const int lCol, const double xNew[DIM]){
                              (double)ky * xOld[1] +
                              (double)kz * xOld[2];
                 k_dot_xOld*= 2.*PI;
+                
+                realPart = cos(k_dot_xNew) - cos(k_dot_xOld);
+                imagPart = sin(k_dot_xNew) - sin(k_dot_xOld);
 
                 for(int iComp=0; iComp<DIM; iComp++){
                     
                     structure[iComp].f_hat[ik] += creal(structure[iComp].f[lCol]) *
-                                                  (exp(I*k_dot_xNew) - exp(I*k_dot_xOld));
+                                                  (realPart + I*imagPart);
                                                 
                 }
     
