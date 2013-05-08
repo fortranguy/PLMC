@@ -91,13 +91,6 @@ void Epot_reci_init(const double Lsize[DIM], const double alpha){
 
 double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol){
 
-    
-    // Doing the transform : structure
-    
-    for (int iComp=0; iComp<DIM; iComp++){
-        nfft_adjoint(&structure[iComp]);
-    }
-
     double Epot;
     int ikx, iky, ik;
     double k_dot_xNew, k_dot_xOld, k_dot_mOld;
@@ -162,13 +155,8 @@ void Epot_reci_updateX(const int lCol, const double xNew[DIM]){
         }
     }
     
-    // Precompute $\psi$
-    for(int iComp=0; iComp<DIM; iComp++){
-
-        if(structure[iComp].nfft_flags & PRE_ONE_PSI)
-            nfft_precompute_one_psi(&structure[iComp]);
-        
-    }
+    structure[iComp].f_hat[ik] += -m[iComp]*exp(I*2.PI*k_dot_xOld) + m[iComp]*exp(I*2.PI*k_dot_xOld)
+    
     return;
     
 }
