@@ -240,7 +240,7 @@ double Epot_reci(double X[][DIM], double D[][DIM], const int Ncol, const double 
     // Doing the transform : structure
     
     for (int iComp=0; iComp<DIM; iComp++){
-        nfft_adjoint_direct(&structure[iComp]);
+        nfft_adjoint(&structure[iComp]);
     }
     
     // Setting the function potential : potential
@@ -282,7 +282,7 @@ double Epot_reci(double X[][DIM], double D[][DIM], const int Ncol, const double 
     // Doing the transform :potential
     
     for (int iComp=0; iComp<DIM; iComp++){
-        nfft_trafo_direct(&potential[iComp]);
+        nfft_trafo(&potential[iComp]);
     }
     
     // Result
