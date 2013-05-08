@@ -123,9 +123,9 @@ double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol){
                              (double)kz * xNew[2];
                 k_dot_xNew*= 2.*PI;
                 
-                k_dot_xOld = (double)kx * potential[0].x[DIM*lCol+0] +
-                             (double)ky * potential[0].x[DIM*lCol+1] +
-                             (double)kz * potential[0].x[DIM*lCol+2];
+                k_dot_xOld = (double)kx * structure[0].x[DIM*lCol+0] +
+                             (double)ky * structure[0].x[DIM*lCol+1] +
+                             (double)kz * structure[0].x[DIM*lCol+2];
                 k_dot_xOld*= 2.*PI;
                 
                 k_dot_structure = (double)kx * structure[0].f_hat[ik] +
@@ -156,18 +156,15 @@ void Epot_reci_updateX(const int lCol, const double xNew[DIM]){
  
     for(int iComp=0; iComp<DIM; iComp++){
         for (int iDim=0; iDim<DIM; iDim++){
-            
-            potential[iComp].x[DIM*lCol+iDim] = xNew[iDim];            
-            structure[iComp].x[DIM*lCol+iDim] = xNew[iDim];            
+                       
+            structure[iComp].x[DIM*lCol+iDim] = xNew[iDim];
             
         }
     }
     
     // Precompute $\psi$
     for(int iComp=0; iComp<DIM; iComp++){
-        
-        if(potential[iComp].nfft_flags & PRE_ONE_PSI)
-            nfft_precompute_one_psi(&potential[iComp]);
+
         if(structure[iComp].nfft_flags & PRE_ONE_PSI)
             nfft_precompute_one_psi(&structure[iComp]);
         
