@@ -81,7 +81,7 @@ implicit none
 
     real(DP), parameter :: Tstar = 1._DP
     integer, parameter :: Nstep = 2**3
-    integer, parameter :: Ntherm = 2**3
+    integer, parameter :: Ntherm = 0
     
     integer, parameter :: Nmove = Ncol
     
