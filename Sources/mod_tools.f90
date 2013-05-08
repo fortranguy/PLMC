@@ -29,8 +29,7 @@ contains
 
         call system_clock(count=clock)
 
-        ! 63532437    63532474
-        seed(:) = clock + 37 * [ (i - 1, i = 1, n) ]
+        seed(:) = [1026447305,  1026447342]
         call random_seed(put = seed)
         
         write(report_unit, *) "Random number generator :"

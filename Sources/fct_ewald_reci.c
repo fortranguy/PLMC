@@ -146,16 +146,58 @@ double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol){
 }
 
 void Epot_reci_updateX(const int lCol, const double xNew[DIM]){
+    
+    double xOld[DIM];
  
-    for(int iComp=0; iComp<DIM; iComp++){
-        for (int iDim=0; iDim<DIM; iDim++){
-                       
+    for (int iDim=0; iDim<DIM; iDim++){
+        
+        xOld[iDim] = structure[0].x[DIM*lCol+iDim];
+        
+        for(int iComp=0; iComp<DIM; iComp++){
+            
             structure[iComp].x[DIM*lCol+iDim] = xNew[iDim];
             
         }
+        
     }
     
-    structure[iComp].f_hat[ik] += -m[iComp]*exp(I*2.PI*k_dot_xOld) + m[iComp]*exp(I*2.PI*k_dot_xOld)
+    int ikx, iky, ik;
+    double k_dot_xNew, k_dot_xOld;
+    
+    for (int kx=-Nx; kx<Nx; kx++){
+        
+        ikx = (kx + Nx)*(2*Ny * 2*Nz);
+        
+        for (int ky=-Ny; ky<Ny; ky++){
+            
+            iky = (ky + Ny)*2*Nz;
+            
+            for (int kz=-Nz; kz<Nz; kz++){
+                
+                ik = ikx + iky + (kz + Nz);
+    
+                k_dot_xNew = (double)kx * xNew[0] +
+                             (double)ky * xNew[1] +
+                             (double)kz * xNew[2];
+                k_dot_xNew*= 2.*PI;
+                
+                k_dot_xOld = (double)kx * xOld[0] +
+                             (double)ky * xOld[1] +
+                             (double)kz * xOld[2];
+                k_dot_xOld*= 2.*PI;
+
+                for(int iComp=0; iComp<DIM; iComp++){
+                    
+                    structure[iComp].f_hat[ik] += creal(structure[iComp].f[lCol]) *
+                                                  (exp(I*k_dot_xNew) - exp(I*k_dot_xOld));
+                                                
+                }
+    
+            }
+            
+        }
+        
+    }
     
     return;
     
