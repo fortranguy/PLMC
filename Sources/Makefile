@@ -9,7 +9,7 @@ LDFLAGS_OMP = $(LDFLAGS) -openmp
 
 CC = icc
 NFFT_DIR = /home/salomon/Libraries
-CFLAGS = -std=c99 -I$(NFFT_DIR)/include -Wall -W -debug all -w3 -Wcheck 
+CFLAGS = -std=c99 -I$(NFFT_DIR)/include #-Wall -W -debug all -w3 -Wcheck 
 CLDFLAGS = -L$(NFFT_DIR)/lib
 LDLIBS  = -lnfft3 -lfftw3
 

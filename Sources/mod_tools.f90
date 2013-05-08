@@ -28,8 +28,8 @@ contains
         allocate(seed(n))
 
         call system_clock(count=clock)
-
-        seed(:) = [1026447305,  1026447342]
+        
+        seed(:) = clock + 37 * [ (i - 1, i = 1, n) ]
         call random_seed(put = seed)
         
         write(report_unit, *) "Random number generator :"
