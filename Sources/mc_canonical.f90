@@ -55,7 +55,7 @@ implicit none
     open(newunit=obsTherm_unit, recl=4096, file="obsTherm.out", status='new', action='write')
     open(newunit=obsEqb_unit, recl=4096, file="obsEqb.out", status='new', action='write')
     call report(report_unit)
-    call initRandomSeed(report_unit)
+    !call initRandomSeed(report_unit)
     
     call mix%construct()
     mix_EpotSum = 0._DP
