@@ -310,7 +310,7 @@ double Epot_reci_rotate(const int lCol, const double mNew[DIM], const double Vol
 
                 Epot_k = k_dot_mNew*k_dot_mNew - k_dot_mOld*k_dot_mOld;
                 Epot_k+= 2.*(k_dot_mNew - k_dot_mOld) * realPart;
-                Epot_k*= Epot_reci_tab[kx+Nx][ky+Ny][kz+Nz];  
+                Epot_k*= Epot_reci_tab[kx+Nx][ky+Ny][kz+Nz];
                 Epot += Epot_k;
             }            
         }        
