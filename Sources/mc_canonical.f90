@@ -170,7 +170,7 @@ implicit none
             else ! Rotation adaptation
                 type1_obs%rejRotAdapt = type1_obs%rejRotAdapt/real(type1_sph%getNadaptRot()-1)
                 call type1_sph%adaptDm(type1_obs%rejRotAdapt)
-                write(type1_io%dx, *) iStep, type1_sph%getDm(), type1_obs%rejRotAdapt
+                write(type1_io%dm, *) iStep, type1_sph%getDm(), type1_obs%rejRotAdapt
                 type1_obs%rejRotAdapt = 0._DP
             end if
 
