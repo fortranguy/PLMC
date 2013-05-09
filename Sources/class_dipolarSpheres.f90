@@ -56,9 +56,9 @@ private
         procedure :: snapShot => DipolarSpheres_snapShot
         
         !> Adapt the displacement dx during thermalisation
-        procedure :: adaptDm => Spheres_adaptDm
-        procedure :: definiteDm => Spheres_definiteDm
-        procedure :: getDm => Spheres_getDm
+        procedure :: adaptDm => DipolarSpheres_adaptDm
+        procedure :: definiteDm => DipolarSpheres_definiteDm
+        procedure :: getDm => DipolarSpheres_getDm
         
         !> Potential energy
         !>     Real
@@ -208,9 +208,9 @@ contains
     
     !> Adaptation of dm during the thermalisation
     
-    subroutine Spheres_adaptDm(this, rej)
+    subroutine DipolarSpheres_adaptDm(this, rej)
     
-        class(Spheres), intent(inout) :: this
+        class(DipolarSpheres), intent(inout) :: this
         real(DP), intent(in) :: rej
         
         real(DP), parameter :: eps_dm = 0.05_DP
@@ -233,46 +233,43 @@ contains
             
         end if
     
-    end subroutine Spheres_adaptDm
+    end subroutine DipolarSpheres_adaptDm
     
-    subroutine Spheres_definiteDm(this, rej, report_unit)
+    subroutine DipolarSpheres_definiteDm(this, rej, report_unit)
     
-        class(Spheres), intent(inout) :: this    
+        class(DipolarSpheres), intent(inout) :: this    
         real(DP), intent(in) :: rej
         integer, intent(in) :: report_unit
         
-            if (rej == 0._DP) then
-                write(error_unit, *) this%name, " :    Warning : dx adaptation problem."
-                this%dm(:) = this%dmSave(:)
-                write(error_unit, *) "default dx :", this%dx(:)
-            end if
-            
-            dx_normSqr = dot_product(this%dx, this%dx)
-            Lsize_normSqr = dot_product(LsizeMi, LsizeMi)
-            if (dx_normSqr >= Lsize_normSqr) then
-                write(error_unit, *) this%name, " :   Warning : dx too big."
-                this%dx(:) = LsizeMi(:)
-                write(error_unit, *) "big dx :", this%dx(:)
-            end if
-            
-            write(output_unit, *) this%name, " :    Thermalisation : over"
-            
-            write(report_unit, *) "Displacement :"
-            write(report_unit, *) "    dx(:) = ", this%dx(:)
-            write(report_unit, *) "    rejection relative difference = ", &
-                                       abs(rej-this%rejFix)/this%rejFix
-    
-    end subroutine Spheres_definiteDm
-    
-    function Spheres_getDm(this) result(getDx)
+        if (rej == 0._DP) then
+            write(error_unit, *) this%name, " :    Warning : dm adaptation problem."
+            this%dm = this%dmSave
+            write(error_unit, *) "default dm :", this%dm
+        end if
         
-        class(Spheres), intent(in) :: this        
+        if (this%dm > this%dmMax) then
+            write(error_unit, *) this%name, " :   Warning : dm too big."
+            this%dm = this%dmMax
+            write(error_unit, *) "big dm :", this%dm
+        end if
+        
+        write(output_unit, *) this%name, " :    Thermalisation : over"
+        
+        write(report_unit, *) "Displacement :"
+        write(report_unit, *) "    dm = ", this%dm
+        write(report_unit, *) "    rejection relative difference = ", &
+                                    abs(rej-this%rejRotFix)/this%rejRotFix
+    
+    end subroutine DipolarSpheres_definiteDm
+    
+    function DipolarSpheres_getDm(this) result(getDx)
+        
+        class(DipolarSpheres), intent(in) :: this        
         real(DP) :: getDx
         
-        ! average dx of 3 vector components
-        getDx = sum(this%dx)/size(this%dx)
+        getDx = this%dm
         
-    end function Spheres_getDm
+    end function DipolarSpheres_getDm
     
     !> Potential energy : real part
     !> Initialisation
@@ -643,7 +640,7 @@ contains
         iOld = int(rand*real(this%Ncol, DP)) + 1
         
         mRand(:) = random_surface()
-        mNew(:) = this%M(:, iOld) + this%dm(:) * mRand(:)
+        mNew(:) = this%M(:, iOld) + this%dm * mRand(:)
         mNew(:) = mNew(:)/sqrt(dot_product(mNew, mNew))
         
         C_mNew(:) = real(mNew(:)/Lsize(:), C_double) - 0.5_c_double
