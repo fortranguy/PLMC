@@ -339,13 +339,10 @@ void Epot_reci_updateM(const int lCol, const double mNew[DIM]){
                 
                 ik = ikx + iky + (kz + Nz);
                 
-                k_dot_xOld = (double)kx * xOld[0] +
-                             (double)ky * xOld[1] +
-                             (double)kz * xOld[2];
+                k_dot_xOld = (double)kx * structure[0].x[DIM*lCol+0] +
+                             (double)ky * structure[0].x[DIM*lCol+1] +
+                             (double)kz * structure[0].x[DIM*lCol+2];
                 k_dot_xOld*= 2.*PI;
-                
-                realPart = cos(k_dot_xNew) - cos(k_dot_xOld);
-                imagPart = sin(k_dot_xNew) - sin(k_dot_xOld);
 
                 for(int iComp=0; iComp<DIM; iComp++){
                     

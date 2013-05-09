@@ -72,7 +72,7 @@ implicit none
             integer(C_int), value :: C_lCol
             real(C_double), dimension(Dim), intent(in) :: C_mNew
             
-        end subroutine C_Epot_reci_updateX
+        end subroutine C_Epot_reci_updateM
         
         ! ------------------------------------------------------------------------------------------
         
