@@ -16,7 +16,7 @@ use mod_tools
 implicit none
     
     ! Monte-Carlo variables
-    integer :: iStep, iMove !< Monte-Carlo counters
+    integer :: iStep, iMove, iRotate !< Monte-Carlo counters
     integer :: iColRand !< random particle
     real(DP) :: rand !< random number in between 0 and 1
     real(DP) :: tIni, tFin !< CPU initial and final time
@@ -124,6 +124,13 @@ implicit none
             end if
             
         end do MC_Move
+        
+        MC_Rotate : do iRotate = 1, Nrotate
+ 
+            call type1_sph%rotate(type1_obs%Epot, type1_obs%NrejRot)
+            type1_obs%Nrotate = type1_obs%Nrotate + 1
+            
+        end do MC_Rotate
         
         ! Chemical potentials : Widom method
         call type1_sph%widom(type2_sph%X, mix, type1_obs%activ)

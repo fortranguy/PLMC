@@ -48,6 +48,17 @@ implicit none
             
         end subroutine C_Epot_reci_updateX
         
+        subroutine C_Epot_reci_rotate(C_lcol, C_mNew, C_Vol) bind(C, name="Epot_reci_rotate")
+        
+            import :: Dim, C_int, C_double
+            
+            nteger(C_int), value :: C_lCol
+            real(C_double), dimension(Dim), intent(in) :: C_mNew
+            real(C_double), value :: C_Vol
+            real(C_double) :: C_Epot_reci_rotate
+        
+        end subroutine C_Epot_reci_rotate
+        
         function C_Epot_reci(C_X, C_M, C_Ncol, C_Vol) bind(C, name="Epot_reci")
         
             import :: Dim, C_int, C_double

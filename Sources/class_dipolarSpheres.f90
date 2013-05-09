@@ -68,6 +68,7 @@ private
         
         !> Monte-Carlo
         procedure :: move => DipolarSpheres_move
+        procedure :: rotate = DipolarSpheres_rotate
         procedure :: widom => DipolarSpheres_widom
         
     end type DipolarSpheres
@@ -536,6 +537,26 @@ contains
         end if
     
     end subroutine DipolarSpheres_move
+    
+    subroutine DipolarSpheres_rotate(this, same_Epot, Nrej)
+    
+        class(DipolarSpheres), intent(inout) :: this
+        real(DP), intent(inout) :: same_Epot
+        integer, intent(inout) :: Nrej
+        
+        integer :: iOld
+        real(DP) :: rand
+        real(DP), dimension(Dim) :: mMew
+        
+        real(C_double) :: C_Epot
+        real(C_double), dimension(Dim) :: C_xNew
+        
+        call random_number(rand)
+        iOld = int(rand*real(this%Ncol, DP)) + 1
+        
+        mNew(:) = random_surface()
+    
+    end subroutine DipolarSpheres_rotate
     
     !> Widom's method : with other type ?
 

@@ -97,6 +97,8 @@ void Epot_reci_init(const double Lsize[DIM], const double alpha){
     
 }
 
+// Move --------------------------------------------------------------------------------------------
+
 /*!> Difference of Energy \f[ \Delta U = \frac{2\pi}{V} \sum_{\vec{k} \neq 0} \Delta M^2 
  * f(\alpha, \vec{k}) \f]
  * \f[
@@ -123,7 +125,7 @@ double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol){
     int ikx, iky, ik;
     double k_dot_xNew, k_dot_xOld, k_dot_mOld;
     double complex k_dot_structure;
-    double realPart, imagPart;
+    double realPart1, realPart2;
     
     Epot = 0.;
     
@@ -149,21 +151,21 @@ double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol){
                              (double)kz * structure[0].x[DIM*lCol+2];
                 k_dot_xOld*= 2.*PI;
                 
+                k_dot_mOld = (double)kx * creal(structure[0].f[lCol]) +
+                             (double)ky * creal(structure[1].f[lCol]) +
+                             (double)kz * creal(structure[2].f[lCol]);
+                             
                 k_dot_structure = (double)kx * structure[0].f_hat[ik] +
                                   (double)ky * structure[1].f_hat[ik] +
                                   (double)kz * structure[2].f_hat[ik];
                 
-                k_dot_mOld = (double)kx * creal(structure[0].f[lCol]) +
-                             (double)ky * creal(structure[1].f[lCol]) +
-                             (double)kz * creal(structure[2].f[lCol]);
+                realPart1 = cos(k_dot_xNew) - cos(k_dot_xOld);
+                realPart1*= creal(k_dot_structure) - k_dot_mOld * cos(k_dot_xOld);
                 
-                realPart = cos(k_dot_xNew) - cos(k_dot_xOld);
-                realPart*= creal(k_dot_structure) - k_dot_mOld * cos(k_dot_xOld);
+                realPart2 =-sin(k_dot_xNew) + sin(k_dot_xOld);
+                realPart2*= cimag(k_dot_structure) - k_dot_mOld * sin(k_dot_xOld);
                 
-                imagPart =-sin(k_dot_xNew) + sin(k_dot_xOld);
-                imagPart*= cimag(k_dot_structure) - k_dot_mOld * sin(k_dot_xOld);
-                
-                Epot += 2.*k_dot_mOld * (realPart - imagPart) * Epot_reci_tab[kx+Nx][ky+Ny][kz+Nz];
+                Epot += 2.*k_dot_mOld * (realPart1 - realPart2) * Epot_reci_tab[kx+Nx][ky+Ny][kz+Nz];
             
             }            
         }        
@@ -247,6 +249,65 @@ void Epot_reci_updateX(const int lCol, const double xNew[DIM]){
     return;
     
 }
+
+// -------------------------------------------------------------------------------------------------
+
+// Rotate ------------------------------------------------------------------------------------------
+
+double Epot_reci_rotate(const int lCol, const double mNew[DIM], const double Vol){
+
+    double Epot;
+    int ikx, iky, ik;
+    double k_dot_xNew, k_dot_xOld, k_dot_mOld;
+    double complex k_dot_structure;
+    double realPart;
+    
+    Epot = 0.;
+    
+    for (int kx=-Nx; kx<Nx; kx++){
+        
+        ikx = (kx + Nx)*(2*Ny * 2*Nz);
+        
+        for (int ky=-Ny; ky<Ny; ky++){
+            
+            iky = (ky + Ny)*2*Nz;
+            
+            for (int kz=-Nz; kz<Nz; kz++){
+                
+                ik = ikx + iky + (kz + Nz);
+                
+                k_dot_xOld = (double)kx * structure[0].x[DIM*lCol+0] +
+                             (double)ky * structure[0].x[DIM*lCol+1] +
+                             (double)kz * structure[0].x[DIM*lCol+2];
+                k_dot_xOld*= 2.*PI;
+                
+                k_dot_mNew = (double)kx * mNew[0] +
+                             (double)ky * mNew[1] +
+                             (double)kz * mNew[2];
+                k_dot_mNew*= 2.*PI;               
+                
+                k_dot_mOld = (double)kx * creal(structure[0].f[lCol]) +
+                             (double)ky * creal(structure[1].f[lCol]) +
+                             (double)kz * creal(structure[2].f[lCol]);                             
+                             
+                k_dot_structure = (double)kx * structure[0].f_hat[ik] +
+                                  (double)ky * structure[1].f_hat[ik] +
+                                  (double)kz * structure[2].f_hat[ik];
+                
+                realPart = cos(k_dot_xOld) * (creal(k_dot_structure) - k_dot_mOld * cos(k_dot_xOld));
+                realPart+= sin(k_dot_xOld) * (cimag(k_dot_structure) - k_dot_mOld * sin(k_dot_xOld));
+
+                Epot = k_dot_mNew*k_dot_mNew - k_dot_mOld*k_dot_mOld;
+                Epot+= 2.*(k_dot_mNew - k_dot_mOld) * realPart * Epot_reci_tab[kx+Nx][ky+Ny][kz+Nz];
+                Epot += k_dot_mOld * (realPart - imagPart) * 
+            
+            }            
+        }        
+    }
+    
+    return 2.*PI/Vol * Epot;
+
+// -------------------------------------------------------------------------------------------------
 
 double Epot_reci(double X[][DIM], double D[][DIM], const int Ncol, const double Vol){
     
