@@ -72,7 +72,7 @@ private
         procedure :: Epot_reci_init => DipolarSpheres_Epot_reci_init
         procedure :: Epot_reci => DipolarSpheres_Epot_reci
         !>     Self
-        procedure :: Epot_self_delta => DipolarSpheres_Epot_self_delta
+        procedure :: Epot_self_rotate => DipolarSpheres_Epot_self_rotate
         procedure :: Epot_self => DipolarSpheres_Epot_self
         !>     (Other)
         procedure :: Epot_neigh => DipolarSpheres_Epot_neigh
@@ -456,20 +456,20 @@ contains
     end function DipolarSpheres_Epot_reci    
     
     !> Self energy difference : rotation
-    !> \f[ \frac{2}{3}\frac{\alpha^3}{\sqrt{\pi}} (2\vec{\Delta\mu}_i\cdot\vec{\mu}_i +
-    !>                                              \vec{\Delta\mu}_i\cdot\vec{\Delta\mu}_i)\f]
+    !> \f[ \frac{2}{3}\frac{\alpha^3}{\sqrt{\pi}} (\vec{\mu}^\prime_i\cdot\vec{\mu}^\prime_i -
+    !>                                             \vec{\mu}_i\cdot\vec{\mu}_i)\f]
     
-    function DipolarSpheres_Epot_self_delta(this, iCol, deltaM) result(Epot_self_delta)
+    function DipolarSpheres_Epot_self_rotate(this, iCol, mNew) result(Epot_self_rotate)
     
         class(DipolarSpheres), intent(in) :: this
         integer, intent(in) :: iCol
-        real(DP), dimension(:) :: deltaM
-        real(DP) :: Epot_self_delta
+        real(DP), dimension(:) :: mNew
+        real(DP) :: Epot_self_rotate
         
-        Epot_self_delta = 2._DP*dot_product(deltaM, this%M(:, iCol)) + dot_product(deltaM, deltaM)
-        Epot_self_delta = Epot_self_delta * 2._DP/3._DP * this%alpha**3/sqrt(PI)
+        Epot_self_rotate = dot_product(mNew, mNew) - dot_product(this%M(:, iCol), this%M(:, iCol))
+        Epot_self_rotate = Epot_self_rotate * 2._DP/3._DP * this%alpha**3/sqrt(PI)
     
-    end function DipolarSpheres_Epot_self_delta
+    end function DipolarSpheres_Epot_self_rotate
     
     !> Total self energy
     !> \f[ \frac{2}{3}\frac{\alpha^3}{\sqrt{\pi}} \sum_i \vec{\mu}_i\cdot\vec{\mu}_i \f]
@@ -660,7 +660,7 @@ contains
         C_mNew(:) = real(mNew(:)/Lsize(:), C_double)
         C_Epot = C_Epot_reci_rotate(int(iOld-1, C_int), C_mNew, real(product(Lsize), C_double))
         
-        dEpot = real(C_Epot, DP)
+        dEpot = real(C_Epot, DP) - this%Epot_self_rotate(iOld, mNew)
         
         call random_number(rand)
         if (rand < exp(-dEpot/Tstar)) then
@@ -728,7 +728,7 @@ contains
         class(DipolarSpheres), intent(in) :: this        
         real(DP) :: Epot_conf
         
-        Epot_conf = this%Epot_real() + this%Epot_reci() !- this%Epot_self()
+        Epot_conf = this%Epot_real() + this%Epot_reci() - this%Epot_self()
     
     end function DipolarSpheres_Epot_conf
     
