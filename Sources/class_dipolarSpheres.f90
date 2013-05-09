@@ -669,7 +669,6 @@ contains
         
         real_dEpot = real_eNew - real_eOld
         dEpot = real(C_Epot, DP) + real_dEpot - this%Epot_self_rotate(iOld, mNew)
-        
         call random_number(rand)
         if (rand < exp(-dEpot/Tstar)) then
         

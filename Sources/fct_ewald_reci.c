@@ -268,7 +268,7 @@ void Epot_reci_updateX(const int lCol, const double xNew[DIM]){
 
 double Epot_reci_rotate(const int lCol, const double mNew[DIM], const double Vol){
 
-    double Epot;
+    double Epot, Epot_k;
     int ikx, iky, ik;
     double k_dot_xOld, k_dot_mNew, k_dot_mOld;
     double complex k_dot_structure;
@@ -308,9 +308,10 @@ double Epot_reci_rotate(const int lCol, const double mNew[DIM], const double Vol
                 realPart = cos(k_dot_xOld) * (creal(k_dot_structure) - k_dot_mOld * cos(k_dot_xOld));
                 realPart+= sin(k_dot_xOld) * (cimag(k_dot_structure) - k_dot_mOld * sin(k_dot_xOld));
 
-                Epot = k_dot_mNew*k_dot_mNew - k_dot_mOld*k_dot_mOld;
-                Epot+= 2.*(k_dot_mNew - k_dot_mOld) * realPart * Epot_reci_tab[kx+Nx][ky+Ny][kz+Nz];
-            
+                Epot_k = k_dot_mNew*k_dot_mNew - k_dot_mOld*k_dot_mOld;
+                Epot_k+= 2.*(k_dot_mNew - k_dot_mOld) * realPart;
+                Epot_k*= Epot_reci_tab[kx+Nx][ky+Ny][kz+Nz];  
+                Epot += Epot_k;
             }            
         }        
     }
