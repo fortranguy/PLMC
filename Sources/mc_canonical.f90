@@ -201,6 +201,7 @@ implicit none
             type1_obs%EpotSum = type1_obs%EpotSum + type1_obs%Epot
             type1_obs%activSum = type1_obs%activSum + type1_obs%activ
             type1_obs%rejSum = type1_obs%rejSum + type1_obs%rej
+            type1_obs%rejRotSum = type1_obs%rejRotSum + type1_obs%rejRot
         
             type2_obs%EpotSum = type2_obs%EpotSum + type2_obs%Epot
             type2_obs%activSum = type2_obs%activSum + type2_obs%activ
@@ -209,7 +210,8 @@ implicit none
             mix_EpotSum = mix_EpotSum + mix_Epot
             
             ! Observables writing
-            write(type1_io%obsEqb, *) iStep, type1_obs%Epot, type1_obs%activ, type1_obs%rej
+            write(type1_io%obsEqb, *) iStep, type1_obs%Epot, type1_obs%activ, type1_obs%rej, &
+                                                                              type1_obs%rejRot
             write(type2_io%obsEqb, *) iStep, type2_obs%Epot, type2_obs%activ, type2_obs%rej
             write(mix_obsEqb_unit, *) iStep, mix_Epot
             write(obsEqb_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
