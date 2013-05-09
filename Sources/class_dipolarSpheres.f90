@@ -657,7 +657,7 @@ contains
         mNew(:) = this%M(:, iOld) + this%dm * mRand(:)
         mNew(:) = mNew(:)/sqrt(dot_product(mNew, mNew))
         
-        C_mNew(:) = real(mNew(:)/Lsize(:), C_double) - 0.5_c_double
+        C_mNew(:) = real(mNew(:)/Lsize(:), C_double)
         C_Epot = C_Epot_reci_rotate(int(iOld-1, C_int), C_mNew, real(product(Lsize), C_double))
         
         dEpot = real(C_Epot, DP)
