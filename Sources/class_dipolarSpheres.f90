@@ -529,11 +529,11 @@ contains
                 end if
          
             else
-                Nrej = Nrej + 1                
+                Nrej = Nrej + 1
             end if            
             
         else        
-            Nrej = Nrej + 1            
+            Nrej = Nrej + 1
         end if
     
     end subroutine DipolarSpheres_move
@@ -547,14 +547,28 @@ contains
         integer :: iOld
         real(DP) :: rand
         real(DP), dimension(Dim) :: mMew
+        real(DP) :: dEpot
         
         real(C_double) :: C_Epot
-        real(C_double), dimension(Dim) :: C_xNew
+        real(C_double), dimension(Dim) :: C_mNew
         
         call random_number(rand)
         iOld = int(rand*real(this%Ncol, DP)) + 1
         
         mNew(:) = random_surface()
+        
+        C_mNew(:) = real(mNew(:)/Lsize(:), C_double) - 0.5_c_double
+        C_Epot = C_Epot_reci_rotate(int(iOld-1, C_int), C_mNew, real(product(Lsize), C_double))
+        
+        dEpot = real(Epot, DP)
+        
+        call random_number(rand)
+        if (rand < exp(-dEpot/Tstar)) then
+            this%M(:, iOld) = mNew(:)
+            !call C_Epot_reci_updateM(int(iOld-1, C_int), C_mNew)        
+        else
+            Nrej = Nrej + 1
+        end if
     
     end subroutine DipolarSpheres_rotate
     

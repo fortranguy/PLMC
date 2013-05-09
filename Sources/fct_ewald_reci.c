@@ -19,8 +19,12 @@ static double Epot_reci_tab[2*Nx][2*Ny][2*Nz]; /*!< \f[ f(\alpha, \vec{k}) = \fr
 void Epot_reci_nfft_init(const int Ncol);
 void Epot_reci_nfft_finalize();
 void Epot_reci_init(const double Lsize[DIM], const double alpha);
+
 double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol);
 void Epot_reci_updateX(const int lCol, const double xNew[DIM]);
+
+double Epot_reci_rotate(const int lCol, const double mNew[DIM], const double Vol);
+
 double Epot_reci(double X[][DIM], double D[][DIM], const int Ncol, const double Vol);
 void snapShot(const int Ncol);
 
@@ -299,7 +303,6 @@ double Epot_reci_rotate(const int lCol, const double mNew[DIM], const double Vol
 
                 Epot = k_dot_mNew*k_dot_mNew - k_dot_mOld*k_dot_mOld;
                 Epot+= 2.*(k_dot_mNew - k_dot_mOld) * realPart * Epot_reci_tab[kx+Nx][ky+Ny][kz+Nz];
-                Epot += k_dot_mOld * (realPart - imagPart) * 
             
             }            
         }        
