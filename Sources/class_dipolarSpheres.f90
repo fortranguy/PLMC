@@ -665,7 +665,7 @@ contains
         call random_number(rand)
         if (rand < exp(-dEpot/Tstar)) then
             this%M(:, iOld) = mNew(:)
-            call C_Epot_reci_updateM(int(iOld-1, C_int), C_mNew)        
+            call C_Epot_reci_updateM(int(iOld-1, C_int), C_mNew)
         else
             Nrej = Nrej + 1
         end if
