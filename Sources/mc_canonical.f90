@@ -105,6 +105,8 @@ implicit none
         
     write(output_unit, *) "Beginning of cycles"
     
+    write(type1_io%obsTherm, *) 0, type1_obs%Epot, type1_sph%Epot_conf()
+    
     call cpu_time(tIni)
     MC_Cycle : do iStep = 1, Ntherm + Nstep
     
@@ -184,8 +186,8 @@ implicit none
             end if
             
             ! Observables writing
-            write(type1_io%obsTherm, *) iStep, type1_obs%Epot, type1_obs%activ, type1_obs%rej, &
-                                                                                type1_obs%rejRot
+            write(type1_io%obsTherm, *) iStep, type1_obs%Epot, type1_sph%Epot_conf()!type1_obs%activ, type1_obs%rej, &
+                                                                !                type1_obs%rejRot
             write(type2_io%obsTherm, *) iStep, type2_obs%Epot, type2_obs%activ, type2_obs%rej
             write(mix_obsTherm_unit, *) iStep, mix_Epot
             write(obsTherm_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
