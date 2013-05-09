@@ -163,6 +163,16 @@ implicit none
                 write(type1_io%dx, *) iStep, type1_sph%getDx(), type1_obs%rejAdapt
                 type1_obs%rejAdapt = 0._DP
             end if
+            
+            ! Rotation optimisation
+            if (mod(iStep, type1_sph%getNadaptRot()) /= 0) then ! Rejections accumulation
+                type1_obs%rejRotAdapt = type1_obs%rejRotAdapt + type1_obs%rejRot
+            else ! Rotation adaptation
+                type1_obs%rejRotAdapt = type1_obs%rejRotAdapt/real(type1_sph%getNadaptRot()-1)
+                call type1_sph%adaptDm(type1_obs%rejRotAdapt)
+                write(type1_io%dx, *) iStep, type1_sph%getDm(), type1_obs%rejRotAdapt
+                type1_obs%rejRotAdapt = 0._DP
+            end if
 
             if (mod(iStep, type2_sph%getNadapt()) /= 0) then
                 type2_obs%rejAdapt = type2_obs%rejAdapt + type2_obs%rej
@@ -174,7 +184,8 @@ implicit none
             end if
             
             ! Observables writing
-            write(type1_io%obsTherm, *) iStep, type1_obs%Epot, type1_obs%activ, type1_obs%rej
+            write(type1_io%obsTherm, *) iStep, type1_obs%Epot, type1_obs%activ, type1_obs%rej, &
+                                                                                type1_obs%rejRot
             write(type2_io%obsTherm, *) iStep, type2_obs%Epot, type2_obs%activ, type2_obs%rej
             write(mix_obsTherm_unit, *) iStep, mix_Epot
             write(obsTherm_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot

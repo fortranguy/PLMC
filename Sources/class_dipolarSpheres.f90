@@ -59,6 +59,7 @@ private
         procedure :: adaptDm => DipolarSpheres_adaptDm
         procedure :: definiteDm => DipolarSpheres_definiteDm
         procedure :: getDm => DipolarSpheres_getDm
+        procedure :: getNadaptRot => DipolarSpheres_getNadaptRot
         
         !> Potential energy
         !>     Real
@@ -262,6 +263,8 @@ contains
     
     end subroutine DipolarSpheres_definiteDm
     
+    !> Accessor : dm
+    
     function DipolarSpheres_getDm(this) result(getDx)
         
         class(DipolarSpheres), intent(in) :: this        
@@ -270,6 +273,17 @@ contains
         getDx = this%dm
         
     end function DipolarSpheres_getDm
+    
+    !> Accessor : Nadapt
+    
+    function DipolarSpheres_getNadaptRot(this) result(getNadaptRot)
+    
+        class(DipolarSpheres), intent(in) :: this        
+        integer :: getNadaptRot
+        
+        getNadaptRot = this%NadaptRot
+        
+    end function DipolarSpheres_getNadaptRot
     
     !> Potential energy : real part
     !> Initialisation
