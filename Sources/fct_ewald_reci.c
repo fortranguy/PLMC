@@ -353,7 +353,8 @@ void Epot_reci_updateM(const int lCol, const double mNew[DIM]){
 
                 for(int iComp=0; iComp<DIM; iComp++){
                     
-                    structure[iComp].f_hat[ik] += (mNew[iComp] - mOld[iComp]) * exp(I*k_dot_xOld);
+                    structure[iComp].f_hat[ik] += (mNew[iComp] - mOld[iComp]) * 
+                                                  (cos(k_dot_xOld) + I*sin(k_dot_xOld));
                                                 
                 }
     
