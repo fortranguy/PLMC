@@ -139,6 +139,8 @@ implicit none
         ! Rejections rates updates
         type1_obs%rej = real(type1_obs%Nrej, DP)/real(type1_obs%Nmove, DP)
         type1_obs%Nrej = 0; type1_obs%Nmove = 0
+        type1_obs%rejRot = real(type1_obs%NrejRot, DP)/real(type1_obs%Nrotate, DP)
+        type1_obs%NrejRot = 0; type1_obs%Nrotate = 0
 
         type2_obs%rej = real(type2_obs%Nrej, DP)/real(type2_obs%Nmove, DP)
         type2_obs%Nrej = 0; type2_obs%Nmove = 0
@@ -148,6 +150,7 @@ implicit none
             ! Initial displacements & rejections
             if (iStep == 1) then
                 write(type1_io%dx, *) iStep, type1_sph%getDx(), type1_obs%rej
+                write(type1_io%dm, *) iStep, type1_sph%getDm(), type1_obs%rejRot
                 write(type2_io%dx, *) iStep, type2_sph%getDx(), type2_obs%rej
             end if
             

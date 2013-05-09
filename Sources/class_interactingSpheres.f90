@@ -70,7 +70,7 @@ contains
         
         ! Monte-Carlo
         this%dx = inter_dx
-        this%dx_save = this%dx
+        this%dxSave = this%dx
         this%rejFix = inter_rejFix
         this%Nadapt = inter_Nadapt
         this%Nwidom = inter_Nwidom

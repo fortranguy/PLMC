@@ -29,8 +29,9 @@ private
         real(DP), dimension(:, :), allocatable, public :: M !< moments of all particles
         
         ! Monte-Carlo
-        real(DP), dimension(Dim) :: dm !< rotation
-        real(DP), dimension(Dim) :: dm_save
+        real(DP) :: dm !< rotation
+        real(DP) :: dmSave
+        real(DP) :: dmMax
         real(DP) :: rejRotFix
         integer :: NadaptRot
 
@@ -53,6 +54,11 @@ private
         !> Take a snap shot of the configuration : orientations
         procedure :: snapShot_M => DipolarSpheres_snapShot_M
         procedure :: snapShot => DipolarSpheres_snapShot
+        
+        !> Adapt the displacement dx during thermalisation
+        procedure :: adaptDm => Spheres_adaptDm
+        procedure :: definiteDm => Spheres_definiteDm
+        procedure :: getDm => Spheres_getDm
         
         !> Potential energy
         !>     Real
@@ -97,12 +103,13 @@ contains
         
         ! Monte-Carlo
         this%dx = dipol_dx
-        this%dx_save = this%dx
+        this%dxSave = this%dx
         this%rejFix = dipol_rejFix
         this%Nadapt = dipol_Nadapt
         
         this%dm = dipol_dm
-        this%dm_save = this%dm
+        this%dmSave = this%dm
+        this%dmMax = dipol_dmMax
         this%rejRotFix = dipol_rejRotFix
         this%NadaptRot = dipol_NadaptRot
         
@@ -198,6 +205,74 @@ contains
         call C_snapShot(int(this%Ncol, C_int))
 
     end subroutine DipolarSpheres_snapShot
+    
+    !> Adaptation of dm during the thermalisation
+    
+    subroutine Spheres_adaptDm(this, rej)
+    
+        class(Spheres), intent(inout) :: this
+        real(DP), intent(in) :: rej
+        
+        real(DP), parameter :: eps_dm = 0.05_DP
+        real(DP), parameter :: eps_rej = 0.1_DP * eps_dm
+        real(DP), parameter :: more = 1._DP+eps_dm
+        real(DP), parameter :: less = 1._DP-eps_dm
+
+        
+        if (rej < this%rejRotFix - eps_rej) then
+        
+            this%dm = this%dm * more
+  
+            if (this%dm > this%dmMax) then
+                this%dm = this%dmMax
+            end if
+            
+        else if (rej > this%rejRotFix + eps_rej) then
+        
+            this%dm = this%dm * less
+            
+        end if
+    
+    end subroutine Spheres_adaptDm
+    
+    subroutine Spheres_definiteDm(this, rej, report_unit)
+    
+        class(Spheres), intent(inout) :: this    
+        real(DP), intent(in) :: rej
+        integer, intent(in) :: report_unit
+        
+            if (rej == 0._DP) then
+                write(error_unit, *) this%name, " :    Warning : dx adaptation problem."
+                this%dm(:) = this%dmSave(:)
+                write(error_unit, *) "default dx :", this%dx(:)
+            end if
+            
+            dx_normSqr = dot_product(this%dx, this%dx)
+            Lsize_normSqr = dot_product(LsizeMi, LsizeMi)
+            if (dx_normSqr >= Lsize_normSqr) then
+                write(error_unit, *) this%name, " :   Warning : dx too big."
+                this%dx(:) = LsizeMi(:)
+                write(error_unit, *) "big dx :", this%dx(:)
+            end if
+            
+            write(output_unit, *) this%name, " :    Thermalisation : over"
+            
+            write(report_unit, *) "Displacement :"
+            write(report_unit, *) "    dx(:) = ", this%dx(:)
+            write(report_unit, *) "    rejection relative difference = ", &
+                                       abs(rej-this%rejFix)/this%rejFix
+    
+    end subroutine Spheres_definiteDm
+    
+    function Spheres_getDm(this) result(getDx)
+        
+        class(Spheres), intent(in) :: this        
+        real(DP) :: getDx
+        
+        ! average dx of 3 vector components
+        getDx = sum(this%dx)/size(this%dx)
+        
+    end function Spheres_getDm
     
     !> Potential energy : real part
     !> Initialisation

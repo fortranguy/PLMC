@@ -27,7 +27,7 @@ private
 
         ! Monte-Carlo
         real(DP), dimension(Dim) :: dx !< displacement
-        real(DP), dimension(Dim) :: dx_save
+        real(DP), dimension(Dim) :: dxSave
         real(DP) :: rejFix
         integer :: Nadapt
         integer :: Nwidom
@@ -203,12 +203,13 @@ contains
         
         real(DP) :: dx_normSqr, Lsize_normSqr
         
+        Lsize_normSqr = dot_product(LsizeMi, LsizeMi)
+        
         if (rej < this%rejFix - eps_rej) then
         
             this%dx(:) = this%dx(:) * more
             
             dx_normSqr = dot_product(this%dx, this%dx)
-            Lsize_normSqr = dot_product(LsizeMi, LsizeMi)
             if (dx_normSqr > Lsize_normSqr) then
                 this%dx(:) = LsizeMi(:)
             end if
@@ -231,7 +232,7 @@ contains
         
             if (rej == 0._DP) then
                 write(error_unit, *) this%name, " :    Warning : dx adaptation problem."
-                this%dx(:) = this%dx_save(:)
+                this%dx(:) = this%dxSave(:)
                 write(error_unit, *) "default dx :", this%dx(:)
             end if
             
