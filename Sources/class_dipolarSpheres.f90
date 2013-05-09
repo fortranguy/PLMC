@@ -636,10 +636,10 @@ contains
     
     end subroutine DipolarSpheres_move
     
-    subroutine DipolarSpheres_rotate(this, same_Epot, Nrej)
+    subroutine DipolarSpheres_rotate(this, Epot, Nrej)
     
         class(DipolarSpheres), intent(inout) :: this
-        real(DP), intent(inout) :: same_Epot
+        real(DP), intent(inout) :: Epot
         integer, intent(inout) :: Nrej
         
         integer :: iOld
@@ -664,8 +664,12 @@ contains
         
         call random_number(rand)
         if (rand < exp(-dEpot/Tstar)) then
+        
             this%M(:, iOld) = mNew(:)
             call C_Epot_reci_updateM(int(iOld-1, C_int), C_mNew)
+            
+            Epot = Epot + dEpot
+            
         else
             Nrej = Nrej + 1
         end if
