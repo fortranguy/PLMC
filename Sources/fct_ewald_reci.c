@@ -24,6 +24,7 @@ double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol);
 void Epot_reci_updateX(const int lCol, const double xNew[DIM]);
 
 double Epot_reci_rotate(const int lCol, const double mNew[DIM], const double Vol);
+void Epot_reci_updateM(const int lCol, const double mNew[DIM]);
 
 double Epot_reci(double X[][DIM], double D[][DIM], const int Ncol, const double Vol);
 void snapShot(const int Ncol);
@@ -262,7 +263,7 @@ double Epot_reci_rotate(const int lCol, const double mNew[DIM], const double Vol
 
     double Epot;
     int ikx, iky, ik;
-    double k_dot_xNew, k_dot_xOld, k_dot_mOld;
+    double k_dot_xOld, k_dot_mNew, k_dot_mOld;
     double complex k_dot_structure;
     double realPart;
     
@@ -309,6 +310,58 @@ double Epot_reci_rotate(const int lCol, const double mNew[DIM], const double Vol
     }
     
     return 2.*PI/Vol * Epot;
+    
+}
+
+void Epot_reci_updateM(const int lCol, const double mNew[DIM]){
+
+    double mOld[DIM];
+        
+    for(int iDim=0; iDim<DIM; iDim++){
+        
+        mOld[iDim] = structure[iDim].f[lCol];
+        structure[iDim].f[lCol] = mNew[iDim];
+        
+    }
+    
+    int ikx, iky, ik;
+    double k_dot_xOld;
+    
+    for (int kx=-Nx; kx<Nx; kx++){
+        
+        ikx = (kx + Nx)*(2*Ny * 2*Nz);
+        
+        for (int ky=-Ny; ky<Ny; ky++){
+            
+            iky = (ky + Ny)*2*Nz;
+            
+            for (int kz=-Nz; kz<Nz; kz++){
+                
+                ik = ikx + iky + (kz + Nz);
+                
+                k_dot_xOld = (double)kx * xOld[0] +
+                             (double)ky * xOld[1] +
+                             (double)kz * xOld[2];
+                k_dot_xOld*= 2.*PI;
+                
+                realPart = cos(k_dot_xNew) - cos(k_dot_xOld);
+                imagPart = sin(k_dot_xNew) - sin(k_dot_xOld);
+
+                for(int iComp=0; iComp<DIM; iComp++){
+                    
+                    structure[iComp].f_hat[ik] += (mNew[iComp] - mOld[iComp]) * exp(I*k_dot_xOld);
+                                                
+                }
+    
+            }
+            
+        }
+        
+    }
+    
+    return;    
+
+}
 
 // -------------------------------------------------------------------------------------------------
 

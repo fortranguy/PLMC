@@ -35,6 +35,19 @@ private
     
     end type Observables
     
+    type, extends(Observables), public :: MoreObservables
+        
+        ! Rotate
+        integer :: Nrotate
+        
+        ! Rejection
+        integer :: NrejRot
+        real(DP) :: rejRot
+        real(DP) :: rejRotSum
+        real(DP) :: rejRotAdapt
+        
+    end type MoreObservables
+    
 contains
 
     subroutine Observables_init(this)
@@ -50,6 +63,21 @@ contains
         
         this%EpotSum = 0._DP        
         this%activSum = 0._DP
+        
+        select type (this)
+        
+            type is (Observables)
+            
+            class is (MoreObservables)
+                
+                this%Nrotate = 0
+                
+                this%NrejRot = 0
+                this%rejRot = 0._DP
+                this%rejRotSum = 0._DP
+                this%rejRotAdapt = 0._DP
+                
+        end select
         
     end subroutine Observables_init
     
@@ -76,6 +104,16 @@ contains
         write(report_unit, *) "    potChi.avg = ", potChiId + potChiEx
         
         write(report_unit, *) "    Rejection rate = ", this%rejSum/real(Nstep, DP)
+        
+        select type (this)
+        
+            type is (Observables)
+            
+            class is (MoreObservables)
+            
+                write(report_unit, *) "not yet implemented"
+            
+        end select
     
     end subroutine Observables_results
 

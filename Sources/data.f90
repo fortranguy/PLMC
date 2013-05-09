@@ -84,7 +84,7 @@ implicit none
     integer, parameter :: Ntherm = 2**6
     
     integer, parameter :: Nmove = Ncol
-    integer, parameter :: Nrotate = dipol_Ncol
+    integer, parameter :: Nrotate = 0 ! dipol_Ncol
     
     real(DP), dimension(Dim), parameter :: dipol_dx = 1._DP
     real(DP), parameter :: dipol_rejFix = 0.5_DP

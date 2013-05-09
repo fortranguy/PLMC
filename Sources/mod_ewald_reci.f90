@@ -28,6 +28,8 @@ implicit none
             
         end subroutine C_Epot_reci_init
         
+        ! Move -------------------------------------------------------------------------------------
+        
         function C_Epot_reci_move(C_lCol, C_xNew, C_Vol) bind(C, name="Epot_reci_move")
         
             import :: Dim, C_int, C_double
@@ -48,16 +50,31 @@ implicit none
             
         end subroutine C_Epot_reci_updateX
         
-        subroutine C_Epot_reci_rotate(C_lcol, C_mNew, C_Vol) bind(C, name="Epot_reci_rotate")
+        ! ------------------------------------------------------------------------------------------
+        
+        ! Rotate -----------------------------------------------------------------------------------
+        
+        function C_Epot_reci_rotate(C_lcol, C_mNew, C_Vol) bind(C, name="Epot_reci_rotate")
         
             import :: Dim, C_int, C_double
             
-            nteger(C_int), value :: C_lCol
+            integer(C_int), value :: C_lCol
             real(C_double), dimension(Dim), intent(in) :: C_mNew
             real(C_double), value :: C_Vol
             real(C_double) :: C_Epot_reci_rotate
         
-        end subroutine C_Epot_reci_rotate
+        end function C_Epot_reci_rotate
+        
+        subroutine C_Epot_reci_updateM(C_lCol, C_mNew) bind(C, name="Epot_reci_updateM")
+        
+            import :: Dim, C_int, C_double
+            
+            integer(C_int), value :: C_lCol
+            real(C_double), dimension(Dim), intent(in) :: C_mNew
+            
+        end subroutine C_Epot_reci_updateX
+        
+        ! ------------------------------------------------------------------------------------------
         
         function C_Epot_reci(C_X, C_M, C_Ncol, C_Vol) bind(C, name="Epot_reci")
         

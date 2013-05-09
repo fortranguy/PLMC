@@ -68,7 +68,7 @@ private
         
         !> Monte-Carlo
         procedure :: move => DipolarSpheres_move
-        procedure :: rotate = DipolarSpheres_rotate
+        procedure :: rotate => DipolarSpheres_rotate
         procedure :: widom => DipolarSpheres_widom
         
     end type DipolarSpheres
@@ -546,7 +546,7 @@ contains
         
         integer :: iOld
         real(DP) :: rand
-        real(DP), dimension(Dim) :: mMew
+        real(DP), dimension(Dim) :: mNew
         real(DP) :: dEpot
         
         real(C_double) :: C_Epot
@@ -560,12 +560,12 @@ contains
         C_mNew(:) = real(mNew(:)/Lsize(:), C_double) - 0.5_c_double
         C_Epot = C_Epot_reci_rotate(int(iOld-1, C_int), C_mNew, real(product(Lsize), C_double))
         
-        dEpot = real(Epot, DP)
+        dEpot = real(C_Epot, DP)
         
         call random_number(rand)
         if (rand < exp(-dEpot/Tstar)) then
             this%M(:, iOld) = mNew(:)
-            !call C_Epot_reci_updateM(int(iOld-1, C_int), C_mNew)        
+            call C_Epot_reci_updateM(int(iOld-1, C_int), C_mNew)        
         else
             Nrej = Nrej + 1
         end if
