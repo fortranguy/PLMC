@@ -645,7 +645,10 @@ contains
         integer :: iOld
         real(DP) :: rand
         real(DP), dimension(Dim) :: mNew, mRand
-        real(DP) :: dEpot
+        real(DP) :: dEpot, real_dEpot
+        real(DP) :: real_eNew, real_eOld
+        integer :: iCell
+        logical :: overlap
         
         real(C_double) :: C_Epot
         real(C_double), dimension(Dim) :: C_mNew
@@ -660,7 +663,12 @@ contains
         C_mNew(:) = real(mNew(:)/Lsize(:), C_double)
         C_Epot = C_Epot_reci_rotate(int(iOld-1, C_int), C_mNew, real(product(Lsize), C_double))
         
-        dEpot = real(C_Epot, DP) - this%Epot_self_rotate(iOld, mNew)
+        iCell = this%same%position_to_cell(this%X(:, iOld))
+        call this%Epot_neigh(iOld, this%X(:, iOld), mNew, iCell, overlap, real_eNew)
+        call this%Epot_neigh(iOld, this%X(:, iOld), this%M(:, iOld), iCell, overlap, real_eOld)
+        
+        real_dEpot = real_eNew - real_eOld
+        dEpot = real(C_Epot, DP) + real_dEpot - this%Epot_self_rotate(iOld, mNew)
         
         call random_number(rand)
         if (rand < exp(-dEpot/Tstar)) then
