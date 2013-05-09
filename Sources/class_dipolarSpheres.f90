@@ -27,6 +27,12 @@ private
         ! Particles
         
         real(DP), dimension(:, :), allocatable, public :: M !< moments of all particles
+        
+        ! Monte-Carlo
+        real(DP), dimension(Dim) :: dm !< rotation
+        real(DP), dimension(Dim) :: dm_save
+        real(DP) :: rejRotFix
+        integer :: NadaptRot
 
         ! Potential
         real(DP)  :: dr !< discretisation step
@@ -94,6 +100,12 @@ contains
         this%dx_save = this%dx
         this%rejFix = dipol_rejFix
         this%Nadapt = dipol_Nadapt
+        
+        this%dm = dipol_dm
+        this%dm_save = this%dm
+        this%rejRotFix = dipol_rejRotFix
+        this%NadaptRot = dipol_NadaptRot
+        
         this%Nwidom = dipol_Nwidom
         
         ! Potential
@@ -475,7 +487,7 @@ contains
         iOld = int(rand*real(this%Ncol, DP)) + 1
         
         call random_number(xRand)
-        xNew(:) = this%X(:, iOld) + (xRand(:)-0.5_DP)*this%dx(:)
+        xNew(:) = this%X(:, iOld) + this%dx(:) * (xRand(:)-0.5_DP)
         xNew(:) = modulo(xNew(:), Lsize(:))
         
         mix_iCellNew = this%mix%position_to_cell(xNew)
@@ -546,7 +558,7 @@ contains
         
         integer :: iOld
         real(DP) :: rand
-        real(DP), dimension(Dim) :: mNew
+        real(DP), dimension(Dim) :: mNew, mRand
         real(DP) :: dEpot
         
         real(C_double) :: C_Epot
@@ -555,7 +567,9 @@ contains
         call random_number(rand)
         iOld = int(rand*real(this%Ncol, DP)) + 1
         
-        mNew(:) = random_surface()
+        mRand(:) = random_surface()
+        mNew(:) = this%M(:, iOld) + this%dm(:) * mRand(:)
+        mNew(:) = mNew(:)/sqrt(dot_product(mNew, mNew))
         
         C_mNew(:) = real(mNew(:)/Lsize(:), C_double) - 0.5_c_double
         C_Epot = C_Epot_reci_rotate(int(iOld-1, C_int), C_mNew, real(product(Lsize), C_double))

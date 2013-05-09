@@ -89,6 +89,9 @@ implicit none
     real(DP), dimension(Dim), parameter :: dipol_dx = 1._DP
     real(DP), parameter :: dipol_rejFix = 0.5_DP
     integer, parameter :: dipol_Nadapt = Ntherm/8
+    real(DP), dimension(Dim), parameter :: dipol_dm = 1._DP
+    real(DP), parameter :: dipol_rejRotFix = 0.5_DP
+    integer, parameter :: dipol_NadaptRot = Ntherm/8
     integer, parameter :: dipol_Nwidom = dipol_Ncol
     
     real(DP), dimension(Dim), parameter :: inter_dx = 1._DP
