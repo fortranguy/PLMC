@@ -1,12 +1,20 @@
+/* \brief Non-uniform Fast Fourier Transform + delta of energy
+ * 
+ *  Uses NFFT3 library based on FFTW3.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <tgmath.h>
 #include "nfft3.h"
 #include "data_reci.h"
 
-static nfft_plan structure[DIM];
-static nfft_plan potential[DIM];
-static double Epot_reci_tab[2*Nx][2*Ny][2*Nz];
+static nfft_plan structure[DIM]; //!< ``Structure factor'' \f[ \vec{S} \f]
+static nfft_plan potential[DIM]; //!< ``Potential'' \f[ \vec{\phi} \f]
+static double Epot_reci_tab[2*Nx][2*Ny][2*Nz]; /*!< \f[ f(\alpha, \vec{k}) = \frac{e^{-\frac{\pi^2}
+{\alpha^2} \sum_d \frac{k_d^2}{L_d}}}{\sum_d \frac{k_d^2}{L_d}} \f]
+*/
+
 
 void Epot_reci_nfft_init(const int Ncol);
 void Epot_reci_nfft_finalize();
@@ -16,7 +24,7 @@ void Epot_reci_updateX(const int lCol, const double xNew[DIM]);
 double Epot_reci(double X[][DIM], double D[][DIM], const int Ncol, const double Vol);
 void snapShot(const int Ncol);
 
-// Initialisation : phi and S
+//!> Initialisation : ``Potential'' and ``Structure factor''
 
 void Epot_reci_nfft_init(const int Ncol){
     
@@ -32,7 +40,7 @@ void Epot_reci_nfft_init(const int Ncol){
 }
 
 
-// Finalisation
+//!> Finalisation
 
 void Epot_reci_nfft_finalize(){
  
@@ -89,6 +97,26 @@ void Epot_reci_init(const double Lsize[DIM], const double alpha){
     
 }
 
+/*!> Difference of Energy \f[ \Delta U = \frac{2\pi}{V} \sum_{\vec{k} \neq 0} \Delta M^2 
+ * f(\alpha, \vec{k}) \f]
+ * \f[
+ *  \Delta M^2 = 2\Re[
+ *      (\vec{\mu}_l\cdot\vec{k}) (e^{i(\vec{k}\cdot\vec{x}^\prime_l)} -e^{i(\vec{k}\cdot\vec{x}_l)}
+ *      (\vec{k}\cdot\vec{S}_l)
+ *  ]
+ * \f]
+ * \f[  \vec{S}_l = \sum_{i \neq l} \vec{\mu}_i e^{i(\vec{k}\cdot\vec{x}_i)}
+ * \f]
+ * Implementation :
+ * \f[ 
+ *  \Delta M^2 = 2(\vec{\mu_l}\cdot\vec{k}) 
+ *  [ \cos(\vec{k}\cdot\vec{x}^\prime_l) - \cos(\vec{k}\cdot\vec{x})]
+ *  [\Re{(\vec{k}\cdot\vec{S})} - (\vec{k}\cdot\vec{\mu}_l) cos(\vec{k}\cdot\vec{x}_l)] -
+ *  [-\sin(\vec{k}\cdot\vec{x}^\prime_l) + \sin(\vec{k}\cdot\vec{x})]
+ *  [\Im{(\vec{k}\cdot\vec{S})} - (\vec{k}\cdot\vec{\mu}_l) sin(\vec{k}\cdot\vec{x}_l)]
+ * \f]
+ */
+
 double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol){
 
     double Epot;
@@ -144,6 +172,19 @@ double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol){
     return 2.*PI/Vol * Epot;
     
 }
+
+/*!> Update position -> update the ``structure factor''
+ *  \f[
+ *      \Delta \vec{S} = \vec{\mu}_l
+ *      (e^{i(\vec{k}\cdot\vec{x}^\prime_l)} -e^{i(\vec{k}\cdot\vec{x}_l)}) 
+ *  \f]
+ * Implementation :
+ *  \f[
+ *      \Delta \vec{S} = \vec{\mu}_l
+ *      [(\cos(\vec{k}\cdot\vec{x}^\prime_l)-\cos(\vec{k}\cdot\vec{x}_l)) +
+ *      i(\sin(\vec{k}\cdot\vec{x}^\prime_l)-\sin(\vec{k}\cdot\vec{x}_l)) ] 
+ *  \f]
+ */
 
 void Epot_reci_updateX(const int lCol, const double xNew[DIM]){
     
