@@ -111,7 +111,7 @@ contains
             
             class is (MoreObservables)
             
-                write(report_unit, *) "not yet implemented"
+                write(report_unit, *) "    Rotation rejection rate = ", this%rejRotSum/real(Nstep, DP)
             
         end select
     

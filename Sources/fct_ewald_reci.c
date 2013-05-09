@@ -100,9 +100,9 @@ void Epot_reci_init(const double Lsize[DIM], const double alpha){
     
     FILE *fpX = fopen("C_report.out", "w");
         fprintf(fpX, " Ewald Summation : Number of wave vectors : %d\n", nb_k);
-        fprintf(fpX, "Nx = %d\n", Nx);
-        fprintf(fpX, "Ny = %d\n", Nx);
-        fprintf(fpX, "Nz = %d\n", Nx);
+        fprintf(fpX, "     Nx = %d\n", Nx);
+        fprintf(fpX, "     Ny = %d\n", Nx);
+        fprintf(fpX, "     Nz = %d\n", Nx);
     fclose(fpX);
     
     return;
