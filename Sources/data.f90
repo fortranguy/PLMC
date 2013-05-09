@@ -60,9 +60,9 @@ implicit none
     integer, parameter :: hard_Ncol = 270
     
     real(DP), parameter :: mix_delta = 0._DP
-    real(DP), parameter :: mix_rMin = inter_radius + hard_radius + mix_delta
+    real(DP), parameter :: mix_rMin = dipol_radius + hard_radius + mix_delta
     
-    integer, parameter :: Ncol = inter_Ncol + hard_Ncol
+    integer, parameter :: Ncol = dipol_Ncol + hard_Ncol
     
 end module data_particles
 !***************************************************************************************************
