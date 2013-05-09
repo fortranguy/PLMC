@@ -295,8 +295,7 @@ double Epot_reci_rotate(const int lCol, const double mNew[DIM], const double Vol
                 
                 k_dot_mNew = (double)kx * mNew[0] +
                              (double)ky * mNew[1] +
-                             (double)kz * mNew[2];
-                k_dot_mNew*= 2.*PI;               
+                             (double)kz * mNew[2];               
                 
                 k_dot_mOld = (double)kx * creal(structure[0].f[lCol]) +
                              (double)ky * creal(structure[1].f[lCol]) +
@@ -330,7 +329,7 @@ void Epot_reci_updateM(const int lCol, const double mNew[DIM]){
         structure[iDim].f[lCol] = mNew[iDim];
         
     }
-    
+
     int ikx, iky, ik;
     double k_dot_xOld;
     

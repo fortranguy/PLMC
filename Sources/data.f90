@@ -80,8 +80,8 @@ use data_cell
 implicit none
 
     real(DP), parameter :: Tstar = 1._DP
-    integer, parameter :: Nstep = 2**8
-    integer, parameter :: Ntherm = 2**6
+    integer, parameter :: Nstep = 2**3
+    integer, parameter :: Ntherm = 2**3
     
     integer, parameter :: Nmove = Ncol
     integer, parameter :: Nrotate = dipol_Ncol
