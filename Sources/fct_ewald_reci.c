@@ -580,7 +580,9 @@ double Epot_reci(double X[][DIM], double D[][DIM], const int Ncol, const double 
     
     }
     
-    return 2.*PI/Vol * Epot;
+    Epot*= 2.*PI/Vol;
+    
+    return Epot;
     
 }
 
