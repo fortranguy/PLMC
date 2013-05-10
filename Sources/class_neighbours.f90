@@ -148,7 +148,6 @@ contains
             if (this%cell_Lsize(iDir) < rCut) then
                 write(error_unit, *) "Warning : big rCut in the direction", iDir, ":"
                 write(error_unit, *) this%cell_Lsize(iDir), "<", rCut
-                stop
             end if
             
             if (this%cell_coordMax(iDir) < cell_neigh_coordMax(iDir)) then
