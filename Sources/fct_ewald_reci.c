@@ -448,7 +448,14 @@ void Epot_reci_updateM(const int lCol, const double mNew[DIM]){
     }
 
     int ikx, iky, ik;
-    double k_dot_xOld;
+    double complex exp_IkxOld;
+    double xOld[DIM];
+    
+    for (int iDim=0; iDim<DIM; iDim++){
+        xOld[iDim] = structure[0].x[DIM*lCol+iDim];
+    }
+       
+    Epot_reci_fourier_old(xOld);
     
     for (int kx=-Nx; kx<Nx; kx++){
         
@@ -462,15 +469,11 @@ void Epot_reci_updateM(const int lCol, const double mNew[DIM]){
                 
                 ik = ikx + iky + (kz + Nz);
                 
-                k_dot_xOld = (double)kx * structure[0].x[DIM*lCol+0] +
-                             (double)ky * structure[0].x[DIM*lCol+1] +
-                             (double)kz * structure[0].x[DIM*lCol+2];
-                k_dot_xOld*= 2.*PI;
+                exp_IkxOld = exp_IkxOld_x[kx+Nx] * exp_IkxOld_y[ky+Ny] * exp_IkxOld_z[kz+Nz];
 
                 for(int iComp=0; iComp<DIM; iComp++){
                     
-                    structure[iComp].f_hat[ik] += (mNew[iComp] - mOld[iComp]) * 
-                                                  (cos(k_dot_xOld) + I*sin(k_dot_xOld));
+                    structure[iComp].f_hat[ik] += (mNew[iComp] - mOld[iComp]) * exp_IkxOld;
                                                 
                 }
     
