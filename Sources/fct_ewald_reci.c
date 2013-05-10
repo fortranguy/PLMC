@@ -27,8 +27,8 @@ void Epot_reci_nfft_init(const int Ncol);
 void Epot_reci_nfft_finalize();
 void Epot_reci_init(const double Lsize[DIM], const double alpha);
 
-void Epot_reci_fourier_new(const double xNew[DIM]);
-void Epot_reci_fourier_old(const double xOld[DIM]);
+static void Epot_reci_fourier_new(const double xNew[DIM]);
+static void Epot_reci_fourier_old(const double xOld[DIM]);
 
 double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol);
 void Epot_reci_updateX(const int lCol, const double xNew[DIM]);
@@ -441,7 +441,7 @@ void Epot_reci_updateM(const int lCol, const double mNew[DIM]){
         
     for(int iDim=0; iDim<DIM; iDim++){
         
-        mOld[iDim] = structure[iDim].f[lCol];
+        mOld[iDim] = creal(structure[iDim].f[lCol]);
         structure[iDim].f[lCol] = mNew[iDim];
         
     }
