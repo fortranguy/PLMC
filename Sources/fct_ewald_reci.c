@@ -305,12 +305,6 @@ double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol){
  *      \Delta \vec{S} = \vec{\mu}_l
  *      (e^{i(\vec{k}\cdot\vec{x}^\prime_l)} -e^{i(\vec{k}\cdot\vec{x}_l)}) 
  *  \f]
- * Implementation :
- *  \f[
- *      \Delta \vec{S} = \vec{\mu}_l
- *      [(\cos(\vec{k}\cdot\vec{x}^\prime_l)-\cos(\vec{k}\cdot\vec{x}_l)) +
- *      i(\sin(\vec{k}\cdot\vec{x}^\prime_l)-\sin(\vec{k}\cdot\vec{x}_l)) ] 
- *  \f]
  */
 
 void Epot_reci_updateX(const int lCol, const double xNew[DIM]){
@@ -426,6 +420,7 @@ double Epot_reci_rotate(const int lCol, const double mNew[DIM], const double Vol
                 Epot_k+= 2.*(k_dot_mNew - k_dot_mOld) * realPart;
                 Epot_k*= Epot_reci_tab[kx+Nx][ky+Ny][kz+Nz];
                 Epot += Epot_k;
+                
             }            
         }        
     }
