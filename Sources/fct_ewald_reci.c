@@ -138,15 +138,17 @@ double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol){
     double k_dot_xNew, k_dot_xOld, k_dot_mOld;
     double complex k_dot_structure;
     double realPart1, realPart2;
-
-    exp_IkxNew(Nx+0) = 1.;
-    exp_IkxNew(Nx+1) = exp(I*2.*PI * 1.*xNew[0]);
-    exp_IkxNew(Nx-1) = conj(exp_IkxNew(1));
     
-    for (int kx=2, Nx; kx<Nx; kx++){
+    double complex exp_IkxNew[2*Nx];
+
+    exp_IkxNew[Nx+0] = 1.;
+    exp_IkxNew[Nx+1] = exp(I*2.*PI * 1.*xNew[0]);
+    exp_IkxNew[Nx-1] = conj(exp_IkxNew[1]);
+    
+    for (int kx=2; kx<Nx; kx++){
         
-        exp_IkxNew(Nx+kx) = exp_IkxNew(Nx+kx-1) * exp_IkxNew(Nx+1);
-        exp_IkxNew(Nx-kx) = conj(exp_IkxNew(Nx+kx));
+        exp_IkxNew[Nx+kx] = exp_IkxNew[Nx+kx-1] * exp_IkxNew[Nx+1];
+        exp_IkxNew[Nx-kx] = conj(exp_IkxNew[Nx+kx]);
     }
     
     Epot = 0.;
