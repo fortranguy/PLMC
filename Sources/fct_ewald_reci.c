@@ -159,14 +159,14 @@ double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol){
         exp_IkxNew[1][Ny+ky] = exp_IkxNew[1][Ny+ky-1] * exp_IkxNew[1][Ny+1];
         exp_IkxNew[1][Ny-ky] = conj(exp_IkxNew[1][Ny+ky]);
     }
-    exp_IkxNew[1][Nx-Nx] = exp_IkxNew[1][Nx-(Nx-1)] * exp_IkxNew[1][Nx-1];
+    exp_IkxNew[1][Ny-Ny] = exp_IkxNew[1][Ny-(Ny-1)] * exp_IkxNew[1][Ny-1];
     
     for (int kz=2; kz<Nz; kz++){
         
         exp_IkxNew[2][Nz+kz] = exp_IkxNew[2][Nz+kz-1] * exp_IkxNew[2][Nz+1];
         exp_IkxNew[2][Nz-kz] = conj(exp_IkxNew[2][Nz+kz]);
     }
-    exp_IkxNew[2][Nx-Nx] = exp_IkxNew[2][Nx-(Nx-1)] * exp_IkxNew[2][Nx-1];
+    exp_IkxNew[2][Nz-Nz] = exp_IkxNew[2][Nz-(Nz-1)] * exp_IkxNew[2][Nz-1];
         
     Epot = 0.;
     
