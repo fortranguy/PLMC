@@ -141,7 +141,7 @@ double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol){
     
     double complex exp_IkxNew[DIM][2*Nx];
 
-    for (int iDim=0: iDim<DIM; iDim++){
+    for (int iDim=0; iDim<DIM; iDim++){
         exp_IkxNew[iDim][Nx+0] = 1.;
         exp_IkxNew[iDim][Nx+1] = exp(I*2.*PI * 1.*xNew[iDim]);
         exp_IkxNew[iDim][Nx-1] = conj(exp_IkxNew[iDim][1]);
