@@ -139,34 +139,48 @@ double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol){
     double complex k_dot_structure;
     double realPart1, realPart2;
     
-    double complex exp_IkxNew[DIM][2*Nx];
+    double complex exp_IkxNew_x[2*Nx];
+    double complex exp_IkxNew_y[2*Ny];
+    double complex exp_IkxNew_z[2*Nz];
 
-    for (int iDim=0; iDim<DIM; iDim++){
-        exp_IkxNew[iDim][Nx+0] = 1.;
-        exp_IkxNew[iDim][Nx+1] = exp(I*2.*PI * 1.*xNew[iDim]);
-        exp_IkxNew[iDim][Nx-1] = conj(exp_IkxNew[iDim][1]);
-    }    
+    // x
+    exp_IkxNew_x[Nx+0] = 1.;
+    exp_IkxNew_x[Nx+1] = exp(I*2.*PI * 1.*xNew[0]);
+    exp_IkxNew_x[Nx-1] = conj(exp_IkxNew_x[Nx+1]);
     
     for (int kx=2; kx<Nx; kx++){
         
-        exp_IkxNew[0][Nx+kx] = exp_IkxNew[0][Nx+kx-1] * exp_IkxNew[0][Nx+1];
-        exp_IkxNew[0][Nx-kx] = conj(exp_IkxNew[0][Nx+kx]);
+        exp_IkxNew_x[Nx+kx] = exp_IkxNew_x[Nx+kx-1] * exp_IkxNew_x[Nx+1];
+        exp_IkxNew_x[Nx-kx] = conj(exp_IkxNew_x[Nx+kx]);
     }    
-    exp_IkxNew[0][Nx-Nx] = exp_IkxNew[0][Nx-(Nx-1)] * exp_IkxNew[0][Nx-1];
+    
+    exp_IkxNew_x[Nx-Nx] = exp_IkxNew_x[Nx-(Nx-1)] * exp_IkxNew_x[Nx-1];
+    
+    // y
+    
+    exp_IkxNew_y[Ny+0] = 1.;
+    exp_IkxNew_y[Ny+1] = exp(I*2.*PI * 1.*xNew[1]);
+    exp_IkxNew_y[Ny-1] = conj(exp_IkxNew_y[Ny+1]);
     
     for (int ky=2; ky<Ny; ky++){
         
-        exp_IkxNew[1][Ny+ky] = exp_IkxNew[1][Ny+ky-1] * exp_IkxNew[1][Ny+1];
-        exp_IkxNew[1][Ny-ky] = conj(exp_IkxNew[1][Ny+ky]);
+        exp_IkxNew_y[Ny+ky] = exp_IkxNew_y[Ny+ky-1] * exp_IkxNew_y[Ny+1];
+        exp_IkxNew_y[Ny-ky] = conj(exp_IkxNew_y[Ny+ky]);
     }
-    exp_IkxNew[1][Ny-Ny] = exp_IkxNew[1][Ny-(Ny-1)] * exp_IkxNew[1][Ny-1];
+    exp_IkxNew_y[Ny-Ny] = exp_IkxNew_y[Ny-(Ny-1)] * exp_IkxNew_y[Ny-1];
+    
+    // z
+    
+    exp_IkxNew_z[Nz+0] = 1.;
+    exp_IkxNew_z[Nz+1] = exp(I*2.*PI * 1.*xNew[2]);
+    exp_IkxNew_z[Nz-1] = conj(exp_IkxNew_z[Nz+1]);
     
     for (int kz=2; kz<Nz; kz++){
         
-        exp_IkxNew[2][Nz+kz] = exp_IkxNew[2][Nz+kz-1] * exp_IkxNew[2][Nz+1];
-        exp_IkxNew[2][Nz-kz] = conj(exp_IkxNew[2][Nz+kz]);
+        exp_IkxNew_z[Nz+kz] = exp_IkxNew_z[Nz+kz-1] * exp_IkxNew_z[Nz+1];
+        exp_IkxNew_z[Nz-kz] = conj(exp_IkxNew_z[Nz+kz]);
     }
-    exp_IkxNew[2][Nz-Nz] = exp_IkxNew[2][Nz-(Nz-1)] * exp_IkxNew[2][Nz-1];
+    exp_IkxNew_z[Nz-Nz] = exp_IkxNew_z[Nz-(Nz-1)] * exp_IkxNew_z[Nz-1];
         
     Epot = 0.;
     
