@@ -139,18 +139,32 @@ double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol){
     double complex k_dot_structure;
     double realPart1, realPart2;
     
-    double complex exp_IkxNew[2*Nx];
+    double complex exp_IkxNew[DIM][2*Nx];
 
-    exp_IkxNew[Nx+0] = 1.;
-    exp_IkxNew[Nx+1] = exp(I*2.*PI * 1.*xNew[0]);
-    exp_IkxNew[Nx-1] = conj(exp_IkxNew[1]);
+    for (int iDim=0: iDim<DIM; iDim++){
+        exp_IkxNew[iDim][Nx+0] = 1.;
+        exp_IkxNew[iDim][Nx+1] = exp(I*2.*PI * 1.*xNew[iDim]);
+        exp_IkxNew[iDim][Nx-1] = conj(exp_IkxNew[iDim][1]);
+    }    
     
     for (int kx=2; kx<Nx; kx++){
         
-        exp_IkxNew[Nx+kx] = exp_IkxNew[Nx+kx-1] * exp_IkxNew[Nx+1];
-        exp_IkxNew[Nx-kx] = conj(exp_IkxNew[Nx+kx]);
+        exp_IkxNew[0][Nx+kx] = exp_IkxNew[0][Nx+kx-1] * exp_IkxNew[0][Nx+1];
+        exp_IkxNew[0][Nx-kx] = conj(exp_IkxNew[0][Nx+kx]);
     }
     
+    for (int ky=2; ky<Ny; ky++){
+        
+        exp_IkxNew[1][Ny+ky] = exp_IkxNew[0][Ny+ky-1] * exp_IkxNew[1][Ny+1];
+        exp_IkxNew[1][Ny-ky] = conj(exp_IkxNew[0][Ny+ky]);
+    }
+    
+    for (int kz=2; kz<Nz; kz++){
+        
+        exp_IkxNew[2][Nz+kz] = exp_IkxNew[0][Nz+kz-1] * exp_IkxNew[1][Nz+1];
+        exp_IkxNew[2][Nz-kz] = conj(exp_IkxNew[0][Nz+kz]);
+    }    
+        
     Epot = 0.;
     
     for (int kx=-Nx; kx<Nx; kx++){
