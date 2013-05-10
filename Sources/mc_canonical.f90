@@ -192,6 +192,7 @@ implicit none
             
             if (iStep == Ntherm) then ! Definite thermalised displacements
                 call type1_sph%definiteDx(type1_obs%rej, type1_io%report)
+                call type1_sph%definiteDm(type1_obs%rejRot, type1_io%report)
                 call type2_sph%definiteDx(type2_obs%rej, type2_io%report)
             end if       
         

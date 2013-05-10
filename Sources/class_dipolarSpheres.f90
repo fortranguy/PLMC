@@ -254,9 +254,9 @@ contains
             write(error_unit, *) "big dm :", this%dm
         end if
         
-        write(output_unit, *) this%name, " :    Thermalisation : over"
+        write(output_unit, *) this%name, " :    Thermalisation : over (rotation)"
         
-        write(report_unit, *) "Displacement :"
+        write(report_unit, *) "Rotation :"
         write(report_unit, *) "    dm = ", this%dm
         write(report_unit, *) "    rejection relative difference = ", &
                                     abs(rej-this%rejRotFix)/this%rejRotFix
