@@ -339,9 +339,15 @@ void Epot_reci_updateX(const int lCol, const double xNew[DIM]){
         
     }
     
+    Epot_reci_fourier_new(xNew);  
+    Epot_reci_fourier_old(xOld);
+    
     int ikx, iky, ik;
     double k_dot_xNew, k_dot_xOld;
     double realPart, imagPart;
+    
+    double complex exp_IkxNew;
+    double complex exp_IkxOld;
     
     for (int kx=-Nx; kx<Nx; kx++){
         
@@ -355,23 +361,13 @@ void Epot_reci_updateX(const int lCol, const double xNew[DIM]){
                 
                 ik = ikx + iky + (kz + Nz);
     
-                k_dot_xNew = (double)kx * xNew[0] +
-                             (double)ky * xNew[1] +
-                             (double)kz * xNew[2];
-                k_dot_xNew*= 2.*PI;
-                
-                k_dot_xOld = (double)kx * xOld[0] +
-                             (double)ky * xOld[1] +
-                             (double)kz * xOld[2];
-                k_dot_xOld*= 2.*PI;
-                
-                realPart = cos(k_dot_xNew) - cos(k_dot_xOld);
-                imagPart = sin(k_dot_xNew) - sin(k_dot_xOld);
+                exp_IkxNew = exp_IkxNew_x[kx+Nx] * exp_IkxNew_y[ky+Ny] * exp_IkxNew_z[kz+Nz];                                
+                exp_IkxOld = exp_IkxOld_x[kx+Nx] * exp_IkxOld_y[ky+Ny] * exp_IkxOld_z[kz+Nz];
 
                 for(int iComp=0; iComp<DIM; iComp++){
                     
                     structure[iComp].f_hat[ik] += creal(structure[iComp].f[lCol]) *
-                                                  (realPart + I*imagPart);
+                                                  (exp_IkxNew - exp_IkxOld);
                                                 
                 }
     
