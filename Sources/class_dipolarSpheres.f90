@@ -53,7 +53,7 @@ private
         
         !> Take a snap shot of the configuration : orientations
         procedure :: snapShot_M => DipolarSpheres_snapShot_M
-        procedure :: snapShot => DipolarSpheres_snapShot
+        procedure :: C_snapShot => DipolarSpheres_C_snapShot
         
         !> Adapt the displacement dx during thermalisation
         procedure :: adaptDm => DipolarSpheres_adaptDm
@@ -199,13 +199,13 @@ contains
 
     end subroutine DipolarSpheres_snapShot_M
     
-    subroutine DipolarSpheres_snapShot(this)
+    subroutine DipolarSpheres_C_snapShot(this)
         
         class(DipolarSpheres), intent(in) :: this
         
         call C_snapShot(int(this%Ncol, C_int))
 
-    end subroutine DipolarSpheres_snapShot
+    end subroutine DipolarSpheres_C_snapShot
     
     !> Adaptation of dm during the thermalisation
     
