@@ -329,9 +329,7 @@ void Epot_reci_updateX(const int lCol, const double xNew[DIM]){
         
     }
     
-    int ikx, iky, ik;
-    double realPart, imagPart;
-    
+    int ikx, iky, ik;    
     double complex exp_IkxNew;
     double complex exp_IkxOld;
     
