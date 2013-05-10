@@ -243,13 +243,15 @@ double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol){
     double complex k_dot_structure;
     double realPart1, realPart2;
     
+    double cos_kxNew, cos_kxOld;
+    
     double xOld[DIM];
     
     for (int iDim=0; iDim<DIM; iDim++){
         xOld[iDim] = structure[0].x[DIM*lCol+iDim];
     }
     
-    Epot_reci_fourier_new(xNew);
+    Epot_reci_fourier_new(xNew);  
     Epot_reci_fourier_old(xOld);
         
     Epot = 0.;
@@ -284,10 +286,12 @@ double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol){
                                   (double)ky * structure[1].f_hat[ik] +
                                   (double)kz * structure[2].f_hat[ik];
                 
-                //realPart1 = cos(k_dot_xNew) - cos(k_dot_xOld);
+                cos_kxNew = creal(exp_IkxNew_x[kx+Nx] * exp_IkxNew_y[ky+Ny] * exp_IkxNew_z[kz+Nz]);
+                cos_kxOld = creal(exp_IkxOld_x[kx+Nx] * exp_IkxOld_y[ky+Ny] * exp_IkxOld_z[kz+Nz]);
+                //realPart1 = cos(k_dot_xNew) - cos(k_dot_xOld);                
+                realPart1 = cos_kxNew - cos_kxOld;
                 
-                realPart1 = creal(exp_IkxNew_x[kx+Nx] - exp_IkxOld_x[kx+Nx]);
-                realPart1*= creal(k_dot_structure) - k_dot_mOld * creal(exp_IkxOld_x[kx+Nx]);
+                realPart1*= creal(k_dot_structure) - k_dot_mOld * cos_kxOld;
                 
                 realPart2 =-sin(k_dot_xNew) + sin(k_dot_xOld);
                 realPart2*= cimag(k_dot_structure) - k_dot_mOld * sin(k_dot_xOld);
