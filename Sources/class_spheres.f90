@@ -35,7 +35,8 @@ private
         ! Potential
         real(DP) :: rCut !< short-range cut
         
-        ! Neighbours (cell/grid scheme)   
+        ! Neighbours (cell/grid scheme)
+        real(DP), dimension(Dim) :: cell_Lsize
         type(Neighbours) :: same !< same kind
         type(Neighbours) :: mix !< other kind
         

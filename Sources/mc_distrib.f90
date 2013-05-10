@@ -62,7 +62,7 @@ implicit none
     if (.not.snap) stop "Snap désactivé."
 
     call mix%construct()
-    call inter%construct(mix%getRcut())
+    call inter%construct(mix%getCell_Lsize(), mix%getRcut())
 
     call initDistriParams()
     allocate(distrib(Ndist))

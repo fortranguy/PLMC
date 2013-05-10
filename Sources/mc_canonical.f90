@@ -66,14 +66,15 @@ implicit none
     call mix%report(mix_report_unit)
     call mix%Epot_print(mix_Epot_unit)
     
-    call type1_sph%construct(mix%getRcut()) !< type1_sph needs mix%rCut for the Cell List method
+    call type1_sph%construct(mix%getCell_Lsize(), mix%getRcut()) !< type1_sph needs mix%rCut for the 
+                                                                 !< Cell List method
     call type1_obs%init()
     call type1_io%open(type1_sph%getName())
     call type1_sph%report(type1_io%report)
     call type1_sph%printInfo(type1_io%report)
     call type1_sph%Epot_real_print(type1_io%Epot)
     
-    call type2_sph%construct(mix%getRcut())
+    call type2_sph%construct(mix%getCell_Lsize(), mix%getRcut())
     call type2_obs%init()
     call type2_io%open(type2_sph%getName())
     call type2_sph%report(type2_io%report)

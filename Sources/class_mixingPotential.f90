@@ -4,6 +4,7 @@ module class_mixingPotential
 
 use iso_fortran_env
 use data_constants
+use data_cell
 use data_particles
 use data_mc
 use data_potentiel
@@ -29,6 +30,8 @@ private
         real(DP) :: epsilon !< factor in Yukawa
         real(DP) :: alpha !< coefficient in Yukawa
         real(DP), dimension(:), allocatable :: Epot_tab !< tabulation
+        
+        real(DP), dimension(Dim) :: cell_Lsize
 
     contains
 
@@ -39,6 +42,7 @@ private
 
         procedure :: getRmin => MixingPotential_getRmin
         procedure :: getRcut => MixingPotential_getRcut
+        procedure :: getCell_Lsize => MixingPotential_getCell_Lsize
         
         procedure :: overlapTest => MixingPotential_overlapTest
 
@@ -70,6 +74,10 @@ contains
         this%alpha = mix_alpha
         allocate(this%Epot_tab(this%iMin:this%iCut))
         call this%Epot_init()
+        
+        ! Neighbours        
+        this%cell_Lsize(:) = mix_cell_Lsize(:)
+
 
     end subroutine MixingPotential_construct
 
@@ -119,6 +127,17 @@ contains
         getRcut = this%rCut
     
     end function MixingPotential_getRcut
+    
+    !> Accessor : cell_Lsize
+    
+    function MixingPotential_getCell_Lsize(this) result(getCell_Lsize)
+    
+        class(MixingPotential), intent(in) :: this        
+        real(DP), dimension(Dim) :: getCell_Lsize
+        
+        getCell_Lsize(:) = this%Cell_Lsize(:)
+    
+   end function MixingPotential_getCell_Lsize
     
     !> Overlapt test
     

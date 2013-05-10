@@ -47,9 +47,10 @@ private
     
 contains
 
-    subroutine HardSpheres_construct(this, shared_rCut)
+    subroutine HardSpheres_construct(this, shared_cell_Lsize, shared_rCut)
     
         class(HardSpheres), intent(out) :: this
+        real(DP), dimension(:), intent(in) :: shared_cell_Lsize
         real(DP), intent(in) :: shared_rCut
         
         this%name = "hardS"
@@ -72,11 +73,12 @@ contains
         this%Epot = 0._DP
         
         ! Neighbours : same kind
-        call this%same%construct(this%rCut)
+        this%cell_Lsize(:) = hard_cell_Lsize(:)
+        call this%same%construct(this%cell_Lsize, this%rCut)
         call this%same%alloc_cells()
         call this%same%ini_cell_neighs()
         ! Neighbours : other kind
-        call this%mix%construct(shared_rCut)
+        call this%mix%construct(shared_cell_Lsize, shared_rCut)
         call this%mix%alloc_cells()
         call this%mix%ini_cell_neighs()
     
