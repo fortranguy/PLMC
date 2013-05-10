@@ -139,6 +139,7 @@ implicit none
         ! Rejections rates updates
         type1_obs%rej = real(type1_obs%Nrej, DP)/real(type1_obs%Nmove, DP)
         type1_obs%Nrej = 0; type1_obs%Nmove = 0
+        
         type1_obs%rejRot = real(type1_obs%NrejRot, DP)/real(type1_obs%Nrotate, DP)
         type1_obs%NrejRot = 0; type1_obs%Nrotate = 0
 
