@@ -150,6 +150,12 @@ contains
                 write(error_unit, *) this%cell_Lsize(iDir), "<", rCut
             end if
             
+            if (Lsize(iDir)/2._DP*sqrt(3._DP) < rCut) then
+                write(error_unit, *) "rCut too large in the direction", iDir, ":"
+                write(error_unit, *) Lsize(iDir)/2._DP*sqrt(3._DP), "<", rCut
+                stop
+            end if
+            
             if (this%cell_coordMax(iDir) < cell_neigh_coordMax(iDir)) then
                 write(error_unit, *) "Too few cells in the direction", iDir, ":"
                 write(error_unit, *) this%cell_coordMax(iDir), "<", cell_neigh_coordMax(iDir)
