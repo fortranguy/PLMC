@@ -238,7 +238,7 @@ void Epot_reci_fourier_old(const double xOld[DIM]){
 double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol){
 
     double Epot;
-    int ikx, iky, ik;
+    int ik;
     double k_dot_mOld;
     double complex k_dot_structure;
     double realPart1, realPart2;
@@ -256,18 +256,13 @@ double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol){
     Epot_reci_fourier_old(xOld);
         
     Epot = 0.;
+    ik = 0;
     
     for (int kx=-Nx; kx<Nx; kx++){
         
-        ikx = (kx + Nx)*(2*Ny * 2*Nz);
-        
         for (int ky=-Ny; ky<Ny; ky++){
             
-            iky = (ky + Ny)*2*Nz;
-            
             for (int kz=-Nz; kz<Nz; kz++){
-                
-                ik = ikx + iky + (kz + Nz);
                 
                 k_dot_mOld = (double)kx * creal(structure[0].f[lCol]) +
                              (double)ky * creal(structure[1].f[lCol]) +
@@ -276,6 +271,7 @@ double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol){
                 k_dot_structure = (double)kx * structure[0].f_hat[ik] +
                                   (double)ky * structure[1].f_hat[ik] +
                                   (double)kz * structure[2].f_hat[ik];
+                ik++;
                 
                 cos_kxNew = creal(exp_IkxNew_x[kx+Nx] * exp_IkxNew_y[ky+Ny] * exp_IkxNew_z[kz+Nz]);
                 sin_kxNew = cimag(exp_IkxNew_x[kx+Nx] * exp_IkxNew_y[ky+Ny] * exp_IkxNew_z[kz+Nz]);
@@ -323,24 +319,20 @@ void Epot_reci_updateX(const int lCol, const double xNew[DIM]){
         
     }
     
-    int ikx, iky, ik;    
+    int ik;    
     double complex exp_IkxNew;
     double complex exp_IkxOld;
     
     Epot_reci_fourier_new(xNew);  
     Epot_reci_fourier_old(xOld);
     
+    ik = 0;
+    
     for (int kx=-Nx; kx<Nx; kx++){
-        
-        ikx = (kx + Nx)*(2*Ny * 2*Nz);
         
         for (int ky=-Ny; ky<Ny; ky++){
             
-            iky = (ky + Ny)*2*Nz;
-            
             for (int kz=-Nz; kz<Nz; kz++){
-                
-                ik = ikx + iky + (kz + Nz);
     
                 exp_IkxNew = exp_IkxNew_x[kx+Nx] * exp_IkxNew_y[ky+Ny] * exp_IkxNew_z[kz+Nz];                                
                 exp_IkxOld = exp_IkxOld_x[kx+Nx] * exp_IkxOld_y[ky+Ny] * exp_IkxOld_z[kz+Nz];
@@ -351,6 +343,7 @@ void Epot_reci_updateX(const int lCol, const double xNew[DIM]){
                                                   (exp_IkxNew - exp_IkxOld);
                                                 
                 }
+                ik++;
     
             }
             
@@ -369,7 +362,7 @@ void Epot_reci_updateX(const int lCol, const double xNew[DIM]){
 double Epot_reci_rotate(const int lCol, const double mNew[DIM], const double Vol){
 
     double Epot, Epot_k;
-    int ikx, iky, ik;
+    int ik;
     double k_dot_mNew, k_dot_mOld;
     double complex k_dot_structure;
     double realPart;
@@ -384,18 +377,13 @@ double Epot_reci_rotate(const int lCol, const double mNew[DIM], const double Vol
     Epot_reci_fourier_old(xOld);
     
     Epot = 0.;
+    ik = 0;
     
     for (int kx=-Nx; kx<Nx; kx++){
         
-        ikx = (kx + Nx)*(2*Ny * 2*Nz);
-        
         for (int ky=-Ny; ky<Ny; ky++){
             
-            iky = (ky + Ny)*2*Nz;
-            
-            for (int kz=-Nz; kz<Nz; kz++){
-                
-                ik = ikx + iky + (kz + Nz);                
+            for (int kz=-Nz; kz<Nz; kz++){              
 
                 
                 k_dot_mNew = (double)kx * mNew[0] +
@@ -409,6 +397,7 @@ double Epot_reci_rotate(const int lCol, const double mNew[DIM], const double Vol
                 k_dot_structure = (double)kx * structure[0].f_hat[ik] +
                                   (double)ky * structure[1].f_hat[ik] +
                                   (double)kz * structure[2].f_hat[ik];
+                ik++;
                 
                 cos_kxOld = creal(exp_IkxOld_x[kx+Nx] * exp_IkxOld_y[ky+Ny] * exp_IkxOld_z[kz+Nz]);
                 sin_kxOld = cimag(exp_IkxOld_x[kx+Nx] * exp_IkxOld_y[ky+Ny] * exp_IkxOld_z[kz+Nz]);
@@ -440,7 +429,7 @@ void Epot_reci_updateM(const int lCol, const double mNew[DIM]){
         
     }
 
-    int ikx, iky, ik;
+    int ik;
     double complex exp_IkxOld;
     double xOld[DIM];
     
@@ -449,18 +438,13 @@ void Epot_reci_updateM(const int lCol, const double mNew[DIM]){
     }
        
     Epot_reci_fourier_old(xOld);
+    ik = 0;
     
     for (int kx=-Nx; kx<Nx; kx++){
         
-        ikx = (kx + Nx)*(2*Ny * 2*Nz);
-        
         for (int ky=-Ny; ky<Ny; ky++){
             
-            iky = (ky + Ny)*2*Nz;
-            
             for (int kz=-Nz; kz<Nz; kz++){
-                
-                ik = ikx + iky + (kz + Nz);
                 
                 exp_IkxOld = exp_IkxOld_x[kx+Nx] * exp_IkxOld_y[ky+Ny] * exp_IkxOld_z[kz+Nz];
 
@@ -469,6 +453,7 @@ void Epot_reci_updateM(const int lCol, const double mNew[DIM]){
                     structure[iComp].f_hat[ik] += (mNew[iComp] - mOld[iComp]) * exp_IkxOld;
                                                 
                 }
+                ik++;
     
             }
             
@@ -524,21 +509,17 @@ double Epot_reci(double X[][DIM], double D[][DIM], const int Ncol, const double 
     
     // Setting the function potential : potential
     
-    int ikx, iky, ik;
+    int ik;
     double complex k_dot_structure;
     double Epot_tabulated;
     
+    ik = 0;
+    
     for (int kx=-Nx; kx<Nx; kx++){
-        
-        ikx = (kx + Nx)*(2*Ny * 2*Nz);
         
         for (int ky=-Ny; ky<Ny; ky++){
             
-            iky = (ky + Ny)*2*Nz;
-            
             for (int kz=-Nz; kz<Nz; kz++){
-                
-                ik = ikx + iky + (kz + Nz);
                 
                 k_dot_structure  = (double)kx * structure[0].f_hat[ik] +
                                    (double)ky * structure[1].f_hat[ik] +
@@ -553,6 +534,8 @@ double Epot_reci(double X[][DIM], double D[][DIM], const int Ncol, const double 
                 potential[0].f_hat[ik] *= (double)kx * Epot_tabulated;
                 potential[1].f_hat[ik] *= (double)ky * Epot_tabulated;
                 potential[2].f_hat[ik] *= (double)kz * Epot_tabulated;
+                
+                ik ++;
             
             }            
         }        

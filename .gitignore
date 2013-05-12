@@ -16,7 +16,7 @@ Sources/*.mod
 Sources/*.o
 Sources/procedures.txt~
 Sources/Doxyfile~
-Sources/Ref
+Sources/Ref*
 Documentation/
 Temp/
 Data/
