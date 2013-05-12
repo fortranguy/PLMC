@@ -292,7 +292,9 @@ double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol){
         }        
     }
     
-    return 2.*PI/Vol * Epot;
+    Epot *= 2.*PI/Vol;
+    
+    return Epot;
     
 }
 
@@ -414,7 +416,9 @@ double Epot_reci_rotate(const int lCol, const double mNew[DIM], const double Vol
         }        
     }
     
-    return 2.*PI/Vol * Epot;
+    Epot *= 2.*PI/Vol;
+    
+    return Epot;
     
 }
 
