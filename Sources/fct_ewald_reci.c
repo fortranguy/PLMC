@@ -505,7 +505,7 @@ double Epot_reci_test(const double xTest[DIM], const double mTest[DIM], const do
                 sin_kxTest = cimag(exp_IkxNew_x[kx+Nx] * exp_IkxNew_y[ky+Ny] * exp_IkxNew_z[kz+Nz]);
                 
                 realPart1 = creal(k_dot_structure) * cos_kxTest;
-                realPart1 = cimag(k_dot_structure) * sin_kxTest;
+                realPart2 = cimag(k_dot_structure) * sin_kxTest;
                 
                 Epot += k_dot_mTest * (realPart1 + realPart2) * Epot_reci_tab[kx+Nx][ky+Ny][kz+Nz];
             
