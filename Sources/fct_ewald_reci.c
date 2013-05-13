@@ -478,7 +478,7 @@ double Epot_reci_test(const double xTest[DIM], const double mTest[DIM], const do
     int ik;
     double k_dot_mTest;
     double complex k_dot_structure;
-    double realPart1, realPart2;    
+    double realPart;
     double cos_kxTest, sin_kxTest;
     
     Epot_reci_fourier_new(xTest);
@@ -502,12 +502,13 @@ double Epot_reci_test(const double xTest[DIM], const double mTest[DIM], const do
                 ik++;
                 
                 cos_kxTest = creal(exp_IkxNew_x[kx+Nx] * exp_IkxNew_y[ky+Ny] * exp_IkxNew_z[kz+Nz]);
-                sin_kxTest = cimag(exp_IkxNew_x[kx+Nx] * exp_IkxNew_y[ky+Ny] * exp_IkxNew_z[kz+Nz]);
+                sin_kxTest =-cimag(exp_IkxNew_x[kx+Nx] * exp_IkxNew_y[ky+Ny] * exp_IkxNew_z[kz+Nz]);
                 
-                realPart1 = creal(k_dot_structure) * cos_kxTest;
-                realPart2 = cimag(k_dot_structure) * sin_kxTest;
+                realPart = creal(k_dot_structure) * cos_kxTest;
+                realPart+= cimag(k_dot_structure) * sin_kxTest;
                 
-                Epot += k_dot_mTest * (realPart1 + realPart2) * Epot_reci_tab[kx+Nx][ky+Ny][kz+Nz];
+                Epot += k_dot_mTest * (k_dot_mTest + 2.*realPart) * 
+                        Epot_reci_tab[kx+Nx][ky+Ny][kz+Nz];
             
             }
             
