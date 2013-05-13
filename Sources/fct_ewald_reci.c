@@ -15,14 +15,6 @@ static double Epot_reci_tab[2*Nx][2*Ny][2*Nz]; /*!< \f[ f(\alpha, \vec{k}) = \fr
 {\alpha^2} \sum_d \frac{k_d^2}{L_d}}}{\sum_d \frac{k_d^2}{L_d}} \f]
 */
 
-static double complex exp_IkxNew_x[2*Nx];
-static double complex exp_IkxNew_y[2*Ny];
-static double complex exp_IkxNew_z[2*Nz];
-    
-static double complex exp_IkxOld_x[2*Nx];
-static double complex exp_IkxOld_y[2*Ny];
-static double complex exp_IkxOld_z[2*Nz];
-
 void Epot_reci_nfft_init(const int Ncol);
 void Epot_reci_nfft_finalize();
 void Epot_reci_init(const double Lsize[DIM], const double alpha);
@@ -119,97 +111,53 @@ void Epot_reci_init(const double Lsize[DIM], const double alpha){
     
 }
 
-void Epot_reci_fourier_new(const double xNew[DIM]){
+void Epot_reci_fourier(const double xNew[DIM], complex exp_IkxCol_x[2*Nx], 
+                                               complex exp_IkxCol_y[2*Ny],
+                                               complex exp_IkxCol_z[2*Nz]){
 
     // x
     
-    exp_IkxNew_x[Nx+0] = 1.;
-    exp_IkxNew_x[Nx+1] = exp(I*2.*PI * 1.*xNew[0]);
-    exp_IkxNew_x[Nx-1] = conj(exp_IkxNew_x[Nx+1]);
+    exp_IkxCol_x[Nx+0] = 1.;
+    exp_IkxCol_x[Nx+1] = exp(I*2.*PI * 1.*xNew[0]);
+    exp_IkxCol_x[Nx-1] = conj(exp_IkxCol_x[Nx+1]);
     
     for (int kx=2; kx<Nx; kx++){
         
-        exp_IkxNew_x[Nx+kx] = exp_IkxNew_x[Nx+kx-1] * exp_IkxNew_x[Nx+1];
-        exp_IkxNew_x[Nx-kx] = conj(exp_IkxNew_x[Nx+kx]);
+        exp_IkxCol_x[Nx+kx] = exp_IkxCol_x[Nx+kx-1] * exp_IkxCol_x[Nx+1];
+        exp_IkxCol_x[Nx-kx] = conj(exp_IkxCol_x[Nx+kx]);
         
     }    
     
-    exp_IkxNew_x[Nx-Nx] = exp_IkxNew_x[Nx-(Nx-1)] * exp_IkxNew_x[Nx-1];
+    exp_IkxCol_x[Nx-Nx] = exp_IkxCol_x[Nx-(Nx-1)] * exp_IkxCol_x[Nx-1];
     
     // y
     
-    exp_IkxNew_y[Ny+0] = 1.;
-    exp_IkxNew_y[Ny+1] = exp(I*2.*PI * 1.*xNew[1]);
-    exp_IkxNew_y[Ny-1] = conj(exp_IkxNew_y[Ny+1]);
+    exp_IkxCol_y[Ny+0] = 1.;
+    exp_IkxCol_y[Ny+1] = exp(I*2.*PI * 1.*xNew[1]);
+    exp_IkxCol_y[Ny-1] = conj(exp_IkxCol_y[Ny+1]);
     
     for (int ky=2; ky<Ny; ky++){
         
-        exp_IkxNew_y[Ny+ky] = exp_IkxNew_y[Ny+ky-1] * exp_IkxNew_y[Ny+1];
-        exp_IkxNew_y[Ny-ky] = conj(exp_IkxNew_y[Ny+ky]);
+        exp_IkxCol_y[Ny+ky] = exp_IkxCol_y[Ny+ky-1] * exp_IkxCol_y[Ny+1];
+        exp_IkxCol_y[Ny-ky] = conj(exp_IkxCol_y[Ny+ky]);
         
     }
-    exp_IkxNew_y[Ny-Ny] = exp_IkxNew_y[Ny-(Ny-1)] * exp_IkxNew_y[Ny-1];
+    exp_IkxCol_y[Ny-Ny] = exp_IkxCol_y[Ny-(Ny-1)] * exp_IkxCol_y[Ny-1];
             
     // z
     
-    exp_IkxNew_z[Nz+0] = 1.;
-    exp_IkxNew_z[Nz+1] = exp(I*2.*PI * 1.*xNew[2]);
-    exp_IkxNew_z[Nz-1] = conj(exp_IkxNew_z[Nz+1]);
+    exp_IkxCol_z[Nz+0] = 1.;
+    exp_IkxCol_z[Nz+1] = exp(I*2.*PI * 1.*xNew[2]);
+    exp_IkxCol_z[Nz-1] = conj(exp_IkxCol_z[Nz+1]);
     
     for (int kz=2; kz<Nz; kz++){
         
-        exp_IkxNew_z[Nz+kz] = exp_IkxNew_z[Nz+kz-1] * exp_IkxNew_z[Nz+1];
-        exp_IkxNew_z[Nz-kz] = conj(exp_IkxNew_z[Nz+kz]);
+        exp_IkxCol_z[Nz+kz] = exp_IkxCol_z[Nz+kz-1] * exp_IkxCol_z[Nz+1];
+        exp_IkxCol_z[Nz-kz] = conj(exp_IkxCol_z[Nz+kz]);
         
     }
     
-    exp_IkxNew_z[Nz-Nz] = exp_IkxNew_z[Nz-(Nz-1)] * exp_IkxNew_z[Nz-1];
-
-}
-
-void Epot_reci_fourier_old(const double xOld[DIM]){
-    
-    // x
-    exp_IkxOld_x[Nx+0] = 1.;
-    exp_IkxOld_x[Nx+1] = exp(I*2.*PI * 1.*xOld[0]);
-    exp_IkxOld_x[Nx-1] = conj(exp_IkxOld_x[Nx+1]);
-    
-    for (int kx=2; kx<Nx; kx++){
-    
-        exp_IkxOld_x[Nx+kx] = exp_IkxOld_x[Nx+kx-1] * exp_IkxOld_x[Nx+1];
-        exp_IkxOld_x[Nx-kx] = conj(exp_IkxOld_x[Nx+kx]);
-    
-    }
-    
-    exp_IkxOld_x[Nx-Nx] = exp_IkxOld_x[Nx-(Nx-1)] * exp_IkxOld_x[Nx-1];
-    
-    // y
-    exp_IkxOld_y[Ny+0] = 1.;
-    exp_IkxOld_y[Ny+1] = exp(I*2.*PI * 1.*xOld[1]);
-    exp_IkxOld_y[Ny-1] = conj(exp_IkxOld_y[Ny+1]);
-    
-    for (int ky=2; ky<Ny; ky++){
-    
-        exp_IkxOld_y[Ny+ky] = exp_IkxOld_y[Ny+ky-1] * exp_IkxOld_y[Ny+1];
-        exp_IkxOld_y[Ny-ky] = conj(exp_IkxOld_y[Ny+ky]);
-    
-    }
-    
-    exp_IkxOld_y[Ny-Ny] = exp_IkxOld_y[Ny-(Ny-1)] * exp_IkxOld_y[Ny-1];
-    
-    // z
-    exp_IkxOld_z[Nz+0] = 1.;
-    exp_IkxOld_z[Nz+1] = exp(I*2.*PI * 1.*xOld[2]);
-    exp_IkxOld_z[Nz-1] = conj(exp_IkxOld_z[Nz+1]);
-    
-    for (int kz=2; kz<Nz; kz++){
-    
-        exp_IkxOld_z[Nz+kz] = exp_IkxOld_z[Nz+kz-1] * exp_IkxOld_z[Nz+1];
-        exp_IkxOld_z[Nz-kz] = conj(exp_IkxOld_z[Nz+kz]);
-    
-    }
-    
-    exp_IkxOld_z[Nz-Nz] = exp_IkxOld_z[Nz-(Nz-1)] * exp_IkxOld_z[Nz-1];
+    exp_IkxCol_z[Nz-Nz] = exp_IkxCol_z[Nz-(Nz-1)] * exp_IkxCol_z[Nz-1];
 
 }
 
@@ -241,6 +189,7 @@ double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol){
     int ik;
     double k_dot_mOld;
     double complex k_dot_structure;
+    double complex exp_IkxNew, exp_IkxOld;
     double realPart1, realPart2;
     
     double cos_kxNew, sin_kxNew;
@@ -252,8 +201,16 @@ double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol){
         xOld[iDim] = structure[0].x[DIM*lCol+iDim];
     }
     
-    Epot_reci_fourier_new(xNew);  
-    Epot_reci_fourier_old(xOld);
+    double complex exp_IkxNew_x[2*Nx];
+    double complex exp_IkxNew_y[2*Ny];
+    double complex exp_IkxNew_z[2*Nz];
+    
+    double complex exp_IkxOld_x[2*Nx];
+    double complex exp_IkxOld_y[2*Ny];
+    double complex exp_IkxOld_z[2*Nz];
+    
+    Epot_reci_fourier(xNew, exp_IkxNew_x, exp_IkxNew_y, exp_IkxNew_z);
+    Epot_reci_fourier(xOld, exp_IkxOld_x, exp_IkxOld_y, exp_IkxOld_z);
         
     Epot = 0.;
     ik = 0;
@@ -273,11 +230,13 @@ double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol){
                                   (double)kz * structure[2].f_hat[ik];
                 ik++;
                 
-                cos_kxNew = creal(exp_IkxNew_x[kx+Nx] * exp_IkxNew_y[ky+Ny] * exp_IkxNew_z[kz+Nz]);
-                sin_kxNew = cimag(exp_IkxNew_x[kx+Nx] * exp_IkxNew_y[ky+Ny] * exp_IkxNew_z[kz+Nz]);
+                exp_IkxNew = exp_IkxNew_x[kx+Nx] * exp_IkxNew_y[ky+Ny] * exp_IkxNew_z[kz+Nz];
+                cos_kxNew = creal(exp_IkxNew);
+                sin_kxNew = cimag(exp_IkxNew);
                 
-                cos_kxOld = creal(exp_IkxOld_x[kx+Nx] * exp_IkxOld_y[ky+Ny] * exp_IkxOld_z[kz+Nz]);
-                sin_kxOld = cimag(exp_IkxOld_x[kx+Nx] * exp_IkxOld_y[ky+Ny] * exp_IkxOld_z[kz+Nz]);
+                exp_IkxOld = exp_IkxOld_x[kx+Nx] * exp_IkxOld_y[ky+Ny] * exp_IkxOld_z[kz+Nz];
+                cos_kxOld = creal(exp_IkxOld);
+                sin_kxOld = cimag(exp_IkxOld);
                 
                 realPart1 = cos_kxNew - cos_kxOld;                
                 realPart1*= creal(k_dot_structure) - k_dot_mOld * cos_kxOld;
@@ -324,8 +283,16 @@ void Epot_reci_updateX(const int lCol, const double xNew[DIM]){
     double complex exp_IkxNew;
     double complex exp_IkxOld;
     
-    Epot_reci_fourier_new(xNew);
-    Epot_reci_fourier_old(xOld);
+    double complex exp_IkxNew_x[2*Nx];
+    double complex exp_IkxNew_y[2*Ny];
+    double complex exp_IkxNew_z[2*Nz];
+    
+    double complex exp_IkxOld_x[2*Nx];
+    double complex exp_IkxOld_y[2*Ny];
+    double complex exp_IkxOld_z[2*Nz];
+    
+    Epot_reci_fourier(xNew, exp_IkxNew_x, exp_IkxNew_y, exp_IkxNew_z);
+    Epot_reci_fourier(xOld, exp_IkxOld_x, exp_IkxOld_y, exp_IkxOld_z);
     
     ik = 0;
     
@@ -366,6 +333,7 @@ double Epot_reci_rotate(const int lCol, const double mNew[DIM], const double Vol
     int ik;
     double k_dot_mNew, k_dot_mOld;
     double complex k_dot_structure;
+    double complex exp_IkxOld;
     double realPart;
     double cos_kxOld, sin_kxOld;
     
@@ -374,8 +342,12 @@ double Epot_reci_rotate(const int lCol, const double mNew[DIM], const double Vol
     for (int iDim=0; iDim<DIM; iDim++){
         xOld[iDim] = structure[0].x[DIM*lCol+iDim];
     }
-     
-    Epot_reci_fourier_old(xOld);
+    
+    double complex exp_IkxOld_x[2*Nx];
+    double complex exp_IkxOld_y[2*Ny];
+    double complex exp_IkxOld_z[2*Nz];
+
+    Epot_reci_fourier(xOld, exp_IkxOld_x, exp_IkxOld_y, exp_IkxOld_z);
     
     Epot = 0.;
     ik = 0;
@@ -400,8 +372,9 @@ double Epot_reci_rotate(const int lCol, const double mNew[DIM], const double Vol
                                   (double)kz * structure[2].f_hat[ik];
                 ik++;
                 
-                cos_kxOld = creal(exp_IkxOld_x[kx+Nx] * exp_IkxOld_y[ky+Ny] * exp_IkxOld_z[kz+Nz]);
-                sin_kxOld = cimag(exp_IkxOld_x[kx+Nx] * exp_IkxOld_y[ky+Ny] * exp_IkxOld_z[kz+Nz]);
+                exp_IkxOld = exp_IkxOld_x[kx+Nx] * exp_IkxOld_y[ky+Ny] * exp_IkxOld_z[kz+Nz];
+                cos_kxOld = creal(exp_IkxOld);
+                sin_kxOld = cimag(exp_IkxOld);
                 
                 realPart = cos_kxOld * (creal(k_dot_structure) - k_dot_mOld * cos_kxOld);
                 realPart+= sin_kxOld * (cimag(k_dot_structure) - k_dot_mOld * sin_kxOld);
@@ -439,8 +412,13 @@ void Epot_reci_updateM(const int lCol, const double mNew[DIM]){
     for (int iDim=0; iDim<DIM; iDim++){
         xOld[iDim] = structure[0].x[DIM*lCol+iDim];
     }
-       
-    Epot_reci_fourier_old(xOld);
+    
+    double complex exp_IkxOld_x[2*Nx];
+    double complex exp_IkxOld_y[2*Ny];
+    double complex exp_IkxOld_z[2*Nz];
+
+    Epot_reci_fourier(xOld, exp_IkxOld_x, exp_IkxOld_y, exp_IkxOld_z);
+    
     ik = 0;
     
     for (int kx=-Nx; kx<Nx; kx++){
@@ -478,10 +456,15 @@ double Epot_reci_test(const double xTest[DIM], const double mTest[DIM], const do
     int ik;
     double k_dot_mTest;
     double complex k_dot_structure;
+    double complex exp_IkxTest;
     double realPart;
     double cos_kxTest, sin_kxTest;
     
-    Epot_reci_fourier_new(xTest);
+    double complex exp_IkxTest_x[2*Nx];
+    double complex exp_IkxTest_y[2*Ny];
+    double complex exp_IkxTest_z[2*Nz];
+
+    Epot_reci_fourier(xTest, exp_IkxTest_x, exp_IkxTest_y, exp_IkxTest_z);
         
     Epot = 0.;
     ik = 0;
@@ -501,8 +484,9 @@ double Epot_reci_test(const double xTest[DIM], const double mTest[DIM], const do
                                   (double)kz * structure[2].f_hat[ik];
                 ik++;
                 
-                cos_kxTest = creal(exp_IkxNew_x[kx+Nx] * exp_IkxNew_y[ky+Ny] * exp_IkxNew_z[kz+Nz]);
-                sin_kxTest =-cimag(exp_IkxNew_x[kx+Nx] * exp_IkxNew_y[ky+Ny] * exp_IkxNew_z[kz+Nz]);
+                exp_IkxTest = exp_IkxTest_x[kx+Nx] * exp_IkxTest_y[ky+Ny] * exp_IkxTest_z[kz+Nz];
+                cos_kxTest = creal(exp_IkxTest);
+                sin_kxTest =-cimag(exp_IkxTest);
                 
                 realPart = creal(k_dot_structure) * cos_kxTest;
                 realPart+= cimag(k_dot_structure) * sin_kxTest;
