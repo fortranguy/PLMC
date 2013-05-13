@@ -50,8 +50,6 @@ implicit none
             
         end subroutine C_Epot_reci_updateX
         
-        ! ------------------------------------------------------------------------------------------
-        
         ! Rotate -----------------------------------------------------------------------------------
         
         function C_Epot_reci_rotate(C_lcol, C_mNew, C_Vol) bind(C, name="Epot_reci_rotate")
@@ -74,9 +72,7 @@ implicit none
             
         end subroutine C_Epot_reci_updateM
         
-        ! ------------------------------------------------------------------------------------------
-        
-        ! Widom ----
+        ! Widom ------------------------------------------------------------------------------------
         
         function C_Epot_reci_test(C_xTest, C_mTest, C_Vol) bind(C, name="Epot_reci_test")
         
