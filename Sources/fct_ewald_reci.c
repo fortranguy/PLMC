@@ -279,8 +279,7 @@ double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol){
                 cos_kxOld = creal(exp_IkxOld_x[kx+Nx] * exp_IkxOld_y[ky+Ny] * exp_IkxOld_z[kz+Nz]);
                 sin_kxOld = cimag(exp_IkxOld_x[kx+Nx] * exp_IkxOld_y[ky+Ny] * exp_IkxOld_z[kz+Nz]);
                 
-                realPart1 = cos_kxNew - cos_kxOld;
-                
+                realPart1 = cos_kxNew - cos_kxOld;                
                 realPart1*= creal(k_dot_structure) - k_dot_mOld * cos_kxOld;
                 
                 realPart2 =-sin_kxNew + sin_kxOld;
@@ -325,7 +324,7 @@ void Epot_reci_updateX(const int lCol, const double xNew[DIM]){
     double complex exp_IkxNew;
     double complex exp_IkxOld;
     
-    Epot_reci_fourier_new(xNew);  
+    Epot_reci_fourier_new(xNew);
     Epot_reci_fourier_old(xOld);
     
     ik = 0;
@@ -465,7 +464,60 @@ void Epot_reci_updateM(const int lCol, const double mNew[DIM]){
         
     }
     
-    return;    
+    return;
+
+}
+
+// -------------------------------------------------------------------------------------------------
+
+// Test particle -----------------------------------------------------------------------------------
+
+double Epot_reci_test(const double xTest[DIM], const double mTest[DIM], const double Vol){
+
+    double Epot;
+    int ik;
+    double k_dot_mTest;
+    double complex k_dot_structure;
+    double realPart1, realPart2;    
+    double cos_kxTest, sin_kxTest;
+    
+    Epot_reci_fourier_new(xTest);
+        
+    Epot = 0.;
+    ik = 0;
+    
+    for (int kx=-Nx; kx<Nx; kx++){
+        
+        for (int ky=-Ny; ky<Ny; ky++){
+            
+            for (int kz=-Nz; kz<Nz; kz++){
+            
+                k_dot_mTest = (double)kx * mTest[0] +
+                              (double)ky * mTest[1] +
+                              (double)kz * mTest[2];  
+            
+                k_dot_structure = (double)kx * structure[0].f_hat[ik] +
+                                  (double)ky * structure[1].f_hat[ik] +
+                                  (double)kz * structure[2].f_hat[ik];
+                ik++;
+                
+                cos_kxTest = creal(exp_IkxNew_x[kx+Nx] * exp_IkxNew_y[ky+Ny] * exp_IkxNew_z[kz+Nz]);
+                sin_kxTest = cimag(exp_IkxNew_x[kx+Nx] * exp_IkxNew_y[ky+Ny] * exp_IkxNew_z[kz+Nz]);
+                
+                realPart1 = creal(k_dot_structure) * cos_kxTest;
+                realPart1 = cimag(k_dot_structure) * sin_kxTest;
+                
+                Epot += k_dot_mTest * (realPart1 + realPart2) * Epot_reci_tab[kx+Nx][ky+Ny][kz+Nz];
+            
+            }
+            
+        }
+        
+    }
+    
+    Epot *= 2.*PI/Vol;
+    
+    return Epot;
 
 }
 

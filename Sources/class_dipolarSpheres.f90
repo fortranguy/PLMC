@@ -72,7 +72,7 @@ private
         procedure :: Epot_reci_init => DipolarSpheres_Epot_reci_init
         procedure :: Epot_reci => DipolarSpheres_Epot_reci
         !>     Self
-        procedure :: Epot_self_rotate => DipolarSpheres_Epot_self_rotate
+        procedure :: Epot_self_solo => DipolarSpheres_Epot_self_solo
         procedure :: Epot_self => DipolarSpheres_Epot_self
         !>     (Other)
         procedure :: Epot_neigh => DipolarSpheres_Epot_neigh
@@ -455,23 +455,20 @@ contains
         deallocate(C_X)
         deallocate(C_M)
         
-    end function DipolarSpheres_Epot_reci    
+    end function DipolarSpheres_Epot_reci
     
-    !> Self energy difference : rotation
-    !> \f[ \frac{2}{3}\frac{\alpha^3}{\sqrt{\pi}} (\vec{\mu}^\prime_i\cdot\vec{\mu}^\prime_i -
-    !>                                             \vec{\mu}_i\cdot\vec{\mu}_i)\f]
+    !> Self energy of 1 dipole
+    !> \f[ \frac{2}{3}\frac{\alpha^3}{\sqrt{\pi}} \vec{\mu}_i\cdot\vec{\mu}_i \f]
     
-    function DipolarSpheres_Epot_self_rotate(this, iCol, mNew) result(Epot_self_rotate)
+    function DipolarSpheres_Epot_self_solo(this, mCol) result(Epot_self_solo)
     
         class(DipolarSpheres), intent(in) :: this
-        integer, intent(in) :: iCol
-        real(DP), dimension(:) :: mNew
-        real(DP) :: Epot_self_rotate
+        real(DP), dimension(:), intent(in) :: mCol
+        real(DP) :: Epot_self_solo
         
-        Epot_self_rotate = dot_product(mNew, mNew) - dot_product(this%M(:, iCol), this%M(:, iCol))
-        Epot_self_rotate = Epot_self_rotate * 2._DP/3._DP * this%alpha**3/sqrt(PI)
+        Epot_self_solo = 2._DP/3._DP * this%alpha**3/sqrt(PI) * dot_product(mCol, mCol)
     
-    end function DipolarSpheres_Epot_self_rotate
+    end function DipolarSpheres_Epot_self_solo
     
     !> Total self energy
     !> \f[ \frac{2}{3}\frac{\alpha^3}{\sqrt{\pi}} \sum_i \vec{\mu}_i\cdot\vec{\mu}_i \f]
@@ -480,16 +477,13 @@ contains
     
         class(DipolarSpheres), intent(in) :: this
         real(DP) :: Epot_self
-        
-        real(DP) :: momentsSum
+
         integer :: iCol        
         
-        momentsSum = 0._DP
+        Epot_self = 0._DP
         do iCol = 1, this%Ncol
-            momentsSum = momentsSum + dot_product(this%M(:, iCol), this%M(:, iCol))
+            Epot_self = Epot_self + this%Epot_self_solo(this%M(:, iCol))
         end do
-        
-        Epot_self = 2._DP/3._DP * this%alpha**3/sqrt(PI) * momentsSum
         
     end function DipolarSpheres_Epot_self
     
@@ -647,7 +641,7 @@ contains
         integer :: iOld
         real(DP) :: rand
         real(DP), dimension(Dim) :: mNew, mRand
-        real(DP) :: dEpot, real_dEpot
+        real(DP) :: dEpot, real_dEpot, self_dEpot
         real(DP) :: real_eNew, real_eOld
         integer :: iCell
         logical :: overlap
@@ -667,10 +661,12 @@ contains
         
         iCell = this%same%position_to_cell(this%X(:, iOld))
         call this%Epot_neigh(iOld, this%X(:, iOld), mNew, iCell, overlap, real_eNew)
-        call this%Epot_neigh(iOld, this%X(:, iOld), this%M(:, iOld), iCell, overlap, real_eOld)
-        
+        call this%Epot_neigh(iOld, this%X(:, iOld), this%M(:, iOld), iCell, overlap, real_eOld)        
         real_dEpot = real_eNew - real_eOld
-        dEpot = real(C_Epot, DP) + real_dEpot - this%Epot_self_rotate(iOld, mNew)
+        
+        self_dEpot = this%Epot_self_solo(mNew) - this%Epot_self_solo(this%M(:, iOld))
+        
+        dEpot = real(C_Epot, DP) + real_dEpot - self_dEpot
         call random_number(rand)
         if (rand < exp(-dEpot/Tstar)) then
         
@@ -727,6 +723,8 @@ contains
                     ! Reci
                     C_xTest(:) = real(xTest(:)/Lsize(:), C_double) - 0.5_c_double                    
                     C_mTest(:) = real(mTest(:)/Lsize(:), C_double)
+                    
+                    C_Epot = C_Epot_reci_test(C_xTest, C_mTest, real(product(Lsize), C_double))
                 
                     enTest = same_enTest + mix_enTest
                     widTestSum = widTestSum + exp(-enTest/Tstar)
