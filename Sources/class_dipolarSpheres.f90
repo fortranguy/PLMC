@@ -702,6 +702,9 @@ contains
         logical :: overlap
         real(DP) :: enTest, same_enTest, mix_enTest
         
+        real(C_double) :: C_Epot
+        real(C_double), dimension(Dim) :: C_xTest, C_mTest
+        
         widTestSum = 0._DP
         
         do iWidom = 1, this%Nwidom
@@ -715,11 +718,15 @@ contains
             if (.not. overlap) then
             
                 mTest(:) = random_surface()
-                
+                               
                 same_iCellTest = this%same%position_to_cell(xTest)               
                 call this%Epot_neigh(0, xTest, mTest, same_iCellTest, overlap, same_enTest)
                 
                 if (.not. overlap) then
+                
+                    ! Reci
+                    C_xTest(:) = real(xTest(:)/Lsize(:), C_double) - 0.5_c_double                    
+                    C_mTest(:) = real(mTest(:)/Lsize(:), C_double)
                 
                     enTest = same_enTest + mix_enTest
                     widTestSum = widTestSum + exp(-enTest/Tstar)
