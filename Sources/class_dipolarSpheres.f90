@@ -726,7 +726,7 @@ contains
                     
                     C_Epot = C_Epot_reci_test(C_xTest, C_mTest, real(product(Lsize), C_double))
                 
-                    enTest = same_enTest + mix_enTest
+                    enTest = same_enTest + mix_enTest + real(C_Epot, DP) - this%Epot_self_solo(mTest)
                     widTestSum = widTestSum + exp(-enTest/Tstar)
                     
                 end if
