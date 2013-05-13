@@ -19,14 +19,17 @@ void Epot_reci_nfft_init(const int Ncol);
 void Epot_reci_nfft_finalize();
 void Epot_reci_init(const double Lsize[DIM], const double alpha);
 
-static void Epot_reci_fourier_new(const double xNew[DIM]);
-static void Epot_reci_fourier_old(const double xOld[DIM]);
+void Epot_reci_fourier(const double xNew[DIM], complex exp_IkxCol_x[2*Nx], 
+                                               complex exp_IkxCol_y[2*Ny],
+                                               complex exp_IkxCol_z[2*Nz]);
 
 double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol);
 void Epot_reci_updateX(const int lCol, const double xNew[DIM]);
 
 double Epot_reci_rotate(const int lCol, const double mNew[DIM], const double Vol);
 void Epot_reci_updateM(const int lCol, const double mNew[DIM]);
+
+double Epot_reci_test(const double xTest[DIM], const double mTest[DIM], const double Vol);
 
 double Epot_reci(double X[][DIM], double D[][DIM], const int Ncol, const double Vol);
 void snapShot(const int Ncol);
@@ -111,6 +114,9 @@ void Epot_reci_init(const double Lsize[DIM], const double alpha){
     
 }
 
+/*!> Fourier coefficients calculation
+ *  \f[ e^{i\vec{k}\vec{x}} = e^{i k_x x} e^{i k_y y} e^{i k_z z}\f] 
+ */
 void Epot_reci_fourier(const double xNew[DIM], complex exp_IkxCol_x[2*Nx], 
                                                complex exp_IkxCol_y[2*Ny],
                                                complex exp_IkxCol_z[2*Nz]){
@@ -166,20 +172,18 @@ void Epot_reci_fourier(const double xNew[DIM], complex exp_IkxCol_x[2*Nx],
 /*!> Difference of Energy \f[ \Delta U = \frac{2\pi}{V} \sum_{\vec{k} \neq 0} \Delta M^2 
  * f(\alpha, \vec{k}) \f]
  * \f[
- *  \Delta M^2 = 2\Re[
- *      (\vec{\mu}_l\cdot\vec{k}) (e^{i(\vec{k}\cdot\vec{x}^\prime_l)} -e^{i(\vec{k}\cdot\vec{x}_l)}
- *      (\vec{k}\cdot\vec{S}_l)
- *  ]
+ *  \Delta M^2 = 2\Re[(\vec{\mu}_l\cdot\vec{k}) (e^{i(\vec{k}\cdot\vec{x}^\prime_l)} -
+ *               e^{i(\vec{k}\cdot\vec{x}_l)} (\vec{k}\cdot\vec{S}_l)]
  * \f]
  * \f[  \vec{S}_l = \sum_{i \neq l} \vec{\mu}_i e^{i(\vec{k}\cdot\vec{x}_i)}
  * \f]
  * Implementation :
  * \f[ 
  *  \Delta M^2 = 2(\vec{\mu_l}\cdot\vec{k}) 
- *  [ \cos(\vec{k}\cdot\vec{x}^\prime_l) - \cos(\vec{k}\cdot\vec{x})]
- *  [\Re{(\vec{k}\cdot\vec{S})} - (\vec{k}\cdot\vec{\mu}_l) cos(\vec{k}\cdot\vec{x}_l)] -
- *  [-\sin(\vec{k}\cdot\vec{x}^\prime_l) + \sin(\vec{k}\cdot\vec{x})]
- *  [\Im{(\vec{k}\cdot\vec{S})} - (\vec{k}\cdot\vec{\mu}_l) sin(\vec{k}\cdot\vec{x}_l)]
+ *              [ \cos(\vec{k}\cdot\vec{x}^\prime_l) - \cos(\vec{k}\cdot\vec{x})]
+ *              [\Re{(\vec{k}\cdot\vec{S})} - (\vec{k}\cdot\vec{\mu}_l) \cos(\vec{k}\cdot\vec{x}_l)] -
+ *              [-\sin(\vec{k}\cdot\vec{x}^\prime_l) + \sin(\vec{k}\cdot\vec{x})]
+ *              [\Im{(\vec{k}\cdot\vec{S})} - (\vec{k}\cdot\vec{\mu}_l) \sin(\vec{k}\cdot\vec{x}_l)]
  * \f]
  */
 
