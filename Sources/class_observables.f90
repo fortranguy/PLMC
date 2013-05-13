@@ -94,8 +94,6 @@ contains
         write(report_unit, *) "Results :"
         
         write(report_unit, *) "    average energy = ", this%EpotSum/real(Nstep, DP)
-        write(report_unit, *) "    average energy per particule = ", &
-                                   this%EpotSum/real(Nstep, DP)/real(Ncol, DP)
             
         potChiId = -Tstar*log( product(Lsize)/real(Ncol+1,DP) )
         write(report_unit, *) "    ideal chemical potential = ", potChiId

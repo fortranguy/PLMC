@@ -270,6 +270,8 @@ contains
             
         write(report_unit, *) "Results :"
         write(report_unit, *) "    average energy = ", EpotSum/real(Nstep, DP)
+        write(report_unit, *) "    average energy per particule = ", &
+                                   EpotSum/real(Nstep, DP)/real(Ncol, DP)
         write(report_unit, *) "    duration =", duration/60._DP, "min"
     
     end subroutine results
