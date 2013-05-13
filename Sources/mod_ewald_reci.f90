@@ -76,6 +76,18 @@ implicit none
         
         ! ------------------------------------------------------------------------------------------
         
+        ! Widom ----
+        
+        function C_Epot_reci_test(C_xTest, C_mTest, C_Vol) bind(C, name="Epot_reci_test")
+        
+            import ::Dim, C_double
+            
+            real(C_double), dimension(Dim), intent(in) :: C_xTest, C_mTest
+            real(C_double), value :: C_Vol
+            real(C_double) :: C_Epot_reci_test
+            
+        end function C_Epot_reci_test
+        
         function C_Epot_reci(C_X, C_M, C_Ncol, C_Vol) bind(C, name="Epot_reci")
         
             import :: Dim, C_int, C_double
