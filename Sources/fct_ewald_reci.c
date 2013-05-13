@@ -331,6 +331,18 @@ void Epot_reci_updateX(const int lCol, const double xNew[DIM]){
 
 // Rotate ------------------------------------------------------------------------------------------
 
+/*!> Difference of Energy \f[ \Delta U = \frac{2\pi}{V} \sum_{\vec{k} \neq 0} \Delta M^2 
+ *                                       f(\alpha, \vec{k}) \f]
+ * \f[
+ *  \Delta M^2 = (\vec{k} \cdot \vec{\mu}_l^\prime)^2 - (\vec{k} \cdot \vec{\mu}_l)^2 +
+ *              [(\vec{k} \cdot \vec{\mu}_l^\prime) e^{-i \vec{k} \vec{x}_l^\prime} -
+ *               (\vec{k} \cdot \vec{\mu}_l) e^{-i \vec{k} \vec{x}_l}]
+ *               2\Re(\vec{k}\cdot\vec{S}_l)
+ * \f]
+ * Implementation :
+ * 
+ */
+
 double Epot_reci_rotate(const int lCol, const double mNew[DIM], const double Vol){
 
     double Epot, Epot_k;
@@ -453,6 +465,15 @@ void Epot_reci_updateM(const int lCol, const double mNew[DIM]){
 // -------------------------------------------------------------------------------------------------
 
 // Test particle -----------------------------------------------------------------------------------
+
+/*!> Difference of Energy 
+ * \f[ \Delta U^{N+1} = \frac{2\pi}{V} \sum_{\vec{k} \neq 0} (\vec{k} \cdot \vec{\mu}_{N+1})
+ *                      f(\alpha, \vec{k}) [(\vec{k} \cdot \vec{\mu}_{N+1}) + 
+ *                      2\Re(\vec{k} \cdot \vec{S} e^{-i \vec{k} \cdot \vec{x}_{N+1}})]
+ * \f]
+ * Implementation :
+ * 
+ */
 
 double Epot_reci_test(const double xTest[DIM], const double mTest[DIM], const double Vol){
 
