@@ -206,7 +206,7 @@ implicit none
                                                                                 type1_obs%rejRot
             write(type2_io%obsTherm, *) iStep, type2_obs%Epot, type2_obs%activ, type2_obs%rej
             write(mix_obsTherm_unit, *) iStep, mix_Epot
-            write(obsTherm_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
+            write(obsTherm_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot!, type1_sph%Epot_conf()
             
             if (iStep == Ntherm) then ! Definite thermalised displacements
                 call type1_sph%definiteDx(type1_obs%rej, type1_io%report)
