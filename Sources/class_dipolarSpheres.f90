@@ -569,6 +569,8 @@ contains
         xNew(:) = this%X(:, iOld) + this%dx(:) * (xRand(:)-0.5_DP)
         xNew(:) = modulo(xNew(:), Lsize(:))
         
+        write(*, *) "xNew", xNew(:)
+        
         mix_iCellNew = this%mix%position_to_cell(xNew)
         call mix%Epot_neigh(xNew, mix_iCellNew, this%mix, other%X, overlap, mix_eNew)
             
@@ -595,6 +597,8 @@ contains
                 mix_dEpot = mix_eNew - mix_eOld
                 
                 dEpot = same_dEpot + mix_dEpot
+                
+                write(*, *) "rand", rand
                 
                 if (rand < exp(-dEpot/Tstar)) then
                 
