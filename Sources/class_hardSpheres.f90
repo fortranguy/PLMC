@@ -197,7 +197,7 @@ contains
         xNew(:) = this%X(:, iOld) + (xRand(:)-0.5_DP)*this%dx(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
         
-        write(*, *) "xNew", xNew(:)
+        !write(*, *) "xNew", xNew(:)
         
         same_iCellNew = this%same%position_to_cell(xNew)
         call this%Epot_neigh(iOld, xNew, same_iCellNew, overlap)
@@ -219,7 +219,7 @@ contains
                 mix_dEpot = mix_eNew - mix_eOld
                 
                 call random_number(rand)
-                write(*, *) "rand", rand
+                !write(*, *) "rand", rand
                 if (rand < exp(-mix_dEpot/Tstar)) then
                 
                     this%X(:, iOld) = xNew(:)

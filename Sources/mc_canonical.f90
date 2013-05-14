@@ -115,7 +115,7 @@ implicit none
             ! Randomly choosing a particle among both types
             call random_number(rand)
             iColRand = int(rand*real(Ncol, DP)) + 1
-            write(*, *) iStep, iMove, iColRand
+            !write(*, *) iStep, iMove, iColRand
             
             ! Random new position
             call random_number(xRand)
