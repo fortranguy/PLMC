@@ -48,22 +48,43 @@ contains
         real(DP) :: x, y
         real(DP) :: normSqr, factor
         
-        do
+        real(DP) :: gaussSet
+        integer :: iset
         
-            call random_number(x)
-            x = 2._DP*x - 1._DP
-            call random_number(y)
-            y = 2._DP*y - 1._DP
+        data iset/0/
+        save
         
-            normSqr = x*x + y*y
-            if (normSqr <= 1._DP .and. normSqr /= 0._DP) exit
+        if (iset == 0) then
+        
+            do
             
-        end do
+                call random_number(x)
+                x = 2._DP*x - 1._DP
+                call random_number(y)
+                y = 2._DP*y - 1._DP
+            
+                normSqr = x*x + y*y
+                !write(*, *) "x", x, "y", x, "normSqr", normSqr
+                
+                if (normSqr <= 1._DP .and. normSqr /= 0._DP) exit
+                
+            end do
+            
+            factor = sqrt(-2._DP * log(normSqr) / normSqr)
+            
+            gaussSet = sigma3d * factor * x
+            gauss = sigma3d * factor * y
+            
+            iset = 1
+            
+        else
         
-        factor = sqrt(-2._DP * log(normSqr) / normSqr)
-        gauss = sigma3d * factor * x
+            gauss = gaussSet
+            iset = 0
+            
+        end if
         
-        write(*, *) "gauss", gauss
+        !write(*, *) "gauss", gauss
         
     end function gauss
     
@@ -93,8 +114,8 @@ contains
         
         integer, dimension(2) :: seed
 
-        call random_seed(get=seed)
-        write(*, *) "markov_seed", seed(:)
+        !call random_seed(get=seed)
+        !write(*, *) "markov_seed", seed(:)
         
         do iDim = 1, Dim        
             rotation(iDim) = gauss()
