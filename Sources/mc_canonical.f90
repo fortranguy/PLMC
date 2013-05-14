@@ -117,18 +117,22 @@ implicit none
             
             ! Moving a particle : Metropolis algorithm
             if (iColRand <= type1_sph%getNcol()) then
-                call type1_sph%move(type2_sph, mix, type1_obs%Epot, mix_Epot, type1_obs%Nrej)
+                call type1_sph%move(iColRand, type2_sph, mix, type1_obs%Epot, mix_Epot, type1_obs%Nrej)
                 type1_obs%Nmove = type1_obs%Nmove + 1
             else
-                call type2_sph%move(type1_sph, mix, type2_obs%Epot, mix_Epot, type2_obs%Nrej)
+                iColRand = iColRand - type1_sph%getNcol()
+                call type2_sph%move(iColRand, type1_sph, mix, type2_obs%Epot, mix_Epot, type2_obs%Nrej)
                 type2_obs%Nmove = type2_obs%Nmove + 1
             end if
             
         end do MC_Move
         
         MC_Rotate : do iRotate = 1, Nrotate
+        
+            call random_number(rand)
+            iColRand = int(rand*real(type1_sph%getNcol(), DP)) + 1
  
-            call type1_sph%rotate(type1_obs%Epot, type1_obs%NrejRot)
+            call type1_sph%rotate(iColRand, type1_obs%Epot, type1_obs%NrejRot)
             type1_obs%Nrotate = type1_obs%Nrotate + 1
             
         end do MC_Rotate
