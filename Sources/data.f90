@@ -27,7 +27,7 @@ use data_constants
 implicit none
     
     integer, parameter :: Dim = 3
-    real(DP), parameter :: Lsize1 = 12._DP
+    real(DP), parameter :: Lsize1 = 25._DP
     real(DP), parameter :: Lsize2 = Lsize1
     real(DP), parameter :: Lsize3 = Lsize1
     real(DP), dimension(Dim), parameter :: Lsize = [Lsize1, Lsize2, Lsize3]
@@ -49,17 +49,17 @@ implicit none
 
     real(DP), parameter :: dipol_radius = .5_DP
     real(DP), parameter :: dipol_rMin = 2._DP * dipol_radius
-    integer, parameter :: dipol_Ncol = 270
+    integer, parameter :: dipol_Ncol = 281
 
     real(DP), parameter :: inter_radius = .5_DP
     real(DP), parameter :: inter_rMin = 2._DP * inter_radius
-    integer, parameter :: inter_Ncol = 270
+    integer, parameter :: inter_Ncol = 0
     
     real(DP), parameter :: hard_radius = .5_DP
     real(DP), parameter :: hard_rMin = 2._DP * hard_radius
-    integer, parameter :: hard_Ncol = 270
+    integer, parameter :: hard_Ncol = 6750
     
-    real(DP), parameter :: mix_delta = 0._DP
+    real(DP), parameter :: mix_delta = 0.2_DP
     real(DP), parameter :: mix_rMin = dipol_radius + hard_radius + mix_delta
     
     integer, parameter :: Ncol = dipol_Ncol + hard_Ncol
@@ -80,33 +80,33 @@ use data_cell
 implicit none
 
     real(DP), parameter :: Tstar = 1._DP
-    integer, parameter :: Nstep = 2**8
-    integer, parameter :: Ntherm = 2**6
+    integer, parameter :: Nstep = 2**16
+    integer, parameter :: Ntherm = 25000
     
     integer, parameter :: Nmove = Ncol
     integer, parameter :: Nrotate = dipol_Ncol
     
     ! move
-    real(DP), dimension(Dim), parameter :: dipol_dx = 1._DP
+    real(DP), dimension(Dim), parameter :: dipol_dx = 15._DP
     real(DP), parameter :: dipol_rejFix = 0.5_DP
-    integer, parameter :: dipol_Nadapt = Ntherm/8
+    integer, parameter :: dipol_Nadapt = 50
     ! rotate
-    real(DP), parameter :: dipol_dm = 10._DP
-    real(DP), parameter :: dipol_dmMax = 100._DP
-    real(DP), parameter :: dipol_rejRotFix = 0.2_DP
-    integer, parameter :: dipol_NadaptRot = Ntherm/8
+    real(DP), parameter :: dipol_dm = 75._DP
+    real(DP), parameter :: dipol_dmMax = 75._DP
+    real(DP), parameter :: dipol_rejRotFix = 0.1_DP
+    integer, parameter :: dipol_NadaptRot = 2*Ntherm
     ! chemical potential
-    integer, parameter :: dipol_Nwidom = dipol_Ncol
+    integer, parameter :: dipol_Nwidom = 500
     
     real(DP), dimension(Dim), parameter :: inter_dx = 1._DP
     real(DP), parameter :: inter_rejFix = 0.5_DP
     integer, parameter :: inter_Nadapt = Ntherm/8
     integer, parameter :: inter_Nwidom = inter_Ncol
     
-    real(DP), dimension(Dim), parameter :: hard_dx = 1._DP
+    real(DP), dimension(Dim), parameter :: hard_dx = 3._DP
     real(DP), parameter :: hard_rejFix = 0.5_DP
-    integer, parameter :: hard_Nadapt = Ntherm/8
-    integer, parameter :: hard_Nwidom = hard_Ncol
+    integer, parameter :: hard_Nadapt = 50
+    integer, parameter :: hard_Nwidom = 500
 
 end module data_mc
 !***************************************************************************************************
@@ -128,7 +128,7 @@ use data_particles
 
 implicit none
 
-    real(DP), parameter :: dipol_rCut = Lsize1/2._DP
+    real(DP), parameter :: dipol_rCut = Lsize1/2._DP*sqrt(3._DP)
     real(DP), parameter :: dipol_dr = 5.E-5_DP
     real(DP), parameter :: dipol_alpha = 7._DP/Lsize1
 
@@ -139,10 +139,10 @@ implicit none
     
     real(DP), parameter :: hard_rCut = hard_rMin
     
-    real(DP), parameter :: mix_rCut = 2._DP
-    real(DP), parameter :: mix_dr = 5.E-5_DP
-    real(DP), parameter :: mix_epsilon = 0.5_DP
-    real(DP), parameter :: mix_alpha = 10._DP
+    real(DP), parameter :: mix_rCut = 1.25_DP
+    real(DP), parameter :: mix_dr = 1._DP
+    real(DP), parameter :: mix_epsilon = 0._DP
+    real(DP), parameter :: mix_alpha = 40._DP
         
 end module data_potentiel
 !***************************************************************************************************
@@ -161,7 +161,7 @@ implicit none
 
     integer, dimension(Dim), parameter :: cell_neigh_coordMax = 3
     integer, parameter :: cell_neighs_nb = 3**3 !< including itself
-    
+
     real(DP), dimension(Dim), parameter :: dipol_cell_Lsize = Lsize1/3._DP
     real(DP), dimension(Dim), parameter :: inter_cell_Lsize = inter_rCut
     real(DP), dimension(Dim), parameter :: hard_cell_Lsize = hard_rCut
@@ -182,7 +182,7 @@ use data_cell
 
 implicit none
 
-    logical, parameter :: snap = .false.
+    logical, parameter :: snap = .true.
     real(DP), parameter :: deltaDist = 0.01_DP
     real(DP), protected :: rMax
     integer, protected :: Ndist
