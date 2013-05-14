@@ -138,10 +138,6 @@ implicit none
             
         end do MC_Rotate
         
-        ! Chemical potentials : Widom method
-        call type1_sph%widom(type2_sph%X, mix, type1_obs%activ)
-        call type2_sph%widom(type1_sph%X, mix, type2_obs%activ)
-        
         ! Rejections rates updates
         type1_obs%rej = real(type1_obs%Nrej, DP)/real(type1_obs%Nmove, DP)
         type1_obs%Nrej = 0; type1_obs%Nmove = 0
@@ -204,6 +200,10 @@ implicit none
             end if       
         
         else MC_Regime ! Thermalisation over -> Equilibrium
+        
+            ! Chemical potentials : Widom method
+            call type2_sph%widom(type1_sph%X, mix, type2_obs%activ)
+            call type1_sph%widom(type2_sph%X, mix, type1_obs%activ)            
         
             ! Observables accumulations
             type1_obs%EpotSum = type1_obs%EpotSum + type1_obs%Epot
