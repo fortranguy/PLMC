@@ -176,24 +176,24 @@ contains
     
     !> Particle move
     
-    subroutine HardSpheres_move(this, iOld, other, mix, same_Epot, mix_Epot, Nrej)
+    subroutine HardSpheres_move(this, iOld, xRand, other, mix, rand, same_Epot, mix_Epot, Nrej)
     
         class(HardSpheres), intent(inout) :: this
         integer, intent(in) :: iOld
+        real(DP), dimension(Dim) :: xRand
         class(Spheres), intent(inout) :: other
         class(MixingPotential), intent(in) :: mix
+        real(DP), intent(in) :: rand
         real(DP), intent(inout) :: same_Epot, mix_Epot
         integer, intent(inout) :: Nrej
         
         logical :: overlap
-        real(DP) :: rand
-        real(DP), dimension(Dim) :: xRand, xNew
+        real(DP), dimension(Dim) :: xNew
         integer :: same_iCellOld, same_iCellNew
         integer :: mix_iCellOld, mix_iCellNew
         real(DP) :: mix_dEpot
         real(DP) :: mix_eNew, mix_eOld
         
-        call random_number(xRand)
         xNew(:) = this%X(:, iOld) + (xRand(:)-0.5_DP)*this%dx(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
         same_iCellNew = this%same%position_to_cell(xNew)
@@ -214,8 +214,7 @@ contains
                                     mix_eOld)
                 
                 mix_dEpot = mix_eNew - mix_eOld
-                    
-                call random_number(rand)
+
                 if (rand < exp(-mix_dEpot/Tstar)) then
                 
                     this%X(:, iOld) = xNew(:)

@@ -19,6 +19,7 @@ implicit none
     integer :: iStep, iMove, iRotate !< Monte-Carlo counters
     integer :: iColRand !< random particle
     real(DP) :: rand !< random number in between 0 and 1
+    real(DP), dimension(Dim) :: xRand
     real(DP) :: tIni, tFin !< CPU initial and final time
     
     ! Total physical system variables
@@ -116,13 +117,21 @@ implicit none
             iColRand = int(rand*real(Ncol, DP)) + 1
             write(*, *) iStep, iMove, iColRand
             
-            ! Moving a particle : Metropolis algorithm
+            ! Random new position
+            call random_number(xRand)
+            
+            ! Metropolis algorithm
+            call random_number(rand)
+            
+            ! Moving a particle : 
             if (iColRand <= type1_sph%getNcol()) then
-                call type1_sph%move(iColRand, type2_sph, mix, type1_obs%Epot, mix_Epot, type1_obs%Nrej)
+                call type1_sph%move(iColRand, xRand, type2_sph, mix, rand, type1_obs%Epot, mix_Epot, &
+                                    type1_obs%Nrej)
                 type1_obs%Nmove = type1_obs%Nmove + 1
             else
                 iColRand = iColRand - type1_sph%getNcol()
-                call type2_sph%move(iColRand, type1_sph, mix, type2_obs%Epot, mix_Epot, type2_obs%Nrej)
+                call type2_sph%move(iColRand, xRand, type1_sph, mix, rand, type2_obs%Epot, mix_Epot, &
+                                    type2_obs%Nrej)
                 type2_obs%Nmove = type2_obs%Nmove + 1
             end if
             
