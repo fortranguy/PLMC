@@ -192,6 +192,7 @@ contains
         integer :: mix_iCellOld, mix_iCellNew
         real(DP) :: mix_dEpot
         real(DP) :: mix_eNew, mix_eOld
+        real(DP) :: rand
         
         xNew(:) = this%X(:, iOld) + (xRand(:)-0.5_DP)*this%dx(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
