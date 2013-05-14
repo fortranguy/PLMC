@@ -84,7 +84,7 @@ implicit none
     integer, parameter :: Ntherm = 25000
     
     integer, parameter :: Nmove = Ncol
-    integer, parameter :: Nrotate = 0!dipol_Ncol
+    integer, parameter :: Nrotate = dipol_Ncol
     
     ! move
     real(DP), dimension(Dim), parameter :: dipol_dx = .15_DP
