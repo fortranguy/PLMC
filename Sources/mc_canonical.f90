@@ -121,16 +121,16 @@ implicit none
             call random_number(xRand)
             
             ! Metropolis algorithm
-            call random_number(rand)
+            !call random_number(rand)
             
             ! Moving a particle : 
             if (iColRand <= type1_sph%getNcol()) then
-                call type1_sph%move(iColRand, xRand, type2_sph, mix, rand, type1_obs%Epot, mix_Epot, &
+                call type1_sph%move(iColRand, xRand, type2_sph, mix, type1_obs%Epot, mix_Epot, &
                                     type1_obs%Nrej)
                 type1_obs%Nmove = type1_obs%Nmove + 1
             else
                 iColRand = iColRand - type1_sph%getNcol()
-                call type2_sph%move(iColRand, xRand, type1_sph, mix, rand, type2_obs%Epot, mix_Epot, &
+                call type2_sph%move(iColRand, xRand, type1_sph, mix, type2_obs%Epot, mix_Epot, &
                                     type2_obs%Nrej)
                 type2_obs%Nmove = type2_obs%Nmove + 1
             end if

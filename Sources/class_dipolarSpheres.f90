@@ -544,14 +544,13 @@ contains
     
     !> Particle move
     
-    subroutine DipolarSpheres_move(this, iOld, xRand, other, mix, rand, same_Epot, mix_Epot, Nrej)
+    subroutine DipolarSpheres_move(this, iOld, xRand, other, mix, same_Epot, mix_Epot, Nrej)
     
         class(DipolarSpheres), intent(inout) :: this
         integer, intent(in) :: iOld
         real(DP), dimension(Dim) :: xRand
         class(Spheres), intent(inout) :: other
         class(MixingPotential), intent(in) :: mix
-        real(DP), intent(in) :: rand
         real(DP), intent(inout) :: same_Epot, mix_Epot
         integer, intent(inout) :: Nrej
         
@@ -562,6 +561,7 @@ contains
         real(DP) :: dEpot, same_dEpot, mix_dEpot
         real(DP) :: same_eNew, same_eOld
         real(DP) :: mix_eNew, mix_eOld
+        real(DP) :: rand
         
         real(C_double) :: C_Epot
         real(C_double), dimension(Dim) :: C_xNew
@@ -598,8 +598,8 @@ contains
                 
                 dEpot = same_dEpot + mix_dEpot
                 
-                write(*, *) "rand", rand
-                
+                call random_number(rand)
+                write(*, *) "rand", rand                
                 if (rand < exp(-dEpot/Tstar)) then
                 
                     this%X(:, iOld) = xNew(:)
