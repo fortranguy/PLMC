@@ -78,5 +78,31 @@ contains
         random_surface(:) = random_surface(:) / sqrt(dot_product(random_surface, random_surface))
     
     end function random_surface
+    
+    subroutine markov_surface(mCol, dm)
+    
+        real(DP), dimension(Dim), intent(inout) :: mCol
+        real(DP), intent(in) :: dm
+        
+        real(DP), dimension(Dim) :: rotation
+        real(DP) :: rotation_dot_mCol
+        real(DP) :: amplitude, rand
+        integer :: iDim
+        
+        do iDim = 1, Dim        
+            rotation(iDim) = gauss()
+        end do
+        
+        rotation_dot_mCol = dot_product(rotation, mCol)
+        rotation(:) = rotation(:) - rotation_dot_mCol * mCol(:)
+        rotation(:) = rotation(:) / sqrt(dot_product(rotation, rotation))
+        
+        call random_number(rand)
+        amplitude = dm * (rand - 0.5_DP)
+        
+        mCol(:) = mCol(:) + amplitude * rotation(:)
+        mCol(:) = mCol(:) / sqrt(dot_product(mCol, mCol))
+    
+    end subroutine markov_surface
 
 end module mod_physics

@@ -637,7 +637,7 @@ contains
         integer, intent(inout) :: Nrej
         
         real(DP) :: rand
-        real(DP), dimension(Dim) :: mNew, mRand
+        real(DP), dimension(Dim) :: mNew
         real(DP) :: dEpot, real_dEpot, self_dEpot
         real(DP) :: real_eNew, real_eOld
         integer :: iCell
@@ -646,9 +646,8 @@ contains
         real(C_double) :: C_Epot
         real(C_double), dimension(Dim) :: C_mNew
         
-        mRand(:) = random_surface()
-        mNew(:) = this%M(:, iOld) + this%dm * mRand(:)
-        mNew(:) = mNew(:)/sqrt(dot_product(mNew, mNew))
+        mNew(:) = this%M(:, iOld)
+        call markov_surface(mNew, this%dm)
         
         C_mNew(:) = real(mNew(:)/Lsize(:), C_double)
         C_Epot = C_Epot_reci_rotate(int(iOld-1, C_int), C_mNew, real(product(Lsize), C_double))
