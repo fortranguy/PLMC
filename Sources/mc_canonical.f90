@@ -114,6 +114,7 @@ implicit none
             ! Randomly choosing a particle among both types
             call random_number(rand)
             iColRand = int(rand*real(Ncol, DP)) + 1
+            write(*, *) iStep, iMove, iColRand
             
             ! Moving a particle : Metropolis algorithm
             if (iColRand <= type1_sph%getNcol()) then
