@@ -87,7 +87,7 @@ implicit none
     integer, parameter :: Nrotate = 0!dipol_Ncol
     
     ! move
-    real(DP), dimension(Dim), parameter :: dipol_dx = 15._DP
+    real(DP), dimension(Dim), parameter :: dipol_dx = .15_DP
     real(DP), parameter :: dipol_rejFix = 0.5_DP
     integer, parameter :: dipol_Nadapt = 2*Ntherm
     ! rotate
@@ -103,7 +103,7 @@ implicit none
     integer, parameter :: inter_Nadapt = Ntherm/8
     integer, parameter :: inter_Nwidom = inter_Ncol
     
-    real(DP), dimension(Dim), parameter :: hard_dx = 3._DP
+    real(DP), dimension(Dim), parameter :: hard_dx = .3_DP
     real(DP), parameter :: hard_rejFix = 0.5_DP
     integer, parameter :: hard_Nadapt = 2*Ntherm
     integer, parameter :: hard_Nwidom = 500
