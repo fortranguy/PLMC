@@ -89,7 +89,7 @@ implicit none
     ! move
     real(DP), dimension(Dim), parameter :: dipol_dx = 15._DP
     real(DP), parameter :: dipol_rejFix = 0.5_DP
-    integer, parameter :: dipol_Nadapt = 50
+    integer, parameter :: dipol_Nadapt = 2*Ntherm
     ! rotate
     real(DP), parameter :: dipol_dm = 75._DP
     real(DP), parameter :: dipol_dmMax = 75._DP
@@ -105,7 +105,7 @@ implicit none
     
     real(DP), dimension(Dim), parameter :: hard_dx = 3._DP
     real(DP), parameter :: hard_rejFix = 0.5_DP
-    integer, parameter :: hard_Nadapt = 50
+    integer, parameter :: hard_Nadapt = 2*Ntherm
     integer, parameter :: hard_Nwidom = 500
 
 end module data_mc
