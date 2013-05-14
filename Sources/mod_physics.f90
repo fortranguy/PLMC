@@ -91,6 +91,11 @@ contains
         real(DP) :: amplitude, rand
         integer :: iDim
         
+        integer, dimension(2) :: seed
+
+        call random_seed(get=seed)
+        write(*, *) "markov_seed", seed(:)
+        
         do iDim = 1, Dim        
             rotation(iDim) = gauss()
         end do

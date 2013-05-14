@@ -46,6 +46,8 @@ implicit none
     type(Observables) :: type2_obs
     type(Units) :: type2_io
     
+    integer, dimension(2) :: seed
+    
 ! Beginning ----------------------------------------------------------------------------------------
     
     write(output_unit, *) "Monte-Carlo Mix - Canonical : Volume =", product(Lsize)
@@ -138,6 +140,9 @@ implicit none
         end do MC_Move
         
         MC_Rotate : do iRotate = 1, Nrotate
+        
+            call random_seed(get=seed)
+            write(*, *) "seed", seed(:)
         
             call random_number(rand)
             iColRand = int(rand*real(type1_sph%getNcol(), DP)) + 1            
