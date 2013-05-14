@@ -83,8 +83,8 @@ implicit none
     integer, parameter :: Nstep = 2**16
     integer, parameter :: Ntherm = 25000
     
-    integer, parameter :: Nmove = Ncol
-    integer, parameter :: Nrotate = dipol_Ncol
+    integer, parameter :: Nmove = 1!Ncol
+    integer, parameter :: Nrotate = 0!dipol_Ncol
     
     ! move
     real(DP), dimension(Dim), parameter :: dipol_dx = 15._DP
