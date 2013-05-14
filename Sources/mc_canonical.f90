@@ -140,7 +140,8 @@ implicit none
         MC_Rotate : do iRotate = 1, Nrotate
         
             call random_number(rand)
-            iColRand = int(rand*real(type1_sph%getNcol(), DP)) + 1
+            iColRand = int(rand*real(type1_sph%getNcol(), DP)) + 1            
+            write(*, *) iStep, iRotate, iColRand
  
             call type1_sph%rotate(iColRand, type1_obs%Epot, type1_obs%NrejRot)
             type1_obs%Nrotate = type1_obs%Nrotate + 1

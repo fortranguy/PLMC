@@ -63,6 +63,8 @@ contains
         factor = sqrt(-2._DP * log(normSqr) / normSqr)
         gauss = sigma3d * factor * x
         
+        write(*, *) "gauss", gauss
+        
     end function gauss
     
     function random_surface()
