@@ -129,8 +129,7 @@ contains
         call C_Epot_reci_nfft_init(int(this%Ncol, C_int))
         
         ! Neighbours : same kind
-        this%cell_Lsize(:) = dipol_cell_Lsize(:)
-        call this%same%construct(this%cell_Lsize, this%rCut)
+        call this%same%construct(dipol_cell_Lsize, this%rCut)
         call this%same%alloc_cells()
         call this%same%ini_cell_neighs()
         ! Neighbours : other kind

@@ -87,8 +87,7 @@ contains
         call this%Epot_init()
         
         ! Neighbours : same kind
-        this%cell_Lsize(:) = inter_cell_Lsize(:)
-        call this%same%construct(this%cell_Lsize, this%rCut)
+        call this%same%construct(inter_cell_Lsize, this%rCut)
         call this%same%alloc_cells()
         call this%same%ini_cell_neighs()
         ! Neighbours : other kind

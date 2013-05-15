@@ -73,8 +73,7 @@ contains
         this%Epot = 0._DP
         
         ! Neighbours : same kind
-        this%cell_Lsize(:) = hard_cell_Lsize(:)
-        call this%same%construct(this%cell_Lsize, this%rCut)
+        call this%same%construct(hard_cell_Lsize, this%rCut)
         call this%same%alloc_cells()
         call this%same%ini_cell_neighs()
         ! Neighbours : other kind
