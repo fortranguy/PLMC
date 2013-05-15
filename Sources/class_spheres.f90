@@ -203,7 +203,7 @@ contains
         
         real(DP) :: dx_normSqr, Lsize_normSqr
         
-        Lsize_normSqr = dot_product(LsizeMi, LsizeMi)
+        Lsize_normSqr = dot_product(Lsize, Lsize)
         
         if (rej < this%rejFix - eps_rej) then
         
@@ -211,7 +211,7 @@ contains
             
             dx_normSqr = dot_product(this%dx, this%dx)
             if (dx_normSqr > Lsize_normSqr) then
-                this%dx(:) = LsizeMi(:)
+                this%dx(:) = Lsizz(:)
             end if
             
         else if (rej > this%rejFix + eps_rej) then
@@ -237,10 +237,10 @@ contains
             end if
             
             dx_normSqr = dot_product(this%dx, this%dx)
-            Lsize_normSqr = dot_product(LsizeMi, LsizeMi)
+            Lsize_normSqr = dot_product(Lsize, Lsize)
             if (dx_normSqr >= Lsize_normSqr) then
                 write(error_unit, *) this%name, " :   Warning : dx too big."
-                this%dx(:) = LsizeMi(:)
+                this%dx(:) = Lsizz(:)
                 write(error_unit, *) "big dx :", this%dx(:)
             end if
             
