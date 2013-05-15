@@ -102,6 +102,7 @@ implicit none
     
     Epot_conf = type1_obs%Epot + type2_obs%Epot + mix_Epot
     write(output_unit, *) "Initial potential energy =", Epot_conf
+    write(obsTherm_unit, *) 0, Epot_conf
     
 ! Middle -------------------------------------------------------------------------------------------
         
@@ -159,20 +160,20 @@ implicit none
                 write(type2_io%dx, *) iStep, type2_sph%getDx(), type2_obs%rej
             end if
             
-            ! Displacements optimisations           
+            ! Displacements adaptation           
             if (mod(iStep, type1_sph%getNadapt()) /= 0) then ! Rejections accumulation
                 type1_obs%rejAdapt = type1_obs%rejAdapt + type1_obs%rej
-            else ! Displacement adaptation
+            else ! Average & adaptation
                 type1_obs%rejAdapt = type1_obs%rejAdapt/real(type1_sph%getNadapt()-1)
                 call type1_sph%adaptDx(type1_obs%rejAdapt)
                 write(type1_io%dx, *) iStep, type1_sph%getDx(), type1_obs%rejAdapt
                 type1_obs%rejAdapt = 0._DP
             end if
             
-            ! Rotation optimisation
+            ! Rotation adaptation
             if (mod(iStep, type1_sph%getNadaptRot()) /= 0) then ! Rejections accumulation
                 type1_obs%rejRotAdapt = type1_obs%rejRotAdapt + type1_obs%rejRot
-            else ! Rotation adaptation
+            else ! Average & adaptation
                 type1_obs%rejRotAdapt = type1_obs%rejRotAdapt/real(type1_sph%getNadaptRot()-1)
                 call type1_sph%adaptDm(type1_obs%rejRotAdapt)
                 write(type1_io%dm, *) iStep, type1_sph%getDm(), type1_obs%rejRotAdapt
