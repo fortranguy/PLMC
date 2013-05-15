@@ -51,7 +51,7 @@ contains
         real(DP) :: gaussSet
         integer :: iset
         
-        data iset/0/
+        data iset/0/ !< What is that ?
         save
         
         if (iset == 0) then
@@ -64,7 +64,6 @@ contains
                 y = 2._DP*y - 1._DP
             
                 normSqr = x*x + y*y
-                !write(*, *) "x", x, "y", x, "normSqr", normSqr
                 
                 if (normSqr <= 1._DP .and. normSqr /= 0._DP) exit
                 
@@ -83,8 +82,6 @@ contains
             iset = 0
             
         end if
-        
-        !write(*, *) "gauss", gauss
         
     end function gauss
     
@@ -111,11 +108,6 @@ contains
         real(DP) :: rotation_dot_mCol
         real(DP) :: amplitude, rand
         integer :: iDim
-        
-        integer, dimension(2) :: seed
-
-        !call random_seed(get=seed)
-        !write(*, *) "markov_seed", seed(:)
         
         do iDim = 1, Dim        
             rotation(iDim) = gauss()
