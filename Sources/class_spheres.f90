@@ -211,7 +211,7 @@ contains
             
             dx_normSqr = dot_product(this%dx, this%dx)
             if (dx_normSqr > Lsize_normSqr) then
-                this%dx(:) = Lsizz(:)
+                this%dx(:) = Lsize(:)
             end if
             
         else if (rej > this%rejFix + eps_rej) then
@@ -240,7 +240,7 @@ contains
             Lsize_normSqr = dot_product(Lsize, Lsize)
             if (dx_normSqr >= Lsize_normSqr) then
                 write(error_unit, *) this%name, " :   Warning : dx too big."
-                this%dx(:) = Lsizz(:)
+                this%dx(:) = Lsize(:)
                 write(error_unit, *) "big dx :", this%dx(:)
             end if
             
