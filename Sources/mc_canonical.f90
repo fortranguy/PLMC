@@ -46,8 +46,6 @@ implicit none
     type(Observables) :: type2_obs
     type(Units) :: type2_io
     
-    integer, dimension(2) :: seed
-    
 ! Beginning ----------------------------------------------------------------------------------------
     
     write(output_unit, *) "Monte-Carlo Mix - Canonical : Volume =", product(Lsize)
@@ -117,7 +115,6 @@ implicit none
             ! Randomly choosing a particle among both types
             call random_number(rand)
             iColRand = int(rand*real(Ncol, DP)) + 1
-            !write(*, *) iStep, iMove, iColRand
             
             ! Moving a particle : 
             if (iColRand <= type1_sph%getNcol()) then
@@ -135,12 +132,8 @@ implicit none
         
         MC_Rotate : do iRotate = 1, Nrotate
         
-            !call random_seed(get=seed)
-            !write(*, *) "seed", seed(:)
-        
             call random_number(rand)
-            iColRand = int(rand*real(type1_sph%getNcol(), DP)) + 1            
-            !write(*, *) iStep, iRotate, iColRand
+            iColRand = int(rand*real(type1_sph%getNcol(), DP)) + 1
  
             call type1_sph%rotate(iColRand, type1_obs%Epot, type1_obs%NrejRot)
             type1_obs%Nrotate = type1_obs%Nrotate + 1
@@ -196,11 +189,10 @@ implicit none
             end if
             
             ! Observables writing
-            write(type1_io%obsTherm, *) iStep, type1_obs%Epot, type1_obs%activ, type1_obs%rej, &
-                                                                                type1_obs%rejRot
-            write(type2_io%obsTherm, *) iStep, type2_obs%Epot, type2_obs%activ, type2_obs%rej
+            write(type1_io%obsTherm, *) iStep, type1_obs%Epot, type1_obs%rej, type1_obs%rejRot
+            write(type2_io%obsTherm, *) iStep, type2_obs%Epot, type2_obs%rej
             write(mix_obsTherm_unit, *) iStep, mix_Epot
-            write(obsTherm_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot!, type1_sph%Epot_conf()
+            write(obsTherm_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
             
             if (iStep == Ntherm) then ! Definite thermalised displacements
                 call type1_sph%definiteDx(type1_obs%rej, type1_io%report)
