@@ -111,7 +111,8 @@ implicit none
     call cpu_time(tIni)
     MC_Cycle : do iStep = 1, Ntherm + Nstep
     
-        if (modulo(iStep, Structure_iStep) == 0) then
+        ! Ewald summation : recalculate the structure factor to prevent it from drifting.
+        if (modulo(iStep, type1_sph%getStructure_iStep()) == 0) then
             call type1_sph%Epot_reci_structure(iStep, type1_io%moduli)
         end if
     

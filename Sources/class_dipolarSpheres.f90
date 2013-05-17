@@ -30,6 +30,7 @@ private
         real(DP), dimension(:, :), allocatable, public :: M !< moments of all particles
         
         ! Monte-Carlo
+        integer :: structure_iStep
         real(DP) :: dm !< rotation
         real(DP) :: dmSave
         real(DP) :: dmMax
@@ -61,6 +62,8 @@ private
         procedure :: definiteDm => DipolarSpheres_definiteDm
         procedure :: getDm => DipolarSpheres_getDm
         procedure :: getNadaptRot => DipolarSpheres_getNadaptRot
+        
+        procedure :: getStructure_iStep => DipolarSpheres_getStructure_iStep
         
         !> Potential energy
         !>     Real
@@ -109,6 +112,7 @@ contains
         this%snap_factor = dipol_snap_factor
         
         ! Monte-Carlo
+        this%structure_iStep = dipol_structure_iStep
         this%dx = dipol_dx
         this%dxSave = this%dx
         this%rejFix = dipol_rejFix
@@ -178,6 +182,7 @@ contains
         write(report_unit ,*) "    Ncol = ", this%Ncol
         write(report_unit ,*) "    Nwidom = ", this%Nwidom
         write(report_unit ,*) "    Nadapt = ", this%Nadapt
+        write(report_unit, *) "    Structure_iStep = ", this%structure_iStep
 
         write(report_unit, *) "    alpha = ", this%alpha
         write(report_unit, *) "    rCut = ", this%rCut
@@ -295,6 +300,17 @@ contains
         getNadaptRot = this%NadaptRot
         
     end function DipolarSpheres_getNadaptRot
+    
+    !> Accessor : structure_iStep
+    
+    function DipolarSpheres_getStructure_iStep(this) result (getStructure_iStep)
+    
+        class(DipolarSpheres), intent(in) :: this
+        integer :: getStructure_iStep
+    
+        getStructure_iStep = this%structure_iStep
+        
+    end function DipolarSpheres_getStructure_iStep
     
     !> Potential energy : real part
     !> Initialisation
