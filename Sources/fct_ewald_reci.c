@@ -32,6 +32,7 @@ void Epot_reci_updateM(const int lCol, const double mNew[DIM]);
 double Epot_reci_test(const double xTest[DIM], const double mTest[DIM], const double Vol);
 
 double Epot_reci(double X[][DIM], double D[][DIM], const int Ncol, const double Vol);
+void Epot_reci_structure_moduli(double moduli[DIM]);
 void Epot_reci_structure();
 void snapShot(const int Ncol);
 
@@ -636,6 +637,26 @@ double Epot_reci(double X[][DIM], double D[][DIM], const int Ncol, const double 
     
 }
 
+void Epot_reci_structure_moduli(double moduli[DIM]){
+
+    for (int iComp=0; iComp<DIM; iComp++){
+    
+        moduli[iComp] = 0.;
+        
+    }
+    
+    for (int ik=0; ik<(2*Nx)*(2*Ny)*(2*Nz); ik++){
+    
+        for (int iComp=0; iComp<DIM; iComp++){
+        
+            moduli[iComp] += cabs(structure[iComp].f_hat[ik]);
+        
+        }
+    
+    }
+
+}
+
 void Epot_reci_structure(){
 
     // Precompute $\psi$
@@ -650,7 +671,9 @@ void Epot_reci_structure(){
     // Doing the transform : structure
     
     for (int iComp=0; iComp<DIM; iComp++){
+    
         nfft_adjoint(&structure[iComp]);
+        
     }
 
 }

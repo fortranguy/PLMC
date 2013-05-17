@@ -28,9 +28,17 @@ implicit none
             
         end subroutine C_Epot_reci_init
         
-        subroutine C_Epot_reci_structure bind(C, name="Epot_reci_structure")
+        subroutine C_Epot_reci_structure() bind(C, name="Epot_reci_structure")
         
         end subroutine C_Epot_reci_structure
+        
+        subroutine C_Epot_reci_structure_moduli(C_moduli) bind(C, name="Epot_reci_structure_moduli")
+        
+            import :: Dim, C_double
+            
+            real(C_double), dimension(Dim), intent(out) :: C_moduli
+        
+        end subroutine C_Epot_reci_structure_moduli
         
         ! Move -------------------------------------------------------------------------------------
         

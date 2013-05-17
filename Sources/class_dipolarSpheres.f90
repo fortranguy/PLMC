@@ -466,11 +466,19 @@ contains
         
     end function DipolarSpheres_Epot_reci
     
-    subroutine DipolarSpheres_Epot_reci_structure(this)
+    subroutine DipolarSpheres_Epot_reci_structure(this, iStep, moduli_unit)
     
         class(DipolarSpheres), intent(in) :: this
+        integer, intent(in) :: iStep
+        integer, intent(in) :: moduli_unit
         
+        real(C_double), dimension(Dim) :: moduli_drifted, moduli_nfft
+        
+        call C_Epot_reci_structure_moduli(moduli_drifted)
         call C_Epot_reci_structure()
+        call C_Epot_reci_structure_moduli(moduli_nfft)
+        
+        write(moduli_unit, *) iStep, abs(moduli_nfft(:)-moduli_drifted(:))
     
     end subroutine DipolarSpheres_Epot_reci_structure
     

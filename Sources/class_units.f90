@@ -33,6 +33,8 @@ private
         integer :: snapIni_M
         integer :: snapFin_M
         integer :: snapShots_M
+        
+        integer :: moduli
     
     end type MoreUnits
     
@@ -72,6 +74,9 @@ contains
                      action='write')
                 open(newunit=this%snapShots_M, recl=4096, file=name//"_snap_M.shots", status='new', &
                      action='write')
+                     
+                 open(newunit=this%moduli, recl=4096, file=name//"_moduli.out", status='new', &
+                    action='write')
                 
             class default
                 
@@ -107,6 +112,8 @@ contains
                 close(this%snapIni_M)
                 close(this%snapFin_M)
                 close(this%snapShots_M)
+                
+                close(this%moduli)
                     
             class default
                 
