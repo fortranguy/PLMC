@@ -229,7 +229,9 @@ implicit none
             if (snap) then ! Snap shots of the configuration
                 call type1_sph%snapShot_X(type1_io%snapShots_X)
                 call type1_sph%snapShot_M(type1_io%snapShots_M)
-                call type2_sph%snapShot_X(type2_io%snapShots_X)
+                if (modulo(iStep, 8) == 0) then
+                    call type2_sph%snapShot_X(type2_io%snapShots_X)
+                end if
             end if
             
         end if MC_Regime

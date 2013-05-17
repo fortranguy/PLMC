@@ -128,7 +128,7 @@ use data_particles
 
 implicit none
 
-    real(DP), parameter :: dipol_rCut = Lsize1/2._DP
+    real(DP), parameter :: dipol_rCut = Lsize1/2.*sqrt(3._DP)_DP
     real(DP), parameter :: dipol_dr = 5.E-5_DP
     real(DP), parameter :: dipol_alpha = 7._DP/Lsize1
 
