@@ -34,7 +34,7 @@ private
         integer :: snapFin_M
         integer :: snapShots_M
         
-        integer :: moduli
+        integer :: structure_moduli
     
     end type MoreUnits
     
@@ -75,8 +75,8 @@ contains
                 open(newunit=this%snapShots_M, recl=4096, file=name//"_snap_M.shots", status='new', &
                      action='write')
                      
-                 open(newunit=this%moduli, recl=4096, file=name//"_moduli.out", status='new', &
-                    action='write')
+                 open(newunit=this%structure_moduli, recl=4096, file=name//"_structure_moduli.out", &
+                    status='new', action='write')
                 
             class default
                 
@@ -113,7 +113,7 @@ contains
                 close(this%snapFin_M)
                 close(this%snapShots_M)
                 
-                close(this%moduli)
+                close(this%structure_moduli)
                     
             class default
                 
