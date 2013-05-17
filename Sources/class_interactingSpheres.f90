@@ -9,6 +9,7 @@ use data_particles
 use data_potentiel
 use data_mc
 use data_neighbours
+use data_distrib
 use mod_physics
 use class_neighbours
 use class_mixingPotential
@@ -68,6 +69,9 @@ contains
         this%rMin = inter_rMin
         this%Ncol = inter_Ncol
         allocate(this%X(Dim, this%Ncol))
+        
+        ! Snapshot
+        this%snap_factor = inter_snap_factor
         
         ! Monte-Carlo
         this%dx = inter_dx

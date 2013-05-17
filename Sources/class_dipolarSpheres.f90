@@ -10,6 +10,7 @@ use data_particles
 use data_potentiel
 use data_mc
 use data_neighbours
+use data_distrib
 use mod_physics
 use class_neighbours
 use class_mixingPotential
@@ -103,6 +104,9 @@ contains
         allocate(this%X(Dim, this%Ncol))
         allocate(this%M(Dim, this%Ncol))
         
+        ! Snapshot
+        this%snap_factor = dipol_snap_factor
+        
         ! Monte-Carlo
         this%dx = dipol_dx
         this%dxSave = this%dx
@@ -187,16 +191,21 @@ contains
     
     !> Configuration state : orientations
       
-    subroutine DipolarSpheres_snapShot_M(this, snap_unit)
+    subroutine DipolarSpheres_snapShot_M(this, iStep, snap_unit)
         
         class(DipolarSpheres), intent(in) :: this
+        integer, intent(in) :: iStep
         integer, intent(in) :: snap_unit
     
         integer :: iCol
         
-        do iCol = 1, this%Ncol
-            write(snap_unit, *) this%M(:, iCol)
-        end do    
+        if (modulo(iStep, this%snap_factor) == 0) then
+        
+            do iCol = 1, this%Ncol
+                write(snap_unit, *) this%M(:, iCol)
+            end do
+            
+        end if
 
     end subroutine DipolarSpheres_snapShot_M
     

@@ -88,13 +88,13 @@ implicit none
     
     call type1_sph%overlapTest()
     type1_obs%Epot = type1_sph%Epot_conf()
-    call type1_sph%snapShot_X(type1_io%snapIni_X)
-    call type1_sph%snapShot_M(type1_io%snapIni_M)
+    call type1_sph%snapShot_X(0, type1_io%snapIni_X)
+    call type1_sph%snapShot_M(0, type1_io%snapIni_M)
     call type1_sph%cols_to_cells(type2_sph%X) !< Cell List : filling cells with particles
     
     call type2_sph%overlapTest()
     type2_obs%Epot = type2_sph%Epot_conf()
-    call type2_sph%snapShot_X(type2_io%snapIni_X)
+    call type2_sph%snapShot_X(0, type2_io%snapIni_X)
     call type2_sph%cols_to_cells(type1_sph%X)
     
     call mix%overlapTest(type1_sph%X, type2_sph%X)
@@ -227,11 +227,9 @@ implicit none
             write(obsEqb_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
 
             if (snap) then ! Snap shots of the configuration
-                call type1_sph%snapShot_X(type1_io%snapShots_X)
-                call type1_sph%snapShot_M(type1_io%snapShots_M)
-                if (modulo(iStep, 8) == 0) then
-                    call type2_sph%snapShot_X(type2_io%snapShots_X)
-                end if
+                call type1_sph%snapShot_X(iStep, type1_io%snapShots_X)
+                call type1_sph%snapShot_M(iStep, type1_io%snapShots_M)
+                call type2_sph%snapShot_X(iStep, type2_io%snapShots_X)
             end if
             
         end if MC_Regime
@@ -248,13 +246,13 @@ implicit none
     call type1_sph%overlapTest()
     call type1_sph%C_snapShot()
     call type1_sph%consistTest(type1_obs%Epot, type1_io%report)
-    call type1_sph%snapShot_X(type1_io%snapFin_X)
-    call type1_sph%snapShot_M(type1_io%snapFin_M)
+    call type1_sph%snapShot_X(0, type1_io%snapFin_X)
+    call type1_sph%snapShot_M(0, type1_io%snapFin_M)
     call type1_obs%results(type1_sph%getNcol(), type1_io%report)
     
     call type2_sph%overlapTest()
     call type2_sph%consistTest(type2_obs%Epot, type2_io%report)
-    call type2_sph%snapShot_X(type2_io%snapFin_X)
+    call type2_sph%snapShot_X(0, type2_io%snapFin_X)
     call type2_obs%results(type2_sph%getNcol(), type2_io%report)
     
     call mix%overlapTest(type1_sph%X, type2_sph%X)

@@ -24,6 +24,9 @@ private
         real(DP) :: rMin !< minimum distance between two particles
         integer ::  Ncol !< number of a component particles
         real(DP), dimension(:, :), allocatable, public :: X !< positions of all particles
+        
+        ! Snashot
+        integer :: snap_factor
 
         ! Monte-Carlo
         real(DP), dimension(Dim) :: dx !< displacement
@@ -132,16 +135,21 @@ contains
     
     !> Configuration state : positions
       
-    subroutine Spheres_snapShot_X(this, snap_unit)
+    subroutine Spheres_snapShot_X(this, iStep, snap_unit)
         
         class(Spheres), intent(in) :: this
+        integer, intent(in) :: iStep
         integer, intent(in) :: snap_unit
     
         integer :: iCol
         
-        do iCol = 1, this%Ncol
-            write(snap_unit, *) this%X(:, iCol)
-        end do    
+        if (modulo(iStep, this%snap_factor) == 0) then
+        
+            do iCol = 1, this%Ncol
+                write(snap_unit, *) this%X(:, iCol)
+            end do
+            
+        end if            
 
     end subroutine Spheres_snapShot_X
     
