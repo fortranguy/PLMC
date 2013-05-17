@@ -80,6 +80,7 @@ use data_cell
 implicit none
 
     real(DP), parameter :: Tstar = 1._DP
+    integer, parameter :: Structure_iStep = 10000
     integer, parameter :: Nstep = 2**16
     integer, parameter :: Ntherm = 25000
     

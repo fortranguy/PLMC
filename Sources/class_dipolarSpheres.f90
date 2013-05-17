@@ -72,6 +72,7 @@ private
         !>     Reciprocal
         procedure :: Epot_reci_init => DipolarSpheres_Epot_reci_init
         procedure :: Epot_reci => DipolarSpheres_Epot_reci
+        procedure :: Epot_reci_structure => DipolarSpheres_Epot_reci_structure
         !>     Self
         procedure :: Epot_self_solo => DipolarSpheres_Epot_self_solo
         procedure :: Epot_self => DipolarSpheres_Epot_self
@@ -464,6 +465,14 @@ contains
         deallocate(C_M)
         
     end function DipolarSpheres_Epot_reci
+    
+    subroutine DipolarSpheres_Epot_reci_structure(this)
+    
+        class(DipolarSpheres), intent(in) :: this
+        
+        call C_Epot_reci_structure()
+    
+    end subroutine DipolarSpheres_Epot_reci_structure
     
     !> Self energy of 1 dipole
     !> \f[ \frac{2}{3}\frac{\alpha^3}{\sqrt{\pi}} \vec{\mu}_i\cdot\vec{\mu}_i \f]

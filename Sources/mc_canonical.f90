@@ -111,6 +111,10 @@ implicit none
     call cpu_time(tIni)
     MC_Cycle : do iStep = 1, Ntherm + Nstep
     
+        if (modulo(iStep, Structure_iStep) == 0) then
+            call type1_sph%Epot_reci_structure()
+        end if
+    
         MC_Move : do iMove = 1, Nmove
         
             ! Randomly choosing a particle among both types

@@ -28,6 +28,10 @@ implicit none
             
         end subroutine C_Epot_reci_init
         
+        subroutine C_Epot_reci_structure bind(C, name="Epot_reci_structure")
+        
+        end subroutine C_Epot_reci_structure
+        
         ! Move -------------------------------------------------------------------------------------
         
         function C_Epot_reci_move(C_lCol, C_xNew, C_Vol) bind(C, name="Epot_reci_move")

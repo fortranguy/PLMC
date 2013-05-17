@@ -32,6 +32,7 @@ void Epot_reci_updateM(const int lCol, const double mNew[DIM]);
 double Epot_reci_test(const double xTest[DIM], const double mTest[DIM], const double Vol);
 
 double Epot_reci(double X[][DIM], double D[][DIM], const int Ncol, const double Vol);
+void Epot_reci_structure();
 void snapShot(const int Ncol);
 
 //!> Initialisation : ``Potential'' and ``Structure factor''
@@ -570,7 +571,7 @@ double Epot_reci(double X[][DIM], double D[][DIM], const int Ncol, const double 
     // Doing the transform : structure
     
     for (int iComp=0; iComp<DIM; iComp++){
-        nfft_adjoint_direct(&structure[iComp]);
+        nfft_adjoint(&structure[iComp]);
     }
     
     // Setting the function potential : potential
@@ -610,7 +611,7 @@ double Epot_reci(double X[][DIM], double D[][DIM], const int Ncol, const double 
     // Doing the transform :potential
     
     for (int iComp=0; iComp<DIM; iComp++){
-        nfft_trafo_direct(&potential[iComp]);
+        nfft_trafo(&potential[iComp]);
     }
     
     // Result
@@ -635,6 +636,25 @@ double Epot_reci(double X[][DIM], double D[][DIM], const int Ncol, const double 
     
 }
 
+void Epot_reci_structure(){
+
+    // Precompute $\psi$
+    
+    for(int iComp=0; iComp<DIM; iComp++){
+
+        if(structure[iComp].nfft_flags & PRE_ONE_PSI)
+            nfft_precompute_one_psi(&structure[iComp]);
+        
+    }
+    
+    // Doing the transform : structure
+    
+    for (int iComp=0; iComp<DIM; iComp++){
+        nfft_adjoint(&structure[iComp]);
+    }
+
+}
+
 void snapShot(const int Ncol){
     
     FILE *fpX = fopen("C_snapX.out", "w");
@@ -654,3 +674,4 @@ void snapShot(const int Ncol){
     
     return;
 }
+
