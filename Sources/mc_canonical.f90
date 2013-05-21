@@ -209,8 +209,8 @@ implicit none
         else MC_Regime ! Thermalisation over -> Equilibrium
         
             ! Chemical potentials : Widom method
+            call type1_sph%widom(type2_sph%X, mix, type1_obs%activ)
             call type2_sph%widom(type1_sph%X, mix, type2_obs%activ)
-            call type1_sph%widom(type2_sph%X, mix, type1_obs%activ)            
         
             ! Observables accumulations
             type1_obs%EpotSum = type1_obs%EpotSum + type1_obs%Epot
