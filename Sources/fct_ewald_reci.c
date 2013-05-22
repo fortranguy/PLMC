@@ -174,11 +174,12 @@ void Epot_reci_fourier(const double xNew[DIM], complex exp_IkxCol_x[2*Nx],
 /*!> Difference of Energy \f[ \Delta U = \frac{2\pi}{V} \sum_{\vec{k} \neq 0} \Delta M^2 
  * f(\alpha, \vec{k}) \f]
  * \f[
- *  \Delta M^2 = 2\Re[(\vec{\mu}_l\cdot\vec{k}) (e^{i(\vec{k}\cdot\vec{x}^\prime_l)} -
- *               e^{i(\vec{k}\cdot\vec{x}_l)} (\vec{k}\cdot\vec{S}_l)]
+ *  \Delta M^2 = 2\Re[
+ *                  (\vec{\mu}_l\cdot\vec{k}) (e^{i(\vec{k}\cdot\vec{x}^\prime_l)} -
+ *                  e^{i(\vec{k}\cdot\vec{x}_l)} (\vec{k}\cdot\vec{S}_l)
+ *               ]
  * \f]
- * \f[  \vec{S}_l = \sum_{i \neq l} \vec{\mu}_i e^{i(\vec{k}\cdot\vec{x}_i)}
- * \f]
+ * \f[ \vec{S}_l = \sum_{i \neq l} \vec{\mu}_i e^{i(\vec{k}\cdot\vec{x}_i)} \f]
  * Implementation :
  * \f[ 
  *  \Delta M^2 = 2(\vec{\mu_l}\cdot\vec{k}) 
@@ -337,11 +338,24 @@ void Epot_reci_updateX(const int lCol, const double xNew[DIM]){
  *                                       f(\alpha, \vec{k}) \f]
  * \f[
  *  \Delta M^2 = (\vec{k} \cdot \vec{\mu}_l^\prime)^2 - (\vec{k} \cdot \vec{\mu}_l)^2 +
- *              [(\vec{k} \cdot \vec{\mu}_l^\prime) e^{-i \vec{k} \vec{x}_l^\prime} -
- *               (\vec{k} \cdot \vec{\mu}_l) e^{-i \vec{k} \vec{x}_l}]
- *               2\Re(\vec{k}\cdot\vec{S}_l)
+ *               2\Re\{
+ *                  [(\vec{k} \cdot \vec{\mu}_l^\prime) - (\vec{k} \cdot \vec{\mu}_l)]
+ *                  e^{-i \vec{k} \cdot \vec{x}_l}
+ *                  (\vec{k} \cdot \vec{S}_l)
+ *               \}
  * \f]
+ * \f[ \vec{S}_l = \sum_{i \neq l} \vec{\mu}_i e^{i(\vec{k}\cdot\vec{x}_i)} \f]
  * Implementation :
+ * \f[
+ *  \Delta M^2 = (\vec{k} \cdot \vec{\mu}_l^\prime)^2 - (\vec{k} \cdot \vec{\mu}_l)^2 +
+ *               [(\vec{k} \cdot \vec{\mu}_l^\prime) - (\vec{k} \cdot \vec{\mu}_l)] 
+ *               \{
+ *                  \cos(\vec{k} \cdot \vec{x}_l)[\Re(\vec{k} \cdot \vec{S}) - 
+ *                      (\vec{k} \cdot \vec{\mu}_l) \cos(\vec{k} \cdot \vec{x}_l)] +
+ *                  \sin(\vec{k} \cdot \vec{x}_l)[\Im(\vec{k} \cdot \vec{S}) - 
+ *                      (\vec{k} \cdot \vec{\mu}_l) \sin(\vec{k} \cdot \vec{x}_l)]
+ *               \}
+ * \f]
  * 
  */
 
