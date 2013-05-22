@@ -495,7 +495,7 @@ void Epot_reci_updateM(const int lCol, const double mNew[DIM]){
  *                          2\Re(\vec{k} \cdot \vec{S} e^{-i \vec{k} \cdot \vec{x}_{N+1}})]
  * \f]
  * Implementation :
- * \f[ \Delta U^{N+1} = \frac{2\pi}{V} \sum_{\vec{k} \neq \vec{0}} 
+ * \f[ \Delta U^{N+1} = \frac{2\pi}{V} \sum_{\vec{k} \neq \vec{0}}
  *                          (\vec{k} \cdot \vec{\mu}_{N+1}) f(\alpha, \vec{k})
  *                          \{
  *                              (\vec{k} \cdot \vec{\mu}_{N+1}) +
