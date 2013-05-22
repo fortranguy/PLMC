@@ -499,8 +499,8 @@ void Epot_reci_updateM(const int lCol, const double mNew[DIM]){
  *                          (\vec{k} \cdot \vec{\mu}_{N+1}) f(\alpha, \vec{k})
  *                          \{
  *                              (\vec{k} \cdot \vec{\mu}_{N+1}) +
- *                              2 [cos(\vec{k} \cdot \vec{x}_{N+1}}) \Re(\vec{k} \cdot \vec{S}) +
- *                                 sin(\vec{k} \cdot \vec{x}_{N+1}}) \Im(\vec{k} \cdot \vec{S})]
+ *                              2 [cos(\vec{k} \cdot \vec{x}_{N+1}) \Re(\vec{k} \cdot \vec{S}) +
+ *                                 sin(\vec{k} \cdot \vec{x}_{N+1}) \Im(\vec{k} \cdot \vec{S})]
  *                          \}
  * \f]
  */
