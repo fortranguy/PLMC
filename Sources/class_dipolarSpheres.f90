@@ -538,15 +538,13 @@ contains
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energ
     
-        integer :: iNeigh,  iCell_neigh
+        integer :: iNeigh,  iCell_neigh, jCol
         real(DP), dimension(Dim) :: rVec_ij
         real(DP) :: r_ij        
         
         type(Link), pointer :: current => null(), next => null()
         
-        
         overlap = .false.
-        energ = 0._DP
     
         do iNeigh = 1, cell_neighs_nb
         
@@ -560,16 +558,12 @@ contains
             
                 if (current%iCol /= iCol) then
                 
-                    rVec_ij = distVec(xCol(:), this%X(:, current%iCol))
-                    r_ij = sqrt(dot_product(rVec_ij, rVec_ij))
+                    r_ij = dist(xCol(:), this%X(:, current%iCol))
                     
                     if (r_ij < this%rMin) then
                         overlap = .true.
                         return
                     end if
-                    
-                    energ = energ + this%Epot_real_pair(mCol, this%M(:, current%iCol), &
-                                                        rVec_ij, r_ij)
        
                 end if
                 
@@ -578,6 +572,21 @@ contains
                 current => next
             
             end do            
+            
+        end do
+
+        energ = 0._DP
+
+        do jCol = 1, this%Ncol
+
+            if (jCol /= iCol) then
+
+                rVec_ij = distVec(xCol(:), this%X(:, jCol))
+                r_ij = sqrt(dot_product(rVec_ij, rVec_ij))
+
+                energ = energ + this%Epot_real_pair(mCol, this%M(:, jCol), rVec_ij, r_ij)
+                                
+            end if
             
         end do
     
