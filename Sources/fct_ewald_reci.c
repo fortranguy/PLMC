@@ -349,7 +349,7 @@ void Epot_reci_updateX(const int lCol, const double xNew[DIM]){
  * \f[
  *  \Delta M^2 = (\vec{k} \cdot \vec{\mu}_l^\prime)^2 - (\vec{k} \cdot \vec{\mu}_l)^2 +
  *               [(\vec{k} \cdot \vec{\mu}_l^\prime) - (\vec{k} \cdot \vec{\mu}_l)] 
- *               \{
+ *               2 \{
  *                  \cos(\vec{k} \cdot \vec{x}_l)[\Re(\vec{k} \cdot \vec{S}) - 
  *                      (\vec{k} \cdot \vec{\mu}_l) \cos(\vec{k} \cdot \vec{x}_l)] +
  *                  \sin(\vec{k} \cdot \vec{x}_l)[\Im(\vec{k} \cdot \vec{S}) - 
@@ -425,6 +425,12 @@ double Epot_reci_rotate(const int lCol, const double mNew[DIM], const double Vol
     return Epot;
     
 }
+
+/*!> Update moment -> update the ``structure factor''
+ *  \f[
+ *      \Delta \vec{S} = (\vec{\mu}_l^\prime - \vec{\mu}_l^) e^{i(\vec{k}\cdot\vec{x}_l)})
+ *  \f]
+ */
 
 void Epot_reci_updateM(const int lCol, const double mNew[DIM]){
 
