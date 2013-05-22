@@ -175,11 +175,12 @@ void Epot_reci_fourier(const double xNew[DIM], complex exp_IkxCol_x[2*Nx],
  * f(\alpha, \vec{k}) \f]
  * \f[
  *  \Delta M^2 = 2\Re[
- *                  (\vec{\mu}_l\cdot\vec{k}) (e^{i(\vec{k}\cdot\vec{x}^\prime_l)} -
- *                  e^{i(\vec{k}\cdot\vec{x}_l)} (\vec{k}\cdot\vec{S}_l)
+ *                  (\vec{\mu}_l\cdot\vec{k}) 
+ *                  (e^{-i\vec{k}\cdot\vec{x}^\prime_l} - e^{-i\vec{k}\cdot\vec{x}_l})
+ *                  (\vec{k}\cdot\vec{S}_l)
  *               ]
  * \f]
- * \f[ \vec{S}_l = \sum_{i \neq l} \vec{\mu}_i e^{i(\vec{k}\cdot\vec{x}_i)} \f]
+ * \f[ \vec{S}_l = \sum_{i \neq l} \vec{\mu}_i e^{+i\vec{k}\cdot\vec{x}_i} \f]
  * Implementation :
  * \f[ 
  *  \Delta M^2 = 2(\vec{\mu_l}\cdot\vec{k}) 
@@ -266,7 +267,7 @@ double Epot_reci_move(const int lCol, const double xNew[DIM], const double Vol){
 /*!> Update position -> update the ``structure factor''
  *  \f[
  *      \Delta \vec{S} = \vec{\mu}_l
- *      (e^{i(\vec{k}\cdot\vec{x}^\prime_l)} -e^{i(\vec{k}\cdot\vec{x}_l)}) 
+ *      (e^{+i\vec{k}\cdot\vec{x}^\prime_l} -e^{+i\vec{k}\cdot\vec{x}_l}) 
  *  \f]
  */
 
@@ -344,7 +345,7 @@ void Epot_reci_updateX(const int lCol, const double xNew[DIM]){
  *                  (\vec{k} \cdot \vec{S}_l)
  *               \}
  * \f]
- * \f[ \vec{S}_l = \sum_{i \neq l} \vec{\mu}_i e^{i(\vec{k}\cdot\vec{x}_i)} \f]
+ * \f[ \vec{S}_l = \sum_{i \neq l} \vec{\mu}_i e^{+i\vec{k}\cdot\vec{x}_i} \f]
  * Implementation :
  * \f[
  *  \Delta M^2 = (\vec{k} \cdot \vec{\mu}_l^\prime)^2 - (\vec{k} \cdot \vec{\mu}_l)^2 +
@@ -428,7 +429,7 @@ double Epot_reci_rotate(const int lCol, const double mNew[DIM], const double Vol
 
 /*!> Update moment -> update the ``structure factor''
  *  \f[
- *      \Delta \vec{S} = (\vec{\mu}_l^\prime - \vec{\mu}_l^) e^{i(\vec{k}\cdot\vec{x}_l)})
+ *      \Delta \vec{S} = (\vec{\mu}_l^\prime - \vec{\mu}_l) e^{+i\vec{k}\cdot\vec{x}_l}
  *  \f]
  */
 
@@ -491,16 +492,18 @@ void Epot_reci_updateM(const int lCol, const double mNew[DIM]){
 /*!> Difference of Energy 
  * \f[ \Delta U^{N+1} = \frac{2\pi}{V} \sum_{\vec{k} \neq \vec{0}} 
  *                          (\vec{k} \cdot \vec{\mu}_{N+1}) f(\alpha, \vec{k})
- *                         [(\vec{k} \cdot \vec{\mu}_{N+1}) + 
- *                          2\Re(\vec{k} \cdot \vec{S} e^{-i \vec{k} \cdot \vec{x}_{N+1}})]
+ *                          \{
+ *                              (\vec{k} \cdot \vec{\mu}_{N+1}) + 
+ *                              2\Re[(\vec{k} \cdot \vec{S}) e^{-i \vec{k} \cdot \vec{x}_{N+1}}]
+ *                          \}
  * \f]
  * Implementation :
  * \f[ \Delta U^{N+1} = \frac{2\pi}{V} \sum_{\vec{k} \neq \vec{0}}
  *                          (\vec{k} \cdot \vec{\mu}_{N+1}) f(\alpha, \vec{k})
  *                          \{
  *                              (\vec{k} \cdot \vec{\mu}_{N+1}) +
- *                              2 [cos(\vec{k} \cdot \vec{x}_{N+1}) \Re(\vec{k} \cdot \vec{S}) +
- *                                 sin(\vec{k} \cdot \vec{x}_{N+1}) \Im(\vec{k} \cdot \vec{S})]
+ *                              2 [\Re(\vec{k} \cdot \vec{S}) \cos(\vec{k} \cdot \vec{x}_{N+1}) +
+ *                                 \Im(\vec{k} \cdot \vec{S}) \sin(\vec{k} \cdot \vec{x}_{N+1})]
  *                          \}
  * \f]
  */
@@ -543,8 +546,8 @@ double Epot_reci_test(const double xTest[DIM], const double mTest[DIM], const do
                 cos_kxTest = creal(exp_IkxTest);
                 sin_kxTest =-cimag(exp_IkxTest);
                 
-                realPart = cos_kxTest * creal(k_dot_structure);
-                realPart+= sin_kxTest * cimag(k_dot_structure);
+                realPart = creal(k_dot_structure) * cos_kxTest;
+                realPart+= cimag(k_dot_structure) * sin_kxTest;
                 
                 Epot += k_dot_mTest * (k_dot_mTest + 2.*realPart) * 
                         Epot_reci_tab[kx+Nx][ky+Ny][kz+Nz];
