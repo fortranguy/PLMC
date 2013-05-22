@@ -348,8 +348,8 @@ void Epot_reci_updateX(const int lCol, const double xNew[DIM]){
  * Implementation :
  * \f[
  *  \Delta M^2 = (\vec{k} \cdot \vec{\mu}_l^\prime)^2 - (\vec{k} \cdot \vec{\mu}_l)^2 +
- *               [(\vec{k} \cdot \vec{\mu}_l^\prime) - (\vec{k} \cdot \vec{\mu}_l)] 
- *               2 \{
+ *               2 [(\vec{k} \cdot \vec{\mu}_l^\prime) - (\vec{k} \cdot \vec{\mu}_l)] 
+ *               \{
  *                  \cos(\vec{k} \cdot \vec{x}_l)[\Re(\vec{k} \cdot \vec{S}) - 
  *                      (\vec{k} \cdot \vec{\mu}_l) \cos(\vec{k} \cdot \vec{x}_l)] +
  *                  \sin(\vec{k} \cdot \vec{x}_l)[\Im(\vec{k} \cdot \vec{S}) - 
@@ -489,12 +489,20 @@ void Epot_reci_updateM(const int lCol, const double mNew[DIM]){
 // Test particle -----------------------------------------------------------------------------------
 
 /*!> Difference of Energy 
- * \f[ \Delta U^{N+1} = \frac{2\pi}{V} \sum_{\vec{k} \neq 0} (\vec{k} \cdot \vec{\mu}_{N+1})
- *                      f(\alpha, \vec{k}) [(\vec{k} \cdot \vec{\mu}_{N+1}) + 
- *                      2\Re(\vec{k} \cdot \vec{S} e^{-i \vec{k} \cdot \vec{x}_{N+1}})]
+ * \f[ \Delta U^{N+1} = \frac{2\pi}{V} \sum_{\vec{k} \neq \vec{0}} 
+ *                          (\vec{k} \cdot \vec{\mu}_{N+1}) f(\alpha, \vec{k})
+ *                         [(\vec{k} \cdot \vec{\mu}_{N+1}) + 
+ *                          2\Re(\vec{k} \cdot \vec{S} e^{-i \vec{k} \cdot \vec{x}_{N+1}})]
  * \f]
  * Implementation :
- * 
+ * \f[ \Delta U^{N+1} = \frac{2\pi}{V} \sum_{\vec{k} \neq \vec{0}} 
+ *                          (\vec{k} \cdot \vec{\mu}_{N+1}) f(\alpha, \vec{k})
+ *                          \{
+ *                              (\vec{k} \cdot \vec{\mu}_{N+1}) +
+ *                              2 [cos(\vec{k} \cdot \vec{x}_{N+1}}) \Re(\vec{k} \cdot \vec{S}) +
+ *                                 sin(\vec{k} \cdot \vec{x}_{N+1}}) \Im(\vec{k} \cdot \vec{S})]
+ *                          \}
+ * \f]
  */
 
 double Epot_reci_test(const double xTest[DIM], const double mTest[DIM], const double Vol){
@@ -535,8 +543,8 @@ double Epot_reci_test(const double xTest[DIM], const double mTest[DIM], const do
                 cos_kxTest = creal(exp_IkxTest);
                 sin_kxTest =-cimag(exp_IkxTest);
                 
-                realPart = creal(k_dot_structure) * cos_kxTest;
-                realPart+= cimag(k_dot_structure) * sin_kxTest;
+                realPart = cos_kxTest * creal(k_dot_structure);
+                realPart+= sin_kxTest * cimag(k_dot_structure);
                 
                 Epot += k_dot_mTest * (k_dot_mTest + 2.*realPart) * 
                         Epot_reci_tab[kx+Nx][ky+Ny][kz+Nz];
