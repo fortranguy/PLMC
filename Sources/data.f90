@@ -32,6 +32,7 @@ implicit none
     real(DP), parameter :: Lsize3 = Lsize1
     real(DP), dimension(Dim), parameter :: Lsize = [Lsize1, Lsize2, Lsize3]
     real(DP), dimension(Dim), parameter :: LsizeMi = 0.5_DP * Lsize
+    real(DP), parameter :: Volume = Lsize1 * Lsize2 * Lsize3
     
 end module data_cell
 !***************************************************************************************************

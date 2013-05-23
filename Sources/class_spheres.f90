@@ -123,7 +123,7 @@ contains
         
         real(DP) :: density, compac
         
-        density = real(this%Ncol, DP) / product(Lsize)
+        density = real(this%Ncol, DP) / Volume
         compac = 4._DP/3._DP*PI*this%radius**3 * density
         
         write(output_unit, *) this%name, " : ", "density = ", density, "compacity = ", compac

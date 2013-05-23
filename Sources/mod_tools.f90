@@ -226,7 +226,7 @@ contains
         write(report_unit, *) "Data :"
         
         write(report_unit ,*) "    Lsize(:) = ", Lsize(:)
-        write(report_unit ,*) "    Vol = ", product(Lsize)
+        write(report_unit ,*) "    Volume = ", Volume
         write(report_unit ,*) "    Ncol = ", Ncol
         write(report_unit ,*) "    Tstar = ", Tstar
         

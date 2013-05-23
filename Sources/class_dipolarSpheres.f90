@@ -474,7 +474,7 @@ contains
             C_M(:, iCol) = real(this%M(:, iCol)/Lsize(:), C_double)
         end do
         
-        C_Epot = C_Epot_reci(C_X, C_M, int(this%Ncol, C_int), real(product(Lsize), C_double))
+        C_Epot = C_Epot_reci(C_X, C_M, int(this%Ncol, C_int), real(Volume, C_double))
         Epot_reci = real(C_Epot, DP)
         
         deallocate(C_X)
@@ -628,7 +628,7 @@ contains
                                      overlap, same_eOld)
                 ! Reci
                 C_xNew(:) = real(xNew(:)/Lsize(:), C_double) - 0.5_c_double
-                C_Epot = C_Epot_reci_move(int(iOld-1, C_int), C_xNew, real(product(Lsize), C_double))
+                C_Epot = C_Epot_reci_move(int(iOld-1, C_int), C_xNew, real(Volume, C_double))
                 
                 same_dEpot = (same_eNew - same_eOld) + real(C_Epot, DP)
                     
@@ -693,7 +693,7 @@ contains
         call markov_surface(mNew, this%dm)
         
         C_mNew(:) = real(mNew(:)/Lsize(:), C_double)
-        C_Epot = C_Epot_reci_rotate(int(iOld-1, C_int), C_mNew, real(product(Lsize), C_double))
+        C_Epot = C_Epot_reci_rotate(int(iOld-1, C_int), C_mNew, real(Volume, C_double))
         
         iCell = this%same%position_to_cell(this%X(:, iOld))
         call this%Epot_neigh(iOld, this%X(:, iOld), mNew, iCell, overlap, real_eNew)
@@ -760,7 +760,7 @@ contains
                     C_xTest(:) = real(xTest(:)/Lsize(:), C_double) - 0.5_c_double                    
                     C_mTest(:) = real(mTest(:)/Lsize(:), C_double)
                     
-                    C_Epot = C_Epot_reci_test(C_xTest, C_mTest, real(product(Lsize), C_double))
+                    C_Epot = C_Epot_reci_test(C_xTest, C_mTest, real(Volume, C_double))
                 
                     enTest = same_enTest + mix_enTest + real(C_Epot, DP) - this%Epot_self_solo(mTest)
                     widTestSum = widTestSum + exp(-enTest/Tstar)

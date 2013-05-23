@@ -95,7 +95,7 @@ contains
         
         write(report_unit, *) "    average energy = ", this%EpotSum/real(Nstep, DP)
             
-        potChiId = -Tstar*log( product(Lsize)/real(Ncol+1,DP) )
+        potChiId = -Tstar*log( Volume/real(Ncol+1,DP) )
         write(report_unit, *) "    ideal chemical potential = ", potChiId
         potChiEx = -Tstar*log( this%activSum/real(Nstep, DP) )
         write(report_unit, *) "    average excess chemical potential = ", potChiEx           

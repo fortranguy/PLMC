@@ -47,7 +47,7 @@ implicit none
     
 ! Beginning ----------------------------------------------------------------------------------------
     
-    write(output_unit, *) "Monte-Carlo Mix - Canonical : Volume =", product(Lsize)
+    write(output_unit, *) "Monte-Carlo Mix - Canonical : Volume =", Volume
 
     ! Initialisations & reports
     
