@@ -21,7 +21,7 @@ contains
         
         distVec_12(:) = distVec(xCol1, xCol2)
         
-        dist = sqrt(dot_product(distVec_12, distVec_12))
+        dist = norm2(distVec_12)
     
     end function dist
     
@@ -95,7 +95,7 @@ contains
             random_surface(iDim) = gauss()          
         end do
         
-        random_surface(:) = random_surface(:) / sqrt(dot_product(random_surface, random_surface))
+        random_surface(:) = random_surface(:) / norm2(random_surface)
     
     end function random_surface
     
@@ -115,13 +115,13 @@ contains
         
         rotation_dot_mCol = dot_product(rotation, mCol)
         rotation(:) = rotation(:) - rotation_dot_mCol * mCol(:)
-        rotation(:) = rotation(:) / sqrt(dot_product(rotation, rotation))
+        rotation(:) = rotation(:) / norm2(rotation)
         
         call random_number(rand)
         amplitude = dm * (rand - 0.5_DP)
         
         mCol(:) = mCol(:) + amplitude * rotation(:)
-        mCol(:) = mCol(:) / sqrt(dot_product(mCol, mCol))
+        mCol(:) = mCol(:) / norm2(mCol)
     
     end subroutine markov_surface
 

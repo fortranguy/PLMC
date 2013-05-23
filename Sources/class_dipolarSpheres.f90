@@ -436,7 +436,7 @@ contains
                 if (iCol /= jCol) then
                     
                     rVec_ij = distVec(this%X(:, iCol), this%X(:, jCol))
-                    r_ij = sqrt(dot_product(rVec_ij, rVec_ij))
+                    r_ij = norm2(rVec_ij)
                     
                     Epot_real = Epot_real + &
                                 this%Epot_real_pair(this%M(:, iCol), this%M(:, jCol), rVec_ij, r_ij)
@@ -561,7 +561,7 @@ contains
                 if (current%iCol /= iCol) then
                 
                     rVec_ij = distVec(xCol(:), this%X(:, current%iCol))
-                    r_ij = sqrt(dot_product(rVec_ij, rVec_ij))
+                    r_ij = norm2(rVec_ij)
                     
                     if (r_ij < this%rMin) then
                         overlap = .true.

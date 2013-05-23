@@ -197,7 +197,7 @@ contains
 
     subroutine initDistriParams()
 
-        rMax = sqrt(dot_product(LsizeMi, LsizeMi))
+        rMax = norm2(LsizeMi)
         Ndist = int(rMax/deltaDist)
 
     end subroutine initDistriParams
