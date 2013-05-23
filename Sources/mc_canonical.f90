@@ -19,7 +19,6 @@ implicit none
     integer :: iStep, iMove, iRotate !< Monte-Carlo counters
     integer :: iColRand !< random particle
     real(DP) :: rand !< random number in between 0 and 1
-    real(DP), dimension(Dim) :: xRand
     real(DP) :: tIni, tFin !< CPU initial and final time
     
     ! Total physical system variables
