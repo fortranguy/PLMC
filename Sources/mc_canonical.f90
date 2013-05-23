@@ -36,7 +36,7 @@ implicit none
     integer :: mix_obsTherm_unit, mix_obsEqb_unit
     
     ! Type 1 : Dipolar spheres : Ewald summation
-    type(DipolarSpheres) :: type1_sph !< Monte-Carlo subroutines
+    type(DipolarSpheres) :: type1_sph !< physical properties and Monte-Carlo subroutines
     type(MoreObservables) :: type1_obs !< energy & inverse of activity (-> chemical potential)
     type(MoreUnits) :: type1_io !< (input/)output files
     
@@ -175,9 +175,9 @@ implicit none
             end if
             
             ! Rotation adaptation
-            if (mod(iStep, type1_sph%getNadaptRot()) /= 0) then ! Rejections accumulation
+            if (mod(iStep, type1_sph%getNadaptRot()) /= 0) then
                 type1_obs%rejRotAdapt = type1_obs%rejRotAdapt + type1_obs%rejRot
-            else ! Average & adaptation
+            else
                 type1_obs%rejRotAdapt = type1_obs%rejRotAdapt/real(type1_sph%getNadaptRot()-1)
                 call type1_sph%adaptDm(type1_obs%rejRotAdapt)
                 write(type1_io%dm, *) iStep, type1_sph%getDm(), type1_obs%rejRotAdapt
@@ -222,8 +222,7 @@ implicit none
             type2_obs%rejSum = type2_obs%rejSum + type2_obs%rej
                 
             mix_EpotSum = mix_EpotSum + mix_Epot
-            
-            ! Observables writing
+
             write(type1_io%obsEqb, *) iStep, type1_obs%Epot, type1_obs%activ, type1_obs%rej, &
                                                                               type1_obs%rejRot
             write(type2_io%obsEqb, *) iStep, type2_obs%Epot, type2_obs%activ, type2_obs%rej
@@ -248,7 +247,7 @@ implicit none
     ! Tests & results
 
     call type1_sph%overlapTest()
-    call type1_sph%C_snapShot()
+    call type1_sph%C_snapShot() ! check in C if the final configuration is the same.
     call type1_sph%consistTest(type1_obs%Epot, type1_io%report)
     call type1_sph%snapShot_X(0, type1_io%snapFin_X)
     call type1_sph%snapShot_M(0, type1_io%snapFin_M)
