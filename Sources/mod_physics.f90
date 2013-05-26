@@ -48,11 +48,8 @@ contains
         real(DP) :: x, y
         real(DP) :: normSqr, factor
         
-        real(DP) :: gaussSet
-        integer :: iset
-        
-        data iset/0/ !< What is that ?
-        save
+        real(DP), save :: gaussSet        
+        integer, save :: iset = 0
         
         if (iset == 0) then
         
