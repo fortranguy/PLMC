@@ -142,7 +142,7 @@ implicit none
     real(DP), parameter :: hard_rCut = hard_rMin
     
     real(DP), parameter :: mix_rCut = 1.25_DP
-    real(DP), parameter :: mix_dr = 1._DP
+    real(DP), parameter :: mix_dr = mix_rCut/2._DP
     real(DP), parameter :: mix_epsilon = 0._DP
     real(DP), parameter :: mix_alpha = 40._DP
         

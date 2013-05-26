@@ -43,6 +43,8 @@ private
         integer :: iCut !< maximum index of tabulation : until potential cut
         real(DP) :: alpha !< coefficient of Ewald summation
         real(DP), dimension(:, :), allocatable :: Epot_real_tab !< tabulation : real short-range
+        real(C_double), dimension(Dim) :: moduli_drifted
+        real(C_double), dimension(Dim) :: moduli_nfft
         
     contains
 
@@ -484,17 +486,15 @@ contains
     
     subroutine DipolarSpheres_Epot_reci_structure(this, iStep, moduli_unit)
     
-        class(DipolarSpheres), intent(in) :: this
+        class(DipolarSpheres), intent(inout) :: this
         integer, intent(in) :: iStep
         integer, intent(in) :: moduli_unit
         
-        real(C_double), dimension(Dim) :: moduli_drifted, moduli_nfft
-        
-        call C_Epot_reci_structure_moduli(moduli_drifted)
+        call C_Epot_reci_structure_moduli(this%moduli_drifted)
         call C_Epot_reci_structure()
-        call C_Epot_reci_structure_moduli(moduli_nfft)
+        call C_Epot_reci_structure_moduli(this%moduli_nfft)
         
-        write(moduli_unit, *) iStep, abs(moduli_nfft(:)-moduli_drifted(:))
+        write(moduli_unit, *) iStep, abs(this%moduli_nfft(:)-this%moduli_drifted(:))
     
     end subroutine DipolarSpheres_Epot_reci_structure
     
