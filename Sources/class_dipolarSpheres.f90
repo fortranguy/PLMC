@@ -283,12 +283,12 @@ contains
     
     !> Accessor : dm
     
-    function DipolarSpheres_getDm(this) result(getDx)
+    function DipolarSpheres_getDm(this) result(getDm)
         
         class(DipolarSpheres), intent(in) :: this        
-        real(DP) :: getDx
+        real(DP) :: getDm
         
-        getDx = this%dm
+        getDm = this%dm
         
     end function DipolarSpheres_getDm
     
