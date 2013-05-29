@@ -145,7 +145,7 @@ contains
         
         do iDir = 1, Dim
         
-            if (this%cell_Lsize(iDir) < rCut) then
+            if (this%cell_Lsize(iDir) < rCut .and. this%cell_Lsize(iDir) /= Lsize(iDir)/3._DP) then
                 write(error_unit, *) "Warning : big rCut in the direction", iDir, ":"
                 write(error_unit, *) this%cell_Lsize(iDir), "<", rCut
             end if
