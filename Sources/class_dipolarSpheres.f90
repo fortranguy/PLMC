@@ -577,7 +577,7 @@ contains
                 
                 current => next
             
-            end do            
+            end do
             
         end do
     
