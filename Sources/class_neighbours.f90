@@ -2,7 +2,7 @@
 
 module class_neighbours
 
-use iso_fortran_env
+use, intrinsic :: iso_fortran_env
 use data_constants
 use data_cell
 use data_neighbours
