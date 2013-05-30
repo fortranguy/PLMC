@@ -517,9 +517,9 @@ contains
         class(DipolarSpheres), intent(inout) :: this
 
         complex(DP) :: exp_Ikx_i
-        complex(DP), dimension(2*Kmax(1)) :: exp_Ikx_i_x
-        complex(DP), dimension(2*Kmax(2)) :: exp_Ikx_i_y
-        complex(DP), dimension(2*Kmax(3)) :: exp_Ikx_i_z
+        complex(DP), dimension(2*Kmax(1)+1) :: exp_Ikx_i_x
+        complex(DP), dimension(2*Kmax(2)+1) :: exp_Ikx_i_y
+        complex(DP), dimension(2*Kmax(3)+1) :: exp_Ikx_i_z
         integer :: ik
         integer :: kx, ky, kz
 
