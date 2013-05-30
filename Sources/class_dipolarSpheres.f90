@@ -530,7 +530,7 @@ contains
         do iCol = 1, this%Ncol
         
             exp_Ikx_i = exp_Ikx_i_x(kx) * exp_Ikx_i_y(ky) * exp_Ikx_i_z(kz)
-            this%structure(:, ik) = this%structure(:, ik) + this%M(:, iCol)*exp_Ikx_i
+            this%structure(:, ik) = this%structure(:, ik) + this%M(:, iCol)/Lsize(:) * exp_Ikx_i
             
         end do
 
