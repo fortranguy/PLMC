@@ -510,7 +510,31 @@ contains
             
         end do
         
-    end subroutine DipolarSpheres_Epot_reci_init    
+    end subroutine DipolarSpheres_Epot_reci_init
+
+    subroutine DipolarSpheres_Epot_reci_structure_init(this)
+
+        class(DipolarSpheres), intent(inout) :: this
+
+        complex(DP) :: exp_Ikx_i
+        complex(DP), dimension(2*Kmax(1)) :: exp_Ikx_i_x
+        complex(DP), dimension(2*Kmax(2)) :: exp_Ikx_i_y
+        complex(DP), dimension(2*Kmax(3)) :: exp_Ikx_i_z
+        integer :: ik
+        integer :: kx, ky, kz
+
+        integer :: iCol
+
+        this%structure(:, :) = (0._DP, 0._DP)
+
+        do iCol = 1, this%Ncol
+        
+            exp_Ikx_i = exp_Ikx_i_x(kx) * exp_Ikx_i_y(ky) * exp_Ikx_i_z(kz)
+            this%structure(:, ik) = this%structure(:, ik) + this%M(:, iCol)*exp_Ikx_i
+            
+        end do
+
+    end subroutine DipolarSpheres_Epot_reci_structure_init
     
     function DipolarSpheres_Epot_reci(this) result(Epot_reci)
         
