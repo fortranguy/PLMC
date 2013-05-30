@@ -139,6 +139,9 @@ contains
         this%alpha = dipol_alpha        
         allocate(this%Epot_real_tab(this%iMin:this%iCut, 2))
         call this%Epot_real_init()
+
+        allocate(this%structure(Dim, NwaveVectors))
+        allocate(this%potential(Dim, this%Ncol))
         call this%Epot_reci_init()
         call C_Epot_reci_nfft_init(int(this%Ncol, C_int))
         
@@ -168,6 +171,13 @@ contains
         if (allocated(this%Epot_real_tab)) then
             deallocate(this%Epot_real_tab)
         endif
+
+        if (allocated(this%structure))then
+            deallocate(this%structure)
+        end if
+        if (allocated(this%potential))then
+            deallocate(this%potential)
+        end if
         call C_Epot_reci_nfft_finalize()
         
         call this%same%destroy()
@@ -458,7 +468,9 @@ contains
         
         class(DipolarSpheres), intent(in) :: this
         
-        call C_Epot_reci_init(real(Lsize, C_double), real(this%alpha, C_double))
+        !call C_Epot_reci_init(real(Lsize, C_double), real(this%alpha, C_double))
+
+        
         
     end subroutine DipolarSpheres_Epot_reci_init    
     
