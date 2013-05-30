@@ -43,6 +43,9 @@ private
         integer :: iCut !< maximum index of tabulation : until potential cut
         real(DP) :: alpha !< coefficient of Ewald summation
         real(DP), dimension(:, :), allocatable :: Epot_real_tab !< tabulation : real short-range
+        real(DP), dimension(:, :), allocatable :: Epot_reci_tab
+        complex(DP), dimension(:, :), allocatable :: structure
+        complex(DP), dimension(:, :), allocatable :: potential
         real(C_double), dimension(Dim) :: moduli_drifted
         real(C_double), dimension(Dim) :: moduli_nfft
         

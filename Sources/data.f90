@@ -27,12 +27,19 @@ use data_constants
 implicit none
     
     integer, parameter :: Dim = 3
+    
     real(DP), parameter :: Lsize1 = 25._DP
     real(DP), parameter :: Lsize2 = Lsize1
     real(DP), parameter :: Lsize3 = Lsize1
     real(DP), dimension(Dim), parameter :: Lsize = [Lsize1, Lsize2, Lsize3]
     real(DP), dimension(Dim), parameter :: LsizeMi = 0.5_DP * Lsize
     real(DP), parameter :: Volume = Lsize1 * Lsize2 * Lsize3
+
+    integer, parameter :: kMax1 = 9
+    integer, parameter :: kMax2 = kMax1
+    integer, parameter :: kMax3 = kMax1
+    integer, dimension(Dim), parameter :: kMax = [kMax1, kMax2, kMax3]
+    integer, parameter :: NwaveVectors = (2*kMax1+1) * (2*kMax2+1) * (2*kMax3+1)
     
 end module data_cell
 !***************************************************************************************************
