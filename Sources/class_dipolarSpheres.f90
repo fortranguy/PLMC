@@ -44,6 +44,7 @@ private
         real(DP) :: alpha !< coefficient of Ewald summation
         real(DP), dimension(:, :), allocatable :: Epot_real_tab !< tabulation : real short-range
         real(DP), dimension(2*kMax(1), 2*kMax(2), 2*kMax(3)) :: Epot_reci_tab
+        integer :: NwaveVectors
         complex(DP), dimension(:, :), allocatable :: structure
         complex(DP), dimension(:, :), allocatable :: potential
         real(C_double), dimension(Dim) :: moduli_drifted
@@ -475,8 +476,10 @@ contains
         class(DipolarSpheres), intent(inout) :: this
         
         integer :: kx, ky, kz
-        integer, dimension(Dim) :: waveVector
+        real(DP), dimension(Dim) :: waveVector
         real(DP) :: kOverL
+
+        this%NwaveVectors = 0
 
         do kx = -kMax(1), kMax(1)-1
         
@@ -484,11 +487,22 @@ contains
             
                 do kz = -kMax(3), kMax(3)-1
 
-                    waveVector = [kx, ky, kz]
+                    waveVector = real([kx, ky, kz], DP)
 
-                    kOverL = norm2(waveVector(:)/Lsize(:))
+                    if (norm2(waveVector) /= 0)then
+                    
+                        kOverL = norm2(waveVector(:)/Lsize(:))
 
-                    this%Epot_reci_tab(kx, ky, kz) = 0
+                        this%Epot_reci_tab(kx, ky, kz) = exp(-PI**2/this%alpha**2 * kOverL**2) / &
+                                                        kOverL**2
+
+                        this%NwaveVectors = this%NwaveVectors + 1
+
+                    else
+
+                        this%Epot_reci_tab(kx, ky, kz) = 0._DP
+
+                    end if
 
                 end do
                 
