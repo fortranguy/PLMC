@@ -43,7 +43,7 @@ private
         integer :: iCut !< maximum index of tabulation : until potential cut
         real(DP) :: alpha !< coefficient of Ewald summation
         real(DP), dimension(:, :), allocatable :: Epot_real_tab !< tabulation : real short-range
-        real(DP), dimension(:, :), allocatable :: Epot_reci_tab
+        real(DP), dimension(2*kMax(1), 2*kMax(2), 2*kMax(3)) :: Epot_reci_tab
         complex(DP), dimension(:, :), allocatable :: structure
         complex(DP), dimension(:, :), allocatable :: potential
         real(C_double), dimension(Dim) :: moduli_drifted
@@ -326,6 +326,8 @@ contains
         getStructure_iStep = this%structure_iStep
         
     end function DipolarSpheres_getStructure_iStep
+
+    ! Real -----------------------------------------------------------------------------------------
     
     !> Potential energy : real part
     !> Initialisation
@@ -463,14 +465,36 @@ contains
         Epot_real = 0.5_DP*Epot_real
     
     end function DipolarSpheres_Epot_real
+
+    ! Reciprocal -----------------------------------------------------------------------------------
     
+    !> \f[ f(\alpha, \vec{k}) = \frac{e^{-\frac{\pi^2}
+    !>      {\alpha^2} \sum_d \frac{k_d^2}{L_d}}}{\sum_d \frac{k_d^2}{L_d}} \f]
     subroutine DipolarSpheres_Epot_reci_init(this)
         
-        class(DipolarSpheres), intent(in) :: this
+        class(DipolarSpheres), intent(inout) :: this
         
-        !call C_Epot_reci_init(real(Lsize, C_double), real(this%alpha, C_double))
+        integer :: kx, ky, kz
+        integer, dimension(Dim) :: waveVector
+        real(DP) :: kOverL
 
+        do kx = -kMax(1), kMax(1)-1
         
+            do ky = -kMax(2), kMax(2)-1
+            
+                do kz = -kMax(3), kMax(3)-1
+
+                    waveVector = [kx, ky, kz]
+
+                    kOverL = norm2(waveVector(:)/Lsize(:))
+
+                    this%Epot_reci_tab(kx, ky, kz) = 0
+
+                end do
+                
+            end do
+            
+        end do
         
     end subroutine DipolarSpheres_Epot_reci_init    
     
