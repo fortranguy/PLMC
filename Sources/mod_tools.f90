@@ -2,7 +2,7 @@
 
 module mod_tools
 
-use iso_fortran_env
+use, intrinsic :: iso_fortran_env
 use data_constants
 use data_particles
 use data_mc
@@ -28,7 +28,7 @@ contains
         allocate(seed(n))
 
         call system_clock(count=clock)
-
+        
         seed(:) = clock + 37 * [ (i - 1, i = 1, n) ]
         call random_seed(put = seed)
         
@@ -226,7 +226,7 @@ contains
         write(report_unit, *) "Data :"
         
         write(report_unit ,*) "    Lsize(:) = ", Lsize(:)
-        write(report_unit ,*) "    Vol = ", product(Lsize)
+        write(report_unit ,*) "    Volume = ", Volume
         write(report_unit ,*) "    Ncol = ", Ncol
         write(report_unit ,*) "    Tstar = ", Tstar
         
@@ -270,6 +270,8 @@ contains
             
         write(report_unit, *) "Results :"
         write(report_unit, *) "    average energy = ", EpotSum/real(Nstep, DP)
+        write(report_unit, *) "    average energy per particule = ", &
+                                   EpotSum/real(Nstep, DP)/real(Ncol, DP)
         write(report_unit, *) "    duration =", duration/60._DP, "min"
     
     end subroutine results

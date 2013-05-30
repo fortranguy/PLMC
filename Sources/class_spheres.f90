@@ -2,7 +2,7 @@
 
 module class_spheres
 
-use iso_fortran_env
+use, intrinsic :: iso_fortran_env
 use data_constants
 use data_cell
 use data_mc
@@ -24,10 +24,13 @@ private
         real(DP) :: rMin !< minimum distance between two particles
         integer ::  Ncol !< number of a component particles
         real(DP), dimension(:, :), allocatable, public :: X !< positions of all particles
+        
+        ! Snashot
+        integer :: snap_factor
 
         ! Monte-Carlo
         real(DP), dimension(Dim) :: dx !< displacement
-        real(DP), dimension(Dim) :: dx_save
+        real(DP), dimension(Dim) :: dxSave
         real(DP) :: rejFix
         integer :: Nadapt
         integer :: Nwidom
@@ -35,7 +38,7 @@ private
         ! Potential
         real(DP) :: rCut !< short-range cut
         
-        ! Neighbours (cell/grid scheme)   
+        ! Neighbours (cell/grid scheme)
         type(Neighbours) :: same !< same kind
         type(Neighbours) :: mix !< other kind
         
@@ -120,7 +123,7 @@ contains
         
         real(DP) :: density, compac
         
-        density = real(this%Ncol, DP) / product(Lsize)
+        density = real(this%Ncol, DP) / Volume
         compac = 4._DP/3._DP*PI*this%radius**3 * density
         
         write(output_unit, *) this%name, " : ", "density = ", density, "compacity = ", compac
@@ -132,16 +135,21 @@ contains
     
     !> Configuration state : positions
       
-    subroutine Spheres_snapShot_X(this, snap_unit)
+    subroutine Spheres_snapShot_X(this, iStep, snap_unit)
         
         class(Spheres), intent(in) :: this
+        integer, intent(in) :: iStep
         integer, intent(in) :: snap_unit
     
         integer :: iCol
         
-        do iCol = 1, this%Ncol
-            write(snap_unit, *) this%X(:, iCol)
-        end do    
+        if (modulo(iStep, this%snap_factor) == 0) then
+        
+            do iCol = 1, this%Ncol
+                write(snap_unit, *) this%X(:, iCol)
+            end do
+            
+        end if            
 
     end subroutine Spheres_snapShot_X
     
@@ -203,14 +211,15 @@ contains
         
         real(DP) :: dx_normSqr, Lsize_normSqr
         
+        Lsize_normSqr = dot_product(Lsize, Lsize)
+        
         if (rej < this%rejFix - eps_rej) then
         
             this%dx(:) = this%dx(:) * more
             
             dx_normSqr = dot_product(this%dx, this%dx)
-            Lsize_normSqr = dot_product(LsizeMi, LsizeMi)
             if (dx_normSqr > Lsize_normSqr) then
-                this%dx(:) = LsizeMi(:)
+                this%dx(:) = Lsize(:)
             end if
             
         else if (rej > this%rejFix + eps_rej) then
@@ -231,15 +240,15 @@ contains
         
             if (rej == 0._DP) then
                 write(error_unit, *) this%name, " :    Warning : dx adaptation problem."
-                this%dx(:) = this%dx_save(:)
+                this%dx(:) = this%dxSave(:)
                 write(error_unit, *) "default dx :", this%dx(:)
             end if
             
             dx_normSqr = dot_product(this%dx, this%dx)
-            Lsize_normSqr = dot_product(LsizeMi, LsizeMi)
+            Lsize_normSqr = dot_product(Lsize, Lsize)
             if (dx_normSqr >= Lsize_normSqr) then
                 write(error_unit, *) this%name, " :   Warning : dx too big."
-                this%dx(:) = LsizeMi(:)
+                this%dx(:) = Lsize(:)
                 write(error_unit, *) "big dx :", this%dx(:)
             end if
             

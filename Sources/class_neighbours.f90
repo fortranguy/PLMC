@@ -2,7 +2,7 @@
 
 module class_neighbours
 
-use iso_fortran_env
+use, intrinsic :: iso_fortran_env
 use data_constants
 use data_cell
 use data_neighbours
@@ -50,13 +50,14 @@ public :: Link
     
 contains
 
-    subroutine Neighbours_construct(this, rCut)
+    subroutine Neighbours_construct(this, cell_Lsize, rCut)
     
         class(Neighbours), intent(out) :: this
+        real(DP), dimension(:), intent(in) :: cell_Lsize
         real(DP), intent(in) :: rCut
         
-        this%cell_Lsize(:) = rCut
-        this%cell_coordMax(:) = int(Lsize(:)/rCut)
+        this%cell_Lsize(:) = cell_Lsize(:)
+        this%cell_coordMax(:) = int(Lsize(:)/this%cell_Lsize(:))
         allocate(this%cell_neighs(cell_neighs_nb, product(this%cell_coordMax)))
             
         call this%check_CellsSize(rCut)
@@ -144,9 +145,14 @@ contains
         
         do iDir = 1, Dim
         
-            if (this%cell_Lsize(iDir) < rCut) then
-                write(error_unit, *) "Too small cell in the direction", iDir, ":"
+            if (this%cell_Lsize(iDir) < rCut .and. this%cell_Lsize(iDir) /= Lsize(iDir)/3._DP) then
+                write(error_unit, *) "Warning : big rCut in the direction", iDir, ":"
                 write(error_unit, *) this%cell_Lsize(iDir), "<", rCut
+            end if
+            
+            if (Lsize(iDir)/2._DP*sqrt(3._DP) < rCut) then
+                write(error_unit, *) "rCut too large in the direction", iDir, ":"
+                write(error_unit, *) Lsize(iDir)/2._DP*sqrt(3._DP), "<", rCut
                 stop
             end if
             

@@ -21,7 +21,7 @@ contains
         
         distVec_12(:) = distVec(xCol1, xCol2)
         
-        dist = sqrt(dot_product(distVec_12, distVec_12))
+        dist = norm2(distVec_12)
     
     end function dist
     
@@ -48,20 +48,37 @@ contains
         real(DP) :: x, y
         real(DP) :: normSqr, factor
         
-        do
+        real(DP), save :: gaussSet        
+        integer, save :: iset = 0
         
-            call random_number(x)
-            x = 2._DP*x - 1._DP
-            call random_number(y)
-            y = 2._DP*y - 1._DP
+        if (iset == 0) then
         
-            normSqr = x*x + y*y
-            if (normSqr <= 1._DP .and. normSqr /= 0._DP) exit
+            do
             
-        end do
+                call random_number(x)
+                x = 2._DP*x - 1._DP
+                call random_number(y)
+                y = 2._DP*y - 1._DP
+            
+                normSqr = x*x + y*y
+                
+                if (normSqr <= 1._DP .and. normSqr /= 0._DP) exit
+                
+            end do
+            
+            factor = sqrt(-2._DP * log(normSqr) / normSqr)
+            
+            gaussSet = sigma3d * factor * x
+            gauss = sigma3d * factor * y
+            
+            iset = 1
+            
+        else
         
-        factor = sqrt(-2._DP * log(normSqr) / normSqr)
-        gauss = sigma3d * factor * x
+            gauss = gaussSet
+            iset = 0
+            
+        end if
         
     end function gauss
     
@@ -75,8 +92,34 @@ contains
             random_surface(iDim) = gauss()          
         end do
         
-        random_surface(:) = random_surface(:) / sqrt(dot_product(random_surface, random_surface))
+        random_surface(:) = random_surface(:) / norm2(random_surface)
     
     end function random_surface
+    
+    subroutine markov_surface(mCol, dm)
+    
+        real(DP), dimension(Dim), intent(inout) :: mCol
+        real(DP), intent(in) :: dm
+        
+        real(DP), dimension(Dim) :: rotation
+        real(DP) :: rotation_dot_mCol
+        real(DP) :: amplitude, rand
+        integer :: iDim
+        
+        do iDim = 1, Dim        
+            rotation(iDim) = gauss()
+        end do
+        
+        rotation_dot_mCol = dot_product(rotation, mCol)
+        rotation(:) = rotation(:) - rotation_dot_mCol * mCol(:)
+        rotation(:) = rotation(:) / norm2(rotation)
+        
+        call random_number(rand)
+        amplitude = dm * (rand - 0.5_DP)
+        
+        mCol(:) = mCol(:) + amplitude * rotation(:)
+        mCol(:) = mCol(:) / norm2(mCol)
+    
+    end subroutine markov_surface
 
 end module mod_physics

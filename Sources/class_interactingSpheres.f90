@@ -2,13 +2,14 @@
 
 module class_interactingSpheres
 
-use iso_fortran_env
+use, intrinsic :: iso_fortran_env
 use data_constants
 use data_cell
 use data_particles
 use data_potentiel
 use data_mc
 use data_neighbours
+use data_distrib
 use mod_physics
 use class_neighbours
 use class_mixingPotential
@@ -55,9 +56,10 @@ private
     
 contains
 
-    subroutine InteractingSpheres_construct(this, shared_rCut)
+    subroutine InteractingSpheres_construct(this, shared_cell_Lsize, shared_rCut)
     
         class(InteractingSpheres), intent(out) :: this
+        real(DP), dimension(:), intent(in) :: shared_cell_Lsize
         real(DP), intent(in) :: shared_rCut
         
         this%name = "inter"
@@ -68,9 +70,12 @@ contains
         this%Ncol = inter_Ncol
         allocate(this%X(Dim, this%Ncol))
         
+        ! Snapshot
+        this%snap_factor = inter_snap_factor
+        
         ! Monte-Carlo
         this%dx = inter_dx
-        this%dx_save = this%dx
+        this%dxSave = this%dx
         this%rejFix = inter_rejFix
         this%Nadapt = inter_Nadapt
         this%Nwidom = inter_Nwidom
@@ -85,12 +90,12 @@ contains
         allocate(this%Epot_tab(this%iMin:this%iCut))
         call this%Epot_init()
         
-        ! Neighbours : same kind    
-        call this%same%construct(this%rCut)
+        ! Neighbours : same kind
+        call this%same%construct(inter_cell_Lsize, this%rCut)
         call this%same%alloc_cells()
         call this%same%ini_cell_neighs()
         ! Neighbours : other kind
-        call this%mix%construct(shared_rCut)
+        call this%mix%construct(shared_cell_Lsize, shared_rCut)
         call this%mix%alloc_cells()
         call this%mix%ini_cell_neighs()
     
@@ -249,16 +254,16 @@ contains
     
     !> Particle move
     
-    subroutine InteractingSpheres_move(this, other, mix, same_Epot, mix_Epot, Nrej)
+    subroutine InteractingSpheres_move(this, iOld, other, mix, same_Epot, mix_Epot, Nrej)
     
         class(InteractingSpheres), intent(inout) :: this
+        integer, intent(in) :: iOld
         class(Spheres), intent(inout) :: other
         class(MixingPotential), intent(in) :: mix        
         real(DP), intent(inout) :: same_Epot, mix_Epot
         integer, intent(inout) :: Nrej
         
         logical :: overlap
-        integer :: iOld
         real(DP) :: rand
         real(DP), dimension(Dim) :: xRand, xNew
         integer :: same_iCellOld, same_iCellNew
@@ -267,9 +272,6 @@ contains
         real(DP) :: same_dEpot, mix_dEpot
         real(DP) :: same_eNew, same_eOld
         real(DP) :: mix_eNew, mix_eOld
-        
-        call random_number(rand)
-        iOld = int(rand*real(this%Ncol, DP)) + 1
         
         call random_number(xRand)
         xNew(:) = this%X(:, iOld) + (xRand(:)-0.5_DP)*this%dx(:)

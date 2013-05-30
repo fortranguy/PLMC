@@ -8,6 +8,7 @@ use data_particles
 use data_potentiel
 use data_mc
 use data_neighbours
+use data_distrib
 use mod_physics
 use class_neighbours
 use class_mixingPotential
@@ -47,9 +48,10 @@ private
     
 contains
 
-    subroutine HardSpheres_construct(this, shared_rCut)
+    subroutine HardSpheres_construct(this, shared_cell_Lsize, shared_rCut)
     
         class(HardSpheres), intent(out) :: this
+        real(DP), dimension(:), intent(in) :: shared_cell_Lsize
         real(DP), intent(in) :: shared_rCut
         
         this%name = "hardS"
@@ -60,9 +62,12 @@ contains
         this%Ncol = hard_Ncol
         allocate(this%X(Dim, this%Ncol))
         
+        ! Snapshot
+        this%snap_factor = hard_snap_factor
+        
         ! Monte-Carlo
         this%dx = hard_dx
-        this%dx_save = this%dx
+        this%dxSave = this%dx
         this%rejFix = hard_rejFix
         this%Nadapt = hard_Nadapt
         this%Nwidom = hard_Nwidom
@@ -72,11 +77,11 @@ contains
         this%Epot = 0._DP
         
         ! Neighbours : same kind
-        call this%same%construct(this%rCut)
+        call this%same%construct(hard_cell_Lsize, this%rCut)
         call this%same%alloc_cells()
         call this%same%ini_cell_neighs()
         ! Neighbours : other kind
-        call this%mix%construct(shared_rCut)
+        call this%mix%construct(shared_cell_Lsize, shared_rCut)
         call this%mix%alloc_cells()
         call this%mix%ini_cell_neighs()
     
@@ -174,29 +179,29 @@ contains
     
     !> Particle move
     
-    subroutine HardSpheres_move(this, other, mix, same_Epot, mix_Epot, Nrej)
+    subroutine HardSpheres_move(this, iOld, other, mix, same_Epot, mix_Epot, Nrej)
     
         class(HardSpheres), intent(inout) :: this
+        integer, intent(in) :: iOld
         class(Spheres), intent(inout) :: other
         class(MixingPotential), intent(in) :: mix
         real(DP), intent(inout) :: same_Epot, mix_Epot
         integer, intent(inout) :: Nrej
         
+        real(DP), dimension(Dim) :: xRand
         logical :: overlap
-        integer :: iOld
-        real(DP) :: rand
-        real(DP), dimension(Dim) :: xRand, xNew
+        real(DP), dimension(Dim) :: xNew
         integer :: same_iCellOld, same_iCellNew
         integer :: mix_iCellOld, mix_iCellNew
         real(DP) :: mix_dEpot
         real(DP) :: mix_eNew, mix_eOld
+        real(DP) :: rand
         
-        call random_number(rand)
-        iOld = int(rand*real(this%Ncol, DP)) + 1
-        
+        ! Random new position
         call random_number(xRand)
         xNew(:) = this%X(:, iOld) + (xRand(:)-0.5_DP)*this%dx(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
+        
         same_iCellNew = this%same%position_to_cell(xNew)
         call this%Epot_neigh(iOld, xNew, same_iCellNew, overlap)
         
@@ -215,7 +220,7 @@ contains
                                     mix_eOld)
                 
                 mix_dEpot = mix_eNew - mix_eOld
-                    
+                
                 call random_number(rand)
                 if (rand < exp(-mix_dEpot/Tstar)) then
                 

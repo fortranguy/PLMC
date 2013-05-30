@@ -2,17 +2,20 @@
 
 module class_dipolarSpheres
 
-use iso_fortran_env
+use, intrinsic :: iso_fortran_env
+use, intrinsic :: iso_c_binding, only : C_int, C_double
 use data_constants
 use data_cell
 use data_particles
 use data_potentiel
 use data_mc
 use data_neighbours
+use data_distrib
 use mod_physics
 use class_neighbours
 use class_mixingPotential
 use class_spheres
+use mod_ewald_reci
 
 implicit none
 
@@ -25,6 +28,14 @@ private
         ! Particles
         
         real(DP), dimension(:, :), allocatable, public :: M !< moments of all particles
+        
+        ! Monte-Carlo
+        integer :: structure_iStep
+        real(DP) :: dm !< rotation
+        real(DP) :: dmSave
+        real(DP) :: dmMax
+        real(DP) :: rejRotFix
+        integer :: NadaptRot
 
         ! Potential
         real(DP)  :: dr !< discretisation step
@@ -32,6 +43,8 @@ private
         integer :: iCut !< maximum index of tabulation : until potential cut
         real(DP) :: alpha !< coefficient of Ewald summation
         real(DP), dimension(:, :), allocatable :: Epot_real_tab !< tabulation : real short-range
+        real(C_double), dimension(Dim) :: moduli_drifted
+        real(C_double), dimension(Dim) :: moduli_nfft
         
     contains
 
@@ -44,30 +57,48 @@ private
         
         !> Take a snap shot of the configuration : orientations
         procedure :: snapShot_M => DipolarSpheres_snapShot_M
+        procedure :: C_snapShot => DipolarSpheres_C_snapShot
+        
+        !> Adapt the displacement dx during thermalisation
+        procedure :: adaptDm => DipolarSpheres_adaptDm
+        procedure :: definiteDm => DipolarSpheres_definiteDm
+        procedure :: getDm => DipolarSpheres_getDm
+        procedure :: getNadaptRot => DipolarSpheres_getNadaptRot
+        
+        procedure :: getStructure_iStep => DipolarSpheres_getStructure_iStep
         
         !> Potential energy
+        !>     Real
         procedure :: Epot_real_init => DipolarSpheres_Epot_real_init
         procedure :: Epot_real_print => DipolarSpheres_Epot_real_print
         procedure :: Epot_real_interpol => DipolarSpheres_Epot_real_interpol
         procedure :: Epot_real_pair => DipolarSpheres_Epot_real_pair
         procedure :: Epot_real => DipolarSpheres_Epot_real
-        procedure :: Epot_self_delta => DipolarSpheres_Epot_self_delta
+        !>     Reciprocal
+        procedure :: Epot_reci_init => DipolarSpheres_Epot_reci_init
+        procedure :: Epot_reci => DipolarSpheres_Epot_reci
+        procedure :: Epot_reci_structure => DipolarSpheres_Epot_reci_structure
+        !>     Self
+        procedure :: Epot_self_solo => DipolarSpheres_Epot_self_solo
         procedure :: Epot_self => DipolarSpheres_Epot_self
+        !>     (Other)
         procedure :: Epot_neigh => DipolarSpheres_Epot_neigh
         procedure :: Epot_conf => DipolarSpheres_Epot_conf
         procedure :: consistTest => DipolarSpheres_consistTest
         
         !> Monte-Carlo
         procedure :: move => DipolarSpheres_move
+        procedure :: rotate => DipolarSpheres_rotate
         procedure :: widom => DipolarSpheres_widom
         
     end type DipolarSpheres
     
 contains
 
-    subroutine DipolarSpheres_construct(this, shared_rCut)
+    subroutine DipolarSpheres_construct(this, shared_cell_Lsize, shared_rCut)
     
         class(DipolarSpheres), intent(out) :: this
+        real(DP), dimension(:), intent(in) :: shared_cell_Lsize
         real(DP), intent(in) :: shared_rCut
         
         this%name = "dipol"
@@ -79,11 +110,22 @@ contains
         allocate(this%X(Dim, this%Ncol))
         allocate(this%M(Dim, this%Ncol))
         
+        ! Snapshot
+        this%snap_factor = dipol_snap_factor
+        
         ! Monte-Carlo
+        this%structure_iStep = dipol_structure_iStep
         this%dx = dipol_dx
-        this%dx_save = this%dx
+        this%dxSave = this%dx
         this%rejFix = dipol_rejFix
         this%Nadapt = dipol_Nadapt
+        
+        this%dm = dipol_dm
+        this%dmSave = this%dm
+        this%dmMax = dipol_dmMax
+        this%rejRotFix = dipol_rejRotFix
+        this%NadaptRot = dipol_NadaptRot
+        
         this%Nwidom = dipol_Nwidom
         
         ! Potential
@@ -94,13 +136,15 @@ contains
         this%alpha = dipol_alpha        
         allocate(this%Epot_real_tab(this%iMin:this%iCut, 2))
         call this%Epot_real_init()
+        call this%Epot_reci_init()
+        call C_Epot_reci_nfft_init(int(this%Ncol, C_int))
         
-        ! Neighbours : same kind    
-        call this%same%construct(this%rCut)
+        ! Neighbours : same kind
+        call this%same%construct(dipol_cell_Lsize, this%rCut)
         call this%same%alloc_cells()
         call this%same%ini_cell_neighs()
         ! Neighbours : other kind
-        call this%mix%construct(shared_rCut)
+        call this%mix%construct(shared_cell_Lsize, shared_rCut)
         call this%mix%alloc_cells()
         call this%mix%ini_cell_neighs()
     
@@ -121,6 +165,7 @@ contains
         if (allocated(this%Epot_real_tab)) then
             deallocate(this%Epot_real_tab)
         endif
+        call C_Epot_reci_nfft_finalize()
         
         call this%same%destroy()
         call this%mix%destroy()
@@ -139,6 +184,7 @@ contains
         write(report_unit ,*) "    Ncol = ", this%Ncol
         write(report_unit ,*) "    Nwidom = ", this%Nwidom
         write(report_unit ,*) "    Nadapt = ", this%Nadapt
+        write(report_unit, *) "    Structure_iStep = ", this%structure_iStep
 
         write(report_unit, *) "    alpha = ", this%alpha
         write(report_unit, *) "    rCut = ", this%rCut
@@ -153,18 +199,120 @@ contains
     
     !> Configuration state : orientations
       
-    subroutine DipolarSpheres_snapShot_M(this, snap_unit)
+    subroutine DipolarSpheres_snapShot_M(this, iStep, snap_unit)
         
         class(DipolarSpheres), intent(in) :: this
+        integer, intent(in) :: iStep
         integer, intent(in) :: snap_unit
     
         integer :: iCol
         
-        do iCol = 1, this%Ncol
-            write(snap_unit, *) this%M(:, iCol)
-        end do    
+        if (modulo(iStep, this%snap_factor) == 0) then
+        
+            do iCol = 1, this%Ncol
+                write(snap_unit, *) this%M(:, iCol)
+            end do
+            
+        end if
 
     end subroutine DipolarSpheres_snapShot_M
+    
+    subroutine DipolarSpheres_C_snapShot(this)
+        
+        class(DipolarSpheres), intent(in) :: this
+        
+        call C_snapShot(int(this%Ncol, C_int))
+
+    end subroutine DipolarSpheres_C_snapShot
+    
+    !> Adaptation of dm during the thermalisation
+    
+    subroutine DipolarSpheres_adaptDm(this, rej)
+    
+        class(DipolarSpheres), intent(inout) :: this
+        real(DP), intent(in) :: rej
+        
+        real(DP), parameter :: eps_dm = 0.05_DP
+        real(DP), parameter :: eps_rej = 0.1_DP * eps_dm
+        real(DP), parameter :: more = 1._DP+eps_dm
+        real(DP), parameter :: less = 1._DP-eps_dm
+
+        
+        if (rej < this%rejRotFix - eps_rej) then
+        
+            this%dm = this%dm * more
+  
+            if (this%dm > this%dmMax) then
+                this%dm = this%dmMax
+            end if
+            
+        else if (rej > this%rejRotFix + eps_rej) then
+        
+            this%dm = this%dm * less
+            
+        end if
+    
+    end subroutine DipolarSpheres_adaptDm
+    
+    subroutine DipolarSpheres_definiteDm(this, rej, report_unit)
+    
+        class(DipolarSpheres), intent(inout) :: this    
+        real(DP), intent(in) :: rej
+        integer, intent(in) :: report_unit
+        
+        if (rej == 0._DP) then
+            write(error_unit, *) this%name, " :    Warning : dm adaptation problem."
+            this%dm = this%dmSave
+            write(error_unit, *) "default dm :", this%dm
+        end if
+        
+        if (this%dm > this%dmMax) then
+            write(error_unit, *) this%name, " :   Warning : dm too big."
+            this%dm = this%dmMax
+            write(error_unit, *) "big dm :", this%dm
+        end if
+        
+        write(output_unit, *) this%name, " :    Thermalisation : over (rotation)"
+        
+        write(report_unit, *) "Rotation :"
+        write(report_unit, *) "    dm = ", this%dm
+        write(report_unit, *) "    rejection relative difference = ", &
+                                    abs(rej-this%rejRotFix)/this%rejRotFix
+    
+    end subroutine DipolarSpheres_definiteDm
+    
+    !> Accessor : dm
+    
+    function DipolarSpheres_getDm(this) result(getDm)
+        
+        class(DipolarSpheres), intent(in) :: this        
+        real(DP) :: getDm
+        
+        getDm = this%dm
+        
+    end function DipolarSpheres_getDm
+    
+    !> Accessor : Nadapt
+    
+    function DipolarSpheres_getNadaptRot(this) result(getNadaptRot)
+    
+        class(DipolarSpheres), intent(in) :: this        
+        integer :: getNadaptRot
+        
+        getNadaptRot = this%NadaptRot
+        
+    end function DipolarSpheres_getNadaptRot
+    
+    !> Accessor : structure_iStep
+    
+    function DipolarSpheres_getStructure_iStep(this) result (getStructure_iStep)
+    
+        class(DipolarSpheres), intent(in) :: this
+        integer :: getStructure_iStep
+    
+        getStructure_iStep = this%structure_iStep
+        
+    end function DipolarSpheres_getStructure_iStep
     
     !> Potential energy : real part
     !> Initialisation
@@ -290,7 +438,7 @@ contains
                 if (iCol /= jCol) then
                     
                     rVec_ij = distVec(this%X(:, iCol), this%X(:, jCol))
-                    r_ij = dot_product(rVec_ij, rVec_ij)
+                    r_ij = norm2(rVec_ij)
                     
                     Epot_real = Epot_real + &
                                 this%Epot_real_pair(this%M(:, iCol), this%M(:, jCol), rVec_ij, r_ij)
@@ -303,21 +451,65 @@ contains
     
     end function DipolarSpheres_Epot_real
     
-    !> Self energy difference : rotation
-    !> \f[ \frac{2}{3}\frac{\alpha^3}{\sqrt{\pi}} (2\vec{\Delta\mu}_i\cdot\vec{\mu}_i +
-    !>                                              \vec{\Delta\mu}_i\cdot\vec{\Delta\mu}_i)\f]
+    subroutine DipolarSpheres_Epot_reci_init(this)
+        
+        class(DipolarSpheres), intent(in) :: this
+        
+        call C_Epot_reci_init(real(Lsize, C_double), real(this%alpha, C_double))
+        
+    end subroutine DipolarSpheres_Epot_reci_init    
     
-    function DipolarSpheres_Epot_self_delta(this, iCol, deltaM) result(Epot_self_delta)
+    function DipolarSpheres_Epot_reci(this) result(Epot_reci)
+        
+        class(DipolarSpheres), intent(in) :: this
+        real(DP) :: Epot_reci
+        
+        real(C_double) :: C_Epot
+        real(C_double), dimension(:, :), allocatable :: C_X, C_M
+        integer :: iCol
+        
+        allocate(C_X(Dim, this%Ncol))
+        allocate(C_M(Dim, this%Ncol))
+        
+        do iCol = 1, this%Ncol
+            C_X(:, iCol) = real(this%X(:, iCol)/Lsize(:), C_double) - 0.5_c_double
+            C_M(:, iCol) = real(this%M(:, iCol)/Lsize(:), C_double)
+        end do
+        
+        C_Epot = C_Epot_reci(C_X, C_M, int(this%Ncol, C_int), real(Volume, C_double))
+        Epot_reci = real(C_Epot, DP)
+        
+        deallocate(C_X)
+        deallocate(C_M)
+        
+    end function DipolarSpheres_Epot_reci
+    
+    subroutine DipolarSpheres_Epot_reci_structure(this, iStep, moduli_unit)
+    
+        class(DipolarSpheres), intent(inout) :: this
+        integer, intent(in) :: iStep
+        integer, intent(in) :: moduli_unit
+        
+        call C_Epot_reci_structure_moduli(this%moduli_drifted)
+        call C_Epot_reci_structure()
+        call C_Epot_reci_structure_moduli(this%moduli_nfft)
+        
+        write(moduli_unit, *) iStep, abs(this%moduli_nfft(:)-this%moduli_drifted(:))
+    
+    end subroutine DipolarSpheres_Epot_reci_structure
+    
+    !> Self energy of 1 dipole
+    !> \f[ \frac{2}{3}\frac{\alpha^3}{\sqrt{\pi}} \vec{\mu}_i\cdot\vec{\mu}_i \f]
+    
+    function DipolarSpheres_Epot_self_solo(this, mCol) result(Epot_self_solo)
     
         class(DipolarSpheres), intent(in) :: this
-        integer, intent(in) :: iCol
-        real(DP), dimension(:) :: deltaM
-        real(DP) :: Epot_self_delta
+        real(DP), dimension(:), intent(in) :: mCol
+        real(DP) :: Epot_self_solo
         
-        Epot_self_delta = 2._DP*dot_product(deltaM, this%M(:, iCol)) + dot_product(deltaM, deltaM)
-        Epot_self_delta = Epot_self_delta * 2._DP/3._DP * this%alpha**3/sqrt(PI)
+        Epot_self_solo = 2._DP/3._DP * this%alpha**3/sqrt(PI) * dot_product(mCol, mCol)
     
-    end function DipolarSpheres_Epot_self_delta
+    end function DipolarSpheres_Epot_self_solo
     
     !> Total self energy
     !> \f[ \frac{2}{3}\frac{\alpha^3}{\sqrt{\pi}} \sum_i \vec{\mu}_i\cdot\vec{\mu}_i \f]
@@ -326,16 +518,13 @@ contains
     
         class(DipolarSpheres), intent(in) :: this
         real(DP) :: Epot_self
-        
-        real(DP) :: momentsSum
+
         integer :: iCol        
         
-        momentsSum = 0._DP
+        Epot_self = 0._DP
         do iCol = 1, this%Ncol
-            momentsSum = momentsSum + dot_product(this%M(:, iCol), this%M(:, iCol))
+            Epot_self = Epot_self + this%Epot_self_solo(this%M(:, iCol))
         end do
-        
-        Epot_self = 2._DP/3._DP * this%alpha**3/sqrt(PI) * momentsSum
         
     end function DipolarSpheres_Epot_self
     
@@ -372,7 +561,7 @@ contains
                 if (current%iCol /= iCol) then
                 
                     rVec_ij = distVec(xCol(:), this%X(:, current%iCol))
-                    r_ij = dot_product(rVec_ij, rVec_ij)
+                    r_ij = norm2(rVec_ij)
                     
                     if (r_ij < this%rMin) then
                         overlap = .true.
@@ -388,7 +577,7 @@ contains
                 
                 current => next
             
-            end do            
+            end do
             
         end do
     
@@ -396,29 +585,31 @@ contains
     
     !> Particle move
     
-    subroutine DipolarSpheres_move(this, other, mix, same_Epot, mix_Epot, Nrej)
+    subroutine DipolarSpheres_move(this, iOld, other, mix, same_Epot, mix_Epot, Nrej)
     
         class(DipolarSpheres), intent(inout) :: this
+        integer, intent(in) :: iOld
         class(Spheres), intent(inout) :: other
         class(MixingPotential), intent(in) :: mix
         real(DP), intent(inout) :: same_Epot, mix_Epot
         integer, intent(inout) :: Nrej
         
+        real(DP), dimension(Dim) :: xRand
         logical :: overlap
-        integer :: iOld
-        real(DP) :: rand
-        real(DP), dimension(Dim) :: xNew, xRand
+        real(DP), dimension(Dim) :: xNew
         integer :: same_iCellOld, same_iCellNew
         integer :: mix_iCellOld, mix_iCellNew
         real(DP) :: dEpot, same_dEpot, mix_dEpot
         real(DP) :: same_eNew, same_eOld
         real(DP) :: mix_eNew, mix_eOld
+        real(DP) :: rand
         
-        call random_number(rand)
-        iOld = int(rand*real(this%Ncol, DP)) + 1
+        real(C_double) :: C_Epot
+        real(C_double), dimension(Dim) :: C_xNew
         
+        ! Random new position
         call random_number(xRand)
-        xNew(:) = this%X(:, iOld) + (xRand(:)-0.5_DP)*this%dx(:)
+        xNew(:) = this%X(:, iOld) + this%dx(:) * (xRand(:)-0.5_DP)
         xNew(:) = modulo(xNew(:), Lsize(:))
         
         mix_iCellNew = this%mix%position_to_cell(xNew)
@@ -430,11 +621,16 @@ contains
             call this%Epot_neigh(iOld, xNew, this%M(:, iOld), same_iCellNew, overlap, same_eNew)
                         
             if (.not. overlap) then
-    
+                
+                ! Real
                 same_iCellOld = this%same%position_to_cell(this%X(:, iOld))
                 call this%Epot_neigh(iOld, this%X(:, iOld), this%M(:, iOld), same_iCellOld, &
                                      overlap, same_eOld)
-                same_dEpot = same_eNew - same_eOld
+                ! Reci
+                C_xNew(:) = real(xNew(:)/Lsize(:), C_double) - 0.5_c_double
+                C_Epot = C_Epot_reci_move(int(iOld-1, C_int), C_xNew, real(Volume, C_double))
+                
+                same_dEpot = (same_eNew - same_eOld) + real(C_Epot, DP)
                     
                 mix_iCellOld = this%mix%position_to_cell(this%X(:, iOld))
                 call mix%Epot_neigh(this%X(:, iOld), mix_iCellOld, this%mix, other%X, overlap, &
@@ -443,10 +639,12 @@ contains
                 
                 dEpot = same_dEpot + mix_dEpot
                 
-                call random_number(rand)
+                call random_number(rand)            
                 if (rand < exp(-dEpot/Tstar)) then
                 
                     this%X(:, iOld) = xNew(:)
+                    call C_Epot_reci_updateX(int(iOld-1, C_int), C_xNew)
+                    
                     same_Epot = same_Epot + same_dEpot
                     mix_Epot = mix_Epot + mix_dEpot
                     
@@ -465,14 +663,59 @@ contains
                 end if
          
             else
-                Nrej = Nrej + 1                
+                Nrej = Nrej + 1
             end if            
             
         else        
-            Nrej = Nrej + 1            
+            Nrej = Nrej + 1
         end if
     
     end subroutine DipolarSpheres_move
+    
+    subroutine DipolarSpheres_rotate(this, iOld, Epot, Nrej)
+    
+        class(DipolarSpheres), intent(inout) :: this
+        integer, intent(in) :: iOld
+        real(DP), intent(inout) :: Epot
+        integer, intent(inout) :: Nrej
+        
+        real(DP) :: rand
+        real(DP), dimension(Dim) :: mNew
+        real(DP) :: dEpot, real_dEpot, self_dEpot
+        real(DP) :: real_eNew, real_eOld
+        integer :: iCell
+        logical :: overlap
+        
+        real(C_double) :: C_Epot
+        real(C_double), dimension(Dim) :: C_mNew
+        
+        mNew(:) = this%M(:, iOld)
+        call markov_surface(mNew, this%dm)
+        
+        C_mNew(:) = real(mNew(:)/Lsize(:), C_double)
+        C_Epot = C_Epot_reci_rotate(int(iOld-1, C_int), C_mNew, real(Volume, C_double))
+        
+        iCell = this%same%position_to_cell(this%X(:, iOld))
+        call this%Epot_neigh(iOld, this%X(:, iOld), mNew, iCell, overlap, real_eNew)
+        call this%Epot_neigh(iOld, this%X(:, iOld), this%M(:, iOld), iCell, overlap, real_eOld)        
+        real_dEpot = real_eNew - real_eOld
+        
+        self_dEpot = this%Epot_self_solo(mNew) - this%Epot_self_solo(this%M(:, iOld))
+        
+        dEpot = real(C_Epot, DP) + real_dEpot - self_dEpot
+        call random_number(rand)
+        if (rand < exp(-dEpot/Tstar)) then
+        
+            this%M(:, iOld) = mNew(:)
+            call C_Epot_reci_updateM(int(iOld-1, C_int), C_mNew)
+            
+            Epot = Epot + dEpot
+            
+        else
+            Nrej = Nrej + 1
+        end if
+    
+    end subroutine DipolarSpheres_rotate
     
     !> Widom's method : with other type ?
 
@@ -491,6 +734,9 @@ contains
         logical :: overlap
         real(DP) :: enTest, same_enTest, mix_enTest
         
+        real(C_double) :: C_Epot
+        real(C_double), dimension(Dim) :: C_xTest, C_mTest
+        
         widTestSum = 0._DP
         
         do iWidom = 1, this%Nwidom
@@ -504,13 +750,19 @@ contains
             if (.not. overlap) then
             
                 mTest(:) = random_surface()
-                
+                               
                 same_iCellTest = this%same%position_to_cell(xTest)               
                 call this%Epot_neigh(0, xTest, mTest, same_iCellTest, overlap, same_enTest)
                 
                 if (.not. overlap) then
                 
-                    enTest = same_enTest + mix_enTest
+                    ! Reci
+                    C_xTest(:) = real(xTest(:)/Lsize(:), C_double) - 0.5_c_double                    
+                    C_mTest(:) = real(mTest(:)/Lsize(:), C_double)
+                    
+                    C_Epot = C_Epot_reci_test(C_xTest, C_mTest, real(Volume, C_double))
+                
+                    enTest = same_enTest + mix_enTest + real(C_Epot, DP) - this%Epot_self_solo(mTest)
                     widTestSum = widTestSum + exp(-enTest/Tstar)
                     
                 end if
@@ -530,7 +782,17 @@ contains
         class(DipolarSpheres), intent(in) :: this        
         real(DP) :: Epot_conf
         
-        Epot_conf = this%Epot_real() - this%Epot_self()
+        real(DP) :: Epot_real, Epot_reci, Epot_self
+        
+        Epot_real = this%Epot_real()
+        Epot_reci = this%Epot_reci()
+        Epot_self = this%Epot_self()
+        
+        Epot_conf = Epot_real + Epot_reci - Epot_self
+        
+        write(output_unit, *) "Epot_real", Epot_real
+        write(output_unit, *) "Epot_reci", Epot_reci
+        write(output_unit, *) "Epot_self", Epot_self
     
     end function DipolarSpheres_Epot_conf
     
