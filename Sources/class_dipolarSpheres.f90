@@ -489,12 +489,12 @@ contains
 
                     waveVector = real([kx, ky, kz], DP)
 
-                    if (norm2(waveVector) /= 0)then
+                    if (norm2(waveVector) /= 0) then
                     
                         kOverL = norm2(waveVector(:)/Lsize(:))
 
                         this%Epot_reci_tab(kx, ky, kz) = exp(-PI**2/this%alpha**2 * kOverL**2) / &
-                                                        kOverL**2
+                                                         kOverL**2
 
                         this%NwaveVectors = this%NwaveVectors + 1
 
