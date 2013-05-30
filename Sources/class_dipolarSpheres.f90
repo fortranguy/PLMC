@@ -43,7 +43,7 @@ private
         integer :: iCut !< maximum index of tabulation : until potential cut
         real(DP) :: alpha !< coefficient of Ewald summation
         real(DP), dimension(:, :), allocatable :: Epot_real_tab !< tabulation : real short-range
-        real(DP), dimension(2*kMax(1), 2*kMax(2), 2*kMax(3)) :: Epot_reci_tab
+        real(DP), dimension(2*kMax(1)+1, 2*kMax(2)+1, 2*kMax(3)+1) :: Epot_reci_tab
         integer :: NwaveVectors
         complex(DP), dimension(:, :), allocatable :: structure
         complex(DP), dimension(:, :), allocatable :: potential
