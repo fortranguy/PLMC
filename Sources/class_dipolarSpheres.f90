@@ -480,16 +480,12 @@ contains
         this%NwaveVectors = 0
 
         do kz = -Kmax(3), Kmax(3)
-        
-            waveVector(3) = real(kz, DP)        
 
             do ky = -Kmax(2), Kmax(2)
-            
-                waveVector(2) = real(ky, DP)
 
                 do kx = -Kmax(1), Kmax(1)
                 
-                    waveVector(1) = real(kx, DP)
+                    waveVector(:) = real([kx, ky, kz], DP)
 
                     if (norm2(waveVector) /= 0) then
                     
@@ -522,8 +518,7 @@ contains
         complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_Ikx_1
         complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_Ikx_2
         complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_Ikx_3
-        
-        real(DP) :: k_dot_xCol
+
         real(DP), dimension(Dim) :: xColOverL, mColOverL
         real(DP), dimension(Dim) :: waveVector
         integer :: kx, ky, kz
@@ -540,10 +535,9 @@ contains
         
             do kz = -Kmax(3), Kmax(3)
             do ky = -Kmax(2), Kmax(2)
-            do kx = -Kmax(1), Kmax(1)
+            do kx = -Kmax(1), Kmax(1)            
             
-            
-                exp_IkxCol = exp_Ikx_1(kx) * exp_Ikx_2(kx) * exp_Ikx_3(kz)
+                exp_IkxCol = exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz)
                           
                 this%structure(:, kx, ky, kz) = this%structure(:, kx, ky, kz) + &
                                                 mColOverL(:) * exp_IkxCol
@@ -569,6 +563,45 @@ contains
         write(moduli_unit, *) iStep, abs(this%moduli_nfft(:)-this%moduli_drifted(:))
     
     end subroutine DipolarSpheres_Epot_reci_structure_reInit
+    
+    subroutine DipolarSpheres_Epot_reci_potential_init(this)
+    
+        class(DipolarSpheres), intent(inout) :: this
+        
+        complex(DP) :: conjg_exp_IkxCol
+        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_Ikx_1
+        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_Ikx_2
+        complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_Ikx_3
+
+        real(DP), dimension(Dim) :: xColOverL
+        real(DP), dimension(Dim) :: waveVector
+        integer :: kx, ky, kz
+        integer :: iCol
+        
+        do iCol = 1, this%Ncol
+        
+            xColOverL(:) = this%X(:, iCol)/Lsize(:) - 0.5_DP ! nécessaire ?
+            
+            call fourier(xColOverL, exp_Ikx_1, exp_Ikx_2, exp_Ikx_3)
+        
+            do kz = -Kmax(3), Kmax(3)
+            do ky = -Kmax(2), Kmax(2)
+            do kx = -Kmax(1), Kmax(1)
+            
+                waveVector(:) = real([kx, ky, kz], DP)
+            
+                conjg_exp_IkxCol = conjg(exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz))
+                
+                this%potential(:, iCol) = waveVector(:) * this%this%Epot_reci_tab[kx][ky][kz] *
+                                          dot_product(waveVector) * conjg_exp_IkxCol
+                
+            end do
+            end do
+            end do
+            
+        end do
+    
+    end subroutine DipolarSpheres_Epot_reci_potential_init
     
     !> Total reciprocal energy
     
