@@ -45,7 +45,7 @@ private
         real(DP), dimension(:, :), allocatable :: Epot_real_tab !< tabulation : real short-range
         real(DP), dimension(-Kmax(1):Kmax(1), -Kmax(2):Kmax(2), -Kmax(3):Kmax(3)) :: Epot_reci_tab
         integer :: NwaveVectors
-        complex(DP), dimension(:, :), allocatable :: structure
+        complex(DP), dimension(Dim, -Kmax(1):Kmax(1), -Kmax(2):Kmax(2), -Kmax(3):Kmax(3)) :: structure
         complex(DP), dimension(:, :), allocatable :: potential
         real(C_double), dimension(Dim) :: moduli_drifted
         real(C_double), dimension(Dim) :: moduli_nfft
@@ -141,7 +141,6 @@ contains
         allocate(this%Epot_real_tab(this%iMin:this%iCut, 2))
         call this%Epot_real_init()
 
-        allocate(this%structure(Dim, NwaveVectors))
         allocate(this%potential(Dim, this%Ncol))
         call this%Epot_reci_init()
         call C_Epot_reci_nfft_init(int(this%Ncol, C_int))
@@ -173,9 +172,6 @@ contains
             deallocate(this%Epot_real_tab)
         endif
 
-        if (allocated(this%structure))then
-            deallocate(this%structure)
-        end if
         if (allocated(this%potential))then
             deallocate(this%potential)
         end if
@@ -517,9 +513,9 @@ contains
         class(DipolarSpheres), intent(inout) :: this
 
         complex(DP) :: exp_IkxCol
-        complex(DP), dimension(-Kmax(1), Kmax(1)) :: exp_Ikx_1
-        complex(DP), dimension(-Kmax(2), Kmax(2)) :: exp_Ikx_2
-        complex(DP), dimension(-Kmax(3), Kmax(3)) :: exp_Ikx_3
+        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_Ikx_1
+        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_Ikx_2
+        complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_Ikx_3
         
         real(DP) :: k_dot_xCol
         real(DP), dimension(Dim) :: xColOverL, mColOverL
@@ -527,7 +523,7 @@ contains
         integer :: kx, ky, kz
         integer :: iCol
 
-        this%structure(:, :) = (0._DP, 0._DP)
+        this%structure(:, :, :, :) = (0._DP, 0._DP)
 
         do iCol = 1, this%Ncol
         

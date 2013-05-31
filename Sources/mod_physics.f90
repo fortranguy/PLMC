@@ -127,9 +127,9 @@ contains
     subroutine fourier(xColOverL, exp_Ikx_1, exp_Ikx_2, exp_Ikx_3)
     
         real(DP), dimension(:), intent(in) :: xColOverL
-        complex(DP), dimension(:), intent(out) :: exp_Ikx_1
-        complex(DP), dimension(:), intent(out) :: exp_Ikx_2
-        complex(DP), dimension(:), intent(out) :: exp_Ikx_3
+        complex(DP), dimension(:), intent(inout) :: exp_Ikx_1
+        complex(DP), dimension(:), intent(inout) :: exp_Ikx_2
+        complex(DP), dimension(:), intent(inout) :: exp_Ikx_3
         
         real(DP) :: arg
         integer :: kx, ky, kz
@@ -157,8 +157,8 @@ contains
         
         do ky = 2, Kmax(2)
         
-            exp_Iky_1(ky) = exp_Iky_1(ky-1) * exp_Iky_1(1)
-            exp_Iky_1(-ky) = conjg(exp_Iky_1(ky))
+            exp_Ikx_1(ky) = exp_Ikx_1(ky-1) * exp_Ikx_1(1)
+            exp_Ikx_1(-ky) = conjg(exp_Ikx_1(ky))
         
         end do
         
@@ -171,8 +171,8 @@ contains
         
         do kz = 2, Kmax(3)
         
-            exp_Ikz_1(kz) = exp_Ikz_1(kz-1) * exp_Ikz_1(1)
-            exp_Ikz_1(-kz) = conjg(exp_Ikz_1(kz))
+            exp_Ikx_1(kz) = exp_Ikx_1(kz-1) * exp_Ikx_1(1)
+            exp_Ikx_1(-kz) = conjg(exp_Ikx_1(kz))
         
         end do        
     
