@@ -138,7 +138,7 @@ contains
         
         exp_Ikx_1(0) = (1._DP, 0._DP)
         arg = 2._DP*PI * 1._DP*xColOverL(1)
-        exp_Ikx_1(1) = cmplx(cos(arg), sin(arg))
+        exp_Ikx_1(1) = cmplx(cos(arg), sin(arg), DP)
         exp_Ikx_1(-1) =  conjg(exp_Ikx_1(1))
         
         do kx = 2, Kmax(1)
@@ -152,7 +152,7 @@ contains
         
         exp_Ikx_2(0) = (1._DP, 0._DP)
         arg = 2._DP*PI * 1._DP*xColOverL(2)
-        exp_Ikx_2(1) = cmplx(cos(arg), sin(arg))
+        exp_Ikx_2(1) = cmplx(cos(arg), sin(arg), DP)
         exp_Ikx_2(-1) =  conjg(exp_Ikx_2(1))
         
         do ky = 2, Kmax(2)
@@ -166,7 +166,7 @@ contains
         
         exp_Ikx_3(0) = (1._DP, 0._DP)
         arg = 2._DP*PI * 1._DP*xColOverL(3)
-        exp_Ikx_3(1) = cmplx(cos(arg), sin(arg))
+        exp_Ikx_3(1) = cmplx(cos(arg), sin(arg), DP)
         exp_Ikx_3(-1) =  conjg(exp_Ikx_3(1))
         
         do kz = 2, Kmax(3)
