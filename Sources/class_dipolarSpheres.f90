@@ -82,6 +82,7 @@ private
         procedure :: Epot_reci_weight_init => DipolarSpheres_Epot_reci_weight_init
         procedure :: Epot_reci_structure_init => DipolarSpheres_Epot_reci_structure_init
         procedure :: Epot_reci_structure_reInit => DipolarSpheres_Epot_reci_structure_reInit
+        procedure :: Epot_reci_potential_init => DipolarSpheres_Epot_reci_potential_init
         procedure :: Epot_reci => DipolarSpheres_Epot_reci
         !>     Self
         procedure :: Epot_self_solo => DipolarSpheres_Epot_self_solo
@@ -480,32 +481,32 @@ contains
         this%NwaveVectors = 0
 
         do kz = -Kmax(3), Kmax(3)
+            waveVector(3) = real(kz, DP)
+        
+        do ky = -Kmax(2), Kmax(2)
+            waveVector(2) = real(ky, DP)
+        
+        do kx = -Kmax(1), Kmax(1)
+            waveVector(1) = real(kx, DP)
 
-            do ky = -Kmax(2), Kmax(2)
-
-                do kx = -Kmax(1), Kmax(1)
-                
-                    waveVector(:) = real([kx, ky, kz], DP)
-
-                    if (norm2(waveVector) /= 0) then
-                    
-                        kOverL = norm2(waveVector(:)/Lsize(:))
-
-                        this%Epot_reci_tab(kx, ky, kz) = exp(-PI**2/this%alpha**2 * kOverL**2) / &
-                                                         kOverL**2
-
-                        this%NwaveVectors = this%NwaveVectors + 1
-
-                    else
-
-                        this%Epot_reci_tab(kx, ky, kz) = 0._DP
-
-                    end if
-
-                end do
-                
-            end do
+            if (norm2(waveVector) /= 0) then
             
+                kOverL = norm2(waveVector(:)/Lsize(:))
+
+                this%Epot_reci_tab(kx, ky, kz) = exp(-PI**2/this%alpha**2 * kOverL**2) / kOverL**2
+
+                this%NwaveVectors = this%NwaveVectors + 1
+
+            else
+
+                this%Epot_reci_tab(kx, ky, kz) = 0._DP
+
+            end if
+
+        end do
+            
+        end do
+        
         end do
         
     end subroutine DipolarSpheres_Epot_reci_weight_init
@@ -578,22 +579,31 @@ contains
         integer :: kx, ky, kz
         integer :: iCol
         
+        this%potential(:, :) = (0._DP, 0._DP)
+        
         do iCol = 1, this%Ncol
         
             xColOverL(:) = this%X(:, iCol)/Lsize(:) - 0.5_DP ! nécessaire ?
             
             call fourier(xColOverL, exp_Ikx_1, exp_Ikx_2, exp_Ikx_3)
         
-            do kz = -Kmax(3), Kmax(3)
-            do ky = -Kmax(2), Kmax(2)
-            do kx = -Kmax(1), Kmax(1)
+            do kz = -Kmax(3), Kmax(3)          
+              
+                waveVector(3) = real(kz, DP)
             
-                waveVector(:) = real([kx, ky, kz], DP)
+            do ky = -Kmax(2), Kmax(2)      
+                  
+                waveVector(2) = real(ky, DP)
+            
+            do kx = -Kmax(1), Kmax(1)      
+                  
+                waveVector(1) = real(kx, DP)
             
                 conjg_exp_IkxCol = conjg(exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz))
                 
-                this%potential(:, iCol) = waveVector(:) * this%this%Epot_reci_tab[kx][ky][kz] *
-                                          dot_product(waveVector) * conjg_exp_IkxCol
+                this%potential(:, iCol) = this%potential(:, iCol) + 
+                                          waveVector(:) * this%this%Epot_reci_tab[kx][ky][kz] *
+                                          dot_product(waveVector, this%structure) * conjg_exp_IkxCol
                 
             end do
             end do
