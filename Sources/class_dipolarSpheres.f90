@@ -556,6 +556,20 @@ contains
 
     end subroutine DipolarSpheres_Epot_reci_structure_init
     
+    subroutine DipolarSpheres_Epot_reci_structure_reInit(this, iStep, moduli_unit)
+    
+        class(DipolarSpheres), intent(inout) :: this
+        integer, intent(in) :: iStep
+        integer, intent(in) :: moduli_unit
+        
+        call C_Epot_reci_structure_moduli(this%moduli_drifted)
+        call C_Epot_reci_structure()
+        call C_Epot_reci_structure_moduli(this%moduli_nfft)
+        
+        write(moduli_unit, *) iStep, abs(this%moduli_nfft(:)-this%moduli_drifted(:))
+    
+    end subroutine DipolarSpheres_Epot_reci_structure_reInit
+    
     function DipolarSpheres_Epot_reci(this) result(Epot_reci)
         
         class(DipolarSpheres), intent(in) :: this
@@ -580,20 +594,6 @@ contains
         deallocate(C_M)
         
     end function DipolarSpheres_Epot_reci
-    
-    subroutine DipolarSpheres_Epot_reci_structure_reInit(this, iStep, moduli_unit)
-    
-        class(DipolarSpheres), intent(inout) :: this
-        integer, intent(in) :: iStep
-        integer, intent(in) :: moduli_unit
-        
-        call C_Epot_reci_structure_moduli(this%moduli_drifted)
-        call C_Epot_reci_structure()
-        call C_Epot_reci_structure_moduli(this%moduli_nfft)
-        
-        write(moduli_unit, *) iStep, abs(this%moduli_nfft(:)-this%moduli_drifted(:))
-    
-    end subroutine DipolarSpheres_Epot_reci_structure_reInit
     
     ! Self -----------------------------------------------------------------------------------------
     
