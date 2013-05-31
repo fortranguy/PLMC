@@ -531,9 +531,9 @@ contains
         class(DipolarSpheres), intent(inout) :: this
 
         complex(DP) :: exp_Ikx_i
-        complex(DP), dimension(:) :: exp_Ikx_1
-        complex(DP), dimension(:) :: exp_Ikx_2
-        complex(DP), dimension(:) :: exp_Ikx_3
+        complex(DP), dimension(-kMax(1), kMax(1)) :: exp_Ikx_1
+        complex(DP), dimension(-kMax(2), kMax(2)) :: exp_Ikx_2
+        complex(DP), dimension(-kMax(3), kMax(3)) :: exp_Ikx_3
         
         real(DP) :: k_dot_xCol
         real(DP), dimension(Dim) :: xColOverL
