@@ -43,7 +43,7 @@ private
         integer :: iCut !< maximum index of tabulation : until potential cut
         real(DP) :: alpha !< coefficient of Ewald summation
         real(DP), dimension(:, :), allocatable :: Epot_real_tab !< tabulation : real short-range
-        real(DP), dimension(-kMax(1):kMax(1), -kMax(2):kMax(2), -kMax(3):kMax(3)) :: Epot_reci_tab
+        real(DP), dimension(-Kmax(1):Kmax(1), -Kmax(2):Kmax(2), -Kmax(3):Kmax(3)) :: Epot_reci_tab
         integer :: NwaveVectors
         complex(DP), dimension(:, :), allocatable :: structure
         complex(DP), dimension(:, :), allocatable :: potential
@@ -481,11 +481,11 @@ contains
 
         this%NwaveVectors = 0
 
-        do kz = -kMax(3), kMax(3)
+        do kz = -Kmax(3), Kmax(3)
 
-            do ky = -kMax(2), kMax(2)
+            do ky = -Kmax(2), Kmax(2)
 
-                do kx = -kMax(1), kMax(1)
+                do kx = -Kmax(1), Kmax(1)
                 
                     waveVector = real([kx, ky, kz], DP)
 
@@ -512,28 +512,14 @@ contains
         
     end subroutine DipolarSpheres_Epot_reci_init
 
-    subroutine DipolarSpheres_Epot_reci_fourier(this, xCol, exp_Ikx_1, exp_Ikx_2, exp_Ikx_3)
-
-        class(DipolarSpheres), intent(in) :: this
-        real(DP), dimension(:) :: xCol
-        complex(DP), dimension(:) :: exp_Ikx_1
-        complex(DP), dimension(:) :: exp_Ikx_2
-        complex(DP), dimension(:) :: exp_Ikx_3
-
-        exp_Ikx_1(0) = (1._DP, 0._DP)
-        !exp_Ikx_1(1) = (cos(2._DP*PI*))
-        !exp_Ikx_1(-1)=
-        
-    end subroutine DipolarSpheres_Epot_reci_fourier
-
     subroutine DipolarSpheres_Epot_reci_structure_init(this)
 
         class(DipolarSpheres), intent(inout) :: this
 
-        complex(DP) :: exp_IkxColOverL
-        complex(DP), dimension(-kMax(1), kMax(1)) :: exp_Ikx_1
-        complex(DP), dimension(-kMax(2), kMax(2)) :: exp_Ikx_2
-        complex(DP), dimension(-kMax(3), kMax(3)) :: exp_Ikx_3
+        complex(DP) :: exp_IkxCol
+        complex(DP), dimension(-Kmax(1), Kmax(1)) :: exp_Ikx_1
+        complex(DP), dimension(-Kmax(2), Kmax(2)) :: exp_Ikx_2
+        complex(DP), dimension(-Kmax(3), Kmax(3)) :: exp_Ikx_3
         
         real(DP) :: k_dot_xCol
         real(DP), dimension(Dim) :: xColOverL, mColOverL
@@ -548,17 +534,17 @@ contains
             xColOverL(:) = this%X(:, iCol)/Lsize(:) - 0.5_DP ! nécessaire ?
             mColOverL(:) = this%M(:, iCol)/Lsize(:)
             
-            call this%Epot_reci_fourier(xColOverL, exp_Ikx_1, exp_Ikx_2, exp_Ikx_3)
+            call fourier(xColOverL, exp_Ikx_1, exp_Ikx_2, exp_Ikx_3)
         
-            do kz = -kMax(3), kMax(3)
-            do ky = -kMax(2), kMax(2)
-            do kx = -kMax(1), kMax(1)
+            do kz = -Kmax(3), Kmax(3)
+            do ky = -Kmax(2), Kmax(2)
+            do kx = -Kmax(1), Kmax(1)
             
             
-                exp_IkxColOverL = exp_Ikx_1(kx) * exp_Ikx_2(kx) * exp_Ikx_3(kz)
+                exp_IkxCol = exp_Ikx_1(kx) * exp_Ikx_2(kx) * exp_Ikx_3(kz)
                           
                 this%structure(:, kx, ky, kz) = this%structure(:, kx, ky, kz) + &
-                                                mColOverL(:) * exp_IkxColOverL
+                                                mColOverL(:) * exp_IkxCol
             
             end do
             end do

@@ -121,5 +121,61 @@ contains
         mCol(:) = mCol(:) / norm2(mCol)
     
     end subroutine markov_surface
+    
+    !> Fourier coefficients (bases)
+    
+    subroutine fourier(xColOverL, exp_Ikx_1, exp_Ikx_2, exp_Ikx_3)
+    
+        real(DP), dimension(:), intent(in) :: xColOverL
+        complex(DP), dimension(:), intent(out) :: exp_Ikx_1
+        complex(DP), dimension(:), intent(out) :: exp_Ikx_2
+        complex(DP), dimension(:), intent(out) :: exp_Ikx_3
+        
+        real(DP) :: arg
+        integer :: kx, ky, kz
+
+        ! x
+        
+        exp_Ikx_1(0) = (1._DP, 0._DP)
+        arg = 2._DP*PI * 1._DP*xColOverL(1)
+        exp_Ikx_1(1) = cmplx(cos(arg), sin(arg))
+        exp_Ikx_1(-1) =  conjg(exp_Ikx_1(1))
+        
+        do kx = 2, Kmax(1)
+        
+            exp_Ikx_1(kx) = exp_Ikx_1(kx-1) * exp_Ikx_1(1)
+            exp_Ikx_1(-kx) = conjg(exp_Ikx_1(kx))
+        
+        end do
+        
+        !y
+        
+        exp_Ikx_2(0) = (1._DP, 0._DP)
+        arg = 2._DP*PI * 1._DP*xColOverL(2)
+        exp_Ikx_2(1) = cmplx(cos(arg), sin(arg))
+        exp_Ikx_2(-1) =  conjg(exp_Ikx_2(1))
+        
+        do ky = 2, Kmax(2)
+        
+            exp_Iky_1(ky) = exp_Iky_1(ky-1) * exp_Iky_1(1)
+            exp_Iky_1(-ky) = conjg(exp_Iky_1(ky))
+        
+        end do
+        
+        !z
+        
+        exp_Ikx_3(0) = (1._DP, 0._DP)
+        arg = 2._DP*PI * 1._DP*xColOverL(3)
+        exp_Ikx_3(1) = cmplx(cos(arg), sin(arg))
+        exp_Ikx_3(-1) =  conjg(exp_Ikx_3(1))
+        
+        do kz = 2, Kmax(3)
+        
+            exp_Ikz_1(kz) = exp_Ikz_1(kz-1) * exp_Ikz_1(1)
+            exp_Ikz_1(-kz) = conjg(exp_Ikz_1(kz))
+        
+        end do        
+    
+    end subroutine fourier
 
 end module mod_physics
