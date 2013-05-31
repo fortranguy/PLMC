@@ -570,6 +570,8 @@ contains
     
     end subroutine DipolarSpheres_Epot_reci_structure_reInit
     
+    !> Total reciprocal energy
+    
     function DipolarSpheres_Epot_reci(this) result(Epot_reci)
         
         class(DipolarSpheres), intent(in) :: this
@@ -626,6 +628,8 @@ contains
         end do
         
     end function DipolarSpheres_Epot_self
+    
+    ! ----------------------------------------------------------------------------------------------
     
     !> Real potential energy : short-range
     
