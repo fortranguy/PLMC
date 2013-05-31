@@ -531,6 +531,10 @@ contains
         class(DipolarSpheres), intent(inout) :: this
 
         complex(DP) :: exp_Ikx_i
+        complex(DP), dimension(:) :: exp_Ikx_1
+        complex(DP), dimension(:) :: exp_Ikx_2
+        complex(DP), dimension(:) :: exp_Ikx_3
+        
         real(DP) :: k_dot_xCol
         real(DP), dimension(Dim) :: xColOverL
         real(DP), dimension(Dim) :: waveVector
@@ -543,11 +547,22 @@ contains
 
         do iCol = 1, this%Ncol
         
-            xColOverL(:) = this%X(:, iCol)/Lsize(:)            
-            k_dot_xCol = dot_product(waveVector, xColOverL)
+            xColOverL(:) = this%X(:, iCol)/Lsize(:)
             
-            exp_Ikx_i = (cos(2._DP*xCol), sin(2._DP*xCol))
-            this%structure(:, ik) = this%structure(:, ik) + this%M(:, iCol)/Lsize(:) * exp_Ikx_i
+            this%Epot_reci_fourier(xColOverL, exp_Ikx_1, exp_Ikx_2, exp_Ikx_3)
+        
+            do kx = -kMax(1), kMax(1)
+            do ky = -kMax(2), kMax(2)
+            do kz = -kMax(3), kMax(3)        
+                          
+                k_dot_xCol = dot_product(waveVector, xColOverL)
+                
+                exp_Ikx_i = (cos(2._DP*xCol), sin(2._DP*xCol))
+                this%structure(:, ik) = this%structure(:, ik) + this%M(:, iCol)/Lsize(:) * exp_Ikx_i
+            
+            end do
+            end do
+            end do
             
         end do
 
