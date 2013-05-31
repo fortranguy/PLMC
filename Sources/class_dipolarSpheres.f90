@@ -573,7 +573,8 @@ contains
         complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_Ikx_1
         complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_Ikx_2
         complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_Ikx_3
-
+        complex(DP) :: k_dot_structure
+        
         real(DP), dimension(Dim) :: xColOverL
         real(DP), dimension(Dim) :: waveVector
         integer :: kx, ky, kz
@@ -601,9 +602,11 @@ contains
             
                 conjg_exp_IkxCol = conjg(exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz))
                 
-                this%potential(:, iCol) = this%potential(:, iCol) + 
-                                          waveVector(:) * this%this%Epot_reci_tab[kx][ky][kz] *
-                                          dot_product(waveVector, this%structure) * conjg_exp_IkxCol
+                k_dot_structure = dot_product(cmplx(waveVector, DP), this%structure(:, kx, ky,kz))
+                
+                this%potential(:, iCol) = this%potential(:, iCol) + &
+                                          waveVector(:) * this%Epot_reci_tab(kx, ky, kz) * &
+                                          k_dot_structure * conjg_exp_IkxCol
                 
             end do
             end do
