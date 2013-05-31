@@ -520,6 +520,10 @@ contains
         complex(DP), dimension(:) :: exp_Ikx_2
         complex(DP), dimension(:) :: exp_Ikx_3
 
+        exp_Ikx_1(0) = (1._DP, 0._DP)
+        !exp_Ikx_1(1) = (cos(2._DP*PI*))
+        !exp_Ikx_1(-1)=
+        
     end subroutine DipolarSpheres_Epot_reci_fourier
 
     subroutine DipolarSpheres_Epot_reci_structure_init(this)
