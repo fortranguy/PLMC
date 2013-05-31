@@ -512,10 +512,10 @@ contains
         
     end subroutine DipolarSpheres_Epot_reci_init
 
-    subroutine DipolarSpheres_Epot_reci_fourier(this, xNew, exp_Ikx_1, exp_Ikx_2, exp_Ikx_3)
+    subroutine DipolarSpheres_Epot_reci_fourier(this, xCol, exp_Ikx_1, exp_Ikx_2, exp_Ikx_3)
 
         class(DipolarSpheres), intent(in) :: this
-        real(DP), dimension(:) :: xNew
+        real(DP), dimension(:) :: xCol
         complex(DP), dimension(:) :: exp_Ikx_1
         complex(DP), dimension(:) :: exp_Ikx_2
         complex(DP), dimension(:) :: exp_Ikx_3
@@ -531,19 +531,22 @@ contains
         class(DipolarSpheres), intent(inout) :: this
 
         complex(DP) :: exp_Ikx_i
-        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_Ikx_1
-        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_Ikx_2
-        complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_Ikx_3
-        integer :: ik
+        real(DP) :: k_dot_xCol
+        real(DP), dimension(Dim) :: xColOverL
+        real(DP), dimension(Dim) :: waveVector
         integer :: kx, ky, kz
-
         integer :: iCol
 
         this%structure(:, :) = (0._DP, 0._DP)
+        
+        waveVector = real([kx, ky, kz], DP)
 
         do iCol = 1, this%Ncol
         
-            exp_Ikx_i = exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz)
+            xColOverL(:) = this%X(:, iCol)/Lsize(:)            
+            k_dot_xCol = dot_product(waveVector, xColOverL)
+            
+            exp_Ikx_i = (cos(2._DP*xCol), sin(2._DP*xCol))
             this%structure(:, ik) = this%structure(:, ik) + this%M(:, iCol)/Lsize(:) * exp_Ikx_i
             
         end do
