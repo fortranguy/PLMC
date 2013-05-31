@@ -79,7 +79,7 @@ private
         procedure :: Epot_real_pair => DipolarSpheres_Epot_real_pair
         procedure :: Epot_real => DipolarSpheres_Epot_real
         !>     Reciprocal
-        procedure :: Epot_reci_init => DipolarSpheres_Epot_reci_init
+        procedure :: Epot_reci_weight_init => DipolarSpheres_Epot_reci_weight_init
         procedure :: Epot_reci_structure_init => DipolarSpheres_Epot_reci_structure_init
         procedure :: Epot_reci_structure_reInit => DipolarSpheres_Epot_reci_structure_reInit
         procedure :: Epot_reci => DipolarSpheres_Epot_reci
@@ -143,7 +143,7 @@ contains
         call this%Epot_real_init()
 
         allocate(this%potential(Dim, this%Ncol))
-        call this%Epot_reci_init()
+        call this%Epot_reci_weight_init()
         call C_Epot_reci_nfft_init(int(this%Ncol, C_int))
         
         ! Neighbours : same kind
@@ -469,7 +469,7 @@ contains
     !> \f[ f(\alpha, \vec{k}) = \frac{e^{-\frac{\pi^2}
     !>      {\alpha^2} \sum_d \frac{k_d^2}{L_d}}}{\sum_d \frac{k_d^2}{L_d}} \f]
     
-    subroutine DipolarSpheres_Epot_reci_init(this)
+    subroutine DipolarSpheres_Epot_reci_weight_init(this)
         
         class(DipolarSpheres), intent(inout) :: this
         
@@ -512,7 +512,7 @@ contains
             
         end do
         
-    end subroutine DipolarSpheres_Epot_reci_init
+    end subroutine DipolarSpheres_Epot_reci_weight_init
 
     subroutine DipolarSpheres_Epot_reci_structure_init(this)
 
