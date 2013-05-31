@@ -481,12 +481,12 @@ contains
 
         this%NwaveVectors = 0
 
-        do kx = -kMax(1), kMax(1)
-        
-            do ky = -kMax(2), kMax(2)
-            
-                do kz = -kMax(3), kMax(3)
+        do kz = -kMax(3), kMax(3)
 
+            do ky = -kMax(2), kMax(2)
+
+                do kx = -kMax(1), kMax(1)
+                
                     waveVector = real([kx, ky, kz], DP)
 
                     if (norm2(waveVector) /= 0) then
