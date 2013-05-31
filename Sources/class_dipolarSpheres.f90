@@ -43,7 +43,7 @@ private
         integer :: iCut !< maximum index of tabulation : until potential cut
         real(DP) :: alpha !< coefficient of Ewald summation
         real(DP), dimension(:, :), allocatable :: Epot_real_tab !< tabulation : real short-range
-        real(DP), dimension(-Kmax(1):Kmax(1), -Kmax(2):Kmax(2), -Kmax(3):Kmax(3)) :: Epot_reci_tab
+        real(DP), dimension(-Kmax(1):Kmax(1), -Kmax(2):Kmax(2), -Kmax(3):Kmax(3)) :: Epot_reci_weight
         integer :: NwaveVectors
         complex(DP), dimension(Dim, -Kmax(1):Kmax(1), -Kmax(2):Kmax(2), -Kmax(3):Kmax(3)) :: structure
         complex(DP), dimension(:, :), allocatable :: potential
@@ -493,13 +493,13 @@ contains
             
                 kOverL = norm2(waveVector(:)/Lsize(:))
 
-                this%Epot_reci_tab(kx, ky, kz) = exp(-PI**2/this%alpha**2 * kOverL**2) / kOverL**2
+                this%Epot_reci_weight(kx, ky, kz) = exp(-PI**2/this%alpha**2 * kOverL**2) / kOverL**2
 
                 this%NwaveVectors = this%NwaveVectors + 1
 
             else
 
-                this%Epot_reci_tab(kx, ky, kz) = 0._DP
+                this%Epot_reci_weight(kx, ky, kz) = 0._DP
 
             end if
 
@@ -606,7 +606,7 @@ contains
                                               this%structure(:, kx, ky,kz))
                 
                 this%potential(:, iCol) = this%potential(:, iCol) + &
-                                          waveVector(:) * this%Epot_reci_tab(kx, ky, kz) * &
+                                          waveVector(:) * this%Epot_reci_weight(kx, ky, kz) * &
                                           k_dot_structure * conjg_exp_IkxCol
                 
             end do
