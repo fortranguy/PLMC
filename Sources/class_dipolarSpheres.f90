@@ -530,35 +530,35 @@ contains
 
         class(DipolarSpheres), intent(inout) :: this
 
-        complex(DP) :: exp_Ikx_i
+        complex(DP) :: exp_IkxColOverL
         complex(DP), dimension(-kMax(1), kMax(1)) :: exp_Ikx_1
         complex(DP), dimension(-kMax(2), kMax(2)) :: exp_Ikx_2
         complex(DP), dimension(-kMax(3), kMax(3)) :: exp_Ikx_3
         
         real(DP) :: k_dot_xCol
-        real(DP), dimension(Dim) :: xColOverL
+        real(DP), dimension(Dim) :: xColOverL, mColOverL
         real(DP), dimension(Dim) :: waveVector
         integer :: kx, ky, kz
         integer :: iCol
 
         this%structure(:, :) = (0._DP, 0._DP)
-        
-        waveVector = real([kx, ky, kz], DP)
 
         do iCol = 1, this%Ncol
         
-            xColOverL(:) = this%X(:, iCol)/Lsize(:)
+            xColOverL(:) = this%X(:, iCol)/Lsize(:) - 0.5_DP ! nécessaire ?
+            mColOverL(:) = this%M(:, iCol)/Lsize(:)
             
-            this%Epot_reci_fourier(xColOverL, exp_Ikx_1, exp_Ikx_2, exp_Ikx_3)
+            call this%Epot_reci_fourier(xColOverL, exp_Ikx_1, exp_Ikx_2, exp_Ikx_3)
         
-            do kx = -kMax(1), kMax(1)
+            do kz = -kMax(3), kMax(3)
             do ky = -kMax(2), kMax(2)
-            do kz = -kMax(3), kMax(3)        
+            do kx = -kMax(1), kMax(1)
+            
+            
+                exp_IkxColOverL = exp_Ikx_1(kx) * exp_Ikx_2(kx) * exp_Ikx_3(kz)
                           
-                k_dot_xCol = dot_product(waveVector, xColOverL)
-                
-                exp_Ikx_i = (cos(2._DP*xCol), sin(2._DP*xCol))
-                this%structure(:, ik) = this%structure(:, ik) + this%M(:, iCol)/Lsize(:) * exp_Ikx_i
+                this%structure(:, kx, ky, kz) = this%structure(:, kx, ky, kz) + &
+                                                mColOverL(:) * exp_IkxColOverL
             
             end do
             end do
