@@ -43,7 +43,7 @@ private
         integer :: iCut !< maximum index of tabulation : until potential cut
         real(DP) :: alpha !< coefficient of Ewald summation
         real(DP), dimension(:, :), allocatable :: Epot_real_tab !< tabulation : real short-range
-        real(DP), dimension(2*kMax(1)+1, 2*kMax(2)+1, 2*kMax(3)+1) :: Epot_reci_tab
+        real(DP), dimension(-kMax(1):kMax(1), -kMax(2):kMax(2), -kMax(3):kMax(3)) :: Epot_reci_tab
         integer :: NwaveVectors
         complex(DP), dimension(:, :), allocatable :: structure
         complex(DP), dimension(:, :), allocatable :: potential
@@ -512,14 +512,24 @@ contains
         
     end subroutine DipolarSpheres_Epot_reci_init
 
+    subroutine DipolarSpheres_Epot_reci_fourier(this, xNew, exp_Ikx_1, exp_Ikx_2, exp_Ikx_3)
+
+        class(DipolarSpheres), intent(in) :: this
+        real(DP), dimension(:) :: xNew
+        complex(DP), dimension(:) :: exp_Ikx_1
+        complex(DP), dimension(:) :: exp_Ikx_2
+        complex(DP), dimension(:) :: exp_Ikx_3
+
+    end subroutine DipolarSpheres_Epot_reci_fourier
+
     subroutine DipolarSpheres_Epot_reci_structure_init(this)
 
         class(DipolarSpheres), intent(inout) :: this
 
         complex(DP) :: exp_Ikx_i
-        complex(DP), dimension(2*Kmax(1)+1) :: exp_Ikx_i_x
-        complex(DP), dimension(2*Kmax(2)+1) :: exp_Ikx_i_y
-        complex(DP), dimension(2*Kmax(3)+1) :: exp_Ikx_i_z
+        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_Ikx_1
+        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_Ikx_2
+        complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_Ikx_3
         integer :: ik
         integer :: kx, ky, kz
 
@@ -529,7 +539,7 @@ contains
 
         do iCol = 1, this%Ncol
         
-            exp_Ikx_i = exp_Ikx_i_x(kx) * exp_Ikx_i_y(ky) * exp_Ikx_i_z(kz)
+            exp_Ikx_i = exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz)
             this%structure(:, ik) = this%structure(:, ik) + this%M(:, iCol)/Lsize(:) * exp_Ikx_i
             
         end do
