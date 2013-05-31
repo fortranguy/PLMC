@@ -80,8 +80,9 @@ private
         procedure :: Epot_real => DipolarSpheres_Epot_real
         !>     Reciprocal
         procedure :: Epot_reci_init => DipolarSpheres_Epot_reci_init
+        procedure :: Epot_reci_structure_init => DipolarSpheres_Epot_reci_structure_init
+        procedure :: Epot_reci_structure_reInit => DipolarSpheres_Epot_reci_structure_reInit
         procedure :: Epot_reci => DipolarSpheres_Epot_reci
-        procedure :: Epot_reci_structure => DipolarSpheres_Epot_reci_structure
         !>     Self
         procedure :: Epot_self_solo => DipolarSpheres_Epot_self_solo
         procedure :: Epot_self => DipolarSpheres_Epot_self
@@ -467,6 +468,7 @@ contains
     
     !> \f[ f(\alpha, \vec{k}) = \frac{e^{-\frac{\pi^2}
     !>      {\alpha^2} \sum_d \frac{k_d^2}{L_d}}}{\sum_d \frac{k_d^2}{L_d}} \f]
+    
     subroutine DipolarSpheres_Epot_reci_init(this)
         
         class(DipolarSpheres), intent(inout) :: this
@@ -478,12 +480,16 @@ contains
         this%NwaveVectors = 0
 
         do kz = -Kmax(3), Kmax(3)
+        
+            waveVector(3) = real(kz, DP)        
 
             do ky = -Kmax(2), Kmax(2)
+            
+                waveVector(2) = real(ky, DP)
 
                 do kx = -Kmax(1), Kmax(1)
                 
-                    waveVector = real([kx, ky, kz], DP)
+                    waveVector(1) = real(kx, DP)
 
                     if (norm2(waveVector) /= 0) then
                     
@@ -575,7 +581,7 @@ contains
         
     end function DipolarSpheres_Epot_reci
     
-    subroutine DipolarSpheres_Epot_reci_structure(this, iStep, moduli_unit)
+    subroutine DipolarSpheres_Epot_reci_structure_reInit(this, iStep, moduli_unit)
     
         class(DipolarSpheres), intent(inout) :: this
         integer, intent(in) :: iStep
@@ -587,7 +593,9 @@ contains
         
         write(moduli_unit, *) iStep, abs(this%moduli_nfft(:)-this%moduli_drifted(:))
     
-    end subroutine DipolarSpheres_Epot_reci_structure
+    end subroutine DipolarSpheres_Epot_reci_structure_reInit
+    
+    ! Self -----------------------------------------------------------------------------------------
     
     !> Self energy of 1 dipole
     !> \f[ \frac{2}{3}\frac{\alpha^3}{\sqrt{\pi}} \vec{\mu}_i\cdot\vec{\mu}_i \f]
