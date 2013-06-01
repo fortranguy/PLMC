@@ -612,7 +612,7 @@ contains
                 conjg_exp_IkxCol = conjg(exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz))
                 
                 k_dot_structure = dot_product(cmplx(waveVector, 0._DP, DP), &
-                                              this%structure(:, kx, ky,kz))
+                                              this%structure(:, kx, ky, kz))
                 
                 this%potential(:, iCol) = this%potential(:, iCol) + &
                                           waveVector(:) * this%Epot_reci_weight(kx, ky, kz) * &
