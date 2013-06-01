@@ -531,7 +531,6 @@ contains
         complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_Ikx_3
 
         real(DP), dimension(Dim) :: xColOverL, mColOverL
-        real(DP), dimension(Dim) :: waveVector
         integer :: kx, ky, kz
         integer :: iCol
 

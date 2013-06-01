@@ -126,10 +126,10 @@ contains
     
     subroutine fourier(xColOverL, exp_Ikx_1, exp_Ikx_2, exp_Ikx_3)
     
-        real(DP), dimension(:), intent(in) :: xColOverL
-        complex(DP), dimension(:), intent(inout) :: exp_Ikx_1
-        complex(DP), dimension(:), intent(inout) :: exp_Ikx_2
-        complex(DP), dimension(:), intent(inout) :: exp_Ikx_3
+        real(DP), dimension(Dim), intent(in) :: xColOverL
+        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_Ikx_1
+        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_Ikx_2
+        complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_Ikx_3
         
         real(DP) :: arg
         integer :: kx, ky, kz
