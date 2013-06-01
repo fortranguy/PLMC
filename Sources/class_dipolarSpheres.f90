@@ -634,26 +634,9 @@ contains
         class(DipolarSpheres), intent(in) :: this
         real(DP) :: Epot_reci
         
-        real(C_double) :: C_Epot
-        real(C_double), dimension(:, :), allocatable :: C_X, C_M
-        integer :: iCol, jCol
-
+        integer :: jCol
         real(DP), dimension(Dim) :: mColOverL
         real(DP), dimension(Dim) :: real_potential
-        
-        allocate(C_X(Dim, this%Ncol))
-        allocate(C_M(Dim, this%Ncol))
-        
-        do iCol = 1, this%Ncol
-            C_X(:, iCol) = real(this%X(:, iCol)/Lsize(:), C_double) - 0.5_c_double
-            C_M(:, iCol) = real(this%M(:, iCol)/Lsize(:), C_double)
-        end do
-        
-        C_Epot = C_Epot_reci(C_X, C_M, int(this%Ncol, C_int), real(Volume, C_double))
-        Epot_reci = real(C_Epot, DP)
-        
-        deallocate(C_X)
-        deallocate(C_M)
 
         Epot_reci = 0._DP
 
