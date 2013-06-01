@@ -538,7 +538,7 @@ contains
 
         do iCol = 1, this%Ncol
         
-            xColOverL(:) = this%X(:, iCol)/Lsize(:) - 0.5_DP ! nécessaire ?
+            xColOverL(:) = this%X(:, iCol)/Lsize(:)
             mColOverL(:) = this%M(:, iCol)/Lsize(:)
             
             call fourier(xColOverL, exp_Ikx_1, exp_Ikx_2, exp_Ikx_3)
@@ -593,7 +593,7 @@ contains
         
         do iCol = 1, this%Ncol
         
-            xColOverL(:) = this%X(:, iCol)/Lsize(:) - 0.5_DP ! nécessaire ?
+            xColOverL(:) = this%X(:, iCol)/Lsize(:)
             
             call fourier(xColOverL, exp_Ikx_1, exp_Ikx_2, exp_Ikx_3)
         
