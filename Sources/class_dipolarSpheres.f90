@@ -646,6 +646,8 @@ contains
             real_potential(:) = real(this%potential(:, jCol), DP)
 
             Epot_reci = Epot_reci + dot_product(mColOverL, real_potential)
+
+            write(*, *) "Epot_reci :", jCol, Epot_reci
         
         end do
         
