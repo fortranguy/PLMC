@@ -558,6 +558,17 @@ contains
             
         end do
 
+        do kz = -Kmax(3), Kmax(3)
+        do ky = -Kmax(2), Kmax(2)
+        do kx = -Kmax(1), Kmax(1)
+
+            write(*, *) kx, ky, kz, &
+                        real(this%structure(:, kx, ky, kz)), aimag(this%structure(:, kx, ky, kz))
+
+        end do
+        end do
+        end do
+
     end subroutine DipolarSpheres_Epot_reci_structure_init
     
     subroutine DipolarSpheres_Epot_reci_structure_reInit(this, iStep, moduli_unit)
