@@ -534,7 +534,7 @@ contains
         integer :: kx, ky, kz
         integer :: iCol
 
-        this%structure(:, :, :, :) = (0._DP, 0._DP)
+        this%structure(:, :, :, :) = cmplx(0._DP, 0._DP, DP)
 
         do iCol = 1, this%Ncol
         
@@ -589,7 +589,7 @@ contains
         integer :: kx, ky, kz
         integer :: iCol
         
-        this%potential(:, :) = (0._DP, 0._DP)
+        this%potential(:, :) = cmplx(0._DP, 0._DP, DP)
         
         do iCol = 1, this%Ncol
         
