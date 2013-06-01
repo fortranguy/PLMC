@@ -555,22 +555,7 @@ contains
             end do
             end do
             end do
-
-            write(*, *) iCol, exp_IkxCol, cmplx(mColOverL(:), 0._DP, DP) * exp_IkxCol
             
-        end do
-
-        stop
-
-        do kz = -Kmax(3), Kmax(3)
-        do ky = -Kmax(2), Kmax(2)
-        do kx = -Kmax(1), Kmax(1)
-
-            write(*, *) kx, ky, kz, &
-                        real(this%structure(1, kx, ky, kz)), aimag(this%structure(1, kx, ky, kz))
-
-        end do
-        end do
         end do
 
     end subroutine DipolarSpheres_Epot_reci_structure_init
@@ -661,8 +646,6 @@ contains
             real_potential(:) = real(this%potential(:, jCol), DP)
 
             Epot_reci = Epot_reci + dot_product(mColOverL, real_potential)
-
-            write(*, *) "Epot_reci :", jCol, Epot_reci
         
         end do
         
