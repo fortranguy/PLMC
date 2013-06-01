@@ -136,7 +136,7 @@ contains
 
         arg(:) = 2._DP*PI * 1._DP*xColOverL(:)
 
-        ! x
+        !x
         
         exp_Ikx_1(0) = (1._DP, 0._DP)
         exp_Ikx_1(1) = cmplx(cos(arg(1)), sin(arg(1)), DP)
