@@ -79,6 +79,7 @@ private
         procedure :: Epot_real_pair => DipolarSpheres_Epot_real_pair
         procedure :: Epot_real => DipolarSpheres_Epot_real
         !>     Reciprocal
+        procedure :: Epot_reci_init => DipolarSpheres_Epot_reci_init
         procedure :: Epot_reci_weight_init => DipolarSpheres_Epot_reci_weight_init
         procedure :: Epot_reci_structure_init => DipolarSpheres_Epot_reci_structure_init
         procedure :: Epot_reci_structure_reInit => DipolarSpheres_Epot_reci_structure_reInit
@@ -466,6 +467,15 @@ contains
     end function DipolarSpheres_Epot_real
 
     ! Reciprocal -----------------------------------------------------------------------------------
+
+    subroutine DipolarSpheres_Epot_reci_init(this)
+
+        class(DipolarSpheres), intent(inout) :: this
+
+        call this%Epot_reci_structure_init()
+        call this%Epot_reci_potential_init()
+
+    end subroutine
     
     !> \f[ f(\alpha, \vec{k}) = \frac{e^{-\frac{\pi^2}
     !>      {\alpha^2} \sum_d \frac{k_d^2}{L_d}}}{\sum_d \frac{k_d^2}{L_d}} \f]
@@ -626,7 +636,10 @@ contains
         
         real(C_double) :: C_Epot
         real(C_double), dimension(:, :), allocatable :: C_X, C_M
-        integer :: iCol
+        integer :: iCol, jCol
+
+        real(DP), dimension(Dim) :: mColOverL
+        real(DP), dimension(Dim) :: real_potential
         
         allocate(C_X(Dim, this%Ncol))
         allocate(C_M(Dim, this%Ncol))
@@ -641,6 +654,19 @@ contains
         
         deallocate(C_X)
         deallocate(C_M)
+
+        Epot_reci = 0._DP
+
+        do jCol = 1, this%Ncol
+
+            mColOverL(:) = this%M(:, jCol)/Lsize(:)
+            real_potential(:) = real(this%potential(:, jCol), DP)
+
+            Epot_reci = Epot_reci + dot_product(mColOverL, real_potential)
+        
+        end do
+
+        Epot_reci = 2._DP*PI/Volume * Epot_reci
         
     end function DipolarSpheres_Epot_reci
     

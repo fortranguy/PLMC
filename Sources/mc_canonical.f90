@@ -86,6 +86,7 @@ implicit none
     call initialCondition(type1_sph, type2_sph, mix%getRmin(), report_unit)
     
     call type1_sph%overlapTest()
+    call type1_sph%Epot_reci_init()
     type1_obs%Epot = type1_sph%Epot_conf()
     call type1_sph%snapShot_X(0, type1_io%snapIni_X)
     call type1_sph%snapShot_M(0, type1_io%snapIni_M)
