@@ -647,7 +647,7 @@ contains
             Epot_reci = Epot_reci + dot_product(mColOverL, real_potential)
         
         end do
-
+        
         Epot_reci = 2._DP*PI/Volume * Epot_reci
         
     end function DipolarSpheres_Epot_reci
