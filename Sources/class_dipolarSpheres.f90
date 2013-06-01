@@ -550,7 +550,7 @@ contains
                 exp_IkxCol = exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz)
                           
                 this%structure(:, kx, ky, kz) = this%structure(:, kx, ky, kz) + &
-                                                mColOverL(:) * exp_IkxCol
+                                                cmplx(mColOverL(:), 0._DP, DP) * exp_IkxCol
             
             end do
             end do
@@ -615,7 +615,8 @@ contains
                                               this%structure(:, kx, ky, kz))
                 
                 this%potential(:, iCol) = this%potential(:, iCol) + &
-                                          waveVector(:) * this%Epot_reci_weight(kx, ky, kz) * &
+                                          cmplx(waveVector(:), 0._DP, DP) * &
+                                          cmplx(this%Epot_reci_weight(kx, ky, kz), 0._DP, DP) * &
                                           k_dot_structure * conjg_exp_IkxCol
                 
             end do
