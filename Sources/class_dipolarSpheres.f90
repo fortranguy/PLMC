@@ -47,7 +47,7 @@ private
         integer :: NwaveVectors
         complex(DP), dimension(Dim, -Kmax(1):Kmax(1), -Kmax(2):Kmax(2), -Kmax(3):Kmax(3)) :: &
                      Epot_reci_structure
-        complex(DP), dimension(:, :), allocatable :: potential
+        complex(DP), dimension(:, :), allocatable :: Epot_reci_potential
         real(C_double), dimension(Dim) :: moduli_drifted
         real(C_double), dimension(Dim) :: moduli_nfft
         
@@ -145,7 +145,7 @@ contains
         allocate(this%Epot_real_tab(this%iMin:this%iCut, 2))
         call this%Epot_real_init()
 
-        allocate(this%potential(Dim, this%Ncol))
+        allocate(this%Epot_reci_potential(Dim, this%Ncol))
         call this%Epot_reci_weight_init()
         call C_Epot_reci_nfft_init(int(this%Ncol, C_int))
         
@@ -176,8 +176,8 @@ contains
             deallocate(this%Epot_real_tab)
         endif
 
-        if (allocated(this%potential))then
-            deallocate(this%potential)
+        if (allocated(this%Epot_reci_potential))then
+            deallocate(this%Epot_reci_potential)
         end if
         call C_Epot_reci_nfft_finalize()
         
@@ -583,14 +583,14 @@ contains
         complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_Ikx_1
         complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_Ikx_2
         complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_Ikx_3
-        complex(DP) :: k_dot_structure
+        complex(DP) :: k_dot_structure, Epot_reci_weight
         
         real(DP), dimension(Dim) :: xColOverL
         real(DP), dimension(Dim) :: waveVector
         integer :: kx, ky, kz
         integer :: iCol
         
-        this%potential(:, :) = cmplx(0._DP, 0._DP, DP)
+        this%Epot_reci_potential(:, :) = cmplx(0._DP, 0._DP, DP)
         
         do iCol = 1, this%Ncol
         
@@ -614,18 +614,20 @@ contains
                 
                 k_dot_structure = dot_product(cmplx(waveVector, 0._DP, DP), &
                                               this%Epot_reci_structure(:, kx, ky, kz))
+
+                Epot_reci_weight = cmplx(this%Epot_reci_weight(kx, ky, kz), 0._DP, DP)
                 
-                this%potential(:, iCol) = this%potential(:, iCol) + &
-                                          cmplx(waveVector(:), 0._DP, DP) * &
-                                          cmplx(this%Epot_reci_weight(kx, ky, kz), 0._DP, DP) * &
-                                          k_dot_structure * conjg_exp_IkxCol
+                this%Epot_reci_potential(:, iCol) = this%Epot_reci_potential(:, iCol) + &
+                                                    cmplx(waveVector(:), 0._DP, DP) * &
+                                                    Epot_reci_weight * k_dot_structure * &
+                                                    conjg_exp_IkxCol
                 
             end do
             end do
             end do
             
         end do
-    
+        
     end subroutine DipolarSpheres_Epot_reci_potential_init
     
     !> Total reciprocal energy
@@ -644,7 +646,7 @@ contains
         do jCol = 1, this%Ncol
 
             mColOverL(:) = this%M(:, jCol)/Lsize(:)
-            real_potential(:) = real(this%potential(:, jCol), DP)
+            real_potential(:) = real(this%Epot_reci_potential(:, jCol), DP)
 
             Epot_reci = Epot_reci + dot_product(mColOverL, real_potential)
         
