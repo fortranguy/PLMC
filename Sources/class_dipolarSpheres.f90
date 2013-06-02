@@ -646,7 +646,8 @@ contains
         complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_Ikx_2
         complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_Ikx_3
         complex(DP) :: k_dot_structure, Epot_reci_weight
-        
+
+        complex(DP), dimension(Dim) :: potential_k
         real(DP), dimension(Dim) :: xColOverL
         real(DP), dimension(Dim) :: waveVector
         integer :: kx, ky, kz
@@ -678,11 +679,12 @@ contains
                                               this%Epot_reci_structure(:, kx, ky, kz))
 
                 Epot_reci_weight = cmplx(this%Epot_reci_weight(kx, ky, kz), 0._DP, DP)
+
+                potential_k(:) = cmplx(waveVector(:), 0._DP, DP) * Epot_reci_weight * k_dot_structure
                 
                 this%Epot_reci_potential(:, iCol) = this%Epot_reci_potential(:, iCol) + &
-                                                    cmplx(waveVector(:), 0._DP, DP) * &
-                                                    Epot_reci_weight * k_dot_structure * &
-                                                    conjg_exp_IkxCol
+                                                    potential_k(:) * conjg_exp_IkxCol
+
                 
             end do
             end do
