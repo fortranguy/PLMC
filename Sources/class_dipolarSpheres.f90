@@ -467,6 +467,61 @@ contains
     
     end function DipolarSpheres_Epot_real
 
+    !> Real potential energy : short-range
+
+    subroutine DipolarSpheres_Epot_neigh(this, iCol, xCol, mCol, iCell, overlap, energ)
+
+        class(DipolarSpheres), intent(in) :: this
+        integer, intent(in) :: iCol, iCell
+        real(DP), dimension(:), intent(in) :: xCol, mCol
+        logical, intent(out) :: overlap
+        real(DP), intent(out) :: energ
+
+        integer :: iNeigh,  iCell_neigh
+        real(DP), dimension(Dim) :: rVec_ij
+        real(DP) :: r_ij
+
+        type(Link), pointer :: current => null(), next => null()
+
+
+        overlap = .false.
+        energ = 0._DP
+
+        do iNeigh = 1, cell_neighs_nb
+
+            iCell_neigh = this%same%cell_neighs(iNeigh, iCell)
+            current => this%same%cellsBegin(iCell_neigh)%particle%next
+            if (.not. associated(current%next)) cycle
+
+            do
+
+                next => current%next
+
+                if (current%iCol /= iCol) then
+
+                    rVec_ij = distVec(xCol(:), this%X(:, current%iCol))
+                    r_ij = norm2(rVec_ij)
+
+                    if (r_ij < this%rMin) then
+                        overlap = .true.
+                        return
+                    end if
+
+                    energ = energ + this%Epot_real_pair(mCol, this%M(:, current%iCol), &
+                                                        rVec_ij, r_ij)
+
+                end if
+
+                if (.not. associated(next%next)) exit
+
+                current => next
+
+            end do
+
+        end do
+
+    end subroutine DipolarSpheres_Epot_neigh
+
     ! Reciprocal -----------------------------------------------------------------------------------
 
     subroutine DipolarSpheres_Epot_reci_init(this)
@@ -689,61 +744,6 @@ contains
     end function DipolarSpheres_Epot_self
     
     ! ----------------------------------------------------------------------------------------------
-    
-    !> Real potential energy : short-range
-    
-    subroutine DipolarSpheres_Epot_neigh(this, iCol, xCol, mCol, iCell, overlap, energ)
-        
-        class(DipolarSpheres), intent(in) :: this
-        integer, intent(in) :: iCol, iCell
-        real(DP), dimension(:), intent(in) :: xCol, mCol
-        logical, intent(out) :: overlap
-        real(DP), intent(out) :: energ
-    
-        integer :: iNeigh,  iCell_neigh
-        real(DP), dimension(Dim) :: rVec_ij
-        real(DP) :: r_ij        
-        
-        type(Link), pointer :: current => null(), next => null()
-        
-        
-        overlap = .false.
-        energ = 0._DP
-    
-        do iNeigh = 1, cell_neighs_nb
-        
-            iCell_neigh = this%same%cell_neighs(iNeigh, iCell)
-            current => this%same%cellsBegin(iCell_neigh)%particle%next            
-            if (.not. associated(current%next)) cycle
-            
-            do
-            
-                next => current%next
-            
-                if (current%iCol /= iCol) then
-                
-                    rVec_ij = distVec(xCol(:), this%X(:, current%iCol))
-                    r_ij = norm2(rVec_ij)
-                    
-                    if (r_ij < this%rMin) then
-                        overlap = .true.
-                        return
-                    end if
-                    
-                    energ = energ + this%Epot_real_pair(mCol, this%M(:, current%iCol), &
-                                                        rVec_ij, r_ij)
-       
-                end if
-                
-                if (.not. associated(next%next)) exit
-                
-                current => next
-            
-            end do
-            
-        end do
-    
-    end subroutine DipolarSpheres_Epot_neigh
     
     !> Particle move
     
