@@ -709,10 +709,10 @@ contains
     !> Implementation :
     !> \f[
     !>  \Delta M^2 = 2(\vec{\mu_l}\cdot\vec{k})
-    !>              [ \cos(\vec{k}\cdot\vec{x}^\prime_l) - \cos(\vec{k}\cdot\vec{x})]
+    !>              [ \cos(\vec{k}\cdot\vec{x}^\prime_l) - \cos(\vec{k}\cdot\vec{x}_l)]
     !>              [\Re{(\vec{k}\cdot\vec{S})} - (\vec{k}\cdot\vec{\mu}_l) \cos(\vec{k}\cdot
     !>                  \vec{x}_l)] -
-    !>              [-\sin(\vec{k}\cdot\vec{x}^\prime_l) + \sin(\vec{k}\cdot\vec{x})]
+    !>              [-\sin(\vec{k}\cdot\vec{x}^\prime_l) + \sin(\vec{k}\cdot\vec{x}_l)]
     !>              [\Im{(\vec{k}\cdot\vec{S})} - (\vec{k}\cdot\vec{\mu}_l) \sin(\vec{k}\cdot
     !>                  \vec{x}_l)]
     !> \f]
