@@ -730,13 +730,15 @@ contains
         complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxNew_2
         complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_IkxNew_3
         complex(DP) :: exp_IkxNew
-        real(DP) :: cos_IkxNew, sin_IkxNew
+        real(DP) :: cos_kxNew, sin_kxNew
 
         complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxOld_1
         complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxOld_2
         complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_IkxOld_3
         complex(DP) :: exp_IkxOld
-        real(DP) :: cos_IkxOld, sin_IkxOld
+        real(DP) :: cos_kxOld, sin_kxOld
+
+        real(DP) :: realPart1, realPart2
 
         real(DP), dimension(Dim) :: waveVector
         real(DP) :: k_dot_mOld
@@ -771,18 +773,29 @@ contains
                                           this%Epot_reci_structure(:, kx, ky, kz))
 
             exp_IkxNew = exp_IkxNew_1(kx) * exp_IkxNew_2(ky) * exp_IkxNew_3(kz)
-            cos_IkxNew = real(exp_IkxNew, DP)
-            sin_IkxNew = aimag(exp_IkxNew)
+            cos_kxNew = real(exp_IkxNew, DP)
+            sin_kxNew = aimag(exp_IkxNew)
 
             exp_IkxOld = exp_IkxOld_1(kx) * exp_IkxOld_2(ky) * exp_IkxOld_3(kz)
-            cos_IkxOld = real(exp_IkxOld, DP)
-            sin_IkxOld = aimag(exp_IkxOld)
+            cos_kxOld = real(exp_IkxOld, DP)
+            sin_kxOld = aimag(exp_IkxOld)
+
+            realPart1 = cos_kxNew - cos_kxOld
+            realPart1 = realPart1 * (real(k_dot_structure, DP) - k_dot_mOld * cos_kxOld)
+
+            realPart2 =-sin_kxNew + sin_kxOld
+            realPart2 = realPart2 * (aimag(k_dot_structure) - k_dot_mOld * sin_kxOld)
+
+            Epot_reci_move = Epot_reci_move + 2._DP*k_dot_mOld * (realPart1-realPart2) * &
+                                              this%Epot_reci_weight(kx, ky, kz)
 
         end do
         
         end do
         
         end do
+
+        Epot_reci_move = 2._DP*PI/Volume * Epot_reci_move
 
     end function DipolarSpheres_Epot_reci_move
 
