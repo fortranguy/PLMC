@@ -1081,8 +1081,8 @@ contains
         real(DP), dimension(Dim) :: xNew
         integer :: same_iCellOld, same_iCellNew
         integer :: mix_iCellOld, mix_iCellNew
-        real(DP) :: dEpot, same_dEpot, mix_dEpot
-        real(DP) :: same_eNew, same_eOld
+        real(DP) :: dEpot, dEpot_same, dEpot_mix
+        real(DP) :: same_eNew_real, same_eOld_real
         real(DP) :: mix_eNew, mix_eOld
         real(DP) :: rand
         
@@ -1097,23 +1097,24 @@ contains
         if (.not. overlap) then
         
             same_iCellNew = this%same%position_to_cell(xNew)
-            call this%Epot_real_neigh(iOld, xNew, this%M(:, iOld), same_iCellNew, overlap, same_eNew)
+            call this%Epot_real_neigh(iOld, xNew, this%M(:, iOld), same_iCellNew, overlap, &
+                                      same_eNew_real)
                         
             if (.not. overlap) then
                 
                 ! Real
                 same_iCellOld = this%same%position_to_cell(this%X(:, iOld))
                 call this%Epot_real_neigh(iOld, this%X(:, iOld), this%M(:, iOld), same_iCellOld, &
-                                     overlap, same_eOld)
+                                          overlap, same_eOld_real)
                 
-                same_dEpot = (same_eNew - same_eOld) + this%Epot_reci_move(iOld, xNew)
+                dEpot_same = (same_eNew_real-same_eOld_real) + this%Epot_reci_move(iOld, xNew)
                     
                 mix_iCellOld = this%mix%position_to_cell(this%X(:, iOld))
                 call mix%Epot_neigh(this%X(:, iOld), mix_iCellOld, this%mix, other%X, overlap, &
                                     mix_eOld)
-                mix_dEpot = mix_eNew - mix_eOld
+                dEpot_mix = mix_eNew - mix_eOld
                 
-                dEpot = same_dEpot + mix_dEpot
+                dEpot = dEpot_same + dEpot_mix
                 
                 call random_number(rand)            
                 if (rand < exp(-dEpot/Tstar)) then
@@ -1121,8 +1122,8 @@ contains
                     this%X(:, iOld) = xNew(:)
                     call this%Epot_reci_updateX(iOld, xNew)
                     
-                    same_Epot = same_Epot + same_dEpot
-                    mix_Epot = mix_Epot + mix_dEpot
+                    same_Epot = same_Epot + dEpot_same
+                    mix_Epot = mix_Epot + dEpot_mix
                     
                     if (same_iCellOld /= same_iCellNew) then
                         call this%same%remove_cell_col(iOld, same_iCellOld)
