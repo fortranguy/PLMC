@@ -720,7 +720,7 @@ contains
 
         class(DipolarSpheres), intent(in) :: this
         integer, intent(in) :: lCol
-        real(DP), dimension(Dim) :: xNew
+        real(DP), dimension(Dim), intent(in) :: xNew
         real(DP) :: Epot_reci_move
 
         real(DP), dimension(Dim) :: xNewOverL, xOldOverL
@@ -746,7 +746,7 @@ contains
         integer :: kx, ky, kz
 
         xNewOverL(:) = xNew(:)/Lsize(:)
-        xOldOverL(:) = this%X(:, lCol)/Lsize(:)        
+        xOldOverL(:) = this%X(:, lCol)/Lsize(:)
 
         call fourier(xNewOverL, exp_IkxNew_1, exp_IkxNew_2, exp_IkxNew_3)
         call fourier(xOldOverL, exp_IkxOld_1, exp_IkxOld_2, exp_IkxOld_3)
@@ -799,9 +799,56 @@ contains
 
     end function DipolarSpheres_Epot_reci_move
 
-    subroutine DipolarSpheres_Epot_reci_updateX(this)
+    !> Update position -> update the ``structure factor''
+    !>  \f[
+    !>      \Delta \vec{S} = \vec{\mu}_l
+    !>      (e^{+i\vec{k}\cdot\vec{x}^\prime_l} -e^{+i\vec{k}\cdot\vec{x}_l})
+    !>  \f]
+    !>
+
+    subroutine DipolarSpheres_Epot_reci_updateX(this, lCol, xNew)
 
         class(DipolarSpheres), intent(inout) :: this
+        integer, intent(in) :: lCol
+        real(DP), dimension(Dim), intent(in) :: xNew
+        
+        real(DP), dimension(Dim) :: xNewOverL, xOldOverL
+        real(DP), dimension(Dim) :: mColOverL
+
+        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxNew_1
+        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxNew_2
+        complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_IkxNew_3
+        complex(DP) :: exp_IkxNew
+
+        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxOld_1
+        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxOld_2
+        complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_IkxOld_3
+        complex(DP) :: exp_IkxOld
+
+        integer :: kx, ky, kz
+
+        xNewOverL(:) = xNew(:)/Lsize(:)
+        xOldOverL(:) = this%X(:, lCol)/Lsize(:)
+
+        call fourier(xNewOverL, exp_IkxNew_1, exp_IkxNew_2, exp_IkxNew_3)
+        call fourier(xOldOverL, exp_IkxOld_1, exp_IkxOld_2, exp_IkxOld_3)
+
+        mColOverL(:) = this%M(:, lCol)/Lsize(:)
+
+        do kz = -Kmax(3), Kmax(3)
+        do ky = -Kmax(2), Kmax(2)
+        do kx = -Kmax(1), Kmax(1)
+
+            exp_IkxNew = exp_IkxNew_1(kx) * exp_IkxNew_2(ky) * exp_IkxNew_3(kz)
+            exp_IkxOld = exp_IkxOld_1(kx) * exp_IkxOld_2(ky) * exp_IkxOld_3(kz)
+                                                  
+            this%Epot_reci_structure(:, kx, ky, kz) = this%Epot_reci_structure(:, kx, ky, kz) + &
+                                                      cmplx(mColOverL(:), 0._DP, DP) * &
+                                                      (exp_IkxNew - exp_IkxOld)
+
+        end do
+        end do
+        end do
 
     end subroutine DipolarSpheres_Epot_reci_updateX
 
