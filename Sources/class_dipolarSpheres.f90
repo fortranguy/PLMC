@@ -598,15 +598,15 @@ contains
             
             call fourier(xColOverL, exp_Ikx_1, exp_Ikx_2, exp_Ikx_3)
         
-            do kz = -Kmax(3), Kmax(3)          
+            do kz = -Kmax(3), Kmax(3)
               
                 waveVector(3) = real(kz, DP)
             
-            do ky = -Kmax(2), Kmax(2)      
+            do ky = -Kmax(2), Kmax(2)
                   
                 waveVector(2) = real(ky, DP)
             
-            do kx = -Kmax(1), Kmax(1)      
+            do kx = -Kmax(1), Kmax(1)
                   
                 waveVector(1) = real(kx, DP)
             
