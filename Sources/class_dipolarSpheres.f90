@@ -884,6 +884,8 @@ contains
         real(DP), dimension(Dim), intent(in) :: mNew
         real(DP) :: Epot_reci_rotate
 
+        real(DP) :: Epot_k
+
         real(DP), dimension(Dim) :: mNewOverL, mOldOverL
         real(DP), dimension(Dim) :: xColOverL
 
@@ -935,11 +937,16 @@ contains
 
             realPart = realPart1 + realPart2
 
-        end do
+            Epot_k = k_dot_mNew**2 - k_dot_mOld**2 + 2._DP*(k_dot_mNew - k_dot_mOld) * realPart
+            Epot_reci_rotate = Epot_reci_rotate + Epot_k*this%Epot_reci_weight(kx, ky, kz)
 
         end do
 
         end do
+
+        end do
+
+        Epot_reci_rotate = 2._DP*PI/Volume * Epot_reci_rotate
 
     end function DipolarSpheres_Epot_reci_rotate
 
