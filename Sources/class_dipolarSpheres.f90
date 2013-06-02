@@ -1118,9 +1118,9 @@ contains
                 
                 call random_number(rand)            
                 if (rand < exp(-dEpot/Tstar)) then
-                
-                    this%X(:, iOld) = xNew(:)
+
                     call this%Epot_reci_updateX(iOld, xNew)
+                    this%X(:, iOld) = xNew(:)
                     
                     same_Epot = same_Epot + dEpot_same
                     mix_Epot = mix_Epot + dEpot_mix
@@ -1177,8 +1177,8 @@ contains
         call random_number(rand)
         if (rand < exp(-dEpot/Tstar)) then
         
-            this%M(:, iOld) = mNew(:)
             call this%Epot_reci_updateM(iOld, mNew)
+            this%M(:, iOld) = mNew(:)
             
             Epot = Epot + dEpot
             
