@@ -48,8 +48,6 @@ private
         complex(DP), dimension(Dim, -Kmax(1):Kmax(1), -Kmax(2):Kmax(2), -Kmax(3):Kmax(3)) :: &
                      Epot_reci_structure
         complex(DP), dimension(:, :), allocatable :: Epot_reci_potential
-        real(C_double), dimension(Dim) :: moduli_drifted
-        real(C_double), dimension(Dim) :: moduli_nfft
         
     contains
 
@@ -84,6 +82,7 @@ private
         procedure :: Epot_reci_init => DipolarSpheres_Epot_reci_init
         procedure :: Epot_reci_weight_init => DipolarSpheres_Epot_reci_weight_init
         procedure :: Epot_reci_structure_init => DipolarSpheres_Epot_reci_structure_init
+        procedure :: Epot_reci_structure_moduli => DipolarSpheres_Epot_reci_structure_moduli
         procedure :: Epot_reci_structure_reInit => DipolarSpheres_Epot_reci_structure_reInit
         procedure :: Epot_reci_potential_init => DipolarSpheres_Epot_reci_potential_init
         !>     Reciprocal : delta
@@ -622,18 +621,42 @@ contains
         end do
 
     end subroutine DipolarSpheres_Epot_reci_structure_init
+
+    function DipolarSpheres_Epot_reci_structure_moduli(this) result(Epot_reci_structure_moduli)
+
+        class(DipolarSpheres), intent(in) :: this
+        real(DP), dimension(Dim) :: Epot_reci_structure_moduli
+
+        integer :: kx, ky, kz
+
+        Epot_reci_structure_moduli(:) = 0._DP
+
+        do kz = -Kmax(3), Kmax(3)
+        do ky = -Kmax(2), Kmax(2)
+        do kx = -Kmax(1), Kmax(1)
+
+            Epot_reci_structure_moduli(:) = Epot_reci_structure_moduli(:) + &
+                                            abs(this%Epot_reci_structure(:, kx, ky, kz))
+
+        end do
+        end do
+        end do
+
+    end function DipolarSpheres_Epot_reci_structure_moduli
     
     subroutine DipolarSpheres_Epot_reci_structure_reInit(this, iStep, moduli_unit)
     
         class(DipolarSpheres), intent(inout) :: this
         integer, intent(in) :: iStep
         integer, intent(in) :: moduli_unit
+
+        real(DP), dimension(Dim) :: moduli_drifted, moduli_reInit
         
-        call C_Epot_reci_structure_moduli(this%moduli_drifted)
-        call C_Epot_reci_structure()
-        call C_Epot_reci_structure_moduli(this%moduli_nfft)
+        moduli_drifted = this%Epot_reci_structure_moduli()
+        call this%Epot_reci_structure_init()
+        moduli_reInit = this%Epot_reci_structure_moduli()
         
-        write(moduli_unit, *) iStep, abs(this%moduli_nfft(:)-this%moduli_drifted(:))
+        write(moduli_unit, *) iStep, abs(moduli_reInit - moduli_drifted)
     
     end subroutine DipolarSpheres_Epot_reci_structure_reInit
     
