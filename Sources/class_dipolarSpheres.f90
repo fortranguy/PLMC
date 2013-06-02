@@ -1158,7 +1158,7 @@ contains
         
         real(DP) :: rand
         real(DP), dimension(Dim) :: mNew
-        real(DP) :: dEpot, dEpot_real, dEpot_reci, dEpot_self
+        real(DP) :: dEpot, dEpot_real, dEpot_self
         real(DP) :: real_eNew, real_eOld
         integer :: iCell
         logical :: overlap
@@ -1170,11 +1170,10 @@ contains
 
         mNew(:) = this%M(:, iOld)
         call markov_surface(mNew, this%dm)
-        dEpot_reci = this%Epot_reci_rotate(iOld, mNew)
         
         dEpot_self = this%Epot_self_solo(mNew) - this%Epot_self_solo(this%M(:, iOld))
         
-        dEpot = dEpot_real + dEpot_reci - dEpot_self
+        dEpot = dEpot_real + this%Epot_reci_rotate(iOld, mNew) - dEpot_self
         call random_number(rand)
         if (rand < exp(-dEpot/Tstar)) then
         
