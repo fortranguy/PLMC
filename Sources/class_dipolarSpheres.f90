@@ -911,6 +911,8 @@ contains
         mNewOverL(:) = mNew(:)/Lsize(:)
         mOldOverL(:) = this%M(:, lCol)/Lsize(:)
 
+        Epot_reci_rotate = 0._DP
+
         do kz = -Kmax(3), Kmax(3)
 
             waveVector(3) = real(kz, DP)
