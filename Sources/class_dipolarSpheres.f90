@@ -45,7 +45,8 @@ private
         real(DP), dimension(:, :), allocatable :: Epot_real_tab !< tabulation : real short-range
         real(DP), dimension(-Kmax(1):Kmax(1), -Kmax(2):Kmax(2), -Kmax(3):Kmax(3)) :: Epot_reci_weight
         integer :: NwaveVectors
-        complex(DP), dimension(Dim, -Kmax(1):Kmax(1), -Kmax(2):Kmax(2), -Kmax(3):Kmax(3)) :: structure
+        complex(DP), dimension(Dim, -Kmax(1):Kmax(1), -Kmax(2):Kmax(2), -Kmax(3):Kmax(3)) :: &
+                     Epot_reci_structure
         complex(DP), dimension(:, :), allocatable :: potential
         real(C_double), dimension(Dim) :: moduli_drifted
         real(C_double), dimension(Dim) :: moduli_nfft
@@ -534,7 +535,7 @@ contains
         integer :: kx, ky, kz
         integer :: iCol
 
-        this%structure(:, :, :, :) = cmplx(0._DP, 0._DP, DP)
+        this%Epot_reci_structure(:, :, :, :) = cmplx(0._DP, 0._DP, DP)
 
         do iCol = 1, this%Ncol
         
@@ -549,8 +550,8 @@ contains
             
                 exp_IkxCol = exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz)
                           
-                this%structure(:, kx, ky, kz) = this%structure(:, kx, ky, kz) + &
-                                                cmplx(mColOverL(:), 0._DP, DP) * exp_IkxCol
+                this%Epot_reci_structure(:, kx, ky, kz) = this%Epot_reci_structure(:, kx, ky, kz) + &
+                                                          cmplx(mColOverL(:), 0._DP, DP) * exp_IkxCol
             
             end do
             end do
@@ -612,7 +613,7 @@ contains
                 conjg_exp_IkxCol = conjg(exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz))
                 
                 k_dot_structure = dot_product(cmplx(waveVector, 0._DP, DP), &
-                                              this%structure(:, kx, ky, kz))
+                                              this%Epot_reci_structure(:, kx, ky, kz))
                 
                 this%potential(:, iCol) = this%potential(:, iCol) + &
                                           cmplx(waveVector(:), 0._DP, DP) * &
