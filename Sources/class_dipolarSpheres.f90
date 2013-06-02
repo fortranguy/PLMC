@@ -770,13 +770,13 @@ contains
             k_dot_structure = dot_product(cmplx(waveVector, 0._DP, DP), &
                                           this%Epot_reci_structure(:, kx, ky, kz))
 
-            exp_IkxNew = exp_IkxNew_1(kx, ky, kz) * exp_IkxNew_2(kx, ky, kz) * exp_IkxNew_3(kx, ky, kz)
+            exp_IkxNew = exp_IkxNew_1(kx) * exp_IkxNew_2(ky) * exp_IkxNew_3(kz)
             cos_IkxNew = real(exp_IkxNew, DP)
-            sin_IkxNew = aimag(exp_IkxNew, DP)
+            sin_IkxNew = aimag(exp_IkxNew)
 
-            exp_IkxOld = exp_IkxOld_1(kx, ky, kz) * exp_IkxOld_2(kx, ky, kz) * exp_IkxOld_3(kx, ky, kz)
+            exp_IkxOld = exp_IkxOld_1(kx) * exp_IkxOld_2(ky) * exp_IkxOld_3(kz)
             cos_IkxOld = real(exp_IkxOld, DP)
-            sin_IkxOld = aimag(exp_IkxOld, DP)            
+            sin_IkxOld = aimag(exp_IkxOld)
 
         end do
         
