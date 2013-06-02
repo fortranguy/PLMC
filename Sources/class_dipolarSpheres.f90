@@ -1084,9 +1084,6 @@ contains
         real(DP) :: mix_eNew, mix_eOld
         real(DP) :: rand
         
-        real(C_double) :: C_Epot
-        real(C_double), dimension(Dim) :: C_xNew
-        
         ! Random new position
         call random_number(xRand)
         xNew(:) = this%X(:, iOld) + this%dx(:) * (xRand(:)-0.5_DP)
@@ -1106,11 +1103,8 @@ contains
                 same_iCellOld = this%same%position_to_cell(this%X(:, iOld))
                 call this%Epot_real_neigh(iOld, this%X(:, iOld), this%M(:, iOld), same_iCellOld, &
                                      overlap, same_eOld)
-                ! Reci
-                C_xNew(:) = real(xNew(:)/Lsize(:), C_double) - 0.5_c_double
-                C_Epot = C_Epot_reci_move(int(iOld-1, C_int), C_xNew, real(Volume, C_double))
                 
-                same_dEpot = (same_eNew - same_eOld) + real(C_Epot, DP)
+                same_dEpot = (same_eNew - same_eOld) + this%Epot_reci_move(iOld, xNew)
                     
                 mix_iCellOld = this%mix%position_to_cell(this%X(:, iOld))
                 call mix%Epot_neigh(this%X(:, iOld), mix_iCellOld, this%mix, other%X, overlap, &
