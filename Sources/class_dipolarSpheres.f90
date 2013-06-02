@@ -716,20 +716,32 @@ contains
     !> \f]
     !>
 
-    function DipolarSpheres_Epot_reci_move(this) result(Epot_reci_move)
+    function DipolarSpheres_Epot_reci_move(this, lCol, xNew) result(Epot_reci_move)
 
         class(DipolarSpheres), intent(in) :: this
+        integer, intent(in) :: lCol
+        real(DP), dimension(Dim) :: xNew
         real(DP) :: Epot_reci_move
 
-        complex(DP) :: exp_IkxNew
+        real(DP), dimension(Dim) :: xNewOverL, xOldOverL
+        real(DP), dimension(Dim) :: mOldOverL
+
         complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxNew_1
         complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxNew_2
         complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_IkxNew_3
+        complex(DP) :: exp_IkxNew
+        real(DP) :: cos_IkxNew, sin_IkxNew
 
-        complex(DP) :: exp_IkxOld
         complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxOld_1
         complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxOld_2
         complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_IkxOld_3
+        complex(DP) :: exp_IkxOld
+        real(DP) :: cos_IkxOld, sin_IkxOld
+
+        real(DP), dimension(Dim) :: waveVector
+        real(DP) :: k_dot_mOld
+        complex(DP) :: k_dot_structure
+        integer :: kx, ky, kz
 
         xNewOverL(:) = xNew(:)/Lsize(:)
         xOldOverL(:) = this%X(:, lCol)/Lsize(:)        
@@ -737,16 +749,39 @@ contains
         call fourier(xNewOverL, exp_IkxNew_1, exp_IkxNew_2, exp_IkxNew_3)
         call fourier(xOldOverL, exp_IkxOld_1, exp_IkxOld_2, exp_IkxOld_3)
 
+        mOldOverL(:) = this%M(:, lCol)/Lsize(:)
+
         Epot_reci_move = 0._DP
 
         do kz = -Kmax(3), Kmax(3)
+
+            waveVector(3) = real(kz, DP)
+
         do ky = -Kmax(2), Kmax(2)
+
+            waveVector(2) = real(ky, DP)
+
         do kx = -Kmax(1), Kmax(1)
 
-            
+            waveVector(1) = real(kx, DP)
+
+            k_dot_mOld = dot_product(waveVector, mOldOverL)
+
+            k_dot_structure = dot_product(cmplx(waveVector, 0._DP, DP), &
+                                          this%Epot_reci_structure(:, kx, ky, kz))
+
+            exp_IkxNew = exp_IkxNew_1(kx, ky, kz) * exp_IkxNew_2(kx, ky, kz) * exp_IkxNew_3(kx, ky, kz)
+            cos_IkxNew = real(exp_IkxNew, DP)
+            sin_IkxNew = aimag(exp_IkxNew, DP)
+
+            exp_IkxOld = exp_IkxOld_1(kx, ky, kz) * exp_IkxOld_2(kx, ky, kz) * exp_IkxOld_3(kx, ky, kz)
+            cos_IkxOld = real(exp_IkxOld, DP)
+            sin_IkxOld = aimag(exp_IkxOld, DP)            
 
         end do
+        
         end do
+        
         end do
 
     end function DipolarSpheres_Epot_reci_move
