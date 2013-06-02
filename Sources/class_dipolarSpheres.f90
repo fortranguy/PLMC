@@ -724,7 +724,7 @@ contains
         real(DP) :: Epot_reci_move
 
         real(DP), dimension(Dim) :: xNewOverL, xOldOverL
-        real(DP), dimension(Dim) :: mOldOverL
+        real(DP), dimension(Dim) :: mColOverL
 
         complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxNew_1
         complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxNew_2
@@ -741,7 +741,7 @@ contains
         real(DP) :: realPart1, realPart2
 
         real(DP), dimension(Dim) :: waveVector
-        real(DP) :: k_dot_mOld
+        real(DP) :: k_dot_mCol
         complex(DP) :: k_dot_structure
         integer :: kx, ky, kz
 
@@ -751,7 +751,7 @@ contains
         call fourier(xNewOverL, exp_IkxNew_1, exp_IkxNew_2, exp_IkxNew_3)
         call fourier(xOldOverL, exp_IkxOld_1, exp_IkxOld_2, exp_IkxOld_3)
 
-        mOldOverL(:) = this%M(:, lCol)/Lsize(:)
+        mColOverL(:) = this%M(:, lCol)/Lsize(:)
 
         Epot_reci_move = 0._DP
 
@@ -767,7 +767,7 @@ contains
 
             waveVector(1) = real(kx, DP)
 
-            k_dot_mOld = dot_product(waveVector, mOldOverL)
+            k_dot_mCol = dot_product(waveVector, mColOverL)
 
             k_dot_structure = dot_product(cmplx(waveVector, 0._DP, DP), &
                                           this%Epot_reci_structure(:, kx, ky, kz))
@@ -781,12 +781,12 @@ contains
             sin_kxOld = aimag(exp_IkxOld)
 
             realPart1 = cos_kxNew - cos_kxOld
-            realPart1 = realPart1 * (real(k_dot_structure, DP) - k_dot_mOld * cos_kxOld)
+            realPart1 = realPart1 * (real(k_dot_structure, DP) - k_dot_mCol * cos_kxOld)
 
             realPart2 =-sin_kxNew + sin_kxOld
-            realPart2 = realPart2 * (aimag(k_dot_structure) - k_dot_mOld * sin_kxOld)
+            realPart2 = realPart2 * (aimag(k_dot_structure) - k_dot_mCol * sin_kxOld)
 
-            Epot_reci_move = Epot_reci_move + 2._DP*k_dot_mOld * (realPart1-realPart2) * &
+            Epot_reci_move = Epot_reci_move + 2._DP*k_dot_mCol * (realPart1-realPart2) * &
                                               this%Epot_reci_weight(kx, ky, kz)
 
         end do
@@ -852,12 +852,94 @@ contains
 
     end subroutine DipolarSpheres_Epot_reci_updateX
 
+    !> Difference of Energy \f[ \Delta U = \frac{2\pi}{V} \sum_{\vec{k} \neq 0} \Delta M^2
+    !>                                       f(\alpha, \vec{k}) \f]
+    !> \f[
+    !>  \Delta M^2 = (\vec{k} \cdot \vec{\mu}_l^\prime)^2 - (\vec{k} \cdot \vec{\mu}_l)^2 +
+    !>               2\Re\{
+    !>                  [(\vec{k} \cdot \vec{\mu}_l^\prime) - (\vec{k} \cdot \vec{\mu}_l)]
+    !>                  e^{-i \vec{k} \cdot \vec{x}_l}
+    !>                  (\vec{k} \cdot \vec{S}_l)
+    !>               \}
+    !> \f]
+    !> \f[ \vec{S}_l = \sum_{i \neq l} \vec{\mu}_i e^{+i\vec{k}\cdot\vec{x}_i} \f]
+    !> Implementation :
+    !> \f[
+    !>  \Delta M^2 = (\vec{k} \cdot \vec{\mu}_l^\prime)^2 - (\vec{k} \cdot \vec{\mu}_l)^2 +
+    !>               2 [(\vec{k} \cdot \vec{\mu}_l^\prime) - (\vec{k} \cdot \vec{\mu}_l)]
+    !>               \{
+    !>                  \cos(\vec{k} \cdot \vec{x}_l)[\Re(\vec{k} \cdot \vec{S}) -
+    !>                      (\vec{k} \cdot \vec{\mu}_l) \cos(\vec{k} \cdot \vec{x}_l)] +
+    !>                  \sin(\vec{k} \cdot \vec{x}_l)[\Im(\vec{k} \cdot \vec{S}) -
+    !>                      (\vec{k} \cdot \vec{\mu}_l) \sin(\vec{k} \cdot \vec{x}_l)]
+    !>               \}
+    !> \f]
+
     ! Rotate
 
-    function DipolarSpheres_Epot_reci_rotate(this) result(Epot_reci_rotate)
+    function DipolarSpheres_Epot_reci_rotate(this, lCol, mNew) result(Epot_reci_rotate)
 
         class(DipolarSpheres), intent(in) :: this
+        integer, intent(in) :: lCol
+        real(DP), dimension(Dim), intent(in) :: mNew
         real(DP) :: Epot_reci_rotate
+
+        real(DP), dimension(Dim) :: mNewOverL, mOldOverL
+        real(DP), dimension(Dim) :: xColOverL
+
+        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxCol_1
+        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxCol_2
+        complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_IkxCol_3
+        complex(DP) :: exp_IkxCol
+        real(DP) :: cos_kxCol, sin_kxCol
+
+        real(DP) :: realPart, realPart1, realPart2
+
+        real(DP), dimension(Dim) :: waveVector
+        real(DP) :: k_dot_mNew, k_dot_mOld
+        complex(DP) :: k_dot_structure
+        integer :: kx, ky, kz
+
+        xColOverL(:) = this%X(:, lCol)/Lsize(:)
+
+        call fourier(xColOverL, exp_IkxCol_1, exp_IkxCol_2, exp_IkxCol_3)
+
+        mNewOverL(:) = mNew(:)/Lsize(:)
+        mOldOverL(:) = this%M(:, lCol)/Lsize(:)
+
+        do kz = -Kmax(3), Kmax(3)
+
+            waveVector(3) = real(kz, DP)
+
+        do ky = -Kmax(2), Kmax(2)
+
+            waveVector(2) = real(ky, DP)
+
+        do kx = -Kmax(1), Kmax(1)
+
+            waveVector(1) = real(kx, DP)
+
+            k_dot_mNew = dot_product(waveVector, mNewOverL)
+
+            k_dot_mOld = dot_product(waveVector, mOldOverL)
+
+            k_dot_structure = dot_product(cmplx(waveVector, 0._DP, DP), &
+                                          this%Epot_reci_structure(:, kx, ky, kz))
+
+            exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky) * exp_IkxCol_3(kz)
+            cos_kxCol = real(exp_IkxCol, DP)
+            sin_kxCol = aimag(exp_IkxCol)
+
+            realPart1 = cos_kxCol * (real(k_dot_structure, DP) - k_dot_mOld * cos_kxCol)
+            realPart2 = sin_kxCol * (aimag(k_dot_structure) - k_dot_mOld * sin_kxCol)
+
+            realPart = realPart1 + realPart2
+
+        end do
+
+        end do
+
+        end do
 
     end function DipolarSpheres_Epot_reci_rotate
 
