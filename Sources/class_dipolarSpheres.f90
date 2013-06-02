@@ -78,6 +78,7 @@ private
         procedure :: Epot_real_print => DipolarSpheres_Epot_real_print
         procedure :: Epot_real_interpol => DipolarSpheres_Epot_real_interpol
         procedure :: Epot_real_pair => DipolarSpheres_Epot_real_pair
+        procedure :: Epot_real_neigh => DipolarSpheres_Epot_real_neigh
         procedure :: Epot_real => DipolarSpheres_Epot_real
         !>     Reciprocal
         procedure :: Epot_reci_init => DipolarSpheres_Epot_reci_init
@@ -89,8 +90,7 @@ private
         !>     Self
         procedure :: Epot_self_solo => DipolarSpheres_Epot_self_solo
         procedure :: Epot_self => DipolarSpheres_Epot_self
-        !>     (Other)
-        procedure :: Epot_neigh => DipolarSpheres_Epot_neigh
+        !>     Total
         procedure :: Epot_conf => DipolarSpheres_Epot_conf
         procedure :: consistTest => DipolarSpheres_consistTest
         
@@ -469,7 +469,7 @@ contains
 
     !> Real potential energy : short-range
 
-    subroutine DipolarSpheres_Epot_neigh(this, iCol, xCol, mCol, iCell, overlap, energ)
+    subroutine DipolarSpheres_Epot_real_neigh(this, iCol, xCol, mCol, iCell, overlap, energ)
 
         class(DipolarSpheres), intent(in) :: this
         integer, intent(in) :: iCol, iCell
@@ -520,7 +520,7 @@ contains
 
         end do
 
-    end subroutine DipolarSpheres_Epot_neigh
+    end subroutine DipolarSpheres_Epot_real_neigh
 
     ! Reciprocal -----------------------------------------------------------------------------------
 
@@ -780,13 +780,13 @@ contains
         if (.not. overlap) then
         
             same_iCellNew = this%same%position_to_cell(xNew)
-            call this%Epot_neigh(iOld, xNew, this%M(:, iOld), same_iCellNew, overlap, same_eNew)
+            call this%Epot_real_neigh(iOld, xNew, this%M(:, iOld), same_iCellNew, overlap, same_eNew)
                         
             if (.not. overlap) then
                 
                 ! Real
                 same_iCellOld = this%same%position_to_cell(this%X(:, iOld))
-                call this%Epot_neigh(iOld, this%X(:, iOld), this%M(:, iOld), same_iCellOld, &
+                call this%Epot_real_neigh(iOld, this%X(:, iOld), this%M(:, iOld), same_iCellOld, &
                                      overlap, same_eOld)
                 ! Reci
                 C_xNew(:) = real(xNew(:)/Lsize(:), C_double) - 0.5_c_double
@@ -858,8 +858,8 @@ contains
         C_Epot = C_Epot_reci_rotate(int(iOld-1, C_int), C_mNew, real(Volume, C_double))
         
         iCell = this%same%position_to_cell(this%X(:, iOld))
-        call this%Epot_neigh(iOld, this%X(:, iOld), mNew, iCell, overlap, real_eNew)
-        call this%Epot_neigh(iOld, this%X(:, iOld), this%M(:, iOld), iCell, overlap, real_eOld)        
+        call this%Epot_real_neigh(iOld, this%X(:, iOld), mNew, iCell, overlap, real_eNew)
+        call this%Epot_real_neigh(iOld, this%X(:, iOld), this%M(:, iOld), iCell, overlap, real_eOld)
         real_dEpot = real_eNew - real_eOld
         
         self_dEpot = this%Epot_self_solo(mNew) - this%Epot_self_solo(this%M(:, iOld))
@@ -914,7 +914,7 @@ contains
                 mTest(:) = random_surface()
                                
                 same_iCellTest = this%same%position_to_cell(xTest)               
-                call this%Epot_neigh(0, xTest, mTest, same_iCellTest, overlap, same_enTest)
+                call this%Epot_real_neigh(0, xTest, mTest, same_iCellTest, overlap, same_enTest)
                 
                 if (.not. overlap) then
                 
