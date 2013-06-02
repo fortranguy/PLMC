@@ -747,7 +747,7 @@ contains
 
         xNewOverL(:) = xNew(:)/Lsize(:)
         xOldOverL(:) = this%X(:, lCol)/Lsize(:)
-
+        
         call fourier(xNewOverL, exp_IkxNew_1, exp_IkxNew_2, exp_IkxNew_3)
         call fourier(xOldOverL, exp_IkxOld_1, exp_IkxOld_2, exp_IkxOld_3)
 
@@ -829,7 +829,7 @@ contains
 
         xNewOverL(:) = xNew(:)/Lsize(:)
         xOldOverL(:) = this%X(:, lCol)/Lsize(:)
-
+        
         call fourier(xNewOverL, exp_IkxNew_1, exp_IkxNew_2, exp_IkxNew_3)
         call fourier(xOldOverL, exp_IkxOld_1, exp_IkxOld_2, exp_IkxOld_3)
 
@@ -886,8 +886,8 @@ contains
 
         real(DP) :: Epot_k
 
-        real(DP), dimension(Dim) :: mNewOverL, mOldOverL
         real(DP), dimension(Dim) :: xColOverL
+        real(DP), dimension(Dim) :: mNewOverL, mOldOverL
 
         complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxCol_1
         complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxCol_2
@@ -903,7 +903,7 @@ contains
         integer :: kx, ky, kz
 
         xColOverL(:) = this%X(:, lCol)/Lsize(:)
-
+        
         call fourier(xColOverL, exp_IkxCol_1, exp_IkxCol_2, exp_IkxCol_3)
 
         mNewOverL(:) = mNew(:)/Lsize(:)
@@ -950,9 +950,47 @@ contains
 
     end function DipolarSpheres_Epot_reci_rotate
 
-    subroutine DipolarSpheres_Epot_reci_updateM(this)
+    !> Update moment -> update the ``structure factor''
+    !>  \f[
+    !>      \Delta \vec{S} = (\vec{\mu}_l^\prime - \vec{\mu}_l) e^{+i\vec{k}\cdot\vec{x}_l}
+    !>  \f]
+    !>
+
+    subroutine DipolarSpheres_Epot_reci_updateM(this, lCol, mNew)
 
         class(DipolarSpheres), intent(inout) :: this
+        integer, intent(in) :: lCol
+        real(DP), dimension(Dim), intent(in) :: mNew
+
+        real(DP), dimension(Dim) :: xColOverL
+        real(DP), dimension(Dim) :: mNewOverL, mOldOverL
+
+        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxCol_1
+        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxCol_2
+        complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_IkxCol_3
+        complex(DP) :: exp_IkxCol
+
+        integer :: kx, ky, kz
+
+        xColOverL(:) = this%X(:, lCol)/Lsize(:)
+        
+        call fourier(xColOverL, exp_IkxCol_1, exp_IkxCol_2, exp_IkxCol_3)
+
+        mNewOverL(:) = mNew(:)/Lsize(:)
+        mOldOverL(:) = this%M(:, lCol)/Lsize(:)
+
+        do kz = -Kmax(3), Kmax(3)
+        do ky = -Kmax(2), Kmax(2)
+        do kx = -Kmax(1), Kmax(1)
+
+            exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky) * exp_IkxCol_3(kz)
+
+            this%Epot_reci_structure(:, kx, ky, kz) = this%Epot_reci_structure(:, kx, ky, kz) + &
+                                                      (mNewOverL(:) - mOldOverL(:)) * exp_IkxCol
+
+        end do
+        end do
+        end do
 
     end subroutine DipolarSpheres_Epot_reci_updateM
 
