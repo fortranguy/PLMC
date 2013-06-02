@@ -1123,7 +1123,7 @@ contains
                 if (rand < exp(-dEpot/Tstar)) then
                 
                     this%X(:, iOld) = xNew(:)
-                    call C_Epot_reci_updateX(int(iOld-1, C_int), C_xNew)
+                    call this%Epot_reci_updateX(iOld, xNew)
                     
                     same_Epot = same_Epot + same_dEpot
                     mix_Epot = mix_Epot + mix_dEpot
@@ -1187,7 +1187,7 @@ contains
         if (rand < exp(-dEpot/Tstar)) then
         
             this%M(:, iOld) = mNew(:)
-            call C_Epot_reci_updateM(int(iOld-1, C_int), C_mNew)
+            call this%Epot_reci_updateM(iOld, mNew)
             
             Epot = Epot + dEpot
             
