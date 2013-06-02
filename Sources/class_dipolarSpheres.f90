@@ -694,10 +694,60 @@ contains
 
     !> Move
 
+    !> Difference of Energy \f[ \Delta U = \frac{2\pi}{V} \sum_{\vec{k} \neq 0} \Delta M^2
+    !> f(\alpha, \vec{k}) \f]
+    !> \f[
+    !>  \Delta M^2 = 2\Re[
+    !>                  (\vec{\mu}_l\cdot\vec{k})
+    !>                  (e^{-i\vec{k}\cdot\vec{x}^\prime_l} - e^{-i\vec{k}\cdot\vec{x}_l})
+    !>                  (\vec{k}\cdot\vec{S}_l)
+    !>               ]
+    !> \f]
+    !> \f[ \vec{S}_l = \sum_{i \neq l} \vec{\mu}_i e^{+i\vec{k}\cdot\vec{x}_i} \f]
+    !> Implementation :
+    !> \f[
+    !>  \Delta M^2 = 2(\vec{\mu_l}\cdot\vec{k})
+    !>              [ \cos(\vec{k}\cdot\vec{x}^\prime_l) - \cos(\vec{k}\cdot\vec{x})]
+    !>              [\Re{(\vec{k}\cdot\vec{S})} - (\vec{k}\cdot\vec{\mu}_l) \cos(\vec{k}\cdot
+    !>                  \vec{x}_l)] -
+    !>              [-\sin(\vec{k}\cdot\vec{x}^\prime_l) + \sin(\vec{k}\cdot\vec{x})]
+    !>              [\Im{(\vec{k}\cdot\vec{S})} - (\vec{k}\cdot\vec{\mu}_l) \sin(\vec{k}\cdot
+    !>                  \vec{x}_l)]
+    !> \f]
+    !>
+
     function DipolarSpheres_Epot_reci_move(this) result(Epot_reci_move)
 
         class(DipolarSpheres), intent(in) :: this
         real(DP) :: Epot_reci_move
+
+        complex(DP) :: exp_IkxNew
+        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxNew_1
+        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxNew_2
+        complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_IkxNew_3
+
+        complex(DP) :: exp_IkxOld
+        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxOld_1
+        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxOld_2
+        complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_IkxOld_3
+
+        xNewOverL(:) = xNew(:)/Lsize(:)
+        xOldOverL(:) = this%X(:, lCol)/Lsize(:)        
+
+        call fourier(xNewOverL, exp_IkxNew_1, exp_IkxNew_2, exp_IkxNew_3)
+        call fourier(xOldOverL, exp_IkxOld_1, exp_IkxOld_2, exp_IkxOld_3)
+
+        Epot_reci_move = 0._DP
+
+        do kz = -Kmax(3), Kmax(3)
+        do ky = -Kmax(2), Kmax(2)
+        do kx = -Kmax(1), Kmax(1)
+
+            
+
+        end do
+        end do
+        end do
 
     end function DipolarSpheres_Epot_reci_move
 
@@ -1024,3 +1074,4 @@ contains
     end subroutine DipolarSpheres_consistTest
 
 end module class_dipolarSpheres
+
