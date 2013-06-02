@@ -435,37 +435,6 @@ contains
         Epot_real_pair = dot_product(Epot_coeff, this%Epot_real_interpol(r_ij))
     
     end function DipolarSpheres_Epot_real_pair
-    
-    !> Total real energy
-    
-    function DipolarSpheres_Epot_real(this) result(Epot_real)
-    
-        class(DipolarSpheres), intent(in) :: this
-        real(DP) :: Epot_real
-        
-        real(DP), dimension(Dim) :: rVec_ij
-        real(DP) :: r_ij
-        integer :: iCol, jCol
-    
-        Epot_real = 0._DP
-        
-        do jCol = 1, this%Ncol
-            do iCol = 1, this%Ncol
-                if (iCol /= jCol) then
-                    
-                    rVec_ij = distVec(this%X(:, iCol), this%X(:, jCol))
-                    r_ij = norm2(rVec_ij)
-                    
-                    Epot_real = Epot_real + &
-                                this%Epot_real_pair(this%M(:, iCol), this%M(:, jCol), rVec_ij, r_ij)
-                    
-                end if
-            end do
-        end do
-        
-        Epot_real = 0.5_DP*Epot_real
-    
-    end function DipolarSpheres_Epot_real
 
     !> Real potential energy : short-range
 
@@ -521,6 +490,37 @@ contains
         end do
 
     end subroutine DipolarSpheres_Epot_real_neigh
+    
+    !> Total real energy
+    
+    function DipolarSpheres_Epot_real(this) result(Epot_real)
+    
+        class(DipolarSpheres), intent(in) :: this
+        real(DP) :: Epot_real
+        
+        real(DP), dimension(Dim) :: rVec_ij
+        real(DP) :: r_ij
+        integer :: iCol, jCol
+    
+        Epot_real = 0._DP
+        
+        do jCol = 1, this%Ncol
+            do iCol = 1, this%Ncol
+                if (iCol /= jCol) then
+                    
+                    rVec_ij = distVec(this%X(:, iCol), this%X(:, jCol))
+                    r_ij = norm2(rVec_ij)
+                    
+                    Epot_real = Epot_real + &
+                                this%Epot_real_pair(this%M(:, iCol), this%M(:, jCol), rVec_ij, r_ij)
+                    
+                end if
+            end do
+        end do
+        
+        Epot_real = 0.5_DP*Epot_real
+    
+    end function DipolarSpheres_Epot_real
 
     ! Reciprocal -----------------------------------------------------------------------------------
 
