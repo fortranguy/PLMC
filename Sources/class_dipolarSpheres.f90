@@ -80,12 +80,19 @@ private
         procedure :: Epot_real_pair => DipolarSpheres_Epot_real_pair
         procedure :: Epot_real_neigh => DipolarSpheres_Epot_real_neigh
         procedure :: Epot_real => DipolarSpheres_Epot_real
-        !>     Reciprocal
+        !>     Reciprocal : init
         procedure :: Epot_reci_init => DipolarSpheres_Epot_reci_init
         procedure :: Epot_reci_weight_init => DipolarSpheres_Epot_reci_weight_init
         procedure :: Epot_reci_structure_init => DipolarSpheres_Epot_reci_structure_init
         procedure :: Epot_reci_structure_reInit => DipolarSpheres_Epot_reci_structure_reInit
         procedure :: Epot_reci_potential_init => DipolarSpheres_Epot_reci_potential_init
+        !>     Reciprocal : delta
+        procedure :: Epot_reci_move => DipolarSpheres_Epot_reci_move
+        procedure :: Epot_reci_updateX => DipolarSpheres_Epot_reci_updateX
+        procedure :: Epot_reci_rotate => DipolarSpheres_Epot_reci_rotate
+        procedure :: Epot_reci_updateM => DipolarSpheres_Epot_reci_updateM
+        procedure :: Epot_reci_test => DipolarSpheres_Epot_reci_test
+        !>     Reciprocal : total
         procedure :: Epot_reci => DipolarSpheres_Epot_reci
         !>     Self
         procedure :: Epot_self_solo => DipolarSpheres_Epot_self_solo
@@ -684,6 +691,45 @@ contains
         end do
         
     end subroutine DipolarSpheres_Epot_reci_potential_init
+
+    !> Move
+
+    function DipolarSpheres_Epot_reci_move(this) result(Epot_reci_move)
+
+        class(DipolarSpheres), intent(in) :: this
+        real(DP) :: Epot_reci_move
+
+    end function DipolarSpheres_Epot_reci_move
+
+    subroutine DipolarSpheres_Epot_reci_updateX(this)
+
+        class(DipolarSpheres), intent(inout) :: this
+
+    end subroutine DipolarSpheres_Epot_reci_updateX
+
+    ! Rotate
+
+    function DipolarSpheres_Epot_reci_rotate(this) result(Epot_reci_rotate)
+
+        class(DipolarSpheres), intent(in) :: this
+        real(DP) :: Epot_reci_rotate
+
+    end function DipolarSpheres_Epot_reci_rotate
+
+    subroutine DipolarSpheres_Epot_reci_updateM(this)
+
+        class(DipolarSpheres), intent(inout) :: this
+
+    end subroutine DipolarSpheres_Epot_reci_updateM
+
+    ! Widom
+
+    function DipolarSpheres_Epot_reci_test(this) result(Epot_reci_test)
+
+        class(DipolarSpheres), intent(in) :: this
+        real(DP) :: Epot_reci_test
+
+    end function DipolarSpheres_Epot_reci_test
     
     !> Total reciprocal energy
     
