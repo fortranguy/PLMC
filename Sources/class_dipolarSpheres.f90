@@ -1155,28 +1155,23 @@ contains
         
         real(DP) :: rand
         real(DP), dimension(Dim) :: mNew
-        real(DP) :: dEpot, real_dEpot, self_dEpot
+        real(DP) :: dEpot, dEpot_real, dEpot_reci, dEpot_self
         real(DP) :: real_eNew, real_eOld
         integer :: iCell
         logical :: overlap
         
-        real(C_double) :: C_Epot
-        real(C_double), dimension(Dim) :: C_mNew
-        
-        mNew(:) = this%M(:, iOld)
-        call markov_surface(mNew, this%dm)
-        
-        C_mNew(:) = real(mNew(:)/Lsize(:), C_double)
-        C_Epot = C_Epot_reci_rotate(int(iOld-1, C_int), C_mNew, real(Volume, C_double))
-        
         iCell = this%same%position_to_cell(this%X(:, iOld))
         call this%Epot_real_neigh(iOld, this%X(:, iOld), mNew, iCell, overlap, real_eNew)
         call this%Epot_real_neigh(iOld, this%X(:, iOld), this%M(:, iOld), iCell, overlap, real_eOld)
-        real_dEpot = real_eNew - real_eOld
+        dEpot_real = real_eNew - real_eOld
+
+        mNew(:) = this%M(:, iOld)
+        call markov_surface(mNew, this%dm)
+        dEpot_reci = this%Epot_reci_rotate(iOld, mNew)
         
-        self_dEpot = this%Epot_self_solo(mNew) - this%Epot_self_solo(this%M(:, iOld))
+        dEpot_self = this%Epot_self_solo(mNew) - this%Epot_self_solo(this%M(:, iOld))
         
-        dEpot = real(C_Epot, DP) + real_dEpot - self_dEpot
+        dEpot = dEpot_real + dEpot_reci - dEpot_self
         call random_number(rand)
         if (rand < exp(-dEpot/Tstar)) then
         
