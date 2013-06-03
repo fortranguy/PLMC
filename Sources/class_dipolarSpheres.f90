@@ -947,7 +947,7 @@ contains
 
         real(DP) :: realPart, realPart1, realPart2
         
-        integer :: kMax1_sym, kMax2_sym
+        integer :: kMax1_sym, kMax2_sym ! symmetry : half wave vectors -> double Energy
         real(DP), dimension(Dim) :: waveVector
         real(DP) :: k_dot_mNew, k_dot_mOld
         complex(DP) :: k_dot_structure
@@ -1012,7 +1012,7 @@ contains
 
         end do
 
-        deltaEpot_reci_rotate = 2._DP*PI/Volume * deltaEpot_reci_rotate
+        deltaEpot_reci_rotate = 4._DP*PI/Volume * deltaEpot_reci_rotate
 
     end function DipolarSpheres_deltaEpot_reci_rotate
 
