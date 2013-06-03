@@ -706,12 +706,41 @@ contains
         
     end subroutine DipolarSpheres_Epot_reci_potential_init
 
+    ! Symmetry : half wave vectors in do loop
+    
+    function kMax2_sym(kz)
+
+        integer, intent(in) :: kz
+        integer :: kMax2_sym
+
+        if (kz == 0) then
+            kMax2_sym = 0
+        else
+            kMax2_sym = kMax(2)
+        end if
+
+    end function kMax2_sym
+
+    function kMax1_sym(ky, kz)
+
+        integer, intent(in) :: ky, kz
+        integer :: kMax1_sym
+
+        if (ky == 0 .and. kz == 0) then
+            kMax1_sym = 0
+        else
+            kMax1_sym = kMax(1)
+        end if
+
+    end function kMax1_sym
+
+    ! Count the number of wave vectors
+
     subroutine DipolarSpheres_Epot_reci_countNwaveVectors(this, waveVectors_unit)
 
         class(DipolarSpheres), intent(inout) :: this
         integer, intent(in) :: waveVectors_unit
-
-        integer :: kMax1_sym, kMax2_sym ! symmetry : half wave vectors
+        
         real(DP), dimension(Dim) :: waveVector
         integer :: kx, ky, kz
 
@@ -721,23 +750,11 @@ contains
 
             waveVector(3) = real(kz, DP)
 
-            if (kz == 0) then
-                kMax2_sym = 0
-            else
-                kMax2_sym = kMax(2)
-            end if
-
-            do ky = -Kmax(2), kMax2_sym
+            do ky = -Kmax(2), kMax2_sym(kz)
 
                 waveVector(2) = real(ky, DP)
 
-                if (kz == 0 .and. ky == 0) then
-                    kMax1_sym = 0
-                else
-                    kMax1_sym = kMax(1)
-                end if
-
-                do kx = -kMax(1), kMax1_sym
+                do kx = -kMax(1), kMax1_sym(ky, kz)
 
                     waveVector(1) = real(kx, DP)
 
@@ -809,7 +826,6 @@ contains
 
         real(DP) :: realPart1, realPart2
         
-        integer :: kMax1_sym, kMax2_sym ! symmetry : half wave vectors -> double Energy
         real(DP), dimension(Dim) :: waveVector
         real(DP) :: k_dot_mCol
         complex(DP) :: k_dot_structure
@@ -825,27 +841,15 @@ contains
 
         deltaEpot_reci_move = 0._DP
 
-        do kz = -Kmax(3), 0
+        do kz = -Kmax(3), 0 ! symmetry : half wave vectors -> double Energy
 
             waveVector(3) = real(kz, DP)
-            
-            if (kz == 0) then
-                kMax2_sym = 0
-            else
-                kMax2_sym = kMax(2)
-            end if
 
-            do ky = -Kmax(2), kMax2_sym
+            do ky = -Kmax(2), kMax2_sym(kz) 
 
                 waveVector(2) = real(ky, DP)
-
-                if (kz == 0 .and. ky == 0) then
-                    kMax1_sym = 0
-                else
-                    kMax1_sym = kMax(1)
-                end if
             
-                do kx = -kMax(1), kMax1_sym
+                do kx = -kMax(1), kMax1_sym(ky, kz)
 
                     waveVector(1) = real(kx, DP)
 
@@ -909,7 +913,6 @@ contains
         complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_IkxOld_3
         complex(DP) :: exp_IkxOld
         
-        integer :: kMax1_sym, kMax2_sym ! symmetry : half wave vectors
         integer :: kx, ky, kz
 
         xNewOverL(:) = xNew(:)/Lsize(:)
@@ -921,22 +924,10 @@ contains
         mColOverL(:) = this%orientations(:, lCol)/Lsize(:)
 
         do kz = -kMax(3), 0
-    
-            if (kz == 0) then
-                kMax2_sym = 0
-            else
-                kMax2_sym = kMax(2)
-            end if
             
-            do ky = -kMax(2), kMax2_sym
-            
-                if (kz == 0 .and. ky == 0) then
-                    kMax1_sym = 0
-                else
-                    kMax1_sym = kMax(1)
-                end if
+            do ky = -kMax(2), kMax2_sym(kz)
                 
-                do kx = -kMax(1), kMax1_sym
+                do kx = -kMax(1), kMax1_sym(ky, kz)
 
                     exp_IkxNew = exp_IkxNew_1(kx) * exp_IkxNew_2(ky) * exp_IkxNew_3(kz)
                     exp_IkxOld = exp_IkxOld_1(kx) * exp_IkxOld_2(ky) * exp_IkxOld_3(kz)
@@ -998,7 +989,6 @@ contains
 
         real(DP) :: realPart, realPart1, realPart2
         
-        integer :: kMax1_sym, kMax2_sym ! symmetry : half wave vectors -> double Energy
         real(DP), dimension(Dim) :: waveVector
         real(DP) :: k_dot_mNew, k_dot_mOld
         complex(DP) :: k_dot_structure
@@ -1013,27 +1003,15 @@ contains
 
         deltaEpot_reci_rotate = 0._DP
 
-        do kz = -Kmax(3), 0
+        do kz = -Kmax(3), 0 ! symmetry : half wave vectors -> double Energy
 
             waveVector(3) = real(kz, DP)
-            
-            if (kz == 0) then
-                kMax2_sym = 0
-            else
-                kMax2_sym = kMax(2)
-            end if
 
-            do ky = -Kmax(2), kMax2_sym
+            do ky = -Kmax(2), kMax2_sym(kz)
 
                 waveVector(2) = real(ky, DP)
-
-                if (kz == 0 .and. ky == 0) then
-                    kMax1_sym = 0
-                else
-                    kMax1_sym = kMax(1)
-                end if
             
-                do kx = -kMax(1), kMax1_sym
+                do kx = -kMax(1), kMax1_sym(ky, kz)
 
                     waveVector(1) = real(kx, DP)
 
@@ -1088,7 +1066,6 @@ contains
         complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_IkxCol_3
         complex(DP) :: exp_IkxCol
         
-        integer :: kMax1_sym, kMax2_sym
         integer :: kx, ky, kz
 
         xColOverL(:) = this%positions(:, lCol)/Lsize(:)
@@ -1099,28 +1076,16 @@ contains
         mOldOverL(:) = this%orientations(:, lCol)/Lsize(:)
 
         do kz = -kMax(3), 0
-    
-            if (kz == 0) then
-                kMax2_sym = 0
-            else
-                kMax2_sym = kMax(2)
-            end if
             
-            do ky = -kMax(2), kMax2_sym
-            
-                if (kz == 0 .and. ky == 0) then
-                    kMax1_sym = 0
-                else
-                    kMax1_sym = kMax(1)
-                end if
+            do ky = -kMax(2), kMax2_sym(kz)
                 
-                do kx = -kMax(1), kMax1_sym
+                do kx = -kMax(1), kMax1_sym(ky, kz)
 
-                exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky) * exp_IkxCol_3(kz)
+                    exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky) * exp_IkxCol_3(kz)
 
-                this%Epot_reci_structure(:, kx, ky, kz) = &
-                    this%Epot_reci_structure(:, kx, ky, kz) + &
-                    (mNewOverL(:) - mOldOverL(:)) * exp_IkxCol
+                    this%Epot_reci_structure(:, kx, ky, kz) = &
+                        this%Epot_reci_structure(:, kx, ky, kz) + &
+                        (mNewOverL(:) - mOldOverL(:)) * exp_IkxCol
 
                 end do
                 
@@ -1170,7 +1135,6 @@ contains
         
         real(DP) :: realPart
         
-        integer :: kMax1_sym, kMax2_sym
         real(DP), dimension(Dim) :: waveVector
         real(DP) :: k_dot_mTest
         complex(DP) :: k_dot_structure
@@ -1187,24 +1151,12 @@ contains
         do kz = -Kmax(3), 0
 
             waveVector(3) = real(kz, DP)
-            
-            if (kz == 0) then
-                kMax2_sym = 0
-            else
-                kMax2_sym = kMax(2)
-            end if
 
-            do ky = -Kmax(2), kMax2_sym
+            do ky = -Kmax(2), kMax2_sym(kz)
 
                 waveVector(2) = real(ky, DP)
-
-                if (kz == 0 .and. ky == 0) then
-                    kMax1_sym = 0
-                else
-                    kMax1_sym = kMax(1)
-                end if
             
-                do kx = -kMax(1), kMax1_sym
+                do kx = -kMax(1), kMax1_sym(ky, kz)
                 
                     waveVector(1) = real(kx, DP)
                     
