@@ -70,7 +70,8 @@ contains
                         write(report_unit, *) "    Random depositions + random orientations"
                     case default
                         write(error_unit, *) "Enter the initial condition : "
-                        write(error_unit, *) "   'rand' or '[type1_X] [type1_M] [type2_X]'."
+                        write(error_unit, *) &
+                            "   'rand' or '[type1_positions] [type1_M] [type2_positions]'."
                         stop
                 end select
                 
@@ -87,7 +88,7 @@ contains
             
             case default
                 write(error_unit, *) "Enter the initial condition : "
-                write(error_unit, *) "   'rand' or '[type1_X] [type1_M] [type2_X]'."
+                write(error_unit, *) "   'rand' or '[type1_positions] [type1_M] [type2_positions]'."
                 stop
                 
         end select
@@ -96,9 +97,9 @@ contains
     
     !> Random depositions configuration
     
-    subroutine randomDepositions(type1_X, type1_rMin, type2_X, type2_rMin, mix_rMin)
+    subroutine randomDepositions(type1_positions, type1_rMin, type2_positions, type2_rMin, mix_rMin)
     
-        real(DP), dimension(:, :), intent(out) :: type1_X, type2_X
+        real(DP), dimension(:, :), intent(out) :: type1_positions, type2_positions
         real(DP), intent(in) :: type1_rMin, type2_rMin, mix_rMin
         
         integer :: type1_Ncol, type2_Ncol
@@ -107,14 +108,14 @@ contains
         real(DP) :: rTest
         
         ! Type 1
-        type1_Ncol = size(type1_X, 2)
+        type1_Ncol = size(type1_positions, 2)
         do iCol = 1, type1_Ncol
         
 7101        call random_number(xRand)
-            type1_X(:, iCol) = xRand*Lsize(:)
+            type1_positions(:, iCol) = xRand*Lsize(:)
             
             do iColTest = 1, iCol-1            
-                rTest = dist(type1_X(:, iColTest), type1_X(:, iCol))
+                rTest = dist(type1_positions(:, iColTest), type1_positions(:, iCol))
                 if (rTest < type1_rMin) then
                     goto 7101
                 end if            
@@ -123,21 +124,21 @@ contains
         end do
         
         ! Type 2
-        type2_Ncol = size(type2_X, 2)
+        type2_Ncol = size(type2_positions, 2)
         do iCol = 1, type2_Ncol
         
 7102        call random_number(xRand)
-            type2_X(:, iCol) = xRand*Lsize(:)
+            type2_positions(:, iCol) = xRand*Lsize(:)
             
             do iColTest = 1, type1_Ncol
-                rTest = dist(type1_X(:, iColTest), type2_X(:, iCol))
+                rTest = dist(type1_positions(:, iColTest), type2_positions(:, iCol))
                 if (rTest < mix_rMin) then
                     goto 7102
                 end if            
             end do
             
             do iColTest = 1, iCol-1            
-                rTest = dist(type2_X(:, iColTest), type2_X(:, iCol))
+                rTest = dist(type2_positions(:, iColTest), type2_positions(:, iCol))
                 if (rTest < type2_rMin) then
                     goto 7102
                 end if            

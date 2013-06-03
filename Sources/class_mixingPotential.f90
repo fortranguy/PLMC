@@ -141,22 +141,22 @@ contains
     
     !> Overlapt test
     
-    subroutine MixingPotential_overlapTest(this, type1_X, type2_X)
+    subroutine MixingPotential_overlapTest(this, type1_positions, type2_positions)
     
         class(MixingPotential), intent(in) :: this
-        real(DP), dimension(:, :), intent(in) :: type1_X, type2_X
+        real(DP), dimension(:, :), intent(in) :: type1_positions, type2_positions
         
         integer :: Ncol1, Ncol2
         integer :: iCol1, iCol2
         real(DP) :: r_mix
         
-        Ncol1 = size(type1_X, 2)
-        Ncol2 = size(type2_X, 2)
+        Ncol1 = size(type1_positions, 2)
+        Ncol2 = size(type2_positions, 2)
         
         do iCol1 = 1, Ncol1
             do iCol2 = 1, Ncol2
                     
-                r_mix = dist(type1_X(:, iCol1), type2_X(:, iCol2))
+                r_mix = dist(type1_positions(:, iCol1), type2_positions(:, iCol2))
                 if (r_mix < this%rMin) then
                     write(error_unit, *) this%name, " :    Overlap !", iCol1, iCol2
                     write(error_unit, *) "    r_mix = ", r_mix
@@ -279,25 +279,25 @@ contains
     
     !> Total potential energy
     
-    function MixingPotential_Epot_conf(this, type1_X, type2_X) result(Epot_conf)
+    function MixingPotential_Epot_conf(this, type1_positions, type2_positions) result(Epot_conf)
     
         class(MixingPotential), intent(in) :: this
-        real(DP), dimension(:, :), intent(in) :: type1_X, type2_X
+        real(DP), dimension(:, :), intent(in) :: type1_positions, type2_positions
         real(DP) :: Epot_conf
         
         integer :: Ncol1, Ncol2
         integer :: iCol1, iCol2
         real(DP) :: r_mix
         
-        Ncol1 = size(type1_X, 2)
-        Ncol2 = size(type2_X, 2)
+        Ncol1 = size(type1_positions, 2)
+        Ncol2 = size(type2_positions, 2)
         
         Epot_conf = 0._DP
         
         do iCol1 = 1, Ncol1
             do iCol2 = 1, Ncol2
                 
-                r_mix = dist(type1_X(:, iCol1), type2_X(:, iCol2))
+                r_mix = dist(type1_positions(:, iCol1), type2_positions(:, iCol2))
                 Epot_conf = Epot_conf + this%Epot_pair(r_mix)
 
             end do
