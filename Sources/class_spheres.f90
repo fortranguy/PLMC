@@ -23,7 +23,7 @@ private
         real(DP) :: radius !< radius of a particle
         real(DP) :: rMin !< minimum distance between two particles
         integer ::  Ncol !< number of a component particles
-        real(DP), dimension(:, :), allocatable, public :: X !< positions of all particles
+        real(DP), dimension(:, :), allocatable, public :: positions !< positions of all particles
         
         ! Snashot
         integer :: snap_factor
@@ -146,7 +146,7 @@ contains
         if (modulo(iStep, this%snap_factor) == 0) then
         
             do iCol = 1, this%Ncol
-                write(snap_unit, *) this%X(:, iCol)
+                write(snap_unit, *) this%positions(:, iCol)
             end do
             
         end if            
@@ -166,7 +166,7 @@ contains
             do iCol = 1, this%Ncol
                 if (iCol /= jCol) then
                     
-                    r_ij = dist(this%X(:, iCol), this%X(:, jCol))
+                    r_ij = dist(this%positions(:, iCol), this%positions(:, jCol))
                     if (r_ij < this%rMin) then
                         write(error_unit, *) this%name, "    Overlap !", iCol, jCol
                         write(error_unit, *) "    r_ij = ", r_ij

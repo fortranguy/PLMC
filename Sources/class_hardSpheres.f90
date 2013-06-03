@@ -60,7 +60,7 @@ contains
         this%radius = hard_radius
         this%rMin = hard_rMin
         this%Ncol = hard_Ncol
-        allocate(this%X(Dim, this%Ncol))
+        allocate(this%positions(Dim, this%Ncol))
         
         ! Snapshot
         this%snap_factor = hard_snap_factor
@@ -159,7 +159,7 @@ contains
             
                 if (current%iCol /= iCol) then
                 
-                    r = dist(xCol(:), this%X(:, current%iCol))
+                    r = dist(xCol(:), this%positions(:, current%iCol))
                     if (r < this%rMin) then
                         overlap = .true.
                         return
@@ -199,7 +199,7 @@ contains
         
         ! Random new position
         call random_number(xRand)
-        xNew(:) = this%X(:, iOld) + (xRand(:)-0.5_DP)*this%dx(:)
+        xNew(:) = this%positions(:, iOld) + (xRand(:)-0.5_DP)*this%dx(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
         
         same_iCellNew = this%same%position_to_cell(xNew)
@@ -212,11 +212,11 @@ contains
                         
             if (.not. overlap) then
     
-                same_iCellOld = this%same%position_to_cell(this%X(:, iOld))
-                call this%Epot_neigh(iOld, this%X(:, iOld), same_iCellOld, overlap)
+                same_iCellOld = this%same%position_to_cell(this%positions(:, iOld))
+                call this%Epot_neigh(iOld, this%positions(:, iOld), same_iCellOld, overlap)
                     
-                mix_iCellOld = this%mix%position_to_cell(this%X(:, iOld))
-                call mix%Epot_neigh(this%X(:, iOld), mix_iCellOld, this%mix, other%X, overlap, &
+                mix_iCellOld = this%mix%position_to_cell(this%positions(:, iOld))
+                call mix%Epot_neigh(this%positions(:, iOld), mix_iCellOld, this%mix, other%X, overlap, &
                                     mix_eOld)
                 
                 mix_dEpot = mix_eNew - mix_eOld
@@ -224,7 +224,7 @@ contains
                 call random_number(rand)
                 if (rand < exp(-mix_dEpot/Tstar)) then
                 
-                    this%X(:, iOld) = xNew(:)
+                    this%positions(:, iOld) = xNew(:)
                     same_Epot = same_Epot + 0._DP
                     mix_Epot = mix_Epot + mix_dEpot
                     

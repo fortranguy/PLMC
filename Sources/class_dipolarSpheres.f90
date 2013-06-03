@@ -118,7 +118,7 @@ contains
         this%radius = dipol_radius
         this%rMin = dipol_rMin
         this%Ncol = dipol_Ncol
-        allocate(this%X(Dim, this%Ncol))
+        allocate(this%positions(Dim, this%Ncol))
         allocate(this%M(Dim, this%Ncol))
         
         ! Snapshot
@@ -461,7 +461,7 @@ contains
 
                 if (current%iCol /= iCol) then
 
-                    rVec_ij = distVec(xCol(:), this%X(:, current%iCol))
+                    rVec_ij = distVec(xCol(:), this%positions(:, current%iCol))
                     r_ij = norm2(rVec_ij)
 
                     if (r_ij < this%rMin) then
@@ -501,7 +501,7 @@ contains
             do iCol = 1, this%Ncol
                 if (iCol /= jCol) then
                     
-                    rVec_ij = distVec(this%X(:, iCol), this%X(:, jCol))
+                    rVec_ij = distVec(this%positions(:, iCol), this%positions(:, jCol))
                     r_ij = norm2(rVec_ij)
                     
                     Epot_real = Epot_real + &
@@ -587,7 +587,7 @@ contains
 
         do iCol = 1, this%Ncol
         
-            xColOverL(:) = this%X(:, iCol)/Lsize(:)
+            xColOverL(:) = this%positions(:, iCol)/Lsize(:)
             mColOverL(:) = this%M(:, iCol)/Lsize(:)
             
             call fourier(xColOverL, exp_Ikx_1, exp_Ikx_2, exp_Ikx_3)
@@ -667,7 +667,7 @@ contains
         
         do iCol = 1, this%Ncol
         
-            xColOverL(:) = this%X(:, iCol)/Lsize(:)
+            xColOverL(:) = this%positions(:, iCol)/Lsize(:)
             
             call fourier(xColOverL, exp_Ikx_1, exp_Ikx_2, exp_Ikx_3)
         
@@ -758,7 +758,7 @@ contains
         integer :: kx, ky, kz
 
         xNewOverL(:) = xNew(:)/Lsize(:)
-        xOldOverL(:) = this%X(:, lCol)/Lsize(:)
+        xOldOverL(:) = this%positions(:, lCol)/Lsize(:)
         
         call fourier(xNewOverL, exp_IkxNew_1, exp_IkxNew_2, exp_IkxNew_3)
         call fourier(xOldOverL, exp_IkxOld_1, exp_IkxOld_2, exp_IkxOld_3)
@@ -838,7 +838,7 @@ contains
         integer :: kx, ky, kz
 
         xNewOverL(:) = xNew(:)/Lsize(:)
-        xOldOverL(:) = this%X(:, lCol)/Lsize(:)
+        xOldOverL(:) = this%positions(:, lCol)/Lsize(:)
         
         call fourier(xNewOverL, exp_IkxNew_1, exp_IkxNew_2, exp_IkxNew_3)
         call fourier(xOldOverL, exp_IkxOld_1, exp_IkxOld_2, exp_IkxOld_3)
@@ -912,7 +912,7 @@ contains
         complex(DP) :: k_dot_structure
         integer :: kx, ky, kz
 
-        xColOverL(:) = this%X(:, lCol)/Lsize(:)
+        xColOverL(:) = this%positions(:, lCol)/Lsize(:)
         
         call fourier(xColOverL, exp_IkxCol_1, exp_IkxCol_2, exp_IkxCol_3)
 
@@ -984,7 +984,7 @@ contains
 
         integer :: kx, ky, kz
 
-        xColOverL(:) = this%X(:, lCol)/Lsize(:)
+        xColOverL(:) = this%positions(:, lCol)/Lsize(:)
         
         call fourier(xColOverL, exp_IkxCol_1, exp_IkxCol_2, exp_IkxCol_3)
 
@@ -1178,7 +1178,7 @@ contains
         
         ! Random new position
         call random_number(xRand)
-        xNew(:) = this%X(:, iOld) + this%dx(:) * (xRand(:)-0.5_DP)
+        xNew(:) = this%positions(:, iOld) + this%dx(:) * (xRand(:)-0.5_DP)
         xNew(:) = modulo(xNew(:), Lsize(:))
         
         mix_iCellNew = this%mix%position_to_cell(xNew)
@@ -1193,14 +1193,14 @@ contains
             if (.not. overlap) then
                 
                 ! Real
-                same_iCellOld = this%same%position_to_cell(this%X(:, iOld))
-                call this%Epot_real_neigh(iOld, this%X(:, iOld), this%M(:, iOld), same_iCellOld, &
+                same_iCellOld = this%same%position_to_cell(this%positions(:, iOld))
+                call this%Epot_real_neigh(iOld, this%positions(:, iOld), this%M(:, iOld), same_iCellOld, &
                                           overlap, same_eOld_real)
                 
                 dEpot_same = (same_eNew_real - same_eOld_real) + this%Epot_reci_move(iOld, xNew)
                     
-                mix_iCellOld = this%mix%position_to_cell(this%X(:, iOld))
-                call mix%Epot_neigh(this%X(:, iOld), mix_iCellOld, this%mix, other%X, overlap, &
+                mix_iCellOld = this%mix%position_to_cell(this%positions(:, iOld))
+                call mix%Epot_neigh(this%positions(:, iOld), mix_iCellOld, this%mix, other%X, overlap, &
                                     mix_eOld)
                 dEpot_mix = mix_eNew - mix_eOld
                 
@@ -1210,7 +1210,7 @@ contains
                 if (rand < exp(-dEpot/Tstar)) then
 
                     call this%Epot_reci_updateX(iOld, xNew)
-                    this%X(:, iOld) = xNew(:)
+                    this%positions(:, iOld) = xNew(:)
                     
                     same_Epot = same_Epot + dEpot_same
                     mix_Epot = mix_Epot + dEpot_mix
@@ -1256,9 +1256,9 @@ contains
         mNew(:) = this%M(:, iOld)
         call markov_surface(mNew, this%dm)
         
-        iCell = this%same%position_to_cell(this%X(:, iOld))
-        call this%Epot_real_neigh(iOld, this%X(:, iOld), mNew, iCell, overlap, real_eNew)
-        call this%Epot_real_neigh(iOld, this%X(:, iOld), this%M(:, iOld), iCell, overlap, real_eOld)
+        iCell = this%same%position_to_cell(this%positions(:, iOld))
+        call this%Epot_real_neigh(iOld, this%positions(:, iOld), mNew, iCell, overlap, real_eNew)
+        call this%Epot_real_neigh(iOld, this%positions(:, iOld), this%M(:, iOld), iCell, overlap, real_eOld)
         dEpot_real = real_eNew - real_eOld        
         
         dEpot_self = this%Epot_self_solo(mNew) - this%Epot_self_solo(this%M(:, iOld))
