@@ -1258,8 +1258,8 @@ contains
         
         iCell = this%same%position_to_cell(this%positions(:, iOld))
         call this%Epot_real_neigh(iOld, this%positions(:, iOld), mNew, iCell, overlap, real_eNew)
-        call this%Epot_real_neigh(iOld, this%positions(:, iOld), this%moments(:, iOld), iCell, overlap, &
-                                  real_eOld)
+        call this%Epot_real_neigh(iOld, this%positions(:, iOld), this%moments(:, iOld), iCell, &
+                                  overlap, real_eOld)
         dEpot_real = real_eNew - real_eOld        
         
         dEpot_self = this%Epot_self_solo(mNew) - this%Epot_self_solo(this%moments(:, iOld))
@@ -1282,10 +1282,10 @@ contains
     
     !> Widom's method
 
-    subroutine DipolarSpheres_widom(this, other_X, mix, activ)
+    subroutine DipolarSpheres_widom(this, other_positions, mix, activ)
         
         class(DipolarSpheres), intent(in) :: this
-        real(DP), dimension(:, :), intent(in) :: other_X
+        real(DP), dimension(:, :), intent(in) :: other_positions
         class(MixingPotential), intent(in) :: mix
         real(DP), intent(inOut) :: activ 
         
@@ -1307,7 +1307,7 @@ contains
             xTest(:) = Lsize(:) * xRand(:)
             
             mix_iCellTest = this%mix%position_to_cell(xTest)
-            call mix%Epot_neigh(xTest, mix_iCellTest, this%mix, other_X, overlap, mix_enTest)
+            call mix%Epot_neigh(xTest, mix_iCellTest, this%mix, other_positions, overlap, mix_enTest)
             
             if (.not. overlap) then
             

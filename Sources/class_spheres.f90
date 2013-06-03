@@ -53,7 +53,7 @@ private
         procedure :: printInfo => Spheres_printInfo
         
         !> Take a snap shot of the configuration : positions
-        procedure :: snapShot_X => Spheres_snapShot_X
+        procedure :: snapShot_positions => Spheres_snapShot_positions
         
         !> Do an overlap test
         procedure :: overlapTest => Spheres_overlapTest
@@ -135,7 +135,7 @@ contains
     
     !> Configuration state : positions
       
-    subroutine Spheres_snapShot_X(this, iStep, snap_unit)
+    subroutine Spheres_snapShot_positions(this, iStep, snap_unit)
         
         class(Spheres), intent(in) :: this
         integer, intent(in) :: iStep
@@ -151,7 +151,7 @@ contains
             
         end if            
 
-    end subroutine Spheres_snapShot_X
+    end subroutine Spheres_snapShot_positions
     
     !> Overlapt test
     
@@ -183,17 +183,17 @@ contains
     
     !> Fill cells with colloids
     
-    subroutine Spheres_cols_to_cells(this, other_X)
+    subroutine Spheres_cols_to_cells(this, other_positions)
     
         class(Spheres), intent(inout) :: this
-        real(DP), dimension(:, :), intent(in) :: other_X
+        real(DP), dimension(:, :), intent(in) :: other_positions
         
         integer :: other_Ncol 
         
         call this%same%cols_to_cells(this%Ncol, this%positions)
         
-        other_Ncol = size(other_X, 2)
-        call this%mix%cols_to_cells(other_Ncol, other_X)
+        other_Ncol = size(other_positions, 2)
+        call this%mix%cols_to_cells(other_Ncol, other_positions)
     
     end subroutine Spheres_cols_to_cells
     

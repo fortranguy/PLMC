@@ -254,10 +254,10 @@ contains
     
     !> Widom's method : with other type ?
 
-    subroutine HardSpheres_widom(this, other_X, mix, activ)
+    subroutine HardSpheres_widom(this, other_positions, mix, activ)
         
         class(HardSpheres), intent(in) :: this
-        real(DP), dimension(:, :), intent(in) :: other_X
+        real(DP), dimension(:, :), intent(in) :: other_positions
         class(MixingPotential), intent(in) :: mix
         real(DP), intent(inOut) :: activ 
         
@@ -280,7 +280,8 @@ contains
             if (.not. overlap) then
             
                 mix_iCellTest = this%mix%position_to_cell(xTest)
-                call mix%Epot_neigh(xTest, mix_iCellTest, this%mix, other_X, overlap, mix_enTest)
+                call mix%Epot_neigh(xTest, mix_iCellTest, this%mix, other_positions, overlap, &
+                                    mix_enTest)
                 
                 if (.not. overlap) then
                 
