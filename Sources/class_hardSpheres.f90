@@ -68,7 +68,7 @@ contains
         ! Monte-Carlo
         this%deltaX = hard_deltaX
         this%deltaXSave = this%deltaX
-        this%rejFix = hard_rejFix
+        this%rejectFix = hard_rejectFix
         this%Nadapt = hard_Nadapt
         this%Nwidom = hard_Nwidom
                 
@@ -179,14 +179,14 @@ contains
     
     !> Particle move
     
-    subroutine HardSpheres_move(this, iOld, other, mix, same_Epot, mix_Epot, Nrej)
+    subroutine HardSpheres_move(this, iOld, other, mix, same_Epot, mix_Epot, Nreject)
     
         class(HardSpheres), intent(inout) :: this
         integer, intent(in) :: iOld
         class(Spheres), intent(inout) :: other
         class(MixingPotential), intent(in) :: mix
         real(DP), intent(inout) :: same_Epot, mix_Epot
-        integer, intent(inout) :: Nrej
+        integer, intent(inout) :: Nreject
         
         real(DP), dimension(Dim) :: xRand
         logical :: overlap
@@ -239,15 +239,15 @@ contains
                     end if
                     
                 else
-                    Nrej = Nrej + 1
+                    Nreject = Nreject + 1
                 end if
          
             else
-                Nrej = Nrej + 1                
+                Nreject = Nreject + 1                
             end if            
             
         else        
-            Nrej = Nrej + 1            
+            Nreject = Nreject + 1            
         end if
     
     end subroutine HardSpheres_move
