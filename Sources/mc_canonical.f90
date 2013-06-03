@@ -131,12 +131,12 @@ implicit none
             ! Moving a particle : 
             if (iColRand <= type1_sph%getNcol()) then
                 call type1_sph%move(iColRand, type2_sph, mix, type1_obs%Epot, mix_Epot, &
-                                    type1_obs%Nrej)
+                                    type1_obs%Nreject)
                 type1_obs%Nmove = type1_obs%Nmove + 1
             else
                 iColRand = iColRand - type1_sph%getNcol()
                 call type2_sph%move(iColRand, type1_sph, mix, type2_obs%Epot, mix_Epot, &
-                                    type2_obs%Nrej)
+                                    type2_obs%Nreject)
                 type2_obs%Nmove = type2_obs%Nmove + 1
             end if
             
@@ -147,70 +147,70 @@ implicit none
             call random_number(rand)
             iColRand = int(rand*real(type1_sph%getNcol(), DP)) + 1
  
-            call type1_sph%rotate(iColRand, type1_obs%Epot, type1_obs%NrejRot)
+            call type1_sph%rotate(iColRand, type1_obs%Epot, type1_obs%NrejectRot)
             type1_obs%Nrotate = type1_obs%Nrotate + 1
             
         end do MC_Rotate
         
         ! Rejections rates updates
-        type1_obs%rej = real(type1_obs%Nrej, DP)/real(type1_obs%Nmove, DP)
-        type1_obs%Nrej = 0; type1_obs%Nmove = 0
+        type1_obs%reject = real(type1_obs%Nreject, DP)/real(type1_obs%Nmove, DP)
+        type1_obs%Nreject = 0; type1_obs%Nmove = 0
         
-        type1_obs%rejRot = real(type1_obs%NrejRot, DP)/real(type1_obs%Nrotate, DP)
-        type1_obs%NrejRot = 0; type1_obs%Nrotate = 0
+        type1_obs%rejectRot = real(type1_obs%NrejectRot, DP)/real(type1_obs%Nrotate, DP)
+        type1_obs%NrejectRot = 0; type1_obs%Nrotate = 0
 
-        type2_obs%rej = real(type2_obs%Nrej, DP)/real(type2_obs%Nmove, DP)
-        type2_obs%Nrej = 0; type2_obs%Nmove = 0
+        type2_obs%reject = real(type2_obs%Nreject, DP)/real(type2_obs%Nmove, DP)
+        type2_obs%Nreject = 0; type2_obs%Nmove = 0
         
         MC_Regime : if (iStep <= Ntherm) then ! Thermalisation
         
-            ! Initial displacements & rejections
+            ! Initial displacements & rejectections
             if (iStep == 1) then
-                write(type1_io%deltaX, *) iStep, type1_sph%getDeltaX(), type1_obs%rej
-                write(type1_io%deltaM, *) iStep, type1_sph%getDeltaM(), type1_obs%rejRot
-                write(type2_io%deltaX, *) iStep, type2_sph%getDeltaX(), type2_obs%rej
+                write(type1_io%deltaX, *) iStep, type1_sph%getDeltaX(), type1_obs%reject
+                write(type1_io%deltaM, *) iStep, type1_sph%getDeltaM(), type1_obs%rejectRot
+                write(type2_io%deltaX, *) iStep, type2_sph%getDeltaX(), type2_obs%reject
             end if
             
             ! Displacements adaptation           
             if (mod(iStep, type1_sph%getNadapt()) /= 0) then ! Rejections accumulation
-                type1_obs%rejAdapt = type1_obs%rejAdapt + type1_obs%rej
+                type1_obs%rejectAdapt = type1_obs%rejectAdapt + type1_obs%reject
             else ! Average & adaptation
-                type1_obs%rejAdapt = type1_obs%rejAdapt/real(type1_sph%getNadapt()-1)
-                call type1_sph%adaptDeltaX(type1_obs%rejAdapt)
-                write(type1_io%deltaX, *) iStep, type1_sph%getDeltaX(), type1_obs%rejAdapt
-                type1_obs%rejAdapt = 0._DP
+                type1_obs%rejectAdapt = type1_obs%rejectAdapt/real(type1_sph%getNadapt()-1)
+                call type1_sph%adaptDeltaX(type1_obs%rejectAdapt)
+                write(type1_io%deltaX, *) iStep, type1_sph%getDeltaX(), type1_obs%rejectAdapt
+                type1_obs%rejectAdapt = 0._DP
             end if
             
             ! Rotation adaptation
             if (mod(iStep, type1_sph%getNadaptRot()) /= 0) then
-                type1_obs%rejRotAdapt = type1_obs%rejRotAdapt + type1_obs%rejRot
+                type1_obs%rejectRotAdapt = type1_obs%rejectRotAdapt + type1_obs%rejectRot
             else
-                type1_obs%rejRotAdapt = type1_obs%rejRotAdapt/real(type1_sph%getNadaptRot()-1)
-                call type1_sph%adaptDeltaM(type1_obs%rejRotAdapt)
-                write(type1_io%deltaM, *) iStep, type1_sph%getDeltaM(), type1_obs%rejRotAdapt
-                type1_obs%rejRotAdapt = 0._DP
+                type1_obs%rejectRotAdapt = type1_obs%rejectRotAdapt/real(type1_sph%getNadaptRot()-1)
+                call type1_sph%adaptDeltaM(type1_obs%rejectRotAdapt)
+                write(type1_io%deltaM, *) iStep, type1_sph%getDeltaM(), type1_obs%rejectRotAdapt
+                type1_obs%rejectRotAdapt = 0._DP
             end if
 
             if (mod(iStep, type2_sph%getNadapt()) /= 0) then
-                type2_obs%rejAdapt = type2_obs%rejAdapt + type2_obs%rej
+                type2_obs%rejectAdapt = type2_obs%rejectAdapt + type2_obs%reject
             else                
-                type2_obs%rejAdapt = type2_obs%rejAdapt/real(type2_sph%getNadapt()-1)
-                call type2_sph%adaptDeltaX(type2_obs%rejAdapt)
-                write(type2_io%deltaX, *) iStep, type2_sph%getDeltaX(), type2_obs%rejAdapt
-                type2_obs%rejAdapt = 0._DP
+                type2_obs%rejectAdapt = type2_obs%rejectAdapt/real(type2_sph%getNadapt()-1)
+                call type2_sph%adaptDeltaX(type2_obs%rejectAdapt)
+                write(type2_io%deltaX, *) iStep, type2_sph%getDeltaX(), type2_obs%rejectAdapt
+                type2_obs%rejectAdapt = 0._DP
             end if
             
             ! Observables writing
-            write(type1_io%obsThermal, *) iStep, type1_obs%Epot, 0._DP, type1_obs%rej, &
-                                                        type1_obs%rejRot
-            write(type2_io%obsThermal, *) iStep, type2_obs%Epot, 0._DP, type2_obs%rej
+            write(type1_io%obsThermal, *) iStep, type1_obs%Epot, 0._DP, type1_obs%reject, &
+                                                        type1_obs%rejectRot
+            write(type2_io%obsThermal, *) iStep, type2_obs%Epot, 0._DP, type2_obs%reject
             write(mix_obsThermal_unit, *) iStep, mix_Epot
             write(obsThermal_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
             
             if (iStep == Ntherm) then ! Definite thermalised displacements
-                call type1_sph%definiteDeltaX(type1_obs%rej, type1_io%report)
-                call type1_sph%definiteDeltaM(type1_obs%rejRot, type1_io%report)
-                call type2_sph%definiteDeltaX(type2_obs%rej, type2_io%report)
+                call type1_sph%definiteDeltaX(type1_obs%reject, type1_io%report)
+                call type1_sph%definiteDeltaM(type1_obs%rejectRot, type1_io%report)
+                call type2_sph%definiteDeltaX(type2_obs%reject, type2_io%report)
             end if       
         
         else MC_Regime ! Thermalisation over -> Equilibrium
@@ -222,18 +222,18 @@ implicit none
             ! Observables accumulations
             type1_obs%EpotSum = type1_obs%EpotSum + type1_obs%Epot
             type1_obs%activSum = type1_obs%activSum + type1_obs%activ
-            type1_obs%rejSum = type1_obs%rejSum + type1_obs%rej
-            type1_obs%rejRotSum = type1_obs%rejRotSum + type1_obs%rejRot
+            type1_obs%rejectSum = type1_obs%rejectSum + type1_obs%reject
+            type1_obs%rejectRotSum = type1_obs%rejectRotSum + type1_obs%rejectRot
         
             type2_obs%EpotSum = type2_obs%EpotSum + type2_obs%Epot
             type2_obs%activSum = type2_obs%activSum + type2_obs%activ
-            type2_obs%rejSum = type2_obs%rejSum + type2_obs%rej
+            type2_obs%rejectSum = type2_obs%rejectSum + type2_obs%reject
                 
             mix_EpotSum = mix_EpotSum + mix_Epot
 
-            write(type1_io%obsEquilib, *) iStep, type1_obs%Epot, type1_obs%activ, type1_obs%rej, &
-                                                     type1_obs%rejRot
-            write(type2_io%obsEquilib, *) iStep, type2_obs%Epot, type2_obs%activ, type2_obs%rej
+            write(type1_io%obsEquilib, *) iStep, type1_obs%Epot, type1_obs%activ, type1_obs%reject, &
+                                                     type1_obs%rejectRot
+            write(type2_io%obsEquilib, *) iStep, type2_obs%Epot, type2_obs%activ, type2_obs%reject
             write(mix_obsEquilib_unit, *) iStep, mix_Epot
             write(obsEquilib_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
 
