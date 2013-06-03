@@ -738,6 +738,8 @@ contains
         integer, intent(in) :: lCol
         real(DP), dimension(Dim), intent(in) :: xNew
         real(DP) :: deltaEpot_reci_move
+        
+        real(DP) :: deltaEpot_k
 
         real(DP), dimension(Dim) :: xNewOverL, xOldOverL
         real(DP), dimension(Dim) :: mColOverL
@@ -755,7 +757,8 @@ contains
         real(DP) :: cos_kxOld, sin_kxOld
 
         real(DP) :: realPart1, realPart2
-
+        
+        integer :: kMax2_sym ! symmetry : half wave vectors -> double Energy
         real(DP), dimension(Dim) :: waveVector
         real(DP) :: k_dot_mCol
         complex(DP) :: k_dot_structure
@@ -771,11 +774,17 @@ contains
 
         deltaEpot_reci_move = 0._DP
 
-        do kz = -Kmax(3), Kmax(3)
+        do kz = -Kmax(3), 0
 
             waveVector(3) = real(kz, DP)
+            
+        if (kz == 0) then
+            kMax2_sym = 0
+        else
+            kMax2_sym = kMax2
+        end if
 
-        do ky = -Kmax(2), Kmax(2)
+        do ky = -Kmax(2), kMax2_sym
 
             waveVector(2) = real(ky, DP)
 
@@ -796,12 +805,15 @@ contains
             cos_kxOld = real(exp_IkxOld, DP)
             sin_kxOld = aimag(exp_IkxOld)
 
-            realPart1 = (cos_kxNew - cos_kxOld) * (real(k_dot_structure, DP) - k_dot_mCol * cos_kxOld)
+            realPart1 = (cos_kxNew - cos_kxOld)
+            realPart1 = realPart1 * (real(k_dot_structure, DP) - k_dot_mCol * cos_kxOld)
 
-            realPart2 = (-sin_kxNew + sin_kxOld) * (aimag(k_dot_structure) - k_dot_mCol * sin_kxOld)
-
-            deltaEpot_reci_move = deltaEpot_reci_move + 2._DP*k_dot_mCol * (realPart1 - realPart2) * &
-                                              this%Epot_reci_weight(kx, ky, kz)
+            realPart2 = (-sin_kxNew + sin_kxOld)
+            realPart2 = realPart2 * (aimag(k_dot_structure) - k_dot_mCol * sin_kxOld)
+            
+            deltaEpot_k = 2._DP*k_dot_mCol * (realPart1-realPart2) * this%Epot_reci_weight(kx, ky, kz)
+            deltaEpot_reci_move = deltaEpot_reci_move + deltaEpot_k
+                                              
 
         end do
         
