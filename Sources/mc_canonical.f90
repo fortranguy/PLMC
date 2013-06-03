@@ -90,15 +90,15 @@ implicit none
     type1_obs%Epot = type1_sph%Epot_conf()
     call type1_sph%snapShot_X(0, type1_io%snapIni_X)
     call type1_sph%snapShot_M(0, type1_io%snapIni_M)
-    call type1_sph%cols_to_cells(type2_sph%X) !< Cell List : filling cells with particles
+    call type1_sph%cols_to_cells(type2_sph%positions) !< Cell List : filling cells with particles
     
     call type2_sph%overlapTest()
     type2_obs%Epot = type2_sph%Epot_conf()
     call type2_sph%snapShot_X(0, type2_io%snapIni_X)
-    call type2_sph%cols_to_cells(type1_sph%X)
+    call type2_sph%cols_to_cells(type1_sph%positions)
     
-    call mix%overlapTest(type1_sph%X, type2_sph%X)
-    mix_Epot = mix%Epot_conf(type1_sph%X, type2_sph%X)
+    call mix%overlapTest(type1_sph%positions, type2_sph%positions)
+    mix_Epot = mix%Epot_conf(type1_sph%positions, type2_sph%positions)
     
     Epot_conf = type1_obs%Epot + type2_obs%Epot + mix_Epot
     write(output_unit, *) "Initial potential energy =", Epot_conf
@@ -209,8 +209,8 @@ implicit none
         else MC_Regime ! Thermalisation over -> Equilibrium
         
             ! Chemical potentials : Widom method
-            call type1_sph%widom(type2_sph%X, mix, type1_obs%activ)
-            call type2_sph%widom(type1_sph%X, mix, type2_obs%activ)
+            call type1_sph%widom(type2_sph%positions, mix, type1_obs%activ)
+            call type2_sph%widom(type1_sph%positions, mix, type2_obs%activ)
         
             ! Observables accumulations
             type1_obs%EpotSum = type1_obs%EpotSum + type1_obs%Epot
@@ -259,8 +259,8 @@ implicit none
     call type2_sph%snapShot_X(0, type2_io%snapFin_X)
     call type2_obs%results(type2_sph%getNcol(), type2_io%report)
     
-    call mix%overlapTest(type1_sph%X, type2_sph%X)
-    mix_Epot_conf = mix%Epot_conf(type1_sph%X, type2_sph%X)
+    call mix%overlapTest(type1_sph%positions, type2_sph%positions)
+    mix_Epot_conf = mix%Epot_conf(type1_sph%positions, type2_sph%positions)
     call consistTest(mix_Epot, mix_Epot_conf, mix_report_unit)
     call mix_results(mix_EpotSum, mix_report_unit)
     

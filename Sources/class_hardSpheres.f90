@@ -91,8 +91,8 @@ contains
     
         class(HardSpheres), intent(inout) :: this
         
-        if (allocated(this%X)) then
-            deallocate(this%X)
+        if (allocated(this%positions)) then
+            deallocate(this%positions)
         end if
         
         call this%same%destroy()
@@ -208,7 +208,7 @@ contains
         if (.not. overlap) then
         
             mix_iCellNew = this%mix%position_to_cell(xNew)
-            call mix%Epot_neigh(xNew, mix_iCellNew, this%mix, other%X, overlap, mix_eNew)
+            call mix%Epot_neigh(xNew, mix_iCellNew, this%mix, other%positions, overlap, mix_eNew)
                         
             if (.not. overlap) then
     
@@ -216,7 +216,7 @@ contains
                 call this%Epot_neigh(iOld, this%positions(:, iOld), same_iCellOld, overlap)
                     
                 mix_iCellOld = this%mix%position_to_cell(this%positions(:, iOld))
-                call mix%Epot_neigh(this%positions(:, iOld), mix_iCellOld, this%mix, other%X, overlap, &
+                call mix%Epot_neigh(this%positions(:, iOld), mix_iCellOld, this%mix, other%positions, overlap, &
                                     mix_eOld)
                 
                 mix_dEpot = mix_eNew - mix_eOld

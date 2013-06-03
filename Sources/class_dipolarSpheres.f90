@@ -166,8 +166,8 @@ contains
     
         class(DipolarSpheres), intent(inout) :: this
         
-        if (allocated(this%X)) then
-            deallocate(this%X)
+        if (allocated(this%positions)) then
+            deallocate(this%positions)
         end if
         
         if (allocated(this%M)) then
@@ -1182,7 +1182,7 @@ contains
         xNew(:) = modulo(xNew(:), Lsize(:))
         
         mix_iCellNew = this%mix%position_to_cell(xNew)
-        call mix%Epot_neigh(xNew, mix_iCellNew, this%mix, other%X, overlap, mix_eNew)
+        call mix%Epot_neigh(xNew, mix_iCellNew, this%mix, other%positions, overlap, mix_eNew)
             
         if (.not. overlap) then
         
@@ -1200,7 +1200,7 @@ contains
                 dEpot_same = (same_eNew_real - same_eOld_real) + this%Epot_reci_move(iOld, xNew)
                     
                 mix_iCellOld = this%mix%position_to_cell(this%positions(:, iOld))
-                call mix%Epot_neigh(this%positions(:, iOld), mix_iCellOld, this%mix, other%X, overlap, &
+                call mix%Epot_neigh(this%positions(:, iOld), mix_iCellOld, this%mix, other%positions, overlap, &
                                     mix_eOld)
                 dEpot_mix = mix_eNew - mix_eOld
                 
