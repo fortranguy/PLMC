@@ -71,7 +71,7 @@ contains
                     case default
                         write(error_unit, *) "Enter the initial condition : "
                         write(error_unit, *) &
-                            "   'rand' or '[type1_positions] [type1_M] [type2_positions]'."
+                            "   'rand' or '[type1_positions] [type1_moments] [type2_positions]'."
                         stop
                 end select
                 
@@ -82,13 +82,14 @@ contains
                 
                 call oldConfiguration(1, type1%getName()//"_X", type1%positions, &
                                       dot_product(Lsize, Lsize))
-                call oldConfiguration(2, type1%getName()//"_M", type1%moments, 1._DP)
+                call oldConfiguration(2, type1%getName()//"_moments", type1%moments, 1._DP)
                 call oldConfiguration(3, type2%getName()//"_X", type2%positions, &
                                       dot_product(Lsize, Lsize))
             
             case default
                 write(error_unit, *) "Enter the initial condition : "
-                write(error_unit, *) "   'rand' or '[type1_positions] [type1_M] [type2_positions]'."
+                write(error_unit, *) &
+                    "   'rand' or '[type1_positions] [type1_moments] [type2_positions]'."
                 stop
                 
         end select
