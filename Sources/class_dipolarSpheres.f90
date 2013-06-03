@@ -1020,11 +1020,91 @@ contains
     end subroutine DipolarSpheres_Epot_reci_updateM
 
     ! Widom
+    
+    !> Difference of Energy 
+    !> \f[ \Delta U^{N+1} = \frac{2\pi}{V} \sum_{\vec{k} \neq \vec{0}} 
+    !>                          (\vec{k} \cdot \vec{\mu}_{N+1}) f(\alpha, \vec{k})
+    !>                          \{
+    !>                              (\vec{k} \cdot \vec{\mu}_{N+1}) + 
+    !>                              2\Re[(\vec{k} \cdot \vec{S}) e^{-i \vec{k} \cdot \vec{x}_{N+1}}]
+    !>                          \}
+    !> \f]
+    !> Implementation :
+    !> \f[ \Delta U^{N+1} = \frac{2\pi}{V} \sum_{\vec{k} \neq \vec{0}}
+    !>                          (\vec{k} \cdot \vec{\mu}_{N+1}) f(\alpha, \vec{k})
+    !>                          \{
+    !>                              (\vec{k} \cdot \vec{\mu}_{N+1}) +
+    !>                              2 [\Re(\vec{k} \cdot \vec{S}) \cos(\vec{k} \cdot \vec{x}_{N+1}) +
+    !>                                 \Im(\vec{k} \cdot \vec{S}) \sin(\vec{k} \cdot \vec{x}_{N+1})]
+    !>                          \}
+    !> \f]
 
-    function DipolarSpheres_Epot_reci_test(this) result(Epot_reci_test)
+    function DipolarSpheres_Epot_reci_test(this, xTest, mTest) result(Epot_reci_test)
 
         class(DipolarSpheres), intent(in) :: this
+        real(DP), dimension(Dim), intent(in) :: xTest
+        real(DP), dimension(Dim), intent(in) :: mTest
         real(DP) :: Epot_reci_test
+        
+        real(DP) :: Epot_k
+        
+        real(DP), dimension(Dim) :: xTestOverL
+        real(DP), dimension(Dim) :: mTestOverL
+        
+        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxTest_1
+        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxTest_2
+        complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_IkxTest_3
+        complex(DP) :: exp_IkxTest
+        real(DP) :: cos_kxTest, sin_kxTest
+        
+        real(DP) :: realPart
+        
+        real(DP), dimension(Dim) :: waveVector
+        real(DP) :: k_dot_mTest
+        complex(DP) :: k_dot_structure
+        integer :: kx, ky, kz
+        
+        xTestOverL(:) = xTest(:)/Lsize(:)
+        
+        call fourier(xTestOverL, exp_IkxTest_1, exp_IkxTest_2, exp_IkxTest_3)
+        
+        mTestOverL(:) = mTest(:)/Lsize(:)
+        
+        Epot_reci_test = 0._DP
+        
+        do kz = -Kmax(3), Kmax(3)
+
+            waveVector(3) = real(kz, DP)
+
+        do ky = -Kmax(2), Kmax(2)
+
+            waveVector(2) = real(ky, DP)
+
+        do kx = -Kmax(1), Kmax(1)
+            
+            waveVector(1) = real(kx, DP)
+            
+            k_dot_mTest = dot_product(waveVector, mTestOverL)
+            
+            k_dot_structure = dot_product(cmplx(waveVector, 0._DP, DP), &
+                                          this%Epot_reci_structure(:, kx, ky, kz))
+                                          
+            exp_IkxTest = exp_IkxTest_1(kx) * exp_IkxTest_2(ky) * exp_IkxTest_3(kz)
+            cos_kxTest = real(exp_IkxTest, DP)
+            sin_kxTest = aimag(exp_IkxTest)
+            
+            realPart = real(k_dot_structure, DP) * cos_kxTest - aimag(k_dot_structure) * sin_kxTest
+            
+            Epot_k = k_dot_mTest * (k_dot_mTest + 2._DP * realPart)
+            Epot_reci_test = Epot_reci_test + Epot_k * this%Epot_reci_weight(kx, ky, kz)            
+        
+        end do
+        
+        end do
+        
+        end do
+        
+        Epot_reci_test = 2._DP*PI/Volume * Epot_reci_test
 
     end function DipolarSpheres_Epot_reci_test
     
