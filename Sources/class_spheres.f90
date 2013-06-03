@@ -31,7 +31,7 @@ private
         ! Monte-Carlo
         real(DP), dimension(Dim) :: deltaX !< displacement
         real(DP), dimension(Dim) :: deltaXsave
-        real(DP) :: rejFix
+        real(DP) :: rejectFix
         integer :: Nadapt
         integer :: Nwidom
 
@@ -199,13 +199,13 @@ contains
     
     !> Adaptation of deltaX during the thermalisation
     
-    subroutine Spheres_adaptDeltaX(this, rej)
+    subroutine Spheres_adaptDeltaX(this, reject)
     
         class(Spheres), intent(inout) :: this
-        real(DP), intent(in) :: rej
+        real(DP), intent(in) :: reject
         
         real(DP), parameter :: eps_deltaX = 0.05_DP
-        real(DP), parameter :: eps_rej = 0.1_DP * eps_deltaX
+        real(DP), parameter :: eps_reject = 0.1_DP * eps_deltaX
         real(DP), parameter :: more = 1._DP+eps_deltaX
         real(DP), parameter :: less = 1._DP-eps_deltaX
         
@@ -213,7 +213,7 @@ contains
         
         Lsize_normSqr = dot_product(Lsize, Lsize)
         
-        if (rej < this%rejFix - eps_rej) then
+        if (reject < this%rejectFix - eps_reject) then
         
             this%deltaX(:) = this%deltaX(:) * more
             
@@ -222,7 +222,7 @@ contains
                 this%deltaX(:) = Lsize(:)
             end if
             
-        else if (rej > this%rejFix + eps_rej) then
+        else if (reject > this%rejectFix + eps_reject) then
         
             this%deltaX(:) = this%deltaX(:) * less
             
@@ -230,15 +230,15 @@ contains
     
     end subroutine Spheres_adaptDeltaX
     
-    subroutine Spheres_definiteDeltaX(this, rej, report_unit)
+    subroutine Spheres_definiteDeltaX(this, reject, report_unit)
     
         class(Spheres), intent(inout) :: this    
-        real(DP), intent(in) :: rej
+        real(DP), intent(in) :: reject
         integer, intent(in) :: report_unit
         
         real(DP) :: deltaX_normSqr, Lsize_normSqr
         
-            if (rej == 0._DP) then
+            if (reject == 0._DP) then
                 write(error_unit, *) this%name, " :    Warning : deltaX adaptation problem."
                 this%deltaX(:) = this%deltaXsave(:)
                 write(error_unit, *) "default deltaX :", this%deltaX(:)
@@ -256,8 +256,8 @@ contains
             
             write(report_unit, *) "Displacement :"
             write(report_unit, *) "    deltaX(:) = ", this%deltaX(:)
-            write(report_unit, *) "    rejection relative difference = ", &
-                                       abs(rej-this%rejFix)/this%rejFix
+            write(report_unit, *) "    rejectection relative difference = ", &
+                                       abs(reject-this%rejectFix)/this%rejectFix
     
     end subroutine Spheres_definiteDeltaX
     
