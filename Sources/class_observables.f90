@@ -31,7 +31,7 @@ private
     contains
     
         procedure :: init => Observables_init
-        procedure :: results => Observables_results
+        procedure :: printResults => Observables_printResults
     
     end type Observables
     
@@ -83,7 +83,7 @@ contains
     
     !> Results
     
-    subroutine Observables_results(this, Ncol, report_unit)
+    subroutine Observables_printResults(this, Ncol, report_unit)
 
         class(Observables), intent(in) :: this
         integer, intent(in) :: Ncol
@@ -114,6 +114,6 @@ contains
             
         end select
     
-    end subroutine Observables_results
+    end subroutine Observables_printResults
 
 end module class_observables

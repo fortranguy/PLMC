@@ -268,7 +268,7 @@ contains
     
     !> Total : Results    
     
-    subroutine results(EpotSum, duration, report_unit)
+    subroutine printResults(EpotSum, duration, report_unit)
     
         real(DP), intent(in) :: EpotSum
         real(DP), intent(in) :: duration
@@ -280,11 +280,11 @@ contains
                                    EpotSum/real(Nstep, DP)/real(Ncol, DP)
         write(report_unit, *) "    duration =", duration/60._DP, "min"
     
-    end subroutine results
+    end subroutine printResults
     
     !> Mix : Results
     
-    subroutine mix_results(EpotSum, report_unit)
+    subroutine mix_printResults(EpotSum, report_unit)
     
         real(DP), intent(in) :: EpotSum
         integer, intent(in) :: report_unit
@@ -292,6 +292,6 @@ contains
         write(report_unit, *) "Results :"        
         write(report_unit, *) "    average energy = ", EpotSum/real(Nstep, DP)
     
-    end subroutine mix_results
+    end subroutine mix_printResults
     
 end module mod_tools

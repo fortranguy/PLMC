@@ -101,4 +101,4 @@ mrproper : clean
 	rm -f $(EXEC1) $(EXEC2) $(EXEC3) data_copy.f90
 	
 remove :
-	rm -f *.out *.txt *.shots
+	rm -f *.out *.txt *.shots *.tmp
