@@ -76,7 +76,7 @@ contains
         ! Monte-Carlo
         this%deltaX = inter_deltaX
         this%deltaXSave = this%deltaX
-        this%rejFix = inter_rejFix
+        this%rejectFix = inter_rejectFix
         this%Nadapt = inter_Nadapt
         this%Nwidom = inter_Nwidom
         
@@ -254,14 +254,14 @@ contains
     
     !> Particle move
     
-    subroutine InteractingSpheres_move(this, iOld, other, mix, same_Epot, mix_Epot, Nrej)
+    subroutine InteractingSpheres_move(this, iOld, other, mix, same_Epot, mix_Epot, Nreject)
     
         class(InteractingSpheres), intent(inout) :: this
         integer, intent(in) :: iOld
         class(Spheres), intent(inout) :: other
         class(MixingPotential), intent(in) :: mix        
         real(DP), intent(inout) :: same_Epot, mix_Epot
-        integer, intent(inout) :: Nrej
+        integer, intent(inout) :: Nreject
         
         logical :: overlap
         real(DP) :: rand
@@ -315,15 +315,15 @@ contains
                     end if
                     
                 else
-                    Nrej = Nrej + 1
+                    Nreject = Nreject + 1
                 end if
          
             else
-                Nrej = Nrej + 1                
+                Nreject = Nreject + 1                
             end if            
             
         else        
-            Nrej = Nrej + 1            
+            Nreject = Nreject + 1            
         end if
     
     end subroutine InteractingSpheres_move
