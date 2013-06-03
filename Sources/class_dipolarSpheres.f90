@@ -44,7 +44,7 @@ private
         real(DP), dimension(-Kmax(1):Kmax(1), -Kmax(2):Kmax(2), -Kmax(3):Kmax(3)) :: Epot_reci_weight
         integer :: NwaveVectors
         complex(DP), dimension(Dim, -Kmax(1):Kmax(1), -Kmax(2):Kmax(2), -Kmax(3):Kmax(3)) :: &
-                     Epot_reci_structure
+            Epot_reci_structure
         complex(DP), dimension(:, :), allocatable :: Epot_reci_potential
         
     contains
