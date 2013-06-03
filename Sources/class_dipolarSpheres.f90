@@ -83,6 +83,7 @@ private
         procedure :: Epot_reci_structure_moduli => DipolarSpheres_Epot_reci_structure_moduli
         procedure :: Epot_reci_structure_reInit => DipolarSpheres_Epot_reci_structure_reInit
         procedure :: Epot_reci_potential_init => DipolarSpheres_Epot_reci_potential_init
+        procedure :: Epot_reci_countNwaveVectors => DipolarSpheres_Epot_reci_countNwaveVectors
         !>     Reciprocal : delta
         procedure :: deltaEpot_reci_move => DipolarSpheres_deltaEpot_reci_move
         procedure :: deltaEpot_reci_move_updateStructure => &
@@ -202,11 +203,12 @@ contains
         write(report_unit ,*) "    Ncol = ", this%Ncol
         write(report_unit ,*) "    Nwidom = ", this%Nwidom
         write(report_unit ,*) "    Nadapt = ", this%Nadapt
-        write(report_unit, *) "    Structure_iStep = ", this%structure_iStep
 
         write(report_unit, *) "    alpha = ", this%alpha
         write(report_unit, *) "    rCut = ", this%rCut
         write(report_unit, *) "    dr = ", this%dr
+        write(report_unit, *) "    Structure_iStep = ", this%structure_iStep
+        write(report_unit, *) "    NwaveVectors = ", this%NwaveVectors
         
         write(report_unit, *) "    same_cell_coordMax(:) = ", this%same%cell_coordMax(:)
         write(report_unit, *) "    same_cell_Lsize(:) = ", this%same%cell_Lsize(:)
@@ -541,8 +543,6 @@ contains
         real(DP), dimension(Dim) :: waveVector
         real(DP) :: kOverL
 
-        this%NwaveVectors = 0
-
         do kz = -Kmax(3), Kmax(3)
             waveVector(3) = real(kz, DP)
         
@@ -557,8 +557,6 @@ contains
                 kOverL = norm2(waveVector(:)/Lsize(:))
 
                 this%Epot_reci_weight(kx, ky, kz) = exp(-PI**2/this%alpha**2 * kOverL**2) / kOverL**2
-
-                this%NwaveVectors = this%NwaveVectors + 1
 
             else
 
@@ -707,6 +705,58 @@ contains
         end do
         
     end subroutine DipolarSpheres_Epot_reci_potential_init
+
+    subroutine DipolarSpheres_Epot_reci_countNwaveVectors(this, waveVector_unit)
+
+        class(DipolarSpheres), intent(inout) :: this
+
+        integer :: kMax1_sym, kMax2_sym ! symmetry : half wave vectors
+        real(DP), dimension(Dim) :: waveVector
+        integer :: kx, ky, kz
+
+        this%NwaveVectors = 0
+
+        do kz = -Kmax(3), 0
+
+            waveVector(3) = real(kz, DP)
+
+            if (kz == 0) then
+                kMax2_sym = 0
+            else
+                kMax2_sym = kMax(2)
+            end if
+
+            do ky = -Kmax(2), kMax2_sym
+
+                waveVector(2) = real(ky, DP)
+
+                if (kz == 0 .and. ky == 0) then
+                    kMax1_sym = 0
+                else
+                    kMax1_sym = kMax(1)
+                end if
+
+                do kx = -kMax(1), kMax1_sym
+
+                    waveVector(1) = real(kx, DP)
+
+                    if (norm2(waveVector) /= 0) then
+
+                        write(waveVector_unit, *) kx, ky, kz
+                        write(waveVector_unit, *)
+                        write(waveVector_unit, *)
+
+                        this%NwaveVectors = this%NwaveVectors + 1
+
+                    end if
+
+                end do
+
+            end do
+
+        end do
+
+    end subroutine DipolarSpheres_Epot_reci_countNwaveVectors
 
     !> Move
 
