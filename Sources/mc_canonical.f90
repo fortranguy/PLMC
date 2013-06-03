@@ -248,7 +248,6 @@ implicit none
     ! Tests & results
 
     call type1_sph%overlapTest()
-    call type1_sph%C_snapShot() ! check in C if the final configuration is the same.
     call type1_sph%consistTest(type1_obs%Epot, type1_io%report)
     call type1_sph%snapShot_X(0, type1_io%snapFin_X)
     call type1_sph%snapShot_M(0, type1_io%snapFin_M)

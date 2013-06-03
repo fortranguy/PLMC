@@ -1292,6 +1292,7 @@ contains
         real(DP) :: Epot_conf
         real(DP) :: difference
         
+        call this%Epot_reci_init()
         Epot_conf = this%Epot_conf()
         difference = abs((Epot_conf-Epot)/Epot_conf)
         
