@@ -216,8 +216,8 @@ contains
                 call this%Epot_neigh(iOld, this%positions(:, iOld), same_iCellOld, overlap)
                     
                 mix_iCellOld = this%mix%position_to_cell(this%positions(:, iOld))
-                call mix%Epot_neigh(this%positions(:, iOld), mix_iCellOld, this%mix, other%positions, overlap, &
-                                    mix_eOld)
+                call mix%Epot_neigh(this%positions(:, iOld), mix_iCellOld, this%mix, other%positions, &
+                                    overlap, mix_eOld)
                 
                 mix_dEpot = mix_eNew - mix_eOld
                 
