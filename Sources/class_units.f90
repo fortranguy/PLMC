@@ -8,8 +8,8 @@ private
 
     type, public :: Units
     
-        integer :: obsEqb
-        integer :: obsTherm
+        integer :: obsThermalisation
+        integer :: obsThermalisation
         integer :: deltaX
 
         integer :: snapIni_positions
@@ -45,9 +45,10 @@ contains
         class(Units), intent(out) :: this
         character(len=*), intent(in) :: name
         
-        open(newunit=this%obsEqb, recl=4096, file=name//"_obsEqb.out", status='new', action='write')
-        open(newunit=this%obsTherm, recl=4096, file=name//"_obsTherm.out", status='new', &
-             action='write')
+        open(newunit=this%obsThermalisation, recl=4096, file=name//"_obsThermalisation.out", &
+             status='new', action='write')
+        open(newunit=this%obsThermalisation, recl=4096, file=name//"_obsThermalisation.out", &
+             status='new', action='write')
         open(newunit=this%deltaX, recl=4096, file=name//"_deltaX.out", status='new', action='write')
         
         open(newunit=this%snapIni_positions, recl=4096, file=name//"_snapIni_positions.out", &
@@ -66,7 +67,8 @@ contains
             
             class is (MoreUnits)
             
-                open(newunit=this%deltaM, recl=4096, file=name//"_deltaM.out", status='new', action='write')
+                open(newunit=this%deltaM, recl=4096, file=name//"_deltaM.out", status='new', &
+                     action='write')
                 
                 open(newunit=this%snapIni_orientations, recl=4096, &
                      file=name//"_snapIni_orientations.out", status='new', action='write')
@@ -90,8 +92,8 @@ contains
     
         class(Units), intent(inout) :: this
         
-        close(this%obsEqb)
-        close(this%obsTherm)
+        close(this%obsThermalisation)
+        close(this%obsThermalisation)
         close(this%deltaX)
 
         close(this%snapIni_positions)
