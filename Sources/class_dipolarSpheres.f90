@@ -934,7 +934,7 @@ contains
         real(DP), dimension(Dim), intent(in) :: mNew
         real(DP) :: deltaEpot_reci_rotate
 
-        real(DP) :: Epot_k
+        real(DP) :: deltaEpot_k
 
         real(DP), dimension(Dim) :: xColOverL
         real(DP), dimension(Dim) :: mNewOverL, mOldOverL
@@ -1002,9 +1002,10 @@ contains
 
                     realPart = realPart1 + realPart2
 
-                    Epot_k = k_dot_mNew**2 - k_dot_mOld**2 + 2._DP*(k_dot_mNew - k_dot_mOld) * realPart
-                    Epot_k = Epot_k * this%Epot_reci_weight(kx, ky, kz)
-                    deltaEpot_reci_rotate = deltaEpot_reci_rotate + Epot_k
+                    deltaEpot_k = k_dot_mNew**2 - k_dot_mOld**2
+                    deltaEpot_k = deltaEpot_k + 2._DP*(k_dot_mNew - k_dot_mOld) * realPart
+                    deltaEpot_k = deltaEpot_k * this%Epot_reci_weight(kx, ky, kz)
+                    deltaEpot_reci_rotate = deltaEpot_reci_rotate + deltaEpot_k
 
                 end do
 
@@ -1105,7 +1106,7 @@ contains
         real(DP), dimension(Dim), intent(in) :: mTest
         real(DP) :: deltaEpot_reci_test
         
-        real(DP) :: Epot_k
+        real(DP) :: deltaEpot_k
         
         real(DP), dimension(Dim) :: xTestOverL
         real(DP), dimension(Dim) :: mTestOverL
@@ -1168,9 +1169,9 @@ contains
                     realPart = real(k_dot_structure, DP) * cos_kxTest
                     realPart = realPart + aimag(k_dot_structure) * sin_kxTest
                     
-                    Epot_k = k_dot_mTest * (k_dot_mTest + 2._DP * realPart)
-                    Epot_k = Epot_k * this%Epot_reci_weight(kx, ky, kz)
-                    deltaEpot_reci_test = deltaEpot_reci_test + Epot_k
+                    deltaEpot_k = k_dot_mTest * (k_dot_mTest + 2._DP * realPart)
+                    deltaEpot_k = deltaEpot_k * this%Epot_reci_weight(kx, ky, kz)
+                    deltaEpot_reci_test = deltaEpot_reci_test + deltaEpot_k
                    
                 end do
             
