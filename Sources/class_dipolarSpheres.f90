@@ -1132,37 +1132,49 @@ contains
         
         deltaEpot_reci_test = 0._DP
         
-        do kz = -Kmax(3), Kmax(3)
+        do kz = -Kmax(3), 0
 
             waveVector(3) = real(kz, DP)
+            
+            if (kz == 0) then
+                kMax2_sym = 0
+            else
+                kMax2_sym = kMax2
+            end if
 
-        do ky = -Kmax(2), Kmax(2)
+            do ky = -Kmax(2), kMax2_sym
 
-            waveVector(2) = real(ky, DP)
+                waveVector(2) = real(ky, DP)
 
-        do kx = -Kmax(1), Kmax(1)
+                if (kz == 0 .and. ky == 0) then
+                    kMax1_sym = 0
+                else
+                    kMax1_sym = kMax1
+                end if
             
-            waveVector(1) = real(kx, DP)
+                do kx = -kMax1, kMax1_sym
+                
+                    waveVector(1) = real(kx, DP)
+                    
+                    k_dot_mTest = dot_product(waveVector, mTestOverL)
+                    
+                    k_dot_structure = dot_product(cmplx(waveVector, 0._DP, DP), &
+                                                  this%Epot_reci_structure(:, kx, ky, kz))
+                                                  
+                    exp_IkxTest = exp_IkxTest_1(kx) * exp_IkxTest_2(ky) * exp_IkxTest_3(kz)
+                    cos_kxTest = real(exp_IkxTest, DP)
+                    sin_kxTest = aimag(exp_IkxTest)
+                    
+                    realPart = real(k_dot_structure, DP) * cos_kxTest
+                    realPart = realPart + aimag(k_dot_structure) * sin_kxTest
+                    
+                    Epot_k = k_dot_mTest * (k_dot_mTest + 2._DP * realPart)
+                    Epot_k = Epot_k * this%Epot_reci_weight(kx, ky, kz)
+                    deltaEpot_reci_test = deltaEpot_reci_test + Epot_k
+                   
+                end do
             
-            k_dot_mTest = dot_product(waveVector, mTestOverL)
-            
-            k_dot_structure = dot_product(cmplx(waveVector, 0._DP, DP), &
-                                          this%Epot_reci_structure(:, kx, ky, kz))
-                                          
-            exp_IkxTest = exp_IkxTest_1(kx) * exp_IkxTest_2(ky) * exp_IkxTest_3(kz)
-            cos_kxTest = real(exp_IkxTest, DP)
-            sin_kxTest = aimag(exp_IkxTest)
-            
-            realPart = real(k_dot_structure, DP) * cos_kxTest
-            realPart = realPart + aimag(k_dot_structure) * sin_kxTest
-            
-            Epot_k = k_dot_mTest * (k_dot_mTest + 2._DP * realPart)
-            Epot_k = Epot_k * this%Epot_reci_weight(kx, ky, kz)
-            deltaEpot_reci_test = deltaEpot_reci_test + Epot_k
-               
-        end do
-        
-        end do
+            end do
         
         end do
         
