@@ -190,7 +190,7 @@ contains
         
         integer :: other_Ncol 
         
-        call this%same%cols_to_cells(this%Ncol, this%X)
+        call this%same%cols_to_cells(this%Ncol, this%positions)
         
         other_Ncol = size(other_X, 2)
         call this%mix%cols_to_cells(other_Ncol, other_X)
