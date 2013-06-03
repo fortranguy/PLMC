@@ -33,7 +33,7 @@ private
         real(DP) :: deltaM !< rotation
         real(DP) :: deltaMsave
         real(DP) :: deltaMmax
-        real(DP) :: rejRotFix
+        real(DP) :: rejectRotFix
         integer :: NadaptRot
 
         ! Potential
@@ -131,13 +131,13 @@ contains
         this%structure_iStep = dipol_structure_iStep
         this%deltaX = dipol_deltaX
         this%deltaXsave = this%deltaX
-        this%rejFix = dipol_rejFix
+        this%rejectFix = dipol_rejectFix
         this%Nadapt = dipol_Nadapt
         
         this%deltaM = dipol_deltaM
         this%deltaMsave = this%deltaM
         this%deltaMmax = dipol_deltaMmax
-        this%rejRotFix = dipol_rejRotFix
+        this%rejectRotFix = dipol_rejectRotFix
         this%NadaptRot = dipol_NadaptRot
         
         this%Nwidom = dipol_Nwidom
@@ -237,18 +237,18 @@ contains
     
     !> Adaptation of deltaM during the thermalisation
     
-    subroutine DipolarSpheres_adaptDeltaM(this, rej)
+    subroutine DipolarSpheres_adaptDeltaM(this, reject)
     
         class(DipolarSpheres), intent(inout) :: this
-        real(DP), intent(in) :: rej
+        real(DP), intent(in) :: reject
         
         real(DP), parameter :: eps_deltaM = 0.05_DP
-        real(DP), parameter :: eps_rej = 0.1_DP * eps_deltaM
+        real(DP), parameter :: eps_reject = 0.1_DP * eps_deltaM
         real(DP), parameter :: more = 1._DP+eps_deltaM
         real(DP), parameter :: less = 1._DP-eps_deltaM
 
         
-        if (rej < this%rejRotFix - eps_rej) then
+        if (reject < this%rejectRotFix - eps_reject) then
         
             this%deltaM = this%deltaM * more
   
@@ -256,7 +256,7 @@ contains
                 this%deltaM = this%deltaMmax
             end if
             
-        else if (rej > this%rejRotFix + eps_rej) then
+        else if (reject > this%rejectRotFix + eps_reject) then
         
             this%deltaM = this%deltaM * less
             
@@ -264,13 +264,13 @@ contains
     
     end subroutine DipolarSpheres_adaptDeltaM
     
-    subroutine DipolarSpheres_definiteDeltaM(this, rej, report_unit)
+    subroutine DipolarSpheres_definiteDeltaM(this, reject, report_unit)
     
         class(DipolarSpheres), intent(inout) :: this    
-        real(DP), intent(in) :: rej
+        real(DP), intent(in) :: reject
         integer, intent(in) :: report_unit
         
-        if (rej == 0._DP) then
+        if (reject == 0._DP) then
             write(error_unit, *) this%name, " :    Warning : deltaM adaptation problem."
             this%deltaM = this%deltaMsave
             write(error_unit, *) "default deltaM :", this%deltaM
@@ -286,8 +286,8 @@ contains
         
         write(report_unit, *) "Rotation :"
         write(report_unit, *) "    deltaM = ", this%deltaM
-        write(report_unit, *) "    rejection relative difference = ", &
-                                    abs(rej-this%rejRotFix)/this%rejRotFix
+        write(report_unit, *) "    rejectection relative difference = ", &
+                                    abs(reject-this%rejectRotFix)/this%rejectRotFix
     
     end subroutine DipolarSpheres_definiteDeltaM
     
@@ -1161,14 +1161,14 @@ contains
     
     !> Particle move
     
-    subroutine DipolarSpheres_move(this, iOld, other, mix, same_Epot, mix_Epot, Nrej)
+    subroutine DipolarSpheres_move(this, iOld, other, mix, same_Epot, mix_Epot, Nreject)
     
         class(DipolarSpheres), intent(inout) :: this
         integer, intent(in) :: iOld
         class(Spheres), intent(inout) :: other
         class(MixingPotential), intent(in) :: mix
         real(DP), intent(inout) :: same_Epot, mix_Epot
-        integer, intent(inout) :: Nrej
+        integer, intent(inout) :: Nreject
         
         real(DP), dimension(Dim) :: xRand
         logical :: overlap
@@ -1230,25 +1230,25 @@ contains
                     end if
                     
                 else
-                    Nrej = Nrej + 1
+                    Nreject = Nreject + 1
                 end if
          
             else
-                Nrej = Nrej + 1
+                Nreject = Nreject + 1
             end if            
             
         else        
-            Nrej = Nrej + 1
+            Nreject = Nreject + 1
         end if
     
     end subroutine DipolarSpheres_move
     
-    subroutine DipolarSpheres_rotate(this, iOld, Epot, Nrej)
+    subroutine DipolarSpheres_rotate(this, iOld, Epot, Nreject)
     
         class(DipolarSpheres), intent(inout) :: this
         integer, intent(in) :: iOld
         real(DP), intent(inout) :: Epot
-        integer, intent(inout) :: Nrej
+        integer, intent(inout) :: Nreject
         
         real(DP) :: rand
         real(DP), dimension(Dim) :: mNew
@@ -1279,7 +1279,7 @@ contains
             Epot = Epot + deltaEpot
             
         else
-            Nrej = Nrej + 1
+            Nreject = Nreject + 1
         end if
     
     end subroutine DipolarSpheres_rotate
