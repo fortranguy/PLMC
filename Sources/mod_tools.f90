@@ -65,13 +65,13 @@ contains
                     case ("rand") 
                         call randomDepositions(type1%positions, type1%getRMin(), type2%positions, &
                                                type2%getRmin(), mix_rMin)
-                        call randomMoments(type1%moments)
+                        call randomorientations(type1%orientations)
                         write(output_unit, *) "Random depositions + random orientations"
                         write(report_unit, *) "    Random depositions + random orientations"
                     case default
                         write(error_unit, *) "Enter the initial condition : "
                         write(error_unit, *) &
-                            "   'rand' or '[type1_positions] [type1_moments] [type2_positions]'."
+                            "   'rand' or '[type1_positions] [type1_orientations] [type2_positions]'."
                         stop
                 end select
                 
@@ -82,14 +82,14 @@ contains
                 
                 call oldConfiguration(1, type1%getName()//"_positions", type1%positions, &
                                       dot_product(Lsize, Lsize))
-                call oldConfiguration(2, type1%getName()//"_moments", type1%moments, 1._DP)
+                call oldConfiguration(2, type1%getName()//"_orientations", type1%orientations, 1._DP)
                 call oldConfiguration(3, type2%getName()//"_positions", type2%positions, &
                                       dot_product(Lsize, Lsize))
             
             case default
                 write(error_unit, *) "Enter the initial condition : "
                 write(error_unit, *) &
-                    "   'rand' or '[type1_positions] [type1_moments] [type2_positions]'."
+                    "   'rand' or '[type1_positions] [type1_orientations] [type2_positions]'."
                 stop
                 
         end select
@@ -149,22 +149,22 @@ contains
     
     end subroutine randomDepositions
     
-    !> Uniform (gaussian) moments
+    !> Uniform (gaussian) orientations
     
-    subroutine randomMoments(type_moments)
+    subroutine randomorientations(type_orientations)
     
-        real(DP), dimension(:, :), intent(out) :: type_moments
+        real(DP), dimension(:, :), intent(out) :: type_orientations
         
         integer :: type_Ncol
         integer :: iCol
         
-        type_Ncol = size(type_moments, 2)
+        type_Ncol = size(type_orientations, 2)
         
         do iCol = 1, type_Ncol
-            type_moments(:, iCol) = random_surface()
+            type_orientations(:, iCol) = random_surface()
         end do
     
-    end subroutine randomMoments
+    end subroutine randomorientations
     
     !> From an old configuration
     

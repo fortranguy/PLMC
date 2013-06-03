@@ -30,9 +30,9 @@ private
     
         integer :: dm
 
-        integer :: snapIni_moments
-        integer :: snapFin_moments
-        integer :: snapShots_moments
+        integer :: snapIni_orientations
+        integer :: snapFin_orientations
+        integer :: snapShots_orientations
         
         integer :: structure_moduli
     
@@ -68,12 +68,12 @@ contains
             
                 open(newunit=this%dm, recl=4096, file=name//"_dm.out", status='new', action='write')
                 
-                open(newunit=this%snapIni_moments, recl=4096, file=name//"_snapIni_moments.out", &
-                     status='new', action='write')
-                open(newunit=this%snapFin_moments, recl=4096, file=name//"_snapFin_moments.out", &
-                     status='new', action='write')
-                open(newunit=this%snapShots_moments, recl=4096, file=name//"_snap_moments.shots", &
-                     status='new', action='write')
+                open(newunit=this%snapIni_orientations, recl=4096, &
+                     file=name//"_snapIni_orientations.out", status='new', action='write')
+                open(newunit=this%snapFin_orientations, recl=4096, &
+                     file=name//"_snapFin_orientations.out", status='new', action='write')
+                open(newunit=this%snapShots_orientations, recl=4096, &
+                     file=name//"_snap_orientations.shots", status='new', action='write')
                      
                  open(newunit=this%structure_moduli, recl=4096, file=name//"_structure_moduli.out", &
                     status='new', action='write')
@@ -109,9 +109,9 @@ contains
             
                 close(this%dm)
         
-                close(this%snapIni_moments)
-                close(this%snapFin_moments)
-                close(this%snapShots_moments)
+                close(this%snapIni_orientations)
+                close(this%snapFin_orientations)
+                close(this%snapShots_orientations)
                 
                 close(this%structure_moduli)
                     
