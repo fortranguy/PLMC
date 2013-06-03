@@ -552,7 +552,7 @@ contains
         do kx = -Kmax(1), Kmax(1)
             waveVector(1) = real(kx, DP)
 
-            if (norm2(waveVector) /= 0) then
+            if (norm2(waveVector) /= 0._DP) then
             
                 kOverL = norm2(waveVector(:)/Lsize(:))
 
@@ -741,7 +741,7 @@ contains
 
                     waveVector(1) = real(kx, DP)
 
-                    if (norm2(waveVector) /= 0) then
+                    if (norm2(waveVector) /= 0._DP) then
 
                         write(waveVectors_unit, *) kx, ky, kz
                         write(waveVectors_unit, *)
