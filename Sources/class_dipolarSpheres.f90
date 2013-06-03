@@ -1118,6 +1118,7 @@ contains
         
         real(DP) :: realPart
         
+        integer :: kMax1_sym, kMax2_sym
         real(DP), dimension(Dim) :: waveVector
         real(DP) :: k_dot_mTest
         complex(DP) :: k_dot_structure
@@ -1152,18 +1153,20 @@ contains
             cos_kxTest = real(exp_IkxTest, DP)
             sin_kxTest = aimag(exp_IkxTest)
             
-            realPart = real(k_dot_structure, DP) * cos_kxTest + aimag(k_dot_structure) * sin_kxTest
+            realPart = real(k_dot_structure, DP) * cos_kxTest
+            realPart = realPart + aimag(k_dot_structure) * sin_kxTest
             
             Epot_k = k_dot_mTest * (k_dot_mTest + 2._DP * realPart)
-            deltaEpot_reci_test = deltaEpot_reci_test + Epot_k * this%Epot_reci_weight(kx, ky, kz)            
-        
+            Epot_k = Epot_k * this%Epot_reci_weight(kx, ky, kz)
+            deltaEpot_reci_test = deltaEpot_reci_test + Epot_k
+               
         end do
         
         end do
         
         end do
         
-        deltaEpot_reci_test = 2._DP*PI/Volume * deltaEpot_reci_test
+        deltaEpot_reci_test = 4._DP*PI/Volume * deltaEpot_reci_test
 
     end function DipolarSpheres_deltaEpot_reci_test
     
