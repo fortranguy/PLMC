@@ -89,7 +89,7 @@ implicit none
     call type1_sph%Epot_reci_init()
     type1_obs%Epot = type1_sph%Epot_conf()
     call type1_sph%snapShot_positions(0, type1_io%snapIni_positions)
-    call type1_sph%snapShot_M(0, type1_io%snapIni_M)
+    call type1_sph%snapShot_moments(0, type1_io%snapIni_moments)
     call type1_sph%cols_to_cells(type2_sph%positions) !< Cell List : filling cells with particles
     
     call type2_sph%overlapTest()
@@ -232,7 +232,7 @@ implicit none
 
             if (snap) then ! Snap shots of the configuration
                 call type1_sph%snapShot_positions(iStep, type1_io%snapShots_positions)
-                call type1_sph%snapShot_M(iStep, type1_io%snapShots_M)
+                call type1_sph%snapShot_moments(iStep, type1_io%snapShots_moments)
                 call type2_sph%snapShot_positions(iStep, type2_io%snapShots_positions)
             end if
             
@@ -251,7 +251,7 @@ implicit none
     call type1_sph%Epot_reci_init()
     call type1_sph%consistTest(type1_obs%Epot, type1_io%report)
     call type1_sph%snapShot_positions(0, type1_io%snapFin_positions)
-    call type1_sph%snapShot_M(0, type1_io%snapFin_M)
+    call type1_sph%snapShot_moments(0, type1_io%snapFin_moments)
     call type1_obs%results(type1_sph%getNcol(), type1_io%report)
     
     call type2_sph%overlapTest()

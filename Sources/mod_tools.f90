@@ -80,10 +80,10 @@ contains
                 write(output_unit, *) "Old configuration"
                 write(report_unit, *) "    Old configuration"
                 
-                call oldConfiguration(1, type1%getName()//"_X", type1%positions, &
+                call oldConfiguration(1, type1%getName()//"_positions", type1%positions, &
                                       dot_product(Lsize, Lsize))
                 call oldConfiguration(2, type1%getName()//"_moments", type1%moments, 1._DP)
-                call oldConfiguration(3, type2%getName()//"_X", type2%positions, &
+                call oldConfiguration(3, type2%getName()//"_positions", type2%positions, &
                                       dot_product(Lsize, Lsize))
             
             case default

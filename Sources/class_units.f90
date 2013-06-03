@@ -30,9 +30,9 @@ private
     
         integer :: dm
 
-        integer :: snapIni_M
-        integer :: snapFin_M
-        integer :: snapShots_M
+        integer :: snapIni_moments
+        integer :: snapFin_moments
+        integer :: snapShots_moments
         
         integer :: structure_moduli
     
@@ -51,11 +51,11 @@ contains
         open(newunit=this%dx, recl=4096, file=name//"_dx.out", status='new', action='write')
         
         open(newunit=this%snapIni_positions, recl=4096, file=name//"_snapIni_positions.out", &
-            status='new', action='write')
+             status='new', action='write')
         open(newunit=this%snapFin_positions, recl=4096, file=name//"_snapFin_positions.out", &
-            status='new', action='write')
+             status='new', action='write')
         open(newunit=this%snapShots_positions, recl=4096, file=name//"_snap_positions.shots", &
-            status='new', action='write')
+             status='new', action='write')
         
         open(newunit=this%report, recl=4096, file=name//"_report.txt", status='new', action='write')
         open(newunit=this%Epot, recl=4096, file=name//"_Epot.out", status='new', action='write')
@@ -68,12 +68,12 @@ contains
             
                 open(newunit=this%dm, recl=4096, file=name//"_dm.out", status='new', action='write')
                 
-                open(newunit=this%snapIni_M, recl=4096, file=name//"_snapIni_M.out", status='new', &
-                     action='write')
-                open(newunit=this%snapFin_M, recl=4096, file=name//"_snapFin_M.out", status='new', &
-                     action='write')
-                open(newunit=this%snapShots_M, recl=4096, file=name//"_snap_M.shots", status='new', &
-                     action='write')
+                open(newunit=this%snapIni_moments, recl=4096, file=name//"_snapIni_moments.out", &
+                     status='new', action='write')
+                open(newunit=this%snapFin_moments, recl=4096, file=name//"_snapFin_moments.out", &
+                     status='new', action='write')
+                open(newunit=this%snapShots_moments, recl=4096, file=name//"_snap_moments.shots", &
+                     status='new', action='write')
                      
                  open(newunit=this%structure_moduli, recl=4096, file=name//"_structure_moduli.out", &
                     status='new', action='write')
@@ -109,9 +109,9 @@ contains
             
                 close(this%dm)
         
-                close(this%snapIni_M)
-                close(this%snapFin_M)
-                close(this%snapShots_M)
+                close(this%snapIni_moments)
+                close(this%snapFin_moments)
+                close(this%snapShots_moments)
                 
                 close(this%structure_moduli)
                     
