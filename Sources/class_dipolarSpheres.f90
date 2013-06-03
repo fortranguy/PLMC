@@ -781,7 +781,7 @@ contains
             if (kz == 0) then
                 kMax2_sym = 0
             else
-                kMax2_sym = kMax2
+                kMax2_sym = kMax(2)
             end if
 
             do ky = -Kmax(2), kMax2_sym
@@ -791,7 +791,7 @@ contains
                 if (kz == 0 .and. ky == 0) then
                     kMax1_sym = 0
                 else
-                    kMax1_sym = kMax1
+                    kMax1_sym = kMax(1)
                 end if
             
                 do kx = -kMax(1), kMax1_sym
@@ -869,20 +869,20 @@ contains
 
         mColOverL(:) = this%orientations(:, lCol)/Lsize(:)
 
-        do kz = -kMax3, 0
+        do kz = -kMax(3), 0
     
             if (kz == 0) then
                 kMax2_sym = 0
             else
-                kMax2_sym = kMax2
+                kMax2_sym = kMax(2)
             end if
             
-            do ky = -kMax2, kMax2_sym
+            do ky = -kMax(2), kMax2_sym
             
                 if (kz == 0 .and. ky == 0) then
                     kMax1_sym = 0
                 else
-                    kMax1_sym = kMax1
+                    kMax1_sym = kMax(1)
                 end if
                 
                 do kx = -kMax(1), kMax1_sym
@@ -969,7 +969,7 @@ contains
             if (kz == 0) then
                 kMax2_sym = 0
             else
-                kMax2_sym = kMax2
+                kMax2_sym = kMax(2)
             end if
 
             do ky = -Kmax(2), kMax2_sym
@@ -979,7 +979,7 @@ contains
                 if (kz == 0 .and. ky == 0) then
                     kMax1_sym = 0
                 else
-                    kMax1_sym = kMax1
+                    kMax1_sym = kMax(1)
                 end if
             
                 do kx = -kMax(1), kMax1_sym
@@ -1047,20 +1047,20 @@ contains
         mNewOverL(:) = mNew(:)/Lsize(:)
         mOldOverL(:) = this%orientations(:, lCol)/Lsize(:)
 
-        do kz = -kMax3, 0
+        do kz = -kMax(3), 0
     
             if (kz == 0) then
                 kMax2_sym = 0
             else
-                kMax2_sym = kMax2
+                kMax2_sym = kMax(2)
             end if
             
-            do ky = -kMax2, kMax2_sym
+            do ky = -kMax(2), kMax2_sym
             
                 if (kz == 0 .and. ky == 0) then
                     kMax1_sym = 0
                 else
-                    kMax1_sym = kMax1
+                    kMax1_sym = kMax(1)
                 end if
                 
                 do kx = -kMax(1), kMax1_sym
@@ -1140,7 +1140,7 @@ contains
             if (kz == 0) then
                 kMax2_sym = 0
             else
-                kMax2_sym = kMax2
+                kMax2_sym = kMax(2)
             end if
 
             do ky = -Kmax(2), kMax2_sym
@@ -1150,7 +1150,7 @@ contains
                 if (kz == 0 .and. ky == 0) then
                     kMax1_sym = 0
                 else
-                    kMax1_sym = kMax1
+                    kMax1_sym = kMax(1)
                 end if
             
                 do kx = -kMax(1), kMax1_sym
