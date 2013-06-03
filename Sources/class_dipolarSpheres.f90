@@ -1093,7 +1093,7 @@ contains
             cos_kxTest = real(exp_IkxTest, DP)
             sin_kxTest = aimag(exp_IkxTest)
             
-            realPart = real(k_dot_structure, DP) * cos_kxTest - aimag(k_dot_structure) * sin_kxTest
+            realPart = real(k_dot_structure, DP) * cos_kxTest + aimag(k_dot_structure) * sin_kxTest
             
             Epot_k = k_dot_mTest * (k_dot_mTest + 2._DP * realPart)
             Epot_reci_test = Epot_reci_test + Epot_k * this%Epot_reci_weight(kx, ky, kz)            
