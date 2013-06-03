@@ -268,8 +268,8 @@ contains
         real(DP), dimension(Dim) :: xRand, xNew
         integer :: same_iCellOld, same_iCellNew
         integer :: mix_iCellOld, mix_iCellNew
-        real(DP) :: dEpot
-        real(DP) :: same_dEpot, mix_dEpot
+        real(DP) :: deltaEpot
+        real(DP) :: same_deltaEpot, mix_deltaEpot
         real(DP) :: same_eNew, same_eOld
         real(DP) :: mix_eNew, mix_eOld
         
@@ -288,21 +288,21 @@ contains
     
                 same_iCellOld = this%same%position_to_cell(this%positions(:, iOld))
                 call this%Epot_neigh(iOld, this%positions(:, iOld), same_iCellOld, overlap, same_eOld)                    
-                same_dEpot = same_eNew - same_eOld
+                same_deltaEpot = same_eNew - same_eOld
                     
                 mix_iCellOld = this%mix%position_to_cell(this%positions(:, iOld))
                 call mix%Epot_neigh(this%positions(:, iOld), mix_iCellOld, this%mix, other%positions, &
                                     overlap, mix_eOld)
-                mix_dEpot = mix_eNew - mix_eOld
+                mix_deltaEpot = mix_eNew - mix_eOld
                 
-                dEpot = same_dEpot + mix_dEpot
+                deltaEpot = same_deltaEpot + mix_deltaEpot
                 
                 call random_number(rand)
-                if (rand < exp(-dEpot/Tstar)) then
+                if (rand < exp(-deltaEpot/Tstar)) then
                 
                     this%positions(:, iOld) = xNew(:)
-                    same_Epot = same_Epot + same_dEpot
-                    mix_Epot = mix_Epot + mix_dEpot
+                    same_Epot = same_Epot + same_deltaEpot
+                    mix_Epot = mix_Epot + mix_deltaEpot
                     
                     if (same_iCellOld /= same_iCellNew) then
                         call this%same%remove_cell_col(iOld, same_iCellOld)

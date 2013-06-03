@@ -1175,7 +1175,7 @@ contains
         real(DP), dimension(Dim) :: xNew
         integer :: same_iCellOld, same_iCellNew
         integer :: mix_iCellOld, mix_iCellNew
-        real(DP) :: dEpot, dEpot_same, dEpot_mix
+        real(DP) :: deltaEpot, same_deltaEpot, mix_deltaEpot
         real(DP) :: same_eNew_real, same_eOld_real
         real(DP) :: mix_eNew, mix_eOld
         real(DP) :: rand
@@ -1201,23 +1201,23 @@ contains
                 call this%Epot_real_neigh(iOld, this%positions(:, iOld), this%orientations(:, iOld), &
                                           same_iCellOld, overlap, same_eOld_real)
                 
-                dEpot_same = (same_eNew_real - same_eOld_real) + this%deltaEpot_reci_move(iOld, xNew)
+                same_deltaEpot = (same_eNew_real-same_eOld_real) + this%deltaEpot_reci_move(iOld, xNew)
                     
                 mix_iCellOld = this%mix%position_to_cell(this%positions(:, iOld))
                 call mix%Epot_neigh(this%positions(:, iOld), mix_iCellOld, this%mix, other%positions, &
                                     overlap, mix_eOld)
-                dEpot_mix = mix_eNew - mix_eOld
+                mix_deltaEpot = mix_eNew - mix_eOld
                 
-                dEpot = dEpot_same + dEpot_mix
+                deltaEpot = same_deltaEpot + mix_deltaEpot
                 
                 call random_number(rand)            
-                if (rand < exp(-dEpot/Tstar)) then
+                if (rand < exp(-deltaEpot/Tstar)) then
 
                     call this%deltaEpot_reci_move_updateStructure(iOld, xNew)
                     this%positions(:, iOld) = xNew(:)
                     
-                    same_Epot = same_Epot + dEpot_same
-                    mix_Epot = mix_Epot + dEpot_mix
+                    same_Epot = same_Epot + same_deltaEpot
+                    mix_Epot = mix_Epot + mix_deltaEpot
                     
                     if (same_iCellOld /= same_iCellNew) then
                         call this%same%remove_cell_col(iOld, same_iCellOld)
@@ -1252,7 +1252,7 @@ contains
         
         real(DP) :: rand
         real(DP), dimension(Dim) :: mNew
-        real(DP) :: dEpot, dEpot_real, dEpot_self
+        real(DP) :: deltaEpot, deltaEpot_real, deltaEpot_self
         real(DP) :: real_eNew, real_eOld
         integer :: iCell
         logical :: overlap
@@ -1264,19 +1264,19 @@ contains
         call this%Epot_real_neigh(iOld, this%positions(:, iOld), mNew, iCell, overlap, real_eNew)
         call this%Epot_real_neigh(iOld, this%positions(:, iOld), this%orientations(:, iOld), iCell, &
                                   overlap, real_eOld)
-        dEpot_real = real_eNew - real_eOld        
+        deltaEpot_real = real_eNew - real_eOld        
         
-        dEpot_self = this%Epot_self_solo(mNew) - this%Epot_self_solo(this%orientations(:, iOld))
+        deltaEpot_self = this%Epot_self_solo(mNew) - this%Epot_self_solo(this%orientations(:, iOld))
         
-        dEpot = dEpot_real + this%deltaEpot_reci_rotate(iOld, mNew) - dEpot_self
+        deltaEpot = deltaEpot_real + this%deltaEpot_reci_rotate(iOld, mNew) - deltaEpot_self
         
         call random_number(rand)
-        if (rand < exp(-dEpot/Tstar)) then
+        if (rand < exp(-deltaEpot/Tstar)) then
         
             call this%deltaEpot_reci_rotate_updateStructure(iOld, mNew)
             this%orientations(:, iOld) = mNew(:)
             
-            Epot = Epot + dEpot
+            Epot = Epot + deltaEpot
             
         else
             Nrej = Nrej + 1
