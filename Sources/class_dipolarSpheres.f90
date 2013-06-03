@@ -1021,7 +1021,8 @@ contains
         complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxCol_2
         complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_IkxCol_3
         complex(DP) :: exp_IkxCol
-
+        
+        integer :: kMax1_sym, kMax2_sym
         integer :: kx, ky, kz
 
         xColOverL(:) = this%positions(:, lCol)/Lsize(:)
@@ -1031,17 +1032,34 @@ contains
         mNewOverL(:) = mNew(:)/Lsize(:)
         mOldOverL(:) = this%orientations(:, lCol)/Lsize(:)
 
-        do kz = -Kmax(3), Kmax(3)
-        do ky = -Kmax(2), Kmax(2)
-        do kx = -Kmax(1), Kmax(1)
+        do kz = -kMax3, 0
+    
+            if (kz == 0) then
+                kMax2_sym = 0
+            else
+                kMax2_sym = kMax2
+            end if
+            
+            do ky = -kMax2, kMax2_sym
+            
+                if (kz == 0 .and. ky == 0) then
+                    kMax1_sym = 0
+                else
+                    kMax1_sym = kMax1
+                end if
+                
+                do kx = -kMax1, kMax1_sym
 
-            exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky) * exp_IkxCol_3(kz)
+                exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky) * exp_IkxCol_3(kz)
 
-            this%Epot_reci_structure(:, kx, ky, kz) = this%Epot_reci_structure(:, kx, ky, kz) + &
-                                                      (mNewOverL(:) - mOldOverL(:)) * exp_IkxCol
+                this%Epot_reci_structure(:, kx, ky, kz) = &
+                    this%Epot_reci_structure(:, kx, ky, kz) + &
+                    (mNewOverL(:) - mOldOverL(:)) * exp_IkxCol
 
-        end do
-        end do
+                end do
+                
+            end do
+            
         end do
 
     end subroutine DipolarSpheres_deltaEpot_reci_rotate_updateStructure
