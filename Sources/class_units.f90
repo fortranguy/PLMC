@@ -12,9 +12,9 @@ private
         integer :: obsTherm
         integer :: dx
 
-        integer :: snapIni_X
-        integer :: snapFin_X
-        integer :: snapShots_X
+        integer :: snapIni_positions
+        integer :: snapFin_positions
+        integer :: snapShots_positions
         
         integer :: report
         integer :: Epot
@@ -50,12 +50,12 @@ contains
              action='write')
         open(newunit=this%dx, recl=4096, file=name//"_dx.out", status='new', action='write')
         
-        open(newunit=this%snapIni_X, recl=4096, file=name//"_snapIni_X.out", status='new', &
-             action='write')
-        open(newunit=this%snapFin_X, recl=4096, file=name//"_snapFin_X.out", status='new', &
-             action='write')
-        open(newunit=this%snapShots_X, recl=4096, file=name//"_snap_X.shots", status='new', &
-             action='write')
+        open(newunit=this%snapIni_positions, recl=4096, file=name//"_snapIni_positions.out", &
+            status='new', action='write')
+        open(newunit=this%snapFin_positions, recl=4096, file=name//"_snapFin_positions.out", &
+            status='new', action='write')
+        open(newunit=this%snapShots_positions, recl=4096, file=name//"_snap_positions.shots", &
+            status='new', action='write')
         
         open(newunit=this%report, recl=4096, file=name//"_report.txt", status='new', action='write')
         open(newunit=this%Epot, recl=4096, file=name//"_Epot.out", status='new', action='write')
@@ -94,9 +94,9 @@ contains
         close(this%obsTherm)
         close(this%dx)
 
-        close(this%snapIni_X)
-        close(this%snapFin_X)
-        close(this%snapShots_X)
+        close(this%snapIni_positions)
+        close(this%snapFin_positions)
+        close(this%snapShots_positions)
         
         close(this%report)
         close(this%Epot)
