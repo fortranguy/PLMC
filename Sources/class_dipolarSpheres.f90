@@ -25,7 +25,7 @@ private
         
         ! Particles
         
-        real(DP), dimension(:, :), allocatable, public :: M !< moments of all particles
+        real(DP), dimension(:, :), allocatable, public :: moments !< dipolar moments of all particles
         
         ! Monte-Carlo
         integer :: structure_iStep
@@ -119,7 +119,7 @@ contains
         this%rMin = dipol_rMin
         this%Ncol = dipol_Ncol
         allocate(this%positions(Dim, this%Ncol))
-        allocate(this%M(Dim, this%Ncol))
+        allocate(this%moments(Dim, this%Ncol))
         
         ! Snapshot
         this%snap_factor = dipol_snap_factor
@@ -170,8 +170,8 @@ contains
             deallocate(this%positions)
         end if
         
-        if (allocated(this%M)) then
-            deallocate(this%M)
+        if (allocated(this%moments)) then
+            deallocate(this%moments)
         end if
         
         if (allocated(this%Epot_real_tab)) then
@@ -225,7 +225,7 @@ contains
         if (modulo(iStep, this%snap_factor) == 0) then
         
             do iCol = 1, this%Ncol
-                write(snap_unit, *) this%M(:, iCol)
+                write(snap_unit, *) this%moments(:, iCol)
             end do
             
         end if
@@ -469,7 +469,7 @@ contains
                         return
                     end if
 
-                    energ = energ + this%Epot_real_pair(mCol, this%M(:, current%iCol), &
+                    energ = energ + this%Epot_real_pair(mCol, this%moments(:, current%iCol), &
                                                         rVec_ij, r_ij)
 
                 end if
@@ -505,7 +505,7 @@ contains
                     r_ij = norm2(rVec_ij)
                     
                     Epot_real = Epot_real + &
-                                this%Epot_real_pair(this%M(:, iCol), this%M(:, jCol), rVec_ij, r_ij)
+                                this%Epot_real_pair(this%moments(:, iCol), this%moments(:, jCol), rVec_ij, r_ij)
                     
                 end if
             end do
@@ -588,7 +588,7 @@ contains
         do iCol = 1, this%Ncol
         
             xColOverL(:) = this%positions(:, iCol)/Lsize(:)
-            mColOverL(:) = this%M(:, iCol)/Lsize(:)
+            mColOverL(:) = this%moments(:, iCol)/Lsize(:)
             
             call fourier(xColOverL, exp_Ikx_1, exp_Ikx_2, exp_Ikx_3)
         
@@ -763,7 +763,7 @@ contains
         call fourier(xNewOverL, exp_IkxNew_1, exp_IkxNew_2, exp_IkxNew_3)
         call fourier(xOldOverL, exp_IkxOld_1, exp_IkxOld_2, exp_IkxOld_3)
 
-        mColOverL(:) = this%M(:, lCol)/Lsize(:)
+        mColOverL(:) = this%moments(:, lCol)/Lsize(:)
 
         Epot_reci_move = 0._DP
 
@@ -843,7 +843,7 @@ contains
         call fourier(xNewOverL, exp_IkxNew_1, exp_IkxNew_2, exp_IkxNew_3)
         call fourier(xOldOverL, exp_IkxOld_1, exp_IkxOld_2, exp_IkxOld_3)
 
-        mColOverL(:) = this%M(:, lCol)/Lsize(:)
+        mColOverL(:) = this%moments(:, lCol)/Lsize(:)
 
         do kz = -Kmax(3), Kmax(3)
         do ky = -Kmax(2), Kmax(2)
@@ -917,7 +917,7 @@ contains
         call fourier(xColOverL, exp_IkxCol_1, exp_IkxCol_2, exp_IkxCol_3)
 
         mNewOverL(:) = mNew(:)/Lsize(:)
-        mOldOverL(:) = this%M(:, lCol)/Lsize(:)
+        mOldOverL(:) = this%moments(:, lCol)/Lsize(:)
 
         Epot_reci_rotate = 0._DP
 
@@ -989,7 +989,7 @@ contains
         call fourier(xColOverL, exp_IkxCol_1, exp_IkxCol_2, exp_IkxCol_3)
 
         mNewOverL(:) = mNew(:)/Lsize(:)
-        mOldOverL(:) = this%M(:, lCol)/Lsize(:)
+        mOldOverL(:) = this%moments(:, lCol)/Lsize(:)
 
         do kz = -Kmax(3), Kmax(3)
         do ky = -Kmax(2), Kmax(2)
@@ -1110,7 +1110,7 @@ contains
 
         do jCol = 1, this%Ncol
 
-            mColOverL(:) = this%M(:, jCol)/Lsize(:)
+            mColOverL(:) = this%moments(:, jCol)/Lsize(:)
             real_potential(:) = real(this%Epot_reci_potential(:, jCol), DP)
 
             Epot_reci = Epot_reci + dot_product(mColOverL, real_potential)
@@ -1148,7 +1148,7 @@ contains
         
         Epot_self = 0._DP
         do iCol = 1, this%Ncol
-            Epot_self = Epot_self + this%Epot_self_solo(this%M(:, iCol))
+            Epot_self = Epot_self + this%Epot_self_solo(this%moments(:, iCol))
         end do
         
     end function DipolarSpheres_Epot_self
@@ -1187,14 +1187,14 @@ contains
         if (.not. overlap) then
         
             same_iCellNew = this%same%position_to_cell(xNew)
-            call this%Epot_real_neigh(iOld, xNew, this%M(:, iOld), same_iCellNew, overlap, &
+            call this%Epot_real_neigh(iOld, xNew, this%moments(:, iOld), same_iCellNew, overlap, &
                                       same_eNew_real)
                         
             if (.not. overlap) then
                 
                 ! Real
                 same_iCellOld = this%same%position_to_cell(this%positions(:, iOld))
-                call this%Epot_real_neigh(iOld, this%positions(:, iOld), this%M(:, iOld), &
+                call this%Epot_real_neigh(iOld, this%positions(:, iOld), this%moments(:, iOld), &
                                           same_iCellOld, overlap, same_eOld_real)
                 
                 dEpot_same = (same_eNew_real - same_eOld_real) + this%Epot_reci_move(iOld, xNew)
@@ -1253,16 +1253,16 @@ contains
         integer :: iCell
         logical :: overlap
         
-        mNew(:) = this%M(:, iOld)
+        mNew(:) = this%moments(:, iOld)
         call markov_surface(mNew, this%dm)
         
         iCell = this%same%position_to_cell(this%positions(:, iOld))
         call this%Epot_real_neigh(iOld, this%positions(:, iOld), mNew, iCell, overlap, real_eNew)
-        call this%Epot_real_neigh(iOld, this%positions(:, iOld), this%M(:, iOld), iCell, overlap, &
+        call this%Epot_real_neigh(iOld, this%positions(:, iOld), this%moments(:, iOld), iCell, overlap, &
                                   real_eOld)
         dEpot_real = real_eNew - real_eOld        
         
-        dEpot_self = this%Epot_self_solo(mNew) - this%Epot_self_solo(this%M(:, iOld))
+        dEpot_self = this%Epot_self_solo(mNew) - this%Epot_self_solo(this%moments(:, iOld))
         
         dEpot = dEpot_real + this%Epot_reci_rotate(iOld, mNew) - dEpot_self
         
@@ -1270,7 +1270,7 @@ contains
         if (rand < exp(-dEpot/Tstar)) then
         
             call this%Epot_reci_updateM(iOld, mNew)
-            this%M(:, iOld) = mNew(:)
+            this%moments(:, iOld) = mNew(:)
             
             Epot = Epot + dEpot
             
