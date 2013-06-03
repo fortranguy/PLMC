@@ -743,9 +743,9 @@ contains
 
                     if (norm2(waveVector) /= 0) then
 
-                        write(waveVector_unit, *) kx, ky, kz
-                        write(waveVector_unit, *)
-                        write(waveVector_unit, *)
+                        write(waveVectors_unit, *) kx, ky, kz
+                        write(waveVectors_unit, *)
+                        write(waveVectors_unit, *)
 
                         this%NwaveVectors = this%NwaveVectors + 1
 
