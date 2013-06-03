@@ -1130,7 +1130,7 @@ contains
                 call this%Epot_real_neigh(iOld, this%X(:, iOld), this%M(:, iOld), same_iCellOld, &
                                           overlap, same_eOld_real)
                 
-                dEpot_same = (same_eNew_real-same_eOld_real) + this%Epot_reci_move(iOld, xNew)
+                dEpot_same = (same_eNew_real - same_eOld_real) + this%Epot_reci_move(iOld, xNew)
                     
                 mix_iCellOld = this%mix%position_to_cell(this%X(:, iOld))
                 call mix%Epot_neigh(this%X(:, iOld), mix_iCellOld, this%mix, other%X, overlap, &
