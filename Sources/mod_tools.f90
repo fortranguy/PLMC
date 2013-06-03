@@ -63,8 +63,8 @@ contains
                 
                 select case (init)
                     case ("rand") 
-                        call randomDepositions(type1%positions, type1%getRMin(), type2%positions, type2%getRmin(), &
-                                               mix_rMin)
+                        call randomDepositions(type1%positions, type1%getRMin(), type2%positions, &
+                                               type2%getRmin(), mix_rMin)
                         call randomMoments(type1%M)
                         write(output_unit, *) "Random depositions + random orientations"
                         write(report_unit, *) "    Random depositions + random orientations"
@@ -79,9 +79,11 @@ contains
                 write(output_unit, *) "Old configuration"
                 write(report_unit, *) "    Old configuration"
                 
-                call oldConfiguration(1, type1%getName()//"_X", type1%positions, dot_product(Lsize, Lsize))
+                call oldConfiguration(1, type1%getName()//"_X", type1%positions, &
+                                      dot_product(Lsize, Lsize))
                 call oldConfiguration(2, type1%getName()//"_M", type1%M, 1._DP)
-                call oldConfiguration(3, type2%getName()//"_X", type2%positions, dot_product(Lsize, Lsize))
+                call oldConfiguration(3, type2%getName()//"_X", type2%positions, &
+                                      dot_product(Lsize, Lsize))
             
             case default
                 write(error_unit, *) "Enter the initial condition : "
