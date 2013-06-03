@@ -88,13 +88,13 @@ use data_cell
 implicit none
 
     real(DP), parameter :: Tstar = 1._DP
-    integer, parameter :: Nstep = 2**10
-    integer, parameter :: Ntherm = 2**10
+    integer, parameter :: Nstep = 2**16
+    integer, parameter :: Ntherm = 25000
     
     integer, parameter :: Nmove = Ncol
     integer, parameter :: Nrotate = dipol_Ncol
     
-    integer, parameter :: dipol_structure_iStep = 2**10
+    integer, parameter :: dipol_structure_iStep = 1000
     ! move
     real(DP), dimension(Dim), parameter :: dipol_dx = .15_DP
     real(DP), parameter :: dipol_rejFix = 0.5_DP
