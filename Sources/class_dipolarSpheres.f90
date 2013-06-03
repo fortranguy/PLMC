@@ -3,7 +3,6 @@
 module class_dipolarSpheres
 
 use, intrinsic :: iso_fortran_env
-use, intrinsic :: iso_c_binding, only : C_int, C_double
 use data_constants
 use data_cell
 use data_particles
@@ -15,7 +14,6 @@ use mod_physics
 use class_neighbours
 use class_mixingPotential
 use class_spheres
-use mod_ewald_reci
 
 implicit none
 
@@ -60,7 +58,6 @@ private
         
         !> Take a snap shot of the configuration : orientations
         procedure :: snapShot_M => DipolarSpheres_snapShot_M
-        procedure :: C_snapShot => DipolarSpheres_C_snapShot
         
         !> Adapt the displacement dx during thermalisation
         procedure :: adaptDm => DipolarSpheres_adaptDm
@@ -153,7 +150,6 @@ contains
 
         allocate(this%Epot_reci_potential(Dim, this%Ncol))
         call this%Epot_reci_weight_init()
-        call C_Epot_reci_nfft_init(int(this%Ncol, C_int))
         
         ! Neighbours : same kind
         call this%same%construct(dipol_cell_Lsize, this%rCut)
@@ -185,7 +181,6 @@ contains
         if (allocated(this%Epot_reci_potential))then
             deallocate(this%Epot_reci_potential)
         end if
-        call C_Epot_reci_nfft_finalize()
         
         call this%same%destroy()
         call this%mix%destroy()
@@ -236,14 +231,6 @@ contains
         end if
 
     end subroutine DipolarSpheres_snapShot_M
-    
-    subroutine DipolarSpheres_C_snapShot(this)
-        
-        class(DipolarSpheres), intent(in) :: this
-        
-        call C_snapShot(int(this%Ncol, C_int))
-
-    end subroutine DipolarSpheres_C_snapShot
     
     !> Adaptation of dm during the thermalisation
     
@@ -1292,7 +1279,7 @@ contains
     
     end subroutine DipolarSpheres_rotate
     
-    !> Widom's method : with other type ?
+    !> Widom's method
 
     subroutine DipolarSpheres_widom(this, other_X, mix, activ)
         
@@ -1307,10 +1294,9 @@ contains
         real(DP), dimension(Dim) :: mTest
         integer :: same_iCellTest, mix_iCellTest
         logical :: overlap
-        real(DP) :: enTest, same_enTest, mix_enTest
-        
-        real(C_double) :: C_Epot
-        real(C_double), dimension(Dim) :: C_xTest, C_mTest
+        real(DP) :: enTest
+        real(DP) :: same_enTest, same_enTest_real
+        real(DP) :: mix_enTest
         
         widTestSum = 0._DP
         
@@ -1327,17 +1313,14 @@ contains
                 mTest(:) = random_surface()
                                
                 same_iCellTest = this%same%position_to_cell(xTest)               
-                call this%Epot_real_neigh(0, xTest, mTest, same_iCellTest, overlap, same_enTest)
+                call this%Epot_real_neigh(0, xTest, mTest, same_iCellTest, overlap, same_enTest_real)
                 
                 if (.not. overlap) then
-                
-                    ! Reci
-                    C_xTest(:) = real(xTest(:)/Lsize(:), C_double) - 0.5_c_double                    
-                    C_mTest(:) = real(mTest(:)/Lsize(:), C_double)
                     
-                    C_Epot = C_Epot_reci_test(C_xTest, C_mTest, real(Volume, C_double))
+                    same_enTest = same_enTest_real + this%Epot_reci_test(xTest, mTest) - &
+                                  this%Epot_self_solo(mTest)
                 
-                    enTest = same_enTest + mix_enTest + real(C_Epot, DP) - this%Epot_self_solo(mTest)
+                    enTest = same_enTest + mix_enTest
                     widTestSum = widTestSum + exp(-enTest/Tstar)
                     
                 end if
