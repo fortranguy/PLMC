@@ -774,7 +774,7 @@ contains
 
         deltaEpot_reci_move = 0._DP
 
-        do kz = -Kmax(3), 0
+        do kz = -Kmax(3), Kmax(3)
 
             waveVector(3) = real(kz, DP)
             
@@ -784,7 +784,7 @@ contains
                 kMax2_sym = kMax2
             end if
 
-            do ky = -Kmax(2), kMax2_sym
+            do ky = -Kmax(2), Kmax(2)
 
                 waveVector(2) = real(ky, DP)
 
@@ -822,7 +822,7 @@ contains
         
         end do
 
-        deltaEpot_reci_move = 4._DP*PI/Volume * deltaEpot_reci_move
+        deltaEpot_reci_move = 2._DP*PI/Volume * deltaEpot_reci_move
 
     end function DipolarSpheres_deltaEpot_reci_move
 
