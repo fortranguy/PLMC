@@ -758,7 +758,7 @@ contains
 
         real(DP) :: realPart1, realPart2
         
-        integer :: kMax2_sym ! symmetry : half wave vectors -> double Energy
+        integer :: kMax1_sym, kMax2_sym ! symmetry : half wave vectors -> double Energy
         real(DP), dimension(Dim) :: waveVector
         real(DP) :: k_dot_mCol
         complex(DP) :: k_dot_structure
@@ -774,7 +774,7 @@ contains
 
         deltaEpot_reci_move = 0._DP
 
-        do kz = -Kmax(3), Kmax(3)
+        do kz = -Kmax(3), 0
 
             waveVector(3) = real(kz, DP)
             
@@ -784,45 +784,51 @@ contains
                 kMax2_sym = kMax2
             end if
 
-            do ky = -Kmax(2), Kmax(2)
+            do ky = -Kmax(2), kMax2_sym
 
                 waveVector(2) = real(ky, DP)
 
-            do kx = -Kmax(1), Kmax(1)
+                if (kz == 0 .and. ky == 0) then
+                    kMax1_sym = 0
+                else
+                    kMax1_sym = kMax1
+                end if
+            
+                do kx = -kMax1, kMax1_sym
 
-                waveVector(1) = real(kx, DP)
+                    waveVector(1) = real(kx, DP)
 
-                k_dot_mCol = dot_product(waveVector, mColOverL)
+                    k_dot_mCol = dot_product(waveVector, mColOverL)
 
-                k_dot_structure = dot_product(cmplx(waveVector, 0._DP, DP), &
-                                              this%Epot_reci_structure(:, kx, ky, kz))
+                    k_dot_structure = dot_product(cmplx(waveVector, 0._DP, DP), &
+                                                  this%Epot_reci_structure(:, kx, ky, kz))
 
-                exp_IkxNew = exp_IkxNew_1(kx) * exp_IkxNew_2(ky) * exp_IkxNew_3(kz)
-                cos_kxNew = real(exp_IkxNew, DP)
-                sin_kxNew = aimag(exp_IkxNew)
+                    exp_IkxNew = exp_IkxNew_1(kx) * exp_IkxNew_2(ky) * exp_IkxNew_3(kz)
+                    cos_kxNew = real(exp_IkxNew, DP)
+                    sin_kxNew = aimag(exp_IkxNew)
 
-                exp_IkxOld = exp_IkxOld_1(kx) * exp_IkxOld_2(ky) * exp_IkxOld_3(kz)
-                cos_kxOld = real(exp_IkxOld, DP)
-                sin_kxOld = aimag(exp_IkxOld)
+                    exp_IkxOld = exp_IkxOld_1(kx) * exp_IkxOld_2(ky) * exp_IkxOld_3(kz)
+                    cos_kxOld = real(exp_IkxOld, DP)
+                    sin_kxOld = aimag(exp_IkxOld)
 
-                realPart1 = (cos_kxNew - cos_kxOld)
-                realPart1 = realPart1 * (real(k_dot_structure, DP) - k_dot_mCol * cos_kxOld)
+                    realPart1 = (cos_kxNew - cos_kxOld)
+                    realPart1 = realPart1 * (real(k_dot_structure, DP) - k_dot_mCol * cos_kxOld)
 
-                realPart2 = (-sin_kxNew + sin_kxOld)
-                realPart2 = realPart2 * (aimag(k_dot_structure) - k_dot_mCol * sin_kxOld)
-                
-                deltaEpot_k = 2._DP*k_dot_mCol * (realPart1 - realPart2) * &
-                              this%Epot_reci_weight(kx, ky, kz)
-                deltaEpot_reci_move = deltaEpot_reci_move + deltaEpot_k
-                                                  
+                    realPart2 = (-sin_kxNew + sin_kxOld)
+                    realPart2 = realPart2 * (aimag(k_dot_structure) - k_dot_mCol * sin_kxOld)
+                    
+                    deltaEpot_k = 2._DP*k_dot_mCol * (realPart1 - realPart2) * &
+                                  this%Epot_reci_weight(kx, ky, kz)
+                    deltaEpot_reci_move = deltaEpot_reci_move + deltaEpot_k
+                                                      
 
-            end do
+                end do
             
             end do
         
         end do
 
-        deltaEpot_reci_move = 2._DP*PI/Volume * deltaEpot_reci_move
+        deltaEpot_reci_move = 4._DP*PI/Volume * deltaEpot_reci_move
 
     end function DipolarSpheres_deltaEpot_reci_move
 
