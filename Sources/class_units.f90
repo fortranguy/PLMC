@@ -45,10 +45,10 @@ contains
         class(Units), intent(out) :: this
         character(len=*), intent(in) :: name
         
-        open(newunit=this%obsThermal, recl=4096, file=name//"_obsThermal.out", &
-             status='new', action='write')
-        open(newunit=this%obsEquilib, recl=4096, file=name//"_obsEquilib.out", &
-             status='new', action='write')
+        open(newunit=this%obsThermal, recl=4096, file=name//"_obsThermal.out", status='new', &
+             action='write')
+        open(newunit=this%obsEquilib, recl=4096, file=name//"_obsEquilib.out", status='new', &
+             action='write')
         open(newunit=this%deltaX, recl=4096, file=name//"_deltaX.out", status='new', action='write')
         
         open(newunit=this%snapIni_positions, recl=4096, file=name//"_snapIni_positions.out", &
