@@ -1186,17 +1186,18 @@ contains
         integer :: iCell
         logical :: overlap
         
+        mNew(:) = this%M(:, iOld)
+        call markov_surface(mNew, this%dm)
+        
         iCell = this%same%position_to_cell(this%X(:, iOld))
         call this%Epot_real_neigh(iOld, this%X(:, iOld), mNew, iCell, overlap, real_eNew)
         call this%Epot_real_neigh(iOld, this%X(:, iOld), this%M(:, iOld), iCell, overlap, real_eOld)
-        dEpot_real = real_eNew - real_eOld
-
-        mNew(:) = this%M(:, iOld)
-        call markov_surface(mNew, this%dm)
+        dEpot_real = real_eNew - real_eOld        
         
         dEpot_self = this%Epot_self_solo(mNew) - this%Epot_self_solo(this%M(:, iOld))
         
         dEpot = dEpot_real + this%Epot_reci_rotate(iOld, mNew) - dEpot_self
+        
         call random_number(rand)
         if (rand < exp(-dEpot/Tstar)) then
         
