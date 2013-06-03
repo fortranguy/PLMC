@@ -706,10 +706,10 @@ contains
         
     end subroutine DipolarSpheres_Epot_reci_potential_init
 
-    subroutine DipolarSpheres_Epot_reci_countNwaveVectors(this, waveVector_unit)
+    subroutine DipolarSpheres_Epot_reci_countNwaveVectors(this, waveVectors_unit)
 
         class(DipolarSpheres), intent(inout) :: this
-        integer, intent(in) :: waveVector_unit
+        integer, intent(in) :: waveVectors_unit
 
         integer :: kMax1_sym, kMax2_sym ! symmetry : half wave vectors
         real(DP), dimension(Dim) :: waveVector
