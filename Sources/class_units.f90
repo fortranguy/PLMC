@@ -10,7 +10,7 @@ private
     
         integer :: obsEqb
         integer :: obsTherm
-        integer :: dx
+        integer :: deltaX
 
         integer :: snapIni_positions
         integer :: snapFin_positions
@@ -48,7 +48,7 @@ contains
         open(newunit=this%obsEqb, recl=4096, file=name//"_obsEqb.out", status='new', action='write')
         open(newunit=this%obsTherm, recl=4096, file=name//"_obsTherm.out", status='new', &
              action='write')
-        open(newunit=this%dx, recl=4096, file=name//"_dx.out", status='new', action='write')
+        open(newunit=this%deltaX, recl=4096, file=name//"_deltaX.out", status='new', action='write')
         
         open(newunit=this%snapIni_positions, recl=4096, file=name//"_snapIni_positions.out", &
              status='new', action='write')
@@ -92,7 +92,7 @@ contains
         
         close(this%obsEqb)
         close(this%obsTherm)
-        close(this%dx)
+        close(this%deltaX)
 
         close(this%snapIni_positions)
         close(this%snapFin_positions)

@@ -66,8 +66,8 @@ contains
         this%snap_factor = hard_snap_factor
         
         ! Monte-Carlo
-        this%dx = hard_dx
-        this%dxSave = this%dx
+        this%deltaX = hard_deltaX
+        this%deltaXSave = this%deltaX
         this%rejFix = hard_rejFix
         this%Nadapt = hard_Nadapt
         this%Nwidom = hard_Nwidom
@@ -199,7 +199,7 @@ contains
         
         ! Random new position
         call random_number(xRand)
-        xNew(:) = this%positions(:, iOld) + (xRand(:)-0.5_DP)*this%dx(:)
+        xNew(:) = this%positions(:, iOld) + (xRand(:)-0.5_DP)*this%deltaX(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
         
         same_iCellNew = this%same%position_to_cell(xNew)

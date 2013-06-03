@@ -95,7 +95,7 @@ implicit none
     
     integer, parameter :: dipol_structure_iStep = 1000
     ! move
-    real(DP), dimension(Dim), parameter :: dipol_dx = .15_DP
+    real(DP), dimension(Dim), parameter :: dipol_deltaX = .15_DP
     real(DP), parameter :: dipol_rejFix = 0.5_DP
     integer, parameter :: dipol_Nadapt = 2*Ntherm
     ! rotate
@@ -106,12 +106,12 @@ implicit none
     ! chemical potential
     integer, parameter :: dipol_Nwidom = 500
     
-    real(DP), dimension(Dim), parameter :: inter_dx = 1._DP
+    real(DP), dimension(Dim), parameter :: inter_deltaX = 1._DP
     real(DP), parameter :: inter_rejFix = 0.5_DP
     integer, parameter :: inter_Nadapt = Ntherm/8
     integer, parameter :: inter_Nwidom = inter_Ncol
     
-    real(DP), dimension(Dim), parameter :: hard_dx = .3_DP
+    real(DP), dimension(Dim), parameter :: hard_deltaX = .3_DP
     real(DP), parameter :: hard_rejFix = 0.5_DP
     integer, parameter :: hard_Nadapt = 2*Ntherm
     integer, parameter :: hard_Nwidom = 500

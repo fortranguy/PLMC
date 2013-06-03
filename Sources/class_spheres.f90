@@ -29,8 +29,8 @@ private
         integer :: snap_factor
 
         ! Monte-Carlo
-        real(DP), dimension(Dim) :: dx !< displacement
-        real(DP), dimension(Dim) :: dxSave
+        real(DP), dimension(Dim) :: deltaX !< displacement
+        real(DP), dimension(Dim) :: deltaXsave
         real(DP) :: rejFix
         integer :: Nadapt
         integer :: Nwidom
@@ -61,10 +61,10 @@ private
         !> Assign all particles to cells
         procedure :: cols_to_cells => Spheres_cols_to_cells
                 
-        !> Adapt the displacement dx during thermalisation
-        procedure :: adaptDx => Spheres_adaptDx
-        procedure :: definiteDx => Spheres_definiteDx
-        procedure :: getDx => Spheres_getDx
+        !> Adapt the displacement deltaX during thermalisation
+        procedure :: adaptDeltaX => Spheres_adaptDeltaX
+        procedure :: definiteDeltaX => Spheres_definiteDeltaX
+        procedure :: getDeltaX => Spheres_getDeltaX
         
     end type Spheres
     
@@ -197,78 +197,78 @@ contains
     
     end subroutine Spheres_cols_to_cells
     
-    !> Adaptation of dx during the thermalisation
+    !> Adaptation of deltaX during the thermalisation
     
-    subroutine Spheres_adaptDx(this, rej)
+    subroutine Spheres_adaptDeltaX(this, rej)
     
         class(Spheres), intent(inout) :: this
         real(DP), intent(in) :: rej
         
-        real(DP), parameter :: eps_dx = 0.05_DP
-        real(DP), parameter :: eps_rej = 0.1_DP * eps_dx
-        real(DP), parameter :: more = 1._DP+eps_dx
-        real(DP), parameter :: less = 1._DP-eps_dx
+        real(DP), parameter :: eps_deltaX = 0.05_DP
+        real(DP), parameter :: eps_rej = 0.1_DP * eps_deltaX
+        real(DP), parameter :: more = 1._DP+eps_deltaX
+        real(DP), parameter :: less = 1._DP-eps_deltaX
         
-        real(DP) :: dx_normSqr, Lsize_normSqr
+        real(DP) :: deltaX_normSqr, Lsize_normSqr
         
         Lsize_normSqr = dot_product(Lsize, Lsize)
         
         if (rej < this%rejFix - eps_rej) then
         
-            this%dx(:) = this%dx(:) * more
+            this%deltaX(:) = this%deltaX(:) * more
             
-            dx_normSqr = dot_product(this%dx, this%dx)
-            if (dx_normSqr > Lsize_normSqr) then
-                this%dx(:) = Lsize(:)
+            deltaX_normSqr = dot_product(this%deltaX, this%deltaX)
+            if (deltaX_normSqr > Lsize_normSqr) then
+                this%deltaX(:) = Lsize(:)
             end if
             
         else if (rej > this%rejFix + eps_rej) then
         
-            this%dx(:) = this%dx(:) * less
+            this%deltaX(:) = this%deltaX(:) * less
             
         end if
     
-    end subroutine Spheres_adaptDx
+    end subroutine Spheres_adaptDeltaX
     
-    subroutine Spheres_definiteDx(this, rej, report_unit)
+    subroutine Spheres_definiteDeltaX(this, rej, report_unit)
     
         class(Spheres), intent(inout) :: this    
         real(DP), intent(in) :: rej
         integer, intent(in) :: report_unit
         
-        real(DP) :: dx_normSqr, Lsize_normSqr
+        real(DP) :: deltaX_normSqr, Lsize_normSqr
         
             if (rej == 0._DP) then
-                write(error_unit, *) this%name, " :    Warning : dx adaptation problem."
-                this%dx(:) = this%dxSave(:)
-                write(error_unit, *) "default dx :", this%dx(:)
+                write(error_unit, *) this%name, " :    Warning : deltaX adaptation problem."
+                this%deltaX(:) = this%deltaXsave(:)
+                write(error_unit, *) "default deltaX :", this%deltaX(:)
             end if
             
-            dx_normSqr = dot_product(this%dx, this%dx)
+            deltaX_normSqr = dot_product(this%deltaX, this%deltaX)
             Lsize_normSqr = dot_product(Lsize, Lsize)
-            if (dx_normSqr >= Lsize_normSqr) then
-                write(error_unit, *) this%name, " :   Warning : dx too big."
-                this%dx(:) = Lsize(:)
-                write(error_unit, *) "big dx :", this%dx(:)
+            if (deltaX_normSqr >= Lsize_normSqr) then
+                write(error_unit, *) this%name, " :   Warning : deltaX too big."
+                this%deltaX(:) = Lsize(:)
+                write(error_unit, *) "big deltaX :", this%deltaX(:)
             end if
             
             write(output_unit, *) this%name, " :    Thermalisation : over"
             
             write(report_unit, *) "Displacement :"
-            write(report_unit, *) "    dx(:) = ", this%dx(:)
+            write(report_unit, *) "    deltaX(:) = ", this%deltaX(:)
             write(report_unit, *) "    rejection relative difference = ", &
                                        abs(rej-this%rejFix)/this%rejFix
     
-    end subroutine Spheres_definiteDx
+    end subroutine Spheres_definiteDeltaX
     
-    function Spheres_getDx(this) result(getDx)
+    function Spheres_getDeltaX(this) result(getDeltaX)
         
         class(Spheres), intent(in) :: this        
-        real(DP) :: getDx
+        real(DP) :: getDeltaX
         
-        ! average dx of 3 vector components
-        getDx = sum(this%dx)/size(this%dx)
+        ! average deltaX of 3 vector components
+        getDeltaX = sum(this%deltaX)/size(this%deltaX)
         
-    end function Spheres_getDx    
+    end function Spheres_getDeltaX    
 
 end module class_spheres

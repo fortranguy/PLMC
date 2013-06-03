@@ -74,8 +74,8 @@ contains
         this%snap_factor = inter_snap_factor
         
         ! Monte-Carlo
-        this%dx = inter_dx
-        this%dxSave = this%dx
+        this%deltaX = inter_deltaX
+        this%deltaXSave = this%deltaX
         this%rejFix = inter_rejFix
         this%Nadapt = inter_Nadapt
         this%Nwidom = inter_Nwidom
@@ -274,7 +274,7 @@ contains
         real(DP) :: mix_eNew, mix_eOld
         
         call random_number(xRand)
-        xNew(:) = this%positions(:, iOld) + (xRand(:)-0.5_DP)*this%dx(:)
+        xNew(:) = this%positions(:, iOld) + (xRand(:)-0.5_DP)*this%deltaX(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
         same_iCellNew = this%same%position_to_cell(xNew)
         call this%Epot_neigh(iOld, xNew, same_iCellNew, overlap, same_eNew)

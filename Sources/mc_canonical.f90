@@ -160,9 +160,9 @@ implicit none
         
             ! Initial displacements & rejections
             if (iStep == 1) then
-                write(type1_io%dx, *) iStep, type1_sph%getDx(), type1_obs%rej
+                write(type1_io%deltaX, *) iStep, type1_sph%getDeltaX(), type1_obs%rej
                 write(type1_io%dm, *) iStep, type1_sph%getDm(), type1_obs%rejRot
-                write(type2_io%dx, *) iStep, type2_sph%getDx(), type2_obs%rej
+                write(type2_io%deltaX, *) iStep, type2_sph%getDeltaX(), type2_obs%rej
             end if
             
             ! Displacements adaptation           
@@ -170,8 +170,8 @@ implicit none
                 type1_obs%rejAdapt = type1_obs%rejAdapt + type1_obs%rej
             else ! Average & adaptation
                 type1_obs%rejAdapt = type1_obs%rejAdapt/real(type1_sph%getNadapt()-1)
-                call type1_sph%adaptDx(type1_obs%rejAdapt)
-                write(type1_io%dx, *) iStep, type1_sph%getDx(), type1_obs%rejAdapt
+                call type1_sph%adaptDeltaX(type1_obs%rejAdapt)
+                write(type1_io%deltaX, *) iStep, type1_sph%getDeltaX(), type1_obs%rejAdapt
                 type1_obs%rejAdapt = 0._DP
             end if
             
@@ -189,8 +189,8 @@ implicit none
                 type2_obs%rejAdapt = type2_obs%rejAdapt + type2_obs%rej
             else                
                 type2_obs%rejAdapt = type2_obs%rejAdapt/real(type2_sph%getNadapt()-1)
-                call type2_sph%adaptDx(type2_obs%rejAdapt)
-                write(type2_io%dx, *) iStep, type2_sph%getDx(), type2_obs%rejAdapt
+                call type2_sph%adaptDeltaX(type2_obs%rejAdapt)
+                write(type2_io%deltaX, *) iStep, type2_sph%getDeltaX(), type2_obs%rejAdapt
                 type2_obs%rejAdapt = 0._DP
             end if
             
@@ -201,9 +201,9 @@ implicit none
             write(obsTherm_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
             
             if (iStep == Ntherm) then ! Definite thermalised displacements
-                call type1_sph%definiteDx(type1_obs%rej, type1_io%report)
+                call type1_sph%definiteDeltaX(type1_obs%rej, type1_io%report)
                 call type1_sph%definiteDm(type1_obs%rejRot, type1_io%report)
-                call type2_sph%definiteDx(type2_obs%rej, type2_io%report)
+                call type2_sph%definiteDeltaX(type2_obs%rej, type2_io%report)
             end if       
         
         else MC_Regime ! Thermalisation over -> Equilibrium

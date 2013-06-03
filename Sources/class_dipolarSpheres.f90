@@ -60,7 +60,7 @@ private
         !> Take a snap shot of the configuration : orientations
         procedure :: snapShot_orientations => DipolarSpheres_snapShot_orientations
         
-        !> Adapt the displacement dx during thermalisation
+        !> Adapt the rotation dm during thermalisation
         procedure :: adaptDm => DipolarSpheres_adaptDm
         procedure :: definiteDm => DipolarSpheres_definiteDm
         procedure :: getDm => DipolarSpheres_getDm
@@ -127,8 +127,8 @@ contains
         
         ! Monte-Carlo
         this%structure_iStep = dipol_structure_iStep
-        this%dx = dipol_dx
-        this%dxSave = this%dx
+        this%deltaX = dipol_deltaX
+        this%deltaXsave = this%deltaX
         this%rejFix = dipol_rejFix
         this%Nadapt = dipol_Nadapt
         
@@ -1180,7 +1180,7 @@ contains
         
         ! Random new position
         call random_number(xRand)
-        xNew(:) = this%positions(:, iOld) + this%dx(:) * (xRand(:)-0.5_DP)
+        xNew(:) = this%positions(:, iOld) + this%deltaX(:) * (xRand(:)-0.5_DP)
         xNew(:) = modulo(xNew(:), Lsize(:))
         
         mix_iCellNew = this%mix%position_to_cell(xNew)
