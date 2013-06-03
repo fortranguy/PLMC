@@ -805,11 +805,11 @@ contains
             cos_kxOld = real(exp_IkxOld, DP)
             sin_kxOld = aimag(exp_IkxOld)
 
-            realPart1 = (cos_kxNew-cos_kxOld) * (real(k_dot_structure, DP) - k_dot_mCol * cos_kxOld)
+            realPart1 = (cos_kxNew - cos_kxOld) * (real(k_dot_structure, DP) - k_dot_mCol * cos_kxOld)
 
-            realPart2 = (-sin_kxNew+sin_kxOld) * (aimag(k_dot_structure) - k_dot_mCol * sin_kxOld)
+            realPart2 = (-sin_kxNew + sin_kxOld) * (aimag(k_dot_structure) - k_dot_mCol * sin_kxOld)
 
-            Epot_reci_move = Epot_reci_move + 2._DP*k_dot_mCol * (realPart1-realPart2) * &
+            Epot_reci_move = Epot_reci_move + 2._DP*k_dot_mCol * (realPart1 - realPart2) * &
                                               this%Epot_reci_weight(kx, ky, kz)
 
         end do
