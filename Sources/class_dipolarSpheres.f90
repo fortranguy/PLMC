@@ -84,11 +84,13 @@ private
         procedure :: Epot_reci_structure_reInit => DipolarSpheres_Epot_reci_structure_reInit
         procedure :: Epot_reci_potential_init => DipolarSpheres_Epot_reci_potential_init
         !>     Reciprocal : delta
-        procedure :: Epot_reci_move => DipolarSpheres_Epot_reci_move
-        procedure :: Epot_reci_updateX => DipolarSpheres_Epot_reci_updateX
-        procedure :: Epot_reci_rotate => DipolarSpheres_Epot_reci_rotate
-        procedure :: Epot_reci_updateM => DipolarSpheres_Epot_reci_updateM
-        procedure :: Epot_reci_test => DipolarSpheres_Epot_reci_test
+        procedure :: deltaEpot_reci_move => DipolarSpheres_deltaEpot_reci_move
+        procedure :: deltaEpot_reci_move_updateStructure => &
+                     DipolarSpheres_deltaEpot_reci_move_updateStructure
+        procedure :: deltaEpot_reci_rotate => DipolarSpheres_deltaEpot_reci_rotate
+        procedure :: deltaEpot_reci_rotate_updateStructure => &
+                     DipolarSpheres_deltaEpot_reci_rotate_updateStructure
+        procedure :: deltaEpot_reci_test => DipolarSpheres_deltaEpot_reci_test
         !>     Reciprocal : total
         procedure :: Epot_reci => DipolarSpheres_Epot_reci
         !>     Self
@@ -730,12 +732,12 @@ contains
     !> \f]
     !>
 
-    function DipolarSpheres_Epot_reci_move(this, lCol, xNew) result(Epot_reci_move)
+    function DipolarSpheres_deltaEpot_reci_move(this, lCol, xNew) result(deltaEpot_reci_move)
 
         class(DipolarSpheres), intent(in) :: this
         integer, intent(in) :: lCol
         real(DP), dimension(Dim), intent(in) :: xNew
-        real(DP) :: Epot_reci_move
+        real(DP) :: deltaEpot_reci_move
 
         real(DP), dimension(Dim) :: xNewOverL, xOldOverL
         real(DP), dimension(Dim) :: mColOverL
@@ -767,7 +769,7 @@ contains
 
         mColOverL(:) = this%orientations(:, lCol)/Lsize(:)
 
-        Epot_reci_move = 0._DP
+        deltaEpot_reci_move = 0._DP
 
         do kz = -Kmax(3), Kmax(3)
 
@@ -798,7 +800,7 @@ contains
 
             realPart2 = (-sin_kxNew + sin_kxOld) * (aimag(k_dot_structure) - k_dot_mCol * sin_kxOld)
 
-            Epot_reci_move = Epot_reci_move + 2._DP*k_dot_mCol * (realPart1 - realPart2) * &
+            deltaEpot_reci_move = deltaEpot_reci_move + 2._DP*k_dot_mCol * (realPart1 - realPart2) * &
                                               this%Epot_reci_weight(kx, ky, kz)
 
         end do
@@ -807,9 +809,9 @@ contains
         
         end do
 
-        Epot_reci_move = 2._DP*PI/Volume * Epot_reci_move
+        deltaEpot_reci_move = 2._DP*PI/Volume * deltaEpot_reci_move
 
-    end function DipolarSpheres_Epot_reci_move
+    end function DipolarSpheres_deltaEpot_reci_move
 
     !> Update position -> update the ``structure factor''
     !>  \f[
@@ -818,7 +820,7 @@ contains
     !>  \f]
     !>
 
-    subroutine DipolarSpheres_Epot_reci_updateX(this, lCol, xNew)
+    subroutine DipolarSpheres_deltaEpot_reci_move_updateStructure(this, lCol, xNew)
 
         class(DipolarSpheres), intent(inout) :: this
         integer, intent(in) :: lCol
@@ -862,7 +864,7 @@ contains
         end do
         end do
 
-    end subroutine DipolarSpheres_Epot_reci_updateX
+    end subroutine DipolarSpheres_deltaEpot_reci_move_updateStructure
 
     !> Difference of Energy \f[ \Delta U = \frac{2\pi}{V} \sum_{\vec{k} \neq 0} \Delta M^2
     !>                                       f(\alpha, \vec{k}) \f]
@@ -889,12 +891,12 @@ contains
 
     ! Rotate
 
-    function DipolarSpheres_Epot_reci_rotate(this, lCol, mNew) result(Epot_reci_rotate)
+    function DipolarSpheres_deltaEpot_reci_rotate(this, lCol, mNew) result(deltaEpot_reci_rotate)
 
         class(DipolarSpheres), intent(in) :: this
         integer, intent(in) :: lCol
         real(DP), dimension(Dim), intent(in) :: mNew
-        real(DP) :: Epot_reci_rotate
+        real(DP) :: deltaEpot_reci_rotate
 
         real(DP) :: Epot_k
 
@@ -921,7 +923,7 @@ contains
         mNewOverL(:) = mNew(:)/Lsize(:)
         mOldOverL(:) = this%orientations(:, lCol)/Lsize(:)
 
-        Epot_reci_rotate = 0._DP
+        deltaEpot_reci_rotate = 0._DP
 
         do kz = -Kmax(3), Kmax(3)
 
@@ -952,7 +954,7 @@ contains
             realPart = realPart1 + realPart2
 
             Epot_k = k_dot_mNew**2 - k_dot_mOld**2 + 2._DP*(k_dot_mNew - k_dot_mOld) * realPart
-            Epot_reci_rotate = Epot_reci_rotate + Epot_k*this%Epot_reci_weight(kx, ky, kz)
+            deltaEpot_reci_rotate = deltaEpot_reci_rotate + Epot_k*this%Epot_reci_weight(kx, ky, kz)
 
         end do
 
@@ -960,9 +962,9 @@ contains
 
         end do
 
-        Epot_reci_rotate = 2._DP*PI/Volume * Epot_reci_rotate
+        deltaEpot_reci_rotate = 2._DP*PI/Volume * deltaEpot_reci_rotate
 
-    end function DipolarSpheres_Epot_reci_rotate
+    end function DipolarSpheres_deltaEpot_reci_rotate
 
     !> Update moment -> update the ``structure factor''
     !>  \f[
@@ -970,7 +972,7 @@ contains
     !>  \f]
     !>
 
-    subroutine DipolarSpheres_Epot_reci_updateM(this, lCol, mNew)
+    subroutine DipolarSpheres_deltaEpot_reci_rotate_updateStructure(this, lCol, mNew)
 
         class(DipolarSpheres), intent(inout) :: this
         integer, intent(in) :: lCol
@@ -1006,7 +1008,7 @@ contains
         end do
         end do
 
-    end subroutine DipolarSpheres_Epot_reci_updateM
+    end subroutine DipolarSpheres_deltaEpot_reci_rotate_updateStructure
 
     ! Widom
     
@@ -1028,12 +1030,12 @@ contains
     !>                          \}
     !> \f]
 
-    function DipolarSpheres_Epot_reci_test(this, xTest, mTest) result(Epot_reci_test)
+    function DipolarSpheres_deltaEpot_reci_test(this, xTest, mTest) result(deltaEpot_reci_test)
 
         class(DipolarSpheres), intent(in) :: this
         real(DP), dimension(Dim), intent(in) :: xTest
         real(DP), dimension(Dim), intent(in) :: mTest
-        real(DP) :: Epot_reci_test
+        real(DP) :: deltaEpot_reci_test
         
         real(DP) :: Epot_k
         
@@ -1059,7 +1061,7 @@ contains
         
         mTestOverL(:) = mTest(:)/Lsize(:)
         
-        Epot_reci_test = 0._DP
+        deltaEpot_reci_test = 0._DP
         
         do kz = -Kmax(3), Kmax(3)
 
@@ -1085,7 +1087,7 @@ contains
             realPart = real(k_dot_structure, DP) * cos_kxTest + aimag(k_dot_structure) * sin_kxTest
             
             Epot_k = k_dot_mTest * (k_dot_mTest + 2._DP * realPart)
-            Epot_reci_test = Epot_reci_test + Epot_k * this%Epot_reci_weight(kx, ky, kz)            
+            deltaEpot_reci_test = deltaEpot_reci_test + Epot_k * this%Epot_reci_weight(kx, ky, kz)            
         
         end do
         
@@ -1093,9 +1095,9 @@ contains
         
         end do
         
-        Epot_reci_test = 2._DP*PI/Volume * Epot_reci_test
+        deltaEpot_reci_test = 2._DP*PI/Volume * deltaEpot_reci_test
 
-    end function DipolarSpheres_Epot_reci_test
+    end function DipolarSpheres_deltaEpot_reci_test
     
     !> Total reciprocal energy
     
@@ -1199,7 +1201,7 @@ contains
                 call this%Epot_real_neigh(iOld, this%positions(:, iOld), this%orientations(:, iOld), &
                                           same_iCellOld, overlap, same_eOld_real)
                 
-                dEpot_same = (same_eNew_real - same_eOld_real) + this%Epot_reci_move(iOld, xNew)
+                dEpot_same = (same_eNew_real - same_eOld_real) + this%deltaEpot_reci_move(iOld, xNew)
                     
                 mix_iCellOld = this%mix%position_to_cell(this%positions(:, iOld))
                 call mix%Epot_neigh(this%positions(:, iOld), mix_iCellOld, this%mix, other%positions, &
@@ -1211,7 +1213,7 @@ contains
                 call random_number(rand)            
                 if (rand < exp(-dEpot/Tstar)) then
 
-                    call this%Epot_reci_updateX(iOld, xNew)
+                    call this%deltaEpot_reci_move_updateStructure(iOld, xNew)
                     this%positions(:, iOld) = xNew(:)
                     
                     same_Epot = same_Epot + dEpot_same
@@ -1266,12 +1268,12 @@ contains
         
         dEpot_self = this%Epot_self_solo(mNew) - this%Epot_self_solo(this%orientations(:, iOld))
         
-        dEpot = dEpot_real + this%Epot_reci_rotate(iOld, mNew) - dEpot_self
+        dEpot = dEpot_real + this%deltaEpot_reci_rotate(iOld, mNew) - dEpot_self
         
         call random_number(rand)
         if (rand < exp(-dEpot/Tstar)) then
         
-            call this%Epot_reci_updateM(iOld, mNew)
+            call this%deltaEpot_reci_rotate_updateStructure(iOld, mNew)
             this%orientations(:, iOld) = mNew(:)
             
             Epot = Epot + dEpot
@@ -1320,7 +1322,7 @@ contains
                 
                 if (.not. overlap) then
                     
-                    same_enTest = same_enTest_real + this%Epot_reci_test(xTest, mTest) - &
+                    same_enTest = same_enTest_real + this%deltaEpot_reci_test(xTest, mTest) - &
                                   this%Epot_self_solo(mTest)
                 
                     enTest = same_enTest + mix_enTest
