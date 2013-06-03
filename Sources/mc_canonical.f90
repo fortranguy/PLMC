@@ -111,7 +111,7 @@ implicit none
     call cpu_time(tIni)
     MC_Cycle : do iStep = 1, Ntherm + Nstep
     
-        ! Ewald summation : reinitialize (recalculate) the structure factor to prevent it from drifting.
+        ! Ewald summation : reinitialize the structure factor to prevent it from drifting.
         if (modulo(iStep, type1_sph%getStructure_iStep()) == 0) then
             call type1_sph%Epot_reci_structure_reInit(iStep, type1_io%structure_moduli)
         end if
@@ -161,7 +161,7 @@ implicit none
             ! Initial displacements & rejections
             if (iStep == 1) then
                 write(type1_io%deltaX, *) iStep, type1_sph%getDeltaX(), type1_obs%rej
-                write(type1_io%dm, *) iStep, type1_sph%getDm(), type1_obs%rejRot
+                write(type1_io%deltaM, *) iStep, type1_sph%getDeltaM(), type1_obs%rejRot
                 write(type2_io%deltaX, *) iStep, type2_sph%getDeltaX(), type2_obs%rej
             end if
             
@@ -180,8 +180,8 @@ implicit none
                 type1_obs%rejRotAdapt = type1_obs%rejRotAdapt + type1_obs%rejRot
             else
                 type1_obs%rejRotAdapt = type1_obs%rejRotAdapt/real(type1_sph%getNadaptRot()-1)
-                call type1_sph%adaptDm(type1_obs%rejRotAdapt)
-                write(type1_io%dm, *) iStep, type1_sph%getDm(), type1_obs%rejRotAdapt
+                call type1_sph%adaptDeltaM(type1_obs%rejRotAdapt)
+                write(type1_io%deltaM, *) iStep, type1_sph%getDeltaM(), type1_obs%rejRotAdapt
                 type1_obs%rejRotAdapt = 0._DP
             end if
 
@@ -202,7 +202,7 @@ implicit none
             
             if (iStep == Ntherm) then ! Definite thermalised displacements
                 call type1_sph%definiteDeltaX(type1_obs%rej, type1_io%report)
-                call type1_sph%definiteDm(type1_obs%rejRot, type1_io%report)
+                call type1_sph%definiteDeltaM(type1_obs%rejRot, type1_io%report)
                 call type2_sph%definiteDeltaX(type2_obs%rej, type2_io%report)
             end if       
         

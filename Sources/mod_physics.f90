@@ -96,10 +96,10 @@ contains
     
     end function random_surface
     
-    subroutine markov_surface(mCol, dm)
+    subroutine markov_surface(mCol, deltaM)
     
         real(DP), dimension(Dim), intent(inout) :: mCol
-        real(DP), intent(in) :: dm
+        real(DP), intent(in) :: deltaM
         
         real(DP), dimension(Dim) :: rotation
         real(DP) :: rotation_dot_mCol
@@ -115,7 +115,7 @@ contains
         rotation(:) = rotation(:) / norm2(rotation)
         
         call random_number(rand)
-        amplitude = dm * (rand - 0.5_DP)
+        amplitude = deltaM * (rand - 0.5_DP)
         
         mCol(:) = mCol(:) + amplitude * rotation(:)
         mCol(:) = mCol(:) / norm2(mCol)

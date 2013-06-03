@@ -30,9 +30,9 @@ private
         
         ! Monte-Carlo
         integer :: structure_iStep
-        real(DP) :: dm !< rotation
-        real(DP) :: dmSave
-        real(DP) :: dmMax
+        real(DP) :: deltaM !< rotation
+        real(DP) :: deltaMsave
+        real(DP) :: deltaMmax
         real(DP) :: rejRotFix
         integer :: NadaptRot
 
@@ -60,10 +60,10 @@ private
         !> Take a snap shot of the configuration : orientations
         procedure :: snapShot_orientations => DipolarSpheres_snapShot_orientations
         
-        !> Adapt the rotation dm during thermalisation
-        procedure :: adaptDm => DipolarSpheres_adaptDm
-        procedure :: definiteDm => DipolarSpheres_definiteDm
-        procedure :: getDm => DipolarSpheres_getDm
+        !> Adapt the rotation deltaM during thermalisation
+        procedure :: adaptDeltaM => DipolarSpheres_adaptDeltaM
+        procedure :: definiteDeltaM => DipolarSpheres_definiteDeltaM
+        procedure :: getDeltaM => DipolarSpheres_getDeltaM
         procedure :: getNadaptRot => DipolarSpheres_getNadaptRot
         
         procedure :: getStructure_iStep => DipolarSpheres_getStructure_iStep
@@ -132,9 +132,9 @@ contains
         this%rejFix = dipol_rejFix
         this%Nadapt = dipol_Nadapt
         
-        this%dm = dipol_dm
-        this%dmSave = this%dm
-        this%dmMax = dipol_dmMax
+        this%deltaM = dipol_deltaM
+        this%deltaMsave = this%deltaM
+        this%deltaMmax = dipol_deltaMmax
         this%rejRotFix = dipol_rejRotFix
         this%NadaptRot = dipol_NadaptRot
         
@@ -233,72 +233,72 @@ contains
 
     end subroutine DipolarSpheres_snapShot_orientations
     
-    !> Adaptation of dm during the thermalisation
+    !> Adaptation of deltaM during the thermalisation
     
-    subroutine DipolarSpheres_adaptDm(this, rej)
+    subroutine DipolarSpheres_adaptDeltaM(this, rej)
     
         class(DipolarSpheres), intent(inout) :: this
         real(DP), intent(in) :: rej
         
-        real(DP), parameter :: eps_dm = 0.05_DP
-        real(DP), parameter :: eps_rej = 0.1_DP * eps_dm
-        real(DP), parameter :: more = 1._DP+eps_dm
-        real(DP), parameter :: less = 1._DP-eps_dm
+        real(DP), parameter :: eps_deltaM = 0.05_DP
+        real(DP), parameter :: eps_rej = 0.1_DP * eps_deltaM
+        real(DP), parameter :: more = 1._DP+eps_deltaM
+        real(DP), parameter :: less = 1._DP-eps_deltaM
 
         
         if (rej < this%rejRotFix - eps_rej) then
         
-            this%dm = this%dm * more
+            this%deltaM = this%deltaM * more
   
-            if (this%dm > this%dmMax) then
-                this%dm = this%dmMax
+            if (this%deltaM > this%deltaMmax) then
+                this%deltaM = this%deltaMmax
             end if
             
         else if (rej > this%rejRotFix + eps_rej) then
         
-            this%dm = this%dm * less
+            this%deltaM = this%deltaM * less
             
         end if
     
-    end subroutine DipolarSpheres_adaptDm
+    end subroutine DipolarSpheres_adaptDeltaM
     
-    subroutine DipolarSpheres_definiteDm(this, rej, report_unit)
+    subroutine DipolarSpheres_definiteDeltaM(this, rej, report_unit)
     
         class(DipolarSpheres), intent(inout) :: this    
         real(DP), intent(in) :: rej
         integer, intent(in) :: report_unit
         
         if (rej == 0._DP) then
-            write(error_unit, *) this%name, " :    Warning : dm adaptation problem."
-            this%dm = this%dmSave
-            write(error_unit, *) "default dm :", this%dm
+            write(error_unit, *) this%name, " :    Warning : deltaM adaptation problem."
+            this%deltaM = this%deltaMsave
+            write(error_unit, *) "default deltaM :", this%deltaM
         end if
         
-        if (this%dm > this%dmMax) then
-            write(error_unit, *) this%name, " :   Warning : dm too big."
-            this%dm = this%dmMax
-            write(error_unit, *) "big dm :", this%dm
+        if (this%deltaM > this%deltaMmax) then
+            write(error_unit, *) this%name, " :   Warning : deltaM too big."
+            this%deltaM = this%deltaMmax
+            write(error_unit, *) "big deltaM :", this%deltaM
         end if
         
         write(output_unit, *) this%name, " :    Thermalisation : over (rotation)"
         
         write(report_unit, *) "Rotation :"
-        write(report_unit, *) "    dm = ", this%dm
+        write(report_unit, *) "    deltaM = ", this%deltaM
         write(report_unit, *) "    rejection relative difference = ", &
                                     abs(rej-this%rejRotFix)/this%rejRotFix
     
-    end subroutine DipolarSpheres_definiteDm
+    end subroutine DipolarSpheres_definiteDeltaM
     
-    !> Accessor : dm
+    !> Accessor : deltaM
     
-    function DipolarSpheres_getDm(this) result(getDm)
+    function DipolarSpheres_getDeltaM(this) result(getDeltaM)
         
         class(DipolarSpheres), intent(in) :: this        
-        real(DP) :: getDm
+        real(DP) :: getDeltaM
         
-        getDm = this%dm
+        getDeltaM = this%deltaM
         
-    end function DipolarSpheres_getDm
+    end function DipolarSpheres_getDeltaM
     
     !> Accessor : Nadapt
     
@@ -1256,7 +1256,7 @@ contains
         logical :: overlap
         
         mNew(:) = this%orientations(:, iOld)
-        call markov_surface(mNew, this%dm)
+        call markov_surface(mNew, this%deltaM)
         
         iCell = this%same%position_to_cell(this%positions(:, iOld))
         call this%Epot_real_neigh(iOld, this%positions(:, iOld), mNew, iCell, overlap, real_eNew)
