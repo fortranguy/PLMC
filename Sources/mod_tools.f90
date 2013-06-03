@@ -231,6 +231,8 @@ contains
         
         write(report_unit ,*) "    Lsize(:) = ", Lsize(:)
         write(report_unit ,*) "    Volume = ", Volume
+        write(report_unit ,*) "    kMax(:) = ", kMax(:)
+        write(report_unit ,*) "    NwaveVectors =", (2*kMax(1)+1) * (2*kMax(2)+1) * (2*kMax(3)+1)
         write(report_unit ,*) "    Ncol = ", Ncol
         write(report_unit ,*) "    Tstar = ", Tstar
         
