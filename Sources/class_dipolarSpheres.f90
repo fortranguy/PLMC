@@ -946,7 +946,8 @@ contains
         real(DP) :: cos_kxCol, sin_kxCol
 
         real(DP) :: realPart, realPart1, realPart2
-
+        
+        integer :: kMax1_sym, kMax2_sym
         real(DP), dimension(Dim) :: waveVector
         real(DP) :: k_dot_mNew, k_dot_mOld
         complex(DP) :: k_dot_structure
@@ -961,40 +962,53 @@ contains
 
         deltaEpot_reci_rotate = 0._DP
 
-        do kz = -Kmax(3), Kmax(3)
+        do kz = -Kmax(3), 0
 
             waveVector(3) = real(kz, DP)
+            
+            if (kz == 0) then
+                kMax2_sym = 0
+            else
+                kMax2_sym = kMax2
+            end if
 
-        do ky = -Kmax(2), Kmax(2)
+            do ky = -Kmax(2), kMax2_sym
 
-            waveVector(2) = real(ky, DP)
+                waveVector(2) = real(ky, DP)
 
-        do kx = -Kmax(1), Kmax(1)
+                if (kz == 0 .and. ky == 0) then
+                    kMax1_sym = 0
+                else
+                    kMax1_sym = kMax1
+                end if
+            
+                do kx = -kMax1, kMax1_sym
 
-            waveVector(1) = real(kx, DP)
+                    waveVector(1) = real(kx, DP)
 
-            k_dot_mNew = dot_product(waveVector, mNewOverL)
+                    k_dot_mNew = dot_product(waveVector, mNewOverL)
 
-            k_dot_mOld = dot_product(waveVector, mOldOverL)
+                    k_dot_mOld = dot_product(waveVector, mOldOverL)
 
-            k_dot_structure = dot_product(cmplx(waveVector, 0._DP, DP), &
-                                          this%Epot_reci_structure(:, kx, ky, kz))
+                    k_dot_structure = dot_product(cmplx(waveVector, 0._DP, DP), &
+                                                  this%Epot_reci_structure(:, kx, ky, kz))
 
-            exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky) * exp_IkxCol_3(kz)
-            cos_kxCol = real(exp_IkxCol, DP)
-            sin_kxCol = aimag(exp_IkxCol)
+                    exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky) * exp_IkxCol_3(kz)
+                    cos_kxCol = real(exp_IkxCol, DP)
+                    sin_kxCol = aimag(exp_IkxCol)
 
-            realPart1 = cos_kxCol * (real(k_dot_structure, DP) - k_dot_mOld * cos_kxCol)
-            realPart2 = sin_kxCol * (aimag(k_dot_structure) - k_dot_mOld * sin_kxCol)
+                    realPart1 = cos_kxCol * (real(k_dot_structure, DP)-k_dot_mOld*cos_kxCol)
+                    realPart2 = sin_kxCol * (aimag(k_dot_structure)-k_dot_mOld*sin_kxCol)
 
-            realPart = realPart1 + realPart2
+                    realPart = realPart1 + realPart2
 
-            Epot_k = k_dot_mNew**2 - k_dot_mOld**2 + 2._DP*(k_dot_mNew - k_dot_mOld) * realPart
-            deltaEpot_reci_rotate = deltaEpot_reci_rotate + Epot_k*this%Epot_reci_weight(kx, ky, kz)
+                    Epot_k = k_dot_mNew**2 - k_dot_mOld**2 + 2._DP*(k_dot_mNew - k_dot_mOld) * realPart
+                    Epot_k = Epot_k * this%Epot_reci_weight(kx, ky, kz)
+                    deltaEpot_reci_rotate = deltaEpot_reci_rotate + Epot_k
 
-        end do
+                end do
 
-        end do
+            end do
 
         end do
 
