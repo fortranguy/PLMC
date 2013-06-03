@@ -794,7 +794,7 @@ contains
                     kMax1_sym = kMax1
                 end if
             
-                do kx = -kMax1, kMax1_sym
+                do kx = -kMax(1), kMax1_sym
 
                     waveVector(1) = real(kx, DP)
 
@@ -885,7 +885,7 @@ contains
                     kMax1_sym = kMax1
                 end if
                 
-                do kx = -kMax1, kMax1_sym
+                do kx = -kMax(1), kMax1_sym
 
                     exp_IkxNew = exp_IkxNew_1(kx) * exp_IkxNew_2(ky) * exp_IkxNew_3(kz)
                     exp_IkxOld = exp_IkxOld_1(kx) * exp_IkxOld_2(ky) * exp_IkxOld_3(kz)
@@ -982,7 +982,7 @@ contains
                     kMax1_sym = kMax1
                 end if
             
-                do kx = -kMax1, kMax1_sym
+                do kx = -kMax(1), kMax1_sym
 
                     waveVector(1) = real(kx, DP)
 
@@ -1063,7 +1063,7 @@ contains
                     kMax1_sym = kMax1
                 end if
                 
-                do kx = -kMax1, kMax1_sym
+                do kx = -kMax(1), kMax1_sym
 
                 exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky) * exp_IkxCol_3(kz)
 
@@ -1153,7 +1153,7 @@ contains
                     kMax1_sym = kMax1
                 end if
             
-                do kx = -kMax1, kMax1_sym
+                do kx = -kMax(1), kMax1_sym
                 
                     waveVector(1) = real(kx, DP)
                     
