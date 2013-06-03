@@ -38,7 +38,7 @@ private
         procedure :: destroy => InteractingSpheres_destroy
         
         !> Print a report of the component in a file
-        procedure :: report => InteractingSpheres_report
+        procedure :: PrintReport => InteractingSpheres_printReport
         
         !> Potential energy
         procedure :: Epot_init => InteractingSpheres_Epot_init
@@ -120,7 +120,7 @@ contains
     
     !> Report
     
-    subroutine InteractingSpheres_report(this, report_unit)
+    subroutine InteractingSpheres_printReport(this, report_unit)
     
         class(InteractingSpheres), intent(in) :: this
         integer, intent(in) :: report_unit    
@@ -141,7 +141,7 @@ contains
         write(report_unit, *) "    mix_cell_coordMax(:) = ", this%mix%cell_coordMax(:)
         write(report_unit, *) "    mix_cell_Lsize(:) = ", this%mix%cell_Lsize(:)
         
-    end subroutine InteractingSpheres_report
+    end subroutine InteractingSpheres_printReport
     
     !> Potential energy
     !> Tabulation of Yukawa potential    

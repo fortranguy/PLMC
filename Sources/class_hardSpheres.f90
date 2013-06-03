@@ -32,7 +32,7 @@ private
         procedure :: destroy => HardSpheres_destroy
         
         !> Print a report of the component in a file
-        procedure :: report => HardSpheres_report
+        procedure :: printReport => HardSpheres_printReport
               
         !> Potential energy
         procedure :: Epot_print => HardSpheres_Epot_print
@@ -102,7 +102,7 @@ contains
     
     !> Report
     
-    subroutine HardSpheres_report(this, report_unit)
+    subroutine HardSpheres_printReport(this, report_unit)
     
         class(HardSpheres), intent(in) :: this
         integer, intent(in) :: report_unit    
@@ -120,7 +120,7 @@ contains
         write(report_unit, *) "    mix_cell_coordMax(:) = ", this%mix%cell_coordMax(:)
         write(report_unit, *) "    mix_cell_Lsize(:) = ", this%mix%cell_Lsize(:)
         
-    end subroutine HardSpheres_report
+    end subroutine HardSpheres_printReport
     
     !> Print the potential : dummy
     

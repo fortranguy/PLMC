@@ -55,7 +55,7 @@ private
         procedure :: destroy => DipolarSpheres_destroy
         
         !> Print a report of the component in a file
-        procedure :: report => DipolarSpheres_report
+        procedure :: PrintReport => DipolarSpheres_printReport
         
         !> Take a snap shot of the configuration : orientations
         procedure :: snapShot_orientations => DipolarSpheres_snapShot_orientations
@@ -193,7 +193,7 @@ contains
     
     !> Report
     
-    subroutine DipolarSpheres_report(this, report_unit)
+    subroutine DipolarSpheres_printReport(this, report_unit)
     
         class(DipolarSpheres), intent(in) :: this
         integer, intent(in) :: report_unit    
@@ -215,7 +215,7 @@ contains
         write(report_unit, *) "    mix_cell_coordMax(:) = ", this%mix%cell_coordMax(:)
         write(report_unit, *) "    mix_cell_Lsize(:) = ", this%mix%cell_Lsize(:)
         
-    end subroutine DipolarSpheres_report
+    end subroutine DipolarSpheres_printReport
     
     !> Configuration state : orientations
       
