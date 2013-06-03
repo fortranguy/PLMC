@@ -287,7 +287,7 @@ contains
             if (.not. overlap) then
     
                 same_iCellOld = this%same%position_to_cell(this%positions(:, iOld))
-                call this%Epot_neigh(iOld, this%positions(:, iOld), same_iCellOld, overlap, same_eOld)                    
+                call this%Epot_neigh(iOld, this%positions(:, iOld), same_iCellOld, overlap, same_eOld)
                 same_deltaEpot = same_eNew - same_eOld
                     
                 mix_iCellOld = this%mix%position_to_cell(this%positions(:, iOld))
