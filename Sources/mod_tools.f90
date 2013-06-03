@@ -65,7 +65,7 @@ contains
                     case ("rand") 
                         call randomDepositions(type1%positions, type1%getRMin(), type2%positions, &
                                                type2%getRmin(), mix_rMin)
-                        call randomMoments(type1%M)
+                        call randomMoments(type1%moments)
                         write(output_unit, *) "Random depositions + random orientations"
                         write(report_unit, *) "    Random depositions + random orientations"
                     case default
@@ -82,7 +82,7 @@ contains
                 
                 call oldConfiguration(1, type1%getName()//"_X", type1%positions, &
                                       dot_product(Lsize, Lsize))
-                call oldConfiguration(2, type1%getName()//"_M", type1%M, 1._DP)
+                call oldConfiguration(2, type1%getName()//"_M", type1%moments, 1._DP)
                 call oldConfiguration(3, type2%getName()//"_X", type2%positions, &
                                       dot_product(Lsize, Lsize))
             
@@ -150,17 +150,17 @@ contains
     
     !> Uniform (gaussian) moments
     
-    subroutine randomMoments(type_M)
+    subroutine randomMoments(type_moments)
     
-        real(DP), dimension(:, :), intent(out) :: type_M
+        real(DP), dimension(:, :), intent(out) :: type_moments
         
         integer :: type_Ncol
         integer :: iCol
         
-        type_Ncol = size(type_M, 2)
+        type_Ncol = size(type_moments, 2)
         
         do iCol = 1, type_Ncol
-            type_M(:, iCol) = random_surface()
+            type_moments(:, iCol) = random_surface()
         end do
     
     end subroutine randomMoments
