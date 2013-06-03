@@ -39,7 +39,6 @@ implicit none
     integer, parameter :: Kmax2 = Kmax1
     integer, parameter :: Kmax3 = Kmax1
     integer, dimension(Dim), parameter :: Kmax = [Kmax1, Kmax2, Kmax3]
-    integer, parameter :: NwaveVectors = (2*Kmax1+1) * (2*Kmax2+1) * (2*Kmax3+1)
     
 end module data_cell
 !***************************************************************************************************
