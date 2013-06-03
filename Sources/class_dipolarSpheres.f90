@@ -1194,14 +1194,14 @@ contains
                 
                 ! Real
                 same_iCellOld = this%same%position_to_cell(this%positions(:, iOld))
-                call this%Epot_real_neigh(iOld, this%positions(:, iOld), this%M(:, iOld), same_iCellOld, &
-                                          overlap, same_eOld_real)
+                call this%Epot_real_neigh(iOld, this%positions(:, iOld), this%M(:, iOld), &
+                                          same_iCellOld, overlap, same_eOld_real)
                 
                 dEpot_same = (same_eNew_real - same_eOld_real) + this%Epot_reci_move(iOld, xNew)
                     
                 mix_iCellOld = this%mix%position_to_cell(this%positions(:, iOld))
-                call mix%Epot_neigh(this%positions(:, iOld), mix_iCellOld, this%mix, other%positions, overlap, &
-                                    mix_eOld)
+                call mix%Epot_neigh(this%positions(:, iOld), mix_iCellOld, this%mix, other%positions, &
+                                    overlap, mix_eOld)
                 dEpot_mix = mix_eNew - mix_eOld
                 
                 dEpot = dEpot_same + dEpot_mix
@@ -1258,7 +1258,8 @@ contains
         
         iCell = this%same%position_to_cell(this%positions(:, iOld))
         call this%Epot_real_neigh(iOld, this%positions(:, iOld), mNew, iCell, overlap, real_eNew)
-        call this%Epot_real_neigh(iOld, this%positions(:, iOld), this%M(:, iOld), iCell, overlap, real_eOld)
+        call this%Epot_real_neigh(iOld, this%positions(:, iOld), this%M(:, iOld), iCell, overlap, &
+                                  real_eOld)
         dEpot_real = real_eNew - real_eOld        
         
         dEpot_self = this%Epot_self_solo(mNew) - this%Epot_self_solo(this%M(:, iOld))
