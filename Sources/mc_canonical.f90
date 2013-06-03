@@ -69,24 +69,24 @@ implicit none
          status='new', action='write')
     open(newunit=mix_obsEquilib_unit, recl=4096, file="mix_obsEquilib.out", status='new', &
          action='write')
-    call mix%report(mix_report_unit)
     call mix%Epot_print(mix_Epot_unit)
+    call mix%report(mix_report_unit)
     
     call type1_sph%construct(mix%getCell_Lsize(), mix%getRcut()) !< type1_sph needs mix%rCut for the 
                                                                  !< Cell List method
     call type1_obs%init()
     call type1_io%open(type1_sph%getName())
-    call type1_sph%report(type1_io%report)
-    call type1_sph%printInfo(type1_io%report)
     call type1_sph%Epot_real_print(type1_io%Epot)
     call type1_sph%Epot_reci_countNwaveVectors(type1_io%waveVectors)
+    call type1_sph%printDensity(type1_io%report)
+    call type1_sph%report(type1_io%report)
     
     call type2_sph%construct(mix%getCell_Lsize(), mix%getRcut())
     call type2_obs%init()
     call type2_io%open(type2_sph%getName())
-    call type2_sph%report(type2_io%report)
-    call type2_sph%printInfo(type2_io%report)
     call type2_sph%Epot_print(type2_io%Epot)
+    call type2_sph%printDensity(type2_io%report)
+    call type2_sph%report(type2_io%report)
     
     ! Initial condition
     

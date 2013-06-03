@@ -50,7 +50,7 @@ private
         procedure :: getRmin => Spheres_getRmin
         procedure :: getNadapt => Spheres_getNadapt
         
-        procedure :: printInfo => Spheres_printInfo
+        procedure :: printDensity => Spheres_printDensity
         
         !> Take a snap shot of the configuration : positions
         procedure :: snapShot_positions => Spheres_snapShot_positions
@@ -116,7 +116,7 @@ contains
     
     !> Print density and compacity
     
-    subroutine Spheres_printInfo(this, report_unit)
+    subroutine Spheres_printDensity(this, report_unit)
     
         class(Spheres), intent(in) :: this
         integer, intent(in) :: report_unit
@@ -131,7 +131,7 @@ contains
         write(report_unit, *) "    density = ", density
         write(report_unit, *) "    compacity = ", compac
     
-    end subroutine Spheres_printInfo
+    end subroutine Spheres_printDensity
     
     !> Configuration state : positions
       
