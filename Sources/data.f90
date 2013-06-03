@@ -35,7 +35,7 @@ implicit none
     real(DP), dimension(Dim), parameter :: LsizeMi = 0.5_DP * Lsize
     real(DP), parameter :: Volume = Lsize1 * Lsize2 * Lsize3
 
-    integer, parameter :: Kmax1 = 9
+    integer, parameter :: Kmax1 = 8
     integer, parameter :: Kmax2 = Kmax1
     integer, parameter :: Kmax3 = Kmax1
     integer, dimension(Dim), parameter :: Kmax = [Kmax1, Kmax2, Kmax3]
