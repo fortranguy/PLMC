@@ -15,10 +15,10 @@ private
         integer :: Nmove
     
         ! Rejection
-        integer :: Nrej
-        real(DP) :: rej
-        real(DP) :: rejSum
-        real(DP) :: rejAdapt
+        integer :: Nreject
+        real(DP) :: reject
+        real(DP) :: rejectSum
+        real(DP) :: rejectAdapt
         
         ! Potential energy
         real(DP) :: Epot
@@ -41,10 +41,10 @@ private
         integer :: Nrotate
         
         ! Rejection
-        integer :: NrejRot
-        real(DP) :: rejRot
-        real(DP) :: rejRotSum
-        real(DP) :: rejRotAdapt
+        integer :: NrejectRot
+        real(DP) :: rejectRot
+        real(DP) :: rejectRotSum
+        real(DP) :: rejectRotAdapt
         
     end type MoreObservables
     
@@ -56,10 +56,10 @@ contains
         
         this%Nmove = 0
         
-        this%Nrej = 0
-        this%rej = 0._DP
-        this%rejSum = 0._DP
-        this%rejAdapt = 0._DP
+        this%Nreject = 0
+        this%reject = 0._DP
+        this%rejectSum = 0._DP
+        this%rejectAdapt = 0._DP
         
         this%EpotSum = 0._DP        
         this%activSum = 0._DP
@@ -72,10 +72,10 @@ contains
                 
                 this%Nrotate = 0
                 
-                this%NrejRot = 0
-                this%rejRot = 0._DP
-                this%rejRotSum = 0._DP
-                this%rejRotAdapt = 0._DP
+                this%NrejectRot = 0
+                this%rejectRot = 0._DP
+                this%rejectRotSum = 0._DP
+                this%rejectRotAdapt = 0._DP
                 
         end select
         
@@ -101,7 +101,7 @@ contains
         write(report_unit, *) "    average excess chemical potential = ", potChiEx           
         write(report_unit, *) "    potChi.avg = ", potChiId + potChiEx
         
-        write(report_unit, *) "    Rejection rate = ", this%rejSum/real(Nstep, DP)
+        write(report_unit, *) "    Rejection rate = ", this%rejectSum/real(Nstep, DP)
         
         select type (this)
         
@@ -109,7 +109,8 @@ contains
             
             class is (MoreObservables)
             
-                write(report_unit, *) "    Rotation rejection rate = ", this%rejRotSum/real(Nstep, DP)
+                write(report_unit, *) "    Rotation rejectection rate = ", &
+                                      this%rejectRotSum/real(Nstep, DP)
             
         end select
     
