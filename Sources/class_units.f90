@@ -80,7 +80,7 @@ contains
 
                 open(newunit=this%structure_moduli, recl=4096, file=name//"_structure_moduli.out", &
                      status='new', action='write')
-                open(newunit=this%waveVectors, recl=4096, file=name//"_waveVectors.out", &
+                open(newunit=this%waveVectors, recl=4096, file=name//"_waveVectors.tmp", &
                      status='new', action='write')
                 
             class default
