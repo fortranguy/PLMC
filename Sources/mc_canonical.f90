@@ -64,7 +64,7 @@ implicit none
     call mix%construct()
     mix_EpotSum = 0._DP
     open(newunit=mix_report_unit, recl=4096, file="mix_report.txt", status='new', action='write')
-    open(newunit=mix_Epot_unit, recl=4096, file="mix_Epot.out", status='new', action='write')
+    open(newunit=mix_Epot_unit, recl=4096, file="mix_Epot.tmp", status='new', action='write')
     open(newunit=mix_obsThermal_unit, recl=4096, file="mix_obsThermal.out", &
          status='new', action='write')
     open(newunit=mix_obsEquilib_unit, recl=4096, file="mix_obsEquilib.out", status='new', &

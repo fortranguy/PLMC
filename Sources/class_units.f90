@@ -59,7 +59,7 @@ contains
              status='new', action='write')
         
         open(newunit=this%report, recl=4096, file=name//"_report.txt", status='new', action='write')
-        open(newunit=this%Epot, recl=4096, file=name//"_Epot.out", status='new', action='write')
+        open(newunit=this%Epot, recl=4096, file=name//"_Epot.tmp", status='new', action='write')
         
         select type (this)
         
