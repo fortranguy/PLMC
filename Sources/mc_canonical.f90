@@ -25,8 +25,8 @@ implicit none
     real(DP) :: Epot, EpotSum !< potential energy : at a Monte-Carlo step
     real(DP) :: Epot_conf !< potential energy : complete calculation from a configuration
     integer :: report_unit  !< data & results file
-    integer :: obsThermalisation_unit, obsEquilibrium_unit !< observables files : Thermalisation &
-                                                           !< Equilibrium
+    integer :: obsThermal_unit !< observables files : Thermalisation
+    integer :: obsEquilib_unit !< observables files : Equilibrium
     
     ! Mixing potential between 2 types
     type(MixingPotential) :: mix !< short-range potential
@@ -34,7 +34,8 @@ implicit none
     real(DP) :: mix_Epot_conf
     integer :: mix_report_unit
     integer :: mix_Epot_unit !< tabulated potential file
-    integer :: mix_obsThermalisation_unit, mix_obsEquilibrium_unit
+    integer :: mix_obsThermal_unit
+    integer :: mix_obsEquilib_unit
     
     ! Type 1 : Dipolar spheres : Ewald summation
     type(DipolarSpheres) :: type1_sph !< physical properties and Monte-Carlo subroutines
@@ -53,9 +54,9 @@ implicit none
     ! Initialisations & reports
     
     open(newunit=report_unit, recl=4096, file="report.txt", status='new', action='write')
-    open(newunit=obsThermalisation_unit, recl=4096, file="obsThermalisation.out", status='new', &
+    open(newunit=obsThermal_unit, recl=4096, file="obsThermal.out", status='new', &
          action='write')
-    open(newunit=obsEquilibrium_unit, recl=4096, file="obsEquilibrium.out", status='new', &
+    open(newunit=obsEquilib_unit, recl=4096, file="obsEquilib.out", status='new', &
          action='write')
     call report(report_unit)
     !call initRandomSeed(report_unit)
@@ -64,9 +65,9 @@ implicit none
     mix_EpotSum = 0._DP
     open(newunit=mix_report_unit, recl=4096, file="mix_report.txt", status='new', action='write')
     open(newunit=mix_Epot_unit, recl=4096, file="mix_Epot.out", status='new', action='write')
-    open(newunit=mix_obsThermalisation_unit, recl=4096, file="mix_obsThermalisation.out", &
+    open(newunit=mix_obsThermal_unit, recl=4096, file="mix_obsThermal.out", &
          status='new', action='write')
-    open(newunit=mix_obsEquilibrium_unit, recl=4096, file="mix_obsEquilibrium.out", status='new', &
+    open(newunit=mix_obsEquilib_unit, recl=4096, file="mix_obsEquilib.out", status='new', &
          action='write')
     call mix%report(mix_report_unit)
     call mix%Epot_print(mix_Epot_unit)
@@ -107,7 +108,7 @@ implicit none
     
     Epot_conf = type1_obs%Epot + type2_obs%Epot + mix_Epot
     write(output_unit, *) "Initial potential energy =", Epot_conf
-    write(obsThermalisation_unit, *) 0, Epot_conf
+    write(obsThermal_unit, *) 0, Epot_conf
     
 ! Middle -------------------------------------------------------------------------------------------
         
@@ -200,11 +201,11 @@ implicit none
             end if
             
             ! Observables writing
-            write(type1_io%obsThermalisation, *) iStep, type1_obs%Epot, 0._DP, type1_obs%rej, &
+            write(type1_io%obsThermal, *) iStep, type1_obs%Epot, 0._DP, type1_obs%rej, &
                                                         type1_obs%rejRot
-            write(type2_io%obsThermalisation, *) iStep, type2_obs%Epot, 0._DP, type2_obs%rej
-            write(mix_obsThermalisation_unit, *) iStep, mix_Epot
-            write(obsThermalisation_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
+            write(type2_io%obsThermal, *) iStep, type2_obs%Epot, 0._DP, type2_obs%rej
+            write(mix_obsThermal_unit, *) iStep, mix_Epot
+            write(obsThermal_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
             
             if (iStep == Ntherm) then ! Definite thermalised displacements
                 call type1_sph%definiteDeltaX(type1_obs%rej, type1_io%report)
@@ -230,11 +231,11 @@ implicit none
                 
             mix_EpotSum = mix_EpotSum + mix_Epot
 
-            write(type1_io%obsEquilibrium, *) iStep, type1_obs%Epot, type1_obs%activ, type1_obs%rej, &
+            write(type1_io%obsEquilib, *) iStep, type1_obs%Epot, type1_obs%activ, type1_obs%rej, &
                                                      type1_obs%rejRot
-            write(type2_io%obsEquilibrium, *) iStep, type2_obs%Epot, type2_obs%activ, type2_obs%rej
-            write(mix_obsEquilibrium_unit, *) iStep, mix_Epot
-            write(obsEquilibrium_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
+            write(type2_io%obsEquilib, *) iStep, type2_obs%Epot, type2_obs%activ, type2_obs%rej
+            write(mix_obsEquilib_unit, *) iStep, mix_Epot
+            write(obsEquilib_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
 
             if (snap) then ! Snap shots of the configuration
                 call type1_sph%snapShot_positions(iStep, type1_io%snapShots_positions)
@@ -287,11 +288,11 @@ implicit none
     call mix%destroy()
     close(mix_report_unit)
     close(mix_Epot_unit)
-    close(mix_obsThermalisation_unit)
-    close(mix_obsEquilibrium_unit)
+    close(mix_obsThermal_unit)
+    close(mix_obsEquilib_unit)
     
     close(report_unit)
-    close(obsThermalisation_unit)
-    close(obsEquilibrium_unit)
+    close(obsThermal_unit)
+    close(obsEquilib_unit)
     
 end program mc_canonical

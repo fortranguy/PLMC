@@ -8,8 +8,8 @@ private
 
     type, public :: Units
     
-        integer :: obsThermalisation
-        integer :: obsEquilibrium
+        integer :: obsThermal
+        integer :: obsEquilib
         integer :: deltaX
 
         integer :: snapIni_positions
@@ -45,9 +45,9 @@ contains
         class(Units), intent(out) :: this
         character(len=*), intent(in) :: name
         
-        open(newunit=this%obsThermalisation, recl=4096, file=name//"_obsThermalisation.out", &
+        open(newunit=this%obsThermal, recl=4096, file=name//"_obsThermal.out", &
              status='new', action='write')
-        open(newunit=this%obsEquilibrium, recl=4096, file=name//"_obsEquilibrium.out", &
+        open(newunit=this%obsEquilib, recl=4096, file=name//"_obsEquilib.out", &
              status='new', action='write')
         open(newunit=this%deltaX, recl=4096, file=name//"_deltaX.out", status='new', action='write')
         
@@ -92,8 +92,8 @@ contains
     
         class(Units), intent(inout) :: this
         
-        close(this%obsThermalisation)
-        close(this%obsEquilibrium)
+        close(this%obsThermal)
+        close(this%obsEquilib)
         close(this%deltaX)
 
         close(this%snapIni_positions)
