@@ -1042,8 +1042,7 @@ contains
 
                     k_dot_mOld = dot_product(waveVector, mOldOverL)
 
-                    k_dot_structure = dot_product(cmplx(waveVector, 0._DP, DP), &
-                                                  this%Epot_reci_structure(:, kx, ky, kz))
+                    k_dot_structure = this%Epot_reci_structure(kx, ky, kz)
 
                     exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky) * exp_IkxCol_3(kz)
                     cos_kxCol = real(exp_IkxCol, DP)
@@ -1088,7 +1087,9 @@ contains
         complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxCol_2
         complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_IkxCol_3
         complex(DP) :: exp_IkxCol
-        
+
+        real(DP), dimension(Dim) :: waveVector
+        real(DP) :: k_dot_deltaMcol
         integer :: kx, ky, kz
 
         xColOverL(:) = this%positions(:, lCol)/Lsize(:)
@@ -1098,17 +1099,25 @@ contains
         mNewOverL(:) = mNew(:)/Lsize(:)
         mOldOverL(:) = this%orientations(:, lCol)/Lsize(:)
 
-        do kz = -kMax(3), 0
-            
-            do ky = -kMax(2), kMax2_sym(kz)
-                
+        do kz = -Kmax(3), 0
+
+            waveVector(3) = real(kz, DP)
+
+            do ky = -Kmax(2), kMax2_sym(kz)
+
+                waveVector(2) = real(ky, DP)
+
                 do kx = -kMax(1), kMax1_sym(ky, kz)
+
+                    waveVector(1) = real(kx, DP)
 
                     exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky) * exp_IkxCol_3(kz)
 
-                    this%Epot_reci_structure(:, kx, ky, kz) = &
-                        this%Epot_reci_structure(:, kx, ky, kz) + &
-                        (mNewOverL(:) - mOldOverL(:)) * exp_IkxCol
+                    k_dot_deltaMcol = dot_product(waveVector, mNewOverL - mOldOverL)
+
+                    this%Epot_reci_structure(kx, ky, kz) = &
+                        this%Epot_reci_structure(kx, ky, kz) + &
+                        cmplx(k_dot_deltaMcol, 0._DP, DP) * exp_IkxCol
 
                 end do
                 
@@ -1185,8 +1194,7 @@ contains
                     
                     k_dot_mTest = dot_product(waveVector, mTestOverL)
                     
-                    k_dot_structure = dot_product(cmplx(waveVector, 0._DP, DP), &
-                                                  this%Epot_reci_structure(:, kx, ky, kz))
+                    k_dot_structure = this%Epot_reci_structure(kx, ky, kz)
                                                   
                     exp_IkxTest = exp_IkxTest_1(kx) * exp_IkxTest_2(ky) * exp_IkxTest_3(kz)
                     cos_kxTest = real(exp_IkxTest, DP)
