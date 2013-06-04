@@ -170,7 +170,7 @@ implicit none
     integer, dimension(Dim), parameter :: cell_neigh_coordMax = 3
     integer, parameter :: cell_neighs_nb = 3**3 !< including itself
 
-    real(DP), dimension(Dim), parameter :: dipol_cell_Lsize = Lsize1/3._DP
+    real(DP), dimension(Dim), parameter :: dipol_cell_Lsize = dipol_rMin
     real(DP), dimension(Dim), parameter :: inter_cell_Lsize = inter_rCut
     real(DP), dimension(Dim), parameter :: hard_cell_Lsize = hard_rCut
     
