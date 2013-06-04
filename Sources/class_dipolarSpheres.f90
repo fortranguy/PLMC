@@ -1275,7 +1275,7 @@ contains
             
                 if (current%iCol /= iCol) then
                 
-                    r_ij = dist(xCol(:), this%X(:, current%iCol))
+                    r_ij = dist(xCol(:), this%positions(:, current%iCol))
                     
                     if (r_ij < this%rMin) then
                         overlap = .true.
@@ -1298,10 +1298,10 @@ contains
 
             if (jCol /= iCol) then
 
-                rVec_ij = distVec(xCol(:), this%X(:, jCol))
+                rVec_ij = distVec(xCol(:), this%positions(:, jCol))
                 r_ij = sqrt(dot_product(rVec_ij, rVec_ij))
 
-                energ = energ + this%Epot_real_pair(mCol, this%M(:, jCol), rVec_ij, r_ij)
+                energ = energ + this%Epot_real_pair(mCol, this%orientations(:, jCol), rVec_ij, r_ij)
                                 
             end if
             
