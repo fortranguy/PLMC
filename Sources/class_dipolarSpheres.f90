@@ -1245,7 +1245,70 @@ contains
     end function DipolarSpheres_Epot_self
     
     ! ----------------------------------------------------------------------------------------------
+    !> Real potential energy : short-range
     
+    subroutine DipolarSpheres_Epot_neigh(this, iCol, xCol, mCol, iCell, overlap, energ)
+        
+        class(DipolarSpheres), intent(in) :: this
+        integer, intent(in) :: iCol, iCell
+        real(DP), dimension(:), intent(in) :: xCol, mCol
+        logical, intent(out) :: overlap
+        real(DP), intent(out) :: energ
+    
+        integer :: iNeigh,  iCell_neigh, jCol
+        real(DP), dimension(Dim) :: rVec_ij
+        real(DP) :: r_ij        
+        
+        type(Link), pointer :: current => null(), next => null()
+        
+        overlap = .false.
+    
+        do iNeigh = 1, cell_neighs_nb
+        
+            iCell_neigh = this%same%cell_neighs(iNeigh, iCell)
+            current => this%same%cellsBegin(iCell_neigh)%particle%next            
+            if (.not. associated(current%next)) cycle
+            
+            do
+            
+                next => current%next
+            
+                if (current%iCol /= iCol) then
+                
+                    r_ij = dist(xCol(:), this%X(:, current%iCol))
+                    
+                    if (r_ij < this%rMin) then
+                        overlap = .true.
+                        return
+                    end if
+       
+                end if
+                
+                if (.not. associated(next%next)) exit
+                
+                current => next
+            
+            end do            
+            
+        end do
+
+        energ = 0._DP
+
+        do jCol = 1, this%Ncol
+
+            if (jCol /= iCol) then
+
+                rVec_ij = distVec(xCol(:), this%X(:, jCol))
+                r_ij = sqrt(dot_product(rVec_ij, rVec_ij))
+
+                energ = energ + this%Epot_real_pair(mCol, this%M(:, jCol), rVec_ij, r_ij)
+                                
+            end if
+            
+        end do
+    
+    end subroutine DipolarSpheres_Epot_neigh
+
     !> Particle move
     
     subroutine DipolarSpheres_move(this, iOld, other, mix, same_Epot, mix_Epot, Nreject)
