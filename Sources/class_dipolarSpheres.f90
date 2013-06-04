@@ -44,7 +44,7 @@ private
         real(DP), dimension(:, :), allocatable :: Epot_real_tab !< tabulation : real short-range
         real(DP), dimension(-Kmax(1):Kmax(1), -Kmax(2):Kmax(2), -Kmax(3):Kmax(3)) :: Epot_reci_weight
         integer :: NwaveVectors
-        complex(DP), dimension(Dim, -Kmax(1):Kmax(1), -Kmax(2):Kmax(2), -Kmax(3):Kmax(3)) :: &
+        complex(DP), dimension(-Kmax(1):Kmax(1), -Kmax(2):Kmax(2), -Kmax(3):Kmax(3)) :: &
             Epot_reci_structure
         complex(DP), dimension(:, :), allocatable :: Epot_reci_potential
         
@@ -582,10 +582,12 @@ contains
         complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_Ikx_3
 
         real(DP), dimension(Dim) :: xColOverL, mColOverL
+        real(DP), dimension(Dim) :: waveVector
+        real(DP) :: k_dot_mCol
         integer :: kx, ky, kz
         integer :: iCol
 
-        this%Epot_reci_structure(:, :, :, :) = cmplx(0._DP, 0._DP, DP)
+        this%Epot_reci_structure(:, :, :) = cmplx(0._DP, 0._DP, DP)
 
         do iCol = 1, this%Ncol
         
@@ -595,16 +597,29 @@ contains
             call fourier(xColOverL, exp_Ikx_1, exp_Ikx_2, exp_Ikx_3)
         
             do kz = -Kmax(3), Kmax(3)
+
+                waveVector(3) = real(kz, DP)
+
             do ky = -Kmax(2), Kmax(2)
-            do kx = -Kmax(1), Kmax(1)            
+
+                waveVector(2) = real(ky, DP)
+
+            do kx = -Kmax(1), Kmax(1)
+
+                waveVector(1) = real(kx, DP)
+            
             
                 exp_IkxCol = exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz)
+
+                k_dot_mCol = dot_product(waveVector, mColOverL)
                           
-                this%Epot_reci_structure(:, kx, ky, kz) = this%Epot_reci_structure(:, kx, ky, kz) + &
-                                                          cmplx(mColOverL(:), 0._DP, DP) * exp_IkxCol
+                this%Epot_reci_structure(kx, ky, kz) = this%Epot_reci_structure(kx, ky, kz) + &
+                                                       cmplx(k_dot_mCol, 0._DP, DP) * exp_IkxCol
             
             end do
+            
             end do
+            
             end do
             
         end do
@@ -614,18 +629,18 @@ contains
     function DipolarSpheres_Epot_reci_structure_moduli(this) result(Epot_reci_structure_moduli)
 
         class(DipolarSpheres), intent(in) :: this
-        real(DP), dimension(Dim) :: Epot_reci_structure_moduli
+        real(DP) :: Epot_reci_structure_moduli
 
         integer :: kx, ky, kz
 
-        Epot_reci_structure_moduli(:) = 0._DP
+        Epot_reci_structure_moduli = 0._DP
 
         do kz = -Kmax(3), Kmax(3)
         do ky = -Kmax(2), Kmax(2)
         do kx = -Kmax(1), Kmax(1)
 
-            Epot_reci_structure_moduli(:) = Epot_reci_structure_moduli(:) + &
-                                            abs(this%Epot_reci_structure(:, kx, ky, kz))
+            Epot_reci_structure_moduli = Epot_reci_structure_moduli + &
+                                         abs(this%Epot_reci_structure(kx, ky, kz))
 
         end do
         end do
@@ -687,8 +702,7 @@ contains
             
                 conjg_exp_IkxCol = conjg(exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz))
                 
-                k_dot_structure = dot_product(cmplx(waveVector, 0._DP, DP), &
-                                              this%Epot_reci_structure(:, kx, ky, kz))
+                k_dot_structure = this%Epot_reci_structure(kx, ky, kz)
 
                 Epot_reci_weight = cmplx(this%Epot_reci_weight(kx, ky, kz), 0._DP, DP)
 
@@ -855,8 +869,7 @@ contains
 
                     k_dot_mCol = dot_product(waveVector, mColOverL)
 
-                    k_dot_structure = dot_product(cmplx(waveVector, 0._DP, DP), &
-                                                  this%Epot_reci_structure(:, kx, ky, kz))
+                    k_dot_structure = this%Epot_reci_structure(kx, ky, kz)
 
                     exp_IkxNew = exp_IkxNew_1(kx) * exp_IkxNew_2(ky) * exp_IkxNew_3(kz)
                     cos_kxNew = real(exp_IkxNew, DP)
@@ -912,7 +925,9 @@ contains
         complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxOld_2
         complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_IkxOld_3
         complex(DP) :: exp_IkxOld
-        
+
+        real(DP), dimension(Dim) :: waveVector
+        real(DP) :: k_dot_mCol
         integer :: kx, ky, kz
 
         xNewOverL(:) = xNew(:)/Lsize(:)
@@ -923,18 +938,26 @@ contains
 
         mColOverL(:) = this%orientations(:, lCol)/Lsize(:)
 
-        do kz = -kMax(3), 0
-            
-            do ky = -kMax(2), kMax2_sym(kz)
-                
+        do kz = -Kmax(3), 0
+
+            waveVector(3) = real(kz, DP)
+
+            do ky = -Kmax(2), kMax2_sym(kz)
+
+                waveVector(2) = real(ky, DP)
+
                 do kx = -kMax(1), kMax1_sym(ky, kz)
+
+                    waveVector(1) = real(kx, DP)
+
+                    k_dot_mCol = dot_product(waveVector, mColOverL)
 
                     exp_IkxNew = exp_IkxNew_1(kx) * exp_IkxNew_2(ky) * exp_IkxNew_3(kz)
                     exp_IkxOld = exp_IkxOld_1(kx) * exp_IkxOld_2(ky) * exp_IkxOld_3(kz)
                                                           
-                    this%Epot_reci_structure(:, kx, ky, kz) = &
-                        this%Epot_reci_structure(:, kx, ky, kz) + &
-                        cmplx(mColOverL(:), 0._DP, DP) * (exp_IkxNew - exp_IkxOld)
+                    this%Epot_reci_structure(kx, ky, kz) = &
+                        this%Epot_reci_structure(kx, ky, kz) + &
+                        cmplx(k_dot_mCol, 0._DP, DP) * (exp_IkxNew - exp_IkxOld)
 
                 end do
                 
