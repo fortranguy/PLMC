@@ -451,6 +451,8 @@ contains
         type(Link), pointer :: current => null(), next => null()
 
         overlap = .false.
+        
+        ! Overlap test only
 
         do iNeigh = 1, cell_neighs_nb
 
@@ -480,6 +482,8 @@ contains
             end do
 
         end do
+        
+        ! Energy of 1 dipole with others
 
         energ = 0._DP
 
