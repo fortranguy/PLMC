@@ -45,7 +45,7 @@ private
         real(DP), dimension(-Kmax(1):Kmax(1), -Kmax(2):Kmax(2), -Kmax(3):Kmax(3)) :: Epot_reci_weight
         integer :: NwaveVectors
         complex(DP), dimension(-Kmax(1):Kmax(1), -Kmax(2):Kmax(2), -Kmax(3):Kmax(3)) :: &
-            Epot_reci_structure
+            Epot_reci_kStructure
         complex(DP), dimension(:, :), allocatable :: Epot_reci_potential
         
     contains
@@ -587,7 +587,7 @@ contains
         integer :: kx, ky, kz
         integer :: iCol
 
-        this%Epot_reci_structure(:, :, :) = cmplx(0._DP, 0._DP, DP)
+        this%Epot_reci_kStructure(:, :, :) = cmplx(0._DP, 0._DP, DP)
 
         do iCol = 1, this%Ncol
         
@@ -613,7 +613,7 @@ contains
 
                 k_dot_mCol = dot_product(waveVector, mColOverL)
                           
-                this%Epot_reci_structure(kx, ky, kz) = this%Epot_reci_structure(kx, ky, kz) + &
+                this%Epot_reci_kStructure(kx, ky, kz) = this%Epot_reci_kStructure(kx, ky, kz) + &
                                                        cmplx(k_dot_mCol, 0._DP, DP) * exp_IkxCol
             
             end do
@@ -640,7 +640,7 @@ contains
         do kx = -Kmax(1), Kmax(1)
 
             Epot_reci_structure_moduli = Epot_reci_structure_moduli + &
-                                         abs(this%Epot_reci_structure(kx, ky, kz))
+                                         abs(this%Epot_reci_kStructure(kx, ky, kz))
 
         end do
         end do
@@ -702,7 +702,7 @@ contains
             
                 conjg_exp_IkxCol = conjg(exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz))
                 
-                k_dot_structure = this%Epot_reci_structure(kx, ky, kz)
+                k_dot_structure = this%Epot_reci_kStructure(kx, ky, kz)
 
                 Epot_reci_weight = cmplx(this%Epot_reci_weight(kx, ky, kz), 0._DP, DP)
 
@@ -869,7 +869,7 @@ contains
 
                     k_dot_mCol = dot_product(waveVector, mColOverL)
 
-                    k_dot_structure = this%Epot_reci_structure(kx, ky, kz)
+                    k_dot_structure = this%Epot_reci_kStructure(kx, ky, kz)
 
                     exp_IkxNew = exp_IkxNew_1(kx) * exp_IkxNew_2(ky) * exp_IkxNew_3(kz)
                     cos_kxNew = real(exp_IkxNew, DP)
@@ -955,8 +955,8 @@ contains
                     exp_IkxNew = exp_IkxNew_1(kx) * exp_IkxNew_2(ky) * exp_IkxNew_3(kz)
                     exp_IkxOld = exp_IkxOld_1(kx) * exp_IkxOld_2(ky) * exp_IkxOld_3(kz)
                                                           
-                    this%Epot_reci_structure(kx, ky, kz) = &
-                        this%Epot_reci_structure(kx, ky, kz) + &
+                    this%Epot_reci_kStructure(kx, ky, kz) = &
+                        this%Epot_reci_kStructure(kx, ky, kz) + &
                         cmplx(k_dot_mCol, 0._DP, DP) * (exp_IkxNew - exp_IkxOld)
 
                 end do
@@ -1042,7 +1042,7 @@ contains
 
                     k_dot_mOld = dot_product(waveVector, mOldOverL)
 
-                    k_dot_structure = this%Epot_reci_structure(kx, ky, kz)
+                    k_dot_structure = this%Epot_reci_kStructure(kx, ky, kz)
 
                     exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky) * exp_IkxCol_3(kz)
                     cos_kxCol = real(exp_IkxCol, DP)
@@ -1115,8 +1115,8 @@ contains
 
                     k_dot_deltaMcol = dot_product(waveVector, mNewOverL - mOldOverL)
 
-                    this%Epot_reci_structure(kx, ky, kz) = &
-                        this%Epot_reci_structure(kx, ky, kz) + &
+                    this%Epot_reci_kStructure(kx, ky, kz) = &
+                        this%Epot_reci_kStructure(kx, ky, kz) + &
                         cmplx(k_dot_deltaMcol, 0._DP, DP) * exp_IkxCol
 
                 end do
@@ -1194,7 +1194,7 @@ contains
                     
                     k_dot_mTest = dot_product(waveVector, mTestOverL)
                     
-                    k_dot_structure = this%Epot_reci_structure(kx, ky, kz)
+                    k_dot_structure = this%Epot_reci_kStructure(kx, ky, kz)
                                                   
                     exp_IkxTest = exp_IkxTest_1(kx) * exp_IkxTest_2(ky) * exp_IkxTest_3(kz)
                     cos_kxTest = real(exp_IkxTest, DP)
