@@ -614,7 +614,7 @@ contains
                 k_dot_mCol = dot_product(waveVector, mColOverL)
                           
                 this%Epot_reci_kStructure(kx, ky, kz) = this%Epot_reci_kStructure(kx, ky, kz) + &
-                                                       cmplx(k_dot_mCol, 0._DP, DP) * exp_IkxCol
+                                                        cmplx(k_dot_mCol, 0._DP, DP) * exp_IkxCol
             
             end do
             
