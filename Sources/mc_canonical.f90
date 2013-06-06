@@ -16,7 +16,9 @@ use mod_tools
 implicit none
     
     ! Monte-Carlo variables
-    integer :: iStep, iMove, iRotate !< Monte-Carlo counters
+    integer :: iStep !< step counter
+    integer :: iChangeRand !< random change
+    integer :: iMove, iRotate !< change counters
     integer :: iColRand !< random particle
     real(DP) :: rand !< random number in between 0 and 1
     real(DP) :: tIni, tFin !< CPU initial and final time
@@ -122,37 +124,46 @@ implicit none
         if (modulo(iStep, type1_sph%getStructure_iStep()) == 0) then
             call type1_sph%Epot_reci_structure_reInit(iStep, type1_io%structure_moduli)
         end if
-    
-        MC_Move : do iMove = 1, Nmove
         
-            ! Randomly choosing a particle among both types
-            call random_number(rand)
-            iColRand = int(rand*real(Ncol, DP)) + 1
+        ! Randomly choosing the change
+        call random_number(rand)
+        iChangeRand = int(rand*real(Nmove+Nrotate, DP)) + 1
+        if (iChangeRand <= Nmove) then ! change = move
+        
+            MC_Move : do iMove = 1, Nmove
             
-            ! Moving a particle : 
-            if (iColRand <= type1_sph%getNcol()) then
-                call type1_sph%move(iColRand, type2_sph, mix, type1_obs%Epot, mix_Epot, &
-                                    type1_obs%Nreject)
-                type1_obs%Nmove = type1_obs%Nmove + 1
-            else
-                iColRand = iColRand - type1_sph%getNcol()
-                call type2_sph%move(iColRand, type1_sph, mix, type2_obs%Epot, mix_Epot, &
-                                    type2_obs%Nreject)
-                type2_obs%Nmove = type2_obs%Nmove + 1
-            end if
+                ! Randomly choosing a particle among both types
+                call random_number(rand)
+                iColRand = int(rand*real(Ncol, DP)) + 1
+                
+                ! Moving a particle : 
+                if (iColRand <= type1_sph%getNcol()) then
+                    call type1_sph%move(iColRand, type2_sph, mix, type1_obs%Epot, mix_Epot, &
+                                        type1_obs%Nreject)
+                    type1_obs%Nmove = type1_obs%Nmove + 1
+                else
+                    iColRand = iColRand - type1_sph%getNcol()
+                    call type2_sph%move(iColRand, type1_sph, mix, type2_obs%Epot, mix_Epot, &
+                                        type2_obs%Nreject)
+                    type2_obs%Nmove = type2_obs%Nmove + 1
+                end if
+                
+            end do MC_Move
             
-        end do MC_Move
+        else ! change = rotate
         
-        MC_Rotate : do iRotate = 1, Nrotate
-        
-            call random_number(rand)
-            iColRand = int(rand*real(type1_sph%getNcol(), DP)) + 1
- 
-            call type1_sph%rotate(iColRand, type1_obs%Epot, type1_obs%NrejectRot)
-            type1_obs%Nrotate = type1_obs%Nrotate + 1
+            MC_Rotate : do iRotate = 1, Nrotate
             
-        end do MC_Rotate
-        
+                call random_number(rand)
+                iColRand = int(rand*real(type1_sph%getNcol(), DP)) + 1
+     
+                call type1_sph%rotate(iColRand, type1_obs%Epot, type1_obs%NrejectRot)
+                type1_obs%Nrotate = type1_obs%Nrotate + 1
+                
+            end do MC_Rotate
+            
+        end if
+            
         ! Rejections rates updates
         type1_obs%reject = real(type1_obs%Nreject, DP)/real(type1_obs%Nmove, DP)
         type1_obs%Nreject = 0; type1_obs%Nmove = 0
