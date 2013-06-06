@@ -18,7 +18,7 @@ implicit none
     ! Monte-Carlo variables
     integer :: iStep !< step counter
     integer :: iChangeRand !< random change
-    integer :: iMove, iRotate !< change counters
+    integer :: iChange !< change counters
     integer :: iColRand !< random particle
     real(DP) :: rand !< random number in between 0 and 1
     real(DP) :: tIni, tFin !< CPU initial and final time
