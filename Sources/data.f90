@@ -95,14 +95,14 @@ implicit none
     
     integer, parameter :: dipol_structure_iStep = 1000
     ! move
-    real(DP), dimension(Dim), parameter :: dipol_deltaX = .15_DP
+    real(DP), dimension(Dim), parameter :: dipol_deltaX = 0.3_DP
     real(DP), parameter :: dipol_rejectFix = 0.5_DP
-    integer, parameter :: dipol_Nadapt = 2*Ntherm
+    integer, parameter :: dipol_Nadapt = Ntherm/50
     ! rotate
-    real(DP), parameter :: dipol_deltaM = 75._DP
+    real(DP), parameter :: dipol_deltaM = 30._DP
     real(DP), parameter :: dipol_deltaMmax = 75._DP
-    real(DP), parameter :: dipol_rejectRotFix = 0.1_DP
-    integer, parameter :: dipol_NadaptRot = 2*Ntherm
+    real(DP), parameter :: dipol_rejectRotFix = 0.17_DP
+    integer, parameter :: dipol_NadaptRot = Ntherm/50
     ! chemical potential
     integer, parameter :: dipol_Nwidom = 500
     
@@ -111,9 +111,9 @@ implicit none
     integer, parameter :: inter_Nadapt = Ntherm/8
     integer, parameter :: inter_Nwidom = inter_Ncol
     
-    real(DP), dimension(Dim), parameter :: hard_deltaX = .3_DP
+    real(DP), dimension(Dim), parameter :: hard_deltaX = 0.5_DP
     real(DP), parameter :: hard_rejectFix = 0.5_DP
-    integer, parameter :: hard_Nadapt = 2*Ntherm
+    integer, parameter :: hard_Nadapt = Ntherm/50
     integer, parameter :: hard_Nwidom = 500
 
 end module data_mc
