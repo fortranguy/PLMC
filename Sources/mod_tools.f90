@@ -239,6 +239,7 @@ contains
         write(report_unit, *) "    Nstep = ", Nstep
         write(report_unit, *) "    Ntherm = ", Ntherm
         write(report_unit, *) "    Nmove = ", Nmove
+        write(report_unit, *) "    Nrotate = ", Nrotate
     
     end subroutine report
     
