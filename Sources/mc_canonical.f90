@@ -125,13 +125,14 @@ implicit none
             call type1_sph%Epot_reci_structure_reInit(iStep, type1_io%structure_moduli)
         end if
         
-        ! Randomly choosing the change
-        call random_number(rand)
-        iChangeRand = int(rand*real(Nmove+Nrotate, DP)) + 1
-        if (iChangeRand <= Nmove) then ! change = move
+        MC_Change : do iChange = 1, Nmove + Nrotate
         
-            MC_Move : do iMove = 1, Nmove
+            ! Randomly choosing the change
+            call random_number(rand)
+            iChangeRand = int(rand*real(Nmove+Nrotate, DP)) + 1
             
+            if (iChangeRand <= Nmove) then ! change = move
+
                 ! Randomly choosing a particle among both types
                 call random_number(rand)
                 iColRand = int(rand*real(Ncol, DP)) + 1
@@ -147,23 +148,21 @@ implicit none
                                         type2_obs%Nreject)
                     type2_obs%Nmove = type2_obs%Nmove + 1
                 end if
+
                 
-            end do MC_Move
-            
-        else ! change = rotate
-        
-            MC_Rotate : do iRotate = 1, Nrotate
-            
+            else ! change = rotate
+                
                 call random_number(rand)
                 iColRand = int(rand*real(type1_sph%getNcol(), DP)) + 1
      
                 call type1_sph%rotate(iColRand, type1_obs%Epot, type1_obs%NrejectRot)
                 type1_obs%Nrotate = type1_obs%Nrotate + 1
+
                 
-            end do MC_Rotate
+            end if
             
-        end if
-            
+        end do MC_Change
+        
         ! Rejections rates updates
         type1_obs%reject = real(type1_obs%Nreject, DP)/real(type1_obs%Nmove, DP)
         type1_obs%Nreject = 0; type1_obs%Nmove = 0
