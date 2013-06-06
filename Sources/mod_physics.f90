@@ -4,7 +4,6 @@ module mod_physics
 
 use data_constants
 use data_cell
-!$ use omp_lib
 
 implicit none
 
