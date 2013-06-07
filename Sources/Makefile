@@ -48,7 +48,7 @@ mod_tools.o : data_constants.mod data_particles.mod data_mc.mod \
 # -----------------------------------------------
 
 mod_physics.o : mod_physics.f90
-	$(FC) -c $(FFLAGS) $< -o $@
+	$(FC) -c $(FFLAGS_OMP) $< -o $@
 class_neighbours.o : class_neighbours.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_mixingPotential.o : class_mixingPotential.f90
