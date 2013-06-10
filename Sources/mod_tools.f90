@@ -49,7 +49,7 @@ contains
         real(DP), intent(in) :: mix_rMin
         integer, intent(in) :: report_unit        
 
-        character(len=20) :: init
+        character(len=4096) :: init
         integer :: length, status
         
         write(report_unit, *) "Initial condition :"
