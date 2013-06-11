@@ -88,12 +88,12 @@ implicit none
 
     real(DP), parameter :: Tstar = 1._DP
     integer, parameter :: Nstep = 2**16
-    integer, parameter :: Ntherm = 25000
+    integer, parameter :: decorrelFactor = 2**0
+    integer, parameter :: Ntherm = 2**15/decorrelFactor
+    integer, parameter :: Nmove = decorrelFactor * Ncol
+    integer, parameter :: Nrotate = decorrelFactor * dipol_Ncol
     
-    integer, parameter :: Nmove = Ncol
-    integer, parameter :: Nrotate = dipol_Ncol
-    
-    integer, parameter :: dipol_structure_iStep = 1000
+    integer, parameter :: dipol_structure_iStep = 2**13/decorrelFactor
     ! move
     real(DP), dimension(Dim), parameter :: dipol_deltaX = 0.3_DP
     real(DP), parameter :: dipol_rejectFix = 0.5_DP
