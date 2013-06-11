@@ -638,6 +638,34 @@ contains
         end do
 
     end subroutine DipolarSpheres_Epot_reci_structure_init
+    
+    ! Symmetry : half wave vectors in do loop
+    
+    function kMax2_sym(kz)
+
+        integer, intent(in) :: kz
+        integer :: kMax2_sym
+
+        if (kz == 0) then
+            kMax2_sym = 0
+        else
+            kMax2_sym = kMax(2)
+        end if
+
+    end function kMax2_sym
+
+    function kMax1_sym(ky, kz)
+
+        integer, intent(in) :: ky, kz
+        integer :: kMax1_sym
+
+        if (ky == 0 .and. kz == 0) then
+            kMax1_sym = 0
+        else
+            kMax1_sym = kMax(1)
+        end if
+
+    end function kMax1_sym
 
     function DipolarSpheres_Epot_reci_structure_moduli(this) result(Epot_reci_structure_moduli)
 
@@ -648,15 +676,15 @@ contains
 
         Epot_reci_structure_moduli = 0._DP
 
-        do kz = -Kmax(3), Kmax(3)
-        do ky = -Kmax(2), Kmax(2)
-        do kx = -Kmax(1), Kmax(1)
+        do kz = -Kmax(3), 0
+            do ky = -Kmax(2), kMax2_sym(kz)
+                do kx = -kMax(1), kMax1_sym(ky, kz)
+                
+                    Epot_reci_structure_moduli = Epot_reci_structure_moduli + &
+                                                 abs(this%Epot_reci_kStructure(kx, ky, kz))
 
-            Epot_reci_structure_moduli = Epot_reci_structure_moduli + &
-                                         abs(this%Epot_reci_kStructure(kx, ky, kz))
-
-        end do
-        end do
+                end do
+            end do
         end do
 
     end function DipolarSpheres_Epot_reci_structure_moduli
@@ -732,34 +760,6 @@ contains
         end do
         
     end subroutine DipolarSpheres_Epot_reci_potential_init
-
-    ! Symmetry : half wave vectors in do loop
-    
-    function kMax2_sym(kz)
-
-        integer, intent(in) :: kz
-        integer :: kMax2_sym
-
-        if (kz == 0) then
-            kMax2_sym = 0
-        else
-            kMax2_sym = kMax(2)
-        end if
-
-    end function kMax2_sym
-
-    function kMax1_sym(ky, kz)
-
-        integer, intent(in) :: ky, kz
-        integer :: kMax1_sym
-
-        if (ky == 0 .and. kz == 0) then
-            kMax1_sym = 0
-        else
-            kMax1_sym = kMax(1)
-        end if
-
-    end function kMax1_sym
 
     ! Count the number of wave vectors
 
