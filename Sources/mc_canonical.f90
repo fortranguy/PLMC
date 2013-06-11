@@ -119,11 +119,6 @@ implicit none
     
     call cpu_time(tIni)
     MC_Cycle : do iStep = 1, Ntherm + Nstep
-    
-        ! Ewald summation : reinitialize the structure factor to prevent it from drifting.
-        if (modulo(iStep, type1_sph%getStructure_iStep()) == 0) then
-            call type1_sph%Epot_reci_structure_reInit(iStep, type1_io%structure_moduli)
-        end if
         
         MC_Change : do iChange = 1, Nmove + Nrotate
         
@@ -255,6 +250,11 @@ implicit none
             end if
             
         end if MC_Regime
+        
+        ! Ewald summation : reinitialize the structure factor to prevent it from drifting.
+        if (modulo(iStep, type1_sph%getStructure_iStep()) == 0) then
+            call type1_sph%Epot_reci_structure_reInit(iStep, type1_io%structure_moduli)
+        end if
     
     end do MC_Cycle
     call cpu_time(tFin)
