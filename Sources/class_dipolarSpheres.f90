@@ -667,7 +667,7 @@ contains
         integer, intent(in) :: iStep
         integer, intent(in) :: moduli_unit
 
-        real(DP), dimension(Dim) :: moduli_drifted, moduli_reInit
+        real(DP) :: moduli_drifted, moduli_reInit
         
         moduli_drifted = this%Epot_reci_structure_moduli()
         call this%Epot_reci_structure_init()
