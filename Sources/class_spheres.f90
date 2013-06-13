@@ -256,7 +256,7 @@ contains
             
             write(report_unit, *) "Displacement :"
             write(report_unit, *) "    deltaX(:) = ", this%deltaX(:)
-            write(report_unit, *) "    rejectection relative difference = ", &
+            write(report_unit, *) "    rejection relative difference = ", &
                                        abs(reject-this%rejectFix)/this%rejectFix
     
     end subroutine Spheres_definiteDeltaX

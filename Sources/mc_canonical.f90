@@ -170,7 +170,7 @@ implicit none
         
         MC_Regime : if (iStep <= Ntherm) then ! Thermalisation
         
-            ! Initial displacements & rejectections
+            ! Initial displacements & rejections
             if (iStep == 1) then
                 write(type1_io%deltaX, *) iStep, type1_sph%getDeltaX(), type1_obs%reject
                 write(type1_io%deltaM, *) iStep, type1_sph%getDeltaM(), type1_obs%rejectRot

@@ -288,7 +288,7 @@ contains
         
         write(report_unit, *) "Rotation :"
         write(report_unit, *) "    deltaM = ", this%deltaM
-        write(report_unit, *) "    rejectection relative difference = ", &
+        write(report_unit, *) "    rejection relative difference = ", &
                                     abs(reject-this%rejectRotFix)/this%rejectRotFix
     
     end subroutine DipolarSpheres_definiteDeltaM
