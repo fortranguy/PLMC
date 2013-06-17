@@ -298,7 +298,7 @@ contains
                 deltaEpot = same_deltaEpot + mix_deltaEpot
                 
                 call random_number(rand)
-                if (rand < exp(-deltaEpot/Tstar)) then
+                if (rand < exp(-deltaEpot/Temperature)) then
                 
                     this%positions(:, iOld) = xNew(:)
                     same_Epot = same_Epot + same_deltaEpot
@@ -362,7 +362,7 @@ contains
                 if (.not. overlap) then
                 
                     enTest = same_enTest + mix_enTest
-                    widTestSum = widTestSum + exp(-enTest/Tstar)
+                    widTestSum = widTestSum + exp(-enTest/Temperature)
                     
                 end if
                 

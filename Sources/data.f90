@@ -86,7 +86,7 @@ use data_cell
 
 implicit none
 
-    real(DP), parameter :: Tstar = 1._DP
+    real(DP), parameter :: Temperature = 1._DP
     integer, parameter :: Nstep = 2**16
     integer, parameter :: decorrelFactor = 2**0
     integer, parameter :: Ntherm = 2**15/decorrelFactor

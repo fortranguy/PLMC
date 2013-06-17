@@ -234,7 +234,7 @@ contains
         write(report_unit ,*) "    kMax(:) = ", kMax(:)
         write(report_unit ,*) "    NwaveVectors =", (2*kMax(1)+1) * (2*kMax(2)+1) * (2*kMax(3)+1)
         write(report_unit ,*) "    Ncol = ", Ncol
-        write(report_unit ,*) "    Tstar = ", Tstar
+        write(report_unit ,*) "    Temperature = ", Temperature
         
         write(report_unit, *) "    Nstep = ", Nstep
         write(report_unit, *) "    Ntherm = ", Ntherm

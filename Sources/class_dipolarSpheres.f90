@@ -1340,7 +1340,7 @@ contains
                 deltaEpot = same_deltaEpot + mix_deltaEpot
                 
                 call random_number(rand)            
-                if (rand < exp(-deltaEpot/Tstar)) then
+                if (rand < exp(-deltaEpot/Temperature)) then
 
                     call this%deltaEpot_reci_move_updateStructure(iOld, xNew)
                     this%positions(:, iOld) = xNew(:)
@@ -1400,7 +1400,7 @@ contains
         deltaEpot = deltaEpot_real + this%deltaEpot_reci_rotate(iOld, mNew) - deltaEpot_self
         
         call random_number(rand)
-        if (rand < exp(-deltaEpot/Tstar)) then
+        if (rand < exp(-deltaEpot/Temperature)) then
         
             call this%deltaEpot_reci_rotate_updateStructure(iOld, mNew)
             this%orientations(:, iOld) = mNew(:)
@@ -1455,7 +1455,7 @@ contains
                                   this%Epot_self_solo(mTest)
                 
                     enTest = same_enTest + mix_enTest
-                    widTestSum = widTestSum + exp(-enTest/Tstar)
+                    widTestSum = widTestSum + exp(-enTest/Temperature)
                     
                 end if
             
