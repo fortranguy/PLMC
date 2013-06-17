@@ -192,21 +192,10 @@ implicit none
 
     logical, parameter :: snap = .true.
     real(DP), parameter :: deltaDist = 0.01_DP
-    real(DP), protected :: rMax
-    integer, protected :: Ndist
     
     integer, parameter :: dipol_snap_factor = 1
     integer, parameter :: inter_snap_factor = 1
     integer, parameter :: hard_snap_factor = 8
-
-contains
-
-    subroutine initDistriParams()
-
-        rMax = norm2(LsizeMi)
-        Ndist = int(rMax/deltaDist)
-
-    end subroutine initDistriParams
 
 end module data_distrib
 !***************************************************************************************************

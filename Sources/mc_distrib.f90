@@ -43,6 +43,8 @@ implicit none
     integer, dimension(:), allocatable :: distrib
     integer, parameter :: snaps_unit = 10, distrib_unit = 11, energ_unit = 12
 
+    real(DP) :: rMax
+    integer :: Ndist
     integer :: iStep
     integer :: iCol, jCol
     real(DP) :: r_ij
@@ -64,7 +66,8 @@ implicit none
     call mix%construct()
     call inter%construct(mix%getCell_Lsize(), mix%getRcut())
 
-    call initDistriParams()
+    rMax = norm2(LsizeMi)
+    Ndist = int(rMax/deltaDist)
     allocate(distrib(Ndist))
     allocate(fct_dist(Ndist))
 
