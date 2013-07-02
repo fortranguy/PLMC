@@ -493,6 +493,7 @@ contains
         real(DP), dimension(:), intent(in) :: xCol, mCol
         real(DP) :: Epot_real_solo
 
+        integer :: jCol
         real(DP), dimension(Dim) :: rVec_ij
         real(DP) :: r_ij
 
@@ -521,9 +522,9 @@ contains
         class(DipolarSpheres), intent(in) :: this
         real(DP) :: Epot_real
         
+        integer :: iCol, jCol
         real(DP), dimension(Dim) :: rVec_ij
         real(DP) :: r_ij
-        integer :: iCol, jCol
     
         Epot_real = 0._DP
         
