@@ -504,7 +504,7 @@ contains
             if (jCol /= iCol) then
 
                 rVec_ij = distVec(xCol(:), this%positions(:, jCol))
-                r_ij = sqrt(dot_product(rVec_ij, rVec_ij))
+                r_ij = norm2(rVec_ij)
 
                 Epot_real_solo = Epot_real_solo + &
                                  this%Epot_real_pair(mCol, this%orientations(:, jCol), rVec_ij, r_ij)
