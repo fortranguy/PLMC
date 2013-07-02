@@ -1457,11 +1457,13 @@ contains
             
                 mTest(:) = random_surface()
                                
-                same_iCellTest = this%same%position_to_cell(xTest)               
-                call this%Epot_real_neigh(0, xTest, mTest, same_iCellTest, overlap, same_enTest_real)
+                same_iCellTest = this%same%position_to_cell(xTest)
+                call this%Epot_real_overlapTest(0, xTest, same_iCellTest, overlap)
                 
                 if (.not. overlap) then
-                    
+                
+                    same_enTest_real = this%Epot_real_solo(0, xTest, mTest)
+                                        
                     same_enTest = same_enTest_real + this%deltaEpot_reci_test(xTest, mTest) - &
                                   this%Epot_self_solo(mTest)
                 
