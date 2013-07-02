@@ -1332,7 +1332,7 @@ contains
         if (.not. overlap) then
         
             same_iCellNew = this%same%position_to_cell(xNew)
-            call this%Epot_real_neigh(iOld, xNew, same_iCellNew, overlap)
+            call this%Epot_real_overlapTest(iOld, xNew, same_iCellNew, overlap)
                         
             if (.not. overlap) then
                 
@@ -1402,9 +1402,8 @@ contains
         call markov_surface(mNew, this%deltaM)
         
         iCell = this%same%position_to_cell(this%positions(:, iOld))
-        call this%Epot_real_neigh(iOld, this%positions(:, iOld), mNew, iCell, overlap, real_eNew)
-        call this%Epot_real_neigh(iOld, this%positions(:, iOld), this%orientations(:, iOld), iCell, &
-                                  overlap, real_eOld)
+        real_eNew = this%Epot_real_solo(iOld, this%positions(:, iOld), mNew)
+        real_eOld = this%Epot_real_solo(iOld, this%positions(:, iOld), this%orientations(:, iOld))
         deltaEpot_real = real_eNew - real_eOld        
         
         deltaEpot_self = this%Epot_self_solo(mNew) - this%Epot_self_solo(this%orientations(:, iOld))
