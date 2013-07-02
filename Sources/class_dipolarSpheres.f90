@@ -74,7 +74,8 @@ private
         procedure :: Epot_real_print => DipolarSpheres_Epot_real_print
         procedure :: Epot_real_interpol => DipolarSpheres_Epot_real_interpol
         procedure :: Epot_real_pair => DipolarSpheres_Epot_real_pair
-        procedure :: Epot_real_neigh => DipolarSpheres_Epot_real_neigh
+        procedure :: Epot_real_overlapTest => DipolarSpheres_Epot_real_overlapTest
+        procedure :: Epot_real_solo => DipolarSpheres_Epot_real_solo
         procedure :: Epot_real => DipolarSpheres_Epot_real
         !>     Reciprocal : init
         procedure :: Epot_reci_init => DipolarSpheres_Epot_reci_init
@@ -434,15 +435,15 @@ contains
     
     end function DipolarSpheres_Epot_real_pair
 
-    !> Real potential energy : short-range
+    !> Real potential energy : short-range    
+    !> Overlap test of 1 particle
 
-    subroutine DipolarSpheres_Epot_real_neigh(this, iCol, xCol, mCol, iCell, overlap, energ)
+    subroutine DipolarSpheres_Epot_real_overlapTest(this, iCol, xCol, iCell, overlap)
 
         class(DipolarSpheres), intent(in) :: this
         integer, intent(in) :: iCol, iCell
-        real(DP), dimension(:), intent(in) :: xCol, mCol
+        real(DP), dimension(:), intent(in) :: xCol
         logical, intent(out) :: overlap
-        real(DP), intent(out) :: energ
 
         integer :: iNeigh,  iCell_neigh, jCol
         real(DP), dimension(Dim) :: rVec_ij
@@ -450,9 +451,7 @@ contains
 
         type(Link), pointer :: current => null(), next => null()
 
-        overlap = .false.
-        
-        ! Overlap test only
+        overlap = .false.        
 
         do iNeigh = 1, cell_neighs_nb
 
@@ -482,10 +481,22 @@ contains
             end do
 
         end do
-        
-        ! Energy of 1 dipole with others
 
-        energ = 0._DP
+    end subroutine DipolarSpheres_Epot_real_overlapTest
+    
+    !> Energy of 1 dipole with others
+    
+    function DipolarSpheres_Epot_real_solo(this, iCol, xCol, mCol) result(Epot_real_solo)
+
+        class(DipolarSpheres), intent(in) :: this
+        integer, intent(in) :: iCol
+        real(DP), dimension(:), intent(in) :: xCol, mCol
+        real(DP) :: Epot_real_solo
+
+        real(DP), dimension(Dim) :: rVec_ij
+        real(DP) :: r_ij
+
+        Epot_real_solo = 0._DP
 
         do jCol = 1, this%Ncol
 
@@ -494,13 +505,14 @@ contains
                 rVec_ij = distVec(xCol(:), this%positions(:, jCol))
                 r_ij = sqrt(dot_product(rVec_ij, rVec_ij))
 
-                energ = energ + this%Epot_real_pair(mCol, this%orientations(:, jCol), rVec_ij, r_ij)
+                Epot_real_solo = Epot_real_solo + &
+                                 this%Epot_real_pair(mCol, this%orientations(:, jCol), rVec_ij, r_ij)
 
             end if
 
         end do
-
-    end subroutine DipolarSpheres_Epot_real_neigh
+        
+    end function DipolarSpheres_Epot_real_solo
     
     !> Total real energy
     
@@ -1320,15 +1332,15 @@ contains
         if (.not. overlap) then
         
             same_iCellNew = this%same%position_to_cell(xNew)
-            call this%Epot_real_neigh(iOld, xNew, this%orientations(:, iOld), same_iCellNew, overlap, &
-                                      same_eNew_real)
+            call this%Epot_real_neigh(iOld, xNew, same_iCellNew, overlap)
                         
             if (.not. overlap) then
                 
                 ! Real
                 same_iCellOld = this%same%position_to_cell(this%positions(:, iOld))
-                call this%Epot_real_neigh(iOld, this%positions(:, iOld), this%orientations(:, iOld), &
-                                          same_iCellOld, overlap, same_eOld_real)
+                same_eNew_real = this%Epot_real_solo(iOld, xNew, this%orientations(:, iOld))
+                same_eOld_real = this%Epot_real_solo(iOld, this%positions(:, iOld), &
+                                                     this%orientations(:, iOld))
                 
                 same_deltaEpot = (same_eNew_real-same_eOld_real) + this%deltaEpot_reci_move(iOld, xNew)
                     
