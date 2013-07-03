@@ -555,7 +555,7 @@ contains
 
     end subroutine
     
-    !> \f[ f(\alpha, \vec{k}) = \frac{e^{-\frac{\pi^2}
+    !> \f[ w(\alpha, \vec{k}) = \frac{e^{-\frac{\pi^2}
     !>      {\alpha^2} \sum_d \frac{k_d^2}{L_d}}}{\sum_d \frac{k_d^2}{L_d}} \f]
     
     subroutine DipolarSpheres_Epot_reci_weight_init(this)
@@ -726,6 +726,12 @@ contains
     
     end subroutine DipolarSpheres_Epot_reci_structure_reInit
     
+    !> Potential initialisation :
+    !> \f[
+    !>      \vec{\phi}(\vec{x}_j) = \sum_{\vec{k}\neq\vec{0}} \vec{k} w(\alpha, \vec{k})
+    !>                              (\vec{k}\cdot\vec{S}(\vec{k})) e^{-i\vec{k}\cdot\vec{x}_j}
+    !> \f]
+    
     subroutine DipolarSpheres_Epot_reci_potential_init(this)
     
         class(DipolarSpheres), intent(inout) :: this
@@ -827,7 +833,7 @@ contains
     !> Move
 
     !> Difference of Energy \f[ \Delta U = \frac{2\pi}{V} \sum_{\vec{k} \neq 0} \Delta M^2
-    !> f(\alpha, \vec{k}) \f]
+    !> w(\alpha, \vec{k}) \f]
     !> \f[
     !>  \Delta M^2 = 2\Re[
     !>                  (\vec{\mu}_l\cdot\vec{k})
@@ -1004,7 +1010,7 @@ contains
     !> Rotate
 
     !> Difference of Energy \f[ \Delta U = \frac{2\pi}{V} \sum_{\vec{k} \neq 0} \Delta M^2
-    !>                                       f(\alpha, \vec{k}) \f]
+    !>                                       w(\alpha, \vec{k}) \f]
     !> \f[
     !>  \Delta M^2 = (\vec{k} \cdot \vec{\mu}_l^\prime)^2 - (\vec{k} \cdot \vec{\mu}_l)^2 +
     !>               2\Re\{
@@ -1165,7 +1171,7 @@ contains
     
     !> Difference of Energy 
     !> \f[ \Delta U^{N+1} = \frac{2\pi}{V} \sum_{\vec{k} \neq \vec{0}} 
-    !>                          (\vec{k} \cdot \vec{\mu}_{N+1}) f(\alpha, \vec{k})
+    !>                          (\vec{k} \cdot \vec{\mu}_{N+1}) w(\alpha, \vec{k})
     !>                          \{
     !>                              (\vec{k} \cdot \vec{\mu}_{N+1}) + 
     !>                              2\Re[(\vec{k} \cdot \vec{S}) e^{-i \vec{k} \cdot \vec{x}_{N+1}}]
@@ -1174,7 +1180,7 @@ contains
     
     !> Implementation :
     !> \f[ \Delta U^{N+1} = \frac{2\pi}{V} \sum_{\vec{k} \neq \vec{0}}
-    !>                          (\vec{k} \cdot \vec{\mu}_{N+1}) f(\alpha, \vec{k})
+    !>                          (\vec{k} \cdot \vec{\mu}_{N+1}) w(\alpha, \vec{k})
     !>                          \{
     !>                              (\vec{k} \cdot \vec{\mu}_{N+1}) +
     !>                              2 [\Re(\vec{k} \cdot \vec{S}) \cos(\vec{k} \cdot \vec{x}_{N+1}) +
