@@ -595,7 +595,10 @@ contains
         
     end subroutine DipolarSpheres_Epot_reci_weight_init
     
-    !> \f[ \vec{S}_l = \sum_{i \neq l} \vec{\mu}_i e^{+i\vec{k}\cdot\vec{x}_i} \f]
+    !> Structure factor init :
+    !> \f[ \vec{S}(\vec{k}) = \sum_{i} \vec{\mu}_i e^{+i\vec{k}\cdot\vec{x}_i} \f]
+    !> We will also use a restricted definition later :
+    !> \f[ \vec{S}_l(\vec{k}) = \sum_{i \neq l} \vec{\mu}_i e^{+i\vec{k}\cdot\vec{x}_i} \f].
 
     subroutine DipolarSpheres_Epot_reci_structure_init(this)
 
@@ -651,7 +654,7 @@ contains
 
     end subroutine DipolarSpheres_Epot_reci_structure_init
     
-    !> Symmetry : half wave vectors in do loop
+    !> Symmetry : half wave vectors in do loop : kMax2
     
     function kMax2_sym(kz)
 
@@ -665,6 +668,8 @@ contains
         end if
 
     end function kMax2_sym
+    
+    !> Symmetry : half wave vectors in do loop : kMax1
 
     function kMax1_sym(ky, kz)
 
