@@ -696,8 +696,8 @@ contains
         Epot_reci_structure_moduli = 0._DP
 
         do kz = 0, Kmax(3)
-            do ky = -Kmax(2), kMax2_sym(kz)
-                do kx = -kMax(1), kMax1_sym(ky, kz)
+            do ky = -kMax2_sym(kz), Kmax(2)
+                do kx = -kMax1_sym(ky, kz), kMax(1)
                 
                     Epot_reci_structure_moduli = Epot_reci_structure_moduli + &
                                                  abs(this%Epot_reci_kStructure(kx, ky, kz))
@@ -804,11 +804,11 @@ contains
 
             waveVector(3) = real(kz, DP)
 
-            do ky = -Kmax(2), kMax2_sym(kz)
+            do ky = -kMax2_sym(kz), Kmax(2)
 
                 waveVector(2) = real(ky, DP)
 
-                do kx = -kMax(1), kMax1_sym(ky, kz)
+                do kx = -kMax1_sym(ky, kz), kMax(1)
 
                     waveVector(1) = real(kx, DP)
 
@@ -899,11 +899,11 @@ contains
 
             waveVector(3) = real(kz, DP)
 
-            do ky = -Kmax(2), kMax2_sym(kz) 
+            do ky = -kMax2_sym(kz), Kmax(2) 
 
                 waveVector(2) = real(ky, DP)
             
-                do kx = -kMax(1), kMax1_sym(ky, kz)
+                do kx = -kMax1_sym(ky, kz), kMax(1)
 
                     waveVector(1) = real(kx, DP)
 
@@ -982,11 +982,11 @@ contains
 
             waveVector(3) = real(kz, DP)
 
-            do ky = -Kmax(2), kMax2_sym(kz)
+            do ky = -kMax2_sym(kz), Kmax(2)
 
                 waveVector(2) = real(ky, DP)
 
-                do kx = -kMax(1), kMax1_sym(ky, kz)
+                do kx = -kMax1_sym(ky, kz), kMax(1)
 
                     waveVector(1) = real(kx, DP)
 
@@ -1070,11 +1070,11 @@ contains
 
             waveVector(3) = real(kz, DP)
 
-            do ky = -Kmax(2), kMax2_sym(kz)
+            do ky = -kMax2_sym(kz), Kmax(2)
 
                 waveVector(2) = real(ky, DP)
             
-                do kx = -kMax(1), kMax1_sym(ky, kz)
+                do kx = -kMax1_sym(ky, kz), kMax(1)
 
                     waveVector(1) = real(kx, DP)
 
@@ -1143,11 +1143,11 @@ contains
 
             waveVector(3) = real(kz, DP)
 
-            do ky = -Kmax(2), kMax2_sym(kz)
+            do ky = -kMax2_sym(kz), Kmax(2)
 
                 waveVector(2) = real(ky, DP)
 
-                do kx = -kMax(1), kMax1_sym(ky, kz)
+                do kx = -kMax1_sym(ky, kz), kMax(1)
 
                     waveVector(1) = real(kx, DP)
 
@@ -1225,11 +1225,11 @@ contains
 
             waveVector(3) = real(kz, DP)
 
-            do ky = -Kmax(2), kMax2_sym(kz)
+            do ky = -kMax2_sym(kz), Kmax(2)
 
                 waveVector(2) = real(ky, DP)
             
-                do kx = -kMax(1), kMax1_sym(ky, kz)
+                do kx = -kMax1_sym(ky, kz), kMax(1)
                 
                     waveVector(1) = real(kx, DP)
                     
