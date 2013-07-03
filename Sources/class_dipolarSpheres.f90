@@ -440,8 +440,7 @@ contains
         real(DP), dimension(:), intent(in) :: xCol
         logical, intent(out) :: overlap
 
-        integer :: iNeigh,  iCell_neigh, jCol
-        real(DP), dimension(Dim) :: rVec_ij
+        integer :: iNeigh,  iCell_neigh
         real(DP) :: r_ij
 
         type(Link), pointer :: current => null(), next => null()
@@ -1412,7 +1411,6 @@ contains
         real(DP) :: deltaEpot, deltaEpot_real, deltaEpot_self
         real(DP) :: real_eNew, real_eOld
         integer :: iCell
-        logical :: overlap
         
         mNew(:) = this%orientations(:, iOld)
         call markov_surface(mNew, this%deltaM)
