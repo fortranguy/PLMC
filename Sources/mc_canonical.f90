@@ -143,7 +143,6 @@ implicit none
                                         type2_obs%Nreject)
                     type2_obs%Nmove = type2_obs%Nmove + 1
                 end if
-
                 
             else ! change = rotate
                 
@@ -152,7 +151,6 @@ implicit none
      
                 call type1_sph%rotate(iColRand, type1_obs%Epot, type1_obs%NrejectRot)
                 type1_obs%Nrotate = type1_obs%Nrotate + 1
-
                 
             end if
             
