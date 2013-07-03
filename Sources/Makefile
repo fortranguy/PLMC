@@ -1,5 +1,5 @@
 FC = ifort
-FFLAGS = -warn all -check all -check noarg_temp_created 
+FFLAGS = #-warn all -check all -check noarg_temp_created 
 LDFLAGS = #-warn all -check all -check noarg_temp_created
 FFLAGS_OMP = $(FFLAGS) -openmp 
 LDFLAGS_OMP = $(LDFLAGS) -openmp
