@@ -543,6 +543,8 @@ contains
     end function DipolarSpheres_Epot_real
 
     ! Reciprocal : long-range interaction ----------------------------------------------------------
+    
+    !> Initialisation of the ``potential'' and the ``structure factor''
 
     subroutine DipolarSpheres_Epot_reci_init(this)
 
@@ -592,6 +594,8 @@ contains
         end do
         
     end subroutine DipolarSpheres_Epot_reci_weight_init
+    
+    !> \f[ \vec{S}_l = \sum_{i \neq l} \vec{\mu}_i e^{+i\vec{k}\cdot\vec{x}_i} \f]
 
     subroutine DipolarSpheres_Epot_reci_structure_init(this)
 
@@ -647,7 +651,7 @@ contains
 
     end subroutine DipolarSpheres_Epot_reci_structure_init
     
-    ! Symmetry : half wave vectors in do loop
+    !> Symmetry : half wave vectors in do loop
     
     function kMax2_sym(kz)
 
@@ -674,6 +678,8 @@ contains
         end if
 
     end function kMax1_sym
+    
+    !> To calculate the drift of the strucutre factor
 
     function DipolarSpheres_Epot_reci_structure_moduli(this) result(Epot_reci_structure_moduli)
 
@@ -696,6 +702,8 @@ contains
         end do
 
     end function DipolarSpheres_Epot_reci_structure_moduli
+    
+    !> Reinitialise the structure factor and print the drift
     
     subroutine DipolarSpheres_Epot_reci_structure_reInit(this, iStep, moduli_unit)
     
@@ -822,7 +830,7 @@ contains
     !>                  (\vec{k}\cdot\vec{S}_l)
     !>               ]
     !> \f]
-    !> \f[ \vec{S}_l = \sum_{i \neq l} \vec{\mu}_i e^{+i\vec{k}\cdot\vec{x}_i} \f]
+
     !> Implementation :
     !> \f[
     !>  \Delta M^2 = 2(\vec{\mu_l}\cdot\vec{k})
@@ -987,6 +995,8 @@ contains
         end do
 
     end subroutine DipolarSpheres_deltaEpot_reci_move_updateStructure
+    
+    !> Rotate
 
     !> Difference of Energy \f[ \Delta U = \frac{2\pi}{V} \sum_{\vec{k} \neq 0} \Delta M^2
     !>                                       f(\alpha, \vec{k}) \f]
@@ -998,7 +1008,7 @@ contains
     !>                  (\vec{k} \cdot \vec{S}_l)
     !>               \}
     !> \f]
-    !> \f[ \vec{S}_l = \sum_{i \neq l} \vec{\mu}_i e^{+i\vec{k}\cdot\vec{x}_i} \f]
+    
     !> Implementation :
     !> \f[
     !>  \Delta M^2 = (\vec{k} \cdot \vec{\mu}_l^\prime)^2 - (\vec{k} \cdot \vec{\mu}_l)^2 +
@@ -1010,8 +1020,6 @@ contains
     !>                      (\vec{k} \cdot \vec{\mu}_l) \sin(\vec{k} \cdot \vec{x}_l)]
     !>               \}
     !> \f]
-
-    ! Rotate
 
     function DipolarSpheres_deltaEpot_reci_rotate(this, lCol, mNew) result(deltaEpot_reci_rotate)
 
@@ -1158,6 +1166,7 @@ contains
     !>                              2\Re[(\vec{k} \cdot \vec{S}) e^{-i \vec{k} \cdot \vec{x}_{N+1}}]
     !>                          \}
     !> \f]
+    
     !> Implementation :
     !> \f[ \Delta U^{N+1} = \frac{2\pi}{V} \sum_{\vec{k} \neq \vec{0}}
     !>                          (\vec{k} \cdot \vec{\mu}_{N+1}) f(\alpha, \vec{k})
@@ -1264,7 +1273,7 @@ contains
         
     end function DipolarSpheres_Epot_reci
     
-    ! Self -----------------------------------------------------------------------------------------
+    ! Self : correction ----------------------------------------------------------------------------
     
     !> Self energy of 1 dipole
     !> \f[ \frac{2}{3}\frac{\alpha^3}{\sqrt{\pi}} \vec{\mu}_i\cdot\vec{\mu}_i \f]
