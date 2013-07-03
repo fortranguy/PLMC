@@ -48,10 +48,10 @@ contains
         real(DP) :: x, y
         real(DP) :: normSqr, factor
         
-        real(DP), save :: gaussSet        
-        integer, save :: iset = 0
+        real(DP), save :: gaussSave        
+        integer, save :: switch = 0
         
-        if (iset == 0) then
+        if (switch == 0) then
         
             do
             
@@ -68,15 +68,15 @@ contains
             
             factor = sqrt(-2._DP * log(normSqr) / normSqr)
             
-            gaussSet = sigma3d * factor * x
+            gaussSave = sigma3d * factor * x
             gauss = sigma3d * factor * y
             
-            iset = 1
+            switch = 1
             
         else
         
-            gauss = gaussSet
-            iset = 0
+            gauss = gaussSave
+            switch = 0
             
         end if
         
