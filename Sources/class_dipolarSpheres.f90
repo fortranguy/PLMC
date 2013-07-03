@@ -327,10 +327,9 @@ contains
         
     end function DipolarSpheres_getStructure_iStep
 
-    ! Real -----------------------------------------------------------------------------------------
+    ! Real : short-range interaction ---------------------------------------------------------------
     
-    !> Potential energy : real part
-    !> Initialisation
+    !> Initialisation : look-up (tabulation) table
     !> \f[ B(r) = \frac{\mathrm{erfc}(\alpha r)}{r^3} + 
     !>           2\frac{\alpha}{\sqrt{\pi}}\frac{e^{-\alpha^2 r^2}}{r^2} \f]
     !> \f[ C(r) = 3\frac{\mathrm{erfc}(\alpha r)}{r^5} +
@@ -366,8 +365,7 @@ contains
         this%Epot_real_tab(:, 2) = this%Epot_real_tab(:, 2) - this%Epot_real_tab(this%iCut, 2)
 
     end subroutine DipolarSpheres_Epot_real_init
-    
-    !> Potential energy : real part
+
     !> Print the tabulated values
     
     subroutine DipolarSpheres_Epot_real_print(this, Epot_unit)
@@ -385,7 +383,6 @@ contains
 
     end subroutine DipolarSpheres_Epot_real_print
     
-    !> Potential energy : real part
     !> Linear interpolation
 
     function DipolarSpheres_Epot_real_interpol(this, r) result(Epot_real_interpol)
@@ -411,8 +408,7 @@ contains
         end if
         
     end function DipolarSpheres_Epot_real_interpol
-    
-    !> Potential energy : real part
+
     !> Between 2 particles
     !> \f[ (\vec{\mu}_i\cdot\vec{\mu}_j) B(r_{ij}) - 
     !>     (\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij}) C(r_{ij}) \f]
@@ -434,8 +430,7 @@ contains
         Epot_real_pair = dot_product(Epot_coeff, this%Epot_real_interpol(r_ij))
     
     end function DipolarSpheres_Epot_real_pair
-
-    !> Real potential energy : short-range    
+ 
     !> Overlap test of 1 particle
 
     subroutine DipolarSpheres_Epot_real_overlapTest(this, iCol, xCol, iCell, overlap)
@@ -547,7 +542,7 @@ contains
     
     end function DipolarSpheres_Epot_real
 
-    ! Reciprocal -----------------------------------------------------------------------------------
+    ! Reciprocal : long-range interaction ----------------------------------------------------------
 
     subroutine DipolarSpheres_Epot_reci_init(this)
 
