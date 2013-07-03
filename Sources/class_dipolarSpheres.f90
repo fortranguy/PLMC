@@ -695,7 +695,7 @@ contains
 
         Epot_reci_structure_moduli = 0._DP
 
-        do kz = -Kmax(3), 0
+        do kz = 0, Kmax(3)
             do ky = -Kmax(2), kMax2_sym(kz)
                 do kx = -kMax(1), kMax1_sym(ky, kz)
                 
@@ -800,7 +800,7 @@ contains
 
         this%NwaveVectors = 0
 
-        do kz = -Kmax(3), 0
+        do kz = 0, Kmax(3)
 
             waveVector(3) = real(kz, DP)
 
@@ -895,7 +895,7 @@ contains
 
         deltaEpot_reci_move = 0._DP
 
-        do kz = -Kmax(3), 0 ! symmetry : half wave vectors -> double Energy
+        do kz = 0, Kmax(3) ! symmetry : half wave vectors -> double Energy
 
             waveVector(3) = real(kz, DP)
 
@@ -978,7 +978,7 @@ contains
 
         mColOverL(:) = this%orientations(:, lCol)/Lsize(:)
 
-        do kz = -Kmax(3), 0
+        do kz = 0, Kmax(3)
 
             waveVector(3) = real(kz, DP)
 
@@ -1066,7 +1066,7 @@ contains
 
         deltaEpot_reci_rotate = 0._DP
 
-        do kz = -Kmax(3), 0 ! symmetry : half wave vectors -> double Energy
+        do kz = 0, Kmax(3) ! symmetry : half wave vectors -> double Energy
 
             waveVector(3) = real(kz, DP)
 
@@ -1139,7 +1139,7 @@ contains
         mNewOverL(:) = mNew(:)/Lsize(:)
         mOldOverL(:) = this%orientations(:, lCol)/Lsize(:)
 
-        do kz = -Kmax(3), 0
+        do kz = 0, Kmax(3)
 
             waveVector(3) = real(kz, DP)
 
@@ -1221,7 +1221,7 @@ contains
         
         deltaEpot_reci_test = 0._DP
         
-        do kz = -Kmax(3), 0
+        do kz = 0, Kmax(3)
 
             waveVector(3) = real(kz, DP)
 
