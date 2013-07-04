@@ -79,11 +79,11 @@ contains
         ! Neighbours : same kind
         call this%same%construct(hard_cell_Lsize, this%rCut)
         call this%same%alloc_cells()
-        call this%same%ini_cell_neighs()
+        call this%same%cell_neighs_init()
         ! Neighbours : other kind
         call this%mix%construct(shared_cell_Lsize, shared_rCut)
         call this%mix%alloc_cells()
-        call this%mix%ini_cell_neighs()
+        call this%mix%cell_neighs_init()
     
     end subroutine HardSpheres_construct
     

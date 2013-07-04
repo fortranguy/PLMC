@@ -44,7 +44,7 @@ public :: Link
         procedure :: add_cell_col => Neighbours_add_cell_col
         procedure :: cell_coord_to_ind => Neighbours_cell_coord_to_ind
         procedure :: cell_period => Neighbours_cell_period
-        procedure :: ini_cell_neighs => Neighbours_ini_cell_neighs
+        procedure :: cell_neighs_init => Neighbours_cell_neighs_init
         
     end type Neighbours
     
@@ -333,7 +333,7 @@ contains
     
     end function Neighbours_cell_period
     
-    subroutine Neighbours_ini_cell_neighs(this)
+    subroutine Neighbours_cell_neighs_init(this)
     
         class(Neighbours), intent(inout) :: this 
     
@@ -368,6 +368,6 @@ contains
         end do
         end do
             
-    end subroutine Neighbours_ini_cell_neighs
+    end subroutine Neighbours_cell_neighs_init
 
 end module class_neighbours
