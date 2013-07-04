@@ -1,17 +1,30 @@
 !***************************************************************************************************
+!> \brief Precisions data :
+!> declaration of precisions paramters
+!***************************************************************************************************
+module data_precisions
+
+implicit none
+
+    integer, parameter :: DP = selected_real_kind(15, 307) !< double precision
+    real(DP), parameter :: io_tiny = 1.E-10_DP
+    real(DP), parameter :: consist_tiny = 1.E-10_DP
+
+end module data_precisions 
+!***************************************************************************************************
+
+!***************************************************************************************************
 !> \brief Constants data :
 !> declaration of constants
 !***************************************************************************************************
 module data_constants
 
-implicit none
+use data_precisions, only : DP
 
-    ! double precision
-    integer, parameter :: DP = selected_real_kind(15, 307)
+implicit none
+    
     real(DP), parameter :: PI = acos(-1._DP)
-    real(DP), parameter :: sigma3d = 1._DP/sqrt(3._DP)
-    real(DP), parameter :: io_tiny = 1.E-10_DP
-    real(DP), parameter :: consist_tiny = 1.E-10_DP
+    real(DP), parameter :: sigma3d = 1._DP/sqrt(3._DP)    
         
 end module data_constants
 !***************************************************************************************************
