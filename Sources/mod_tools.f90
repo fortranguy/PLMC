@@ -13,7 +13,6 @@ use class_dipolarSpheres
 use class_hardSpheres
 
 implicit none
-
 private
 public initRandomSeed, initialCondition, report, consistTest, printResults, mix_printResults
 

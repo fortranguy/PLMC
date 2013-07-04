@@ -10,7 +10,6 @@ use mod_physics
 use class_neighbours
 
 implicit none
-
 private
 
     type, public :: Spheres

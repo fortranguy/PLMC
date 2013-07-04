@@ -8,7 +8,6 @@ use data_cell, only : Dim, Lsize, LsizeMi, Kmax
 !$ use omp_lib
 
 implicit none
-
 private
 public dist, distVec, gauss, random_surface, markov_surface, fourier
 
