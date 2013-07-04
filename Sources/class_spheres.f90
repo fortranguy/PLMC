@@ -2,11 +2,9 @@
 
 module class_spheres
 
-use, intrinsic :: iso_fortran_env
-use data_constants
-use data_cell
-use data_mc
-use data_neighbours
+use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
+use data_precisions, only : DP
+use data_cell, only : Volume
 use mod_physics
 use class_neighbours
 
