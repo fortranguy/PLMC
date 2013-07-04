@@ -16,7 +16,6 @@ private
                             ! Nevertheless, it is public for inheritance.
                             ! It must not be instanciated in the main program.
     
-        !private
         character(len=5) :: name
 
         ! Particles
