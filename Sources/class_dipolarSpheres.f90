@@ -2,15 +2,15 @@
 
 module class_dipolarSpheres
 
-use, intrinsic :: iso_fortran_env
-use data_precisions, only : DP, consist_tiny
-use data_constants
-use data_cell
-use data_particles
-use data_potentiel
-use data_mc
-use data_neighbours
-use data_distrib
+use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
+use data_precisions, only : DP, consist_tiny 
+use data_cell, only : Dim, Volume
+use data_particles, only : dipol_radius, dipol_rMin, dipol_Ncol
+use data_mc, only : Temperature, dipol_structure_iStep, dipol_deltaX, dipol_rejectFix, dipol_Nadapt, &
+                    dipol_deltaM, dipol_deltaMmax, dipol_rejectRotFix, dipol_NadaptRot, dipol_Nwidom
+use data_potentiel, only : dipol_rCut, dipol_dr, dipol_alpha
+use data_neighbours, only : cell_neighs_nb, dipol_cell_Lsize
+use data_distrib, only : dipol_snap_factor
 use mod_physics
 use class_neighbours
 use class_mixingPotential
