@@ -2,15 +2,13 @@
 
 module class_interactingSpheres
 
-use, intrinsic :: iso_fortran_env
 use data_precisions, only : DP, consist_tiny
-use data_constants
-use data_cell
-use data_particles
-use data_potentiel
-use data_mc
-use data_neighbours
-use data_distrib
+use data_cell, only : Dim
+use data_particles, only : inter_radius, inter_rMin, inter_Ncol
+use data_potentiel, only : inter_rCut, inter_dr, inter_epsilon, inter_alpha
+use data_mc, only : Temperature, inter_deltaX, inter_rejectFix, inter_Nadapt, inter_Nwidom
+use data_neighbours, only : cell_neighs_nb, inter_cell_Lsize
+use data_distrib, only : inter_snap_factor
 use mod_physics
 use class_neighbours
 use class_mixingPotential
