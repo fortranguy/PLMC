@@ -2,8 +2,8 @@
 
 program mc_canonical
 
-use, intrinsic :: iso_fortran_env
-use data_constants
+use, intrinsic :: iso_fortran_env, only : output_unit
+use data_precisions, only : DP
 use data_mc
 use data_distrib
 use class_mixingPotential
