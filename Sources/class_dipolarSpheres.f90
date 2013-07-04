@@ -1190,7 +1190,7 @@ contains
     !>                          \}
     !> \f]
 
-    function DipolarSpheres_deltaEpot_reci_test(this, xTest, mTest) result(deltaEpot_reci_test)
+    pure function DipolarSpheres_deltaEpot_reci_test(this, xTest, mTest) result(deltaEpot_reci_test)
 
         class(DipolarSpheres), intent(in) :: this
         real(DP), dimension(Dim), intent(in) :: xTest
@@ -1262,7 +1262,7 @@ contains
     
     !> Total reciprocal energy
     
-    function DipolarSpheres_Epot_reci(this) result(Epot_reci)
+    pure function DipolarSpheres_Epot_reci(this) result(Epot_reci)
         
         class(DipolarSpheres), intent(in) :: this
         real(DP) :: Epot_reci
@@ -1291,7 +1291,7 @@ contains
     !> Self energy of 1 dipole
     !> \f[ \frac{2}{3}\frac{\alpha^3}{\sqrt{\pi}} \vec{\mu}_i\cdot\vec{\mu}_i \f]
     
-    function DipolarSpheres_Epot_self_solo(this, mCol) result(Epot_self_solo)
+    pure function DipolarSpheres_Epot_self_solo(this, mCol) result(Epot_self_solo)
     
         class(DipolarSpheres), intent(in) :: this
         real(DP), dimension(:), intent(in) :: mCol
@@ -1304,7 +1304,7 @@ contains
     !> Total self energy
     !> \f[ \frac{2}{3}\frac{\alpha^3}{\sqrt{\pi}} \sum_i \vec{\mu}_i\cdot\vec{\mu}_i \f]
     
-    function DipolarSpheres_Epot_self(this) result(Epot_self)
+    pure function DipolarSpheres_Epot_self(this) result(Epot_self)
     
         class(DipolarSpheres), intent(in) :: this
         real(DP) :: Epot_self
@@ -1499,7 +1499,7 @@ contains
 
     !> Total potential energy
     
-    function DipolarSpheres_Epot_conf(this) result(Epot_conf)
+    pure function DipolarSpheres_Epot_conf(this) result(Epot_conf)
     
         class(DipolarSpheres), intent(in) :: this        
         real(DP) :: Epot_conf

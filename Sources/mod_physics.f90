@@ -127,7 +127,7 @@ contains
     
     !> Fourier coefficients (bases)
     
-    subroutine fourier(xColOverL, exp_Ikx_1, exp_Ikx_2, exp_Ikx_3)
+    pure subroutine fourier(xColOverL, exp_Ikx_1, exp_Ikx_2, exp_Ikx_3)
     
         real(DP), dimension(Dim), intent(in) :: xColOverL
         complex(DP), dimension(-Kmax(1):Kmax(1)), intent(out) :: exp_Ikx_1
