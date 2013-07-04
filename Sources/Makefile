@@ -40,7 +40,8 @@ class_dipolarSpheres.o : data_precisions.mod data_cell.mod data_particles.mod da
 						 data_potentiel.mod data_neighbours.mod data_distrib.mod mod_physics.o \
 						 class_neighbours.o class_mixingPotential.o class_spheres.o
 class_observables.o : data_precisions.mod data_cell.mod data_mc.mod
-mod_tools.o : data_constants.mod data_particles.mod data_mc.mod mod_physics.o class_spheres.o
+mod_tools.o : data_precisions.mod data_cell.mod data_particles.mod data_mc.mod mod_physics.o \
+			  class_spheres.o
 
 # -----------------------------------------------
 
