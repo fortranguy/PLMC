@@ -107,7 +107,7 @@ contains
     
     !> Accessor : rMin
     
-    function MixingPotential_getRmin(this) result(getRmin)
+    pure function MixingPotential_getRmin(this) result(getRmin)
     
         class(MixingPotential), intent(in) :: this        
         real(DP) :: getRmin
@@ -118,7 +118,7 @@ contains
     
     !> Accessor : rCut
     
-    function MixingPotential_getRcut(this) result(getRcut)
+    pure function MixingPotential_getRcut(this) result(getRcut)
     
         class(MixingPotential), intent(in) :: this        
         real(DP) :: getRcut
@@ -129,7 +129,7 @@ contains
     
     !> Accessor : cell_Lsize
     
-    function MixingPotential_getCell_Lsize(this) result(getCell_Lsize)
+    pure function MixingPotential_getCell_Lsize(this) result(getCell_Lsize)
     
         class(MixingPotential), intent(in) :: this        
         real(DP), dimension(Dim) :: getCell_Lsize
@@ -208,7 +208,7 @@ contains
 
     end subroutine MixingPotential_Epot_print
 
-    function MixingPotential_Epot_pair(this, r) result(Epot_pair)
+    pure function MixingPotential_Epot_pair(this, r) result(Epot_pair)
         
         class(MixingPotential), intent(in) :: this
         real(DP), intent(in) :: r
@@ -278,7 +278,7 @@ contains
     
     !> Total potential energy
     
-    function MixingPotential_Epot_conf(this, type1_positions, type2_positions) result(Epot_conf)
+    pure function MixingPotential_Epot_conf(this, type1_positions, type2_positions) result(Epot_conf)
     
         class(MixingPotential), intent(in) :: this
         real(DP), dimension(:, :), intent(in) :: type1_positions, type2_positions
