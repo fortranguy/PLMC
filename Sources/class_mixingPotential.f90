@@ -2,13 +2,12 @@
 
 module class_mixingPotential
 
-use, intrinsic :: iso_fortran_env
-use data_constants
-use data_cell
-use data_particles
-use data_mc
-use data_potentiel
-use data_neighbours
+use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
+use data_precisions, only : DP
+use data_cell, only : Dim
+use data_particles, only : mix_rMin
+use data_potentiel, only : mix_rCut, mix_dr, mix_epsilon, mix_alpha
+use data_neighbours, only : cell_neighs_nb, mix_cell_Lsize
 use mod_physics
 use class_neighbours
 
