@@ -2,8 +2,9 @@
 
 module mod_physics
 
-use data_constants
-use data_cell
+use data_precisions, only : DP
+use data_constants, only : PI, sigma3d
+use data_cell, only : Dim, Lsize, LsizeMi, Kmax
 !$ use omp_lib
 
 implicit none

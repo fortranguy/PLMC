@@ -2,8 +2,9 @@
 
 module mod_distrib
 
-use data_constants
-use data_distrib
+use data_precisions, only : DP
+use data_constants, only : PI
+use data_distrib, only : deltaDist
 
 implicit none
 
