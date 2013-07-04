@@ -4,10 +4,9 @@ module mod_tools
 
 use, intrinsic :: iso_fortran_env
 use data_precisions, only : DP, io_tiny, consist_tiny
-use data_constants
 use data_cell, only : Dim, Lsize, Volume, kMax
-use data_particles
-use data_mc
+use data_particles, only : Ncol
+use data_mc, only : Temperature, Nstep, decorrelFactor, Ntherm, Nmove, Nrotate
 use mod_physics
 use class_spheres
 use class_dipolarSpheres
