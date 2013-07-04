@@ -1378,12 +1378,12 @@ contains
                     
                     if (same_iCellOld /= same_iCellNew) then
                         call this%same%remove_col_from_cell(iOld, same_iCellOld)
-                        call this%same%add_cell_col(iOld, same_iCellNew)
+                        call this%same%add_col_to_cell(iOld, same_iCellNew)
                     end if
                     
                     if (mix_iCellOld /= mix_iCellNew) then
                         call other%mix%remove_col_from_cell(iOld, mix_iCellOld)
-                        call other%mix%add_cell_col(iOld, mix_iCellNew)
+                        call other%mix%add_col_to_cell(iOld, mix_iCellNew)
                     end if
                     
                 else
