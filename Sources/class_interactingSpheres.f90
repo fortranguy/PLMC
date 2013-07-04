@@ -3,6 +3,7 @@
 module class_interactingSpheres
 
 use, intrinsic :: iso_fortran_env
+use data_precisions, only : DP, consist_tiny
 use data_constants
 use data_cell
 use data_particles

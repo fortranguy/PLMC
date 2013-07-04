@@ -3,6 +3,7 @@
 module mod_tools
 
 use, intrinsic :: iso_fortran_env
+use data_precisions, only : DP, io_tiny, consist_tiny
 use data_constants
 use data_particles
 use data_mc
