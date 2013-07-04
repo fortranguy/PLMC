@@ -40,7 +40,7 @@ public :: Link
         procedure :: check_cellsSize => Neighbours_check_cellsSize
         procedure :: position_to_cell => Neighbours_position_to_cell
         procedure :: cols_to_cells => Neighbours_cols_to_cells
-        procedure :: remove_cell_col => Neighbours_remove_cell_col
+        procedure :: remove_col_from_cell => Neighbours_remove_col_from_cell
         procedure :: add_cell_col => Neighbours_add_cell_col
         procedure :: cell_coord_to_ind => Neighbours_cell_coord_to_ind
         procedure :: cell_period => Neighbours_cell_period
@@ -225,7 +225,7 @@ contains
     
     ! Neighbours cells update
     
-    subroutine Neighbours_remove_cell_col(this, iCol, iCellOld)
+    subroutine Neighbours_remove_col_from_cell(this, iCol, iCellOld)
     
         class(Neighbours), intent(inout) :: this
     
@@ -258,7 +258,7 @@ contains
         
         end do
             
-    end subroutine Neighbours_remove_cell_col   
+    end subroutine Neighbours_remove_col_from_cell   
     
     subroutine Neighbours_add_cell_col(this, iCol, iCellNew)
     
