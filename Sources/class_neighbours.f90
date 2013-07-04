@@ -177,7 +177,7 @@ contains
     
     ! Assignment : particle -> cell
     
-    function Neighbours_position_to_cell(this, xCol) result(position_to_cell)
+    pure function Neighbours_position_to_cell(this, xCol) result(position_to_cell)
     
         class(Neighbours), intent(in) :: this
         real(DP), dimension(:), intent(in) :: xCol
@@ -293,7 +293,7 @@ contains
     
     ! Neighbour cells ------------------------------------------------------------------------------
 
-    function Neighbours_cell_coord_to_ind(this, coord) result(cell_coord_to_ind)
+    pure function Neighbours_cell_coord_to_ind(this, coord) result(cell_coord_to_ind)
         
         class(Neighbours), intent(in) :: this
         integer, dimension(:), intent(in) :: coord
@@ -304,7 +304,7 @@ contains
     
     end function Neighbours_cell_coord_to_ind
     
-    function cell_neigh_coord_to_ind(neigh_coord)
+    pure function cell_neigh_coord_to_ind(neigh_coord)
     
         integer, dimension(:), intent(in) :: neigh_coord        
         integer :: cell_neigh_coord_to_ind
@@ -314,7 +314,7 @@ contains
     
     end function cell_neigh_coord_to_ind
     
-    function Neighbours_cell_period(this, coord) result(cell_period)
+    pure function Neighbours_cell_period(this, coord) result(cell_period)
     
         class(Neighbours), intent(in) :: this    
         integer, dimension(:), intent(in) :: coord        
