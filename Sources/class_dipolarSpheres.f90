@@ -298,7 +298,7 @@ contains
     
     !> Accessor : deltaM
     
-    function DipolarSpheres_getDeltaM(this) result(getDeltaM)
+    pure function DipolarSpheres_getDeltaM(this) result(getDeltaM)
         
         class(DipolarSpheres), intent(in) :: this        
         real(DP) :: getDeltaM
@@ -309,7 +309,7 @@ contains
     
     !> Accessor : Nadapt
     
-    function DipolarSpheres_getNadaptRot(this) result(getNadaptRot)
+    pure function DipolarSpheres_getNadaptRot(this) result(getNadaptRot)
     
         class(DipolarSpheres), intent(in) :: this        
         integer :: getNadaptRot
@@ -320,7 +320,7 @@ contains
     
     !> Accessor : structure_iStep
     
-    function DipolarSpheres_getStructure_iStep(this) result (getStructure_iStep)
+    pure function DipolarSpheres_getStructure_iStep(this) result (getStructure_iStep)
     
         class(DipolarSpheres), intent(in) :: this
         integer :: getStructure_iStep
@@ -387,7 +387,7 @@ contains
     
     !> Linear interpolation
 
-    function DipolarSpheres_Epot_real_interpol(this, r) result(Epot_real_interpol)
+    pure function DipolarSpheres_Epot_real_interpol(this, r) result(Epot_real_interpol)
         
         class(DipolarSpheres), intent(in) :: this
         real(DP), intent(in) :: r
@@ -415,8 +415,8 @@ contains
     !> \f[ (\vec{\mu}_i\cdot\vec{\mu}_j) B(r_{ij}) - 
     !>     (\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij}) C(r_{ij}) \f]
     
-    function DipolarSpheres_Epot_real_pair(this, mCol_i, mCol_j, rVec_ij, r_ij) &
-                     result(Epot_real_pair)
+    pure function DipolarSpheres_Epot_real_pair(this, mCol_i, mCol_j, rVec_ij, r_ij) &
+                  result(Epot_real_pair)
     
         class(DipolarSpheres), intent(in) :: this
         real(DP), dimension(:), intent(in) :: mCol_i, mCol_j
@@ -483,7 +483,7 @@ contains
     
     !> Energy of 1 dipole with others
     
-    function DipolarSpheres_Epot_real_solo(this, iCol, xCol, mCol) result(Epot_real_solo)
+    pure function DipolarSpheres_Epot_real_solo(this, iCol, xCol, mCol) result(Epot_real_solo)
 
         class(DipolarSpheres), intent(in) :: this
         integer, intent(in) :: iCol
@@ -514,7 +514,7 @@ contains
     
     !> Total real energy
     
-    function DipolarSpheres_Epot_real(this) result(Epot_real)
+    pure function DipolarSpheres_Epot_real(this) result(Epot_real)
     
         class(DipolarSpheres), intent(in) :: this
         real(DP) :: Epot_real
@@ -658,7 +658,7 @@ contains
     
     !> Symmetry : half wave vectors in do loop : kMax2
     
-    function kMax2_sym(kz)
+    pure function kMax2_sym(kz)
 
         integer, intent(in) :: kz
         integer :: kMax2_sym
@@ -673,7 +673,7 @@ contains
     
     !> Symmetry : half wave vectors in do loop : kMax1
 
-    function kMax1_sym(ky, kz)
+    pure function kMax1_sym(ky, kz)
 
         integer, intent(in) :: ky, kz
         integer :: kMax1_sym
@@ -688,7 +688,7 @@ contains
     
     !> To calculate the drift of the strucutre factor
 
-    function DipolarSpheres_Epot_reci_structure_moduli(this) result(Epot_reci_structure_moduli)
+    pure function DipolarSpheres_Epot_reci_structure_moduli(this) result(Epot_reci_structure_moduli)
 
         class(DipolarSpheres), intent(in) :: this
         real(DP) :: Epot_reci_structure_moduli
@@ -856,7 +856,7 @@ contains
     !> \f]
     !>
 
-    function DipolarSpheres_deltaEpot_reci_move(this, lCol, xNew) result(deltaEpot_reci_move)
+    pure function DipolarSpheres_deltaEpot_reci_move(this, lCol, xNew) result(deltaEpot_reci_move)
 
         class(DipolarSpheres), intent(in) :: this
         integer, intent(in) :: lCol
@@ -1034,7 +1034,7 @@ contains
     !>               \}
     !> \f]
 
-    function DipolarSpheres_deltaEpot_reci_rotate(this, lCol, mNew) result(deltaEpot_reci_rotate)
+    pure function DipolarSpheres_deltaEpot_reci_rotate(this, lCol, mNew) result(deltaEpot_reci_rotate)
 
         class(DipolarSpheres), intent(in) :: this
         integer, intent(in) :: lCol
