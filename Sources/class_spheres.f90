@@ -71,7 +71,7 @@ contains
 
     !> Accessor : name
 
-    function Spheres_getName(this) result(getName)
+    pure function Spheres_getName(this) result(getName)
     
         class(Spheres), intent(in) :: this        
         character(len=5) :: getName
@@ -82,7 +82,7 @@ contains
 
     !> Accessor : Ncol
 
-    function Spheres_getNcol(this) result(getNcol)
+    pure function Spheres_getNcol(this) result(getNcol)
     
         class(Spheres), intent(in) :: this        
         integer :: getNcol
@@ -93,7 +93,7 @@ contains
     
     !> Accessor : rMin
     
-    function Spheres_getRmin(this) result(getRmin)
+    pure function Spheres_getRmin(this) result(getRmin)
     
         class(Spheres), intent(in) :: this        
         real(DP) :: getRmin
@@ -104,7 +104,7 @@ contains
     
     !> Accessor : Nadapt
     
-    function Spheres_getNadapt(this) result(getNadapt)
+    pure function Spheres_getNadapt(this) result(getNadapt)
     
         class(Spheres), intent(in) :: this        
         integer :: getNadapt
@@ -260,7 +260,7 @@ contains
     
     end subroutine Spheres_definiteDeltaX
     
-    function Spheres_getDeltaX(this) result(getDeltaX)
+    pure function Spheres_getDeltaX(this) result(getDeltaX)
         
         class(Spheres), intent(in) :: this        
         real(DP) :: getDeltaX
@@ -268,6 +268,6 @@ contains
         ! average deltaX of 3 vector components
         getDeltaX = sum(this%deltaX)/size(this%deltaX)
         
-    end function Spheres_getDeltaX    
+    end function Spheres_getDeltaX
 
 end module class_spheres
