@@ -35,7 +35,7 @@ end module data_constants
 !***************************************************************************************************
 module data_cell
 
-use data_constants
+use data_precisions, only : DP
 
 implicit none
     
@@ -62,8 +62,7 @@ end module data_cell
 !***************************************************************************************************
 module data_particles
 
-use data_constants
-use data_cell
+use data_precisions, only : DP
 
 implicit none
 
@@ -93,9 +92,8 @@ end module data_particles
 !***************************************************************************************************
 module data_mc
 
-use data_constants
-use data_particles
-use data_cell
+use data_precisions, only : DP
+use data_particles, only : Ncol, dipol_Ncol
 
 implicit none
 
@@ -144,8 +142,9 @@ end module data_mc
 !***************************************************************************************************
 module data_potentiel
 
-use data_constants
-use data_particles
+use data_precisions, only : DP
+use data_cell, only : Lsize1
+use data_particles, only : hard_rMin
 
 implicit none
 
@@ -174,9 +173,9 @@ end module data_potentiel
 !***************************************************************************************************
 module data_neighbours
 
-use data_constants
-use data_cell
-use data_potentiel
+use data_precisions, only : DP
+use data_particles, only : dipol_rMin
+use data_potentiel, only : inter_rCut, hard_rCut, mix_rCut
 
 implicit none
 
@@ -198,8 +197,7 @@ end module data_neighbours
 !***************************************************************************************************
 module data_distrib
 
-use data_constants
-use data_cell
+use data_precisions, only : DP
 
 implicit none
 
