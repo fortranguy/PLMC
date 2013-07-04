@@ -4,6 +4,8 @@ program mc_canonical
 
 use, intrinsic :: iso_fortran_env, only : output_unit
 use data_precisions, only : DP
+use data_cell, only : Volume
+use data_particles, only : Ncol
 use data_mc, only : Nstep, Ntherm, Nmove, Nrotate
 use data_distrib, only : snap
 use class_mixingPotential
