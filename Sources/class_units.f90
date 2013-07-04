@@ -3,7 +3,6 @@
 module class_Units
 
 implicit none
-
 private
 
     type, public :: Units

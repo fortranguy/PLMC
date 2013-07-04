@@ -7,7 +7,6 @@ use data_cell, only : Volume
 use data_mc, only : Temperature, Nstep
 
 implicit none
-
 private
 
     type, public :: Observables

@@ -8,7 +8,6 @@ use data_cell, only : Dim, Lsize
 use data_neighbours, only : cell_neigh_coordMax, cell_neighs_nb
 
 implicit none
-
 private
 public :: Link
 
