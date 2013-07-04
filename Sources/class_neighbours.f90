@@ -2,10 +2,10 @@
 
 module class_neighbours
 
-use, intrinsic :: iso_fortran_env
-use data_constants
-use data_cell
-use data_neighbours
+use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
+use data_precisions, only : DP
+use data_cell, only : Dim, Lsize
+use data_neighbours, only : cell_neigh_coordMax, cell_neighs_nb
 
 implicit none
 
