@@ -41,8 +41,8 @@ public :: Link
         procedure :: cols_to_cells => Neighbours_cols_to_cells
         procedure :: remove_col_from_cell => Neighbours_remove_col_from_cell
         procedure :: add_col_to_cell => Neighbours_add_col_to_cell
-        procedure :: cell_coord_to_ind => Neighbours_cell_coord_to_ind
-        procedure :: cell_period => Neighbours_cell_period
+        procedure, private :: cell_coord_to_ind => Neighbours_cell_coord_to_ind
+        procedure, private :: cell_period => Neighbours_cell_period
         procedure :: cell_neighs_init => Neighbours_cell_neighs_init
         
     end type Neighbours
