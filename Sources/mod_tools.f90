@@ -2,7 +2,7 @@
 
 module mod_tools
 
-use, intrinsic :: iso_fortran_env
+use, intrinsic :: iso_fortran_env, only : output_unit, error_unit, iostat_end
 use data_precisions, only : DP, io_tiny, consist_tiny
 use data_cell, only : Dim, Lsize, Volume, kMax
 use data_particles, only : Ncol
