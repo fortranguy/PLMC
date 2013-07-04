@@ -237,7 +237,7 @@ contains
                         overlap = .true.
                         return
                     end if
-                    energ = energ + this%Epot_pair(r)
+                    energ = energ + this%Epot_pair(r_ij)
        
                 end if
                 

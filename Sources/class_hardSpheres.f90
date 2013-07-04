@@ -9,7 +9,7 @@ use data_potentiel, only : hard_rCut
 use data_mc, only : Temperature, hard_deltaX, hard_rejectFix, hard_Nadapt, hard_Nwidom
 use data_neighbours, only : cell_neighs_nb, hard_cell_Lsize
 use data_distrib, only : hard_snap_factor
-use mod_physics
+use mod_physics, only : dist
 use class_neighbours
 use class_mixingPotential
 use class_spheres

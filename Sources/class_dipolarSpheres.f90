@@ -12,7 +12,7 @@ use data_mc, only : Temperature, dipol_structure_iStep, dipol_deltaX, dipol_reje
 use data_potentiel, only : dipol_rCut, dipol_dr, dipol_alpha
 use data_neighbours, only : cell_neighs_nb, dipol_cell_Lsize
 use data_distrib, only : dipol_snap_factor
-use mod_physics
+use mod_physics, only : dist, distVec, random_surface, markov_surface, fourier
 use class_neighbours
 use class_mixingPotential
 use class_spheres
