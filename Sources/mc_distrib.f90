@@ -12,7 +12,7 @@ contains
 
     !> Calculate the volume of the sphere
     
-    function sphereVol(iDist)
+    pure function sphereVol(iDist)
     
         integer, intent(in) :: iDist    
         real(DP) :: sphereVol
