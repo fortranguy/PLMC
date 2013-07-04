@@ -3,9 +3,8 @@
 module class_observables
 
 use data_precisions, only : DP
-use data_constants
 use data_cell, only : Volume
-use data_mc
+use data_mc, only : Temperature, Nstep
 
 implicit none
 
