@@ -8,7 +8,7 @@ use data_cell, only : Dim
 use data_particles, only : mix_rMin
 use data_potentiel, only : mix_rCut, mix_dr, mix_epsilon, mix_alpha
 use data_neighbours, only : cell_neighs_nb, mix_cell_Lsize
-use mod_physics
+use mod_physics, only : dist
 use class_neighbours
 
 implicit none

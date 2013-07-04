@@ -141,7 +141,7 @@ contains
         logical, intent(out) :: overlap
     
         integer :: iNeigh,  iCell_neigh
-        real(DP) :: r
+        real(DP) :: r_ij
     
         type(Link), pointer :: current => null(), next => null()
         
@@ -159,8 +159,8 @@ contains
             
                 if (current%iCol /= iCol) then
                 
-                    r = dist(xCol(:), this%positions(:, current%iCol))
-                    if (r < this%rMin) then
+                    r_ij = dist(xCol(:), this%positions(:, current%iCol))
+                    if (r_ij < this%rMin) then
                         overlap = .true.
                         return
                     end if
