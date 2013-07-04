@@ -93,7 +93,8 @@ end module data_particles
 module data_mc
 
 use data_precisions, only : DP
-use data_particles, only : Ncol, dipol_Ncol
+use data_cell, only : Dim
+use data_particles, only : Ncol, dipol_Ncol, inter_Ncol!, hard_Ncol
 
 implicit none
 
@@ -115,7 +116,7 @@ implicit none
     real(DP), parameter :: dipol_rejectRotFix = 0.17_DP
     integer, parameter :: dipol_NadaptRot = Ntherm/8
     ! chemical potential
-    integer, parameter :: dipol_Nwidom = 500
+    integer, parameter :: dipol_Nwidom = 500 ! dipol_Ncol
     
     real(DP), dimension(Dim), parameter :: inter_deltaX = 1._DP
     real(DP), parameter :: inter_rejectFix = 0.5_DP
@@ -125,7 +126,7 @@ implicit none
     real(DP), dimension(Dim), parameter :: hard_deltaX = 0.5_DP
     real(DP), parameter :: hard_rejectFix = 0.5_DP
     integer, parameter :: hard_Nadapt = Ntherm/8
-    integer, parameter :: hard_Nwidom = 500
+    integer, parameter :: hard_Nwidom = 500 ! hard_Ncol
 
 end module data_mc
 !***************************************************************************************************
@@ -174,6 +175,7 @@ end module data_potentiel
 module data_neighbours
 
 use data_precisions, only : DP
+use data_cell, only : Dim
 use data_particles, only : dipol_rMin
 use data_potentiel, only : inter_rCut, hard_rCut, mix_rCut
 
