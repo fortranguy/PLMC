@@ -12,7 +12,9 @@ use class_neighbours
 implicit none
 private
 
-    type, public :: Spheres
+    type, public :: Spheres ! This class must be private according to the encapsulation principle.
+                            ! Nevertheless, it is public for inheritance.
+                            ! It must not be instanciated in the main program.
     
         !private
         character(len=5) :: name
