@@ -181,7 +181,7 @@ contains
 
     end subroutine InteractingSpheres_Epot_print
 
-    function InteractingSpheres_Epot_pair(this, r) result(Epot_pair)
+    pure function InteractingSpheres_Epot_pair(this, r) result(Epot_pair)
         
         class(InteractingSpheres), intent(in) :: this
         real(DP), intent(in) :: r
@@ -375,7 +375,7 @@ contains
 
     !> Total potential energy
     
-    function InteractingSpheres_Epot_conf(this) result(Epot_conf)
+    pure function InteractingSpheres_Epot_conf(this) result(Epot_conf)
     
         class(InteractingSpheres), intent(in) :: this
         real(DP) :: Epot_conf
