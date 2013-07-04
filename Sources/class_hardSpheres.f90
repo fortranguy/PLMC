@@ -2,13 +2,13 @@
 
 module class_hardSpheres
 
-use data_constants
-use data_cell
-use data_particles
-use data_potentiel
-use data_mc
-use data_neighbours
-use data_distrib
+use data_precisions, only : DP
+use data_cell, only : Dim
+use data_particles, only : hard_radius, hard_rMin, hard_Ncol
+use data_potentiel, only : hard_rCut
+use data_mc, only : Temperature, hard_deltaX, hard_rejectFix, hard_Nadapt, hard_Nwidom
+use data_neighbours, only : cell_neighs_nb, hard_cell_Lsize
+use data_distrib, only : hard_snap_factor
 use mod_physics
 use class_neighbours
 use class_mixingPotential
