@@ -9,7 +9,7 @@ use data_cell, only : Dim, Lsize, LsizeMi, Kmax
 
 implicit none
 private
-public dist, distVec, gauss, random_surface, markov_surface, fourier
+public dist, distVec, random_surface, markov_surface, fourier
 
 contains
 
