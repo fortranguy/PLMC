@@ -3,8 +3,9 @@
 module class_dipolarSpheres
 
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
-use data_precisions, only : DP, consist_tiny 
-use data_cell, only : Dim, Volume
+use data_precisions, only : DP, consist_tiny
+use data_constants, only : PI
+use data_cell, only : Dim, Lsize, kMax, Volume
 use data_particles, only : dipol_radius, dipol_rMin, dipol_Ncol
 use data_mc, only : Temperature, dipol_structure_iStep, dipol_deltaX, dipol_rejectFix, dipol_Nadapt, &
                     dipol_deltaM, dipol_deltaMmax, dipol_rejectRotFix, dipol_NadaptRot, dipol_Nwidom

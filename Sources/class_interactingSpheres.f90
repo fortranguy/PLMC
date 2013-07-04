@@ -3,7 +3,7 @@
 module class_interactingSpheres
 
 use data_precisions, only : DP, consist_tiny
-use data_cell, only : Dim
+use data_cell, only : Dim, Lsize
 use data_particles, only : inter_radius, inter_rMin, inter_Ncol
 use data_potentiel, only : inter_rCut, inter_dr, inter_epsilon, inter_alpha
 use data_mc, only : Temperature, inter_deltaX, inter_rejectFix, inter_Nadapt, inter_Nwidom

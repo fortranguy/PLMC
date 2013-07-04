@@ -9,11 +9,14 @@ use data_cell, only : Dim, Lsize, LsizeMi, Kmax
 
 implicit none
 
+private
+public dist, distVec, gauss, random_surface, markov_surface, fourier
+
 contains
 
     !> Distance between 2 positions with Periodic Boundary Conditions
     
-    function dist(xCol1, xCol2)
+    pure function dist(xCol1, xCol2)
     
         real(DP), dimension(:), intent(in) :: xCol1, xCol2        
         real(DP) :: dist
@@ -26,7 +29,7 @@ contains
     
     end function dist
     
-    function distVec(xCol1, xCol2)
+    pure function distVec(xCol1, xCol2)
     
         real(DP), dimension(:), intent(in) :: xCol1, xCol2
         real(DP), dimension(Dim) :: distVec
