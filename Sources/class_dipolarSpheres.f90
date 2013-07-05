@@ -113,11 +113,11 @@ private
     
 contains
 
-    subroutine DipolarSpheres_construct(this, shared_cell_Lsize, shared_rCut)
+    subroutine DipolarSpheres_construct(this, mix_cell_Lsize, mix_rCut)
     
         class(DipolarSpheres), intent(out) :: this
-        real(DP), dimension(:), intent(in) :: shared_cell_Lsize
-        real(DP), intent(in) :: shared_rCut
+        real(DP), dimension(:), intent(in) :: mix_cell_Lsize
+        real(DP), intent(in) :: mix_rCut
         
         this%name = "dipol"
     
@@ -163,7 +163,7 @@ contains
         call this%same%alloc_cells()
         call this%same%cell_neighs_init()
         ! Neighbours : other kind
-        call this%mix%construct(shared_cell_Lsize, shared_rCut)
+        call this%mix%construct(mix_cell_Lsize, mix_rCut)
         call this%mix%alloc_cells()
         call this%mix%cell_neighs_init()
     
