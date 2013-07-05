@@ -2,16 +2,19 @@
 
 program mc_canonical
 
-use, intrinsic :: iso_fortran_env
-use data_constants
-use data_mc
-use data_distrib
+use, intrinsic :: iso_fortran_env, only : output_unit
+use data_precisions, only : DP
+use data_cell, only : Volume
+use data_particles, only : Ncol
+use data_mc, only : Nstep, Ntherm, Nmove, Nrotate
+use data_distrib, only : snap
 use class_mixingPotential
 use class_dipolarSpheres
 use class_hardSpheres
 use class_observables
 use class_units
-use mod_tools
+use mod_tools, only : initRandomSeed, initialCondition, report, consistTest, printResults, &
+                      mix_printResults
 
 implicit none
     

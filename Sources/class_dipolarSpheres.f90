@@ -2,15 +2,17 @@
 
 module class_dipolarSpheres
 
-use, intrinsic :: iso_fortran_env
-use data_constants
-use data_cell
-use data_particles
-use data_potentiel
-use data_mc
-use data_neighbours
-use data_distrib
-use mod_physics
+use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
+use data_precisions, only : DP, consist_tiny
+use data_constants, only : PI
+use data_cell, only : Dim, Lsize, kMax, Volume
+use data_particles, only : dipol_radius, dipol_rMin, dipol_Ncol
+use data_mc, only : Temperature, dipol_structure_iStep, dipol_deltaX, dipol_rejectFix, dipol_Nadapt, &
+                    dipol_deltaM, dipol_deltaMmax, dipol_rejectRotFix, dipol_NadaptRot, dipol_Nwidom
+use data_potentiel, only : dipol_rCut, dipol_dr, dipol_alpha
+use data_neighbours, only : cell_neighs_nb, dipol_cell_Lsize
+use data_distrib, only : dipol_snap_factor
+use mod_physics, only : dist, distVec, random_surface, markov_surface, fourier
 use class_neighbours
 use class_mixingPotential
 use class_spheres
@@ -70,34 +72,34 @@ private
         
         !> Potential energy
         !>     Real
-        procedure :: Epot_real_init => DipolarSpheres_Epot_real_init
+        procedure, private :: Epot_real_init => DipolarSpheres_Epot_real_init
         procedure :: Epot_real_print => DipolarSpheres_Epot_real_print
-        procedure :: Epot_real_interpol => DipolarSpheres_Epot_real_interpol
+        procedure, private :: Epot_real_interpol => DipolarSpheres_Epot_real_interpol
         procedure :: Epot_real_pair => DipolarSpheres_Epot_real_pair
-        procedure :: Epot_real_overlapTest => DipolarSpheres_Epot_real_overlapTest
-        procedure :: Epot_real_solo => DipolarSpheres_Epot_real_solo
-        procedure :: Epot_real => DipolarSpheres_Epot_real
+        procedure, private :: Epot_real_overlapTest => DipolarSpheres_Epot_real_overlapTest
+        procedure, private :: Epot_real_solo => DipolarSpheres_Epot_real_solo
+        procedure, private :: Epot_real => DipolarSpheres_Epot_real
         !>     Reciprocal : init
         procedure :: Epot_reci_init => DipolarSpheres_Epot_reci_init
-        procedure :: Epot_reci_weight_init => DipolarSpheres_Epot_reci_weight_init
-        procedure :: Epot_reci_structure_init => DipolarSpheres_Epot_reci_structure_init
-        procedure :: Epot_reci_structure_moduli => DipolarSpheres_Epot_reci_structure_moduli
+        procedure, private :: Epot_reci_weight_init => DipolarSpheres_Epot_reci_weight_init
+        procedure, private :: Epot_reci_structure_init => DipolarSpheres_Epot_reci_structure_init
+        procedure, private :: Epot_reci_structure_moduli => DipolarSpheres_Epot_reci_structure_moduli
         procedure :: Epot_reci_structure_reInit => DipolarSpheres_Epot_reci_structure_reInit
-        procedure :: Epot_reci_potential_init => DipolarSpheres_Epot_reci_potential_init
+        procedure, private :: Epot_reci_potential_init => DipolarSpheres_Epot_reci_potential_init
         procedure :: Epot_reci_countNwaveVectors => DipolarSpheres_Epot_reci_countNwaveVectors
         !>     Reciprocal : delta
-        procedure :: deltaEpot_reci_move => DipolarSpheres_deltaEpot_reci_move
-        procedure :: deltaEpot_reci_move_updateStructure => &
-                     DipolarSpheres_deltaEpot_reci_move_updateStructure
-        procedure :: deltaEpot_reci_rotate => DipolarSpheres_deltaEpot_reci_rotate
-        procedure :: deltaEpot_reci_rotate_updateStructure => &
-                     DipolarSpheres_deltaEpot_reci_rotate_updateStructure
-        procedure :: deltaEpot_reci_test => DipolarSpheres_deltaEpot_reci_test
+        procedure, private :: deltaEpot_reci_move => DipolarSpheres_deltaEpot_reci_move
+        procedure, private :: deltaEpot_reci_move_updateStructure => &
+                              DipolarSpheres_deltaEpot_reci_move_updateStructure
+        procedure, private :: deltaEpot_reci_rotate => DipolarSpheres_deltaEpot_reci_rotate
+        procedure, private :: deltaEpot_reci_rotate_updateStructure => &
+                              DipolarSpheres_deltaEpot_reci_rotate_updateStructure
+        procedure, private :: deltaEpot_reci_test => DipolarSpheres_deltaEpot_reci_test
         !>     Reciprocal : total
-        procedure :: Epot_reci => DipolarSpheres_Epot_reci
+        procedure, private :: Epot_reci => DipolarSpheres_Epot_reci
         !>     Self
-        procedure :: Epot_self_solo => DipolarSpheres_Epot_self_solo
-        procedure :: Epot_self => DipolarSpheres_Epot_self
+        procedure, private :: Epot_self_solo => DipolarSpheres_Epot_self_solo
+        procedure, private :: Epot_self => DipolarSpheres_Epot_self
         !>     Total
         procedure :: Epot_conf => DipolarSpheres_Epot_conf
         procedure :: consistTest => DipolarSpheres_consistTest
@@ -111,11 +113,11 @@ private
     
 contains
 
-    subroutine DipolarSpheres_construct(this, shared_cell_Lsize, shared_rCut)
+    subroutine DipolarSpheres_construct(this, mix_cell_Lsize, mix_rCut)
     
         class(DipolarSpheres), intent(out) :: this
-        real(DP), dimension(:), intent(in) :: shared_cell_Lsize
-        real(DP), intent(in) :: shared_rCut
+        real(DP), dimension(:), intent(in) :: mix_cell_Lsize
+        real(DP), intent(in) :: mix_rCut
         
         this%name = "dipol"
     
@@ -159,11 +161,11 @@ contains
         ! Neighbours : same kind
         call this%same%construct(dipol_cell_Lsize, this%rCut)
         call this%same%alloc_cells()
-        call this%same%ini_cell_neighs()
+        call this%same%cell_neighs_init()
         ! Neighbours : other kind
-        call this%mix%construct(shared_cell_Lsize, shared_rCut)
+        call this%mix%construct(mix_cell_Lsize, mix_rCut)
         call this%mix%alloc_cells()
-        call this%mix%ini_cell_neighs()
+        call this%mix%cell_neighs_init()
     
     end subroutine DipolarSpheres_construct
     
@@ -296,7 +298,7 @@ contains
     
     !> Accessor : deltaM
     
-    function DipolarSpheres_getDeltaM(this) result(getDeltaM)
+    pure function DipolarSpheres_getDeltaM(this) result(getDeltaM)
         
         class(DipolarSpheres), intent(in) :: this        
         real(DP) :: getDeltaM
@@ -307,7 +309,7 @@ contains
     
     !> Accessor : Nadapt
     
-    function DipolarSpheres_getNadaptRot(this) result(getNadaptRot)
+    pure function DipolarSpheres_getNadaptRot(this) result(getNadaptRot)
     
         class(DipolarSpheres), intent(in) :: this        
         integer :: getNadaptRot
@@ -318,7 +320,7 @@ contains
     
     !> Accessor : structure_iStep
     
-    function DipolarSpheres_getStructure_iStep(this) result (getStructure_iStep)
+    pure function DipolarSpheres_getStructure_iStep(this) result (getStructure_iStep)
     
         class(DipolarSpheres), intent(in) :: this
         integer :: getStructure_iStep
@@ -385,7 +387,7 @@ contains
     
     !> Linear interpolation
 
-    function DipolarSpheres_Epot_real_interpol(this, r) result(Epot_real_interpol)
+    pure function DipolarSpheres_Epot_real_interpol(this, r) result(Epot_real_interpol)
         
         class(DipolarSpheres), intent(in) :: this
         real(DP), intent(in) :: r
@@ -413,8 +415,8 @@ contains
     !> \f[ (\vec{\mu}_i\cdot\vec{\mu}_j) B(r_{ij}) - 
     !>     (\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij}) C(r_{ij}) \f]
     
-    function DipolarSpheres_Epot_real_pair(this, mCol_i, mCol_j, rVec_ij, r_ij) &
-                     result(Epot_real_pair)
+    pure function DipolarSpheres_Epot_real_pair(this, mCol_i, mCol_j, rVec_ij, r_ij) &
+                  result(Epot_real_pair)
     
         class(DipolarSpheres), intent(in) :: this
         real(DP), dimension(:), intent(in) :: mCol_i, mCol_j
@@ -480,7 +482,7 @@ contains
     
     !> Energy of 1 dipole with others
     
-    function DipolarSpheres_Epot_real_solo(this, iCol, xCol, mCol) result(Epot_real_solo)
+    pure function DipolarSpheres_Epot_real_solo(this, iCol, xCol, mCol) result(Epot_real_solo)
 
         class(DipolarSpheres), intent(in) :: this
         integer, intent(in) :: iCol
@@ -511,7 +513,7 @@ contains
     
     !> Total real energy
     
-    function DipolarSpheres_Epot_real(this) result(Epot_real)
+    pure function DipolarSpheres_Epot_real(this) result(Epot_real)
     
         class(DipolarSpheres), intent(in) :: this
         real(DP) :: Epot_real
@@ -655,7 +657,7 @@ contains
     
     !> Symmetry : half wave vectors in do loop : kMax2
     
-    function kMax2_sym(kz)
+    pure function kMax2_sym(kz)
 
         integer, intent(in) :: kz
         integer :: kMax2_sym
@@ -670,7 +672,7 @@ contains
     
     !> Symmetry : half wave vectors in do loop : kMax1
 
-    function kMax1_sym(ky, kz)
+    pure function kMax1_sym(ky, kz)
 
         integer, intent(in) :: ky, kz
         integer :: kMax1_sym
@@ -685,7 +687,7 @@ contains
     
     !> To calculate the drift of the strucutre factor
 
-    function DipolarSpheres_Epot_reci_structure_moduli(this) result(Epot_reci_structure_moduli)
+    pure function DipolarSpheres_Epot_reci_structure_moduli(this) result(Epot_reci_structure_moduli)
 
         class(DipolarSpheres), intent(in) :: this
         real(DP) :: Epot_reci_structure_moduli
@@ -853,7 +855,7 @@ contains
     !> \f]
     !>
 
-    function DipolarSpheres_deltaEpot_reci_move(this, lCol, xNew) result(deltaEpot_reci_move)
+    pure function DipolarSpheres_deltaEpot_reci_move(this, lCol, xNew) result(deltaEpot_reci_move)
 
         class(DipolarSpheres), intent(in) :: this
         integer, intent(in) :: lCol
@@ -1031,7 +1033,7 @@ contains
     !>               \}
     !> \f]
 
-    function DipolarSpheres_deltaEpot_reci_rotate(this, lCol, mNew) result(deltaEpot_reci_rotate)
+    pure function DipolarSpheres_deltaEpot_reci_rotate(this, lCol, mNew) result(deltaEpot_reci_rotate)
 
         class(DipolarSpheres), intent(in) :: this
         integer, intent(in) :: lCol
@@ -1187,7 +1189,7 @@ contains
     !>                          \}
     !> \f]
 
-    function DipolarSpheres_deltaEpot_reci_test(this, xTest, mTest) result(deltaEpot_reci_test)
+    pure function DipolarSpheres_deltaEpot_reci_test(this, xTest, mTest) result(deltaEpot_reci_test)
 
         class(DipolarSpheres), intent(in) :: this
         real(DP), dimension(Dim), intent(in) :: xTest
@@ -1259,7 +1261,7 @@ contains
     
     !> Total reciprocal energy
     
-    function DipolarSpheres_Epot_reci(this) result(Epot_reci)
+    pure function DipolarSpheres_Epot_reci(this) result(Epot_reci)
         
         class(DipolarSpheres), intent(in) :: this
         real(DP) :: Epot_reci
@@ -1288,7 +1290,7 @@ contains
     !> Self energy of 1 dipole
     !> \f[ \frac{2}{3}\frac{\alpha^3}{\sqrt{\pi}} \vec{\mu}_i\cdot\vec{\mu}_i \f]
     
-    function DipolarSpheres_Epot_self_solo(this, mCol) result(Epot_self_solo)
+    pure function DipolarSpheres_Epot_self_solo(this, mCol) result(Epot_self_solo)
     
         class(DipolarSpheres), intent(in) :: this
         real(DP), dimension(:), intent(in) :: mCol
@@ -1301,7 +1303,7 @@ contains
     !> Total self energy
     !> \f[ \frac{2}{3}\frac{\alpha^3}{\sqrt{\pi}} \sum_i \vec{\mu}_i\cdot\vec{\mu}_i \f]
     
-    function DipolarSpheres_Epot_self(this) result(Epot_self)
+    pure function DipolarSpheres_Epot_self(this) result(Epot_self)
     
         class(DipolarSpheres), intent(in) :: this
         real(DP) :: Epot_self
@@ -1376,13 +1378,13 @@ contains
                     mix_Epot = mix_Epot + mix_deltaEpot
                     
                     if (same_iCellOld /= same_iCellNew) then
-                        call this%same%remove_cell_col(iOld, same_iCellOld)
-                        call this%same%add_cell_col(iOld, same_iCellNew)
+                        call this%same%remove_col_from_cell(iOld, same_iCellOld)
+                        call this%same%add_col_to_cell(iOld, same_iCellNew)
                     end if
                     
                     if (mix_iCellOld /= mix_iCellNew) then
-                        call other%mix%remove_cell_col(iOld, mix_iCellOld)
-                        call other%mix%add_cell_col(iOld, mix_iCellNew)
+                        call other%mix%remove_col_from_cell(iOld, mix_iCellOld)
+                        call other%mix%add_col_to_cell(iOld, mix_iCellNew)
                     end if
                     
                 else
@@ -1495,7 +1497,7 @@ contains
 
     !> Total potential energy
     
-    function DipolarSpheres_Epot_conf(this) result(Epot_conf)
+    pure function DipolarSpheres_Epot_conf(this) result(Epot_conf)
     
         class(DipolarSpheres), intent(in) :: this        
         real(DP) :: Epot_conf

@@ -2,16 +2,19 @@
 
 module mod_tools
 
-use, intrinsic :: iso_fortran_env
-use data_constants
-use data_particles
-use data_mc
-use mod_physics
+use, intrinsic :: iso_fortran_env, only : output_unit, error_unit, iostat_end
+use data_precisions, only : DP, io_tiny, consist_tiny
+use data_cell, only : Dim, Lsize, Volume, kMax
+use data_particles, only : Ncol
+use data_mc, only : Temperature, Nstep, decorrelFactor, Ntherm, Nmove, Nrotate
+use mod_physics, only : dist, random_surface
 use class_spheres
 use class_dipolarSpheres
 use class_hardSpheres
 
 implicit none
+private
+public initRandomSeed, initialCondition, report, consistTest, printResults, mix_printResults
 
 contains
 

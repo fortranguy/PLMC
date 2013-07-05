@@ -2,14 +2,13 @@
 
 module class_mixingPotential
 
-use, intrinsic :: iso_fortran_env
-use data_constants
-use data_cell
-use data_particles
-use data_mc
-use data_potentiel
-use data_neighbours
-use mod_physics
+use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
+use data_precisions, only : DP
+use data_cell, only : Dim
+use data_particles, only : mix_rMin
+use data_potentiel, only : mix_rCut, mix_dr, mix_epsilon, mix_alpha
+use data_neighbours, only : cell_neighs_nb, mix_cell_Lsize
+use mod_physics, only : dist
 use class_neighbours
 
 implicit none
@@ -46,7 +45,7 @@ private
         
         procedure :: overlapTest => MixingPotential_overlapTest
 
-        procedure :: Epot_init => MixingPotential_Epot_init
+        procedure, private :: Epot_init => MixingPotential_Epot_init
         procedure :: Epot_print => MixingPotential_Epot_print
         procedure :: Epot_pair => MixingPotential_Epot_pair
         procedure :: Epot_neigh => MixingPotential_Epot_neigh
@@ -108,7 +107,7 @@ contains
     
     !> Accessor : rMin
     
-    function MixingPotential_getRmin(this) result(getRmin)
+    pure function MixingPotential_getRmin(this) result(getRmin)
     
         class(MixingPotential), intent(in) :: this        
         real(DP) :: getRmin
@@ -119,7 +118,7 @@ contains
     
     !> Accessor : rCut
     
-    function MixingPotential_getRcut(this) result(getRcut)
+    pure function MixingPotential_getRcut(this) result(getRcut)
     
         class(MixingPotential), intent(in) :: this        
         real(DP) :: getRcut
@@ -130,7 +129,7 @@ contains
     
     !> Accessor : cell_Lsize
     
-    function MixingPotential_getCell_Lsize(this) result(getCell_Lsize)
+    pure function MixingPotential_getCell_Lsize(this) result(getCell_Lsize)
     
         class(MixingPotential), intent(in) :: this        
         real(DP), dimension(Dim) :: getCell_Lsize
@@ -209,7 +208,7 @@ contains
 
     end subroutine MixingPotential_Epot_print
 
-    function MixingPotential_Epot_pair(this, r) result(Epot_pair)
+    pure function MixingPotential_Epot_pair(this, r) result(Epot_pair)
         
         class(MixingPotential), intent(in) :: this
         real(DP), intent(in) :: r
@@ -279,7 +278,7 @@ contains
     
     !> Total potential energy
     
-    function MixingPotential_Epot_conf(this, type1_positions, type2_positions) result(Epot_conf)
+    pure function MixingPotential_Epot_conf(this, type1_positions, type2_positions) result(Epot_conf)
     
         class(MixingPotential), intent(in) :: this
         real(DP), dimension(:, :), intent(in) :: type1_positions, type2_positions

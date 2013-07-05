@@ -2,15 +2,14 @@
 
 module class_interactingSpheres
 
-use, intrinsic :: iso_fortran_env
-use data_constants
-use data_cell
-use data_particles
-use data_potentiel
-use data_mc
-use data_neighbours
-use data_distrib
-use mod_physics
+use data_precisions, only : DP, consist_tiny
+use data_cell, only : Dim, Lsize
+use data_particles, only : inter_radius, inter_rMin, inter_Ncol
+use data_potentiel, only : inter_rCut, inter_dr, inter_epsilon, inter_alpha
+use data_mc, only : Temperature, inter_deltaX, inter_rejectFix, inter_Nadapt, inter_Nwidom
+use data_neighbours, only : cell_neighs_nb, inter_cell_Lsize
+use data_distrib, only : inter_snap_factor
+use mod_physics, only : dist
 use class_neighbours
 use class_mixingPotential
 use class_spheres
@@ -41,10 +40,10 @@ private
         procedure :: PrintReport => InteractingSpheres_printReport
         
         !> Potential energy
-        procedure :: Epot_init => InteractingSpheres_Epot_init
+        procedure, private :: Epot_init => InteractingSpheres_Epot_init
         procedure :: Epot_print => InteractingSpheres_Epot_print
         procedure :: Epot_pair => InteractingSpheres_Epot_pair
-        procedure :: Epot_neigh => InteractingSpheres_Epot_neigh
+        procedure, private :: Epot_neigh => InteractingSpheres_Epot_neigh
         procedure :: Epot_conf => InteractingSpheres_Epot_conf
         procedure :: consistTest => InteractingSpheres_consistTest
         
@@ -56,11 +55,11 @@ private
     
 contains
 
-    subroutine InteractingSpheres_construct(this, shared_cell_Lsize, shared_rCut)
+    subroutine InteractingSpheres_construct(this, mix_cell_Lsize, mix_rCut)
     
         class(InteractingSpheres), intent(out) :: this
-        real(DP), dimension(:), intent(in) :: shared_cell_Lsize
-        real(DP), intent(in) :: shared_rCut
+        real(DP), dimension(:), intent(in) :: mix_cell_Lsize
+        real(DP), intent(in) :: mix_rCut
         
         this%name = "inter"
     
@@ -93,11 +92,11 @@ contains
         ! Neighbours : same kind
         call this%same%construct(inter_cell_Lsize, this%rCut)
         call this%same%alloc_cells()
-        call this%same%ini_cell_neighs()
+        call this%same%cell_neighs_init()
         ! Neighbours : other kind
-        call this%mix%construct(shared_cell_Lsize, shared_rCut)
+        call this%mix%construct(mix_cell_Lsize, mix_rCut)
         call this%mix%alloc_cells()
-        call this%mix%ini_cell_neighs()
+        call this%mix%cell_neighs_init()
     
     end subroutine InteractingSpheres_construct
     
@@ -182,7 +181,7 @@ contains
 
     end subroutine InteractingSpheres_Epot_print
 
-    function InteractingSpheres_Epot_pair(this, r) result(Epot_pair)
+    pure function InteractingSpheres_Epot_pair(this, r) result(Epot_pair)
         
         class(InteractingSpheres), intent(in) :: this
         real(DP), intent(in) :: r
@@ -214,7 +213,7 @@ contains
         real(DP), intent(out) :: energ
     
         integer :: iNeigh,  iCell_neigh
-        real(DP) :: r
+        real(DP) :: r_ij
     
         type(Link), pointer :: current => null(), next => null()
         
@@ -233,12 +232,12 @@ contains
             
                 if (current%iCol /= iCol) then
                 
-                    r = dist(xCol(:), this%positions(:, current%iCol))
-                    if (r < this%rMin) then
+                    r_ij = dist(xCol(:), this%positions(:, current%iCol))
+                    if (r_ij < this%rMin) then
                         overlap = .true.
                         return
                     end if
-                    energ = energ + this%Epot_pair(r)
+                    energ = energ + this%Epot_pair(r_ij)
        
                 end if
                 
@@ -305,13 +304,13 @@ contains
                     mix_Epot = mix_Epot + mix_deltaEpot
                     
                     if (same_iCellOld /= same_iCellNew) then
-                        call this%same%remove_cell_col(iOld, same_iCellOld)
-                        call this%same%add_cell_col(iOld, same_iCellNew)
+                        call this%same%remove_col_from_cell(iOld, same_iCellOld)
+                        call this%same%add_col_to_cell(iOld, same_iCellNew)
                     end if
                     
                     if (mix_iCellOld /= mix_iCellNew) then
-                        call other%mix%remove_cell_col(iOld, mix_iCellOld)
-                        call other%mix%add_cell_col(iOld, mix_iCellNew)
+                        call other%mix%remove_col_from_cell(iOld, mix_iCellOld)
+                        call other%mix%add_col_to_cell(iOld, mix_iCellNew)
                     end if
                     
                 else
@@ -376,7 +375,7 @@ contains
 
     !> Total potential energy
     
-    function InteractingSpheres_Epot_conf(this) result(Epot_conf)
+    pure function InteractingSpheres_Epot_conf(this) result(Epot_conf)
     
         class(InteractingSpheres), intent(in) :: this
         real(DP) :: Epot_conf

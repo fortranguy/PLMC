@@ -2,14 +2,14 @@
 
 module class_hardSpheres
 
-use data_constants
-use data_cell
-use data_particles
-use data_potentiel
-use data_mc
-use data_neighbours
-use data_distrib
-use mod_physics
+use data_precisions, only : DP
+use data_cell, only : Dim, Lsize
+use data_particles, only : hard_radius, hard_rMin, hard_Ncol
+use data_potentiel, only : hard_rCut
+use data_mc, only : Temperature, hard_deltaX, hard_rejectFix, hard_Nadapt, hard_Nwidom
+use data_neighbours, only : cell_neighs_nb, hard_cell_Lsize
+use data_distrib, only : hard_snap_factor
+use mod_physics, only : dist
 use class_neighbours
 use class_mixingPotential
 use class_spheres
@@ -36,7 +36,7 @@ private
               
         !> Potential energy
         procedure :: Epot_print => HardSpheres_Epot_print
-        procedure :: Epot_neigh => HardSpheres_Epot_neigh
+        procedure, private :: Epot_neigh => HardSpheres_Epot_neigh
         procedure :: Epot_conf => HardSpheres_Epot_conf
         procedure :: consistTest => HardSpheres_consistTest
         
@@ -48,11 +48,11 @@ private
     
 contains
 
-    subroutine HardSpheres_construct(this, shared_cell_Lsize, shared_rCut)
+    subroutine HardSpheres_construct(this, mix_cell_Lsize, mix_rCut)
     
         class(HardSpheres), intent(out) :: this
-        real(DP), dimension(:), intent(in) :: shared_cell_Lsize
-        real(DP), intent(in) :: shared_rCut
+        real(DP), dimension(:), intent(in) :: mix_cell_Lsize
+        real(DP), intent(in) :: mix_rCut
         
         this%name = "hardS"
     
@@ -79,11 +79,11 @@ contains
         ! Neighbours : same kind
         call this%same%construct(hard_cell_Lsize, this%rCut)
         call this%same%alloc_cells()
-        call this%same%ini_cell_neighs()
+        call this%same%cell_neighs_init()
         ! Neighbours : other kind
-        call this%mix%construct(shared_cell_Lsize, shared_rCut)
+        call this%mix%construct(mix_cell_Lsize, mix_rCut)
         call this%mix%alloc_cells()
-        call this%mix%ini_cell_neighs()
+        call this%mix%cell_neighs_init()
     
     end subroutine HardSpheres_construct
     
@@ -141,7 +141,7 @@ contains
         logical, intent(out) :: overlap
     
         integer :: iNeigh,  iCell_neigh
-        real(DP) :: r
+        real(DP) :: r_ij
     
         type(Link), pointer :: current => null(), next => null()
         
@@ -159,8 +159,8 @@ contains
             
                 if (current%iCol /= iCol) then
                 
-                    r = dist(xCol(:), this%positions(:, current%iCol))
-                    if (r < this%rMin) then
+                    r_ij = dist(xCol(:), this%positions(:, current%iCol))
+                    if (r_ij < this%rMin) then
                         overlap = .true.
                         return
                     end if
@@ -229,13 +229,13 @@ contains
                     mix_Epot = mix_Epot + mix_deltaEpot
                     
                     if (same_iCellOld /= same_iCellNew) then                
-                        call this%same%remove_cell_col(iOld, same_iCellOld)
-                        call this%same%add_cell_col(iOld, same_iCellNew)
+                        call this%same%remove_col_from_cell(iOld, same_iCellOld)
+                        call this%same%add_col_to_cell(iOld, same_iCellNew)
                     end if
                     
                     if (mix_iCellOld /= mix_iCellNew) then                
-                        call other%mix%remove_cell_col(iOld, mix_iCellOld)
-                        call other%mix%add_cell_col(iOld, mix_iCellNew)
+                        call other%mix%remove_col_from_cell(iOld, mix_iCellOld)
+                        call other%mix%add_col_to_cell(iOld, mix_iCellNew)
                     end if
                     
                 else
@@ -300,7 +300,7 @@ contains
     
     !> Total potential energy : dummy
     
-    function HardSpheres_Epot_conf(this) result(Epot_conf)
+    pure function HardSpheres_Epot_conf(this) result(Epot_conf)
     
         class(HardSpheres), intent(in) :: this        
         real(DP) :: Epot_conf

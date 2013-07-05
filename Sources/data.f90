@@ -1,17 +1,30 @@
 !***************************************************************************************************
+!> \brief Precisions data :
+!> declaration of precisions paramters
+!***************************************************************************************************
+module data_precisions
+
+implicit none
+
+    integer, parameter :: DP = selected_real_kind(15, 307) !< double precision
+    real(DP), parameter :: io_tiny = 1.E-10_DP
+    real(DP), parameter :: consist_tiny = 1.E-10_DP
+
+end module data_precisions 
+!***************************************************************************************************
+
+!***************************************************************************************************
 !> \brief Constants data :
 !> declaration of constants
 !***************************************************************************************************
 module data_constants
 
-implicit none
+use data_precisions, only : DP
 
-    ! double precision
-    integer, parameter :: DP = selected_real_kind(15, 307)
+implicit none
+    
     real(DP), parameter :: PI = acos(-1._DP)
-    real(DP), parameter :: sigma3d = 1._DP/sqrt(3._DP)
-    real(DP), parameter :: io_tiny = 1.E-10_DP
-    real(DP), parameter :: consist_tiny = 1.E-10_DP
+    real(DP), parameter :: sigma3d = 1._DP/sqrt(3._DP)    
         
 end module data_constants
 !***************************************************************************************************
@@ -22,7 +35,7 @@ end module data_constants
 !***************************************************************************************************
 module data_cell
 
-use data_constants
+use data_precisions, only : DP
 
 implicit none
     
@@ -49,8 +62,7 @@ end module data_cell
 !***************************************************************************************************
 module data_particles
 
-use data_constants
-use data_cell
+use data_precisions, only : DP
 
 implicit none
 
@@ -80,9 +92,9 @@ end module data_particles
 !***************************************************************************************************
 module data_mc
 
-use data_constants
-use data_particles
-use data_cell
+use data_precisions, only : DP
+use data_cell, only : Dim
+use data_particles, only : Ncol, dipol_Ncol, inter_Ncol!, hard_Ncol
 
 implicit none
 
@@ -104,7 +116,7 @@ implicit none
     real(DP), parameter :: dipol_rejectRotFix = 0.17_DP
     integer, parameter :: dipol_NadaptRot = Ntherm/8
     ! chemical potential
-    integer, parameter :: dipol_Nwidom = 500
+    integer, parameter :: dipol_Nwidom = 500 ! dipol_Ncol
     
     real(DP), dimension(Dim), parameter :: inter_deltaX = 1._DP
     real(DP), parameter :: inter_rejectFix = 0.5_DP
@@ -114,7 +126,7 @@ implicit none
     real(DP), dimension(Dim), parameter :: hard_deltaX = 0.5_DP
     real(DP), parameter :: hard_rejectFix = 0.5_DP
     integer, parameter :: hard_Nadapt = Ntherm/8
-    integer, parameter :: hard_Nwidom = 500
+    integer, parameter :: hard_Nwidom = 500 ! hard_Ncol
 
 end module data_mc
 !***************************************************************************************************
@@ -131,8 +143,9 @@ end module data_mc
 !***************************************************************************************************
 module data_potentiel
 
-use data_constants
-use data_particles
+use data_precisions, only : DP
+use data_cell, only : Lsize1
+use data_particles, only : hard_rMin
 
 implicit none
 
@@ -161,9 +174,10 @@ end module data_potentiel
 !***************************************************************************************************
 module data_neighbours
 
-use data_constants
-use data_cell
-use data_potentiel
+use data_precisions, only : DP
+use data_cell, only : Dim
+use data_particles, only : dipol_rMin
+use data_potentiel, only : inter_rCut, hard_rCut, mix_rCut
 
 implicit none
 
@@ -185,8 +199,7 @@ end module data_neighbours
 !***************************************************************************************************
 module data_distrib
 
-use data_constants
-use data_cell
+use data_precisions, only : DP
 
 implicit none
 

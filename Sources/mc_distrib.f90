@@ -2,8 +2,9 @@
 
 module mod_distrib
 
-use data_constants
-use data_distrib
+use data_precisions, only : DP
+use data_constants, only : PI
+use data_distrib, only : deltaDist
 
 implicit none
 
@@ -11,12 +12,12 @@ contains
 
     !> Calculate the volume of the sphere
     
-    function sphereVol(iDist)
+    pure function sphereVol(iDist)
     
         integer, intent(in) :: iDist    
         real(DP) :: sphereVol
         
-        sphereVol = 4._DP/3._DP * PI * ( real(iDist, DP)*deltaDist )**3
+        sphereVol = 4._DP/3._DP * PI * (real(iDist, DP)*deltaDist)**3
         
     end function sphereVol
     
@@ -26,11 +27,13 @@ end module mod_distrib
 
 program distribution
 
-use data_constants
-use data_distrib
+use data_precisions, only : DP
+use data_constants, only : PI
+use data_cell, only : LsizeMi, Volume
 use data_particles
 use data_mc
 use data_potentiel
+use data_distrib
 use mod_distrib
 use mod_physics
 use class_mixingPotential
@@ -39,7 +42,7 @@ use class_interactingSpheres
 
 implicit none
 
-    real(DP), parameter :: densite = real(inter_Ncol, DP) / (Lsize1*Lsize2*Lsize3)
+    real(DP), parameter :: densite = real(inter_Ncol, DP) / Volume
     integer, dimension(:), allocatable :: distrib
     integer, parameter :: snaps_unit = 10, distrib_unit = 11, energ_unit = 12
 

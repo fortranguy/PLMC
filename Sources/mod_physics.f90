@@ -2,17 +2,20 @@
 
 module mod_physics
 
-use data_constants
-use data_cell
+use data_precisions, only : DP
+use data_constants, only : PI, sigma3d
+use data_cell, only : Dim, Lsize, LsizeMi, Kmax
 !$ use omp_lib
 
 implicit none
+private
+public dist, distVec, random_surface, markov_surface, fourier
 
 contains
 
     !> Distance between 2 positions with Periodic Boundary Conditions
     
-    function dist(xCol1, xCol2)
+    pure function dist(xCol1, xCol2)
     
         real(DP), dimension(:), intent(in) :: xCol1, xCol2        
         real(DP) :: dist
@@ -25,7 +28,7 @@ contains
     
     end function dist
     
-    function distVec(xCol1, xCol2)
+    pure function distVec(xCol1, xCol2)
     
         real(DP), dimension(:), intent(in) :: xCol1, xCol2
         real(DP), dimension(Dim) :: distVec
@@ -124,7 +127,7 @@ contains
     
     !> Fourier coefficients (bases)
     
-    subroutine fourier(xColOverL, exp_Ikx_1, exp_Ikx_2, exp_Ikx_3)
+    pure subroutine fourier(xColOverL, exp_Ikx_1, exp_Ikx_2, exp_Ikx_3)
     
         real(DP), dimension(Dim), intent(in) :: xColOverL
         complex(DP), dimension(-Kmax(1):Kmax(1)), intent(out) :: exp_Ikx_1

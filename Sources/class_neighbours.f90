@@ -2,13 +2,12 @@
 
 module class_neighbours
 
-use, intrinsic :: iso_fortran_env
-use data_constants
-use data_cell
-use data_neighbours
+use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
+use data_precisions, only : DP
+use data_cell, only : Dim, Lsize
+use data_neighbours, only : cell_neigh_coordMax, cell_neighs_nb
 
 implicit none
-
 private
 public :: Link
 
@@ -40,11 +39,11 @@ public :: Link
         procedure :: check_cellsSize => Neighbours_check_cellsSize
         procedure :: position_to_cell => Neighbours_position_to_cell
         procedure :: cols_to_cells => Neighbours_cols_to_cells
-        procedure :: remove_cell_col => Neighbours_remove_cell_col
-        procedure :: add_cell_col => Neighbours_add_cell_col
-        procedure :: cell_coord_to_ind => Neighbours_cell_coord_to_ind
-        procedure :: cell_period => Neighbours_cell_period
-        procedure :: ini_cell_neighs => Neighbours_ini_cell_neighs
+        procedure :: remove_col_from_cell => Neighbours_remove_col_from_cell
+        procedure :: add_col_to_cell => Neighbours_add_col_to_cell
+        procedure, private :: cell_coord_to_ind => Neighbours_cell_coord_to_ind
+        procedure, private :: cell_period => Neighbours_cell_period
+        procedure :: cell_neighs_init => Neighbours_cell_neighs_init
         
     end type Neighbours
     
@@ -178,7 +177,7 @@ contains
     
     ! Assignment : particle -> cell
     
-    function Neighbours_position_to_cell(this, xCol) result(position_to_cell)
+    pure function Neighbours_position_to_cell(this, xCol) result(position_to_cell)
     
         class(Neighbours), intent(in) :: this
         real(DP), dimension(:), intent(in) :: xCol
@@ -225,7 +224,7 @@ contains
     
     ! Neighbours cells update
     
-    subroutine Neighbours_remove_cell_col(this, iCol, iCellOld)
+    subroutine Neighbours_remove_col_from_cell(this, iCol, iCellOld)
     
         class(Neighbours), intent(inout) :: this
     
@@ -258,9 +257,9 @@ contains
         
         end do
             
-    end subroutine Neighbours_remove_cell_col   
+    end subroutine Neighbours_remove_col_from_cell   
     
-    subroutine Neighbours_add_cell_col(this, iCol, iCellNew)
+    subroutine Neighbours_add_col_to_cell(this, iCol, iCellNew)
     
         class(Neighbours), intent(inout) :: this
     
@@ -290,11 +289,11 @@ contains
             
         end do
             
-    end  subroutine Neighbours_add_cell_col
+    end  subroutine Neighbours_add_col_to_cell
     
     ! Neighbour cells ------------------------------------------------------------------------------
 
-    function Neighbours_cell_coord_to_ind(this, coord) result(cell_coord_to_ind)
+    pure function Neighbours_cell_coord_to_ind(this, coord) result(cell_coord_to_ind)
         
         class(Neighbours), intent(in) :: this
         integer, dimension(:), intent(in) :: coord
@@ -305,7 +304,7 @@ contains
     
     end function Neighbours_cell_coord_to_ind
     
-    function cell_neigh_coord_to_ind(neigh_coord)
+    pure function cell_neigh_coord_to_ind(neigh_coord)
     
         integer, dimension(:), intent(in) :: neigh_coord        
         integer :: cell_neigh_coord_to_ind
@@ -315,7 +314,7 @@ contains
     
     end function cell_neigh_coord_to_ind
     
-    function Neighbours_cell_period(this, coord) result(cell_period)
+    pure function Neighbours_cell_period(this, coord) result(cell_period)
     
         class(Neighbours), intent(in) :: this    
         integer, dimension(:), intent(in) :: coord        
@@ -333,7 +332,7 @@ contains
     
     end function Neighbours_cell_period
     
-    subroutine Neighbours_ini_cell_neighs(this)
+    subroutine Neighbours_cell_neighs_init(this)
     
         class(Neighbours), intent(inout) :: this 
     
@@ -368,6 +367,6 @@ contains
         end do
         end do
             
-    end subroutine Neighbours_ini_cell_neighs
+    end subroutine Neighbours_cell_neighs_init
 
 end module class_neighbours

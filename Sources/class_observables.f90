@@ -2,11 +2,11 @@
 
 module class_observables
 
-use data_constants
-use data_mc
+use data_precisions, only : DP
+use data_cell, only : Volume
+use data_mc, only : Temperature, Nstep
 
 implicit none
-
 private
 
     type, public :: Observables
@@ -95,9 +95,9 @@ contains
         
         write(report_unit, *) "    average energy = ", this%EpotSum/real(Nstep, DP)
             
-        potChiId = -Temperature*log( Volume/real(Ncol+1,DP) )
+        potChiId = -Temperature*log(Volume/real(Ncol+1,DP))
         write(report_unit, *) "    ideal chemical potential = ", potChiId
-        potChiEx = -Temperature*log( this%activSum/real(Nstep, DP) )
+        potChiEx = -Temperature*log(this%activSum/real(Nstep, DP))
         write(report_unit, *) "    average excess chemical potential = ", potChiEx           
         write(report_unit, *) "    potChi.avg = ", potChiId + potChiEx
         

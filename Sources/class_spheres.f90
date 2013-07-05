@@ -2,21 +2,20 @@
 
 module class_spheres
 
-use, intrinsic :: iso_fortran_env
-use data_constants
-use data_cell
-use data_mc
-use data_neighbours
-use mod_physics
+use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
+use data_precisions, only : DP
+use data_constants, only : PI
+use data_cell, only : Dim, Lsize, Volume
+use mod_physics, only : dist
 use class_neighbours
 
 implicit none
-
 private
 
-    type, public :: Spheres
+    type, public :: Spheres ! This class must be private according to the encapsulation principle.
+                            ! Nevertheless, it is public for inheritance.
+                            ! It must not be instanciated in the main program.
     
-        !private
         character(len=5) :: name
 
         ! Particles
@@ -72,7 +71,7 @@ contains
 
     !> Accessor : name
 
-    function Spheres_getName(this) result(getName)
+    pure function Spheres_getName(this) result(getName)
     
         class(Spheres), intent(in) :: this        
         character(len=5) :: getName
@@ -83,7 +82,7 @@ contains
 
     !> Accessor : Ncol
 
-    function Spheres_getNcol(this) result(getNcol)
+    pure function Spheres_getNcol(this) result(getNcol)
     
         class(Spheres), intent(in) :: this        
         integer :: getNcol
@@ -94,7 +93,7 @@ contains
     
     !> Accessor : rMin
     
-    function Spheres_getRmin(this) result(getRmin)
+    pure function Spheres_getRmin(this) result(getRmin)
     
         class(Spheres), intent(in) :: this        
         real(DP) :: getRmin
@@ -105,7 +104,7 @@ contains
     
     !> Accessor : Nadapt
     
-    function Spheres_getNadapt(this) result(getNadapt)
+    pure function Spheres_getNadapt(this) result(getNadapt)
     
         class(Spheres), intent(in) :: this        
         integer :: getNadapt
@@ -261,7 +260,7 @@ contains
     
     end subroutine Spheres_definiteDeltaX
     
-    function Spheres_getDeltaX(this) result(getDeltaX)
+    pure function Spheres_getDeltaX(this) result(getDeltaX)
         
         class(Spheres), intent(in) :: this        
         real(DP) :: getDeltaX
@@ -269,6 +268,6 @@ contains
         ! average deltaX of 3 vector components
         getDeltaX = sum(this%deltaX)/size(this%deltaX)
         
-    end function Spheres_getDeltaX    
+    end function Spheres_getDeltaX
 
 end module class_spheres
