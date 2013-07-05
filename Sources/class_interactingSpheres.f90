@@ -42,7 +42,7 @@ private
         !> Potential energy
         procedure, private :: Epot_init => InteractingSpheres_Epot_init
         procedure :: Epot_print => InteractingSpheres_Epot_print
-        procedure, private :: Epot_pair => InteractingSpheres_Epot_pair
+        procedure :: Epot_pair => InteractingSpheres_Epot_pair
         procedure, private :: Epot_neigh => InteractingSpheres_Epot_neigh
         procedure :: Epot_conf => InteractingSpheres_Epot_conf
         procedure :: consistTest => InteractingSpheres_consistTest
