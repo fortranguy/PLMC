@@ -40,10 +40,10 @@ private
         procedure :: PrintReport => InteractingSpheres_printReport
         
         !> Potential energy
-        procedure :: Epot_init => InteractingSpheres_Epot_init
+        procedure, private :: Epot_init => InteractingSpheres_Epot_init
         procedure :: Epot_print => InteractingSpheres_Epot_print
-        procedure :: Epot_pair => InteractingSpheres_Epot_pair
-        procedure :: Epot_neigh => InteractingSpheres_Epot_neigh
+        procedure, private :: Epot_pair => InteractingSpheres_Epot_pair
+        procedure, private :: Epot_neigh => InteractingSpheres_Epot_neigh
         procedure :: Epot_conf => InteractingSpheres_Epot_conf
         procedure :: consistTest => InteractingSpheres_consistTest
         

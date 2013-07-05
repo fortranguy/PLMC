@@ -36,7 +36,7 @@ private
               
         !> Potential energy
         procedure :: Epot_print => HardSpheres_Epot_print
-        procedure :: Epot_neigh => HardSpheres_Epot_neigh
+        procedure, private :: Epot_neigh => HardSpheres_Epot_neigh
         procedure :: Epot_conf => HardSpheres_Epot_conf
         procedure :: consistTest => HardSpheres_consistTest
         
