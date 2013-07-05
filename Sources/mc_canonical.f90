@@ -13,7 +13,8 @@ use class_dipolarSpheres
 use class_hardSpheres
 use class_observables
 use class_units
-use mod_tools
+use mod_tools, only : initRandomSeed, initialCondition, report, consistTest, printResults, &
+                      mix_printResults
 
 implicit none
     
