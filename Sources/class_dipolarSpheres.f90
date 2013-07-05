@@ -12,7 +12,7 @@ use data_mc, only : Temperature, dipol_structure_iStep, dipol_deltaX, dipol_reje
 use data_potentiel, only : dipol_rCut, dipol_dr, dipol_alpha
 use data_neighbours, only : cell_neighs_nb, dipol_cell_Lsize
 use data_distrib, only : dipol_snap_factor
-use mod_physics, only : dist, distVec, random_surface, markov_surface, fourier
+use mod_physics, only : dist, distVec, random_surface, markov_surface, kMax1_sym, kMax2_sym, fourier
 use class_neighbours
 use class_mixingPotential
 use class_spheres
@@ -654,36 +654,6 @@ contains
         end do
 
     end subroutine DipolarSpheres_Epot_reci_structure_init
-    
-    !> Symmetry : half wave vectors in do loop : kMax2
-    
-    pure function kMax2_sym(kz)
-
-        integer, intent(in) :: kz
-        integer :: kMax2_sym
-
-        if (kz == 0) then
-            kMax2_sym = 0
-        else
-            kMax2_sym = kMax(2)
-        end if
-
-    end function kMax2_sym
-    
-    !> Symmetry : half wave vectors in do loop : kMax1
-
-    pure function kMax1_sym(ky, kz)
-
-        integer, intent(in) :: ky, kz
-        integer :: kMax1_sym
-
-        if (ky == 0 .and. kz == 0) then
-            kMax1_sym = 0
-        else
-            kMax1_sym = kMax(1)
-        end if
-
-    end function kMax1_sym
     
     !> To calculate the drift of the strucutre factor
 
