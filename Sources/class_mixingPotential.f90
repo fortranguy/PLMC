@@ -45,7 +45,7 @@ private
         
         procedure :: overlapTest => MixingPotential_overlapTest
 
-        procedure :: Epot_init => MixingPotential_Epot_init
+        procedure, private :: Epot_init => MixingPotential_Epot_init
         procedure :: Epot_print => MixingPotential_Epot_print
         procedure :: Epot_pair => MixingPotential_Epot_pair
         procedure :: Epot_neigh => MixingPotential_Epot_neigh
