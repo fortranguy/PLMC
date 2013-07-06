@@ -17,7 +17,7 @@ all: $(EXEC1) $(EXEC2) $(EXEC3)
 
 data_copy.f90 : data.f90
 	cp data.f90 data_copy.f90
-	
+
 data_copy.o data_precisions.mod data_constants.mod data_cell.mod data_particles.mod data_mc.mod \
 data_potentiel.mod data_neighbours.mod data_mc_distrib.mod : data_copy.f90
 	$(FC) $(FFLAGS) -c $<
@@ -25,7 +25,7 @@ data_potentiel.mod data_neighbours.mod data_mc_distrib.mod : data_copy.f90
 
 data.o: data_copy.f90
 	$(FC) -c $(FFLAGS) $< -o $@
-	
+
 # ------------------------------------------------------------------------
 
 mod_physics.o : data_precisions.mod data_constants.mod data_cell.mod
@@ -75,7 +75,7 @@ $(EXEC1) : data.o mod_physics.o class_neighbours.o class_mixingPotential.o class
 	class_hardSpheres.o class_dipolarSpheres.o class_observables.o class_units.o \
 	mod_tools.o mc_canonical.o
 	$(FC) $^ $(LDFLAGS) $(CLDFLAGS) $(LDLIBS) -o $@
-	
+
 # ------------------------------------------------------------------------
 
 mc_bunching.o : mc_bunching.f90
@@ -95,9 +95,9 @@ $(EXEC3) : data.o mod_physics.o class_neighbours.o class_mixingPotential.o class
 	
 clean :
 	rm -f *.o *.mod
-	
+
 mrproper : clean
 	rm -f $(EXEC1) $(EXEC2) $(EXEC3) data_copy.f90
-	
+
 remove :
 	rm -f *.out *.txt *.shots *.tmp
