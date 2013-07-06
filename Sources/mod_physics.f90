@@ -9,7 +9,7 @@ use data_cell, only : Dim, Lsize, LsizeMi, Kmax
 
 implicit none
 private
-public dist, distVec, random_surface, markov_surface, kMax1_sym, kMax2_sym, fourier
+public dist, distVec, random_surface, markov_surface, Kmax1_sym, Kmax2_sym, fourier
 
 contains
 
@@ -125,35 +125,35 @@ contains
     
     end subroutine markov_surface
 
-    !> Symmetry : half wave vectors in do loop : kMax1
+    !> Symmetry : half wave vectors in do loop : Kmax1
 
-    pure function kMax1_sym(ky, kz)
+    pure function Kmax1_sym(ky, kz)
 
         integer, intent(in) :: ky, kz
-        integer :: kMax1_sym
+        integer :: Kmax1_sym
 
         if (ky == 0 .and. kz == 0) then
-            kMax1_sym = 0
+            Kmax1_sym = 0
         else
-            kMax1_sym = kMax(1)
+            Kmax1_sym = Kmax(1)
         end if
 
-    end function kMax1_sym
+    end function Kmax1_sym
 
-    !> Symmetry : half wave vectors in do loop : kMax2
+    !> Symmetry : half wave vectors in do loop : Kmax2
 
-    pure function kMax2_sym(kz)
+    pure function Kmax2_sym(kz)
 
         integer, intent(in) :: kz
-        integer :: kMax2_sym
+        integer :: Kmax2_sym
 
         if (kz == 0) then
-            kMax2_sym = 0
+            Kmax2_sym = 0
         else
-            kMax2_sym = kMax(2)
+            Kmax2_sym = Kmax(2)
         end if
 
-    end function kMax2_sym
+    end function Kmax2_sym
     
     !> Fourier coefficients (bases)
     

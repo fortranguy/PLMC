@@ -5,14 +5,14 @@ module class_dipolarSpheres
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
 use data_precisions, only : DP, consist_tiny
 use data_constants, only : PI
-use data_cell, only : Dim, Lsize, kMax, Volume
+use data_cell, only : Dim, Lsize, Kmax, Volume
 use data_particles, only : dipol_radius, dipol_rMin, dipol_Ncol
 use data_mc, only : Temperature, dipol_structure_iStep, dipol_deltaX, dipol_rejectFix, dipol_Nadapt, &
                     dipol_deltaM, dipol_deltaMmax, dipol_rejectRotFix, dipol_NadaptRot, dipol_Nwidom
 use data_potentiel, only : dipol_rCut, dipol_dr, dipol_alpha
 use data_neighbours, only : cell_neighs_nb, dipol_cell_Lsize
 use data_distrib, only : dipol_snap_factor
-use mod_physics, only : dist, distVec, random_surface, markov_surface, kMax1_sym, kMax2_sym, fourier
+use mod_physics, only : dist, distVec, random_surface, markov_surface, Kmax1_sym, Kmax2_sym, fourier
 use class_neighbours
 use class_mixingPotential
 use class_spheres
@@ -667,8 +667,8 @@ contains
         Epot_reci_structure_moduli = 0._DP
 
         do kz = 0, Kmax(3)
-            do ky = -kMax2_sym(kz), Kmax(2)
-                do kx = -kMax1_sym(ky, kz), kMax(1)
+            do ky = -Kmax2_sym(kz), Kmax(2)
+                do kx = -Kmax1_sym(ky, kz), Kmax(1)
                 
                     Epot_reci_structure_moduli = Epot_reci_structure_moduli + &
                                                  abs(this%Epot_reci_kStructure(kx, ky, kz))
@@ -775,11 +775,11 @@ contains
 
             waveVector(3) = real(kz, DP)
 
-            do ky = -kMax2_sym(kz), Kmax(2)
+            do ky = -Kmax2_sym(kz), Kmax(2)
 
                 waveVector(2) = real(ky, DP)
 
-                do kx = -kMax1_sym(ky, kz), kMax(1)
+                do kx = -Kmax1_sym(ky, kz), Kmax(1)
 
                     waveVector(1) = real(kx, DP)
 
@@ -870,11 +870,11 @@ contains
 
             waveVector(3) = real(kz, DP)
 
-            do ky = -kMax2_sym(kz), Kmax(2) 
+            do ky = -Kmax2_sym(kz), Kmax(2) 
 
                 waveVector(2) = real(ky, DP)
             
-                do kx = -kMax1_sym(ky, kz), kMax(1)
+                do kx = -Kmax1_sym(ky, kz), Kmax(1)
 
                     waveVector(1) = real(kx, DP)
 
@@ -953,11 +953,11 @@ contains
 
             waveVector(3) = real(kz, DP)
 
-            do ky = -kMax2_sym(kz), Kmax(2)
+            do ky = -Kmax2_sym(kz), Kmax(2)
 
                 waveVector(2) = real(ky, DP)
 
-                do kx = -kMax1_sym(ky, kz), kMax(1)
+                do kx = -Kmax1_sym(ky, kz), Kmax(1)
 
                     waveVector(1) = real(kx, DP)
 
@@ -1041,11 +1041,11 @@ contains
 
             waveVector(3) = real(kz, DP)
 
-            do ky = -kMax2_sym(kz), Kmax(2)
+            do ky = -Kmax2_sym(kz), Kmax(2)
 
                 waveVector(2) = real(ky, DP)
             
-                do kx = -kMax1_sym(ky, kz), kMax(1)
+                do kx = -Kmax1_sym(ky, kz), Kmax(1)
 
                     waveVector(1) = real(kx, DP)
 
@@ -1114,11 +1114,11 @@ contains
 
             waveVector(3) = real(kz, DP)
 
-            do ky = -kMax2_sym(kz), Kmax(2)
+            do ky = -Kmax2_sym(kz), Kmax(2)
 
                 waveVector(2) = real(ky, DP)
 
-                do kx = -kMax1_sym(ky, kz), kMax(1)
+                do kx = -Kmax1_sym(ky, kz), Kmax(1)
 
                     waveVector(1) = real(kx, DP)
 
@@ -1196,11 +1196,11 @@ contains
 
             waveVector(3) = real(kz, DP)
 
-            do ky = -kMax2_sym(kz), Kmax(2)
+            do ky = -Kmax2_sym(kz), Kmax(2)
 
                 waveVector(2) = real(ky, DP)
             
-                do kx = -kMax1_sym(ky, kz), kMax(1)
+                do kx = -Kmax1_sym(ky, kz), Kmax(1)
                 
                     waveVector(1) = real(kx, DP)
                     

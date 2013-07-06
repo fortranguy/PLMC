@@ -4,7 +4,7 @@ module mod_tools
 
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit, iostat_end
 use data_precisions, only : DP, io_tiny, consist_tiny
-use data_cell, only : Dim, Lsize, Volume, kMax
+use data_cell, only : Dim, Lsize, Volume, Kmax
 use data_particles, only : Ncol
 use data_mc, only : Temperature, Nstep, decorrelFactor, Ntherm, Nmove, Nrotate
 use mod_physics, only : dist, random_surface
@@ -231,8 +231,8 @@ contains
         
         write(report_unit ,*) "    Lsize(:) = ", Lsize(:)
         write(report_unit ,*) "    Volume = ", Volume
-        write(report_unit ,*) "    kMax(:) = ", kMax(:)
-        write(report_unit ,*) "    NwaveVectors =", (2*kMax(1)+1) * (2*kMax(2)+1) * (2*kMax(3)+1)
+        write(report_unit ,*) "    Kmax(:) = ", Kmax(:)
+        write(report_unit ,*) "    NwaveVectors =", (2*Kmax(1)+1) * (2*Kmax(2)+1) * (2*Kmax(3)+1)
         write(report_unit ,*) "    Ncol = ", Ncol
         write(report_unit ,*) "    Temperature = ", Temperature
         
