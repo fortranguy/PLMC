@@ -101,7 +101,7 @@ contains
     
     subroutine markov_surface(mCol, deltaM)
     
-        real(DP), dimension(Dim), intent(inout) :: mCol
+        real(DP), dimension(:), intent(inout) :: mCol
         real(DP), intent(in) :: deltaM
         
         real(DP), dimension(Dim) :: rotation
@@ -159,7 +159,7 @@ contains
     
     pure subroutine fourier(xColOverL, exp_Ikx_1, exp_Ikx_2, exp_Ikx_3)
     
-        real(DP), dimension(Dim), intent(in) :: xColOverL
+        real(DP), dimension(:), intent(in) :: xColOverL
         complex(DP), dimension(-Kmax(1):Kmax(1)), intent(out) :: exp_Ikx_1
         complex(DP), dimension(-Kmax(2):Kmax(2)), intent(out) :: exp_Ikx_2
         complex(DP), dimension(-Kmax(3):Kmax(3)), intent(out) :: exp_Ikx_3

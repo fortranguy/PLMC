@@ -829,7 +829,7 @@ contains
 
         class(DipolarSpheres), intent(in) :: this
         integer, intent(in) :: lCol
-        real(DP), dimension(Dim), intent(in) :: xNew
+        real(DP), dimension(:), intent(in) :: xNew
         real(DP) :: deltaEpot_reci_move
         
         real(DP) :: deltaEpot_k
@@ -922,7 +922,7 @@ contains
 
         class(DipolarSpheres), intent(inout) :: this
         integer, intent(in) :: lCol
-        real(DP), dimension(Dim), intent(in) :: xNew
+        real(DP), dimension(:), intent(in) :: xNew
         
         real(DP), dimension(Dim) :: xNewOverL, xOldOverL
         real(DP), dimension(Dim) :: mColOverL
@@ -1007,7 +1007,7 @@ contains
 
         class(DipolarSpheres), intent(in) :: this
         integer, intent(in) :: lCol
-        real(DP), dimension(Dim), intent(in) :: mNew
+        real(DP), dimension(:), intent(in) :: mNew
         real(DP) :: deltaEpot_reci_rotate
 
         real(DP) :: deltaEpot_k
@@ -1089,7 +1089,7 @@ contains
 
         class(DipolarSpheres), intent(inout) :: this
         integer, intent(in) :: lCol
-        real(DP), dimension(Dim), intent(in) :: mNew
+        real(DP), dimension(:), intent(in) :: mNew
 
         real(DP), dimension(Dim) :: xColOverL
         real(DP), dimension(Dim) :: mNewOverL, mOldOverL
@@ -1162,8 +1162,8 @@ contains
     pure function DipolarSpheres_deltaEpot_reci_test(this, xTest, mTest) result(deltaEpot_reci_test)
 
         class(DipolarSpheres), intent(in) :: this
-        real(DP), dimension(Dim), intent(in) :: xTest
-        real(DP), dimension(Dim), intent(in) :: mTest
+        real(DP), dimension(:), intent(in) :: xTest
+        real(DP), dimension(:), intent(in) :: mTest
         real(DP) :: deltaEpot_reci_test
         
         real(DP) :: deltaEpot_k
