@@ -188,9 +188,9 @@ contains
         real(DP), intent(inout) :: same_Epot, mix_Epot
         integer, intent(inout) :: Nreject
         
-        real(DP), dimension(Dim) :: xRand
+        real(DP), dimension(Ndim) :: xRand
         logical :: overlap
-        real(DP), dimension(Dim) :: xNew
+        real(DP), dimension(Ndim) :: xNew
         integer :: same_iCellOld, same_iCellNew
         integer :: mix_iCellOld, mix_iCellNew
         real(DP) :: mix_deltaEpot
@@ -263,7 +263,7 @@ contains
         
         integer :: iWidom
         real(DP) :: widTestSum
-        real(DP), dimension(Dim) :: xRand, xTest
+        real(DP), dimension(Ndim) :: xRand, xTest
         integer :: same_iCellTest, mix_iCellTest
         logical :: overlap
         real(DP) :: enTest, mix_enTest

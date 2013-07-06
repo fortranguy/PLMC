@@ -490,7 +490,7 @@ contains
         real(DP) :: Epot_real_solo
 
         integer :: jCol
-        real(DP), dimension(Dim) :: rVec_ij
+        real(DP), dimension(Ndim) :: rVec_ij
         real(DP) :: r_ij
 
         Epot_real_solo = 0._DP
@@ -519,7 +519,7 @@ contains
         real(DP) :: Epot_real
         
         integer :: iCol, jCol
-        real(DP), dimension(Dim) :: rVec_ij
+        real(DP), dimension(Ndim) :: rVec_ij
         real(DP) :: r_ij
     
         Epot_real = 0._DP
@@ -564,7 +564,7 @@ contains
         class(DipolarSpheres), intent(inout) :: this
         
         integer :: kx, ky, kz
-        real(DP), dimension(Dim) :: waveVector
+        real(DP), dimension(Ndim) :: waveVector
         real(DP) :: kOverL
 
         do kz = -Kmax(3), Kmax(3)
@@ -610,8 +610,8 @@ contains
         complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_Ikx_2
         complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_Ikx_3
 
-        real(DP), dimension(Dim) :: xColOverL, mColOverL
-        real(DP), dimension(Dim) :: waveVector
+        real(DP), dimension(Ndim) :: xColOverL, mColOverL
+        real(DP), dimension(Ndim) :: waveVector
         real(DP) :: k_dot_mCol
         integer :: kx, ky, kz
         integer :: iCol
@@ -713,9 +713,9 @@ contains
         complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_Ikx_3
         complex(DP) :: k_dot_structure, Epot_reci_weight
 
-        complex(DP), dimension(Dim) :: potential_k
-        real(DP), dimension(Dim) :: xColOverL
-        real(DP), dimension(Dim) :: waveVector
+        complex(DP), dimension(Ndim) :: potential_k
+        real(DP), dimension(Ndim) :: xColOverL
+        real(DP), dimension(Ndim) :: waveVector
         integer :: kx, ky, kz
         integer :: iCol
         
@@ -766,7 +766,7 @@ contains
         class(DipolarSpheres), intent(inout) :: this
         integer, intent(in) :: waveVectors_unit
         
-        real(DP), dimension(Dim) :: waveVector
+        real(DP), dimension(Ndim) :: waveVector
         integer :: kx, ky, kz
 
         this%NwaveVectors = 0
@@ -834,8 +834,8 @@ contains
         
         real(DP) :: deltaEpot_k
 
-        real(DP), dimension(Dim) :: xNewOverL, xOldOverL
-        real(DP), dimension(Dim) :: mColOverL
+        real(DP), dimension(Ndim) :: xNewOverL, xOldOverL
+        real(DP), dimension(Ndim) :: mColOverL
 
         complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxNew_1
         complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxNew_2
@@ -851,7 +851,7 @@ contains
 
         real(DP) :: realPart1, realPart2
         
-        real(DP), dimension(Dim) :: waveVector
+        real(DP), dimension(Ndim) :: waveVector
         real(DP) :: k_dot_mCol
         complex(DP) :: k_dot_structure
         integer :: kx, ky, kz
@@ -924,8 +924,8 @@ contains
         integer, intent(in) :: lCol
         real(DP), dimension(:), intent(in) :: xNew
         
-        real(DP), dimension(Dim) :: xNewOverL, xOldOverL
-        real(DP), dimension(Dim) :: mColOverL
+        real(DP), dimension(Ndim) :: xNewOverL, xOldOverL
+        real(DP), dimension(Ndim) :: mColOverL
 
         complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxNew_1
         complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxNew_2
@@ -937,7 +937,7 @@ contains
         complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_IkxOld_3
         complex(DP) :: exp_IkxOld
 
-        real(DP), dimension(Dim) :: waveVector
+        real(DP), dimension(Ndim) :: waveVector
         real(DP) :: k_dot_mCol
         integer :: kx, ky, kz
 
@@ -1012,8 +1012,8 @@ contains
 
         real(DP) :: deltaEpot_k
 
-        real(DP), dimension(Dim) :: xColOverL
-        real(DP), dimension(Dim) :: mNewOverL, mOldOverL
+        real(DP), dimension(Ndim) :: xColOverL
+        real(DP), dimension(Ndim) :: mNewOverL, mOldOverL
 
         complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxCol_1
         complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxCol_2
@@ -1023,7 +1023,7 @@ contains
 
         real(DP) :: realPart, realPart1, realPart2
         
-        real(DP), dimension(Dim) :: waveVector
+        real(DP), dimension(Ndim) :: waveVector
         real(DP) :: k_dot_mNew, k_dot_mOld
         complex(DP) :: k_dot_structure
         integer :: kx, ky, kz
@@ -1091,15 +1091,15 @@ contains
         integer, intent(in) :: lCol
         real(DP), dimension(:), intent(in) :: mNew
 
-        real(DP), dimension(Dim) :: xColOverL
-        real(DP), dimension(Dim) :: mNewOverL, mOldOverL
+        real(DP), dimension(Ndim) :: xColOverL
+        real(DP), dimension(Ndim) :: mNewOverL, mOldOverL
 
         complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxCol_1
         complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxCol_2
         complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_IkxCol_3
         complex(DP) :: exp_IkxCol
 
-        real(DP), dimension(Dim) :: waveVector
+        real(DP), dimension(Ndim) :: waveVector
         real(DP) :: k_dot_deltaMcol
         integer :: kx, ky, kz
 
@@ -1168,8 +1168,8 @@ contains
         
         real(DP) :: deltaEpot_k
         
-        real(DP), dimension(Dim) :: xTestOverL
-        real(DP), dimension(Dim) :: mTestOverL
+        real(DP), dimension(Ndim) :: xTestOverL
+        real(DP), dimension(Ndim) :: mTestOverL
         
         complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxTest_1
         complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxTest_2
@@ -1179,7 +1179,7 @@ contains
         
         real(DP) :: realPart
         
-        real(DP), dimension(Dim) :: waveVector
+        real(DP), dimension(Ndim) :: waveVector
         real(DP) :: k_dot_mTest
         complex(DP) :: k_dot_structure
         integer :: kx, ky, kz
@@ -1237,8 +1237,8 @@ contains
         real(DP) :: Epot_reci
         
         integer :: jCol
-        real(DP), dimension(Dim) :: mColOverL
-        real(DP), dimension(Dim) :: real_potential
+        real(DP), dimension(Ndim) :: mColOverL
+        real(DP), dimension(Ndim) :: real_potential
 
         Epot_reci = 0._DP
 
@@ -1298,9 +1298,9 @@ contains
         real(DP), intent(inout) :: same_Epot, mix_Epot
         integer, intent(inout) :: Nreject
         
-        real(DP), dimension(Dim) :: xRand
+        real(DP), dimension(Ndim) :: xRand
         logical :: overlap
-        real(DP), dimension(Dim) :: xNew
+        real(DP), dimension(Ndim) :: xNew
         integer :: same_iCellOld, same_iCellNew
         integer :: mix_iCellOld, mix_iCellNew
         real(DP) :: deltaEpot, same_deltaEpot, mix_deltaEpot
@@ -1379,7 +1379,7 @@ contains
         integer, intent(inout) :: Nreject
         
         real(DP) :: rand
-        real(DP), dimension(Dim) :: mNew
+        real(DP), dimension(Ndim) :: mNew
         real(DP) :: deltaEpot, deltaEpot_real, deltaEpot_self
         real(DP) :: real_eNew, real_eOld
         integer :: iCell
@@ -1421,8 +1421,8 @@ contains
         
         integer :: iWidom
         real(DP) :: widTestSum
-        real(DP), dimension(Dim) :: xTest, xRand
-        real(DP), dimension(Dim) :: mTest
+        real(DP), dimension(Ndim) :: xTest, xRand
+        real(DP), dimension(Ndim) :: mTest
         integer :: same_iCellTest, mix_iCellTest
         logical :: overlap
         real(DP) :: enTest

@@ -39,19 +39,19 @@ use data_precisions, only : DP
 
 implicit none
     
-    integer, parameter :: Dim = 3
+    integer, parameter :: Ndim = 3
     
     real(DP), parameter :: Lsize1 = 25._DP
     real(DP), parameter :: Lsize2 = Lsize1
     real(DP), parameter :: Lsize3 = Lsize1
-    real(DP), dimension(Dim), parameter :: Lsize = [Lsize1, Lsize2, Lsize3]
-    real(DP), dimension(Dim), parameter :: LsizeMi = 0.5_DP * Lsize
+    real(DP), dimension(Ndim), parameter :: Lsize = [Lsize1, Lsize2, Lsize3]
+    real(DP), dimension(Ndim), parameter :: LsizeMi = 0.5_DP * Lsize
     real(DP), parameter :: Volume = Lsize1 * Lsize2 * Lsize3
 
     integer, parameter :: Kmax1 = 8
     integer, parameter :: Kmax2 = Kmax1
     integer, parameter :: Kmax3 = Kmax1
-    integer, dimension(Dim), parameter :: Kmax = [Kmax1, Kmax2, Kmax3]
+    integer, dimension(Ndim), parameter :: Kmax = [Kmax1, Kmax2, Kmax3]
     
 end module data_cell
 !***************************************************************************************************
@@ -107,7 +107,7 @@ implicit none
     
     integer, parameter :: dipol_structure_iStep = 2**13/decorrelFactor
     ! move
-    real(DP), dimension(Dim), parameter :: dipol_deltaX = 0.3_DP
+    real(DP), dimension(Ndim), parameter :: dipol_deltaX = 0.3_DP
     real(DP), parameter :: dipol_rejectFix = 0.5_DP
     integer, parameter :: dipol_Nadapt = Ntherm/8
     ! rotate
@@ -118,12 +118,12 @@ implicit none
     ! chemical potential
     integer, parameter :: dipol_Nwidom = 500 ! dipol_Ncol
     
-    real(DP), dimension(Dim), parameter :: inter_deltaX = 1._DP
+    real(DP), dimension(Ndim), parameter :: inter_deltaX = 1._DP
     real(DP), parameter :: inter_rejectFix = 0.5_DP
     integer, parameter :: inter_Nadapt = Ntherm/8
     integer, parameter :: inter_Nwidom = inter_Ncol
     
-    real(DP), dimension(Dim), parameter :: hard_deltaX = 0.5_DP
+    real(DP), dimension(Ndim), parameter :: hard_deltaX = 0.5_DP
     real(DP), parameter :: hard_rejectFix = 0.5_DP
     integer, parameter :: hard_Nadapt = Ntherm/8
     integer, parameter :: hard_Nwidom = 500 ! hard_Ncol
@@ -181,14 +181,14 @@ use data_potentiel, only : inter_rCut, hard_rCut, mix_rCut
 
 implicit none
 
-    integer, dimension(Dim), parameter :: cell_neigh_coordMax = 3
+    integer, dimension(Ndim), parameter :: cell_neigh_coordMax = 3
     integer, parameter :: cell_neighs_nb = 3**3 !< including itself
 
-    real(DP), dimension(Dim), parameter :: dipol_cell_Lsize = dipol_rMin
-    real(DP), dimension(Dim), parameter :: inter_cell_Lsize = inter_rCut
-    real(DP), dimension(Dim), parameter :: hard_cell_Lsize = hard_rCut
+    real(DP), dimension(Ndim), parameter :: dipol_cell_Lsize = dipol_rMin
+    real(DP), dimension(Ndim), parameter :: inter_cell_Lsize = inter_rCut
+    real(DP), dimension(Ndim), parameter :: hard_cell_Lsize = hard_rCut
     
-    real(DP), dimension(Dim), parameter :: mix_cell_Lsize = mix_rCut
+    real(DP), dimension(Ndim), parameter :: mix_cell_Lsize = mix_rCut
 
 end module data_neighbours
 !***************************************************************************************************

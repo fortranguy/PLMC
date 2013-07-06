@@ -264,7 +264,7 @@ contains
         
         logical :: overlap
         real(DP) :: rand
-        real(DP), dimension(Dim) :: xRand, xNew
+        real(DP), dimension(Ndim) :: xRand, xNew
         integer :: same_iCellOld, same_iCellNew
         integer :: mix_iCellOld, mix_iCellNew
         real(DP) :: deltaEpot
@@ -338,7 +338,7 @@ contains
         
         integer :: iWidom
         real(DP) :: widTestSum
-        real(DP), dimension(Dim) :: xRand, xTest
+        real(DP), dimension(Ndim) :: xRand, xTest
         integer :: same_iCellTest, mix_iCellTest
         logical :: overlap        
         real(DP) :: enTest, same_enTest, mix_enTest

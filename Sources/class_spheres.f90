@@ -28,8 +28,8 @@ private
         integer :: snap_factor
 
         ! Monte-Carlo
-        real(DP), dimension(Dim) :: deltaX !< displacement
-        real(DP), dimension(Dim) :: deltaXsave
+        real(DP), dimension(Ndim) :: deltaX !< displacement
+        real(DP), dimension(Ndim) :: deltaXsave
         real(DP) :: rejectFix
         integer :: Nadapt
         integer :: Nwidom
