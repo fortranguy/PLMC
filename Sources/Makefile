@@ -29,20 +29,20 @@ data.o: data_copy.f90
 # ------------------------------------------------------------------------
 
 mod_physics.o : data_precisions.mod data_constants.mod data_cell.mod
-class_neighbours.o : data_precisions.mod data_cell.mod data_neighbours.mod
+                class_neighbours.o : data_precisions.mod data_cell.mod data_neighbours.mod
 class_mixingPotential.o : data_precisions.mod data_cell.mod data_particles.mod data_potentiel.mod \
-						  data_neighbours.mod mod_physics.o class_neighbours.o
+                          data_neighbours.mod mod_physics.o class_neighbours.o
 class_spheres.o : data_precisions.mod data_constants.mod  data_cell.mod mod_physics.o \
-				  class_neighbours.o
+                  class_neighbours.o
 class_hardSpheres.o : data_precisions.mod data_cell.mod data_particles.mod data_mc.mod \
-					  data_potentiel.mod data_neighbours.mod data_distrib.mod mod_physics.o \
-					  class_neighbours.o class_mixingPotential.o class_spheres.o
+                      data_potentiel.mod data_neighbours.mod data_distrib.mod mod_physics.o \
+                      class_neighbours.o class_mixingPotential.o class_spheres.o
 class_dipolarSpheres.o : data_precisions.mod data_constants.mod data_cell.mod data_particles.mod \
-						 data_mc.mod data_potentiel.mod data_neighbours.mod data_distrib.mod \
-						 mod_physics.o class_neighbours.o class_mixingPotential.o class_spheres.o
+                         data_mc.mod data_potentiel.mod data_neighbours.mod data_distrib.mod \
+                         mod_physics.o class_neighbours.o class_mixingPotential.o class_spheres.o
 class_observables.o : data_precisions.mod data_cell.mod data_mc.mod
 mod_tools.o : data_precisions.mod data_cell.mod data_particles.mod data_mc.mod mod_physics.o \
-			  class_spheres.o
+              class_spheres.o
 
 # -----------------------------------------------
 
@@ -88,7 +88,7 @@ $(EXEC2) : data.o mc_bunching.o
 mc_distrib.o : mc_distrib.f90
 	$(FC) -c $(FFLAGS_OMP) $< -o $@
 $(EXEC3) : data.o mod_physics.o class_neighbours.o class_mixingPotential.o class_spheres.o \
-	class_interactingSpheres.o mod_tools.o mc_distrib.o
+           class_interactingSpheres.o mod_tools.o mc_distrib.o
 	$(FC) $^ $(LDFLAGS_OMP) -o $@
 
 # --------------------------------------------------------------------------------------------------
