@@ -3,7 +3,7 @@
 module class_hardSpheres
 
 use data_precisions, only : DP
-use data_cell, only : Dim, Lsize
+use data_cell, only : Ndim, Lsize
 use data_particles, only : hard_radius, hard_rMin, hard_Ncol
 use data_potentiel, only : hard_rCut
 use data_mc, only : Temperature, hard_deltaX, hard_rejectFix, hard_Nadapt, hard_Nwidom
@@ -60,7 +60,7 @@ contains
         this%radius = hard_radius
         this%rMin = hard_rMin
         this%Ncol = hard_Ncol
-        allocate(this%positions(Dim, this%Ncol))
+        allocate(this%positions(Ndim, this%Ncol))
         
         ! Snapshot
         this%snap_factor = hard_snap_factor

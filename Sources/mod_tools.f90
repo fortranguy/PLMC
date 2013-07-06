@@ -4,7 +4,7 @@ module mod_tools
 
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit, iostat_end
 use data_precisions, only : DP, io_tiny, consist_tiny
-use data_cell, only : Dim, Lsize, Volume, Kmax
+use data_cell, only : Ndim, Lsize, Volume, Kmax
 use data_particles, only : Ncol
 use data_mc, only : Temperature, Nstep, decorrelFactor, Ntherm, Nmove, Nrotate
 use mod_physics, only : dist, random_surface
@@ -109,7 +109,7 @@ contains
         real(DP), intent(in) :: mix_rMin
 
         integer :: iCol, iColTest
-        real(DP), dimension(Dim) :: xRand
+        real(DP), dimension(Ndim) :: xRand
         real(DP) :: rTest
         
         ! Type 1
@@ -184,7 +184,7 @@ contains
         integer :: file_unit
 
         integer :: iCol
-        real(DP), dimension(Dim) :: vecDummy
+        real(DP), dimension(Ndim) :: vecDummy
         real(DP) :: normSqr
         
         call get_command_argument(iFile, file, length, fileStat)

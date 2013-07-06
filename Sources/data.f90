@@ -93,7 +93,7 @@ end module data_particles
 module data_mc
 
 use data_precisions, only : DP
-use data_cell, only : Dim
+use data_cell, only : Ndim
 use data_particles, only : Ncol, dipol_Ncol, inter_Ncol!, hard_Ncol
 
 implicit none
@@ -175,7 +175,7 @@ end module data_potentiel
 module data_neighbours
 
 use data_precisions, only : DP
-use data_cell, only : Dim
+use data_cell, only : Ndim
 use data_particles, only : dipol_rMin
 use data_potentiel, only : inter_rCut, hard_rCut, mix_rCut
 

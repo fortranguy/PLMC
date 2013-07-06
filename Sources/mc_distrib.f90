@@ -58,7 +58,7 @@ implicit none
     real(DP) :: energSum
     type(InteractingSpheres) :: inter
     type(MixingPotential) :: mix
-    real(DP), dimension(Dim, inter_Ncol) :: X
+    real(DP), dimension(Ndim, inter_Ncol) :: X
 
     !$ integer :: nb_taches
     real(DP) :: tIni, tFin

@@ -5,7 +5,7 @@ module class_spheres
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
 use data_precisions, only : DP
 use data_constants, only : PI
-use data_cell, only : Dim, Lsize, Volume
+use data_cell, only : Ndim, Lsize, Volume
 use mod_physics, only : dist
 use class_neighbours
 

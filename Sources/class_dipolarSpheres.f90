@@ -5,7 +5,7 @@ module class_dipolarSpheres
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
 use data_precisions, only : DP, consist_tiny
 use data_constants, only : PI
-use data_cell, only : Dim, Lsize, Kmax, Volume
+use data_cell, only : Ndim, Lsize, Kmax, Volume
 use data_particles, only : dipol_radius, dipol_rMin, dipol_Ncol
 use data_mc, only : Temperature, dipol_structure_iStep, dipol_deltaX, dipol_rejectFix, dipol_Nadapt, &
                     dipol_deltaM, dipol_deltaMmax, dipol_rejectRotFix, dipol_NadaptRot, dipol_Nwidom
@@ -125,8 +125,8 @@ contains
         this%radius = dipol_radius
         this%rMin = dipol_rMin
         this%Ncol = dipol_Ncol
-        allocate(this%positions(Dim, this%Ncol))
-        allocate(this%orientations(Dim, this%Ncol))
+        allocate(this%positions(Ndim, this%Ncol))
+        allocate(this%orientations(Ndim, this%Ncol))
         
         ! Snapshot
         this%snap_factor = dipol_snap_factor
@@ -155,7 +155,7 @@ contains
         allocate(this%Epot_real_tab(this%iMin:this%iCut, 2))
         call this%Epot_real_init()
 
-        allocate(this%Epot_reci_potential(Dim, this%Ncol))
+        allocate(this%Epot_reci_potential(Ndim, this%Ncol))
         call this%Epot_reci_weight_init()
         
         ! Neighbours : same kind

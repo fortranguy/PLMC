@@ -4,7 +4,7 @@ module class_neighbours
 
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
 use data_precisions, only : DP
-use data_cell, only : Dim, Lsize
+use data_cell, only : Ndim, Lsize
 use data_neighbours, only : cell_neigh_coordMax, cell_neighs_nb
 
 implicit none
@@ -22,8 +22,8 @@ public :: Link
 
     type, public :: Neighbours
         
-        real(DP), dimension(Dim) :: cell_Lsize
-        integer, dimension(Dim) :: cell_coordMax
+        real(DP), dimension(Ndim) :: cell_Lsize
+        integer, dimension(Ndim) :: cell_coordMax
         integer, dimension(:, :), allocatable :: cell_neighs
         type(LinkedList), dimension(:), allocatable :: cells
         type(LinkedList), dimension(:), allocatable :: cellsNext
@@ -142,7 +142,7 @@ contains
         
         integer :: iDir
         
-        do iDir = 1, Dim
+        do iDir = 1, Ndim
         
             if (this%cell_Lsize(iDir) < rCut .and. this%cell_Lsize(iDir) /= Lsize(iDir)/3._DP) then
                 write(error_unit, *) "Warning : big rCut in the direction", iDir, ":"
@@ -183,7 +183,7 @@ contains
         real(DP), dimension(:), intent(in) :: xCol
         integer :: position_to_cell
         
-        integer, dimension(Dim) :: cell_coord        
+        integer, dimension(Ndim) :: cell_coord        
     
         cell_coord(:) = int(xCol(:)/this%cell_Lsize(:)) + 1
         position_to_cell = cell_coord(1) + this%cell_coordMax(1)*(cell_coord(2)-1) + &
@@ -318,7 +318,7 @@ contains
     
         class(Neighbours), intent(in) :: this    
         integer, dimension(:), intent(in) :: coord        
-        integer, dimension(Dim) :: cell_period
+        integer, dimension(Ndim) :: cell_period
         
         cell_period(:) = coord(:)
         
@@ -338,7 +338,7 @@ contains
     
         integer :: i, j, k, ind
         integer :: neigh_i, neigh_j, neigh_k, neigh_ind
-        integer, dimension(Dim) :: coord, neigh_coord
+        integer, dimension(Ndim) :: coord, neigh_coord
         
         do i = 1, this%cell_coordMax(1)
         do j = 1, this%cell_coordMax(2)

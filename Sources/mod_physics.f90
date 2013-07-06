@@ -4,7 +4,7 @@ module mod_physics
 
 use data_precisions, only : DP
 use data_constants, only : PI, sigma3d
-use data_cell, only : Dim, Lsize, LsizeMi, Kmax
+use data_cell, only : Ndim, Lsize, LsizeMi, Kmax
 !$ use omp_lib
 
 implicit none
@@ -20,7 +20,7 @@ contains
         real(DP), dimension(:), intent(in) :: xCol1, xCol2        
         real(DP) :: dist
         
-        real(DP), dimension(Dim) :: distVec_12
+        real(DP), dimension(Ndim) :: distVec_12
         
         distVec_12(:) = distVec(xCol1, xCol2)
         
@@ -31,7 +31,7 @@ contains
     pure function distVec(xCol1, xCol2)
     
         real(DP), dimension(:), intent(in) :: xCol1, xCol2
-        real(DP), dimension(Dim) :: distVec
+        real(DP), dimension(Ndim) :: distVec
         
         distVec(:) = xCol2(:) - xCol1(:)
         distVec(:) = modulo(distVec(:), Lsize(:))
@@ -87,12 +87,12 @@ contains
     
     function random_surface()
         
-        real(DP), dimension(Dim) :: random_surface
+        real(DP), dimension(Ndim) :: random_surface
         
-        integer :: iDim
+        integer :: iNdim
         
-        do iDim = 1, Dim        
-            random_surface(iDim) = gauss()          
+        do iNdim = 1, Ndim        
+            random_surface(iNdim) = gauss()          
         end do
         
         random_surface(:) = random_surface(:) / norm2(random_surface)
@@ -104,13 +104,13 @@ contains
         real(DP), dimension(:), intent(inout) :: mCol
         real(DP), intent(in) :: deltaM
         
-        real(DP), dimension(Dim) :: rotation
+        real(DP), dimension(Ndim) :: rotation
         real(DP) :: rotation_dot_mCol
         real(DP) :: amplitude, rand
-        integer :: iDim
+        integer :: iNdim
         
-        do iDim = 1, Dim        
-            rotation(iDim) = gauss()
+        do iNdim = 1, Ndim        
+            rotation(iNdim) = gauss()
         end do
         
         rotation_dot_mCol = dot_product(rotation, mCol)
@@ -164,7 +164,7 @@ contains
         complex(DP), dimension(-Kmax(2):Kmax(2)), intent(out) :: exp_Ikx_2
         complex(DP), dimension(-Kmax(3):Kmax(3)), intent(out) :: exp_Ikx_3
         
-        real(DP), dimension(Dim) :: arg
+        real(DP), dimension(Ndim) :: arg
         integer :: kx, ky, kz
 
         arg(:) = 2._DP*PI * 1._DP*xColOverL(:)

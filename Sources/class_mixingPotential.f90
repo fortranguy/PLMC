@@ -4,7 +4,7 @@ module class_mixingPotential
 
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
 use data_precisions, only : DP
-use data_cell, only : Dim
+use data_cell, only : Ndim
 use data_particles, only : mix_rMin
 use data_potentiel, only : mix_rCut, mix_dr, mix_epsilon, mix_alpha
 use data_neighbours, only : cell_neighs_nb, mix_cell_Lsize
@@ -30,7 +30,7 @@ private
         real(DP) :: alpha !< coefficient in Yukawa
         real(DP), dimension(:), allocatable :: Epot_tab !< tabulation
         
-        real(DP), dimension(Dim) :: cell_Lsize
+        real(DP), dimension(Ndim) :: cell_Lsize
 
     contains
 
@@ -132,7 +132,7 @@ contains
     pure function MixingPotential_getCell_Lsize(this) result(getCell_Lsize)
     
         class(MixingPotential), intent(in) :: this        
-        real(DP), dimension(Dim) :: getCell_Lsize
+        real(DP), dimension(Ndim) :: getCell_Lsize
         
         getCell_Lsize(:) = this%Cell_Lsize(:)
     
