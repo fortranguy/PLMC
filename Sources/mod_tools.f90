@@ -82,10 +82,12 @@ contains
                 write(output_unit, *) "Old configuration"
                 write(report_unit, *) "    Old configuration"
                 
-                call oldConfiguration(1, type1%getName()//"_positions", type1%positions, &
-                                      dot_product(Lsize, Lsize))
-                call oldConfiguration(2, type1%getName()//"_orientations", type1%orientations, 1._DP)
-                call oldConfiguration(3, type2%getName()//"_positions", type2%positions, &
+                call oldConfiguration(1, type1%getName()//"_positions", type1%getNcol(), &
+                                      type1%positions, dot_product(Lsize, Lsize))
+                call oldConfiguration(2, type1%getName()//"_orientations", type1%getNcol(), &
+                                      type1%orientations, 1._DP)
+                ! Warning : be careful with the unit !
+                call oldConfiguration(3, type2%getName()//"_positions", type2%Ncol, type2%positions, &
                                       dot_product(Lsize, Lsize))
             
             case default
@@ -168,11 +170,12 @@ contains
     
     !> From an old configuration
     
-    subroutine oldConfiguration(iFile, type_name, type_vec, normSqrMax)
+    subroutine oldConfiguration(iFile, type_name, type_Ncol, type_coords, normSqrMax)
     
         integer, intent(in) :: iFile
         character(len=*), intent(in) :: type_name
-        real(DP), dimension(:, :), intent(out) :: type_vec
+        integer, intent(in) :: type_Ncol
+        real(DP), dimension(:, :), intent(out) :: type_coords
         real(DP), intent(in) :: normSqrMax
     
         character(len=20) :: file
@@ -180,7 +183,6 @@ contains
         integer :: fileStat, readStat
         integer :: file_unit
 
-        integer :: type_Ncol
         integer :: iCol
         real(DP), dimension(Dim) :: vecDummy
         real(DP) :: normSqr
@@ -189,8 +191,6 @@ contains
         if (fileStat /= 0) stop "error get_command_argument"
         write(output_unit, *) type_name, " <- ", file(1:length)
         open(newunit=file_unit, recl=4096, file=file(1:length), status='old', action='read')
-        
-        type_Ncol = size(type_vec, 2)
         
         iCol = 0
         do
@@ -202,12 +202,12 @@ contains
         if (iCol == type_Ncol) then
             rewind(file_unit)
             do iCol = 1, type_Ncol
-                read(file_unit, *) type_vec(:, iCol)
-                normSqr = dot_product(type_vec(:, iCol), type_vec(:, iCol))
+                read(file_unit, *) type_coords(:, iCol)
+                normSqr = dot_product(type_coords(:, iCol), type_coords(:, iCol))
                 if (normSqr > normSqrMax+io_tiny) then
                     write(error_unit, *) "Norm error : ", file(1:length)
-                    write(error_unit, *) "Vec ", type_vec(:, iCol)
-                    write(error_unit, *) "NormSqr", normSqr
+                    write(error_unit, *) "Coordinates ", type_coords(:, iCol)
+                    write(error_unit, *) "Norm square", normSqr
                     stop
                 end if
             end do
