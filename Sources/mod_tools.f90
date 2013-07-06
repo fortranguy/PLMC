@@ -66,9 +66,8 @@ contains
                 
                 select case (init)
                     case ("rand") 
-                        call randomDepositions(type1%positions, type1%getRMin(), type2%positions, &
-                                               type2%getRmin(), mix_rMin)
-                        call randomorientations(type1%orientations)
+                        call randomDepositions(type1, type2, mix_rMin)
+                        call randomOrientations(type1%orientations, type1%getNcol())
                         write(output_unit, *) "Random depositions + random orientations"
                         write(report_unit, *) "    Random depositions + random orientations"
                     case default
@@ -101,26 +100,26 @@ contains
     
     !> Random depositions configuration
     
-    subroutine randomDepositions(type1_positions, type1_rMin, type2_positions, type2_rMin, mix_rMin)
-    
-        real(DP), dimension(:, :), intent(out) :: type1_positions, type2_positions
-        real(DP), intent(in) :: type1_rMin, type2_rMin, mix_rMin
-        
-        integer :: type1_Ncol, type2_Ncol
+    subroutine randomDepositions(type1, type2, mix_rMin)
+
+        class(DipolarSpheres), intent(inout) :: type1
+        class(Spheres), intent(inout) :: type2
+        real(DP), intent(in) :: mix_rMin
+
         integer :: iCol, iColTest
         real(DP), dimension(Dim) :: xRand
         real(DP) :: rTest
         
         ! Type 1
-        type1_Ncol = size(type1_positions, 2)
-        do iCol = 1, type1_Ncol
+        do iCol = 1, type1%getNcol()
         
-7101        call random_number(xRand)
-            type1_positions(:, iCol) = xRand*Lsize(:)
+7101        continue
+            call random_number(xRand)
+            type1%positions(:, iCol) = xRand*Lsize(:)
             
             do iColTest = 1, iCol-1            
-                rTest = dist(type1_positions(:, iColTest), type1_positions(:, iCol))
-                if (rTest < type1_rMin) then
+                rTest = dist(type1%positions(:, iColTest), type1%positions(:, iCol))
+                if (rTest < type1%getRmin()) then
                     goto 7101
                 end if            
             end do
@@ -128,22 +127,22 @@ contains
         end do
         
         ! Type 2
-        type2_Ncol = size(type2_positions, 2)
-        do iCol = 1, type2_Ncol
+        do iCol = 1, type2%getNcol()
         
-7102        call random_number(xRand)
-            type2_positions(:, iCol) = xRand*Lsize(:)
+7102        continue
+            call random_number(xRand)
+            type2%positions(:, iCol) = xRand*Lsize(:)
             
-            do iColTest = 1, type1_Ncol
-                rTest = dist(type1_positions(:, iColTest), type2_positions(:, iCol))
+            do iColTest = 1, type1%getNcol()
+                rTest = dist(type1%positions(:, iColTest), type2%positions(:, iCol))
                 if (rTest < mix_rMin) then
                     goto 7102
                 end if            
             end do
             
             do iColTest = 1, iCol-1            
-                rTest = dist(type2_positions(:, iColTest), type2_positions(:, iCol))
-                if (rTest < type2_rMin) then
+                rTest = dist(type2%positions(:, iColTest), type2%positions(:, iCol))
+                if (rTest < type2%getRmin()) then
                     goto 7102
                 end if            
             end do
@@ -154,20 +153,18 @@ contains
     
     !> Uniform (gaussian) orientations
     
-    subroutine randomorientations(type_orientations)
+    subroutine randomOrientations(orientations, Ncol)
     
-        real(DP), dimension(:, :), intent(out) :: type_orientations
+        real(DP), dimension(:, :), intent(out) :: orientations
+        integer, intent(in) :: Ncol
         
-        integer :: type_Ncol
         integer :: iCol
         
-        type_Ncol = size(type_orientations, 2)
-        
-        do iCol = 1, type_Ncol
-            type_orientations(:, iCol) = random_surface()
+        do iCol = 1, Ncol
+            orientations(:, iCol) = random_surface()
         end do
     
-    end subroutine randomorientations
+    end subroutine randomOrientations
     
     !> From an old configuration
     
