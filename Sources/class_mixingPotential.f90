@@ -231,13 +231,13 @@ contains
         
     end function MixingPotential_Epot_pair
     
-    subroutine MixingPotential_Epot_neigh(this, xCol, iCell, neigh, other_X, overlap, energ)
+    subroutine MixingPotential_Epot_neigh(this, xCol, iCell, neigh, other_positions, overlap, energ)
         
         class(MixingPotential), intent(in) :: this
         real(DP), dimension(:), intent(in) :: xCol !< type A
         integer, intent(in) :: iCell !< type A in mix grid
         type(Neighbours), intent(in) :: neigh
-        real(DP), dimension(:, :), intent(in) :: other_X
+        real(DP), dimension(:, :), contiguous, intent(in) :: other_positions
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energ
     
@@ -259,7 +259,7 @@ contains
             
                 next => current%next
                 
-                r = dist(xCol(:), other_X(:, current%iCol))
+                r = dist(xCol(:), other_positions(:, current%iCol))
                 if (r < this%rMin) then
                     overlap = .true.
                     return
