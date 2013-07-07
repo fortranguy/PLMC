@@ -9,7 +9,7 @@ use data_cell, only : Ndim, Lsize, Kmax, Volume
 use data_particles, only : dipol_radius, dipol_rMin, dipol_Ncol
 use data_mc, only : Temperature, dipol_structure_iStep, dipol_deltaX, dipol_rejectFix, dipol_Nadapt, &
                     dipol_deltaM, dipol_deltaMmax, dipol_rejectRotFix, dipol_NadaptRot, dipol_Nwidom
-use data_potentiel, only : dipol_rCut, dipol_dr, dipol_alpha
+use data_potential, only : dipol_rCut, dipol_dr, dipol_alpha
 use data_neighbours, only : cell_neighs_nb, dipol_cell_Lsize
 use data_distrib, only : dipol_snap_factor
 use mod_physics, only : dist, distVec, random_surface, markov_surface, Kmax1_sym, Kmax2_sym, fourier

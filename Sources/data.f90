@@ -141,7 +141,7 @@ end module data_mc
 !> The mixing potential (mix) is also composed of 3 parts :
 !> hard sphere (HS) + Yukawa + cut
 !***************************************************************************************************
-module data_potentiel
+module data_potential
 
 use data_precisions, only : DP
 use data_cell, only : Lsize1
@@ -165,7 +165,7 @@ implicit none
     real(DP), parameter :: mix_epsilon = 0._DP
     real(DP), parameter :: mix_alpha = 40._DP
         
-end module data_potentiel
+end module data_potential
 !***************************************************************************************************
 
 !***************************************************************************************************
@@ -177,7 +177,7 @@ module data_neighbours
 use data_precisions, only : DP
 use data_cell, only : Ndim
 use data_particles, only : dipol_rMin
-use data_potentiel, only : inter_rCut, hard_rCut, mix_rCut
+use data_potential, only : inter_rCut, hard_rCut, mix_rCut
 
 implicit none
 

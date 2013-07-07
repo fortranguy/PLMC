@@ -19,7 +19,7 @@ data_copy.f90 : data.f90
 	cp data.f90 data_copy.f90
 
 data_copy.o data_precisions.mod data_constants.mod data_cell.mod data_particles.mod data_mc.mod \
-data_potentiel.mod data_neighbours.mod data_mc_distrib.mod : data_copy.f90
+data_potential.mod data_neighbours.mod data_mc_distrib.mod : data_copy.f90
 	$(FC) $(FFLAGS) -c $<
 	touch $*.o $*.mod
 
@@ -30,15 +30,15 @@ data.o: data_copy.f90
 
 mod_physics.o : data_precisions.mod data_constants.mod data_cell.mod
                 class_neighbours.o : data_precisions.mod data_cell.mod data_neighbours.mod
-class_mixingPotential.o : data_precisions.mod data_cell.mod data_particles.mod data_potentiel.mod \
+class_mixingPotential.o : data_precisions.mod data_cell.mod data_particles.mod data_potential.mod \
                           data_neighbours.mod mod_physics.o class_neighbours.o
 class_spheres.o : data_precisions.mod data_constants.mod  data_cell.mod mod_physics.o \
                   class_neighbours.o
 class_hardSpheres.o : data_precisions.mod data_cell.mod data_particles.mod data_mc.mod \
-                      data_potentiel.mod data_neighbours.mod data_distrib.mod mod_physics.o \
+                      data_potential.mod data_neighbours.mod data_distrib.mod mod_physics.o \
                       class_neighbours.o class_mixingPotential.o class_spheres.o
 class_dipolarSpheres.o : data_precisions.mod data_constants.mod data_cell.mod data_particles.mod \
-                         data_mc.mod data_potentiel.mod data_neighbours.mod data_distrib.mod \
+                         data_mc.mod data_potential.mod data_neighbours.mod data_distrib.mod \
                          mod_physics.o class_neighbours.o class_mixingPotential.o class_spheres.o
 class_observables.o : data_precisions.mod data_cell.mod data_mc.mod
 mod_tools.o : data_precisions.mod data_cell.mod data_particles.mod data_mc.mod mod_physics.o \
