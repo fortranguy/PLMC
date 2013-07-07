@@ -138,12 +138,12 @@ implicit none
                 ! Moving a particle : 
                 if (iColRand <= type1_spheres%getNcol()) then
                     call type1_spheres%move(iColRand, type2_spheres, mix, type1_obs%Epot, mix_Epot, &
-                                        type1_obs%Nreject)
+                                            type1_obs%Nreject)
                     type1_obs%Nmove = type1_obs%Nmove + 1
                 else
                     iColRand = iColRand - type1_spheres%getNcol()
                     call type2_spheres%move(iColRand, type1_spheres, mix, type2_obs%Epot, mix_Epot, &
-                                        type2_obs%Nreject)
+                                            type2_obs%Nreject)
                     type2_obs%Nmove = type2_obs%Nmove + 1
                 end if
                 
