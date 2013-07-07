@@ -38,7 +38,7 @@ public :: Link
         procedure :: dealloc_cells => Neighbours_dealloc_cells
         procedure :: check_cellsSize => Neighbours_check_cellsSize
         procedure :: position_to_cell => Neighbours_position_to_cell
-        procedure :: cols_to_cells => Neighbours_cols_to_cells
+        procedure :: all_cols_to_cells => Neighbours_all_cols_to_cells
         procedure :: remove_col_from_cell => Neighbours_remove_col_from_cell
         procedure :: add_col_to_cell => Neighbours_add_col_to_cell
         procedure, private :: cell_coord_to_ind => Neighbours_cell_coord_to_ind
@@ -191,7 +191,7 @@ contains
     
     end function Neighbours_position_to_cell
     
-    subroutine Neighbours_cols_to_cells(this, Ncol, X)
+    subroutine Neighbours_all_cols_to_cells(this, Ncol, X)
     
         class(Neighbours), intent(inout) :: this
         integer, intent(in) :: Ncol
@@ -220,7 +220,7 @@ contains
             
         end do
         
-    end subroutine Neighbours_cols_to_cells
+    end subroutine Neighbours_all_cols_to_cells
     
     ! Neighbours cells update
     

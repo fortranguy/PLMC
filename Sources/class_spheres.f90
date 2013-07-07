@@ -58,7 +58,7 @@ private
         procedure :: overlapTest => Spheres_overlapTest
         
         !> Assign all particles to cells
-        procedure :: cols_to_cells => Spheres_cols_to_cells
+        procedure :: all_cols_to_cells => Spheres_all_cols_to_cells
                 
         !> Adapt the displacement deltaX during thermalisation
         procedure :: adaptDeltaX => Spheres_adaptDeltaX
@@ -182,19 +182,19 @@ contains
     
     !> Fill cells with colloids
     
-    subroutine Spheres_cols_to_cells(this, other_positions)
+    subroutine Spheres_all_cols_to_cells(this, other_positions)
     
         class(Spheres), intent(inout) :: this
         real(DP), dimension(:, :), intent(in) :: other_positions
         
         integer :: other_Ncol 
         
-        call this%same%cols_to_cells(this%Ncol, this%positions)
+        call this%same%all_cols_to_cells(this%Ncol, this%positions)
         
         other_Ncol = size(other_positions, 2)
-        call this%mix%cols_to_cells(other_Ncol, other_positions)
+        call this%mix%all_cols_to_cells(other_Ncol, other_positions)
     
-    end subroutine Spheres_cols_to_cells
+    end subroutine Spheres_all_cols_to_cells
     
     !> Adaptation of deltaX during the thermalisation
     
