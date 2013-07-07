@@ -4,7 +4,6 @@ program mc_canonical
 
 use, intrinsic :: iso_fortran_env, only : output_unit
 use data_precisions, only : DP
-use data_cell, only : Volume
 use data_particles, only : Ncol
 use data_mc, only : Nstep, Ntherm, Nmove, Nrotate
 use data_distrib, only : snap
@@ -54,7 +53,7 @@ implicit none
     
 ! Beginning ----------------------------------------------------------------------------------------
     
-    write(output_unit, *) "Monte-Carlo Mix - Canonical : Volume =", Volume
+    write(output_unit, *) "Monte-Carlo Simulation : Canonical ensemble"
 
     ! Initialisations & reports
     
@@ -92,6 +91,8 @@ implicit none
     call type2_spheres%Epot_print(type2_units%Epot)
     call type2_spheres%printDensity(type2_units%report)
     call type2_spheres%printReport(type2_units%report)
+
+    write(output_unit, *) "Mix between : ", type1_spheres%getName(), " and ", type2_spheres%getName()
     
     ! Initial condition
     
