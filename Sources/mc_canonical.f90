@@ -23,7 +23,7 @@ implicit none
     integer :: iChangeRand !< random change
     integer :: iChange !< change counters
     integer :: iColRand !< random particle
-    real(DP) :: rand !< random number in between 0 and 1
+    real(DP) :: rand !< random number between 0 and 1
     real(DP) :: tIni, tFin !< CPU initial and final time
     
     ! Total physical system variables
