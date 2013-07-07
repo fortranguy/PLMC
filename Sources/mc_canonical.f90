@@ -43,14 +43,14 @@ implicit none
     integer :: mix_obsEquilib_unit
     
     ! Type 1 : Dipolar spheres : Ewald summation
-    type(DipolarSpheres) :: type1_sph !< physical properties and Monte-Carlo subroutines
+    type(DipolarSpheres) :: type1_spheres !< physical properties and Monte-Carlo subroutines
     type(MoreObservables) :: type1_obs !< energy & inverse of activity (-> chemical potential)
-    type(MoreUnits) :: type1_io !< (input/)output files
+    type(MoreUnits) :: type1_units !< files units
     
     ! Type 2 : Hard spheres
-    type(HardSpheres) :: type2_sph
+    type(HardSpheres) :: type2_spheres
     type(Observables) :: type2_obs
-    type(Units) :: type2_io
+    type(Units) :: type2_units
     
 ! Beginning ----------------------------------------------------------------------------------------
     
@@ -77,40 +77,40 @@ implicit none
     call mix%Epot_print(mix_Epot_unit)
     call mix%printReport(mix_report_unit)
     
-    call type1_sph%construct(mix%getCell_Lsize(), mix%getRcut()) !< type1_sph needs mix%rCut for the 
-                                                                 !< Cell List method
+    call type1_spheres%construct(mix%getCell_Lsize(), mix%getRcut()) !< type1_spheres needs mix%rCut
+                                                                    !< for the Cell List method
     call type1_obs%init()
-    call type1_io%open(type1_sph%getName())
-    call type1_sph%Epot_real_print(type1_io%Epot)
-    call type1_sph%Epot_reci_countNwaveVectors(type1_io%waveVectors)
-    call type1_sph%printDensity(type1_io%report)
-    call type1_sph%printReport(type1_io%report)
+    call type1_units%open(type1_spheres%getName())
+    call type1_spheres%Epot_real_print(type1_units%Epot)
+    call type1_spheres%Epot_reci_countNwaveVectors(type1_units%waveVectors)
+    call type1_spheres%printDensity(type1_units%report)
+    call type1_spheres%printReport(type1_units%report)
     
-    call type2_sph%construct(mix%getCell_Lsize(), mix%getRcut())
+    call type2_spheres%construct(mix%getCell_Lsize(), mix%getRcut())
     call type2_obs%init()
-    call type2_io%open(type2_sph%getName())
-    call type2_sph%Epot_print(type2_io%Epot)
-    call type2_sph%printDensity(type2_io%report)
-    call type2_sph%printReport(type2_io%report)
+    call type2_units%open(type2_spheres%getName())
+    call type2_spheres%Epot_print(type2_units%Epot)
+    call type2_spheres%printDensity(type2_units%report)
+    call type2_spheres%printReport(type2_units%report)
     
     ! Initial condition
     
-    call initialCondition(type1_sph, type2_sph, mix%getRmin(), report_unit)
+    call initialCondition(type1_spheres, type2_spheres, mix%getRmin(), report_unit)
     
-    call type1_sph%overlapTest()
-    call type1_sph%Epot_reci_init()
-    type1_obs%Epot = type1_sph%Epot_conf()
-    call type1_sph%snapShot_positions(0, type1_io%snapIni_positions)
-    call type1_sph%snapShot_orientations(0, type1_io%snapIni_orientations)
-    call type1_sph%cols_to_cells(type2_sph%positions) !< Cell List : filling cells with particles
+    call type1_spheres%overlapTest()
+    call type1_spheres%Epot_reci_init()
+    type1_obs%Epot = type1_spheres%Epot_conf()
+    call type1_spheres%snapShot_positions(0, type1_units%snapIni_positions)
+    call type1_spheres%snapShot_orientations(0, type1_units%snapIni_orientations)
+    call type1_spheres%cols_to_cells(type2_spheres%positions) !< Cell List : filling cells with particles
     
-    call type2_sph%overlapTest()
-    type2_obs%Epot = type2_sph%Epot_conf()
-    call type2_sph%snapShot_positions(0, type2_io%snapIni_positions)
-    call type2_sph%cols_to_cells(type1_sph%positions)
+    call type2_spheres%overlapTest()
+    type2_obs%Epot = type2_spheres%Epot_conf()
+    call type2_spheres%snapShot_positions(0, type2_units%snapIni_positions)
+    call type2_spheres%cols_to_cells(type1_spheres%positions)
     
-    call mix%overlapTest(type1_sph%positions, type2_sph%positions)
-    mix_Epot = mix%Epot_conf(type1_sph%positions, type2_sph%positions)
+    call mix%overlapTest(type1_spheres%positions, type2_spheres%positions)
+    mix_Epot = mix%Epot_conf(type1_spheres%positions, type2_spheres%positions)
     
     Epot_conf = type1_obs%Epot + type2_obs%Epot + mix_Epot
     write(output_unit, *) "Initial potential energy =", Epot_conf
@@ -136,13 +136,13 @@ implicit none
                 iColRand = int(rand*real(Ncol, DP)) + 1
                 
                 ! Moving a particle : 
-                if (iColRand <= type1_sph%getNcol()) then
-                    call type1_sph%move(iColRand, type2_sph, mix, type1_obs%Epot, mix_Epot, &
+                if (iColRand <= type1_spheres%getNcol()) then
+                    call type1_spheres%move(iColRand, type2_spheres, mix, type1_obs%Epot, mix_Epot, &
                                         type1_obs%Nreject)
                     type1_obs%Nmove = type1_obs%Nmove + 1
                 else
-                    iColRand = iColRand - type1_sph%getNcol()
-                    call type2_sph%move(iColRand, type1_sph, mix, type2_obs%Epot, mix_Epot, &
+                    iColRand = iColRand - type1_spheres%getNcol()
+                    call type2_spheres%move(iColRand, type1_spheres, mix, type2_obs%Epot, mix_Epot, &
                                         type2_obs%Nreject)
                     type2_obs%Nmove = type2_obs%Nmove + 1
                 end if
@@ -150,9 +150,9 @@ implicit none
             else ! change = rotate
                 
                 call random_number(rand)
-                iColRand = int(rand*real(type1_sph%getNcol(), DP)) + 1
+                iColRand = int(rand*real(type1_spheres%getNcol(), DP)) + 1
      
-                call type1_sph%rotate(iColRand, type1_obs%Epot, type1_obs%NrejectRot)
+                call type1_spheres%rotate(iColRand, type1_obs%Epot, type1_obs%NrejectRot)
                 type1_obs%Nrotate = type1_obs%Nrotate + 1
                 
             end if
@@ -173,58 +173,58 @@ implicit none
         
             ! Initial displacements & rejections
             if (iStep == 1) then
-                write(type1_io%deltaX, *) iStep, type1_sph%getDeltaX(), type1_obs%reject
-                write(type1_io%deltaM, *) iStep, type1_sph%getDeltaM(), type1_obs%rejectRot
-                write(type2_io%deltaX, *) iStep, type2_sph%getDeltaX(), type2_obs%reject
+                write(type1_units%deltaX, *) iStep, type1_spheres%getDeltaX(), type1_obs%reject
+                write(type1_units%deltaM, *) iStep, type1_spheres%getDeltaM(), type1_obs%rejectRot
+                write(type2_units%deltaX, *) iStep, type2_spheres%getDeltaX(), type2_obs%reject
             end if
             
             ! Displacements adaptation           
-            if (mod(iStep, type1_sph%getNadapt()) /= 0) then ! Rejections accumulation
+            if (mod(iStep, type1_spheres%getNadapt()) /= 0) then ! Rejections accumulation
                 type1_obs%rejectAdapt = type1_obs%rejectAdapt + type1_obs%reject
             else ! Average & adaptation
-                type1_obs%rejectAdapt = type1_obs%rejectAdapt/real(type1_sph%getNadapt()-1)
-                call type1_sph%adaptDeltaX(type1_obs%rejectAdapt)
-                write(type1_io%deltaX, *) iStep, type1_sph%getDeltaX(), type1_obs%rejectAdapt
+                type1_obs%rejectAdapt = type1_obs%rejectAdapt/real(type1_spheres%getNadapt()-1)
+                call type1_spheres%adaptDeltaX(type1_obs%rejectAdapt)
+                write(type1_units%deltaX, *) iStep, type1_spheres%getDeltaX(), type1_obs%rejectAdapt
                 type1_obs%rejectAdapt = 0._DP
             end if
             
             ! Rotation adaptation
-            if (mod(iStep, type1_sph%getNadaptRot()) /= 0) then
+            if (mod(iStep, type1_spheres%getNadaptRot()) /= 0) then
                 type1_obs%rejectRotAdapt = type1_obs%rejectRotAdapt + type1_obs%rejectRot
             else
-                type1_obs%rejectRotAdapt = type1_obs%rejectRotAdapt/real(type1_sph%getNadaptRot()-1)
-                call type1_sph%adaptDeltaM(type1_obs%rejectRotAdapt)
-                write(type1_io%deltaM, *) iStep, type1_sph%getDeltaM(), type1_obs%rejectRotAdapt
+                type1_obs%rejectRotAdapt = type1_obs%rejectRotAdapt/real(type1_spheres%getNadaptRot()-1)
+                call type1_spheres%adaptDeltaM(type1_obs%rejectRotAdapt)
+                write(type1_units%deltaM, *) iStep, type1_spheres%getDeltaM(), type1_obs%rejectRotAdapt
                 type1_obs%rejectRotAdapt = 0._DP
             end if
 
-            if (mod(iStep, type2_sph%getNadapt()) /= 0) then
+            if (mod(iStep, type2_spheres%getNadapt()) /= 0) then
                 type2_obs%rejectAdapt = type2_obs%rejectAdapt + type2_obs%reject
             else                
-                type2_obs%rejectAdapt = type2_obs%rejectAdapt/real(type2_sph%getNadapt()-1)
-                call type2_sph%adaptDeltaX(type2_obs%rejectAdapt)
-                write(type2_io%deltaX, *) iStep, type2_sph%getDeltaX(), type2_obs%rejectAdapt
+                type2_obs%rejectAdapt = type2_obs%rejectAdapt/real(type2_spheres%getNadapt()-1)
+                call type2_spheres%adaptDeltaX(type2_obs%rejectAdapt)
+                write(type2_units%deltaX, *) iStep, type2_spheres%getDeltaX(), type2_obs%rejectAdapt
                 type2_obs%rejectAdapt = 0._DP
             end if
             
             ! Observables writing
-            write(type1_io%obsThermal, *) iStep, type1_obs%Epot, 0._DP, type1_obs%reject, &
+            write(type1_units%obsThermal, *) iStep, type1_obs%Epot, 0._DP, type1_obs%reject, &
                                                  type1_obs%rejectRot
-            write(type2_io%obsThermal, *) iStep, type2_obs%Epot, 0._DP, type2_obs%reject
+            write(type2_units%obsThermal, *) iStep, type2_obs%Epot, 0._DP, type2_obs%reject
             write(mix_obsThermal_unit, *) iStep, mix_Epot
             write(obsThermal_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
             
             if (iStep == Ntherm) then ! Definite thermalised displacements
-                call type1_sph%definiteDeltaX(type1_obs%reject, type1_io%report)
-                call type1_sph%definiteDeltaM(type1_obs%rejectRot, type1_io%report)
-                call type2_sph%definiteDeltaX(type2_obs%reject, type2_io%report)
+                call type1_spheres%definiteDeltaX(type1_obs%reject, type1_units%report)
+                call type1_spheres%definiteDeltaM(type1_obs%rejectRot, type1_units%report)
+                call type2_spheres%definiteDeltaX(type2_obs%reject, type2_units%report)
             end if       
         
         else MC_Regime ! Thermalisation over -> Equilibrium
         
             ! Chemical potentials : Widom method
-            call type1_sph%widom(type2_sph%positions, mix, type1_obs%activ)
-            call type2_sph%widom(type1_sph%positions, mix, type2_obs%activ)
+            call type1_spheres%widom(type2_spheres%positions, mix, type1_obs%activ)
+            call type2_spheres%widom(type1_spheres%positions, mix, type2_obs%activ)
         
             ! Observables accumulations
             type1_obs%EpotSum = type1_obs%EpotSum + type1_obs%Epot
@@ -238,23 +238,23 @@ implicit none
                 
             mix_EpotSum = mix_EpotSum + mix_Epot
 
-            write(type1_io%obsEquilib, *) iStep, type1_obs%Epot, type1_obs%activ, type1_obs%reject, &
+            write(type1_units%obsEquilib, *) iStep, type1_obs%Epot, type1_obs%activ, type1_obs%reject, &
                                                  type1_obs%rejectRot
-            write(type2_io%obsEquilib, *) iStep, type2_obs%Epot, type2_obs%activ, type2_obs%reject
+            write(type2_units%obsEquilib, *) iStep, type2_obs%Epot, type2_obs%activ, type2_obs%reject
             write(mix_obsEquilib_unit, *) iStep, mix_Epot
             write(obsEquilib_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
 
             if (snap) then ! Snap shots of the configuration
-                call type1_sph%snapShot_positions(iStep, type1_io%snapShots_positions)
-                call type1_sph%snapShot_orientations(iStep, type1_io%snapShots_orientations)
-                call type2_sph%snapShot_positions(iStep, type2_io%snapShots_positions)
+                call type1_spheres%snapShot_positions(iStep, type1_units%snapShots_positions)
+                call type1_spheres%snapShot_orientations(iStep, type1_units%snapShots_orientations)
+                call type2_spheres%snapShot_positions(iStep, type2_units%snapShots_positions)
             end if
             
         end if MC_Regime
         
         ! Ewald summation : reinitialize the structure factor to prevent it from drifting.
-        if (modulo(iStep, type1_sph%getStructure_iStep()) == 0) then
-            call type1_sph%Epot_reci_structure_reInit(iStep, type1_io%structure_moduli)
+        if (modulo(iStep, type1_spheres%getStructure_iStep()) == 0) then
+            call type1_spheres%Epot_reci_structure_reInit(iStep, type1_units%structure_moduli)
         end if
     
     end do MC_Cycle
@@ -266,36 +266,36 @@ implicit none
 
     ! Tests & results
 
-    call type1_sph%overlapTest()
-    call type1_sph%Epot_reci_init()
-    call type1_sph%consistTest(type1_obs%Epot, type1_io%report)
-    call type1_sph%snapShot_positions(0, type1_io%snapFin_positions)
-    call type1_sph%snapShot_orientations(0, type1_io%snapFin_orientations)
-    call type1_obs%printResults(type1_sph%getNcol(), type1_io%report)
+    call type1_spheres%overlapTest()
+    call type1_spheres%Epot_reci_init()
+    call type1_spheres%consistTest(type1_obs%Epot, type1_units%report)
+    call type1_spheres%snapShot_positions(0, type1_units%snapFin_positions)
+    call type1_spheres%snapShot_orientations(0, type1_units%snapFin_orientations)
+    call type1_obs%printResults(type1_spheres%getNcol(), type1_units%report)
     
-    call type2_sph%overlapTest()
-    call type2_sph%consistTest(type2_obs%Epot, type2_io%report)
-    call type2_sph%snapShot_positions(0, type2_io%snapFin_positions)
-    call type2_obs%printResults(type2_sph%getNcol(), type2_io%report)
+    call type2_spheres%overlapTest()
+    call type2_spheres%consistTest(type2_obs%Epot, type2_units%report)
+    call type2_spheres%snapShot_positions(0, type2_units%snapFin_positions)
+    call type2_obs%printResults(type2_spheres%getNcol(), type2_units%report)
     
-    call mix%overlapTest(type1_sph%positions, type2_sph%positions)
-    mix_Epot_conf = mix%Epot_conf(type1_sph%positions, type2_sph%positions)
+    call mix%overlapTest(type1_spheres%positions, type2_spheres%positions)
+    mix_Epot_conf = mix%Epot_conf(type1_spheres%positions, type2_spheres%positions)
     call consistTest(mix_Epot, mix_Epot_conf, mix_report_unit)
     call mix_printResults(mix_EpotSum, mix_report_unit)
     
     Epot = type1_obs%Epot + type2_obs%Epot + mix_Epot
-    Epot_conf = type1_sph%Epot_conf() + type2_sph%Epot_conf() + mix_Epot_conf
+    Epot_conf = type1_spheres%Epot_conf() + type2_spheres%Epot_conf() + mix_Epot_conf
     call consistTest(Epot, Epot_conf, report_unit)
     EpotSum = type1_obs%EpotSum + type2_obs%EpotSum + mix_EpotSum
     call printResults(EpotSum, tFin-tIni, report_unit)
     
     ! Finalisations
     
-    call type1_sph%destroy()
-    call type1_io%close()
+    call type1_spheres%destroy()
+    call type1_units%close()
     
-    call type2_sph%destroy()
-    call type2_io%close()
+    call type2_spheres%destroy()
+    call type2_units%close()
     
     call mix%destroy()
     close(mix_report_unit)
