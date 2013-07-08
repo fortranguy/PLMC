@@ -77,7 +77,7 @@ implicit none
     call mix%printReport(mix_report_unit)
     
     call type1_spheres%construct(mix%getCell_Lsize(), mix%getRcut()) !< type1_spheres needs mix%rCut
-                                                                    !< for the Cell List method
+                                                                     !< for the Cell List method
     call type1_obs%init()
     call type1_units%open(type1_spheres%getName())
     call type1_spheres%Epot_real_print(type1_units%Epot)
@@ -103,7 +103,7 @@ implicit none
     type1_obs%Epot = type1_spheres%Epot_conf()
     call type1_spheres%snapShot_positions(0, type1_units%snapIni_positions)
     call type1_spheres%snapShot_orientations(0, type1_units%snapIni_orientations)
-    call type1_spheres%all_cols_to_cells(type2_spheres%positions) !< Cell List : filling cells with particles
+    call type1_spheres%all_cols_to_cells(type2_spheres%positions) !< filling cells with particles
     
     call type2_spheres%overlapTest()
     type2_obs%Epot = type2_spheres%Epot_conf()
