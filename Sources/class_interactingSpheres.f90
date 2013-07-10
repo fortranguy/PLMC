@@ -10,6 +10,7 @@ use data_mc, only : Temperature, inter_deltaX, inter_rejectFix, inter_Nadapt, in
 use data_neighbours, only : cell_neighs_nb, inter_cell_Lsize
 use data_distrib, only : inter_snap_factor
 use mod_physics, only : dist
+use class_observables
 use class_neighbours
 use class_mixingPotential
 use class_spheres
@@ -253,14 +254,14 @@ contains
     
     !> Particle move
     
-    subroutine InteractingSpheres_move(this, iOld, other, mix, same_Epot, mix_Epot, Nreject)
+    subroutine InteractingSpheres_move(this, iOld, other, mix, same_obs, mix_Epot)
     
         class(InteractingSpheres), intent(inout) :: this
         integer, intent(in) :: iOld
         class(Spheres), intent(inout) :: other
-        class(MixingPotential), intent(in) :: mix        
-        real(DP), intent(inout) :: same_Epot, mix_Epot
-        integer, intent(inout) :: Nreject
+        class(MixingPotential), intent(in) :: mix
+        class(Observables) :: same_obs
+        real(DP), intent(inout) :: mix_Epot
         
         logical :: overlap
         real(DP) :: rand
@@ -300,7 +301,7 @@ contains
                 if (rand < exp(-deltaEpot/Temperature)) then
                 
                     this%positions(:, iOld) = xNew(:)
-                    same_Epot = same_Epot + same_deltaEpot
+                    same_obs%Epot = same_obs%Epot + same_deltaEpot
                     mix_Epot = mix_Epot + mix_deltaEpot
                     
                     if (same_iCellOld /= same_iCellNew) then
@@ -314,15 +315,15 @@ contains
                     end if
                     
                 else
-                    Nreject = Nreject + 1
+                    same_obs%Nreject = same_obs%Nreject + 1
                 end if
-         
+
             else
-                Nreject = Nreject + 1                
-            end if            
-            
-        else        
-            Nreject = Nreject + 1            
+                same_obs%Nreject = same_obs%Nreject + 1
+            end if
+
+        else
+            same_obs%Nreject = same_obs%Nreject + 1
         end if
     
     end subroutine InteractingSpheres_move
