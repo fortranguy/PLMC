@@ -1,8 +1,8 @@
 FC = ifort
-FFLAGS = -fast -openmp #-warn all -check all -check noarg_temp_created
-LDFLAGS = -fast -openmp #-warn all -check all -check noarg_temp_created
-FFLAGS_OMP = $(FFLAGS)
-LDFLAGS_OMP = $(LDFLAGS)
+FFLAGS = -warn all -check all -check noarg_temp_created
+LDFLAGS = -warn all -check all -check noarg_temp_created
+FFLAGS_OMP = $(FFLAGS) -openmp
+LDFLAGS_OMP = $(LDFLAGS) -openmp
 #FC = gfortran
 #FFLAGS = -W -Wall -fbounds-check
 #LDFLAGS = -W -Wall -fbounds-check
@@ -49,6 +49,8 @@ mod_tools.o : data_precisions.mod data_cell.mod data_particles.mod data_mc.mod m
 
 mod_physics.o : mod_physics.f90
 	$(FC) -c $(FFLAGS_OMP) $< -o $@
+class_observables.o : class_observables.f90
+	$(FC) -c $(FFLAGS) $< -o $@
 class_neighbours.o : class_neighbours.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_mixingPotential.o : class_mixingPotential.f90
@@ -60,8 +62,6 @@ class_hardSpheres.o : class_hardSpheres.f90
 class_interactingSpheres.o : class_interactingSpheres.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_dipolarSpheres.o : class_dipolarSpheres.f90
-	$(FC) -c $(FFLAGS) $< -o $@
-class_observables.o : class_observables.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_units.o : class_units.f90
 	$(FC) -c $(FFLAGS) $< -o $@
