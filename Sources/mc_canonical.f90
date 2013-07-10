@@ -152,7 +152,7 @@ implicit none
                 call random_number(rand)
                 iColRand = int(rand*real(type1_spheres%getNcol(), DP)) + 1
      
-                call type1_spheres%rotate(iColRand, type1_obs%Epot, type1_obs%NrejectRot)
+                call type1_spheres%rotate(iColRand, type1_obs)
                 type1_obs%Nrotate = type1_obs%Nrotate + 1
                 
             end if

@@ -1372,12 +1372,11 @@ contains
     
     end subroutine DipolarSpheres_move
     
-    subroutine DipolarSpheres_rotate(this, iOld, Epot, Nreject)
+    subroutine DipolarSpheres_rotate(this, iOld, obs)
     
         class(DipolarSpheres), intent(inout) :: this
         integer, intent(in) :: iOld
-        real(DP), intent(inout) :: Epot
-        integer, intent(inout) :: Nreject
+        class(MoreObservables), intent(inout) :: obs
         
         real(DP) :: rand
         real(DP), dimension(Ndim) :: mNew
@@ -1403,10 +1402,10 @@ contains
             call this%deltaEpot_reci_rotate_updateStructure(iOld, mNew)
             this%orientations(:, iOld) = mNew(:)
             
-            Epot = Epot + deltaEpot
+            obs%Epot = obs%Epot + deltaEpot
             
         else
-            Nreject = Nreject + 1
+            obs%NrejectRot = obs%NrejectRot + 1
         end if
     
     end subroutine DipolarSpheres_rotate
