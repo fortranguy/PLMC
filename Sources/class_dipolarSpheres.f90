@@ -1290,7 +1290,7 @@ contains
 
     !> Particle move
     
-    subroutine DipolarSpheres_move(this, iOld, other, mix, same_obs%, mix_Epot)
+    subroutine DipolarSpheres_move(this, iOld, other, mix, same_obs, mix_Epot)
     
         class(DipolarSpheres), intent(inout) :: this
         integer, intent(in) :: iOld
