@@ -138,8 +138,7 @@ implicit none
                 
                 ! Moving a particle : 
                 if (iColRand <= type1_spheres%getNcol()) then
-                    call type1_spheres%move(iColRand, type2_spheres, mix, type1_obs%Epot, mix_Epot, &
-                                            type1_obs%Nreject)
+                    call type1_spheres%move(iColRand, type2_spheres, mix, type1_obs, mix_Epot)
                     type1_obs%Nmove = type1_obs%Nmove + 1
                 else
                     iColRand = iColRand - type1_spheres%getNcol()
@@ -179,7 +178,7 @@ implicit none
                 write(type2_units%deltaX, *) iStep, type2_spheres%getDeltaX(), type2_obs%reject
             end if
             
-            ! Displacements adaptation           
+            ! Displacements adaptation
             if (mod(iStep, type1_spheres%getNadapt()) /= 0) then ! Rejections accumulation
                 type1_obs%rejectAdapt = type1_obs%rejectAdapt + type1_obs%reject
             else ! Average & adaptation

@@ -13,6 +13,7 @@ use data_potential, only : dipol_rCut, dipol_dr, dipol_alpha
 use data_neighbours, only : cell_neighs_nb, dipol_cell_Lsize
 use data_distrib, only : dipol_snap_factor
 use mod_physics, only : dist, distVec, random_surface, markov_surface, Kmax1_sym, Kmax2_sym, fourier
+use class_observables
 use class_neighbours
 use class_mixingPotential
 use class_spheres
@@ -1289,14 +1290,14 @@ contains
 
     !> Particle move
     
-    subroutine DipolarSpheres_move(this, iOld, other, mix, same_Epot, mix_Epot, Nreject)
+    subroutine DipolarSpheres_move(this, iOld, other, mix, same_obs%, mix_Epot)
     
         class(DipolarSpheres), intent(inout) :: this
         integer, intent(in) :: iOld
         class(Spheres), intent(inout) :: other
         class(MixingPotential), intent(in) :: mix
-        real(DP), intent(inout) :: same_Epot, mix_Epot
-        integer, intent(inout) :: Nreject
+        class(MoreObservables), intent(inout) :: same_obs
+        real(DP), intent(inout) :: mix_Epot
         
         real(DP), dimension(Ndim) :: xRand
         logical :: overlap
@@ -1344,7 +1345,7 @@ contains
                     call this%deltaEpot_reci_move_updateStructure(iOld, xNew)
                     this%positions(:, iOld) = xNew(:)
                     
-                    same_Epot = same_Epot + same_deltaEpot
+                    same_obs%Epot = same_obs%Epot + same_deltaEpot
                     mix_Epot = mix_Epot + mix_deltaEpot
                     
                     if (same_iCellOld /= same_iCellNew) then
@@ -1358,15 +1359,15 @@ contains
                     end if
                     
                 else
-                    Nreject = Nreject + 1
+                    same_obs%Nreject = same_obs%Nreject + 1
                 end if
          
             else
-                Nreject = Nreject + 1
+                same_obs%Nreject = same_obs%Nreject + 1
             end if            
             
         else        
-            Nreject = Nreject + 1
+            same_obs%Nreject = same_obs%Nreject + 1
         end if
     
     end subroutine DipolarSpheres_move
