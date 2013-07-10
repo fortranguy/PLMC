@@ -5,7 +5,7 @@ module class_neighbourCells
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
 use data_precisions, only : DP
 use data_cell, only : Ndim, Lsize
-use data_neighbours, only : cell_neigh_coordMax, cell_neighs_nb
+use data_neighbours, only : NnearNeigh, cell_neighs_nb
 
 implicit none
 private
@@ -155,9 +155,9 @@ contains
                 stop
             end if
             
-            if (this%cell_coordMax(iDir) < cell_neigh_coordMax(iDir)) then
+            if (this%cell_coordMax(iDir) < NnearNeigh(iDir)) then
                 write(error_unit, *) "Too few cells in the direction", iDir, ":"
-                write(error_unit, *) this%cell_coordMax(iDir), "<", cell_neigh_coordMax(iDir)
+                write(error_unit, *) this%cell_coordMax(iDir), "<", NnearNeigh(iDir)
                 stop
             end if
             
@@ -309,8 +309,8 @@ contains
         integer, dimension(:), intent(in) :: neigh_coord        
         integer :: cell_neigh_coord_to_ind
         
-        cell_neigh_coord_to_ind = neigh_coord(1) + cell_neigh_coordMax(1)*(neigh_coord(2)-1) + &
-                                  cell_neigh_coordMax(1)*cell_neigh_coordMax(2)*(neigh_coord(3)-1)
+        cell_neigh_coord_to_ind = neigh_coord(1) + NnearNeigh(1)*(neigh_coord(2)-1) + &
+                                  NnearNeigh(1)*NnearNeigh(2)*(neigh_coord(3)-1)
     
     end function cell_neigh_coord_to_ind
     
@@ -346,13 +346,13 @@ contains
             
             ind = this%cell_coord_to_ind([i, j, k])
 
-            do neigh_i = 1, cell_neigh_coordMax(1)
-            do neigh_j = 1, cell_neigh_coordMax(2)
-            do neigh_k = 1, cell_neigh_coordMax(3)
+            do neigh_i = 1, NnearNeigh(1)
+            do neigh_j = 1, NnearNeigh(2)
+            do neigh_k = 1, NnearNeigh(3)
             
                 neigh_coord(:) = [neigh_i, neigh_j, neigh_k]                
                 neigh_ind = cell_neigh_coord_to_ind(neigh_coord(:))          
-                neigh_coord(:) = neigh_coord(:) - cell_neigh_coordMax(:) + 1
+                neigh_coord(:) = neigh_coord(:) - NnearNeigh(:) + 1
                     ! with respect to the center (?) [i, j, k]
                 
                 coord(:) = [i, j, k] + neigh_coord(:)
