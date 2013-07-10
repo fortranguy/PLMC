@@ -169,13 +169,6 @@ implicit none
         type2_obs%Nreject = 0; type2_obs%Nmove = 0
         
         MC_Regime : if (iStep <= Ntherm) then ! Thermalisation
-        
-            ! Initial displacements & rejections
-            if (iStep == 1) then
-                write(type1_units%deltaX, *) iStep, type1_spheres%getDeltaX(), type1_obs%reject
-                write(type1_units%deltaM, *) iStep, type1_spheres%getDeltaM(), type1_obs%rejectRot
-                write(type2_units%deltaX, *) iStep, type2_spheres%getDeltaX(), type2_obs%reject
-            end if
             
             ! Displacements adaptation
             if (mod(iStep, type1_spheres%getNadapt()) /= 0) then ! Rejections accumulation
