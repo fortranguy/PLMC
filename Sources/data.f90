@@ -183,8 +183,8 @@ implicit none
 
     integer, dimension(Ndim), parameter :: NnearNeigh_dim = 3 !< Number of nearest neighbour cells
                                                               !< in each direction
-    integer, parameter :: NnearNeigh = NnearNeigh_dim(1)*NnearNeigh_dim(2)*NnearNeigh_dim(3)
-                          !< Total number of nearest neighbour cells, including itself
+    integer, parameter :: NnearNeigh = 3**3 !< Total number of nearest neighbour cells,
+                                            !< including itself
     real(DP), dimension(Ndim), parameter :: dipol_cell_Lsize = dipol_rMin
     real(DP), dimension(Ndim), parameter :: inter_cell_Lsize = inter_rCut
     real(DP), dimension(Ndim), parameter :: hard_cell_Lsize = hard_rCut

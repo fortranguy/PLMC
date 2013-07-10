@@ -140,34 +140,34 @@ contains
         class(Neighbours), intent(in) :: this
         real(DP), intent(in) :: rCut
         
-        integer :: iDir
+        integer :: iDim
         
-        do iDir = 1, Ndim
+        do iDim = 1, Ndim
         
-            if (this%cell_Lsize(iDir) < rCut .and. this%cell_Lsize(iDir) /= Lsize(iDir)/3._DP) then
-                write(error_unit, *) "Warning : big rCut in the direction", iDir, ":"
-                write(error_unit, *) this%cell_Lsize(iDir), "<", rCut
+            if (this%cell_Lsize(iDim) < rCut .and. this%cell_Lsize(iDim) /= Lsize(iDim)/3._DP) then
+                write(error_unit, *) "Warning : big rCut in the dimension", iDim, ":"
+                write(error_unit, *) this%cell_Lsize(iDim), "<", rCut
             end if
             
-            if (Lsize(iDir)/2._DP*sqrt(3._DP) < rCut) then
-                write(error_unit, *) "rCut too large in the direction", iDir, ":"
-                write(error_unit, *) Lsize(iDir)/2._DP*sqrt(3._DP), "<", rCut
+            if (Lsize(iDim)/2._DP*sqrt(3._DP) < rCut) then
+                write(error_unit, *) "rCut too large in the dimension", iDim, ":"
+                write(error_unit, *) Lsize(iDim)/2._DP*sqrt(3._DP), "<", rCut
                 stop
             end if
             
-            if (this%cell_coordMax(iDir) < NnearNeigh_dim(iDir)) then
-                write(error_unit, *) "Too few cells in the direction", iDir, ":"
-                write(error_unit, *) this%cell_coordMax(iDir), "<", NnearNeigh_dim(iDir)
+            if (this%cell_coordMax(iDim) < NnearNeigh_dim(iDim)) then
+                write(error_unit, *) "Too few cells in the dimension", iDim, ":"
+                write(error_unit, *) this%cell_coordMax(iDim), "<", NnearNeigh_dim(iDim)
                 stop
             end if
             
-            if (modulo(Lsize(iDir), this%cell_Lsize(iDir)) /= 0) then
+            if (modulo(Lsize(iDim), this%cell_Lsize(iDim)) /= 0) then
                 write(error_unit, *) "Cell size is not a divisor of the system size"
-                write(error_unit, *) "in the direction", iDir, ":"
-                write(error_unit, *) "Lsize", Lsize(iDir)
-                write(error_unit, *) "cell_Lsize", this%cell_Lsize(iDir)
+                write(error_unit, *) "in the dimension", iDim, ":"
+                write(error_unit, *) "Lsize", Lsize(iDim)
+                write(error_unit, *) "cell_Lsize", this%cell_Lsize(iDim)
                 write(error_unit, *) "modulo(Lsize, cell_Lsize) = ", &
-                                      modulo(Lsize(iDir), this%cell_Lsize(iDir))
+                                      modulo(Lsize(iDim), this%cell_Lsize(iDim))
                 stop
             end if
             
