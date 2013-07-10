@@ -5,7 +5,7 @@ module class_neighbourCells
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
 use data_precisions, only : DP
 use data_cell, only : Ndim, Lsize
-use data_neighbourCells, only : NnearNeigh_dim, NnearNeigh
+use data_neighbourCells, only : NnearNeighCell_dim, NnearNeighCell
 
 implicit none
 private
@@ -23,7 +23,7 @@ public :: Link
     type, public :: Neighbours
         
         real(DP), dimension(Ndim) :: cell_Lsize
-        integer, dimension(Ndim) :: cell_coordMax
+        integer, dimension(Ndim) :: NtotalNeighCell_dim
         integer, dimension(:, :), allocatable :: cell_neighs
         type(LinkedList), dimension(:), allocatable :: cells
         type(LinkedList), dimension(:), allocatable :: cellsNext
@@ -56,8 +56,8 @@ contains
         real(DP), intent(in) :: rCut
         
         this%cell_Lsize(:) = cell_Lsize(:)
-        this%cell_coordMax(:) = int(Lsize(:)/this%cell_Lsize(:))
-        allocate(this%cell_neighs(NnearNeigh, product(this%cell_coordMax)))
+        this%NtotalNeighCell_dim(:) = int(Lsize(:)/this%cell_Lsize(:))
+        allocate(this%cell_neighs(NnearNeighCell, product(this%NtotalNeighCell_dim)))
             
         call this%check_CellsSize(rCut)
     
@@ -83,7 +83,7 @@ contains
     
         integer :: iCell, nCells
         
-        nCells = product(this%cell_coordMax)
+        nCells = product(this%NtotalNeighCell_dim)
 
         allocate(this%cellsBegin(nCells))
         allocate(this%cells(nCells))
@@ -124,7 +124,7 @@ contains
         integer :: iCell
         integer :: nCells
     
-        nCells = product(this%cell_coordMax)
+        nCells = product(this%NtotalNeighCell_dim)
         do iCell = 1, nCells
             if (associated(this%cellsBegin(iCell)%particle)) then
                 call free_link(this%cellsBegin(iCell)%particle)
@@ -155,9 +155,9 @@ contains
                 stop
             end if
             
-            if (this%cell_coordMax(iDim) < NnearNeigh_dim(iDim)) then
+            if (this%NtotalNeighCell_dim(iDim) < NnearNeighCell_dim(iDim)) then
                 write(error_unit, *) "Too few cells in the dimension", iDim, ":"
-                write(error_unit, *) this%cell_coordMax(iDim), "<", NnearNeigh_dim(iDim)
+                write(error_unit, *) this%NtotalNeighCell_dim(iDim), "<", NnearNeighCell_dim(iDim)
                 stop
             end if
             
@@ -186,8 +186,8 @@ contains
         integer, dimension(Ndim) :: cell_coord        
     
         cell_coord(:) = int(xCol(:)/this%cell_Lsize(:)) + 1
-        position_to_cell = cell_coord(1) + this%cell_coordMax(1)*(cell_coord(2)-1) + &
-                           this%cell_coordMax(1)*this%cell_coordMax(2)*(cell_coord(3)-1)
+        position_to_cell = cell_coord(1) + this%NtotalNeighCell_dim(1)*(cell_coord(2)-1) + &
+                           this%NtotalNeighCell_dim(1)*this%NtotalNeighCell_dim(2)*(cell_coord(3)-1)
     
     end function Neighbours_position_to_cell
     
@@ -200,7 +200,7 @@ contains
         integer :: iCol
         integer :: iCell, nCells
         
-        nCells = product(this%cell_coordMax)
+        nCells = product(this%NtotalNeighCell_dim)
     
         do iCol = 1, Ncol
     
@@ -299,8 +299,8 @@ contains
         integer, dimension(:), intent(in) :: coord
         integer :: cell_coord_to_ind
         
-        cell_coord_to_ind = coord(1) + this%cell_coordMax(1)*(coord(2)-1) + &
-                            this%cell_coordMax(1)*this%cell_coordMax(2)*(coord(3)-1)
+        cell_coord_to_ind = coord(1) + this%NtotalNeighCell_dim(1)*(coord(2)-1) + &
+                            this%NtotalNeighCell_dim(1)*this%NtotalNeighCell_dim(2)*(coord(3)-1)
     
     end function Neighbours_cell_coord_to_ind
     
@@ -309,8 +309,8 @@ contains
         integer, dimension(:), intent(in) :: neigh_coord        
         integer :: cell_neigh_coord_to_ind
         
-        cell_neigh_coord_to_ind = neigh_coord(1) + NnearNeigh_dim(1)*(neigh_coord(2)-1) + &
-                                  NnearNeigh_dim(1)*NnearNeigh_dim(2)*(neigh_coord(3)-1)
+        cell_neigh_coord_to_ind = neigh_coord(1) + NnearNeighCell_dim(1)*(neigh_coord(2)-1) + &
+                                  NnearNeighCell_dim(1)*NnearNeighCell_dim(2)*(neigh_coord(3)-1)
     
     end function cell_neigh_coord_to_ind
     
@@ -323,11 +323,11 @@ contains
         cell_period(:) = coord(:)
         
         where (cell_period(:) < 1)
-            cell_period(:) = cell_period(:) + this%cell_coordMax(:)
+            cell_period(:) = cell_period(:) + this%NtotalNeighCell_dim(:)
         end where
         
-        where (cell_period(:) > this%cell_coordMax(:))
-            cell_period(:) = cell_period(:) - this%cell_coordMax(:)
+        where (cell_period(:) > this%NtotalNeighCell_dim(:))
+            cell_period(:) = cell_period(:) - this%NtotalNeighCell_dim(:)
         end where
     
     end function Neighbours_cell_period
@@ -340,19 +340,19 @@ contains
         integer :: neigh_i, neigh_j, neigh_k, neigh_ind
         integer, dimension(Ndim) :: coord, neigh_coord
         
-        do i = 1, this%cell_coordMax(1)
-        do j = 1, this%cell_coordMax(2)
-        do k = 1, this%cell_coordMax(3)
+        do i = 1, this%NtotalNeighCell_dim(1)
+        do j = 1, this%NtotalNeighCell_dim(2)
+        do k = 1, this%NtotalNeighCell_dim(3)
             
             ind = this%cell_coord_to_ind([i, j, k])
 
-            do neigh_i = 1, NnearNeigh_dim(1)
-            do neigh_j = 1, NnearNeigh_dim(2)
-            do neigh_k = 1, NnearNeigh_dim(3)
+            do neigh_i = 1, NnearNeighCell_dim(1)
+            do neigh_j = 1, NnearNeighCell_dim(2)
+            do neigh_k = 1, NnearNeighCell_dim(3)
             
                 neigh_coord(:) = [neigh_i, neigh_j, neigh_k]                
                 neigh_ind = cell_neigh_coord_to_ind(neigh_coord(:))          
-                neigh_coord(:) = neigh_coord(:) - NnearNeigh_dim(:) + 1
+                neigh_coord(:) = neigh_coord(:) - NnearNeighCell_dim(:) + 1
                     ! with respect to the center (?) [i, j, k]
                 
                 coord(:) = [i, j, k] + neigh_coord(:)
