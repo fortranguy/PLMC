@@ -37,7 +37,7 @@ class_spheres.o : data_precisions.mod data_constants.mod  data_cell.mod mod_phys
                   class_neighbours.o
 class_hardSpheres.o : data_precisions.mod data_cell.mod data_particles.mod data_mc.mod \
                       data_potential.mod data_neighbours.mod data_distrib.mod mod_physics.o \
-                      class_neighbours.o class_mixingPotential.o class_spheres.o
+                      class_observables.o class_neighbours.o class_mixingPotential.o class_spheres.o
 class_dipolarSpheres.o : data_precisions.mod data_constants.mod data_cell.mod data_particles.mod \
                          data_mc.mod data_potential.mod data_neighbours.mod data_distrib.mod \
                          mod_physics.o class_observables.o class_neighbours.o class_mixingPotential.o \

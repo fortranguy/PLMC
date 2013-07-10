@@ -142,8 +142,7 @@ implicit none
                     type1_obs%Nmove = type1_obs%Nmove + 1
                 else
                     iColRand = iColRand - type1_spheres%getNcol()
-                    call type2_spheres%move(iColRand, type1_spheres, mix, type2_obs%Epot, mix_Epot, &
-                                            type2_obs%Nreject)
+                    call type2_spheres%move(iColRand, type1_spheres, mix, type2_obs, mix_Epot)
                     type2_obs%Nmove = type2_obs%Nmove + 1
                 end if
                 
