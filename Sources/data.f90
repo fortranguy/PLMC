@@ -181,9 +181,9 @@ use data_potential, only : inter_rCut, hard_rCut, mix_rCut
 
 implicit none
 
-    integer, dimension(Ndim), parameter :: cell_neigh_coordMax = 3
-    integer, parameter :: cell_neighs_nb = 3**3 !< including itself
-
+    integer, dimension(Ndim), parameter :: NnearNeigh_dim = 3 !< Number of neighbour cells for 3D
+    integer, parameter :: NnearNeigh = NnearNeigh_dim(1)*NnearNeigh_dim(2)*NnearNeigh_dim(3)
+                                       !< including itself
     real(DP), dimension(Ndim), parameter :: dipol_cell_Lsize = dipol_rMin
     real(DP), dimension(Ndim), parameter :: inter_cell_Lsize = inter_rCut
     real(DP), dimension(Ndim), parameter :: hard_cell_Lsize = hard_rCut
