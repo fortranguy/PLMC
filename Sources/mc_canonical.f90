@@ -76,8 +76,7 @@ implicit none
     call mix%Epot_print(mix_Epot_unit)
     call mix%printReport(mix_report_unit)
     
-    call type1_spheres%construct(mix%getCell_Lsize(), mix%getRcut()) !< type1_spheres needs mix%rCut
-                                                                     !< for the Cell List method
+    call type1_spheres%construct(mix%getCell_Lsize(), mix%getRcut())
     call type1_obs%init()
     call type1_units%open(type1_spheres%getName())
     call type1_spheres%Epot_real_print(type1_units%Epot)
