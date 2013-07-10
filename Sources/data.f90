@@ -169,10 +169,10 @@ end module data_potential
 !***************************************************************************************************
 
 !***************************************************************************************************
-!> \brief Neighbours data :
+!> \brief Neighbours Cells data :
 !> declaration of the grid/cell scheme parameters
 !***************************************************************************************************
-module data_neighbours
+module data_neighbourCells
 
 use data_precisions, only : DP
 use data_cell, only : Ndim
@@ -181,16 +181,17 @@ use data_potential, only : inter_rCut, hard_rCut, mix_rCut
 
 implicit none
 
-    integer, dimension(Ndim), parameter :: NnearNeigh_dim = 3 !< Number of neighbour cells for 3D
+    integer, dimension(Ndim), parameter :: NnearNeigh_dim = 3 !< Number of nearest neighbour cells
+                                                              !< in each direction
     integer, parameter :: NnearNeigh = NnearNeigh_dim(1)*NnearNeigh_dim(2)*NnearNeigh_dim(3)
-                                       !< including itself
+                          !< Total number of nearest neighbour cells, including itself
     real(DP), dimension(Ndim), parameter :: dipol_cell_Lsize = dipol_rMin
     real(DP), dimension(Ndim), parameter :: inter_cell_Lsize = inter_rCut
     real(DP), dimension(Ndim), parameter :: hard_cell_Lsize = hard_rCut
     
     real(DP), dimension(Ndim), parameter :: mix_cell_Lsize = mix_rCut
 
-end module data_neighbours
+end module data_neighbourCells
 !***************************************************************************************************
 
 !***************************************************************************************************

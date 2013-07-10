@@ -5,7 +5,7 @@ module class_neighbourCells
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
 use data_precisions, only : DP
 use data_cell, only : Ndim, Lsize
-use data_neighbours, only : NnearNeigh_dim, NnearNeigh
+use data_neighbourCells, only : NnearNeigh_dim, NnearNeigh
 
 implicit none
 private
