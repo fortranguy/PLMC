@@ -7,10 +7,10 @@ use data_precisions, only : DP
 use data_particles, only : Ncol
 use data_mc, only : Nstep, Ntherm, Nmove, Nrotate
 use data_distrib, only : snap
+use class_observables
 use class_mixingPotential
 use class_dipolarSpheres
 use class_hardSpheres
-use class_observables
 use class_units
 use mod_tools, only : initRandomSeed, initialCondition, report, consistTest, printResults, &
                       mix_printResults
