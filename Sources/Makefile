@@ -1,8 +1,8 @@
 FC = ifort
-FFLAGS = -fast -openmp # -warn all -check all -check noarg_temp_created
-LDFLAGS = -fast -openmp # -warn all -check all -check noarg_temp_created
-FFLAGS_OMP = $(FFLAGS)
-LDFLAGS_OMP = $(LDFLAGS)
+FFLAGS = -warn all -check all -check noarg_temp_created
+LDFLAGS = -warn all -check all -check noarg_temp_created
+FFLAGS_OMP = $(FFLAGS) -openmp
+LDFLAGS_OMP = $(LDFLAGS) -openmp
 #FC = gfortran
 #FFLAGS = -W -Wall -fbounds-check
 #LDFLAGS = -W -Wall -fbounds-check
