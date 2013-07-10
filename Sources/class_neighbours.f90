@@ -1,6 +1,6 @@
 !> \brief Description of the neighbours class
 
-module class_neighbours
+module class_neighbourCells
 
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
 use data_precisions, only : DP
@@ -369,4 +369,4 @@ contains
             
     end subroutine Neighbours_cell_neighs_init
 
-end module class_neighbours
+end module class_neighbourCells
