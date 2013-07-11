@@ -203,20 +203,20 @@ contains
         xNew(:) = this%positions(:, iOld) + (xRand(:)-0.5_DP)*this%deltaX(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
         
-        same_iCellNew = this%same%position_to_cell(xNew)
+        same_iCellNew = this%same%cell_from_position(xNew)
         call this%Epot_neighCells(iOld, xNew, same_iCellNew, overlap)
         
         if (.not. overlap) then
         
-            mix_iCellNew = this%mix%position_to_cell(xNew)
+            mix_iCellNew = this%mix%cell_from_position(xNew)
             call mix%Epot_neighCells(xNew, mix_iCellNew, this%mix, other%positions, overlap, mix_eNew)
                         
             if (.not. overlap) then
     
-                same_iCellOld = this%same%position_to_cell(this%positions(:, iOld))
+                same_iCellOld = this%same%cell_from_position(this%positions(:, iOld))
                 call this%Epot_neighCells(iOld, this%positions(:, iOld), same_iCellOld, overlap)
                     
-                mix_iCellOld = this%mix%position_to_cell(this%positions(:, iOld))
+                mix_iCellOld = this%mix%cell_from_position(this%positions(:, iOld))
                 call mix%Epot_neighCells(this%positions(:, iOld), mix_iCellOld, this%mix, &
                                           other%positions, overlap, mix_eOld)
                 
@@ -275,12 +275,12 @@ contains
             
             call random_number(xRand)
             xTest(:) = Lsize(:) * xRand(:)    
-            same_iCellTest = this%same%position_to_cell(xTest)
+            same_iCellTest = this%same%cell_from_position(xTest)
             call this%Epot_neighCells(0, xTest, same_iCellTest, overlap) 
             
             if (.not. overlap) then
             
-                mix_iCellTest = this%mix%position_to_cell(xTest)
+                mix_iCellTest = this%mix%cell_from_position(xTest)
                 call mix%Epot_neighCells(xTest, mix_iCellTest, this%mix, other_positions, overlap, &
                                     mix_enTest)
                 
