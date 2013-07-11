@@ -22,7 +22,7 @@ public :: Link
 
     type, public :: NeighbourCells
         
-        real(DP), dimension(Ndim) :: cell_Lsize
+        real(DP), dimension(Ndim) :: cell_size
         integer, dimension(Ndim) :: NtotalCell_dim
         integer :: NtotalCell
         integer, dimension(:, :), allocatable :: nearCells_from_totalCells
@@ -50,14 +50,14 @@ public :: Link
     
 contains
 
-    subroutine NeighbourCells_construct(this, cell_Lsize, rCut)
+    subroutine NeighbourCells_construct(this, cell_size, rCut)
     
         class(NeighbourCells), intent(out) :: this
-        real(DP), dimension(:), intent(in) :: cell_Lsize
+        real(DP), dimension(:), intent(in) :: cell_size
         real(DP), intent(in) :: rCut
         
-        this%cell_Lsize(:) = cell_Lsize(:)
-        this%NtotalCell_dim(:) = int(Lsize(:)/this%cell_Lsize(:))
+        this%cell_size(:) = cell_size(:)
+        this%NtotalCell_dim(:) = int(Lsize(:)/this%cell_size(:))
         this%NtotalCell = product(this%NtotalCell_dim)
         allocate(this%nearCells_from_totalCells(NnearCell, this%NtotalCell))
             
@@ -142,9 +142,9 @@ contains
         
         do iDim = 1, Ndim
         
-            if (this%cell_Lsize(iDim) < rCut .and. this%cell_Lsize(iDim) /= Lsize(iDim)/3._DP) then
+            if (this%cell_size(iDim) < rCut .and. this%cell_size(iDim) /= Lsize(iDim)/3._DP) then
                 write(error_unit, *) "Warning : big rCut in the dimension", iDim, ":"
-                write(error_unit, *) this%cell_Lsize(iDim), "<", rCut
+                write(error_unit, *) this%cell_size(iDim), "<", rCut
             end if
             
             if (Lsize(iDim)/2._DP*sqrt(3._DP) < rCut) then
@@ -159,13 +159,13 @@ contains
                 stop
             end if
             
-            if (modulo(Lsize(iDim), this%cell_Lsize(iDim)) /= 0) then
+            if (modulo(Lsize(iDim), this%cell_size(iDim)) /= 0) then
                 write(error_unit, *) "Cell size is not a divisor of the system size"
                 write(error_unit, *) "in the dimension", iDim, ":"
                 write(error_unit, *) "Lsize", Lsize(iDim)
-                write(error_unit, *) "cell_Lsize", this%cell_Lsize(iDim)
-                write(error_unit, *) "modulo(Lsize, cell_Lsize) = ", &
-                                      modulo(Lsize(iDim), this%cell_Lsize(iDim))
+                write(error_unit, *) "cell_size", this%cell_size(iDim)
+                write(error_unit, *) "modulo(Lsize, cell_size) = ", &
+                                      modulo(Lsize(iDim), this%cell_size(iDim))
                 stop
             end if
             
@@ -183,7 +183,7 @@ contains
         
         integer, dimension(Ndim) :: cell_coord        
     
-        cell_coord(:) = int(xCol(:)/this%cell_Lsize(:)) + 1
+        cell_coord(:) = int(xCol(:)/this%cell_size(:)) + 1
         position_to_cell = cell_coord(1) + this%NtotalCell_dim(1)*(cell_coord(2)-1) + &
                            this%NtotalCell_dim(1)*this%NtotalCell_dim(2)*(cell_coord(3)-1)
     

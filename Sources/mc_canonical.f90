@@ -76,7 +76,7 @@ implicit none
     call mix%Epot_print(mix_Epot_unit)
     call mix%printReport(mix_report_unit)
     
-    call type1_spheres%construct(mix%getCell_Lsize(), mix%getRcut())
+    call type1_spheres%construct(mix%getcell_size(), mix%getRcut())
     call type1_obs%init()
     call type1_units%open(type1_spheres%getName())
     call type1_spheres%Epot_real_print(type1_units%Epot)
@@ -84,7 +84,7 @@ implicit none
     call type1_spheres%printDensity(type1_units%report)
     call type1_spheres%printReport(type1_units%report)
     
-    call type2_spheres%construct(mix%getCell_Lsize(), mix%getRcut())
+    call type2_spheres%construct(mix%getcell_size(), mix%getRcut())
     call type2_obs%init()
     call type2_units%open(type2_spheres%getName())
     call type2_spheres%Epot_print(type2_units%Epot)

@@ -10,7 +10,7 @@ use data_particles, only : dipol_radius, dipol_rMin, dipol_Ncol
 use data_mc, only : Temperature, dipol_structure_iStep, dipol_deltaX, dipol_rejectFix, dipol_Nadapt, &
                     dipol_deltaM, dipol_deltaMmax, dipol_rejectRotFix, dipol_NadaptRot, dipol_Nwidom
 use data_potential, only : dipol_rCut, dipol_dr, dipol_alpha
-use data_neighbours, only : cell_neighs_nb, dipol_cell_Lsize
+use data_neighbours, only : cell_neighs_nb, dipol_cell_size
 use data_distrib, only : dipol_snap_factor
 use mod_physics, only : dist, distVec, random_surface, markov_surface, Kmax1_sym, Kmax2_sym, fourier
 use class_observables
@@ -114,10 +114,10 @@ private
     
 contains
 
-    subroutine DipolarSpheres_construct(this, mix_cell_Lsize, mix_rCut)
+    subroutine DipolarSpheres_construct(this, mix_cell_size, mix_rCut)
     
         class(DipolarSpheres), intent(out) :: this
-        real(DP), dimension(:), intent(in) :: mix_cell_Lsize
+        real(DP), dimension(:), intent(in) :: mix_cell_size
         real(DP), intent(in) :: mix_rCut
         
         this%name = "dipol"
@@ -160,11 +160,11 @@ contains
         call this%Epot_reci_weight_init()
         
         ! Neighbours : same kind
-        call this%same%construct(dipol_cell_Lsize, this%rCut)
+        call this%same%construct(dipol_cell_size, this%rCut)
         call this%same%alloc_cells()
         call this%same%cell_neighs_init()
         ! Neighbours : other kind
-        call this%mix%construct(mix_cell_Lsize, mix_rCut)
+        call this%mix%construct(mix_cell_size, mix_rCut)
         call this%mix%alloc_cells()
         call this%mix%cell_neighs_init()
     
@@ -215,9 +215,9 @@ contains
         write(report_unit, *) "    NwaveVectors = ", this%NwaveVectors
         
         write(report_unit, *) "    same_cell_coordMax(:) = ", this%same%cell_coordMax(:)
-        write(report_unit, *) "    same_cell_Lsize(:) = ", this%same%cell_Lsize(:)
+        write(report_unit, *) "    same_cell_size(:) = ", this%same%cell_size(:)
         write(report_unit, *) "    mix_cell_coordMax(:) = ", this%mix%cell_coordMax(:)
-        write(report_unit, *) "    mix_cell_Lsize(:) = ", this%mix%cell_Lsize(:)
+        write(report_unit, *) "    mix_cell_size(:) = ", this%mix%cell_size(:)
         
     end subroutine DipolarSpheres_printReport
     

@@ -7,7 +7,7 @@ use data_cell, only : Ndim, Lsize
 use data_particles, only : hard_radius, hard_rMin, hard_Ncol
 use data_potential, only : hard_rCut
 use data_mc, only : Temperature, hard_deltaX, hard_rejectFix, hard_Nadapt, hard_Nwidom
-use data_neighbours, only : cell_neighs_nb, hard_cell_Lsize
+use data_neighbours, only : cell_neighs_nb, hard_cell_size
 use data_distrib, only : hard_snap_factor
 use mod_physics, only : dist
 use class_observables
@@ -49,10 +49,10 @@ private
     
 contains
 
-    subroutine HardSpheres_construct(this, mix_cell_Lsize, mix_rCut)
+    subroutine HardSpheres_construct(this, mix_cell_size, mix_rCut)
     
         class(HardSpheres), intent(out) :: this
-        real(DP), dimension(:), intent(in) :: mix_cell_Lsize
+        real(DP), dimension(:), intent(in) :: mix_cell_size
         real(DP), intent(in) :: mix_rCut
         
         this%name = "hardS"
@@ -78,11 +78,11 @@ contains
         this%Epot = 0._DP
         
         ! Neighbours : same kind
-        call this%same%construct(hard_cell_Lsize, this%rCut)
+        call this%same%construct(hard_cell_size, this%rCut)
         call this%same%alloc_cells()
         call this%same%cell_neighs_init()
         ! Neighbours : other kind
-        call this%mix%construct(mix_cell_Lsize, mix_rCut)
+        call this%mix%construct(mix_cell_size, mix_rCut)
         call this%mix%alloc_cells()
         call this%mix%cell_neighs_init()
     
@@ -117,9 +117,9 @@ contains
         write(report_unit, *) "    rCut = ", this%rCut
         
         write(report_unit, *) "    same_cell_coordMax(:) = ", this%same%cell_coordMax(:)
-        write(report_unit, *) "    same_cell_Lsize(:) = ", this%same%cell_Lsize(:)        
+        write(report_unit, *) "    same_cell_size(:) = ", this%same%cell_size(:)        
         write(report_unit, *) "    mix_cell_coordMax(:) = ", this%mix%cell_coordMax(:)
-        write(report_unit, *) "    mix_cell_Lsize(:) = ", this%mix%cell_Lsize(:)
+        write(report_unit, *) "    mix_cell_size(:) = ", this%mix%cell_size(:)
         
     end subroutine HardSpheres_printReport
     

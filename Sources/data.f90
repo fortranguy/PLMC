@@ -185,11 +185,11 @@ implicit none
                                                              !< in each direction
     integer, parameter :: NnearCell = 3**3 !< Total number of nearest neighbour cells,
                                            !< including itself
-    real(DP), dimension(Ndim), parameter :: dipol_cell_Lsize = dipol_rMin
-    real(DP), dimension(Ndim), parameter :: inter_cell_Lsize = inter_rCut
-    real(DP), dimension(Ndim), parameter :: hard_cell_Lsize = hard_rCut
+    real(DP), dimension(Ndim), parameter :: dipol_cell_size = dipol_rMin
+    real(DP), dimension(Ndim), parameter :: inter_cell_size = inter_rCut
+    real(DP), dimension(Ndim), parameter :: hard_cell_size = hard_rCut
     
-    real(DP), dimension(Ndim), parameter :: mix_cell_Lsize = mix_rCut
+    real(DP), dimension(Ndim), parameter :: mix_cell_size = mix_rCut
 
 end module data_neighbourCells
 !***************************************************************************************************
