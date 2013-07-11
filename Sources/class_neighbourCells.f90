@@ -43,7 +43,7 @@ public :: Link
         procedure :: remove_col_from_cell => NeighbourCells_remove_col_from_cell
         procedure :: add_col_to_cell => NeighbourCells_add_col_to_cell
         procedure, private :: totalCell_coord_to_index => NeighbourCells_cell_coord_to_ind
-        procedure, private :: cell_period => NeighbourCells_cell_period
+        procedure, private :: totalCell_PBC => NeighbourCells_totalCell_PBC
         procedure :: cell_neighs_init => NeighbourCells_cell_neighs_init
         
     end type NeighbourCells
@@ -59,7 +59,7 @@ contains
         this%cell_Lsize(:) = cell_Lsize(:)
         this%NtotalCell_dim(:) = int(Lsize(:)/this%cell_Lsize(:))
         this%NtotalCell = product(this%NtotalCell_dim)
-        allocate(this%cell_neighs(NnearCell, this%NtotalCell))
+        allocate(this%nearCells_from_totalCells(NnearCell, this%NtotalCell))
             
         call this%check_CellsSize(rCut)
     
@@ -69,8 +69,8 @@ contains
     
         class(NeighbourCells), intent(inout) :: this
         
-        if (allocated(this%cell_neighs)) then
-            deallocate(this%cell_neighs)
+        if (allocated(this%nearCells_from_totalCells)) then
+            deallocate(this%nearCells_from_totalCells)
         end if
         
         call this%dealloc_cells()
@@ -312,23 +312,23 @@ contains
     
     end function nearCell_coord_to_index
     
-    pure function NeighbourCells_cell_period(this, totalCell_coord) result(cell_period)
+    pure function NeighbourCells_totalCell_PBC(this, totalCell_coord) result(totalCell_PBC)
     
         class(NeighbourCells), intent(in) :: this
         integer, dimension(:), intent(in) :: totalCell_coord
-        integer, dimension(Ndim) :: cell_period
+        integer, dimension(Ndim) :: totalCell_PBC
         
-        cell_period(:) = totalCell_coord(:)
+        totalCell_PBC(:) = totalCell_coord(:)
         
-        where (cell_period(:) < 1)
-            cell_period(:) = cell_period(:) + this%NtotalCell_dim(:)
+        where (totalCell_PBC(:) < 1)
+            totalCell_PBC(:) = totalCell_PBC(:) + this%NtotalCell_dim(:)
         end where
         
-        where (cell_period(:) > this%NtotalCell_dim(:))
-            cell_period(:) = cell_period(:) - this%NtotalCell_dim(:)
+        where (totalCell_PBC(:) > this%NtotalCell_dim(:))
+            totalCell_PBC(:) = totalCell_PBC(:) - this%NtotalCell_dim(:)
         end where
     
-    end function NeighbourCells_cell_period
+    end function NeighbourCells_totalCell_PBC
     
     subroutine NeighbourCells_cell_neighs_init(this)
     
@@ -355,8 +355,8 @@ contains
                 
                 totalCell_coord(:) = [iTotalCell, jTotalCell, kTotalCell] + nearCell_coord(:)
                 
-                this%cell_neighs(nearCell_index, totalCell_index) = &
-                    this%totalCell_coord_to_index(this%cell_period(totalCell_coord(:)))
+                this%nearCells_from_totalCells(nearCell_index, totalCell_index) = &
+                    this%totalCell_coord_to_index(this%totalCell_PBC(totalCell_coord(:)))
                     
             end do
             end do
