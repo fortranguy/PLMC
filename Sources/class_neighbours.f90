@@ -24,6 +24,7 @@ public :: Link
         
         real(DP), dimension(Ndim) :: cell_Lsize
         integer, dimension(Ndim) :: NtotalNeighCell_dim
+        integer :: NtotalNeighCell
         integer, dimension(:, :), allocatable :: cell_neighs
         type(LinkedList), dimension(:), allocatable :: cells
         type(LinkedList), dimension(:), allocatable :: cellsNext
@@ -57,7 +58,8 @@ contains
         
         this%cell_Lsize(:) = cell_Lsize(:)
         this%NtotalNeighCell_dim(:) = int(Lsize(:)/this%cell_Lsize(:))
-        allocate(this%cell_neighs(NnearNeighCell, product(this%NtotalNeighCell_dim)))
+        this%NtotalNeighCell = product(this%NtotalNeighCell_dim)
+        allocate(this%cell_neighs(NnearNeighCell, this%NtotalNeighCell))
             
         call this%check_CellsSize(rCut)
     
@@ -81,15 +83,13 @@ contains
     
         class(Neighbours), intent(inout) :: this
     
-        integer :: iCell, nCells
-        
-        nCells = product(this%NtotalNeighCell_dim)
+        integer :: iCell
 
-        allocate(this%cellsBegin(nCells))
-        allocate(this%cells(nCells))
-        allocate(this%cellsNext(nCells))
+        allocate(this%cellsBegin(this%NtotalNeighCell))
+        allocate(this%cells(this%NtotalNeighCell))
+        allocate(this%cellsNext(this%NtotalNeighCell))
         
-        do iCell = 1, nCells
+        do iCell = 1, this%NtotalNeighCell
 
             allocate(this%cellsBegin(iCell)%particle)
             this%cells(iCell)%particle => this%cellsBegin(iCell)%particle
@@ -122,10 +122,8 @@ contains
         class(Neighbours), intent(inout) :: this
     
         integer :: iCell
-        integer :: nCells
-    
-        nCells = product(this%NtotalNeighCell_dim)
-        do iCell = 1, nCells
+
+        do iCell = 1, this%NtotalNeighCell
             if (associated(this%cellsBegin(iCell)%particle)) then
                 call free_link(this%cellsBegin(iCell)%particle)
             end if
@@ -198,9 +196,7 @@ contains
         real(DP), dimension(:, :), intent(in) :: X
     
         integer :: iCol
-        integer :: iCell, nCells
-        
-        nCells = product(this%NtotalNeighCell_dim)
+        integer :: iCell
     
         do iCol = 1, Ncol
     
@@ -214,7 +210,7 @@ contains
             
         end do
         
-        do iCell = 1, nCells
+        do iCell = 1, this%NtotalNeighCell
             
             this%cells(iCell)%particle%next => null()
             
