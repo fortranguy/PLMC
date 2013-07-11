@@ -136,9 +136,9 @@ contains
         write(report_unit, *) "    rCut = ", this%rCut
         write(report_unit, *) "    dr = ", this%dr
         
-        write(report_unit, *) "    same_cell_coordMax(:) = ", this%same%cell_coordMax(:)
+        write(report_unit, *) "    same_NtotalCell_dim(:) = ", this%same%NtotalCell_dim(:)
         write(report_unit, *) "    same_cell_size(:) = ", this%same%cell_size(:)
-        write(report_unit, *) "    mix_cell_coordMax(:) = ", this%mix%cell_coordMax(:)
+        write(report_unit, *) "    mix_NtotalCell_dim(:) = ", this%mix%NtotalCell_dim(:)
         write(report_unit, *) "    mix_cell_size(:) = ", this%mix%cell_size(:)
         
     end subroutine InteractingSpheres_printReport
@@ -223,8 +223,8 @@ contains
     
         do iNeigh = 1, cell_neighs_nb
         
-            iCell_neigh = this%same%cell_neighs(iNeigh, iCell)
-            current => this%same%cellsBegin(iCell_neigh)%particle%next            
+            iCell_neigh = this%same%nearCells_from_totalCells(iNeigh, iCell)
+            current => this%same%beginCells(iCell_neigh)%particle%next            
             if (.not. associated(current%next)) cycle
             
             do
