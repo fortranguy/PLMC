@@ -212,7 +212,7 @@ contains
     
         cell_coord(:) = int(xCol(:)/this%cell_size(:)) + 1
         cell_from_position = cell_coord(1) + this%NtotalCell_dim(1)*(cell_coord(2)-1) + &
-                           this%NtotalCell_dim(1)*this%NtotalCell_dim(2)*(cell_coord(3)-1)
+                             this%NtotalCell_dim(1)*this%NtotalCell_dim(2)*(cell_coord(3)-1)
     
     end function NeighbourCells_cell_from_position
     

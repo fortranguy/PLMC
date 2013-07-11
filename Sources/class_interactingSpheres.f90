@@ -358,7 +358,7 @@ contains
                 
                 mix_iCellTest = this%mix%cell_from_position(xTest)
                 call mix%Epot_neighCells(xTest, mix_iCellTest, this%mix, other_positions, overlap, &
-                                    mix_enTest)
+                                         mix_enTest)
                 
                 if (.not. overlap) then
                 

@@ -218,7 +218,7 @@ contains
                     
                 mix_iCellOld = this%mix%cell_from_position(this%positions(:, iOld))
                 call mix%Epot_neighCells(this%positions(:, iOld), mix_iCellOld, this%mix, &
-                                          other%positions, overlap, mix_eOld)
+                                         other%positions, overlap, mix_eOld)
                 
                 mix_deltaEpot = mix_eNew - mix_eOld
                 
@@ -282,7 +282,7 @@ contains
             
                 mix_iCellTest = this%mix%cell_from_position(xTest)
                 call mix%Epot_neighCells(xTest, mix_iCellTest, this%mix, other_positions, overlap, &
-                                    mix_enTest)
+                                         mix_enTest)
                 
                 if (.not. overlap) then
                 
