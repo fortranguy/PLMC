@@ -159,14 +159,9 @@ contains
         allocate(this%Epot_reci_potential(Ndim, this%Ncol))
         call this%Epot_reci_weight_init()
         
-        ! Neighbours : same kind
-        call this%same%construct(dipol_cell_size, this%rCut)
-        call this%same%alloc_cells()
-        call this%same%nearCells_from_totalCells_init()
-        ! Neighbours : other kind
-        call this%mix%construct(mix_cell_size, mix_rCut)
-        call this%mix%alloc_cells()
-        call this%mix%nearCells_from_totalCells_init()
+        ! Neighbour Cells
+        call this%same%construct(dipol_cell_size, this%rCut) !< same kind
+        call this%mix%construct(mix_cell_size, mix_rCut) !< other kind
     
     end subroutine DipolarSpheres_construct
     
@@ -452,7 +447,7 @@ contains
 
         do iNearCell = 1, NnearCell
 
-            nearCell_index = this%same%nearCells_from_totalCells(iNearCell, iTotalCell)
+            nearCell_index = this%same%nearCells_among_totalCells(iNearCell, iTotalCell)
             current => this%same%beginCells(nearCell_index)%particle%next
             if (.not. associated(current%next)) cycle
 

@@ -28,7 +28,7 @@ public :: Link
         real(DP), dimension(Ndim) :: cell_size
         integer, dimension(Ndim) :: NtotalCell_dim
         integer :: NtotalCell
-        integer, dimension(:, :), allocatable, public :: nearCells_from_totalCells
+        integer, dimension(:, :), allocatable, public :: nearCells_among_totalCells
         type(LinkedList), dimension(:), allocatable, public :: beginCells
         type(LinkedList), dimension(:), allocatable :: currentCells
         type(LinkedList), dimension(:), allocatable :: nextCells        
@@ -49,7 +49,7 @@ public :: Link
         procedure :: remove_col_from_cell => NeighbourCells_remove_col_from_cell
         procedure :: add_col_to_cell => NeighbourCells_add_col_to_cell
         procedure, private :: totalCell_PBC => NeighbourCells_totalCell_PBC
-        procedure :: nearCells_from_totalCells_init => NeighbourCells_nearCells_from_totalCells_init
+        procedure :: nearCells_among_totalCells_init => NeighbourCells_nearCells_among_totalCells_init
         
     end type NeighbourCells
     
@@ -64,9 +64,11 @@ contains
         this%cell_size(:) = cell_size(:)
         this%NtotalCell_dim(:) = int(Lsize(:)/this%cell_size(:))
         this%NtotalCell = product(this%NtotalCell_dim)
-        allocate(this%nearCells_from_totalCells(NnearCell, this%NtotalCell))
+        allocate(this%nearCells_among_totalCells(NnearCell, this%NtotalCell))
             
-        call this%check_CellsSize(rCut)
+        call this%check_CellsSize(rCut)        
+        call this%alloc_cells()
+        call this%nearCells_among_totalCells_init()
     
     end subroutine NeighbourCells_construct
     
@@ -74,8 +76,8 @@ contains
     
         class(NeighbourCells), intent(inout) :: this
         
-        if (allocated(this%nearCells_from_totalCells)) then
-            deallocate(this%nearCells_from_totalCells)
+        if (allocated(this%nearCells_among_totalCells)) then
+            deallocate(this%nearCells_among_totalCells)
         end if
         
         call this%dealloc_cells()
@@ -334,7 +336,7 @@ contains
     
     end function NeighbourCells_totalCell_PBC
     
-    subroutine NeighbourCells_nearCells_from_totalCells_init(this)
+    subroutine NeighbourCells_nearCells_among_totalCells_init(this)
     
         class(NeighbourCells), intent(inout) :: this
     
@@ -360,7 +362,7 @@ contains
                 
                 totalCell_coord(:) = [iTotalCell, jTotalCell, kTotalCell] + nearCell_coord(:)
                 
-                this%nearCells_from_totalCells(nearCell_index, totalCell_index) = &
+                this%nearCells_among_totalCells(nearCell_index, totalCell_index) = &
                     index_from_coord(this%totalCell_PBC(totalCell_coord), this%NtotalCell_dim)
                     
             end do
@@ -371,6 +373,6 @@ contains
         end do
         end do
             
-    end subroutine NeighbourCells_nearCells_from_totalCells_init
+    end subroutine NeighbourCells_nearCells_among_totalCells_init
 
 end module class_neighbourCells

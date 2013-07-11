@@ -208,16 +208,11 @@ contains
         real(DP), parameter :: more = 1._DP+eps_deltaX
         real(DP), parameter :: less = 1._DP-eps_deltaX
         
-        real(DP) :: deltaX_normSqr, Lsize_normSqr
-        
-        Lsize_normSqr = dot_product(Lsize, Lsize)
-        
         if (reject < this%rejectFix - eps_reject) then
         
             this%deltaX(:) = this%deltaX(:) * more
             
-            deltaX_normSqr = dot_product(this%deltaX, this%deltaX)
-            if (deltaX_normSqr > Lsize_normSqr) then
+            if (norm2(this%deltaX) > norm2(Lsize)) then
                 this%deltaX(:) = Lsize(:)
             end if
             
@@ -234,29 +229,25 @@ contains
         class(Spheres), intent(inout) :: this    
         real(DP), intent(in) :: reject
         integer, intent(in) :: report_unit
-        
-        real(DP) :: deltaX_normSqr, Lsize_normSqr
-        
-            if (reject == 0._DP) then
-                write(error_unit, *) this%name, " :    Warning : deltaX adaptation problem."
-                this%deltaX(:) = this%deltaXsave(:)
-                write(error_unit, *) "default deltaX :", this%deltaX(:)
-            end if
-            
-            deltaX_normSqr = dot_product(this%deltaX, this%deltaX)
-            Lsize_normSqr = dot_product(Lsize, Lsize)
-            if (deltaX_normSqr >= Lsize_normSqr) then
-                write(error_unit, *) this%name, " :   Warning : deltaX too big."
-                this%deltaX(:) = Lsize(:)
-                write(error_unit, *) "big deltaX :", this%deltaX(:)
-            end if
-            
-            write(output_unit, *) this%name, " :    Thermalisation : over"
-            
-            write(report_unit, *) "Displacement :"
-            write(report_unit, *) "    deltaX(:) = ", this%deltaX(:)
-            write(report_unit, *) "    rejection relative difference = ", &
-                                       abs(reject-this%rejectFix)/this%rejectFix
+
+        if (reject == 0._DP) then
+            write(error_unit, *) this%name, " :    Warning : deltaX adaptation problem."
+            this%deltaX(:) = this%deltaXsave(:)
+            write(error_unit, *) "default deltaX :", this%deltaX(:)
+        end if
+
+        if (norm2(this%deltaX) > norm2(Lsize)) then
+            write(error_unit, *) this%name, " :   Warning : deltaX too big."
+            this%deltaX(:) = Lsize(:)
+            write(error_unit, *) "big deltaX :", this%deltaX(:)
+        end if
+
+        write(output_unit, *) this%name, " :    Thermalisation : over"
+
+        write(report_unit, *) "Displacement :"
+        write(report_unit, *) "    deltaX(:) = ", this%deltaX(:)
+        write(report_unit, *) "    rejection relative difference = ", &
+                                    abs(reject-this%rejectFix)/this%rejectFix
     
     end subroutine Spheres_definiteDeltaX
     
