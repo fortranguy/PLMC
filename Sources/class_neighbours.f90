@@ -42,7 +42,7 @@ public :: Link
         procedure :: all_cols_to_cells => NeighbourCells_all_cols_to_cells
         procedure :: remove_col_from_cell => NeighbourCells_remove_col_from_cell
         procedure :: add_col_to_cell => NeighbourCells_add_col_to_cell
-        procedure, private :: cell_coord_to_ind => NeighbourCells_cell_coord_to_ind
+        procedure, private :: totalCell_coord_to_index => NeighbourCells_cell_coord_to_ind
         procedure, private :: cell_period => NeighbourCells_cell_period
         procedure :: cell_neighs_init => NeighbourCells_cell_neighs_init
         
@@ -289,26 +289,26 @@ contains
     
     ! Neighbour cells ------------------------------------------------------------------------------
 
-    pure function NeighbourCells_cell_coord_to_ind(this, totalCell_coord) result(cell_coord_to_ind)
+    pure function NeighbourCells_cell_coord_to_ind(this, totalCell_coord) result(totalCell_coord_to_index)
         
         class(NeighbourCells), intent(in) :: this
         integer, dimension(:), intent(in) :: totalCell_coord
-        integer :: cell_coord_to_ind
+        integer :: totalCell_coord_to_index
         
-        cell_coord_to_ind = totalCell_coord(1) + this%NtotalCell_dim(1)*(totalCell_coord(2)-1) + &
+        totalCell_coord_to_index = totalCell_coord(1) + this%NtotalCell_dim(1)*(totalCell_coord(2)-1) + &
                             this%NtotalCell_dim(1)*this%NtotalCell_dim(2)*(totalCell_coord(3)-1)
     
     end function NeighbourCells_cell_coord_to_ind
     
-    pure function cell_neigh_coord_to_ind(nearCell_coord)
+    pure function nearCell_coord_to_index(nearCell_coord)
     
         integer, dimension(:), intent(in) :: nearCell_coord
-        integer :: cell_neigh_coord_to_ind
+        integer :: nearCell_coord_to_index
         
-        cell_neigh_coord_to_ind = nearCell_coord(1) + NnearCell_dim(1)*(nearCell_coord(2)-1) + &
+        nearCell_coord_to_index = nearCell_coord(1) + NnearCell_dim(1)*(nearCell_coord(2)-1) + &
                                   NnearCell_dim(1)*NnearCell_dim(2)*(nearCell_coord(3)-1)
     
-    end function cell_neigh_coord_to_ind
+    end function nearCell_coord_to_index
     
     pure function NeighbourCells_cell_period(this, totalCell_coord) result(cell_period)
     
@@ -340,21 +340,21 @@ contains
         do jTotalCell = 1, this%NtotalCell_dim(2)
         do kTotalCell = 1, this%NtotalCell_dim(3)
             
-            totalCell_index = this%cell_coord_to_ind([iTotalCell, jTotalCell, kTotalCell])
+            totalCell_index = this%totalCell_coord_to_index([iTotalCell, jTotalCell, kTotalCell])
 
             do iNearCell = 1, NnearCell_dim(1)
             do jNearCell = 1, NnearCell_dim(2)
             do kNearCell = 1, NnearCell_dim(3)
             
                 nearCell_coord(:) = [iNearCell, jNearCell, kNearCell]
-                nearCell_index = cell_neigh_coord_to_ind(nearCell_coord(:))
+                nearCell_index = nearCell_coord_to_index(nearCell_coord(:))
                 nearCell_coord(:) = nearCell_coord(:) - NnearCell_dim(:) + 1
                     ! with respect to the center (?) [iTotalCell, jTotalCell, kTotalCell]
                 
                 totalCell_coord(:) = [iTotalCell, jTotalCell, kTotalCell] + nearCell_coord(:)
                 
                 this%cell_neighs(nearCell_index, totalCell_index) = &
-                    this%cell_coord_to_ind(this%cell_period(totalCell_coord(:)))
+                    this%totalCell_coord_to_index(this%cell_period(totalCell_coord(:)))
                     
             end do
             end do
