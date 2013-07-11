@@ -332,28 +332,29 @@ contains
     
         class(NeighbourCells), intent(inout) :: this
     
-        integer :: i, j, k, ind
-        integer :: neigh_i, neigh_j, neigh_k, neigh_ind
+        integer :: iTotalCell, jTotalCell, kTotalCell, cell_index
+        integer :: iNearCell, jNearCell, kNearCell, neigh_ind
         integer, dimension(Ndim) :: coord, neigh_coord
         
-        do i = 1, this%NtotalCell_dim(1)
-        do j = 1, this%NtotalCell_dim(2)
-        do k = 1, this%NtotalCell_dim(3)
+        do iTotalCell = 1, this%NtotalCell_dim(1)
+        do jTotalCell = 1, this%NtotalCell_dim(2)
+        do kTotalCell = 1, this%NtotalCell_dim(3)
             
-            ind = this%cell_coord_to_ind([i, j, k])
+            cell_index = this%cell_coord_to_ind([iTotalCell, jTotalCell, kTotalCell])
 
-            do neigh_i = 1, NnearCell_dim(1)
-            do neigh_j = 1, NnearCell_dim(2)
-            do neigh_k = 1, NnearCell_dim(3)
+            do iNearCell = 1, NnearCell_dim(1)
+            do jNearCell = 1, NnearCell_dim(2)
+            do kNearCell = 1, NnearCell_dim(3)
             
-                neigh_coord(:) = [neigh_i, neigh_j, neigh_k]                
+                neigh_coord(:) = [iNearCell, jNearCell, kNearCell]
                 neigh_ind = cell_neigh_coord_to_ind(neigh_coord(:))          
                 neigh_coord(:) = neigh_coord(:) - NnearCell_dim(:) + 1
-                    ! with respect to the center (?) [i, j, k]
+                    ! with respect to the center (?) [iTotalCell, jTotalCell, kTotalCell]
                 
-                coord(:) = [i, j, k] + neigh_coord(:)
+                coord(:) = [iTotalCell, jTotalCell, kTotalCell] + neigh_coord(:)
                 
-                this%cell_neighs(neigh_ind, ind) = this%cell_coord_to_ind(this%cell_period(coord(:)))
+                this%cell_neighs(neigh_ind, cell_index) = &
+                    this%cell_coord_to_ind(this%cell_period(coord(:)))
                     
             end do
             end do
