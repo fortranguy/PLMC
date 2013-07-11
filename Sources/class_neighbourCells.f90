@@ -289,14 +289,16 @@ contains
     
     ! Neighbour cells ------------------------------------------------------------------------------
 
-    pure function NeighbourCells_cell_coord_to_ind(this, totalCell_coord) result(totalCell_coord_to_index)
+    pure function NeighbourCells_cell_coord_to_ind(this, totalCell_coord) 
+                   result(totalCell_coord_to_index)
         
         class(NeighbourCells), intent(in) :: this
         integer, dimension(:), intent(in) :: totalCell_coord
         integer :: totalCell_coord_to_index
         
-        totalCell_coord_to_index = totalCell_coord(1) + this%NtotalCell_dim(1)*(totalCell_coord(2)-1) + &
-                            this%NtotalCell_dim(1)*this%NtotalCell_dim(2)*(totalCell_coord(3)-1)
+        totalCell_coord_to_index = totalCell_coord(1) + this%NtotalCell_dim(1)*(totalCell_coord(2)-1) &
+                                   + this%NtotalCell_dim(1)*this%NtotalCell_dim(2)* &
+                                     (totalCell_coord(3)-1)
     
     end function NeighbourCells_cell_coord_to_ind
     
