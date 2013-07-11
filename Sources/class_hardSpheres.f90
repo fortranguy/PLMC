@@ -145,7 +145,7 @@ contains
     
         do iNearCell = 1, NnearCell
         
-            nearCell_index = this%same%nearCells_from_totalCells(iNearCell, iTotalCell)
+            nearCell_index = this%same%nearCells_among_totalCells(iNearCell, iTotalCell)
             current => this%same%beginCells(nearCell_index)%particle%next            
             if (.not. associated(current%next)) cycle
             

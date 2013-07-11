@@ -252,7 +252,7 @@ contains
     
         do iNearCell = 1, NnearCell
         
-            nearCell_index = neigh%nearCells_from_totalCells(iNearCell, iTotalCell)
+            nearCell_index = neigh%nearCells_among_totalCells(iNearCell, iTotalCell)
             current => neigh%beginCells(nearCell_index)%particle%next            
             if (.not. associated(current%next)) cycle
             
