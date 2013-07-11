@@ -289,34 +289,34 @@ contains
     
     ! Neighbour cells ------------------------------------------------------------------------------
 
-    pure function NeighbourCells_cell_coord_to_ind(this, coord) result(cell_coord_to_ind)
+    pure function NeighbourCells_cell_coord_to_ind(this, totalCell_coord) result(cell_coord_to_ind)
         
         class(NeighbourCells), intent(in) :: this
-        integer, dimension(:), intent(in) :: coord
+        integer, dimension(:), intent(in) :: totalCell_coord
         integer :: cell_coord_to_ind
         
-        cell_coord_to_ind = coord(1) + this%NtotalCell_dim(1)*(coord(2)-1) + &
-                            this%NtotalCell_dim(1)*this%NtotalCell_dim(2)*(coord(3)-1)
+        cell_coord_to_ind = totalCell_coord(1) + this%NtotalCell_dim(1)*(totalCell_coord(2)-1) + &
+                            this%NtotalCell_dim(1)*this%NtotalCell_dim(2)*(totalCell_coord(3)-1)
     
     end function NeighbourCells_cell_coord_to_ind
     
-    pure function cell_neigh_coord_to_ind(neigh_coord)
+    pure function cell_neigh_coord_to_ind(nearCell_coord)
     
-        integer, dimension(:), intent(in) :: neigh_coord        
+        integer, dimension(:), intent(in) :: nearCell_coord
         integer :: cell_neigh_coord_to_ind
         
-        cell_neigh_coord_to_ind = neigh_coord(1) + NnearCell_dim(1)*(neigh_coord(2)-1) + &
-                                  NnearCell_dim(1)*NnearCell_dim(2)*(neigh_coord(3)-1)
+        cell_neigh_coord_to_ind = nearCell_coord(1) + NnearCell_dim(1)*(nearCell_coord(2)-1) + &
+                                  NnearCell_dim(1)*NnearCell_dim(2)*(nearCell_coord(3)-1)
     
     end function cell_neigh_coord_to_ind
     
-    pure function NeighbourCells_cell_period(this, coord) result(cell_period)
+    pure function NeighbourCells_cell_period(this, totalCell_coord) result(cell_period)
     
         class(NeighbourCells), intent(in) :: this
-        integer, dimension(:), intent(in) :: coord        
+        integer, dimension(:), intent(in) :: totalCell_coord
         integer, dimension(Ndim) :: cell_period
         
-        cell_period(:) = coord(:)
+        cell_period(:) = totalCell_coord(:)
         
         where (cell_period(:) < 1)
             cell_period(:) = cell_period(:) + this%NtotalCell_dim(:)
@@ -334,7 +334,7 @@ contains
     
         integer :: iTotalCell, jTotalCell, kTotalCell, totalCell_index
         integer :: iNearCell, jNearCell, kNearCell, nearCell_index
-        integer, dimension(Ndim) :: coord, neigh_coord
+        integer, dimension(Ndim) :: totalCell_coord, nearCell_coord
         
         do iTotalCell = 1, this%NtotalCell_dim(1)
         do jTotalCell = 1, this%NtotalCell_dim(2)
@@ -346,15 +346,15 @@ contains
             do jNearCell = 1, NnearCell_dim(2)
             do kNearCell = 1, NnearCell_dim(3)
             
-                neigh_coord(:) = [iNearCell, jNearCell, kNearCell]
-                nearCell_index = cell_neigh_coord_to_ind(neigh_coord(:))
-                neigh_coord(:) = neigh_coord(:) - NnearCell_dim(:) + 1
+                nearCell_coord(:) = [iNearCell, jNearCell, kNearCell]
+                nearCell_index = cell_neigh_coord_to_ind(nearCell_coord(:))
+                nearCell_coord(:) = nearCell_coord(:) - NnearCell_dim(:) + 1
                     ! with respect to the center (?) [iTotalCell, jTotalCell, kTotalCell]
                 
-                coord(:) = [iTotalCell, jTotalCell, kTotalCell] + neigh_coord(:)
+                totalCell_coord(:) = [iTotalCell, jTotalCell, kTotalCell] + nearCell_coord(:)
                 
                 this%cell_neighs(nearCell_index, totalCell_index) = &
-                    this%cell_coord_to_ind(this%cell_period(coord(:)))
+                    this%cell_coord_to_ind(this%cell_period(totalCell_coord(:)))
                     
             end do
             end do
