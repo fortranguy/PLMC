@@ -66,8 +66,7 @@ contains
         this%NtotalCell = product(this%NtotalCell_dim)
         allocate(this%nearCells_among_totalCells(NnearCell, this%NtotalCell))
             
-        call this%check_CellsSize(rCut)
-        
+        call this%check_CellsSize(rCut)        
         call this%alloc_cells()
         call this%nearCells_among_totalCells_init()
     
