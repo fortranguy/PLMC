@@ -236,7 +236,7 @@ contains
         class(MixingPotential), intent(in) :: this
         real(DP), dimension(:), intent(in) :: xCol !< type A
         integer, intent(in) :: iCell !< type A in mix grid
-        type(Neighbours), intent(in) :: neigh
+        type(NeighbourCells), intent(in) :: neigh
         real(DP), dimension(:, :), contiguous, intent(in) :: other_positions
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energ

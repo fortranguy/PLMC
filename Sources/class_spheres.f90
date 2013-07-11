@@ -38,8 +38,8 @@ private
         real(DP) :: rCut !< short-range cut
         
         ! Neighbours (cell/grid scheme)
-        type(Neighbours) :: same !< same kind
-        type(Neighbours) :: mix !< other kind
+        type(NeighbourCells) :: same !< same kind
+        type(NeighbourCells) :: mix !< other kind
         
     contains
     
