@@ -37,6 +37,9 @@ public :: Link
         procedure :: construct => NeighbourCells_construct
         procedure :: destroy => NeighbourCells_destroy
         
+        procedure :: getCell_size => NeighbourCells_getCell_size
+        procedure :: getNtotalCell_dim => NeighbourCells_getNtotalCell_dim
+        
         procedure :: alloc_cells => NeighbourCells_alloc_cells
         procedure :: dealloc_cells => NeighbourCells_dealloc_cells
         procedure :: check_cellsSize => NeighbourCells_check_cellsSize
@@ -78,8 +81,30 @@ contains
         call this%dealloc_cells()
         
     end subroutine NeighbourCells_destroy
+    
+    !> Accessor : cell_size
+    
+    pure function NeighbourCells_getCell_size(this) result(getCell_size)
+    
+        class(NeighbourCells), intent(in) :: this
+        real(DP), dimension(Ndim) :: getCell_size
+        
+        getCell_size(:) = this%cell_size(:)
+    
+    end function NeighbourCells_getCell_size
+    
+    !> Accessor : NtotalCell_dim
+    
+    pure function NeighbourCells_getNtotalCell_dim(this) result(getNtotalCell_dim)
+    
+        class(NeighbourCells), intent(in) :: this    
+        integer, dimension(Ndim) :: getNtotalCell_dim
+        
+        getNtotalCell_dim(:) = this%NtotalCell_dim(:)
+        
+    end function NeighbourCells_getNtotalCell_dim
 
-    ! Linked-list allocation
+    !> Linked-list allocation
     
     subroutine NeighbourCells_alloc_cells(this)
     
