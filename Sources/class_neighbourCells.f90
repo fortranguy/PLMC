@@ -291,8 +291,8 @@ contains
     
     ! Neighbour cells ------------------------------------------------------------------------------
 
-    pure function NeighbourCells_cell_coord_to_ind(this, totalCell_coord) 
-                   result(totalCell_coord_to_index)
+    pure function NeighbourCells_cell_coord_to_ind(this, totalCell_coord) &
+                  result(totalCell_coord_to_index)
         
         class(NeighbourCells), intent(in) :: this
         integer, dimension(:), intent(in) :: totalCell_coord
