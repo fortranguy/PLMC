@@ -11,7 +11,7 @@ use data_neighbours, only : cell_neighs_nb, inter_cell_Lsize
 use data_distrib, only : inter_snap_factor
 use mod_physics, only : dist
 use class_observables
-use class_neighbours
+use class_neighbourCells
 use class_mixingPotential
 use class_spheres
 

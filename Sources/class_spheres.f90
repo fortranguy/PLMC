@@ -7,7 +7,7 @@ use data_precisions, only : DP
 use data_constants, only : PI
 use data_cell, only : Ndim, Lsize, Volume
 use mod_physics, only : dist
-use class_neighbours
+use class_neighbourCells
 
 implicit none
 private

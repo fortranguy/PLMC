@@ -14,7 +14,7 @@ use data_neighbours, only : cell_neighs_nb, dipol_cell_Lsize
 use data_distrib, only : dipol_snap_factor
 use mod_physics, only : dist, distVec, random_surface, markov_surface, Kmax1_sym, Kmax2_sym, fourier
 use class_observables
-use class_neighbours
+use class_neighbourCells
 use class_mixingPotential
 use class_spheres
 
