@@ -231,17 +231,18 @@ contains
         
     end function MixingPotential_Epot_pair
     
-    subroutine MixingPotential_Epot_neigh(this, xCol, iCell, neigh, other_positions, overlap, energ)
+    subroutine MixingPotential_Epot_neigh(this, xCol, iTotalCell, neigh, other_positions, overlap, &
+                                          energ)
         
         class(MixingPotential), intent(in) :: this
         real(DP), dimension(:), intent(in) :: xCol !< type A
-        integer, intent(in) :: iCell !< type A in mix grid
+        integer, intent(in) :: iTotalCell !< type A in mix grid
         type(NeighbourCells), intent(in) :: neigh
         real(DP), dimension(:, :), contiguous, intent(in) :: other_positions
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energ
     
-        integer :: iNeigh,  iCell_neigh
+        integer :: iNearCell,  nearCell_index
         real(DP) :: r
     
         type(Link), pointer :: current => null(), next => null()
@@ -249,10 +250,10 @@ contains
         overlap = .false.
         energ = 0._DP
     
-        do iNeigh = 1, NnearCell
+        do iNearCell = 1, NnearCell
         
-            iCell_neigh = neigh%nearCells_from_totalCells(iNeigh, iCell)
-            current => neigh%beginCells(iCell_neigh)%particle%next            
+            nearCell_index = neigh%nearCells_from_totalCells(iNearCell, iTotalCell)
+            current => neigh%beginCells(nearCell_index)%particle%next            
             if (.not. associated(current%next)) cycle
             
             do

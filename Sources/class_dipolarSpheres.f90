@@ -436,24 +436,24 @@ contains
  
     !> Overlap test of 1 particle
 
-    subroutine DipolarSpheres_Epot_real_overlapTest(this, iCol, xCol, iCell, overlap)
+    subroutine DipolarSpheres_Epot_real_overlapTest(this, iCol, xCol, iTotalCell, overlap)
 
         class(DipolarSpheres), intent(in) :: this
-        integer, intent(in) :: iCol, iCell
+        integer, intent(in) :: iCol, iTotalCell
         real(DP), dimension(:), intent(in) :: xCol
         logical, intent(out) :: overlap
 
-        integer :: iNeigh,  iCell_neigh
+        integer :: iNearCell,  nearCell_index
         real(DP) :: r_ij
 
         type(Link), pointer :: current => null(), next => null()
 
         overlap = .false.        
 
-        do iNeigh = 1, NnearCell
+        do iNearCell = 1, NnearCell
 
-            iCell_neigh = this%same%nearCells_from_totalCells(iNeigh, iCell)
-            current => this%same%beginCells(iCell_neigh)%particle%next
+            nearCell_index = this%same%nearCells_from_totalCells(iNearCell, iTotalCell)
+            current => this%same%beginCells(nearCell_index)%particle%next
             if (.not. associated(current%next)) cycle
 
             do
@@ -1382,12 +1382,12 @@ contains
         real(DP), dimension(Ndim) :: mNew
         real(DP) :: deltaEpot, deltaEpot_real, deltaEpot_self
         real(DP) :: real_eNew, real_eOld
-        integer :: iCell
+        integer :: iTotalCell
         
         mNew(:) = this%orientations(:, iOld)
         call markov_surface(mNew, this%deltaM)
         
-        iCell = this%same%position_to_cell(this%positions(:, iOld))
+        iTotalCell = this%same%position_to_cell(this%positions(:, iOld))
         real_eNew = this%Epot_real_solo(iOld, this%positions(:, iOld), mNew)
         real_eOld = this%Epot_real_solo(iOld, this%positions(:, iOld), this%orientations(:, iOld))
         deltaEpot_real = real_eNew - real_eOld        

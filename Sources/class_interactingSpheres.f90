@@ -205,15 +205,15 @@ contains
         
     end function InteractingSpheres_Epot_pair
     
-    subroutine InteractingSpheres_Epot_neigh(this, iCol, xCol, iCell, overlap, energ)
+    subroutine InteractingSpheres_Epot_neigh(this, iCol, xCol, iTotalCell, overlap, energ)
         
         class(InteractingSpheres), intent(in) :: this        
-        integer, intent(in) :: iCol, iCell
+        integer, intent(in) :: iCol, iTotalCell
         real(DP), dimension(:), intent(in) :: xCol
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energ
     
-        integer :: iNeigh,  iCell_neigh
+        integer :: iNearCell,  nearCell_index
         real(DP) :: r_ij
     
         type(Link), pointer :: current => null(), next => null()
@@ -221,10 +221,10 @@ contains
         overlap = .false.
         energ = 0._DP
     
-        do iNeigh = 1, NnearCell
+        do iNearCell = 1, NnearCell
         
-            iCell_neigh = this%same%nearCells_from_totalCells(iNeigh, iCell)
-            current => this%same%beginCells(iCell_neigh)%particle%next            
+            nearCell_index = this%same%nearCells_from_totalCells(iNearCell, iTotalCell)
+            current => this%same%beginCells(nearCell_index)%particle%next            
             if (.not. associated(current%next)) cycle
             
             do

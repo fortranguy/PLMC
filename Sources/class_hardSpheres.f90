@@ -134,24 +134,24 @@ contains
     
     end subroutine HardSpheres_Epot_print
     
-    subroutine HardSpheres_Epot_neigh(this, iCol, xCol, iCell, overlap)
+    subroutine HardSpheres_Epot_neigh(this, iCol, xCol, iTotalCell, overlap)
         
         class(HardSpheres), intent(in) :: this        
-        integer, intent(in) :: iCol, iCell
+        integer, intent(in) :: iCol, iTotalCell
         real(DP), dimension(:), intent(in) :: xCol
         logical, intent(out) :: overlap
     
-        integer :: iNeigh,  iCell_neigh
+        integer :: iNearCell,  nearCell_index
         real(DP) :: r_ij
     
         type(Link), pointer :: current => null(), next => null()
         
         overlap = .false.
     
-        do iNeigh = 1, NnearCell
+        do iNearCell = 1, NnearCell
         
-            iCell_neigh = this%same%nearCells_from_totalCells(iNeigh, iCell)
-            current => this%same%beginCells(iCell_neigh)%particle%next            
+            nearCell_index = this%same%nearCells_from_totalCells(iNearCell, iTotalCell)
+            current => this%same%beginCells(nearCell_index)%particle%next            
             if (.not. associated(current%next)) cycle
             
             do
