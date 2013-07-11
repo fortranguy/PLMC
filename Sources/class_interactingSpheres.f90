@@ -91,8 +91,8 @@ contains
         call this%Epot_init()
         
         ! Neighbour Cells
-        call this%same%construct(inter_cell_size, this%rCut)
-        call this%mix%construct(mix_cell_size, mix_rCut)
+        call this%same%construct(inter_cell_size, this%rCut) !< same kind
+        call this%mix%construct(mix_cell_size, mix_rCut) !< other kind
     
     end subroutine InteractingSpheres_construct
     

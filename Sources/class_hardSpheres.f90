@@ -78,8 +78,8 @@ contains
         this%Epot = 0._DP
         
         ! Neighbour Cells
-        call this%same%construct(hard_cell_size, this%rCut)
-        call this%mix%construct(mix_cell_size, mix_rCut)
+        call this%same%construct(hard_cell_size, this%rCut) !< same kind
+        call this%mix%construct(mix_cell_size, mix_rCut) !< other kind
     
     end subroutine HardSpheres_construct
     
