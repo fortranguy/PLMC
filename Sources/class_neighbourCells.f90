@@ -24,8 +24,8 @@ public :: Link
     
         private
         
-        real(DP), dimension(Ndim), public :: cell_size
-        integer, dimension(Ndim), public :: NtotalCell_dim
+        real(DP), dimension(Ndim) :: cell_size
+        integer, dimension(Ndim) :: NtotalCell_dim
         integer :: NtotalCell
         integer, dimension(:, :), allocatable, public :: nearCells_from_totalCells
         type(LinkedList), dimension(:), allocatable, public :: beginCells

@@ -136,10 +136,10 @@ contains
         write(report_unit, *) "    rCut = ", this%rCut
         write(report_unit, *) "    dr = ", this%dr
         
-        write(report_unit, *) "    same_NtotalCell_dim(:) = ", this%same%NtotalCell_dim(:)
-        write(report_unit, *) "    same_cell_size(:) = ", this%same%cell_size(:)
-        write(report_unit, *) "    mix_NtotalCell_dim(:) = ", this%mix%NtotalCell_dim(:)
-        write(report_unit, *) "    mix_cell_size(:) = ", this%mix%cell_size(:)
+        write(report_unit, *) "    same_NtotalCell_dim(:) = ", this%same%getNtotalCell_dim()
+        write(report_unit, *) "    same_cell_size(:) = ", this%same%getCell_size()
+        write(report_unit, *) "    mix_NtotalCell_dim(:) = ", this%mix%getNtotalCell_dim()
+        write(report_unit, *) "    mix_cell_size(:) = ", this%mix%getCell_size()
         
     end subroutine InteractingSpheres_printReport
     
