@@ -67,6 +67,9 @@ contains
         allocate(this%nearCells_from_totalCells(NnearCell, this%NtotalCell))
             
         call this%check_CellsSize(rCut)
+        
+        call this%alloc_cells()
+        call this%nearCells_from_totalCells_init()
     
     end subroutine NeighbourCells_construct
     

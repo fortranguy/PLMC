@@ -77,14 +77,9 @@ contains
         this%rCut = hard_rCut
         this%Epot = 0._DP
         
-        ! Neighbours : same kind
+        ! Neighbour Cells
         call this%same%construct(hard_cell_size, this%rCut)
-        call this%same%alloc_cells()
-        call this%same%nearCells_from_totalCells_init()
-        ! Neighbours : other kind
         call this%mix%construct(mix_cell_size, mix_rCut)
-        call this%mix%alloc_cells()
-        call this%mix%nearCells_from_totalCells_init()
     
     end subroutine HardSpheres_construct
     

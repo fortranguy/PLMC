@@ -90,14 +90,9 @@ contains
         allocate(this%Epot_tab(this%iMin:this%iCut))
         call this%Epot_init()
         
-        ! Neighbours : same kind
+        ! Neighbour Cells
         call this%same%construct(inter_cell_size, this%rCut)
-        call this%same%alloc_cells()
-        call this%same%nearCells_from_totalCells_init()
-        ! Neighbours : other kind
         call this%mix%construct(mix_cell_size, mix_rCut)
-        call this%mix%alloc_cells()
-        call this%mix%nearCells_from_totalCells_init()
     
     end subroutine InteractingSpheres_construct
     
