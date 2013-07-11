@@ -5,7 +5,7 @@ module class_neighbourCells
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
 use data_precisions, only : DP
 use data_cell, only : Ndim, Lsize
-use data_neighbourCells, only : NnearNeighCell_dim, NnearNeighCell
+use data_neighbourCells, only : NnearCell_dim, NnearCell
 
 implicit none
 private
@@ -23,8 +23,8 @@ public :: Link
     type, public :: NeighbourCells
         
         real(DP), dimension(Ndim) :: cell_Lsize
-        integer, dimension(Ndim) :: NtotalNeighCell_dim
-        integer :: NtotalNeighCell
+        integer, dimension(Ndim) :: NtotalCell_dim
+        integer :: NtotalCell
         integer, dimension(:, :), allocatable :: cell_neighs
         type(LinkedList), dimension(:), allocatable :: cells
         type(LinkedList), dimension(:), allocatable :: cellsNext
@@ -57,9 +57,9 @@ contains
         real(DP), intent(in) :: rCut
         
         this%cell_Lsize(:) = cell_Lsize(:)
-        this%NtotalNeighCell_dim(:) = int(Lsize(:)/this%cell_Lsize(:))
-        this%NtotalNeighCell = product(this%NtotalNeighCell_dim)
-        allocate(this%cell_neighs(NnearNeighCell, this%NtotalNeighCell))
+        this%NtotalCell_dim(:) = int(Lsize(:)/this%cell_Lsize(:))
+        this%NtotalCell = product(this%NtotalCell_dim)
+        allocate(this%cell_neighs(NnearCell, this%NtotalCell))
             
         call this%check_CellsSize(rCut)
     
@@ -85,11 +85,11 @@ contains
     
         integer :: iCell
 
-        allocate(this%cellsBegin(this%NtotalNeighCell))
-        allocate(this%cells(this%NtotalNeighCell))
-        allocate(this%cellsNext(this%NtotalNeighCell))
+        allocate(this%cellsBegin(this%NtotalCell))
+        allocate(this%cells(this%NtotalCell))
+        allocate(this%cellsNext(this%NtotalCell))
         
-        do iCell = 1, this%NtotalNeighCell
+        do iCell = 1, this%NtotalCell
 
             allocate(this%cellsBegin(iCell)%particle)
             this%cells(iCell)%particle => this%cellsBegin(iCell)%particle
@@ -123,7 +123,7 @@ contains
     
         integer :: iCell
 
-        do iCell = 1, this%NtotalNeighCell
+        do iCell = 1, this%NtotalCell
             if (associated(this%cellsBegin(iCell)%particle)) then
                 call free_link(this%cellsBegin(iCell)%particle)
             end if
@@ -153,9 +153,9 @@ contains
                 stop
             end if
             
-            if (this%NtotalNeighCell_dim(iDim) < NnearNeighCell_dim(iDim)) then
+            if (this%NtotalCell_dim(iDim) < NnearCell_dim(iDim)) then
                 write(error_unit, *) "Too few cells in the dimension", iDim, ":"
-                write(error_unit, *) this%NtotalNeighCell_dim(iDim), "<", NnearNeighCell_dim(iDim)
+                write(error_unit, *) this%NtotalCell_dim(iDim), "<", NnearCell_dim(iDim)
                 stop
             end if
             
@@ -184,8 +184,8 @@ contains
         integer, dimension(Ndim) :: cell_coord        
     
         cell_coord(:) = int(xCol(:)/this%cell_Lsize(:)) + 1
-        position_to_cell = cell_coord(1) + this%NtotalNeighCell_dim(1)*(cell_coord(2)-1) + &
-                           this%NtotalNeighCell_dim(1)*this%NtotalNeighCell_dim(2)*(cell_coord(3)-1)
+        position_to_cell = cell_coord(1) + this%NtotalCell_dim(1)*(cell_coord(2)-1) + &
+                           this%NtotalCell_dim(1)*this%NtotalCell_dim(2)*(cell_coord(3)-1)
     
     end function NeighbourCells_position_to_cell
     
@@ -210,7 +210,7 @@ contains
             
         end do
         
-        do iCell = 1, this%NtotalNeighCell
+        do iCell = 1, this%NtotalCell
             
             this%cells(iCell)%particle%next => null()
             
@@ -295,8 +295,8 @@ contains
         integer, dimension(:), intent(in) :: coord
         integer :: cell_coord_to_ind
         
-        cell_coord_to_ind = coord(1) + this%NtotalNeighCell_dim(1)*(coord(2)-1) + &
-                            this%NtotalNeighCell_dim(1)*this%NtotalNeighCell_dim(2)*(coord(3)-1)
+        cell_coord_to_ind = coord(1) + this%NtotalCell_dim(1)*(coord(2)-1) + &
+                            this%NtotalCell_dim(1)*this%NtotalCell_dim(2)*(coord(3)-1)
     
     end function NeighbourCells_cell_coord_to_ind
     
@@ -305,8 +305,8 @@ contains
         integer, dimension(:), intent(in) :: neigh_coord        
         integer :: cell_neigh_coord_to_ind
         
-        cell_neigh_coord_to_ind = neigh_coord(1) + NnearNeighCell_dim(1)*(neigh_coord(2)-1) + &
-                                  NnearNeighCell_dim(1)*NnearNeighCell_dim(2)*(neigh_coord(3)-1)
+        cell_neigh_coord_to_ind = neigh_coord(1) + NnearCell_dim(1)*(neigh_coord(2)-1) + &
+                                  NnearCell_dim(1)*NnearCell_dim(2)*(neigh_coord(3)-1)
     
     end function cell_neigh_coord_to_ind
     
@@ -319,11 +319,11 @@ contains
         cell_period(:) = coord(:)
         
         where (cell_period(:) < 1)
-            cell_period(:) = cell_period(:) + this%NtotalNeighCell_dim(:)
+            cell_period(:) = cell_period(:) + this%NtotalCell_dim(:)
         end where
         
-        where (cell_period(:) > this%NtotalNeighCell_dim(:))
-            cell_period(:) = cell_period(:) - this%NtotalNeighCell_dim(:)
+        where (cell_period(:) > this%NtotalCell_dim(:))
+            cell_period(:) = cell_period(:) - this%NtotalCell_dim(:)
         end where
     
     end function NeighbourCells_cell_period
@@ -336,19 +336,19 @@ contains
         integer :: neigh_i, neigh_j, neigh_k, neigh_ind
         integer, dimension(Ndim) :: coord, neigh_coord
         
-        do i = 1, this%NtotalNeighCell_dim(1)
-        do j = 1, this%NtotalNeighCell_dim(2)
-        do k = 1, this%NtotalNeighCell_dim(3)
+        do i = 1, this%NtotalCell_dim(1)
+        do j = 1, this%NtotalCell_dim(2)
+        do k = 1, this%NtotalCell_dim(3)
             
             ind = this%cell_coord_to_ind([i, j, k])
 
-            do neigh_i = 1, NnearNeighCell_dim(1)
-            do neigh_j = 1, NnearNeighCell_dim(2)
-            do neigh_k = 1, NnearNeighCell_dim(3)
+            do neigh_i = 1, NnearCell_dim(1)
+            do neigh_j = 1, NnearCell_dim(2)
+            do neigh_k = 1, NnearCell_dim(3)
             
                 neigh_coord(:) = [neigh_i, neigh_j, neigh_k]                
                 neigh_ind = cell_neigh_coord_to_ind(neigh_coord(:))          
-                neigh_coord(:) = neigh_coord(:) - NnearNeighCell_dim(:) + 1
+                neigh_coord(:) = neigh_coord(:) - NnearCell_dim(:) + 1
                     ! with respect to the center (?) [i, j, k]
                 
                 coord(:) = [i, j, k] + neigh_coord(:)
