@@ -7,7 +7,7 @@ use data_precisions, only : DP
 use data_cell, only : Ndim
 use data_particles, only : mix_rMin
 use data_potential, only : mix_rCut, mix_dr, mix_epsilon, mix_alpha
-use data_neighbours, only : cell_neighs_nb, mix_cell_Lsize
+use data_neighbourCells, only : NnearCell, mix_cell_size
 use mod_physics, only : dist
 use class_neighbourCells
 
@@ -30,7 +30,7 @@ private
         real(DP) :: alpha !< coefficient in Yukawa
         real(DP), dimension(:), allocatable :: Epot_tab !< tabulation
         
-        real(DP), dimension(Ndim) :: cell_Lsize
+        real(DP), dimension(Ndim) :: cell_size
 
     contains
 
@@ -41,7 +41,7 @@ private
 
         procedure :: getRmin => MixingPotential_getRmin
         procedure :: getRcut => MixingPotential_getRcut
-        procedure :: getCell_Lsize => MixingPotential_getCell_Lsize
+        procedure :: getCell_size => MixingPotential_getCell_size
         
         procedure :: overlapTest => MixingPotential_overlapTest
 
@@ -75,7 +75,7 @@ contains
         call this%Epot_init()
         
         ! Neighbours        
-        this%cell_Lsize(:) = mix_cell_Lsize(:)
+        this%cell_size(:) = mix_cell_size(:)
 
 
     end subroutine MixingPotential_construct
@@ -127,16 +127,16 @@ contains
     
     end function MixingPotential_getRcut
     
-    !> Accessor : cell_Lsize
+    !> Accessor : cell_size
     
-    pure function MixingPotential_getCell_Lsize(this) result(getCell_Lsize)
+    pure function MixingPotential_getCell_size(this) result(getCell_size)
     
         class(MixingPotential), intent(in) :: this        
-        real(DP), dimension(Ndim) :: getCell_Lsize
+        real(DP), dimension(Ndim) :: getCell_size
         
-        getCell_Lsize(:) = this%Cell_Lsize(:)
+        getCell_size(:) = this%Cell_Lsize(:)
     
-   end function MixingPotential_getCell_Lsize
+   end function MixingPotential_getCell_size
     
     !> Overlapt test
     
@@ -249,7 +249,7 @@ contains
         overlap = .false.
         energ = 0._DP
     
-        do iNeigh = 1, cell_neighs_nb
+        do iNeigh = 1, NnearCell
         
             iCell_neigh = neigh%cell_neighs(iNeigh, iCell)
             current => neigh%cellsBegin(iCell_neigh)%particle%next            

@@ -7,7 +7,7 @@ use data_cell, only : Ndim, Lsize
 use data_particles, only : inter_radius, inter_rMin, inter_Ncol
 use data_potential, only : inter_rCut, inter_dr, inter_epsilon, inter_alpha
 use data_mc, only : Temperature, inter_deltaX, inter_rejectFix, inter_Nadapt, inter_Nwidom
-use data_neighbours, only : cell_neighs_nb, inter_cell_size
+use data_neighbourCells, only : NnearCell, inter_cell_size
 use data_distrib, only : inter_snap_factor
 use mod_physics, only : dist
 use class_observables
@@ -221,7 +221,7 @@ contains
         overlap = .false.
         energ = 0._DP
     
-        do iNeigh = 1, cell_neighs_nb
+        do iNeigh = 1, NnearCell
         
             iCell_neigh = this%same%nearCells_from_totalCells(iNeigh, iCell)
             current => this%same%beginCells(iCell_neigh)%particle%next            
