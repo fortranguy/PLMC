@@ -9,7 +9,7 @@ use data_cell, only : Ndim, Lsize, LsizeMi, Kmax
 
 implicit none
 private
-public dist, distVec, random_surface, markov_surface, Kmax1_sym, Kmax2_sym, fourier
+public dist, distVec, random_surface, markov_surface, Kmax1_sym, Kmax2_sym, fourier, index_from_coord
 
 contains
 
@@ -209,5 +209,17 @@ contains
         end do        
     
     end subroutine fourier
+    
+    !> 3d vector to 1D index 
+    
+    pure function index_from_coord(cell_coord, maxCell_coord)
+    
+        integer, dimension(:), intent(in) :: cell_coord, maxCell_coord
+        integer :: index_from_coord
+        
+        index_from_coord = cell_coord(1) + maxCell_coord(1)*(cell_coord(2)-1) + &
+                           maxCell_coord(1)*maxCell_coord(2)*(cell_coord(3)-1)
+    
+    end function index_from_coord
 
 end module mod_physics

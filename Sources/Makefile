@@ -30,7 +30,7 @@ data.o: data_copy.f90
 
 mod_physics.o : data_precisions.mod data_constants.mod data_cell.mod
 class_observables.o : data_precisions.mod data_cell.mod data_mc.mod
-class_neighbourCells.o : data_precisions.mod data_cell.mod data_neighbours.mod
+class_neighbourCells.o : data_precisions.mod data_cell.mod data_neighbours.mod mod_physics.o
 class_mixingPotential.o : data_precisions.mod data_cell.mod data_particles.mod data_potential.mod \
                           data_neighbours.mod mod_physics.o class_neighbourCells.o
 class_spheres.o : data_precisions.mod data_constants.mod  data_cell.mod mod_physics.o \
