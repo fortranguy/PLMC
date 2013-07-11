@@ -46,7 +46,7 @@ public :: Link
         procedure :: add_col_to_cell => NeighbourCells_add_col_to_cell
         procedure, private :: totalCell_coord_to_index => NeighbourCells_cell_coord_to_ind
         procedure, private :: totalCell_PBC => NeighbourCells_totalCell_PBC
-        procedure :: cell_neighs_init => NeighbourCells_cell_neighs_init
+        procedure :: nearCells_from_totalCells_init => NeighbourCells_nearCells_from_totalCells_init
         
     end type NeighbourCells
     
@@ -332,7 +332,7 @@ contains
     
     end function NeighbourCells_totalCell_PBC
     
-    subroutine NeighbourCells_cell_neighs_init(this)
+    subroutine NeighbourCells_nearCells_from_totalCells_init(this)
     
         class(NeighbourCells), intent(inout) :: this
     
@@ -368,6 +368,6 @@ contains
         end do
         end do
             
-    end subroutine NeighbourCells_cell_neighs_init
+    end subroutine NeighbourCells_nearCells_from_totalCells_init
 
 end module class_neighbourCells
