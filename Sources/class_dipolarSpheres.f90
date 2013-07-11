@@ -1315,7 +1315,7 @@ contains
         xNew(:) = modulo(xNew(:), Lsize(:))
         
         mix_iCellNew = this%mix%position_to_cell(xNew)
-        call mix%Epot_neigh(xNew, mix_iCellNew, this%mix, other%positions, overlap, mix_eNew)
+        call mix%Epot_neighCells(xNew, mix_iCellNew, this%mix, other%positions, overlap, mix_eNew)
             
         if (.not. overlap) then
         
@@ -1333,8 +1333,8 @@ contains
                 same_deltaEpot = (same_eNew_real-same_eOld_real) + this%deltaEpot_reci_move(iOld, xNew)
                     
                 mix_iCellOld = this%mix%position_to_cell(this%positions(:, iOld))
-                call mix%Epot_neigh(this%positions(:, iOld), mix_iCellOld, this%mix, other%positions, &
-                                    overlap, mix_eOld)
+                call mix%Epot_neighCells(this%positions(:, iOld), mix_iCellOld, this%mix, &
+                                         other%positions, overlap, mix_eOld)
                 mix_deltaEpot = mix_eNew - mix_eOld
                 
                 deltaEpot = same_deltaEpot + mix_deltaEpot
@@ -1437,7 +1437,8 @@ contains
             xTest(:) = Lsize(:) * xRand(:)
             
             mix_iCellTest = this%mix%position_to_cell(xTest)
-            call mix%Epot_neigh(xTest, mix_iCellTest, this%mix, other_positions, overlap, mix_enTest)
+            call mix%Epot_neighCells(xTest, mix_iCellTest, this%mix, other_positions, overlap, &
+                                     mix_enTest)
             
             if (.not. overlap) then
                                

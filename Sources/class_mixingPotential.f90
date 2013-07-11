@@ -48,7 +48,7 @@ private
         procedure, private :: Epot_init => MixingPotential_Epot_init
         procedure :: Epot_print => MixingPotential_Epot_print
         procedure :: Epot_pair => MixingPotential_Epot_pair
-        procedure :: Epot_neigh => MixingPotential_Epot_neigh
+        procedure :: Epot_neighCells => MixingPotential_Epot_neighCells
         procedure :: Epot_conf => MixingPotential_Epot_conf
 
     end type
@@ -231,8 +231,8 @@ contains
         
     end function MixingPotential_Epot_pair
     
-    subroutine MixingPotential_Epot_neigh(this, xCol, iTotalCell, neigh, other_positions, overlap, &
-                                          energ)
+    subroutine MixingPotential_Epot_neighCells(this, xCol, iTotalCell, neigh, other_positions, &
+                                               overlap, energ)
         
         class(MixingPotential), intent(in) :: this
         real(DP), dimension(:), intent(in) :: xCol !< type A
@@ -275,7 +275,7 @@ contains
             
         end do
     
-    end subroutine MixingPotential_Epot_neigh
+    end subroutine MixingPotential_Epot_neighCells
     
     !> Total potential energy
     

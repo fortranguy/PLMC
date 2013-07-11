@@ -44,7 +44,7 @@ private
         procedure, private :: Epot_init => InteractingSpheres_Epot_init
         procedure :: Epot_print => InteractingSpheres_Epot_print
         procedure :: Epot_pair => InteractingSpheres_Epot_pair
-        procedure, private :: Epot_neigh => InteractingSpheres_Epot_neigh
+        procedure, private :: Epot_neighCells => InteractingSpheres_Epot_neighCells
         procedure :: Epot_conf => InteractingSpheres_Epot_conf
         procedure :: consistTest => InteractingSpheres_consistTest
         
@@ -205,7 +205,7 @@ contains
         
     end function InteractingSpheres_Epot_pair
     
-    subroutine InteractingSpheres_Epot_neigh(this, iCol, xCol, iTotalCell, overlap, energ)
+    subroutine InteractingSpheres_Epot_neighCells(this, iCol, xCol, iTotalCell, overlap, energ)
         
         class(InteractingSpheres), intent(in) :: this        
         integer, intent(in) :: iCol, iTotalCell
@@ -250,7 +250,7 @@ contains
             
         end do
     
-    end subroutine InteractingSpheres_Epot_neigh
+    end subroutine InteractingSpheres_Epot_neighCells
     
     !> Particle move
     
@@ -277,22 +277,23 @@ contains
         xNew(:) = this%positions(:, iOld) + (xRand(:)-0.5_DP)*this%deltaX(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
         same_iCellNew = this%same%position_to_cell(xNew)
-        call this%Epot_neigh(iOld, xNew, same_iCellNew, overlap, same_eNew)
+        call this%Epot_neighCells(iOld, xNew, same_iCellNew, overlap, same_eNew)
         
         if (.not. overlap) then
         
             mix_iCellNew = this%mix%position_to_cell(xNew)
-            call mix%Epot_neigh(xNew, mix_iCellNew, this%mix, other%positions, overlap, mix_eNew)
+            call mix%Epot_neighCells(xNew, mix_iCellNew, this%mix, other%positions, overlap, mix_eNew)
                         
             if (.not. overlap) then
     
                 same_iCellOld = this%same%position_to_cell(this%positions(:, iOld))
-                call this%Epot_neigh(iOld, this%positions(:, iOld), same_iCellOld, overlap, same_eOld)
+                call this%Epot_neighCells(iOld, this%positions(:, iOld), same_iCellOld, overlap, &
+                                          same_eOld)
                 same_deltaEpot = same_eNew - same_eOld
                     
                 mix_iCellOld = this%mix%position_to_cell(this%positions(:, iOld))
-                call mix%Epot_neigh(this%positions(:, iOld), mix_iCellOld, this%mix, other%positions, &
-                                    overlap, mix_eOld)
+                call mix%Epot_neighCells(this%positions(:, iOld), mix_iCellOld, this%mix, &
+                                         other%positions, overlap, mix_eOld)
                 mix_deltaEpot = mix_eNew - mix_eOld
                 
                 deltaEpot = same_deltaEpot + mix_deltaEpot
@@ -351,12 +352,12 @@ contains
             call random_number(xRand)
             xTest(:) = Lsize(:) * xRand(:)    
             same_iCellTest = this%same%position_to_cell(xTest)
-            call this%Epot_neigh(0, xTest, same_iCellTest, overlap, same_enTest) 
+            call this%Epot_neighCells(0, xTest, same_iCellTest, overlap, same_enTest) 
             
             if (.not. overlap) then
                 
                 mix_iCellTest = this%mix%position_to_cell(xTest)
-                call mix%Epot_neigh(xTest, mix_iCellTest, this%mix, other_positions, overlap, &
+                call mix%Epot_neighCells(xTest, mix_iCellTest, this%mix, other_positions, overlap, &
                                     mix_enTest)
                 
                 if (.not. overlap) then
