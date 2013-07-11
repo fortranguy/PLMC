@@ -134,7 +134,7 @@ contains
         class(MixingPotential), intent(in) :: this        
         real(DP), dimension(Ndim) :: getCell_size
         
-        getCell_size(:) = this%Cell_Lsize(:)
+        getCell_size(:) = this%cell_size(:)
     
    end function MixingPotential_getCell_size
     
@@ -251,8 +251,8 @@ contains
     
         do iNeigh = 1, NnearCell
         
-            iCell_neigh = neigh%cell_neighs(iNeigh, iCell)
-            current => neigh%cellsBegin(iCell_neigh)%particle%next            
+            iCell_neigh = neigh%nearCells_from_totalCells(iNeigh, iCell)
+            current => neigh%beginCells(iCell_neigh)%particle%next            
             if (.not. associated(current%next)) cycle
             
             do
