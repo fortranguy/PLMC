@@ -26,9 +26,9 @@ public :: Link
         integer, dimension(Ndim) :: NtotalCell_dim
         integer :: NtotalCell
         integer, dimension(:, :), allocatable :: nearCells_from_totalCells
-        type(LinkedList), dimension(:), allocatable :: cells
-        type(LinkedList), dimension(:), allocatable :: cellsNext
-        type(LinkedList), dimension(:), allocatable :: cellsBegin
+        type(LinkedList), dimension(:), allocatable :: beginCells
+        type(LinkedList), dimension(:), allocatable :: currentCells
+        type(LinkedList), dimension(:), allocatable :: nextCells        
         
     contains
     
@@ -85,20 +85,20 @@ contains
     
         integer :: iCell
 
-        allocate(this%cellsBegin(this%NtotalCell))
-        allocate(this%cells(this%NtotalCell))
-        allocate(this%cellsNext(this%NtotalCell))
+        allocate(this%beginCells(this%NtotalCell))
+        allocate(this%currentCells(this%NtotalCell))
+        allocate(this%nextCells(this%NtotalCell))
         
         do iCell = 1, this%NtotalCell
 
-            allocate(this%cellsBegin(iCell)%particle)
-            this%cells(iCell)%particle => this%cellsBegin(iCell)%particle
-            this%cells(iCell)%particle%iCol = 0
+            allocate(this%beginCells(iCell)%particle)
+            this%currentCells(iCell)%particle => this%beginCells(iCell)%particle
+            this%currentCells(iCell)%particle%iCol = 0
             
-            allocate(this%cellsNext(iCell)%particle)
-            this%cellsNext(iCell)%particle%iCol = 0            
-            this%cells(iCell)%particle%next => this%cellsNext(iCell)%particle
-            this%cells(iCell)%particle => this%cellsNext(iCell)%particle     
+            allocate(this%nextCells(iCell)%particle)
+            this%nextCells(iCell)%particle%iCol = 0            
+            this%currentCells(iCell)%particle%next => this%nextCells(iCell)%particle
+            this%currentCells(iCell)%particle => this%nextCells(iCell)%particle     
     
         end do
         
@@ -124,8 +124,8 @@ contains
         integer :: iCell
 
         do iCell = 1, this%NtotalCell
-            if (associated(this%cellsBegin(iCell)%particle)) then
-                call free_link(this%cellsBegin(iCell)%particle)
+            if (associated(this%beginCells(iCell)%particle)) then
+                call free_link(this%beginCells(iCell)%particle)
             end if
         end do
     
@@ -201,18 +201,18 @@ contains
         do iCol = 1, Ncol
     
             iCell = this%position_to_cell(X(:,iCol))
-            this%cells(iCell)%particle%iCol = iCol
+            this%currentCells(iCell)%particle%iCol = iCol
             
-            allocate(this%cellsNext(iCell)%particle)
-            this%cellsNext(iCell)%particle%iCol = 0
-            this%cells(iCell)%particle%next => this%cellsNext(iCell)%particle
-            this%cells(iCell)%particle => this%cellsNext(iCell)%particle
+            allocate(this%nextCells(iCell)%particle)
+            this%nextCells(iCell)%particle%iCol = 0
+            this%currentCells(iCell)%particle%next => this%nextCells(iCell)%particle
+            this%currentCells(iCell)%particle => this%nextCells(iCell)%particle
             
         end do
         
         do iCell = 1, this%NtotalCell
             
-            this%cells(iCell)%particle%next => null()
+            this%currentCells(iCell)%particle%next => null()
             
         end do
         
@@ -229,7 +229,7 @@ contains
         type(Link), pointer :: current => null()
         type(Link), pointer :: next => null(), previous => null()
     
-        previous => this%cellsBegin(iCellOld)%particle
+        previous => this%beginCells(iCellOld)%particle
         current => previous%next
         
         do
@@ -265,7 +265,7 @@ contains
         type(Link), pointer :: next => null(), previous => null()           
           
         
-        previous => this%cellsBegin(iCellNew)%particle
+        previous => this%beginCells(iCellNew)%particle
         
         do
         
