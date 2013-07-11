@@ -83,12 +83,12 @@ contains
                 write(report_unit, *) "    Old configuration"
                 
                 call oldConfiguration(1, type1%getName()//"_positions", type1%getNcol(), &
-                                      type1%positions, dot_product(Lsize, Lsize))
+                                      type1%positions, norm2(Lsize))
                 call oldConfiguration(2, type1%getName()//"_orientations", type1%getNcol(), &
                                       type1%orientations, 1._DP)
                 ! Warning : be careful with the unit !
-                call oldConfiguration(3, type2%getName()//"_positions", type2%Ncol, type2%positions, &
-                                      dot_product(Lsize, Lsize))
+                call oldConfiguration(3, type2%getName()//"_positions", type2%getNcol(),  &
+                                      type2%positions, norm2(Lsize))
             
             case default
                 write(error_unit, *) "Enter the initial condition : "
@@ -170,13 +170,13 @@ contains
     
     !> From an old configuration
     
-    subroutine oldConfiguration(iFile, type_name, type_Ncol, type_coords, normSqrMax)
+    subroutine oldConfiguration(iFile, type_name, type_Ncol, type_coords, normMax)
     
         integer, intent(in) :: iFile
         character(len=*), intent(in) :: type_name
         integer, intent(in) :: type_Ncol
         real(DP), dimension(:, :), intent(out) :: type_coords
-        real(DP), intent(in) :: normSqrMax
+        real(DP), intent(in) :: normMax
     
         character(len=20) :: file
         integer :: length
@@ -185,7 +185,6 @@ contains
 
         integer :: iCol
         real(DP), dimension(Ndim) :: vecDummy
-        real(DP) :: normSqr
         
         call get_command_argument(iFile, file, length, fileStat)
         if (fileStat /= 0) stop "error get_command_argument"
@@ -203,11 +202,10 @@ contains
             rewind(file_unit)
             do iCol = 1, type_Ncol
                 read(file_unit, *) type_coords(:, iCol)
-                normSqr = dot_product(type_coords(:, iCol), type_coords(:, iCol))
-                if (normSqr > normSqrMax+io_tiny) then
+                if (norm2(type_coords(:, iCol)) > normMax+io_tiny) then
                     write(error_unit, *) "Norm error : ", file(1:length)
                     write(error_unit, *) "Coordinates ", type_coords(:, iCol)
-                    write(error_unit, *) "Norm square", normSqr
+                    write(error_unit, *) "Norm", norm2(type_coords(:, iCol))
                     stop
                 end if
             end do
