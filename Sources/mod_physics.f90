@@ -211,7 +211,7 @@ contains
     
     end subroutine fourier
     
-    !> 3D index to 1D index 
+    !> 3D index to 1D index
     
     pure function index_from_coord(cell_coord, maxCell_coord)
     
