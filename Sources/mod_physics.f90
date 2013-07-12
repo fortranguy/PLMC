@@ -9,7 +9,8 @@ use data_cell, only : Ndim, Lsize, LsizeMi, Kmax
 
 implicit none
 private
-public dist, distVec, random_surface, markov_surface, Kmax1_sym, Kmax2_sym, fourier, index_from_coord
+public dist, distVec, random_surface, markov_surface, Kmax1_sym, Kmax2_sym, fourier, &
+       index_from_coord, coord_PBC
 
 contains
 
@@ -210,7 +211,7 @@ contains
     
     end subroutine fourier
     
-    !> 3d vector to 1D index 
+    !> 3D index to 1D index 
     
     pure function index_from_coord(cell_coord, maxCell_coord)
     
@@ -221,5 +222,24 @@ contains
                            maxCell_coord(1)*maxCell_coord(2)*(cell_coord(3)-1)
     
     end function index_from_coord
+    
+    !> 3d index periodic boundary conditions
+    
+    pure function coord_PBC(cell_coord,  maxCell_coord)
+    
+        integer, dimension(:), intent(in) :: cell_coord, maxCell_coord
+        integer, dimension(Ndim) :: coord_PBC
+        
+        coord_PBC(:) = cell_coord(:)
+        
+        where (coord_PBC(:) < 1)
+            coord_PBC(:) = coord_PBC(:) + maxCell_coord(:)
+        end where
+        
+        where (coord_PBC(:) > maxCell_coord(:))
+            coord_PBC(:) = coord_PBC(:) - maxCell_coord(:)
+        end where
+    
+    end function coord_PBC
 
 end module mod_physics
