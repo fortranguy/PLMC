@@ -90,8 +90,6 @@ implicit none
     call type2_spheres%Epot_print(type2_units%Epot)
     call type2_spheres%printDensity(type2_units%report)
     call type2_spheres%printReport(type2_units%report)
-
-    write(output_unit, *) "Mix between : ", type1_spheres%getName(), " and ", type2_spheres%getName()
     
     ! Initial condition
     
