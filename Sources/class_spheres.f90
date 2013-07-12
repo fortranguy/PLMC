@@ -12,9 +12,12 @@ use class_neighbourCells
 implicit none
 private
 
-    type, public :: Spheres ! This class must be private according to the encapsulation principle.
-                            ! Nevertheless, it is public for inheritance.
-                            ! It must not be instanciated in the main program.
+    type, public :: Spheres
+    
+        ! private
+        ! The attributes must be private according to the encapsulation principle.
+        ! Nevertheless, it is public for inheritance.
+        ! The class must not be instanciated in the main program.
     
         character(len=5) :: name
 
@@ -23,6 +26,7 @@ private
         real(DP) :: rMin !< minimum distance between two particles
         integer ::  Ncol !< number of a component particles
         real(DP), dimension(:, :), allocatable, public :: positions !< positions of all particles
+                                                                    !< Warning : use carefully !
         
         ! Snashot
         integer :: snap_factor
@@ -187,7 +191,7 @@ contains
         class(Spheres), intent(inout) :: this
         real(DP), dimension(:, :), intent(in) :: other_positions
         
-        integer :: other_Ncol 
+        integer :: other_Ncol
         
         call this%same%all_cols_to_cells(this%Ncol, this%positions)
         
