@@ -29,7 +29,7 @@ program distribution
 
 use data_precisions, only : DP
 use data_constants, only : PI
-use data_cell, only : LsizeMi, Volume
+use data_box, only : LsizeMi, Volume
 use data_particles
 use data_monteCarlo
 use data_potential

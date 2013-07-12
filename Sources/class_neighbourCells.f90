@@ -4,7 +4,7 @@ module class_neighbourCells
 
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
 use data_precisions, only : DP
-use data_cell, only : Ndim, Lsize
+use data_box, only : Ndim, Lsize
 use data_neighbourCells, only : NnearCell_dim, NnearCell
 use module_physics, only : index_from_coord, coord_PBC
 

@@ -4,7 +4,7 @@ module module_physics
 
 use data_precisions, only : DP
 use data_constants, only : PI, sigma3d
-use data_cell, only : Ndim, Lsize, LsizeMi, Kmax
+use data_box, only : Ndim, Lsize, LsizeMi, Kmax
 !$ use omp_lib
 
 implicit none

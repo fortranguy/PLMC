@@ -4,7 +4,7 @@ module module_tools
 
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit, iostat_end
 use data_precisions, only : DP, io_tiny, consist_tiny
-use data_cell, only : Ndim, Lsize, Volume, Kmax
+use data_box, only : Ndim, Lsize, Volume, Kmax
 use data_particles, only : Ncol
 use data_monteCarlo, only : Temperature, Nstep, decorrelFactor, Ntherm, Nmove, Nrotate
 use module_physics, only : dist_PBC, random_surface
