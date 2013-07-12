@@ -31,7 +31,7 @@ use data_precisions, only : DP
 use data_constants, only : PI
 use data_cell, only : LsizeMi, Volume
 use data_particles
-use data_mc
+use data_monteCarlo
 use data_potential
 use data_distrib
 use mod_distrib
@@ -97,7 +97,7 @@ implicit none
         do iCol = 1, inter_Ncol
             do jCol = iCol + 1, inter_Ncol
 
-                r_ij = dist(X(:, iCol), X(:, jCol))      
+                r_ij = dist_PBC(X(:, iCol), X(:, jCol))      
                 iDist =  int(r_ij/deltaDist)
                 distrib(iDist) = distrib(iDist) + 1
 

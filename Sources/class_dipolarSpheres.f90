@@ -7,12 +7,14 @@ use data_precisions, only : DP, consist_tiny
 use data_constants, only : PI
 use data_cell, only : Ndim, Lsize, Kmax, Volume
 use data_particles, only : dipol_radius, dipol_rMin, dipol_Ncol
-use data_mc, only : Temperature, dipol_structure_iStep, dipol_deltaX, dipol_rejectFix, dipol_Nadapt, &
-                    dipol_deltaM, dipol_deltaMmax, dipol_rejectRotFix, dipol_NadaptRot, dipol_Nwidom
+use data_monteCarlo, only : Temperature, dipol_structure_iStep, dipol_deltaX, dipol_rejectFix, &
+                            dipol_Nadapt, dipol_deltaM, dipol_deltaMmax, dipol_rejectRotFix, &
+                            dipol_NadaptRot, dipol_Nwidom
 use data_potential, only : dipol_rCut, dipol_dr, dipol_alpha
 use data_neighbourCells, only : NnearCell, dipol_cell_size
 use data_distrib, only : dipol_snap_factor
-use mod_physics, only : dist, distVec, random_surface, markov_surface, Kmax1_sym, Kmax2_sym, fourier
+use mod_physics, only : distVec_PBC, dist_PBC, random_surface, markov_surface, Kmax1_sym, Kmax2_sym, &
+                        fourier
 use class_observables
 use class_neighbourCells
 use class_mixingPotential
@@ -457,7 +459,7 @@ contains
 
                 if (current%iCol /= iCol) then
 
-                    r_ij = dist(xCol(:), this%positions(:, current%iCol))
+                    r_ij = dist_PBC(xCol(:), this%positions(:, current%iCol))
 
                     if (r_ij < this%rMin) then
                         overlap = .true.
@@ -495,7 +497,7 @@ contains
 
             if (jCol /= iCol) then
 
-                rVec_ij = distVec(xCol(:), this%positions(:, jCol))
+                rVec_ij = distVec_PBC(xCol(:), this%positions(:, jCol))
                 r_ij = norm2(rVec_ij)
 
                 Epot_real_solo = Epot_real_solo + &
@@ -524,7 +526,7 @@ contains
             do iCol = 1, this%Ncol
                 if (iCol /= jCol) then
                     
-                    rVec_ij = distVec(this%positions(:, iCol), this%positions(:, jCol))
+                    rVec_ij = distVec_PBC(this%positions(:, iCol), this%positions(:, jCol))
                     r_ij = norm2(rVec_ij)
                     
                     Epot_real = Epot_real + &

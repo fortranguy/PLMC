@@ -6,7 +6,7 @@ use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
 use data_precisions, only : DP
 use data_cell, only : Ndim, Lsize
 use data_neighbourCells, only : NnearCell_dim, NnearCell
-use mod_physics, only : index_from_coord
+use mod_physics, only : index_from_coord, coord_PBC
 
 implicit none
 private
@@ -48,7 +48,6 @@ public :: Link
         procedure :: all_cols_to_cells => NeighbourCells_all_cols_to_cells
         procedure :: remove_col_from_cell => NeighbourCells_remove_col_from_cell
         procedure :: add_col_to_cell => NeighbourCells_add_col_to_cell
-        procedure, private :: totalCell_PBC => NeighbourCells_totalCell_PBC
         procedure :: nearCells_among_totalCells_init => NeighbourCells_nearCells_among_totalCells_init
         
     end type NeighbourCells
@@ -316,25 +315,7 @@ contains
             
     end  subroutine NeighbourCells_add_col_to_cell
     
-    ! Neighbour cells ------------------------------------------------------------------------------
-    
-    pure function NeighbourCells_totalCell_PBC(this, totalCell_coord) result(totalCell_PBC)
-    
-        class(NeighbourCells), intent(in) :: this
-        integer, dimension(:), intent(in) :: totalCell_coord
-        integer, dimension(Ndim) :: totalCell_PBC
-        
-        totalCell_PBC(:) = totalCell_coord(:)
-        
-        where (totalCell_PBC(:) < 1)
-            totalCell_PBC(:) = totalCell_PBC(:) + this%NtotalCell_dim(:)
-        end where
-        
-        where (totalCell_PBC(:) > this%NtotalCell_dim(:))
-            totalCell_PBC(:) = totalCell_PBC(:) - this%NtotalCell_dim(:)
-        end where
-    
-    end function NeighbourCells_totalCell_PBC
+    ! Neighbour cells initialisation
     
     subroutine NeighbourCells_nearCells_among_totalCells_init(this)
     
@@ -360,10 +341,11 @@ contains
                 nearCell_coord(:) = nearCell_coord(:) - NnearCell_dim(:) + 1
                     ! with respect to the center (?) [iTotalCell, jTotalCell, kTotalCell]
                 
-                totalCell_coord(:) = [iTotalCell, jTotalCell, kTotalCell] + nearCell_coord(:)
+                totalCell_coord(:) = [iTotalCell, jTotalCell, kTotalCell] + nearCell_coord(:)                
+                totalCell_coord(:) = coord_PBC(totalCell_coord, this%NtotalCell_dim)
                 
                 this%nearCells_among_totalCells(nearCell_index, totalCell_index) = &
-                    index_from_coord(this%totalCell_PBC(totalCell_coord), this%NtotalCell_dim)
+                    index_from_coord(totalCell_coord, this%NtotalCell_dim)
                     
             end do
             end do

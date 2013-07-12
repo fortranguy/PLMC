@@ -6,15 +6,18 @@ use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
 use data_precisions, only : DP
 use data_constants, only : PI
 use data_cell, only : Ndim, Lsize, Volume
-use mod_physics, only : dist
+use mod_physics, only : dist_PBC
 use class_neighbourCells
 
 implicit none
 private
 
-    type, public :: Spheres ! This class must be private according to the encapsulation principle.
-                            ! Nevertheless, it is public for inheritance.
-                            ! It must not be instanciated in the main program.
+    type, public :: Spheres
+    
+        ! private
+        ! The attributes must be private according to the encapsulation principle.
+        ! Nevertheless, it is public for inheritance.
+        ! The class must not be instanciated in the main program.
     
         character(len=5) :: name
 
@@ -23,6 +26,7 @@ private
         real(DP) :: rMin !< minimum distance between two particles
         integer ::  Ncol !< number of a component particles
         real(DP), dimension(:, :), allocatable, public :: positions !< positions of all particles
+                                                                    !< Warning : use carefully !
         
         ! Snashot
         integer :: snap_factor
@@ -120,15 +124,15 @@ contains
         class(Spheres), intent(in) :: this
         integer, intent(in) :: report_unit
         
-        real(DP) :: density, compac
+        real(DP) :: density, compacity
         
         density = real(this%Ncol, DP) / Volume
-        compac = 4._DP/3._DP*PI*this%radius**3 * density
+        compacity = 4._DP/3._DP*PI*this%radius**3 * density
         
-        write(output_unit, *) this%name, " : ", "density = ", density, "compacity = ", compac
+        write(output_unit, *) this%name, " : ", "density = ", density, "compacity = ", compacity
         
         write(report_unit, *) "    density = ", density
-        write(report_unit, *) "    compacity = ", compac
+        write(report_unit, *) "    compacity = ", compacity
     
     end subroutine Spheres_printDensity
     
@@ -165,7 +169,7 @@ contains
             do iCol = 1, this%Ncol
                 if (iCol /= jCol) then
                     
-                    r_ij = dist(this%positions(:, iCol), this%positions(:, jCol))
+                    r_ij = dist_PBC(this%positions(:, iCol), this%positions(:, jCol))
                     if (r_ij < this%rMin) then
                         write(error_unit, *) this%name, "    Overlap !", iCol, jCol
                         write(error_unit, *) "    r_ij = ", r_ij
@@ -182,17 +186,13 @@ contains
     
     !> Fill cells with colloids
     
-    subroutine Spheres_all_cols_to_cells(this, other_positions)
+    subroutine Spheres_all_cols_to_cells(this, other)
     
         class(Spheres), intent(inout) :: this
-        real(DP), dimension(:, :), intent(in) :: other_positions
-        
-        integer :: other_Ncol 
+        class(Spheres), intent(in) :: other
         
         call this%same%all_cols_to_cells(this%Ncol, this%positions)
-        
-        other_Ncol = size(other_positions, 2)
-        call this%mix%all_cols_to_cells(other_Ncol, other_positions)
+        call this%mix%all_cols_to_cells(other%Ncol, other%positions)
     
     end subroutine Spheres_all_cols_to_cells
     

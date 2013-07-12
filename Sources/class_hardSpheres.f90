@@ -6,10 +6,10 @@ use data_precisions, only : DP
 use data_cell, only : Ndim, Lsize
 use data_particles, only : hard_radius, hard_rMin, hard_Ncol
 use data_potential, only : hard_rCut
-use data_mc, only : Temperature, hard_deltaX, hard_rejectFix, hard_Nadapt, hard_Nwidom
+use data_monteCarlo, only : Temperature, hard_deltaX, hard_rejectFix, hard_Nadapt, hard_Nwidom
 use data_neighbourCells, only : NnearCell, hard_cell_size
 use data_distrib, only : hard_snap_factor
-use mod_physics, only : dist
+use mod_physics, only : dist_PBC
 use class_observables
 use class_neighbourCells
 use class_mixingPotential
@@ -155,7 +155,7 @@ contains
             
                 if (current%iCol /= iCol) then
                 
-                    r_ij = dist(xCol(:), this%positions(:, current%iCol))
+                    r_ij = dist_PBC(xCol(:), this%positions(:, current%iCol))
                     if (r_ij < this%rMin) then
                         overlap = .true.
                         return

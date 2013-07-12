@@ -6,8 +6,8 @@ use, intrinsic :: iso_fortran_env, only : output_unit, error_unit, iostat_end
 use data_precisions, only : DP, io_tiny, consist_tiny
 use data_cell, only : Ndim, Lsize, Volume, Kmax
 use data_particles, only : Ncol
-use data_mc, only : Temperature, Nstep, decorrelFactor, Ntherm, Nmove, Nrotate
-use mod_physics, only : dist, random_surface
+use data_monteCarlo, only : Temperature, Nstep, decorrelFactor, Ntherm, Nmove, Nrotate
+use mod_physics, only : dist_PBC, random_surface
 use class_spheres
 use class_dipolarSpheres
 use class_hardSpheres
@@ -120,7 +120,7 @@ contains
             type1%positions(:, iCol) = xRand*Lsize(:)
             
             do iColTest = 1, iCol-1            
-                rTest = dist(type1%positions(:, iColTest), type1%positions(:, iCol))
+                rTest = dist_PBC(type1%positions(:, iColTest), type1%positions(:, iCol))
                 if (rTest < type1%getRmin()) then
                     goto 7101
                 end if            
@@ -136,14 +136,14 @@ contains
             type2%positions(:, iCol) = xRand*Lsize(:)
             
             do iColTest = 1, type1%getNcol()
-                rTest = dist(type1%positions(:, iColTest), type2%positions(:, iCol))
+                rTest = dist_PBC(type1%positions(:, iColTest), type2%positions(:, iCol))
                 if (rTest < mix_rMin) then
                     goto 7102
                 end if            
             end do
             
             do iColTest = 1, iCol-1            
-                rTest = dist(type2%positions(:, iColTest), type2%positions(:, iCol))
+                rTest = dist_PBC(type2%positions(:, iColTest), type2%positions(:, iCol))
                 if (rTest < type2%getRmin()) then
                     goto 7102
                 end if            

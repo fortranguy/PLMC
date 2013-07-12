@@ -5,7 +5,7 @@ program mc_canonical
 use, intrinsic :: iso_fortran_env, only : output_unit
 use data_precisions, only : DP
 use data_particles, only : Ncol
-use data_mc, only : Nstep, Ntherm, Nmove, Nrotate
+use data_monteCarlo, only : Nstep, Ntherm, Nmove, Nrotate
 use data_distrib, only : snap
 use class_observables
 use class_mixingPotential
@@ -102,12 +102,12 @@ implicit none
     type1_obs%Epot = type1_spheres%Epot_conf()
     call type1_spheres%snapShot_positions(0, type1_units%snapIni_positions)
     call type1_spheres%snapShot_orientations(0, type1_units%snapIni_orientations)
-    call type1_spheres%all_cols_to_cells(type2_spheres%positions) !< filling cells with particles
+    call type1_spheres%all_cols_to_cells(type2_spheres) !< filling cells with particles
     
     call type2_spheres%overlapTest()
     type2_obs%Epot = type2_spheres%Epot_conf()
     call type2_spheres%snapShot_positions(0, type2_units%snapIni_positions)
-    call type2_spheres%all_cols_to_cells(type1_spheres%positions)
+    call type2_spheres%all_cols_to_cells(type1_spheres)
     
     call mix%overlapTest(type1_spheres%positions, type2_spheres%positions)
     mix_Epot = mix%Epot_conf(type1_spheres%positions, type2_spheres%positions)
