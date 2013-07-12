@@ -107,7 +107,7 @@ contains
         
         real(DP), dimension(Ndim) :: rotation
         real(DP) :: rotation_dot_mCol
-        real(DP) :: amplitude, rand
+        real(DP) :: amplitude, random
         integer :: iNdim
         
         do iNdim = 1, Ndim        
@@ -118,8 +118,8 @@ contains
         rotation(:) = rotation(:) - rotation_dot_mCol * mCol(:)
         rotation(:) = rotation(:) / norm2(rotation)
         
-        call random_number(rand)
-        amplitude = deltaM * (rand - 0.5_DP)
+        call random_number(random)
+        amplitude = deltaM * (random - 0.5_DP)
         
         mCol(:) = mCol(:) + amplitude * rotation(:)
         mCol(:) = mCol(:) / norm2(mCol)

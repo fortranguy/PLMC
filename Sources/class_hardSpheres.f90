@@ -191,7 +191,7 @@ contains
         integer :: mix_iCellOld, mix_iCellNew
         real(DP) :: mix_deltaEpot
         real(DP) :: mix_eNew, mix_eOld
-        real(DP) :: rand
+        real(DP) :: random
         
         ! Random new position
         call random_number(xRand)
@@ -217,8 +217,8 @@ contains
                 
                 mix_deltaEpot = mix_eNew - mix_eOld
                 
-                call random_number(rand)
-                if (rand < exp(-mix_deltaEpot/Temperature)) then
+                call random_number(random)
+                if (random < exp(-mix_deltaEpot/Temperature)) then
                 
                     this%positions(:, iOld) = xNew(:)
                     same_obs%Epot = same_obs%Epot + 0._DP

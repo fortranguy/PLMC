@@ -1304,7 +1304,7 @@ contains
         real(DP) :: deltaEpot, same_deltaEpot, mix_deltaEpot
         real(DP) :: same_eNew_real, same_eOld_real
         real(DP) :: mix_eNew, mix_eOld
-        real(DP) :: rand
+        real(DP) :: random
         
         ! Random new position
         call random_number(xRand)
@@ -1336,8 +1336,8 @@ contains
                 
                 deltaEpot = same_deltaEpot + mix_deltaEpot
                 
-                call random_number(rand)            
-                if (rand < exp(-deltaEpot/Temperature)) then
+                call random_number(random)            
+                if (random < exp(-deltaEpot/Temperature)) then
 
                     call this%deltaEpot_reci_move_updateStructure(iOld, xNew)
                     this%positions(:, iOld) = xNew(:)
@@ -1375,7 +1375,7 @@ contains
         integer, intent(in) :: iOld
         class(MoreObservables), intent(inout) :: obs
         
-        real(DP) :: rand
+        real(DP) :: random
         real(DP), dimension(Ndim) :: mNew
         real(DP) :: deltaEpot, deltaEpot_real, deltaEpot_self
         real(DP) :: real_eNew, real_eOld
@@ -1393,8 +1393,8 @@ contains
         
         deltaEpot = deltaEpot_real + this%deltaEpot_reci_rotate(iOld, mNew) - deltaEpot_self
         
-        call random_number(rand)
-        if (rand < exp(-deltaEpot/Temperature)) then
+        call random_number(random)
+        if (random < exp(-deltaEpot/Temperature)) then
         
             call this%deltaEpot_reci_rotate_updateStructure(iOld, mNew)
             this%orientations(:, iOld) = mNew(:)

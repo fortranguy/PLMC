@@ -259,7 +259,7 @@ contains
         real(DP), intent(inout) :: mix_Epot
         
         logical :: overlap
-        real(DP) :: rand
+        real(DP) :: random
         real(DP), dimension(Ndim) :: xRand, xNew
         integer :: same_iCellOld, same_iCellNew
         integer :: mix_iCellOld, mix_iCellNew
@@ -293,8 +293,8 @@ contains
                 
                 deltaEpot = same_deltaEpot + mix_deltaEpot
                 
-                call random_number(rand)
-                if (rand < exp(-deltaEpot/Temperature)) then
+                call random_number(random)
+                if (random < exp(-deltaEpot/Temperature)) then
                 
                     this%positions(:, iOld) = xNew(:)
                     same_obs%Epot = same_obs%Epot + same_deltaEpot

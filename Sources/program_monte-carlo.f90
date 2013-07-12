@@ -22,7 +22,7 @@ implicit none
     integer :: iChangeRand !< random change
     integer :: iChange !< change counters
     integer :: iColRand !< random particle
-    real(DP) :: rand !< random number between 0 and 1
+    real(DP) :: random !< random number between 0 and 1
     real(DP) :: tIni, tFin !< CPU initial and final time
     
     ! Total physical system variables
@@ -126,14 +126,14 @@ implicit none
         MC_Change : do iChange = 1, Nmove + Nrotate
         
             ! Randomly choosing the change
-            call random_number(rand)
-            iChangeRand = int(rand*real(Nmove+Nrotate, DP)) + 1
+            call random_number(random)
+            iChangeRand = int(random*real(Nmove+Nrotate, DP)) + 1
             
             if (iChangeRand <= Nmove) then ! change = move
 
                 ! Randomly choosing a particle among both types
-                call random_number(rand)
-                iColRand = int(rand*real(Ncol, DP)) + 1
+                call random_number(random)
+                iColRand = int(random*real(Ncol, DP)) + 1
                 
                 ! Moving a particle : 
                 if (iColRand <= type1_spheres%getNcol()) then
@@ -147,8 +147,8 @@ implicit none
                 
             else ! change = rotate
                 
-                call random_number(rand)
-                iColRand = int(rand*real(type1_spheres%getNcol(), DP)) + 1
+                call random_number(random)
+                iColRand = int(random*real(type1_spheres%getNcol(), DP)) + 1
      
                 call type1_spheres%rotate(iColRand, type1_obs)
                 type1_obs%Nrotate = type1_obs%Nrotate + 1
