@@ -1,6 +1,6 @@
 !> Subroutines for physical purposes
 
-module mod_physics
+module module_physics
 
 use data_precisions, only : DP
 use data_constants, only : PI, sigma3d
@@ -242,4 +242,4 @@ contains
     
     end function coord_PBC
 
-end module mod_physics
+end module module_physics

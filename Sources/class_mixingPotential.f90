@@ -8,7 +8,7 @@ use data_cell, only : Ndim
 use data_particles, only : mix_rMin
 use data_potential, only : mix_rCut, mix_dr, mix_epsilon, mix_alpha
 use data_neighbourCells, only : NnearCell, mix_cell_size
-use mod_physics, only : dist_PBC
+use module_physics, only : dist_PBC
 use class_neighbourCells
 
 implicit none

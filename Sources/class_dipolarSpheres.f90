@@ -13,8 +13,8 @@ use data_monteCarlo, only : Temperature, dipol_structure_iStep, dipol_deltaX, di
 use data_potential, only : dipol_rCut, dipol_dr, dipol_alpha
 use data_neighbourCells, only : NnearCell, dipol_cell_size
 use data_distrib, only : dipol_snap_factor
-use mod_physics, only : distVec_PBC, dist_PBC, random_surface, markov_surface, Kmax1_sym, Kmax2_sym, &
-                        fourier
+use module_physics, only : distVec_PBC, dist_PBC, random_surface, markov_surface, Kmax1_sym, &
+                           Kmax2_sym, fourier
 use class_observables
 use class_neighbourCells
 use class_mixingPotential

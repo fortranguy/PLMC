@@ -28,27 +28,27 @@ data.o: data_copy.f90
 
 # ------------------------------------------------------------------------
 
-mod_physics.o : data_precisions.mod data_constants.mod data_cell.mod
+module_physics.o : data_precisions.mod data_constants.mod data_cell.mod
 class_observables.o : data_precisions.mod data_cell.mod data_monteCarlo.mod
-class_neighbourCells.o : data_precisions.mod data_cell.mod data_neighbours.mod mod_physics.o
+class_neighbourCells.o : data_precisions.mod data_cell.mod data_neighbours.mod module_physics.o
 class_mixingPotential.o : data_precisions.mod data_cell.mod data_particles.mod data_potential.mod \
-                          data_neighbours.mod mod_physics.o class_neighbourCells.o
-class_spheres.o : data_precisions.mod data_constants.mod  data_cell.mod mod_physics.o \
+                          data_neighbours.mod module_physics.o class_neighbourCells.o
+class_spheres.o : data_precisions.mod data_constants.mod  data_cell.mod module_physics.o \
                   class_neighbourCells.o
 class_hardSpheres.o : data_precisions.mod data_cell.mod data_particles.mod data_monteCarlo.mod \
-                      data_potential.mod data_neighbours.mod data_distrib.mod mod_physics.o \
+                      data_potential.mod data_neighbours.mod data_distrib.mod module_physics.o \
                       class_observables.o class_neighbourCells.o class_mixingPotential.o \
                       class_spheres.o
 class_dipolarSpheres.o : data_precisions.mod data_constants.mod data_cell.mod data_particles.mod \
                          data_monteCarlo.mod data_potential.mod data_neighbours.mod data_distrib.mod \
-                         mod_physics.o class_observables.o class_neighbourCells.o \
+                         module_physics.o class_observables.o class_neighbourCells.o \
                          class_mixingPotential.o class_spheres.o
-mod_tools.o : data_precisions.mod data_cell.mod data_particles.mod data_monteCarlo.mod mod_physics.o \
-              class_spheres.o
+module_tools.o : data_precisions.mod data_cell.mod data_particles.mod data_monteCarlo.mod \
+                 module_physics.o class_spheres.o
 
 # -----------------------------------------------
 
-mod_physics.o : mod_physics.f90
+module_physics.o : module_physics.f90
 	$(FC) -c $(FFLAGS_OMP) $< -o $@
 class_observables.o : class_observables.f90
 	$(FC) -c $(FFLAGS) $< -o $@
@@ -66,31 +66,31 @@ class_dipolarSpheres.o : class_dipolarSpheres.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_units.o : class_units.f90
 	$(FC) -c $(FFLAGS) $< -o $@
-mod_tools.o : mod_tools.f90
+module_tools.o : module_tools.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 
 # -----------------------------------------------
 
-mc_canonical.o : mc_canonical.f90
+program_canonical.o : program_canonical.f90
 	$(FC) -c $(FFLAGS) $< -o $@
-$(EXEC1) : data.o mod_physics.o class_neighbourCells.o class_mixingPotential.o class_spheres.o \
+$(EXEC1) : data.o module_physics.o class_neighbourCells.o class_mixingPotential.o class_spheres.o \
 	class_hardSpheres.o class_dipolarSpheres.o class_observables.o class_units.o \
-	mod_tools.o mc_canonical.o
+	module_tools.o program_canonical.o
 	$(FC) $^ $(LDFLAGS) $(CLDFLAGS) $(LDLIBS) -o $@
 
 # ------------------------------------------------------------------------
 
-mc_bunching.o : mc_bunching.f90
+program_bunching.o : program_bunching.f90
 	$(FC) -c $(FFLAGS) $< -o $@
-$(EXEC2) : data.o mc_bunching.o
+$(EXEC2) : data.o program_bunching.o
 	$(FC) $^ $(LDFLAGS) -o $@
 
 # ------------------------------------------------------------------------
 
-mc_distrib.o : mc_distrib.f90
+program_distrib.o : program_distrib.f90
 	$(FC) -c $(FFLAGS_OMP) $< -o $@
-$(EXEC3) : data.o mod_physics.o class_neighbourCells.o class_mixingPotential.o class_spheres.o \
-           class_interactingSpheres.o mod_tools.o mc_distrib.o
+$(EXEC3) : data.o module_physics.o class_neighbourCells.o class_mixingPotential.o class_spheres.o \
+           class_interactingSpheres.o module_tools.o program_distrib.o
 	$(FC) $^ $(LDFLAGS_OMP) -o $@
 
 # --------------------------------------------------------------------------------------------------

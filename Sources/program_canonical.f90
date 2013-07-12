@@ -1,6 +1,6 @@
 !> \brief Monte-Carlo simulation in canonical ensemble for a mixture
 
-program mc_canonical
+program monteCarlo_canonical_bulk
 
 use, intrinsic :: iso_fortran_env, only : output_unit
 use data_precisions, only : DP
@@ -12,8 +12,8 @@ use class_mixingPotential
 use class_dipolarSpheres
 use class_hardSpheres
 use class_units
-use mod_tools, only : initRandomSeed, initialCondition, report, consistTest, printResults, &
-                      mix_printResults
+use module_tools, only : initRandomSeed, initialCondition, report, consistTest, printResults, &
+                         mix_printResults
 
 implicit none
     
@@ -298,4 +298,4 @@ implicit none
     close(obsThermal_unit)
     close(obsEquilib_unit)
     
-end program mc_canonical
+end program monteCarlo_canonical_bulk
