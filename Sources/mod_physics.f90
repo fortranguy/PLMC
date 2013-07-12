@@ -9,39 +9,39 @@ use data_cell, only : Ndim, Lsize, LsizeMi, Kmax
 
 implicit none
 private
-public dist, distVec, random_surface, markov_surface, Kmax1_sym, Kmax2_sym, fourier, &
+public distVec_PBC, dist_PBC, random_surface, markov_surface, Kmax1_sym, Kmax2_sym, fourier, &
        index_from_coord, coord_PBC
 
 contains
 
     !> Distance between 2 positions with Periodic Boundary Conditions
     
-    pure function dist(xCol1, xCol2)
-    
-        real(DP), dimension(:), intent(in) :: xCol1, xCol2        
-        real(DP) :: dist
-        
-        real(DP), dimension(Ndim) :: distVec_12
-        
-        distVec_12(:) = distVec(xCol1, xCol2)
-        
-        dist = norm2(distVec_12)
-    
-    end function dist
-    
-    pure function distVec(xCol1, xCol2)
+    pure function distVec_PBC(xCol1, xCol2)
     
         real(DP), dimension(:), intent(in) :: xCol1, xCol2
-        real(DP), dimension(Ndim) :: distVec
+        real(DP), dimension(Ndim) :: distVec_PBC
         
-        distVec(:) = xCol2(:) - xCol1(:)
-        distVec(:) = modulo(distVec(:), Lsize(:))
+        distVec_PBC(:) = xCol2(:) - xCol1(:)
+        distVec_PBC(:) = modulo(distVec_PBC(:), Lsize(:))
         
-        where(distVec(:) > LsizeMi(:))
-            distVec(:) = distVec(:) - Lsize(:)
+        where(distVec_PBC(:) > LsizeMi(:))
+            distVec_PBC(:) = distVec_PBC(:) - Lsize(:)
         end where
         
-    end function distVec
+    end function distVec_PBC
+    
+    pure function dist_PBC(xCol1, xCol2)
+    
+        real(DP), dimension(:), intent(in) :: xCol1, xCol2        
+        real(DP) :: dist_PBC
+        
+        real(DP), dimension(Ndim) :: distVec_PBC_12
+        
+        distVec_PBC_12(:) = distVec_PBC(xCol1, xCol2)
+        
+        dist_PBC = norm2(distVec_PBC_12)
+    
+    end function dist_PBC
     
     !> Rotation
     

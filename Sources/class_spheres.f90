@@ -6,7 +6,7 @@ use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
 use data_precisions, only : DP
 use data_constants, only : PI
 use data_cell, only : Ndim, Lsize, Volume
-use mod_physics, only : dist
+use mod_physics, only : dist_PBC
 use class_neighbourCells
 
 implicit none
@@ -169,7 +169,7 @@ contains
             do iCol = 1, this%Ncol
                 if (iCol /= jCol) then
                     
-                    r_ij = dist(this%positions(:, iCol), this%positions(:, jCol))
+                    r_ij = dist_PBC(this%positions(:, iCol), this%positions(:, jCol))
                     if (r_ij < this%rMin) then
                         write(error_unit, *) this%name, "    Overlap !", iCol, jCol
                         write(error_unit, *) "    r_ij = ", r_ij

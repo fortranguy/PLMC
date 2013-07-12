@@ -8,7 +8,7 @@ use data_cell, only : Ndim
 use data_particles, only : mix_rMin
 use data_potential, only : mix_rCut, mix_dr, mix_epsilon, mix_alpha
 use data_neighbourCells, only : NnearCell, mix_cell_size
-use mod_physics, only : dist
+use mod_physics, only : dist_PBC
 use class_neighbourCells
 
 implicit none
@@ -155,7 +155,7 @@ contains
         do iCol1 = 1, Ncol1
             do iCol2 = 1, Ncol2
                     
-                r_mix = dist(type1_positions(:, iCol1), type2_positions(:, iCol2))
+                r_mix = dist_PBC(type1_positions(:, iCol1), type2_positions(:, iCol2))
                 if (r_mix < this%rMin) then
                     write(error_unit, *) this%name, " :    Overlap !", iCol1, iCol2
                     write(error_unit, *) "    r_mix = ", r_mix
@@ -260,7 +260,7 @@ contains
             
                 next => current%next
                 
-                r = dist(xCol(:), other_positions(:, current%iCol))
+                r = dist_PBC(xCol(:), other_positions(:, current%iCol))
                 if (r < this%rMin) then
                     overlap = .true.
                     return
@@ -297,7 +297,7 @@ contains
         do iCol1 = 1, Ncol1
             do iCol2 = 1, Ncol2
                 
-                r_mix = dist(type1_positions(:, iCol1), type2_positions(:, iCol2))
+                r_mix = dist_PBC(type1_positions(:, iCol1), type2_positions(:, iCol2))
                 Epot_conf = Epot_conf + this%Epot_pair(r_mix)
 
             end do

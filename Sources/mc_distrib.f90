@@ -97,7 +97,7 @@ implicit none
         do iCol = 1, inter_Ncol
             do jCol = iCol + 1, inter_Ncol
 
-                r_ij = dist(X(:, iCol), X(:, jCol))      
+                r_ij = dist_PBC(X(:, iCol), X(:, jCol))      
                 iDist =  int(r_ij/deltaDist)
                 distrib(iDist) = distrib(iDist) + 1
 

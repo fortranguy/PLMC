@@ -9,7 +9,7 @@ use data_potential, only : inter_rCut, inter_dr, inter_epsilon, inter_alpha
 use data_mc, only : Temperature, inter_deltaX, inter_rejectFix, inter_Nadapt, inter_Nwidom
 use data_neighbourCells, only : NnearCell, inter_cell_size
 use data_distrib, only : inter_snap_factor
-use mod_physics, only : dist
+use mod_physics, only : dist_PBC
 use class_observables
 use class_neighbourCells
 use class_mixingPotential
@@ -228,7 +228,7 @@ contains
             
                 if (current%iCol /= iCol) then
                 
-                    r_ij = dist(xCol(:), this%positions(:, current%iCol))
+                    r_ij = dist_PBC(xCol(:), this%positions(:, current%iCol))
                     if (r_ij < this%rMin) then
                         overlap = .true.
                         return
@@ -386,7 +386,7 @@ contains
             do iCol = 1, this%Ncol
                 if (iCol /= jCol) then
                 
-                    r_ij = dist(this%positions(:, iCol), this%positions(:, jCol))
+                    r_ij = dist_PBC(this%positions(:, iCol), this%positions(:, jCol))
                     Epot_conf = Epot_conf + this%Epot_pair(r_ij)
                     
                 end if
