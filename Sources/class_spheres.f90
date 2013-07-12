@@ -124,15 +124,15 @@ contains
         class(Spheres), intent(in) :: this
         integer, intent(in) :: report_unit
         
-        real(DP) :: density, compac
+        real(DP) :: density, compacity
         
         density = real(this%Ncol, DP) / Volume
-        compac = 4._DP/3._DP*PI*this%radius**3 * density
+        compacity = 4._DP/3._DP*PI*this%radius**3 * density
         
-        write(output_unit, *) this%name, " : ", "density = ", density, "compacity = ", compac
+        write(output_unit, *) this%name, " : ", "density = ", density, "compacity = ", compacity
         
         write(report_unit, *) "    density = ", density
-        write(report_unit, *) "    compacity = ", compac
+        write(report_unit, *) "    compacity = ", compacity
     
     end subroutine Spheres_printDensity
     
@@ -186,17 +186,13 @@ contains
     
     !> Fill cells with colloids
     
-    subroutine Spheres_all_cols_to_cells(this, other_positions)
+    subroutine Spheres_all_cols_to_cells(this, other)
     
         class(Spheres), intent(inout) :: this
-        real(DP), dimension(:, :), intent(in) :: other_positions
-        
-        integer :: other_Ncol
+        class(Spheres), intent(in) :: other
         
         call this%same%all_cols_to_cells(this%Ncol, this%positions)
-        
-        other_Ncol = size(other_positions, 2)
-        call this%mix%all_cols_to_cells(other_Ncol, other_positions)
+        call this%mix%all_cols_to_cells(other%Ncol, other%positions)
     
     end subroutine Spheres_all_cols_to_cells
     
