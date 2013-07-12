@@ -223,7 +223,7 @@ contains
     
     end function index_from_coord
     
-    !> 3d index periodic boundary conditions
+    !> 3d index Periodic Boundary Conditions
     
     pure function coord_PBC(cell_coord,  maxCell_coord)
     

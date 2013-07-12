@@ -315,7 +315,7 @@ contains
             
     end  subroutine NeighbourCells_add_col_to_cell
     
-    ! Neighbour cells ------------------------------------------------------------------------------
+    ! Neighbour cells initialisation
     
     subroutine NeighbourCells_nearCells_among_totalCells_init(this)
     
