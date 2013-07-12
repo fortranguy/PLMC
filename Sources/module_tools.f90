@@ -1,13 +1,13 @@
 !> \brief Subroutines as tools for the main program
 
-module mod_tools
+module module_tools
 
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit, iostat_end
 use data_precisions, only : DP, io_tiny, consist_tiny
 use data_cell, only : Ndim, Lsize, Volume, Kmax
 use data_particles, only : Ncol
 use data_monteCarlo, only : Temperature, Nstep, decorrelFactor, Ntherm, Nmove, Nrotate
-use mod_physics, only : dist_PBC, random_surface
+use module_physics, only : dist_PBC, random_surface
 use class_spheres
 use class_dipolarSpheres
 use class_hardSpheres
@@ -294,4 +294,4 @@ contains
     
     end subroutine mix_printResults
     
-end module mod_tools
+end module module_tools

@@ -1,6 +1,6 @@
 !> \brief Distribution module
 
-module mod_distrib
+module module_distrib
 
 use data_precisions, only : DP
 use data_constants, only : PI
@@ -21,7 +21,7 @@ contains
         
     end function sphereVol
     
-end module mod_distrib
+end module module_distrib
 
 !> \brief Calculate and print the distribution function
 
@@ -34,8 +34,8 @@ use data_particles
 use data_monteCarlo
 use data_potential
 use data_distrib
-use mod_distrib
-use mod_physics
+use module_distrib
+use module_physics
 use class_mixingPotential
 use class_interactingSpheres
 !$ use omp_lib

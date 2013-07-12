@@ -12,8 +12,8 @@ use class_mixingPotential
 use class_dipolarSpheres
 use class_hardSpheres
 use class_units
-use mod_tools, only : initRandomSeed, initialCondition, report, consistTest, printResults, &
-                      mix_printResults
+use module_tools, only : initRandomSeed, initialCondition, report, consistTest, printResults, &
+                         mix_printResults
 
 implicit none
     
