@@ -71,9 +71,8 @@ contains
                         write(output_unit, *) "Random depositions + random orientations"
                         write(report_unit, *) "    Random depositions + random orientations"
                     case default
-                        write(error_unit, *) "Enter the initial condition : "
-                        write(error_unit, *) &
-                            "   'rand' or '[type1_positions] [type1_orientations] [type2_positions]'."
+                        write(error_unit, *) "'", trim(init), "'", " isn't a known argument."
+                        write(error_unit, *) "Do you mean 'rand' ?"
                         stop
                 end select
                 
