@@ -4,7 +4,7 @@ module class_mixingPotential
 
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
 use data_precisions, only : DP
-use data_cell, only : Ndim
+use data_box, only : Ndim
 use data_particles, only : mix_rMin
 use data_potential, only : mix_rCut, mix_dr, mix_epsilon, mix_alpha
 use data_neighbourCells, only : NnearCell, mix_cell_size

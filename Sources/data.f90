@@ -30,10 +30,10 @@ end module data_constants
 !***************************************************************************************************
 
 !***************************************************************************************************
-!> \brief Cell data :
-!> declaration of the cell parameters
+!> \brief Box data :
+!> declaration of the simulation box parameters
 !***************************************************************************************************
-module data_cell
+module data_box
 
 use data_precisions, only : DP
 
@@ -53,7 +53,7 @@ implicit none
     integer, parameter :: Kmax3 = Kmax1
     integer, dimension(Ndim), parameter :: Kmax = [Kmax1, Kmax2, Kmax3]
     
-end module data_cell
+end module data_box
 !***************************************************************************************************
 
 !***************************************************************************************************
@@ -93,7 +93,7 @@ end module data_particles
 module data_monteCarlo
 
 use data_precisions, only : DP
-use data_cell, only : Ndim
+use data_box, only : Ndim
 use data_particles, only : Ncol, dipol_Ncol, inter_Ncol!, hard_Ncol
 
 implicit none
@@ -135,16 +135,18 @@ end module data_monteCarlo
 !> \brief Potential data :
 !> declaration of the potential energy parameters
 
+!> The dipolar spheres interaction uses the Ewald sums methods.
+
 !> The interactive spheres (inter) potential is composed of 3 parts :
-!> hard sphere (HS) + Yukawa + cut
+!> hard sphere (HS) + Yukawa + cut.
 
 !> The mixing potential (mix) is also composed of 3 parts :
-!> hard sphere (HS) + Yukawa + cut
+!> hard sphere (HS) + Yukawa + cut.
 !***************************************************************************************************
 module data_potential
 
 use data_precisions, only : DP
-use data_cell, only : Lsize1
+use data_box, only : Lsize1
 use data_particles, only : hard_rMin
 
 implicit none
@@ -175,7 +177,7 @@ end module data_potential
 module data_neighbourCells
 
 use data_precisions, only : DP
-use data_cell, only : Ndim
+use data_box, only : Ndim
 use data_particles, only : dipol_rMin
 use data_potential, only : inter_rCut, hard_rCut, mix_rCut
 

@@ -3,7 +3,7 @@
 module class_hardSpheres
 
 use data_precisions, only : DP
-use data_cell, only : Ndim, Lsize
+use data_box, only : Ndim, Lsize
 use data_particles, only : hard_radius, hard_rMin, hard_Ncol
 use data_potential, only : hard_rCut
 use data_monteCarlo, only : Temperature, hard_deltaX, hard_rejectFix, hard_Nadapt, hard_Nwidom
