@@ -71,11 +71,11 @@ module_tools.o : module_tools.f90
 
 # -----------------------------------------------
 
-program_canonical.o : program_canonical.f90
+program_monte-carlo.o : program_monte-carlo.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 $(EXEC1) : data.o module_physics.o class_neighbourCells.o class_mixingPotential.o class_spheres.o \
 	class_hardSpheres.o class_dipolarSpheres.o class_observables.o class_units.o \
-	module_tools.o program_canonical.o
+	module_tools.o program_monte-carlo.o
 	$(FC) $^ $(LDFLAGS) $(CLDFLAGS) $(LDLIBS) -o $@
 
 # ------------------------------------------------------------------------
