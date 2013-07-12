@@ -90,7 +90,7 @@ end module data_particles
 !> \brief Monte-Carlo data :
 !> declaration of the Monte-Carlo parameters
 !***************************************************************************************************
-module data_mc
+module data_monteCarlo
 
 use data_precisions, only : DP
 use data_cell, only : Ndim
@@ -128,7 +128,7 @@ implicit none
     integer, parameter :: hard_Nadapt = Ntherm/8
     integer, parameter :: hard_Nwidom = 500 ! hard_Ncol
 
-end module data_mc
+end module data_monteCarlo
 !***************************************************************************************************
 
 !***************************************************************************************************

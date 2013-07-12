@@ -7,8 +7,9 @@ use data_precisions, only : DP, consist_tiny
 use data_constants, only : PI
 use data_cell, only : Ndim, Lsize, Kmax, Volume
 use data_particles, only : dipol_radius, dipol_rMin, dipol_Ncol
-use data_mc, only : Temperature, dipol_structure_iStep, dipol_deltaX, dipol_rejectFix, dipol_Nadapt, &
-                    dipol_deltaM, dipol_deltaMmax, dipol_rejectRotFix, dipol_NadaptRot, dipol_Nwidom
+use data_monteCarlo, only : Temperature, dipol_structure_iStep, dipol_deltaX, dipol_rejectFix, &
+                            dipol_Nadapt, dipol_deltaM, dipol_deltaMmax, dipol_rejectRotFix, &
+                            dipol_NadaptRot, dipol_Nwidom
 use data_potential, only : dipol_rCut, dipol_dr, dipol_alpha
 use data_neighbourCells, only : NnearCell, dipol_cell_size
 use data_distrib, only : dipol_snap_factor

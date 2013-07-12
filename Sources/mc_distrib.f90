@@ -31,7 +31,7 @@ use data_precisions, only : DP
 use data_constants, only : PI
 use data_cell, only : LsizeMi, Volume
 use data_particles
-use data_mc
+use data_monteCarlo
 use data_potential
 use data_distrib
 use mod_distrib

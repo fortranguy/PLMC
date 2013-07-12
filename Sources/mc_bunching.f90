@@ -4,7 +4,7 @@ program bunching
 
 use, intrinsic :: iso_fortran_env, only : output_unit
 use data_precisions, only : DP
-use data_mc, only : Nstep
+use data_monteCarlo, only : Nstep
 
 implicit none
 
