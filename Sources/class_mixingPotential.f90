@@ -140,24 +140,22 @@ contains
     
     !> Overlapt test
     
-    subroutine MixingPotential_overlapTest(this, type1_positions, type2_positions)
+    subroutine MixingPotential_overlapTest(this, type1_positions, type1_Ncol, &
+                                                 type2_positions, type2_Ncol)
     
         class(MixingPotential), intent(in) :: this
         real(DP), dimension(:, :), intent(in) :: type1_positions, type2_positions
+        integer, intent(in) :: type1_Ncol, type2_Ncol
         
-        integer :: Ncol1, Ncol2
-        integer :: iCol1, iCol2
+        integer :: type1_iCol, type2_iCol
         real(DP) :: r_mix
         
-        Ncol1 = size(type1_positions, 2)
-        Ncol2 = size(type2_positions, 2)
-        
-        do iCol1 = 1, Ncol1
-            do iCol2 = 1, Ncol2
+        do type1_iCol = 1, type1_Ncol
+            do type2_iCol = 1, type2_Ncol
                     
-                r_mix = dist_PBC(type1_positions(:, iCol1), type2_positions(:, iCol2))
+                r_mix = dist_PBC(type1_positions(:, type1_iCol), type2_positions(:, type2_iCol))
                 if (r_mix < this%rMin) then
-                    write(error_unit, *) this%name, " :    Overlap !", iCol1, iCol2
+                    write(error_unit, *) this%name, " :    Overlap !", type1_iCol, type2_iCol
                     write(error_unit, *) "    r_mix = ", r_mix
                     stop
                 end if
@@ -279,25 +277,23 @@ contains
     
     !> Total potential energy
     
-    pure function MixingPotential_Epot_conf(this, type1_positions, type2_positions) result(Epot_conf)
+    pure function MixingPotential_Epot_conf(this, type1_positions, type1_Ncol, &
+                                                  type2_positions, type2_Ncol) result(Epot_conf)
     
         class(MixingPotential), intent(in) :: this
         real(DP), dimension(:, :), intent(in) :: type1_positions, type2_positions
+        integer, intent(in) :: type1_Ncol, type2_Ncol
         real(DP) :: Epot_conf
-        
-        integer :: Ncol1, Ncol2
-        integer :: iCol1, iCol2
+
+        integer :: type1_iCol, type2_iCol
         real(DP) :: r_mix
-        
-        Ncol1 = size(type1_positions, 2)
-        Ncol2 = size(type2_positions, 2)
-        
+
         Epot_conf = 0._DP
         
-        do iCol1 = 1, Ncol1
-            do iCol2 = 1, Ncol2
+        do type1_iCol = 1, type1_Ncol
+            do type2_iCol = 1, type2_Ncol
                 
-                r_mix = dist_PBC(type1_positions(:, iCol1), type2_positions(:, iCol2))
+                r_mix = dist_PBC(type1_positions(:, type1_iCol), type2_positions(:, type2_iCol))
                 Epot_conf = Epot_conf + this%Epot_pair(r_mix)
 
             end do
