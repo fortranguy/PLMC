@@ -8,7 +8,7 @@ use data_particles, only : inter_radius, inter_rMin, inter_Ncol
 use data_potential, only : inter_rCut, inter_dr, inter_epsilon, inter_alpha
 use data_monteCarlo, only : Temperature, inter_deltaX, inter_rejectFix, inter_Nadapt, inter_Nwidom
 use data_neighbourCells, only : NnearCell, inter_cell_size
-use data_distrib, only : inter_snap_factor
+use data_distribution, only : inter_snap_factor
 use module_physics, only : dist_PBC
 use class_observables
 use class_neighbourCells

@@ -19,7 +19,7 @@ data_copy.f90 : data.f90
 	cp data.f90 data_copy.f90
 
 data_copy.o data_precisions.mod data_constants.mod data_box.mod data_particles.mod \
-data_monteCarlo.mod data_potential.mod data_neighbours.mod data_monteCarlo_distrib.mod : data_copy.f90
+data_monteCarlo.mod data_potential.mod data_neighbours.mod data_distribution.mod : data_copy.f90
 	$(FC) $(FFLAGS) -c $<
 	touch $*.o $*.mod
 
@@ -36,13 +36,13 @@ class_mixingPotential.o : data_precisions.mod data_box.mod data_particles.mod da
 class_spheres.o : data_precisions.mod data_constants.mod  data_box.mod module_physics.o \
                   class_neighbourCells.o
 class_hardSpheres.o : data_precisions.mod data_box.mod data_particles.mod data_monteCarlo.mod \
-                      data_potential.mod data_neighbours.mod data_distrib.mod module_physics.o \
+                      data_potential.mod data_neighbours.mod data_distribution.mod module_physics.o \
                       class_observables.o class_neighbourCells.o class_mixingPotential.o \
                       class_spheres.o
 class_dipolarSpheres.o : data_precisions.mod data_constants.mod data_box.mod data_particles.mod \
-                         data_monteCarlo.mod data_potential.mod data_neighbours.mod data_distrib.mod \
-                         module_physics.o class_observables.o class_neighbourCells.o \
-                         class_mixingPotential.o class_spheres.o
+                         data_monteCarlo.mod data_potential.mod data_neighbours.mod \
+                         data_distribution.mod module_physics.o class_observables.o \
+                         class_neighbourCells.o class_mixingPotential.o class_spheres.o
 module_tools.o : data_precisions.mod data_box.mod data_particles.mod data_monteCarlo.mod \
                  module_physics.o class_spheres.o
 
@@ -87,10 +87,10 @@ $(EXEC2) : data.o program_bunching.o
 
 # ------------------------------------------------------------------------
 
-program_distrib.o : program_distrib.f90
+program_distribution.o : program_distribution.f90
 	$(FC) -c $(FFLAGS_OMP) $< -o $@
 $(EXEC3) : data.o module_physics.o class_neighbourCells.o class_mixingPotential.o class_spheres.o \
-           class_interactingSpheres.o module_tools.o program_distrib.o
+           class_interactingSpheres.o module_tools.o program_distribution.o
 	$(FC) $^ $(LDFLAGS_OMP) -o $@
 
 # --------------------------------------------------------------------------------------------------

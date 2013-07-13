@@ -4,7 +4,7 @@ module module_distrib
 
 use data_precisions, only : DP
 use data_constants, only : PI
-use data_distrib, only : deltaDist
+use data_distribution, only : deltaDist
 
 implicit none
 
@@ -33,7 +33,7 @@ use data_box, only : LsizeMi, Volume
 use data_particles
 use data_monteCarlo
 use data_potential
-use data_distrib
+use data_distribution
 use module_distrib
 use module_physics
 use class_mixingPotential

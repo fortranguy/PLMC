@@ -200,7 +200,7 @@ end module data_neighbourCells
 !> \brief Distribution data :
 !> declaration of the distribution function parameters
 !***************************************************************************************************
-module data_distrib
+module data_distribution
 
 use data_precisions, only : DP
 
@@ -213,5 +213,5 @@ implicit none
     integer, parameter :: inter_snap_factor = 1
     integer, parameter :: hard_snap_factor = 8
 
-end module data_distrib
+end module data_distribution
 !***************************************************************************************************

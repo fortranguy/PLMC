@@ -6,7 +6,7 @@ use, intrinsic :: iso_fortran_env, only : output_unit
 use data_precisions, only : DP
 use data_particles, only : Ncol
 use data_monteCarlo, only : Nstep, Ntherm, Nmove, Nrotate
-use data_distrib, only : snap
+use data_distribution, only : snap
 use class_observables
 use class_mixingPotential
 use class_dipolarSpheres
