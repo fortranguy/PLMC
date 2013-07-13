@@ -35,16 +35,16 @@ class_mixingPotential.o : data_precisions.mod data_box.mod data_particles.mod da
                           data_neighbours.mod module_physics.o class_neighbourCells.o
 class_spheres.o : data_precisions.mod data_constants.mod  data_box.mod module_physics.o \
                   class_neighbourCells.o
-class_hardSpheres.o : data_precisions.mod data_box.mod data_particles.mod data_monteCarlo.mod \
-                      data_potential.mod data_neighbours.mod data_distribution.mod module_physics.o \
-                      class_observables.o class_neighbourCells.o class_mixingPotential.o \
-                      class_spheres.o
 class_dipolarSpheres.o : data_precisions.mod data_constants.mod data_box.mod data_particles.mod \
                          data_monteCarlo.mod data_potential.mod data_neighbours.mod \
                          data_distribution.mod module_physics.o class_observables.o \
                          class_neighbourCells.o class_mixingPotential.o class_spheres.o
+class_hardSpheres.o : data_precisions.mod data_box.mod data_particles.mod data_monteCarlo.mod \
+                      data_potential.mod data_neighbours.mod data_distribution.mod module_physics.o \
+                      class_observables.o class_neighbourCells.o class_mixingPotential.o \
+                      class_spheres.o
 module_tools.o : data_precisions.mod data_box.mod data_particles.mod data_monteCarlo.mod \
-                 module_physics.o class_spheres.o
+                 module_physics.o class_spheres.o class_dipolarSpheres.o class_hardSpheres.o
 
 # -----------------------------------------------
 
