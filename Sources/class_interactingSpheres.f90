@@ -271,23 +271,23 @@ contains
         call random_number(xRand)
         xNew(:) = this%positions(:, iOld) + (xRand(:)-0.5_DP)*this%deltaX(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
-        same_iCellNew = this%sameCells%cell_from_position(xNew)
+        same_iCellNew = this%sameCells%index_from_position(xNew)
         call this%Epot_neighCells(iOld, xNew, same_iCellNew, overlap, same_eNew)
         
         if (.not. overlap) then
         
-            mix_iCellNew = this%mixCells%cell_from_position(xNew)
+            mix_iCellNew = this%mixCells%index_from_position(xNew)
             call mix%Epot_neighCells(xNew, mix_iCellNew, this%mixCells, other%positions, overlap, &
                                      mix_eNew)
                         
             if (.not. overlap) then
     
-                same_iCellOld = this%sameCells%cell_from_position(this%positions(:, iOld))
+                same_iCellOld = this%sameCells%index_from_position(this%positions(:, iOld))
                 call this%Epot_neighCells(iOld, this%positions(:, iOld), same_iCellOld, overlap, &
                                           same_eOld)
                 same_deltaEpot = same_eNew - same_eOld
                     
-                mix_iCellOld = this%mixCells%cell_from_position(this%positions(:, iOld))
+                mix_iCellOld = this%mixCells%index_from_position(this%positions(:, iOld))
                 call mix%Epot_neighCells(this%positions(:, iOld), mix_iCellOld, this%mixCells, &
                                          other%positions, overlap, mix_eOld)
                 mix_deltaEpot = mix_eNew - mix_eOld
@@ -347,12 +347,12 @@ contains
             
             call random_number(xRand)
             xTest(:) = Lsize(:) * xRand(:)    
-            same_iCellTest = this%sameCells%cell_from_position(xTest)
+            same_iCellTest = this%sameCells%index_from_position(xTest)
             call this%Epot_neighCells(0, xTest, same_iCellTest, overlap, same_enTest) 
             
             if (.not. overlap) then
                 
-                mix_iCellTest = this%mixCells%cell_from_position(xTest)
+                mix_iCellTest = this%mixCells%index_from_position(xTest)
                 call mix%Epot_neighCells(xTest, mix_iCellTest, this%mixCells, other_positions, &
                                          overlap, mix_enTest)
                 

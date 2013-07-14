@@ -1311,25 +1311,25 @@ contains
         xNew(:) = this%positions(:, iOld) + this%deltaX(:) * (xRand(:)-0.5_DP)
         xNew(:) = modulo(xNew(:), Lsize(:))
         
-        mix_iCellNew = this%mixCells%cell_from_position(xNew)
+        mix_iCellNew = this%mixCells%index_from_position(xNew)
         call mix%Epot_neighCells(xNew, mix_iCellNew, this%mixCells, other%positions, overlap, mix_eNew)
             
         if (.not. overlap) then
         
-            same_iCellNew = this%sameCells%cell_from_position(xNew)
+            same_iCellNew = this%sameCells%index_from_position(xNew)
             call this%Epot_real_overlapTest(iOld, xNew, same_iCellNew, overlap)
                         
             if (.not. overlap) then
                 
                 ! Real
-                same_iCellOld = this%sameCells%cell_from_position(this%positions(:, iOld))
+                same_iCellOld = this%sameCells%index_from_position(this%positions(:, iOld))
                 same_eNew_real = this%Epot_real_solo(iOld, xNew, this%orientations(:, iOld))
                 same_eOld_real = this%Epot_real_solo(iOld, this%positions(:, iOld), &
                                                      this%orientations(:, iOld))
                 
                 same_deltaEpot = (same_eNew_real-same_eOld_real) + this%deltaEpot_reci_move(iOld, xNew)
                     
-                mix_iCellOld = this%mixCells%cell_from_position(this%positions(:, iOld))
+                mix_iCellOld = this%mixCells%index_from_position(this%positions(:, iOld))
                 call mix%Epot_neighCells(this%positions(:, iOld), mix_iCellOld, this%mixCells, &
                                          other%positions, overlap, mix_eOld)
                 mix_deltaEpot = mix_eNew - mix_eOld
@@ -1384,7 +1384,7 @@ contains
         mNew(:) = this%orientations(:, iOld)
         call markov_surface(mNew, this%deltaM)
         
-        iTotalCell = this%sameCells%cell_from_position(this%positions(:, iOld))
+        iTotalCell = this%sameCells%index_from_position(this%positions(:, iOld))
         real_eNew = this%Epot_real_solo(iOld, this%positions(:, iOld), mNew)
         real_eOld = this%Epot_real_solo(iOld, this%positions(:, iOld), this%orientations(:, iOld))
         deltaEpot_real = real_eNew - real_eOld        
@@ -1433,13 +1433,13 @@ contains
             call random_number(xRand)
             xTest(:) = Lsize(:) * xRand(:)
             
-            mix_iCellTest = this%mixCells%cell_from_position(xTest)
+            mix_iCellTest = this%mixCells%index_from_position(xTest)
             call mix%Epot_neighCells(xTest, mix_iCellTest, this%mixCells, other_positions, overlap, &
                                      mix_enTest)
             
             if (.not. overlap) then
                                
-                same_iCellTest = this%sameCells%cell_from_position(xTest)
+                same_iCellTest = this%sameCells%index_from_position(xTest)
                 call this%Epot_real_overlapTest(0, xTest, same_iCellTest, overlap)
                 
                 if (.not. overlap) then

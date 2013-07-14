@@ -44,7 +44,7 @@ public :: Link
         procedure :: alloc_cells => NeighbourCells_alloc_cells
         procedure :: dealloc_cells => NeighbourCells_dealloc_cells
         procedure :: check_cellsSize => NeighbourCells_check_cellsSize
-        procedure :: cell_from_position => NeighbourCells_cell_from_position
+        procedure :: index_from_position => NeighbourCells_index_from_position
         procedure :: all_cols_to_cells => NeighbourCells_all_cols_to_cells
         procedure :: remove_col_from_cell => NeighbourCells_remove_col_from_cell
         procedure :: add_col_to_cell => NeighbourCells_add_col_to_cell
@@ -203,19 +203,19 @@ contains
     
     ! Assignment : particle -> cell
     
-    pure function NeighbourCells_cell_from_position(this, xCol) result(cell_from_position)
+    pure function NeighbourCells_index_from_position(this, xCol) result(index_from_position)
     
         class(NeighbourCells), intent(in) :: this
         real(DP), dimension(:), intent(in) :: xCol
-        integer :: cell_from_position
+        integer :: index_from_position
         
         integer, dimension(Ndim) :: cell_coord        
     
         cell_coord(:) = int(xCol(:)/this%cell_size(:)) + 1
-        cell_from_position = cell_coord(1) + this%NtotalCell_dim(1)*(cell_coord(2)-1) + &
+        index_from_position = cell_coord(1) + this%NtotalCell_dim(1)*(cell_coord(2)-1) + &
                              this%NtotalCell_dim(1)*this%NtotalCell_dim(2)*(cell_coord(3)-1)
     
-    end function NeighbourCells_cell_from_position
+    end function NeighbourCells_index_from_position
     
     subroutine NeighbourCells_all_cols_to_cells(this, Ncol, X)
     
@@ -228,7 +228,7 @@ contains
     
         do iCol = 1, Ncol
     
-            iCell = this%cell_from_position(X(:,iCol))
+            iCell = this%index_from_position(X(:,iCol))
             this%currentCells(iCell)%particle%iCol = iCol
             
             allocate(this%nextCells(iCell)%particle)
