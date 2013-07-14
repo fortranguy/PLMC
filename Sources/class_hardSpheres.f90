@@ -78,8 +78,8 @@ contains
         this%Epot = 0._DP
         
         ! Neighbour Cells
-        call this%same%construct(hard_cell_size, this%rCut) !< same kind
-        call this%mix%construct(mix_cell_size, mix_rCut) !< other kind
+        call this%sameCells%construct(hard_cell_size, this%rCut) !< same kind
+        call this%mixCells%construct(mix_cell_size, mix_rCut) !< other kind
     
     end subroutine HardSpheres_construct
     
@@ -91,8 +91,8 @@ contains
             deallocate(this%positions)
         end if
         
-        call this%same%destroy()
-        call this%mix%destroy()
+        call this%sameCells%destroy()
+        call this%mixCells%destroy()
     
     end subroutine HardSpheres_destroy
     
@@ -111,10 +111,10 @@ contains
         
         write(report_unit, *) "    rCut = ", this%rCut
         
-        write(report_unit, *) "    same_NtotalCell_dim(:) = ", this%same%getNtotalCell_dim()
-        write(report_unit, *) "    same_cell_size(:) = ", this%same%getCell_size()        
-        write(report_unit, *) "    mix_NtotalCell_dim(:) = ", this%mix%getNtotalCell_dim()
-        write(report_unit, *) "    mix_cell_size(:) = ", this%mix%getCell_size()
+        write(report_unit, *) "    same_NtotalCell_dim(:) = ", this%sameCells%getNtotalCell_dim()
+        write(report_unit, *) "    same_cell_size(:) = ", this%sameCells%getCell_size()        
+        write(report_unit, *) "    mix_NtotalCell_dim(:) = ", this%mixCells%getNtotalCell_dim()
+        write(report_unit, *) "    mix_cell_size(:) = ", this%mixCells%getCell_size()
         
     end subroutine HardSpheres_printReport
     
@@ -145,8 +145,8 @@ contains
     
         do iNearCell = 1, NnearCell
         
-            nearCell_index = this%same%nearCells_among_totalCells(iNearCell, iTotalCell)
-            current => this%same%beginCells(nearCell_index)%particle%next            
+            nearCell_index = this%sameCells%nearCells_among_totalCells(iNearCell, iTotalCell)
+            current => this%sameCells%beginCells(nearCell_index)%particle%next            
             if (.not. associated(current%next)) cycle
             
             do
@@ -198,21 +198,22 @@ contains
         xNew(:) = this%positions(:, iOld) + (xRand(:)-0.5_DP)*this%deltaX(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
         
-        same_iCellNew = this%same%cell_from_position(xNew)
+        same_iCellNew = this%sameCells%cell_from_position(xNew)
         call this%Epot_neighCells(iOld, xNew, same_iCellNew, overlap)
         
         if (.not. overlap) then
         
-            mix_iCellNew = this%mix%cell_from_position(xNew)
-            call mix%Epot_neighCells(xNew, mix_iCellNew, this%mix, other%positions, overlap, mix_eNew)
+            mix_iCellNew = this%mixCells%cell_from_position(xNew)
+            call mix%Epot_neighCells(xNew, mix_iCellNew, this%mixCells, other%positions, overlap, &
+                                     mix_eNew)
                         
             if (.not. overlap) then
     
-                same_iCellOld = this%same%cell_from_position(this%positions(:, iOld))
+                same_iCellOld = this%sameCells%cell_from_position(this%positions(:, iOld))
                 call this%Epot_neighCells(iOld, this%positions(:, iOld), same_iCellOld, overlap)
                     
-                mix_iCellOld = this%mix%cell_from_position(this%positions(:, iOld))
-                call mix%Epot_neighCells(this%positions(:, iOld), mix_iCellOld, this%mix, &
+                mix_iCellOld = this%mixCells%cell_from_position(this%positions(:, iOld))
+                call mix%Epot_neighCells(this%positions(:, iOld), mix_iCellOld, this%mixCells, &
                                          other%positions, overlap, mix_eOld)
                 
                 mix_deltaEpot = mix_eNew - mix_eOld
@@ -225,13 +226,13 @@ contains
                     mix_Epot = mix_Epot + mix_deltaEpot
                     
                     if (same_iCellOld /= same_iCellNew) then                
-                        call this%same%remove_col_from_cell(iOld, same_iCellOld)
-                        call this%same%add_col_to_cell(iOld, same_iCellNew)
+                        call this%sameCells%remove_col_from_cell(iOld, same_iCellOld)
+                        call this%sameCells%add_col_to_cell(iOld, same_iCellNew)
                     end if
                     
                     if (mix_iCellOld /= mix_iCellNew) then                
-                        call other%mix%remove_col_from_cell(iOld, mix_iCellOld)
-                        call other%mix%add_col_to_cell(iOld, mix_iCellNew)
+                        call other%mixCells%remove_col_from_cell(iOld, mix_iCellOld)
+                        call other%mixCells%add_col_to_cell(iOld, mix_iCellNew)
                     end if
                     
                 else
@@ -270,14 +271,14 @@ contains
             
             call random_number(xRand)
             xTest(:) = Lsize(:) * xRand(:)    
-            same_iCellTest = this%same%cell_from_position(xTest)
+            same_iCellTest = this%sameCells%cell_from_position(xTest)
             call this%Epot_neighCells(0, xTest, same_iCellTest, overlap) 
             
             if (.not. overlap) then
             
-                mix_iCellTest = this%mix%cell_from_position(xTest)
-                call mix%Epot_neighCells(xTest, mix_iCellTest, this%mix, other_positions, overlap, &
-                                         mix_enTest)
+                mix_iCellTest = this%mixCells%cell_from_position(xTest)
+                call mix%Epot_neighCells(xTest, mix_iCellTest, this%mixCells, other_positions, &
+                                         overlap, mix_enTest)
                 
                 if (.not. overlap) then
                 

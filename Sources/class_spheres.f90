@@ -42,8 +42,8 @@ private
         real(DP) :: rCut !< short-range cut
         
         ! Neighbours (cell/grid scheme)
-        type(NeighbourCells) :: same !< same kind
-        type(NeighbourCells) :: mix !< other kind
+        type(NeighbourCells) :: sameCells !< same kind
+        type(NeighbourCells) :: mixCells !< other kind
         
     contains
     
@@ -191,8 +191,8 @@ contains
         class(Spheres), intent(inout) :: this
         class(Spheres), intent(in) :: other
         
-        call this%same%all_cols_to_cells(this%Ncol, this%positions)
-        call this%mix%all_cols_to_cells(other%Ncol, other%positions)
+        call this%sameCells%all_cols_to_cells(this%Ncol, this%positions)
+        call this%mixCells%all_cols_to_cells(other%Ncol, other%positions)
     
     end subroutine Spheres_all_cols_to_cells
     

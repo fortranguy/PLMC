@@ -162,8 +162,8 @@ contains
         call this%Epot_reci_weight_init()
         
         ! Neighbour Cells
-        call this%same%construct(dipol_cell_size, this%rCut) !< same kind
-        call this%mix%construct(mix_cell_size, mix_rCut) !< other kind
+        call this%sameCells%construct(dipol_cell_size, this%rCut) !< same kind
+        call this%mixCells%construct(mix_cell_size, mix_rCut) !< other kind
     
     end subroutine DipolarSpheres_construct
     
@@ -187,8 +187,8 @@ contains
             deallocate(this%Epot_reci_potential)
         end if
         
-        call this%same%destroy()
-        call this%mix%destroy()
+        call this%sameCells%destroy()
+        call this%mixCells%destroy()
     
     end subroutine DipolarSpheres_destroy
     
@@ -211,10 +211,10 @@ contains
         write(report_unit, *) "    Structure_iStep = ", this%structure_iStep
         write(report_unit, *) "    NwaveVectors = ", this%NwaveVectors
         
-        write(report_unit, *) "    same_NtotalCell_dim(:) = ", this%same%getNtotalCell_dim()
-        write(report_unit, *) "    same_cell_size(:) = ", this%same%getCell_size()
-        write(report_unit, *) "    mix_NtotalCell_dim(:) = ", this%mix%getNtotalCell_dim()
-        write(report_unit, *) "    mix_cell_size(:) = ", this%mix%getCell_size()
+        write(report_unit, *) "    same_NtotalCell_dim(:) = ", this%sameCells%getNtotalCell_dim()
+        write(report_unit, *) "    same_cell_size(:) = ", this%sameCells%getCell_size()
+        write(report_unit, *) "    mix_NtotalCell_dim(:) = ", this%mixCells%getNtotalCell_dim()
+        write(report_unit, *) "    mix_cell_size(:) = ", this%mixCells%getCell_size()
         
     end subroutine DipolarSpheres_printReport
     
@@ -449,8 +449,8 @@ contains
 
         do iNearCell = 1, NnearCell
 
-            nearCell_index = this%same%nearCells_among_totalCells(iNearCell, iTotalCell)
-            current => this%same%beginCells(nearCell_index)%particle%next
+            nearCell_index = this%sameCells%nearCells_among_totalCells(iNearCell, iTotalCell)
+            current => this%sameCells%beginCells(nearCell_index)%particle%next
             if (.not. associated(current%next)) cycle
 
             do
@@ -1311,26 +1311,26 @@ contains
         xNew(:) = this%positions(:, iOld) + this%deltaX(:) * (xRand(:)-0.5_DP)
         xNew(:) = modulo(xNew(:), Lsize(:))
         
-        mix_iCellNew = this%mix%cell_from_position(xNew)
-        call mix%Epot_neighCells(xNew, mix_iCellNew, this%mix, other%positions, overlap, mix_eNew)
+        mix_iCellNew = this%mixCells%cell_from_position(xNew)
+        call mix%Epot_neighCells(xNew, mix_iCellNew, this%mixCells, other%positions, overlap, mix_eNew)
             
         if (.not. overlap) then
         
-            same_iCellNew = this%same%cell_from_position(xNew)
+            same_iCellNew = this%sameCells%cell_from_position(xNew)
             call this%Epot_real_overlapTest(iOld, xNew, same_iCellNew, overlap)
                         
             if (.not. overlap) then
                 
                 ! Real
-                same_iCellOld = this%same%cell_from_position(this%positions(:, iOld))
+                same_iCellOld = this%sameCells%cell_from_position(this%positions(:, iOld))
                 same_eNew_real = this%Epot_real_solo(iOld, xNew, this%orientations(:, iOld))
                 same_eOld_real = this%Epot_real_solo(iOld, this%positions(:, iOld), &
                                                      this%orientations(:, iOld))
                 
                 same_deltaEpot = (same_eNew_real-same_eOld_real) + this%deltaEpot_reci_move(iOld, xNew)
                     
-                mix_iCellOld = this%mix%cell_from_position(this%positions(:, iOld))
-                call mix%Epot_neighCells(this%positions(:, iOld), mix_iCellOld, this%mix, &
+                mix_iCellOld = this%mixCells%cell_from_position(this%positions(:, iOld))
+                call mix%Epot_neighCells(this%positions(:, iOld), mix_iCellOld, this%mixCells, &
                                          other%positions, overlap, mix_eOld)
                 mix_deltaEpot = mix_eNew - mix_eOld
                 
@@ -1346,13 +1346,13 @@ contains
                     mix_Epot = mix_Epot + mix_deltaEpot
                     
                     if (same_iCellOld /= same_iCellNew) then
-                        call this%same%remove_col_from_cell(iOld, same_iCellOld)
-                        call this%same%add_col_to_cell(iOld, same_iCellNew)
+                        call this%sameCells%remove_col_from_cell(iOld, same_iCellOld)
+                        call this%sameCells%add_col_to_cell(iOld, same_iCellNew)
                     end if
                     
                     if (mix_iCellOld /= mix_iCellNew) then
-                        call other%mix%remove_col_from_cell(iOld, mix_iCellOld)
-                        call other%mix%add_col_to_cell(iOld, mix_iCellNew)
+                        call other%mixCells%remove_col_from_cell(iOld, mix_iCellOld)
+                        call other%mixCells%add_col_to_cell(iOld, mix_iCellNew)
                     end if
                     
                 else
@@ -1384,7 +1384,7 @@ contains
         mNew(:) = this%orientations(:, iOld)
         call markov_surface(mNew, this%deltaM)
         
-        iTotalCell = this%same%cell_from_position(this%positions(:, iOld))
+        iTotalCell = this%sameCells%cell_from_position(this%positions(:, iOld))
         real_eNew = this%Epot_real_solo(iOld, this%positions(:, iOld), mNew)
         real_eOld = this%Epot_real_solo(iOld, this%positions(:, iOld), this%orientations(:, iOld))
         deltaEpot_real = real_eNew - real_eOld        
@@ -1433,13 +1433,13 @@ contains
             call random_number(xRand)
             xTest(:) = Lsize(:) * xRand(:)
             
-            mix_iCellTest = this%mix%cell_from_position(xTest)
-            call mix%Epot_neighCells(xTest, mix_iCellTest, this%mix, other_positions, overlap, &
+            mix_iCellTest = this%mixCells%cell_from_position(xTest)
+            call mix%Epot_neighCells(xTest, mix_iCellTest, this%mixCells, other_positions, overlap, &
                                      mix_enTest)
             
             if (.not. overlap) then
                                
-                same_iCellTest = this%same%cell_from_position(xTest)
+                same_iCellTest = this%sameCells%cell_from_position(xTest)
                 call this%Epot_real_overlapTest(0, xTest, same_iCellTest, overlap)
                 
                 if (.not. overlap) then
