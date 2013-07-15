@@ -10,6 +10,7 @@ use data_potential, only : mix_rCut, mix_dr, mix_epsilon, mix_alpha
 use data_neighbourCells, only : NnearCell, mix_cell_size
 use module_physics, only : dist_PBC
 use class_neighbourCells
+use class_spheres
 
 implicit none
 
@@ -140,20 +141,18 @@ contains
     
     !> Overlapt test
     
-    subroutine MixingPotential_overlapTest(this, type1_positions, type1_Ncol, &
-                                                 type2_positions, type2_Ncol)
+    subroutine MixingPotential_overlapTest(this, type1, type2)
     
         class(MixingPotential), intent(in) :: this
-        real(DP), dimension(:, :), intent(in) :: type1_positions, type2_positions
-        integer, intent(in) :: type1_Ncol, type2_Ncol
+        class(Spheres), intent(in) :: type1, type2
         
         integer :: type1_iCol, type2_iCol
         real(DP) :: r_mix
         
-        do type1_iCol = 1, type1_Ncol
-            do type2_iCol = 1, type2_Ncol
+        do type1_iCol = 1, type1%getNcol()
+            do type2_iCol = 1, type2%getNcol()
                     
-                r_mix = dist_PBC(type1_positions(:, type1_iCol), type2_positions(:, type2_iCol))
+                r_mix = dist_PBC(type1%positions(:, type1_iCol), type2%positions(:, type2_iCol))
                 if (r_mix < this%rMin) then
                     write(error_unit, *) this%name, " :    Overlap !", type1_iCol, type2_iCol
                     write(error_unit, *) "    r_mix = ", r_mix
@@ -277,12 +276,10 @@ contains
     
     !> Total potential energy
     
-    pure function MixingPotential_Epot_conf(this, type1_positions, type1_Ncol, &
-                                                  type2_positions, type2_Ncol) result(Epot_conf)
+    pure function MixingPotential_Epot_conf(this, type1, type2) result(Epot_conf)
     
         class(MixingPotential), intent(in) :: this
-        real(DP), dimension(:, :), intent(in) :: type1_positions, type2_positions
-        integer, intent(in) :: type1_Ncol, type2_Ncol
+        class(Spheres), intent(in) :: type1, type2
         real(DP) :: Epot_conf
 
         integer :: type1_iCol, type2_iCol
@@ -290,10 +287,10 @@ contains
 
         Epot_conf = 0._DP
         
-        do type1_iCol = 1, type1_Ncol
-            do type2_iCol = 1, type2_Ncol
+        do type1_iCol = 1, type1%getNcol()
+            do type2_iCol = 1, type2%getNcol()
                 
-                r_mix = dist_PBC(type1_positions(:, type1_iCol), type2_positions(:, type2_iCol))
+                r_mix = dist_PBC(type1%positions(:, type1_iCol), type2%positions(:, type2_iCol))
                 Epot_conf = Epot_conf + this%Epot_pair(r_mix)
 
             end do

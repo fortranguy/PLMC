@@ -31,10 +31,10 @@ data.o: data_copy.f90
 module_physics.o : data_precisions.mod data_constants.mod data_box.mod
 class_observables.o : data_precisions.mod data_box.mod data_monteCarlo.mod
 class_neighbourCells.o : data_precisions.mod data_box.mod data_neighbours.mod module_physics.o
-class_mixingPotential.o : data_precisions.mod data_box.mod data_particles.mod data_potential.mod \
-                          data_neighbours.mod module_physics.o class_neighbourCells.o
 class_spheres.o : data_precisions.mod data_constants.mod  data_box.mod module_physics.o \
                   class_neighbourCells.o
+class_mixingPotential.o : data_precisions.mod data_box.mod data_particles.mod data_potential.mod \
+                          data_neighbours.mod module_physics.o class_neighbourCells.o
 class_dipolarSpheres.o : data_precisions.mod data_constants.mod data_box.mod data_particles.mod \
                          data_monteCarlo.mod data_potential.mod data_neighbours.mod \
                          data_distribution.mod module_physics.o class_observables.o \
@@ -54,9 +54,9 @@ class_observables.o : class_observables.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_neighbourCells.o : class_neighbourCells.f90
 	$(FC) -c $(FFLAGS) $< -o $@
-class_mixingPotential.o : class_mixingPotential.f90
-	$(FC) -c $(FFLAGS) $< -o $@
 class_spheres.o : class_spheres.f90
+	$(FC) -c $(FFLAGS) $< -o $@
+class_mixingPotential.o : class_mixingPotential.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_hardSpheres.o : class_hardSpheres.f90
 	$(FC) -c $(FFLAGS) $< -o $@
