@@ -10,7 +10,6 @@ use data_monteCarlo, only : Temperature, Nstep, decorrelFactor, Ntherm, Nmove, N
 use module_physics, only : dist_PBC, random_surface
 use class_spheres
 use class_dipolarSpheres
-use class_hardSpheres
 
 implicit none
 private
@@ -45,10 +44,10 @@ contains
     
     !> Initial condition
     
-    subroutine initialCondition(type1, type2, mix_rMin, report_unit)
+    subroutine initialCondition(dipolar, hardCore, mix_rMin, report_unit)
     
-        class(DipolarSpheres), intent(inout) :: type1
-        class(Spheres), intent(inout) :: type2
+        class(DipolarSpheres), intent(inout) :: dipolar
+        class(Spheres), intent(inout) :: hardCore
         real(DP), intent(in) :: mix_rMin
         integer, intent(in) :: report_unit        
 
@@ -66,8 +65,8 @@ contains
                 
                 select case (init)
                     case ("rand") 
-                        call randomDepositions(type1, type2, mix_rMin)
-                        call randomOrientations(type1%orientations, type1%getNcol())
+                        call randomDepositions(dipolar, hardCore, mix_rMin)
+                        call randomOrientations(dipolar%orientations, dipolar%getNcol())
                         write(output_unit, *) "Random depositions + random orientations"
                         write(report_unit, *) "    Random depositions + random orientations"
                     case default
@@ -81,18 +80,18 @@ contains
                 write(output_unit, *) "Old configuration"
                 write(report_unit, *) "    Old configuration"
                 
-                call oldConfiguration(1, type1%getName()//"_positions", type1%getNcol(), &
-                                      type1%positions, norm2(Lsize))
-                call oldConfiguration(2, type1%getName()//"_orientations", type1%getNcol(), &
-                                      type1%orientations, 1._DP)
+                call oldConfiguration(1, dipolar%getName()//"_positions", dipolar%getNcol(), &
+                                      dipolar%positions, norm2(Lsize))
+                call oldConfiguration(2, dipolar%getName()//"_orientations", dipolar%getNcol(), &
+                                      dipolar%orientations, 1._DP)
                 ! Warning : be careful with the unit !
-                call oldConfiguration(3, type2%getName()//"_positions", type2%getNcol(),  &
-                                      type2%positions, norm2(Lsize))
+                call oldConfiguration(3, hardCore%getName()//"_positions", hardCore%getNcol(),  &
+                                      hardCore%positions, norm2(Lsize))
             
             case default
                 write(error_unit, *) "Enter the initial condition : "
                 write(error_unit, *) &
-                    "   'rand' or '[type1_positions] [type1_orientations] [type2_positions]'."
+                    "   'rand' or '[dipolar_positions] [dipolar_orientations] [hardCore_positions]'."
                 stop
                 
         end select
@@ -103,8 +102,7 @@ contains
     
     subroutine randomDepositions(type1, type2, mix_rMin)
 
-        class(DipolarSpheres), intent(inout) :: type1
-        class(Spheres), intent(inout) :: type2
+        class(Spheres), intent(inout) :: type1, type2
         real(DP), intent(in) :: mix_rMin
 
         integer :: iCol, iColTest
