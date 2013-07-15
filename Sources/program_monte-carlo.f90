@@ -107,10 +107,8 @@ implicit none
     call type2_spheres%snapShot_positions(0, type2_units%snapIni_positions)
     call type2_spheres%all_cols_to_cells(type1_spheres)
     
-    call mix%overlapTest(type1_spheres%positions, type1_spheres%getNcol(), &
-                         type2_spheres%positions, type2_spheres%getNcol())
-    mix_Epot = mix%Epot_conf(type1_spheres%positions, type1_spheres%getNcol(), &
-                             type2_spheres%positions, type2_spheres%getNcol())
+    call mix%overlapTest(type1_spheres, type2_spheres)
+    mix_Epot = mix%Epot_conf(type1_spheres, type2_spheres)
     
     Epot_conf = type1_obs%Epot + type2_obs%Epot + mix_Epot
     write(output_unit, *) "Initial potential energy =", Epot_conf
@@ -269,10 +267,8 @@ implicit none
     call type2_spheres%snapShot_positions(0, type2_units%snapFin_positions)
     call type2_obs%printResults(type2_spheres%getNcol(), type2_units%report)
     
-    call mix%overlapTest(type1_spheres%positions, type1_spheres%getNcol(), &
-                         type2_spheres%positions, type2_spheres%getNcol())
-    mix_Epot_conf = mix%Epot_conf(type1_spheres%positions, type1_spheres%getNcol(), &
-                                  type2_spheres%positions, type2_spheres%getNcol())
+    call mix%overlapTest(type1_spheres, type2_spheres)
+    mix_Epot_conf = mix%Epot_conf(type1_spheres, type2_spheres)
     call consistTest(mix_Epot, mix_Epot_conf, mix_report_unit)
     call mix_printResults(mix_EpotSum, mix_report_unit)
     
