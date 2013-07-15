@@ -2,6 +2,7 @@
 
 module class_hardSpheres
 
+use, intrinsic :: iso_fortran_env, only : output_unit
 use data_precisions, only : DP
 use data_box, only : Ndim, Lsize
 use data_particles, only : hard_radius, hard_rMin, hard_Ncol
@@ -56,6 +57,7 @@ contains
         real(DP), intent(in) :: mix_rCut
         
         this%name = "hardS"
+        write(output_unit, *) this%name, " class construction"
     
         ! Particles
         this%radius = hard_radius
@@ -86,6 +88,8 @@ contains
     subroutine HardSpheres_destroy(this)
     
         class(HardSpheres), intent(inout) :: this
+        
+        write(output_unit, *) this%name, " class destruction"
         
         if (allocated(this%positions)) then
             deallocate(this%positions)

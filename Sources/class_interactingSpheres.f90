@@ -2,6 +2,7 @@
 
 module class_interactingSpheres
 
+use, intrinsic :: iso_fortran_env, only : output_unit
 use data_precisions, only : DP, consist_tiny
 use data_box, only : Ndim, Lsize
 use data_particles, only : inter_radius, inter_rMin, inter_Ncol
@@ -63,6 +64,7 @@ contains
         real(DP), intent(in) :: mix_rCut
         
         this%name = "inter"
+        write(output_unit, *) this%name, " class construction"
     
         ! Particles
         this%radius = inter_radius
@@ -99,6 +101,8 @@ contains
     subroutine InteractingSpheres_destroy(this)
     
         class(InteractingSpheres), intent(inout) :: this
+        
+        write(output_unit, *) this%name, " class destruction"
         
         if (allocated(this%positions)) then
             deallocate(this%positions)

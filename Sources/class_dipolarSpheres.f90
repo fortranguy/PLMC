@@ -122,7 +122,8 @@ contains
         real(DP), dimension(:), intent(in) :: mix_cell_size
         real(DP), intent(in) :: mix_rCut
         
-        this%name = "dipol"
+        this%name = "dipol"        
+        write(output_unit, *) this%name, " class construction"
     
         ! Particles
         this%radius = dipol_radius
@@ -170,6 +171,8 @@ contains
     subroutine DipolarSpheres_destroy(this)
     
         class(DipolarSpheres), intent(inout) :: this
+        
+        write(output_unit, *) this%name, " class destruction"
         
         if (allocated(this%positions)) then
             deallocate(this%positions)
