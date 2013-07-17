@@ -44,10 +44,10 @@ contains
     
     !> Initial condition
     
-    subroutine initialCondition(dipolar, hardCore, mix_rMin, report_unit)
+    subroutine initialCondition(dipolar, spherical, mix_rMin, report_unit)
     
         class(DipolarSpheres), intent(inout) :: dipolar
-        class(Spheres), intent(inout) :: hardCore
+        class(Spheres), intent(inout) :: spherical
         real(DP), intent(in) :: mix_rMin
         integer, intent(in) :: report_unit        
 
@@ -65,7 +65,7 @@ contains
                 
                 select case (init)
                     case ("rand") 
-                        call randomDepositions(dipolar, hardCore, mix_rMin)
+                        call randomDepositions(dipolar, spherical, mix_rMin)
                         call randomOrientations(dipolar%orientations, dipolar%getNcol())
                         write(output_unit, *) "Random depositions + random orientations"
                         write(report_unit, *) "    Random depositions + random orientations"
@@ -85,13 +85,13 @@ contains
                 call oldConfiguration(2, dipolar%getName()//"_orientations", dipolar%getNcol(), &
                                       dipolar%orientations, 1._DP)
                 ! Warning : be careful with the unit !
-                call oldConfiguration(3, hardCore%getName()//"_positions", hardCore%getNcol(),  &
-                                      hardCore%positions, norm2(Lsize))
+                call oldConfiguration(3, spherical%getName()//"_positions", spherical%getNcol(), &
+                                      spherical%positions, norm2(Lsize))
             
             case default
                 write(error_unit, *) "Enter the initial condition : "
                 write(error_unit, *) &
-                    "   'rand' or '[dipolar_positions] [dipolar_orientations] [hardCore_positions]'."
+                    "   'rand' or '[dipolar_positions] [dipolar_orientations] [spherical_positions]'."
                 stop
                 
         end select
