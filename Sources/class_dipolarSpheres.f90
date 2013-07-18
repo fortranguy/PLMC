@@ -1464,15 +1464,15 @@ contains
             if (.not. overlap) then
                 
                 ! Real
-                same_iCellOld = this%sameCells%index_from_position(xOld(:))
+                same_iCellOld = this%sameCells%index_from_position(xOld)
                 same_eNew_real = this%Epot_real_solo(iOld, xNew, this%orientations(:, iOld))
-                same_eOld_real = this%Epot_real_solo(iOld, xOld(:), this%orientations(:, iOld))
+                same_eOld_real = this%Epot_real_solo(iOld, xOld, this%orientations(:, iOld))
                 
                 same_deltaEpot = (same_eNew_real-same_eOld_real) + this%deltaEpot_reci_move(iOld, xNew)
                     
-                mix_iCellOld = this%mixCells%index_from_position(xOld(:))
-                call mix%Epot_neighCells(xOld(:), mix_iCellOld, this%mixCells, other%positions, &
-                                         overlap, mix_eOld)
+                mix_iCellOld = this%mixCells%index_from_position(xOld)
+                call mix%Epot_neighCells(xOld, mix_iCellOld, this%mixCells, other%positions, overlap, &
+                                         mix_eOld)
                 mix_deltaEpot = mix_eNew - mix_eOld
                 
                 deltaEpot = same_deltaEpot + mix_deltaEpot
@@ -1528,9 +1528,9 @@ contains
         mNew(:) = mOld(:)
         call markov_surface(mNew, this%deltaM)
         
-        iTotalCell = this%sameCells%index_from_position(xOld(:))
-        real_eNew = this%Epot_real_solo(iOld, xOld(:), mNew)
-        real_eOld = this%Epot_real_solo(iOld, xOld(:), mOld)
+        iTotalCell = this%sameCells%index_from_position(xOld)
+        real_eNew = this%Epot_real_solo(iOld, xOld, mNew)
+        real_eOld = this%Epot_real_solo(iOld, xOld, mOld)
         deltaEpot_real = real_eNew - real_eOld        
         
         deltaEpot_self = this%Epot_self_solo(mNew) - this%Epot_self_solo(mOld)
