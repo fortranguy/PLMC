@@ -107,12 +107,10 @@ private
         procedure, private :: Epot_self_solo => DipolarSpheres_Epot_self_solo
         procedure, private :: Epot_self => DipolarSpheres_Epot_self
         !>     Boundary conditions
-        procedure :: Epot_bound_init => DipolarSpheres_Epot_bound_init
+        procedure :: Epot_bound_totalMoment_init => DipolarSpheres_Epot_bound_totalMoment_init
         procedure, private :: deltaEpot_bound => DipolarSpheres_deltaEpot_bound
         procedure, private :: deltaEpot_bound_totalMoment_update => &
                               DipolarSpheres_deltaEpot_bound_totalMoment_update
-        procedure, private :: Epot_bound_totalMoment_modulus => &
-                              DipolarSpheres_Epot_bound_totalMoment_modulus
         procedure :: Epot_bound_totalMoment_reInit => DipolarSpheres_Epot_bound_totalMoment_reInit
         procedure, private :: Epot_bound => DipolarSpheres_Epot_bound
         !>     Total
@@ -1318,7 +1316,7 @@ contains
     !> \f[ \vec{M} = \sum_j \vec{\mu}_j \f]
     !> \f[ \vec{M}_l = \sum_{j\neql} \vec{\mu}_j \f]
     
-    subroutine DipolarSpheres_Epot_bound_init(this)
+    subroutine DipolarSpheres_Epot_bound_totalMoment_init(this)
     
         class(DipolarSpheres), intent(inout) :: this
         
@@ -1332,7 +1330,7 @@ contains
         
         end do        
     
-    end subroutine DipolarSpheres_Epot_bound_init
+    end subroutine DipolarSpheres_Epot_bound_totalMoment_init
     
     !> Difference of Energy
     !> \f[
@@ -1370,27 +1368,6 @@ contains
     
     end subroutine DipolarSpheres_deltaEpot_bound_totalMoment_update
     
-     !> Calculate the drift of the total moment
-    
-    pure function DipolarSpheres_Epot_bound_totalMoment_modulus(this) &
-                   result(Epot_bound_totalMoment_modulus)
-
-        class(DipolarSpheres), intent(in) :: this
-        real(DP) :: Epot_bound_totalMoment_modulus
-        
-        integer :: iCol
-        
-        Epot_bound_totalMoment_modulus = 0._DP
-        
-        do iCol = 1, this%Ncol
-        
-            Epot_bound_totalMoment_modulus = Epot_bound_totalMoment_modulus + &
-                                             norm2(this%orientations(:, iCol))
-        
-        end do
-        
-    end function DipolarSpheres_Epot_bound_totalMoment_modulus
-    
     !> Reinitialise the total moment factor and print the drift
     
     subroutine DipolarSpheres_Epot_bound_totalMoment_reInit(this, iStep, modulus_unit)
@@ -1401,9 +1378,9 @@ contains
         
         real(DP) :: modulus_drifted, modulus_reInit
         
-        modulus_drifted = this%Epot_bound_totalMoment_modulus()
-        call this%Epot_bound_init()
-        modulus_reInit = this%Epot_bound_totalMoment_modulus()
+        modulus_drifted = norm2(this%totalMoment(:))
+        call this%Epot_bound_totalMoment_init()
+        modulus_reInit = norm2(this%totalMoment(:))
         
         write(modulus_unit, *) iStep, abs(modulus_reInit - modulus_drifted)
     
