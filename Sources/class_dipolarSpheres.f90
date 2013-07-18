@@ -107,7 +107,8 @@ private
         !>     Boundary conditions
         procedure :: Epot_bound_init => DipolarSpheres_Epot_bound_init
         procedure, private :: deltaEpot_bound => DipolarSpheres_deltaEpot_bound
-        procedure, private :: Epot_bound_update => DipolarSpheres_Epot_bound_update
+        procedure, private :: Epot_bound_totalMoment_update => &
+                               DipolarSpheres_Epot_bound_totalMoment_update
         procedure, private :: Epot_bound => DipolarSpheres_Epot_bound
         !>     Total
         procedure :: Epot_conf => DipolarSpheres_Epot_conf
@@ -1343,7 +1344,7 @@ contains
     !>      \Delta \vec{M} = \vec{\mu}^\prime_l - \vec{\mu}_l
     !> \f]    
     
-    subroutine DipolarSpheres_Epot_bound_update(this, lCol, mNew)
+    subroutine DipolarSpheres_Epot_bound_totalMoment_update(this, lCol, mNew)
     
         class(DipolarSpheres), intent(inout) :: this
         integer, intent(in) :: lCol
@@ -1351,7 +1352,7 @@ contains
         
         this%totalMoment(:) = this%totalMoment(:) + mNew - this%orientations(:, lCol)
     
-    end subroutine DipolarSpheres_Epot_bound_update
+    end subroutine DipolarSpheres_Epot_bound_totalMoment_update
     
     !> Total shape dependent term
     !> \f[
