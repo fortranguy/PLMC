@@ -35,6 +35,8 @@ private
 
         integer :: waveVectors
         integer :: structure_modulus
+        
+        integer :: totalMoment_modulus
     
     end type MoreUnits
     
@@ -81,6 +83,9 @@ contains
                      status='new', action='write')
                 open(newunit=this%waveVectors, recl=4096, file=name//"_waveVectors.tmp", &
                      status='new', action='write')
+                     
+                open(newunit=this%totalMoment_modulus, recl=4096, &
+                     file=name//"_totalMoment_modulus.out", status='new', action='write')
                 
             class default
                 
@@ -119,6 +124,8 @@ contains
 
                 close(this%waveVectors)
                 close(this%structure_modulus)
+                
+                close(this%totalMoment_modulus)
                     
             class default
                 

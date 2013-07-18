@@ -7,9 +7,9 @@ use data_precisions, only : DP, consist_tiny
 use data_constants, only : PI
 use data_box, only : Ndim, Lsize, Kmax, Volume, dielectric
 use data_particles, only : dipol_radius, dipol_rMin, dipol_Ncol
-use data_monteCarlo, only : Temperature, dipol_structure_iStep, dipol_deltaX, dipol_rejectFix, &
-                            dipol_Nadapt, dipol_deltaM, dipol_deltaMmax, dipol_rejectRotFix, &
-                            dipol_NadaptRot, dipol_Nwidom
+use data_monteCarlo, only : Temperature, dipol_deltaX, dipol_rejectFix, dipol_Nadapt, dipol_deltaM, &
+                            dipol_deltaMmax, dipol_rejectRotFix, dipol_NadaptRot, dipol_Nwidom, &
+                            dipol_structure_iStep, dipol_totalMoment_iStep
 use data_potential, only : dipol_rCut, dipol_dr, dipol_alpha
 use data_neighbourCells, only : NnearCell, dipol_cell_size
 use data_distribution, only : dipol_snap_factor
@@ -34,12 +34,13 @@ private
                                                                        !< of all particles
         
         ! Monte-Carlo
-        integer :: structure_iStep
         real(DP) :: deltaM !< rotation
         real(DP) :: deltaMsave
         real(DP) :: deltaMmax
         real(DP) :: rejectRotFix
         integer :: NadaptRot
+        integer :: structure_iStep
+        integer :: totalMoment_iStep
 
         ! Potential
         real(DP)  :: dr !< discretisation step
@@ -73,6 +74,7 @@ private
         procedure :: getNadaptRot => DipolarSpheres_getNadaptRot
         
         procedure :: getStructure_iStep => DipolarSpheres_getStructure_iStep
+        procedure :: getTotalMoment_iStep => DipolarSpheres_getTotalMoment_iStep
         
         !> Potential energy
         !>     Real
@@ -146,11 +148,12 @@ contains
         this%snap_factor = dipol_snap_factor
         
         ! Monte-Carlo
-        this%structure_iStep = dipol_structure_iStep
         this%deltaX = dipol_deltaX
         this%deltaXsave = this%deltaX
         this%rejectFix = dipol_rejectFix
         this%Nadapt = dipol_Nadapt
+        this%structure_iStep = dipol_structure_iStep
+        this%totalMoment_iStep = dipol_totalMoment_iStep
         
         this%deltaM = dipol_deltaM
         this%deltaMsave = this%deltaM
@@ -339,6 +342,17 @@ contains
         getStructure_iStep = this%structure_iStep
         
     end function DipolarSpheres_getStructure_iStep
+    
+    !> Accessor : totalMoment_iStep
+    
+    pure function DipolarSpheres_getTotalMoment_iStep(this) result (getTotalMoment_iStep)
+    
+        class(DipolarSpheres), intent(in) :: this
+        integer :: getTotalMoment_iStep
+    
+        getTotalMoment_iStep = this%totalMoment_iStep
+        
+    end function DipolarSpheres_getTotalMoment_iStep
 
     ! Real : short-range interaction ---------------------------------------------------------------
     

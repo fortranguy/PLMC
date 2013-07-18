@@ -107,7 +107,6 @@ implicit none
     integer, parameter :: Nmove = decorrelFactor * Ncol
     integer, parameter :: Nrotate = decorrelFactor * dipol_Ncol
     
-    integer, parameter :: dipol_structure_iStep = 2**13/decorrelFactor
     ! move
     real(DP), dimension(Ndim), parameter :: dipol_deltaX = 0.3_DP
     real(DP), parameter :: dipol_rejectFix = 0.5_DP
@@ -119,6 +118,9 @@ implicit none
     integer, parameter :: dipol_NadaptRot = Ntherm/8
     ! chemical potential
     integer, parameter :: dipol_Nwidom = 500 ! dipol_Ncol
+    ! reinitialisations
+    integer, parameter :: dipol_structure_iStep = 2**13/decorrelFactor
+    integer, parameter :: dipol_totalMoment_iStep = 2**13/decorrelFactor
     
     real(DP), dimension(Ndim), parameter :: inter_deltaX = 1._DP
     real(DP), parameter :: inter_rejectFix = 0.5_DP
