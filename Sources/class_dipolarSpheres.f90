@@ -1385,7 +1385,7 @@ contains
         do iCol = 1, this%Ncol
         
             Epot_bound_totalMoment_modulus = Epot_bound_totalMoment_modulus + &
-                                            norm2(this%orientations(:, iCol))
+                                             norm2(this%orientations(:, iCol))
         
         end do
         
@@ -1466,14 +1466,13 @@ contains
                 ! Real
                 same_iCellOld = this%sameCells%index_from_position(xOld(:))
                 same_eNew_real = this%Epot_real_solo(iOld, xNew, this%orientations(:, iOld))
-                same_eOld_real = this%Epot_real_solo(iOld, xOld(:), &
-                                                     this%orientations(:, iOld))
+                same_eOld_real = this%Epot_real_solo(iOld, xOld(:), this%orientations(:, iOld))
                 
                 same_deltaEpot = (same_eNew_real-same_eOld_real) + this%deltaEpot_reci_move(iOld, xNew)
                     
                 mix_iCellOld = this%mixCells%index_from_position(xOld(:))
-                call mix%Epot_neighCells(xOld(:), mix_iCellOld, this%mixCells, &
-                                         other%positions, overlap, mix_eOld)
+                call mix%Epot_neighCells(xOld(:), mix_iCellOld, this%mixCells, other%positions, &
+                                         overlap, mix_eOld)
                 mix_deltaEpot = mix_eNew - mix_eOld
                 
                 deltaEpot = same_deltaEpot + mix_deltaEpot
