@@ -1320,7 +1320,7 @@ contains
     
     subroutine DipolarSpheres_Epot_bound_init(this)
     
-        class(DipolarSpheres), intent(out) :: this
+        class(DipolarSpheres), intent(inout) :: this
         
         integer :: iCol
         
@@ -1361,13 +1361,12 @@ contains
     !>      \Delta \vec{M} = \vec{\mu}^\prime_l - \vec{\mu}_l
     !> \f]    
     
-    subroutine DipolarSpheres_deltaEpot_bound_totalMoment_update(this, lCol, mNew)
+    subroutine DipolarSpheres_deltaEpot_bound_totalMoment_update(this, mOld, mNew)
     
         class(DipolarSpheres), intent(inout) :: this
-        integer, intent(in) :: lCol
-        real(DP), dimension(:), intent(in) :: mNew
+        real(DP), dimension(:), intent(in) :: mOld, mNew
         
-        this%totalMoment(:) = this%totalMoment(:) + mNew - this%orientations(:, lCol)
+        this%totalMoment(:) = this%totalMoment(:) + mNew - mOld
     
     end subroutine DipolarSpheres_deltaEpot_bound_totalMoment_update
     
@@ -1518,29 +1517,30 @@ contains
         class(MoreObservables), intent(inout) :: obs
         
         real(DP) :: random
-        real(DP), dimension(Ndim) :: mNew
+        real(DP), dimension(Ndim) :: mOld, mNew
         real(DP) :: deltaEpot, deltaEpot_real, deltaEpot_self
         real(DP) :: real_eNew, real_eOld
         integer :: iTotalCell
         
-        mNew(:) = this%orientations(:, iOld)
+        mOld = this%orientations(:, iOld)
+        mNew(:) = mOld
         call markov_surface(mNew, this%deltaM)
         
         iTotalCell = this%sameCells%index_from_position(this%positions(:, iOld))
         real_eNew = this%Epot_real_solo(iOld, this%positions(:, iOld), mNew)
-        real_eOld = this%Epot_real_solo(iOld, this%positions(:, iOld), this%orientations(:, iOld))
+        real_eOld = this%Epot_real_solo(iOld, this%positions(:, iOld), mOld)
         deltaEpot_real = real_eNew - real_eOld        
         
-        deltaEpot_self = this%Epot_self_solo(mNew) - this%Epot_self_solo(this%orientations(:, iOld))
+        deltaEpot_self = this%Epot_self_solo(mNew) - this%Epot_self_solo(mOld)
         
         deltaEpot = deltaEpot_real + this%deltaEpot_reci_rotate(iOld, mNew) - deltaEpot_self + &
-                    this%deltaEpot_bound(this%orientations(:, iOld), mNew)
+                    this%deltaEpot_bound(mOld, mNew)
         
         call random_number(random)
         if (random < exp(-deltaEpot/Temperature)) then
         
             call this%deltaEpot_reci_rotate_updateStructure(iOld, mNew)
-            call this%deltaEpot_bound_totalMoment_update(iOld, mNew)
+            call this%deltaEpot_bound_totalMoment_update(mOld, mNew)
             this%orientations(:, iOld) = mNew(:)
             
             obs%Epot = obs%Epot + deltaEpot
