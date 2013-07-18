@@ -1324,14 +1324,16 @@ contains
     !>                 ]
     !> \f]
     
-    pure function DipolarSpheres_deltaEpot_bound(this, lCol, mNew) result (deltaEpot_bound)
+    pure function DipolarSpheres_deltaEpot_bound(this, mNew, mOld) result (deltaEpot_bound)
     
         class(DipolarSpheres), intent(in) :: this
-        integer, intent(in) :: lCol
-        real(DP), dimension(:), intent(in) :: mNew
+        real(DP), dimension(:), intent(in) :: mNew, mOld
         real(DP) :: deltaEpot_bound
         
-        deltaEpot_bound = dot_product(mNew, mNew)
+        deltaEpot_bound = dot_product(mNew, mNew) - dot_product(mOld, mOld) + &
+                          2._DP * dot_product(mNew-mOld, this%totalMoment-mOld)
+                          
+        deltaEpot_bound = 2._DP * PI / (2*dielectric + 1) / Volume * deltaEpot_bound
     
     end function DipolarSpheres_deltaEpot_bound
     
