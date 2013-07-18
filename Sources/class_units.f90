@@ -34,7 +34,7 @@ private
         integer :: snapShots_orientations
 
         integer :: waveVectors
-        integer :: structure_moduli
+        integer :: structure_modulus
     
     end type MoreUnits
     
@@ -77,7 +77,7 @@ contains
                 open(newunit=this%snapShots_orientations, recl=4096, &
                      file=name//"_snap_orientations.shots", status='new', action='write')
 
-                open(newunit=this%structure_moduli, recl=4096, file=name//"_structure_moduli.out", &
+                open(newunit=this%structure_modulus, recl=4096, file=name//"_structure_modulus.out", &
                      status='new', action='write')
                 open(newunit=this%waveVectors, recl=4096, file=name//"_waveVectors.tmp", &
                      status='new', action='write')
@@ -118,7 +118,7 @@ contains
                 close(this%snapShots_orientations)
 
                 close(this%waveVectors)
-                close(this%structure_moduli)
+                close(this%structure_modulus)
                     
             class default
                 

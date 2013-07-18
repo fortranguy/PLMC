@@ -244,7 +244,7 @@ implicit none
         
         ! Ewald summation : reinitialize the structure factor to prevent it from drifting.
         if (modulo(iStep, type1_spheres%getStructure_iStep()) == 0) then
-            call type1_spheres%Epot_reci_structure_reInit(iStep, type1_units%structure_moduli)
+            call type1_spheres%Epot_reci_structure_reInit(iStep, type1_units%structure_modulus)
         end if
     
     end do MC_Cycle

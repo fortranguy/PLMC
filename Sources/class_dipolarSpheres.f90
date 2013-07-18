@@ -87,7 +87,7 @@ private
         procedure :: Epot_reci_init => DipolarSpheres_Epot_reci_init
         procedure, private :: Epot_reci_weight_init => DipolarSpheres_Epot_reci_weight_init
         procedure, private :: Epot_reci_structure_init => DipolarSpheres_Epot_reci_structure_init
-        procedure, private :: Epot_reci_structure_moduli => DipolarSpheres_Epot_reci_structure_moduli
+        procedure, private :: Epot_reci_structure_modulus => DipolarSpheres_Epot_reci_structure_modulus
         procedure :: Epot_reci_structure_reInit => DipolarSpheres_Epot_reci_structure_reInit
         procedure, private :: Epot_reci_potential_init => DipolarSpheres_Epot_reci_potential_init
         procedure :: Epot_reci_countNwaveVectors => DipolarSpheres_Epot_reci_countNwaveVectors
@@ -109,8 +109,8 @@ private
         procedure, private :: deltaEpot_bound => DipolarSpheres_deltaEpot_bound
         procedure, private :: Epot_bound_totalMoment_update => &
                               DipolarSpheres_Epot_bound_totalMoment_update
-        procedure, private :: Epot_bound_totalMoment_moduli => &
-                              DipolarSpheres_Epot_bound_totalMoment_moduli
+        procedure, private :: Epot_bound_totalMoment_modulus => &
+                              DipolarSpheres_Epot_bound_totalMoment_modulus
         procedure, private :: Epot_bound_reInit => DipolarSpheres_Epot_bound_reInit
         procedure, private :: Epot_bound => DipolarSpheres_Epot_bound
         !>     Total
@@ -668,43 +668,43 @@ contains
     
     !> To calculate the drift of the strucutre factor
 
-    pure function DipolarSpheres_Epot_reci_structure_moduli(this) result(Epot_reci_structure_moduli)
+    pure function DipolarSpheres_Epot_reci_structure_modulus(this) result(Epot_reci_structure_modulus)
 
         class(DipolarSpheres), intent(in) :: this
-        real(DP) :: Epot_reci_structure_moduli
+        real(DP) :: Epot_reci_structure_modulus
 
         integer :: kx, ky, kz
 
-        Epot_reci_structure_moduli = 0._DP
+        Epot_reci_structure_modulus = 0._DP
 
         do kz = 0, Kmax(3)
             do ky = -Kmax2_sym(kz), Kmax(2)
                 do kx = -Kmax1_sym(ky, kz), Kmax(1)
                 
-                    Epot_reci_structure_moduli = Epot_reci_structure_moduli + &
+                    Epot_reci_structure_modulus = Epot_reci_structure_modulus + &
                                                  abs(this%Epot_reci_kStructure(kx, ky, kz))
 
                 end do
             end do
         end do
 
-    end function DipolarSpheres_Epot_reci_structure_moduli
+    end function DipolarSpheres_Epot_reci_structure_modulus
     
     !> Reinitialise the structure factor and print the drift
     
-    subroutine DipolarSpheres_Epot_reci_structure_reInit(this, iStep, moduli_unit)
+    subroutine DipolarSpheres_Epot_reci_structure_reInit(this, iStep, modulus_unit)
     
         class(DipolarSpheres), intent(inout) :: this
         integer, intent(in) :: iStep
-        integer, intent(in) :: moduli_unit
+        integer, intent(in) :: modulus_unit
 
-        real(DP) :: moduli_drifted, moduli_reInit
+        real(DP) :: modulus_drifted, modulus_reInit
         
-        moduli_drifted = this%Epot_reci_structure_moduli()
+        modulus_drifted = this%Epot_reci_structure_modulus()
         call this%Epot_reci_structure_init()
-        moduli_reInit = this%Epot_reci_structure_moduli()
+        modulus_reInit = this%Epot_reci_structure_modulus()
         
-        write(moduli_unit, *) iStep, abs(moduli_reInit - moduli_drifted)
+        write(modulus_unit, *) iStep, abs(modulus_reInit - modulus_drifted)
     
     end subroutine DipolarSpheres_Epot_reci_structure_reInit
     
@@ -1359,40 +1359,40 @@ contains
     
      !> Calculate the drift of the total moment
     
-    pure function DipolarSpheres_Epot_bound_totalMoment_moduli(this) &
-                   result(Epot_bound_totalMoment_moduli)
+    pure function DipolarSpheres_Epot_bound_totalMoment_modulus(this) &
+                   result(Epot_bound_totalMoment_modulus)
 
         class(DipolarSpheres), intent(in) :: this
-        real(DP) :: Epot_bound_totalMoment_moduli
+        real(DP) :: Epot_bound_totalMoment_modulus
         
         integer :: iCol
         
-        Epot_bound_totalMoment_moduli = 0._DP
+        Epot_bound_totalMoment_modulus = 0._DP
         
         do iCol = 1, this%Ncol
         
-            Epot_bound_totalMoment_moduli = Epot_bound_totalMoment_moduli + &
+            Epot_bound_totalMoment_modulus = Epot_bound_totalMoment_modulus + &
                                             norm2(this%orientations(:, iCol))
         
         end do
         
-    end function DipolarSpheres_Epot_bound_totalMoment_moduli
+    end function DipolarSpheres_Epot_bound_totalMoment_modulus
     
     !> Reinitialise the total moment factor and print the drift
     
-    subroutine DipolarSpheres_Epot_bound_reInit(this, iStep, moduli_unit)
+    subroutine DipolarSpheres_Epot_bound_reInit(this, iStep, modulus_unit)
     
         class(DipolarSpheres), intent(inout) :: this
         integer, intent(in) :: iStep
-        integer, intent(in) :: moduli_unit
+        integer, intent(in) :: modulus_unit
         
-        real(DP) :: moduli_drifted, moduli_reInit
+        real(DP) :: modulus_drifted, modulus_reInit
         
-        moduli_drifted = this%Epot_bound_totalMoment_moduli()
+        modulus_drifted = this%Epot_bound_totalMoment_modulus()
         call this%Epot_bound_init()
-        moduli_reInit = this%Epot_bound_totalMoment_moduli()
+        modulus_reInit = this%Epot_bound_totalMoment_modulus()
         
-        write(moduli_unit, *) iStep, abs(moduli_reInit - moduli_drifted)
+        write(modulus_unit, *) iStep, abs(modulus_reInit - modulus_drifted)
     
     end subroutine DipolarSpheres_Epot_bound_reInit
     
