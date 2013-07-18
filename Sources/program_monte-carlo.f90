@@ -97,6 +97,7 @@ implicit none
     
     call type1_spheres%overlapTest()
     call type1_spheres%Epot_reci_init()
+    call type1_spheres%Epot_bound_init()
     type1_obs%Epot = type1_spheres%Epot_conf()
     call type1_spheres%snapShot_positions(0, type1_units%snapIni_positions)
     call type1_spheres%snapShot_orientations(0, type1_units%snapIni_orientations)

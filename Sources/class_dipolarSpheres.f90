@@ -5,7 +5,7 @@ module class_dipolarSpheres
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
 use data_precisions, only : DP, consist_tiny
 use data_constants, only : PI
-use data_box, only : Ndim, Lsize, Kmax, Volume
+use data_box, only : Ndim, Lsize, Kmax, Volume, dielectric
 use data_particles, only : dipol_radius, dipol_rMin, dipol_Ncol
 use data_monteCarlo, only : Temperature, dipol_structure_iStep, dipol_deltaX, dipol_rejectFix, &
                             dipol_Nadapt, dipol_deltaM, dipol_deltaMmax, dipol_rejectRotFix, &
@@ -52,6 +52,7 @@ private
         complex(DP), dimension(-Kmax(1):Kmax(1), -Kmax(2):Kmax(2), -Kmax(3):Kmax(3)) :: &
             Epot_reci_kStructure
         complex(DP), dimension(:, :), allocatable :: Epot_reci_potential
+        real(DP), dimension(Ndim) :: totalMoment
         
     contains
 
@@ -103,6 +104,10 @@ private
         !>     Self
         procedure, private :: Epot_self_solo => DipolarSpheres_Epot_self_solo
         procedure, private :: Epot_self => DipolarSpheres_Epot_self
+        !>     Boundary conditions
+        procedure :: Epot_bound_init => DipolarSpheres_Epot_bound_init
+        procedure, private :: deltaEpot_bound => DipolarSpheres_deltaEpot_bound
+        procedure, private :: Epot_bound => DipolarSpheres_Epot_bound
         !>     Total
         procedure :: Epot_conf => DipolarSpheres_Epot_conf
         procedure :: consistTest => DipolarSpheres_consistTest
@@ -1287,6 +1292,65 @@ contains
         end do
         
     end function DipolarSpheres_Epot_self
+    
+    !> Boundary conditions : shape-dependent -------------------------------------------------------
+    
+    !> Total dipole moment :
+    !> \f[ \vec{M} = \sum_j \vec{\mu}_j \f]
+    !> \f[ \vec{M}_l = \sum_{j\neql} \vec{\mu}_j \f]
+    
+    subroutine DipolarSpheres_Epot_bound_init(this)
+    
+        class(DipolarSpheres), intent(out) :: this
+        
+        integer :: iCol
+        
+        this%totalMoment(:) = 0._DP
+        
+        do iCol = 1, this%Ncol
+        
+            this%totalMoment(:) = this%totalMoment(:) + this%orientations(:, iCol)
+        
+        end do        
+    
+    end subroutine DipolarSpheres_Epot_bound_init
+    
+    !> Difference of Energy
+    !> \f[
+    !>      \Delta J = 2._DP * PI / (2*dielectric + 1) / Volume [
+    !>                      (\vec{\mu}^\prime_l \cdot \vec{\mu}^\prime_l) -
+    !>                      (\vec{\mu}_l \cdot \vec{\mu}_l) +
+    !>                      2 (\vec{\mu}^\prime_l - \vec{\mu}_l) \cdot \vec{M}_l
+    !>                 ]
+    !> \f]
+    
+    pure function DipolarSpheres_deltaEpot_bound(this, lCol, mNew) result (deltaEpot_bound)
+    
+        class(DipolarSpheres), intent(in) :: this
+        integer, intent(in) :: lCol
+        real(DP), dimension(:), intent(in) :: mNew
+        real(DP) :: deltaEpot_bound
+        
+        deltaEpot_bound = dot_product(mNew, mNew)
+    
+    end function DipolarSpheres_deltaEpot_bound
+    
+    !> Total shape dependent term
+    !> \f[
+    !>      J(\vec{M}, S) = \frac{2\pi}{(2\epsilon_s + 1) V} |\vec{M}|^2
+    !> \f]
+    
+    pure function DipolarSpheres_Epot_bound(this) result(Epot_bound)
+    
+        class(DipolarSpheres), intent(in) :: this
+        real(DP) :: Epot_bound
+        
+        Epot_bound = 2._DP * PI / (2*dielectric + 1) / Volume * &
+                     dot_product(this%totalMoment, this%totalMoment)
+    
+    end function DipolarSpheres_Epot_bound
+    
+    ! Change ---------------------------------------------------------------------------------------
 
     !> Particle move
     
