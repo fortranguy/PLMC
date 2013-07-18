@@ -109,8 +109,8 @@ private
         !>     Boundary conditions
         procedure :: Epot_bound_init => DipolarSpheres_Epot_bound_init
         procedure, private :: deltaEpot_bound => DipolarSpheres_deltaEpot_bound
-        procedure, private :: Epot_bound_totalMoment_update => &
-                              DipolarSpheres_Epot_bound_totalMoment_update
+        procedure, private :: deltaEpot_bound_totalMoment_update => &
+                              DipolarSpheres_deltaEpot_bound_totalMoment_update
         procedure, private :: Epot_bound_totalMoment_modulus => &
                               DipolarSpheres_Epot_bound_totalMoment_modulus
         procedure :: Epot_bound_totalMoment_reInit => DipolarSpheres_Epot_bound_totalMoment_reInit
@@ -1343,10 +1343,10 @@ contains
     !>                 ]
     !> \f]
     
-    pure function DipolarSpheres_deltaEpot_bound(this, mNew, mOld) result (deltaEpot_bound)
+    pure function DipolarSpheres_deltaEpot_bound(this, mOld, mNew) result (deltaEpot_bound)
     
         class(DipolarSpheres), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: mNew, mOld
+        real(DP), dimension(:), intent(in) :: mOld, mNew
         real(DP) :: deltaEpot_bound
         
         deltaEpot_bound = dot_product(mNew, mNew) - dot_product(mOld, mOld) + &
@@ -1361,7 +1361,7 @@ contains
     !>      \Delta \vec{M} = \vec{\mu}^\prime_l - \vec{\mu}_l
     !> \f]    
     
-    subroutine DipolarSpheres_Epot_bound_totalMoment_update(this, lCol, mNew)
+    subroutine DipolarSpheres_deltaEpot_bound_totalMoment_update(this, lCol, mNew)
     
         class(DipolarSpheres), intent(inout) :: this
         integer, intent(in) :: lCol
@@ -1369,7 +1369,7 @@ contains
         
         this%totalMoment(:) = this%totalMoment(:) + mNew - this%orientations(:, lCol)
     
-    end subroutine DipolarSpheres_Epot_bound_totalMoment_update
+    end subroutine DipolarSpheres_deltaEpot_bound_totalMoment_update
     
      !> Calculate the drift of the total moment
     
@@ -1533,12 +1533,14 @@ contains
         
         deltaEpot_self = this%Epot_self_solo(mNew) - this%Epot_self_solo(this%orientations(:, iOld))
         
-        deltaEpot = deltaEpot_real + this%deltaEpot_reci_rotate(iOld, mNew) - deltaEpot_self
+        deltaEpot = deltaEpot_real + this%deltaEpot_reci_rotate(iOld, mNew) - deltaEpot_self + &
+                    this%deltaEpot_bound(this%orientations(:, iOld), mNew)
         
         call random_number(random)
         if (random < exp(-deltaEpot/Temperature)) then
         
             call this%deltaEpot_reci_rotate_updateStructure(iOld, mNew)
+            call this%deltaEpot_bound_totalMoment_update(iOld, mNew)
             this%orientations(:, iOld) = mNew(:)
             
             obs%Epot = obs%Epot + deltaEpot
