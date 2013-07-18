@@ -113,7 +113,7 @@ private
                               DipolarSpheres_Epot_bound_totalMoment_update
         procedure, private :: Epot_bound_totalMoment_modulus => &
                               DipolarSpheres_Epot_bound_totalMoment_modulus
-        procedure, private :: Epot_bound_reInit => DipolarSpheres_Epot_bound_reInit
+        procedure :: Epot_bound_totalMoment_reInit => DipolarSpheres_Epot_bound_totalMoment_reInit
         procedure, private :: Epot_bound => DipolarSpheres_Epot_bound
         !>     Total
         procedure :: Epot_conf => DipolarSpheres_Epot_conf
@@ -1394,7 +1394,7 @@ contains
     
     !> Reinitialise the total moment factor and print the drift
     
-    subroutine DipolarSpheres_Epot_bound_reInit(this, iStep, modulus_unit)
+    subroutine DipolarSpheres_Epot_bound_totalMoment_reInit(this, iStep, modulus_unit)
     
         class(DipolarSpheres), intent(inout) :: this
         integer, intent(in) :: iStep
@@ -1408,7 +1408,7 @@ contains
         
         write(modulus_unit, *) iStep, abs(modulus_reInit - modulus_drifted)
     
-    end subroutine DipolarSpheres_Epot_bound_reInit
+    end subroutine DipolarSpheres_Epot_bound_totalMoment_reInit
     
     !> Total shape dependent term
     !> \f[
