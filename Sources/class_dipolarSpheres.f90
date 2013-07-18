@@ -108,7 +108,10 @@ private
         procedure :: Epot_bound_init => DipolarSpheres_Epot_bound_init
         procedure, private :: deltaEpot_bound => DipolarSpheres_deltaEpot_bound
         procedure, private :: Epot_bound_totalMoment_update => &
-                               DipolarSpheres_Epot_bound_totalMoment_update
+                              DipolarSpheres_Epot_bound_totalMoment_update
+        procedure, private :: Epot_bound_totalMoment_moduli => &
+                              DipolarSpheres_Epot_bound_totalMoment_moduli
+        procedure, private :: Epot_bound_reInit => DipolarSpheres_Epot_bound_reInit
         procedure, private :: Epot_bound => DipolarSpheres_Epot_bound
         !>     Total
         procedure :: Epot_conf => DipolarSpheres_Epot_conf
@@ -1353,6 +1356,45 @@ contains
         this%totalMoment(:) = this%totalMoment(:) + mNew - this%orientations(:, lCol)
     
     end subroutine DipolarSpheres_Epot_bound_totalMoment_update
+    
+     !> Calculate the drift of the total moment
+    
+    pure function DipolarSpheres_Epot_bound_totalMoment_moduli(this) &
+                   result(Epot_bound_totalMoment_moduli)
+
+        class(DipolarSpheres), intent(in) :: this
+        real(DP) :: Epot_bound_totalMoment_moduli
+        
+        integer :: iCol
+        
+        Epot_bound_totalMoment_moduli = 0._DP
+        
+        do iCol = 1, this%Ncol
+        
+            Epot_bound_totalMoment_moduli = Epot_bound_totalMoment_moduli + &
+                                            norm2(this%orientations(:, iCol))
+        
+        end do
+        
+    end function DipolarSpheres_Epot_bound_totalMoment_moduli
+    
+    !> Reinitialise the total moment factor and print the drift
+    
+    subroutine DipolarSpheres_Epot_bound_reInit(this, iStep, moduli_unit)
+    
+        class(DipolarSpheres), intent(inout) :: this
+        integer, intent(in) :: iStep
+        integer, intent(in) :: moduli_unit
+        
+        real(DP) :: moduli_drifted, moduli_reInit
+        
+        moduli_drifted = this%Epot_bound_totalMoment_moduli()
+        call this%Epot_bound_init()
+        moduli_reInit = this%Epot_bound_totalMoment_moduli()
+        
+        write(moduli_unit, *) iStep, abs(moduli_reInit - moduli_drifted)
+    
+    end subroutine DipolarSpheres_Epot_bound_reInit
     
     !> Total shape dependent term
     !> \f[
