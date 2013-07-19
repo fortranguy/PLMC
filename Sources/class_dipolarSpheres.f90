@@ -578,8 +578,10 @@ contains
 
     end subroutine
     
-    !> \f[ w(\alpha, \vec{k}) = \frac{e^{-\frac{\pi^2}
-    !>      {\alpha^2} \sum_d \frac{k_d^2}{L_d}}}{\sum_d \frac{k_d^2}{L_d}} \f]
+    !> \f[ 
+    !>      w(\alpha, \vec{k}) = \frac{e^{-\frac{\pi^2}{\alpha^2} \sum_d \frac{k_d^2}{L_d}}}
+    !>                                {\sum_d \frac{k_d^2}{L_d}}
+    !> \f]
     
     subroutine DipolarSpheres_Epot_reci_weight_init(this)
         
@@ -619,9 +621,13 @@ contains
     end subroutine DipolarSpheres_Epot_reci_weight_init
     
     !> Structure factor init :
-    !> \f[ \vec{S}(\vec{k}) = \sum_{i} \vec{\mu}_i e^{+i\vec{k}\cdot\vec{x}_i} \f]
+    !> \f[ 
+    !>      S(\vec{k}) = \sum_{i} (\vec{k}\cdot\vec{\mu}_i) e^{+i\vec{k}\cdot\vec{x}_i}
+    !> \f]
     !> We will also use a restricted definition later :
-    !> \f[ \vec{S}_l(\vec{k}) = \sum_{i \neq l} \vec{\mu}_i e^{+i\vec{k}\cdot\vec{x}_i} \f].
+    !> \f[ 
+    !>      S_l(\vec{k}) = \sum_{i \neq l} (\vec{k}\cdot\vec{\mu}_i) e^{+i\vec{k}\cdot\vec{x}_i}
+    !> \f].
 
     subroutine DipolarSpheres_Epot_reci_structure_init(this)
 
@@ -721,8 +727,8 @@ contains
     
     !> Potential initialisation :
     !> \f[
-    !>      \vec{\phi}(\vec{x}_j) = \sum_{\vec{k}\neq\vec{0}} \vec{k} w(\alpha, \vec{k})
-    !>                              (\vec{k}\cdot\vec{S}(\vec{k})) e^{-i\vec{k}\cdot\vec{x}_j}
+    !>      \vec{\phi}(\vec{x}_j) = \sum_{\vec{k}\neq\vec{0}} \vec{k} w(\alpha, \vec{k}) S(\vec{k})
+    !>                              e^{-i\vec{k}\cdot\vec{x}_j}
     !> \f]
     
     subroutine DipolarSpheres_Epot_reci_potential_init(this)
