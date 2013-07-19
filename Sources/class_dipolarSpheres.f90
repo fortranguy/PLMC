@@ -843,12 +843,10 @@ contains
     !> Implementation :
     !> \f[
     !>  \Delta M^2 = 2(\vec{\mu_l}\cdot\vec{k})
-    !>              [ \cos(\vec{k}\cdot\vec{x}^\prime_l) - \cos(\vec{k}\cdot\vec{x}_l)]
-    !>              [\Re{S(\vec{k})} - (\vec{k}\cdot\vec{\mu}_l) \cos(\vec{k}\cdot
-    !>                  \vec{x}_l)] -
+    !>              [\cos(\vec{k}\cdot\vec{x}^\prime_l) - \cos(\vec{k}\cdot\vec{x}_l)]
+    !>              [\Re(S(\vec{k})) - (\vec{k}\cdot\vec{\mu}_l) \cos(\vec{k}\cdot\vec{x}_l)] -
     !>              [-\sin(\vec{k}\cdot\vec{x}^\prime_l) + \sin(\vec{k}\cdot\vec{x}_l)]
-    !>              [\Im{S(\vec{k})} - (\vec{k}\cdot\vec{\mu}_l) \sin(\vec{k}\cdot
-    !>                  \vec{x}_l)]
+    !>              [\Im(S(\vec{k})) - (\vec{k}\cdot\vec{\mu}_l) \sin(\vec{k}\cdot\vec{x}_l)]
     !> \f]
     !>
 
@@ -1013,7 +1011,7 @@ contains
     !>               2\Re\{
     !>                  [(\vec{k} \cdot \vec{\mu}_l^\prime) - (\vec{k} \cdot \vec{\mu}_l)]
     !>                  e^{-i \vec{k} \cdot \vec{x}_l}
-    !>                  (\vec{k} \cdot \vec{S}_l)
+    !>                  (S_l(\vec{k}))
     !>               \}
     !> \f]
     
@@ -1022,9 +1020,9 @@ contains
     !>  \Delta M^2 = (\vec{k} \cdot \vec{\mu}_l^\prime)^2 - (\vec{k} \cdot \vec{\mu}_l)^2 +
     !>               2 [(\vec{k} \cdot \vec{\mu}_l^\prime) - (\vec{k} \cdot \vec{\mu}_l)]
     !>               \{
-    !>                  \cos(\vec{k} \cdot \vec{x}_l)[\Re(\vec{k} \cdot \vec{S}) -
+    !>                  \cos(\vec{k} \cdot \vec{x}_l)[\Re(S(\vec{k})) -
     !>                      (\vec{k} \cdot \vec{\mu}_l) \cos(\vec{k} \cdot \vec{x}_l)] +
-    !>                  \sin(\vec{k} \cdot \vec{x}_l)[\Im(\vec{k} \cdot \vec{S}) -
+    !>                  \sin(\vec{k} \cdot \vec{x}_l)[\Im(S(\vec{k})) -
     !>                      (\vec{k} \cdot \vec{\mu}_l) \sin(\vec{k} \cdot \vec{x}_l)]
     !>               \}
     !> \f]
@@ -1170,7 +1168,7 @@ contains
     !>                          (\vec{k} \cdot \vec{\mu}_{N+1}) w(\alpha, \vec{k})
     !>                          \{
     !>                              (\vec{k} \cdot \vec{\mu}_{N+1}) + 
-    !>                              2\Re[(\vec{k} \cdot \vec{S}) e^{-i \vec{k} \cdot \vec{x}_{N+1}}]
+    !>                              2\Re[S(\vec{k}) e^{-i \vec{k} \cdot \vec{x}_{N+1}}]
     !>                          \}
     !> \f]
     
@@ -1179,8 +1177,8 @@ contains
     !>                          (\vec{k} \cdot \vec{\mu}_{N+1}) w(\alpha, \vec{k})
     !>                          \{
     !>                              (\vec{k} \cdot \vec{\mu}_{N+1}) +
-    !>                              2 [\Re(\vec{k} \cdot \vec{S}) \cos(\vec{k} \cdot \vec{x}_{N+1}) +
-    !>                                 \Im(\vec{k} \cdot \vec{S}) \sin(\vec{k} \cdot \vec{x}_{N+1})]
+    !>                              2 [\Re(S(\vec{k})) \cos(\vec{k} \cdot \vec{x}_{N+1}) +
+    !>                                 \Im(S(\vec{k})) \sin(\vec{k} \cdot \vec{x}_{N+1})]
     !>                          \}
     !> \f]
 
