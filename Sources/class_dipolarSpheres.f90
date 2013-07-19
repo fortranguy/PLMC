@@ -1310,11 +1310,11 @@ contains
         
     end function DipolarSpheres_Epot_self
     
-    !> Boundary conditions : shape-dependent -------------------------------------------------------
+    ! Boundary conditions : shape-dependent -------------------------------------------------------
     
     !> Total dipole moment :
     !> \f[ \vec{M} = \sum_j \vec{\mu}_j \f]
-    !> \f[ \vec{M}_l = \sum_{j\neql} \vec{\mu}_j \f]
+    !> \f[ \vec{M}_l = \sum_{j \neq l} \vec{\mu}_j \f]
     
     subroutine DipolarSpheres_Epot_bound_totalMoment_init(this)
     
@@ -1334,7 +1334,7 @@ contains
     
     !> Difference of Energy
     !> \f[
-    !>      \Delta J = 2._DP * PI / (2*dielectric + 1) / Volume [
+    !>      \Delta J = \frac{2\pi}{(2\epsilon_s+1)V} [
     !>                      (\vec{\mu}^\prime_l \cdot \vec{\mu}^\prime_l) -
     !>                      (\vec{\mu}_l \cdot \vec{\mu}_l) +
     !>                      2 (\vec{\mu}^\prime_l - \vec{\mu}_l) \cdot \vec{M}_l
@@ -1388,7 +1388,7 @@ contains
     
     !> Total shape dependent term
     !> \f[
-    !>      J(\vec{M}, S) = \frac{2\pi}{(2\epsilon_s + 1) V} |\vec{M}|^2
+    !>      J(\vec{M}, S) = \frac{2\pi}{(2\epsilon_s+1)V} | \vec{M}|^2
     !> \f]
     
     pure function DipolarSpheres_Epot_bound(this) result(Epot_bound)
