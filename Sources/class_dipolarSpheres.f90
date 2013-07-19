@@ -1010,8 +1010,7 @@ contains
     !>  \Delta M^2 = (\vec{k} \cdot \vec{\mu}_l^\prime)^2 - (\vec{k} \cdot \vec{\mu}_l)^2 +
     !>               2\Re\{
     !>                  [(\vec{k} \cdot \vec{\mu}_l^\prime) - (\vec{k} \cdot \vec{\mu}_l)]
-    !>                  e^{-i \vec{k} \cdot \vec{x}_l}
-    !>                  (S_l(\vec{k}))
+    !>                  e^{-i \vec{k} \cdot \vec{x}_l} S_l(\vec{k})
     !>               \}
     !> \f]
     
