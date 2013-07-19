@@ -836,7 +836,7 @@ contains
     !>  \Delta M^2 = 2\Re[
     !>                  (\vec{\mu}_l\cdot\vec{k})
     !>                  (e^{-i\vec{k}\cdot\vec{x}^\prime_l} - e^{-i\vec{k}\cdot\vec{x}_l})
-    !>                  (\vec{k}\cdot\vec{S}_l)
+    !>                  S_l(\vec{k})
     !>               ]
     !> \f]
 
@@ -844,10 +844,10 @@ contains
     !> \f[
     !>  \Delta M^2 = 2(\vec{\mu_l}\cdot\vec{k})
     !>              [ \cos(\vec{k}\cdot\vec{x}^\prime_l) - \cos(\vec{k}\cdot\vec{x}_l)]
-    !>              [\Re{(\vec{k}\cdot\vec{S})} - (\vec{k}\cdot\vec{\mu}_l) \cos(\vec{k}\cdot
+    !>              [\Re{S(\vec{k})} - (\vec{k}\cdot\vec{\mu}_l) \cos(\vec{k}\cdot
     !>                  \vec{x}_l)] -
     !>              [-\sin(\vec{k}\cdot\vec{x}^\prime_l) + \sin(\vec{k}\cdot\vec{x}_l)]
-    !>              [\Im{(\vec{k}\cdot\vec{S})} - (\vec{k}\cdot\vec{\mu}_l) \sin(\vec{k}\cdot
+    !>              [\Im{S(\vec{k})} - (\vec{k}\cdot\vec{\mu}_l) \sin(\vec{k}\cdot
     !>                  \vec{x}_l)]
     !> \f]
     !>
@@ -940,8 +940,8 @@ contains
 
     !> Update position -> update the ``structure factor''
     !>  \f[
-    !>      \Delta \vec{S} = \vec{\mu}_l
-    !>      (e^{+i\vec{k}\cdot\vec{x}^\prime_l} -e^{+i\vec{k}\cdot\vec{x}_l})
+    !>      \Delta S(\vec{k}) = (\vec{k}\cdot\vec{\mu}_l)
+    !>                          (e^{+i\vec{k}\cdot\vec{x}^\prime_l} - e^{+i\vec{k}\cdot\vec{x}_l})
     !>  \f]
     !>
 
@@ -1107,7 +1107,7 @@ contains
 
     !> Update moment -> update the ``structure factor''
     !>  \f[
-    !>      \Delta \vec{S} = (\vec{\mu}_l^\prime - \vec{\mu}_l) e^{+i\vec{k}\cdot\vec{x}_l}
+    !>      \Delta S(\vec{k}) = [\vec{k}\cdot(\vec{\mu}_l^\prime - \vec{\mu}_l)] e^{+i\vec{k}\cdot\vec{x}_l}
     !>  \f]
     !>
 
