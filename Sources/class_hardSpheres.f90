@@ -274,9 +274,9 @@ contains
         do iWidom = 1, this%Nwidom           
             
             call random_number(xRand)
-            xTest(:) = Lsize(:) * xRand(:)    
+            xTest(:) = Lsize(:) * xRand(:)
             same_iCellTest = this%sameCells%index_from_position(xTest)
-            call this%Epot_neighCells(0, xTest, same_iCellTest, overlap) 
+            call this%Epot_neighCells(0, xTest, same_iCellTest, overlap)
             
             if (.not. overlap) then
             
