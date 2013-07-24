@@ -1418,6 +1418,7 @@ contains
         real(DP), dimension(Ndim) :: xRand
         logical :: overlap
         real(DP), dimension(Ndim) :: xOld, xNew
+        real(DP), dimension(Ndim) :: mCol
         integer :: same_iCellOld, same_iCellNew
         integer :: mix_iCellOld, mix_iCellNew
         real(DP) :: deltaEpot, same_deltaEpot, mix_deltaEpot
@@ -1430,6 +1431,8 @@ contains
         call random_number(xRand)
         xNew(:) = xOld(:) + this%deltaX(:) * (xRand(:)-0.5_DP)
         xNew(:) = modulo(xNew(:), Lsize(:))
+        
+        mCol(:) = this%orientations(:, iOld)
         
         mix_iCellNew = this%mixCells%index_from_position(xNew)
         call mix%Epot_neighCells(xNew, mix_iCellNew, this%mixCells, other%positions, overlap, mix_eNew)
@@ -1446,7 +1449,8 @@ contains
                 same_eNew_real = this%Epot_real_solo(iOld, xNew, this%orientations(:, iOld))
                 same_eOld_real = this%Epot_real_solo(iOld, xOld, this%orientations(:, iOld))
                 
-                same_deltaEpot = (same_eNew_real-same_eOld_real) + this%deltaEpot_reci_move(iOld, xNew)
+                same_deltaEpot = (same_eNew_real-same_eOld_real) + &
+                                 this%deltaEpot_reci_move(xOld, xNew, mCol)
                     
                 mix_iCellOld = this%mixCells%index_from_position(xOld)
                 call mix%Epot_neighCells(xOld, mix_iCellOld, this%mixCells, other%positions, overlap, &
@@ -1458,7 +1462,7 @@ contains
                 call random_number(random)            
                 if (random < exp(-deltaEpot/Temperature)) then
 
-                    call this%deltaEpot_reci_move_updateStructure(iOld, xNew)
+                    call this%deltaEpot_reci_move_updateStructure(xOld, xNew, mCol)
                     this%positions(:, iOld) = xNew(:)
                     
                     same_obs%Epot = same_obs%Epot + same_deltaEpot
@@ -1488,6 +1492,8 @@ contains
     
     end subroutine DipolarSpheres_move
     
+    !> Particle rotation
+    
     subroutine DipolarSpheres_rotate(this, iOld, obs)
     
         class(DipolarSpheres), intent(inout) :: this
@@ -1495,31 +1501,31 @@ contains
         class(MoreObservables), intent(inout) :: obs
         
         real(DP) :: random
-        real(DP), dimension(Ndim) :: xOld
+        real(DP), dimension(Ndim) :: xCol
         real(DP), dimension(Ndim) :: mOld, mNew
         real(DP) :: deltaEpot, deltaEpot_real, deltaEpot_self
         real(DP) :: real_eNew, real_eOld
         integer :: iTotalCell
         
-        xOld(:) = this%positions(:, iOld)
+        xCol(:) = this%positions(:, iOld)
         mOld(:) = this%orientations(:, iOld)
         mNew(:) = mOld(:)
         call markov_surface(mNew, this%deltaM)
         
-        iTotalCell = this%sameCells%index_from_position(xOld)
-        real_eNew = this%Epot_real_solo(iOld, xOld, mNew)
-        real_eOld = this%Epot_real_solo(iOld, xOld, mOld)
+        iTotalCell = this%sameCells%index_from_position(xCol)
+        real_eNew = this%Epot_real_solo(iOld, xCol, mNew)
+        real_eOld = this%Epot_real_solo(iOld, xCol, mOld)
         deltaEpot_real = real_eNew - real_eOld        
         
         deltaEpot_self = this%Epot_self_solo(mNew) - this%Epot_self_solo(mOld)
         
-        deltaEpot = deltaEpot_real + this%deltaEpot_reci_rotate(iOld, mNew) - deltaEpot_self + &
+        deltaEpot = deltaEpot_real + this%deltaEpot_reci_rotate(xCol, mOld, mNew) - deltaEpot_self + &
                     this%deltaEpot_bound(mOld, mNew)
         
         call random_number(random)
         if (random < exp(-deltaEpot/Temperature)) then
         
-            call this%deltaEpot_reci_rotate_updateStructure(iOld, mNew)
+            call this%deltaEpot_reci_rotate_updateStructure(xCol, mOld, mNew)
             call this%deltaEpot_bound_totalMoment_update(mOld, mNew)
             this%orientations(:, iOld) = mNew(:)
             
