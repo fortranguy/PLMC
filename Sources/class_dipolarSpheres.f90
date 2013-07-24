@@ -850,11 +850,12 @@ contains
     !> \f]
     !>
 
-    pure function DipolarSpheres_deltaEpot_reci_move(this, lCol, xNew) result(deltaEpot_reci_move)
+    pure function DipolarSpheres_deltaEpot_reci_move(this, xOld, xNew, mCol) &
+                  result(deltaEpot_reci_move)
 
         class(DipolarSpheres), intent(in) :: this
-        integer, intent(in) :: lCol
-        real(DP), dimension(:), intent(in) :: xNew
+        real(DP), dimension(:), intent(in) :: xOld, xNew
+        real(DP), dimension(:), intent(in) :: mCol
         real(DP) :: deltaEpot_reci_move
         
         real(DP) :: deltaEpot_k
@@ -882,12 +883,12 @@ contains
         integer :: kx, ky, kz
 
         xNewOverL(:) = xNew(:)/Lsize(:)
-        xOldOverL(:) = this%positions(:, lCol)/Lsize(:)
+        xOldOverL(:) = xOld(:)/Lsize(:)
         
         call fourier(xNewOverL, exp_IkxNew_1, exp_IkxNew_2, exp_IkxNew_3)
         call fourier(xOldOverL, exp_IkxOld_1, exp_IkxOld_2, exp_IkxOld_3)
 
-        mColOverL(:) = this%orientations(:, lCol)/Lsize(:)
+        mColOverL(:) = mCol(:)/Lsize(:)
 
         deltaEpot_reci_move = 0._DP
 
@@ -943,11 +944,11 @@ contains
     !>  \f]
     !>
 
-    subroutine DipolarSpheres_deltaEpot_reci_move_updateStructure(this, lCol, xNew)
+    subroutine DipolarSpheres_deltaEpot_reci_move_updateStructure(this, xOld, xNew, mCol)
 
         class(DipolarSpheres), intent(inout) :: this
-        integer, intent(in) :: lCol
-        real(DP), dimension(:), intent(in) :: xNew
+        real(DP), dimension(:), intent(in) :: xOld, xNew
+        real(DP), dimension(:), intent(in) :: mCol
         
         real(DP), dimension(Ndim) :: xNewOverL, xOldOverL
         real(DP), dimension(Ndim) :: mColOverL
@@ -967,12 +968,12 @@ contains
         integer :: kx, ky, kz
 
         xNewOverL(:) = xNew(:)/Lsize(:)
-        xOldOverL(:) = this%positions(:, lCol)/Lsize(:)
+        xOldOverL(:) = xOld(:)/Lsize(:)
         
         call fourier(xNewOverL, exp_IkxNew_1, exp_IkxNew_2, exp_IkxNew_3)
         call fourier(xOldOverL, exp_IkxOld_1, exp_IkxOld_2, exp_IkxOld_3)
 
-        mColOverL(:) = this%orientations(:, lCol)/Lsize(:)
+        mColOverL(:) = mCol(:)/Lsize(:)
 
         do kz = 0, Kmax(3)
 
@@ -1026,11 +1027,12 @@ contains
     !>               \}
     !> \f]
 
-    pure function DipolarSpheres_deltaEpot_reci_rotate(this, lCol, mNew) result(deltaEpot_reci_rotate)
+    pure function DipolarSpheres_deltaEpot_reci_rotate(this, xCol, mOld, mNew) &
+                  result(deltaEpot_reci_rotate)
 
         class(DipolarSpheres), intent(in) :: this
-        integer, intent(in) :: lCol
-        real(DP), dimension(:), intent(in) :: mNew
+        real(DP), dimension(:), intent(in) :: xCol
+        real(DP), dimension(:), intent(in) :: mOld, mNew
         real(DP) :: deltaEpot_reci_rotate
 
         real(DP) :: deltaEpot_k
@@ -1051,12 +1053,12 @@ contains
         complex(DP) :: structure_k
         integer :: kx, ky, kz
 
-        xColOverL(:) = this%positions(:, lCol)/Lsize(:)
+        xColOverL(:) = xCol(:)/Lsize(:)
         
         call fourier(xColOverL, exp_IkxCol_1, exp_IkxCol_2, exp_IkxCol_3)
 
         mNewOverL(:) = mNew(:)/Lsize(:)
-        mOldOverL(:) = this%orientations(:, lCol)/Lsize(:)
+        mOldOverL(:) = mOld(:)/Lsize(:)
 
         deltaEpot_reci_rotate = 0._DP
 
@@ -1108,11 +1110,11 @@ contains
     !>  \f]
     !>
 
-    subroutine DipolarSpheres_deltaEpot_reci_rotate_updateStructure(this, lCol, mNew)
+    subroutine DipolarSpheres_deltaEpot_reci_rotate_updateStructure(this, xCol, mOld, mNew)
 
         class(DipolarSpheres), intent(inout) :: this
-        integer, intent(in) :: lCol
-        real(DP), dimension(:), intent(in) :: mNew
+        real(DP), dimension(:), intent(in) :: xCol
+        real(DP), dimension(:), intent(in) :: mOld, mNew
 
         real(DP), dimension(Ndim) :: xColOverL
         real(DP), dimension(Ndim) :: mNewOverL, mOldOverL
@@ -1126,12 +1128,12 @@ contains
         real(DP) :: k_dot_deltaMcol
         integer :: kx, ky, kz
 
-        xColOverL(:) = this%positions(:, lCol)/Lsize(:)
+        xColOverL(:) = xCol(:)/Lsize(:)
         
         call fourier(xColOverL, exp_IkxCol_1, exp_IkxCol_2, exp_IkxCol_3)
 
         mNewOverL(:) = mNew(:)/Lsize(:)
-        mOldOverL(:) = this%orientations(:, lCol)/Lsize(:)
+        mOldOverL(:) = mOld(:)/Lsize(:)
 
         do kz = 0, Kmax(3)
 
