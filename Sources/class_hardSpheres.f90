@@ -5,7 +5,7 @@ module class_hardSpheres
 use, intrinsic :: iso_fortran_env, only : output_unit
 use data_precisions, only : DP
 use data_box, only : Ndim, Lsize
-use data_particles, only : hard_radius, hard_rMin, hard_Ncol
+use data_particles, only : hard_rMin, hard_radius, hard_Ncol
 use data_potential, only : hard_rCut
 use data_monteCarlo, only : Temperature, hard_deltaX, hard_rejectFix, hard_Nadapt, hard_Nwidom
 use data_neighbourCells, only : NnearCell, hard_cell_size
@@ -60,8 +60,8 @@ contains
         write(output_unit, *) this%name, " class construction"
     
         ! Particles
-        this%radius = hard_radius
         this%rMin = hard_rMin
+        this%radius = hard_radius        
         this%Ncol = hard_Ncol
         allocate(this%positions(Ndim, this%Ncol))
         

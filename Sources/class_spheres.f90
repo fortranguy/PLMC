@@ -22,8 +22,8 @@ private
         character(len=5) :: name
 
         ! Particles
-        real(DP) :: radius !< radius of a particle
         real(DP) :: rMin !< minimum distance between two particles
+        real(DP) :: radius !< radius of a particle
         integer ::  Ncol !< number of a component particles
         real(DP), dimension(:, :), allocatable, public :: positions !< positions of all particles
                                                                     !< Warning : use carefully !

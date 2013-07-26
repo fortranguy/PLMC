@@ -6,7 +6,7 @@ use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
 use data_precisions, only : DP, consist_tiny
 use data_constants, only : PI
 use data_box, only : Ndim, Lsize, Kmax, Volume, out_permittivity
-use data_particles, only : dipol_radius, dipol_rMin, dipol_Ncol
+use data_particles, only : dipol_rMin, dipol_radius, dipol_Ncol
 use data_monteCarlo, only : Temperature, dipol_deltaX, dipol_rejectFix, dipol_Nadapt, dipol_deltaM, &
                             dipol_deltaMmax, dipol_rejectRotFix, dipol_NadaptRot, dipol_Nwidom, &
                             dipol_structure_iStep, dipol_totalMoment_iStep
@@ -135,8 +135,8 @@ contains
         write(output_unit, *) this%name, " class construction"
     
         ! Particles
-        this%radius = dipol_radius
         this%rMin = dipol_rMin
+        this%radius = dipol_radius
         this%Ncol = dipol_Ncol
         allocate(this%positions(Ndim, this%Ncol))
         allocate(this%orientations(Ndim, this%Ncol))
