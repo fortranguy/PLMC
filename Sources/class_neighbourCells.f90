@@ -251,7 +251,6 @@ contains
     subroutine NeighbourCells_remove_col_from_cell(this, iCol, iCellOld)
     
         class(NeighbourCells), intent(inout) :: this
-    
         integer, intent(in) :: iCol, iCellOld
         
         type(Link), pointer :: current => null()
@@ -285,8 +284,7 @@ contains
     
     subroutine NeighbourCells_add_col_to_cell(this, iCol, iCellNew)
     
-        class(NeighbourCells), intent(inout) :: this
-    
+        class(NeighbourCells), intent(inout) :: this    
         integer, intent(in) :: iCol, iCellNew
     
         type(Link), pointer :: new => null()
