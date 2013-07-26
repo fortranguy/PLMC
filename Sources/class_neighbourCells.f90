@@ -263,7 +263,7 @@ contains
         
             next => current%next
         
-            if ( current%iCol == iCol ) then
+            if (current%iCol == iCol) then
             
                 previous%next => current%next
                 deallocate(current)
