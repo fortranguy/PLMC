@@ -53,7 +53,8 @@ implicit none
     integer, parameter :: Kmax3 = Kmax1
     integer, dimension(Ndim), parameter :: Kmax = [Kmax1, Kmax2, Kmax3]
     
-    real(DP), parameter :: dielectric = 1._DP ! !< \f[ espilon_r \f]
+    real(DP), parameter :: in_permittivity = 1._DP ! !< inside
+    real(DP), parameter :: out_permittivity = 1._DP ! !< outside
     
 end module data_box
 !***************************************************************************************************

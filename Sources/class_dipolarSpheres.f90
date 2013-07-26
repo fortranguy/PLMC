@@ -5,7 +5,7 @@ module class_dipolarSpheres
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
 use data_precisions, only : DP, consist_tiny
 use data_constants, only : PI
-use data_box, only : Ndim, Lsize, Kmax, Volume, dielectric
+use data_box, only : Ndim, Lsize, Kmax, Volume, out_permittivity
 use data_particles, only : dipol_radius, dipol_rMin, dipol_Ncol
 use data_monteCarlo, only : Temperature, dipol_deltaX, dipol_rejectFix, dipol_Nadapt, dipol_deltaM, &
                             dipol_deltaMmax, dipol_rejectRotFix, dipol_NadaptRot, dipol_Nwidom, &
@@ -1351,7 +1351,7 @@ contains
         deltaEpot_bound = dot_product(mNew, mNew) - dot_product(mOld, mOld) + &
                           2._DP * dot_product(mNew-mOld, this%totalMoment-mOld)
                           
-        deltaEpot_bound = 2._DP * PI / (2*dielectric + 1) / Volume * deltaEpot_bound
+        deltaEpot_bound = 2._DP * PI / (2*out_permittivity + 1) / Volume * deltaEpot_bound
     
     end function DipolarSpheres_deltaEpot_bound
     
@@ -1397,7 +1397,7 @@ contains
         class(DipolarSpheres), intent(in) :: this
         real(DP) :: Epot_bound
         
-        Epot_bound = 2._DP * PI / (2*dielectric + 1) / Volume * &
+        Epot_bound = 2._DP * PI / (2*out_permittivity + 1) / Volume * &
                      dot_product(this%totalMoment, this%totalMoment)
     
     end function DipolarSpheres_Epot_bound
