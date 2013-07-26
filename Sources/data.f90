@@ -69,16 +69,16 @@ use data_precisions, only : DP
 
 implicit none
 
-    real(DP), parameter :: dipol_radius = .5_DP
-    real(DP), parameter :: dipol_rMin = 2._DP * dipol_radius
+    real(DP), parameter :: dipol_rMin = 1._DP
+    real(DP), parameter :: dipol_radius = dipol_rMin / 2._DP   
     integer, parameter :: dipol_Ncol = 281
 
-    real(DP), parameter :: inter_radius = .5_DP
-    real(DP), parameter :: inter_rMin = 2._DP * inter_radius
+    real(DP), parameter :: inter_rMin = 1._DP
+    real(DP), parameter :: inter_radius = inter_rMin / 2._DP
     integer, parameter :: inter_Ncol = 0
     
-    real(DP), parameter :: hard_radius = .5_DP
-    real(DP), parameter :: hard_rMin = 2._DP * hard_radius
+    real(DP), parameter :: hard_rMin = 1._DP
+    real(DP), parameter :: hard_radius = hard_rMin / 2._DP
     integer, parameter :: hard_Ncol = 6750
     
     real(DP), parameter :: mix_delta = 0.2_DP
