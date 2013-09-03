@@ -41,10 +41,10 @@ private
         integer :: Nrotate
         
         ! Rejection
-        integer :: NrejectRot
-        real(DP) :: rejectRot
-        real(DP) :: rejectRotSum
-        real(DP) :: rejectRotAdapt
+        integer :: Nrotate_reject
+        real(DP) :: rotate_reject
+        real(DP) :: rotate_rejectSum
+        real(DP) :: rotate_rejectAdapt
         
     end type MoreObservables
     
@@ -72,10 +72,10 @@ contains
                 
                 this%Nrotate = 0
                 
-                this%NrejectRot = 0
-                this%rejectRot = 0._DP
-                this%rejectRotSum = 0._DP
-                this%rejectRotAdapt = 0._DP
+                this%Nrotate_reject = 0
+                this%rotate_reject = 0._DP
+                this%rotate_rejectSum = 0._DP
+                this%rotate_rejectAdapt = 0._DP
                 
         end select
         
@@ -110,7 +110,7 @@ contains
             class is (MoreObservables)
             
                 write(report_unit, *) "    Rotation rejection rate = ", &
-                                      this%rejectRotSum/real(Nstep, DP)
+                                      this%rotate_rejectSum/real(Nstep, DP)
             
         end select
     

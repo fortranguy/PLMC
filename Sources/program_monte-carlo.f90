@@ -160,8 +160,8 @@ implicit none
         type1_obs%reject = real(type1_obs%Nreject, DP)/real(type1_obs%Nmove, DP)
         type1_obs%Nreject = 0; type1_obs%Nmove = 0
         
-        type1_obs%rejectRot = real(type1_obs%NrejectRot, DP)/real(type1_obs%Nrotate, DP)
-        type1_obs%NrejectRot = 0; type1_obs%Nrotate = 0
+        type1_obs%rotate_reject = real(type1_obs%Nrotate_reject, DP)/real(type1_obs%Nrotate, DP)
+        type1_obs%Nrotate_reject = 0; type1_obs%Nrotate = 0
 
         type2_obs%reject = real(type2_obs%Nreject, DP)/real(type2_obs%Nmove, DP)
         type2_obs%Nreject = 0; type2_obs%Nmove = 0
@@ -180,12 +180,14 @@ implicit none
             
             ! Rotation adaptation
             if (mod(iStep, type1_spheres%getNadaptRot()) /= 0) then
-                type1_obs%rejectRotAdapt = type1_obs%rejectRotAdapt + type1_obs%rejectRot
+                type1_obs%rotate_rejectAdapt = type1_obs%rotate_rejectAdapt + type1_obs%rotate_reject
             else
-                type1_obs%rejectRotAdapt = type1_obs%rejectRotAdapt/real(type1_spheres%getNadaptRot()-1)
-                call type1_spheres%adaptDeltaM(type1_obs%rejectRotAdapt)
-                write(type1_units%deltaM, *) iStep, type1_spheres%getDeltaM(), type1_obs%rejectRotAdapt
-                type1_obs%rejectRotAdapt = 0._DP
+                type1_obs%rotate_rejectAdapt = type1_obs%rotate_rejectAdapt / &
+                                               real(type1_spheres%getNadaptRot()-1)
+                call type1_spheres%adaptDeltaM(type1_obs%rotate_rejectAdapt)
+                write(type1_units%deltaM, *) iStep, type1_spheres%getDeltaM(), &
+                                             type1_obs%rotate_rejectAdapt
+                type1_obs%rotate_rejectAdapt = 0._DP
             end if
 
             if (mod(iStep, type2_spheres%getNadapt()) /= 0) then
@@ -199,14 +201,14 @@ implicit none
             
             ! Observables writing
             write(type1_units%obsThermal, *) iStep, type1_obs%Epot, 0._DP, type1_obs%reject, &
-                                             type1_obs%rejectRot
+                                             type1_obs%rotate_reject
             write(type2_units%obsThermal, *) iStep, type2_obs%Epot, 0._DP, type2_obs%reject
             write(mix_obsThermal_unit, *) iStep, mix_Epot
             write(obsThermal_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
             
             if (iStep == Ntherm) then ! Definite thermalised displacements
                 call type1_spheres%definiteDeltaX(type1_obs%reject, type1_units%report)
-                call type1_spheres%definiteDeltaM(type1_obs%rejectRot, type1_units%report)
+                call type1_spheres%definiteDeltaM(type1_obs%rotate_reject, type1_units%report)
                 call type2_spheres%definiteDeltaX(type2_obs%reject, type2_units%report)
             end if       
         
@@ -220,7 +222,7 @@ implicit none
             type1_obs%EpotSum = type1_obs%EpotSum + type1_obs%Epot
             type1_obs%activSum = type1_obs%activSum + type1_obs%activ
             type1_obs%rejectSum = type1_obs%rejectSum + type1_obs%reject
-            type1_obs%rejectRotSum = type1_obs%rejectRotSum + type1_obs%rejectRot
+            type1_obs%rotate_rejectSum = type1_obs%rotate_rejectSum + type1_obs%rotate_reject
         
             type2_obs%EpotSum = type2_obs%EpotSum + type2_obs%Epot
             type2_obs%activSum = type2_obs%activSum + type2_obs%activ
@@ -229,7 +231,7 @@ implicit none
             mix_EpotSum = mix_EpotSum + mix_Epot
 
             write(type1_units%obsEquilib, *) iStep, type1_obs%Epot, type1_obs%activ, type1_obs%reject, &
-                                             type1_obs%rejectRot
+                                             type1_obs%rotate_reject
             write(type2_units%obsEquilib, *) iStep, type2_obs%Epot, type2_obs%activ, type2_obs%reject
             write(mix_obsEquilib_unit, *) iStep, mix_Epot
             write(obsEquilib_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot

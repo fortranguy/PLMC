@@ -8,7 +8,7 @@ use data_constants, only : PI
 use data_box, only : Ndim, Lsize, Kmax, Volume, out_permittivity
 use data_particles, only : dipol_rMin, dipol_radius, dipol_Ncol
 use data_monteCarlo, only : Temperature, dipol_deltaX, dipol_rejectFix, dipol_Nadapt, dipol_deltaM, &
-                            dipol_deltaMmax, dipol_rejectRotFix, dipol_NadaptRot, dipol_Nwidom, &
+                            dipol_deltaMmax, dipol_rotate_rejectFix, dipol_NadaptRot, dipol_Nwidom, &
                             dipol_structure_iStep, dipol_totalMoment_iStep
 use data_potential, only : dipol_rCut, dipol_dr, dipol_alpha
 use data_neighbourCells, only : NnearCell, dipol_cell_size
@@ -37,7 +37,7 @@ private
         real(DP) :: deltaM !< rotation
         real(DP) :: deltaMsave
         real(DP) :: deltaMmax
-        real(DP) :: rejectRotFix
+        real(DP) :: rotate_rejectFix
         integer :: NadaptRot
         integer :: structure_iStep
         integer :: totalMoment_iStep
@@ -155,7 +155,7 @@ contains
         this%deltaM = dipol_deltaM
         this%deltaMsave = this%deltaM
         this%deltaMmax = dipol_deltaMmax
-        this%rejectRotFix = dipol_rejectRotFix
+        this%rotate_rejectFix = dipol_rotate_rejectFix
         this%NadaptRot = dipol_NadaptRot
         
         this%Nwidom = dipol_Nwidom
@@ -264,7 +264,7 @@ contains
         real(DP), parameter :: less = 1._DP-eps_deltaM
 
         
-        if (reject < this%rejectRotFix - eps_reject) then
+        if (reject < this%rotate_rejectFix - eps_reject) then
         
             this%deltaM = this%deltaM * more
   
@@ -272,7 +272,7 @@ contains
                 this%deltaM = this%deltaMmax
             end if
             
-        else if (reject > this%rejectRotFix + eps_reject) then
+        else if (reject > this%rotate_rejectFix + eps_reject) then
         
             this%deltaM = this%deltaM * less
             
@@ -303,7 +303,7 @@ contains
         write(report_unit, *) "Rotation :"
         write(report_unit, *) "    deltaM = ", this%deltaM
         write(report_unit, *) "    rejection relative difference = ", &
-                                    abs(reject-this%rejectRotFix)/this%rejectRotFix
+                                    abs(reject-this%rotate_rejectFix)/this%rotate_rejectFix
     
     end subroutine DipolarSpheres_definiteDeltaM
     
@@ -1106,7 +1106,8 @@ contains
 
     !> Update moment -> update the ``structure factor''
     !>  \f[
-    !>      \Delta S(\vec{k}) = [\vec{k}\cdot(\vec{\mu}_l^\prime - \vec{\mu}_l)] e^{+i\vec{k}\cdot\vec{x}_l}
+    !>      \Delta S(\vec{k}) = [\vec{k}\cdot(\vec{\mu}_l^\prime - \vec{\mu}_l)] 
+    !>                          e^{+i\vec{k}\cdot\vec{x}_l}
     !>  \f]
     !>
 
@@ -1532,7 +1533,7 @@ contains
             obs%Epot = obs%Epot + deltaEpot
             
         else
-            obs%NrejectRot = obs%NrejectRot + 1
+            obs%Nrotate_reject = obs%Nrotate_reject + 1
         end if
     
     end subroutine DipolarSpheres_rotate
