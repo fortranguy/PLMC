@@ -35,7 +35,7 @@ private
         real(DP), dimension(Ndim) :: deltaX !< displacement
         real(DP), dimension(Ndim) :: deltaXsave
         real(DP) :: move_rejectFix
-        integer :: Nadapt
+        integer :: move_Nadapt
         integer :: Nwidom
 
         ! Potential
@@ -51,7 +51,7 @@ private
         procedure :: getName => Spheres_getName
         procedure :: getNcol => Spheres_getNcol
         procedure :: getRmin => Spheres_getRmin
-        procedure :: getNadapt => Spheres_getNadapt
+        procedure :: getMove_Nadapt => Spheres_getMove_Nadapt
         
         procedure :: printDensity => Spheres_printDensity
         
@@ -106,16 +106,16 @@ contains
     
     end function Spheres_getRmin
     
-    !> Accessor : Nadapt
+    !> Accessor : move_Nadapt
     
-    pure function Spheres_getNadapt(this) result(getNadapt)
+    pure function Spheres_getMove_Nadapt(this) result(getMove_Nadapt)
     
         class(Spheres), intent(in) :: this        
-        integer :: getNadapt
+        integer :: getMove_Nadapt
         
-        getNadapt = this%Nadapt
+        getMove_Nadapt = this%move_Nadapt
         
-    end function Spheres_getNadapt
+    end function Spheres_getMove_Nadapt
     
     !> Print density and compacity
     

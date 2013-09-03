@@ -169,11 +169,11 @@ implicit none
         MC_Regime : if (iStep <= Ntherm) then ! Thermalisation
             
             ! Displacements adaptation
-            if (mod(iStep, type1_spheres%getNadapt()) /= 0) then ! Rejections accumulation
+            if (mod(iStep, type1_spheres%getMove_Nadapt()) /= 0) then ! Rejections accumulation
                 type1_obs%move_rejectAdapt = type1_obs%move_rejectAdapt + type1_obs%move_reject
             else ! Average & adaptation
                 type1_obs%move_rejectAdapt = type1_obs%move_rejectAdapt / &
-                                             real(type1_spheres%getNadapt()-1)
+                                             real(type1_spheres%getMove_Nadapt()-1)
                 call type1_spheres%adaptDeltaX(type1_obs%move_rejectAdapt)
                 write(type1_units%deltaX, *) iStep, type1_spheres%getDeltaX(), &
                                              type1_obs%move_rejectAdapt
@@ -192,11 +192,11 @@ implicit none
                 type1_obs%rotate_rejectAdapt = 0._DP
             end if
 
-            if (mod(iStep, type2_spheres%getNadapt()) /= 0) then
+            if (mod(iStep, type2_spheres%getMove_Nadapt()) /= 0) then
                 type2_obs%move_rejectAdapt = type2_obs%move_rejectAdapt + type2_obs%move_reject
             else                
                 type2_obs%move_rejectAdapt = type2_obs%move_rejectAdapt / &
-                                             real(type2_spheres%getNadapt()-1)
+                                             real(type2_spheres%getMove_Nadapt()-1)
                 call type2_spheres%adaptDeltaX(type2_obs%move_rejectAdapt)
                 write(type2_units%deltaX, *) iStep, type2_spheres%getDeltaX(), &
                                              type2_obs%move_rejectAdapt

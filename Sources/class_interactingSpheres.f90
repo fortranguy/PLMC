@@ -7,7 +7,8 @@ use data_precisions, only : DP, consist_tiny
 use data_box, only : Ndim, Lsize
 use data_particles, only : inter_rMin, inter_radius, inter_Ncol
 use data_potential, only : inter_rCut, inter_dr, inter_epsilon, inter_alpha
-use data_monteCarlo, only : Temperature, inter_deltaX, inter_move_rejectFix, inter_Nadapt, inter_Nwidom
+use data_monteCarlo, only : Temperature, inter_deltaX, inter_move_rejectFix, &
+                            inter_move_Nadapt, inter_Nwidom
 use data_neighbourCells, only : NnearCell, inter_cell_size
 use data_distribution, only : inter_snap_factor
 use module_physics, only : dist_PBC
@@ -79,7 +80,7 @@ contains
         this%deltaX = inter_deltaX
         this%deltaXSave = this%deltaX
         this%move_rejectFix = inter_move_rejectFix
-        this%Nadapt = inter_Nadapt
+        this%move_Nadapt = inter_move_Nadapt
         this%Nwidom = inter_Nwidom
         
         ! Potential
@@ -128,7 +129,7 @@ contains
         
         write(report_unit ,*) "    Ncol = ", this%Ncol
         write(report_unit ,*) "    Nwidom = ", this%Nwidom
-        write(report_unit ,*) "    Nadapt = ", this%Nadapt
+        write(report_unit ,*) "    move_Nadapt = ", this%move_Nadapt
         
         write(report_unit, *) "    epsilon = ", this%epsilon
         write(report_unit, *) "    alpha = ", this%alpha

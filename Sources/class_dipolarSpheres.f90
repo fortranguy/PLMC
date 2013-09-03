@@ -7,7 +7,7 @@ use data_precisions, only : DP, consist_tiny
 use data_constants, only : PI
 use data_box, only : Ndim, Lsize, Kmax, Volume, out_permittivity
 use data_particles, only : dipol_rMin, dipol_radius, dipol_Ncol
-use data_monteCarlo, only : Temperature, dipol_deltaX, dipol_move_rejectFix, dipol_Nadapt, &
+use data_monteCarlo, only : Temperature, dipol_deltaX, dipol_move_rejectFix, dipol_move_Nadapt, &
                             dipol_deltaM, dipol_deltaMmax, dipol_rotate_rejectFix, &
                             dipol_rotate_Nadapt, dipol_Nwidom, dipol_structure_iStep, &
                             dipol_totalMoment_iStep
@@ -149,7 +149,7 @@ contains
         this%deltaX = dipol_deltaX
         this%deltaXsave = this%deltaX
         this%move_rejectFix = dipol_move_rejectFix
-        this%Nadapt = dipol_Nadapt
+        this%move_Nadapt = dipol_move_Nadapt
         this%structure_iStep = dipol_structure_iStep
         this%totalMoment_iStep = dipol_totalMoment_iStep
         
@@ -217,7 +217,7 @@ contains
         
         write(report_unit ,*) "    Ncol = ", this%Ncol
         write(report_unit ,*) "    Nwidom = ", this%Nwidom
-        write(report_unit ,*) "    Nadapt = ", this%Nadapt
+        write(report_unit ,*) "    move_Nadapt = ", this%move_Nadapt
 
         write(report_unit, *) "    alpha = ", this%alpha
         write(report_unit, *) "    rCut = ", this%rCut
@@ -319,7 +319,7 @@ contains
         
     end function DipolarSpheres_getDeltaM
     
-    !> Accessor : Nadapt
+    !> Accessor : move_Nadapt
     
     pure function DipolarSpheres_getRotate_Nadapt(this) result(getRotate_Nadapt)
     
