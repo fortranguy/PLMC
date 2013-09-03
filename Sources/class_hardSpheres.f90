@@ -7,7 +7,7 @@ use data_precisions, only : DP
 use data_box, only : Ndim, Lsize
 use data_particles, only : hard_rMin, hard_radius, hard_Ncol
 use data_potential, only : hard_rCut
-use data_monteCarlo, only : Temperature, hard_deltaX, hard_rejectFix, hard_Nadapt, hard_Nwidom
+use data_monteCarlo, only : Temperature, hard_deltaX, hard_move_rejectFix, hard_Nadapt, hard_Nwidom
 use data_neighbourCells, only : NnearCell, hard_cell_size
 use data_distribution, only : hard_snap_factor
 use module_physics, only : dist_PBC
@@ -71,7 +71,7 @@ contains
         ! Monte-Carlo
         this%deltaX = hard_deltaX
         this%deltaXSave = this%deltaX
-        this%rejectFix = hard_rejectFix
+        this%move_rejectFix = hard_move_rejectFix
         this%Nadapt = hard_Nadapt
         this%Nwidom = hard_Nwidom
                 
@@ -240,15 +240,15 @@ contains
                     end if
                     
                 else
-                    same_obs%Nreject = same_obs%Nreject + 1
+                    same_obs%Nmove_reject = same_obs%Nmove_reject + 1
                 end if
          
             else
-                same_obs%Nreject = same_obs%Nreject + 1
+                same_obs%Nmove_reject = same_obs%Nmove_reject + 1
             end if            
             
         else        
-            same_obs%Nreject = same_obs%Nreject + 1
+            same_obs%Nmove_reject = same_obs%Nmove_reject + 1
         end if
     
     end subroutine HardSpheres_move

@@ -7,9 +7,9 @@ use data_precisions, only : DP, consist_tiny
 use data_constants, only : PI
 use data_box, only : Ndim, Lsize, Kmax, Volume, out_permittivity
 use data_particles, only : dipol_rMin, dipol_radius, dipol_Ncol
-use data_monteCarlo, only : Temperature, dipol_deltaX, dipol_rejectFix, dipol_Nadapt, dipol_deltaM, &
-                            dipol_deltaMmax, dipol_rotate_rejectFix, dipol_NadaptRot, dipol_Nwidom, &
-                            dipol_structure_iStep, dipol_totalMoment_iStep
+use data_monteCarlo, only : Temperature, dipol_deltaX, dipol_move_rejectFix, dipol_Nadapt, &
+                            dipol_deltaM, dipol_deltaMmax, dipol_rotate_rejectFix, dipol_NadaptRot, &
+                            dipol_Nwidom, dipol_structure_iStep, dipol_totalMoment_iStep
 use data_potential, only : dipol_rCut, dipol_dr, dipol_alpha
 use data_neighbourCells, only : NnearCell, dipol_cell_size
 use data_distribution, only : dipol_snap_factor
@@ -147,7 +147,7 @@ contains
         ! Monte-Carlo
         this%deltaX = dipol_deltaX
         this%deltaXsave = this%deltaX
-        this%rejectFix = dipol_rejectFix
+        this%move_rejectFix = dipol_move_rejectFix
         this%Nadapt = dipol_Nadapt
         this%structure_iStep = dipol_structure_iStep
         this%totalMoment_iStep = dipol_totalMoment_iStep
@@ -1480,15 +1480,15 @@ contains
                     end if
                     
                 else
-                    same_obs%Nreject = same_obs%Nreject + 1
+                    same_obs%Nmove_reject = same_obs%Nmove_reject + 1
                 end if
          
             else
-                same_obs%Nreject = same_obs%Nreject + 1
+                same_obs%Nmove_reject = same_obs%Nmove_reject + 1
             end if            
             
         else        
-            same_obs%Nreject = same_obs%Nreject + 1
+            same_obs%Nmove_reject = same_obs%Nmove_reject + 1
         end if
     
     end subroutine DipolarSpheres_move

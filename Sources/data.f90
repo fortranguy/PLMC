@@ -110,7 +110,7 @@ implicit none
     
     ! move
     real(DP), dimension(Ndim), parameter :: dipol_deltaX = 0.3_DP
-    real(DP), parameter :: dipol_rejectFix = 0.5_DP
+    real(DP), parameter :: dipol_move_rejectFix = 0.5_DP
     integer, parameter :: dipol_Nadapt = Ntherm/8
     ! rotate
     real(DP), parameter :: dipol_deltaM = 30._DP
@@ -124,12 +124,12 @@ implicit none
     integer, parameter :: dipol_totalMoment_iStep = 2**13/decorrelFactor
     
     real(DP), dimension(Ndim), parameter :: inter_deltaX = 1._DP
-    real(DP), parameter :: inter_rejectFix = 0.5_DP
+    real(DP), parameter :: inter_move_rejectFix = 0.5_DP
     integer, parameter :: inter_Nadapt = Ntherm/8
     integer, parameter :: inter_Nwidom = inter_Ncol
     
     real(DP), dimension(Ndim), parameter :: hard_deltaX = 0.5_DP
-    real(DP), parameter :: hard_rejectFix = 0.5_DP
+    real(DP), parameter :: hard_move_rejectFix = 0.5_DP
     integer, parameter :: hard_Nadapt = Ntherm/8
     integer, parameter :: hard_Nwidom = 500 ! hard_Ncol
 

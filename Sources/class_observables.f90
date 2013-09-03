@@ -14,11 +14,11 @@ private
         ! Move
         integer :: Nmove
     
-        ! Rejection
-        integer :: Nreject
-        real(DP) :: reject
-        real(DP) :: rejectSum
-        real(DP) :: rejectAdapt
+        ! Move Rejection
+        integer :: Nmove_reject
+        real(DP) :: move_reject
+        real(DP) :: move_rejectSum
+        real(DP) :: move_rejectAdapt
         
         ! Potential energy
         real(DP) :: Epot
@@ -40,7 +40,7 @@ private
         ! Rotate
         integer :: Nrotate
         
-        ! Rejection
+        ! Rotate rejection
         integer :: Nrotate_reject
         real(DP) :: rotate_reject
         real(DP) :: rotate_rejectSum
@@ -56,10 +56,10 @@ contains
         
         this%Nmove = 0
         
-        this%Nreject = 0
-        this%reject = 0._DP
-        this%rejectSum = 0._DP
-        this%rejectAdapt = 0._DP
+        this%Nmove_reject = 0
+        this%move_reject = 0._DP
+        this%move_rejectSum = 0._DP
+        this%move_rejectAdapt = 0._DP
         
         this%EpotSum = 0._DP        
         this%activSum = 0._DP
@@ -101,7 +101,7 @@ contains
         write(report_unit, *) "    average excess chemical potential = ", potChiEx           
         write(report_unit, *) "    potChi.avg = ", potChiId + potChiEx
         
-        write(report_unit, *) "    Rejection rate = ", this%rejectSum/real(Nstep, DP)
+        write(report_unit, *) "    move_rejection rate = ", this%move_rejectSum/real(Nstep, DP)
         
         select type (this)
         
@@ -109,7 +109,7 @@ contains
             
             class is (MoreObservables)
             
-                write(report_unit, *) "    Rotation rejection rate = ", &
+                write(report_unit, *) "    Rotation move_rejection rate = ", &
                                       this%rotate_rejectSum/real(Nstep, DP)
             
         end select

@@ -157,25 +157,27 @@ implicit none
         end do MC_Change
         
         ! Rejections rates updates
-        type1_obs%reject = real(type1_obs%Nreject, DP)/real(type1_obs%Nmove, DP)
-        type1_obs%Nreject = 0; type1_obs%Nmove = 0
+        type1_obs%move_reject = real(type1_obs%Nmove_reject, DP)/real(type1_obs%Nmove, DP)
+        type1_obs%Nmove_reject = 0; type1_obs%Nmove = 0
         
         type1_obs%rotate_reject = real(type1_obs%Nrotate_reject, DP)/real(type1_obs%Nrotate, DP)
         type1_obs%Nrotate_reject = 0; type1_obs%Nrotate = 0
 
-        type2_obs%reject = real(type2_obs%Nreject, DP)/real(type2_obs%Nmove, DP)
-        type2_obs%Nreject = 0; type2_obs%Nmove = 0
+        type2_obs%move_reject = real(type2_obs%Nmove_reject, DP)/real(type2_obs%Nmove, DP)
+        type2_obs%Nmove_reject = 0; type2_obs%Nmove = 0
         
         MC_Regime : if (iStep <= Ntherm) then ! Thermalisation
             
             ! Displacements adaptation
             if (mod(iStep, type1_spheres%getNadapt()) /= 0) then ! Rejections accumulation
-                type1_obs%rejectAdapt = type1_obs%rejectAdapt + type1_obs%reject
+                type1_obs%move_rejectAdapt = type1_obs%move_rejectAdapt + type1_obs%move_reject
             else ! Average & adaptation
-                type1_obs%rejectAdapt = type1_obs%rejectAdapt/real(type1_spheres%getNadapt()-1)
-                call type1_spheres%adaptDeltaX(type1_obs%rejectAdapt)
-                write(type1_units%deltaX, *) iStep, type1_spheres%getDeltaX(), type1_obs%rejectAdapt
-                type1_obs%rejectAdapt = 0._DP
+                type1_obs%move_rejectAdapt = type1_obs%move_rejectAdapt / &
+                                             real(type1_spheres%getNadapt()-1)
+                call type1_spheres%adaptDeltaX(type1_obs%move_rejectAdapt)
+                write(type1_units%deltaX, *) iStep, type1_spheres%getDeltaX(), &
+                                             type1_obs%move_rejectAdapt
+                type1_obs%move_rejectAdapt = 0._DP
             end if
             
             ! Rotation adaptation
@@ -191,25 +193,27 @@ implicit none
             end if
 
             if (mod(iStep, type2_spheres%getNadapt()) /= 0) then
-                type2_obs%rejectAdapt = type2_obs%rejectAdapt + type2_obs%reject
+                type2_obs%move_rejectAdapt = type2_obs%move_rejectAdapt + type2_obs%move_reject
             else                
-                type2_obs%rejectAdapt = type2_obs%rejectAdapt/real(type2_spheres%getNadapt()-1)
-                call type2_spheres%adaptDeltaX(type2_obs%rejectAdapt)
-                write(type2_units%deltaX, *) iStep, type2_spheres%getDeltaX(), type2_obs%rejectAdapt
-                type2_obs%rejectAdapt = 0._DP
+                type2_obs%move_rejectAdapt = type2_obs%move_rejectAdapt / &
+                                             real(type2_spheres%getNadapt()-1)
+                call type2_spheres%adaptDeltaX(type2_obs%move_rejectAdapt)
+                write(type2_units%deltaX, *) iStep, type2_spheres%getDeltaX(), &
+                                             type2_obs%move_rejectAdapt
+                type2_obs%move_rejectAdapt = 0._DP
             end if
             
             ! Observables writing
-            write(type1_units%obsThermal, *) iStep, type1_obs%Epot, 0._DP, type1_obs%reject, &
+            write(type1_units%obsThermal, *) iStep, type1_obs%Epot, 0._DP, type1_obs%move_reject, &
                                              type1_obs%rotate_reject
-            write(type2_units%obsThermal, *) iStep, type2_obs%Epot, 0._DP, type2_obs%reject
+            write(type2_units%obsThermal, *) iStep, type2_obs%Epot, 0._DP, type2_obs%move_reject
             write(mix_obsThermal_unit, *) iStep, mix_Epot
             write(obsThermal_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
             
             if (iStep == Ntherm) then ! Definite thermalised displacements
-                call type1_spheres%definiteDeltaX(type1_obs%reject, type1_units%report)
+                call type1_spheres%definiteDeltaX(type1_obs%move_reject, type1_units%report)
                 call type1_spheres%definiteDeltaM(type1_obs%rotate_reject, type1_units%report)
-                call type2_spheres%definiteDeltaX(type2_obs%reject, type2_units%report)
+                call type2_spheres%definiteDeltaX(type2_obs%move_reject, type2_units%report)
             end if       
         
         else MC_Regime ! Thermalisation over -> Equilibrium
@@ -221,18 +225,19 @@ implicit none
             ! Observables accumulations
             type1_obs%EpotSum = type1_obs%EpotSum + type1_obs%Epot
             type1_obs%activSum = type1_obs%activSum + type1_obs%activ
-            type1_obs%rejectSum = type1_obs%rejectSum + type1_obs%reject
+            type1_obs%move_rejectSum = type1_obs%move_rejectSum + type1_obs%move_reject
             type1_obs%rotate_rejectSum = type1_obs%rotate_rejectSum + type1_obs%rotate_reject
         
             type2_obs%EpotSum = type2_obs%EpotSum + type2_obs%Epot
             type2_obs%activSum = type2_obs%activSum + type2_obs%activ
-            type2_obs%rejectSum = type2_obs%rejectSum + type2_obs%reject
+            type2_obs%move_rejectSum = type2_obs%move_rejectSum + type2_obs%move_reject
                 
             mix_EpotSum = mix_EpotSum + mix_Epot
 
-            write(type1_units%obsEquilib, *) iStep, type1_obs%Epot, type1_obs%activ, type1_obs%reject, &
-                                             type1_obs%rotate_reject
-            write(type2_units%obsEquilib, *) iStep, type2_obs%Epot, type2_obs%activ, type2_obs%reject
+            write(type1_units%obsEquilib, *) iStep, type1_obs%Epot, type1_obs%activ, &
+                                             type1_obs%move_reject, type1_obs%rotate_reject
+            write(type2_units%obsEquilib, *) iStep, type2_obs%Epot, type2_obs%activ, &
+                                             type2_obs%move_reject
             write(mix_obsEquilib_unit, *) iStep, mix_Epot
             write(obsEquilib_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
 

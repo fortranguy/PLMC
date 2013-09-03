@@ -34,7 +34,7 @@ private
         ! Monte-Carlo
         real(DP), dimension(Ndim) :: deltaX !< displacement
         real(DP), dimension(Ndim) :: deltaXsave
-        real(DP) :: rejectFix
+        real(DP) :: move_rejectFix
         integer :: Nadapt
         integer :: Nwidom
 
@@ -208,7 +208,7 @@ contains
         real(DP), parameter :: more = 1._DP+eps_deltaX
         real(DP), parameter :: less = 1._DP-eps_deltaX
         
-        if (reject < this%rejectFix - eps_reject) then
+        if (reject < this%move_rejectFix - eps_reject) then
         
             this%deltaX(:) = this%deltaX(:) * more
             
@@ -216,7 +216,7 @@ contains
                 this%deltaX(:) = Lsize(:)
             end if
             
-        else if (reject > this%rejectFix + eps_reject) then
+        else if (reject > this%move_rejectFix + eps_reject) then
         
             this%deltaX(:) = this%deltaX(:) * less
             
@@ -247,7 +247,7 @@ contains
         write(report_unit, *) "Displacement :"
         write(report_unit, *) "    deltaX(:) = ", this%deltaX(:)
         write(report_unit, *) "    rejection relative difference = ", &
-                                    abs(reject-this%rejectFix)/this%rejectFix
+                                    abs(reject-this%move_rejectFix)/this%move_rejectFix
     
     end subroutine Spheres_definiteDeltaX
     
