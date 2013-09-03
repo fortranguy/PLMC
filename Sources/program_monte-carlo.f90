@@ -247,7 +247,7 @@ implicit none
             call type1_spheres%Epot_reci_structure_reInit(iStep, type1_units%structure_modulus)
         end if
         
-        ! Boundary conditions : reinitize the total moment to prevent it from drifting.
+        ! Boundary conditions : reinitialize the total moment to prevent it from drifting.
         if (modulo(iStep, type1_spheres%getTotalMoment_iStep()) == 0) then
             call type1_spheres%Epot_bound_totalMoment_reInit(iStep, type1_units%totalMoment_modulus)
         end if
