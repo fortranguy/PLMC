@@ -181,11 +181,11 @@ implicit none
             end if
             
             ! Rotation adaptation
-            if (mod(iStep, type1_spheres%getNadaptRot()) /= 0) then
+            if (mod(iStep, type1_spheres%getRotate_Nadapt()) /= 0) then
                 type1_obs%rotate_rejectAdapt = type1_obs%rotate_rejectAdapt + type1_obs%rotate_reject
             else
                 type1_obs%rotate_rejectAdapt = type1_obs%rotate_rejectAdapt / &
-                                               real(type1_spheres%getNadaptRot()-1)
+                                               real(type1_spheres%getRotate_Nadapt()-1)
                 call type1_spheres%adaptDeltaM(type1_obs%rotate_rejectAdapt)
                 write(type1_units%deltaM, *) iStep, type1_spheres%getDeltaM(), &
                                              type1_obs%rotate_rejectAdapt

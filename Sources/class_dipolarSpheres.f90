@@ -8,8 +8,9 @@ use data_constants, only : PI
 use data_box, only : Ndim, Lsize, Kmax, Volume, out_permittivity
 use data_particles, only : dipol_rMin, dipol_radius, dipol_Ncol
 use data_monteCarlo, only : Temperature, dipol_deltaX, dipol_move_rejectFix, dipol_Nadapt, &
-                            dipol_deltaM, dipol_deltaMmax, dipol_rotate_rejectFix, dipol_NadaptRot, &
-                            dipol_Nwidom, dipol_structure_iStep, dipol_totalMoment_iStep
+                            dipol_deltaM, dipol_deltaMmax, dipol_rotate_rejectFix, &
+                            dipol_rotate_Nadapt, dipol_Nwidom, dipol_structure_iStep, &
+                            dipol_totalMoment_iStep
 use data_potential, only : dipol_rCut, dipol_dr, dipol_alpha
 use data_neighbourCells, only : NnearCell, dipol_cell_size
 use data_distribution, only : dipol_snap_factor
@@ -38,7 +39,7 @@ private
         real(DP) :: deltaMsave
         real(DP) :: deltaMmax
         real(DP) :: rotate_rejectFix
-        integer :: NadaptRot
+        integer :: rotate_Nadapt
         integer :: structure_iStep
         integer :: totalMoment_iStep
 
@@ -70,7 +71,7 @@ private
         procedure :: adaptDeltaM => DipolarSpheres_adaptDeltaM
         procedure :: definiteDeltaM => DipolarSpheres_definiteDeltaM
         procedure :: getDeltaM => DipolarSpheres_getDeltaM
-        procedure :: getNadaptRot => DipolarSpheres_getNadaptRot
+        procedure :: getRotate_Nadapt => DipolarSpheres_getRotate_Nadapt
         
         procedure :: getStructure_iStep => DipolarSpheres_getStructure_iStep
         procedure :: getTotalMoment_iStep => DipolarSpheres_getTotalMoment_iStep
@@ -156,7 +157,7 @@ contains
         this%deltaMsave = this%deltaM
         this%deltaMmax = dipol_deltaMmax
         this%rotate_rejectFix = dipol_rotate_rejectFix
-        this%NadaptRot = dipol_NadaptRot
+        this%rotate_Nadapt = dipol_rotate_Nadapt
         
         this%Nwidom = dipol_Nwidom
         
@@ -320,14 +321,14 @@ contains
     
     !> Accessor : Nadapt
     
-    pure function DipolarSpheres_getNadaptRot(this) result(getNadaptRot)
+    pure function DipolarSpheres_getRotate_Nadapt(this) result(getRotate_Nadapt)
     
         class(DipolarSpheres), intent(in) :: this        
-        integer :: getNadaptRot
+        integer :: getRotate_Nadapt
         
-        getNadaptRot = this%NadaptRot
+        getRotate_Nadapt = this%rotate_Nadapt
         
-    end function DipolarSpheres_getNadaptRot
+    end function DipolarSpheres_getRotate_Nadapt
     
     !> Accessor : structure_iStep
     
