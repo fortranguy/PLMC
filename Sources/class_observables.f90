@@ -14,8 +14,8 @@ private
         ! Move
         integer :: Nmove
     
-        ! Move Rejection
-        integer :: Nmove_reject
+        ! Move rejection
+        integer :: move_Nreject
         real(DP) :: move_reject
         real(DP) :: move_rejectSum
         real(DP) :: move_rejectAdapt
@@ -41,7 +41,7 @@ private
         integer :: Nrotate
         
         ! Rotate rejection
-        integer :: Nrotate_reject
+        integer :: rotate_Nreject
         real(DP) :: rotate_reject
         real(DP) :: rotate_rejectSum
         real(DP) :: rotate_rejectAdapt
@@ -56,7 +56,7 @@ contains
         
         this%Nmove = 0
         
-        this%Nmove_reject = 0
+        this%move_Nreject = 0
         this%move_reject = 0._DP
         this%move_rejectSum = 0._DP
         this%move_rejectAdapt = 0._DP
@@ -72,7 +72,7 @@ contains
                 
                 this%Nrotate = 0
                 
-                this%Nrotate_reject = 0
+                this%rotate_Nreject = 0
                 this%rotate_reject = 0._DP
                 this%rotate_rejectSum = 0._DP
                 this%rotate_rejectAdapt = 0._DP

@@ -1480,15 +1480,15 @@ contains
                     end if
                     
                 else
-                    same_obs%Nmove_reject = same_obs%Nmove_reject + 1
+                    same_obs%move_Nreject = same_obs%move_Nreject + 1
                 end if
          
             else
-                same_obs%Nmove_reject = same_obs%Nmove_reject + 1
+                same_obs%move_Nreject = same_obs%move_Nreject + 1
             end if            
             
         else        
-            same_obs%Nmove_reject = same_obs%Nmove_reject + 1
+            same_obs%move_Nreject = same_obs%move_Nreject + 1
         end if
     
     end subroutine DipolarSpheres_move
@@ -1533,7 +1533,7 @@ contains
             obs%Epot = obs%Epot + deltaEpot
             
         else
-            obs%Nrotate_reject = obs%Nrotate_reject + 1
+            obs%rotate_Nreject = obs%rotate_Nreject + 1
         end if
     
     end subroutine DipolarSpheres_rotate

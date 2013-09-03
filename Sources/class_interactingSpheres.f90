@@ -316,15 +316,15 @@ contains
                     end if
                     
                 else
-                    same_obs%Nmove_reject = same_obs%Nmove_reject + 1
+                    same_obs%move_Nreject = same_obs%move_Nreject + 1
                 end if
 
             else
-                same_obs%Nmove_reject = same_obs%Nmove_reject + 1
+                same_obs%move_Nreject = same_obs%move_Nreject + 1
             end if
 
         else
-            same_obs%Nmove_reject = same_obs%Nmove_reject + 1
+            same_obs%move_Nreject = same_obs%move_Nreject + 1
         end if
     
     end subroutine InteractingSpheres_move
