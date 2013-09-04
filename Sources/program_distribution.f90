@@ -34,15 +34,15 @@ use data_particles
 use data_monteCarlo
 use data_potential
 use data_distribution
-use module_distrib
 use module_physics
+use module_distrib
 use class_mixingPotential
-use class_interactingSpheres
+use class_hardSpheres
 !$ use omp_lib
 
 implicit none
 
-    real(DP), parameter :: densite = real(inter_Ncol, DP) / Volume
+    real(DP), parameter :: densite = real(hard_Ncol, DP) / Volume
     integer, dimension(:), allocatable :: distrib
     integer, parameter :: snaps_unit = 10, distrib_unit = 11, energ_unit = 12
 
@@ -56,9 +56,9 @@ implicit none
     real(DP) :: numerat, denomin
     real(DP), dimension(:), allocatable :: fct_dist
     real(DP) :: energSum
-    type(InteractingSpheres) :: inter
+    type(HardSpheres) :: hard
     type(MixingPotential) :: mix
-    real(DP), dimension(Ndim, inter_Ncol) :: X
+    real(DP), dimension(Ndim, hard_Ncol) :: X
 
     !$ integer :: nb_taches
     real(DP) :: tIni, tFin
@@ -67,7 +67,7 @@ implicit none
     if (.not.snap) stop "Snap désactivé."
 
     call mix%construct()
-    call inter%construct(mix%getCell_size(), mix%getRcut())
+    call hard%construct(mix%getCell_size(), mix%getRcut())
 
     rMax = norm2(LsizeMi)
     Ndist = int(rMax/deltaDist)
@@ -87,15 +87,15 @@ implicit none
 
         ! Lecture :
         !$omp critical
-        do iCol = 1, inter_Ncol
+        do iCol = 1, hard_Ncol
             read(snaps_unit, *) X(:, iCol)
         end do
         !$omp end critical
 
         ! Traitement
             
-        do iCol = 1, inter_Ncol
-            do jCol = iCol + 1, inter_Ncol
+        do iCol = 1, hard_Ncol
+            do jCol = iCol + 1, hard_Ncol
 
                 r_ij = dist_PBC(X(:, iCol), X(:, jCol))      
                 iDist =  int(r_ij/deltaDist)
@@ -130,11 +130,11 @@ implicit none
         
             r = (real(iDist, DP) + 0.5_DP) * deltaDist
             numerat = real(distrib(iDist), DP) / real(Nstep, DP)
-            denomin = real(inter_Ncol, DP) * (sphereVol(iDist+1)-sphereVol(iDist))
+            denomin = real(hard_Ncol, DP) * (sphereVol(iDist+1)-sphereVol(iDist))
             fct_dist(iDist) = 2._DP * numerat / denomin / densite
             write(distrib_unit, *) r, fct_dist(iDist)
             
-            if (r>=inter_rMin .and. r<=inter_rCut) then
+            if (r>=hard_rMin .and. r<=hard_rCut) then
                 if (iDistMin == 0) then
                     iDistMin = iDist
                 end if
@@ -150,7 +150,7 @@ implicit none
 
     do iDist = iDistMin, iDistMax
         r = (real(iDist, DP) + 0.5_DP) * deltaDist
-        energSum = energSum + inter%Epot_pair(r) * fct_dist(iDist) * 4._DP*PI*r**2
+        !energSum = energSum + hard%Epot_pair(r) * fct_dist(iDist) * 4._DP*PI*r**2
     end do
 
     open(unit=energ_unit, file="epp_dist.out", action="write")
@@ -160,7 +160,7 @@ implicit none
     deallocate(fct_dist)
     deallocate(distrib)
 
-    call inter%destroy()
+    call hard%destroy()
     call mix%destroy()
 
 end program distribution
