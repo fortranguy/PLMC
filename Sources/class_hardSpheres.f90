@@ -137,12 +137,17 @@ contains
     
     !> Pair potential : dummy
     
-    pure function HardSpheres_Epot_pair(this) result(Epot_pair)
+    pure function HardSpheres_Epot_pair(this, r) result(Epot_pair)
     
-        class(HardSpheres), intent(in) :: this        
+        class(HardSpheres), intent(in) :: this 
+        real(DP), intent(in) :: r       
         real(DP) :: Epot_pair
+        
+        if (r >= this%rMin) then
     
-        Epot_pair = this%Epot
+            Epot_pair = this%Epot
+            
+        end if
         
     end function HardSpheres_Epot_pair
     
