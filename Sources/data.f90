@@ -72,10 +72,6 @@ implicit none
     real(DP), parameter :: dipol_rMin = 1._DP
     real(DP), parameter :: dipol_radius = dipol_rMin / 2._DP   
     integer, parameter :: dipol_Ncol = 281
-
-    real(DP), parameter :: inter_rMin = 1._DP
-    real(DP), parameter :: inter_radius = inter_rMin / 2._DP
-    integer, parameter :: inter_Ncol = 0
     
     real(DP), parameter :: hard_rMin = 1._DP
     real(DP), parameter :: hard_radius = hard_rMin / 2._DP
@@ -85,6 +81,12 @@ implicit none
     real(DP), parameter :: mix_rMin = dipol_radius + hard_radius + mix_delta
     
     integer, parameter :: Ncol = dipol_Ncol + hard_Ncol
+    
+    ! out ---------------------------------------------------------------------
+    real(DP), parameter :: inter_rMin = 1._DP
+    real(DP), parameter :: inter_radius = inter_rMin / 2._DP
+    integer, parameter :: inter_Ncol = 0    
+    ! -------------------------------------------------------------------------
     
 end module data_particles
 !***************************************************************************************************
@@ -97,7 +99,7 @@ module data_monteCarlo
 
 use data_precisions, only : DP
 use data_box, only : Ndim
-use data_particles, only : Ncol, dipol_Ncol, inter_Ncol!, hard_Ncol
+use data_particles, only : Ncol, dipol_Ncol, hard_Ncol, inter_Ncol
 
 implicit none
 
@@ -123,15 +125,17 @@ implicit none
     integer, parameter :: dipol_structure_iStep = 2**13/decorrelFactor
     integer, parameter :: dipol_totalMoment_iStep = 2**13/decorrelFactor
     
-    real(DP), dimension(Ndim), parameter :: inter_deltaX = 1._DP
-    real(DP), parameter :: inter_move_rejectFix = 0.5_DP
-    integer, parameter :: inter_move_Nadapt = Ntherm/8
-    integer, parameter :: inter_Nwidom = inter_Ncol
-    
     real(DP), dimension(Ndim), parameter :: hard_deltaX = 0.5_DP
     real(DP), parameter :: hard_move_rejectFix = 0.5_DP
     integer, parameter :: hard_move_Nadapt = Ntherm/8
     integer, parameter :: hard_Nwidom = 500 ! hard_Ncol
+    
+    ! out ---------------------------------------------------------------------
+    real(DP), dimension(Ndim), parameter :: inter_deltaX = 1._DP
+    real(DP), parameter :: inter_move_rejectFix = 0.5_DP
+    integer, parameter :: inter_move_Nadapt = Ntherm/8
+    integer, parameter :: inter_Nwidom = inter_Ncol    
+    ! -------------------------------------------------------------------------
 
 end module data_monteCarlo
 !***************************************************************************************************
@@ -141,9 +145,6 @@ end module data_monteCarlo
 !> declaration of the potential energy parameters
 
 !> The dipolar spheres interaction uses the Ewald sums methods.
-
-!> The interactive spheres (inter) potential is composed of 3 parts :
-!> hard sphere (HS) + Yukawa + cut.
 
 !> The mixing potential (mix) is also composed of 3 parts :
 !> hard sphere (HS) + Yukawa + cut.
@@ -159,11 +160,6 @@ implicit none
     real(DP), parameter :: dipol_rCut = Lsize1/2._DP*sqrt(3._DP)
     real(DP), parameter :: dipol_dr = 5.E-5_DP
     real(DP), parameter :: dipol_alpha = 7._DP/Lsize1
-
-    real(DP), parameter :: inter_rCut = 4._DP
-    real(DP), parameter :: inter_dr = 5.E-5_DP
-    real(DP), parameter :: inter_epsilon = 1._DP
-    real(DP), parameter :: inter_alpha = 5._DP
     
     real(DP), parameter :: hard_rCut = hard_rMin
     
@@ -171,6 +167,16 @@ implicit none
     real(DP), parameter :: mix_dr = mix_rCut/2._DP
     real(DP), parameter :: mix_epsilon = 0._DP
     real(DP), parameter :: mix_alpha = 40._DP
+    
+    ! out ---------------------------------------------------------------------
+    !> The interactive spheres (inter) potential is composed of 3 parts :
+    !> hard sphere (HS) + Yukawa + cut.
+    
+    real(DP), parameter :: inter_rCut = 4._DP
+    real(DP), parameter :: inter_dr = 5.E-5_DP
+    real(DP), parameter :: inter_epsilon = 1._DP
+    real(DP), parameter :: inter_alpha = 5._DP    
+    ! -------------------------------------------------------------------------
         
 end module data_potential
 !***************************************************************************************************
@@ -184,7 +190,7 @@ module data_neighbourCells
 use data_precisions, only : DP
 use data_box, only : Ndim
 use data_particles, only : dipol_rMin
-use data_potential, only : inter_rCut, hard_rCut, mix_rCut
+use data_potential, only : hard_rCut, mix_rCut, inter_rCut
 
 implicit none
 
@@ -193,10 +199,13 @@ implicit none
     integer, parameter :: NnearCell = 3**3 !< Total number of nearest neighbour cells,
                                            !< including itself
     real(DP), dimension(Ndim), parameter :: dipol_cell_size = dipol_rMin
-    real(DP), dimension(Ndim), parameter :: inter_cell_size = inter_rCut
     real(DP), dimension(Ndim), parameter :: hard_cell_size = hard_rCut
     
     real(DP), dimension(Ndim), parameter :: mix_cell_size = mix_rCut
+    
+    ! out ---------------------------------------------------------------------
+    real(DP), dimension(Ndim), parameter :: inter_cell_size = inter_rCut
+    ! -------------------------------------------------------------------------
 
 end module data_neighbourCells
 !***************************************************************************************************
@@ -215,8 +224,11 @@ implicit none
     real(DP), parameter :: deltaDist = 0.01_DP
     
     integer, parameter :: dipol_snap_factor = 1
-    integer, parameter :: inter_snap_factor = 1
     integer, parameter :: hard_snap_factor = 8
+    
+    ! out ---------------------------------------------------------------------
+    integer, parameter :: inter_snap_factor = 1
+    ! -------------------------------------------------------------------------
 
 end module data_distribution
 !***************************************************************************************************
