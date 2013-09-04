@@ -39,6 +39,7 @@ private
               
         !> Potential energy
         procedure :: Epot_print => HardSpheres_Epot_print
+        procedure :: Epot_pair => HardSpheres_Epot_pair
         procedure, private :: Epot_neighCells => HardSpheres_Epot_neighCells
         procedure :: Epot_conf => HardSpheres_Epot_conf
         procedure :: consistTest => HardSpheres_consistTest
@@ -133,6 +134,17 @@ contains
         write(Epot_unit, *) this%rCut, this%Epot
     
     end subroutine HardSpheres_Epot_print
+    
+    !> Pair potential : dummy
+    
+    pure function HardSpheres_Epot_pair(this) result(Epot_pair)
+    
+        class(HardSpheres), intent(in) :: this        
+        real(DP) :: Epot_pair
+    
+        Epot_pair = this%Epot
+        
+    end function HardSpheres_Epot_pair
     
     subroutine HardSpheres_Epot_neighCells(this, iCol, xCol, iTotalCell, overlap)
         
