@@ -5,7 +5,7 @@ program monteCarlo_canonical_bulk
 use, intrinsic :: iso_fortran_env, only : output_unit
 use data_precisions, only : DP
 use data_particles, only : Ncol
-use data_monteCarlo, only : Nstep, Ntherm, Nmove, Nrotate
+use data_monteCarlo, only : Nstep, Nthermal, Nmove, Nrotate
 use data_distribution, only : snap
 use class_observables
 use class_mixingPotential
@@ -120,7 +120,7 @@ implicit none
     write(output_unit, *) "Beginning of cycles"
     
     call cpu_time(tIni)
-    MC_Cycle : do iStep = 1, Ntherm + Nstep
+    MC_Cycle : do iStep = 1, Nthermal + Nstep
         
         MC_Change : do iChange = 1, Nmove + Nrotate
         
@@ -166,7 +166,7 @@ implicit none
         type2_obs%move_reject = real(type2_obs%move_Nreject, DP)/real(type2_obs%Nmove, DP)
         type2_obs%move_Nreject = 0; type2_obs%Nmove = 0
         
-        MC_Regime : if (iStep <= Ntherm) then ! Thermalisation
+        MC_Regime : if (iStep <= Nthermal) then ! Thermalisation
             
             ! Displacements adaptation
             if (mod(iStep, type1_spheres%getMove_Nadapt()) /= 0) then ! Rejections accumulation
@@ -210,7 +210,7 @@ implicit none
             write(mix_obsThermal_unit, *) iStep, mix_Epot
             write(obsThermal_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
             
-            if (iStep == Ntherm) then ! Definite thermalised displacements
+            if (iStep == Nthermal) then ! Definite thermalised displacements
                 call type1_spheres%definiteMove_delta(type1_obs%move_reject, type1_units%report)
                 call type1_spheres%definiteRotate_delta(type1_obs%rotate_reject, type1_units%report)
                 call type2_spheres%definiteMove_delta(type2_obs%move_reject, type2_units%report)

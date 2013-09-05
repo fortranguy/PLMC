@@ -6,7 +6,7 @@ use, intrinsic :: iso_fortran_env, only : output_unit, error_unit, iostat_end
 use data_precisions, only : DP, io_tiny, consist_tiny
 use data_box, only : Ndim, Lsize, Volume, Kmax
 use data_particles, only : Ncol
-use data_monteCarlo, only : Temperature, Nstep, decorrelFactor, Ntherm, Nmove, Nrotate
+use data_monteCarlo, only : Temperature, Nstep, decorrelFactor, Nthermal, Nmove, Nrotate
 use module_physics, only : dist_PBC, random_surface
 use class_spheres
 use class_dipolarSpheres
@@ -232,7 +232,7 @@ contains
         write(report_unit ,*) "    Temperature = ", Temperature
         
         write(report_unit, *) "    Nstep = ", Nstep
-        write(report_unit, *) "    Ntherm = ", Ntherm
+        write(report_unit, *) "    Nthermal = ", Nthermal
         write(report_unit, *) "    decorrelFactor = ", decorrelFactor
         write(report_unit, *) "    Nmove = ", Nmove
         write(report_unit, *) "    Nrotate = ", Nrotate

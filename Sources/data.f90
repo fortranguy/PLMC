@@ -106,19 +106,19 @@ implicit none
     real(DP), parameter :: Temperature = 1._DP
     integer, parameter :: Nstep = 2**16
     integer, parameter :: decorrelFactor = 2**0
-    integer, parameter :: Ntherm = 2**15/decorrelFactor
+    integer, parameter :: Nthermal = 2**15/decorrelFactor
     integer, parameter :: Nmove = decorrelFactor * Ncol
     integer, parameter :: Nrotate = decorrelFactor * dipol_Ncol
     
     ! move
     real(DP), dimension(Ndim), parameter :: dipol_move_delta = 0.3_DP
     real(DP), parameter :: dipol_move_rejectFix = 0.5_DP
-    integer, parameter :: dipol_move_Nadapt = Ntherm/8
+    integer, parameter :: dipol_move_Nadapt = Nthermal/8
     ! rotate
     real(DP), parameter :: dipol_rotate_delta = 30._DP
     real(DP), parameter :: dipol_rotate_deltaMax = 75._DP
     real(DP), parameter :: dipol_rotate_rejectFix = 0.17_DP
-    integer, parameter :: dipol_rotate_Nadapt = Ntherm/8
+    integer, parameter :: dipol_rotate_Nadapt = Nthermal/8
     ! chemical potential
     integer, parameter :: dipol_Nwidom = 500 ! dipol_Ncol
     ! reinitialisations
@@ -127,13 +127,13 @@ implicit none
     
     real(DP), dimension(Ndim), parameter :: hard_move_delta = 0.5_DP
     real(DP), parameter :: hard_move_rejectFix = 0.5_DP
-    integer, parameter :: hard_move_Nadapt = Ntherm/8
+    integer, parameter :: hard_move_Nadapt = Nthermal/8
     integer, parameter :: hard_Nwidom = 500 ! hard_Ncol
     
     ! out ---------------------------------------------------------------------
     real(DP), dimension(Ndim), parameter :: inter_move_delta = 1._DP
     real(DP), parameter :: inter_move_rejectFix = 0.5_DP
-    integer, parameter :: inter_move_Nadapt = Ntherm/8
+    integer, parameter :: inter_move_Nadapt = Nthermal/8
     integer, parameter :: inter_Nwidom = inter_Ncol    
     ! -------------------------------------------------------------------------
 
