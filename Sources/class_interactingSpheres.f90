@@ -5,7 +5,7 @@ module class_interactingSpheres
 use, intrinsic :: iso_fortran_env, only : output_unit
 use data_precisions, only : DP, consist_tiny
 use data_box, only : Ndim, Lsize
-use data_particles, only : inter_rMin, inter_radius, inter_Ncol
+use data_particles, only : inter_rMin, inter_Ncol
 use data_potential, only : inter_rCut, inter_dr, inter_epsilon, inter_alpha
 use data_monteCarlo, only : Temperature, inter_move_delta, inter_move_rejectFix, &
                             inter_move_Nadapt, inter_Nwidom
@@ -69,7 +69,7 @@ contains
     
         ! Particles
         this%rMin = inter_rMin
-        this%radius = inter_radius
+        this%radius = this%rMin/2._DP
         this%Ncol = inter_Ncol
         allocate(this%positions(Ndim, this%Ncol))
         

@@ -70,21 +70,18 @@ use data_precisions, only : DP
 implicit none
 
     real(DP), parameter :: dipol_rMin = 1._DP
-    real(DP), parameter :: dipol_radius = dipol_rMin / 2._DP   
     integer, parameter :: dipol_Ncol = 281
     
     real(DP), parameter :: hard_rMin = 1._DP
-    real(DP), parameter :: hard_radius = hard_rMin / 2._DP
     integer, parameter :: hard_Ncol = 6750
     
     real(DP), parameter :: mix_delta = 0.2_DP
-    real(DP), parameter :: mix_rMin = dipol_radius + hard_radius + mix_delta
+    real(DP), parameter :: mix_rMin = (dipol_rMin + hard_rMin)/2._DP + mix_delta
     
     integer, parameter :: Ncol = dipol_Ncol + hard_Ncol
     
     ! out ---------------------------------------------------------------------
     real(DP), parameter :: inter_rMin = 1._DP
-    real(DP), parameter :: inter_radius = inter_rMin / 2._DP
     integer, parameter :: inter_Ncol = 0    
     ! -------------------------------------------------------------------------
     
