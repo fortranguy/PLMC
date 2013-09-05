@@ -204,9 +204,10 @@ implicit none
             end if
             
             ! Observables writing
-            write(type1_units%obsThermal, *) iStep, type1_obs%Epot, 0._DP, type1_obs%move_reject, &
-                                             type1_obs%rotate_reject
-            write(type2_units%obsThermal, *) iStep, type2_obs%Epot, 0._DP, type2_obs%move_reject
+            write(type1_units%obsThermal, *) iStep, type1_obs%Epot, type1_obs%activ, &
+                                             type1_obs%move_reject, type1_obs%rotate_reject
+            write(type2_units%obsThermal, *) iStep, type2_obs%Epot, type2_obs%activ, &
+                                             type2_obs%move_reject
             write(mix_obsThermal_unit, *) iStep, mix_Epot
             write(obsThermal_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
             
