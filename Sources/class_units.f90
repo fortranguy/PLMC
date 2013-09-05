@@ -27,7 +27,7 @@ private
     
     type, extends(Units), public :: MoreUnits
     
-        integer :: deltaM
+        integer :: rotate_delta
 
         integer :: snapIni_orientations
         integer :: snapFin_orientations
@@ -70,8 +70,8 @@ contains
             
             class is (MoreUnits)
             
-                open(newunit=this%deltaM, recl=4096, file=name//"_deltaM.out", status='new', &
-                     action='write')
+                open(newunit=this%rotate_delta, recl=4096, file=name//"_rotate_delta.out", &
+                    status='new', action='write')
                 
                 open(newunit=this%snapIni_orientations, recl=4096, &
                      file=name//"_snapIni_orientations.out", status='new', action='write')
@@ -117,7 +117,7 @@ contains
             
             class is (MoreUnits)
             
-                close(this%deltaM)
+                close(this%rotate_delta)
         
                 close(this%snapIni_orientations)
                 close(this%snapFin_orientations)

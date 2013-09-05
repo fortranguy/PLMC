@@ -186,8 +186,8 @@ implicit none
             else
                 type1_obs%rotate_rejectAdapt = type1_obs%rotate_rejectAdapt / &
                                                real(type1_spheres%getRotate_Nadapt()-1)
-                call type1_spheres%adaptDeltaM(type1_obs%rotate_rejectAdapt)
-                write(type1_units%deltaM, *) iStep, type1_spheres%getDeltaM(), &
+                call type1_spheres%adaptRotate_delta(type1_obs%rotate_rejectAdapt)
+                write(type1_units%rotate_delta, *) iStep, type1_spheres%getRotate_delta(), &
                                              type1_obs%rotate_rejectAdapt
                 type1_obs%rotate_rejectAdapt = 0._DP
             end if
@@ -212,7 +212,7 @@ implicit none
             
             if (iStep == Ntherm) then ! Definite thermalised displacements
                 call type1_spheres%definiteDeltaX(type1_obs%move_reject, type1_units%report)
-                call type1_spheres%definiteDeltaM(type1_obs%rotate_reject, type1_units%report)
+                call type1_spheres%definiteRotate_delta(type1_obs%rotate_reject, type1_units%report)
                 call type2_spheres%definiteDeltaX(type2_obs%move_reject, type2_units%report)
             end if       
         

@@ -115,8 +115,8 @@ implicit none
     real(DP), parameter :: dipol_move_rejectFix = 0.5_DP
     integer, parameter :: dipol_move_Nadapt = Ntherm/8
     ! rotate
-    real(DP), parameter :: dipol_deltaM = 30._DP
-    real(DP), parameter :: dipol_deltaMmax = 75._DP
+    real(DP), parameter :: dipol_rotate_delta = 30._DP
+    real(DP), parameter :: dipol_rotate_deltaMax = 75._DP
     real(DP), parameter :: dipol_rotate_rejectFix = 0.17_DP
     integer, parameter :: dipol_rotate_Nadapt = Ntherm/8
     ! chemical potential

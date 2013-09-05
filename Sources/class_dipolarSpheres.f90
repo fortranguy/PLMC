@@ -8,7 +8,7 @@ use data_constants, only : PI
 use data_box, only : Ndim, Lsize, Kmax, Volume, out_permittivity
 use data_particles, only : dipol_rMin, dipol_radius, dipol_Ncol
 use data_monteCarlo, only : Temperature, dipol_move_delta, dipol_move_rejectFix, dipol_move_Nadapt, &
-                            dipol_deltaM, dipol_deltaMmax, dipol_rotate_rejectFix, &
+                            dipol_rotate_delta, dipol_rotate_deltaMax, dipol_rotate_rejectFix, &
                             dipol_rotate_Nadapt, dipol_Nwidom, dipol_structure_iStep, &
                             dipol_totalMoment_iStep
 use data_potential, only : dipol_rCut, dipol_dr, dipol_alpha
@@ -35,9 +35,9 @@ private
                                                                        !< of all particles
         
         ! Monte-Carlo
-        real(DP) :: deltaM !< rotation
-        real(DP) :: deltaMsave
-        real(DP) :: deltaMmax
+        real(DP) :: rotate_delta !< rotation
+        real(DP) :: rotate_deltaSave
+        real(DP) :: rotate_deltaMax
         real(DP) :: rotate_rejectFix
         integer :: rotate_Nadapt
         integer :: structure_iStep
@@ -67,10 +67,10 @@ private
         !> Take a snap shot of the configuration : orientations
         procedure :: snapShot_orientations => DipolarSpheres_snapShot_orientations
         
-        !> Adapt the rotation deltaM during thermalisation
-        procedure :: adaptDeltaM => DipolarSpheres_adaptDeltaM
-        procedure :: definiteDeltaM => DipolarSpheres_definiteDeltaM
-        procedure :: getDeltaM => DipolarSpheres_getDeltaM
+        !> Adapt the rotation rotate_delta during thermalisation
+        procedure :: adaptRotate_delta => DipolarSpheres_adaptRotate_delta
+        procedure :: definiteRotate_delta => DipolarSpheres_definiteRotate_delta
+        procedure :: getRotate_delta => DipolarSpheres_getRotate_delta
         procedure :: getRotate_Nadapt => DipolarSpheres_getRotate_Nadapt
         
         procedure :: getStructure_iStep => DipolarSpheres_getStructure_iStep
@@ -153,9 +153,9 @@ contains
         this%structure_iStep = dipol_structure_iStep
         this%totalMoment_iStep = dipol_totalMoment_iStep
         
-        this%deltaM = dipol_deltaM
-        this%deltaMsave = this%deltaM
-        this%deltaMmax = dipol_deltaMmax
+        this%rotate_delta = dipol_rotate_delta
+        this%rotate_deltaSave = this%rotate_delta
+        this%rotate_deltaMax = dipol_rotate_deltaMax
         this%rotate_rejectFix = dipol_rotate_rejectFix
         this%rotate_Nadapt = dipol_rotate_Nadapt
         
@@ -252,72 +252,72 @@ contains
 
     end subroutine DipolarSpheres_snapShot_orientations
     
-    !> Adaptation of deltaM during the thermalisation
+    !> Adaptation of rotate_delta during the thermalisation
     
-    subroutine DipolarSpheres_adaptDeltaM(this, reject)
+    subroutine DipolarSpheres_adaptRotate_delta(this, reject)
     
         class(DipolarSpheres), intent(inout) :: this
         real(DP), intent(in) :: reject
         
-        real(DP), parameter :: eps_deltaM = 0.05_DP
-        real(DP), parameter :: eps_reject = 0.1_DP * eps_deltaM
-        real(DP), parameter :: more = 1._DP+eps_deltaM
-        real(DP), parameter :: less = 1._DP-eps_deltaM
+        real(DP), parameter :: rotate_delta_eps = 0.05_DP
+        real(DP), parameter :: rotate_reject_eps = 0.1_DP * rotate_delta_eps
+        real(DP), parameter :: more = 1._DP+rotate_delta_eps
+        real(DP), parameter :: less = 1._DP-rotate_delta_eps
 
         
-        if (reject < this%rotate_rejectFix - eps_reject) then
+        if (reject < this%rotate_rejectFix - rotate_reject_eps) then
         
-            this%deltaM = this%deltaM * more
+            this%rotate_delta = this%rotate_delta * more
   
-            if (this%deltaM > this%deltaMmax) then
-                this%deltaM = this%deltaMmax
+            if (this%rotate_delta > this%rotate_deltaMax) then
+                this%rotate_delta = this%rotate_deltaMax
             end if
             
-        else if (reject > this%rotate_rejectFix + eps_reject) then
+        else if (reject > this%rotate_rejectFix + rotate_reject_eps) then
         
-            this%deltaM = this%deltaM * less
+            this%rotate_delta = this%rotate_delta * less
             
         end if
     
-    end subroutine DipolarSpheres_adaptDeltaM
+    end subroutine DipolarSpheres_adaptRotate_delta
     
-    subroutine DipolarSpheres_definiteDeltaM(this, reject, report_unit)
+    subroutine DipolarSpheres_definiteRotate_delta(this, reject, report_unit)
     
         class(DipolarSpheres), intent(inout) :: this    
         real(DP), intent(in) :: reject
         integer, intent(in) :: report_unit
         
         if (reject == 0._DP) then
-            write(error_unit, *) this%name, " :    Warning : deltaM adaptation problem."
-            this%deltaM = this%deltaMsave
-            write(error_unit, *) "default deltaM :", this%deltaM
+            write(error_unit, *) this%name, " :    Warning : rotate_delta adaptation problem."
+            this%rotate_delta = this%rotate_deltaSave
+            write(error_unit, *) "default rotate_delta :", this%rotate_delta
         end if
         
-        if (this%deltaM > this%deltaMmax) then
-            write(error_unit, *) this%name, " :   Warning : deltaM too big."
-            this%deltaM = this%deltaMmax
-            write(error_unit, *) "big deltaM :", this%deltaM
+        if (this%rotate_delta > this%rotate_deltaMax) then
+            write(error_unit, *) this%name, " :   Warning : rotate_delta too big."
+            this%rotate_delta = this%rotate_deltaMax
+            write(error_unit, *) "big rotate_delta :", this%rotate_delta
         end if
         
         write(output_unit, *) this%name, " :    Thermalisation : over (rotation)"
         
         write(report_unit, *) "Rotation :"
-        write(report_unit, *) "    deltaM = ", this%deltaM
+        write(report_unit, *) "    rotate_delta = ", this%rotate_delta
         write(report_unit, *) "    rejection relative difference = ", &
                                     abs(reject-this%rotate_rejectFix)/this%rotate_rejectFix
     
-    end subroutine DipolarSpheres_definiteDeltaM
+    end subroutine DipolarSpheres_definiteRotate_delta
     
-    !> Accessor : deltaM
+    !> Accessor : rotate_delta
     
-    pure function DipolarSpheres_getDeltaM(this) result(getDeltaM)
+    pure function DipolarSpheres_getRotate_delta(this) result(getRotate_delta)
         
         class(DipolarSpheres), intent(in) :: this        
-        real(DP) :: getDeltaM
+        real(DP) :: getRotate_delta
         
-        getDeltaM = this%deltaM
+        getRotate_delta = this%rotate_delta
         
-    end function DipolarSpheres_getDeltaM
+    end function DipolarSpheres_getRotate_delta
     
     !> Accessor : move_Nadapt
     
@@ -1512,7 +1512,7 @@ contains
         xCol(:) = this%positions(:, iOld)
         mOld(:) = this%orientations(:, iOld)
         mNew(:) = mOld(:)
-        call markov_surface(mNew, this%deltaM)
+        call markov_surface(mNew, this%rotate_delta)
         
         iTotalCell = this%sameCells%index_from_position(xCol)
         real_eNew = this%Epot_real_solo(iOld, xCol, mNew)
