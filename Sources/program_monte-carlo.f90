@@ -174,7 +174,7 @@ implicit none
             else ! Average & adaptation
                 type1_obs%move_rejectAdapt = type1_obs%move_rejectAdapt / &
                                              real(type1_spheres%getMove_Nadapt()-1)
-                call type1_spheres%adaptDeltaX(type1_obs%move_rejectAdapt)
+                call type1_spheres%adaptMove_delta(type1_obs%move_rejectAdapt)
                 write(type1_units%move_delta, *) iStep, type1_spheres%getMove_delta(), &
                                              type1_obs%move_rejectAdapt
                 type1_obs%move_rejectAdapt = 0._DP
@@ -197,7 +197,7 @@ implicit none
             else                
                 type2_obs%move_rejectAdapt = type2_obs%move_rejectAdapt / &
                                              real(type2_spheres%getMove_Nadapt()-1)
-                call type2_spheres%adaptDeltaX(type2_obs%move_rejectAdapt)
+                call type2_spheres%adaptMove_delta(type2_obs%move_rejectAdapt)
                 write(type2_units%move_delta, *) iStep, type2_spheres%getMove_delta(), &
                                              type2_obs%move_rejectAdapt
                 type2_obs%move_rejectAdapt = 0._DP
@@ -211,9 +211,9 @@ implicit none
             write(obsThermal_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
             
             if (iStep == Ntherm) then ! Definite thermalised displacements
-                call type1_spheres%definiteDeltaX(type1_obs%move_reject, type1_units%report)
+                call type1_spheres%definiteMove_delta(type1_obs%move_reject, type1_units%report)
                 call type1_spheres%definiteRotate_delta(type1_obs%rotate_reject, type1_units%report)
-                call type2_spheres%definiteDeltaX(type2_obs%move_reject, type2_units%report)
+                call type2_spheres%definiteMove_delta(type2_obs%move_reject, type2_units%report)
             end if       
         
         else MC_Regime ! Thermalisation over -> Equilibrium
