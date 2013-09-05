@@ -13,8 +13,6 @@ private
     
         ! Move
         integer :: Nmove
-    
-        ! Move rejection
         integer :: move_Nreject
         real(DP) :: move_reject
         real(DP) :: move_rejectSum
@@ -39,8 +37,6 @@ private
         
         ! Rotate
         integer :: Nrotate
-        
-        ! Rotate rejection
         integer :: rotate_Nreject
         real(DP) :: rotate_reject
         real(DP) :: rotate_rejectSum
@@ -54,8 +50,7 @@ contains
         
         class(Observables), intent(out) :: this
         
-        this%Nmove = 0
-        
+        this%Nmove = 0        
         this%move_Nreject = 0
         this%move_reject = 0._DP
         this%move_rejectSum = 0._DP
@@ -70,8 +65,7 @@ contains
             
             class is (MoreObservables)
                 
-                this%Nrotate = 0
-                
+                this%Nrotate = 0                
                 this%rotate_Nreject = 0
                 this%rotate_reject = 0._DP
                 this%rotate_rejectSum = 0._DP
