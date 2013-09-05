@@ -175,7 +175,7 @@ implicit none
                 type1_obs%move_rejectAdapt = type1_obs%move_rejectAdapt / &
                                              real(type1_spheres%getMove_Nadapt()-1)
                 call type1_spheres%adaptDeltaX(type1_obs%move_rejectAdapt)
-                write(type1_units%deltaX, *) iStep, type1_spheres%getDeltaX(), &
+                write(type1_units%move_delta, *) iStep, type1_spheres%getMove_delta(), &
                                              type1_obs%move_rejectAdapt
                 type1_obs%move_rejectAdapt = 0._DP
             end if
@@ -198,7 +198,7 @@ implicit none
                 type2_obs%move_rejectAdapt = type2_obs%move_rejectAdapt / &
                                              real(type2_spheres%getMove_Nadapt()-1)
                 call type2_spheres%adaptDeltaX(type2_obs%move_rejectAdapt)
-                write(type2_units%deltaX, *) iStep, type2_spheres%getDeltaX(), &
+                write(type2_units%move_delta, *) iStep, type2_spheres%getMove_delta(), &
                                              type2_obs%move_rejectAdapt
                 type2_obs%move_rejectAdapt = 0._DP
             end if

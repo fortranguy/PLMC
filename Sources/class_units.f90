@@ -9,7 +9,7 @@ private
     
         integer :: obsThermal
         integer :: obsEquilib
-        integer :: deltaX
+        integer :: move_delta
 
         integer :: snapIni_positions
         integer :: snapFin_positions
@@ -51,7 +51,8 @@ contains
              action='write')
         open(newunit=this%obsEquilib, recl=4096, file=name//"_obsEquilib.out", status='new', &
              action='write')
-        open(newunit=this%deltaX, recl=4096, file=name//"_deltaX.out", status='new', action='write')
+        open(newunit=this%move_delta, recl=4096, file=name//"_move_delta.out", status='new', &
+            action='write')
         
         open(newunit=this%snapIni_positions, recl=4096, file=name//"_snapIni_positions.out", &
              status='new', action='write')
@@ -101,7 +102,7 @@ contains
         
         close(this%obsThermal)
         close(this%obsEquilib)
-        close(this%deltaX)
+        close(this%move_delta)
 
         close(this%snapIni_positions)
         close(this%snapFin_positions)

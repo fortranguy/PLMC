@@ -111,7 +111,7 @@ implicit none
     integer, parameter :: Nrotate = decorrelFactor * dipol_Ncol
     
     ! move
-    real(DP), dimension(Ndim), parameter :: dipol_deltaX = 0.3_DP
+    real(DP), dimension(Ndim), parameter :: dipol_move_delta = 0.3_DP
     real(DP), parameter :: dipol_move_rejectFix = 0.5_DP
     integer, parameter :: dipol_move_Nadapt = Ntherm/8
     ! rotate
@@ -125,13 +125,13 @@ implicit none
     integer, parameter :: dipol_structure_iStep = 2**13/decorrelFactor
     integer, parameter :: dipol_totalMoment_iStep = 2**13/decorrelFactor
     
-    real(DP), dimension(Ndim), parameter :: hard_deltaX = 0.5_DP
+    real(DP), dimension(Ndim), parameter :: hard_move_delta = 0.5_DP
     real(DP), parameter :: hard_move_rejectFix = 0.5_DP
     integer, parameter :: hard_move_Nadapt = Ntherm/8
     integer, parameter :: hard_Nwidom = 500 ! hard_Ncol
     
     ! out ---------------------------------------------------------------------
-    real(DP), dimension(Ndim), parameter :: inter_deltaX = 1._DP
+    real(DP), dimension(Ndim), parameter :: inter_move_delta = 1._DP
     real(DP), parameter :: inter_move_rejectFix = 0.5_DP
     integer, parameter :: inter_move_Nadapt = Ntherm/8
     integer, parameter :: inter_Nwidom = inter_Ncol    

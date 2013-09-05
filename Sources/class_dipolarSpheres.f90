@@ -7,7 +7,7 @@ use data_precisions, only : DP, consist_tiny
 use data_constants, only : PI
 use data_box, only : Ndim, Lsize, Kmax, Volume, out_permittivity
 use data_particles, only : dipol_rMin, dipol_radius, dipol_Ncol
-use data_monteCarlo, only : Temperature, dipol_deltaX, dipol_move_rejectFix, dipol_move_Nadapt, &
+use data_monteCarlo, only : Temperature, dipol_move_delta, dipol_move_rejectFix, dipol_move_Nadapt, &
                             dipol_deltaM, dipol_deltaMmax, dipol_rotate_rejectFix, &
                             dipol_rotate_Nadapt, dipol_Nwidom, dipol_structure_iStep, &
                             dipol_totalMoment_iStep
@@ -146,8 +146,8 @@ contains
         this%snap_factor = dipol_snap_factor
         
         ! Monte-Carlo
-        this%deltaX = dipol_deltaX
-        this%deltaXsave = this%deltaX
+        this%move_delta = dipol_move_delta
+        this%move_deltaSave = this%move_delta
         this%move_rejectFix = dipol_move_rejectFix
         this%move_Nadapt = dipol_move_Nadapt
         this%structure_iStep = dipol_structure_iStep
@@ -1431,7 +1431,7 @@ contains
         xOld(:) = this%positions(:, iOld)
         ! Random new position
         call random_number(xRand)
-        xNew(:) = xOld(:) + this%deltaX(:) * (xRand(:)-0.5_DP)
+        xNew(:) = xOld(:) + this%move_delta(:) * (xRand(:)-0.5_DP)
         xNew(:) = modulo(xNew(:), Lsize(:))
         
         mCol(:) = this%orientations(:, iOld)

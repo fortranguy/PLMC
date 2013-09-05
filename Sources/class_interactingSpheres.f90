@@ -7,7 +7,7 @@ use data_precisions, only : DP, consist_tiny
 use data_box, only : Ndim, Lsize
 use data_particles, only : inter_rMin, inter_radius, inter_Ncol
 use data_potential, only : inter_rCut, inter_dr, inter_epsilon, inter_alpha
-use data_monteCarlo, only : Temperature, inter_deltaX, inter_move_rejectFix, &
+use data_monteCarlo, only : Temperature, inter_move_delta, inter_move_rejectFix, &
                             inter_move_Nadapt, inter_Nwidom
 use data_neighbourCells, only : NnearCell, inter_cell_size
 use data_distribution, only : inter_snap_factor
@@ -77,8 +77,8 @@ contains
         this%snap_factor = inter_snap_factor
         
         ! Monte-Carlo
-        this%deltaX = inter_deltaX
-        this%deltaXSave = this%deltaX
+        this%move_delta = inter_move_delta
+        this%move_deltaSave = this%move_delta
         this%move_rejectFix = inter_move_rejectFix
         this%move_Nadapt = inter_move_Nadapt
         this%Nwidom = inter_Nwidom
@@ -274,7 +274,7 @@ contains
         real(DP) :: mix_eNew, mix_eOld
         
         call random_number(xRand)
-        xNew(:) = this%positions(:, iOld) + (xRand(:)-0.5_DP)*this%deltaX(:)
+        xNew(:) = this%positions(:, iOld) + (xRand(:)-0.5_DP)*this%move_delta(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
         same_iCellNew = this%sameCells%index_from_position(xNew)
         call this%Epot_neighCells(iOld, xNew, same_iCellNew, overlap, same_eNew)

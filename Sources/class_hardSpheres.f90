@@ -7,7 +7,7 @@ use data_precisions, only : DP
 use data_box, only : Ndim, Lsize
 use data_particles, only : hard_rMin, hard_radius, hard_Ncol
 use data_potential, only : hard_rCut
-use data_monteCarlo, only : Temperature, hard_deltaX, hard_move_rejectFix, hard_move_Nadapt, &
+use data_monteCarlo, only : Temperature, hard_move_delta, hard_move_rejectFix, hard_move_Nadapt, &
                             hard_Nwidom
 use data_neighbourCells, only : NnearCell, hard_cell_size
 use data_distribution, only : hard_snap_factor
@@ -71,8 +71,8 @@ contains
         this%snap_factor = hard_snap_factor
         
         ! Monte-Carlo
-        this%deltaX = hard_deltaX
-        this%deltaXSave = this%deltaX
+        this%move_delta = hard_move_delta
+        this%move_deltaSave = this%move_delta
         this%move_rejectFix = hard_move_rejectFix
         this%move_Nadapt = hard_move_Nadapt
         this%Nwidom = hard_Nwidom
@@ -217,7 +217,7 @@ contains
         
         ! Random new position
         call random_number(xRand)
-        xNew(:) = this%positions(:, iOld) + (xRand(:)-0.5_DP)*this%deltaX(:)
+        xNew(:) = this%positions(:, iOld) + (xRand(:)-0.5_DP)*this%move_delta(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
         
         same_iCellNew = this%sameCells%index_from_position(xNew)

@@ -32,8 +32,8 @@ private
         integer :: snap_factor
 
         ! Monte-Carlo
-        real(DP), dimension(Ndim) :: deltaX !< displacement
-        real(DP), dimension(Ndim) :: deltaXsave
+        real(DP), dimension(Ndim) :: move_delta !< displacement
+        real(DP), dimension(Ndim) :: move_deltaSave
         real(DP) :: move_rejectFix
         integer :: move_Nadapt
         integer :: Nwidom
@@ -64,10 +64,10 @@ private
         !> Assign all particles to cells
         procedure :: all_cols_to_cells => Spheres_all_cols_to_cells
                 
-        !> Adapt the displacement deltaX during thermalisation
+        !> Adapt the displacement move_delta during thermalisation
         procedure :: adaptDeltaX => Spheres_adaptDeltaX
         procedure :: definiteDeltaX => Spheres_definiteDeltaX
-        procedure :: getDeltaX => Spheres_getDeltaX
+        procedure :: getMove_delta => Spheres_getMove_delta
         
     end type Spheres
     
@@ -196,29 +196,29 @@ contains
     
     end subroutine Spheres_all_cols_to_cells
     
-    !> Adaptation of deltaX during the thermalisation
+    !> Adaptation of move_delta during the thermalisation
     
     subroutine Spheres_adaptDeltaX(this, reject)
     
         class(Spheres), intent(inout) :: this
         real(DP), intent(in) :: reject
         
-        real(DP), parameter :: eps_deltaX = 0.05_DP
-        real(DP), parameter :: eps_reject = 0.1_DP * eps_deltaX
-        real(DP), parameter :: more = 1._DP+eps_deltaX
-        real(DP), parameter :: less = 1._DP-eps_deltaX
+        real(DP), parameter :: move_delta_eps = 0.05_DP
+        real(DP), parameter :: move_reject_eps = 0.1_DP * move_delta_eps
+        real(DP), parameter :: more = 1._DP+move_delta_eps
+        real(DP), parameter :: less = 1._DP-move_delta_eps
         
-        if (reject < this%move_rejectFix - eps_reject) then
+        if (reject < this%move_rejectFix - move_reject_eps) then
         
-            this%deltaX(:) = this%deltaX(:) * more
+            this%move_delta(:) = this%move_delta(:) * more
             
-            if (norm2(this%deltaX) > norm2(Lsize)) then
-                this%deltaX(:) = Lsize(:)
+            if (norm2(this%move_delta) > norm2(Lsize)) then
+                this%move_delta(:) = Lsize(:)
             end if
             
-        else if (reject > this%move_rejectFix + eps_reject) then
+        else if (reject > this%move_rejectFix + move_reject_eps) then
         
-            this%deltaX(:) = this%deltaX(:) * less
+            this%move_delta(:) = this%move_delta(:) * less
             
         end if
     
@@ -231,34 +231,34 @@ contains
         integer, intent(in) :: report_unit
 
         if (reject == 0._DP) then
-            write(error_unit, *) this%name, " :    Warning : deltaX adaptation problem."
-            this%deltaX(:) = this%deltaXsave(:)
-            write(error_unit, *) "default deltaX :", this%deltaX(:)
+            write(error_unit, *) this%name, " :    Warning : move_delta adaptation problem."
+            this%move_delta(:) = this%move_deltaSave(:)
+            write(error_unit, *) "default move_delta :", this%move_delta(:)
         end if
 
-        if (norm2(this%deltaX) > norm2(Lsize)) then
-            write(error_unit, *) this%name, " :   Warning : deltaX too big."
-            this%deltaX(:) = Lsize(:)
-            write(error_unit, *) "big deltaX :", this%deltaX(:)
+        if (norm2(this%move_delta) > norm2(Lsize)) then
+            write(error_unit, *) this%name, " :   Warning : move_delta too big."
+            this%move_delta(:) = Lsize(:)
+            write(error_unit, *) "big move_delta :", this%move_delta(:)
         end if
 
         write(output_unit, *) this%name, " :    Thermalisation : over"
 
         write(report_unit, *) "Displacement :"
-        write(report_unit, *) "    deltaX(:) = ", this%deltaX(:)
+        write(report_unit, *) "    move_delta(:) = ", this%move_delta(:)
         write(report_unit, *) "    rejection relative difference = ", &
                                     abs(reject-this%move_rejectFix)/this%move_rejectFix
     
     end subroutine Spheres_definiteDeltaX
     
-    pure function Spheres_getDeltaX(this) result(getDeltaX)
+    pure function Spheres_getMove_delta(this) result(getMove_delta)
         
         class(Spheres), intent(in) :: this        
-        real(DP) :: getDeltaX
+        real(DP) :: getMove_delta
         
-        ! average deltaX of 3 vector components
-        getDeltaX = sum(this%deltaX)/size(this%deltaX)
+        ! average move_delta of 3 vector components
+        getMove_delta = sum(this%move_delta)/size(this%move_delta)
         
-    end function Spheres_getDeltaX
+    end function Spheres_getMove_delta
 
 end module class_spheres
