@@ -176,7 +176,7 @@ implicit none
                                              real(type1_spheres%getMove_Nadapt()-1)
                 call type1_spheres%adaptMove_delta(type1_obs%move_rejectAdapt)
                 write(type1_units%move_delta, *) iStep, type1_spheres%getMove_delta(), &
-                                             type1_obs%move_rejectAdapt
+                                                 type1_obs%move_rejectAdapt
                 type1_obs%move_rejectAdapt = 0._DP
             end if
             
@@ -188,7 +188,7 @@ implicit none
                                                real(type1_spheres%getRotate_Nadapt()-1)
                 call type1_spheres%adaptRotate_delta(type1_obs%rotate_rejectAdapt)
                 write(type1_units%rotate_delta, *) iStep, type1_spheres%getRotate_delta(), &
-                                             type1_obs%rotate_rejectAdapt
+                                                   type1_obs%rotate_rejectAdapt
                 type1_obs%rotate_rejectAdapt = 0._DP
             end if
 
@@ -199,7 +199,7 @@ implicit none
                                              real(type2_spheres%getMove_Nadapt()-1)
                 call type2_spheres%adaptMove_delta(type2_obs%move_rejectAdapt)
                 write(type2_units%move_delta, *) iStep, type2_spheres%getMove_delta(), &
-                                             type2_obs%move_rejectAdapt
+                                                 type2_obs%move_rejectAdapt
                 type2_obs%move_rejectAdapt = 0._DP
             end if
             
