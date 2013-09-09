@@ -212,7 +212,7 @@ contains
         integer :: same_iCellOld, same_iCellNew
         integer :: mix_iCellOld, mix_iCellNew
         real(DP) :: mix_deltaEpot
-        real(DP) :: mix_eNew, mix_eOld
+        real(DP) :: mix_EpotNew, mix_EpotOld
         real(DP) :: random
         
         ! Random new position
@@ -227,7 +227,7 @@ contains
         
             mix_iCellNew = this%mixCells%index_from_position(xNew)
             call mix%Epot_neighCells(xNew, mix_iCellNew, this%mixCells, other%positions, overlap, &
-                                     mix_eNew)
+                                     mix_EpotNew)
                         
             if (.not. overlap) then
     
@@ -236,9 +236,9 @@ contains
                     
                 mix_iCellOld = this%mixCells%index_from_position(this%positions(:, iOld))
                 call mix%Epot_neighCells(this%positions(:, iOld), mix_iCellOld, this%mixCells, &
-                                         other%positions, overlap, mix_eOld)
+                                         other%positions, overlap, mix_EpotOld)
                 
-                mix_deltaEpot = mix_eNew - mix_eOld
+                mix_deltaEpot = mix_EpotNew - mix_EpotOld
                 
                 call random_number(random)
                 if (random < exp(-mix_deltaEpot/Temperature)) then

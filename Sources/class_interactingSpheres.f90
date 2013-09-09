@@ -270,32 +270,32 @@ contains
         integer :: mix_iCellOld, mix_iCellNew
         real(DP) :: deltaEpot
         real(DP) :: same_deltaEpot, mix_deltaEpot
-        real(DP) :: same_eNew, same_eOld
-        real(DP) :: mix_eNew, mix_eOld
+        real(DP) :: same_EpotNew, same_EpotOld
+        real(DP) :: mix_EpotNew, mix_EpotOld
         
         call random_number(xRand)
         xNew(:) = this%positions(:, iOld) + (xRand(:)-0.5_DP)*this%move_delta(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
         same_iCellNew = this%sameCells%index_from_position(xNew)
-        call this%Epot_neighCells(iOld, xNew, same_iCellNew, overlap, same_eNew)
+        call this%Epot_neighCells(iOld, xNew, same_iCellNew, overlap, same_EpotNew)
         
         if (.not. overlap) then
         
             mix_iCellNew = this%mixCells%index_from_position(xNew)
             call mix%Epot_neighCells(xNew, mix_iCellNew, this%mixCells, other%positions, overlap, &
-                                     mix_eNew)
+                                     mix_EpotNew)
                         
             if (.not. overlap) then
     
                 same_iCellOld = this%sameCells%index_from_position(this%positions(:, iOld))
                 call this%Epot_neighCells(iOld, this%positions(:, iOld), same_iCellOld, overlap, &
-                                          same_eOld)
-                same_deltaEpot = same_eNew - same_eOld
+                                          same_EpotOld)
+                same_deltaEpot = same_EpotNew - same_EpotOld
                     
                 mix_iCellOld = this%mixCells%index_from_position(this%positions(:, iOld))
                 call mix%Epot_neighCells(this%positions(:, iOld), mix_iCellOld, this%mixCells, &
-                                         other%positions, overlap, mix_eOld)
-                mix_deltaEpot = mix_eNew - mix_eOld
+                                         other%positions, overlap, mix_EpotOld)
+                mix_deltaEpot = mix_EpotNew - mix_EpotOld
                 
                 deltaEpot = same_deltaEpot + mix_deltaEpot
                 

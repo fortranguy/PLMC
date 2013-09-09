@@ -1424,8 +1424,8 @@ contains
         integer :: same_iCellOld, same_iCellNew
         integer :: mix_iCellOld, mix_iCellNew
         real(DP) :: deltaEpot, same_deltaEpot, mix_deltaEpot
-        real(DP) :: same_eNew_real, same_eOld_real
-        real(DP) :: mix_eNew, mix_eOld
+        real(DP) :: same_EpotNew_real, same_EpotOld_real
+        real(DP) :: mix_EpotNew, mix_EpotOld
         real(DP) :: random
         
         xOld(:) = this%positions(:, iOld)
@@ -1437,7 +1437,8 @@ contains
         mCol(:) = this%orientations(:, iOld)
         
         mix_iCellNew = this%mixCells%index_from_position(xNew)
-        call mix%Epot_neighCells(xNew, mix_iCellNew, this%mixCells, other%positions, overlap, mix_eNew)
+        call mix%Epot_neighCells(xNew, mix_iCellNew, this%mixCells, other%positions, overlap, &
+                                 mix_EpotNew)
             
         if (.not. overlap) then
         
@@ -1448,16 +1449,16 @@ contains
                 
                 ! Real
                 same_iCellOld = this%sameCells%index_from_position(xOld)
-                same_eNew_real = this%Epot_real_solo(iOld, xNew, this%orientations(:, iOld))
-                same_eOld_real = this%Epot_real_solo(iOld, xOld, this%orientations(:, iOld))
+                same_EpotNew_real = this%Epot_real_solo(iOld, xNew, this%orientations(:, iOld))
+                same_EpotOld_real = this%Epot_real_solo(iOld, xOld, this%orientations(:, iOld))
                 
-                same_deltaEpot = (same_eNew_real-same_eOld_real) + &
+                same_deltaEpot = (same_EpotNew_real-same_EpotOld_real) + &
                                  this%deltaEpot_reci_move(xOld, xNew, mCol)
                     
                 mix_iCellOld = this%mixCells%index_from_position(xOld)
                 call mix%Epot_neighCells(xOld, mix_iCellOld, this%mixCells, other%positions, overlap, &
-                                         mix_eOld)
-                mix_deltaEpot = mix_eNew - mix_eOld
+                                         mix_EpotOld)
+                mix_deltaEpot = mix_EpotNew - mix_EpotOld
                 
                 deltaEpot = same_deltaEpot + mix_deltaEpot
                 
@@ -1506,7 +1507,7 @@ contains
         real(DP), dimension(Ndim) :: xCol
         real(DP), dimension(Ndim) :: mOld, mNew
         real(DP) :: deltaEpot, deltaEpot_real, deltaEpot_self
-        real(DP) :: real_eNew, real_eOld
+        real(DP) :: real_EpotNew, real_EpotOld
         integer :: iTotalCell
         
         xCol(:) = this%positions(:, iOld)
@@ -1515,9 +1516,9 @@ contains
         call markov_surface(mNew, this%rotate_delta)
         
         iTotalCell = this%sameCells%index_from_position(xCol)
-        real_eNew = this%Epot_real_solo(iOld, xCol, mNew)
-        real_eOld = this%Epot_real_solo(iOld, xCol, mOld)
-        deltaEpot_real = real_eNew - real_eOld        
+        real_EpotNew = this%Epot_real_solo(iOld, xCol, mNew)
+        real_EpotOld = this%Epot_real_solo(iOld, xCol, mOld)
+        deltaEpot_real = real_EpotNew - real_EpotOld        
         
         deltaEpot_self = this%Epot_self_solo(mNew) - this%Epot_self_solo(mOld)
         
