@@ -285,7 +285,7 @@ contains
         real(DP), dimension(Ndim) :: xRand, xTest
         integer :: same_iCellTest, mix_iCellTest
         logical :: overlap
-        real(DP) :: enTest, mix_enTest
+        real(DP) :: EpotTest, mix_EpotTest
         
         widTestSum = 0._DP
         
@@ -300,12 +300,12 @@ contains
             
                 mix_iCellTest = this%mixCells%index_from_position(xTest)
                 call mix%Epot_neighCells(xTest, mix_iCellTest, this%mixCells, other_positions, &
-                                         overlap, mix_enTest)
+                                         overlap, mix_EpotTest)
                 
                 if (.not. overlap) then
                 
-                    enTest = 0._DP + mix_enTest
-                    widTestSum = widTestSum + exp(-enTest/Temperature)
+                    EpotTest = 0._DP + mix_EpotTest
+                    widTestSum = widTestSum + exp(-EpotTest/Temperature)
                     
                 end if
                 

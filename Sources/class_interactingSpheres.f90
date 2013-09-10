@@ -344,7 +344,7 @@ contains
         real(DP), dimension(Ndim) :: xRand, xTest
         integer :: same_iCellTest, mix_iCellTest
         logical :: overlap        
-        real(DP) :: enTest, same_enTest, mix_enTest
+        real(DP) :: EpotTest, same_EpotTest, mix_EpotTest
         
         widTestSum = 0._DP
         
@@ -353,18 +353,18 @@ contains
             call random_number(xRand)
             xTest(:) = Lsize(:) * xRand(:)    
             same_iCellTest = this%sameCells%index_from_position(xTest)
-            call this%Epot_neighCells(0, xTest, same_iCellTest, overlap, same_enTest) 
+            call this%Epot_neighCells(0, xTest, same_iCellTest, overlap, same_EpotTest) 
             
             if (.not. overlap) then
                 
                 mix_iCellTest = this%mixCells%index_from_position(xTest)
                 call mix%Epot_neighCells(xTest, mix_iCellTest, this%mixCells, other_positions, &
-                                         overlap, mix_enTest)
+                                         overlap, mix_EpotTest)
                 
                 if (.not. overlap) then
                 
-                    enTest = same_enTest + mix_enTest
-                    widTestSum = widTestSum + exp(-enTest/Temperature)
+                    EpotTest = same_EpotTest + mix_EpotTest
+                    widTestSum = widTestSum + exp(-EpotTest/Temperature)
                     
                 end if
                 

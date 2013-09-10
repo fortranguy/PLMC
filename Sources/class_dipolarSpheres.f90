@@ -1555,9 +1555,9 @@ contains
         real(DP), dimension(Ndim) :: mTest
         integer :: same_iCellTest, mix_iCellTest
         logical :: overlap
-        real(DP) :: enTest
-        real(DP) :: same_enTest, same_enTest_real
-        real(DP) :: mix_enTest
+        real(DP) :: EpotTest
+        real(DP) :: same_EpotTest, same_EpotTest_real
+        real(DP) :: mix_EpotTest
         
         widTestSum = 0._DP
         
@@ -1568,7 +1568,7 @@ contains
             
             mix_iCellTest = this%mixCells%index_from_position(xTest)
             call mix%Epot_neighCells(xTest, mix_iCellTest, this%mixCells, other_positions, overlap, &
-                                     mix_enTest)
+                                     mix_EpotTest)
             
             if (.not. overlap) then
                                
@@ -1578,13 +1578,13 @@ contains
                 if (.not. overlap) then
                 
                     mTest(:) = random_surface()
-                    same_enTest_real = this%Epot_real_solo(0, xTest, mTest)
+                    same_EpotTest_real = this%Epot_real_solo(0, xTest, mTest)
                                         
-                    same_enTest = same_enTest_real + this%deltaEpot_reci_test(xTest, mTest) - &
-                                  this%Epot_self_solo(mTest)
+                    same_EpotTest = same_EpotTest_real + this%deltaEpot_reci_test(xTest, mTest) - &
+                                    this%Epot_self_solo(mTest)
                 
-                    enTest = same_enTest + mix_enTest
-                    widTestSum = widTestSum + exp(-enTest/Temperature)
+                    EpotTest = same_EpotTest + mix_EpotTest
+                    widTestSum = widTestSum + exp(-EpotTest/Temperature)
                     
                 end if
             
