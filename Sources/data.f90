@@ -41,20 +41,20 @@ implicit none
     
     integer, parameter :: Ndim = 3
     
-    real(DP), parameter :: Lsize1 = 25._DP
-    real(DP), parameter :: Lsize2 = Lsize1
-    real(DP), parameter :: Lsize3 = Lsize1
-    real(DP), dimension(Ndim), parameter :: Lsize = [Lsize1, Lsize2, Lsize3]
-    real(DP), dimension(Ndim), parameter :: LsizeMi = 0.5_DP * Lsize
-    real(DP), parameter :: Volume = Lsize1 * Lsize2 * Lsize3
+    real(DP), parameter :: Lsize1 = 25._DP ! u_length
+    real(DP), parameter :: Lsize2 = Lsize1 ! u_length
+    real(DP), parameter :: Lsize3 = Lsize1 ! u_length 
+    real(DP), dimension(Ndim), parameter :: Lsize = [Lsize1, Lsize2, Lsize3] ! u_length
+    real(DP), dimension(Ndim), parameter :: LsizeMi = 0.5_DP * Lsize ! u_length
+    real(DP), parameter :: Volume = Lsize1 * Lsize2 * Lsize3 ! u_length**3
 
-    integer, parameter :: Kmax1 = 8
-    integer, parameter :: Kmax2 = Kmax1
-    integer, parameter :: Kmax3 = Kmax1
-    integer, dimension(Ndim), parameter :: Kmax = [Kmax1, Kmax2, Kmax3]
+    integer, parameter :: Kmax1 = 8 ! 1/u_length
+    integer, parameter :: Kmax2 = Kmax1 ! 1/u_length
+    integer, parameter :: Kmax3 = Kmax1 ! 1/u_length
+    integer, dimension(Ndim), parameter :: Kmax = [Kmax1, Kmax2, Kmax3] ! 1/u_length
     
-    real(DP), parameter :: in_permittivity = 1._DP ! !< inside
-    real(DP), parameter :: out_permittivity = 1._DP ! !< outside
+    real(DP), parameter :: in_permittivity = 1._DP ! !< inside u_permittivity
+    real(DP), parameter :: out_permittivity = 1._DP ! !< outside u_permittivity
     
 end module data_box
 !***************************************************************************************************
@@ -69,19 +69,19 @@ use data_precisions, only : DP
 
 implicit none
 
-    real(DP), parameter :: dipol_rMin = 1._DP
+    real(DP), parameter :: dipol_rMin = 1._DP ! u_length
     integer, parameter :: dipol_Ncol = 281
     
-    real(DP), parameter :: hard_rMin = 1._DP
+    real(DP), parameter :: hard_rMin = 1._DP ! u_length
     integer, parameter :: hard_Ncol = 6750
     
-    real(DP), parameter :: mix_delta = 0.2_DP
-    real(DP), parameter :: mix_rMin = (dipol_rMin + hard_rMin)/2._DP + mix_delta
+    real(DP), parameter :: mix_delta = 0.2_DP ! u_length
+    real(DP), parameter :: mix_rMin = (dipol_rMin + hard_rMin)/2._DP + mix_delta ! u_length
     
     integer, parameter :: Ncol = dipol_Ncol + hard_Ncol
     
     ! out ---------------------------------------------------------------------
-    real(DP), parameter :: inter_rMin = 1._DP
+    real(DP), parameter :: inter_rMin = 1._DP ! u_length
     integer, parameter :: inter_Ncol = 0    
     ! -------------------------------------------------------------------------
     
@@ -100,7 +100,7 @@ use data_particles, only : Ncol, dipol_Ncol, hard_Ncol, inter_Ncol
 
 implicit none
 
-    real(DP), parameter :: Temperature = 1._DP
+    real(DP), parameter :: Temperature = 1._DP ! u_temperature
     integer, parameter :: Nstep = 2**16
     integer, parameter :: decorrelFactor = 2**0
     integer, parameter :: Nthermal = 2**15/decorrelFactor
@@ -108,11 +108,11 @@ implicit none
     integer, parameter :: Nrotate = decorrelFactor * dipol_Ncol
     
     ! move
-    real(DP), dimension(Ndim), parameter :: dipol_move_delta = 0.3_DP
+    real(DP), dimension(Ndim), parameter :: dipol_move_delta = 0.3_DP ! u_length
     real(DP), parameter :: dipol_move_rejectFix = 0.5_DP
     integer, parameter :: dipol_move_Nadapt = Nthermal/8
     ! rotate
-    real(DP), parameter :: dipol_rotate_delta = 30._DP
+    real(DP), parameter :: dipol_rotate_delta = 30._DP ! u_moment ?
     real(DP), parameter :: dipol_rotate_deltaMax = 75._DP
     real(DP), parameter :: dipol_rotate_rejectFix = 0.17_DP
     integer, parameter :: dipol_rotate_Nadapt = Nthermal/8
@@ -122,13 +122,13 @@ implicit none
     integer, parameter :: dipol_structure_iStep = 2**13/decorrelFactor
     integer, parameter :: dipol_totalMoment_iStep = 2**13/decorrelFactor
     
-    real(DP), dimension(Ndim), parameter :: hard_move_delta = 0.5_DP
+    real(DP), dimension(Ndim), parameter :: hard_move_delta = 0.5_DP ! u_length
     real(DP), parameter :: hard_move_rejectFix = 0.5_DP
     integer, parameter :: hard_move_Nadapt = Nthermal/8
     integer, parameter :: hard_Nwidom = 500 ! hard_Ncol
     
     ! out ---------------------------------------------------------------------
-    real(DP), dimension(Ndim), parameter :: inter_move_delta = 1._DP
+    real(DP), dimension(Ndim), parameter :: inter_move_delta = 1._DP ! u_length
     real(DP), parameter :: inter_move_rejectFix = 0.5_DP
     integer, parameter :: inter_move_Nadapt = Nthermal/8
     integer, parameter :: inter_Nwidom = inter_Ncol    
@@ -154,25 +154,25 @@ use data_particles, only : hard_rMin
 
 implicit none
 
-    real(DP), parameter :: dipol_rCut = Lsize1/2._DP*sqrt(3._DP)
-    real(DP), parameter :: dipol_dr = 5.E-5_DP
-    real(DP), parameter :: dipol_alpha = 7._DP/Lsize1
+    real(DP), parameter :: dipol_rCut = Lsize1/2._DP*sqrt(3._DP) ! u_length
+    real(DP), parameter :: dipol_dr = 5.E-5_DP ! u_length
+    real(DP), parameter :: dipol_alpha = 7._DP/Lsize1 ! 1/u_length
     
-    real(DP), parameter :: hard_rCut = hard_rMin
+    real(DP), parameter :: hard_rCut = hard_rMin ! u_length
     
-    real(DP), parameter :: mix_rCut = 1.25_DP
-    real(DP), parameter :: mix_dr = mix_rCut/2._DP
-    real(DP), parameter :: mix_epsilon = 0._DP
-    real(DP), parameter :: mix_alpha = 40._DP
+    real(DP), parameter :: mix_rCut = 1.25_DP ! u_length
+    real(DP), parameter :: mix_dr = mix_rCut/2._DP ! u_length
+    real(DP), parameter :: mix_epsilon = 0._DP ! u_energy * u_length
+    real(DP), parameter :: mix_alpha = 40._DP ! 1/u_length
     
     ! out ---------------------------------------------------------------------
     !> The interactive spheres (inter) potential is composed of 3 parts :
     !> hard sphere (HS) + Yukawa + cut.
     
-    real(DP), parameter :: inter_rCut = 4._DP
-    real(DP), parameter :: inter_dr = 5.E-5_DP
-    real(DP), parameter :: inter_epsilon = 1._DP
-    real(DP), parameter :: inter_alpha = 5._DP    
+    real(DP), parameter :: inter_rCut = 4._DP ! u_length
+    real(DP), parameter :: inter_dr = 5.E-5_DP ! u_length
+    real(DP), parameter :: inter_epsilon = 1._DP ! u_energy * u_length
+    real(DP), parameter :: inter_alpha = 5._DP ! 1/u_length
     ! -------------------------------------------------------------------------
         
 end module data_potential
@@ -195,13 +195,13 @@ implicit none
                                                              !< in each direction
     integer, parameter :: NnearCell = 3**3 !< Total number of nearest neighbour cells,
                                            !< including itself
-    real(DP), dimension(Ndim), parameter :: dipol_cell_size = dipol_rMin
-    real(DP), dimension(Ndim), parameter :: hard_cell_size = hard_rCut
+    real(DP), dimension(Ndim), parameter :: dipol_cell_size = dipol_rMin ! u_length
+    real(DP), dimension(Ndim), parameter :: hard_cell_size = hard_rCut ! u_length
     
-    real(DP), dimension(Ndim), parameter :: mix_cell_size = mix_rCut
+    real(DP), dimension(Ndim), parameter :: mix_cell_size = mix_rCut ! u_length
     
     ! out ---------------------------------------------------------------------
-    real(DP), dimension(Ndim), parameter :: inter_cell_size = inter_rCut
+    real(DP), dimension(Ndim), parameter :: inter_cell_size = inter_rCut ! u_length
     ! -------------------------------------------------------------------------
 
 end module data_neighbourCells
