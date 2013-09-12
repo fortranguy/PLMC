@@ -276,15 +276,27 @@ contains
         call random_number(xRand)
         xNew(:) = this%positions(:, iOld) + (xRand(:)-0.5_DP)*this%move_delta(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
-        same_iCellNew = this%sameCells%index_from_position(xNew)
-        call this%Epot_neighCells(iOld, xNew, same_iCellNew, overlap, same_EpotNew)
         
-        if (.not. overlap) then
-        
+        if (this%Ncol >= other%Ncol) then ! optimisation : more chance to overlap
+            same_iCellNew = this%sameCells%index_from_position(xNew)
+            call this%Epot_neighCells(iOld, xNew, same_iCellNew, overlap, same_EpotNew)
+        else
             mix_iCellNew = this%mixCells%index_from_position(xNew)
             call mix%Epot_neighCells(xNew, mix_iCellNew, this%mixCells, other%positions, overlap, &
                                      mix_EpotNew)
-                        
+        end if
+        
+        if (.not. overlap) then
+        
+            if (this%Ncol >= other%Ncol) then
+                mix_iCellNew = this%mixCells%index_from_position(xNew)
+                call mix%Epot_neighCells(xNew, mix_iCellNew, this%mixCells, other%positions, overlap, &
+                                         mix_EpotNew)
+            else
+                same_iCellNew = this%sameCells%index_from_position(xNew)
+                call this%Epot_neighCells(iOld, xNew, same_iCellNew, overlap, same_EpotNew)
+            end if
+                            
             if (.not. overlap) then
     
                 same_iCellOld = this%sameCells%index_from_position(this%positions(:, iOld))
