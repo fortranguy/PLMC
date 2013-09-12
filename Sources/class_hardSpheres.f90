@@ -244,7 +244,6 @@ contains
                 if (random < exp(-mix_deltaEpot/Temperature)) then
                 
                     this%positions(:, iOld) = xNew(:)
-                    same_obs%Epot = same_obs%Epot + 0._DP
                     mix_Epot = mix_Epot + mix_deltaEpot
                     
                     if (same_iCellOld /= same_iCellNew) then                
