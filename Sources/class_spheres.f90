@@ -126,7 +126,7 @@ contains
         
         real(DP) :: density, compacity
         
-        density = real(this%Ncol, DP) / Volume
+        density = real(this%Ncol + 1, DP) / Volume ! cheating ? cf. Widom
         compacity = 4._DP/3._DP*PI*this%radius**3 * density
         
         write(output_unit, *) this%name, " : ", "density = ", density, "compacity = ", compacity
