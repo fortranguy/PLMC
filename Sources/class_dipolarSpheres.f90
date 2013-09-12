@@ -1417,16 +1417,15 @@ contains
         class(MoreObservables), intent(inout) :: same_obs
         real(DP), intent(inout) :: mix_Epot
         
-        real(DP), dimension(Ndim) :: xRand
         logical :: overlap
-        real(DP), dimension(Ndim) :: xOld, xNew
+        real(DP), dimension(Ndim) :: xOld, xRand, xNew
         real(DP), dimension(Ndim) :: mCol
+        real(DP) :: random
         integer :: same_iCellOld, same_iCellNew
         integer :: mix_iCellOld, mix_iCellNew
         real(DP) :: deltaEpot, same_deltaEpot, mix_deltaEpot
         real(DP) :: same_EpotNew_real, same_EpotOld_real
         real(DP) :: mix_EpotNew, mix_EpotOld
-        real(DP) :: random
         
         xOld(:) = this%positions(:, iOld)
         ! Random new position
