@@ -1448,8 +1448,8 @@ contains
                 
                 ! Real
                 same_iCellOld = this%sameCells%index_from_position(xOld)
-                same_EpotNew_real = this%Epot_real_solo(iOld, xNew, this%orientations(:, iOld))
-                same_EpotOld_real = this%Epot_real_solo(iOld, xOld, this%orientations(:, iOld))
+                same_EpotNew_real = this%Epot_real_solo(iOld, xNew, mCol)
+                same_EpotOld_real = this%Epot_real_solo(iOld, xOld, mCol)
                 
                 same_deltaEpot = (same_EpotNew_real-same_EpotOld_real) + &
                                  this%deltaEpot_reci_move(xOld, xNew, mCol)
