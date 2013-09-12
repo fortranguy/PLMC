@@ -1555,7 +1555,7 @@ contains
         integer :: same_iCellTest, mix_iCellTest
         logical :: overlap
         real(DP) :: EpotTest
-        real(DP) :: same_EpotTest, same_EpotTest_real
+        real(DP) :: same_EpotTest
         real(DP) :: mix_EpotTest
         
         widTestSum = 0._DP
@@ -1577,10 +1577,9 @@ contains
                 if (.not. overlap) then
                 
                     mTest(:) = random_surface()
-                    same_EpotTest_real = this%Epot_real_solo(0, xTest, mTest)
                                         
-                    same_EpotTest = same_EpotTest_real + this%deltaEpot_reci_test(xTest, mTest) - &
-                                    this%Epot_self_solo(mTest)
+                    same_EpotTest = this%Epot_real_solo(0, xTest, mTest) + &
+                                    this%deltaEpot_reci_test(xTest, mTest) - this%Epot_self_solo(mTest)
                 
                     EpotTest = same_EpotTest + mix_EpotTest
                     widTestSum = widTestSum + exp(-EpotTest/Temperature)
