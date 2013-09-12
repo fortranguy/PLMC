@@ -220,14 +220,25 @@ contains
         xNew(:) = this%positions(:, iOld) + (xRand(:)-0.5_DP)*this%move_delta(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
         
-        same_iCellNew = this%sameCells%index_from_position(xNew)
-        call this%Epot_neighCells(iOld, xNew, same_iCellNew, overlap)
+        if (this%Ncol >= other%Ncol) then        
+            same_iCellNew = this%sameCells%index_from_position(xNew)
+            call this%Epot_neighCells(iOld, xNew, same_iCellNew, overlap)            
+        else        
+            mix_iCellNew = this%mixCells%index_from_position(xNew)
+            call mix%Epot_neighCells(xNew, mix_iCellNew, this%mixCells, other%positions, overlap, &
+                                     mix_EpotNew)        
+        end if
         
         if (.not. overlap) then
         
-            mix_iCellNew = this%mixCells%index_from_position(xNew)
-            call mix%Epot_neighCells(xNew, mix_iCellNew, this%mixCells, other%positions, overlap, &
-                                     mix_EpotNew)
+            if (this%Ncol >= other%Ncol) then        
+                mix_iCellNew = this%mixCells%index_from_position(xNew)
+                call mix%Epot_neighCells(xNew, mix_iCellNew, this%mixCells, other%positions, overlap, &
+                                         mix_EpotNew)
+            else                
+                same_iCellNew = this%sameCells%index_from_position(xNew)
+                call this%Epot_neighCells(iOld, xNew, same_iCellNew, overlap)
+            end if
                         
             if (.not. overlap) then
     
