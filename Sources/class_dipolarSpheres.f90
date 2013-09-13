@@ -1166,6 +1166,8 @@ contains
 
     ! Energy for 1 particle
     
+    ! To do : write a more general comment
+    
     !> Difference of Energy 
     !> \f[ \Delta U^{N+1} = \frac{2\pi}{V} \sum_{\vec{k} \neq \vec{0}} 
     !>                          (\vec{k} \cdot \vec{\mu}_{N+1}) w(\alpha, \vec{k})
