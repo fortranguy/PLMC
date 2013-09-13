@@ -344,10 +344,10 @@ contains
     
     !> Widom's method : with other type ?
 
-    subroutine InteractingSpheres_widom(this, other_positions, mix, activ)
+    subroutine InteractingSpheres_widom(this, other, mix, activ)
         
         class(InteractingSpheres), intent(in) :: this
-        real(DP), dimension(:, :), intent(in) :: other_positions
+        class(Spheres), intent(in) :: other
         class(MixingPotential), intent(in) :: mix
         real(DP), intent(inOut) :: activ
         
@@ -363,15 +363,27 @@ contains
         do iWidom = 1, this%Nwidom
             
             call random_number(xRand)
-            xTest(:) = Lsize(:) * xRand(:)    
-            same_iCellTest = this%sameCells%index_from_position(xTest)
-            call this%Epot_neighCells(0, xTest, same_iCellTest, overlap, same_EpotTest) 
+            xTest(:) = Lsize(:) * xRand(:)
+
+            if (this%Ncol >= other%Ncol) then
+                same_iCellTest = this%sameCells%index_from_position(xTest)
+                call this%Epot_neighCells(0, xTest, same_iCellTest, overlap, same_EpotTest)
+            else
+                mix_iCellTest = this%mixCells%index_from_position(xTest)
+                call mix%Epot_neighCells(xTest, mix_iCellTest, this%mixCells, other%positions, &
+                                         overlap, mix_EpotTest)
+            end if
             
             if (.not. overlap) then
-                
-                mix_iCellTest = this%mixCells%index_from_position(xTest)
-                call mix%Epot_neighCells(xTest, mix_iCellTest, this%mixCells, other_positions, &
-                                         overlap, mix_EpotTest)
+
+                if (this%Ncol >= other%Ncol) then
+                    mix_iCellTest = this%mixCells%index_from_position(xTest)
+                    call mix%Epot_neighCells(xTest, mix_iCellTest, this%mixCells, other%positions, &
+                                            overlap, mix_EpotTest)
+                else
+                    same_iCellTest = this%sameCells%index_from_position(xTest)
+                    call this%Epot_neighCells(0, xTest, same_iCellTest, overlap, same_EpotTest)
+                end if
                 
                 if (.not. overlap) then
                 
