@@ -1552,10 +1552,10 @@ contains
     
     !> Widom's method
 
-    subroutine DipolarSpheres_widom(this, other_positions, mix, activ)
+    subroutine DipolarSpheres_widom(this, other, mix, activ)
         
         class(DipolarSpheres), intent(in) :: this
-        real(DP), dimension(:, :), intent(in) :: other_positions
+        class(Spheres), intent(in) :: other
         class(MixingPotential), intent(in) :: mix
         real(DP), intent(inOut) :: activ 
         
@@ -1575,15 +1575,26 @@ contains
             
             call random_number(xRand)
             xTest(:) = Lsize(:) * xRand(:)
-            
-            mix_iCellTest = this%mixCells%index_from_position(xTest)
-            call mix%Epot_neighCells(xTest, mix_iCellTest, this%mixCells, other_positions, overlap, &
-                                     mix_EpotTest)
+
+            if (this%Ncol >= other%Ncol) then
+                same_iCellTest = this%sameCells%index_from_position(xTest)
+                call this%Epot_real_overlapTest(0, xTest, same_iCellTest, overlap)
+            else            
+                mix_iCellTest = this%mixCells%index_from_position(xTest)
+                call mix%Epot_neighCells(xTest, mix_iCellTest, this%mixCells, other%positions, &
+                                         overlap, mix_EpotTest)
+            end if
             
             if (.not. overlap) then
                                
-                same_iCellTest = this%sameCells%index_from_position(xTest)
-                call this%Epot_real_overlapTest(0, xTest, same_iCellTest, overlap)
+                if (this%Ncol >= other%Ncol) then
+                    mix_iCellTest = this%mixCells%index_from_position(xTest)
+                    call mix%Epot_neighCells(xTest, mix_iCellTest, this%mixCells, other%positions, &
+                                            overlap, mix_EpotTest)
+                else
+                    same_iCellTest = this%sameCells%index_from_position(xTest)
+                    call this%Epot_real_overlapTest(0, xTest, same_iCellTest, overlap)
+                end if
                 
                 if (.not. overlap) then
                 
