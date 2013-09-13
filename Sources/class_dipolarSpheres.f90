@@ -1164,7 +1164,7 @@ contains
 
     end subroutine DipolarSpheres_deltaEpot_reci_rotate_updateStructure
 
-    ! Widom
+    ! Energy for 1 particle
     
     !> Difference of Energy 
     !> \f[ \Delta U^{N+1} = \frac{2\pi}{V} \sum_{\vec{k} \neq \vec{0}} 
