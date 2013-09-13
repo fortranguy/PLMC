@@ -1185,36 +1185,36 @@ contains
     !>                          \}
     !> \f]
 
-    pure function DipolarSpheres_deltaEpot_reci_solo(this, xTest, mTest) result(deltaEpot_reci_solo)
+    pure function DipolarSpheres_deltaEpot_reci_solo(this, xCol, mCol) result(deltaEpot_reci_solo)
 
         class(DipolarSpheres), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: xTest
-        real(DP), dimension(:), intent(in) :: mTest
+        real(DP), dimension(:), intent(in) :: xCol
+        real(DP), dimension(:), intent(in) :: mCol
         real(DP) :: deltaEpot_reci_solo
         
         real(DP) :: deltaEpot_k
         
-        real(DP), dimension(Ndim) :: xTestOverL
-        real(DP), dimension(Ndim) :: mTestOverL
+        real(DP), dimension(Ndim) :: xColOverL
+        real(DP), dimension(Ndim) :: mColOverL
         
-        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxTest_1
-        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxTest_2
-        complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_IkxTest_3
-        complex(DP) :: exp_IkxTest
-        real(DP) :: cos_kxTest, sin_kxTest
+        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxCol_1
+        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxCol_2
+        complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_IkxCol_3
+        complex(DP) :: exp_IkxCol
+        real(DP) :: cos_kxCol, sin_kxCol
         
         real(DP) :: realPart
         
         real(DP), dimension(Ndim) :: waveVector
-        real(DP) :: k_dot_mTest
+        real(DP) :: k_dot_mCol
         complex(DP) :: structure_k
         integer :: kx, ky, kz
         
-        xTestOverL(:) = xTest(:)/Lsize(:)
+        xColOverL(:) = xCol(:)/Lsize(:)
         
-        call fourier(xTestOverL, exp_IkxTest_1, exp_IkxTest_2, exp_IkxTest_3)
+        call fourier(xColOverL, exp_IkxCol_1, exp_IkxCol_2, exp_IkxCol_3)
         
-        mTestOverL(:) = mTest(:)/Lsize(:)
+        mColOverL(:) = mCol(:)/Lsize(:)
         
         deltaEpot_reci_solo = 0._DP
         
@@ -1230,18 +1230,18 @@ contains
                 
                     waveVector(1) = real(kx, DP)
                     
-                    k_dot_mTest = dot_product(waveVector, mTestOverL)
+                    k_dot_mCol = dot_product(waveVector, mColOverL)
                     
                     structure_k = this%structureFactor(kx, ky, kz)
                                                   
-                    exp_IkxTest = exp_IkxTest_1(kx) * exp_IkxTest_2(ky) * exp_IkxTest_3(kz)
-                    cos_kxTest = real(exp_IkxTest, DP)
-                    sin_kxTest = aimag(exp_IkxTest)
+                    exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky) * exp_IkxCol_3(kz)
+                    cos_kxCol = real(exp_IkxCol, DP)
+                    sin_kxCol = aimag(exp_IkxCol)
                     
-                    realPart = real(structure_k, DP) * cos_kxTest
-                    realPart = realPart + aimag(structure_k) * sin_kxTest
+                    realPart = real(structure_k, DP) * cos_kxCol
+                    realPart = realPart + aimag(structure_k) * sin_kxCol
                     
-                    deltaEpot_k = k_dot_mTest * (k_dot_mTest + 2._DP * realPart)
+                    deltaEpot_k = k_dot_mCol * (k_dot_mCol + 2._DP * realPart)
                     deltaEpot_k = deltaEpot_k * this%Epot_reci_weight(kx, ky, kz)
                     deltaEpot_reci_solo = deltaEpot_reci_solo + deltaEpot_k
                    
