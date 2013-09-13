@@ -100,7 +100,7 @@ private
         procedure, private :: deltaEpot_reci_rotate => DipolarSpheres_deltaEpot_reci_rotate
         procedure, private :: deltaEpot_reci_rotate_updateStructure => &
                               DipolarSpheres_deltaEpot_reci_rotate_updateStructure
-        procedure, private :: deltaEpot_reci_test => DipolarSpheres_deltaEpot_reci_test
+        procedure, private :: deltaEpot_reci_solo => DipolarSpheres_deltaEpot_reci_solo
         !>     Reciprocal : total
         procedure, private :: Epot_reci => DipolarSpheres_Epot_reci
         !>     Self
@@ -1185,12 +1185,12 @@ contains
     !>                          \}
     !> \f]
 
-    pure function DipolarSpheres_deltaEpot_reci_test(this, xTest, mTest) result(deltaEpot_reci_test)
+    pure function DipolarSpheres_deltaEpot_reci_solo(this, xTest, mTest) result(deltaEpot_reci_solo)
 
         class(DipolarSpheres), intent(in) :: this
         real(DP), dimension(:), intent(in) :: xTest
         real(DP), dimension(:), intent(in) :: mTest
-        real(DP) :: deltaEpot_reci_test
+        real(DP) :: deltaEpot_reci_solo
         
         real(DP) :: deltaEpot_k
         
@@ -1216,7 +1216,7 @@ contains
         
         mTestOverL(:) = mTest(:)/Lsize(:)
         
-        deltaEpot_reci_test = 0._DP
+        deltaEpot_reci_solo = 0._DP
         
         do kz = 0, Kmax(3)
 
@@ -1243,7 +1243,7 @@ contains
                     
                     deltaEpot_k = k_dot_mTest * (k_dot_mTest + 2._DP * realPart)
                     deltaEpot_k = deltaEpot_k * this%Epot_reci_weight(kx, ky, kz)
-                    deltaEpot_reci_test = deltaEpot_reci_test + deltaEpot_k
+                    deltaEpot_reci_solo = deltaEpot_reci_solo + deltaEpot_k
                    
                 end do
             
@@ -1251,9 +1251,9 @@ contains
         
         end do
         
-        deltaEpot_reci_test = 4._DP*PI/Volume * deltaEpot_reci_test
+        deltaEpot_reci_solo = 4._DP*PI/Volume * deltaEpot_reci_solo
 
-    end function DipolarSpheres_deltaEpot_reci_test
+    end function DipolarSpheres_deltaEpot_reci_solo
     
     !> Total reciprocal energy
     
@@ -1601,7 +1601,7 @@ contains
                     mTest(:) = random_surface()
                                         
                     same_EpotTest = this%Epot_real_solo(0, xTest, mTest) + &
-                                    this%deltaEpot_reci_test(xTest, mTest) - this%Epot_self_solo(mTest)
+                                    this%deltaEpot_reci_solo(xTest, mTest) - this%Epot_self_solo(mTest)
                 
                     EpotTest = same_EpotTest + mix_EpotTest
                     widTestSum = widTestSum + exp(-EpotTest/Temperature)
