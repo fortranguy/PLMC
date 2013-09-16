@@ -65,18 +65,14 @@ contains
         this%name = "[mix]"
         write(output_unit, *) this%name, " class construction"
         
-        ! Particles
-        this%delta = mix_delta
-        
         ! MixingPotential
         this%rCut = mix_rCut
         this%dr = mix_dr
-        this%iMin = int(this%rMin/this%dr)
-        this%iCut = int(this%rCut/this%dr)
         this%epsilon = mix_epsilon
         this%alpha = mix_alpha
-        allocate(this%Epot_tab(this%iMin:this%iCut))
-        call this%Epot_init()
+        
+        ! Particles
+        this%delta = mix_delta
 
     end subroutine MixingPotential_construct
 
@@ -123,6 +119,13 @@ contains
             write(error_unit, *) "    rCut <- rMin"
         end if
         
+        ! MixingPotential
+        this%iMin = int(this%rMin/this%dr)
+        this%iCut = int(this%rCut/this%dr)
+        allocate(this%Epot_tab(this%iMin:this%iCut))
+        call this%Epot_init()
+        
+        ! Neighbours
         this%cell_size(:) = this%rCut
     
     end subroutine MixingPotential_setRmin
