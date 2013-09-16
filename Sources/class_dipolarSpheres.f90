@@ -1441,11 +1441,11 @@ contains
         class(MoreObservables), intent(inout) :: same_obs
         real(DP), intent(inout) :: mix_Epot
         
-        logical :: overlap
+        real(DP) :: random
         integer :: iOld
         real(DP), dimension(Ndim) :: xOld, xRand, xNew
         real(DP), dimension(Ndim) :: mCol
-        real(DP) :: random
+        logical :: overlap
         integer :: same_iCellOld, same_iCellNew
         integer :: mix_iCellOld, mix_iCellNew
         real(DP) :: deltaEpot, same_deltaEpot, mix_deltaEpot

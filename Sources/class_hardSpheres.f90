@@ -207,9 +207,8 @@ contains
         
         real(DP) :: random
         integer :: iOld
-        real(DP), dimension(Ndim) :: xRand
+        real(DP), dimension(Ndim) :: xOld, xRand, xNew
         logical :: overlap
-        real(DP), dimension(Ndim) :: xNew
         integer :: same_iCellOld, same_iCellNew
         integer :: mix_iCellOld, mix_iCellNew
         real(DP) :: mix_deltaEpot
