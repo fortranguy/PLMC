@@ -4,8 +4,7 @@ program monteCarlo_canonical_bulk
 
 use, intrinsic :: iso_fortran_env, only : output_unit
 use data_precisions, only : DP
-use data_particles, only : Ncol
-use data_monteCarlo, only : Nstep, Nthermal, Nmove, Nrotate
+use data_monteCarlo, only : Nstep, Nthermal, decorrelFactor
 use data_distribution, only : snap
 use class_observables
 use class_mixingPotential
@@ -19,8 +18,11 @@ implicit none
     
     ! Monte-Carlo variables
     integer :: iStep !< step counter
-    integer :: iChangeRand !< random change
     integer :: iChange !< change counters
+    integer :: iChangeRand !< random change
+    integer :: Ncol !< Number of particles
+    integer :: Nmove !< Number of displacements
+    integer :: Nrotate !< Number of rotations
     integer :: iColRand !< random particle
     real(DP) :: random !< random number between 0 and 1
     real(DP) :: tIni, tFin !< CPU initial and final time
@@ -51,6 +53,14 @@ implicit none
     type(Observables) :: type2_obs
     type(Units) :: type2_units
     
+    call mix%construct()
+    call type1_spheres%construct(mix%getCell_size(), mix%getRcut())
+    call type2_spheres%construct(mix%getCell_size(), mix%getRcut())
+    
+    Ncol = type1_spheres%getNcol() + type2_spheres%getNcol()
+    Nmove = decorrelFactor * Ncol
+    Nrotate = decorrelFactor * type1_spheres%getNcol()
+    
 ! Beginning ----------------------------------------------------------------------------------------
     
     write(output_unit, *) "Monte-Carlo Simulation : Canonical ensemble"
@@ -62,10 +72,9 @@ implicit none
          action='write')
     open(newunit=obsEquilib_unit, recl=4096, file="obsEquilib.out", status='new', &
          action='write')
-    call report(report_unit)
-    !call initRandomSeed(report_unit)
+    call report(Ncol, Nmove, Nrotate, report_unit)
+    !call initRandomSeed(report_unit)    
     
-    call mix%construct()
     mix_EpotSum = 0._DP
     open(newunit=mix_report_unit, recl=4096, file="mix_report.txt", status='new', action='write')
     open(newunit=mix_Epot_unit, recl=4096, file="mix_Epot.tmp", status='new', action='write')
@@ -76,7 +85,6 @@ implicit none
     call mix%Epot_print(mix_Epot_unit)
     call mix%printReport(mix_report_unit)
     
-    call type1_spheres%construct(mix%getCell_size(), mix%getRcut())
     call type1_obs%init()
     call type1_units%open(type1_spheres%getName())
     call type1_spheres%Epot_real_print(type1_units%Epot)
@@ -84,7 +92,6 @@ implicit none
     call type1_spheres%printDensity(type1_units%report)
     call type1_spheres%printReport(type1_units%report)
     
-    call type2_spheres%construct(mix%getCell_size(), mix%getRcut())
     call type2_obs%init()
     call type2_units%open(type2_spheres%getName())
     call type2_spheres%Epot_print(type2_units%Epot)
@@ -287,7 +294,7 @@ implicit none
     Epot_conf = type1_spheres%Epot_conf() + type2_spheres%Epot_conf() + mix_Epot_conf
     call consistTest(Epot, Epot_conf, report_unit)
     EpotSum = type1_obs%EpotSum + type2_obs%EpotSum + mix_EpotSum
-    call printResults(EpotSum, tFin-tIni, report_unit)
+    call printResults(Ncol, EpotSum, tFin-tIni, report_unit)
     
     ! Finalisations
     

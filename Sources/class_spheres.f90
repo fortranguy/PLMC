@@ -51,6 +51,7 @@ private
         procedure :: getName => Spheres_getName
         procedure :: getNcol => Spheres_getNcol
         procedure :: getRmin => Spheres_getRmin
+        procedure :: getRcut => Spheres_getRcut        
         procedure :: getMove_Nadapt => Spheres_getMove_Nadapt
         
         procedure :: printDensity => Spheres_printDensity
@@ -105,6 +106,17 @@ contains
         getRmin = this%rMin
     
     end function Spheres_getRmin
+    
+    !> Accessor : rCut
+    
+    pure function Spheres_getRcut(this) result(getRcut)
+    
+        class(Spheres), intent(in) :: this        
+        real(DP) :: getRcut
+        
+        getRcut = this%rCut
+    
+    end function Spheres_getRcut
     
     !> Accessor : move_Nadapt
     

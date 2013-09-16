@@ -79,8 +79,6 @@ implicit none
     real(DP), parameter :: mix_delta = 0.2_DP ! u_length
     real(DP), parameter :: mix_rMin = (1._DP + hard_rMin)/2._DP + mix_delta ! u_length
     
-    integer, parameter :: Ncol = dipol_Ncol + hard_Ncol
-    
     ! out ---------------------------------------------------------------------
     real(DP), parameter :: inter_rMin = 1._DP ! u_length
     integer, parameter :: inter_Ncol = 0    
@@ -97,7 +95,6 @@ module data_monteCarlo
 
 use data_precisions, only : DP
 use data_box, only : Ndim
-use data_particles, only : Ncol, dipol_Ncol, hard_Ncol, inter_Ncol
 
 implicit none
 
@@ -105,8 +102,6 @@ implicit none
     integer, parameter :: Nstep = 2**16
     integer, parameter :: decorrelFactor = 2**0
     integer, parameter :: Nthermal = 2**15/decorrelFactor
-    integer, parameter :: Nmove = decorrelFactor * Ncol
-    integer, parameter :: Nrotate = decorrelFactor * dipol_Ncol
     
     ! move
     real(DP), dimension(Ndim), parameter :: dipol_move_delta = 0.3_DP ! u_length, adaptation
@@ -118,7 +113,7 @@ implicit none
     real(DP), parameter :: dipol_rotate_rejectFix = 0.17_DP
     integer, parameter :: dipol_rotate_Nadapt = Nthermal/8
     ! chemical potential
-    integer, parameter :: dipol_Nwidom = 500 ! dipol_Ncol
+    integer, parameter :: dipol_Nwidom = 500
     ! reinitialisations
     integer, parameter :: dipol_structure_iStep = 2**13/decorrelFactor
     integer, parameter :: dipol_totalMoment_iStep = 2**13/decorrelFactor
@@ -126,13 +121,13 @@ implicit none
     real(DP), dimension(Ndim), parameter :: hard_move_delta = 0.5_DP ! u_length, adaptation
     real(DP), parameter :: hard_move_rejectFix = 0.5_DP
     integer, parameter :: hard_move_Nadapt = Nthermal/8
-    integer, parameter :: hard_Nwidom = 500 ! hard_Ncol
+    integer, parameter :: hard_Nwidom = 500
     
     ! out ---------------------------------------------------------------------
     real(DP), dimension(Ndim), parameter :: inter_move_delta = 1._DP ! u_length, adaptation
     real(DP), parameter :: inter_move_rejectFix = 0.5_DP
     integer, parameter :: inter_move_Nadapt = Nthermal/8
-    integer, parameter :: inter_Nwidom = inter_Ncol    
+    integer, parameter :: inter_Nwidom = 0
     ! -------------------------------------------------------------------------
 
 end module data_monteCarlo
@@ -151,15 +146,13 @@ module data_potential
 
 use data_precisions, only : DP
 use data_box, only : Lsize1
-use data_particles, only : mix_rMin, hard_rMin
+use data_particles, only : mix_rMin
 
 implicit none
 
     real(DP), parameter :: dipol_rCut = Lsize1/2._DP ! u_length
     real(DP), parameter :: dipol_dr = 5.E-5_DP ! u_length
     real(DP), parameter :: dipol_alpha = 7._DP/Lsize1 ! 1/u_length
-    
-    real(DP), parameter :: hard_rCut = hard_rMin ! u_length
     
     real(DP), parameter :: mix_rCut = mix_rMin ! u_length
     real(DP), parameter :: mix_dr = mix_rCut/2._DP ! u_length
@@ -187,7 +180,7 @@ module data_neighbourCells
 
 use data_precisions, only : DP
 use data_box, only : Ndim
-use data_potential, only : hard_rCut, mix_rCut, inter_rCut
+use data_potential, only : mix_rCut
 
 implicit none
 
@@ -196,13 +189,8 @@ implicit none
     integer, parameter :: NnearCell = 3**3 !< Total number of nearest neighbour cells,
                                            !< including itself
     real(DP), dimension(Ndim), parameter :: dipol_cell_size = 1._DP ! u_length, adaptation
-    real(DP), dimension(Ndim), parameter :: hard_cell_size = hard_rCut ! u_length, adaptation
     
     real(DP), dimension(Ndim), parameter :: mix_cell_size = mix_rCut ! u_length, adaptation
-    
-    ! out ---------------------------------------------------------------------
-    real(DP), dimension(Ndim), parameter :: inter_cell_size = inter_rCut ! u_length, adaptation
-    ! -------------------------------------------------------------------------
 
 end module data_neighbourCells
 !***************************************************************************************************

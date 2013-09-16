@@ -5,8 +5,7 @@ module module_tools
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit, iostat_end
 use data_precisions, only : DP, io_tiny, consist_tiny
 use data_box, only : Ndim, Lsize, Volume, Kmax
-use data_particles, only : Ncol
-use data_monteCarlo, only : Temperature, Nstep, decorrelFactor, Nthermal, Nmove, Nrotate
+use data_monteCarlo, only : Temperature, Nstep, decorrelFactor, Nthermal
 use module_physics, only : dist_PBC, random_surface
 use class_spheres
 use class_dipolarSpheres
@@ -217,8 +216,9 @@ contains
     
     !> Total : report
     
-    subroutine report(report_unit)
+    subroutine report(Ncol, Nmove, Nrotate, report_unit)
     
+        integer, intent(in) :: Ncol, Nmove, Nrotate
         integer, intent(in) :: report_unit
 
         write(report_unit, *) "Data :"
@@ -264,8 +264,9 @@ contains
     
     !> Total : Results    
     
-    subroutine printResults(EpotSum, duration, report_unit)
+    subroutine printResults(Ncol, EpotSum, duration, report_unit)
     
+        integer, intent(in) :: Ncol
         real(DP), intent(in) :: EpotSum
         real(DP), intent(in) :: duration
         integer, intent(in) :: report_unit

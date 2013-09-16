@@ -6,10 +6,9 @@ use, intrinsic :: iso_fortran_env, only : output_unit
 use data_precisions, only : DP
 use data_box, only : Ndim, Lsize
 use data_particles, only : hard_rMin, hard_Ncol
-use data_potential, only : hard_rCut
 use data_monteCarlo, only : Temperature, hard_move_delta, hard_move_rejectFix, hard_move_Nadapt, &
                             hard_Nwidom
-use data_neighbourCells, only : NnearCell, hard_cell_size
+use data_neighbourCells, only : NnearCell
 use data_distribution, only : hard_snap_factor
 use module_physics, only : dist_PBC
 use class_observables
@@ -58,6 +57,8 @@ contains
         real(DP), dimension(:), intent(in) :: mix_cell_size
         real(DP), intent(in) :: mix_rCut
         
+        real(DP), dimension(Ndim) :: cell_size
+        
         this%name = "hardS"
         write(output_unit, *) this%name, " class construction"
     
@@ -78,11 +79,12 @@ contains
         this%Nwidom = hard_Nwidom
                 
         ! Potential
-        this%rCut = hard_rCut
+        this%rCut = this%rMin
         this%Epot = 0._DP
         
         ! Neighbour Cells
-        call this%sameCells%construct(hard_cell_size, this%rCut) !< same kind
+        cell_size(:) = this%rCut
+        call this%sameCells%construct(cell_size, this%rCut) !< same kind
         call this%mixCells%construct(mix_cell_size, mix_rCut) !< other kind
     
     end subroutine HardSpheres_construct
