@@ -1433,16 +1433,16 @@ contains
 
     !> Particle move
     
-    subroutine DipolarSpheres_move(this, iOld, other, mix, same_obs, mix_Epot)
+    subroutine DipolarSpheres_move(this, other, mix, same_obs, mix_Epot)
     
         class(DipolarSpheres), intent(inout) :: this
-        integer, intent(in) :: iOld
         class(Spheres), intent(inout) :: other
         class(MixingPotential), intent(in) :: mix
         class(MoreObservables), intent(inout) :: same_obs
         real(DP), intent(inout) :: mix_Epot
         
         logical :: overlap
+        integer :: iOld
         real(DP), dimension(Ndim) :: xOld, xRand, xNew
         real(DP), dimension(Ndim) :: mCol
         real(DP) :: random
@@ -1452,7 +1452,10 @@ contains
         real(DP) :: same_EpotNew_real, same_EpotOld_real
         real(DP) :: mix_EpotNew, mix_EpotOld
         
+        call random_number(random)
+        iOld = int(random*this%Ncol) + 1        
         xOld(:) = this%positions(:, iOld)
+        
         ! Random new position
         call random_number(xRand)
         xNew(:) = xOld(:) + this%move_delta(:) * (xRand(:)-0.5_DP)
@@ -1532,18 +1535,21 @@ contains
     
     !> Particle rotation
     
-    subroutine DipolarSpheres_rotate(this, iOld, obs)
+    subroutine DipolarSpheres_rotate(this, obs)
     
         class(DipolarSpheres), intent(inout) :: this
-        integer, intent(in) :: iOld
         class(MoreObservables), intent(inout) :: obs
         
         real(DP) :: random
+        integer :: iOld
         real(DP), dimension(Ndim) :: xCol
         real(DP), dimension(Ndim) :: mOld, mNew
         real(DP) :: deltaEpot, deltaEpot_real, deltaEpot_self
         real(DP) :: real_EpotNew, real_EpotOld
         integer :: iTotalCell
+        
+        call random_number(random)
+        iOld = int(random*this%Ncol) + 1
         
         xCol(:) = this%positions(:, iOld)
         mOld(:) = this%orientations(:, iOld)
