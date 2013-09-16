@@ -153,7 +153,7 @@ use data_particles, only : mix_rMin, hard_rMin
 
 implicit none
 
-    real(DP), parameter :: dipol_rCut = Lsize1/2._DP*sqrt(3._DP) ! u_length
+    real(DP), parameter :: dipol_rCut = Lsize1/2._DP ! u_length
     real(DP), parameter :: dipol_dr = 5.E-5_DP ! u_length
     real(DP), parameter :: dipol_alpha = 7._DP/Lsize1 ! 1/u_length
     

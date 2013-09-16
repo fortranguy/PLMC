@@ -176,9 +176,9 @@ contains
                 write(error_unit, *) "  ", this%cell_size(iDim), "<", rCut
             end if
             
-            if (Lsize(iDim)/2._DP*sqrt(3._DP) < rCut) then
+            if (Lsize(iDim)/2._DP < rCut) then
                 write(error_unit, *) "  rCut too large in the dimension", iDim, ":"
-                write(error_unit, *) "  ", Lsize(iDim)/2._DP*sqrt(3._DP), "<", rCut
+                write(error_unit, *) "  ", Lsize(iDim)/2._DP, "<", rCut
                 stop
             end if
             
