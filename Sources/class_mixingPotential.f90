@@ -63,6 +63,7 @@ contains
         class(MixingPotential), intent(out) :: this
         
         this%name = "[mix]"
+        write(output_unit, *) this%name, " class construction"
         
         ! Particles
         this%delta = mix_delta
@@ -76,15 +77,14 @@ contains
         this%alpha = mix_alpha
         allocate(this%Epot_tab(this%iMin:this%iCut))
         call this%Epot_init()
-        
-        ! Neighbours        
-        this%cell_size(:) = mix_cell_size(:)
 
     end subroutine MixingPotential_construct
 
     subroutine MixingPotential_destroy(this)
     
         class(MixingPotential), intent(inout) :: this
+        
+        write(output_unit, *) this%name, " class destruction"
         
         if (allocated(this%Epot_tab)) then
             deallocate(this%Epot_tab)
@@ -121,6 +121,8 @@ contains
             this%rCut = this%rMin
             write(*, *) "rCut <- rMin"
         end if
+        
+        this%cell_size(:) = this%rCut
     
     end subroutine MixingPotential_setRmin
     

@@ -51,11 +51,9 @@ private
     
 contains
 
-    subroutine HardSpheres_construct(this, mix_cell_size, mix_rCut)
+    subroutine HardSpheres_construct(this)
     
         class(HardSpheres), intent(out) :: this
-        real(DP), dimension(:), intent(in) :: mix_cell_size
-        real(DP), intent(in) :: mix_rCut
         
         real(DP), dimension(Ndim) :: cell_size
         
@@ -85,7 +83,6 @@ contains
         ! Neighbour Cells
         cell_size(:) = this%rCut
         call this%sameCells%construct(cell_size, this%rCut) !< same kind
-        call this%mixCells%construct(mix_cell_size, mix_rCut) !< other kind
     
     end subroutine HardSpheres_construct
     

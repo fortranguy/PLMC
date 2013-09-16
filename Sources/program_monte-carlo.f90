@@ -54,9 +54,11 @@ implicit none
     type(Units) :: type2_units
     
     call mix%construct()
-    call type1_spheres%construct(mix%getCell_size(), mix%getRcut())
-    call type2_spheres%construct(mix%getCell_size(), mix%getRcut())
+    call type1_spheres%construct()
+    call type2_spheres%construct()
     call mix%setRmin(type1_spheres%getRmin(), type2_spheres%getRmin())
+    call type1_spheres%mixCells_construct(mix%getCell_size(), mix%getRcut())
+    call type2_spheres%mixCells_construct(mix%getCell_size(), mix%getRcut())
     
     Ncol = type1_spheres%getNcol() + type2_spheres%getNcol()
     Nmove = decorrelFactor * Ncol

@@ -53,6 +53,8 @@ private
         procedure :: getRmin => Spheres_getRmin
         procedure :: getRcut => Spheres_getRcut        
         procedure :: getMove_Nadapt => Spheres_getMove_Nadapt
+        !> Specifier
+        procedure :: mixCells_construct => Spheres_mixCells_construct
         
         procedure :: printDensity => Spheres_printDensity
         
@@ -122,12 +124,24 @@ contains
     
     pure function Spheres_getMove_Nadapt(this) result(getMove_Nadapt)
     
-        class(Spheres), intent(in) :: this        
+        class(Spheres), intent(in) :: this
         integer :: getMove_Nadapt
         
         getMove_Nadapt = this%move_Nadapt
         
     end function Spheres_getMove_Nadapt
+    
+    !> Specifier : mixCells construction
+    
+    subroutine Spheres_mixCells_construct(this, mix_cell_size, mix_rCut)
+    
+        class(Spheres), intent(inout) :: this
+        real(DP), dimension(:), intent(in) :: mix_cell_size
+        real(DP), intent(in) :: mix_rCut
+        
+        call this%mixCells%construct(mix_cell_size, mix_rCut)
+    
+    end subroutine Spheres_mixCells_construct
     
     !> Print density and compacity
     

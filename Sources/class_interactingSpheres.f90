@@ -58,11 +58,9 @@ private
     
 contains
 
-    subroutine InteractingSpheres_construct(this, mix_cell_size, mix_rCut)
+    subroutine InteractingSpheres_construct(this)
     
         class(InteractingSpheres), intent(out) :: this
-        real(DP), dimension(:), intent(in) :: mix_cell_size
-        real(DP), intent(in) :: mix_rCut
         
         real(DP), dimension(Ndim) :: cell_size
         
@@ -97,8 +95,7 @@ contains
         
         ! Neighbour Cells
         cell_size(:) = this%rCut
-        call this%sameCells%construct(cell_size, this%rCut) !< same kind
-        call this%mixCells%construct(mix_cell_size, mix_rCut) !< other kind
+        call this%sameCells%construct(cell_size, this%rCut)
     
     end subroutine InteractingSpheres_construct
     

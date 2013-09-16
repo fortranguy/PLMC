@@ -126,11 +126,9 @@ private
     
 contains
 
-    subroutine DipolarSpheres_construct(this, mix_cell_size, mix_rCut)
+    subroutine DipolarSpheres_construct(this)
     
         class(DipolarSpheres), intent(out) :: this
-        real(DP), dimension(:), intent(in) :: mix_cell_size
-        real(DP), intent(in) :: mix_rCut
         
         this%name = "dipol"        
         write(output_unit, *) this%name, " class construction"
@@ -175,7 +173,6 @@ contains
         
         ! Neighbour Cells
         call this%sameCells%construct(dipol_cell_size, this%rCut) !< same kind
-        call this%mixCells%construct(mix_cell_size, mix_rCut) !< other kind
     
     end subroutine DipolarSpheres_construct
     
