@@ -21,7 +21,7 @@ implicit none
     integer :: iStep !< step counter
     integer :: iChangeRand !< random change
     integer :: iChange !< change counters
-    integer :: iColType !< random particle
+    integer :: iColRand !< random particle
     real(DP) :: random !< random number between 0 and 1
     real(DP) :: tIni, tFin !< CPU initial and final time
     
@@ -132,14 +132,13 @@ implicit none
             
                 ! Randomly choosing the type
                 call random_number(random)
-                iColType = int(random*real(Ncol, DP)) + 1
+                iColRand = int(random*real(Ncol, DP)) + 1
                 
                 ! Moving a particle : 
-                if (iColType <= type1_spheres%getNcol()) then
+                if (iColRand <= type1_spheres%getNcol()) then
                     call type1_spheres%move(type2_spheres, mix, type1_obs, mix_Epot)
                     type1_obs%Nmove = type1_obs%Nmove + 1
                 else
-                    iColType = iColType - type1_spheres%getNcol()
                     call type2_spheres%move(type1_spheres, mix, type2_obs, mix_Epot)
                     type2_obs%Nmove = type2_obs%Nmove + 1
                 end if
