@@ -1187,7 +1187,7 @@ contains
     !>                          \}
     !> \f]
     
-    !> Subtraction 
+    !> Subtraction : 
     
     !> Difference of Energy 
     !> \f[ \Delta U_{N-1} = \frac{2\pi}{V} \sum_{\vec{k} \neq \vec{0}} 
