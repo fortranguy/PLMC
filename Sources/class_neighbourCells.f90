@@ -60,9 +60,10 @@ contains
         real(DP), dimension(:), intent(in) :: cell_size
         real(DP), intent(in) :: rCut
         
-        this%cell_size(:) = cell_size(:)
-        this%NtotalCell_dim(:) = int(Lsize(:)/this%cell_size(:))
+        this%NtotalCell_dim(:) = int(Lsize(:)/cell_size(:))
         this%NtotalCell = product(this%NtotalCell_dim)
+        this%cell_size(:) = Lsize(:)/this%cell_size(:)
+        
         allocate(this%nearCells_among_totalCells(NnearCell, this%NtotalCell))
             
         call this%check_CellsSize(rCut)        

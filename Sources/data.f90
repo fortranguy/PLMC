@@ -107,11 +107,11 @@ implicit none
     integer, parameter :: Nrotate = decorrelFactor * dipol_Ncol
     
     ! move
-    real(DP), dimension(Ndim), parameter :: dipol_move_delta = 0.3_DP ! u_length
+    real(DP), dimension(Ndim), parameter :: dipol_move_delta = 0.3_DP ! u_length, adaptation
     real(DP), parameter :: dipol_move_rejectFix = 0.5_DP
     integer, parameter :: dipol_move_Nadapt = Nthermal/8
     ! rotate
-    real(DP), parameter :: dipol_rotate_delta = 30._DP ! u_moment ?
+    real(DP), parameter :: dipol_rotate_delta = 30._DP ! u_moment, adaptation
     real(DP), parameter :: dipol_rotate_deltaMax = 75._DP
     real(DP), parameter :: dipol_rotate_rejectFix = 0.17_DP
     integer, parameter :: dipol_rotate_Nadapt = Nthermal/8
@@ -121,13 +121,13 @@ implicit none
     integer, parameter :: dipol_structure_iStep = 2**13/decorrelFactor
     integer, parameter :: dipol_totalMoment_iStep = 2**13/decorrelFactor
     
-    real(DP), dimension(Ndim), parameter :: hard_move_delta = 0.5_DP ! u_length
+    real(DP), dimension(Ndim), parameter :: hard_move_delta = 0.5_DP ! u_length, adaptation
     real(DP), parameter :: hard_move_rejectFix = 0.5_DP
     integer, parameter :: hard_move_Nadapt = Nthermal/8
     integer, parameter :: hard_Nwidom = 500 ! hard_Ncol
     
     ! out ---------------------------------------------------------------------
-    real(DP), dimension(Ndim), parameter :: inter_move_delta = 1._DP ! u_length
+    real(DP), dimension(Ndim), parameter :: inter_move_delta = 1._DP ! u_length, adaptation
     real(DP), parameter :: inter_move_rejectFix = 0.5_DP
     integer, parameter :: inter_move_Nadapt = Nthermal/8
     integer, parameter :: inter_Nwidom = inter_Ncol    
@@ -149,7 +149,7 @@ module data_potential
 
 use data_precisions, only : DP
 use data_box, only : Lsize1
-use data_particles, only : hard_rMin
+use data_particles, only : mix_rMin, hard_rMin
 
 implicit none
 
@@ -159,7 +159,7 @@ implicit none
     
     real(DP), parameter :: hard_rCut = hard_rMin ! u_length
     
-    real(DP), parameter :: mix_rCut = 1.25_DP ! u_length
+    real(DP), parameter :: mix_rCut = mix_rMin ! u_length
     real(DP), parameter :: mix_dr = mix_rCut/2._DP ! u_length
     real(DP), parameter :: mix_epsilon = 0._DP ! u_energy * u_length
     real(DP), parameter :: mix_alpha = 40._DP ! 1/u_length
@@ -194,13 +194,13 @@ implicit none
                                                              !< in each direction
     integer, parameter :: NnearCell = 3**3 !< Total number of nearest neighbour cells,
                                            !< including itself
-    real(DP), dimension(Ndim), parameter :: dipol_cell_size = dipol_rMin ! u_length
-    real(DP), dimension(Ndim), parameter :: hard_cell_size = hard_rCut ! u_length
+    real(DP), dimension(Ndim), parameter :: dipol_cell_size = dipol_rMin ! u_length, adaptation
+    real(DP), dimension(Ndim), parameter :: hard_cell_size = hard_rCut ! u_length, adaptation
     
-    real(DP), dimension(Ndim), parameter :: mix_cell_size = mix_rCut ! u_length
+    real(DP), dimension(Ndim), parameter :: mix_cell_size = mix_rCut ! u_length, adaptation
     
     ! out ---------------------------------------------------------------------
-    real(DP), dimension(Ndim), parameter :: inter_cell_size = inter_rCut ! u_length
+    real(DP), dimension(Ndim), parameter :: inter_cell_size = inter_rCut ! u_length, adaptation
     ! -------------------------------------------------------------------------
 
 end module data_neighbourCells
