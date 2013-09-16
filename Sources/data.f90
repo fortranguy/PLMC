@@ -68,14 +68,13 @@ use data_precisions, only : DP
 
 implicit none
 
-    real(DP), parameter :: dipol_rMin = 1._DP ! u_length
     integer, parameter :: dipol_Ncol = 281
     
     real(DP), parameter :: hard_rMin = 1._DP ! u_length
     integer, parameter :: hard_Ncol = 6750
     
     real(DP), parameter :: mix_delta = 0.2_DP ! u_length
-    real(DP), parameter :: mix_rMin = (dipol_rMin + hard_rMin)/2._DP + mix_delta ! u_length
+    real(DP), parameter :: mix_rMin = (1._DP + hard_rMin)/2._DP + mix_delta ! u_length
     
     integer, parameter :: Ncol = dipol_Ncol + hard_Ncol
     
@@ -185,7 +184,6 @@ module data_neighbourCells
 
 use data_precisions, only : DP
 use data_box, only : Ndim
-use data_particles, only : dipol_rMin
 use data_potential, only : hard_rCut, mix_rCut, inter_rCut
 
 implicit none
@@ -194,7 +192,7 @@ implicit none
                                                              !< in each direction
     integer, parameter :: NnearCell = 3**3 !< Total number of nearest neighbour cells,
                                            !< including itself
-    real(DP), dimension(Ndim), parameter :: dipol_cell_size = dipol_rMin ! u_length, adaptation
+    real(DP), dimension(Ndim), parameter :: dipol_cell_size = 1._DP ! u_length, adaptation
     real(DP), dimension(Ndim), parameter :: hard_cell_size = hard_rCut ! u_length, adaptation
     
     real(DP), dimension(Ndim), parameter :: mix_cell_size = mix_rCut ! u_length, adaptation
