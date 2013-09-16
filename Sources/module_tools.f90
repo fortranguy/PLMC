@@ -84,7 +84,6 @@ contains
                                       dipolar%positions, norm2(Lsize))
                 call oldConfiguration(2, dipolar%getName()//"_orientations", dipolar%getNcol(), &
                                       dipolar%orientations, 1._DP)
-                ! Warning : be careful with the unit !
                 call oldConfiguration(3, spherical%getName()//"_positions", spherical%getNcol(), &
                                       spherical%positions, norm2(Lsize))
             
