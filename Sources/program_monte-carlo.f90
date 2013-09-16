@@ -56,6 +56,7 @@ implicit none
     call mix%construct()
     call type1_spheres%construct()
     call type2_spheres%construct()
+    
     call mix%setRmin(type1_spheres%getRmin(), type2_spheres%getRmin())
     call type1_spheres%mixCells_construct(mix%getCell_size(), mix%getRcut())
     call type2_spheres%mixCells_construct(mix%getCell_size(), mix%getRcut())

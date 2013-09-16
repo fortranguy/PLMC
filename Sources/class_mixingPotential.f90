@@ -117,9 +117,10 @@ contains
         this%rMin = (type1_rMin + type2_rMin)/2._DP + this%delta
         
         if (this%rCut < this%rMin) then
-            write(*, *) "Warning : rCut =",  this%rCut, "< rMin =", this%rMin, "!"
+            write(error_unit, *) this%name
+            write(error_unit, *) "    Warning : rCut =",  this%rCut, "< rMin =", this%rMin, "!"
             this%rCut = this%rMin
-            write(*, *) "rCut <- rMin"
+            write(error_unit, *) "    rCut <- rMin"
         end if
         
         this%cell_size(:) = this%rCut
