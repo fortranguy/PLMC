@@ -187,8 +187,6 @@ implicit none
     integer, parameter :: NnearCell = 3**3 !< Total number of nearest neighbour cells,
                                            !< including itself
     real(DP), dimension(Ndim), parameter :: dipol_cell_size = 1._DP ! u_length, adaptation
-    
-    real(DP), dimension(Ndim), parameter :: mix_cell_size = mix_rCut ! u_length, adaptation
 
 end module data_neighbourCells
 !***************************************************************************************************

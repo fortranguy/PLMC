@@ -7,7 +7,7 @@ use data_precisions, only : DP
 use data_box, only : Ndim
 use data_particles, only : mix_delta
 use data_potential, only : mix_rCut, mix_dr, mix_epsilon, mix_alpha
-use data_neighbourCells, only : NnearCell, mix_cell_size
+use data_neighbourCells, only : NnearCell
 use module_physics, only : dist_PBC
 use class_neighbourCells
 use class_spheres
