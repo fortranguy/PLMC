@@ -1207,6 +1207,8 @@ contains
     !>                                 \Im(S_N(\vec{k})) \sin(\vec{k} \cdot \vec{x}_N)]
     !>                          \}
     !> \f]
+    
+    !> Summary : only the sign of \f[\vec{\mu}\f] changes.
 
     pure function DipolarSpheres_deltaEpot_reci_solo(this, xCol, mCol) result(deltaEpot_reci_solo)
 
