@@ -5,7 +5,7 @@ module class_mixingPotential
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
 use data_precisions, only : DP
 use data_box, only : Ndim
-use data_particles, only : mix_rMin
+use data_particles, only : mix_delta
 use data_potential, only : mix_rCut, mix_dr, mix_epsilon, mix_alpha
 use data_neighbourCells, only : NnearCell, mix_cell_size
 use module_physics, only : dist_PBC
@@ -22,6 +22,7 @@ private
         
         character(len=5) :: name
         
+        real(DP) :: delta !< demixing length
         real(DP) :: rMin !< minimum distance between two particles
         real(DP) :: rCut !< short-range cut
         real(DP) :: dr !< discretisation step
@@ -40,6 +41,7 @@ private
 
         procedure :: PrintReport => MixingPotential_printReport
 
+        procedure :: setRmin => MixingPotential_setRmin
         procedure :: getRmin => MixingPotential_getRmin
         procedure :: getRcut => MixingPotential_getRcut
         procedure :: getCell_size => MixingPotential_getCell_size
@@ -63,7 +65,7 @@ contains
         this%name = "[mix]"
         
         ! Particles
-        this%rMin = mix_rMin
+        this%delta = mix_delta
         
         ! MixingPotential
         this%rCut = mix_rCut
@@ -77,7 +79,6 @@ contains
         
         ! Neighbours        
         this%cell_size(:) = mix_cell_size(:)
-
 
     end subroutine MixingPotential_construct
 
@@ -105,6 +106,23 @@ contains
         write(report_unit, *) "    dr = ", this%dr
         
     end subroutine MixingPotential_printReport
+    
+    !> Specifier : rMin
+    
+    subroutine MixingPotential_setRmin(this, type1_rMin, type2_rMin)
+    
+        class(MixingPotential), intent(inout) :: this
+        real(DP), intent(in) :: type1_rMin, type2_rMin
+    
+        this%rMin = (type1_rMin + type2_rMin)/2._DP + this%delta
+        
+        if (this%rCut < this%rMin) then
+            write(*, *) "Warning : rCut =",  this%rCut, "< rMin =", this%rMin, "!"
+            this%rCut = this%rMin
+            write(*, *) "rCut <- rMin"
+        end if
+    
+    end subroutine MixingPotential_setRmin
     
     !> Accessor : rMin
     

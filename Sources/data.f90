@@ -77,7 +77,6 @@ implicit none
     integer, parameter :: hard_Ncol = 6750
     
     real(DP), parameter :: mix_delta = 0.2_DP ! u_length
-    real(DP), parameter :: mix_rMin = (1._DP + hard_rMin)/2._DP + mix_delta ! u_length
     
     ! out ---------------------------------------------------------------------
     real(DP), parameter :: inter_rMin = 1._DP ! u_length
@@ -146,7 +145,6 @@ module data_potential
 
 use data_precisions, only : DP
 use data_box, only : Lsize1
-use data_particles, only : mix_rMin
 
 implicit none
 
@@ -154,7 +152,7 @@ implicit none
     real(DP), parameter :: dipol_dr = 5.E-5_DP ! u_length
     real(DP), parameter :: dipol_alpha = 7._DP/Lsize1 ! 1/u_length
     
-    real(DP), parameter :: mix_rCut = mix_rMin ! u_length
+    real(DP), parameter :: mix_rCut = 1._DP ! u_length, adaptation
     real(DP), parameter :: mix_dr = mix_rCut/2._DP ! u_length
     real(DP), parameter :: mix_epsilon = 0._DP ! u_energy * u_length
     real(DP), parameter :: mix_alpha = 40._DP ! 1/u_length
