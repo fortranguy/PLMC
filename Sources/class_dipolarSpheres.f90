@@ -1164,15 +1164,15 @@ contains
 
     end subroutine DipolarSpheres_deltaEpot_reci_rotate_updateStructure
 
-    ! Energy for 1 particle
+    !> Energy of 1 dipole with others
     
-    ! To do : write a more general comment
+    !> Addition : 
     
     !> Difference of Energy 
     !> \f[ \Delta U^{N+1} = \frac{2\pi}{V} \sum_{\vec{k} \neq \vec{0}} 
-    !>                          (\vec{k} \cdot \vec{\mu}_{N+1}) w(\alpha, \vec{k})
+    !>                          (\vec{k} \cdot +\vec{\mu}_{N+1}) w(\alpha, \vec{k})
     !>                          \{
-    !>                              (\vec{k} \cdot \vec{\mu}_{N+1}) + 
+    !>                              (\vec{k} \cdot +\vec{\mu}_{N+1}) + 
     !>                              2\Re[S(\vec{k}) e^{-i \vec{k} \cdot \vec{x}_{N+1}}]
     !>                          \}
     !> \f]
@@ -1184,6 +1184,27 @@ contains
     !>                              (\vec{k} \cdot \vec{\mu}_{N+1}) +
     !>                              2 [\Re(S(\vec{k})) \cos(\vec{k} \cdot \vec{x}_{N+1}) +
     !>                                 \Im(S(\vec{k})) \sin(\vec{k} \cdot \vec{x}_{N+1})]
+    !>                          \}
+    !> \f]
+    
+    !> Subtraction 
+    
+    !> Difference of Energy 
+    !> \f[ \Delta U_{N-1} = \frac{2\pi}{V} \sum_{\vec{k} \neq \vec{0}} 
+    !>                          (\vec{k} \cdot -\vec{\mu}_N) w(\alpha, \vec{k})
+    !>                          \{
+    !>                              (\vec{k} \cdot -\vec{\mu}_N) + 
+    !>                              2\Re[S_N(\vec{k}) e^{-i \vec{k} \cdot \vec{x}_N}]
+    !>                          \}
+    !> \f]
+    
+    !> Implementation :
+    !> \f[ \Delta _{N-1} = \frac{2\pi}{V} \sum_{\vec{k} \neq \vec{0}}
+    !>                          (\vec{k} \cdot -\vec{\mu}_N) w(\alpha, \vec{k})
+    !>                          \{
+    !>                              (\vec{k} \cdot -\vec{\mu}_N) +
+    !>                              2 [\Re(S_N(\vec{k})) \cos(\vec{k} \cdot \vec{x}_N) +
+    !>                                 \Im(S_N(\vec{k})) \sin(\vec{k} \cdot \vec{x}_N)]
     !>                          \}
     !> \f]
 
