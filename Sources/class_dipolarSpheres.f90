@@ -1179,9 +1179,9 @@ contains
     
     !> Implementation :
     !> \f[ \Delta U^{N+1} = \frac{2\pi}{V} \sum_{\vec{k} \neq \vec{0}}
-    !>                          (\vec{k} \cdot \vec{\mu}_{N+1}) w(\alpha, \vec{k})
+    !>                          (\vec{k} \cdot +\vec{\mu}_{N+1}) w(\alpha, \vec{k})
     !>                          \{
-    !>                              (\vec{k} \cdot \vec{\mu}_{N+1}) +
+    !>                              (\vec{k} \cdot +\vec{\mu}_{N+1}) +
     !>                              2 [\Re(S(\vec{k})) \cos(\vec{k} \cdot \vec{x}_{N+1}) +
     !>                                 \Im(S(\vec{k})) \sin(\vec{k} \cdot \vec{x}_{N+1})]
     !>                          \}
