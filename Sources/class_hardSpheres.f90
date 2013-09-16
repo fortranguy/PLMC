@@ -197,15 +197,16 @@ contains
     
     !> Particle move
     
-    subroutine HardSpheres_move(this, iOld, other, mix, same_obs, mix_Epot)
+    subroutine HardSpheres_move(this, other, mix, same_obs, mix_Epot)
     
         class(HardSpheres), intent(inout) :: this
-        integer, intent(in) :: iOld
         class(Spheres), intent(inout) :: other
         class(MixingPotential), intent(in) :: mix
         class(Observables) :: same_obs
         real(DP), intent(inout) :: mix_Epot
         
+        real(DP) :: random
+        integer :: iOld
         real(DP), dimension(Ndim) :: xRand
         logical :: overlap
         real(DP), dimension(Ndim) :: xNew
@@ -213,11 +214,14 @@ contains
         integer :: mix_iCellOld, mix_iCellNew
         real(DP) :: mix_deltaEpot
         real(DP) :: mix_EpotNew, mix_EpotOld
-        real(DP) :: random
+        
+        call random_number(random)
+        iOld = int(random*this%Ncol) + 1
+        xOld(:) = this%positions(:, iOld)
         
         ! Random new position
         call random_number(xRand)
-        xNew(:) = this%positions(:, iOld) + (xRand(:)-0.5_DP)*this%move_delta(:)
+        xNew(:) = xOld(:) + (xRand(:)-0.5_DP)*this%move_delta(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
         
         if (this%Ncol >= other%Ncol) then        
@@ -242,12 +246,12 @@ contains
                         
             if (.not. overlap) then
     
-                same_iCellOld = this%sameCells%index_from_position(this%positions(:, iOld))
-                call this%Epot_neighCells(iOld, this%positions(:, iOld), same_iCellOld, overlap)
+                same_iCellOld = this%sameCells%index_from_position(xOld)
+                call this%Epot_neighCells(iOld, xOld, same_iCellOld, overlap)
                     
-                mix_iCellOld = this%mixCells%index_from_position(this%positions(:, iOld))
-                call mix%Epot_neighCells(this%positions(:, iOld), mix_iCellOld, this%mixCells, &
-                                         other%positions, overlap, mix_EpotOld)
+                mix_iCellOld = this%mixCells%index_from_position(xOld)
+                call mix%Epot_neighCells(xOld, mix_iCellOld, this%mixCells, other%positions, overlap, &
+                                         mix_EpotOld)
                 
                 mix_deltaEpot = mix_EpotNew - mix_EpotOld
                 
