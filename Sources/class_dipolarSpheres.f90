@@ -1375,7 +1375,7 @@ contains
         deltaEpot_bound = dot_product(mNew, mNew) - dot_product(mOld, mOld) + &
                           2._DP * dot_product(mNew-mOld, this%totalMoment-mOld)
                           
-        deltaEpot_bound = 2._DP * PI / (2*out_permittivity + 1) / Volume * deltaEpot_bound
+        deltaEpot_bound = 2._DP * PI / (2._DP*out_permittivity + 1._DP) / Volume * deltaEpot_bound
     
     end function DipolarSpheres_deltaEpot_bound
     
@@ -1421,7 +1421,7 @@ contains
         class(DipolarSpheres), intent(in) :: this
         real(DP) :: Epot_bound
         
-        Epot_bound = 2._DP * PI / (2*out_permittivity + 1) / Volume * &
+        Epot_bound = 2._DP * PI / (2._DP*out_permittivity + 1._DP) / Volume * &
                      dot_product(this%totalMoment, this%totalMoment)
     
     end function DipolarSpheres_Epot_bound
