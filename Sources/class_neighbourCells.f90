@@ -68,7 +68,7 @@ contains
         
         do jDim=1, Ndim        
             if (proposed_cell_size(jDim) /= this%cell_size(jDim)) then            
-                write(error_unit, *) "    The proposed cell size in the dimension", jDim, &
+                write(error_unit, *) "    Warning : cell size in the dimension", jDim, &
                                       "was changed."
                 write(error_unit, *) "    ", proposed_cell_size(jDim), "->", this%cell_size(jDim)            
             end if        
