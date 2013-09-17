@@ -66,16 +66,12 @@ contains
         this%NtotalCell = product(this%NtotalCell_dim)
         this%cell_size(:) = Lsize(:)/real(this%NtotalCell_dim(:), DP)
         
-        do jDim=1, Ndim
-        
-            if (proposed_cell_size(jDim) /= this%cell_size(jDim)) then
-            
+        do jDim=1, Ndim        
+            if (proposed_cell_size(jDim) /= this%cell_size(jDim)) then            
                 write(error_unit, *) "    The proposed cell size in the dimension", jDim, &
                                       "was changed."
-                write(error_unit, *) "    ", proposed_cell_size(jDim), "->", this%cell_size(jDim)
-            
-            end if
-        
+                write(error_unit, *) "    ", proposed_cell_size(jDim), "->", this%cell_size(jDim)            
+            end if        
         end do
         
         allocate(this%nearCells_among_totalCells(NnearCell, this%NtotalCell))
@@ -181,34 +177,34 @@ contains
         class(NeighbourCells), intent(in) :: this
         real(DP), intent(in) :: rCut
         
-        integer :: iDim
+        integer :: jDim
         
-        do iDim = 1, Ndim
+        do jDim = 1, Ndim
         
-            if (this%cell_size(iDim) < rCut .and. this%cell_size(iDim) /= Lsize(iDim)/3._DP) then
-                write(error_unit, *) "  Warning : big rCut in the dimension", iDim, ":"
-                write(error_unit, *) "  ", this%cell_size(iDim), "<", rCut
+            if (this%cell_size(jDim) < rCut .and. this%cell_size(jDim) /= Lsize(jDim)/3._DP) then
+                write(error_unit, *) "  Warning : big rCut in the dimension", jDim, ":"
+                write(error_unit, *) "  ", this%cell_size(jDim), "<", rCut
             end if
             
-            if (Lsize(iDim)/2._DP < rCut) then
-                write(error_unit, *) "  rCut too large in the dimension", iDim, ":"
-                write(error_unit, *) "  ", Lsize(iDim)/2._DP, "<", rCut
+            if (Lsize(jDim)/2._DP < rCut) then
+                write(error_unit, *) "  rCut too large in the dimension", jDim, ":"
+                write(error_unit, *) "  ", Lsize(jDim)/2._DP, "<", rCut
                 stop
             end if
             
-            if (this%NtotalCell_dim(iDim) < NnearCell_dim(iDim)) then
-                write(error_unit, *) "  Too few cells in the dimension", iDim, ":"
-                write(error_unit, *) "  ", this%NtotalCell_dim(iDim), "<", NnearCell_dim(iDim)
+            if (this%NtotalCell_dim(jDim) < NnearCell_dim(jDim)) then
+                write(error_unit, *) "  Too few cells in the dimension", jDim, ":"
+                write(error_unit, *) "  ", this%NtotalCell_dim(jDim), "<", NnearCell_dim(jDim)
                 stop
             end if
             
-            if (modulo(Lsize(iDim), this%cell_size(iDim)) /= 0) then
+            if (modulo(Lsize(jDim), this%cell_size(jDim)) /= 0) then
                 write(error_unit, *) "  Cell size is not a divisor of the system size"
-                write(error_unit, *) "  in the dimension", iDim, ":"
-                write(error_unit, *) "  Lsize", Lsize(iDim)
-                write(error_unit, *) "  cell_size", this%cell_size(iDim)
+                write(error_unit, *) "  in the dimension", jDim, ":"
+                write(error_unit, *) "  Lsize", Lsize(jDim)
+                write(error_unit, *) "  cell_size", this%cell_size(jDim)
                 write(error_unit, *) "  modulo(Lsize, cell_size) = ", &
-                                      modulo(Lsize(iDim), this%cell_size(iDim))
+                                      modulo(Lsize(jDim), this%cell_size(jDim))
                 stop
             end if
             

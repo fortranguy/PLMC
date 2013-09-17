@@ -152,7 +152,7 @@ implicit none
     real(DP), parameter :: dipol_dr = 5.E-5_DP ! u_length
     real(DP), parameter :: dipol_alpha = 7._DP/Lsize1 ! 1/u_length
     
-    real(DP), parameter :: mix_rCut = 1._DP ! u_length, adaptation
+    real(DP), parameter :: mix_rCut = 1.2_DP ! u_length, adaptation
     real(DP), parameter :: mix_dr = 0.5_DP ! u_length
     real(DP), parameter :: mix_epsilon = 0._DP ! u_energy * u_length
     real(DP), parameter :: mix_alpha = 40._DP ! 1/u_length
