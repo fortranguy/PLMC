@@ -54,15 +54,29 @@ public :: Link
     
 contains
 
-    subroutine NeighbourCells_construct(this, cell_size, rCut)
+    subroutine NeighbourCells_construct(this, proposed_cell_size, rCut)
     
         class(NeighbourCells), intent(out) :: this
-        real(DP), dimension(:), intent(in) :: cell_size
+        real(DP), dimension(:), intent(in) :: proposed_cell_size
         real(DP), intent(in) :: rCut
         
-        this%NtotalCell_dim(:) = floor(Lsize(:)/cell_size(:))
+        integer :: jDim
+        
+        this%NtotalCell_dim(:) = floor(Lsize(:)/proposed_cell_size(:))
         this%NtotalCell = product(this%NtotalCell_dim)
         this%cell_size(:) = Lsize(:)/real(this%NtotalCell_dim(:), DP)
+        
+        do jDim=1, Ndim
+        
+            if (proposed_cell_size(jDim) /= this%cell_size(jDim)) then
+            
+                write(error_unit, *) "    The proposed cell size in the dimension", jDim, &
+                                      "was changed."
+                write(error_unit, *) "    ", proposed_cell_size(jDim), "->", this%cell_size(jDim)
+            
+            end if
+        
+        end do
         
         allocate(this%nearCells_among_totalCells(NnearCell, this%NtotalCell))
             
