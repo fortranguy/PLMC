@@ -116,8 +116,8 @@ contains
         
         write(report_unit, *) "    rCut = ", this%rCut
         
-        write(report_unit, *) "    same_NtotalCell_dim(:) = ", this%sameCells%getNtotalCell_dim()
-        write(report_unit, *) "    same_cell_size(:) = ", this%sameCells%getCell_size()        
+        write(report_unit, *) "    this_NtotalCell_dim(:) = ", this%sameCells%getNtotalCell_dim()
+        write(report_unit, *) "    this_cell_size(:) = ", this%sameCells%getCell_size()        
         write(report_unit, *) "    mix_NtotalCell_dim(:) = ", this%mixCells%getNtotalCell_dim()
         write(report_unit, *) "    mix_cell_size(:) = ", this%mixCells%getCell_size()
         
@@ -196,19 +196,19 @@ contains
     
     !> Particle move
     
-    subroutine HardSpheres_move(this, other, mix, same_obs, mix_Epot)
+    subroutine HardSpheres_move(this, other, mix, this_obs, mix_Epot)
     
         class(HardSpheres), intent(inout) :: this
         class(Spheres), intent(inout) :: other
         class(MixingPotential), intent(in) :: mix
-        class(Observables) :: same_obs
+        class(Observables) :: this_obs
         real(DP), intent(inout) :: mix_Epot
         
         real(DP) :: random
         integer :: iOld
         real(DP), dimension(Ndim) :: xOld, xRand, xNew
         logical :: overlap
-        integer :: same_iCellOld, same_iCellNew
+        integer :: this_iCellOld, this_iCellNew
         integer :: mix_iCellOld, mix_iCellNew
         real(DP) :: mix_deltaEpot
         real(DP) :: mix_EpotNew, mix_EpotOld
@@ -223,8 +223,8 @@ contains
         xNew(:) = modulo(xNew(:), Lsize(:))
         
         if (this%Ncol >= other%Ncol) then        
-            same_iCellNew = this%sameCells%index_from_position(xNew)
-            call this%Epot_neighCells(iOld, xNew, same_iCellNew, overlap)            
+            this_iCellNew = this%sameCells%index_from_position(xNew)
+            call this%Epot_neighCells(iOld, xNew, this_iCellNew, overlap)            
         else        
             mix_iCellNew = this%mixCells%index_from_position(xNew)
             call mix%Epot_neighCells(xNew, mix_iCellNew, this%mixCells, other%positions, overlap, &
@@ -238,14 +238,14 @@ contains
                 call mix%Epot_neighCells(xNew, mix_iCellNew, this%mixCells, other%positions, overlap, &
                                          mix_EpotNew)
             else                
-                same_iCellNew = this%sameCells%index_from_position(xNew)
-                call this%Epot_neighCells(iOld, xNew, same_iCellNew, overlap)
+                this_iCellNew = this%sameCells%index_from_position(xNew)
+                call this%Epot_neighCells(iOld, xNew, this_iCellNew, overlap)
             end if
                         
             if (.not. overlap) then
     
-                same_iCellOld = this%sameCells%index_from_position(xOld)
-                call this%Epot_neighCells(iOld, xOld, same_iCellOld, overlap)
+                this_iCellOld = this%sameCells%index_from_position(xOld)
+                call this%Epot_neighCells(iOld, xOld, this_iCellOld, overlap)
                     
                 mix_iCellOld = this%mixCells%index_from_position(xOld)
                 call mix%Epot_neighCells(xOld, mix_iCellOld, this%mixCells, other%positions, overlap, &
@@ -259,9 +259,9 @@ contains
                     this%positions(:, iOld) = xNew(:)
                     mix_Epot = mix_Epot + mix_deltaEpot
                     
-                    if (same_iCellOld /= same_iCellNew) then                
-                        call this%sameCells%remove_col_from_cell(iOld, same_iCellOld)
-                        call this%sameCells%add_col_to_cell(iOld, same_iCellNew)
+                    if (this_iCellOld /= this_iCellNew) then                
+                        call this%sameCells%remove_col_from_cell(iOld, this_iCellOld)
+                        call this%sameCells%add_col_to_cell(iOld, this_iCellNew)
                     end if
                     
                     if (mix_iCellOld /= mix_iCellNew) then                
@@ -270,15 +270,15 @@ contains
                     end if
                     
                 else
-                    same_obs%move_Nreject = same_obs%move_Nreject + 1
+                    this_obs%move_Nreject = this_obs%move_Nreject + 1
                 end if
          
             else
-                same_obs%move_Nreject = same_obs%move_Nreject + 1
+                this_obs%move_Nreject = this_obs%move_Nreject + 1
             end if            
             
         else        
-            same_obs%move_Nreject = same_obs%move_Nreject + 1
+            this_obs%move_Nreject = this_obs%move_Nreject + 1
         end if
     
     end subroutine HardSpheres_move
@@ -295,7 +295,7 @@ contains
         integer :: iWidom
         real(DP) :: widTestSum
         real(DP), dimension(Ndim) :: xRand, xTest
-        integer :: same_iCellTest, mix_iCellTest
+        integer :: this_iCellTest, mix_iCellTest
         logical :: overlap
         real(DP) :: EpotTest, mix_EpotTest
         
@@ -307,8 +307,8 @@ contains
             xTest(:) = Lsize(:) * xRand(:)
 
             if (this%Ncol >= other%Ncol) then
-                same_iCellTest = this%sameCells%index_from_position(xTest)
-                call this%Epot_neighCells(0, xTest, same_iCellTest, overlap)
+                this_iCellTest = this%sameCells%index_from_position(xTest)
+                call this%Epot_neighCells(0, xTest, this_iCellTest, overlap)
             else
                 mix_iCellTest = this%mixCells%index_from_position(xTest)
                 call mix%Epot_neighCells(xTest, mix_iCellTest, this%mixCells, other%positions, &
@@ -322,8 +322,8 @@ contains
                     call mix%Epot_neighCells(xTest, mix_iCellTest, this%mixCells, other%positions, &
                                             overlap, mix_EpotTest)
                 else
-                    same_iCellTest = this%sameCells%index_from_position(xTest)
-                    call this%Epot_neighCells(0, xTest, same_iCellTest, overlap)
+                    this_iCellTest = this%sameCells%index_from_position(xTest)
+                    call this%Epot_neighCells(0, xTest, this_iCellTest, overlap)
                 end if
                 
                 if (.not. overlap) then

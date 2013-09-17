@@ -222,8 +222,8 @@ contains
         write(report_unit, *) "    Structure_iStep = ", this%structure_iStep
         write(report_unit, *) "    NwaveVectors = ", this%NwaveVectors
         
-        write(report_unit, *) "    same_NtotalCell_dim(:) = ", this%sameCells%getNtotalCell_dim()
-        write(report_unit, *) "    same_cell_size(:) = ", this%sameCells%getCell_size()
+        write(report_unit, *) "    this_NtotalCell_dim(:) = ", this%sameCells%getNtotalCell_dim()
+        write(report_unit, *) "    this_cell_size(:) = ", this%sameCells%getCell_size()
         write(report_unit, *) "    mix_NtotalCell_dim(:) = ", this%mixCells%getNtotalCell_dim()
         write(report_unit, *) "    mix_cell_size(:) = ", this%mixCells%getCell_size()
         
@@ -1430,12 +1430,12 @@ contains
 
     !> Particle move
     
-    subroutine DipolarSpheres_move(this, other, mix, same_obs, mix_Epot)
+    subroutine DipolarSpheres_move(this, other, mix, this_obs, mix_Epot)
     
         class(DipolarSpheres), intent(inout) :: this
         class(Spheres), intent(inout) :: other
         class(MixingPotential), intent(in) :: mix
-        class(MoreObservables), intent(inout) :: same_obs
+        class(MoreObservables), intent(inout) :: this_obs
         real(DP), intent(inout) :: mix_Epot
         
         real(DP) :: random
@@ -1443,10 +1443,10 @@ contains
         real(DP), dimension(Ndim) :: xOld, xRand, xNew
         real(DP), dimension(Ndim) :: mCol
         logical :: overlap
-        integer :: same_iCellOld, same_iCellNew
+        integer :: this_iCellOld, this_iCellNew
         integer :: mix_iCellOld, mix_iCellNew
-        real(DP) :: deltaEpot, same_deltaEpot, mix_deltaEpot
-        real(DP) :: same_EpotNew_real, same_EpotOld_real
+        real(DP) :: deltaEpot, this_deltaEpot, mix_deltaEpot
+        real(DP) :: this_EpotNew_real, this_EpotOld_real
         real(DP) :: mix_EpotNew, mix_EpotOld
         
         call random_number(random)
@@ -1461,8 +1461,8 @@ contains
         mCol(:) = this%orientations(:, iOld)
         
         if (this%Ncol >= other%Ncol) then        
-            same_iCellNew = this%sameCells%index_from_position(xNew)
-            call this%Epot_real_overlapTest(iOld, xNew, same_iCellNew, overlap)            
+            this_iCellNew = this%sameCells%index_from_position(xNew)
+            call this%Epot_real_overlapTest(iOld, xNew, this_iCellNew, overlap)            
         else            
             mix_iCellNew = this%mixCells%index_from_position(xNew)
             call mix%Epot_neighCells(xNew, mix_iCellNew, this%mixCells, other%positions, overlap, &
@@ -1476,18 +1476,18 @@ contains
                 call mix%Epot_neighCells(xNew, mix_iCellNew, this%mixCells, other%positions, overlap, &
                                          mix_EpotNew)                            
             else
-                same_iCellNew = this%sameCells%index_from_position(xNew)
-                call this%Epot_real_overlapTest(iOld, xNew, same_iCellNew, overlap)                                                 
+                this_iCellNew = this%sameCells%index_from_position(xNew)
+                call this%Epot_real_overlapTest(iOld, xNew, this_iCellNew, overlap)                                                 
             end if            
                         
             if (.not. overlap) then
                 
                 ! Real
-                same_iCellOld = this%sameCells%index_from_position(xOld)
-                same_EpotNew_real = this%Epot_real_solo(iOld, xNew, mCol)
-                same_EpotOld_real = this%Epot_real_solo(iOld, xOld, mCol)
+                this_iCellOld = this%sameCells%index_from_position(xOld)
+                this_EpotNew_real = this%Epot_real_solo(iOld, xNew, mCol)
+                this_EpotOld_real = this%Epot_real_solo(iOld, xOld, mCol)
                 
-                same_deltaEpot = (same_EpotNew_real-same_EpotOld_real) + &
+                this_deltaEpot = (this_EpotNew_real-this_EpotOld_real) + &
                                  this%deltaEpot_reci_move(xOld, xNew, mCol)
                     
                 mix_iCellOld = this%mixCells%index_from_position(xOld)
@@ -1495,7 +1495,7 @@ contains
                                          mix_EpotOld)
                 mix_deltaEpot = mix_EpotNew - mix_EpotOld
                 
-                deltaEpot = same_deltaEpot + mix_deltaEpot
+                deltaEpot = this_deltaEpot + mix_deltaEpot
                 
                 call random_number(random)            
                 if (random < exp(-deltaEpot/Temperature)) then
@@ -1503,12 +1503,12 @@ contains
                     call this%deltaEpot_reci_move_updateStructure(xOld, xNew, mCol)
                     this%positions(:, iOld) = xNew(:)
                     
-                    same_obs%Epot = same_obs%Epot + same_deltaEpot
+                    this_obs%Epot = this_obs%Epot + this_deltaEpot
                     mix_Epot = mix_Epot + mix_deltaEpot
                     
-                    if (same_iCellOld /= same_iCellNew) then
-                        call this%sameCells%remove_col_from_cell(iOld, same_iCellOld)
-                        call this%sameCells%add_col_to_cell(iOld, same_iCellNew)
+                    if (this_iCellOld /= this_iCellNew) then
+                        call this%sameCells%remove_col_from_cell(iOld, this_iCellOld)
+                        call this%sameCells%add_col_to_cell(iOld, this_iCellNew)
                     end if
                     
                     if (mix_iCellOld /= mix_iCellNew) then
@@ -1517,15 +1517,15 @@ contains
                     end if
                     
                 else
-                    same_obs%move_Nreject = same_obs%move_Nreject + 1
+                    this_obs%move_Nreject = this_obs%move_Nreject + 1
                 end if
          
             else
-                same_obs%move_Nreject = same_obs%move_Nreject + 1
+                this_obs%move_Nreject = this_obs%move_Nreject + 1
             end if            
             
         else        
-            same_obs%move_Nreject = same_obs%move_Nreject + 1
+            this_obs%move_Nreject = this_obs%move_Nreject + 1
         end if
     
     end subroutine DipolarSpheres_move
@@ -1591,10 +1591,10 @@ contains
         real(DP) :: widTestSum
         real(DP), dimension(Ndim) :: xTest, xRand
         real(DP), dimension(Ndim) :: mTest
-        integer :: same_iCellTest, mix_iCellTest
+        integer :: this_iCellTest, mix_iCellTest
         logical :: overlap
         real(DP) :: EpotTest
-        real(DP) :: same_EpotTest
+        real(DP) :: this_EpotTest
         real(DP) :: mix_EpotTest
         
         widTestSum = 0._DP
@@ -1605,8 +1605,8 @@ contains
             xTest(:) = Lsize(:) * xRand(:)
 
             if (this%Ncol >= other%Ncol) then
-                same_iCellTest = this%sameCells%index_from_position(xTest)
-                call this%Epot_real_overlapTest(0, xTest, same_iCellTest, overlap)
+                this_iCellTest = this%sameCells%index_from_position(xTest)
+                call this%Epot_real_overlapTest(0, xTest, this_iCellTest, overlap)
             else            
                 mix_iCellTest = this%mixCells%index_from_position(xTest)
                 call mix%Epot_neighCells(xTest, mix_iCellTest, this%mixCells, other%positions, &
@@ -1620,18 +1620,18 @@ contains
                     call mix%Epot_neighCells(xTest, mix_iCellTest, this%mixCells, other%positions, &
                                             overlap, mix_EpotTest)
                 else
-                    same_iCellTest = this%sameCells%index_from_position(xTest)
-                    call this%Epot_real_overlapTest(0, xTest, same_iCellTest, overlap)
+                    this_iCellTest = this%sameCells%index_from_position(xTest)
+                    call this%Epot_real_overlapTest(0, xTest, this_iCellTest, overlap)
                 end if
                 
                 if (.not. overlap) then
                 
                     mTest(:) = random_surface()
                                         
-                    same_EpotTest = this%Epot_real_solo(0, xTest, mTest) + &
+                    this_EpotTest = this%Epot_real_solo(0, xTest, mTest) + &
                                     this%deltaEpot_reci_solo(xTest, mTest) - this%Epot_self_solo(mTest)
                 
-                    EpotTest = same_EpotTest + mix_EpotTest
+                    EpotTest = this_EpotTest + mix_EpotTest
                     widTestSum = widTestSum + exp(-EpotTest/Temperature)
                     
                 end if
