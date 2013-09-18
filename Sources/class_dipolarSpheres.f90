@@ -1430,12 +1430,12 @@ contains
 
     !> Particle move
     
-    subroutine DipolarSpheres_move(this, other, mix, this_obs, mix_Epot)
+    subroutine DipolarSpheres_move(this, this_obs, other, mix, mix_Epot)
     
         class(DipolarSpheres), intent(inout) :: this
-        class(Spheres), intent(inout) :: other
-        class(MixingPotential), intent(in) :: mix
         class(MoreObservables), intent(inout) :: this_obs
+        class(Spheres), intent(inout) :: other
+        class(MixingPotential), intent(in) :: mix        
         real(DP), intent(inout) :: mix_Epot
         
         real(DP) :: random
