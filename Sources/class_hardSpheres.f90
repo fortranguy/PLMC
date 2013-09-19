@@ -34,14 +34,14 @@ private
         procedure :: destroy => HardSpheres_destroy
         
         !> Print a report of the component in a file
-        procedure :: printReport => HardSpheres_printReport
+        procedure :: print_report => HardSpheres_print_report
               
         !> Potential energy
         procedure :: Epot_print => HardSpheres_Epot_print
         procedure :: Epot_pair => HardSpheres_Epot_pair
         procedure, private :: Epot_neighCells => HardSpheres_Epot_neighCells
         procedure :: Epot_conf => HardSpheres_Epot_conf
-        procedure :: consistTest => HardSpheres_consistTest
+        procedure :: test_consist => HardSpheres_test_consist
         
         !> Monte-Carlo
         procedure :: move => HardSpheres_move
@@ -103,7 +103,7 @@ contains
     
     !> Report
     
-    subroutine HardSpheres_printReport(this, report_unit)
+    subroutine HardSpheres_print_report(this, report_unit)
     
         class(HardSpheres), intent(in) :: this
         integer, intent(in) :: report_unit    
@@ -121,7 +121,7 @@ contains
         write(report_unit, *) "    mix_NtotalCell_dim(:) = ", this%mixCells%getNtotalCell_dim()
         write(report_unit, *) "    mix_cell_size(:) = ", this%mixCells%getCell_size()
         
-    end subroutine HardSpheres_printReport
+    end subroutine HardSpheres_print_report
     
     !> Print the potential : dummy
     
@@ -354,7 +354,7 @@ contains
     
     !> Consistency test : dummy
     
-    subroutine HardSpheres_consistTest(this, Epot, report_unit)
+    subroutine HardSpheres_test_consist(this, Epot, report_unit)
     
         class(HardSpheres), intent(in) :: this
         real(DP), intent(in) :: Epot
@@ -377,6 +377,6 @@ contains
             write(report_unit, *) "    OK !"
         end if
     
-    end subroutine HardSpheres_consistTest
+    end subroutine HardSpheres_test_consist
 
 end module class_hardSpheres

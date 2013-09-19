@@ -40,7 +40,7 @@ private
         procedure :: destroy => InteractingSpheres_destroy
         
         !> Print a report of the component in a file
-        procedure :: PrintReport => InteractingSpheres_printReport
+        procedure :: print_report => InteractingSpheres_print_report
         
         !> Potential energy
         procedure, private :: Epot_init => InteractingSpheres_Epot_init
@@ -48,7 +48,7 @@ private
         procedure :: Epot_pair => InteractingSpheres_Epot_pair
         procedure, private :: Epot_neighCells => InteractingSpheres_Epot_neighCells
         procedure :: Epot_conf => InteractingSpheres_Epot_conf
-        procedure :: consistTest => InteractingSpheres_consistTest
+        procedure :: test_consist => InteractingSpheres_test_consist
         
         !> Monte-Carlo
         procedure :: move => InteractingSpheres_move
@@ -120,7 +120,7 @@ contains
     
     !> Report
     
-    subroutine InteractingSpheres_printReport(this, report_unit)
+    subroutine InteractingSpheres_print_report(this, report_unit)
     
         class(InteractingSpheres), intent(in) :: this
         integer, intent(in) :: report_unit    
@@ -141,7 +141,7 @@ contains
         write(report_unit, *) "    mix_NtotalCell_dim(:) = ", this%mixCells%getNtotalCell_dim()
         write(report_unit, *) "    mix_cell_size(:) = ", this%mixCells%getCell_size()
         
-    end subroutine InteractingSpheres_printReport
+    end subroutine InteractingSpheres_print_report
     
     !> Potential energy
     !> Tabulation of Yukawa potential    
@@ -432,7 +432,7 @@ contains
     
     !> Consistency test 
     
-    subroutine InteractingSpheres_consistTest(this, Epot, report_unit)
+    subroutine InteractingSpheres_test_consist(this, Epot, report_unit)
     
         class(InteractingSpheres), intent(in) :: this
         real(DP), intent(in) :: Epot
@@ -455,6 +455,6 @@ contains
             write(report_unit, *) "    OK !"
         end if
     
-    end subroutine InteractingSpheres_consistTest
+    end subroutine InteractingSpheres_test_consist
 
 end module class_interactingSpheres

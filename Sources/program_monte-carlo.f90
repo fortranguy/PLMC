@@ -87,20 +87,20 @@ implicit none
     open(newunit=mix_obsEquilib_unit, recl=4096, file="mix_obsEquilib.out", status='new', &
          action='write')
     call mix%Epot_print(mix_Epot_unit)
-    call mix%printReport(mix_report_unit)
+    call mix%print_report(mix_report_unit)
     
     call type1_obs%init()
     call type1_units%open(type1_spheres%get_name())
     call type1_spheres%Epot_real_print(type1_units%Epot)
     call type1_spheres%Epot_reci_countNwaveVectors(type1_units%waveVectors)
     call type1_spheres%print_density(type1_units%report)
-    call type1_spheres%printReport(type1_units%report)
+    call type1_spheres%print_report(type1_units%report)
     
     call type2_obs%init()
     call type2_units%open(type2_spheres%get_name())
     call type2_spheres%Epot_print(type2_units%Epot)
     call type2_spheres%print_density(type2_units%report)
-    call type2_spheres%printReport(type2_units%report)
+    call type2_spheres%print_report(type2_units%report)
     
     ! Initial condition
     
@@ -279,13 +279,13 @@ implicit none
     call type1_spheres%test_overlap()
     call type1_spheres%Epot_reci_init()
     call type1_spheres%Epot_bound_totalMoment_init()
-    call type1_spheres%consistTest(type1_obs%Epot, type1_units%report)
+    call type1_spheres%test_consist(type1_obs%Epot, type1_units%report)
     call type1_spheres%snapShot_positions(0, type1_units%snapFin_positions)
     call type1_spheres%snapShot_orientations(0, type1_units%snapFin_orientations)
     call type1_obs%printResults(type1_units%report)
     
     call type2_spheres%test_overlap()
-    call type2_spheres%consistTest(type2_obs%Epot, type2_units%report)
+    call type2_spheres%test_consist(type2_obs%Epot, type2_units%report)
     call type2_spheres%snapShot_positions(0, type2_units%snapFin_positions)
     call type2_obs%printResults(type2_units%report)
     

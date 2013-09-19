@@ -62,7 +62,7 @@ private
         procedure :: destroy => DipolarSpheres_destroy
         
         !> Print a report of the component in a file
-        procedure :: PrintReport => DipolarSpheres_printReport
+        procedure :: print_report => DipolarSpheres_print_report
         
         !> Take a snap shot of the configuration : orientations
         procedure :: snapShot_orientations => DipolarSpheres_snapShot_orientations
@@ -115,7 +115,7 @@ private
         procedure, private :: Epot_bound => DipolarSpheres_Epot_bound
         !>     Total
         procedure :: Epot_conf => DipolarSpheres_Epot_conf
-        procedure :: consistTest => DipolarSpheres_consistTest
+        procedure :: test_consist => DipolarSpheres_test_consist
         
         !> Monte-Carlo
         procedure :: move => DipolarSpheres_move
@@ -205,7 +205,7 @@ contains
     
     !> Report
     
-    subroutine DipolarSpheres_printReport(this, report_unit)
+    subroutine DipolarSpheres_print_report(this, report_unit)
     
         class(DipolarSpheres), intent(in) :: this
         integer, intent(in) :: report_unit    
@@ -227,7 +227,7 @@ contains
         write(report_unit, *) "    mix_NtotalCell_dim(:) = ", this%mixCells%getNtotalCell_dim()
         write(report_unit, *) "    mix_cell_size(:) = ", this%mixCells%getCell_size()
         
-    end subroutine DipolarSpheres_printReport
+    end subroutine DipolarSpheres_print_report
     
     !> Configuration state : orientations
       
@@ -1657,7 +1657,7 @@ contains
     
     !> Consistency test 
     
-    subroutine DipolarSpheres_consistTest(this, Epot, report_unit)
+    subroutine DipolarSpheres_test_consist(this, Epot, report_unit)
     
         class(DipolarSpheres), intent(in) :: this
         real(DP), intent(in) :: Epot
@@ -1680,7 +1680,7 @@ contains
             write(report_unit, *) "    OK !"
         end if
     
-    end subroutine DipolarSpheres_consistTest
+    end subroutine DipolarSpheres_test_consist
 
 end module class_dipolarSpheres
 

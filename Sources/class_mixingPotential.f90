@@ -39,7 +39,7 @@ private
         procedure :: construct => MixingPotential_construct
         procedure :: destroy => MixingPotential_destroy
 
-        procedure :: PrintReport => MixingPotential_printReport
+        procedure :: print_report => MixingPotential_print_report
 
         procedure :: setRmin => MixingPotential_setRmin
         procedure :: get_rMin => MixingPotential_get_rMin
@@ -90,7 +90,7 @@ contains
     
     !> Report
     
-    subroutine MixingPotential_printReport(this, report_unit)
+    subroutine MixingPotential_print_report(this, report_unit)
     
         class(MixingPotential), intent(in) :: this
         integer, intent(in) :: report_unit    
@@ -101,7 +101,7 @@ contains
         write(report_unit, *) "    rCut = ", this%rCut
         write(report_unit, *) "    dr = ", this%dr
         
-    end subroutine MixingPotential_printReport
+    end subroutine MixingPotential_print_report
     
     !> Specifier : rMin
     
