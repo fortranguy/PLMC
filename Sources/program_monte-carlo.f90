@@ -57,9 +57,9 @@ implicit none
     call type1_spheres%construct()
     call type2_spheres%construct()
     
-    call mix%setRmin(type1_spheres%get_rMin(), type2_spheres%get_rMin())
-    call type1_spheres%construct_mixCells(mix%getCell_size(), mix%get_rCut())
-    call type2_spheres%construct_mixCells(mix%getCell_size(), mix%get_rCut())
+    call mix%set_rMin(type1_spheres%get_rMin(), type2_spheres%get_rMin())
+    call type1_spheres%construct_mixCells(mix%get_cell_size(), mix%get_rCut())
+    call type2_spheres%construct_mixCells(mix%get_cell_size(), mix%get_rCut())
     
     Ncol = type1_spheres%get_Ncol() + type2_spheres%get_Ncol()
     Nmove = decorrelFactor * Ncol

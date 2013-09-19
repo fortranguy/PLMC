@@ -41,10 +41,10 @@ private
 
         procedure :: print_report => MixingPotential_print_report
 
-        procedure :: setRmin => MixingPotential_setRmin
+        procedure :: set_rMin => MixingPotential_set_rMin
         procedure :: get_rMin => MixingPotential_get_rMin
         procedure :: get_rCut => MixingPotential_get_rCut
-        procedure :: getCell_size => MixingPotential_getCell_size
+        procedure :: get_cell_size => MixingPotential_get_cell_size
         
         procedure :: test_overlap => MixingPotential_test_overlap
 
@@ -105,7 +105,7 @@ contains
     
     !> Specifier : rMin
     
-    subroutine MixingPotential_setRmin(this, type1_rMin, type2_rMin)
+    subroutine MixingPotential_set_rMin(this, type1_rMin, type2_rMin)
     
         class(MixingPotential), intent(inout) :: this
         real(DP), intent(in) :: type1_rMin, type2_rMin
@@ -128,7 +128,7 @@ contains
         ! Neighbours
         this%cell_size(:) = this%rCut
     
-    end subroutine MixingPotential_setRmin
+    end subroutine MixingPotential_set_rMin
     
     !> Accessor : rMin
     
@@ -154,14 +154,14 @@ contains
     
     !> Accessor : cell_size
     
-    pure function MixingPotential_getCell_size(this) result(getCell_size)
+    pure function MixingPotential_get_cell_size(this) result(get_cell_size)
     
         class(MixingPotential), intent(in) :: this        
-        real(DP), dimension(Ndim) :: getCell_size
+        real(DP), dimension(Ndim) :: get_cell_size
         
-        getCell_size(:) = this%cell_size(:)
+        get_cell_size(:) = this%cell_size(:)
     
-   end function MixingPotential_getCell_size
+   end function MixingPotential_get_cell_size
     
     !> Overlapt test
     
