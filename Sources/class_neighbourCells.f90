@@ -48,7 +48,8 @@ public :: Link
         procedure :: all_cols_to_cells => NeighbourCells_all_cols_to_cells
         procedure :: remove_col_from_cell => NeighbourCells_remove_col_from_cell
         procedure :: add_col_to_cell => NeighbourCells_add_col_to_cell
-        procedure, private :: init_nearCells_among_totalCells => NeighbourCells_init_nearCells_among_totalCells
+        procedure, private :: init_nearCells_among_totalCells => &
+                              NeighbourCells_init_nearCells_among_totalCells
         
     end type NeighbourCells
     
