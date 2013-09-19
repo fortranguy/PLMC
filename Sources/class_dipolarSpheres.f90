@@ -109,9 +109,9 @@ private
         procedure, private :: Epot_self => DipolarSpheres_Epot_self
         !>     Boundary conditions
         procedure :: Epot_bound_init_totalMoment => DipolarSpheres_Epot_bound_init_totalMoment
-        procedure, private :: deltaEpot_bound => DipolarSpheres_deltaEpot_bound
-        procedure, private :: deltaEpot_bound_totalMoment_update => &
-                              DipolarSpheres_deltaEpot_bound_totalMoment_update
+        procedure, private :: deltaEpot_bound_rotate => DipolarSpheres_deltaEpot_bound_rotate
+        procedure, private :: deltaEpot_bound_rotate_update_totalMoment => &
+                              DipolarSpheres_deltaEpot_bound_rotate_update_totalMoment
         procedure :: Epot_bound_reInit_totalMoment => DipolarSpheres_Epot_bound_reInit_totalMoment
         procedure, private :: Epot_bound => DipolarSpheres_Epot_bound
         !>     Total
@@ -1369,32 +1369,34 @@ contains
     !>                 ]
     !> \f]
     
-    pure function DipolarSpheres_deltaEpot_bound(this, mOld, mNew) result (deltaEpot_bound)
+    pure function DipolarSpheres_deltaEpot_bound_rotate(this, mOld, mNew) &
+                  result (deltaEpot_bound_rotate)
     
         class(DipolarSpheres), intent(in) :: this
         real(DP), dimension(:), intent(in) :: mOld, mNew
-        real(DP) :: deltaEpot_bound
+        real(DP) :: deltaEpot_bound_rotate
         
-        deltaEpot_bound = dot_product(mNew, mNew) - dot_product(mOld, mOld) + &
+        deltaEpot_bound_rotate = dot_product(mNew, mNew) - dot_product(mOld, mOld) + &
                           2._DP * dot_product(mNew-mOld, this%totalMoment-mOld)
                           
-        deltaEpot_bound = 2._DP * PI / (2._DP*out_permittivity + 1._DP) / Volume * deltaEpot_bound
+        deltaEpot_bound_rotate = 2._DP*PI / (2._DP*out_permittivity+1._DP) / Volume * &
+                                 deltaEpot_bound_rotate
     
-    end function DipolarSpheres_deltaEpot_bound
+    end function DipolarSpheres_deltaEpot_bound_rotate
     
     !> Update the total moment
     !> \f[
     !>      \Delta \vec{M} = \vec{\mu}^\prime_l - \vec{\mu}_l
     !> \f]    
     
-    subroutine DipolarSpheres_deltaEpot_bound_totalMoment_update(this, mOld, mNew)
+    subroutine DipolarSpheres_deltaEpot_bound_rotate_update_totalMoment(this, mOld, mNew)
     
         class(DipolarSpheres), intent(inout) :: this
         real(DP), dimension(:), intent(in) :: mOld, mNew
         
         this%totalMoment(:) = this%totalMoment(:) + mNew - mOld
     
-    end subroutine DipolarSpheres_deltaEpot_bound_totalMoment_update
+    end subroutine DipolarSpheres_deltaEpot_bound_rotate_update_totalMoment
     
     !> Reinitialise the total moment factor and print the drift
     
@@ -1564,13 +1566,13 @@ contains
         deltaEpot_self = this%Epot_self_solo(mNew) - this%Epot_self_solo(mOld)
         
         deltaEpot = deltaEpot_real + this%deltaEpot_reci_rotate(xCol, mOld, mNew) - deltaEpot_self + &
-                    this%deltaEpot_bound(mOld, mNew)
+                    this%deltaEpot_bound_rotate(mOld, mNew)
         
         call random_number(random)
         if (random < exp(-deltaEpot/Temperature)) then
         
             call this%deltaEpot_reci_rotate_update_structure(xCol, mOld, mNew)
-            call this%deltaEpot_bound_totalMoment_update(mOld, mNew)
+            call this%deltaEpot_bound_rotate_update_totalMoment(mOld, mNew)
             this%orientations(:, iOld) = mNew(:)
             
             obs%Epot = obs%Epot + deltaEpot
