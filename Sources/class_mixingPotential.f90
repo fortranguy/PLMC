@@ -42,11 +42,11 @@ private
         procedure :: PrintReport => MixingPotential_printReport
 
         procedure :: setRmin => MixingPotential_setRmin
-        procedure :: getRmin => MixingPotential_getRmin
-        procedure :: getRcut => MixingPotential_getRcut
+        procedure :: get_rMin => MixingPotential_get_rMin
+        procedure :: get_rCut => MixingPotential_get_rCut
         procedure :: getCell_size => MixingPotential_getCell_size
         
-        procedure :: overlapTest => MixingPotential_overlapTest
+        procedure :: test_overlap => MixingPotential_test_overlap
 
         procedure, private :: Epot_init => MixingPotential_Epot_init
         procedure :: Epot_print => MixingPotential_Epot_print
@@ -132,25 +132,25 @@ contains
     
     !> Accessor : rMin
     
-    pure function MixingPotential_getRmin(this) result(getRmin)
+    pure function MixingPotential_get_rMin(this) result(get_rMin)
     
         class(MixingPotential), intent(in) :: this        
-        real(DP) :: getRmin
+        real(DP) :: get_rMin
         
-        getRmin = this%rMin
+        get_rMin = this%rMin
     
-    end function MixingPotential_getRmin
+    end function MixingPotential_get_rMin
     
     !> Accessor : rCut
     
-    pure function MixingPotential_getRcut(this) result(getRcut)
+    pure function MixingPotential_get_rCut(this) result(get_rCut)
     
         class(MixingPotential), intent(in) :: this        
-        real(DP) :: getRcut
+        real(DP) :: get_rCut
         
-        getRcut = this%rCut
+        get_rCut = this%rCut
     
-    end function MixingPotential_getRcut
+    end function MixingPotential_get_rCut
     
     !> Accessor : cell_size
     
@@ -165,7 +165,7 @@ contains
     
     !> Overlapt test
     
-    subroutine MixingPotential_overlapTest(this, type1, type2)
+    subroutine MixingPotential_test_overlap(this, type1, type2)
     
         class(MixingPotential), intent(in) :: this
         class(Spheres), intent(in) :: type1, type2
@@ -173,8 +173,8 @@ contains
         integer :: type1_iCol, type2_iCol
         real(DP) :: r_mix
         
-        do type1_iCol = 1, type1%getNcol()
-            do type2_iCol = 1, type2%getNcol()
+        do type1_iCol = 1, type1%get_Ncol()
+            do type2_iCol = 1, type2%get_Ncol()
                     
                 r_mix = dist_PBC(type1%positions(:, type1_iCol), type2%positions(:, type2_iCol))
                 if (r_mix < this%rMin) then
@@ -188,7 +188,7 @@ contains
 
         write(output_unit, *) this%name, " :    Overlap test : OK !"
     
-    end subroutine MixingPotential_overlapTest
+    end subroutine MixingPotential_test_overlap
 
     !> MixingPotential energy
     !> Tabulation of Yukawa potential
@@ -311,8 +311,8 @@ contains
 
         Epot_conf = 0._DP
         
-        do type1_iCol = 1, type1%getNcol()
-            do type2_iCol = 1, type2%getNcol()
+        do type1_iCol = 1, type1%get_Ncol()
+            do type2_iCol = 1, type2%get_Ncol()
                 
                 r_mix = dist_PBC(type1%positions(:, type1_iCol), type2%positions(:, type2_iCol))
                 Epot_conf = Epot_conf + this%Epot_pair(r_mix)

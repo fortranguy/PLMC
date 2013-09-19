@@ -66,7 +66,7 @@ contains
                 select case (init)
                     case ("rand") 
                         call randomDepositions(dipolar, spherical, mix_rMin)
-                        call randomOrientations(dipolar%orientations, dipolar%getNcol())
+                        call randomOrientations(dipolar%orientations, dipolar%get_Ncol())
                         write(output_unit, *) "Random depositions + random orientations"
                         write(report_unit, *) "    Random depositions + random orientations"
                     case default
@@ -80,11 +80,11 @@ contains
                 write(output_unit, *) "Old configuration"
                 write(report_unit, *) "    Old configuration"
                 
-                call oldConfiguration(1, dipolar%getName()//"_positions", dipolar%getNcol(), &
+                call oldConfiguration(1, dipolar%get_name()//"_positions", dipolar%get_Ncol(), &
                                       dipolar%positions, norm2(Lsize))
-                call oldConfiguration(2, dipolar%getName()//"_orientations", dipolar%getNcol(), &
+                call oldConfiguration(2, dipolar%get_name()//"_orientations", dipolar%get_Ncol(), &
                                       dipolar%orientations, 1._DP)
-                call oldConfiguration(3, spherical%getName()//"_positions", spherical%getNcol(), &
+                call oldConfiguration(3, spherical%get_name()//"_positions", spherical%get_Ncol(), &
                                       spherical%positions, norm2(Lsize))
             
             case default
@@ -109,7 +109,7 @@ contains
         real(DP) :: rTest
         
         ! Type 1
-        do iCol = 1, type1%getNcol()
+        do iCol = 1, type1%get_Ncol()
         
 7101        continue
             call random_number(xRand)
@@ -117,7 +117,7 @@ contains
             
             do iColTest = 1, iCol-1            
                 rTest = dist_PBC(type1%positions(:, iColTest), type1%positions(:, iCol))
-                if (rTest < type1%getRmin()) then
+                if (rTest < type1%get_rMin()) then
                     goto 7101
                 end if            
             end do
@@ -125,13 +125,13 @@ contains
         end do
         
         ! Type 2
-        do iCol = 1, type2%getNcol()
+        do iCol = 1, type2%get_Ncol()
         
 7102        continue
             call random_number(xRand)
             type2%positions(:, iCol) = xRand*Lsize(:)
             
-            do iColTest = 1, type1%getNcol()
+            do iColTest = 1, type1%get_Ncol()
                 rTest = dist_PBC(type1%positions(:, iColTest), type2%positions(:, iCol))
                 if (rTest < mix_rMin) then
                     goto 7102
@@ -140,7 +140,7 @@ contains
             
             do iColTest = 1, iCol-1            
                 rTest = dist_PBC(type2%positions(:, iColTest), type2%positions(:, iCol))
-                if (rTest < type2%getRmin()) then
+                if (rTest < type2%get_rMin()) then
                     goto 7102
                 end if            
             end do

@@ -134,7 +134,7 @@ implicit none
             fct_dist(iDist) = 2._DP * numerat / denomin / densite
             write(distrib_unit, *) r, fct_dist(iDist)
             
-            if (r>=hard%getRmin() .and. r<=hard%getRcut()) then
+            if (r>=hard%get_rMin() .and. r<=hard%get_rCut()) then
                 if (iDistMin == 0) then
                     iDistMin = iDist
                 end if

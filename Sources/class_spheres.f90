@@ -48,29 +48,29 @@ private
     contains
     
         !> Accessors
-        procedure :: getName => Spheres_getName
-        procedure :: getNcol => Spheres_getNcol
-        procedure :: getRmin => Spheres_getRmin
-        procedure :: getRcut => Spheres_getRcut        
-        procedure :: getMove_Nadapt => Spheres_getMove_Nadapt
+        procedure :: get_name => Spheres_get_name
+        procedure :: get_Ncol => Spheres_get_Ncol
+        procedure :: get_rMin => Spheres_get_rMin
+        procedure :: get_rCut => Spheres_get_rCut        
+        procedure :: get_move_Nadapt => Spheres_get_move_Nadapt
         !> Specifier
-        procedure :: mixCells_construct => Spheres_mixCells_construct
+        procedure :: construct_mixCells => Spheres_construct_mixCells
         
-        procedure :: printDensity => Spheres_printDensity
+        procedure :: print_density => Spheres_print_density
         
         !> Take a snap shot of the configuration : positions
         procedure :: snapShot_positions => Spheres_snapShot_positions
         
         !> Do an overlap test
-        procedure :: overlapTest => Spheres_overlapTest
+        procedure :: test_overlap => Spheres_test_overlap
         
         !> Assign all particles to cells
         procedure :: all_cols_to_cells => Spheres_all_cols_to_cells
                 
         !> Adapt the displacement move_delta during thermalisation
-        procedure :: adaptMove_delta => Spheres_adaptMove_delta
-        procedure :: definiteMove_delta => Spheres_definiteMove_delta
-        procedure :: getMove_delta => Spheres_getMove_delta
+        procedure :: adapt_move_delta => Spheres_adapt_move_delta
+        procedure :: define_move_delta => Spheres_define_move_delta
+        procedure :: get_move_delta => Spheres_get_move_delta
         
     end type Spheres
     
@@ -78,62 +78,62 @@ contains
 
     !> Accessor : name
 
-    pure function Spheres_getName(this) result(getName)
+    pure function Spheres_get_name(this) result(get_name)
     
         class(Spheres), intent(in) :: this        
-        character(len=5) :: getName
+        character(len=5) :: get_name
         
-        getName = this%name
+        get_name = this%name
     
-    end function Spheres_getName
+    end function Spheres_get_name
 
     !> Accessor : Ncol
 
-    pure function Spheres_getNcol(this) result(getNcol)
+    pure function Spheres_get_Ncol(this) result(get_Ncol)
     
         class(Spheres), intent(in) :: this        
-        integer :: getNcol
+        integer :: get_Ncol
         
-        getNcol = this%Ncol
+        get_Ncol = this%Ncol
     
-    end function Spheres_getNcol
+    end function Spheres_get_Ncol
     
     !> Accessor : rMin
     
-    pure function Spheres_getRmin(this) result(getRmin)
+    pure function Spheres_get_rMin(this) result(get_rMin)
     
         class(Spheres), intent(in) :: this        
-        real(DP) :: getRmin
+        real(DP) :: get_rMin
         
-        getRmin = this%rMin
+        get_rMin = this%rMin
     
-    end function Spheres_getRmin
+    end function Spheres_get_rMin
     
     !> Accessor : rCut
     
-    pure function Spheres_getRcut(this) result(getRcut)
+    pure function Spheres_get_rCut(this) result(get_rCut)
     
         class(Spheres), intent(in) :: this        
-        real(DP) :: getRcut
+        real(DP) :: get_rCut
         
-        getRcut = this%rCut
+        get_rCut = this%rCut
     
-    end function Spheres_getRcut
+    end function Spheres_get_rCut
     
     !> Accessor : move_Nadapt
     
-    pure function Spheres_getMove_Nadapt(this) result(getMove_Nadapt)
+    pure function Spheres_get_move_Nadapt(this) result(get_move_Nadapt)
     
         class(Spheres), intent(in) :: this
-        integer :: getMove_Nadapt
+        integer :: get_move_Nadapt
         
-        getMove_Nadapt = this%move_Nadapt
+        get_move_Nadapt = this%move_Nadapt
         
-    end function Spheres_getMove_Nadapt
+    end function Spheres_get_move_Nadapt
     
     !> Specifier : mixCells construction
     
-    subroutine Spheres_mixCells_construct(this, mix_cell_size, mix_rCut)
+    subroutine Spheres_construct_mixCells(this, mix_cell_size, mix_rCut)
     
         class(Spheres), intent(inout) :: this
         real(DP), dimension(:), intent(in) :: mix_cell_size
@@ -143,11 +143,11 @@ contains
         
         call this%mixCells%construct(mix_cell_size, mix_rCut)
     
-    end subroutine Spheres_mixCells_construct
+    end subroutine Spheres_construct_mixCells
     
     !> Print density and compacity
     
-    subroutine Spheres_printDensity(this, report_unit)
+    subroutine Spheres_print_density(this, report_unit)
     
         class(Spheres), intent(in) :: this
         integer, intent(in) :: report_unit
@@ -162,7 +162,7 @@ contains
         write(report_unit, *) "    density = ", density
         write(report_unit, *) "    compacity = ", compacity
     
-    end subroutine Spheres_printDensity
+    end subroutine Spheres_print_density
     
     !> Configuration state : positions
       
@@ -186,7 +186,7 @@ contains
     
     !> Overlapt test
     
-    subroutine Spheres_overlapTest(this)
+    subroutine Spheres_test_overlap(this)
     
         class(Spheres), intent(in) :: this
     
@@ -210,7 +210,7 @@ contains
         
         write(output_unit, *) this%name, " :    Overlap test : OK !"
     
-    end subroutine Spheres_overlapTest
+    end subroutine Spheres_test_overlap
     
     !> Fill cells with colloids
     
@@ -226,7 +226,7 @@ contains
     
     !> Adaptation of move_delta during the thermalisation
     
-    subroutine Spheres_adaptMove_delta(this, reject)
+    subroutine Spheres_adapt_move_delta(this, reject)
     
         class(Spheres), intent(inout) :: this
         real(DP), intent(in) :: reject
@@ -250,9 +250,9 @@ contains
             
         end if
     
-    end subroutine Spheres_adaptMove_delta
+    end subroutine Spheres_adapt_move_delta
     
-    subroutine Spheres_definiteMove_delta(this, reject, report_unit)
+    subroutine Spheres_define_move_delta(this, reject, report_unit)
     
         class(Spheres), intent(inout) :: this    
         real(DP), intent(in) :: reject
@@ -277,16 +277,16 @@ contains
         write(report_unit, *) "    rejection relative difference = ", &
                                     abs(reject-this%move_rejectFix)/this%move_rejectFix
     
-    end subroutine Spheres_definiteMove_delta
+    end subroutine Spheres_define_move_delta
     
-    pure function Spheres_getMove_delta(this) result(getMove_delta)
+    pure function Spheres_get_move_delta(this) result(get_move_delta)
         
         class(Spheres), intent(in) :: this        
-        real(DP) :: getMove_delta
+        real(DP) :: get_move_delta
         
         ! average move_delta of 3 vector components
-        getMove_delta = sum(this%move_delta)/size(this%move_delta)
+        get_move_delta = sum(this%move_delta)/size(this%move_delta)
         
-    end function Spheres_getMove_delta
+    end function Spheres_get_move_delta
 
 end module class_spheres

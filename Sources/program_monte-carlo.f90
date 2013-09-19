@@ -57,13 +57,13 @@ implicit none
     call type1_spheres%construct()
     call type2_spheres%construct()
     
-    call mix%setRmin(type1_spheres%getRmin(), type2_spheres%getRmin())
-    call type1_spheres%mixCells_construct(mix%getCell_size(), mix%getRcut())
-    call type2_spheres%mixCells_construct(mix%getCell_size(), mix%getRcut())
+    call mix%setRmin(type1_spheres%get_rMin(), type2_spheres%get_rMin())
+    call type1_spheres%construct_mixCells(mix%getCell_size(), mix%get_rCut())
+    call type2_spheres%construct_mixCells(mix%getCell_size(), mix%get_rCut())
     
-    Ncol = type1_spheres%getNcol() + type2_spheres%getNcol()
+    Ncol = type1_spheres%get_Ncol() + type2_spheres%get_Ncol()
     Nmove = decorrelFactor * Ncol
-    Nrotate = decorrelFactor * type1_spheres%getNcol()
+    Nrotate = decorrelFactor * type1_spheres%get_Ncol()
     
 ! Beginning ----------------------------------------------------------------------------------------
     
@@ -90,23 +90,23 @@ implicit none
     call mix%printReport(mix_report_unit)
     
     call type1_obs%init()
-    call type1_units%open(type1_spheres%getName())
+    call type1_units%open(type1_spheres%get_name())
     call type1_spheres%Epot_real_print(type1_units%Epot)
     call type1_spheres%Epot_reci_countNwaveVectors(type1_units%waveVectors)
-    call type1_spheres%printDensity(type1_units%report)
+    call type1_spheres%print_density(type1_units%report)
     call type1_spheres%printReport(type1_units%report)
     
     call type2_obs%init()
-    call type2_units%open(type2_spheres%getName())
+    call type2_units%open(type2_spheres%get_name())
     call type2_spheres%Epot_print(type2_units%Epot)
-    call type2_spheres%printDensity(type2_units%report)
+    call type2_spheres%print_density(type2_units%report)
     call type2_spheres%printReport(type2_units%report)
     
     ! Initial condition
     
-    call set_initialCondition(type1_spheres, type2_spheres, mix%getRmin(), report_unit)
+    call set_initialCondition(type1_spheres, type2_spheres, mix%get_rMin(), report_unit)
     
-    call type1_spheres%overlapTest()
+    call type1_spheres%test_overlap()
     call type1_spheres%Epot_reci_init()
     call type1_spheres%Epot_bound_totalMoment_init()
     type1_obs%Epot = type1_spheres%Epot_conf()
@@ -114,12 +114,12 @@ implicit none
     call type1_spheres%snapShot_orientations(0, type1_units%snapIni_orientations)
     call type1_spheres%all_cols_to_cells(type2_spheres) !< filling cells with particles
     
-    call type2_spheres%overlapTest()
+    call type2_spheres%test_overlap()
     type2_obs%Epot = type2_spheres%Epot_conf()
     call type2_spheres%snapShot_positions(0, type2_units%snapIni_positions)
     call type2_spheres%all_cols_to_cells(type1_spheres)
     
-    call mix%overlapTest(type1_spheres, type2_spheres)
+    call mix%test_overlap(type1_spheres, type2_spheres)
     mix_Epot = mix%Epot_conf(type1_spheres, type2_spheres)
     
     Epot_conf = type1_obs%Epot + type2_obs%Epot + mix_Epot
@@ -146,7 +146,7 @@ implicit none
                 iColRand = int(random*real(Ncol, DP)) + 1
                 
                 ! Moving a particle : 
-                if (iColRand <= type1_spheres%getNcol()) then
+                if (iColRand <= type1_spheres%get_Ncol()) then
                     call type1_spheres%move(type1_obs, type2_spheres, mix, mix_Epot)
                     type1_obs%Nmove = type1_obs%Nmove + 1
                 else
@@ -176,13 +176,13 @@ implicit none
         MC_Regime : if (iStep <= Nthermal) then ! Thermalisation
             
             ! Displacements adaptation
-            if (mod(iStep, type1_spheres%getMove_Nadapt()) /= 0) then ! Rejections accumulation
+            if (mod(iStep, type1_spheres%get_move_Nadapt()) /= 0) then ! Rejections accumulation
                 type1_obs%move_rejectAdapt = type1_obs%move_rejectAdapt + type1_obs%move_reject
             else ! Average & adaptation
                 type1_obs%move_rejectAdapt = type1_obs%move_rejectAdapt / &
-                                             real(type1_spheres%getMove_Nadapt()-1)
-                call type1_spheres%adaptMove_delta(type1_obs%move_rejectAdapt)
-                write(type1_units%move_delta, *) iStep, type1_spheres%getMove_delta(), &
+                                             real(type1_spheres%get_move_Nadapt()-1)
+                call type1_spheres%adapt_move_delta(type1_obs%move_rejectAdapt)
+                write(type1_units%move_delta, *) iStep, type1_spheres%get_move_delta(), &
                                                  type1_obs%move_rejectAdapt
                 type1_obs%move_rejectAdapt = 0._DP
             end if
@@ -199,13 +199,13 @@ implicit none
                 type1_obs%rotate_rejectAdapt = 0._DP
             end if
 
-            if (mod(iStep, type2_spheres%getMove_Nadapt()) /= 0) then
+            if (mod(iStep, type2_spheres%get_move_Nadapt()) /= 0) then
                 type2_obs%move_rejectAdapt = type2_obs%move_rejectAdapt + type2_obs%move_reject
             else                
                 type2_obs%move_rejectAdapt = type2_obs%move_rejectAdapt / &
-                                             real(type2_spheres%getMove_Nadapt()-1)
-                call type2_spheres%adaptMove_delta(type2_obs%move_rejectAdapt)
-                write(type2_units%move_delta, *) iStep, type2_spheres%getMove_delta(), &
+                                             real(type2_spheres%get_move_Nadapt()-1)
+                call type2_spheres%adapt_move_delta(type2_obs%move_rejectAdapt)
+                write(type2_units%move_delta, *) iStep, type2_spheres%get_move_delta(), &
                                                  type2_obs%move_rejectAdapt
                 type2_obs%move_rejectAdapt = 0._DP
             end if
@@ -219,9 +219,9 @@ implicit none
             write(obsThermal_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
             
             if (iStep == Nthermal) then ! Definite thermalised displacements
-                call type1_spheres%definiteMove_delta(type1_obs%move_reject, type1_units%report)
+                call type1_spheres%define_move_delta(type1_obs%move_reject, type1_units%report)
                 call type1_spheres%definiteRotate_delta(type1_obs%rotate_reject, type1_units%report)
-                call type2_spheres%definiteMove_delta(type2_obs%move_reject, type2_units%report)
+                call type2_spheres%define_move_delta(type2_obs%move_reject, type2_units%report)
             end if       
         
         else MC_Regime ! Thermalisation over -> Equilibrium
@@ -276,7 +276,7 @@ implicit none
 
     ! Tests & results
 
-    call type1_spheres%overlapTest()
+    call type1_spheres%test_overlap()
     call type1_spheres%Epot_reci_init()
     call type1_spheres%Epot_bound_totalMoment_init()
     call type1_spheres%consistTest(type1_obs%Epot, type1_units%report)
@@ -284,12 +284,12 @@ implicit none
     call type1_spheres%snapShot_orientations(0, type1_units%snapFin_orientations)
     call type1_obs%printResults(type1_units%report)
     
-    call type2_spheres%overlapTest()
+    call type2_spheres%test_overlap()
     call type2_spheres%consistTest(type2_obs%Epot, type2_units%report)
     call type2_spheres%snapShot_positions(0, type2_units%snapFin_positions)
     call type2_obs%printResults(type2_units%report)
     
-    call mix%overlapTest(type1_spheres, type2_spheres)
+    call mix%test_overlap(type1_spheres, type2_spheres)
     mix_Epot_conf = mix%Epot_conf(type1_spheres, type2_spheres)
     call test_consist(mix_Epot, mix_Epot_conf, mix_report_unit)
     call mix_print_results(mix_EpotSum, mix_report_unit)
