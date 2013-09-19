@@ -38,8 +38,8 @@ public :: Link
         procedure :: construct => NeighbourCells_construct
         procedure :: destroy => NeighbourCells_destroy
         
-        procedure :: getCell_size => NeighbourCells_getCell_size
-        procedure :: getNtotalCell_dim => NeighbourCells_getNtotalCell_dim
+        procedure :: get_cell_size => NeighbourCells_get_cell_size
+        procedure :: get_NtotalCell_dim => NeighbourCells_get_NtotalCell_dim
         
         procedure :: alloc_cells => NeighbourCells_alloc_cells
         procedure :: dealloc_cells => NeighbourCells_dealloc_cells
@@ -48,7 +48,7 @@ public :: Link
         procedure :: all_cols_to_cells => NeighbourCells_all_cols_to_cells
         procedure :: remove_col_from_cell => NeighbourCells_remove_col_from_cell
         procedure :: add_col_to_cell => NeighbourCells_add_col_to_cell
-        procedure :: nearCells_among_totalCells_init => NeighbourCells_nearCells_among_totalCells_init
+        procedure :: init_nearCells_among_totalCells => NeighbourCells_init_nearCells_among_totalCells
         
     end type NeighbourCells
     
@@ -78,7 +78,7 @@ contains
             
         call this%check_CellsSize(rCut)        
         call this%alloc_cells()
-        call this%nearCells_among_totalCells_init()
+        call this%init_nearCells_among_totalCells()
     
     end subroutine NeighbourCells_construct
     
@@ -96,25 +96,25 @@ contains
     
     !> Accessor : cell_size
     
-    pure function NeighbourCells_getCell_size(this) result(getCell_size)
+    pure function NeighbourCells_get_cell_size(this) result(get_cell_size)
     
         class(NeighbourCells), intent(in) :: this
-        real(DP), dimension(Ndim) :: getCell_size
+        real(DP), dimension(Ndim) :: get_cell_size
         
-        getCell_size(:) = this%cell_size(:)
+        get_cell_size(:) = this%cell_size(:)
     
-    end function NeighbourCells_getCell_size
+    end function NeighbourCells_get_cell_size
     
     !> Accessor : NtotalCell_dim
     
-    pure function NeighbourCells_getNtotalCell_dim(this) result(getNtotalCell_dim)
+    pure function NeighbourCells_get_NtotalCell_dim(this) result(get_NtotalCell_dim)
     
         class(NeighbourCells), intent(in) :: this    
-        integer, dimension(Ndim) :: getNtotalCell_dim
+        integer, dimension(Ndim) :: get_NtotalCell_dim
         
-        getNtotalCell_dim(:) = this%NtotalCell_dim(:)
+        get_NtotalCell_dim(:) = this%NtotalCell_dim(:)
         
-    end function NeighbourCells_getNtotalCell_dim
+    end function NeighbourCells_get_NtotalCell_dim
 
     !> Linked-list allocation
     
@@ -326,7 +326,7 @@ contains
     
     ! Neighbour cells initialisation
     
-    subroutine NeighbourCells_nearCells_among_totalCells_init(this)
+    subroutine NeighbourCells_init_nearCells_among_totalCells(this)
     
         class(NeighbourCells), intent(inout) :: this
     
@@ -364,6 +364,6 @@ contains
         end do
         end do
             
-    end subroutine NeighbourCells_nearCells_among_totalCells_init
+    end subroutine NeighbourCells_init_nearCells_among_totalCells
 
 end module class_neighbourCells
