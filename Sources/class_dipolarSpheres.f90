@@ -112,6 +112,9 @@ private
         procedure, private :: deltaEpot_bound_rotate => DipolarSpheres_deltaEpot_bound_rotate
         procedure, private :: deltaEpot_bound_rotate_update_totalMoment => &
                               DipolarSpheres_deltaEpot_bound_rotate_update_totalMoment
+        procedure, private :: deltaEpot_bound_exchange => DipolarSpheres_deltaEpot_bound_exchange
+        procedure, private :: deltaEpot_bound_exchange_update_totalMoment => &
+                              DipolarSpheres_deltaEpot_bound_exchange_update_totalMoment
         procedure :: Epot_bound_reInit_totalMoment => DipolarSpheres_Epot_bound_reInit_totalMoment
         procedure, private :: Epot_bound => DipolarSpheres_Epot_bound
         !>     Total
@@ -1360,9 +1363,11 @@ contains
     
     end subroutine DipolarSpheres_Epot_bound_init_totalMoment
     
+    !> Rotation
+    
     !> Difference of Energy
     !> \f[
-    !>      \Delta J = \frac{2\pi}{(2\epsilon_s+1)V} [
+    !>      \Delta U = \frac{2\pi}{(2\epsilon_s+1)V} [
     !>                      (\vec{\mu}^\prime_l \cdot \vec{\mu}^\prime_l) -
     !>                      (\vec{\mu}_l \cdot \vec{\mu}_l) +
     !>                      2 (\vec{\mu}^\prime_l - \vec{\mu}_l) \cdot \vec{M}_l
@@ -1377,12 +1382,14 @@ contains
         real(DP) :: deltaEpot_bound_rotate
         
         deltaEpot_bound_rotate = dot_product(mNew, mNew) - dot_product(mOld, mOld) + &
-                          2._DP * dot_product(mNew-mOld, this%totalMoment-mOld)
+                                 2._DP*dot_product(mNew-mOld, this%totalMoment-mOld)
                           
         deltaEpot_bound_rotate = 2._DP*PI / (2._DP*out_permittivity+1._DP) / Volume * &
                                  deltaEpot_bound_rotate
     
     end function DipolarSpheres_deltaEpot_bound_rotate
+    
+    !> Rotation
     
     !> Update the total moment
     !> \f[
@@ -1394,9 +1401,63 @@ contains
         class(DipolarSpheres), intent(inout) :: this
         real(DP), dimension(:), intent(in) :: mOld, mNew
         
-        this%totalMoment(:) = this%totalMoment(:) + mNew - mOld
+        this%totalMoment(:) = this%totalMoment(:) + mNew(:) - mOld(:)
     
     end subroutine DipolarSpheres_deltaEpot_bound_rotate_update_totalMoment
+    
+    !> Exchange
+    
+    !> Difference of Energy : add
+    !> \f[
+    !>      \Delta U_{N \rightarrow N+1} = \frac{2\pi}{(2\epsilon_s+1)V} [
+    !>                                         (\vec{\mu}_{N+1} \cdot \vec{\mu}_{N+1})
+    !>                                          2\vec{\mu}) \cdot \vec{M}^N
+    !>                                     ]
+    !> \f]
+    
+    !> Difference of Energy : remove
+    !> \f[
+    !>      \Delta U_{N \rightarrow N-1} = \frac{2\pi}{(2\epsilon_s+1)V} [
+    !>                                          (\vec{\mu}_{N+1} \cdot \vec{\mu}_{N+1})
+    !>                                          -2\vec{\mu}) \cdot \vec{M}^N
+    !>                                      ]
+    !> \f]
+    
+    pure function DipolarSpheres_deltaEpot_bound_exchange(this, mCol) &
+                  result (deltaEpot_bound_exchange)
+    
+        class(DipolarSpheres), intent(in) :: this
+        real(DP), dimension(:), intent(in) :: mCol
+        real(DP) :: deltaEpot_bound_exchange
+        
+        deltaEpot_bound_exchange = dot_product(mCol, mCol) + &
+                                   2._DP * dot_product(mCol, this%totalMoment)
+                          
+        deltaEpot_bound_exchange = 2._DP*PI / (2._DP*out_permittivity+1._DP) / Volume * &
+                                   deltaEpot_bound_exchange
+    
+    end function DipolarSpheres_deltaEpot_bound_exchange
+    
+    !> Exchange
+    
+    !> Update the total moment : add
+    !> \f[
+    !>      \Delta \vec{M} = +\vec{\mu}_l
+    !> \f]
+    
+    !> Update the total moment : remove
+    !> \f[
+    !>      \Delta \vec{M} = -\vec{\mu}_l
+    !> \f]  
+    
+    subroutine DipolarSpheres_deltaEpot_bound_exchange_update_totalMoment(this, mCol)
+    
+        class(DipolarSpheres), intent(inout) :: this
+        real(DP), dimension(:), intent(in) :: mCol
+        
+        this%totalMoment(:) = this%totalMoment(:) + mCol(:)
+    
+    end subroutine DipolarSpheres_deltaEpot_bound_exchange_update_totalMoment
     
     !> Reinitialise the total moment factor and print the drift
     
