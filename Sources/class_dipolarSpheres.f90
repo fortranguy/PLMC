@@ -1696,7 +1696,7 @@ contains
                                         
                     this_EpotTest = this%Epot_real_solo(0, xTest, mTest) + &
                                     this%deltaEpot_reci_exchange(xTest, mTest) - &
-                                    this%Epot_self_solo(mTest)
+                                    this%Epot_self_solo(mTest) + this%deltaEpot_bound_exchange(+mTest)
                 
                     EpotTest = this_EpotTest + mix_EpotTest
                     widTestSum = widTestSum + exp(-EpotTest/Temperature)
