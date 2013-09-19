@@ -69,7 +69,7 @@ private
                 
         !> Adapt the displacement move_delta during thermalisation
         procedure :: adapt_move_delta => Spheres_adapt_move_delta
-        procedure :: define_move_delta => Spheres_define_move_delta
+        procedure :: set_move_delta => Spheres_set_move_delta
         procedure :: get_move_delta => Spheres_get_move_delta
         
     end type Spheres
@@ -252,7 +252,7 @@ contains
     
     end subroutine Spheres_adapt_move_delta
     
-    subroutine Spheres_define_move_delta(this, reject, report_unit)
+    subroutine Spheres_set_move_delta(this, reject, report_unit)
     
         class(Spheres), intent(inout) :: this    
         real(DP), intent(in) :: reject
@@ -277,7 +277,7 @@ contains
         write(report_unit, *) "    rejection relative difference = ", &
                                     abs(reject-this%move_rejectFix)/this%move_rejectFix
     
-    end subroutine Spheres_define_move_delta
+    end subroutine Spheres_set_move_delta
     
     pure function Spheres_get_move_delta(this) result(get_move_delta)
         
