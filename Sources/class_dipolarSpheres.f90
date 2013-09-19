@@ -68,13 +68,13 @@ private
         procedure :: snapShot_orientations => DipolarSpheres_snapShot_orientations
         
         !> Adapt the rotation rotate_delta during thermalisation
-        procedure :: adaptRotate_delta => DipolarSpheres_adaptRotate_delta
-        procedure :: definiteRotate_delta => DipolarSpheres_definiteRotate_delta
-        procedure :: getRotate_delta => DipolarSpheres_getRotate_delta
-        procedure :: getRotate_Nadapt => DipolarSpheres_getRotate_Nadapt
+        procedure :: adapt_rotate_delta => DipolarSpheres_adapt_rotate_delta
+        procedure :: set_rotate_delta => DipolarSpheres_set_rotate_delta
+        procedure :: get_rotate_delta => DipolarSpheres_get_rotate_delta
+        procedure :: get_rotate_Nadapt => DipolarSpheres_get_rotate_Nadapt
         
-        procedure :: getStructure_iStep => DipolarSpheres_getStructure_iStep
-        procedure :: getTotalMoment_iStep => DipolarSpheres_getTotalMoment_iStep
+        procedure :: get_structure_iStep => DipolarSpheres_get_structure_iStep
+        procedure :: get_totalMoment_iStep => DipolarSpheres_get_totalMoment_iStep
         
         !> Potential energy
         !>     Real
@@ -251,7 +251,7 @@ contains
     
     !> Adaptation of rotate_delta during the thermalisation
     
-    subroutine DipolarSpheres_adaptRotate_delta(this, reject)
+    subroutine DipolarSpheres_adapt_rotate_delta(this, reject)
     
         class(DipolarSpheres), intent(inout) :: this
         real(DP), intent(in) :: reject
@@ -276,9 +276,9 @@ contains
             
         end if
     
-    end subroutine DipolarSpheres_adaptRotate_delta
+    end subroutine DipolarSpheres_adapt_rotate_delta
     
-    subroutine DipolarSpheres_definiteRotate_delta(this, reject, report_unit)
+    subroutine DipolarSpheres_set_rotate_delta(this, reject, report_unit)
     
         class(DipolarSpheres), intent(inout) :: this    
         real(DP), intent(in) :: reject
@@ -303,51 +303,51 @@ contains
         write(report_unit, *) "    rejection relative difference = ", &
                                     abs(reject-this%rotate_rejectFix)/this%rotate_rejectFix
     
-    end subroutine DipolarSpheres_definiteRotate_delta
+    end subroutine DipolarSpheres_set_rotate_delta
     
     !> Accessor : rotate_delta
     
-    pure function DipolarSpheres_getRotate_delta(this) result(getRotate_delta)
+    pure function DipolarSpheres_get_rotate_delta(this) result(get_rotate_delta)
         
         class(DipolarSpheres), intent(in) :: this        
-        real(DP) :: getRotate_delta
+        real(DP) :: get_rotate_delta
         
-        getRotate_delta = this%rotate_delta
+        get_rotate_delta = this%rotate_delta
         
-    end function DipolarSpheres_getRotate_delta
+    end function DipolarSpheres_get_rotate_delta
     
     !> Accessor : move_Nadapt
     
-    pure function DipolarSpheres_getRotate_Nadapt(this) result(getRotate_Nadapt)
+    pure function DipolarSpheres_get_rotate_Nadapt(this) result(get_rotate_Nadapt)
     
         class(DipolarSpheres), intent(in) :: this        
-        integer :: getRotate_Nadapt
+        integer :: get_rotate_Nadapt
         
-        getRotate_Nadapt = this%rotate_Nadapt
+        get_rotate_Nadapt = this%rotate_Nadapt
         
-    end function DipolarSpheres_getRotate_Nadapt
+    end function DipolarSpheres_get_rotate_Nadapt
     
     !> Accessor : structure_iStep
     
-    pure function DipolarSpheres_getStructure_iStep(this) result (getStructure_iStep)
+    pure function DipolarSpheres_get_structure_iStep(this) result (get_structure_iStep)
     
         class(DipolarSpheres), intent(in) :: this
-        integer :: getStructure_iStep
+        integer :: get_structure_iStep
     
-        getStructure_iStep = this%structure_iStep
+        get_structure_iStep = this%structure_iStep
         
-    end function DipolarSpheres_getStructure_iStep
+    end function DipolarSpheres_get_structure_iStep
     
     !> Accessor : totalMoment_iStep
     
-    pure function DipolarSpheres_getTotalMoment_iStep(this) result (getTotalMoment_iStep)
+    pure function DipolarSpheres_get_totalMoment_iStep(this) result (get_totalMoment_iStep)
     
         class(DipolarSpheres), intent(in) :: this
-        integer :: getTotalMoment_iStep
+        integer :: get_totalMoment_iStep
     
-        getTotalMoment_iStep = this%totalMoment_iStep
+        get_totalMoment_iStep = this%totalMoment_iStep
         
-    end function DipolarSpheres_getTotalMoment_iStep
+    end function DipolarSpheres_get_totalMoment_iStep
 
     ! Real : short-range interaction ---------------------------------------------------------------
     

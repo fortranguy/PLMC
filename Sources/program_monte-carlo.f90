@@ -188,13 +188,13 @@ implicit none
             end if
             
             ! Rotation adaptation
-            if (mod(iStep, type1_spheres%getRotate_Nadapt()) /= 0) then
+            if (mod(iStep, type1_spheres%get_rotate_Nadapt()) /= 0) then
                 type1_obs%rotate_rejectAdapt = type1_obs%rotate_rejectAdapt + type1_obs%rotate_reject
             else
                 type1_obs%rotate_rejectAdapt = type1_obs%rotate_rejectAdapt / &
-                                               real(type1_spheres%getRotate_Nadapt()-1)
-                call type1_spheres%adaptRotate_delta(type1_obs%rotate_rejectAdapt)
-                write(type1_units%rotate_delta, *) iStep, type1_spheres%getRotate_delta(), &
+                                               real(type1_spheres%get_rotate_Nadapt()-1)
+                call type1_spheres%adapt_rotate_delta(type1_obs%rotate_rejectAdapt)
+                write(type1_units%rotate_delta, *) iStep, type1_spheres%get_rotate_delta(), &
                                                    type1_obs%rotate_rejectAdapt
                 type1_obs%rotate_rejectAdapt = 0._DP
             end if
@@ -220,7 +220,7 @@ implicit none
             
             if (iStep == Nthermal) then ! Definite thermalised displacements
                 call type1_spheres%set_move_delta(type1_obs%move_reject, type1_units%report)
-                call type1_spheres%definiteRotate_delta(type1_obs%rotate_reject, type1_units%report)
+                call type1_spheres%set_rotate_delta(type1_obs%rotate_reject, type1_units%report)
                 call type2_spheres%set_move_delta(type2_obs%move_reject, type2_units%report)
             end if       
         
@@ -258,12 +258,12 @@ implicit none
         end if MC_Regime
         
         ! Ewald summation : reinitialize the structure factor to prevent it from drifting.
-        if (modulo(iStep, type1_spheres%getStructure_iStep()) == 0) then
+        if (modulo(iStep, type1_spheres%get_structure_iStep()) == 0) then
             call type1_spheres%Epot_reci_structure_reInit(iStep, type1_units%structure_modulus)
         end if
         
         ! Boundary conditions : reinitialize the total moment to prevent it from drifting.
-        if (modulo(iStep, type1_spheres%getTotalMoment_iStep()) == 0) then
+        if (modulo(iStep, type1_spheres%get_totalMoment_iStep()) == 0) then
             call type1_spheres%Epot_bound_totalMoment_reInit(iStep, type1_units%totalMoment_modulus)
         end if
     
