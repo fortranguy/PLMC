@@ -92,7 +92,7 @@ implicit none
     call type1_obs%init()
     call type1_units%open(type1_spheres%get_name())
     call type1_spheres%Epot_real_print(type1_units%Epot)
-    call type1_spheres%Epot_reci_countNwaveVectors(type1_units%waveVectors)
+    call type1_spheres%Epot_reci_count_waveVectors(type1_units%waveVectors)
     call type1_spheres%print_density(type1_units%report)
     call type1_spheres%print_report(type1_units%report)
     
@@ -108,7 +108,7 @@ implicit none
     
     call type1_spheres%test_overlap()
     call type1_spheres%Epot_reci_init()
-    call type1_spheres%Epot_bound_totalMoment_init()
+    call type1_spheres%Epot_bound_init_totalMoment()
     type1_obs%Epot = type1_spheres%Epot_conf()
     call type1_spheres%snapShot_positions(0, type1_units%snapIni_positions)
     call type1_spheres%snapShot_orientations(0, type1_units%snapIni_orientations)
@@ -259,12 +259,12 @@ implicit none
         
         ! Ewald summation : reinitialize the structure factor to prevent it from drifting.
         if (modulo(iStep, type1_spheres%get_structure_iStep()) == 0) then
-            call type1_spheres%Epot_reci_structure_reInit(iStep, type1_units%structure_modulus)
+            call type1_spheres%Epot_reci_reInit_structure(iStep, type1_units%structure_modulus)
         end if
         
         ! Boundary conditions : reinitialize the total moment to prevent it from drifting.
         if (modulo(iStep, type1_spheres%get_totalMoment_iStep()) == 0) then
-            call type1_spheres%Epot_bound_totalMoment_reInit(iStep, type1_units%totalMoment_modulus)
+            call type1_spheres%Epot_bound_reInit_totalMoment(iStep, type1_units%totalMoment_modulus)
         end if
     
     end do MC_Cycle
@@ -278,7 +278,7 @@ implicit none
 
     call type1_spheres%test_overlap()
     call type1_spheres%Epot_reci_init()
-    call type1_spheres%Epot_bound_totalMoment_init()
+    call type1_spheres%Epot_bound_init_totalMoment()
     call type1_spheres%test_consist(type1_obs%Epot, type1_units%report)
     call type1_spheres%snapShot_positions(0, type1_units%snapFin_positions)
     call type1_spheres%snapShot_orientations(0, type1_units%snapFin_orientations)

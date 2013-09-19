@@ -82,36 +82,37 @@ private
         procedure :: Epot_real_print => DipolarSpheres_Epot_real_print
         procedure, private :: Epot_real_interpol => DipolarSpheres_Epot_real_interpol
         procedure :: Epot_real_pair => DipolarSpheres_Epot_real_pair
-        procedure, private :: Epot_real_overlapTest => DipolarSpheres_Epot_real_overlapTest
+        procedure, private :: Epot_real_test_overlap => DipolarSpheres_Epot_real_test_overlap
         procedure, private :: Epot_real_solo => DipolarSpheres_Epot_real_solo
         procedure, private :: Epot_real => DipolarSpheres_Epot_real
         !>     Reciprocal : init
         procedure :: Epot_reci_init => DipolarSpheres_Epot_reci_init
-        procedure, private :: Epot_reci_weight_init => DipolarSpheres_Epot_reci_weight_init
-        procedure, private :: Epot_reci_structure_init => DipolarSpheres_Epot_reci_structure_init
-        procedure, private :: Epot_reci_structure_modulus => DipolarSpheres_Epot_reci_structure_modulus
-        procedure :: Epot_reci_structure_reInit => DipolarSpheres_Epot_reci_structure_reInit
-        procedure, private :: Epot_reci_potential_init => DipolarSpheres_Epot_reci_potential_init
-        procedure :: Epot_reci_countNwaveVectors => DipolarSpheres_Epot_reci_countNwaveVectors
+        procedure, private :: Epot_reci_init_weight => DipolarSpheres_Epot_reci_init_weight
+        procedure, private :: Epot_reci_init_structure => DipolarSpheres_Epot_reci_init_structure
+        procedure, private :: Epot_reci_get_structure_modulus => &
+                              DipolarSpheres_Epot_reci_get_structure_modulus
+        procedure :: Epot_reci_reInit_structure => DipolarSpheres_Epot_reci_reInit_structure
+        procedure, private :: Epot_reci_init_potential => DipolarSpheres_Epot_reci_init_potential
+        procedure :: Epot_reci_count_waveVectors => DipolarSpheres_Epot_reci_count_waveVectors
         !>     Reciprocal : delta
         procedure, private :: deltaEpot_reci_move => DipolarSpheres_deltaEpot_reci_move
-        procedure, private :: deltaEpot_reci_move_updateStructure => &
-                              DipolarSpheres_deltaEpot_reci_move_updateStructure
+        procedure, private :: deltaEpot_reci_move_update_structure => &
+                              DipolarSpheres_deltaEpot_reci_move_update_structure
         procedure, private :: deltaEpot_reci_rotate => DipolarSpheres_deltaEpot_reci_rotate
-        procedure, private :: deltaEpot_reci_rotate_updateStructure => &
-                              DipolarSpheres_deltaEpot_reci_rotate_updateStructure
-        procedure, private :: deltaEpot_reci_solo => DipolarSpheres_deltaEpot_reci_solo
+        procedure, private :: deltaEpot_reci_rotate_update_structure => &
+                              DipolarSpheres_deltaEpot_reci_rotate_update_structure
+        procedure, private :: deltaEpot_reci_exchange => DipolarSpheres_deltaEpot_reci_exchange
         !>     Reciprocal : total
         procedure, private :: Epot_reci => DipolarSpheres_Epot_reci
         !>     Self
         procedure, private :: Epot_self_solo => DipolarSpheres_Epot_self_solo
         procedure, private :: Epot_self => DipolarSpheres_Epot_self
         !>     Boundary conditions
-        procedure :: Epot_bound_totalMoment_init => DipolarSpheres_Epot_bound_totalMoment_init
+        procedure :: Epot_bound_init_totalMoment => DipolarSpheres_Epot_bound_init_totalMoment
         procedure, private :: deltaEpot_bound => DipolarSpheres_deltaEpot_bound
         procedure, private :: deltaEpot_bound_totalMoment_update => &
                               DipolarSpheres_deltaEpot_bound_totalMoment_update
-        procedure :: Epot_bound_totalMoment_reInit => DipolarSpheres_Epot_bound_totalMoment_reInit
+        procedure :: Epot_bound_reInit_totalMoment => DipolarSpheres_Epot_bound_reInit_totalMoment
         procedure, private :: Epot_bound => DipolarSpheres_Epot_bound
         !>     Total
         procedure :: Epot_conf => DipolarSpheres_Epot_conf
@@ -169,7 +170,7 @@ contains
         call this%Epot_real_init()
 
         allocate(this%Epot_reci_potential(Ndim, this%Ncol))
-        call this%Epot_reci_weight_init()
+        call this%Epot_reci_init_weight()
         
         ! Neighbour Cells
         call this%sameCells%construct(dipol_cell_size, this%rCut) !< same kind
@@ -455,7 +456,7 @@ contains
  
     !> Overlap test of 1 particle
 
-    subroutine DipolarSpheres_Epot_real_overlapTest(this, iCol, xCol, iTotalCell, overlap)
+    subroutine DipolarSpheres_Epot_real_test_overlap(this, iCol, xCol, iTotalCell, overlap)
 
         class(DipolarSpheres), intent(in) :: this
         integer, intent(in) :: iCol, iTotalCell
@@ -498,7 +499,7 @@ contains
 
         end do
 
-    end subroutine DipolarSpheres_Epot_real_overlapTest
+    end subroutine DipolarSpheres_Epot_real_test_overlap
     
     !> Energy of 1 dipole with others
     
@@ -571,8 +572,8 @@ contains
 
         class(DipolarSpheres), intent(inout) :: this
 
-        call this%Epot_reci_structure_init()
-        call this%Epot_reci_potential_init()
+        call this%Epot_reci_init_structure()
+        call this%Epot_reci_init_potential()
 
     end subroutine
     
@@ -581,7 +582,7 @@ contains
     !>                                {\sum_d \frac{k_d^2}{L_d}}
     !> \f]
     
-    subroutine DipolarSpheres_Epot_reci_weight_init(this)
+    subroutine DipolarSpheres_Epot_reci_init_weight(this)
         
         class(DipolarSpheres), intent(inout) :: this
         
@@ -616,7 +617,7 @@ contains
         
         end do
         
-    end subroutine DipolarSpheres_Epot_reci_weight_init
+    end subroutine DipolarSpheres_Epot_reci_init_weight
     
     !> Structure factor init :
     !> \f[ 
@@ -627,7 +628,7 @@ contains
     !>      S_l(\vec{k}) = \sum_{i \neq l} (\vec{k}\cdot\vec{\mu}_i) e^{+i\vec{k}\cdot\vec{x}_i}
     !> \f].
 
-    subroutine DipolarSpheres_Epot_reci_structure_init(this)
+    subroutine DipolarSpheres_Epot_reci_init_structure(this)
 
         class(DipolarSpheres), intent(inout) :: this
 
@@ -679,35 +680,36 @@ contains
             
         end do
 
-    end subroutine DipolarSpheres_Epot_reci_structure_init
+    end subroutine DipolarSpheres_Epot_reci_init_structure
     
     !> To calculate the drift of the strucutre factor
 
-    pure function DipolarSpheres_Epot_reci_structure_modulus(this) result(Epot_reci_structure_modulus)
+    pure function DipolarSpheres_Epot_reci_get_structure_modulus(this) &
+                  result(Epot_reci_get_structure_modulus)
 
         class(DipolarSpheres), intent(in) :: this
-        real(DP) :: Epot_reci_structure_modulus
+        real(DP) :: Epot_reci_get_structure_modulus
 
         integer :: kx, ky, kz
 
-        Epot_reci_structure_modulus = 0._DP
+        Epot_reci_get_structure_modulus = 0._DP
 
         do kz = 0, Kmax(3)
             do ky = -Kmax2_sym(kz), Kmax(2)
                 do kx = -Kmax1_sym(ky, kz), Kmax(1)
                 
-                    Epot_reci_structure_modulus = Epot_reci_structure_modulus + &
+                    Epot_reci_get_structure_modulus = Epot_reci_get_structure_modulus + &
                                                   abs(this%structureFactor(kx, ky, kz))
 
                 end do
             end do
         end do
 
-    end function DipolarSpheres_Epot_reci_structure_modulus
+    end function DipolarSpheres_Epot_reci_get_structure_modulus
     
     !> Reinitialise the structure factor and print the drift
     
-    subroutine DipolarSpheres_Epot_reci_structure_reInit(this, iStep, modulus_unit)
+    subroutine DipolarSpheres_Epot_reci_reInit_structure(this, iStep, modulus_unit)
     
         class(DipolarSpheres), intent(inout) :: this
         integer, intent(in) :: iStep
@@ -715,13 +717,13 @@ contains
 
         real(DP) :: modulus_drifted, modulus_reInit
         
-        modulus_drifted = this%Epot_reci_structure_modulus()
-        call this%Epot_reci_structure_init()
-        modulus_reInit = this%Epot_reci_structure_modulus()
+        modulus_drifted = this%Epot_reci_get_structure_modulus()
+        call this%Epot_reci_init_structure()
+        modulus_reInit = this%Epot_reci_get_structure_modulus()
         
         write(modulus_unit, *) iStep, abs(modulus_reInit - modulus_drifted)
     
-    end subroutine DipolarSpheres_Epot_reci_structure_reInit
+    end subroutine DipolarSpheres_Epot_reci_reInit_structure
     
     !> Potential initialisation :
     !> \f[
@@ -729,7 +731,7 @@ contains
     !>                              e^{-i\vec{k}\cdot\vec{x}_j}
     !> \f]
     
-    subroutine DipolarSpheres_Epot_reci_potential_init(this)
+    subroutine DipolarSpheres_Epot_reci_init_potential(this)
     
         class(DipolarSpheres), intent(inout) :: this
         
@@ -782,11 +784,11 @@ contains
             
         end do
         
-    end subroutine DipolarSpheres_Epot_reci_potential_init
+    end subroutine DipolarSpheres_Epot_reci_init_potential
 
     ! Count the number of wave vectors
 
-    subroutine DipolarSpheres_Epot_reci_countNwaveVectors(this, waveVectors_unit)
+    subroutine DipolarSpheres_Epot_reci_count_waveVectors(this, waveVectors_unit)
 
         class(DipolarSpheres), intent(inout) :: this
         integer, intent(in) :: waveVectors_unit
@@ -824,7 +826,7 @@ contains
 
         end do
 
-    end subroutine DipolarSpheres_Epot_reci_countNwaveVectors
+    end subroutine DipolarSpheres_Epot_reci_count_waveVectors
 
     !> Move
 
@@ -942,7 +944,7 @@ contains
     !>  \f]
     !>
 
-    subroutine DipolarSpheres_deltaEpot_reci_move_updateStructure(this, xOld, xNew, mCol)
+    subroutine DipolarSpheres_deltaEpot_reci_move_update_structure(this, xOld, xNew, mCol)
 
         class(DipolarSpheres), intent(inout) :: this
         real(DP), dimension(:), intent(in) :: xOld, xNew
@@ -999,7 +1001,7 @@ contains
             
         end do
 
-    end subroutine DipolarSpheres_deltaEpot_reci_move_updateStructure
+    end subroutine DipolarSpheres_deltaEpot_reci_move_update_structure
     
     !> Rotate
 
@@ -1109,7 +1111,7 @@ contains
     !>  \f]
     !>
 
-    subroutine DipolarSpheres_deltaEpot_reci_rotate_updateStructure(this, xCol, mOld, mNew)
+    subroutine DipolarSpheres_deltaEpot_reci_rotate_update_structure(this, xCol, mOld, mNew)
 
         class(DipolarSpheres), intent(inout) :: this
         real(DP), dimension(:), intent(in) :: xCol
@@ -1159,7 +1161,7 @@ contains
             
         end do
 
-    end subroutine DipolarSpheres_deltaEpot_reci_rotate_updateStructure
+    end subroutine DipolarSpheres_deltaEpot_reci_rotate_update_structure
 
     !> Energy of 1 dipole with others
     
@@ -1207,12 +1209,13 @@ contains
     
     !> Summary : only the sign of \f[\vec{\mu}\f] changes.
 
-    pure function DipolarSpheres_deltaEpot_reci_solo(this, xCol, mCol) result(deltaEpot_reci_solo)
+    pure function DipolarSpheres_deltaEpot_reci_exchange(this, xCol, mCol) &
+                  result(deltaEpot_reci_exchange)
 
         class(DipolarSpheres), intent(in) :: this
         real(DP), dimension(:), intent(in) :: xCol
         real(DP), dimension(:), intent(in) :: mCol
-        real(DP) :: deltaEpot_reci_solo
+        real(DP) :: deltaEpot_reci_exchange
         
         real(DP) :: deltaEpot_k
         
@@ -1238,7 +1241,7 @@ contains
         
         mColOverL(:) = mCol(:)/Lsize(:)
         
-        deltaEpot_reci_solo = 0._DP
+        deltaEpot_reci_exchange = 0._DP
         
         do kz = 0, Kmax(3)
 
@@ -1265,7 +1268,7 @@ contains
                     
                     deltaEpot_k = k_dot_mCol * (k_dot_mCol + 2._DP * realPart)
                     deltaEpot_k = deltaEpot_k * this%Epot_reci_weight(kx, ky, kz)
-                    deltaEpot_reci_solo = deltaEpot_reci_solo + deltaEpot_k
+                    deltaEpot_reci_exchange = deltaEpot_reci_exchange + deltaEpot_k
                    
                 end do
             
@@ -1273,9 +1276,9 @@ contains
         
         end do
         
-        deltaEpot_reci_solo = 4._DP*PI/Volume * deltaEpot_reci_solo
+        deltaEpot_reci_exchange = 4._DP*PI/Volume * deltaEpot_reci_exchange
 
-    end function DipolarSpheres_deltaEpot_reci_solo
+    end function DipolarSpheres_deltaEpot_reci_exchange
     
     !> Total reciprocal energy
     
@@ -1341,7 +1344,7 @@ contains
     !> \f[ \vec{M} = \sum_j \vec{\mu}_j \f]
     !> \f[ \vec{M}_l = \sum_{j \neq l} \vec{\mu}_j \f]
     
-    subroutine DipolarSpheres_Epot_bound_totalMoment_init(this)
+    subroutine DipolarSpheres_Epot_bound_init_totalMoment(this)
     
         class(DipolarSpheres), intent(inout) :: this
         
@@ -1355,7 +1358,7 @@ contains
         
         end do        
     
-    end subroutine DipolarSpheres_Epot_bound_totalMoment_init
+    end subroutine DipolarSpheres_Epot_bound_init_totalMoment
     
     !> Difference of Energy
     !> \f[
@@ -1395,7 +1398,7 @@ contains
     
     !> Reinitialise the total moment factor and print the drift
     
-    subroutine DipolarSpheres_Epot_bound_totalMoment_reInit(this, iStep, modulus_unit)
+    subroutine DipolarSpheres_Epot_bound_reInit_totalMoment(this, iStep, modulus_unit)
     
         class(DipolarSpheres), intent(inout) :: this
         integer, intent(in) :: iStep
@@ -1404,12 +1407,12 @@ contains
         real(DP) :: modulus_drifted, modulus_reInit
         
         modulus_drifted = norm2(this%totalMoment(:))
-        call this%Epot_bound_totalMoment_init()
+        call this%Epot_bound_init_totalMoment()
         modulus_reInit = norm2(this%totalMoment(:))
         
         write(modulus_unit, *) iStep, abs(modulus_reInit - modulus_drifted)
     
-    end subroutine DipolarSpheres_Epot_bound_totalMoment_reInit
+    end subroutine DipolarSpheres_Epot_bound_reInit_totalMoment
     
     !> Total shape dependent term
     !> \f[
@@ -1462,7 +1465,7 @@ contains
         
         if (this%Ncol >= other%Ncol) then        
             this_iCellNew = this%sameCells%index_from_position(xNew)
-            call this%Epot_real_overlapTest(iOld, xNew, this_iCellNew, overlap)            
+            call this%Epot_real_test_overlap(iOld, xNew, this_iCellNew, overlap)            
         else            
             mix_iCellNew = this%mixCells%index_from_position(xNew)
             call mix%Epot_neighCells(xNew, mix_iCellNew, this%mixCells, other%positions, overlap, &
@@ -1477,7 +1480,7 @@ contains
                                          mix_EpotNew)                            
             else
                 this_iCellNew = this%sameCells%index_from_position(xNew)
-                call this%Epot_real_overlapTest(iOld, xNew, this_iCellNew, overlap)                                                 
+                call this%Epot_real_test_overlap(iOld, xNew, this_iCellNew, overlap)                                                 
             end if            
                         
             if (.not. overlap) then
@@ -1500,7 +1503,7 @@ contains
                 call random_number(random)            
                 if (random < exp(-deltaEpot/Temperature)) then
 
-                    call this%deltaEpot_reci_move_updateStructure(xOld, xNew, mCol)
+                    call this%deltaEpot_reci_move_update_structure(xOld, xNew, mCol)
                     this%positions(:, iOld) = xNew(:)
                     
                     this_obs%Epot = this_obs%Epot + this_deltaEpot
@@ -1566,7 +1569,7 @@ contains
         call random_number(random)
         if (random < exp(-deltaEpot/Temperature)) then
         
-            call this%deltaEpot_reci_rotate_updateStructure(xCol, mOld, mNew)
+            call this%deltaEpot_reci_rotate_update_structure(xCol, mOld, mNew)
             call this%deltaEpot_bound_totalMoment_update(mOld, mNew)
             this%orientations(:, iOld) = mNew(:)
             
@@ -1606,7 +1609,7 @@ contains
 
             if (this%Ncol >= other%Ncol) then
                 this_iCellTest = this%sameCells%index_from_position(xTest)
-                call this%Epot_real_overlapTest(0, xTest, this_iCellTest, overlap)
+                call this%Epot_real_test_overlap(0, xTest, this_iCellTest, overlap)
             else            
                 mix_iCellTest = this%mixCells%index_from_position(xTest)
                 call mix%Epot_neighCells(xTest, mix_iCellTest, this%mixCells, other%positions, &
@@ -1621,7 +1624,7 @@ contains
                                             overlap, mix_EpotTest)
                 else
                     this_iCellTest = this%sameCells%index_from_position(xTest)
-                    call this%Epot_real_overlapTest(0, xTest, this_iCellTest, overlap)
+                    call this%Epot_real_test_overlap(0, xTest, this_iCellTest, overlap)
                 end if
                 
                 if (.not. overlap) then
@@ -1629,7 +1632,8 @@ contains
                     mTest(:) = random_surface()
                                         
                     this_EpotTest = this%Epot_real_solo(0, xTest, mTest) + &
-                                    this%deltaEpot_reci_solo(xTest, mTest) - this%Epot_self_solo(mTest)
+                                    this%deltaEpot_reci_exchange(xTest, mTest) - &
+                                    this%Epot_self_solo(mTest)
                 
                     EpotTest = this_EpotTest + mix_EpotTest
                     widTestSum = widTestSum + exp(-EpotTest/Temperature)
