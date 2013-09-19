@@ -11,8 +11,8 @@ use class_mixingPotential
 use class_dipolarSpheres
 use class_hardSpheres
 use class_units
-use module_tools, only : initRandomSeed, initialCondition, report, consistTest, printResults, &
-                         mix_printResults
+use module_tools, only : init_randomSeed, set_initialCondition, print_report, test_consist, &
+                         print_results, mix_print_results
 
 implicit none
     
@@ -30,7 +30,7 @@ implicit none
     ! Total physical system variables
     real(DP) :: Epot, EpotSum !< potential energy : at a Monte-Carlo step
     real(DP) :: Epot_conf !< potential energy : complete calculation from a configuration
-    integer :: report_unit  !< data & results file
+    integer :: report_unit !< data & results file
     integer :: obsThermal_unit !< observables files : Thermalisation
     integer :: obsEquilib_unit !< observables files : Equilibrium
     
@@ -76,8 +76,8 @@ implicit none
          action='write')
     open(newunit=obsEquilib_unit, recl=4096, file="obsEquilib.out", status='new', &
          action='write')
-    call report(Ncol, Nmove, Nrotate, report_unit)
-    !call initRandomSeed(report_unit)    
+    call print_report(Ncol, Nmove, Nrotate, report_unit)
+    !call init_randomSeed(report_unit)    
     
     mix_EpotSum = 0._DP
     open(newunit=mix_report_unit, recl=4096, file="mix_report.txt", status='new', action='write')
@@ -104,7 +104,7 @@ implicit none
     
     ! Initial condition
     
-    call initialCondition(type1_spheres, type2_spheres, mix%getRmin(), report_unit)
+    call set_initialCondition(type1_spheres, type2_spheres, mix%getRmin(), report_unit)
     
     call type1_spheres%overlapTest()
     call type1_spheres%Epot_reci_init()
@@ -291,14 +291,14 @@ implicit none
     
     call mix%overlapTest(type1_spheres, type2_spheres)
     mix_Epot_conf = mix%Epot_conf(type1_spheres, type2_spheres)
-    call consistTest(mix_Epot, mix_Epot_conf, mix_report_unit)
-    call mix_printResults(mix_EpotSum, mix_report_unit)
+    call test_consist(mix_Epot, mix_Epot_conf, mix_report_unit)
+    call mix_print_results(mix_EpotSum, mix_report_unit)
     
     Epot = type1_obs%Epot + type2_obs%Epot + mix_Epot
     Epot_conf = type1_spheres%Epot_conf() + type2_spheres%Epot_conf() + mix_Epot_conf
-    call consistTest(Epot, Epot_conf, report_unit)
+    call test_consist(Epot, Epot_conf, report_unit)
     EpotSum = type1_obs%EpotSum + type2_obs%EpotSum + mix_EpotSum
-    call printResults(Ncol, EpotSum, tFin-tIni, report_unit)
+    call print_results(Ncol, EpotSum, tFin-tIni, report_unit)
     
     ! Finalisations
     

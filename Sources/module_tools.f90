@@ -12,13 +12,14 @@ use class_dipolarSpheres
 
 implicit none
 private
-public initRandomSeed, initialCondition, report, consistTest, printResults, mix_printResults
+public init_randomSeed, set_initialCondition, print_report, test_consist, print_results, &
+       mix_print_results
 
 contains
 
     !> Random number generator : seed
     
-    subroutine initRandomSeed(report_unit)
+    subroutine init_randomSeed(report_unit)
     
         integer, intent(in) :: report_unit
     
@@ -39,11 +40,11 @@ contains
 
         deallocate(seed)
         
-    end subroutine initRandomSeed
+    end subroutine init_randomSeed
     
     !> Initial condition
     
-    subroutine initialCondition(dipolar, spherical, mix_rMin, report_unit)
+    subroutine set_initialCondition(dipolar, spherical, mix_rMin, report_unit)
     
         class(DipolarSpheres), intent(inout) :: dipolar
         class(Spheres), intent(inout) :: spherical
@@ -94,7 +95,7 @@ contains
                 
         end select
         
-    end subroutine initialCondition
+    end subroutine set_initialCondition
     
     !> Random depositions configuration
     
@@ -214,9 +215,9 @@ contains
         
     end subroutine oldConfiguration
     
-    !> Total : report
+    !> Total : print_report
     
-    subroutine report(Ncol, Nmove, Nrotate, report_unit)
+    subroutine print_report(Ncol, Nmove, Nrotate, report_unit)
     
         integer, intent(in) :: Ncol, Nmove, Nrotate
         integer, intent(in) :: report_unit
@@ -236,11 +237,11 @@ contains
         write(report_unit, *) "    Nmove = ", Nmove
         write(report_unit, *) "    Nrotate = ", Nrotate
     
-    end subroutine report
+    end subroutine print_report
     
     ! Total & Mix : consistency test
     
-    subroutine consistTest(Epot, Epot_conf, report_unit)
+    subroutine test_consist(Epot, Epot_conf, report_unit)
     
         real(DP), intent(in) :: Epot, Epot_conf
         integer, intent(in) :: report_unit
@@ -260,11 +261,11 @@ contains
             write(report_unit, *) "    OK !"
         end if
     
-    end subroutine consistTest
+    end subroutine test_consist
     
     !> Total : Results    
     
-    subroutine printResults(Ncol, EpotSum, duration, report_unit)
+    subroutine print_results(Ncol, EpotSum, duration, report_unit)
     
         integer, intent(in) :: Ncol
         real(DP), intent(in) :: EpotSum
@@ -277,11 +278,11 @@ contains
                                    EpotSum/real(Nstep, DP)/real(Ncol, DP)
         write(report_unit, *) "    duration =", duration/60._DP, "min"
     
-    end subroutine printResults
+    end subroutine print_results
     
     !> Mix : Results
     
-    subroutine mix_printResults(EpotSum, report_unit)
+    subroutine mix_print_results(EpotSum, report_unit)
     
         real(DP), intent(in) :: EpotSum
         integer, intent(in) :: report_unit
@@ -289,6 +290,6 @@ contains
         write(report_unit, *) "Results :"        
         write(report_unit, *) "    average energy = ", EpotSum/real(Nstep, DP)
     
-    end subroutine mix_printResults
+    end subroutine mix_print_results
     
 end module module_tools
