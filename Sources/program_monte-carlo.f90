@@ -282,12 +282,12 @@ implicit none
     call type1_spheres%test_consist(type1_obs%Epot, type1_units%report)
     call type1_spheres%snapShot_positions(0, type1_units%snapFin_positions)
     call type1_spheres%snapShot_orientations(0, type1_units%snapFin_orientations)
-    call type1_obs%printResults(type1_units%report)
+    call type1_obs%print_results(type1_units%report)
     
     call type2_spheres%test_overlap()
     call type2_spheres%test_consist(type2_obs%Epot, type2_units%report)
     call type2_spheres%snapShot_positions(0, type2_units%snapFin_positions)
-    call type2_obs%printResults(type2_units%report)
+    call type2_obs%print_results(type2_units%report)
     
     call mix%test_overlap(type1_spheres, type2_spheres)
     mix_Epot_conf = mix%Epot_conf(type1_spheres, type2_spheres)
