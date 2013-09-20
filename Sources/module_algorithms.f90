@@ -45,7 +45,7 @@ contains
         class(Spheres), intent(inout) :: this
         class(Observables) :: this_obs
         class(Spheres), intent(inout) :: other
-        class(MixingPotential), intent(in) :: mix        
+        class(MixingPotential), intent(in) :: mix
         real(DP), intent(inout) :: mix_Epot
         
         real(DP) :: random
@@ -54,7 +54,9 @@ contains
         logical :: overlap
         integer :: this_iCellOld, this_iCellNew
         integer :: mix_iCellOld, mix_iCellNew
-        real(DP) :: mix_deltaEpot
+        real(DP) :: deltaEpot
+        real(DP) :: this_deltaEpot, mix_deltaEpot
+        real(DP) :: this_EpotNew, this_EpotOld
         real(DP) :: mix_EpotNew, mix_EpotOld
         
         call random_number(random)
@@ -71,6 +73,8 @@ contains
             select type (this)
                 type is (hardSpheres)
                     call this%Epot_neighCells(iOld, xNew, this_iCellNew, overlap)
+                type is (interactingSpheres)
+                    call this%Epot_neighCells(iOld, xNew, this_iCellNew, overlap, this_EpotNew)                
             end select
         else        
             mix_iCellNew = this%mixCells%index_from_position(xNew)
@@ -89,6 +93,8 @@ contains
                 select type (this)
                     type is (hardSpheres)
                         call this%Epot_neighCells(iOld, xNew, this_iCellNew, overlap)
+                    type is (interactingSpheres)
+                        call this%Epot_neighCells(iOld, xNew, this_iCellNew, overlap, this_EpotNew)
                 end select
             end if
                         
@@ -98,6 +104,10 @@ contains
                 select type (this)
                     type is (hardSpheres)
                         call this%Epot_neighCells(iOld, xOld, this_iCellOld, overlap)
+                        this_deltaEpot = 0._DP
+                    type is (interactingSpheres)
+                        call this%Epot_neighCells(iOld, xOld, this_iCellOld, overlap, this_EpotOld)
+                        this_deltaEpot = this_EpotNew - this_EpotOld
                 end select
                     
                 mix_iCellOld = this%mixCells%index_from_position(xOld)
@@ -105,11 +115,14 @@ contains
                                          mix_EpotOld)
                 
                 mix_deltaEpot = mix_EpotNew - mix_EpotOld
+
+                deltaEpot = this_deltaEpot + mix_deltaEpot
                 
                 call random_number(random)
-                if (random < exp(-mix_deltaEpot/Temperature)) then
+                if (random < exp(-deltaEpot/Temperature)) then
                 
                     this%positions(:, iOld) = xNew(:)
+                    this_obs%Epot = this_obs%Epot + this_deltaEpot
                     mix_Epot = mix_Epot + mix_deltaEpot
                     
                     if (this_iCellOld /= this_iCellNew) then                
