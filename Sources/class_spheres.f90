@@ -297,7 +297,9 @@ contains
         
         select type (this)
         
-            !class is (InteractingSpheres)
+            class is (InteractingSpheres)
+            
+                write(*, *) "Hello, I'm inter !"
             
             class default  
             
