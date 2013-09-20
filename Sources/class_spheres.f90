@@ -72,8 +72,6 @@ private
         procedure :: set_move_delta => Spheres_set_move_delta
         procedure :: get_move_delta => Spheres_get_move_delta
         
-        procedure :: polymorph => Spheres_polymorph
-        
     end type Spheres
     
 contains
@@ -290,23 +288,5 @@ contains
         get_move_delta = sum(this%move_delta)/size(this%move_delta)
         
     end function Spheres_get_move_delta
-    
-    subroutine Spheres_polymorph(this)
-    
-        class(Spheres), intent(in) :: this
-        
-        select type (this)
-        
-            class is (InteractingSpheres)
-            
-                write(*, *) "Hello, I'm inter !"
-            
-            class default  
-            
-                write(*, *) "Hello world !"
-        
-        end select
-    
-    end subroutine Spheres_polymorph
 
 end module class_spheres

@@ -50,6 +50,7 @@ class_hardSpheres.o : data_precisions.mod data_box.mod data_particles.mod data_m
                       module_physics.o \
                       class_observables.o class_neighbourCells.o class_mixingPotential.o \
                       class_spheres.o
+classe_spheres_change.o : class_spheres.o class_dipolarSpheres.o class_hardSpheres.o
 module_tools.o : data_precisions.mod data_box.mod data_monteCarlo.mod \
                  module_physics.o \
                  class_spheres.o class_dipolarSpheres.o
@@ -71,6 +72,8 @@ class_hardSpheres.o : class_hardSpheres.f90
 class_interactingSpheres.o : class_interactingSpheres.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_dipolarSpheres.o : class_dipolarSpheres.f90
+	$(FC) -c $(FFLAGS) $< -o $@
+classe_spheres_change.o : classe_spheres_change.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_units.o : class_units.f90
 	$(FC) -c $(FFLAGS) $< -o $@
