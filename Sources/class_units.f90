@@ -65,10 +65,8 @@ contains
         open(newunit=this%Epot, recl=4096, file=name//"_Epot.tmp", status='new', action='write')
         
         select type (this)
-        
-            type is (Units)
-            
-            class is (MoreUnits)
+
+            type is (MoreUnits)
             
                 open(newunit=this%rotate_delta, recl=4096, file=name//"_rotate_delta.out", &
                     status='new', action='write')
@@ -87,10 +85,6 @@ contains
                      
                 open(newunit=this%totalMoment_modulus, recl=4096, &
                      file=name//"_totalMoment_modulus.out", status='new', action='write')
-                
-            class default
-                
-                stop "Units_open : expected type for Units object !"
                 
         end select
         

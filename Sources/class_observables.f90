@@ -60,10 +60,8 @@ contains
         this%activSum = 0._DP
         
         select type (this)
-        
-            type is (Observables)
             
-            class is (MoreObservables)
+            type is (MoreObservables)
                 
                 this%Nrotate = 0                
                 this%rotate_Nreject = 0
