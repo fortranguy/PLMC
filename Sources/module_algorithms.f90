@@ -15,15 +15,15 @@ contains
         
         select type (sph)
         
-            class is (hardSpheres)
+            type is (hardSpheres)
             
                 write(*, *) "hard : ", sph%name
         
-            class is (interactingSpheres)
+            type is (interactingSpheres)
             
                 write(*, *) "inter : ", sph%name
             
-            class is (dipolarSpheres)
+            type is (dipolarSpheres)
             
                 write(*, *) "dipol : ", sph%name
         
