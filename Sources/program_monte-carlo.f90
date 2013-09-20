@@ -10,8 +10,8 @@ use class_observables
 use class_mixingPotential
 use class_dipolarSpheres
 use class_hardSpheres
-use class_spheres_changes
 use class_units
+use module_changes
 use module_tools, only : init_randomSeed, set_initialCondition, print_report, test_consist, &
                          print_results, mix_print_results
 
@@ -53,8 +53,6 @@ implicit none
     type(HardSpheres) :: type2_spheres
     type(Observables) :: type2_obs
     type(Units) :: type2_units
-    
-    type(Spheres_changes) :: changes
     
     call mix%construct()
     call type1_spheres%construct()
@@ -130,8 +128,6 @@ implicit none
     write(obsThermal_unit, *) 0, Epot_conf
     
 ! Middle -------------------------------------------------------------------------------------------
-
-    call changes%polymorph()
         
     write(output_unit, *) "Beginning of cycles"
     
