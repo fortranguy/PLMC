@@ -11,6 +11,8 @@ contains
     subroutine polymorph(sph)
     
         class(Spheres), intent(in) :: sph
+        
+        write(*, *) "sph :", sph%name
     
     end subroutine polymorph
 

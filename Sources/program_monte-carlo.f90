@@ -128,6 +128,9 @@ implicit none
     write(obsThermal_unit, *) 0, Epot_conf
     
 ! Middle -------------------------------------------------------------------------------------------
+
+    call polymorph(type1_spheres)
+    stop
         
     write(output_unit, *) "Beginning of cycles"
     
