@@ -72,6 +72,8 @@ private
         procedure :: set_move_delta => Spheres_set_move_delta
         procedure :: get_move_delta => Spheres_get_move_delta
         
+        procedure :: polymorph => Spheres_polymorph
+        
     end type Spheres
     
 contains
@@ -254,7 +256,7 @@ contains
     
     subroutine Spheres_set_move_delta(this, reject, report_unit)
     
-        class(Spheres), intent(inout) :: this    
+        class(Spheres), intent(inout) :: this
         real(DP), intent(in) :: reject
         integer, intent(in) :: report_unit
 
@@ -281,12 +283,28 @@ contains
     
     pure function Spheres_get_move_delta(this) result(get_move_delta)
         
-        class(Spheres), intent(in) :: this        
+        class(Spheres), intent(in) :: this
         real(DP) :: get_move_delta
         
         ! average move_delta of 3 vector components
         get_move_delta = sum(this%move_delta)/size(this%move_delta)
         
     end function Spheres_get_move_delta
+    
+    subroutine Spheres_polymorph(this)
+    
+        class(Spheres), intent(in) :: this
+        
+        select type (this)
+        
+            !class is (InteractingSpheres)
+            
+            class default  
+            
+                write(*, *) "Hello world !"
+        
+        end select
+    
+    end subroutine Spheres_polymorph
 
 end module class_spheres
