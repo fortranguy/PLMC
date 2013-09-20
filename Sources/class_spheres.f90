@@ -59,7 +59,7 @@ private
         procedure :: print_density => Spheres_print_density
         
         !> Take a snap shot of the configuration : positions
-        procedure :: snapShot_positions => Spheres_snapShot_positions
+        procedure :: snap_positions => Spheres_snap_positions
         
         !> Do an overlap test
         procedure :: test_overlap => Spheres_test_overlap
@@ -166,7 +166,7 @@ contains
     
     !> Configuration state : positions
       
-    subroutine Spheres_snapShot_positions(this, iStep, snap_unit)
+    subroutine Spheres_snap_positions(this, iStep, snap_unit)
         
         class(Spheres), intent(in) :: this
         integer, intent(in) :: iStep
@@ -182,7 +182,7 @@ contains
             
         end if            
 
-    end subroutine Spheres_snapShot_positions
+    end subroutine Spheres_snap_positions
     
     !> Overlapt test
     

@@ -13,7 +13,7 @@ private
 
         integer :: snapIni_positions
         integer :: snapFin_positions
-        integer :: snapShots_positions
+        integer :: snap_positions
         
         integer :: report
         integer :: Epot
@@ -31,7 +31,7 @@ private
 
         integer :: snapIni_orientations
         integer :: snapFin_orientations
-        integer :: snapShots_orientations
+        integer :: snap_orientations
 
         integer :: waveVectors
         integer :: structure_modulus
@@ -58,7 +58,7 @@ contains
              status='new', action='write')
         open(newunit=this%snapFin_positions, recl=4096, file=name//"_snapFin_positions.out", &
              status='new', action='write')
-        open(newunit=this%snapShots_positions, recl=4096, file=name//"_snap_positions.shots", &
+        open(newunit=this%snap_positions, recl=4096, file=name//"_snap_positions.shots", &
              status='new', action='write')
         
         open(newunit=this%report, recl=4096, file=name//"_report.txt", status='new', action='write')
@@ -77,7 +77,7 @@ contains
                      file=name//"_snapIni_orientations.out", status='new', action='write')
                 open(newunit=this%snapFin_orientations, recl=4096, &
                      file=name//"_snapFin_orientations.out", status='new', action='write')
-                open(newunit=this%snapShots_orientations, recl=4096, &
+                open(newunit=this%snap_orientations, recl=4096, &
                      file=name//"_snap_orientations.shots", status='new', action='write')
 
                 open(newunit=this%structure_modulus, recl=4096, file=name//"_structure_modulus.out", &
@@ -106,7 +106,7 @@ contains
 
         close(this%snapIni_positions)
         close(this%snapFin_positions)
-        close(this%snapShots_positions)
+        close(this%snap_positions)
         
         close(this%report)
         close(this%Epot)
@@ -121,7 +121,7 @@ contains
         
                 close(this%snapIni_orientations)
                 close(this%snapFin_orientations)
-                close(this%snapShots_orientations)
+                close(this%snap_orientations)
 
                 close(this%waveVectors)
                 close(this%structure_modulus)

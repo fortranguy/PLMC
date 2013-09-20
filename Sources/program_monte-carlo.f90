@@ -110,13 +110,13 @@ implicit none
     call type1_spheres%Epot_reci_init()
     call type1_spheres%Epot_bound_init_totalMoment()
     type1_obs%Epot = type1_spheres%Epot_conf()
-    call type1_spheres%snapShot_positions(0, type1_units%snapIni_positions)
-    call type1_spheres%snapShot_orientations(0, type1_units%snapIni_orientations)
+    call type1_spheres%snap_positions(0, type1_units%snapIni_positions)
+    call type1_spheres%snap_orientations(0, type1_units%snapIni_orientations)
     call type1_spheres%all_cols_to_cells(type2_spheres) !< filling cells with particles
     
     call type2_spheres%test_overlap()
     type2_obs%Epot = type2_spheres%Epot_conf()
-    call type2_spheres%snapShot_positions(0, type2_units%snapIni_positions)
+    call type2_spheres%snap_positions(0, type2_units%snapIni_positions)
     call type2_spheres%all_cols_to_cells(type1_spheres)
     
     call mix%test_overlap(type1_spheres, type2_spheres)
@@ -250,9 +250,9 @@ implicit none
             write(obsEquilib_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
 
             if (snap) then ! Snap shots of the configuration
-                call type1_spheres%snapShot_positions(iStep, type1_units%snapShots_positions)
-                call type1_spheres%snapShot_orientations(iStep, type1_units%snapShots_orientations)
-                call type2_spheres%snapShot_positions(iStep, type2_units%snapShots_positions)
+                call type1_spheres%snap_positions(iStep, type1_units%snap_positions)
+                call type1_spheres%snap_orientations(iStep, type1_units%snap_orientations)
+                call type2_spheres%snap_positions(iStep, type2_units%snap_positions)
             end if
             
         end if MC_Regime
@@ -280,13 +280,13 @@ implicit none
     call type1_spheres%Epot_reci_init()
     call type1_spheres%Epot_bound_init_totalMoment()
     call type1_spheres%test_consist(type1_obs%Epot, type1_units%report)
-    call type1_spheres%snapShot_positions(0, type1_units%snapFin_positions)
-    call type1_spheres%snapShot_orientations(0, type1_units%snapFin_orientations)
+    call type1_spheres%snap_positions(0, type1_units%snapFin_positions)
+    call type1_spheres%snap_orientations(0, type1_units%snapFin_orientations)
     call type1_obs%print_results(type1_units%report)
     
     call type2_spheres%test_overlap()
     call type2_spheres%test_consist(type2_obs%Epot, type2_units%report)
-    call type2_spheres%snapShot_positions(0, type2_units%snapFin_positions)
+    call type2_spheres%snap_positions(0, type2_units%snapFin_positions)
     call type2_obs%print_results(type2_units%report)
     
     call mix%test_overlap(type1_spheres, type2_spheres)

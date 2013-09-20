@@ -65,7 +65,7 @@ private
         procedure :: print_report => DipolarSpheres_print_report
         
         !> Take a snap shot of the configuration : orientations
-        procedure :: snapShot_orientations => DipolarSpheres_snapShot_orientations
+        procedure :: snap_orientations => DipolarSpheres_snap_orientations
         
         !> Adapt the rotation rotate_delta during thermalisation
         procedure :: adapt_rotate_delta => DipolarSpheres_adapt_rotate_delta
@@ -235,7 +235,7 @@ contains
     
     !> Configuration state : orientations
       
-    subroutine DipolarSpheres_snapShot_orientations(this, iStep, snap_unit)
+    subroutine DipolarSpheres_snap_orientations(this, iStep, snap_unit)
         
         class(DipolarSpheres), intent(in) :: this
         integer, intent(in) :: iStep
@@ -251,7 +251,7 @@ contains
             
         end if
 
-    end subroutine DipolarSpheres_snapShot_orientations
+    end subroutine DipolarSpheres_snap_orientations
     
     !> Adaptation of rotate_delta during the thermalisation
     
