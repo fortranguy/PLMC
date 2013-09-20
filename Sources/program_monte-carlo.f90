@@ -9,6 +9,7 @@ use data_distribution, only : snap
 use class_observables
 use class_mixingPotential
 use class_dipolarSpheres
+use class_interactingSpheres
 use class_hardSpheres
 use class_units
 use module_changes
