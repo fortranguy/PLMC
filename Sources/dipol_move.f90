@@ -21,7 +21,6 @@
         iOld = int(random*this%Ncol) + 1        
         xOld(:) = this%positions(:, iOld)
         
-        ! Random new position
         call random_number(xRand)
         xNew(:) = xOld(:) + this%move_delta(:) * (xRand(:)-0.5_DP)
         xNew(:) = modulo(xNew(:), Lsize(:))
@@ -49,8 +48,7 @@
             end if            
                         
             if (.not. overlap) then
-                
-                ! Real
+
                 this_iCellOld = this%sameCells%index_from_position(xOld)
                 this_EpotNew_real = this%Epot_real_solo(iOld, xNew, mCol)
                 this_EpotOld_real = this%Epot_real_solo(iOld, xOld, mCol)

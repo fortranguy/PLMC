@@ -25,7 +25,7 @@
         xNew(:) = xOld(:) + (xRand(:)-0.5_DP)*this%move_delta(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
         
-        if (this%Ncol >= other%Ncol) then ! optimisation : more chance to overlap
+        if (this%Ncol >= other%Ncol) then
             this_iCellNew = this%sameCells%index_from_position(xNew)
             call this%Epot_neighCells(iOld, xNew, this_iCellNew, overlap, this_EpotNew)
         else

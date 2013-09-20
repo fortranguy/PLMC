@@ -18,8 +18,7 @@
         call random_number(random)
         iOld = int(random*this%Ncol) + 1
         xOld(:) = this%positions(:, iOld)
-        
-        ! Random new position
+
         call random_number(xRand)
         xNew(:) = xOld(:) + (xRand(:)-0.5_DP)*this%move_delta(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
