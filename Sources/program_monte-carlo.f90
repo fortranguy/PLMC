@@ -8,9 +8,9 @@ use data_monteCarlo, only : Nstep, Nthermal, decorrelFactor
 use data_distribution, only : snap
 use class_observables
 use class_mixingPotential
-use class_dipolarSpheres
-use class_interactingSpheres
 use class_hardSpheres
+use class_interactingSpheres
+use class_dipolarSpheres
 use class_units
 use module_algorithms
 use module_tools, only : init_randomSeed, set_initialCondition, print_report, test_consist, &

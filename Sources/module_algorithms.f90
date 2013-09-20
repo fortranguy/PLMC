@@ -2,6 +2,7 @@ module module_algorithms
 
 use class_spheres
 use class_hardSpheres
+use class_interactingSpheres
 use class_dipolarSpheres
 
 implicit none
