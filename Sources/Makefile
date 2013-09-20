@@ -55,7 +55,7 @@ class_hardSpheres.o : data_precisions.mod data_box.mod data_particles.mod data_m
                       module_physics.o \
                       class_observables.o class_neighbourCells.o class_mixingPotential.o \
                       class_spheres.o
-module_changes.o : class_spheres.o class_hardSpheres.o class_dipolarSpheres.o
+module_algorithms.o : class_spheres.o class_hardSpheres.o class_dipolarSpheres.o
 module_tools.o : data_precisions.mod data_box.mod data_monteCarlo.mod \
                  module_physics.o \
                  class_spheres.o class_dipolarSpheres.o
@@ -78,7 +78,7 @@ class_interactingSpheres.o : class_interactingSpheres.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_dipolarSpheres.o : class_dipolarSpheres.f90
 	$(FC) -c $(FFLAGS) $< -o $@
-module_changes.o : module_changes.f90
+module_algorithms.o : module_algorithms.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_units.o : class_units.f90
 	$(FC) -c $(FFLAGS) $< -o $@
@@ -91,7 +91,7 @@ program_monte-carlo.o : program_monte-carlo.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 $(EXEC1) : data.o module_physics.o class_neighbourCells.o class_spheres.o class_mixingPotential.o \
 	class_dipolarSpheres.o class_interactingSpheres.o class_hardSpheres.o class_observables.o \
-	class_units.o module_tools.o module_changes.o program_monte-carlo.o
+	class_units.o module_tools.o module_algorithms.o program_monte-carlo.o
 	$(FC) $^ $(LDFLAGS) $(CLDFLAGS) $(LDLIBS) -o $@
 
 # ------------------------------------------------------------------------
@@ -106,7 +106,7 @@ $(EXEC2) : data.o program_bunching.o
 program_distribution.o : program_distribution.f90
 	$(FC) -c $(FFLAGS_OMP) $< -o $@
 $(EXEC3) : data.o module_physics.o class_neighbourCells.o class_spheres.o class_mixingPotential.o \
-           class_hardSpheres.o module_changes.o module_tools.o program_distribution.o
+           class_hardSpheres.o module_algorithms.o module_tools.o program_distribution.o
 	$(FC) $^ $(LDFLAGS_OMP) -o $@
 
 # --------------------------------------------------------------------------------------------------

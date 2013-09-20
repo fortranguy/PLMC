@@ -12,7 +12,7 @@ use class_dipolarSpheres
 use class_interactingSpheres
 use class_hardSpheres
 use class_units
-use module_changes
+use module_algorithms
 use module_tools, only : init_randomSeed, set_initialCondition, print_report, test_consist, &
                          print_results, mix_print_results
 

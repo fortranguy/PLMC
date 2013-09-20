@@ -1,4 +1,4 @@
-module module_changes
+module module_algorithms
 
 use class_spheres
 use class_hardSpheres
@@ -16,4 +16,4 @@ contains
     
     end subroutine polymorph
 
-end module module_changes
+end module module_algorithms
