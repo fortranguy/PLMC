@@ -13,8 +13,22 @@ contains
     
         class(Spheres), intent(in) :: sph
         
-        write(*, *) "sph :", sph%name
-    
+        select type (sph)
+        
+            class is (hardSpheres)
+            
+                write(*, *) "hard : ", sph%name
+        
+            class is (interactingSpheres)
+            
+                write(*, *) "inter : ", sph%name
+            
+            class is (dipolarSpheres)
+            
+                write(*, *) "dipol : ", sph%name
+        
+        end select 
+
     end subroutine polymorph
 
 end module module_algorithms
