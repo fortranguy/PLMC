@@ -46,7 +46,7 @@ private
         procedure, private :: Epot_init => InteractingSpheres_Epot_init
         procedure :: Epot_print => InteractingSpheres_Epot_print
         procedure :: Epot_pair => InteractingSpheres_Epot_pair
-        procedure, private :: Epot_neighCells => InteractingSpheres_Epot_neighCells
+        procedure :: Epot_neighCells => InteractingSpheres_Epot_neighCells
         procedure :: Epot_conf => InteractingSpheres_Epot_conf
         procedure :: test_consist => InteractingSpheres_test_consist
         

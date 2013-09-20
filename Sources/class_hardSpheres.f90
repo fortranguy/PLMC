@@ -39,7 +39,7 @@ private
         !> Potential energy
         procedure :: Epot_print => HardSpheres_Epot_print
         procedure :: Epot_pair => HardSpheres_Epot_pair
-        procedure, private :: Epot_neighCells => HardSpheres_Epot_neighCells
+        procedure :: Epot_neighCells => HardSpheres_Epot_neighCells
         procedure :: Epot_conf => HardSpheres_Epot_conf
         procedure :: test_consist => HardSpheres_test_consist
         

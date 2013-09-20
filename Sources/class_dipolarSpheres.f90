@@ -82,7 +82,7 @@ private
         procedure :: Epot_real_print => DipolarSpheres_Epot_real_print
         procedure, private :: Epot_real_interpol => DipolarSpheres_Epot_real_interpol
         procedure :: Epot_real_pair => DipolarSpheres_Epot_real_pair
-        procedure, private :: Epot_real_test_overlap => DipolarSpheres_Epot_real_test_overlap
+        procedure :: Epot_real_test_overlap => DipolarSpheres_Epot_real_test_overlap
         procedure, private :: Epot_real_solo => DipolarSpheres_Epot_real_solo
         procedure, private :: Epot_real => DipolarSpheres_Epot_real
         !>     Reciprocal : init
