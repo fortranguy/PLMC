@@ -48,7 +48,7 @@ contains
     subroutine set_initialCondition(dipolar, spherical, mix_rMin, report_unit)
     
         class(DipolarSpheres), intent(inout) :: dipolar
-        class(Spheres), intent(inout) :: spherical
+        class(HardSpheres), intent(inout) :: spherical
         real(DP), intent(in) :: mix_rMin
         integer, intent(in) :: report_unit        
 
@@ -102,7 +102,7 @@ contains
     
     subroutine randomDepositions(type1, type2, mix_rMin)
 
-        class(Spheres), intent(inout) :: type1, type2
+        class(HardSpheres), intent(inout) :: type1, type2
         real(DP), intent(in) :: mix_rMin
 
         integer :: iCol, iColTest

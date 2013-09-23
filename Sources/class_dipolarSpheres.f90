@@ -18,7 +18,6 @@ use module_physics, only : distVec_PBC, dist_PBC, random_surface, markov_surface
                            Kmax2_sym, fourier
 use class_observables
 use class_neighbourCells
-use class_mixingPotential
 use class_hardSpheres
 
 implicit none

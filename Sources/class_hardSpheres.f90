@@ -406,12 +406,13 @@ contains
         
     end function HardSpheres_Epot_pair
     
-    subroutine HardSpheres_Epot_neighCells(this, iCol, xCol, iTotalCell, overlap)
+    subroutine HardSpheres_Epot_neighCells(this, iCol, xCol, iTotalCell, overlap, energ)
         
         class(HardSpheres), intent(in) :: this        
         integer, intent(in) :: iCol, iTotalCell
         real(DP), dimension(:), intent(in) :: xCol
         logical, intent(out) :: overlap
+        real(DP), intent(out) :: energ
     
         integer :: iNearCell,  nearCell_index
         real(DP) :: r_ij
@@ -419,6 +420,7 @@ contains
         type(Link), pointer :: current => null(), next => null()
         
         overlap = .false.
+        energ = 0._DP
     
         do iNearCell = 1, NnearCell
         

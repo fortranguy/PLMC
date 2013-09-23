@@ -16,7 +16,7 @@ contains
 
     subroutine polymorph(sph)
     
-        class(Spheres), intent(in) :: sph
+        class(HardSpheres), intent(in) :: sph
         
         select type (sph)
         
@@ -40,9 +40,9 @@ contains
     
     subroutine move(this, this_obs, other, mix, mix_Epot)
     
-        class(Spheres), intent(inout) :: this
+        class(HardSpheres), intent(inout) :: this
         class(Observables) :: this_obs
-        class(Spheres), intent(inout) :: other
+        class(HardSpheres), intent(inout) :: other
         class(MixingPotential), intent(in) :: mix
         real(DP), intent(inout) :: mix_Epot
         
@@ -70,7 +70,7 @@ contains
             this_iCellNew = this%sameCells%index_from_position(xNew)
             select type (this)
                 type is (hardSpheres)
-                    call this%Epot_neighCells(iOld, xNew, this_iCellNew, overlap)
+                    call this%Epot_neighCells(iOld, xNew, this_iCellNew, overlap, this_EpotOld)
                 type is (interactingSpheres)
                     call this%Epot_neighCells(iOld, xNew, this_iCellNew, overlap, this_EpotNew)                
             end select
@@ -90,7 +90,7 @@ contains
                 this_iCellNew = this%sameCells%index_from_position(xNew)
                 select type (this)
                     type is (hardSpheres)
-                        call this%Epot_neighCells(iOld, xNew, this_iCellNew, overlap)
+                        call this%Epot_neighCells(iOld, xNew, this_iCellNew, overlap, this_EpotOld)
                     type is (interactingSpheres)
                         call this%Epot_neighCells(iOld, xNew, this_iCellNew, overlap, this_EpotNew)
                 end select
@@ -101,7 +101,7 @@ contains
                 this_iCellOld = this%sameCells%index_from_position(xOld)
                 select type (this)
                     type is (hardSpheres)
-                        call this%Epot_neighCells(iOld, xOld, this_iCellOld, overlap)
+                        call this%Epot_neighCells(iOld, xOld, this_iCellOld, overlap, this_EpotOld)
                         this_deltaEpot = 0._DP
                     type is (interactingSpheres)
                         call this%Epot_neighCells(iOld, xOld, this_iCellOld, overlap, this_EpotOld)
@@ -151,8 +151,8 @@ contains
 
     subroutine widom(this, other, mix, activ)
         
-        class(Spheres), intent(in) :: this
-        class(Spheres), intent(in) :: other
+        class(HardSpheres), intent(in) :: this
+        class(HardSpheres), intent(in) :: other
         class(MixingPotential), intent(in) :: mix
         real(DP), intent(inOut) :: activ 
         
@@ -172,7 +172,7 @@ contains
 
             if (this%Ncol >= other%Ncol) then
                 this_iCellTest = this%sameCells%index_from_position(xTest)
-                call this%Epot_neighCells(0, xTest, this_iCellTest, overlap)
+                call this%Epot_neighCells(0, xTest, this_iCellTest, overlap, EpotTest)
             else
                 mix_iCellTest = this%mixCells%index_from_position(xTest)
                 call mix%Epot_neighCells(xTest, mix_iCellTest, this%mixCells, other%positions, &
@@ -187,7 +187,7 @@ contains
                                             overlap, mix_EpotTest)
                 else
                     this_iCellTest = this%sameCells%index_from_position(xTest)
-                    call this%Epot_neighCells(0, xTest, this_iCellTest, overlap)
+                    call this%Epot_neighCells(0, xTest, this_iCellTest, overlap, EpotTest)
                 end if
                 
                 if (.not. overlap) then

@@ -99,7 +99,7 @@ $(EXEC2) : data.o program_bunching.o
 program_distribution.o : program_distribution.f90
 	$(FC) -c $(FFLAGS_OMP) $< -o $@
 $(EXEC3) : data.o module_physics.o class_neighbourCells.o class_hardSpheres.o module_algorithms.o \
-           class_mixingPotential.omodule_tools.o program_distribution.o
+           class_mixingPotential.o module_tools.o program_distribution.o
 	$(FC) $^ $(LDFLAGS_OMP) -o $@
 
 # --------------------------------------------------------------------------------------------------

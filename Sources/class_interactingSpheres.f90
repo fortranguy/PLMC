@@ -14,7 +14,6 @@ use data_distribution, only : inter_snap_factor
 use module_physics, only : dist_PBC
 use class_observables
 use class_neighbourCells
-use class_mixingPotential
 use class_hardSpheres
 
 implicit none
