@@ -2,9 +2,10 @@
 
 module class_hardSpheres
 
-use, intrinsic :: iso_fortran_env, only : output_unit
+use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
 use data_precisions, only : DP
-use data_box, only : Ndim, Lsize
+use data_constants, only : PI
+use data_box, only : Ndim, Lsize, Volume
 use data_particles, only : hard_rMin, hard_Ncol
 use data_monteCarlo, only : Temperature, hard_move_delta, hard_move_rejectFix, hard_move_Nadapt, &
                             hard_Nwidom
@@ -13,19 +14,42 @@ use data_distribution, only : hard_snap_factor
 use module_physics, only : dist_PBC
 use class_observables
 use class_neighbourCells
-use class_mixingPotential
-use class_spheres
 
 implicit none
 
 private
 
-    type, extends(Spheres), public :: HardSpheres
+    type, public :: HardSpheres
     
-        private
+        ! private
+        ! The attributes must be private according to the encapsulation principle.
+        ! Nevertheless, it is public for inheritance.
     
+        character(len=5) :: name
+
+        ! Particles
+        real(DP) :: rMin !< minimum distance between two particles
+        real(DP) :: radius !< radius of a particle
+        integer ::  Ncol !< number of a component particles
+        real(DP), dimension(:, :), allocatable, public :: positions !< positions of all particles
+        
+        ! Snashot
+        integer :: snap_factor
+
+        ! Monte-Carlo
+        real(DP), dimension(Ndim) :: move_delta !< displacement
+        real(DP), dimension(Ndim) :: move_deltaSave
+        real(DP) :: move_rejectFix
+        integer :: move_Nadapt
+        integer :: Nwidom
+
         ! Potential
+        real(DP) :: rCut !< short-range cut
         real(DP) :: Epot
+        
+        ! Neighbours (cell/grid scheme)
+        type(NeighbourCells) :: sameCells !< same kind
+        type(NeighbourCells) :: mixCells !< other kind        
         
     contains
 
@@ -33,9 +57,32 @@ private
         procedure :: construct => HardSpheres_construct
         procedure :: destroy => HardSpheres_destroy
         
+        !> Accessors
+        procedure :: get_name => HardSpheres_get_name
+        procedure :: get_Ncol => HardSpheres_get_Ncol
+        procedure :: get_rMin => HardSpheres_get_rMin
+        procedure :: get_rCut => HardSpheres_get_rCut        
+        procedure :: get_move_Nadapt => HardSpheres_get_move_Nadapt
+        procedure :: get_move_delta => HardSpheres_get_move_delta
+        !> Specifier        
+        !> Adapt the displacement move_delta during thermalisation
+        procedure :: adapt_move_delta => HardSpheres_adapt_move_delta
+        procedure :: set_move_delta => HardSpheres_set_move_delta        
+        
+        procedure :: print_density => HardSpheres_print_density
         !> Print a report of the component in a file
         procedure :: print_report => HardSpheres_print_report
-              
+        
+        !> Take a snap shot of the configuration : positions
+        procedure :: snap_positions => HardSpheres_snap_positions
+        
+        !> Do an overlap test
+        procedure :: test_overlap => HardSpheres_test_overlap
+        
+        procedure :: construct_mixCells => HardSpheres_construct_mixCells
+        !> Assign all particles to cells
+        procedure :: all_cols_to_cells => HardSpheres_all_cols_to_cells
+        
         !> Potential energy
         procedure :: Epot_print => HardSpheres_Epot_print
         procedure :: Epot_pair => HardSpheres_Epot_pair
@@ -101,6 +148,145 @@ contains
     
     end subroutine HardSpheres_destroy
     
+    !> Accessor : name
+
+    pure function HardSpheres_get_name(this) result(get_name)
+    
+        class(HardSpheres), intent(in) :: this        
+        character(len=5) :: get_name
+        
+        get_name = this%name
+    
+    end function HardSpheres_get_name
+
+    !> Accessor : Ncol
+
+    pure function HardSpheres_get_Ncol(this) result(get_Ncol)
+    
+        class(HardSpheres), intent(in) :: this        
+        integer :: get_Ncol
+        
+        get_Ncol = this%Ncol
+    
+    end function HardSpheres_get_Ncol
+    
+    !> Accessor : rMin
+    
+    pure function HardSpheres_get_rMin(this) result(get_rMin)
+    
+        class(HardSpheres), intent(in) :: this        
+        real(DP) :: get_rMin
+        
+        get_rMin = this%rMin
+    
+    end function HardSpheres_get_rMin
+    
+    !> Accessor : rCut
+    
+    pure function HardSpheres_get_rCut(this) result(get_rCut)
+    
+        class(HardSpheres), intent(in) :: this        
+        real(DP) :: get_rCut
+        
+        get_rCut = this%rCut
+    
+    end function HardSpheres_get_rCut
+    
+    !> Accessor : move_Nadapt
+    
+    pure function HardSpheres_get_move_Nadapt(this) result(get_move_Nadapt)
+    
+        class(HardSpheres), intent(in) :: this
+        integer :: get_move_Nadapt
+        
+        get_move_Nadapt = this%move_Nadapt
+        
+    end function HardSpheres_get_move_Nadapt
+    
+    pure function HardSpheres_get_move_delta(this) result(get_move_delta)
+        
+        class(HardSpheres), intent(in) :: this
+        real(DP) :: get_move_delta
+        
+        ! average move_delta of 3 vector components
+        get_move_delta = sum(this%move_delta)/size(this%move_delta)
+        
+    end function HardSpheres_get_move_delta
+    
+    !> Adaptation of move_delta during the thermalisation
+    
+    subroutine HardSpheres_adapt_move_delta(this, reject)
+    
+        class(HardSpheres), intent(inout) :: this
+        real(DP), intent(in) :: reject
+        
+        real(DP), parameter :: move_delta_eps = 0.05_DP
+        real(DP), parameter :: move_reject_eps = 0.1_DP * move_delta_eps
+        real(DP), parameter :: more = 1._DP+move_delta_eps
+        real(DP), parameter :: less = 1._DP-move_delta_eps
+        
+        if (reject < this%move_rejectFix - move_reject_eps) then
+        
+            this%move_delta(:) = this%move_delta(:) * more
+            
+            if (norm2(this%move_delta) > norm2(Lsize)) then
+                this%move_delta(:) = Lsize(:)
+            end if
+            
+        else if (reject > this%move_rejectFix + move_reject_eps) then
+        
+            this%move_delta(:) = this%move_delta(:) * less
+            
+        end if
+    
+    end subroutine HardSpheres_adapt_move_delta
+    
+    subroutine HardSpheres_set_move_delta(this, reject, report_unit)
+    
+        class(HardSpheres), intent(inout) :: this
+        real(DP), intent(in) :: reject
+        integer, intent(in) :: report_unit
+
+        if (reject == 0._DP) then
+            write(error_unit, *) this%name, " :    Warning : move_delta adaptation problem."
+            this%move_delta(:) = this%move_deltaSave(:)
+            write(error_unit, *) "default move_delta :", this%move_delta(:)
+        end if
+
+        if (norm2(this%move_delta) > norm2(Lsize)) then
+            write(error_unit, *) this%name, " :   Warning : move_delta too big."
+            this%move_delta(:) = Lsize(:)
+            write(error_unit, *) "big move_delta :", this%move_delta(:)
+        end if
+
+        write(output_unit, *) this%name, " :    Thermalisation : over"
+
+        write(report_unit, *) "Displacement :"
+        write(report_unit, *) "    move_delta(:) = ", this%move_delta(:)
+        write(report_unit, *) "    rejection relative difference = ", &
+                                    abs(reject-this%move_rejectFix)/this%move_rejectFix
+    
+    end subroutine HardSpheres_set_move_delta
+    
+    !> Print density and compacity
+    
+    subroutine HardSpheres_print_density(this, report_unit)
+    
+        class(HardSpheres), intent(in) :: this
+        integer, intent(in) :: report_unit
+        
+        real(DP) :: density, compacity
+        
+        density = real(this%Ncol + 1, DP) / Volume ! cheating ? cf. Widom
+        compacity = 4._DP/3._DP*PI*this%radius**3 * density
+        
+        write(output_unit, *) this%name, " : ", "density = ", density, "compacity = ", compacity
+        
+        write(report_unit, *) "    density = ", density
+        write(report_unit, *) "    compacity = ", compacity
+    
+    end subroutine HardSpheres_print_density
+    
     !> Report
     
     subroutine HardSpheres_print_report(this, report_unit)
@@ -122,6 +308,80 @@ contains
         write(report_unit, *) "    mix_cell_size(:) = ", this%mixCells%get_cell_size()
         
     end subroutine HardSpheres_print_report
+    
+    !> Configuration state : positions
+      
+    subroutine HardSpheres_snap_positions(this, iStep, snap_unit)
+        
+        class(HardSpheres), intent(in) :: this
+        integer, intent(in) :: iStep
+        integer, intent(in) :: snap_unit
+    
+        integer :: iCol
+        
+        if (modulo(iStep, this%snap_factor) == 0) then
+        
+            do iCol = 1, this%Ncol
+                write(snap_unit, *) this%positions(:, iCol)
+            end do
+            
+        end if            
+
+    end subroutine HardSpheres_snap_positions
+    
+    !> Overlapt test
+    
+    subroutine HardSpheres_test_overlap(this)
+    
+        class(HardSpheres), intent(in) :: this
+    
+        integer :: jCol, iCol
+        real(DP) :: r_ij
+    
+        do jCol = 1, this%Ncol
+            do iCol = 1, this%Ncol
+                if (iCol /= jCol) then
+                    
+                    r_ij = dist_PBC(this%positions(:, iCol), this%positions(:, jCol))
+                    if (r_ij < this%rMin) then
+                        write(error_unit, *) this%name, "    Overlap !", iCol, jCol
+                        write(error_unit, *) "    r_ij = ", r_ij
+                        stop
+                    end if
+                    
+                end if
+            end do
+        end do
+        
+        write(output_unit, *) this%name, " :    Overlap test : OK !"
+    
+    end subroutine HardSpheres_test_overlap
+    
+     !> Specifier : mixCells construction
+    
+    subroutine HardSpheres_construct_mixCells(this, mix_cell_size, mix_rCut)
+    
+        class(HardSpheres), intent(inout) :: this
+        real(DP), dimension(:), intent(in) :: mix_cell_size
+        real(DP), intent(in) :: mix_rCut
+        
+        write(output_unit, *) this%name, ": mixCells construction"
+        
+        call this%mixCells%construct(mix_cell_size, mix_rCut)
+    
+    end subroutine HardSpheres_construct_mixCells
+    
+    !> Fill cells with colloids
+    
+    subroutine HardSpheres_all_cols_to_cells(this, other)
+    
+        class(HardSpheres), intent(inout) :: this
+        class(HardSpheres), intent(in) :: other
+        
+        call this%sameCells%all_cols_to_cells(this%Ncol, this%positions)
+        call this%mixCells%all_cols_to_cells(other%Ncol, other%positions)
+    
+    end subroutine HardSpheres_all_cols_to_cells
     
     !> Print the potential : dummy
     
@@ -193,153 +453,6 @@ contains
         end do
     
     end subroutine HardSpheres_Epot_neighCells
-    
-    !> Particle move
-    
-    subroutine HardSpheres_move(this, this_obs, other, mix, mix_Epot)
-    
-        class(HardSpheres), intent(inout) :: this
-        class(Observables) :: this_obs
-        class(Spheres), intent(inout) :: other
-        class(MixingPotential), intent(in) :: mix        
-        real(DP), intent(inout) :: mix_Epot
-        
-        real(DP) :: random
-        integer :: iOld
-        real(DP), dimension(Ndim) :: xOld, xRand, xNew
-        logical :: overlap
-        integer :: this_iCellOld, this_iCellNew
-        integer :: mix_iCellOld, mix_iCellNew
-        real(DP) :: mix_deltaEpot
-        real(DP) :: mix_EpotNew, mix_EpotOld
-        
-        call random_number(random)
-        iOld = int(random*this%Ncol) + 1
-        xOld(:) = this%positions(:, iOld)
-        
-        ! Random new position
-        call random_number(xRand)
-        xNew(:) = xOld(:) + (xRand(:)-0.5_DP)*this%move_delta(:)
-        xNew(:) = modulo(xNew(:), Lsize(:))
-        
-        if (this%Ncol >= other%Ncol) then        
-            this_iCellNew = this%sameCells%index_from_position(xNew)
-            call this%Epot_neighCells(iOld, xNew, this_iCellNew, overlap)            
-        else        
-            mix_iCellNew = this%mixCells%index_from_position(xNew)
-            call mix%Epot_neighCells(xNew, mix_iCellNew, this%mixCells, other%positions, overlap, &
-                                     mix_EpotNew)        
-        end if
-        
-        if (.not. overlap) then
-        
-            if (this%Ncol >= other%Ncol) then        
-                mix_iCellNew = this%mixCells%index_from_position(xNew)
-                call mix%Epot_neighCells(xNew, mix_iCellNew, this%mixCells, other%positions, overlap, &
-                                         mix_EpotNew)
-            else                
-                this_iCellNew = this%sameCells%index_from_position(xNew)
-                call this%Epot_neighCells(iOld, xNew, this_iCellNew, overlap)
-            end if
-                        
-            if (.not. overlap) then
-    
-                this_iCellOld = this%sameCells%index_from_position(xOld)
-                call this%Epot_neighCells(iOld, xOld, this_iCellOld, overlap)
-                    
-                mix_iCellOld = this%mixCells%index_from_position(xOld)
-                call mix%Epot_neighCells(xOld, mix_iCellOld, this%mixCells, other%positions, overlap, &
-                                         mix_EpotOld)
-                
-                mix_deltaEpot = mix_EpotNew - mix_EpotOld
-                
-                call random_number(random)
-                if (random < exp(-mix_deltaEpot/Temperature)) then
-                
-                    this%positions(:, iOld) = xNew(:)
-                    mix_Epot = mix_Epot + mix_deltaEpot
-                    
-                    if (this_iCellOld /= this_iCellNew) then                
-                        call this%sameCells%remove_col_from_cell(iOld, this_iCellOld)
-                        call this%sameCells%add_col_to_cell(iOld, this_iCellNew)
-                    end if
-                    
-                    if (mix_iCellOld /= mix_iCellNew) then                
-                        call other%mixCells%remove_col_from_cell(iOld, mix_iCellOld)
-                        call other%mixCells%add_col_to_cell(iOld, mix_iCellNew)
-                    end if
-                    
-                else
-                    this_obs%move_Nreject = this_obs%move_Nreject + 1
-                end if
-         
-            else
-                this_obs%move_Nreject = this_obs%move_Nreject + 1
-            end if            
-            
-        else        
-            this_obs%move_Nreject = this_obs%move_Nreject + 1
-        end if
-    
-    end subroutine HardSpheres_move
-    
-    !> Widom's method : with other type ?
-
-    subroutine HardSpheres_widom(this, other, mix, activ)
-        
-        class(HardSpheres), intent(in) :: this
-        class(Spheres), intent(in) :: other
-        class(MixingPotential), intent(in) :: mix
-        real(DP), intent(inOut) :: activ 
-        
-        integer :: iWidom
-        real(DP) :: widTestSum
-        real(DP), dimension(Ndim) :: xRand, xTest
-        integer :: this_iCellTest, mix_iCellTest
-        logical :: overlap
-        real(DP) :: EpotTest, mix_EpotTest
-        
-        widTestSum = 0._DP
-        
-        do iWidom = 1, this%Nwidom           
-            
-            call random_number(xRand)
-            xTest(:) = Lsize(:) * xRand(:)
-
-            if (this%Ncol >= other%Ncol) then
-                this_iCellTest = this%sameCells%index_from_position(xTest)
-                call this%Epot_neighCells(0, xTest, this_iCellTest, overlap)
-            else
-                mix_iCellTest = this%mixCells%index_from_position(xTest)
-                call mix%Epot_neighCells(xTest, mix_iCellTest, this%mixCells, other%positions, &
-                                         overlap, mix_EpotTest)
-            end if
-            
-            if (.not. overlap) then
-            
-                if (this%Ncol >= other%Ncol) then
-                    mix_iCellTest = this%mixCells%index_from_position(xTest)
-                    call mix%Epot_neighCells(xTest, mix_iCellTest, this%mixCells, other%positions, &
-                                            overlap, mix_EpotTest)
-                else
-                    this_iCellTest = this%sameCells%index_from_position(xTest)
-                    call this%Epot_neighCells(0, xTest, this_iCellTest, overlap)
-                end if
-                
-                if (.not. overlap) then
-                
-                    EpotTest = 0._DP + mix_EpotTest
-                    widTestSum = widTestSum + exp(-EpotTest/Temperature)
-                    
-                end if
-                
-            end if
-            
-        end do
-        
-        activ = widTestSum/real(this%Nwidom, DP)
-        
-    end subroutine HardSpheres_widom
     
     !> Total potential energy : dummy
     
