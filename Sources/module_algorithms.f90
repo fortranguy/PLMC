@@ -49,11 +49,6 @@ contains
         xNew(:) = xOld(:) + (xRand(:)-0.5_DP)*this%move_delta(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
         
-        select type (this)
-            type is (DipolarSpheres)
-                mCol(:) = this%orientations(:, iOld)
-        end select
-        
         if (this%Ncol >= other%Ncol) then        
             this_iCellNew = this%sameCells%index_from_position(xNew)
             call this%Epot_neighCells(iOld, xNew, this_iCellNew, overlap, this_EpotNew)
@@ -79,6 +74,7 @@ contains
                 this_iCellOld = this%sameCells%index_from_position(xOld)                
                 select type (this)
                     type is (DipolarSpheres)
+                        mCol(:) = this%orientations(:, iOld)
                         this_EpotNew_real = this%Epot_real_solo(iOld, xNew, mCol)
                         this_EpotOld_real = this%Epot_real_solo(iOld, xOld, mCol)
                         this_deltaEpot = (this_EpotNew_real-this_EpotOld_real) + &
