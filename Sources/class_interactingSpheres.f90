@@ -7,8 +7,7 @@ use data_precisions, only : DP, consist_tiny
 use data_box, only : Ndim, Lsize
 use data_particles, only : inter_rMin, inter_Ncol
 use data_potential, only : inter_rCut, inter_dr, inter_epsilon, inter_alpha
-use data_monteCarlo, only : Temperature, inter_move_delta, inter_move_rejectFix, &
-                            inter_move_Nadapt, inter_Nwidom
+use data_monteCarlo, only : inter_move_delta, inter_move_rejectFix, inter_move_Nadapt, inter_Nwidom
 use data_neighbourCells, only : NnearCell
 use data_distribution, only : inter_snap_factor
 use module_physics, only : dist_PBC

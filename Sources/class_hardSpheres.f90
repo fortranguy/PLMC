@@ -7,8 +7,7 @@ use data_precisions, only : DP
 use data_constants, only : PI
 use data_box, only : Ndim, Lsize, Volume
 use data_particles, only : hard_rMin, hard_Ncol
-use data_monteCarlo, only : Temperature, hard_move_delta, hard_move_rejectFix, hard_move_Nadapt, &
-                            hard_Nwidom
+use data_monteCarlo, only : hard_move_delta, hard_move_rejectFix, hard_move_Nadapt, hard_Nwidom
 use data_neighbourCells, only : NnearCell
 use data_distribution, only : hard_snap_factor
 use module_physics, only : dist_PBC
