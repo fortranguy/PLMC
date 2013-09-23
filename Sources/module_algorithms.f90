@@ -46,12 +46,7 @@ contains
         
         if (this%Ncol >= other%Ncol) then        
             this_iCellNew = this%sameCells%index_from_position(xNew)
-            select type (this)
-                type is (hardSpheres)
-                    call this%Epot_neighCells(iOld, xNew, this_iCellNew, overlap, this_EpotOld)
-                type is (interactingSpheres)
-                    call this%Epot_neighCells(iOld, xNew, this_iCellNew, overlap, this_EpotNew)                
-            end select
+            call this%Epot_neighCells(iOld, xNew, this_iCellNew, overlap, this_EpotNew)
         else        
             mix_iCellNew = this%mixCells%index_from_position(xNew)
             call mix%Epot_neighCells(xNew, mix_iCellNew, this%mixCells, other%positions, overlap, &
@@ -66,25 +61,14 @@ contains
                                          mix_EpotNew)
             else                
                 this_iCellNew = this%sameCells%index_from_position(xNew)
-                select type (this)
-                    type is (hardSpheres)
-                        call this%Epot_neighCells(iOld, xNew, this_iCellNew, overlap, this_EpotOld)
-                    type is (interactingSpheres)
-                        call this%Epot_neighCells(iOld, xNew, this_iCellNew, overlap, this_EpotNew)
-                end select
+                call this%Epot_neighCells(iOld, xNew, this_iCellNew, overlap, this_EpotNew)
             end if
                         
             if (.not. overlap) then
     
                 this_iCellOld = this%sameCells%index_from_position(xOld)
-                select type (this)
-                    type is (hardSpheres)
-                        call this%Epot_neighCells(iOld, xOld, this_iCellOld, overlap, this_EpotOld)
-                        this_deltaEpot = 0._DP
-                    type is (interactingSpheres)
-                        call this%Epot_neighCells(iOld, xOld, this_iCellOld, overlap, this_EpotOld)
-                        this_deltaEpot = this_EpotNew - this_EpotOld
-                end select
+                call this%Epot_neighCells(iOld, xOld, this_iCellOld, overlap, this_EpotOld)
+                this_deltaEpot = this_EpotNew - this_EpotOld
                     
                 mix_iCellOld = this%mixCells%index_from_position(xOld)
                 call mix%Epot_neighCells(xOld, mix_iCellOld, this%mixCells, other%positions, overlap, &
