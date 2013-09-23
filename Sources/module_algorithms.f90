@@ -36,7 +36,7 @@ contains
         real(DP) :: mix_EpotNew, mix_EpotOld
         
         real(DP), dimension(Ndim) :: mCol
-        real(DP) :: this_deltaEpot_real
+        real(DP) :: this_EpotNew_real, this_EpotOld_real
         
         call random_number(random)
         iOld = int(random*this%Ncol) + 1
@@ -74,9 +74,17 @@ contains
                         
             if (.not. overlap) then
     
-                this_iCellOld = this%sameCells%index_from_position(xOld)
-                call this%Epot_neighCells(iOld, xOld, this_iCellOld, overlap, this_EpotOld)
-                this_deltaEpot = this_EpotNew - this_EpotOld
+                this_iCellOld = this%sameCells%index_from_position(xOld)                
+                select type (this)
+                    type is (DipolarSpheres)
+                        this_EpotNew_real = this%Epot_real_solo(iOld, xNew, mCol)
+                        this_EpotOld_real = this%Epot_real_solo(iOld, xOld, mCol)
+                        this_deltaEpot = (this_EpotNew_real-this_EpotOld_real) + &
+                                         this%deltaEpot_reci_move(xOld, xNew, mCol)
+                    class default
+                        call this%Epot_neighCells(iOld, xOld, this_iCellOld, overlap, this_EpotOld)
+                        this_deltaEpot = this_EpotNew - this_EpotOld
+                end select
                     
                 mix_iCellOld = this%mixCells%index_from_position(xOld)
                 call mix%Epot_neighCells(xOld, mix_iCellOld, this%mixCells, other%positions, overlap, &
@@ -88,6 +96,11 @@ contains
                 
                 call random_number(random)
                 if (random < exp(-deltaEpot/Temperature)) then
+                
+                    select type (this)
+                        type is (DipolarSpheres)
+                            call this%deltaEpot_reci_move_update_structure(xOld, xNew, mCol)
+                    end select
                 
                     this%positions(:, iOld) = xNew(:)
                     this_obs%Epot = this_obs%Epot + this_deltaEpot

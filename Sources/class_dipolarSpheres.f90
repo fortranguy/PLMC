@@ -81,7 +81,7 @@ private
         procedure :: Epot_real_print => DipolarSpheres_Epot_real_print
         procedure, private :: Epot_real_interpol => DipolarSpheres_Epot_real_interpol
         procedure :: Epot_real_pair => DipolarSpheres_Epot_real_pair
-        procedure, private :: Epot_real_solo => DipolarSpheres_Epot_real_solo
+        procedure :: Epot_real_solo => DipolarSpheres_Epot_real_solo
         procedure, private :: Epot_real => DipolarSpheres_Epot_real
         !>     Reciprocal : init
         procedure :: Epot_reci_init => DipolarSpheres_Epot_reci_init
@@ -93,13 +93,13 @@ private
         procedure, private :: Epot_reci_init_potential => DipolarSpheres_Epot_reci_init_potential
         procedure :: Epot_reci_count_waveVectors => DipolarSpheres_Epot_reci_count_waveVectors
         !>     Reciprocal : delta
-        procedure, private :: deltaEpot_reci_move => DipolarSpheres_deltaEpot_reci_move
-        procedure, private :: deltaEpot_reci_move_update_structure => &
+        procedure :: deltaEpot_reci_move => DipolarSpheres_deltaEpot_reci_move
+        procedure :: deltaEpot_reci_move_update_structure => &
                               DipolarSpheres_deltaEpot_reci_move_update_structure
-        procedure, private :: deltaEpot_reci_rotate => DipolarSpheres_deltaEpot_reci_rotate
-        procedure, private :: deltaEpot_reci_rotate_update_structure => &
+        procedure :: deltaEpot_reci_rotate => DipolarSpheres_deltaEpot_reci_rotate
+        procedure :: deltaEpot_reci_rotate_update_structure => &
                               DipolarSpheres_deltaEpot_reci_rotate_update_structure
-        procedure, private :: deltaEpot_reci_exchange => DipolarSpheres_deltaEpot_reci_exchange
+        procedure :: deltaEpot_reci_exchange => DipolarSpheres_deltaEpot_reci_exchange
         !>     Reciprocal : total
         procedure, private :: Epot_reci => DipolarSpheres_Epot_reci
         !>     Self
