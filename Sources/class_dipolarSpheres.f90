@@ -33,7 +33,7 @@ private
                                                                        !< of all particles
         
         ! Monte-Carlo
-        real(DP) :: rotate_delta !< rotation
+        real(DP), public :: rotate_delta !< rotation
         real(DP) :: rotate_deltaSave
         real(DP) :: rotate_deltaMax
         real(DP) :: rotate_rejectFix

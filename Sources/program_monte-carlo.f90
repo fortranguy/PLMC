@@ -161,7 +161,7 @@ implicit none
                 
             else ! change = rotate
      
-                !call type1_spheres%rotate(type1_obs)
+                call rotate(type1_spheres, type1_obs)
                 type1_obs%Nrotate = type1_obs%Nrotate + 1
                 
             end if
@@ -232,8 +232,8 @@ implicit none
         else MC_Regime ! Thermalisation over -> Equilibrium
         
             ! Chemical potentials : Widom method
-            !call type1_spheres%widom(type2_spheres, mix, type1_obs%activ)
-            !call type2_spheres%widom(type1_spheres, mix, type2_obs%activ)
+            call widom(type1_spheres, type1_obs, type2_spheres, mix)
+            call widom(type2_spheres, type2_obs, type1_spheres, mix)
         
             ! Observables accumulations
             type1_obs%EpotSum = type1_obs%EpotSum + type1_obs%Epot
