@@ -152,10 +152,10 @@ implicit none
                 
                 ! Moving a particle : 
                 if (iColRand <= type1_spheres%get_Ncol()) then
-                    !call type1_spheres%move(type1_obs, type2_spheres, mix, mix_Epot)
+                    call move(type1_spheres, type1_obs, type2_spheres, mix, mix_Epot)
                     type1_obs%Nmove = type1_obs%Nmove + 1
                 else
-                    !call type2_spheres%move(type2_obs, type1_spheres, mix, mix_Epot)
+                    call move(type2_spheres, type2_obs, type1_spheres, mix, mix_Epot)
                     type2_obs%Nmove = type2_obs%Nmove + 1
                 end if
                 
