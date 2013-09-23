@@ -12,7 +12,7 @@ use data_monteCarlo, only : dipol_move_delta, dipol_move_rejectFix, dipol_move_N
                             dipol_rotate_Nadapt, dipol_Nwidom, dipol_structure_iStep, &
                             dipol_totalMoment_iStep
 use data_potential, only : dipol_rCut, dipol_dr, dipol_alpha
-use data_neighbourCells, only : NnearCell, dipol_cell_size
+use data_neighbourCells, only : NnearCell
 use data_distribution, only : dipol_snap_factor
 use module_physics, only : distVec_PBC, Kmax1_sym, Kmax2_sym, fourier
 use class_observables
@@ -126,6 +126,8 @@ contains
     
         class(DipolarSpheres), intent(out) :: this
         
+        real(DP), dimension(Ndim) :: cell_size
+        
         this%name = "dipol"        
         write(output_unit, *) this%name, " class construction"
     
@@ -168,7 +170,8 @@ contains
         call this%Epot_reci_init_weight()
         
         ! Neighbour Cells
-        call this%sameCells%construct(dipol_cell_size, this%rCut) !< same kind
+        cell_size(:) = this%rMin
+        call this%sameCells%construct(cell_size, this%rCut) !< same kind
     
     end subroutine DipolarSpheres_construct
     
