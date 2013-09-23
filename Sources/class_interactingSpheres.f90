@@ -15,13 +15,13 @@ use module_physics, only : dist_PBC
 use class_observables
 use class_neighbourCells
 use class_mixingPotential
-use class_spheres
+use class_hardSpheres
 
 implicit none
 
 private
 
-    type, extends(Spheres), public :: InteractingSpheres
+    type, extends(HardSpheres), public :: InteractingSpheres
 
         private
 

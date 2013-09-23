@@ -19,13 +19,13 @@ use module_physics, only : distVec_PBC, dist_PBC, random_surface, markov_surface
 use class_observables
 use class_neighbourCells
 use class_mixingPotential
-use class_spheres
+use class_hardSpheres
 
 implicit none
 
 private
 
-    type, extends(Spheres), public :: DipolarSpheres
+    type, extends(HardSpheres), public :: DipolarSpheres
 
         private
         

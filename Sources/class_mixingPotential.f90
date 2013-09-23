@@ -10,7 +10,7 @@ use data_potential, only : mix_rCut, mix_dr, mix_epsilon, mix_alpha
 use data_neighbourCells, only : NnearCell
 use module_physics, only : dist_PBC
 use class_neighbourCells
-use class_spheres
+use class_hardSpheres
 
 implicit none
 
@@ -168,7 +168,7 @@ contains
     subroutine MixingPotential_test_overlap(this, type1, type2)
     
         class(MixingPotential), intent(in) :: this
-        class(Spheres), intent(in) :: type1, type2
+        class(HardSpheres), intent(in) :: type1, type2
         
         integer :: type1_iCol, type2_iCol
         real(DP) :: r_mix
@@ -303,7 +303,7 @@ contains
     pure function MixingPotential_Epot_conf(this, type1, type2) result(Epot_conf)
     
         class(MixingPotential), intent(in) :: this
-        class(Spheres), intent(in) :: type1, type2
+        class(HardSpheres), intent(in) :: type1, type2
         real(DP) :: Epot_conf
 
         integer :: type1_iCol, type2_iCol
