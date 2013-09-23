@@ -7,10 +7,10 @@ use data_precisions, only : DP
 use data_monteCarlo, only : Nstep, Nthermal, decorrelFactor
 use data_distribution, only : snap
 use class_observables
-use class_mixingPotential
 use class_hardSpheres
 use class_interactingSpheres
 use class_dipolarSpheres
+use class_mixingPotential
 use class_units
 use module_algorithms
 use module_tools, only : init_randomSeed, set_initialCondition, print_report, test_consist, &
@@ -157,16 +157,16 @@ implicit none
                 
                 ! Moving a particle : 
                 if (iColRand <= type1_spheres%get_Ncol()) then
-                    call type1_spheres%move(type1_obs, type2_spheres, mix, mix_Epot)
+                    !call type1_spheres%move(type1_obs, type2_spheres, mix, mix_Epot)
                     type1_obs%Nmove = type1_obs%Nmove + 1
                 else
-                    call type2_spheres%move(type2_obs, type1_spheres, mix, mix_Epot)
+                    !call type2_spheres%move(type2_obs, type1_spheres, mix, mix_Epot)
                     type2_obs%Nmove = type2_obs%Nmove + 1
                 end if
                 
             else ! change = rotate
      
-                call type1_spheres%rotate(type1_obs)
+                !call type1_spheres%rotate(type1_obs)
                 type1_obs%Nrotate = type1_obs%Nrotate + 1
                 
             end if

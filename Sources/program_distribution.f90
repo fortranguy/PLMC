@@ -36,8 +36,8 @@ use data_potential
 use data_distribution
 use module_physics
 use module_distrib
-use class_mixingPotential
 use class_hardSpheres
+use class_mixingPotential
 !$ use omp_lib
 
 implicit none

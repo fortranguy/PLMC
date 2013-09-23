@@ -7,7 +7,8 @@ use data_precisions, only : DP, io_tiny, consist_tiny
 use data_box, only : Ndim, Lsize, Volume, Kmax
 use data_monteCarlo, only : Temperature, Nstep, decorrelFactor, Nthermal
 use module_physics, only : dist_PBC, random_surface
-use class_spheres
+use class_hardSpheres
+use class_interactingSpheres
 use class_dipolarSpheres
 
 implicit none

@@ -4,12 +4,10 @@ use data_precisions, only : DP
 use data_box, only : Ndim, Lsize
 use data_monteCarlo, only : Temperature
 use class_observables
-use class_spheres
-use class_mixingPotential
 use class_hardSpheres
 use class_interactingSpheres
 use class_dipolarSpheres
-use class_observables
+use class_mixingPotential
 
 
 implicit none
