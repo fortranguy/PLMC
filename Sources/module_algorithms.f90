@@ -14,28 +14,6 @@ implicit none
 
 contains
 
-    subroutine polymorph(sph)
-    
-        class(HardSpheres), intent(in) :: sph
-        
-        select type (sph)
-        
-            type is (hardSpheres)
-            
-                write(*, *) "hard : ", sph%name
-        
-            type is (interactingSpheres)
-            
-                write(*, *) "inter : ", sph%name
-            
-            type is (dipolarSpheres)
-            
-                write(*, *) "dipol : ", sph%name
-        
-        end select 
-
-    end subroutine polymorph
-    
     !> Particle move
     
     subroutine move(this, this_obs, other, mix, mix_Epot)
