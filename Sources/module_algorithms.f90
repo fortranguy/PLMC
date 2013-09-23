@@ -3,6 +3,7 @@ module module_algorithms
 use data_precisions, only : DP
 use data_box, only : Ndim, Lsize
 use data_monteCarlo, only : Temperature
+use module_physics, only : random_surface
 use class_observables
 use class_hardSpheres
 use class_interactingSpheres
@@ -144,7 +145,10 @@ contains
         real(DP), dimension(Ndim) :: xRand, xTest
         integer :: this_iCellTest, mix_iCellTest
         logical :: overlap
-        real(DP) :: EpotTest, this_EpotTest, mix_EpotTest
+        real(DP) :: EpotTest
+        real(DP) :: this_EpotTest, mix_EpotTest
+        
+        real(DP), dimension(Ndim) :: mTest
         
         widTestSum = 0._DP
         
@@ -174,6 +178,15 @@ contains
                 end if
                 
                 if (.not. overlap) then
+                
+                    select type (this)
+                        type is (DipolarSpheres)
+                            mTest(:) = random_surface()                            
+                            this_EpotTest = this%Epot_real_solo(0, xTest, mTest) + &
+                                            this%deltaEpot_reci_exchange(xTest, +mTest) - &
+                                            this%Epot_self_solo(mTest) + &
+                                            this%deltaEpot_bound_exchange(+mTest)
+                    end select
                 
                     EpotTest = this_EpotTest + mix_EpotTest
                     widTestSum = widTestSum + exp(-EpotTest/Temperature)

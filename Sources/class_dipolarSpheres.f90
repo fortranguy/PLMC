@@ -14,8 +14,7 @@ use data_monteCarlo, only : Temperature, dipol_move_delta, dipol_move_rejectFix,
 use data_potential, only : dipol_rCut, dipol_dr, dipol_alpha
 use data_neighbourCells, only : NnearCell, dipol_cell_size
 use data_distribution, only : dipol_snap_factor
-use module_physics, only : distVec_PBC, dist_PBC, random_surface, markov_surface, Kmax1_sym, &
-                           Kmax2_sym, fourier
+use module_physics, only : distVec_PBC, Kmax1_sym, Kmax2_sym, fourier
 use class_observables
 use class_neighbourCells
 use class_hardSpheres
@@ -103,15 +102,15 @@ private
         !>     Reciprocal : total
         procedure, private :: Epot_reci => DipolarSpheres_Epot_reci
         !>     Self
-        procedure, private :: Epot_self_solo => DipolarSpheres_Epot_self_solo
+        procedure :: Epot_self_solo => DipolarSpheres_Epot_self_solo
         procedure, private :: Epot_self => DipolarSpheres_Epot_self
         !>     Boundary conditions
         procedure :: Epot_bound_init_totalMoment => DipolarSpheres_Epot_bound_init_totalMoment
-        procedure, private :: deltaEpot_bound_rotate => DipolarSpheres_deltaEpot_bound_rotate
-        procedure, private :: deltaEpot_bound_rotate_update_totalMoment => &
+        procedure :: deltaEpot_bound_rotate => DipolarSpheres_deltaEpot_bound_rotate
+        procedure :: deltaEpot_bound_rotate_update_totalMoment => &
                               DipolarSpheres_deltaEpot_bound_rotate_update_totalMoment
-        procedure, private :: deltaEpot_bound_exchange => DipolarSpheres_deltaEpot_bound_exchange
-        procedure, private :: deltaEpot_bound_exchange_update_totalMoment => &
+        procedure :: deltaEpot_bound_exchange => DipolarSpheres_deltaEpot_bound_exchange
+        procedure :: deltaEpot_bound_exchange_update_totalMoment => &
                               DipolarSpheres_deltaEpot_bound_exchange_update_totalMoment
         procedure :: Epot_bound_reInit_totalMoment => DipolarSpheres_Epot_bound_reInit_totalMoment
         procedure, private :: Epot_bound => DipolarSpheres_Epot_bound
