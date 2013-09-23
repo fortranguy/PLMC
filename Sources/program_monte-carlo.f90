@@ -55,13 +55,10 @@ implicit none
     type(HardSpheres) :: type2_spheres
     type(Observables) :: type2_obs
     type(Units) :: type2_units
-    
-    type(InteractingSpheres) :: type3_spheres
-    
+
     call mix%construct()
     call type1_spheres%construct()
     call type2_spheres%construct()
-    call type3_spheres%construct()
     
     call mix%set_rMin(type1_spheres%get_rMin(), type2_spheres%get_rMin())
     call type1_spheres%construct_mixCells(mix%get_cell_size(), mix%get_rCut())
