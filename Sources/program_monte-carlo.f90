@@ -7,13 +7,13 @@ use data_precisions, only : DP
 use data_monteCarlo, only : Nstep, Nthermal, decorrelFactor
 use data_distribution, only : snap
 use class_observables
+use class_units
 use class_neighbourCells
 use class_hardSpheres
 use class_interactingSpheres
 use class_dipolarSpheres
 use class_mixingPotential
 use module_algorithms
-use class_units
 use module_tools, only : init_randomSeed, set_initialCondition, print_report, test_consist, &
                          print_results, mix_print_results
 

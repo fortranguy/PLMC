@@ -63,6 +63,8 @@ module_physics.o : module_physics.f90
 	$(FC) -c $(FFLAGS_OMP) $< -o $@
 class_observables.o : class_observables.f90
 	$(FC) -c $(FFLAGS) $< -o $@
+class_units.o : class_units.f90
+	$(FC) -c $(FFLAGS) $< -o $@
 class_neighbourCells.o : class_neighbourCells.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_hardSpheres.o : class_hardSpheres.f90
@@ -75,8 +77,6 @@ class_mixingPotential.o : class_mixingPotential.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 module_algorithms.o : module_algorithms.f90
 	$(FC) -c $(FFLAGS) $< -o $@
-class_units.o : class_units.f90
-	$(FC) -c $(FFLAGS) $< -o $@
 module_tools.o : module_tools.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 
@@ -84,9 +84,9 @@ module_tools.o : module_tools.f90
 
 program_monte-carlo.o : program_monte-carlo.f90
 	$(FC) -c $(FFLAGS) $< -o $@
-$(EXEC1) : data.o module_physics.o class_observables.o class_neighbourCells.o class_hardSpheres.o \
-    class_interactingSpheres.o class_dipolarSpheres.o class_mixingPotential.o module_algorithms.o \
-	class_units.o module_tools.o program_monte-carlo.o
+$(EXEC1) : data.o module_physics.o class_observables.o class_units.o class_neighbourCells.o \
+           class_hardSpheres.o class_interactingSpheres.o class_dipolarSpheres.o \
+           class_mixingPotential.o module_algorithms.o module_tools.o program_monte-carlo.o
 	$(FC) $^ $(LDFLAGS) $(CLDFLAGS) $(LDLIBS) -o $@
 
 # ------------------------------------------------------------------------
