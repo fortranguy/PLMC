@@ -13,7 +13,7 @@ use class_hardSpheres
 use class_interactingSpheres
 use class_dipolarSpheres
 use class_mixingPotential
-use module_algorithms
+use module_algorithms, only : move, widom, rotate
 use module_tools, only : init_randomSeed, set_initialCondition, print_report, test_consist, &
                          print_results, mix_print_results
 

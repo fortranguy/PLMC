@@ -10,8 +10,9 @@ use class_interactingSpheres
 use class_dipolarSpheres
 use class_mixingPotential
 
-
 implicit none
+private
+public move, widom, rotate
 
 contains
 
