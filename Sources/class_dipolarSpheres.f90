@@ -81,7 +81,6 @@ private
         procedure :: Epot_real_print => DipolarSpheres_Epot_real_print
         procedure, private :: Epot_real_interpol => DipolarSpheres_Epot_real_interpol
         procedure :: Epot_real_pair => DipolarSpheres_Epot_real_pair
-        procedure :: Epot_real_test_overlap => DipolarSpheres_Epot_real_test_overlap
         procedure, private :: Epot_real_solo => DipolarSpheres_Epot_real_solo
         procedure, private :: Epot_real => DipolarSpheres_Epot_real
         !>     Reciprocal : init
@@ -450,53 +449,6 @@ contains
         Epot_real_pair = dot_product(Epot_coeff, this%Epot_real_interpol(r_ij))
     
     end function DipolarSpheres_Epot_real_pair
- 
-    !> Overlap test of 1 particle
-
-    subroutine DipolarSpheres_Epot_real_test_overlap(this, iCol, xCol, iTotalCell, overlap)
-
-        class(DipolarSpheres), intent(in) :: this
-        integer, intent(in) :: iCol, iTotalCell
-        real(DP), dimension(:), intent(in) :: xCol
-        logical, intent(out) :: overlap
-
-        integer :: iNearCell,  nearCell_index
-        real(DP) :: r_ij
-
-        type(Link), pointer :: current => null(), next => null()
-
-        overlap = .false.        
-
-        do iNearCell = 1, NnearCell
-
-            nearCell_index = this%sameCells%nearCells_among_totalCells(iNearCell, iTotalCell)
-            current => this%sameCells%beginCells(nearCell_index)%particle%next
-            if (.not. associated(current%next)) cycle
-
-            do
-
-                next => current%next
-
-                if (current%iCol /= iCol) then
-
-                    r_ij = dist_PBC(xCol(:), this%positions(:, current%iCol))
-
-                    if (r_ij < this%rMin) then
-                        overlap = .true.
-                        return
-                    end if
-
-                end if
-
-                if (.not. associated(next%next)) exit
-
-                current => next
-
-            end do
-
-        end do
-
-    end subroutine DipolarSpheres_Epot_real_test_overlap
     
     !> Energy of 1 dipole with others
     

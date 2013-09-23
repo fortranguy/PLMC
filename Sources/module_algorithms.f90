@@ -35,6 +35,9 @@ contains
         real(DP) :: this_EpotNew, this_EpotOld
         real(DP) :: mix_EpotNew, mix_EpotOld
         
+        real(DP), dimension(Ndim) :: mCol
+        real(DP) :: this_deltaEpot_real
+        
         call random_number(random)
         iOld = int(random*this%Ncol) + 1
         xOld(:) = this%positions(:, iOld)
@@ -43,6 +46,11 @@ contains
         call random_number(xRand)
         xNew(:) = xOld(:) + (xRand(:)-0.5_DP)*this%move_delta(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
+        
+        select type (this)
+            type is (DipolarSpheres)
+                mCol(:) = this%orientations(:, iOld)
+        end select
         
         if (this%Ncol >= other%Ncol) then        
             this_iCellNew = this%sameCells%index_from_position(xNew)
