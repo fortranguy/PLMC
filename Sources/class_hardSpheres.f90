@@ -90,10 +90,6 @@ private
         procedure :: Epot_conf => HardSpheres_Epot_conf
         procedure :: test_consist => HardSpheres_test_consist
         
-        !> Monte-Carlo
-        procedure :: move => HardSpheres_move
-        procedure :: widom => HardSpheres_widom
-        
     end type HardSpheres
     
 contains
