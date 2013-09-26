@@ -360,7 +360,7 @@ contains
         real(DP), dimension(:), intent(in) :: mix_cell_size
         real(DP), intent(in) :: mix_rCut
         
-        write(output_unit, *) this%name, ": mixCells construction"
+        write(output_unit, *) this%name, " : mixCells construction"
         
         call this%mixCells%construct(mix_cell_size, mix_rCut)
     
