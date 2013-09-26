@@ -98,9 +98,9 @@ use data_box, only : Ndim
 implicit none
 
     real(DP), parameter :: Temperature = 1._DP ! u_temperature
-    integer, parameter :: Nstep = 2**16
     integer, parameter :: decorrelFactor = 2**0
     integer, parameter :: Nthermal = 2**15/decorrelFactor
+    integer, parameter :: Nstep = 2**16
     
     ! move
     real(DP), dimension(Ndim), parameter :: dipol_move_delta = 0.3_DP ! u_length, adaptation
