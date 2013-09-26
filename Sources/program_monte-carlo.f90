@@ -4,7 +4,7 @@ program monteCarlo_canonical_bulk
 
 use, intrinsic :: iso_fortran_env, only : output_unit
 use data_precisions, only : DP
-use data_monteCarlo, only : Nstep, Nthermal, decorrelFactor
+use data_monteCarlo, only : decorrelFactor, Nthermal, Nstep
 use data_distribution, only : snap
 use class_observables
 use class_units
