@@ -260,13 +260,9 @@ implicit none
             
         end if MC_Regime
         
-        ! Ewald summation : reinitialize the structure factor to prevent it from drifting.
-        if (modulo(iStep, type1_spheres%get_structure_iStep()) == 0) then
+        ! Reinitialize to prevent it from drifting.
+        if (modulo(iStep, type1_spheres%get_reInit_iStep()) == 0) then
             call type1_spheres%Epot_reci_reInit_structure(iStep, type1_units%structure_modulus)
-        end if
-        
-        ! Boundary conditions : reinitialize the total moment to prevent it from drifting.
-        if (modulo(iStep, type1_spheres%get_totalMoment_iStep()) == 0) then
             call type1_spheres%Epot_bound_reInit_totalMoment(iStep, type1_units%totalMoment_modulus)
         end if
     

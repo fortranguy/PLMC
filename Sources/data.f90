@@ -114,8 +114,7 @@ implicit none
     ! chemical potential
     integer, parameter :: dipol_Nwidom = 500
     ! reinitialisations
-    integer, parameter :: dipol_structure_iStep = 2**13/decorrelFactor
-    integer, parameter :: dipol_totalMoment_iStep = 2**13/decorrelFactor
+    integer, parameter :: dipol_reInit_iStep = 2**13/decorrelFactor
     
     real(DP), dimension(Ndim), parameter :: hard_move_delta = 0.5_DP ! u_length, adaptation
     real(DP), parameter :: hard_move_rejectFix = 0.5_DP

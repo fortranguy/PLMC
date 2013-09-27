@@ -9,8 +9,7 @@ use data_box, only : Ndim, Lsize, Kmax, Volume, out_permittivity
 use data_particles, only : dipol_Ncol
 use data_monteCarlo, only : dipol_move_delta, dipol_move_rejectFix, dipol_move_Nadapt, &
                             dipol_rotate_delta, dipol_rotate_deltaMax, dipol_rotate_rejectFix, &
-                            dipol_rotate_Nadapt, dipol_Nwidom, dipol_structure_iStep, &
-                            dipol_totalMoment_iStep
+                            dipol_rotate_Nadapt, dipol_Nwidom, dipol_reInit_iStep
 use data_potential, only : dipol_rCut, dipol_dr, dipol_alpha
 use data_neighbourCells, only : NnearCell
 use data_distribution, only : dipol_snap_factor
@@ -38,8 +37,7 @@ private
         real(DP) :: rotate_deltaMax
         real(DP) :: rotate_rejectFix
         integer :: rotate_Nadapt
-        integer :: structure_iStep
-        integer :: totalMoment_iStep
+        integer :: reInit_iStep
 
         ! Potential
         real(DP)  :: dr !< discretisation step
@@ -71,8 +69,7 @@ private
         procedure :: get_rotate_delta => DipolarSpheres_get_rotate_delta
         procedure :: get_rotate_Nadapt => DipolarSpheres_get_rotate_Nadapt
         
-        procedure :: get_structure_iStep => DipolarSpheres_get_structure_iStep
-        procedure :: get_totalMoment_iStep => DipolarSpheres_get_totalMoment_iStep
+        procedure :: get_reInit_iStep => DipolarSpheres_get_reInit_iStep
         
         !> Potential energy
         !>     Real
@@ -146,8 +143,7 @@ contains
         this%move_deltaSave = this%move_delta
         this%move_rejectFix = dipol_move_rejectFix
         this%move_Nadapt = dipol_move_Nadapt
-        this%structure_iStep = dipol_structure_iStep
-        this%totalMoment_iStep = dipol_totalMoment_iStep
+        this%reInit_iStep = dipol_reInit_iStep
         
         this%rotate_delta = dipol_rotate_delta
         this%rotate_deltaSave = this%rotate_delta
@@ -218,7 +214,7 @@ contains
         write(report_unit, *) "    alpha = ", this%alpha
         write(report_unit, *) "    rCut = ", this%rCut
         write(report_unit, *) "    dr = ", this%dr
-        write(report_unit, *) "    Structure_iStep = ", this%structure_iStep
+        write(report_unit, *) "    reInit_iStep = ", this%reInit_iStep
         write(report_unit, *) "    NwaveVectors = ", this%NwaveVectors
         
         write(report_unit, *) "    this_NtotalCell_dim(:) = ", this%sameCells%get_NtotalCell_dim()
@@ -326,27 +322,16 @@ contains
         
     end function DipolarSpheres_get_rotate_Nadapt
     
-    !> Accessor : structure_iStep
+    !> Accessor : reInit_iStep
     
-    pure function DipolarSpheres_get_structure_iStep(this) result (get_structure_iStep)
-    
-        class(DipolarSpheres), intent(in) :: this
-        integer :: get_structure_iStep
-    
-        get_structure_iStep = this%structure_iStep
-        
-    end function DipolarSpheres_get_structure_iStep
-    
-    !> Accessor : totalMoment_iStep
-    
-    pure function DipolarSpheres_get_totalMoment_iStep(this) result (get_totalMoment_iStep)
+    pure function DipolarSpheres_get_reInit_iStep(this) result (get_reInit_iStep)
     
         class(DipolarSpheres), intent(in) :: this
-        integer :: get_totalMoment_iStep
+        integer :: get_reInit_iStep
     
-        get_totalMoment_iStep = this%totalMoment_iStep
+        get_reInit_iStep = this%reInit_iStep
         
-    end function DipolarSpheres_get_totalMoment_iStep
+    end function DipolarSpheres_get_reInit_iStep
 
     ! Real : short-range interaction ---------------------------------------------------------------
     
