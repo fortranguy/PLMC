@@ -910,7 +910,7 @@ contains
         xNewOverL(:) = 2._DP*PI * xNew(:)/Lsize(:)
         call fourier_i(Kmax(1), xNewOverL(1), exp_IkxNew_1)
         call fourier_i(Kmax(2), xNewOverL(2), exp_IkxNew_2)
-        call fourier_i(Kmax(3), xNewOverL(3), exp_IkxNew_3)    
+        call fourier_i(Kmax(3), xNewOverL(3), exp_IkxNew_3)
         
         xOldOverL(:) = 2._DP*PI * xOld(:)/Lsize(:)
         call fourier_i(Kmax(1), xOldOverL(1), exp_IkxOld_1)
@@ -997,9 +997,10 @@ contains
         complex(DP) :: structure_k
         integer :: kx, ky, kz
 
-        xColOverL(:) = xCol(:)/Lsize(:)
-        
-        call fourier(xColOverL, exp_IkxCol_1, exp_IkxCol_2, exp_IkxCol_3)
+        xColOverL(:) = 2._DP*PI * xCol(:)/Lsize(:)        
+        call fourier_i(Kmax(1), xColOverL(1), exp_IkxCol_1)
+        call fourier_i(Kmax(2), xColOverL(2), exp_IkxCol_2)
+        call fourier_i(Kmax(3), xColOverL(3), exp_IkxCol_3)
 
         mNewOverL(:) = mNew(:)/Lsize(:)
         mOldOverL(:) = mOld(:)/Lsize(:)
@@ -1073,9 +1074,10 @@ contains
         real(DP) :: k_dot_deltaMcol
         integer :: kx, ky, kz
 
-        xColOverL(:) = xCol(:)/Lsize(:)
-        
-        call fourier(xColOverL, exp_IkxCol_1, exp_IkxCol_2, exp_IkxCol_3)
+        xColOverL(:) = 2._DP*PI * xCol(:)/Lsize(:)        
+        call fourier_i(Kmax(1), xColOverL(1), exp_IkxCol_1)
+        call fourier_i(Kmax(2), xColOverL(2), exp_IkxCol_2)
+        call fourier_i(Kmax(3), xColOverL(3), exp_IkxCol_3)
 
         mNewOverL(:) = mNew(:)/Lsize(:)
         mOldOverL(:) = mOld(:)/Lsize(:)
