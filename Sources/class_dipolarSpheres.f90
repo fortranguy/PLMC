@@ -13,7 +13,7 @@ use data_monteCarlo, only : dipol_move_delta, dipol_move_rejectFix, dipol_move_N
 use data_potential, only : dipol_rCut, dipol_dr, dipol_alpha
 use data_neighbourCells, only : NnearCell
 use data_distribution, only : dipol_snap_factor
-use module_physics, only : distVec_PBC, Kmax1_sym, Kmax2_sym, fourier
+use module_physics, only : distVec_PBC, Kmax1_sym, Kmax2_sym, fourier_i, fourier
 use class_observables
 use class_neighbourCells
 use class_hardSpheres
@@ -828,9 +828,6 @@ contains
         call fourier_i(Kmax(1), xOldOverL(1), exp_IkxOld_1)
         call fourier_i(Kmax(2), xOldOverL(2), exp_IkxOld_2)
         call fourier_i(Kmax(3), xOldOverL(3), exp_IkxOld_3)
-        
-        call fourier(xNewOverL, exp_IkxNew_1, exp_IkxNew_2, exp_IkxNew_3)
-        call fourier(xOldOverL, exp_IkxOld_1, exp_IkxOld_2, exp_IkxOld_3)
 
         mColOverL(:) = mCol(:)/Lsize(:)
 

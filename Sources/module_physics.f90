@@ -9,7 +9,7 @@ use data_box, only : Ndim, Lsize, LsizeMi, Kmax
 
 implicit none
 private
-public distVec_PBC, dist_PBC, random_surface, markov_surface, Kmax1_sym, Kmax2_sym, fourier, &
+public distVec_PBC, dist_PBC, random_surface, markov_surface, Kmax1_sym, Kmax2_sym, fourier_i, fourier, &
        index_from_coord, coord_PBC
 
 contains
@@ -162,7 +162,7 @@ contains
     
         integer, intent(in) :: Kmax_i
         real(DP), intent(in) :: xColOverL_i
-        complex(DP), dimension(:), intent(out) :: exp_Ikx_i
+        complex(DP), dimension(-Kmax_i:Kmax_i), intent(out) :: exp_Ikx_i
         
         integer :: kx_i
         
@@ -178,6 +178,59 @@ contains
         end do
     
     end subroutine fourier_i
+    
+    pure subroutine fourier(xColOverL, exp_Ikx_1, exp_Ikx_2, exp_Ikx_3)
+    
+        real(DP), dimension(:), intent(in) :: xColOverL
+        complex(DP), dimension(-Kmax(1):Kmax(1)), intent(out) :: exp_Ikx_1
+        complex(DP), dimension(-Kmax(2):Kmax(2)), intent(out) :: exp_Ikx_2
+        complex(DP), dimension(-Kmax(3):Kmax(3)), intent(out) :: exp_Ikx_3
+        
+        real(DP), dimension(Ndim) :: arg
+        integer :: kx, ky, kz
+
+        arg(:) = 2._DP*PI * 1._DP*xColOverL(:)
+
+        !x
+        
+        exp_Ikx_1(0) = (1._DP, 0._DP)
+        exp_Ikx_1(1) = cmplx(cos(arg(1)), sin(arg(1)), DP)
+        exp_Ikx_1(-1) =  conjg(exp_Ikx_1(1))
+        
+        do kx = 2, Kmax(1)
+        
+            exp_Ikx_1(kx) = exp_Ikx_1(kx-1) * exp_Ikx_1(1)
+            exp_Ikx_1(-kx) = conjg(exp_Ikx_1(kx))
+        
+        end do
+        
+        !y
+        
+        exp_Ikx_2(0) = (1._DP, 0._DP)
+        exp_Ikx_2(1) = cmplx(cos(arg(2)), sin(arg(2)), DP)
+        exp_Ikx_2(-1) =  conjg(exp_Ikx_2(1))
+        
+        do ky = 2, Kmax(2)
+        
+            exp_Ikx_2(ky) = exp_Ikx_2(ky-1) * exp_Ikx_2(1)
+            exp_Ikx_2(-ky) = conjg(exp_Ikx_2(ky))
+        
+        end do
+        
+        !z
+        
+        exp_Ikx_3(0) = (1._DP, 0._DP)
+        exp_Ikx_3(1) = cmplx(cos(arg(3)), sin(arg(3)), DP)
+        exp_Ikx_3(-1) =  conjg(exp_Ikx_3(1))
+        
+        do kz = 2, Kmax(3)
+        
+            exp_Ikx_3(kz) = exp_Ikx_3(kz-1) * exp_Ikx_3(1)
+            exp_Ikx_3(-kz) = conjg(exp_Ikx_3(kz))
+        
+        end do        
+    
+    end subroutine fourier
     
     !> 3D index to 1D index
     
