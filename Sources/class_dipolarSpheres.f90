@@ -600,10 +600,9 @@ contains
             do kx = -Kmax(1), Kmax(1)
 
                 waveVector(1) = real(kx, DP)
-            
-            
+                
                 exp_IkxCol = exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz)
-
+                
                 k_dot_mCol = dot_product(waveVector, mColOverL)
                           
                 this%structureFactor(kx, ky, kz) = this%structureFactor(kx, ky, kz) + &
