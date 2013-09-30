@@ -6,13 +6,13 @@ use, intrinsic :: iso_fortran_env, only : output_unit
 use data_precisions, only : DP
 use data_monteCarlo, only : decorrelFactor, Nthermal, Nstep
 use data_distribution, only : snap
-use class_units
 use class_neighbourCells
 use class_hardSpheres
 use class_interactingSpheres
 use class_dipolarSpheres
 use class_mixingPotential
 use class_observables
+use class_units
 use module_algorithms, only : move, widom, rotate
 use module_tools, only : init_randomSeed, set_initialCondition, print_report, test_consist, &
                          print_results, mix_print_results
