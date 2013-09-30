@@ -14,7 +14,6 @@ use data_potential, only : dipol_rCut, dipol_dr, dipol_alpha
 use data_neighbourCells, only : NnearCell
 use data_distribution, only : dipol_snap_factor
 use module_physics, only : distVec_PBC, Kmax1_sym, Kmax2_sym, fourier_i
-use class_observables
 use class_neighbourCells
 use class_hardSpheres
 

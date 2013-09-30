@@ -11,7 +11,6 @@ use data_monteCarlo, only : hard_move_delta, hard_move_rejectFix, hard_move_Nada
 use data_neighbourCells, only : NnearCell
 use data_distribution, only : hard_snap_factor
 use module_physics, only : dist_PBC
-use class_observables
 use class_neighbourCells
 
 implicit none

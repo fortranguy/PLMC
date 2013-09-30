@@ -11,7 +11,6 @@ use data_monteCarlo, only : inter_move_delta, inter_move_rejectFix, inter_move_N
 use data_neighbourCells, only : NnearCell
 use data_distribution, only : inter_snap_factor
 use module_physics, only : dist_PBC
-use class_observables
 use class_neighbourCells
 use class_hardSpheres
 

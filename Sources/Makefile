@@ -35,16 +35,16 @@ class_neighbourCells.o : data_precisions.mod data_box.mod data_neighbourCells.mo
 class_hardSpheres.o : data_precisions.mod data_constants.mod data_box.mod data_particles.mod \
                       data_monteCarlo.mod data_neighbourCells.mod data_distribution.mod \
                       module_physics.o \
-                      class_observables.o class_neighbourCells.o
+                      class_neighbourCells.o
 class_interactingSpheres.o : data_precisions.mod data_box.mod data_particles.mod data_potential.mod \
                              data_monteCarlo.mod data_neighbourCells.mod data_distribution.mod \
                              module_physics.o \
-                             class_observables.o class_neighbourCells.o class_hardSpheres.o
+                             class_neighbourCells.o class_hardSpheres.o
 class_dipolarSpheres.o : data_precisions.mod data_constants.mod data_box.mod data_particles.mod \
                          data_monteCarlo.mod data_potential.mod data_neighbourCells.mod \
                          data_distribution.mod \
                          module_physics.o \
-                         class_observables.o class_neighbourCells.o class_hardSpheres.o
+                         class_neighbourCells.o class_hardSpheres.o
 class_mixingPotential.o : data_precisions.mod data_box.mod data_particles.mod data_potential.mod \
                           data_neighbourCells.mod \
                           module_physics.o \
