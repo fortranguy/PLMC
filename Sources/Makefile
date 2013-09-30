@@ -29,7 +29,6 @@ data.o: data_copy.f90
 # ------------------------------------------------------------------------
 
 module_physics.o : data_precisions.mod data_constants.mod data_box.mod
-class_observables.o : data_precisions.mod data_box.mod data_monteCarlo.mod
 class_neighbourCells.o : data_precisions.mod data_box.mod data_neighbourCells.mod \
                          module_physics.o
 class_hardSpheres.o : data_precisions.mod data_constants.mod data_box.mod data_particles.mod \
@@ -49,6 +48,7 @@ class_mixingPotential.o : data_precisions.mod data_box.mod data_particles.mod da
                           data_neighbourCells.mod \
                           module_physics.o \
                           class_neighbourCells.o class_hardSpheres.o
+class_observables.o : data_precisions.mod data_box.mod data_monteCarlo.mod
 module_algorithms.o : data_precisions.mod data_box.mod data_monteCarlo.mod \
                       module_physics.o \
                       class_observables.mod class_hardSpheres.o class_interactingSpheres.o \
@@ -61,8 +61,6 @@ module_tools.o : data_precisions.mod data_box.mod data_monteCarlo.mod \
 
 module_physics.o : module_physics.f90
 	$(FC) -c $(FFLAGS_OMP) $< -o $@
-class_observables.o : class_observables.f90
-	$(FC) -c $(FFLAGS) $< -o $@
 class_units.o : class_units.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_neighbourCells.o : class_neighbourCells.f90
@@ -75,6 +73,8 @@ class_dipolarSpheres.o : class_dipolarSpheres.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_mixingPotential.o : class_mixingPotential.f90
 	$(FC) -c $(FFLAGS) $< -o $@
+class_observables.o : class_observables.f90
+	$(FC) -c $(FFLAGS) $< -o $@
 module_algorithms.o : module_algorithms.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 module_tools.o : module_tools.f90
@@ -84,9 +84,10 @@ module_tools.o : module_tools.f90
 
 program_monte-carlo.o : program_monte-carlo.f90
 	$(FC) -c $(FFLAGS) $< -o $@
-$(EXEC1) : data.o module_physics.o class_observables.o class_units.o class_neighbourCells.o \
-           class_hardSpheres.o class_interactingSpheres.o class_dipolarSpheres.o \
-           class_mixingPotential.o module_algorithms.o module_tools.o program_monte-carlo.o
+$(EXEC1) : data.o module_physics.o class_units.o class_neighbourCells.o class_hardSpheres.o \
+           class_interactingSpheres.o class_dipolarSpheres.o class_mixingPotential.o \
+           class_observables.o \
+           module_algorithms.o module_tools.o program_monte-carlo.o
 	$(FC) $^ $(LDFLAGS) $(CLDFLAGS) $(LDLIBS) -o $@
 
 # ------------------------------------------------------------------------
