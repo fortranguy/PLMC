@@ -818,8 +818,16 @@ contains
         complex(DP) :: structure_k
         integer :: kx, ky, kz
 
-        xNewOverL(:) = xNew(:)/Lsize(:)
-        xOldOverL(:) = xOld(:)/Lsize(:)
+        xNewOverL(:) = 2._DP * xNew(:)/Lsize(:)
+        xOldOverL(:) = 2._DP * xOld(:)/Lsize(:)
+        
+        call fourier_i(Kmax(1), xNewOverL(1), exp_IkxNew_1)
+        call fourier_i(Kmax(2), xNewOverL(2), exp_IkxNew_2)
+        call fourier_i(Kmax(3), xNewOverL(3), exp_IkxNew_3)
+        
+        call fourier_i(Kmax(1), xOldOverL(1), exp_IkxOld_1)
+        call fourier_i(Kmax(2), xOldOverL(2), exp_IkxOld_2)
+        call fourier_i(Kmax(3), xOldOverL(3), exp_IkxOld_3)
         
         call fourier(xNewOverL, exp_IkxNew_1, exp_IkxNew_2, exp_IkxNew_3)
         call fourier(xOldOverL, exp_IkxOld_1, exp_IkxOld_2, exp_IkxOld_3)
