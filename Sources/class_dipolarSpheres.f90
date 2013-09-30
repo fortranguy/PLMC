@@ -997,7 +997,7 @@ contains
         complex(DP) :: structure_k
         integer :: kx, ky, kz
 
-        xColOverL(:) = 2._DP*PI * xCol(:)/Lsize(:)        
+        xColOverL(:) = 2._DP*PI * xCol(:)/Lsize(:)
         call fourier_i(Kmax(1), xColOverL(1), exp_IkxCol_1)
         call fourier_i(Kmax(2), xColOverL(2), exp_IkxCol_2)
         call fourier_i(Kmax(3), xColOverL(3), exp_IkxCol_3)
@@ -1074,7 +1074,7 @@ contains
         real(DP) :: k_dot_deltaMcol
         integer :: kx, ky, kz
 
-        xColOverL(:) = 2._DP*PI * xCol(:)/Lsize(:)        
+        xColOverL(:) = 2._DP*PI * xCol(:)/Lsize(:)
         call fourier_i(Kmax(1), xColOverL(1), exp_IkxCol_1)
         call fourier_i(Kmax(2), xColOverL(2), exp_IkxCol_2)
         call fourier_i(Kmax(3), xColOverL(3), exp_IkxCol_3)
@@ -1181,7 +1181,7 @@ contains
         complex(DP) :: structure_k
         integer :: kx, ky, kz
         
-        xColOverL(:) = 2._DP*PI * xCol(:)/Lsize(:)        
+        xColOverL(:) = 2._DP*PI * xCol(:)/Lsize(:)
         call fourier_i(Kmax(1), xColOverL(1), exp_IkxCol_1)
         call fourier_i(Kmax(2), xColOverL(2), exp_IkxCol_2)
         call fourier_i(Kmax(3), xColOverL(3), exp_IkxCol_3)
