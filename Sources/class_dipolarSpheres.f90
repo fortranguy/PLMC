@@ -583,10 +583,12 @@ contains
 
         do iCol = 1, this%Ncol
         
-            xColOverL(:) = this%positions(:, iCol)/Lsize(:)
-            mColOverL(:) = this%orientations(:, iCol)/Lsize(:)
+            xColOverL(:) = 2._DP*PI * this%positions(:, iCol)/Lsize(:)            
+            call fourier_i(Kmax(1), xColOverL(1), exp_Ikx_1)
+            call fourier_i(Kmax(2), xColOverL(2), exp_Ikx_2)
+            call fourier_i(Kmax(3), xColOverL(3), exp_Ikx_3)
             
-            call fourier(xColOverL, exp_Ikx_1, exp_Ikx_2, exp_Ikx_3)
+            mColOverL(:) = this%orientations(:, iCol)/Lsize(:)
         
             do kz = -Kmax(3), Kmax(3)
 
@@ -687,9 +689,10 @@ contains
         
         do iCol = 1, this%Ncol
         
-            xColOverL(:) = this%positions(:, iCol)/Lsize(:)
-            
-            call fourier(xColOverL, exp_Ikx_1, exp_Ikx_2, exp_Ikx_3)
+            xColOverL(:) = 2._DP*PI * this%positions(:, iCol)/Lsize(:)            
+            call fourier_i(Kmax(1), xColOverL(1), exp_Ikx_1)
+            call fourier_i(Kmax(2), xColOverL(2), exp_Ikx_2)
+            call fourier_i(Kmax(3), xColOverL(3), exp_Ikx_3)
         
             do kz = -Kmax(3), Kmax(3)
               
