@@ -1181,9 +1181,10 @@ contains
         complex(DP) :: structure_k
         integer :: kx, ky, kz
         
-        xColOverL(:) = xCol(:)/Lsize(:)
-        
-        call fourier(xColOverL, exp_IkxCol_1, exp_IkxCol_2, exp_IkxCol_3)
+        xColOverL(:) = 2._DP*PI * xCol(:)/Lsize(:)        
+        call fourier_i(Kmax(1), xColOverL(1), exp_IkxCol_1)
+        call fourier_i(Kmax(2), xColOverL(2), exp_IkxCol_2)
+        call fourier_i(Kmax(3), xColOverL(3), exp_IkxCol_3)
         
         mColOverL(:) = mCol(:)/Lsize(:)
         
