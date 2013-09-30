@@ -49,7 +49,7 @@ implicit none
     real(DP), parameter :: Lsize3 = Lsize1 ! u_length 
     real(DP), dimension(Ndim), parameter :: Lsize = [Lsize1, Lsize2, Lsize3] ! u_length
     real(DP), dimension(Ndim), parameter :: LsizeMi = 0.5_DP * Lsize ! u_length
-    real(DP), parameter :: Volume = Lsize1 * Lsize2 * Lsize3 ! u_length**3
+    real(DP), parameter :: Volume = Lsize(1) * Lsize(2) * Lsize(3) ! u_length**3
 
     integer, parameter :: Kmax1 = 8 ! 1/u_length
     integer, parameter :: Kmax2 = Kmax1 ! 1/u_length
