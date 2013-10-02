@@ -1,11 +1,19 @@
+# Monte-Carlo simulation Makefile
+
 FC = ifort
-FFLAGS = -fast -openmp # -warn all -check all -check noarg_temp_created #
-LDFLAGS = -fast -openmp # -warn all -check all -check noarg_temp_created #
-FFLAGS_OMP = $(FFLAGS)
-LDFLAGS_OMP = $(LDFLAGS)
-#FC = gfortran
-#FFLAGS = -W -Wall -fbounds-check
-#LDFLAGS = -W -Wall -fbounds-check
+FFLAGS = -warn all -check all -check noarg_temp_created
+
+ifeq ($(compiler), gfortran)
+	FC = gfortran
+	FFLAGS = -W -Wall -fbounds-check
+	ifeq($(mode), release)
+		FFLAGS = -O3 -fopenmp
+	endif
+else
+	ifeq ($(mode), release)
+		FFLAGS = -fast -openmp
+	endif
+endif
 
 EXEC1 = xMC_Canonical
 EXEC2 = xMC_Bunching
@@ -60,7 +68,7 @@ module_tools.o : data_precisions.mod data_box.mod data_monteCarlo.mod \
 # -----------------------------------------------
 
 module_physics.o : module_physics.f90
-	$(FC) -c $(FFLAGS_OMP) $< -o $@
+	$(FC) -c $(FFLAGS) $< -o $@
 class_neighbourCells.o : class_neighbourCells.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_hardSpheres.o : class_hardSpheres.f90
@@ -100,10 +108,10 @@ $(EXEC2) : data.o program_bunching.o
 # ------------------------------------------------------------------------
 
 program_distribution.o : program_distribution.f90
-	$(FC) -c $(FFLAGS_OMP) $< -o $@
+	$(FC) -c $(FFLAGS) $< -o $@
 $(EXEC3) : data.o module_physics.o class_neighbourCells.o class_hardSpheres.o module_algorithms.o \
            class_mixingPotential.o module_tools.o program_distribution.o
-	$(FC) $^ $(LDFLAGS_OMP) -o $@
+	$(FC) $^ $(LDFLAGS) -o $@
 
 # --------------------------------------------------------------------------------------------------
 	
