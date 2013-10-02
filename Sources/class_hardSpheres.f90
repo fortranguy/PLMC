@@ -59,6 +59,7 @@ private
         procedure :: get_name => HardSpheres_get_name
         procedure :: get_Ncol => HardSpheres_get_Ncol
         procedure :: get_rMin => HardSpheres_get_rMin
+        procedure :: get_radius => HardSpheres_get_radius
         procedure :: get_rCut => HardSpheres_get_rCut        
         procedure :: get_move_Nadapt => HardSpheres_get_move_Nadapt
         procedure :: get_move_delta => HardSpheres_get_move_delta
@@ -174,6 +175,17 @@ contains
         get_rMin = this%rMin
     
     end function HardSpheres_get_rMin
+    
+    !> Accessor : radius
+    
+    pure function HardSpheres_get_radius(this) result(get_radius)
+    
+        class(HardSpheres), intent(in) :: this        
+        real(DP) :: get_radius
+        
+        get_radius = this%radius
+    
+    end function HardSpheres_get_radius
     
     !> Accessor : rCut
     
