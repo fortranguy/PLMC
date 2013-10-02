@@ -120,7 +120,7 @@ contains
                 rTest = dist_PBC(type1%positions(:, iColTest), type1%positions(:, iCol))
                 if (rTest < type1%get_rMin()) then
                     goto 7101
-                end if            
+                end if
             end do
         
         end do
@@ -136,14 +136,14 @@ contains
                 rTest = dist_PBC(type1%positions(:, iColTest), type2%positions(:, iCol))
                 if (rTest < mix_rMin) then
                     goto 7102
-                end if            
+                end if
             end do
             
             do iColTest = 1, iCol-1            
                 rTest = dist_PBC(type2%positions(:, iColTest), type2%positions(:, iCol))
                 if (rTest < type2%get_rMin()) then
                     goto 7102
-                end if            
+                end if
             end do
         
         end do
