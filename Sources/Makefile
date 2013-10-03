@@ -104,7 +104,7 @@ $(EXEC1) : data.o module_physics.o class_neighbourCells.o class_hardSpheres.o \
            class_interactingSpheres.o class_dipolarSpheres.o class_mixingPotential.o \
            class_observables.o class_units.o \
            module_algorithms.o module_tools.o program_monte-carlo.o
-	$(FC) $^ $(LDFLAGS) $(CLDFLAGS) $(LDLIBS) -o $@
+	$(FC) $^ $(LDFLAGS) -o $@
 
 # ------------------------------------------------------------------------
 
