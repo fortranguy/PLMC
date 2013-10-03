@@ -46,8 +46,8 @@ private
         real(DP) :: Epot
         
         ! Neighbours (cell/grid scheme)
-        type(NeighbourCells) :: sameCells !< same kind
-        type(NeighbourCells) :: mixCells !< other kind        
+        type(NeighbourCells), public :: sameCells !< same kind
+        type(NeighbourCells) :: mixCells !< other kind
         
     contains
 

@@ -117,8 +117,9 @@ $(EXEC2) : data.o program_bunching.o
 
 program_distribution.o : program_distribution.f90
 	$(FC) -c $(FFLAGS) $< -o $@
-$(EXEC3) : data.o module_physics.o class_neighbourCells.o class_hardSpheres.o module_algorithms.o \
-           class_mixingPotential.o module_tools.o program_distribution.o
+$(EXEC3) : data.o module_physics.o class_neighbourCells.o class_hardSpheres.o \
+           class_interactingSpheres.o class_dipolarSpheres.o class_mixingPotential.o \
+           module_algorithms.o module_tools.o program_distribution.o
 	$(FC) $^ $(LDFLAGS) -o $@
 
 # --------------------------------------------------------------------------------------------------
