@@ -199,7 +199,7 @@ contains
                 stop
             end if
             
-            if (modulo(Lsize(jDim), this%cell_size(jDim)) /= 0) then
+            if (modulo(Lsize(jDim), this%cell_size(jDim)) /= 0._DP) then
                 write(error_unit, *) "  Cell size is not a divisor of the system size"
                 write(error_unit, *) "  in the dimension", jDim, ":"
                 write(error_unit, *) "  Lsize", Lsize(jDim)
