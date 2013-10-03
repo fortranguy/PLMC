@@ -1,28 +1,29 @@
 # Monte-Carlo simulation Makefile
 
-FC = ifort
-FFLAGS = -warn all -check all -check noarg_temp_created
-
 ifeq ($(compiler), gfortran)
 
 	FC = gfortran
 	FFLAGS = -W -Wall -fbounds-check
-	compiler = ifort
 
 	ifeq ($(mode), release)
 		FFLAGS = -O3 -fopenmp
-		mode = debug
 	endif
 
 else
 
+	FC = ifort
+	FFLAGS = -warn all -check all -check noarg_temp_created
+
 	ifeq ($(mode), release)
 		FFLAGS = -fast -openmp
 		LDFLAGS = -openmp
-		mode = debug
 	endif
 	
 endif
+
+# Default
+compiler = ifort
+mode = debug
 
 EXEC1 = xMC_Canonical
 EXEC2 = xMC_Bunching
