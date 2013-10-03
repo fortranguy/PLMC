@@ -804,19 +804,16 @@ contains
         complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxNew_2
         complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_IkxNew_3
         complex(DP) :: exp_IkxNew
-        real(DP) :: cos_kxNew, sin_kxNew
 
         complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxOld_1
         complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxOld_2
         complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_IkxOld_3
         complex(DP) :: exp_IkxOld
-        real(DP) :: cos_kxOld, sin_kxOld
 
-        real(DP) :: realPart1, realPart2
+        real(DP) :: realPart
         
         real(DP), dimension(Ndim) :: waveVector
         real(DP) :: k_dot_mCol
-        complex(DP) :: structure_k
         integer :: kx, ky, kz
 
         xNewOverL(:) = 2._DP*PI * xNew(:)/Lsize(:)
@@ -847,23 +844,14 @@ contains
 
                     k_dot_mCol = dot_product(waveVector, mColOverL)
 
-                    structure_k = this%structureFactor(kx, ky, kz)
-
                     exp_IkxNew = exp_IkxNew_1(kx) * exp_IkxNew_2(ky) * exp_IkxNew_3(kz)
-                    cos_kxNew = real(exp_IkxNew, DP)
-                    sin_kxNew = aimag(exp_IkxNew)
 
                     exp_IkxOld = exp_IkxOld_1(kx) * exp_IkxOld_2(ky) * exp_IkxOld_3(kz)
-                    cos_kxOld = real(exp_IkxOld, DP)
-                    sin_kxOld = aimag(exp_IkxOld)
 
-                    realPart1 = (cos_kxNew - cos_kxOld)
-                    realPart1 = realPart1 * (real(structure_k, DP) - k_dot_mCol * cos_kxOld)
+                    realPart = k_dot_mCol * real((conjg(exp_IkxNew) - conjg(exp_IkxOld)) * &
+                    (this%structureFactor(kx, ky, kz) - cmplx(k_dot_mCol, 0._DP, DP) * exp_IkxOld), DP)
 
-                    realPart2 = (-sin_kxNew + sin_kxOld)
-                    realPart2 = realPart2 * (aimag(structure_k) - k_dot_mCol * sin_kxOld)
-                    
-                    deltaEpot_k = 2._DP*k_dot_mCol * (realPart1 - realPart2) * &
+                    deltaEpot_k = 2._DP * realPart * &
                                   this%Epot_reci_weight(kx, ky, kz)
                     deltaEpot_reci_move = deltaEpot_reci_move + deltaEpot_k
                                                       
