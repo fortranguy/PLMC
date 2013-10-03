@@ -37,7 +37,10 @@ use data_distribution
 use module_physics
 use module_distrib
 use class_hardSpheres
+use class_interactingSpheres
+use class_dipolarSpheres
 use class_mixingPotential
+use module_algorithms
 !$ use omp_lib
 
 implicit none

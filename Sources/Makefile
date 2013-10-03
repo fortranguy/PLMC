@@ -1,17 +1,34 @@
-FC = ifort
-FFLAGS = -fast -openmp # -warn all -check all -check noarg_temp_created #
-LDFLAGS =  -fast -openmp # -warn all -check all -check noarg_temp_created #
-FFLAGS_OMP = $(FFLAGS)
-LDFLAGS_OMP = $(LDFLAGS)
-#FC = gfortran
-#FFLAGS = -W -Wall -fbounds-check
-#LDFLAGS = -W -Wall -fbounds-check
+# Monte-Carlo simulation Makefile
+
+ifeq ($(compiler), gfortran)
+	FC = gfortran
+	FFLAGS = -W -Wall -fbounds-check
+	ifeq ($(mode), release)
+		FFLAGS = -O3 -fopenmp
+		LDFLAGS = -fopenmp
+	endif
+else
+	FC = ifort
+	FFLAGS = -warn all -check all -check noarg_temp_created
+	ifeq ($(mode), release)
+		FFLAGS = -fast -openmp
+		LDFLAGS = -openmp
+	endif
+endif
+
+# Default
+compiler = ifort
+mode = debug
 
 EXEC1 = xMC_Canonical
 EXEC2 = xMC_Bunching
 EXEC3 = xMC_Distrib
 
 all: $(EXEC1) $(EXEC2) $(EXEC3)
+	# Report
+	echo "FC = ${FC}" > make_report.txt
+	echo "FFLAGS = ${FFLAGS}" >> make_report.txt
+	echo "LDFLAGS = ${LDFLAGS}" >> make_report.txt
 
 #---------------------------------------------------------------------------------------------------
 
@@ -60,7 +77,7 @@ module_tools.o : data_precisions.mod data_box.mod data_monteCarlo.mod \
 # -----------------------------------------------
 
 module_physics.o : module_physics.f90
-	$(FC) -c $(FFLAGS_OMP) $< -o $@
+	$(FC) -c $(FFLAGS) $< -o $@
 class_neighbourCells.o : class_neighbourCells.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_hardSpheres.o : class_hardSpheres.f90
@@ -88,7 +105,7 @@ $(EXEC1) : data.o module_physics.o class_neighbourCells.o class_hardSpheres.o \
            class_interactingSpheres.o class_dipolarSpheres.o class_mixingPotential.o \
            class_observables.o class_units.o \
            module_algorithms.o module_tools.o program_monte-carlo.o
-	$(FC) $^ $(LDFLAGS) $(CLDFLAGS) $(LDLIBS) -o $@
+	$(FC) $^ $(LDFLAGS) -o $@
 
 # ------------------------------------------------------------------------
 
@@ -100,10 +117,11 @@ $(EXEC2) : data.o program_bunching.o
 # ------------------------------------------------------------------------
 
 program_distribution.o : program_distribution.f90
-	$(FC) -c $(FFLAGS_OMP) $< -o $@
-$(EXEC3) : data.o module_physics.o class_neighbourCells.o class_hardSpheres.o module_algorithms.o \
-           class_mixingPotential.o module_tools.o program_distribution.o
-	$(FC) $^ $(LDFLAGS_OMP) -o $@
+	$(FC) -c $(FFLAGS) $< -o $@
+$(EXEC3) : data.o module_physics.o class_neighbourCells.o class_hardSpheres.o \
+           class_interactingSpheres.o class_dipolarSpheres.o class_mixingPotential.o \
+           module_algorithms.o module_tools.o program_distribution.o
+	$(FC) $^ $(LDFLAGS) -o $@
 
 # --------------------------------------------------------------------------------------------------
 	

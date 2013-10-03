@@ -41,7 +41,7 @@ contains
         real(DP) :: this_EpotNew_real, this_EpotOld_real
         
         call random_number(random)
-        iOld = int(random*this%Ncol) + 1
+        iOld = int(random*this%get_Ncol()) + 1
         xOld(:) = this%positions(:, iOld)
         
         ! Random new position
@@ -49,7 +49,7 @@ contains
         xNew(:) = xOld(:) + (xRand(:)-0.5_DP)*this%move_delta(:)
         xNew(:) = modulo(xNew(:), Lsize(:))
         
-        if (this%Ncol >= other%Ncol) then        
+        if (this%get_Ncol() >= other%get_Ncol()) then
             this_iCellNew = this%sameCells%index_from_position(xNew)
             call this%Epot_neighCells(iOld, xNew, this_iCellNew, overlap, this_EpotNew)
         else        
@@ -60,7 +60,7 @@ contains
         
         if (.not. overlap) then
         
-            if (this%Ncol >= other%Ncol) then        
+            if (this%get_Ncol() >= other%get_Ncol()) then
                 mix_iCellNew = this%mixCells%index_from_position(xNew)
                 call mix%Epot_neighCells(xNew, mix_iCellNew, this%mixCells, other%positions, overlap, &
                                          mix_EpotNew)
@@ -155,7 +155,7 @@ contains
             call random_number(xRand)
             xTest(:) = Lsize(:) * xRand(:)
 
-            if (this%Ncol >= other%Ncol) then
+            if (this%get_Ncol() >= other%get_Ncol()) then
                 this_iCellTest = this%sameCells%index_from_position(xTest)
                 call this%Epot_neighCells(0, xTest, this_iCellTest, overlap, this_EpotTest)
             else
@@ -166,7 +166,7 @@ contains
             
             if (.not. overlap) then
             
-                if (this%Ncol >= other%Ncol) then
+                if (this%get_Ncol() >= other%get_Ncol()) then
                     mix_iCellTest = this%mixCells%index_from_position(xTest)
                     call mix%Epot_neighCells(xTest, mix_iCellTest, this%mixCells, other%positions, &
                                             overlap, mix_EpotTest)
@@ -216,7 +216,7 @@ contains
         integer :: iTotalCell
         
         call random_number(random)
-        iOld = int(random*this%Ncol) + 1
+        iOld = int(random*this%get_Ncol()) + 1
         
         xCol(:) = this%positions(:, iOld)
         mOld(:) = this%orientations(:, iOld)
