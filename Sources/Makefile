@@ -24,6 +24,10 @@ EXEC2 = xMC_Bunching
 EXEC3 = xMC_Distrib
 
 all: $(EXEC1) $(EXEC2) $(EXEC3)
+	# Report
+	echo "FC = ${FC}" > make_report.txt
+	echo "FFLAGS = ${FFLAGS}" >> make_report.txt
+	echo "LDFLAGS = ${LDFLAGS}" >> make_report.txt
 
 #---------------------------------------------------------------------------------------------------
 
