@@ -7,9 +7,11 @@
 !***************************************************************************************************
 module data_precisions
 
+use, intrinsic :: iso_fortran_env
+
 implicit none
 
-    integer, parameter :: DP = selected_real_kind(15, 307) !< double precision
+    integer, parameter :: DP = REAL64 !< double precision
     real(DP), parameter :: io_tiny = 1.E-10_DP
     real(DP), parameter :: consist_tiny = 1.E-10_DP
 
