@@ -5,6 +5,7 @@ ifeq ($(compiler), gfortran)
 	FFLAGS = -W -Wall -fbounds-check
 	ifeq ($(mode), release)
 		FFLAGS = -O3 -fopenmp
+		LDFLAGS = -fopenmp
 	endif
 else
 	FC = ifort
