@@ -12,7 +12,7 @@ else
 	ifeq ($(mode), release)
 		FFLAGS = -fast -openmp
 		LDFLAGS = -openmp
-	endif	
+	endif
 endif
 
 # Default
