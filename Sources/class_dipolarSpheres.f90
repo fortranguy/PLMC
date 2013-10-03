@@ -977,13 +977,11 @@ contains
         complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxCol_2
         complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_IkxCol_3
         complex(DP) :: exp_IkxCol
-        real(DP) :: cos_kxCol, sin_kxCol
 
-        real(DP) :: realPart, realPart1, realPart2
+        real(DP) :: realPart
         
         real(DP), dimension(Ndim) :: waveVector
         real(DP) :: k_dot_mNew, k_dot_mOld
-        complex(DP) :: structure_k
         integer :: kx, ky, kz
 
         xColOverL(:) = 2._DP*PI * xCol(:)/Lsize(:)
@@ -1009,23 +1007,15 @@ contains
                     waveVector(1) = real(kx, DP)
 
                     k_dot_mNew = dot_product(waveVector, mNewOverL)
-
                     k_dot_mOld = dot_product(waveVector, mOldOverL)
 
-                    structure_k = this%structureFactor(kx, ky, kz)
-
                     exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky) * exp_IkxCol_3(kz)
-                    cos_kxCol = real(exp_IkxCol, DP)
-                    sin_kxCol = aimag(exp_IkxCol)
 
-                    realPart1 = cos_kxCol * (real(structure_k, DP)-k_dot_mOld*cos_kxCol)
-                    realPart2 = sin_kxCol * (aimag(structure_k)-k_dot_mOld*sin_kxCol)
+                    realPart = k_dot_mNew**2 - k_dot_mOld**2
+                    realPart = realPart + 2._DP * (k_dot_mNew - k_dot_mOld) * real(conjg(exp_IkxCol) * &
+                    (this%structureFactor(kx, ky, kz) - k_dot_mOld * exp_IkxCol), DP)
 
-                    realPart = realPart1 + realPart2
-
-                    deltaEpot_k = k_dot_mNew**2 - k_dot_mOld**2
-                    deltaEpot_k = deltaEpot_k + 2._DP*(k_dot_mNew - k_dot_mOld) * realPart
-                    deltaEpot_k = deltaEpot_k * this%Epot_reci_weight(kx, ky, kz)
+                    deltaEpot_k = this%Epot_reci_weight(kx, ky, kz) * realPart
                     deltaEpot_reci_rotate = deltaEpot_reci_rotate + deltaEpot_k
 
                 end do
