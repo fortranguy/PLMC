@@ -360,7 +360,7 @@ contains
                                        2._DP*alpha/sqrt(PI) * exp(-alpha**2*r_i**2) / r_i**2
                                  
             this%Epot_real_tab(i, 2) = 3._DP*erfc(alpha*r_i)/r_i**5 + &
-                                       2._DP*alpha/sqrt(PI) * (2_DP*alpha**2+3._DP/r_i**2) * &
+                                       2._DP*alpha/sqrt(PI) * (2._DP*alpha**2+3._DP/r_i**2) * &
                                                               exp(-alpha**2*r_i**2) / r_i**2
                                     
         end do
