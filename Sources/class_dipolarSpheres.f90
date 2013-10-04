@@ -785,8 +785,6 @@ contains
         real(DP), dimension(:), intent(in) :: mCol
         real(DP) :: deltaEpot_reci_move
         
-        real(DP) :: deltaEpot_k
-
         real(DP), dimension(Ndim) :: xNewOverL, xOldOverL
         real(DP), dimension(Ndim) :: mColOverL
 
@@ -831,20 +829,16 @@ contains
                 do kx = -Kmax1_sym(ky, kz), Kmax(1)
 
                     waveVector(1) = real(kx, DP)
-
                     k_dot_mCol = dot_product(waveVector, mColOverL)
 
                     exp_IkxNew = exp_IkxNew_1(kx) * exp_IkxNew_2(ky) * exp_IkxNew_3(kz)
-
                     exp_IkxOld = exp_IkxOld_1(kx) * exp_IkxOld_2(ky) * exp_IkxOld_3(kz)
 
                     realPart = k_dot_mCol * real((conjg(exp_IkxNew) - conjg(exp_IkxOld)) * &
                     (this%structureFactor(kx, ky, kz) - cmplx(k_dot_mCol, 0._DP, DP) * exp_IkxOld), DP)
 
-                    deltaEpot_k = 2._DP * realPart * &
-                                  this%Epot_reci_weight(kx, ky, kz)
-                    deltaEpot_reci_move = deltaEpot_reci_move + deltaEpot_k
-                                                      
+                    deltaEpot_reci_move = deltaEpot_reci_move + &
+                                          2._DP * this%Epot_reci_weight(kx, ky, kz) * realPart
 
                 end do
             
@@ -909,7 +903,6 @@ contains
                 do kx = -Kmax1_sym(ky, kz), Kmax(1)
 
                     waveVector(1) = real(kx, DP)
-
                     k_dot_mCol = dot_product(waveVector, mColOverL)
 
                     exp_IkxNew = exp_IkxNew_1(kx) * exp_IkxNew_2(ky) * exp_IkxNew_3(kz)
@@ -945,8 +938,6 @@ contains
         real(DP), dimension(:), intent(in) :: xCol
         real(DP), dimension(:), intent(in) :: mOld, mNew
         real(DP) :: deltaEpot_reci_rotate
-
-        real(DP) :: deltaEpot_k
 
         real(DP), dimension(Ndim) :: xColOverL
         real(DP), dimension(Ndim) :: mNewOverL, mOldOverL
@@ -993,8 +984,8 @@ contains
                     realPart = realPart + 2._DP * (k_dot_mNew - k_dot_mOld) * real(conjg(exp_IkxCol) * &
                     (this%structureFactor(kx, ky, kz) - k_dot_mOld * exp_IkxCol), DP)
 
-                    deltaEpot_k = this%Epot_reci_weight(kx, ky, kz) * realPart
-                    deltaEpot_reci_rotate = deltaEpot_reci_rotate + deltaEpot_k
+                    deltaEpot_reci_rotate = deltaEpot_reci_rotate + &
+                                            this%Epot_reci_weight(kx, ky, kz) * realPart
 
                 end do
 
@@ -1050,10 +1041,9 @@ contains
                 do kx = -Kmax1_sym(ky, kz), Kmax(1)
 
                     waveVector(1) = real(kx, DP)
+                    k_dot_deltaMcol = dot_product(waveVector, mNewOverL - mOldOverL)
 
                     exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky) * exp_IkxCol_3(kz)
-
-                    k_dot_deltaMcol = dot_product(waveVector, mNewOverL - mOldOverL)
 
                     this%structureFactor(kx, ky, kz) = this%structureFactor(kx, ky, kz) + &
                         cmplx(k_dot_deltaMcol, 0._DP, DP) * exp_IkxCol
@@ -1089,8 +1079,6 @@ contains
         real(DP), dimension(:), intent(in) :: mCol
         real(DP) :: deltaEpot_reci_exchange
         
-        real(DP) :: deltaEpot_k
-        
         real(DP), dimension(Ndim) :: xColOverL
         real(DP), dimension(Ndim) :: mColOverL
         
@@ -1124,8 +1112,7 @@ contains
             
                 do kx = -Kmax1_sym(ky, kz), Kmax(1)
                 
-                    waveVector(1) = real(kx, DP)
-                    
+                    waveVector(1) = real(kx, DP)                    
                     k_dot_mCol = dot_product(waveVector, mColOverL)
                                                   
                     exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky) * exp_IkxCol_3(kz)
@@ -1133,8 +1120,8 @@ contains
                     realPart = k_dot_mCol * (k_dot_mCol + 2._DP * &
                     real(this%structureFactor(kx, ky, kz) * conjg(exp_IkxCol), DP))
 
-                    deltaEpot_k = this%Epot_reci_weight(kx, ky, kz) * realPart
-                    deltaEpot_reci_exchange = deltaEpot_reci_exchange + deltaEpot_k
+                    deltaEpot_reci_exchange = deltaEpot_reci_exchange + &
+                                              this%Epot_reci_weight(kx, ky, kz) * realPart
                    
                 end do
             
