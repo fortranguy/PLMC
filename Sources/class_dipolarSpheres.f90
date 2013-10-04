@@ -1381,4 +1381,3 @@ contains
     end subroutine DipolarSpheres_test_consist
 
 end module class_dipolarSpheres
-
