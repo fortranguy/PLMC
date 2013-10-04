@@ -777,16 +777,6 @@ contains
     !>               ]
     !> \f]
 
-    !> Implementation :
-    !> \f[
-    !>  \Delta M^2 = 2(\vec{\mu_l}\cdot\vec{k})
-    !>              [\cos(\vec{k}\cdot\vec{x}^\prime_l) - \cos(\vec{k}\cdot\vec{x}_l)]
-    !>              [\Re(S(\vec{k})) - (\vec{k}\cdot\vec{\mu}_l) \cos(\vec{k}\cdot\vec{x}_l)] -
-    !>              [-\sin(\vec{k}\cdot\vec{x}^\prime_l) + \sin(\vec{k}\cdot\vec{x}_l)]
-    !>              [\Im(S(\vec{k})) - (\vec{k}\cdot\vec{\mu}_l) \sin(\vec{k}\cdot\vec{x}_l)]
-    !> \f]
-    !>
-
     pure function DipolarSpheres_deltaEpot_reci_move(this, xOld, xNew, mCol) &
                   result(deltaEpot_reci_move)
 
@@ -948,18 +938,6 @@ contains
     !>               \}
     !> \f]
     
-    !> Implementation :
-    !> \f[
-    !>  \Delta M^2 = (\vec{k} \cdot \vec{\mu}_l^\prime)^2 - (\vec{k} \cdot \vec{\mu}_l)^2 +
-    !>               2 [(\vec{k} \cdot \vec{\mu}_l^\prime) - (\vec{k} \cdot \vec{\mu}_l)]
-    !>               \{
-    !>                  \cos(\vec{k} \cdot \vec{x}_l)[\Re(S(\vec{k})) -
-    !>                      (\vec{k} \cdot \vec{\mu}_l) \cos(\vec{k} \cdot \vec{x}_l)] +
-    !>                  \sin(\vec{k} \cdot \vec{x}_l)[\Im(S(\vec{k})) -
-    !>                      (\vec{k} \cdot \vec{\mu}_l) \sin(\vec{k} \cdot \vec{x}_l)]
-    !>               \}
-    !> \f]
-
     pure function DipolarSpheres_deltaEpot_reci_rotate(this, xCol, mOld, mNew) &
                   result(deltaEpot_reci_rotate)
 
@@ -1098,37 +1076,6 @@ contains
     !>                          \{
     !>                              (\vec{k} \cdot +\vec{\mu}_{N+1}) + 
     !>                              2\Re[S(\vec{k}) e^{-i \vec{k} \cdot \vec{x}_{N+1}}]
-    !>                          \}
-    !> \f]
-    
-    !> Implementation :
-    !> \f[ \Delta U^{N+1} = \frac{2\pi}{V} \sum_{\vec{k} \neq \vec{0}}
-    !>                          (\vec{k} \cdot +\vec{\mu}_{N+1}) w(\alpha, \vec{k})
-    !>                          \{
-    !>                              (\vec{k} \cdot +\vec{\mu}_{N+1}) +
-    !>                              2 [\Re(S(\vec{k})) \cos(\vec{k} \cdot \vec{x}_{N+1}) +
-    !>                                 \Im(S(\vec{k})) \sin(\vec{k} \cdot \vec{x}_{N+1})]
-    !>                          \}
-    !> \f]
-    
-    !> Subtraction : 
-    
-    !> Difference of Energy 
-    !> \f[ \Delta U_{N-1} = \frac{2\pi}{V} \sum_{\vec{k} \neq \vec{0}} 
-    !>                          (\vec{k} \cdot -\vec{\mu}_N) w(\alpha, \vec{k})
-    !>                          \{
-    !>                              (\vec{k} \cdot -\vec{\mu}_N) + 
-    !>                              2\Re[S_N(\vec{k}) e^{-i \vec{k} \cdot \vec{x}_N}]
-    !>                          \}
-    !> \f]
-    
-    !> Implementation :
-    !> \f[ \Delta _{N-1} = \frac{2\pi}{V} \sum_{\vec{k} \neq \vec{0}}
-    !>                          (\vec{k} \cdot -\vec{\mu}_N) w(\alpha, \vec{k})
-    !>                          \{
-    !>                              (\vec{k} \cdot -\vec{\mu}_N) +
-    !>                              2 [\Re(S_N(\vec{k})) \cos(\vec{k} \cdot \vec{x}_N) +
-    !>                                 \Im(S_N(\vec{k})) \sin(\vec{k} \cdot \vec{x}_N)]
     !>                          \}
     !> \f]
     
