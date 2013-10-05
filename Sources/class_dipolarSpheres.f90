@@ -183,10 +183,6 @@ contains
         if (allocated(this%Epot_real_tab)) then
             deallocate(this%Epot_real_tab)
         endif
-
-        if (allocated(this%Epot_reci_potential))then
-            deallocate(this%Epot_reci_potential)
-        end if
         
         call this%sameCells%destroy()
         call this%mixCells%destroy()
@@ -1073,8 +1069,8 @@ contains
 
                 do kx = -Kmax(1), Kmax(1)
 
-                    Epot_reci = Epot_reci + this%Epot_reci_weight(kx, ky, kz) *
-                                real(this%structure(kx, ky, kz) * conj(this%structure(kx, ky, kz)), DP)
+                    Epot_reci = Epot_reci + this%Epot_reci_weight(kx, ky, kz) * &
+                                real(this%structure(kx, ky, kz)*conjg(this%structure(kx, ky, kz)), DP)
         
                 end do
 
