@@ -58,9 +58,11 @@ private
         !> Accessors
         procedure :: get_name => HardSpheres_get_name
         procedure :: get_Ncol => HardSpheres_get_Ncol
+        procedure :: get_Nwidom => HardSpheres_get_Nwidom
         procedure :: get_rMin => HardSpheres_get_rMin
         procedure :: get_radius => HardSpheres_get_radius
-        procedure :: get_rCut => HardSpheres_get_rCut        
+        procedure :: get_rCut => HardSpheres_get_rCut
+        procedure :: get_Epot => HardSpheres_get_Epot
         procedure :: get_move_Nadapt => HardSpheres_get_move_Nadapt
         procedure :: get_move_delta => HardSpheres_get_move_delta
         !> Specifier        
@@ -164,6 +166,17 @@ contains
         get_Ncol = this%Ncol
     
     end function HardSpheres_get_Ncol
+
+    !> Accessor : Nwidom
+
+    pure function HardSpheres_get_Nwidom(this) result(get_Nwidom)
+
+        class(HardSpheres), intent(in) :: this
+        integer :: get_Nwidom
+
+        get_Nwidom = this%Nwidom
+
+    end function HardSpheres_get_Nwidom
     
     !> Accessor : rMin
     
@@ -197,6 +210,17 @@ contains
         get_rCut = this%rCut
     
     end function HardSpheres_get_rCut
+
+    !> Accessor : Epot
+
+    pure function HardSpheres_get_Epot(this) result(get_Epot)
+
+        class(HardSpheres), intent(in) :: this
+        real(DP) :: get_Epot
+
+        get_Epot = this%Epot
+
+    end function HardSpheres_get_Epot
     
     !> Accessor : move_Nadapt
     
