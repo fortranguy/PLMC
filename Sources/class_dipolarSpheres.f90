@@ -46,8 +46,7 @@ private
         real(DP), dimension(:, :), allocatable :: Epot_real_tab !< tabulation : real short-range
         real(DP), dimension(-Kmax(1):Kmax(1), -Kmax(2):Kmax(2), -Kmax(3):Kmax(3)) :: Epot_reci_weight
         integer :: NwaveVectors
-        complex(DP), dimension(-Kmax(1):Kmax(1), -Kmax(2):Kmax(2), -Kmax(3):Kmax(3)) :: structureFactor
-        complex(DP), dimension(:, :), allocatable :: Epot_reci_potential
+        complex(DP), dimension(-Kmax(1):Kmax(1), -Kmax(2):Kmax(2), -Kmax(3):Kmax(3)) :: structure
         real(DP), dimension(Ndim) :: totalMoment
         
     contains
@@ -81,11 +80,9 @@ private
         !>     Reciprocal : init
         procedure :: Epot_reci_init => DipolarSpheres_Epot_reci_init
         procedure, private :: Epot_reci_init_weight => DipolarSpheres_Epot_reci_init_weight
-        procedure, private :: Epot_reci_init_structure => DipolarSpheres_Epot_reci_init_structure
         procedure, private :: Epot_reci_get_structure_modulus => &
                               DipolarSpheres_Epot_reci_get_structure_modulus
         procedure :: Epot_reci_reInit_structure => DipolarSpheres_Epot_reci_reInit_structure
-        procedure, private :: Epot_reci_init_potential => DipolarSpheres_Epot_reci_init_potential
         procedure :: Epot_reci_count_waveVectors => DipolarSpheres_Epot_reci_count_waveVectors
         !>     Reciprocal : delta
         procedure :: deltaEpot_reci_move => DipolarSpheres_deltaEpot_reci_move
@@ -161,7 +158,6 @@ contains
         allocate(this%Epot_real_tab(this%iMin:this%iCut, 2))
         call this%Epot_real_init()
 
-        allocate(this%Epot_reci_potential(Ndim, this%Ncol))
         call this%Epot_reci_init_weight()
         
         ! Neighbour Cells
@@ -501,17 +497,6 @@ contains
 
     ! Reciprocal : long-range interaction ----------------------------------------------------------
     
-    !> Initialisation of the ``potential'' and the ``structure factor''
-
-    subroutine DipolarSpheres_Epot_reci_init(this)
-
-        class(DipolarSpheres), intent(inout) :: this
-
-        call this%Epot_reci_init_structure()
-        call this%Epot_reci_init_potential()
-
-    end subroutine
-    
     !> \f[ 
     !>      w(\alpha, \vec{k}) = \frac{e^{-\frac{\pi^2}{\alpha^2} \sum_d \frac{k_d^2}{L_d}}}
     !>                                {\sum_d \frac{k_d^2}{L_d}}
@@ -563,7 +548,7 @@ contains
     !>      S_l(\vec{k}) = \sum_{i \neq l} (\vec{k}\cdot\vec{\mu}_i) e^{+i\vec{k}\cdot\vec{x}_i}
     !> \f].
 
-    subroutine DipolarSpheres_Epot_reci_init_structure(this)
+    subroutine DipolarSpheres_Epot_reci_init(this)
 
         class(DipolarSpheres), intent(inout) :: this
 
@@ -578,7 +563,7 @@ contains
         integer :: kx, ky, kz
         integer :: iCol
 
-        this%structureFactor(:, :, :) = cmplx(0._DP, 0._DP, DP)
+        this%structure(:, :, :) = cmplx(0._DP, 0._DP, DP)
 
         do iCol = 1, this%Ncol
         
@@ -605,8 +590,8 @@ contains
                 
                 k_dot_mCol = dot_product(waveVector, mColOverL)
                           
-                this%structureFactor(kx, ky, kz) = this%structureFactor(kx, ky, kz) + &
-                                                   cmplx(k_dot_mCol, 0._DP, DP) * exp_IkxCol
+                this%structure(kx, ky, kz) = this%structure(kx, ky, kz) + &
+                                             cmplx(k_dot_mCol, 0._DP, DP) * exp_IkxCol
             
             end do
             
@@ -616,7 +601,7 @@ contains
             
         end do
 
-    end subroutine DipolarSpheres_Epot_reci_init_structure
+    end subroutine DipolarSpheres_Epot_reci_init
     
     !> To calculate the drift of the strucutre factor
 
@@ -635,7 +620,7 @@ contains
                 do kx = -Kmax1_sym(ky, kz), Kmax(1)
                 
                     Epot_reci_get_structure_modulus = Epot_reci_get_structure_modulus + &
-                                                  abs(this%structureFactor(kx, ky, kz))
+                                                      abs(this%structure(kx, ky, kz))
 
                 end do
             end do
@@ -654,74 +639,12 @@ contains
         real(DP) :: modulus_drifted, modulus_reInit
         
         modulus_drifted = this%Epot_reci_get_structure_modulus()
-        call this%Epot_reci_init_structure()
+        call this%Epot_reci_init()
         modulus_reInit = this%Epot_reci_get_structure_modulus()
         
         write(modulus_unit, *) iStep, abs(modulus_reInit - modulus_drifted)
     
     end subroutine DipolarSpheres_Epot_reci_reInit_structure
-    
-    !> Potential initialisation :
-    !> \f[
-    !>      \vec{\phi}(\vec{x}_j) = \sum_{\vec{k}\neq\vec{0}} \vec{k} w(\alpha, \vec{k}) S(\vec{k})
-    !>                              e^{-i\vec{k}\cdot\vec{x}_j}
-    !> \f]
-    
-    subroutine DipolarSpheres_Epot_reci_init_potential(this)
-    
-        class(DipolarSpheres), intent(inout) :: this
-        
-        complex(DP) :: conjg_exp_IkxCol
-        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_Ikx_1
-        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_Ikx_2
-        complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_Ikx_3
-        complex(DP) :: Epot_reci_weight
-
-        complex(DP), dimension(Ndim) :: potential_k
-        real(DP), dimension(Ndim) :: xColOverL
-        real(DP), dimension(Ndim) :: waveVector
-        integer :: kx, ky, kz
-        integer :: iCol
-        
-        this%Epot_reci_potential(:, :) = cmplx(0._DP, 0._DP, DP)
-        
-        do iCol = 1, this%Ncol
-        
-            xColOverL(:) = 2._DP*PI * this%positions(:, iCol)/Lsize(:)            
-            call fourier_i(Kmax(1), xColOverL(1), exp_Ikx_1)
-            call fourier_i(Kmax(2), xColOverL(2), exp_Ikx_2)
-            call fourier_i(Kmax(3), xColOverL(3), exp_Ikx_3)
-        
-            do kz = -Kmax(3), Kmax(3)
-              
-                waveVector(3) = real(kz, DP)
-            
-            do ky = -Kmax(2), Kmax(2)
-                  
-                waveVector(2) = real(ky, DP)
-            
-            do kx = -Kmax(1), Kmax(1)
-                  
-                waveVector(1) = real(kx, DP)
-            
-                conjg_exp_IkxCol = conjg(exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz))
-
-                Epot_reci_weight = cmplx(this%Epot_reci_weight(kx, ky, kz), 0._DP, DP)
-
-                potential_k(:) = cmplx(waveVector(:), 0._DP, DP) * Epot_reci_weight * &
-                                 this%structureFactor(kx, ky, kz)
-                
-                this%Epot_reci_potential(:, iCol) = this%Epot_reci_potential(:, iCol) + &
-                                                    potential_k(:) * conjg_exp_IkxCol
-
-                
-            end do
-            end do
-            end do
-            
-        end do
-        
-    end subroutine DipolarSpheres_Epot_reci_init_potential
 
     ! Count the number of wave vectors
 
@@ -835,7 +758,7 @@ contains
                     exp_IkxOld = exp_IkxOld_1(kx) * exp_IkxOld_2(ky) * exp_IkxOld_3(kz)
 
                     realPart = k_dot_mCol * real((conjg(exp_IkxNew) - conjg(exp_IkxOld)) * &
-                    (this%structureFactor(kx, ky, kz) - cmplx(k_dot_mCol, 0._DP, DP) * exp_IkxOld), DP)
+                    (this%structure(kx, ky, kz) - cmplx(k_dot_mCol, 0._DP, DP) * exp_IkxOld), DP)
 
                     deltaEpot_reci_move = deltaEpot_reci_move + &
                                           2._DP * this%Epot_reci_weight(kx, ky, kz) * realPart
@@ -908,7 +831,7 @@ contains
                     exp_IkxNew = exp_IkxNew_1(kx) * exp_IkxNew_2(ky) * exp_IkxNew_3(kz)
                     exp_IkxOld = exp_IkxOld_1(kx) * exp_IkxOld_2(ky) * exp_IkxOld_3(kz)
                                                           
-                    this%structureFactor(kx, ky, kz) = this%structureFactor(kx, ky, kz) + &
+                    this%structure(kx, ky, kz) = this%structure(kx, ky, kz) + &
                         cmplx(k_dot_mCol, 0._DP, DP) * (exp_IkxNew - exp_IkxOld)
 
                 end do
@@ -982,7 +905,7 @@ contains
 
                     realPart = k_dot_mNew**2 - k_dot_mOld**2
                     realPart = realPart + 2._DP * (k_dot_mNew - k_dot_mOld) * real(conjg(exp_IkxCol) * &
-                    (this%structureFactor(kx, ky, kz) - k_dot_mOld * exp_IkxCol), DP)
+                    (this%structure(kx, ky, kz) - k_dot_mOld * exp_IkxCol), DP)
 
                     deltaEpot_reci_rotate = deltaEpot_reci_rotate + &
                                             this%Epot_reci_weight(kx, ky, kz) * realPart
@@ -1045,7 +968,7 @@ contains
 
                     exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky) * exp_IkxCol_3(kz)
 
-                    this%structureFactor(kx, ky, kz) = this%structureFactor(kx, ky, kz) + &
+                    this%structure(kx, ky, kz) = this%structure(kx, ky, kz) + &
                         cmplx(k_dot_deltaMcol, 0._DP, DP) * exp_IkxCol
 
                 end do
@@ -1118,7 +1041,7 @@ contains
                     exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky) * exp_IkxCol_3(kz)
                     
                     realPart = k_dot_mCol * (k_dot_mCol + 2._DP * &
-                    real(this%structureFactor(kx, ky, kz) * conjg(exp_IkxCol), DP))
+                    real(this%structure(kx, ky, kz) * conjg(exp_IkxCol), DP))
 
                     deltaEpot_reci_exchange = deltaEpot_reci_exchange + &
                                               this%Epot_reci_weight(kx, ky, kz) * realPart
@@ -1139,20 +1062,24 @@ contains
         
         class(DipolarSpheres), intent(in) :: this
         real(DP) :: Epot_reci
-        
-        integer :: jCol
-        real(DP), dimension(Ndim) :: mColOverL
-        real(DP), dimension(Ndim) :: real_potential
+
+        integer :: kx, ky, kz
 
         Epot_reci = 0._DP
 
-        do jCol = 1, this%Ncol
+        do kz = -Kmax(3), Kmax(3)
 
-            mColOverL(:) = this%orientations(:, jCol)/Lsize(:)
-            real_potential(:) = real(this%Epot_reci_potential(:, jCol), DP)
+            do ky = -Kmax(2), Kmax(2)
 
-            Epot_reci = Epot_reci + dot_product(mColOverL, real_potential)
+                do kx = -Kmax(1), Kmax(1)
+
+                    Epot_reci = Epot_reci + this%Epot_reci_weight(kx, ky, kz) *
+                                real(this%structure(kx, ky, kz) * conj(this%structure(kx, ky, kz)), DP)
         
+                end do
+
+            end do
+
         end do
         
         Epot_reci = 2._DP*PI/Volume * Epot_reci
