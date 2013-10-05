@@ -150,7 +150,7 @@ contains
         
         widTestSum = 0._DP
         
-        do iWidom = 1, this%Nwidom           
+        do iWidom = 1, this%get_Nwidom()
             
             call random_number(xRand)
             xTest(:) = Lsize(:) * xRand(:)
@@ -195,7 +195,7 @@ contains
             
         end do
         
-        this_obs%activ = widTestSum/real(this%Nwidom, DP)
+        this_obs%activ = widTestSum/real(this%get_Nwidom(), DP)
         
     end subroutine widom
     
