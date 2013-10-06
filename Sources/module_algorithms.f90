@@ -237,7 +237,7 @@ contains
         if (random < exp(-deltaEpot/Temperature)) then
         
             call this%deltaEpot_reci_rotate_update_structure(xCol, mOld, mNew)
-            call this%deltaEpot_bound_rotate_update_totalMoment(mOld, mNew)
+            call this%update_totalMoment_rotate(mOld, mNew)
             this%orientations(:, iOld) = mNew(:)
             
             obs%Epot = obs%Epot + deltaEpot

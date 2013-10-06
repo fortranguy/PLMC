@@ -100,13 +100,10 @@ private
         !>     Total moment
         procedure :: init_totalMoment => DipolarSpheres_init_totalMoment
         procedure :: reInit_totalMoment => DipolarSpheres_reInit_totalMoment
+        procedure :: update_totalMoment_rotate => DipolarSpheres_update_totalMoment_rotate
         !>     Boundary conditions
         procedure :: deltaEpot_bound_rotate => DipolarSpheres_deltaEpot_bound_rotate
-        procedure :: deltaEpot_bound_rotate_update_totalMoment => &
-                              DipolarSpheres_deltaEpot_bound_rotate_update_totalMoment
         procedure :: deltaEpot_bound_exchange => DipolarSpheres_deltaEpot_bound_exchange
-        procedure :: deltaEpot_bound_exchange_update_totalMoment => &
-                              DipolarSpheres_deltaEpot_bound_exchange_update_totalMoment
         procedure, private :: Epot_bound => DipolarSpheres_Epot_bound
         !>     Total
         procedure :: Epot_conf => DipolarSpheres_Epot_conf
@@ -1155,6 +1152,22 @@ contains
 
     end subroutine DipolarSpheres_reInit_totalMoment
 
+    !> Rotation
+
+    !> Update the total moment
+    !> \f[
+    !>      \Delta \vec{M} = \vec{\mu}^\prime_l - \vec{\mu}_l
+    !> \f]
+
+    subroutine DipolarSpheres_update_totalMoment_rotate(this, mOld, mNew)
+
+        class(DipolarSpheres), intent(inout) :: this
+        real(DP), dimension(:), intent(in) :: mOld, mNew
+
+        this%totalMoment(:) = this%totalMoment(:) + mNew(:) - mOld(:)
+
+    end subroutine DipolarSpheres_update_totalMoment_rotate
+
     ! Boundary conditions : shape-dependent -------------------------------------------------------
     
     !> Exchange
@@ -1190,27 +1203,6 @@ contains
     
     end function DipolarSpheres_deltaEpot_bound_exchange
     
-    !> Exchange
-    
-    !> Update the total moment : add
-    !> \f[
-    !>      \Delta \vec{M} = +\vec{\mu}_l
-    !> \f]
-    
-    !> Update the total moment : remove
-    !> \f[
-    !>      \Delta \vec{M} = -\vec{\mu}_l
-    !> \f]  
-    
-    subroutine DipolarSpheres_deltaEpot_bound_exchange_update_totalMoment(this, mCol)
-    
-        class(DipolarSpheres), intent(inout) :: this
-        real(DP), dimension(:), intent(in) :: mCol
-        
-        this%totalMoment(:) = this%totalMoment(:) + mCol(:)
-    
-    end subroutine DipolarSpheres_deltaEpot_bound_exchange_update_totalMoment
-    
     !> Rotation
     
     !> Difference of Energy
@@ -1236,22 +1228,6 @@ contains
                                  deltaEpot_bound_rotate
     
     end function DipolarSpheres_deltaEpot_bound_rotate
-    
-    !> Rotation
-    
-    !> Update the total moment
-    !> \f[
-    !>      \Delta \vec{M} = \vec{\mu}^\prime_l - \vec{\mu}_l
-    !> \f]    
-    
-    subroutine DipolarSpheres_deltaEpot_bound_rotate_update_totalMoment(this, mOld, mNew)
-    
-        class(DipolarSpheres), intent(inout) :: this
-        real(DP), dimension(:), intent(in) :: mOld, mNew
-        
-        this%totalMoment(:) = this%totalMoment(:) + mNew(:) - mOld(:)
-    
-    end subroutine DipolarSpheres_deltaEpot_bound_rotate_update_totalMoment
     
     !> Total shape dependent term
     !> \f[
