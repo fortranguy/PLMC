@@ -97,15 +97,16 @@ private
         !>     Self
         procedure :: Epot_self_solo => DipolarSpheres_Epot_self_solo
         procedure, private :: Epot_self => DipolarSpheres_Epot_self
+        !>     Total moment
+        procedure :: init_totalMoment => DipolarSpheres_init_totalMoment
+        procedure :: reInit_totalMoment => DipolarSpheres_reInit_totalMoment
         !>     Boundary conditions
-        procedure :: Epot_bound_init_totalMoment => DipolarSpheres_Epot_bound_init_totalMoment
         procedure :: deltaEpot_bound_rotate => DipolarSpheres_deltaEpot_bound_rotate
         procedure :: deltaEpot_bound_rotate_update_totalMoment => &
                               DipolarSpheres_deltaEpot_bound_rotate_update_totalMoment
         procedure :: deltaEpot_bound_exchange => DipolarSpheres_deltaEpot_bound_exchange
         procedure :: deltaEpot_bound_exchange_update_totalMoment => &
                               DipolarSpheres_deltaEpot_bound_exchange_update_totalMoment
-        procedure :: Epot_bound_reInit_totalMoment => DipolarSpheres_Epot_bound_reInit_totalMoment
         procedure, private :: Epot_bound => DipolarSpheres_Epot_bound
         !>     Total
         procedure :: Epot_conf => DipolarSpheres_Epot_conf
@@ -1113,14 +1114,14 @@ contains
         end do
         
     end function DipolarSpheres_Epot_self
-    
-    ! Boundary conditions : shape-dependent -------------------------------------------------------
-    
+
+    ! Total moment ---------------------------------------------------------------------------------
+
     !> Total dipole moment :
     !> \f[ \vec{M} = \sum_j \vec{\mu}_j \f]
     !> \f[ \vec{M}_l = \sum_{j \neq l} \vec{\mu}_j \f]
     
-    subroutine DipolarSpheres_Epot_bound_init_totalMoment(this)
+    subroutine DipolarSpheres_init_totalMoment(this)
     
         class(DipolarSpheres), intent(inout) :: this
         
@@ -1134,7 +1135,27 @@ contains
         
         end do        
     
-    end subroutine DipolarSpheres_Epot_bound_init_totalMoment
+    end subroutine DipolarSpheres_init_totalMoment
+
+    !> Reinitialise the total moment factor and print the drift
+
+    subroutine DipolarSpheres_reInit_totalMoment(this, iStep, modulus_unit)
+
+        class(DipolarSpheres), intent(inout) :: this
+        integer, intent(in) :: iStep
+        integer, intent(in) :: modulus_unit
+
+        real(DP) :: modulus_drifted, modulus_reInit
+
+        modulus_drifted = norm2(this%totalMoment(:))
+        call this%init_totalMoment()
+        modulus_reInit = norm2(this%totalMoment(:))
+
+        write(modulus_unit, *) iStep, abs(modulus_reInit - modulus_drifted)
+
+    end subroutine DipolarSpheres_reInit_totalMoment
+
+    ! Boundary conditions : shape-dependent -------------------------------------------------------
     
     !> Exchange
     
@@ -1231,24 +1252,6 @@ contains
         this%totalMoment(:) = this%totalMoment(:) + mNew(:) - mOld(:)
     
     end subroutine DipolarSpheres_deltaEpot_bound_rotate_update_totalMoment
-    
-    !> Reinitialise the total moment factor and print the drift
-    
-    subroutine DipolarSpheres_Epot_bound_reInit_totalMoment(this, iStep, modulus_unit)
-    
-        class(DipolarSpheres), intent(inout) :: this
-        integer, intent(in) :: iStep
-        integer, intent(in) :: modulus_unit
-        
-        real(DP) :: modulus_drifted, modulus_reInit
-        
-        modulus_drifted = norm2(this%totalMoment(:))
-        call this%Epot_bound_init_totalMoment()
-        modulus_reInit = norm2(this%totalMoment(:))
-        
-        write(modulus_unit, *) iStep, abs(modulus_reInit - modulus_drifted)
-    
-    end subroutine DipolarSpheres_Epot_bound_reInit_totalMoment
     
     !> Total shape dependent term
     !> \f[

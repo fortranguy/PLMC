@@ -111,7 +111,7 @@ implicit none
     
     call type1_spheres%test_overlap()
     call type1_spheres%Epot_reci_init()
-    call type1_spheres%Epot_bound_init_totalMoment()
+    call type1_spheres%init_totalMoment()
     type1_obs%Epot = type1_spheres%Epot_conf()
     call type1_spheres%snap_positions(0, type1_units%snapIni_positions)
     call type1_spheres%snap_orientations(0, type1_units%snapIni_orientations)
@@ -263,7 +263,7 @@ implicit none
         ! Reinitialize to prevent it from drifting.
         if (modulo(iStep, type1_spheres%get_reInit_iStep()) == 0) then
             call type1_spheres%Epot_reci_reInit_structure(iStep, type1_units%structure_modulus)
-            call type1_spheres%Epot_bound_reInit_totalMoment(iStep, type1_units%totalMoment_modulus)
+            call type1_spheres%reInit_totalMoment(iStep, type1_units%totalMoment_modulus)
         end if
     
     end do MC_Cycle
@@ -277,7 +277,7 @@ implicit none
 
     call type1_spheres%test_overlap()
     call type1_spheres%Epot_reci_init()
-    call type1_spheres%Epot_bound_init_totalMoment()
+    call type1_spheres%init_totalMoment()
     call type1_spheres%test_consist(type1_obs%Epot, type1_units%report)
     call type1_spheres%snap_positions(0, type1_units%snapFin_positions)
     call type1_spheres%snap_orientations(0, type1_units%snapFin_orientations)
