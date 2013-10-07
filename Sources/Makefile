@@ -3,14 +3,14 @@
 ifeq ($(compiler), gfortran)
 	FC = gfortran
 	FFLAGS = -W -Wall -fbounds-check
-	ifeq ($(mode), release)
-		FFLAGS = -O3 -fopenmp
+	ifeq ($(mode), fast)
+		FFLAGS = -Ofast -fopenmp
 		LDFLAGS = -fopenmp
 	endif
 else
 	FC = ifort
 	FFLAGS = -warn all -check all -check noarg_temp_created
-	ifeq ($(mode), release)
+	ifeq ($(mode), fast)
 		FFLAGS = -fast -openmp
 		LDFLAGS = -openmp
 	endif
