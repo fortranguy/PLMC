@@ -40,6 +40,11 @@ contains
         real(DP), dimension(Ndim) :: mCol
         real(DP) :: this_EpotNew_real, this_EpotOld_real
         
+        if (this%get_Ncol() == 0) then
+            this_obs%move_Nreject = this_obs%move_Nreject + 1
+            return
+        end if
+        
         call random_number(random)
         iOld = int(random*this%get_Ncol()) + 1
         xOld(:) = this%positions(:, iOld)
@@ -214,6 +219,11 @@ contains
         real(DP) :: deltaEpot_real, deltaEpot_self
         real(DP) :: real_EpotNew, real_EpotOld
         integer :: iTotalCell
+        
+        if (this%get_Ncol() == 0) then
+            obs%rotate_Nreject = obs%rotate_Nreject + 1
+            return
+        end if
         
         call random_number(random)
         iOld = int(random*this%get_Ncol()) + 1
