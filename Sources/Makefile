@@ -6,7 +6,7 @@ ifeq ($(compiler), gfortran)
 	# default : debug
 	FFLAGS = -W -Wall -fbounds-check -fopenmp -g
 	ifeq ($(mode), release)
-		FFLAGS = -O2 -fopenmp -g		
+		FFLAGS = -O2 -fopenmp -g
 	endif
 	ifeq ($(mode), fast)
 		FFLAGS = -Ofast -fopenmp
@@ -138,7 +138,8 @@ $(EXEC3) : data.o module_physics.o class_neighbourCells.o class_hardSpheres.o \
 	$(FC) $^ $(LDFLAGS) -o $@
 
 # --------------------------------------------------------------------------------------------------
-	
+.PHONY : clean mrproper remove
+
 clean :
 	rm -f *.o *.mod
 
