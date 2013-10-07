@@ -21,8 +21,7 @@ contains
         real(DP), dimension(:), intent(in) :: xCol1, xCol2
         real(DP), dimension(Ndim) :: distVec_PBC
         
-        distVec_PBC(:) = xCol2(:) - xCol1(:)
-        distVec_PBC(:) = modulo(distVec_PBC(:), Lsize(:))
+        distVec_PBC(:) = modulo(xCol2(:)-xCol1(:), Lsize(:))
         
         where(distVec_PBC(:) > LsizeMi(:))
             distVec_PBC(:) = distVec_PBC(:) - Lsize(:)
@@ -35,11 +34,15 @@ contains
         real(DP), dimension(:), intent(in) :: xCol1, xCol2        
         real(DP) :: dist_PBC
         
-        real(DP), dimension(Ndim) :: distVec_PBC_12
+        real(DP), dimension(Ndim) :: distVec_PBC
+
+        distVec_PBC(:) = modulo(xCol2(:)-xCol1(:), Lsize(:))
+
+        where(distVec_PBC(:) > LsizeMi(:))
+            distVec_PBC(:) = distVec_PBC(:) - Lsize(:)
+        end where
         
-        distVec_PBC_12(:) = distVec_PBC(xCol1, xCol2)
-        
-        dist_PBC = norm2(distVec_PBC_12)
+        dist_PBC = norm2(distVec_PBC)
     
     end function dist_PBC
     
