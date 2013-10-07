@@ -1,19 +1,31 @@
 # Monte-Carlo simulation Makefile
 
 ifeq ($(compiler), gfortran)
+
 	FC = gfortran
-	FFLAGS = -W -Wall -fbounds-check
+	# default : debug
+	FFLAGS = -W -Wall -fbounds-check -fopenmp -g
+	ifeq ($(mode), release)
+		FFLAGS = -O2 -fopenmp -g		
+	endif
 	ifeq ($(mode), fast)
 		FFLAGS = -Ofast -fopenmp
-		LDFLAGS = -fopenmp
 	endif
+	LDFLAGS = -fopenmp
+	
 else
+
 	FC = ifort
-	FFLAGS = -warn all -check all -check noarg_temp_created
+	# default : debug
+	FFLAGS = -warn all -check all -check noarg_temp_created -fopenmp -g
+	ifeq ($(mode), release)
+		FFLAGS =  -fopenmp -g
+	endif
 	ifeq ($(mode), fast)
 		FFLAGS = -fast -openmp
-		LDFLAGS = -openmp
 	endif
+	LDFLAGS = -fopenmp
+	
 endif
 
 # Default
