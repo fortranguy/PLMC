@@ -227,8 +227,7 @@ implicit none
             call widom(type1_spheres, type1_obs, type2_spheres, mix)
             call widom(type2_spheres, type2_obs, type1_spheres, mix)
         
-            ! Observables accumulations
-            
+            ! Observables accumulations            
             call type1_obs%accumulate()
             call type2_obs%accumulate()
             mix_EpotSum = mix_EpotSum + mix_Epot
