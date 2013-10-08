@@ -89,7 +89,7 @@ contains
         potChiEx = -Temperature*log(this%activSum/real(Nstep, DP))
         write(report_unit, *) "    average excess chemical potential = ", potChiEx
         
-        write(report_unit, *) "    move_rejection rate = ", this%move_rejectSum/real(Nstep, DP)
+        write(report_unit, *) "    move rejection rate = ", this%move_rejectSum/real(Nstep, DP)
         
         select type (this)
         
@@ -97,7 +97,7 @@ contains
             
             class is (MoreObservables)
             
-                write(report_unit, *) "    Rotation move_rejection rate = ", &
+                write(report_unit, *) "    rotation rejection rate = ", &
                                       this%rotate_rejectSum/real(Nstep, DP)
             
         end select
