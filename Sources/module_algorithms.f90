@@ -102,7 +102,7 @@ contains
                 
                     select type (this)
                         type is (DipolarSpheres)
-                            call this%deltaEpot_reci_move_update_structure(xOld, xNew, mCol)
+                            call this%reci_move_update_structure(xOld, xNew, mCol)
                     end select
                 
                     this%positions(:, iOld) = xNew(:)
@@ -246,7 +246,7 @@ contains
         call random_number(random)
         if (random < exp(-deltaEpot/Temperature)) then
         
-            call this%deltaEpot_reci_rotate_update_structure(xCol, mOld, mNew)
+            call this%reci_rotate_update_structure(xCol, mOld, mNew)
             call this%update_totalMoment_rotate(mOld, mNew)
             this%orientations(:, iOld) = mNew(:)
             

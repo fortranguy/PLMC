@@ -84,11 +84,11 @@ private
         procedure :: Epot_reci_count_waveVectors => DipolarSpheres_Epot_reci_count_waveVectors
         !>     Reciprocal : delta
         procedure :: deltaEpot_reci_move => DipolarSpheres_deltaEpot_reci_move
-        procedure :: deltaEpot_reci_move_update_structure => &
-                              DipolarSpheres_deltaEpot_reci_move_update_structure
+        procedure :: reci_move_update_structure => &
+                              DipolarSpheres_reci_move_update_structure
         procedure :: deltaEpot_reci_rotate => DipolarSpheres_deltaEpot_reci_rotate
-        procedure :: deltaEpot_reci_rotate_update_structure => &
-                              DipolarSpheres_deltaEpot_reci_rotate_update_structure
+        procedure :: reci_rotate_update_structure => &
+                              DipolarSpheres_reci_rotate_update_structure
         procedure :: deltaEpot_reci_exchange => DipolarSpheres_deltaEpot_reci_exchange
         !>     Reciprocal : total
         procedure, private :: Epot_reci => DipolarSpheres_Epot_reci
@@ -759,7 +759,7 @@ contains
     !>  \f]
     !>
 
-    subroutine DipolarSpheres_deltaEpot_reci_move_update_structure(this, xOld, xNew, mCol)
+    subroutine DipolarSpheres_reci_move_update_structure(this, xOld, xNew, mCol)
 
         class(DipolarSpheres), intent(inout) :: this
         real(DP), dimension(:), intent(in) :: xOld, xNew
@@ -819,7 +819,7 @@ contains
             
         end do
 
-    end subroutine DipolarSpheres_deltaEpot_reci_move_update_structure
+    end subroutine DipolarSpheres_reci_move_update_structure
     
     !> Rotate
 
@@ -906,7 +906,7 @@ contains
     !>  \f]
     !>
 
-    subroutine DipolarSpheres_deltaEpot_reci_rotate_update_structure(this, xCol, mOld, mNew)
+    subroutine DipolarSpheres_reci_rotate_update_structure(this, xCol, mOld, mNew)
 
         class(DipolarSpheres), intent(inout) :: this
         real(DP), dimension(:), intent(in) :: xCol
@@ -956,7 +956,7 @@ contains
             
         end do
 
-    end subroutine DipolarSpheres_deltaEpot_reci_rotate_update_structure
+    end subroutine DipolarSpheres_reci_rotate_update_structure
 
     !> Energy of 1 dipole with others
     
