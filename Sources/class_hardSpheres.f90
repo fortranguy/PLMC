@@ -7,7 +7,7 @@ use data_precisions, only : DP
 use data_constants, only : PI
 use data_box, only : Ndim, Lsize, Volume
 use data_particles, only : hard_rMin, hard_Ncol
-use data_monteCarlo, only : hard_move_delta, hard_move_rejectFix, hard_move_Nadapt, hard_Nwidom
+use data_monteCarlo, only : hard_move_delta, hard_move_rejectFix, hard_Nwidom
 use data_neighbourCells, only : NnearCell
 use data_distribution, only : hard_snap_factor
 use module_physics, only : dist_PBC
@@ -38,7 +38,6 @@ private
         real(DP), dimension(Ndim) :: move_delta !< displacement
         real(DP), dimension(Ndim) :: move_deltaSave
         real(DP) :: move_rejectFix
-        integer :: move_Nadapt
         integer :: Nwidom
 
         ! Potential
@@ -63,7 +62,6 @@ private
         procedure :: get_radius => HardSpheres_get_radius
         procedure :: get_rCut => HardSpheres_get_rCut
         procedure :: get_Epot => HardSpheres_get_Epot
-        procedure :: get_move_Nadapt => HardSpheres_get_move_Nadapt
         procedure :: get_move_delta => HardSpheres_get_move_delta
         !> Specifier        
         !> Adapt the displacement move_delta during thermalisation
@@ -117,7 +115,6 @@ contains
         this%move_delta = hard_move_delta
         this%move_deltaSave = this%move_delta
         this%move_rejectFix = hard_move_rejectFix
-        this%move_Nadapt = hard_move_Nadapt
         this%Nwidom = hard_Nwidom
                 
         ! Potential
@@ -222,17 +219,6 @@ contains
 
     end function HardSpheres_get_Epot
     
-    !> Accessor : move_Nadapt
-    
-    pure function HardSpheres_get_move_Nadapt(this) result(get_move_Nadapt)
-    
-        class(HardSpheres), intent(in) :: this
-        integer :: get_move_Nadapt
-        
-        get_move_Nadapt = this%move_Nadapt
-        
-    end function HardSpheres_get_move_Nadapt
-    
     pure function HardSpheres_get_move_delta(this) result(get_move_delta)
         
         class(HardSpheres), intent(in) :: this
@@ -328,7 +314,6 @@ contains
         
         write(report_unit ,*) "    Ncol = ", this%Ncol
         write(report_unit ,*) "    Nwidom = ", this%Nwidom
-        write(report_unit ,*) "    move_Nadapt = ", this%move_Nadapt
         
         write(report_unit, *) "    rCut = ", this%rCut
         

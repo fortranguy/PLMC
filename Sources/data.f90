@@ -108,12 +108,10 @@ implicit none
     ! move
     real(DP), dimension(Ndim), parameter :: dipol_move_delta = 0.3_DP ! u_length, adaptation
     real(DP), parameter :: dipol_move_rejectFix = 0.5_DP
-    integer, parameter :: dipol_move_Nadapt = Nthermal/8
     ! rotate
     real(DP), parameter :: dipol_rotate_delta = 30._DP ! u_moment, adaptation
     real(DP), parameter :: dipol_rotate_deltaMax = 75._DP
     real(DP), parameter :: dipol_rotate_rejectFix = 0.17_DP
-    integer, parameter :: dipol_rotate_Nadapt = Nthermal/8
     ! chemical potential
     integer, parameter :: dipol_Nwidom = 500
     ! reinitialisations
@@ -121,13 +119,11 @@ implicit none
     
     real(DP), dimension(Ndim), parameter :: hard_move_delta = 0.5_DP ! u_length, adaptation
     real(DP), parameter :: hard_move_rejectFix = 0.5_DP
-    integer, parameter :: hard_move_Nadapt = Nthermal/8
     integer, parameter :: hard_Nwidom = 500
     
     ! out ---------------------------------------------------------------------
     real(DP), dimension(Ndim), parameter :: inter_move_delta = 1._DP ! u_length, adaptation
     real(DP), parameter :: inter_move_rejectFix = 0.5_DP
-    integer, parameter :: inter_move_Nadapt = Nthermal/8
     integer, parameter :: inter_Nwidom = 0
     ! -------------------------------------------------------------------------
 

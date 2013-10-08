@@ -7,9 +7,9 @@ use data_precisions, only : DP, consist_tiny
 use data_constants, only : PI
 use data_box, only : Ndim, Lsize, Kmax, Volume, out_permittivity
 use data_particles, only : dipol_Ncol
-use data_monteCarlo, only : dipol_move_delta, dipol_move_rejectFix, dipol_move_Nadapt, &
-                            dipol_rotate_delta, dipol_rotate_deltaMax, dipol_rotate_rejectFix, &
-                            dipol_rotate_Nadapt, dipol_Nwidom, dipol_reInit_iStep
+use data_monteCarlo, only : dipol_move_delta, dipol_move_rejectFix, dipol_rotate_delta, &
+                            dipol_rotate_deltaMax, dipol_rotate_rejectFix, dipol_Nwidom, &
+                            dipol_reInit_iStep
 use data_potential, only : dipol_rCut, dipol_dr, dipol_alpha
 use data_neighbourCells, only : NnearCell
 use data_distribution, only : dipol_snap_factor
@@ -35,7 +35,6 @@ private
         real(DP) :: rotate_deltaSave
         real(DP) :: rotate_deltaMax
         real(DP) :: rotate_rejectFix
-        integer :: rotate_Nadapt
         integer :: reInit_iStep
 
         ! Potential
@@ -65,7 +64,6 @@ private
         procedure :: adapt_rotate_delta => DipolarSpheres_adapt_rotate_delta
         procedure :: set_rotate_delta => DipolarSpheres_set_rotate_delta
         procedure :: get_rotate_delta => DipolarSpheres_get_rotate_delta
-        procedure :: get_rotate_Nadapt => DipolarSpheres_get_rotate_Nadapt
         
         procedure :: get_reInit_iStep => DipolarSpheres_get_reInit_iStep
         
@@ -136,16 +134,15 @@ contains
         this%move_delta = dipol_move_delta
         this%move_deltaSave = this%move_delta
         this%move_rejectFix = dipol_move_rejectFix
-        this%move_Nadapt = dipol_move_Nadapt
-        this%reInit_iStep = dipol_reInit_iStep
         
         this%rotate_delta = dipol_rotate_delta
         this%rotate_deltaSave = this%rotate_delta
         this%rotate_deltaMax = dipol_rotate_deltaMax
         this%rotate_rejectFix = dipol_rotate_rejectFix
-        this%rotate_Nadapt = dipol_rotate_Nadapt
         
         this%Nwidom = dipol_Nwidom
+        
+        this%reInit_iStep = dipol_reInit_iStep
         
         ! Potential
         this%rCut = dipol_rCut
@@ -198,7 +195,6 @@ contains
         
         write(report_unit ,*) "    Ncol = ", this%Ncol
         write(report_unit ,*) "    Nwidom = ", this%Nwidom
-        write(report_unit ,*) "    move_Nadapt = ", this%move_Nadapt
 
         write(report_unit, *) "    alpha = ", this%alpha
         write(report_unit, *) "    rCut = ", this%rCut
@@ -299,17 +295,6 @@ contains
         get_rotate_delta = this%rotate_delta
         
     end function DipolarSpheres_get_rotate_delta
-    
-    !> Accessor : move_Nadapt
-    
-    pure function DipolarSpheres_get_rotate_Nadapt(this) result(get_rotate_Nadapt)
-    
-        class(DipolarSpheres), intent(in) :: this        
-        integer :: get_rotate_Nadapt
-        
-        get_rotate_Nadapt = this%rotate_Nadapt
-        
-    end function DipolarSpheres_get_rotate_Nadapt
     
     !> Accessor : reInit_iStep
     
