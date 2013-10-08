@@ -118,7 +118,7 @@ contains
             
             type is (MoreObservables)
             
-                write(report_unit, *) "    rotation rejection rate = ", &
+                write(report_unit, *) "    rotate rejection rate = ", &
                                       this%rotate_rejectSum/real(Nstep, DP)
             
         end select
