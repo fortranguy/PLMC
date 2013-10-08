@@ -228,15 +228,9 @@ implicit none
             call widom(type2_spheres, type2_obs, type1_spheres, mix)
         
             ! Observables accumulations
-            type1_obs%EpotSum = type1_obs%EpotSum + type1_obs%Epot
-            type1_obs%activSum = type1_obs%activSum + type1_obs%activ
-            type1_obs%move_rejectSum = type1_obs%move_rejectSum + type1_obs%move_reject
-            type1_obs%rotate_rejectSum = type1_obs%rotate_rejectSum + type1_obs%rotate_reject
-        
-            type2_obs%EpotSum = type2_obs%EpotSum + type2_obs%Epot
-            type2_obs%activSum = type2_obs%activSum + type2_obs%activ
-            type2_obs%move_rejectSum = type2_obs%move_rejectSum + type2_obs%move_reject
-                
+            
+            call type1_obs%accumulate()
+            call type2_obs%accumulate()
             mix_EpotSum = mix_EpotSum + mix_Epot
 
             write(type1_units%obsEquilib, *) iStep, type1_obs%Epot, type1_obs%activ, &

@@ -106,10 +106,8 @@ contains
         close(this%Epot)
         
         select type (this)
-        
-            type is (Units)
             
-            class is (MoreUnits)
+            type is (MoreUnits)
             
                 close(this%rotate_delta)
         
@@ -121,10 +119,6 @@ contains
                 close(this%structure_modulus)
                 
                 close(this%totalMoment_modulus)
-                    
-            class default
-                
-                stop "Units_close : expected type for Units object !"
                 
         end select
     

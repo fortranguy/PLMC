@@ -134,6 +134,7 @@ program_distribution.o : program_distribution.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 $(EXEC3) : data.o module_physics.o class_neighbourCells.o class_hardSpheres.o \
            class_interactingSpheres.o class_dipolarSpheres.o class_mixingPotential.o \
+           class_observables.o \
            module_algorithms.o module_tools.o program_distribution.o
 	$(FC) $^ $(LDFLAGS) -o $@
 
