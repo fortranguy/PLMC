@@ -167,14 +167,8 @@ implicit none
         end do MC_Change
         
         ! Rejections rates updates
-        type1_obs%move_reject = real(type1_obs%move_Nreject, DP)/real(type1_obs%Nmove, DP)
-        type1_obs%move_Nreject = 0; type1_obs%Nmove = 0
-        
-        type1_obs%rotate_reject = real(type1_obs%rotate_Nreject, DP)/real(type1_obs%Nrotate, DP)
-        type1_obs%rotate_Nreject = 0; type1_obs%Nrotate = 0
-
-        type2_obs%move_reject = real(type2_obs%move_Nreject, DP)/real(type2_obs%Nmove, DP)
-        type2_obs%move_Nreject = 0; type2_obs%Nmove = 0
+        call type1_obs%update_rejections()
+        call type2_obs%update_rejections()
         
         MC_Regime : if (iStep <= Nthermal) then ! Thermalisation
             

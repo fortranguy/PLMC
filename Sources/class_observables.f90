@@ -29,6 +29,7 @@ private
     contains
     
         procedure :: init => Observables_init
+        procedure :: update_rejections => Observables_update_rejections
         procedure :: accumulate => Observables_accumulate
         procedure :: print_results => Observables_print_results
     
@@ -76,6 +77,28 @@ contains
         
     end subroutine Observables_init
     
+    !> Update rejection
+    
+    subroutine Observables_update_rejections(this)
+    
+        class(Observables), intent(inout) :: this
+        
+        this%move_reject = real(this%move_Nreject, DP)/real(this%Nmove, DP)
+        this%move_Nreject = 0
+        this%Nmove = 0
+        
+         select type (this)
+        
+            type is (MoreObservables)
+                
+                this%rotate_reject = real(this%rotate_Nreject, DP)/real(this%Nrotate, DP)
+                this%rotate_Nreject = 0
+                this%Nrotate = 0
+        
+        end select
+    
+    end subroutine Observables_update_rejections
+    
     !> Accumulations
     
     subroutine Observables_accumulate(this)
@@ -92,7 +115,7 @@ contains
         
                 this%rotate_rejectSum = this%rotate_rejectSum + this%rotate_reject
         
-        end select 
+        end select
     
     end subroutine Observables_accumulate
     
