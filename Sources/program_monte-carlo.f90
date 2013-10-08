@@ -96,13 +96,13 @@ implicit none
     call type1_units%open(type1_spheres%get_name())
     call type1_spheres%Epot_real_print(type1_units%Epot)
     call type1_spheres%Epot_reci_count_waveVectors(type1_units%waveVectors)
-    call type1_spheres%print_density(type1_units%report)
+    call type1_spheres%print_density(Ncol, type1_units%report)
     call type1_spheres%print_report(type1_units%report)
     
     call type2_obs%init()
     call type2_units%open(type2_spheres%get_name())
     call type2_spheres%Epot_print(type2_units%Epot)
-    call type2_spheres%print_density(type2_units%report)
+    call type2_spheres%print_density(Ncol, type2_units%report)
     call type2_spheres%print_report(type2_units%report)
     
     ! Initial condition

@@ -286,20 +286,26 @@ contains
     
     !> Print density and compacity
     
-    subroutine HardSpheres_print_density(this, report_unit)
+    subroutine HardSpheres_print_density(this, total_Ncol, report_unit)
     
         class(HardSpheres), intent(in) :: this
+        integer, intent(in) :: total_Ncol
         integer, intent(in) :: report_unit
         
-        real(DP) :: density, compacity
+        real(DP) :: density, compacity, concentration
         
         density = real(this%Ncol + 1, DP) / Volume ! cheating ? cf. Widom
         compacity = 4._DP/3._DP*PI*this%radius**3 * density
+        concentration = real(this%Ncol, DP) / real(total_Ncol, DP)
         
-        write(output_unit, *) this%name, " : ", "density = ", density, "compacity = ", compacity
+        write(output_unit, *) this%name, " : "
+        write(output_unit, *) "    density = ", density
+        write(output_unit, *) "    compacity = ", compacity
+        write(output_unit, *) "    concentration = ", concentration
         
         write(report_unit, *) "    density = ", density
         write(report_unit, *) "    compacity = ", compacity
+        write(report_unit, *) "    concentration = ", concentration
     
     end subroutine HardSpheres_print_density
     
