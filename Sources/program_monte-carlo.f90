@@ -210,6 +210,7 @@ implicit none
             write(obsThermal_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
             
             if (iStep == Nthermal) then ! Definite thermalised displacements
+                write(output_unit, *) "Thermalisation : over"
                 call type1_spheres%set_move_delta(type1_obs%move_reject, type1_units%report)
                 call type1_spheres%set_rotate_delta(type1_obs%rotate_reject, type1_units%report)
                 call type2_spheres%set_move_delta(type2_obs%move_reject, type2_units%report)

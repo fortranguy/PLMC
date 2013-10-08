@@ -276,8 +276,6 @@ contains
             write(error_unit, *) "big rotate_delta :", this%rotate_delta
         end if
         
-        write(output_unit, *) this%name, " :    Thermalisation : over (rotation)"
-        
         write(report_unit, *) "Rotation :"
         write(report_unit, *) "    rotate_delta = ", this%rotate_delta
         write(report_unit, *) "    rejection relative difference = ", &
