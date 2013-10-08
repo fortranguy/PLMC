@@ -4,7 +4,7 @@ program monteCarlo_canonical_bulk
 
 use, intrinsic :: iso_fortran_env, only : output_unit
 use data_precisions, only : DP
-use data_monteCarlo, only : decorrelFactor, Nthermal, Nstep
+use data_monteCarlo, only : decorrelFactor, Nthermal, Nadapt, Nstep
 use data_distribution, only : snap
 use class_neighbourCells
 use class_hardSpheres
@@ -179,38 +179,32 @@ implicit none
         MC_Regime : if (iStep <= Nthermal) then ! Thermalisation
             
             ! Displacements adaptation
-            if (mod(iStep, type1_spheres%get_move_Nadapt()) /= 0) then ! Rejections accumulation
+            if (mod(iStep, Nadapt) /= 0) then ! Rejections accumulation
+            
                 type1_obs%move_rejectAdapt = type1_obs%move_rejectAdapt + type1_obs%move_reject
+                type1_obs%rotate_rejectAdapt = type1_obs%rotate_rejectAdapt + type1_obs%rotate_reject
+                type2_obs%move_rejectAdapt = type2_obs%move_rejectAdapt + type2_obs%move_reject
+                
             else ! Average & adaptation
-                type1_obs%move_rejectAdapt = type1_obs%move_rejectAdapt / &
-                                             real(type1_spheres%get_move_Nadapt()-1)
+            
+                type1_obs%move_rejectAdapt = type1_obs%move_rejectAdapt / real(Nadapt-1, DP)
                 call type1_spheres%adapt_move_delta(type1_obs%move_rejectAdapt)
                 write(type1_units%move_delta, *) iStep, type1_spheres%get_move_delta(), &
                                                  type1_obs%move_rejectAdapt
                 type1_obs%move_rejectAdapt = 0._DP
-            end if
-            
-            ! Rotation adaptation
-            if (mod(iStep, type1_spheres%get_rotate_Nadapt()) /= 0) then
-                type1_obs%rotate_rejectAdapt = type1_obs%rotate_rejectAdapt + type1_obs%rotate_reject
-            else
-                type1_obs%rotate_rejectAdapt = type1_obs%rotate_rejectAdapt / &
-                                               real(type1_spheres%get_rotate_Nadapt()-1)
+                
+                type1_obs%rotate_rejectAdapt = type1_obs%rotate_rejectAdapt / real(Nadapt-1, DP)
                 call type1_spheres%adapt_rotate_delta(type1_obs%rotate_rejectAdapt)
                 write(type1_units%rotate_delta, *) iStep, type1_spheres%get_rotate_delta(), &
                                                    type1_obs%rotate_rejectAdapt
                 type1_obs%rotate_rejectAdapt = 0._DP
-            end if
-
-            if (mod(iStep, type2_spheres%get_move_Nadapt()) /= 0) then
-                type2_obs%move_rejectAdapt = type2_obs%move_rejectAdapt + type2_obs%move_reject
-            else                
-                type2_obs%move_rejectAdapt = type2_obs%move_rejectAdapt / &
-                                             real(type2_spheres%get_move_Nadapt()-1)
+                
+                type2_obs%move_rejectAdapt = type2_obs%move_rejectAdapt / real(Nadapt-1, DP)
                 call type2_spheres%adapt_move_delta(type2_obs%move_rejectAdapt)
                 write(type2_units%move_delta, *) iStep, type2_spheres%get_move_delta(), &
                                                  type2_obs%move_rejectAdapt
                 type2_obs%move_rejectAdapt = 0._DP
+                
             end if
             
             ! Observables writing

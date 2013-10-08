@@ -102,6 +102,7 @@ implicit none
     real(DP), parameter :: Temperature = 1._DP ! u_temperature
     integer, parameter :: decorrelFactor = 2**0
     integer, parameter :: Nthermal = 2**15/decorrelFactor
+    integer, parameter :: Nadapt = Nthermal/8
     integer, parameter :: Nstep = 2**16
     
     ! move
