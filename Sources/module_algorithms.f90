@@ -41,7 +41,6 @@ contains
         real(DP) :: this_EpotNew_real, this_EpotOld_real
         
         if (this%get_Ncol() == 0) then
-            this_obs%move_Nreject = this_obs%move_Nreject + 1
             return
         end if
         
@@ -221,7 +220,6 @@ contains
         integer :: iTotalCell
         
         if (this%get_Ncol() == 0) then
-            obs%rotate_Nreject = obs%rotate_Nreject + 1
             return
         end if
         
