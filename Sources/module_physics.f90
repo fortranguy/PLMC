@@ -31,18 +31,10 @@ contains
     
     pure function dist_PBC(xCol1, xCol2)
     
-        real(DP), dimension(:), intent(in) :: xCol1, xCol2        
+        real(DP), dimension(:), intent(in) :: xCol1, xCol2
         real(DP) :: dist_PBC
-        
-        real(DP), dimension(Ndim) :: distVec_PBC
-
-        distVec_PBC(:) = modulo(xCol2(:)-xCol1(:), Lsize(:))
-
-        where(distVec_PBC(:) > LsizeMi(:))
-            distVec_PBC(:) = distVec_PBC(:) - Lsize(:)
-        end where
-        
-        dist_PBC = norm2(distVec_PBC)
+                
+        dist_PBC = norm2(distVec_PBC(xCol1, xCol2))
     
     end function dist_PBC
     
