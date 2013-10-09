@@ -335,16 +335,16 @@ contains
         integer :: iNearCell, jNearCell, kNearCell, nearCell_index
         integer, dimension(Ndim) :: totalCell_coord, nearCell_coord
         
-        do iTotalCell = 1, this%NtotalCell_dim(1)
-        do jTotalCell = 1, this%NtotalCell_dim(2)
         do kTotalCell = 1, this%NtotalCell_dim(3)
+        do jTotalCell = 1, this%NtotalCell_dim(2)
+        do iTotalCell = 1, this%NtotalCell_dim(1)
             
             totalCell_index = index_from_coord([iTotalCell, jTotalCell, kTotalCell], &
                                                this%NtotalCell_dim)
 
-            do iNearCell = 1, NnearCell_dim(1)
-            do jNearCell = 1, NnearCell_dim(2)
             do kNearCell = 1, NnearCell_dim(3)
+            do jNearCell = 1, NnearCell_dim(2)
+            do iNearCell = 1, NnearCell_dim(1)
             
                 nearCell_coord(:) = [iNearCell, jNearCell, kNearCell]
                 nearCell_index = index_from_coord(nearCell_coord, NnearCell_dim)
