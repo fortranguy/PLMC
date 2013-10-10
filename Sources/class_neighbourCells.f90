@@ -3,7 +3,7 @@
 module class_neighbourCells
 
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
-use data_precisions, only : DP
+use data_precisions, only : DP, real_zero
 use data_box, only : Ndim, Lsize
 use data_neighbourCells, only : NnearCell_dim, NnearCell
 use module_physics, only : index_from_coord, coord_PBC
@@ -199,7 +199,7 @@ contains
                 stop
             end if
             
-            if (modulo(Lsize(jDim), this%cell_size(jDim)) /= 0._DP) then
+            if (modulo(Lsize(jDim), this%cell_size(jDim)) > real_zero) then
                 write(error_unit, *) "  Cell size is not a divisor of the system size"
                 write(error_unit, *) "  in the dimension", jDim, ":"
                 write(error_unit, *) "  Lsize", Lsize(jDim)
