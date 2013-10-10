@@ -19,7 +19,7 @@ else
 	# default : debug
 	FFLAGS = -warn all -check all -check noarg_temp_created -fltconsistency -fopenmp -g
 	ifeq ($(mode), release)
-		FFLAGS =  -fopenmp -g
+		FFLAGS =  -fltconsistency -fopenmp -g
 	endif
 	ifeq ($(mode), fast)
 		FFLAGS = -fast -openmp
