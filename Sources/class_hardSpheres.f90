@@ -3,7 +3,7 @@
 module class_hardSpheres
 
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
-use data_precisions, only : DP
+use data_precisions, only : DP, real_zero
 use data_constants, only : PI
 use data_box, only : Ndim, Lsize, Volume
 use data_particles, only : hard_rMin, hard_Ncol
@@ -263,7 +263,7 @@ contains
         real(DP), intent(in) :: reject
         integer, intent(in) :: report_unit
 
-        if (reject == 0._DP) then
+        if (abs(reject) < real_zero) then
             write(error_unit, *) this%name, " :    Warning : move_delta adaptation problem."
             this%move_delta(:) = this%move_deltaSave(:)
             write(error_unit, *) "default move_delta :", this%move_delta(:)
@@ -505,7 +505,7 @@ contains
         write(report_unit, *) "    Epot_conf = ", Epot_conf
         write(report_unit, *) "    absolute difference = ", difference
         
-        if (difference /= 0._DP) then
+        if (difference > 0._DP) then
             write(report_unit, *) "    WARNING !"
         else
             write(report_unit, *) "    OK !"
