@@ -3,7 +3,7 @@
 module class_dipolarSpheres
 
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
-use data_precisions, only : DP, consist_tiny
+use data_precisions, only : DP, real_zero, consist_tiny
 use data_constants, only : PI
 use data_box, only : Ndim, Lsize, Kmax, Volume, out_permittivity
 use data_particles, only : dipol_Ncol
@@ -264,7 +264,7 @@ contains
         real(DP), intent(in) :: reject
         integer, intent(in) :: report_unit
         
-        if (reject == 0._DP) then
+        if (reject < real_zero) then
             write(error_unit, *) this%name, " :    Warning : rotate_delta adaptation problem."
             this%rotate_delta = this%rotate_deltaSave
             write(error_unit, *) "default rotate_delta :", this%rotate_delta

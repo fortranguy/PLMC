@@ -263,7 +263,7 @@ contains
         real(DP), intent(in) :: reject
         integer, intent(in) :: report_unit
 
-        if (abs(reject) < real_zero) then
+        if (reject < real_zero) then
             write(error_unit, *) this%name, " :    Warning : move_delta adaptation problem."
             this%move_delta(:) = this%move_deltaSave(:)
             write(error_unit, *) "default move_delta :", this%move_delta(:)
