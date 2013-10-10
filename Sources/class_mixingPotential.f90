@@ -96,6 +96,9 @@ contains
         integer, intent(in) :: report_unit    
         
         write(report_unit, *) "Data :"
+        
+        write(report_unit, *) "    delta = ", this%delta
+        
         write(report_unit, *) "    epsilon = ", this%epsilon
         write(report_unit, *) "    alpha = ", this%alpha
         write(report_unit, *) "    rCut = ", this%rCut
