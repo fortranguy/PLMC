@@ -78,8 +78,8 @@ contains
         ! Potential
         this%rCut = inter_rCut
         this%dr = inter_dr
-        this%iMin = int(this%rMin/this%dr)
-        this%iCut = int(this%rCut/this%dr)
+        this%iMin = int(this%rMin/this%dr) - 1
+        this%iCut = int(this%rCut/this%dr) + 1
         this%epsilon = inter_epsilon
         this%alpha = inter_alpha        
         allocate(this%Epot_tab(this%iMin:this%iCut))

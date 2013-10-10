@@ -147,8 +147,8 @@ contains
         ! Potential
         this%rCut = dipol_rCut
         this%dr = dipol_dr
-        this%iMin = int(this%rMin/this%dr)
-        this%iCut = int(this%rCut/this%dr)
+        this%iMin = int(this%rMin/this%dr) - 1
+        this%iCut = int(this%rCut/this%dr) + 1
         this%alpha = dipol_alpha        
         allocate(this%Epot_real_tab(this%iMin:this%iCut, 2))
         call this%Epot_real_init()

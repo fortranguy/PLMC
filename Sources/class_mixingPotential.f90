@@ -123,8 +123,8 @@ contains
         end if
         
         ! MixingPotential
-        this%iMin = int(this%rMin/this%dr)
-        this%iCut = int(this%rCut/this%dr)
+        this%iMin = int(this%rMin/this%dr) - 1
+        this%iCut = int(this%rCut/this%dr) + 1
         allocate(this%Epot_tab(this%iMin:this%iCut))
         call this%Epot_init()
         
