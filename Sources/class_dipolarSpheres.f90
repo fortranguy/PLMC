@@ -231,7 +231,7 @@ contains
     
     !> Adaptation of rotate_delta during the thermalisation
     
-    subroutine DipolarSpheres_adapt_rotate_delta(this, reject)
+    pure subroutine DipolarSpheres_adapt_rotate_delta(this, reject)
     
         class(DipolarSpheres), intent(inout) :: this
         real(DP), intent(in) :: reject
@@ -314,7 +314,7 @@ contains
     !>            2\frac{\alpha}{\sqrt{\pi}}(2\alpha^2 + \frac{3}{r^2})
     !>                                     \frac{e^{-\alpha^2 r^2}}{r^2} \f]
     
-    subroutine DipolarSpheres_Epot_real_init(this)
+    pure subroutine DipolarSpheres_Epot_real_init(this)
     
         class(DipolarSpheres), intent(inout) :: this
 
@@ -479,7 +479,7 @@ contains
     !>                                {\sum_d \frac{k_d^2}{L_d}}
     !> \f]
     
-    subroutine DipolarSpheres_Epot_reci_init_weight(this)
+    pure subroutine DipolarSpheres_Epot_reci_init_weight(this)
         
         class(DipolarSpheres), intent(inout) :: this
         
@@ -525,7 +525,7 @@ contains
     !>      S_l(\vec{k}) = \sum_{i \neq l} (\vec{k}\cdot\vec{\mu}_i) e^{+i\vec{k}\cdot\vec{x}_i}
     !> \f].
 
-    subroutine DipolarSpheres_Epot_reci_init(this)
+    pure subroutine DipolarSpheres_Epot_reci_init(this)
 
         class(DipolarSpheres), intent(inout) :: this
 
@@ -750,7 +750,7 @@ contains
     !>  \f]
     !>
 
-    subroutine DipolarSpheres_reci_update_structure_move(this, xOld, xNew, mCol)
+    pure subroutine DipolarSpheres_reci_update_structure_move(this, xOld, xNew, mCol)
 
         class(DipolarSpheres), intent(inout) :: this
         real(DP), dimension(:), intent(in) :: xOld, xNew
@@ -897,7 +897,7 @@ contains
     !>  \f]
     !>
 
-    subroutine DipolarSpheres_reci_update_structure_rotate(this, xCol, mOld, mNew)
+    pure subroutine DipolarSpheres_reci_update_structure_rotate(this, xCol, mOld, mNew)
 
         class(DipolarSpheres), intent(inout) :: this
         real(DP), dimension(:), intent(in) :: xCol
@@ -1094,7 +1094,7 @@ contains
     !> \f[ \vec{M} = \sum_j \vec{\mu}_j \f]
     !> \f[ \vec{M}_l = \sum_{j \neq l} \vec{\mu}_j \f]
     
-    subroutine DipolarSpheres_init_totalMoment(this)
+    pure subroutine DipolarSpheres_init_totalMoment(this)
     
         class(DipolarSpheres), intent(inout) :: this
         
@@ -1135,7 +1135,7 @@ contains
     !>      \Delta \vec{M} = \vec{\mu}^\prime_l - \vec{\mu}_l
     !> \f]
 
-    subroutine DipolarSpheres_update_totalMoment_rotate(this, mOld, mNew)
+    pure subroutine DipolarSpheres_update_totalMoment_rotate(this, mOld, mNew)
 
         class(DipolarSpheres), intent(inout) :: this
         real(DP), dimension(:), intent(in) :: mOld, mNew
