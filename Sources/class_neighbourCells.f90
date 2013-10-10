@@ -182,7 +182,7 @@ contains
         
         do jDim = 1, Ndim
         
-            if (this%cell_size(jDim) < rCut .and. this%cell_size(jDim) /= Lsize(jDim)/3._DP) then
+            if (this%cell_size(jDim) < rCut) then
                 write(error_unit, *) "  Warning : big rCut in the dimension", jDim, ":"
                 write(error_unit, *) "  ", this%cell_size(jDim), "<", rCut
             end if
