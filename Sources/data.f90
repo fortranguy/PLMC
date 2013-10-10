@@ -182,8 +182,8 @@ implicit none
 
     integer, dimension(Ndim), parameter :: NnearCell_dim = 3 !< Number of nearest neighbour cells
                                                              !< in each direction
-    integer, parameter :: NnearCell = 3**3 !< Total number of nearest neighbour cells,
-                                       !< including itself
+    integer, parameter :: NnearCell = NnearCell_dim(1) * NnearCell_dim(2) * NnearCell_dim(3)
+                          !< Total number of nearest neighbour cells, including itself
 
 end module data_neighbourCells
 !***************************************************************************************************
