@@ -3,7 +3,8 @@
 module module_tools
 
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit, iostat_end
-use data_precisions, only : DP, io_tiny, consist_tiny
+use data_precisions, only : DP, real_zero, io_tiny, consist_tiny
+use data_constants, only : PI, sigma3d
 use data_box, only : Ndim, Lsize, Volume, Kmax
 use data_monteCarlo, only : Temperature, Nstep, decorrelFactor, Nthermal
 use module_physics, only : dist_PBC, random_surface
@@ -224,6 +225,14 @@ contains
         integer, intent(in) :: report_unit
 
         write(report_unit, *) "Data :"
+        
+        write(report_unit ,*) "    Precision = ", DP
+        write(report_unit ,*) "    Real zero = ", real_zero
+        write(report_unit ,*) "    I/O tiny = ", io_tiny
+        write(report_unit ,*) "    Energy consistency tiny = ", consist_tiny
+        
+        write(report_unit ,*) "    Pi = ", PI
+        write(report_unit ,*) "    Sigma3d = ", sigma3d
         
         write(report_unit ,*) "    Lsize(:) = ", Lsize(:)
         write(report_unit ,*) "    Volume = ", Volume
