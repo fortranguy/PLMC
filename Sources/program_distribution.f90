@@ -111,7 +111,7 @@ implicit none
     !$omp end do nowait
     !$omp end parallel
     call cpu_time(tFin)
-    !$ tFin_para = omp_get_wtime()	
+    !$ tFin_para = omp_get_wtime()
 
     open(unit=100, file="dist_duree.out")
         write(100, *) "DuréeSérie_pseudo", tFin - tIni
