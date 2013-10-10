@@ -496,7 +496,7 @@ contains
         do kx = -Kmax(1), Kmax(1)
             waveVector(1) = real(kx, DP)
 
-            if (norm2(waveVector) /= 0._DP) then
+            if (kx**2 + ky**2 + kz**2 /= 0) then
             
                 kOverL = norm2(waveVector(:)/Lsize(:))
 
