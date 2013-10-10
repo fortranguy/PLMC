@@ -83,7 +83,7 @@ contains
     
     end subroutine NeighbourCells_construct
     
-    subroutine NeighbourCells_destroy(this)
+    pure subroutine NeighbourCells_destroy(this)
     
         class(NeighbourCells), intent(inout) :: this
         
@@ -119,7 +119,7 @@ contains
 
     !> Linked-list allocation
     
-    subroutine NeighbourCells_alloc_cells(this)
+    pure subroutine NeighbourCells_alloc_cells(this)
     
         class(NeighbourCells), intent(inout) :: this
     
@@ -146,7 +146,7 @@ contains
     
     ! Linked-list deallocation
     
-    recursive subroutine free_link(current)
+    recursive pure subroutine free_link(current)
 
         type(Link), pointer :: current
         
@@ -157,7 +157,7 @@ contains
         
     end subroutine free_link
     
-    subroutine NeighbourCells_dealloc_cells(this)
+    pure subroutine NeighbourCells_dealloc_cells(this)
     
         class(NeighbourCells), intent(inout) :: this
     
@@ -229,7 +229,7 @@ contains
     
     end function NeighbourCells_index_from_position
     
-    subroutine NeighbourCells_all_cols_to_cells(this, Ncol, X)
+    pure subroutine NeighbourCells_all_cols_to_cells(this, Ncol, X)
     
         class(NeighbourCells), intent(inout) :: this
         integer, intent(in) :: Ncol
@@ -323,11 +323,11 @@ contains
             
         end do
             
-    end  subroutine NeighbourCells_add_col_to_cell
+    end subroutine NeighbourCells_add_col_to_cell
     
     ! Neighbour cells initialisation
     
-    subroutine NeighbourCells_init_nearCells_among_totalCells(this)
+    pure subroutine NeighbourCells_init_nearCells_among_totalCells(this)
     
         class(NeighbourCells), intent(inout) :: this
     
