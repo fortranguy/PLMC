@@ -231,7 +231,7 @@ contains
     
     !> Adaptation of move_delta during the thermalisation
     
-    subroutine HardSpheres_adapt_move_delta(this, reject)
+    pure subroutine HardSpheres_adapt_move_delta(this, reject)
     
         class(HardSpheres), intent(inout) :: this
         real(DP), intent(in) :: reject
@@ -392,7 +392,7 @@ contains
     
     !> Fill cells with colloids
     
-    subroutine HardSpheres_all_cols_to_cells(this, other)
+    pure subroutine HardSpheres_all_cols_to_cells(this, other)
     
         class(HardSpheres), intent(inout) :: this
         class(HardSpheres), intent(in) :: other
