@@ -68,7 +68,7 @@ contains
         this%cell_size(:) = Lsize(:)/real(this%NtotalCell_dim(:), DP)
         
         do jDim=1, Ndim        
-            if (proposed_cell_size(jDim) /= this%cell_size(jDim)) then            
+            if (proposed_cell_size(jDim) < this%cell_size(jDim)) then            
                 write(error_unit, *) "    Warning : cell size in the dimension", jDim, &
                                       "was changed."
                 write(error_unit, *) "    ", proposed_cell_size(jDim), "->", this%cell_size(jDim)            
