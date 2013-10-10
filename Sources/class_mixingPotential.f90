@@ -197,7 +197,7 @@ contains
     !> Tabulation of Yukawa potential
     !> \f[ \epsilon \frac{e^{-\alpha (r-r_{min})}}{r} \f]
     
-    subroutine MixingPotential_Epot_init(this)
+    pure subroutine MixingPotential_Epot_init(this)
     
         class(MixingPotential), intent(inout) :: this
 
