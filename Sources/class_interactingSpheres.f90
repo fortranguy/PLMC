@@ -138,7 +138,7 @@ contains
     !> Tabulation of Yukawa potential    
     !> \f[ \epsilon \frac{e^{-\alpha (r-r_{min})}}{r} \f]
     
-    subroutine InteractingSpheres_Epot_init(this)
+    pure subroutine InteractingSpheres_Epot_init(this)
     
         class(InteractingSpheres), intent(inout) :: this
 
