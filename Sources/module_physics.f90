@@ -61,7 +61,7 @@ contains
             
                 normSqr = x*x + y*y
                 
-                if (normSqr <= 1._DP .and. normSqr /= 0._DP) exit
+                if (normSqr <= 1._DP .and. normSqr > 0._DP) exit
                 
             end do
             
