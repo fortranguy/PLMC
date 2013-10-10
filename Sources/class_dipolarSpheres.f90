@@ -630,24 +630,17 @@ contains
         class(DipolarSpheres), intent(inout) :: this
         integer, intent(in) :: waveVectors_unit
         
-        real(DP), dimension(Ndim) :: waveVector
         integer :: kx, ky, kz
 
         this%NwaveVectors = 0
 
         do kz = 0, Kmax(3)
 
-            waveVector(3) = real(kz, DP)
-
             do ky = -Kmax2_sym(kz), Kmax(2)
-
-                waveVector(2) = real(ky, DP)
 
                 do kx = -Kmax1_sym(ky, kz), Kmax(1)
 
-                    waveVector(1) = real(kx, DP)
-
-                    if (norm2(waveVector) /= 0._DP) then
+                    if (kx**2 + ky**2 + kz**2 /= 0) then
 
                         write(waveVectors_unit, *) kx, ky, kz
                         write(waveVectors_unit, *)
