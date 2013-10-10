@@ -50,7 +50,7 @@ contains
 
     !> Initialisation
 
-    subroutine Observables_init(this)
+    pure subroutine Observables_init(this)
         
         class(Observables), intent(out) :: this
         
@@ -79,7 +79,7 @@ contains
     
     !> Update rejection
     
-    subroutine Observables_update_rejections(this)
+    pure subroutine Observables_update_rejections(this)
     
         class(Observables), intent(inout) :: this
         
@@ -101,7 +101,7 @@ contains
     
     !> Accumulations
     
-    subroutine Observables_accumulate(this)
+    pure subroutine Observables_accumulate(this)
     
         class(Observables), intent(inout) :: this
         
