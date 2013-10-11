@@ -18,7 +18,7 @@ implicit none
     integer :: rMin, rCut
     real(DP) :: densite
     integer, dimension(:), allocatable :: distrib
-    integer, parameter :: snaps_unit = 10, distrib_unit = 11
+    integer :: snaps_unit, distrib_unit = 11
 
     real(DP) :: rMax
     integer :: Ndist
@@ -30,6 +30,9 @@ implicit none
     real(DP) :: numerat, denomin
     real(DP), dimension(:), allocatable :: fct_dist
     real(DP), dimension(:, :), allocatable :: positions
+    
+    character(len=20) :: file_name
+    integer :: length, file_stat
 
     !$ integer :: nb_taches
     real(DP) :: tIni, tFin
@@ -37,7 +40,9 @@ implicit none
 
     if (.not.snap) stop "Snap désactivé."
     
-    open(unit=snaps_unit, recl=4096, file="dipol_snap_positions.shots", status='old', action='read')
+    call get_command_argument(1, file_name, length, file_stat)
+    if (file_stat /= 0) stop "error get_command_argument"
+    open(newunit=snaps_unit, recl=4096, file=file_name(1:length), status='old', action='read')
     
     read(snaps_unit, *) name, Ncol, rMin, rCut
     write(*, *) name, Ncol, rMin, rCut
