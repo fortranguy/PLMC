@@ -37,10 +37,12 @@ implicit none
 
     if (.not.snap) stop "Snap désactivé."
     
-    name = "hardS"
-    Ncol = 1000
-    rMin = 1._DP
-    rCut = 2._DP
+    open(unit=snaps_unit, recl=4096, file="dipol_snap_positions.shots", status='old', action='read')
+    
+    read(snaps_unit, *) name, Ncol, rMin, rCut
+    write(*, *) name, Ncol, rMin, rCut
+    stop
+    
     rMax = norm2(LsizeMi)
     Ndist = int(rMax/dist_dr)
     allocate(distrib(Ndist))
@@ -50,7 +52,7 @@ implicit none
 
     distrib(:) = 0
 
-    open(unit=snaps_unit, recl=4096, file="snap.shot", status='old', action='read')
+    
 
     call cpu_time(tIni)
     !$ tIni_para = omp_get_wtime()
