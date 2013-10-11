@@ -54,9 +54,7 @@ implicit none
     allocate(positions(Ndim, Ncol))
     densite = real(Ncol, DP) / Volume
 
-    distrib(:) = 0
-
-    
+    distrib(:) = 0   
 
     call cpu_time(tIni)
     !$ tIni_para = omp_get_wtime()
