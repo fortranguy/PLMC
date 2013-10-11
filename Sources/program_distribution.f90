@@ -59,8 +59,7 @@ implicit none
     call cpu_time(tIni)
     !$ tIni_para = omp_get_wtime()
     !$omp parallel private(positions, iCol, jCol, r_ij, iDist)
-    !$ nb_taches = omp_get_num_threads()
-    !$omp do schedule(static, Nstep/nb_taches) reduction(+:distrib)
+    !$omp do schedule(static) reduction(+:distrib)
     do iStep = 1, Nstep
 
         ! Lecture :
@@ -91,7 +90,7 @@ implicit none
     open(unit=100, file="dist_duree.out")
         write(100, *) "DuréeSérie_pseudo", tFin - tIni
         !$ write(100, *) "DuréeParallèle", tFin_para - tIni_para
-        !$ write(100, *) "nb_taches =", nb_taches
+        !$ write(100, *) "nb_taches =", omp_get_num_threads()
         !$ write(100, *) "Rapport =", (tFin-tIni)/(tFin_para-tIni_para)
             ! trompeur ?
     close(100)
