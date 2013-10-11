@@ -31,7 +31,7 @@ implicit none
     real(DP), dimension(:), allocatable :: fct_dist
     real(DP), dimension(:, :), allocatable :: positions
     
-    character(len=20) :: file_name
+    character(len=4096) :: file_name
     integer :: length, file_stat
 
     !$ integer :: nb_taches
@@ -46,7 +46,6 @@ implicit none
     
     read(snaps_unit, *) name, Ncol, rMin, rCut
     write(*, *) name, Ncol, rMin, rCut
-    stop
     
     rMax = norm2(LsizeMi)
     Ndist = int(rMax/dist_dr)
