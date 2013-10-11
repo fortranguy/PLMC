@@ -13,6 +13,7 @@ use module_distribution, only : sphereVol
 
 implicit none
 
+    character(len=5) :: name
     integer :: Ncol
     integer :: rMin, rCut
     real(DP) :: densite
