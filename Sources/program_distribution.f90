@@ -55,9 +55,10 @@ implicit none
 
     distrib(:) = 0   
 
+    write(*, *) "Start !"
     call cpu_time(tIni)
     !$ tIni_para = omp_get_wtime()
-    !$omp parallel private(positions, iCol, jCol, r_ij, iDist)
+    !$omp parallel private(iCol, jCol, r_ij, iDist)
     !$omp do schedule(static) reduction(+:distrib)
     do iStep = 1, Nstep
 
@@ -85,6 +86,7 @@ implicit none
     !$omp end parallel
     call cpu_time(tFin)
     !$ tFin_para = omp_get_wtime()
+    write(*, *) "Finish !"
 
     open(unit=100, file="dist_duree.out")
         write(100, *) "DuréeSérie_pseudo", tFin - tIni
