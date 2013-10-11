@@ -37,6 +37,7 @@ implicit none
 
     if (.not.snap) stop "Snap désactivé."
     
+    name = "hardS"
     Ncol = 1000
     rMin = 1._DP
     rCut = 2._DP

@@ -73,6 +73,7 @@ private
         procedure :: print_report => HardSpheres_print_report
         
         !> Take a snap shot of the configuration : positions
+        procedure :: snap_positions_data => HardSpheres_snap_positions_data
         procedure :: snap_positions => HardSpheres_snap_positions
         
         !> Do an overlap test
@@ -327,6 +328,17 @@ contains
         write(report_unit, *) "    mix_cell_size(:) = ", this%mixCells%get_cell_size()
         
     end subroutine HardSpheres_print_report
+    
+    !> Tag the snapshots
+    
+    subroutine HardSpheres_snap_positions_data(this, snap_unit)
+    
+        class(HardSpheres), intent(in) :: this
+        integer, intent(in) :: snap_unit
+        
+        write(snap_unit) this%name, this%Ncol, this%rMin, this%rCut
+    
+    end subroutine HardSpheres_snap_positions_data
     
     !> Configuration state : positions
       
