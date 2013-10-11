@@ -34,7 +34,7 @@ mode = debug
 
 EXEC1 = xMC_Canonical
 EXEC2 = xMC_Bunching
-EXEC3 = xMC_Distrib
+EXEC3 = xMC_Distribution
 
 all: $(EXEC1) $(EXEC2) $(EXEC3)
 	# Report
@@ -87,6 +87,7 @@ module_algorithms.o : data_precisions.mod data_box.mod data_monteCarlo.mod \
 module_tools.o : data_precisions.mod data_box.mod data_monteCarlo.mod \
                  module_physics.o \
                  class_hardSpheres.o class_interactingSpheres.o class_dipolarSpheres.o
+module_distribution.o : data_precisions.mod data_constants.mod data_distribution.mod
 
 # -----------------------------------------------
 
@@ -110,6 +111,8 @@ module_algorithms.o : module_algorithms.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 module_tools.o : module_tools.f90
 	$(FC) -c $(FFLAGS) $< -o $@
+module_distribution.o : module_distribution.f90
+	$(FC) -c $(FFLAGS) $< -o $@
 
 # -----------------------------------------------
 
@@ -132,10 +135,7 @@ $(EXEC2) : data.o program_bunching.o
 
 program_distribution.o : program_distribution.f90
 	$(FC) -c $(FFLAGS) $< -o $@
-$(EXEC3) : data.o module_physics.o class_neighbourCells.o class_hardSpheres.o \
-           class_interactingSpheres.o class_dipolarSpheres.o class_mixingPotential.o \
-           class_observables.o \
-           module_algorithms.o module_tools.o program_distribution.o
+$(EXEC3) : data.o module_physics.o module_distribution.o program_distribution.o
 	$(FC) $^ $(LDFLAGS) -o $@
 
 # --------------------------------------------------------------------------------------------------

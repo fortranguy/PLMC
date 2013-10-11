@@ -1,28 +1,3 @@
-!> \brief Distribution module
-
-module module_distrib
-
-use data_precisions, only : DP
-use data_constants, only : PI
-use data_distribution, only : deltaDist
-
-implicit none
-
-contains
-
-    !> Calculate the volume of the sphere
-    
-    pure function sphereVol(iDist)
-    
-        integer, intent(in) :: iDist    
-        real(DP) :: sphereVol
-        
-        sphereVol = 4._DP/3._DP * PI * (real(iDist, DP)*deltaDist)**3
-        
-    end function sphereVol
-    
-end module module_distrib
-
 !> \brief Calculate and print the distribution function
 
 program distribution
@@ -30,24 +5,18 @@ program distribution
 use data_precisions, only : DP
 use data_constants, only : PI
 use data_box, only : LsizeMi, Volume
-use data_particles
-use data_monteCarlo
-use data_potential
-use data_distribution
-use module_physics
-use module_distrib
-use class_hardSpheres
-use class_interactingSpheres
-use class_dipolarSpheres
-use class_mixingPotential
-use module_algorithms
+use data_distribution : only, snap, dist_dr
+use module_physics, only : dist_PBC
+use module_distribution, only : sphereVol
 !$ use omp_lib
 
 implicit none
 
-    real(DP), parameter :: densite = real(hard_Ncol, DP) / Volume
+    integer :: Ncol
+    integer :: rMin, rCut
+    real(DP) :: densite
     integer, dimension(:), allocatable :: distrib
-    integer, parameter :: snaps_unit = 10, distrib_unit = 11, energ_unit = 12
+    integer, parameter :: snaps_unit = 10, distrib_unit = 11
 
     real(DP) :: rMax
     integer :: Ndist
@@ -58,24 +27,23 @@ implicit none
     real(DP) :: r
     real(DP) :: numerat, denomin
     real(DP), dimension(:), allocatable :: fct_dist
-    real(DP) :: energSum
-    type(HardSpheres) :: hard
-    type(MixingPotential) :: mix
-    real(DP), dimension(Ndim, hard_Ncol) :: X
+    real(DP), dimension(:, :), allocatable :: positions
 
     !$ integer :: nb_taches
     real(DP) :: tIni, tFin
     !$ real(DP) :: tIni_para, tFin_para
 
     if (.not.snap) stop "Snap désactivé."
-
-    call mix%construct()
-    call hard%construct()
-
+    
+    Ncol = 1000
+    rMin = 1._DP
+    rCut = 2._DP
     rMax = norm2(LsizeMi)
-    Ndist = int(rMax/deltaDist)
+    Ndist = int(rMax/dist_dr)
     allocate(distrib(Ndist))
     allocate(fct_dist(Ndist))
+    allocate(positions(Ndim, Ncol))
+    densite = real(Ncol, DP) / Volume
 
     distrib(:) = 0
 
@@ -83,7 +51,7 @@ implicit none
 
     call cpu_time(tIni)
     !$ tIni_para = omp_get_wtime()
-    !$omp parallel private(X, iCol, jCol, r_ij, iDist)
+    !$omp parallel private(positions, iCol, jCol, r_ij, iDist)
     !$ nb_taches = omp_get_num_threads()
     !$omp do schedule(static, Nstep/nb_taches) reduction(+:distrib)
     do iStep = 1, Nstep
@@ -91,7 +59,7 @@ implicit none
         ! Lecture :
         !$omp critical
         do iCol = 1, hard_Ncol
-            read(snaps_unit, *) X(:, iCol)
+            read(snaps_unit, *) positions(:, iCol)
         end do
         !$omp end critical
 
@@ -100,8 +68,8 @@ implicit none
         do iCol = 1, hard_Ncol
             do jCol = iCol + 1, hard_Ncol
 
-                r_ij = dist_PBC(X(:, iCol), X(:, jCol))      
-                iDist =  int(r_ij/deltaDist)
+                r_ij = dist_PBC(positions(:, iCol), positions(:, jCol))      
+                iDist =  int(r_ij/dist_dr)
                 distrib(iDist) = distrib(iDist) + 1
 
             end do
@@ -131,13 +99,13 @@ implicit none
     open(unit=distrib_unit, file="fct_distrib.out", action="write")
         do iDist = 1, Ndist
         
-            r = (real(iDist, DP) + 0.5_DP) * deltaDist
+            r = (real(iDist, DP) + 0.5_DP) * dist_dr
             numerat = real(distrib(iDist), DP) / real(Nstep, DP)
             denomin = real(hard_Ncol, DP) * (sphereVol(iDist+1)-sphereVol(iDist))
             fct_dist(iDist) = 2._DP * numerat / denomin / densite
             write(distrib_unit, *) r, fct_dist(iDist)
             
-            if (r>=hard%get_rMin() .and. r<=hard%get_rCut()) then
+            if (r>=rMin .and. r<=rCut) then
                 if (iDistMin == 0) then
                     iDistMin = iDist
                 end if
@@ -146,24 +114,9 @@ implicit none
             
         end do
     close(distrib_unit)
-
-    ! Energie par particule
-
-    energSum = 0._DP
-
-    do iDist = iDistMin, iDistMax
-        r = (real(iDist, DP) + 0.5_DP) * deltaDist
-        energSum = energSum + hard%Epot_pair(r) * fct_dist(iDist) * 4._DP*PI*r**2
-    end do
-
-    open(unit=energ_unit, file="epp_dist.out", action="write")
-        write(energ_unit, *) "epp_dist =", densite/2._DP * energSum * deltaDist
-    close(energ_unit)
-
+    
     deallocate(fct_dist)
     deallocate(distrib)
-
-    call hard%destroy()
-    call mix%destroy()
+    deallocate(positions)
 
 end program distribution
