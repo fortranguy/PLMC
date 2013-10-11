@@ -4,8 +4,9 @@ program distribution
 
 use data_precisions, only : DP
 use data_constants, only : PI
-use data_box, only : LsizeMi, Volume
-use data_distribution : only, snap, dist_dr
+use data_box, only : Ndim, LsizeMi, Volume
+use data_monteCarlo, only : Nstep
+use data_distribution, only : snap, dist_dr
 use module_physics, only : dist_PBC
 use module_distribution, only : sphereVol
 !$ use omp_lib
@@ -58,15 +59,15 @@ implicit none
 
         ! Lecture :
         !$omp critical
-        do iCol = 1, hard_Ncol
+        do iCol = 1, Ncol
             read(snaps_unit, *) positions(:, iCol)
         end do
         !$omp end critical
 
         ! Traitement
             
-        do iCol = 1, hard_Ncol
-            do jCol = iCol + 1, hard_Ncol
+        do iCol = 1, Ncol
+            do jCol = iCol + 1, Ncol
 
                 r_ij = dist_PBC(positions(:, iCol), positions(:, jCol))      
                 iDist =  int(r_ij/dist_dr)
@@ -101,7 +102,7 @@ implicit none
         
             r = (real(iDist, DP) + 0.5_DP) * dist_dr
             numerat = real(distrib(iDist), DP) / real(Nstep, DP)
-            denomin = real(hard_Ncol, DP) * (sphereVol(iDist+1)-sphereVol(iDist))
+            denomin = real(Ncol, DP) * (sphereVol(iDist+1)-sphereVol(iDist))
             fct_dist(iDist) = 2._DP * numerat / denomin / densite
             write(distrib_unit, *) r, fct_dist(iDist)
             
