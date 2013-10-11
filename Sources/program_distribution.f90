@@ -34,7 +34,6 @@ implicit none
     character(len=4096) :: file_name
     integer :: length, file_stat
 
-    !$ integer :: nb_taches
     real(DP) :: tIni, tFin
     !$ real(DP) :: tIni_para, tFin_para
 

@@ -17,9 +17,9 @@ else
 
 	FC = ifort
 	# default : debug
-	FFLAGS = -warn all -check all -check noarg_temp_created -fltconsistency -g #-fopenmp
+	FFLAGS = -warn all -check all -check noarg_temp_created -fltconsistency -g -fopenmp
 	ifeq ($(mode), release)
-		FFLAGS =  -fltconsistency -g #-fopenmp
+		FFLAGS =  -fltconsistency -g -fopenmp
 	endif
 	ifeq ($(mode), fast)
 		FFLAGS = -fast -openmp
