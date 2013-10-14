@@ -19,7 +19,7 @@ implicit none
     integer :: snap_factor
     real(DP) :: density
     integer, dimension(:), allocatable :: distrib
-    integer :: snaps_unit, distrib_unit = 11
+    integer :: snaps_unit, distrib_unit
 
     real(DP) :: rMax
     integer :: Ndist
@@ -33,15 +33,17 @@ implicit none
     real(DP), dimension(:, :), allocatable :: positions
     
     character(len=4096) :: file_name
-    integer :: length, file_stat
+    integer :: length, time_unit, file_stat
 
     real(DP) :: tIni, tFin
+    !$ integer :: num_threads
     !$ real(DP) :: tIni_para, tFin_para
 
     if (.not.snap) stop "Snap désactivé."
     
     call get_command_argument(1, file_name, length, file_stat)
     if (file_stat /= 0) stop "error get_command_argument"
+    
     open(newunit=snaps_unit, recl=4096, file=file_name(1:length), status='old', action='read')
     
     read(snaps_unit, *) name, Ncol, rMin, rCut, snap_factor
@@ -60,6 +62,7 @@ implicit none
     call cpu_time(tIni)
     !$ tIni_para = omp_get_wtime()
     !$omp parallel private(iCol, jCol, r_ij, iDist)
+    !$ num_threads = omp_get_num_threads()
     !$omp do schedule(static) reduction(+:distrib)
     do iStep = 1, Nstep/snap_factor
 
@@ -85,17 +88,9 @@ implicit none
     end do
     !$omp end do nowait
     !$omp end parallel
-    call cpu_time(tFin)
     !$ tFin_para = omp_get_wtime()
+    call cpu_time(tFin)
     write(*, *) "Finish !"
-
-    open(unit=100, file="dist_duree.out")
-        write(100, *) "DuréeSérie_pseudo", tFin - tIni
-        !$ write(100, *) "DuréeParallèle", tFin_para - tIni_para
-        !$ write(100, *) "nb_taches =", omp_get_num_threads()
-        !$ write(100, *) "Rapport =", (tFin-tIni)/(tFin_para-tIni_para)
-            ! trompeur ?
-    close(100)
 
     close(snaps_unit)
 
@@ -104,7 +99,8 @@ implicit none
     iDistMin = 0
     iDistMax = 0
 
-    open(unit=distrib_unit, file="fct_distrib.out", action="write")
+    open(newunit=distrib_unit, file=name//"_dist_function.out", action="write")
+    
         do iDist = 1, Ndist
         
             r = (real(iDist, DP) + 0.5_DP) * dist_dr
@@ -121,7 +117,16 @@ implicit none
             end if
             
         end do
+        
     close(distrib_unit)
+    
+    open(newunit=time_unit, file=name//"dist_duree.out")
+        write(time_unit, *) "DuréeSérie_pseudo", tFin - tIni
+        !$ write(time_unit, *) "DuréeParallèle", tFin_para - tIni_para
+        !$ write(time_unit, *) "number of threads =", num_threads
+        !$ write(time_unit, *) "Rapport =", (tFin-tIni)/(tFin_para-tIni_para)
+            ! trompeur ?
+    close(time_unit)
     
     deallocate(fct_dist)
     deallocate(distrib)
