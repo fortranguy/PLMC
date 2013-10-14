@@ -120,7 +120,7 @@ implicit none
         
     close(distrib_unit)
     
-    open(newunit=time_unit, file=name//"dist_duree.out")
+    open(newunit=time_unit, file=name//"_dist_duree.out")
         write(time_unit, *) "DuréeSérie_pseudo", tFin - tIni
         !$ write(time_unit, *) "DuréeParallèle", tFin_para - tIni_para
         !$ write(time_unit, *) "number of threads =", num_threads
