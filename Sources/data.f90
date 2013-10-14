@@ -74,10 +74,10 @@ use data_precisions, only : DP
 
 implicit none
 
-    integer, parameter :: dipol_Ncol = 10
+    integer, parameter :: dipol_Ncol = 281
     
     real(DP), parameter :: hard_rMin = 1._DP ! u_length
-    integer, parameter :: hard_Ncol = 100
+    integer, parameter :: hard_Ncol = 6750
     
     real(DP), parameter :: mix_delta = 0.2_DP ! u_length
     
@@ -102,9 +102,9 @@ implicit none
 
     real(DP), parameter :: Temperature = 1._DP ! u_temperature
     integer, parameter :: decorrelFactor = 2**0
-    integer, parameter :: Nthermal = 2**5/decorrelFactor
+    integer, parameter :: Nthermal = 2**15/decorrelFactor
     integer, parameter :: Nadapt = Nthermal/8
-    integer, parameter :: Nstep = 2**8
+    integer, parameter :: Nstep = 2**16
     
     ! move
     real(DP), dimension(Ndim), parameter :: dipol_move_delta = 0.3_DP ! u_length, adaptation
