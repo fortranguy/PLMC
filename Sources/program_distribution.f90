@@ -16,6 +16,7 @@ implicit none
     character(len=5) :: name
     integer :: Ncol
     integer :: rMin, rCut
+    integer :: snap_factor
     real(DP) :: densite
     integer, dimension(:), allocatable :: distrib
     integer :: snaps_unit, distrib_unit = 11
@@ -43,8 +44,8 @@ implicit none
     if (file_stat /= 0) stop "error get_command_argument"
     open(newunit=snaps_unit, recl=4096, file=file_name(1:length), status='old', action='read')
     
-    read(snaps_unit, *) name, Ncol, rMin, rCut
-    write(*, *) name, Ncol, rMin, rCut
+    read(snaps_unit, *) name, Ncol, rMin, rCut, snap_factor
+    write(*, *) name, Ncol, rMin, rCut, snap_factor
     
     rMax = norm2(LsizeMi)
     Ndist = int(rMax/dist_dr)
@@ -60,7 +61,7 @@ implicit none
     !$ tIni_para = omp_get_wtime()
     !$omp parallel private(iCol, jCol, r_ij, iDist)
     !$omp do schedule(static) reduction(+:distrib)
-    do iStep = 1, Nstep
+    do iStep = 1, Nstep/snap_factor
 
         ! Lecture :
         !$omp critical
@@ -107,7 +108,7 @@ implicit none
         do iDist = 1, Ndist
         
             r = (real(iDist, DP) + 0.5_DP) * dist_dr
-            numerat = real(distrib(iDist), DP) / real(Nstep, DP)
+            numerat = real(distrib(iDist), DP) / real(Nstep/snap_factor, DP)
             denomin = real(Ncol, DP) * (sphereVol(iDist+1)-sphereVol(iDist))
             fct_dist(iDist) = 2._DP * numerat / denomin / densite
             write(distrib_unit, *) r, fct_dist(iDist)
