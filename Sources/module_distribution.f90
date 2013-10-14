@@ -9,19 +9,19 @@ use data_distribution, only : dist_dr
 implicit none
 
 private
-public sphereVol
+public sphere_volume
 
 contains
 
     !> Calculate the volume of the sphere
     
-    pure function sphereVol(iDist)
+    pure function sphere_volume(iDist)
     
         integer, intent(in) :: iDist    
-        real(DP) :: sphereVol
+        real(DP) :: sphere_volume
         
-        sphereVol = 4._DP/3._DP * PI * (real(iDist, DP)*dist_dr)**3
+        sphere_volume = 4._DP/3._DP * PI * (real(iDist, DP)*dist_dr)**3
         
-    end function sphereVol
+    end function sphere_volume
     
 end module module_distribution

@@ -8,7 +8,7 @@ use data_box, only : Ndim, LsizeMi, Volume
 use data_monteCarlo, only : Nstep
 use data_distribution, only : snap, dist_dr
 use module_physics, only : dist_PBC
-use module_distribution, only : sphereVol
+use module_distribution, only : sphere_volume
 !$ use omp_lib
 
 implicit none
@@ -105,7 +105,7 @@ implicit none
         
             r = (real(iDist, DP) + 0.5_DP) * dist_dr
             numerat = real(dist_sum(iDist), DP) / real(Nstep/snap_factor, DP)
-            denomin = real(Ncol, DP) * (sphereVol(iDist+1)-sphereVol(iDist))
+            denomin = real(Ncol, DP) * (sphere_volume(iDist+1)-sphere_volume(iDist))
             dist_function(iDist) = 2._DP * numerat / denomin / density
             write(distrib_unit, *) r, dist_function(iDist)
             
@@ -120,12 +120,12 @@ implicit none
         
     close(distrib_unit)
     
-    open(newunit=time_unit, file=name//"_dist_duree.out")
-        write(time_unit, *) "DuréeSérie_pseudo", tFin - tIni
-        !$ write(time_unit, *) "DuréeParallèle", tFin_para - tIni_para
+    open(newunit=time_unit, file=name//"_dist_time.out")
+        write(time_unit, *) "pseudo serial time", tFin - tIni
+        !$ write(time_unit, *) "parallel time", tFin_para - tIni_para
         !$ write(time_unit, *) "number of threads =", num_threads
-        !$ write(time_unit, *) "Rapport =", (tFin-tIni)/(tFin_para-tIni_para)
-            ! trompeur ?
+        !$ write(time_unit, *) "ratio =", (tFin-tIni)/(tFin_para-tIni_para)
+            ! fake ?
     close(time_unit)
     
     deallocate(dist_function)
