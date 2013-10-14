@@ -17,7 +17,7 @@ implicit none
     integer :: Ncol
     integer :: rMin, rCut
     integer :: snap_factor
-    real(DP) :: densite
+    real(DP) :: density
     integer, dimension(:), allocatable :: distrib
     integer :: snaps_unit, distrib_unit = 11
 
@@ -52,7 +52,7 @@ implicit none
     allocate(distrib(Ndist))
     allocate(fct_dist(Ndist))
     allocate(positions(Ndim, Ncol))
-    densite = real(Ncol, DP) / Volume
+    density = real(Ncol, DP) / Volume
 
     distrib(:) = 0   
 
@@ -110,7 +110,7 @@ implicit none
             r = (real(iDist, DP) + 0.5_DP) * dist_dr
             numerat = real(distrib(iDist), DP) / real(Nstep/snap_factor, DP)
             denomin = real(Ncol, DP) * (sphereVol(iDist+1)-sphereVol(iDist))
-            fct_dist(iDist) = 2._DP * numerat / denomin / densite
+            fct_dist(iDist) = 2._DP * numerat / denomin / density
             write(distrib_unit, *) r, fct_dist(iDist)
             
             if (r>=rMin .and. r<=rCut) then
