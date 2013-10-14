@@ -18,7 +18,7 @@ implicit none
     integer :: rMin, rCut
     integer :: snap_factor
     real(DP) :: density
-    integer, dimension(:), allocatable :: distrib
+    integer, dimension(:), allocatable :: dist_sum
     integer :: snaps_unit, distrib_unit
 
     real(DP) :: rMax
@@ -29,7 +29,7 @@ implicit none
     integer :: iDist, iDistMin, iDistMax
     real(DP) :: r
     real(DP) :: numerat, denomin
-    real(DP), dimension(:), allocatable :: fct_dist
+    real(DP), dimension(:), allocatable :: dist_function
     real(DP), dimension(:, :), allocatable :: positions
     
     character(len=4096) :: file_name
@@ -51,19 +51,19 @@ implicit none
     
     rMax = norm2(LsizeMi)
     Ndist = int(rMax/dist_dr)
-    allocate(distrib(Ndist))
-    allocate(fct_dist(Ndist))
+    allocate(dist_sum(Ndist))
+    allocate(dist_function(Ndist))
     allocate(positions(Ndim, Ncol))
     density = real(Ncol, DP) / Volume
 
-    distrib(:) = 0   
+    dist_sum(:) = 0   
 
     write(*, *) "Start !"
     call cpu_time(tIni)
     !$ tIni_para = omp_get_wtime()
     !$omp parallel private(iCol, jCol, r_ij, iDist)
     !$ num_threads = omp_get_num_threads()
-    !$omp do schedule(static) reduction(+:distrib)
+    !$omp do schedule(static) reduction(+:dist_sum)
     do iStep = 1, Nstep/snap_factor
 
         ! Lecture :
@@ -80,7 +80,7 @@ implicit none
 
                 r_ij = dist_PBC(positions(:, iCol), positions(:, jCol))      
                 iDist =  int(r_ij/dist_dr)
-                distrib(iDist) = distrib(iDist) + 1
+                dist_sum(iDist) = dist_sum(iDist) + 1
 
             end do
         end do
@@ -104,10 +104,10 @@ implicit none
         do iDist = 1, Ndist
         
             r = (real(iDist, DP) + 0.5_DP) * dist_dr
-            numerat = real(distrib(iDist), DP) / real(Nstep/snap_factor, DP)
+            numerat = real(dist_sum(iDist), DP) / real(Nstep/snap_factor, DP)
             denomin = real(Ncol, DP) * (sphereVol(iDist+1)-sphereVol(iDist))
-            fct_dist(iDist) = 2._DP * numerat / denomin / density
-            write(distrib_unit, *) r, fct_dist(iDist)
+            dist_function(iDist) = 2._DP * numerat / denomin / density
+            write(distrib_unit, *) r, dist_function(iDist)
             
             if (r>=rMin .and. r<=rCut) then
                 if (iDistMin == 0) then
@@ -128,8 +128,8 @@ implicit none
             ! trompeur ?
     close(time_unit)
     
-    deallocate(fct_dist)
-    deallocate(distrib)
+    deallocate(dist_function)
+    deallocate(dist_sum)
     deallocate(positions)
 
 end program distribution
