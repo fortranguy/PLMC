@@ -36,7 +36,6 @@ implicit none
     integer :: length, time_unit, file_stat
 
     real(DP) :: tIni, tFin
-    !$ integer :: num_threads
     !$ real(DP) :: tIni_para, tFin_para
 
     if (.not.snap) stop "Snap désactivé."
@@ -61,9 +60,7 @@ implicit none
     write(*, *) "Start !"
     call cpu_time(tIni)
     !$ tIni_para = omp_get_wtime()
-    !$omp parallel private(iCol, jCol, r_ij, iDist)
-    !$ num_threads = omp_get_num_threads()
-    !$omp do schedule(static) reduction(+:dist_sum)
+    !$omp parallel do schedule(static) reduction(+:dist_sum) private(iCol, jCol, r_ij, iDist)
     do iStep = 1, Nstep/snap_factor
 
         ! Lecture :
@@ -86,8 +83,7 @@ implicit none
         end do
 
     end do
-    !$omp end do nowait
-    !$omp end parallel
+    !$omp end parallel do
     !$ tFin_para = omp_get_wtime()
     call cpu_time(tFin)
     write(*, *) "Finish !"
@@ -123,7 +119,11 @@ implicit none
     open(newunit=time_unit, file=name//"_dist_time.out")
         write(time_unit, *) "pseudo serial time", tFin - tIni
         !$ write(time_unit, *) "parallel time", tFin_para - tIni_para
-        !$ write(time_unit, *) "number of threads =", num_threads
+        !$omp parallel
+            !$omp master
+                !$ write(time_unit, *) "number of threads =", omp_get_num_threads()
+            !$omp end master
+        !$omp end parallel
         !$ write(time_unit, *) "ratio =", (tFin-tIni)/(tFin_para-tIni_para)
             ! fake ?
     close(time_unit)
