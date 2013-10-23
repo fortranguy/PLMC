@@ -2,7 +2,7 @@
 
 module class_interactingSpheres
 
-use, intrinsic :: iso_fortran_env, only : output_unit
+use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
 use data_precisions, only : DP, consist_tiny
 use data_box, only : Ndim, Lsize
 use data_particles, only : inter_rMin, inter_Ncol
@@ -78,8 +78,13 @@ contains
         ! Potential
         this%rCut = inter_rCut
         this%dr = inter_dr
-        this%iMin = int(this%rMin/this%dr) - 1
-        this%iCut = int(this%rCut/this%dr) + 1
+        if (this%dr > this%rMin) then
+            write(error_unit, *) "    dr > rMin"
+            this%dr = this%rMin
+            write(error_unit, *) "    dr <- rMin"
+        end if
+        this%iMin = int(this%rMin/this%dr)
+        this%iCut = int(this%rCut/this%dr)
         this%epsilon = inter_epsilon
         this%alpha = inter_alpha        
         allocate(this%Epot_tab(this%iMin:this%iCut))
