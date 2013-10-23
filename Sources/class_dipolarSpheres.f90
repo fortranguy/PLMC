@@ -13,7 +13,7 @@ use data_monteCarlo, only : dipol_move_delta, dipol_move_rejectFix, dipol_rotate
 use data_potential, only : dipol_rCut, dipol_dr, dipol_alpha
 use data_neighbourCells, only : NnearCell
 use data_distribution, only : dipol_snap_factor
-use module_physics, only : distVec_PBC, Kmax1_sym, Kmax2_sym, fourier_i
+use module_physics, only : set_discrete_length, distVec_PBC, Kmax1_sym, Kmax2_sym, fourier_i
 use class_neighbourCells
 use class_hardSpheres
 
@@ -147,11 +147,7 @@ contains
         ! Potential
         this%rCut = dipol_rCut
         this%dr = dipol_dr
-        if (this%dr > this%rMin) then
-            write(error_unit, *) "    dr > rMin"
-            this%dr = this%rMin
-            write(error_unit, *) "    dr <- rMin"
-        end if
+        call set_discrete_length(this%rMin, this%dr)
         this%iMin = int(this%rMin/this%dr)
         this%iCut = int(this%rCut/this%dr) + 1
         this%alpha = dipol_alpha        

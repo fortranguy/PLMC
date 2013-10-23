@@ -8,7 +8,7 @@ use data_box, only : Ndim
 use data_particles, only : mix_delta
 use data_potential, only : mix_rCut, mix_dr, mix_epsilon, mix_alpha
 use data_neighbourCells, only : NnearCell
-use module_physics, only : dist_PBC
+use module_physics, only : set_discrete_length, dist_PBC
 use class_neighbourCells
 use class_hardSpheres
 
@@ -123,11 +123,7 @@ contains
         end if
         
         ! MixingPotential
-        if (this%dr > this%rMin) then
-            write(error_unit, *) "    dr > rMin"
-            this%dr = this%rMin
-            write(error_unit, *) "    dr <- rMin"
-        end if
+        call set_discrete_length(this%rMin, this%dr)
         this%iMin = int(this%rMin/this%dr)
         this%iCut = int(this%rCut/this%dr) + 1
         allocate(this%Epot_tab(this%iMin:this%iCut))

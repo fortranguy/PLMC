@@ -2,6 +2,7 @@
 
 module module_physics
 
+use, intrinsic :: iso_fortran_env, only : error_unit
 use data_precisions, only : DP
 use data_constants, only : PI, sigma3d
 use data_box, only : Ndim, Lsize, LsizeMi, Kmax
@@ -9,10 +10,25 @@ use data_box, only : Ndim, Lsize, LsizeMi, Kmax
 
 implicit none
 private
-public distVec_PBC, dist_PBC, random_surface, markov_surface, Kmax1_sym, Kmax2_sym, fourier_i, &
-       index_from_coord, coord_PBC
+public set_discrete_length, distVec_PBC, dist_PBC, random_surface, markov_surface, &
+       Kmax1_sym, Kmax2_sym, fourier_i, index_from_coord, coord_PBC
 
 contains
+
+    !> Set discretization length
+    
+    subroutine set_discrete_length(rMin, dr)
+        
+        real(DP), intent(in) ::rMin
+        real(DP), intent(inout) :: dr
+        
+        if (dr > rMin) then
+            write(error_unit, *) "    dr", dr, "> rMin", rMin
+            dr = rMin
+            write(error_unit, *) "    dr <- rMin"
+        end if
+    
+    end subroutine set_discrete_length
 
     !> Distance between 2 positions with Periodic Boundary Conditions
     
