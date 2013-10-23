@@ -112,6 +112,8 @@ contains
     
         class(MixingPotential), intent(inout) :: this
         real(DP), intent(in) :: type1_rMin, type2_rMin
+        
+        write(output_unit, *) this%name, " : set rMin"
     
         this%rMin = (type1_rMin + type2_rMin)/2._DP + this%delta
         
