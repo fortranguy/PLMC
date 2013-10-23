@@ -183,28 +183,28 @@ contains
         do jDim = 1, Ndim
         
             if (this%cell_size(jDim) < rCut) then
-                write(error_unit, *) "  Warning : big rCut in the dimension", jDim, ":"
-                write(error_unit, *) "  ", this%cell_size(jDim), "<", rCut
+                write(error_unit, *) "    Warning : big rCut in the dimension", jDim, ":"
+                write(error_unit, *) "    ", this%cell_size(jDim), "<", rCut
             end if
             
             if (Lsize(jDim)/2._DP < rCut) then
-                write(error_unit, *) "  rCut too large in the dimension", jDim, ":"
-                write(error_unit, *) "  ", Lsize(jDim)/2._DP, "<", rCut
+                write(error_unit, *) "    rCut too large in the dimension", jDim, ":"
+                write(error_unit, *) "    ", Lsize(jDim)/2._DP, "<", rCut
                 stop
             end if
             
             if (this%NtotalCell_dim(jDim) < NnearCell_dim(jDim)) then
-                write(error_unit, *) "  Too few cells in the dimension", jDim, ":"
-                write(error_unit, *) "  ", this%NtotalCell_dim(jDim), "<", NnearCell_dim(jDim)
+                write(error_unit, *) "    Too few cells in the dimension", jDim, ":"
+                write(error_unit, *) "    ", this%NtotalCell_dim(jDim), "<", NnearCell_dim(jDim)
                 stop
             end if
             
             if (modulo(Lsize(jDim), this%cell_size(jDim)) > real_zero) then
-                write(error_unit, *) "  Cell size is not a divisor of the system size"
-                write(error_unit, *) "  in the dimension", jDim, ":"
-                write(error_unit, *) "  Lsize", Lsize(jDim)
-                write(error_unit, *) "  cell_size", this%cell_size(jDim)
-                write(error_unit, *) "  modulo(Lsize, cell_size) = ", &
+                write(error_unit, *) "    Cell size is not a divisor of the system size"
+                write(error_unit, *) "    in the dimension", jDim, ":"
+                write(error_unit, *) "    Lsize", Lsize(jDim)
+                write(error_unit, *) "    cell_size", this%cell_size(jDim)
+                write(error_unit, *) "    modulo(Lsize, cell_size) = ", &
                                       modulo(Lsize(jDim), this%cell_size(jDim))
                 stop
             end if
