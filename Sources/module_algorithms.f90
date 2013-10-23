@@ -40,10 +40,6 @@ contains
         real(DP), dimension(Ndim) :: mCol
         real(DP) :: this_EpotNew_real, this_EpotOld_real
         
-        if (this%get_Ncol() == 0) then
-            return
-        end if
-        
         call random_number(random)
         iOld = int(random*this%get_Ncol()) + 1
         xOld(:) = this%positions(:, iOld)
@@ -139,8 +135,7 @@ contains
         class(HardSpheres), intent(in) :: this
         class(Observables), intent(inout) :: this_obs
         class(HardSpheres), intent(in) :: other
-        class(MixingPotential), intent(in) :: mix
-        
+        class(MixingPotential), intent(in) :: mix        
         
         integer :: iWidom
         real(DP) :: widTestSum
@@ -218,11 +213,7 @@ contains
         real(DP) :: deltaEpot_real, deltaEpot_self
         real(DP) :: real_EpotNew, real_EpotOld
         integer :: iTotalCell
-        
-        if (this%get_Ncol() == 0) then
-            return
-        end if
-        
+
         call random_number(random)
         iOld = int(random*this%get_Ncol()) + 1
         
