@@ -153,7 +153,7 @@ contains
             write(error_unit, *) "    dr <- rMin"
         end if
         this%iMin = int(this%rMin/this%dr)
-        this%iCut = int(this%rCut/this%dr)
+        this%iCut = int(this%rCut/this%dr) + 1
         this%alpha = dipol_alpha        
         allocate(this%Epot_real_tab(this%iMin:this%iCut, 2))
         call this%Epot_real_init()
