@@ -17,15 +17,15 @@ contains
 
     !> Set discretization length
     
-    subroutine set_discrete_length(rMin, dr)
+    subroutine set_discrete_length(lMin, dl)
         
-        real(DP), intent(in) ::rMin
-        real(DP), intent(inout) :: dr
+        real(DP), intent(in) ::lMin
+        real(DP), intent(inout) :: dl
         
-        if (dr > rMin) then
-            write(error_unit, *) "    dr", dr, "> rMin", rMin
-            dr = rMin
-            write(error_unit, *) "    dr <- rMin"
+        if (dl > lMin) then
+            write(error_unit, *) "    dl", dl, "> lMin", lMin
+            dl = lMin
+            write(error_unit, *) "    dl <- lMin"
         end if
     
     end subroutine set_discrete_length
