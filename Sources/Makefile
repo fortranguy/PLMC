@@ -48,6 +48,7 @@ all: $(EXEC1) $(EXEC2) $(EXEC3)
 
 data_copy.f90 : data.f90
 	cp data.f90 data_copy.f90
+	chmod ugo-w data_copy.f90
 
 data_copy.o data_precisions.mod data_constants.mod data_box.mod data_particles.mod \
 data_monteCarlo.mod data_potential.mod data_neighbourCells.mod data_distribution.mod : data_copy.f90
