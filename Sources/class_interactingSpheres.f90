@@ -116,7 +116,7 @@ contains
     subroutine InteractingSpheres_print_report(this, report_unit)
     
         class(InteractingSpheres), intent(in) :: this
-        integer, intent(in) :: report_unit    
+        integer, intent(in) :: report_unit
         
         write(report_unit, *) "Data :"
         

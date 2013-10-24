@@ -190,7 +190,7 @@ contains
     subroutine DipolarSpheres_print_report(this, report_unit)
     
         class(DipolarSpheres), intent(in) :: this
-        integer, intent(in) :: report_unit    
+        integer, intent(in) :: report_unit
         
         write(report_unit, *) "Data :"
         

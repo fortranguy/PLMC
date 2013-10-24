@@ -312,7 +312,7 @@ contains
     subroutine HardSpheres_print_report(this, report_unit)
     
         class(HardSpheres), intent(in) :: this
-        integer, intent(in) :: report_unit    
+        integer, intent(in) :: report_unit
         
         write(report_unit, *) "Data :"
         
