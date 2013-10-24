@@ -15,7 +15,7 @@ implicit none
 
     character(len=5) :: name
     integer :: Ncol
-    integer :: rMin, rCut
+    real(DP) :: rMin, rCut
     integer :: snap_factor
     real(DP) :: density
     integer, dimension(:), allocatable :: dist_sum
