@@ -465,7 +465,7 @@ contains
         class(HardSpheres), intent(in) :: this        
         real(DP) :: Epot_conf
     
-        Epot_conf = 0._DP * this%Ncol
+        Epot_conf = this%Ncol * 0._DP
         
     end function HardSpheres_Epot_conf
     
