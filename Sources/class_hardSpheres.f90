@@ -42,7 +42,6 @@ private
 
         ! Potential
         real(DP) :: rCut !< short-range cut
-        real(DP) :: Epot
         
         ! Neighbours (cell/grid scheme)
         type(NeighbourCells), public :: sameCells !< same kind
@@ -61,7 +60,6 @@ private
         procedure :: get_rMin => HardSpheres_get_rMin
         procedure :: get_radius => HardSpheres_get_radius
         procedure :: get_rCut => HardSpheres_get_rCut
-        procedure :: get_Epot => HardSpheres_get_Epot
         procedure :: get_move_delta => HardSpheres_get_move_delta
         !> Specifier        
         !> Adapt the displacement move_delta during thermalisation
@@ -85,7 +83,6 @@ private
         
         !> Potential energy
         procedure :: Epot_print => HardSpheres_Epot_print
-        procedure :: Epot_pair => HardSpheres_Epot_pair
         procedure :: Epot_neighCells => HardSpheres_Epot_neighCells
         procedure :: Epot_conf => HardSpheres_Epot_conf
         procedure :: test_consist => HardSpheres_test_consist
@@ -120,7 +117,6 @@ contains
                 
         ! Potential
         this%rCut = this%rMin
-        this%Epot = 0._DP
         
         ! Neighbour Cells
         cell_size(:) = this%rCut
@@ -208,17 +204,6 @@ contains
         get_rCut = this%rCut
     
     end function HardSpheres_get_rCut
-
-    !> Accessor : Epot
-
-    pure function HardSpheres_get_Epot(this) result(get_Epot)
-
-        class(HardSpheres), intent(in) :: this
-        real(DP) :: get_Epot
-
-        get_Epot = this%Epot
-
-    end function HardSpheres_get_Epot
     
     pure function HardSpheres_get_move_delta(this) result(get_move_delta)
         
@@ -423,25 +408,9 @@ contains
         class(HardSpheres), intent(in) :: this
         integer, intent(in) :: Epot_unit
 
-        write(Epot_unit, *) this%rCut, this%Epot
+        write(Epot_unit, *) this%rCut, 0._DP
     
     end subroutine HardSpheres_Epot_print
-    
-    !> Pair potential : dummy
-    
-    pure function HardSpheres_Epot_pair(this, r) result(Epot_pair)
-    
-        class(HardSpheres), intent(in) :: this 
-        real(DP), intent(in) :: r       
-        real(DP) :: Epot_pair
-        
-        if (r >= this%rMin) then
-    
-            Epot_pair = this%Epot
-            
-        end if
-        
-    end function HardSpheres_Epot_pair
     
     subroutine HardSpheres_Epot_neighCells(this, iCol, xCol, iTotalCell, overlap, energ)
         
@@ -496,7 +465,7 @@ contains
         class(HardSpheres), intent(in) :: this        
         real(DP) :: Epot_conf
     
-        Epot_conf = this%Epot
+        Epot_conf = 0._DP * this%Ncol
         
     end function HardSpheres_Epot_conf
     
