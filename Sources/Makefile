@@ -32,9 +32,9 @@ endif
 compiler = ifort
 mode = debug
 
-EXEC1 = xMC_Canonical
-EXEC2 = xMC_Bunching
-EXEC3 = xMC_Distrib
+EXEC1 = mc_cano_bulk
+EXEC2 = mc_bunching
+EXEC3 = mc_distribution
 
 all: $(EXEC1) $(EXEC2) $(EXEC3)
 	# Report
