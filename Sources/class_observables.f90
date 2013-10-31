@@ -17,6 +17,7 @@ private
         real(DP) :: move_reject
         real(DP) :: move_rejectSum
         real(DP) :: move_rejectAdapt
+        real(DP) :: move_rejectAvg
         
         ! Potential energy
         real(DP) :: Epot
@@ -43,6 +44,7 @@ private
         real(DP) :: rotate_reject
         real(DP) :: rotate_rejectSum
         real(DP) :: rotate_rejectAdapt
+        real(DP) :: rotate_rejectAvg
         
     end type MoreObservables
     
@@ -59,6 +61,7 @@ contains
         this%move_reject = 0._DP
         this%move_rejectSum = 0._DP
         this%move_rejectAdapt = 0._DP
+        this%move_rejectAvg = 0._DP
         
         this%EpotSum = 0._DP        
         this%activSum = 0._DP
@@ -72,6 +75,7 @@ contains
                 this%rotate_reject = 0._DP
                 this%rotate_rejectSum = 0._DP
                 this%rotate_rejectAdapt = 0._DP
+                this%rotate_rejectAvg = 0._DP
                 
         end select
         
