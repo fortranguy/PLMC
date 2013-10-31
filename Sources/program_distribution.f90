@@ -27,8 +27,7 @@ implicit none
     integer :: iCol, jCol
     real(DP) :: r_ij
     integer :: iDist, iDistMin, iDistMax
-    real(DP) :: r
-    real(DP) :: numerat, denomin
+    real(DP) :: r_iDist
     real(DP), dimension(:), allocatable :: dist_function
     real(DP), dimension(:, :), allocatable :: positions
     
@@ -99,13 +98,12 @@ implicit none
     
         do iDist = 1, Ndist
         
-            r = (real(iDist, DP) + 0.5_DP) * dist_dr
-            numerat = real(dist_sum(iDist), DP) / real(Nstep/snap_factor, DP)
-            denomin = real(Ncol, DP) * (sphere_volume(iDist+1)-sphere_volume(iDist))
-            dist_function(iDist) = 2._DP * numerat / denomin / density
-            write(distrib_unit, *) r, dist_function(iDist)
+            r_iDist = (real(iDist, DP) + 0.5_DP) * dist_dr
+            dist_function(iDist) = 2._DP * real(dist_sum(iDist), DP) / real(Nstep/snap_factor, DP) / &
+                real(Ncol, DP) / (sphere_volume(iDist+1)-sphere_volume(iDist)) / density
+            write(distrib_unit, *) r_iDist, dist_function(iDist)
             
-            if (r>=rMin .and. r<=rCut) then
+            if (r_iDist>=rMin .and. r_iDist<=rCut) then
                 if (iDistMin == 0) then
                     iDistMin = iDist
                 end if
