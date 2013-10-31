@@ -26,7 +26,7 @@ implicit none
     integer :: iStep
     integer :: iCol, jCol
     real(DP) :: r_ij
-    integer :: iDist, iDistMin, iDistMax
+    integer :: iDist
     real(DP) :: r_iDist
     real(DP), dimension(:), allocatable :: dist_function
     real(DP), dimension(:, :), allocatable :: positions
@@ -89,11 +89,6 @@ implicit none
 
     close(snaps_unit)
 
-    ! Ecriture
-
-    iDistMin = 0
-    iDistMax = 0
-
     open(newunit=distrib_unit, file=name//"_dist_function.out", action="write")
     
         do iDist = 1, Ndist
@@ -102,13 +97,6 @@ implicit none
             dist_function(iDist) = 2._DP * real(dist_sum(iDist), DP) / real(Nstep/snap_factor, DP) / &
                 real(Ncol, DP) / (sphere_volume(iDist+1)-sphere_volume(iDist)) / density
             write(distrib_unit, *) r_iDist, dist_function(iDist)
-            
-            if (r_iDist>=rMin .and. r_iDist<=rCut) then
-                if (iDistMin == 0) then
-                    iDistMin = iDist
-                end if
-                iDistMax = iDist
-            end if
             
         end do
         
