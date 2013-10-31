@@ -15,7 +15,6 @@ implicit none
 
     character(len=5) :: name
     integer :: Ncol
-    real(DP) :: rMin, rCut
     integer :: snap_factor
     real(DP) :: density
     integer, dimension(:), allocatable :: dist_sum
@@ -44,8 +43,8 @@ implicit none
     
     open(newunit=snaps_unit, recl=4096, file=file_name(1:length), status='old', action='read')
     
-    read(snaps_unit, *) name, Ncol, rMin, rCut, snap_factor
-    write(*, *) name, Ncol, rMin, rCut, snap_factor
+    read(snaps_unit, *) name, Ncol, snap_factor
+    write(*, *) name, Ncol, snap_factor
     
     rMax = norm2(LsizeMi)
     Ndist = int(rMax/dist_dr)

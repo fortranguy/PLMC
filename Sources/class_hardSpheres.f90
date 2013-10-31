@@ -323,7 +323,7 @@ contains
         class(HardSpheres), intent(in) :: this
         integer, intent(in) :: snap_unit
         
-        write(snap_unit, *) this%name, this%Ncol, this%rMin, this%rCut, this%snap_factor
+        write(snap_unit, *) this%name, this%Ncol, this%snap_factor
     
     end subroutine HardSpheres_snap_positions_data
     
