@@ -60,15 +60,14 @@ implicit none
     !$omp parallel do schedule(static) reduction(+:dist_sum) private(positions, iCol, jCol, r_ij, iDist)
     do iStep = 1, Nstep/snap_factor
 
-        ! Lecture :
+        ! Read
         !$omp critical
         do iCol = 1, Ncol
             read(snaps_unit, *) positions(:, iCol)
         end do
         !$omp end critical
 
-        ! Traitement
-            
+        ! Fill           
         do iCol = 1, Ncol
             do jCol = iCol + 1, Ncol
 
