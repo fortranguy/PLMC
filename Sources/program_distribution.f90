@@ -3,7 +3,6 @@
 program distribution
 
 use data_precisions, only : DP
-use data_constants, only : PI
 use data_box, only : Ndim, LsizeMi, Volume
 use data_monteCarlo, only : Nstep
 use data_distribution, only : snap, dist_dr
@@ -58,7 +57,7 @@ implicit none
     write(*, *) "Start !"
     call cpu_time(tIni)
     !$ tIni_para = omp_get_wtime()
-    !$omp parallel do schedule(static) reduction(+:dist_sum) private(iCol, jCol, r_ij, iDist)
+    !$omp parallel do schedule(static) reduction(+:dist_sum) private(positions, iCol, jCol, r_ij, iDist)
     do iStep = 1, Nstep/snap_factor
 
         ! Lecture :
