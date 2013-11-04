@@ -300,29 +300,16 @@ contains
         integer, intent(in) :: iCol, iCellNew
     
         type(Link), pointer :: new => null()
-        type(Link), pointer :: next => null(), previous => null()           
-          
+        type(Link), pointer :: next => null(), previous => null()          
         
         previous => this%beginCells(iCellNew)%particle
-        
-        do
-        
-            next => previous%next
-            
-            if (.not. associated(next%next)) then
-            
-                allocate(new)
-                new%next => previous%next
-                previous%next => new
-                new%iCol = iCol
-                exit
-                
-            end if
-            
-            previous => next
-            
-        end do
-            
+        next => previous%next
+
+        allocate(new)
+        new%next => previous%next
+        previous%next => new
+        new%iCol = iCol
+
     end subroutine NeighbourCells_add_col_to_cell
     
     ! Neighbour cells initialisation
