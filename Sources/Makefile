@@ -4,27 +4,33 @@ ifeq ($(compiler), gfortran)
 
 	FC = gfortran
 	# default : debug
-	FFLAGS = -W -Wall -fbounds-check -fopenmp -g
+	FFLAGS = -W -Wall -fbounds-check -g
 	ifeq ($(mode), release)
-		FFLAGS = -O2 -fopenmp -g
+		FFLAGS = -O2 -g
 	endif
 	ifeq ($(mode), fast)
-		FFLAGS = -Ofast -fopenmp
+		FFLAGS = -Ofast
 	endif
-	LDFLAGS = -fopenmp
+	ifeq ($(omp), true)
+        FFLAGS += -fopenmp
+        LDFLAGS = -fopenmp
+    endif
 	
 else
 
 	FC = ifort
 	# default : debug
-	FFLAGS = -warn all -check all -check noarg_temp_created -fltconsistency -g -fopenmp
+	FFLAGS = -warn all -check all -check noarg_temp_created -fltconsistency -g
 	ifeq ($(mode), release)
-		FFLAGS =  -fltconsistency -g -fopenmp
+		FFLAGS =  -fltconsistency -g
 	endif
 	ifeq ($(mode), fast)
-		FFLAGS = -fast -openmp
+		FFLAGS = -fast
 	endif
-	LDFLAGS = -fopenmp
+	ifeq ($(omp), true)
+        FFLAGS += -openmp
+        LDFLAGS = -openmp
+    endif
 	
 endif
 
