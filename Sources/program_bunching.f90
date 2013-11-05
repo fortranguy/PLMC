@@ -90,7 +90,7 @@ implicit none
         
         ! Results
         
-        write(11, *) iBunching, error(1)
+        write(11, *) iBunching, error(:)
         
     end do
     
