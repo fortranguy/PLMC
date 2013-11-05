@@ -47,8 +47,7 @@ implicit none
     
     write(output_unit, *)
     
-    open(newunit=bunch_unit, recl=4096, file=file_name(1:length-4)//"_bunched.out", status='new', &
-         action='write')
+    open(newunit=bunch_unit, recl=4096, file=file_name(1:length-4)//"_bunched.out", action='write')
     
     do iBunching = 1, Nbunching
     
