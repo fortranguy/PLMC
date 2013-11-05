@@ -79,6 +79,7 @@ implicit none
          action='write')
     open(newunit=obsEquilib_unit, recl=4096, file="obsEquilib.out", status='new', &
          action='write')
+    write(obsEquilib_unit, *) "#", 1 ! 1 observable : energy
     call print_report(Ncol, Nmove, Nrotate, report_unit)
     !call init_randomSeed(report_unit)    
     
@@ -94,6 +95,7 @@ implicit none
     
     call type1_obs%init()
     call type1_units%open(type1_spheres%get_name())
+    write(type1_units%obsEquilib, *) "#", 4 ! 4 observables
     call type1_spheres%Epot_real_print(type1_units%Epot)
     call type1_spheres%Epot_reci_count_waveVectors(type1_units%waveVectors)
     call type1_spheres%print_density(Ncol, type1_units%report)
@@ -102,6 +104,7 @@ implicit none
     
     call type2_obs%init()
     call type2_units%open(type2_spheres%get_name())
+    write(type2_units%obsEquilib, *) "#", 3 ! 3 observables
     call type2_spheres%Epot_print(type2_units%Epot)
     call type2_spheres%print_density(Ncol, type2_units%report)
     call type2_spheres%print_report(type2_units%report)
