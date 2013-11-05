@@ -90,6 +90,7 @@ implicit none
          status='new', action='write')
     open(newunit=mix_obsEquilib_unit, recl=4096, file="mix_obsEquilib.out", status='new', &
          action='write')
+    write(mix_obsEquilib_unit, *) "#", 1 ! 1 observable : energy
     call mix%Epot_print(mix_Epot_unit)
     call mix%print_report(mix_report_unit)
     
