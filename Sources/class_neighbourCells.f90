@@ -10,15 +10,15 @@ use module_physics, only : index_from_coord, coord_PBC
 
 implicit none
 private
-public :: Link
+public :: Node
 
-    type Link
+    type Node
         integer :: iCol
-        type(Link), pointer :: next => null()
-    end type Link
+        type(Node), pointer :: next => null()
+    end type Node
     
     type LinkedList
-        type(Link), pointer :: particle => null()
+        type(Node), pointer :: particle => null()
     end type LinkedList
 
     type, public :: NeighbourCells
@@ -148,7 +148,7 @@ contains
     
     recursive pure subroutine free_link(current)
 
-        type(Link), pointer :: current
+        type(Node), pointer :: current
         
         if (associated(current%next)) then
             call free_link(current%next)
@@ -265,8 +265,8 @@ contains
         class(NeighbourCells), intent(inout) :: this
         integer, intent(in) :: iCol, iCellOld
         
-        type(Link), pointer :: current => null()
-        type(Link), pointer :: next => null(), previous => null()
+        type(Node), pointer :: current => null()
+        type(Node), pointer :: next => null(), previous => null()
     
         previous => this%beginCells(iCellOld)%particle
         current => previous%next
@@ -299,8 +299,8 @@ contains
         class(NeighbourCells), intent(inout) :: this    
         integer, intent(in) :: iCol, iCellNew
     
-        type(Link), pointer :: new => null()
-        type(Link), pointer :: next => null(), previous => null()          
+        type(Node), pointer :: new => null()
+        type(Node), pointer :: next => null(), previous => null()          
         
         previous => this%beginCells(iCellNew)%particle
         next => previous%next

@@ -199,7 +199,7 @@ contains
         integer :: iNearCell,  nearCell_index
         real(DP) :: r_ij
     
-        type(Link), pointer :: current => null(), next => null()
+        type(Node), pointer :: current => null(), next => null()
         
         overlap = .false.
         energ = 0._DP
