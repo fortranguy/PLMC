@@ -8,7 +8,7 @@ use data_monteCarlo, only : Nstep
 
 implicit none
 
-    ! Physique 
+    ! Physics 
     
     integer, parameter :: nObs = 2
     integer :: iBunching, nBunching
@@ -16,7 +16,7 @@ implicit none
     real(DP), dimension(nObs) :: sumVal, sumValSqr
     real(DP), dimension(nObs) :: error
 
-    ! Numérique    
+    ! Numerical    
     
     integer, parameter :: nDataMi = Nstep/2
     real(DP), dimension(nObs, 2*nDataMi) :: dataIn
@@ -37,7 +37,7 @@ implicit none
         write(output_unit, *) "iBunching = ", iBunching, "NstepVar = ", NstepVar
         NstepVar = NstepVar/2
         
-        ! Lecture
+        ! Read
         
         if (iBunching == 1) then
         
@@ -55,7 +55,7 @@ implicit none
             
         end if
     
-        ! Bunching
+        ! Bunch
         
         sumVal = 0.
         sumValSqr = 0.
@@ -71,7 +71,7 @@ implicit none
         error(:) = sumValSqr(:)/real(2*NstepVar, DP) - (sumVal(:)/real(2*NstepVar, DP))**2
         error(:) = sqrt(error(:)/real(2*NstepVar, DP))
         
-        ! Résultats
+        ! Results
         
         write(11, *) iBunching, sumVal(1)/real(2*NstepVar, DP), error(1)
         write(12, *) iBunching, sumVal(2)/real(2*NstepVar, DP), error(2)
