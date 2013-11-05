@@ -90,14 +90,15 @@ implicit none
         
     end do
     
-    deallocate(sumVal)
-    deallocate(sumValSqr)
-    deallocate(error)
-    
-    deallocate(dataIn)
-    deallocate(dataOut)
-    
-    close(obs_unit)
     close(bunch_unit)
+    
+    deallocate(dataOut)
+    deallocate(dataIn)
+    
+    deallocate(error)
+    deallocate(sumValSqr)
+    deallocate(sumVal)
+    
+    close(obs_unit)    
 
 end program bunching
