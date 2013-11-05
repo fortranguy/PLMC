@@ -32,6 +32,7 @@ implicit none
     
     open(newunit=obs_unit, recl=4096, file=file_name(1:length), status='old', action='read')
     read(obs_unit, *) comment_symbol, Nobs
+    write(output_unit, *) "Nobs = ", Nobs
     
     allocate(sumVal(Nobs))
     allocate(sumValSqr(Nobs))
@@ -40,6 +41,7 @@ implicit none
     allocate(dataIn(Nobs, 2*NdataMi))
     allocate(dataOut(Nobs, NdataMi))
     
+    write(output_unit, *) "Nstep = ", Nstep
     Nbunching = int(log(real(Nstep, DP))/log(2._DP))
     write(output_unit, *) "Nbunching = ", Nbunching
 
@@ -49,7 +51,6 @@ implicit none
     
     do iBunching = 1, Nbunching
     
-        write(output_unit, *) "iBunching = ", iBunching, "NstepVar = ", NstepVar
         NstepVar = NstepVar/2
         
         ! Read
