@@ -67,7 +67,7 @@ implicit none
         end do
         !$omp end critical
 
-        ! Fill           
+        ! Fill
         do iCol = 1, Ncol
             do jCol = iCol + 1, Ncol
 
