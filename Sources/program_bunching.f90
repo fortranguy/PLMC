@@ -60,7 +60,7 @@ implicit none
         if (iBunching == 1) then        
             
             do iStep = 1, 2*NstepVar
-                read(obs_unit, *) iStepIn, dataIn(1, iStep), dataIn(2, iStep)
+                read(obs_unit, *) iStepIn, dataIn(:, iStep)
             end do            
             
         else
