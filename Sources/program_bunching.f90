@@ -47,9 +47,8 @@ implicit none
     
     write(output_unit, *)
     
-    open(unit=11, file="bunching_eTot.out")
-    open(newunit=bunch_unit, recl=4096, file=file_name(1:length-4)//"_bunched.out", status='old', &
-         action='read')
+    open(newunit=bunch_unit, recl=4096, file=file_name(1:length-4)//"_bunched.out", status='new', &
+         action='write')
     
     do iBunching = 1, Nbunching
     
