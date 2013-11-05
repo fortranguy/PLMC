@@ -50,7 +50,7 @@ implicit none
         
             open(newunit=obs_unit, recl=4096, file=file_name(1:length), status='old', action='read')
             do iStep = 1, 2*NstepVar
-                read(10, *) iStepIn, dataIn(1, iStep), dataIn(2, iStep)
+                read(obs_unit, *) iStepIn, dataIn(1, iStep), dataIn(2, iStep)
             end do
             close(obs_unit)
             
