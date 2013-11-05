@@ -18,9 +18,16 @@ implicit none
 
     ! Numerical    
     
+    integer :: obs_unit
     integer, parameter :: nDataMi = Nstep/2
     real(DP), dimension(nObs, 2*nDataMi) :: dataIn
     real(DP), dimension(nObs, nDataMi) :: dataOut
+    
+    character(len=4096) :: file_name
+    integer :: length, file_stat
+    
+    call get_command_argument(1, file_name, length, file_stat)
+    if (file_stat /= 0) stop "error get_command_argument"
     
     nBunching = int(log(real(Nstep, DP))/log(2._DP))
     write(output_unit, *) "nBunching = ", nBunching
@@ -41,11 +48,11 @@ implicit none
         
         if (iBunching == 1) then
         
-            open(unit=10, file="dipol_obsEquilib.out")
+            open(newunit=obs_unit, recl=4096, file=file_name(1:length), status='old', action='read')
             do iStep = 1, 2*NstepVar
                 read(10, *) iStepIn, dataIn(1, iStep), dataIn(2, iStep)
             end do
-            close(10)
+            close(obs_unit)
             
         else
         
