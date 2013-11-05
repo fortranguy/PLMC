@@ -10,18 +10,19 @@ implicit none
 
     ! Physics 
     
-    integer, parameter :: nObs = 2
-    integer :: iBunching, nBunching
+    integer :: Nobs
+    integer :: iBunching, Nbunching
     integer :: iStep, iStepIn, NstepVar
-    real(DP), dimension(nObs) :: sumVal, sumValSqr
-    real(DP), dimension(nObs) :: error
+    real(DP), dimension(:), allocatable :: sumVal, sumValSqr
+    real(DP), dimension(:), allocatable :: error
 
     ! Numerical    
     
-    integer :: obs_unit
-    integer, parameter :: nDataMi = Nstep/2
-    real(DP), dimension(nObs, 2*nDataMi) :: dataIn
-    real(DP), dimension(nObs, nDataMi) :: dataOut
+    integer :: obs_unit, bunch_unit
+    character(len=1) :: comment_symbol
+    integer, parameter :: NdataMi = Nstep/2
+    real(DP), dimension(:, :), allocatable :: dataIn
+    real(DP), dimension(:, :), allocatable :: dataOut
     
     character(len=4096) :: file_name
     integer :: length, file_stat
@@ -29,30 +30,39 @@ implicit none
     call get_command_argument(1, file_name, length, file_stat)
     if (file_stat /= 0) stop "error get_command_argument"
     
-    nBunching = int(log(real(Nstep, DP))/log(2._DP))
-    write(output_unit, *) "nBunching = ", nBunching
+    open(newunit=obs_unit, recl=4096, file=file_name(1:length), status='old', action='read')
+    read(obs_unit, *) comment_symbol, Nobs
+    
+    allocate(sumVal(Nobs))
+    allocate(sumValSqr(Nobs))
+    allocate(error(Nobs))
+    
+    allocate(dataIn(Nobs, 2*NdataMi))
+    allocate(dataOut(Nobs, NdataMi))
+    
+    Nbunching = int(log(real(Nstep, DP))/log(2._DP))
+    write(output_unit, *) "Nbunching = ", Nbunching
 
     NstepVar = Nstep
     
     write(output_unit, *)
     
     open(unit=11, file="bunching_eTot.out")
-    open(unit=12, file="bunching_activInv.out")
+    open(newunit=bunch_unit, recl=4096, file=file_name(1:length-4)//"_bunched.out", status='old', &
+         action='read')
     
-    do iBunching = 1, nBunching
+    do iBunching = 1, Nbunching
     
         write(output_unit, *) "iBunching = ", iBunching, "NstepVar = ", NstepVar
         NstepVar = NstepVar/2
         
         ! Read
         
-        if (iBunching == 1) then
-        
-            open(newunit=obs_unit, recl=4096, file=file_name(1:length), status='old', action='read')
+        if (iBunching == 1) then        
+            
             do iStep = 1, 2*NstepVar
                 read(obs_unit, *) iStepIn, dataIn(1, iStep), dataIn(2, iStep)
-            end do
-            close(obs_unit)
+            end do            
             
         else
         
@@ -80,12 +90,18 @@ implicit none
         
         ! Results
         
-        write(11, *) iBunching, sumVal(1)/real(2*NstepVar, DP), error(1)
-        write(12, *) iBunching, sumVal(2)/real(2*NstepVar, DP), error(2)
+        write(11, *) iBunching, error(1)
         
     end do
-
-    close(12)
-    close(11)
+    
+    deallocate(sumVal)
+    deallocate(sumValSqr)
+    deallocate(error)
+    
+    deallocate(dataIn)
+    deallocate(dataOut)
+    
+    close(obs_unit)
+    close(bunch_unit)
 
 end program bunching
