@@ -69,6 +69,7 @@ private
         
         !> Potential energy
         !>     Real
+        procedure, private :: Epot_real_true => DipolarSpheres_Epot_real_true
         procedure, private :: Epot_real_init => DipolarSpheres_Epot_real_init
         procedure :: Epot_real_print => DipolarSpheres_Epot_real_print
         procedure, private :: Epot_real_interpol => DipolarSpheres_Epot_real_interpol
@@ -298,13 +299,32 @@ contains
     end function DipolarSpheres_get_reInit_iStep
 
     ! Real : short-range interaction ---------------------------------------------------------------
-    
-    !> Initialisation : look-up (tabulation) table
-    !> \f[ B(r) = \frac{\mathrm{erfc}(\alpha r)}{r^3} + 
+
+    !> \f[ B(r) = \frac{\mathrm{erfc}(\alpha r)}{r^3} +
     !>           2\frac{\alpha}{\sqrt{\pi}}\frac{e^{-\alpha^2 r^2}}{r^2} \f]
     !> \f[ C(r) = 3\frac{\mathrm{erfc}(\alpha r)}{r^5} +
     !>            2\frac{\alpha}{\sqrt{\pi}}(2\alpha^2 + \frac{3}{r^2})
     !>                                     \frac{e^{-\alpha^2 r^2}}{r^2} \f]
+
+    pure function DipolarSpheres_Epot_real_true(this, r) result(Epot_real_true)
+
+        class(DipolarSpheres), intent(in) :: this
+        real(DP), intent(in) :: r
+        real(DP), dimension(2) :: Epot_real_true
+
+        real(DP) :: alpha
+
+        alpha = this%alpha
+
+        Epot_real_true(1) = erfc(alpha*r)/r**3 + 2._DP*alpha/sqrt(PI) * exp(-alpha**2*r**2) / r**2
+
+        Epot_real_true(2) = 3._DP*erfc(alpha*r)/r**5 + &
+                            2._DP*alpha/sqrt(PI) * (2._DP*alpha**2+3._DP/r**2) * &
+                            exp(-alpha**2*r**2) / r**2
+
+    end function DipolarSpheres_Epot_real_true
+    
+    !> Initialisation : look-up (tabulation) table
     
     pure subroutine DipolarSpheres_Epot_real_init(this)
     
@@ -321,12 +341,7 @@ contains
         
             r_i = real(i, DP)*this%dr
             
-            this%Epot_real_tab(i, 1) = erfc(alpha*r_i)/r_i**3 + &
-                                       2._DP*alpha/sqrt(PI) * exp(-alpha**2*r_i**2) / r_i**2
-                                 
-            this%Epot_real_tab(i, 2) = 3._DP*erfc(alpha*r_i)/r_i**5 + &
-                                       2._DP*alpha/sqrt(PI) * (2._DP*alpha**2+3._DP/r_i**2) * &
-                                                              exp(-alpha**2*r_i**2) / r_i**2
+            this%Epot_real_tab(i, :) = this%Epot_real_true(r_i)
                                     
         end do
         
