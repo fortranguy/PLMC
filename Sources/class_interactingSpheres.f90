@@ -40,6 +40,7 @@ private
         procedure :: print_report => InteractingSpheres_print_report
         
         !> Potential energy
+        procedure, private :: Epot_true => InteractingSpheres_Epot_true
         procedure, private :: Epot_init => InteractingSpheres_Epot_init
         procedure :: Epot_print => InteractingSpheres_Epot_print
         procedure :: Epot_pair => InteractingSpheres_Epot_pair
@@ -127,8 +128,21 @@ contains
     end subroutine InteractingSpheres_print_report
     
     !> Potential energy
-    !> Tabulation of Yukawa potential    
+    
+    !> Yukawa potential
     !> \f[ \epsilon \frac{e^{-\alpha (r-r_{min})}}{r} \f]
+    
+    pure function InteractingSpheres_Epot_true(this, r) result(Epot_true)
+    
+        class(InteractingSpheres), intent(in) :: this
+        real(DP), intent(in) :: r
+        real(DP) :: Epot_true
+        
+        Epot_true = this%epsilon * exp(-this%alpha*(r-this%rMin)) / r
+    
+    end function InteractingSpheres_Epot_true    
+    
+    !> Tabulation of the potential    
     
     pure subroutine InteractingSpheres_Epot_init(this)
     
@@ -140,7 +154,7 @@ contains
         ! cut
         do i = this%iMin, this%iCut       
             r_i = real(i, DP)*this%dr
-            this%Epot_tab(i) = this%epsilon * exp(-this%alpha*(r_i-this%rMin)) / r_i
+            this%Epot_tab(i) = this%Epot_true(r_i)
         end do
         
         ! shift        
