@@ -5,7 +5,7 @@ module module_tools
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit, iostat_end
 use data_precisions, only : DP, real_zero, io_tiny, consist_tiny
 use data_constants, only : PI, sigma3d
-use data_box, only : Ndim, Lsize, Volume, Kmax
+use data_box, only : Ndim, Lsize, Kmax
 use data_monteCarlo, only : Temperature, Nstep, decorrelFactor, Nthermal
 use module_physics, only : dist_PBC, random_surface
 use class_hardSpheres
@@ -235,7 +235,7 @@ contains
         write(report_unit ,*) "    Sigma3d = ", sigma3d
         
         write(report_unit ,*) "    Lsize(:) = ", Lsize(:)
-        write(report_unit ,*) "    Volume = ", Volume
+        write(report_unit ,*) "    Volume = ", product(Lsize)
         write(report_unit ,*) "    Kmax(:) = ", Kmax(:)
         write(report_unit ,*) "    NwaveVectors =", (2*Kmax(1)+1) * (2*Kmax(2)+1) * (2*Kmax(3)+1)
         write(report_unit ,*) "    Ncol = ", Ncol

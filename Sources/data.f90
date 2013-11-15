@@ -51,8 +51,6 @@ implicit none
     real(DP), parameter :: Lsize2 = Lsize1 ! u_length
     real(DP), parameter :: Lsize3 = Lsize1 ! u_length 
     real(DP), dimension(Ndim), parameter :: Lsize = [Lsize1, Lsize2, Lsize3] ! u_length
-    real(DP), dimension(Ndim), parameter :: LsizeMi = 0.5_DP * Lsize ! u_length
-    real(DP), parameter :: Volume = Lsize(1) * Lsize(2) * Lsize(3) ! u_length**3
 
     integer, parameter :: Kmax1 = 8 ! 1/u_length
     integer, parameter :: Kmax2 = Kmax1 ! 1/u_length
@@ -143,13 +141,13 @@ end module data_monteCarlo
 module data_potential
 
 use data_precisions, only : DP
-use data_box, only : Lsize1
+use data_box, only : Lsize
 
 implicit none
 
-    real(DP), parameter :: dipol_rCut = Lsize1/2._DP ! u_length
+    real(DP), parameter :: dipol_rCut = Lsize(1)/2._DP ! u_length
     real(DP), parameter :: dipol_dr = 5.E-5_DP ! u_length
-    real(DP), parameter :: dipol_alpha = 7._DP/Lsize1 ! 1/u_length
+    real(DP), parameter :: dipol_alpha = 7._DP/Lsize(1) ! 1/u_length
     
     real(DP), parameter :: mix_rCut = 1._DP ! u_length, adaptation
     real(DP), parameter :: mix_dr = 1._DP ! u_length

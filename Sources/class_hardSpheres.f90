@@ -5,7 +5,7 @@ module class_hardSpheres
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
 use data_precisions, only : DP, real_zero
 use data_constants, only : PI
-use data_box, only : Ndim, Lsize, Volume
+use data_box, only : Ndim, Lsize
 use data_particles, only : hard_rMin, hard_Ncol
 use data_monteCarlo, only : hard_move_delta, hard_move_rejectFix, hard_Nwidom
 use data_neighbourCells, only : NnearCell
@@ -278,7 +278,7 @@ contains
         
         real(DP) :: density, compacity, concentration
         
-        density = real(this%Ncol + 1, DP) / Volume ! cheating ? cf. Widom
+        density = real(this%Ncol + 1, DP) / product(Lsize) ! cheating ? cf. Widom
         compacity = 4._DP/3._DP*PI*this%radius**3 * density
         concentration = real(this%Ncol, DP) / real(total_Ncol, DP)
         

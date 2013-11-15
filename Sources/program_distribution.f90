@@ -3,7 +3,7 @@
 program distribution
 
 use data_precisions, only : DP
-use data_box, only : Ndim, LsizeMi, Volume
+use data_box, only : Ndim, Lsize
 use data_monteCarlo, only : Nstep
 use data_distribution, only : snap, dist_dr
 use module_physics, only : dist_PBC
@@ -45,12 +45,12 @@ implicit none
     read(snaps_unit, *) name, Ncol, snap_factor
     write(*, *) name, Ncol, snap_factor
     
-    rMax = norm2(LsizeMi)
+    rMax = norm2(Lsize/2._DP)
     Ndist = int(rMax/dist_dr)
     allocate(dist_sum(Ndist))
     allocate(dist_function(Ndist))
     allocate(positions(Ndim, Ncol))
-    density = real(Ncol, DP) / Volume
+    density = real(Ncol, DP) / product(Lsize)
 
     dist_sum(:) = 0   
 

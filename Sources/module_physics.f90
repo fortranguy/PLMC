@@ -5,7 +5,7 @@ module module_physics
 use, intrinsic :: iso_fortran_env, only : error_unit
 use data_precisions, only : DP
 use data_constants, only : PI, sigma3d
-use data_box, only : Ndim, Lsize, LsizeMi, Kmax
+use data_box, only : Ndim, Lsize, Kmax
 !$ use omp_lib
 
 implicit none
@@ -39,7 +39,7 @@ contains
         
         distVec_PBC(:) = modulo(xCol2(:)-xCol1(:), Lsize(:))
         
-        where(distVec_PBC(:) > LsizeMi(:))
+        where(distVec_PBC(:) > Lsize(:)/2._DP)
             distVec_PBC(:) = distVec_PBC(:) - Lsize(:)
         end where
         

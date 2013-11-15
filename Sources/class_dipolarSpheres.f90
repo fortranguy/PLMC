@@ -5,7 +5,7 @@ module class_dipolarSpheres
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
 use data_precisions, only : DP, real_zero, consist_tiny
 use data_constants, only : PI
-use data_box, only : Ndim, Lsize, Kmax, Volume, out_permittivity
+use data_box, only : Ndim, Lsize, Kmax, out_permittivity
 use data_particles, only : dipol_Ncol
 use data_monteCarlo, only : dipol_move_delta, dipol_move_rejectFix, dipol_rotate_delta, &
                             dipol_rotate_deltaMax, dipol_rotate_rejectFix, dipol_Nwidom, &
@@ -746,7 +746,7 @@ contains
         
         end do
 
-        deltaEpot_reci_move = 4._DP*PI/Volume * deltaEpot_reci_move
+        deltaEpot_reci_move = 4._DP*PI/product(Lsize) * deltaEpot_reci_move
 
     end function DipolarSpheres_deltaEpot_reci_move
 
@@ -893,7 +893,7 @@ contains
 
         end do
 
-        deltaEpot_reci_rotate = 4._DP*PI/Volume * deltaEpot_reci_rotate
+        deltaEpot_reci_rotate = 4._DP*PI/product(Lsize) * deltaEpot_reci_rotate
 
     end function DipolarSpheres_deltaEpot_reci_rotate
 
@@ -1029,7 +1029,7 @@ contains
         
         end do
         
-        deltaEpot_reci_exchange = 4._DP*PI/Volume * deltaEpot_reci_exchange
+        deltaEpot_reci_exchange = 4._DP*PI/product(Lsize) * deltaEpot_reci_exchange
 
     end function DipolarSpheres_deltaEpot_reci_exchange
     
@@ -1059,7 +1059,7 @@ contains
 
         end do
         
-        Epot_reci = 2._DP*PI/Volume * Epot_reci
+        Epot_reci = 2._DP*PI/product(Lsize) * Epot_reci
         
     end function DipolarSpheres_Epot_reci
     
@@ -1181,7 +1181,7 @@ contains
         deltaEpot_bound_exchange = dot_product(mCol, mCol) + &
                                    2._DP * dot_product(mCol, this%totalMoment)
                           
-        deltaEpot_bound_exchange = 2._DP*PI / (2._DP*out_permittivity+1._DP) / Volume * &
+        deltaEpot_bound_exchange = 2._DP*PI / (2._DP*out_permittivity+1._DP) / product(Lsize) * &
                                    deltaEpot_bound_exchange
     
     end function DipolarSpheres_deltaEpot_bound_exchange
@@ -1207,7 +1207,7 @@ contains
         deltaEpot_bound_rotate = dot_product(mNew, mNew) - dot_product(mOld, mOld) + &
                                  2._DP*dot_product(mNew-mOld, this%totalMoment-mOld)
                           
-        deltaEpot_bound_rotate = 2._DP*PI / (2._DP*out_permittivity+1._DP) / Volume * &
+        deltaEpot_bound_rotate = 2._DP*PI / (2._DP*out_permittivity+1._DP) / product(Lsize) * &
                                  deltaEpot_bound_rotate
     
     end function DipolarSpheres_deltaEpot_bound_rotate
@@ -1222,7 +1222,7 @@ contains
         class(DipolarSpheres), intent(in) :: this
         real(DP) :: Epot_bound
         
-        Epot_bound = 2._DP * PI / (2._DP*out_permittivity + 1._DP) / Volume * &
+        Epot_bound = 2._DP * PI / (2._DP*out_permittivity + 1._DP) / product(Lsize) * &
                      dot_product(this%totalMoment, this%totalMoment)
     
     end function DipolarSpheres_Epot_bound
