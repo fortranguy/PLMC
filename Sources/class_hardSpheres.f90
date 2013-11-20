@@ -357,17 +357,15 @@ contains
         real(DP) :: r_ij
     
         do jCol = 1, this%Ncol
-            do iCol = 1, this%Ncol
-                if (iCol /= jCol) then
+            do iCol = jCol+1, this%Ncol
                     
-                    r_ij = dist_PBC(this%positions(:, iCol), this%positions(:, jCol))
-                    if (r_ij < this%rMin) then
-                        write(error_unit, *) this%name, "    Overlap !", iCol, jCol
-                        write(error_unit, *) "    r_ij = ", r_ij
-                        stop
-                    end if
-                    
+                r_ij = dist_PBC(this%positions(:, iCol), this%positions(:, jCol))
+                if (r_ij < this%rMin) then
+                    write(error_unit, *) this%name, "    Overlap !", iCol, jCol
+                    write(error_unit, *) "    r_ij = ", r_ij
+                    stop
                 end if
+                    
             end do
         end do
         
