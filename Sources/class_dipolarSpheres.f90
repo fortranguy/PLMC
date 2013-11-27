@@ -175,7 +175,7 @@ contains
         
         if (allocated(this%Epot_real_tab)) then
             deallocate(this%Epot_real_tab)
-        endif
+        end if
     
     end subroutine DipolarSpheres_destroy
     

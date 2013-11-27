@@ -101,7 +101,7 @@ contains
         
         if (allocated(this%Epot_tab)) then
             deallocate(this%Epot_tab)
-        endif
+        end if
 
     end subroutine InteractingSpheres_destroy
     
