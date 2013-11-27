@@ -212,7 +212,6 @@ contains
         real(DP) :: deltaEpot
         real(DP) :: deltaEpot_real, deltaEpot_self
         real(DP) :: real_EpotNew, real_EpotOld
-        integer :: iTotalCell
 
         call random_number(random)
         iOld = int(random*this%get_Ncol()) + 1
@@ -222,7 +221,6 @@ contains
         mNew(:) = mOld(:)
         call markov_surface(mNew, this%rotate_delta)
         
-        iTotalCell = this%sameCells%index_from_position(xCol)
         real_EpotNew = this%Epot_real_solo(iOld, xCol, mNew)
         real_EpotOld = this%Epot_real_solo(iOld, xCol, mOld)
         deltaEpot_real = real_EpotNew - real_EpotOld        
