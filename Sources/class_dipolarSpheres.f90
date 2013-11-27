@@ -167,11 +167,7 @@ contains
     
         class(DipolarSpheres), intent(inout) :: this
         
-        write(output_unit, *) this%name, " class destruction"
-        
-        if (allocated(this%positions)) then
-            deallocate(this%positions)
-        end if
+        call this%HardSpheres%destroy()
         
         if (allocated(this%orientations)) then
             deallocate(this%orientations)
@@ -180,9 +176,6 @@ contains
         if (allocated(this%Epot_real_tab)) then
             deallocate(this%Epot_real_tab)
         endif
-        
-        call this%sameCells%destroy()
-        call this%mixCells%destroy()
     
     end subroutine DipolarSpheres_destroy
     

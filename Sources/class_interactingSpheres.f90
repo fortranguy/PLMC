@@ -97,19 +97,12 @@ contains
     
         class(InteractingSpheres), intent(inout) :: this
         
-        write(output_unit, *) this%name, " class destruction"
-        
-        if (allocated(this%positions)) then
-            deallocate(this%positions)
-        end if
+        call this%HardSpheres%destroy()
         
         if (allocated(this%Epot_tab)) then
             deallocate(this%Epot_tab)
         endif
-        
-        call this%sameCells%destroy()
-        call this%mixCells%destroy()
-    
+
     end subroutine InteractingSpheres_destroy
     
     !> Report
