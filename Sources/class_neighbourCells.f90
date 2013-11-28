@@ -200,13 +200,15 @@ contains
             end if
             
             if (modulo(Lsize(jDim), this%cell_size(jDim)) > real_zero) then
-                write(error_unit, *) "    Cell size is not a divisor of the system size"
-                write(error_unit, *) "    in the dimension", jDim, ":"
-                write(error_unit, *) "    Lsize", Lsize(jDim)
-                write(error_unit, *) "    cell_size", this%cell_size(jDim)
-                write(error_unit, *) "    modulo(Lsize, cell_size) = ", &
-                                      modulo(Lsize(jDim), this%cell_size(jDim))
-                stop
+                if (abs(modulo(Lsize(jDim), this%cell_size(jDim)) - this%cell_size(jDim)) > real_zero) then
+                    write(error_unit, *) "    Cell size is not a divisor of the system size"
+                    write(error_unit, *) "    in the dimension", jDim, ":"
+                    write(error_unit, *) "    Lsize", Lsize(jDim)
+                    write(error_unit, *) "    cell_size", this%cell_size(jDim)
+                    write(error_unit, *) "    modulo(Lsize, cell_size) = ", &
+                                          modulo(Lsize(jDim), this%cell_size(jDim))
+                    stop
+                end if
             end if
             
         end do
