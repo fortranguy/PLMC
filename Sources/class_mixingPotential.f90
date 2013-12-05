@@ -3,7 +3,7 @@
 module class_mixingPotential
 
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
-use data_precisions, only : DP
+use data_precisions, only : DP, real_zero
 use data_box, only : Ndim
 use data_particles, only : mix_delta
 use data_potential, only : mix_rCut, mix_dr, mix_epsilon, mix_alpha
@@ -316,6 +316,10 @@ contains
         real(DP) :: r_mix
 
         Epot_conf = 0._DP
+        
+        if (this%epsilon < real_zero) then
+            return
+        end if
         
         do type1_iCol = 1, type1%get_Ncol()
             do type2_iCol = 1, type2%get_Ncol()
