@@ -53,6 +53,7 @@ private
         !> Construction and destruction of the class
         procedure :: init_particles => DipolarSpheres_init_particles
         procedure :: init_changes => DipolarSpheres_init_changes
+        procedure :: init_potential => DipolarSpheres_init_potential
         procedure :: construct => DipolarSpheres_construct
         procedure :: destroy => DipolarSpheres_destroy
         
@@ -142,6 +143,24 @@ contains
         this%Nwidom = dipol_Nwidom
         
     end subroutine DipolarSpheres_init_changes
+    
+    subroutine DipolarSpheres_init_potential(this)
+    
+        class(DipolarSpheres), intent(inout) :: this
+        
+        this%rCut = dipol_rCut
+        this%dr = dipol_dr
+        call set_discrete_length(this%rMin, this%dr)
+        this%iMin = int(this%rMin/this%dr)
+        this%iCut = int(this%rCut/this%dr) + 1
+        this%alpha = dipol_alpha        
+        allocate(this%Epot_real_tab(this%iMin:this%iCut, 2))
+        call this%Epot_real_init()
+
+        call this%Epot_reci_init_weight()
+        this%reInit_iStep = dipol_reInit_iStep
+        
+    end subroutine DipolarSpheres_init_potential
 
     subroutine DipolarSpheres_construct(this)
     
@@ -159,19 +178,7 @@ contains
         
         call this%init_changes()
         
-        this%reInit_iStep = dipol_reInit_iStep
-        
-        ! Potential
-        this%rCut = dipol_rCut
-        this%dr = dipol_dr
-        call set_discrete_length(this%rMin, this%dr)
-        this%iMin = int(this%rMin/this%dr)
-        this%iCut = int(this%rCut/this%dr) + 1
-        this%alpha = dipol_alpha        
-        allocate(this%Epot_real_tab(this%iMin:this%iCut, 2))
-        call this%Epot_real_init()
-
-        call this%Epot_reci_init_weight()
+        call this%init_potential()
         
         ! Neighbour Cells
         cell_size(:) = this%rMin
