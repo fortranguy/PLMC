@@ -34,7 +34,7 @@ private
 
         !> Construction and destruction of the class
         procedure :: init_particles => InteractingSpheres_init_particles
-        procedure :: init_monteCarlo => InteractingSpheres_init_monteCarlo
+        procedure :: init_changes => InteractingSpheres_init_changes
         procedure :: init_potential => InteractingSpheres_init_potential
         procedure :: construct => InteractingSpheres_construct
         procedure :: destroy => InteractingSpheres_destroy
@@ -66,7 +66,7 @@ contains
         
     end subroutine InteractingSpheres_init_particles
     
-    subroutine InteractingSpheres_init_monteCarlo(this)
+    subroutine InteractingSpheres_init_changes(this)
     
         class(InteractingSpheres), intent(inout) :: this
         
@@ -75,7 +75,7 @@ contains
         this%move_rejectFix = inter_move_rejectFix
         this%Nwidom = inter_Nwidom
         
-    end subroutine InteractingSpheres_init_monteCarlo
+    end subroutine InteractingSpheres_init_changes
     
     subroutine InteractingSpheres_init_potential(this)
     
@@ -106,7 +106,7 @@ contains
         
         this%snap_factor = inter_snap_factor
         
-        call this%init_monteCarlo()        
+        call this%init_changes()        
         
         call this%init_potential()
         

@@ -52,7 +52,7 @@ private
 
         !> Construction and destruction of the class
         procedure :: init_particles => DipolarSpheres_init_particles
-        procedure :: init_monteCarlo => DipolarSpheres_init_monteCarlo
+        procedure :: init_changes => DipolarSpheres_init_changes
         procedure :: construct => DipolarSpheres_construct
         procedure :: destroy => DipolarSpheres_destroy
         
@@ -126,7 +126,7 @@ contains
     
     end subroutine DipolarSpheres_init_particles
     
-    subroutine DipolarSpheres_init_monteCarlo(this)
+    subroutine DipolarSpheres_init_changes(this)
     
         class(DipolarSpheres), intent(inout) :: this
         
@@ -141,7 +141,7 @@ contains
         
         this%Nwidom = dipol_Nwidom
         
-    end subroutine DipolarSpheres_init_monteCarlo
+    end subroutine DipolarSpheres_init_changes
 
     subroutine DipolarSpheres_construct(this)
     
@@ -158,7 +158,7 @@ contains
         this%snap_factor = dipol_snap_factor
         
         ! Monte-Carlo
-        call this%init_monteCarlo()
+        call this%init_changes()
         
         this%reInit_iStep = dipol_reInit_iStep
         

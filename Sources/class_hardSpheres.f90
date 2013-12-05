@@ -51,7 +51,7 @@ private
 
         !> Construction and destruction of the class
         procedure :: init_particles => HardSpheres_init_particles
-        procedure :: init_monteCarlo => HardSpheres_init_monteCarlo
+        procedure :: init_changes => HardSpheres_init_changes
         procedure :: construct => HardSpheres_construct
         procedure :: destroy => HardSpheres_destroy
         
@@ -104,7 +104,7 @@ contains
     
     end subroutine HardSpheres_init_particles
     
-    subroutine HardSpheres_init_monteCarlo(this)
+    subroutine HardSpheres_init_changes(this)
     
         class(HardSpheres), intent(inout) :: this
         
@@ -113,7 +113,7 @@ contains
         this%move_rejectFix = hard_move_rejectFix
         this%Nwidom = hard_Nwidom                
         
-    end subroutine HardSpheres_init_monteCarlo
+    end subroutine HardSpheres_init_changes
 
     subroutine HardSpheres_construct(this)
     
@@ -128,7 +128,7 @@ contains
         
         this%snap_factor = hard_snap_factor
         
-        call this%init_monteCarlo()
+        call this%init_changes()
         
         ! Potential
         this%rCut = this%rMin
