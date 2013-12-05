@@ -157,7 +157,6 @@ contains
         ! Snapshot
         this%snap_factor = dipol_snap_factor
         
-        ! Monte-Carlo
         call this%init_changes()
         
         this%reInit_iStep = dipol_reInit_iStep
