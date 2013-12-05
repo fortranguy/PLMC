@@ -3,7 +3,7 @@
 module class_interactingSpheres
 
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
-use data_precisions, only : DP, consist_tiny
+use data_precisions, only : DP, real_zero, consist_tiny
 use data_box, only : Ndim, Lsize
 use data_particles, only : inter_rMin, inter_Ncol
 use data_potential, only : inter_rCut, inter_dr, inter_epsilon, inter_alpha
@@ -277,18 +277,18 @@ contains
     
         Epot_conf = 0._DP
         
+        if (this%epsilon < real_zero) then
+            return
+        end if
+        
         do jCol = 1, this%Ncol
-            do iCol = 1, this%Ncol
-                if (iCol /= jCol) then
+            do iCol = jCol + 1, this%Ncol
                 
-                    r_ij = dist_PBC(this%positions(:, iCol), this%positions(:, jCol))
-                    Epot_conf = Epot_conf + this%Epot_pair(r_ij)
+                r_ij = dist_PBC(this%positions(:, iCol), this%positions(:, jCol))
+                Epot_conf = Epot_conf + this%Epot_pair(r_ij)
                     
-                end if
             end do
         end do
-        
-        Epot_conf = 0.5_DP*Epot_conf
     
     end function InteractingSpheres_Epot_conf
     
