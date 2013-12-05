@@ -51,6 +51,8 @@ private
     contains
 
         !> Construction and destruction of the class
+        procedure :: init_particles => DipolarSpheres_init_particles
+        procedure :: init_monteCarlo => DipolarSpheres_init_monteCarlo
         procedure :: construct => DipolarSpheres_construct
         procedure :: destroy => DipolarSpheres_destroy
         
@@ -112,26 +114,22 @@ private
     
 contains
 
-    subroutine DipolarSpheres_construct(this)
+    subroutine DipolarSpheres_init_particles(this)
     
-        class(DipolarSpheres), intent(out) :: this
+        class(DipolarSpheres), intent(inout) :: this
         
-        real(DP), dimension(Ndim) :: cell_size
-        
-        this%name = "dipol"        
-        write(output_unit, *) this%name, " class construction"
-    
-        ! Particles
         this%rMin = 1._DP
         this%radius = this%rMin/2._DP
         this%Ncol = dipol_Ncol
         allocate(this%positions(Ndim, this%Ncol))
         allocate(this%orientations(Ndim, this%Ncol))
+    
+    end subroutine DipolarSpheres_init_particles
+    
+    subroutine DipolarSpheres_init_monteCarlo(this)
+    
+        class(DipolarSpheres), intent(inout) :: this
         
-        ! Snapshot
-        this%snap_factor = dipol_snap_factor
-        
-        ! Monte-Carlo
         this%move_delta = dipol_move_delta
         this%move_deltaSave = this%move_delta
         this%move_rejectFix = dipol_move_rejectFix
@@ -142,6 +140,25 @@ contains
         this%rotate_rejectFix = dipol_rotate_rejectFix
         
         this%Nwidom = dipol_Nwidom
+        
+    end subroutine DipolarSpheres_init_monteCarlo
+
+    subroutine DipolarSpheres_construct(this)
+    
+        class(DipolarSpheres), intent(out) :: this
+        
+        real(DP), dimension(Ndim) :: cell_size
+        
+        this%name = "dipol"        
+        write(output_unit, *) this%name, " class construction"
+    
+        call this%init_particles()
+        
+        ! Snapshot
+        this%snap_factor = dipol_snap_factor
+        
+        ! Monte-Carlo
+        call this%init_monteCarlo()
         
         this%reInit_iStep = dipol_reInit_iStep
         
