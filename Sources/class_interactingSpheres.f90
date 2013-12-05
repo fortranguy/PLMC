@@ -33,6 +33,9 @@ private
     contains
 
         !> Construction and destruction of the class
+        procedure :: init_particles => InteractingSpheres_init_particles
+        procedure :: init_monteCarlo => InteractingSpheres_init_monteCarlo
+        procedure :: init_potential => InteractingSpheres_init_potential
         procedure :: construct => InteractingSpheres_construct
         procedure :: destroy => InteractingSpheres_destroy
         
@@ -52,31 +55,32 @@ private
     
 contains
 
-    subroutine InteractingSpheres_construct(this)
+    subroutine InteractingSpheres_init_particles(this)
     
-        class(InteractingSpheres), intent(out) :: this
+        class(InteractingSpheres), intent(inout) :: this
         
-        real(DP), dimension(Ndim) :: cell_size
-        
-        this%name = "inter"
-        write(output_unit, *) this%name, " class construction"
-    
-        ! Particles
         this%rMin = inter_rMin
         this%radius = this%rMin/2._DP
         this%Ncol = inter_Ncol
         allocate(this%positions(Ndim, this%Ncol))
         
-        ! Snapshot
-        this%snap_factor = inter_snap_factor
+    end subroutine InteractingSpheres_init_particles
+    
+    subroutine InteractingSpheres_init_monteCarlo(this)
+    
+        class(InteractingSpheres), intent(inout) :: this
         
-        ! Monte-Carlo
         this%move_delta = inter_move_delta
         this%move_deltaSave = this%move_delta
         this%move_rejectFix = inter_move_rejectFix
         this%Nwidom = inter_Nwidom
         
-        ! Potential
+    end subroutine InteractingSpheres_init_monteCarlo
+    
+    subroutine InteractingSpheres_init_potential(this)
+    
+        class(InteractingSpheres), intent(inout) :: this
+        
         this%rCut = inter_rCut
         this%dr = inter_dr
         call set_discrete_length(this%rMin, this%dr)
@@ -86,6 +90,25 @@ contains
         this%alpha = inter_alpha        
         allocate(this%Epot_tab(this%iMin:this%iCut))
         call this%Epot_init()
+        
+    end subroutine InteractingSpheres_init_potential
+
+    subroutine InteractingSpheres_construct(this)
+    
+        class(InteractingSpheres), intent(out) :: this
+        
+        real(DP), dimension(Ndim) :: cell_size
+        
+        this%name = "inter"
+        write(output_unit, *) this%name, " class construction"
+        
+        call this%init_particles()
+        
+        this%snap_factor = inter_snap_factor
+        
+        call this%init_monteCarlo()        
+        
+        call this%init_potential()
         
         ! Neighbour Cells
         cell_size(:) = this%rCut
