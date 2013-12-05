@@ -50,6 +50,8 @@ private
     contains
 
         !> Construction and destruction of the class
+        procedure :: init_particles => HardSpheres_init_particles
+        procedure :: init_monteCarlo => HardSpheres_init_monteCarlo
         procedure :: construct => HardSpheres_construct
         procedure :: destroy => HardSpheres_destroy
         
@@ -91,6 +93,28 @@ private
     
 contains
 
+    subroutine HardSpheres_init_particles(this)
+    
+        class(HardSpheres), intent(inout) :: this
+        
+        this%rMin = hard_rMin
+        this%radius = this%rMin/2._DP
+        this%Ncol = hard_Ncol
+        allocate(this%positions(Ndim, this%Ncol))
+    
+    end subroutine HardSpheres_init_particles
+    
+    subroutine HardSpheres_init_monteCarlo(this)
+    
+        class(HardSpheres), intent(inout) :: this
+        
+        this%move_delta = hard_move_delta
+        this%move_deltaSave = this%move_delta
+        this%move_rejectFix = hard_move_rejectFix
+        this%Nwidom = hard_Nwidom                
+        
+    end subroutine HardSpheres_init_monteCarlo
+
     subroutine HardSpheres_construct(this)
     
         class(HardSpheres), intent(out) :: this
@@ -99,22 +123,13 @@ contains
         
         this%name = "hardS"
         write(output_unit, *) this%name, " class construction"
-    
-        ! Particles
-        this%rMin = hard_rMin
-        this%radius = this%rMin/2._DP
-        this%Ncol = hard_Ncol
-        allocate(this%positions(Ndim, this%Ncol))
         
-        ! Snapshot
+        call this%init_particles()
+        
         this%snap_factor = hard_snap_factor
         
-        ! Monte-Carlo
-        this%move_delta = hard_move_delta
-        this%move_deltaSave = this%move_delta
-        this%move_rejectFix = hard_move_rejectFix
-        this%Nwidom = hard_Nwidom
-                
+        call this%init_monteCarlo()
+        
         ! Potential
         this%rCut = this%rMin
         
