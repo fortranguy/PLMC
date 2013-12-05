@@ -36,6 +36,7 @@ private
 
     contains
 
+        procedure :: init_potential => MixingPotential_init_potential
         procedure :: construct => MixingPotential_construct
         procedure :: destroy => MixingPotential_destroy
 
@@ -58,6 +59,17 @@ private
 
 contains
 
+    subroutine MixingPotential_init_potential(this)
+    
+        class(MixingPotential), intent(inout) :: this
+        
+        this%rCut = mix_rCut
+        this%dr = mix_dr
+        this%epsilon = mix_epsilon
+        this%alpha = mix_alpha
+    
+    end subroutine MixingPotential_init_potential
+
     subroutine MixingPotential_construct(this)
 
         class(MixingPotential), intent(out) :: this
@@ -65,11 +77,7 @@ contains
         this%name = "[mix]"
         write(output_unit, *) this%name, " class construction"
         
-        ! MixingPotential
-        this%rCut = mix_rCut
-        this%dr = mix_dr
-        this%epsilon = mix_epsilon
-        this%alpha = mix_alpha
+        call this%init_potential()
         
         ! Particles
         this%delta = mix_delta
