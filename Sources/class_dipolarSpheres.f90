@@ -53,6 +53,7 @@ private
         !> Construction and destruction of the class
         procedure :: init_particles => DipolarSpheres_init_particles
         procedure :: init_changes => DipolarSpheres_init_changes
+        procedure :: Epot_real_set_parameters => DipolarSpheres_Epot_real_set_parameters
         procedure :: init_potential => DipolarSpheres_init_potential
         procedure :: construct => DipolarSpheres_construct
         procedure :: destroy => DipolarSpheres_destroy
@@ -73,7 +74,7 @@ private
         !> Potential energy
         !>     Real
         procedure, private :: Epot_real_true => DipolarSpheres_Epot_real_true
-        procedure, private :: Epot_real_init => DipolarSpheres_Epot_real_init
+        procedure, private :: Epot_real_set_tab => DipolarSpheres_Epot_real_set_tab
         procedure :: Epot_real_print => DipolarSpheres_Epot_real_print
         procedure, private :: Epot_real_interpol => DipolarSpheres_Epot_real_interpol
         procedure :: Epot_real_pair => DipolarSpheres_Epot_real_pair
@@ -144,7 +145,7 @@ contains
         
     end subroutine DipolarSpheres_init_changes
     
-    subroutine DipolarSpheres_init_potential(this)
+    subroutine DipolarSpheres_Epot_real_set_parameters(this)
     
         class(DipolarSpheres), intent(inout) :: this
         
@@ -153,9 +154,17 @@ contains
         call set_discrete_length(this%rMin, this%dr)
         this%iMin = int(this%rMin/this%dr)
         this%iCut = int(this%rCut/this%dr) + 1
+        
+    end subroutine DipolarSpheres_Epot_real_set_parameters
+
+    subroutine DipolarSpheres_init_potential(this)
+    
+        class(DipolarSpheres), intent(inout) :: this
+        
         this%alpha = dipol_alpha
+                
         allocate(this%Epot_real_tab(this%iMin:this%iCut, 2))
-        call this%Epot_real_init()
+        call this%Epot_real_set_tab()
 
         call this%Epot_reci_init_weight()
         this%reInit_iStep = dipol_reInit_iStep
@@ -342,7 +351,7 @@ contains
     
     !> Initialisation : look-up (tabulation) table
     
-    pure subroutine DipolarSpheres_Epot_real_init(this)
+    pure subroutine DipolarSpheres_Epot_real_set_tab(this)
     
         class(DipolarSpheres), intent(inout) :: this
 
@@ -365,6 +374,14 @@ contains
         this%Epot_real_tab(:, 1) = this%Epot_real_tab(:, 1) - this%Epot_real_tab(this%iCut, 1)
         this%Epot_real_tab(:, 2) = this%Epot_real_tab(:, 2) - this%Epot_real_tab(this%iCut, 2)
 
+    end subroutine DipolarSpheres_Epot_real_set_tab
+    
+    !> Initialisation
+    
+    subroutine DipolarSpheres_Epot_real_init(this)
+    
+        class(DipolarSpheres), intent(inout) :: this
+    
     end subroutine DipolarSpheres_Epot_real_init
 
     !> Print the tabulated values
