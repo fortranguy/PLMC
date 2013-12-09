@@ -118,7 +118,7 @@ private
     
 contains
 
-    subroutine DipolarSpheres_init_particles(this)
+    pure subroutine DipolarSpheres_init_particles(this)
     
         class(DipolarSpheres), intent(inout) :: this
         
@@ -130,7 +130,7 @@ contains
     
     end subroutine DipolarSpheres_init_particles
     
-    subroutine DipolarSpheres_init_changes(this)
+    pure subroutine DipolarSpheres_init_changes(this)
     
         class(DipolarSpheres), intent(inout) :: this
         
@@ -364,7 +364,7 @@ contains
         
     end subroutine DipolarSpheres_Epot_real_set_parameters
     
-    subroutine DipolarSpheres_Epot_real_init(this)
+    pure subroutine DipolarSpheres_Epot_real_init(this)
     
         class(DipolarSpheres), intent(inout) :: this
         
@@ -615,7 +615,7 @@ contains
 
     end subroutine DipolarSpheres_Epot_reci_init_structure
     
-    subroutine DipolarSpheres_Epot_reci_init(this)
+    pure subroutine DipolarSpheres_Epot_reci_init(this)
     
         class(DipolarSpheres), intent(inout) :: this
         
@@ -1268,7 +1268,7 @@ contains
     
     !> Potential energy initialisation
     
-    subroutine DipolarSpheres_init_potential(this)
+    pure subroutine DipolarSpheres_init_potential(this)
     
         class(DipolarSpheres), intent(inout) :: this
         

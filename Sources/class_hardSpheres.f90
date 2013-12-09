@@ -77,10 +77,12 @@ private
         procedure :: test_overlap => HardSpheres_test_overlap
         
         !> Neighbour cells
+        procedure :: construct_sameCells => HardSpheres_construct_sameCells
         procedure :: construct_mixCells => HardSpheres_construct_mixCells
         procedure :: all_cols_to_cells => HardSpheres_all_cols_to_cells
         
         !> Potential energy
+        procedure :: Epot_init => HardSpheres_Epot_init
         procedure :: Epot_print => HardSpheres_Epot_print
         procedure :: Epot_neighCells => HardSpheres_Epot_neighCells
         procedure :: Epot_conf => HardSpheres_Epot_conf
@@ -90,7 +92,7 @@ private
     
 contains
 
-    subroutine HardSpheres_init_particles(this)
+    pure subroutine HardSpheres_init_particles(this)
     
         class(HardSpheres), intent(inout) :: this
         
@@ -101,7 +103,7 @@ contains
     
     end subroutine HardSpheres_init_particles
     
-    subroutine HardSpheres_init_changes(this)
+    pure subroutine HardSpheres_init_changes(this)
     
         class(HardSpheres), intent(inout) :: this
         
@@ -116,8 +118,6 @@ contains
     
         class(HardSpheres), intent(out) :: this
         
-        real(DP), dimension(Ndim) :: cell_size
-        
         this%name = "hardS"
         write(output_unit, *) this%name, " class construction"
         
@@ -127,12 +127,9 @@ contains
         
         call this%init_changes()
         
-        ! Potential
-        this%rCut = this%rMin
+        call this%Epot_init()
         
-        ! Neighbour Cells
-        cell_size(:) = this%rCut
-        call this%sameCells%construct(cell_size, this%rCut) !< same kind
+        call this%construct_sameCells()
     
     end subroutine HardSpheres_construct
     
@@ -387,7 +384,20 @@ contains
     
     end subroutine HardSpheres_test_overlap
     
-     !> Mutator : mixCells construction
+    !> Neighbour Cells
+    
+    subroutine HardSpheres_construct_sameCells(this)
+    
+        class(HardSpheres), intent(inout) :: this
+        
+        real(DP), dimension(Ndim) :: cell_size
+        
+        cell_size(:) = this%rCut
+        call this%sameCells%construct(cell_size, this%rCut) !< same kind
+    
+    end subroutine HardSpheres_construct_sameCells
+    
+     !> mixCells construction
     
     subroutine HardSpheres_construct_mixCells(this, mix_cell_size, mix_rCut)
     
@@ -412,6 +422,16 @@ contains
         call this%mixCells%all_cols_to_cells(other%Ncol, other%positions)
     
     end subroutine HardSpheres_all_cols_to_cells
+    
+    ! Potential
+    
+    subroutine HardSpheres_Epot_init(this)
+    
+        class(HardSpheres), intent(inout) :: this
+        
+        this%rCut = this%rMin
+        
+    end subroutine HardSpheres_Epot_init
     
     !> Print the potential : dummy
     

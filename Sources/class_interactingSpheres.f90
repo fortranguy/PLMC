@@ -44,7 +44,7 @@ private
         
         !> Potential energy
         procedure, private :: Epot_true => InteractingSpheres_Epot_true
-        procedure, private :: Epot_init => InteractingSpheres_Epot_init
+        procedure :: Epot_set_tab => InteractingSpheres_Epot_set_tab
         procedure :: Epot_print => InteractingSpheres_Epot_print
         procedure :: Epot_pair => InteractingSpheres_Epot_pair
         procedure :: Epot_neighCells => InteractingSpheres_Epot_neighCells
@@ -55,7 +55,7 @@ private
     
 contains
 
-    subroutine InteractingSpheres_init_particles(this)
+    pure subroutine InteractingSpheres_init_particles(this)
     
         class(InteractingSpheres), intent(inout) :: this
         
@@ -66,7 +66,7 @@ contains
         
     end subroutine InteractingSpheres_init_particles
     
-    subroutine InteractingSpheres_init_changes(this)
+    pure subroutine InteractingSpheres_init_changes(this)
     
         class(InteractingSpheres), intent(inout) :: this
         
@@ -89,7 +89,7 @@ contains
         this%epsilon = inter_epsilon
         this%alpha = inter_alpha        
         allocate(this%Epot_tab(this%iMin:this%iCut))
-        call this%Epot_init()
+        call this%Epot_set_tab()
         
     end subroutine InteractingSpheres_init_potential
 
@@ -160,7 +160,7 @@ contains
     
     !> Tabulation of the potential    
     
-    pure subroutine InteractingSpheres_Epot_init(this)
+    pure subroutine InteractingSpheres_Epot_set_tab(this)
     
         class(InteractingSpheres), intent(inout) :: this
 
@@ -176,7 +176,7 @@ contains
         ! shift        
         this%Epot_tab(:) = this%Epot_tab(:) - this%Epot_tab(this%iCut)
 
-    end subroutine InteractingSpheres_Epot_init
+    end subroutine InteractingSpheres_Epot_set_tab
     
     !> Print the tabulated potential
     

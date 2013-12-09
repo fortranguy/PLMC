@@ -122,6 +122,7 @@ implicit none
     call type1_spheres%all_cols_to_cells(type2_spheres) !< filling cells with particles
     
     call type2_spheres%test_overlap()
+    call type2_spheres%Epot_init()
     call type2_spheres%Epot_print(type2_units%Epot)
     type2_obs%Epot = type2_spheres%Epot_conf()
     call type2_spheres%snap_positions(0, type2_units%snapIni_positions)
