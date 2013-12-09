@@ -53,8 +53,6 @@ private
         !> Construction and destruction of the class
         procedure :: init_particles => DipolarSpheres_init_particles
         procedure :: init_changes => DipolarSpheres_init_changes
-        procedure :: Epot_real_set_parameters => DipolarSpheres_Epot_real_set_parameters
-        procedure :: init_potential => DipolarSpheres_init_potential
         procedure :: construct => DipolarSpheres_construct
         procedure :: destroy => DipolarSpheres_destroy
         
@@ -75,14 +73,17 @@ private
         !>     Real
         procedure, private :: Epot_real_true => DipolarSpheres_Epot_real_true
         procedure, private :: Epot_real_set_tab => DipolarSpheres_Epot_real_set_tab
+        procedure :: Epot_real_set_parameters => DipolarSpheres_Epot_real_set_parameters
+        procedure :: Epot_real_init => DipolarSpheres_Epot_real_init
         procedure :: Epot_real_print => DipolarSpheres_Epot_real_print
         procedure, private :: Epot_real_interpol => DipolarSpheres_Epot_real_interpol
         procedure :: Epot_real_pair => DipolarSpheres_Epot_real_pair
         procedure :: Epot_real_solo => DipolarSpheres_Epot_real_solo
         procedure, private :: Epot_real => DipolarSpheres_Epot_real
         !>     Reciprocal : init
-        procedure :: Epot_reci_init => DipolarSpheres_Epot_reci_init
         procedure, private :: Epot_reci_init_weight => DipolarSpheres_Epot_reci_init_weight
+        procedure, private :: Epot_reci_init_structure => DipolarSpheres_Epot_reci_init_structure
+        procedure :: Epot_reci_init => DipolarSpheres_Epot_reci_init
         procedure, private :: Epot_reci_get_structure_modulus => &
                               DipolarSpheres_Epot_reci_get_structure_modulus
         procedure :: Epot_reci_reInit_structure => DipolarSpheres_Epot_reci_reInit_structure
@@ -109,6 +110,7 @@ private
         procedure :: deltaEpot_bound_exchange => DipolarSpheres_deltaEpot_bound_exchange
         procedure, private :: Epot_bound => DipolarSpheres_Epot_bound
         !>     Total
+        procedure :: init_potential => DipolarSpheres_init_potential
         procedure :: Epot_conf => DipolarSpheres_Epot_conf
         procedure :: test_consist => DipolarSpheres_test_consist
         
@@ -144,32 +146,6 @@ contains
         this%Nwidom = dipol_Nwidom
         
     end subroutine DipolarSpheres_init_changes
-    
-    subroutine DipolarSpheres_Epot_real_set_parameters(this)
-    
-        class(DipolarSpheres), intent(inout) :: this
-        
-        this%rCut = dipol_rCut
-        this%dr = dipol_dr
-        call set_discrete_length(this%rMin, this%dr)
-        this%iMin = int(this%rMin/this%dr)
-        this%iCut = int(this%rCut/this%dr) + 1
-        
-    end subroutine DipolarSpheres_Epot_real_set_parameters
-
-    subroutine DipolarSpheres_init_potential(this)
-    
-        class(DipolarSpheres), intent(inout) :: this
-        
-        this%alpha = dipol_alpha
-                
-        allocate(this%Epot_real_tab(this%iMin:this%iCut, 2))
-        call this%Epot_real_set_tab()
-
-        call this%Epot_reci_init_weight()
-        this%reInit_iStep = dipol_reInit_iStep
-        
-    end subroutine DipolarSpheres_init_potential
 
     subroutine DipolarSpheres_construct(this)
     
@@ -186,8 +162,6 @@ contains
         this%snap_factor = dipol_snap_factor
         
         call this%init_changes()
-        
-        call this%init_potential()
         
         ! Neighbour Cells
         cell_size(:) = this%rMin
@@ -378,9 +352,26 @@ contains
     
     !> Initialisation
     
+    subroutine DipolarSpheres_Epot_real_set_parameters(this)
+    
+        class(DipolarSpheres), intent(inout) :: this
+        
+        this%rCut = dipol_rCut
+        this%dr = dipol_dr
+        call set_discrete_length(this%rMin, this%dr)
+        this%iMin = int(this%rMin/this%dr)
+        this%iCut = int(this%rCut/this%dr) + 1
+        
+    end subroutine DipolarSpheres_Epot_real_set_parameters
+    
     subroutine DipolarSpheres_Epot_real_init(this)
     
         class(DipolarSpheres), intent(inout) :: this
+        
+        call this%Epot_real_set_parameters()
+        
+        allocate(this%Epot_real_tab(this%iMin:this%iCut, 2))
+        call this%Epot_real_set_tab()
     
     end subroutine DipolarSpheres_Epot_real_init
 
@@ -565,7 +556,7 @@ contains
     !>      S_l(\vec{k}) = \sum_{i \neq l} (\vec{k}\cdot\vec{\mu}_i) e^{+i\vec{k}\cdot\vec{x}_i}
     !> \f].
 
-    pure subroutine DipolarSpheres_Epot_reci_init(this)
+    pure subroutine DipolarSpheres_Epot_reci_init_structure(this)
 
         class(DipolarSpheres), intent(inout) :: this
 
@@ -618,6 +609,15 @@ contains
             
         end do
 
+    end subroutine DipolarSpheres_Epot_reci_init_structure
+    
+    subroutine DipolarSpheres_Epot_reci_init(this)
+    
+        class(DipolarSpheres), intent(inout) :: this
+        
+        call this%Epot_reci_init_weight()
+        call this%Epot_reci_init_structure()
+    
     end subroutine DipolarSpheres_Epot_reci_init
     
     !> To calculate the drift of the strucutre factor
@@ -656,7 +656,7 @@ contains
         real(DP) :: modulus_drifted, modulus_reInit
         
         modulus_drifted = this%Epot_reci_get_structure_modulus()
-        call this%Epot_reci_init()
+        call this%Epot_reci_init_structure()
         modulus_reInit = this%Epot_reci_get_structure_modulus()
         
         write(modulus_unit, *) iStep, abs(modulus_reInit - modulus_drifted)
@@ -1259,6 +1259,21 @@ contains
                      dot_product(this%totalMoment, this%totalMoment)
     
     end function DipolarSpheres_Epot_bound
+    
+    !> Potential energy initialisation
+    
+    subroutine DipolarSpheres_init_potential(this)
+    
+        class(DipolarSpheres), intent(inout) :: this
+        
+        this%alpha = dipol_alpha
+        
+        call this%Epot_real_init()
+        
+        call this%Epot_reci_init()
+        this%reInit_iStep = dipol_reInit_iStep
+        
+    end subroutine DipolarSpheres_init_potential
 
     !> Total potential energy
     
