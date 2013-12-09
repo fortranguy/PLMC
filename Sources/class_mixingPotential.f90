@@ -73,7 +73,7 @@ contains
         call this%Epot_init()
         
         ! Neighbours
-        this%cell_size(:) = this%rCut        
+        this%cell_size(:) = this%rCut
 
     end subroutine MixingPotential_construct
 
@@ -94,7 +94,7 @@ contains
     subroutine MixingPotential_print_report(this, report_unit)
     
         class(MixingPotential), intent(in) :: this
-        integer, intent(in) :: report_unit    
+        integer, intent(in) :: report_unit
         
         write(report_unit, *) "Data :"
         
@@ -111,7 +111,7 @@ contains
     
     pure function MixingPotential_get_rMin(this) result(get_rMin)
     
-        class(MixingPotential), intent(in) :: this        
+        class(MixingPotential), intent(in) :: this
         real(DP) :: get_rMin
         
         get_rMin = this%rMin
@@ -122,7 +122,7 @@ contains
     
     pure function MixingPotential_get_rCut(this) result(get_rCut)
     
-        class(MixingPotential), intent(in) :: this        
+        class(MixingPotential), intent(in) :: this
         real(DP) :: get_rCut
         
         get_rCut = this%rCut
@@ -133,7 +133,7 @@ contains
     
     pure function MixingPotential_get_cell_size(this) result(get_cell_size)
     
-        class(MixingPotential), intent(in) :: this        
+        class(MixingPotential), intent(in) :: this
         real(DP), dimension(Ndim) :: get_cell_size
         
         get_cell_size(:) = this%cell_size(:)
@@ -179,12 +179,12 @@ contains
         real(DP) :: r_i
        
         ! cut
-        do i = this%iMin, this%iCut       
+        do i = this%iMin, this%iCut
             r_i = real(i, DP)*this%dr
             this%Epot_tab(i) = this%epsilon * exp(-this%alpha*(r_i-this%rMin)) / r_i
         end do
         
-        ! shift        
+        ! shift
         this%Epot_tab(:) = this%Epot_tab(:) - this%Epot_tab(this%iCut)
 
     end subroutine MixingPotential_Epot_set_tab
@@ -293,7 +293,7 @@ contains
                 
                 current => next
             
-            end do            
+            end do
             
         end do
     
