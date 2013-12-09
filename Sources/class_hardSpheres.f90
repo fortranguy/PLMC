@@ -63,24 +63,21 @@ private
         procedure :: get_radius => HardSpheres_get_radius
         procedure :: get_rCut => HardSpheres_get_rCut
         procedure :: get_move_delta => HardSpheres_get_move_delta
-        !> Specifier        
-        !> Adapt the displacement move_delta during thermalisation
+        
+        !> Mutators
         procedure :: adapt_move_delta => HardSpheres_adapt_move_delta
-        procedure :: set_move_delta => HardSpheres_set_move_delta        
+        procedure :: set_move_delta => HardSpheres_set_move_delta
         
         procedure :: print_density => HardSpheres_print_density
-        !> Print a report of the component in a file
         procedure :: print_report => HardSpheres_print_report
         
-        !> Take a snap shot of the configuration : positions
         procedure :: snap_positions_data => HardSpheres_snap_positions_data
         procedure :: snap_positions => HardSpheres_snap_positions
         
-        !> Do an overlap test
         procedure :: test_overlap => HardSpheres_test_overlap
         
+        !> Neighbour cells
         procedure :: construct_mixCells => HardSpheres_construct_mixCells
-        !> Assign all particles to cells
         procedure :: all_cols_to_cells => HardSpheres_all_cols_to_cells
         
         !> Potential energy
@@ -229,8 +226,8 @@ contains
         get_move_delta = sum(this%move_delta)/size(this%move_delta)
         
     end function HardSpheres_get_move_delta
-    
-    !> Adaptation of move_delta during the thermalisation
+        
+    !> Adapt the displacement move_delta during thermalisation
     
     pure subroutine HardSpheres_adapt_move_delta(this, reject)
     
@@ -308,7 +305,7 @@ contains
     
     end subroutine HardSpheres_print_density
     
-    !> Report
+    !> Print a report of the component in a file
     
     subroutine HardSpheres_print_report(this, report_unit)
     
@@ -330,6 +327,8 @@ contains
         write(report_unit, *) "    snap_factor = ", this%snap_factor
         
     end subroutine HardSpheres_print_report
+    
+    !> Take a snap shot of the configuration : positions
     
     !> Tag the snapshots
     
@@ -362,7 +361,7 @@ contains
 
     end subroutine HardSpheres_snap_positions
     
-    !> Overlapt test
+    !> Do an overlap test
     
     subroutine HardSpheres_test_overlap(this)
     
@@ -388,7 +387,7 @@ contains
     
     end subroutine HardSpheres_test_overlap
     
-     !> Specifier : mixCells construction
+     !> Mutator : mixCells construction
     
     subroutine HardSpheres_construct_mixCells(this, mix_cell_size, mix_rCut)
     

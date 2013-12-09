@@ -114,7 +114,7 @@ contains
         
     end subroutine MixingPotential_print_report
     
-    !> Specifier : rMin
+    !> Mutator : rMin
     
     subroutine MixingPotential_set_rMin(this, type1_rMin, type2_rMin)
     
