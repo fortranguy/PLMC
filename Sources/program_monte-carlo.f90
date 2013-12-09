@@ -104,7 +104,6 @@ implicit none
     call type2_obs%init()
     call type2_units%open(type2_spheres%get_name())
     write(type2_units%obsEquilib, *) "#", 3 ! 3 observables
-    call type2_spheres%Epot_print(type2_units%Epot)
     call type2_spheres%print_density(Ncol, type2_units%report)
     call type2_spheres%print_report(type2_units%report)
     call type2_spheres%snap_positions_data(type2_units%snap_positions)
@@ -124,6 +123,7 @@ implicit none
     call type1_spheres%all_cols_to_cells(type2_spheres) !< filling cells with particles
     
     call type2_spheres%test_overlap()
+    call type2_spheres%Epot_print(type2_units%Epot)
     type2_obs%Epot = type2_spheres%Epot_conf()
     call type2_spheres%snap_positions(0, type2_units%snapIni_positions)
     call type2_spheres%all_cols_to_cells(type1_spheres)
