@@ -16,7 +16,7 @@ implicit none
     real(DP), parameter :: io_tiny = real(2, DP) * epsilon(1._DP)
     real(DP), parameter :: consist_tiny = real(2**13, DP) * epsilon(1._DP)
 
-end module data_precisions 
+end module data_precisions
 !***************************************************************************************************
 
 !***************************************************************************************************
@@ -30,7 +30,7 @@ use data_precisions, only : DP
 implicit none
     
     real(DP), parameter :: PI = acos(-1._DP)
-    real(DP), parameter :: sigma3d = 1._DP/sqrt(3._DP)    
+    real(DP), parameter :: sigma3d = 1._DP/sqrt(3._DP)
         
 end module data_constants
 !***************************************************************************************************
@@ -49,7 +49,7 @@ implicit none
     
     real(DP), parameter :: Lsize1 = 25._DP ! u_length
     real(DP), parameter :: Lsize2 = Lsize1 ! u_length
-    real(DP), parameter :: Lsize3 = Lsize1 ! u_length 
+    real(DP), parameter :: Lsize3 = Lsize1 ! u_length
     real(DP), dimension(Ndim), parameter :: Lsize = [Lsize1, Lsize2, Lsize3] ! u_length
 
     integer, parameter :: Kmax1 = 8 ! 1/u_length
@@ -81,7 +81,7 @@ implicit none
     
     ! out ---------------------------------------------------------------------
     real(DP), parameter :: inter_rMin = 1._DP ! u_length
-    integer, parameter :: inter_Ncol = 0    
+    integer, parameter :: inter_Ncol = 0
     ! -------------------------------------------------------------------------
     
 end module data_particles
