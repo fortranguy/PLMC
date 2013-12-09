@@ -83,7 +83,7 @@ private
         !>     Reciprocal : init
         procedure, private :: Epot_reci_init_weight => DipolarSpheres_Epot_reci_init_weight
         procedure, private :: Epot_reci_init_structure => DipolarSpheres_Epot_reci_init_structure
-        procedure :: Epot_reci_init => DipolarSpheres_Epot_reci_init
+        procedure, private :: Epot_reci_init => DipolarSpheres_Epot_reci_init
         procedure, private :: Epot_reci_get_structure_modulus => &
                               DipolarSpheres_Epot_reci_get_structure_modulus
         procedure :: Epot_reci_reInit_structure => DipolarSpheres_Epot_reci_reInit_structure
