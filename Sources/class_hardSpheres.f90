@@ -108,7 +108,7 @@ contains
         this%move_delta = hard_move_delta
         this%move_deltaSave = this%move_delta
         this%move_rejectFix = hard_move_rejectFix
-        this%Nwidom = hard_Nwidom                
+        this%Nwidom = hard_Nwidom
         
     end subroutine HardSpheres_init_changes
 
@@ -146,7 +146,7 @@ contains
 
     pure function HardSpheres_get_name(this) result(get_name)
     
-        class(HardSpheres), intent(in) :: this        
+        class(HardSpheres), intent(in) :: this
         character(len=5) :: get_name
         
         get_name = this%name
@@ -157,7 +157,7 @@ contains
 
     pure function HardSpheres_get_Ncol(this) result(get_Ncol)
     
-        class(HardSpheres), intent(in) :: this        
+        class(HardSpheres), intent(in) :: this
         integer :: get_Ncol
         
         get_Ncol = this%Ncol
@@ -179,7 +179,7 @@ contains
     
     pure function HardSpheres_get_rMin(this) result(get_rMin)
     
-        class(HardSpheres), intent(in) :: this        
+        class(HardSpheres), intent(in) :: this
         real(DP) :: get_rMin
         
         get_rMin = this%rMin
@@ -190,7 +190,7 @@ contains
     
     pure function HardSpheres_get_radius(this) result(get_radius)
     
-        class(HardSpheres), intent(in) :: this        
+        class(HardSpheres), intent(in) :: this
         real(DP) :: get_radius
         
         get_radius = this%radius
@@ -201,7 +201,7 @@ contains
     
     pure function HardSpheres_get_rCut(this) result(get_rCut)
     
-        class(HardSpheres), intent(in) :: this        
+        class(HardSpheres), intent(in) :: this
         real(DP) :: get_rCut
         
         get_rCut = this%rCut
@@ -311,7 +311,7 @@ contains
         write(report_unit, *) "    rCut = ", this%rCut
         
         write(report_unit, *) "    this_NtotalCell_dim(:) = ", this%sameCells%get_NtotalCell_dim()
-        write(report_unit, *) "    this_cell_size(:) = ", this%sameCells%get_cell_size()        
+        write(report_unit, *) "    this_cell_size(:) = ", this%sameCells%get_cell_size()
         write(report_unit, *) "    mix_NtotalCell_dim(:) = ", this%mixCells%get_NtotalCell_dim()
         write(report_unit, *) "    mix_cell_size(:) = ", this%mixCells%get_cell_size()
         
@@ -348,7 +348,7 @@ contains
                 write(snap_unit, *) this%positions(:, iCol)
             end do
             
-        end if            
+        end if
 
     end subroutine HardSpheres_snap_positions
     
@@ -421,7 +421,7 @@ contains
     
     subroutine HardSpheres_Epot_neighCells(this, iCol, xCol, iTotalCell, overlap, energ)
         
-        class(HardSpheres), intent(in) :: this        
+        class(HardSpheres), intent(in) :: this
         integer, intent(in) :: iCol, iTotalCell
         real(DP), dimension(:), intent(in) :: xCol
         logical, intent(out) :: overlap
@@ -438,7 +438,7 @@ contains
         do iNearCell = 1, NnearCell
         
             nearCell_index = this%sameCells%nearCells_among_totalCells(iNearCell, iTotalCell)
-            current => this%sameCells%beginCells(nearCell_index)%particle%next            
+            current => this%sameCells%beginCells(nearCell_index)%particle%next
             if (.not. associated(current%next)) cycle
             
             do
@@ -459,7 +459,7 @@ contains
                 
                 current => next
             
-            end do            
+            end do
             
         end do
     
@@ -469,7 +469,7 @@ contains
     
     pure function HardSpheres_Epot_conf(this) result(Epot_conf)
     
-        class(HardSpheres), intent(in) :: this        
+        class(HardSpheres), intent(in) :: this
         real(DP) :: Epot_conf
     
         Epot_conf = this%Ncol * 0._DP
