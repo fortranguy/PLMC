@@ -44,9 +44,9 @@ private
         
         !> Potential energy
         procedure, private :: Epot_true => InteractingSpheres_Epot_true
-        procedure :: Epot_set_tab => InteractingSpheres_Epot_set_tab
+        procedure, private :: Epot_set_tab => InteractingSpheres_Epot_set_tab
         procedure :: Epot_print => InteractingSpheres_Epot_print
-        procedure :: Epot_pair => InteractingSpheres_Epot_pair
+        procedure, private :: Epot_pair => InteractingSpheres_Epot_pair
         procedure :: Epot_neighCells => InteractingSpheres_Epot_neighCells
         procedure :: Epot_conf => InteractingSpheres_Epot_conf
         procedure :: test_consist => InteractingSpheres_test_consist
