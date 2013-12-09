@@ -50,8 +50,8 @@ private
     contains
 
         !> Construction and destruction of the class
-        procedure :: init_particles => HardSpheres_init_particles
-        procedure :: init_changes => HardSpheres_init_changes
+        procedure, private :: init_particles => HardSpheres_init_particles
+        procedure, private :: init_changes => HardSpheres_init_changes
         procedure :: construct => HardSpheres_construct
         procedure :: destroy => HardSpheres_destroy
         

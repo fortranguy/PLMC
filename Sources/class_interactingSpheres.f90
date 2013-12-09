@@ -33,8 +33,8 @@ private
     contains
 
         !> Construction and destruction of the class
-        procedure :: init_particles => InteractingSpheres_init_particles
-        procedure :: init_changes => InteractingSpheres_init_changes
+        procedure, private :: init_particles => InteractingSpheres_init_particles
+        procedure, private :: init_changes => InteractingSpheres_init_changes
         procedure :: construct => InteractingSpheres_construct
         procedure :: destroy => InteractingSpheres_destroy
         

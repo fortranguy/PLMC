@@ -50,7 +50,7 @@ private
         procedure, private :: Epot_set_tab => MixingPotential_Epot_set_tab
         procedure, private :: Epot_init => MixingPotential_Epot_init
         procedure :: Epot_print => MixingPotential_Epot_print
-        procedure :: Epot_pair => MixingPotential_Epot_pair
+        procedure, private :: Epot_pair => MixingPotential_Epot_pair
         procedure :: Epot_neighCells => MixingPotential_Epot_neighCells
         procedure :: Epot_conf => MixingPotential_Epot_conf
 

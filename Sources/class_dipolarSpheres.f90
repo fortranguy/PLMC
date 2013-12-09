@@ -52,8 +52,8 @@ private
     contains
 
         !> Construction and destruction of the class
-        procedure :: init_particles => DipolarSpheres_init_particles
-        procedure :: init_changes => DipolarSpheres_init_changes
+        procedure, private :: init_particles => DipolarSpheres_init_particles
+        procedure, private :: init_changes => DipolarSpheres_init_changes
         procedure :: construct => DipolarSpheres_construct
         procedure :: destroy => DipolarSpheres_destroy
         
