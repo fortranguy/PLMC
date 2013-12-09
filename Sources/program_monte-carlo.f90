@@ -61,8 +61,6 @@ implicit none
     call type2_spheres%construct()
     
     call mix%set_rMin(type1_spheres%get_rMin(), type2_spheres%get_rMin())
-    call type1_spheres%construct_mixCells(mix%get_cell_size(), mix%get_rCut())
-    call type2_spheres%construct_mixCells(mix%get_cell_size(), mix%get_rCut())
     
     Ncol = type1_spheres%get_Ncol() + type2_spheres%get_Ncol()
     Nmove = decorrelFactor * Ncol
@@ -119,14 +117,14 @@ implicit none
     type1_obs%Epot = type1_spheres%Epot_conf()
     call type1_spheres%snap_positions(0, type1_units%snapIni_positions)
     call type1_spheres%snap_orientations(0, type1_units%snapIni_orientations)
-    call type1_spheres%all_cols_to_cells(type2_spheres) !< filling cells with particles
+    call type1_spheres%construct_cells(type2_spheres, mix%get_cell_size(), mix%get_rCut())
     
     call type2_spheres%test_overlap()
     call type2_spheres%Epot_init()
     call type2_spheres%Epot_print(type2_units%Epot)
     type2_obs%Epot = type2_spheres%Epot_conf()
     call type2_spheres%snap_positions(0, type2_units%snapIni_positions)
-    call type2_spheres%all_cols_to_cells(type1_spheres)
+    call type2_spheres%construct_cells(type1_spheres, mix%get_cell_size(), mix%get_rCut())
     
     call mix%test_overlap(type1_spheres, type2_spheres)
     mix_Epot = mix%Epot_conf(type1_spheres, type2_spheres)

@@ -77,9 +77,7 @@ private
         procedure :: test_overlap => HardSpheres_test_overlap
         
         !> Neighbour cells
-        procedure :: construct_sameCells => HardSpheres_construct_sameCells
-        procedure :: construct_mixCells => HardSpheres_construct_mixCells
-        procedure :: all_cols_to_cells => HardSpheres_all_cols_to_cells
+        procedure :: construct_cells => HardSpheres_construct_cells
         
         !> Potential energy
         procedure :: Epot_init => HardSpheres_Epot_init
@@ -127,10 +125,6 @@ contains
         
         call this%init_changes()
         
-        call this%Epot_init()
-        
-        call this%construct_sameCells()
-    
     end subroutine HardSpheres_construct
     
     subroutine HardSpheres_destroy(this)
@@ -386,42 +380,23 @@ contains
     
     !> Neighbour Cells
     
-    subroutine HardSpheres_construct_sameCells(this)
-    
-        class(HardSpheres), intent(inout) :: this
-        
-        real(DP), dimension(Ndim) :: cell_size
-        
-        cell_size(:) = this%rCut
-        call this%sameCells%construct(cell_size, this%rCut) !< same kind
-    
-    end subroutine HardSpheres_construct_sameCells
-    
-     !> mixCells construction
-    
-    subroutine HardSpheres_construct_mixCells(this, mix_cell_size, mix_rCut)
-    
-        class(HardSpheres), intent(inout) :: this
-        real(DP), dimension(:), intent(in) :: mix_cell_size
-        real(DP), intent(in) :: mix_rCut
-        
-        write(output_unit, *) this%name, " : mixCells construction"
-        
-        call this%mixCells%construct(mix_cell_size, mix_rCut)
-    
-    end subroutine HardSpheres_construct_mixCells
-    
-    !> Fill cells with colloids
-    
-    pure subroutine HardSpheres_all_cols_to_cells(this, other)
+    subroutine HardSpheres_construct_cells(this, other, mix_cell_size, mix_rCut)
     
         class(HardSpheres), intent(inout) :: this
         class(HardSpheres), intent(in) :: other
+        real(DP), dimension(:), intent(in) :: mix_cell_size
+        real(DP), intent(in) :: mix_rCut
         
+        real(DP), dimension(Ndim) :: same_cell_size
+        
+        same_cell_size(:) = this%rCut
+        call this%sameCells%construct(same_cell_size, this%rCut) !< same kind
         call this%sameCells%all_cols_to_cells(this%Ncol, this%positions)
+        
+        call this%mixCells%construct(mix_cell_size, mix_rCut)
         call this%mixCells%all_cols_to_cells(other%Ncol, other%positions)
     
-    end subroutine HardSpheres_all_cols_to_cells
+    end subroutine HardSpheres_construct_cells
     
     ! Potential
     
