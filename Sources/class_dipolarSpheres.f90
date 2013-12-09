@@ -370,7 +370,11 @@ contains
         
         call this%Epot_real_set_parameters()
         
+        if (allocated(this%Epot_real_tab)) then
+            deallocate(this%Epot_real_tab)
+        end if
         allocate(this%Epot_real_tab(this%iMin:this%iCut, 2))
+        
         call this%Epot_real_set_tab()
     
     end subroutine DipolarSpheres_Epot_real_init
