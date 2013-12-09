@@ -144,8 +144,8 @@ use data_precisions, only : DP
 
 implicit none
 
-    real(DP), parameter :: dipol_rCut_factor = 0.5_DP ! * Lsize(1)
-    real(DP), parameter :: dipol_dr = 5.E-5_DP ! u_length
+    real(DP), parameter :: dipol_real_rCut_factor = 0.5_DP ! * Lsize(1)
+    real(DP), parameter :: dipol_real_dr = 5.E-5_DP ! u_length
     real(DP), parameter :: dipol_alpha_factor = 7._DP ! / Lsize(1)
     
     real(DP), parameter :: mix_rCut = 1._DP ! u_length, adaptation

@@ -10,7 +10,7 @@ use data_particles, only : dipol_Ncol
 use data_monteCarlo, only : dipol_move_delta, dipol_move_rejectFix, dipol_rotate_delta, &
                             dipol_rotate_deltaMax, dipol_rotate_rejectFix, dipol_Nwidom, &
                             dipol_reInit_iStep
-use data_potential, only : dipol_rCut_factor, dipol_dr, dipol_alpha_factor
+use data_potential, only : dipol_real_rCut_factor, dipol_real_dr, dipol_alpha_factor
 use data_neighbourCells, only : NnearCell
 use data_distribution, only : dipol_snap_factor
 use module_physics, only : set_discrete_length, distVec_PBC, Kmax1_sym, Kmax2_sym, fourier_i
@@ -38,9 +38,10 @@ private
         integer :: reInit_iStep
 
         ! Potential
-        real(DP)  :: dr !< discretisation step
-        integer :: iMin !< minimum index of tabulation : minimum distance
-        integer :: iCut !< maximum index of tabulation : until potential cut
+        real(DP) :: real_rCut !< real space potential cut
+        real(DP) :: real_dr !< discretisation step
+        integer :: real_iMin !< minimum index of tabulation : minimum distance
+        integer :: real_iCut !< maximum index of tabulation : until potential cut
         real(DP) :: alpha !< coefficient of Ewald summation
         real(DP), dimension(:, :), allocatable :: Epot_real_tab !< tabulation : real short-range
         real(DP), dimension(-Kmax(1):Kmax(1), -Kmax(2):Kmax(2), -Kmax(3):Kmax(3)) :: Epot_reci_weight
@@ -110,7 +111,7 @@ private
         procedure :: deltaEpot_bound_exchange => DipolarSpheres_deltaEpot_bound_exchange
         procedure, private :: Epot_bound => DipolarSpheres_Epot_bound
         !>     Total
-        procedure :: init_potential => DipolarSpheres_init_potential
+        procedure :: Epot_init => DipolarSpheres_Epot_init
         procedure :: Epot_conf => DipolarSpheres_Epot_conf
         procedure :: test_consist => DipolarSpheres_test_consist
         
@@ -189,7 +190,7 @@ contains
         call this%HardSpheres%print_report(report_unit)
 
         write(report_unit, *) "    alpha = ", this%alpha
-        write(report_unit, *) "    dr = ", this%dr
+        write(report_unit, *) "    dr = ", this%real_dr
         write(report_unit, *) "    reInit_iStep = ", this%reInit_iStep
         write(report_unit, *) "    NwaveVectors = ", this%NwaveVectors
         
@@ -330,17 +331,17 @@ contains
         alpha = this%alpha
        
         ! cut
-        do i = this%iMin, this%iCut
+        do i = this%real_iMin, this%real_iCut
         
-            r_i = real(i, DP)*this%dr
+            r_i = real(i, DP)*this%real_dr
             
             this%Epot_real_tab(i, :) = this%Epot_real_true(r_i)
             
         end do
         
         ! shift        
-        this%Epot_real_tab(:, 1) = this%Epot_real_tab(:, 1) - this%Epot_real_tab(this%iCut, 1)
-        this%Epot_real_tab(:, 2) = this%Epot_real_tab(:, 2) - this%Epot_real_tab(this%iCut, 2)
+        this%Epot_real_tab(:, 1) = this%Epot_real_tab(:, 1) - this%Epot_real_tab(this%real_iCut, 1)
+        this%Epot_real_tab(:, 2) = this%Epot_real_tab(:, 2) - this%Epot_real_tab(this%real_iCut, 2)
 
     end subroutine DipolarSpheres_Epot_real_set_tab
     
@@ -350,11 +351,11 @@ contains
     
         class(DipolarSpheres), intent(inout) :: this
         
-        this%rCut = dipol_rCut_factor * Lsize(1)
-        this%dr = dipol_dr
-        call set_discrete_length(this%rMin, this%dr)
-        this%iMin = int(this%rMin/this%dr)
-        this%iCut = int(this%rCut/this%dr) + 1
+        this%real_rCut = dipol_real_rCut_factor * Lsize(1)
+        this%real_dr = dipol_real_dr
+        call set_discrete_length(this%rMin, this%real_dr)
+        this%real_iMin = int(this%rMin/this%real_dr)
+        this%real_iCut = int(this%real_rCut/this%real_dr) + 1
         
     end subroutine DipolarSpheres_Epot_real_set_parameters
     
@@ -367,7 +368,7 @@ contains
         if (allocated(this%Epot_real_tab)) then
             deallocate(this%Epot_real_tab)
         end if
-        allocate(this%Epot_real_tab(this%iMin:this%iCut, 2))
+        allocate(this%Epot_real_tab(this%real_iMin:this%real_iCut, 2))
         
         call this%Epot_real_set_tab()
     
@@ -383,8 +384,8 @@ contains
         integer :: i
         real(DP) :: r_i
 
-        do i = this%iMin, this%iCut
-            r_i = real(i, DP)*this%dr
+        do i = this%real_iMin, this%real_iCut
+            r_i = real(i, DP)*this%real_dr
             write(Epot_unit, *) r_i, this%Epot_real_tab(i, :)
         end do
 
@@ -401,11 +402,11 @@ contains
         integer :: i
         real(DP) :: r_i
        
-        if (r < this%rCut) then
+        if (r < this%real_rCut) then
        
-            i = int(r/this%dr)
-            r_i = real(i, DP)*this%dr
-            Epot_real_interpol(:) = this%Epot_real_tab(i, :) + (r-r_i)/this%dr * &
+            i = int(r/this%real_dr)
+            r_i = real(i, DP)*this%real_dr
+            Epot_real_interpol(:) = this%Epot_real_tab(i, :) + (r-r_i)/this%real_dr * &
                                    (this%Epot_real_tab(i+1, :) - this%Epot_real_tab(i, :))
            
         else
@@ -1262,9 +1263,11 @@ contains
     
     !> Potential energy initialisation
     
-    subroutine DipolarSpheres_init_potential(this)
+    subroutine DipolarSpheres_Epot_init(this)
     
         class(DipolarSpheres), intent(inout) :: this
+        
+        this%rCut = this%rMin
         
         this%alpha = dipol_alpha_factor / Lsize(1)
         
@@ -1275,7 +1278,7 @@ contains
         
         call this%init_totalMoment()
         
-    end subroutine DipolarSpheres_init_potential
+    end subroutine DipolarSpheres_Epot_init
 
     !> Total potential energy of a configuration
     

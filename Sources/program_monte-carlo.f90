@@ -111,7 +111,7 @@ implicit none
     call set_initialCondition(type1_spheres, type2_spheres, mix%get_rMin(), report_unit)
     
     call type1_spheres%test_overlap()
-    call type1_spheres%init_potential()
+    call type1_spheres%Epot_init()
     call type1_spheres%Epot_real_print(type1_units%Epot)
     call type1_spheres%Epot_reci_count_waveVectors(type1_units%waveVectors)
     type1_obs%Epot = type1_spheres%Epot_conf()
@@ -263,7 +263,7 @@ implicit none
     ! Tests & results
 
     call type1_spheres%test_overlap()
-    call type1_spheres%init_potential()
+    call type1_spheres%Epot_init()
     call type1_spheres%test_consist(type1_obs%Epot, type1_units%report)
     call type1_spheres%snap_positions(0, type1_units%snapFin_positions)
     call type1_spheres%snap_orientations(0, type1_units%snapFin_orientations)
