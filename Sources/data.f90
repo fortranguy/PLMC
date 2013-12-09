@@ -7,7 +7,7 @@
 !***************************************************************************************************
 module data_precisions
 
-use, intrinsic :: iso_fortran_env
+use, intrinsic :: iso_fortran_env, only : REAL64
 
 implicit none
 
