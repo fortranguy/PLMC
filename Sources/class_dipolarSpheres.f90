@@ -151,8 +151,6 @@ contains
     
         class(DipolarSpheres), intent(out) :: this
         
-        real(DP), dimension(Ndim) :: cell_size
-        
         this%name = "dipol"        
         write(output_unit, *) this%name, " class construction"
     
@@ -162,10 +160,6 @@ contains
         this%snap_factor = dipol_snap_factor
         
         call this%init_changes()
-        
-        ! Neighbour Cells
-        cell_size(:) = this%rMin
-        call this%sameCells%construct(cell_size, this%rCut) !< same kind
     
     end subroutine DipolarSpheres_construct
     

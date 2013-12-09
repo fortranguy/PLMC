@@ -81,8 +81,6 @@ contains
     
         class(InteractingSpheres), intent(out) :: this
         
-        real(DP), dimension(Ndim) :: cell_size
-        
         this%name = "inter"
         write(output_unit, *) this%name, " class construction"
         
@@ -91,10 +89,6 @@ contains
         this%snap_factor = inter_snap_factor
         
         call this%init_changes()
-        
-        ! Neighbour Cells
-        cell_size(:) = this%rCut
-        call this%sameCells%construct(cell_size, this%rCut)
     
     end subroutine InteractingSpheres_construct
     
