@@ -102,7 +102,7 @@ private
         procedure :: Epot_self_solo => DipolarSpheres_Epot_self_solo
         procedure, private :: Epot_self => DipolarSpheres_Epot_self
         !>     Total moment
-        procedure :: init_totalMoment => DipolarSpheres_init_totalMoment
+        procedure, private :: init_totalMoment => DipolarSpheres_init_totalMoment
         procedure :: reInit_totalMoment => DipolarSpheres_reInit_totalMoment
         procedure :: update_totalMoment_rotate => DipolarSpheres_update_totalMoment_rotate
         !>     Boundary conditions
