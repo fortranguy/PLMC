@@ -56,11 +56,9 @@ implicit none
     type(Observables) :: type2_obs
     type(Units) :: type2_units
 
-    call mix%construct()
     call type1_spheres%construct()
-    call type2_spheres%construct()
-    
-    call mix%set_rMin(type1_spheres%get_rMin(), type2_spheres%get_rMin())
+    call type2_spheres%construct()    
+    call mix%construct(type1_spheres%get_rMin(), type2_spheres%get_rMin())
     
     Ncol = type1_spheres%get_Ncol() + type2_spheres%get_Ncol()
     Nmove = decorrelFactor * Ncol

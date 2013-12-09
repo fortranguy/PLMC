@@ -35,20 +35,19 @@ private
         real(DP), dimension(Ndim) :: cell_size
 
     contains
-
-        procedure :: init_potential => MixingPotential_init_potential
+    
         procedure :: construct => MixingPotential_construct
         procedure :: destroy => MixingPotential_destroy
 
         procedure :: print_report => MixingPotential_print_report
-
-        procedure :: set_rMin => MixingPotential_set_rMin
+        
         procedure :: get_rMin => MixingPotential_get_rMin
         procedure :: get_rCut => MixingPotential_get_rCut
         procedure :: get_cell_size => MixingPotential_get_cell_size
         
         procedure :: test_overlap => MixingPotential_test_overlap
 
+        procedure, private :: Epot_set_tab => MixingPotential_Epot_set_tab
         procedure, private :: Epot_init => MixingPotential_Epot_init
         procedure :: Epot_print => MixingPotential_Epot_print
         procedure :: Epot_pair => MixingPotential_Epot_pair
@@ -59,28 +58,23 @@ private
 
 contains
 
-    subroutine MixingPotential_init_potential(this)
-    
-        class(MixingPotential), intent(inout) :: this
-        
-        this%rCut = mix_rCut
-        this%dr = mix_dr
-        this%epsilon = mix_epsilon
-        this%alpha = mix_alpha
-    
-    end subroutine MixingPotential_init_potential
-
-    subroutine MixingPotential_construct(this)
+    subroutine MixingPotential_construct(this, type1_rMin, type2_rMin)
 
         class(MixingPotential), intent(out) :: this
+        real(DP), intent(in) :: type1_rMin, type2_rMin
         
         this%name = "[mix]"
         write(output_unit, *) this%name, " class construction"
         
-        call this%init_potential()
-        
         ! Particles
         this%delta = mix_delta
+        this%rMin = (type1_rMin + type2_rMin)/2._DP + this%delta
+        
+        ! MixingPotential
+        call this%Epot_init()
+        
+        ! Neighbours
+        this%cell_size(:) = this%rCut        
 
     end subroutine MixingPotential_construct
 
@@ -113,36 +107,6 @@ contains
         write(report_unit, *) "    dr = ", this%dr
         
     end subroutine MixingPotential_print_report
-    
-    !> Mutator : rMin
-    
-    subroutine MixingPotential_set_rMin(this, type1_rMin, type2_rMin)
-    
-        class(MixingPotential), intent(inout) :: this
-        real(DP), intent(in) :: type1_rMin, type2_rMin
-        
-        write(output_unit, *) this%name, " : set rMin"
-    
-        this%rMin = (type1_rMin + type2_rMin)/2._DP + this%delta
-        
-        if (this%rCut < this%rMin) then
-            write(error_unit, *) this%name
-            write(error_unit, *) "    Warning : rCut =",  this%rCut, "< rMin =", this%rMin, "!"
-            this%rCut = this%rMin
-            write(error_unit, *) "    rCut <- rMin"
-        end if
-        
-        ! MixingPotential
-        call set_discrete_length(this%rMin, this%dr)
-        this%iMin = int(this%rMin/this%dr)
-        this%iCut = int(this%rCut/this%dr) + 1
-        allocate(this%Epot_tab(this%iMin:this%iCut))
-        call this%Epot_init()
-        
-        ! Neighbours
-        this%cell_size(:) = this%rCut
-    
-    end subroutine MixingPotential_set_rMin
     
     !> Accessor : rMin
     
@@ -208,7 +172,7 @@ contains
     !> Tabulation of Yukawa potential
     !> \f[ \epsilon \frac{e^{-\alpha (r-r_{min})}}{r} \f]
     
-    pure subroutine MixingPotential_Epot_init(this)
+    pure subroutine MixingPotential_Epot_set_tab(this)
     
         class(MixingPotential), intent(inout) :: this
 
@@ -224,6 +188,31 @@ contains
         ! shift        
         this%Epot_tab(:) = this%Epot_tab(:) - this%Epot_tab(this%iCut)
 
+    end subroutine MixingPotential_Epot_set_tab
+    
+    subroutine MixingPotential_Epot_init(this)
+    
+        class(MixingPotential), intent(inout) :: this
+        
+        this%rCut = mix_rCut
+        
+        if (this%rCut < this%rMin) then
+            write(error_unit, *) this%name
+            write(error_unit, *) "    Warning : rCut =",  this%rCut, "< rMin =", this%rMin, "!"
+            this%rCut = this%rMin
+            write(error_unit, *) "    rCut <- rMin"
+        end if
+        
+        this%dr = mix_dr
+        call set_discrete_length(this%rMin, this%dr)
+        this%iMin = int(this%rMin/this%dr)
+        this%iCut = int(this%rCut/this%dr) + 1
+        this%epsilon = mix_epsilon
+        this%alpha = mix_alpha
+        
+        allocate(this%Epot_tab(this%iMin:this%iCut))
+        call this%Epot_set_tab()
+        
     end subroutine MixingPotential_Epot_init
     
     !> Print the tabulated potential
