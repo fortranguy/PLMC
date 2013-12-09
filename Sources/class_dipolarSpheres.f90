@@ -10,7 +10,7 @@ use data_particles, only : dipol_Ncol
 use data_monteCarlo, only : dipol_move_delta, dipol_move_rejectFix, dipol_rotate_delta, &
                             dipol_rotate_deltaMax, dipol_rotate_rejectFix, dipol_Nwidom, &
                             dipol_reInit_iStep
-use data_potential, only : dipol_rCut, dipol_dr, dipol_alpha
+use data_potential, only : dipol_rCut_factor, dipol_dr, dipol_alpha_factor
 use data_neighbourCells, only : NnearCell
 use data_distribution, only : dipol_snap_factor
 use module_physics, only : set_discrete_length, distVec_PBC, Kmax1_sym, Kmax2_sym, fourier_i
@@ -356,7 +356,7 @@ contains
     
         class(DipolarSpheres), intent(inout) :: this
         
-        this%rCut = dipol_rCut
+        this%rCut = dipol_rCut_factor * Lsize(1)
         this%dr = dipol_dr
         call set_discrete_length(this%rMin, this%dr)
         this%iMin = int(this%rMin/this%dr)
@@ -1260,13 +1260,15 @@ contains
     
     end function DipolarSpheres_Epot_bound
     
+    !> Total potential energy ----------------------------------------------------------------------
+    
     !> Potential energy initialisation
     
     subroutine DipolarSpheres_init_potential(this)
     
         class(DipolarSpheres), intent(inout) :: this
         
-        this%alpha = dipol_alpha
+        this%alpha = dipol_alpha_factor / Lsize(1)
         
         call this%Epot_real_init()
         
@@ -1275,7 +1277,7 @@ contains
         
     end subroutine DipolarSpheres_init_potential
 
-    !> Total potential energy
+    !> Total potential energy of a configuration
     
     pure function DipolarSpheres_Epot_conf(this) result(Epot_conf)
     
