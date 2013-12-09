@@ -31,7 +31,7 @@ public :: Node
         integer, dimension(:, :), allocatable, public :: nearCells_among_totalCells
         type(LinkedList), dimension(:), allocatable, public :: beginCells
         type(LinkedList), dimension(:), allocatable :: currentCells
-        type(LinkedList), dimension(:), allocatable :: nextCells        
+        type(LinkedList), dimension(:), allocatable :: nextCells
         
     contains
     
@@ -67,7 +67,7 @@ contains
         
         allocate(this%nearCells_among_totalCells(NnearCell, this%NtotalCell))
             
-        call this%check_CellsSize(rCut)        
+        call this%check_CellsSize(rCut)
         call this%alloc_cells()
         call this%init_nearCells_among_totalCells()
     
@@ -100,7 +100,7 @@ contains
     
     pure function NeighbourCells_get_NtotalCell_dim(this) result(get_NtotalCell_dim)
     
-        class(NeighbourCells), intent(in) :: this    
+        class(NeighbourCells), intent(in) :: this
         integer, dimension(Ndim) :: get_NtotalCell_dim
         
         get_NtotalCell_dim(:) = this%NtotalCell_dim(:)
@@ -126,9 +126,9 @@ contains
             this%currentCells(iCell)%particle%iCol = 0
             
             allocate(this%nextCells(iCell)%particle)
-            this%nextCells(iCell)%particle%iCol = 0            
+            this%nextCells(iCell)%particle%iCol = 0
             this%currentCells(iCell)%particle%next => this%nextCells(iCell)%particle
-            this%currentCells(iCell)%particle => this%nextCells(iCell)%particle     
+            this%currentCells(iCell)%particle => this%nextCells(iCell)%particle
     
         end do
         
@@ -208,7 +208,7 @@ contains
         real(DP), dimension(:), intent(in) :: xCol
         integer :: index_from_position
         
-        integer, dimension(Ndim) :: cell_coord        
+        integer, dimension(Ndim) :: cell_coord
     
         cell_coord(:) = int(xCol(:)/this%cell_size(:)) + 1
         index_from_position = cell_coord(1) + this%NtotalCell_dim(1)*(cell_coord(2)-1) + &
@@ -283,11 +283,11 @@ contains
     
     subroutine NeighbourCells_add_col_to_cell(this, iCol, iCellNew)
     
-        class(NeighbourCells), intent(inout) :: this    
+        class(NeighbourCells), intent(inout) :: this
         integer, intent(in) :: iCol, iCellNew
     
         type(Node), pointer :: new => null()
-        type(Node), pointer :: next => null(), previous => null()          
+        type(Node), pointer :: next => null(), previous => null()
         
         previous => this%beginCells(iCellNew)%particle
         next => previous%next
@@ -325,7 +325,7 @@ contains
                 nearCell_coord(:) = nearCell_coord(:) - NnearCell_dim(:) + 1
                     ! with respect to the center (?) [iTotalCell, jTotalCell, kTotalCell]
                 
-                totalCell_coord(:) = [iTotalCell, jTotalCell, kTotalCell] + nearCell_coord(:)                
+                totalCell_coord(:) = [iTotalCell, jTotalCell, kTotalCell] + nearCell_coord(:)
                 totalCell_coord(:) = coord_PBC(totalCell_coord, this%NtotalCell_dim)
                 
                 this%nearCells_among_totalCells(nearCell_index, totalCell_index) = &
