@@ -70,7 +70,6 @@ contains
         this%delta = mix_delta
         this%rMin = (type1_rMin + type2_rMin)/2._DP + this%delta
         
-        ! MixingPotential
         call this%Epot_init()
         
         ! Neighbours

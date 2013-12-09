@@ -87,7 +87,6 @@ implicit none
     open(newunit=mix_obsEquilib_unit, recl=4096, file="mix_obsEquilib.out", status='new', &
          action='write')
     write(mix_obsEquilib_unit, *) "#", 1 ! 1 observable : energy
-    call mix%Epot_print(mix_Epot_unit)
     call mix%print_report(mix_report_unit)
     
     call type1_obs%init()
@@ -125,6 +124,7 @@ implicit none
     call type2_spheres%construct_cells(type1_spheres, mix%get_cell_size(), mix%get_rCut())
     
     call mix%test_overlap(type1_spheres, type2_spheres)
+    call mix%Epot_print(mix_Epot_unit)
     mix_Epot = mix%Epot_conf(type1_spheres, type2_spheres)
     
     Epot_conf = type1_obs%Epot + type2_obs%Epot + mix_Epot
