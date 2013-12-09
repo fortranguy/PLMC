@@ -183,13 +183,8 @@ contains
         do jDim = 1, Ndim
         
             if (this%cell_size(jDim) < rCut) then
-                write(error_unit, *) "    Warning : big rCut in the dimension", jDim, ":"
+                write(error_unit, *) "    rCut too big in the dimension", jDim, ":"
                 write(error_unit, *) "    ", this%cell_size(jDim), "<", rCut
-            end if
-            
-            if (Lsize(jDim)/2._DP < rCut) then
-                write(error_unit, *) "    rCut too large in the dimension", jDim, ":"
-                write(error_unit, *) "    ", Lsize(jDim)/2._DP, "<", rCut
                 stop
             end if
             
