@@ -132,9 +132,9 @@ contains
         
         Epot_true = this%epsilon * exp(-this%alpha*(r-this%rMin)) / r
     
-    end function InteractingSpheres_Epot_true    
+    end function InteractingSpheres_Epot_true
     
-    !> Tabulation of the potential    
+    !> Tabulation of the potential
     
     pure subroutine InteractingSpheres_Epot_set_tab(this)
     
@@ -144,12 +144,12 @@ contains
         real(DP) :: r_i
        
         ! cut
-        do i = this%iMin, this%iCut       
+        do i = this%iMin, this%iCut
             r_i = real(i, DP)*this%dr
             this%Epot_tab(i) = this%Epot_true(r_i)
         end do
         
-        ! shift        
+        ! shift
         this%Epot_tab(:) = this%Epot_tab(:) - this%Epot_tab(this%iCut)
 
     end subroutine InteractingSpheres_Epot_set_tab
@@ -215,7 +215,7 @@ contains
     
     subroutine InteractingSpheres_Epot_neighCells(this, iCol, xCol, iTotalCell, overlap, energ)
         
-        class(InteractingSpheres), intent(in) :: this        
+        class(InteractingSpheres), intent(in) :: this
         integer, intent(in) :: iCol, iTotalCell
         real(DP), dimension(:), intent(in) :: xCol
         logical, intent(out) :: overlap
@@ -232,7 +232,7 @@ contains
         do iNearCell = 1, NnearCell
         
             nearCell_index = this%sameCells%nearCells_among_totalCells(iNearCell, iTotalCell)
-            current => this%sameCells%beginCells(nearCell_index)%particle%next            
+            current => this%sameCells%beginCells(nearCell_index)%particle%next
             if (.not. associated(current%next)) cycle
             
             do
@@ -254,7 +254,7 @@ contains
                 
                 current => next
             
-            end do            
+            end do
             
         end do
     
@@ -287,7 +287,7 @@ contains
     
     end function InteractingSpheres_Epot_conf
     
-    !> Consistency test 
+    !> Consistency test
     
     subroutine InteractingSpheres_test_consist(this, Epot, report_unit)
     
