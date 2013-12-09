@@ -2,6 +2,7 @@
 
 program distribution
 
+use, intrinsic :: iso_fortran_env, only : output_unit
 use data_precisions, only : DP
 use data_box, only : Ndim, Lsize
 use data_monteCarlo, only : Nstep
@@ -43,7 +44,7 @@ implicit none
     open(newunit=snaps_unit, recl=4096, file=file_name(1:length), status='old', action='read')
     
     read(snaps_unit, *) name, Ncol, snap_factor
-    write(*, *) name, Ncol, snap_factor
+    write(output_unit, *) name, Ncol, snap_factor
     
     rMax = norm2(Lsize/2._DP)
     Ndist = int(rMax/dist_dr)
@@ -54,7 +55,7 @@ implicit none
 
     dist_sum(:) = 0   
 
-    write(*, *) "Start !"
+    write(output_unit, *) "Start !"
     call cpu_time(tIni)
     !$ tIni_para = omp_get_wtime()
     !$omp parallel do schedule(static) reduction(+:dist_sum) private(positions, iCol, jCol, r_ij, iDist)
@@ -82,7 +83,7 @@ implicit none
     !$omp end parallel do
     !$ tFin_para = omp_get_wtime()
     call cpu_time(tFin)
-    write(*, *) "Finish !"
+    write(output_unit, *) "Finish !"
 
     close(snaps_unit)
 
