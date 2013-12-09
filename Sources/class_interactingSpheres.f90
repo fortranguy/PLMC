@@ -35,7 +35,6 @@ private
         !> Construction and destruction of the class
         procedure :: init_particles => InteractingSpheres_init_particles
         procedure :: init_changes => InteractingSpheres_init_changes
-        procedure :: init_potential => InteractingSpheres_init_potential
         procedure :: construct => InteractingSpheres_construct
         procedure :: destroy => InteractingSpheres_destroy
         
@@ -45,6 +44,7 @@ private
         !> Potential energy
         procedure, private :: Epot_true => InteractingSpheres_Epot_true
         procedure, private :: Epot_set_tab => InteractingSpheres_Epot_set_tab
+        procedure :: Epot_init => InteractingSpheres_Epot_init
         procedure :: Epot_print => InteractingSpheres_Epot_print
         procedure, private :: Epot_pair => InteractingSpheres_Epot_pair
         procedure :: Epot_neighCells => InteractingSpheres_Epot_neighCells
@@ -76,22 +76,6 @@ contains
         this%Nwidom = inter_Nwidom
         
     end subroutine InteractingSpheres_init_changes
-    
-    subroutine InteractingSpheres_init_potential(this)
-    
-        class(InteractingSpheres), intent(inout) :: this
-        
-        this%rCut = inter_rCut
-        this%dr = inter_dr
-        call set_discrete_length(this%rMin, this%dr)
-        this%iMin = int(this%rMin/this%dr)
-        this%iCut = int(this%rCut/this%dr) + 1
-        this%epsilon = inter_epsilon
-        this%alpha = inter_alpha        
-        allocate(this%Epot_tab(this%iMin:this%iCut))
-        call this%Epot_set_tab()
-        
-    end subroutine InteractingSpheres_init_potential
 
     subroutine InteractingSpheres_construct(this)
     
@@ -106,9 +90,7 @@ contains
         
         this%snap_factor = inter_snap_factor
         
-        call this%init_changes()        
-        
-        call this%init_potential()
+        call this%init_changes()
         
         ! Neighbour Cells
         cell_size(:) = this%rCut
@@ -177,6 +159,25 @@ contains
         this%Epot_tab(:) = this%Epot_tab(:) - this%Epot_tab(this%iCut)
 
     end subroutine InteractingSpheres_Epot_set_tab
+    
+    !> Initialisation
+    
+    subroutine InteractingSpheres_Epot_init(this)
+    
+        class(InteractingSpheres), intent(inout) :: this
+        
+        this%rCut = inter_rCut
+        this%dr = inter_dr
+        call set_discrete_length(this%rMin, this%dr)
+        this%iMin = int(this%rMin/this%dr)
+        this%iCut = int(this%rCut/this%dr) + 1
+        this%epsilon = inter_epsilon
+        this%alpha = inter_alpha
+        
+        allocate(this%Epot_tab(this%iMin:this%iCut))        
+        call this%Epot_set_tab()
+        
+    end subroutine InteractingSpheres_Epot_init
     
     !> Print the tabulated potential
     
