@@ -174,7 +174,7 @@ contains
         this%epsilon = inter_epsilon
         this%alpha = inter_alpha
         
-        allocate(this%Epot_tab(this%iMin:this%iCut))        
+        allocate(this%Epot_tab(this%iMin:this%iCut))
         call this%Epot_set_tab()
         
     end subroutine InteractingSpheres_Epot_init
