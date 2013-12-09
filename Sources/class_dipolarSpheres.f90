@@ -72,12 +72,12 @@ private
         !> Potential energy
         !>     Real
         procedure, private :: Epot_real_true => DipolarSpheres_Epot_real_true
+        procedure, private :: Epot_real_set_parameters => DipolarSpheres_Epot_real_set_parameters
         procedure, private :: Epot_real_set_tab => DipolarSpheres_Epot_real_set_tab
-        procedure :: Epot_real_set_parameters => DipolarSpheres_Epot_real_set_parameters
-        procedure :: Epot_real_init => DipolarSpheres_Epot_real_init
+        procedure, private :: Epot_real_init => DipolarSpheres_Epot_real_init
         procedure :: Epot_real_print => DipolarSpheres_Epot_real_print
         procedure, private :: Epot_real_interpol => DipolarSpheres_Epot_real_interpol
-        procedure :: Epot_real_pair => DipolarSpheres_Epot_real_pair
+        procedure, private :: Epot_real_pair => DipolarSpheres_Epot_real_pair
         procedure :: Epot_real_solo => DipolarSpheres_Epot_real_solo
         procedure, private :: Epot_real => DipolarSpheres_Epot_real
         !>     Reciprocal : init
