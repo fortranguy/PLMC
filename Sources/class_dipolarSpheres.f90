@@ -27,7 +27,7 @@ private
         
         ! Particles
         
-        real(DP), dimension(:, :), allocatable, public :: orientations !< dipolar orientations 
+        real(DP), dimension(:, :), allocatable, public :: orientations !< dipolar orientations
                                                                        !< of all particles
         
         ! Monte-Carlo
@@ -152,7 +152,7 @@ contains
     
         class(DipolarSpheres), intent(out) :: this
         
-        this%name = "dipol"        
+        this%name = "dipol"
         write(output_unit, *) this%name, " class construction"
     
         call this%init_particles()
@@ -247,7 +247,7 @@ contains
     
     subroutine DipolarSpheres_set_rotate_delta(this, reject, report_unit)
     
-        class(DipolarSpheres), intent(inout) :: this    
+        class(DipolarSpheres), intent(inout) :: this
         real(DP), intent(in) :: reject
         integer, intent(in) :: report_unit
         
@@ -274,7 +274,7 @@ contains
     
     pure function DipolarSpheres_get_rotate_delta(this) result(get_rotate_delta)
         
-        class(DipolarSpheres), intent(in) :: this        
+        class(DipolarSpheres), intent(in) :: this
         real(DP) :: get_rotate_delta
         
         get_rotate_delta = this%rotate_delta
@@ -339,7 +339,7 @@ contains
             
         end do
         
-        ! shift        
+        ! shift
         this%Epot_real_tab(:, 1) = this%Epot_real_tab(:, 1) - this%Epot_real_tab(this%real_iCut, 1)
         this%Epot_real_tab(:, 2) = this%Epot_real_tab(:, 2) - this%Epot_real_tab(this%real_iCut, 2)
 
@@ -418,7 +418,7 @@ contains
     end function DipolarSpheres_Epot_real_interpol
 
     !> Between 2 particles
-    !> \f[ (\vec{\mu}_i\cdot\vec{\mu}_j) B(r_{ij}) - 
+    !> \f[ (\vec{\mu}_i\cdot\vec{\mu}_j) B(r_{ij}) -
     !>     (\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij}) C(r_{ij}) \f]
     
     pure function DipolarSpheres_Epot_real_pair(this, mCol_i, mCol_j, rVec_ij, r_ij) &
@@ -504,7 +504,7 @@ contains
 
     ! Reciprocal : long-range interaction ----------------------------------------------------------
     
-    !> \f[ 
+    !> \f[
     !>      w(\alpha, \vec{k}) = \frac{e^{-\frac{\pi^2}{\alpha^2} \sum_d \frac{k_d^2}{L_d}}}
     !>                                {\sum_d \frac{k_d^2}{L_d}}
     !> \f]
@@ -547,11 +547,11 @@ contains
     end subroutine DipolarSpheres_Epot_reci_init_weight
     
     !> Structure factor init :
-    !> \f[ 
+    !> \f[
     !>      S(\vec{k}) = \sum_{i} (\vec{k}\cdot\vec{\mu}_i) e^{+i\vec{k}\cdot\vec{x}_i}
     !> \f]
     !> We will also use a restricted definition later :
-    !> \f[ 
+    !> \f[
     !>      S_l(\vec{k}) = \sum_{i \neq l} (\vec{k}\cdot\vec{\mu}_i) e^{+i\vec{k}\cdot\vec{x}_i}
     !> \f].
 
@@ -574,7 +574,7 @@ contains
 
         do iCol = 1, this%Ncol
         
-            xColOverL(:) = 2._DP*PI * this%positions(:, iCol)/Lsize(:)            
+            xColOverL(:) = 2._DP*PI * this%positions(:, iCol)/Lsize(:)
             call fourier_i(Kmax(1), xColOverL(1), exp_Ikx_1)
             call fourier_i(Kmax(2), xColOverL(2), exp_Ikx_2)
             call fourier_i(Kmax(3), xColOverL(3), exp_Ikx_3)
@@ -754,7 +754,7 @@ contains
 
             waveVector(3) = real(kz, DP)
 
-            do ky = -Kmax2_sym(kz), Kmax(2) 
+            do ky = -Kmax2_sym(kz), Kmax(2)
 
                 waveVector(2) = real(ky, DP)
             
@@ -931,7 +931,7 @@ contains
 
     !> Update moment -> update the ``structure factor''
     !>  \f[
-    !>      \Delta S(\vec{k}) = [\vec{k}\cdot(\vec{\mu}_l^\prime - \vec{\mu}_l)] 
+    !>      \Delta S(\vec{k}) = [\vec{k}\cdot(\vec{\mu}_l^\prime - \vec{\mu}_l)]
     !>                          e^{+i\vec{k}\cdot\vec{x}_l}
     !>  \f]
     !>
@@ -990,13 +990,13 @@ contains
 
     !> Energy of 1 dipole with others
     
-    !> Addition : 
+    !> Addition :
     
-    !> Difference of Energy 
-    !> \f[ \Delta U^{N+1} = \frac{2\pi}{V} \sum_{\vec{k} \neq \vec{0}} 
+    !> Difference of Energy
+    !> \f[ \Delta U^{N+1} = \frac{2\pi}{V} \sum_{\vec{k} \neq \vec{0}}
     !>                          (\vec{k} \cdot +\vec{\mu}_{N+1}) w(\alpha, \vec{k})
     !>                          \{
-    !>                              (\vec{k} \cdot +\vec{\mu}_{N+1}) + 
+    !>                              (\vec{k} \cdot +\vec{\mu}_{N+1}) +
     !>                              2\Re[S(\vec{k}) e^{-i \vec{k} \cdot \vec{x}_{N+1}}]
     !>                          \}
     !> \f]
@@ -1044,7 +1044,7 @@ contains
             
                 do kx = -Kmax1_sym(ky, kz), Kmax(1)
                 
-                    waveVector(1) = real(kx, DP)                    
+                    waveVector(1) = real(kx, DP)
                     k_dot_mCol = dot_product(waveVector, mColOverL)
                                                   
                     exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky) * exp_IkxCol_3(kz)
@@ -1118,7 +1118,7 @@ contains
         class(DipolarSpheres), intent(in) :: this
         real(DP) :: Epot_self
 
-        integer :: iCol        
+        integer :: iCol
         
         Epot_self = 0._DP
         do iCol = 1, this%Ncol
@@ -1145,7 +1145,7 @@ contains
         
             this%totalMoment(:) = this%totalMoment(:) + this%orientations(:, iCol)
         
-        end do        
+        end do
     
     end subroutine DipolarSpheres_init_totalMoment
 
@@ -1284,14 +1284,14 @@ contains
     
     pure function DipolarSpheres_Epot_conf(this) result(Epot_conf)
     
-        class(DipolarSpheres), intent(in) :: this        
+        class(DipolarSpheres), intent(in) :: this
         real(DP) :: Epot_conf
         
         Epot_conf = this%Epot_real() + this%Epot_reci() - this%Epot_self() + this%Epot_bound()
     
     end function DipolarSpheres_Epot_conf
     
-    !> Consistency test 
+    !> Consistency test
     
     subroutine DipolarSpheres_test_consist(this, Epot, report_unit)
     
