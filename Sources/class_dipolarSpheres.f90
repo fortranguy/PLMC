@@ -1279,6 +1279,8 @@ contains
         call this%Epot_reci_init()
         this%reInit_iStep = dipol_reInit_iStep
         
+        call this%init_totalMoment()
+        
     end subroutine DipolarSpheres_init_potential
 
     !> Total potential energy of a configuration

@@ -116,7 +116,6 @@ implicit none
     call type1_spheres%init_potential()
     call type1_spheres%Epot_real_print(type1_units%Epot)
     call type1_spheres%Epot_reci_count_waveVectors(type1_units%waveVectors)
-    call type1_spheres%init_totalMoment()
     type1_obs%Epot = type1_spheres%Epot_conf()
     call type1_spheres%snap_positions(0, type1_units%snapIni_positions)
     call type1_spheres%snap_orientations(0, type1_units%snapIni_orientations)
@@ -266,7 +265,6 @@ implicit none
 
     call type1_spheres%test_overlap()
     call type1_spheres%init_potential()
-    call type1_spheres%init_totalMoment()
     call type1_spheres%test_consist(type1_obs%Epot, type1_units%report)
     call type1_spheres%snap_positions(0, type1_units%snapFin_positions)
     call type1_spheres%snap_orientations(0, type1_units%snapFin_orientations)
