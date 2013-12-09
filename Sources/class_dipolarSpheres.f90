@@ -364,7 +364,7 @@ contains
         
     end subroutine DipolarSpheres_Epot_real_set_parameters
     
-    pure subroutine DipolarSpheres_Epot_real_init(this)
+    subroutine DipolarSpheres_Epot_real_init(this)
     
         class(DipolarSpheres), intent(inout) :: this
         
@@ -1268,7 +1268,7 @@ contains
     
     !> Potential energy initialisation
     
-    pure subroutine DipolarSpheres_init_potential(this)
+    subroutine DipolarSpheres_init_potential(this)
     
         class(DipolarSpheres), intent(inout) :: this
         
