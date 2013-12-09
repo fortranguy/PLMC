@@ -55,21 +55,21 @@ contains
         
         class(Observables), intent(out) :: this
         
-        this%Nmove = 0        
+        this%Nmove = 0
         this%move_Nreject = 0
         this%move_reject = 0._DP
         this%move_rejectSum = 0._DP
         this%move_rejectAdapt = 0._DP
         this%move_rejectAvg = 0._DP
         
-        this%EpotSum = 0._DP        
+        this%EpotSum = 0._DP
         this%activSum = 0._DP
         
         select type (this)
             
             type is (MoreObservables)
                 
-                this%Nrotate = 0                
+                this%Nrotate = 0
                 this%rotate_Nreject = 0
                 this%rotate_reject = 0._DP
                 this%rotate_rejectSum = 0._DP
