@@ -63,7 +63,7 @@ contains
         real(DP) :: x, y
         real(DP) :: normSqr, factor
         
-        real(DP), save :: gaussSave        
+        real(DP), save :: gaussSave
         integer, save :: switch = 0
         
         if (switch == 0) then
@@ -103,8 +103,8 @@ contains
         
         integer :: iNdim
         
-        do iNdim = 1, Ndim        
-            random_surface(iNdim) = gauss()          
+        do iNdim = 1, Ndim
+            random_surface(iNdim) = gauss()
         end do
         
         random_surface(:) = random_surface(:) / norm2(random_surface)
@@ -121,7 +121,7 @@ contains
         real(DP) :: amplitude, random
         integer :: iNdim
         
-        do iNdim = 1, Ndim        
+        do iNdim = 1, Ndim
             rotation(iNdim) = gauss()
         end do
         
