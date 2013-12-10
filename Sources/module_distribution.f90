@@ -17,7 +17,7 @@ contains
     
     pure function sphere_volume(iDist)
     
-        integer, intent(in) :: iDist    
+        integer, intent(in) :: iDist
         real(DP) :: sphere_volume
         
         sphere_volume = 4._DP/3._DP * PI * (real(iDist, DP)*dist_dr)**3
