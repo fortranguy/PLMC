@@ -53,7 +53,7 @@ implicit none
     allocate(positions(Ndim, Ncol))
     density = real(Ncol, DP) / product(Lsize)
 
-    dist_sum(:) = 0   
+    dist_sum(:) = 0
 
     write(output_unit, *) "Start !"
     call cpu_time(tIni)
@@ -72,7 +72,7 @@ implicit none
         do iCol = 1, Ncol
             do jCol = iCol + 1, Ncol
 
-                r_ij = dist_PBC(positions(:, iCol), positions(:, jCol))      
+                r_ij = dist_PBC(positions(:, iCol), positions(:, jCol))
                 iDist =  int(r_ij/dist_dr)
                 dist_sum(iDist) = dist_sum(iDist) + 1
 
