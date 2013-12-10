@@ -57,7 +57,7 @@ implicit none
     type(Units) :: type2_units
 
     call type1_spheres%construct()
-    call type2_spheres%construct()    
+    call type2_spheres%construct()
     call mix%construct(type1_spheres%get_rMin(), type2_spheres%get_rMin())
     
     Ncol = type1_spheres%get_Ncol() + type2_spheres%get_Ncol()
@@ -77,7 +77,7 @@ implicit none
          action='write')
     write(obsEquilib_unit, *) "#", 1 ! 1 observable : energy
     call print_report(Ncol, Nmove, Nrotate, report_unit)
-    !call init_randomSeed(report_unit)    
+    !call init_randomSeed(report_unit)
     
     mix_EpotSum = 0._DP
     open(newunit=mix_report_unit, recl=4096, file="mix_report.txt", status='new', action='write')
@@ -150,7 +150,7 @@ implicit none
                 call random_number(random)
                 iColRand = int(random*real(Ncol, DP)) + 1
                 
-                ! Moving a particle : 
+                ! Moving a particle :
                 if (iColRand <= type1_spheres%get_Ncol()) then
                     call move(type1_spheres, type1_obs, type2_spheres, mix, mix_Epot)
                     type1_obs%Nmove = type1_obs%Nmove + 1
@@ -217,7 +217,7 @@ implicit none
                 call type1_spheres%set_move_delta(type1_obs%move_rejectAvg, type1_units%report)
                 call type1_spheres%set_rotate_delta(type1_obs%rotate_rejectAvg, type1_units%report)
                 call type2_spheres%set_move_delta(type2_obs%move_rejectAvg, type2_units%report)
-            end if       
+            end if
         
         else MC_Regime ! Thermalisation over -> Equilibrium
         
@@ -225,7 +225,7 @@ implicit none
             call widom(type1_spheres, type1_obs, type2_spheres, mix)
             call widom(type2_spheres, type2_obs, type1_spheres, mix)
         
-            ! Observables accumulations            
+            ! Observables accumulations
             call type1_obs%accumulate()
             call type2_obs%accumulate()
             mix_EpotSum = mix_EpotSum + mix_Epot
