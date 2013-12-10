@@ -81,7 +81,7 @@ implicit none
     
     ! out ---------------------------------------------------------------------
     real(DP), parameter :: inter_rMin = 1._DP ! u_length
-    integer, parameter :: inter_Ncol = 0
+    integer, parameter :: inter_Ncol = 281
     ! -------------------------------------------------------------------------
     
 end module data_particles
@@ -123,7 +123,7 @@ implicit none
     ! out ---------------------------------------------------------------------
     real(DP), dimension(Ndim), parameter :: inter_move_delta = 1._DP ! u_length, adaptation
     real(DP), parameter :: inter_move_rejectFix = 0.5_DP
-    integer, parameter :: inter_Nwidom = 0
+    integer, parameter :: inter_Nwidom = 500
     ! -------------------------------------------------------------------------
 
 end module data_monteCarlo
