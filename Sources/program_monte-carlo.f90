@@ -124,6 +124,7 @@ implicit none
     call type2_spheres%construct_cells(type1_spheres, mix%get_cell_size(), mix%get_rCut())
     
     call mix%test_overlap(type1_spheres, type2_spheres)
+    call mix%Epot_init()
     call mix%Epot_print(mix_Epot_unit)
     mix_Epot = mix%Epot_conf(type1_spheres, type2_spheres)
     
@@ -274,6 +275,7 @@ implicit none
     call type2_obs%print_results(type2_units%report)
     
     call mix%test_overlap(type1_spheres, type2_spheres)
+    call mix%Epot_init()
     mix_Epot_conf = mix%Epot_conf(type1_spheres, type2_spheres)
     call test_consist(mix_Epot, mix_Epot_conf, mix_report_unit)
     call mix_print_results(mix_EpotSum, mix_report_unit)

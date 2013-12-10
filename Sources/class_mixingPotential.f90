@@ -48,7 +48,7 @@ private
         procedure :: test_overlap => MixingPotential_test_overlap
 
         procedure, private :: Epot_set_tab => MixingPotential_Epot_set_tab
-        procedure, private :: Epot_init => MixingPotential_Epot_init
+        procedure :: Epot_init => MixingPotential_Epot_init
         procedure :: Epot_print => MixingPotential_Epot_print
         procedure, private :: Epot_pair => MixingPotential_Epot_pair
         procedure :: Epot_neighCells => MixingPotential_Epot_neighCells
@@ -69,8 +69,6 @@ contains
         ! Particles
         this%delta = mix_delta
         this%rMin = (type1_rMin + type2_rMin)/2._DP + this%delta
-        
-        call this%Epot_init()
         
         ! Neighbours
         this%cell_size(:) = this%rCut
@@ -206,6 +204,9 @@ contains
         this%epsilon = mix_epsilon
         this%alpha = mix_alpha
         
+        if (allocated(this%Epot_tab)) then
+            deallocate(this%Epot_tab)
+        end if
         allocate(this%Epot_tab(this%iMin:this%iCut))
         call this%Epot_set_tab()
         
