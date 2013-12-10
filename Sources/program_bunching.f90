@@ -8,7 +8,7 @@ use data_monteCarlo, only : Nstep
 
 implicit none
 
-    ! Physics 
+    ! Physics
     
     integer :: Nobs
     integer :: iBunching, Nbunching
@@ -16,7 +16,7 @@ implicit none
     real(DP), dimension(:), allocatable :: sumVal, sumValSqr
     real(DP), dimension(:), allocatable :: error
 
-    ! Numerical    
+    ! Numerical
     
     integer :: obs_unit, bunch_unit
     character(len=1) :: comment_symbol
@@ -55,11 +55,11 @@ implicit none
         
         ! Read
         
-        if (iBunching == 1) then        
+        if (iBunching == 1) then
             
             do iStep = 1, 2*NstepVar
                 read(obs_unit, *) iStepIn, dataIn(:, iStep)
-            end do            
+            end do
             
         else
         
@@ -100,6 +100,6 @@ implicit none
     deallocate(sumValSqr)
     deallocate(sumVal)
     
-    close(obs_unit)    
+    close(obs_unit)
 
 end program bunching
