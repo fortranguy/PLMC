@@ -93,15 +93,11 @@ implicit none
     call type1_units%open(type1_spheres%get_name())
     write(type1_units%obsEquilib, *) "#", 4 ! 4 observables
     call type1_spheres%print_density(Ncol, type1_units%report)
-    call type1_spheres%print_report(type1_units%report)
-    call type1_spheres%snap_positions_data(type1_units%snap_positions)
     
     call type2_obs%init()
     call type2_units%open(type2_spheres%get_name())
     write(type2_units%obsEquilib, *) "#", 3 ! 3 observables
     call type2_spheres%print_density(Ncol, type2_units%report)
-    call type2_spheres%print_report(type2_units%report)
-    call type2_spheres%snap_positions_data(type2_units%snap_positions)
     
     ! Initial condition
     
@@ -118,6 +114,8 @@ implicit none
     call type1_spheres%Epot_real_print(type1_units%Epot)
     call type1_spheres%Epot_reci_count_waveVectors(type1_units%waveVectors)
     type1_obs%Epot = type1_spheres%Epot_conf()
+    call type1_spheres%print_report(type1_units%report)
+    call type1_spheres%snap_positions_data(type1_units%snap_positions)
     call type1_spheres%snap_positions(0, type1_units%snapIni_positions)
     call type1_spheres%snap_orientations(0, type1_units%snapIni_orientations)
     call type1_spheres%construct_cells(type2_spheres, mix%get_cell_size(), mix%get_rCut())
@@ -126,6 +124,8 @@ implicit none
     call type2_spheres%Epot_init()
     call type2_spheres%Epot_print(type2_units%Epot)
     type2_obs%Epot = type2_spheres%Epot_conf()
+    call type2_spheres%print_report(type2_units%report)
+    call type2_spheres%snap_positions_data(type2_units%snap_positions)
     call type2_spheres%snap_positions(0, type2_units%snapIni_positions)
     call type2_spheres%construct_cells(type1_spheres, mix%get_cell_size(), mix%get_rCut())
     
