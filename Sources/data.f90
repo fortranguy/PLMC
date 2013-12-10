@@ -81,7 +81,7 @@ implicit none
     
     ! out ---------------------------------------------------------------------
     real(DP), parameter :: inter_rMin = 1._DP ! u_length
-    integer, parameter :: inter_Ncol = 281
+    integer, parameter :: inter_Ncol = 6750
     ! -------------------------------------------------------------------------
     
 end module data_particles
