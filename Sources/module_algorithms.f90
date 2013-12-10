@@ -52,10 +52,10 @@ contains
         if (this%get_Ncol() >= other%get_Ncol()) then
             this_iCellNew = this%sameCells%index_from_position(xNew)
             call this%Epot_neighCells(iOld, xNew, this_iCellNew, overlap, this_EpotNew)
-        else        
+        else
             mix_iCellNew = this%mixCells%index_from_position(xNew)
             call mix%Epot_neighCells(xNew, mix_iCellNew, this%mixCells, other%positions, overlap, &
-                                     mix_EpotNew)        
+                                     mix_EpotNew)
         end if
         
         if (.not. overlap) then
@@ -64,14 +64,14 @@ contains
                 mix_iCellNew = this%mixCells%index_from_position(xNew)
                 call mix%Epot_neighCells(xNew, mix_iCellNew, this%mixCells, other%positions, overlap, &
                                          mix_EpotNew)
-            else                
+            else
                 this_iCellNew = this%sameCells%index_from_position(xNew)
                 call this%Epot_neighCells(iOld, xNew, this_iCellNew, overlap, this_EpotNew)
             end if
                         
             if (.not. overlap) then
     
-                this_iCellOld = this%sameCells%index_from_position(xOld)                
+                this_iCellOld = this%sameCells%index_from_position(xOld)
                 select type (this)
                     type is (DipolarSpheres)
                         mCol(:) = this%orientations(:, iOld)
@@ -104,12 +104,12 @@ contains
                     this_obs%Epot = this_obs%Epot + this_deltaEpot
                     mix_Epot = mix_Epot + mix_deltaEpot
                     
-                    if (this_iCellOld /= this_iCellNew) then                
+                    if (this_iCellOld /= this_iCellNew) then
                         call this%sameCells%remove_col_from_cell(iOld, this_iCellOld)
                         call this%sameCells%add_col_to_cell(iOld, this_iCellNew)
                     end if
                     
-                    if (mix_iCellOld /= mix_iCellNew) then                
+                    if (mix_iCellOld /= mix_iCellNew) then
                         call other%mixCells%remove_col_from_cell(iOld, mix_iCellOld)
                         call other%mixCells%add_col_to_cell(iOld, mix_iCellNew)
                     end if
@@ -120,9 +120,9 @@ contains
          
             else
                 this_obs%move_Nreject = this_obs%move_Nreject + 1
-            end if            
+            end if
             
-        else        
+        else
             this_obs%move_Nreject = this_obs%move_Nreject + 1
         end if
     
@@ -135,7 +135,7 @@ contains
         class(HardSpheres), intent(in) :: this
         class(Observables), intent(inout) :: this_obs
         class(HardSpheres), intent(in) :: other
-        class(MixingPotential), intent(in) :: mix        
+        class(MixingPotential), intent(in) :: mix
         
         integer :: iWidom
         real(DP) :: widTestSum
@@ -178,7 +178,7 @@ contains
                 
                     select type (this)
                         type is (DipolarSpheres)
-                            mTest(:) = random_surface()                            
+                            mTest(:) = random_surface()
                             this_EpotTest = this%Epot_real_solo(0, xTest, mTest) + &
                                             this%deltaEpot_reci_exchange(xTest, +mTest) - &
                                             this%Epot_self_solo(mTest) + &
@@ -223,7 +223,7 @@ contains
         
         real_EpotNew = this%Epot_real_solo(iOld, xCol, mNew)
         real_EpotOld = this%Epot_real_solo(iOld, xCol, mOld)
-        deltaEpot_real = real_EpotNew - real_EpotOld        
+        deltaEpot_real = real_EpotNew - real_EpotOld
         
         deltaEpot_self = this%Epot_self_solo(mNew) - this%Epot_self_solo(mOld)
         
