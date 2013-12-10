@@ -268,6 +268,7 @@ implicit none
     call type1_obs%print_results(type1_units%report)
     
     call type2_spheres%test_overlap()
+    call type2_spheres%Epot_init()
     call type2_spheres%test_consist(type2_obs%Epot, type2_units%report)
     call type2_spheres%snap_positions(0, type2_units%snapFin_positions)
     call type2_obs%print_results(type2_units%report)

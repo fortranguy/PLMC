@@ -168,6 +168,9 @@ contains
         this%epsilon = inter_epsilon
         this%alpha = inter_alpha
         
+        if (allocated(this%Epot_tab)) then
+            deallocate(this%Epot_tab)
+        end if
         allocate(this%Epot_tab(this%iMin:this%iCut))
         call this%Epot_set_tab()
         
