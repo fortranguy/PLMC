@@ -51,7 +51,7 @@ contains
         class(DipolarSpheres), intent(inout) :: dipolar
         class(HardSpheres), intent(inout) :: spherical
         real(DP), intent(in) :: mix_rMin
-        integer, intent(in) :: report_unit        
+        integer, intent(in) :: report_unit
 
         character(len=4096) :: init
         integer :: length, status
@@ -66,7 +66,7 @@ contains
                 if (status /= 0) stop "error get_command_argument"
                 
                 select case (init)
-                    case ("rand") 
+                    case ("rand")
                         call randomDepositions(dipolar, spherical, mix_rMin)
                         call randomOrientations(dipolar%orientations, dipolar%get_Ncol())
                         write(output_unit, *) "Random depositions + random orientations"
@@ -117,7 +117,7 @@ contains
             call random_number(xRand)
             type1%positions(:, iCol) = xRand*Lsize(:)
             
-            do iColTest = 1, iCol-1            
+            do iColTest = 1, iCol-1
                 rTest = dist_PBC(type1%positions(:, iColTest), type1%positions(:, iCol))
                 if (rTest < type1%get_rMin()) then
                     goto 7101
@@ -140,7 +140,7 @@ contains
                 end if
             end do
             
-            do iColTest = 1, iCol-1            
+            do iColTest = 1, iCol-1
                 rTest = dist_PBC(type2%positions(:, iColTest), type2%positions(:, iCol))
                 if (rTest < type2%get_rMin()) then
                     goto 7102
@@ -211,7 +211,7 @@ contains
             write(error_unit, *) "Error reading : ", file(1:length)
             write(error_unit, *) "iCol", iCol, " /= ", "type_Ncol", type_Ncol
             stop
-        end if        
+        end if
         
         close(file_unit)
         
@@ -273,7 +273,7 @@ contains
     
     end subroutine test_consist
     
-    !> Total : Results    
+    !> Total : Results
     
     subroutine print_results(Ncol, EpotSum, duration, report_unit)
     
@@ -297,7 +297,7 @@ contains
         real(DP), intent(in) :: EpotSum
         integer, intent(in) :: report_unit
     
-        write(report_unit, *) "Results :"        
+        write(report_unit, *) "Results :"
         write(report_unit, *) "    average energy = ", EpotSum/real(Nstep, DP)
     
     end subroutine mix_print_results
