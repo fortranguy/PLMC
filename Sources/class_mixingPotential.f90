@@ -43,6 +43,8 @@ private
         
         procedure :: get_rMin => MixingPotential_get_rMin
         procedure :: get_rCut => MixingPotential_get_rCut
+        
+        procedure :: set_cell_size => MixingPotential_set_cell_size
         procedure :: get_cell_size => MixingPotential_get_cell_size
         
         procedure :: test_overlap => MixingPotential_test_overlap
@@ -69,9 +71,6 @@ contains
         ! Particles
         this%delta = mix_delta
         this%rMin = (type1_rMin + type2_rMin)/2._DP + this%delta
-        
-        ! Neighbours
-        this%cell_size(:) = this%rCut
 
     end subroutine MixingPotential_construct
 
@@ -126,6 +125,16 @@ contains
         get_rCut = this%rCut
     
     end function MixingPotential_get_rCut
+    
+    !> Mutator : cell_size
+    
+    pure subroutine MixingPotential_set_cell_size(this)
+    
+        class(MixingPotential), intent(inout) :: this
+        
+        this%cell_size(:) = this%rCut
+    
+    end subroutine MixingPotential_set_cell_size
     
     !> Accessor : cell_size
     

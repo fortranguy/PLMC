@@ -107,6 +107,12 @@ implicit none
     
     call set_initialCondition(type1_spheres, type2_spheres, mix%get_rMin(), report_unit)
     
+    call mix%test_overlap(type1_spheres, type2_spheres)
+    call mix%Epot_init()
+    call mix%Epot_print(mix_Epot_unit)
+    call mix%set_cell_size()
+    mix_Epot = mix%Epot_conf(type1_spheres, type2_spheres)
+    
     call type1_spheres%test_overlap()
     call type1_spheres%Epot_init()
     call type1_spheres%Epot_real_print(type1_units%Epot)
@@ -122,11 +128,6 @@ implicit none
     type2_obs%Epot = type2_spheres%Epot_conf()
     call type2_spheres%snap_positions(0, type2_units%snapIni_positions)
     call type2_spheres%construct_cells(type1_spheres, mix%get_cell_size(), mix%get_rCut())
-    
-    call mix%test_overlap(type1_spheres, type2_spheres)
-    call mix%Epot_init()
-    call mix%Epot_print(mix_Epot_unit)
-    mix_Epot = mix%Epot_conf(type1_spheres, type2_spheres)
     
     Epot_conf = type1_obs%Epot + type2_obs%Epot + mix_Epot
     write(output_unit, *) "Initial potential energy =", Epot_conf
