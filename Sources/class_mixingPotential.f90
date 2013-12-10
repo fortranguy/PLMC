@@ -196,9 +196,7 @@ contains
         this%rCut = mix_rCut
         
         if (this%rCut < this%rMin) then
-            write(error_unit, *) "    Warning : rCut =",  this%rCut, "< rMin =", this%rMin, "!"
             this%rCut = this%rMin
-            write(error_unit, *) "    rCut <- rMin"
         end if
         
         this%dr = mix_dr
