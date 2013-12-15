@@ -493,6 +493,8 @@ contains
             Epot_real = Epot_real + this%Epot_real_solo(iCol, xCol_i, mCol_i)
             
         end do
+
+        Epot_real = Epot_real/2._DP
     
     end function DipolarSpheres_Epot_real
 
