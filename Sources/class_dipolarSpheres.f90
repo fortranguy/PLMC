@@ -477,28 +477,19 @@ contains
         class(DipolarSpheres), intent(in) :: this
         real(DP) :: Epot_real
         
-        integer :: iCol, jCol
-        real(DP), dimension(Ndim) :: rVec_ij
-        real(DP) :: r_ij
+        integer :: iCol
+        real(DP), dimension(Ndim) :: xCol_i
+        real(DP), dimension(Ndim) :: mCol_i
     
         Epot_real = 0._DP
         
-        do jCol = 1, this%Ncol
-            do iCol = 1, this%Ncol
-                if (iCol /= jCol) then
-                    
-                    rVec_ij = distVec_PBC(this%positions(:, iCol), this%positions(:, jCol))
-                    r_ij = norm2(rVec_ij)
-                    
-                    Epot_real = Epot_real + &
-                                this%Epot_real_pair(this%orientations(:, iCol), &
-                                                    this%orientations(:, jCol), rVec_ij, r_ij)
-                    
-                end if
-            end do
+        do iCol = 1, this%Ncol
+
+            xCol_i(:) = this%positions(:, iCol)
+            mCol_i(:) = this%orientations(:, iCol)
+            Epot_real = Epot_real + this%Epot_real_solo(iCol, xCol_i, mCol_i)
+            
         end do
-        
-        Epot_real = 0.5_DP*Epot_real
     
     end function DipolarSpheres_Epot_real
 
