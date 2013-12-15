@@ -441,14 +441,15 @@ contains
     
     !> Energy of 1 dipole with others
     
-    pure function DipolarSpheres_Epot_real_solo(this, iCol, xCol, mCol) result(Epot_real_solo)
+    pure function DipolarSpheres_Epot_real_solo(this, iCol, xCol_i, mCol_i) result(Epot_real_solo)
 
         class(DipolarSpheres), intent(in) :: this
         integer, intent(in) :: iCol
-        real(DP), dimension(:), intent(in) :: xCol, mCol
+        real(DP), dimension(:), intent(in) :: xCol_i, mCol_i
         real(DP) :: Epot_real_solo
 
         integer :: jCol
+        real(DP), dimension(Ndim) :: xCol_j, mCol_j
         real(DP), dimension(Ndim) :: rVec_ij
         real(DP) :: r_ij
 
@@ -458,11 +459,13 @@ contains
 
             if (jCol /= iCol) then
 
-                rVec_ij = distVec_PBC(xCol(:), this%positions(:, jCol))
+                xCol_j(:) = this%positions(:, jCol)
+                rVec_ij = distVec_PBC(xCol_i(:), xCol_j)
                 r_ij = norm2(rVec_ij)
 
-                Epot_real_solo = Epot_real_solo + &
-                                 this%Epot_real_pair(mCol, this%orientations(:, jCol), rVec_ij, r_ij)
+                mCol_j(:) = this%orientations(:, jCol)
+
+                Epot_real_solo = Epot_real_solo + this%Epot_real_pair(mCol_i, mCol_j, rVec_ij, r_ij)
 
             end if
 
