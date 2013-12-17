@@ -196,10 +196,10 @@ use data_precisions, only : DP
 implicit none
 
     logical, parameter :: snap = .true.
-    real(DP), parameter :: dist_dr = 0.01_DP
+    real(DP), parameter :: dist_dr = 0.05_DP
     
     integer, parameter :: dipol_snap_factor = 1
-    integer, parameter :: hard_snap_factor = 8
+    integer, parameter :: hard_snap_factor = 16
     
     ! out ---------------------------------------------------------------------
     integer, parameter :: inter_snap_factor = 1
