@@ -113,3 +113,6 @@
     01:36 : Revoir la méthode de Widom : particule test. Si iCol = 0 : problème.
     [nuit]: OK : mTest (moment) en argument
     12:56 : Widom : aussi avec autre type ?
+    
+17 12 13
+    19:55 : this%move_delta = Temperature * dipol_move_delta ?
