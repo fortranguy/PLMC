@@ -246,7 +246,7 @@ implicit none
             
         end if MC_Regime
         
-        ! Reinitialize to prevent it from drifting.
+        ! Reinitialize quantities to prevent them from drifting.
         if (modulo(iStep, type1_spheres%get_reInit_iStep()) == 0) then
             call type1_spheres%Epot_reci_reInit_structure(iStep, type1_units%structure_modulus)
             call type1_spheres%reInit_totalMoment(iStep, type1_units%totalMoment_modulus)
