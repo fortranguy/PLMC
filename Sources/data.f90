@@ -135,7 +135,7 @@ end module data_monteCarlo
 
 !> The dipolar spheres interaction uses the Ewald sums methods.
 
-!> The mixing potential (mix) is also composed of 3 parts :
+!> The mixing potential (mix) is composed of 3 parts :
 !> hard sphere (HS) + Yukawa + cut.
 !***************************************************************************************************
 module data_potential
@@ -202,7 +202,7 @@ implicit none
     integer, parameter :: hard_snap_factor = 16
     
     ! out ---------------------------------------------------------------------
-    integer, parameter :: inter_snap_factor = 1
+    integer, parameter :: inter_snap_factor = 16
     ! -------------------------------------------------------------------------
 
 end module data_distribution
