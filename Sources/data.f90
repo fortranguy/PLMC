@@ -3,7 +3,7 @@
 
 !***************************************************************************************************
 !> \brief Precisions data :
-!> declaration of precisions paramters
+!> declaration of precisions parameters
 !***************************************************************************************************
 module data_precisions
 
