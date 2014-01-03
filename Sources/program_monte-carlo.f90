@@ -6,7 +6,6 @@ use, intrinsic :: iso_fortran_env, only : output_unit
 use data_precisions, only : DP
 use data_monteCarlo, only : decorrelFactor, Nthermal, Nadapt, Nstep
 use data_distribution, only : snap
-use class_neighbourCells
 use class_hardSpheres
 use class_interactingSpheres
 use class_dipolarSpheres
