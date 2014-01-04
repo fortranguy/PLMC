@@ -2,7 +2,7 @@
 
 module class_neighbourCells
 
-use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
+use, intrinsic :: iso_fortran_env, only : error_unit
 use data_precisions, only : DP, real_zero
 use data_box, only : Ndim, Lsize
 use data_neighbourCells, only : NnearCell_dim, NnearCell
@@ -216,18 +216,18 @@ contains
     
     end function NeighbourCells_index_from_position
     
-    pure subroutine NeighbourCells_all_cols_to_cells(this, Ncol, X)
+    pure subroutine NeighbourCells_all_cols_to_cells(this, Ncol, positions)
     
         class(NeighbourCells), intent(inout) :: this
         integer, intent(in) :: Ncol
-        real(DP), dimension(:, :), intent(in) :: X
+        real(DP), dimension(:, :), intent(in) :: positions
     
         integer :: iCol
         integer :: iCell
     
         do iCol = 1, Ncol
     
-            iCell = this%index_from_position(X(:,iCol))
+            iCell = this%index_from_position(positions(:,iCol))
             this%currentCells(iCell)%particle%iCol = iCol
             
             allocate(this%nextCells(iCell)%particle)

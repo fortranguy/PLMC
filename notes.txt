@@ -119,10 +119,12 @@
     
 04 01 14
     00:25 : 
-        main
+        main :
         - init -> réduire par polymorphisme
         - change : move/rotate : obs increment : inside
         - thermalisation : condenser update
-        physics
+        physics :
         - source of algorithms
+        cells :
+        - check modulo : dangerous ? less repetition
             
