@@ -127,4 +127,6 @@
         - source of algorithms
         cells :
         - check modulo : dangerous ? less repetition
+        spheres :
+        - widom : in particles ?
             
