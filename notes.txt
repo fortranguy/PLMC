@@ -129,4 +129,6 @@
         - check modulo : dangerous ? less repetition
         spheres :
         - widom : in particles ?
+        inter : yukawa -> physics ?
+        
             
