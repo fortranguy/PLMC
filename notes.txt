@@ -128,5 +128,8 @@
         spheres : widom : in particles ?
         inter : yukawa -> physics ?
         dipol : revoir permittivité
-        
+        algo : uniformisation : energy
+        tools : 
+        - arguments : plus général ?
+        - consist : unifié ?        
             
