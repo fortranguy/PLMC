@@ -31,6 +31,7 @@ contains
     end subroutine set_discrete_length
 
     !> Distance between 2 positions with Periodic Boundary Conditions
+    !> from SMAC, algorithm 2.5 & 2.6, p.91
     
     pure function distVec_PBC(xCol1, xCol2)
     
@@ -55,6 +56,7 @@ contains
     end function dist_PBC
     
     !> Rotation
+    !> From SMAC, Algorithm 1.19, p.39
     
     function gauss()
         
@@ -97,6 +99,8 @@ contains
         
     end function gauss
     
+    !> From SMAC, Algorithm 1.23, p. 43
+    
     function random_surface()
         
         real(DP), dimension(Ndim) :: random_surface
@@ -110,6 +114,8 @@ contains
         random_surface(:) = random_surface(:) / norm2(random_surface)
     
     end function random_surface
+    
+    !> From SMAC, Algorithm 1.24, p.44
     
     subroutine markov_surface(mCol, deltaM)
     
