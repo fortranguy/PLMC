@@ -169,6 +169,7 @@ contains
         real(DP), intent(in) :: rCut
         
         integer :: jDim
+        real(DP) :: Lsize_mod_cell_size
         
         do jDim = 1, Ndim
         
@@ -184,16 +185,15 @@ contains
                 stop
             end if
             
-            if (modulo(Lsize(jDim), this%cell_size(jDim)) > real_zero) then
-                if (abs(modulo(Lsize(jDim), this%cell_size(jDim)) - this%cell_size(jDim)) > real_zero) then
-                    write(error_unit, *) "    Cell size is not a divisor of the system size"
-                    write(error_unit, *) "    in the dimension", jDim, ":"
-                    write(error_unit, *) "    Lsize", Lsize(jDim)
-                    write(error_unit, *) "    cell_size", this%cell_size(jDim)
-                    write(error_unit, *) "    modulo(Lsize, cell_size) = ", &
-                                          modulo(Lsize(jDim), this%cell_size(jDim))
-                    stop
-                end if
+            Lsize_mod_cell_size = modulo(Lsize(jDim), this%cell_size(jDim))
+            if (Lsize_mod_cell_size > real_zero .and. &
+            abs(Lsize_mod_cell_size - this%cell_size(jDim)) > real_zero) then
+                write(error_unit, *) "    Cell size is not a divisor of the system size"
+                write(error_unit, *) "    in the dimension", jDim, ":"
+                write(error_unit, *) "    Lsize", Lsize(jDim)
+                write(error_unit, *) "    cell_size", this%cell_size(jDim)
+                write(error_unit, *) "    modulo(Lsize, cell_size) = ", Lsize_mod_cell_size
+                stop
             end if
             
         end do
