@@ -165,8 +165,7 @@ implicit none
                 type1_obs%move_rejectAdapt = 0._DP
                 call type1_spheres%adapt_move_delta(type1_obs%move_rejectAvg)
                 write(type1_units%move_delta, *) iStep, type1_spheres%get_move_delta(), &
-                                                 type1_obs%move_rejectAvg
-                
+                                                 type1_obs%move_rejectAvg                
                 
                 type1_obs%rotate_rejectAvg = type1_obs%rotate_rejectAdapt / real(Nadapt-1, DP)
                 type1_obs%rotate_rejectAdapt = 0._DP

@@ -121,7 +121,7 @@
     00:25 : 
         main :
         - init -> réduire par polymorphisme : 86438ae04902a33a92107e334e813385553943d8
-        - change : move/rotate : obs increment : inside
+        - change : move/rotate : obs increment : inside : 8e3d12ebac87aa6e639fbad67dd31b4ca4187134
         - thermalisation : condenser update
         physics : source of algorithms
         cells : check modulo : dangerous ? less repetition
