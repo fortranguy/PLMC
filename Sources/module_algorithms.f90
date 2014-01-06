@@ -214,6 +214,8 @@ contains
         real(DP) :: deltaEpot
         real(DP) :: deltaEpot_real, deltaEpot_self
         real(DP) :: real_EpotNew, real_EpotOld
+        
+        obs%Nrotate = obs%Nrotate + 1
 
         call random_number(random)
         iOld = int(random*this%get_Ncol()) + 1

@@ -126,23 +126,21 @@ implicit none
             call random_number(random)
             iChangeRand = int(random*real(Nmove+Nrotate, DP)) + 1
             
-            if (iChangeRand <= Nmove) then ! change = move
+            if (iChangeRand <= Nmove) then
             
                 ! Randomly choosing the type
                 call random_number(random)
                 iColRand = int(random*real(Ncol, DP)) + 1
                 
-                ! Moving a particle :
                 if (iColRand <= type1_spheres%get_Ncol()) then
                     call move(type1_spheres, type1_obs, type2_spheres, mix, mix_Epot)
                 else
                     call move(type2_spheres, type2_obs, type1_spheres, mix, mix_Epot)
                 end if
                 
-            else ! change = rotate
+            else
      
                 call rotate(type1_spheres, type1_obs)
-                type1_obs%Nrotate = type1_obs%Nrotate + 1
                 
             end if
             
