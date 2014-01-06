@@ -12,12 +12,13 @@ use class_hardSpheres
 use class_interactingSpheres
 use class_dipolarSpheres
 use class_mixingPotential
+use class_observables
 use class_units
 
 implicit none
 private
-public init_randomSeed, set_initialCondition, print_report, init, test_consist, print_results, &
-       mix_print_results
+public init_randomSeed, set_initialCondition, print_report, init, adapt_move, adapt_rotate, &
+       test_consist, print_results, mix_print_results
 
 contains
 
@@ -282,7 +283,37 @@ contains
         call this%construct_cells(other, mix%get_cell_size(), mix%get_rCut())
         call this%print_report(this_units%report)
     
-    end subroutine init    
+    end subroutine init
+    
+    ! Change : average & adaptation
+    
+    subroutine adapt_move(this, iStep, Nadapt, obs, move_unit)
+    
+        class(HardSpheres), intent(inout) :: this
+        integer, intent(in) :: iStep, Nadapt
+        class(Observables), intent(inout) :: obs
+        integer, intent(in) :: move_unit
+    
+        obs%move_rejectAvg = obs%move_rejectAdapt / real(Nadapt-1, DP)
+        obs%move_rejectAdapt = 0._DP
+        call this%adapt_move_delta(obs%move_rejectAvg)
+        write(move_unit, *) iStep, this%get_move_delta(), obs%move_rejectAvg
+    
+    end subroutine adapt_move
+    
+    subroutine adapt_rotate(this, iStep, Nadapt, obs, rotate_unit)
+    
+        class(DipolarSpheres), intent(inout) :: this
+        integer, intent(in) :: iStep, Nadapt
+        class(MoreObservables), intent(inout) :: obs
+        integer, intent(in) :: rotate_unit
+        
+        obs%rotate_rejectAvg = obs%rotate_rejectAdapt / real(Nadapt-1, DP)
+        obs%rotate_rejectAdapt = 0._DP
+        call this%adapt_rotate_delta(obs%rotate_rejectAvg)
+        write(rotate_unit, *) iStep, this%get_rotate_delta(), obs%rotate_rejectAvg
+        
+    end subroutine adapt_rotate
     
     ! Total & Mix : consistency test
     

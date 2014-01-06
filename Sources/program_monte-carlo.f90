@@ -13,8 +13,8 @@ use class_mixingPotential
 use class_observables
 use class_units
 use module_algorithms, only : move, widom, rotate
-use module_tools, only : init_randomSeed, set_initialCondition, print_report, init, test_consist, &
-                         print_results, mix_print_results
+use module_tools, only : init_randomSeed, set_initialCondition, print_report, init, adapt_move, &
+                         adapt_rotate, test_consist, print_results, mix_print_results
 
 implicit none
     
@@ -152,7 +152,7 @@ implicit none
         
         MC_Regime : if (iStep <= Nthermal) then ! Thermalisation
             
-            ! Displacements adaptation
+            ! Change adaptation
             if (mod(iStep, Nadapt) /= 0) then ! Rejections accumulation
             
                 type1_obs%move_rejectAdapt = type1_obs%move_rejectAdapt + type1_obs%move_reject
@@ -161,23 +161,9 @@ implicit none
                 
             else ! Average & adaptation
             
-                type1_obs%move_rejectAvg = type1_obs%move_rejectAdapt / real(Nadapt-1, DP)
-                type1_obs%move_rejectAdapt = 0._DP
-                call type1_spheres%adapt_move_delta(type1_obs%move_rejectAvg)
-                write(type1_units%move_delta, *) iStep, type1_spheres%get_move_delta(), &
-                                                 type1_obs%move_rejectAvg                
-                
-                type1_obs%rotate_rejectAvg = type1_obs%rotate_rejectAdapt / real(Nadapt-1, DP)
-                type1_obs%rotate_rejectAdapt = 0._DP
-                call type1_spheres%adapt_rotate_delta(type1_obs%rotate_rejectAvg)
-                write(type1_units%rotate_delta, *) iStep, type1_spheres%get_rotate_delta(), &
-                                                   type1_obs%rotate_rejectAvg
-                
-                type2_obs%move_rejectAvg = type2_obs%move_rejectAdapt / real(Nadapt-1, DP)
-                type2_obs%move_rejectAdapt = 0._DP
-                call type2_spheres%adapt_move_delta(type2_obs%move_rejectAvg)
-                write(type2_units%move_delta, *) iStep, type2_spheres%get_move_delta(), &
-                                                 type2_obs%move_rejectAvg
+                call adapt_move(type1_spheres, iStep, Nadapt, type1_obs, type1_units%move_delta)
+                call adapt_rotate(type1_spheres, iStep, Nadapt, type1_obs, type1_units%rotate_delta)
+                call adapt_move(type2_spheres, iStep, Nadapt, type2_obs, type2_units%move_delta)
                 
             end if
             
