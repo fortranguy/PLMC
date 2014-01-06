@@ -258,15 +258,28 @@ contains
         class(HardSpheres), intent(inout) :: this
         class(HardSpheres), intent(in) :: other
         class(MixingPotential), intent(in) :: mix
-        class(Units) :: this_units
+        class(Units), intent(inout) :: this_units
         real(DP), intent(inout) :: this_Epot
         
         call this%test_overlap()
-        call this%Epot_init()
-        call this%Epot_print(this_units%Epot)
-        this_Epot = this%Epot_conf()
+        
         call this%snap_positions_data(this_units%snap_positions)
         call this%snap_positions(0, this_units%snap_positions)
+        select type (this)
+            type is (DipolarSpheres)
+                call this%snap_orientations(0, this_units%snapIni_orientations)
+        end select
+        
+        call this%Epot_init()        
+        select type (this)
+            type is (DipolarSpheres)
+                call this%Epot_real_print(this_units%Epot)
+                call this%Epot_reci_count_waveVectors(this_units%waveVectors)
+            class default
+                call this%Epot_print(this_units%Epot)
+        end select        
+        this_Epot = this%Epot_conf()        
+        
         call this%construct_cells(other, mix%get_cell_size(), mix%get_rCut())
         call this%print_report(this_units%report)
     

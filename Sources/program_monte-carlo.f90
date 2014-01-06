@@ -108,17 +108,7 @@ implicit none
     call mix%set_cell_size()
     mix_Epot = mix%Epot_conf(type1_spheres, type2_spheres)
     
-    call type1_spheres%test_overlap()
-    call type1_spheres%Epot_init()
-    call type1_spheres%Epot_real_print(type1_units%Epot)
-    call type1_spheres%Epot_reci_count_waveVectors(type1_units%waveVectors)
-    type1_obs%Epot = type1_spheres%Epot_conf()
-    call type1_spheres%snap_positions_data(type1_units%snap_positions)
-    call type1_spheres%snap_positions(0, type1_units%snapIni_positions)
-    call type1_spheres%snap_orientations(0, type1_units%snapIni_orientations)
-    call type1_spheres%construct_cells(type2_spheres, mix%get_cell_size(), mix%get_rCut())
-    call type1_spheres%print_report(type1_units%report)
-    
+    call init(type1_spheres, type2_spheres, mix, type1_units, type1_obs%Epot)
     call init(type2_spheres, type1_spheres, mix, type2_units, type2_obs%Epot)
     
     Epot_conf = type1_obs%Epot + type2_obs%Epot + mix_Epot
