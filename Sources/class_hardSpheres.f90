@@ -108,7 +108,6 @@ contains
         this%move_delta = hard_move_delta
         this%move_deltaSave = this%move_delta
         this%move_rejectFix = hard_move_rejectFix
-        this%Nwidom = hard_Nwidom
         
     end subroutine HardSpheres_init_changes
 
@@ -120,10 +119,9 @@ contains
         write(output_unit, *) this%name, " class construction"
         
         call this%init_particles()
-        
-        this%snap_factor = hard_snap_factor
-        
         call this%init_changes()
+        this%Nwidom = hard_Nwidom
+        this%snap_factor = hard_snap_factor
         
     end subroutine HardSpheres_construct
     

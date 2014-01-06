@@ -73,7 +73,6 @@ contains
         this%move_delta = inter_move_delta
         this%move_deltaSave = this%move_delta
         this%move_rejectFix = inter_move_rejectFix
-        this%Nwidom = inter_Nwidom
         
     end subroutine InteractingSpheres_init_changes
 
@@ -85,10 +84,9 @@ contains
         write(output_unit, *) this%name, " class construction"
         
         call this%init_particles()
-        
-        this%snap_factor = inter_snap_factor
-        
         call this%init_changes()
+        this%Nwidom = inter_Nwidom
+        this%snap_factor = inter_snap_factor
     
     end subroutine InteractingSpheres_construct
     

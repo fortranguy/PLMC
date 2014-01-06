@@ -144,8 +144,6 @@ contains
         this%rotate_deltaMax = dipol_rotate_deltaMax
         this%rotate_rejectFix = dipol_rotate_rejectFix
         
-        this%Nwidom = dipol_Nwidom
-        
     end subroutine DipolarSpheres_init_changes
 
     subroutine DipolarSpheres_construct(this)
@@ -156,11 +154,9 @@ contains
         write(output_unit, *) this%name, " class construction"
     
         call this%init_particles()
-        
-        ! Snapshot
-        this%snap_factor = dipol_snap_factor
-        
         call this%init_changes()
+        this%Nwidom = dipol_Nwidom
+        this%snap_factor = dipol_snap_factor
     
     end subroutine DipolarSpheres_construct
     
