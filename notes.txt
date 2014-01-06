@@ -120,7 +120,7 @@
 04 01 14
     00:25 : 
         main :
-        - init -> réduire par polymorphisme
+        - init -> réduire par polymorphisme : 86438ae04902a33a92107e334e813385553943d8
         - change : move/rotate : obs increment : inside
         - thermalisation : condenser update
         physics : source of algorithms

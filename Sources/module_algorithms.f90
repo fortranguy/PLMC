@@ -40,6 +40,8 @@ contains
         real(DP), dimension(Ndim) :: mCol
         real(DP) :: this_EpotNew_real, this_EpotOld_real
         
+        this_obs%Nmove = this_obs%Nmove + 1
+        
         call random_number(random)
         iOld = int(random*this%get_Ncol()) + 1
         xOld(:) = this%positions(:, iOld)
