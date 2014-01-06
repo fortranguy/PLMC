@@ -13,7 +13,7 @@ use class_mixingPotential
 use class_observables
 use class_units
 use module_algorithms, only : move, widom, rotate
-use module_tools, only : init_randomSeed, set_initialCondition, print_report, test_consist, &
+use module_tools, only : init_randomSeed, set_initialCondition, print_report, init, test_consist, &
                          print_results, mix_print_results
 
 implicit none
@@ -119,14 +119,7 @@ implicit none
     call type1_spheres%construct_cells(type2_spheres, mix%get_cell_size(), mix%get_rCut())
     call type1_spheres%print_report(type1_units%report)
     
-    call type2_spheres%test_overlap()
-    call type2_spheres%Epot_init()
-    call type2_spheres%Epot_print(type2_units%Epot)
-    type2_obs%Epot = type2_spheres%Epot_conf()
-    call type2_spheres%snap_positions_data(type2_units%snap_positions)
-    call type2_spheres%snap_positions(0, type2_units%snapIni_positions)
-    call type2_spheres%construct_cells(type1_spheres, mix%get_cell_size(), mix%get_rCut())
-    call type2_spheres%print_report(type2_units%report)
+    call init(type2_spheres, type1_spheres, mix, type2_units, type2_obs%Epot)
     
     Epot_conf = type1_obs%Epot + type2_obs%Epot + mix_Epot
     write(output_unit, *) "Initial potential energy =", Epot_conf

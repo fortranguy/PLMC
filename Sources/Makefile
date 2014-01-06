@@ -93,7 +93,8 @@ module_algorithms.o : data_precisions.mod data_box.mod data_monteCarlo.mod \
                       class_dipolarSpheres.o class_mixingPotential.o
 module_tools.o : data_precisions.mod data_box.mod data_monteCarlo.mod \
                  module_physics.o \
-                 class_hardSpheres.o class_interactingSpheres.o class_dipolarSpheres.o
+                 class_hardSpheres.o class_interactingSpheres.o class_dipolarSpheres.o \
+                 class_mixingPotential.o class_units.o
 module_distribution.o : data_precisions.mod data_constants.mod data_distribution.mod
 
 # -----------------------------------------------

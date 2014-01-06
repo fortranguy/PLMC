@@ -11,10 +11,12 @@ use module_physics, only : dist_PBC, random_surface
 use class_hardSpheres
 use class_interactingSpheres
 use class_dipolarSpheres
+use class_mixingPotential
+use class_units
 
 implicit none
 private
-public init_randomSeed, set_initialCondition, print_report, test_consist, print_results, &
+public init_randomSeed, set_initialCondition, print_report, init, test_consist, print_results, &
        mix_print_results
 
 contains
@@ -248,6 +250,27 @@ contains
         write(report_unit, *) "    Nrotate = ", Nrotate
     
     end subroutine print_report
+    
+    ! Spheres initialisations
+    
+    subroutine init(this, other, mix, this_units, this_Epot)
+    
+        class(HardSpheres), intent(inout) :: this
+        class(HardSpheres), intent(in) :: other
+        class(MixingPotential), intent(in) :: mix
+        class(Units) :: this_units
+        real(DP), intent(inout) :: this_Epot
+        
+        call this%test_overlap()
+        call this%Epot_init()
+        call this%Epot_print(this_units%Epot)
+        this_Epot = this%Epot_conf()
+        call this%snap_positions_data(this_units%snap_positions)
+        call this%snap_positions(0, this_units%snap_positions)
+        call this%construct_cells(other, mix%get_cell_size(), mix%get_rCut())
+        call this%print_report(this_units%report)
+    
+    end subroutine init    
     
     ! Total & Mix : consistency test
     
