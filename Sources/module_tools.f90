@@ -262,19 +262,18 @@ contains
         real(DP), intent(inout) :: this_Epot
         
         call this%test_overlap()
-        
         call this%snap_positions_data(this_units%snap_positions)
         call this%snap_positions(0, this_units%snap_positions)
+        call this%Epot_init()
+               
         select type (this)
-            type is (DipolarSpheres)
-                call this%snap_orientations(0, this_units%snapIni_orientations)
-        end select
-        
-        call this%Epot_init()        
-        select type (this)
-            type is (DipolarSpheres)
-                call this%Epot_real_print(this_units%Epot)
-                call this%Epot_reci_count_waveVectors(this_units%waveVectors)
+            type is (DipolarSpheres)            
+                select type (this_units)
+                    type is (MoreUnits)
+                        call this%snap_orientations(0, this_units%snapIni_orientations)
+                        call this%Epot_real_print(this_units%Epot)
+                        call this%Epot_reci_count_waveVectors(this_units%waveVectors)
+                end select
             class default
                 call this%Epot_print(this_units%Epot)
         end select        
