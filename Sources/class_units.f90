@@ -86,6 +86,12 @@ contains
                 open(newunit=this%totalMoment_modulus, recl=4096, &
                      file=name//"_totalMoment_modulus.out", status='new', action='write')
                 
+                write(this%obsEquilib, *) "#", 4 ! 4 observables
+                
+            class default
+            
+                write(this%obsEquilib, *) "#", 3 ! 3 observables
+                
         end select
         
     end subroutine Units_open

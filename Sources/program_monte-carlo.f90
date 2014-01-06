@@ -90,12 +90,10 @@ implicit none
     
     call type1_obs%init()
     call type1_units%open(type1_spheres%get_name())
-    write(type1_units%obsEquilib, *) "#", 4 ! 4 observables
     call type1_spheres%print_density(Ncol, type1_units%report)
     
     call type2_obs%init()
     call type2_units%open(type2_spheres%get_name())
-    write(type2_units%obsEquilib, *) "#", 3 ! 3 observables
     call type2_spheres%print_density(Ncol, type2_units%report)
     
     ! Initial condition
