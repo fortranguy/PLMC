@@ -228,26 +228,27 @@ contains
     !> Potential energy
     
     !> Lennard-Jones
-    pure function Epot_lennardJones(epsilon, rMin, r)
+    !> \f[ 4 epsilon ((\frac{\sigma}{r})^12 - (\frac{\sigma}{r})^6) \f]
+    pure function Epot_lennardJones(epsilon, sigma, r)
     
         real(DP), intent(in) :: epsilon
-        real(DP), intent(in) :: rMin, r
+        real(DP), intent(in) :: sigma, r
         real(DP) :: Epot_lennardJones
         
-        Epot_lennardJones = 4._DP * epsilon * ((rMin/r)**12 - (rMin/r)**6)
+        Epot_lennardJones = 4._DP * epsilon * ((sigma/r)**12 - (sigma/r)**6)
     
     end function Epot_lennardJones
     
     !> Yukawa potential
-    !> \f[ \epsilon \frac{e^{-\alpha (r-r_{min})}}{r} \f]
+    !> \f[ \epsilon \frac{e^{-\alpha (r-r_0)}}{r} \f]
     
-    pure function Epot_yukawa(epsilon, alpha, rMin, r)
+    pure function Epot_yukawa(epsilon, alpha, r_0, r)
     
         real(DP), intent(in) :: epsilon, alpha
-        real(DP), intent(in) :: rMin, r
+        real(DP), intent(in) :: r_0, r
         real(DP) :: Epot_yukawa
         
-        Epot_yukawa = epsilon * exp(-alpha*(r-rMin)) / r
+        Epot_yukawa = epsilon * exp(-alpha*(r-r_0)) / r
     
     end function Epot_yukawa
 
