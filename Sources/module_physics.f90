@@ -224,5 +224,31 @@ contains
         end where
     
     end function coord_PBC
+    
+    !> Potential energy
+    
+    !> Lennard-Jones
+    pure function Epot_lennardJones(epsilon, rMin, r)
+    
+        real(DP), intent(in) :: epsilon
+        real(DP), intent(in) :: rMin, r
+        real(DP) :: Epot_lennardJones
+        
+        Epot_lennardJones = 4._DP * epsilon * ((rMin/r)**12 - (rMin/r)**6)
+    
+    end function Epot_lennardJones
+    
+    !> Yukawa potential
+    !> \f[ \epsilon \frac{e^{-\alpha (r-r_{min})}}{r} \f]
+    
+    pure function Epot_yukawa(epsilon, alpha, rMin, r)
+    
+        real(DP), intent(in) :: epsilon, alpha
+        real(DP), intent(in) :: rMin, r
+        real(DP) :: Epot_yukawa
+        
+        Epot_yukawa = epsilon * exp(-alpha*(r-rMin)) / r
+    
+    end function Epot_yukawa
 
 end module module_physics
