@@ -13,8 +13,8 @@ use class_mixingPotential
 use class_observables
 use class_units
 use module_algorithms, only : move, widom, rotate
-use module_tools, only : init_randomSeed, set_initialCondition, print_report, init, final, &
-                         adapt_move, adapt_rotate, test_consist, print_results, mix_print_results
+use module_tools, only : mix_open_units, init_randomSeed, set_initialCondition, print_report, &
+                         init, final, adapt_move, adapt_rotate, test_consist, print_results, mix_print_results
 
 implicit none
     
@@ -72,13 +72,7 @@ implicit none
     !call init_randomSeed(report_unit)
     
     mix_EpotSum = 0._DP
-    open(newunit=mix_report_unit, recl=4096, file="mix_report.txt", status='new', action='write')
-    open(newunit=mix_Epot_unit, recl=4096, file="mix_Epot.tmp", status='new', action='write')
-    open(newunit=mix_obsThermal_unit, recl=4096, file="mix_obsThermal.out", &
-         status='new', action='write')
-    open(newunit=mix_obsEquilib_unit, recl=4096, file="mix_obsEquilib.out", status='new', &
-         action='write')
-    write(mix_obsEquilib_unit, *) "#", 1 ! 1 observable : energy
+    call mix_open_units(mix_report_unit, mix_Epot_unit, mix_obsThermal_unit, mix_obsEquilib_unit)
     call mix%print_report(mix_report_unit)
     
     call type1_obs%init()

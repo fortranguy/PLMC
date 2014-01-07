@@ -17,10 +17,28 @@ use class_units
 
 implicit none
 private
-public init_randomSeed, set_initialCondition, print_report, init, final, adapt_move, adapt_rotate, &
-       test_consist, print_results, mix_print_results
+public mix_open_units, init_randomSeed, set_initialCondition, print_report, &
+       init, final, adapt_move, adapt_rotate, test_consist, print_results, mix_print_results
 
 contains
+
+    !> Mix : open units
+    
+    subroutine mix_open_units(mix_report_unit, mix_Epot_unit, mix_obsThermal_unit, &
+                                  mix_obsEquilib_unit)
+                                  
+        integer, intent(out) :: mix_report_unit, mix_Epot_unit, mix_obsThermal_unit, &
+                                  mix_obsEquilib_unit
+    
+        open(newunit=mix_report_unit, recl=4096, file="mix_report.txt", status='new', action='write')
+        open(newunit=mix_Epot_unit, recl=4096, file="mix_Epot.tmp", status='new', action='write')
+        open(newunit=mix_obsThermal_unit, recl=4096, file="mix_obsThermal.out", &
+             status='new', action='write')
+        open(newunit=mix_obsEquilib_unit, recl=4096, file="mix_obsEquilib.out", status='new', &
+             action='write')
+        write(mix_obsEquilib_unit, *) "#", 1 ! 1 observable : energy
+        
+     end subroutine mix_open_units
 
     !> Random number generator : seed
     
@@ -252,7 +270,7 @@ contains
     
     end subroutine print_report
     
-    ! Spheres initialisations
+    !> Spheres initialisations
     
     subroutine init(this, other, mix, this_units, this_Epot)
     
@@ -285,7 +303,7 @@ contains
     
     end subroutine init
     
-    ! Spheres finalizations
+    !> Spheres finalizations
     
     subroutine final(this, this_units, this_obs)
     
@@ -309,7 +327,7 @@ contains
     
     end subroutine final
     
-    ! Change : average & adaptation
+    !> Change : average & adaptation
     
     subroutine adapt_move(this, iStep, Nadapt, obs, move_unit)
     
@@ -339,7 +357,7 @@ contains
         
     end subroutine adapt_rotate
     
-    ! Total & Mix : consistency test
+    !> Total & Mix : consistency test
     
     subroutine test_consist(Epot, Epot_conf, report_unit)
     
