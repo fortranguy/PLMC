@@ -13,8 +13,8 @@ use class_mixingPotential
 use class_observables
 use class_units
 use module_algorithms, only : move, widom, rotate
-use module_tools, only : init_randomSeed, set_initialCondition, print_report, init, adapt_move, &
-                         adapt_rotate, test_consist, print_results, mix_print_results
+use module_tools, only : init_randomSeed, set_initialCondition, print_report, init, final, &
+                         adapt_move, adapt_rotate, test_consist, print_results, mix_print_results
 
 implicit none
     
@@ -219,11 +219,7 @@ implicit none
     call type1_spheres%snap_orientations(0, type1_units%snapFin_orientations)
     call type1_obs%print_results(type1_units%report)
     
-    call type2_spheres%test_overlap()
-    call type2_spheres%Epot_init()
-    call type2_spheres%test_consist(type2_obs%Epot, type2_units%report)
-    call type2_spheres%snap_positions(0, type2_units%snapFin_positions)
-    call type2_obs%print_results(type2_units%report)
+    call final(type2_spheres, type2_units, type2_obs)
     
     call mix%test_overlap(type1_spheres, type2_spheres)
     call mix%Epot_init()

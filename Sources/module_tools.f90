@@ -17,7 +17,7 @@ use class_units
 
 implicit none
 private
-public init_randomSeed, set_initialCondition, print_report, init, adapt_move, adapt_rotate, &
+public init_randomSeed, set_initialCondition, print_report, init, final, adapt_move, adapt_rotate, &
        test_consist, print_results, mix_print_results
 
 contains
@@ -259,7 +259,7 @@ contains
         class(HardSpheres), intent(inout) :: this
         class(HardSpheres), intent(in) :: other
         class(MixingPotential), intent(in) :: mix
-        class(Units), intent(inout) :: this_units
+        class(Units), intent(in) :: this_units
         real(DP), intent(inout) :: this_Epot
         
         call this%test_overlap()
@@ -284,6 +284,22 @@ contains
         call this%print_report(this_units%report)
     
     end subroutine init
+    
+    ! Spheres finalizations
+    
+    subroutine final(this, this_units, this_obs)
+    
+        class(HardSpheres), intent(inout) :: this
+        class(Units), intent(in) :: this_units
+        class(Observables), intent(in) :: this_obs
+        
+        call this%test_overlap()
+        call this%Epot_init()
+        call this%test_consist(this_obs%Epot, this_units%report)
+        call this%snap_positions(0, this_units%snapFin_positions)
+        call this_obs%print_results(this_units%report)
+    
+    end subroutine final
     
     ! Change : average & adaptation
     
