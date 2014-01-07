@@ -14,7 +14,7 @@ use class_observables
 use class_units
 use module_algorithms, only : move, widom, rotate
 use module_tools, only : open_units, mix_open_units, init_randomSeed, set_initialCondition, &
-                         print_report, init, final, adapt_move, adapt_rotate, test_consist, &
+                         print_report, mix_init, init, final, adapt_move, adapt_rotate, test_consist, &
                          print_results, mix_print_results
 
 implicit none
@@ -83,12 +83,7 @@ implicit none
     
     call set_initialCondition(type1_spheres, type2_spheres, mix%get_rMin(), report_unit)
     
-    call mix%test_overlap(type1_spheres, type2_spheres)
-    call mix%Epot_init()
-    call mix%Epot_print(mix_Epot_unit)
-    call mix%set_cell_size()
-    mix_Epot = mix%Epot_conf(type1_spheres, type2_spheres)
-    
+    call mix_init(mix, type1_spheres, type2_spheres, mix_Epot_unit, mix_Epot)    
     call init(type1_spheres, type2_spheres, mix, type1_units, type1_obs%Epot)
     call init(type2_spheres, type1_spheres, mix, type2_units, type2_obs%Epot)
     

@@ -18,7 +18,7 @@ use class_units
 implicit none
 private
 public open_units, mix_open_units, init_randomSeed, set_initialCondition, print_report, &
-       init, final, adapt_move, adapt_rotate, test_consist, print_results, mix_print_results
+       mix_init, init, final, adapt_move, adapt_rotate, test_consist, print_results, mix_print_results
 
 contains
 
@@ -284,6 +284,23 @@ contains
         write(report_unit, *) "    Nrotate = ", Nrotate
     
     end subroutine print_report
+    
+    !> Mix initialisation
+    
+    subroutine mix_init(mix, type1, type2, mix_Epot_unit, mix_Epot)
+    
+        class(MixingPotential), intent(inout) :: mix
+        class(HardSpheres), intent(in) :: type1, type2
+        integer, intent(in) :: mix_Epot_unit
+        real(DP), intent(out) :: mix_Epot
+    
+        call mix%test_overlap(type1, type2)
+        call mix%Epot_init()
+        call mix%Epot_print(mix_Epot_unit)
+        call mix%set_cell_size()
+        mix_Epot = mix%Epot_conf(type1, type2)
+    
+    end subroutine mix_init
     
     !> Spheres initialisations
     
