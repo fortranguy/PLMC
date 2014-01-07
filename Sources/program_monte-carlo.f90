@@ -13,8 +13,9 @@ use class_mixingPotential
 use class_observables
 use class_units
 use module_algorithms, only : move, widom, rotate
-use module_tools, only : mix_open_units, init_randomSeed, set_initialCondition, print_report, &
-                         init, final, adapt_move, adapt_rotate, test_consist, print_results, mix_print_results
+use module_tools, only : open_units, mix_open_units, init_randomSeed, set_initialCondition, &
+                         print_report, init, final, adapt_move, adapt_rotate, test_consist, &
+                         print_results, mix_print_results
 
 implicit none
     
@@ -62,12 +63,7 @@ implicit none
 
     ! Initialisations & reports
     
-    open(newunit=report_unit, recl=4096, file="report.txt", status='new', action='write')
-    open(newunit=obsThermal_unit, recl=4096, file="obsThermal.out", status='new', &
-         action='write')
-    open(newunit=obsEquilib_unit, recl=4096, file="obsEquilib.out", status='new', &
-         action='write')
-    write(obsEquilib_unit, *) "#", 1 ! 1 observable : energy
+    call open_units(report_unit, obsThermal_unit, obsEquilib_unit)
     call print_report(Ncol, Nmove, Nrotate, report_unit)
     !call init_randomSeed(report_unit)
     

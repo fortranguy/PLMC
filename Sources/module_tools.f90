@@ -17,10 +17,25 @@ use class_units
 
 implicit none
 private
-public mix_open_units, init_randomSeed, set_initialCondition, print_report, &
+public open_units, mix_open_units, init_randomSeed, set_initialCondition, print_report, &
        init, final, adapt_move, adapt_rotate, test_consist, print_results, mix_print_results
 
 contains
+
+    !> Total : open units
+    
+    subroutine open_units(report_unit, obsThermal_unit, obsEquilib_unit)
+    
+        integer, intent(out) :: report_unit, obsThermal_unit, obsEquilib_unit
+    
+        open(newunit=report_unit, recl=4096, file="report.txt", status='new', action='write')
+        open(newunit=obsThermal_unit, recl=4096, file="obsThermal.out", status='new', &
+             action='write')
+        open(newunit=obsEquilib_unit, recl=4096, file="obsEquilib.out", status='new', &
+             action='write')
+        write(obsEquilib_unit, *) "#", 1 ! 1 observable : energy
+        
+    end subroutine open_units
 
     !> Mix : open units
     
