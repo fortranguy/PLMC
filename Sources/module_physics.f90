@@ -11,7 +11,7 @@ use data_box, only : Ndim, Lsize, Kmax
 implicit none
 private
 public set_discrete_length, distVec_PBC, dist_PBC, random_surface, markov_surface, &
-       Kmax1_sym, Kmax2_sym, fourier_i, index_from_coord, coord_PBC
+       Kmax1_sym, Kmax2_sym, fourier_i, index_from_coord, coord_PBC, Epot_lennardJones, Epot_yukawa
 
 contains
 
