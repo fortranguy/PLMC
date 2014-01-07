@@ -14,8 +14,8 @@ use class_observables
 use class_units
 use module_algorithms, only : move, widom, rotate
 use module_tools, only : open_units, mix_open_units, init_randomSeed, set_initialCondition, &
-                         print_report, mix_init, init, final, adapt_move, adapt_rotate, test_consist, &
-                         print_results, mix_print_results
+                         print_report, mix_init, mix_final, init, final, adapt_move, adapt_rotate, &
+                         test_consist, print_results
 
 implicit none
     
@@ -199,12 +199,8 @@ implicit none
 
     call final(type1_spheres, type1_units, type1_obs)
     call final(type2_spheres, type2_units, type2_obs)
-    
-    call mix%test_overlap(type1_spheres, type2_spheres)
-    call mix%Epot_init()
-    mix_Epot_conf = mix%Epot_conf(type1_spheres, type2_spheres)
-    call test_consist(mix_Epot, mix_Epot_conf, mix_report_unit)
-    call mix_print_results(mix_EpotSum, mix_report_unit)
+    call mix_final(mix, type1_spheres, type2_spheres, mix_report_unit, mix_Epot, mix_EpotSum, &
+                   mix_Epot_conf)
     
     Epot = type1_obs%Epot + type2_obs%Epot + mix_Epot
     Epot_conf = type1_spheres%Epot_conf() + type2_spheres%Epot_conf() + mix_Epot_conf
