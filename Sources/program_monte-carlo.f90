@@ -212,13 +212,7 @@ implicit none
 
     ! Tests & results
 
-    call type1_spheres%test_overlap()
-    call type1_spheres%Epot_init()
-    call type1_spheres%test_consist(type1_obs%Epot, type1_units%report)
-    call type1_spheres%snap_positions(0, type1_units%snapFin_positions)
-    call type1_spheres%snap_orientations(0, type1_units%snapFin_orientations)
-    call type1_obs%print_results(type1_units%report)
-    
+    call final(type1_spheres, type1_units, type1_obs)
     call final(type2_spheres, type2_units, type2_obs)
     
     call mix%test_overlap(type1_spheres, type2_spheres)

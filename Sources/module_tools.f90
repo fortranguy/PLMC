@@ -298,6 +298,14 @@ contains
         call this%test_consist(this_obs%Epot, this_units%report)
         call this%snap_positions(0, this_units%snapFin_positions)
         call this_obs%print_results(this_units%report)
+        
+        select type (this)
+            type is (DipolarSpheres)            
+                select type (this_units)
+                    type is (MoreUnits)
+                        call this%snap_orientations(0, this_units%snapFin_orientations)
+                end select
+        end select
     
     end subroutine final
     
