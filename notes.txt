@@ -125,7 +125,7 @@
         - thermalisation : condenser update : 0f3a5f2784ef4daf48b380cc67133e79529a9f88
         physics : source of algorithms : done, 06/01/14
         cells : check modulo : dangerous ? less repetition
-        spheres : widom : in particles ?
+        spheres : widom : in particles ? à part d3eb20ea432ab70585375a7c211f2a473b3c2bf5
         inter : yukawa -> physics ?
         dipol : revoir permittivité
         algo : uniformisation : energy
