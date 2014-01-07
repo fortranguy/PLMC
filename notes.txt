@@ -126,7 +126,8 @@
         physics : source of algorithms : done, 06/01/14
         cells : check modulo : dangerous ? less repetition
         spheres : widom : in particles ? à part d3eb20ea432ab70585375a7c211f2a473b3c2bf5
-        inter : yukawa -> physics ?
+        inter : yukawa -> physics ? aa4a36518cda72528e1dc5a1084f365f3453d3b4 et
+            f382054f4f2815891c29ba01abff06c547dd1a85 pour mix
         dipol : revoir permittivité
         algo : uniformisation : energy
         tools : 
