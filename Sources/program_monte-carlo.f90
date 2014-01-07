@@ -19,13 +19,9 @@ use module_tools, only : init_randomSeed, set_initialCondition, print_report, in
 implicit none
     
     ! Monte-Carlo variables
-    integer :: iStep !< step counter
-    integer :: iChange !< change counters
-    integer :: iChangeRand !< random change
-    integer :: Ncol !< Number of particles
-    integer :: Nmove !< Number of displacements
-    integer :: Nrotate !< Number of rotations
-    integer :: iColRand !< random particle
+    integer :: iStep, iChange, iChangeRand !< counters
+    integer :: Ncol, iColRand !< number of particles & random particle
+    integer :: Nmove, Nrotate !< number of changes
     real(DP) :: random !< random number between 0 and 1
     real(DP) :: tIni, tFin !< CPU initial and final time
     
@@ -33,17 +29,14 @@ implicit none
     real(DP) :: Epot, EpotSum !< potential energy : at a Monte-Carlo step
     real(DP) :: Epot_conf !< potential energy : complete calculation from a configuration
     integer :: report_unit !< data & results file
-    integer :: obsThermal_unit !< observables files : Thermalisation
-    integer :: obsEquilib_unit !< observables files : Equilibrium
+    integer :: obsThermal_unit, obsEquilib_unit !< observables files : thermalisation & equilibrium
     
     ! Mixing potential between 2 types
     type(MixingPotential) :: mix !< short-range potential
-    real(DP) :: mix_Epot, mix_EpotSum
-    real(DP) :: mix_Epot_conf
+    real(DP) :: mix_Epot, mix_EpotSum, mix_Epot_conf
     integer :: mix_report_unit
     integer :: mix_Epot_unit !< tabulated potential file
-    integer :: mix_obsThermal_unit
-    integer :: mix_obsEquilib_unit
+    integer :: mix_obsThermal_unit, mix_obsEquilib_unit
     
     ! Type 1 : Dipolar spheres : Ewald summation
     type(DipolarSpheres) :: type1_spheres !< physical properties and Monte-Carlo subroutines
