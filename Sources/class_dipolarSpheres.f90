@@ -5,7 +5,7 @@ module class_dipolarSpheres
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
 use data_precisions, only : DP, real_zero, consist_tiny
 use data_constants, only : PI
-use data_box, only : Ndim, Lsize, Kmax, out_permittivity
+use data_box, only : Ndim, Lsize, Kmax
 use data_particles, only : dipol_Ncol
 use data_monteCarlo, only : dipol_move_delta, dipol_move_rejectFix, dipol_rotate_delta, &
                             dipol_rotate_deltaMax, dipol_rotate_rejectFix, dipol_Nwidom, &
@@ -1181,7 +1181,7 @@ contains
     
     !> Difference of Energy : add
     !> \f[
-    !>      \Delta U_{N \rightarrow N+1} = \frac{2\pi}{(2\epsilon_s+1)V} [
+    !>      \Delta U_{N \rightarrow N+1} = \frac{2\pi}{3V} [
     !>                                         (\vec{\mu}_{N+1} \cdot \vec{\mu}_{N+1})
     !>                                          2\vec{\mu}) \cdot \vec{M}^N
     !>                                     ]
@@ -1189,7 +1189,7 @@ contains
     
     !> Difference of Energy : remove
     !> \f[
-    !>      \Delta U_{N \rightarrow N-1} = \frac{2\pi}{(2\epsilon_s+1)V} [
+    !>      \Delta U_{N \rightarrow N-1} = \frac{2\pi}{3V} [
     !>                                          (\vec{\mu}_{N+1} \cdot \vec{\mu}_{N+1})
     !>                                          -2\vec{\mu}) \cdot \vec{M}^N
     !>                                      ]
@@ -1205,8 +1205,7 @@ contains
         deltaEpot_bound_exchange = dot_product(mCol, mCol) + &
                                    2._DP * dot_product(mCol, this%totalMoment)
                           
-        deltaEpot_bound_exchange = 2._DP*PI / (2._DP*out_permittivity+1._DP) / product(Lsize) * &
-                                   deltaEpot_bound_exchange
+        deltaEpot_bound_exchange = 2._DP*PI/3._DP/product(Lsize) * deltaEpot_bound_exchange
     
     end function DipolarSpheres_deltaEpot_bound_exchange
     
@@ -1214,7 +1213,7 @@ contains
     
     !> Difference of Energy
     !> \f[
-    !>      \Delta U = \frac{2\pi}{(2\epsilon_s+1)V} [
+    !>      \Delta U = \frac{2\pi}{3V} [
     !>                      (\vec{\mu}^\prime_l \cdot \vec{\mu}^\prime_l) -
     !>                      (\vec{\mu}_l \cdot \vec{\mu}_l) +
     !>                      2 (\vec{\mu}^\prime_l - \vec{\mu}_l) \cdot \vec{M}_l
@@ -1231,14 +1230,13 @@ contains
         deltaEpot_bound_rotate = dot_product(mNew, mNew) - dot_product(mOld, mOld) + &
                                  2._DP*dot_product(mNew-mOld, this%totalMoment-mOld)
                           
-        deltaEpot_bound_rotate = 2._DP*PI / (2._DP*out_permittivity+1._DP) / product(Lsize) * &
-                                 deltaEpot_bound_rotate
+        deltaEpot_bound_rotate = 2._DP*PI/3._DP/product(Lsize) * deltaEpot_bound_rotate
     
     end function DipolarSpheres_deltaEpot_bound_rotate
     
     !> Total shape dependent term
     !> \f[
-    !>      J(\vec{M}, S) = \frac{2\pi}{(2\epsilon_s+1)V} | \vec{M}|^2
+    !>      J(\vec{M}, S) = \frac{2\pi}{3V} | \vec{M}|^2
     !> \f]
     
     pure function DipolarSpheres_Epot_bound(this) result(Epot_bound)
@@ -1246,8 +1244,7 @@ contains
         class(DipolarSpheres), intent(in) :: this
         real(DP) :: Epot_bound
         
-        Epot_bound = 2._DP * PI / (2._DP*out_permittivity + 1._DP) / product(Lsize) * &
-                     dot_product(this%totalMoment, this%totalMoment)
+        Epot_bound = 2._DP*PI/3._DP/product(Lsize) * dot_product(this%totalMoment, this%totalMoment)
     
     end function DipolarSpheres_Epot_bound
     

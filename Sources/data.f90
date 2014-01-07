@@ -57,8 +57,6 @@ implicit none
     integer, parameter :: Kmax3 = Kmax1 ! 1/u_length
     integer, dimension(Ndim), parameter :: Kmax = [Kmax1, Kmax2, Kmax3] ! 1/u_length
     
-    real(DP), parameter :: out_permittivity = 1._DP ! !< u_permittivity
-    
 end module data_box
 !***************************************************************************************************
 
