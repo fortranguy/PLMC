@@ -364,7 +364,7 @@ contains
         
         call this%test_overlap()
         call this%Epot_init()
-        call this%test_consist(this_obs%Epot, this_units%report)
+        call test_consist(this_obs%Epot, this%Epot_conf(), this_units%report)
         call this%snap_positions(0, this_units%snapFin_positions)
         call this_obs%print_results(this_units%report)
         

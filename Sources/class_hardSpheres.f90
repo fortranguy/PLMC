@@ -84,7 +84,6 @@ private
         procedure :: Epot_print => HardSpheres_Epot_print
         procedure :: Epot_neighCells => HardSpheres_Epot_neighCells
         procedure :: Epot_conf => HardSpheres_Epot_conf
-        procedure :: test_consist => HardSpheres_test_consist
         
     end type HardSpheres
     
@@ -473,32 +472,5 @@ contains
         Epot_conf = this%Ncol * 0._DP
         
     end function HardSpheres_Epot_conf
-    
-    !> Consistency test : dummy
-    
-    subroutine HardSpheres_test_consist(this, Epot, report_unit)
-    
-        class(HardSpheres), intent(in) :: this
-        real(DP), intent(in) :: Epot
-        integer, intent(in) :: report_unit
-        
-        real(DP) :: Epot_conf
-        real(DP) :: difference
-    
-        Epot_conf = this%Epot_conf()
-        difference = abs(Epot_conf-Epot)
-        
-        write(report_unit, *) "Consistency test:"
-        write(report_unit, *) "    Epot = ", Epot
-        write(report_unit, *) "    Epot_conf = ", Epot_conf
-        write(report_unit, *) "    absolute difference = ", difference
-        
-        if (difference > 0._DP) then
-            write(report_unit, *) "    WARNING !"
-        else
-            write(report_unit, *) "    OK !"
-        end if
-    
-    end subroutine HardSpheres_test_consist
 
 end module class_hardSpheres

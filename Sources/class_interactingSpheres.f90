@@ -48,7 +48,6 @@ private
         procedure, private :: Epot_pair => InteractingSpheres_Epot_pair
         procedure :: Epot_neighCells => InteractingSpheres_Epot_neighCells
         procedure :: Epot_conf => InteractingSpheres_Epot_conf
-        procedure :: test_consist => InteractingSpheres_test_consist
 
     end type InteractingSpheres
     
@@ -272,32 +271,5 @@ contains
         end do
     
     end function InteractingSpheres_Epot_conf
-    
-    !> Consistency test
-    
-    subroutine InteractingSpheres_test_consist(this, Epot, report_unit)
-    
-        class(InteractingSpheres), intent(in) :: this
-        real(DP), intent(in) :: Epot
-        integer, intent(in) :: report_unit
-        
-        real(DP) :: Epot_conf
-        real(DP) :: difference
-        
-        Epot_conf = this%Epot_conf()
-        difference = abs((Epot_conf-Epot)/Epot_conf)
-        
-        write(report_unit, *) "Consistency test:"
-        write(report_unit, *) "    Epot = ", Epot
-        write(report_unit, *) "    Epot_conf = ", Epot_conf
-        write(report_unit, *) "    relative difference = ", difference
-        
-        if (difference > consist_tiny) then
-            write(report_unit, *) "    WARNING !"
-        else
-            write(report_unit, *) "    OK !"
-        end if
-    
-    end subroutine InteractingSpheres_test_consist
 
 end module class_interactingSpheres
