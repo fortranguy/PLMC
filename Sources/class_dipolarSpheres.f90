@@ -1247,7 +1247,7 @@ contains
     
     end function DipolarSpheres_Epot_bound
     
-    !> Total potential energy ----------------------------------------------------------------------
+    ! Total potential energy ----------------------------------------------------------------------
     
     !> Potential energy initialisation
     
