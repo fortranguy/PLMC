@@ -83,11 +83,11 @@ contains
     
     !> Initial condition
     
-    subroutine set_initialCondition(dipolar, spherical, mix_rMin, report_unit)
+    subroutine set_initialCondition(dipolar, spherical, mix_sigma, report_unit)
     
         class(DipolarSpheres), intent(inout) :: dipolar
         class(HardSpheres), intent(inout) :: spherical
-        real(DP), intent(in) :: mix_rMin
+        real(DP), intent(in) :: mix_sigma
         integer, intent(in) :: report_unit
 
         character(len=4096) :: init
@@ -104,7 +104,7 @@ contains
                 
                 select case (init)
                     case ("rand")
-                        call randomDepositions(dipolar, spherical, mix_rMin)
+                        call randomDepositions(dipolar, spherical, mix_sigma)
                         call randomOrientations(dipolar%orientations, dipolar%get_Ncol())
                         write(output_unit, *) "Random depositions + random orientations"
                         write(report_unit, *) "    Random depositions + random orientations"
@@ -138,10 +138,10 @@ contains
     
     !> Random depositions configuration
     
-    subroutine randomDepositions(type1, type2, mix_rMin)
+    subroutine randomDepositions(type1, type2, mix_sigma)
 
         class(HardSpheres), intent(inout) :: type1, type2
-        real(DP), intent(in) :: mix_rMin
+        real(DP), intent(in) :: mix_sigma
 
         integer :: iCol, iColTest
         real(DP), dimension(Ndim) :: xRand
@@ -156,7 +156,7 @@ contains
             
             do iColTest = 1, iCol-1
                 rTest = dist_PBC(type1%positions(:, iColTest), type1%positions(:, iCol))
-                if (rTest < type1%get_rMin()) then
+                if (rTest < type1%get_sigma()) then
                     goto 7101
                 end if
             end do
@@ -172,14 +172,14 @@ contains
             
             do iColTest = 1, type1%get_Ncol()
                 rTest = dist_PBC(type1%positions(:, iColTest), type2%positions(:, iCol))
-                if (rTest < mix_rMin) then
+                if (rTest < mix_sigma) then
                     goto 7102
                 end if
             end do
             
             do iColTest = 1, iCol-1
                 rTest = dist_PBC(type2%positions(:, iColTest), type2%positions(:, iCol))
-                if (rTest < type2%get_rMin()) then
+                if (rTest < type2%get_sigma()) then
                     goto 7102
                 end if
             end do

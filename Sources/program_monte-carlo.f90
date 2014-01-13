@@ -81,7 +81,7 @@ implicit none
     
     ! Initial condition
     
-    call set_initialCondition(type1_spheres, type2_spheres, mix%get_rMin(), report_unit)
+    call set_initialCondition(type1_spheres, type2_spheres, mix%get_sigma(), report_unit)
     
     call mix_init(mix, type1_spheres, type2_spheres, mix_Epot_unit, mix_Epot)    
     call init(type1_spheres, type2_spheres, mix, type1_units, type1_obs%Epot)
