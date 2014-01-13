@@ -47,6 +47,7 @@ private
         procedure :: Epot_print => InteractingSpheres_Epot_print
         procedure, private :: Epot_pair => InteractingSpheres_Epot_pair
         procedure :: Epot_neighCells => InteractingSpheres_Epot_neighCells
+        procedure :: Epot_short => InteractingSpheres_Epot_short
         procedure :: Epot_conf => InteractingSpheres_Epot_conf
 
     end type InteractingSpheres
@@ -246,31 +247,40 @@ contains
     
     end subroutine InteractingSpheres_Epot_neighCells
 
-    !> Total potential energy
-    
-    pure function InteractingSpheres_Epot_conf(this) result(Epot_conf)
-    
+    pure function InteractingSpheres_Epot_short(this) result(Epot_short)
+
         class(InteractingSpheres), intent(in) :: this
-        real(DP) :: Epot_conf
-        
+        real(DP) :: Epot_short
+
         integer :: iCol, jCol
         real(DP) :: r_ij
-    
-        Epot_conf = 0._DP
-        
+
+        Epot_short = 0._DP
+
         if (this%epsilon < real_zero) then
             return
         end if
-        
+
         do jCol = 1, this%Ncol
             do iCol = jCol + 1, this%Ncol
-                
+
                 r_ij = dist_PBC(this%positions(:, iCol), this%positions(:, jCol))
-                Epot_conf = Epot_conf + this%Epot_pair(r_ij)
-                    
+                Epot_short = Epot_short + this%Epot_pair(r_ij)
+
             end do
         end do
+
+    end function InteractingSpheres_Epot_short
+
+    !> Total potential energy
     
+    pure function InteractingSpheres_Epot_conf(this) result(Epot_conf)
+
+        class(InteractingSpheres), intent(in) :: this
+        real(DP) :: Epot_conf
+
+        Epot_conf = this%Epot_short()
+
     end function InteractingSpheres_Epot_conf
 
 end module class_interactingSpheres
