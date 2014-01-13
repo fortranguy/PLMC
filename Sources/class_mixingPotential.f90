@@ -41,7 +41,8 @@ private
         procedure :: destroy => MixingPotential_destroy
 
         procedure :: print_report => MixingPotential_print_report
-        
+
+        procedure :: get_sigma => MixingPotential_get_sigma
         procedure :: get_rMin => MixingPotential_get_rMin
         procedure :: get_rCut => MixingPotential_get_rCut
         
@@ -104,6 +105,17 @@ contains
         write(report_unit, *) "    dr = ", this%dr
         
     end subroutine MixingPotential_print_report
+
+    !> Accessor : sigma
+
+    pure function MixingPotential_get_sigma(this) result(get_sigma)
+
+        class(MixingPotential), intent(in) :: this
+        real(DP) :: get_sigma
+
+        get_sigma = this%sigma
+
+    end function MixingPotential_get_sigma
     
     !> Accessor : rMin
     
