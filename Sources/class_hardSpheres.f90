@@ -97,7 +97,7 @@ contains
         class(HardSpheres), intent(inout) :: this
 
         this%sigma = hard_sigma
-        this%radius = this%rMin/2._DP
+        this%radius = this%sigma/2._DP
         this%Ncol = hard_Ncol
         allocate(this%positions(Ndim, this%Ncol))
     

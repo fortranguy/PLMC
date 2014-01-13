@@ -58,7 +58,7 @@ contains
         class(InteractingSpheres), intent(inout) :: this
         
         this%sigma = inter_sigma
-        this%radius = this%rMin/2._DP
+        this%radius = this%sigma/2._DP
         this%Ncol = inter_Ncol
         allocate(this%positions(Ndim, this%Ncol))
         

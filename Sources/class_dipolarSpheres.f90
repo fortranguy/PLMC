@@ -123,7 +123,7 @@ contains
         class(DipolarSpheres), intent(inout) :: this
         
         this%sigma = 1._DP ! = u_length
-        this%radius = this%rMin/2._DP
+        this%radius = this%sigma/2._DP
         this%Ncol = dipol_Ncol
         allocate(this%positions(Ndim, this%Ncol))
         allocate(this%orientations(Ndim, this%Ncol))

@@ -158,7 +158,8 @@ implicit none
     ! out ---------------------------------------------------------------------
     !> The interactive spheres (inter) potential is composed of 3 parts :
     !> hard sphere (HS) + Yukawa + cut.
-    
+
+    real(DP), parameter :: inter_rMin_factor = 1._DP
     real(DP), parameter :: inter_rCut = 4._DP ! u_length
     real(DP), parameter :: inter_dr = 5.E-5_DP ! u_length
     real(DP), parameter :: inter_epsilon = 1._DP ! u_energy * u_length
