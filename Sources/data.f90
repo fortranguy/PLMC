@@ -72,13 +72,13 @@ implicit none
 
     integer, parameter :: dipol_Ncol = 281
     
-    real(DP), parameter :: hard_rMin = 1._DP ! u_length
+    real(DP), parameter :: hard_sigma = 1._DP ! u_length
     integer, parameter :: hard_Ncol = 6750
     
     real(DP), parameter :: mix_delta = 0.2_DP ! u_length
     
     ! out ---------------------------------------------------------------------
-    real(DP), parameter :: inter_rMin = 1._DP ! u_length
+    real(DP), parameter :: inter_sigma = 1._DP ! u_length
     integer, parameter :: inter_Ncol = 6750
     ! -------------------------------------------------------------------------
     
@@ -142,10 +142,14 @@ use data_precisions, only : DP
 
 implicit none
 
+    real(DP), parameter :: dipol_rMin_factor = 1._DP
     real(DP), parameter :: dipol_real_rCut_factor = 0.5_DP ! * Lsize(1)
     real(DP), parameter :: dipol_real_dr = 5.E-5_DP ! u_length
     real(DP), parameter :: dipol_alpha_factor = 7._DP ! / Lsize(1)
-    
+
+    real(DP), parameter :: hard_rMin_factor = 1._DP
+
+    real(DP), parameter :: mix_rMin_factor = 1._dP
     real(DP), parameter :: mix_rCut = 1._DP ! u_length, adaptation
     real(DP), parameter :: mix_dr = 1._DP ! u_length
     real(DP), parameter :: mix_epsilon = 0._DP ! u_energy * u_length

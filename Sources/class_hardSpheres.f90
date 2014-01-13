@@ -6,8 +6,9 @@ use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
 use data_precisions, only : DP, real_zero
 use data_constants, only : PI
 use data_box, only : Ndim, Lsize
-use data_particles, only : hard_rMin, hard_Ncol
+use data_particles, only : hard_sigma, hard_Ncol
 use data_monteCarlo, only : hard_move_delta, hard_move_rejectFix, hard_Nwidom
+use data_potential, only : hard_rMin_factor
 use data_neighbourCells, only : NnearCell
 use data_distribution, only : hard_snap_factor
 use module_physics, only : dist_PBC
@@ -26,7 +27,7 @@ private
         character(len=5) :: name
 
         ! Particles
-        real(DP) :: rMin !< minimum distance between two particles
+        real(DP) :: sigma !< diameter
         real(DP) :: radius !< radius of a particle
         integer ::  Ncol !< number of a component particles
         real(DP), dimension(:, :), allocatable, public :: positions !< positions of all particles
@@ -41,6 +42,7 @@ private
         integer :: Nwidom
 
         ! Potential
+        real(DP) :: rMin !< minimum distance between two particles
         real(DP) :: rCut !< short-range cut
         
         ! Neighbours (cell/grid scheme)
@@ -59,8 +61,9 @@ private
         procedure :: get_name => HardSpheres_get_name
         procedure :: get_Ncol => HardSpheres_get_Ncol
         procedure :: get_Nwidom => HardSpheres_get_Nwidom
-        procedure :: get_rMin => HardSpheres_get_rMin
+        procedure :: get_sigma => HardSpheres_get_sigma
         procedure :: get_radius => HardSpheres_get_radius
+        procedure :: get_rMin => HardSpheres_get_rMin
         procedure :: get_rCut => HardSpheres_get_rCut
         procedure :: get_move_delta => HardSpheres_get_move_delta
         
@@ -92,8 +95,8 @@ contains
     pure subroutine HardSpheres_init_particles(this)
     
         class(HardSpheres), intent(inout) :: this
-        
-        this%rMin = hard_rMin
+
+        this%sigma = hard_sigma
         this%radius = this%rMin/2._DP
         this%Ncol = hard_Ncol
         allocate(this%positions(Ndim, this%Ncol))
@@ -171,17 +174,17 @@ contains
         get_Nwidom = this%Nwidom
 
     end function HardSpheres_get_Nwidom
-    
-    !> Accessor : rMin
-    
-    pure function HardSpheres_get_rMin(this) result(get_rMin)
-    
+
+    !> Accessor : sigma
+
+    pure function HardSpheres_get_sigma(this) result(get_sigma)
+
         class(HardSpheres), intent(in) :: this
-        real(DP) :: get_rMin
-        
-        get_rMin = this%rMin
-    
-    end function HardSpheres_get_rMin
+        real(DP) :: get_sigma
+
+        get_sigma = this%sigma
+
+    end function HardSpheres_get_sigma
     
     !> Accessor : radius
     
@@ -193,6 +196,17 @@ contains
         get_radius = this%radius
     
     end function HardSpheres_get_radius
+
+    !> Accessor : rMin
+
+    pure function HardSpheres_get_rMin(this) result(get_rMin)
+
+        class(HardSpheres), intent(in) :: this
+        real(DP) :: get_rMin
+
+        get_rMin = this%rMin
+
+    end function HardSpheres_get_rMin
     
     !> Accessor : rCut
     
@@ -400,7 +414,8 @@ contains
     subroutine HardSpheres_Epot_init(this)
     
         class(HardSpheres), intent(inout) :: this
-        
+
+        this%rMin = hard_rMin_factor * this%sigma
         this%rCut = this%rMin
         
     end subroutine HardSpheres_Epot_init
