@@ -166,7 +166,7 @@ implicit none
     real(DP), parameter :: inter_alpha = 5._DP ! 1/u_length
     ! -------------------------------------------------------------------------
     
-    logical, parameter :: printPotential = .true.
+    logical, parameter :: print_potential = .true.
         
 end module data_potential
 !***************************************************************************************************
