@@ -333,7 +333,7 @@ contains
         
         call this%test_overlap()
         call this%snap_positions_data(this_units%snap_positions)
-        call this%snap_positions(0, this_units%snap_positions)
+        call this%snap_positions(0, this_units%snapIni_positions)
         call this%Epot_init()
                
         select type (this)
