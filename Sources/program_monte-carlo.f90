@@ -136,9 +136,9 @@ implicit none
                 type1_obs%rotate_rejectAdapt = type1_obs%rotate_rejectAdapt + type1_obs%rotate_reject
                 type2_obs%move_rejectAdapt = type2_obs%move_rejectAdapt + type2_obs%move_reject                
             else ! Average & adaptation            
-                call adapt_move(type1_spheres, iStep, Nadapt, type1_obs, type1_units%move_delta)
-                call adapt_rotate(type1_spheres, iStep, Nadapt, type1_obs, type1_units%rotate_delta)
-                call adapt_move(type2_spheres, iStep, Nadapt, type2_obs, type2_units%move_delta)                
+                call adapt_move(type1_spheres, iStep, type1_obs, type1_units%move_delta)
+                call adapt_rotate(type1_spheres, iStep, type1_obs, type1_units%rotate_delta)
+                call adapt_move(type2_spheres, iStep, type2_obs, type2_units%move_delta)                
             end if
             
             ! Observables writing

@@ -165,6 +165,8 @@ implicit none
     real(DP), parameter :: inter_epsilon = 1._DP ! u_energy * u_length
     real(DP), parameter :: inter_alpha = 5._DP ! 1/u_length
     ! -------------------------------------------------------------------------
+    
+    logical, parameter :: printPotential = .true.
         
 end module data_potential
 !***************************************************************************************************

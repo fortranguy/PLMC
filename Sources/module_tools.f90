@@ -6,7 +6,7 @@ use, intrinsic :: iso_fortran_env, only : output_unit, error_unit, iostat_end
 use data_precisions, only : DP, real_zero, io_tiny, consist_tiny
 use data_constants, only : PI, sigma3d
 use data_box, only : Ndim, Lsize, Kmax
-use data_monteCarlo, only : Temperature, Nstep, decorrelFactor, Nthermal
+use data_monteCarlo, only : Temperature, Nadapt, Nstep, decorrelFactor, Nthermal
 use module_physics, only : dist_PBC, random_surface
 use class_hardSpheres
 use class_interactingSpheres
@@ -379,10 +379,10 @@ contains
     
     !> Change : average & adaptation
     
-    subroutine adapt_move(this, iStep, Nadapt, obs, move_unit)
+    subroutine adapt_move(this, iStep, obs, move_unit)
     
         class(HardSpheres), intent(inout) :: this
-        integer, intent(in) :: iStep, Nadapt
+        integer, intent(in) :: iStep
         class(Observables), intent(inout) :: obs
         integer, intent(in) :: move_unit
     
@@ -393,10 +393,10 @@ contains
     
     end subroutine adapt_move
     
-    subroutine adapt_rotate(this, iStep, Nadapt, obs, rotate_unit)
+    subroutine adapt_rotate(this, iStep, obs, rotate_unit)
     
         class(DipolarSpheres), intent(inout) :: this
-        integer, intent(in) :: iStep, Nadapt
+        integer, intent(in) :: iStep
         class(MoreObservables), intent(inout) :: obs
         integer, intent(in) :: rotate_unit
         
