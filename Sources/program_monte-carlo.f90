@@ -51,7 +51,7 @@ implicit none
 
     call type1_spheres%construct()
     call type2_spheres%construct()
-    call mix%construct(type1_spheres%get_rMin(), type2_spheres%get_rMin())
+    call mix%construct(type1_spheres%get_sigma(), type2_spheres%get_sigma())
     
     Ncol = type1_spheres%get_Ncol() + type2_spheres%get_Ncol()
     Nmove = decorrelFactor * Ncol
