@@ -336,16 +336,15 @@ contains
         call this%snap_positions(0, this_units%snapIni_positions)
         call this%Epot_init()
                
+        call this%Epot_print(this_units%Epot)
         select type (this)
             type is (DipolarSpheres)            
                 select type (this_units)
                     type is (MoreUnits)
                         call this%snap_orientations(0, this_units%snapIni_orientations)
-                        call this%Epot_real_print(this_units%Epot)
+                        call this%Epot_real_print(this_units%Epot_real)
                         call this%Epot_reci_count_waveVectors(this_units%waveVectors)
                 end select
-            class default
-                call this%Epot_print(this_units%Epot)
         end select        
         this_Epot = this%Epot_conf()        
         

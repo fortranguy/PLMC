@@ -32,6 +32,8 @@ private
         integer :: snapIni_orientations
         integer :: snapFin_orientations
         integer :: snap_orientations
+        
+        integer :: Epot_real
 
         integer :: waveVectors
         integer :: structure_modulus
@@ -77,6 +79,9 @@ contains
                      file=name//"_snapFin_orientations.out", status='new', action='write')
                 open(newunit=this%snap_orientations, recl=4096, &
                      file=name//"_snap_orientations.shots", status='new', action='write')
+                     
+                open(newunit=this%Epot_real, recl=4096, file=name//"_Epot_real.tmp", status='new', &
+                     action='write')
 
                 open(newunit=this%structure_modulus, recl=4096, file=name//"_structure_modulus.out", &
                      status='new', action='write')
@@ -120,6 +125,8 @@ contains
                 close(this%snapIni_orientations)
                 close(this%snapFin_orientations)
                 close(this%snap_orientations)
+                
+                close(this%Epot_real)
 
                 close(this%waveVectors)
                 close(this%structure_modulus)
