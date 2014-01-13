@@ -5,8 +5,8 @@ module class_interactingSpheres
 use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
 use data_precisions, only : DP, real_zero, consist_tiny
 use data_box, only : Ndim, Lsize
-use data_particles, only : inter_rMin, inter_Ncol
-use data_potential, only : inter_rCut, inter_dr, inter_epsilon, inter_alpha
+use data_particles, only : inter_sigma, inter_Ncol
+use data_potential, only : inter_rMin_factor, inter_rCut, inter_dr, inter_epsilon, inter_alpha
 use data_monteCarlo, only : inter_move_delta, inter_move_rejectFix, inter_Nwidom
 use data_neighbourCells, only : NnearCell
 use data_distribution, only : inter_snap_factor
@@ -57,7 +57,7 @@ contains
     
         class(InteractingSpheres), intent(inout) :: this
         
-        this%rMin = inter_rMin
+        this%sigma = inter_sigma
         this%radius = this%rMin/2._DP
         this%Ncol = inter_Ncol
         allocate(this%positions(Ndim, this%Ncol))
@@ -141,7 +141,8 @@ contains
     subroutine InteractingSpheres_Epot_init(this)
     
         class(InteractingSpheres), intent(inout) :: this
-        
+
+        this%rMin = inter_rMin_factor * this%sigma
         this%rCut = inter_rCut
         this%dr = inter_dr
         call set_discrete_length(this%rMin, this%dr)

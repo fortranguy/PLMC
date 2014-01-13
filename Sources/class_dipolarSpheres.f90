@@ -10,7 +10,7 @@ use data_particles, only : dipol_Ncol
 use data_monteCarlo, only : dipol_move_delta, dipol_move_rejectFix, dipol_rotate_delta, &
                             dipol_rotate_deltaMax, dipol_rotate_rejectFix, dipol_Nwidom, &
                             dipol_reInit_iStep
-use data_potential, only : dipol_real_rCut_factor, dipol_real_dr, dipol_alpha_factor
+use data_potential, only : dipol_rMin_factor, dipol_real_rCut_factor, dipol_real_dr, dipol_alpha_factor
 use data_neighbourCells, only : NnearCell
 use data_distribution, only : dipol_snap_factor
 use module_physics, only : set_discrete_length, distVec_PBC, Kmax1_sym, Kmax2_sym, fourier_i
@@ -122,7 +122,7 @@ contains
     
         class(DipolarSpheres), intent(inout) :: this
         
-        this%rMin = 1._DP
+        this%sigma = 1._DP ! = u_length
         this%radius = this%rMin/2._DP
         this%Ncol = dipol_Ncol
         allocate(this%positions(Ndim, this%Ncol))
@@ -1254,7 +1254,8 @@ contains
     subroutine DipolarSpheres_Epot_init(this)
     
         class(DipolarSpheres), intent(inout) :: this
-        
+
+        this%rMin = dipol_rMin_factor * this%sigma
         this%rCut = this%rMin
         
         this%alpha = dipol_alpha_factor / Lsize(1)

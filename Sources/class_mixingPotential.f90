@@ -6,7 +6,7 @@ use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
 use data_precisions, only : DP, real_zero
 use data_box, only : Ndim
 use data_particles, only : mix_delta
-use data_potential, only : mix_rCut, mix_dr, mix_epsilon, mix_alpha
+use data_potential, only : mix_rMin_factor, mix_rCut, mix_dr, mix_epsilon, mix_alpha
 use data_neighbourCells, only : NnearCell
 use module_physics, only : set_discrete_length, dist_PBC, Epot_yukawa
 use class_neighbourCells
@@ -23,6 +23,7 @@ private
         character(len=5) :: name
         
         real(DP) :: delta !< demixing length
+        real(DP) :: sigma
         real(DP) :: rMin !< minimum distance between two particles
         real(DP) :: rCut !< short-range cut
         real(DP) :: dr !< discretisation step
@@ -60,17 +61,17 @@ private
 
 contains
 
-    subroutine MixingPotential_construct(this, type1_rMin, type2_rMin)
+    subroutine MixingPotential_construct(this, type1_sigma, type2_sigma)
 
         class(MixingPotential), intent(out) :: this
-        real(DP), intent(in) :: type1_rMin, type2_rMin
+        real(DP), intent(in) :: type1_sigma, type2_sigma
         
         this%name = "[mix]"
         write(output_unit, *) this%name, " class construction"
         
         ! Particles
         this%delta = mix_delta
-        this%rMin = (type1_rMin + type2_rMin)/2._DP + this%delta
+        this%sigma = (type1_sigma + type2_sigma)/2._DP + this%delta
 
     end subroutine MixingPotential_construct
 
@@ -199,7 +200,8 @@ contains
     subroutine MixingPotential_Epot_init(this)
     
         class(MixingPotential), intent(inout) :: this
-        
+
+        this%rMin = mix_rMin_factor * this%sigma
         this%rCut = mix_rCut
         
         if (this%rCut < this%rMin) then
