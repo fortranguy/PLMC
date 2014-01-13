@@ -69,7 +69,6 @@ implicit none
     
     mix_EpotSum = 0._DP
     call mix_open_units(mix_report_unit, mix_Epot_unit, mix_obsThermal_unit, mix_obsEquilib_unit)
-    call mix%print_report(mix_report_unit)
     
     call type1_obs%init()
     call type1_units%open(type1_spheres%get_name())
@@ -83,7 +82,8 @@ implicit none
     
     call set_initialCondition(type1_spheres, type2_spheres, mix%get_sigma(), report_unit)
     
-    call mix_init(mix, type1_spheres, type2_spheres, mix_Epot_unit, mix_Epot)    
+    call mix_init(mix, type1_spheres, type2_spheres, mix_Epot_unit, mix_Epot)
+    call mix%print_report(mix_report_unit)
     call init(type1_spheres, type2_spheres, mix, type1_units, type1_obs%Epot)
     call init(type2_spheres, type1_spheres, mix, type2_units, type2_obs%Epot)
     
