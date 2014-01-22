@@ -134,3 +134,6 @@
         - arguments : plus général ?
         - consist : unifié ?        
             
+22 01 14
+    17:25 :
+    bulk : corriger dist : dip lecture
