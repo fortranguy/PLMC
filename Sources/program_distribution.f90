@@ -2,7 +2,7 @@
 
 program distribution
 
-use, intrinsic :: iso_fortran_env, only : output_unit
+use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
 use data_precisions, only : DP
 use data_box, only : Ndim, Lsize
 use data_monteCarlo, only : Nstep
@@ -13,9 +13,9 @@ use module_distribution, only : sphere_volume
 
 implicit none
 
-    character(len=5) :: name
-    integer :: Ncol
-    integer :: snap_factor
+    character(len=5) :: name, nameBis
+    integer :: Ncol, NcolBis
+    integer :: snap_factor, snap_factorBis
     real(DP) :: density
     integer, dimension(:), allocatable :: dist_sum
     integer :: positions_unit, orientations_unit, distrib_unit
@@ -56,12 +56,20 @@ implicit none
     dist_sum(:) = 0
     
     if (name == "dipol" .and. command_argument_count() == 2) then
+    
         call get_command_argument(2, file_name, length, file_stat)
         if (file_stat /= 0) stop "error get_command_argument"
         open(newunit=orientations_unit, recl=4096, file=file_name(1:length), status='old', &
         action='read')
         
+        read(positions_unit, *) nameBis, NcolBis, snap_factorBis
+        if (nameBis/=name .or. NcolBis/=Ncol .or. snap_factorBis/=snap_factor) then
+            write(error_unit, *) "Error : positions and orientations tags don't match."
+            stop
+        end if
+        
         allocate(orientations(Ndim, Ncol))
+        
     end if
 
     write(output_unit, *) "Start !"
