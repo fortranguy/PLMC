@@ -18,7 +18,7 @@ implicit none
     integer :: snap_factor
     real(DP) :: density
     integer, dimension(:), allocatable :: dist_sum
-    integer :: snaps_unit, distrib_unit
+    integer :: positions_unit, orientations_unit, distrib_unit
 
     real(DP) :: rMax
     integer :: Ndist
@@ -41,9 +41,9 @@ implicit none
     call get_command_argument(1, file_name, length, file_stat)
     if (file_stat /= 0) stop "error get_command_argument"
     
-    open(newunit=snaps_unit, recl=4096, file=file_name(1:length), status='old', action='read')
+    open(newunit=positions_unit, recl=4096, file=file_name(1:length), status='old', action='read')
     
-    read(snaps_unit, *) name, Ncol, snap_factor
+    read(positions_unit, *) name, Ncol, snap_factor
     write(output_unit, *) name, Ncol, snap_factor
     
     rMax = norm2(Lsize/2._DP)
@@ -54,6 +54,13 @@ implicit none
     density = real(Ncol, DP) / product(Lsize)
 
     dist_sum(:) = 0
+    
+    if (name == "dipol" .and. command_argument_count() == 2) then
+        call get_command_argument(2, file_name, length, file_stat)
+        if (file_stat /= 0) stop "error get_command_argument"
+        open(newunit=orientations_unit, recl=4096, file=file_name(1:length), status='old', &
+        action='read')
+    end if
 
     write(output_unit, *) "Start !"
     call cpu_time(tIni)
@@ -64,7 +71,7 @@ implicit none
         ! Read
         !$omp critical
         do iCol = 1, Ncol
-            read(snaps_unit, *) positions(:, iCol)
+            read(positions_unit, *) positions(:, iCol)
         end do
         !$omp end critical
 
@@ -85,7 +92,11 @@ implicit none
     call cpu_time(tFin)
     write(output_unit, *) "Finish !"
 
-    close(snaps_unit)
+    close(positions_unit)
+    
+    if (name == "dipol" .and. command_argument_count() == 2) then
+        close(orientations_unit)
+    end if
 
     open(newunit=distrib_unit, file=name//"_dist_function.out", action="write")
     
