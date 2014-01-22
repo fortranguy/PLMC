@@ -28,7 +28,7 @@ implicit none
     integer :: iDist
     real(DP) :: r_iDist
     real(DP), dimension(:), allocatable :: dist_function
-    real(DP), dimension(:, :), allocatable :: positions
+    real(DP), dimension(:, :), allocatable :: positions, orientations
     
     character(len=4096) :: file_name
     integer :: length, time_unit, file_stat
@@ -60,6 +60,8 @@ implicit none
         if (file_stat /= 0) stop "error get_command_argument"
         open(newunit=orientations_unit, recl=4096, file=file_name(1:length), status='old', &
         action='read')
+        
+        allocate(orientations(Ndim, Ncol))
     end if
 
     write(output_unit, *) "Start !"
@@ -73,6 +75,12 @@ implicit none
         do iCol = 1, Ncol
             read(positions_unit, *) positions(:, iCol)
         end do
+        
+        if (name == "dipol" .and. command_argument_count() == 2) then
+            do iCol = 1, Ncol
+                read(orientations_unit, *) orientations(:, iCol)
+            end do
+        end if
         !$omp end critical
 
         ! Fill
@@ -93,9 +101,11 @@ implicit none
     write(output_unit, *) "Finish !"
 
     close(positions_unit)
+    deallocate(positions)
     
     if (name == "dipol" .and. command_argument_count() == 2) then
         close(orientations_unit)
+        deallocate(orientations)
     end if
 
     open(newunit=distrib_unit, file=name//"_dist_function.out", action="write")
@@ -125,6 +135,5 @@ implicit none
     
     deallocate(dist_function)
     deallocate(dist_sum)
-    deallocate(positions)
 
 end program distribution
