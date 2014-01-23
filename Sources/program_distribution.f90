@@ -62,7 +62,7 @@ implicit none
         open(newunit=orientations_unit, recl=4096, file=file_name(1:length), status='old', &
         action='read')
         
-        read(positions_unit, *) nameBis, NcolBis, snap_factorBis
+        read(orientations_unit, *) nameBis, NcolBis, snap_factorBis
         if (nameBis/=name .or. NcolBis/=Ncol .or. snap_factorBis/=snap_factor) then
             write(error_unit, *) "Error : positions and orientations tags don't match."
             stop
