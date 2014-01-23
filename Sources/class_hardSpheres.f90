@@ -74,7 +74,7 @@ private
         procedure :: print_density => HardSpheres_print_density
         procedure :: print_report => HardSpheres_print_report
         
-        procedure :: snap_positions_data => HardSpheres_snap_positions_data
+        procedure :: snap_data => HardSpheres_snap_data
         procedure :: snap_positions => HardSpheres_snap_positions
         
         procedure :: test_overlap => HardSpheres_test_overlap
@@ -334,14 +334,14 @@ contains
     
     !> Tag the snapshots
     
-    subroutine HardSpheres_snap_positions_data(this, snap_unit)
+    subroutine HardSpheres_snap_data(this, snap_unit)
     
         class(HardSpheres), intent(in) :: this
         integer, intent(in) :: snap_unit
         
         write(snap_unit, *) this%name, this%Ncol, this%snap_factor
     
-    end subroutine HardSpheres_snap_positions_data
+    end subroutine HardSpheres_snap_data
     
     !> Configuration state : positions
       

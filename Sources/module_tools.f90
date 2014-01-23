@@ -335,7 +335,7 @@ contains
         real(DP), intent(inout) :: this_Epot
         
         call this%test_overlap()
-        call this%snap_positions_data(this_units%snap_positions)
+        call this%snap_data(this_units%snap_positions)
         call this%snap_positions(0, this_units%snapIni_positions)
         call this%Epot_init()
         
@@ -346,6 +346,7 @@ contains
             type is (DipolarSpheres)            
                 select type (this_units)
                     type is (MoreUnits)
+                        call this%snap_data(this_units%snap_orientations)
                         call this%snap_orientations(0, this_units%snapIni_orientations)
                         if (print_potential) then
                             call this%Epot_real_print(this_units%Epot_real)
