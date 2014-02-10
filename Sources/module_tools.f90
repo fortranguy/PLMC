@@ -41,6 +41,10 @@ contains
 
             select case (argument)
 
+                case ("--help")
+                    write(output_unit, *) "--intial=CONDITION"
+                    write(output_unit, *) "--seed=VALUE"
+
                 case ("--initial")
                     write(output_unit, *) "initial condition"
 
