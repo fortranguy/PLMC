@@ -29,21 +29,32 @@ contains
     subroutine read_arguments()
 
         character(len=4096) :: argument
-        integer :: length, status
+        integer :: iArg, length, status
 
         call get_command_argument(1, argument, length, status)
         if (status /= 0) stop "error get_command_argument"
 
-        select case (argument)
-        
-            case ("--initial")
-                write(output_unit, *) "initial condition"
-                stop
-                
-            case default
-                stop "no argument"
-                
-        end select
+        do iArg = 1, command_argument_count()
+
+            call get_command_argument(iArg, argument, length, status)
+            if (status /= 0) stop "error get_command_argument"
+
+            select case (argument)
+
+                case ("--initial")
+                    write(output_unit, *) "initial condition"
+
+                case ("--seed")
+                    write(output_unit, *) "set seed"
+
+                case default
+                    write(output_unit, *) "no argument"
+
+            end select
+
+        end do
+
+        stop
 
     end subroutine read_arguments
 
