@@ -34,6 +34,16 @@ contains
         call get_command_argument(1, argument, length, status)
         if (status /= 0) stop "error get_command_argument"
 
+        select case (argument)
+        
+            case ("--initial")
+                write(output_unit, *) "initial condition"
+                
+            case default
+                stop "no argument"
+                
+        end select
+
     end subroutine read_arguments
 
     !> Total : open units
