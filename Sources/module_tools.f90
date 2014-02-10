@@ -24,15 +24,32 @@ public read_arguments, open_units, mix_open_units, init_randomSeed, set_initialC
 
 contains
 
+    subroutine print_help()
+    
+        write(output_unit, *) "Usage: mc_[ENSEMBLE]_[GEOMETRY] [OPTION]"
+        write(output_unit, *) "Run ENSEMBLE Monte-Carlo simulation in GEOMETRY."
+        write(output_unit, *)        
+        write(output_unit, *) "Mandatory arguments to long options are mandatory for short options too."
+        write(output_unit, *) "    -h, --help"
+        write(output_unit, *) "    -i, --intial=CONDITION   CONDITION='rand', [dipol_positions] "
+        write(output_unit, *) "                             [dipol_orientations] [hardS_positions]"
+        write(output_unit, *) "    -s, --fix-seed           Fix the seed to the default value."
+    
+    end subroutine print_help
+
     !> Read arguments
 
-    subroutine read_arguments()
+    subroutine read_arguments(variable_seed)
+    
+        logical, intent(out) :: variable_seed
 
         character(len=4096) :: argument
         integer :: iArg, length, status
-
-        call get_command_argument(1, argument, length, status)
-        if (status /= 0) stop "error get_command_argument"
+        
+        logical :: rand_initial
+        
+        rand_initial = .true.
+        variable_seed = .true.
 
         do iArg = 1, command_argument_count()
 
@@ -41,24 +58,26 @@ contains
 
             select case (argument)
 
-                case ("--help")
-                    write(output_unit, *) "--intial=CONDITION"
-                    write(output_unit, *) "--seed=VALUE"
+                case ("-h", "--help")
+                    call print_help()
 
-                case ("--initial")
-                    write(output_unit, *) "initial condition"
+                case ("-i", "--initial")
+                    call get_command_argument(iArg+1, argument, length, status)
+                    if (status /= 0) stop "error get_command_argument"
+                    if (argument /= "rand") then
+                        rand_initial = .false.
+                        write(*, *) "rand_initial = .false."
+                    end if
 
-                case ("--seed")
-                    write(output_unit, *) "set seed"
-
-                case default
-                    write(output_unit, *) "no argument"
+                case ("-s", "--fix-seed")
+                    variable_seed = .false.
+                    write(*, *) "variable_seed = .false."
 
             end select
 
         end do
 
-        stop
+        stop "end of read_arguments"
 
     end subroutine read_arguments
 
@@ -97,26 +116,31 @@ contains
 
     !> Random number generator : seed
     
-    subroutine init_randomSeed(report_unit)
+    subroutine init_randomSeed(variable_seed, report_unit)
     
+        logical, intent(in) :: variable_seed
         integer, intent(in) :: report_unit
     
         integer :: i, n, clock
         integer, dimension(:), allocatable :: seed
-
-        call random_seed(size = n)
-        allocate(seed(n))
-
-        call system_clock(count=clock)
         
-        seed(:) = clock + 37 * [ (i - 1, i = 1, n) ]
-        call random_seed(put = seed)
-        
-        write(report_unit, *) "Random number generator :"
-        write(report_unit ,*) "    n = ", n
-        write(report_unit ,*) "    seed(:) = ", seed(:)
+        if (variable_seed) then
 
-        deallocate(seed)
+            call random_seed(size = n)
+            allocate(seed(n))
+
+            call system_clock(count=clock)
+            
+            seed(:) = clock + 37 * [ (i - 1, i = 1, n) ]
+            call random_seed(put = seed)
+            
+            write(report_unit, *) "Random number generator :"
+            write(report_unit ,*) "    n = ", n
+            write(report_unit ,*) "    seed(:) = ", seed(:)
+
+            deallocate(seed)
+            
+        end if
         
     end subroutine init_randomSeed
     
