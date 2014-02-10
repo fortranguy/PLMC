@@ -18,8 +18,8 @@ use class_units
 
 implicit none
 private
-public open_units, mix_open_units, init_randomSeed, set_initialCondition, print_report, &
-       mix_init, mix_final, init, final, adapt_move, adapt_rotate, test_consist, &
+public read_arguments, open_units, mix_open_units, init_randomSeed, set_initialCondition, &
+       print_report, mix_init, mix_final, init, final, adapt_move, adapt_rotate, test_consist, &
        print_results, mix_print_results
 
 contains
@@ -38,6 +38,7 @@ contains
         
             case ("--initial")
                 write(output_unit, *) "initial condition"
+                stop
                 
             case default
                 stop "no argument"

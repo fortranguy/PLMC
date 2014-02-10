@@ -13,9 +13,9 @@ use class_mixingPotential
 use class_observables
 use class_units
 use module_algorithms, only : move, widom, rotate
-use module_tools, only : open_units, mix_open_units, init_randomSeed, set_initialCondition, &
-                         print_report, mix_init, mix_final, init, final, adapt_move, adapt_rotate, &
-                         test_consist, print_results
+use module_tools, only : read_arguments, open_units, mix_open_units, init_randomSeed, &
+                         set_initialCondition, print_report, mix_init, mix_final, init, final, &
+                         adapt_move, adapt_rotate, test_consist, print_results
 
 implicit none
     
@@ -48,6 +48,8 @@ implicit none
     type(HardSpheres) :: type2_spheres
     type(Observables) :: type2_obs
     type(Units) :: type2_units
+
+    call read_arguments()
 
     call type1_spheres%construct()
     call type2_spheres%construct()
