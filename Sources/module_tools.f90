@@ -31,7 +31,7 @@ contains
         write(output_unit, *)        
         write(output_unit, *) "Mandatory arguments to long options are mandatory for short options too."
         write(output_unit, *) "    -h, --help"
-        write(output_unit, *) "    -i, --intial CONDITION   CONDITION='r', 'random' : random desposition"
+        write(output_unit, *) "    -i, --intial CONDITION   CONDITION='r', 'random': random desposition"
         write(output_unit, *) "                             CONDITION='f', 'files' [dipol_positions] "
         write(output_unit, *) "                             [dipol_orientations] [hardS_positions]"
         write(output_unit, *) "    -s, --fix-seed           Fix the seed to the default value."
@@ -63,6 +63,7 @@ contains
 
                 case ("-h", "--help")
                     call print_help()
+                    stop
 
                 case ("-i", "--initial")
                     call get_command_argument(iArg+1, argument, length, status)
