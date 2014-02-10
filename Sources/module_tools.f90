@@ -24,6 +24,18 @@ public open_units, mix_open_units, init_randomSeed, set_initialCondition, print_
 
 contains
 
+    !> Read arguments
+
+    subroutine read_arguments()
+
+        character(len=4096) :: argument
+        integer :: length, status
+
+        call get_command_argument(1, argument, length, status)
+        if (status /= 0) stop "error get_command_argument"
+
+    end subroutine read_arguments
+
     !> Total : open units
     
     subroutine open_units(report_unit, obsThermal_unit, obsEquilib_unit)
