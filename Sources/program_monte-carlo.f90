@@ -49,9 +49,9 @@ implicit none
     type(Observables) :: type2_obs
     type(Units) :: type2_units
     
-    logical :: variable_seed
+    logical :: seed_variable
 
-    call read_arguments(variable_seed)
+    call read_arguments(seed_variable)
 
     call type1_spheres%construct()
     call type2_spheres%construct()
@@ -69,7 +69,7 @@ implicit none
     
     call open_units(report_unit, obsThermal_unit, obsEquilib_unit)
     call print_report(Ncol, Nmove, Nrotate, report_unit)
-    call init_randomSeed(variable_seed, report_unit)
+    call init_randomSeed(seed_variable, report_unit)
     
     mix_EpotSum = 0._DP
     call mix_open_units(mix_report_unit, mix_Epot_unit, mix_obsThermal_unit, mix_obsEquilib_unit)

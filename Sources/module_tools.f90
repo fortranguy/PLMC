@@ -42,17 +42,17 @@ contains
 
     !> Read arguments
 
-    subroutine read_arguments(variable_seed)
+    subroutine read_arguments(seed_variable)
     
-        logical, intent(out) :: variable_seed
+        logical, intent(out) :: seed_variable
 
         character(len=4096) :: argument
         integer :: iArg, length, status
         
-        logical :: rand_initial
+        logical :: initial_rand
         
-        rand_initial = .true.
-        variable_seed = .true.
+        initial_rand = .true.
+        seed_variable = .true.
 
         do iArg = 1, command_argument_count()
 
@@ -79,8 +79,8 @@ contains
                     end select
 
                 case ("-s", "--fix-seed")
-                    variable_seed = .false.
-                    write(*, *) "variable_seed = .false."
+                    seed_variable = .false.
+                    write(*, *) "seed_variable = .false."
 
             end select
 
@@ -125,15 +125,15 @@ contains
 
     !> Random number generator : seed
     
-    subroutine init_randomSeed(variable_seed, report_unit)
+    subroutine init_randomSeed(seed_variable, report_unit)
     
-        logical, intent(in) :: variable_seed
+        logical, intent(in) :: seed_variable
         integer, intent(in) :: report_unit
     
         integer :: i, n, clock
         integer, dimension(:), allocatable :: seed
         
-        if (variable_seed) then
+        if (seed_variable) then
 
             call random_seed(size = n)
             allocate(seed(n))
