@@ -63,6 +63,7 @@ contains
             end if
             arg_init%files(iFile) = file_name
             arg_init%length(iFile) = length
+            write(*, *) arg_init%files(iFile)(1:arg_init%length(iFile))
         end do
         
     end subroutine read_init_files
