@@ -63,7 +63,6 @@ contains
             end if
             arg_init%files(iFile) = file
             arg_init%length(iFile) = length
-            write(*, *) arg_init%files(iFile)(1:arg_init%length(iFile))
         end do
         
     end subroutine read_init_files
@@ -104,10 +103,8 @@ contains
                     if (status /= 0) stop "Enter initial condition, cf. help."
                     select case (sub_argument)
                         case ("r", "random")
-                            write(*, *) "random"
                         case ("f", "files")
                             arg_init%choice = 'f'
-                            write(*, *) "files"
                             call read_init_files(iArg, arg_init)
                         case default
                             call print_help()
@@ -122,9 +119,7 @@ contains
                     if (status /= 0) stop "Enter seed definition, cf. help."
                     select case (sub_argument)
                         case ("v", "variable")
-                            write(*, *) "variable"
                         case ("f", "fix")
-                            write(*, *) "fix"
                             arg_seed%choice = 'f'
                         case default
                             call print_help()
