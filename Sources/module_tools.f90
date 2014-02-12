@@ -44,8 +44,8 @@ contains
         write(output_unit, *) "    -i, --intial CONDITION   CONDITION='r', 'random' (default)"
         write(output_unit, *) "                             CONDITION='f', 'files' [dipol_positions] "
         write(output_unit, *) "                             [dipol_orientations] [hardS_positions]"
-        write(output_unit, *) "    -s, --seed VAUE          VAUE='r', 'variable' (default)"
-        write(output_unit, *) "                             VAUE='f', 'fix'"
+        write(output_unit, *) "    -s, --seed STATE         STATE='v', 'variable' (default)"
+        write(output_unit, *) "                             STATE='f', 'fix'"
         write(output_unit, *)
         write(output_unit, *) "Report bugs to <salomon.chung@u-pe.fr>."
     
