@@ -65,13 +65,15 @@ contains
                     stop
 
                 case ("-i", "--initial")
-                    call get_command_argument(iArg+1, sub_argument, length, status)
+                    iArg = iArg + 1
+                    call get_command_argument(iArg, sub_argument, length, status)
                     if (status /= 0) stop "Enter initial condition, cf. help."
                     select case (sub_argument)
                         case ("r", "random")
                             write(*, *) "random"
                         case ("f", "files")
                             write(*, *) "files"
+                            iArg = iArg + 3
                         case default
                             call print_help()
                             stop
