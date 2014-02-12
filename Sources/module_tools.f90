@@ -43,6 +43,30 @@ contains
     
     end subroutine print_help
 
+    subroutine read_init_files(iArg, arg_init)
+
+        integer, intent(inout) :: iArg
+        type(argument_initial), intent(inout) :: arg_init
+
+        character(len=4096) :: file_name
+        integer :: iFile, length, status
+        logical :: present
+
+        do iFile = 1, 3
+            iArg = iArg + 1
+            call get_command_argument(iArg, file_name, length, status)
+            if (status /= 0) stop "no file"
+            inquire(file=file_name(1:length), exist=present)
+            if (.not.present) then
+                write(error_unit, *) "missing file: ", file_name(1:length)
+                stop
+            end if
+            arg_init%files(iFile) = file_name
+            arg_init%length(iFile) = length
+        end do
+        
+    end subroutine read_init_files
+
     !> Read arguments
 
     subroutine read_arguments(arg_seed, arg_init)
@@ -50,8 +74,8 @@ contains
         type(argument_seed), intent(out) :: arg_seed
         type(argument_initial), intent(out) :: arg_init
 
-        character(len=4096) :: argument, sub_argument, file_name
-        integer :: iArg, iFile, length, status
+        character(len=4096) :: argument, sub_argument
+        integer :: iArg, length, status
         logical :: seed_redefined, init_redefined
 
         arg_seed%choice = 'v'
@@ -83,10 +107,7 @@ contains
                         case ("f", "files")
                             arg_init%choice = 'f'
                             write(*, *) "files"
-                            do iFile = 1, 3
-                                iArg = iArg + 1
-                                call get_command_argument(iArg, file_name, length, status)
-                            end do
+                            call read_init_files(iArg, arg_init)
                         case default
                             call print_help()
                             stop
