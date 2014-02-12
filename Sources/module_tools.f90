@@ -46,13 +46,14 @@ contains
     
         logical, intent(out) :: seed_variable, initial_rand
 
-        character(len=4096) :: argument
+        character(len=4096) :: argument, sub_argument
         integer :: iArg, length, status
 
         seed_variable = .true.
         initial_rand = .true.
 
-        do iArg = 1, command_argument_count()
+        iArg = 1
+        do while(iArg <= command_argument_count())
 
             call get_command_argument(iArg, argument, length, status)
             if (status /= 0) stop "error get_command_argument"
@@ -64,9 +65,9 @@ contains
                     stop
 
                 case ("-i", "--initial")
-                    call get_command_argument(iArg+1, argument, length, status)
+                    call get_command_argument(iArg+1, sub_argument, length, status)
                     if (status /= 0) stop "Enter initial condition, cf. help."
-                    select case (argument)
+                    select case (sub_argument)
                         case ("r", "random")
                             write(*, *) "random"
                         case ("f", "files")
@@ -80,7 +81,13 @@ contains
                     seed_variable = .false.
                     write(*, *) "seed_variable = .false."
 
+                case default
+                    write(error_unit, *) "Unknown option: '", trim(argument), "'"
+                    stop
+
             end select
+
+            iArg = iArg + 1
 
         end do
 
