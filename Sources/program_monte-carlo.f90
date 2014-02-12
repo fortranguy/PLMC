@@ -12,8 +12,9 @@ use class_dipolarSpheres
 use class_mixingPotential
 use class_observables
 use class_units
+use module_types, only : argument_seed, argument_initial
 use module_algorithms, only : move, widom, rotate
-use module_tools, only : argument_seed, argument_initial, read_arguments, open_units, mix_open_units, &
+use module_tools, only : read_arguments, open_units, mix_open_units, &
                          init_randomSeed, set_initialCondition, print_report, mix_init, mix_final, &
                          init, final, adapt_move, adapt_rotate, test_consist, print_results
 

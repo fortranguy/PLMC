@@ -8,6 +8,7 @@ use data_constants, only : PI, sigma3d
 use data_box, only : Ndim, Lsize, Kmax
 use data_monteCarlo, only : Temperature, Nadapt, Nstep, decorrelFactor, Nthermal
 use data_potential, only : print_potential
+use module_types, only : argument_seed, argument_initial
 use module_physics, only : dist_PBC, random_surface
 use class_hardSpheres
 use class_interactingSpheres
@@ -17,15 +18,6 @@ use class_observables
 use class_units
 
 implicit none
-
-type, public :: argument_seed
-    character(len=1) :: choice
-end type argument_seed
-
-type, public :: argument_initial
-    character(len=1) :: choice
-    character(len=4096), dimension(3) :: files
-end type argument_initial
 
 private
 public read_arguments, open_units, mix_open_units, init_randomSeed, set_initialCondition, &
@@ -58,8 +50,8 @@ contains
         type(argument_seed), intent(out) :: arg_seed
         type(argument_initial), intent(out) :: arg_init
 
-        character(len=4096) :: argument, sub_argument
-        integer :: iArg, length, status
+        character(len=4096) :: argument, sub_argument, file_name
+        integer :: iArg, iFile, length, status
         logical :: seed_redefined, init_redefined
 
         arg_seed%choice = 'v'
@@ -91,7 +83,10 @@ contains
                         case ("f", "files")
                             arg_init%choice = 'f'
                             write(*, *) "files"
-                            iArg = iArg + 3
+                            do iFile = 1, 3
+                                iArg = iArg + 1
+                                call get_command_argument(iArg, file_name, length, status)
+                            end do
                         case default
                             call print_help()
                             stop

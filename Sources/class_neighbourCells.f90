@@ -6,20 +6,11 @@ use, intrinsic :: iso_fortran_env, only : error_unit
 use data_precisions, only : DP, real_zero
 use data_box, only : Ndim, Lsize
 use data_neighbourCells, only : NnearCell_dim, NnearCell
+use module_types, only : Node, LinkedList
 use module_physics, only : index_from_coord, coord_PBC
 
 implicit none
 private
-public :: Node
-
-    type Node
-        integer :: iCol
-        type(Node), pointer :: next => null()
-    end type Node
-    
-    type LinkedList
-        type(Node), pointer :: particle => null()
-    end type LinkedList
 
     type, public :: NeighbourCells
     

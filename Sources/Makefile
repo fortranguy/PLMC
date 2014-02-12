@@ -68,14 +68,15 @@ data.o: data_copy.f90
 
 module_physics.o : data_precisions.mod data_constants.mod data_box.mod
 class_neighbourCells.o : data_precisions.mod data_box.mod data_neighbourCells.mod \
-                         module_physics.o
+                         module_types.o module_physics.o
 class_hardSpheres.o : data_precisions.mod data_constants.mod data_box.mod data_particles.mod \
                       data_monteCarlo.mod data_potential.mod data_neighbourCells.mod \
-                      data_distribution.mod module_physics.o \
+                      data_distribution.mod \
+                      module_types.o module_physics.o \
                       class_neighbourCells.o
 class_interactingSpheres.o : data_precisions.mod data_box.mod data_particles.mod data_monteCarlo.mod \
                              data_potential.mod data_neighbourCells.mod data_distribution.mod \
-                             module_physics.o \
+                             module_types.o module_physics.o \
                              class_neighbourCells.o class_hardSpheres.o
 class_dipolarSpheres.o : data_precisions.mod data_constants.mod data_box.mod data_particles.mod \
                          data_monteCarlo.mod data_potential.mod data_neighbourCells.mod \
@@ -84,7 +85,7 @@ class_dipolarSpheres.o : data_precisions.mod data_constants.mod data_box.mod dat
                          class_neighbourCells.o class_hardSpheres.o
 class_mixingPotential.o : data_precisions.mod data_box.mod data_particles.mod data_potential.mod \
                           data_neighbourCells.mod \
-                          module_physics.o \
+                          module_physics.o module_physics.o \
                           class_neighbourCells.o class_hardSpheres.o
 class_observables.o : data_precisions.mod data_box.mod data_monteCarlo.mod
 module_algorithms.o : data_precisions.mod data_box.mod data_monteCarlo.mod \
@@ -92,13 +93,14 @@ module_algorithms.o : data_precisions.mod data_box.mod data_monteCarlo.mod \
                       class_observables.mod class_hardSpheres.o class_interactingSpheres.o \
                       class_dipolarSpheres.o class_mixingPotential.o
 module_tools.o : data_precisions.mod data_box.mod data_monteCarlo.mod \
-                 module_physics.o \
+                 module_types.o module_physics.o \
                  class_hardSpheres.o class_interactingSpheres.o class_dipolarSpheres.o \
                  class_mixingPotential.o class_observables.o class_units.o
 module_distribution.o : data_precisions.mod data_constants.mod data_distribution.mod
 
 # -----------------------------------------------
-
+module_types.o : module_types.f90
+	$(FC) -c $(FFLAGS) $< -o $@
 module_physics.o : module_physics.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_neighbourCells.o : class_neighbourCells.f90
@@ -129,7 +131,7 @@ program_monte-carlo.o : program_monte-carlo.f90
 $(EXEC1) : data.o module_physics.o class_neighbourCells.o class_hardSpheres.o \
            class_interactingSpheres.o class_dipolarSpheres.o class_mixingPotential.o \
            class_observables.o class_units.o \
-           module_algorithms.o module_tools.o program_monte-carlo.o
+           module_types.o module_algorithms.o module_tools.o program_monte-carlo.o
 	$(FC) $^ $(LDFLAGS) -o $@
 
 # ------------------------------------------------------------------------

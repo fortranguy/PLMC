@@ -10,6 +10,7 @@ use data_potential, only : inter_rMin_factor, inter_rCut, inter_dr, inter_epsilo
 use data_monteCarlo, only : inter_move_delta, inter_move_rejectFix, inter_Nwidom
 use data_neighbourCells, only : NnearCell
 use data_distribution, only : inter_snap_factor
+use module_types, only : Node
 use module_physics, only : set_discrete_length, dist_PBC, Epot_yukawa
 use class_neighbourCells
 use class_hardSpheres
