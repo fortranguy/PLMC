@@ -48,9 +48,13 @@ contains
 
         character(len=4096) :: argument, sub_argument
         integer :: iArg, length, status
+        logical :: seed_defined, initial_defined
 
         seed_variable = .true.
         initial_rand = .true.
+
+        seed_defined = .false.
+        initial_defined = .false.
 
         iArg = 1
         do while(iArg <= command_argument_count())
@@ -65,6 +69,7 @@ contains
                     stop
 
                 case ("-i", "--initial")
+                    if (initial_defined) stop "Error : initial condition already defined."
                     iArg = iArg + 1
                     call get_command_argument(iArg, sub_argument, length, status)
                     if (status /= 0) stop "Enter initial condition, cf. help."
@@ -78,10 +83,13 @@ contains
                             call print_help()
                             stop
                     end select
+                    initial_defined = .true.
 
                 case ("-s", "--fix-seed")
+                    if (seed_defined) stop "Error : seed already defined."
                     seed_variable = .false.
                     write(*, *) "seed_variable = .false."
+                    seed_defined = .true.
 
                 case default
                     write(error_unit, *) "Unknown option: '", trim(argument), "'"
