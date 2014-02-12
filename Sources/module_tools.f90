@@ -137,8 +137,6 @@ contains
 
         end do
 
-        stop "end of read_arguments"
-
     end subroutine read_arguments
 
     !> Total : open units
