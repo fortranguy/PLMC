@@ -49,9 +49,9 @@ implicit none
     type(Observables) :: type2_obs
     type(Units) :: type2_units
     
-    logical :: seed_variable
+    logical :: seed_variable, initial_rand
 
-    call read_arguments(seed_variable)
+    call read_arguments(seed_variable, initial_rand)
 
     call type1_spheres%construct()
     call type2_spheres%construct()

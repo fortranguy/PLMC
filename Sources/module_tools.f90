@@ -42,17 +42,15 @@ contains
 
     !> Read arguments
 
-    subroutine read_arguments(seed_variable)
+    subroutine read_arguments(seed_variable, initial_rand)
     
-        logical, intent(out) :: seed_variable
+        logical, intent(out) :: seed_variable, initial_rand
 
         character(len=4096) :: argument
         integer :: iArg, length, status
-        
-        logical :: initial_rand
-        
-        initial_rand = .true.
+
         seed_variable = .true.
+        initial_rand = .true.
 
         do iArg = 1, command_argument_count()
 
