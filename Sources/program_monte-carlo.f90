@@ -86,7 +86,7 @@ implicit none
     
     ! Initial condition
     
-    call set_initialCondition(type1_spheres, type2_spheres, mix%get_sigma(), report_unit)
+    call set_initialCondition(arg_init, type1_spheres, type2_spheres, mix%get_sigma(), report_unit)
     
     call mix_init(mix, type1_spheres, type2_spheres, mix_Epot_unit, mix_Epot)
     call mix%print_report(mix_report_unit)

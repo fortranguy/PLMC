@@ -48,20 +48,20 @@ contains
         integer, intent(inout) :: iArg
         type(argument_initial), intent(inout) :: arg_init
 
-        character(len=4096) :: file_name
+        character(len=4096) :: file
         integer :: iFile, length, status
-        logical :: present
+        logical :: exist
 
         do iFile = 1, 3
             iArg = iArg + 1
-            call get_command_argument(iArg, file_name, length, status)
+            call get_command_argument(iArg, file, length, status)
             if (status /= 0) stop "no file"
-            inquire(file=file_name(1:length), exist=present)
-            if (.not.present) then
-                write(error_unit, *) "missing file: ", file_name(1:length)
+            inquire(file=file(1:length), exist=exist)
+            if (.not.exist) then
+                write(error_unit, *) "missing file: ", file(1:length)
                 stop
             end if
-            arg_init%files(iFile) = file_name
+            arg_init%files(iFile) = file
             arg_init%length(iFile) = length
             write(*, *) arg_init%files(iFile)(1:arg_init%length(iFile))
         end do
@@ -211,53 +211,39 @@ contains
     
     !> Initial condition
     
-    subroutine set_initialCondition(dipolar, spherical, mix_sigma, report_unit)
-    
+    subroutine set_initialCondition(arg_init, dipolar, spherical, mix_sigma, report_unit)
+
+        type(argument_initial), intent(in) :: arg_init
         class(DipolarSpheres), intent(inout) :: dipolar
         class(HardSpheres), intent(inout) :: spherical
         real(DP), intent(in) :: mix_sigma
         integer, intent(in) :: report_unit
-
-        character(len=4096) :: init
-        integer :: length, status
         
         write(report_unit, *) "Initial condition :"
         
-        select case (command_argument_count())
+        select case (arg_init%choice)
         
-            case (1)
-            
-                call get_command_argument(1, init, length, status)
-                if (status /= 0) stop "error get_command_argument"
+            case ('r')
+                call randomDepositions(dipolar, spherical, mix_sigma)
+                call randomOrientations(dipolar%orientations, dipolar%get_Ncol())
+                write(output_unit, *) "Random depositions + random orientations"
+                write(report_unit, *) "    Random depositions + random orientations"
                 
-                select case (init)
-                    case ("rand")
-                        call randomDepositions(dipolar, spherical, mix_sigma)
-                        call randomOrientations(dipolar%orientations, dipolar%get_Ncol())
-                        write(output_unit, *) "Random depositions + random orientations"
-                        write(report_unit, *) "    Random depositions + random orientations"
-                    case default
-                        write(error_unit, *) "'", trim(init), "'", " isn't a known argument."
-                        write(error_unit, *) "Do you mean 'rand' ?"
-                        stop
-                end select
-                
-            case (3)
-            
+            case ('f')
                 write(output_unit, *) "Old configuration"
                 write(report_unit, *) "    Old configuration"
-                
-                call oldConfiguration(1, dipolar%get_name()//"_positions", dipolar%get_Ncol(), &
+                call oldConfiguration(arg_init%files(1), arg_init%length(1), &
+                                      dipolar%get_name()//"_positions", dipolar%get_Ncol(), &
                                       dipolar%positions, norm2(Lsize))
-                call oldConfiguration(2, dipolar%get_name()//"_orientations", dipolar%get_Ncol(), &
+                call oldConfiguration(arg_init%files(2), arg_init%length(2), &
+                                      dipolar%get_name()//"_orientations", dipolar%get_Ncol(), &
                                       dipolar%orientations, 1._DP)
-                call oldConfiguration(3, spherical%get_name()//"_positions", spherical%get_Ncol(), &
+                call oldConfiguration(arg_init%files(3), arg_init%length(3), &
+                                      spherical%get_name()//"_positions", spherical%get_Ncol(), &
                                       spherical%positions, norm2(Lsize))
             
             case default
-                write(error_unit, *) "Enter the initial condition : "
-                write(error_unit, *) &
-                    "   'rand' or '[dipolar_positions] [dipolar_orientations] [spherical_positions]'."
+                write(error_unit, *) "Error : set_initialCondition"
                 stop
                 
         end select
@@ -333,24 +319,20 @@ contains
     
     !> From an old configuration
     
-    subroutine oldConfiguration(iFile, type_name, type_Ncol, type_coords, normMax)
+    subroutine oldConfiguration(file, length, type_name, type_Ncol, type_coords, normMax)
     
-        integer, intent(in) :: iFile
+        character(len=*), intent(in) :: file
+        integer, intent(in) :: length
         character(len=*), intent(in) :: type_name
         integer, intent(in) :: type_Ncol
         real(DP), dimension(:, :), intent(out) :: type_coords
         real(DP), intent(in) :: normMax
-    
-        character(len=20) :: file
-        integer :: length
-        integer :: fileStat, readStat
-        integer :: file_unit
+        
+        integer :: file_unit, readStat
 
         integer :: iCol
         real(DP), dimension(Ndim) :: vecDummy
         
-        call get_command_argument(iFile, file, length, fileStat)
-        if (fileStat /= 0) stop "error get_command_argument"
         write(output_unit, *) type_name, " <- ", file(1:length)
         open(newunit=file_unit, recl=4096, file=file(1:length), status='old', action='read')
         
