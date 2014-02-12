@@ -17,6 +17,16 @@ use class_observables
 use class_units
 
 implicit none
+
+type, public :: argument_seed
+    character(len=1) :: choice
+end type argument_seed
+
+type, public :: argument_initial
+    character(len=1) :: choice
+    character(len=4096), dimension(3) :: files
+end type argument_initial
+
 private
 public read_arguments, open_units, mix_open_units, init_randomSeed, set_initialCondition, &
        print_report, mix_init, mix_final, init, final, adapt_move, adapt_rotate, test_consist, &
@@ -42,19 +52,20 @@ contains
 
     !> Read arguments
 
-    subroutine read_arguments(seed_variable, initial_rand)
+    subroutine read_arguments(arg_seed, arg_init)
     
-        logical, intent(out) :: seed_variable, initial_rand
+        type(argument_seed), intent(out) :: arg_seed
+        type(argument_initial), intent(out) :: arg_init
 
         character(len=4096) :: argument, sub_argument
         integer :: iArg, length, status
-        logical :: seed_defined, initial_defined
+        logical :: seed_redefined, init_redefined
 
-        seed_variable = .true.
-        initial_rand = .true.
+        arg_seed%choice = 'v'
+        arg_init%choice = 'r'
 
-        seed_defined = .false.
-        initial_defined = .false.
+        seed_redefined = .false.
+        init_redefined = .false.
 
         iArg = 1
         do while(iArg <= command_argument_count())
@@ -69,7 +80,7 @@ contains
                     stop
 
                 case ("-i", "--initial")
-                    if (initial_defined) stop "Error : initial condition already defined."
+                    if (init_redefined) stop "Error : initial condition already defined."
                     iArg = iArg + 1
                     call get_command_argument(iArg, sub_argument, length, status)
                     if (status /= 0) stop "Enter initial condition, cf. help."
@@ -77,19 +88,29 @@ contains
                         case ("r", "random")
                             write(*, *) "random"
                         case ("f", "files")
+                            arg_init%choice = 'f'
                             write(*, *) "files"
                             iArg = iArg + 3
                         case default
                             call print_help()
                             stop
                     end select
-                    initial_defined = .true.
+                    init_redefined = .true.
 
-                case ("-s", "--fix-seed")
-                    if (seed_defined) stop "Error : seed already defined."
-                    seed_variable = .false.
+                case ("-s", "--seed")
+                    if (seed_redefined) stop "Error : seed already defined."
+                    iArg = iArg + 1
+                    call get_command_argument(iArg, sub_argument, length, status)
+                    if (status /= 0) stop "Enter seed definition, cf. help."
+                    select case (sub_argument)
+                        case ("v", "variable")
+                            write(*, *) "variable"
+                        case ("f", "fix")
+                            write(*, *) "fix"
+                            arg_seed%choice = 'f'
+                    end select                    
                     write(*, *) "seed_variable = .false."
-                    seed_defined = .true.
+                    seed_redefined = .true.
 
                 case default
                     write(error_unit, *) "Unknown option: '", trim(argument), "'"
@@ -140,15 +161,15 @@ contains
 
     !> Random number generator : seed
     
-    subroutine init_randomSeed(seed_variable, report_unit)
+    subroutine init_randomSeed(arg_seed, report_unit)
     
-        logical, intent(in) :: seed_variable
+        type(argument_seed) :: arg_seed
         integer, intent(in) :: report_unit
     
         integer :: i, n, clock
         integer, dimension(:), allocatable :: seed
         
-        if (seed_variable) then
+        if (arg_seed%choice == 'v') then
 
             call random_seed(size = n)
             allocate(seed(n))

@@ -13,9 +13,9 @@ use class_mixingPotential
 use class_observables
 use class_units
 use module_algorithms, only : move, widom, rotate
-use module_tools, only : read_arguments, open_units, mix_open_units, init_randomSeed, &
-                         set_initialCondition, print_report, mix_init, mix_final, init, final, &
-                         adapt_move, adapt_rotate, test_consist, print_results
+use module_tools, only : argument_seed, argument_initial, read_arguments, open_units, mix_open_units, &
+                         init_randomSeed, set_initialCondition, print_report, mix_init, mix_final, &
+                         init, final, adapt_move, adapt_rotate, test_consist, print_results
 
 implicit none
     
@@ -48,10 +48,11 @@ implicit none
     type(HardSpheres) :: type2_spheres
     type(Observables) :: type2_obs
     type(Units) :: type2_units
-    
-    logical :: seed_variable, initial_rand
 
-    call read_arguments(seed_variable, initial_rand)
+    type(argument_seed) :: arg_seed
+    type(argument_initial) :: arg_init
+
+    call read_arguments(arg_seed, arg_init)
 
     call type1_spheres%construct()
     call type2_spheres%construct()
@@ -69,7 +70,7 @@ implicit none
     
     call open_units(report_unit, obsThermal_unit, obsEquilib_unit)
     call print_report(Ncol, Nmove, Nrotate, report_unit)
-    call init_randomSeed(seed_variable, report_unit)
+    call init_randomSeed(arg_seed, report_unit)
     
     mix_EpotSum = 0._DP
     call mix_open_units(mix_report_unit, mix_Epot_unit, mix_obsThermal_unit, mix_obsEquilib_unit)
