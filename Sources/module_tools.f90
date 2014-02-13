@@ -93,7 +93,7 @@ contains
             iArg = iArg + 1
             call get_command_argument(iArg, argument, length, status)
             if (status /= 0) error stop "Error: read_seed_put: component"
-            read(argument(1:length), '(i10)') arg_seed_i
+            read(argument(1:length), '(i9)') arg_seed_i
             arg_seed%seed(iSeed) = arg_seed_i
         end do
 
