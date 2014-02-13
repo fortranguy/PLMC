@@ -82,7 +82,7 @@ contains
         iArg = iArg + 1
         call get_command_argument(iArg, argument, length, status)
         if (status /= 0) error stop "Error: read_seed_put"
-        read(argument(1:length), '(i2)') arg_seed_size ! limited to 99 : more ?
+        read(argument(1:length), '(i3)') arg_seed_size ! limits ?
 
         call random_seed(size = seed_size)
         if (arg_seed_size /= seed_size) error stop "error seed size"
@@ -93,7 +93,7 @@ contains
             iArg = iArg + 1
             call get_command_argument(iArg, argument, length, status)
             if (status /= 0) error stop "Error: read_seed_put: component"
-            read(argument(1:length), '(i9)') arg_seed_i
+            read(argument(1:length), '(i11)') arg_seed_i ! limits ?
             arg_seed%seed(iSeed) = arg_seed_i
         end do
 
