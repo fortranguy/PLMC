@@ -215,24 +215,41 @@ contains
     
         integer :: i, n, clock
         integer, dimension(:), allocatable :: seed
+
+        call random_seed(size = n)
+        allocate(seed(n))
+
+        select case (arg_seed%choice)
         
-        if (arg_seed%choice == 'v') then
+            case ('v')
 
-            call random_seed(size = n)
-            allocate(seed(n))
+                call system_clock(count=clock)
 
-            call system_clock(count=clock)
-            
-            seed(:) = clock + 37 * [ (i - 1, i = 1, n) ]
-            call random_seed(put = seed)
-            
-            write(report_unit, *) "Random number generator :"
-            write(report_unit ,*) "    size = ", n
-            write(report_unit ,*) "    seed = ", seed(:)
+                seed(:) = clock + 37 * [ (i - 1, i = 1, n) ]
+                call random_seed(put = seed)
 
-            deallocate(seed)
-            
-        end if
+                write(report_unit, *) "Random number generator: variable"
+
+            case ('p')
+                call random_seed(put = arg_seed%seed)
+
+                write(report_unit, *) "Random number generator: put"
+
+            case ('f')
+                write(report_unit, *) "Random number generator: fix"
+
+            case default
+                write(error_unit, *) "Error : init_randomSeed"
+                error stop
+
+        end select
+
+        call random_seed(get = seed)
+        
+        write(report_unit ,*) "    size = ", n
+        write(report_unit ,*) "    seed = ", seed(:)
+
+        deallocate(seed)
         
     end subroutine init_randomSeed
     
