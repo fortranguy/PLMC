@@ -2,7 +2,7 @@
 
 program bunching
 
-use, intrinsic :: iso_fortran_env, only : output_unit
+use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
 use data_precisions, only : DP
 use data_monteCarlo, only : Nstep
 
@@ -24,13 +24,19 @@ implicit none
     real(DP), dimension(:, :), allocatable :: dataIn
     real(DP), dimension(:, :), allocatable :: dataOut
     
-    character(len=4096) :: file_name
-    integer :: length, file_stat
+    character(len=4096) :: file
+    integer :: length, stat
+    logical :: exist
     
-    call get_command_argument(1, file_name, length, file_stat)
-    if (file_stat /= 0) error stop "error get_command_argument"
+    call get_command_argument(1, file, length, stat)
+    if (stat /= 0) error stop "error get_command_argument"
+    inquire(file=file(1:length), exist=exist)
+    if (.not.exist) then
+        write(error_unit, *) "missing file: ", file(1:length)
+        error stop
+    end if
     
-    open(newunit=obs_unit, recl=4096, file=file_name(1:length), status='old', action='read')
+    open(newunit=obs_unit, recl=4096, file=file(1:length), status='old', action='read')
     read(obs_unit, *) comment_symbol, Nobs
     write(output_unit, *) "Nobs = ", Nobs
     
@@ -47,7 +53,7 @@ implicit none
 
     NstepVar = Nstep
     
-    open(newunit=bunch_unit, recl=4096, file=file_name(1:length-4)//"_bunched.out", action='write')
+    open(newunit=bunch_unit, recl=4096, file=file(1:length-4)//"_bunched.out", action='write')
     
     do iBunching = 1, Nbunching
     

@@ -30,18 +30,24 @@ implicit none
     real(DP), dimension(:), allocatable :: dist_function
     real(DP), dimension(:, :), allocatable :: positions, orientations
     
-    character(len=4096) :: file_name
-    integer :: length, time_unit, file_stat
+    character(len=4096) :: file
+    integer :: length, time_unit, stat
+    logical :: exist
 
     real(DP) :: tIni, tFin
     !$ real(DP) :: tIni_para, tFin_para
 
     if (.not.snap) stop "Snap désactivé."
     
-    call get_command_argument(1, file_name, length, file_stat)
-    if (file_stat /= 0) error stop "error get_command_argument"
+    call get_command_argument(1, file, length, stat)
+    if (stat /= 0) error stop "error get_command_argument"
+    inquire(file=file(1:length), exist=exist)
+    if (.not.exist) then
+        write(error_unit, *) "missing file: ", file(1:length)
+        error stop
+    end if
     
-    open(newunit=positions_unit, recl=4096, file=file_name(1:length), status='old', action='read')
+    open(newunit=positions_unit, recl=4096, file=file(1:length), status='old', action='read')
     
     read(positions_unit, *) name, Ncol, snap_factor
     write(output_unit, *) name, Ncol, snap_factor
@@ -57,9 +63,15 @@ implicit none
     
     if (name == "dipol" .and. command_argument_count() == 2) then
     
-        call get_command_argument(2, file_name, length, file_stat)
-        if (file_stat /= 0) error stop "error get_command_argument"
-        open(newunit=orientations_unit, recl=4096, file=file_name(1:length), status='old', &
+        call get_command_argument(2, file, length, stat)
+        if (stat /= 0) error stop "error get_command_argument"
+        inquire(file=file(1:length), exist=exist)
+        if (.not.exist) then
+            write(error_unit, *) "missing file: ", file(1:length)
+            error stop
+        end if
+        
+        open(newunit=orientations_unit, recl=4096, file=file(1:length), status='old', &
         action='read')
         
         read(orientations_unit, *) nameBis, NcolBis, snap_factorBis
