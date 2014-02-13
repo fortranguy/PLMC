@@ -154,6 +154,7 @@ contains
                         case ("f", "fix")
                             arg_seed%choice = 'f'
                         case ("p", "put")
+                            arg_seed%choice = 'p'
                             call read_seed_put(iArg, arg_seed)
                         case default
                             call print_help()
