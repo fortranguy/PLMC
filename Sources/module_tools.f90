@@ -229,6 +229,9 @@ contains
                 seed(:) = clock + 37 * [ (i - 1, i = 1, n) ]
                 call random_seed(put = seed)
 
+                ! not sufficent ? cf.
+                ! http://gcc.gnu.org/onlinedocs/gfortran/RANDOM_005fSEED.html
+
                 write(report_unit, *) "Random number generator: variable"
 
             case ('p')
