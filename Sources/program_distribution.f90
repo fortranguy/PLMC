@@ -39,7 +39,7 @@ implicit none
     if (.not.snap) stop "Snap désactivé."
     
     call get_command_argument(1, file_name, length, file_stat)
-    if (file_stat /= 0) stop "error get_command_argument"
+    if (file_stat /= 0) error stop "error get_command_argument"
     
     open(newunit=positions_unit, recl=4096, file=file_name(1:length), status='old', action='read')
     
@@ -58,14 +58,14 @@ implicit none
     if (name == "dipol" .and. command_argument_count() == 2) then
     
         call get_command_argument(2, file_name, length, file_stat)
-        if (file_stat /= 0) stop "error get_command_argument"
+        if (file_stat /= 0) error stop "error get_command_argument"
         open(newunit=orientations_unit, recl=4096, file=file_name(1:length), status='old', &
         action='read')
         
         read(orientations_unit, *) nameBis, NcolBis, snap_factorBis
         if (nameBis/=name .or. NcolBis/=Ncol .or. snap_factorBis/=snap_factor) then
             write(error_unit, *) "Error : positions and orientations tags don't match."
-            stop
+            error stop
         end if
         
         allocate(orientations(Ndim, Ncol))

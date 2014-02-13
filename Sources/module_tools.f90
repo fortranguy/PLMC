@@ -55,11 +55,11 @@ contains
         do iFile = 1, 3
             iArg = iArg + 1
             call get_command_argument(iArg, file, length, status)
-            if (status /= 0) stop "no file"
+            if (status /= 0) error stop "no file"
             inquire(file=file(1:length), exist=exist)
             if (.not.exist) then
                 write(error_unit, *) "missing file: ", file(1:length)
-                stop
+                error stop
             end if
             arg_init%files(iFile) = file
             arg_init%length(iFile) = length
@@ -88,7 +88,7 @@ contains
         do while(iArg <= command_argument_count())
 
             call get_command_argument(iArg, argument, length, status)
-            if (status /= 0) stop "error get_command_argument"
+            if (status /= 0) error stop "Error: read_arguments"
 
             select case (argument)
 
@@ -97,10 +97,10 @@ contains
                     stop
 
                 case ("-i", "--initial")
-                    if (init_redefined) stop "Error : initial condition already defined."
+                    if (init_redefined) error stop "Error: initial condition already defined."
                     iArg = iArg + 1
                     call get_command_argument(iArg, sub_argument, length, status)
-                    if (status /= 0) stop "Enter initial condition, cf. help."
+                    if (status /= 0) error stop "Enter initial condition, cf. help."
                     select case (sub_argument)
                         case ("r", "random")
                         case ("f", "files")
@@ -108,28 +108,28 @@ contains
                             call read_init_files(iArg, arg_init)
                         case default
                             call print_help()
-                            stop
+                            error stop
                     end select
                     init_redefined = .true.
 
                 case ("-s", "--seed")
-                    if (seed_redefined) stop "Error : seed already defined."
+                    if (seed_redefined) error stop "Error : seed already defined."
                     iArg = iArg + 1
                     call get_command_argument(iArg, sub_argument, length, status)
-                    if (status /= 0) stop "Enter seed definition, cf. help."
+                    if (status /= 0) error stop "Enter seed definition, cf. help."
                     select case (sub_argument)
                         case ("v", "variable")
                         case ("f", "fix")
                             arg_seed%choice = 'f'
                         case default
                             call print_help()
-                            stop
+                            error stop
                     end select
                     seed_redefined = .true.
 
                 case default
                     write(error_unit, *) "Unknown option: '", trim(argument), "'"
-                    stop
+                    error stop
 
             end select
 
@@ -237,7 +237,7 @@ contains
             
             case default
                 write(error_unit, *) "Error : set_initialCondition"
-                stop
+                error stop
                 
         end select
         
@@ -344,13 +344,13 @@ contains
                     write(error_unit, *) "Norm error in file: ", file(1:length)
                     write(error_unit, *) "Coordinates ", type_coords(:, iCol)
                     write(error_unit, *) "Norm =", norm2(type_coords(:, iCol))
-                    stop
+                    error stop
                 end if
             end do
         else
             write(error_unit, *) "Error reading: ", file(1:length)
             write(error_unit, *) "iCol", iCol, " /= ", "type_Ncol", type_Ncol
-            stop
+            error stop
         end if
         
         close(file_unit)

@@ -28,7 +28,7 @@ implicit none
     integer :: length, file_stat
     
     call get_command_argument(1, file_name, length, file_stat)
-    if (file_stat /= 0) stop "error get_command_argument"
+    if (file_stat /= 0) error stop "error get_command_argument"
     
     open(newunit=obs_unit, recl=4096, file=file_name(1:length), status='old', action='read')
     read(obs_unit, *) comment_symbol, Nobs
