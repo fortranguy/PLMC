@@ -178,7 +178,7 @@ contains
                 if (r_mix < this%rMin) then
                     write(error_unit, *) this%name, " :    Overlap !", type1_iCol, type2_iCol
                     write(error_unit, *) "    r_mix = ", r_mix
-                    stop
+                    error stop
                 end if
 
             end do

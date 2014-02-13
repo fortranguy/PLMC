@@ -167,7 +167,7 @@ contains
             if (this%cell_size(jDim) < rCut) then
                 write(error_unit, *) "    rCut too big in the dimension", jDim, ":"
                 write(error_unit, *) "    ", this%cell_size(jDim), "<", rCut
-                stop
+                error stop
             end if
             
             if (this%NtotalCell_dim(jDim) < NnearCell_dim(jDim)) then

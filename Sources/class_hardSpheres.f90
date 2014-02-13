@@ -380,7 +380,7 @@ contains
                 if (r_ij < this%rMin) then
                     write(error_unit, *) this%name, "    Overlap !", iCol, jCol
                     write(error_unit, *) "    r_ij = ", r_ij
-                    stop
+                    error stop
                 end if
                     
             end do
