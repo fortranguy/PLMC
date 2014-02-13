@@ -341,14 +341,14 @@ contains
             do iCol = 1, type_Ncol
                 read(file_unit, *) type_coords(:, iCol)
                 if (norm2(type_coords(:, iCol)) > normMax+io_tiny) then
-                    write(error_unit, *) "Norm error : ", file(1:length)
+                    write(error_unit, *) "Norm error in file: ", file(1:length)
                     write(error_unit, *) "Coordinates ", type_coords(:, iCol)
-                    write(error_unit, *) "Norm", norm2(type_coords(:, iCol))
+                    write(error_unit, *) "Norm =", norm2(type_coords(:, iCol))
                     stop
                 end if
             end do
         else
-            write(error_unit, *) "Error reading : ", file(1:length)
+            write(error_unit, *) "Error reading: ", file(1:length)
             write(error_unit, *) "iCol", iCol, " /= ", "type_Ncol", type_Ncol
             stop
         end if
