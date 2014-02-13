@@ -38,6 +38,8 @@ contains
         write(output_unit, *) "                             [dipol_orientations] [hardS_positions]"
         write(output_unit, *) "    -s, --seed STATE         STATE='v', 'variable' (default)"
         write(output_unit, *) "                             STATE='f', 'fix'"
+        write(output_unit, *) "                             STATE='p', 'put' [size] [seed_1]...[seed_n]"
+        write(output_unit, *) "                                              Warning: compiler-dependent"
         write(output_unit, *)
         write(output_unit, *) "Report bugs to <salomon.chung@u-pe.fr>."
     
@@ -66,6 +68,27 @@ contains
         end do
         
     end subroutine read_init_files
+
+    subroutine read_seed_put(iArg, arg_seed)
+
+        integer, intent(inout) :: iArg
+        type(argument_seed), intent(inout) :: arg_seed
+        
+        character(len=4096) :: argument
+        integer :: iFile, length, status, seed_size
+        integer :: arg_size
+        
+        iArg = iArg + 1
+        call get_command_argument(iArg, argument, length, status)
+        if (status /= 0) error stop "Error: read_seed_put"
+        read(argument(1:length), '(i)') arg_size
+        
+        call random_seed(size = seed_size)
+        if (arg_size /= seed_size) error stop "error seed size"
+
+        stop
+
+    end subroutine read_seed_put
 
     !> Read arguments
 
@@ -116,11 +139,13 @@ contains
                     if (seed_redefined) error stop "Error : seed already defined."
                     iArg = iArg + 1
                     call get_command_argument(iArg, sub_argument, length, status)
-                    if (status /= 0) error stop "Enter seed definition, cf. help."
+                    if (status /= 0) error stop "Enter seed choice, cf. help."
                     select case (sub_argument)
                         case ("v", "variable")
                         case ("f", "fix")
                             arg_seed%choice = 'f'
+                        case ("p", "put")
+                            call read_seed_put(iArg, arg_seed)
                         case default
                             call print_help()
                             error stop
@@ -193,8 +218,8 @@ contains
             call random_seed(put = seed)
             
             write(report_unit, *) "Random number generator :"
-            write(report_unit ,*) "    n = ", n
-            write(report_unit ,*) "    seed(:) = ", seed(:)
+            write(report_unit ,*) "    size = ", n
+            write(report_unit ,*) "    seed = ", seed(:)
 
             deallocate(seed)
             

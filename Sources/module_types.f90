@@ -6,6 +6,8 @@ implicit none
 
 type, public :: argument_seed
     character(len=1) :: choice
+    integer :: size
+    integer, dimension(:), allocatable :: seed
 end type argument_seed
 
 type, public :: argument_initial
