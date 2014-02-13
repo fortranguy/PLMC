@@ -240,8 +240,7 @@ contains
                 write(report_unit, *) "Random number generator: fix"
 
             case default
-                write(error_unit, *) "Error : init_randomSeed"
-                error stop
+                error stop "Error : init_randomSeed"                
 
         end select
 
@@ -288,8 +287,7 @@ contains
                                       spherical%positions, norm2(Lsize))
             
             case default
-                write(error_unit, *) "Error : set_initialCondition"
-                error stop
+                error stop "Error : set_initialCondition"                
                 
         end select
         
