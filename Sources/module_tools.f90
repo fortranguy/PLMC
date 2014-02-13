@@ -97,8 +97,6 @@ contains
             arg_seed%seed(iSeed) = arg_seed_i
         end do
 
-        stop
-
     end subroutine read_seed_put
 
     !> Read arguments
