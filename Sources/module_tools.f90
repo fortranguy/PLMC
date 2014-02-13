@@ -75,16 +75,27 @@ contains
         type(argument_seed), intent(inout) :: arg_seed
         
         character(len=4096) :: argument
-        integer :: iFile, length, status, seed_size
-        integer :: arg_size
+        integer :: length, status
+        integer :: seed_size, arg_seed_size
+        integer :: iSeed, arg_seed_i
         
         iArg = iArg + 1
         call get_command_argument(iArg, argument, length, status)
         if (status /= 0) error stop "Error: read_seed_put"
-        read(argument(1:length), '(i)') arg_size
-        
+        read(argument(1:length), '(i2)') arg_seed_size ! limited to 99 : more ?
+
         call random_seed(size = seed_size)
-        if (arg_size /= seed_size) error stop "error seed size"
+        if (arg_seed_size /= seed_size) error stop "error seed size"
+
+        allocate(arg_seed%seed(seed_size))
+
+        do iSeed = 1, seed_size
+            iArg = iArg + 1
+            call get_command_argument(iArg, argument, length, status)
+            if (status /= 0) error stop "Error: read_seed_put: component"
+            read(argument(1:length), '(i10)') arg_seed_i
+            arg_seed%seed(iSeed) = arg_seed_i
+        end do
 
         stop
 
