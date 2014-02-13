@@ -85,7 +85,7 @@ class_dipolarSpheres.o : data_precisions.mod data_constants.mod data_box.mod dat
                          class_neighbourCells.o class_hardSpheres.o
 class_mixingPotential.o : data_precisions.mod data_box.mod data_particles.mod data_potential.mod \
                           data_neighbourCells.mod \
-                          module_physics.o module_physics.o \
+                          module_types.o module_physics.o \
                           class_neighbourCells.o class_hardSpheres.o
 class_observables.o : data_precisions.mod data_box.mod data_monteCarlo.mod
 module_algorithms.o : data_precisions.mod data_box.mod data_monteCarlo.mod \
