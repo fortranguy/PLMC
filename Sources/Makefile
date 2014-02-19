@@ -1,7 +1,6 @@
 # Monte-Carlo simulation Makefile
 
 ifeq ($(compiler), gfortran)
-
 	FC = gfortran
 	# default: debug
 	FFLAGS = -W -Wall -fbounds-check -g
@@ -14,10 +13,8 @@ ifeq ($(compiler), gfortran)
 	ifeq ($(omp), true)
         FFLAGS += -fopenmp
         LDFLAGS = -fopenmp
-    endif
-	
+    endif	
 else
-
 	FC = ifort
 	# default: debug
 	FFLAGS = -warn all -check all -check noarg_temp_created -fltconsistency -g
@@ -30,8 +27,7 @@ else
 	ifeq ($(omp), true)
         FFLAGS += -openmp
         LDFLAGS = -openmp
-    endif
-	
+    endif	
 endif
 
 # Default
@@ -78,11 +74,15 @@ module_tools.o: module_tools.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 module_distribution.o: module_distribution.f90
 	$(FC) -c $(FFLAGS) $< -o $@
-
-# ------------------------------------------------------------------------
-
 program_monte-carlo.o: program_monte-carlo.f90
 	$(FC) -c $(FFLAGS) $< -o $@
+program_bunching.o: program_bunching.f90
+	$(FC) -c $(FFLAGS) $< -o $@
+program_distribution.o: program_distribution.f90
+	$(FC) -c $(FFLAGS) $< -o $@
+	
+# ------------------------------------------------------------------------
+
 $(EXEC1): data.o \
           module_types.o module_physics.o \
           class_neighbourCells.o \
@@ -92,18 +92,10 @@ $(EXEC1): data.o \
           module_algorithms.o module_tools.o \
           program_monte-carlo.o
 	$(FC) $^ $(LDFLAGS) -o $@
-
-# ------------------------------------------------------------------------
-
-program_bunching.o: program_bunching.f90
-	$(FC) -c $(FFLAGS) $< -o $@
+	
 $(EXEC2): data.o program_bunching.o
 	$(FC) $^ $(LDFLAGS) -o $@
-
-# ------------------------------------------------------------------------
-
-program_distribution.o: program_distribution.f90
-	$(FC) -c $(FFLAGS) $< -o $@
+	
 $(EXEC3): data.o module_physics.o module_distribution.o program_distribution.o
 	$(FC) $^ $(LDFLAGS) -o $@
 
