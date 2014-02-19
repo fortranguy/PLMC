@@ -23,7 +23,7 @@ implicit none
     ! Monte-Carlo variables
     integer :: iStep, iChange, iChangeRand !< counters
     integer :: Ncol, iColRand !< number of particles & random particle
-    integer :: Nmove, Nrotate !< number of changes
+    integer :: Nmove, Nswitch, Nrotate !< number of changes
     real(DP) :: random !< random number between 0 and 1
     real(DP) :: tIni, tFin !< CPU initial and final time
     
@@ -61,6 +61,7 @@ implicit none
     
     Ncol = type1_spheres%get_Ncol() + type2_spheres%get_Ncol()
     Nmove = decorrelFactor * Ncol
+    Nswitch = Nmove
     Nrotate = decorrelFactor * type1_spheres%get_Ncol()
     
 ! Beginning ----------------------------------------------------------------------------------------
