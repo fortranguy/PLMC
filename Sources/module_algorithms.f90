@@ -106,19 +106,14 @@ contains
                     this_obs%Epot = this_obs%Epot + this_deltaEpot
                     mix_Epot = mix_Epot + mix_deltaEpot
                     
-                    write(*, *) "m", this%get_name(), iOld, other%get_name()
-                    write(*, *) "m-1-", this_iCellOld, this_iCellNew
                     if (this_iCellOld /= this_iCellNew) then
                         call this%sameCells%remove_col_from_cell(iOld, this_iCellOld)
                         call this%sameCells%add_col_to_cell(iOld, this_iCellNew)
                     end if
-                    write(*, *) "m-2-", mix_iCellOld, mix_iCellNew
                     if (mix_iCellOld /= mix_iCellNew) then
                         call other%mixCells%remove_col_from_cell(iOld, mix_iCellOld)
                         call other%mixCells%add_col_to_cell(iOld, mix_iCellNew)
                     end if
-                    write(*, *) "m-3-"
-                    write(*, *) "m---"
                     
                 else
                     this_obs%move_Nreject = this_obs%move_Nreject + 1
@@ -309,19 +304,14 @@ contains
                 call this%reci_update_structure_exchange(xNew, +mCol)
         end select
         
-        write(*, *) "s-1-"
         if (indicesOld(1) /= indicesNew(1)) then
             call this%sameCells%remove_col_from_cell(this_iCol, indicesOld(1))
             call this%sameCells%add_col_to_cell(this_iCol, indicesNew(1))
         end if
-        write(*, *) "s-2-"
-        if (indicesOld(2)==2507) write(*, *) "s-in"
         if (indicesOld(2) /= indicesNew(2)) then
             call other%mixCells%remove_col_from_cell(this_iCol, indicesOld(2))
             call other%mixCells%add_col_to_cell(this_iCol, indicesNew(2))
         end if
-        write(*, *) "s-3-"
-        write(*, *) "s---"
         
     end subroutine after_switch_update
     
@@ -383,7 +373,6 @@ contains
                 call random_number(random)
                 if (random < exp(-deltaEpot/Temperature)) then
                 
-                    write(*, *) "s", type1%get_name(), type2%get_name()
                     call after_switch_update(type1, type1_iCol, type1_indicesOld, type1_indicesNew, &
                                              type1_xOld, type1_xNew, type2)
                     call after_switch_update(type2, type2_iCol, type2_indicesOld, type2_indicesNew, &
