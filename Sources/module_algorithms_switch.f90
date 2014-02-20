@@ -31,38 +31,38 @@
         
     end subroutine before_switch_energy
     
-    subroutine after_switch_energy(this, this_iCol, other, other_iCol, mix, iCellNew, mix_iCellNew, &
-                                   overlap, EpotNew, mix_EpotNew)
+    subroutine after_switch_energy(this, this_iCol, other, other_iCol, mix, indicesNew, overlap, &
+                                   EpotsNew)
         
         class(HardSpheres), intent(in) :: this, other
         class(MixingPotential), intent(in) :: mix
         integer, intent(in) :: this_iCol, other_iCol
-        integer, intent(ou) :: iCellNew, mix_iCellNew
+        integer, dimension(:), intent(out) :: indicesNew
         logical, intent(out) :: overlap
-        real(DP), intent(out) :: EpotNew, mix_EpotNew
+        real(DP), dimension(:), intent(out) :: EpotsNew
         
         real(DP), dimension(Ndim) :: xNew, mCol
         
         xNew(:) = other%positions(:, other_iCol)
         
         if (this%get_Ncol() >= other%get_Ncol()) then ! optimisation : more chance to overlap
-            iCellNew = this%sameCells%index_from_position(xNew)
-            call this%Epot_neighCells(this_iCol, xNew, iCellNew, overlap, EpotNew)
+            indicesNew(1) = this%sameCells%index_from_position(xNew)
+            call this%Epot_neighCells(this_iCol, xNew, indicesNew(1), overlap, EpotsNew(1))
         else
-            mix_iCellNew = this%mixCells%index_from_position(xNew)
-            call mix%Epot_neighCells(other_iCol, xNew, mix_iCellNew, this%mixCells, other%positions, &
-                                     overlap, mix_EpotNew)
+            indicesNew(2) = this%mixCells%index_from_position(xNew)
+            call mix%Epot_neighCells(other_iCol, xNew, indicesNew(2), this%mixCells, other%positions, &
+                                     overlap, EpotsNew(2))
         end if
         
         if (.not. overlap) then
         
             if (this%get_Ncol() >= other%get_Ncol()) then
-                mix_iCellNew = this%mixCells%index_from_position(xNew)
-                call mix%Epot_neighCells(other_iCol, xNew, mix_iCellNew, this%mixCells, &
-                                         other%positions, overlap, mix_EpotNew)
+                indicesNew(2) = this%mixCells%index_from_position(xNew)
+                call mix%Epot_neighCells(other_iCol, xNew, indicesNew(2), this%mixCells, &
+                                         other%positions, overlap, EpotsNew(2))
             else
-                iCellNew = this%sameCells%index_from_position(xNew)
-                call this%Epot_neighCells(this_iCol, xNew, iCellNew, overlap, EpotNew)
+                indicesNew(1) = this%sameCells%index_from_position(xNew)
+                call this%Epot_neighCells(this_iCol, xNew, indicesNew(1), overlap, EpotsNew(1))
             end if
             
             if (.not. overlap) then
@@ -70,8 +70,8 @@
                 select type (this)
                     type is (DipolarSpheres)
                         mCol(:) = this%orientations(:, iCol)
-                        EpotNew = this%Epot_real_solo(this_iCol, xNew, mCol) + &
-                                       this%deltaEpot_reci_exchange(xNew, +mCol)
+                        EpotsNew(1) = this%Epot_real_solo(this_iCol, xNew, mCol) + &
+                                      this%deltaEpot_reci_exchange(xNew, +mCol)
                 end select
             
             end if
@@ -80,14 +80,12 @@
     
     end subroutine after_switch_energy
     
-    subroutine after_switch_update(this, this_iCol, this_iCellOld, mix_iCellOld, this_iCellNew, &
-                                   mix_iCellNew, other, other_iCol, mix)
+    subroutine after_switch_update(this, this_iCol, indicesOld, indicesNew, other, other_iCol, mix)
         
         class(HardSpheres), intent(inout) :: this, other
         class(MixingPotential), intent(in) :: mix
         integer, intent(in) :: this_iOld, other_iCol
-        integer, intent(in) :: this_iCellOld, mix_iCellOld
-        integer, intent(in) :: this_iCellNew, mix_iCellNew
+        integer, dimension(:), intent(in) :: indicesOld, indicesNew
         
         real(DP), dimension(Ndim) :: xOld, xNew, mCol
         
@@ -98,8 +96,8 @@
                 call this%reci_update_structure_exchange(xOld, -mCol)
         end select
     
-        call this%sameCells%remove_col_from_cell(this_iCol, this_iCellOld)
-        call other%mixCells%remove_col_from_cell(this_iCol, mix_iCellOld)
+        call this%sameCells%remove_col_from_cell(this_iCol, indicesOld(1))
+        call other%mixCells%remove_col_from_cell(this_iCol, indicesOld(2))
         
         this%positions(:, this_iCol) = other%positions(:, other_iCol)
         select type (this)
@@ -109,8 +107,8 @@
                 call this%reci_update_structure_exchange(xNew, +mCol)
         end select
         
-        call this%sameCells%add_col_to_cell(this_iCol, this_iCellNew)
-        call other%mixCells%add_col_to_cell(this_iCol, mix_iCellNew)
+        call this%sameCells%add_col_to_cell(this_iCol, indicesNew(1))
+        call other%mixCells%add_col_to_cell(this_iCol, indicesNew(2))
         
     end subroutine after_switch_update
     
@@ -154,7 +152,7 @@
         if (.not. overlap) then
         
             call after_switch_energy(type2, type2_iCol, type1, type1_iCol, mix, type2_indicesNew, &
-                                     overlap, type2_EpotNew, type2_EpotsNew)
+                                     overlap, type2_EpotsNew)
 
             type1_deltaEpot = type1_EpotsNew(1) - type1_EpotsOld(1)
             type1_mix_deltaEpot = type1_EpotsNew(2) - type1_EpotsOld(2)
