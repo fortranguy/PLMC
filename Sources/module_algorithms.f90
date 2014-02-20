@@ -296,11 +296,9 @@ contains
                 mCol(:) = this%orientations(:, this_iCol)
                 call this%reci_update_structure_exchange(xOld, -mCol)
         end select
-    
-        call this%sameCells%remove_col_from_cell(this_iCol, indicesOld(1))
-        call other%mixCells%remove_col_from_cell(this_iCol, indicesOld(2))
         
         this%positions(:, this_iCol) = other%positions(:, other_iCol)
+        
         select type (this)
             type is (DipolarSpheres)
                 xNew(:) = this%positions(:, this_iCol)
@@ -308,8 +306,15 @@ contains
                 call this%reci_update_structure_exchange(xNew, +mCol)
         end select
         
-        call this%sameCells%add_col_to_cell(this_iCol, indicesNew(1))
-        call other%mixCells%add_col_to_cell(this_iCol, indicesNew(2))
+        if (indicesOld(1) /= indicesNew(1)) then
+            call this%sameCells%remove_col_from_cell(this_iCol, indicesOld(1))
+            call this%sameCells%add_col_to_cell(this_iCol, indicesNew(1))
+        end if
+        
+        if (indicesOld(2) /= indicesNew(2)) then
+            call other%mixCells%remove_col_from_cell(this_iCol, indicesOld(2))
+            call other%mixCells%add_col_to_cell(this_iCol, indicesNew(2))
+        end if
         
     end subroutine after_switch_update
     
