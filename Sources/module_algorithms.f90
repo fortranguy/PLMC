@@ -354,25 +354,44 @@ contains
         
             call after_switch_energy(type2, type2_iCol, type1, type1_iCol, mix, type2_indicesNew, &
                                      overlap, type2_EpotsNew)
+            
+            if (.not. overlap) then
 
-            type1_deltaEpot = type1_EpotsNew(1) - type1_EpotsOld(1)
-            type1_mix_deltaEpot = type1_EpotsNew(2) - type1_EpotsOld(2)
-            type2_deltaEpot = type2_EpotsNew(1) - type2_EpotsOld(1)
-            type2_mix_deltaEpot = type2_EpotsNew(2) - type2_EpotsOld(2)
-            deltaEpot = type1_deltaEpot + type1_mix_deltaEpot + type2_deltaEpot + type2_mix_deltaEpot
+                type1_deltaEpot = type1_EpotsNew(1) - type1_EpotsOld(1)
+                type1_mix_deltaEpot = type1_EpotsNew(2) - type1_EpotsOld(2)
+                type2_deltaEpot = type2_EpotsNew(1) - type2_EpotsOld(1)
+                type2_mix_deltaEpot = type2_EpotsNew(2) - type2_EpotsOld(2)
+                deltaEpot = type1_deltaEpot + type1_mix_deltaEpot + type2_deltaEpot + &
+                            type2_mix_deltaEpot
+                
+                call random_number(random)
+                if (random < exp(-deltaEpot/Temperature)) then
+                
+                    call after_switch_update(type1, type1_iCol, type1_indicesOld, type1_indicesNew, &
+                                             type2)
+                    call after_switch_update(type2, type2_iCol, type2_indicesOld, type2_indicesNew, &
+                                             type1)
+                                             
+                    type1_obs%Epot = type1_obs%Epot + type1_deltaEpot
+                    type2_obs%Epot = type2_obs%Epot + type2_deltaEpot
+                    mix_Epot = mix_Epot + type1_mix_deltaEpot + type2_mix_deltaEpot
+                    
+                else
+                
+                    type1_obs%switch_Nreject = type1_obs%switch_Nreject + 1
+                    
+                end if
+                
+            else
             
-            call random_number(random)
-            if (random < exp(-deltaEpot/Temperature)) then
-            
-                call after_switch_update(type1, type1_iCol, type1_indicesOld, type1_indicesNew, type2)
-                call after_switch_update(type2, type2_iCol, type2_indicesOld, type2_indicesNew, type1)
-                                         
-                type1_obs%Epot = type1_obs%Epot + type1_deltaEpot
-                type2_obs%Epot = type2_obs%Epot + type2_deltaEpot
-                mix_Epot = mix_Epot + type1_mix_deltaEpot + type2_mix_deltaEpot
+                type1_obs%switch_Nreject = type1_obs%switch_Nreject + 1
             
             end if
+            
+        else
         
+            type1_obs%switch_Nreject = type1_obs%switch_Nreject + 1
+            
         end if
         
     end subroutine switch
