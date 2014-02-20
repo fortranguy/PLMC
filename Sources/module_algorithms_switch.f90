@@ -1,30 +1,34 @@
     !> Particle switch
     
-    subroutine before_switch_energy(this, iOld, other, mix, EpotOld, mix_EpotOld)
+    subroutine before_switch_energy(this, iCol, other, mix, EpotOld, mix_EpotOld)
         
         class(HardSpheres), intent(in) :: this, other
         class(MixingPotential), intent(in) :: mix
-        integer, intent(in) :: iOld
+        integer, intent(in) :: iCol
         real(DP), intent(out) :: EpotOld, mix_EpotOld
         
-        xOld(:) = this%positions(:, iOld)
+        real(DP), dimension(Ndim) :: xOld, mCol
+        integer :: iCellOld, mix_iCellOld
+        logical :: overlap
+        
+        xOld(:) = this%positions(:, iCol)
         
         iCellOld = this%sameCells%index_from_position(xOld)
         select type (this)
             type is (DipolarSpheres)
-                mOld(:) = this%orientations(:, iOld)
-                EpotOld = this%Epot_real_solo(iOld, xOld, mOld) - &
-                          this%deltaEpot_reci_exchange(xOld, -mOld) - &
-                          this%Epot_self_solo(mOld) - &
-                          this%deltaEpot_bound_exchange(-mOld)
+                mCol(:) = this%orientations(:, iCol)
+                EpotOld = this%Epot_real_solo(iCol, xOld, mCol) - &
+                          this%deltaEpot_reci_exchange(xOld, -mCol) - &
+                          this%Epot_self_solo(mCol) - &
+                          this%deltaEpot_bound_exchange(-mCol)
             type is (InteractingSpheres)
-                call this%Epot_neighCells(iOld, xOld, iCellOld, overlap, EpotOld)
+                call this%Epot_neighCells(iCol, xOld, iCellOld, overlap, EpotOld)
             type is (HardSpheres)
                 EpotOld = 0._DP
         end select
         
         mix_iCellOld = this%mixCells%index_from_position(xOld)
-        call mix%Epot_neighCells(xOld, mix_iCellOld, this%mixCells, other%positions, overlap, &
+        call mix%Epot_neighCells(0, xOld, mix_iCellOld, this%mixCells, other%positions, overlap, &
                                  mix_EpotOld)
         
     end subroutine before_switch_energy
@@ -132,11 +136,11 @@
         ! Old : before switch
         call random_number(random)
         type1_iCol = int(random*type1%get_Ncol()) + 1
-        call before_switch_energy(type1, type1_iCol, type2, type1_EpotOld, type1_mix_EpotOld)
+        call before_switch_energy(type1, type1_iCol, type2, mix, type1_EpotOld, type1_mix_EpotOld)
         
         call random_number(random)
         type2_iCol = int(random*type2%get_Ncol()) + 1
-        call before_switch_energy(type2, type2_iCol, type1, type2_EpotOld, type2_mix_EpotOld)
+        call before_switch_energy(type2, type2_iCol, type1, mix, type2_EpotOld, type2_mix_EpotOld)
         
         ! New : after switch
         call after_switch_energy(type1, type2_iCol, type2, mix, overlap, type1_EpotNew, &
