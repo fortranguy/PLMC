@@ -601,10 +601,10 @@ contains
     
     !> Total : Results
     
-    subroutine print_results(Ncol, EpotSum, duration, report_unit)
+    subroutine print_results(Ncol, EpotSum, switch_rejectSum, duration, report_unit)
     
         integer, intent(in) :: Ncol
-        real(DP), intent(in) :: EpotSum
+        real(DP), intent(in) :: EpotSum, switch_rejectSum
         real(DP), intent(in) :: duration
         integer, intent(in) :: report_unit
             
@@ -612,6 +612,7 @@ contains
         write(report_unit, *) "    average energy = ", EpotSum/real(Nstep, DP)
         write(report_unit, *) "    average energy per particule = ", &
                                    EpotSum/real(Nstep, DP)/real(Ncol, DP)
+        write(report_unit, *) "    switch rejection rate = ", switch_rejectSum/real(Nstep, DP)
         write(report_unit, *) "    duration =", duration/60._DP, "min"
     
     end subroutine print_results

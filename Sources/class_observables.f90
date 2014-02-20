@@ -37,12 +37,6 @@ private
     end type Observables
     
     type, extends(Observables), public :: MoreObservables
-    
-        ! Switch
-        integer :: Nswitch
-        integer :: switch_Nreject
-        real(DP) :: switch_reject
-        real(DP) :: switch_rejectSum
         
         ! Rotate
         integer :: Nrotate
@@ -75,11 +69,6 @@ contains
         select type (this)
             
             type is (MoreObservables)
-            
-                this%Nswitch = 0
-                this%switch_Nreject = 0
-                this%switch_reject = 0._DP
-                this%switch_rejectSum = 0._DP
                 
                 this%Nrotate = 0
                 this%rotate_Nreject = 0
@@ -105,10 +94,6 @@ contains
          select type (this)
         
             type is (MoreObservables)
-            
-                this%switch_reject = real(this%switch_Nreject, DP)/real(this%Nswitch, DP)
-                this%switch_Nreject = 0
-                this%Nswitch = 0
                 
                 this%rotate_reject = real(this%rotate_Nreject, DP)/real(this%Nrotate, DP)
                 this%rotate_Nreject = 0
@@ -125,10 +110,10 @@ contains
         
         select type (this)        
             type is (MoreObservables)
-                write(obs_unit, *) iStep, this%Epot, this%activ, this%move_reject, this%switch_reject, &
+                write(obs_unit, *) iStep, this%Epot, this%activ, this%move_reject, &
                                    this%rotate_reject
             class default
-                write(obs_unit, *) iStep, this%Epot, this%activ, this%move_reject, this%switch_reject
+                write(obs_unit, *) iStep, this%Epot, this%activ, this%move_reject
         end select
     
     end subroutine Observables_write
@@ -142,12 +127,11 @@ contains
         this%EpotSum = this%EpotSum + this%Epot
         this%activSum = this%activSum + this%activ
         this%move_rejectSum = this%move_rejectSum + this%move_reject
-        this%switch_rejectSum = this%switch_rejectSum + this%switch_reject
         
         select type (this)
         
             type is (MoreObservables)
-        
+            
                 this%rotate_rejectSum = this%rotate_rejectSum + this%rotate_reject
         
         end select
@@ -171,7 +155,6 @@ contains
         write(report_unit, *) "    average excess chemical potential = ", potChiEx
         
         write(report_unit, *) "    move rejection rate = ", this%move_rejectSum/real(Nstep, DP)
-        write(report_unit, *) "    switch rejection rate = ", this%switch_rejectSum/real(Nstep, DP)
         
         select type (this)
             

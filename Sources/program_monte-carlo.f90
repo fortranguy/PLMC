@@ -33,6 +33,10 @@ implicit none
     integer :: report_unit !< data & results file
     integer :: obsThermal_unit, obsEquilib_unit !< observables files : thermalisation & equilibrium
     
+    ! Switch
+    integer :: switch_num, switch_Nreject
+    real(DP) :: switch_reject, switch_rejectSum
+    
     ! Mixing potential between 2 types
     type(MixingPotential) :: mix !< short-range potential
     real(DP) :: mix_Epot, mix_EpotSum, mix_Epot_conf
@@ -85,6 +89,9 @@ implicit none
     call type2_units%open(type2_spheres%get_name())
     call type2_spheres%print_density(Ncol, type2_units%report)
     
+    switch_num = 0; switch_Nreject = 0
+    switch_reject = 0._DP; switch_rejectSum = 0._DP
+    
     ! Initial condition
     
     call set_initialCondition(arg_init, type1_spheres, type2_spheres, mix%get_sigma(), report_unit)
@@ -125,7 +132,8 @@ implicit none
                 
             else if (iChangeRand <= Nmove+Nswitch) then
             
-                call switch(type1_spheres, type1_obs, type2_spheres, type2_obs, mix, mix_Epot)
+                call switch(type1_spheres, type1_obs, type2_spheres, type2_obs, mix, mix_Epot, &
+                            switch_num, switch_Nreject)
                 
             else
      
@@ -138,6 +146,8 @@ implicit none
         ! Rejections rates updates
         call type1_obs%update_rejections()
         call type2_obs%update_rejections()
+        switch_reject = real(switch_Nreject, DP)/real(switch_num, DP)
+        switch_Nreject = 0; switch_num = 0
         
         MC_Regime : if (iStep <= Nthermal) then ! Thermalisation
             
@@ -175,6 +185,7 @@ implicit none
             call type1_obs%accumulate()
             call type2_obs%accumulate()
             mix_EpotSum = mix_EpotSum + mix_Epot
+            switch_rejectSum = switch_rejectSum + switch_reject
             
             call type1_obs%write(iStep, type1_units%obsEquilib)
             call type2_obs%write(iStep, type2_units%obsEquilib)
@@ -213,7 +224,7 @@ implicit none
     Epot_conf = type1_spheres%Epot_conf() + type2_spheres%Epot_conf() + mix_Epot_conf
     call test_consist(Epot, Epot_conf, report_unit)
     EpotSum = type1_obs%EpotSum + type2_obs%EpotSum + mix_EpotSum
-    call print_results(Ncol, EpotSum, tFin-tIni, report_unit)
+    call print_results(Ncol, EpotSum, switch_rejectSum, tFin-tIni, report_unit)
     
     ! Finalisations
     
