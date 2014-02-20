@@ -11,7 +11,7 @@ private
     type, public :: Observables
     
         ! Move
-        integer :: Nmove
+        integer :: move_Nhit
         integer :: move_Nreject
         real(DP) :: move_reject
         real(DP) :: move_rejectSum
@@ -39,7 +39,7 @@ private
     type, extends(Observables), public :: MoreObservables
         
         ! Rotate
-        integer :: Nrotate
+        integer :: rotate_Nhit
         integer :: rotate_Nreject
         real(DP) :: rotate_reject
         real(DP) :: rotate_rejectSum
@@ -56,7 +56,7 @@ contains
         
         class(Observables), intent(out) :: this
         
-        this%Nmove = 0
+        this%move_Nhit = 0
         this%move_Nreject = 0
         this%move_reject = 0._DP
         this%move_rejectSum = 0._DP
@@ -70,7 +70,7 @@ contains
             
             type is (MoreObservables)
                 
-                this%Nrotate = 0
+                this%rotate_Nhit = 0
                 this%rotate_Nreject = 0
                 this%rotate_reject = 0._DP
                 this%rotate_rejectSum = 0._DP
@@ -87,17 +87,17 @@ contains
     
         class(Observables), intent(inout) :: this
         
-        this%move_reject = real(this%move_Nreject, DP)/real(this%Nmove, DP)
+        this%move_reject = real(this%move_Nreject, DP)/real(this%move_Nhit, DP)
         this%move_Nreject = 0
-        this%Nmove = 0
+        this%move_Nhit = 0
         
          select type (this)
         
             type is (MoreObservables)
                 
-                this%rotate_reject = real(this%rotate_Nreject, DP)/real(this%Nrotate, DP)
+                this%rotate_reject = real(this%rotate_Nreject, DP)/real(this%rotate_Nhit, DP)
                 this%rotate_Nreject = 0
-                this%Nrotate = 0
+                this%rotate_Nhit = 0
         
         end select
     

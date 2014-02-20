@@ -40,7 +40,7 @@ contains
         real(DP), dimension(Ndim) :: mCol
         real(DP) :: this_EpotNew_real, this_EpotOld_real
         
-        this_obs%Nmove = this_obs%Nmove + 1
+        this_obs%move_Nhit = this_obs%move_Nhit + 1
         
         call random_number(random)
         iOld = int(random*this%get_Ncol()) + 1
@@ -419,7 +419,7 @@ contains
         real(DP) :: deltaEpot_real, deltaEpot_self
         real(DP) :: real_EpotNew, real_EpotOld
         
-        obs%Nrotate = obs%Nrotate + 1
+        obs%rotate_Nhit = obs%rotate_Nhit + 1
 
         call random_number(random)
         iOld = int(random*this%get_Ncol()) + 1
