@@ -206,15 +206,16 @@ contains
     
     !> Particle switch
     
-    subroutine before_switch_energy(this, this_iCol, other, other_iCol, mix, indicesOld, EpotsOld)
+    subroutine before_switch_energy(this, this_iCol, other, other_iCol, mix, indicesOld, xOld, &
+                                    EpotsOld)
         
         class(HardSpheres), intent(in) :: this, other
         class(MixingPotential), intent(in) :: mix
         integer, intent(in) :: this_iCol, other_iCol
         integer, dimension(:), intent(out) :: indicesOld
-        real(DP), dimension(:), intent(out) :: EpotsOld
+        real(DP), dimension(:), intent(out) :: xOld, EpotsOld
         
-        real(DP), dimension(Ndim) :: xOld, mCol
+        real(DP), dimension(Ndim) :: mCol
         logical :: overlap
         
         xOld(:) = this%positions(:, this_iCol)
@@ -231,24 +232,23 @@ contains
                 EpotsOld(1) = 0._DP
         end select
         
-        indicesOld(2) = this%mixCells%index_from_position(xOld)
-        write(*, *) "-s-", this%mixCells%index_from_position(xOld), other%mixCells%index_from_position(xOld)
+        indicesOld(2) = other%mixCells%index_from_position(xOld)
         call mix%Epot_neighCells(other_iCol, xOld, indicesOld(2), this%mixCells, other%positions, &
                                  overlap, EpotsOld(2))
         
     end subroutine before_switch_energy
     
-    subroutine after_switch_energy(this, this_iCol, other, other_iCol, mix, indicesNew, overlap, &
-                                   EpotsNew)
+    subroutine after_switch_energy(this, this_iCol, other, other_iCol, mix, overlap, indicesNew, &
+                                   xNew, EpotsNew)
         
         class(HardSpheres), intent(in) :: this, other
         class(MixingPotential), intent(in) :: mix
         integer, intent(in) :: this_iCol, other_iCol
         integer, dimension(:), intent(out) :: indicesNew
         logical, intent(out) :: overlap
-        real(DP), dimension(:), intent(out) :: EpotsNew
+        real(DP), dimension(:), intent(out) :: xNew, EpotsNew
         
-        real(DP), dimension(Ndim) :: xNew, mCol
+        real(DP), dimension(Ndim) :: mCol
         
         xNew(:) = other%positions(:, other_iCol)
         
@@ -256,7 +256,7 @@ contains
             indicesNew(1) = this%sameCells%index_from_position(xNew)
             call this%Epot_neighCells(this_iCol, xNew, indicesNew(1), overlap, EpotsNew(1))
         else
-            indicesNew(2) = this%mixCells%index_from_position(xNew)
+            indicesNew(2) = other%mixCells%index_from_position(xNew)
             call mix%Epot_neighCells(other_iCol, xNew, indicesNew(2), this%mixCells, other%positions, &
                                      overlap, EpotsNew(2))
         end if
@@ -264,7 +264,7 @@ contains
         if (.not. overlap) then
         
             if (this%get_Ncol() >= other%get_Ncol()) then
-                indicesNew(2) = this%mixCells%index_from_position(xNew)
+                indicesNew(2) = other%mixCells%index_from_position(xNew)
                 call mix%Epot_neighCells(other_iCol, xNew, indicesNew(2), this%mixCells, &
                                          other%positions, overlap, EpotsNew(2))
             else
@@ -287,26 +287,25 @@ contains
     
     end subroutine after_switch_energy
     
-    subroutine after_switch_update(this, this_iCol, indicesOld, indicesNew, other, other_iCol)
+    subroutine after_switch_update(this, this_iCol, indicesOld, indicesNew, xOld, xNew, other)
         
         class(HardSpheres), intent(inout) :: this, other
-        integer, intent(in) :: this_iCol, other_iCol
+        integer, intent(in) :: this_iCol
         integer, dimension(:), intent(in) :: indicesOld, indicesNew
+        real(DP), dimension(:), intent(in) :: xOld, xNew
         
-        real(DP), dimension(Ndim) :: xOld, xNew, mCol
+        real(DP), dimension(Ndim) :: mCol
+        
+        this%positions(:, this_iCol) = xNew(:)
         
         select type (this)
             type is (DipolarSpheres)
-                xOld(:) = this%positions(:, this_iCol)
                 mCol(:) = this%orientations(:, this_iCol)
                 call this%reci_update_structure_exchange(xOld, -mCol)
         end select
         
-        this%positions(:, this_iCol) = other%positions(:, other_iCol)
-        
         select type (this)
             type is (DipolarSpheres)
-                xNew(:) = this%positions(:, this_iCol)
                 call this%reci_update_structure_exchange(xNew, +mCol)
         end select
         
@@ -335,13 +334,15 @@ contains
         
         real(DP) :: random
         integer :: type1_iCol, type2_iCol
-        integer, dimension(2) :: type1_indicesOld, type2_indicesOld ! (1): same, (2): other
-        integer, dimension(2) :: type1_indicesNew, type2_indicesNew
+        integer, dimension(2) :: type1_indicesOld, type1_indicesNew ! (1): same, (2): other
+        integer, dimension(2) :: type2_indicesOld , type2_indicesNew
         logical :: overlap
+        real(DP), dimension(Ndim) :: type1_xOld, type1_xNew
+        real(DP), dimension(Ndim) :: type2_xOld, type2_xNew
         real(DP) :: deltaEpot, type1_deltaEpot, type2_deltaEpot
         real(DP) :: type1_mix_deltaEpot, type2_mix_deltaEpot
-        real(DP), dimension(2) :: type1_EpotsOld, type2_EpotsOld ! (1): same, (2): mix
-        real(DP), dimension(2) :: type1_EpotsNew, type2_EpotsNew
+        real(DP), dimension(2) :: type1_EpotsOld, type1_EpotsNew ! (1): same, (2): mix
+        real(DP), dimension(2) :: type2_EpotsOld, type2_EpotsNew
         
         type1_obs%Nswitch = type1_obs%Nswitch + 1
         
@@ -354,21 +355,21 @@ contains
         call random_number(random)
         type1_iCol = int(random*type1%get_Ncol()) + 1
         call before_switch_energy(type1, type1_iCol, type2, type2_iCol, mix, type1_indicesOld, &
-                                  type1_EpotsOld)
+                                  type1_xOld, type1_EpotsOld)
         
         call random_number(random)
         type2_iCol = int(random*type2%get_Ncol()) + 1
         call before_switch_energy(type2, type2_iCol, type1, type1_iCol, mix, type2_indicesOld, &
-                                  type2_EpotsOld)
+                                  type2_xOld, type2_EpotsOld)
         
         ! New : after switch
-        call after_switch_energy(type1, type1_iCol, type2, type2_iCol, mix, type1_indicesNew, &
-                                 overlap, type1_EpotsNew)
+        call after_switch_energy(type1, type1_iCol, type2, type2_iCol, mix, overlap, type1_indicesNew, &
+                                 type1_xNew, type1_EpotsNew)
         
         if (.not. overlap) then
         
-            call after_switch_energy(type2, type2_iCol, type1, type1_iCol, mix, type2_indicesNew, &
-                                     overlap, type2_EpotsNew)
+            call after_switch_energy(type2, type2_iCol, type1, type1_iCol, mix, overlap, &
+                                     type2_indicesNew, type2_xNew, type2_EpotsNew)
             
             if (.not. overlap) then
 
@@ -384,9 +385,9 @@ contains
                 
                     write(*, *) "s", type1%get_name(), type2%get_name()
                     call after_switch_update(type1, type1_iCol, type1_indicesOld, type1_indicesNew, &
-                                             type2, type2_iCol)
+                                             type1_xOld, type1_xNew, type2)
                     call after_switch_update(type2, type2_iCol, type2_indicesOld, type2_indicesNew, &
-                                             type1, type1_iCol)
+                                             type2_xOld, type2_xNew, type1)
                                              
                     type1_obs%Epot = type1_obs%Epot + type1_deltaEpot
                     type2_obs%Epot = type2_obs%Epot + type2_deltaEpot
