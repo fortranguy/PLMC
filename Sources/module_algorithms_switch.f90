@@ -80,10 +80,9 @@
     
     end subroutine after_switch_energy
     
-    subroutine after_switch_update(this, this_iCol, indicesOld, indicesNew, other, other_iCol, mix)
+    subroutine after_switch_update(this, this_iCol, indicesOld, indicesNew, other, other_iCol)
         
         class(HardSpheres), intent(inout) :: this, other
-        class(MixingPotential), intent(in) :: mix
         integer, intent(in) :: this_iOld, other_iCol
         integer, dimension(:), intent(in) :: indicesOld, indicesNew
         
@@ -163,10 +162,8 @@
             call random_number(random)
             if (random < exp(-deltaEpot/Temperature)) then
             
-                call after_switch_update(type1, type1_iCol, type1_indicesOld, &
-                                         type1_indicesNew, type2, mix)
-                call after_switch_update(type2, type2_iCol, type2_indicesOld, &
-                                         type2_indicesNew, type1, mix)
+                call after_switch_update(type1, type1_iCol, type1_indicesOld, type1_indicesNew, type2)
+                call after_switch_update(type2, type2_iCol, type2_indicesOld, type2_indicesNew, type1)
                                          
                 type1_obs%Epot = type1_obs%Epot + type1_deltaEpot
                 type2_obs%Epot = type2_obs%Epot + type2_deltaEpot
