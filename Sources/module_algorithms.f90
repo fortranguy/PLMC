@@ -219,8 +219,8 @@ contains
         select type (this)
             type is (DipolarSpheres)
                 mCol(:) = this%orientations(:, this_iCol)
-                EpotsOld(1) = this%Epot_real_solo(this_iCol, xOld, mCol) - &
-                              this%deltaEpot_reci_exchange(xOld, -mCol)
+                EpotsOld(1) = this%Epot_real_solo(this_iCol, xOld, mCol) ! Epot_reci: 
+                                                                         ! cf. after_switch_energy
             type is (InteractingSpheres)
                 call this%Epot_neighCells(this_iCol, xOld, indicesOld(1), overlap, EpotsOld(1))
             type is (HardSpheres)
@@ -233,12 +233,13 @@ contains
         
     end subroutine before_switch_energy
     
-    subroutine after_switch_energy(this, this_iCol, other, other_iCol, mix, overlap, indicesNew, &
-                                   xNew, EpotsNew)
+    subroutine after_switch_energy(this, this_iCol, xOld, other, other_iCol, mix, overlap, &
+                                   indicesNew, xNew, EpotsNew)
         
         class(HardSpheres), intent(in) :: this, other
         class(MixingPotential), intent(in) :: mix
         integer, intent(in) :: this_iCol, other_iCol
+        real(DP), dimension(:), intent(in) :: xOld
         integer, dimension(:), intent(out) :: indicesNew
         logical, intent(out) :: overlap
         real(DP), dimension(:), intent(out) :: xNew, EpotsNew
@@ -273,7 +274,7 @@ contains
                     type is (DipolarSpheres)
                         mCol(:) = this%orientations(:, this_iCol)
                         EpotsNew(1) = this%Epot_real_solo(this_iCol, xNew, mCol) + &
-                                      this%deltaEpot_reci_exchange(xNew, +mCol)
+                                      this%deltaEpot_reci_move(xOld, xNew, mCol)
                 end select
             
             end if
@@ -282,20 +283,20 @@ contains
     
     end subroutine after_switch_energy
     
-    subroutine after_switch_update(this, this_iCol, indicesOld, indicesNew, xOld, xNew, other)
+    subroutine after_switch_update(this, iCol, indicesOld, indicesNew, xOld, xNew, other)
         
         class(HardSpheres), intent(inout) :: this, other
-        integer, intent(in) :: this_iCol
+        integer, intent(in) :: iCol
         integer, dimension(:), intent(in) :: indicesOld, indicesNew
         real(DP), dimension(:), intent(in) :: xOld, xNew
         
         real(DP), dimension(Ndim) :: mCol
         
-        this%positions(:, this_iCol) = xNew(:)
+        this%positions(:, iCol) = xNew(:)
         
         select type (this)
             type is (DipolarSpheres)
-                mCol(:) = this%orientations(:, this_iCol)
+                mCol(:) = this%orientations(:, iCol)
                 call this%reci_update_structure_exchange(xOld, -mCol)
         end select
         
@@ -305,12 +306,12 @@ contains
         end select
         
         if (indicesOld(1) /= indicesNew(1)) then
-            call this%sameCells%remove_col_from_cell(this_iCol, indicesOld(1))
-            call this%sameCells%add_col_to_cell(this_iCol, indicesNew(1))
+            call this%sameCells%remove_col_from_cell(iCol, indicesOld(1))
+            call this%sameCells%add_col_to_cell(iCol, indicesNew(1))
         end if
         if (indicesOld(2) /= indicesNew(2)) then
-            call other%mixCells%remove_col_from_cell(this_iCol, indicesOld(2))
-            call other%mixCells%add_col_to_cell(this_iCol, indicesNew(2))
+            call other%mixCells%remove_col_from_cell(iCol, indicesOld(2))
+            call other%mixCells%add_col_to_cell(iCol, indicesNew(2))
         end if
         
     end subroutine after_switch_update
@@ -353,12 +354,12 @@ contains
                                   type2_xOld, type2_EpotsOld)
         
         ! New : after switch
-        call after_switch_energy(type1, type1_iCol, type2, type2_iCol, mix, overlap, type1_indicesNew, &
-                                 type1_xNew, type1_EpotsNew)
+        call after_switch_energy(type1, type1_iCol, type1_xOld, type2, type2_iCol, mix, overlap, &
+                                 type1_indicesNew, type1_xNew, type1_EpotsNew)
         
         if (.not. overlap) then
         
-            call after_switch_energy(type2, type2_iCol, type1, type1_iCol, mix, overlap, &
+            call after_switch_energy(type2, type2_iCol, type2_xOld, type1, type1_iCol, mix, overlap, &
                                      type2_indicesNew, type2_xNew, type2_EpotsNew)
             
             if (.not. overlap) then
