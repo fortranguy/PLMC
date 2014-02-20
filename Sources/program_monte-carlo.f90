@@ -34,7 +34,7 @@ implicit none
     integer :: obsThermal_unit, obsEquilib_unit !< observables files : thermalisation & equilibrium
     
     ! Switch
-    integer :: switch_num, switch_Nreject
+    integer :: switch_Nhit, switch_Nreject
     real(DP) :: switch_reject, switch_rejectSum
     
     ! Mixing potential between 2 types
@@ -89,7 +89,7 @@ implicit none
     call type2_units%open(type2_spheres%get_name())
     call type2_spheres%print_density(Ncol, type2_units%report)
     
-    switch_num = 0; switch_Nreject = 0
+    switch_Nhit = 0; switch_Nreject = 0
     switch_reject = 0._DP; switch_rejectSum = 0._DP
     
     ! Initial condition
@@ -133,7 +133,7 @@ implicit none
             else if (iChangeRand <= Nmove+Nswitch) then
             
                 call switch(type1_spheres, type1_obs, type2_spheres, type2_obs, mix, mix_Epot, &
-                            switch_num, switch_Nreject)
+                            switch_Nhit, switch_Nreject)
                 
             else
      
@@ -146,8 +146,8 @@ implicit none
         ! Rejections rates updates
         call type1_obs%update_rejections()
         call type2_obs%update_rejections()
-        switch_reject = real(switch_Nreject, DP)/real(switch_num, DP)
-        switch_Nreject = 0; switch_num = 0
+        switch_reject = real(switch_Nreject, DP)/real(switch_Nhit, DP)
+        switch_Nreject = 0; switch_Nhit = 0
         
         MC_Regime : if (iStep <= Nthermal) then ! Thermalisation
             

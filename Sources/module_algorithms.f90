@@ -316,13 +316,13 @@ contains
         
     end subroutine after_switch_update
     
-    subroutine switch(type1, type1_obs, type2, type2_obs, mix, mix_Epot, switch_num, switch_Nreject)
+    subroutine switch(type1, type1_obs, type2, type2_obs, mix, mix_Epot, switch_Nhit, switch_Nreject)
     
         class(HardSpheres), intent(inout) :: type1, type2
         class(Observables), intent(inout) :: type1_obs, type2_obs
         class(MixingPotential), intent(in) :: mix
         real(DP), intent(inout) :: mix_Epot
-        integer, intent(inout) :: switch_num, switch_Nreject
+        integer, intent(inout) :: switch_Nhit, switch_Nreject
         
         real(DP) :: random
         integer :: type1_iCol, type2_iCol
@@ -336,7 +336,7 @@ contains
         real(DP), dimension(2) :: type1_EpotsOld, type1_EpotsNew ! (1): same, (2): mix
         real(DP), dimension(2) :: type2_EpotsOld, type2_EpotsNew
         
-        switch_num = switch_num + 1
+        switch_Nhit = switch_Nhit + 1
         
         if (type1%get_Ncol()==0 .or. type2%get_Ncol()==0) then
             switch_Nreject = switch_Nreject + 1
