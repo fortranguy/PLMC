@@ -12,7 +12,7 @@ use class_observables
 
 implicit none
 private
-public move, widom, rotate
+public move, widom, switch, rotate
 
 contains
 

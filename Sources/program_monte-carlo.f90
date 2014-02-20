@@ -4,7 +4,7 @@ program monteCarlo_canonical_bulk
 
 use, intrinsic :: iso_fortran_env, only : output_unit
 use data_precisions, only : DP
-use data_monteCarlo, only : decorrelFactor, Nthermal, Nadapt, Nstep
+use data_monteCarlo, only : decorrelFactor, switch_factor, Nthermal, Nadapt, Nstep
 use data_distribution, only : snap
 use class_hardSpheres
 use class_interactingSpheres
@@ -13,7 +13,7 @@ use class_mixingPotential
 use class_observables
 use class_units
 use module_types, only : argument_seed, argument_initial
-use module_algorithms, only : move, widom, rotate
+use module_algorithms, only : move, widom, switch, rotate
 use module_tools, only : read_arguments, open_units, mix_open_units, &
                          init_randomSeed, set_initialCondition, print_report, mix_init, mix_final, &
                          init, final, adapt_move, adapt_rotate, test_consist, print_results
@@ -61,7 +61,7 @@ implicit none
     
     Ncol = type1_spheres%get_Ncol() + type2_spheres%get_Ncol()
     Nmove = decorrelFactor * Ncol
-    Nswitch = Nmove
+    Nswitch = switch_factor * Nmove
     Nrotate = decorrelFactor * type1_spheres%get_Ncol()
     
 ! Beginning ----------------------------------------------------------------------------------------
@@ -105,11 +105,11 @@ implicit none
     call cpu_time(tIni)
     MC_Cycle : do iStep = 1, Nthermal + Nstep
         
-        MC_Change : do iChange = 1, Nmove + Nrotate
+        MC_Change : do iChange = 1, Nmove + Nswitch + Nrotate
         
             ! Randomly choosing the change
             call random_number(random)
-            iChangeRand = int(random*real(Nmove+Nrotate, DP)) + 1
+            iChangeRand = int(random*real(Nmove+Nswitch+Nrotate, DP)) + 1
             
             if (iChangeRand <= Nmove) then
             
@@ -122,6 +122,10 @@ implicit none
                 else
                     call move(type2_spheres, type2_obs, type1_spheres, mix, mix_Epot)
                 end if
+                
+            else if (iChangeRand <= Nmove+Nswitch) then
+            
+                call switch(type1_spheres, type1_obs, type2_spheres, type2_obs, mix, mix_Epot)
                 
             else
      
