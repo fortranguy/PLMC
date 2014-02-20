@@ -1,14 +1,15 @@
     !> Particle switch
     
-    subroutine before_switch_energy(this, iCol, other, mix, EpotOld, mix_EpotOld)
+    subroutine before_switch_energy(this, iCol, other, mix, iCellOld, mix_iCellOld, EpotOld, &
+                                    mix_EpotOld)
         
         class(HardSpheres), intent(in) :: this, other
         class(MixingPotential), intent(in) :: mix
         integer, intent(in) :: iCol
+        integer, intent(out) :: iCellOld, mix_iCellOld
         real(DP), intent(out) :: EpotOld, mix_EpotOld
         
         real(DP), dimension(Ndim) :: xOld, mCol
-        integer :: iCellOld, mix_iCellOld
         logical :: overlap
         
         xOld(:) = this%positions(:, iCol)
@@ -18,9 +19,7 @@
             type is (DipolarSpheres)
                 mCol(:) = this%orientations(:, iCol)
                 EpotOld = this%Epot_real_solo(iCol, xOld, mCol) - &
-                          this%deltaEpot_reci_exchange(xOld, -mCol) - &
-                          this%Epot_self_solo(mCol) - &
-                          this%deltaEpot_bound_exchange(-mCol)
+                          this%deltaEpot_reci_exchange(xOld, -mCol)
             type is (InteractingSpheres)
                 call this%Epot_neighCells(iCol, xOld, iCellOld, overlap, EpotOld)
             type is (HardSpheres)
@@ -33,81 +32,86 @@
         
     end subroutine before_switch_energy
     
-    subroutine after_switch_energy(this, iNew, other, mix, overlap, EpotNew, mix_EpotNew)
+    subroutine after_switch_energy(this, this_iCol, other, other_iCol, mix, iCellNew, mix_iCellNew, &
+                                   overlap, EpotNew, mix_EpotNew)
         
         class(HardSpheres), intent(in) :: this, other
         class(MixingPotential), intent(in) :: mix
-        integer, intent(in) :: iNew
+        integer, intent(in) :: this_iCol, other_iCol
+        integer, intent(ou) :: iCellNew, mix_iCellNew
         logical, intent(out) :: overlap
         real(DP), intent(out) :: EpotNew, mix_EpotNew
         
-        xNew(:) = this%positions(:, iNew)
+        real(DP), dimension(Ndim) :: xNew, mCol
+        
+        xNew(:) = other%positions(:, other_iCol)
         
         if (this%get_Ncol() >= other%get_Ncol()) then ! optimisation : more chance to overlap
             iCellNew = this%sameCells%index_from_position(xNew)
-            call this%Epot_neighCells(iNew, xNew, iCellNew, overlap, EpotNew)
+            call this%Epot_neighCells(this_iCol, xNew, iCellNew, overlap, EpotNew)
         else
             mix_iCellNew = this%mixCells%index_from_position(xNew)
-            call mix%Epot_neighCells(xNew, mix_iCellNew, this%mixCells, other%positions, overlap, &
-                                     mix_EpotNew)
+            call mix%Epot_neighCells(other_iCol, xNew, mix_iCellNew, this%mixCells, other%positions, &
+                                     overlap, mix_EpotNew)
         end if
         
         if (.not. overlap) then
         
             if (this%get_Ncol() >= other%get_Ncol()) then
                 mix_iCellNew = this%mixCells%index_from_position(xNew)
-                call mix%Epot_neighCells(xNew, mix_iCellNew, this%mixCells, other%positions, overlap, &
-                                         mix_EpotNew)
+                call mix%Epot_neighCells(other_iCol, xNew, mix_iCellNew, this%mixCells, &
+                                         other%positions, overlap, mix_EpotNew)
             else
-                this_iCellNew = this%sameCells%index_from_position(xNew)
-                call this%Epot_neighCells(iNew, xNew, this_iCellNew, overlap, this_EpotNew)
+                iCellNew = this%sameCells%index_from_position(xNew)
+                call this%Epot_neighCells(this_iCol, xNew, iCellNew, overlap, EpotNew)
             end if
             
             if (.not. overlap) then
             
                 select type (this)
                     type is (DipolarSpheres)
-                        mNew(:) = random_surface()
-                        EpotNew = this%Epot_real_solo(iNew, xNew, mNew) + &
-                                       this%deltaEpot_reci_exchange(xNew, +mNew) - &
-                                       this%Epot_self_solo(mNew) + &
-                                       this%deltaEpot_bound_exchange(+mNew)
+                        mCol(:) = this%orientations(:, iCol)
+                        EpotNew = this%Epot_real_solo(this_iCol, xNew, mCol) + &
+                                       this%deltaEpot_reci_exchange(xNew, +mCol)
                 end select
             
-                EpotNew = EpotNew + mix_EpotNew
+            end if
                 
         end if
     
     end subroutine after_switch_energy
     
-    subroutine after_switch_update(this, iOld, other, mix)
+    subroutine after_switch_update(this, this_iCol, this_iCellOld, mix_iCellOld, this_iCellNew, &
+                                   mix_iCellNew, other, other_iCol, mix)
         
         class(HardSpheres), intent(inout) :: this, other
         class(MixingPotential), intent(in) :: mix
-        integer, intent(in) :: iOld
+        integer, intent(in) :: this_iOld, other_iCol
+        integer, intent(in) :: this_iCellOld, mix_iCellOld
+        integer, intent(in) :: this_iCellNew, mix_iCellNew
+        
+        real(DP), dimension(Ndim) :: xOld, xNew, mCol
         
         select type (this)
             type is (DipolarSpheres)
-                xOld(:) = this%positions(:, iOld)
-                mOld(:) = this%orientations(:, iOld)
-                call this%reci_update_structure_exchange(xOld, -mOld)
-                call this%update_totalMoment_exchange(-mOld)
+                xOld(:) = this%positions(:, this_iCol)
+                mCol(:) = this%orientations(:, this_iCol)
+                call this%reci_update_structure_exchange(xOld, -mCol)
         end select
     
-        call this%sameCells%remove_col_from_cell(iOld, this_iCellOld)
-        call other%mixCells%remove_col_from_cell(iOld, mix_iCellOld)
+        call this%sameCells%remove_col_from_cell(this_iCol, this_iCellOld)
+        call other%mixCells%remove_col_from_cell(this_iCol, mix_iCellOld)
         
-        this%positions(:, iNew) = other%positions(:, iOld)
+        this%positions(:, this_iCol) = other%positions(:, other_iCol)
         select type (this)
             type is (DipolarSpheres)
-                xNew(:) = this%positions(:, iNew)
-                mOld(:) = this%orientations(:, iNew)
-                call this%reci_update_structure_exchange(xNew, +mOld)
-                call this%update_totalMoment_exchange(+mOld)
+                xNew(:) = this%positions(:, this_iCol)
+                mCol(:) = this%orientations(:, this_iCol)
+                call this%reci_update_structure_exchange(xNew, +mCol)
         end select
         
-        call this%sameCells%add_col_to_cell(iOld, this_iCellNew)
-        call other%mixCells%add_col_to_cell(iOld, mix_iCellNew)
+        call this%sameCells%add_col_to_cell(this_iCol, this_iCellNew)
+        call other%mixCells%add_col_to_cell(this_iCol, mix_iCellNew)
         
     end subroutine after_switch_update
     
@@ -119,7 +123,9 @@
         real(DP), intent(inout) :: mix_Epot
         
         real(DP) :: random
-        integer :: type1_iCol, type2_iCol ! Warnin : not clear
+        integer :: type1_iCol, type2_iCol
+        integer :: type1_iCellOld, type1_mix_iCellOld, type1_iCellNew, type1_mix_iCellNew
+        integer :: type2_iCellOld, type2_mix_iCellOld, type2_iCellNew, type2_mix_iCellNew
         logical :: overlap
         real(DP) :: deltaEpot, type1_deltaEpot, type2_deltaEpot
         real(DP) :: type1_mix_deltaEpot, type2_mix_deltaEpot
@@ -136,20 +142,22 @@
         ! Old : before switch
         call random_number(random)
         type1_iCol = int(random*type1%get_Ncol()) + 1
-        call before_switch_energy(type1, type1_iCol, type2, mix, type1_EpotOld, type1_mix_EpotOld)
+        call before_switch_energy(type1, type1_iCol, type2, mix, type1_iCellOld, type1_mix_iCellOld, &
+                                  type1_EpotOld, type1_mix_EpotOld)
         
         call random_number(random)
         type2_iCol = int(random*type2%get_Ncol()) + 1
-        call before_switch_energy(type2, type2_iCol, type1, mix, type2_EpotOld, type2_mix_EpotOld)
+        call before_switch_energy(type2, type2_iCol, type1, mix, type2_iCellOld, type2_mix_iCellOld, &
+                                  type2_EpotOld, type2_mix_EpotOld)
         
         ! New : after switch
-        call after_switch_energy(type1, type2_iCol, type2, mix, overlap, type1_EpotNew, &
-                                 type1_mix_EpotNew)
+        call after_switch_energy(type1, type1_iCol, type2, type2_iCol, mix, type1_iCellNew, &
+                                 type1_mix_iCellNew, overlap, type1_EpotNew, type1_mix_EpotNew)
         
         if (.not. overlap) then
         
-            call after_switch_energy(type2, type1_iCol, type1, mix, overlap, type2_EpotNew, &
-                                     type2_mix_EpotNew)
+            call after_switch_energy(type2, type2_iCol, type1, type1_iCol, mix, type2_iCellNew, &
+                                     type2_mix_iCellNew, overlap, type2_EpotNew, type2_mix_EpotNew)
 
             type1_deltaEpot = type1_EpotNew - type1_EpotOld
             type1_mix_deltaEpot = type1_mix_EpotNew - type1_mix_EpotOld
@@ -160,8 +168,14 @@
             call random_number(random)
             if (random < exp(-deltaEpot/Temperature)) then
             
-                call after_switch_update(type1, type1_iCol, type2, mix)
-                call after_switch_update(type2, type2_iCol, type1, mix)
+                call after_switch_update(type1, type1_iCol, type1_iCellOld, type1_mix_iCellOld, &
+                                         type1_iCellNew, type1_mix_iCellNew, type2, mix)
+                call after_switch_update(type2, type2_iCol, type2_iCellOld, type2_mix_iCellOld, &
+                                         type2_iCellNew, type2_mix_iCellNew, type1, mix)
+                                         
+                type1_obs%Epot = type1_obs%Epot + type1_deltaEpot
+                type2_obs%Epot = type2_obs%Epot + type2_deltaEpot
+                mix_Epot = mix_Epot + type1_mix_deltaEpot + type2_mix_deltaEpot
             
             end if
         
