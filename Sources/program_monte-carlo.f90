@@ -133,7 +133,8 @@ implicit none
             else if (iChangeRand <= Nmove+Nswitch) then
             
                 call switch(type1_spheres, type1_obs, type2_spheres, type2_obs, mix, mix_Epot, &
-                            switch_Nhit, switch_Nreject)
+                            switch_Nreject)
+                switch_Nhit = switch_Nhit + 1
                 
             else
      
