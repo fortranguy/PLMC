@@ -18,6 +18,12 @@ private
         real(DP) :: move_rejectAdapt
         real(DP) :: move_rejectAvg
         
+        ! Switch
+        integer :: Nswitch
+        integer :: switch_Nreject
+        real(DP) :: switch_reject
+        real(DP) :: switch_rejectSum
+        
         ! Potential energy
         real(DP) :: Epot
         real(DP) :: EpotSum
@@ -30,6 +36,7 @@ private
     
         procedure :: init => Observables_init
         procedure :: update_rejections => Observables_update_rejections
+        procedure :: write => Observables_write
         procedure :: accumulate => Observables_accumulate
         procedure :: print_results => Observables_print_results
     
@@ -62,6 +69,11 @@ contains
         this%move_rejectAdapt = 0._DP
         this%move_rejectAvg = 0._DP
         
+        this%Nswitch = 0
+        this%switch_Nreject = 0
+        this%switch_reject = 0._DP
+        this%switch_rejectSum = 0._DP
+        
         this%EpotSum = 0._DP
         this%activSum = 0._DP
         
@@ -90,6 +102,10 @@ contains
         this%move_Nreject = 0
         this%Nmove = 0
         
+        this%switch_reject = real(this%switch_Nreject, DP)/real(this%Nswitch, DP)
+        this%switch_Nreject = 0
+        this%Nswitch = 0
+        
          select type (this)
         
             type is (MoreObservables)
@@ -102,6 +118,21 @@ contains
     
     end subroutine Observables_update_rejections
     
+    subroutine Observables_write(this, iStep, obs_unit)
+    
+        class(Observables), intent(in) :: this
+        integer, intent(in) :: iStep, obs_unit
+        
+        select type (this)        
+            type is (MoreObservables)
+                write(obs_unit, *) iStep, this%Epot, this%activ, this%move_reject, this%switch_reject, &
+                                   this%rotate_reject
+            class default
+                write(obs_unit, *) iStep, this%Epot, this%activ, this%move_reject, this%switch_reject
+        end select
+    
+    end subroutine Observables_write
+    
     !> Accumulations
     
     pure subroutine Observables_accumulate(this)
@@ -111,6 +142,7 @@ contains
         this%EpotSum = this%EpotSum + this%Epot
         this%activSum = this%activSum + this%activ
         this%move_rejectSum = this%move_rejectSum + this%move_reject
+        this%switch_rejectSum = this%switch_rejectSum + this%switch_reject
         
         select type (this)
         
@@ -139,6 +171,7 @@ contains
         write(report_unit, *) "    average excess chemical potential = ", potChiEx
         
         write(report_unit, *) "    move rejection rate = ", this%move_rejectSum/real(Nstep, DP)
+        write(report_unit, *) "    switch rejection rate = ", this%switch_rejectSum/real(Nstep, DP)
         
         select type (this)
             

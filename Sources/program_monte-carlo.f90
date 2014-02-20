@@ -149,10 +149,8 @@ implicit none
             end if
             
             ! Observables writing
-            write(type1_units%obsThermal, *) iStep, type1_obs%Epot, type1_obs%activ, &
-                                             type1_obs%move_reject, type1_obs%rotate_reject
-            write(type2_units%obsThermal, *) iStep, type2_obs%Epot, type2_obs%activ, &
-                                             type2_obs%move_reject
+            call type1_obs%write(iStep, type1_units%obsThermal)
+            call type2_obs%write(iStep, type2_units%obsThermal)
             write(mix_obsThermal_unit, *) iStep, mix_Epot
             write(obsThermal_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
             
@@ -173,11 +171,9 @@ implicit none
             call type1_obs%accumulate()
             call type2_obs%accumulate()
             mix_EpotSum = mix_EpotSum + mix_Epot
-
-            write(type1_units%obsEquilib, *) iStep, type1_obs%Epot, type1_obs%activ, &
-                                             type1_obs%move_reject, type1_obs%rotate_reject
-            write(type2_units%obsEquilib, *) iStep, type2_obs%Epot, type2_obs%activ, &
-                                             type2_obs%move_reject
+            
+            call type1_obs%write(iStep, type1_units%obsEquilib)
+            call type2_obs%write(iStep, type2_units%obsEquilib)
             write(mix_obsEquilib_unit, *) iStep, mix_Epot
             write(obsEquilib_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
 

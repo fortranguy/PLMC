@@ -368,9 +368,9 @@ contains
                 if (random < exp(-deltaEpot/Temperature)) then
                 
                     call after_switch_update(type1, type1_iCol, type1_indicesOld, type1_indicesNew, &
-                                             type2)
+                                             type2, type2_iCol)
                     call after_switch_update(type2, type2_iCol, type2_indicesOld, type2_indicesNew, &
-                                             type1)
+                                             type1, type1_iCol)
                                              
                     type1_obs%Epot = type1_obs%Epot + type1_deltaEpot
                     type2_obs%Epot = type2_obs%Epot + type2_deltaEpot
