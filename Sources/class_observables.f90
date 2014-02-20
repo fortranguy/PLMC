@@ -18,12 +18,6 @@ private
         real(DP) :: move_rejectAdapt
         real(DP) :: move_rejectAvg
         
-        ! Switch
-        integer :: Nswitch
-        integer :: switch_Nreject
-        real(DP) :: switch_reject
-        real(DP) :: switch_rejectSum
-        
         ! Potential energy
         real(DP) :: Epot
         real(DP) :: EpotSum
@@ -43,6 +37,12 @@ private
     end type Observables
     
     type, extends(Observables), public :: MoreObservables
+    
+        ! Switch
+        integer :: Nswitch
+        integer :: switch_Nreject
+        real(DP) :: switch_reject
+        real(DP) :: switch_rejectSum
         
         ! Rotate
         integer :: Nrotate
@@ -69,17 +69,17 @@ contains
         this%move_rejectAdapt = 0._DP
         this%move_rejectAvg = 0._DP
         
-        this%Nswitch = 0
-        this%switch_Nreject = 0
-        this%switch_reject = 0._DP
-        this%switch_rejectSum = 0._DP
-        
         this%EpotSum = 0._DP
         this%activSum = 0._DP
         
         select type (this)
             
             type is (MoreObservables)
+            
+                this%Nswitch = 0
+                this%switch_Nreject = 0
+                this%switch_reject = 0._DP
+                this%switch_rejectSum = 0._DP
                 
                 this%Nrotate = 0
                 this%rotate_Nreject = 0
@@ -102,13 +102,13 @@ contains
         this%move_Nreject = 0
         this%Nmove = 0
         
-        this%switch_reject = real(this%switch_Nreject, DP)/real(this%Nswitch, DP)
-        this%switch_Nreject = 0
-        this%Nswitch = 0
-        
          select type (this)
         
             type is (MoreObservables)
+            
+                this%switch_reject = real(this%switch_Nreject, DP)/real(this%Nswitch, DP)
+                this%switch_Nreject = 0
+                this%Nswitch = 0
                 
                 this%rotate_reject = real(this%rotate_Nreject, DP)/real(this%Nrotate, DP)
                 this%rotate_Nreject = 0

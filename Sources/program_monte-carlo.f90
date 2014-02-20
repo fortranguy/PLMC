@@ -61,7 +61,7 @@ implicit none
     
     Ncol = type1_spheres%get_Ncol() + type2_spheres%get_Ncol()
     Nmove = decorrelFactor * Ncol
-    Nswitch = switch_factor * Nmove
+    Nswitch = switch_factor * decorrelFactor * type1_spheres%get_Ncol()
     Nrotate = decorrelFactor * type1_spheres%get_Ncol()
     
 ! Beginning ----------------------------------------------------------------------------------------
