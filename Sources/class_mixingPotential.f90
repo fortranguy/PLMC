@@ -276,10 +276,11 @@ contains
         
     end function MixingPotential_Epot_pair
     
-    subroutine MixingPotential_Epot_neighCells(this, xCol, iTotalCell, neighCells, other_positions, &
-                                               overlap, energ)
+    subroutine MixingPotential_Epot_neighCells(this, iCol, xCol, iTotalCell, neighCells, &
+                                               other_positions, overlap, energ)
         
         class(MixingPotential), intent(in) :: this
+        integer, intent(in) :: iCol
         real(DP), dimension(:), intent(in) :: xCol !< type A
         integer, intent(in) :: iTotalCell !< type A in mix grid
         type(NeighbourCells), intent(in) :: neighCells
@@ -304,13 +305,17 @@ contains
             do
             
                 next => current%next
+
+                if (current%iCol /= iCol) then
                 
-                r = dist_PBC(xCol(:), other_positions(:, current%iCol))
-                if (r < this%rMin) then
-                    overlap = .true.
-                    return
+                    r = dist_PBC(xCol(:), other_positions(:, current%iCol))
+                    if (r < this%rMin) then
+                        overlap = .true.
+                        return
+                    end if
+                    energ = energ + this%Epot_pair(r)
+
                 end if
-                energ = energ + this%Epot_pair(r)
                 
                 if (.not. associated(next%next)) exit
                 
