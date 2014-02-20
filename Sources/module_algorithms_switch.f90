@@ -115,18 +115,12 @@
         real(DP), intent(inout) :: mix_Epot
         
         real(DP) :: random
-        integer :: type1_iOld, type2_iOld
-        real(DP), dimension(Ndim) :: type1_xOld, type2_xOld, xRand, type1_xNew, type2_xNew
+        integer :: type1_iCol, type2_iCol ! Warnin : not clear
         logical :: overlap
-        integer :: type1_iCellOld, type1_iCellNew
-        integer :: mix_iCellOld, mix_iCellNew
-        real(DP) :: deltaEpot
-        real(DP) :: type1_deltaEpot, mix_deltaEpot
-        real(DP) :: type1_EpotNew, type1_EpotOld
-        real(DP) :: mix_EpotNew, mix_EpotOld
-        
-        real(DP), dimension(Ndim) :: mCol
-        real(DP) :: type1_EpotNew_real, type1_EpotOld_real
+        real(DP) :: deltaEpot, type1_deltaEpot, type2_deltaEpot
+        real(DP) :: type1_mix_deltaEpot, type2_mix_deltaEpot
+        real(DP) :: type1_EpotOld, type1_mix_EpotOld, type1_EpotNew, type1_mix_EpotNew
+        real(DP) :: type2_EpotOld, type2_mix_EpotOld, type2_EpotNew, type2_mix_EpotNew
         
         type1_obs%Nswitch = type1_obs%Nswitch + 1
         
@@ -137,27 +131,33 @@
         
         ! Old : before switch
         call random_number(random)
-        type1_iOld = int(random*type1%get_Ncol()) + 1        
-        call before_switch_energy(type1, type1_iOld, type2, type1_EpotOld)
+        type1_iCol = int(random*type1%get_Ncol()) + 1
+        call before_switch_energy(type1, type1_iCol, type2, type1_EpotOld, type1_mix_EpotOld)
         
         call random_number(random)
-        type2_iOld = int(random*type2%get_Ncol()) + 1        
-        call before_switch_energy(type2, type2_iOld, type1, type2_EpotOld)
+        type2_iCol = int(random*type2%get_Ncol()) + 1
+        call before_switch_energy(type2, type2_iCol, type1, type2_EpotOld, type2_mix_EpotOld)
         
         ! New : after switch
-        call after_switch_energy(type1, type2_iOld, type2, mix, overlap, type1_EpotNew)
+        call after_switch_energy(type1, type2_iCol, type2, mix, overlap, type1_EpotNew, &
+                                 type1_mix_EpotNew)
         
         if (.not. overlap) then
         
-            call after_switch_energy(type2, type1_iOld, type1, mix, overlap, type2_EpotNew)
-            
-            deltaEpot = type1_EpotNew - type1_EpotOld + type2_EpotNew - type2_EpotOld
+            call after_switch_energy(type2, type1_iCol, type1, mix, overlap, type2_EpotNew, &
+                                     type2_mix_EpotNew)
+
+            type1_deltaEpot = type1_EpotNew - type1_EpotOld
+            type1_mix_deltaEpot = type1_mix_EpotNew - type1_mix_EpotOld
+            type2_deltaEpot = type2_EpotNew - type2_EpotOld
+            type2_mix_deltaEpot = type2_mix_EpotNew - type2_mix_EpotOld
+            deltaEpot = type1_deltaEpot + type1_mix_deltaEpot + type2_deltaEpot + type2_mix_deltaEpot
             
             call random_number(random)
             if (random < exp(-deltaEpot/Temperature)) then
             
-                call after_switch_update(type1, type1_iOld, type2, mix)
-                call after_switch_update(type2, type2_iOld, type1, mix)
+                call after_switch_update(type1, type1_iCol, type2, mix)
+                call after_switch_update(type2, type2_iCol, type1, mix)
             
             end if
         
