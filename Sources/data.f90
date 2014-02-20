@@ -70,10 +70,10 @@ use data_precisions, only : DP
 
 implicit none
 
-    integer, parameter :: dipol_Ncol = 281/10
+    integer, parameter :: dipol_Ncol = 28
     
     real(DP), parameter :: hard_sigma = 1._DP ! u_length
-    integer, parameter :: hard_Ncol = 6750/10
+    integer, parameter :: hard_Ncol = 675
     
     real(DP), parameter :: mix_delta = 0.2_DP ! u_length
     
