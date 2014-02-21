@@ -39,7 +39,7 @@ EXEC2 = mc_bunching
 EXEC3 = mc_histogram
 EXEC4 = mc_distribution
 
-all: $(EXEC1) $(EXEC2) $(EXEC3)
+all: $(EXEC1) $(EXEC2) $(EXEC3) $(EXEC4)
 	# Report
 	git log | head -n3 > make_report.txt
 	git diff >> make_report.txt

@@ -57,7 +57,7 @@ implicit none
     dist_funct_energy(:) = 0._DP
     do iStep = 1, Nstep
         iDist = int(observables(1, iStep)/hist_dE)
-        dist_funct_energy(:) = dist_funct_energy(:) + 1._DP
+        dist_funct_energy(iDist) = dist_funct_energy(iDist) + 1._DP
     end do
     dist_funct_energy(:) = dist_funct_energy(:) / real(Nstep, DP) / hist_dE
     
