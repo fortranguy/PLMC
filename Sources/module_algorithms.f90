@@ -55,7 +55,7 @@ contains
             this_iCellNew = this%sameCells%index_from_position(xNew)
             call this%Epot_neighCells(iOld, xNew, this_iCellNew, overlap, this_EpotNew)
         else
-            mix_iCellNew = this%mixCells%index_from_position(xNew)
+            mix_iCellNew = other%mixCells%index_from_position(xNew)
             call mix%Epot_neighCells(0, xNew, mix_iCellNew, this%mixCells, other%positions, overlap, &
                                      mix_EpotNew)
         end if
@@ -63,7 +63,7 @@ contains
         if (.not. overlap) then
         
             if (this%get_Ncol() >= other%get_Ncol()) then
-                mix_iCellNew = this%mixCells%index_from_position(xNew)
+                mix_iCellNew = other%mixCells%index_from_position(xNew)
                 call mix%Epot_neighCells(0, xNew, mix_iCellNew, this%mixCells, other%positions, &
                                          overlap, mix_EpotNew)
             else
@@ -86,7 +86,7 @@ contains
                         this_deltaEpot = this_EpotNew - this_EpotOld
                 end select
                     
-                mix_iCellOld = this%mixCells%index_from_position(xOld)
+                mix_iCellOld = other%mixCells%index_from_position(xOld)
                 call mix%Epot_neighCells(0, xOld, mix_iCellOld, this%mixCells, other%positions, &
                                          overlap, mix_EpotOld)
                 
@@ -159,7 +159,7 @@ contains
                 this_iCellTest = this%sameCells%index_from_position(xTest)
                 call this%Epot_neighCells(0, xTest, this_iCellTest, overlap, this_EpotTest)
             else
-                mix_iCellTest = this%mixCells%index_from_position(xTest)
+                mix_iCellTest = other%mixCells%index_from_position(xTest)
                 call mix%Epot_neighCells(0, xTest, mix_iCellTest, this%mixCells, other%positions, &
                                          overlap, mix_EpotTest)
             end if
@@ -167,7 +167,7 @@ contains
             if (.not. overlap) then
             
                 if (this%get_Ncol() >= other%get_Ncol()) then
-                    mix_iCellTest = this%mixCells%index_from_position(xTest)
+                    mix_iCellTest = other%mixCells%index_from_position(xTest)
                     call mix%Epot_neighCells(0, xTest, mix_iCellTest, this%mixCells, other%positions, &
                                              overlap, mix_EpotTest)
                 else
