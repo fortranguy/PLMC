@@ -75,7 +75,7 @@ implicit none
     ! Initialisations & reports
     
     call open_units(report_unit, obsThermal_unit, obsEquilib_unit)
-    call print_report(Ncol, Nmove, Nrotate, report_unit)
+    call print_report(Ncol, Nmove, Nswitch, Nrotate, report_unit)
     call init_randomSeed(arg_seed, report_unit)
     
     mix_EpotSum = 0._DP
