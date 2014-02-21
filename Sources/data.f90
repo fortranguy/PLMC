@@ -201,7 +201,7 @@ use data_precisions, only : DP
 
 implicit none
 
-    real(DP), parameter :: hist_dE = 0.1_DP
+    real(DP), parameter :: hist_dE = 1._DP
 
 end module data_histogram
 !***************************************************************************************************
