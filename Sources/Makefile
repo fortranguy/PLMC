@@ -36,7 +36,8 @@ mode = debug
 
 EXEC1 = mc_cano_bulk
 EXEC2 = mc_bunching
-EXEC3 = mc_distribution
+EXEC3 = mc_histogram
+EXEC4 = mc_distribution
 
 all: $(EXEC1) $(EXEC2) $(EXEC3)
 	# Report
@@ -78,6 +79,8 @@ program_monte-carlo.o: program_monte-carlo.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 program_bunching.o: program_bunching.f90
 	$(FC) -c $(FFLAGS) $< -o $@
+program_histogram.o: program_histogram.f90
+	$(FC) -c $(FFLAGS) $< -o $@
 program_distribution.o: program_distribution.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 	
@@ -96,7 +99,10 @@ $(EXEC1): data.o \
 $(EXEC2): data.o program_bunching.o
 	$(FC) $^ $(LDFLAGS) -o $@
 	
-$(EXEC3): data.o module_physics.o module_distribution.o program_distribution.o
+$(EXEC3): data.o program_histogram.o
+	$(FC) $^ $(LDFLAGS) -o $@
+	
+$(EXEC4): data.o module_physics.o module_distribution.o program_distribution.o
 	$(FC) $^ $(LDFLAGS) -o $@
 
 # --------------------------------------------------------------------------------------------------
@@ -106,7 +112,7 @@ clean:
 	rm -f *.o *.mod
 
 mrproper: clean
-	rm -f $(EXEC1) $(EXEC2) $(EXEC3)
+	rm -f $(EXEC1) $(EXEC2) $(EXEC3) $(EXEC4)
 
 remove:
 	rm -f *.out *.txt *.shots *.tmp

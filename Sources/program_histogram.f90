@@ -1,19 +1,21 @@
-!> \brief Histogram program of observables
+!> \brief Histogram program of observables: energy
 
 program histogram
 
-use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
-use data_precisions, only : DP
-use data_monteCarlo, only : Nstep
+use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
+use data_precisions, only: DP
+use data_monteCarlo, only: Nstep
+use data_histogram, only: hist_dE
 
 implicit none
 
-    ! Physics
-    
     integer :: Nobs
     integer :: iStep, iStepIn
-
-    ! Numerical
+    integer :: iObs, iDist
+    real(DP), dimension(:, :), allocatable :: limit_values
+    integer, dimension(:, :), allocatable :: Ndists
+    real(DP), dimension(:), allocatable :: dist_funct_energy
+    real(DP) :: x_i
     
     integer :: obs_unit, histo_unit
     character(len=1) :: comment_symbol
@@ -36,6 +38,8 @@ implicit none
     write(output_unit, *) "Nobs = ", Nobs
     
     allocate(observables(Nobs, Nstep))
+    allocate(limit_values(2, Nobs))
+    allocate(Ndists(2, Nobs))
     
     write(output_unit, *) "Nstep = ", Nstep
     
@@ -43,12 +47,32 @@ implicit none
         read(obs_unit, *) iStepIn, observables(:, iStep)
     end do
     
+    do iObs = 1, Nobs
+        limit_values(1, iObs) = minval(observables(iObs, :))
+        limit_values(2, iObs) = maxval(observables(iObs, :))
+    end do
+    Ndists(:, 1) = int(limit_values(:, 1)/hist_dE)
+    allocate(dist_funct_energy(Ndists(1, 1): Ndists(2, 1)))
+    
+    dist_funct_energy(:) = 0._DP
+    do iStep = 1, Nstep
+        iDist = int(observables(1, iStep)/hist_dE)
+        dist_funct_energy(:) = dist_funct_energy(:) + 1._DP
+    end do
+    dist_funct_energy(:) = dist_funct_energy(:) / real(Nstep, DP) / hist_dE
+    
     open(newunit=histo_unit, recl=4096, file=file(1:length-4)//"_histo.out", action='write')
+    do iDist = Ndists(1, 1), Ndists(2, 1)
+        x_i = (real(iDist, DP)+0.5_DP) * hist_dE
+        write(histo_unit, *) x_i, dist_funct_energy(iDist)
+    end do
     
     close(histo_unit)
-    
     close(obs_unit)
-
+    
+    deallocate(dist_funct_energy)
+    deallocate(Ndists)
+    deallocate(limit_values)
     deallocate(observables)
 
 end program histogram
