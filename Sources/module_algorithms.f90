@@ -297,12 +297,7 @@ contains
         select type (this)
             type is (DipolarSpheres)
                 mCol(:) = this%orientations(:, iCol)
-                call this%reci_update_structure_exchange(xOld, -mCol)
-        end select
-        
-        select type (this)
-            type is (DipolarSpheres)
-                call this%reci_update_structure_exchange(xNew, +mCol)
+                call this%reci_update_structure_move(xOld, xNew, mCol)
         end select
         
         if (indicesOld(1) /= indicesNew(1)) then
