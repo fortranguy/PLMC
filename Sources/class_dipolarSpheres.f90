@@ -97,8 +97,6 @@ private
         procedure :: reci_update_structure_rotate => &
                               DipolarSpheres_reci_update_structure_rotate
         procedure :: deltaEpot_reci_exchange => DipolarSpheres_deltaEpot_reci_exchange
-        procedure :: reci_update_structure_exchange => &
-                              DipolarSpheres_reci_update_structure_exchange
         !>     Reciprocal : total
         procedure, private :: Epot_reci => DipolarSpheres_Epot_reci
         !>     Self
@@ -1057,72 +1055,6 @@ contains
         deltaEpot_reci_exchange = 4._DP*PI/product(Lsize) * deltaEpot_reci_exchange
 
     end function DipolarSpheres_deltaEpot_reci_exchange
-    
-    !> Exchange a particle -> update the ``structure factor''
-    
-    !> Add particle
-    !>  \f[
-    !>      \Delta S(\vec{k}) = (\vec{k}\cdot+\vec{\mu}_{N+1}) e^{+i\vec{k}\cdot\vec{x}_{N+1}}
-    !>  \f]
-    !>
-    
-    !> Remove particle -> update the ``structure factor''
-    !>  \f[
-    !>      \Delta S(\vec{k}) = (\vec{k}\cdot-\vec{\mu}_{N}) e^{+i\vec{k}\cdot\vec{x}_{N}}
-    !>  \f]
-    !>
-
-    pure subroutine DipolarSpheres_reci_update_structure_exchange(this, xCol, mCol)
-
-        class(DipolarSpheres), intent(inout) :: this
-        real(DP), dimension(:), intent(in) :: xCol
-        real(DP), dimension(:), intent(in) :: mCol
-        
-        real(DP), dimension(Ndim) :: xColOverL
-        real(DP), dimension(Ndim) :: mColOverL
-
-        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxCol_1
-        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxCol_2
-        complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_IkxCol_3
-        complex(DP) :: exp_IkxCol
-
-        real(DP), dimension(Ndim) :: waveVector
-        real(DP) :: k_dot_mCol
-        integer :: kx, ky, kz
-
-        xColOverL(:) = 2._DP*PI * xCol(:)/Lsize(:)
-        call fourier_i(Kmax(1), xColOverL(1), exp_IkxCol_1)
-        call fourier_i(Kmax(2), xColOverL(2), exp_IkxCol_2)
-        call fourier_i(Kmax(3), xColOverL(3), exp_IkxCol_3)
-
-        mColOverL(:) = mCol(:)/Lsize(:)
-
-        do kz = 0, Kmax(3)
-
-            waveVector(3) = real(kz, DP)
-
-            do ky = -Kmax2_sym(kz), Kmax(2)
-
-                waveVector(2) = real(ky, DP)
-
-                do kx = -Kmax1_sym(ky, kz), Kmax(1)
-
-                    waveVector(1) = real(kx, DP)
-
-                    k_dot_mCol = dot_product(waveVector, mColOverL)
-
-                    exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky) * exp_IkxCol_3(kz)
-                                                          
-                    this%structure(kx, ky, kz) = this%structure(kx, ky, kz) + &
-                                                 cmplx(k_dot_mCol, 0._DP, DP) * exp_IkxCol
-
-                end do
-                
-            end do
-            
-        end do
-
-    end subroutine DipolarSpheres_reci_update_structure_exchange
     
     !> Total reciprocal energy
     
