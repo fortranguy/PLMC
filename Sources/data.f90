@@ -218,7 +218,7 @@ implicit none
 
     logical, parameter :: snap = .true.
     real(DP), parameter :: dist_dr = 0.025_DP
-    integer, parameter :: snap_ratio = 1
+    integer, parameter :: snap_ratio = 400
 
 end module data_distribution
 !***************************************************************************************************
