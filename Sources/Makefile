@@ -17,7 +17,7 @@ ifeq ($(compiler), gfortran)
 else
 	FC = ifort
 	# default: debug
-	FFLAGS = -warn all -check all -check noarg_temp_created -fltconsistency -g
+	FFLAGS = -warn all -check all -check noarg_temp_created -fltconsistency -g -traceback
 	ifeq ($(mode), release)
 		FFLAGS =  -fltconsistency -g
 	endif
