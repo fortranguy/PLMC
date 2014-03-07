@@ -450,7 +450,7 @@ contains
     
         do iNearCell = 1, NnearCell
         
-            nearCell_index = this%sameCells%nearCells_among_totalCells(iNearCell, iTotalCell)
+            nearCell_index = this%sameCells%near_among_total(iNearCell, iTotalCell)
             current => this%sameCells%beginCells(nearCell_index)%particle%next
             if (.not. associated(current%next)) cycle
             
