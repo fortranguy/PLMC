@@ -134,9 +134,7 @@ contains
         
         write(output_unit, *) this%name, " class destruction"
         
-        if (allocated(this%positions)) then
-            deallocate(this%positions)
-        end if
+        if (allocated(this%positions)) deallocate(this%positions)
         
         call this%sameCells%destroy()
         call this%mixCells%destroy()

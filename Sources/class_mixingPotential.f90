@@ -83,9 +83,7 @@ contains
         
         write(output_unit, *) this%name, " class destruction"
         
-        if (allocated(this%Epot_tab)) then
-            deallocate(this%Epot_tab)
-        end if
+        if (allocated(this%Epot_tab)) deallocate(this%Epot_tab)
     
     end subroutine MixingPotential_destroy
     
@@ -228,9 +226,7 @@ contains
         this%epsilon = mix_epsilon
         this%alpha = mix_alpha
         
-        if (allocated(this%Epot_tab)) then
-            deallocate(this%Epot_tab)
-        end if
+        if (allocated(this%Epot_tab)) deallocate(this%Epot_tab)
         allocate(this%Epot_tab(this%iMin:this%iCut))
         call this%Epot_set_tab()
         

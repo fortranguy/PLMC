@@ -96,9 +96,7 @@ contains
         
         call this%HardSpheres%destroy()
         
-        if (allocated(this%Epot_tab)) then
-            deallocate(this%Epot_tab)
-        end if
+        if (allocated(this%Epot_tab)) deallocate(this%Epot_tab)
 
     end subroutine InteractingSpheres_destroy
     
@@ -153,9 +151,7 @@ contains
         this%epsilon = inter_epsilon
         this%alpha = inter_alpha
         
-        if (allocated(this%Epot_tab)) then
-            deallocate(this%Epot_tab)
-        end if
+        if (allocated(this%Epot_tab)) deallocate(this%Epot_tab)
         allocate(this%Epot_tab(this%iMin:this%iCut))
         call this%Epot_set_tab()
         

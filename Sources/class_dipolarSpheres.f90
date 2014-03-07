@@ -165,13 +165,9 @@ contains
         
         call this%HardSpheres%destroy()
         
-        if (allocated(this%orientations)) then
-            deallocate(this%orientations)
-        end if
+        if (allocated(this%orientations)) deallocate(this%orientations)
         
-        if (allocated(this%Epot_real_tab)) then
-            deallocate(this%Epot_real_tab)
-        end if
+        if (allocated(this%Epot_real_tab)) deallocate(this%Epot_real_tab)
     
     end subroutine DipolarSpheres_destroy
     
@@ -360,9 +356,7 @@ contains
         
         call this%Epot_real_set_parameters()
         
-        if (allocated(this%Epot_real_tab)) then
-            deallocate(this%Epot_real_tab)
-        end if
+        if (allocated(this%Epot_real_tab)) deallocate(this%Epot_real_tab)
         allocate(this%Epot_real_tab(this%real_iMin:this%real_iCut, 2))
         
         call this%Epot_real_set_tab()
