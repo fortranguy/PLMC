@@ -10,7 +10,7 @@ use data_particles, only : hard_sigma, hard_Ncol
 use data_monteCarlo, only : hard_move_delta, hard_move_rejectFix, hard_Nwidom
 use data_potential, only : hard_rMin_factor
 use data_neighbourCells, only : NnearCell
-use data_distribution, only : hard_snap_factor
+use data_distribution, only : snap_ratio
 use module_types, only : Node
 use module_physics, only : dist_PBC
 use class_neighbourCells
@@ -124,7 +124,8 @@ contains
         call this%init_particles()
         call this%init_changes()
         this%Nwidom = hard_Nwidom
-        this%snap_factor = hard_snap_factor
+        this%snap_factor = this%Ncol/snap_ratio
+        if (this%snap_factor == 0) this%snap_factor = 1
         
     end subroutine HardSpheres_construct
     

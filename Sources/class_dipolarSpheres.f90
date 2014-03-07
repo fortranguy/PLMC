@@ -12,7 +12,7 @@ use data_monteCarlo, only : dipol_move_delta, dipol_move_rejectFix, dipol_rotate
                             dipol_reInit_iStep
 use data_potential, only : dipol_rMin_factor, dipol_real_rCut_factor, dipol_real_dr, dipol_alpha_factor
 use data_neighbourCells, only : NnearCell
-use data_distribution, only : dipol_snap_factor
+use data_distribution, only : snap_ratio
 use module_physics, only : set_discrete_length, distVec_PBC, Kmax1_sym, Kmax2_sym, fourier_i
 use class_neighbourCells
 use class_hardSpheres
@@ -155,7 +155,8 @@ contains
         call this%init_particles()
         call this%init_changes()
         this%Nwidom = dipol_Nwidom
-        this%snap_factor = dipol_snap_factor
+        this%snap_factor = this%Ncol/snap_ratio
+        if (this%snap_factor == 0) this%snap_factor = 1
     
     end subroutine DipolarSpheres_construct
     
