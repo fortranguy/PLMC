@@ -63,9 +63,6 @@ private
         procedure :: get_Ncol => HardSpheres_get_Ncol
         procedure :: get_Nwidom => HardSpheres_get_Nwidom
         procedure :: get_sigma => HardSpheres_get_sigma
-        procedure :: get_radius => HardSpheres_get_radius
-        procedure :: get_rMin => HardSpheres_get_rMin
-        procedure :: get_rCut => HardSpheres_get_rCut
         procedure :: get_move_delta => HardSpheres_get_move_delta
         
         !> Mutators
@@ -98,7 +95,6 @@ contains
         class(HardSpheres), intent(inout) :: this
 
         this%sigma = hard_sigma
-        this%radius = this%sigma/2._DP
         this%Ncol = hard_Ncol
         allocate(this%positions(Ndim, this%Ncol))
     
@@ -186,39 +182,6 @@ contains
 
     end function HardSpheres_get_sigma
     
-    !> Accessor : radius
-    
-    pure function HardSpheres_get_radius(this) result(get_radius)
-    
-        class(HardSpheres), intent(in) :: this
-        real(DP) :: get_radius
-        
-        get_radius = this%radius
-    
-    end function HardSpheres_get_radius
-
-    !> Accessor : rMin
-
-    pure function HardSpheres_get_rMin(this) result(get_rMin)
-
-        class(HardSpheres), intent(in) :: this
-        real(DP) :: get_rMin
-
-        get_rMin = this%rMin
-
-    end function HardSpheres_get_rMin
-    
-    !> Accessor : rCut
-    
-    pure function HardSpheres_get_rCut(this) result(get_rCut)
-    
-        class(HardSpheres), intent(in) :: this
-        real(DP) :: get_rCut
-        
-        get_rCut = this%rCut
-    
-    end function HardSpheres_get_rCut
-    
     pure function HardSpheres_get_move_delta(this) result(get_move_delta)
         
         class(HardSpheres), intent(in) :: this
@@ -293,7 +256,7 @@ contains
         real(DP) :: density, compacity, concentration
         
         density = real(this%Ncol + 1, DP) / product(Lsize) ! cheating ? cf. Widom
-        compacity = 4._DP/3._DP*PI*this%radius**3 * density
+        compacity = 4._DP/3._DP*PI*(this%sigma/2._DP)**3 * density
         concentration = real(this%Ncol, DP) / real(total_Ncol, DP)
         
         write(output_unit, *) this%name, " : "
