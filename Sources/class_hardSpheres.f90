@@ -138,58 +138,36 @@ contains
     
     end subroutine HardSpheres_destroy
     
-    !> Accessor : name
+    !> Accessors
 
-    pure function HardSpheres_get_name(this) result(get_name)
-    
+    pure function HardSpheres_get_name(this) result(get_name)    
         class(HardSpheres), intent(in) :: this
-        character(len=5) :: get_name
-        
-        get_name = this%name
-    
+        character(len=5) :: get_name        
+        get_name = this%name    
     end function HardSpheres_get_name
 
-    !> Accessor : Ncol
-
-    pure function HardSpheres_get_Ncol(this) result(get_Ncol)
-    
+    pure function HardSpheres_get_Ncol(this) result(get_Ncol)    
         class(HardSpheres), intent(in) :: this
-        integer :: get_Ncol
-        
-        get_Ncol = this%Ncol
-    
+        integer :: get_Ncol        
+        get_Ncol = this%Ncol    
     end function HardSpheres_get_Ncol
 
-    !> Accessor : Nwidom
-
     pure function HardSpheres_get_Nwidom(this) result(get_Nwidom)
-
         class(HardSpheres), intent(in) :: this
         integer :: get_Nwidom
-
         get_Nwidom = this%Nwidom
-
     end function HardSpheres_get_Nwidom
-
-    !> Accessor : sigma
-
+    
     pure function HardSpheres_get_sigma(this) result(get_sigma)
-
         class(HardSpheres), intent(in) :: this
         real(DP) :: get_sigma
-
         get_sigma = this%sigma
-
     end function HardSpheres_get_sigma
     
-    pure function HardSpheres_get_move_delta(this) result(get_move_delta)
-        
+    pure function HardSpheres_get_move_delta(this) result(get_move_delta)        
         class(HardSpheres), intent(in) :: this
         real(DP) :: get_move_delta
-        
-        ! average move_delta of 3 vector components
-        get_move_delta = sum(this%move_delta)/size(this%move_delta)
-        
+        get_move_delta = sum(this%move_delta)/size(this%move_delta) ! average        
     end function HardSpheres_get_move_delta
         
     !> Adapt the displacement move_delta during thermalisation
