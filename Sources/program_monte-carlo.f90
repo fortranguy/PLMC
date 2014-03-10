@@ -7,7 +7,6 @@ use data_precisions, only : DP
 use data_monteCarlo, only : decorrelFactor, switch_factor, Nthermal, Nadapt, Nstep
 use data_distribution, only : snap
 use class_hardSpheres
-use class_interactingSpheres
 use class_dipolarSpheres
 use class_mixingPotential
 use class_observables

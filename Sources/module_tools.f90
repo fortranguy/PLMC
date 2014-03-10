@@ -11,7 +11,6 @@ use data_potential, only : print_potential
 use module_types, only : argument_seed, argument_initial
 use module_physics, only : dist_PBC, random_surface
 use class_hardSpheres
-use class_interactingSpheres
 use class_dipolarSpheres
 use class_mixingPotential
 use class_observables

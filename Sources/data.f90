@@ -77,11 +77,6 @@ implicit none
     
     real(DP), parameter :: mix_delta = 0.2_DP ! u_length
     
-    ! out ---------------------------------------------------------------------
-    real(DP), parameter :: inter_sigma = 1._DP ! u_length
-    integer, parameter :: inter_Ncol = 6750
-    ! -------------------------------------------------------------------------
-    
 end module data_particles
 !***************************************************************************************************
     
@@ -119,12 +114,6 @@ implicit none
     real(DP), parameter :: hard_move_rejectFix = 0.5_DP
     integer, parameter :: hard_Nwidom = 500
     
-    ! out ---------------------------------------------------------------------
-    real(DP), dimension(Ndim), parameter :: inter_move_delta = 1._DP ! u_length, adaptation
-    real(DP), parameter :: inter_move_rejectFix = 0.5_DP
-    integer, parameter :: inter_Nwidom = 500
-    ! -------------------------------------------------------------------------
-
 end module data_monteCarlo
 !***************************************************************************************************
 
@@ -155,17 +144,6 @@ implicit none
     real(DP), parameter :: mix_dr = 1._DP ! u_length
     real(DP), parameter :: mix_epsilon = 0._DP ! u_energy * u_length
     real(DP), parameter :: mix_alpha = 1._DP ! 1/u_length
-    
-    ! out ---------------------------------------------------------------------
-    !> The interactive spheres (inter) potential is composed of 3 parts :
-    !> hard sphere (HS) + Yukawa + cut.
-
-    real(DP), parameter :: inter_rMin_factor = 1._DP
-    real(DP), parameter :: inter_rCut = 4._DP ! u_length
-    real(DP), parameter :: inter_dr = 5.E-5_DP ! u_length
-    real(DP), parameter :: inter_epsilon = 1._DP ! u_energy * u_length
-    real(DP), parameter :: inter_alpha = 5._DP ! 1/u_length
-    ! -------------------------------------------------------------------------
     
     logical, parameter :: print_potential = .true.
         

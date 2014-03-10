@@ -5,7 +5,6 @@ use data_box, only : Ndim, Lsize
 use data_monteCarlo, only : Temperature
 use module_physics, only : random_surface, markov_surface
 use class_hardSpheres
-use class_interactingSpheres
 use class_dipolarSpheres
 use class_mixingPotential
 use class_observables
@@ -221,8 +220,6 @@ contains
                 mCol(:) = this%orientations(:, this_iCol)
                 EpotsOld(1) = this%Epot_real_solo(this_iCol, xOld, mCol) ! Epot_reci: 
                                                                          ! cf. after_switch_energy
-            type is (InteractingSpheres)
-                call this%Epot_neighCells(this_iCol, xOld, indicesOld(1), overlap, EpotsOld(1))
             type is (HardSpheres)
                 EpotsOld(1) = 0._DP
         end select
