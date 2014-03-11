@@ -2,17 +2,17 @@
 
 module class_hardSpheres
 
-use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
-use data_precisions, only : DP, real_zero
-use data_constants, only : PI
-use data_box, only : Ndim, Lsize
-use data_particles, only : hard_sigma, hard_Ncol
-use data_monteCarlo, only : hard_move_delta, hard_move_rejectFix, hard_Nwidom
-use data_potential, only : hard_rMin_factor
-use data_neighbourCells, only : NnearCell
-use data_distribution, only : snap_ratio
-use module_types, only : Node
-use module_physics_micro, only : dist_PBC
+use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
+use data_precisions, only: DP, real_zero
+use data_constants, only: PI
+use data_box, only: Ndim, Lsize
+use data_particles, only: hard_sigma, hard_Ncol
+use data_monteCarlo, only: hard_move_delta, hard_move_rejectFix, hard_Nwidom
+use data_potential, only: hard_rMin_factor
+use data_neighbourCells, only: NnearCell
+use data_distribution, only: snap_ratio
+use module_types, only: Node
+use module_physics_micro, only: dist_PBC
 use class_neighbourCells
 
 implicit none
@@ -199,13 +199,13 @@ contains
         integer, intent(in) :: report_unit
 
         if (reject < real_zero) then
-            write(error_unit, *) this%name, " :    Warning : move_delta adaptation problem."
+            write(error_unit, *) this%name, ":    Warning: move_delta adaptation problem."
             this%move_delta(:) = this%move_deltaSave(:)
             write(error_unit, *) "default move_delta :", this%move_delta(:)
         end if
 
         if (norm2(this%move_delta) > norm2(Lsize)) then
-            write(error_unit, *) this%name, " :   Warning : move_delta too big."
+            write(error_unit, *) this%name, ":   Warning: move_delta too big."
             this%move_delta(:) = Lsize(:)
             write(error_unit, *) "big move_delta :", this%move_delta(:)
         end if
@@ -231,7 +231,7 @@ contains
         compacity = 4._DP/3._DP*PI*(this%sigma/2._DP)**3 * density
         concentration = real(this%Ncol, DP) / real(total_Ncol, DP)
         
-        write(output_unit, *) this%name, " : "
+        write(output_unit, *) this%name, ": "
         write(output_unit, *) "    density = ", density
         write(output_unit, *) "    compacity = ", compacity
         write(output_unit, *) "    concentration = ", concentration
@@ -265,7 +265,7 @@ contains
         
     end subroutine HardSpheres_print_report
     
-    !> Take a snap shot of the configuration : positions
+    !> Take a snap shot of the configuration: positions
     
     !> Tag the snapshots
     
@@ -275,7 +275,7 @@ contains
         write(snap_unit, *) this%name, this%Ncol, this%snap_factor
     end subroutine HardSpheres_snap_data
     
-    !> Configuration state : positions
+    !> Configuration state: positions
       
     subroutine HardSpheres_snap_positions(this, iStep, snap_unit)
         
@@ -315,7 +315,7 @@ contains
             end do
         end do
         
-        write(output_unit, *) this%name, " :    Overlap test : OK !"
+        write(output_unit, *) this%name, ":    Overlap test: OK !"
     
     end subroutine HardSpheres_test_overlap
     
@@ -350,7 +350,7 @@ contains
         
     end subroutine HardSpheres_Epot_init
     
-    !> Print the potential : dummy
+    !> Print the potential: dummy
     
     subroutine HardSpheres_Epot_print(this, Epot_unit)
     
@@ -407,7 +407,7 @@ contains
     
     end subroutine HardSpheres_Epot_neighCells
     
-    !> Total potential energy : dummy
+    !> Total potential energy: dummy
     
     pure function HardSpheres_Epot_conf(this) result(Epot_conf)
     

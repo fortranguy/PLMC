@@ -2,10 +2,10 @@
 
 module module_physics_micro
 
-use, intrinsic :: iso_fortran_env, only : error_unit
-use data_precisions, only : DP
-use data_constants, only : PI, sigma3d
-use data_box, only : Ndim, Lsize, Kmax
+use, intrinsic :: iso_fortran_env, only: error_unit
+use data_precisions, only: DP
+use data_constants, only: PI, sigma3d
+use data_box, only: Ndim, Lsize, Kmax
 !$ use omp_lib
 
 implicit none
@@ -143,7 +143,7 @@ contains
     
     end subroutine markov_surface
 
-    !> Symmetry : half wave vectors in do loop : Kmax1
+    !> Symmetry: half wave vectors in do loop: Kmax1
 
     pure function Kmax1_sym(ky, kz)
 
@@ -158,7 +158,7 @@ contains
 
     end function Kmax1_sym
 
-    !> Symmetry : half wave vectors in do loop : Kmax2
+    !> Symmetry: half wave vectors in do loop: Kmax2
 
     pure function Kmax2_sym(kz)
 

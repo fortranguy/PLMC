@@ -2,7 +2,7 @@
 
 module module_monteCarlo
 
-use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
+use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
 use module_types, only: argument_seed, argument_initial
 
 implicit none
@@ -131,7 +131,7 @@ contains
                     init_redefined = .true.
 
                 case ("-s", "--seed")
-                    if (seed_redefined) error stop "Error : seed already defined."
+                    if (seed_redefined) error stop "Error: seed already defined."
                     iArg = iArg + 1
                     call get_command_argument(iArg, sub_argument, length, status)
                     if (status /= 0) error stop "Enter seed choice, cf. help."

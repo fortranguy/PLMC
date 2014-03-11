@@ -2,9 +2,9 @@
 
 module module_distribution
 
-use data_precisions, only : DP
-use data_constants, only : PI
-use data_distribution, only : dist_dr
+use data_precisions, only: DP
+use data_constants, only: PI
+use data_distribution, only: dist_dr
 
 implicit none
 

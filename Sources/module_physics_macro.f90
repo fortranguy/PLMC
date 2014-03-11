@@ -2,7 +2,7 @@
 
 module module_physics_macro
 
-use, intrinsic :: iso_fortran_env, only : output_unit, error_unit, iostat_end
+use, intrinsic :: iso_fortran_env, only: output_unit, error_unit, iostat_end
 use data_precisions, only: DP, io_tiny
 use data_box, only: Ndim, Lsize
 use module_types, only: argument_seed, argument_initial
@@ -17,7 +17,7 @@ public init_randomSeed, set_initialCondition
 
 contains
 
-    !> Random number generator : seed
+    !> Random number generator: seed
     
     subroutine init_randomSeed(arg_seed, report_unit)
     
@@ -49,7 +49,7 @@ contains
                 write(report_unit, *) "Random number generator: fix"
 
             case default
-                error stop "Error : init_randomSeed"
+                error stop "Error: init_randomSeed"
 
         end select
 
@@ -209,7 +209,7 @@ contains
                                       spherical%positions, norm2(Lsize))
             
             case default
-                error stop "Error : set_initialCondition"
+                error stop "Error: set_initialCondition"
                 
         end select
         

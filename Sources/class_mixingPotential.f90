@@ -2,14 +2,14 @@
 
 module class_mixingPotential
 
-use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
-use data_precisions, only : DP, real_zero
-use data_box, only : Ndim
-use data_particles, only : mix_delta
-use data_potential, only : mix_rMin_factor, mix_rCut, mix_dr, mix_epsilon, mix_alpha
-use data_neighbourCells, only : NnearCell
-use module_types, only : Node
-use module_physics_micro, only : set_discrete_length, dist_PBC, Epot_yukawa
+use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
+use data_precisions, only: DP, real_zero
+use data_box, only: Ndim
+use data_particles, only: mix_delta
+use data_potential, only: mix_rMin_factor, mix_rCut, mix_dr, mix_epsilon, mix_alpha
+use data_neighbourCells, only: NnearCell
+use module_types, only: Node
+use module_physics_micro, only: set_discrete_length, dist_PBC, Epot_yukawa
 use class_neighbourCells
 use class_hardSpheres
 
@@ -28,8 +28,8 @@ private
         real(DP) :: rMin !< minimum distance between two particles
         real(DP) :: rCut !< short-range cut
         real(DP) :: dr !< discretisation step
-        integer :: iMin !< minimum index of tabulation : minimum distance
-        integer :: iCut !< maximum index of tabulation : until potential cut
+        integer :: iMin !< minimum index of tabulation: minimum distance
+        integer :: iCut !< maximum index of tabulation: until potential cut
         real(DP) :: epsilon !< factor in Yukawa
         real(DP) :: alpha !< coefficient in Yukawa
         real(DP), dimension(:), allocatable :: Epot_tab !< tabulation
@@ -141,7 +141,7 @@ contains
                     
                 r_mix = dist_PBC(type1%positions(:, type1_iCol), type2%positions(:, type2_iCol))
                 if (r_mix < this%rMin) then
-                    write(error_unit, *) this%name, " :    Overlap !", type1_iCol, type2_iCol
+                    write(error_unit, *) this%name, ":    Overlap !", type1_iCol, type2_iCol
                     write(error_unit, *) "    r_mix = ", r_mix
                     error stop
                 end if
@@ -149,7 +149,7 @@ contains
             end do
         end do
 
-        write(output_unit, *) this%name, " :    Overlap test : OK !"
+        write(output_unit, *) this%name, ":    Overlap test: OK !"
     
     end subroutine MixingPotential_test_overlap
 

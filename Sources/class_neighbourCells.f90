@@ -2,12 +2,12 @@
 
 module class_neighbourCells
 
-use, intrinsic :: iso_fortran_env, only : error_unit
-use data_precisions, only : DP, real_zero
-use data_box, only : Ndim, Lsize
-use data_neighbourCells, only : NnearCell_dim, NnearCell
-use module_types, only : Node, LinkedList
-use module_physics_micro, only : index_from_coord, coord_PBC
+use, intrinsic :: iso_fortran_env, only: error_unit
+use data_precisions, only: DP, real_zero
+use data_box, only: Ndim, Lsize
+use data_neighbourCells, only: NnearCell_dim, NnearCell
+use module_types, only: Node, LinkedList
+use module_physics_micro, only: index_from_coord, coord_PBC
 
 implicit none
 private
@@ -76,7 +76,7 @@ contains
         
     end subroutine NeighbourCells_destroy
     
-    !> Accessor : cell_size
+    !> Accessor: cell_size
     
     pure function NeighbourCells_get_cell_size(this) result(get_cell_size)
     
@@ -87,7 +87,7 @@ contains
     
     end function NeighbourCells_get_cell_size
     
-    !> Accessor : NtotalCell_dim
+    !> Accessor: NtotalCell_dim
     
     pure function NeighbourCells_get_NtotalCell_dim(this) result(get_NtotalCell_dim)
     
@@ -211,7 +211,7 @@ contains
         
     end subroutine NeighbourCells_check_cellsSize
     
-    ! Assignment : particle -> cell
+    ! Assignment: particle -> cell
     
     pure function NeighbourCells_index_from_position(this, xCol) result(index_from_position)
     

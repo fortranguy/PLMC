@@ -1,9 +1,9 @@
 module module_algorithms
 
-use data_precisions, only : DP
-use data_box, only : Ndim, Lsize
-use data_monteCarlo, only : Temperature
-use module_physics_micro, only : random_surface, markov_surface
+use data_precisions, only: DP
+use data_box, only: Ndim, Lsize
+use data_monteCarlo, only: Temperature
+use module_physics_micro, only: random_surface, markov_surface
 use class_hardSpheres
 use class_dipolarSpheres
 use class_mixingPotential
@@ -245,7 +245,7 @@ contains
         
         xNew(:) = other%positions(:, other_iCol)
         
-        if (this%get_Ncol() >= other%get_Ncol()) then ! optimisation : more chance to overlap
+        if (this%get_Ncol() >= other%get_Ncol()) then ! optimisation: more chance to overlap
             indicesNew(1) = this%sameCells%index_from_position(xNew)
             call this%Epot_neighCells(this_iCol, xNew, indicesNew(1), overlap, EpotsNew(1))
         else
@@ -333,7 +333,7 @@ contains
             return
         end if
         
-        ! Old : before switch
+        ! Old: before switch
         call random_number(random)
         type1_iCol = int(random*type1%get_Ncol()) + 1
         call before_switch_energy(type1, type1_iCol, type2, type2_iCol, mix, type1_indicesOld, &
@@ -344,7 +344,7 @@ contains
         call before_switch_energy(type2, type2_iCol, type1, type1_iCol, mix, type2_indicesOld, &
                                   type2_xOld, type2_EpotsOld)
         
-        ! New : after switch
+        ! New: after switch
         call after_switch_energy(type1, type1_iCol, type1_xOld, type2, type2_iCol, mix, overlap, &
                                  type1_indicesNew, type1_xNew, type1_EpotsNew)
         

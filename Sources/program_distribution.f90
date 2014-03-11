@@ -2,13 +2,13 @@
 
 program distribution
 
-use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
-use data_precisions, only : DP
-use data_box, only : Ndim, Lsize
-use data_monteCarlo, only : Nstep
-use data_distribution, only : snap, dist_dr
-use module_physics_micro, only : dist_PBC
-use module_distribution, only : sphere_volume
+use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
+use data_precisions, only: DP
+use data_box, only: Ndim, Lsize
+use data_monteCarlo, only: Nstep
+use data_distribution, only: snap, dist_dr
+use module_physics_micro, only: dist_PBC
+use module_distribution, only: sphere_volume
 !$ use omp_lib
 
 implicit none
@@ -76,7 +76,7 @@ implicit none
         
         read(orientations_unit, *) nameBis, NcolBis, snap_factorBis
         if (nameBis/=name .or. NcolBis/=Ncol .or. snap_factorBis/=snap_factor) then
-            write(error_unit, *) "Error : positions and orientations tags don't match."
+            write(error_unit, *) "Error: positions and orientations tags don't match."
             error stop
         end if
         

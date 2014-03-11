@@ -2,19 +2,19 @@
 
 program monteCarlo_canonical_bulk
 
-use, intrinsic :: iso_fortran_env, only : output_unit
-use data_precisions, only : DP
-use data_monteCarlo, only : decorrelFactor, switch_factor, Nthermal, Nadapt, Nstep
-use data_distribution, only : snap
+use, intrinsic :: iso_fortran_env, only: output_unit
+use data_precisions, only: DP
+use data_monteCarlo, only: decorrelFactor, switch_factor, Nthermal, Nadapt, Nstep
+use data_distribution, only: snap
 use class_hardSpheres
 use class_dipolarSpheres
 use class_mixingPotential
 use class_observables
 use class_units
-use module_types, only : argument_seed, argument_initial
+use module_types, only: argument_seed, argument_initial
 use module_physics_macro, only: init_randomSeed, set_initialCondition
-use module_algorithms, only : move, widom, switch, rotate
-use module_tools, only : open_units, mix_open_units, &
+use module_algorithms, only: move, widom, switch, rotate
+use module_tools, only: open_units, mix_open_units, &
                          print_report, mix_init, mix_final, &
                          init, final, adapt_move, adapt_rotate, test_consist, print_results
 use module_monteCarlo, only: read_arguments
@@ -29,10 +29,10 @@ implicit none
     real(DP) :: tIni, tFin !< CPU initial and final time
     
     ! Total physical system variables
-    real(DP) :: Epot, EpotSum !< potential energy : at a Monte-Carlo step
-    real(DP) :: Epot_conf !< potential energy : complete calculation from a configuration
+    real(DP) :: Epot, EpotSum !< potential energy: at a Monte-Carlo step
+    real(DP) :: Epot_conf !< potential energy: complete calculation from a configuration
     integer :: report_unit !< data & results file
-    integer :: obsThermal_unit, obsEquilib_unit !< observables files : thermalisation & equilibrium
+    integer :: obsThermal_unit, obsEquilib_unit !< observables files: thermalisation & equilibrium
     
     ! Switch
     integer :: switch_Nhit, switch_Nreject
@@ -45,12 +45,12 @@ implicit none
     integer :: mix_Epot_unit !< tabulated potential file
     integer :: mix_obsThermal_unit, mix_obsEquilib_unit
     
-    ! Type 1 : Dipolar spheres : Ewald summation
+    ! Type 1: Dipolar spheres: Ewald summation
     type(DipolarSpheres) :: type1_spheres !< physical properties and Monte-Carlo subroutines
     type(MoreObservables) :: type1_obs !< e.g. energy, inverse of activity (-> chemical potential)
     type(MoreUnits) :: type1_units !< files units
     
-    ! Type 2 : Hard spheres
+    ! Type 2: Hard spheres
     type(HardSpheres) :: type2_spheres
     type(Observables) :: type2_obs
     type(Units) :: type2_units
@@ -71,7 +71,7 @@ implicit none
     
 ! Beginning ----------------------------------------------------------------------------------------
     
-    write(output_unit, *) "Monte-Carlo Simulation : Canonical ensemble"
+    write(output_unit, *) "Monte-Carlo Simulation: Canonical ensemble"
 
     ! Initialisations & reports
     
@@ -111,9 +111,9 @@ implicit none
     write(output_unit, *) "Beginning of cycles"
     
     call cpu_time(tIni)
-    MC_Cycle : do iStep = 1, Nthermal + Nstep
+    MC_Cycle: do iStep = 1, Nthermal + Nstep
         
-        MC_Change : do iChange = 1, Nmove + Nswitch + Nrotate
+        MC_Change: do iChange = 1, Nmove + Nswitch + Nrotate
         
             ! Randomly choosing the change
             call random_number(random)
@@ -151,7 +151,7 @@ implicit none
         switch_reject = real(switch_Nreject, DP)/real(switch_Nhit, DP)
         switch_Nreject = 0; switch_Nhit = 0
         
-        MC_Regime : if (iStep <= Nthermal) then ! Thermalisation
+        MC_Regime: if (iStep <= Nthermal) then ! Thermalisation
             
             ! Change adaptation
             if (mod(iStep, Nadapt) /= 0) then ! Rejections accumulation
@@ -171,7 +171,7 @@ implicit none
             write(obsThermal_unit, *) iStep, type1_obs%Epot + type2_obs%Epot + mix_Epot
             
             if (iStep == Nthermal) then ! Definite thermalised displacements
-                write(output_unit, *) "Thermalisation : over"
+                write(output_unit, *) "Thermalisation: over"
                 call type1_spheres%set_move_delta(type1_obs%move_rejectAvg, type1_units%report)
                 call type1_spheres%set_rotate_delta(type1_obs%rotate_rejectAvg, type1_units%report)
                 call type2_spheres%set_move_delta(type2_obs%move_rejectAvg, type2_units%report)
@@ -179,7 +179,7 @@ implicit none
         
         else MC_Regime ! Thermalisation over -> Equilibrium
         
-            ! Chemical potentials : Widom method
+            ! Chemical potentials: Widom method
             call widom(type1_spheres, type1_obs, type2_spheres, mix)
             call widom(type2_spheres, type2_obs, type1_spheres, mix)
         

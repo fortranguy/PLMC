@@ -2,9 +2,9 @@
 
 program bunching
 
-use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
-use data_precisions, only : DP
-use data_monteCarlo, only : Nstep
+use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
+use data_precisions, only: DP
+use data_monteCarlo, only: Nstep
 
 implicit none
 

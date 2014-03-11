@@ -2,12 +2,12 @@
 
 module module_tools
 
-use data_precisions, only : DP, real_zero, io_tiny, consist_tiny
-use data_constants, only : PI, sigma3d
-use data_box, only : Ndim, Lsize, Kmax
-use data_monteCarlo, only : Temperature, Nadapt, Nstep, decorrelFactor, Nthermal
-use data_potential, only : print_potential
-use module_types, only : argument_seed, argument_initial
+use data_precisions, only: DP, real_zero, io_tiny, consist_tiny
+use data_constants, only: PI, sigma3d
+use data_box, only: Ndim, Lsize, Kmax
+use data_monteCarlo, only: Temperature, Nadapt, Nstep, decorrelFactor, Nthermal
+use data_potential, only: print_potential
+use module_types, only: argument_seed, argument_initial
 use class_hardSpheres
 use class_dipolarSpheres
 use class_mixingPotential
@@ -23,7 +23,7 @@ public open_units, mix_open_units, &
 
 contains
 
-    !> Total : open units
+    !> Total: open units
     
     subroutine open_units(report_unit, obsThermal_unit, obsEquilib_unit)
     
@@ -34,11 +34,11 @@ contains
              action='write')
         open(newunit=obsEquilib_unit, recl=4096, file="obsEquilib.out", status='new', &
              action='write')
-        write(obsEquilib_unit, *) "#", 1 ! 1 observable : energy
+        write(obsEquilib_unit, *) "#", 1 ! 1 observable: energy
         
     end subroutine open_units
 
-    !> Mix : open units
+    !> Mix: open units
     
     subroutine mix_open_units(mix_report_unit, mix_Epot_unit, mix_obsThermal_unit, &
                                   mix_obsEquilib_unit)
@@ -52,11 +52,11 @@ contains
              status='new', action='write')
         open(newunit=mix_obsEquilib_unit, recl=4096, file="mix_obsEquilib.out", status='new', &
              action='write')
-        write(mix_obsEquilib_unit, *) "#", 1 ! 1 observable : energy
+        write(mix_obsEquilib_unit, *) "#", 1 ! 1 observable: energy
         
      end subroutine mix_open_units
     
-    !> Total : print_report
+    !> Total: print_report
     
     subroutine print_report(Ncol, Nmove, Nswitch, Nrotate, report_unit)
     
@@ -187,7 +187,7 @@ contains
     
     end subroutine final
     
-    !> Change : average & adaptation
+    !> Change: average & adaptation
     
     subroutine adapt_move(this, iStep, obs, move_unit)
     
@@ -217,7 +217,7 @@ contains
         
     end subroutine adapt_rotate
     
-    !> Total & Mix : consistency test
+    !> Total & Mix: consistency test
     
     subroutine test_consist(Epot, Epot_conf, report_unit)
     
@@ -246,7 +246,7 @@ contains
     
     end subroutine test_consist
     
-    !> Total : Results
+    !> Total: Results
     
     subroutine print_results(Ncol, EpotSum, switch_rejectSum, duration, report_unit)
     
@@ -264,7 +264,7 @@ contains
     
     end subroutine print_results
     
-    !> Mix : Results
+    !> Mix: Results
     
     subroutine mix_print_results(EpotSum, report_unit)
     

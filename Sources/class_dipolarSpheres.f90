@@ -2,18 +2,18 @@
 
 module class_dipolarSpheres
 
-use, intrinsic :: iso_fortran_env, only : output_unit, error_unit
-use data_precisions, only : DP, real_zero, consist_tiny
-use data_constants, only : PI
-use data_box, only : Ndim, Lsize, Kmax
-use data_particles, only : dipol_Ncol
-use data_monteCarlo, only : dipol_move_delta, dipol_move_rejectFix, dipol_rotate_delta, &
+use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
+use data_precisions, only: DP, real_zero, consist_tiny
+use data_constants, only: PI
+use data_box, only: Ndim, Lsize, Kmax
+use data_particles, only: dipol_Ncol
+use data_monteCarlo, only: dipol_move_delta, dipol_move_rejectFix, dipol_rotate_delta, &
                             dipol_rotate_deltaMax, dipol_rotate_rejectFix, dipol_Nwidom, &
                             dipol_reInit_iStep
-use data_potential, only : dipol_rMin_factor, dipol_real_rCut_factor, dipol_real_dr, dipol_alpha_factor
-use data_neighbourCells, only : NnearCell
-use data_distribution, only : snap_ratio
-use module_physics_micro, only : set_discrete_length, distVec_PBC, Kmax1_sym, Kmax2_sym, fourier_i
+use data_potential, only: dipol_rMin_factor, dipol_real_rCut_factor, dipol_real_dr, dipol_alpha_factor
+use data_neighbourCells, only: NnearCell
+use data_distribution, only: snap_ratio
+use module_physics_micro, only: set_discrete_length, distVec_PBC, Kmax1_sym, Kmax2_sym, fourier_i
 use class_neighbourCells
 use class_hardSpheres
 
@@ -40,10 +40,10 @@ private
         ! Potential
         real(DP) :: real_rCut !< real space potential cut
         real(DP) :: real_dr !< discretisation step
-        integer :: real_iMin !< minimum index of tabulation : minimum distance
-        integer :: real_iCut !< maximum index of tabulation : until potential cut
+        integer :: real_iMin !< minimum index of tabulation: minimum distance
+        integer :: real_iCut !< maximum index of tabulation: until potential cut
         real(DP) :: alpha !< coefficient of Ewald summation
-        real(DP), dimension(:, :), allocatable :: Epot_real_tab !< tabulation : real short-range
+        real(DP), dimension(:, :), allocatable :: Epot_real_tab !< tabulation: real short-range
         real(DP), dimension(-Kmax(1):Kmax(1), -Kmax(2):Kmax(2), -Kmax(3):Kmax(3)) :: Epot_reci_weight
         integer :: NwaveVectors
         complex(DP), dimension(-Kmax(1):Kmax(1), -Kmax(2):Kmax(2), -Kmax(3):Kmax(3)) :: structure
@@ -60,7 +60,7 @@ private
         !> Print a report of the component in a file
         procedure :: print_report => DipolarSpheres_print_report
         
-        !> Take a snap shot of the configuration : orientations
+        !> Take a snap shot of the configuration: orientations
         procedure :: snap_orientations => DipolarSpheres_snap_orientations
         
         !> Adapt the rotation rotate_delta during thermalisation
@@ -81,7 +81,7 @@ private
         procedure, private :: Epot_real_pair => DipolarSpheres_Epot_real_pair
         procedure :: Epot_real_solo => DipolarSpheres_Epot_real_solo
         procedure, private :: Epot_real => DipolarSpheres_Epot_real
-        !>     Reciprocal : init
+        !>     Reciprocal: init
         procedure, private :: Epot_reci_init_weight => DipolarSpheres_Epot_reci_init_weight
         procedure, private :: Epot_reci_init_structure => DipolarSpheres_Epot_reci_init_structure
         procedure, private :: Epot_reci_init => DipolarSpheres_Epot_reci_init
@@ -89,7 +89,7 @@ private
                               DipolarSpheres_Epot_reci_get_structure_modulus
         procedure :: Epot_reci_reInit_structure => DipolarSpheres_Epot_reci_reInit_structure
         procedure :: Epot_reci_count_waveVectors => DipolarSpheres_Epot_reci_count_waveVectors
-        !>     Reciprocal : delta
+        !>     Reciprocal: delta
         procedure :: deltaEpot_reci_move => DipolarSpheres_deltaEpot_reci_move
         procedure :: reci_update_structure_move => &
                               DipolarSpheres_reci_update_structure_move
@@ -97,7 +97,7 @@ private
         procedure :: reci_update_structure_rotate => &
                               DipolarSpheres_reci_update_structure_rotate
         procedure :: deltaEpot_reci_exchange => DipolarSpheres_deltaEpot_reci_exchange
-        !>     Reciprocal : total
+        !>     Reciprocal: total
         procedure, private :: Epot_reci => DipolarSpheres_Epot_reci
         !>     Self
         procedure :: Epot_self_solo => DipolarSpheres_Epot_self_solo
@@ -187,7 +187,7 @@ contains
         
     end subroutine DipolarSpheres_print_report
     
-    !> Configuration state : orientations
+    !> Configuration state: orientations
       
     subroutine DipolarSpheres_snap_orientations(this, iStep, snap_unit)
         
@@ -235,13 +235,13 @@ contains
         integer, intent(in) :: report_unit
         
         if (reject < real_zero) then
-            write(error_unit, *) this%name, " :    Warning : rotate_delta adaptation problem."
+            write(error_unit, *) this%name, ":    Warning: rotate_delta adaptation problem."
             this%rotate_delta = this%rotate_deltaSave
             write(error_unit, *) "default rotate_delta :", this%rotate_delta
         end if
         
         if (this%rotate_delta > this%rotate_deltaMax) then
-            write(error_unit, *) this%name, " :   Warning : rotate_delta too big."
+            write(error_unit, *) this%name, ":   Warning: rotate_delta too big."
             this%rotate_delta = this%rotate_deltaMax
             write(error_unit, *) "big rotate_delta :", this%rotate_delta
         end if
@@ -253,7 +253,7 @@ contains
     
     end subroutine DipolarSpheres_set_rotate_delta
     
-    !> Accessor : rotate_delta
+    !> Accessor: rotate_delta
     
     pure function DipolarSpheres_get_rotate_delta(this) result(get_rotate_delta)
         class(DipolarSpheres), intent(in) :: this
@@ -261,7 +261,7 @@ contains
         get_rotate_delta = this%rotate_delta
     end function DipolarSpheres_get_rotate_delta
     
-    !> Accessor : reInit_iStep
+    !> Accessor: reInit_iStep
     
     pure function DipolarSpheres_get_reInit_iStep(this) result (get_reInit_iStep)
         class(DipolarSpheres), intent(in) :: this
@@ -269,7 +269,7 @@ contains
         get_reInit_iStep = this%reInit_iStep
     end function DipolarSpheres_get_reInit_iStep
 
-    ! Real : short-range interaction ---------------------------------------------------------------
+    ! Real: short-range interaction ---------------------------------------------------------------
 
     !> \f[ B(r) = \frac{\mathrm{erfc}(\alpha r)}{r^3} +
     !>           2\frac{\alpha}{\sqrt{\pi}}\frac{e^{-\alpha^2 r^2}}{r^2} \f]
@@ -295,7 +295,7 @@ contains
 
     end function DipolarSpheres_Epot_real_true
     
-    !> Initialisation : look-up (tabulation) table
+    !> Initialisation: look-up (tabulation) table
     
     pure subroutine DipolarSpheres_Epot_real_set_tab(this)
     
@@ -473,7 +473,7 @@ contains
     
     end function DipolarSpheres_Epot_real
 
-    ! Reciprocal : long-range interaction ----------------------------------------------------------
+    ! Reciprocal: long-range interaction ----------------------------------------------------------
     
     !> \f[
     !>      w(\alpha, \vec{k}) = \frac{e^{-\frac{\pi^2}{\alpha^2} \sum_d \frac{k_d^2}{L_d}}}
@@ -721,7 +721,7 @@ contains
 
         deltaEpot_reci_move = 0._DP
 
-        do kz = 0, Kmax(3) ! symmetry : half wave vectors -> double Energy
+        do kz = 0, Kmax(3) ! symmetry: half wave vectors -> double Energy
 
             waveVector(3) = real(kz, DP)
 
@@ -866,7 +866,7 @@ contains
 
         deltaEpot_reci_rotate = 0._DP
 
-        do kz = 0, Kmax(3) ! symmetry : half wave vectors -> double Energy
+        do kz = 0, Kmax(3) ! symmetry: half wave vectors -> double Energy
 
             waveVector(3) = real(kz, DP)
 
@@ -972,7 +972,7 @@ contains
     !>                          \}
     !> \f]
     
-    !> Summary : only the sign of \f[\vec{\mu}\f] changes.
+    !> Summary: only the sign of \f[\vec{\mu}\f] changes.
 
     pure function DipolarSpheres_deltaEpot_reci_exchange(this, xCol, mCol) &
                   result(deltaEpot_reci_exchange)
@@ -1066,7 +1066,7 @@ contains
         
     end function DipolarSpheres_Epot_reci
     
-    ! Self : correction ----------------------------------------------------------------------------
+    ! Self: correction ----------------------------------------------------------------------------
     
     !> Self energy of 1 dipole
     !> \f[ \frac{2}{3}\frac{\alpha^3}{\sqrt{\pi}} \vec{\mu}_i\cdot\vec{\mu}_i \f]
@@ -1154,11 +1154,11 @@ contains
 
     end subroutine DipolarSpheres_update_totalMoment_rotate
 
-    ! Boundary conditions : shape-dependent -------------------------------------------------------
+    ! Boundary conditions: shape-dependent -------------------------------------------------------
     
     !> Exchange
     
-    !> Difference of Energy : add
+    !> Difference of Energy: add
     !> \f[
     !>      \Delta U_{N \rightarrow N+1} = \frac{2\pi}{3V} [
     !>                                         (\vec{\mu}_{N+1} \cdot \vec{\mu}_{N+1})
@@ -1166,7 +1166,7 @@ contains
     !>                                     ]
     !> \f]
     
-    !> Difference of Energy : remove
+    !> Difference of Energy: remove
     !> \f[
     !>      \Delta U_{N \rightarrow N-1} = \frac{2\pi}{3V} [
     !>                                          (\vec{\mu}_{N+1} \cdot \vec{\mu}_{N+1})

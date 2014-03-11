@@ -7,7 +7,7 @@
 !***************************************************************************************************
 module data_precisions
 
-use, intrinsic :: iso_fortran_env, only : REAL64
+use, intrinsic :: iso_fortran_env, only: REAL64
 
 implicit none
 
@@ -25,7 +25,7 @@ end module data_precisions
 !***************************************************************************************************
 module data_constants
 
-use data_precisions, only : DP
+use data_precisions, only: DP
 
 implicit none
     
@@ -41,7 +41,7 @@ end module data_constants
 !***************************************************************************************************
 module data_box
 
-use data_precisions, only : DP
+use data_precisions, only: DP
 
 implicit none
     
@@ -66,7 +66,7 @@ end module data_box
 !***************************************************************************************************
 module data_particles
 
-use data_precisions, only : DP
+use data_precisions, only: DP
 
 implicit none
 
@@ -86,8 +86,8 @@ end module data_particles
 !***************************************************************************************************
 module data_monteCarlo
 
-use data_precisions, only : DP
-use data_box, only : Ndim
+use data_precisions, only: DP
+use data_box, only: Ndim
 
 implicit none
 
@@ -128,7 +128,7 @@ end module data_monteCarlo
 !***************************************************************************************************
 module data_potential
 
-use data_precisions, only : DP
+use data_precisions, only: DP
 
 implicit none
 
@@ -156,8 +156,8 @@ end module data_potential
 !***************************************************************************************************
 module data_neighbourCells
 
-use data_precisions, only : DP
-use data_box, only : Ndim
+use data_precisions, only: DP
+use data_box, only: Ndim
 
 implicit none
 
@@ -175,7 +175,7 @@ end module data_neighbourCells
 !***************************************************************************************************
 module data_histogram
 
-use data_precisions, only : DP
+use data_precisions, only: DP
 
 implicit none
 
@@ -190,7 +190,7 @@ end module data_histogram
 !***************************************************************************************************
 module data_distribution
 
-use data_precisions, only : DP
+use data_precisions, only: DP
 
 implicit none
 
