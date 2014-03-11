@@ -272,7 +272,7 @@ contains
     !> \f[ B(r) = \frac{\mathrm{erfc}(\alpha r)}{r^3} +
     !>           2\frac{\alpha}{\sqrt{\pi}}\frac{e^{-\alpha^2 r^2}}{r^2} \f]
     !> \f[ C(r) = 3\frac{\mathrm{erfc}(\alpha r)}{r^5} +
-    !>            2\frac{\alpha}{\sqrt{\pi}}(2\alpha^2 + \frac{3}{r^2})
+    !>            2\frac{\alpha}{\sqrt{\pi}}\left(2\alpha^2 + \frac{3}{r^2}\right)
     !>                                     \frac{e^{-\alpha^2 r^2}}{r^2} \f]
 
     pure function DipolarSpheres_Epot_real_true(this, r) result(Epot_real_true)
@@ -474,8 +474,8 @@ contains
     ! Reciprocal: long-range interaction ----------------------------------------------------------
     
     !> \f[
-    !>      w(\alpha, \vec{k}) = \frac{e^{-\frac{\pi^2}{\alpha^2} \sum_d \frac{k_d^2}{L_d}}}
-    !>                                {\sum_d \frac{k_d^2}{L_d}}
+    !>      w(\alpha, \vec{k}) = \frac{e^{-\frac{\pi^2}{\alpha^2} \sum_{d=1}^3 \frac{k_d^2}{L_d}}}
+    !>                                {\sum_{d=1}^3 \frac{k_d^2}{L_d}}
     !> \f]
     
     pure subroutine DipolarSpheres_Epot_reci_init_weight(this)
