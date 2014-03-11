@@ -29,7 +29,6 @@ private
 
         ! Particles
         real(DP) :: sigma !< diameter
-        real(DP) :: radius !< radius of a particle
         integer ::  Ncol !< number of a component particles
         real(DP), dimension(:, :), allocatable, public :: positions !< positions of all particles
         
