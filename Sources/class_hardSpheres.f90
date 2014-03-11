@@ -181,18 +181,13 @@ contains
         real(DP), parameter :: more = 1._DP+move_delta_eps
         real(DP), parameter :: less = 1._DP-move_delta_eps
         
-        if (reject < this%move_rejectFix - move_reject_eps) then
-        
-            this%move_delta(:) = this%move_delta(:) * more
-            
+        if (reject < this%move_rejectFix - move_reject_eps) then        
+            this%move_delta(:) = this%move_delta(:) * more            
             if (norm2(this%move_delta) > norm2(Lsize)) then
                 this%move_delta(:) = Lsize(:)
-            end if
-            
-        else if (reject > this%move_rejectFix + move_reject_eps) then
-        
-            this%move_delta(:) = this%move_delta(:) * less
-            
+            end if            
+        else if (reject > this%move_rejectFix + move_reject_eps) then        
+            this%move_delta(:) = this%move_delta(:) * less            
         end if
     
     end subroutine HardSpheres_adapt_move_delta
@@ -274,13 +269,10 @@ contains
     
     !> Tag the snapshots
     
-    subroutine HardSpheres_snap_data(this, snap_unit)
-    
+    subroutine HardSpheres_snap_data(this, snap_unit)    
         class(HardSpheres), intent(in) :: this
-        integer, intent(in) :: snap_unit
-        
-        write(snap_unit, *) this%name, this%Ncol, this%snap_factor
-    
+        integer, intent(in) :: snap_unit        
+        write(snap_unit, *) this%name, this%Ncol, this%snap_factor    
     end subroutine HardSpheres_snap_data
     
     !> Configuration state : positions
@@ -293,12 +285,10 @@ contains
     
         integer :: iCol
         
-        if (modulo(iStep, this%snap_factor) == 0) then
-        
+        if (modulo(iStep, this%snap_factor) == 0) then        
             do iCol = 1, this%Ncol
                 write(snap_unit, *) this%positions(:, iCol)
-            end do
-            
+            end do            
         end if
 
     end subroutine HardSpheres_snap_positions

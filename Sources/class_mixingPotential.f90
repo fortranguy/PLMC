@@ -40,17 +40,14 @@ private
     
         procedure :: construct => MixingPotential_construct
         procedure :: destroy => MixingPotential_destroy
-
         procedure :: print_report => MixingPotential_print_report
 
         procedure :: get_sigma => MixingPotential_get_sigma
-        procedure :: get_rCut => MixingPotential_get_rCut
-        
+        procedure :: get_rCut => MixingPotential_get_rCut        
         procedure :: set_cell_size => MixingPotential_set_cell_size
         procedure :: get_cell_size => MixingPotential_get_cell_size
         
         procedure :: test_overlap => MixingPotential_test_overlap
-
         procedure, private :: Epot_set_tab => MixingPotential_Epot_set_tab
         procedure :: Epot_init => MixingPotential_Epot_init
         procedure :: Epot_print => MixingPotential_Epot_print

@@ -197,12 +197,10 @@ contains
     
         integer :: iCol
         
-        if (modulo(iStep, this%snap_factor) == 0) then
-        
+        if (modulo(iStep, this%snap_factor) == 0) then        
             do iCol = 1, this%Ncol
                 write(snap_unit, *) this%orientations(:, iCol)
-            end do
-            
+            end do            
         end if
 
     end subroutine DipolarSpheres_snap_orientations
@@ -218,20 +216,14 @@ contains
         real(DP), parameter :: rotate_reject_eps = 0.1_DP * rotate_delta_eps
         real(DP), parameter :: more = 1._DP+rotate_delta_eps
         real(DP), parameter :: less = 1._DP-rotate_delta_eps
-
         
-        if (reject < this%rotate_rejectFix - rotate_reject_eps) then
-        
-            this%rotate_delta = this%rotate_delta * more
-  
+        if (reject < this%rotate_rejectFix - rotate_reject_eps) then        
+            this%rotate_delta = this%rotate_delta * more  
             if (this%rotate_delta > this%rotate_deltaMax) then
                 this%rotate_delta = this%rotate_deltaMax
-            end if
-            
-        else if (reject > this%rotate_rejectFix + rotate_reject_eps) then
-        
-            this%rotate_delta = this%rotate_delta * less
-            
+            end if            
+        else if (reject > this%rotate_rejectFix + rotate_reject_eps) then        
+            this%rotate_delta = this%rotate_delta * less            
         end if
     
     end subroutine DipolarSpheres_adapt_rotate_delta
@@ -263,24 +255,18 @@ contains
     
     !> Accessor : rotate_delta
     
-    pure function DipolarSpheres_get_rotate_delta(this) result(get_rotate_delta)
-        
+    pure function DipolarSpheres_get_rotate_delta(this) result(get_rotate_delta)        
         class(DipolarSpheres), intent(in) :: this
-        real(DP) :: get_rotate_delta
-        
-        get_rotate_delta = this%rotate_delta
-        
+        real(DP) :: get_rotate_delta        
+        get_rotate_delta = this%rotate_delta        
     end function DipolarSpheres_get_rotate_delta
     
     !> Accessor : reInit_iStep
     
-    pure function DipolarSpheres_get_reInit_iStep(this) result (get_reInit_iStep)
-    
+    pure function DipolarSpheres_get_reInit_iStep(this) result (get_reInit_iStep)    
         class(DipolarSpheres), intent(in) :: this
-        integer :: get_reInit_iStep
-    
-        get_reInit_iStep = this%reInit_iStep
-        
+        integer :: get_reInit_iStep    
+        get_reInit_iStep = this%reInit_iStep        
     end function DipolarSpheres_get_reInit_iStep
 
     ! Real : short-range interaction ---------------------------------------------------------------
