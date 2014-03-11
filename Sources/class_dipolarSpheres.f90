@@ -253,15 +253,13 @@ contains
     
     end subroutine DipolarSpheres_set_rotate_delta
     
-    !> Accessor: rotate_delta
+    !> Accessors
     
     pure function DipolarSpheres_get_rotate_delta(this) result(get_rotate_delta)
         class(DipolarSpheres), intent(in) :: this
         real(DP) :: get_rotate_delta
         get_rotate_delta = this%rotate_delta
     end function DipolarSpheres_get_rotate_delta
-    
-    !> Accessor: reInit_iStep
     
     pure function DipolarSpheres_get_reInit_iStep(this) result (get_reInit_iStep)
         class(DipolarSpheres), intent(in) :: this
