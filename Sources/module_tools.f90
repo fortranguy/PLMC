@@ -255,46 +255,6 @@ contains
         
     end subroutine init_randomSeed
     
-    !> Initial condition
-    
-    subroutine set_initialCondition(arg_init, dipolar, spherical, mix_sigma, report_unit)
-
-        type(argument_initial), intent(in) :: arg_init
-        class(DipolarSpheres), intent(inout) :: dipolar
-        class(HardSpheres), intent(inout) :: spherical
-        real(DP), intent(in) :: mix_sigma
-        integer, intent(in) :: report_unit
-        
-        write(report_unit, *) "Initial condition :"
-        
-        select case (arg_init%choice)
-        
-            case ('r')
-                call randomDepositions(dipolar, spherical, mix_sigma)
-                call randomOrientations(dipolar%orientations, dipolar%get_Ncol())
-                write(output_unit, *) "Random depositions + random orientations"
-                write(report_unit, *) "    Random depositions + random orientations"
-                
-            case ('f')
-                write(output_unit, *) "Old configuration"
-                write(report_unit, *) "    Old configuration"
-                call oldConfiguration(arg_init%files(1), arg_init%length(1), &
-                                      dipolar%get_name()//"_positions", dipolar%get_Ncol(), &
-                                      dipolar%positions, norm2(Lsize))
-                call oldConfiguration(arg_init%files(2), arg_init%length(2), &
-                                      dipolar%get_name()//"_orientations", dipolar%get_Ncol(), &
-                                      dipolar%orientations, 1._DP)
-                call oldConfiguration(arg_init%files(3), arg_init%length(3), &
-                                      spherical%get_name()//"_positions", spherical%get_Ncol(), &
-                                      spherical%positions, norm2(Lsize))
-            
-            case default
-                error stop "Error : set_initialCondition"                
-                
-        end select
-        
-    end subroutine set_initialCondition
-    
     !> Random depositions configuration
     
     subroutine randomDepositions(type1, type2, mix_sigma)
@@ -408,6 +368,46 @@ contains
         close(file_unit)
         
     end subroutine oldConfiguration
+    
+    !> Initial condition
+    
+    subroutine set_initialCondition(arg_init, dipolar, spherical, mix_sigma, report_unit)
+
+        type(argument_initial), intent(in) :: arg_init
+        class(DipolarSpheres), intent(inout) :: dipolar
+        class(HardSpheres), intent(inout) :: spherical
+        real(DP), intent(in) :: mix_sigma
+        integer, intent(in) :: report_unit
+        
+        write(report_unit, *) "Initial condition :"
+        
+        select case (arg_init%choice)
+        
+            case ('r')
+                call randomDepositions(dipolar, spherical, mix_sigma)
+                call randomOrientations(dipolar%orientations, dipolar%get_Ncol())
+                write(output_unit, *) "Random depositions + random orientations"
+                write(report_unit, *) "    Random depositions + random orientations"
+                
+            case ('f')
+                write(output_unit, *) "Old configuration"
+                write(report_unit, *) "    Old configuration"
+                call oldConfiguration(arg_init%files(1), arg_init%length(1), &
+                                      dipolar%get_name()//"_positions", dipolar%get_Ncol(), &
+                                      dipolar%positions, norm2(Lsize))
+                call oldConfiguration(arg_init%files(2), arg_init%length(2), &
+                                      dipolar%get_name()//"_orientations", dipolar%get_Ncol(), &
+                                      dipolar%orientations, 1._DP)
+                call oldConfiguration(arg_init%files(3), arg_init%length(3), &
+                                      spherical%get_name()//"_positions", spherical%get_Ncol(), &
+                                      spherical%positions, norm2(Lsize))
+            
+            case default
+                error stop "Error : set_initialCondition"                
+                
+        end select
+        
+    end subroutine set_initialCondition
     
     !> Total : print_report
     
