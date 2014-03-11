@@ -1,0 +1,6 @@
+*.f90~
+Makefile~
+*.mod
+*.o
+Doxyfile~
+.gitignore~
