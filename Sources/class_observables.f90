@@ -108,7 +108,7 @@ contains
         class(Observables), intent(in) :: this
         integer, intent(in) :: iStep, obs_unit
         
-        select type (this)        
+        select type (this)
             type is (MoreObservables)
                 write(obs_unit, *) iStep, this%Epot, this%activ, this%move_reject, &
                                    this%rotate_reject

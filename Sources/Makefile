@@ -13,7 +13,7 @@ ifeq ($(compiler), gfortran)
 	ifeq ($(omp), true)
         FFLAGS += -fopenmp
         LDFLAGS = -fopenmp
-    endif	
+    endif
 else
 	FC = ifort
 	# default: debug
@@ -27,7 +27,7 @@ else
 	ifeq ($(omp), true)
         FFLAGS += -openmp
         LDFLAGS = -openmp
-    endif	
+    endif
 endif
 
 # Default

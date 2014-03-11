@@ -43,7 +43,7 @@ private
         procedure :: print_report => MixingPotential_print_report
 
         procedure :: get_sigma => MixingPotential_get_sigma
-        procedure :: get_rCut => MixingPotential_get_rCut        
+        procedure :: get_rCut => MixingPotential_get_rCut
         procedure :: set_cell_size => MixingPotential_set_cell_size
         procedure :: get_cell_size => MixingPotential_get_cell_size
         
@@ -109,21 +109,21 @@ contains
         get_sigma = this%sigma
     end function MixingPotential_get_sigma
     
-    pure function MixingPotential_get_rCut(this) result(get_rCut)    
+    pure function MixingPotential_get_rCut(this) result(get_rCut)
         class(MixingPotential), intent(in) :: this
-        real(DP) :: get_rCut        
-        get_rCut = this%rCut    
+        real(DP) :: get_rCut
+        get_rCut = this%rCut
     end function MixingPotential_get_rCut
     
-    pure subroutine MixingPotential_set_cell_size(this)    
-        class(MixingPotential), intent(inout) :: this        
-        this%cell_size(:) = this%rCut    
+    pure subroutine MixingPotential_set_cell_size(this)
+        class(MixingPotential), intent(inout) :: this
+        this%cell_size(:) = this%rCut
     end subroutine MixingPotential_set_cell_size
     
-    pure function MixingPotential_get_cell_size(this) result(get_cell_size)    
+    pure function MixingPotential_get_cell_size(this) result(get_cell_size)
         class(MixingPotential), intent(in) :: this
-        real(DP), dimension(Ndim) :: get_cell_size        
-        get_cell_size(:) = this%cell_size(:)    
+        real(DP), dimension(Ndim) :: get_cell_size
+        get_cell_size(:) = this%cell_size(:)
    end function MixingPotential_get_cell_size
     
     !> Overlapt test

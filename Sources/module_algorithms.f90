@@ -218,7 +218,7 @@ contains
         select type (this)
             type is (DipolarSpheres)
                 mCol(:) = this%orientations(:, this_iCol)
-                EpotsOld(1) = this%Epot_real_solo(this_iCol, xOld, mCol) ! Epot_reci: 
+                EpotsOld(1) = this%Epot_real_solo(this_iCol, xOld, mCol) ! Epot_reci:
                                                                          ! cf. after_switch_energy
             type is (HardSpheres)
                 EpotsOld(1) = 0._DP

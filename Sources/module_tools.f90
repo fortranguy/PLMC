@@ -29,7 +29,7 @@ contains
     
         write(output_unit, *) "Usage: mc_[ENSEMBLE]_[GEOMETRY] [OPTION]"
         write(output_unit, *) "Run ENSEMBLE Monte-Carlo simulation in GEOMETRY."
-        write(output_unit, *)        
+        write(output_unit, *)
         write(output_unit, *) "Mandatory arguments to long options are mandatory for short options too."
         write(output_unit, *) "    -h, --help"
         write(output_unit, *) "    -i, --intial CONDITION   CONDITION='r', 'random' (default)"
@@ -238,7 +238,7 @@ contains
                 write(report_unit, *) "Random number generator: fix"
 
             case default
-                error stop "Error : init_randomSeed"                
+                error stop "Error : init_randomSeed"
 
         end select
 
@@ -398,7 +398,7 @@ contains
                                       spherical%positions, norm2(Lsize))
             
             case default
-                error stop "Error : set_initialCondition"                
+                error stop "Error : set_initialCondition"
                 
         end select
         
@@ -493,7 +493,7 @@ contains
             call this%Epot_print(this_units%Epot)
         end if
         select type (this)
-            type is (DipolarSpheres)            
+            type is (DipolarSpheres)
                 select type (this_units)
                     type is (MoreUnits)
                         call this%snap_data(this_units%snap_orientations)
@@ -503,8 +503,8 @@ contains
                         end if
                         call this%Epot_reci_count_waveVectors(this_units%waveVectors)
                 end select
-        end select        
-        this_Epot = this%Epot_conf()        
+        end select
+        this_Epot = this%Epot_conf()
         
         call this%construct_cells(other, mix%get_cell_size(), mix%get_rCut())
         call this%print_report(this_units%report)
@@ -526,7 +526,7 @@ contains
         call this_obs%print_results(this_units%report)
         
         select type (this)
-            type is (DipolarSpheres)            
+            type is (DipolarSpheres)
                 select type (this_units)
                     type is (MoreUnits)
                         call this%snap_orientations(0, this_units%snapFin_orientations)
@@ -581,9 +581,9 @@ contains
         if (abs(Epot_conf) < real_zero) then
             difference = abs(Epot_conf-Epot)
             write(report_unit, *) "    absolute difference = ", difference
-        else        
+        else
             difference = abs((Epot_conf-Epot)/Epot_conf)
-            write(report_unit, *) "    relative difference = ", difference        
+            write(report_unit, *) "    relative difference = ", difference
         end if
         
         if (difference > consist_tiny) then ! not sufficient for HS ?

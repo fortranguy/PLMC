@@ -187,9 +187,9 @@ contains
         exp_Ikx_i(1) = cmplx(cos(xColOverL_i), sin(xColOverL_i), DP)
         exp_Ikx_i(-1) = conjg(exp_Ikx_i(1))
         
-        do kx_i = 2, Kmax_i        
+        do kx_i = 2, Kmax_i
             exp_Ikx_i(kx_i) = exp_Ikx_i(kx_i-1) * exp_Ikx_i(1)
-            exp_Ikx_i(-kx_i) = conjg(exp_Ikx_i(kx_i))        
+            exp_Ikx_i(-kx_i) = conjg(exp_Ikx_i(kx_i))
         end do
     
     end subroutine fourier_i
