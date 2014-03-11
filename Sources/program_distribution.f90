@@ -7,7 +7,7 @@ use data_precisions, only : DP
 use data_box, only : Ndim, Lsize
 use data_monteCarlo, only : Nstep
 use data_distribution, only : snap, dist_dr
-use module_physics, only : dist_PBC
+use module_physics_micro, only : dist_PBC
 use module_distribution, only : sphere_volume
 !$ use omp_lib
 

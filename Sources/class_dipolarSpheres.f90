@@ -13,7 +13,7 @@ use data_monteCarlo, only : dipol_move_delta, dipol_move_rejectFix, dipol_rotate
 use data_potential, only : dipol_rMin_factor, dipol_real_rCut_factor, dipol_real_dr, dipol_alpha_factor
 use data_neighbourCells, only : NnearCell
 use data_distribution, only : snap_ratio
-use module_physics, only : set_discrete_length, distVec_PBC, Kmax1_sym, Kmax2_sym, fourier_i
+use module_physics_micro, only : set_discrete_length, distVec_PBC, Kmax1_sym, Kmax2_sym, fourier_i
 use class_neighbourCells
 use class_hardSpheres
 

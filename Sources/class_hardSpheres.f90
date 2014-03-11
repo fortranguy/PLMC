@@ -12,7 +12,7 @@ use data_potential, only : hard_rMin_factor
 use data_neighbourCells, only : NnearCell
 use data_distribution, only : snap_ratio
 use module_types, only : Node
-use module_physics, only : dist_PBC
+use module_physics_micro, only : dist_PBC
 use class_neighbourCells
 
 implicit none

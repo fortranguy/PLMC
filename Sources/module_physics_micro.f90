@@ -1,6 +1,6 @@
-!> Subroutines for physical purposes
+!> Subroutines for Physics / micro: before
 
-module module_physics
+module module_physics_micro
 
 use, intrinsic :: iso_fortran_env, only : error_unit
 use data_precisions, only : DP
@@ -252,4 +252,4 @@ contains
     
     end function Epot_yukawa
 
-end module module_physics
+end module module_physics_micro

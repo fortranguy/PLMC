@@ -9,7 +9,7 @@ use data_box, only : Ndim, Lsize, Kmax
 use data_monteCarlo, only : Temperature, Nadapt, Nstep, decorrelFactor, Nthermal
 use data_potential, only : print_potential
 use module_types, only : argument_seed, argument_initial
-use module_physics, only : dist_PBC, random_surface
+use module_physics_micro, only : dist_PBC, random_surface
 use class_hardSpheres
 use class_dipolarSpheres
 use class_mixingPotential

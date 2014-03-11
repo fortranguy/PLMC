@@ -3,7 +3,7 @@ module module_algorithms
 use data_precisions, only : DP
 use data_box, only : Ndim, Lsize
 use data_monteCarlo, only : Temperature
-use module_physics, only : random_surface, markov_surface
+use module_physics_micro, only : random_surface, markov_surface
 use class_hardSpheres
 use class_dipolarSpheres
 use class_mixingPotential

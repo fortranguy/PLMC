@@ -7,7 +7,7 @@ use data_precisions, only : DP, real_zero
 use data_box, only : Ndim, Lsize
 use data_neighbourCells, only : NnearCell_dim, NnearCell
 use module_types, only : Node, LinkedList
-use module_physics, only : index_from_coord, coord_PBC
+use module_physics_micro, only : index_from_coord, coord_PBC
 
 implicit none
 private

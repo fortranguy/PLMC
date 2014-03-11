@@ -53,7 +53,7 @@ data.o: data.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 module_types.o: module_types.f90
 	$(FC) -c $(FFLAGS) $< -o $@
-module_physics.o: module_physics.f90
+module_physics_micro.o: module_physics_micro.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_neighbourCells.o: class_neighbourCells.f90
 	$(FC) -c $(FFLAGS) $< -o $@
@@ -85,7 +85,7 @@ program_distribution.o: program_distribution.f90
 # ------------------------------------------------------------------------
 
 $(EXEC1): data.o \
-          module_types.o module_physics.o \
+          module_types.o module_physics_micro.o \
           class_neighbourCells.o \
           class_hardSpheres.o class_dipolarSpheres.o \
           class_mixingPotential.o \
@@ -100,7 +100,7 @@ $(EXEC2): data.o program_bunching.o
 $(EXEC3): data.o program_histogram.o
 	$(FC) $^ $(LDFLAGS) -o $@
 	
-$(EXEC4): data.o module_physics.o module_distribution.o program_distribution.o
+$(EXEC4): data.o module_physics_micro.o module_distribution.o program_distribution.o
 	$(FC) $^ $(LDFLAGS) -o $@
 
 # --------------------------------------------------------------------------------------------------
