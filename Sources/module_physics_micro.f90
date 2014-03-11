@@ -228,7 +228,9 @@ contains
     !> Potential energy
     
     !> Lennard-Jones
-    !> \f[ 4 epsilon ((\frac{\sigma}{r})^12 - (\frac{\sigma}{r})^6) \f]
+    !> \f[ 
+    !>      4\epsilon\left[\left(\frac{\sigma}{r}\right)^{12} - \left(\frac{\sigma}{r}\right)^6\right]
+    !> \f]
     pure function Epot_lennardJones(epsilon, sigma, r)
     
         real(DP), intent(in) :: epsilon
