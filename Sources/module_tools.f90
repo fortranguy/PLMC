@@ -243,7 +243,6 @@ contains
         end select
 
         call random_seed(get = seed)
-        
         write(report_unit ,*) "    size = ", n
         write(report_unit ,*) "    seed = ", seed(:)
 
