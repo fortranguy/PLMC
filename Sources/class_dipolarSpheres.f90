@@ -521,7 +521,7 @@ contains
     !> \f]
     !> We will also use a restricted definition later :
     !> \f[
-    !>      S_l(\vec{k}) = \sum_{i \neq l} (\vec{k}\cdot\vec{\mu}_i) e^{+i\vec{k}\cdot\vec{x}_i}
+    !>      S_\underline{l}(\vec{k}) = \sum_{i \neq l} (\vec{k}\cdot\vec{\mu}_i) e^{+i\vec{k}\cdot\vec{x}_i}
     !> \f].
 
     pure subroutine DipolarSpheres_Epot_reci_init_structure(this)
@@ -668,13 +668,13 @@ contains
 
     !> Move
 
-    !> Difference of Energy \f[ \Delta U = \frac{2\pi}{V} \sum_{\vec{k} \neq 0} \Delta M^2
+    !> Difference of Energy \f[ \Delta U = \frac{2\pi}{V} \sum_{\vec{k} \neq 0} \Delta S^2
     !> w(\alpha, \vec{k}) \f]
     !> \f[
-    !>  \Delta M^2 = 2\Re[
+    !>  \Delta S^2 = 2\Re[
     !>                  (\vec{\mu}_l\cdot\vec{k})
     !>                  (e^{-i\vec{k}\cdot\vec{x}^\prime_l} - e^{-i\vec{k}\cdot\vec{x}_l})
-    !>                  S_l(\vec{k})
+    !>                  S_\underline{l}(\vec{k})
     !>               ]
     !> \f]
 
@@ -822,13 +822,13 @@ contains
     
     !> Rotate
 
-    !> Difference of Energy \f[ \Delta U = \frac{2\pi}{V} \sum_{\vec{k} \neq 0} \Delta M^2
+    !> Difference of Energy \f[ \Delta U = \frac{2\pi}{V} \sum_{\vec{k} \neq 0} \Delta S^2
     !>                                       w(\alpha, \vec{k}) \f]
     !> \f[
-    !>  \Delta M^2 = (\vec{k} \cdot \vec{\mu}_l^\prime)^2 - (\vec{k} \cdot \vec{\mu}_l)^2 +
+    !>  \Delta S^2 = (\vec{k} \cdot \vec{\mu}_l^\prime)^2 - (\vec{k} \cdot \vec{\mu}_l)^2 +
     !>               2\Re\{
     !>                  [(\vec{k} \cdot \vec{\mu}_l^\prime) - (\vec{k} \cdot \vec{\mu}_l)]
-    !>                  e^{-i \vec{k} \cdot \vec{x}_l} S_l(\vec{k})
+    !>                  e^{-i \vec{k} \cdot \vec{x}_l} S_\underline{l}(\vec{k})
     !>               \}
     !> \f]
     
@@ -1100,7 +1100,7 @@ contains
 
     !> Total dipole moment :
     !> \f[ \vec{M} = \sum_j \vec{\mu}_j \f]
-    !> \f[ \vec{M}_l = \sum_{j \neq l} \vec{\mu}_j \f]
+    !> \f[ \vec{M}_\underline{l} = \sum_{j \neq l} \vec{\mu}_j \f]
     
     pure subroutine DipolarSpheres_init_totalMoment(this)
     
@@ -1160,7 +1160,7 @@ contains
     !> \f[
     !>      \Delta U_{N \rightarrow N+1} = \frac{2\pi}{3V} [
     !>                                         (\vec{\mu}_{N+1} \cdot \vec{\mu}_{N+1})
-    !>                                          2\vec{\mu}) \cdot \vec{M}^N
+    !>                                          +2(\vec{\mu} \cdot \vec{M}_N)
     !>                                     ]
     !> \f]
     
@@ -1168,7 +1168,7 @@ contains
     !> \f[
     !>      \Delta U_{N \rightarrow N-1} = \frac{2\pi}{3V} [
     !>                                          (\vec{\mu}_{N+1} \cdot \vec{\mu}_{N+1})
-    !>                                          -2\vec{\mu}) \cdot \vec{M}^N
+    !>                                          -2(\vec{\mu} \cdot \vec{M}_N)
     !>                                      ]
     !> \f]
     
@@ -1193,7 +1193,7 @@ contains
     !>      \Delta U = \frac{2\pi}{3V} [
     !>                      (\vec{\mu}^\prime_l \cdot \vec{\mu}^\prime_l) -
     !>                      (\vec{\mu}_l \cdot \vec{\mu}_l) +
-    !>                      2 (\vec{\mu}^\prime_l - \vec{\mu}_l) \cdot \vec{M}_l
+    !>                      2 (\vec{\mu}^\prime_l - \vec{\mu}_l) \cdot \vec{M}_\underline{l}
     !>                 ]
     !> \f]
     
