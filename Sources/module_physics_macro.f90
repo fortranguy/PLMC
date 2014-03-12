@@ -185,7 +185,7 @@ contains
         real(DP), intent(in) :: mix_sigma
         integer, intent(in) :: report_unit
         
-        write(report_unit, *) "Initial condition :"
+        write(report_unit, *) "Initial condition: "
         
         select case (arg_init%choice)
         

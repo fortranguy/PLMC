@@ -201,16 +201,16 @@ contains
         if (reject < real_zero) then
             write(error_unit, *) this%name, ":    Warning: move_delta adaptation problem."
             this%move_delta(:) = this%move_deltaSave(:)
-            write(error_unit, *) "default move_delta :", this%move_delta(:)
+            write(error_unit, *) "default move_delta: ", this%move_delta(:)
         end if
 
         if (norm2(this%move_delta) > norm2(Lsize)) then
             write(error_unit, *) this%name, ":   Warning: move_delta too big."
             this%move_delta(:) = Lsize(:)
-            write(error_unit, *) "big move_delta :", this%move_delta(:)
+            write(error_unit, *) "big move_delta: ", this%move_delta(:)
         end if
 
-        write(report_unit, *) "Displacement :"
+        write(report_unit, *) "Displacement: "
         write(report_unit, *) "    move_delta(:) = ", this%move_delta(:)
         write(report_unit, *) "    rejection relative difference = ", &
                                     abs(reject-this%move_rejectFix)/this%move_rejectFix
@@ -249,7 +249,7 @@ contains
         class(HardSpheres), intent(in) :: this
         integer, intent(in) :: report_unit
         
-        write(report_unit, *) "Data :"
+        write(report_unit, *) "Data: "
         
         write(report_unit ,*) "    Ncol = ", this%Ncol
         write(report_unit ,*) "    Nwidom = ", this%Nwidom

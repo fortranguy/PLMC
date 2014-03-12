@@ -237,16 +237,16 @@ contains
         if (reject < real_zero) then
             write(error_unit, *) this%name, ":    Warning: rotate_delta adaptation problem."
             this%rotate_delta = this%rotate_deltaSave
-            write(error_unit, *) "default rotate_delta :", this%rotate_delta
+            write(error_unit, *) "default rotate_delta: ", this%rotate_delta
         end if
         
         if (this%rotate_delta > this%rotate_deltaMax) then
             write(error_unit, *) this%name, ":   Warning: rotate_delta too big."
             this%rotate_delta = this%rotate_deltaMax
-            write(error_unit, *) "big rotate_delta :", this%rotate_delta
+            write(error_unit, *) "big rotate_delta: ", this%rotate_delta
         end if
         
-        write(report_unit, *) "Rotation :"
+        write(report_unit, *) "Rotation: "
         write(report_unit, *) "    rotate_delta = ", this%rotate_delta
         write(report_unit, *) "    rejection relative difference = ", &
                                     abs(reject-this%rotate_rejectFix)/this%rotate_rejectFix

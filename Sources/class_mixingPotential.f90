@@ -90,7 +90,7 @@ contains
         class(MixingPotential), intent(in) :: this
         integer, intent(in) :: report_unit
         
-        write(report_unit, *) "Data :"
+        write(report_unit, *) "Data: "
         
         write(report_unit, *) "    delta = ", this%delta
         

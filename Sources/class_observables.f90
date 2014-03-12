@@ -147,7 +147,7 @@ contains
         
         real(DP) :: potChiEx
             
-        write(report_unit, *) "Results :"
+        write(report_unit, *) "Results: "
         
         write(report_unit, *) "    average energy = ", this%EpotSum/real(Nstep, DP)
             

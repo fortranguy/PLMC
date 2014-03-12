@@ -63,7 +63,7 @@ contains
         integer, intent(in) :: Ncol, Nmove, Nswitch, Nrotate
         integer, intent(in) :: report_unit
 
-        write(report_unit, *) "Data :"
+        write(report_unit, *) "Data: "
         
         write(report_unit ,*) "    Precision = ", DP
         write(report_unit ,*) "    Real zero = ", real_zero
@@ -226,7 +226,7 @@ contains
         
         real(DP) :: difference
         
-        write(report_unit, *) "Consistency test:"
+        write(report_unit, *) "Consistency test: "
         write(report_unit, *) "    Epot = ", Epot
         write(report_unit, *) "    Epot_conf = ", Epot_conf
         
@@ -255,7 +255,7 @@ contains
         real(DP), intent(in) :: duration
         integer, intent(in) :: report_unit
             
-        write(report_unit, *) "Results :"
+        write(report_unit, *) "Results: "
         write(report_unit, *) "    average energy = ", EpotSum/real(Nstep, DP)
         write(report_unit, *) "    average energy per particule = ", &
                                    EpotSum/real(Nstep, DP)/real(Ncol, DP)
@@ -271,7 +271,7 @@ contains
         real(DP), intent(in) :: EpotSum
         integer, intent(in) :: report_unit
     
-        write(report_unit, *) "Results :"
+        write(report_unit, *) "Results: "
         write(report_unit, *) "    average energy = ", EpotSum/real(Nstep, DP)
     
     end subroutine mix_print_results

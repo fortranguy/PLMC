@@ -185,13 +185,13 @@ contains
         do jDim = 1, Ndim
         
             if (this%cell_size(jDim) < rCut) then
-                write(error_unit, *) "    rCut too big in the dimension", jDim, ":"
+                write(error_unit, *) "    rCut too big in the dimension", jDim, ": "
                 write(error_unit, *) "    ", this%cell_size(jDim), "<", rCut
                 error stop
             end if
             
             if (this%NtotalCell_dim(jDim) < NnearCell_dim(jDim)) then
-                write(error_unit, *) "    Too few cells in the dimension", jDim, ":"
+                write(error_unit, *) "    Too few cells in the dimension", jDim, ": "
                 write(error_unit, *) "    ", this%NtotalCell_dim(jDim), "<", NnearCell_dim(jDim)
                 stop
             end if
@@ -200,7 +200,7 @@ contains
             if (Lsize_mod_cell_size > real_zero .and. &
             abs(Lsize_mod_cell_size - this%cell_size(jDim)) > real_zero) then
                 write(error_unit, *) "    Cell size is not a divisor of the system size"
-                write(error_unit, *) "    in the dimension", jDim, ":"
+                write(error_unit, *) "    in the dimension", jDim, ": "
                 write(error_unit, *) "    Lsize", Lsize(jDim)
                 write(error_unit, *) "    cell_size", this%cell_size(jDim)
                 write(error_unit, *) "    modulo(Lsize, cell_size) = ", Lsize_mod_cell_size
