@@ -30,6 +30,8 @@ implicit none
     real(DP), dimension(:), allocatable :: dist_function
     real(DP), dimension(:, :), allocatable :: positions, orientations
     
+    logical :: withOrientations
+    
     character(len=4096) :: file
     integer :: length, time_unit, stat
     logical :: exist
@@ -61,7 +63,9 @@ implicit none
 
     dist_sum(:) = 0
     
-    if (name == "dipol" .and. command_argument_count() == 2) then
+    withOrientations = (name == "dipol" .and. command_argument_count() == 2)
+    
+    if (withOrientations) then
     
         call get_command_argument(2, file, length, stat)
         if (stat /= 0) error stop "error get_command_argument"
@@ -96,7 +100,7 @@ implicit none
             read(positions_unit, *) positions(:, iCol)
         end do
         
-        if (name == "dipol" .and. command_argument_count() == 2) then
+        if (withOrientations) then
             do iCol = 1, Ncol
                 read(orientations_unit, *) orientations(:, iCol)
             end do
@@ -123,7 +127,7 @@ implicit none
     close(positions_unit)
     deallocate(positions)
     
-    if (name == "dipol" .and. command_argument_count() == 2) then
+    if (withOrientations) then
         close(orientations_unit)
         deallocate(orientations)
     end if
