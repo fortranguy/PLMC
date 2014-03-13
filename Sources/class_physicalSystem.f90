@@ -84,6 +84,7 @@ private
         !> Finalisation
         procedure :: final_spheres => PhysicalSystem_final_spheres
         procedure :: print_results => PhysicalSystem_print_results
+        procedure :: close_units => PhysicalSystem_close_units
         procedure :: final => PhysicalSystem_final
     
     end type PhysicalSystem
@@ -235,20 +236,43 @@ contains
     
     end subroutine PhysicalSystem_print_results
     
+    subroutine PhysicalSystem_close_units(this)
+    
+        class(PhysicalSystem), intent(inout) :: this
+    
+        call this%type1_units%close()
+        call this%type2_units%close()
+        
+        close(this%mix_report_unit)
+        close(this%mix_Epot_tab_unit)
+        close(this%mix_obsThermal_unit)
+        close(this%mix_obsEquilib_unit)
+        
+        close(this%report_unit)
+        close(this%obsThermal_unit)
+        close(this%obsEquilib_unit)
+    
+    end subroutine PhysicalSystem_close_units
+    
     subroutine PhysicalSystem_final(this)
     
         class(PhysicalSystem), intent(inout) :: this
         
         call this%final_spheres()
         call this%print_results()
+        call this%close_units()
     
-    end subroutine PhysicalSystem_final    
+    end subroutine PhysicalSystem_final
     
     subroutine PhysicalSystem_destroy(this)
     
         class(PhysicalSystem), intent(inout) :: this
         
         write(output_unit, *) this%name, " class destruction"
+        
+        call this%type1_spheres%destroy()
+        call this%type2_spheres%destroy()
+        call this%mix%destroy()
     
     end subroutine PhysicalSystem_destroy
 
