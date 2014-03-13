@@ -385,12 +385,12 @@ contains
             
                 next => current%next
             
-                if (current%iCol /= iCol) then                
+                if (current%iCol /= iCol) then
                     r_ij = dist_PBC(xCol(:), this%positions(:, current%iCol))
                     if (r_ij < this%rMin) then
                         overlap = .true.
                         return
-                    end if       
+                    end if
                 end if
                 
                 if (.not. associated(next%next)) exit

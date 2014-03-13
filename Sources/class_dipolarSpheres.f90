@@ -25,7 +25,7 @@ private
 
         private
         
-        ! Particles        
+        ! Particles
         real(DP), dimension(:, :), allocatable, public :: orientations !< dipolar orientations
                                                                        !< of all particles
         
@@ -305,9 +305,9 @@ contains
         alpha = this%alpha
        
         ! cut
-        do i = this%real_iMin, this%real_iCut        
-            r_i = real(i, DP)*this%real_dr            
-            this%Epot_real_tab(i, :) = this%Epot_real_true(r_i)            
+        do i = this%real_iMin, this%real_iCut
+            r_i = real(i, DP)*this%real_dr
+            this%Epot_real_tab(i, :) = this%Epot_real_true(r_i)
         end do
         
         ! shift
@@ -371,13 +371,13 @@ contains
         integer :: i
         real(DP) :: r_i
        
-        if (r < this%real_rCut) then       
+        if (r < this%real_rCut) then
             i = int(r/this%real_dr)
             r_i = real(i, DP)*this%real_dr
             Epot_real_interpol(:) = this%Epot_real_tab(i, :) + (r-r_i)/this%real_dr * &
-                                   (this%Epot_real_tab(i+1, :) - this%Epot_real_tab(i, :))           
-        else       
-            Epot_real_interpol(:) = 0._DP           
+                                   (this%Epot_real_tab(i+1, :) - this%Epot_real_tab(i, :))
+        else
+            Epot_real_interpol(:) = 0._DP
         end if
         
     end function DipolarSpheres_Epot_real_interpol
@@ -451,7 +451,7 @@ contains
         do iCol = 1, this%Ncol
             xCol_i(:) = this%positions(:, iCol)
             mCol_i(:) = this%orientations(:, iCol)
-            Epot_real = Epot_real + this%Epot_real_solo(iCol, xCol_i, mCol_i)            
+            Epot_real = Epot_real + this%Epot_real_solo(iCol, xCol_i, mCol_i)
         end do
 
         Epot_real = Epot_real/2._DP
@@ -482,7 +482,7 @@ contains
         do kx = -Kmax(1), Kmax(1)
             waveVector(1) = real(kx, DP)
 
-            if (kx**2 + ky**2 + kz**2 /= 0) then            
+            if (kx**2 + ky**2 + kz**2 /= 0) then
                 kOverL = norm2(waveVector(:)/Lsize(:))
                 this%Epot_reci_weight(kx, ky, kz) = exp(-PI**2/this%alpha**2 * kOverL**2) / kOverL**2
             else
@@ -539,9 +539,9 @@ contains
                 waveVector(2) = real(ky, DP)
                 
             do kx = -Kmax(1), Kmax(1)
-                waveVector(1) = real(kx, DP)  
+                waveVector(1) = real(kx, DP)
                               
-                exp_IkxCol = exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz)                
+                exp_IkxCol = exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz)
                 k_dot_mCol = dot_product(waveVector, mColOverL)
                           
                 this%structure(kx, ky, kz) = this%structure(kx, ky, kz) + &
@@ -580,7 +580,7 @@ contains
 
         do kz = 0, Kmax(3)
             do ky = -Kmax2_sym(kz), Kmax(2)
-                do kx = -Kmax1_sym(ky, kz), Kmax(1)                
+                do kx = -Kmax1_sym(ky, kz), Kmax(1)
                     Epot_reci_get_structure_modulus = Epot_reci_get_structure_modulus + &
                                                       abs(this%structure(kx, ky, kz))
                 end do
@@ -967,7 +967,7 @@ contains
             do ky = -Kmax2_sym(kz), Kmax(2)
                 waveVector(2) = real(ky, DP)
             
-                do kx = -Kmax1_sym(ky, kz), Kmax(1)                
+                do kx = -Kmax1_sym(ky, kz), Kmax(1)
                     waveVector(1) = real(kx, DP)
                     
                     k_dot_mCol = dot_product(waveVector, mColOverL)
@@ -1059,8 +1059,8 @@ contains
         
         this%totalMoment(:) = 0._DP
         
-        do iCol = 1, this%Ncol        
-            this%totalMoment(:) = this%totalMoment(:) + this%orientations(:, iCol)        
+        do iCol = 1, this%Ncol
+            this%totalMoment(:) = this%totalMoment(:) + this%orientations(:, iCol)
         end do
     
     end subroutine DipolarSpheres_init_totalMoment

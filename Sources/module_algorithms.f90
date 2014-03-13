@@ -374,16 +374,16 @@ contains
                     type2_obs%Epot = type2_obs%Epot + type2_deltaEpot
                     mix_Epot = mix_Epot + type1_mix_deltaEpot + type2_mix_deltaEpot
                     
-                else                
-                    switch_Nreject = switch_Nreject + 1                    
+                else
+                    switch_Nreject = switch_Nreject + 1
                 end if
                 
-            else            
-                switch_Nreject = switch_Nreject + 1            
+            else
+                switch_Nreject = switch_Nreject + 1
             end if
             
-        else        
-            switch_Nreject = switch_Nreject + 1            
+        else
+            switch_Nreject = switch_Nreject + 1
         end if
         
     end subroutine switch

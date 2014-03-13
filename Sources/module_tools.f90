@@ -18,7 +18,7 @@ implicit none
 
 private
 public open_units, mix_open_units, &
-       print_report, mix_init, mix_final, init, final, adapt_move, adapt_rotate, test_consist, & 
+       print_report, mix_init, mix_final, init, final, adapt_move, adapt_rotate, test_consist, &
        print_results, mix_print_results
 
 contains

@@ -1,5 +1,6 @@
 *.f90~
 Makefile~
+*.sh~
 *.mod
 *.o
 Doxyfile~

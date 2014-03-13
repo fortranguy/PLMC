@@ -59,31 +59,31 @@ implicit none
     
         NstepVar = NstepVar/2
         
-        ! Read        
-        if (iBunching == 1) then            
+        ! Read
+        if (iBunching == 1) then
             do iStep = 1, 2*NstepVar
                 read(obs_unit, *) iStepIn, dataIn(:, iStep)
-            end do            
-        else        
+            end do
+        else
             do iStep = 1, 2*NstepVar
                 dataIn(:, iStep) = dataOut(:, iStep)
-            end do            
+            end do
         end if
     
-        ! Bunch        
+        ! Bunch
         sumVal = 0.
         sumValSqr = 0.
         
-        do iStep = 1, NstepVar        
+        do iStep = 1, NstepVar
             sumVal(:) = sumVal(:) + dataIn(:, 2*iStep-1) + dataIn(:, 2*iStep)
             sumValSqr(:) = sumValSqr(:) + dataIn(:, 2*iStep-1)**2 + dataIn(:, 2*iStep)**2
-            dataOut(:, iStep) = (dataIn(:, 2*iStep-1) + dataIn(:, 2*iStep))/2.            
+            dataOut(:, iStep) = (dataIn(:, 2*iStep-1) + dataIn(:, 2*iStep))/2.
         end do
         
         error(:) = sumValSqr(:)/real(2*NstepVar, DP) - (sumVal(:)/real(2*NstepVar, DP))**2
         error(:) = sqrt(error(:)/real(2*NstepVar, DP))
         
-        ! Results        
+        ! Results
         write(bunch_unit, *) iBunching, error(:)
         
     end do

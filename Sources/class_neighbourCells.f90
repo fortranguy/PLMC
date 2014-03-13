@@ -78,16 +78,16 @@ contains
     
     !> Accessors:
     
-    pure function NeighbourCells_get_cell_size(this) result(get_cell_size)    
+    pure function NeighbourCells_get_cell_size(this) result(get_cell_size)
         class(NeighbourCells), intent(in) :: this
-        real(DP), dimension(Ndim) :: get_cell_size        
-        get_cell_size(:) = this%cell_size(:)    
+        real(DP), dimension(Ndim) :: get_cell_size
+        get_cell_size(:) = this%cell_size(:)
     end function NeighbourCells_get_cell_size
     
-    pure function NeighbourCells_get_NtotalCell_dim(this) result(get_NtotalCell_dim)    
+    pure function NeighbourCells_get_NtotalCell_dim(this) result(get_NtotalCell_dim)
         class(NeighbourCells), intent(in) :: this
-        integer, dimension(Ndim) :: get_NtotalCell_dim        
-        get_NtotalCell_dim(:) = this%NtotalCell_dim(:)        
+        integer, dimension(Ndim) :: get_NtotalCell_dim
+        get_NtotalCell_dim(:) = this%NtotalCell_dim(:)
     end function NeighbourCells_get_NtotalCell_dim
 
     !> Linked-list allocation
@@ -240,8 +240,8 @@ contains
             
         end do
         
-        do iCell = 1, this%NtotalCell            
-            this%currentCells(iCell)%particle%next => null()            
+        do iCell = 1, this%NtotalCell
+            this%currentCells(iCell)%particle%next => null()
         end do
         
     end subroutine NeighbourCells_all_cols_to_cells
@@ -263,13 +263,13 @@ contains
         
             next => current%next
         
-            if (current%iCol == iCol) then            
+            if (current%iCol == iCol) then
                 previous%next => current%next
                 deallocate(current)
                 current => next
-                exit                
-            else            
-                previous => current                
+                exit
+            else
+                previous => current
             end if
             
             current => next
