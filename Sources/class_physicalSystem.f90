@@ -67,20 +67,35 @@ private
     contains
     
         !> Construction and destruction of the class
+        procedure :: construct => PhysicalSystem_construct
+        procedure :: destroy => PhysicalSystem_destroy
+        
+        !> Initialization
         procedure :: init_box => PhysicalSystem_init_box
         procedure :: init_monteCarlo => PhysicalSystem_init_monteCarlo
-        procedure :: construct_spheres => PhysicalSystem_construct_spheres
         procedure :: init_switch => PhysicalSystem_init_switch
         procedure :: init_changes => PhysicalSystem_init_changes
         procedure :: open_units => PhysicalSystem_open_units
         procedure :: init_spheres => PhysicalSystem_init_spheres
         procedure :: init_observables => PhysicalSystem_init_observables
-        procedure :: construct => PhysicalSystem_construct
-        procedure :: destroy => PhysicalSystem_destroy
+        procedure :: init => PhysicalSystem_init
     
     end type PhysicalSystem
     
 contains
+
+    subroutine PhysicalSystem_construct(this)
+    
+        class(PhysicalSystem), intent(inout) :: this
+        
+        this%name = "sys"
+        write(output_unit, *) this%name, " class construction"
+        
+        call this%type1_spheres%construct()
+        call this%type2_spheres%construct()
+        call this%mix%construct(this%type1_spheres%get_sigma(), this%type2_spheres%get_sigma())
+    
+    end subroutine PhysicalSystem_construct
 
     pure subroutine PhysicalSystem_init_box(this)
     
@@ -101,16 +116,6 @@ contains
         this%Nstep = Nstep
     
     end subroutine PhysicalSystem_init_monteCarlo
-    
-    subroutine PhysicalSystem_construct_spheres(this)
-    
-        class(PhysicalSystem), intent(inout) :: this
-        
-        call this%type1_spheres%construct()
-        call this%type2_spheres%construct()
-        call this%mix%construct(this%type1_spheres%get_sigma(), this%type2_spheres%get_sigma())
-    
-    end subroutine PhysicalSystem_construct_spheres
     
     pure subroutine PhysicalSystem_init_switch(this)
     
@@ -182,20 +187,16 @@ contains
         write(output_unit, *) "Initial potential energy =", Epot_conf
         write(this%obsThermal_unit, *) 0, Epot_conf
         
-    end subroutine PhysicalSystem_init_observables
+    end subroutine PhysicalSystem_init_observables    
 
-    subroutine PhysicalSystem_construct(this, arg_seed, arg_init)
+    subroutine PhysicalSystem_init(this, arg_seed, arg_init)
     
         class(PhysicalSystem), intent(out) :: this
         type(argument_seed), intent(in) :: arg_seed
         type(argument_initial), intent(in) :: arg_init
         
-        this%name = "sys"
-        write(output_unit, *) this%name, " class construction"
-        
         call this%init_box()
         call this%init_monteCarlo()
-        call this%construct_spheres()
         call this%init_changes()
         
         write(output_unit, *) "Monte-Carlo Simulation: Canonical ensemble"        
@@ -209,7 +210,13 @@ contains
         call this%init_spheres()
         call this%init_observables()
     
-    end subroutine PhysicalSystem_construct
+    end subroutine PhysicalSystem_init
+    
+    subroutine PhysicalSystem_final(this)
+    
+        class(PhysicalSystem), intent(inout) :: this
+    
+    end subroutine PhysicalSystem_final    
     
     subroutine PhysicalSystem_destroy(this)
     
