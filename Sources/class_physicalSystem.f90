@@ -67,15 +67,15 @@ private
     contains
     
         !> Construction and destruction of the class
+        procedure :: set_box => PhysicalSystem_set_box
+        procedure :: set_monteCarlo => PhysicalSystem_set_monteCarlo
+        procedure :: set_changes => PhysicalSystem_set_changes
         procedure :: construct => PhysicalSystem_construct
         procedure :: destroy => PhysicalSystem_destroy
         
-        !> Initialization
-        procedure :: init_box => PhysicalSystem_init_box
-        procedure :: init_monteCarlo => PhysicalSystem_init_monteCarlo
-        procedure :: init_switch => PhysicalSystem_init_switch
-        procedure :: init_changes => PhysicalSystem_init_changes
+        !> Initialization                
         procedure :: open_units => PhysicalSystem_open_units
+        procedure :: init_switch => PhysicalSystem_init_switch
         procedure :: init_spheres => PhysicalSystem_init_spheres
         procedure :: init_observables => PhysicalSystem_init_observables
         procedure :: init => PhysicalSystem_init
@@ -83,6 +83,28 @@ private
     end type PhysicalSystem
     
 contains
+    
+    pure subroutine PhysicalSystem_set_box(this)    
+        class(PhysicalSystem), intent(inout) :: this        
+        this%Lsize(:) = Lsize(:)
+        this%Kmax(:) = Kmax(:)        
+    end subroutine PhysicalSystem_set_box
+    
+    pure subroutine PhysicalSystem_set_monteCarlo(this)    
+        class(PhysicalSystem), intent(inout) :: this        
+        this%Temperature = Temperature
+        this%Nthermal = Nthermal
+        this%Nadapt = Nadapt
+        this%Nstep = Nstep    
+    end subroutine PhysicalSystem_set_monteCarlo
+    
+    pure subroutine PhysicalSystem_set_changes(this)    
+        class(PhysicalSystem), intent(inout) :: this    
+        this%Ncol = this%type1_spheres%get_Ncol() + this%type2_spheres%get_Ncol()
+        this%Nmove = decorrelFactor * this%Ncol
+        this%Nswitch = switch_factor * decorrelFactor * this%type1_spheres%get_Ncol()
+        this%Nrotate = decorrelFactor * this%type1_spheres%get_Ncol()    
+    end subroutine PhysicalSystem_set_changes
 
     subroutine PhysicalSystem_construct(this)
     
@@ -91,53 +113,16 @@ contains
         this%name = "sys"
         write(output_unit, *) this%name, " class construction"
         
+        call this%set_box()
+        call this%set_monteCarlo()
+        
         call this%type1_spheres%construct()
         call this%type2_spheres%construct()
         call this%mix%construct(this%type1_spheres%get_sigma(), this%type2_spheres%get_sigma())
+        
+        call this%set_changes()
     
     end subroutine PhysicalSystem_construct
-
-    pure subroutine PhysicalSystem_init_box(this)
-    
-        class(PhysicalSystem), intent(inout) :: this
-        
-        this%Lsize(:) = Lsize(:)
-        this%Kmax(:) = Kmax(:)
-        
-    end subroutine PhysicalSystem_init_box
-    
-    pure subroutine PhysicalSystem_init_monteCarlo(this)
-    
-        class(PhysicalSystem), intent(inout) :: this
-        
-        this%Temperature = Temperature
-        this%Nthermal = Nthermal
-        this%Nadapt = Nadapt
-        this%Nstep = Nstep
-    
-    end subroutine PhysicalSystem_init_monteCarlo
-    
-    pure subroutine PhysicalSystem_init_switch(this)
-    
-        class(PhysicalSystem), intent(inout) :: this
-    
-        this%switch_Nhit = 0
-        this%switch_Nreject = 0
-        this%switch_reject = 0._DP
-        this%switch_rejectSum = 0._DP
-        
-    end subroutine PhysicalSystem_init_switch
-    
-    pure subroutine PhysicalSystem_init_changes(this)
-    
-        class(PhysicalSystem), intent(inout) :: this
-    
-        this%Ncol = this%type1_spheres%get_Ncol() + this%type2_spheres%get_Ncol()
-        this%Nmove = decorrelFactor * this%Ncol
-        this%Nswitch = switch_factor * decorrelFactor * this%type1_spheres%get_Ncol()
-        this%Nrotate = decorrelFactor * this%type1_spheres%get_Ncol()
-    
-    end subroutine PhysicalSystem_init_changes
     
     subroutine PhysicalSystem_open_units(this)
     
@@ -157,6 +142,14 @@ contains
         call this%mix%print_report(this%mix_report_unit)
     
     end subroutine PhysicalSystem_open_units
+    
+    pure subroutine PhysicalSystem_init_switch(this)    
+        class(PhysicalSystem), intent(inout) :: this    
+        this%switch_Nhit = 0
+        this%switch_Nreject = 0
+        this%switch_reject = 0._DP
+        this%switch_rejectSum = 0._DP        
+    end subroutine PhysicalSystem_init_switch
     
     subroutine PhysicalSystem_init_spheres(this)
     
@@ -194,10 +187,6 @@ contains
         class(PhysicalSystem), intent(out) :: this
         type(argument_seed), intent(in) :: arg_seed
         type(argument_initial), intent(in) :: arg_init
-        
-        call this%init_box()
-        call this%init_monteCarlo()
-        call this%init_changes()
         
         write(output_unit, *) "Monte-Carlo Simulation: Canonical ensemble"        
         
