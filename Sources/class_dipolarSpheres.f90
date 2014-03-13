@@ -928,7 +928,7 @@ contains
     !>                          \}
     !> \f]
     
-    !> Summary: only the sign of \f[\vec{\mu}\f] changes.
+    !> Summary: only the sign of \f$\vec{\mu}\f$ changes.
 
     pure function DipolarSpheres_deltaEpot_reci_exchange(this, xCol, mCol) &
                   result(deltaEpot_reci_exchange)
