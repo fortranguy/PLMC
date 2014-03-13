@@ -225,16 +225,12 @@ contains
         integer :: i
         real(DP) :: r_i
        
-        if (r < this%rCut) then
-       
+        if (r < this%rCut) then       
             i = int(r/this%dr)
             r_i = real(i, DP)*this%dr
             Epot_pair = this%Epot_tab(i) + (r-r_i)/this%dr * (this%Epot_tab(i+1)-this%Epot_tab(i))
-           
-        else
-       
-            Epot_pair = 0._DP
-           
+        else       
+            Epot_pair = 0._DP           
         end if
         
     end function MixingPotential_Epot_pair
@@ -269,15 +265,13 @@ contains
             
                 next => current%next
 
-                if (current%iCol /= iCol) then
-                
+                if (current%iCol /= iCol) then                
                     r = dist_PBC(xCol(:), other_positions(:, current%iCol))
                     if (r < this%rMin) then
                         overlap = .true.
                         return
                     end if
                     energ = energ + this%Epot_pair(r)
-
                 end if
                 
                 if (.not. associated(next%next)) exit

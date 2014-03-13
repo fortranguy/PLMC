@@ -7,8 +7,7 @@ use data_precisions, only: DP
 use data_box, only: Ndim, Lsize
 use data_monteCarlo, only: Nstep
 use data_distribution, only: snap, dist_dr
-use module_physics_micro, only: dist_PBC
-use module_distribution, only: sphere_volume
+use module_physics_micro, only: sphere_volume, dist_PBC
 !$ use omp_lib
 
 implicit none
@@ -26,7 +25,7 @@ implicit none
     integer :: iCol, jCol
     real(DP) :: r_ij
     integer :: iDist
-    real(DP) :: r_iDist
+    real(DP) :: r_iDist, r_iMinus, r_iPlus
     real(DP), dimension(:), allocatable :: dist_function
     real(DP), dimension(:, :), allocatable :: positions, orientations
     
@@ -137,8 +136,11 @@ implicit none
         do iDist = 1, Ndist
         
             r_iDist = (real(iDist, DP) + 0.5_DP) * dist_dr
+            r_iMinus = real(iDist, DP) * dist_dr
+            r_iPlus = real(iDist + 1, DP) * dist_dr
+            
             dist_function(iDist) = 2._DP * real(dist_sum(iDist), DP) / real(Nstep/snap_factor, DP) / &
-                real(Ncol, DP) / (sphere_volume(iDist+1)-sphere_volume(iDist)) / density
+                real(Ncol, DP) / (sphere_volume(r_iPlus)-sphere_volume(r_iMinus)) / density
             write(distrib_unit, *) r_iDist, dist_function(iDist)
             
         end do

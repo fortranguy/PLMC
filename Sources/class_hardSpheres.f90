@@ -57,14 +57,12 @@ private
         procedure :: construct => HardSpheres_construct
         procedure :: destroy => HardSpheres_destroy
         
-        !> Accessors
+        !> Accessors & Mutators
         procedure :: get_name => HardSpheres_get_name
         procedure :: get_Ncol => HardSpheres_get_Ncol
         procedure :: get_Nwidom => HardSpheres_get_Nwidom
         procedure :: get_sigma => HardSpheres_get_sigma
         procedure :: get_move_delta => HardSpheres_get_move_delta
-        
-        !> Mutators
         procedure :: adapt_move_delta => HardSpheres_adapt_move_delta
         procedure :: set_move_delta => HardSpheres_set_move_delta
         
@@ -387,14 +385,12 @@ contains
             
                 next => current%next
             
-                if (current%iCol /= iCol) then
-                
+                if (current%iCol /= iCol) then                
                     r_ij = dist_PBC(xCol(:), this%positions(:, current%iCol))
                     if (r_ij < this%rMin) then
                         overlap = .true.
                         return
-                    end if
-       
+                    end if       
                 end if
                 
                 if (.not. associated(next%next)) exit

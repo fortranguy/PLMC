@@ -73,9 +73,7 @@ module_algorithms.o: module_algorithms.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 module_tools.o: module_tools.f90
 	$(FC) -c $(FFLAGS) $< -o $@
-module_monte-carlo.o: module_monte-carlo.f90
-	$(FC) -c $(FFLAGS) $< -o $@
-module_distribution.o: module_distribution.f90
+module_monte-carlo_arguments.o: module_monte-carlo_arguments.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 program_monte-carlo.o: program_monte-carlo.f90
 	$(FC) -c $(FFLAGS) $< -o $@
@@ -94,7 +92,7 @@ $(EXEC1): data.o \
           class_hardSpheres.o class_dipolarSpheres.o \
           class_mixingPotential.o \
           class_observables.o class_units.o \
-          module_physics_macro.o module_algorithms.o module_tools.o module_monte-carlo.o\
+          module_physics_macro.o module_algorithms.o module_tools.o module_monte-carlo_arguments.o\
           program_monte-carlo.o
 	$(FC) $^ $(LDFLAGS) -o $@
 	
@@ -104,7 +102,7 @@ $(EXEC2): data.o program_bunching.o
 $(EXEC3): data.o program_histogram.o
 	$(FC) $^ $(LDFLAGS) -o $@
 	
-$(EXEC4): data.o module_physics_micro.o module_distribution.o program_distribution.o
+$(EXEC4): data.o module_physics_micro.o program_distribution.o
 	$(FC) $^ $(LDFLAGS) -o $@
 
 # --------------------------------------------------------------------------------------------------

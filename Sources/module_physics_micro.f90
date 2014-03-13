@@ -10,7 +10,7 @@ use data_box, only: Ndim, Lsize, Kmax
 
 implicit none
 private
-public set_discrete_length, distVec_PBC, dist_PBC, random_surface, markov_surface, &
+public set_discrete_length, sphere_volume, distVec_PBC, dist_PBC, random_surface, markov_surface, &
        Kmax1_sym, Kmax2_sym, fourier_i, index_from_coord, coord_PBC, Epot_lennardJones, Epot_yukawa
 
 contains
@@ -29,6 +29,14 @@ contains
         end if
     
     end subroutine set_discrete_length
+    
+    !> Calculate the volume of the sphere
+    
+    pure function sphere_volume(radius)    
+        real(DP), intent(in) :: radius
+        real(DP) :: sphere_volume        
+        sphere_volume = 4._DP/3._DP * PI * radius**3        
+    end function sphere_volume
 
     !> Distance between 2 positions with Periodic Boundary Conditions
     !> from SMAC, algorithm 2.5 & 2.6, p.91
@@ -46,13 +54,10 @@ contains
         
     end function distVec_PBC
     
-    pure function dist_PBC(xCol1, xCol2)
-    
+    pure function dist_PBC(xCol1, xCol2)    
         real(DP), dimension(:), intent(in) :: xCol1, xCol2
-        real(DP) :: dist_PBC
-                
-        dist_PBC = norm2(distVec_PBC(xCol1, xCol2))
-    
+        real(DP) :: dist_PBC                
+        dist_PBC = norm2(distVec_PBC(xCol1, xCol2))    
     end function dist_PBC
     
     !> Rotation

@@ -91,14 +91,11 @@ contains
         this%move_Nreject = 0
         this%move_Nhit = 0
         
-         select type (this)
-        
-            type is (MoreObservables)
-                
+         select type (this)        
+            type is (MoreObservables)                
                 this%rotate_reject = real(this%rotate_Nreject, DP)/real(this%rotate_Nhit, DP)
                 this%rotate_Nreject = 0
-                this%rotate_Nhit = 0
-        
+                this%rotate_Nhit = 0        
         end select
     
     end subroutine Observables_update_rejections
@@ -128,12 +125,9 @@ contains
         this%activSum = this%activSum + this%activ
         this%move_rejectSum = this%move_rejectSum + this%move_reject
         
-        select type (this)
-        
-            type is (MoreObservables)
-            
-                this%rotate_rejectSum = this%rotate_rejectSum + this%rotate_reject
-        
+        select type (this)        
+            type is (MoreObservables)            
+                this%rotate_rejectSum = this%rotate_rejectSum + this%rotate_reject        
         end select
     
     end subroutine Observables_accumulate
@@ -149,20 +143,15 @@ contains
             
         write(report_unit, *) "Results: "
         
-        write(report_unit, *) "    average energy = ", this%EpotSum/real(Nstep, DP)
-            
+        write(report_unit, *) "    average energy = ", this%EpotSum/real(Nstep, DP)            
         potChiEx = -Temperature*log(this%activSum/real(Nstep, DP))
-        write(report_unit, *) "    average excess chemical potential = ", potChiEx
-        
+        write(report_unit, *) "    average excess chemical potential = ", potChiEx        
         write(report_unit, *) "    move rejection rate = ", this%move_rejectSum/real(Nstep, DP)
         
-        select type (this)
-            
-            type is (MoreObservables)
-            
+        select type (this)            
+            type is (MoreObservables)            
                 write(report_unit, *) "    rotate rejection rate = ", &
-                                      this%rotate_rejectSum/real(Nstep, DP)
-            
+                                      this%rotate_rejectSum/real(Nstep, DP)            
         end select
     
     end subroutine Observables_print_results

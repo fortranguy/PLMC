@@ -8,8 +8,8 @@ use data_constants, only: PI
 use data_box, only: Ndim, Lsize, Kmax
 use data_particles, only: dipol_Ncol
 use data_monteCarlo, only: dipol_move_delta, dipol_move_rejectFix, dipol_rotate_delta, &
-                            dipol_rotate_deltaMax, dipol_rotate_rejectFix, dipol_Nwidom, &
-                            dipol_reInit_iStep
+                           dipol_rotate_deltaMax, dipol_rotate_rejectFix, dipol_Nwidom, &
+                           dipol_reInit_iStep
 use data_potential, only: dipol_rMin_factor, dipol_real_rCut_factor, dipol_real_dr, dipol_alpha_factor
 use data_neighbourCells, only: NnearCell
 use data_distribution, only: snap_ratio
@@ -25,8 +25,7 @@ private
 
         private
         
-        ! Particles
-        
+        ! Particles        
         real(DP), dimension(:, :), allocatable, public :: orientations !< dipolar orientations
                                                                        !< of all particles
         
@@ -306,12 +305,9 @@ contains
         alpha = this%alpha
        
         ! cut
-        do i = this%real_iMin, this%real_iCut
-        
-            r_i = real(i, DP)*this%real_dr
-            
-            this%Epot_real_tab(i, :) = this%Epot_real_true(r_i)
-            
+        do i = this%real_iMin, this%real_iCut        
+            r_i = real(i, DP)*this%real_dr            
+            this%Epot_real_tab(i, :) = this%Epot_real_true(r_i)            
         end do
         
         ! shift
@@ -375,17 +371,13 @@ contains
         integer :: i
         real(DP) :: r_i
        
-        if (r < this%real_rCut) then
-       
+        if (r < this%real_rCut) then       
             i = int(r/this%real_dr)
             r_i = real(i, DP)*this%real_dr
             Epot_real_interpol(:) = this%Epot_real_tab(i, :) + (r-r_i)/this%real_dr * &
-                                   (this%Epot_real_tab(i+1, :) - this%Epot_real_tab(i, :))
-           
-        else
-       
-            Epot_real_interpol(:) = 0._DP
-           
+                                   (this%Epot_real_tab(i+1, :) - this%Epot_real_tab(i, :))           
+        else       
+            Epot_real_interpol(:) = 0._DP           
         end if
         
     end function DipolarSpheres_Epot_real_interpol
@@ -429,19 +421,16 @@ contains
         Epot_real_solo = 0._DP
 
         do jCol = 1, this%Ncol
-
             if (jCol /= iCol) then
 
                 xCol_j(:) = this%positions(:, jCol)
                 rVec_ij = distVec_PBC(xCol_i(:), xCol_j)
                 r_ij = norm2(rVec_ij)
-
                 mCol_j(:) = this%orientations(:, jCol)
 
                 Epot_real_solo = Epot_real_solo + this%Epot_real_pair(mCol_i, mCol_j, rVec_ij, r_ij)
 
             end if
-
         end do
         
     end function DipolarSpheres_Epot_real_solo
@@ -460,11 +449,9 @@ contains
         Epot_real = 0._DP
         
         do iCol = 1, this%Ncol
-
             xCol_i(:) = this%positions(:, iCol)
             mCol_i(:) = this%orientations(:, iCol)
-            Epot_real = Epot_real + this%Epot_real_solo(iCol, xCol_i, mCol_i)
-            
+            Epot_real = Epot_real + this%Epot_real_solo(iCol, xCol_i, mCol_i)            
         end do
 
         Epot_real = Epot_real/2._DP
@@ -495,16 +482,11 @@ contains
         do kx = -Kmax(1), Kmax(1)
             waveVector(1) = real(kx, DP)
 
-            if (kx**2 + ky**2 + kz**2 /= 0) then
-            
+            if (kx**2 + ky**2 + kz**2 /= 0) then            
                 kOverL = norm2(waveVector(:)/Lsize(:))
-
                 this%Epot_reci_weight(kx, ky, kz) = exp(-PI**2/this%alpha**2 * kOverL**2) / kOverL**2
-
             else
-
                 this%Epot_reci_weight(kx, ky, kz) = 0._DP
-
             end if
 
         end do
@@ -551,19 +533,15 @@ contains
             mColOverL(:) = this%orientations(:, iCol)/Lsize(:)
         
             do kz = -Kmax(3), Kmax(3)
-
                 waveVector(3) = real(kz, DP)
 
             do ky = -Kmax(2), Kmax(2)
-
                 waveVector(2) = real(ky, DP)
-
+                
             do kx = -Kmax(1), Kmax(1)
-
-                waveVector(1) = real(kx, DP)
-                
-                exp_IkxCol = exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz)
-                
+                waveVector(1) = real(kx, DP)  
+                              
+                exp_IkxCol = exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz)                
                 k_dot_mCol = dot_product(waveVector, mColOverL)
                           
                 this%structure(kx, ky, kz) = this%structure(kx, ky, kz) + &
@@ -602,11 +580,9 @@ contains
 
         do kz = 0, Kmax(3)
             do ky = -Kmax2_sym(kz), Kmax(2)
-                do kx = -Kmax1_sym(ky, kz), Kmax(1)
-                
+                do kx = -Kmax1_sym(ky, kz), Kmax(1)                
                     Epot_reci_get_structure_modulus = Epot_reci_get_structure_modulus + &
                                                       abs(this%structure(kx, ky, kz))
-
                 end do
             end do
         end do
@@ -643,11 +619,8 @@ contains
         this%NwaveVectors = 0
 
         do kz = 0, Kmax(3)
-
             do ky = -Kmax2_sym(kz), Kmax(2)
-
                 do kx = -Kmax1_sym(ky, kz), Kmax(1)
-
                     if (kx**2 + ky**2 + kz**2 /= 0) then
 
                         write(waveVectors_unit, *) kx, ky, kz
@@ -657,11 +630,8 @@ contains
                         this%NwaveVectors = this%NwaveVectors + 1
 
                     end if
-
                 end do
-
             end do
-
         end do
 
     end subroutine DipolarSpheres_Epot_reci_count_waveVectors
@@ -720,16 +690,14 @@ contains
         deltaEpot_reci_move = 0._DP
 
         do kz = 0, Kmax(3) ! symmetry: half wave vectors -> double Energy
-
             waveVector(3) = real(kz, DP)
 
             do ky = -Kmax2_sym(kz), Kmax(2)
-
                 waveVector(2) = real(ky, DP)
             
                 do kx = -Kmax1_sym(ky, kz), Kmax(1)
-
                     waveVector(1) = real(kx, DP)
+                    
                     k_dot_mCol = dot_product(waveVector, mColOverL)
 
                     exp_IkxNew = exp_IkxNew_1(kx) * exp_IkxNew_2(ky) * exp_IkxNew_3(kz)
@@ -794,18 +762,15 @@ contains
         mColOverL(:) = mCol(:)/Lsize(:)
 
         do kz = 0, Kmax(3)
-
             waveVector(3) = real(kz, DP)
 
             do ky = -Kmax2_sym(kz), Kmax(2)
-
                 waveVector(2) = real(ky, DP)
 
                 do kx = -Kmax1_sym(ky, kz), Kmax(1)
-
                     waveVector(1) = real(kx, DP)
+                    
                     k_dot_mCol = dot_product(waveVector, mColOverL)
-
                     exp_IkxNew = exp_IkxNew_1(kx) * exp_IkxNew_2(ky) * exp_IkxNew_3(kz)
                     exp_IkxOld = exp_IkxOld_1(kx) * exp_IkxOld_2(ky) * exp_IkxOld_3(kz)
                                                           
@@ -865,25 +830,21 @@ contains
         deltaEpot_reci_rotate = 0._DP
 
         do kz = 0, Kmax(3) ! symmetry: half wave vectors -> double Energy
-
             waveVector(3) = real(kz, DP)
 
             do ky = -Kmax2_sym(kz), Kmax(2)
-
                 waveVector(2) = real(ky, DP)
             
                 do kx = -Kmax1_sym(ky, kz), Kmax(1)
-
                     waveVector(1) = real(kx, DP)
 
                     k_dot_mNew = dot_product(waveVector, mNewOverL)
                     k_dot_mOld = dot_product(waveVector, mOldOverL)
-
                     exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky) * exp_IkxCol_3(kz)
 
                     realPart = k_dot_mNew**2 - k_dot_mOld**2
-                    realPart = realPart + 2._DP * (k_dot_mNew - k_dot_mOld) * real(conjg(exp_IkxCol) * &
-                    (this%structure(kx, ky, kz) - k_dot_mOld * exp_IkxCol), DP)
+                    realPart = realPart + 2._DP * (k_dot_mNew-k_dot_mOld) * real(conjg(exp_IkxCol) * &
+                        (this%structure(kx, ky, kz) - k_dot_mOld * exp_IkxCol), DP)
 
                     deltaEpot_reci_rotate = deltaEpot_reci_rotate + &
                                             this%Epot_reci_weight(kx, ky, kz) * realPart
@@ -932,18 +893,15 @@ contains
         mOldOverL(:) = mOld(:)/Lsize(:)
 
         do kz = 0, Kmax(3)
-
             waveVector(3) = real(kz, DP)
 
             do ky = -Kmax2_sym(kz), Kmax(2)
-
                 waveVector(2) = real(ky, DP)
 
                 do kx = -Kmax1_sym(ky, kz), Kmax(1)
-
                     waveVector(1) = real(kx, DP)
+                    
                     k_dot_deltaMcol = dot_product(waveVector, mNewOverL - mOldOverL)
-
                     exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky) * exp_IkxCol_3(kz)
 
                     this%structure(kx, ky, kz) = this%structure(kx, ky, kz) + &
@@ -1004,18 +962,15 @@ contains
         deltaEpot_reci_exchange = 0._DP
         
         do kz = 0, Kmax(3)
-
             waveVector(3) = real(kz, DP)
 
             do ky = -Kmax2_sym(kz), Kmax(2)
-
                 waveVector(2) = real(ky, DP)
             
-                do kx = -Kmax1_sym(ky, kz), Kmax(1)
-                
+                do kx = -Kmax1_sym(ky, kz), Kmax(1)                
                     waveVector(1) = real(kx, DP)
+                    
                     k_dot_mCol = dot_product(waveVector, mColOverL)
-                                                  
                     exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky) * exp_IkxCol_3(kz)
                     
                     realPart = k_dot_mCol * (k_dot_mCol + 2._DP * &
@@ -1046,18 +1001,12 @@ contains
         Epot_reci = 0._DP
 
         do kz = -Kmax(3), Kmax(3)
-
             do ky = -Kmax(2), Kmax(2)
-
                 do kx = -Kmax(1), Kmax(1)
-
                     Epot_reci = Epot_reci + this%Epot_reci_weight(kx, ky, kz) * &
                                 real(this%structure(kx, ky, kz)*conjg(this%structure(kx, ky, kz)), DP)
-        
                 end do
-
             end do
-
         end do
         
         Epot_reci = 2._DP*PI/product(Lsize) * Epot_reci
@@ -1110,10 +1059,8 @@ contains
         
         this%totalMoment(:) = 0._DP
         
-        do iCol = 1, this%Ncol
-        
-            this%totalMoment(:) = this%totalMoment(:) + this%orientations(:, iCol)
-        
+        do iCol = 1, this%Ncol        
+            this%totalMoment(:) = this%totalMoment(:) + this%orientations(:, iCol)        
         end do
     
     end subroutine DipolarSpheres_init_totalMoment

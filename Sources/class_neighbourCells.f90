@@ -240,10 +240,8 @@ contains
             
         end do
         
-        do iCell = 1, this%NtotalCell
-            
-            this%currentCells(iCell)%particle%next => null()
-            
+        do iCell = 1, this%NtotalCell            
+            this%currentCells(iCell)%particle%next => null()            
         end do
         
     end subroutine NeighbourCells_all_cols_to_cells
@@ -265,17 +263,13 @@ contains
         
             next => current%next
         
-            if (current%iCol == iCol) then
-            
+            if (current%iCol == iCol) then            
                 previous%next => current%next
                 deallocate(current)
                 current => next
-                exit
-                
-            else
-            
-                previous => current
-                
+                exit                
+            else            
+                previous => current                
             end if
             
             current => next

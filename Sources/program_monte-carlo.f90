@@ -14,10 +14,9 @@ use class_units
 use module_types, only: argument_seed, argument_initial
 use module_physics_macro, only: init_randomSeed, set_initialCondition
 use module_algorithms, only: move, widom, switch, rotate
-use module_tools, only: open_units, mix_open_units, &
-                         print_report, mix_init, mix_final, &
-                         init, final, adapt_move, adapt_rotate, test_consist, print_results
-use module_monteCarlo, only: read_arguments
+use module_tools, only: open_units, mix_open_units, print_report, mix_init, mix_final, init, final, &
+                        adapt_move, adapt_rotate, test_consist, print_results
+use module_monteCarlo_arguments, only: read_arguments
 
 implicit none
     
