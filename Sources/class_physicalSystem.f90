@@ -13,8 +13,8 @@ use class_mixingPotential
 use class_observables
 use class_units
 use module_monteCarlo_arguments, only: read_arguments
-use module_physics_macro, only: init_randomSeed
-use module_tools, only: open_units, mix_open_units, print_report
+use module_physics_macro, only: init_randomSeed, set_initialCondition
+use module_tools, only: open_units, mix_open_units, print_report, mix_init, init
 
 implicit none
 
@@ -54,6 +54,7 @@ private
         integer :: mix_obsThermal_unit, mix_obsEquilib_unit
         
         ! Observables: write to files
+        real(DP) :: Epot, EpotSum
         integer :: report_unit !< data & results file
         integer :: obsThermal_unit, obsEquilib_unit !< observables files: thermalisation & equilibrium
            
@@ -68,10 +69,12 @@ private
         !> Construction and destruction of the class
         procedure :: init_box => PhysicalSystem_init_box
         procedure :: init_monteCarlo => PhysicalSystem_init_monteCarlo
-        procedure :: init_spheres => PhysicalSystem_init_spheres
+        procedure :: construct_spheres => PhysicalSystem_construct_spheres
         procedure :: init_switch => PhysicalSystem_init_switch
         procedure :: init_changes => PhysicalSystem_init_changes
+        procedure :: init_observables => PhysicalSystem_init_observables
         procedure :: open_units => PhysicalSystem_open_units
+        procedure :: init_spheres => PhysicalSystem_init_spheres
         procedure :: construct => PhysicalSystem_construct
         procedure :: destroy => PhysicalSystem_destroy
     
@@ -99,7 +102,7 @@ contains
     
     end subroutine PhysicalSystem_init_monteCarlo
     
-    subroutine PhysicalSystem_init_spheres(this)
+    subroutine PhysicalSystem_construct_spheres(this)
     
         class(PhysicalSystem), intent(inout) :: this
         
@@ -107,7 +110,7 @@ contains
         call this%type2_spheres%construct()
         call this%mix%construct(this%type1_spheres%get_sigma(), this%type2_spheres%get_sigma())
     
-    end subroutine PhysicalSystem_init_spheres
+    end subroutine PhysicalSystem_construct_spheres
     
     pure subroutine PhysicalSystem_init_switch(this)
     
@@ -131,15 +134,49 @@ contains
     
     end subroutine PhysicalSystem_init_changes
     
+    subroutine PhysicalSystem_init_observables(this)
+    
+        class(PhysicalSystem), intent(inout) :: this
+        
+        call this%type1_obs%init()
+        call this%type2_obs%init()
+        this%mix_EpotSum = 0._DP
+        this%EpotSum = 0._DP
+        
+    end subroutine PhysicalSystem_init_observables
+    
     subroutine PhysicalSystem_open_units(this)
     
         class(PhysicalSystem), intent(inout) :: this
-    
-        call open_units(this%report_unit, this%obsThermal_unit, this%obsEquilib_unit)
+        
+        call open_units(this%report_unit, this%obsThermal_unit, this%obsEquilib_unit)        
+        call print_report(this%Ncol, this%Nmove, this%Nswitch, this%Nrotate, this%report_unit)        
+        
+        call this%type1_units%open(this%type1_spheres%get_name())
+        call this%type1_spheres%print_density(this%Ncol, this%type1_units%report)        
+        
+        call this%type2_units%open(this%type2_spheres%get_name())
+        call this%type2_spheres%print_density(this%Ncol, this%type2_units%report)    
+        
         call mix_open_units(this%mix_report_unit, this%mix_Epot_tab_unit, this%mix_obsThermal_unit, &
                             this%mix_obsEquilib_unit)
+        call this%mix%print_report(this%mix_report_unit)
     
     end subroutine PhysicalSystem_open_units
+    
+    subroutine PhysicalSystem_init_spheres(this)
+    
+        class(PhysicalSystem), intent(out) :: this
+    
+        call mix_init(this%mix, this%type1_spheres, this%type2_spheres, this%mix_Epot_tab_unit, &
+                      this%mix_Epot)
+        call this%mix%print_report(this%mix_report_unit)
+        call init(this%type1_spheres, this%type2_spheres, this%mix, this%type1_units, &
+                  this%type1_obs%Epot)
+        call init(this%type2_spheres, this%type1_spheres, this%mix, this%type2_units, &
+                  this%type2_obs%Epot)
+        
+    end subroutine PhysicalSystem_init_spheres
 
     subroutine PhysicalSystem_construct(this, arg_seed, arg_init)
     
@@ -152,17 +189,19 @@ contains
         
         call this%init_box()
         call this%init_monteCarlo()
-        call this%init_spheres()
+        call this%construct_spheres()
         call this%init_changes()
         
-        write(output_unit, *) "Monte-Carlo Simulation: Canonical ensemble"
+        write(output_unit, *) "Monte-Carlo Simulation: Canonical ensemble"        
         
-        call print_report(this%Ncol, this%Nmove, this%Nswitch, this%Nrotate, this%report_unit)
+        call this%init_observables()
+        call this%open_units()        
+        call this%init_switch()        
         
         call init_randomSeed(arg_seed, this%report_unit)
-        
-        call this%init_switch()
-        this%mix_EpotSum = 0._DP
+        call set_initialCondition(arg_init, this%type1_spheres, this%type2_spheres, &
+                                  this%mix%get_sigma(), this%report_unit)
+        call this%init_spheres()
     
     end subroutine PhysicalSystem_construct
     
