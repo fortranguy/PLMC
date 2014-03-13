@@ -72,9 +72,9 @@ private
         procedure :: construct_spheres => PhysicalSystem_construct_spheres
         procedure :: init_switch => PhysicalSystem_init_switch
         procedure :: init_changes => PhysicalSystem_init_changes
-        procedure :: init_observables => PhysicalSystem_init_observables
         procedure :: open_units => PhysicalSystem_open_units
         procedure :: init_spheres => PhysicalSystem_init_spheres
+        procedure :: init_observables => PhysicalSystem_init_observables
         procedure :: construct => PhysicalSystem_construct
         procedure :: destroy => PhysicalSystem_destroy
     
@@ -134,17 +134,6 @@ contains
     
     end subroutine PhysicalSystem_init_changes
     
-    subroutine PhysicalSystem_init_observables(this)
-    
-        class(PhysicalSystem), intent(inout) :: this
-        
-        call this%type1_obs%init()
-        call this%type2_obs%init()
-        this%mix_EpotSum = 0._DP
-        this%EpotSum = 0._DP
-        
-    end subroutine PhysicalSystem_init_observables
-    
     subroutine PhysicalSystem_open_units(this)
     
         class(PhysicalSystem), intent(inout) :: this
@@ -177,6 +166,23 @@ contains
                   this%type2_obs%Epot)
         
     end subroutine PhysicalSystem_init_spheres
+    
+    subroutine PhysicalSystem_init_observables(this)
+    
+        class(PhysicalSystem), intent(inout) :: this
+        
+        real(DP) :: Epot_conf
+        
+        call this%type1_obs%init()
+        call this%type2_obs%init()
+        this%mix_EpotSum = 0._DP
+        this%EpotSum = 0._DP
+        
+        Epot_conf = this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
+        write(output_unit, *) "Initial potential energy =", Epot_conf
+        write(this%obsThermal_unit, *) 0, Epot_conf
+        
+    end subroutine PhysicalSystem_init_observables
 
     subroutine PhysicalSystem_construct(this, arg_seed, arg_init)
     
@@ -194,7 +200,6 @@ contains
         
         write(output_unit, *) "Monte-Carlo Simulation: Canonical ensemble"        
         
-        call this%init_observables()
         call this%open_units()        
         call this%init_switch()        
         
@@ -202,6 +207,7 @@ contains
         call set_initialCondition(arg_init, this%type1_spheres, this%type2_spheres, &
                                   this%mix%get_sigma(), this%report_unit)
         call this%init_spheres()
+        call this%init_observables()
     
     end subroutine PhysicalSystem_construct
     
