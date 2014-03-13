@@ -49,7 +49,7 @@ private
         
         ! Mixing potential
         type(MixingPotential) :: mix !< short-range potential
-        real(DP) :: mix_Epot, mix_EpotSum !< potential energy
+        real(DP) :: mix_Epot, mix_EpotSum, mix_Epot_conf !< potential energy
         integer :: mix_report_unit
         integer :: mix_Epot_tab_unit
         integer :: mix_obsThermal_unit, mix_obsEquilib_unit
@@ -80,6 +80,11 @@ private
         procedure :: init_spheres => PhysicalSystem_init_spheres
         procedure :: init_observables => PhysicalSystem_init_observables
         procedure :: init => PhysicalSystem_init
+        
+        !> Finalisation
+        procedure :: final_spheres => PhysicalSystem_final_spheres
+        procedure :: print_results => PhysicalSystem_print_results
+        procedure :: final => PhysicalSystem_final
     
     end type PhysicalSystem
     
@@ -202,24 +207,40 @@ contains
     
     end subroutine PhysicalSystem_init
     
-    subroutine PhysicalSystem_final(this)
+    subroutine PhysicalSystem_final_spheres(this)
     
         class(PhysicalSystem), intent(inout) :: this
-        
-        real(DP) :: Epot, Epot_conf, mix_Epot_conf
-        real(DP) :: duration
         
         call final(this%type1_spheres, this%type1_units, this%type1_obs)
         call final(this%type2_spheres, this%type2_units, this%type2_obs)
         call mix_final(this%mix, this%type1_spheres, this%type2_spheres, this%mix_report_unit, &
-                       this%mix_Epot, this%mix_EpotSum, mix_Epot_conf)
+                       this%mix_Epot, this%mix_EpotSum, this%mix_Epot_conf)
+        
+    end subroutine PhysicalSystem_final_spheres
+    
+    subroutine PhysicalSystem_print_results(this)
+    
+        class(PhysicalSystem), intent(inout) :: this
+        
+        real(DP) :: Epot, Epot_conf
+        real(DP) :: duration
         
         Epot = this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
-        Epot_conf = this%type1_spheres%Epot_conf() + this%type2_spheres%Epot_conf() + mix_Epot_conf
+        Epot_conf = this%type1_spheres%Epot_conf() + this%type2_spheres%Epot_conf() + &
+                    this%mix_Epot_conf
         call test_consist(Epot, Epot_conf, this%report_unit)
         this%EpotSum = this%type1_obs%EpotSum + this%type2_obs%EpotSum + this%mix_EpotSum
         duration = this%time_end - this%time_start
         call print_results(this%Ncol, this%EpotSum, this%switch_rejectSum, duration, this%report_unit)
+    
+    end subroutine PhysicalSystem_print_results
+    
+    subroutine PhysicalSystem_final(this)
+    
+        class(PhysicalSystem), intent(inout) :: this
+        
+        call this%final_spheres()
+        call this%print_results()
     
     end subroutine PhysicalSystem_final    
     
