@@ -13,6 +13,8 @@ use class_mixingPotential
 use class_observables
 use class_units
 use module_monteCarlo_arguments, only: read_arguments
+use module_physics_macro, only: init_randomSeed
+use module_tools, only: open_units, mix_open_units, print_report
 
 implicit none
 
@@ -25,14 +27,14 @@ private
         character(len=5) :: name
         
         ! Box
-        real(DP), dimension(Ndim) :: Lsize !< Box size
-        integer, dimension(Ndim) :: Kmax !< Number of wave vectors
-        integer :: Ncol !< Number of particles
+        real(DP), dimension(Ndim) :: Lsize !< box size
+        integer, dimension(Ndim) :: Kmax !< number of wave vectors
+        integer :: Ncol !< number of particles
         
         ! Monte-Carlo
         real(DP) :: Temperature
         integer :: Nthermal, Nadapt, Nstep !< Markov-chain Monte-Carlo
-        integer :: Nmove, Nswitch, Nrotate !< Changes
+        integer :: Nmove, Nswitch, Nrotate !< changes
         
         ! Type 1: Dipolar spheres
         type(DipolarSpheres) :: type1_spheres !< physical properties and Monte-Carlo subroutines
@@ -46,6 +48,7 @@ private
         
         ! Mixing potential
         type(MixingPotential) :: mix !< short-range potential
+        real(DP) :: mix_Epot, mix_EpotSum !< potential energy
         integer :: mix_report_unit
         integer :: mix_Epot_tab_unit
         integer :: mix_obsThermal_unit, mix_obsEquilib_unit
@@ -68,6 +71,7 @@ private
         procedure :: init_spheres => PhysicalSystem_init_spheres
         procedure :: init_switch => PhysicalSystem_init_switch
         procedure :: init_changes => PhysicalSystem_init_changes
+        procedure :: open_units => PhysicalSystem_open_units
         procedure :: construct => PhysicalSystem_construct
         procedure :: destroy => PhysicalSystem_destroy
     
@@ -126,6 +130,16 @@ contains
         this%Nrotate = decorrelFactor * this%type1_spheres%get_Ncol()
     
     end subroutine PhysicalSystem_init_changes
+    
+    subroutine PhysicalSystem_open_units(this)
+    
+        class(PhysicalSystem), intent(inout) :: this
+    
+        call open_units(this%report_unit, this%obsThermal_unit, this%obsEquilib_unit)
+        call mix_open_units(this%mix_report_unit, this%mix_Epot_tab_unit, this%mix_obsThermal_unit, &
+                            this%mix_obsEquilib_unit)
+    
+    end subroutine PhysicalSystem_open_units
 
     subroutine PhysicalSystem_construct(this, arg_seed, arg_init)
     
@@ -140,7 +154,15 @@ contains
         call this%init_monteCarlo()
         call this%init_spheres()
         call this%init_changes()
+        
+        write(output_unit, *) "Monte-Carlo Simulation: Canonical ensemble"
+        
+        call print_report(this%Ncol, this%Nmove, this%Nswitch, this%Nrotate, this%report_unit)
+        
+        call init_randomSeed(arg_seed, this%report_unit)
+        
         call this%init_switch()
+        this%mix_EpotSum = 0._DP
     
     end subroutine PhysicalSystem_construct
     
