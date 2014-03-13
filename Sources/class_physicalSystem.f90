@@ -14,7 +14,8 @@ use class_observables
 use class_units
 use module_monteCarlo_arguments, only: read_arguments
 use module_physics_macro, only: init_randomSeed, set_initialCondition
-use module_tools, only: open_units, mix_open_units, print_report, mix_init, init
+use module_tools, only: open_units, mix_open_units, print_report, init, final, mix_init, mix_final, &
+                        test_consist, print_results
 
 implicit none
 
@@ -204,6 +205,21 @@ contains
     subroutine PhysicalSystem_final(this)
     
         class(PhysicalSystem), intent(inout) :: this
+        
+        real(DP) :: Epot, Epot_conf, mix_Epot_conf
+        real(DP) :: duration
+        
+        call final(this%type1_spheres, this%type1_units, this%type1_obs)
+        call final(this%type2_spheres, this%type2_units, this%type2_obs)
+        call mix_final(this%mix, this%type1_spheres, this%type2_spheres, this%mix_report_unit, &
+                       this%mix_Epot, this%mix_EpotSum, mix_Epot_conf)
+        
+        Epot = this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
+        Epot_conf = this%type1_spheres%Epot_conf() + this%type2_spheres%Epot_conf() + mix_Epot_conf
+        call test_consist(Epot, Epot_conf, this%report_unit)
+        this%EpotSum = this%type1_obs%EpotSum + this%type2_obs%EpotSum + this%mix_EpotSum
+        duration = this%time_end - this%time_start
+        call print_results(this%Ncol, this%EpotSum, this%switch_rejectSum, duration, this%report_unit)
     
     end subroutine PhysicalSystem_final    
     
