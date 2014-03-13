@@ -2,6 +2,6 @@
 
 for file in $@
 do
-    vi -c ":%s/\(\S\+\)\@<=\s\+$" -c "wq" ${file}
+    vi -es -c ":%s/\(\S\+\)\@<=\s\+$" -c "wq" ${file}
 done
 
