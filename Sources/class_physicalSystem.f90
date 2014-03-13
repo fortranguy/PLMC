@@ -67,21 +67,19 @@ private
     
     contains
     
-        !> Construction and destruction of the class
+        !> Construction & destruction of the class
         procedure :: set_box => PhysicalSystem_set_box
         procedure :: set_monteCarlo => PhysicalSystem_set_monteCarlo
         procedure :: set_changes => PhysicalSystem_set_changes
         procedure :: construct => PhysicalSystem_construct
         procedure :: destroy => PhysicalSystem_destroy
         
-        !> Initialization                
+        !> Initialization & Finalisation         
         procedure :: open_units => PhysicalSystem_open_units
         procedure :: init_switch => PhysicalSystem_init_switch
         procedure :: init_spheres => PhysicalSystem_init_spheres
         procedure :: init_observables => PhysicalSystem_init_observables
         procedure :: init => PhysicalSystem_init
-        
-        !> Finalisation
         procedure :: final_spheres => PhysicalSystem_final_spheres
         procedure :: print_results => PhysicalSystem_print_results
         procedure :: close_units => PhysicalSystem_close_units
