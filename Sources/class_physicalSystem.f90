@@ -89,10 +89,11 @@ private
         procedure :: random_changes => PhysicalSystem_random_changes
         procedure :: update_rejections => PhysicalSystem_update_rejections
         procedure :: adapt_changes => PhysicalSystem_adapt_changes
-        procedure :: write_observables => PhysicalSystem_write_observables
+        procedure :: write_observables_thermalisation => PhysicalSystem_write_observables_thermalisation
         procedure :: fix_changes => PhysicalSystem_fix_changes
         procedure :: measure_chemical_potentials => PhysicalSystem_measure_chemical_potentials
         procedure :: accumulate_observables => PhysicalSystem_accumulate_observables
+        procedure :: write_observables_equilibrium => PhysicalSystem_write_observables_equilibrium
     
     end type PhysicalSystem
     
@@ -363,7 +364,7 @@ contains
         
     end subroutine PhysicalSystem_adapt_changes
     
-    subroutine PhysicalSystem_write_observables(this, iStep)
+    subroutine PhysicalSystem_write_observables_thermalisation(this, iStep)
     
         class(PhysicalSystem), intent(inout) :: this
         integer, intent(in) :: iStep
@@ -374,7 +375,7 @@ contains
         write(this%mix_obsThermal_unit, *) iStep, this%mix_Epot
         write(this%obsThermal_unit, *) iStep, this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
             
-    end subroutine PhysicalSystem_write_observables
+    end subroutine PhysicalSystem_write_observables_thermalisation
     
     subroutine PhysicalSystem_fix_changes(this)
     
@@ -407,5 +408,18 @@ contains
         this%switch_rejectSum = this%switch_rejectSum + this%switch_reject
             
     end subroutine PhysicalSystem_accumulate_observables
+    
+    subroutine PhysicalSystem_write_observables_equilibrium(this, iStep)
+    
+        class(PhysicalSystem), intent(inout) :: this
+        integer, intent(in) :: iStep
+    
+        call this%type1_obs%write(iStep, this%type1_units%obsEquilib)
+        call this%type2_obs%write(iStep, this%type2_units%obsEquilib)
+        
+        write(this%mix_obsEquilib_unit, *) iStep, this%mix_Epot
+        write(this%obsEquilib_unit, *) iStep, this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
+            
+    end subroutine PhysicalSystem_write_observables_equilibrium
 
 end module class_physicalSystem
