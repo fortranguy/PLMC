@@ -87,7 +87,9 @@ private
         procedure :: final => PhysicalSystem_final
         
         ! Random change algorithms
-        procedure :: random_change => PhysicalSystem_random_change
+        procedure :: random_changes => PhysicalSystem_random_changes
+        
+        procedure :: update_rejections => PhysicalSystem_update_rejections
     
     end type PhysicalSystem
     
@@ -289,7 +291,7 @@ contains
     
     ! Random change
     
-    subroutine PhysicalSystem_random_change(this)
+    subroutine PhysicalSystem_random_changes(this)
     
         class(PhysicalSystem), intent(inout) :: this
         
@@ -323,6 +325,20 @@ contains
             
         end do MC_Change
     
-    end subroutine PhysicalSystem_random_change
+    end subroutine PhysicalSystem_random_changes
+    
+    subroutine PhysicalSystem_update_rejections(this)
+    
+        class(PhysicalSystem), intent(inout) :: this
+    
+        call this%type1_obs%update_rejections()
+        call this%type2_obs%update_rejections()
+        
+        this%switch_reject = real(this%switch_Nreject, DP)/real(this%switch_Nhit, DP)
+        this%switch_Nreject = 0
+        this%switch_Nhit = 0 
+        
+    end subroutine PhysicalSystem_update_rejections
+    
 
 end module class_physicalSystem
