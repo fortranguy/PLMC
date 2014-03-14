@@ -16,7 +16,7 @@ use module_monteCarlo_arguments, only: read_arguments
 use module_physics_macro, only: init_randomSeed, set_initialCondition
 use module_algorithms, only: move, switch, rotate
 use module_tools, only: open_units, mix_open_units, print_report, init, final, mix_init, mix_final, &
-                        test_consist, print_results
+                        test_consist, print_results, adapt_move, adapt_rotate
 
 implicit none
 
@@ -86,10 +86,9 @@ private
         procedure :: close_units => PhysicalSystem_close_units
         procedure :: final => PhysicalSystem_final
         
-        ! Random change algorithms
         procedure :: random_changes => PhysicalSystem_random_changes
-        
         procedure :: update_rejections => PhysicalSystem_update_rejections
+        procedure :: adapt_changes => PhysicalSystem_adapt_changes
     
     end type PhysicalSystem
     
@@ -340,5 +339,24 @@ contains
         
     end subroutine PhysicalSystem_update_rejections
     
+    subroutine PhysicalSystem_adapt_changes(this, iStep)
+    
+        class(PhysicalSystem), intent(inout) :: this
+        integer, intent(in) :: iStep
+        
+        if (mod(iStep, this%Nadapt) /= 0) then ! Rejections accumulation
+            this%type1_obs%move_rejectAdapt = this%type1_obs%move_rejectAdapt + &
+                                              this%type1_obs%move_reject
+            this%type1_obs%rotate_rejectAdapt = this%type1_obs%rotate_rejectAdapt + &
+                                                this%type1_obs%rotate_reject
+            this%type2_obs%move_rejectAdapt = this%type2_obs%move_rejectAdapt + &
+                                              this%type2_obs%move_reject
+        else ! Average & adaptation
+            call adapt_move(this%type1_spheres, iStep, this%type1_obs, this%type1_units%move_delta)
+            call adapt_rotate(this%type1_spheres, iStep, this%type1_obs, this%type1_units%rotate_delta)
+            call adapt_move(this%type2_spheres, iStep, this%type2_obs, this%type2_units%move_delta)
+        end if
+        
+    end subroutine PhysicalSystem_adapt_changes
 
 end module class_physicalSystem
