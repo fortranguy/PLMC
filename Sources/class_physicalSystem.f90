@@ -73,23 +73,28 @@ private
     contains
     
         !> Construction & destruction of the class
-        procedure :: set_box => PhysicalSystem_set_box
-        procedure :: set_monteCarlo => PhysicalSystem_set_monteCarlo
-        procedure :: set_changes => PhysicalSystem_set_changes
+        procedure, private :: set_box => PhysicalSystem_set_box
+        procedure, private :: set_monteCarlo => PhysicalSystem_set_monteCarlo
+        procedure, private :: set_changes => PhysicalSystem_set_changes
         procedure :: construct => PhysicalSystem_construct
         procedure :: destroy => PhysicalSystem_destroy
         
         !> Initialization & Finalisation         
-        procedure :: open_units => PhysicalSystem_open_units
-        procedure :: init_switch => PhysicalSystem_init_switch
-        procedure :: init_spheres => PhysicalSystem_init_spheres
-        procedure :: init_observables => PhysicalSystem_init_observables
+        procedure, private :: open_units => PhysicalSystem_open_units
+        procedure, private :: init_switch => PhysicalSystem_init_switch
+        procedure, private :: init_spheres => PhysicalSystem_init_spheres
+        procedure, private :: init_observables => PhysicalSystem_init_observables
         procedure :: init => PhysicalSystem_init
-        procedure :: final_spheres => PhysicalSystem_final_spheres
-        procedure :: print_results => PhysicalSystem_print_results
-        procedure :: close_units => PhysicalSystem_close_units
+        procedure, private :: final_spheres => PhysicalSystem_final_spheres
+        procedure, private :: print_results => PhysicalSystem_print_results
+        procedure, private :: close_units => PhysicalSystem_close_units
         procedure :: final => PhysicalSystem_final
         
+        !> Accessors
+        procedure :: get_Nthermal => PhysicalSystem_get_Nthermal
+        procedure :: get_Nstep => PhysicalSystem_get_Nstep
+        
+        !> Simulation
         procedure :: random_changes => PhysicalSystem_random_changes
         procedure :: update_rejections => PhysicalSystem_update_rejections
         procedure :: adapt_changes => PhysicalSystem_adapt_changes
@@ -302,7 +307,21 @@ contains
     
     end subroutine PhysicalSystem_destroy
     
-    ! Random change
+    ! Accessors
+    
+    pure function PhysicalSystem_get_Nthermal(this) result(get_Nthermal)
+        class(PhysicalSystem), intent(in) :: this
+        integer :: get_Nthermal
+        get_Nthermal = this%Nthermal
+    end function PhysicalSystem_get_Nthermal
+    
+    pure function PhysicalSystem_get_Nstep(this) result(get_Nstep)
+        class(PhysicalSystem), intent(in) :: this
+        integer :: get_Nstep
+        get_Nstep = this%Nstep
+    end function PhysicalSystem_get_Nstep
+    
+    ! Random changes
     
     subroutine PhysicalSystem_random_changes(this)
     
