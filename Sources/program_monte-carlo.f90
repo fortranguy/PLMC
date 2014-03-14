@@ -8,11 +8,11 @@ use module_monteCarlo_arguments, only: read_arguments
 use class_physicalSystem
 
 implicit none
-
-    integer :: iStep
     
     type(PhysicalSystem) :: sys
     type(monteCarlo_arguments) :: args
+    
+    integer :: iStep
 
     call read_arguments(args)
     call sys%construct()
