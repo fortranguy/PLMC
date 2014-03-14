@@ -75,11 +75,12 @@ private
         !> Construction & destruction of the class
         procedure, private :: set_box => PhysicalSystem_set_box
         procedure, private :: set_monteCarlo => PhysicalSystem_set_monteCarlo
-        procedure, private :: set_changes => PhysicalSystem_set_changes
         procedure :: construct => PhysicalSystem_construct
         procedure :: destroy => PhysicalSystem_destroy
         
-        !> Initialization & Finalisation         
+        !> Initialization & Finalisation     
+        procedure, private :: construct_spheres => PhysicalSystem_construct_spheres
+        procedure, private :: set_changes => PhysicalSystem_set_changes    
         procedure, private :: open_units => PhysicalSystem_open_units
         procedure, private :: init_switch => PhysicalSystem_init_switch
         procedure, private :: init_spheres => PhysicalSystem_init_spheres
@@ -139,23 +140,27 @@ contains
 
     subroutine PhysicalSystem_construct(this)
     
-        class(PhysicalSystem), intent(inout) :: this
+        class(PhysicalSystem), intent(out) :: this
         
         this%name = "sys"
         write(output_unit, *) this%name, " class construction"
         
         call this%set_box()
         call this%set_monteCarlo()
-        
-        call this%type1_spheres%construct()
-        call this%type2_spheres%construct()
-        call this%mix%construct(this%type1_spheres%get_sigma(), this%type2_spheres%get_sigma())
-        
-        call this%set_changes()
     
     end subroutine PhysicalSystem_construct
     
     ! Initialization
+    
+    subroutine PhysicalSystem_construct_spheres(this)
+    
+        class(PhysicalSystem), intent(out) :: this
+    
+        call this%type1_spheres%construct()
+        call this%type2_spheres%construct()
+        call this%mix%construct(this%type1_spheres%get_sigma(), this%type2_spheres%get_sigma())
+    
+    end subroutine PhysicalSystem_construct_spheres
     
     subroutine PhysicalSystem_open_units(this)
     
@@ -221,6 +226,9 @@ contains
         class(PhysicalSystem), intent(out) :: this
         type(argument_seed), intent(in) :: arg_seed
         type(argument_initial), intent(in) :: arg_init
+        
+        call this%construct_spheres()
+        call this%set_changes()
         
         write(output_unit, *) "Monte-Carlo Simulation: Canonical ensemble"        
         
