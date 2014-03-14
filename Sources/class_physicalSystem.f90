@@ -92,6 +92,7 @@ private
         procedure :: write_observables => PhysicalSystem_write_observables
         procedure :: fix_changes => PhysicalSystem_fix_changes
         procedure :: measure_chemical_potentials => PhysicalSystem_measure_chemical_potentials
+        procedure :: accumulate_observables => PhysicalSystem_accumulate_observables
     
     end type PhysicalSystem
     
@@ -369,6 +370,7 @@ contains
     
         call this%type1_obs%write(iStep, this%type1_units%obsThermal)
         call this%type2_obs%write(iStep, this%type2_units%obsThermal)
+        
         write(this%mix_obsThermal_unit, *) iStep, this%mix_Epot
         write(this%obsThermal_unit, *) iStep, this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
             
@@ -393,5 +395,17 @@ contains
         call widom(this%type2_spheres, this%type2_obs, this%type1_spheres, this%mix)
     
     end subroutine PhysicalSystem_measure_chemical_potentials
+    
+    subroutine PhysicalSystem_accumulate_observables(this)
+    
+        class(PhysicalSystem), intent(inout) :: this
+    
+        call this%type1_obs%accumulate()
+        call this%type2_obs%accumulate()
+        
+        this%mix_EpotSum = this%mix_EpotSum + this%mix_Epot
+        this%switch_rejectSum = this%switch_rejectSum + this%switch_reject
+            
+    end subroutine PhysicalSystem_accumulate_observables
 
 end module class_physicalSystem
