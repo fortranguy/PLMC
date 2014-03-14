@@ -5,7 +5,7 @@ module module_tools
 use data_precisions, only: DP, real_zero, io_tiny, consist_tiny
 use data_constants, only: PI, sigma3d
 use data_box, only: Ndim, Lsize, Kmax
-use data_monteCarlo, only: Temperature, Nadapt, Nstep, decorrelFactor, Nthermal
+use data_monteCarlo, only: Temperature, Nstep, decorrelFactor, Nthermal
 use data_potential, only: print_potential
 use module_types, only: argument_seed, argument_initial
 use class_hardSpheres
@@ -13,12 +13,12 @@ use class_dipolarSpheres
 use class_mixingPotential
 use class_observables
 use class_units
+use module_physics_macro, only: test_consist
 
 implicit none
 
 private
-public open_units, mix_open_units, &
-       print_report, mix_init, mix_final, init, final, adapt_move, adapt_rotate, test_consist, &
+public open_units, mix_open_units, print_report, mix_init, mix_final, init, final, &
        print_results, mix_print_results
 
 contains
@@ -188,65 +188,6 @@ contains
         end select
     
     end subroutine final
-    
-    !> Change: average & adaptation
-    
-    subroutine adapt_move(this, iStep, obs, move_unit)
-    
-        class(HardSpheres), intent(inout) :: this
-        integer, intent(in) :: iStep
-        class(Observables), intent(inout) :: obs
-        integer, intent(in) :: move_unit
-    
-        obs%move_rejectAvg = obs%move_rejectAdapt / real(Nadapt-1, DP)
-        obs%move_rejectAdapt = 0._DP
-        call this%adapt_move_delta(obs%move_rejectAvg)
-        write(move_unit, *) iStep, this%get_move_delta(), obs%move_rejectAvg
-    
-    end subroutine adapt_move
-    
-    subroutine adapt_rotate(this, iStep, obs, rotate_unit)
-    
-        class(DipolarSpheres), intent(inout) :: this
-        integer, intent(in) :: iStep
-        class(MoreObservables), intent(inout) :: obs
-        integer, intent(in) :: rotate_unit
-        
-        obs%rotate_rejectAvg = obs%rotate_rejectAdapt / real(Nadapt-1, DP)
-        obs%rotate_rejectAdapt = 0._DP
-        call this%adapt_rotate_delta(obs%rotate_rejectAvg)
-        write(rotate_unit, *) iStep, this%get_rotate_delta(), obs%rotate_rejectAvg
-        
-    end subroutine adapt_rotate
-    
-    !> Total & Mix: consistency test
-    
-    subroutine test_consist(Epot, Epot_conf, report_unit)
-    
-        real(DP), intent(in) :: Epot, Epot_conf
-        integer, intent(in) :: report_unit
-        
-        real(DP) :: difference
-        
-        write(report_unit, *) "Consistency test: "
-        write(report_unit, *) "    Epot = ", Epot
-        write(report_unit, *) "    Epot_conf = ", Epot_conf
-        
-        if (abs(Epot_conf) < real_zero) then
-            difference = abs(Epot_conf-Epot)
-            write(report_unit, *) "    absolute difference = ", difference
-        else
-            difference = abs((Epot_conf-Epot)/Epot_conf)
-            write(report_unit, *) "    relative difference = ", difference
-        end if
-        
-        if (difference > consist_tiny) then ! not sufficient for HS ?
-            write(report_unit, *) "    WARNING !"
-        else
-            write(report_unit, *) "    OK !"
-        end if
-    
-    end subroutine test_consist
     
     !> Total: Results
     
