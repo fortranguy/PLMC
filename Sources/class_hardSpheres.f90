@@ -223,11 +223,6 @@ contains
         compacity = 4._DP/3._DP*PI*(this%sigma/2._DP)**3 * density
         concentration = real(this%Ncol, DP) / real(total_Ncol, DP)
         
-        write(output_unit, *) this%name, ": "
-        write(output_unit, *) "    density = ", density
-        write(output_unit, *) "    compacity = ", compacity
-        write(output_unit, *) "    concentration = ", concentration
-        
         write(report_unit, *) "    density = ", density
         write(report_unit, *) "    compacity = ", compacity
         write(report_unit, *) "    concentration = ", concentration
