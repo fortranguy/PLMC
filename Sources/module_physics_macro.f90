@@ -17,7 +17,7 @@ use class_units
 
 implicit none
 private
-public init_randomSeed, set_initialCondition, init, final, mix_init, mix_final, &
+public init_randomSeed, set_initialConfiguration, init, final, mix_init, mix_final, &
        adapt_move, adapt_rotate, test_consist
 
 contains
@@ -180,9 +180,9 @@ contains
         
     end subroutine oldConfiguration
     
-    !> Initial condition
+    !> Initial configuration
     
-    subroutine set_initialCondition(arg_init, dipolar, spherical, mix_sigma, report_unit)
+    subroutine set_initialConfiguration(arg_init, dipolar, spherical, mix_sigma, report_unit)
 
         type(argument_initial), intent(in) :: arg_init
         class(DipolarSpheres), intent(inout) :: dipolar
@@ -190,7 +190,7 @@ contains
         real(DP), intent(in) :: mix_sigma
         integer, intent(in) :: report_unit
         
-        write(report_unit, *) "Initial condition: "
+        write(report_unit, *) "Initial configuration: "
         
         select case (arg_init%choice)
         
@@ -214,11 +214,11 @@ contains
                                       spherical%positions, norm2(Lsize))
             
             case default
-                error stop "Error: set_initialCondition"
+                error stop "Error: in setting new configuration"
                 
         end select
         
-    end subroutine set_initialCondition
+    end subroutine set_initialConfiguration
     
     !> Spheres initialisations
     

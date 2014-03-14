@@ -19,13 +19,15 @@ contains
         write(output_unit, *)
         write(output_unit, *) "Mandatory arguments to long options are mandatory for short options too."
         write(output_unit, *) "    -h, --help"
-        write(output_unit, *) "    -i, --intial CONDITION   CONDITION='r', 'random' (default)"
-        write(output_unit, *) "                             CONDITION='f', 'files' [dipol_positions] "
-        write(output_unit, *) "                             [dipol_orientations] [hardS_positions]"
-        write(output_unit, *) "    -r, --random SEED        SEED='v', 'variable' (default)"
-        write(output_unit, *) "                             SEED='f', 'fix'"
-        write(output_unit, *) "                             SEED='p', 'put' [size] [seed_1]...[seed_n]"
-        write(output_unit, *) "                                             Warning: compiler-dependent"
+        write(output_unit, *) "    -i, --initial    CONFIGURATION: choose initial configuration"
+        write(output_unit, *) "                     CONFIGURATION = 'r', 'random' (default)"
+        write(output_unit, *) "                     CONFIGURATION = 'f', 'files' [dipol_positions] "
+        write(output_unit, *) "                     [dipol_orientations] [hardS_positions]"
+        write(output_unit, *) "    -r, --random     SEED: choose random number generator seed"
+        write(output_unit, *) "                     SEED = 'v', 'variable' (default)"
+        write(output_unit, *) "                     SEED = 'f', 'fix'"
+        write(output_unit, *) "                     SEED = 'p', 'put' [size] [seed_1]...[seed_n]"
+        write(output_unit, *) "                            Warning: compiler-dependent"
         write(output_unit, *)
         write(output_unit, *) "Report bugs to <salomon.chung@u-pe.fr>."
     
@@ -114,10 +116,10 @@ contains
                     stop
 
                 case ("-i", "--initial")
-                    if (init_redefined) error stop "Error: initial condition already defined."
+                    if (init_redefined) error stop "Error: initial configuration already defined."
                     iArg = iArg + 1
                     call get_command_argument(iArg, sub_argument, length, status)
-                    if (status /= 0) error stop "Enter initial condition, cf. help."
+                    if (status /= 0) error stop "Enter initial configuration, cf. help."
                     select case (sub_argument)
                         case ("r", "random")
                         case ("f", "files")

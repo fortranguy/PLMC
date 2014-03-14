@@ -15,7 +15,7 @@ use class_mixingPotential
 use class_observables
 use class_units
 use module_monteCarlo_arguments, only: read_arguments
-use module_physics_macro, only: init_randomSeed, set_initialCondition, init, final, mix_init, &
+use module_physics_macro, only: init_randomSeed, set_initialConfiguration, init, final, mix_init, &
                                 mix_final, adapt_move, adapt_rotate, test_consist
 use module_algorithms, only: move, widom, switch, rotate
 use module_write, only: open_units, mix_open_units, write_report, write_results, mix_write_results
@@ -230,8 +230,8 @@ contains
         call this%init_switch()        
         
         call init_randomSeed(args%random, this%report_unit)
-        call set_initialCondition(args%initial, this%type1_spheres, this%type2_spheres, &
-                                  this%mix%get_sigma(), this%report_unit)
+        call set_initialConfiguration(args%initial, this%type1_spheres, this%type2_spheres, &
+                                      this%mix%get_sigma(), this%report_unit)
         call this%init_spheres()
         call this%init_observables()
     
