@@ -88,6 +88,8 @@ private
     end type PhysicalSystem
     
 contains
+
+    ! Construction
     
     pure subroutine PhysicalSystem_set_box(this)    
         class(PhysicalSystem), intent(inout) :: this        
@@ -128,6 +130,8 @@ contains
         call this%set_changes()
     
     end subroutine PhysicalSystem_construct
+    
+    ! Initialization
     
     subroutine PhysicalSystem_open_units(this)
     
@@ -206,6 +210,8 @@ contains
     
     end subroutine PhysicalSystem_init
     
+    ! Finalisation
+    
     subroutine PhysicalSystem_final_spheres(this)
     
         class(PhysicalSystem), intent(inout) :: this
@@ -261,6 +267,8 @@ contains
         call this%close_units()
     
     end subroutine PhysicalSystem_final
+    
+    ! Destruction
     
     subroutine PhysicalSystem_destroy(this)
     
