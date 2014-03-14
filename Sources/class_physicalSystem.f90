@@ -14,6 +14,7 @@ use class_observables
 use class_units
 use module_monteCarlo_arguments, only: read_arguments
 use module_physics_macro, only: init_randomSeed, set_initialCondition
+use module_algorithms, only: move, switch, rotate
 use module_tools, only: open_units, mix_open_units, print_report, init, final, mix_init, mix_final, &
                         test_consist, print_results
 
@@ -35,7 +36,7 @@ private
         ! Monte-Carlo
         real(DP) :: Temperature
         integer :: Nthermal, Nadapt, Nstep !< Markov-chain Monte-Carlo
-        integer :: Nmove, Nswitch, Nrotate !< changes
+        integer :: Nchange, Nmove, Nswitch, Nrotate !< changes
         
         ! Type 1: Dipolar spheres
         type(DipolarSpheres) :: type1_spheres !< physical properties and Monte-Carlo subroutines
@@ -84,6 +85,9 @@ private
         procedure :: print_results => PhysicalSystem_print_results
         procedure :: close_units => PhysicalSystem_close_units
         procedure :: final => PhysicalSystem_final
+        
+        ! Random change algorithms
+        procedure :: random_change => PhysicalSystem_random_change
     
     end type PhysicalSystem
     
@@ -111,6 +115,7 @@ contains
         this%Nmove = decorrelFactor * this%Ncol
         this%Nswitch = switch_factor * decorrelFactor * this%type1_spheres%get_Ncol()
         this%Nrotate = decorrelFactor * this%type1_spheres%get_Ncol()    
+        this%Nchange = this%Nmove + this%Nswitch + this%Nrotate
     end subroutine PhysicalSystem_set_changes
 
     subroutine PhysicalSystem_construct(this)
@@ -281,5 +286,43 @@ contains
         call this%mix%destroy()
     
     end subroutine PhysicalSystem_destroy
+    
+    ! Random change
+    
+    subroutine PhysicalSystem_random_change(this)
+    
+        class(PhysicalSystem), intent(inout) :: this
+        
+        integer :: iChange, iChangeRand, iColRand
+        real(DP) :: rand
+        
+        MC_Change: do iChange = 1, this%Nchange
+        
+            ! Randomly choosing the change
+            call random_number(rand)
+            iChangeRand = int(rand*real(this%Nchange, DP)) + 1
+            
+            if (iChangeRand <= this%Nmove) then            
+                ! Randomly choosing the type
+                call random_number(rand)
+                iColRand = int(rand*real(this%Ncol, DP)) + 1                
+                if (iColRand <= this%type1_spheres%get_Ncol()) then
+                    call move(this%type1_spheres, this%type1_obs, this%type2_spheres, this%mix, &
+                              this%mix_Epot)
+                else
+                    call move(this%type2_spheres, this%type2_obs, this%type1_spheres, this%mix, &
+                              this%mix_Epot)
+                end if                
+            else if (iChangeRand <= this%Nmove + this%Nswitch) then            
+                call switch(this%type1_spheres, this%type1_obs, this%type2_spheres, this%type2_obs, &
+                            this%mix, this%mix_Epot, this%switch_Nreject)
+                this%switch_Nhit = this%switch_Nhit + 1                
+            else     
+                call rotate(this%type1_spheres, this%type1_obs)                
+            end if
+            
+        end do MC_Change
+    
+    end subroutine PhysicalSystem_random_change
 
 end module class_physicalSystem
