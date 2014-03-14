@@ -15,11 +15,10 @@ use class_mixingPotential
 use class_observables
 use class_units
 use module_monteCarlo_arguments, only: read_arguments
-use module_physics_macro, only: init_randomSeed, set_initialCondition, adapt_move, adapt_rotate, &
-                                test_consist
+use module_physics_macro, only: init_randomSeed, set_initialCondition, init, final, mix_init, &
+                                mix_final, adapt_move, adapt_rotate, test_consist
 use module_algorithms, only: move, widom, switch, rotate
-use module_tools, only: open_units, mix_open_units, print_report, init, final, mix_init, mix_final, &
-                        print_results
+use module_tools, only: open_units, mix_open_units, print_report, print_results, mix_print_results
 
 implicit none
 
@@ -248,7 +247,8 @@ contains
         call final(this%type1_spheres, this%type1_units, this%type1_obs)
         call final(this%type2_spheres, this%type2_units, this%type2_obs)
         call mix_final(this%mix, this%type1_spheres, this%type2_spheres, this%mix_report_unit, &
-                       this%mix_Epot, this%mix_EpotSum, this%mix_Epot_conf)
+                       this%mix_Epot, this%mix_Epot_conf)
+        call mix_print_results(this%mix_EpotSum, this%mix_report_unit)
         
     end subroutine PhysicalSystem_final_spheres
     

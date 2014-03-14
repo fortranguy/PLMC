@@ -12,14 +12,12 @@ use class_hardSpheres
 use class_dipolarSpheres
 use class_mixingPotential
 use class_observables
-use class_units
 use module_physics_macro, only: test_consist
 
 implicit none
 
 private
-public open_units, mix_open_units, print_report, mix_init, mix_final, init, final, &
-       print_results, mix_print_results
+public open_units, mix_open_units, print_report, print_results, mix_print_results
 
 contains
 
@@ -88,106 +86,9 @@ contains
         write(report_unit, *) "    Nrotate = ", Nrotate
         
         write(report_unit, *) "    reset_iStep = ", reset_iStep
+        write(report_unit, *) "    print_potential = ", print_potential
     
     end subroutine print_report
-    
-    !> Mix initialisation
-    
-    subroutine mix_init(mix, type1, type2, mix_Epot_unit, mix_Epot)
-    
-        class(MixingPotential), intent(inout) :: mix
-        class(HardSpheres), intent(in) :: type1, type2
-        integer, intent(in) :: mix_Epot_unit
-        real(DP), intent(out) :: mix_Epot
-    
-        call mix%test_overlap(type1, type2)
-        call mix%set_Epot()
-        if (print_potential) then
-            call mix%Epot_print(mix_Epot_unit)
-        end if
-        call mix%set_cell_size()
-        mix_Epot = mix%Epot_conf(type1, type2)
-    
-    end subroutine mix_init
-    
-    !> Mix finalization
-    
-    subroutine mix_final(mix, type1, type2, mix_report_unit, mix_Epot, mix_EpotSum, mix_Epot_conf)
-    
-        class(MixingPotential), intent(inout) :: mix
-        class(HardSpheres), intent(in) :: type1, type2
-        integer, intent(in) :: mix_report_unit
-        real(DP), intent(in) :: mix_Epot, mix_EpotSum
-        real(DP), intent(out) :: mix_Epot_conf
-        
-        call mix%test_overlap(type1, type2)
-        call mix%set_Epot()
-        mix_Epot_conf = mix%Epot_conf(type1, type2)
-        call test_consist(mix_Epot, mix_Epot_conf, mix_report_unit)
-        call mix_print_results(mix_EpotSum, mix_report_unit)
-    
-    end subroutine mix_final
-    
-    !> Spheres initialisations
-    
-    subroutine init(this, other, mix, this_units, this_Epot)
-    
-        class(HardSpheres), intent(inout) :: this
-        class(HardSpheres), intent(in) :: other
-        class(MixingPotential), intent(in) :: mix
-        class(Units), intent(in) :: this_units
-        real(DP), intent(inout) :: this_Epot
-        
-        call this%test_overlap()
-        call this%snap_data(this_units%snap_positions)
-        call this%snap_positions(0, this_units%snapIni_positions)
-        call this%set_Epot()
-        
-        if (print_potential) then
-            call this%Epot_print(this_units%Epot)
-        end if
-        select type (this)
-            type is (DipolarSpheres)
-                select type (this_units)
-                    type is (MoreUnits)
-                        call this%snap_data(this_units%snap_orientations)
-                        call this%snap_orientations(0, this_units%snapIni_orientations)
-                        if (print_potential) then
-                            call this%Epot_real_print(this_units%Epot_real)
-                        end if
-                        call this%Epot_reci_count_waveVectors(this_units%waveVectors)
-                end select
-        end select
-        this_Epot = this%Epot_conf()
-        
-        call this%construct_cells(other, mix%get_cell_size(), mix%get_rCut())
-        call this%print_report(this_units%report)
-    
-    end subroutine init
-    
-    !> Spheres finalizations
-    
-    subroutine final(this, this_units, this_obs)
-    
-        class(HardSpheres), intent(inout) :: this
-        class(Units), intent(in) :: this_units
-        class(Observables), intent(in) :: this_obs
-        
-        call this%test_overlap()
-        call this%set_Epot()
-        call test_consist(this_obs%Epot, this%Epot_conf(), this_units%report)
-        call this%snap_positions(0, this_units%snapFin_positions)
-        call this_obs%print_results(this_units%report)
-        
-        select type (this)
-            type is (DipolarSpheres)
-                select type (this_units)
-                    type is (MoreUnits)
-                        call this%snap_orientations(0, this_units%snapFin_orientations)
-                end select
-        end select
-    
-    end subroutine final
     
     !> Total: Results
     
