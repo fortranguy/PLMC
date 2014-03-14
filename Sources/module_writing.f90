@@ -1,6 +1,6 @@
 !> \brief Subroutines as tools for the main program
 
-module module_tools
+module module_writing
 
 use data_precisions, only: DP, real_zero, io_tiny, consist_tiny
 use data_constants, only: PI, sigma3d
@@ -120,4 +120,4 @@ contains
     
     end subroutine mix_print_results
     
-end module module_tools
+end module module_writing

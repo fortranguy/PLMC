@@ -18,7 +18,7 @@ use module_monteCarlo_arguments, only: read_arguments
 use module_physics_macro, only: init_randomSeed, set_initialCondition, init, final, mix_init, &
                                 mix_final, adapt_move, adapt_rotate, test_consist
 use module_algorithms, only: move, widom, switch, rotate
-use module_tools, only: open_units, mix_open_units, print_report, print_results, mix_print_results
+use module_writing, only: open_units, mix_open_units, print_report, print_results, mix_print_results
 
 implicit none
 
