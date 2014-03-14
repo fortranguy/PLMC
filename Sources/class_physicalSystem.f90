@@ -90,6 +90,7 @@ private
         procedure :: update_rejections => PhysicalSystem_update_rejections
         procedure :: adapt_changes => PhysicalSystem_adapt_changes
         procedure :: write_observables => PhysicalSystem_write_observables
+        procedure :: fix_changes => PhysicalSystem_fix_changes
     
     end type PhysicalSystem
     
@@ -371,5 +372,16 @@ contains
         write(this%obsThermal_unit, *) iStep, this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
             
     end subroutine PhysicalSystem_write_observables
+    
+    subroutine PhysicalSystem_fix_changes(this)
+    
+        class(PhysicalSystem), intent(inout) :: this
+        
+        call this%type1_spheres%set_move_delta(this%type1_obs%move_rejectAvg, this%type1_units%report)
+        call this%type1_spheres%set_rotate_delta(this%type1_obs%rotate_rejectAvg, &
+                                                 this%type1_units%report)
+        call this%type2_spheres%set_move_delta(this%type2_obs%move_rejectAvg, this%type2_units%report)
+    
+    end subroutine PhysicalSystem_fix_changes
 
 end module class_physicalSystem
