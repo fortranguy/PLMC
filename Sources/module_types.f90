@@ -17,11 +17,11 @@ implicit none
 
     ! For main program
 
-    type, public :: argument_seed
+    type, public :: argument_random
         character(len=1) :: choice
         integer :: size
         integer, dimension(:), allocatable :: seed
-    end type argument_seed
+    end type argument_random
 
     type, public :: argument_initial
         character(len=1) :: choice
@@ -30,7 +30,7 @@ implicit none
     end type argument_initial
     
     type, public :: monteCarlo_arguments
-        type(argument_seed) :: seed
+        type(argument_random) :: random
         type(argument_initial) :: initial
     end type monteCarlo_arguments
 

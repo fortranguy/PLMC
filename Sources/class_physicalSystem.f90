@@ -229,7 +229,7 @@ contains
         call this%open_units()        
         call this%init_switch()        
         
-        call init_randomSeed(args%seed, this%report_unit)
+        call init_randomSeed(args%random, this%report_unit)
         call set_initialCondition(args%initial, this%type1_spheres, this%type2_spheres, &
                                   this%mix%get_sigma(), this%report_unit)
         call this%init_spheres()

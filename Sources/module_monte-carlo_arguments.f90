@@ -3,7 +3,7 @@
 module module_monteCarlo_arguments
 
 use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
-use module_types, only: argument_seed, argument_initial, monteCarlo_arguments
+use module_types, only: argument_random, argument_initial, monteCarlo_arguments
 
 implicit none
 
@@ -55,32 +55,32 @@ contains
         
     end subroutine read_init_files
 
-    subroutine read_seed_put(iArg, arg_seed)
+    subroutine read_seed_put(iArg, arg_rand)
 
         integer, intent(inout) :: iArg
-        type(argument_seed), intent(inout) :: arg_seed
+        type(argument_random), intent(inout) :: arg_rand
         
         character(len=4096) :: argument
         integer :: length, status
-        integer :: seed_size, arg_seed_size
-        integer :: iSeed, arg_seed_i
+        integer :: seed_size, arg_rand_size
+        integer :: iSeed, arg_rand_i
         
         iArg = iArg + 1
         call get_command_argument(iArg, argument, length, status)
         if (status /= 0) error stop "Error: read_seed_put"
-        read(argument(1:length), '(i3)') arg_seed_size ! limits ?
+        read(argument(1:length), '(i3)') arg_rand_size ! limits ?
 
         call random_seed(size = seed_size)
-        if (arg_seed_size /= seed_size) error stop "error seed size"
+        if (arg_rand_size /= seed_size) error stop "error seed size"
 
-        allocate(arg_seed%seed(seed_size))
+        allocate(arg_rand%seed(seed_size))
 
         do iSeed = 1, seed_size
             iArg = iArg + 1
             call get_command_argument(iArg, argument, length, status)
             if (status /= 0) error stop "Error: read_seed_put: component"
-            read(argument(1:length), '(i11)') arg_seed_i ! limits ?
-            arg_seed%seed(iSeed) = arg_seed_i
+            read(argument(1:length), '(i11)') arg_rand_i ! limits ?
+            arg_rand%seed(iSeed) = arg_rand_i
         end do
 
     end subroutine read_seed_put
@@ -95,7 +95,7 @@ contains
         integer :: iArg, length, status
         logical :: seed_redefined, init_redefined
 
-        args%seed%choice = 'v'
+        args%random%choice = 'v'
         args%initial%choice = 'r'
 
         seed_redefined = .false.
@@ -137,10 +137,10 @@ contains
                     select case (sub_argument)
                         case ("v", "variable")
                         case ("f", "fix")
-                            args%seed%choice = 'f'
+                            args%random%choice = 'f'
                         case ("p", "put")
-                            args%seed%choice = 'p'
-                            call read_seed_put(iArg, args%seed)
+                            args%random%choice = 'p'
+                            call read_seed_put(iArg, args%random)
                         case default
                             call write_help()
                             error stop

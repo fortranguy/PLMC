@@ -7,12 +7,6 @@ use data_constants, only: PI, sigma3d
 use data_box, only: Ndim, Lsize, Kmax
 use data_monteCarlo, only: Temperature, Nstep, decorrelFactor, Nthermal
 use data_potential, only: write_potential
-use module_types, only: argument_seed, argument_initial
-use class_hardSpheres
-use class_dipolarSpheres
-use class_mixingPotential
-use class_observables
-use module_physics_macro, only: test_consist
 
 implicit none
 

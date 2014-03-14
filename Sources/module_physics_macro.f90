@@ -7,7 +7,7 @@ use data_precisions, only: DP, real_zero, io_tiny, consist_tiny
 use data_box, only: Ndim, Lsize
 use data_monteCarlo, only: Nadapt
 use data_potential, only: write_potential
-use module_types, only: argument_seed, argument_initial
+use module_types, only: argument_random, argument_initial
 use module_physics_micro, only: dist_PBC, random_surface
 use class_hardSpheres
 use class_dipolarSpheres
@@ -24,9 +24,9 @@ contains
 
     !> Random number generator: seed
     
-    subroutine init_randomSeed(arg_seed, report_unit)
+    subroutine init_randomSeed(arg_rand, report_unit)
     
-        type(argument_seed) :: arg_seed
+        type(argument_random) :: arg_rand
         integer, intent(in) :: report_unit
     
         integer :: i, n, clock
@@ -35,7 +35,7 @@ contains
         call random_seed(size = n)
         allocate(seed(n))
 
-        select case (arg_seed%choice)
+        select case (arg_rand%choice)
         
             case ('v')
 
@@ -47,7 +47,7 @@ contains
                 write(report_unit, *) "Random number generator: variable"
 
             case ('p')
-                call random_seed(put = arg_seed%seed)
+                call random_seed(put = arg_rand%seed)
                 write(report_unit, *) "Random number generator: put"
                 
             case ('f')
