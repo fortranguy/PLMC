@@ -34,7 +34,7 @@ private
         real(DP) :: rotate_deltaSave
         real(DP) :: rotate_deltaMax
         real(DP) :: rotate_rejectFix
-        integer :: reInit_iStep
+        integer :: reset_iStep
 
         ! Potential
         real(DP) :: real_rCut !< real space potential cut
@@ -67,26 +67,26 @@ private
         procedure :: set_rotate_delta => DipolarSpheres_set_rotate_delta
         procedure :: get_rotate_delta => DipolarSpheres_get_rotate_delta
         
-        procedure :: get_reInit_iStep => DipolarSpheres_get_reInit_iStep
+        procedure :: get_reset_iStep => DipolarSpheres_get_reset_iStep
         
         !> Potential energy
         !>     Real
         procedure, private :: Epot_real_true => DipolarSpheres_Epot_real_true
-        procedure, private :: Epot_real_set_parameters => DipolarSpheres_Epot_real_set_parameters
-        procedure, private :: Epot_real_set_tab => DipolarSpheres_Epot_real_set_tab
-        procedure, private :: Epot_real_set => DipolarSpheres_Epot_real_set
+        procedure, private :: set_Epot_real_parameters => DipolarSpheres_set_Epot_real_parameters
+        procedure, private :: set_Epot_real_tab => DipolarSpheres_set_Epot_real_tab
+        procedure, private :: set_Epot_real => DipolarSpheres_set_Epot_real
         procedure :: Epot_real_print => DipolarSpheres_Epot_real_print
         procedure, private :: Epot_real_interpol => DipolarSpheres_Epot_real_interpol
         procedure, private :: Epot_real_pair => DipolarSpheres_Epot_real_pair
         procedure :: Epot_real_solo => DipolarSpheres_Epot_real_solo
         procedure, private :: Epot_real => DipolarSpheres_Epot_real
         !>     Reciprocal: init
-        procedure, private :: Epot_reci_set_weight => DipolarSpheres_Epot_reci_set_weight
-        procedure, private :: Epot_reci_set_structure => DipolarSpheres_Epot_reci_set_structure
-        procedure, private :: Epot_reci_set => DipolarSpheres_Epot_reci_set
+        procedure, private :: set_Epot_reci_weight => DipolarSpheres_set_Epot_reci_weight
+        procedure, private :: set_Epot_reci_structure => DipolarSpheres_set_Epot_reci_structure
+        procedure, private :: set_Epot_reci => DipolarSpheres_set_Epot_reci
         procedure, private :: Epot_reci_get_structure_modulus => &
                               DipolarSpheres_Epot_reci_get_structure_modulus
-        procedure :: Epot_reci_reInit_structure => DipolarSpheres_Epot_reci_reInit_structure
+        procedure :: reset_Epot_reci_structure => DipolarSpheres_reset_Epot_reci_structure
         procedure :: Epot_reci_count_waveVectors => DipolarSpheres_Epot_reci_count_waveVectors
         !>     Reciprocal: delta
         procedure :: deltaEpot_reci_move => DipolarSpheres_deltaEpot_reci_move
@@ -103,14 +103,14 @@ private
         procedure, private :: Epot_self => DipolarSpheres_Epot_self
         !>     Total moment
         procedure, private :: set_totalMoment => DipolarSpheres_set_totalMoment
-        procedure :: reInit_totalMoment => DipolarSpheres_reInit_totalMoment
+        procedure :: reset_totalMoment => DipolarSpheres_reset_totalMoment
         procedure :: update_totalMoment_rotate => DipolarSpheres_update_totalMoment_rotate
         !>     Boundary conditions
         procedure :: deltaEpot_bound_rotate => DipolarSpheres_deltaEpot_bound_rotate
         procedure :: deltaEpot_bound_exchange => DipolarSpheres_deltaEpot_bound_exchange
         procedure, private :: Epot_bound => DipolarSpheres_Epot_bound
         !>     Total
-        procedure :: Epot_set => DipolarSpheres_Epot_set
+        procedure :: set_Epot => DipolarSpheres_set_Epot
         procedure :: Epot_conf => DipolarSpheres_Epot_conf
         
     end type DipolarSpheres
@@ -174,7 +174,7 @@ contains
 
         write(report_unit, *) "    alpha = ", this%alpha
         write(report_unit, *) "    dr = ", this%real_dr
-        write(report_unit, *) "    reInit_iStep = ", this%reInit_iStep
+        write(report_unit, *) "    reset_iStep = ", this%reset_iStep
         write(report_unit, *) "    NwaveVectors = ", this%NwaveVectors
         
     end subroutine DipolarSpheres_print_report
@@ -253,11 +253,11 @@ contains
         get_rotate_delta = this%rotate_delta
     end function DipolarSpheres_get_rotate_delta
     
-    pure function DipolarSpheres_get_reInit_iStep(this) result (get_reInit_iStep)
+    pure function DipolarSpheres_get_reset_iStep(this) result (get_reset_iStep)
         class(DipolarSpheres), intent(in) :: this
-        integer :: get_reInit_iStep
-        get_reInit_iStep = this%reInit_iStep
-    end function DipolarSpheres_get_reInit_iStep
+        integer :: get_reset_iStep
+        get_reset_iStep = this%reset_iStep
+    end function DipolarSpheres_get_reset_iStep
 
     ! Real: short-range interaction ---------------------------------------------------------------
 
@@ -287,7 +287,7 @@ contains
     
     !> Initialisation: look-up (tabulation) table
     
-    pure subroutine DipolarSpheres_Epot_real_set_tab(this)
+    pure subroutine DipolarSpheres_set_Epot_real_tab(this)
     
         class(DipolarSpheres), intent(inout) :: this
 
@@ -307,31 +307,31 @@ contains
         this%Epot_real_tab(:, 1) = this%Epot_real_tab(:, 1) - this%Epot_real_tab(this%real_iCut, 1)
         this%Epot_real_tab(:, 2) = this%Epot_real_tab(:, 2) - this%Epot_real_tab(this%real_iCut, 2)
 
-    end subroutine DipolarSpheres_Epot_real_set_tab
+    end subroutine DipolarSpheres_set_Epot_real_tab
     
     !> Initialisation
     
-    subroutine DipolarSpheres_Epot_real_set_parameters(this)    
+    subroutine DipolarSpheres_set_Epot_real_parameters(this)    
         class(DipolarSpheres), intent(inout) :: this        
         this%real_rCut = dipol_real_rCut_factor * Lsize(1)
         this%real_dr = dipol_real_dr
         call set_discrete_length(this%rMin, this%real_dr)
         this%real_iMin = int(this%rMin/this%real_dr)
         this%real_iCut = int(this%real_rCut/this%real_dr) + 1        
-    end subroutine DipolarSpheres_Epot_real_set_parameters
+    end subroutine DipolarSpheres_set_Epot_real_parameters
     
-    subroutine DipolarSpheres_Epot_real_set(this)
+    subroutine DipolarSpheres_set_Epot_real(this)
     
         class(DipolarSpheres), intent(inout) :: this
         
-        call this%Epot_real_set_parameters()
+        call this%set_Epot_real_parameters()
         
         if (allocated(this%Epot_real_tab)) deallocate(this%Epot_real_tab)
         allocate(this%Epot_real_tab(this%real_iMin:this%real_iCut, 2))
         
-        call this%Epot_real_set_tab()
+        call this%set_Epot_real_tab()
     
-    end subroutine DipolarSpheres_Epot_real_set
+    end subroutine DipolarSpheres_set_Epot_real
 
     !> Print the tabulated values
     
@@ -455,7 +455,7 @@ contains
     !>                                {\sum_{d=1}^3 \frac{k_d^2}{L_d}}
     !> \f]
     
-    pure subroutine DipolarSpheres_Epot_reci_set_weight(this)
+    pure subroutine DipolarSpheres_set_Epot_reci_weight(this)
         
         class(DipolarSpheres), intent(inout) :: this
         
@@ -485,7 +485,7 @@ contains
         
         end do
         
-    end subroutine DipolarSpheres_Epot_reci_set_weight
+    end subroutine DipolarSpheres_set_Epot_reci_weight
     
     !> Structure factor init :
     !> \f[
@@ -496,7 +496,7 @@ contains
     !>      S_\underline{l}(\vec{k}) = \sum_{i \neq l} (\vec{k}\cdot\vec{\mu}_i) e^{+i\vec{k}\cdot\vec{x}_i}
     !> \f].
 
-    pure subroutine DipolarSpheres_Epot_reci_set_structure(this)
+    pure subroutine DipolarSpheres_set_Epot_reci_structure(this)
 
         class(DipolarSpheres), intent(inout) :: this
 
@@ -545,16 +545,16 @@ contains
             
         end do
 
-    end subroutine DipolarSpheres_Epot_reci_set_structure
+    end subroutine DipolarSpheres_set_Epot_reci_structure
     
-    pure subroutine DipolarSpheres_Epot_reci_set(this)
+    pure subroutine DipolarSpheres_set_Epot_reci(this)
     
         class(DipolarSpheres), intent(inout) :: this
         
-        call this%Epot_reci_set_weight()
-        call this%Epot_reci_set_structure()
+        call this%set_Epot_reci_weight()
+        call this%set_Epot_reci_structure()
     
-    end subroutine DipolarSpheres_Epot_reci_set
+    end subroutine DipolarSpheres_set_Epot_reci
     
     !> To calculate the drift of the strucutre factor
 
@@ -581,7 +581,7 @@ contains
     
     !> Reinitialise the structure factor and print the drift
     
-    subroutine DipolarSpheres_Epot_reci_reInit_structure(this, iStep, modulus_unit)
+    subroutine DipolarSpheres_reset_Epot_reci_structure(this, iStep, modulus_unit)
     
         class(DipolarSpheres), intent(inout) :: this
         integer, intent(in) :: iStep
@@ -590,12 +590,12 @@ contains
         real(DP) :: modulus_drifted, modulus_reInit
         
         modulus_drifted = this%Epot_reci_get_structure_modulus()
-        call this%Epot_reci_set_structure()
+        call this%set_Epot_reci_structure()
         modulus_reInit = this%Epot_reci_get_structure_modulus()
         
         write(modulus_unit, *) iStep, abs(modulus_reInit - modulus_drifted)
     
-    end subroutine DipolarSpheres_Epot_reci_reInit_structure
+    end subroutine DipolarSpheres_reset_Epot_reci_structure
 
     ! Count the number of wave vectors
 
@@ -1052,7 +1052,7 @@ contains
 
     !> Reinitialise the total moment factor and print the drift
 
-    subroutine DipolarSpheres_reInit_totalMoment(this, iStep, modulus_unit)
+    subroutine DipolarSpheres_reset_totalMoment(this, iStep, modulus_unit)
 
         class(DipolarSpheres), intent(inout) :: this
         integer, intent(in) :: iStep
@@ -1066,7 +1066,7 @@ contains
 
         write(modulus_unit, *) iStep, abs(modulus_reInit - modulus_drifted)
 
-    end subroutine DipolarSpheres_reInit_totalMoment
+    end subroutine DipolarSpheres_reset_totalMoment
 
     !> Rotation
 
@@ -1161,7 +1161,7 @@ contains
     
     !> Potential energy initialisation
     
-    subroutine DipolarSpheres_Epot_set(this)
+    subroutine DipolarSpheres_set_Epot(this)
     
         class(DipolarSpheres), intent(inout) :: this
 
@@ -1170,14 +1170,14 @@ contains
         
         this%alpha = dipol_alpha_factor / Lsize(1)
         
-        call this%Epot_real_set()
+        call this%set_Epot_real()
         
-        call this%Epot_reci_set()
-        this%reInit_iStep = dipol_reInit_iStep
+        call this%set_Epot_reci()
+        this%reset_iStep = dipol_reInit_iStep
         
         call this%set_totalMoment()
         
-    end subroutine DipolarSpheres_Epot_set
+    end subroutine DipolarSpheres_set_Epot
 
     !> Total potential energy of a configuration
     

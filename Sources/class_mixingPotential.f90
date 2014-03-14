@@ -48,8 +48,8 @@ private
         procedure :: get_cell_size => MixingPotential_get_cell_size
         
         procedure :: test_overlap => MixingPotential_test_overlap
-        procedure, private :: Epot_set_tab => MixingPotential_Epot_set_tab
-        procedure :: Epot_set => MixingPotential_Epot_set
+        procedure, private :: set_Epot_tab => MixingPotential_set_Epot_tab
+        procedure :: set_Epot => MixingPotential_set_Epot
         procedure :: Epot_print => MixingPotential_Epot_print
         procedure, private :: Epot_pair => MixingPotential_Epot_pair
         procedure :: Epot_neighCells => MixingPotential_Epot_neighCells
@@ -157,7 +157,7 @@ contains
     !> Tabulation of Yukawa potential
     !> \f[ \epsilon \frac{e^{-\alpha (r-r_{min})}}{r} \f]
     
-    pure subroutine MixingPotential_Epot_set_tab(this)
+    pure subroutine MixingPotential_set_Epot_tab(this)
     
         class(MixingPotential), intent(inout) :: this
 
@@ -173,9 +173,9 @@ contains
         ! shift
         this%Epot_tab(:) = this%Epot_tab(:) - this%Epot_tab(this%iCut)
 
-    end subroutine MixingPotential_Epot_set_tab
+    end subroutine MixingPotential_set_Epot_tab
     
-    subroutine MixingPotential_Epot_set(this)
+    subroutine MixingPotential_set_Epot(this)
     
         class(MixingPotential), intent(inout) :: this
 
@@ -195,9 +195,9 @@ contains
         
         if (allocated(this%Epot_tab)) deallocate(this%Epot_tab)
         allocate(this%Epot_tab(this%iMin:this%iCut))
-        call this%Epot_set_tab()
+        call this%set_Epot_tab()
         
-    end subroutine MixingPotential_Epot_set
+    end subroutine MixingPotential_set_Epot
     
     !> Print the tabulated potential
     

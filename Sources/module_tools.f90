@@ -99,7 +99,7 @@ contains
         real(DP), intent(out) :: mix_Epot
     
         call mix%test_overlap(type1, type2)
-        call mix%Epot_init()
+        call mix%set_Epot()
         if (print_potential) then
             call mix%Epot_print(mix_Epot_unit)
         end if
@@ -119,7 +119,7 @@ contains
         real(DP), intent(out) :: mix_Epot_conf
         
         call mix%test_overlap(type1, type2)
-        call mix%Epot_init()
+        call mix%set_Epot()
         mix_Epot_conf = mix%Epot_conf(type1, type2)
         call test_consist(mix_Epot, mix_Epot_conf, mix_report_unit)
         call mix_print_results(mix_EpotSum, mix_report_unit)
@@ -139,7 +139,7 @@ contains
         call this%test_overlap()
         call this%snap_data(this_units%snap_positions)
         call this%snap_positions(0, this_units%snapIni_positions)
-        call this%Epot_init()
+        call this%set_Epot()
         
         if (print_potential) then
             call this%Epot_print(this_units%Epot)
@@ -172,7 +172,7 @@ contains
         class(Observables), intent(in) :: this_obs
         
         call this%test_overlap()
-        call this%Epot_init()
+        call this%set_Epot()
         call test_consist(this_obs%Epot, this%Epot_conf(), this_units%report)
         call this%snap_positions(0, this_units%snapFin_positions)
         call this_obs%print_results(this_units%report)
