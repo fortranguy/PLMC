@@ -154,7 +154,7 @@ contains
     
     subroutine PhysicalSystem_construct_spheres(this)
     
-        class(PhysicalSystem), intent(out) :: this
+        class(PhysicalSystem), intent(inout) :: this
     
         call this%type1_spheres%construct()
         call this%type2_spheres%construct()
@@ -192,7 +192,7 @@ contains
     
     subroutine PhysicalSystem_init_spheres(this)
     
-        class(PhysicalSystem), intent(out) :: this
+        class(PhysicalSystem), intent(inout) :: this
     
         call mix_init(this%mix, this%type1_spheres, this%type2_spheres, this%mix_Epot_tab_unit, &
                       this%mix_Epot)
@@ -223,12 +223,14 @@ contains
 
     subroutine PhysicalSystem_init(this, arg_seed, arg_init)
     
-        class(PhysicalSystem), intent(out) :: this
+        class(PhysicalSystem), intent(inout) :: this
         type(argument_seed), intent(in) :: arg_seed
         type(argument_initial), intent(in) :: arg_init
         
         call this%construct_spheres()
         call this%set_changes()
+        this%snap = snap
+        this%reset_iStep = reset_iStep
         
         write(output_unit, *) "Monte-Carlo Simulation: Canonical ensemble"        
         
@@ -240,9 +242,6 @@ contains
                                   this%mix%get_sigma(), this%report_unit)
         call this%init_spheres()
         call this%init_observables()
-        
-        this%snap = snap
-        this%reset_iStep = reset_iStep
     
     end subroutine PhysicalSystem_init
     
