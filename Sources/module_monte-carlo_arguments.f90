@@ -22,10 +22,10 @@ contains
         write(output_unit, *) "    -i, --intial CONDITION   CONDITION='r', 'random' (default)"
         write(output_unit, *) "                             CONDITION='f', 'files' [dipol_positions] "
         write(output_unit, *) "                             [dipol_orientations] [hardS_positions]"
-        write(output_unit, *) "    -s, --seed STATE         STATE='v', 'variable' (default)"
-        write(output_unit, *) "                             STATE='f', 'fix'"
-        write(output_unit, *) "                             STATE='p', 'put' [size] [seed_1]...[seed_n]"
-        write(output_unit, *) "                                              Warning: compiler-dependent"
+        write(output_unit, *) "    -r, --random SEED        SEED='v', 'variable' (default)"
+        write(output_unit, *) "                             SEED='f', 'fix'"
+        write(output_unit, *) "                             SEED='p', 'put' [size] [seed_1]...[seed_n]"
+        write(output_unit, *) "                                             Warning: compiler-dependent"
         write(output_unit, *)
         write(output_unit, *) "Report bugs to <salomon.chung@u-pe.fr>."
     
@@ -93,12 +93,12 @@ contains
 
         character(len=4096) :: argument, sub_argument
         integer :: iArg, length, status
-        logical :: seed_redefined, init_redefined
+        logical :: rand_redefined, init_redefined
 
         args%random%choice = 'v'
         args%initial%choice = 'r'
 
-        seed_redefined = .false.
+        rand_redefined = .false.
         init_redefined = .false.
 
         iArg = 1
@@ -129,11 +129,11 @@ contains
                     end select
                     init_redefined = .true.
 
-                case ("-s", "--seed")
-                    if (seed_redefined) error stop "Error: seed already defined."
+                case ("-r", "--random")
+                    if (rand_redefined) error stop "Error: random seed already defined."
                     iArg = iArg + 1
                     call get_command_argument(iArg, sub_argument, length, status)
-                    if (status /= 0) error stop "Enter seed choice, cf. help."
+                    if (status /= 0) error stop "Enter random seed choice, cf. help."
                     select case (sub_argument)
                         case ("v", "variable")
                         case ("f", "fix")
@@ -145,7 +145,7 @@ contains
                             call write_help()
                             error stop
                     end select
-                    seed_redefined = .true.
+                    rand_redefined = .true.
 
                 case default
                     write(error_unit, *) "Unknown option: '", trim(argument), "'"
