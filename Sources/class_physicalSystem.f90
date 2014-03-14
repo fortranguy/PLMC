@@ -14,7 +14,7 @@ use class_observables
 use class_units
 use module_monteCarlo_arguments, only: read_arguments
 use module_physics_macro, only: init_randomSeed, set_initialCondition
-use module_algorithms, only: move, switch, rotate
+use module_algorithms, only: move, widom, switch, rotate
 use module_tools, only: open_units, mix_open_units, print_report, init, final, mix_init, mix_final, &
                         test_consist, print_results, adapt_move, adapt_rotate
 
@@ -91,6 +91,7 @@ private
         procedure :: adapt_changes => PhysicalSystem_adapt_changes
         procedure :: write_observables => PhysicalSystem_write_observables
         procedure :: fix_changes => PhysicalSystem_fix_changes
+        procedure :: measure_chemical_potentials => PhysicalSystem_measure_chemical_potentials
     
     end type PhysicalSystem
     
@@ -383,5 +384,14 @@ contains
         call this%type2_spheres%set_move_delta(this%type2_obs%move_rejectAvg, this%type2_units%report)
     
     end subroutine PhysicalSystem_fix_changes
+    
+    subroutine PhysicalSystem_measure_chemical_potentials(this)
+    
+        class(PhysicalSystem), intent(inout) :: this
+    
+        call widom(this%type1_spheres, this%type1_obs, this%type2_spheres, this%mix)
+        call widom(this%type2_spheres, this%type2_obs, this%type1_spheres, this%mix)
+    
+    end subroutine PhysicalSystem_measure_chemical_potentials
 
 end module class_physicalSystem
