@@ -78,7 +78,7 @@ private
         procedure :: construct_cells => HardSpheres_construct_cells
         
         !> Potential energy
-        procedure :: Epot_init => HardSpheres_Epot_init
+        procedure :: Epot_set => HardSpheres_Epot_set
         procedure :: Epot_print => HardSpheres_Epot_print
         procedure :: Epot_neighCells => HardSpheres_Epot_neighCells
         procedure :: Epot_conf => HardSpheres_Epot_conf
@@ -333,14 +333,14 @@ contains
     
     ! Potential
     
-    subroutine HardSpheres_Epot_init(this)
+    subroutine HardSpheres_Epot_set(this)
     
         class(HardSpheres), intent(inout) :: this
 
         this%rMin = hard_rMin_factor * this%sigma
         this%rCut = this%rMin
         
-    end subroutine HardSpheres_Epot_init
+    end subroutine HardSpheres_Epot_set
     
     !> Print the potential: dummy
     

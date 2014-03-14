@@ -49,7 +49,7 @@ private
         
         procedure :: test_overlap => MixingPotential_test_overlap
         procedure, private :: Epot_set_tab => MixingPotential_Epot_set_tab
-        procedure :: Epot_init => MixingPotential_Epot_init
+        procedure :: Epot_set => MixingPotential_Epot_set
         procedure :: Epot_print => MixingPotential_Epot_print
         procedure, private :: Epot_pair => MixingPotential_Epot_pair
         procedure :: Epot_neighCells => MixingPotential_Epot_neighCells
@@ -175,7 +175,7 @@ contains
 
     end subroutine MixingPotential_Epot_set_tab
     
-    subroutine MixingPotential_Epot_init(this)
+    subroutine MixingPotential_Epot_set(this)
     
         class(MixingPotential), intent(inout) :: this
 
@@ -197,7 +197,7 @@ contains
         allocate(this%Epot_tab(this%iMin:this%iCut))
         call this%Epot_set_tab()
         
-    end subroutine MixingPotential_Epot_init
+    end subroutine MixingPotential_Epot_set
     
     !> Print the tabulated potential
     
