@@ -162,7 +162,8 @@ contains
         class(PhysicalSystem), intent(inout) :: this
         
         call open_units(this%report_unit, this%obsThermal_unit, this%obsEquilib_unit)        
-        call print_report(this%Ncol, this%Nmove, this%Nswitch, this%Nrotate, this%report_unit)        
+        call print_report(this%Ncol, this%Nmove, this%Nswitch, this%Nrotate, this%reset_iStep, &
+                          this%report_unit)        
         
         call this%type1_units%open(this%type1_spheres%get_name())
         call this%type1_spheres%print_density(this%Ncol, this%type1_units%report)        

@@ -58,9 +58,9 @@ contains
     
     !> Total: print_report
     
-    subroutine print_report(Ncol, Nmove, Nswitch, Nrotate, report_unit)
+    subroutine print_report(Ncol, Nmove, Nswitch, Nrotate, reset_iStep, report_unit)
     
-        integer, intent(in) :: Ncol, Nmove, Nswitch, Nrotate
+        integer, intent(in) :: Ncol, Nmove, Nswitch, Nrotate, reset_iStep
         integer, intent(in) :: report_unit
 
         write(report_unit, *) "Data: "
@@ -86,6 +86,8 @@ contains
         write(report_unit, *) "    Nmove = ", Nmove
         write(report_unit, *) "    Nswitch = ", Nswitch
         write(report_unit, *) "    Nrotate = ", Nrotate
+        
+        write(report_unit, *) "    reset_iStep = ", reset_iStep
     
     end subroutine print_report
     

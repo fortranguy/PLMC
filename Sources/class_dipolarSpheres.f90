@@ -8,8 +8,7 @@ use data_constants, only: PI
 use data_box, only: Ndim, Lsize, Kmax
 use data_particles, only: dipol_Ncol
 use data_monteCarlo, only: dipol_move_delta, dipol_move_rejectFix, dipol_rotate_delta, &
-                           dipol_rotate_deltaMax, dipol_rotate_rejectFix, dipol_Nwidom, &
-                           reset_iStep
+                           dipol_rotate_deltaMax, dipol_rotate_rejectFix, dipol_Nwidom
 use data_potential, only: dipol_rMin_factor, dipol_real_rCut_factor, dipol_real_dr, dipol_alpha_factor
 use data_neighbourCells, only: NnearCell
 use data_distribution, only: snap_ratio
@@ -34,7 +33,6 @@ private
         real(DP) :: rotate_deltaSave
         real(DP) :: rotate_deltaMax
         real(DP) :: rotate_rejectFix
-        integer :: reset_iStep
 
         ! Potential
         real(DP) :: real_rCut !< real space potential cut
@@ -66,8 +64,6 @@ private
         procedure :: adapt_rotate_delta => DipolarSpheres_adapt_rotate_delta
         procedure :: set_rotate_delta => DipolarSpheres_set_rotate_delta
         procedure :: get_rotate_delta => DipolarSpheres_get_rotate_delta
-        
-        procedure :: get_reset_iStep => DipolarSpheres_get_reset_iStep
         
         !> Potential energy
         !>     Real
@@ -174,7 +170,6 @@ contains
 
         write(report_unit, *) "    alpha = ", this%alpha
         write(report_unit, *) "    dr = ", this%real_dr
-        write(report_unit, *) "    reset_iStep = ", this%reset_iStep
         write(report_unit, *) "    NwaveVectors = ", this%NwaveVectors
         
     end subroutine DipolarSpheres_print_report
@@ -252,12 +247,6 @@ contains
         real(DP) :: get_rotate_delta
         get_rotate_delta = this%rotate_delta
     end function DipolarSpheres_get_rotate_delta
-    
-    pure function DipolarSpheres_get_reset_iStep(this) result (get_reset_iStep)
-        class(DipolarSpheres), intent(in) :: this
-        integer :: get_reset_iStep
-        get_reset_iStep = this%reset_iStep
-    end function DipolarSpheres_get_reset_iStep
 
     ! Real: short-range interaction ---------------------------------------------------------------
 
@@ -1170,11 +1159,8 @@ contains
         
         this%alpha = dipol_alpha_factor / Lsize(1)
         
-        call this%set_Epot_real()
-        
-        call this%set_Epot_reci()
-        this%reset_iStep = reset_iStep
-        
+        call this%set_Epot_real()        
+        call this%set_Epot_reci()        
         call this%set_totalMoment()
         
     end subroutine DipolarSpheres_set_Epot
