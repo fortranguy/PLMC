@@ -236,7 +236,7 @@ contains
         call this%set_Epot()
         
         if (write_potential) then
-            call this%Epot_print(this_units%Epot)
+            call this%write_Epot(this_units%Epot)
         end if
         select type (this)
             type is (DipolarSpheres)
@@ -245,7 +245,7 @@ contains
                         call this%snap_data(this_units%snap_orientations)
                         call this%snap_orientations(0, this_units%snapIni_orientations)
                         if (write_potential) then
-                            call this%Epot_real_print(this_units%Epot_real)
+                            call this%write_Epot_real(this_units%Epot_real)
                         end if
                         call this%Epot_reci_count_waveVectors(this_units%waveVectors)
                 end select
@@ -293,7 +293,7 @@ contains
         call mix%test_overlap(type1, type2)
         call mix%set_Epot()
         if (write_potential) then
-            call mix%Epot_print(mix_Epot_unit)
+            call mix%write_Epot(mix_Epot_unit)
         end if
         call mix%set_cell_size()
         mix_Epot = mix%Epot_conf(type1, type2)

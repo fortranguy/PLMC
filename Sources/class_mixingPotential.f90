@@ -50,7 +50,7 @@ private
         procedure :: test_overlap => MixingPotential_test_overlap
         procedure, private :: set_Epot_tab => MixingPotential_set_Epot_tab
         procedure :: set_Epot => MixingPotential_set_Epot
-        procedure :: Epot_print => MixingPotential_Epot_print
+        procedure :: write_Epot => MixingPotential_write_Epot
         procedure, private :: Epot_pair => MixingPotential_Epot_pair
         procedure :: Epot_neighCells => MixingPotential_Epot_neighCells
         procedure :: Epot_conf => MixingPotential_Epot_conf
@@ -199,9 +199,9 @@ contains
         
     end subroutine MixingPotential_set_Epot
     
-    !> Print the tabulated potential
+    !> Write the tabulated potential
     
-    subroutine MixingPotential_Epot_print(this, Epot_unit)
+    subroutine MixingPotential_write_Epot(this, Epot_unit)
 
         class(MixingPotential), intent(in) :: this
         integer, intent(in) :: Epot_unit
@@ -214,7 +214,7 @@ contains
             write(Epot_unit, *) r_i, this%Epot_tab(i)
         end do
 
-    end subroutine MixingPotential_Epot_print
+    end subroutine MixingPotential_write_Epot
 
     pure function MixingPotential_Epot_pair(this, r) result(Epot_pair)
         

@@ -54,7 +54,7 @@ private
         procedure :: construct => DipolarSpheres_construct
         procedure :: destroy => DipolarSpheres_destroy
         
-        !> Print a report of the component in a file
+        !> Write a report of the component in a file
         procedure :: write_report => DipolarSpheres_write_report
         
         !> Take a snap shot of the configuration: orientations
@@ -71,7 +71,7 @@ private
         procedure, private :: set_Epot_real_parameters => DipolarSpheres_set_Epot_real_parameters
         procedure, private :: set_Epot_real_tab => DipolarSpheres_set_Epot_real_tab
         procedure, private :: set_Epot_real => DipolarSpheres_set_Epot_real
-        procedure :: Epot_real_print => DipolarSpheres_Epot_real_print
+        procedure :: write_Epot_real => DipolarSpheres_write_Epot_real
         procedure, private :: Epot_real_interpol => DipolarSpheres_Epot_real_interpol
         procedure, private :: Epot_real_pair => DipolarSpheres_Epot_real_pair
         procedure :: Epot_real_solo => DipolarSpheres_Epot_real_solo
@@ -322,9 +322,9 @@ contains
     
     end subroutine DipolarSpheres_set_Epot_real
 
-    !> Print the tabulated values
+    !> Write the tabulated values
     
-    subroutine DipolarSpheres_Epot_real_print(this, Epot_unit)
+    subroutine DipolarSpheres_write_Epot_real(this, Epot_unit)
 
         class(DipolarSpheres), intent(in) :: this
         integer, intent(in) :: Epot_unit
@@ -337,7 +337,7 @@ contains
             write(Epot_unit, *) r_i, this%Epot_real_tab(i, :)
         end do
 
-    end subroutine DipolarSpheres_Epot_real_print
+    end subroutine DipolarSpheres_write_Epot_real
     
     !> Linear interpolation
 
@@ -568,7 +568,7 @@ contains
 
     end function DipolarSpheres_Epot_reci_get_structure_modulus
     
-    !> Reinitialise the structure factor and print the drift
+    !> Reinitialise the structure factor and write the drift
     
     subroutine DipolarSpheres_reset_Epot_reci_structure(this, iStep, modulus_unit)
     
@@ -1039,7 +1039,7 @@ contains
         end do    
     end subroutine DipolarSpheres_set_totalMoment
 
-    !> Reinitialise the total moment factor and print the drift
+    !> Reinitialise the total moment factor and write the drift
 
     subroutine DipolarSpheres_reset_totalMoment(this, iStep, modulus_unit)
 

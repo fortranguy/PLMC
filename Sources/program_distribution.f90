@@ -1,4 +1,4 @@
-!> \brief Calculate and print the distribution function
+!> \brief Calculate and write the distribution function
 
 program distribution
 

@@ -79,7 +79,7 @@ private
         
         !> Potential energy
         procedure :: set_Epot => HardSpheres_set_Epot
-        procedure :: Epot_print => HardSpheres_Epot_print
+        procedure :: write_Epot => HardSpheres_write_Epot
         procedure :: Epot_neighCells => HardSpheres_Epot_neighCells
         procedure :: Epot_conf => HardSpheres_Epot_conf
         
@@ -209,7 +209,7 @@ contains
     
     end subroutine HardSpheres_set_move_delta
     
-    !> Print density and compacity
+    !> Write density and compacity
     
     subroutine HardSpheres_write_density(this, total_Ncol, report_unit)
     
@@ -229,7 +229,7 @@ contains
     
     end subroutine HardSpheres_write_density
     
-    !> Print a report of the component in a file
+    !> Write a report of the component in a file
     
     subroutine HardSpheres_write_report(this, report_unit)
     
@@ -337,16 +337,16 @@ contains
         
     end subroutine HardSpheres_set_Epot
     
-    !> Print the potential: dummy
+    !> Write the potential: dummy
     
-    subroutine HardSpheres_Epot_print(this, Epot_unit)
+    subroutine HardSpheres_write_Epot(this, Epot_unit)
     
         class(HardSpheres), intent(in) :: this
         integer, intent(in) :: Epot_unit
 
         write(Epot_unit, *) this%rCut, 0._DP
     
-    end subroutine HardSpheres_Epot_print
+    end subroutine HardSpheres_write_Epot
     
     subroutine HardSpheres_Epot_neighCells(this, iCol, xCol, iTotalCell, overlap, energ)
         
