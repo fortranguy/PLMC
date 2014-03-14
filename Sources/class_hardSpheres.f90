@@ -87,18 +87,18 @@ private
     
 contains
 
-    pure subroutine HardSpheres_set_particles(this)    
+    pure subroutine HardSpheres_set_particles(this)
         class(HardSpheres), intent(inout) :: this
         this%sigma = hard_sigma
         this%Ncol = hard_Ncol
-        allocate(this%positions(Ndim, this%Ncol))    
+        allocate(this%positions(Ndim, this%Ncol))
     end subroutine HardSpheres_set_particles
     
-    pure subroutine HardSpheres_set_changes(this)    
-        class(HardSpheres), intent(inout) :: this        
+    pure subroutine HardSpheres_set_changes(this)
+        class(HardSpheres), intent(inout) :: this
         this%move_delta = hard_move_delta
         this%move_deltaSave = this%move_delta
-        this%move_rejectFix = hard_move_rejectFix        
+        this%move_rejectFix = hard_move_rejectFix
     end subroutine HardSpheres_set_changes
 
     subroutine HardSpheres_construct(this)

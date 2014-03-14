@@ -113,23 +113,23 @@ private
     
 contains
 
-    pure subroutine DipolarSpheres_set_particles(this)    
-        class(DipolarSpheres), intent(inout) :: this        
+    pure subroutine DipolarSpheres_set_particles(this)
+        class(DipolarSpheres), intent(inout) :: this
         this%sigma = 1._DP ! = u_length
         this%Ncol = dipol_Ncol
         allocate(this%positions(Ndim, this%Ncol))
-        allocate(this%orientations(Ndim, this%Ncol))    
+        allocate(this%orientations(Ndim, this%Ncol))
     end subroutine DipolarSpheres_set_particles
     
-    pure subroutine DipolarSpheres_set_changes(this)    
-        class(DipolarSpheres), intent(inout) :: this        
+    pure subroutine DipolarSpheres_set_changes(this)
+        class(DipolarSpheres), intent(inout) :: this
         this%move_delta = dipol_move_delta
         this%move_deltaSave = this%move_delta
-        this%move_rejectFix = dipol_move_rejectFix        
+        this%move_rejectFix = dipol_move_rejectFix
         this%rotate_delta = dipol_rotate_delta
         this%rotate_deltaSave = this%rotate_delta
         this%rotate_deltaMax = dipol_rotate_deltaMax
-        this%rotate_rejectFix = dipol_rotate_rejectFix        
+        this%rotate_rejectFix = dipol_rotate_rejectFix
     end subroutine DipolarSpheres_set_changes
 
     subroutine DipolarSpheres_construct(this)
@@ -300,13 +300,13 @@ contains
     
     !> Initialisation
     
-    subroutine DipolarSpheres_set_Epot_real_parameters(this)    
-        class(DipolarSpheres), intent(inout) :: this        
+    subroutine DipolarSpheres_set_Epot_real_parameters(this)
+        class(DipolarSpheres), intent(inout) :: this
         this%real_rCut = dipol_real_rCut_factor * Lsize(1)
         this%real_dr = dipol_real_dr
         call set_discrete_length(this%rMin, this%real_dr)
         this%real_iMin = int(this%rMin/this%real_dr)
-        this%real_iCut = int(this%real_rCut/this%real_dr) + 1        
+        this%real_iCut = int(this%real_rCut/this%real_dr) + 1
     end subroutine DipolarSpheres_set_Epot_real_parameters
     
     subroutine DipolarSpheres_set_Epot_real(this)
@@ -1030,13 +1030,13 @@ contains
     !> \f[ \vec{M} = \sum_j \vec{\mu}_j \f]
     !> \f[ \vec{M}_\underline{l} = \sum_{j \neq l} \vec{\mu}_j \f]
     
-    pure subroutine DipolarSpheres_set_totalMoment(this)    
-        class(DipolarSpheres), intent(inout) :: this        
-        integer :: iCol        
-        this%totalMoment(:) = 0._DP        
+    pure subroutine DipolarSpheres_set_totalMoment(this)
+        class(DipolarSpheres), intent(inout) :: this
+        integer :: iCol
+        this%totalMoment(:) = 0._DP
         do iCol = 1, this%Ncol
             this%totalMoment(:) = this%totalMoment(:) + this%orientations(:, iCol)
-        end do    
+        end do
     end subroutine DipolarSpheres_set_totalMoment
 
     !> Reinitialise the total moment factor and write the drift
@@ -1159,8 +1159,8 @@ contains
         
         this%alpha = dipol_alpha_factor / Lsize(1)
         
-        call this%set_Epot_real()        
-        call this%set_Epot_reci()        
+        call this%set_Epot_real()
+        call this%set_Epot_reci()
         call this%set_totalMoment()
         
     end subroutine DipolarSpheres_set_Epot

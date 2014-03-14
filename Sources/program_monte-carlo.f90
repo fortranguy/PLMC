@@ -23,12 +23,12 @@ implicit none
     call sys%set_time_start()
     MC_Cycle: do iStep = 1, sys%get_Nthermal() + sys%get_Nstep()
     
-        call sys%random_changes() 
+        call sys%random_changes()
         call sys%update_rejections()
         
         MC_Regime: if (iStep <= sys%get_Nthermal()) then
             
-            call sys%adapt_changes(iStep)            
+            call sys%adapt_changes(iStep)
             call sys%write_observables_thermalisation(iStep)
             
             if (iStep == sys%get_Nthermal()) then
@@ -38,8 +38,8 @@ implicit none
         
         else MC_Regime
         
-            call sys%measure_chemical_potentials()        
-            call sys%accumulate_observables()            
+            call sys%measure_chemical_potentials()
+            call sys%accumulate_observables()
             call sys%write_observables_equilibrium(iStep)
             call sys%take_snapshots(iStep)
             
@@ -52,7 +52,7 @@ implicit none
 
     write(output_unit, *) "End of cycles"
     
-    call sys%final()    
+    call sys%final()
     call sys%destroy()
     
 end program monteCarlo_canonical_bulk

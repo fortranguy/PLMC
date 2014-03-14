@@ -79,7 +79,7 @@ private
         procedure :: construct => PhysicalSystem_construct
         procedure :: destroy => PhysicalSystem_destroy
         
-        !> Initialization & Finalisation         
+        !> Initialization & Finalisation
         procedure, private :: open_units => PhysicalSystem_open_units
         procedure, private :: init_switch => PhysicalSystem_init_switch
         procedure, private :: init_spheres => PhysicalSystem_init_spheres
@@ -114,26 +114,26 @@ contains
 
     ! Construction
     
-    pure subroutine PhysicalSystem_set_box(this)    
-        class(PhysicalSystem), intent(inout) :: this        
+    pure subroutine PhysicalSystem_set_box(this)
+        class(PhysicalSystem), intent(inout) :: this
         this%Lsize(:) = Lsize(:)
-        this%Kmax(:) = Kmax(:)        
+        this%Kmax(:) = Kmax(:)
     end subroutine PhysicalSystem_set_box
     
-    pure subroutine PhysicalSystem_set_monteCarlo(this)    
-        class(PhysicalSystem), intent(inout) :: this        
+    pure subroutine PhysicalSystem_set_monteCarlo(this)
+        class(PhysicalSystem), intent(inout) :: this
         this%Temperature = Temperature
         this%Nthermal = Nthermal
         this%Nadapt = Nadapt
-        this%Nstep = Nstep    
+        this%Nstep = Nstep
     end subroutine PhysicalSystem_set_monteCarlo
     
-    pure subroutine PhysicalSystem_set_changes(this)    
-        class(PhysicalSystem), intent(inout) :: this    
+    pure subroutine PhysicalSystem_set_changes(this)
+        class(PhysicalSystem), intent(inout) :: this
         this%Ncol = this%type1_spheres%get_Ncol() + this%type2_spheres%get_Ncol()
         this%Nmove = decorrelFactor * this%Ncol
         this%Nswitch = switch_factor * decorrelFactor * this%type1_spheres%get_Ncol()
-        this%Nrotate = decorrelFactor * this%type1_spheres%get_Ncol()    
+        this%Nrotate = decorrelFactor * this%type1_spheres%get_Ncol()
         this%Nchange = this%Nmove + this%Nswitch + this%Nrotate
     end subroutine PhysicalSystem_set_changes
 
@@ -161,15 +161,15 @@ contains
     
         class(PhysicalSystem), intent(inout) :: this
         
-        call open_units(this%report_unit, this%obsThermal_unit, this%obsEquilib_unit)        
+        call open_units(this%report_unit, this%obsThermal_unit, this%obsEquilib_unit)
         call write_report(this%Ncol, this%Nmove, this%Nswitch, this%Nrotate, this%reset_iStep, &
-                          this%report_unit)        
+                          this%report_unit)
         
         call this%type1_units%open(this%type1_spheres%get_name())
-        call this%type1_spheres%write_density(this%Ncol, this%type1_units%report)        
+        call this%type1_spheres%write_density(this%Ncol, this%type1_units%report)
         
         call this%type2_units%open(this%type2_spheres%get_name())
-        call this%type2_spheres%write_density(this%Ncol, this%type2_units%report)    
+        call this%type2_spheres%write_density(this%Ncol, this%type2_units%report)
         
         call mix_open_units(this%mix_report_unit, this%mix_Epot_tab_unit, this%mix_obsThermal_unit, &
                             this%mix_obsEquilib_unit)
@@ -177,12 +177,12 @@ contains
     
     end subroutine PhysicalSystem_open_units
     
-    pure subroutine PhysicalSystem_init_switch(this)    
-        class(PhysicalSystem), intent(inout) :: this    
+    pure subroutine PhysicalSystem_init_switch(this)
+        class(PhysicalSystem), intent(inout) :: this
         this%switch_Nhit = 0
         this%switch_Nreject = 0
         this%switch_reject = 0._DP
-        this%switch_rejectSum = 0._DP        
+        this%switch_rejectSum = 0._DP
     end subroutine PhysicalSystem_init_switch
     
     subroutine PhysicalSystem_init_spheres(this)
@@ -214,7 +214,7 @@ contains
         write(output_unit, *) "Initial potential energy =", Epot_conf
         write(this%obsThermal_unit, *) 0, Epot_conf
         
-    end subroutine PhysicalSystem_init_observables    
+    end subroutine PhysicalSystem_init_observables
 
     subroutine PhysicalSystem_init(this, args)
     
@@ -224,10 +224,10 @@ contains
         this%snap = snap
         this%reset_iStep = reset_iStep
         
-        write(output_unit, *) "Monte-Carlo Simulation: Canonical ensemble"        
+        write(output_unit, *) "Monte-Carlo Simulation: Canonical ensemble"
         
-        call this%open_units()        
-        call this%init_switch()        
+        call this%open_units()
+        call this%init_switch()
         
         call init_randomSeed(args%random, this%report_unit)
         call set_initialConfiguration(args%initial, this%type1_spheres, this%type2_spheres, &
@@ -334,7 +334,7 @@ contains
     subroutine PhysicalSystem_set_time_end(this)
         class(PhysicalSystem), intent(inout) :: this
         call cpu_time(this%time_end)
-    end subroutine PhysicalSystem_set_time_end        
+    end subroutine PhysicalSystem_set_time_end
     
     ! Random changes
     
@@ -351,23 +351,23 @@ contains
             call random_number(rand)
             iChangeRand = int(rand*real(this%Nchange, DP)) + 1
             
-            if (iChangeRand <= this%Nmove) then            
+            if (iChangeRand <= this%Nmove) then
                 ! Randomly choosing the type
                 call random_number(rand)
-                iColRand = int(rand*real(this%Ncol, DP)) + 1                
+                iColRand = int(rand*real(this%Ncol, DP)) + 1
                 if (iColRand <= this%type1_spheres%get_Ncol()) then
                     call move(this%type1_spheres, this%type1_obs, this%type2_spheres, this%mix, &
                               this%mix_Epot)
                 else
                     call move(this%type2_spheres, this%type2_obs, this%type1_spheres, this%mix, &
                               this%mix_Epot)
-                end if                
-            else if (iChangeRand <= this%Nmove + this%Nswitch) then            
+                end if
+            else if (iChangeRand <= this%Nmove + this%Nswitch) then
                 call switch(this%type1_spheres, this%type1_obs, this%type2_spheres, this%type2_obs, &
                             this%mix, this%mix_Epot, this%switch_Nreject)
-                this%switch_Nhit = this%switch_Nhit + 1                
-            else     
-                call rotate(this%type1_spheres, this%type1_obs)                
+                this%switch_Nhit = this%switch_Nhit + 1
+            else
+                call rotate(this%type1_spheres, this%type1_obs)
             end if
             
         end do MC_Change
@@ -383,7 +383,7 @@ contains
         
         this%switch_reject = real(this%switch_Nreject, DP)/real(this%switch_Nhit, DP)
         this%switch_Nreject = 0
-        this%switch_Nhit = 0 
+        this%switch_Nhit = 0
         
     end subroutine PhysicalSystem_update_rejections
     
