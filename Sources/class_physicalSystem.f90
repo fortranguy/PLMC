@@ -5,7 +5,8 @@ module class_physicalSystem
 use, intrinsic :: iso_fortran_env, only: output_unit
 use data_precisions, only: DP
 use data_box, only: Ndim, Lsize, Kmax
-use data_monteCarlo, only: Temperature, decorrelFactor, switch_factor, Nthermal, Nadapt, Nstep
+use data_monteCarlo, only: Temperature, decorrelFactor, switch_factor, Nthermal, Nadapt, Nstep, &
+                           dipol_reInit_iStep
 use data_distribution, only: snap
 use module_types, only: argument_seed, argument_initial
 use class_hardSpheres
@@ -66,6 +67,7 @@ private
         real(DP) :: switch_reject, switch_rejectSum
         
         logical :: snap
+        integer :: reInit_iStep
         real(DP) :: time_start, time_end
     
     contains
@@ -97,6 +99,7 @@ private
         procedure :: accumulate_observables => PhysicalSystem_accumulate_observables
         procedure :: write_observables_equilibrium => PhysicalSystem_write_observables_equilibrium
         procedure :: take_snapshots => PhysicalSystem_take_snapshots
+        procedure :: reinitialize_quantites => PhysicalSystem_reinitialize_quantites
     
     end type PhysicalSystem
     
@@ -223,6 +226,7 @@ contains
         call this%init_observables()
         
         this%snap = snap
+        this%reInit_iStep = dipol_reInit_iStep
     
     end subroutine PhysicalSystem_init
     
@@ -439,5 +443,19 @@ contains
         end if
         
     end subroutine PhysicalSystem_take_snapshots
+    
+    !> Reinitialize summed quantities to prevent them from drifting.
+    subroutine PhysicalSystem_reinitialize_quantites(this, iStep)
+    
+        class(PhysicalSystem), intent(inout) :: this
+        integer, intent(in) :: iStep
+    
+        if (modulo(iStep, this%reInit_iStep) == 0) then
+            call this%type1_spheres%Epot_reci_reInit_structure(iStep, &
+                                                               this%type1_units%structure_modulus)
+            call this%type1_spheres%reInit_totalMoment(iStep, this%type1_units%totalMoment_modulus)
+        end if
+        
+    end subroutine PhysicalSystem_reinitialize_quantites
 
 end module class_physicalSystem
