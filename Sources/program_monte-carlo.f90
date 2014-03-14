@@ -3,7 +3,7 @@
 program monteCarlo_canonical_bulk
 
 use, intrinsic :: iso_fortran_env, only: output_unit
-use module_types, only: argument_seed, argument_initial
+use module_types, only: monteCarlo_arguments
 use module_monteCarlo_arguments, only: read_arguments
 use class_physicalSystem
 
@@ -12,12 +12,11 @@ implicit none
     integer :: iStep
     
     type(PhysicalSystem) :: sys
-    type(argument_seed) :: arg_seed
-    type(argument_initial) :: arg_init
+    type(monteCarlo_arguments) :: args
 
-    call read_arguments(arg_seed, arg_init)
+    call read_arguments(args)
     call sys%construct()
-    call sys%init(arg_seed, arg_init)
+    call sys%init(args)
         
     write(output_unit, *) "Beginning of cycles"
     

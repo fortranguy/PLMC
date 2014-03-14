@@ -3,7 +3,7 @@
 module module_monteCarlo_arguments
 
 use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
-use module_types, only: argument_seed, argument_initial
+use module_types, only: argument_seed, argument_initial, monteCarlo_arguments
 
 implicit none
 
@@ -87,17 +87,16 @@ contains
 
     !> Read arguments
 
-    subroutine read_arguments(arg_seed, arg_init)
+    subroutine read_arguments(args)
     
-        type(argument_seed), intent(out) :: arg_seed
-        type(argument_initial), intent(out) :: arg_init
+        type(monteCarlo_arguments), intent(out) :: args
 
         character(len=4096) :: argument, sub_argument
         integer :: iArg, length, status
         logical :: seed_redefined, init_redefined
 
-        arg_seed%choice = 'v'
-        arg_init%choice = 'r'
+        args%seed%choice = 'v'
+        args%initial%choice = 'r'
 
         seed_redefined = .false.
         init_redefined = .false.
@@ -122,8 +121,8 @@ contains
                     select case (sub_argument)
                         case ("r", "random")
                         case ("f", "files")
-                            arg_init%choice = 'f'
-                            call read_init_files(iArg, arg_init)
+                            args%initial%choice = 'f'
+                            call read_init_files(iArg, args%initial)
                         case default
                             call write_help()
                             error stop
@@ -138,10 +137,10 @@ contains
                     select case (sub_argument)
                         case ("v", "variable")
                         case ("f", "fix")
-                            arg_seed%choice = 'f'
+                            args%seed%choice = 'f'
                         case ("p", "put")
-                            arg_seed%choice = 'p'
-                            call read_seed_put(iArg, arg_seed)
+                            args%seed%choice = 'p'
+                            call read_seed_put(iArg, args%seed)
                         case default
                             call write_help()
                             error stop

@@ -8,7 +8,7 @@ use data_box, only: Ndim, Lsize, Kmax
 use data_monteCarlo, only: Temperature, decorrelFactor, switch_factor, Nthermal, Nadapt, Nstep, &
                            reset_iStep
 use data_distribution, only: snap
-use module_types, only: argument_seed, argument_initial
+use module_types, only: monteCarlo_arguments
 use class_hardSpheres
 use class_dipolarSpheres
 use class_mixingPotential
@@ -216,11 +216,10 @@ contains
         
     end subroutine PhysicalSystem_init_observables    
 
-    subroutine PhysicalSystem_init(this, arg_seed, arg_init)
+    subroutine PhysicalSystem_init(this, args)
     
         class(PhysicalSystem), intent(inout) :: this
-        type(argument_seed), intent(in) :: arg_seed
-        type(argument_initial), intent(in) :: arg_init
+        type(monteCarlo_arguments), intent(in) :: args
         
         this%snap = snap
         this%reset_iStep = reset_iStep
@@ -230,8 +229,8 @@ contains
         call this%open_units()        
         call this%init_switch()        
         
-        call init_randomSeed(arg_seed, this%report_unit)
-        call set_initialCondition(arg_init, this%type1_spheres, this%type2_spheres, &
+        call init_randomSeed(args%seed, this%report_unit)
+        call set_initialCondition(args%initial, this%type1_spheres, this%type2_spheres, &
                                   this%mix%get_sigma(), this%report_unit)
         call this%init_spheres()
         call this%init_observables()

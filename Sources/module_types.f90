@@ -28,5 +28,10 @@ implicit none
         character(len=4096), dimension(3) :: files
         integer, dimension(3) :: length
     end type argument_initial
+    
+    type, public :: monteCarlo_arguments
+        type(argument_seed) :: seed
+        type(argument_initial) :: initial
+    end type monteCarlo_arguments
 
 end module module_types
