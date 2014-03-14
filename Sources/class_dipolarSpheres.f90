@@ -9,7 +9,7 @@ use data_box, only: Ndim, Lsize, Kmax
 use data_particles, only: dipol_Ncol
 use data_monteCarlo, only: dipol_move_delta, dipol_move_rejectFix, dipol_rotate_delta, &
                            dipol_rotate_deltaMax, dipol_rotate_rejectFix, dipol_Nwidom, &
-                           dipol_reInit_iStep
+                           reset_iStep
 use data_potential, only: dipol_rMin_factor, dipol_real_rCut_factor, dipol_real_dr, dipol_alpha_factor
 use data_neighbourCells, only: NnearCell
 use data_distribution, only: snap_ratio
@@ -1173,7 +1173,7 @@ contains
         call this%set_Epot_real()
         
         call this%set_Epot_reci()
-        this%reset_iStep = dipol_reInit_iStep
+        this%reset_iStep = reset_iStep
         
         call this%set_totalMoment()
         

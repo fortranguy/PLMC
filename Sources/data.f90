@@ -97,6 +97,7 @@ implicit none
     integer, parameter :: Nthermal = 2**15/decorrelFactor
     integer, parameter :: Nadapt = 2**10
     integer, parameter :: Nstep = 2**16
+    integer, parameter :: reset_iStep = 2**13/decorrelFactor
     
     ! move
     real(DP), dimension(Ndim), parameter :: dipol_move_delta = 0.3_DP ! u_length, adaptation
@@ -107,8 +108,6 @@ implicit none
     real(DP), parameter :: dipol_rotate_rejectFix = 0.17_DP
     ! chemical potential
     integer, parameter :: dipol_Nwidom = 500
-    ! reinitialisations
-    integer, parameter :: dipol_reInit_iStep = 2**13/decorrelFactor
     
     real(DP), dimension(Ndim), parameter :: hard_move_delta = 0.5_DP ! u_length, adaptation
     real(DP), parameter :: hard_move_rejectFix = 0.5_DP

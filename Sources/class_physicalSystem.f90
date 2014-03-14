@@ -6,7 +6,7 @@ use, intrinsic :: iso_fortran_env, only: output_unit
 use data_precisions, only: DP
 use data_box, only: Ndim, Lsize, Kmax
 use data_monteCarlo, only: Temperature, decorrelFactor, switch_factor, Nthermal, Nadapt, Nstep, &
-                           dipol_reInit_iStep
+                           reset_iStep
 use data_distribution, only: snap
 use module_types, only: argument_seed, argument_initial
 use class_hardSpheres
@@ -67,7 +67,7 @@ private
         real(DP) :: switch_reject, switch_rejectSum
         
         logical :: snap
-        integer :: reInit_iStep
+        integer :: reset_iStep
         real(DP) :: time_start, time_end
     
     contains
@@ -226,7 +226,7 @@ contains
         call this%init_observables()
         
         this%snap = snap
-        this%reInit_iStep = dipol_reInit_iStep
+        this%reset_iStep = reset_iStep
     
     end subroutine PhysicalSystem_init
     
@@ -450,10 +450,9 @@ contains
         class(PhysicalSystem), intent(inout) :: this
         integer, intent(in) :: iStep
     
-        if (modulo(iStep, this%reInit_iStep) == 0) then
-            call this%type1_spheres%Epot_reci_reInit_structure(iStep, &
-                                                               this%type1_units%structure_modulus)
-            call this%type1_spheres%reInit_totalMoment(iStep, this%type1_units%totalMoment_modulus)
+        if (modulo(iStep, this%reset_iStep) == 0) then
+            call this%type1_spheres%reset_Epot_reci_structure(iStep, this%type1_units%structure_modulus)
+            call this%type1_spheres%reset_totalMoment(iStep, this%type1_units%totalMoment_modulus)
         end if
         
     end subroutine PhysicalSystem_reinitialize_quantites
