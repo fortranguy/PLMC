@@ -21,7 +21,7 @@ implicit none
         
     write(output_unit, *) "Beginning of cycles"
     
-    !call cpu_time(tIni)
+    call sys%set_time_start()
     MC_Cycle: do iStep = 1, sys%get_Nthermal() + sys%get_Nstep()
     
         call sys%random_changes() 
@@ -49,7 +49,7 @@ implicit none
         call sys%reinitialize_quantites(iStep)
     
     end do MC_Cycle
-    !call cpu_time(tFin)
+    call sys%set_time_end()
 
     write(output_unit, *) "End of cycles"
     

@@ -90,9 +90,11 @@ private
         procedure, private :: close_units => PhysicalSystem_close_units
         procedure :: final => PhysicalSystem_final
         
-        !> Accessors
+        !> Accessors & Mutators
         procedure :: get_Nthermal => PhysicalSystem_get_Nthermal
         procedure :: get_Nstep => PhysicalSystem_get_Nstep
+        procedure :: set_time_start => PhysicalSystem_set_time_start
+        procedure :: set_time_end => PhysicalSystem_set_time_end
         
         !> Simulation
         procedure :: random_changes => PhysicalSystem_random_changes
@@ -320,6 +322,18 @@ contains
         integer :: get_Nstep
         get_Nstep = this%Nstep
     end function PhysicalSystem_get_Nstep
+    
+    ! Mutators
+    
+    subroutine PhysicalSystem_set_time_start(this)
+        class(PhysicalSystem), intent(inout) :: this
+        call cpu_time(this%time_start)
+    end subroutine PhysicalSystem_set_time_start
+    
+    subroutine PhysicalSystem_set_time_end(this)
+        class(PhysicalSystem), intent(inout) :: this
+        call cpu_time(this%time_end)
+    end subroutine PhysicalSystem_set_time_end        
     
     ! Random changes
     
