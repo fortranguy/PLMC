@@ -27,7 +27,7 @@ implicit none
         call sys%random_changes() 
         call sys%update_rejections()
         
-        MC_Regime: if (iStep <= sys%get_Nthermal()) then ! Thermalisation
+        MC_Regime: if (iStep <= sys%get_Nthermal()) then
             
             call sys%adapt_changes(iStep)            
             call sys%write_observables_thermalisation(iStep)
@@ -37,7 +37,7 @@ implicit none
                 call sys%fix_changes()
             end if
         
-        else MC_Regime ! Thermalisation over -> Equilibrium
+        else MC_Regime
         
             call sys%measure_chemical_potentials()        
             call sys%accumulate_observables()            
