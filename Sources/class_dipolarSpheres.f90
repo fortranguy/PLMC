@@ -51,8 +51,8 @@ private
     contains
 
         !> Construction and destruction of the class
-        procedure, private :: init_particles => DipolarSpheres_init_particles
-        procedure, private :: init_changes => DipolarSpheres_init_changes
+        procedure, private :: set_particles => DipolarSpheres_set_particles
+        procedure, private :: set_changes => DipolarSpheres_set_changes
         procedure :: construct => DipolarSpheres_construct
         procedure :: destroy => DipolarSpheres_destroy
         
@@ -81,8 +81,8 @@ private
         procedure :: Epot_real_solo => DipolarSpheres_Epot_real_solo
         procedure, private :: Epot_real => DipolarSpheres_Epot_real
         !>     Reciprocal: init
-        procedure, private :: Epot_reci_init_weight => DipolarSpheres_Epot_reci_init_weight
-        procedure, private :: Epot_reci_init_structure => DipolarSpheres_Epot_reci_init_structure
+        procedure, private :: Epot_reci_set_weight => DipolarSpheres_Epot_reci_set_weight
+        procedure, private :: Epot_reci_set_structure => DipolarSpheres_Epot_reci_set_structure
         procedure, private :: Epot_reci_init => DipolarSpheres_Epot_reci_init
         procedure, private :: Epot_reci_get_structure_modulus => &
                               DipolarSpheres_Epot_reci_get_structure_modulus
@@ -102,7 +102,7 @@ private
         procedure :: Epot_self_solo => DipolarSpheres_Epot_self_solo
         procedure, private :: Epot_self => DipolarSpheres_Epot_self
         !>     Total moment
-        procedure, private :: init_totalMoment => DipolarSpheres_init_totalMoment
+        procedure, private :: set_totalMoment => DipolarSpheres_set_totalMoment
         procedure :: reInit_totalMoment => DipolarSpheres_reInit_totalMoment
         procedure :: update_totalMoment_rotate => DipolarSpheres_update_totalMoment_rotate
         !>     Boundary conditions
@@ -117,31 +117,24 @@ private
     
 contains
 
-    pure subroutine DipolarSpheres_init_particles(this)
-    
-        class(DipolarSpheres), intent(inout) :: this
-        
+    pure subroutine DipolarSpheres_set_particles(this)    
+        class(DipolarSpheres), intent(inout) :: this        
         this%sigma = 1._DP ! = u_length
         this%Ncol = dipol_Ncol
         allocate(this%positions(Ndim, this%Ncol))
-        allocate(this%orientations(Ndim, this%Ncol))
+        allocate(this%orientations(Ndim, this%Ncol))    
+    end subroutine DipolarSpheres_set_particles
     
-    end subroutine DipolarSpheres_init_particles
-    
-    pure subroutine DipolarSpheres_init_changes(this)
-    
-        class(DipolarSpheres), intent(inout) :: this
-        
+    pure subroutine DipolarSpheres_set_changes(this)    
+        class(DipolarSpheres), intent(inout) :: this        
         this%move_delta = dipol_move_delta
         this%move_deltaSave = this%move_delta
-        this%move_rejectFix = dipol_move_rejectFix
-        
+        this%move_rejectFix = dipol_move_rejectFix        
         this%rotate_delta = dipol_rotate_delta
         this%rotate_deltaSave = this%rotate_delta
         this%rotate_deltaMax = dipol_rotate_deltaMax
-        this%rotate_rejectFix = dipol_rotate_rejectFix
-        
-    end subroutine DipolarSpheres_init_changes
+        this%rotate_rejectFix = dipol_rotate_rejectFix        
+    end subroutine DipolarSpheres_set_changes
 
     subroutine DipolarSpheres_construct(this)
     
@@ -150,8 +143,8 @@ contains
         this%name = "dipol"
         write(output_unit, *) this%name, " class construction"
     
-        call this%init_particles()
-        call this%init_changes()
+        call this%set_particles()
+        call this%set_changes()
         this%Nwidom = dipol_Nwidom
         this%snap_factor = this%Ncol/snap_ratio
         if (this%snap_factor == 0) this%snap_factor = 1
@@ -318,16 +311,13 @@ contains
     
     !> Initialisation
     
-    subroutine DipolarSpheres_Epot_real_set_parameters(this)
-    
-        class(DipolarSpheres), intent(inout) :: this
-        
+    subroutine DipolarSpheres_Epot_real_set_parameters(this)    
+        class(DipolarSpheres), intent(inout) :: this        
         this%real_rCut = dipol_real_rCut_factor * Lsize(1)
         this%real_dr = dipol_real_dr
         call set_discrete_length(this%rMin, this%real_dr)
         this%real_iMin = int(this%rMin/this%real_dr)
-        this%real_iCut = int(this%real_rCut/this%real_dr) + 1
-        
+        this%real_iCut = int(this%real_rCut/this%real_dr) + 1        
     end subroutine DipolarSpheres_Epot_real_set_parameters
     
     subroutine DipolarSpheres_Epot_real_init(this)
@@ -465,7 +455,7 @@ contains
     !>                                {\sum_{d=1}^3 \frac{k_d^2}{L_d}}
     !> \f]
     
-    pure subroutine DipolarSpheres_Epot_reci_init_weight(this)
+    pure subroutine DipolarSpheres_Epot_reci_set_weight(this)
         
         class(DipolarSpheres), intent(inout) :: this
         
@@ -495,7 +485,7 @@ contains
         
         end do
         
-    end subroutine DipolarSpheres_Epot_reci_init_weight
+    end subroutine DipolarSpheres_Epot_reci_set_weight
     
     !> Structure factor init :
     !> \f[
@@ -506,7 +496,7 @@ contains
     !>      S_\underline{l}(\vec{k}) = \sum_{i \neq l} (\vec{k}\cdot\vec{\mu}_i) e^{+i\vec{k}\cdot\vec{x}_i}
     !> \f].
 
-    pure subroutine DipolarSpheres_Epot_reci_init_structure(this)
+    pure subroutine DipolarSpheres_Epot_reci_set_structure(this)
 
         class(DipolarSpheres), intent(inout) :: this
 
@@ -555,14 +545,14 @@ contains
             
         end do
 
-    end subroutine DipolarSpheres_Epot_reci_init_structure
+    end subroutine DipolarSpheres_Epot_reci_set_structure
     
     pure subroutine DipolarSpheres_Epot_reci_init(this)
     
         class(DipolarSpheres), intent(inout) :: this
         
-        call this%Epot_reci_init_weight()
-        call this%Epot_reci_init_structure()
+        call this%Epot_reci_set_weight()
+        call this%Epot_reci_set_structure()
     
     end subroutine DipolarSpheres_Epot_reci_init
     
@@ -600,7 +590,7 @@ contains
         real(DP) :: modulus_drifted, modulus_reInit
         
         modulus_drifted = this%Epot_reci_get_structure_modulus()
-        call this%Epot_reci_init_structure()
+        call this%Epot_reci_set_structure()
         modulus_reInit = this%Epot_reci_get_structure_modulus()
         
         write(modulus_unit, *) iStep, abs(modulus_reInit - modulus_drifted)
@@ -1051,19 +1041,14 @@ contains
     !> \f[ \vec{M} = \sum_j \vec{\mu}_j \f]
     !> \f[ \vec{M}_\underline{l} = \sum_{j \neq l} \vec{\mu}_j \f]
     
-    pure subroutine DipolarSpheres_init_totalMoment(this)
-    
-        class(DipolarSpheres), intent(inout) :: this
-        
-        integer :: iCol
-        
-        this%totalMoment(:) = 0._DP
-        
+    pure subroutine DipolarSpheres_set_totalMoment(this)    
+        class(DipolarSpheres), intent(inout) :: this        
+        integer :: iCol        
+        this%totalMoment(:) = 0._DP        
         do iCol = 1, this%Ncol
             this%totalMoment(:) = this%totalMoment(:) + this%orientations(:, iCol)
-        end do
-    
-    end subroutine DipolarSpheres_init_totalMoment
+        end do    
+    end subroutine DipolarSpheres_set_totalMoment
 
     !> Reinitialise the total moment factor and print the drift
 
@@ -1076,7 +1061,7 @@ contains
         real(DP) :: modulus_drifted, modulus_reInit
 
         modulus_drifted = norm2(this%totalMoment(:))
-        call this%init_totalMoment()
+        call this%set_totalMoment()
         modulus_reInit = norm2(this%totalMoment(:))
 
         write(modulus_unit, *) iStep, abs(modulus_reInit - modulus_drifted)
@@ -1190,7 +1175,7 @@ contains
         call this%Epot_reci_init()
         this%reInit_iStep = dipol_reInit_iStep
         
-        call this%init_totalMoment()
+        call this%set_totalMoment()
         
     end subroutine DipolarSpheres_Epot_init
 

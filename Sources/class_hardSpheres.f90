@@ -52,8 +52,8 @@ private
     contains
 
         !> Construction and destruction of the class
-        procedure, private :: init_particles => HardSpheres_init_particles
-        procedure, private :: init_changes => HardSpheres_init_changes
+        procedure, private :: set_particles => HardSpheres_set_particles
+        procedure, private :: set_changes => HardSpheres_set_changes
         procedure :: construct => HardSpheres_construct
         procedure :: destroy => HardSpheres_destroy
         
@@ -87,25 +87,19 @@ private
     
 contains
 
-    pure subroutine HardSpheres_init_particles(this)
-    
+    pure subroutine HardSpheres_set_particles(this)    
         class(HardSpheres), intent(inout) :: this
-
         this%sigma = hard_sigma
         this%Ncol = hard_Ncol
-        allocate(this%positions(Ndim, this%Ncol))
+        allocate(this%positions(Ndim, this%Ncol))    
+    end subroutine HardSpheres_set_particles
     
-    end subroutine HardSpheres_init_particles
-    
-    pure subroutine HardSpheres_init_changes(this)
-    
-        class(HardSpheres), intent(inout) :: this
-        
+    pure subroutine HardSpheres_set_changes(this)    
+        class(HardSpheres), intent(inout) :: this        
         this%move_delta = hard_move_delta
         this%move_deltaSave = this%move_delta
-        this%move_rejectFix = hard_move_rejectFix
-        
-    end subroutine HardSpheres_init_changes
+        this%move_rejectFix = hard_move_rejectFix        
+    end subroutine HardSpheres_set_changes
 
     subroutine HardSpheres_construct(this)
     
@@ -114,8 +108,8 @@ contains
         this%name = "hardS"
         write(output_unit, *) this%name, " class construction"
         
-        call this%init_particles()
-        call this%init_changes()
+        call this%set_particles()
+        call this%set_changes()
         this%Nwidom = hard_Nwidom
         this%snap_factor = this%Ncol/snap_ratio
         if (this%snap_factor == 0) this%snap_factor = 1
