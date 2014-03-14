@@ -89,6 +89,7 @@ private
         procedure :: random_changes => PhysicalSystem_random_changes
         procedure :: update_rejections => PhysicalSystem_update_rejections
         procedure :: adapt_changes => PhysicalSystem_adapt_changes
+        procedure :: write_observables => PhysicalSystem_write_observables
     
     end type PhysicalSystem
     
@@ -358,5 +359,17 @@ contains
         end if
         
     end subroutine PhysicalSystem_adapt_changes
+    
+    subroutine PhysicalSystem_write_observables(this, iStep)
+    
+        class(PhysicalSystem), intent(inout) :: this
+        integer, intent(in) :: iStep
+    
+        call this%type1_obs%write(iStep, this%type1_units%obsThermal)
+        call this%type2_obs%write(iStep, this%type2_units%obsThermal)
+        write(this%mix_obsThermal_unit, *) iStep, this%mix_Epot
+        write(this%obsThermal_unit, *) iStep, this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
+            
+    end subroutine PhysicalSystem_write_observables
 
 end module class_physicalSystem
