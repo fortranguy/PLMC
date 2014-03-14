@@ -71,7 +71,7 @@ module_physics_macro.o: module_physics_macro.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 module_algorithms.o: module_algorithms.f90
 	$(FC) -c $(FFLAGS) $< -o $@
-module_writing.o: module_writing.f90
+module_write.o: module_write.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 module_monte-carlo_arguments.o: module_monte-carlo_arguments.f90
 	$(FC) -c $(FFLAGS) $< -o $@
@@ -94,7 +94,7 @@ $(EXEC1): data.o \
           class_hardSpheres.o class_dipolarSpheres.o \
           class_mixingPotential.o \
           class_observables.o class_units.o \
-          module_physics_macro.o module_algorithms.o module_writing.o module_monte-carlo_arguments.o\
+          module_physics_macro.o module_algorithms.o module_write.o module_monte-carlo_arguments.o\
           class_physicalSystem.o \
           program_monte-carlo.o
 	$(FC) $^ $(LDFLAGS) -o $@

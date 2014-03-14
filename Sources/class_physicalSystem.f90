@@ -18,7 +18,7 @@ use module_monteCarlo_arguments, only: read_arguments
 use module_physics_macro, only: init_randomSeed, set_initialCondition, init, final, mix_init, &
                                 mix_final, adapt_move, adapt_rotate, test_consist
 use module_algorithms, only: move, widom, switch, rotate
-use module_writing, only: open_units, mix_open_units, print_report, print_results, mix_print_results
+use module_write, only: open_units, mix_open_units, write_report, write_results, mix_write_results
 
 implicit none
 
@@ -86,7 +86,7 @@ private
         procedure, private :: init_observables => PhysicalSystem_init_observables
         procedure :: init => PhysicalSystem_init
         procedure, private :: final_spheres => PhysicalSystem_final_spheres
-        procedure, private :: print_results => PhysicalSystem_print_results
+        procedure, private :: write_results => PhysicalSystem_write_results
         procedure, private :: close_units => PhysicalSystem_close_units
         procedure :: final => PhysicalSystem_final
         
@@ -162,18 +162,18 @@ contains
         class(PhysicalSystem), intent(inout) :: this
         
         call open_units(this%report_unit, this%obsThermal_unit, this%obsEquilib_unit)        
-        call print_report(this%Ncol, this%Nmove, this%Nswitch, this%Nrotate, this%reset_iStep, &
+        call write_report(this%Ncol, this%Nmove, this%Nswitch, this%Nrotate, this%reset_iStep, &
                           this%report_unit)        
         
         call this%type1_units%open(this%type1_spheres%get_name())
-        call this%type1_spheres%print_density(this%Ncol, this%type1_units%report)        
+        call this%type1_spheres%write_density(this%Ncol, this%type1_units%report)        
         
         call this%type2_units%open(this%type2_spheres%get_name())
-        call this%type2_spheres%print_density(this%Ncol, this%type2_units%report)    
+        call this%type2_spheres%write_density(this%Ncol, this%type2_units%report)    
         
         call mix_open_units(this%mix_report_unit, this%mix_Epot_tab_unit, this%mix_obsThermal_unit, &
                             this%mix_obsEquilib_unit)
-        call this%mix%print_report(this%mix_report_unit)
+        call this%mix%write_report(this%mix_report_unit)
     
     end subroutine PhysicalSystem_open_units
     
@@ -191,7 +191,7 @@ contains
     
         call mix_init(this%mix, this%type1_spheres, this%type2_spheres, this%mix_Epot_tab_unit, &
                       this%mix_Epot)
-        call this%mix%print_report(this%mix_report_unit)
+        call this%mix%write_report(this%mix_report_unit)
         call init(this%type1_spheres, this%type2_spheres, this%mix, this%type1_units, &
                   this%type1_obs%Epot)
         call init(this%type2_spheres, this%type1_spheres, this%mix, this%type2_units, &
@@ -248,11 +248,11 @@ contains
         call final(this%type2_spheres, this%type2_units, this%type2_obs)
         call mix_final(this%mix, this%type1_spheres, this%type2_spheres, this%mix_report_unit, &
                        this%mix_Epot, this%mix_Epot_conf)
-        call mix_print_results(this%mix_EpotSum, this%mix_report_unit)
+        call mix_write_results(this%mix_EpotSum, this%mix_report_unit)
         
     end subroutine PhysicalSystem_final_spheres
     
-    subroutine PhysicalSystem_print_results(this)
+    subroutine PhysicalSystem_write_results(this)
     
         class(PhysicalSystem), intent(inout) :: this
         
@@ -265,9 +265,9 @@ contains
         call test_consist(Epot, Epot_conf, this%report_unit)
         this%EpotSum = this%type1_obs%EpotSum + this%type2_obs%EpotSum + this%mix_EpotSum
         duration = this%time_end - this%time_start
-        call print_results(this%Ncol, this%EpotSum, this%switch_rejectSum, duration, this%report_unit)
+        call write_results(this%Ncol, this%EpotSum, this%switch_rejectSum, duration, this%report_unit)
     
-    end subroutine PhysicalSystem_print_results
+    end subroutine PhysicalSystem_write_results
     
     subroutine PhysicalSystem_close_units(this)
     
@@ -292,7 +292,7 @@ contains
         class(PhysicalSystem), intent(inout) :: this
         
         call this%final_spheres()
-        call this%print_results()
+        call this%write_results()
         call this%close_units()
     
     end subroutine PhysicalSystem_final

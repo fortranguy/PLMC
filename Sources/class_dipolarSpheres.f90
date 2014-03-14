@@ -55,7 +55,7 @@ private
         procedure :: destroy => DipolarSpheres_destroy
         
         !> Print a report of the component in a file
-        procedure :: print_report => DipolarSpheres_print_report
+        procedure :: write_report => DipolarSpheres_write_report
         
         !> Take a snap shot of the configuration: orientations
         procedure :: snap_orientations => DipolarSpheres_snap_orientations
@@ -161,18 +161,18 @@ contains
     
     !> Report
     
-    subroutine DipolarSpheres_print_report(this, report_unit)
+    subroutine DipolarSpheres_write_report(this, report_unit)
     
         class(DipolarSpheres), intent(in) :: this
         integer, intent(in) :: report_unit
         
-        call this%HardSpheres%print_report(report_unit)
+        call this%HardSpheres%write_report(report_unit)
 
         write(report_unit, *) "    alpha = ", this%alpha
         write(report_unit, *) "    dr = ", this%real_dr
         write(report_unit, *) "    NwaveVectors = ", this%NwaveVectors
         
-    end subroutine DipolarSpheres_print_report
+    end subroutine DipolarSpheres_write_report
     
     !> Configuration state: orientations
       

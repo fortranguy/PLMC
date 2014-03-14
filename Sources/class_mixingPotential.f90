@@ -40,7 +40,7 @@ private
     
         procedure :: construct => MixingPotential_construct
         procedure :: destroy => MixingPotential_destroy
-        procedure :: print_report => MixingPotential_print_report
+        procedure :: write_report => MixingPotential_write_report
 
         procedure :: get_sigma => MixingPotential_get_sigma
         procedure :: get_rCut => MixingPotential_get_rCut
@@ -85,7 +85,7 @@ contains
     
     !> Report
     
-    subroutine MixingPotential_print_report(this, report_unit)
+    subroutine MixingPotential_write_report(this, report_unit)
     
         class(MixingPotential), intent(in) :: this
         integer, intent(in) :: report_unit
@@ -99,7 +99,7 @@ contains
         write(report_unit, *) "    rCut = ", this%rCut
         write(report_unit, *) "    dr = ", this%dr
         
-    end subroutine MixingPotential_print_report
+    end subroutine MixingPotential_write_report
 
     !> Accessors & Mutators
 

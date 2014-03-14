@@ -6,7 +6,7 @@ use, intrinsic :: iso_fortran_env, only: output_unit, error_unit, iostat_end
 use data_precisions, only: DP, real_zero, io_tiny, consist_tiny
 use data_box, only: Ndim, Lsize
 use data_monteCarlo, only: Nadapt
-use data_potential, only: print_potential
+use data_potential, only: write_potential
 use module_types, only: argument_seed, argument_initial
 use module_physics_micro, only: dist_PBC, random_surface
 use class_hardSpheres
@@ -235,7 +235,7 @@ contains
         call this%snap_positions(0, this_units%snapIni_positions)
         call this%set_Epot()
         
-        if (print_potential) then
+        if (write_potential) then
             call this%Epot_print(this_units%Epot)
         end if
         select type (this)
@@ -244,7 +244,7 @@ contains
                     type is (MoreUnits)
                         call this%snap_data(this_units%snap_orientations)
                         call this%snap_orientations(0, this_units%snapIni_orientations)
-                        if (print_potential) then
+                        if (write_potential) then
                             call this%Epot_real_print(this_units%Epot_real)
                         end if
                         call this%Epot_reci_count_waveVectors(this_units%waveVectors)
@@ -253,7 +253,7 @@ contains
         this_Epot = this%Epot_conf()
         
         call this%construct_cells(other, mix%get_cell_size(), mix%get_rCut())
-        call this%print_report(this_units%report)
+        call this%write_report(this_units%report)
     
     end subroutine init
     
@@ -269,7 +269,7 @@ contains
         call this%set_Epot()
         call test_consist(this_obs%Epot, this%Epot_conf(), this_units%report)
         call this%snap_positions(0, this_units%snapFin_positions)
-        call this_obs%print_results(this_units%report)
+        call this_obs%write_results(this_units%report)
         
         select type (this)
             type is (DipolarSpheres)
@@ -292,7 +292,7 @@ contains
     
         call mix%test_overlap(type1, type2)
         call mix%set_Epot()
-        if (print_potential) then
+        if (write_potential) then
             call mix%Epot_print(mix_Epot_unit)
         end if
         call mix%set_cell_size()

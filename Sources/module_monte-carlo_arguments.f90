@@ -12,7 +12,7 @@ public read_arguments
 
 contains
 
-    subroutine print_help()
+    subroutine write_help()
     
         write(output_unit, *) "Usage: mc_[ENSEMBLE]_[GEOMETRY] [OPTION]"
         write(output_unit, *) "Run ENSEMBLE Monte-Carlo simulation in GEOMETRY."
@@ -29,7 +29,7 @@ contains
         write(output_unit, *)
         write(output_unit, *) "Report bugs to <salomon.chung@u-pe.fr>."
     
-    end subroutine print_help
+    end subroutine write_help
 
     subroutine read_init_files(iArg, arg_init)
 
@@ -111,7 +111,7 @@ contains
             select case (argument)
 
                 case ("-h", "--help")
-                    call print_help()
+                    call write_help()
                     stop
 
                 case ("-i", "--initial")
@@ -125,7 +125,7 @@ contains
                             arg_init%choice = 'f'
                             call read_init_files(iArg, arg_init)
                         case default
-                            call print_help()
+                            call write_help()
                             error stop
                     end select
                     init_redefined = .true.
@@ -143,7 +143,7 @@ contains
                             arg_seed%choice = 'p'
                             call read_seed_put(iArg, arg_seed)
                         case default
-                            call print_help()
+                            call write_help()
                             error stop
                     end select
                     seed_redefined = .true.

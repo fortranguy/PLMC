@@ -32,7 +32,7 @@ private
         procedure :: update_rejections => Observables_update_rejections
         procedure :: write => Observables_write
         procedure :: accumulate => Observables_accumulate
-        procedure :: print_results => Observables_print_results
+        procedure :: write_results => Observables_write_results
     
     end type Observables
     
@@ -134,7 +134,7 @@ contains
     
     !> Results
     
-    subroutine Observables_print_results(this, report_unit)
+    subroutine Observables_write_results(this, report_unit)
 
         class(Observables), intent(in) :: this
         integer, intent(in) :: report_unit
@@ -154,6 +154,6 @@ contains
                                       this%rotate_rejectSum/real(Nstep, DP)
         end select
     
-    end subroutine Observables_print_results
+    end subroutine Observables_write_results
 
 end module class_observables

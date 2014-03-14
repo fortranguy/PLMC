@@ -66,8 +66,8 @@ private
         procedure :: adapt_move_delta => HardSpheres_adapt_move_delta
         procedure :: set_move_delta => HardSpheres_set_move_delta
         
-        procedure :: print_density => HardSpheres_print_density
-        procedure :: print_report => HardSpheres_print_report
+        procedure :: write_density => HardSpheres_write_density
+        procedure :: write_report => HardSpheres_write_report
         
         procedure :: snap_data => HardSpheres_snap_data
         procedure :: snap_positions => HardSpheres_snap_positions
@@ -211,7 +211,7 @@ contains
     
     !> Print density and compacity
     
-    subroutine HardSpheres_print_density(this, total_Ncol, report_unit)
+    subroutine HardSpheres_write_density(this, total_Ncol, report_unit)
     
         class(HardSpheres), intent(in) :: this
         integer, intent(in) :: total_Ncol
@@ -227,11 +227,11 @@ contains
         write(report_unit, *) "    compacity = ", compacity
         write(report_unit, *) "    concentration = ", concentration
     
-    end subroutine HardSpheres_print_density
+    end subroutine HardSpheres_write_density
     
     !> Print a report of the component in a file
     
-    subroutine HardSpheres_print_report(this, report_unit)
+    subroutine HardSpheres_write_report(this, report_unit)
     
         class(HardSpheres), intent(in) :: this
         integer, intent(in) :: report_unit
@@ -250,7 +250,7 @@ contains
         
         write(report_unit, *) "    snap_factor = ", this%snap_factor
         
-    end subroutine HardSpheres_print_report
+    end subroutine HardSpheres_write_report
     
     !> Take a snap shot of the configuration: positions
     

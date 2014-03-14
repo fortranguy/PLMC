@@ -144,7 +144,7 @@ implicit none
     real(DP), parameter :: mix_epsilon = 0._DP ! u_energy * u_length
     real(DP), parameter :: mix_alpha = 1._DP ! 1/u_length
     
-    logical, parameter :: print_potential = .true.
+    logical, parameter :: write_potential = .true.
         
 end module data_potential
 !***************************************************************************************************

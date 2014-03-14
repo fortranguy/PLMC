@@ -1,12 +1,12 @@
 !> \brief Subroutines as tools for the main program
 
-module module_writing
+module module_write
 
 use data_precisions, only: DP, real_zero, io_tiny, consist_tiny
 use data_constants, only: PI, sigma3d
 use data_box, only: Ndim, Lsize, Kmax
 use data_monteCarlo, only: Temperature, Nstep, decorrelFactor, Nthermal
-use data_potential, only: print_potential
+use data_potential, only: write_potential
 use module_types, only: argument_seed, argument_initial
 use class_hardSpheres
 use class_dipolarSpheres
@@ -17,7 +17,7 @@ use module_physics_macro, only: test_consist
 implicit none
 
 private
-public open_units, mix_open_units, print_report, print_results, mix_print_results
+public open_units, mix_open_units, write_report, write_results, mix_write_results
 
 contains
 
@@ -54,9 +54,9 @@ contains
         
      end subroutine mix_open_units
     
-    !> Total: print_report
+    !> Total: write_report
     
-    subroutine print_report(Ncol, Nmove, Nswitch, Nrotate, reset_iStep, report_unit)
+    subroutine write_report(Ncol, Nmove, Nswitch, Nrotate, reset_iStep, report_unit)
     
         integer, intent(in) :: Ncol, Nmove, Nswitch, Nrotate, reset_iStep
         integer, intent(in) :: report_unit
@@ -86,13 +86,13 @@ contains
         write(report_unit, *) "    Nrotate = ", Nrotate
         
         write(report_unit, *) "    reset_iStep = ", reset_iStep
-        write(report_unit, *) "    print_potential = ", print_potential
+        write(report_unit, *) "    write_potential = ", write_potential
     
-    end subroutine print_report
+    end subroutine write_report
     
     !> Total: Results
     
-    subroutine print_results(Ncol, EpotSum, switch_rejectSum, duration, report_unit)
+    subroutine write_results(Ncol, EpotSum, switch_rejectSum, duration, report_unit)
     
         integer, intent(in) :: Ncol
         real(DP), intent(in) :: EpotSum, switch_rejectSum
@@ -106,11 +106,11 @@ contains
         write(report_unit, *) "    switch rejection rate = ", switch_rejectSum/real(Nstep, DP)
         write(report_unit, *) "    duration =", duration/60._DP, "min"
     
-    end subroutine print_results
+    end subroutine write_results
     
     !> Mix: Results
     
-    subroutine mix_print_results(EpotSum, report_unit)
+    subroutine mix_write_results(EpotSum, report_unit)
     
         real(DP), intent(in) :: EpotSum
         integer, intent(in) :: report_unit
@@ -118,6 +118,6 @@ contains
         write(report_unit, *) "Results: "
         write(report_unit, *) "    average energy = ", EpotSum/real(Nstep, DP)
     
-    end subroutine mix_print_results
+    end subroutine mix_write_results
     
-end module module_writing
+end module module_write
