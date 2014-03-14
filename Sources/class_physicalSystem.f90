@@ -6,6 +6,7 @@ use, intrinsic :: iso_fortran_env, only: output_unit
 use data_precisions, only: DP
 use data_box, only: Ndim, Lsize, Kmax
 use data_monteCarlo, only: Temperature, decorrelFactor, switch_factor, Nthermal, Nadapt, Nstep
+use data_distribution, only: snap
 use module_types, only: argument_seed, argument_initial
 use class_hardSpheres
 use class_dipolarSpheres
@@ -59,12 +60,13 @@ private
         real(DP) :: Epot, EpotSum
         integer :: report_unit !< data & results file
         integer :: obsThermal_unit, obsEquilib_unit !< observables files: thermalisation & equilibrium
-           
-        real(DP) :: time_start, time_end
         
         ! Switch
         integer :: switch_Nhit, switch_Nreject
         real(DP) :: switch_reject, switch_rejectSum
+        
+        logical :: snap
+        real(DP) :: time_start, time_end
     
     contains
     
@@ -94,6 +96,7 @@ private
         procedure :: measure_chemical_potentials => PhysicalSystem_measure_chemical_potentials
         procedure :: accumulate_observables => PhysicalSystem_accumulate_observables
         procedure :: write_observables_equilibrium => PhysicalSystem_write_observables_equilibrium
+        procedure :: take_snapshots => PhysicalSystem_take_snapshots
     
     end type PhysicalSystem
     
@@ -218,6 +221,8 @@ contains
                                   this%mix%get_sigma(), this%report_unit)
         call this%init_spheres()
         call this%init_observables()
+        
+        this%snap = snap
     
     end subroutine PhysicalSystem_init
     
@@ -421,5 +426,18 @@ contains
         write(this%obsEquilib_unit, *) iStep, this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
             
     end subroutine PhysicalSystem_write_observables_equilibrium
+    
+    subroutine PhysicalSystem_take_snapshots(this, iStep)
+    
+        class(PhysicalSystem), intent(inout) :: this
+        integer, intent(in) :: iStep
+        
+        if (this%snap) then ! Snap shots of the configuration
+            call this%type1_spheres%snap_positions(iStep, this%type1_units%snap_positions)
+            call this%type1_spheres%snap_orientations(iStep, this%type1_units%snap_orientations)
+            call this%type2_spheres%snap_positions(iStep, this%type2_units%snap_positions)
+        end if
+        
+    end subroutine PhysicalSystem_take_snapshots
 
 end module class_physicalSystem
