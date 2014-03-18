@@ -4,9 +4,7 @@ module module_write
 
 use data_precisions, only: DP, real_zero, io_tiny, consist_tiny
 use data_constants, only: PI, sigma3d
-use data_box, only: Ndim, Lsize, Kmax
-use data_monteCarlo, only: Temperature, Nstep, decorrelFactor, Nthermal
-use data_potential, only: write_potential
+use data_box, only: Ndim
 
 implicit none
 
@@ -48,47 +46,11 @@ contains
         
      end subroutine mix_open_units
     
-    !> Total: write_report
-    
-    subroutine write_report(Ncol, Nmove, Nswitch, Nrotate, reset_iStep, report_unit)
-    
-        integer, intent(in) :: Ncol, Nmove, Nswitch, Nrotate, reset_iStep
-        integer, intent(in) :: report_unit
-
-        write(report_unit, *) "Data: "
-        
-        write(report_unit ,*) "    Precision = ", DP
-        write(report_unit ,*) "    Real zero = ", real_zero
-        write(report_unit ,*) "    I/O tiny = ", io_tiny
-        write(report_unit ,*) "    Energy consistency tiny = ", consist_tiny
-        
-        write(report_unit ,*) "    Pi = ", PI
-        write(report_unit ,*) "    Sigma3d = ", sigma3d
-        
-        write(report_unit ,*) "    Lsize(:) = ", Lsize(:)
-        write(report_unit ,*) "    Volume = ", product(Lsize)
-        write(report_unit ,*) "    Kmax(:) = ", Kmax(:)
-        write(report_unit ,*) "    NwaveVectors =", (2*Kmax(1)+1) * (2*Kmax(2)+1) * (2*Kmax(3)+1)
-        write(report_unit ,*) "    Ncol = ", Ncol
-        write(report_unit ,*) "    Temperature = ", Temperature
-        
-        write(report_unit, *) "    Nstep = ", Nstep
-        write(report_unit, *) "    Nthermal = ", Nthermal
-        write(report_unit, *) "    decorrelFactor = ", decorrelFactor
-        write(report_unit, *) "    Nmove = ", Nmove
-        write(report_unit, *) "    Nswitch = ", Nswitch
-        write(report_unit, *) "    Nrotate = ", Nrotate
-        
-        write(report_unit, *) "    reset_iStep = ", reset_iStep
-        write(report_unit, *) "    write_potential = ", write_potential
-    
-    end subroutine write_report
-    
     !> Total: Results
     
-    subroutine write_results(Ncol, EpotSum, switch_rejectSum, duration, report_unit)
+    subroutine write_results(Ncol, Nstep, EpotSum, switch_rejectSum, duration, report_unit)
     
-        integer, intent(in) :: Ncol
+        integer, intent(in) :: Ncol, Nstep
         real(DP), intent(in) :: EpotSum, switch_rejectSum
         real(DP), intent(in) :: duration
         integer, intent(in) :: report_unit

@@ -5,7 +5,7 @@ module module_physics_micro
 use, intrinsic :: iso_fortran_env, only: error_unit
 use data_precisions, only: DP
 use data_constants, only: PI, sigma3d
-use data_box, only: Ndim, Lsize, Kmax
+use data_box, only: Ndim, Kmax
 !$ use omp_lib
 
 implicit none
@@ -41,8 +41,9 @@ contains
     !> Distance between 2 positions with Periodic Boundary Conditions
     !> from SMAC, algorithm 2.5 & 2.6, p.91
     
-    pure function distVec_PBC(xCol1, xCol2)
+    pure function distVec_PBC(Lsize, xCol1, xCol2)
     
+        real(DP), dimension(:), intent(in) :: Lsize
         real(DP), dimension(:), intent(in) :: xCol1, xCol2
         real(DP), dimension(Ndim) :: distVec_PBC
         
@@ -54,10 +55,11 @@ contains
         
     end function distVec_PBC
     
-    pure function dist_PBC(xCol1, xCol2)
+    pure function dist_PBC(Lsize, xCol1, xCol2)
+        real(DP), dimension(:), intent(in) :: Lsize
         real(DP), dimension(:), intent(in) :: xCol1, xCol2
         real(DP) :: dist_PBC
-        dist_PBC = norm2(distVec_PBC(xCol1, xCol2))
+        dist_PBC = norm2(distVec_PBC(Lsize, xCol1, xCol2))
     end function dist_PBC
     
     !> Rotation

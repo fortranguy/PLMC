@@ -1,7 +1,7 @@
 module module_algorithms
 
 use data_precisions, only: DP
-use data_box, only: Ndim, Lsize
+use data_box, only: Ndim
 use data_monteCarlo, only: Temperature
 use module_physics_micro, only: random_surface, markov_surface
 use class_hardSpheres
@@ -17,8 +17,9 @@ contains
 
     !> Particle move
     
-    subroutine move(this, this_obs, other, mix, mix_Epot)
+    subroutine move(Lsize, this, this_obs, other, mix, mix_Epot)
     
+        real(DP), dimension(:), intent(in) :: Lsize
         class(HardSpheres), intent(inout) :: this
         class(Observables), intent(inout) :: this_obs
         class(HardSpheres), intent(inout) :: other
@@ -52,10 +53,10 @@ contains
         
         if (this%get_Ncol() >= other%get_Ncol()) then
             this_iCellNew = this%sameCells%index_from_position(xNew)
-            call this%Epot_neighCells(iOld, xNew, this_iCellNew, overlap, this_EpotNew)
+            call this%Epot_neighCells(Lsize, iOld, xNew, this_iCellNew, overlap, this_EpotNew)
         else
             mix_iCellNew = other%mixCells%index_from_position(xNew)
-            call mix%Epot_neighCells(0, xNew, mix_iCellNew, this%mixCells, other%positions, overlap, &
+            call mix%Epot_neighCells(Lsize, 0, xNew, mix_iCellNew, this%mixCells, other%positions, overlap, &
                                      mix_EpotNew)
         end if
         
@@ -63,11 +64,11 @@ contains
         
             if (this%get_Ncol() >= other%get_Ncol()) then
                 mix_iCellNew = other%mixCells%index_from_position(xNew)
-                call mix%Epot_neighCells(0, xNew, mix_iCellNew, this%mixCells, other%positions, &
+                call mix%Epot_neighCells(Lsize, 0, xNew, mix_iCellNew, this%mixCells, other%positions, &
                                          overlap, mix_EpotNew)
             else
                 this_iCellNew = this%sameCells%index_from_position(xNew)
-                call this%Epot_neighCells(iOld, xNew, this_iCellNew, overlap, this_EpotNew)
+                call this%Epot_neighCells(Lsize, iOld, xNew, this_iCellNew, overlap, this_EpotNew)
             end if
                         
             if (.not. overlap) then
@@ -76,17 +77,17 @@ contains
                 select type (this)
                     type is (DipolarSpheres)
                         mCol(:) = this%orientations(:, iOld)
-                        this_EpotNew_real = this%Epot_real_solo(iOld, xNew, mCol)
-                        this_EpotOld_real = this%Epot_real_solo(iOld, xOld, mCol)
+                        this_EpotNew_real = this%Epot_real_solo(Lsize, iOld, xNew, mCol)
+                        this_EpotOld_real = this%Epot_real_solo(Lsize, iOld, xOld, mCol)
                         this_deltaEpot = (this_EpotNew_real-this_EpotOld_real) + &
-                                         this%deltaEpot_reci_move(xOld, xNew, mCol)
+                                         this%deltaEpot_reci_move(Lsize, xOld, xNew, mCol)
                     class default
-                        call this%Epot_neighCells(iOld, xOld, this_iCellOld, overlap, this_EpotOld)
+                        call this%Epot_neighCells(Lsize, iOld, xOld, this_iCellOld, overlap, this_EpotOld)
                         this_deltaEpot = this_EpotNew - this_EpotOld
                 end select
                     
                 mix_iCellOld = other%mixCells%index_from_position(xOld)
-                call mix%Epot_neighCells(0, xOld, mix_iCellOld, this%mixCells, other%positions, &
+                call mix%Epot_neighCells(Lsize, 0, xOld, mix_iCellOld, this%mixCells, other%positions, &
                                          overlap, mix_EpotOld)
                 
                 mix_deltaEpot = mix_EpotNew - mix_EpotOld
@@ -98,7 +99,7 @@ contains
                 
                     select type (this)
                         type is (DipolarSpheres)
-                            call this%reci_update_structure_move(xOld, xNew, mCol)
+                            call this%reci_update_structure_move(Lsize, xOld, xNew, mCol)
                     end select
                 
                     this%positions(:, iOld) = xNew(:)
@@ -130,8 +131,9 @@ contains
     
     !> Widom's method
 
-    subroutine widom(this, this_obs, other, mix)
+    subroutine widom(Lsize, this, this_obs, other, mix)
         
+        real(DP), dimension(:), intent(in) :: Lsize
         class(HardSpheres), intent(in) :: this
         class(Observables), intent(inout) :: this_obs
         class(HardSpheres), intent(in) :: other
@@ -156,10 +158,10 @@ contains
 
             if (this%get_Ncol() >= other%get_Ncol()) then
                 this_iCellTest = this%sameCells%index_from_position(xTest)
-                call this%Epot_neighCells(0, xTest, this_iCellTest, overlap, this_EpotTest)
+                call this%Epot_neighCells(Lsize, 0, xTest, this_iCellTest, overlap, this_EpotTest)
             else
                 mix_iCellTest = other%mixCells%index_from_position(xTest)
-                call mix%Epot_neighCells(0, xTest, mix_iCellTest, this%mixCells, other%positions, &
+                call mix%Epot_neighCells(Lsize, 0, xTest, mix_iCellTest, this%mixCells, other%positions, &
                                          overlap, mix_EpotTest)
             end if
             
@@ -167,11 +169,11 @@ contains
             
                 if (this%get_Ncol() >= other%get_Ncol()) then
                     mix_iCellTest = other%mixCells%index_from_position(xTest)
-                    call mix%Epot_neighCells(0, xTest, mix_iCellTest, this%mixCells, other%positions, &
-                                             overlap, mix_EpotTest)
+                    call mix%Epot_neighCells(Lsize, 0, xTest, mix_iCellTest, this%mixCells, other%positions, &
+                                            overlap, mix_EpotTest)
                 else
                     this_iCellTest = this%sameCells%index_from_position(xTest)
-                    call this%Epot_neighCells(0, xTest, this_iCellTest, overlap, this_EpotTest)
+                    call this%Epot_neighCells(Lsize, 0, xTest, this_iCellTest, overlap, this_EpotTest)
                 end if
                 
                 if (.not. overlap) then
@@ -179,10 +181,10 @@ contains
                     select type (this)
                         type is (DipolarSpheres)
                             mTest(:) = random_surface()
-                            this_EpotTest = this%Epot_real_solo(0, xTest, mTest) + &
-                                            this%deltaEpot_reci_exchange(xTest, +mTest) - &
+                            this_EpotTest = this%Epot_real_solo(Lsize, 0, xTest, mTest) + &
+                                            this%deltaEpot_reci_exchange(Lsize, xTest, +mTest) - &
                                             this%Epot_self_solo(mTest) + &
-                                            this%deltaEpot_bound_exchange(+mTest)
+                                            this%deltaEpot_bound_exchange(Lsize, +mTest)
                     end select
                 
                     EpotTest = this_EpotTest + mix_EpotTest
@@ -200,9 +202,10 @@ contains
     
     !> Particle switch
     
-    subroutine before_switch_energy(this, this_iCol, other, other_iCol, mix, indicesOld, xOld, &
+    subroutine before_switch_energy(Lsize, this, this_iCol, other, other_iCol, mix, indicesOld, xOld, &
                                     EpotsOld)
         
+        real(DP), dimension(:), intent(in) :: Lsize
         class(HardSpheres), intent(in) :: this, other
         class(MixingPotential), intent(in) :: mix
         integer, intent(in) :: this_iCol, other_iCol
@@ -218,21 +221,22 @@ contains
         select type (this)
             type is (DipolarSpheres)
                 mCol(:) = this%orientations(:, this_iCol)
-                EpotsOld(1) = this%Epot_real_solo(this_iCol, xOld, mCol) ! Epot_reci:
+                EpotsOld(1) = this%Epot_real_solo(Lsize, this_iCol, xOld, mCol) ! Epot_reci:
                                                                          ! cf. after_switch_energy
             type is (HardSpheres)
                 EpotsOld(1) = 0._DP
         end select
         
         indicesOld(2) = other%mixCells%index_from_position(xOld)
-        call mix%Epot_neighCells(other_iCol, xOld, indicesOld(2), this%mixCells, other%positions, &
+        call mix%Epot_neighCells(Lsize, other_iCol, xOld, indicesOld(2), this%mixCells, other%positions, &
                                  overlap, EpotsOld(2))
         
     end subroutine before_switch_energy
     
-    subroutine after_switch_energy(this, this_iCol, xOld, other, other_iCol, mix, overlap, &
+    subroutine after_switch_energy(Lsize, this, this_iCol, xOld, other, other_iCol, mix, overlap, &
                                    indicesNew, xNew, EpotsNew)
-        
+
+        real(DP), dimension(:), intent(in) :: Lsize
         class(HardSpheres), intent(in) :: this, other
         class(MixingPotential), intent(in) :: mix
         integer, intent(in) :: this_iCol, other_iCol
@@ -247,10 +251,10 @@ contains
         
         if (this%get_Ncol() >= other%get_Ncol()) then ! optimisation: more chance to overlap
             indicesNew(1) = this%sameCells%index_from_position(xNew)
-            call this%Epot_neighCells(this_iCol, xNew, indicesNew(1), overlap, EpotsNew(1))
+            call this%Epot_neighCells(Lsize, this_iCol, xNew, indicesNew(1), overlap, EpotsNew(1))
         else
             indicesNew(2) = other%mixCells%index_from_position(xNew)
-            call mix%Epot_neighCells(other_iCol, xNew, indicesNew(2), this%mixCells, other%positions, &
+            call mix%Epot_neighCells(Lsize, other_iCol, xNew, indicesNew(2), this%mixCells, other%positions, &
                                      overlap, EpotsNew(2))
         end if
         
@@ -258,11 +262,11 @@ contains
         
             if (this%get_Ncol() >= other%get_Ncol()) then
                 indicesNew(2) = other%mixCells%index_from_position(xNew)
-                call mix%Epot_neighCells(other_iCol, xNew, indicesNew(2), this%mixCells, &
+                call mix%Epot_neighCells(Lsize, other_iCol, xNew, indicesNew(2), this%mixCells, &
                                          other%positions, overlap, EpotsNew(2))
             else
                 indicesNew(1) = this%sameCells%index_from_position(xNew)
-                call this%Epot_neighCells(this_iCol, xNew, indicesNew(1), overlap, EpotsNew(1))
+                call this%Epot_neighCells(Lsize, this_iCol, xNew, indicesNew(1), overlap, EpotsNew(1))
             end if
             
             if (.not. overlap) then
@@ -270,8 +274,8 @@ contains
                 select type (this)
                     type is (DipolarSpheres)
                         mCol(:) = this%orientations(:, this_iCol)
-                        EpotsNew(1) = this%Epot_real_solo(this_iCol, xNew, mCol) + &
-                                      this%deltaEpot_reci_move(xOld, xNew, mCol)
+                        EpotsNew(1) = this%Epot_real_solo(Lsize, this_iCol, xNew, mCol) + &
+                                      this%deltaEpot_reci_move(Lsize, xOld, xNew, mCol)
                 end select
             
             end if
@@ -280,8 +284,9 @@ contains
     
     end subroutine after_switch_energy
     
-    subroutine after_switch_update(this, iCol, indicesOld, indicesNew, xOld, xNew, other)
-        
+    subroutine after_switch_update(Lsize, this, iCol, indicesOld, indicesNew, xOld, xNew, other)
+
+        real(DP), dimension(:), intent(in) :: Lsize
         class(HardSpheres), intent(inout) :: this, other
         integer, intent(in) :: iCol
         integer, dimension(:), intent(in) :: indicesOld, indicesNew
@@ -294,7 +299,7 @@ contains
         select type (this)
             type is (DipolarSpheres)
                 mCol(:) = this%orientations(:, iCol)
-                call this%reci_update_structure_move(xOld, xNew, mCol)
+                call this%reci_update_structure_move(Lsize, xOld, xNew, mCol)
         end select
         
         if (indicesOld(1) /= indicesNew(1)) then
@@ -308,8 +313,9 @@ contains
         
     end subroutine after_switch_update
     
-    subroutine switch(type1, type1_obs, type2, type2_obs, mix, mix_Epot, switch_Nreject)
+    subroutine switch(Lsize, type1, type1_obs, type2, type2_obs, mix, mix_Epot, switch_Nreject)
     
+        real(DP), dimension(:), intent(in) :: Lsize
         class(HardSpheres), intent(inout) :: type1, type2
         class(Observables), intent(inout) :: type1_obs, type2_obs
         class(MixingPotential), intent(in) :: mix
@@ -336,21 +342,21 @@ contains
         ! Old: before switch
         call random_number(random)
         type1_iCol = int(random*type1%get_Ncol()) + 1
-        call before_switch_energy(type1, type1_iCol, type2, type2_iCol, mix, type1_indicesOld, &
+        call before_switch_energy(Lsize, type1, type1_iCol, type2, type2_iCol, mix, type1_indicesOld, &
                                   type1_xOld, type1_EpotsOld)
         
         call random_number(random)
         type2_iCol = int(random*type2%get_Ncol()) + 1
-        call before_switch_energy(type2, type2_iCol, type1, type1_iCol, mix, type2_indicesOld, &
+        call before_switch_energy(Lsize, type2, type2_iCol, type1, type1_iCol, mix, type2_indicesOld, &
                                   type2_xOld, type2_EpotsOld)
         
         ! New: after switch
-        call after_switch_energy(type1, type1_iCol, type1_xOld, type2, type2_iCol, mix, overlap, &
+        call after_switch_energy(Lsize, type1, type1_iCol, type1_xOld, type2, type2_iCol, mix, overlap, &
                                  type1_indicesNew, type1_xNew, type1_EpotsNew)
         
         if (.not. overlap) then
         
-            call after_switch_energy(type2, type2_iCol, type2_xOld, type1, type1_iCol, mix, overlap, &
+            call after_switch_energy(Lsize, type2, type2_iCol, type2_xOld, type1, type1_iCol, mix, overlap, &
                                      type2_indicesNew, type2_xNew, type2_EpotsNew)
             
             if (.not. overlap) then
@@ -365,9 +371,9 @@ contains
                 call random_number(random)
                 if (random < exp(-deltaEpot/Temperature)) then
                 
-                    call after_switch_update(type1, type1_iCol, type1_indicesOld, type1_indicesNew, &
+                    call after_switch_update(Lsize, type1, type1_iCol, type1_indicesOld, type1_indicesNew, &
                                              type1_xOld, type1_xNew, type2)
-                    call after_switch_update(type2, type2_iCol, type2_indicesOld, type2_indicesNew, &
+                    call after_switch_update(Lsize, type2, type2_iCol, type2_indicesOld, type2_indicesNew, &
                                              type2_xOld, type2_xNew, type1)
                                              
                     type1_obs%Epot = type1_obs%Epot + type1_deltaEpot
@@ -390,8 +396,9 @@ contains
     
     !> Dipole rotation
     
-    subroutine rotate(this, obs)
+    subroutine rotate(Lsize, this, obs)
     
+        real(DP), dimension(:), intent(in) :: Lsize
         class(DipolarSpheres), intent(inout) :: this
         class(MoreObservables), intent(inout) :: obs
         
@@ -413,19 +420,19 @@ contains
         mNew(:) = mOld(:)
         call markov_surface(mNew, this%rotate_delta)
         
-        real_EpotNew = this%Epot_real_solo(iOld, xCol, mNew)
-        real_EpotOld = this%Epot_real_solo(iOld, xCol, mOld)
+        real_EpotNew = this%Epot_real_solo(Lsize, iOld, xCol, mNew)
+        real_EpotOld = this%Epot_real_solo(Lsize, iOld, xCol, mOld)
         deltaEpot_real = real_EpotNew - real_EpotOld
         
         deltaEpot_self = this%Epot_self_solo(mNew) - this%Epot_self_solo(mOld)
         
-        deltaEpot = deltaEpot_real + this%deltaEpot_reci_rotate(xCol, mOld, mNew) - deltaEpot_self + &
-                    this%deltaEpot_bound_rotate(mOld, mNew)
+        deltaEpot = deltaEpot_real + this%deltaEpot_reci_rotate(Lsize, xCol, mOld, mNew) - deltaEpot_self + &
+                    this%deltaEpot_bound_rotate(Lsize, mOld, mNew)
         
         call random_number(random)
         if (random < exp(-deltaEpot/Temperature)) then
         
-            call this%reci_update_structure_rotate(xCol, mOld, mNew)
+            call this%reci_update_structure_rotate(Lsize, xCol, mOld, mNew)
             call this%update_totalMoment_rotate(mOld, mNew)
             this%orientations(:, iOld) = mNew(:)
             

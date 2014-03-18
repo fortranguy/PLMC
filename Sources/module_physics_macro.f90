@@ -4,9 +4,7 @@ module module_physics_macro
 
 use, intrinsic :: iso_fortran_env, only: output_unit, error_unit, iostat_end
 use data_precisions, only: DP, real_zero, io_tiny, consist_tiny
-use data_box, only: Ndim, Lsize
-use data_monteCarlo, only: Nadapt
-use data_potential, only: write_potential
+use data_box, only: Ndim
 use module_types, only: argument_random, argument_initial
 use module_physics_micro, only: dist_PBC, random_surface
 use class_hardSpheres
@@ -68,8 +66,9 @@ contains
 
     !> Random depositions configuration
     
-    subroutine randomDepositions(type1, type2, mix_sigma)
+    subroutine randomDepositions(Lsize, type1, type2, mix_sigma)
 
+        real(DP), dimension(:), intent(in) :: Lsize
         class(HardSpheres), intent(inout) :: type1, type2
         real(DP), intent(in) :: mix_sigma
 
@@ -85,7 +84,7 @@ contains
             type1%positions(:, iCol) = xRand*Lsize(:)
             
             do iColTest = 1, iCol-1
-                rTest = dist_PBC(type1%positions(:, iColTest), type1%positions(:, iCol))
+                rTest = dist_PBC(Lsize, type1%positions(:, iColTest), type1%positions(:, iCol))
                 if (rTest < type1%get_sigma()) then
                     goto 7101
                 end if
@@ -101,14 +100,14 @@ contains
             type2%positions(:, iCol) = xRand*Lsize(:)
             
             do iColTest = 1, type1%get_Ncol()
-                rTest = dist_PBC(type1%positions(:, iColTest), type2%positions(:, iCol))
+                rTest = dist_PBC(Lsize, type1%positions(:, iColTest), type2%positions(:, iCol))
                 if (rTest < mix_sigma) then
                     goto 7102
                 end if
             end do
             
             do iColTest = 1, iCol-1
-                rTest = dist_PBC(type2%positions(:, iColTest), type2%positions(:, iCol))
+                rTest = dist_PBC(Lsize, type2%positions(:, iColTest), type2%positions(:, iCol))
                 if (rTest < type2%get_sigma()) then
                     goto 7102
                 end if
@@ -182,8 +181,9 @@ contains
     
     !> Initial configuration
     
-    subroutine set_initialConfiguration(arg_init, dipolar, spherical, mix_sigma, report_unit)
-
+    subroutine set_initialConfiguration(Lsize, arg_init, dipolar, spherical, mix_sigma, report_unit)
+        
+        real(DP), dimension(:), intent(in) :: Lsize
         type(argument_initial), intent(in) :: arg_init
         class(DipolarSpheres), intent(inout) :: dipolar
         class(HardSpheres), intent(inout) :: spherical
@@ -195,7 +195,7 @@ contains
         select case (arg_init%choice)
         
             case ('r')
-                call randomDepositions(dipolar, spherical, mix_sigma)
+                call randomDepositions(Lsize, dipolar, spherical, mix_sigma)
                 call randomOrientations(dipolar%orientations, dipolar%get_Ncol())
                 write(output_unit, *) "Random depositions + random orientations"
                 write(report_unit, *) "    Random depositions + random orientations"
@@ -321,11 +321,11 @@ contains
     
     !> Change: average & adaptation
     
-    subroutine adapt_move(Lsize, this, iStep, obs, move_unit)
+    subroutine adapt_move(Lsize, this, Nadapt, iStep, obs, move_unit)
     
         real(DP), dimension(:), intent(in) :: Lsize
         class(HardSpheres), intent(inout) :: this
-        integer, intent(in) :: iStep
+        integer, intent(in) :: Nadapt, iStep
         class(Observables), intent(inout) :: obs
         integer, intent(in) :: move_unit
     
@@ -336,10 +336,10 @@ contains
     
     end subroutine adapt_move
     
-    subroutine adapt_rotate(this, iStep, obs, rotate_unit)
+    subroutine adapt_rotate(this, Nadapt, iStep, obs, rotate_unit)
     
         class(DipolarSpheres), intent(inout) :: this
-        integer, intent(in) :: iStep
+        integer, intent(in) :: Nadapt, iStep
         class(MoreObservables), intent(inout) :: obs
         integer, intent(in) :: rotate_unit
         

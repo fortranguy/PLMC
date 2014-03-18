@@ -38,7 +38,7 @@ private
         ! Monte-Carlo
         real(DP) :: Temperature
         integer :: Nthermal, Nadapt, Nstep !< Markov-chain Monte-Carlo
-        integer :: Nchange, Nmove, Nswitch, Nrotate !< changes
+        integer :: decorrelFactor, Nchange, Nmove, Nswitch, Nrotate !< changes
         
         ! Type 1: Dipolar spheres
         type(DipolarSpheres) :: type1_spheres !< physical properties and Monte-Carlo subroutines
@@ -84,6 +84,7 @@ private
         procedure, private :: init_switch => PhysicalSystem_init_switch
         procedure, private :: init_spheres => PhysicalSystem_init_spheres
         procedure, private :: init_observables => PhysicalSystem_init_observables
+        procedure :: write_report => PhysicalSystem_write_report
         procedure :: init => PhysicalSystem_init
         procedure, private :: final_spheres => PhysicalSystem_final_spheres
         procedure, private :: write_results => PhysicalSystem_write_results
@@ -131,9 +132,10 @@ contains
     pure subroutine PhysicalSystem_set_changes(this)
         class(PhysicalSystem), intent(inout) :: this
         this%Ncol = this%type1_spheres%get_Ncol() + this%type2_spheres%get_Ncol()
-        this%Nmove = decorrelFactor * this%Ncol
-        this%Nswitch = switch_factor * decorrelFactor * this%type1_spheres%get_Ncol()
-        this%Nrotate = decorrelFactor * this%type1_spheres%get_Ncol()
+        this%decorrelFactor = decorrelFactor
+        this%Nmove = this%decorrelFactor * this%Ncol
+        this%Nswitch = switch_factor * this%decorrelFactor * this%type1_spheres%get_Ncol()
+        this%Nrotate = this%decorrelFactor * this%type1_spheres%get_Ncol()
         this%Nchange = this%Nmove + this%Nswitch + this%Nrotate
     end subroutine PhysicalSystem_set_changes
 
@@ -162,8 +164,7 @@ contains
         class(PhysicalSystem), intent(inout) :: this
         
         call open_units(this%report_unit, this%obsThermal_unit, this%obsEquilib_unit)
-        call write_report(this%Ncol, this%Nmove, this%Nswitch, this%Nrotate, this%reset_iStep, &
-                          this%report_unit)
+        call this%write_report(this%report_unit)
         
         call this%type1_units%open(this%type1_spheres%get_name())
         call this%type1_spheres%write_density(this%Lsize, this%Ncol, this%type1_units%report)
@@ -236,6 +237,41 @@ contains
         call this%init_observables()
     
     end subroutine PhysicalSystem_init
+    
+    subroutine PhysicalSystem_write_report(this, report_unit)
+    
+        class(PhysicalSystem), intent(in) :: this
+        integer, intent(in) :: report_unit
+
+        write(report_unit, *) "Data: "
+        
+        write(report_unit ,*) "    Precision = ", DP
+        write(report_unit ,*) "    Real zero = ", real_zero
+        write(report_unit ,*) "    I/O tiny = ", io_tiny
+        write(report_unit ,*) "    Energy consistency tiny = ", consist_tiny
+        
+        write(report_unit ,*) "    Pi = ", PI
+        write(report_unit ,*) "    Sigma3d = ", sigma3d
+        
+        write(report_unit ,*) "    Lsize(:) = ", this%Lsize(:)
+        write(report_unit ,*) "    Volume = ", product(this%Lsize)
+        write(report_unit ,*) "    Kmax(:) = ", this%Kmax(:)
+        write(report_unit ,*) "    NwaveVectors =", (2*this%Kmax(1)+1) * (2*this%Kmax(2)+1) * &
+                                                    (2*this%Kmax(3)+1)
+        write(report_unit ,*) "    Ncol = ", this%Ncol
+        write(report_unit ,*) "    Temperature = ", this%Temperature
+        
+        write(report_unit, *) "    Nstep = ", this%Nstep
+        write(report_unit, *) "    Nthermal = ", this%Nthermal
+        write(report_unit, *) "    decorrelFactor = ", this%decorrelFactor
+        write(report_unit, *) "    Nmove = ", this%Nmove
+        write(report_unit, *) "    Nswitch = ", this%Nswitch
+        write(report_unit, *) "    Nrotate = ", this%Nrotate
+        
+        write(report_unit, *) "    reset_iStep = ", this%reset_iStep
+        write(report_unit, *) "    write_potential = ", this%write_potential
+    
+    end subroutine PhysicalSystem_write_report    
     
     ! Finalisation
     

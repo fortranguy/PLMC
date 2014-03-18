@@ -4,7 +4,7 @@ module class_neighbourCells
 
 use, intrinsic :: iso_fortran_env, only: error_unit
 use data_precisions, only: DP, real_zero
-use data_box, only: Ndim, Lsize
+use data_box, only: Ndim
 use data_neighbourCells, only: NnearCell_dim, NnearCell
 use module_types, only: Node, LinkedList
 use module_physics_micro, only: index_from_coord, coord_PBC
@@ -48,9 +48,10 @@ private
     
 contains
 
-    subroutine NeighbourCells_construct(this, proposed_cell_size, rCut)
+    subroutine NeighbourCells_construct(this, Lsize, proposed_cell_size, rCut)
     
         class(NeighbourCells), intent(out) :: this
+        real(DP), dimension(:), intent(in) :: Lsize
         real(DP), dimension(:), intent(in) :: proposed_cell_size
         real(DP), intent(in) :: rCut
         
@@ -60,7 +61,7 @@ contains
         
         allocate(this%near_among_total(NnearCell, this%NtotalCell))
             
-        call this%check_CellsSize(rCut)
+        call this%check_CellsSize(Lsize, rCut)
         call this%alloc_cells()
         call this%init_near_among_total()
     
@@ -166,9 +167,10 @@ contains
     
     ! NeighbourCells cells size check
     
-    subroutine NeighbourCells_check_cellsSize(this, rCut)
+    subroutine NeighbourCells_check_cellsSize(this, Lsize, rCut)
     
         class(NeighbourCells), intent(in) :: this
+        real(DP), dimension(:), intent(in) :: Lsize
         real(DP), intent(in) :: rCut
         
         integer :: jDim
