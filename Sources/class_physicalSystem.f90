@@ -166,10 +166,10 @@ contains
                           this%report_unit)
         
         call this%type1_units%open(this%type1_spheres%get_name())
-        call this%type1_spheres%write_density(this%Ncol, this%type1_units%report)
+        call this%type1_spheres%write_density(this%Lsize, this%Ncol, this%type1_units%report)
         
         call this%type2_units%open(this%type2_spheres%get_name())
-        call this%type2_spheres%write_density(this%Ncol, this%type2_units%report)
+        call this%type2_spheres%write_density(this%Lsize, this%Ncol, this%type2_units%report)
         
         call mix_open_units(this%mix_report_unit, this%mix_Epot_tab_unit, this%mix_obsThermal_unit, &
                             this%mix_obsEquilib_unit)
@@ -400,9 +400,11 @@ contains
             this%type2_obs%move_rejectAdapt = this%type2_obs%move_rejectAdapt + &
                                               this%type2_obs%move_reject
         else ! Average & adaptation
-            call adapt_move(this%type1_spheres, iStep, this%type1_obs, this%type1_units%move_delta)
+            call adapt_move(this%Lsize, this%type1_spheres, iStep, this%type1_obs, &
+                            this%type1_units%move_delta)
             call adapt_rotate(this%type1_spheres, iStep, this%type1_obs, this%type1_units%rotate_delta)
-            call adapt_move(this%type2_spheres, iStep, this%type2_obs, this%type2_units%move_delta)
+            call adapt_move(this%Lsize, this%type2_spheres, iStep, this%type2_obs, &
+                            this%type2_units%move_delta)
         end if
         
     end subroutine PhysicalSystem_adapt_changes
@@ -424,10 +426,12 @@ contains
     
         class(PhysicalSystem), intent(inout) :: this
         
-        call this%type1_spheres%set_move_delta(this%type1_obs%move_rejectAvg, this%type1_units%report)
+        call this%type1_spheres%set_move_delta(this%Lsize, this%type1_obs%move_rejectAvg, &
+                                               this%type1_units%report)
         call this%type1_spheres%set_rotate_delta(this%type1_obs%rotate_rejectAvg, &
                                                  this%type1_units%report)
-        call this%type2_spheres%set_move_delta(this%type2_obs%move_rejectAvg, this%type2_units%report)
+        call this%type2_spheres%set_move_delta(this%Lsize, this%type2_obs%move_rejectAvg, &
+                                               this%type2_units%report)
     
     end subroutine PhysicalSystem_fix_changes
     

@@ -222,15 +222,16 @@ contains
     
     !> Spheres initialisations
     
-    subroutine init(this, other, mix, this_units, this_Epot)
+    subroutine init(Lsize, this, other, mix, this_units, this_Epot)
     
+        real(DP), dimension(:), intent(in) :: Lsize    
         class(HardSpheres), intent(inout) :: this
         class(HardSpheres), intent(in) :: other
         class(MixingPotential), intent(in) :: mix
         class(Units), intent(in) :: this_units
         real(DP), intent(inout) :: this_Epot
         
-        call this%test_overlap()
+        call this%test_overlap(Lsize)
         call this%snap_data(this_units%snap_positions)
         call this%snap_positions(0, this_units%snapIni_positions)
         call this%set_Epot()
@@ -250,7 +251,7 @@ contains
                         call this%Epot_reci_count_waveVectors(this_units%waveVectors)
                 end select
         end select
-        this_Epot = this%Epot_conf()
+        this_Epot = this%Epot_conf(Lsize)
         
         call this%construct_cells(other, mix%get_cell_size(), mix%get_rCut())
         call this%write_report(this_units%report)
@@ -259,15 +260,16 @@ contains
     
     !> Spheres finalizations
     
-    subroutine final(this, this_units, this_obs)
+    subroutine final(Lsize, this, this_units, this_obs)
     
+        real(DP), dimension(:), intent(in) :: Lsize    
         class(HardSpheres), intent(inout) :: this
         class(Units), intent(in) :: this_units
         class(Observables), intent(in) :: this_obs
         
-        call this%test_overlap()
-        call this%set_Epot()
-        call test_consist(this_obs%Epot, this%Epot_conf(), this_units%report)
+        call this%test_overlap(Lsize)
+        call this%set_Epot(Lsize)
+        call test_consist(this_obs%Epot, this%Epot_conf(Lsize), this_units%report)
         call this%snap_positions(0, this_units%snapFin_positions)
         call this_obs%write_results(this_units%report)
         
@@ -319,8 +321,9 @@ contains
     
     !> Change: average & adaptation
     
-    subroutine adapt_move(this, iStep, obs, move_unit)
+    subroutine adapt_move(Lsize, this, iStep, obs, move_unit)
     
+        real(DP), dimension(:), intent(in) :: Lsize
         class(HardSpheres), intent(inout) :: this
         integer, intent(in) :: iStep
         class(Observables), intent(inout) :: obs
@@ -328,7 +331,7 @@ contains
     
         obs%move_rejectAvg = obs%move_rejectAdapt / real(Nadapt-1, DP)
         obs%move_rejectAdapt = 0._DP
-        call this%adapt_move_delta(obs%move_rejectAvg)
+        call this%adapt_move_delta(Lsize, obs%move_rejectAvg)
         write(move_unit, *) iStep, this%get_move_delta(), obs%move_rejectAvg
     
     end subroutine adapt_move
