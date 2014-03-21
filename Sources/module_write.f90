@@ -9,7 +9,7 @@ use data_box, only: Ndim
 implicit none
 
 private
-public open_units, mix_open_units, write_report, write_results, mix_write_results
+public open_units, mix_open_units, write_results, mix_write_results
 
 contains
 
@@ -66,8 +66,9 @@ contains
     
     !> Mix: Results
     
-    subroutine mix_write_results(EpotSum, report_unit)
+    subroutine mix_write_results(Nstep, EpotSum, report_unit)
     
+        integer, intent(in) :: Nstep
         real(DP), intent(in) :: EpotSum
         integer, intent(in) :: report_unit
     

@@ -222,19 +222,20 @@ contains
     
     !> Spheres initialisations
     
-    subroutine init(Lsize, this, other, mix, this_units, this_Epot)
+    subroutine init(Lsize, this, other, mix, write_potential, this_units, this_Epot)
     
         real(DP), dimension(:), intent(in) :: Lsize    
         class(HardSpheres), intent(inout) :: this
         class(HardSpheres), intent(in) :: other
         class(MixingPotential), intent(in) :: mix
+        logical, intent(in) :: write_potential
         class(Units), intent(in) :: this_units
         real(DP), intent(inout) :: this_Epot
         
         call this%test_overlap(Lsize)
         call this%snap_data(this_units%snap_positions)
         call this%snap_positions(0, this_units%snapIni_positions)
-        call this%set_Epot()
+        call this%set_Epot(Lsize)
         
         if (write_potential) then
             call this%write_Epot(this_units%Epot)
@@ -253,7 +254,7 @@ contains
         end select
         this_Epot = this%Epot_conf(Lsize)
         
-        call this%construct_cells(other, mix%get_cell_size(), mix%get_rCut())
+        call this%construct_cells(Lsize, other, mix%get_cell_size(), mix%get_rCut())
         call this%write_report(this_units%report)
     
     end subroutine init
@@ -285,36 +286,39 @@ contains
     
     !> Mix initialisation
     
-    subroutine mix_init(mix, type1, type2, mix_Epot_unit, mix_Epot)
+    subroutine mix_init(Lsize, mix, type1, type2, write_potential, mix_Epot_unit, mix_Epot)
     
+        real(DP), dimension(:), intent(in) :: Lsize
         class(MixingPotential), intent(inout) :: mix
         class(HardSpheres), intent(in) :: type1, type2
+        logical, intent(in) :: write_potential
         integer, intent(in) :: mix_Epot_unit
         real(DP), intent(out) :: mix_Epot
     
-        call mix%test_overlap(type1, type2)
+        call mix%test_overlap(Lsize, type1, type2)
         call mix%set_Epot()
         if (write_potential) then
             call mix%write_Epot(mix_Epot_unit)
         end if
         call mix%set_cell_size()
-        mix_Epot = mix%Epot_conf(type1, type2)
+        mix_Epot = mix%Epot_conf(Lsize, type1, type2)
     
     end subroutine mix_init
     
     !> Mix finalization
     
-    subroutine mix_final(mix, type1, type2, mix_report_unit, mix_Epot, mix_Epot_conf)
+    subroutine mix_final(Lsize, mix, type1, type2, mix_report_unit, mix_Epot, mix_Epot_conf)
     
+        real(DP), dimension(:), intent(in) :: Lsize
         class(MixingPotential), intent(inout) :: mix
         class(HardSpheres), intent(in) :: type1, type2
         integer, intent(in) :: mix_report_unit
         real(DP), intent(in) :: mix_Epot
         real(DP), intent(out) :: mix_Epot_conf
         
-        call mix%test_overlap(type1, type2)
+        call mix%test_overlap(Lsize, type1, type2)
         call mix%set_Epot()
-        mix_Epot_conf = mix%Epot_conf(type1, type2)
+        mix_Epot_conf = mix%Epot_conf(Lsize, type1, type2)
         call test_consist(mix_Epot, mix_Epot_conf, mix_report_unit)
     
     end subroutine mix_final

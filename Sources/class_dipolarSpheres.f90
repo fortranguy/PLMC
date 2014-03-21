@@ -134,10 +134,9 @@ contains
         this%rotate_rejectFix = dipol_rotate_rejectFix
     end subroutine DipolarSpheres_set_changes
 
-    subroutine DipolarSpheres_construct(this, Lsize)
+    subroutine DipolarSpheres_construct(this)
     
         class(DipolarSpheres), intent(out) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
         
         this%name = "dipol"
         write(output_unit, *) this%name, " class construction"

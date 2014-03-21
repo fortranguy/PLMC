@@ -101,13 +101,9 @@ contains
         this%move_rejectFix = hard_move_rejectFix
     end subroutine HardSpheres_set_changes
 
-    subroutine HardSpheres_construct(this, Lsize)
+    subroutine HardSpheres_construct(this)
     
         class(HardSpheres), intent(out) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
-
-        real(DP), dimension(Ndim) :: Lsize_dummy
-        Lsize_dummy = Lsize
         
         this%name = "hardS"
         write(output_unit, *) this%name, " class construction"

@@ -7,6 +7,7 @@ use data_precisions, only: DP
 use data_box, only: Ndim, Lsize, Kmax
 use data_monteCarlo, only: Temperature, decorrelFactor, switch_factor, Nthermal, Nadapt, Nstep, &
                            reset_iStep
+use data_potential, only: write_potential                       
 use data_distribution, only: snap
 use module_types, only: monteCarlo_arguments
 use class_hardSpheres
@@ -18,7 +19,7 @@ use module_monteCarlo_arguments, only: read_arguments
 use module_physics_macro, only: init_randomSeed, set_initialConfiguration, init, final, mix_init, &
                                 mix_final, adapt_move, adapt_rotate, test_consist
 use module_algorithms, only: move, widom, switch, rotate
-use module_write, only: open_units, mix_open_units, write_report, write_results, mix_write_results
+use module_write, only: open_units, mix_open_units, write_results, mix_write_results
 
 implicit none
 
@@ -66,7 +67,7 @@ private
         integer :: switch_Nhit, switch_Nreject
         real(DP) :: switch_reject, switch_rejectSum
         
-        logical :: snap
+        logical :: write_potential, snap
         integer :: reset_iStep
         real(DP) :: time_start, time_end
     
@@ -148,6 +149,7 @@ contains
         
         call this%set_box()
         call this%set_monteCarlo()
+        this%write_potential = write_potential
         
         call this%type1_spheres%construct()
         call this%type2_spheres%construct()
@@ -190,13 +192,13 @@ contains
     
         class(PhysicalSystem), intent(inout) :: this
     
-        call mix_init(this%mix, this%type1_spheres, this%type2_spheres, this%mix_Epot_tab_unit, &
-                      this%mix_Epot)
+        call mix_init(this%Lsize, this%mix, this%type1_spheres, this%type2_spheres, &
+                      this%write_potential, this%mix_Epot_tab_unit, this%mix_Epot)
         call this%mix%write_report(this%mix_report_unit)
-        call init(this%type1_spheres, this%type2_spheres, this%mix, this%type1_units, &
-                  this%type1_obs%Epot)
-        call init(this%type2_spheres, this%type1_spheres, this%mix, this%type2_units, &
-                  this%type2_obs%Epot)
+        call init(this%Lsize, this%type1_spheres, this%type2_spheres, this%mix, this%write_potential, &
+                  this%type1_units, this%type1_obs%Epot)
+        call init(this%Lsize, this%type2_spheres, this%type1_spheres, this%mix, this%write_potential, &
+                  this%type2_units, this%type2_obs%Epot)
         
     end subroutine PhysicalSystem_init_spheres
     
@@ -279,11 +281,11 @@ contains
     
         class(PhysicalSystem), intent(inout) :: this
         
-        call final(this%type1_spheres, this%type1_units, this%type1_obs)
-        call final(this%type2_spheres, this%type2_units, this%type2_obs)
-        call mix_final(this%mix, this%type1_spheres, this%type2_spheres, this%mix_report_unit, &
-                       this%mix_Epot, this%mix_Epot_conf)
-        call mix_write_results(this%mix_EpotSum, this%mix_report_unit)
+        call final(this%Lsize, this%type1_spheres, this%type1_units, this%type1_obs)
+        call final(this%Lsize, this%type2_spheres, this%type2_units, this%type2_obs)
+        call mix_final(this%Lsize, this%mix, this%type1_spheres, this%type2_spheres, &
+                       this%mix_report_unit, this%mix_Epot, this%mix_Epot_conf)
+        call mix_write_results(this%Nstep, this%mix_EpotSum, this%mix_report_unit)
         
     end subroutine PhysicalSystem_final_spheres
     
