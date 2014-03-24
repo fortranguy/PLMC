@@ -110,7 +110,7 @@ implicit none
         do iCol = 1, Ncol
             do jCol = iCol + 1, Ncol
 
-                r_ij = dist_PBC(positions(:, iCol), positions(:, jCol))
+                r_ij = dist_PBC(Lsize, positions(:, iCol), positions(:, jCol))
                 iDist =  int(r_ij/dist_dr)
                 dist_sum(iDist) = dist_sum(iDist) + 1
 

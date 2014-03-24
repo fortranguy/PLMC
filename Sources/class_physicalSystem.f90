@@ -19,7 +19,7 @@ use module_monteCarlo_arguments, only: read_arguments
 use module_physics_macro, only: init_randomSeed, set_initialConfiguration, init, final, mix_init, &
                                 mix_final, adapt_move, adapt_rotate, test_consist
 use module_algorithms, only: move, widom, switch, rotate
-use module_write, only: open_units, mix_open_units, write_results, mix_write_results
+use module_write, only: open_units, write_data, mix_open_units, write_results, mix_write_results
 
 implicit none
 
@@ -166,6 +166,7 @@ contains
         class(PhysicalSystem), intent(inout) :: this
         
         call open_units(this%report_unit, this%obsThermal_unit, this%obsEquilib_unit)
+        call write_data(this%report_unit)
         call this%write_report(this%report_unit)
         
         call this%type1_units%open(this%type1_spheres%get_name())
@@ -233,8 +234,8 @@ contains
         call this%init_switch()
         
         call init_randomSeed(args%random, this%report_unit)
-        call set_initialConfiguration(args%initial, this%type1_spheres, this%type2_spheres, &
-                                      this%mix%get_sigma(), this%report_unit)
+        call set_initialConfiguration(this%Lsize, args%initial, this%type1_spheres, &
+                                      this%type2_spheres, this%mix%get_sigma(), this%report_unit)
         call this%init_spheres()
         call this%init_observables()
     
@@ -245,15 +246,7 @@ contains
         class(PhysicalSystem), intent(in) :: this
         integer, intent(in) :: report_unit
 
-        write(report_unit, *) "Data: "
-        
-        write(report_unit ,*) "    Precision = ", DP
-        write(report_unit ,*) "    Real zero = ", real_zero
-        write(report_unit ,*) "    I/O tiny = ", io_tiny
-        write(report_unit ,*) "    Energy consistency tiny = ", consist_tiny
-        
-        write(report_unit ,*) "    Pi = ", PI
-        write(report_unit ,*) "    Sigma3d = ", sigma3d
+        write(report_unit, *) "Data macro: "
         
         write(report_unit ,*) "    Lsize(:) = ", this%Lsize(:)
         write(report_unit ,*) "    Volume = ", product(this%Lsize)
@@ -297,12 +290,13 @@ contains
         real(DP) :: duration
         
         Epot = this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
-        Epot_conf = this%type1_spheres%Epot_conf() + this%type2_spheres%Epot_conf() + &
-                    this%mix_Epot_conf
+        Epot_conf = this%type1_spheres%Epot_conf(this%Lsize) + &
+                    this%type2_spheres%Epot_conf(this%Lsize) + this%mix_Epot_conf
         call test_consist(Epot, Epot_conf, this%report_unit)
         this%EpotSum = this%type1_obs%EpotSum + this%type2_obs%EpotSum + this%mix_EpotSum
         duration = this%time_end - this%time_start
-        call write_results(this%Ncol, this%EpotSum, this%switch_rejectSum, duration, this%report_unit)
+        call write_results(this%Ncol, this%Nstep, this%EpotSum, this%switch_rejectSum, duration,&
+                           this%report_unit)
     
     end subroutine PhysicalSystem_write_results
     
@@ -394,18 +388,18 @@ contains
                 call random_number(rand)
                 iColRand = int(rand*real(this%Ncol, DP)) + 1
                 if (iColRand <= this%type1_spheres%get_Ncol()) then
-                    call move(this%type1_spheres, this%type1_obs, this%type2_spheres, this%mix, &
-                              this%mix_Epot)
+                    call move(this%Lsize, this%type1_spheres, this%type1_obs, this%type2_spheres, &
+                              this%mix, this%mix_Epot)
                 else
-                    call move(this%type2_spheres, this%type2_obs, this%type1_spheres, this%mix, &
-                              this%mix_Epot)
+                    call move(this%Lsize, this%type2_spheres, this%type2_obs, this%type1_spheres, &
+                              this%mix, this%mix_Epot)
                 end if
             else if (iChangeRand <= this%Nmove + this%Nswitch) then
-                call switch(this%type1_spheres, this%type1_obs, this%type2_spheres, this%type2_obs, &
-                            this%mix, this%mix_Epot, this%switch_Nreject)
+                call switch(this%Lsize, this%type1_spheres, this%type1_obs, this%type2_spheres, &
+                            this%type2_obs, this%mix, this%mix_Epot, this%switch_Nreject)
                 this%switch_Nhit = this%switch_Nhit + 1
             else
-                call rotate(this%type1_spheres, this%type1_obs)
+                call rotate(this%Lsize, this%type1_spheres, this%type1_obs)
             end if
             
         end do MC_Change
@@ -438,10 +432,11 @@ contains
             this%type2_obs%move_rejectAdapt = this%type2_obs%move_rejectAdapt + &
                                               this%type2_obs%move_reject
         else ! Average & adaptation
-            call adapt_move(this%Lsize, this%type1_spheres, iStep, this%type1_obs, &
+            call adapt_move(this%Lsize, this%type1_spheres, this%Nadapt, iStep, this%type1_obs, &
                             this%type1_units%move_delta)
-            call adapt_rotate(this%type1_spheres, iStep, this%type1_obs, this%type1_units%rotate_delta)
-            call adapt_move(this%Lsize, this%type2_spheres, iStep, this%type2_obs, &
+            call adapt_rotate(this%type1_spheres, this%Nadapt, iStep, this%type1_obs, &
+                              this%type1_units%rotate_delta)
+            call adapt_move(this%Lsize, this%type2_spheres, this%Nadapt, iStep, this%type2_obs, &
                             this%type2_units%move_delta)
         end if
         
@@ -477,8 +472,8 @@ contains
     
         class(PhysicalSystem), intent(inout) :: this
     
-        call widom(this%type1_spheres, this%type1_obs, this%type2_spheres, this%mix)
-        call widom(this%type2_spheres, this%type2_obs, this%type1_spheres, this%mix)
+        call widom(this%Lsize, this%type1_spheres, this%type1_obs, this%type2_spheres, this%mix)
+        call widom(this%Lsize, this%type2_spheres, this%type2_obs, this%type1_spheres, this%mix)
     
     end subroutine PhysicalSystem_measure_chemical_potentials
     
@@ -527,7 +522,8 @@ contains
         integer, intent(in) :: iStep
     
         if (modulo(iStep, this%reset_iStep) == 0) then
-            call this%type1_spheres%reset_Epot_reci_structure(iStep, this%type1_units%structure_modulus)
+            call this%type1_spheres%reset_Epot_reci_structure(this%Lsize, iStep, &
+                                                              this%type1_units%structure_modulus)
             call this%type1_spheres%reset_totalMoment(iStep, this%type1_units%totalMoment_modulus)
         end if
         

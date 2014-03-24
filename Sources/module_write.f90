@@ -9,7 +9,7 @@ use data_box, only: Ndim
 implicit none
 
 private
-public open_units, mix_open_units, write_results, mix_write_results
+public open_units, write_data, mix_open_units, write_results, mix_write_results
 
 contains
 
@@ -27,6 +27,24 @@ contains
         write(obsEquilib_unit, *) "#", 1 ! 1 observable: energy
         
     end subroutine open_units
+
+    !> Data: low level
+
+    subroutine write_data(report_unit)
+    
+        integer, intent(in) :: report_unit
+
+        write(report_unit, *) "Data micro: "
+
+        write(report_unit ,*) "    Precision = ", DP
+        write(report_unit ,*) "    Real zero = ", real_zero
+        write(report_unit ,*) "    I/O tiny = ", io_tiny
+        write(report_unit ,*) "    Energy consistency tiny = ", consist_tiny
+
+        write(report_unit ,*) "    Pi = ", PI
+        write(report_unit ,*) "    Sigma3d = ", sigma3d
+
+    end subroutine write_data
 
     !> Mix: open units
     
