@@ -230,7 +230,7 @@ contains
         class(MixingPotential), intent(in) :: mix
         logical, intent(in) :: write_potential
         class(Units), intent(in) :: this_units
-        real(DP), intent(inout) :: this_Epot
+        real(DP), intent(out) :: this_Epot
         
         call this%test_overlap(Lsize)
         call this%snap_data(this_units%snap_positions)

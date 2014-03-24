@@ -83,8 +83,8 @@ private
         !> Initialization & Finalisation
         procedure, private :: open_units => PhysicalSystem_open_units
         procedure, private :: init_switch => PhysicalSystem_init_switch
-        procedure, private :: init_spheres => PhysicalSystem_init_spheres
         procedure, private :: init_observables => PhysicalSystem_init_observables
+        procedure, private :: init_spheres => PhysicalSystem_init_spheres
         procedure :: write_report => PhysicalSystem_write_report
         procedure :: init => PhysicalSystem_init
         procedure, private :: final_spheres => PhysicalSystem_final_spheres
@@ -189,6 +189,17 @@ contains
         this%switch_rejectSum = 0._DP
     end subroutine PhysicalSystem_init_switch
     
+    subroutine PhysicalSystem_init_observables(this)
+    
+        class(PhysicalSystem), intent(inout) :: this
+        
+        call this%type1_obs%init()
+        call this%type2_obs%init()
+        this%mix_EpotSum = 0._DP
+        this%EpotSum = 0._DP
+        
+    end subroutine PhysicalSystem_init_observables
+    
     subroutine PhysicalSystem_init_spheres(this)
     
         class(PhysicalSystem), intent(inout) :: this
@@ -202,28 +213,13 @@ contains
                   this%type2_units, this%type2_obs%Epot)
         
     end subroutine PhysicalSystem_init_spheres
-    
-    subroutine PhysicalSystem_init_observables(this)
-    
-        class(PhysicalSystem), intent(inout) :: this
-        
-        real(DP) :: Epot_conf
-        
-        call this%type1_obs%init()
-        call this%type2_obs%init()
-        this%mix_EpotSum = 0._DP
-        this%EpotSum = 0._DP
-        
-        Epot_conf = this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
-        write(output_unit, *) "Initial potential energy =", Epot_conf
-        write(this%obsThermal_unit, *) 0, Epot_conf
-        
-    end subroutine PhysicalSystem_init_observables
 
     subroutine PhysicalSystem_init(this, args)
     
         class(PhysicalSystem), intent(inout) :: this
         type(monteCarlo_arguments), intent(in) :: args
+        
+        real(DP) :: Epot_conf
         
         this%snap = snap
         this%reset_iStep = reset_iStep
@@ -236,8 +232,12 @@ contains
         call init_randomSeed(args%random, this%report_unit)
         call set_initialConfiguration(this%Lsize, args%initial, this%type1_spheres, &
                                       this%type2_spheres, this%mix%get_sigma(), this%report_unit)
-        call this%init_spheres()
         call this%init_observables()
+        call this%init_spheres()
+        
+        Epot_conf = this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
+        write(output_unit, *) "Initial potential energy =", Epot_conf
+        write(this%obsThermal_unit, *) 0, Epot_conf
     
     end subroutine PhysicalSystem_init
     
