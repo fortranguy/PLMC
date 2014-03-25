@@ -207,10 +207,10 @@ contains
         call mix_init(this%Lsize, this%mix, this%type1_spheres, this%type2_spheres, &
                       this%write_potential, this%mix_Epot_tab_unit, this%mix_Epot)
         call this%mix%write_report(this%mix_report_unit)
-        call init(this%Lsize, this%type1_spheres, this%type2_spheres, this%mix, this%write_potential, &
-                  this%type1_units, this%type1_obs%Epot)
-        call init(this%Lsize, this%type2_spheres, this%type1_spheres, this%mix, this%write_potential, &
-                  this%type2_units, this%type2_obs%Epot)
+        call init(this%Lsize, this%Kmax, this%type1_spheres, this%type2_spheres, this%mix, &
+                  this%write_potential, this%type1_units, this%type1_obs%Epot)
+        call init(this%Lsize, this%Kmax, this%type2_spheres, this%type1_spheres, this%mix, &
+                  this%write_potential, this%type2_units, this%type2_obs%Epot)
         
     end subroutine PhysicalSystem_init_spheres
 
@@ -274,8 +274,8 @@ contains
     
         class(PhysicalSystem), intent(inout) :: this
         
-        call final(this%Lsize, this%type1_spheres, this%type1_units, this%type1_obs)
-        call final(this%Lsize, this%type2_spheres, this%type2_units, this%type2_obs)
+        call final(this%Lsize, this%Kmax, this%type1_spheres, this%type1_units, this%type1_obs)
+        call final(this%Lsize, this%Kmax, this%type2_spheres, this%type2_units, this%type2_obs)
         call mix_final(this%Lsize, this%mix, this%type1_spheres, this%type2_spheres, &
                        this%mix_report_unit, this%mix_Epot, this%mix_Epot_conf)
         call mix_write_results(this%Nstep, this%mix_EpotSum, this%mix_report_unit)
@@ -290,8 +290,8 @@ contains
         real(DP) :: duration
         
         Epot = this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
-        Epot_conf = this%type1_spheres%Epot_conf(this%Lsize) + &
-                    this%type2_spheres%Epot_conf(this%Lsize) + this%mix_Epot_conf
+        Epot_conf = this%type1_spheres%Epot_conf(this%Lsize, this%Kmax) + &
+                    this%type2_spheres%Epot_conf(this%Lsize, this%Kmax) + this%mix_Epot_conf
         call test_consist(Epot, Epot_conf, this%report_unit)
         this%EpotSum = this%type1_obs%EpotSum + this%type2_obs%EpotSum + this%mix_EpotSum
         duration = this%time_end - this%time_start
@@ -388,18 +388,18 @@ contains
                 call random_number(rand)
                 iColRand = int(rand*real(this%Ncol, DP)) + 1
                 if (iColRand <= this%type1_spheres%get_Ncol()) then
-                    call move(this%Lsize, this%type1_spheres, this%type1_obs, this%type2_spheres, &
-                              this%mix, this%mix_Epot)
+                    call move(this%Lsize, this%Kmax, this%type1_spheres, this%type1_obs, &
+                              this%type2_spheres, this%mix, this%mix_Epot)
                 else
-                    call move(this%Lsize, this%type2_spheres, this%type2_obs, this%type1_spheres, &
-                              this%mix, this%mix_Epot)
+                    call move(this%Lsize, this%Kmax, this%type2_spheres, this%type2_obs, &
+                              this%type1_spheres, this%mix, this%mix_Epot)
                 end if
             else if (iChangeRand <= this%Nmove + this%Nswitch) then
-                call switch(this%Lsize, this%type1_spheres, this%type1_obs, this%type2_spheres, &
-                            this%type2_obs, this%mix, this%mix_Epot, this%switch_Nreject)
+                call switch(this%Lsize, this%Kmax, this%type1_spheres, this%type1_obs, &
+                            this%type2_spheres, this%type2_obs, this%mix, this%mix_Epot, this%switch_Nreject)
                 this%switch_Nhit = this%switch_Nhit + 1
             else
-                call rotate(this%Lsize, this%type1_spheres, this%type1_obs)
+                call rotate(this%Lsize, this%Kmax, this%type1_spheres, this%type1_obs)
             end if
             
         end do MC_Change
@@ -472,8 +472,10 @@ contains
     
         class(PhysicalSystem), intent(inout) :: this
     
-        call widom(this%Lsize, this%type1_spheres, this%type1_obs, this%type2_spheres, this%mix)
-        call widom(this%Lsize, this%type2_spheres, this%type2_obs, this%type1_spheres, this%mix)
+        call widom(this%Lsize, this%Kmax, this%type1_spheres, this%type1_obs, this%type2_spheres, &
+                   this%mix)
+        call widom(this%Lsize, this%Kmax, this%type2_spheres, this%type2_obs, this%type1_spheres, &
+                   this%mix)
     
     end subroutine PhysicalSystem_measure_chemical_potentials
     
@@ -522,7 +524,7 @@ contains
         integer, intent(in) :: iStep
     
         if (modulo(iStep, this%reset_iStep) == 0) then
-            call this%type1_spheres%reset_Epot_reci_structure(this%Lsize, iStep, &
+            call this%type1_spheres%reset_Epot_reci_structure(this%Lsize, this%Kmax, iStep, &
                                                               this%type1_units%structure_modulus)
             call this%type1_spheres%reset_totalMoment(iStep, this%type1_units%totalMoment_modulus)
         end if

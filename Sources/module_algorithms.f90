@@ -17,9 +17,10 @@ contains
 
     !> Particle move
     
-    subroutine move(Lsize, this, this_obs, other, mix, mix_Epot)
+    subroutine move(Lsize, Kmax, this, this_obs, other, mix, mix_Epot)
     
         real(DP), dimension(:), intent(in) :: Lsize
+        integer, dimension(:), intent(in) :: Kmax
         class(HardSpheres), intent(inout) :: this
         class(Observables), intent(inout) :: this_obs
         class(HardSpheres), intent(inout) :: other
@@ -80,7 +81,7 @@ contains
                         this_EpotNew_real = this%Epot_real_solo(Lsize, iOld, xNew, mCol)
                         this_EpotOld_real = this%Epot_real_solo(Lsize, iOld, xOld, mCol)
                         this_deltaEpot = (this_EpotNew_real-this_EpotOld_real) + &
-                                         this%deltaEpot_reci_move(Lsize, xOld, xNew, mCol)
+                                         this%deltaEpot_reci_move(Lsize, Kmax, xOld, xNew, mCol)
                     class default
                         call this%Epot_neighCells(Lsize, iOld, xOld, this_iCellOld, overlap, this_EpotOld)
                         this_deltaEpot = this_EpotNew - this_EpotOld
@@ -99,7 +100,7 @@ contains
                 
                     select type (this)
                         type is (DipolarSpheres)
-                            call this%reci_update_structure_move(Lsize, xOld, xNew, mCol)
+                            call this%reci_update_structure_move(Lsize, Kmax, xOld, xNew, mCol)
                     end select
                 
                     this%positions(:, iOld) = xNew(:)
@@ -131,9 +132,10 @@ contains
     
     !> Widom's method
 
-    subroutine widom(Lsize, this, this_obs, other, mix)
+    subroutine widom(Lsize, Kmax, this, this_obs, other, mix)
         
         real(DP), dimension(:), intent(in) :: Lsize
+        integer, dimension(:), intent(in) :: Kmax
         class(HardSpheres), intent(in) :: this
         class(Observables), intent(inout) :: this_obs
         class(HardSpheres), intent(in) :: other
@@ -182,7 +184,7 @@ contains
                         type is (DipolarSpheres)
                             mTest(:) = random_surface()
                             this_EpotTest = this%Epot_real_solo(Lsize, 0, xTest, mTest) + &
-                                            this%deltaEpot_reci_exchange(Lsize, xTest, +mTest) - &
+                                            this%deltaEpot_reci_exchange(Lsize, Kmax, xTest, +mTest) - &
                                             this%Epot_self_solo(mTest) + &
                                             this%deltaEpot_bound_exchange(Lsize, +mTest)
                     end select
@@ -202,8 +204,8 @@ contains
     
     !> Particle switch
     
-    subroutine before_switch_energy(Lsize, this, this_iCol, other, other_iCol, mix, indicesOld, xOld, &
-                                    EpotsOld)
+    subroutine before_switch_energy(Lsize, this, this_iCol, other, other_iCol, mix, indicesOld, &
+                                    xOld, EpotsOld)
         
         real(DP), dimension(:), intent(in) :: Lsize
         class(HardSpheres), intent(in) :: this, other
@@ -233,10 +235,11 @@ contains
         
     end subroutine before_switch_energy
     
-    subroutine after_switch_energy(Lsize, this, this_iCol, xOld, other, other_iCol, mix, overlap, &
+    subroutine after_switch_energy(Lsize, Kmax, this, this_iCol, xOld, other, other_iCol, mix, overlap, &
                                    indicesNew, xNew, EpotsNew)
 
         real(DP), dimension(:), intent(in) :: Lsize
+        integer, dimension(:), intent(in) :: Kmax
         class(HardSpheres), intent(in) :: this, other
         class(MixingPotential), intent(in) :: mix
         integer, intent(in) :: this_iCol, other_iCol
@@ -275,7 +278,7 @@ contains
                     type is (DipolarSpheres)
                         mCol(:) = this%orientations(:, this_iCol)
                         EpotsNew(1) = this%Epot_real_solo(Lsize, this_iCol, xNew, mCol) + &
-                                      this%deltaEpot_reci_move(Lsize, xOld, xNew, mCol)
+                                      this%deltaEpot_reci_move(Lsize, Kmax, xOld, xNew, mCol)
                 end select
             
             end if
@@ -284,9 +287,10 @@ contains
     
     end subroutine after_switch_energy
     
-    subroutine after_switch_update(Lsize, this, iCol, indicesOld, indicesNew, xOld, xNew, other)
+    subroutine after_switch_update(Lsize, Kmax, this, iCol, indicesOld, indicesNew, xOld, xNew, other)
 
         real(DP), dimension(:), intent(in) :: Lsize
+        integer, dimension(:), intent(in) :: Kmax
         class(HardSpheres), intent(inout) :: this, other
         integer, intent(in) :: iCol
         integer, dimension(:), intent(in) :: indicesOld, indicesNew
@@ -299,7 +303,7 @@ contains
         select type (this)
             type is (DipolarSpheres)
                 mCol(:) = this%orientations(:, iCol)
-                call this%reci_update_structure_move(Lsize, xOld, xNew, mCol)
+                call this%reci_update_structure_move(Lsize, Kmax, xOld, xNew, mCol)
         end select
         
         if (indicesOld(1) /= indicesNew(1)) then
@@ -313,9 +317,10 @@ contains
         
     end subroutine after_switch_update
     
-    subroutine switch(Lsize, type1, type1_obs, type2, type2_obs, mix, mix_Epot, switch_Nreject)
+    subroutine switch(Lsize, Kmax, type1, type1_obs, type2, type2_obs, mix, mix_Epot, switch_Nreject)
     
         real(DP), dimension(:), intent(in) :: Lsize
+        integer, dimension(:), intent(in) :: Kmax
         class(HardSpheres), intent(inout) :: type1, type2
         class(Observables), intent(inout) :: type1_obs, type2_obs
         class(MixingPotential), intent(in) :: mix
@@ -351,13 +356,13 @@ contains
                                   type2_xOld, type2_EpotsOld)
         
         ! New: after switch
-        call after_switch_energy(Lsize, type1, type1_iCol, type1_xOld, type2, type2_iCol, mix, overlap, &
-                                 type1_indicesNew, type1_xNew, type1_EpotsNew)
+        call after_switch_energy(Lsize, Kmax, type1, type1_iCol, type1_xOld, type2, type2_iCol, mix, &
+                                 overlap, type1_indicesNew, type1_xNew, type1_EpotsNew)
         
         if (.not. overlap) then
         
-            call after_switch_energy(Lsize, type2, type2_iCol, type2_xOld, type1, type1_iCol, mix, overlap, &
-                                     type2_indicesNew, type2_xNew, type2_EpotsNew)
+            call after_switch_energy(Lsize, Kmax, type2, type2_iCol, type2_xOld, type1, type1_iCol, &
+                                     mix, overlap, type2_indicesNew, type2_xNew, type2_EpotsNew)
             
             if (.not. overlap) then
 
@@ -371,10 +376,10 @@ contains
                 call random_number(random)
                 if (random < exp(-deltaEpot/Temperature)) then
                 
-                    call after_switch_update(Lsize, type1, type1_iCol, type1_indicesOld, type1_indicesNew, &
-                                             type1_xOld, type1_xNew, type2)
-                    call after_switch_update(Lsize, type2, type2_iCol, type2_indicesOld, type2_indicesNew, &
-                                             type2_xOld, type2_xNew, type1)
+                    call after_switch_update(Lsize, Kmax, type1, type1_iCol, type1_indicesOld, &
+                                             type1_indicesNew, type1_xOld, type1_xNew, type2)
+                    call after_switch_update(Lsize, Kmax, type2, type2_iCol, type2_indicesOld, &
+                                             type2_indicesNew, type2_xOld, type2_xNew, type1)
                                              
                     type1_obs%Epot = type1_obs%Epot + type1_deltaEpot
                     type2_obs%Epot = type2_obs%Epot + type2_deltaEpot
@@ -396,9 +401,10 @@ contains
     
     !> Dipole rotation
     
-    subroutine rotate(Lsize, this, obs)
+    subroutine rotate(Lsize, Kmax, this, obs)
     
         real(DP), dimension(:), intent(in) :: Lsize
+        integer, dimension(:), intent(in) :: Kmax
         class(DipolarSpheres), intent(inout) :: this
         class(MoreObservables), intent(inout) :: obs
         
@@ -426,13 +432,13 @@ contains
         
         deltaEpot_self = this%Epot_self_solo(mNew) - this%Epot_self_solo(mOld)
         
-        deltaEpot = deltaEpot_real + this%deltaEpot_reci_rotate(Lsize, xCol, mOld, mNew) - deltaEpot_self + &
-                    this%deltaEpot_bound_rotate(Lsize, mOld, mNew)
+        deltaEpot = deltaEpot_real + this%deltaEpot_reci_rotate(Lsize, Kmax, xCol, mOld, mNew) - &
+                    deltaEpot_self + this%deltaEpot_bound_rotate(Lsize, mOld, mNew)
         
         call random_number(random)
         if (random < exp(-deltaEpot/Temperature)) then
         
-            call this%reci_update_structure_rotate(Lsize, xCol, mOld, mNew)
+            call this%reci_update_structure_rotate(Lsize, Kmax, xCol, mOld, mNew)
             call this%update_totalMoment_rotate(mOld, mNew)
             this%orientations(:, iOld) = mNew(:)
             

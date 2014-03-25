@@ -222,9 +222,10 @@ contains
     
     !> Spheres initialisations
     
-    subroutine init(Lsize, this, other, mix, write_potential, this_units, this_Epot)
+    subroutine init(Lsize, Kmax, this, other, mix, write_potential, this_units, this_Epot)
     
         real(DP), dimension(:), intent(in) :: Lsize    
+        integer, dimension(:), intent(in) :: Kmax
         class(HardSpheres), intent(inout) :: this
         class(HardSpheres), intent(in) :: other
         class(MixingPotential), intent(in) :: mix
@@ -235,7 +236,7 @@ contains
         call this%test_overlap(Lsize)
         call this%snap_data(this_units%snap_positions)
         call this%snap_positions(0, this_units%snapIni_positions)
-        call this%set_Epot(Lsize)
+        call this%set_Epot(Lsize, Kmax)
         
         if (write_potential) then
             call this%write_Epot(this_units%Epot)
@@ -249,10 +250,10 @@ contains
                         if (write_potential) then
                             call this%write_Epot_real(this_units%Epot_real)
                         end if
-                        call this%Epot_reci_count_waveVectors(this_units%waveVectors)
+                        call this%Epot_reci_count_waveVectors(Kmax, this_units%waveVectors)
                 end select
         end select
-        this_Epot = this%Epot_conf(Lsize)
+        this_Epot = this%Epot_conf(Lsize, Kmax)
         
         call this%construct_cells(Lsize, other, mix%get_cell_size(), mix%get_rCut())
         call this%write_report(this_units%report)
@@ -261,16 +262,17 @@ contains
     
     !> Spheres finalizations
     
-    subroutine final(Lsize, this, this_units, this_obs)
+    subroutine final(Lsize, Kmax, this, this_units, this_obs)
     
         real(DP), dimension(:), intent(in) :: Lsize    
+        integer, dimension(:), intent(in) :: Kmax
         class(HardSpheres), intent(inout) :: this
         class(Units), intent(in) :: this_units
         class(Observables), intent(in) :: this_obs
         
         call this%test_overlap(Lsize)
-        call this%set_Epot(Lsize)
-        call test_consist(this_obs%Epot, this%Epot_conf(Lsize), this_units%report)
+        call this%set_Epot(Lsize, Kmax)
+        call test_consist(this_obs%Epot, this%Epot_conf(Lsize, Kmax), this_units%report)
         call this%snap_positions(0, this_units%snapFin_positions)
         call this_obs%write_results(this_units%report)
         

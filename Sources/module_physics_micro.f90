@@ -5,7 +5,7 @@ module module_physics_micro
 use, intrinsic :: iso_fortran_env, only: error_unit
 use data_precisions, only: DP
 use data_constants, only: PI, sigma3d
-use data_box, only: Ndim, Kmax
+use data_box, only: Ndim
 !$ use omp_lib
 
 implicit none
@@ -152,8 +152,9 @@ contains
 
     !> Symmetry: half wave vectors in do loop: Kmax1
 
-    pure function Kmax1_sym(ky, kz)
+    pure function Kmax1_sym(Kmax, ky, kz)
 
+        integer, dimension(:), intent(in) :: Kmax
         integer, intent(in) :: ky, kz
         integer :: Kmax1_sym
 
@@ -167,8 +168,9 @@ contains
 
     !> Symmetry: half wave vectors in do loop: Kmax2
 
-    pure function Kmax2_sym(kz)
-
+    pure function Kmax2_sym(Kmax, kz)
+    
+        integer, dimension(:), intent(in) :: Kmax
         integer, intent(in) :: kz
         integer :: Kmax2_sym
 

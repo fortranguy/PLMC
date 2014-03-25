@@ -333,13 +333,16 @@ contains
     
     ! Potential
     
-    subroutine HardSpheres_set_Epot(this, Lsize)
+    subroutine HardSpheres_set_Epot(this, Lsize, Kmax)
     
         class(HardSpheres), intent(inout) :: this
         real(DP), dimension(:), intent(in) :: Lsize
+        integer, dimension(:), intent(in) :: Kmax
 
         real(DP), dimension(Ndim) :: Lsize_dummy
-        Lsize_dummy = Lsize
+        integer, dimension(Ndim) :: Kmax_dummy
+        Lsize_dummy(:) = Lsize(:)
+        Kmax_dummy(:) = Kmax(:)
 
         this%rMin = hard_rMin_factor * this%sigma
         this%rCut = this%rMin
@@ -404,14 +407,17 @@ contains
     
     !> Total potential energy: dummy
     
-    pure function HardSpheres_Epot_conf(this, Lsize) result(Epot_conf)
+    pure function HardSpheres_Epot_conf(this, Lsize, Kmax) result(Epot_conf)
     
         class(HardSpheres), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Lsize
+        integer, dimension(:), intent(in) :: Kmax
         real(DP) :: Epot_conf
 
         real(DP), dimension(Ndim) :: Lsize_dummy
-        Lsize_dummy = Lsize
+        integer, dimension(Ndim) :: Kmax_dummy
+        Lsize_dummy(:) = Lsize(:)
+        Kmax_dummy(:) = Kmax(:)
     
         Epot_conf = this%Ncol * 0._DP
         
