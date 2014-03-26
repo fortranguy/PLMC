@@ -49,10 +49,10 @@ contains
     !> Mix: open units
     
     subroutine mix_open_units(mix_report_unit, mix_Epot_unit, mix_obsThermal_unit, &
-                                  mix_obsEquilib_unit)
+                              mix_obsEquilib_unit)
                                   
         integer, intent(out) :: mix_report_unit, mix_Epot_unit, mix_obsThermal_unit, &
-                                  mix_obsEquilib_unit
+                                mix_obsEquilib_unit
     
         open(newunit=mix_report_unit, recl=4096, file="mix_report.txt", status='new', action='write')
         open(newunit=mix_Epot_unit, recl=4096, file="mix_Epot.tmp", status='new', action='write')
