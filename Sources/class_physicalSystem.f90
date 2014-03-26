@@ -9,7 +9,7 @@ use data_monteCarlo, only: Temperature, decorrelFactor, switch_factor, Nthermal,
                            reset_iStep
 use data_potential, only: write_potential                       
 use data_distribution, only: snap
-use module_types, only: monteCarlo_arguments
+use module_types, only: Box_dimensions, monteCarlo_arguments
 use module_physics_micro, only: NwaveVectors
 use class_hardSpheres
 use class_dipolarSpheres
@@ -33,6 +33,7 @@ private
         character(len=5) :: name
         
         ! Box
+        type(Box_dimensions) :: box
         real(DP), dimension(Ndim) :: Lsize !< box size
         integer, dimension(Ndim) :: Kmax !< number of wave vectors
         integer :: Ncol !< number of particles

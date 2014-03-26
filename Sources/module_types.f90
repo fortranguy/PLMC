@@ -2,7 +2,17 @@
 
 module module_types
 
+use data_precisions, only: DP
+use data_box, only: Ndim
+
 implicit none
+
+    ! System Box
+    
+    type, public :: Box_dimensions
+        real(DP), dimension(Ndim) :: size
+        integer, dimension(Ndim) :: wave
+    end type Box_dimensions
 
     ! For neighbour cells
 
