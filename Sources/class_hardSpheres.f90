@@ -338,6 +338,9 @@ contains
         class(HardSpheres), intent(inout) :: this
         type(Box_dimensions), intent(in) :: Box
         
+        real(DP) :: volume_dummy
+        volume_dummy = product(Box%size)
+        
         this%rMin = hard_rMin_factor * this%sigma
         this%rCut = this%rMin
         
@@ -406,6 +409,9 @@ contains
         class(HardSpheres), intent(in) :: this
         type(Box_dimensions), intent(in) :: Box
         real(DP) :: Epot_conf
+        
+        real(DP) :: volume_dummy
+        volume_dummy = product(Box%size)
     
         Epot_conf = this%Ncol * 0._DP
         
