@@ -102,7 +102,8 @@ private
         procedure :: random_changes => PhysicalSystem_random_changes
         procedure :: update_rejections => PhysicalSystem_update_rejections
         procedure :: adapt_changes => PhysicalSystem_adapt_changes
-        procedure :: write_observables_thermalisation => PhysicalSystem_write_observables_thermalisation
+        procedure :: write_observables_thermalisation => &
+                     PhysicalSystem_write_observables_thermalisation
         procedure :: fix_changes => PhysicalSystem_fix_changes
         procedure :: measure_chemical_potentials => PhysicalSystem_measure_chemical_potentials
         procedure :: accumulate_observables => PhysicalSystem_accumulate_observables
@@ -394,8 +395,8 @@ contains
                               this%type1_spheres, this%mix, this%mix_Epot)
                 end if
             else if (iChangeRand <= this%Nmove + this%Nswitch) then
-                call switch(this%Box, this%type1_spheres, this%type1_obs, &
-                            this%type2_spheres, this%type2_obs, this%mix, this%mix_Epot, this%switch_Nreject)
+                call switch(this%Box, this%type1_spheres, this%type1_obs, this%type2_spheres, &
+                            this%type2_obs, this%mix, this%mix_Epot, this%switch_Nreject)
                 this%switch_Nhit = this%switch_Nhit + 1
             else
                 call rotate(this%Box, this%type1_spheres, this%type1_obs)
