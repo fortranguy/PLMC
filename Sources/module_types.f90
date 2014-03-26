@@ -24,6 +24,12 @@ implicit none
     type, public :: LinkedList
         type(Node), pointer :: particle => null()
     end type LinkedList
+    
+    type, public :: position_to_cell_data
+        integer :: iCol
+        real(DP), dimension(Ndim) :: xCol
+        integer :: same_index, mix_index
+    end type position_to_cell_data
 
     ! For main program
 
