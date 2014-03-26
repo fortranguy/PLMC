@@ -10,6 +10,7 @@ use data_monteCarlo, only: Temperature, decorrelFactor, switch_factor, Nthermal,
 use data_potential, only: write_potential                       
 use data_distribution, only: snap
 use module_types, only: monteCarlo_arguments
+use module_physics_micro, only: NwaveVectors
 use class_hardSpheres
 use class_dipolarSpheres
 use class_mixingPotential
@@ -251,8 +252,7 @@ contains
         write(report_unit ,*) "    Lsize(:) = ", this%Lsize(:)
         write(report_unit ,*) "    Volume = ", product(this%Lsize)
         write(report_unit ,*) "    Kmax(:) = ", this%Kmax(:)
-        write(report_unit ,*) "    NwaveVectors =", (2*this%Kmax(1)+1) * (2*this%Kmax(2)+1) * &
-                                                    (2*this%Kmax(3)+1)
+        write(report_unit ,*) "    NwaveVectors =", NwaveVectors(this%Kmax)
         write(report_unit ,*) "    Ncol = ", this%Ncol
         write(report_unit ,*) "    Temperature = ", this%Temperature
         

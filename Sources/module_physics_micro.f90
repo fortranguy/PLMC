@@ -11,7 +11,8 @@ use data_box, only: Ndim
 implicit none
 private
 public set_discrete_length, sphere_volume, distVec_PBC, dist_PBC, random_surface, markov_surface, &
-       Kmax1_sym, Kmax2_sym, fourier_i, index_from_coord, coord_PBC, Epot_lennardJones, Epot_yukawa
+       NwaveVectors, Kmax1_sym, Kmax2_sym, fourier_i, index_from_coord, coord_PBC, &
+       Epot_lennardJones, Epot_yukawa
 
 contains
 
@@ -112,10 +113,10 @@ contains
         
         real(DP), dimension(Ndim) :: random_surface
         
-        integer :: iNdim
+        integer :: jDim
         
-        do iNdim = 1, Ndim
-            random_surface(iNdim) = gauss()
+        do jDim = 1, Ndim
+            random_surface(jDim) = gauss()
         end do
         
         random_surface(:) = random_surface(:) / norm2(random_surface)
@@ -132,10 +133,10 @@ contains
         real(DP), dimension(Ndim) :: rotation
         real(DP) :: rotation_dot_mCol
         real(DP) :: amplitude, random
-        integer :: iNdim
+        integer :: jDim
         
-        do iNdim = 1, Ndim
-            rotation(iNdim) = gauss()
+        do jDim = 1, Ndim
+            rotation(jDim) = gauss()
         end do
         
         rotation_dot_mCol = dot_product(rotation, mCol)
@@ -149,6 +150,22 @@ contains
         mCol(:) = mCol(:) / norm2(mCol)
     
     end subroutine markov_surface
+    
+    !> Number of wave vectors
+    
+    pure function NwaveVectors(Kmax)
+    
+        integer, dimension(:), intent(in) :: Kmax
+        integer :: NwaveVectors
+        
+        integer :: jDim
+        
+        NwaveVectors = 1
+        do jDim = 1, Ndim
+            NwaveVectors = NwaveVectors * (2*Kmax(jDim) + 1)
+        end do
+    
+    end function NwaveVectors
 
     !> Symmetry: half wave vectors in do loop: Kmax1
 
