@@ -11,7 +11,7 @@ use data_monteCarlo, only: hard_move_delta, hard_move_rejectFix, hard_Nwidom
 use data_potential, only: hard_rMin_factor
 use data_neighbourCells, only: NnearCell
 use data_distribution, only: snap_ratio
-use module_types, only: Node
+use module_types, only: Box_dimensions, Node
 use module_physics_micro, only: dist_PBC
 use class_neighbourCells
 
@@ -163,10 +163,10 @@ contains
         
     !> Adapt the displacement move_delta during thermalisation
     
-    pure subroutine HardSpheres_adapt_move_delta(this, Lsize, reject)
+    pure subroutine HardSpheres_adapt_move_delta(this, Box_size, reject)
     
         class(HardSpheres), intent(inout) :: this
-        real(DP), dimension(:), intent(in) :: Lsize ! warning: average  ?
+        real(DP), dimension(:), intent(in) :: Box_size ! warning: average  ?
         real(DP), intent(in) :: reject
         
         real(DP), parameter :: move_delta_eps = 0.05_DP
@@ -176,8 +176,8 @@ contains
         
         if (reject < this%move_rejectFix - move_reject_eps) then
             this%move_delta(:) = this%move_delta(:) * more
-            if (norm2(this%move_delta) > norm2(Lsize)) then
-                this%move_delta(:) = Lsize(:)
+            if (norm2(this%move_delta) > norm2(Box_size)) then
+                this%move_delta(:) = Box_size(:)
             end if
         else if (reject > this%move_rejectFix + move_reject_eps) then
             this%move_delta(:) = this%move_delta(:) * less
@@ -185,10 +185,10 @@ contains
     
     end subroutine HardSpheres_adapt_move_delta
     
-    subroutine HardSpheres_set_move_delta(this, Lsize, reject, report_unit)
+    subroutine HardSpheres_set_move_delta(this, Box_size, reject, report_unit)
     
         class(HardSpheres), intent(inout) :: this
-        real(DP), dimension(:), intent(in) :: Lsize ! warning: average ?
+        real(DP), dimension(:), intent(in) :: Box_size ! warning: average ?
         real(DP), intent(in) :: reject
         integer, intent(in) :: report_unit
 
@@ -198,9 +198,9 @@ contains
             write(error_unit, *) "default move_delta: ", this%move_delta(:)
         end if
 
-        if (norm2(this%move_delta) > norm2(Lsize)) then
+        if (norm2(this%move_delta) > norm2(Box_size)) then
             write(error_unit, *) this%name, ":   Warning: move_delta too big."
-            this%move_delta(:) = Lsize(:)
+            this%move_delta(:) = Box_size(:)
             write(error_unit, *) "big move_delta: ", this%move_delta(:)
         end if
 
@@ -213,16 +213,16 @@ contains
     
     !> Write density and compacity
     
-    subroutine HardSpheres_write_density(this, Lsize, total_Ncol, report_unit)
+    subroutine HardSpheres_write_density(this, Box_size, total_Ncol, report_unit)
     
         class(HardSpheres), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: Lsize ! warning: average ?
+        real(DP), dimension(:), intent(in) :: Box_size ! warning: average ?
         integer, intent(in) :: total_Ncol
         integer, intent(in) :: report_unit
         
         real(DP) :: density, compacity, concentration
         
-        density = real(this%Ncol + 1, DP) / product(Lsize) ! cheating ? cf. Widom
+        density = real(this%Ncol + 1, DP) / product(Box_size) ! cheating ? cf. Widom
         compacity = 4._DP/3._DP*PI*(this%sigma/2._DP)**3 * density
         concentration = real(this%Ncol, DP) / real(total_Ncol, DP)
         
@@ -285,10 +285,10 @@ contains
     
     !> Do an overlap test
     
-    subroutine HardSpheres_test_overlap(this, Lsize)
+    subroutine HardSpheres_test_overlap(this, Box_size)
     
         class(HardSpheres), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
+        real(DP), dimension(:), intent(in) :: Box_size
     
         integer :: jCol, iCol
         real(DP) :: r_ij
@@ -296,7 +296,7 @@ contains
         do jCol = 1, this%Ncol
             do iCol = jCol+1, this%Ncol
                     
-                r_ij = dist_PBC(Lsize, this%positions(:, iCol), this%positions(:, jCol))
+                r_ij = dist_PBC(Box_size, this%positions(:, iCol), this%positions(:, jCol))
                 if (r_ij < this%rMin) then
                     write(error_unit, *) this%name, "    Overlap !", iCol, jCol
                     write(error_unit, *) "    r_ij = ", r_ij
@@ -312,10 +312,10 @@ contains
     
     !> Neighbour Cells
     
-    subroutine HardSpheres_construct_cells(this, Lsize, other, mix_cell_size, mix_rCut)
+    subroutine HardSpheres_construct_cells(this, Box_size, other, mix_cell_size, mix_rCut)
     
         class(HardSpheres), intent(inout) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
+        real(DP), dimension(:), intent(in) :: Box_size
         class(HardSpheres), intent(in) :: other
         real(DP), dimension(:), intent(in) :: mix_cell_size
         real(DP), intent(in) :: mix_rCut
@@ -323,27 +323,21 @@ contains
         real(DP), dimension(Ndim) :: same_cell_size
         
         same_cell_size(:) = this%rCut
-        call this%sameCells%construct(Lsize, same_cell_size, this%rCut) !< same kind
+        call this%sameCells%construct(Box_size, same_cell_size, this%rCut) !< same kind
         call this%sameCells%all_cols_to_cells(this%Ncol, this%positions)
         
-        call this%mixCells%construct(Lsize, mix_cell_size, mix_rCut)
+        call this%mixCells%construct(Box_size, mix_cell_size, mix_rCut)
         call this%mixCells%all_cols_to_cells(other%Ncol, other%positions)
     
     end subroutine HardSpheres_construct_cells
     
     ! Potential
     
-    subroutine HardSpheres_set_Epot(this, Lsize, Kmax)
+    subroutine HardSpheres_set_Epot(this, Box)
     
         class(HardSpheres), intent(inout) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
-        integer, dimension(:), intent(in) :: Kmax
-
-        real(DP), dimension(Ndim) :: Lsize_dummy
-        integer, dimension(Ndim) :: Kmax_dummy
-        Lsize_dummy(:) = Lsize(:)
-        Kmax_dummy(:) = Kmax(:)
-
+        type(Box_dimensions), intent(in) :: Box
+        
         this%rMin = hard_rMin_factor * this%sigma
         this%rCut = this%rMin
         
@@ -360,10 +354,10 @@ contains
     
     end subroutine HardSpheres_write_Epot
     
-    subroutine HardSpheres_Epot_neighCells(this, Lsize, iCol, xCol, iTotalCell, overlap, energ)
+    subroutine HardSpheres_Epot_neighCells(this, Box_size, iCol, xCol, iTotalCell, overlap, energ)
         
         class(HardSpheres), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
+        real(DP), dimension(:), intent(in) :: Box_size
         integer, intent(in) :: iCol, iTotalCell
         real(DP), dimension(:), intent(in) :: xCol
         logical, intent(out) :: overlap
@@ -388,7 +382,7 @@ contains
                 next => current%next
             
                 if (current%iCol /= iCol) then
-                    r_ij = dist_PBC(Lsize, xCol(:), this%positions(:, current%iCol))
+                    r_ij = dist_PBC(Box_size, xCol(:), this%positions(:, current%iCol))
                     if (r_ij < this%rMin) then
                         overlap = .true.
                         return
@@ -407,17 +401,11 @@ contains
     
     !> Total potential energy: dummy
     
-    pure function HardSpheres_Epot_conf(this, Lsize, Kmax) result(Epot_conf)
+    pure function HardSpheres_Epot_conf(this, Box) result(Epot_conf)
     
         class(HardSpheres), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
-        integer, dimension(:), intent(in) :: Kmax
+        type(Box_dimensions), intent(in) :: Box
         real(DP) :: Epot_conf
-
-        real(DP), dimension(Ndim) :: Lsize_dummy
-        integer, dimension(Ndim) :: Kmax_dummy
-        Lsize_dummy(:) = Lsize(:)
-        Kmax_dummy(:) = Kmax(:)
     
         Epot_conf = this%Ncol * 0._DP
         

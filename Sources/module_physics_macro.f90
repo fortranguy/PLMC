@@ -5,7 +5,7 @@ module module_physics_macro
 use, intrinsic :: iso_fortran_env, only: output_unit, error_unit, iostat_end
 use data_precisions, only: DP, real_zero, io_tiny, consist_tiny
 use data_box, only: Ndim
-use module_types, only: argument_random, argument_initial
+use module_types, only: Box_dimensions, argument_random, argument_initial
 use module_physics_micro, only: dist_PBC, random_surface
 use class_hardSpheres
 use class_dipolarSpheres
@@ -66,9 +66,9 @@ contains
 
     !> Random depositions configuration
     
-    subroutine randomDepositions(Lsize, type1, type2, mix_sigma)
+    subroutine randomDepositions(Box_size, type1, type2, mix_sigma)
 
-        real(DP), dimension(:), intent(in) :: Lsize
+        real(DP), dimension(:), intent(in) :: Box_size
         class(HardSpheres), intent(inout) :: type1, type2
         real(DP), intent(in) :: mix_sigma
 
@@ -81,10 +81,10 @@ contains
         
 7101        continue
             call random_number(xRand)
-            type1%positions(:, iCol) = xRand*Lsize(:)
+            type1%positions(:, iCol) = xRand*Box_size(:)
             
             do iColTest = 1, iCol-1
-                rTest = dist_PBC(Lsize, type1%positions(:, iColTest), type1%positions(:, iCol))
+                rTest = dist_PBC(Box_size, type1%positions(:, iColTest), type1%positions(:, iCol))
                 if (rTest < type1%get_sigma()) then
                     goto 7101
                 end if
@@ -97,17 +97,17 @@ contains
         
 7102        continue
             call random_number(xRand)
-            type2%positions(:, iCol) = xRand*Lsize(:)
+            type2%positions(:, iCol) = xRand*Box_size(:)
             
             do iColTest = 1, type1%get_Ncol()
-                rTest = dist_PBC(Lsize, type1%positions(:, iColTest), type2%positions(:, iCol))
+                rTest = dist_PBC(Box_size, type1%positions(:, iColTest), type2%positions(:, iCol))
                 if (rTest < mix_sigma) then
                     goto 7102
                 end if
             end do
             
             do iColTest = 1, iCol-1
-                rTest = dist_PBC(Lsize, type2%positions(:, iColTest), type2%positions(:, iCol))
+                rTest = dist_PBC(Box_size, type2%positions(:, iColTest), type2%positions(:, iCol))
                 if (rTest < type2%get_sigma()) then
                     goto 7102
                 end if
@@ -181,9 +181,9 @@ contains
     
     !> Initial configuration
     
-    subroutine set_initialConfiguration(Lsize, arg_init, dipolar, spherical, mix_sigma, report_unit)
+    subroutine set_initialConfiguration(Box_size, arg_init, dipolar, spherical, mix_sigma, report_unit)
         
-        real(DP), dimension(:), intent(in) :: Lsize
+        real(DP), dimension(:), intent(in) :: Box_size
         type(argument_initial), intent(in) :: arg_init
         class(DipolarSpheres), intent(inout) :: dipolar
         class(HardSpheres), intent(inout) :: spherical
@@ -195,7 +195,7 @@ contains
         select case (arg_init%choice)
         
             case ('r')
-                call randomDepositions(Lsize, dipolar, spherical, mix_sigma)
+                call randomDepositions(Box_size, dipolar, spherical, mix_sigma)
                 call randomOrientations(dipolar%orientations, dipolar%get_Ncol())
                 write(output_unit, *) "Random depositions + random orientations"
                 write(report_unit, *) "    Random depositions + random orientations"
@@ -205,13 +205,13 @@ contains
                 write(report_unit, *) "    Old configuration"
                 call oldConfiguration(arg_init%files(1), arg_init%length(1), &
                                       dipolar%get_name()//"_positions", dipolar%get_Ncol(), &
-                                      dipolar%positions, norm2(Lsize))
+                                      dipolar%positions, norm2(Box_size))
                 call oldConfiguration(arg_init%files(2), arg_init%length(2), &
                                       dipolar%get_name()//"_orientations", dipolar%get_Ncol(), &
                                       dipolar%orientations, 1._DP)
                 call oldConfiguration(arg_init%files(3), arg_init%length(3), &
                                       spherical%get_name()//"_positions", spherical%get_Ncol(), &
-                                      spherical%positions, norm2(Lsize))
+                                      spherical%positions, norm2(Box_size))
             
             case default
                 error stop "Error: in setting new configuration"
@@ -222,10 +222,9 @@ contains
     
     !> Spheres initialisations
     
-    subroutine init(Lsize, Kmax, this, other, mix, write_potential, this_units, this_Epot)
+    subroutine init(Box, this, other, mix, write_potential, this_units, this_Epot)
     
-        real(DP), dimension(:), intent(in) :: Lsize    
-        integer, dimension(:), intent(in) :: Kmax
+        type(Box_dimensions), intent(in) :: Box
         class(HardSpheres), intent(inout) :: this
         class(HardSpheres), intent(in) :: other
         class(MixingPotential), intent(in) :: mix
@@ -233,10 +232,10 @@ contains
         class(Units), intent(in) :: this_units
         real(DP), intent(out) :: this_Epot
         
-        call this%test_overlap(Lsize)
+        call this%test_overlap(Box%size)
         call this%snap_data(this_units%snap_positions)
         call this%snap_positions(0, this_units%snapIni_positions)
-        call this%set_Epot(Lsize, Kmax)
+        call this%set_Epot(Box)
         
         if (write_potential) then
             call this%write_Epot(this_units%Epot)
@@ -250,29 +249,28 @@ contains
                         if (write_potential) then
                             call this%write_Epot_real(this_units%Epot_real)
                         end if
-                        call this%Epot_reci_count_waveVectors(Kmax, this_units%waveVectors)
+                        call this%Epot_reci_count_waveVectors(Box%wave, this_units%waveVectors)
                 end select
         end select
-        this_Epot = this%Epot_conf(Lsize, Kmax)
+        this_Epot = this%Epot_conf(Box)
         
-        call this%construct_cells(Lsize, other, mix%get_cell_size(), mix%get_rCut())
+        call this%construct_cells(Box%size, other, mix%get_cell_size(), mix%get_rCut())
         call this%write_report(this_units%report)
     
     end subroutine init
     
     !> Spheres finalizations
     
-    subroutine final(Lsize, Kmax, this, this_units, this_obs)
+    subroutine final(Box, this, this_units, this_obs)
     
-        real(DP), dimension(:), intent(in) :: Lsize    
-        integer, dimension(:), intent(in) :: Kmax
+        type(Box_dimensions), intent(in) :: Box
         class(HardSpheres), intent(inout) :: this
         class(Units), intent(in) :: this_units
         class(Observables), intent(in) :: this_obs
         
-        call this%test_overlap(Lsize)
-        call this%set_Epot(Lsize, Kmax)
-        call test_consist(this_obs%Epot, this%Epot_conf(Lsize, Kmax), this_units%report)
+        call this%test_overlap(Box%size)
+        call this%set_Epot(Box)
+        call test_consist(this_obs%Epot, this%Epot_conf(Box), this_units%report)
         call this%snap_positions(0, this_units%snapFin_positions)
         call this_obs%write_results(this_units%report)
         
@@ -288,48 +286,48 @@ contains
     
     !> Mix initialisation
     
-    subroutine mix_init(Lsize, mix, type1, type2, write_potential, mix_Epot_unit, mix_Epot)
+    subroutine mix_init(Box_size, mix, type1, type2, write_potential, mix_Epot_unit, mix_Epot)
     
-        real(DP), dimension(:), intent(in) :: Lsize
+        real(DP), dimension(:), intent(in) :: Box_size
         class(MixingPotential), intent(inout) :: mix
         class(HardSpheres), intent(in) :: type1, type2
         logical, intent(in) :: write_potential
         integer, intent(in) :: mix_Epot_unit
         real(DP), intent(out) :: mix_Epot
     
-        call mix%test_overlap(Lsize, type1, type2)
+        call mix%test_overlap(Box_size, type1, type2)
         call mix%set_Epot()
         if (write_potential) then
             call mix%write_Epot(mix_Epot_unit)
         end if
         call mix%set_cell_size()
-        mix_Epot = mix%Epot_conf(Lsize, type1, type2)
+        mix_Epot = mix%Epot_conf(Box_size, type1, type2)
     
     end subroutine mix_init
     
     !> Mix finalization
     
-    subroutine mix_final(Lsize, mix, type1, type2, mix_report_unit, mix_Epot, mix_Epot_conf)
+    subroutine mix_final(Box_size, mix, type1, type2, mix_report_unit, mix_Epot, mix_Epot_conf)
     
-        real(DP), dimension(:), intent(in) :: Lsize
+        real(DP), dimension(:), intent(in) :: Box_size
         class(MixingPotential), intent(inout) :: mix
         class(HardSpheres), intent(in) :: type1, type2
         integer, intent(in) :: mix_report_unit
         real(DP), intent(in) :: mix_Epot
         real(DP), intent(out) :: mix_Epot_conf
         
-        call mix%test_overlap(Lsize, type1, type2)
+        call mix%test_overlap(Box_size, type1, type2)
         call mix%set_Epot()
-        mix_Epot_conf = mix%Epot_conf(Lsize, type1, type2)
+        mix_Epot_conf = mix%Epot_conf(Box_size, type1, type2)
         call test_consist(mix_Epot, mix_Epot_conf, mix_report_unit)
     
     end subroutine mix_final
     
     !> Change: average & adaptation
     
-    subroutine adapt_move(Lsize, this, Nadapt, iStep, obs, move_unit)
+    subroutine adapt_move(Box_size, this, Nadapt, iStep, obs, move_unit)
     
-        real(DP), dimension(:), intent(in) :: Lsize
+        real(DP), dimension(:), intent(in) :: Box_size
         class(HardSpheres), intent(inout) :: this
         integer, intent(in) :: Nadapt, iStep
         class(Observables), intent(inout) :: obs
@@ -337,7 +335,7 @@ contains
     
         obs%move_rejectAvg = obs%move_rejectAdapt / real(Nadapt-1, DP)
         obs%move_rejectAdapt = 0._DP
-        call this%adapt_move_delta(Lsize, obs%move_rejectAvg)
+        call this%adapt_move_delta(Box_size, obs%move_rejectAvg)
         write(move_unit, *) iStep, this%get_move_delta(), obs%move_rejectAvg
     
     end subroutine adapt_move

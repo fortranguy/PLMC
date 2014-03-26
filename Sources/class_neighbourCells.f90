@@ -48,20 +48,20 @@ private
     
 contains
 
-    subroutine NeighbourCells_construct(this, Lsize, proposed_cell_size, rCut)
+    subroutine NeighbourCells_construct(this, Box_size, proposed_cell_size, rCut)
     
         class(NeighbourCells), intent(out) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
+        real(DP), dimension(:), intent(in) :: Box_size
         real(DP), dimension(:), intent(in) :: proposed_cell_size
         real(DP), intent(in) :: rCut
         
-        this%NtotalCell_dim(:) = floor(Lsize(:)/proposed_cell_size(:))
+        this%NtotalCell_dim(:) = floor(Box_size(:)/proposed_cell_size(:))
         this%NtotalCell = product(this%NtotalCell_dim)
-        this%cell_size(:) = Lsize(:)/real(this%NtotalCell_dim(:), DP)
+        this%cell_size(:) = Box_size(:)/real(this%NtotalCell_dim(:), DP)
         
         allocate(this%near_among_total(NnearCell, this%NtotalCell))
             
-        call this%check_CellsSize(Lsize, rCut)
+        call this%check_CellsSize(Box_size, rCut)
         call this%alloc_cells()
         call this%init_near_among_total()
     
@@ -167,14 +167,14 @@ contains
     
     ! NeighbourCells cells size check
     
-    subroutine NeighbourCells_check_cellsSize(this, Lsize, rCut)
+    subroutine NeighbourCells_check_cellsSize(this, Box_size, rCut)
     
         class(NeighbourCells), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
+        real(DP), dimension(:), intent(in) :: Box_size
         real(DP), intent(in) :: rCut
         
         integer :: jDim
-        real(DP) :: Lsize_mod_cell_size
+        real(DP) :: Box_size_mod_cell_size
         
         do jDim = 1, Ndim
         
@@ -190,14 +190,14 @@ contains
                 stop
             end if
             
-            Lsize_mod_cell_size = modulo(Lsize(jDim), this%cell_size(jDim))
-            if (Lsize_mod_cell_size > real_zero .and. &
-            abs(Lsize_mod_cell_size - this%cell_size(jDim)) > real_zero) then
+            Box_size_mod_cell_size = modulo(Box_size(jDim), this%cell_size(jDim))
+            if (Box_size_mod_cell_size > real_zero .and. &
+            abs(Box_size_mod_cell_size - this%cell_size(jDim)) > real_zero) then
                 write(error_unit, *) "    Cell size is not a divisor of the system size"
                 write(error_unit, *) "    in the dimension", jDim, ": "
-                write(error_unit, *) "    Lsize", Lsize(jDim)
+                write(error_unit, *) "    Box_size", Box_size(jDim)
                 write(error_unit, *) "    cell_size", this%cell_size(jDim)
-                write(error_unit, *) "    modulo(Lsize, cell_size) = ", Lsize_mod_cell_size
+                write(error_unit, *) "    modulo(Box_size, cell_size) = ", Box_size_mod_cell_size
                 stop
             end if
             

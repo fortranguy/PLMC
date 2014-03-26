@@ -4,7 +4,7 @@ module class_physicalSystem
 
 use, intrinsic :: iso_fortran_env, only: output_unit
 use data_precisions, only: DP
-use data_box, only: Ndim, Lsize, Kmax
+use data_box, only: Ndim, Box_size, Box_wave
 use data_monteCarlo, only: Temperature, decorrelFactor, switch_factor, Nthermal, Nadapt, Nstep, &
                            reset_iStep
 use data_potential, only: write_potential                       
@@ -33,9 +33,7 @@ private
         character(len=5) :: name
         
         ! Box
-        type(Box_dimensions) :: box
-        real(DP), dimension(Ndim) :: Lsize !< box size
-        integer, dimension(Ndim) :: Kmax !< number of wave vectors
+        type(Box_dimensions) :: Box
         integer :: Ncol !< number of particles
         
         ! Monte-Carlo
@@ -120,8 +118,8 @@ contains
     
     pure subroutine PhysicalSystem_set_box(this)
         class(PhysicalSystem), intent(inout) :: this
-        this%Lsize(:) = Lsize(:)
-        this%Kmax(:) = Kmax(:)
+        this%Box%size(:) = Box_size(:)
+        this%Box%wave(:) = Box_wave(:)
     end subroutine PhysicalSystem_set_box
     
     pure subroutine PhysicalSystem_set_monteCarlo(this)
@@ -172,10 +170,10 @@ contains
         call this%write_report(this%report_unit)
         
         call this%type1_units%open(this%type1_spheres%get_name())
-        call this%type1_spheres%write_density(this%Lsize, this%Ncol, this%type1_units%report)
+        call this%type1_spheres%write_density(this%Box%size, this%Ncol, this%type1_units%report)
         
         call this%type2_units%open(this%type2_spheres%get_name())
-        call this%type2_spheres%write_density(this%Lsize, this%Ncol, this%type2_units%report)
+        call this%type2_spheres%write_density(this%Box%size, this%Ncol, this%type2_units%report)
         
         call mix_open_units(this%mix_report_unit, this%mix_Epot_tab_unit, this%mix_obsThermal_unit, &
                             this%mix_obsEquilib_unit)
@@ -206,12 +204,12 @@ contains
     
         class(PhysicalSystem), intent(inout) :: this
     
-        call mix_init(this%Lsize, this%mix, this%type1_spheres, this%type2_spheres, &
+        call mix_init(this%Box%size, this%mix, this%type1_spheres, this%type2_spheres, &
                       this%write_potential, this%mix_Epot_tab_unit, this%mix_Epot)
         call this%mix%write_report(this%mix_report_unit)
-        call init(this%Lsize, this%Kmax, this%type1_spheres, this%type2_spheres, this%mix, &
+        call init(this%Box, this%type1_spheres, this%type2_spheres, this%mix, &
                   this%write_potential, this%type1_units, this%type1_obs%Epot)
-        call init(this%Lsize, this%Kmax, this%type2_spheres, this%type1_spheres, this%mix, &
+        call init(this%Box, this%type2_spheres, this%type1_spheres, this%mix, &
                   this%write_potential, this%type2_units, this%type2_obs%Epot)
         
     end subroutine PhysicalSystem_init_spheres
@@ -232,7 +230,7 @@ contains
         call this%init_switch()
         
         call init_randomSeed(args%random, this%report_unit)
-        call set_initialConfiguration(this%Lsize, args%initial, this%type1_spheres, &
+        call set_initialConfiguration(this%Box%size, args%initial, this%type1_spheres, &
                                       this%type2_spheres, this%mix%get_sigma(), this%report_unit)
         call this%init_observables()
         call this%init_spheres()
@@ -250,10 +248,10 @@ contains
 
         write(report_unit, *) "Data macro: "
         
-        write(report_unit ,*) "    Lsize(:) = ", this%Lsize(:)
-        write(report_unit ,*) "    Volume = ", product(this%Lsize)
-        write(report_unit ,*) "    Kmax(:) = ", this%Kmax(:)
-        write(report_unit ,*) "    NwaveVectors =", NwaveVectors(this%Kmax)
+        write(report_unit ,*) "    Box_size(:) = ", this%Box%size(:)
+        write(report_unit ,*) "    Volume = ", product(this%Box%size)
+        write(report_unit ,*) "    Box_wave(:) = ", this%Box%wave(:)
+        write(report_unit ,*) "    NwaveVectors =", NwaveVectors(this%Box%wave)
         write(report_unit ,*) "    Ncol = ", this%Ncol
         write(report_unit ,*) "    Temperature = ", this%Temperature
         
@@ -275,9 +273,9 @@ contains
     
         class(PhysicalSystem), intent(inout) :: this
         
-        call final(this%Lsize, this%Kmax, this%type1_spheres, this%type1_units, this%type1_obs)
-        call final(this%Lsize, this%Kmax, this%type2_spheres, this%type2_units, this%type2_obs)
-        call mix_final(this%Lsize, this%mix, this%type1_spheres, this%type2_spheres, &
+        call final(this%Box, this%type1_spheres, this%type1_units, this%type1_obs)
+        call final(this%Box, this%type2_spheres, this%type2_units, this%type2_obs)
+        call mix_final(this%Box%size, this%mix, this%type1_spheres, this%type2_spheres, &
                        this%mix_report_unit, this%mix_Epot, this%mix_Epot_conf)
         call mix_write_results(this%Nstep, this%mix_EpotSum, this%mix_report_unit)
         
@@ -291,8 +289,8 @@ contains
         real(DP) :: duration
         
         Epot = this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
-        Epot_conf = this%type1_spheres%Epot_conf(this%Lsize, this%Kmax) + &
-                    this%type2_spheres%Epot_conf(this%Lsize, this%Kmax) + this%mix_Epot_conf
+        Epot_conf = this%type1_spheres%Epot_conf(this%Box) + &
+                    this%type2_spheres%Epot_conf(this%Box) + this%mix_Epot_conf
         call test_consist(Epot, Epot_conf, this%report_unit)
         this%EpotSum = this%type1_obs%EpotSum + this%type2_obs%EpotSum + this%mix_EpotSum
         duration = this%time_end - this%time_start
@@ -389,18 +387,18 @@ contains
                 call random_number(rand)
                 iColRand = int(rand*real(this%Ncol, DP)) + 1
                 if (iColRand <= this%type1_spheres%get_Ncol()) then
-                    call move(this%Lsize, this%Kmax, this%type1_spheres, this%type1_obs, &
+                    call move(this%Box, this%type1_spheres, this%type1_obs, &
                               this%type2_spheres, this%mix, this%mix_Epot)
                 else
-                    call move(this%Lsize, this%Kmax, this%type2_spheres, this%type2_obs, &
+                    call move(this%Box, this%type2_spheres, this%type2_obs, &
                               this%type1_spheres, this%mix, this%mix_Epot)
                 end if
             else if (iChangeRand <= this%Nmove + this%Nswitch) then
-                call switch(this%Lsize, this%Kmax, this%type1_spheres, this%type1_obs, &
+                call switch(this%Box, this%type1_spheres, this%type1_obs, &
                             this%type2_spheres, this%type2_obs, this%mix, this%mix_Epot, this%switch_Nreject)
                 this%switch_Nhit = this%switch_Nhit + 1
             else
-                call rotate(this%Lsize, this%Kmax, this%type1_spheres, this%type1_obs)
+                call rotate(this%Box, this%type1_spheres, this%type1_obs)
             end if
             
         end do MC_Change
@@ -433,11 +431,11 @@ contains
             this%type2_obs%move_rejectAdapt = this%type2_obs%move_rejectAdapt + &
                                               this%type2_obs%move_reject
         else ! Average & adaptation
-            call adapt_move(this%Lsize, this%type1_spheres, this%Nadapt, iStep, this%type1_obs, &
+            call adapt_move(this%Box%size, this%type1_spheres, this%Nadapt, iStep, this%type1_obs, &
                             this%type1_units%move_delta)
             call adapt_rotate(this%type1_spheres, this%Nadapt, iStep, this%type1_obs, &
                               this%type1_units%rotate_delta)
-            call adapt_move(this%Lsize, this%type2_spheres, this%Nadapt, iStep, this%type2_obs, &
+            call adapt_move(this%Box%size, this%type2_spheres, this%Nadapt, iStep, this%type2_obs, &
                             this%type2_units%move_delta)
         end if
         
@@ -460,11 +458,11 @@ contains
     
         class(PhysicalSystem), intent(inout) :: this
         
-        call this%type1_spheres%set_move_delta(this%Lsize, this%type1_obs%move_rejectAvg, &
+        call this%type1_spheres%set_move_delta(this%Box%size, this%type1_obs%move_rejectAvg, &
                                                this%type1_units%report)
         call this%type1_spheres%set_rotate_delta(this%type1_obs%rotate_rejectAvg, &
                                                  this%type1_units%report)
-        call this%type2_spheres%set_move_delta(this%Lsize, this%type2_obs%move_rejectAvg, &
+        call this%type2_spheres%set_move_delta(this%Box%size, this%type2_obs%move_rejectAvg, &
                                                this%type2_units%report)
     
     end subroutine PhysicalSystem_fix_changes
@@ -473,10 +471,8 @@ contains
     
         class(PhysicalSystem), intent(inout) :: this
     
-        call widom(this%Lsize, this%Kmax, this%type1_spheres, this%type1_obs, this%type2_spheres, &
-                   this%mix)
-        call widom(this%Lsize, this%Kmax, this%type2_spheres, this%type2_obs, this%type1_spheres, &
-                   this%mix)
+        call widom(this%Box, this%type1_spheres, this%type1_obs, this%type2_spheres, this%mix)
+        call widom(this%Box, this%type2_spheres, this%type2_obs, this%type1_spheres, this%mix)
     
     end subroutine PhysicalSystem_measure_chemical_potentials
     
@@ -525,7 +521,7 @@ contains
         integer, intent(in) :: iStep
     
         if (modulo(iStep, this%reset_iStep) == 0) then
-            call this%type1_spheres%reset_Epot_reci_structure(this%Lsize, this%Kmax, iStep, &
+            call this%type1_spheres%reset_Epot_reci_structure(this%Box, iStep, &
                                                               this%type1_units%structure_modulus)
             call this%type1_spheres%reset_totalMoment(iStep, this%type1_units%totalMoment_modulus)
         end if

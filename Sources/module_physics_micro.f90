@@ -11,7 +11,7 @@ use data_box, only: Ndim
 implicit none
 private
 public set_discrete_length, sphere_volume, distVec_PBC, dist_PBC, random_surface, markov_surface, &
-       NwaveVectors, Kmax1_sym, Kmax2_sym, fourier_i, index_from_coord, coord_PBC, &
+       NwaveVectors, Box_wave1_sym, Box_wave2_sym, fourier_i, index_from_coord, coord_PBC, &
        Epot_lennardJones, Epot_yukawa
 
 contains
@@ -42,25 +42,25 @@ contains
     !> Distance between 2 positions with Periodic Boundary Conditions
     !> from SMAC, algorithm 2.5 & 2.6, p.91
     
-    pure function distVec_PBC(Lsize, xCol1, xCol2)
+    pure function distVec_PBC(Box_size, xCol1, xCol2)
     
-        real(DP), dimension(:), intent(in) :: Lsize
+        real(DP), dimension(:), intent(in) :: Box_size
         real(DP), dimension(:), intent(in) :: xCol1, xCol2
         real(DP), dimension(Ndim) :: distVec_PBC
         
-        distVec_PBC(:) = modulo(xCol2(:)-xCol1(:), Lsize(:))
+        distVec_PBC(:) = modulo(xCol2(:)-xCol1(:), Box_size(:))
         
-        where(distVec_PBC(:) > Lsize(:)/2._DP)
-            distVec_PBC(:) = distVec_PBC(:) - Lsize(:)
+        where(distVec_PBC(:) > Box_size(:)/2._DP)
+            distVec_PBC(:) = distVec_PBC(:) - Box_size(:)
         end where
         
     end function distVec_PBC
     
-    pure function dist_PBC(Lsize, xCol1, xCol2)
-        real(DP), dimension(:), intent(in) :: Lsize
+    pure function dist_PBC(Box_size, xCol1, xCol2)
+        real(DP), dimension(:), intent(in) :: Box_size
         real(DP), dimension(:), intent(in) :: xCol1, xCol2
         real(DP) :: dist_PBC
-        dist_PBC = norm2(distVec_PBC(Lsize, xCol1, xCol2))
+        dist_PBC = norm2(distVec_PBC(Box_size, xCol1, xCol2))
     end function dist_PBC
     
     !> Rotation
@@ -169,35 +169,35 @@ contains
 
     !> Symmetry: half wave vectors in do loop: Kmax1
 
-    pure function Kmax1_sym(Kmax, ky, kz)
+    pure function Box_wave1_sym(Kmax, ky, kz)
 
         integer, dimension(:), intent(in) :: Kmax
         integer, intent(in) :: ky, kz
-        integer :: Kmax1_sym
+        integer :: Box_wave1_sym
 
         if (ky == 0 .and. kz == 0) then
-            Kmax1_sym = 0
+            Box_wave1_sym = 0
         else
-            Kmax1_sym = Kmax(1)
+            Box_wave1_sym = Kmax(1)
         end if
 
-    end function Kmax1_sym
+    end function Box_wave1_sym
 
     !> Symmetry: half wave vectors in do loop: Kmax2
 
-    pure function Kmax2_sym(Kmax, kz)
+    pure function Box_wave2_sym(Kmax, kz)
     
         integer, dimension(:), intent(in) :: Kmax
         integer, intent(in) :: kz
-        integer :: Kmax2_sym
+        integer :: Box_wave2_sym
 
         if (kz == 0) then
-            Kmax2_sym = 0
+            Box_wave2_sym = 0
         else
-            Kmax2_sym = Kmax(2)
+            Box_wave2_sym = Kmax(2)
         end if
 
-    end function Kmax2_sym
+    end function Box_wave2_sym
     
     !> Fourier coefficients (bases)
     

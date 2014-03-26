@@ -128,19 +128,22 @@ contains
     
     !> Overlapt test
     
-    subroutine MixingPotential_test_overlap(this, Lsize, type1, type2)
+    subroutine MixingPotential_test_overlap(this, Box_size, type1, type2)
     
         class(MixingPotential), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
+        real(DP), dimension(:), intent(in) :: Box_size
         class(HardSpheres), intent(in) :: type1, type2
         
         integer :: type1_iCol, type2_iCol
         real(DP) :: r_mix
+        real(DP), dimension(Ndim) :: type1_xCol, type2_xCol
         
         do type1_iCol = 1, type1%get_Ncol()
             do type2_iCol = 1, type2%get_Ncol()
                     
-                r_mix = dist_PBC(Lsize, type1%positions(:, type1_iCol), type2%positions(:, type2_iCol))
+                type1_xCol(:) = type1%positions(:, type1_iCol)
+                type2_xCol(:) = type2%positions(:, type2_iCol)
+                r_mix = dist_PBC(Box_size, type1_xCol, type2_xCol)
                 if (r_mix < this%rMin) then
                     write(error_unit, *) this%name, ":    Overlap !", type1_iCol, type2_iCol
                     write(error_unit, *) "    r_mix = ", r_mix
@@ -236,11 +239,11 @@ contains
         
     end function MixingPotential_Epot_pair
     
-    subroutine MixingPotential_Epot_neighCells(this, Lsize, iCol, xCol, iTotalCell, neighCells, &
+    subroutine MixingPotential_Epot_neighCells(this, Box_size, iCol, xCol, iTotalCell, neighCells, &
                                                other_positions, overlap, energ)
         
         class(MixingPotential), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
+        real(DP), dimension(:), intent(in) :: Box_size
         integer, intent(in) :: iCol
         real(DP), dimension(:), intent(in) :: xCol !< type A
         integer, intent(in) :: iTotalCell !< type A in mix grid
@@ -268,7 +271,7 @@ contains
                 next => current%next
 
                 if (current%iCol /= iCol) then
-                    r = dist_PBC(Lsize, xCol(:), other_positions(:, current%iCol))
+                    r = dist_PBC(Box_size, xCol(:), other_positions(:, current%iCol))
                     if (r < this%rMin) then
                         overlap = .true.
                         return
@@ -288,15 +291,16 @@ contains
     
     !> Total potential energy
     
-    pure function MixingPotential_Epot_conf(this, Lsize, type1, type2) result(Epot_conf)
+    pure function MixingPotential_Epot_conf(this, Box_size, type1, type2) result(Epot_conf)
     
         class(MixingPotential), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
+        real(DP), dimension(:), intent(in) :: Box_size
         class(HardSpheres), intent(in) :: type1, type2
         real(DP) :: Epot_conf
 
         integer :: type1_iCol, type2_iCol
         real(DP) :: r_mix
+        real(DP), dimension(Ndim) :: type1_xCol, type2_xCol
 
         Epot_conf = 0._DP
         
@@ -307,7 +311,9 @@ contains
         do type1_iCol = 1, type1%get_Ncol()
             do type2_iCol = 1, type2%get_Ncol()
                 
-                r_mix = dist_PBC(Lsize, type1%positions(:, type1_iCol), type2%positions(:, type2_iCol))
+                type1_xCol(:) = type1%positions(:, type1_iCol)
+                type2_xCol(:) = type2%positions(:, type2_iCol)
+                r_mix = dist_PBC(Box_size, type1_xCol, type2_xCol)
                 Epot_conf = Epot_conf + this%Epot_pair(r_mix)
 
             end do

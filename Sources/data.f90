@@ -47,15 +47,15 @@ implicit none
     
     integer, parameter :: Ndim = 3
     
-    real(DP), parameter :: Lsize1 = 25._DP ! u_length
-    real(DP), parameter :: Lsize2 = Lsize1 ! u_length
-    real(DP), parameter :: Lsize3 = Lsize1 ! u_length
-    real(DP), dimension(Ndim), parameter :: Lsize = [Lsize1, Lsize2, Lsize3] ! u_length
+    real(DP), parameter :: Box_size1 = 25._DP ! u_length
+    real(DP), parameter :: Box_size2 = Box_size1 ! u_length
+    real(DP), parameter :: Box_size3 = Box_size1 ! u_length
+    real(DP), dimension(Ndim), parameter :: Box_size = [Box_size1, Box_size2, Box_size3] ! u_length
 
-    integer, parameter :: Kmax1 = 8 ! 1/u_length
-    integer, parameter :: Kmax2 = Kmax1 ! 1/u_length
-    integer, parameter :: Kmax3 = Kmax1 ! 1/u_length
-    integer, dimension(Ndim), parameter :: Kmax = [Kmax1, Kmax2, Kmax3] ! 1/u_length
+    integer, parameter :: Box_wave1 = 8 ! 1/u_length
+    integer, parameter :: Box_wave2 = Box_wave1 ! 1/u_length
+    integer, parameter :: Box_wave3 = Box_wave1 ! 1/u_length
+    integer, dimension(Ndim), parameter :: Box_wave = [Box_wave1, Box_wave2, Box_wave3] ! 1/u_length
     
 end module data_box
 !***************************************************************************************************
@@ -132,9 +132,9 @@ use data_precisions, only: DP
 implicit none
 
     real(DP), parameter :: dipol_rMin_factor = 1._DP
-    real(DP), parameter :: dipol_real_rCut_factor = 0.5_DP ! * Lsize(1)
+    real(DP), parameter :: dipol_real_rCut_factor = 0.5_DP ! * Box_size(1)
     real(DP), parameter :: dipol_real_dr = 5.E-5_DP ! u_length
-    real(DP), parameter :: dipol_alpha_factor = 7._DP ! / Lsize(1)
+    real(DP), parameter :: dipol_alpha_factor = 7._DP ! / Box_size(1)
 
     real(DP), parameter :: hard_rMin_factor = 1._DP
 

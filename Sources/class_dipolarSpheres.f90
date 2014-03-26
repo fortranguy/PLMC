@@ -12,7 +12,9 @@ use data_monteCarlo, only: dipol_move_delta, dipol_move_rejectFix, dipol_rotate_
 use data_potential, only: dipol_rMin_factor, dipol_real_rCut_factor, dipol_real_dr, dipol_alpha_factor
 use data_neighbourCells, only: NnearCell
 use data_distribution, only: snap_ratio
-use module_physics_micro, only: set_discrete_length, distVec_PBC, Kmax1_sym, Kmax2_sym, fourier_i
+use module_types, only: Box_dimensions
+use module_physics_micro, only: set_discrete_length, distVec_PBC, Box_wave1_sym, Box_wave2_sym, &
+                                fourier_i
 use class_neighbourCells
 use class_hardSpheres
 
@@ -250,10 +252,10 @@ contains
         get_rotate_delta = this%rotate_delta
     end function DipolarSpheres_get_rotate_delta
 
-    subroutine DipolarSpheres_Epot_set_alpha(this, Lsize)
+    subroutine DipolarSpheres_Epot_set_alpha(this, Box_size)
         class(DipolarSpheres), intent(inout) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
-        this%alpha = dipol_alpha_factor / Lsize(1)
+        real(DP), dimension(:), intent(in) :: Box_size
+        this%alpha = dipol_alpha_factor / Box_size(1)
     end subroutine DipolarSpheres_Epot_set_alpha
 
     ! Real: short-range interaction ---------------------------------------------------------------
@@ -308,24 +310,24 @@ contains
     
     !> Initialisation
     
-    subroutine DipolarSpheres_set_Epot_real_parameters(this, Lsize)
+    subroutine DipolarSpheres_set_Epot_real_parameters(this, Box_size)
         
         class(DipolarSpheres), intent(inout) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
+        real(DP), dimension(:), intent(in) :: Box_size
         
-        this%real_rCut = dipol_real_rCut_factor * Lsize(1)
+        this%real_rCut = dipol_real_rCut_factor * Box_size(1)
         this%real_dr = dipol_real_dr
         call set_discrete_length(this%rMin, this%real_dr)
         this%real_iMin = int(this%rMin/this%real_dr)
         this%real_iCut = int(this%real_rCut/this%real_dr) + 1
     end subroutine DipolarSpheres_set_Epot_real_parameters
     
-    subroutine DipolarSpheres_set_Epot_real(this, Lsize)
+    subroutine DipolarSpheres_set_Epot_real(this, Box_size)
     
         class(DipolarSpheres), intent(inout) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
+        real(DP), dimension(:), intent(in) :: Box_size
         
-        call this%set_Epot_real_parameters(Lsize)
+        call this%set_Epot_real_parameters(Box_size)
         
         if (allocated(this%Epot_real_tab)) deallocate(this%Epot_real_tab)
         allocate(this%Epot_real_tab(this%real_iMin:this%real_iCut, 2))
@@ -397,10 +399,11 @@ contains
     
     !> Energy of 1 dipole with others
     
-    pure function DipolarSpheres_Epot_real_solo(this, Lsize, iCol, xCol_i, mCol_i) result(Epot_real_solo)
+    pure function DipolarSpheres_Epot_real_solo(this, Box_size, iCol, xCol_i, mCol_i) &
+                  result(Epot_real_solo)
 
         class(DipolarSpheres), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
+        real(DP), dimension(:), intent(in) :: Box_size
         integer, intent(in) :: iCol
         real(DP), dimension(:), intent(in) :: xCol_i, mCol_i
         real(DP) :: Epot_real_solo
@@ -416,7 +419,7 @@ contains
             if (jCol /= iCol) then
 
                 xCol_j(:) = this%positions(:, jCol)
-                rVec_ij = distVec_PBC(Lsize, xCol_i(:), xCol_j)
+                rVec_ij = distVec_PBC(Box_size, xCol_i(:), xCol_j)
                 r_ij = norm2(rVec_ij)
                 mCol_j(:) = this%orientations(:, jCol)
 
@@ -429,10 +432,10 @@ contains
     
     !> Total real energy
     
-    pure function DipolarSpheres_Epot_real(this, Lsize) result(Epot_real)
+    pure function DipolarSpheres_Epot_real(this, Box_size) result(Epot_real)
     
         class(DipolarSpheres), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
+        real(DP), dimension(:), intent(in) :: Box_size
         real(DP) :: Epot_real
         
         integer :: iCol
@@ -444,7 +447,7 @@ contains
         do iCol = 1, this%Ncol
             xCol_i(:) = this%positions(:, iCol)
             mCol_i(:) = this%orientations(:, iCol)
-            Epot_real = Epot_real + this%Epot_real_solo(Lsize, iCol, xCol_i, mCol_i)
+            Epot_real = Epot_real + this%Epot_real_solo(Box_size, iCol, xCol_i, mCol_i)
         end do
 
         Epot_real = Epot_real/2._DP
@@ -458,27 +461,26 @@ contains
     !>                                {\sum_{d=1}^3 \frac{k_d^2}{L_d}}
     !> \f]
     
-    pure subroutine DipolarSpheres_set_Epot_reci_weight(this, Lsize, Kmax)
+    pure subroutine DipolarSpheres_set_Epot_reci_weight(this, Box)
         
         class(DipolarSpheres), intent(inout) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
-        integer, dimension(:), intent(in) :: Kmax
+        type(Box_dimensions), intent(in) :: Box
         
         integer :: kx, ky, kz
         real(DP), dimension(Ndim) :: waveVector
         real(DP) :: kOverL
 
-        do kz = -Kmax(3), Kmax(3)
+        do kz = -Box%wave(3), Box%wave(3)
             waveVector(3) = real(kz, DP)
         
-        do ky = -Kmax(2), Kmax(2)
+        do ky = -Box%wave(2), Box%wave(2)
             waveVector(2) = real(ky, DP)
         
-        do kx = -Kmax(1), Kmax(1)
+        do kx = -Box%wave(1), Box%wave(1)
             waveVector(1) = real(kx, DP)
 
             if (kx**2 + ky**2 + kz**2 /= 0) then
-                kOverL = norm2(waveVector(:)/Lsize(:))
+                kOverL = norm2(waveVector(:)/Box%size(:))
                 this%Epot_reci_weight(kx, ky, kz) = exp(-PI**2/this%alpha**2 * kOverL**2) / kOverL**2
             else
                 this%Epot_reci_weight(kx, ky, kz) = 0._DP
@@ -502,16 +504,15 @@ contains
     !>                                 e^{+i\vec{k}\cdot\vec{x}_i}
     !> \f].
 
-    pure subroutine DipolarSpheres_set_Epot_reci_structure(this, Lsize, Kmax)
+    pure subroutine DipolarSpheres_set_Epot_reci_structure(this, Box)
 
         class(DipolarSpheres), intent(inout) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
-        integer, dimension(:), intent(in) :: Kmax
+        type(Box_dimensions), intent(in) :: Box
 
         complex(DP) :: exp_IkxCol
-        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_Ikx_1
-        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_Ikx_2
-        complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_Ikx_3
+        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_1
+        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_2
+        complex(DP), dimension(-Box%wave(3):Box%wave(3)) :: exp_Ikx_3
 
         real(DP), dimension(Ndim) :: xColOverL, mColOverL
         real(DP), dimension(Ndim) :: waveVector
@@ -523,20 +524,20 @@ contains
 
         do iCol = 1, this%Ncol
         
-            xColOverL(:) = 2._DP*PI * this%positions(:, iCol)/Lsize(:)
-            call fourier_i(Kmax(1), xColOverL(1), exp_Ikx_1)
-            call fourier_i(Kmax(2), xColOverL(2), exp_Ikx_2)
-            call fourier_i(Kmax(3), xColOverL(3), exp_Ikx_3)
+            xColOverL(:) = 2._DP*PI * this%positions(:, iCol)/Box%size(:)
+            call fourier_i(Box%wave(1), xColOverL(1), exp_Ikx_1)
+            call fourier_i(Box%wave(2), xColOverL(2), exp_Ikx_2)
+            call fourier_i(Box%wave(3), xColOverL(3), exp_Ikx_3)
             
-            mColOverL(:) = this%orientations(:, iCol)/Lsize(:)
+            mColOverL(:) = this%orientations(:, iCol)/Box%size(:)
         
-            do kz = -Kmax(3), Kmax(3)
+            do kz = -Box%wave(3), Box%wave(3)
                 waveVector(3) = real(kz, DP)
 
-            do ky = -Kmax(2), Kmax(2)
+            do ky = -Box%wave(2), Box%wave(2)
                 waveVector(2) = real(ky, DP)
                 
-            do kx = -Kmax(1), Kmax(1)
+            do kx = -Box%wave(1), Box%wave(1)
                 waveVector(1) = real(kx, DP)
                               
                 exp_IkxCol = exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz)
@@ -555,39 +556,40 @@ contains
 
     end subroutine DipolarSpheres_set_Epot_reci_structure
     
-    pure subroutine DipolarSpheres_set_Epot_reci(this, Lsize, Kmax)
+    pure subroutine DipolarSpheres_set_Epot_reci(this, Box)
         
         class(DipolarSpheres), intent(inout) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
-        integer, dimension(:), intent(in) :: Kmax
+        type(Box_dimensions), intent(in) :: Box
         
         if (allocated(this%Epot_reci_weight)) deallocate(this%Epot_reci_weight)
-        allocate(this%Epot_reci_weight(-Kmax(1):Kmax(1), -Kmax(2):Kmax(2), -Kmax(3):Kmax(3)))
+        allocate(this%Epot_reci_weight(-Box%wave(1):Box%wave(1), -Box%wave(2):Box%wave(2), &
+                                       -Box%wave(3):Box%wave(3)))
         
         if (allocated(this%Epot_reci_structure)) deallocate(this%Epot_reci_structure)
-        allocate(this%Epot_reci_structure(-Kmax(1):Kmax(1), -Kmax(2):Kmax(2), -Kmax(3):Kmax(3)))
+        allocate(this%Epot_reci_structure(-Box%wave(1):Box%wave(1), -Box%wave(2):Box%wave(2), &
+                                          -Box%wave(3):Box%wave(3)))
         
-        call this%set_Epot_reci_weight(Lsize, Kmax)
-        call this%set_Epot_reci_structure(Lsize, Kmax)
+        call this%set_Epot_reci_weight(Box)
+        call this%set_Epot_reci_structure(Box)
     
     end subroutine DipolarSpheres_set_Epot_reci
     
     !> To calculate the drift of the strucutre factor
 
-    pure function DipolarSpheres_Epot_reci_get_structure_modulus(this, Kmax) &
+    pure function DipolarSpheres_Epot_reci_get_structure_modulus(this, Box_wave) &
                   result(Epot_reci_get_structure_modulus)
 
         class(DipolarSpheres), intent(in) :: this
-        integer, dimension(:), intent(in) :: Kmax
+        integer, dimension(:), intent(in) :: Box_wave
         real(DP) :: Epot_reci_get_structure_modulus
 
         integer :: kx, ky, kz
 
         Epot_reci_get_structure_modulus = 0._DP
 
-        do kz = 0, Kmax(3)
-            do ky = -Kmax2_sym(Kmax, kz), Kmax(2)
-                do kx = -Kmax1_sym(Kmax, ky, kz), Kmax(1)
+        do kz = 0, Box_wave(3)
+            do ky = -Box_wave2_sym(Box_wave, kz), Box_wave(2)
+                do kx = -Box_wave1_sym(Box_wave, ky, kz), Box_wave(1)
                     Epot_reci_get_structure_modulus = Epot_reci_get_structure_modulus + &
                                                       abs(this%Epot_reci_structure(kx, ky, kz))
                 end do
@@ -598,19 +600,18 @@ contains
     
     !> Reinitialise the structure factor and write the drift
     
-    subroutine DipolarSpheres_reset_Epot_reci_structure(this, Lsize, Kmax, iStep, modulus_unit)
+    subroutine DipolarSpheres_reset_Epot_reci_structure(this, Box, iStep, modulus_unit)
     
         class(DipolarSpheres), intent(inout) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
-        integer, dimension(:), intent(in) :: Kmax
+        type(Box_dimensions), intent(in) :: Box
         integer, intent(in) :: iStep
         integer, intent(in) :: modulus_unit
 
         real(DP) :: modulus_drifted, modulus_reInit
         
-        modulus_drifted = this%Epot_reci_get_structure_modulus(Kmax)
-        call this%set_Epot_reci_structure(Lsize, Kmax)
-        modulus_reInit = this%Epot_reci_get_structure_modulus(Kmax)
+        modulus_drifted = this%Epot_reci_get_structure_modulus(Box%wave)
+        call this%set_Epot_reci_structure(Box)
+        modulus_reInit = this%Epot_reci_get_structure_modulus(Box%wave)
         
         write(modulus_unit, *) iStep, abs(modulus_reInit - modulus_drifted)
     
@@ -618,19 +619,19 @@ contains
 
     ! Count the number of wave vectors
 
-    subroutine DipolarSpheres_Epot_reci_count_waveVectors(this, Kmax, waveVectors_unit)
+    subroutine DipolarSpheres_Epot_reci_count_waveVectors(this, Box_wave, waveVectors_unit)
 
         class(DipolarSpheres), intent(inout) :: this
-        integer, dimension(:), intent(in) :: Kmax
+        integer, dimension(:), intent(in) :: Box_wave
         integer, intent(in) :: waveVectors_unit
         
         integer :: kx, ky, kz
 
         this%NwaveVectors = 0
 
-        do kz = 0, Kmax(3)
-            do ky = -Kmax2_sym(Kmax, kz), Kmax(2)
-                do kx = -Kmax1_sym(Kmax, ky, kz), Kmax(1)
+        do kz = 0, Box_wave(3)
+            do ky = -Box_wave2_sym(Box_wave, kz), Box_wave(2)
+                do kx = -Box_wave1_sym(Box_wave, ky, kz), Box_wave(1)
                     if (kx**2 + ky**2 + kz**2 /= 0) then
 
                         write(waveVectors_unit, *) kx, ky, kz
@@ -658,12 +659,11 @@ contains
     !>               ]
     !> \f]
 
-    pure function DipolarSpheres_deltaEpot_reci_move(this, Lsize, Kmax, xOld, xNew, mCol) &
+    pure function DipolarSpheres_deltaEpot_reci_move(this, Box, xOld, xNew, mCol) &
                   result(deltaEpot_reci_move)
 
         class(DipolarSpheres), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
-        integer, dimension(:), intent(in) :: Kmax
+        type(Box_dimensions), intent(in) :: Box
         real(DP), dimension(:), intent(in) :: xOld, xNew
         real(DP), dimension(:), intent(in) :: mCol
         real(DP) :: deltaEpot_reci_move
@@ -671,14 +671,14 @@ contains
         real(DP), dimension(Ndim) :: xNewOverL, xOldOverL
         real(DP), dimension(Ndim) :: mColOverL
 
-        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxNew_1
-        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxNew_2
-        complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_IkxNew_3
+        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxNew_1
+        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxNew_2
+        complex(DP), dimension(-Box%wave(3):Box%wave(3)) :: exp_IkxNew_3
         complex(DP) :: exp_IkxNew
 
-        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxOld_1
-        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxOld_2
-        complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_IkxOld_3
+        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxOld_1
+        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxOld_2
+        complex(DP), dimension(-Box%wave(3):Box%wave(3)) :: exp_IkxOld_3
         complex(DP) :: exp_IkxOld
 
         real(DP) :: realPart
@@ -687,27 +687,27 @@ contains
         real(DP) :: k_dot_mCol
         integer :: kx, ky, kz
 
-        xNewOverL(:) = 2._DP*PI * xNew(:)/Lsize(:)
-        call fourier_i(Kmax(1), xNewOverL(1), exp_IkxNew_1)
-        call fourier_i(Kmax(2), xNewOverL(2), exp_IkxNew_2)
-        call fourier_i(Kmax(3), xNewOverL(3), exp_IkxNew_3)
+        xNewOverL(:) = 2._DP*PI * xNew(:)/Box%size(:)
+        call fourier_i(Box%wave(1), xNewOverL(1), exp_IkxNew_1)
+        call fourier_i(Box%wave(2), xNewOverL(2), exp_IkxNew_2)
+        call fourier_i(Box%wave(3), xNewOverL(3), exp_IkxNew_3)
         
-        xOldOverL(:) = 2._DP*PI * xOld(:)/Lsize(:)
-        call fourier_i(Kmax(1), xOldOverL(1), exp_IkxOld_1)
-        call fourier_i(Kmax(2), xOldOverL(2), exp_IkxOld_2)
-        call fourier_i(Kmax(3), xOldOverL(3), exp_IkxOld_3)
+        xOldOverL(:) = 2._DP*PI * xOld(:)/Box%size(:)
+        call fourier_i(Box%wave(1), xOldOverL(1), exp_IkxOld_1)
+        call fourier_i(Box%wave(2), xOldOverL(2), exp_IkxOld_2)
+        call fourier_i(Box%wave(3), xOldOverL(3), exp_IkxOld_3)
 
-        mColOverL(:) = mCol(:)/Lsize(:)
+        mColOverL(:) = mCol(:)/Box%size(:)
 
         deltaEpot_reci_move = 0._DP
 
-        do kz = 0, Kmax(3) ! symmetry: half wave vectors -> double Energy
+        do kz = 0, Box%wave(3) ! symmetry: half wave vectors -> double Energy
             waveVector(3) = real(kz, DP)
 
-            do ky = -Kmax2_sym(Kmax, kz), Kmax(2)
+            do ky = -Box_wave2_sym(Box%wave, kz), Box%wave(2)
                 waveVector(2) = real(ky, DP)
             
-                do kx = -Kmax1_sym(Kmax, ky, kz), Kmax(1)
+                do kx = -Box_wave1_sym(Box%wave, ky, kz), Box%wave(1)
                     waveVector(1) = real(kx, DP)
                     
                     k_dot_mCol = dot_product(waveVector, mColOverL)
@@ -728,7 +728,7 @@ contains
         
         end do
 
-        deltaEpot_reci_move = 4._DP*PI/product(Lsize) * deltaEpot_reci_move
+        deltaEpot_reci_move = 4._DP*PI/product(Box%size) * deltaEpot_reci_move
 
     end function DipolarSpheres_deltaEpot_reci_move
 
@@ -739,50 +739,49 @@ contains
     !>  \f]
     !>
 
-    pure subroutine DipolarSpheres_reci_update_structure_move(this, Lsize, Kmax, xOld, xNew, mCol)
+    pure subroutine DipolarSpheres_reci_update_structure_move(this, Box, xOld, xNew, mCol)
 
         class(DipolarSpheres), intent(inout) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
-        integer, dimension(:), intent(in) :: Kmax
+        type(Box_dimensions), intent(in) :: Box
         real(DP), dimension(:), intent(in) :: xOld, xNew
         real(DP), dimension(:), intent(in) :: mCol
         
         real(DP), dimension(Ndim) :: xNewOverL, xOldOverL
         real(DP), dimension(Ndim) :: mColOverL
 
-        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxNew_1
-        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxNew_2
-        complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_IkxNew_3
+        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxNew_1
+        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxNew_2
+        complex(DP), dimension(-Box%wave(3):Box%wave(3)) :: exp_IkxNew_3
         complex(DP) :: exp_IkxNew
 
-        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxOld_1
-        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxOld_2
-        complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_IkxOld_3
+        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxOld_1
+        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxOld_2
+        complex(DP), dimension(-Box%wave(3):Box%wave(3)) :: exp_IkxOld_3
         complex(DP) :: exp_IkxOld
 
         real(DP), dimension(Ndim) :: waveVector
         real(DP) :: k_dot_mCol
         integer :: kx, ky, kz
 
-        xNewOverL(:) = 2._DP*PI * xNew(:)/Lsize(:)
-        call fourier_i(Kmax(1), xNewOverL(1), exp_IkxNew_1)
-        call fourier_i(Kmax(2), xNewOverL(2), exp_IkxNew_2)
-        call fourier_i(Kmax(3), xNewOverL(3), exp_IkxNew_3)
+        xNewOverL(:) = 2._DP*PI * xNew(:)/Box%size(:)
+        call fourier_i(Box%wave(1), xNewOverL(1), exp_IkxNew_1)
+        call fourier_i(Box%wave(2), xNewOverL(2), exp_IkxNew_2)
+        call fourier_i(Box%wave(3), xNewOverL(3), exp_IkxNew_3)
         
-        xOldOverL(:) = 2._DP*PI * xOld(:)/Lsize(:)
-        call fourier_i(Kmax(1), xOldOverL(1), exp_IkxOld_1)
-        call fourier_i(Kmax(2), xOldOverL(2), exp_IkxOld_2)
-        call fourier_i(Kmax(3), xOldOverL(3), exp_IkxOld_3)
+        xOldOverL(:) = 2._DP*PI * xOld(:)/Box%size(:)
+        call fourier_i(Box%wave(1), xOldOverL(1), exp_IkxOld_1)
+        call fourier_i(Box%wave(2), xOldOverL(2), exp_IkxOld_2)
+        call fourier_i(Box%wave(3), xOldOverL(3), exp_IkxOld_3)
 
-        mColOverL(:) = mCol(:)/Lsize(:)
+        mColOverL(:) = mCol(:)/Box%size(:)
 
-        do kz = 0, Kmax(3)
+        do kz = 0, Box%wave(3)
             waveVector(3) = real(kz, DP)
 
-            do ky = -Kmax2_sym(Kmax, kz), Kmax(2)
+            do ky = -Box_wave2_sym(Box%wave, kz), Box%wave(2)
                 waveVector(2) = real(ky, DP)
 
-                do kx = -Kmax1_sym(Kmax, ky, kz), Kmax(1)
+                do kx = -Box_wave1_sym(Box%wave, ky, kz), Box%wave(1)
                     waveVector(1) = real(kx, DP)
                     
                     k_dot_mCol = dot_product(waveVector, mColOverL)
@@ -812,12 +811,11 @@ contains
     !>               \}
     !> \f]
     
-    pure function DipolarSpheres_deltaEpot_reci_rotate(this, Lsize, Kmax, xCol, mOld, mNew) &
+    pure function DipolarSpheres_deltaEpot_reci_rotate(this, Box, xCol, mOld, mNew) &
                   result(deltaEpot_reci_rotate)
 
         class(DipolarSpheres), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
-        integer, dimension(:), intent(in) :: Kmax
+        type(Box_dimensions), intent(in) :: Box
         real(DP), dimension(:), intent(in) :: xCol
         real(DP), dimension(:), intent(in) :: mOld, mNew
         real(DP) :: deltaEpot_reci_rotate
@@ -825,9 +823,9 @@ contains
         real(DP), dimension(Ndim) :: xColOverL
         real(DP), dimension(Ndim) :: mNewOverL, mOldOverL
 
-        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxCol_1
-        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxCol_2
-        complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_IkxCol_3
+        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxCol_1
+        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxCol_2
+        complex(DP), dimension(-Box%wave(3):Box%wave(3)) :: exp_IkxCol_3
         complex(DP) :: exp_IkxCol
 
         real(DP) :: realPart
@@ -836,23 +834,23 @@ contains
         real(DP) :: k_dot_mNew, k_dot_mOld
         integer :: kx, ky, kz
 
-        xColOverL(:) = 2._DP*PI * xCol(:)/Lsize(:)
-        call fourier_i(Kmax(1), xColOverL(1), exp_IkxCol_1)
-        call fourier_i(Kmax(2), xColOverL(2), exp_IkxCol_2)
-        call fourier_i(Kmax(3), xColOverL(3), exp_IkxCol_3)
+        xColOverL(:) = 2._DP*PI * xCol(:)/Box%size(:)
+        call fourier_i(Box%wave(1), xColOverL(1), exp_IkxCol_1)
+        call fourier_i(Box%wave(2), xColOverL(2), exp_IkxCol_2)
+        call fourier_i(Box%wave(3), xColOverL(3), exp_IkxCol_3)
 
-        mNewOverL(:) = mNew(:)/Lsize(:)
-        mOldOverL(:) = mOld(:)/Lsize(:)
+        mNewOverL(:) = mNew(:)/Box%size(:)
+        mOldOverL(:) = mOld(:)/Box%size(:)
 
         deltaEpot_reci_rotate = 0._DP
 
-        do kz = 0, Kmax(3) ! symmetry: half wave vectors -> double Energy
+        do kz = 0, Box%wave(3) ! symmetry: half wave vectors -> double Energy
             waveVector(3) = real(kz, DP)
 
-            do ky = -Kmax2_sym(Kmax, kz), Kmax(2)
+            do ky = -Box_wave2_sym(Box%wave, kz), Box%wave(2)
                 waveVector(2) = real(ky, DP)
             
-                do kx = -Kmax1_sym(Kmax, ky, kz), Kmax(1)
+                do kx = -Box_wave1_sym(Box%wave, ky, kz), Box%wave(1)
                     waveVector(1) = real(kx, DP)
 
                     k_dot_mNew = dot_product(waveVector, mNewOverL)
@@ -872,7 +870,7 @@ contains
 
         end do
 
-        deltaEpot_reci_rotate = 4._DP*PI/product(Lsize) * deltaEpot_reci_rotate
+        deltaEpot_reci_rotate = 4._DP*PI/product(Box%size) * deltaEpot_reci_rotate
 
     end function DipolarSpheres_deltaEpot_reci_rotate
 
@@ -883,41 +881,40 @@ contains
     !>  \f]
     !>
 
-    pure subroutine DipolarSpheres_reci_update_structure_rotate(this, Lsize, Kmax, xCol, mOld, mNew)
+    pure subroutine DipolarSpheres_reci_update_structure_rotate(this, Box, xCol, mOld, mNew)
 
         class(DipolarSpheres), intent(inout) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
-        integer, dimension(:), intent(in) :: Kmax
+        type(Box_dimensions), intent(in) :: Box
         real(DP), dimension(:), intent(in) :: xCol
         real(DP), dimension(:), intent(in) :: mOld, mNew
 
         real(DP), dimension(Ndim) :: xColOverL
         real(DP), dimension(Ndim) :: mNewOverL, mOldOverL
 
-        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxCol_1
-        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxCol_2
-        complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_IkxCol_3
+        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxCol_1
+        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxCol_2
+        complex(DP), dimension(-Box%wave(3):Box%wave(3)) :: exp_IkxCol_3
         complex(DP) :: exp_IkxCol
 
         real(DP), dimension(Ndim) :: waveVector
         real(DP) :: k_dot_deltaMcol
         integer :: kx, ky, kz
 
-        xColOverL(:) = 2._DP*PI * xCol(:)/Lsize(:)
-        call fourier_i(Kmax(1), xColOverL(1), exp_IkxCol_1)
-        call fourier_i(Kmax(2), xColOverL(2), exp_IkxCol_2)
-        call fourier_i(Kmax(3), xColOverL(3), exp_IkxCol_3)
+        xColOverL(:) = 2._DP*PI * xCol(:)/Box%size(:)
+        call fourier_i(Box%wave(1), xColOverL(1), exp_IkxCol_1)
+        call fourier_i(Box%wave(2), xColOverL(2), exp_IkxCol_2)
+        call fourier_i(Box%wave(3), xColOverL(3), exp_IkxCol_3)
 
-        mNewOverL(:) = mNew(:)/Lsize(:)
-        mOldOverL(:) = mOld(:)/Lsize(:)
+        mNewOverL(:) = mNew(:)/Box%size(:)
+        mOldOverL(:) = mOld(:)/Box%size(:)
 
-        do kz = 0, Kmax(3)
+        do kz = 0, Box%wave(3)
             waveVector(3) = real(kz, DP)
 
-            do ky = -Kmax2_sym(Kmax, kz), Kmax(2)
+            do ky = -Box_wave2_sym(Box%wave, kz), Box%wave(2)
                 waveVector(2) = real(ky, DP)
 
-                do kx = -Kmax1_sym(Kmax, ky, kz), Kmax(1)
+                do kx = -Box_wave1_sym(Box%wave, ky, kz), Box%wave(1)
                     waveVector(1) = real(kx, DP)
                     
                     k_dot_deltaMcol = dot_product(waveVector, mNewOverL - mOldOverL)
@@ -949,12 +946,11 @@ contains
     
     !> Summary: only the sign of \f$\vec{\mu}\f$ changes.
 
-    pure function DipolarSpheres_deltaEpot_reci_exchange(this, Lsize, Kmax, xCol, mCol) &
+    pure function DipolarSpheres_deltaEpot_reci_exchange(this, Box, xCol, mCol) &
                   result(deltaEpot_reci_exchange)
 
         class(DipolarSpheres), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
-        integer, dimension(:), intent(in) :: Kmax
+        type(Box_dimensions), intent(in) :: Box
         real(DP), dimension(:), intent(in) :: xCol
         real(DP), dimension(:), intent(in) :: mCol
         real(DP) :: deltaEpot_reci_exchange
@@ -962,9 +958,9 @@ contains
         real(DP), dimension(Ndim) :: xColOverL
         real(DP), dimension(Ndim) :: mColOverL
         
-        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxCol_1
-        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxCol_2
-        complex(DP), dimension(-Kmax(3):Kmax(3)) :: exp_IkxCol_3
+        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxCol_1
+        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxCol_2
+        complex(DP), dimension(-Box%wave(3):Box%wave(3)) :: exp_IkxCol_3
         complex(DP) :: exp_IkxCol
         
         real(DP) :: realPart
@@ -973,22 +969,22 @@ contains
         real(DP) :: k_dot_mCol
         integer :: kx, ky, kz
         
-        xColOverL(:) = 2._DP*PI * xCol(:)/Lsize(:)
-        call fourier_i(Kmax(1), xColOverL(1), exp_IkxCol_1)
-        call fourier_i(Kmax(2), xColOverL(2), exp_IkxCol_2)
-        call fourier_i(Kmax(3), xColOverL(3), exp_IkxCol_3)
+        xColOverL(:) = 2._DP*PI * xCol(:)/Box%size(:)
+        call fourier_i(Box%wave(1), xColOverL(1), exp_IkxCol_1)
+        call fourier_i(Box%wave(2), xColOverL(2), exp_IkxCol_2)
+        call fourier_i(Box%wave(3), xColOverL(3), exp_IkxCol_3)
         
-        mColOverL(:) = mCol(:)/Lsize(:)
+        mColOverL(:) = mCol(:)/Box%size(:)
         
         deltaEpot_reci_exchange = 0._DP
         
-        do kz = 0, Kmax(3)
+        do kz = 0, Box%wave(3)
             waveVector(3) = real(kz, DP)
 
-            do ky = -Kmax2_sym(Kmax, kz), Kmax(2)
+            do ky = -Box_wave2_sym(Box%wave, kz), Box%wave(2)
                 waveVector(2) = real(ky, DP)
             
-                do kx = -Kmax1_sym(Kmax, ky, kz), Kmax(1)
+                do kx = -Box_wave1_sym(Box%wave, ky, kz), Box%wave(1)
                     waveVector(1) = real(kx, DP)
                     
                     k_dot_mCol = dot_product(waveVector, mColOverL)
@@ -1006,26 +1002,25 @@ contains
         
         end do
         
-        deltaEpot_reci_exchange = 4._DP*PI/product(Lsize) * deltaEpot_reci_exchange
+        deltaEpot_reci_exchange = 4._DP*PI/product(Box%size) * deltaEpot_reci_exchange
 
     end function DipolarSpheres_deltaEpot_reci_exchange
     
     !> Total reciprocal energy
     
-    pure function DipolarSpheres_Epot_reci(this, Lsize, Kmax) result(Epot_reci)
+    pure function DipolarSpheres_Epot_reci(this, Box) result(Epot_reci)
         
         class(DipolarSpheres), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
-        integer, dimension(:), intent(in) :: Kmax
+        type(Box_dimensions), intent(in) :: Box
         real(DP) :: Epot_reci
 
         integer :: kx, ky, kz
 
         Epot_reci = 0._DP
 
-        do kz = -Kmax(3), Kmax(3)
-            do ky = -Kmax(2), Kmax(2)
-                do kx = -Kmax(1), Kmax(1)
+        do kz = -Box%wave(3), Box%wave(3)
+            do ky = -Box%wave(2), Box%wave(2)
+                do kx = -Box%wave(1), Box%wave(1)
                     Epot_reci = Epot_reci + this%Epot_reci_weight(kx, ky, kz) * &
                                             real(this%Epot_reci_structure(kx, ky, kz) * &
                                             conjg(this%Epot_reci_structure(kx, ky, kz)), DP)
@@ -1033,7 +1028,7 @@ contains
             end do
         end do
         
-        Epot_reci = 2._DP*PI/product(Lsize) * Epot_reci
+        Epot_reci = 2._DP*PI/product(Box%size) * Epot_reci
         
     end function DipolarSpheres_Epot_reci
     
@@ -1138,18 +1133,18 @@ contains
     !>                                      ]
     !> \f]
     
-    pure function DipolarSpheres_deltaEpot_bound_exchange(this, Lsize, mCol) &
+    pure function DipolarSpheres_deltaEpot_bound_exchange(this, Box_size, mCol) &
                   result (deltaEpot_bound_exchange)
     
         class(DipolarSpheres), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
+        real(DP), dimension(:), intent(in) :: Box_size
         real(DP), dimension(:), intent(in) :: mCol
         real(DP) :: deltaEpot_bound_exchange
         
         deltaEpot_bound_exchange = dot_product(mCol, mCol) + &
                                    2._DP * dot_product(mCol, this%totalMoment)
                           
-        deltaEpot_bound_exchange = 2._DP*PI/3._DP/product(Lsize) * deltaEpot_bound_exchange
+        deltaEpot_bound_exchange = 2._DP*PI/3._DP/product(Box_size) * deltaEpot_bound_exchange
     
     end function DipolarSpheres_deltaEpot_bound_exchange
     
@@ -1164,18 +1159,18 @@ contains
     !>                 ]
     !> \f]
     
-    pure function DipolarSpheres_deltaEpot_bound_rotate(this, Lsize, mOld, mNew) &
+    pure function DipolarSpheres_deltaEpot_bound_rotate(this, Box_size, mOld, mNew) &
                   result (deltaEpot_bound_rotate)
     
         class(DipolarSpheres), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
+        real(DP), dimension(:), intent(in) :: Box_size
         real(DP), dimension(:), intent(in) :: mOld, mNew
         real(DP) :: deltaEpot_bound_rotate
         
         deltaEpot_bound_rotate = dot_product(mNew, mNew) - dot_product(mOld, mOld) + &
                                  2._DP*dot_product(mNew-mOld, this%totalMoment-mOld)
                           
-        deltaEpot_bound_rotate = 2._DP*PI/3._DP/product(Lsize) * deltaEpot_bound_rotate
+        deltaEpot_bound_rotate = 2._DP*PI/3._DP/product(Box_size) * deltaEpot_bound_rotate
     
     end function DipolarSpheres_deltaEpot_bound_rotate
     
@@ -1184,13 +1179,13 @@ contains
     !>      J(\vec{M}, S) = \frac{2\pi}{3V} | \vec{M}|^2
     !> \f]
     
-    pure function DipolarSpheres_Epot_bound(this, Lsize) result(Epot_bound)
+    pure function DipolarSpheres_Epot_bound(this, Box_size) result(Epot_bound)
     
         class(DipolarSpheres), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
+        real(DP), dimension(:), intent(in) :: Box_size
         real(DP) :: Epot_bound
         
-        Epot_bound = 2._DP*PI/3._DP/product(Lsize) * dot_product(this%totalMoment, this%totalMoment)
+        Epot_bound = 2._DP*PI/3._DP/product(Box_size) * dot_product(this%totalMoment, this%totalMoment)
     
     end function DipolarSpheres_Epot_bound
     
@@ -1198,34 +1193,32 @@ contains
     
     !> Potential energy initialisation
     
-    subroutine DipolarSpheres_set_Epot(this, Lsize, Kmax)
+    subroutine DipolarSpheres_set_Epot(this, Box)
     
         class(DipolarSpheres), intent(inout) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
-        integer, dimension(:), intent(in) :: Kmax
+        type(Box_dimensions), intent(in) :: Box
         
 
         this%rMin = dipol_rMin_factor * this%sigma
         this%rCut = this%rMin
 
-        call this%Epot_set_alpha(Lsize)        
-        call this%set_Epot_real(Lsize)
-        call this%set_Epot_reci(Lsize, Kmax)
+        call this%Epot_set_alpha(Box%size)        
+        call this%set_Epot_real(Box%size)
+        call this%set_Epot_reci(Box)
         call this%set_totalMoment()
         
     end subroutine DipolarSpheres_set_Epot
 
     !> Total potential energy of a configuration
     
-    pure function DipolarSpheres_Epot_conf(this, Lsize, Kmax) result(Epot_conf)
+    pure function DipolarSpheres_Epot_conf(this, Box) result(Epot_conf)
     
         class(DipolarSpheres), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: Lsize
-        integer, dimension(:), intent(in) :: Kmax
+        type(Box_dimensions), intent(in) :: Box
         real(DP) :: Epot_conf
         
-        Epot_conf = this%Epot_real(Lsize) + this%Epot_reci(Lsize, Kmax) - this%Epot_self() + &
-                    this%Epot_bound(Lsize)
+        Epot_conf = this%Epot_real(Box%size) + this%Epot_reci(Box) - this%Epot_self() + &
+                    this%Epot_bound(Box%size)
     
     end function DipolarSpheres_Epot_conf
 
