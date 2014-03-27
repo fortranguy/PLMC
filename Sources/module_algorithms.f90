@@ -3,7 +3,7 @@ module module_algorithms
 use data_precisions, only: DP
 use data_box, only: Ndim
 use data_monteCarlo, only: Temperature
-use module_types, only: Box_dimensions
+use module_types, only: Box_dimensions, position_to_cell_index
 use module_physics_micro, only: random_surface, markov_surface
 use class_hardSpheres
 use class_dipolarSpheres
@@ -28,11 +28,9 @@ contains
         real(DP), intent(inout) :: mix_Epot
         
         real(DP) :: random
-        integer :: iOld
-        real(DP), dimension(Ndim) :: xOld, xRand, xNew
+        real(DP), dimension(Ndim) :: xRand
+        type(position_to_cell_index) :: old, new
         logical :: overlap
-        integer :: this_iCellOld, this_iCellNew
-        integer :: mix_iCellOld, mix_iCellNew
         real(DP) :: deltaEpot
         real(DP) :: this_deltaEpot, mix_deltaEpot
         real(DP) :: this_EpotNew, this_EpotOld
@@ -44,19 +42,19 @@ contains
         this_obs%move_Nhit = this_obs%move_Nhit + 1
         
         call random_number(random)
-        iOld = int(random*this%get_Ncol()) + 1
-        xOld(:) = this%positions(:, iOld)
+        old%iCol = int(random*this%get_Ncol()) + 1
+        old%xCol(:) = this%positions(:, old%iCol)
         
         ! Random new position
         call random_number(xRand)
-        xNew(:) = xOld(:) + (xRand(:)-0.5_DP)*this%move_delta(:)
-        xNew(:) = modulo(xNew(:), Box%size(:))
+        new%xCol(:) = old%xCol(:) + (xRand(:)-0.5_DP)*this%move_delta(:)
+        new%xCol(:) = modulo(new%xCol(:), Box%size(:))
         
         if (this%get_Ncol() >= other%get_Ncol()) then
-            this_iCellNew = this%sameCells%index_from_position(xNew)
+            new%same_index = this%sameCells%index_from_position(new%xCol)
             call this%Epot_neighCells(Box%size, iOld, xNew, this_iCellNew, overlap, this_EpotNew)
         else
-            mix_iCellNew = other%mixCells%index_from_position(xNew)
+            new%mix_index = other%mixCells%index_from_position(new%xCol)
             call mix%Epot_neighCells(Box%size, 0, xNew, mix_iCellNew, this%mixCells, other%positions, &
                                      overlap, mix_EpotNew)
         end if
@@ -64,31 +62,31 @@ contains
         if (.not. overlap) then
         
             if (this%get_Ncol() >= other%get_Ncol()) then
-                mix_iCellNew = other%mixCells%index_from_position(xNew)
+                new%mix_index = other%mixCells%index_from_position(new%xCol)
                 call mix%Epot_neighCells(Box%size, 0, xNew, mix_iCellNew, this%mixCells, &
                                          other%positions, overlap, mix_EpotNew)
             else
-                this_iCellNew = this%sameCells%index_from_position(xNew)
+                new%same_index = this%sameCells%index_from_position(new%xCol)
                 call this%Epot_neighCells(Box%size, iOld, xNew, this_iCellNew, overlap, this_EpotNew)
             end if
                         
             if (.not. overlap) then
     
-                this_iCellOld = this%sameCells%index_from_position(xOld)
+                old%same_index = this%sameCells%index_from_position(old%xCol)
                 select type (this)
                     type is (DipolarSpheres)
-                        mCol(:) = this%orientations(:, iOld)
-                        this_EpotNew_real = this%Epot_real_solo(Box%size, iOld, xNew, mCol)
-                        this_EpotOld_real = this%Epot_real_solo(Box%size, iOld, xOld, mCol)
+                        mCol(:) = this%orientations(:, old%iCol)
+                        this_EpotNew_real = this%Epot_real_solo(Box%size, old%iCol, new%xCol, mCol)
+                        this_EpotOld_real = this%Epot_real_solo(Box%size, old%iCol, old%xCol, mCol)
                         this_deltaEpot = (this_EpotNew_real-this_EpotOld_real) + &
-                                         this%deltaEpot_reci_move(Box, xOld, xNew, mCol)
+                                         this%deltaEpot_reci_move(Box, old%xCol, new%xCol, mCol)
                     class default
                         call this%Epot_neighCells(Box%size, iOld, xOld, this_iCellOld, overlap, &
                                                   this_EpotOld)
                         this_deltaEpot = this_EpotNew - this_EpotOld
                 end select
                     
-                mix_iCellOld = other%mixCells%index_from_position(xOld)
+                old%mix_index = other%mixCells%index_from_position(old%xCol)
                 call mix%Epot_neighCells(Box%size, 0, xOld, mix_iCellOld, this%mixCells, &
                                          other%positions, overlap, mix_EpotOld)
                 
@@ -101,18 +99,18 @@ contains
                 
                     select type (this)
                         type is (DipolarSpheres)
-                            call this%reci_update_structure_move(Box, xOld, xNew, mCol)
+                            call this%reci_update_structure_move(Box, old%xCol, new%xCol, mCol)
                     end select
                 
-                    this%positions(:, iOld) = xNew(:)
+                    this%positions(:, old%iCol) = new%xCol(:)
                     this_obs%Epot = this_obs%Epot + this_deltaEpot
                     mix_Epot = mix_Epot + mix_deltaEpot
                     
-                    if (this_iCellOld /= this_iCellNew) then
+                    if (old%same_index /= new%same_index) then
                         call this%sameCells%remove_col_from_cell(iOld, this_iCellOld)
                         call this%sameCells%add_col_to_cell(iOld, this_iCellNew)
                     end if
-                    if (mix_iCellOld /= mix_iCellNew) then
+                    if (old%mix_index /= new%mix_index) then
                         call other%mixCells%remove_col_from_cell(iOld, mix_iCellOld)
                         call other%mixCells%add_col_to_cell(iOld, mix_iCellNew)
                     end if
