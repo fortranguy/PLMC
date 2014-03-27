@@ -25,11 +25,12 @@ implicit none
         type(Node), pointer :: particle => null()
     end type LinkedList
     
-    type, public :: position_index
-        integer :: iCol
-        real(DP), dimension(Ndim) :: xCol
-        integer :: iCell
-    end type position_index
+    type, public :: particle_index
+        integer :: this_iCol, other_iCol
+        real(DP), dimension(Ndim) :: xCol, mCol
+        integer :: same_iCell, mix_iCell
+        logical :: add
+    end type particle_index
 
     ! For main program
 

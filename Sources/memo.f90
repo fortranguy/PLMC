@@ -1,0 +1,7 @@
+Epot_neighCells
+remove_col_from_cell
+add_col_to_cell
+Epot_real_solo
+deltaEpot_reci_move
+deltaEpot_reci_exchange
+deltaEpot_bound_exchange
