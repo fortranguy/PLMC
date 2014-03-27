@@ -326,12 +326,9 @@ contains
         integer, intent(inout) :: switch_Nreject
         
         real(DP) :: random
-        integer :: type1_iCol, type2_iCol
-        integer, dimension(2) :: type1_indicesOld, type1_indicesNew ! (1): same, (2): other
-        integer, dimension(2) :: type2_indicesOld , type2_indicesNew
+        type(particle_index) :: type1Old, type2Old
+        type(particle_index) :: type1New, type2New
         logical :: overlap
-        real(DP), dimension(Ndim) :: type1_xOld, type1_xNew
-        real(DP), dimension(Ndim) :: type2_xOld, type2_xNew
         real(DP) :: deltaEpot, type1_deltaEpot, type2_deltaEpot
         real(DP) :: type1_mix_deltaEpot, type2_mix_deltaEpot
         real(DP), dimension(2) :: type1_EpotsOld, type1_EpotsNew ! (1): same, (2): mix
@@ -344,23 +341,23 @@ contains
         
         ! Old: before switch
         call random_number(random)
-        type1_iCol = int(random*type1%get_Ncol()) + 1
-        call before_switch_energy(Box%size, type1, type1_iCol, type2, type2_iCol, mix, &
-                                  type1_indicesOld, type1_xOld, type1_EpotsOld)
-        
+        type1Old%iCol = int(random*type1%get_Ncol()) + 1
         call random_number(random)
-        type2_iCol = int(random*type2%get_Ncol()) + 1
-        call before_switch_energy(Box%size, type2, type2_iCol, type1, type1_iCol, mix, &
-                                  type2_indicesOld, type2_xOld, type2_EpotsOld)
+        type2Old%iCol = int(random*type2%get_Ncol()) + 1
+        
+        call before_switch_energy(Box%size, type1, type1Old, type2, type2Old%iCol, mix, type1_EpotsOld)
+        call before_switch_energy(Box%size, type2, type2Old, type1, type1Old%iCol, mix, type2_EpotsOld)
         
         ! New: after switch
-        call after_switch_energy(Box, type1, type1_iCol, type1_xOld, type2, type2_iCol, mix, overlap, &
-                                 type1_indicesNew, type1_xNew, type1_EpotsNew)
+        type1New%iCol = type1Old%iCol
+        type2New%iCol = type2Old%iCol
+        call after_switch_energy(Box, type1, type1Old, type1New, type2, type2Old%iCol, mix, overlap, &
+                                 type1_EpotsNew)
         
         if (.not. overlap) then
         
-            call after_switch_energy(Box, type2, type2_iCol, type2_xOld, type1, type1_iCol, mix, &
-                                     overlap, type2_indicesNew, type2_xNew, type2_EpotsNew)
+            call after_switch_energy(Box, type2, type2Old, type2New, type1, type1Old%iCol, mix, &
+                                     overlap,  type2_EpotsNew)
             
             if (.not. overlap) then
 
@@ -374,10 +371,8 @@ contains
                 call random_number(random)
                 if (random < exp(-deltaEpot/Temperature)) then
                 
-                    call after_switch_update(Box, type1, type1_iCol, type1_indicesOld, &
-                                             type1_indicesNew, type1_xOld, type1_xNew, type2)
-                    call after_switch_update(Box, type2, type2_iCol, type2_indicesOld, &
-                                             type2_indicesNew, type2_xOld, type2_xNew, type1)
+                    call after_switch_update(Box, type1, type1Old, type1New, type2)
+                    call after_switch_update(Box, type2, type2Old, type2New, type1)
                                              
                     type1_obs%Epot = type1_obs%Epot + type1_deltaEpot
                     type2_obs%Epot = type2_obs%Epot + type2_deltaEpot

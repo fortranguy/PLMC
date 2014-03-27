@@ -5,3 +5,7 @@ Epot_real_solo
 deltaEpot_reci_move
 deltaEpot_reci_exchange
 deltaEpot_bound_exchange
+
+before_switch_energy
+after_switch_energy
+after_switch_update
