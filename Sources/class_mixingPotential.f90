@@ -239,14 +239,12 @@ contains
         
     end function MixingPotential_Epot_pair
     
-    subroutine MixingPotential_Epot_neighCells(this, Box_size, iCol, xCol, iTotalCell, neighCells, &
-                                               other_positions, overlap, energ)
+    subroutine MixingPotential_Epot_neighCells(this, Box_size, particle, neighCells, other_positions, &
+                                               overlap, energ)
         
         class(MixingPotential), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
-        integer, intent(in) :: iCol
-        real(DP), dimension(:), intent(in) :: xCol !< type A
-        integer, intent(in) :: iTotalCell !< type A in mix grid
+        type(particle_index), intent(in) :: particle
         type(NeighbourCells), intent(in) :: neighCells
         real(DP), dimension(:, :), contiguous, intent(in) :: other_positions
         logical, intent(out) :: overlap
@@ -262,7 +260,7 @@ contains
     
         do iNearCell = 1, NnearCell
         
-            nearCell_index = neighCells%near_among_total(iNearCell, iTotalCell)
+            nearCell_index = neighCells%near_among_total(iNearCell, particle%mix_iCell)
             current => neighCells%beginCells(nearCell_index)%particle%next
             if (.not. associated(current%next)) cycle
             
@@ -270,8 +268,8 @@ contains
             
                 next => current%next
 
-                if (current%iCol /= iCol) then
-                    r = dist_PBC(Box_size, xCol(:), other_positions(:, current%iCol))
+                if (current%iCol /= particle%other_iCol) then
+                    r = dist_PBC(Box_size, particle%xCol(:), other_positions(:, current%iCol))
                     if (r < this%rMin) then
                         overlap = .true.
                         return

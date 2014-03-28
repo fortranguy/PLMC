@@ -108,12 +108,12 @@ contains
                     mix_Epot = mix_Epot + mix_deltaEpot
                     
                     if (old%same_iCell /= new%same_iCell) then
-                        call this%sameCells%remove_col_from_cell(old%iCol, old%same_iCell)
-                        call this%sameCells%add_col_to_cell(new%iCol, new%same_iCell)
+                        call this%sameCells%remove_col_from_cell(old%this_iCol, old%same_iCell)
+                        call this%sameCells%add_col_to_cell(new%this_iCol, new%same_iCell)
                     end if
                     if (old%mix_iCell /= new%mix_iCell) then
-                        call other%mixCells%remove_col_from_cell(old%iCol, old%mix_iCell)
-                        call other%mixCells%add_col_to_cell(new%iCol, new%mix_iCell)
+                        call other%mixCells%remove_col_from_cell(old%this_iCol, old%mix_iCell)
+                        call other%mixCells%add_col_to_cell(new%this_iCol, new%mix_iCell)
                     end if
                     
                 else
@@ -216,12 +216,12 @@ contains
         real(DP), dimension(Ndim) :: mCol
         logical :: overlap
         
-        old%xCol(:) = this%positions(:, old%iCol)
+        old%xCol(:) = this%positions(:, old%this_iCol)
         
         old%same_iCell = this%sameCells%index_from_position(old%xCol)
         select type (this)
             type is (DipolarSpheres)
-                old%mCol(:) = this%orientations(:, old%iCol)
+                old%mCol(:) = this%orientations(:, old%this_iCol)
                 EpotsOld(1) = this%Epot_real_solo(Box_size, old) ! Epot_reci: cf. after_switch_energy
             type is (HardSpheres)
                 EpotsOld(1) = 0._DP
@@ -267,7 +267,7 @@ contains
             
                 select type (this)
                     type is (DipolarSpheres)
-                        old%mCol(:) = this%orientations(:, old%iCol)
+                        old%mCol(:) = this%orientations(:, old%this_iCol)
                         EpotsNew(1) = this%Epot_real_solo(Box%size, new) + &
                                       this%deltaEpot_reci_move(Box, old, new)
                 end select
@@ -293,12 +293,12 @@ contains
         end select
         
         if (old%same_iCell /= new%same_iCell) then
-            call this%sameCells%remove_col_from_cell(old%iCol, old%same_iCell)
-            call this%sameCells%add_col_to_cell(new%iCol, new%same_iCell)
+            call this%sameCells%remove_col_from_cell(old%this_iCol, old%same_iCell)
+            call this%sameCells%add_col_to_cell(new%this_iCol, new%same_iCell)
         end if
         if (old%mix_iCell /= new%mix_iCell) then
-            call other%mixCells%remove_col_from_cell(old%iCol, old%mix_iCell)
-            call other%mixCells%add_col_to_cell(new%iCol, new%mix_iCell)
+            call other%mixCells%remove_col_from_cell(old%this_iCol, old%mix_iCell)
+            call other%mixCells%add_col_to_cell(new%this_iCol, new%mix_iCell)
         end if
         
     end subroutine after_switch_update
@@ -328,22 +328,22 @@ contains
         
         ! Old: before switch
         call random_number(random)
-        old1%iCol = int(random*type1%get_Ncol()) + 1
+        old1%this_iCol = int(random*type1%get_Ncol()) + 1
         call random_number(random)
-        old2%iCol = int(random*type2%get_Ncol()) + 1
+        old2%this_iCol = int(random*type2%get_Ncol()) + 1
         
-        call before_switch_energy(Box%size, type1, old1, type2, old2%iCol, mix, type1_EpotsOld)
-        call before_switch_energy(Box%size, type2, old2, type1, old1%iCol, mix, type2_EpotsOld)
+        call before_switch_energy(Box%size, type1, old1, type2, old2%this_iCol, mix, type1_EpotsOld)
+        call before_switch_energy(Box%size, type2, old2, type1, old1%this_iCol, mix, type2_EpotsOld)
         
         ! New: after switch
-        new1%iCol = old1%iCol
-        new2%iCol = old2%iCol
-        call after_switch_energy(Box, type1, old1, new1, type2, old2%iCol, mix, overlap, &
+        new1%this_iCol = old1%this_iCol
+        new2%this_iCol = old2%this_iCol
+        call after_switch_energy(Box, type1, old1, new1, type2, old2%this_iCol, mix, overlap, &
                                  type1_EpotsNew)
         
         if (.not. overlap) then
         
-            call after_switch_energy(Box, type2, old2, new2, type1, old1%iCol, mix, &
+            call after_switch_energy(Box, type2, old2, new2, type1, old1%this_iCol, mix, &
                                      overlap,  type2_EpotsNew)
             
             if (.not. overlap) then
