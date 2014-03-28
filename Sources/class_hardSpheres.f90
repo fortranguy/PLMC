@@ -361,7 +361,7 @@ contains
         
         class(HardSpheres), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
-        type(particle_index) :: particle
+        type(particle_index), intent(in) :: particle
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energ
     

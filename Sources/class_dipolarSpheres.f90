@@ -12,7 +12,7 @@ use data_monteCarlo, only: dipol_move_delta, dipol_move_rejectFix, dipol_rotate_
 use data_potential, only: dipol_rMin_factor, dipol_real_rCut_factor, dipol_real_dr, dipol_alpha_factor
 use data_neighbourCells, only: NnearCell
 use data_distribution, only: snap_ratio
-use module_types, only: Box_dimensions
+use module_types, only: Box_dimensions, particle_index
 use module_physics_micro, only: set_discrete_length, distVec_PBC, Box_wave1_sym, Box_wave2_sym, &
                                 fourier_i
 use class_neighbourCells
@@ -399,28 +399,30 @@ contains
     
     !> Energy of 1 dipole with others
     
-    pure function DipolarSpheres_Epot_real_solo(this, Box_size, iCol, xCol_i, mCol_i) &
-                  result(Epot_real_solo)
+    pure function DipolarSpheres_Epot_real_solo(this, Box_size, particle) result(Epot_real_solo)
 
         class(DipolarSpheres), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
-        integer, intent(in) :: iCol
-        real(DP), dimension(:), intent(in) :: xCol_i, mCol_i
+        type(particle_index), intent(in) :: particle
         real(DP) :: Epot_real_solo
 
         integer :: jCol
-        real(DP), dimension(Ndim) :: xCol_j, mCol_j
+        real(DP), dimension(Ndim) :: xCol_i, xCol_j
+        real(DP), dimension(Ndim) :: mCol_i, mCol_j
         real(DP), dimension(Ndim) :: rVec_ij
         real(DP) :: r_ij
 
         Epot_real_solo = 0._DP
 
         do jCol = 1, this%Ncol
-            if (jCol /= iCol) then
-
+            if (jCol /= particle%iCol) then
+            
+                xCol_i(:) = particle%xCol(:)
                 xCol_j(:) = this%positions(:, jCol)
-                rVec_ij = distVec_PBC(Box_size, xCol_i(:), xCol_j)
+                rVec_ij = distVec_PBC(Box_size, xCol_i, xCol_j)
                 r_ij = norm2(rVec_ij)
+                
+                mCol_i(:) = particle%mCol(:)
                 mCol_j(:) = this%orientations(:, jCol)
 
                 Epot_real_solo = Epot_real_solo + this%Epot_real_pair(mCol_i, mCol_j, rVec_ij, r_ij)
