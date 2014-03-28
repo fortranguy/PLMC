@@ -11,7 +11,7 @@ use data_monteCarlo, only: hard_move_delta, hard_move_rejectFix, hard_Nwidom
 use data_potential, only: hard_rMin_factor
 use data_neighbourCells, only: NnearCell
 use data_distribution, only: snap_ratio
-use module_types, only: Box_dimensions, Node
+use module_types, only: Box_dimensions, Node, particle_index
 use module_physics_micro, only: dist_PBC
 use class_neighbourCells
 
@@ -357,12 +357,11 @@ contains
     
     end subroutine HardSpheres_write_Epot
     
-    subroutine HardSpheres_Epot_neighCells(this, Box_size, iCol, xCol, iTotalCell, overlap, energ)
+    subroutine HardSpheres_Epot_neighCells(this, Box_size, particle, overlap, energ)
         
         class(HardSpheres), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
-        integer, intent(in) :: iCol, iTotalCell
-        real(DP), dimension(:), intent(in) :: xCol
+        type(particle_index) :: particle
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energ
     
@@ -376,7 +375,7 @@ contains
     
         do iNearCell = 1, NnearCell
         
-            nearCell_index = this%sameCells%near_among_total(iNearCell, iTotalCell)
+            nearCell_index = this%sameCells%near_among_total(iNearCell, particle%same_iCell)
             current => this%sameCells%beginCells(nearCell_index)%particle%next
             if (.not. associated(current%next)) cycle
             
@@ -384,8 +383,8 @@ contains
             
                 next => current%next
             
-                if (current%iCol /= iCol) then
-                    r_ij = dist_PBC(Box_size, xCol(:), this%positions(:, current%iCol))
+                if (current%iCol /= particle%iCol) then
+                    r_ij = dist_PBC(Box_size, particle%xCol(:), this%positions(:, current%iCol))
                     if (r_ij < this%rMin) then
                         overlap = .true.
                         return
