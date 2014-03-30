@@ -14,7 +14,7 @@ use data_neighbourCells, only: NnearCell
 use data_distribution, only: snap_ratio
 use module_types, only: Box_dimensions, particle_index
 use module_physics_micro, only: set_discrete_length, distVec_PBC, Box_wave1_sym, Box_wave2_sym, &
-                                fourier_i
+                                fourier_i, exchange_sign
 use class_neighbourCells
 use class_hardSpheres
 
@@ -415,7 +415,7 @@ contains
         Epot_real_solo = 0._DP
 
         do jCol = 1, this%Ncol
-            if (jCol /= particle%iCol) then
+            if (jCol /= particle%this_iCol) then
             
                 xCol_i(:) = particle%xCol(:)
                 xCol_j(:) = this%positions(:, jCol)
@@ -441,15 +441,15 @@ contains
         real(DP) :: Epot_real
         
         integer :: iCol
-        real(DP), dimension(Ndim) :: xCol_i
-        real(DP), dimension(Ndim) :: mCol_i
+        type(particle_index) :: particle
     
         Epot_real = 0._DP
         
         do iCol = 1, this%Ncol
-            xCol_i(:) = this%positions(:, iCol)
-            mCol_i(:) = this%orientations(:, iCol)
-            Epot_real = Epot_real + this%Epot_real_solo(Box_size, iCol, xCol_i, mCol_i)
+            particle%this_iCol = iCol
+            particle%xCol(:) = this%positions(:, particle%this_iCol)
+            particle%mCol(:) = this%orientations(:, particle%this_iCol)
+            Epot_real = Epot_real + this%Epot_real_solo(Box_size, particle)
         end do
 
         Epot_real = Epot_real/2._DP
@@ -661,13 +661,12 @@ contains
     !>               ]
     !> \f]
 
-    pure function DipolarSpheres_deltaEpot_reci_move(this, Box, xOld, xNew, mCol) &
+    pure function DipolarSpheres_deltaEpot_reci_move(this, Box, old, new) &
                   result(deltaEpot_reci_move)
 
         class(DipolarSpheres), intent(in) :: this
         type(Box_dimensions), intent(in) :: Box
-        real(DP), dimension(:), intent(in) :: xOld, xNew
-        real(DP), dimension(:), intent(in) :: mCol
+        type(particle_index), intent(in) :: old, new
         real(DP) :: deltaEpot_reci_move
         
         real(DP), dimension(Ndim) :: xNewOverL, xOldOverL
@@ -689,17 +688,17 @@ contains
         real(DP) :: k_dot_mCol
         integer :: kx, ky, kz
 
-        xNewOverL(:) = 2._DP*PI * xNew(:)/Box%size(:)
+        xNewOverL(:) = 2._DP*PI * new%xCol(:)/Box%size(:)
         call fourier_i(Box%wave(1), xNewOverL(1), exp_IkxNew_1)
         call fourier_i(Box%wave(2), xNewOverL(2), exp_IkxNew_2)
         call fourier_i(Box%wave(3), xNewOverL(3), exp_IkxNew_3)
         
-        xOldOverL(:) = 2._DP*PI * xOld(:)/Box%size(:)
+        xOldOverL(:) = 2._DP*PI * old%xCol(:)/Box%size(:)
         call fourier_i(Box%wave(1), xOldOverL(1), exp_IkxOld_1)
         call fourier_i(Box%wave(2), xOldOverL(2), exp_IkxOld_2)
         call fourier_i(Box%wave(3), xOldOverL(3), exp_IkxOld_3)
 
-        mColOverL(:) = mCol(:)/Box%size(:)
+        mColOverL(:) = new%mCol(:)/Box%size(:)
 
         deltaEpot_reci_move = 0._DP
 
@@ -741,12 +740,11 @@ contains
     !>  \f]
     !>
 
-    pure subroutine DipolarSpheres_reci_update_structure_move(this, Box, xOld, xNew, mCol)
+    pure subroutine DipolarSpheres_reci_update_structure_move(this, Box, old, new)
 
         class(DipolarSpheres), intent(inout) :: this
         type(Box_dimensions), intent(in) :: Box
-        real(DP), dimension(:), intent(in) :: xOld, xNew
-        real(DP), dimension(:), intent(in) :: mCol
+        type(particle_index), intent(in) :: old, new
         
         real(DP), dimension(Ndim) :: xNewOverL, xOldOverL
         real(DP), dimension(Ndim) :: mColOverL
@@ -765,17 +763,17 @@ contains
         real(DP) :: k_dot_mCol
         integer :: kx, ky, kz
 
-        xNewOverL(:) = 2._DP*PI * xNew(:)/Box%size(:)
+        xNewOverL(:) = 2._DP*PI * new%xCol(:)/Box%size(:)
         call fourier_i(Box%wave(1), xNewOverL(1), exp_IkxNew_1)
         call fourier_i(Box%wave(2), xNewOverL(2), exp_IkxNew_2)
         call fourier_i(Box%wave(3), xNewOverL(3), exp_IkxNew_3)
         
-        xOldOverL(:) = 2._DP*PI * xOld(:)/Box%size(:)
+        xOldOverL(:) = 2._DP*PI * old%xCol(:)/Box%size(:)
         call fourier_i(Box%wave(1), xOldOverL(1), exp_IkxOld_1)
         call fourier_i(Box%wave(2), xOldOverL(2), exp_IkxOld_2)
         call fourier_i(Box%wave(3), xOldOverL(3), exp_IkxOld_3)
 
-        mColOverL(:) = mCol(:)/Box%size(:)
+        mColOverL(:) = new%mCol(:)/Box%size(:)
 
         do kz = 0, Box%wave(3)
             waveVector(3) = real(kz, DP)
@@ -813,13 +811,12 @@ contains
     !>               \}
     !> \f]
     
-    pure function DipolarSpheres_deltaEpot_reci_rotate(this, Box, xCol, mOld, mNew) &
+    pure function DipolarSpheres_deltaEpot_reci_rotate(this, Box, old, new) &
                   result(deltaEpot_reci_rotate)
 
         class(DipolarSpheres), intent(in) :: this
         type(Box_dimensions), intent(in) :: Box
-        real(DP), dimension(:), intent(in) :: xCol
-        real(DP), dimension(:), intent(in) :: mOld, mNew
+        type(particle_index), intent(in) :: old, new
         real(DP) :: deltaEpot_reci_rotate
 
         real(DP), dimension(Ndim) :: xColOverL
@@ -836,13 +833,13 @@ contains
         real(DP) :: k_dot_mNew, k_dot_mOld
         integer :: kx, ky, kz
 
-        xColOverL(:) = 2._DP*PI * xCol(:)/Box%size(:)
+        xColOverL(:) = 2._DP*PI * new%xCol(:)/Box%size(:)
         call fourier_i(Box%wave(1), xColOverL(1), exp_IkxCol_1)
         call fourier_i(Box%wave(2), xColOverL(2), exp_IkxCol_2)
         call fourier_i(Box%wave(3), xColOverL(3), exp_IkxCol_3)
 
-        mNewOverL(:) = mNew(:)/Box%size(:)
-        mOldOverL(:) = mOld(:)/Box%size(:)
+        mNewOverL(:) = new%mCol(:)/Box%size(:)
+        mOldOverL(:) = old%mCol(:)/Box%size(:)
 
         deltaEpot_reci_rotate = 0._DP
 
@@ -883,12 +880,11 @@ contains
     !>  \f]
     !>
 
-    pure subroutine DipolarSpheres_reci_update_structure_rotate(this, Box, xCol, mOld, mNew)
+    pure subroutine DipolarSpheres_reci_update_structure_rotate(this, Box, old, new)
 
         class(DipolarSpheres), intent(inout) :: this
         type(Box_dimensions), intent(in) :: Box
-        real(DP), dimension(:), intent(in) :: xCol
-        real(DP), dimension(:), intent(in) :: mOld, mNew
+        type(particle_index), intent(in) :: old, new
 
         real(DP), dimension(Ndim) :: xColOverL
         real(DP), dimension(Ndim) :: mNewOverL, mOldOverL
@@ -902,13 +898,13 @@ contains
         real(DP) :: k_dot_deltaMcol
         integer :: kx, ky, kz
 
-        xColOverL(:) = 2._DP*PI * xCol(:)/Box%size(:)
+        xColOverL(:) = 2._DP*PI * new%xCol(:)/Box%size(:)
         call fourier_i(Box%wave(1), xColOverL(1), exp_IkxCol_1)
         call fourier_i(Box%wave(2), xColOverL(2), exp_IkxCol_2)
         call fourier_i(Box%wave(3), xColOverL(3), exp_IkxCol_3)
 
-        mNewOverL(:) = mNew(:)/Box%size(:)
-        mOldOverL(:) = mOld(:)/Box%size(:)
+        mNewOverL(:) = new%mCol(:)/Box%size(:)
+        mOldOverL(:) = old%mCol(:)/Box%size(:)
 
         do kz = 0, Box%wave(3)
             waveVector(3) = real(kz, DP)
@@ -948,13 +944,12 @@ contains
     
     !> Summary: only the sign of \f$\vec{\mu}\f$ changes.
 
-    pure function DipolarSpheres_deltaEpot_reci_exchange(this, Box, xCol, mCol) &
+    pure function DipolarSpheres_deltaEpot_reci_exchange(this, Box, particle) &
                   result(deltaEpot_reci_exchange)
 
         class(DipolarSpheres), intent(in) :: this
         type(Box_dimensions), intent(in) :: Box
-        real(DP), dimension(:), intent(in) :: xCol
-        real(DP), dimension(:), intent(in) :: mCol
+        type(particle_index), intent(in) :: particle
         real(DP) :: deltaEpot_reci_exchange
         
         real(DP), dimension(Ndim) :: xColOverL
@@ -971,12 +966,12 @@ contains
         real(DP) :: k_dot_mCol
         integer :: kx, ky, kz
         
-        xColOverL(:) = 2._DP*PI * xCol(:)/Box%size(:)
+        xColOverL(:) = 2._DP*PI * particle%xCol(:)/Box%size(:)
         call fourier_i(Box%wave(1), xColOverL(1), exp_IkxCol_1)
         call fourier_i(Box%wave(2), xColOverL(2), exp_IkxCol_2)
         call fourier_i(Box%wave(3), xColOverL(3), exp_IkxCol_3)
         
-        mColOverL(:) = mCol(:)/Box%size(:)
+        mColOverL(:) = exchange_sign(particle%add) * particle%mCol(:)/Box%size(:)
         
         deltaEpot_reci_exchange = 0._DP
         

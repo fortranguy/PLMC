@@ -11,7 +11,8 @@ use data_box, only: Ndim
 implicit none
 private
 public set_discrete_length, sphere_volume, distVec_PBC, dist_PBC, random_surface, markov_surface, &
-       NwaveVectors, Box_wave1_sym, Box_wave2_sym, fourier_i, index_from_coord, coord_PBC, &
+       NwaveVectors, Box_wave1_sym, Box_wave2_sym, fourier_i, exchange_sign, &
+       index_from_coord, coord_PBC, &
        Epot_lennardJones, Epot_yukawa
 
 contains
@@ -219,6 +220,21 @@ contains
         end do
     
     end subroutine fourier_i
+    
+    !> Exchange : + or -
+    
+    pure function exchange_sign(add)
+        
+        logical, intent(in) :: add
+        real(DP) :: exchange_sign
+        
+        if (add) then
+            exchange_sign = +1._DP
+        else
+            exchange_sign = -1._DP
+        end if
+        
+    end function exchange_sign
 
     !> 3D index to 1D index
     

@@ -8,7 +8,7 @@ use data_box, only: Ndim
 use data_particles, only: mix_delta
 use data_potential, only: mix_rMin_factor, mix_rCut, mix_dr, mix_epsilon, mix_alpha
 use data_neighbourCells, only: NnearCell
-use module_types, only: Node
+use module_types, only: Node, particle_index
 use module_physics_micro, only: set_discrete_length, dist_PBC, Epot_yukawa
 use class_neighbourCells
 use class_hardSpheres
