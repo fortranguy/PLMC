@@ -386,7 +386,6 @@ contains
         class(MoreObservables), intent(inout) :: obs
         
         real(DP) :: random
-        integer :: iOld
         type(particle_index) :: old, new
         real(DP) :: deltaEpot
         real(DP) :: deltaEpot_real, deltaEpot_self
@@ -395,11 +394,11 @@ contains
         obs%rotate_Nhit = obs%rotate_Nhit + 1
 
         call random_number(random)
-        iOld = int(random*this%get_Ncol()) + 1
+        old%this_iCol = int(random*this%get_Ncol()) + 1        
+        old%xCol(:) = this%positions(:, old%this_iCol)
+        old%mCol(:) = this%orientations(:, old%this_iCol)
         
-        old%xCol(:) = this%positions(:, iOld)
-        old%mCol(:) = this%orientations(:, iOld)        
-        
+        new%this_iCol = old%this_iCol
         new%xCol(:) = old%xCol(:)
         new%mCol(:) = old%mCol(:)
         call markov_surface(new%mCol, this%rotate_delta)
@@ -418,7 +417,7 @@ contains
         
             call this%reci_update_structure_rotate(Box, old, new)
             call this%update_totalMoment_rotate(old%mCol, new%mCol)
-            this%orientations(:, iOld) = new%mCol(:)
+            this%orientations(:, old%this_iCol) = new%mCol(:)
             
             obs%Epot = obs%Epot + deltaEpot
             
