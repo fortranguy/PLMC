@@ -265,6 +265,7 @@ contains
             
                 select type (this)
                     type is (DipolarSpheres)
+                        new%mCol(:) = this%orientations(:, new%this_iCol)
                         EpotsNew(1) = this%Epot_real_solo(Box%size, new) + &
                                       this%deltaEpot_reci_move(Box, old, new)
                 end select
