@@ -411,18 +411,18 @@ contains
         real(DP), dimension(Ndim) :: mCol_i, mCol_j
         real(DP), dimension(Ndim) :: rVec_ij
         real(DP) :: r_ij
-
+         
+        xCol_i(:) = particle%xCol(:)
+        mCol_i(:) = particle%mCol(:)
+        
         Epot_real_solo = 0._DP
-
         do jCol = 1, this%Ncol
             if (jCol /= particle%this_iCol) then
             
-                xCol_i(:) = particle%xCol(:)
                 xCol_j(:) = this%positions(:, jCol)
                 rVec_ij = distVec_PBC(Box_size, xCol_i, xCol_j)
-                r_ij = norm2(rVec_ij)
+                r_ij = norm2(rVec_ij)                
                 
-                mCol_i(:) = particle%mCol(:)
                 mCol_j(:) = this%orientations(:, jCol)
 
                 Epot_real_solo = Epot_real_solo + this%Epot_real_pair(mCol_i, mCol_j, rVec_ij, r_ij)
