@@ -155,11 +155,11 @@ contains
     
         class(DipolarSpheres), intent(inout) :: this
         
-        call this%HardSpheres%destroy()        
-        if (allocated(this%orientations)) deallocate(this%orientations)        
+        call this%HardSpheres%destroy()
+        if (allocated(this%orientations)) deallocate(this%orientations)
         if (allocated(this%Epot_real_tab)) deallocate(this%Epot_real_tab)
         if (allocated(this%Epot_reci_weight)) deallocate(this%Epot_reci_weight)
-        if (allocated(this%Epot_reci_structure)) deallocate(this%Epot_reci_structure)        
+        if (allocated(this%Epot_reci_structure)) deallocate(this%Epot_reci_structure)
     
     end subroutine DipolarSpheres_destroy
     
@@ -501,7 +501,7 @@ contains
     !> \f]
     !> We will also use a restricted definition later :
     !> \f[
-    !>      S_\underline{l}(\vec{k}) = \sum_{i \neq l} (\vec{k}\cdot\vec{\mu}_i) 
+    !>      S_\underline{l}(\vec{k}) = \sum_{i \neq l} (\vec{k}\cdot\vec{\mu}_i)
     !>                                 e^{+i\vec{k}\cdot\vec{x}_i}
     !> \f].
 
@@ -1198,7 +1198,7 @@ contains
         this%rMin = dipol_rMin_factor * this%sigma
         this%rCut = this%rMin
 
-        call this%Epot_set_alpha(Box%size)        
+        call this%Epot_set_alpha(Box%size)
         call this%set_Epot_real(Box%size)
         call this%set_Epot_reci(Box)
         call this%set_totalMoment()

@@ -7,7 +7,7 @@ use data_precisions, only: DP
 use data_box, only: Ndim, Box_size, Box_wave
 use data_monteCarlo, only: Temperature, decorrelFactor, switch_factor, Nthermal, Nadapt, Nstep, &
                            reset_iStep
-use data_potential, only: write_potential                       
+use data_potential, only: write_potential
 use data_distribution, only: snap
 use module_types, only: Box_dimensions, monteCarlo_arguments
 use module_physics_micro, only: NwaveVectors
@@ -266,7 +266,7 @@ contains
         write(report_unit, *) "    reset_iStep = ", this%reset_iStep
         write(report_unit, *) "    write_potential = ", this%write_potential
     
-    end subroutine PhysicalSystem_write_report    
+    end subroutine PhysicalSystem_write_report
     
     ! Finalisation
     

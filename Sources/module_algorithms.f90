@@ -234,8 +234,8 @@ contains
         type(Box_dimensions), intent(in) :: Box
         class(HardSpheres), intent(in) :: this, other
         type(particle_index), intent(in) :: old
-        type(particle_index), intent(inout) :: new    
-        class(MixingPotential), intent(in) :: mix        
+        type(particle_index), intent(inout) :: new
+        class(MixingPotential), intent(in) :: mix
         logical, intent(out) :: overlap
         real(DP), dimension(:), intent(out) :: EpotsNew
         
@@ -397,7 +397,7 @@ contains
         obs%rotate_Nhit = obs%rotate_Nhit + 1
 
         call random_number(random)
-        old%this_iCol = int(random*this%get_Ncol()) + 1        
+        old%this_iCol = int(random*this%get_Ncol()) + 1
         old%xCol(:) = this%positions(:, old%this_iCol)
         old%mCol(:) = this%orientations(:, old%this_iCol)
         
