@@ -233,7 +233,8 @@ contains
 
         type(Box_dimensions), intent(in) :: Box
         class(HardSpheres), intent(in) :: this, other
-        type(particle_index), intent(inout) :: old, new    
+        type(particle_index), intent(in) :: old
+        type(particle_index), intent(inout) :: new    
         class(MixingPotential), intent(in) :: mix        
         logical, intent(out) :: overlap
         real(DP), dimension(:), intent(out) :: EpotsNew
@@ -264,7 +265,6 @@ contains
             
                 select type (this)
                     type is (DipolarSpheres)
-                        old%mCol(:) = this%orientations(:, old%this_iCol)
                         EpotsNew(1) = this%Epot_real_solo(Box%size, new) + &
                                       this%deltaEpot_reci_move(Box, old, new)
                 end select
@@ -279,13 +279,12 @@ contains
 
         type(Box_dimensions), intent(in) :: Box
         class(HardSpheres), intent(inout) :: this, other
-        type(particle_index), intent(inout) :: old, new
+        type(particle_index), intent(in) :: old, new
         
         this%positions(:, old%this_iCol) = new%xCol(:)
         
         select type (this)
             type is (DipolarSpheres)
-                old%mCol(:) = this%orientations(:, old%this_iCol)
                 call this%reci_update_structure_move(Box, old, new)
         end select
         
@@ -329,8 +328,8 @@ contains
         call random_number(random)
         old2%this_iCol = int(random*type2%get_Ncol()) + 1
         
-        old1%other_iCol = old2%this_iCol
-        old2%other_iCol = old1%this_iCol
+        old1%other_iCol = 0 ! old2%this_iCol
+        old2%other_iCol = 0 ! old1%this_iCol
         
         call before_switch_energy(Box%size, type1, old1, type2, mix, type1_EpotsOld)
         call before_switch_energy(Box%size, type2, old2, type1, mix, type2_EpotsOld)
@@ -338,6 +337,9 @@ contains
         ! New: after switch
         new1%this_iCol = old1%this_iCol
         new2%this_iCol = old2%this_iCol
+        new1%other_iCol = 0 ! new2%this_iCol
+        new2%other_iCol = 0 ! new1%this_iCol
+        
         call after_switch_energy(Box, type1, old1, new1, type2, mix, overlap, type1_EpotsNew)
         
         if (.not. overlap) then
