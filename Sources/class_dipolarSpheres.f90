@@ -421,8 +421,7 @@ contains
             
                 xCol_j(:) = this%positions(:, jCol)
                 rVec_ij = distVec_PBC(Box_size, xCol_i, xCol_j)
-                r_ij = norm2(rVec_ij)                
-                
+                r_ij = norm2(rVec_ij)
                 mCol_j(:) = this%orientations(:, jCol)
 
                 Epot_real_solo = Epot_real_solo + this%Epot_real_pair(mCol_i, mCol_j, rVec_ij, r_ij)
