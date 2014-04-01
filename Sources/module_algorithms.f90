@@ -208,7 +208,7 @@ contains
         
         real(DP), dimension(:), intent(in) :: Box_size
         class(HardSpheres), intent(in) :: this, other
-        type(particle_index) :: old
+        type(particle_index), intent(inout) :: old
         class(MixingPotential), intent(in) :: mix
         real(DP), dimension(:), intent(out) :: EpotsOld
         logical :: overlap
@@ -233,7 +233,7 @@ contains
 
         type(Box_dimensions), intent(in) :: Box
         class(HardSpheres), intent(in) :: this, other
-        type(particle_index) :: old, new    
+        type(particle_index), intent(inout) :: old, new    
         class(MixingPotential), intent(in) :: mix        
         logical, intent(out) :: overlap
         real(DP), dimension(:), intent(out) :: EpotsNew
@@ -279,7 +279,7 @@ contains
 
         type(Box_dimensions), intent(in) :: Box
         class(HardSpheres), intent(inout) :: this, other
-        type(particle_index) :: old, new
+        type(particle_index), intent(inout) :: old, new
         
         this%positions(:, old%this_iCol) = new%xCol(:)
         
