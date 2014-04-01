@@ -239,7 +239,7 @@ contains
         logical, intent(out) :: overlap
         real(DP), dimension(:), intent(out) :: EpotsNew
         
-        new%xCol(:) = other%positions(:, old%other_iCol)
+        new%xCol(:) = other%positions(:, new%other_iCol)
         
         if (this%get_Ncol() >= other%get_Ncol()) then ! optimisation: more chance to overlap
             new%same_iCell = this%sameCells%index_from_position(new%xCol)
@@ -328,8 +328,8 @@ contains
         call random_number(random)
         old2%this_iCol = int(random*type2%get_Ncol()) + 1
         
-        old1%other_iCol = 0 ! old2%this_iCol
-        old2%other_iCol = 0 ! old1%this_iCol
+        old1%other_iCol = old2%this_iCol
+        old2%other_iCol = old1%this_iCol
         
         call before_switch_energy(Box%size, type1, old1, type2, mix, type1_EpotsOld)
         call before_switch_energy(Box%size, type2, old2, type1, mix, type2_EpotsOld)
@@ -337,8 +337,8 @@ contains
         ! New: after switch
         new1%this_iCol = old1%this_iCol
         new2%this_iCol = old2%this_iCol
-        new1%other_iCol = 0 ! new2%this_iCol
-        new2%other_iCol = 0 ! new1%this_iCol
+        new1%other_iCol = new2%this_iCol
+        new2%other_iCol = new1%this_iCol
         
         call after_switch_energy(Box, type1, old1, new1, type2, mix, overlap, type1_EpotsNew)
         
