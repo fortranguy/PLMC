@@ -3,7 +3,7 @@ module module_algorithms
 use data_precisions, only: DP
 use data_box, only: Ndim
 use data_monteCarlo, only: Temperature
-use module_types, only: Box_dimensions, particle_index
+use module_types, only: Box_dimensions, particle_index, particle_energy
 use module_physics_micro, only: random_surface, markov_surface
 use class_hardSpheres
 use class_dipolarSpheres
@@ -201,13 +201,13 @@ contains
     
     !> Particle switch
     
-    subroutine before_switch_energy(Box_size, this, old, other, mix, EpotsOld)
+    subroutine before_switch_energy(Box_size, this, old, other, mix, EpotOld)
         
         real(DP), dimension(:), intent(in) :: Box_size
         class(HardSpheres), intent(in) :: this, other
         type(particle_index), intent(inout) :: old
         class(MixingPotential), intent(in) :: mix
-        real(DP), dimension(:), intent(out) :: EpotsOld
+        type(particle_energy), intent(out) :: EpotOld
         logical :: overlap
         
         old%xCol(:) = this%positions(:, old%iCol)
@@ -216,17 +216,17 @@ contains
         select type (this)
             type is (DipolarSpheres)
                 old%mCol(:) = this%orientations(:, old%iCol)
-                EpotsOld(1) = this%Epot_real_solo(Box_size, old) ! Epot_reci: cf. after_switch_energy
+                EpotOld%same = this%Epot_real_solo(Box_size, old) ! Epot_reci: cf. after_switch_energy
             type is (HardSpheres)
-                EpotsOld(1) = 0._DP
+                EpotOld%same = 0._DP
         end select
         
         old%mix_iCell = other%mixCells%index_from_position(old%xCol)
-        call mix%Epot_neighCells(Box_size, old, this%mixCells, other%positions, overlap, EpotsOld(2))
+        call mix%Epot_neighCells(Box_size, old, this%mixCells, other%positions, overlap, EpotOld%mix)
         
     end subroutine before_switch_energy
     
-    subroutine after_switch_energy(Box, this, old, new, other, mix, overlap, EpotsNew)
+    subroutine after_switch_energy(Box, this, old, new, other, mix, overlap, EpotNew)
 
         type(Box_dimensions), intent(in) :: Box
         class(HardSpheres), intent(in) :: this, other
@@ -234,17 +234,17 @@ contains
         type(particle_index), intent(inout) :: new
         class(MixingPotential), intent(in) :: mix
         logical, intent(out) :: overlap
-        real(DP), dimension(:), intent(out) :: EpotsNew
+        type(particle_energy), intent(out) :: EpotNew
         
         new%xCol(:) = other%positions(:, new%other_iCol)
         
         if (this%get_Ncol() >= other%get_Ncol()) then ! optimisation: more chance to overlap
             new%same_iCell = this%sameCells%index_from_position(new%xCol)
-            call this%Epot_neighCells(Box%size, new, overlap, EpotsNew(1))
+            call this%Epot_neighCells(Box%size, new, overlap, EpotNew%same)
         else
             new%mix_iCell = other%mixCells%index_from_position(new%xCol)
             call mix%Epot_neighCells(Box%size, new, this%mixCells, other%positions, overlap, &
-                                     EpotsNew(2))
+                                     EpotNew%mix)
         end if
         
         if (.not. overlap) then
@@ -252,10 +252,10 @@ contains
             if (this%get_Ncol() >= other%get_Ncol()) then
                 new%mix_iCell = other%mixCells%index_from_position(new%xCol)
                 call mix%Epot_neighCells(Box%size, new, this%mixCells, other%positions, overlap, &
-                                         EpotsNew(2))
+                                         EpotNew%mix)
             else
                 new%same_iCell = this%sameCells%index_from_position(new%xCol)
-                call this%Epot_neighCells(Box%size, new, overlap, EpotsNew(1))
+                call this%Epot_neighCells(Box%size, new, overlap, EpotNew%same)
             end if
             
             if (.not. overlap) then
@@ -263,7 +263,7 @@ contains
                 select type (this)
                     type is (DipolarSpheres)
                         new%mCol(:) = this%orientations(:, new%iCol)
-                        EpotsNew(1) = this%Epot_real_solo(Box%size, new) + &
+                        EpotNew%same = this%Epot_real_solo(Box%size, new) + &
                                       this%deltaEpot_reci_move(Box, old, new)
                 end select
             
@@ -312,8 +312,8 @@ contains
         logical :: overlap
         real(DP) :: deltaEpot, type1_deltaEpot, type2_deltaEpot
         real(DP) :: type1_mix_deltaEpot, type2_mix_deltaEpot
-        real(DP), dimension(2) :: type1_EpotsOld, type1_EpotsNew ! (1): same, (2): mix
-        real(DP), dimension(2) :: type2_EpotsOld, type2_EpotsNew
+        type(particle_energy) :: type1_EpotOld, type1_EpotNew
+        type(particle_energy) :: type2_EpotOld, type2_EpotNew
         
         if (type1%get_Ncol()==0 .or. type2%get_Ncol()==0) then
             switch_Nreject = switch_Nreject + 1
@@ -330,21 +330,21 @@ contains
         old1%other_iCol = old2%iCol; new1%other_iCol = new2%iCol
         old2%other_iCol = old1%iCol; new2%other_iCol = new1%iCol
                 
-        call before_switch_energy(Box%size, type1, old1, type2, mix, type1_EpotsOld)
-        call before_switch_energy(Box%size, type2, old2, type1, mix, type2_EpotsOld)        
+        call before_switch_energy(Box%size, type1, old1, type2, mix, type1_EpotOld)
+        call before_switch_energy(Box%size, type2, old2, type1, mix, type2_EpotOld)        
              
-        call after_switch_energy(Box, type1, old1, new1, type2, mix, overlap, type1_EpotsNew)
+        call after_switch_energy(Box, type1, old1, new1, type2, mix, overlap, type1_EpotNew)
         
         if (.not. overlap) then
         
-            call after_switch_energy(Box, type2, old2, new2, type1, mix, overlap, type2_EpotsNew)
+            call after_switch_energy(Box, type2, old2, new2, type1, mix, overlap, type2_EpotNew)
             
             if (.not. overlap) then
 
-                type1_deltaEpot = type1_EpotsNew(1) - type1_EpotsOld(1)
-                type1_mix_deltaEpot = type1_EpotsNew(2) - type1_EpotsOld(2)
-                type2_deltaEpot = type2_EpotsNew(1) - type2_EpotsOld(1)
-                type2_mix_deltaEpot = type2_EpotsNew(2) - type2_EpotsOld(2)
+                type1_deltaEpot = type1_EpotNew%same - type1_EpotOld%same
+                type1_mix_deltaEpot = type1_EpotNew%mix - type1_EpotOld%mix
+                type2_deltaEpot = type2_EpotNew%same - type2_EpotOld%same
+                type2_mix_deltaEpot = type2_EpotNew%mix - type2_EpotOld%mix
                 deltaEpot = type1_deltaEpot + type1_mix_deltaEpot + type2_deltaEpot + &
                             type2_mix_deltaEpot
                 

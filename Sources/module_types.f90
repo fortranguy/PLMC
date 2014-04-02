@@ -25,6 +25,8 @@ implicit none
         type(Node), pointer :: particle => null()
     end type LinkedList
     
+    ! For algorithms
+    
     type, public :: particle_index
         integer :: iCol
         integer :: other_iCol = 0
@@ -34,6 +36,11 @@ implicit none
         integer :: mix_iCell
         logical :: add
     end type particle_index
+    
+    type, public :: particle_energy
+        real(DP) :: same
+        real(DP) :: mix
+    end type particle_energy
 
     ! For main program
 
