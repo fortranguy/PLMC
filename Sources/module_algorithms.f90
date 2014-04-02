@@ -41,15 +41,13 @@ contains
         this_obs%move_Nhit = this_obs%move_Nhit + 1
         
         call random_number(random)
-        old%this_iCol = int(random*this%get_Ncol()) + 1
-        old%xCol(:) = this%positions(:, old%this_iCol)
-        old%other_iCol = 0
+        old%iCol = int(random*this%get_Ncol()) + 1
+        old%xCol(:) = this%positions(:, old%iCol)
         
-        new%this_iCol = old%this_iCol
+        new%iCol = old%iCol
         call random_number(xRand)
         new%xCol(:) = old%xCol(:) + (xRand(:)-0.5_DP)*this%move_delta(:)
         new%xCol(:) = modulo(new%xCol(:), Box%size(:))
-        new%other_iCol = 0
         
         if (this%get_Ncol() >= other%get_Ncol()) then
             new%same_iCell = this%sameCells%index_from_position(new%xCol)
@@ -76,7 +74,7 @@ contains
                 old%same_iCell = this%sameCells%index_from_position(old%xCol)
                 select type (this)
                     type is (DipolarSpheres)
-                        old%mCol(:) = this%orientations(:, old%this_iCol)
+                        old%mCol(:) = this%orientations(:, old%iCol)
                         new%mCol(:) = old%mCol(:)
                         this_EpotNew_real = this%Epot_real_solo(Box%size, new)
                         this_EpotOld_real = this%Epot_real_solo(Box%size, old)
@@ -103,17 +101,17 @@ contains
                             call this%reci_update_structure_move(Box, old, new)
                     end select
                 
-                    this%positions(:, old%this_iCol) = new%xCol(:)
+                    this%positions(:, old%iCol) = new%xCol(:)
                     this_obs%Epot = this_obs%Epot + this_deltaEpot
                     mix_Epot = mix_Epot + mix_deltaEpot
                     
                     if (old%same_iCell /= new%same_iCell) then
-                        call this%sameCells%remove_col_from_cell(old%this_iCol, old%same_iCell)
-                        call this%sameCells%add_col_to_cell(new%this_iCol, new%same_iCell)
+                        call this%sameCells%remove_col_from_cell(old%iCol, old%same_iCell)
+                        call this%sameCells%add_col_to_cell(new%iCol, new%same_iCell)
                     end if
                     if (old%mix_iCell /= new%mix_iCell) then
-                        call other%mixCells%remove_col_from_cell(old%this_iCol, old%mix_iCell)
-                        call other%mixCells%add_col_to_cell(new%this_iCol, new%mix_iCell)
+                        call other%mixCells%remove_col_from_cell(old%iCol, old%mix_iCell)
+                        call other%mixCells%add_col_to_cell(new%iCol, new%mix_iCell)
                     end if
                     
                 else
@@ -149,8 +147,7 @@ contains
         real(DP) :: this_EpotTest, mix_EpotTest
         
         widTestSum = 0._DP
-        test%this_iCol = 0
-        test%other_iCol = 0
+        test%iCol = 0
         
         do iWidom = 1, this%get_Nwidom()
             
@@ -213,12 +210,12 @@ contains
         real(DP), dimension(:), intent(out) :: EpotsOld
         logical :: overlap
         
-        old%xCol(:) = this%positions(:, old%this_iCol)
+        old%xCol(:) = this%positions(:, old%iCol)
         
         old%same_iCell = this%sameCells%index_from_position(old%xCol)
         select type (this)
             type is (DipolarSpheres)
-                old%mCol(:) = this%orientations(:, old%this_iCol)
+                old%mCol(:) = this%orientations(:, old%iCol)
                 EpotsOld(1) = this%Epot_real_solo(Box_size, old) ! Epot_reci: cf. after_switch_energy
             type is (HardSpheres)
                 EpotsOld(1) = 0._DP
@@ -265,7 +262,7 @@ contains
             
                 select type (this)
                     type is (DipolarSpheres)
-                        new%mCol(:) = this%orientations(:, new%this_iCol)
+                        new%mCol(:) = this%orientations(:, new%iCol)
                         EpotsNew(1) = this%Epot_real_solo(Box%size, new) + &
                                       this%deltaEpot_reci_move(Box, old, new)
                 end select
@@ -282,7 +279,7 @@ contains
         class(HardSpheres), intent(inout) :: this, other
         type(particle_index), intent(in) :: old, new
         
-        this%positions(:, old%this_iCol) = new%xCol(:)
+        this%positions(:, old%iCol) = new%xCol(:)
         
         select type (this)
             type is (DipolarSpheres)
@@ -290,12 +287,12 @@ contains
         end select
         
         if (old%same_iCell /= new%same_iCell) then
-            call this%sameCells%remove_col_from_cell(old%this_iCol, old%same_iCell)
-            call this%sameCells%add_col_to_cell(new%this_iCol, new%same_iCell)
+            call this%sameCells%remove_col_from_cell(old%iCol, old%same_iCell)
+            call this%sameCells%add_col_to_cell(new%iCol, new%same_iCell)
         end if
         if (old%mix_iCell /= new%mix_iCell) then
-            call other%mixCells%remove_col_from_cell(old%this_iCol, old%mix_iCell)
-            call other%mixCells%add_col_to_cell(new%this_iCol, new%mix_iCell)
+            call other%mixCells%remove_col_from_cell(old%iCol, old%mix_iCell)
+            call other%mixCells%add_col_to_cell(new%iCol, new%mix_iCell)
         end if
         
     end subroutine after_switch_update
@@ -325,21 +322,21 @@ contains
         
         ! Old: before switch
         call random_number(random)
-        old1%this_iCol = int(random*type1%get_Ncol()) + 1
+        old1%iCol = int(random*type1%get_Ncol()) + 1
         call random_number(random)
-        old2%this_iCol = int(random*type2%get_Ncol()) + 1
+        old2%iCol = int(random*type2%get_Ncol()) + 1
         
-        old1%other_iCol = old2%this_iCol
-        old2%other_iCol = old1%this_iCol
+        old1%other_iCol = old2%iCol
+        old2%other_iCol = old1%iCol
         
         call before_switch_energy(Box%size, type1, old1, type2, mix, type1_EpotsOld)
         call before_switch_energy(Box%size, type2, old2, type1, mix, type2_EpotsOld)
         
         ! New: after switch
-        new1%this_iCol = old1%this_iCol
-        new2%this_iCol = old2%this_iCol
-        new1%other_iCol = new2%this_iCol
-        new2%other_iCol = new1%this_iCol
+        new1%iCol = old1%iCol
+        new2%iCol = old2%iCol
+        new1%other_iCol = new2%iCol
+        new2%other_iCol = new1%iCol
         
         call after_switch_energy(Box, type1, old1, new1, type2, mix, overlap, type1_EpotsNew)
         
@@ -397,11 +394,11 @@ contains
         obs%rotate_Nhit = obs%rotate_Nhit + 1
 
         call random_number(random)
-        old%this_iCol = int(random*this%get_Ncol()) + 1
-        old%xCol(:) = this%positions(:, old%this_iCol)
-        old%mCol(:) = this%orientations(:, old%this_iCol)
+        old%iCol = int(random*this%get_Ncol()) + 1
+        old%xCol(:) = this%positions(:, old%iCol)
+        old%mCol(:) = this%orientations(:, old%iCol)
         
-        new%this_iCol = old%this_iCol
+        new%iCol = old%iCol
         new%xCol(:) = old%xCol(:)
         new%mCol(:) = old%mCol(:)
         call markov_surface(new%mCol, this%rotate_delta)
@@ -420,7 +417,7 @@ contains
         
             call this%reci_update_structure_rotate(Box, old, new)
             call this%update_totalMoment_rotate(old%mCol, new%mCol)
-            this%orientations(:, old%this_iCol) = new%mCol(:)
+            this%orientations(:, old%iCol) = new%mCol(:)
             
             obs%Epot = obs%Epot + deltaEpot
             

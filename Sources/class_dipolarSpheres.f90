@@ -417,7 +417,7 @@ contains
         
         Epot_real_solo = 0._DP
         do jCol = 1, this%Ncol
-            if (jCol /= particle%this_iCol) then
+            if (jCol /= particle%iCol) then
             
                 xCol_j(:) = this%positions(:, jCol)
                 rVec_ij = distVec_PBC(Box_size, xCol_i, xCol_j)
@@ -445,9 +445,9 @@ contains
         Epot_real = 0._DP
         
         do iCol = 1, this%Ncol
-            particle%this_iCol = iCol
-            particle%xCol(:) = this%positions(:, particle%this_iCol)
-            particle%mCol(:) = this%orientations(:, particle%this_iCol)
+            particle%iCol = iCol
+            particle%xCol(:) = this%positions(:, particle%iCol)
+            particle%mCol(:) = this%orientations(:, particle%iCol)
             Epot_real = Epot_real + this%Epot_real_solo(Box_size, particle)
         end do
 

@@ -26,8 +26,8 @@ implicit none
     end type LinkedList
     
     type, public :: particle_index
-        integer :: this_iCol
-        integer :: other_iCol
+        integer :: iCol
+        integer :: other_iCol = 0
         real(DP), dimension(Ndim) :: xCol
         real(DP), dimension(Ndim) :: mCol
         integer :: same_iCell
