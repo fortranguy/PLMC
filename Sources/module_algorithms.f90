@@ -78,7 +78,7 @@ contains
                         new%mCol(:) = old%mCol(:)
                         this_EpotNew_real = this%Epot_real_solo(Box%size, new)
                         this_EpotOld_real = this%Epot_real_solo(Box%size, old)
-                        this_deltaEpot = (this_EpotNew_real-this_EpotOld_real) + &
+                        this_deltaEpot = (this_EpotNew_real - this_EpotOld_real) + &
                                          this%deltaEpot_reci_move(Box, old, new)
                     class default
                         call this%Epot_neighCells(Box%size, old, overlap, this_EpotOld)
