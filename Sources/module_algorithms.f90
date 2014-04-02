@@ -320,24 +320,19 @@ contains
             return
         end if
         
-        ! Old: before switch
         call random_number(random)
         old1%iCol = int(random*type1%get_Ncol()) + 1
+        new1%iCol = old1%iCol
         call random_number(random)
         old2%iCol = int(random*type2%get_Ncol()) + 1
-        
-        old1%other_iCol = old2%iCol
-        old2%other_iCol = old1%iCol
-        
-        call before_switch_energy(Box%size, type1, old1, type2, mix, type1_EpotsOld)
-        call before_switch_energy(Box%size, type2, old2, type1, mix, type2_EpotsOld)
-        
-        ! New: after switch
-        new1%iCol = old1%iCol
         new2%iCol = old2%iCol
-        new1%other_iCol = new2%iCol
-        new2%other_iCol = new1%iCol
         
+        old1%other_iCol = old2%iCol; new1%other_iCol = new2%iCol
+        old2%other_iCol = old1%iCol; new2%other_iCol = new1%iCol
+                
+        call before_switch_energy(Box%size, type1, old1, type2, mix, type1_EpotsOld)
+        call before_switch_energy(Box%size, type2, old2, type1, mix, type2_EpotsOld)        
+             
         call after_switch_energy(Box, type1, old1, new1, type2, mix, overlap, type1_EpotsNew)
         
         if (.not. overlap) then
