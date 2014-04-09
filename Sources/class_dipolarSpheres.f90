@@ -127,9 +127,7 @@ contains
     
     pure subroutine DipolarSpheres_set_changes(this)
         class(DipolarSpheres), intent(inout) :: this
-        this%move_delta = dipol_move_delta
-        this%move_deltaSave = this%move_delta
-        this%move_rejectFix = dipol_move_rejectFix
+        call this%move%init(dipol_move_delta, dipol_move_rejectFix)
         this%rotate_delta = dipol_rotate_delta
         this%rotate_deltaSave = this%rotate_delta
         this%rotate_deltaMax = dipol_rotate_deltaMax

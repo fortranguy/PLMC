@@ -14,6 +14,7 @@ use data_distribution, only: snap_ratio
 use module_types, only: Box_dimensions, Node, particle_index
 use module_physics_micro, only: dist_PBC
 use class_neighbourCells
+use class_small_move
 
 implicit none
 
@@ -36,14 +37,13 @@ private
         integer :: snap_factor
 
         ! Monte-Carlo
-        real(DP), dimension(Ndim) :: move_delta !< displacement
-        real(DP), dimension(Ndim) :: move_deltaSave
-        real(DP) :: move_rejectFix
         integer :: Nwidom
 
         ! Potential
         real(DP) :: rMin !< minimum distance between two particles
         real(DP) :: rCut !< short-range cut
+        
+        type(Small_move) :: move
         
         ! Neighbours (cell/grid scheme)
         type(NeighbourCells), public :: sameCells !< same kind
@@ -63,8 +63,7 @@ private
         procedure :: get_Nwidom => HardSpheres_get_Nwidom
         procedure :: get_sigma => HardSpheres_get_sigma
         procedure :: get_move_delta => HardSpheres_get_move_delta
-        procedure :: adapt_move_delta => HardSpheres_adapt_move_delta
-        procedure :: set_move_delta => HardSpheres_set_move_delta
+        procedure :: set_move_delta => HardSpheres_set_move_delta        
         
         procedure :: write_density => HardSpheres_write_density
         procedure :: write_report => HardSpheres_write_report
@@ -96,9 +95,7 @@ contains
     
     pure subroutine HardSpheres_set_changes(this)
         class(HardSpheres), intent(inout) :: this
-        this%move_delta = hard_move_delta
-        this%move_deltaSave = this%move_delta
-        this%move_rejectFix = hard_move_rejectFix
+        call this%move%init(hard_move_delta, hard_move_rejectFix)
     end subroutine HardSpheres_set_changes
 
     subroutine HardSpheres_construct(this)
@@ -134,81 +131,45 @@ contains
     pure function HardSpheres_get_name(this) result(get_name)
         class(HardSpheres), intent(in) :: this
         character(len=5) :: get_name
+        
         get_name = this%name
     end function HardSpheres_get_name
 
     pure function HardSpheres_get_Ncol(this) result(get_Ncol)
         class(HardSpheres), intent(in) :: this
         integer :: get_Ncol
+        
         get_Ncol = this%Ncol
     end function HardSpheres_get_Ncol
 
     pure function HardSpheres_get_Nwidom(this) result(get_Nwidom)
         class(HardSpheres), intent(in) :: this
         integer :: get_Nwidom
+        
         get_Nwidom = this%Nwidom
     end function HardSpheres_get_Nwidom
     
     pure function HardSpheres_get_sigma(this) result(get_sigma)
         class(HardSpheres), intent(in) :: this
         real(DP) :: get_sigma
+        
         get_sigma = this%sigma
     end function HardSpheres_get_sigma
     
     pure function HardSpheres_get_move_delta(this) result(get_move_delta)
         class(HardSpheres), intent(in) :: this
-        real(DP) :: get_move_delta
-        get_move_delta = sum(this%move_delta)/size(this%move_delta) ! average
-    end function HardSpheres_get_move_delta
+        real(DP), dimension(Ndim) :: get_move_delta
         
-    !> Adapt the displacement move_delta during thermalisation
-    
-    pure subroutine HardSpheres_adapt_move_delta(this, Box_size, reject)
-    
-        class(HardSpheres), intent(inout) :: this
-        real(DP), dimension(:), intent(in) :: Box_size ! warning: average  ?
-        real(DP), intent(in) :: reject
-        
-        real(DP), parameter :: move_delta_eps = 0.05_DP
-        real(DP), parameter :: move_reject_eps = 0.1_DP * move_delta_eps
-        real(DP), parameter :: more = 1._DP+move_delta_eps
-        real(DP), parameter :: less = 1._DP-move_delta_eps
-        
-        if (reject < this%move_rejectFix - move_reject_eps) then
-            this%move_delta(:) = this%move_delta(:) * more
-            if (norm2(this%move_delta) > norm2(Box_size)) then
-                this%move_delta(:) = Box_size(:)
-            end if
-        else if (reject > this%move_rejectFix + move_reject_eps) then
-            this%move_delta(:) = this%move_delta(:) * less
-        end if
-    
-    end subroutine HardSpheres_adapt_move_delta
+        get_move_delta = this%move%delta
+    end function HardSpheres_get_move_delta    
     
     subroutine HardSpheres_set_move_delta(this, Box_size, reject, report_unit)
-    
         class(HardSpheres), intent(inout) :: this
-        real(DP), dimension(:), intent(in) :: Box_size ! warning: average ?
+        real(DP), dimension(:), intent(in) :: Box_size
         real(DP), intent(in) :: reject
         integer, intent(in) :: report_unit
-
-        if (reject < real_zero) then
-            write(error_unit, *) this%name, ":    Warning: move_delta adaptation problem."
-            this%move_delta(:) = this%move_deltaSave(:)
-            write(error_unit, *) "default move_delta: ", this%move_delta(:)
-        end if
-
-        if (norm2(this%move_delta) > norm2(Box_size)) then
-            write(error_unit, *) this%name, ":   Warning: move_delta too big."
-            this%move_delta(:) = Box_size(:)
-            write(error_unit, *) "big move_delta: ", this%move_delta(:)
-        end if
-
-        write(report_unit, *) "Displacement: "
-        write(report_unit, *) "    move_delta(:) = ", this%move_delta(:)
-        write(report_unit, *) "    rejection relative difference = ", &
-                                    abs(reject-this%move_rejectFix)/this%move_rejectFix
-    
+        
+        call this%move%set_delta(this%name, Box_size, reject, report_unit)
     end subroutine HardSpheres_set_move_delta
     
     !> Write density and compacity

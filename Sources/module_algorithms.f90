@@ -46,7 +46,7 @@ contains
         
         new%iCol = old%iCol
         call random_number(xRand)
-        new%xCol(:) = old%xCol(:) + (xRand(:)-0.5_DP)*this%move_delta(:)
+        new%xCol(:) = old%xCol(:) + (xRand(:)-0.5_DP)*this%get_move_delta()
         new%xCol(:) = modulo(new%xCol(:), Box%size(:))
         
         if (this%get_Ncol() >= other%get_Ncol()) then

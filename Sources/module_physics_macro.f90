@@ -335,8 +335,8 @@ contains
     
         obs%move_rejectAvg = obs%move_rejectAdapt / real(Nadapt-1, DP)
         obs%move_rejectAdapt = 0._DP
-        call this%adapt_move_delta(Box_size, obs%move_rejectAvg)
-        write(move_unit, *) iStep, this%get_move_delta(), obs%move_rejectAvg
+        call this%move%adapt_delta(Box_size, obs%move_rejectAvg)
+        write(move_unit, *) iStep, this%move%get_delta_scalar(), obs%move_rejectAvg
     
     end subroutine adapt_move
     
