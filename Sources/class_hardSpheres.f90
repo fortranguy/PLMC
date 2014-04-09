@@ -37,13 +37,12 @@ private
         integer :: snap_factor
 
         ! Monte-Carlo
+        type(Small_move) :: move
         integer :: Nwidom
 
         ! Potential
         real(DP) :: rMin !< minimum distance between two particles
         real(DP) :: rCut !< short-range cut
-        
-        type(Small_move) :: move
         
         ! Neighbours (cell/grid scheme)
         type(NeighbourCells), public :: sameCells !< same kind
@@ -63,6 +62,7 @@ private
         procedure :: get_Nwidom => HardSpheres_get_Nwidom
         procedure :: get_sigma => HardSpheres_get_sigma
         procedure :: get_move_delta => HardSpheres_get_move_delta
+        procedure :: adapt_move_delta => HardSpheres_adapt_move_delta
         procedure :: set_move_delta => HardSpheres_set_move_delta        
         
         procedure :: write_density => HardSpheres_write_density
@@ -161,7 +161,15 @@ contains
         real(DP), dimension(Ndim) :: get_move_delta
         
         get_move_delta = this%move%delta
-    end function HardSpheres_get_move_delta    
+    end function HardSpheres_get_move_delta  
+    
+    subroutine HardSpheres_adapt_move_delta(this, Box_size, reject)
+        class(HardSpheres), intent(inout) :: this
+        real(DP), dimension(:), intent(in) :: Box_size
+        real(DP), intent(in) :: reject        
+    
+        call this%move%adapt_delta(Box_size, reject)
+    end subroutine HardSpheres_adapt_move_delta
     
     subroutine HardSpheres_set_move_delta(this, Box_size, reject, report_unit)
         class(HardSpheres), intent(inout) :: this

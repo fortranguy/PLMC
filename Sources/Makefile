@@ -59,6 +59,8 @@ class_neighbourCells.o: class_neighbourCells.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_small_move.o: class_small_move.f90
 	$(FC) -c $(FFLAGS) $< -o $@
+class_small_rotation.o: class_small_rotation.f90
+	$(FC) -c $(FFLAGS) $< -o $@
 class_hardSpheres.o: class_hardSpheres.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_dipolarSpheres.o: class_dipolarSpheres.f90
@@ -92,7 +94,7 @@ program_distribution.o: program_distribution.f90
 
 $(EXEC1): data.o \
           module_types.o module_physics_micro.o \
-          class_neighbourCells.o class_small_move.o\
+          class_neighbourCells.o class_small_move.o class_small_rotation.o\
           class_hardSpheres.o class_dipolarSpheres.o \
           class_mixingPotential.o \
           class_observables.o class_units.o \

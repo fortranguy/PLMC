@@ -461,7 +461,7 @@ contains
         
         call this%type1_spheres%set_move_delta(this%Box%size, this%type1_obs%move_rejectAvg, &
                                                this%type1_units%report)
-        call this%type1_spheres%set_rotate_delta(this%type1_obs%rotate_rejectAvg, &
+        call this%type1_spheres%set_rotation_delta(this%type1_obs%rotate_rejectAvg, &
                                                  this%type1_units%report)
         call this%type2_spheres%set_move_delta(this%Box%size, this%type2_obs%move_rejectAvg, &
                                                this%type2_units%report)

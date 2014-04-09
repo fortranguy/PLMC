@@ -17,6 +17,7 @@ use module_physics_micro, only: set_discrete_length, distVec_PBC, Box_wave1_sym,
                                 fourier_i, exchange_sign
 use class_neighbourCells
 use class_hardSpheres
+use class_small_rotation
 
 implicit none
 
@@ -29,13 +30,7 @@ private
         ! Particles
         real(DP), dimension(:, :), allocatable, public :: orientations !< dipolar orientations
                                                                        !< of all particles
-        
-        ! Monte-Carlo
-        real(DP), public :: rotate_delta !< rotation
-        real(DP) :: rotate_deltaSave
-        real(DP) :: rotate_deltaMax
-        real(DP) :: rotate_rejectFix
-
+        type(Small_rotation) :: rotation
         ! Potential
         real(DP) :: real_rCut !< real space potential cut
         real(DP) :: real_dr !< discretisation step
@@ -56,16 +51,15 @@ private
         procedure :: construct => DipolarSpheres_construct
         procedure :: destroy => DipolarSpheres_destroy
         
+        procedure :: get_rotation_delta => DipolarSpheres_get_rotation_delta
+        procedure :: adapt_rotation_delta => DipolarSpheres_adapt_rotation_delta
+        procedure :: set_rotation_delta => DipolarSpheres_set_rotation_delta
+        
         !> Write a report of the component in a file
         procedure :: write_report => DipolarSpheres_write_report
         
         !> Take a snap shot of the configuration: orientations
         procedure :: snap_orientations => DipolarSpheres_snap_orientations
-        
-        !> Adapt the rotation rotate_delta during thermalisation
-        procedure :: adapt_rotate_delta => DipolarSpheres_adapt_rotate_delta
-        procedure :: set_rotate_delta => DipolarSpheres_set_rotate_delta
-        procedure :: get_rotate_delta => DipolarSpheres_get_rotate_delta
 
         procedure :: Epot_set_alpha => DipolarSpheres_Epot_set_alpha
         
@@ -119,6 +113,7 @@ contains
 
     pure subroutine DipolarSpheres_set_particles(this)
         class(DipolarSpheres), intent(inout) :: this
+        
         this%sigma = 1._DP ! = u_length
         this%Ncol = dipol_Ncol
         allocate(this%positions(Ndim, this%Ncol))
@@ -127,11 +122,9 @@ contains
     
     pure subroutine DipolarSpheres_set_changes(this)
         class(DipolarSpheres), intent(inout) :: this
+        
         call this%move%init(dipol_move_delta, dipol_move_rejectFix)
-        this%rotate_delta = dipol_rotate_delta
-        this%rotate_deltaSave = this%rotate_delta
-        this%rotate_deltaMax = dipol_rotate_deltaMax
-        this%rotate_rejectFix = dipol_rotate_rejectFix
+        call this%rotation%init(dipol_rotate_delta, dipol_rotate_deltaMax, dipol_rotate_rejectFix)
     end subroutine DipolarSpheres_set_changes
 
     subroutine DipolarSpheres_construct(this)
@@ -149,17 +142,37 @@ contains
     
     end subroutine DipolarSpheres_construct
     
-    subroutine DipolarSpheres_destroy(this)
-    
+    subroutine DipolarSpheres_destroy(this)    
         class(DipolarSpheres), intent(inout) :: this
         
         call this%HardSpheres%destroy()
         if (allocated(this%orientations)) deallocate(this%orientations)
         if (allocated(this%Epot_real_tab)) deallocate(this%Epot_real_tab)
         if (allocated(this%Epot_reci_weight)) deallocate(this%Epot_reci_weight)
-        if (allocated(this%Epot_reci_structure)) deallocate(this%Epot_reci_structure)
-    
+        if (allocated(this%Epot_reci_structure)) deallocate(this%Epot_reci_structure)    
     end subroutine DipolarSpheres_destroy
+    
+    pure function DipolarSpheres_get_rotation_delta(this) result(get_rotation_delta)
+        class(DipolarSpheres), intent(in) :: this
+        real(DP) :: get_rotation_delta
+        
+        get_rotation_delta = this%rotation%delta
+    end function DipolarSpheres_get_rotation_delta    
+    
+    subroutine DipolarSpheres_adapt_rotation_delta(this, reject)
+        class(DipolarSpheres), intent(inout) :: this
+        real(DP), intent(in) :: reject        
+    
+        call this%rotation%adapt_delta(reject)
+    end subroutine DipolarSpheres_adapt_rotation_delta
+    
+    subroutine DipolarSpheres_set_rotation_delta(this, reject, report_unit)
+        class(DipolarSpheres), intent(inout) :: this
+        real(DP), intent(in) :: reject
+        integer, intent(in) :: report_unit
+        
+        call this%rotation%set_delta(this%name, reject, report_unit)
+    end subroutine DipolarSpheres_set_rotation_delta
     
     !> Report
     
@@ -194,65 +207,12 @@ contains
 
     end subroutine DipolarSpheres_snap_orientations
     
-    !> Adaptation of rotate_delta during the thermalisation
-    
-    pure subroutine DipolarSpheres_adapt_rotate_delta(this, reject)
-    
-        class(DipolarSpheres), intent(inout) :: this
-        real(DP), intent(in) :: reject
-        
-        real(DP), parameter :: rotate_delta_eps = 0.05_DP
-        real(DP), parameter :: rotate_reject_eps = 0.1_DP * rotate_delta_eps
-        real(DP), parameter :: more = 1._DP+rotate_delta_eps
-        real(DP), parameter :: less = 1._DP-rotate_delta_eps
-        
-        if (reject < this%rotate_rejectFix - rotate_reject_eps) then
-            this%rotate_delta = this%rotate_delta * more
-            if (this%rotate_delta > this%rotate_deltaMax) then
-                this%rotate_delta = this%rotate_deltaMax
-            end if
-        else if (reject > this%rotate_rejectFix + rotate_reject_eps) then
-            this%rotate_delta = this%rotate_delta * less
-        end if
-    
-    end subroutine DipolarSpheres_adapt_rotate_delta
-    
-    subroutine DipolarSpheres_set_rotate_delta(this, reject, report_unit)
-    
-        class(DipolarSpheres), intent(inout) :: this
-        real(DP), intent(in) :: reject
-        integer, intent(in) :: report_unit
-        
-        if (reject < real_zero) then
-            write(error_unit, *) this%name, ":    Warning: rotate_delta adaptation problem."
-            this%rotate_delta = this%rotate_deltaSave
-            write(error_unit, *) "default rotate_delta: ", this%rotate_delta
-        end if
-        
-        if (this%rotate_delta > this%rotate_deltaMax) then
-            write(error_unit, *) this%name, ":   Warning: rotate_delta too big."
-            this%rotate_delta = this%rotate_deltaMax
-            write(error_unit, *) "big rotate_delta: ", this%rotate_delta
-        end if
-        
-        write(report_unit, *) "Rotation: "
-        write(report_unit, *) "    rotate_delta = ", this%rotate_delta
-        write(report_unit, *) "    rejection relative difference = ", &
-                                    abs(reject-this%rotate_rejectFix)/this%rotate_rejectFix
-    
-    end subroutine DipolarSpheres_set_rotate_delta
-    
     !> Accessors
-    
-    pure function DipolarSpheres_get_rotate_delta(this) result(get_rotate_delta)
-        class(DipolarSpheres), intent(in) :: this
-        real(DP) :: get_rotate_delta
-        get_rotate_delta = this%rotate_delta
-    end function DipolarSpheres_get_rotate_delta
 
     subroutine DipolarSpheres_Epot_set_alpha(this, Box_size)
         class(DipolarSpheres), intent(inout) :: this
         real(DP), dimension(:), intent(in) :: Box_size
+        
         this%alpha = dipol_alpha_factor / Box_size(1)
     end subroutine DipolarSpheres_Epot_set_alpha
 

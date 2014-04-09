@@ -396,7 +396,7 @@ contains
         new%iCol = old%iCol
         new%xCol(:) = old%xCol(:)
         new%mCol(:) = old%mCol(:)
-        call markov_surface(new%mCol, this%rotate_delta)
+        call markov_surface(new%mCol, this%get_rotation_delta())
         
         real_EpotOld = this%Epot_real_solo(Box%size, old)
         real_EpotNew = this%Epot_real_solo(Box%size, new)
