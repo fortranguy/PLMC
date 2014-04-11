@@ -17,7 +17,6 @@ private
     contains
     
         procedure :: init => Small_move_init
-        procedure :: get_delta_scalar => Small_move_get_delta_scalar
         procedure :: adapt_delta => Small_move_adapt_delta
         procedure :: set_delta => Small_move_set_delta
     
@@ -34,13 +33,6 @@ contains
         this%deltaSave = this%delta
         this%rejectFix = rejectFix
     end subroutine Small_move_init
-    
-    pure function Small_move_get_delta_scalar(this) result(get_delta_scalar)
-        class(Small_move), intent(in) :: this
-        real(DP) :: get_delta_scalar
-        
-        get_delta_scalar = sum(this%delta)/size(this%delta) ! average
-    end function Small_move_get_delta_scalar
         
     !> Adapt the displacement delta during thermalisation
     

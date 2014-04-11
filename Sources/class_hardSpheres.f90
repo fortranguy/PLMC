@@ -62,6 +62,7 @@ private
         procedure :: get_Nwidom => HardSpheres_get_Nwidom
         procedure :: get_sigma => HardSpheres_get_sigma
         procedure :: get_move_delta => HardSpheres_get_move_delta
+        procedure :: get_move_delta_scalar => HardSpheres_get_move_delta_scalar
         procedure :: adapt_move_delta => HardSpheres_adapt_move_delta
         procedure :: set_move_delta => HardSpheres_set_move_delta        
         
@@ -161,7 +162,14 @@ contains
         real(DP), dimension(Ndim) :: get_move_delta
         
         get_move_delta = this%move%delta
-    end function HardSpheres_get_move_delta  
+    end function HardSpheres_get_move_delta
+    
+    pure function HardSpheres_get_move_delta_scalar(this) result(get_move_delta_scalar)
+        class(HardSpheres), intent(in) :: this
+        real(DP) :: get_move_delta_scalar
+        
+        get_move_delta_scalar = sum(this%move%delta)/size(this%move%delta)
+    end function HardSpheres_get_move_delta_scalar
     
     subroutine HardSpheres_adapt_move_delta(this, Box_size, reject)
         class(HardSpheres), intent(inout) :: this
