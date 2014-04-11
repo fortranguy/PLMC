@@ -42,18 +42,18 @@ contains
         
         call random_number(random)
         old%number = int(random*this%get_num_particles()) + 1
-        old%xCol(:) = this%all_positions(:, old%number)
+        old%position(:) = this%all_positions(:, old%number)
         
         new%number = old%number
         call random_number(xRand)
-        new%xCol(:) = old%xCol(:) + (xRand(:)-0.5_DP)*this%get_move_delta()
-        new%xCol(:) = modulo(new%xCol(:), Box%size(:))
+        new%position(:) = old%position(:) + (xRand(:)-0.5_DP)*this%get_move_delta()
+        new%position(:) = modulo(new%position(:), Box%size(:))
         
         if (this%get_num_particles() >= other%get_num_particles()) then
-            new%same_iCell = this%sameCells%index_from_position(new%xCol)
+            new%same_iCell = this%sameCells%index_from_position(new%position)
             call this%Epot_neighCells(Box%size, new, overlap, this_EpotNew)
         else
-            new%mix_iCell = other%mixCells%index_from_position(new%xCol)
+            new%mix_iCell = other%mixCells%index_from_position(new%position)
             call mix%Epot_neighCells(Box%size, new, this%mixCells, other%all_positions, overlap, &
                                      mix_EpotNew)
         end if
@@ -61,21 +61,21 @@ contains
         if (.not. overlap) then
         
             if (this%get_num_particles() >= other%get_num_particles()) then
-                new%mix_iCell = other%mixCells%index_from_position(new%xCol)
+                new%mix_iCell = other%mixCells%index_from_position(new%position)
                 call mix%Epot_neighCells(Box%size, new, this%mixCells, other%all_positions, overlap, &
                                          mix_EpotNew)
             else
-                new%same_iCell = this%sameCells%index_from_position(new%xCol)
+                new%same_iCell = this%sameCells%index_from_position(new%position)
                 call this%Epot_neighCells(Box%size, new, overlap, this_EpotNew)
             end if
                         
             if (.not. overlap) then
     
-                old%same_iCell = this%sameCells%index_from_position(old%xCol)
+                old%same_iCell = this%sameCells%index_from_position(old%position)
                 select type (this)
                     type is (Dipolar_Spheres)
-                        old%mCol(:) = this%orientations(:, old%number)
-                        new%mCol(:) = old%mCol(:)
+                        old%orientation(:) = this%all_orientations(:, old%number)
+                        new%orientation(:) = old%orientation(:)
                         this_EpotNew_real = this%Epot_real_solo(Box%size, new)
                         this_EpotOld_real = this%Epot_real_solo(Box%size, old)
                         this_deltaEpot = (this_EpotNew_real - this_EpotOld_real) + &
@@ -85,7 +85,7 @@ contains
                         this_deltaEpot = this_EpotNew - this_EpotOld
                 end select
                     
-                old%mix_iCell = other%mixCells%index_from_position(old%xCol)
+                old%mix_iCell = other%mixCells%index_from_position(old%position)
                 call mix%Epot_neighCells(Box%size, old, this%mixCells, other%all_positions, overlap, &
                                          mix_EpotOld)
                 
@@ -101,7 +101,7 @@ contains
                             call this%reci_update_structure_move(Box, old, new)
                     end select
                 
-                    this%all_positions(:, old%number) = new%xCol(:)
+                    this%all_positions(:, old%number) = new%position(:)
                     this_obs%Epot = this_obs%Epot + this_deltaEpot
                     mix_Epot = mix_Epot + mix_deltaEpot
                     
@@ -152,13 +152,13 @@ contains
         do iWidom = 1, this%get_Nwidom()
             
             call random_number(xRand)
-            test%xCol(:) = Box%size(:) * xRand(:)
+            test%position(:) = Box%size(:) * xRand(:)
 
             if (this%get_num_particles() >= other%get_num_particles()) then
-                test%same_iCell = this%sameCells%index_from_position(test%xCol)
+                test%same_iCell = this%sameCells%index_from_position(test%position)
                 call this%Epot_neighCells(Box%size, test, overlap, this_EpotTest)
             else
-                test%mix_iCell = other%mixCells%index_from_position(test%xCol)
+                test%mix_iCell = other%mixCells%index_from_position(test%position)
                 call mix%Epot_neighCells(Box%size, test, this%mixCells, other%all_positions, overlap, &
                                          mix_EpotTest)
             end if
@@ -166,11 +166,11 @@ contains
             if (.not. overlap) then
             
                 if (this%get_num_particles() >= other%get_num_particles()) then
-                    test%mix_iCell = other%mixCells%index_from_position(test%xCol)
+                    test%mix_iCell = other%mixCells%index_from_position(test%position)
                     call mix%Epot_neighCells(Box%size, test, this%mixCells, other%all_positions, overlap, &
                                              mix_EpotTest)
                 else
-                    test%same_iCell = this%sameCells%index_from_position(test%xCol)
+                    test%same_iCell = this%sameCells%index_from_position(test%position)
                     call this%Epot_neighCells(Box%size, test, overlap, this_EpotTest)
                 end if
                 
@@ -179,11 +179,11 @@ contains
                     select type (this)
                         type is (Dipolar_Spheres)
                             test%add = .true.
-                            test%mCol(:) = random_surface()
+                            test%orientation(:) = random_surface()
                             this_EpotTest = this%Epot_real_solo(Box%size, test) + &
                                             this%deltaEpot_reci_exchange(Box, test) - &
-                                            this%Epot_self_solo(test%mCol) + &
-                                            this%deltaEpot_bound_exchange(Box%size, test%mCol)
+                                            this%Epot_self_solo(test%orientation) + &
+                                            this%deltaEpot_bound_exchange(Box%size, test%orientation)
                     end select
                 
                     EpotTest = this_EpotTest + mix_EpotTest
@@ -210,18 +210,18 @@ contains
         type(Particle_Energy), intent(out) :: EpotOld
         logical :: overlap
         
-        old%xCol(:) = this%all_positions(:, old%number)
+        old%position(:) = this%all_positions(:, old%number)
         
-        old%same_iCell = this%sameCells%index_from_position(old%xCol)
+        old%same_iCell = this%sameCells%index_from_position(old%position)
         select type (this)
             type is (Dipolar_Spheres)
-                old%mCol(:) = this%orientations(:, old%number)
+                old%orientation(:) = this%all_orientations(:, old%number)
                 EpotOld%same = this%Epot_real_solo(Box_size, old) ! Epot_reci: cf. after_switch_energy
             type is (Hard_Spheres)
                 EpotOld%same = 0._DP
         end select
         
-        old%mix_iCell = other%mixCells%index_from_position(old%xCol)
+        old%mix_iCell = other%mixCells%index_from_position(old%position)
         call mix%Epot_neighCells(Box_size, old, this%mixCells, other%all_positions, overlap, EpotOld%mix)
         
     end subroutine before_switch_energy
@@ -236,13 +236,13 @@ contains
         logical, intent(out) :: overlap
         type(Particle_Energy), intent(out) :: EpotNew
         
-        new%xCol(:) = other%all_positions(:, new%other_number)
+        new%position(:) = other%all_positions(:, new%other_number)
         
         if (this%get_num_particles() >= other%get_num_particles()) then ! optimisation: more chance to overlap
-            new%same_iCell = this%sameCells%index_from_position(new%xCol)
+            new%same_iCell = this%sameCells%index_from_position(new%position)
             call this%Epot_neighCells(Box%size, new, overlap, EpotNew%same)
         else
-            new%mix_iCell = other%mixCells%index_from_position(new%xCol)
+            new%mix_iCell = other%mixCells%index_from_position(new%position)
             call mix%Epot_neighCells(Box%size, new, this%mixCells, other%all_positions, overlap, &
                                      EpotNew%mix)
         end if
@@ -250,11 +250,11 @@ contains
         if (.not. overlap) then
         
             if (this%get_num_particles() >= other%get_num_particles()) then
-                new%mix_iCell = other%mixCells%index_from_position(new%xCol)
+                new%mix_iCell = other%mixCells%index_from_position(new%position)
                 call mix%Epot_neighCells(Box%size, new, this%mixCells, other%all_positions, overlap, &
                                          EpotNew%mix)
             else
-                new%same_iCell = this%sameCells%index_from_position(new%xCol)
+                new%same_iCell = this%sameCells%index_from_position(new%position)
                 call this%Epot_neighCells(Box%size, new, overlap, EpotNew%same)
             end if
             
@@ -262,7 +262,7 @@ contains
             
                 select type (this)
                     type is (Dipolar_Spheres)
-                        new%mCol(:) = this%orientations(:, new%number)
+                        new%orientation(:) = this%all_orientations(:, new%number)
                         EpotNew%same = this%Epot_real_solo(Box%size, new) + &
                                       this%deltaEpot_reci_move(Box, old, new)
                 end select
@@ -279,7 +279,7 @@ contains
         class(Hard_Spheres), intent(inout) :: this, other
         type(Particle_Index), intent(in) :: old, new
         
-        this%all_positions(:, old%number) = new%xCol(:)
+        this%all_positions(:, old%number) = new%position(:)
         
         select type (this)
             type is (Dipolar_Spheres)
@@ -390,29 +390,29 @@ contains
 
         call random_number(random)
         old%number = int(random*this%get_num_particles()) + 1
-        old%xCol(:) = this%all_positions(:, old%number)
-        old%mCol(:) = this%orientations(:, old%number)
+        old%position(:) = this%all_positions(:, old%number)
+        old%orientation(:) = this%all_orientations(:, old%number)
         
         new%number = old%number
-        new%xCol(:) = old%xCol(:)
-        new%mCol(:) = old%mCol(:)
-        call markov_surface(new%mCol, this%get_rotation_delta())
+        new%position(:) = old%position(:)
+        new%orientation(:) = old%orientation(:)
+        call markov_surface(new%orientation, this%get_rotation_delta())
         
         real_EpotOld = this%Epot_real_solo(Box%size, old)
         real_EpotNew = this%Epot_real_solo(Box%size, new)
         deltaEpot_real = real_EpotNew - real_EpotOld
         
-        deltaEpot_self = this%Epot_self_solo(new%mCol) - this%Epot_self_solo(old%mCol)
+        deltaEpot_self = this%Epot_self_solo(new%orientation) - this%Epot_self_solo(old%orientation)
         
         deltaEpot = deltaEpot_real + this%deltaEpot_reci_rotate(Box, old, new) - &
-                    deltaEpot_self + this%deltaEpot_bound_rotate(Box%size, old%mCol, new%mCol)
+                    deltaEpot_self + this%deltaEpot_bound_rotate(Box%size, old%orientation, new%orientation)
         
         call random_number(random)
         if (random < exp(-deltaEpot/Temperature)) then
         
             call this%reci_update_structure_rotate(Box, old, new)
-            call this%update_totalMoment_rotate(old%mCol, new%mCol)
-            this%orientations(:, old%number) = new%mCol(:)
+            call this%update_totalMoment_rotate(old%orientation, new%orientation)
+            this%all_orientations(:, old%number) = new%orientation(:)
             
             obs%Epot = obs%Epot + deltaEpot
             

@@ -30,8 +30,8 @@ implicit none
     type, public :: Particle_Index
         integer :: number
         integer :: other_number = 0
-        real(DP), dimension(Ndim) :: xCol
-        real(DP), dimension(Ndim) :: mCol
+        real(DP), dimension(Ndim) :: position
+        real(DP), dimension(Ndim) :: orientation
         integer :: same_iCell
         integer :: mix_iCell
         logical :: add

@@ -28,8 +28,7 @@ private
         private
         
         ! Particles
-        real(DP), dimension(:, :), allocatable, public :: orientations !< dipolar orientations
-                                                                       !< of all particles
+        real(DP), dimension(:, :), allocatable, public :: all_orientations
         type(Small_Rotation) :: rotation
         ! Potential
         real(DP) :: real_rCut !< real space potential cut
@@ -117,7 +116,7 @@ contains
         this%diameter = 1._DP ! = u_length
         this%num_particles = dipol_num_particles
         allocate(this%all_positions(Ndim, this%num_particles))
-        allocate(this%orientations(Ndim, this%num_particles))
+        allocate(this%all_orientations(Ndim, this%num_particles))
     end subroutine Dipolar_Spheres_set_particles
     
     pure subroutine Dipolar_Spheres_set_changes(this)
@@ -146,7 +145,7 @@ contains
         class(Dipolar_Spheres), intent(inout) :: this
         
         call this%Hard_Spheres%destroy()
-        if (allocated(this%orientations)) deallocate(this%orientations)
+        if (allocated(this%all_orientations)) deallocate(this%all_orientations)
         if (allocated(this%Epot_real_tab)) deallocate(this%Epot_real_tab)
         if (allocated(this%Epot_reci_weight)) deallocate(this%Epot_reci_weight)
         if (allocated(this%Epot_reci_structure)) deallocate(this%Epot_reci_structure)    
@@ -201,7 +200,7 @@ contains
         
         if (modulo(iStep, this%snap_factor) == 0) then
             do i_particle = 1, this%num_particles
-                write(snap_unit, *) this%orientations(:, i_particle)
+                write(snap_unit, *) this%all_orientations(:, i_particle)
             end do
         end if
 
@@ -370,8 +369,8 @@ contains
         real(DP), dimension(Ndim) :: rVec_ij
         real(DP) :: r_ij
          
-        xCol_i(:) = particle%xCol(:)
-        mCol_i(:) = particle%mCol(:)
+        xCol_i(:) = particle%position(:)
+        mCol_i(:) = particle%orientation(:)
         
         Epot_real_solo = 0._DP
         do j_particle = 1, this%num_particles
@@ -380,7 +379,7 @@ contains
                 xCol_j(:) = this%all_positions(:, j_particle)
                 rVec_ij = distVec_PBC(Box_size, xCol_i, xCol_j)
                 r_ij = norm2(rVec_ij)
-                mCol_j(:) = this%orientations(:, j_particle)
+                mCol_j(:) = this%all_orientations(:, j_particle)
 
                 Epot_real_solo = Epot_real_solo + this%Epot_real_pair(mCol_i, mCol_j, rVec_ij, r_ij)
 
@@ -404,8 +403,8 @@ contains
         
         do i_particle = 1, this%num_particles
             particle%number = i_particle
-            particle%xCol(:) = this%all_positions(:, particle%number)
-            particle%mCol(:) = this%orientations(:, particle%number)
+            particle%position(:) = this%all_positions(:, particle%number)
+            particle%orientation(:) = this%all_orientations(:, particle%number)
             Epot_real = Epot_real + this%Epot_real_solo(Box_size, particle)
         end do
 
@@ -488,7 +487,7 @@ contains
             call fourier_i(Box%wave(2), xColOverL(2), exp_Ikx_2)
             call fourier_i(Box%wave(3), xColOverL(3), exp_Ikx_3)
             
-            mColOverL(:) = this%orientations(:, i_particle)/Box%size(:)
+            mColOverL(:) = this%all_orientations(:, i_particle)/Box%size(:)
         
             do kz = -Box%wave(3), Box%wave(3)
                 waveVector(3) = real(kz, DP)
@@ -645,17 +644,17 @@ contains
         real(DP) :: k_dot_mCol
         integer :: kx, ky, kz
 
-        xNewOverL(:) = 2._DP*PI * new%xCol(:)/Box%size(:)
+        xNewOverL(:) = 2._DP*PI * new%position(:)/Box%size(:)
         call fourier_i(Box%wave(1), xNewOverL(1), exp_IkxNew_1)
         call fourier_i(Box%wave(2), xNewOverL(2), exp_IkxNew_2)
         call fourier_i(Box%wave(3), xNewOverL(3), exp_IkxNew_3)
         
-        xOldOverL(:) = 2._DP*PI * old%xCol(:)/Box%size(:)
+        xOldOverL(:) = 2._DP*PI * old%position(:)/Box%size(:)
         call fourier_i(Box%wave(1), xOldOverL(1), exp_IkxOld_1)
         call fourier_i(Box%wave(2), xOldOverL(2), exp_IkxOld_2)
         call fourier_i(Box%wave(3), xOldOverL(3), exp_IkxOld_3)
 
-        mColOverL(:) = new%mCol(:)/Box%size(:)
+        mColOverL(:) = new%orientation(:)/Box%size(:)
 
         deltaEpot_reci_move = 0._DP
 
@@ -720,17 +719,17 @@ contains
         real(DP) :: k_dot_mCol
         integer :: kx, ky, kz
 
-        xNewOverL(:) = 2._DP*PI * new%xCol(:)/Box%size(:)
+        xNewOverL(:) = 2._DP*PI * new%position(:)/Box%size(:)
         call fourier_i(Box%wave(1), xNewOverL(1), exp_IkxNew_1)
         call fourier_i(Box%wave(2), xNewOverL(2), exp_IkxNew_2)
         call fourier_i(Box%wave(3), xNewOverL(3), exp_IkxNew_3)
         
-        xOldOverL(:) = 2._DP*PI * old%xCol(:)/Box%size(:)
+        xOldOverL(:) = 2._DP*PI * old%position(:)/Box%size(:)
         call fourier_i(Box%wave(1), xOldOverL(1), exp_IkxOld_1)
         call fourier_i(Box%wave(2), xOldOverL(2), exp_IkxOld_2)
         call fourier_i(Box%wave(3), xOldOverL(3), exp_IkxOld_3)
 
-        mColOverL(:) = new%mCol(:)/Box%size(:)
+        mColOverL(:) = new%orientation(:)/Box%size(:)
 
         do kz = 0, Box%wave(3)
             waveVector(3) = real(kz, DP)
@@ -790,13 +789,13 @@ contains
         real(DP) :: k_dot_mNew, k_dot_mOld
         integer :: kx, ky, kz
 
-        xColOverL(:) = 2._DP*PI * new%xCol(:)/Box%size(:)
+        xColOverL(:) = 2._DP*PI * new%position(:)/Box%size(:)
         call fourier_i(Box%wave(1), xColOverL(1), exp_IkxCol_1)
         call fourier_i(Box%wave(2), xColOverL(2), exp_IkxCol_2)
         call fourier_i(Box%wave(3), xColOverL(3), exp_IkxCol_3)
 
-        mNewOverL(:) = new%mCol(:)/Box%size(:)
-        mOldOverL(:) = old%mCol(:)/Box%size(:)
+        mNewOverL(:) = new%orientation(:)/Box%size(:)
+        mOldOverL(:) = old%orientation(:)/Box%size(:)
 
         deltaEpot_reci_rotate = 0._DP
 
@@ -855,13 +854,13 @@ contains
         real(DP) :: k_dot_deltaMcol
         integer :: kx, ky, kz
 
-        xColOverL(:) = 2._DP*PI * new%xCol(:)/Box%size(:)
+        xColOverL(:) = 2._DP*PI * new%position(:)/Box%size(:)
         call fourier_i(Box%wave(1), xColOverL(1), exp_IkxCol_1)
         call fourier_i(Box%wave(2), xColOverL(2), exp_IkxCol_2)
         call fourier_i(Box%wave(3), xColOverL(3), exp_IkxCol_3)
 
-        mNewOverL(:) = new%mCol(:)/Box%size(:)
-        mOldOverL(:) = old%mCol(:)/Box%size(:)
+        mNewOverL(:) = new%orientation(:)/Box%size(:)
+        mOldOverL(:) = old%orientation(:)/Box%size(:)
 
         do kz = 0, Box%wave(3)
             waveVector(3) = real(kz, DP)
@@ -923,12 +922,12 @@ contains
         real(DP) :: k_dot_mCol
         integer :: kx, ky, kz
         
-        xColOverL(:) = 2._DP*PI * particle%xCol(:)/Box%size(:)
+        xColOverL(:) = 2._DP*PI * particle%position(:)/Box%size(:)
         call fourier_i(Box%wave(1), xColOverL(1), exp_IkxCol_1)
         call fourier_i(Box%wave(2), xColOverL(2), exp_IkxCol_2)
         call fourier_i(Box%wave(3), xColOverL(3), exp_IkxCol_3)
         
-        mColOverL(:) = exchange_sign(particle%add) * particle%mCol(:)/Box%size(:)
+        mColOverL(:) = exchange_sign(particle%add) * particle%orientation(:)/Box%size(:)
         
         deltaEpot_reci_exchange = 0._DP
         
@@ -1013,7 +1012,7 @@ contains
         
         Epot_self = 0._DP
         do i_particle = 1, this%num_particles
-            Epot_self = Epot_self + this%Epot_self_solo(this%orientations(:, i_particle))
+            Epot_self = Epot_self + this%Epot_self_solo(this%all_orientations(:, i_particle))
         end do
         
     end function Dipolar_Spheres_Epot_self
@@ -1029,7 +1028,7 @@ contains
         integer :: i_particle
         this%totalMoment(:) = 0._DP
         do i_particle = 1, this%num_particles
-            this%totalMoment(:) = this%totalMoment(:) + this%orientations(:, i_particle)
+            this%totalMoment(:) = this%totalMoment(:) + this%all_orientations(:, i_particle)
         end do
     end subroutine Dipolar_Spheres_set_totalMoment
 

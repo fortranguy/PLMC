@@ -203,7 +203,7 @@ contains
         
             case ('r')
                 call randomDepositions(Box_size, dipolar, spherical, mix_min_distance)
-                call randomOrientations(dipolar%orientations, dipolar%get_num_particles())
+                call randomOrientations(dipolar%all_orientations, dipolar%get_num_particles())
                 write(output_unit, *) "Random depositions + random orientations"
                 write(report_unit, *) "    Random depositions + random orientations"
                 
@@ -215,7 +215,7 @@ contains
                                       dipolar%all_positions, norm2(Box_size))
                 call oldConfiguration(arg_init%files(2), arg_init%length(2), &
                                       dipolar%get_name()//"_orientations", dipolar%get_num_particles(), &
-                                      dipolar%orientations, 1._DP)
+                                      dipolar%all_orientations, 1._DP)
                 call oldConfiguration(arg_init%files(3), arg_init%length(3), &
                                       spherical%get_name()//"_positions", spherical%get_num_particles(), &
                                       spherical%all_positions, norm2(Box_size))

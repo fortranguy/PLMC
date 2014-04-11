@@ -365,7 +365,7 @@ contains
                 next => current%next
             
                 if (current%number /= particle%number) then
-                    r_ij = dist_PBC(Box_size, particle%xCol(:), this%all_positions(:, current%number))
+                    r_ij = dist_PBC(Box_size, particle%position(:), this%all_positions(:, current%number))
                     if (r_ij < this%rMin) then
                         overlap = .true.
                         return
