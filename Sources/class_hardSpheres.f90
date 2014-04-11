@@ -6,7 +6,7 @@ use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
 use data_precisions, only: DP, real_zero
 use data_constants, only: PI
 use data_box, only: Ndim
-use data_particles, only: hard_sigma, hard_Ncol
+use data_particles, only: hard_diameter, hard_Ncol
 use data_monteCarlo, only: hard_move_delta, hard_move_rejectFix, hard_Nwidom
 use data_potential, only: hard_rMin_factor
 use data_neighbourCells, only: NnearCell
@@ -29,7 +29,7 @@ private
         character(len=5) :: name
 
         ! Particles
-        real(DP) :: sigma !< diameter
+        real(DP) :: diameter
         integer ::  Ncol !< number of a component particles
         real(DP), dimension(:, :), allocatable, public :: positions !< positions of all particles
         
@@ -60,7 +60,7 @@ private
         procedure :: get_name => HardSpheres_get_name
         procedure :: get_Ncol => HardSpheres_get_Ncol
         procedure :: get_Nwidom => HardSpheres_get_Nwidom
-        procedure :: get_sigma => HardSpheres_get_sigma
+        procedure :: get_diameter => HardSpheres_get_diameter
         procedure :: get_move_delta => HardSpheres_get_move_delta
         procedure :: get_move_delta_scalar => HardSpheres_get_move_delta_scalar
         procedure :: adapt_move_delta => HardSpheres_adapt_move_delta
@@ -89,7 +89,7 @@ contains
 
     pure subroutine HardSpheres_set_particles(this)
         class(HardSpheres), intent(inout) :: this
-        this%sigma = hard_sigma
+        this%diameter = hard_diameter
         this%Ncol = hard_Ncol
         allocate(this%positions(Ndim, this%Ncol))
     end subroutine HardSpheres_set_particles
@@ -150,12 +150,12 @@ contains
         get_Nwidom = this%Nwidom
     end function HardSpheres_get_Nwidom
     
-    pure function HardSpheres_get_sigma(this) result(get_sigma)
+    pure function HardSpheres_get_diameter(this) result(get_diameter)
         class(HardSpheres), intent(in) :: this
-        real(DP) :: get_sigma
+        real(DP) :: get_diameter
         
-        get_sigma = this%sigma
-    end function HardSpheres_get_sigma
+        get_diameter = this%diameter
+    end function HardSpheres_get_diameter
     
     pure function HardSpheres_get_move_delta(this) result(get_move_delta)
         class(HardSpheres), intent(in) :: this
@@ -200,7 +200,7 @@ contains
         real(DP) :: density, compacity, concentration
         
         density = real(this%Ncol + 1, DP) / product(Box_size) ! cheating ? cf. Widom
-        compacity = 4._DP/3._DP*PI*(this%sigma/2._DP)**3 * density
+        compacity = 4._DP/3._DP*PI*(this%diameter/2._DP)**3 * density
         concentration = real(this%Ncol, DP) / real(total_Ncol, DP)
         
         write(report_unit, *) "    density = ", density
@@ -318,7 +318,7 @@ contains
         real(DP) :: volume_dummy
         volume_dummy = product(Box%size)
         
-        this%rMin = hard_rMin_factor * this%sigma
+        this%rMin = hard_rMin_factor * this%diameter
         this%rCut = this%rMin
         
     end subroutine HardSpheres_set_Epot

@@ -66,11 +66,11 @@ contains
 
     !> Random depositions configuration
     
-    subroutine randomDepositions(Box_size, type1, type2, mix_sigma)
+    subroutine randomDepositions(Box_size, type1, type2, mix_min_distance)
 
         real(DP), dimension(:), intent(in) :: Box_size
         class(HardSpheres), intent(inout) :: type1, type2
-        real(DP), intent(in) :: mix_sigma
+        real(DP), intent(in) :: mix_min_distance
 
         integer :: iCol, iColTest
         real(DP), dimension(Ndim) :: xRand
@@ -85,7 +85,7 @@ contains
             
             do iColTest = 1, iCol-1
                 rTest = dist_PBC(Box_size, type1%positions(:, iColTest), type1%positions(:, iCol))
-                if (rTest < type1%get_sigma()) then
+                if (rTest < type1%get_diameter()) then
                     goto 7101
                 end if
             end do
@@ -101,14 +101,14 @@ contains
             
             do iColTest = 1, type1%get_Ncol()
                 rTest = dist_PBC(Box_size, type1%positions(:, iColTest), type2%positions(:, iCol))
-                if (rTest < mix_sigma) then
+                if (rTest < mix_min_distance) then
                     goto 7102
                 end if
             end do
             
             do iColTest = 1, iCol-1
                 rTest = dist_PBC(Box_size, type2%positions(:, iColTest), type2%positions(:, iCol))
-                if (rTest < type2%get_sigma()) then
+                if (rTest < type2%get_diameter()) then
                     goto 7102
                 end if
             end do
@@ -181,13 +181,14 @@ contains
     
     !> Initial configuration
     
-    subroutine set_initialConfiguration(Box_size, arg_init, dipolar, spherical, mix_sigma, report_unit)
+    subroutine set_initialConfiguration(Box_size, arg_init, dipolar, spherical, mix_min_distance, &
+                                        report_unit)
         
         real(DP), dimension(:), intent(in) :: Box_size
         type(argument_initial), intent(in) :: arg_init
         class(DipolarSpheres), intent(inout) :: dipolar
         class(HardSpheres), intent(inout) :: spherical
-        real(DP), intent(in) :: mix_sigma
+        real(DP), intent(in) :: mix_min_distance
         integer, intent(in) :: report_unit
         
         write(report_unit, *) "Initial configuration: "
@@ -195,7 +196,7 @@ contains
         select case (arg_init%choice)
         
             case ('r')
-                call randomDepositions(Box_size, dipolar, spherical, mix_sigma)
+                call randomDepositions(Box_size, dipolar, spherical, mix_min_distance)
                 call randomOrientations(dipolar%orientations, dipolar%get_Ncol())
                 write(output_unit, *) "Random depositions + random orientations"
                 write(report_unit, *) "    Random depositions + random orientations"

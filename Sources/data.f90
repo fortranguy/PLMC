@@ -72,7 +72,7 @@ implicit none
 
     integer, parameter :: dipol_Ncol = 281
     
-    real(DP), parameter :: hard_sigma = 1._DP ! u_length
+    real(DP), parameter :: hard_diameter = 1._DP ! u_length
     integer, parameter :: hard_Ncol = 6750
     
     real(DP), parameter :: mix_delta = 0.2_DP ! u_length

@@ -154,7 +154,7 @@ contains
         
         call this%type1_spheres%construct()
         call this%type2_spheres%construct()
-        call this%mix%construct(this%type1_spheres%get_sigma(), this%type2_spheres%get_sigma())
+        call this%mix%construct(this%type1_spheres%get_diameter(), this%type2_spheres%get_diameter())
         
         call this%set_changes()
     
@@ -232,7 +232,7 @@ contains
         
         call init_randomSeed(args%random, this%report_unit)
         call set_initialConfiguration(this%Box%size, args%initial, this%type1_spheres, &
-                                      this%type2_spheres, this%mix%get_sigma(), this%report_unit)
+                                      this%type2_spheres, this%mix%get_min_distance(), this%report_unit)
         call this%init_observables()
         call this%init_spheres()
         

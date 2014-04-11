@@ -114,7 +114,7 @@ contains
     pure subroutine DipolarSpheres_set_particles(this)
         class(DipolarSpheres), intent(inout) :: this
         
-        this%sigma = 1._DP ! = u_length
+        this%diameter = 1._DP ! = u_length
         this%Ncol = dipol_Ncol
         allocate(this%positions(Ndim, this%Ncol))
         allocate(this%orientations(Ndim, this%Ncol))
@@ -1153,7 +1153,7 @@ contains
         type(Box_dimensions), intent(in) :: Box
         
 
-        this%rMin = dipol_rMin_factor * this%sigma
+        this%rMin = dipol_rMin_factor * this%diameter
         this%rCut = this%rMin
 
         call this%Epot_set_alpha(Box%size)

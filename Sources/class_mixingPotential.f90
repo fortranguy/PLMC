@@ -24,7 +24,7 @@ private
         character(len=5) :: name
         
         real(DP) :: delta !< demixing length
-        real(DP) :: sigma
+        real(DP) :: min_distance
         real(DP) :: rMin !< minimum distance between two particles
         real(DP) :: rCut !< short-range cut
         real(DP) :: dr !< discretisation step
@@ -42,7 +42,7 @@ private
         procedure :: destroy => MixingPotential_destroy
         procedure :: write_report => MixingPotential_write_report
 
-        procedure :: get_sigma => MixingPotential_get_sigma
+        procedure :: get_min_distance => MixingPotential_get_min_distance
         procedure :: get_rCut => MixingPotential_get_rCut
         procedure :: set_cell_size => MixingPotential_set_cell_size
         procedure :: get_cell_size => MixingPotential_get_cell_size
@@ -59,17 +59,17 @@ private
 
 contains
 
-    subroutine MixingPotential_construct(this, type1_sigma, type2_sigma)
+    subroutine MixingPotential_construct(this, type1_diameter, type2_diameter)
 
         class(MixingPotential), intent(out) :: this
-        real(DP), intent(in) :: type1_sigma, type2_sigma
+        real(DP), intent(in) :: type1_diameter, type2_diameter
         
         this%name = "[mix]"
         write(output_unit, *) this%name, " class construction"
         
         ! Particles
         this%delta = mix_delta
-        this%sigma = (type1_sigma + type2_sigma)/2._DP + this%delta
+        this%min_distance = (type1_diameter + type2_diameter)/2._DP + this%delta
 
     end subroutine MixingPotential_construct
 
@@ -103,11 +103,11 @@ contains
 
     !> Accessors & Mutators
 
-    pure function MixingPotential_get_sigma(this) result(get_sigma)
+    pure function MixingPotential_get_min_distance(this) result(get_min_distance)
         class(MixingPotential), intent(in) :: this
-        real(DP) :: get_sigma
-        get_sigma = this%sigma
-    end function MixingPotential_get_sigma
+        real(DP) :: get_min_distance
+        get_min_distance = this%min_distance
+    end function MixingPotential_get_min_distance
     
     pure function MixingPotential_get_rCut(this) result(get_rCut)
         class(MixingPotential), intent(in) :: this
@@ -183,7 +183,7 @@ contains
     
         class(MixingPotential), intent(inout) :: this
 
-        this%rMin = mix_rMin_factor * this%sigma
+        this%rMin = mix_rMin_factor * this%min_distance
         this%rCut = mix_rCut
         
         if (this%rCut < this%rMin) then
