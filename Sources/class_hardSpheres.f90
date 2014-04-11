@@ -30,7 +30,7 @@ private
 
         ! Particles
         real(DP) :: diameter
-        integer ::  num_particles !< number of a component particles
+        integer ::  num_particles
         real(DP), dimension(:, :), allocatable, public :: positions !< positions of all particles
         
         ! Snashot
