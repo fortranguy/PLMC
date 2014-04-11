@@ -42,7 +42,7 @@ contains
         
         call random_number(random)
         old%number = int(random*this%get_num_particles()) + 1
-        old%xCol(:) = this%positions(:, old%number)
+        old%xCol(:) = this%all_positions(:, old%number)
         
         new%number = old%number
         call random_number(xRand)
@@ -54,7 +54,7 @@ contains
             call this%Epot_neighCells(Box%size, new, overlap, this_EpotNew)
         else
             new%mix_iCell = other%mixCells%index_from_position(new%xCol)
-            call mix%Epot_neighCells(Box%size, new, this%mixCells, other%positions, overlap, &
+            call mix%Epot_neighCells(Box%size, new, this%mixCells, other%all_positions, overlap, &
                                      mix_EpotNew)
         end if
         
@@ -62,7 +62,7 @@ contains
         
             if (this%get_num_particles() >= other%get_num_particles()) then
                 new%mix_iCell = other%mixCells%index_from_position(new%xCol)
-                call mix%Epot_neighCells(Box%size, new, this%mixCells, other%positions, overlap, &
+                call mix%Epot_neighCells(Box%size, new, this%mixCells, other%all_positions, overlap, &
                                          mix_EpotNew)
             else
                 new%same_iCell = this%sameCells%index_from_position(new%xCol)
@@ -86,7 +86,7 @@ contains
                 end select
                     
                 old%mix_iCell = other%mixCells%index_from_position(old%xCol)
-                call mix%Epot_neighCells(Box%size, old, this%mixCells, other%positions, overlap, &
+                call mix%Epot_neighCells(Box%size, old, this%mixCells, other%all_positions, overlap, &
                                          mix_EpotOld)
                 
                 mix_deltaEpot = mix_EpotNew - mix_EpotOld
@@ -101,7 +101,7 @@ contains
                             call this%reci_update_structure_move(Box, old, new)
                     end select
                 
-                    this%positions(:, old%number) = new%xCol(:)
+                    this%all_positions(:, old%number) = new%xCol(:)
                     this_obs%Epot = this_obs%Epot + this_deltaEpot
                     mix_Epot = mix_Epot + mix_deltaEpot
                     
@@ -159,7 +159,7 @@ contains
                 call this%Epot_neighCells(Box%size, test, overlap, this_EpotTest)
             else
                 test%mix_iCell = other%mixCells%index_from_position(test%xCol)
-                call mix%Epot_neighCells(Box%size, test, this%mixCells, other%positions, overlap, &
+                call mix%Epot_neighCells(Box%size, test, this%mixCells, other%all_positions, overlap, &
                                          mix_EpotTest)
             end if
             
@@ -167,7 +167,7 @@ contains
             
                 if (this%get_num_particles() >= other%get_num_particles()) then
                     test%mix_iCell = other%mixCells%index_from_position(test%xCol)
-                    call mix%Epot_neighCells(Box%size, test, this%mixCells, other%positions, overlap, &
+                    call mix%Epot_neighCells(Box%size, test, this%mixCells, other%all_positions, overlap, &
                                              mix_EpotTest)
                 else
                     test%same_iCell = this%sameCells%index_from_position(test%xCol)
@@ -210,7 +210,7 @@ contains
         type(particle_energy), intent(out) :: EpotOld
         logical :: overlap
         
-        old%xCol(:) = this%positions(:, old%number)
+        old%xCol(:) = this%all_positions(:, old%number)
         
         old%same_iCell = this%sameCells%index_from_position(old%xCol)
         select type (this)
@@ -222,7 +222,7 @@ contains
         end select
         
         old%mix_iCell = other%mixCells%index_from_position(old%xCol)
-        call mix%Epot_neighCells(Box_size, old, this%mixCells, other%positions, overlap, EpotOld%mix)
+        call mix%Epot_neighCells(Box_size, old, this%mixCells, other%all_positions, overlap, EpotOld%mix)
         
     end subroutine before_switch_energy
     
@@ -236,14 +236,14 @@ contains
         logical, intent(out) :: overlap
         type(particle_energy), intent(out) :: EpotNew
         
-        new%xCol(:) = other%positions(:, new%other_number)
+        new%xCol(:) = other%all_positions(:, new%other_number)
         
         if (this%get_num_particles() >= other%get_num_particles()) then ! optimisation: more chance to overlap
             new%same_iCell = this%sameCells%index_from_position(new%xCol)
             call this%Epot_neighCells(Box%size, new, overlap, EpotNew%same)
         else
             new%mix_iCell = other%mixCells%index_from_position(new%xCol)
-            call mix%Epot_neighCells(Box%size, new, this%mixCells, other%positions, overlap, &
+            call mix%Epot_neighCells(Box%size, new, this%mixCells, other%all_positions, overlap, &
                                      EpotNew%mix)
         end if
         
@@ -251,7 +251,7 @@ contains
         
             if (this%get_num_particles() >= other%get_num_particles()) then
                 new%mix_iCell = other%mixCells%index_from_position(new%xCol)
-                call mix%Epot_neighCells(Box%size, new, this%mixCells, other%positions, overlap, &
+                call mix%Epot_neighCells(Box%size, new, this%mixCells, other%all_positions, overlap, &
                                          EpotNew%mix)
             else
                 new%same_iCell = this%sameCells%index_from_position(new%xCol)
@@ -279,7 +279,7 @@ contains
         class(HardSpheres), intent(inout) :: this, other
         type(particle_index), intent(in) :: old, new
         
-        this%positions(:, old%number) = new%xCol(:)
+        this%all_positions(:, old%number) = new%xCol(:)
         
         select type (this)
             type is (DipolarSpheres)
@@ -390,7 +390,7 @@ contains
 
         call random_number(random)
         old%number = int(random*this%get_num_particles()) + 1
-        old%xCol(:) = this%positions(:, old%number)
+        old%xCol(:) = this%all_positions(:, old%number)
         old%mCol(:) = this%orientations(:, old%number)
         
         new%number = old%number

@@ -81,11 +81,11 @@ contains
         
 7101        continue
             call random_number(xRand)
-            type1%positions(:, i_particle) = xRand*Box_size(:)
+            type1%all_positions(:, i_particle) = xRand*Box_size(:)
             
-            position(:) = type1%positions(:, i_particle)
+            position(:) = type1%all_positions(:, i_particle)
             do i_particle_test = 1, i_particle-1
-                position_test(:) = type1%positions(:, i_particle_test)
+                position_test(:) = type1%all_positions(:, i_particle_test)
                 rTest = dist_PBC(Box_size, position, position_test)
                 if (rTest < type1%get_diameter()) then
                     goto 7101
@@ -99,11 +99,11 @@ contains
         
 7102        continue
             call random_number(xRand)
-            type2%positions(:, i_particle) = xRand*Box_size(:)
+            type2%all_positions(:, i_particle) = xRand*Box_size(:)
             
-            position(:) = type2%positions(:, i_particle)
+            position(:) = type2%all_positions(:, i_particle)
             do i_particle_test = 1, type1%get_num_particles()
-                position_test(:) = type1%positions(:, i_particle_test)
+                position_test(:) = type1%all_positions(:, i_particle_test)
                 rTest = dist_PBC(Box_size, position, position_test)
                 if (rTest < mix_min_distance) then
                     goto 7102
@@ -111,7 +111,7 @@ contains
             end do
             
             do i_particle_test = 1, i_particle-1
-                position_test(:) = type2%positions(:, i_particle_test)
+                position_test(:) = type2%all_positions(:, i_particle_test)
                 rTest = dist_PBC(Box_size, position, position_test)
                 if (rTest < type2%get_diameter()) then
                     goto 7102
@@ -212,13 +212,13 @@ contains
                 write(report_unit, *) "    Old configuration"
                 call oldConfiguration(arg_init%files(1), arg_init%length(1), &
                                       dipolar%get_name()//"_positions", dipolar%get_num_particles(), &
-                                      dipolar%positions, norm2(Box_size))
+                                      dipolar%all_positions, norm2(Box_size))
                 call oldConfiguration(arg_init%files(2), arg_init%length(2), &
                                       dipolar%get_name()//"_orientations", dipolar%get_num_particles(), &
                                       dipolar%orientations, 1._DP)
                 call oldConfiguration(arg_init%files(3), arg_init%length(3), &
                                       spherical%get_name()//"_positions", spherical%get_num_particles(), &
-                                      spherical%positions, norm2(Box_size))
+                                      spherical%all_positions, norm2(Box_size))
             
             case default
                 error stop "Error: in setting new configuration"

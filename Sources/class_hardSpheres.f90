@@ -31,7 +31,7 @@ private
         ! Particles
         real(DP) :: diameter
         integer ::  num_particles
-        real(DP), dimension(:, :), allocatable, public :: positions !< positions of all particles
+        real(DP), dimension(:, :), allocatable, public :: all_positions
         
         ! Snashot
         integer :: snap_factor
@@ -91,7 +91,7 @@ contains
         class(HardSpheres), intent(inout) :: this
         this%diameter = hard_diameter
         this%num_particles = hard_num_particles
-        allocate(this%positions(Ndim, this%num_particles))
+        allocate(this%all_positions(Ndim, this%num_particles))
     end subroutine HardSpheres_set_particles
     
     pure subroutine HardSpheres_set_changes(this)
@@ -120,7 +120,7 @@ contains
         
         write(output_unit, *) this%name, " class destruction"
         
-        if (allocated(this%positions)) deallocate(this%positions)
+        if (allocated(this%all_positions)) deallocate(this%all_positions)
         
         call this%sameCells%destroy()
         call this%mixCells%destroy()
@@ -254,7 +254,7 @@ contains
         
         if (modulo(iStep, this%snap_factor) == 0) then
             do i_particle = 1, this%num_particles
-                write(snap_unit, *) this%positions(:, i_particle)
+                write(snap_unit, *) this%all_positions(:, i_particle)
             end do
         end if
 
@@ -273,7 +273,7 @@ contains
         do jCol = 1, this%num_particles
             do i_particle = jCol+1, this%num_particles
                     
-                r_ij = dist_PBC(Box_size, this%positions(:, i_particle), this%positions(:, jCol))
+                r_ij = dist_PBC(Box_size, this%all_positions(:, i_particle), this%all_positions(:, jCol))
                 if (r_ij < this%rMin) then
                     write(error_unit, *) this%name, "    Overlap !", i_particle, jCol
                     write(error_unit, *) "    r_ij = ", r_ij
@@ -301,10 +301,10 @@ contains
         
         same_cell_size(:) = this%rCut
         call this%sameCells%construct(Box_size, same_cell_size, this%rCut) !< same kind
-        call this%sameCells%all_cols_to_cells(this%num_particles, this%positions)
+        call this%sameCells%all_cols_to_cells(this%num_particles, this%all_positions)
         
         call this%mixCells%construct(Box_size, mix_cell_size, mix_rCut)
-        call this%mixCells%all_cols_to_cells(other%num_particles, other%positions)
+        call this%mixCells%all_cols_to_cells(other%num_particles, other%all_positions)
     
     end subroutine HardSpheres_construct_cells
     
@@ -361,7 +361,7 @@ contains
                 next => current%next
             
                 if (current%number /= particle%number) then
-                    r_ij = dist_PBC(Box_size, particle%xCol(:), this%positions(:, current%number))
+                    r_ij = dist_PBC(Box_size, particle%xCol(:), this%all_positions(:, current%number))
                     if (r_ij < this%rMin) then
                         overlap = .true.
                         return

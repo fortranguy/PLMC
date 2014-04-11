@@ -141,8 +141,8 @@ contains
         do type1_i_particle = 1, type1%get_num_particles()
             do type2_i_particle = 1, type2%get_num_particles()
                     
-                type1_xCol(:) = type1%positions(:, type1_i_particle)
-                type2_xCol(:) = type2%positions(:, type2_i_particle)
+                type1_xCol(:) = type1%all_positions(:, type1_i_particle)
+                type2_xCol(:) = type2%all_positions(:, type2_i_particle)
                 r_mix = dist_PBC(Box_size, type1_xCol, type2_xCol)
                 if (r_mix < this%rMin) then
                     write(error_unit, *) this%name, ":    Overlap !", type1_i_particle, type2_i_particle
@@ -239,14 +239,14 @@ contains
         
     end function MixingPotential_Epot_pair
     
-    subroutine MixingPotential_Epot_neighCells(this, Box_size, particle, neighCells, other_positions, &
-                                               overlap, energ)
+    subroutine MixingPotential_Epot_neighCells(this, Box_size, particle, neighCells, &
+                                               other_all_positions, overlap, energ)
         
         class(MixingPotential), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         type(particle_index), intent(in) :: particle
         type(NeighbourCells), intent(in) :: neighCells
-        real(DP), dimension(:, :), contiguous, intent(in) :: other_positions
+        real(DP), dimension(:, :), contiguous, intent(in) :: other_all_positions
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energ
     
@@ -269,7 +269,7 @@ contains
                 next => current%next
 
                 if (current%number /= particle%other_number) then
-                    r = dist_PBC(Box_size, particle%xCol(:), other_positions(:, current%number))
+                    r = dist_PBC(Box_size, particle%xCol(:), other_all_positions(:, current%number))
                     if (r < this%rMin) then
                         overlap = .true.
                         return
@@ -309,8 +309,8 @@ contains
         do type1_i_particle = 1, type1%get_num_particles()
             do type2_i_particle = 1, type2%get_num_particles()
                 
-                type1_xCol(:) = type1%positions(:, type1_i_particle)
-                type2_xCol(:) = type2%positions(:, type2_i_particle)
+                type1_xCol(:) = type1%all_positions(:, type1_i_particle)
+                type2_xCol(:) = type2%all_positions(:, type2_i_particle)
                 r_mix = dist_PBC(Box_size, type1_xCol, type2_xCol)
                 Epot_conf = Epot_conf + this%Epot_pair(r_mix)
 

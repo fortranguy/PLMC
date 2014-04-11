@@ -116,7 +116,7 @@ contains
         
         this%diameter = 1._DP ! = u_length
         this%num_particles = dipol_num_particles
-        allocate(this%positions(Ndim, this%num_particles))
+        allocate(this%all_positions(Ndim, this%num_particles))
         allocate(this%orientations(Ndim, this%num_particles))
     end subroutine DipolarSpheres_set_particles
     
@@ -377,7 +377,7 @@ contains
         do j_particle = 1, this%num_particles
             if (j_particle /= particle%number) then
             
-                xCol_j(:) = this%positions(:, j_particle)
+                xCol_j(:) = this%all_positions(:, j_particle)
                 rVec_ij = distVec_PBC(Box_size, xCol_i, xCol_j)
                 r_ij = norm2(rVec_ij)
                 mCol_j(:) = this%orientations(:, j_particle)
@@ -404,7 +404,7 @@ contains
         
         do i_particle = 1, this%num_particles
             particle%number = i_particle
-            particle%xCol(:) = this%positions(:, particle%number)
+            particle%xCol(:) = this%all_positions(:, particle%number)
             particle%mCol(:) = this%orientations(:, particle%number)
             Epot_real = Epot_real + this%Epot_real_solo(Box_size, particle)
         end do
@@ -483,7 +483,7 @@ contains
 
         do i_particle = 1, this%num_particles
         
-            xColOverL(:) = 2._DP*PI * this%positions(:, i_particle)/Box%size(:)
+            xColOverL(:) = 2._DP*PI * this%all_positions(:, i_particle)/Box%size(:)
             call fourier_i(Box%wave(1), xColOverL(1), exp_Ikx_1)
             call fourier_i(Box%wave(2), xColOverL(2), exp_Ikx_2)
             call fourier_i(Box%wave(3), xColOverL(3), exp_Ikx_3)
