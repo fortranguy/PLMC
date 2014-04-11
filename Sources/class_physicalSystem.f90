@@ -34,7 +34,7 @@ private
         
         ! Box
         type(Box_dimensions) :: Box
-        integer :: Ncol !< number of particles
+        integer :: num_particles
         
         ! Monte-Carlo
         real(DP) :: Temperature
@@ -133,11 +133,11 @@ contains
     
     pure subroutine PhysicalSystem_set_changes(this)
         class(PhysicalSystem), intent(inout) :: this
-        this%Ncol = this%type1_spheres%get_Ncol() + this%type2_spheres%get_Ncol()
+        this%num_particles = this%type1_spheres%get_num_particles() + this%type2_spheres%get_num_particles()
         this%decorrelFactor = decorrelFactor
-        this%Nmove = this%decorrelFactor * this%Ncol
-        this%Nswitch = switch_factor * this%decorrelFactor * this%type1_spheres%get_Ncol()
-        this%Nrotate = this%decorrelFactor * this%type1_spheres%get_Ncol()
+        this%Nmove = this%decorrelFactor * this%num_particles
+        this%Nswitch = switch_factor * this%decorrelFactor * this%type1_spheres%get_num_particles()
+        this%Nrotate = this%decorrelFactor * this%type1_spheres%get_num_particles()
         this%Nchange = this%Nmove + this%Nswitch + this%Nrotate
     end subroutine PhysicalSystem_set_changes
 
@@ -171,10 +171,10 @@ contains
         call this%write_report(this%report_unit)
         
         call this%type1_units%open(this%type1_spheres%get_name())
-        call this%type1_spheres%write_density(this%Box%size, this%Ncol, this%type1_units%report)
+        call this%type1_spheres%write_density(this%Box%size, this%num_particles, this%type1_units%report)
         
         call this%type2_units%open(this%type2_spheres%get_name())
-        call this%type2_spheres%write_density(this%Box%size, this%Ncol, this%type2_units%report)
+        call this%type2_spheres%write_density(this%Box%size, this%num_particles, this%type2_units%report)
         
         call mix_open_units(this%mix_report_unit, this%mix_Epot_tab_unit, this%mix_obsThermal_unit, &
                             this%mix_obsEquilib_unit)
@@ -253,7 +253,7 @@ contains
         write(report_unit ,*) "    Volume = ", product(this%Box%size)
         write(report_unit ,*) "    Box_wave(:) = ", this%Box%wave(:)
         write(report_unit ,*) "    NwaveVectors =", NwaveVectors(this%Box%wave)
-        write(report_unit ,*) "    Ncol = ", this%Ncol
+        write(report_unit ,*) "    num_particles = ", this%num_particles
         write(report_unit ,*) "    Temperature = ", this%Temperature
         
         write(report_unit, *) "    Nstep = ", this%Nstep
@@ -295,7 +295,7 @@ contains
         call test_consist(Epot, Epot_conf, this%report_unit)
         this%EpotSum = this%type1_obs%EpotSum + this%type2_obs%EpotSum + this%mix_EpotSum
         duration = this%time_end - this%time_start
-        call write_results(this%Ncol, this%Nstep, this%EpotSum, this%switch_rejectSum, duration,&
+        call write_results(this%num_particles, this%Nstep, this%EpotSum, this%switch_rejectSum, duration,&
                            this%report_unit)
     
     end subroutine PhysicalSystem_write_results
@@ -386,8 +386,8 @@ contains
             if (iChangeRand <= this%Nmove) then
                 ! Randomly choosing the type
                 call random_number(rand)
-                iColRand = int(rand*real(this%Ncol, DP)) + 1
-                if (iColRand <= this%type1_spheres%get_Ncol()) then
+                iColRand = int(rand*real(this%num_particles, DP)) + 1
+                if (iColRand <= this%type1_spheres%get_num_particles()) then
                     call move(this%Box, this%type1_spheres, this%type1_obs, &
                               this%type2_spheres, this%mix, this%mix_Epot)
                 else

@@ -134,18 +134,18 @@ contains
         real(DP), dimension(:), intent(in) :: Box_size
         class(HardSpheres), intent(in) :: type1, type2
         
-        integer :: type1_iCol, type2_iCol
+        integer :: type1_i_particle, type2_i_particle
         real(DP) :: r_mix
         real(DP), dimension(Ndim) :: type1_xCol, type2_xCol
         
-        do type1_iCol = 1, type1%get_Ncol()
-            do type2_iCol = 1, type2%get_Ncol()
+        do type1_i_particle = 1, type1%get_num_particles()
+            do type2_i_particle = 1, type2%get_num_particles()
                     
-                type1_xCol(:) = type1%positions(:, type1_iCol)
-                type2_xCol(:) = type2%positions(:, type2_iCol)
+                type1_xCol(:) = type1%positions(:, type1_i_particle)
+                type2_xCol(:) = type2%positions(:, type2_i_particle)
                 r_mix = dist_PBC(Box_size, type1_xCol, type2_xCol)
                 if (r_mix < this%rMin) then
-                    write(error_unit, *) this%name, ":    Overlap !", type1_iCol, type2_iCol
+                    write(error_unit, *) this%name, ":    Overlap !", type1_i_particle, type2_i_particle
                     write(error_unit, *) "    r_mix = ", r_mix
                     error stop
                 end if
@@ -268,8 +268,8 @@ contains
             
                 next => current%next
 
-                if (current%iCol /= particle%other_iCol) then
-                    r = dist_PBC(Box_size, particle%xCol(:), other_positions(:, current%iCol))
+                if (current%number /= particle%other_number) then
+                    r = dist_PBC(Box_size, particle%xCol(:), other_positions(:, current%number))
                     if (r < this%rMin) then
                         overlap = .true.
                         return
@@ -296,7 +296,7 @@ contains
         class(HardSpheres), intent(in) :: type1, type2
         real(DP) :: Epot_conf
 
-        integer :: type1_iCol, type2_iCol
+        integer :: type1_i_particle, type2_i_particle
         real(DP) :: r_mix
         real(DP), dimension(Ndim) :: type1_xCol, type2_xCol
 
@@ -306,11 +306,11 @@ contains
             return
         end if
         
-        do type1_iCol = 1, type1%get_Ncol()
-            do type2_iCol = 1, type2%get_Ncol()
+        do type1_i_particle = 1, type1%get_num_particles()
+            do type2_i_particle = 1, type2%get_num_particles()
                 
-                type1_xCol(:) = type1%positions(:, type1_iCol)
-                type2_xCol(:) = type2%positions(:, type2_iCol)
+                type1_xCol(:) = type1%positions(:, type1_i_particle)
+                type2_xCol(:) = type2%positions(:, type2_i_particle)
                 r_mix = dist_PBC(Box_size, type1_xCol, type2_xCol)
                 Epot_conf = Epot_conf + this%Epot_pair(r_mix)
 

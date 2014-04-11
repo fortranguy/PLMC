@@ -6,7 +6,7 @@ use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
 use data_precisions, only: DP, real_zero, consist_tiny
 use data_constants, only: PI
 use data_box, only: Ndim
-use data_particles, only: dipol_Ncol
+use data_particles, only: dipol_num_particles
 use data_monteCarlo, only: dipol_move_delta, dipol_move_rejectFix, dipol_rotate_delta, &
                            dipol_rotate_deltaMax, dipol_rotate_rejectFix, dipol_Nwidom
 use data_potential, only: dipol_rMin_factor, dipol_real_rCut_factor, dipol_real_dr, dipol_alpha_factor
@@ -115,9 +115,9 @@ contains
         class(DipolarSpheres), intent(inout) :: this
         
         this%diameter = 1._DP ! = u_length
-        this%Ncol = dipol_Ncol
-        allocate(this%positions(Ndim, this%Ncol))
-        allocate(this%orientations(Ndim, this%Ncol))
+        this%num_particles = dipol_num_particles
+        allocate(this%positions(Ndim, this%num_particles))
+        allocate(this%orientations(Ndim, this%num_particles))
     end subroutine DipolarSpheres_set_particles
     
     pure subroutine DipolarSpheres_set_changes(this)
@@ -137,7 +137,7 @@ contains
         call this%set_particles()
         call this%set_changes()
         this%Nwidom = dipol_Nwidom
-        this%snap_factor = this%Ncol/snap_ratio
+        this%snap_factor = this%num_particles/snap_ratio
         if (this%snap_factor == 0) this%snap_factor = 1
     
     end subroutine DipolarSpheres_construct
@@ -197,11 +197,11 @@ contains
         integer, intent(in) :: iStep
         integer, intent(in) :: snap_unit
     
-        integer :: iCol
+        integer :: i_particle
         
         if (modulo(iStep, this%snap_factor) == 0) then
-            do iCol = 1, this%Ncol
-                write(snap_unit, *) this%orientations(:, iCol)
+            do i_particle = 1, this%num_particles
+                write(snap_unit, *) this%orientations(:, i_particle)
             end do
         end if
 
@@ -364,7 +364,7 @@ contains
         type(particle_index), intent(in) :: particle
         real(DP) :: Epot_real_solo
 
-        integer :: jCol
+        integer :: j_particle
         real(DP), dimension(Ndim) :: xCol_i, xCol_j
         real(DP), dimension(Ndim) :: mCol_i, mCol_j
         real(DP), dimension(Ndim) :: rVec_ij
@@ -374,13 +374,13 @@ contains
         mCol_i(:) = particle%mCol(:)
         
         Epot_real_solo = 0._DP
-        do jCol = 1, this%Ncol
-            if (jCol /= particle%iCol) then
+        do j_particle = 1, this%num_particles
+            if (j_particle /= particle%number) then
             
-                xCol_j(:) = this%positions(:, jCol)
+                xCol_j(:) = this%positions(:, j_particle)
                 rVec_ij = distVec_PBC(Box_size, xCol_i, xCol_j)
                 r_ij = norm2(rVec_ij)
-                mCol_j(:) = this%orientations(:, jCol)
+                mCol_j(:) = this%orientations(:, j_particle)
 
                 Epot_real_solo = Epot_real_solo + this%Epot_real_pair(mCol_i, mCol_j, rVec_ij, r_ij)
 
@@ -397,15 +397,15 @@ contains
         real(DP), dimension(:), intent(in) :: Box_size
         real(DP) :: Epot_real
         
-        integer :: iCol
+        integer :: i_particle
         type(particle_index) :: particle
     
         Epot_real = 0._DP
         
-        do iCol = 1, this%Ncol
-            particle%iCol = iCol
-            particle%xCol(:) = this%positions(:, particle%iCol)
-            particle%mCol(:) = this%orientations(:, particle%iCol)
+        do i_particle = 1, this%num_particles
+            particle%number = i_particle
+            particle%xCol(:) = this%positions(:, particle%number)
+            particle%mCol(:) = this%orientations(:, particle%number)
             Epot_real = Epot_real + this%Epot_real_solo(Box_size, particle)
         end do
 
@@ -477,18 +477,18 @@ contains
         real(DP), dimension(Ndim) :: waveVector
         real(DP) :: k_dot_mCol
         integer :: kx, ky, kz
-        integer :: iCol
+        integer :: i_particle
 
         this%Epot_reci_structure(:, :, :) = cmplx(0._DP, 0._DP, DP)
 
-        do iCol = 1, this%Ncol
+        do i_particle = 1, this%num_particles
         
-            xColOverL(:) = 2._DP*PI * this%positions(:, iCol)/Box%size(:)
+            xColOverL(:) = 2._DP*PI * this%positions(:, i_particle)/Box%size(:)
             call fourier_i(Box%wave(1), xColOverL(1), exp_Ikx_1)
             call fourier_i(Box%wave(2), xColOverL(2), exp_Ikx_2)
             call fourier_i(Box%wave(3), xColOverL(3), exp_Ikx_3)
             
-            mColOverL(:) = this%orientations(:, iCol)/Box%size(:)
+            mColOverL(:) = this%orientations(:, i_particle)/Box%size(:)
         
             do kz = -Box%wave(3), Box%wave(3)
                 waveVector(3) = real(kz, DP)
@@ -1009,11 +1009,11 @@ contains
         class(DipolarSpheres), intent(in) :: this
         real(DP) :: Epot_self
 
-        integer :: iCol
+        integer :: i_particle
         
         Epot_self = 0._DP
-        do iCol = 1, this%Ncol
-            Epot_self = Epot_self + this%Epot_self_solo(this%orientations(:, iCol))
+        do i_particle = 1, this%num_particles
+            Epot_self = Epot_self + this%Epot_self_solo(this%orientations(:, i_particle))
         end do
         
     end function DipolarSpheres_Epot_self
@@ -1026,10 +1026,10 @@ contains
     
     pure subroutine DipolarSpheres_set_totalMoment(this)
         class(DipolarSpheres), intent(inout) :: this
-        integer :: iCol
+        integer :: i_particle
         this%totalMoment(:) = 0._DP
-        do iCol = 1, this%Ncol
-            this%totalMoment(:) = this%totalMoment(:) + this%orientations(:, iCol)
+        do i_particle = 1, this%num_particles
+            this%totalMoment(:) = this%totalMoment(:) + this%orientations(:, i_particle)
         end do
     end subroutine DipolarSpheres_set_totalMoment
 

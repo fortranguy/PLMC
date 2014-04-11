@@ -17,7 +17,7 @@ implicit none
     ! For neighbour cells
 
     type, public :: Node
-        integer :: iCol
+        integer :: number
         type(Node), pointer :: next => null()
     end type Node
 
@@ -28,8 +28,8 @@ implicit none
     ! For algorithms
     
     type, public :: particle_index
-        integer :: iCol
-        integer :: other_iCol = 0
+        integer :: number
+        integer :: other_number = 0
         real(DP), dimension(Ndim) :: xCol
         real(DP), dimension(Ndim) :: mCol
         integer :: same_iCell

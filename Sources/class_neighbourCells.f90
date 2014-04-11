@@ -103,10 +103,10 @@ contains
 
             allocate(this%beginCells(iCell)%particle)
             this%currentCells(iCell)%particle => this%beginCells(iCell)%particle
-            this%currentCells(iCell)%particle%iCol = 0
+            this%currentCells(iCell)%particle%number = 0
             
             allocate(this%nextCells(iCell)%particle)
-            this%nextCells(iCell)%particle%iCol = 0
+            this%nextCells(iCell)%particle%number = 0
             this%currentCells(iCell)%particle%next => this%nextCells(iCell)%particle
             this%currentCells(iCell)%particle => this%nextCells(iCell)%particle
     
@@ -221,22 +221,22 @@ contains
     
     end function NeighbourCells_index_from_position
     
-    pure subroutine NeighbourCells_all_cols_to_cells(this, Ncol, positions)
+    pure subroutine NeighbourCells_all_cols_to_cells(this, num_particles, positions)
     
         class(NeighbourCells), intent(inout) :: this
-        integer, intent(in) :: Ncol
+        integer, intent(in) :: num_particles
         real(DP), dimension(:, :), intent(in) :: positions
     
-        integer :: iCol
+        integer :: i_particle
         integer :: iCell
     
-        do iCol = 1, Ncol
+        do i_particle = 1, num_particles
     
-            iCell = this%index_from_position(positions(:,iCol))
-            this%currentCells(iCell)%particle%iCol = iCol
+            iCell = this%index_from_position(positions(:,i_particle))
+            this%currentCells(iCell)%particle%number = i_particle
             
             allocate(this%nextCells(iCell)%particle)
-            this%nextCells(iCell)%particle%iCol = 0
+            this%nextCells(iCell)%particle%number = 0
             this%currentCells(iCell)%particle%next => this%nextCells(iCell)%particle
             this%currentCells(iCell)%particle => this%nextCells(iCell)%particle
             
@@ -250,10 +250,10 @@ contains
     
     ! Neighbour cells update
     
-    subroutine NeighbourCells_remove_col_from_cell(this, iCol, iCellOld)
+    subroutine NeighbourCells_remove_col_from_cell(this, i_particle, iCellOld)
     
         class(NeighbourCells), intent(inout) :: this
-        integer, intent(in) :: iCol, iCellOld
+        integer, intent(in) :: i_particle, iCellOld
         
         type(Node), pointer :: current => null()
         type(Node), pointer :: next => null(), previous => null()
@@ -265,7 +265,7 @@ contains
         
             next => current%next
         
-            if (current%iCol == iCol) then
+            if (current%number == i_particle) then
                 previous%next => current%next
                 deallocate(current)
                 current => next
@@ -280,10 +280,10 @@ contains
             
     end subroutine NeighbourCells_remove_col_from_cell
     
-    subroutine NeighbourCells_add_col_to_cell(this, iCol, iCellNew)
+    subroutine NeighbourCells_add_col_to_cell(this, i_particle, iCellNew)
     
         class(NeighbourCells), intent(inout) :: this
-        integer, intent(in) :: iCol, iCellNew
+        integer, intent(in) :: i_particle, iCellNew
     
         type(Node), pointer :: new => null()
         type(Node), pointer :: next => null(), previous => null()
@@ -294,7 +294,7 @@ contains
         allocate(new)
         new%next => previous%next
         previous%next => new
-        new%iCol = iCol
+        new%number = i_particle
 
     end subroutine NeighbourCells_add_col_to_cell
     

@@ -6,7 +6,7 @@ use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
 use data_precisions, only: DP, real_zero
 use data_constants, only: PI
 use data_box, only: Ndim
-use data_particles, only: hard_diameter, hard_Ncol
+use data_particles, only: hard_diameter, hard_num_particles
 use data_monteCarlo, only: hard_move_delta, hard_move_rejectFix, hard_Nwidom
 use data_potential, only: hard_rMin_factor
 use data_neighbourCells, only: NnearCell
@@ -30,7 +30,7 @@ private
 
         ! Particles
         real(DP) :: diameter
-        integer ::  Ncol !< number of a component particles
+        integer ::  num_particles !< number of a component particles
         real(DP), dimension(:, :), allocatable, public :: positions !< positions of all particles
         
         ! Snashot
@@ -58,7 +58,7 @@ private
         
         !> Accessors & Mutators
         procedure :: get_name => HardSpheres_get_name
-        procedure :: get_Ncol => HardSpheres_get_Ncol
+        procedure :: get_num_particles => HardSpheres_get_num_particles
         procedure :: get_Nwidom => HardSpheres_get_Nwidom
         procedure :: get_diameter => HardSpheres_get_diameter
         procedure :: get_move_delta => HardSpheres_get_move_delta
@@ -90,8 +90,8 @@ contains
     pure subroutine HardSpheres_set_particles(this)
         class(HardSpheres), intent(inout) :: this
         this%diameter = hard_diameter
-        this%Ncol = hard_Ncol
-        allocate(this%positions(Ndim, this%Ncol))
+        this%num_particles = hard_num_particles
+        allocate(this%positions(Ndim, this%num_particles))
     end subroutine HardSpheres_set_particles
     
     pure subroutine HardSpheres_set_changes(this)
@@ -109,7 +109,7 @@ contains
         call this%set_particles()
         call this%set_changes()
         this%Nwidom = hard_Nwidom
-        this%snap_factor = this%Ncol/snap_ratio
+        this%snap_factor = this%num_particles/snap_ratio
         if (this%snap_factor == 0) this%snap_factor = 1
         
     end subroutine HardSpheres_construct
@@ -136,12 +136,12 @@ contains
         get_name = this%name
     end function HardSpheres_get_name
 
-    pure function HardSpheres_get_Ncol(this) result(get_Ncol)
+    pure function HardSpheres_get_num_particles(this) result(get_num_particles)
         class(HardSpheres), intent(in) :: this
-        integer :: get_Ncol
+        integer :: get_num_particles
         
-        get_Ncol = this%Ncol
-    end function HardSpheres_get_Ncol
+        get_num_particles = this%num_particles
+    end function HardSpheres_get_num_particles
 
     pure function HardSpheres_get_Nwidom(this) result(get_Nwidom)
         class(HardSpheres), intent(in) :: this
@@ -190,18 +190,18 @@ contains
     
     !> Write density and compacity
     
-    subroutine HardSpheres_write_density(this, Box_size, total_Ncol, report_unit)
+    subroutine HardSpheres_write_density(this, Box_size, total_num_particles, report_unit)
     
         class(HardSpheres), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size ! warning: average ?
-        integer, intent(in) :: total_Ncol
+        integer, intent(in) :: total_num_particles
         integer, intent(in) :: report_unit
         
         real(DP) :: density, compacity, concentration
         
-        density = real(this%Ncol + 1, DP) / product(Box_size) ! cheating ? cf. Widom
+        density = real(this%num_particles + 1, DP) / product(Box_size) ! cheating ? cf. Widom
         compacity = 4._DP/3._DP*PI*(this%diameter/2._DP)**3 * density
-        concentration = real(this%Ncol, DP) / real(total_Ncol, DP)
+        concentration = real(this%num_particles, DP) / real(total_num_particles, DP)
         
         write(report_unit, *) "    density = ", density
         write(report_unit, *) "    compacity = ", compacity
@@ -218,7 +218,7 @@ contains
         
         write(report_unit, *) "Data: "
         
-        write(report_unit ,*) "    Ncol = ", this%Ncol
+        write(report_unit ,*) "    num_particles = ", this%num_particles
         write(report_unit ,*) "    Nwidom = ", this%Nwidom
         
         write(report_unit, *) "    rCut = ", this%rCut
@@ -239,7 +239,7 @@ contains
     subroutine HardSpheres_snap_data(this, snap_unit)
         class(HardSpheres), intent(in) :: this
         integer, intent(in) :: snap_unit
-        write(snap_unit, *) this%name, this%Ncol, this%snap_factor
+        write(snap_unit, *) this%name, this%num_particles, this%snap_factor
     end subroutine HardSpheres_snap_data
     
     !> Configuration state: positions
@@ -250,11 +250,11 @@ contains
         integer, intent(in) :: iStep
         integer, intent(in) :: snap_unit
     
-        integer :: iCol
+        integer :: i_particle
         
         if (modulo(iStep, this%snap_factor) == 0) then
-            do iCol = 1, this%Ncol
-                write(snap_unit, *) this%positions(:, iCol)
+            do i_particle = 1, this%num_particles
+                write(snap_unit, *) this%positions(:, i_particle)
             end do
         end if
 
@@ -267,15 +267,15 @@ contains
         class(HardSpheres), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
     
-        integer :: jCol, iCol
+        integer :: jCol, i_particle
         real(DP) :: r_ij
     
-        do jCol = 1, this%Ncol
-            do iCol = jCol+1, this%Ncol
+        do jCol = 1, this%num_particles
+            do i_particle = jCol+1, this%num_particles
                     
-                r_ij = dist_PBC(Box_size, this%positions(:, iCol), this%positions(:, jCol))
+                r_ij = dist_PBC(Box_size, this%positions(:, i_particle), this%positions(:, jCol))
                 if (r_ij < this%rMin) then
-                    write(error_unit, *) this%name, "    Overlap !", iCol, jCol
+                    write(error_unit, *) this%name, "    Overlap !", i_particle, jCol
                     write(error_unit, *) "    r_ij = ", r_ij
                     error stop
                 end if
@@ -301,10 +301,10 @@ contains
         
         same_cell_size(:) = this%rCut
         call this%sameCells%construct(Box_size, same_cell_size, this%rCut) !< same kind
-        call this%sameCells%all_cols_to_cells(this%Ncol, this%positions)
+        call this%sameCells%all_cols_to_cells(this%num_particles, this%positions)
         
         call this%mixCells%construct(Box_size, mix_cell_size, mix_rCut)
-        call this%mixCells%all_cols_to_cells(other%Ncol, other%positions)
+        call this%mixCells%all_cols_to_cells(other%num_particles, other%positions)
     
     end subroutine HardSpheres_construct_cells
     
@@ -360,8 +360,8 @@ contains
             
                 next => current%next
             
-                if (current%iCol /= particle%iCol) then
-                    r_ij = dist_PBC(Box_size, particle%xCol(:), this%positions(:, current%iCol))
+                if (current%number /= particle%number) then
+                    r_ij = dist_PBC(Box_size, particle%xCol(:), this%positions(:, current%number))
                     if (r_ij < this%rMin) then
                         overlap = .true.
                         return
@@ -389,7 +389,7 @@ contains
         real(DP) :: volume_dummy
         volume_dummy = product(Box%size)
     
-        Epot_conf = this%Ncol * 0._DP
+        Epot_conf = this%num_particles * 0._DP
         
     end function HardSpheres_Epot_conf
 

@@ -12,9 +12,9 @@ use module_physics_micro, only: sphere_volume, dist_PBC
 
 implicit none
 
-    character(len=5) :: name, nameBis
-    integer :: Ncol, NcolBis
-    integer :: snap_factor, snap_factorBis
+    character(len=5) :: name, name_bis
+    integer :: num_particles, num_particles_bis
+    integer :: snap_factor, snap_factor_bis
     real(DP) :: density
     integer, dimension(:), allocatable :: dist_sum
     integer :: positions_unit, orientations_unit, distrib_unit
@@ -22,7 +22,7 @@ implicit none
     real(DP) :: rMax
     integer :: Ndist
     integer :: iStep
-    integer :: iCol, jCol
+    integer :: i_particle, j_particle
     real(DP) :: r_ij
     integer :: iDist
     real(DP) :: r_iDist, r_iMinus, r_iPlus
@@ -50,15 +50,15 @@ implicit none
     
     open(newunit=positions_unit, recl=4096, file=file(1:length), status='old', action='read')
     
-    read(positions_unit, *) name, Ncol, snap_factor
-    write(output_unit, *) name, Ncol, snap_factor
+    read(positions_unit, *) name, num_particles, snap_factor
+    write(output_unit, *) name, num_particles, snap_factor
     
     rMax = norm2(Box_size/2._DP)
     Ndist = int(rMax/dist_dr)
     allocate(dist_sum(Ndist))
     allocate(dist_function(Ndist))
-    allocate(positions(Ndim, Ncol))
-    density = real(Ncol, DP) / product(Box_size)
+    allocate(positions(Ndim, num_particles))
+    density = real(num_particles, DP) / product(Box_size)
 
     dist_sum(:) = 0
     
@@ -77,40 +77,41 @@ implicit none
         open(newunit=orientations_unit, recl=4096, file=file(1:length), status='old', &
         action='read')
         
-        read(orientations_unit, *) nameBis, NcolBis, snap_factorBis
-        if (nameBis/=name .or. NcolBis/=Ncol .or. snap_factorBis/=snap_factor) then
+        read(orientations_unit, *) name_bis, num_particles_bis, snap_factor_bis
+        if (name_bis/=name .or. num_particles_bis/=num_particles .or. snap_factor_bis/=snap_factor) then
             write(error_unit, *) "Error: positions and orientations tags don't match."
             error stop
         end if
         
-        allocate(orientations(Ndim, Ncol))
+        allocate(orientations(Ndim, num_particles))
         
     end if
 
     write(output_unit, *) "Start !"
     call cpu_time(tIni)
     !$ tIni_para = omp_get_wtime()
-    !$omp parallel do schedule(static) reduction(+:dist_sum) private(positions, iCol, jCol, r_ij, iDist)
+    !$omp parallel do schedule(static) reduction(+:dist_sum) private(positions, i_particle, j_particle, &
+    !$ r_ij, iDist)
     do iStep = 1, Nstep/snap_factor
 
         ! Read
         !$omp critical
-        do iCol = 1, Ncol
-            read(positions_unit, *) positions(:, iCol)
+        do i_particle = 1, num_particles
+            read(positions_unit, *) positions(:, i_particle)
         end do
         
         if (withOrientations) then
-            do iCol = 1, Ncol
-                read(orientations_unit, *) orientations(:, iCol)
+            do i_particle = 1, num_particles
+                read(orientations_unit, *) orientations(:, i_particle)
             end do
         end if
         !$omp end critical
 
         ! Fill
-        do iCol = 1, Ncol
-            do jCol = iCol + 1, Ncol
+        do i_particle = 1, num_particles
+            do j_particle = i_particle + 1, num_particles
 
-                r_ij = dist_PBC(Box_size, positions(:, iCol), positions(:, jCol))
+                r_ij = dist_PBC(Box_size, positions(:, i_particle), positions(:, j_particle))
                 iDist =  int(r_ij/dist_dr)
                 dist_sum(iDist) = dist_sum(iDist) + 1
 
@@ -140,7 +141,7 @@ implicit none
             r_iPlus = real(iDist + 1, DP) * dist_dr
             
             dist_function(iDist) = 2._DP * real(dist_sum(iDist), DP) / real(Nstep/snap_factor, DP) / &
-                real(Ncol, DP) / (sphere_volume(r_iPlus)-sphere_volume(r_iMinus)) / density
+                real(num_particles, DP) / (sphere_volume(r_iPlus)-sphere_volume(r_iMinus)) / density
             write(distrib_unit, *) r_iDist, dist_function(iDist)
             
         end do

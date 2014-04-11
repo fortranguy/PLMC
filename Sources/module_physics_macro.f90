@@ -72,19 +72,21 @@ contains
         class(HardSpheres), intent(inout) :: type1, type2
         real(DP), intent(in) :: mix_min_distance
 
-        integer :: iCol, iColTest
-        real(DP), dimension(Ndim) :: xRand
+        integer :: i_particle, i_particle_test
+        real(DP), dimension(Ndim) :: xRand, position, position_test
         real(DP) :: rTest
         
         ! Type 1
-        do iCol = 1, type1%get_Ncol()
+        do i_particle = 1, type1%get_num_particles()
         
 7101        continue
             call random_number(xRand)
-            type1%positions(:, iCol) = xRand*Box_size(:)
+            type1%positions(:, i_particle) = xRand*Box_size(:)
             
-            do iColTest = 1, iCol-1
-                rTest = dist_PBC(Box_size, type1%positions(:, iColTest), type1%positions(:, iCol))
+            position(:) = type1%positions(:, i_particle)
+            do i_particle_test = 1, i_particle-1
+                position_test(:) = type1%positions(:, i_particle_test)
+                rTest = dist_PBC(Box_size, position, position_test)
                 if (rTest < type1%get_diameter()) then
                     goto 7101
                 end if
@@ -93,21 +95,24 @@ contains
         end do
         
         ! Type 2
-        do iCol = 1, type2%get_Ncol()
+        do i_particle = 1, type2%get_num_particles()
         
 7102        continue
             call random_number(xRand)
-            type2%positions(:, iCol) = xRand*Box_size(:)
+            type2%positions(:, i_particle) = xRand*Box_size(:)
             
-            do iColTest = 1, type1%get_Ncol()
-                rTest = dist_PBC(Box_size, type1%positions(:, iColTest), type2%positions(:, iCol))
+            position(:) = type2%positions(:, i_particle)
+            do i_particle_test = 1, type1%get_num_particles()
+                position_test(:) = type1%positions(:, i_particle_test)
+                rTest = dist_PBC(Box_size, position, position_test)
                 if (rTest < mix_min_distance) then
                     goto 7102
                 end if
             end do
             
-            do iColTest = 1, iCol-1
-                rTest = dist_PBC(Box_size, type2%positions(:, iColTest), type2%positions(:, iCol))
+            do i_particle_test = 1, i_particle-1
+                position_test(:) = type2%positions(:, i_particle_test)
+                rTest = dist_PBC(Box_size, position, position_test)
                 if (rTest < type2%get_diameter()) then
                     goto 7102
                 end if
@@ -119,59 +124,60 @@ contains
     
     !> Uniform (gaussian) orientations
     
-    subroutine randomOrientations(orientations, Ncol)
+    subroutine randomOrientations(orientations, num_particles)
     
         real(DP), dimension(:, :), intent(out) :: orientations
-        integer, intent(in) :: Ncol
+        integer, intent(in) :: num_particles
         
-        integer :: iCol
+        integer :: i_particle
         
-        do iCol = 1, Ncol
-            orientations(:, iCol) = random_surface()
+        do i_particle = 1, num_particles
+            orientations(:, i_particle) = random_surface()
         end do
     
     end subroutine randomOrientations
     
     !> From an old configuration
     
-    subroutine oldConfiguration(file, length, type_name, type_Ncol, type_coords, normMax)
+    subroutine oldConfiguration(file, length, type_name, type_num_particles, type_coords, normMax)
     
         character(len=*), intent(in) :: file
         integer, intent(in) :: length
         character(len=*), intent(in) :: type_name
-        integer, intent(in) :: type_Ncol
+        integer, intent(in) :: type_num_particles
         real(DP), dimension(:, :), intent(out) :: type_coords
         real(DP), intent(in) :: normMax
         
         integer :: file_unit, readStat
 
-        integer :: iCol
+        integer :: i_particle
         real(DP), dimension(Ndim) :: vecDummy
         
         write(output_unit, *) type_name, " <- ", file(1:length)
         open(newunit=file_unit, recl=4096, file=file(1:length), status='old', action='read')
         
-        iCol = 0
+        i_particle = 0
         do
             read(file_unit, fmt=*, iostat=readStat) vecDummy(:)
             if (readStat == iostat_end) exit
-            iCol = iCol + 1
+            i_particle = i_particle + 1
         end do
         
-        if (iCol == type_Ncol) then
+        if (i_particle == type_num_particles) then
             rewind(file_unit)
-            do iCol = 1, type_Ncol
-                read(file_unit, *) type_coords(:, iCol)
-                if (norm2(type_coords(:, iCol)) > normMax+io_tiny) then
+            do i_particle = 1, type_num_particles
+                read(file_unit, *) type_coords(:, i_particle)
+                if (norm2(type_coords(:, i_particle)) > normMax+io_tiny) then
                     write(error_unit, *) "Norm error in file: ", file(1:length)
-                    write(error_unit, *) "Coordinates ", type_coords(:, iCol)
-                    write(error_unit, *) "Norm =", norm2(type_coords(:, iCol))
+                    write(error_unit, *) "Coordinates ", type_coords(:, i_particle)
+                    write(error_unit, *) "Norm =", norm2(type_coords(:, i_particle))
                     error stop
                 end if
             end do
         else
             write(error_unit, *) "Error reading: ", file(1:length)
-            write(error_unit, *) "iCol", iCol, " /= ", "type_Ncol", type_Ncol
+            write(error_unit, *) "i_particle", i_particle, " /= ", "type_num_particles", &
+                                 type_num_particles
             error stop
         end if
         
@@ -197,7 +203,7 @@ contains
         
             case ('r')
                 call randomDepositions(Box_size, dipolar, spherical, mix_min_distance)
-                call randomOrientations(dipolar%orientations, dipolar%get_Ncol())
+                call randomOrientations(dipolar%orientations, dipolar%get_num_particles())
                 write(output_unit, *) "Random depositions + random orientations"
                 write(report_unit, *) "    Random depositions + random orientations"
                 
@@ -205,13 +211,13 @@ contains
                 write(output_unit, *) "Old configuration"
                 write(report_unit, *) "    Old configuration"
                 call oldConfiguration(arg_init%files(1), arg_init%length(1), &
-                                      dipolar%get_name()//"_positions", dipolar%get_Ncol(), &
+                                      dipolar%get_name()//"_positions", dipolar%get_num_particles(), &
                                       dipolar%positions, norm2(Box_size))
                 call oldConfiguration(arg_init%files(2), arg_init%length(2), &
-                                      dipolar%get_name()//"_orientations", dipolar%get_Ncol(), &
+                                      dipolar%get_name()//"_orientations", dipolar%get_num_particles(), &
                                       dipolar%orientations, 1._DP)
                 call oldConfiguration(arg_init%files(3), arg_init%length(3), &
-                                      spherical%get_name()//"_positions", spherical%get_Ncol(), &
+                                      spherical%get_name()//"_positions", spherical%get_num_particles(), &
                                       spherical%positions, norm2(Box_size))
             
             case default
