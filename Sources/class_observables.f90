@@ -3,7 +3,7 @@
 module class_observables
 
 use data_precisions, only: DP
-use data_monteCarlo, only: Temperature, Nstep
+use data_monte_carlo, only: Temperature, Nstep
 
 implicit none
 private

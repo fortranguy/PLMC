@@ -84,7 +84,7 @@ end module data_particles
 !> \brief Monte-Carlo data :
 !> declaration of the Monte-Carlo parameters
 !***************************************************************************************************
-module data_monteCarlo
+module data_monte_carlo
 
 use data_precisions, only: DP
 use data_box, only: Ndim
@@ -113,7 +113,7 @@ implicit none
     real(DP), parameter :: hard_move_rejectFix = 0.5_DP
     integer, parameter :: hard_Nwidom = 500
     
-end module data_monteCarlo
+end module data_monte_carlo
 !***************************************************************************************************
 
 !***************************************************************************************************
@@ -153,7 +153,7 @@ end module data_potential
 !> \brief Neighbours Cells data :
 !> declaration of the grid/cell scheme parameters
 !***************************************************************************************************
-module data_neighbourCells
+module data_neighbour_cells
 
 use data_precisions, only: DP
 use data_box, only: Ndim
@@ -165,7 +165,7 @@ implicit none
     integer, parameter :: NnearCell = NnearCell_dim(1) * NnearCell_dim(2) * NnearCell_dim(3)
                           !< Total number of nearest neighbour cells, including itself
 
-end module data_neighbourCells
+end module data_neighbour_cells
 !***************************************************************************************************
 
 !***************************************************************************************************

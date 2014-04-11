@@ -5,7 +5,7 @@ module class_physical_system
 use, intrinsic :: iso_fortran_env, only: output_unit
 use data_precisions, only: DP
 use data_box, only: Ndim, Box_size, Box_wave
-use data_monteCarlo, only: Temperature, decorrelFactor, switch_factor, Nthermal, Nadapt, Nstep, &
+use data_monte_carlo, only: Temperature, decorrelFactor, switch_factor, Nthermal, Nadapt, Nstep, &
                            reset_iStep
 use data_potential, only: write_potential
 use data_distribution, only: snap

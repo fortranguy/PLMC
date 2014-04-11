@@ -5,7 +5,7 @@ program distribution
 use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
 use data_precisions, only: DP
 use data_box, only: Ndim, Box_size
-use data_monteCarlo, only: Nstep
+use data_monte_carlo, only: Nstep
 use data_distribution, only: snap, dist_dr
 use module_physics_micro, only: sphere_volume, dist_PBC
 !$ use omp_lib

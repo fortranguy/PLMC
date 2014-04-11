@@ -2,7 +2,7 @@ module module_algorithms
 
 use data_precisions, only: DP
 use data_box, only: Ndim
-use data_monteCarlo, only: Temperature
+use data_monte_carlo, only: Temperature
 use module_types, only: Box_dimensions, particle_index, particle_energy
 use module_physics_micro, only: random_surface, markov_surface
 use class_hard_spheres

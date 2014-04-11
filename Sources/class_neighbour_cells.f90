@@ -5,14 +5,14 @@ module class_neighbour_cells
 use, intrinsic :: iso_fortran_env, only: error_unit
 use data_precisions, only: DP, real_zero
 use data_box, only: Ndim
-use data_neighbourCells, only: NnearCell_dim, NnearCell
+use data_neighbour_cells, only: NnearCell_dim, NnearCell
 use module_types, only: Node, LinkedList
 use module_physics_micro, only: index_from_coord, coord_PBC
 
 implicit none
 private
 
-    type, public :: NeighbourCells
+    type, public :: Neighbour_Cells
     
         private
         
@@ -26,31 +26,31 @@ private
         
     contains
     
-        procedure :: construct => NeighbourCells_construct
-        procedure :: destroy => NeighbourCells_destroy
+        procedure :: construct => Neighbour_Cells_construct
+        procedure :: destroy => Neighbour_Cells_destroy
         
-        procedure :: get_cell_size => NeighbourCells_get_cell_size
-        procedure :: get_NtotalCell_dim => NeighbourCells_get_NtotalCell_dim
+        procedure :: get_cell_size => Neighbour_Cells_get_cell_size
+        procedure :: get_NtotalCell_dim => Neighbour_Cells_get_NtotalCell_dim
         
-        procedure :: alloc_nodes => NeighbourCells_alloc_nodes
-        procedure :: alloc_cells => NeighbourCells_alloc_cells
-        procedure :: dealloc_nodes => NeighbourCells_dealloc_nodes
-        procedure :: dealloc_cells => NeighbourCells_dealloc_cells
-        procedure :: check_cellsSize => NeighbourCells_check_cellsSize
-        procedure :: index_from_position => NeighbourCells_index_from_position
-        procedure :: all_cols_to_cells => NeighbourCells_all_cols_to_cells
-        procedure :: remove_col_from_cell => NeighbourCells_remove_col_from_cell
-        procedure :: add_col_to_cell => NeighbourCells_add_col_to_cell
+        procedure :: alloc_nodes => Neighbour_Cells_alloc_nodes
+        procedure :: alloc_cells => Neighbour_Cells_alloc_cells
+        procedure :: dealloc_nodes => Neighbour_Cells_dealloc_nodes
+        procedure :: dealloc_cells => Neighbour_Cells_dealloc_cells
+        procedure :: check_cellsSize => Neighbour_Cells_check_cellsSize
+        procedure :: index_from_position => Neighbour_Cells_index_from_position
+        procedure :: all_cols_to_cells => Neighbour_Cells_all_cols_to_cells
+        procedure :: remove_col_from_cell => Neighbour_Cells_remove_col_from_cell
+        procedure :: add_col_to_cell => Neighbour_Cells_add_col_to_cell
         procedure, private :: init_near_among_total => &
-                              NeighbourCells_init_near_among_total
+                              Neighbour_Cells_init_near_among_total
         
-    end type NeighbourCells
+    end type Neighbour_Cells
     
 contains
 
-    subroutine NeighbourCells_construct(this, Box_size, proposed_cell_size, rCut)
+    subroutine Neighbour_Cells_construct(this, Box_size, proposed_cell_size, rCut)
     
-        class(NeighbourCells), intent(out) :: this
+        class(Neighbour_Cells), intent(out) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         real(DP), dimension(:), intent(in) :: proposed_cell_size
         real(DP), intent(in) :: rCut
@@ -65,37 +65,37 @@ contains
         call this%alloc_cells()
         call this%init_near_among_total()
     
-    end subroutine NeighbourCells_construct
+    end subroutine Neighbour_Cells_construct
     
-    subroutine NeighbourCells_destroy(this)
+    subroutine Neighbour_Cells_destroy(this)
     
-        class(NeighbourCells), intent(inout) :: this
+        class(Neighbour_Cells), intent(inout) :: this
         
         if (allocated(this%near_among_total)) deallocate(this%near_among_total)
         
         call this%dealloc_cells()
         
-    end subroutine NeighbourCells_destroy
+    end subroutine Neighbour_Cells_destroy
     
     !> Accessors:
     
-    pure function NeighbourCells_get_cell_size(this) result(get_cell_size)
-        class(NeighbourCells), intent(in) :: this
+    pure function Neighbour_Cells_get_cell_size(this) result(get_cell_size)
+        class(Neighbour_Cells), intent(in) :: this
         real(DP), dimension(Ndim) :: get_cell_size
         get_cell_size(:) = this%cell_size(:)
-    end function NeighbourCells_get_cell_size
+    end function Neighbour_Cells_get_cell_size
     
-    pure function NeighbourCells_get_NtotalCell_dim(this) result(get_NtotalCell_dim)
-        class(NeighbourCells), intent(in) :: this
+    pure function Neighbour_Cells_get_NtotalCell_dim(this) result(get_NtotalCell_dim)
+        class(Neighbour_Cells), intent(in) :: this
         integer, dimension(Ndim) :: get_NtotalCell_dim
         get_NtotalCell_dim(:) = this%NtotalCell_dim(:)
-    end function NeighbourCells_get_NtotalCell_dim
+    end function Neighbour_Cells_get_NtotalCell_dim
 
     !> Linked-list allocation
     
-    subroutine NeighbourCells_alloc_nodes(this)
+    subroutine Neighbour_Cells_alloc_nodes(this)
     
-        class(NeighbourCells), intent(inout) :: this
+        class(Neighbour_Cells), intent(inout) :: this
     
         integer :: iCell
     
@@ -112,11 +112,11 @@ contains
     
         end do
     
-    end subroutine NeighbourCells_alloc_nodes
+    end subroutine Neighbour_Cells_alloc_nodes
     
-    subroutine NeighbourCells_alloc_cells(this)
+    subroutine Neighbour_Cells_alloc_cells(this)
     
-        class(NeighbourCells), intent(inout) :: this
+        class(Neighbour_Cells), intent(inout) :: this
 
         allocate(this%beginCells(this%NtotalCell))
         allocate(this%currentCells(this%NtotalCell))
@@ -124,7 +124,7 @@ contains
         
         call this%alloc_nodes()
         
-    end subroutine NeighbourCells_alloc_cells
+    end subroutine Neighbour_Cells_alloc_cells
     
     ! Linked-list deallocation
     
@@ -139,9 +139,9 @@ contains
         
     end subroutine free_link
     
-    pure subroutine NeighbourCells_dealloc_nodes(this)
+    pure subroutine Neighbour_Cells_dealloc_nodes(this)
     
-        class(NeighbourCells), intent(inout) :: this
+        class(Neighbour_Cells), intent(inout) :: this
     
         integer :: iCell
 
@@ -151,11 +151,11 @@ contains
             end if
         end do
     
-    end subroutine NeighbourCells_dealloc_nodes
+    end subroutine Neighbour_Cells_dealloc_nodes
     
-    pure subroutine NeighbourCells_dealloc_cells(this)
+    pure subroutine Neighbour_Cells_dealloc_cells(this)
     
-        class(NeighbourCells), intent(inout) :: this
+        class(Neighbour_Cells), intent(inout) :: this
         
         call this%dealloc_nodes()
         
@@ -163,13 +163,13 @@ contains
         if (allocated(this%currentCells)) deallocate(this%currentCells)
         if (allocated(this%nextCells)) deallocate(this%nextCells)
     
-    end subroutine NeighbourCells_dealloc_cells
+    end subroutine Neighbour_Cells_dealloc_cells
     
-    ! NeighbourCells cells size check
+    ! Neighbour_Cells cells size check
     
-    subroutine NeighbourCells_check_cellsSize(this, Box_size, rCut)
+    subroutine Neighbour_Cells_check_cellsSize(this, Box_size, rCut)
     
-        class(NeighbourCells), intent(in) :: this
+        class(Neighbour_Cells), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         real(DP), intent(in) :: rCut
         
@@ -203,13 +203,13 @@ contains
             
         end do
         
-    end subroutine NeighbourCells_check_cellsSize
+    end subroutine Neighbour_Cells_check_cellsSize
     
     ! Assignment: particle -> cell
     
-    pure function NeighbourCells_index_from_position(this, xCol) result(index_from_position)
+    pure function Neighbour_Cells_index_from_position(this, xCol) result(index_from_position)
     
-        class(NeighbourCells), intent(in) :: this
+        class(Neighbour_Cells), intent(in) :: this
         real(DP), dimension(:), intent(in) :: xCol
         integer :: index_from_position
         
@@ -219,11 +219,11 @@ contains
         index_from_position = cell_coord(1) + this%NtotalCell_dim(1)*(cell_coord(2)-1) + &
                              this%NtotalCell_dim(1)*this%NtotalCell_dim(2)*(cell_coord(3)-1)
     
-    end function NeighbourCells_index_from_position
+    end function Neighbour_Cells_index_from_position
     
-    pure subroutine NeighbourCells_all_cols_to_cells(this, num_particles, positions)
+    pure subroutine Neighbour_Cells_all_cols_to_cells(this, num_particles, positions)
     
-        class(NeighbourCells), intent(inout) :: this
+        class(Neighbour_Cells), intent(inout) :: this
         integer, intent(in) :: num_particles
         real(DP), dimension(:, :), intent(in) :: positions
     
@@ -246,13 +246,13 @@ contains
             this%currentCells(iCell)%particle%next => null()
         end do
         
-    end subroutine NeighbourCells_all_cols_to_cells
+    end subroutine Neighbour_Cells_all_cols_to_cells
     
     ! Neighbour cells update
     
-    subroutine NeighbourCells_remove_col_from_cell(this, i_particle, iCellOld)
+    subroutine Neighbour_Cells_remove_col_from_cell(this, i_particle, iCellOld)
     
-        class(NeighbourCells), intent(inout) :: this
+        class(Neighbour_Cells), intent(inout) :: this
         integer, intent(in) :: i_particle, iCellOld
         
         type(Node), pointer :: current => null()
@@ -278,11 +278,11 @@ contains
         
         end do
             
-    end subroutine NeighbourCells_remove_col_from_cell
+    end subroutine Neighbour_Cells_remove_col_from_cell
     
-    subroutine NeighbourCells_add_col_to_cell(this, i_particle, iCellNew)
+    subroutine Neighbour_Cells_add_col_to_cell(this, i_particle, iCellNew)
     
-        class(NeighbourCells), intent(inout) :: this
+        class(Neighbour_Cells), intent(inout) :: this
         integer, intent(in) :: i_particle, iCellNew
     
         type(Node), pointer :: new => null()
@@ -296,13 +296,13 @@ contains
         previous%next => new
         new%number = i_particle
 
-    end subroutine NeighbourCells_add_col_to_cell
+    end subroutine Neighbour_Cells_add_col_to_cell
     
     ! Neighbour cells initialisation
     
-    pure subroutine NeighbourCells_init_near_among_total(this)
+    pure subroutine Neighbour_Cells_init_near_among_total(this)
     
-        class(NeighbourCells), intent(inout) :: this
+        class(Neighbour_Cells), intent(inout) :: this
     
         integer :: iTotalCell, jTotalCell, kTotalCell, totalCell_index
         integer :: iNearCell, jNearCell, kNearCell, nearCell_index
@@ -338,6 +338,6 @@ contains
         end do
         end do
             
-    end subroutine NeighbourCells_init_near_among_total
+    end subroutine Neighbour_Cells_init_near_among_total
 
 end module class_neighbour_cells

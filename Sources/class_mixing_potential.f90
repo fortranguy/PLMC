@@ -7,7 +7,7 @@ use data_precisions, only: DP, real_zero
 use data_box, only: Ndim
 use data_particles, only: mix_delta
 use data_potential, only: mix_rMin_factor, mix_rCut, mix_dr, mix_epsilon, mix_alpha
-use data_neighbourCells, only: NnearCell
+use data_neighbour_cells, only: NnearCell
 use module_types, only: Node, particle_index
 use module_physics_micro, only: set_discrete_length, dist_PBC, Epot_yukawa
 use class_neighbour_cells
@@ -245,7 +245,7 @@ contains
         class(MixingPotential), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         type(particle_index), intent(in) :: particle
-        type(NeighbourCells), intent(in) :: neighCells
+        type(Neighbour_Cells), intent(in) :: neighCells
         real(DP), dimension(:, :), contiguous, intent(in) :: other_all_positions
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energ

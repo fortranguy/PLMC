@@ -7,10 +7,10 @@ use data_precisions, only: DP, real_zero, consist_tiny
 use data_constants, only: PI
 use data_box, only: Ndim
 use data_particles, only: dipol_num_particles
-use data_monteCarlo, only: dipol_move_delta, dipol_move_rejectFix, dipol_rotate_delta, &
+use data_monte_carlo, only: dipol_move_delta, dipol_move_rejectFix, dipol_rotate_delta, &
                            dipol_rotate_deltaMax, dipol_rotate_rejectFix, dipol_Nwidom
 use data_potential, only: dipol_rMin_factor, dipol_real_rCut_factor, dipol_real_dr, dipol_alpha_factor
-use data_neighbourCells, only: NnearCell
+use data_neighbour_cells, only: NnearCell
 use data_distribution, only: snap_ratio
 use module_types, only: Box_dimensions, particle_index
 use module_physics_micro, only: set_discrete_length, distVec_PBC, Box_wave1_sym, Box_wave2_sym, &

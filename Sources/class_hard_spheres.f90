@@ -7,9 +7,9 @@ use data_precisions, only: DP, real_zero
 use data_constants, only: PI
 use data_box, only: Ndim
 use data_particles, only: hard_diameter, hard_num_particles
-use data_monteCarlo, only: hard_move_delta, hard_move_rejectFix, hard_Nwidom
+use data_monte_carlo, only: hard_move_delta, hard_move_rejectFix, hard_Nwidom
 use data_potential, only: hard_rMin_factor
-use data_neighbourCells, only: NnearCell
+use data_neighbour_cells, only: NnearCell
 use data_distribution, only: snap_ratio
 use module_types, only: Box_dimensions, Node, particle_index
 use module_physics_micro, only: dist_PBC
@@ -45,8 +45,8 @@ private
         real(DP) :: rCut !< short-range cut
         
         ! Neighbours (cell/grid scheme)
-        type(NeighbourCells), public :: sameCells !< same kind
-        type(NeighbourCells) :: mixCells !< other kind
+        type(Neighbour_Cells), public :: sameCells !< same kind
+        type(Neighbour_Cells) :: mixCells !< other kind
         
     contains
 

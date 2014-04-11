@@ -4,7 +4,7 @@ program histogram
 
 use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
 use data_precisions, only: DP
-use data_monteCarlo, only: Nstep
+use data_monte_carlo, only: Nstep
 use data_histogram, only: hist_dE
 
 implicit none
