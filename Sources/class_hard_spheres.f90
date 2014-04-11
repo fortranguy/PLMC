@@ -267,15 +267,19 @@ contains
         class(Hard_Spheres), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
     
-        integer :: jCol, i_particle
+        integer :: i_particle, j_particle
+        real(DP), dimension(Ndim) :: position_i, position_j
         real(DP) :: r_ij
     
-        do jCol = 1, this%num_particles
-            do i_particle = jCol+1, this%num_particles
-                    
-                r_ij = dist_PBC(Box_size, this%all_positions(:, i_particle), this%all_positions(:, jCol))
+        do j_particle = 1, this%num_particles
+            do i_particle = j_particle+1, this%num_particles
+            
+                position_i(:) = this%all_positions(:, i_particle)
+                position_j(:) = this%all_positions(:, j_particle)
+                r_ij = dist_PBC(Box_size, position_i, position_j)
+                
                 if (r_ij < this%rMin) then
-                    write(error_unit, *) this%name, "    Overlap !", i_particle, jCol
+                    write(error_unit, *) this%name, "    Overlap !", i_particle, j_particle
                     write(error_unit, *) "    r_ij = ", r_ij
                     error stop
                 end if
