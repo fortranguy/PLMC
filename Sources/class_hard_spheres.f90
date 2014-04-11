@@ -1,6 +1,6 @@
 !> \brief Description of the Hard Spheres class
 
-module class_hardSpheres
+module class_hard_spheres
 
 use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
 use data_precisions, only: DP, real_zero
@@ -13,7 +13,7 @@ use data_neighbourCells, only: NnearCell
 use data_distribution, only: snap_ratio
 use module_types, only: Box_dimensions, Node, particle_index
 use module_physics_micro, only: dist_PBC
-use class_neighbourCells
+use class_neighbour_cells
 use class_small_move
 
 implicit none
@@ -393,4 +393,4 @@ contains
         
     end function HardSpheres_Epot_conf
 
-end module class_hardSpheres
+end module class_hard_spheres

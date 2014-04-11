@@ -7,9 +7,9 @@ use data_precisions, only: DP, real_zero, io_tiny, consist_tiny
 use data_box, only: Ndim
 use module_types, only: Box_dimensions, argument_random, argument_initial
 use module_physics_micro, only: dist_PBC, random_surface
-use class_hardSpheres
-use class_dipolarSpheres
-use class_mixingPotential
+use class_hard_spheres
+use class_dipolar_spheres
+use class_mixing_potential
 use class_observables
 use class_units
 

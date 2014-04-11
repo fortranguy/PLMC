@@ -5,9 +5,9 @@ use data_box, only: Ndim
 use data_monteCarlo, only: Temperature
 use module_types, only: Box_dimensions, particle_index, particle_energy
 use module_physics_micro, only: random_surface, markov_surface
-use class_hardSpheres
-use class_dipolarSpheres
-use class_mixingPotential
+use class_hard_spheres
+use class_dipolar_spheres
+use class_mixing_potential
 use class_observables
 
 implicit none

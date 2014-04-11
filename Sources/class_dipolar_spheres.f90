@@ -1,6 +1,6 @@
 !> \brief Description of the DipolarSpheres class
 
-module class_dipolarSpheres
+module class_dipolar_spheres
 
 use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
 use data_precisions, only: DP, real_zero, consist_tiny
@@ -15,8 +15,8 @@ use data_distribution, only: snap_ratio
 use module_types, only: Box_dimensions, particle_index
 use module_physics_micro, only: set_discrete_length, distVec_PBC, Box_wave1_sym, Box_wave2_sym, &
                                 fourier_i, exchange_sign
-use class_neighbourCells
-use class_hardSpheres
+use class_neighbour_cells
+use class_hard_spheres
 use class_small_rotation
 
 implicit none
@@ -1176,4 +1176,4 @@ contains
     
     end function DipolarSpheres_Epot_conf
 
-end module class_dipolarSpheres
+end module class_dipolar_spheres

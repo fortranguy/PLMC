@@ -1,6 +1,6 @@
 !> \brief Description of the Physical System class
 
-module class_physicalSystem
+module class_physical_system
 
 use, intrinsic :: iso_fortran_env, only: output_unit
 use data_precisions, only: DP
@@ -11,12 +11,12 @@ use data_potential, only: write_potential
 use data_distribution, only: snap
 use module_types, only: Box_dimensions, monteCarlo_arguments
 use module_physics_micro, only: NwaveVectors
-use class_hardSpheres
-use class_dipolarSpheres
-use class_mixingPotential
+use class_hard_spheres
+use class_dipolar_spheres
+use class_mixing_potential
 use class_observables
 use class_units
-use module_monteCarlo_arguments, only: read_arguments
+use module_monte_carlo_arguments, only: read_arguments
 use module_physics_macro, only: init_randomSeed, set_initialConfiguration, init, final, mix_init, &
                                 mix_final, adapt_move, adapt_rotate, test_consist
 use module_algorithms, only: move, widom, switch, rotate
@@ -529,4 +529,4 @@ contains
         
     end subroutine PhysicalSystem_reinitialize_quantites
 
-end module class_physicalSystem
+end module class_physical_system

@@ -1,6 +1,6 @@
 !> \brief Description of the  Mixing Potential class
 
-module class_mixingPotential
+module class_mixing_potential
 
 use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
 use data_precisions, only: DP, real_zero
@@ -10,8 +10,8 @@ use data_potential, only: mix_rMin_factor, mix_rCut, mix_dr, mix_epsilon, mix_al
 use data_neighbourCells, only: NnearCell
 use module_types, only: Node, particle_index
 use module_physics_micro, only: set_discrete_length, dist_PBC, Epot_yukawa
-use class_neighbourCells
-use class_hardSpheres
+use class_neighbour_cells
+use class_hard_spheres
 
 implicit none
 
@@ -319,4 +319,4 @@ contains
     
     end function MixingPotential_Epot_conf
 
-end module class_mixingPotential
+end module class_mixing_potential

@@ -1,11 +1,11 @@
-!> \brief Monte-Carlo simulation in canonical ensemble for a mixture
+!> \brief Monte Carlo simulation in canonical ensemble for a mixture
 
-program monteCarlo_canonical_bulk
+program monte_carlo_canonical_bulk
 
 use, intrinsic :: iso_fortran_env, only: output_unit
 use module_types, only: monteCarlo_arguments
-use module_monteCarlo_arguments, only: read_arguments
-use class_physicalSystem
+use module_monte_carlo_arguments, only: read_arguments
+use class_physical_system
 
 implicit none
     
@@ -55,4 +55,4 @@ implicit none
     call sys%final()
     call sys%destroy()
     
-end program monteCarlo_canonical_bulk
+end program monte_carlo_canonical_bulk

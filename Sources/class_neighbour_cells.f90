@@ -1,6 +1,6 @@
 !> \brief Description of the neighbours class
 
-module class_neighbourCells
+module class_neighbour_cells
 
 use, intrinsic :: iso_fortran_env, only: error_unit
 use data_precisions, only: DP, real_zero
@@ -340,4 +340,4 @@ contains
             
     end subroutine NeighbourCells_init_near_among_total
 
-end module class_neighbourCells
+end module class_neighbour_cells
