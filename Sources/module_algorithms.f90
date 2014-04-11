@@ -3,7 +3,7 @@ module module_algorithms
 use data_precisions, only: DP
 use data_box, only: Ndim
 use data_monte_carlo, only: Temperature
-use module_types, only: Box_dimensions, particle_index, particle_energy
+use module_types, only: Box_Dimensions, Particle_Index, Particle_Energy
 use module_physics_micro, only: random_surface, markov_surface
 use class_hard_spheres
 use class_dipolar_spheres
@@ -20,16 +20,16 @@ contains
     
     subroutine move(Box, this, this_obs, other, mix, mix_Epot)
     
-        type(Box_dimensions), intent(in) :: Box
-        class(HardSpheres), intent(inout) :: this
+        type(Box_Dimensions), intent(in) :: Box
+        class(Hard_Spheres), intent(inout) :: this
         class(Observables), intent(inout) :: this_obs
-        class(HardSpheres), intent(inout) :: other
-        class(MixingPotential), intent(in) :: mix
+        class(Hard_Spheres), intent(inout) :: other
+        class(Mixing_Potential), intent(in) :: mix
         real(DP), intent(inout) :: mix_Epot
         
         real(DP) :: random
         real(DP), dimension(Ndim) :: xRand
-        type(particle_index) :: old, new
+        type(Particle_Index) :: old, new
         logical :: overlap
         real(DP) :: deltaEpot
         real(DP) :: this_deltaEpot, mix_deltaEpot
@@ -73,7 +73,7 @@ contains
     
                 old%same_iCell = this%sameCells%index_from_position(old%xCol)
                 select type (this)
-                    type is (DipolarSpheres)
+                    type is (Dipolar_Spheres)
                         old%mCol(:) = this%orientations(:, old%number)
                         new%mCol(:) = old%mCol(:)
                         this_EpotNew_real = this%Epot_real_solo(Box%size, new)
@@ -97,7 +97,7 @@ contains
                 if (random < exp(-deltaEpot/Temperature)) then
                 
                     select type (this)
-                        type is (DipolarSpheres)
+                        type is (Dipolar_Spheres)
                             call this%reci_update_structure_move(Box, old, new)
                     end select
                 
@@ -132,16 +132,16 @@ contains
 
     subroutine widom(Box, this, this_obs, other, mix)
         
-        type(Box_dimensions), intent(in) :: Box
-        class(HardSpheres), intent(in) :: this
+        type(Box_Dimensions), intent(in) :: Box
+        class(Hard_Spheres), intent(in) :: this
         class(Observables), intent(inout) :: this_obs
-        class(HardSpheres), intent(in) :: other
-        class(MixingPotential), intent(in) :: mix
+        class(Hard_Spheres), intent(in) :: other
+        class(Mixing_Potential), intent(in) :: mix
         
         integer :: iWidom
         real(DP) :: widTestSum
         real(DP), dimension(Ndim) :: xRand
-        type(particle_index) :: test
+        type(Particle_Index) :: test
         logical :: overlap
         real(DP) :: EpotTest
         real(DP) :: this_EpotTest, mix_EpotTest
@@ -177,7 +177,7 @@ contains
                 if (.not. overlap) then
                 
                     select type (this)
-                        type is (DipolarSpheres)
+                        type is (Dipolar_Spheres)
                             test%add = .true.
                             test%mCol(:) = random_surface()
                             this_EpotTest = this%Epot_real_solo(Box%size, test) + &
@@ -204,20 +204,20 @@ contains
     subroutine before_switch_energy(Box_size, this, old, other, mix, EpotOld)
         
         real(DP), dimension(:), intent(in) :: Box_size
-        class(HardSpheres), intent(in) :: this, other
-        type(particle_index), intent(inout) :: old
-        class(MixingPotential), intent(in) :: mix
-        type(particle_energy), intent(out) :: EpotOld
+        class(Hard_Spheres), intent(in) :: this, other
+        type(Particle_Index), intent(inout) :: old
+        class(Mixing_Potential), intent(in) :: mix
+        type(Particle_Energy), intent(out) :: EpotOld
         logical :: overlap
         
         old%xCol(:) = this%all_positions(:, old%number)
         
         old%same_iCell = this%sameCells%index_from_position(old%xCol)
         select type (this)
-            type is (DipolarSpheres)
+            type is (Dipolar_Spheres)
                 old%mCol(:) = this%orientations(:, old%number)
                 EpotOld%same = this%Epot_real_solo(Box_size, old) ! Epot_reci: cf. after_switch_energy
-            type is (HardSpheres)
+            type is (Hard_Spheres)
                 EpotOld%same = 0._DP
         end select
         
@@ -228,13 +228,13 @@ contains
     
     subroutine after_switch_energy(Box, this, old, new, other, mix, overlap, EpotNew)
 
-        type(Box_dimensions), intent(in) :: Box
-        class(HardSpheres), intent(in) :: this, other
-        type(particle_index), intent(in) :: old
-        type(particle_index), intent(inout) :: new
-        class(MixingPotential), intent(in) :: mix
+        type(Box_Dimensions), intent(in) :: Box
+        class(Hard_Spheres), intent(in) :: this, other
+        type(Particle_Index), intent(in) :: old
+        type(Particle_Index), intent(inout) :: new
+        class(Mixing_Potential), intent(in) :: mix
         logical, intent(out) :: overlap
-        type(particle_energy), intent(out) :: EpotNew
+        type(Particle_Energy), intent(out) :: EpotNew
         
         new%xCol(:) = other%all_positions(:, new%other_number)
         
@@ -261,7 +261,7 @@ contains
             if (.not. overlap) then
             
                 select type (this)
-                    type is (DipolarSpheres)
+                    type is (Dipolar_Spheres)
                         new%mCol(:) = this%orientations(:, new%number)
                         EpotNew%same = this%Epot_real_solo(Box%size, new) + &
                                       this%deltaEpot_reci_move(Box, old, new)
@@ -275,14 +275,14 @@ contains
     
     subroutine after_switch_update(Box, this, old, new, other)
 
-        type(Box_dimensions), intent(in) :: Box
-        class(HardSpheres), intent(inout) :: this, other
-        type(particle_index), intent(in) :: old, new
+        type(Box_Dimensions), intent(in) :: Box
+        class(Hard_Spheres), intent(inout) :: this, other
+        type(Particle_Index), intent(in) :: old, new
         
         this%all_positions(:, old%number) = new%xCol(:)
         
         select type (this)
-            type is (DipolarSpheres)
+            type is (Dipolar_Spheres)
                 call this%reci_update_structure_move(Box, old, new)
         end select
         
@@ -299,21 +299,21 @@ contains
     
     subroutine switch(Box, type1, type1_obs, type2, type2_obs, mix, mix_Epot, switch_Nreject)
     
-        type(Box_dimensions), intent(in) :: Box
-        class(HardSpheres), intent(inout) :: type1, type2
+        type(Box_Dimensions), intent(in) :: Box
+        class(Hard_Spheres), intent(inout) :: type1, type2
         class(Observables), intent(inout) :: type1_obs, type2_obs
-        class(MixingPotential), intent(in) :: mix
+        class(Mixing_Potential), intent(in) :: mix
         real(DP), intent(inout) :: mix_Epot
         integer, intent(inout) :: switch_Nreject
         
         real(DP) :: random
-        type(particle_index) :: old1, old2
-        type(particle_index) :: new1, new2
+        type(Particle_Index) :: old1, old2
+        type(Particle_Index) :: new1, new2
         logical :: overlap
         real(DP) :: deltaEpot, type1_deltaEpot, type2_deltaEpot
         real(DP) :: type1_mix_deltaEpot, type2_mix_deltaEpot
-        type(particle_energy) :: type1_EpotOld, type1_EpotNew
-        type(particle_energy) :: type2_EpotOld, type2_EpotNew
+        type(Particle_Energy) :: type1_EpotOld, type1_EpotNew
+        type(Particle_Energy) :: type2_EpotOld, type2_EpotNew
         
         if (type1%get_num_particles()==0 .or. type2%get_num_particles()==0) then
             switch_Nreject = switch_Nreject + 1
@@ -376,12 +376,12 @@ contains
     
     subroutine rotate(Box, this, obs)
     
-        type(Box_dimensions), intent(in) :: Box
-        class(DipolarSpheres), intent(inout) :: this
+        type(Box_Dimensions), intent(in) :: Box
+        class(Dipolar_Spheres), intent(inout) :: this
         class(MoreObservables), intent(inout) :: obs
         
         real(DP) :: random
-        type(particle_index) :: old, new
+        type(Particle_Index) :: old, new
         real(DP) :: deltaEpot
         real(DP) :: deltaEpot_real, deltaEpot_self
         real(DP) :: real_EpotNew, real_EpotOld

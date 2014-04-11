@@ -6,7 +6,7 @@ use, intrinsic :: iso_fortran_env, only: error_unit
 use data_precisions, only: DP, real_zero
 use data_box, only: Ndim
 use data_neighbour_cells, only: NnearCell_dim, NnearCell
-use module_types, only: Node, LinkedList
+use module_types, only: Node, Linked_List
 use module_physics_micro, only: index_from_coord, coord_PBC
 
 implicit none
@@ -20,9 +20,9 @@ private
         integer, dimension(Ndim) :: NtotalCell_dim
         integer :: NtotalCell
         integer, dimension(:, :), allocatable, public :: near_among_total
-        type(LinkedList), dimension(:), allocatable, public :: beginCells
-        type(LinkedList), dimension(:), allocatable :: currentCells
-        type(LinkedList), dimension(:), allocatable :: nextCells
+        type(Linked_List), dimension(:), allocatable, public :: beginCells
+        type(Linked_List), dimension(:), allocatable :: currentCells
+        type(Linked_List), dimension(:), allocatable :: nextCells
         
     contains
     

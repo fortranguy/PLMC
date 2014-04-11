@@ -9,10 +9,10 @@ implicit none
 
     ! System Box
     
-    type, public :: Box_dimensions
+    type, public :: Box_Dimensions
         real(DP), dimension(Ndim) :: size
         integer, dimension(Ndim) :: wave
-    end type Box_dimensions
+    end type Box_Dimensions
 
     ! For neighbour cells
 
@@ -21,13 +21,13 @@ implicit none
         type(Node), pointer :: next => null()
     end type Node
 
-    type, public :: LinkedList
+    type, public :: Linked_List
         type(Node), pointer :: particle => null()
-    end type LinkedList
+    end type Linked_List
     
     ! For algorithms
     
-    type, public :: particle_index
+    type, public :: Particle_Index
         integer :: number
         integer :: other_number = 0
         real(DP), dimension(Ndim) :: xCol
@@ -35,30 +35,30 @@ implicit none
         integer :: same_iCell
         integer :: mix_iCell
         logical :: add
-    end type particle_index
+    end type Particle_Index
     
-    type, public :: particle_energy
+    type, public :: Particle_Energy
         real(DP) :: same
         real(DP) :: mix
-    end type particle_energy
+    end type Particle_Energy
 
     ! For main program
 
-    type, public :: argument_random
+    type, public :: Argument_Random
         character(len=1) :: choice
         integer :: size
         integer, dimension(:), allocatable :: seed
-    end type argument_random
+    end type Argument_Random
 
-    type, public :: argument_initial
+    type, public :: Argument_Initial
         character(len=1) :: choice
         character(len=4096), dimension(3) :: files
         integer, dimension(3) :: length
-    end type argument_initial
+    end type Argument_Initial
     
-    type, public :: monteCarlo_arguments
-        type(argument_random) :: random
-        type(argument_initial) :: initial
-    end type monteCarlo_arguments
+    type, public :: Monte_Carlo_Arguments
+        type(Argument_Random) :: random
+        type(Argument_Initial) :: initial
+    end type Monte_Carlo_Arguments
 
 end module module_types

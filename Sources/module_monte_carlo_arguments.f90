@@ -3,7 +3,7 @@
 module module_monte_carlo_arguments
 
 use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
-use module_types, only: argument_random, argument_initial, monteCarlo_arguments
+use module_types, only: argument_random, Argument_Initial, Monte_Carlo_Arguments
 
 implicit none
 
@@ -36,7 +36,7 @@ contains
     subroutine read_init_files(iArg, arg_init)
 
         integer, intent(inout) :: iArg
-        type(argument_initial), intent(inout) :: arg_init
+        type(Argument_Initial), intent(inout) :: arg_init
 
         character(len=4096) :: file
         integer :: iFile, length, status
@@ -91,7 +91,7 @@ contains
 
     subroutine read_arguments(args)
     
-        type(monteCarlo_arguments), intent(out) :: args
+        type(Monte_Carlo_Arguments), intent(out) :: args
 
         character(len=4096) :: argument, sub_argument
         integer :: iArg, length, status

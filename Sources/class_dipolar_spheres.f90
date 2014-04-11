@@ -1,4 +1,4 @@
-!> \brief Description of the DipolarSpheres class
+!> \brief Description of the Dipolar_Spheres class
 
 module class_dipolar_spheres
 
@@ -12,7 +12,7 @@ use data_monte_carlo, only: dipol_move_delta, dipol_move_rejectFix, dipol_rotate
 use data_potential, only: dipol_rMin_factor, dipol_real_rCut_factor, dipol_real_dr, dipol_alpha_factor
 use data_neighbour_cells, only: NnearCell
 use data_distribution, only: snap_ratio
-use module_types, only: Box_dimensions, particle_index
+use module_types, only: Box_Dimensions, Particle_Index
 use module_physics_micro, only: set_discrete_length, distVec_PBC, Box_wave1_sym, Box_wave2_sym, &
                                 fourier_i, exchange_sign
 use class_neighbour_cells
@@ -23,14 +23,14 @@ implicit none
 
 private
 
-    type, extends(HardSpheres), public :: DipolarSpheres
+    type, extends(Hard_Spheres), public :: Dipolar_Spheres
 
         private
         
         ! Particles
         real(DP), dimension(:, :), allocatable, public :: orientations !< dipolar orientations
                                                                        !< of all particles
-        type(Small_rotation) :: rotation
+        type(Small_Rotation) :: rotation
         ! Potential
         real(DP) :: real_rCut !< real space potential cut
         real(DP) :: real_dr !< discretisation step
@@ -46,90 +46,90 @@ private
     contains
 
         !> Construction and destruction of the class
-        procedure, private :: set_particles => DipolarSpheres_set_particles
-        procedure, private :: set_changes => DipolarSpheres_set_changes
-        procedure :: construct => DipolarSpheres_construct
-        procedure :: destroy => DipolarSpheres_destroy
+        procedure, private :: set_particles => Dipolar_Spheres_set_particles
+        procedure, private :: set_changes => Dipolar_Spheres_set_changes
+        procedure :: construct => Dipolar_Spheres_construct
+        procedure :: destroy => Dipolar_Spheres_destroy
         
-        procedure :: get_rotation_delta => DipolarSpheres_get_rotation_delta
-        procedure :: adapt_rotation_delta => DipolarSpheres_adapt_rotation_delta
-        procedure :: set_rotation_delta => DipolarSpheres_set_rotation_delta
+        procedure :: get_rotation_delta => Dipolar_Spheres_get_rotation_delta
+        procedure :: adapt_rotation_delta => Dipolar_Spheres_adapt_rotation_delta
+        procedure :: set_rotation_delta => Dipolar_Spheres_set_rotation_delta
         
         !> Write a report of the component in a file
-        procedure :: write_report => DipolarSpheres_write_report
+        procedure :: write_report => Dipolar_Spheres_write_report
         
         !> Take a snap shot of the configuration: orientations
-        procedure :: snap_orientations => DipolarSpheres_snap_orientations
+        procedure :: snap_orientations => Dipolar_Spheres_snap_orientations
 
-        procedure :: Epot_set_alpha => DipolarSpheres_Epot_set_alpha
+        procedure :: Epot_set_alpha => Dipolar_Spheres_Epot_set_alpha
         
         !> Potential energy
         !>     Real
-        procedure, private :: Epot_real_true => DipolarSpheres_Epot_real_true
-        procedure, private :: set_Epot_real_parameters => DipolarSpheres_set_Epot_real_parameters
-        procedure, private :: set_Epot_real_tab => DipolarSpheres_set_Epot_real_tab
-        procedure, private :: set_Epot_real => DipolarSpheres_set_Epot_real
-        procedure :: write_Epot_real => DipolarSpheres_write_Epot_real
-        procedure, private :: Epot_real_interpol => DipolarSpheres_Epot_real_interpol
-        procedure, private :: Epot_real_pair => DipolarSpheres_Epot_real_pair
-        procedure :: Epot_real_solo => DipolarSpheres_Epot_real_solo
-        procedure, private :: Epot_real => DipolarSpheres_Epot_real
+        procedure, private :: Epot_real_true => Dipolar_Spheres_Epot_real_true
+        procedure, private :: set_Epot_real_parameters => Dipolar_Spheres_set_Epot_real_parameters
+        procedure, private :: set_Epot_real_tab => Dipolar_Spheres_set_Epot_real_tab
+        procedure, private :: set_Epot_real => Dipolar_Spheres_set_Epot_real
+        procedure :: write_Epot_real => Dipolar_Spheres_write_Epot_real
+        procedure, private :: Epot_real_interpol => Dipolar_Spheres_Epot_real_interpol
+        procedure, private :: Epot_real_pair => Dipolar_Spheres_Epot_real_pair
+        procedure :: Epot_real_solo => Dipolar_Spheres_Epot_real_solo
+        procedure, private :: Epot_real => Dipolar_Spheres_Epot_real
         !>     Reciprocal: init
-        procedure, private :: set_Epot_reci_weight => DipolarSpheres_set_Epot_reci_weight
-        procedure, private :: set_Epot_reci_structure => DipolarSpheres_set_Epot_reci_structure
-        procedure, private :: set_Epot_reci => DipolarSpheres_set_Epot_reci
+        procedure, private :: set_Epot_reci_weight => Dipolar_Spheres_set_Epot_reci_weight
+        procedure, private :: set_Epot_reci_structure => Dipolar_Spheres_set_Epot_reci_structure
+        procedure, private :: set_Epot_reci => Dipolar_Spheres_set_Epot_reci
         procedure, private :: Epot_reci_get_structure_modulus => &
-                              DipolarSpheres_Epot_reci_get_structure_modulus
-        procedure :: reset_Epot_reci_structure => DipolarSpheres_reset_Epot_reci_structure
-        procedure :: Epot_reci_count_waveVectors => DipolarSpheres_Epot_reci_count_waveVectors
+                              Dipolar_Spheres_Epot_reci_get_structure_modulus
+        procedure :: reset_Epot_reci_structure => Dipolar_Spheres_reset_Epot_reci_structure
+        procedure :: Epot_reci_count_waveVectors => Dipolar_Spheres_Epot_reci_count_waveVectors
         !>     Reciprocal: delta
-        procedure :: deltaEpot_reci_move => DipolarSpheres_deltaEpot_reci_move
+        procedure :: deltaEpot_reci_move => Dipolar_Spheres_deltaEpot_reci_move
         procedure :: reci_update_structure_move => &
-                              DipolarSpheres_reci_update_structure_move
-        procedure :: deltaEpot_reci_rotate => DipolarSpheres_deltaEpot_reci_rotate
+                              Dipolar_Spheres_reci_update_structure_move
+        procedure :: deltaEpot_reci_rotate => Dipolar_Spheres_deltaEpot_reci_rotate
         procedure :: reci_update_structure_rotate => &
-                              DipolarSpheres_reci_update_structure_rotate
-        procedure :: deltaEpot_reci_exchange => DipolarSpheres_deltaEpot_reci_exchange
+                              Dipolar_Spheres_reci_update_structure_rotate
+        procedure :: deltaEpot_reci_exchange => Dipolar_Spheres_deltaEpot_reci_exchange
         !>     Reciprocal: total
-        procedure, private :: Epot_reci => DipolarSpheres_Epot_reci
+        procedure, private :: Epot_reci => Dipolar_Spheres_Epot_reci
         !>     Self
-        procedure :: Epot_self_solo => DipolarSpheres_Epot_self_solo
-        procedure, private :: Epot_self => DipolarSpheres_Epot_self
+        procedure :: Epot_self_solo => Dipolar_Spheres_Epot_self_solo
+        procedure, private :: Epot_self => Dipolar_Spheres_Epot_self
         !>     Total moment
-        procedure, private :: set_totalMoment => DipolarSpheres_set_totalMoment
-        procedure :: reset_totalMoment => DipolarSpheres_reset_totalMoment
-        procedure :: update_totalMoment_rotate => DipolarSpheres_update_totalMoment_rotate
+        procedure, private :: set_totalMoment => Dipolar_Spheres_set_totalMoment
+        procedure :: reset_totalMoment => Dipolar_Spheres_reset_totalMoment
+        procedure :: update_totalMoment_rotate => Dipolar_Spheres_update_totalMoment_rotate
         !>     Boundary conditions
-        procedure :: deltaEpot_bound_rotate => DipolarSpheres_deltaEpot_bound_rotate
-        procedure :: deltaEpot_bound_exchange => DipolarSpheres_deltaEpot_bound_exchange
-        procedure, private :: Epot_bound => DipolarSpheres_Epot_bound
+        procedure :: deltaEpot_bound_rotate => Dipolar_Spheres_deltaEpot_bound_rotate
+        procedure :: deltaEpot_bound_exchange => Dipolar_Spheres_deltaEpot_bound_exchange
+        procedure, private :: Epot_bound => Dipolar_Spheres_Epot_bound
         !>     Total
-        procedure :: set_Epot => DipolarSpheres_set_Epot
-        procedure :: Epot_conf => DipolarSpheres_Epot_conf
+        procedure :: set_Epot => Dipolar_Spheres_set_Epot
+        procedure :: Epot_conf => Dipolar_Spheres_Epot_conf
         
-    end type DipolarSpheres
+    end type Dipolar_Spheres
     
 contains
 
-    pure subroutine DipolarSpheres_set_particles(this)
-        class(DipolarSpheres), intent(inout) :: this
+    pure subroutine Dipolar_Spheres_set_particles(this)
+        class(Dipolar_Spheres), intent(inout) :: this
         
         this%diameter = 1._DP ! = u_length
         this%num_particles = dipol_num_particles
         allocate(this%all_positions(Ndim, this%num_particles))
         allocate(this%orientations(Ndim, this%num_particles))
-    end subroutine DipolarSpheres_set_particles
+    end subroutine Dipolar_Spheres_set_particles
     
-    pure subroutine DipolarSpheres_set_changes(this)
-        class(DipolarSpheres), intent(inout) :: this
+    pure subroutine Dipolar_Spheres_set_changes(this)
+        class(Dipolar_Spheres), intent(inout) :: this
         
         call this%move%init(dipol_move_delta, dipol_move_rejectFix)
         call this%rotation%init(dipol_rotate_delta, dipol_rotate_deltaMax, dipol_rotate_rejectFix)
-    end subroutine DipolarSpheres_set_changes
+    end subroutine Dipolar_Spheres_set_changes
 
-    subroutine DipolarSpheres_construct(this)
+    subroutine Dipolar_Spheres_construct(this)
     
-        class(DipolarSpheres), intent(out) :: this
+        class(Dipolar_Spheres), intent(out) :: this
         
         this%name = "dipol"
         write(output_unit, *) this%name, " class construction"
@@ -140,60 +140,60 @@ contains
         this%snap_factor = this%num_particles/snap_ratio
         if (this%snap_factor == 0) this%snap_factor = 1
     
-    end subroutine DipolarSpheres_construct
+    end subroutine Dipolar_Spheres_construct
     
-    subroutine DipolarSpheres_destroy(this)    
-        class(DipolarSpheres), intent(inout) :: this
+    subroutine Dipolar_Spheres_destroy(this)    
+        class(Dipolar_Spheres), intent(inout) :: this
         
-        call this%HardSpheres%destroy()
+        call this%Hard_Spheres%destroy()
         if (allocated(this%orientations)) deallocate(this%orientations)
         if (allocated(this%Epot_real_tab)) deallocate(this%Epot_real_tab)
         if (allocated(this%Epot_reci_weight)) deallocate(this%Epot_reci_weight)
         if (allocated(this%Epot_reci_structure)) deallocate(this%Epot_reci_structure)    
-    end subroutine DipolarSpheres_destroy
+    end subroutine Dipolar_Spheres_destroy
     
-    pure function DipolarSpheres_get_rotation_delta(this) result(get_rotation_delta)
-        class(DipolarSpheres), intent(in) :: this
+    pure function Dipolar_Spheres_get_rotation_delta(this) result(get_rotation_delta)
+        class(Dipolar_Spheres), intent(in) :: this
         real(DP) :: get_rotation_delta
         
         get_rotation_delta = this%rotation%delta
-    end function DipolarSpheres_get_rotation_delta    
+    end function Dipolar_Spheres_get_rotation_delta    
     
-    subroutine DipolarSpheres_adapt_rotation_delta(this, reject)
-        class(DipolarSpheres), intent(inout) :: this
+    subroutine Dipolar_Spheres_adapt_rotation_delta(this, reject)
+        class(Dipolar_Spheres), intent(inout) :: this
         real(DP), intent(in) :: reject        
     
         call this%rotation%adapt_delta(reject)
-    end subroutine DipolarSpheres_adapt_rotation_delta
+    end subroutine Dipolar_Spheres_adapt_rotation_delta
     
-    subroutine DipolarSpheres_set_rotation_delta(this, reject, report_unit)
-        class(DipolarSpheres), intent(inout) :: this
+    subroutine Dipolar_Spheres_set_rotation_delta(this, reject, report_unit)
+        class(Dipolar_Spheres), intent(inout) :: this
         real(DP), intent(in) :: reject
         integer, intent(in) :: report_unit
         
         call this%rotation%set_delta(this%name, reject, report_unit)
-    end subroutine DipolarSpheres_set_rotation_delta
+    end subroutine Dipolar_Spheres_set_rotation_delta
     
     !> Report
     
-    subroutine DipolarSpheres_write_report(this, report_unit)
+    subroutine Dipolar_Spheres_write_report(this, report_unit)
     
-        class(DipolarSpheres), intent(in) :: this
+        class(Dipolar_Spheres), intent(in) :: this
         integer, intent(in) :: report_unit
         
-        call this%HardSpheres%write_report(report_unit)
+        call this%Hard_Spheres%write_report(report_unit)
 
         write(report_unit, *) "    alpha = ", this%alpha
         write(report_unit, *) "    dr = ", this%real_dr
         write(report_unit, *) "    NwaveVectors = ", this%NwaveVectors
         
-    end subroutine DipolarSpheres_write_report
+    end subroutine Dipolar_Spheres_write_report
     
     !> Configuration state: orientations
       
-    subroutine DipolarSpheres_snap_orientations(this, iStep, snap_unit)
+    subroutine Dipolar_Spheres_snap_orientations(this, iStep, snap_unit)
         
-        class(DipolarSpheres), intent(in) :: this
+        class(Dipolar_Spheres), intent(in) :: this
         integer, intent(in) :: iStep
         integer, intent(in) :: snap_unit
     
@@ -205,16 +205,16 @@ contains
             end do
         end if
 
-    end subroutine DipolarSpheres_snap_orientations
+    end subroutine Dipolar_Spheres_snap_orientations
     
     !> Accessors
 
-    subroutine DipolarSpheres_Epot_set_alpha(this, Box_size)
-        class(DipolarSpheres), intent(inout) :: this
+    subroutine Dipolar_Spheres_Epot_set_alpha(this, Box_size)
+        class(Dipolar_Spheres), intent(inout) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         
         this%alpha = dipol_alpha_factor / Box_size(1)
-    end subroutine DipolarSpheres_Epot_set_alpha
+    end subroutine Dipolar_Spheres_Epot_set_alpha
 
     ! Real: short-range interaction ---------------------------------------------------------------
 
@@ -224,9 +224,9 @@ contains
     !>            2\frac{\alpha}{\sqrt{\pi}}\left(2\alpha^2 + \frac{3}{r^2}\right)
     !>                                     \frac{e^{-\alpha^2 r^2}}{r^2} \f]
 
-    pure function DipolarSpheres_Epot_real_true(this, r) result(Epot_real_true)
+    pure function Dipolar_Spheres_Epot_real_true(this, r) result(Epot_real_true)
 
-        class(DipolarSpheres), intent(in) :: this
+        class(Dipolar_Spheres), intent(in) :: this
         real(DP), intent(in) :: r
         real(DP), dimension(2) :: Epot_real_true
 
@@ -240,13 +240,13 @@ contains
                             2._DP*alpha/sqrt(PI) * (2._DP*alpha**2+3._DP/r**2) * &
                             exp(-alpha**2*r**2) / r**2
 
-    end function DipolarSpheres_Epot_real_true
+    end function Dipolar_Spheres_Epot_real_true
     
     !> Initialisation: look-up (tabulation) table
     
-    pure subroutine DipolarSpheres_set_Epot_real_tab(this)
+    pure subroutine Dipolar_Spheres_set_Epot_real_tab(this)
     
-        class(DipolarSpheres), intent(inout) :: this
+        class(Dipolar_Spheres), intent(inout) :: this
 
         integer :: i
         real(DP) :: r_i
@@ -264,13 +264,13 @@ contains
         this%Epot_real_tab(:, 1) = this%Epot_real_tab(:, 1) - this%Epot_real_tab(this%real_iCut, 1)
         this%Epot_real_tab(:, 2) = this%Epot_real_tab(:, 2) - this%Epot_real_tab(this%real_iCut, 2)
 
-    end subroutine DipolarSpheres_set_Epot_real_tab
+    end subroutine Dipolar_Spheres_set_Epot_real_tab
     
     !> Initialisation
     
-    subroutine DipolarSpheres_set_Epot_real_parameters(this, Box_size)
+    subroutine Dipolar_Spheres_set_Epot_real_parameters(this, Box_size)
         
-        class(DipolarSpheres), intent(inout) :: this
+        class(Dipolar_Spheres), intent(inout) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         
         this%real_rCut = dipol_real_rCut_factor * Box_size(1)
@@ -278,11 +278,11 @@ contains
         call set_discrete_length(this%rMin, this%real_dr)
         this%real_iMin = int(this%rMin/this%real_dr)
         this%real_iCut = int(this%real_rCut/this%real_dr) + 1
-    end subroutine DipolarSpheres_set_Epot_real_parameters
+    end subroutine Dipolar_Spheres_set_Epot_real_parameters
     
-    subroutine DipolarSpheres_set_Epot_real(this, Box_size)
+    subroutine Dipolar_Spheres_set_Epot_real(this, Box_size)
     
-        class(DipolarSpheres), intent(inout) :: this
+        class(Dipolar_Spheres), intent(inout) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         
         call this%set_Epot_real_parameters(Box_size)
@@ -292,13 +292,13 @@ contains
         
         call this%set_Epot_real_tab()
     
-    end subroutine DipolarSpheres_set_Epot_real
+    end subroutine Dipolar_Spheres_set_Epot_real
 
     !> Write the tabulated values
     
-    subroutine DipolarSpheres_write_Epot_real(this, Epot_unit)
+    subroutine Dipolar_Spheres_write_Epot_real(this, Epot_unit)
 
-        class(DipolarSpheres), intent(in) :: this
+        class(Dipolar_Spheres), intent(in) :: this
         integer, intent(in) :: Epot_unit
 
         integer :: i
@@ -309,13 +309,13 @@ contains
             write(Epot_unit, *) r_i, this%Epot_real_tab(i, :)
         end do
 
-    end subroutine DipolarSpheres_write_Epot_real
+    end subroutine Dipolar_Spheres_write_Epot_real
     
     !> Linear interpolation
 
-    pure function DipolarSpheres_Epot_real_interpol(this, r) result(Epot_real_interpol)
+    pure function Dipolar_Spheres_Epot_real_interpol(this, r) result(Epot_real_interpol)
         
-        class(DipolarSpheres), intent(in) :: this
+        class(Dipolar_Spheres), intent(in) :: this
         real(DP), intent(in) :: r
         real(DP), dimension(2) :: Epot_real_interpol
         
@@ -331,16 +331,16 @@ contains
             Epot_real_interpol(:) = 0._DP
         end if
         
-    end function DipolarSpheres_Epot_real_interpol
+    end function Dipolar_Spheres_Epot_real_interpol
 
     !> Between 2 particles
     !> \f[ (\vec{\mu}_i\cdot\vec{\mu}_j) B(r_{ij}) -
     !>     (\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij}) C(r_{ij}) \f]
     
-    pure function DipolarSpheres_Epot_real_pair(this, mCol_i, mCol_j, rVec_ij, r_ij) &
+    pure function Dipolar_Spheres_Epot_real_pair(this, mCol_i, mCol_j, rVec_ij, r_ij) &
                   result(Epot_real_pair)
     
-        class(DipolarSpheres), intent(in) :: this
+        class(Dipolar_Spheres), intent(in) :: this
         real(DP), dimension(:), intent(in) :: mCol_i, mCol_j
         real(DP), dimension(:), intent(in) :: rVec_ij
         real(DP), intent(in) :: r_ij
@@ -353,15 +353,15 @@ contains
         
         Epot_real_pair = dot_product(Epot_coeff, this%Epot_real_interpol(r_ij))
     
-    end function DipolarSpheres_Epot_real_pair
+    end function Dipolar_Spheres_Epot_real_pair
     
     !> Energy of 1 dipole with others
     
-    pure function DipolarSpheres_Epot_real_solo(this, Box_size, particle) result(Epot_real_solo)
+    pure function Dipolar_Spheres_Epot_real_solo(this, Box_size, particle) result(Epot_real_solo)
 
-        class(DipolarSpheres), intent(in) :: this
+        class(Dipolar_Spheres), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
-        type(particle_index), intent(in) :: particle
+        type(Particle_Index), intent(in) :: particle
         real(DP) :: Epot_real_solo
 
         integer :: j_particle
@@ -387,18 +387,18 @@ contains
             end if
         end do
         
-    end function DipolarSpheres_Epot_real_solo
+    end function Dipolar_Spheres_Epot_real_solo
     
     !> Total real energy
     
-    pure function DipolarSpheres_Epot_real(this, Box_size) result(Epot_real)
+    pure function Dipolar_Spheres_Epot_real(this, Box_size) result(Epot_real)
     
-        class(DipolarSpheres), intent(in) :: this
+        class(Dipolar_Spheres), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         real(DP) :: Epot_real
         
         integer :: i_particle
-        type(particle_index) :: particle
+        type(Particle_Index) :: particle
     
         Epot_real = 0._DP
         
@@ -411,7 +411,7 @@ contains
 
         Epot_real = Epot_real/2._DP
     
-    end function DipolarSpheres_Epot_real
+    end function Dipolar_Spheres_Epot_real
 
     ! Reciprocal: long-range interaction ----------------------------------------------------------
     
@@ -420,10 +420,10 @@ contains
     !>                                {\sum_{d=1}^3 \frac{k_d^2}{L_d}}
     !> \f]
     
-    pure subroutine DipolarSpheres_set_Epot_reci_weight(this, Box)
+    pure subroutine Dipolar_Spheres_set_Epot_reci_weight(this, Box)
         
-        class(DipolarSpheres), intent(inout) :: this
-        type(Box_dimensions), intent(in) :: Box
+        class(Dipolar_Spheres), intent(inout) :: this
+        type(Box_Dimensions), intent(in) :: Box
         
         integer :: kx, ky, kz
         real(DP), dimension(Ndim) :: waveVector
@@ -451,7 +451,7 @@ contains
         
         end do
         
-    end subroutine DipolarSpheres_set_Epot_reci_weight
+    end subroutine Dipolar_Spheres_set_Epot_reci_weight
     
     !> Structure factor init :
     !> \f[
@@ -463,10 +463,10 @@ contains
     !>                                 e^{+i\vec{k}\cdot\vec{x}_i}
     !> \f].
 
-    pure subroutine DipolarSpheres_set_Epot_reci_structure(this, Box)
+    pure subroutine Dipolar_Spheres_set_Epot_reci_structure(this, Box)
 
-        class(DipolarSpheres), intent(inout) :: this
-        type(Box_dimensions), intent(in) :: Box
+        class(Dipolar_Spheres), intent(inout) :: this
+        type(Box_Dimensions), intent(in) :: Box
 
         complex(DP) :: exp_IkxCol
         complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_1
@@ -513,12 +513,12 @@ contains
             
         end do
 
-    end subroutine DipolarSpheres_set_Epot_reci_structure
+    end subroutine Dipolar_Spheres_set_Epot_reci_structure
     
-    pure subroutine DipolarSpheres_set_Epot_reci(this, Box)
+    pure subroutine Dipolar_Spheres_set_Epot_reci(this, Box)
         
-        class(DipolarSpheres), intent(inout) :: this
-        type(Box_dimensions), intent(in) :: Box
+        class(Dipolar_Spheres), intent(inout) :: this
+        type(Box_Dimensions), intent(in) :: Box
         
         if (allocated(this%Epot_reci_weight)) deallocate(this%Epot_reci_weight)
         allocate(this%Epot_reci_weight(-Box%wave(1):Box%wave(1), -Box%wave(2):Box%wave(2), &
@@ -531,14 +531,14 @@ contains
         call this%set_Epot_reci_weight(Box)
         call this%set_Epot_reci_structure(Box)
     
-    end subroutine DipolarSpheres_set_Epot_reci
+    end subroutine Dipolar_Spheres_set_Epot_reci
     
     !> To calculate the drift of the strucutre factor
 
-    pure function DipolarSpheres_Epot_reci_get_structure_modulus(this, Box_wave) &
+    pure function Dipolar_Spheres_Epot_reci_get_structure_modulus(this, Box_wave) &
                   result(Epot_reci_get_structure_modulus)
 
-        class(DipolarSpheres), intent(in) :: this
+        class(Dipolar_Spheres), intent(in) :: this
         integer, dimension(:), intent(in) :: Box_wave
         real(DP) :: Epot_reci_get_structure_modulus
 
@@ -555,14 +555,14 @@ contains
             end do
         end do
 
-    end function DipolarSpheres_Epot_reci_get_structure_modulus
+    end function Dipolar_Spheres_Epot_reci_get_structure_modulus
     
     !> Reinitialise the structure factor and write the drift
     
-    subroutine DipolarSpheres_reset_Epot_reci_structure(this, Box, iStep, modulus_unit)
+    subroutine Dipolar_Spheres_reset_Epot_reci_structure(this, Box, iStep, modulus_unit)
     
-        class(DipolarSpheres), intent(inout) :: this
-        type(Box_dimensions), intent(in) :: Box
+        class(Dipolar_Spheres), intent(inout) :: this
+        type(Box_Dimensions), intent(in) :: Box
         integer, intent(in) :: iStep
         integer, intent(in) :: modulus_unit
 
@@ -574,13 +574,13 @@ contains
         
         write(modulus_unit, *) iStep, abs(modulus_reInit - modulus_drifted)
     
-    end subroutine DipolarSpheres_reset_Epot_reci_structure
+    end subroutine Dipolar_Spheres_reset_Epot_reci_structure
 
     ! Count the number of wave vectors
 
-    subroutine DipolarSpheres_Epot_reci_count_waveVectors(this, Box_wave, waveVectors_unit)
+    subroutine Dipolar_Spheres_Epot_reci_count_waveVectors(this, Box_wave, waveVectors_unit)
 
-        class(DipolarSpheres), intent(inout) :: this
+        class(Dipolar_Spheres), intent(inout) :: this
         integer, dimension(:), intent(in) :: Box_wave
         integer, intent(in) :: waveVectors_unit
         
@@ -604,7 +604,7 @@ contains
             end do
         end do
 
-    end subroutine DipolarSpheres_Epot_reci_count_waveVectors
+    end subroutine Dipolar_Spheres_Epot_reci_count_waveVectors
 
     !> Move
 
@@ -618,12 +618,12 @@ contains
     !>               ]
     !> \f]
 
-    pure function DipolarSpheres_deltaEpot_reci_move(this, Box, old, new) &
+    pure function Dipolar_Spheres_deltaEpot_reci_move(this, Box, old, new) &
                   result(deltaEpot_reci_move)
 
-        class(DipolarSpheres), intent(in) :: this
-        type(Box_dimensions), intent(in) :: Box
-        type(particle_index), intent(in) :: old, new
+        class(Dipolar_Spheres), intent(in) :: this
+        type(Box_Dimensions), intent(in) :: Box
+        type(Particle_Index), intent(in) :: old, new
         real(DP) :: deltaEpot_reci_move
         
         real(DP), dimension(Ndim) :: xNewOverL, xOldOverL
@@ -688,7 +688,7 @@ contains
 
         deltaEpot_reci_move = 4._DP*PI/product(Box%size) * deltaEpot_reci_move
 
-    end function DipolarSpheres_deltaEpot_reci_move
+    end function Dipolar_Spheres_deltaEpot_reci_move
 
     !> Update position -> update the ``structure factor''
     !>  \f[
@@ -697,11 +697,11 @@ contains
     !>  \f]
     !>
 
-    pure subroutine DipolarSpheres_reci_update_structure_move(this, Box, old, new)
+    pure subroutine Dipolar_Spheres_reci_update_structure_move(this, Box, old, new)
 
-        class(DipolarSpheres), intent(inout) :: this
-        type(Box_dimensions), intent(in) :: Box
-        type(particle_index), intent(in) :: old, new
+        class(Dipolar_Spheres), intent(inout) :: this
+        type(Box_Dimensions), intent(in) :: Box
+        type(Particle_Index), intent(in) :: old, new
         
         real(DP), dimension(Ndim) :: xNewOverL, xOldOverL
         real(DP), dimension(Ndim) :: mColOverL
@@ -754,7 +754,7 @@ contains
             
         end do
 
-    end subroutine DipolarSpheres_reci_update_structure_move
+    end subroutine Dipolar_Spheres_reci_update_structure_move
     
     !> Rotate
 
@@ -768,12 +768,12 @@ contains
     !>               \}
     !> \f]
     
-    pure function DipolarSpheres_deltaEpot_reci_rotate(this, Box, old, new) &
+    pure function Dipolar_Spheres_deltaEpot_reci_rotate(this, Box, old, new) &
                   result(deltaEpot_reci_rotate)
 
-        class(DipolarSpheres), intent(in) :: this
-        type(Box_dimensions), intent(in) :: Box
-        type(particle_index), intent(in) :: old, new
+        class(Dipolar_Spheres), intent(in) :: this
+        type(Box_Dimensions), intent(in) :: Box
+        type(Particle_Index), intent(in) :: old, new
         real(DP) :: deltaEpot_reci_rotate
 
         real(DP), dimension(Ndim) :: xColOverL
@@ -828,7 +828,7 @@ contains
 
         deltaEpot_reci_rotate = 4._DP*PI/product(Box%size) * deltaEpot_reci_rotate
 
-    end function DipolarSpheres_deltaEpot_reci_rotate
+    end function Dipolar_Spheres_deltaEpot_reci_rotate
 
     !> Update moment -> update the ``structure factor''
     !>  \f[
@@ -837,11 +837,11 @@ contains
     !>  \f]
     !>
 
-    pure subroutine DipolarSpheres_reci_update_structure_rotate(this, Box, old, new)
+    pure subroutine Dipolar_Spheres_reci_update_structure_rotate(this, Box, old, new)
 
-        class(DipolarSpheres), intent(inout) :: this
-        type(Box_dimensions), intent(in) :: Box
-        type(particle_index), intent(in) :: old, new
+        class(Dipolar_Spheres), intent(inout) :: this
+        type(Box_Dimensions), intent(in) :: Box
+        type(Particle_Index), intent(in) :: old, new
 
         real(DP), dimension(Ndim) :: xColOverL
         real(DP), dimension(Ndim) :: mNewOverL, mOldOverL
@@ -884,7 +884,7 @@ contains
             
         end do
 
-    end subroutine DipolarSpheres_reci_update_structure_rotate
+    end subroutine Dipolar_Spheres_reci_update_structure_rotate
 
     !> Energy of 1 dipole with others
     
@@ -901,12 +901,12 @@ contains
     
     !> Summary: only the sign of \f$\vec{\mu}\f$ changes.
 
-    pure function DipolarSpheres_deltaEpot_reci_exchange(this, Box, particle) &
+    pure function Dipolar_Spheres_deltaEpot_reci_exchange(this, Box, particle) &
                   result(deltaEpot_reci_exchange)
 
-        class(DipolarSpheres), intent(in) :: this
-        type(Box_dimensions), intent(in) :: Box
-        type(particle_index), intent(in) :: particle
+        class(Dipolar_Spheres), intent(in) :: this
+        type(Box_Dimensions), intent(in) :: Box
+        type(Particle_Index), intent(in) :: particle
         real(DP) :: deltaEpot_reci_exchange
         
         real(DP), dimension(Ndim) :: xColOverL
@@ -958,14 +958,14 @@ contains
         
         deltaEpot_reci_exchange = 4._DP*PI/product(Box%size) * deltaEpot_reci_exchange
 
-    end function DipolarSpheres_deltaEpot_reci_exchange
+    end function Dipolar_Spheres_deltaEpot_reci_exchange
     
     !> Total reciprocal energy
     
-    pure function DipolarSpheres_Epot_reci(this, Box) result(Epot_reci)
+    pure function Dipolar_Spheres_Epot_reci(this, Box) result(Epot_reci)
         
-        class(DipolarSpheres), intent(in) :: this
-        type(Box_dimensions), intent(in) :: Box
+        class(Dipolar_Spheres), intent(in) :: this
+        type(Box_Dimensions), intent(in) :: Box
         real(DP) :: Epot_reci
 
         integer :: kx, ky, kz
@@ -984,29 +984,29 @@ contains
         
         Epot_reci = 2._DP*PI/product(Box%size) * Epot_reci
         
-    end function DipolarSpheres_Epot_reci
+    end function Dipolar_Spheres_Epot_reci
     
     ! Self: correction ----------------------------------------------------------------------------
     
     !> Self energy of 1 dipole
     !> \f[ \frac{2}{3}\frac{\alpha^3}{\sqrt{\pi}} \vec{\mu}_i\cdot\vec{\mu}_i \f]
     
-    pure function DipolarSpheres_Epot_self_solo(this, mCol) result(Epot_self_solo)
+    pure function Dipolar_Spheres_Epot_self_solo(this, mCol) result(Epot_self_solo)
     
-        class(DipolarSpheres), intent(in) :: this
+        class(Dipolar_Spheres), intent(in) :: this
         real(DP), dimension(:), intent(in) :: mCol
         real(DP) :: Epot_self_solo
         
         Epot_self_solo = 2._DP/3._DP * this%alpha**3/sqrt(PI) * dot_product(mCol, mCol)
     
-    end function DipolarSpheres_Epot_self_solo
+    end function Dipolar_Spheres_Epot_self_solo
     
     !> Total self energy
     !> \f[ \frac{2}{3}\frac{\alpha^3}{\sqrt{\pi}} \sum_i \vec{\mu}_i\cdot\vec{\mu}_i \f]
     
-    pure function DipolarSpheres_Epot_self(this) result(Epot_self)
+    pure function Dipolar_Spheres_Epot_self(this) result(Epot_self)
     
-        class(DipolarSpheres), intent(in) :: this
+        class(Dipolar_Spheres), intent(in) :: this
         real(DP) :: Epot_self
 
         integer :: i_particle
@@ -1016,7 +1016,7 @@ contains
             Epot_self = Epot_self + this%Epot_self_solo(this%orientations(:, i_particle))
         end do
         
-    end function DipolarSpheres_Epot_self
+    end function Dipolar_Spheres_Epot_self
 
     ! Total moment ---------------------------------------------------------------------------------
 
@@ -1024,20 +1024,20 @@ contains
     !> \f[ \vec{M} = \sum_j \vec{\mu}_j \f]
     !> \f[ \vec{M}_\underline{l} = \sum_{j \neq l} \vec{\mu}_j \f]
     
-    pure subroutine DipolarSpheres_set_totalMoment(this)
-        class(DipolarSpheres), intent(inout) :: this
+    pure subroutine Dipolar_Spheres_set_totalMoment(this)
+        class(Dipolar_Spheres), intent(inout) :: this
         integer :: i_particle
         this%totalMoment(:) = 0._DP
         do i_particle = 1, this%num_particles
             this%totalMoment(:) = this%totalMoment(:) + this%orientations(:, i_particle)
         end do
-    end subroutine DipolarSpheres_set_totalMoment
+    end subroutine Dipolar_Spheres_set_totalMoment
 
     !> Reinitialise the total moment factor and write the drift
 
-    subroutine DipolarSpheres_reset_totalMoment(this, iStep, modulus_unit)
+    subroutine Dipolar_Spheres_reset_totalMoment(this, iStep, modulus_unit)
 
-        class(DipolarSpheres), intent(inout) :: this
+        class(Dipolar_Spheres), intent(inout) :: this
         integer, intent(in) :: iStep
         integer, intent(in) :: modulus_unit
 
@@ -1049,7 +1049,7 @@ contains
 
         write(modulus_unit, *) iStep, abs(modulus_reInit - modulus_drifted)
 
-    end subroutine DipolarSpheres_reset_totalMoment
+    end subroutine Dipolar_Spheres_reset_totalMoment
 
     !> Rotation
 
@@ -1058,14 +1058,14 @@ contains
     !>      \Delta \vec{M} = \vec{\mu}^\prime_l - \vec{\mu}_l
     !> \f]
 
-    pure subroutine DipolarSpheres_update_totalMoment_rotate(this, mOld, mNew)
+    pure subroutine Dipolar_Spheres_update_totalMoment_rotate(this, mOld, mNew)
 
-        class(DipolarSpheres), intent(inout) :: this
+        class(Dipolar_Spheres), intent(inout) :: this
         real(DP), dimension(:), intent(in) :: mOld, mNew
 
         this%totalMoment(:) = this%totalMoment(:) + mNew(:) - mOld(:)
 
-    end subroutine DipolarSpheres_update_totalMoment_rotate
+    end subroutine Dipolar_Spheres_update_totalMoment_rotate
 
     ! Boundary conditions: shape-dependent -------------------------------------------------------
     
@@ -1087,10 +1087,10 @@ contains
     !>                                      ]
     !> \f]
     
-    pure function DipolarSpheres_deltaEpot_bound_exchange(this, Box_size, mCol) &
+    pure function Dipolar_Spheres_deltaEpot_bound_exchange(this, Box_size, mCol) &
                   result (deltaEpot_bound_exchange)
     
-        class(DipolarSpheres), intent(in) :: this
+        class(Dipolar_Spheres), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         real(DP), dimension(:), intent(in) :: mCol
         real(DP) :: deltaEpot_bound_exchange
@@ -1100,7 +1100,7 @@ contains
                           
         deltaEpot_bound_exchange = 2._DP*PI/3._DP/product(Box_size) * deltaEpot_bound_exchange
     
-    end function DipolarSpheres_deltaEpot_bound_exchange
+    end function Dipolar_Spheres_deltaEpot_bound_exchange
     
     !> Rotation
     
@@ -1113,10 +1113,10 @@ contains
     !>                 ]
     !> \f]
     
-    pure function DipolarSpheres_deltaEpot_bound_rotate(this, Box_size, mOld, mNew) &
+    pure function Dipolar_Spheres_deltaEpot_bound_rotate(this, Box_size, mOld, mNew) &
                   result (deltaEpot_bound_rotate)
     
-        class(DipolarSpheres), intent(in) :: this
+        class(Dipolar_Spheres), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         real(DP), dimension(:), intent(in) :: mOld, mNew
         real(DP) :: deltaEpot_bound_rotate
@@ -1126,31 +1126,31 @@ contains
                           
         deltaEpot_bound_rotate = 2._DP*PI/3._DP/product(Box_size) * deltaEpot_bound_rotate
     
-    end function DipolarSpheres_deltaEpot_bound_rotate
+    end function Dipolar_Spheres_deltaEpot_bound_rotate
     
     !> Total shape dependent term
     !> \f[
     !>      J(\vec{M}, S) = \frac{2\pi}{3V} | \vec{M}|^2
     !> \f]
     
-    pure function DipolarSpheres_Epot_bound(this, Box_size) result(Epot_bound)
+    pure function Dipolar_Spheres_Epot_bound(this, Box_size) result(Epot_bound)
     
-        class(DipolarSpheres), intent(in) :: this
+        class(Dipolar_Spheres), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         real(DP) :: Epot_bound
         
         Epot_bound = 2._DP*PI/3._DP/product(Box_size) * dot_product(this%totalMoment, this%totalMoment)
     
-    end function DipolarSpheres_Epot_bound
+    end function Dipolar_Spheres_Epot_bound
     
     ! Total potential energy ----------------------------------------------------------------------
     
     !> Potential energy initialisation
     
-    subroutine DipolarSpheres_set_Epot(this, Box)
+    subroutine Dipolar_Spheres_set_Epot(this, Box)
     
-        class(DipolarSpheres), intent(inout) :: this
-        type(Box_dimensions), intent(in) :: Box
+        class(Dipolar_Spheres), intent(inout) :: this
+        type(Box_Dimensions), intent(in) :: Box
         
 
         this%rMin = dipol_rMin_factor * this%diameter
@@ -1161,19 +1161,19 @@ contains
         call this%set_Epot_reci(Box)
         call this%set_totalMoment()
         
-    end subroutine DipolarSpheres_set_Epot
+    end subroutine Dipolar_Spheres_set_Epot
 
     !> Total potential energy of a configuration
     
-    pure function DipolarSpheres_Epot_conf(this, Box) result(Epot_conf)
+    pure function Dipolar_Spheres_Epot_conf(this, Box) result(Epot_conf)
     
-        class(DipolarSpheres), intent(in) :: this
-        type(Box_dimensions), intent(in) :: Box
+        class(Dipolar_Spheres), intent(in) :: this
+        type(Box_Dimensions), intent(in) :: Box
         real(DP) :: Epot_conf
         
         Epot_conf = this%Epot_real(Box%size) + this%Epot_reci(Box) - this%Epot_self() + &
                     this%Epot_bound(Box%size)
     
-    end function DipolarSpheres_Epot_conf
+    end function Dipolar_Spheres_Epot_conf
 
 end module class_dipolar_spheres

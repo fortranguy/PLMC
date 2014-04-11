@@ -8,7 +8,7 @@ use data_box, only: Ndim
 use data_particles, only: mix_delta
 use data_potential, only: mix_rMin_factor, mix_rCut, mix_dr, mix_epsilon, mix_alpha
 use data_neighbour_cells, only: NnearCell
-use module_types, only: Node, particle_index
+use module_types, only: Node, Particle_Index
 use module_physics_micro, only: set_discrete_length, dist_PBC, Epot_yukawa
 use class_neighbour_cells
 use class_hard_spheres
@@ -17,7 +17,7 @@ implicit none
 
 private
 
-    type, public :: MixingPotential
+    type, public :: Mixing_Potential
 
         private
         
@@ -38,30 +38,30 @@ private
 
     contains
     
-        procedure :: construct => MixingPotential_construct
-        procedure :: destroy => MixingPotential_destroy
-        procedure :: write_report => MixingPotential_write_report
+        procedure :: construct => Mixing_Potential_construct
+        procedure :: destroy => Mixing_Potential_destroy
+        procedure :: write_report => Mixing_Potential_write_report
 
-        procedure :: get_min_distance => MixingPotential_get_min_distance
-        procedure :: get_rCut => MixingPotential_get_rCut
-        procedure :: set_cell_size => MixingPotential_set_cell_size
-        procedure :: get_cell_size => MixingPotential_get_cell_size
+        procedure :: get_min_distance => Mixing_Potential_get_min_distance
+        procedure :: get_rCut => Mixing_Potential_get_rCut
+        procedure :: set_cell_size => Mixing_Potential_set_cell_size
+        procedure :: get_cell_size => Mixing_Potential_get_cell_size
         
-        procedure :: test_overlap => MixingPotential_test_overlap
-        procedure, private :: set_Epot_tab => MixingPotential_set_Epot_tab
-        procedure :: set_Epot => MixingPotential_set_Epot
-        procedure :: write_Epot => MixingPotential_write_Epot
-        procedure, private :: Epot_pair => MixingPotential_Epot_pair
-        procedure :: Epot_neighCells => MixingPotential_Epot_neighCells
-        procedure :: Epot_conf => MixingPotential_Epot_conf
+        procedure :: test_overlap => Mixing_Potential_test_overlap
+        procedure, private :: set_Epot_tab => Mixing_Potential_set_Epot_tab
+        procedure :: set_Epot => Mixing_Potential_set_Epot
+        procedure :: write_Epot => Mixing_Potential_write_Epot
+        procedure, private :: Epot_pair => Mixing_Potential_Epot_pair
+        procedure :: Epot_neighCells => Mixing_Potential_Epot_neighCells
+        procedure :: Epot_conf => Mixing_Potential_Epot_conf
 
     end type
 
 contains
 
-    subroutine MixingPotential_construct(this, type1_diameter, type2_diameter)
+    subroutine Mixing_Potential_construct(this, type1_diameter, type2_diameter)
 
-        class(MixingPotential), intent(out) :: this
+        class(Mixing_Potential), intent(out) :: this
         real(DP), intent(in) :: type1_diameter, type2_diameter
         
         this%name = "[mix]"
@@ -71,23 +71,23 @@ contains
         this%delta = mix_delta
         this%min_distance = (type1_diameter + type2_diameter)/2._DP + this%delta
 
-    end subroutine MixingPotential_construct
+    end subroutine Mixing_Potential_construct
 
-    subroutine MixingPotential_destroy(this)
+    subroutine Mixing_Potential_destroy(this)
     
-        class(MixingPotential), intent(inout) :: this
+        class(Mixing_Potential), intent(inout) :: this
         
         write(output_unit, *) this%name, " class destruction"
         
         if (allocated(this%Epot_tab)) deallocate(this%Epot_tab)
     
-    end subroutine MixingPotential_destroy
+    end subroutine Mixing_Potential_destroy
     
     !> Report
     
-    subroutine MixingPotential_write_report(this, report_unit)
+    subroutine Mixing_Potential_write_report(this, report_unit)
     
-        class(MixingPotential), intent(in) :: this
+        class(Mixing_Potential), intent(in) :: this
         integer, intent(in) :: report_unit
         
         write(report_unit, *) "Data: "
@@ -99,40 +99,40 @@ contains
         write(report_unit, *) "    rCut = ", this%rCut
         write(report_unit, *) "    dr = ", this%dr
         
-    end subroutine MixingPotential_write_report
+    end subroutine Mixing_Potential_write_report
 
     !> Accessors & Mutators
 
-    pure function MixingPotential_get_min_distance(this) result(get_min_distance)
-        class(MixingPotential), intent(in) :: this
+    pure function Mixing_Potential_get_min_distance(this) result(get_min_distance)
+        class(Mixing_Potential), intent(in) :: this
         real(DP) :: get_min_distance
         get_min_distance = this%min_distance
-    end function MixingPotential_get_min_distance
+    end function Mixing_Potential_get_min_distance
     
-    pure function MixingPotential_get_rCut(this) result(get_rCut)
-        class(MixingPotential), intent(in) :: this
+    pure function Mixing_Potential_get_rCut(this) result(get_rCut)
+        class(Mixing_Potential), intent(in) :: this
         real(DP) :: get_rCut
         get_rCut = this%rCut
-    end function MixingPotential_get_rCut
+    end function Mixing_Potential_get_rCut
     
-    pure subroutine MixingPotential_set_cell_size(this)
-        class(MixingPotential), intent(inout) :: this
+    pure subroutine Mixing_Potential_set_cell_size(this)
+        class(Mixing_Potential), intent(inout) :: this
         this%cell_size(:) = this%rCut
-    end subroutine MixingPotential_set_cell_size
+    end subroutine Mixing_Potential_set_cell_size
     
-    pure function MixingPotential_get_cell_size(this) result(get_cell_size)
-        class(MixingPotential), intent(in) :: this
+    pure function Mixing_Potential_get_cell_size(this) result(get_cell_size)
+        class(Mixing_Potential), intent(in) :: this
         real(DP), dimension(Ndim) :: get_cell_size
         get_cell_size(:) = this%cell_size(:)
-   end function MixingPotential_get_cell_size
+   end function Mixing_Potential_get_cell_size
     
     !> Overlapt test
     
-    subroutine MixingPotential_test_overlap(this, Box_size, type1, type2)
+    subroutine Mixing_Potential_test_overlap(this, Box_size, type1, type2)
     
-        class(MixingPotential), intent(in) :: this
+        class(Mixing_Potential), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
-        class(HardSpheres), intent(in) :: type1, type2
+        class(Hard_Spheres), intent(in) :: type1, type2
         
         integer :: type1_i_particle, type2_i_particle
         real(DP) :: r_mix
@@ -155,15 +155,15 @@ contains
 
         write(output_unit, *) this%name, ":    Overlap test: OK !"
     
-    end subroutine MixingPotential_test_overlap
+    end subroutine Mixing_Potential_test_overlap
 
-    !> MixingPotential energy
+    !> Mixing_Potential energy
     !> Tabulation of Yukawa potential
     !> \f[ \epsilon \frac{e^{-\alpha (r-r_{min})}}{r} \f]
     
-    pure subroutine MixingPotential_set_Epot_tab(this)
+    pure subroutine Mixing_Potential_set_Epot_tab(this)
     
-        class(MixingPotential), intent(inout) :: this
+        class(Mixing_Potential), intent(inout) :: this
 
         integer :: i
         real(DP) :: r_i
@@ -177,11 +177,11 @@ contains
         ! shift
         this%Epot_tab(:) = this%Epot_tab(:) - this%Epot_tab(this%iCut)
 
-    end subroutine MixingPotential_set_Epot_tab
+    end subroutine Mixing_Potential_set_Epot_tab
     
-    subroutine MixingPotential_set_Epot(this)
+    subroutine Mixing_Potential_set_Epot(this)
     
-        class(MixingPotential), intent(inout) :: this
+        class(Mixing_Potential), intent(inout) :: this
 
         this%rMin = mix_rMin_factor * this%min_distance
         this%rCut = mix_rCut
@@ -201,13 +201,13 @@ contains
         allocate(this%Epot_tab(this%iMin:this%iCut))
         call this%set_Epot_tab()
         
-    end subroutine MixingPotential_set_Epot
+    end subroutine Mixing_Potential_set_Epot
     
     !> Write the tabulated potential
     
-    subroutine MixingPotential_write_Epot(this, Epot_unit)
+    subroutine Mixing_Potential_write_Epot(this, Epot_unit)
 
-        class(MixingPotential), intent(in) :: this
+        class(Mixing_Potential), intent(in) :: this
         integer, intent(in) :: Epot_unit
 
         integer :: i
@@ -218,11 +218,11 @@ contains
             write(Epot_unit, *) r_i, this%Epot_tab(i)
         end do
 
-    end subroutine MixingPotential_write_Epot
+    end subroutine Mixing_Potential_write_Epot
 
-    pure function MixingPotential_Epot_pair(this, r) result(Epot_pair)
+    pure function Mixing_Potential_Epot_pair(this, r) result(Epot_pair)
         
-        class(MixingPotential), intent(in) :: this
+        class(Mixing_Potential), intent(in) :: this
         real(DP), intent(in) :: r
         real(DP) :: Epot_pair
         
@@ -237,14 +237,14 @@ contains
             Epot_pair = 0._DP
         end if
         
-    end function MixingPotential_Epot_pair
+    end function Mixing_Potential_Epot_pair
     
-    subroutine MixingPotential_Epot_neighCells(this, Box_size, particle, neighCells, &
+    subroutine Mixing_Potential_Epot_neighCells(this, Box_size, particle, neighCells, &
                                                other_all_positions, overlap, energ)
         
-        class(MixingPotential), intent(in) :: this
+        class(Mixing_Potential), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
-        type(particle_index), intent(in) :: particle
+        type(Particle_Index), intent(in) :: particle
         type(Neighbour_Cells), intent(in) :: neighCells
         real(DP), dimension(:, :), contiguous, intent(in) :: other_all_positions
         logical, intent(out) :: overlap
@@ -285,15 +285,15 @@ contains
             
         end do
     
-    end subroutine MixingPotential_Epot_neighCells
+    end subroutine Mixing_Potential_Epot_neighCells
     
     !> Total potential energy
     
-    pure function MixingPotential_Epot_conf(this, Box_size, type1, type2) result(Epot_conf)
+    pure function Mixing_Potential_Epot_conf(this, Box_size, type1, type2) result(Epot_conf)
     
-        class(MixingPotential), intent(in) :: this
+        class(Mixing_Potential), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
-        class(HardSpheres), intent(in) :: type1, type2
+        class(Hard_Spheres), intent(in) :: type1, type2
         real(DP) :: Epot_conf
 
         integer :: type1_i_particle, type2_i_particle
@@ -317,6 +317,6 @@ contains
             end do
         end do
     
-    end function MixingPotential_Epot_conf
+    end function Mixing_Potential_Epot_conf
 
 end module class_mixing_potential

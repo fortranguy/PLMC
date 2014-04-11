@@ -7,7 +7,7 @@ implicit none
 
 private
 
-    type, public :: Small_rotation
+    type, public :: Small_Rotation
     
         real(DP) :: delta
         real(DP) :: deltaSave
@@ -16,17 +16,17 @@ private
         
     contains
     
-        procedure :: init => Small_rotation_init
-        procedure :: adapt_delta => Small_rotation_adapt_delta
-        procedure :: set_delta => Small_rotation_set_delta
-        procedure :: get_delta => Small_rotation_get_delta
+        procedure :: init => Small_Rotation_init
+        procedure :: adapt_delta => Small_Rotation_adapt_delta
+        procedure :: set_delta => Small_Rotation_set_delta
+        procedure :: get_delta => Small_Rotation_get_delta
     
-    end type Small_rotation
+    end type Small_Rotation
     
 contains
 
-    pure subroutine Small_rotation_init(this, delta, deltaMax, rejectFix)
-        class(Small_rotation), intent(out) :: this
+    pure subroutine Small_Rotation_init(this, delta, deltaMax, rejectFix)
+        class(Small_Rotation), intent(out) :: this
         real(DP), intent(in) :: delta, deltaMax
         real(DP), intent(in) :: rejectFix
         
@@ -34,20 +34,20 @@ contains
         this%deltaSave = this%delta
         this%deltaMax = deltaMax
         this%rejectFix = rejectFix    
-    end subroutine Small_rotation_init
+    end subroutine Small_Rotation_init
 
-    pure function Small_rotation_get_delta(this) result(get_delta)
-        class(Small_rotation), intent(in) :: this
+    pure function Small_Rotation_get_delta(this) result(get_delta)
+        class(Small_Rotation), intent(in) :: this
         real(DP) :: get_delta
         
         get_delta = this%delta
-    end function Small_rotation_get_delta
+    end function Small_Rotation_get_delta
     
     !> Adaptation of delta during the thermalisation
     
-    pure subroutine Small_rotation_adapt_delta(this, reject)
+    pure subroutine Small_Rotation_adapt_delta(this, reject)
     
-        class(Small_rotation), intent(inout) :: this
+        class(Small_Rotation), intent(inout) :: this
         real(DP), intent(in) :: reject
         
         real(DP), parameter :: delta_eps = 0.05_DP
@@ -64,11 +64,11 @@ contains
             this%delta = this%delta * less
         end if
     
-    end subroutine Small_rotation_adapt_delta
+    end subroutine Small_Rotation_adapt_delta
     
-    subroutine Small_rotation_set_delta(this, type_name, reject, report_unit)
+    subroutine Small_Rotation_set_delta(this, type_name, reject, report_unit)
     
-        class(Small_rotation), intent(inout) :: this
+        class(Small_Rotation), intent(inout) :: this
         character(len=*), intent(in) :: type_name
         real(DP), intent(in) :: reject
         integer, intent(in) :: report_unit
@@ -90,6 +90,6 @@ contains
         write(report_unit, *) "    rejection relative difference = ", &
                                     abs(reject-this%rejectFix)/this%rejectFix
     
-    end subroutine Small_rotation_set_delta
+    end subroutine Small_Rotation_set_delta
 
 end module class_small_rotation

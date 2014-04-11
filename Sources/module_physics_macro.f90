@@ -5,7 +5,7 @@ module module_physics_macro
 use, intrinsic :: iso_fortran_env, only: output_unit, error_unit, iostat_end
 use data_precisions, only: DP, real_zero, io_tiny, consist_tiny
 use data_box, only: Ndim
-use module_types, only: Box_dimensions, argument_random, argument_initial
+use module_types, only: Box_Dimensions, Argument_Random, Argument_Initial
 use module_physics_micro, only: dist_PBC, random_surface
 use class_hard_spheres
 use class_dipolar_spheres
@@ -24,7 +24,7 @@ contains
     
     subroutine init_randomSeed(arg_rand, report_unit)
     
-        type(argument_random) :: arg_rand
+        type(Argument_Random) :: arg_rand
         integer, intent(in) :: report_unit
     
         integer :: i, n, clock
@@ -69,7 +69,7 @@ contains
     subroutine randomDepositions(Box_size, type1, type2, mix_min_distance)
 
         real(DP), dimension(:), intent(in) :: Box_size
-        class(HardSpheres), intent(inout) :: type1, type2
+        class(Hard_Spheres), intent(inout) :: type1, type2
         real(DP), intent(in) :: mix_min_distance
 
         integer :: i_particle, i_particle_test
@@ -191,9 +191,9 @@ contains
                                         report_unit)
         
         real(DP), dimension(:), intent(in) :: Box_size
-        type(argument_initial), intent(in) :: arg_init
-        class(DipolarSpheres), intent(inout) :: dipolar
-        class(HardSpheres), intent(inout) :: spherical
+        type(Argument_Initial), intent(in) :: arg_init
+        class(Dipolar_Spheres), intent(inout) :: dipolar
+        class(Hard_Spheres), intent(inout) :: spherical
         real(DP), intent(in) :: mix_min_distance
         integer, intent(in) :: report_unit
         
@@ -231,10 +231,10 @@ contains
     
     subroutine init(Box, this, other, mix, write_potential, this_units, this_Epot)
     
-        type(Box_dimensions), intent(in) :: Box
-        class(HardSpheres), intent(inout) :: this
-        class(HardSpheres), intent(in) :: other
-        class(MixingPotential), intent(in) :: mix
+        type(Box_Dimensions), intent(in) :: Box
+        class(Hard_Spheres), intent(inout) :: this
+        class(Hard_Spheres), intent(in) :: other
+        class(Mixing_Potential), intent(in) :: mix
         logical, intent(in) :: write_potential
         class(Units), intent(in) :: this_units
         real(DP), intent(out) :: this_Epot
@@ -248,7 +248,7 @@ contains
             call this%write_Epot(this_units%Epot)
         end if
         select type (this)
-            type is (DipolarSpheres)
+            type is (Dipolar_Spheres)
                 select type (this_units)
                     type is (MoreUnits)
                         call this%snap_data(this_units%snap_orientations)
@@ -270,8 +270,8 @@ contains
     
     subroutine final(Box, this, this_units, this_obs)
     
-        type(Box_dimensions), intent(in) :: Box
-        class(HardSpheres), intent(inout) :: this
+        type(Box_Dimensions), intent(in) :: Box
+        class(Hard_Spheres), intent(inout) :: this
         class(Units), intent(in) :: this_units
         class(Observables), intent(in) :: this_obs
         
@@ -282,7 +282,7 @@ contains
         call this_obs%write_results(this_units%report)
         
         select type (this)
-            type is (DipolarSpheres)
+            type is (Dipolar_Spheres)
                 select type (this_units)
                     type is (MoreUnits)
                         call this%snap_orientations(0, this_units%snapFin_orientations)
@@ -296,8 +296,8 @@ contains
     subroutine mix_init(Box_size, mix, type1, type2, write_potential, mix_Epot_unit, mix_Epot)
     
         real(DP), dimension(:), intent(in) :: Box_size
-        class(MixingPotential), intent(inout) :: mix
-        class(HardSpheres), intent(in) :: type1, type2
+        class(Mixing_Potential), intent(inout) :: mix
+        class(Hard_Spheres), intent(in) :: type1, type2
         logical, intent(in) :: write_potential
         integer, intent(in) :: mix_Epot_unit
         real(DP), intent(out) :: mix_Epot
@@ -317,8 +317,8 @@ contains
     subroutine mix_final(Box_size, mix, type1, type2, mix_report_unit, mix_Epot, mix_Epot_conf)
     
         real(DP), dimension(:), intent(in) :: Box_size
-        class(MixingPotential), intent(inout) :: mix
-        class(HardSpheres), intent(in) :: type1, type2
+        class(Mixing_Potential), intent(inout) :: mix
+        class(Hard_Spheres), intent(in) :: type1, type2
         integer, intent(in) :: mix_report_unit
         real(DP), intent(in) :: mix_Epot
         real(DP), intent(out) :: mix_Epot_conf
@@ -335,7 +335,7 @@ contains
     subroutine adapt_move(Box_size, this, Nadapt, iStep, obs, move_unit)
     
         real(DP), dimension(:), intent(in) :: Box_size
-        class(HardSpheres), intent(inout) :: this
+        class(Hard_Spheres), intent(inout) :: this
         integer, intent(in) :: Nadapt, iStep
         class(Observables), intent(inout) :: obs
         integer, intent(in) :: move_unit
@@ -349,7 +349,7 @@ contains
     
     subroutine adapt_rotate(this, Nadapt, iStep, obs, rotate_unit)
     
-        class(DipolarSpheres), intent(inout) :: this
+        class(Dipolar_Spheres), intent(inout) :: this
         integer, intent(in) :: Nadapt, iStep
         class(MoreObservables), intent(inout) :: obs
         integer, intent(in) :: rotate_unit

@@ -8,7 +8,7 @@ implicit none
 
 private
 
-    type, public :: Small_move
+    type, public :: Small_Move
     
         real(DP), dimension(Ndim) :: delta
         real(DP), dimension(Ndim) :: deltaSave
@@ -16,29 +16,29 @@ private
     
     contains
     
-        procedure :: init => Small_move_init
-        procedure :: adapt_delta => Small_move_adapt_delta
-        procedure :: set_delta => Small_move_set_delta
+        procedure :: init => Small_Move_init
+        procedure :: adapt_delta => Small_Move_adapt_delta
+        procedure :: set_delta => Small_Move_set_delta
     
-    end type Small_move
+    end type Small_Move
     
 contains
 
-    pure subroutine Small_move_init(this, delta, rejectFix)
-        class(Small_move), intent(out) :: this
+    pure subroutine Small_Move_init(this, delta, rejectFix)
+        class(Small_Move), intent(out) :: this
         real(DP), dimension(Ndim), intent(in) :: delta
         real(DP), intent(in) :: rejectFix
         
         this%delta = delta
         this%deltaSave = this%delta
         this%rejectFix = rejectFix
-    end subroutine Small_move_init
+    end subroutine Small_Move_init
         
     !> Adapt the displacement delta during thermalisation
     
-    pure subroutine Small_move_adapt_delta(this, Box_size, reject)
+    pure subroutine Small_Move_adapt_delta(this, Box_size, reject)
     
-        class(Small_move), intent(inout) :: this
+        class(Small_Move), intent(inout) :: this
         real(DP), dimension(:), intent(in) :: Box_size ! warning: average  ?
         real(DP), intent(in) :: reject
         
@@ -56,11 +56,11 @@ contains
             this%delta(:) = this%delta(:) * less
         end if
     
-    end subroutine Small_move_adapt_delta
+    end subroutine Small_Move_adapt_delta
     
-    subroutine Small_move_set_delta(this, type_name, Box_size, reject, report_unit)
+    subroutine Small_Move_set_delta(this, type_name, Box_size, reject, report_unit)
     
-        class(Small_move), intent(inout) :: this
+        class(Small_Move), intent(inout) :: this
         character(len=*), intent(in) :: type_name
         real(DP), dimension(:), intent(in) :: Box_size ! warning: average ?
         real(DP), intent(in) :: reject
@@ -83,6 +83,6 @@ contains
         write(report_unit, *) "    rejection relative difference = ", &
                                     abs(reject-this%rejectFix)/this%rejectFix
     
-    end subroutine Small_move_set_delta
+    end subroutine Small_Move_set_delta
 
 end module class_small_move
