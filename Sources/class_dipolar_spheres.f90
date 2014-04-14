@@ -16,7 +16,6 @@ use module_physics_micro, only: set_discrete_length, distVec_PBC, Box_wave1_sym,
                                 fourier_i, exchange_sign
 use class_neighbour_cells
 use class_hard_spheres
-use class_small_rotation
 
 implicit none
 
@@ -28,7 +27,6 @@ private
         
         ! Particles
         real(DP), dimension(:, :), allocatable, public :: all_orientations
-        type(Small_Rotation) :: rotation
         ! Potential
         real(DP) :: real_rCut !< real space potential cut
         real(DP) :: real_dr !< discretisation step
@@ -45,13 +43,8 @@ private
 
         !> Construction and destruction of the class
         procedure, private :: set_particles => Dipolar_Spheres_set_particles
-        procedure, private :: set_changes => Dipolar_Spheres_set_changes
         procedure :: construct => Dipolar_Spheres_construct
         procedure :: destroy => Dipolar_Spheres_destroy
-        
-        procedure :: get_rotation_delta => Dipolar_Spheres_get_rotation_delta
-        procedure :: adapt_rotation_delta => Dipolar_Spheres_adapt_rotation_delta
-        procedure :: set_rotation_delta => Dipolar_Spheres_set_rotation_delta
         
         !> Write a report of the component in a file
         procedure :: write_report => Dipolar_Spheres_write_report
@@ -117,12 +110,6 @@ contains
         allocate(this%all_positions(Ndim, this%num_particles))
         allocate(this%all_orientations(Ndim, this%num_particles))
     end subroutine Dipolar_Spheres_set_particles
-    
-    pure subroutine Dipolar_Spheres_set_changes(this)
-        class(Dipolar_Spheres), intent(inout) :: this
-        
-        call this%rotation%init(dipol_rotate_delta, dipol_rotate_deltaMax, dipol_rotate_rejectFix)
-    end subroutine Dipolar_Spheres_set_changes
 
     subroutine Dipolar_Spheres_construct(this)
     
@@ -132,7 +119,6 @@ contains
         write(output_unit, *) this%name, " class construction"
     
         call this%set_particles()
-        call this%set_changes()
         this%widom_num_particles = dipol_widom_num_particles
         this%snap_factor = this%num_particles/snap_ratio
         if (this%snap_factor == 0) this%snap_factor = 1
@@ -148,28 +134,6 @@ contains
         if (allocated(this%Epot_reci_weight)) deallocate(this%Epot_reci_weight)
         if (allocated(this%Epot_reci_structure)) deallocate(this%Epot_reci_structure)    
     end subroutine Dipolar_Spheres_destroy
-    
-    pure function Dipolar_Spheres_get_rotation_delta(this) result(get_rotation_delta)
-        class(Dipolar_Spheres), intent(in) :: this
-        real(DP) :: get_rotation_delta
-        
-        get_rotation_delta = this%rotation%delta
-    end function Dipolar_Spheres_get_rotation_delta    
-    
-    subroutine Dipolar_Spheres_adapt_rotation_delta(this, reject)
-        class(Dipolar_Spheres), intent(inout) :: this
-        real(DP), intent(in) :: reject        
-    
-        call this%rotation%adapt_delta(reject)
-    end subroutine Dipolar_Spheres_adapt_rotation_delta
-    
-    subroutine Dipolar_Spheres_set_rotation_delta(this, reject, report_unit)
-        class(Dipolar_Spheres), intent(inout) :: this
-        real(DP), intent(in) :: reject
-        integer, intent(in) :: report_unit
-        
-        call this%rotation%set_delta(this%name, reject, report_unit)
-    end subroutine Dipolar_Spheres_set_rotation_delta
     
     !> Report
     

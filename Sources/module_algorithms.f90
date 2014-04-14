@@ -8,6 +8,7 @@ use module_physics_micro, only: random_surface, markov_surface
 use class_hard_spheres
 use class_small_move
 use class_dipolar_spheres
+use class_small_rotation
 use class_mixing_potential
 use class_observables
 
@@ -376,10 +377,11 @@ contains
     
     !> Dipole rotation
     
-    subroutine rotate(Box, this, obs)
+    subroutine rotate(Box, this, rotation, obs)
     
         type(Box_Dimensions), intent(in) :: Box
         class(Dipolar_Spheres), intent(inout) :: this
+        class(Small_rotation), intent(in) :: rotation
         class(MoreObservables), intent(inout) :: obs
         
         real(DP) :: random
@@ -398,7 +400,7 @@ contains
         new%number = old%number
         new%position(:) = old%position(:)
         new%orientation(:) = old%orientation(:)
-        call markov_surface(new%orientation, this%get_rotation_delta())
+        call markov_surface(new%orientation, rotation%get_delta())
         
         real_EpotOld = this%Epot_real_solo(Box%size, old)
         real_EpotNew = this%Epot_real_solo(Box%size, new)

@@ -9,6 +9,7 @@ use module_types, only: Box_Dimensions, Argument_Random, Argument_Initial
 use module_physics_micro, only: dist_PBC, random_surface
 use class_hard_spheres
 use class_small_move
+use class_small_rotation
 use class_dipolar_spheres
 use class_mixing_potential
 use class_observables
@@ -17,7 +18,7 @@ use class_units
 implicit none
 private
 public init_randomSeed, set_initialConfiguration, init, final, mix_init, mix_final, &
-       adapt_move, adapt_rotate, test_consist
+       adapt_move, adapt_rotation, test_consist
 
 contains
 
@@ -348,19 +349,19 @@ contains
     
     end subroutine adapt_move
     
-    subroutine adapt_rotate(this, Nadapt, iStep, obs, rotate_unit)
+    subroutine adapt_rotation(this, Nadapt, iStep, obs, rotate_unit)
     
-        class(Dipolar_Spheres), intent(inout) :: this
+        class(Small_Rotation), intent(inout) :: this
         integer, intent(in) :: Nadapt, iStep
         class(MoreObservables), intent(inout) :: obs
         integer, intent(in) :: rotate_unit
         
         obs%rotate_rejectAvg = obs%rotate_rejectAdapt / real(Nadapt-1, DP)
         obs%rotate_rejectAdapt = 0._DP
-        call this%adapt_rotation_delta(obs%rotate_rejectAvg)
-        write(rotate_unit, *) iStep, this%get_rotation_delta(), obs%rotate_rejectAvg
+        call this%adapt_delta(obs%rotate_rejectAvg)
+        write(rotate_unit, *) iStep, this%get_delta(), obs%rotate_rejectAvg
         
-    end subroutine adapt_rotate
+    end subroutine adapt_rotation
     
     !> Consistency test
     

@@ -6,21 +6,24 @@ use, intrinsic :: iso_fortran_env, only: output_unit
 use data_precisions, only: DP
 use data_box, only: Ndim, Box_size, Box_wave
 use data_monte_carlo, only: Temperature, decorrelFactor, switch_factor, Nthermal, Nadapt, Nstep, &
-                            reset_iStep, dipol_move_delta, dipol_move_rejectFix, hard_move_delta, &
-                            hard_move_rejectFix
+                            reset_iStep, &
+                            dipol_move_delta, dipol_move_rejectFix, &
+                            dipol_rotate_delta, dipol_rotate_deltaMax, dipol_rotate_rejectFix, &
+                            hard_move_delta, hard_move_rejectFix
 use data_potential, only: write_potential
 use data_distribution, only: snap
 use module_types, only: Box_Dimensions, Monte_Carlo_Arguments
 use module_physics_micro, only: NwaveVectors
 use class_hard_spheres
 use class_small_move
+use class_small_rotation
 use class_dipolar_spheres
 use class_mixing_potential
 use class_observables
 use class_units
 use module_monte_carlo_arguments, only: read_arguments
 use module_physics_macro, only: init_randomSeed, set_initialConfiguration, init, final, mix_init, &
-                                mix_final, adapt_move, adapt_rotate, test_consist
+                                mix_final, adapt_move, adapt_rotation, test_consist
 use module_algorithms, only: move, widom, switch, rotate
 use module_write, only: open_units, write_data, mix_open_units, write_results, mix_write_results
 
@@ -44,8 +47,9 @@ private
         integer :: decorrelFactor, Nchange, Nmove, Nswitch, Nrotate !< changes
         
         ! Type 1: Dipolar spheres
-        type(Dipolar_Spheres) :: type1_spheres !< physical properties and Monte-Carlo subroutines
+        type(Dipolar_Spheres) :: type1_spheres
         type(Small_Move) :: type1_move
+        type(Small_Rotation) :: type1_rotation
         type(MoreObservables) :: type1_obs !< e.g. energy, inverse of activity (-> chemical potential)
         type(MoreUnits) :: type1_units !< files units
         
@@ -149,6 +153,8 @@ contains
         this%Nchange = this%Nmove + this%Nswitch + this%Nrotate
         
         call this%type1_move%init(dipol_move_delta, dipol_move_rejectFix) ! ugly
+        call this%type1_rotation%init(dipol_rotate_delta, dipol_rotate_deltaMax, &
+                                      dipol_rotate_rejectFix) ! ugly
         call this%type2_move%init(hard_move_delta, hard_move_rejectFix) ! ugly
     end subroutine Physical_System_set_changes
 
@@ -410,7 +416,7 @@ contains
                             this%type2_obs, this%mix, this%mix_Epot, this%switch_Nreject)
                 this%switch_Nhit = this%switch_Nhit + 1
             else
-                call rotate(this%Box, this%type1_spheres, this%type1_obs)
+                call rotate(this%Box, this%type1_spheres, this%type1_rotation, this%type1_obs)
             end if
             
         end do MC_Change
@@ -445,8 +451,8 @@ contains
         else ! Average & adaptation
             call adapt_move(this%Box%size, this%type1_move, this%Nadapt, iStep, this%type1_obs, &
                             this%type1_units%move_delta)
-            call adapt_rotate(this%type1_spheres, this%Nadapt, iStep, this%type1_obs, &
-                              this%type1_units%rotate_delta)
+            call adapt_rotation(this%type1_rotation, this%Nadapt, iStep, this%type1_obs, &
+                                this%type1_units%rotate_delta)
             call adapt_move(this%Box%size, this%type2_move, this%Nadapt, iStep, this%type2_obs, &
                             this%type2_units%move_delta)
         end if
@@ -475,8 +481,8 @@ contains
         type_name = this%type1_spheres%get_name()
         call this%type1_move%set_delta(type_name, this%Box%size, this%type1_obs%move_rejectAvg, &
                                        this%type1_units%report)
-        call this%type1_spheres%set_rotation_delta(this%type1_obs%rotate_rejectAvg, &
-                                                 this%type1_units%report)
+        call this%type1_rotation%set_delta(type_name, this%type1_obs%rotate_rejectAvg, &
+                                           this%type1_units%report)
         type_name = this%type2_spheres%get_name()
         call this%type2_move%set_delta(type_name, this%Box%size, this%type2_obs%move_rejectAvg, &
                                        this%type2_units%report)
