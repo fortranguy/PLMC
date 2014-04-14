@@ -13,6 +13,7 @@ use data_distribution, only: snap_ratio
 use module_types, only: Box_Dimensions, Node, Particle_Index
 use module_physics_micro, only: dist_PBC
 use class_neighbour_cells
+use class_hard_spheres_potential
 
 implicit none
 
@@ -36,10 +37,6 @@ private
 
         ! Monte-Carlo
         integer :: widom_num_particles
-
-        ! Potential
-        real(DP) :: rMin !< minimum distance between two particles
-        real(DP) :: rCut !< short-range cut
         
         ! Neighbours (cell/grid scheme)
         type(Neighbour_Cells), public :: sameCells !< same kind
@@ -68,12 +65,6 @@ private
         
         !> Neighbour cells
         procedure :: construct_cells => Hard_Spheres_construct_cells
-        
-        !> Potential energy
-        procedure :: set_Epot => Hard_Spheres_set_Epot
-        procedure :: write_Epot => Hard_Spheres_write_Epot
-        procedure :: Epot_neighCells => Hard_Spheres_Epot_neighCells
-        procedure :: Epot_conf => Hard_Spheres_Epot_conf
         
     end type Hard_Spheres
     
@@ -267,89 +258,4 @@ contains
     
     end subroutine Hard_Spheres_construct_cells
     
-    ! Potential
-    
-    subroutine Hard_Spheres_set_Epot(this, Box)
-    
-        class(Hard_Spheres), intent(inout) :: this
-        type(Box_Dimensions), intent(in) :: Box
-        
-        real(DP) :: volume_dummy
-        volume_dummy = product(Box%size)
-        
-        this%rMin = hard_rMin_factor * this%diameter
-        this%rCut = this%rMin
-        
-    end subroutine Hard_Spheres_set_Epot
-    
-    !> Write the potential: dummy
-    
-    subroutine Hard_Spheres_write_Epot(this, Epot_unit)
-    
-        class(Hard_Spheres), intent(in) :: this
-        integer, intent(in) :: Epot_unit
-
-        write(Epot_unit, *) this%rCut, 0._DP
-    
-    end subroutine Hard_Spheres_write_Epot
-    
-    subroutine Hard_Spheres_Epot_neighCells(this, Box_size, particle, overlap, energ)
-        
-        class(Hard_Spheres), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: Box_size
-        type(Particle_Index), intent(in) :: particle
-        logical, intent(out) :: overlap
-        real(DP), intent(out) :: energ
-    
-        integer :: iNearCell,  nearCell_index
-        real(DP) :: r_ij
-    
-        type(Node), pointer :: current => null(), next => null()
-        
-        overlap = .false.
-        energ = 0._DP
-    
-        do iNearCell = 1, NnearCell
-        
-            nearCell_index = this%sameCells%near_among_total(iNearCell, particle%same_iCell)
-            current => this%sameCells%beginCells(nearCell_index)%particle%next
-            if (.not. associated(current%next)) cycle
-            
-            do
-            
-                next => current%next
-            
-                if (current%number /= particle%number) then
-                    r_ij = dist_PBC(Box_size, particle%position(:), this%all_positions(:, current%number))
-                    if (r_ij < this%rMin) then
-                        overlap = .true.
-                        return
-                    end if
-                end if
-                
-                if (.not. associated(next%next)) exit
-                
-                current => next
-            
-            end do
-            
-        end do
-    
-    end subroutine Hard_Spheres_Epot_neighCells
-    
-    !> Total potential energy: dummy
-    
-    pure function Hard_Spheres_Epot_conf(this, Box) result(Epot_conf)
-    
-        class(Hard_Spheres), intent(in) :: this
-        type(Box_Dimensions), intent(in) :: Box
-        real(DP) :: Epot_conf
-        
-        real(DP) :: volume_dummy
-        volume_dummy = product(Box%size)
-    
-        Epot_conf = this%num_particles * 0._DP
-        
-    end function Hard_Spheres_Epot_conf
-
 end module class_hard_spheres
