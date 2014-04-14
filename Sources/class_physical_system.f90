@@ -12,6 +12,7 @@ use data_distribution, only: snap
 use module_types, only: Box_Dimensions, Monte_Carlo_Arguments
 use module_physics_micro, only: NwaveVectors
 use class_hard_spheres
+use class_small_move
 use class_dipolar_spheres
 use class_mixing_potential
 use class_observables
@@ -43,11 +44,13 @@ private
         
         ! Type 1: Dipolar spheres
         type(Dipolar_Spheres) :: type1_spheres !< physical properties and Monte-Carlo subroutines
+        type(Small_Move) :: type1_move
         type(MoreObservables) :: type1_obs !< e.g. energy, inverse of activity (-> chemical potential)
         type(MoreUnits) :: type1_units !< files units
         
         ! Type 2: Hard spheres
         type(Hard_Spheres) :: type2_spheres
+        type(Small_Move) :: type2_move
         type(Observables) :: type2_obs
         type(Units) :: type2_units
         
@@ -133,7 +136,8 @@ contains
     
     pure subroutine Physical_System_set_changes(this)
         class(Physical_System), intent(inout) :: this
-        this%num_particles = this%type1_spheres%get_num_particles() + this%type2_spheres%get_num_particles()
+        this%num_particles = this%type1_spheres%get_num_particles() + &
+                             this%type2_spheres%get_num_particles()
         this%decorrelFactor = decorrelFactor
         this%Nmove = this%decorrelFactor * this%num_particles
         this%Nswitch = switch_factor * this%decorrelFactor * this%type1_spheres%get_num_particles()
@@ -153,7 +157,7 @@ contains
         this%write_potential = write_potential
         
         call this%type1_spheres%construct()
-        call this%type2_spheres%construct()
+        call this%type2_spheres%construct("hardS")
         call this%mix%construct(this%type1_spheres%get_diameter(), this%type2_spheres%get_diameter())
         
         call this%set_changes()

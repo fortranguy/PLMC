@@ -10,6 +10,7 @@ private
 
     type, public :: Small_Move
     
+        private
         real(DP), dimension(Ndim) :: delta
         real(DP), dimension(Ndim) :: deltaSave
         real(DP) :: rejectFix
@@ -17,6 +18,8 @@ private
     contains
     
         procedure :: init => Small_Move_init
+        procedure :: get_delta => Small_Move_move_delta
+        procedure :: get_delta_scalar => Small_Move_get_delta_scalar
         procedure :: adapt_delta => Small_Move_adapt_delta
         procedure :: set_delta => Small_Move_set_delta
     
@@ -33,6 +36,20 @@ contains
         this%deltaSave = this%delta
         this%rejectFix = rejectFix
     end subroutine Small_Move_init
+    
+    pure function Small_Move_get_delta(this) result(get_delta)
+        class(Small_Move), intent(in) :: this
+        real(DP), dimension(Ndim) :: get_delta
+        
+        get_delta = this%delta
+    end function Small_Move_get_delta
+    
+    pure function Small_Move_get_delta_scalar(this) result(get_delta_scalar)
+        class(Small_Move), intent(in) :: this
+        real(DP) :: get_delta_scalar
+        
+        get_delta_scalar = sum(this%delta)/size(this%delta)
+    end function Small_Move_get_delta_scalar
         
     !> Adapt the displacement delta during thermalisation
     

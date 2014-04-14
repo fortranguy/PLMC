@@ -14,7 +14,6 @@ use data_distribution, only: snap_ratio
 use module_types, only: Box_Dimensions, Node, Particle_Index
 use module_physics_micro, only: dist_PBC
 use class_neighbour_cells
-use class_small_move
 
 implicit none
 
@@ -37,7 +36,6 @@ private
         integer :: snap_factor
 
         ! Monte-Carlo
-        type(Small_Move) :: move
         integer :: Nwidom
 
         ! Potential
@@ -52,7 +50,6 @@ private
 
         !> Construction and destruction of the class
         procedure, private :: set_particles => Hard_Spheres_set_particles
-        procedure, private :: set_changes => Hard_Spheres_set_changes
         procedure :: construct => Hard_Spheres_construct
         procedure :: destroy => Hard_Spheres_destroy
         
@@ -60,11 +57,7 @@ private
         procedure :: get_name => Hard_Spheres_get_name
         procedure :: get_num_particles => Hard_Spheres_get_num_particles
         procedure :: get_Nwidom => Hard_Spheres_get_Nwidom
-        procedure :: get_diameter => Hard_Spheres_get_diameter
-        procedure :: get_move_delta => Hard_Spheres_get_move_delta
-        procedure :: get_move_delta_scalar => Hard_Spheres_get_move_delta_scalar
-        procedure :: adapt_move_delta => Hard_Spheres_adapt_move_delta
-        procedure :: set_move_delta => Hard_Spheres_set_move_delta        
+        procedure :: get_diameter => Hard_Spheres_get_diameter  
         
         procedure :: write_density => Hard_Spheres_write_density
         procedure :: write_report => Hard_Spheres_write_report
@@ -93,17 +86,13 @@ contains
         this%num_particles = hard_num_particles
         allocate(this%all_positions(Ndim, this%num_particles))
     end subroutine Hard_Spheres_set_particles
-    
-    pure subroutine Hard_Spheres_set_changes(this)
-        class(Hard_Spheres), intent(inout) :: this
-        call this%move%init(hard_move_delta, hard_move_rejectFix)
-    end subroutine Hard_Spheres_set_changes
 
-    subroutine Hard_Spheres_construct(this)
+    subroutine Hard_Spheres_construct(this, name)
     
         class(Hard_Spheres), intent(out) :: this
+        character(len=*), intent(in) :: name
         
-        this%name = "hardS"
+        this%name = name
         write(output_unit, *) this%name, " class construction"
         
         call this%set_particles()
@@ -156,37 +145,6 @@ contains
         
         get_diameter = this%diameter
     end function Hard_Spheres_get_diameter
-    
-    pure function Hard_Spheres_get_move_delta(this) result(get_move_delta)
-        class(Hard_Spheres), intent(in) :: this
-        real(DP), dimension(Ndim) :: get_move_delta
-        
-        get_move_delta = this%move%delta
-    end function Hard_Spheres_get_move_delta
-    
-    pure function Hard_Spheres_get_move_delta_scalar(this) result(get_move_delta_scalar)
-        class(Hard_Spheres), intent(in) :: this
-        real(DP) :: get_move_delta_scalar
-        
-        get_move_delta_scalar = sum(this%move%delta)/size(this%move%delta)
-    end function Hard_Spheres_get_move_delta_scalar
-    
-    subroutine Hard_Spheres_adapt_move_delta(this, Box_size, reject)
-        class(Hard_Spheres), intent(inout) :: this
-        real(DP), dimension(:), intent(in) :: Box_size
-        real(DP), intent(in) :: reject        
-    
-        call this%move%adapt_delta(Box_size, reject)
-    end subroutine Hard_Spheres_adapt_move_delta
-    
-    subroutine Hard_Spheres_set_move_delta(this, Box_size, reject, report_unit)
-        class(Hard_Spheres), intent(inout) :: this
-        real(DP), dimension(:), intent(in) :: Box_size
-        real(DP), intent(in) :: reject
-        integer, intent(in) :: report_unit
-        
-        call this%move%set_delta(this%name, Box_size, reject, report_unit)
-    end subroutine Hard_Spheres_set_move_delta
     
     !> Write density and compacity
     
