@@ -18,7 +18,7 @@ private
     contains
     
         procedure :: init => Small_Move_init
-        procedure :: get_delta => Small_Move_move_delta
+        procedure :: get_delta => Small_Move_get_delta
         procedure :: get_delta_scalar => Small_Move_get_delta_scalar
         procedure :: adapt_delta => Small_Move_adapt_delta
         procedure :: set_delta => Small_Move_set_delta

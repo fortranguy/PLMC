@@ -6,6 +6,7 @@ use data_monte_carlo, only: Temperature
 use module_types, only: Box_Dimensions, Particle_Index, Particle_Energy
 use module_physics_micro, only: random_surface, markov_surface
 use class_hard_spheres
+use class_small_move
 use class_dipolar_spheres
 use class_mixing_potential
 use class_observables
@@ -18,10 +19,11 @@ contains
 
     !> Particle move
     
-    subroutine move(Box, this, this_obs, other, mix, mix_Epot)
+    subroutine move(Box, this, this_move, this_obs, other, mix, mix_Epot)
     
         type(Box_Dimensions), intent(in) :: Box
         class(Hard_Spheres), intent(inout) :: this
+        class(Small_Move), intent(in) :: this_move
         class(Observables), intent(inout) :: this_obs
         class(Hard_Spheres), intent(inout) :: other
         class(Mixing_Potential), intent(in) :: mix
@@ -46,7 +48,7 @@ contains
         
         new%number = old%number
         call random_number(xRand)
-        new%position(:) = old%position(:) + (xRand(:)-0.5_DP)*this%get_move_delta()
+        new%position(:) = old%position(:) + (xRand(:)-0.5_DP)*this_move%get_delta()
         new%position(:) = modulo(new%position(:), Box%size(:))
         
         if (this%get_num_particles() >= other%get_num_particles()) then
@@ -149,7 +151,7 @@ contains
         widTestSum = 0._DP
         test%number = 0
         
-        do iWidom = 1, this%get_Nwidom()
+        do iWidom = 1, this%get_widom_num_particles()
             
             call random_number(xRand)
             test%position(:) = Box%size(:) * xRand(:)
@@ -195,7 +197,7 @@ contains
             
         end do
         
-        this_obs%activ = widTestSum/real(this%get_Nwidom(), DP)
+        this_obs%activ = widTestSum/real(this%get_widom_num_particles(), DP)
         
     end subroutine widom
     

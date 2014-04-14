@@ -71,9 +71,11 @@ use data_precisions, only: DP
 implicit none
 
     integer, parameter :: dipol_num_particles = 281
+    integer, parameter :: dipol_widom_num_particles = 500
     
     real(DP), parameter :: hard_diameter = 1._DP ! u_length
     integer, parameter :: hard_num_particles = 6750
+    integer, parameter :: hard_widom_num_particles = 500
     
     real(DP), parameter :: mix_delta = 0.2_DP ! u_length
     
@@ -105,13 +107,10 @@ implicit none
     ! rotate
     real(DP), parameter :: dipol_rotate_delta = 30._DP ! u_moment, adaptation
     real(DP), parameter :: dipol_rotate_deltaMax = 75._DP
-    real(DP), parameter :: dipol_rotate_rejectFix = 0.17_DP
-    ! chemical potential
-    integer, parameter :: dipol_Nwidom = 500
+    real(DP), parameter :: dipol_rotate_rejectFix = 0.17_DP    
     
     real(DP), dimension(Ndim), parameter :: hard_move_delta = 0.5_DP ! u_length, adaptation
     real(DP), parameter :: hard_move_rejectFix = 0.5_DP
-    integer, parameter :: hard_Nwidom = 500
     
 end module data_monte_carlo
 !***************************************************************************************************

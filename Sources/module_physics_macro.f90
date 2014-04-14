@@ -8,6 +8,7 @@ use data_box, only: Ndim
 use module_types, only: Box_Dimensions, Argument_Random, Argument_Initial
 use module_physics_micro, only: dist_PBC, random_surface
 use class_hard_spheres
+use class_small_move
 use class_dipolar_spheres
 use class_mixing_potential
 use class_observables
@@ -335,15 +336,15 @@ contains
     subroutine adapt_move(Box_size, this, Nadapt, iStep, obs, move_unit)
     
         real(DP), dimension(:), intent(in) :: Box_size
-        class(Hard_Spheres), intent(inout) :: this
+        class(Small_Move), intent(inout) :: this
         integer, intent(in) :: Nadapt, iStep
         class(Observables), intent(inout) :: obs
         integer, intent(in) :: move_unit
     
         obs%move_rejectAvg = obs%move_rejectAdapt / real(Nadapt-1, DP)
         obs%move_rejectAdapt = 0._DP
-        call this%adapt_move_delta(Box_size, obs%move_rejectAvg)
-        write(move_unit, *) iStep, this%get_move_delta_scalar(), obs%move_rejectAvg
+        call this%adapt_delta(Box_size, obs%move_rejectAvg)
+        write(move_unit, *) iStep, this%get_delta_scalar(), obs%move_rejectAvg
     
     end subroutine adapt_move
     

@@ -6,7 +6,8 @@ use, intrinsic :: iso_fortran_env, only: output_unit
 use data_precisions, only: DP
 use data_box, only: Ndim, Box_size, Box_wave
 use data_monte_carlo, only: Temperature, decorrelFactor, switch_factor, Nthermal, Nadapt, Nstep, &
-                           reset_iStep
+                            reset_iStep, dipol_move_delta, dipol_move_rejectFix, hard_move_delta, &
+                            hard_move_rejectFix
 use data_potential, only: write_potential
 use data_distribution, only: snap
 use module_types, only: Box_Dimensions, Monte_Carlo_Arguments
@@ -122,12 +123,14 @@ contains
     
     pure subroutine Physical_System_set_box(this)
         class(Physical_System), intent(inout) :: this
+        
         this%Box%size(:) = Box_size(:)
         this%Box%wave(:) = Box_wave(:)
     end subroutine Physical_System_set_box
     
     pure subroutine Physical_System_set_monteCarlo(this)
         class(Physical_System), intent(inout) :: this
+        
         this%Temperature = Temperature
         this%Nthermal = Nthermal
         this%Nadapt = Nadapt
@@ -136,6 +139,7 @@ contains
     
     pure subroutine Physical_System_set_changes(this)
         class(Physical_System), intent(inout) :: this
+        
         this%num_particles = this%type1_spheres%get_num_particles() + &
                              this%type2_spheres%get_num_particles()
         this%decorrelFactor = decorrelFactor
@@ -143,6 +147,9 @@ contains
         this%Nswitch = switch_factor * this%decorrelFactor * this%type1_spheres%get_num_particles()
         this%Nrotate = this%decorrelFactor * this%type1_spheres%get_num_particles()
         this%Nchange = this%Nmove + this%Nswitch + this%Nrotate
+        
+        call this%type1_move%init(dipol_move_delta, dipol_move_rejectFix) ! ugly
+        call this%type2_move%init(hard_move_delta, hard_move_rejectFix) ! ugly
     end subroutine Physical_System_set_changes
 
     subroutine Physical_System_construct(this)
@@ -157,7 +164,7 @@ contains
         this%write_potential = write_potential
         
         call this%type1_spheres%construct()
-        call this%type2_spheres%construct("hardS")
+        call this%type2_spheres%construct()
         call this%mix%construct(this%type1_spheres%get_diameter(), this%type2_spheres%get_diameter())
         
         call this%set_changes()
@@ -392,10 +399,10 @@ contains
                 call random_number(rand)
                 iColRand = int(rand*real(this%num_particles, DP)) + 1
                 if (iColRand <= this%type1_spheres%get_num_particles()) then
-                    call move(this%Box, this%type1_spheres, this%type1_obs, &
+                    call move(this%Box, this%type1_spheres, this%type1_move, this%type1_obs, &
                               this%type2_spheres, this%mix, this%mix_Epot)
                 else
-                    call move(this%Box, this%type2_spheres, this%type2_obs, &
+                    call move(this%Box, this%type2_spheres, this%type2_move, this%type2_obs, &
                               this%type1_spheres, this%mix, this%mix_Epot)
                 end if
             else if (iChangeRand <= this%Nmove + this%Nswitch) then
@@ -436,11 +443,11 @@ contains
             this%type2_obs%move_rejectAdapt = this%type2_obs%move_rejectAdapt + &
                                               this%type2_obs%move_reject
         else ! Average & adaptation
-            call adapt_move(this%Box%size, this%type1_spheres, this%Nadapt, iStep, this%type1_obs, &
+            call adapt_move(this%Box%size, this%type1_move, this%Nadapt, iStep, this%type1_obs, &
                             this%type1_units%move_delta)
             call adapt_rotate(this%type1_spheres, this%Nadapt, iStep, this%type1_obs, &
                               this%type1_units%rotate_delta)
-            call adapt_move(this%Box%size, this%type2_spheres, this%Nadapt, iStep, this%type2_obs, &
+            call adapt_move(this%Box%size, this%type2_move, this%Nadapt, iStep, this%type2_obs, &
                             this%type2_units%move_delta)
         end if
         
@@ -463,12 +470,16 @@ contains
     
         class(Physical_System), intent(inout) :: this
         
-        call this%type1_spheres%set_move_delta(this%Box%size, this%type1_obs%move_rejectAvg, &
-                                               this%type1_units%report)
+        character(len=5) :: type_name
+        
+        type_name = this%type1_spheres%get_name()
+        call this%type1_move%set_delta(type_name, this%Box%size, this%type1_obs%move_rejectAvg, &
+                                       this%type1_units%report)
         call this%type1_spheres%set_rotation_delta(this%type1_obs%rotate_rejectAvg, &
                                                  this%type1_units%report)
-        call this%type2_spheres%set_move_delta(this%Box%size, this%type2_obs%move_rejectAvg, &
-                                               this%type2_units%report)
+        type_name = this%type2_spheres%get_name()
+        call this%type2_move%set_delta(type_name, this%Box%size, this%type2_obs%move_rejectAvg, &
+                                       this%type2_units%report)
     
     end subroutine Physical_System_fix_changes
     

@@ -6,9 +6,9 @@ use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
 use data_precisions, only: DP, real_zero, consist_tiny
 use data_constants, only: PI
 use data_box, only: Ndim
-use data_particles, only: dipol_num_particles
+use data_particles, only: dipol_num_particles, dipol_widom_num_particles
 use data_monte_carlo, only: dipol_move_delta, dipol_move_rejectFix, dipol_rotate_delta, &
-                           dipol_rotate_deltaMax, dipol_rotate_rejectFix, dipol_Nwidom
+                           dipol_rotate_deltaMax, dipol_rotate_rejectFix
 use data_potential, only: dipol_rMin_factor, dipol_real_rCut_factor, dipol_real_dr, dipol_alpha_factor
 use data_neighbour_cells, only: NnearCell
 use data_distribution, only: snap_ratio
@@ -122,7 +122,6 @@ contains
     pure subroutine Dipolar_Spheres_set_changes(this)
         class(Dipolar_Spheres), intent(inout) :: this
         
-        call this%move%init(dipol_move_delta, dipol_move_rejectFix)
         call this%rotation%init(dipol_rotate_delta, dipol_rotate_deltaMax, dipol_rotate_rejectFix)
     end subroutine Dipolar_Spheres_set_changes
 
@@ -135,7 +134,7 @@ contains
     
         call this%set_particles()
         call this%set_changes()
-        this%Nwidom = dipol_Nwidom
+        this%widom_num_particles = dipol_widom_num_particles
         this%snap_factor = this%num_particles/snap_ratio
         if (this%snap_factor == 0) this%snap_factor = 1
     

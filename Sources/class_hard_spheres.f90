@@ -6,8 +6,8 @@ use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
 use data_precisions, only: DP, real_zero
 use data_constants, only: PI
 use data_box, only: Ndim
-use data_particles, only: hard_diameter, hard_num_particles
-use data_monte_carlo, only: hard_move_delta, hard_move_rejectFix, hard_Nwidom
+use data_particles, only: hard_diameter, hard_num_particles, hard_widom_num_particles
+use data_monte_carlo, only: hard_move_delta, hard_move_rejectFix
 use data_potential, only: hard_rMin_factor
 use data_neighbour_cells, only: NnearCell
 use data_distribution, only: snap_ratio
@@ -36,7 +36,7 @@ private
         integer :: snap_factor
 
         ! Monte-Carlo
-        integer :: Nwidom
+        integer :: widom_num_particles
 
         ! Potential
         real(DP) :: rMin !< minimum distance between two particles
@@ -56,7 +56,7 @@ private
         !> Accessors & Mutators
         procedure :: get_name => Hard_Spheres_get_name
         procedure :: get_num_particles => Hard_Spheres_get_num_particles
-        procedure :: get_Nwidom => Hard_Spheres_get_Nwidom
+        procedure :: get_widom_num_particles => Hard_Spheres_get_widom_num_particles
         procedure :: get_diameter => Hard_Spheres_get_diameter  
         
         procedure :: write_density => Hard_Spheres_write_density
@@ -87,17 +87,15 @@ contains
         allocate(this%all_positions(Ndim, this%num_particles))
     end subroutine Hard_Spheres_set_particles
 
-    subroutine Hard_Spheres_construct(this, name)
+    subroutine Hard_Spheres_construct(this)
     
         class(Hard_Spheres), intent(out) :: this
-        character(len=*), intent(in) :: name
         
-        this%name = name
+        this%name = "hardS"
         write(output_unit, *) this%name, " class construction"
         
         call this%set_particles()
-        call this%set_changes()
-        this%Nwidom = hard_Nwidom
+        this%widom_num_particles = hard_widom_num_particles
         this%snap_factor = this%num_particles/snap_ratio
         if (this%snap_factor == 0) this%snap_factor = 1
         
@@ -117,7 +115,7 @@ contains
     end subroutine Hard_Spheres_destroy
     
     !> Accessors
-
+    
     pure function Hard_Spheres_get_name(this) result(get_name)
         class(Hard_Spheres), intent(in) :: this
         character(len=5) :: get_name
@@ -132,12 +130,12 @@ contains
         get_num_particles = this%num_particles
     end function Hard_Spheres_get_num_particles
 
-    pure function Hard_Spheres_get_Nwidom(this) result(get_Nwidom)
+    pure function Hard_Spheres_get_widom_num_particles(this) result(get_widom_num_particles)
         class(Hard_Spheres), intent(in) :: this
-        integer :: get_Nwidom
+        integer :: get_widom_num_particles
         
-        get_Nwidom = this%Nwidom
-    end function Hard_Spheres_get_Nwidom
+        get_widom_num_particles = this%widom_num_particles
+    end function Hard_Spheres_get_widom_num_particles
     
     pure function Hard_Spheres_get_diameter(this) result(get_diameter)
         class(Hard_Spheres), intent(in) :: this
@@ -177,7 +175,7 @@ contains
         write(report_unit, *) "Data: "
         
         write(report_unit ,*) "    num_particles = ", this%num_particles
-        write(report_unit ,*) "    Nwidom = ", this%Nwidom
+        write(report_unit ,*) "    widom_num_particles = ", this%widom_num_particles
         
         write(report_unit, *) "    rCut = ", this%rCut
         
