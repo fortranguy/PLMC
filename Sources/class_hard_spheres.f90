@@ -7,7 +7,6 @@ use data_precisions, only: DP, real_zero
 use data_constants, only: PI
 use data_box, only: Ndim
 use data_particles, only: hard_diameter, hard_num_particles, hard_widom_num_particles
-use data_monte_carlo, only: hard_move_delta, hard_move_rejectFix
 use data_potential, only: hard_rMin_factor
 use data_neighbour_cells, only: NnearCell
 use data_distribution, only: snap_ratio
