@@ -10,7 +10,7 @@ use data_particles, only: hard_diameter, hard_num_particles, hard_widom_num_part
 use data_potential, only: hard_rMin_factor
 use data_neighbour_cells, only: NnearCell
 use data_distribution, only: snap_ratio
-use module_types, only: Box_Dimensions, Node, Particle_Index
+use module_types, only: Box_Dimensions
 use module_physics_micro, only: dist_PBC
 use class_neighbour_cells
 use class_hard_spheres_potential

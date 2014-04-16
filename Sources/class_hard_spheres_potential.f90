@@ -1,13 +1,14 @@
 module class_hard_spheres_potential
 
 use data_precisions, only: DP
-use module_types, only: Box_Dimensions
+use module_types, only: Box_Dimensions, Node, Particle_Index
 
 implicit none
 
 private
 
     type, public :: Hard_Spheres_Potential
+        private
         real(DP) :: min_distance
         real(DP) :: range_cut
     contains
