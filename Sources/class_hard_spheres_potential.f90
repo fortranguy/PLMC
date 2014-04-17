@@ -34,8 +34,6 @@ contains
         
     end subroutine Hard_Spheres_Potential_init
     
-    !> Write the potential: dummy
-    
     subroutine Hard_Spheres_Potential_write(this, unit)
     
         class(Hard_Spheres_Potential), intent(in) :: this
