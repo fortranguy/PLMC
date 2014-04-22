@@ -9,6 +9,7 @@ use data_monte_carlo, only: Temperature, decorrelFactor, switch_factor, Nthermal
                            reset_iStep
 use data_potential, only: write_potential
 use data_distribution, only: snap
+use json_module, only: json_file, json_initialize
 use module_types, only: Box_Dimensions, Monte_Carlo_Arguments
 use module_physics_micro, only: NwaveVectors
 use class_hard_spheres
@@ -117,10 +118,23 @@ contains
 
     ! Construction
     
-    pure subroutine Physical_System_set_box(this)
+    subroutine Physical_System_set_box(this)
         class(Physical_System), intent(inout) :: this
+        
+        type(json_file) :: json
+        real(DP), dimension(:), allocatable :: Box_size
+        integer, dimension(:), allocatable :: Box_wave
+        
+        call json_initialize()
+        call json%load_file(filename = "data.json")
+        
+        call json%get("Box.size", Box_size)
+        if (size(Box_size) /= size (this%Box%size)) stop "Box size dimension"
         this%Box%size(:) = Box_size(:)
+        call json%get("Box.wave", Box_wave)
         this%Box%wave(:) = Box_wave(:)
+        
+        call json%destroy()
     end subroutine Physical_System_set_box
     
     pure subroutine Physical_System_set_monteCarlo(this)
