@@ -43,16 +43,16 @@ contains
         real(DP), intent(in) :: reject
         
         real(DP), parameter :: delta_eps = 0.05_DP
-        real(DP), parameter :: move_reject_eps = 0.1_DP * delta_eps
+        real(DP), parameter :: reject_eps = 0.1_DP * delta_eps
         real(DP), parameter :: more = 1._DP+delta_eps
         real(DP), parameter :: less = 1._DP-delta_eps
         
-        if (reject < this%rejectFix - move_reject_eps) then
+        if (reject < this%rejectFix - reject_eps) then
             this%delta(:) = this%delta(:) * more
             if (norm2(this%delta) > norm2(Box_size)) then
                 this%delta(:) = Box_size(:)
             end if
-        else if (reject > this%rejectFix + move_reject_eps) then
+        else if (reject > this%rejectFix + reject_eps) then
             this%delta(:) = this%delta(:) * less
         end if
     
