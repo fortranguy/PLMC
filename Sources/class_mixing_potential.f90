@@ -257,7 +257,7 @@ contains
         
         overlap = .false.
         energ = 0._DP
-    
+        
         do iNearCell = 1, NnearCell
         
             nearCell_index = neighCells%near_among_total(iNearCell, particle%mix_iCell)

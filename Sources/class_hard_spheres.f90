@@ -7,13 +7,9 @@ use data_precisions, only: DP, real_zero
 use data_constants, only: PI
 use data_box, only: Ndim
 use data_particles, only: hard_diameter, hard_num_particles, hard_widom_num_particles
-use data_potential, only: hard_rMin_factor
-use data_neighbour_cells, only: NnearCell
 use data_distribution, only: snap_ratio
 use module_types, only: Box_Dimensions
 use module_physics_micro, only: dist_PBC
-use class_neighbour_cells
-use class_hard_spheres_potential
 
 implicit none
 
@@ -38,10 +34,6 @@ private
         ! Monte-Carlo
         integer :: widom_num_particles
         
-        ! Neighbours (cell/grid scheme)
-        type(Neighbour_Cells), public :: sameCells !< same kind
-        type(Neighbour_Cells) :: mixCells !< other kind
-        
     contains
 
         !> Construction and destruction of the class
@@ -53,7 +45,9 @@ private
         procedure :: get_name => Hard_Spheres_get_name
         procedure :: get_num_particles => Hard_Spheres_get_num_particles
         procedure :: get_widom_num_particles => Hard_Spheres_get_widom_num_particles
-        procedure :: get_diameter => Hard_Spheres_get_diameter  
+        procedure :: get_diameter => Hard_Spheres_get_diameter
+        procedure :: get_all_positions => Hard_Spheres_get_all_positions
+        procedure :: get_position => Hard_Spheres_get_position
         
         procedure :: write_density => Hard_Spheres_write_density
         procedure :: write_report => Hard_Spheres_write_report
@@ -98,9 +92,6 @@ contains
         write(output_unit, *) this%name, " class destruction"
         
         if (allocated(this%all_positions)) deallocate(this%all_positions)
-        
-        call this%sameCells%destroy()
-        call this%mixCells%destroy()
     
     end subroutine Hard_Spheres_destroy
     
@@ -134,6 +125,23 @@ contains
         get_diameter = this%diameter
     end function Hard_Spheres_get_diameter
     
+    pure function Hard_Spheres_get_all_positions(this) result(get_all_positions)
+        class(Hard_Spheres), intent(in) :: this
+        real(DP), dimension(:, :), allocatable :: get_all_positions
+        
+        allocate(get_all_positions(Ndim, this%num_particles))
+        get_all_positions(:, :) = this%all_positions(:, :)
+        deallocate(get_all_positions)        
+    end function Hard_Spheres_get_all_positions
+    
+    pure function Hard_Spheres_get_position(this, i_particle) result(get_position)
+        class(Hard_Spheres), intent(in) :: this
+        integer, intent(in) :: i_particle
+        real(DP), dimension(:) :: get_position
+        
+        get_position(:) = this%all_positions(:, i_particle)
+    end function Hard_Spheres_get_position
+    
     !> Write density and compacity
     
     subroutine Hard_Spheres_write_density(this, Box_size, total_num_particles, report_unit)
@@ -166,13 +174,6 @@ contains
         
         write(report_unit ,*) "    num_particles = ", this%num_particles
         write(report_unit ,*) "    widom_num_particles = ", this%widom_num_particles
-        
-        write(report_unit, *) "    rCut = ", this%rCut
-        
-        write(report_unit, *) "    this_NtotalCell_dim(:) = ", this%sameCells%get_NtotalCell_dim()
-        write(report_unit, *) "    this_cell_size(:) = ", this%sameCells%get_cell_size()
-        write(report_unit, *) "    mix_NtotalCell_dim(:) = ", this%mixCells%get_NtotalCell_dim()
-        write(report_unit, *) "    mix_cell_size(:) = ", this%mixCells%get_cell_size()
         
         write(report_unit, *) "    snap_factor = ", this%snap_factor
         
@@ -236,26 +237,5 @@ contains
         write(output_unit, *) this%name, ":    Overlap test: OK !"
     
     end subroutine Hard_Spheres_test_overlap
-    
-    !> Neighbour Cells
-    
-    subroutine Hard_Spheres_construct_cells(this, Box_size, other, mix_cell_size, mix_rCut)
-    
-        class(Hard_Spheres), intent(inout) :: this
-        real(DP), dimension(:), intent(in) :: Box_size
-        class(Hard_Spheres), intent(in) :: other
-        real(DP), dimension(:), intent(in) :: mix_cell_size
-        real(DP), intent(in) :: mix_rCut
-        
-        real(DP), dimension(Ndim) :: same_cell_size
-        
-        same_cell_size(:) = this%rCut
-        call this%sameCells%construct(Box_size, same_cell_size, this%rCut) !< same kind
-        call this%sameCells%all_cols_to_cells(this%num_particles, this%all_positions)
-        
-        call this%mixCells%construct(Box_size, mix_cell_size, mix_rCut)
-        call this%mixCells%all_cols_to_cells(other%num_particles, other%all_positions)
-    
-    end subroutine Hard_Spheres_construct_cells
     
 end module class_hard_spheres
