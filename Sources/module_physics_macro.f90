@@ -17,7 +17,7 @@ use class_units
 
 implicit none
 private
-public init_randomSeed, set_initialConfiguration, init_spheres, final, init_mix, mix_final, &
+public init_randomSeed, set_initialConfiguration, init_spheres, final_spheres, init_mix, mix_final, &
        adapt_move, adapt_rotation, test_consist
 
 contains
@@ -273,14 +273,14 @@ contains
         end select
         this_Epot = this%Epot_conf(Box)
         
-        call this%construct_cells(Box%size, other, mix%get_cell_size(), mix%get_rCut())
+        call this%construct_cells(Box%size, other, mix%get_cell_size(), mix%get_rCut()) ! Warning: to change
         call this%write_report(this_units%report)
     
     end subroutine init
     
     !> Spheres finalizations
     
-    subroutine final(Box, this, this_units, this_obs)
+    subroutine final_spheres(Box, this, this_units, this_obs)
     
         type(Box_Dimensions), intent(in) :: Box
         class(Hard_Spheres), intent(inout) :: this

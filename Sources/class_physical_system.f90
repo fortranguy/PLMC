@@ -23,8 +23,8 @@ use class_mixing_potential
 use class_observables
 use class_units
 use module_monte_carlo_arguments, only: read_arguments
-use module_physics_macro, only: init_randomSeed, set_initialConfiguration, init_spheres, final, init_mix, &
-                                mix_final, adapt_move, adapt_rotation, test_consist
+use module_physics_macro, only: init_randomSeed, set_initialConfiguration, init_spheres, final_spheres, &
+                                init_mix, mix_final, adapt_move, adapt_rotation, test_consist
 use module_algorithms, only: move, widom, switch, rotate
 use module_write, only: open_units, write_data, mix_open_units, write_results, mix_write_results
 
@@ -98,12 +98,11 @@ private
         procedure, private :: open_units => Physical_System_open_units
         procedure, private :: init_switch => Physical_System_init_switch
         procedure, private :: init_observables => Physical_System_init_observables
-        procedure, private :: init_spheres => Physical_System_init_spheres
         procedure :: write_report => Physical_System_write_report        
-        procedure, private :: final_spheres => Physical_System_final_spheres
+        procedure :: final => Physical_System_final
         procedure, private :: write_results => Physical_System_write_results
         procedure, private :: close_units => Physical_System_close_units
-        procedure :: final => Physical_System_final
+
         
         !> Accessors & Mutators
         procedure :: get_Nthermal => Physical_System_get_Nthermal
@@ -130,8 +129,7 @@ contains
 
     ! Construction
     
-    subroutine Physical_System_construct(this)
-    
+    subroutine Physical_System_construct(this)        
         class(Physical_System), intent(out) :: this
         
         this%name = "sys"
@@ -154,6 +152,7 @@ contains
         
         this%Box%size(:) = Box_size(:)
         this%Box%wave(:) = Box_wave(:)
+        
     end subroutine Physical_System_set_box
     
     pure subroutine Physical_System_set_monte_carlo(this)
@@ -163,6 +162,7 @@ contains
         this%Nthermal = Nthermal
         this%Nadapt = Nadapt
         this%Nstep = Nstep
+        
     end subroutine Physical_System_set_monte_carlo
     
     pure subroutine Physical_System_set_changes(this)
@@ -180,12 +180,12 @@ contains
         call this%type1_rotation%init(dipol_rotate_delta, dipol_rotate_deltaMax, &
                                       dipol_rotate_rejectFix) ! ugly
         call this%type2_move%init(hard_move_delta, hard_move_rejectFix) ! ugly
+        
     end subroutine Physical_System_set_changes
     
     ! Initialization
     
-    subroutine Physical_System_init(this, args)
-    
+    subroutine Physical_System_init(this, args)    
         class(Physical_System), intent(inout) :: this
         type(Monte_Carlo_Arguments), intent(in) :: args
         
@@ -204,7 +204,14 @@ contains
                                       this%type2_spheres, this%mix%get_min_distance(), &
                                       this%report_unit)
         call this%init_observables()
-        call this%init_spheres()
+        
+        call init_mix(this%Box%size, this%mix, this%type1_spheres, this%type2_spheres, &
+                      this%write_potential, this%mix_Epot_tab_unit, this%mix_Epot)
+        call this%mix%write_report(this%mix_report_unit)
+        call init_spheres(this%Box, this%type1_spheres, this%type2_spheres, this%mix, &
+                  this%write_potential, this%type1_units, this%type1_obs%Epot)
+        call init_spheres(this%Box, this%type2_spheres, this%type1_spheres, this%mix, &
+                  this%write_potential, this%type2_units, this%type2_obs%Epot)
         
         Epot_conf = this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
         write(output_unit, *) "Initial potential energy =", Epot_conf
@@ -212,8 +219,7 @@ contains
     
     end subroutine Physical_System_init
     
-    subroutine Physical_System_open_units(this)
-    
+    subroutine Physical_System_open_units(this)    
         class(Physical_System), intent(inout) :: this
         
         call open_units(this%report_unit, this%obsThermal_unit, this%obsEquilib_unit)
@@ -234,14 +240,15 @@ contains
     
     pure subroutine Physical_System_init_switch(this)
         class(Physical_System), intent(inout) :: this
+        
         this%switch_Nhit = 0
         this%switch_Nreject = 0
         this%switch_reject = 0._DP
         this%switch_rejectSum = 0._DP
+        
     end subroutine Physical_System_init_switch
     
-    subroutine Physical_System_init_observables(this)
-    
+    subroutine Physical_System_init_observables(this)    
         class(Physical_System), intent(inout) :: this
         
         call this%type1_obs%init()
@@ -251,22 +258,7 @@ contains
         
     end subroutine Physical_System_init_observables
     
-    subroutine Physical_System_init_spheres(this)
-    
-        class(Physical_System), intent(inout) :: this
-    
-        call init_mix(this%Box%size, this%mix, this%type1_spheres, this%type2_spheres, &
-                      this%write_potential, this%mix_Epot_tab_unit, this%mix_Epot)
-        call this%mix%write_report(this%mix_report_unit)
-        call init_spheres(this%Box, this%type1_spheres, this%type2_spheres, this%mix, &
-                  this%write_potential, this%type1_units, this%type1_obs%Epot)
-        call init_spheres(this%Box, this%type2_spheres, this%type1_spheres, this%mix, &
-                  this%write_potential, this%type2_units, this%type2_obs%Epot)
-        
-    end subroutine Physical_System_init_spheres
-    
-    subroutine Physical_System_write_report(this, report_unit)
-    
+    subroutine Physical_System_write_report(this, report_unit)    
         class(Physical_System), intent(in) :: this
         integer, intent(in) :: report_unit
 
@@ -293,20 +285,21 @@ contains
     
     ! Finalisation
     
-    subroutine Physical_System_final_spheres(this)
-    
+    subroutine Physical_System_final(this)    
         class(Physical_System), intent(inout) :: this
         
-        call final(this%Box, this%type1_spheres, this%type1_units, this%type1_obs)
-        call final(this%Box, this%type2_spheres, this%type2_units, this%type2_obs)
+        call final_spheres(this%Box, this%type1_spheres, this%type1_units, this%type1_obs)
+        call final_spheres(this%Box, this%type2_spheres, this%type2_units, this%type2_obs)
         call mix_final(this%Box%size, this%mix, this%type1_spheres, this%type2_spheres, &
                        this%mix_report_unit, this%mix_Epot, this%mix_Epot_conf)
         call mix_write_results(this%Nstep, this%mix_EpotSum, this%mix_report_unit)
         
-    end subroutine Physical_System_final_spheres
+        call this%write_results()
+        call this%close_units()
     
-    subroutine Physical_System_write_results(this)
+    end subroutine Physical_System_final
     
+    subroutine Physical_System_write_results(this)    
         class(Physical_System), intent(inout) :: this
         
         real(DP) :: Epot, Epot_conf
@@ -323,8 +316,7 @@ contains
     
     end subroutine Physical_System_write_results
     
-    subroutine Physical_System_close_units(this)
-    
+    subroutine Physical_System_close_units(this)    
         class(Physical_System), intent(inout) :: this
     
         call this%type1_units%close()
@@ -341,20 +333,9 @@ contains
     
     end subroutine Physical_System_close_units
     
-    subroutine Physical_System_final(this)
-    
-        class(Physical_System), intent(inout) :: this
-        
-        call this%final_spheres()
-        call this%write_results()
-        call this%close_units()
-    
-    end subroutine Physical_System_final
-    
     ! Destruction
     
-    subroutine Physical_System_destroy(this)
-    
+    subroutine Physical_System_destroy(this)    
         class(Physical_System), intent(inout) :: this
         
         write(output_unit, *) this%name, " class destruction"
@@ -370,31 +351,38 @@ contains
     pure function Physical_System_get_Nthermal(this) result(get_Nthermal)
         class(Physical_System), intent(in) :: this
         integer :: get_Nthermal
+                
         get_Nthermal = this%Nthermal
+        
     end function Physical_System_get_Nthermal
     
     pure function Physical_System_get_Nstep(this) result(get_Nstep)
         class(Physical_System), intent(in) :: this
         integer :: get_Nstep
+                
         get_Nstep = this%Nstep
+        
     end function Physical_System_get_Nstep
     
     ! Mutators
     
     subroutine Physical_System_set_time_start(this)
-        class(Physical_System), intent(inout) :: this
+        class(Physical_System), intent(inout) :: this  
+              
         call cpu_time(this%time_start)
+        
     end subroutine Physical_System_set_time_start
     
     subroutine Physical_System_set_time_end(this)
-        class(Physical_System), intent(inout) :: this
+        class(Physical_System), intent(inout) :: this  
+              
         call cpu_time(this%time_end)
+        
     end subroutine Physical_System_set_time_end
     
     ! Random changes
     
-    subroutine Physical_System_random_changes(this)
-    
+    subroutine Physical_System_random_changes(this)    
         class(Physical_System), intent(inout) :: this
         
         integer :: iChange, iChangeRand, iColRand
@@ -429,8 +417,7 @@ contains
     
     end subroutine Physical_System_random_changes
     
-    subroutine Physical_System_update_rejections(this)
-    
+    subroutine Physical_System_update_rejections(this)    
         class(Physical_System), intent(inout) :: this
     
         call this%type1_obs%update_rejections()
@@ -442,8 +429,7 @@ contains
         
     end subroutine Physical_System_update_rejections
     
-    subroutine Physical_System_adapt_changes(this, iStep)
-    
+    subroutine Physical_System_adapt_changes(this, iStep)    
         class(Physical_System), intent(inout) :: this
         integer, intent(in) :: iStep
         
@@ -465,8 +451,7 @@ contains
         
     end subroutine Physical_System_adapt_changes
     
-    subroutine Physical_System_write_observables_thermalisation(this, iStep)
-    
+    subroutine Physical_System_write_observables_thermalisation(this, iStep)    
         class(Physical_System), intent(inout) :: this
         integer, intent(in) :: iStep
     

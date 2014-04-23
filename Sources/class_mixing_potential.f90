@@ -140,8 +140,8 @@ contains
         do type1_i_particle = 1, type1%get_num_particles()
             do type2_i_particle = 1, type2%get_num_particles()
                     
-                type1_xCol(:) = type1%all_positions(:, type1_i_particle)
-                type2_xCol(:) = type2%all_positions(:, type2_i_particle)
+                type1_xCol(:) = type1%get_position(type1_i_particle)
+                type2_xCol(:) = type2%get_position(type2_i_particle)
                 r_mix = dist_PBC(Box_size, type1_xCol, type2_xCol)
                 if (r_mix < this%rMin) then
                     write(error_unit, *) this%name, ":    Overlap !", type1_i_particle, type2_i_particle
@@ -308,8 +308,8 @@ contains
         do type1_i_particle = 1, type1%get_num_particles()
             do type2_i_particle = 1, type2%get_num_particles()
                 
-                type1_xCol(:) = type1%all_positions(:, type1_i_particle)
-                type2_xCol(:) = type2%all_positions(:, type2_i_particle)
+                type1_xCol(:) = type1%get_position(type1_i_particle)
+                type2_xCol(:) = type2%get_position(type2_i_particle)
                 r_mix = dist_PBC(Box_size, type1_xCol, type2_xCol)
                 Epot_conf = Epot_conf + this%Epot_pair(r_mix)
 
