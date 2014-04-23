@@ -31,6 +31,7 @@ private
         
         procedure :: get_cell_size => Neighbour_Cells_get_cell_size
         procedure :: get_NtotalCell_dim => Neighbour_Cells_get_NtotalCell_dim
+        procedure :: point_to_begin => Neighbour_Cells_point_to_begin
         
         procedure :: alloc_nodes => Neighbour_Cells_alloc_nodes
         procedure :: alloc_cells => Neighbour_Cells_alloc_cells
@@ -90,6 +91,14 @@ contains
         integer, dimension(Ndim) :: get_NtotalCell_dim
         get_NtotalCell_dim(:) = this%NtotalCell_dim(:)
     end function Neighbour_Cells_get_NtotalCell_dim
+    
+    subroutine Neighbour_Cells_point_to_begin(this, current, index)
+        class(Neighbour_Cells), intent(in) :: this
+        type(Node), pointer, intent(out) :: current
+        integer, intent(in) :: index
+        
+        current => this%beginCells(index)%particle%next
+    end subroutine Neighbour_Cells_point_to_begin
 
     !> Linked-list allocation
     

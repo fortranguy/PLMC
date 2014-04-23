@@ -110,7 +110,7 @@ contains
         do iNearCell = 1, NnearCell
         
             nearCell_index = this%sameCells%near_among_total(iNearCell, particle%same_iCell)
-            current => this%sameCells%beginCells(nearCell_index)%particle%next
+            call this%sameCells%point_to_begin(current, nearCell_index)
             if (.not. associated(current%next)) cycle
             
             do
