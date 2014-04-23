@@ -20,7 +20,7 @@ private
         integer, dimension(Ndim) :: NtotalCell_dim
         integer :: NtotalCell
         integer, dimension(:, :), allocatable, public :: near_among_total
-        type(Linked_List), dimension(:), allocatable, public :: beginCells
+        type(Linked_List), dimension(:), allocatable :: beginCells
         type(Linked_List), dimension(:), allocatable :: currentCells
         type(Linked_List), dimension(:), allocatable :: nextCells
         

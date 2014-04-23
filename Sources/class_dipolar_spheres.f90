@@ -42,15 +42,17 @@ private
     contains
 
         !> Construction and destruction of the class
-        procedure, private :: set_particles => Dipolar_Spheres_set_particles
         procedure :: construct => Dipolar_Spheres_construct
+        procedure, private :: set_particles => Dipolar_Spheres_set_particles
         procedure :: destroy => Dipolar_Spheres_destroy
         
         !> Write a report of the component in a file
         procedure :: write_report => Dipolar_Spheres_write_report
         
+        procedure :: set_orientation => Dipolar_Spheres_set_orientation
+        
         !> Take a snap shot of the configuration: orientations
-        procedure :: snap_orientations => Dipolar_Spheres_snap_orientations
+        procedure :: write_snap_orientations => Dipolar_Spheres_write_snap_orientations
 
         procedure :: Epot_set_alpha => Dipolar_Spheres_Epot_set_alpha
         
@@ -102,15 +104,6 @@ private
     
 contains
 
-    pure subroutine Dipolar_Spheres_set_particles(this)
-        class(Dipolar_Spheres), intent(inout) :: this
-        
-        this%diameter = 1._DP ! = u_length
-        this%num_particles = dipol_num_particles
-        allocate(this%all_positions(Ndim, this%num_particles))
-        allocate(this%all_orientations(Ndim, this%num_particles))
-    end subroutine Dipolar_Spheres_set_particles
-
     subroutine Dipolar_Spheres_construct(this)
     
         class(Dipolar_Spheres), intent(out) :: this
@@ -118,12 +111,21 @@ contains
         this%name = "dipol"
         write(output_unit, *) this%name, " class construction"
     
-        call this%set_particles()
-        this%widom_num_particles = dipol_widom_num_particles
+        call this%set_particles()        
         this%snap_factor = this%num_particles/snap_ratio
         if (this%snap_factor == 0) this%snap_factor = 1
     
     end subroutine Dipolar_Spheres_construct
+
+    pure subroutine Dipolar_Spheres_set_particles(this)
+        class(Dipolar_Spheres), intent(inout) :: this
+        
+        this%diameter = 1._DP ! = u_length
+        this%num_particles = dipol_num_particles
+        allocate(this%all_positions(Ndim, this%num_particles))
+        allocate(this%all_orientations(Ndim, this%num_particles))
+        this%widom_num_particles = dipol_widom_num_particles
+    end subroutine Dipolar_Spheres_set_particles
     
     subroutine Dipolar_Spheres_destroy(this)    
         class(Dipolar_Spheres), intent(inout) :: this
@@ -150,9 +152,17 @@ contains
         
     end subroutine Dipolar_Spheres_write_report
     
+    subroutine Dipolar_Spheres_set_orientation(this, i_particle, orientation)
+        class(Dipolar_Spheres), intent(inout) :: this
+        integer, intent(in) :: i_particle
+        real(DP), dimension(:), intent(in) :: orientation
+        
+        this%all_orientations(:, i_particle) = orientation(:)
+    end subroutine Dipolar_Spheres_set_orientation
+    
     !> Configuration state: orientations
       
-    subroutine Dipolar_Spheres_snap_orientations(this, iStep, snap_unit)
+    subroutine Dipolar_Spheres_write_snap_orientations(this, iStep, snap_unit)
         
         class(Dipolar_Spheres), intent(in) :: this
         integer, intent(in) :: iStep
@@ -166,7 +176,7 @@ contains
             end do
         end if
 
-    end subroutine Dipolar_Spheres_snap_orientations
+    end subroutine Dipolar_Spheres_write_snap_orientations
     
     !> Accessors
 

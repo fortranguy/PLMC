@@ -15,15 +15,15 @@ use data_distribution, only: snap
 use module_types, only: Box_Dimensions, Monte_Carlo_Arguments
 use module_physics_micro, only: NwaveVectors
 use class_hard_spheres
+use class_dipolar_spheres
 use class_small_move
 use class_small_rotation
 use class_neighbour_cells
-use class_dipolar_spheres
 use class_mixing_potential
 use class_observables
 use class_units
 use module_monte_carlo_arguments, only: read_arguments
-use module_physics_macro, only: init_randomSeed, set_initialConfiguration, init, final, mix_init, &
+use module_physics_macro, only: init_randomSeed, set_initialConfiguration, init_spheres, final, init_mix, &
                                 mix_final, adapt_move, adapt_rotation, test_consist
 use module_algorithms, only: move, widom, switch, rotate
 use module_write, only: open_units, write_data, mix_open_units, write_results, mix_write_results
@@ -49,18 +49,18 @@ private
         
         ! Type 1: Dipolar spheres
         type(Dipolar_Spheres) :: type1_spheres
-        type(Neighbour_Cells) :: type1_same_cells
-        type(Neighbour_Cells) :: type1_mix_cells
         type(Small_Move) :: type1_move
         type(Small_Rotation) :: type1_rotation
+        type(Neighbour_Cells) :: type1_same_cells
+        type(Neighbour_Cells) :: type1_mix_cells
         type(MoreObservables) :: type1_obs !< e.g. energy, inverse of activity (-> chemical potential)
         type(MoreUnits) :: type1_units !< files units
         
         ! Type 2: Hard spheres
         type(Hard_Spheres) :: type2_spheres
-        type(Neighbour_Cells) :: type2_same_cells
-        type(Neighbour_Cells) :: type2_mix_cells
         type(Small_Move) :: type2_move
+        type(Neighbour_Cells) :: type2_same_cells
+        type(Neighbour_Cells) :: type2_mix_cells        
         type(Observables) :: type2_obs
         type(Units) :: type2_units
         
@@ -87,19 +87,19 @@ private
     contains
     
         !> Construction & destruction of the class
-        procedure, private :: set_box => Physical_System_set_box
-        procedure, private :: set_monteCarlo => Physical_System_set_monteCarlo
-        procedure, private :: set_changes => Physical_System_set_changes
         procedure :: construct => Physical_System_construct
+        procedure, private :: set_box => Physical_System_set_box
+        procedure, private :: set_monte_carlo => Physical_System_set_monte_carlo
+        procedure, private :: set_changes => Physical_System_set_changes        
         procedure :: destroy => Physical_System_destroy
         
         !> Initialization & Finalisation
+        procedure :: init => Physical_System_init
         procedure, private :: open_units => Physical_System_open_units
         procedure, private :: init_switch => Physical_System_init_switch
         procedure, private :: init_observables => Physical_System_init_observables
         procedure, private :: init_spheres => Physical_System_init_spheres
-        procedure :: write_report => Physical_System_write_report
-        procedure :: init => Physical_System_init
+        procedure :: write_report => Physical_System_write_report        
         procedure, private :: final_spheres => Physical_System_final_spheres
         procedure, private :: write_results => Physical_System_write_results
         procedure, private :: close_units => Physical_System_close_units
@@ -130,6 +130,25 @@ contains
 
     ! Construction
     
+    subroutine Physical_System_construct(this)
+    
+        class(Physical_System), intent(out) :: this
+        
+        this%name = "sys"
+        write(output_unit, *) this%name, " class construction"
+        
+        call this%set_box()
+        call this%set_monte_carlo()
+        this%write_potential = write_potential
+        
+        call this%type1_spheres%construct()
+        call this%type2_spheres%construct()
+        call this%mix%construct(this%type1_spheres%get_diameter(), this%type2_spheres%get_diameter())
+        
+        call this%set_changes()
+    
+    end subroutine Physical_System_construct
+    
     pure subroutine Physical_System_set_box(this)
         class(Physical_System), intent(inout) :: this
         
@@ -137,14 +156,14 @@ contains
         this%Box%wave(:) = Box_wave(:)
     end subroutine Physical_System_set_box
     
-    pure subroutine Physical_System_set_monteCarlo(this)
+    pure subroutine Physical_System_set_monte_carlo(this)
         class(Physical_System), intent(inout) :: this
         
         this%Temperature = Temperature
         this%Nthermal = Nthermal
         this%Nadapt = Nadapt
         this%Nstep = Nstep
-    end subroutine Physical_System_set_monteCarlo
+    end subroutine Physical_System_set_monte_carlo
     
     pure subroutine Physical_System_set_changes(this)
         class(Physical_System), intent(inout) :: this
@@ -162,27 +181,36 @@ contains
                                       dipol_rotate_rejectFix) ! ugly
         call this%type2_move%init(hard_move_delta, hard_move_rejectFix) ! ugly
     end subroutine Physical_System_set_changes
-
-    subroutine Physical_System_construct(this)
-    
-        class(Physical_System), intent(out) :: this
-        
-        this%name = "sys"
-        write(output_unit, *) this%name, " class construction"
-        
-        call this%set_box()
-        call this%set_monteCarlo()
-        this%write_potential = write_potential
-        
-        call this%type1_spheres%construct()
-        call this%type2_spheres%construct()
-        call this%mix%construct(this%type1_spheres%get_diameter(), this%type2_spheres%get_diameter())
-        
-        call this%set_changes()
-    
-    end subroutine Physical_System_construct
     
     ! Initialization
+    
+    subroutine Physical_System_init(this, args)
+    
+        class(Physical_System), intent(inout) :: this
+        type(Monte_Carlo_Arguments), intent(in) :: args
+        
+        real(DP) :: Epot_conf
+        
+        this%snap = snap
+        this%reset_iStep = reset_iStep
+        
+        write(output_unit, *) "Monte-Carlo Simulation: Canonical ensemble"
+        
+        call this%open_units()
+        call this%init_switch()
+        
+        call init_randomSeed(args%random, this%report_unit)
+        call set_initialConfiguration(this%Box%size, args%initial, this%type1_spheres, &
+                                      this%type2_spheres, this%mix%get_min_distance(), &
+                                      this%report_unit)
+        call this%init_observables()
+        call this%init_spheres()
+        
+        Epot_conf = this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
+        write(output_unit, *) "Initial potential energy =", Epot_conf
+        write(this%obsThermal_unit, *) 0, Epot_conf
+    
+    end subroutine Physical_System_init
     
     subroutine Physical_System_open_units(this)
     
@@ -227,42 +255,15 @@ contains
     
         class(Physical_System), intent(inout) :: this
     
-        call mix_init(this%Box%size, this%mix, this%type1_spheres, this%type2_spheres, &
+        call init_mix(this%Box%size, this%mix, this%type1_spheres, this%type2_spheres, &
                       this%write_potential, this%mix_Epot_tab_unit, this%mix_Epot)
         call this%mix%write_report(this%mix_report_unit)
-        call init(this%Box, this%type1_spheres, this%type2_spheres, this%mix, &
+        call init_spheres(this%Box, this%type1_spheres, this%type2_spheres, this%mix, &
                   this%write_potential, this%type1_units, this%type1_obs%Epot)
-        call init(this%Box, this%type2_spheres, this%type1_spheres, this%mix, &
+        call init_spheres(this%Box, this%type2_spheres, this%type1_spheres, this%mix, &
                   this%write_potential, this%type2_units, this%type2_obs%Epot)
         
     end subroutine Physical_System_init_spheres
-
-    subroutine Physical_System_init(this, args)
-    
-        class(Physical_System), intent(inout) :: this
-        type(Monte_Carlo_Arguments), intent(in) :: args
-        
-        real(DP) :: Epot_conf
-        
-        this%snap = snap
-        this%reset_iStep = reset_iStep
-        
-        write(output_unit, *) "Monte-Carlo Simulation: Canonical ensemble"
-        
-        call this%open_units()
-        call this%init_switch()
-        
-        call init_randomSeed(args%random, this%report_unit)
-        call set_initialConfiguration(this%Box%size, args%initial, this%type1_spheres, &
-                                      this%type2_spheres, this%mix%get_min_distance(), this%report_unit)
-        call this%init_observables()
-        call this%init_spheres()
-        
-        Epot_conf = this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
-        write(output_unit, *) "Initial potential energy =", Epot_conf
-        write(this%obsThermal_unit, *) 0, Epot_conf
-    
-    end subroutine Physical_System_init
     
     subroutine Physical_System_write_report(this, report_unit)
     
@@ -534,9 +535,9 @@ contains
         integer, intent(in) :: iStep
         
         if (this%snap) then ! Snap shots of the configuration
-            call this%type1_spheres%snap_positions(iStep, this%type1_units%snap_positions)
-            call this%type1_spheres%snap_orientations(iStep, this%type1_units%snap_orientations)
-            call this%type2_spheres%snap_positions(iStep, this%type2_units%snap_positions)
+            call this%type1_spheres%write_snap_positions(iStep, this%type1_units%write_snap_positions)
+            call this%type1_spheres%write_snap_orientations(iStep, this%type1_units%write_snap_orientations)
+            call this%type2_spheres%write_snap_positions(iStep, this%type2_units%write_snap_positions)
         end if
         
     end subroutine Physical_System_take_snapshots

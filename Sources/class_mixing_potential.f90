@@ -67,7 +67,6 @@ contains
         this%name = "[mix]"
         write(output_unit, *) this%name, " class construction"
         
-        ! Particles
         this%delta = mix_delta
         this%min_distance = (type1_diameter + type2_diameter)/2._DP + this%delta
 

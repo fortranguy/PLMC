@@ -17,7 +17,7 @@ use class_units
 
 implicit none
 private
-public init_randomSeed, set_initialConfiguration, init, final, mix_init, mix_final, &
+public init_randomSeed, set_initialConfiguration, init_spheres, final, init_mix, mix_final, &
        adapt_move, adapt_rotation, test_consist
 
 contains
@@ -65,127 +65,6 @@ contains
         deallocate(seed)
         
     end subroutine init_randomSeed
-
-    !> Random depositions configuration
-    
-    subroutine randomDepositions(Box_size, type1, type2, mix_min_distance)
-
-        real(DP), dimension(:), intent(in) :: Box_size
-        class(Hard_Spheres), intent(inout) :: type1, type2
-        real(DP), intent(in) :: mix_min_distance
-
-        integer :: i_particle, i_particle_test
-        real(DP), dimension(Ndim) :: xRand, position, position_test
-        real(DP) :: rTest
-        
-        ! Type 1
-        do i_particle = 1, type1%get_num_particles()
-        
-7101        continue
-            call random_number(xRand)
-            type1%all_positions(:, i_particle) = xRand*Box_size(:)
-            
-            position(:) = type1%all_positions(:, i_particle)
-            do i_particle_test = 1, i_particle-1
-                position_test(:) = type1%all_positions(:, i_particle_test)
-                rTest = dist_PBC(Box_size, position, position_test)
-                if (rTest < type1%get_diameter()) then
-                    goto 7101
-                end if
-            end do
-        
-        end do
-        
-        ! Type 2
-        do i_particle = 1, type2%get_num_particles()
-        
-7102        continue
-            call random_number(xRand)
-            type2%all_positions(:, i_particle) = xRand*Box_size(:)
-            
-            position(:) = type2%all_positions(:, i_particle)
-            do i_particle_test = 1, type1%get_num_particles()
-                position_test(:) = type1%all_positions(:, i_particle_test)
-                rTest = dist_PBC(Box_size, position, position_test)
-                if (rTest < mix_min_distance) then
-                    goto 7102
-                end if
-            end do
-            
-            do i_particle_test = 1, i_particle-1
-                position_test(:) = type2%all_positions(:, i_particle_test)
-                rTest = dist_PBC(Box_size, position, position_test)
-                if (rTest < type2%get_diameter()) then
-                    goto 7102
-                end if
-            end do
-        
-        end do
-    
-    end subroutine randomDepositions
-    
-    !> Uniform (gaussian) orientations
-    
-    subroutine randomOrientations(orientations, num_particles)
-    
-        real(DP), dimension(:, :), intent(out) :: orientations
-        integer, intent(in) :: num_particles
-        
-        integer :: i_particle
-        
-        do i_particle = 1, num_particles
-            orientations(:, i_particle) = random_surface()
-        end do
-    
-    end subroutine randomOrientations
-    
-    !> From an old configuration
-    
-    subroutine oldConfiguration(file, length, type_name, type_num_particles, type_coords, normMax)
-    
-        character(len=*), intent(in) :: file
-        integer, intent(in) :: length
-        character(len=*), intent(in) :: type_name
-        integer, intent(in) :: type_num_particles
-        real(DP), dimension(:, :), intent(out) :: type_coords
-        real(DP), intent(in) :: normMax
-        
-        integer :: file_unit, readStat
-
-        integer :: i_particle
-        real(DP), dimension(Ndim) :: vecDummy
-        
-        write(output_unit, *) type_name, " <- ", file(1:length)
-        open(newunit=file_unit, recl=4096, file=file(1:length), status='old', action='read')
-        
-        i_particle = 0
-        do
-            read(file_unit, fmt=*, iostat=readStat) vecDummy(:)
-            if (readStat == iostat_end) exit
-            i_particle = i_particle + 1
-        end do
-        
-        if (i_particle == type_num_particles) then
-            rewind(file_unit)
-            do i_particle = 1, type_num_particles
-                read(file_unit, *) type_coords(:, i_particle)
-                if (norm2(type_coords(:, i_particle)) > normMax+io_tiny) then
-                    write(error_unit, *) "Norm error in file: ", file(1:length)
-                    write(error_unit, *) "Coordinates ", type_coords(:, i_particle)
-                    write(error_unit, *) "Norm =", norm2(type_coords(:, i_particle))
-                    error stop
-                end if
-            end do
-        else
-            write(error_unit, *) "Error reading: ", file(1:length)
-            write(error_unit, *) "i_particle", i_particle, " /= ", "type_num_particles", &
-                                 type_num_particles
-            error stop
-        end if
-        
-        close(file_unit)
-        
-    end subroutine oldConfiguration
     
     !> Initial configuration
     
@@ -204,23 +83,19 @@ contains
         select case (arg_init%choice)
         
             case ('r')
-                call randomDepositions(Box_size, dipolar, spherical, mix_min_distance)
-                call randomOrientations(dipolar%all_orientations, dipolar%get_num_particles())
+                call random_depositions(Box_size, dipolar, spherical, mix_min_distance)
+                call random_orientations(dipolar, dipolar%get_num_particles())
                 write(output_unit, *) "Random depositions + random orientations"
                 write(report_unit, *) "    Random depositions + random orientations"
                 
             case ('f')
                 write(output_unit, *) "Old configuration"
                 write(report_unit, *) "    Old configuration"
-                call oldConfiguration(arg_init%files(1), arg_init%length(1), &
-                                      dipolar%get_name()//"_positions", dipolar%get_num_particles(), &
-                                      dipolar%all_positions, norm2(Box_size))
-                call oldConfiguration(arg_init%files(2), arg_init%length(2), &
-                                      dipolar%get_name()//"_orientations", dipolar%get_num_particles(), &
-                                      dipolar%all_orientations, 1._DP)
-                call oldConfiguration(arg_init%files(3), arg_init%length(3), &
-                                      spherical%get_name()//"_positions", spherical%get_num_particles(), &
-                                      spherical%all_positions, norm2(Box_size))
+                call oldConfiguration(arg_init%files(1), arg_init%length(1), dipolar, norm2(Box_size), &
+                                      "positions")
+                call oldConfiguration(arg_init%files(2), arg_init%length(2), dipolar, 1._DP, "orientations")
+                call oldConfiguration(arg_init%files(3), arg_init%length(3), spherical, norm2(Box_size), &
+                                      "positions")
             
             case default
                 error stop "Error: in setting new configuration"
@@ -228,10 +103,145 @@ contains
         end select
         
     end subroutine set_initialConfiguration
+
+    !> Random depositions configuration
+    
+    subroutine random_depositions(Box_size, spheres1, spheres2, mix_min_distance)
+
+        real(DP), dimension(:), intent(in) :: Box_size
+        class(Hard_Spheres), intent(inout) :: spheres1, spheres2
+        real(DP), intent(in) :: mix_min_distance
+
+        integer :: i_particle, i_particle_test
+        real(DP), dimension(Ndim) :: xRand, position, position_test
+        real(DP) :: rTest
+        
+        ! Type 1
+        do i_particle = 1, spheres1%get_num_particles()
+        
+7101        continue
+            call random_number(xRand)
+            call spheres1%set_position(i_particle, xRand*Box_size)
+            
+            position(:) = spheres1%get_position(i_particle)
+            do i_particle_test = 1, i_particle-1
+                position_test(:) = spheres1%get_position(i_particle_test)
+                rTest = dist_PBC(Box_size, position, position_test)
+                if (rTest < spheres1%get_diameter()) then
+                    goto 7101
+                end if
+            end do
+        
+        end do
+        
+        ! Type 2
+        do i_particle = 1, spheres2%get_num_particles()
+        
+7102        continue
+            call random_number(xRand)
+            spheres2%set_position(i_particle, xRand*Box_size)
+            
+            position(:) = spheres2%get_position(i_particle)
+            do i_particle_test = 1, spheres1%get_num_particles()
+                position_test(:) = spheres1%get_position(i_particle_test)
+                rTest = dist_PBC(Box_size, position, position_test)
+                if (rTest < mix_min_distance) then
+                    goto 7102
+                end if
+            end do
+            
+            do i_particle_test = 1, i_particle-1
+                position_test(:) = spheres2%get_position(i_particle_test)
+                rTest = dist_PBC(Box_size, position, position_test)
+                if (rTest < spheres2%get_diameter()) then
+                    goto 7102
+                end if
+            end do
+        
+        end do
+    
+    end subroutine random_depositions
+    
+    !> Uniform (gaussian) orientations
+    
+    subroutine random_orientations(spheres, num_particles)
+    
+        class(Hard_Spheres), intent(inout) :: spheres
+        integer, intent(in) :: num_particles
+        
+        integer :: i_particle
+        
+        do i_particle = 1, num_particles
+            spheres%set_orientation(i_particle, random_surface())
+        end do
+    
+    end subroutine random_orientations
+    
+    !> From an old configuration
+    
+    subroutine oldConfiguration(file, length, spheres, normMax, coordinates_name)
+    
+        character(len=*), intent(in) :: file
+        integer, intent(in) :: length
+        class(Hard_Spheres), intent(inout) :: spheres
+        real(DP), dimension(:, :), intent(out) :: type_coords
+        real(DP), intent(in) :: normMax
+        character(len=*), intent(in) :: coordinates_name
+        
+        integer :: file_unit, readStat
+
+        integer :: i_particle
+        real(DP), dimension(Ndim) :: coordinate
+        real(DP) :: coordinate_norm
+        
+        write(output_unit, *) spheres%get_name()//coordinates_name, " <- ", file(1:length)
+        open(newunit=file_unit, recl=4096, file=file(1:length), status='old', action='read')
+        
+        i_particle = 0
+        do
+            read(file_unit, fmt=*, iostat=readStat) coordinate(:)
+            if (readStat == iostat_end) exit
+            i_particle = i_particle + 1
+        end do
+        
+        if (i_particle == spheres%get_num_particles()) then
+            rewind(file_unit)
+            do i_particle = 1, spheres%get_num_particles()
+            
+                read(file_unit, *) coordinate(:)
+                select case(coordinates_name)
+                    case("positions")
+                        call spheres%set_position(i_particle, coordinate)
+                        coordinate_norm = norm2(pheres%get_position(i_particle))
+                    case("orientations")
+                        call spheres%set_orientation(i_particle, coordinate)
+                        coordinate_norm = norm2(pheres%get_orientation(i_particle))
+                    case default
+                        write(error_unit) "Error: unknown coordinate name"
+                        error stop
+                end select
+                
+                if (coordinate_norm > normMax+io_tiny) then
+                    write(error_unit, *) "Norm error in file: ", file(1:length)
+                    write(error_unit, *) "Index ", i_particle
+                    write(error_unit, *) "Norm =", coordinate_norm
+                    error stop
+                end if
+            end do
+        else
+            write(error_unit, *) "Error reading: ", file(1:length)
+            write(error_unit, *) "i_particle", i_particle, " /= ", "num_particles", &
+                                 spheres%get_num_particles()
+            error stop
+        end if
+        
+        close(file_unit)
+        
+    end subroutine oldConfiguration
     
     !> Spheres initialisations
     
-    subroutine init(Box, this, other, mix, write_potential, this_units, this_Epot)
+    subroutine init_spheres(Box, this, other, mix, write_potential, this_units, this_Epot)
     
         type(Box_Dimensions), intent(in) :: Box
         class(Hard_Spheres), intent(inout) :: this
@@ -242,7 +252,7 @@ contains
         real(DP), intent(out) :: this_Epot
         
         call this%test_overlap(Box%size)
-        call this%snap_data(this_units%snap_positions)
+        call this%write_snap_data(this_units%snap_positions)
         call this%snap_positions(0, this_units%snapIni_positions)
         call this%set_Epot(Box)
         
@@ -253,8 +263,8 @@ contains
             type is (Dipolar_Spheres)
                 select type (this_units)
                     type is (MoreUnits)
-                        call this%snap_data(this_units%snap_orientations)
-                        call this%snap_orientations(0, this_units%snapIni_orientations)
+                        call this%write_snap_data(this_units%write_snap_orientations)
+                        call this%write_snap_orientations(0, this_units%snapIni_orientations)
                         if (write_potential) then
                             call this%write_Epot_real(this_units%Epot_real)
                         end if
@@ -287,7 +297,7 @@ contains
             type is (Dipolar_Spheres)
                 select type (this_units)
                     type is (MoreUnits)
-                        call this%snap_orientations(0, this_units%snapFin_orientations)
+                        call this%write_snap_orientations(0, this_units%snapFin_orientations)
                 end select
         end select
     
@@ -295,39 +305,39 @@ contains
     
     !> Mix initialisation
     
-    subroutine mix_init(Box_size, mix, type1, type2, write_potential, mix_Epot_unit, mix_Epot)
+    subroutine init_mix(Box_size, mix, spheres1, spheres2, write_potential, mix_Epot_unit, mix_Epot)
     
         real(DP), dimension(:), intent(in) :: Box_size
         class(Mixing_Potential), intent(inout) :: mix
-        class(Hard_Spheres), intent(in) :: type1, type2
+        class(Hard_Spheres), intent(in) :: spheres1, spheres2
         logical, intent(in) :: write_potential
         integer, intent(in) :: mix_Epot_unit
         real(DP), intent(out) :: mix_Epot
     
-        call mix%test_overlap(Box_size, type1, type2)
+        call mix%test_overlap(Box_size, spheres1, spheres2)
         call mix%set_Epot()
         if (write_potential) then
             call mix%write_Epot(mix_Epot_unit)
         end if
         call mix%set_cell_size()
-        mix_Epot = mix%Epot_conf(Box_size, type1, type2)
+        mix_Epot = mix%Epot_conf(Box_size, spheres1, spheres2)
     
-    end subroutine mix_init
+    end subroutine init_mix
     
     !> Mix finalization
     
-    subroutine mix_final(Box_size, mix, type1, type2, mix_report_unit, mix_Epot, mix_Epot_conf)
+    subroutine mix_final(Box_size, mix, spheres1, spheres2, mix_report_unit, mix_Epot, mix_Epot_conf)
     
         real(DP), dimension(:), intent(in) :: Box_size
         class(Mixing_Potential), intent(inout) :: mix
-        class(Hard_Spheres), intent(in) :: type1, type2
+        class(Hard_Spheres), intent(in) :: spheres1, spheres2
         integer, intent(in) :: mix_report_unit
         real(DP), intent(in) :: mix_Epot
         real(DP), intent(out) :: mix_Epot_conf
         
-        call mix%test_overlap(Box_size, type1, type2)
+        call mix%test_overlap(Box_size, spheres1, spheres2)
         call mix%set_Epot()
-        mix_Epot_conf = mix%Epot_conf(Box_size, type1, type2)
+        mix_Epot_conf = mix%Epot_conf(Box_size, spheres1, spheres2)
         call test_consist(mix_Epot, mix_Epot_conf, mix_report_unit)
     
     end subroutine mix_final

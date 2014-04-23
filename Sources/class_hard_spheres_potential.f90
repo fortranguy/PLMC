@@ -15,7 +15,7 @@ private
         real(DP) :: min_distance
         real(DP) :: range_cut
     contains
-        procedure :: set_domain => Hard_Spheres_Potential_set_domain
+        procedure :: construct => Hard_Spheres_Potential_construct
         procedure :: write => Hard_Spheres_Potential_write
         procedure :: neighCells => Hard_Spheres_Potential_neighCells
         procedure :: conf => Hard_Spheres_Potential_conf
@@ -23,7 +23,7 @@ private
     
 contains
 
-    subroutine Hard_Spheres_Potential_set_domain(this, diameter)
+    subroutine Hard_Spheres_Potential_construct(this, diameter)
     
         class(Hard_Spheres_Potential), intent(inout) :: this
         real(DP), intent(in) :: diameter
@@ -31,7 +31,7 @@ contains
         this%min_distance = hard_rMin_factor * diameter
         this%range_cut = this%min_distance
         
-    end subroutine Hard_Spheres_Potential_set_domain
+    end subroutine Hard_Spheres_Potential_construct
     
     subroutine Hard_Spheres_Potential_write(this, unit)
     

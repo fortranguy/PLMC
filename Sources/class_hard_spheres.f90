@@ -37,8 +37,8 @@ private
     contains
 
         !> Construction and destruction of the class
-        procedure, private :: set_particles => Hard_Spheres_set_particles
         procedure :: construct => Hard_Spheres_construct
+        procedure, private :: set_particles => Hard_Spheres_set_particles
         procedure :: destroy => Hard_Spheres_destroy
         
         !> Accessors & Mutators
@@ -46,14 +46,15 @@ private
         procedure :: get_num_particles => Hard_Spheres_get_num_particles
         procedure :: get_widom_num_particles => Hard_Spheres_get_widom_num_particles
         procedure :: get_diameter => Hard_Spheres_get_diameter
-        procedure :: get_all_positions => Hard_Spheres_get_all_positions
+        procedure :: set_position => Hard_Spheres_set_position
         procedure :: get_position => Hard_Spheres_get_position
+        procedure :: get_all_positions => Hard_Spheres_get_all_positions        
         
         procedure :: write_density => Hard_Spheres_write_density
         procedure :: write_report => Hard_Spheres_write_report
         
-        procedure :: snap_data => Hard_Spheres_snap_data
-        procedure :: snap_positions => Hard_Spheres_snap_positions
+        procedure :: write_snap_data => Hard_Spheres_write_snap_data
+        procedure :: write_snap_positions => Hard_Spheres_write_snap_positions
         
         procedure :: test_overlap => Hard_Spheres_test_overlap
         
@@ -64,26 +65,26 @@ private
     
 contains
 
-    pure subroutine Hard_Spheres_set_particles(this)
-        class(Hard_Spheres), intent(inout) :: this
-        this%diameter = hard_diameter
-        this%num_particles = hard_num_particles
-        allocate(this%all_positions(Ndim, this%num_particles))
-    end subroutine Hard_Spheres_set_particles
-
-    subroutine Hard_Spheres_construct(this)
-    
+    subroutine Hard_Spheres_construct(this)    
         class(Hard_Spheres), intent(out) :: this
         
         this%name = "hardS"
         write(output_unit, *) this%name, " class construction"
         
         call this%set_particles()
-        this%widom_num_particles = hard_widom_num_particles
         this%snap_factor = this%num_particles/snap_ratio
         if (this%snap_factor == 0) this%snap_factor = 1
         
     end subroutine Hard_Spheres_construct
+    
+    pure subroutine Hard_Spheres_set_particles(this)
+        class(Hard_Spheres), intent(inout) :: this
+        
+        this%diameter = hard_diameter
+        this%num_particles = hard_num_particles
+        allocate(this%all_positions(Ndim, this%num_particles))
+        this%widom_num_particles = hard_widom_num_particles
+    end subroutine Hard_Spheres_set_particles
     
     subroutine Hard_Spheres_destroy(this)
     
@@ -125,14 +126,13 @@ contains
         get_diameter = this%diameter
     end function Hard_Spheres_get_diameter
     
-    pure function Hard_Spheres_get_all_positions(this) result(get_all_positions)
-        class(Hard_Spheres), intent(in) :: this
-        real(DP), dimension(:, :), allocatable :: get_all_positions
-        
-        allocate(get_all_positions(Ndim, this%num_particles))
-        get_all_positions(:, :) = this%all_positions(:, :)
-        deallocate(get_all_positions)        
-    end function Hard_Spheres_get_all_positions
+    subroutine Hard_Spheres_set_position(this, i_particle, position)
+        class(Hard_Spheres), intent(inout) :: this
+        integer, intent(in) :: i_particle
+        real(DP), dimension(:), intent(in) :: position
+    
+        this%all_positions(:, i_particle) = position(:)
+    end subroutine Hard_Spheres_set_position
     
     pure function Hard_Spheres_get_position(this, i_particle) result(get_position)
         class(Hard_Spheres), intent(in) :: this
@@ -141,6 +141,15 @@ contains
         
         get_position(:) = this%all_positions(:, i_particle)
     end function Hard_Spheres_get_position
+    
+    pure function Hard_Spheres_get_all_positions(this) result(get_all_positions)
+        class(Hard_Spheres), intent(in) :: this
+        real(DP), dimension(:, :), allocatable :: get_all_positions
+        
+        allocate(get_all_positions(Ndim, this%num_particles))
+        get_all_positions(:, :) = this%all_positions(:, :)
+        deallocate(get_all_positions)        
+    end function Hard_Spheres_get_all_positions
     
     !> Write density and compacity
     
@@ -183,15 +192,15 @@ contains
     
     !> Tag the snapshots
     
-    subroutine Hard_Spheres_snap_data(this, snap_unit)
+    subroutine Hard_Spheres_write_snap_data(this, snap_unit)
         class(Hard_Spheres), intent(in) :: this
         integer, intent(in) :: snap_unit
         write(snap_unit, *) this%name, this%num_particles, this%snap_factor
-    end subroutine Hard_Spheres_snap_data
+    end subroutine Hard_Spheres_write_snap_data
     
     !> Configuration state: positions
       
-    subroutine Hard_Spheres_snap_positions(this, iStep, snap_unit)
+    subroutine Hard_Spheres_write_snap_positions(this, iStep, snap_unit)
         
         class(Hard_Spheres), intent(in) :: this
         integer, intent(in) :: iStep
@@ -205,7 +214,7 @@ contains
             end do
         end if
 
-    end subroutine Hard_Spheres_snap_positions
+    end subroutine Hard_Spheres_write_snap_positions
     
     !> Do an overlap test
     
