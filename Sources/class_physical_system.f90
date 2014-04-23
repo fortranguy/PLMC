@@ -17,6 +17,7 @@ use module_physics_micro, only: NwaveVectors
 use class_hard_spheres
 use class_small_move
 use class_small_rotation
+use class_neighbour_cells
 use class_dipolar_spheres
 use class_mixing_potential
 use class_observables
@@ -48,6 +49,8 @@ private
         
         ! Type 1: Dipolar spheres
         type(Dipolar_Spheres) :: type1_spheres
+        type(Neighbour_Cells) :: type1_same_cells
+        type(Neighbour_Cells) :: type1_mix_cells
         type(Small_Move) :: type1_move
         type(Small_Rotation) :: type1_rotation
         type(MoreObservables) :: type1_obs !< e.g. energy, inverse of activity (-> chemical potential)
@@ -55,6 +58,8 @@ private
         
         ! Type 2: Hard spheres
         type(Hard_Spheres) :: type2_spheres
+        type(Neighbour_Cells) :: type2_same_cells
+        type(Neighbour_Cells) :: type2_mix_cells
         type(Small_Move) :: type2_move
         type(Observables) :: type2_obs
         type(Units) :: type2_units
