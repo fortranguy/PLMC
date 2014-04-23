@@ -55,7 +55,7 @@ contains
         class(Hard_Spheres_Potential), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         class(Hard_Spheres), intent(in) :: this_spheres
-        class(Neighbour_Cells) :: this_cells
+        class(Neighbour_Cells), intent(in) :: this_cells
         type(Particle_Index), intent(in) :: particle
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energ
