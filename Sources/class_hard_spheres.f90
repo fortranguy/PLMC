@@ -195,7 +195,9 @@ contains
     subroutine Hard_Spheres_write_snap_data(this, snap_unit)
         class(Hard_Spheres), intent(in) :: this
         integer, intent(in) :: snap_unit
+        
         write(snap_unit, *) this%name, this%num_particles, this%snap_factor
+        
     end subroutine Hard_Spheres_write_snap_data
     
     !> Configuration state: positions

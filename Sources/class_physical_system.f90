@@ -24,7 +24,7 @@ use class_observables
 use class_units
 use module_monte_carlo_arguments, only: read_arguments
 use module_physics_macro, only: init_random_seed, set_initial_configuration, &
-                                init_spheres, final_spheres, init_mix, mix_final, &
+                                init_spheres, init_cells, final_spheres, init_mix, mix_final, &
                                 adapt_move, adapt_rotation, test_consist
 use module_algorithms, only: move, widom, switch, rotate
 use module_write, only: open_units, write_data, mix_open_units, write_results, mix_write_results
@@ -207,10 +207,14 @@ contains
         call init_mix(this%Box%size, this%mix, this%type1_spheres, this%type2_spheres, &
                       this%write_potential, this%mix_Epot_tab_unit, this%mix_Epot)
         call this%mix%write_report(this%mix_report_unit)
-        call init_spheres(this%Box, this%type1_spheres, this%type2_spheres, this%mix, &
-                          this%write_potential, this%type1_units, this%type1_obs%Epot)
-        call init_spheres(this%Box, this%type2_spheres, this%type1_spheres, this%mix, &
-                          this%write_potential, this%type2_units, this%type2_obs%Epot)
+        call init_spheres(this%Box, this%type1_spheres, this%type1_potential, this%type2_spheres, &
+                          this%mix, this%write_potential, this%type1_units, this%type1_obs%Epot)
+        call init_cells(this%Box%size, this%type1_spheres, this%type1_same_cells, this%type2_spheres, &
+                        this%type1_mix_cells, this%type1_potential, mix)
+        call init_spheres(this%Box, this%type2_spheres, this%type2_potential, this%type1_spheres, &
+                          this%mix, this%write_potential, this%type2_units, this%type2_obs%Epot)
+        call init_cells(this%Box%size, this%type2_spheres, this%type2_same_cells, this%type1_spheres, &
+                        this%type2_mix_cells, this%type2_potential, mix)
         
         this%EpotSum = 0._DP
         Epot_conf = this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot

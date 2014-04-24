@@ -99,14 +99,10 @@ contains
     
     !> Total potential energy: dummy
     
-    pure function Hard_Spheres_Potential_conf(this, Box) result(conf)
+    pure function Hard_Spheres_Potential_conf(this) result(conf)
     
         class(Hard_Spheres_Potential), intent(in) :: this
-        type(Box_Dimensions), intent(in) :: Box
         real(DP) :: conf
-        
-        real(DP) :: volume_dummy
-        volume_dummy = product(Box%size)
     
         conf = this%num_particles * 0._DP
         

@@ -8,6 +8,7 @@ use data_box, only: Ndim
 use module_types, only: Box_Dimensions, Argument_Random, Argument_Initial
 use module_physics_micro, only: dist_PBC, random_surface
 use class_hard_spheres
+use class_hard_spheres_potential
 use class_small_move
 use class_small_rotation
 use class_dipolar_spheres
@@ -17,7 +18,8 @@ use class_units
 
 implicit none
 private
-public init_random_seed, set_initial_configuration, init_spheres, final_spheres, init_mix, mix_final, &
+public init_random_seed, set_initial_configuration, &
+       init_spheres, init_cells, final_spheres, init_mix, mix_final, &
        adapt_move, adapt_rotation, test_consist
 
 contains
@@ -242,11 +244,13 @@ contains
     
     !> Spheres initialisations
     
-    subroutine init_spheres(Box, this, other, mix, write_potential, this_units, this_Epot)
+    subroutine init_spheres(Box, this, this_potential, other, mix, write_potential, this_units, &
+                            this_Epot) ! separate ?
     
         type(Box_Dimensions), intent(in) :: Box
         class(Hard_Spheres), intent(inout) :: this
         class(Hard_Spheres), intent(in) :: other
+        class(Hard_Spheres_Potential), intent(inout) :: this_potential        
         class(Mixing_Potential), intent(in) :: mix
         logical, intent(in) :: write_potential
         class(Units), intent(in) :: this_units
@@ -255,13 +259,15 @@ contains
         call this%test_overlap(Box%size)
         call this%write_snap_data(this_units%snap_positions)
         call this%snap_positions(0, this_units%snapIni_positions)
-        call this%set_Epot(Box)
+        call this_potential%construct(this%get_diameter())
+        this_Epot = this_potential%conf()
         
         if (write_potential) then
-            call this%write_Epot(this_units%Epot)
+            call this_potentia%write(this_units%Epot)
         end if
         select type (this)
             type is (Dipolar_Spheres)
+                this_Epot = this_Epot + this%Epot_conf(Box) ! temp
                 select type (this_units)
                     type is (MoreUnits)
                         call this%write_snap_data(this_units%write_snap_orientations)
@@ -272,12 +278,31 @@ contains
                         call this%Epot_reci_count_waveVectors(Box%wave, this_units%waveVectors)
                 end select
         end select
-        this_Epot = this%Epot_conf(Box)
-        
-        call this%construct_cells(Box%size, other, mix%get_cell_size(), mix%get_rCut()) ! Warning: to change
         call this%write_report(this_units%report)
     
     end subroutine init
+    
+    subroutine init_cells(Box_size, this_spheres, sameCells, other_spheres, mixCells, this_potential, &
+                          mix)
+    
+        real(DP), dimension(:), intent(in) :: Box_size
+        class(Hard_Spheres), intent(in) :: this_spheres, other_spheres
+        class(Neighbour_Cells), intent(out) :: sameCells, mixCells
+        class(Hard_Spheres_Potential), intent(in) :: this_potential
+        class(Mixing_Potential), intent(in) :: mix
+        
+        real(DP), dimension(Ndim) :: same_cell_size
+        
+        same_cell_size(:) = this_potential%get_range_cut()
+        call sameCells%construct(Box_size, same_cell_size, this_potential%get_range_cut())
+        call sameCells%all_cols_to_cells(this_spheres%get_num_particles(), &
+                                              this_spheres%get_all_positions())
+        
+        call mixCells%construct(Box_size, mix%get_cell_size(), mix%get_rCut())
+        call mixCells%all_cols_to_cells(other_spheres%get_num_particles(), &
+                                             other_spheres%get_all_positions())
+
+    end subroutine init_cells
     
     !> Spheres finalizations
     
