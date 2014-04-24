@@ -157,26 +157,6 @@ contains
     end subroutine Mixing_Potential_test_overlap
 
     !> Mixing_Potential energy
-    !> Tabulation of Yukawa potential
-    !> \f[ \epsilon \frac{e^{-\alpha (r-r_{min})}}{r} \f]
-    
-    pure subroutine Mixing_Potential_set_Epot_tab(this)
-    
-        class(Mixing_Potential), intent(inout) :: this
-
-        integer :: i
-        real(DP) :: r_i
-       
-        ! cut
-        do i = this%iMin, this%iCut
-            r_i = real(i, DP)*this%dr
-            this%Epot_tab(i) = Epot_yukawa(this%epsilon, this%alpha, this%rMin, r_i)
-        end do
-        
-        ! shift
-        this%Epot_tab(:) = this%Epot_tab(:) - this%Epot_tab(this%iCut)
-
-    end subroutine Mixing_Potential_set_Epot_tab
     
     subroutine Mixing_Potential_set_Epot(this)
     
@@ -202,6 +182,27 @@ contains
         
     end subroutine Mixing_Potential_set_Epot
     
+    !> Tabulation of Yukawa potential
+    !> \f[ \epsilon \frac{e^{-\alpha (r-r_{min})}}{r} \f]
+    
+    pure subroutine Mixing_Potential_set_Epot_tab(this)
+    
+        class(Mixing_Potential), intent(inout) :: this
+
+        integer :: i
+        real(DP) :: r_i
+       
+        ! cut
+        do i = this%iMin, this%iCut
+            r_i = real(i, DP)*this%dr
+            this%Epot_tab(i) = Epot_yukawa(this%epsilon, this%alpha, this%rMin, r_i)
+        end do
+        
+        ! shift
+        this%Epot_tab(:) = this%Epot_tab(:) - this%Epot_tab(this%iCut)
+
+    end subroutine Mixing_Potential_set_Epot_tab
+    
     !> Write the tabulated potential
     
     subroutine Mixing_Potential_write_Epot(this, Epot_unit)
@@ -218,25 +219,38 @@ contains
         end do
 
     end subroutine Mixing_Potential_write_Epot
-
-    pure function Mixing_Potential_Epot_pair(this, r) result(Epot_pair)
-        
+    
+    !> Total potential energy
+    
+    pure function Mixing_Potential_Epot_conf(this, Box_size, type1, type2) result(Epot_conf)
+    
         class(Mixing_Potential), intent(in) :: this
-        real(DP), intent(in) :: r
-        real(DP) :: Epot_pair
+        real(DP), dimension(:), intent(in) :: Box_size
+        class(Hard_Spheres), intent(in) :: type1, type2
+        real(DP) :: Epot_conf
+
+        integer :: type1_i_particle, type2_i_particle
+        real(DP) :: r_mix
+        real(DP), dimension(Ndim) :: type1_xCol, type2_xCol
+
+        Epot_conf = 0._DP
         
-        integer :: i
-        real(DP) :: r_i
-       
-        if (r < this%rCut) then
-            i = int(r/this%dr)
-            r_i = real(i, DP)*this%dr
-            Epot_pair = this%Epot_tab(i) + (r-r_i)/this%dr * (this%Epot_tab(i+1)-this%Epot_tab(i))
-        else
-            Epot_pair = 0._DP
+        if (this%epsilon < real_zero) then
+            return
         end if
         
-    end function Mixing_Potential_Epot_pair
+        do type1_i_particle = 1, type1%get_num_particles()
+            do type2_i_particle = 1, type2%get_num_particles()
+                
+                type1_xCol(:) = type1%get_position(type1_i_particle)
+                type2_xCol(:) = type2%get_position(type2_i_particle)
+                r_mix = dist_PBC(Box_size, type1_xCol, type2_xCol)
+                Epot_conf = Epot_conf + this%Epot_pair(r_mix)
+
+            end do
+        end do
+    
+    end function Mixing_Potential_Epot_conf
     
     subroutine Mixing_Potential_Epot_neighCells(this, Box_size, particle, this_cells, other, overlap, &
                                                 energ)
@@ -286,36 +300,23 @@ contains
     
     end subroutine Mixing_Potential_Epot_neighCells
     
-    !> Total potential energy
-    
-    pure function Mixing_Potential_Epot_conf(this, Box_size, type1, type2) result(Epot_conf)
-    
-        class(Mixing_Potential), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: Box_size
-        class(Hard_Spheres), intent(in) :: type1, type2
-        real(DP) :: Epot_conf
-
-        integer :: type1_i_particle, type2_i_particle
-        real(DP) :: r_mix
-        real(DP), dimension(Ndim) :: type1_xCol, type2_xCol
-
-        Epot_conf = 0._DP
+    pure function Mixing_Potential_Epot_pair(this, r) result(Epot_pair)
         
-        if (this%epsilon < real_zero) then
-            return
+        class(Mixing_Potential), intent(in) :: this
+        real(DP), intent(in) :: r
+        real(DP) :: Epot_pair
+        
+        integer :: i
+        real(DP) :: r_i
+       
+        if (r < this%rCut) then
+            i = int(r/this%dr)
+            r_i = real(i, DP)*this%dr
+            Epot_pair = this%Epot_tab(i) + (r-r_i)/this%dr * (this%Epot_tab(i+1)-this%Epot_tab(i))
+        else
+            Epot_pair = 0._DP
         end if
         
-        do type1_i_particle = 1, type1%get_num_particles()
-            do type2_i_particle = 1, type2%get_num_particles()
-                
-                type1_xCol(:) = type1%get_position(type1_i_particle)
-                type2_xCol(:) = type2%get_position(type2_i_particle)
-                r_mix = dist_PBC(Box_size, type1_xCol, type2_xCol)
-                Epot_conf = Epot_conf + this%Epot_pair(r_mix)
-
-            end do
-        end do
-    
-    end function Mixing_Potential_Epot_conf
+    end function Mixing_Potential_Epot_pair
 
 end module class_mixing_potential
