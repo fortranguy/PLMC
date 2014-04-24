@@ -23,8 +23,9 @@ use class_mixing_potential
 use class_observables
 use class_units
 use module_monte_carlo_arguments, only: read_arguments
-use module_physics_macro, only: init_randomSeed, set_initialConfiguration, init_spheres, final_spheres, &
-                                init_mix, mix_final, adapt_move, adapt_rotation, test_consist
+use module_physics_macro, only: init_random_seed, set_initial_configuration, &
+                                init_spheres, final_spheres, init_mix, mix_final, &
+                                adapt_move, adapt_rotation, test_consist
 use module_algorithms, only: move, widom, switch, rotate
 use module_write, only: open_units, write_data, mix_open_units, write_results, mix_write_results
 
@@ -44,8 +45,8 @@ private
         
         ! Monte-Carlo
         real(DP) :: Temperature
-        integer :: Nthermal, Nadapt, Nstep !< Markov-chain Monte-Carlo
-        integer :: decorrelFactor, Nchange, Nmove, Nswitch, Nrotate !< changes
+        integer :: Nthermal, Nadapt, Nstep
+        integer :: decorrelFactor, Nchange, Nmove, Nswitch, Nrotate
         
         ! Type 1: Dipolar spheres
         type(Dipolar_Spheres) :: type1_spheres
@@ -53,8 +54,8 @@ private
         type(Small_Rotation) :: type1_rotation
         type(Neighbour_Cells) :: type1_same_cells
         type(Neighbour_Cells) :: type1_mix_cells
-        type(MoreObservables) :: type1_obs !< e.g. energy, inverse of activity (-> chemical potential)
-        type(MoreUnits) :: type1_units !< files units
+        type(MoreObservables) :: type1_obs
+        type(MoreUnits) :: type1_units
         
         ! Type 2: Hard spheres
         type(Hard_Spheres) :: type2_spheres
@@ -65,16 +66,16 @@ private
         type(Units) :: type2_units
         
         ! Mixing potential
-        type(Mixing_Potential) :: mix !< short-range potential
-        real(DP) :: mix_Epot, mix_EpotSum, mix_Epot_conf !< potential energy
+        type(Mixing_Potential) :: mix
+        real(DP) :: mix_Epot, mix_EpotSum, mix_Epot_conf
         integer :: mix_report_unit
         integer :: mix_Epot_tab_unit
         integer :: mix_obsThermal_unit, mix_obsEquilib_unit
         
         ! Observables: write to files
         real(DP) :: Epot, EpotSum
-        integer :: report_unit !< data & results file
-        integer :: obsThermal_unit, obsEquilib_unit !< observables files: thermalisation & equilibrium
+        integer :: report_unit
+        integer :: obsThermal_unit, obsEquilib_unit
         
         ! Switch
         integer :: switch_Nhit, switch_Nreject
@@ -97,7 +98,6 @@ private
         procedure :: init => Physical_System_init
         procedure, private :: open_units => Physical_System_open_units
         procedure, private :: init_switch => Physical_System_init_switch
-        procedure, private :: init_observables => Physical_System_init_observables
         procedure :: write_report => Physical_System_write_report        
         procedure :: final => Physical_System_final
         procedure, private :: write_results => Physical_System_write_results
@@ -199,20 +199,20 @@ contains
         call this%open_units()
         call this%init_switch()
         
-        call init_randomSeed(args%random, this%report_unit)
-        call set_initialConfiguration(this%Box%size, args%initial, this%type1_spheres, &
-                                      this%type2_spheres, this%mix%get_min_distance(), &
-                                      this%report_unit)
-        call this%init_observables()
-        
+        call init_random_seed(args%random, this%report_unit)
+        call set_initial_configuration(this%Box%size, args%initial, this%type1_spheres, &
+                                       this%type2_spheres, this%mix%get_min_distance(), &
+                                       this%report_unit)
+        this%mix_EpotSum = 0._DP        
         call init_mix(this%Box%size, this%mix, this%type1_spheres, this%type2_spheres, &
                       this%write_potential, this%mix_Epot_tab_unit, this%mix_Epot)
         call this%mix%write_report(this%mix_report_unit)
         call init_spheres(this%Box, this%type1_spheres, this%type2_spheres, this%mix, &
-                  this%write_potential, this%type1_units, this%type1_obs%Epot)
+                          this%write_potential, this%type1_units, this%type1_obs%Epot)
         call init_spheres(this%Box, this%type2_spheres, this%type1_spheres, this%mix, &
-                  this%write_potential, this%type2_units, this%type2_obs%Epot)
+                          this%write_potential, this%type2_units, this%type2_obs%Epot)
         
+        this%EpotSum = 0._DP
         Epot_conf = this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
         write(output_unit, *) "Initial potential energy =", Epot_conf
         write(this%obsThermal_unit, *) 0, Epot_conf
@@ -227,10 +227,11 @@ contains
         call this%write_report(this%report_unit)
         
         call this%type1_units%open(this%type1_spheres%get_name())
-        call this%type1_spheres%write_density(this%Box%size, this%num_particles, this%type1_units%report)
-        
+        call this%type1_spheres%write_density(this%Box%size, this%num_particles, &
+                                              this%type1_units%report)        
         call this%type2_units%open(this%type2_spheres%get_name())
-        call this%type2_spheres%write_density(this%Box%size, this%num_particles, this%type2_units%report)
+        call this%type2_spheres%write_density(this%Box%size, this%num_particles, &
+                                              this%type2_units%report)
         
         call mix_open_units(this%mix_report_unit, this%mix_Epot_tab_unit, this%mix_obsThermal_unit, &
                             this%mix_obsEquilib_unit)
@@ -247,16 +248,6 @@ contains
         this%switch_rejectSum = 0._DP
         
     end subroutine Physical_System_init_switch
-    
-    subroutine Physical_System_init_observables(this)    
-        class(Physical_System), intent(inout) :: this
-        
-        call this%type1_obs%init()
-        call this%type2_obs%init()
-        this%mix_EpotSum = 0._DP
-        this%EpotSum = 0._DP
-        
-    end subroutine Physical_System_init_observables
     
     subroutine Physical_System_write_report(this, report_unit)    
         class(Physical_System), intent(in) :: this

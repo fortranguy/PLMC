@@ -11,24 +11,23 @@ private
     type, public :: Observables
     
         ! Move
-        integer :: move_Nhit
-        integer :: move_Nreject
-        real(DP) :: move_reject
-        real(DP) :: move_rejectSum
-        real(DP) :: move_rejectAdapt
-        real(DP) :: move_rejectAvg
+        integer :: move_Nhit = 0
+        integer :: move_Nreject = 0
+        real(DP) :: move_reject = 0._DP
+        real(DP) :: move_rejectSum = 0._DP
+        real(DP) :: move_rejectAdapt = 0._DP
+        real(DP) :: move_rejectAvg = 0._DP
         
         ! Potential energy
         real(DP) :: Epot
-        real(DP) :: EpotSum
+        real(DP) :: EpotSum = 0._DP
         
         ! Inverse of activity
         real(DP) :: activ
-        real(DP) :: activSum
+        real(DP) :: activSum = 0._DP
     
     contains
     
-        procedure :: init => Observables_init
         procedure :: update_rejections => Observables_update_rejections
         procedure :: write => Observables_write
         procedure :: accumulate => Observables_accumulate
@@ -39,47 +38,16 @@ private
     type, extends(Observables), public :: MoreObservables
         
         ! Rotate
-        integer :: rotate_Nhit
-        integer :: rotate_Nreject
-        real(DP) :: rotate_reject
-        real(DP) :: rotate_rejectSum
-        real(DP) :: rotate_rejectAdapt
-        real(DP) :: rotate_rejectAvg
+        integer :: rotate_Nhit = 0
+        integer :: rotate_Nreject = 0
+        real(DP) :: rotate_reject = 0._DP
+        real(DP) :: rotate_rejectSum = 0._DP
+        real(DP) :: rotate_rejectAdapt = 0._DP
+        real(DP) :: rotate_rejectAvg = 0._DP
         
     end type MoreObservables
     
 contains
-
-    !> Initialisation
-
-    pure subroutine Observables_init(this)
-        
-        class(Observables), intent(out) :: this
-        
-        this%move_Nhit = 0
-        this%move_Nreject = 0
-        this%move_reject = 0._DP
-        this%move_rejectSum = 0._DP
-        this%move_rejectAdapt = 0._DP
-        this%move_rejectAvg = 0._DP
-        
-        this%EpotSum = 0._DP
-        this%activSum = 0._DP
-        
-        select type (this)
-            
-            type is (MoreObservables)
-                
-                this%rotate_Nhit = 0
-                this%rotate_Nreject = 0
-                this%rotate_reject = 0._DP
-                this%rotate_rejectSum = 0._DP
-                this%rotate_rejectAdapt = 0._DP
-                this%rotate_rejectAvg = 0._DP
-                
-        end select
-        
-    end subroutine Observables_init
     
     !> Update rejection
     

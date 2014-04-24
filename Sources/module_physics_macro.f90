@@ -17,14 +17,14 @@ use class_units
 
 implicit none
 private
-public init_randomSeed, set_initialConfiguration, init_spheres, final_spheres, init_mix, mix_final, &
+public init_random_seed, set_initial_configuration, init_spheres, final_spheres, init_mix, mix_final, &
        adapt_move, adapt_rotation, test_consist
 
 contains
 
     !> Random number generator: seed
     
-    subroutine init_randomSeed(arg_rand, report_unit)
+    subroutine init_random_seed(arg_rand, report_unit)
     
         type(Argument_Random) :: arg_rand
         integer, intent(in) :: report_unit
@@ -54,7 +54,7 @@ contains
                 write(report_unit, *) "Random number generator: fix"
 
             case default
-                error stop "Error: init_randomSeed"
+                error stop "Error: init_random_seed"
 
         end select
 
@@ -64,12 +64,12 @@ contains
 
         deallocate(seed)
         
-    end subroutine init_randomSeed
+    end subroutine init_random_seed
     
     !> Initial configuration
     
-    subroutine set_initialConfiguration(Box_size, arg_init, dipolar, spherical, mix_min_distance, &
-                                        report_unit)
+    subroutine set_initial_configuration(Box_size, arg_init, dipolar, spherical, mix_min_distance, &
+                                         report_unit)
         
         real(DP), dimension(:), intent(in) :: Box_size
         type(Argument_Initial), intent(in) :: arg_init
@@ -91,18 +91,19 @@ contains
             case ('f')
                 write(output_unit, *) "Old configuration"
                 write(report_unit, *) "    Old configuration"
-                call oldConfiguration(arg_init%files(1), arg_init%length(1), dipolar, norm2(Box_size), &
-                                      "positions")
-                call oldConfiguration(arg_init%files(2), arg_init%length(2), dipolar, 1._DP, "orientations")
-                call oldConfiguration(arg_init%files(3), arg_init%length(3), spherical, norm2(Box_size), &
-                                      "positions")
+                call old_configuration(arg_init%files(1), arg_init%length(1), dipolar, &
+                                       norm2(Box_size), "positions")
+                call old_configuration(arg_init%files(2), arg_init%length(2), dipolar, &
+                                       1._DP, "orientations")
+                call old_configuration(arg_init%files(3), arg_init%length(3), spherical, &
+                                       norm2(Box_size), "positions")
             
             case default
                 error stop "Error: in setting new configuration"
                 
         end select
         
-    end subroutine set_initialConfiguration
+    end subroutine set_initial_configuration
 
     !> Random depositions configuration
     
@@ -179,7 +180,7 @@ contains
     
     !> From an old configuration
     
-    subroutine oldConfiguration(file, length, spheres, normMax, coordinates_name)
+    subroutine old_configuration(file, length, spheres, normMax, coordinates_name)
     
         character(len=*), intent(in) :: file
         integer, intent(in) :: length
@@ -237,7 +238,7 @@ contains
         
         close(file_unit)
         
-    end subroutine oldConfiguration
+    end subroutine old_configuration
     
     !> Spheres initialisations
     
