@@ -96,7 +96,8 @@ private
         
         !> Initialization & Finalisation
         procedure :: init => Physical_System_init
-        procedure, private :: open_units => Physical_System_open_units
+        procedure, private :: open_all_units => Physical_System_open_all_units
+        procedure, private :: write_all_reports => Physical_System_write_all_reports
         procedure, private :: init_switch => Physical_System_init_switch
         procedure :: write_report => Physical_System_write_report        
         procedure :: final => Physical_System_final
@@ -196,7 +197,8 @@ contains
         
         write(output_unit, *) "Monte-Carlo Simulation: Canonical ensemble"
         
-        call this%open_units()
+        call this%open_all_units()
+        call this%write_reports()
         call this%init_switch()
         
         call init_random_seed(args%random, this%report_unit)
@@ -223,35 +225,29 @@ contains
     
     end subroutine Physical_System_init
     
-    subroutine Physical_System_open_units(this)    
+    subroutine Physical_System_open_all_units(this)    
         class(Physical_System), intent(inout) :: this
         
-        call open_units(this%report_unit, this%obsThermal_unit, this%obsEquilib_unit)
+        call open_units(this%report_unit, this%obsThermal_unit, this%obsEquilib_unit)        
+        call this%type1_units%open(this%type1_spheres%get_name())           
+        call this%type2_units%open(this%type2_spheres%get_name())       
+        call mix_open_units(this%mix_report_unit, this%mix_Epot_tab_unit, this%mix_obsThermal_unit, &
+                            this%mix_obsEquilib_unit)        
+    
+    end subroutine Physical_System_open_all_units
+    
+    subroutine Physical_System_write_all_reports(this)    
+        class(Physical_System), intent(in) :: this
+        
         call write_data(this%report_unit)
         call this%write_report(this%report_unit)
-        
-        call this%type1_units%open(this%type1_spheres%get_name())
         call this%type1_spheres%write_density(this%Box%size, this%num_particles, &
-                                              this%type1_units%report)        
-        call this%type2_units%open(this%type2_spheres%get_name())
+                                              this%type1_units%report)
         call this%type2_spheres%write_density(this%Box%size, this%num_particles, &
                                               this%type2_units%report)
-        
-        call mix_open_units(this%mix_report_unit, this%mix_Epot_tab_unit, this%mix_obsThermal_unit, &
-                            this%mix_obsEquilib_unit)
         call this%mix%write_report(this%mix_report_unit)
     
-    end subroutine Physical_System_open_units
-    
-    pure subroutine Physical_System_init_switch(this)
-        class(Physical_System), intent(inout) :: this
-        
-        this%switch_Nhit = 0
-        this%switch_Nreject = 0
-        this%switch_reject = 0._DP
-        this%switch_rejectSum = 0._DP
-        
-    end subroutine Physical_System_init_switch
+    end subroutine Physical_System_write_all_reports
     
     subroutine Physical_System_write_report(this, report_unit)    
         class(Physical_System), intent(in) :: this
@@ -277,6 +273,16 @@ contains
         write(report_unit, *) "    write_potential = ", this%write_potential
     
     end subroutine Physical_System_write_report
+    
+    pure subroutine Physical_System_init_switch(this)
+        class(Physical_System), intent(inout) :: this
+        
+        this%switch_Nhit = 0
+        this%switch_Nreject = 0
+        this%switch_reject = 0._DP
+        this%switch_rejectSum = 0._DP
+        
+    end subroutine Physical_System_init_switch
     
     ! Finalisation
     
@@ -306,8 +312,8 @@ contains
         call test_consist(Epot, Epot_conf, this%report_unit)
         this%EpotSum = this%type1_obs%EpotSum + this%type2_obs%EpotSum + this%mix_EpotSum
         duration = this%time_end - this%time_start
-        call write_results(this%num_particles, this%Nstep, this%EpotSum, this%switch_rejectSum, duration,&
-                           this%report_unit)
+        call write_results(this%num_particles, this%Nstep, this%EpotSum, this%switch_rejectSum,&
+                           duration, this%report_unit)
     
     end subroutine Physical_System_write_results
     
