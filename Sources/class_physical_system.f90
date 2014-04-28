@@ -240,10 +240,15 @@ contains
         
         call write_data(this%report_unit)
         call this%write_report(this%report_unit)
+        
         call this%type1_spheres%write_density(this%Box%size, this%num_particles, &
                                               this%type1_units%report)
+        call this%type1_spheres%write_report(this%type1_units%report)
+        
         call this%type2_spheres%write_density(this%Box%size, this%num_particles, &
                                               this%type2_units%report)
+        call this%type2_spheres%write_report(this%type2_units%report)
+        
         call this%mix%write_report(this%mix_report_unit)
     
     end subroutine Physical_System_write_all_reports

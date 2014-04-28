@@ -278,7 +278,6 @@ contains
                         call this%Epot_reci_count_waveVectors(Box%wave, this_units%waveVectors)
                 end select
         end select
-        call this%write_report(this_units%report)
     
     end subroutine init
     
