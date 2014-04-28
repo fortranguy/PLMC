@@ -98,12 +98,11 @@ private
         procedure :: init => Physical_System_init
         procedure, private :: open_all_units => Physical_System_open_all_units
         procedure, private :: write_all_reports => Physical_System_write_all_reports
-        procedure, private :: init_switch => Physical_System_init_switch
-        procedure :: write_report => Physical_System_write_report        
+        procedure, private :: write_report => Physical_System_write_report
+        procedure, private :: init_switch => Physical_System_init_switch              
         procedure :: final => Physical_System_final
         procedure, private :: write_results => Physical_System_write_results
         procedure, private :: close_units => Physical_System_close_units
-
         
         !> Accessors & Mutators
         procedure :: get_Nthermal => Physical_System_get_Nthermal
@@ -198,7 +197,7 @@ contains
         write(output_unit, *) "Monte-Carlo Simulation: Canonical ensemble"
         
         call this%open_all_units()
-        call this%write_reports()
+        call this%write_all_reports()
         call this%init_switch()
         
         call init_random_seed(args%random, this%report_unit)
