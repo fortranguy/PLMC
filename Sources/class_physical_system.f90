@@ -101,6 +101,7 @@ private
         procedure, private :: write_report => Physical_System_write_report
         procedure, private :: init_switch => Physical_System_init_switch              
         procedure :: final => Physical_System_final
+        procedure, private :: write_all_results => Physical_System_write_all_results
         procedure, private :: write_results => Physical_System_write_results
         procedure, private :: close_units => Physical_System_close_units
         
@@ -297,12 +298,22 @@ contains
         call final_spheres(this%Box, this%type2_spheres, this%type2_units, this%type2_obs)
         call mix_final(this%Box%size, this%mix, this%type1_spheres, this%type2_spheres, &
                        this%mix_report_unit, this%mix_Epot, this%mix_Epot_conf)
-        call mix_write_results(this%Nstep, this%mix_EpotSum, this%mix_report_unit)
         
-        call this%write_results()
+        call this%write_all_results()
         call this%close_units()
     
     end subroutine Physical_System_final
+    
+    subroutine Physical_System_write_all_results(this)
+        class(Physical_System), intent(inout) :: this
+        
+        call this%type1_obs%write_results(this%type1_units%report)
+        call this%type2_obs%write_results(this%type2_units%report)
+        call mix_write_results(this%Nstep, this%mix_EpotSum, this%mix_report_unit)
+        
+        call this%write_results()
+    
+    end subroutine Physical_System_write_all_results
     
     subroutine Physical_System_write_results(this)    
         class(Physical_System), intent(inout) :: this
@@ -526,7 +537,8 @@ contains
         
         if (this%snap) then ! Snap shots of the configuration
             call this%type1_spheres%write_snap_positions(iStep, this%type1_units%write_snap_positions)
-            call this%type1_spheres%write_snap_orientations(iStep, this%type1_units%write_snap_orientations)
+            call this%type1_spheres%write_snap_orientations(iStep, &
+                                                            this%type1_units%write_snap_orientations)
             call this%type2_spheres%write_snap_positions(iStep, this%type2_units%write_snap_positions)
         end if
         

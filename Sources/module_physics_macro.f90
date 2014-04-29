@@ -316,7 +316,6 @@ contains
         call this%set_Epot(Box)
         call test_consist(this_obs%Epot, this%Epot_conf(Box), this_units%report)
         call this%snap_positions(0, this_units%snapFin_positions)
-        call this_obs%write_results(this_units%report)
         
         select type (this)
             type is (Dipolar_Spheres)
