@@ -54,6 +54,7 @@ private
         type(Small_Rotation) :: type1_rotation
         type(Neighbour_Cells) :: type1_same_cells
         type(Neighbour_Cells) :: type1_mix_cells
+        type(Hard_Spheres_Potential) :: type1_hard_potential
         type(MoreObservables) :: type1_obs
         type(MoreUnits) :: type1_units
         
@@ -61,7 +62,8 @@ private
         type(Hard_Spheres) :: type2_spheres
         type(Small_Move) :: type2_move
         type(Neighbour_Cells) :: type2_same_cells
-        type(Neighbour_Cells) :: type2_mix_cells        
+        type(Neighbour_Cells) :: type2_mix_cells   
+        type(Hard_Spheres_Potential) :: type2_hard_potential     
         type(Observables) :: type2_obs
         type(Units) :: type2_units
         
