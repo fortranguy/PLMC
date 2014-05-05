@@ -47,7 +47,7 @@ contains
         
         call random_number(random)
         old%number = int(random*this_spheres%get_num_particles()) + 1
-        old%position(:) = this_spheres%all_positions(:, old%number)
+        old%position(:) = this_spheres%get_position(old%number)
         
         new%number = old%number
         call random_number(xRand)
@@ -81,7 +81,7 @@ contains
                 old%same_iCell = this_same_cells%index_from_position(old%position)
                 select type (this)
                     type is (Dipolar_Spheres)
-                        old%orientation(:) = this_spheres%all_orientations(:, old%number)
+                        old%orientation(:) = this_spheres%get_orientation(old%number)
                         new%orientation(:) = old%orientation(:)
                         this_EpotNew_real = this_spheres%Epot_real_solo(Box%size, new)
                         this_EpotOld_real = this_spheres%Epot_real_solo(Box%size, old)
@@ -109,7 +109,7 @@ contains
                             call this_spheres%reci_update_structure_move(Box, old, new)
                     end select
                 
-                    this_spheres%all_positions(:, old%number) = new%position(:)
+                    this_spheres%set_position(old%number, new%position)
                     this_obs%Epot = this_obs%Epot + this_deltaEpot
                     mix_Epot = mix_Epot + mix_deltaEpot
                     
@@ -167,7 +167,7 @@ contains
                 call this_hard_potential%neighCells(Box%size, test, overlap, this_EpotTest)
             else
                 test%mix_iCell = other_mix_cells%index_from_position(test%position)
-                call mix%Epot_neighCells(Box%size, test, this%mixCells, other%all_positions, overlap, &
+                call mix%Epot_neighCells(Box%size, test, this%mixCells, other, overlap, &
                                          mix_EpotTest)
             end if
             
@@ -175,7 +175,7 @@ contains
             
                 if (this%get_num_particles() >= other%get_num_particles()) then
                     test%mix_iCell = other_mix_cells%index_from_position(test%position)
-                    call mix%Epot_neighCells(Box%size, test, this%mixCells, other%all_positions, overlap, &
+                    call mix%Epot_neighCells(Box%size, test, this%mixCells, other, overlap, &
                                              mix_EpotTest)
                 else
                     test%same_iCell = this_same_cells%index_from_position(test%position)
@@ -402,10 +402,10 @@ contains
     
     !> Dipole rotation
     
-    subroutine rotate(Box, this, rotation, obs)
+    subroutine rotate(Box, spheres, rotation, obs)
     
         type(Box_Dimensions), intent(in) :: Box
-        class(Dipolar_Spheres), intent(inout) :: this
+        class(Dipolar_Spheres), intent(inout) :: spheres
         class(Small_rotation), intent(in) :: rotation
         class(MoreObservables), intent(inout) :: obs
         
@@ -418,30 +418,31 @@ contains
         obs%rotate_Nhit = obs%rotate_Nhit + 1
 
         call random_number(random)
-        old%number = int(random*this%get_num_particles()) + 1
-        old%position(:) = this%all_positions(:, old%number)
-        old%orientation(:) = this%all_orientations(:, old%number)
+        old%number = int(random*spheres%get_num_particles()) + 1
+        old%position(:) = spheres%get_position(old%number)
+        old%orientation(:) = spheres%get_orientation(old%number)
         
         new%number = old%number
         new%position(:) = old%position(:)
         new%orientation(:) = old%orientation(:)
         call markov_surface(new%orientation, rotation%get_delta())
         
-        real_EpotOld = this%Epot_real_solo(Box%size, old)
-        real_EpotNew = this%Epot_real_solo(Box%size, new)
+        real_EpotOld = spheres%Epot_real_solo(Box%size, old)
+        real_EpotNew = spheres%Epot_real_solo(Box%size, new)
         deltaEpot_real = real_EpotNew - real_EpotOld
         
-        deltaEpot_self = this%Epot_self_solo(new%orientation) - this%Epot_self_solo(old%orientation)
+        deltaEpot_self = spheres%Epot_self_solo(new%orientation) - spheres%Epot_self_solo(old%orientation)
         
-        deltaEpot = deltaEpot_real + this%deltaEpot_reci_rotate(Box, old, new) - &
-                    deltaEpot_self + this%deltaEpot_bound_rotate(Box%size, old%orientation, new%orientation)
+        deltaEpot = deltaEpot_real + spheres%deltaEpot_reci_rotate(Box, old, new) - &
+                    deltaEpot_self + spheres%deltaEpot_bound_rotate(Box%size, old%orientation, &
+                                                                    new%orientation)
         
         call random_number(random)
         if (random < exp(-deltaEpot/Temperature)) then
         
-            call this%reci_update_structure_rotate(Box, old, new)
-            call this%update_totalMoment_rotate(old%orientation, new%orientation)
-            this%all_orientations(:, old%number) = new%orientation(:)
+            call spheres%reci_update_structure_rotate(Box, old, new)
+            call spheres%update_totalMoment_rotate(old%orientation, new%orientation)
+            spheres%set_orientation(old%number, new%orientation)
             
             obs%Epot = obs%Epot + deltaEpot
             
