@@ -506,8 +506,10 @@ contains
     
         class(Physical_System), intent(inout) :: this
     
-        call widom(this%Box, this%type1_spheres, this%type1_obs, this%type2_spheres, this%mix)
-        call widom(this%Box, this%type2_spheres, this%type2_obs, this%type1_spheres, this%mix)
+        call widom(this%Box, this%type1_spheres, this%type1_same_cells, this%type1_mix_cells, &
+                   this%type1_obs, this%type2_spheres, this%type2_mix_cells, this%mix)
+        call widom(this%Box, this%type2_spheres, this%type2_same_cells, this%type2_mix_cells, &
+                   this%type2_obs, this%type1_spheres, this%type1_mix_cells, this%mix)
     
     end subroutine Physical_System_measure_chemical_potentials
     

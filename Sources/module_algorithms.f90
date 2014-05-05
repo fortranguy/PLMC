@@ -138,12 +138,15 @@ contains
     
     !> Widom's method
 
-    subroutine widom(Box, this, this_obs, other, mix)
+    subroutine widom(Box, this_spheres, this_same_cells, this_mix_cells, this_obs, other_spheres, &
+                     other_mix_cells, mix)
         
         type(Box_Dimensions), intent(in) :: Box
-        class(Hard_Spheres), intent(in) :: this
+        class(Hard_Spheres), intent(in) :: this_spheres
+        class(Neighbour_Cells), intent(inout) :: this_same_cells, this_mix_cells, other_mix_cells
+        class(Hard_Spheres_Potential), intent(in) :: this_hard_potential
         class(Observables), intent(inout) :: this_obs
-        class(Hard_Spheres), intent(in) :: other
+        class(Hard_Spheres), intent(in) :: other_spheres
         class(Mixing_Potential), intent(in) :: mix
         
         integer :: iWidom
@@ -157,41 +160,44 @@ contains
         widTestSum = 0._DP
         test%number = 0
         
-        do iWidom = 1, this%get_widom_num_particles()
+        do iWidom = 1, this_spheres%get_widom_num_particles()
             
             call random_number(xRand)
             test%position(:) = Box%size(:) * xRand(:)
 
-            if (this%get_num_particles() >= other%get_num_particles()) then
+            if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
                 test%same_iCell = this_same_cells%index_from_position(test%position)
-                call this_hard_potential%neighCells(Box%size, test, overlap, this_EpotTest)
+                call this_hard_potential%neighCells(Box%size, this_spheres, this_same_cells, test, &
+                                                    overlap, this_EpotTest)
             else
                 test%mix_iCell = other_mix_cells%index_from_position(test%position)
-                call mix%Epot_neighCells(Box%size, test, this%mixCells, other, overlap, &
+                call mix%Epot_neighCells(Box%size, test, this_mix_cells, other_spheres, overlap, &
                                          mix_EpotTest)
             end if
             
             if (.not. overlap) then
             
-                if (this%get_num_particles() >= other%get_num_particles()) then
+                if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
                     test%mix_iCell = other_mix_cells%index_from_position(test%position)
-                    call mix%Epot_neighCells(Box%size, test, this%mixCells, other, overlap, &
+                    call mix%Epot_neighCells(Box%size, test, this_mix_cells, other_spheres, overlap, &
                                              mix_EpotTest)
                 else
                     test%same_iCell = this_same_cells%index_from_position(test%position)
-                    call this_hard_potential%neighCells(Box%size, test, overlap, this_EpotTest)
+                    call this_hard_potential%neighCells(Box%size, this_spheres, this_same_cells, test, &
+                                                        overlap, this_EpotTest)
                 end if
                 
                 if (.not. overlap) then
                 
-                    select type (this)
+                    select type (this_spheres)
                         type is (Dipolar_Spheres)
                             test%add = .true.
                             test%orientation(:) = random_surface()
-                            this_EpotTest = this%Epot_real_solo(Box%size, test) + &
-                                            this%deltaEpot_reci_exchange(Box, test) - &
-                                            this%Epot_self_solo(test%orientation) + &
-                                            this%deltaEpot_bound_exchange(Box%size, test%orientation)
+                            this_EpotTest = this_spheres%Epot_real_solo(Box%size, test) + &
+                                            this_spheres%deltaEpot_reci_exchange(Box, test) - &
+                                            this_spheres%Epot_self_solo(test%orientation) + &
+                                            this_spheres%deltaEpot_bound_exchange(Box%size, &
+                                                                                  test%orientation)
                     end select
                 
                     EpotTest = this_EpotTest + mix_EpotTest
@@ -203,7 +209,7 @@ contains
             
         end do
         
-        this_obs%activ = widTestSum/real(this%get_widom_num_particles(), DP)
+        this_obs%activ = widTestSum/real(this_spheres%get_widom_num_particles(), DP)
         
     end subroutine widom
     
