@@ -209,6 +209,81 @@ contains
     
     !> Particle switch
     
+    subroutine switch(Box, type1, type1_obs, type2, type2_obs, mix, mix_Epot, switch_Nreject)
+    
+        type(Box_Dimensions), intent(in) :: Box
+        class(Hard_Spheres), intent(inout) :: type1, type2
+        class(Observables), intent(inout) :: type1_obs, type2_obs
+        class(Mixing_Potential), intent(in) :: mix
+        real(DP), intent(inout) :: mix_Epot
+        integer, intent(inout) :: switch_Nreject
+        
+        real(DP) :: random
+        type(Particle_Index) :: old1, old2
+        type(Particle_Index) :: new1, new2
+        logical :: overlap
+        real(DP) :: deltaEpot, type1_deltaEpot, type2_deltaEpot
+        real(DP) :: type1_mix_deltaEpot, type2_mix_deltaEpot
+        type(Particle_Energy) :: type1_EpotOld, type1_EpotNew
+        type(Particle_Energy) :: type2_EpotOld, type2_EpotNew
+        
+        if (type1%get_num_particles()==0 .or. type2%get_num_particles()==0) then
+            switch_Nreject = switch_Nreject + 1
+            return
+        end if
+        
+        call random_number(random)
+        old1%number = int(random*type1%get_num_particles()) + 1
+        new1%number = old1%number
+        call random_number(random)
+        old2%number = int(random*type2%get_num_particles()) + 1
+        new2%number = old2%number
+        
+        old1%other_number = old2%number; new1%other_number = new2%number
+        old2%other_number = old1%number; new2%other_number = new1%number
+                
+        call before_switch_energy(Box%size, type1, old1, type2, mix, type1_EpotOld)
+        call before_switch_energy(Box%size, type2, old2, type1, mix, type2_EpotOld)        
+             
+        call after_switch_energy(Box, type1, old1, new1, type2, mix, overlap, type1_EpotNew)
+        
+        if (.not. overlap) then
+        
+            call after_switch_energy(Box, type2, old2, new2, type1, mix, overlap, type2_EpotNew)
+            
+            if (.not. overlap) then
+
+                type1_deltaEpot = type1_EpotNew%same - type1_EpotOld%same
+                type1_mix_deltaEpot = type1_EpotNew%mix - type1_EpotOld%mix
+                type2_deltaEpot = type2_EpotNew%same - type2_EpotOld%same
+                type2_mix_deltaEpot = type2_EpotNew%mix - type2_EpotOld%mix
+                deltaEpot = type1_deltaEpot + type1_mix_deltaEpot + type2_deltaEpot + &
+                            type2_mix_deltaEpot
+                
+                call random_number(random)
+                if (random < exp(-deltaEpot/Temperature)) then
+                
+                    call after_switch_update(Box, type1, old1, new1, type2)
+                    call after_switch_update(Box, type2, old2, new2, type1)
+                                             
+                    type1_obs%Epot = type1_obs%Epot + type1_deltaEpot
+                    type2_obs%Epot = type2_obs%Epot + type2_deltaEpot
+                    mix_Epot = mix_Epot + type1_mix_deltaEpot + type2_mix_deltaEpot
+                    
+                else
+                    switch_Nreject = switch_Nreject + 1
+                end if
+                
+            else
+                switch_Nreject = switch_Nreject + 1
+            end if
+            
+        else
+            switch_Nreject = switch_Nreject + 1
+        end if
+        
+    end subroutine switch
+    
     subroutine before_switch_energy(Box_size, this, old, other, mix, EpotOld)
         
         real(DP), dimension(:), intent(in) :: Box_size
@@ -304,81 +379,6 @@ contains
         end if
         
     end subroutine after_switch_update
-    
-    subroutine switch(Box, type1, type1_obs, type2, type2_obs, mix, mix_Epot, switch_Nreject)
-    
-        type(Box_Dimensions), intent(in) :: Box
-        class(Hard_Spheres), intent(inout) :: type1, type2
-        class(Observables), intent(inout) :: type1_obs, type2_obs
-        class(Mixing_Potential), intent(in) :: mix
-        real(DP), intent(inout) :: mix_Epot
-        integer, intent(inout) :: switch_Nreject
-        
-        real(DP) :: random
-        type(Particle_Index) :: old1, old2
-        type(Particle_Index) :: new1, new2
-        logical :: overlap
-        real(DP) :: deltaEpot, type1_deltaEpot, type2_deltaEpot
-        real(DP) :: type1_mix_deltaEpot, type2_mix_deltaEpot
-        type(Particle_Energy) :: type1_EpotOld, type1_EpotNew
-        type(Particle_Energy) :: type2_EpotOld, type2_EpotNew
-        
-        if (type1%get_num_particles()==0 .or. type2%get_num_particles()==0) then
-            switch_Nreject = switch_Nreject + 1
-            return
-        end if
-        
-        call random_number(random)
-        old1%number = int(random*type1%get_num_particles()) + 1
-        new1%number = old1%number
-        call random_number(random)
-        old2%number = int(random*type2%get_num_particles()) + 1
-        new2%number = old2%number
-        
-        old1%other_number = old2%number; new1%other_number = new2%number
-        old2%other_number = old1%number; new2%other_number = new1%number
-                
-        call before_switch_energy(Box%size, type1, old1, type2, mix, type1_EpotOld)
-        call before_switch_energy(Box%size, type2, old2, type1, mix, type2_EpotOld)        
-             
-        call after_switch_energy(Box, type1, old1, new1, type2, mix, overlap, type1_EpotNew)
-        
-        if (.not. overlap) then
-        
-            call after_switch_energy(Box, type2, old2, new2, type1, mix, overlap, type2_EpotNew)
-            
-            if (.not. overlap) then
-
-                type1_deltaEpot = type1_EpotNew%same - type1_EpotOld%same
-                type1_mix_deltaEpot = type1_EpotNew%mix - type1_EpotOld%mix
-                type2_deltaEpot = type2_EpotNew%same - type2_EpotOld%same
-                type2_mix_deltaEpot = type2_EpotNew%mix - type2_EpotOld%mix
-                deltaEpot = type1_deltaEpot + type1_mix_deltaEpot + type2_deltaEpot + &
-                            type2_mix_deltaEpot
-                
-                call random_number(random)
-                if (random < exp(-deltaEpot/Temperature)) then
-                
-                    call after_switch_update(Box, type1, old1, new1, type2)
-                    call after_switch_update(Box, type2, old2, new2, type1)
-                                             
-                    type1_obs%Epot = type1_obs%Epot + type1_deltaEpot
-                    type2_obs%Epot = type2_obs%Epot + type2_deltaEpot
-                    mix_Epot = mix_Epot + type1_mix_deltaEpot + type2_mix_deltaEpot
-                    
-                else
-                    switch_Nreject = switch_Nreject + 1
-                end if
-                
-            else
-                switch_Nreject = switch_Nreject + 1
-            end if
-            
-        else
-            switch_Nreject = switch_Nreject + 1
-        end if
-        
-    end subroutine switch
     
     !> Dipole rotation
     
