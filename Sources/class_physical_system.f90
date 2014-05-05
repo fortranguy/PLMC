@@ -416,16 +416,20 @@ contains
                 ! Randomly choosing the type
                 call random_number(rand)
                 iColRand = int(rand*real(this%num_particles, DP)) + 1
-                if (iColRand <= this%type1_spheres%get_num_particles()) then
-                    call move(this%Box, this%type1_spheres, this%type1_move, this%type1_obs, &
-                              this%type2_spheres, this%mix, this%mix_Epot)
+                if (iColRand <= this%type1_spheres%get_num_particles()) then                    
+                    call move(this%Box, this%type1_spheres, this%type1_same_cells, this%type1_mix_cells, &
+                              this%type1_move, this%type1_hard_potential, this%type1_obs, &
+                              this%type2_spheres, this%type2_mix_cells, this%mix, this%mix_Epot)
                 else
-                    call move(this%Box, this%type2_spheres, this%type2_move, this%type2_obs, &
-                              this%type1_spheres, this%mix, this%mix_Epot)
+                    call move(this%Box, this%type2_spheres, this%type2_same_cells, this%type2_mix_cells, &
+                              this%type2_move, this%type2_hard_potential, this%type2_obs, &
+                              this%type1_spheres, this%type1_mix_cells, this%mix, this%mix_Epot)
                 end if
             else if (iChangeRand <= this%Nmove + this%Nswitch) then
-                call switch(this%Box, this%type1_spheres, this%type1_obs, this%type2_spheres, &
-                            this%type2_obs, this%mix, this%mix_Epot, this%switch_Nreject)
+                call switch(this%Box, this%type1_spheres, this%type1_same_cells, this%type1_mix_cells, &
+                this%type1_hard_potential, this%type1_obs, this%type2_spheres, this%type2_same_cells, &
+                this%type2_mix_cells, this%type2_hard_potential, this%type2_obs, this%mix, &
+                this%mix_Epot, this%switch_Nreject)
                 this%switch_Nhit = this%switch_Nhit + 1
             else
                 call rotate(this%Box, this%type1_spheres, this%type1_rotation, this%type1_obs)

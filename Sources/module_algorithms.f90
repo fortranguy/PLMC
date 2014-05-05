@@ -210,14 +210,14 @@ contains
     !> Particle switch
     
     subroutine switch(Box, type1_spheres, type1_same_cells, type1_mix_cells, type1_hard_potential, &
-                      type1_obs, type2_spheres, type2_same_cells, type2_mix_cells, type2_obs, mix, &
-                      mix_Epot, switch_Nreject)
+                      type1_obs, type2_spheres, type2_same_cells, type2_mix_cells, type1_hard_potential, &
+                      type2_obs, mix, mix_Epot, switch_Nreject)
     
         type(Box_Dimensions), intent(in) :: Box
         class(Hard_Spheres), intent(inout) :: type1_spheres, type2_spheres
         class(Neighbour_Cells), intent(inout) :: type1_same_cells, type1_mix_cells
         class(Neighbour_Cells), intent(inout) :: type2_same_cells, type2_mix_cells
-        class(Hard_Spheres_Potential), intent(in) :: type1_hard_potential
+        class(Hard_Spheres_Potential), intent(in) :: type1_hard_potential, type2_hard_potential
         class(Observables), intent(inout) :: type1_obs, type2_obs
         class(Mixing_Potential), intent(in) :: mix
         real(DP), intent(inout) :: mix_Epot
