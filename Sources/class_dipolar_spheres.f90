@@ -49,12 +49,13 @@ private
         !> Write a report of the component in a file
         procedure :: write_report => Dipolar_Spheres_write_report
         
+        !> Accessor & Mutator
+        procedure :: get_orientation => Dipolar_Spheres_get_orientation
         procedure :: set_orientation => Dipolar_Spheres_set_orientation
+        procedure :: Epot_set_alpha => Dipolar_Spheres_Epot_set_alpha
         
         !> Take a snap shot of the configuration: orientations
         procedure :: write_snap_orientations => Dipolar_Spheres_write_snap_orientations
-
-        procedure :: Epot_set_alpha => Dipolar_Spheres_Epot_set_alpha
         
         !> Potential energy
         !>     Real
@@ -152,6 +153,16 @@ contains
         
     end subroutine Dipolar_Spheres_write_report
     
+    !> Accessors & Mutators
+    
+    pure function Dipolar_Spheres_get_orientation(this, i_particle) result(get_orientation)
+        class(Dipolar_Spheres), intent(in) :: this
+        integer, intent(in) :: i_particle
+        real(DP), dimension(Ndim), :: get_orientation
+        
+        get_orientation(:) = this%all_orientations(:, i_particle)
+    end subroutine Dipolar_Spheres_get_orientation
+    
     subroutine Dipolar_Spheres_set_orientation(this, i_particle, orientation)
         class(Dipolar_Spheres), intent(inout) :: this
         integer, intent(in) :: i_particle
@@ -159,6 +170,13 @@ contains
         
         this%all_orientations(:, i_particle) = orientation(:)
     end subroutine Dipolar_Spheres_set_orientation
+    
+    subroutine Dipolar_Spheres_Epot_set_alpha(this, Box_size)
+        class(Dipolar_Spheres), intent(inout) :: this
+        real(DP), dimension(:), intent(in) :: Box_size
+        
+        this%alpha = dipol_alpha_factor / Box_size(1)
+    end subroutine Dipolar_Spheres_Epot_set_alpha
     
     !> Configuration state: orientations
       
@@ -176,16 +194,7 @@ contains
             end do
         end if
 
-    end subroutine Dipolar_Spheres_write_snap_orientations
-    
-    !> Accessors
-
-    subroutine Dipolar_Spheres_Epot_set_alpha(this, Box_size)
-        class(Dipolar_Spheres), intent(inout) :: this
-        real(DP), dimension(:), intent(in) :: Box_size
-        
-        this%alpha = dipol_alpha_factor / Box_size(1)
-    end subroutine Dipolar_Spheres_Epot_set_alpha
+    end subroutine Dipolar_Spheres_write_snap_orientations    
 
     ! Real: short-range interaction ---------------------------------------------------------------
 

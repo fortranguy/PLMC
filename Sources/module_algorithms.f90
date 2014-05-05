@@ -209,10 +209,15 @@ contains
     
     !> Particle switch
     
-    subroutine switch(Box, type1, type1_obs, type2, type2_obs, mix, mix_Epot, switch_Nreject)
+    subroutine switch(Box, type1_spheres, type1_same_cells, type1_mix_cells, type1_hard_potential, &
+                      type1_obs, type2_spheres, type2_same_cells, type2_mix_cells, type2_obs, mix, &
+                      mix_Epot, switch_Nreject)
     
         type(Box_Dimensions), intent(in) :: Box
-        class(Hard_Spheres), intent(inout) :: type1, type2
+        class(Hard_Spheres), intent(inout) :: type1_spheres, type2_spheres
+        class(Neighbour_Cells), intent(inout) :: type1_same_cells, type1_mix_cells
+        class(Neighbour_Cells), intent(inout) :: type2_same_cells, type2_mix_cells
+        class(Hard_Spheres_Potential), intent(in) :: type1_hard_potential
         class(Observables), intent(inout) :: type1_obs, type2_obs
         class(Mixing_Potential), intent(in) :: mix
         real(DP), intent(inout) :: mix_Epot
@@ -227,23 +232,25 @@ contains
         type(Particle_Energy) :: type1_EpotOld, type1_EpotNew
         type(Particle_Energy) :: type2_EpotOld, type2_EpotNew
         
-        if (type1%get_num_particles()==0 .or. type2%get_num_particles()==0) then
+        if (type1_spheres%get_num_particles()==0 .or. type2_spheres%get_num_particles()==0) then
             switch_Nreject = switch_Nreject + 1
             return
         end if
         
         call random_number(random)
-        old1%number = int(random*type1%get_num_particles()) + 1
+        old1%number = int(random*type1_spheres%get_num_particles()) + 1
         new1%number = old1%number
         call random_number(random)
-        old2%number = int(random*type2%get_num_particles()) + 1
+        old2%number = int(random*type2_spheres%get_num_particles()) + 1
         new2%number = old2%number
         
         old1%other_number = old2%number; new1%other_number = new2%number
         old2%other_number = old1%number; new2%other_number = new1%number
                 
-        call before_switch_energy(Box%size, type1, old1, type2, mix, type1_EpotOld)
-        call before_switch_energy(Box%size, type2, old2, type1, mix, type2_EpotOld)        
+        call before_switch_energy(Box%size, type1_spheres, type1_same_cells, old1, &
+                                  type2_spheres, type2_mix_cells, mix, type1_EpotOld)
+        call before_switch_energy(Box%size, type2_spheres, type2_same_cells, old2, &
+                                  type1_spheres, type1_mix_cells, mix, type2_EpotOld)       
              
         call after_switch_energy(Box, type1, old1, new1, type2, mix, overlap, type1_EpotNew)
         
@@ -284,28 +291,31 @@ contains
         
     end subroutine switch
     
-    subroutine before_switch_energy(Box_size, this, old, other, mix, EpotOld)
+    subroutine before_switch_energy(Box_size, this_spheres, this_same_cells, old, other_spheres,
+                                    ohter_mix_cells, mix, EpotOld)
         
         real(DP), dimension(:), intent(in) :: Box_size
-        class(Hard_Spheres), intent(in) :: this, other
+        class(Hard_Spheres), intent(in) :: this_spheres, other_spheres
+        class(Neighbour_Cells), intent(inout) :: this_same_cells, ohter_mix_cells
         type(Particle_Index), intent(inout) :: old
         class(Mixing_Potential), intent(in) :: mix
         type(Particle_Energy), intent(out) :: EpotOld
         logical :: overlap
         
-        old%position(:) = this%all_positions(:, old%number)
+        old%position(:) = this_spheres%get_position(old%number)
         
         old%same_iCell = this_same_cells%index_from_position(old%position)
-        select type (this)
+        select type (this_spheres)
             type is (Dipolar_Spheres)
-                old%orientation(:) = this%all_orientations(:, old%number)
-                EpotOld%same = this%Epot_real_solo(Box_size, old) ! Epot_reci: cf. after_switch_energy
+                old%orientation(:) = this_spheres%get_orientation(old%number)
+                EpotOld%same = this_spheres%Epot_real_solo(Box_size, old)
+                               ! Epot_reci: cf. after_switch_energy
             type is (Hard_Spheres)
                 EpotOld%same = 0._DP
         end select
         
         old%mix_iCell = other_mix_cells%index_from_position(old%position)
-        call mix%Epot_neighCells(Box_size, old, this%mixCells, other%all_positions, overlap, EpotOld%mix)
+        call mix%Epot_neighCells(Box_size, old, this%mixCells, other_spheres, overlap, EpotOld%mix)
         
     end subroutine before_switch_energy
     
