@@ -272,8 +272,10 @@ contains
                 call random_number(random)
                 if (random < exp(-deltaEpot/Temperature)) then
                 
-                    call after_switch_update(Box, type1, old1, new1, type2)
-                    call after_switch_update(Box, type2, old2, new2, type1)
+                    call after_switch_update(Box, type1_spheres, type1_same_cells, old1, new1, &
+                                             type2_mix_cells)
+                    call after_switch_update(Box, type2_spheres, type2_same_cells, old2, new2, &
+                                             type1_mix_cells)
                                              
                     type1_obs%Epot = type1_obs%Epot + type1_deltaEpot
                     type2_obs%Epot = type2_obs%Epot + type2_deltaEpot
@@ -372,17 +374,19 @@ contains
     
     end subroutine after_switch_energy
     
-    subroutine after_switch_update(Box, this, old, new, other)
+    subroutine after_switch_update(Box, this_spheres, this_same_cells, old, new, &
+                                   other_mix_cells)
 
         type(Box_Dimensions), intent(in) :: Box
-        class(Hard_Spheres), intent(inout) :: this, other
+        class(Hard_Spheres), intent(inout) :: this_spheres
+        class(Neighbour_Cells), intent(inout) :: this_same_cells, other_mix_cells
         type(Particle_Index), intent(in) :: old, new
         
-        this%all_positions(:, old%number) = new%position(:)
+        this_spheres%set_position(old%number, new%position)
         
-        select type (this)
+        select type (this_spheres)
             type is (Dipolar_Spheres)
-                call this%reci_update_structure_move(Box, old, new)
+                call this_spheres%reci_update_structure_move(Box, old, new)
         end select
         
         if (old%same_iCell /= new%same_iCell) then
