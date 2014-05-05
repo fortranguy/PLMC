@@ -54,7 +54,7 @@ contains
         new%position(:) = old%position(:) + (xRand(:)-0.5_DP)*this_move%get_delta()
         new%position(:) = modulo(new%position(:), Box%size(:))
         
-        if (this_spheres%get_num_particles() >= other%get_num_particles()) then
+        if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
             new%same_iCell = this_same_cells%index_from_position(new%position)
             call this_hard_potential%neighCells(Box%size, this_spheres, this_same_cells, new, &
                                                 overlap, this_EpotNew)
@@ -66,7 +66,7 @@ contains
         
         if (.not. overlap) then
         
-            if (this_spheres%get_num_particles() >= other%get_num_particles()) then
+            if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
                 new%mix_iCell = other_mix_cells%index_from_position(new%position)
                 call mix%Epot_neighCells(Box%size, new, this_mix_cells, other_spheres, overlap, &
                                          mix_EpotNew)
@@ -250,13 +250,15 @@ contains
         call before_switch_energy(Box%size, type1_spheres, type1_same_cells, old1, &
                                   type2_spheres, type2_mix_cells, mix, type1_EpotOld)
         call before_switch_energy(Box%size, type2_spheres, type2_same_cells, old2, &
-                                  type1_spheres, type1_mix_cells, mix, type2_EpotOld)       
+                                  type1_spheres, type1_mix_cells, mix, type2_EpotOld)
              
-        call after_switch_energy(Box, type1, old1, new1, type2, mix, overlap, type1_EpotNew)
+        call after_switch_energy(Box, type1_spheres, type1_same_cells, type1_hard_potential, old1, &
+                                 new1, type2_spheres, type2_mix_cells, mix, overlap, type1_EpotNew)
         
         if (.not. overlap) then
         
-            call after_switch_energy(Box, type2, old2, new2, type1, mix, overlap, type2_EpotNew)
+            call after_switch_energy(Box, type2_spheres, type2_same_cells, type2_hard_potential, old2, &
+                                 new2, type1_spheres, type1_mix_cells, mix, overlap, type2_EpotNew)
             
             if (.not. overlap) then
 
@@ -292,11 +294,11 @@ contains
     end subroutine switch
     
     subroutine before_switch_energy(Box_size, this_spheres, this_same_cells, old, other_spheres,
-                                    ohter_mix_cells, mix, EpotOld)
+                                    other_mix_cells, mix, EpotOld)
         
         real(DP), dimension(:), intent(in) :: Box_size
         class(Hard_Spheres), intent(in) :: this_spheres, other_spheres
-        class(Neighbour_Cells), intent(inout) :: this_same_cells, ohter_mix_cells
+        class(Neighbour_Cells), intent(inout) :: this_same_cells, other_mix_cells
         type(Particle_Index), intent(inout) :: old
         class(Mixing_Potential), intent(in) :: mix
         type(Particle_Energy), intent(out) :: EpotOld
@@ -315,49 +317,53 @@ contains
         end select
         
         old%mix_iCell = other_mix_cells%index_from_position(old%position)
-        call mix%Epot_neighCells(Box_size, old, this%mixCells, other_spheres, overlap, EpotOld%mix)
+        call mix%Epot_neighCells(Box_size, old, this_mix_cells, other_spheres, overlap, EpotOld%mix)
         
     end subroutine before_switch_energy
     
-    subroutine after_switch_energy(Box, this, old, new, other, mix, overlap, EpotNew)
+    subroutine after_switch_energy(Box, this_spheres, this_same_cells, this_hard_potential, old, new, &
+                                   other_spheres, other_mix_cells, mix, overlap, EpotNew)
 
         type(Box_Dimensions), intent(in) :: Box
-        class(Hard_Spheres), intent(in) :: this, other
+        class(Hard_Spheres), intent(in) :: this_spheres, other_spheres
+        class(Neighbour_Cells), intent(inout) :: this_same_cells, other_mix_cells
+        class(Hard_Spheres_Potential), intent(in) :: this_hard_potential
         type(Particle_Index), intent(in) :: old
         type(Particle_Index), intent(inout) :: new
         class(Mixing_Potential), intent(in) :: mix
         logical, intent(out) :: overlap
         type(Particle_Energy), intent(out) :: EpotNew
         
-        new%position(:) = other%all_positions(:, new%other_number)
+        new%position(:) = other_spheres%get_position(new%other_number)
         
-        if (this%get_num_particles() >= other%get_num_particles()) then ! optimisation: more chance to overlap
+        if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
             new%same_iCell = this_same_cells%index_from_position(new%position)
-            call this_hard_potential%neighCells(Box%size, new, overlap, EpotNew%same)
+            call this_hard_potential%neighCells(Box%size, this_spheres, this_same_cells, new, overlap, &
+                                                EpotNew%same)
         else
             new%mix_iCell = other_mix_cells%index_from_position(new%position)
-            call mix%Epot_neighCells(Box%size, new, this%mixCells, other%all_positions, overlap, &
-                                     EpotNew%mix)
+            call mix%Epot_neighCells(Box%size, new, this_mix_cells, other_spheres, overlap, EpotNew%mix)
         end if
         
         if (.not. overlap) then
         
-            if (this%get_num_particles() >= other%get_num_particles()) then
+            if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
                 new%mix_iCell = other_mix_cells%index_from_position(new%position)
-                call mix%Epot_neighCells(Box%size, new, this%mixCells, other%all_positions, overlap, &
+                call mix%Epot_neighCells(Box%size, new, this_mix_cells, other_spheres, overlap, &
                                          EpotNew%mix)
             else
                 new%same_iCell = this_same_cells%index_from_position(new%position)
-                call this_hard_potential%neighCells(Box%size, new, overlap, EpotNew%same)
+                call this_hard_potential%neighCells(Box%size, this_spheres, this_same_cells, new, &
+                                                    overlap, EpotNew%same)
             end if
             
             if (.not. overlap) then
             
                 select type (this)
                     type is (Dipolar_Spheres)
-                        new%orientation(:) = this%all_orientations(:, new%number)
-                        EpotNew%same = this%Epot_real_solo(Box%size, new) + &
-                                      this%deltaEpot_reci_move(Box, old, new)
+                        new%orientation(:) = this_spheres%get_orientation(new%number)
+                        EpotNew%same = this_spheres%Epot_real_solo(Box%size, new) + &
+                                       this_spheres%deltaEpot_reci_move(Box, old, new)
                 end select
             
             end if
