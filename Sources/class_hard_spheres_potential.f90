@@ -1,8 +1,10 @@
 module class_hard_spheres_potential
 
 use data_precisions, only: DP
-use module_types, only: Box_Dimensions, Node, Particle_Index
+use data_potential, only: hard_rMin_factor
 use data_neighbour_cells, only: NnearCell
+use module_types, only: Box_Dimensions, Node, Particle_Index
+use module_physics_micro, only: dist_PBC
 use class_neighbour_cells
 use class_hard_spheres
 
@@ -17,24 +19,23 @@ private
     contains
         procedure :: construct => Hard_Spheres_Potential_construct
         procedure :: write => Hard_Spheres_Potential_write
+        procedure :: get_range_cut => Hard_Spheres_Potential_get_range_cut
         procedure :: neighCells => Hard_Spheres_Potential_neighCells
         procedure :: conf => Hard_Spheres_Potential_conf
     end type Hard_Spheres_Potential
     
 contains
 
-    subroutine Hard_Spheres_Potential_construct(this, diameter)
-    
+    subroutine Hard_Spheres_Potential_construct(this, diameter)    
         class(Hard_Spheres_Potential), intent(inout) :: this
         real(DP), intent(in) :: diameter
         
-        this%min_distance = hard_rMin_factor * diameter
+        this%min_distance = hard_rMin_factor * diameter ! careful for Dipoles !
         this%range_cut = this%min_distance
         
     end subroutine Hard_Spheres_Potential_construct
     
-    subroutine Hard_Spheres_Potential_write(this, unit)
-    
+    subroutine Hard_Spheres_Potential_write(this, unit)    
         class(Hard_Spheres_Potential), intent(in) :: this
         integer, intent(in) :: unit
 
@@ -42,12 +43,20 @@ contains
     
     end subroutine Hard_Spheres_Potential_write
     
+    pure function Hard_Spheres_Potential_get_range_cut(this) result(get_range_cut)
+        class(Hard_Spheres_Potential), intent(in) :: this
+        real(DP) :: get_range_cut
+        
+        get_range_cut = this%range_cut
+    end function Hard_Spheres_Potential_get_range_cut
+    
+    
     subroutine Hard_Spheres_write_report(this, unit)
         class(Hard_Spheres_Potential), intent(in) :: this
         integer, intent(in) :: unit
     
-        write(report_unit, *) "    range_cut = ", this%range_cut
-    subroutine Hard_Spheres_write_report
+        write(unit, *) "    range_cut = ", this%range_cut
+    end subroutine Hard_Spheres_write_report
     
     subroutine Hard_Spheres_Potential_neighCells(this, Box_size, this_spheres, this_cells, particle, &
                                                  overlap, energ)
@@ -79,7 +88,7 @@ contains
                 next => current%next
             
                 if (current%number /= particle%number) then
-                    r_ij = dist_PBC(Box_size, particle%position, 
+                    r_ij = dist_PBC(Box_size, particle%position, &
                                     this_spheres%get_position(current%number))
                     if (r_ij < this%min_distance) then
                         overlap = .true.
@@ -104,7 +113,7 @@ contains
         class(Hard_Spheres_Potential), intent(in) :: this
         real(DP) :: conf
     
-        conf = this%num_particles * 0._DP
+        conf = 0._DP
         
     end function Hard_Spheres_Potential_conf
 

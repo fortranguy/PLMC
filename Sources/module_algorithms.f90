@@ -5,9 +5,11 @@ use data_box, only: Ndim
 use data_monte_carlo, only: Temperature
 use module_types, only: Box_Dimensions, Particle_Index, Particle_Energy
 use module_physics_micro, only: random_surface, markov_surface
+use class_neighbour_cells
 use class_hard_spheres
 use class_small_move
 use class_dipolar_spheres
+use class_hard_spheres_potential
 use class_small_rotation
 use class_mixing_potential
 use class_observables
@@ -79,7 +81,7 @@ contains
             if (.not. overlap) then
     
                 old%same_iCell = this_same_cells%index_from_position(old%position)
-                select type (this)
+                select type (this_spheres)
                     type is (Dipolar_Spheres)
                         old%orientation(:) = this_spheres%get_orientation(old%number)
                         new%orientation(:) = old%orientation(:)
@@ -104,12 +106,12 @@ contains
                 call random_number(random)
                 if (random < exp(-deltaEpot/Temperature)) then
                 
-                    select type (this)
+                    select type (this_spheres)
                         type is (Dipolar_Spheres)
                             call this_spheres%reci_update_structure_move(Box, old, new)
                     end select
                 
-                    this_spheres%set_position(old%number, new%position)
+                    call this_spheres%set_position(old%number, new%position)
                     this_obs%Epot = this_obs%Epot + this_deltaEpot
                     mix_Epot = mix_Epot + mix_deltaEpot
                     
@@ -138,8 +140,8 @@ contains
     
     !> Widom's method
 
-    subroutine widom(Box, this_spheres, this_same_cells, this_mix_cells, this_obs, other_spheres, &
-                     other_mix_cells, mix)
+    subroutine widom(Box, this_spheres, this_same_cells, this_mix_cells, this_hard_potential, this_obs, &
+                     other_spheres, other_mix_cells, mix)
         
         type(Box_Dimensions), intent(in) :: Box
         class(Hard_Spheres), intent(in) :: this_spheres
@@ -216,7 +218,7 @@ contains
     !> Particle switch
     
     subroutine switch(Box, type1_spheres, type1_same_cells, type1_mix_cells, type1_hard_potential, &
-                      type1_obs, type2_spheres, type2_same_cells, type2_mix_cells, type1_hard_potential, &
+                      type1_obs, type2_spheres, type2_same_cells, type2_mix_cells, type2_hard_potential, &
                       type2_obs, mix, mix_Epot, switch_Nreject)
     
         type(Box_Dimensions), intent(in) :: Box
@@ -253,18 +255,20 @@ contains
         old1%other_number = old2%number; new1%other_number = new2%number
         old2%other_number = old1%number; new2%other_number = new1%number
                 
-        call before_switch_energy(Box%size, type1_spheres, type1_same_cells, old1, &
+        call before_switch_energy(Box%size, type1_spheres, type1_same_cells, type1_mix_cells, old1, &
                                   type2_spheres, type2_mix_cells, mix, type1_EpotOld)
-        call before_switch_energy(Box%size, type2_spheres, type2_same_cells, old2, &
+        call before_switch_energy(Box%size, type2_spheres, type2_same_cells, type2_mix_cells, old2, &
                                   type1_spheres, type1_mix_cells, mix, type2_EpotOld)
              
-        call after_switch_energy(Box, type1_spheres, type1_same_cells, type1_hard_potential, old1, &
-                                 new1, type2_spheres, type2_mix_cells, mix, overlap, type1_EpotNew)
+        call after_switch_energy(Box, type1_spheres, type1_same_cells, type1_mix_cells, &
+                                 type1_hard_potential, old1, new1, type2_spheres, type2_mix_cells, &
+                                 mix, overlap, type1_EpotNew)
         
         if (.not. overlap) then
         
-            call after_switch_energy(Box, type2_spheres, type2_same_cells, type2_hard_potential, old2, &
-                                 new2, type1_spheres, type1_mix_cells, mix, overlap, type2_EpotNew)
+            call after_switch_energy(Box, type2_spheres, type2_same_cells, type2_mix_cells, &
+                                     type2_hard_potential, old2, new2, type1_spheres, type1_mix_cells, & 
+                                     mix, overlap, type2_EpotNew)
             
             if (.not. overlap) then
 
@@ -301,12 +305,12 @@ contains
         
     end subroutine switch
     
-    subroutine before_switch_energy(Box_size, this_spheres, this_same_cells, old, other_spheres,
-                                    other_mix_cells, mix, EpotOld)
+    subroutine before_switch_energy(Box_size, this_spheres, this_same_cells, this_mix_cells, old, &
+                                    other_spheres, other_mix_cells, mix, EpotOld)
         
         real(DP), dimension(:), intent(in) :: Box_size
         class(Hard_Spheres), intent(in) :: this_spheres, other_spheres
-        class(Neighbour_Cells), intent(inout) :: this_same_cells, other_mix_cells
+        class(Neighbour_Cells), intent(inout) :: this_same_cells, this_mix_cells, other_mix_cells
         type(Particle_Index), intent(inout) :: old
         class(Mixing_Potential), intent(in) :: mix
         type(Particle_Energy), intent(out) :: EpotOld
@@ -329,12 +333,13 @@ contains
         
     end subroutine before_switch_energy
     
-    subroutine after_switch_energy(Box, this_spheres, this_same_cells, this_hard_potential, old, new, &
-                                   other_spheres, other_mix_cells, mix, overlap, EpotNew)
+    subroutine after_switch_energy(Box, this_spheres, this_same_cells, this_mix_cells, &
+                                   this_hard_potential, old, new, other_spheres, other_mix_cells, &
+                                   mix, overlap, EpotNew)
 
         type(Box_Dimensions), intent(in) :: Box
         class(Hard_Spheres), intent(in) :: this_spheres, other_spheres
-        class(Neighbour_Cells), intent(inout) :: this_same_cells, other_mix_cells
+        class(Neighbour_Cells), intent(inout) :: this_same_cells, this_mix_cells, other_mix_cells
         class(Hard_Spheres_Potential), intent(in) :: this_hard_potential
         type(Particle_Index), intent(in) :: old
         type(Particle_Index), intent(inout) :: new
@@ -367,7 +372,7 @@ contains
             
             if (.not. overlap) then
             
-                select type (this)
+                select type (this_spheres)
                     type is (Dipolar_Spheres)
                         new%orientation(:) = this_spheres%get_orientation(new%number)
                         EpotNew%same = this_spheres%Epot_real_solo(Box%size, new) + &
@@ -388,7 +393,7 @@ contains
         class(Neighbour_Cells), intent(inout) :: this_same_cells, other_mix_cells
         type(Particle_Index), intent(in) :: old, new
         
-        this_spheres%set_position(old%number, new%position)
+        call this_spheres%set_position(old%number, new%position)
         
         select type (this_spheres)
             type is (Dipolar_Spheres)
@@ -448,7 +453,7 @@ contains
         
             call spheres%reci_update_structure_rotate(Box, old, new)
             call spheres%update_totalMoment_rotate(old%orientation, new%orientation)
-            spheres%set_orientation(old%number, new%orientation)
+            call spheres%set_orientation(old%number, new%orientation)
             
             obs%Epot = obs%Epot + deltaEpot
             

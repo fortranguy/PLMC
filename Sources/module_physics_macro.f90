@@ -7,6 +7,7 @@ use data_precisions, only: DP, real_zero, io_tiny, consist_tiny
 use data_box, only: Ndim
 use module_types, only: Box_Dimensions, Argument_Random, Argument_Initial
 use module_physics_micro, only: dist_PBC, random_surface
+use class_neighbour_cells
 use class_hard_spheres
 use class_hard_spheres_potential
 use class_small_move
@@ -142,7 +143,7 @@ contains
         
 7102        continue
             call random_number(xRand)
-            spheres2%set_position(i_particle, xRand*Box_size)
+            call spheres2%set_position(i_particle, xRand*Box_size)
             
             position(:) = spheres2%get_position(i_particle)
             do i_particle_test = 1, spheres1%get_num_particles()
@@ -169,13 +170,13 @@ contains
     
     subroutine random_orientations(spheres, num_particles)
     
-        class(Hard_Spheres), intent(inout) :: spheres
+        class(Dipolar_Spheres), intent(inout) :: spheres
         integer, intent(in) :: num_particles
         
         integer :: i_particle
         
         do i_particle = 1, num_particles
-            spheres%set_orientation(i_particle, random_surface())
+            call spheres%set_orientation(i_particle, random_surface())
         end do
     
     end subroutine random_orientations
@@ -187,7 +188,6 @@ contains
         character(len=*), intent(in) :: file
         integer, intent(in) :: length
         class(Hard_Spheres), intent(inout) :: spheres
-        real(DP), dimension(:, :), intent(out) :: type_coords
         real(DP), intent(in) :: normMax
         character(len=*), intent(in) :: coordinates_name
         
@@ -215,10 +215,13 @@ contains
                 select case(coordinates_name)
                     case("positions")
                         call spheres%set_position(i_particle, coordinate)
-                        coordinate_norm = norm2(pheres%get_position(i_particle))
+                        coordinate_norm = norm2(spheres%get_position(i_particle))
                     case("orientations")
-                        call spheres%set_orientation(i_particle, coordinate)
-                        coordinate_norm = norm2(pheres%get_orientation(i_particle))
+                        select type(spheres)
+                            type is (Dipolar_Spheres)
+                                call spheres%set_orientation(i_particle, coordinate)
+                                coordinate_norm = norm2(spheres%get_orientation(i_particle))
+                        end select
                     case default
                         write(error_unit) "Error: unknown coordinate name"
                         error stop
@@ -244,33 +247,31 @@ contains
     
     !> Spheres initialisations
     
-    subroutine init_spheres(Box, this, this_potential, other, mix, write_potential, this_units, &
+    subroutine init_spheres(Box, this, this_potential, write_potential, this_units, &
                             this_Epot) ! separate ?
     
         type(Box_Dimensions), intent(in) :: Box
         class(Hard_Spheres), intent(inout) :: this
-        class(Hard_Spheres), intent(in) :: other
-        class(Hard_Spheres_Potential), intent(inout) :: this_potential        
-        class(Mixing_Potential), intent(in) :: mix
+        class(Hard_Spheres_Potential), intent(inout) :: this_potential
         logical, intent(in) :: write_potential
         class(Units), intent(in) :: this_units
         real(DP), intent(out) :: this_Epot
         
         call this%test_overlap(Box%size)
         call this%write_snap_data(this_units%snap_positions)
-        call this%snap_positions(0, this_units%snapIni_positions)
+        call this%write_snap_positions(0, this_units%snapIni_positions)
         call this_potential%construct(this%get_diameter())
         this_Epot = this_potential%conf()
         
         if (write_potential) then
-            call this_potentia%write(this_units%Epot)
+            call this_potential%write(this_units%Epot)
         end if
         select type (this)
             type is (Dipolar_Spheres)
                 this_Epot = this_Epot + this%Epot_conf(Box) ! temp
                 select type (this_units)
                     type is (MoreUnits)
-                        call this%write_snap_data(this_units%write_snap_orientations)
+                        call this%write_snap_data(this_units%snap_orientations)
                         call this%write_snap_orientations(0, this_units%snapIni_orientations)
                         if (write_potential) then
                             call this%write_Epot_real(this_units%Epot_real)
@@ -279,7 +280,7 @@ contains
                 end select
         end select
     
-    end subroutine init
+    end subroutine init_spheres
     
     subroutine init_cells(Box_size, this_spheres, sameCells, other_spheres, mixCells, this_potential, &
                           mix)
@@ -313,9 +314,13 @@ contains
         class(Observables), intent(in) :: this_obs
         
         call this%test_overlap(Box%size)
-        call this%set_Epot(Box)
-        call test_consist(this_obs%Epot, this%Epot_conf(Box), this_units%report)
-        call this%snap_positions(0, this_units%snapFin_positions)
+        select type (this)
+            type is (Dipolar_Spheres)
+                call this%set_Epot(Box) ! ugly !
+                call test_consist(this_obs%Epot, this%Epot_conf(Box), this_units%report)
+                ! for HS too ?
+        end select
+        call this%write_snap_positions(0, this_units%snapFin_positions)
         
         select type (this)
             type is (Dipolar_Spheres)
@@ -325,7 +330,7 @@ contains
                 end select
         end select
     
-    end subroutine final
+    end subroutine final_spheres
     
     !> Mix initialisation
     

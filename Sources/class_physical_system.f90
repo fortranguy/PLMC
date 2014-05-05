@@ -14,11 +14,12 @@ use data_potential, only: write_potential
 use data_distribution, only: snap
 use module_types, only: Box_Dimensions, Monte_Carlo_Arguments
 use module_physics_micro, only: NwaveVectors
+use class_neighbour_cells
 use class_hard_spheres
 use class_dipolar_spheres
+use class_hard_spheres_potential
 use class_small_move
 use class_small_rotation
-use class_neighbour_cells
 use class_mixing_potential
 use class_observables
 use class_units
@@ -211,14 +212,14 @@ contains
         call init_mix(this%Box%size, this%mix, this%type1_spheres, this%type2_spheres, &
                       this%write_potential, this%mix_Epot_tab_unit, this%mix_Epot)
         call this%mix%write_report(this%mix_report_unit)
-        call init_spheres(this%Box, this%type1_spheres, this%type1_potential, this%type2_spheres, &
-                          this%mix, this%write_potential, this%type1_units, this%type1_obs%Epot)
+        call init_spheres(this%Box, this%type1_spheres, this%type1_hard_potential, &
+                          this%write_potential, this%type1_units, this%type1_obs%Epot)
         call init_cells(this%Box%size, this%type1_spheres, this%type1_same_cells, this%type2_spheres, &
-                        this%type1_mix_cells, this%type1_potential, mix)
-        call init_spheres(this%Box, this%type2_spheres, this%type2_potential, this%type1_spheres, &
-                          this%mix, this%write_potential, this%type2_units, this%type2_obs%Epot)
+                        this%type1_mix_cells, this%type1_hard_potential, this%mix)
+        call init_spheres(this%Box, this%type2_spheres, this%type2_hard_potential, &
+                          this%write_potential, this%type2_units, this%type2_obs%Epot)
         call init_cells(this%Box%size, this%type2_spheres, this%type2_same_cells, this%type1_spheres, &
-                        this%type2_mix_cells, this%type2_potential, mix)
+                        this%type2_mix_cells, this%type2_hard_potential, this%mix)
         
         this%EpotSum = 0._DP
         Epot_conf = this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
@@ -325,7 +326,7 @@ contains
         
         Epot = this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
         Epot_conf = this%type1_spheres%Epot_conf(this%Box) + &
-                    this%type2_spheres%Epot_conf(this%Box) + this%mix_Epot_conf
+                    this%type2_hard_potential%conf() + this%mix_Epot_conf
         call test_consist(Epot, Epot_conf, this%report_unit)
         this%EpotSum = this%type1_obs%EpotSum + this%type2_obs%EpotSum + this%mix_EpotSum
         duration = this%time_end - this%time_start
@@ -507,9 +508,11 @@ contains
         class(Physical_System), intent(inout) :: this
     
         call widom(this%Box, this%type1_spheres, this%type1_same_cells, this%type1_mix_cells, &
-                   this%type1_obs, this%type2_spheres, this%type2_mix_cells, this%mix)
+                   this%type1_hard_potential, this%type1_obs, this%type2_spheres, this%type2_mix_cells, &
+                   this%mix)
         call widom(this%Box, this%type2_spheres, this%type2_same_cells, this%type2_mix_cells, &
-                   this%type2_obs, this%type1_spheres, this%type1_mix_cells, this%mix)
+                   this%type2_hard_potential, this%type2_obs, this%type1_spheres, this%type1_mix_cells, &
+                   this%mix)
     
     end subroutine Physical_System_measure_chemical_potentials
     
@@ -544,10 +547,10 @@ contains
         integer, intent(in) :: iStep
         
         if (this%snap) then ! Snap shots of the configuration
-            call this%type1_spheres%write_snap_positions(iStep, this%type1_units%write_snap_positions)
+            call this%type1_spheres%write_snap_positions(iStep, this%type1_units%snap_positions)
             call this%type1_spheres%write_snap_orientations(iStep, &
-                                                            this%type1_units%write_snap_orientations)
-            call this%type2_spheres%write_snap_positions(iStep, this%type2_units%write_snap_positions)
+                                                            this%type1_units%snap_orientations)
+            call this%type2_spheres%write_snap_positions(iStep, this%type2_units%snap_positions)
         end if
         
     end subroutine Physical_System_take_snapshots

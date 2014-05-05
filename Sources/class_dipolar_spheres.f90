@@ -28,6 +28,7 @@ private
         ! Particles
         real(DP), dimension(:, :), allocatable, public :: all_orientations
         ! Potential
+        real(DP) :: real_rMin
         real(DP) :: real_rCut !< real space potential cut
         real(DP) :: real_dr !< discretisation step
         integer :: real_iMin !< minimum index of tabulation: minimum distance
@@ -158,10 +159,10 @@ contains
     pure function Dipolar_Spheres_get_orientation(this, i_particle) result(get_orientation)
         class(Dipolar_Spheres), intent(in) :: this
         integer, intent(in) :: i_particle
-        real(DP), dimension(Ndim), :: get_orientation
+        real(DP), dimension(Ndim) :: get_orientation
         
         get_orientation(:) = this%all_orientations(:, i_particle)
-    end subroutine Dipolar_Spheres_get_orientation
+    end function Dipolar_Spheres_get_orientation
     
     subroutine Dipolar_Spheres_set_orientation(this, i_particle, orientation)
         class(Dipolar_Spheres), intent(inout) :: this
@@ -255,8 +256,8 @@ contains
         
         this%real_rCut = dipol_real_rCut_factor * Box_size(1)
         this%real_dr = dipol_real_dr
-        call set_discrete_length(this%rMin, this%real_dr)
-        this%real_iMin = int(this%rMin/this%real_dr)
+        call set_discrete_length(this%real_rMin, this%real_dr)
+        this%real_iMin = int(this%real_rMin/this%real_dr)
         this%real_iCut = int(this%real_rCut/this%real_dr) + 1
     end subroutine Dipolar_Spheres_set_Epot_real_parameters
     
@@ -1133,9 +1134,8 @@ contains
         type(Box_Dimensions), intent(in) :: Box
         
 
-        this%rMin = dipol_rMin_factor * this%diameter
-        this%rCut = this%rMin
-
+        this%real_rMin = dipol_rMin_factor * this%diameter
+        
         call this%Epot_set_alpha(Box%size)
         call this%set_Epot_real(Box%size)
         call this%set_Epot_reci(Box)
