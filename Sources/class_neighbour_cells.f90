@@ -8,6 +8,7 @@ use data_box, only: Ndim
 use data_neighbour_cells, only: NnearCell_dim, NnearCell
 use module_types, only: Node, Linked_List
 use module_physics_micro, only: index_from_coord, coord_PBC
+use class_hard_spheres
 
 implicit none
 private
@@ -230,18 +231,18 @@ contains
     
     end function Neighbour_Cells_index_from_position
     
-    pure subroutine Neighbour_Cells_all_cols_to_cells(this, num_particles, positions)
+    pure subroutine Neighbour_Cells_all_cols_to_cells(this, num_particles, spheres)
     
         class(Neighbour_Cells), intent(inout) :: this
         integer, intent(in) :: num_particles
-        real(DP), dimension(:, :), intent(in) :: positions
+        class(Hard_Spheres), intent(in) :: spheres
     
         integer :: i_particle
         integer :: iCell
     
         do i_particle = 1, num_particles
     
-            iCell = this%index_from_position(positions(:,i_particle))
+            iCell = this%index_from_position(spheres%get_position(i_particle))
             this%currentCells(iCell)%particle%number = i_particle
             
             allocate(this%nextCells(iCell)%particle)

@@ -55,8 +55,6 @@ module_types.o: module_types.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 module_physics_micro.o: module_physics_micro.f90
 	$(FC) -c $(FFLAGS) $< -o $@
-class_neighbour_cells.o: class_neighbour_cells.f90
-	$(FC) -c $(FFLAGS) $< -o $@
 class_small_move.o: class_small_move.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_small_rotation.o: class_small_rotation.f90
@@ -64,6 +62,8 @@ class_small_rotation.o: class_small_rotation.f90
 class_hard_spheres.o: class_hard_spheres.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_dipolar_spheres.o: class_dipolar_spheres.f90
+	$(FC) -c $(FFLAGS) $< -o $@
+class_neighbour_cells.o: class_neighbour_cells.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_hard_spheres_potential.o: class_hard_spheres_potential.f90
 	$(FC) -c $(FFLAGS) $< -o $@
@@ -96,8 +96,9 @@ program_distribution.o: program_distribution.f90
 
 $(EXEC1): data.o \
           module_types.o module_physics_micro.o \
-          class_neighbour_cells.o class_small_move.o class_small_rotation.o\
+          class_small_move.o class_small_rotation.o\
           class_hard_spheres.o class_dipolar_spheres.o \
+          class_neighbour_cells.o \
           class_hard_spheres_potential.o \
           class_mixing_potential.o \
           class_observables.o class_units.o \

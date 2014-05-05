@@ -47,8 +47,7 @@ private
         procedure :: get_widom_num_particles => Hard_Spheres_get_widom_num_particles
         procedure :: get_diameter => Hard_Spheres_get_diameter
         procedure :: get_position => Hard_Spheres_get_position
-        procedure :: set_position => Hard_Spheres_set_position
-        procedure :: get_all_positions => Hard_Spheres_get_all_positions       
+        procedure :: set_position => Hard_Spheres_set_position    
         
         procedure :: write_density => Hard_Spheres_write_density
         procedure :: write_report => Hard_Spheres_write_report
@@ -138,15 +137,6 @@ contains
     
         this%all_positions(:, i_particle) = position(:)
     end subroutine Hard_Spheres_set_position
-
-    pure function Hard_Spheres_get_all_positions(this) result(get_all_positions)
-        class(Hard_Spheres), intent(in) :: this
-        real(DP), dimension(:, :), allocatable :: get_all_positions
-        
-        allocate(get_all_positions(Ndim, this%num_particles))
-        get_all_positions(:, :) = this%all_positions(:, :)
-        deallocate(get_all_positions)        
-    end function Hard_Spheres_get_all_positions
     
     !> Write density and compacity
     

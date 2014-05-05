@@ -268,6 +268,7 @@ contains
         end if
         select type (this)
             type is (Dipolar_Spheres)
+                call this%set_Epot(Box) ! ugly !
                 this_Epot = this_Epot + this%Epot_conf(Box) ! temp
                 select type (this_units)
                     type is (MoreUnits)
@@ -295,12 +296,10 @@ contains
         
         same_cell_size(:) = this_potential%get_range_cut()
         call sameCells%construct(Box_size, same_cell_size, this_potential%get_range_cut())
-        call sameCells%all_cols_to_cells(this_spheres%get_num_particles(), &
-                                              this_spheres%get_all_positions())
+        call sameCells%all_cols_to_cells(this_spheres%get_num_particles(), this_spheres)
         
         call mixCells%construct(Box_size, mix%get_cell_size(), mix%get_rCut())
-        call mixCells%all_cols_to_cells(other_spheres%get_num_particles(), &
-                                             other_spheres%get_all_positions())
+        call mixCells%all_cols_to_cells(other_spheres%get_num_particles(), other_spheres)
 
     end subroutine init_cells
     

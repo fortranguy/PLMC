@@ -14,7 +14,6 @@ use data_distribution, only: snap_ratio
 use module_types, only: Box_Dimensions, Particle_Index
 use module_physics_micro, only: set_discrete_length, distVec_PBC, Box_wave1_sym, Box_wave2_sym, &
                                 fourier_i, exchange_sign
-use class_neighbour_cells
 use class_hard_spheres
 
 implicit none
