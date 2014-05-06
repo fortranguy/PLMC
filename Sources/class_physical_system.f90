@@ -406,12 +406,10 @@ contains
                 call random_number(rand)
                 iColRand = int(rand*real(this%num_particles, DP)) + 1
                 if (iColRand <= this%type1_spheres%get_num_particles()) then                    
-                    call move(this%Box, this%type1_spheres, this%type1_macro%same_cells, this%type1_macro%mix_cells, &
-                              this%type1_macro%move, this%type1_macro%hard_potential, this%type1_observables, &
+                    call move(this%Box, this%type1_spheres, this%type1_macro, this%type1_observables, &
                               this%type2_spheres, this%type2_macro%mix_cells, this%mix, this%mix_Epot)
                 else
-                    call move(this%Box, this%type2_spheres, this%type2_macro%same_cells, this%type2_macro%mix_cells, &
-                              this%type2_macro%move, this%type2_macro%hard_potential, this%type2_observables, &
+                    call move(this%Box, this%type2_spheres, this%type2_macro, this%type2_observables, &
                               this%type1_spheres, this%type1_macro%mix_cells, this%mix, this%mix_Epot)
                 end if
             else if (iChangeRand <= this%Nmove + this%Nswitch) then
