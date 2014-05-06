@@ -5,14 +5,39 @@
     },
     "Particles": {
         "Dipoles": {
-            "number of particles": 281
+            "number of particles": 281,
+            "number of Widom particles": 281
         },
         "Hard Spheres": {
             "diameter": 1.0,
-            "number of particles": 6750
+            "number of particles": 6750,
+            "number of Widom particles": 6750
         },
         "Mixing": {
             "non addivity": 0.2
+        }
+    },
+    "Monte Carlo": {
+        "number of thermalisation steps": 32768,
+        "number of equilibrium steps": 65536,
+        "adapt change period": 1024,
+        "reset sums period": 8192,
+        "Dipoles": {
+            "move": {
+                "delta": 0.3,
+                "rejection rate": 0.5
+            },
+            "rotation": {
+                "delta": 30.0,
+                "maximum delta": 75.0,
+                "rejection rate": 0.17
+            }
+        },
+        "Hard Spheres": {
+            "move": {
+                "delta": 0.3,
+                "rejection rate": 0.5
+            }     
         }
     }
 }
