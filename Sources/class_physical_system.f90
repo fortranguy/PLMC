@@ -49,13 +49,13 @@ private
         ! Type 1: Dipolar spheres
         type(Dipolar_Spheres) :: type1_spheres
         type(Dipolar_Spheres_Macro) :: type1_macro
-        type(MoreObservables) :: type1_observables
+        type(MoreObservables) :: type1_obs
         type(MoreUnits) :: type1_units
         
         ! Type 2: Hard spheres
         type(Hard_Spheres) :: type2_spheres
         type(Hard_Spheres_Macro) :: type2_macro
-        type(Observables) :: type2_observables
+        type(Observables) :: type2_obs
         type(Units) :: type2_units
         
         ! Mixing potential
@@ -203,14 +203,14 @@ contains
                       this%write_potential, this%mix_Epot_tab_unit, this%mix_Epot)
         call this%mix%write_report(this%mix_report_unit)
         call init_spheres(this%Box, this%type1_spheres, this%type1_macro%hard_potential, &
-                          this%write_potential, this%type1_units, this%type1_observables%Epot)
+                          this%write_potential, this%type1_units, this%type1_obs%Epot)
         call init_cells(this%Box%size, this%type1_spheres, this%type1_macro, this%type2_spheres, this%mix)
         call init_spheres(this%Box, this%type2_spheres, this%type2_macro%hard_potential, &
-                          this%write_potential, this%type2_units, this%type2_observables%Epot)
+                          this%write_potential, this%type2_units, this%type2_obs%Epot)
         call init_cells(this%Box%size, this%type2_spheres, this%type2_macro, this%type1_spheres, this%mix)
         
         this%EpotSum = 0._DP
-        Epot_conf = this%type1_observables%Epot + this%type2_observables%Epot + this%mix_Epot
+        Epot_conf = this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
         write(output_unit, *) "Initial potential energy =", Epot_conf
         write(this%obsThermal_unit, *) 0, Epot_conf
     
@@ -285,8 +285,8 @@ contains
     subroutine Physical_System_final(this)    
         class(Physical_System), intent(inout) :: this
         
-        call final_spheres(this%Box, this%type1_spheres, this%type1_units, this%type1_observables)
-        call final_spheres(this%Box, this%type2_spheres, this%type2_units, this%type2_observables)
+        call final_spheres(this%Box, this%type1_spheres, this%type1_units, this%type1_obs)
+        call final_spheres(this%Box, this%type2_spheres, this%type2_units, this%type2_obs)
         call mix_final(this%Box%size, this%mix, this%type1_spheres, this%type2_spheres, &
                        this%mix_report_unit, this%mix_Epot, this%mix_Epot_conf)
         
@@ -298,8 +298,8 @@ contains
     subroutine Physical_System_write_all_results(this)
         class(Physical_System), intent(inout) :: this
         
-        call this%type1_observables%write_results(this%type1_units%report)
-        call this%type2_observables%write_results(this%type2_units%report)
+        call this%type1_obs%write_results(this%type1_units%report)
+        call this%type2_obs%write_results(this%type2_units%report)
         call mix_write_results(this%Nstep, this%mix_EpotSum, this%mix_report_unit)
         
         call this%write_results()
@@ -312,11 +312,11 @@ contains
         real(DP) :: Epot, Epot_conf
         real(DP) :: duration
         
-        Epot = this%type1_observables%Epot + this%type2_observables%Epot + this%mix_Epot
+        Epot = this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
         Epot_conf = this%type1_spheres%Epot_conf(this%Box) + &
                     this%type2_macro%hard_potential%conf() + this%mix_Epot_conf
         call test_consist(Epot, Epot_conf, this%report_unit)
-        this%EpotSum = this%type1_observables%EpotSum + this%type2_observables%EpotSum + this%mix_EpotSum
+        this%EpotSum = this%type1_obs%EpotSum + this%type2_obs%EpotSum + this%mix_EpotSum
         duration = this%time_end - this%time_start
         call write_results(this%num_particles, this%Nstep, this%EpotSum, this%switch_rejectSum,&
                            duration, this%report_unit)
@@ -407,25 +407,25 @@ contains
                 iColRand = int(rand*real(this%num_particles, DP)) + 1
                 if (iColRand <= this%type1_spheres%get_num_particles()) then                    
                     call move(this%Box, &
-                              this%type1_spheres, this%type1_macro, this%type1_observables, &
+                              this%type1_spheres, this%type1_macro, this%type1_obs, &
                               this%type2_spheres, this%type2_macro%mix_cells, &
                               this%mix, this%mix_Epot)
                 else
                     call move(this%Box, &
-                              this%type2_spheres, this%type2_macro, this%type2_observables, &
+                              this%type2_spheres, this%type2_macro, this%type2_obs, &
                               this%type1_spheres, this%type1_macro%mix_cells, &
                               this%mix, this%mix_Epot)
                 end if
             else if (iChangeRand <= this%Nmove + this%Nswitch) then
                 call switch(this%Box, &
-                            this%type1_spheres, this%type1_macro, this%type1_observables, &
-                            this%type2_spheres, this%type2_macro, this%type2_observables, &
+                            this%type1_spheres, this%type1_macro, this%type1_obs, &
+                            this%type2_spheres, this%type2_macro, this%type2_obs, &
                             this%mix, this%mix_Epot, &
                             this%switch_Nreject)
                 this%switch_Nhit = this%switch_Nhit + 1
             else
                 call rotate(this%Box, &
-                            this%type1_spheres, this%type1_macro%rotation, this%type1_observables)
+                            this%type1_spheres, this%type1_macro%rotation, this%type1_obs)
             end if
             
         end do MC_Change
@@ -435,8 +435,8 @@ contains
     subroutine Physical_System_update_rejections(this)    
         class(Physical_System), intent(inout) :: this
     
-        call this%type1_observables%update_rejections()
-        call this%type2_observables%update_rejections()
+        call this%type1_obs%update_rejections()
+        call this%type2_obs%update_rejections()
         
         this%switch_reject = real(this%switch_Nreject, DP)/real(this%switch_Nhit, DP)
         this%switch_Nreject = 0
@@ -449,18 +449,18 @@ contains
         integer, intent(in) :: iStep
         
         if (mod(iStep, this%Nadapt) /= 0) then ! Rejections accumulation
-            this%type1_observables%move_rejectAdapt = this%type1_observables%move_rejectAdapt + &
-                                              this%type1_observables%move_reject
-            this%type1_observables%rotate_rejectAdapt = this%type1_observables%rotate_rejectAdapt + &
-                                                this%type1_observables%rotate_reject
-            this%type2_observables%move_rejectAdapt = this%type2_observables%move_rejectAdapt + &
-                                              this%type2_observables%move_reject
+            this%type1_obs%move_rejectAdapt = this%type1_obs%move_rejectAdapt + &
+                                              this%type1_obs%move_reject
+            this%type1_obs%rotate_rejectAdapt = this%type1_obs%rotate_rejectAdapt + &
+                                                this%type1_obs%rotate_reject
+            this%type2_obs%move_rejectAdapt = this%type2_obs%move_rejectAdapt + &
+                                              this%type2_obs%move_reject
         else ! Average & adaptation
-            call adapt_move(this%Box%size, this%type1_macro%move, this%Nadapt, iStep, this%type1_observables, &
+            call adapt_move(this%Box%size, this%type1_macro%move, this%Nadapt, iStep, this%type1_obs, &
                             this%type1_units%move_delta)
-            call adapt_rotation(this%type1_macro%rotation, this%Nadapt, iStep, this%type1_observables, &
+            call adapt_rotation(this%type1_macro%rotation, this%Nadapt, iStep, this%type1_obs, &
                                 this%type1_units%rotate_delta)
-            call adapt_move(this%Box%size, this%type2_macro%move, this%Nadapt, iStep, this%type2_observables, &
+            call adapt_move(this%Box%size, this%type2_macro%move, this%Nadapt, iStep, this%type2_obs, &
                             this%type2_units%move_delta)
         end if
         
@@ -470,11 +470,11 @@ contains
         class(Physical_System), intent(inout) :: this
         integer, intent(in) :: iStep
     
-        call this%type1_observables%write(iStep, this%type1_units%obsThermal)
-        call this%type2_observables%write(iStep, this%type2_units%obsThermal)
+        call this%type1_obs%write(iStep, this%type1_units%obsThermal)
+        call this%type2_obs%write(iStep, this%type2_units%obsThermal)
         
         write(this%mix_obsThermal_unit, *) iStep, this%mix_Epot
-        write(this%obsThermal_unit, *) iStep, this%type1_observables%Epot + this%type2_observables%Epot + this%mix_Epot
+        write(this%obsThermal_unit, *) iStep, this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
             
     end subroutine Physical_System_write_observables_thermalisation
     
@@ -485,12 +485,12 @@ contains
         character(len=5) :: type_name
         
         type_name = this%type1_spheres%get_name()
-        call this%type1_macro%move%set_delta(type_name, this%Box%size, this%type1_observables%move_rejectAvg, &
+        call this%type1_macro%move%set_delta(type_name, this%Box%size, this%type1_obs%move_rejectAvg, &
                                        this%type1_units%report)
-        call this%type1_macro%rotation%set_delta(type_name, this%type1_observables%rotate_rejectAvg, &
+        call this%type1_macro%rotation%set_delta(type_name, this%type1_obs%rotate_rejectAvg, &
                                            this%type1_units%report)
         type_name = this%type2_spheres%get_name()
-        call this%type2_macro%move%set_delta(type_name, this%Box%size, this%type2_observables%move_rejectAvg, &
+        call this%type2_macro%move%set_delta(type_name, this%Box%size, this%type2_obs%move_rejectAvg, &
                                        this%type2_units%report)
     
     end subroutine Physical_System_fix_changes
@@ -499,11 +499,13 @@ contains
     
         class(Physical_System), intent(inout) :: this
     
-        call widom(this%Box, this%type1_spheres, this%type1_macro%same_cells, this%type1_macro%mix_cells, &
-                   this%type1_macro%hard_potential, this%type1_observables, this%type2_spheres, this%type2_macro%mix_cells, &
+        call widom(this%Box, &
+                   this%type1_spheres, this%type1_macro, this%type1_obs, &
+                   this%type2_spheres, this%type2_macro%mix_cells, &
                    this%mix)
-        call widom(this%Box, this%type2_spheres, this%type2_macro%same_cells, this%type2_macro%mix_cells, &
-                   this%type2_macro%hard_potential, this%type2_observables, this%type1_spheres, this%type1_macro%mix_cells, &
+        call widom(this%Box, &
+                   this%type2_spheres, this%type2_macro, this%type2_obs, &
+                   this%type1_spheres, this%type1_macro%mix_cells, &
                    this%mix)
     
     end subroutine Physical_System_measure_chemical_potentials
@@ -512,8 +514,8 @@ contains
     
         class(Physical_System), intent(inout) :: this
     
-        call this%type1_observables%accumulate()
-        call this%type2_observables%accumulate()
+        call this%type1_obs%accumulate()
+        call this%type2_obs%accumulate()
         
         this%mix_EpotSum = this%mix_EpotSum + this%mix_Epot
         this%switch_rejectSum = this%switch_rejectSum + this%switch_reject
@@ -525,11 +527,11 @@ contains
         class(Physical_System), intent(inout) :: this
         integer, intent(in) :: iStep
     
-        call this%type1_observables%write(iStep, this%type1_units%obsEquilib)
-        call this%type2_observables%write(iStep, this%type2_units%obsEquilib)
+        call this%type1_obs%write(iStep, this%type1_units%obsEquilib)
+        call this%type2_obs%write(iStep, this%type2_units%obsEquilib)
         
         write(this%mix_obsEquilib_unit, *) iStep, this%mix_Epot
-        write(this%obsEquilib_unit, *) iStep, this%type1_observables%Epot + this%type2_observables%Epot + this%mix_Epot
+        write(this%obsEquilib_unit, *) iStep, this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
             
     end subroutine Physical_System_write_observables_equilibrium
     

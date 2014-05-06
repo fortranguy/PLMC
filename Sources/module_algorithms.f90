@@ -142,13 +142,15 @@ contains
     
     !> Widom's method
 
-    subroutine widom(Box, this_spheres, this_same_cells, this_mix_cells, this_hard_potential, this_obs, &
-                     other_spheres, other_mix_cells, mix)
+    subroutine widom(Box, &
+                     this_spheres, this_macro, this_obs, &
+                     other_spheres, other_mix_cells, &
+                     mix)
         
         type(Box_Dimensions), intent(in) :: Box
         class(Hard_Spheres), intent(in) :: this_spheres
-        class(Neighbour_Cells), intent(inout) :: this_same_cells, this_mix_cells, other_mix_cells
-        class(Hard_Spheres_Potential), intent(in) :: this_hard_potential
+        class(Hard_Spheres_Macro), intent(inout) :: this_macro
+        class(Neighbour_Cells), intent(in) ::  other_mix_cells
         class(Observables), intent(inout) :: this_obs
         class(Hard_Spheres), intent(in) :: other_spheres
         class(Mixing_Potential), intent(in) :: mix
@@ -170,12 +172,12 @@ contains
             test%position(:) = Box%size(:) * xRand(:)
 
             if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
-                test%same_iCell = this_same_cells%index_from_position(test%position)
-                call this_hard_potential%neighCells(Box%size, this_spheres, this_same_cells, test, &
+                test%same_iCell = this_macro%same_cells%index_from_position(test%position)
+                call this_macro%hard_potential%neighCells(Box%size, this_spheres, this_macro%same_cells, test, &
                                                     overlap, this_EpotTest)
             else
                 test%mix_iCell = other_mix_cells%index_from_position(test%position)
-                call mix%Epot_neighCells(Box%size, test, this_mix_cells, other_spheres, overlap, &
+                call mix%Epot_neighCells(Box%size, test, this_macro%mix_cells, other_spheres, overlap, &
                                          mix_EpotTest)
             end if
             
@@ -183,11 +185,11 @@ contains
             
                 if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
                     test%mix_iCell = other_mix_cells%index_from_position(test%position)
-                    call mix%Epot_neighCells(Box%size, test, this_mix_cells, other_spheres, overlap, &
+                    call mix%Epot_neighCells(Box%size, test, this_macro%mix_cells, other_spheres, overlap, &
                                              mix_EpotTest)
                 else
-                    test%same_iCell = this_same_cells%index_from_position(test%position)
-                    call this_hard_potential%neighCells(Box%size, this_spheres, this_same_cells, test, &
+                    test%same_iCell = this_macro%same_cells%index_from_position(test%position)
+                    call this_macro%hard_potential%neighCells(Box%size, this_spheres, this_macro%same_cells, test, &
                                                         overlap, this_EpotTest)
                 end if
                 
