@@ -3,7 +3,7 @@
 module module_monte_carlo_arguments
 
 use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
-use module_types, only: argument_random, Argument_Initial, Monte_Carlo_Arguments
+use module_types_micro, only: argument_random, Argument_Initial, Monte_Carlo_Arguments
 
 implicit none
 

@@ -8,7 +8,7 @@ use data_constants, only: PI
 use data_box, only: Ndim
 use data_particles, only: hard_diameter, hard_num_particles, hard_widom_num_particles
 use data_distribution, only: snap_ratio
-use module_types, only: Box_Dimensions, Node, Particle_Index
+use module_types_micro, only: Box_Dimensions, Node, Particle_Index
 use module_physics_micro, only: dist_PBC
 
 implicit none

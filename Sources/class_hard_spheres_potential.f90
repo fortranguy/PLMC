@@ -3,7 +3,7 @@ module class_hard_spheres_potential
 use data_precisions, only: DP
 use data_potential, only: hard_rMin_factor
 use data_neighbour_cells, only: NnearCell
-use module_types, only: Box_Dimensions, Node, Particle_Index
+use module_types_micro, only: Box_Dimensions, Node, Particle_Index
 use module_physics_micro, only: dist_PBC
 use class_neighbour_cells
 use class_hard_spheres

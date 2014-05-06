@@ -11,7 +11,7 @@ use data_monte_carlo, only: dipol_rotate_delta, dipol_rotate_deltaMax, dipol_rot
 use data_potential, only: dipol_rMin_factor, dipol_real_rCut_factor, dipol_real_dr, dipol_alpha_factor
 use data_neighbour_cells, only: NnearCell
 use data_distribution, only: snap_ratio
-use module_types, only: Box_Dimensions, Particle_Index
+use module_types_micro, only: Box_Dimensions, Particle_Index
 use module_physics_micro, only: set_discrete_length, distVec_PBC, Box_wave1_sym, Box_wave2_sym, &
                                 fourier_i, exchange_sign
 use class_hard_spheres

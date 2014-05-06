@@ -5,7 +5,7 @@ module module_physics_macro
 use, intrinsic :: iso_fortran_env, only: output_unit, error_unit, iostat_end
 use data_precisions, only: DP, real_zero, io_tiny, consist_tiny
 use data_box, only: Ndim
-use module_types, only: Box_Dimensions, Argument_Random, Argument_Initial
+use module_types_micro, only: Box_Dimensions, Argument_Random, Argument_Initial
 use module_physics_micro, only: dist_PBC, random_surface
 use class_neighbour_cells
 use class_hard_spheres

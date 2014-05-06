@@ -6,7 +6,7 @@ use, intrinsic :: iso_fortran_env, only: error_unit
 use data_precisions, only: DP, real_zero
 use data_box, only: Ndim
 use data_neighbour_cells, only: NnearCell_dim, NnearCell
-use module_types, only: Node, Linked_List
+use module_types_micro, only: Node, Linked_List
 use module_physics_micro, only: index_from_coord, coord_PBC
 use class_hard_spheres
 

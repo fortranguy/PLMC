@@ -12,7 +12,7 @@ use data_monte_carlo, only: Temperature, decorrelFactor, switch_factor, Nthermal
                             hard_move_delta, hard_move_rejectFix
 use data_potential, only: write_potential
 use data_distribution, only: snap
-use module_types, only: Box_Dimensions, Monte_Carlo_Arguments
+use module_types_micro, only: Box_Dimensions, Monte_Carlo_Arguments
 use module_physics_micro, only: NwaveVectors
 use class_neighbour_cells
 use class_hard_spheres

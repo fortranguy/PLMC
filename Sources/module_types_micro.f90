@@ -1,6 +1,6 @@
 !> \brief Definition of derives types
 
-module module_types
+module module_types_micro
 
 use data_precisions, only: DP
 use data_box, only: Ndim
@@ -61,4 +61,4 @@ implicit none
         type(Argument_Initial) :: initial
     end type Monte_Carlo_Arguments
 
-end module module_types
+end module module_types_micro

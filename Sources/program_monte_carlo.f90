@@ -3,7 +3,7 @@
 program monte_carlo_canonical_bulk
 
 use, intrinsic :: iso_fortran_env, only: output_unit
-use module_types, only: Monte_Carlo_Arguments
+use module_types_micro, only: Monte_Carlo_Arguments
 use module_monte_carlo_arguments, only: read_arguments
 use class_physical_system
 
