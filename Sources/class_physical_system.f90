@@ -172,7 +172,7 @@ contains
         
         call this%type1_macro%move%init(dipol_move_delta, dipol_move_rejectFix) ! ugly
         call this%type1_macro%rotation%init(dipol_rotate_delta, dipol_rotate_deltaMax, &
-                                      dipol_rotate_rejectFix) ! ugly
+                                            dipol_rotate_rejectFix) ! ugly
         call this%type2_macro%move%init(hard_move_delta, hard_move_rejectFix) ! ugly
         
     end subroutine Physical_System_set_changes
@@ -204,12 +204,10 @@ contains
         call this%mix%write_report(this%mix_report_unit)
         call init_spheres(this%Box, this%type1_spheres, this%type1_macro%hard_potential, &
                           this%write_potential, this%type1_units, this%type1_observables%Epot)
-        call init_cells(this%Box%size, this%type1_spheres, this%type1_macro%same_cells, this%type2_spheres, &
-                        this%type1_macro%mix_cells, this%type1_macro%hard_potential, this%mix)
+        call init_cells(this%Box%size, this%type1_spheres, this%type1_macro, this%type2_spheres, this%mix)
         call init_spheres(this%Box, this%type2_spheres, this%type2_macro%hard_potential, &
                           this%write_potential, this%type2_units, this%type2_observables%Epot)
-        call init_cells(this%Box%size, this%type2_spheres, this%type2_macro%same_cells, this%type1_spheres, &
-                        this%type2_macro%mix_cells, this%type2_macro%hard_potential, this%mix)
+        call init_cells(this%Box%size, this%type2_spheres, this%type2_macro, this%type1_spheres, this%mix)
         
         this%EpotSum = 0._DP
         Epot_conf = this%type1_observables%Epot + this%type2_observables%Epot + this%mix_Epot

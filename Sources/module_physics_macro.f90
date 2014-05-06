@@ -13,6 +13,7 @@ use class_hard_spheres_potential
 use class_small_move
 use class_small_rotation
 use class_dipolar_spheres
+use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Spheres_Macro
 use class_mixing_potential
 use class_observables
 use class_units
@@ -247,8 +248,7 @@ contains
     
     !> Spheres initialisations
     
-    subroutine init_spheres(Box, this, this_potential, write_potential, this_units, &
-                            this_Epot) ! separate ?
+    subroutine init_spheres(Box, this, this_potential, write_potential, this_units, this_Epot) ! separate ?
     
         type(Box_Dimensions), intent(in) :: Box
         class(Hard_Spheres), intent(inout) :: this
@@ -283,23 +283,22 @@ contains
     
     end subroutine init_spheres
     
-    subroutine init_cells(Box_size, this_spheres, sameCells, other_spheres, mixCells, this_potential, &
-                          mix)
+    subroutine init_cells(Box_size, this_spheres, this_macro, other_spheres, mix)
     
         real(DP), dimension(:), intent(in) :: Box_size
         class(Hard_Spheres), intent(in) :: this_spheres, other_spheres
-        class(Neighbour_Cells), intent(out) :: sameCells, mixCells
-        class(Hard_Spheres_Potential), intent(in) :: this_potential
+        class(Hard_Spheres_Macro), intent(inout) :: this_macro
         class(Mixing_Potential), intent(in) :: mix
         
         real(DP), dimension(Ndim) :: same_cell_size
         
-        same_cell_size(:) = this_potential%get_range_cut()
-        call sameCells%construct(Box_size, same_cell_size, this_potential%get_range_cut())
-        call sameCells%all_cols_to_cells(this_spheres%get_num_particles(), this_spheres)
+        same_cell_size(:) = this_macro%hard_potential%get_range_cut()
+        call this_macro%same_cells%construct(Box_size, same_cell_size, &
+                                             this_macro%hard_potential%get_range_cut())
+        call this_macro%same_cells%all_cols_to_cells(this_spheres%get_num_particles(), this_spheres)
         
-        call mixCells%construct(Box_size, mix%get_cell_size(), mix%get_rCut())
-        call mixCells%all_cols_to_cells(other_spheres%get_num_particles(), other_spheres)
+        call this_macro%mix_cells%construct(Box_size, mix%get_cell_size(), mix%get_rCut())
+        call this_macro%mix_cells%all_cols_to_cells(other_spheres%get_num_particles(), other_spheres)
 
     end subroutine init_cells
     
