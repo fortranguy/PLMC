@@ -149,7 +149,7 @@ contains
         
         type(Box_Dimensions), intent(in) :: Box
         class(Hard_Spheres), intent(in) :: this_spheres
-        class(Hard_Spheres_Macro), intent(inout) :: this_macro
+        class(Hard_Spheres_Macro), intent(in) :: this_macro
         class(Neighbour_Cells), intent(in) ::  other_mix_cells
         class(Observables), intent(inout) :: this_obs
         class(Hard_Spheres), intent(in) :: other_spheres
