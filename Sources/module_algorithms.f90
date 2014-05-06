@@ -437,7 +437,8 @@ contains
     
     !> Dipole rotation
     
-    subroutine rotate(Box, spheres, rotation, obs)
+    subroutine rotate(Box, &
+                      spheres, rotation, obs)
     
         type(Box_Dimensions), intent(in) :: Box
         class(Dipolar_Spheres), intent(inout) :: spheres

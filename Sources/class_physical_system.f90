@@ -424,7 +424,8 @@ contains
                             this%switch_Nreject)
                 this%switch_Nhit = this%switch_Nhit + 1
             else
-                call rotate(this%Box, this%type1_spheres, this%type1_macro%rotation, this%type1_observables)
+                call rotate(this%Box, &
+                            this%type1_spheres, this%type1_macro%rotation, this%type1_observables)
             end if
             
         end do MC_Change
