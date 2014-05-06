@@ -1,4 +1,4 @@
-!> \brief Definition of derives types
+!> \brief Definition of derived types (micro)
 
 module module_types_micro
 

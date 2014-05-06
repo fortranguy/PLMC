@@ -73,6 +73,8 @@ class_observables.o: class_observables.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_units.o: class_units.f90
 	$(FC) -c $(FFLAGS) $< -o $@
+module_types_macro.o: module_types_macro.f90
+	$(FC) -c $(FFLAGS) $< -o $@
 module_physics_macro.o: module_physics_macro.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 module_algorithms.o: module_algorithms.f90
@@ -102,6 +104,7 @@ $(EXEC1): data.o \
           class_hard_spheres_potential.o \
           class_mixing_potential.o \
           class_observables.o class_units.o \
+          module_types_macro.o \
           module_physics_macro.o module_algorithms.o module_write.o module_monte_carlo_arguments.o\
           class_physical_system.o \
           program_monte_carlo.o

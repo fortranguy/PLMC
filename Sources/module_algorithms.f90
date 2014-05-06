@@ -417,7 +417,7 @@ contains
     
         type(Box_Dimensions), intent(in) :: Box
         class(Dipolar_Spheres), intent(inout) :: spheres
-        class(Small_rotation), intent(in) :: rotation
+        class(Small_Rotation), intent(in) :: rotation
         class(MoreObservables), intent(inout) :: obs
         
         real(DP) :: random
