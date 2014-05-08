@@ -30,6 +30,8 @@ else
     endif
 endif
 
+LDFLAGS += -L${HOME}/usr/lib -ljson
+
 # Default
 compiler = ifort
 mode = debug
@@ -108,16 +110,16 @@ $(EXEC1): data.o \
           module_physics_macro.o module_algorithms.o module_write.o module_monte_carlo_arguments.o\
           class_physical_system.o \
           program_monte_carlo.o
-	$(FC) $^ $(LDFLAGS) -o $@
+	$(FC) $^ -o $@ $(LDFLAGS)
 	
 $(EXEC2): data.o program_bunching.o
-	$(FC) $^ $(LDFLAGS) -o $@
+	$(FC) $^ -o $@ $(LDFLAGS)
 	
 $(EXEC3): data.o program_histogram.o
-	$(FC) $^ $(LDFLAGS) -o $@
+	$(FC) $^ -o $@ $(LDFLAGS)
 	
 $(EXEC4): data.o module_physics_micro.o program_distribution.o
-	$(FC) $^ $(LDFLAGS) -o $@
+	$(FC) $^ -o $@ $(LDFLAGS)
 
 # --------------------------------------------------------------------------------------------------
 .PHONY: clean mrproper remove

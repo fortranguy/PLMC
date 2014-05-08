@@ -1,0 +1,18 @@
+{
+    "Box": {
+        "size": [25, 25, 25],
+        "wave": [8, 8, 8]
+    },
+    "Particles": {
+        "Dipoles": {
+            "number of particles": 281
+        },
+        "Hard Spheres": {
+            "diameter": 1.0,
+            "number of particles": 6750
+        },
+        "Mixing": {
+            "non addivity": 0.2
+        }
+    }
+}
