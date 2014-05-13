@@ -1,7 +1,8 @@
 {
     "Box": {
         "size": [25, 25, 25],
-        "wave": [8, 8, 8]
+        "wave": [8, 8, 8],
+        "temperature": 1.0
     },
     "Particles": {
         "Dipoles": {
@@ -14,5 +15,38 @@
         "Mixing": {
             "non addivity": 0.2
         }
+    },
+    "Monte Carlo": {
+        "number of thermalisation steps": 30000,
+        "number of equilibrium steps": 60000,
+        "period of adaptation": 1000,
+        "period of reset": 10000,
+        "decorrelation factor": 1,
+        "switch factor": 1,
+        "Dipoles": {
+            "move": {
+                "initial delta": 0.3,
+                "wanted rejection": 0.5
+            },
+            "rotation": {
+                "initial delta": 30.0,
+                "maximum delta": 75.0,
+                "wanted rejection": 0.17
+            }
+        },
+        "Hard Spheres": {
+            "move": {
+                "initial delta": 0.5,
+                "wanted rejection": 0.5
+            }
+        }
+    },
+    "Histogram": {
+        "energy delta": 1.0
+    },
+    "Distribution": {
+        "take snapshot": true,
+        "delta": 0.025,
+        "period": 400
     }
 }
