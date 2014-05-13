@@ -213,6 +213,7 @@ contains
         
         call json%get("Distribution.take snapshot", this%snap)
         call json%get("Distribution.period", this%reset_iStep)
+        this%reset_iStep = this%reset_iStep / this%decorrelFactor
         
         call json%destroy()
         

@@ -17,10 +17,10 @@
         }
     },
     "Monte Carlo": {
-        "number of thermalisation steps": 30000,
-        "number of equilibrium steps": 60000,
-        "period of adaptation": 1000,
-        "period of reset": 10000,
+        "number of thermalisation steps": 32768,
+        "number of equilibrium steps": 65536,
+        "period of adaptation": 1024,
+        "period of reset": 8192,
         "decorrelation factor": 1,
         "switch factor": 1,
         "Dipoles": {
