@@ -64,7 +64,7 @@
                 "alpha": 1.0
             }
         },
-        "write potential": true
+        "write": true
     },
     "Histogram": {
         "energy delta": 1.0

@@ -4,14 +4,7 @@ module class_physical_system
 
 use, intrinsic :: iso_fortran_env, only: output_unit
 use data_precisions, only: DP
-use data_box, only: Ndim, Box_size, Box_wave
-use data_monte_carlo, only: Temperature, decorrelFactor, switch_factor, Nthermal, Nadapt, Nstep, &
-                            reset_iStep, &
-                            dipol_move_delta, dipol_move_rejectFix, &
-                            dipol_rotate_delta, dipol_rotate_deltaMax, dipol_rotate_rejectFix, &
-                            hard_move_delta, hard_move_rejectFix
 use data_potential, only: write_potential
-use data_distribution, only: snap
 use json_module, only: json_file, json_initialize
 use module_types_micro, only: Box_Dimensions, Monte_Carlo_Arguments
 use module_physics_micro, only: NwaveVectors
@@ -136,7 +129,7 @@ contains
         
         call this%set_box(json)
         call this%set_monte_carlo(json)
-        this%write_potential = write_potential
+        call json%get("Potential.write", this%write_potential)
         
         call this%type1_spheres%construct()
         call this%type2_spheres%construct()
@@ -145,6 +138,7 @@ contains
         call this%set_changes(json)
     
         call json%destroy()
+        
     end subroutine Physical_System_construct
     
     subroutine Physical_System_set_box(this, json)
@@ -167,9 +161,9 @@ contains
         class(Physical_System), intent(inout) :: this
         type(json_file), intent(inout) :: json 
         
-        call json%get("number of thermalisation steps", this%Nthermal)
-        call json%get("period of adaptation", this%Nadapt)
-        call json%get("number of equilibrium steps", this%Nstep)
+        call json%get("Monte Carlo.number of thermalisation steps", this%Nthermal)
+        call json%get("Monte Carlo.period of adaptation", this%Nadapt)
+        call json%get("Monte Carlo.number of equilibrium steps", this%Nstep)
         
     end subroutine Physical_System_set_monte_carlo
     
@@ -178,20 +172,30 @@ contains
         type(json_file), intent(inout) :: json
         
         integer :: switch_factor
+        real(DP) :: type1_move_delta, type1_move_rejection
+        real(DP) :: type1_rotation_delta, type1_rotation_delta_max, type1_rotation_rejection
+        real(DP) :: type2_move_delta, type2_move_rejection
         
         this%num_particles = this%type1_spheres%get_num_particles() + &
                              this%type2_spheres%get_num_particles()
-        call json%get("decorrelation factor", this%decorrelFactor)
+        call json%get("Monte Carlo.decorrelation factor", this%decorrelFactor)
         this%Nmove = this%decorrelFactor * this%num_particles
-        call json%get("switch factor", switch_factor)
+        call json%get("Monte Carlo.switch factor", switch_factor)
         this%Nswitch = switch_factor * this%decorrelFactor * this%type1_spheres%get_num_particles()
         this%Nrotate = this%decorrelFactor * this%type1_spheres%get_num_particles()
         this%Nchange = this%Nmove + this%Nswitch + this%Nrotate
         
-        call this%type1_macro%move%init(dipol_move_delta, dipol_move_rejectFix) ! ugly
-        call this%type1_macro%rotation%init(dipol_rotate_delta, dipol_rotate_deltaMax, &
-                                            dipol_rotate_rejectFix) ! ugly
-        call this%type2_macro%move%init(hard_move_delta, hard_move_rejectFix) ! ugly
+        call json%get("Monte Carlo.Dipoles.move.initial delta", type1_move_delta)
+        call json%get("Monte Carlo.Dipoles.move.wanted rejection", type1_move_rejection)
+        call this%type1_macro%move%init(type1_move_delta, type1_move_rejection)
+        call json%get("Monte Carlo.Dipoles.rotation.initial delta", type1_rotation_delta)
+        call json%get("Monte Carlo.Dipoles.rotation.maximum delta", type1_rotation_delta_max)
+        call json%get("Monte Carlo.Dipoles.rotation.wanted rejection", type1_rotation_rejection)
+        call this%type1_macro%rotation%init(type1_rotation_delta, type1_rotation_delta_max, &
+                                            type1_rotation_rejection)
+        call json%get("Monte Carlo.Hard Spheres.move.initial delta", type2_move_delta)
+        call json%get("Monte Carlo.Hard Spheres.move.wanted rejection", type2_move_rejection)
+        call this%type2_macro%move%init(type2_move_delta, type2_move_rejection)
         
     end subroutine Physical_System_set_changes
     
@@ -201,10 +205,16 @@ contains
         class(Physical_System), intent(inout) :: this
         type(Monte_Carlo_Arguments), intent(in) :: args
         
-        real(DP) :: Epot_conf
+        real(DP) :: Epot_conf        
         
-        this%snap = snap
-        this%reset_iStep = reset_iStep
+        type(json_file) :: json
+        call json_initialize()
+        call json%load_file(filename = "data.json")
+        
+        call json%get("Distribution.take snapshot", this%snap)
+        call json%get("Distribution.period", this%reset_iStep)
+        
+        call json%destroy()
         
         write(output_unit, *) "Monte-Carlo Simulation: Canonical ensemble"
         
@@ -222,10 +232,12 @@ contains
         call this%mix%write_report(this%mix_report_unit)
         call init_spheres(this%Box, this%type1_spheres, this%type1_macro%hard_potential, &
                           this%write_potential, this%type1_units, this%type1_obs%Epot)
-        call init_cells(this%Box%size, this%type1_spheres, this%type1_macro, this%type2_spheres, this%mix)
+        call init_cells(this%Box%size, this%type1_spheres, this%type1_macro, this%type2_spheres, &
+                        this%mix)
         call init_spheres(this%Box, this%type2_spheres, this%type2_macro%hard_potential, &
                           this%write_potential, this%type2_units, this%type2_obs%Epot)
-        call init_cells(this%Box%size, this%type2_spheres, this%type2_macro, this%type1_spheres, this%mix)
+        call init_cells(this%Box%size, this%type2_spheres, this%type2_macro, this%type1_spheres, &
+                        this%mix)
         
         this%EpotSum = 0._DP
         Epot_conf = this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot

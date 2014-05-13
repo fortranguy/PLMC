@@ -29,11 +29,11 @@ contains
 
     pure subroutine Small_Move_init(this, delta, rejectFix)
         class(Small_Move), intent(out) :: this
-        real(DP), dimension(Ndim), intent(in) :: delta
+        real(DP), intent(in) :: delta
         real(DP), intent(in) :: rejectFix
         
-        this%delta = delta
-        this%deltaSave = this%delta
+        this%delta(:) = delta
+        this%deltaSave(:) = this%delta(:)
         this%rejectFix = rejectFix
     end subroutine Small_Move_init
     
@@ -41,7 +41,7 @@ contains
         class(Small_Move), intent(in) :: this
         real(DP), dimension(Ndim) :: get_delta
         
-        get_delta = this%delta
+        get_delta(:) = this%delta(:)
     end function Small_Move_get_delta
     
     pure function Small_Move_get_delta_scalar(this) result(get_delta_scalar)
