@@ -6,11 +6,13 @@
     },
     "Particles": {
         "Dipoles": {
-            "number of particles": 281
+            "number of particles": 281,
+            "number of Widom particles": 281
         },
         "Hard Spheres": {
             "diameter": 1.0,
-            "number of particles": 6750
+            "number of particles": 6750,
+            "number of Widom particles": 6750
         },
         "Mixing": {
             "non addivity": 0.2
