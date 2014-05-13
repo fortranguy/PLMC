@@ -77,8 +77,9 @@ private
         !> Construction & destruction of the class
         procedure :: construct => Physical_System_construct
         procedure, private :: set_box => Physical_System_set_box
-        procedure, private :: set_monte_carlo => Physical_System_set_monte_carlo
-        procedure, private :: set_changes => Physical_System_set_changes        
+        procedure, private :: set_monte_carlo_steps => Physical_System_set_monte_carlo_steps
+        procedure, private :: set_monte_carlo_changes => &
+                              Physical_System_set_monte_carlo_changes        
         procedure :: destroy => Physical_System_destroy
         
         !> Initialization & Finalisation
@@ -128,14 +129,14 @@ contains
         write(output_unit, *) this%name, " class construction"
         
         call this%set_box(json)
-        call this%set_monte_carlo(json)
+        call this%set_monte_carlo_steps(json)
         call json%get("Potential.write", this%write_potential)
         
         call this%type1_spheres%construct()
         call this%type2_spheres%construct()
         call this%mix%construct(this%type1_spheres%get_diameter(), this%type2_spheres%get_diameter())
         
-        call this%set_changes(json)
+        call this%set_monte_carlo_changes(json)
     
         call json%destroy()
         
@@ -157,7 +158,7 @@ contains
         
     end subroutine Physical_System_set_box
     
-    subroutine Physical_System_set_monte_carlo(this, json)
+    subroutine Physical_System_set_monte_carlo_steps(this, json)
         class(Physical_System), intent(inout) :: this
         type(json_file), intent(inout) :: json 
         
@@ -165,9 +166,9 @@ contains
         call json%get("Monte Carlo.period of adaptation", this%Nadapt)
         call json%get("Monte Carlo.number of equilibrium steps", this%Nstep)
         
-    end subroutine Physical_System_set_monte_carlo
+    end subroutine Physical_System_set_monte_carlo_steps
     
-    subroutine Physical_System_set_changes(this, json)
+    subroutine Physical_System_set_monte_carlo_changes(this, json)
         class(Physical_System), intent(inout) :: this
         type(json_file), intent(inout) :: json
         
@@ -188,16 +189,18 @@ contains
         call json%get("Monte Carlo.Dipoles.move.initial delta", type1_move_delta)
         call json%get("Monte Carlo.Dipoles.move.wanted rejection", type1_move_rejection)
         call this%type1_macro%move%init(type1_move_delta, type1_move_rejection)
+        
         call json%get("Monte Carlo.Dipoles.rotation.initial delta", type1_rotation_delta)
         call json%get("Monte Carlo.Dipoles.rotation.maximum delta", type1_rotation_delta_max)
         call json%get("Monte Carlo.Dipoles.rotation.wanted rejection", type1_rotation_rejection)
         call this%type1_macro%rotation%init(type1_rotation_delta, type1_rotation_delta_max, &
                                             type1_rotation_rejection)
+                                            
         call json%get("Monte Carlo.Hard Spheres.move.initial delta", type2_move_delta)
         call json%get("Monte Carlo.Hard Spheres.move.wanted rejection", type2_move_rejection)
         call this%type2_macro%move%init(type2_move_delta, type2_move_rejection)
         
-    end subroutine Physical_System_set_changes
+    end subroutine Physical_System_set_monte_carlo_changes
     
     ! Initialization
     
