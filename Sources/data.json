@@ -41,6 +41,31 @@
             }
         }
     },
+    "Potential": {
+        "Dipoles": {
+            "minimum distance factor": 1.0,
+            "Ewald summation": {
+                "alpha factor": 7.0,
+                "real": {
+                    "range cut factor": 0.5,
+                    "delta": 5.0e-5
+                } 
+            }
+        },
+        "Hard Spheres": {
+            "minimum distance factor": 1.0
+        },
+        "Mixing": {
+            "minimum distance factor": 1.0,
+            "range cut": 1.0,
+            "delta": 1.0,
+            "Yukawa": {
+                "epsilon": 0.0,
+                "alpha": 1.0
+            }
+        },
+        "write potential": true
+    },
     "Histogram": {
         "energy delta": 1.0
     },
