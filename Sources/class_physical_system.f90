@@ -4,7 +4,6 @@ module class_physical_system
 
 use, intrinsic :: iso_fortran_env, only: output_unit
 use data_precisions, only: DP
-use data_potential, only: write_potential
 use json_module, only: json_file, json_initialize
 use module_types_micro, only: Box_Dimensions, Monte_Carlo_Arguments
 use module_physics_micro, only: NwaveVectors
