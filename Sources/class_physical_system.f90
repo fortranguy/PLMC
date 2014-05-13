@@ -127,57 +127,63 @@ contains
     subroutine Physical_System_construct(this)        
         class(Physical_System), intent(out) :: this
         
+        type(json_file) :: json
+        call json_initialize()
+        call json%load_file(filename = "data.json")
+        
         this%name = "sys"
         write(output_unit, *) this%name, " class construction"
         
-        call this%set_box()
-        call this%set_monte_carlo()
+        call this%set_box(json)
+        call this%set_monte_carlo(json)
         this%write_potential = write_potential
         
         call this%type1_spheres%construct()
         call this%type2_spheres%construct()
         call this%mix%construct(this%type1_spheres%get_diameter(), this%type2_spheres%get_diameter())
         
-        call this%set_changes()
+        call this%set_changes(json)
     
+        call json%destroy()
     end subroutine Physical_System_construct
     
-    subroutine Physical_System_set_box(this)
-        class(Physical_System), intent(inout) :: this
+    subroutine Physical_System_set_box(this, json)
+        class(Physical_System), intent(inout) :: this    
+        type(json_file), intent(inout) :: json    
         
-        type(json_file) :: json
         real(DP), dimension(:), allocatable :: Box_size
         integer, dimension(:), allocatable :: Box_wave
-        
-        call json_initialize()
-        call json%load_file(filename = "data.json")
         
         call json%get("Box.size", Box_size)
         if (size(Box_size) /= size (this%Box%size)) stop "Box size dimension"
         this%Box%size(:) = Box_size(:)
         call json%get("Box.wave", Box_wave)
         this%Box%wave(:) = Box_wave(:)
+        call json%get("Box.temperature", this%Temperature)        
         
-        call json%destroy()
     end subroutine Physical_System_set_box
     
-    pure subroutine Physical_System_set_monte_carlo(this)
+    subroutine Physical_System_set_monte_carlo(this, json)
         class(Physical_System), intent(inout) :: this
+        type(json_file), intent(inout) :: json 
         
-        this%Temperature = Temperature
-        this%Nthermal = Nthermal
-        this%Nadapt = Nadapt
-        this%Nstep = Nstep
+        call json%get("number of thermalisation steps", this%Nthermal)
+        call json%get("period of adaptation", this%Nadapt)
+        call json%get("number of equilibrium steps", this%Nstep)
         
     end subroutine Physical_System_set_monte_carlo
     
-    pure subroutine Physical_System_set_changes(this)
+    subroutine Physical_System_set_changes(this, json)
         class(Physical_System), intent(inout) :: this
+        type(json_file), intent(inout) :: json
+        
+        integer :: switch_factor
         
         this%num_particles = this%type1_spheres%get_num_particles() + &
                              this%type2_spheres%get_num_particles()
-        this%decorrelFactor = decorrelFactor
+        call json%get("decorrelation factor", this%decorrelFactor)
         this%Nmove = this%decorrelFactor * this%num_particles
+        call json%get("switch factor", switch_factor)
         this%Nswitch = switch_factor * this%decorrelFactor * this%type1_spheres%get_num_particles()
         this%Nrotate = this%decorrelFactor * this%type1_spheres%get_num_particles()
         this%Nchange = this%Nmove + this%Nswitch + this%Nrotate
