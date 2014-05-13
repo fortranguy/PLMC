@@ -153,7 +153,7 @@ contains
         this%Box%size(:) = Box_size(:)
         call json%get("Box.wave", Box_wave)
         this%Box%wave(:) = Box_wave(:)
-        call json%get("Box.temperature", this%Temperature)        
+        call json%get("Box.temperature", this%Box%temperature)        
         
     end subroutine Physical_System_set_box
     

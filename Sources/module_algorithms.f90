@@ -2,7 +2,6 @@ module module_algorithms
 
 use data_precisions, only: DP
 use data_box, only: Ndim
-use data_monte_carlo, only: Temperature
 use module_types_micro, only: Box_Dimensions, Particle_Index, Particle_Energy
 use module_physics_micro, only: random_surface, markov_surface
 use class_neighbour_cells
@@ -106,7 +105,7 @@ contains
                 deltaEpot = this_deltaEpot + mix_deltaEpot
                 
                 call random_number(random)
-                if (random < exp(-deltaEpot/Temperature)) then
+                if (random < exp(-deltaEpot/Box%temperature)) then
                 
                     select type (this_spheres)
                         type is (Dipolar_Spheres)
@@ -207,7 +206,7 @@ contains
                     end select
                 
                     EpotTest = this_EpotTest + mix_EpotTest
-                    widTestSum = widTestSum + exp(-EpotTest/Temperature)
+                    widTestSum = widTestSum + exp(-EpotTest/Box%temperature)
                     
                 end if
                 
@@ -296,7 +295,7 @@ contains
                             type2_mix_deltaEpot
                 
                 call random_number(random)
-                if (random < exp(-deltaEpot/Temperature)) then
+                if (random < exp(-deltaEpot/Box%temperature)) then
                 
                     call after_switch_update(Box, &
                                              type1_spheres, type1_macro%same_cells, old1, new1, &
@@ -476,7 +475,7 @@ contains
                                                                     new%orientation)
         
         call random_number(random)
-        if (random < exp(-deltaEpot/Temperature)) then
+        if (random < exp(-deltaEpot/Box%temperature)) then
         
             call spheres%reci_update_structure_rotate(Box, old, new)
             call spheres%update_totalMoment_rotate(old%orientation, new%orientation)

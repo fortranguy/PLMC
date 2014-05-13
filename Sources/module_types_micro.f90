@@ -12,6 +12,7 @@ implicit none
     type, public :: Box_Dimensions
         real(DP), dimension(Ndim) :: size
         integer, dimension(Ndim) :: wave
+        real(DP) :: temperature
     end type Box_Dimensions
 
     ! For neighbour cells
