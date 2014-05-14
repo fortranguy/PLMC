@@ -222,7 +222,6 @@ contains
         write(output_unit, *) "Monte-Carlo Simulation: Canonical ensemble"
         
         call this%open_all_units()
-        call this%write_all_reports()
         call this%init_switch()
         
         call init_random_seed(args%random, this%report_unit)
@@ -241,6 +240,8 @@ contains
                           this%write_potential, this%type2_units, this%type2_obs%Epot)
         call init_cells(this%Box%size, this%type2_spheres, this%type2_macro, this%type1_spheres, &
                         this%mix)
+                        
+        call this%write_all_reports()
         
         this%EpotSum = 0._DP
         Epot_conf = this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
