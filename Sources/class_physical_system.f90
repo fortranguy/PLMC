@@ -35,7 +35,6 @@ private
         integer :: num_particles
         
         ! Monte-Carlo
-        real(DP) :: Temperature
         integer :: Nthermal, Nadapt, Nstep
         integer :: decorrelFactor, Nchange, Nmove, Nswitch, Nrotate
         
@@ -289,8 +288,8 @@ contains
         write(report_unit ,*) "    Volume = ", product(this%Box%size)
         write(report_unit ,*) "    Box_wave(:) = ", this%Box%wave(:)
         write(report_unit ,*) "    NwaveVectors =", NwaveVectors(this%Box%wave)
-        write(report_unit ,*) "    num_particles = ", this%num_particles
-        write(report_unit ,*) "    Temperature = ", this%Temperature
+        write(report_unit ,*) "    Temperature = ", this%Box%temperature
+        write(report_unit ,*) "    num_particles = ", this%num_particles        
         
         write(report_unit, *) "    Nstep = ", this%Nstep
         write(report_unit, *) "    Nthermal = ", this%Nthermal
