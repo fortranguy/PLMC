@@ -155,9 +155,15 @@ contains
         call test_data_not_found(data_name, found)
         if (size(Box_size) /= size (this%Box%size)) error stop "Box size dimension"
         this%Box%size(:) = Box_size(:)
-        call json%get("Box.wave", Box_wave)
+        
+        data_name = "Box.wave"
+        call json%get(data_name, Box_wave, found)
+        call test_data_not_found(data_name, found)
         this%Box%wave(:) = Box_wave(:)
-        call json%get("Box.temperature", this%Box%temperature)        
+        
+        data_name = "Box.temperature"
+        call json%get(data_name, this%Box%temperature, found)
+        call test_data_not_found(data_name, found)                
         
     end subroutine Physical_System_set_box
     
