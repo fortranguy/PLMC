@@ -331,8 +331,8 @@ contains
     subroutine Physical_System_write_all_results(this)
         class(Physical_System), intent(inout) :: this
         
-        call this%type1_obs%write_results(this%type1_units%report)
-        call this%type2_obs%write_results(this%type2_units%report)
+        call this%type1_obs%write_results(this%Box%temperature, this%Nstep, this%type1_units%report)
+        call this%type2_obs%write_results(this%Box%temperature, this%Nstep, this%type2_units%report)
         call mix_write_results(this%Nstep, this%mix_EpotSum, this%mix_report_unit)
         
         call this%write_results()

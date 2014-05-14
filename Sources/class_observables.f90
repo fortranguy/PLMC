@@ -3,7 +3,6 @@
 module class_observables
 
 use data_precisions, only: DP
-use data_monte_carlo, only: Temperature, Nstep
 
 implicit none
 private
@@ -102,9 +101,11 @@ contains
     
     !> Results
     
-    subroutine Observables_write_results(this, report_unit)
+    subroutine Observables_write_results(this, temperature, Nstep, report_unit)
 
         class(Observables), intent(in) :: this
+        real(DP), intent(in) :: temperature
+        integer, intent(in) :: Nstep
         integer, intent(in) :: report_unit
         
         real(DP) :: potChiEx
@@ -112,7 +113,7 @@ contains
         write(report_unit, *) "Results: "
         
         write(report_unit, *) "    average energy = ", this%EpotSum/real(Nstep, DP)
-        potChiEx = -Temperature*log(this%activSum/real(Nstep, DP))
+        potChiEx = -temperature*log(this%activSum/real(Nstep, DP))
         write(report_unit, *) "    average excess chemical potential = ", potChiEx
         write(report_unit, *) "    move rejection rate = ", this%move_rejectSum/real(Nstep, DP)
         
