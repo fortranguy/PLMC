@@ -159,6 +159,7 @@ contains
         data_name = "Box.wave"
         call json%get(data_name, Box_wave, found)
         call test_data_not_found(data_name, found)
+        if (size(Box_wave) /= size (this%Box%wave)) error stop "Box wave dimension"
         this%Box%wave(:) = Box_wave(:)
         
         data_name = "Box.temperature"
