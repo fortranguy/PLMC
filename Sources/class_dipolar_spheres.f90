@@ -345,24 +345,22 @@ contains
         real(DP) :: Epot_real_solo
 
         integer :: j_particle
-        real(DP), dimension(Ndim) :: xCol_i, xCol_j
-        real(DP), dimension(Ndim) :: mCol_i, mCol_j
+        real(DP), dimension(Ndim) :: xCol_j
+        real(DP), dimension(Ndim) :: mCol_j
         real(DP), dimension(Ndim) :: rVec_ij
         real(DP) :: r_ij
-         
-        xCol_i(:) = particle%position(:)
-        mCol_i(:) = particle%orientation(:)
         
         Epot_real_solo = 0._DP
         do j_particle = 1, this%num_particles
             if (j_particle /= particle%number) then
             
                 xCol_j(:) = this%all_positions(:, j_particle)
-                rVec_ij = distVec_PBC(Box_size, xCol_i, xCol_j)
+                rVec_ij = distVec_PBC(Box_size, particle%position, xCol_j)
                 r_ij = norm2(rVec_ij)
                 mCol_j(:) = this%all_orientations(:, j_particle)
 
-                Epot_real_solo = Epot_real_solo + this%Epot_real_pair(mCol_i, mCol_j, rVec_ij, r_ij)
+                Epot_real_solo = Epot_real_solo + this%Epot_real_pair(particle%orientation, mCol_j, &
+                                                                      rVec_ij, r_ij)
 
             end if
         end do
