@@ -7,6 +7,7 @@ use data_precisions, only: DP
 use json_module, only: json_file, json_initialize
 use module_types_micro, only: Box_Dimensions, Monte_Carlo_Arguments
 use module_physics_micro, only: NwaveVectors
+use module_data, only: test_data_not_found
 use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Spheres_Macro
 use class_hard_spheres
 use class_dipolar_spheres
@@ -144,11 +145,15 @@ contains
         class(Physical_System), intent(inout) :: this    
         type(json_file), intent(inout) :: json    
         
+        character(len=4096) :: data_name
+        logical :: found
         real(DP), dimension(:), allocatable :: Box_size
         integer, dimension(:), allocatable :: Box_wave
         
-        call json%get("Box.size", Box_size)
-        if (size(Box_size) /= size (this%Box%size)) stop "Box size dimension"
+        data_name = "Box.size"
+        call json%get(data_name, Box_size, found)
+        call test_data_not_found(data_name, found)
+        if (size(Box_size) /= size (this%Box%size)) error stop "Box size dimension"
         this%Box%size(:) = Box_size(:)
         call json%get("Box.wave", Box_wave)
         this%Box%wave(:) = Box_wave(:)

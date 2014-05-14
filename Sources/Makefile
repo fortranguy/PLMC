@@ -58,6 +58,8 @@ module_types_micro.o: module_types_micro.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 module_physics_micro.o: module_physics_micro.f90
 	$(FC) -c $(FFLAGS) $< -o $@
+module_data.o: module_data.f90
+	$(FC) -c $(FFLAGS) $< -o $@
 class_small_move.o: class_small_move.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_small_rotation.o: class_small_rotation.f90
@@ -100,7 +102,7 @@ program_distribution.o: program_distribution.f90
 # ------------------------------------------------------------------------
 
 $(EXEC1): data.o \
-          module_types_micro.o module_physics_micro.o \
+          module_types_micro.o module_physics_micro.o module_data.o\
           class_small_move.o class_small_rotation.o\
           class_hard_spheres.o class_dipolar_spheres.o \
           class_neighbour_cells.o \
