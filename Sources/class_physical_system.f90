@@ -260,14 +260,22 @@ contains
         class(Physical_System), intent(inout) :: this
         type(Monte_Carlo_Arguments), intent(in) :: args
         
-        real(DP) :: Epot_conf        
+        real(DP) :: Epot_conf      
+        
+        character(len=4096) :: data_name
+        logical :: found  
         
         type(json_file) :: json
         call json_initialize()
         call json%load_file(filename = "data.json")
         
-        call json%get("Distribution.take snapshot", this%snap)
-        call json%get("Distribution.period", this%reset_iStep)
+        data_name = "Distribution.take snapshot"
+        call json%get(data_name, this%snap, found)
+        call test_data_not_found(data_name, found)
+        
+        data_name = "Distribution.period"
+        call json%get(data_name, this%reset_iStep, found)
+        call test_data_not_found(data_name, found)
         this%reset_iStep = this%reset_iStep / this%decorrelFactor
         
         call json%destroy()
