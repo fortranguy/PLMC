@@ -40,6 +40,7 @@ private
         !> Construction and destruction of the class
         procedure :: construct => Hard_Spheres_construct
         procedure, private :: set_particles => Hard_Spheres_set_particles
+        procedure, private :: set_snap => Hard_Spheres_set_snap
         procedure :: destroy => Hard_Spheres_destroy
         
         !> Accessors & Mutators
@@ -73,9 +74,7 @@ contains
         write(output_unit, *) this%name, " class construction"
         
         call this%set_particles(json)
-        
-        this%snap_factor = this%num_particles/snap_ratio
-        if (this%snap_factor == 0) this%snap_factor = 1
+        call this%set_snap(json)
         
         call json%destroy()
         
@@ -102,6 +101,23 @@ contains
         call test_data_found(data_name, found)
         
     end subroutine Hard_Spheres_set_particles
+    
+    subroutine Hard_Spheres_set_snap(this, json)
+    
+        class(Hard_Spheres), intent(inout) :: this
+        type(json_file), intent(inout) :: json
+        
+        character(len=4096) :: data_name
+        logical :: found
+        integer :: snap_ratio
+        
+        data_name = "Distribution.period"
+        call json%get(data_name, snap_ratio, found)
+        call test_data_found(data_name, found)
+        this%snap_factor = this%num_particles/snap_ratio
+        if (this%snap_factor == 0) this%snap_factor = 1
+    
+    end subroutine Hard_Spheres_set_snap
     
     subroutine Hard_Spheres_destroy(this)
     

@@ -74,6 +74,6 @@
     "Distribution": {
         "take snapshot": true,
         "delta": 0.025,
-        "period": 400
+        "number of particles": 400
     }
 }
