@@ -6,7 +6,7 @@ use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
 use data_precisions, only: DP, real_zero, consist_tiny
 use data_constants, only: PI
 use data_box, only: Ndim
-use data_particles, only: dipol_num_particles, dipol_widom_num_particles
+use json_module, only: json_file, json_initialize
 use data_monte_carlo, only: dipol_rotate_delta, dipol_rotate_deltaMax, dipol_rotate_rejectFix
 use data_potential, only: dipol_rMin_factor, dipol_real_rCut_factor, dipol_real_dr, dipol_alpha_factor
 use data_neighbour_cells, only: NnearCell
@@ -14,6 +14,7 @@ use data_distribution, only: snap_ratio
 use module_types_micro, only: Box_Dimensions, Particle_Index
 use module_physics_micro, only: set_discrete_length, distVec_PBC, Box_wave1_sym, Box_wave2_sym, &
                                 fourier_i, exchange_sign
+use module_data, only: test_data_found
 use class_hard_spheres
 
 implicit none
@@ -109,23 +110,40 @@ contains
     
         class(Dipolar_Spheres), intent(out) :: this
         
+        type(json_file) :: json
+        call json_initialize()
+        call json%load_file(filename = "data.json")
+        
         this%name = "dipol"
         write(output_unit, *) this%name, " class construction"
     
-        call this%set_particles()        
+        call this%set_particles(json)        
         this%snap_factor = this%num_particles/snap_ratio
         if (this%snap_factor == 0) this%snap_factor = 1
+        
+        call json%destroy()
     
     end subroutine Dipolar_Spheres_construct
 
-    pure subroutine Dipolar_Spheres_set_particles(this)
+    subroutine Dipolar_Spheres_set_particles(this, json)
         class(Dipolar_Spheres), intent(inout) :: this
+        type(json_file), intent(inout) :: json
+        
+        character(len=4096) :: data_name
+        logical :: found
         
         this%diameter = 1._DP ! = u_length
-        this%num_particles = dipol_num_particles
+        
+        data_name = "Particles.Dipoles.number of particles"
+        call json%get(data_name, this%num_particles, found)
+        call test_data_found(data_name, found)
         allocate(this%all_positions(Ndim, this%num_particles))
         allocate(this%all_orientations(Ndim, this%num_particles))
-        this%widom_num_particles = dipol_widom_num_particles
+        
+        data_name = "Particles.Dipoles.number of Widom particles"
+        call json%get(data_name, this%widom_num_particles, found)
+        call test_data_found(data_name, found)
+        
     end subroutine Dipolar_Spheres_set_particles
     
     subroutine Dipolar_Spheres_destroy(this)    

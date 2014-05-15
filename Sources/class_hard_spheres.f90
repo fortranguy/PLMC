@@ -6,10 +6,11 @@ use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
 use data_precisions, only: DP, real_zero
 use data_constants, only: PI
 use data_box, only: Ndim
-use data_particles, only: hard_diameter, hard_num_particles, hard_widom_num_particles
+use json_module, only: json_file, json_initialize
 use data_distribution, only: snap_ratio
 use module_types_micro, only: Box_Dimensions, Node, Particle_Index
 use module_physics_micro, only: dist_PBC
+use module_data, only: test_data_found
 
 implicit none
 
@@ -64,22 +65,42 @@ contains
     subroutine Hard_Spheres_construct(this)    
         class(Hard_Spheres), intent(out) :: this
         
+        type(json_file) :: json
+        call json_initialize()
+        call json%load_file(filename = "data.json")
+        
         this%name = "hardS"
         write(output_unit, *) this%name, " class construction"
         
-        call this%set_particles()
+        call this%set_particles(json)
+        
         this%snap_factor = this%num_particles/snap_ratio
         if (this%snap_factor == 0) this%snap_factor = 1
         
+        call json%destroy()
+        
     end subroutine Hard_Spheres_construct
     
-    pure subroutine Hard_Spheres_set_particles(this)
+    subroutine Hard_Spheres_set_particles(this, json)
         class(Hard_Spheres), intent(inout) :: this
+        type(json_file), intent(inout) :: json
         
-        this%diameter = hard_diameter
-        this%num_particles = hard_num_particles
+        character(len=4096) :: data_name
+        logical :: found
+        
+        data_name = "Particles.Hard Spheres.diameter"
+        call json%get(data_name, this%diameter, found)
+        call test_data_found(data_name, found)
+        
+        data_name = "Particles.Hard Spheres.number of particles"
+        call json%get(data_name, this%num_particles, found)
+        call test_data_found(data_name, found)        
         allocate(this%all_positions(Ndim, this%num_particles))
-        this%widom_num_particles = hard_widom_num_particles
+        
+        data_name = "Particles.Hard Spheres.number of Widom particles"
+        call json%get(data_name, this%widom_num_particles, found)
+        call test_data_found(data_name, found)
+        
     end subroutine Hard_Spheres_set_particles
     
     subroutine Hard_Spheres_destroy(this)

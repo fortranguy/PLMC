@@ -7,7 +7,7 @@ use data_precisions, only: DP
 use json_module, only: json_file, json_initialize
 use module_types_micro, only: Box_Dimensions, Monte_Carlo_Arguments
 use module_physics_micro, only: NwaveVectors
-use module_data, only: test_data_not_found
+use module_data, only: test_data_found
 use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Spheres_Macro
 use class_hard_spheres
 use class_dipolar_spheres
@@ -152,19 +152,19 @@ contains
         
         data_name = "Box.size"
         call json%get(data_name, Box_size, found)
-        call test_data_not_found(data_name, found)
+        call test_data_found(data_name, found)
         if (size(Box_size) /= size (this%Box%size)) error stop "Box size dimension"
         this%Box%size(:) = Box_size(:)
         
         data_name = "Box.wave"
         call json%get(data_name, Box_wave, found)
-        call test_data_not_found(data_name, found)
+        call test_data_found(data_name, found)
         if (size(Box_wave) /= size (this%Box%wave)) error stop "Box wave dimension"
         this%Box%wave(:) = Box_wave(:)
         
         data_name = "Box.temperature"
         call json%get(data_name, this%Box%temperature, found)
-        call test_data_not_found(data_name, found)                
+        call test_data_found(data_name, found)                
         
     end subroutine Physical_System_set_box
     
@@ -177,15 +177,15 @@ contains
         
         data_name = "Monte Carlo.number of thermalisation steps"
         call json%get(data_name, this%Nthermal, found)
-        call test_data_not_found(data_name, found)
+        call test_data_found(data_name, found)
         
         data_name = "Monte Carlo.period of adaptation"
         call json%get(data_name, this%Nadapt, found)
-        call test_data_not_found(data_name, found)
+        call test_data_found(data_name, found)
         
         data_name = "Monte Carlo.number of equilibrium steps"
         call json%get(data_name, this%Nstep, found)
-        call test_data_not_found(data_name, found)
+        call test_data_found(data_name, found)
         
     end subroutine Physical_System_set_monte_carlo_steps
     
@@ -205,13 +205,13 @@ contains
                              this%type2_spheres%get_num_particles()
         data_name = "Monte Carlo.decorrelation factor"
         call json%get(data_name, this%decorrelFactor, found)
-        call test_data_not_found(data_name, found)
+        call test_data_found(data_name, found)
         
         this%Nmove = this%decorrelFactor * this%num_particles
         
         data_name = "Monte Carlo.switch factor"
         call json%get(data_name, switch_factor, found)
-        call test_data_not_found(data_name, found)
+        call test_data_found(data_name, found)
         
         this%Nswitch = switch_factor * this%decorrelFactor * this%type1_spheres%get_num_particles()
         this%Nrotate = this%decorrelFactor * this%type1_spheres%get_num_particles()
@@ -219,36 +219,36 @@ contains
         
         data_name = "Monte Carlo.Dipoles.move.initial delta"
         call json%get(data_name, type1_move_delta, found)
-        call test_data_not_found(data_name, found)
+        call test_data_found(data_name, found)
         
         data_name = "Monte Carlo.Dipoles.move.wanted rejection"
         call json%get(data_name, type1_move_rejection, found)
-        call test_data_not_found(data_name, found)
+        call test_data_found(data_name, found)
         
         call this%type1_macro%move%init(type1_move_delta, type1_move_rejection)
         
         data_name = "Monte Carlo.Dipoles.rotation.initial delta"
         call json%get(data_name, type1_rotation_delta, found)
-        call test_data_not_found(data_name, found)
+        call test_data_found(data_name, found)
         
         data_name = "Monte Carlo.Dipoles.rotation.maximum delta"
         call json%get(data_name, type1_rotation_delta_max, found)
-        call test_data_not_found(data_name, found)
+        call test_data_found(data_name, found)
         
         data_name = "Monte Carlo.Dipoles.rotation.wanted rejection"
         call json%get(data_name, type1_rotation_rejection, found)
-        call test_data_not_found(data_name, found)
+        call test_data_found(data_name, found)
         
         call this%type1_macro%rotation%init(type1_rotation_delta, type1_rotation_delta_max, &
                                             type1_rotation_rejection)
                       
         data_name = "Monte Carlo.Hard Spheres.move.initial delta"
         call json%get(data_name, type2_move_delta, found)
-        call test_data_not_found(data_name, found)
+        call test_data_found(data_name, found)
         
         data_name = "Monte Carlo.Hard Spheres.move.wanted rejection"
         call json%get(data_name, type2_move_rejection, found)
-        call test_data_not_found(data_name, found)
+        call test_data_found(data_name, found)
         
         call this%type2_macro%move%init(type2_move_delta, type2_move_rejection)
         
@@ -271,11 +271,11 @@ contains
         
         data_name = "Distribution.take snapshot"
         call json%get(data_name, this%snap, found)
-        call test_data_not_found(data_name, found)
+        call test_data_found(data_name, found)
         
         data_name = "Distribution.period"
         call json%get(data_name, this%reset_iStep, found)
-        call test_data_not_found(data_name, found)
+        call test_data_found(data_name, found)
         this%reset_iStep = this%reset_iStep / this%decorrelFactor
         
         call json%destroy()
