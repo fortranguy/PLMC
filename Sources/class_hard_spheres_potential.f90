@@ -13,15 +13,19 @@ implicit none
 private
 
     type, public :: Hard_Spheres_Potential
+    
         private
         real(DP) :: min_distance
         real(DP) :: range_cut
+        
     contains
+    
         procedure :: construct => Hard_Spheres_Potential_construct
         procedure :: write => Hard_Spheres_Potential_write
         procedure :: get_range_cut => Hard_Spheres_Potential_get_range_cut
         procedure :: neighCells => Hard_Spheres_Potential_neighCells
         procedure :: conf => Hard_Spheres_Potential_conf
+        
     end type Hard_Spheres_Potential
     
 contains

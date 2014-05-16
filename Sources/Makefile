@@ -72,6 +72,8 @@ class_neighbour_cells.o: class_neighbour_cells.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_hard_spheres_potential.o: class_hard_spheres_potential.f90
 	$(FC) -c $(FFLAGS) $< -o $@
+class_ewald_real.o: class_ewald_real.f90
+	$(FC) -c $(FFLAGS) $< -o $@
 class_mixing_potential.o: class_mixing_potential.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_observables.o: class_observables.f90
