@@ -6,7 +6,7 @@ use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
 use data_precisions, only: DP, real_zero, consist_tiny
 use data_constants, only: PI
 use data_box, only: Ndim
-use json_module, only: json_file, json_initialize
+use json_module, only: json_file
 use data_monte_carlo, only: dipol_rotate_delta, dipol_rotate_deltaMax, dipol_rotate_rejectFix
 use data_potential, only: dipol_rMin_factor, dipol_real_rCut_factor, dipol_real_dr, dipol_alpha_factor
 use data_neighbour_cells, only: NnearCell
@@ -106,22 +106,16 @@ private
     
 contains
 
-    subroutine Dipolar_Spheres_construct(this)
+    subroutine Dipolar_Spheres_construct(this, json)
     
         class(Dipolar_Spheres), intent(out) :: this
-        
-        type(json_file) :: json
-        call json_initialize()
-        call json%load_file(filename = "data.json")
+        type(json_file), intent(inout) :: json
         
         this%name = "dipol"
         write(output_unit, *) this%name, " class construction"
     
         call this%set_particles(json)        
-        this%snap_factor = this%num_particles/snap_ratio
-        if (this%snap_factor == 0) this%snap_factor = 1
-        
-        call json%destroy()
+        call this%Hard_Spheres%set_snap(json)
     
     end subroutine Dipolar_Spheres_construct
 

@@ -6,7 +6,7 @@ use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
 use data_precisions, only: DP, real_zero
 use data_constants, only: PI
 use data_box, only: Ndim
-use json_module, only: json_file, json_initialize
+use json_module, only: json_file
 use data_distribution, only: snap_ratio
 use module_types_micro, only: Box_Dimensions, Node, Particle_Index
 use module_physics_micro, only: dist_PBC
@@ -40,7 +40,7 @@ private
         !> Construction and destruction of the class
         procedure :: construct => Hard_Spheres_construct
         procedure, private :: set_particles => Hard_Spheres_set_particles
-        procedure, private :: set_snap => Hard_Spheres_set_snap
+        procedure :: set_snap => Hard_Spheres_set_snap
         procedure :: destroy => Hard_Spheres_destroy
         
         !> Accessors & Mutators
@@ -63,20 +63,15 @@ private
     
 contains
 
-    subroutine Hard_Spheres_construct(this)    
+    subroutine Hard_Spheres_construct(this, json)    
         class(Hard_Spheres), intent(out) :: this
-        
-        type(json_file) :: json
-        call json_initialize()
-        call json%load_file(filename = "data.json")
+        type(json_file), intent(inout) :: json
         
         this%name = "hardS"
         write(output_unit, *) this%name, " class construction"
         
         call this%set_particles(json)
         call this%set_snap(json)
-        
-        call json%destroy()
         
     end subroutine Hard_Spheres_construct
     

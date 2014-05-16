@@ -131,8 +131,8 @@ contains
         call this%set_monte_carlo_steps(json)
         call json%get("Potential.write", this%write_potential)
         
-        call this%type1_spheres%construct()
-        call this%type2_spheres%construct()
+        call this%type1_spheres%construct(json)
+        call this%type2_spheres%construct(json)
         call this%mix%construct(this%type1_spheres%get_diameter(), this%type2_spheres%get_diameter())
         
         call this%set_monte_carlo_changes(json)
