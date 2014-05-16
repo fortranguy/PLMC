@@ -5,11 +5,12 @@ module class_mixing_potential
 use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
 use data_precisions, only: DP, real_zero
 use data_box, only: Ndim
-use data_particles, only: mix_delta
 use data_potential, only: mix_rMin_factor, mix_rCut, mix_dr, mix_epsilon, mix_alpha
 use data_neighbour_cells, only: NnearCell
+use json_module, only: json_file
 use module_types_micro, only: Node, Particle_Index
 use module_physics_micro, only: set_discrete_length, dist_PBC, Epot_yukawa
+use module_data, only: test_data_found
 use class_neighbour_cells
 use class_hard_spheres
 
@@ -59,15 +60,22 @@ private
 
 contains
 
-    subroutine Mixing_Potential_construct(this, type1_diameter, type2_diameter)
+    subroutine Mixing_Potential_construct(this, json, type1_diameter, type2_diameter)
 
         class(Mixing_Potential), intent(out) :: this
+        type(json_file), intent(inout) :: json
         real(DP), intent(in) :: type1_diameter, type2_diameter
+        
+        character(len=4096) :: data_name
+        logical :: found
         
         this%name = "[mix]"
         write(output_unit, *) this%name, " class construction"
         
-        this%delta = mix_delta
+        data_name = "Particles.Mixing.non addivity"
+        call json%get(data_name, this%delta, found)
+        call test_data_found(data_name, found)
+        
         this%min_distance = (type1_diameter + type2_diameter)/2._DP + this%delta
 
     end subroutine Mixing_Potential_construct

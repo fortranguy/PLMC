@@ -139,7 +139,8 @@ contains
         
         call this%type1_spheres%construct(json)
         call this%type2_spheres%construct(json)
-        call this%mix%construct(this%type1_spheres%get_diameter(), this%type2_spheres%get_diameter())
+        call this%mix%construct(json, this%type1_spheres%get_diameter(), &
+                                      this%type2_spheres%get_diameter())
         
         call this%set_monte_carlo_changes(json)
     

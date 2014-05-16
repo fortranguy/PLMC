@@ -106,7 +106,7 @@ contains
         logical :: found
         integer :: snap_ratio
         
-        data_name = "Distribution.period"
+        data_name = "Distribution.number of particles"
         call json%get(data_name, snap_ratio, found)
         call test_data_found(data_name, found)
         this%snap_factor = this%num_particles/snap_ratio
