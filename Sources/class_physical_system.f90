@@ -273,7 +273,7 @@ contains
         call json%get(data_name, this%snap, found)
         call test_data_found(data_name, found)
         
-        data_name = "Distribution.period"
+        data_name = "Monte Carlo.period of reset"
         call json%get(data_name, this%reset_iStep, found)
         call test_data_found(data_name, found)
         this%reset_iStep = this%reset_iStep / this%decorrelFactor
