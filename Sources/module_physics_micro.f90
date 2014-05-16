@@ -11,6 +11,7 @@ use data_box, only: Ndim
 implicit none
 private
 public set_discrete_length, sphere_volume, distVec_PBC, dist_PBC, random_surface, markov_surface, &
+       ewald_real_B, ewald_real_C, &
        NwaveVectors, Box_wave1_sym, Box_wave2_sym, fourier_i, exchange_sign, &
        index_from_coord, coord_PBC, &
        Epot_lennardJones, Epot_yukawa
@@ -151,6 +152,33 @@ contains
         mCol(:) = mCol(:) / norm2(mCol)
     
     end subroutine markov_surface
+    
+    !> \f[ B(r) = \frac{\mathrm{erfc}(\alpha r)}{r^3} +
+    !>           2\frac{\alpha}{\sqrt{\pi}}\frac{e^{-\alpha^2 r^2}}{r^2} \f]
+    
+    pure function ewald_real_B(alpha, r)    
+        real(DP) :: ewald_real_B
+        real(DP), intent(in) :: alpha
+        real(DP), intent(in) :: r
+    
+        ewald_real_B = erfc(alpha*r)/r**3 + 2._DP*alpha/sqrt(PI) * exp(-alpha**2*r**2) / r**2
+    
+    end function ewald_real_B
+    
+    !> \f[ C(r) = 3\frac{\mathrm{erfc}(\alpha r)}{r^5} +
+    !>            2\frac{\alpha}{\sqrt{\pi}}\left(2\alpha^2 + \frac{3}{r^2}\right)
+    !>                                     \frac{e^{-\alpha^2 r^2}}{r^2} \f]
+    
+    pure function ewald_real_C(alpha, r)    
+        real(DP) :: ewald_real_C
+        real(DP), intent(in) :: alpha
+        real(DP), intent(in) :: r
+    
+        ewald_real_C = 3._DP*erfc(alpha*r)/r**5 + &
+                       2._DP*alpha/sqrt(PI) * (2._DP*alpha**2+3._DP/r**2) * &
+                                              exp(-alpha**2*r**2) / r**2
+    
+    end function ewald_real_C
     
     !> Number of wave vectors
     
