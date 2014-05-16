@@ -120,6 +120,9 @@ contains
     subroutine Physical_System_construct(this)        
         class(Physical_System), intent(out) :: this
         
+        character(len=4096) :: data_name
+        logical :: found
+        
         type(json_file) :: json
         call json_initialize()
         call json%load_file(filename = "data.json")
@@ -129,7 +132,10 @@ contains
         
         call this%set_box(json)
         call this%set_monte_carlo_steps(json)
-        call json%get("Potential.write", this%write_potential)
+        
+        data_name = "Potential.write"
+        call json%get(data_name, this%write_potential, found)
+        call test_data_found(data_name, found)
         
         call this%type1_spheres%construct(json)
         call this%type2_spheres%construct(json)
