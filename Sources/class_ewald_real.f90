@@ -136,13 +136,12 @@ contains
         type(Particle_Index) :: particle
 
         total = 0._DP
-        do i_particle = 1, this_spheres%get_num_particles()
         
+        do i_particle = 1, this_spheres%get_num_particles()        
             particle%number = i_particle
             particle%position(:) = this_spheres%get_position(particle%number)
             particle%orientation(:) = this_spheres%get_orientation(particle%number)
-            total = total + this%solo(Box_size, this_spheres, particle)
-            
+            total = total + this%solo(Box_size, this_spheres, particle)            
         end do
 
         total = total/2._DP
