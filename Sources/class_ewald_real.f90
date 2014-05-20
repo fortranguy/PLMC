@@ -30,10 +30,10 @@ private
         procedure, private :: set_tabulation => Ewald_Real_set_tabulation
         procedure :: destroy => Ewald_Real_destroy
         procedure :: write => Ewald_Real_write
+        procedure :: total => Ewald_Real_total
+        procedure :: solo => Ewald_Real_solo
         procedure, private :: pair => Ewald_Real_pair
         procedure, private :: interpolation => Ewald_Real_interpolation
-        !procedure :: solo => Ewald_Real_solo
-        !procedure, private :: Epot_real => Ewald_Real_Epot_real
     
     end type Ewald_Real
 
@@ -54,8 +54,6 @@ contains
         call this%set_tabulation(alpha)
 
     end subroutine Ewald_Real_construct
-
-    !> Initialisation
 
     subroutine Ewald_Real_set_parameters(this, Box_size, min_distance, json)
         class(Ewald_Real), intent(inout) :: this
@@ -85,8 +83,6 @@ contains
 
     end subroutine Ewald_Real_set_parameters
 
-    !> Initialisation: look-up (tabulation) table
-
     pure subroutine Ewald_Real_set_tabulation(this, alpha)
 
         class(Ewald_Real), intent(inout) :: this
@@ -115,8 +111,6 @@ contains
 
     end subroutine Ewald_Real_destroy
 
-    !> Write the tabulated values
-
     subroutine Ewald_Real_write(this, potential_unit)
         class(Ewald_Real), intent(in) :: this
         integer, intent(in) :: potential_unit
@@ -130,6 +124,30 @@ contains
         end do
 
     end subroutine Ewald_Real_write
+
+    pure function Ewald_Real_total(this, Box_size, this_spheres) result(total)
+
+        class(Ewald_Real), intent(in) :: this
+        real(DP), dimension(:), intent(in) :: Box_size
+        type(Dipolar_Spheres), intent(in) :: this_spheres
+        real(DP) :: total
+
+        integer :: i_particle
+        type(Particle_Index) :: particle
+
+        total = 0._DP
+        do i_particle = 1, this_spheres%get_num_particles()
+        
+            particle%number = i_particle
+            particle%position(:) = this_spheres%get_position(particle%number)
+            particle%orientation(:) = this_spheres%get_orientation(particle%number)
+            total = total + this%solo(Box_size, this_spheres, particle)
+            
+        end do
+
+        total = total/2._DP
+
+    end function Ewald_Real_total
 
     !> Energy of 1 dipole with others
 
