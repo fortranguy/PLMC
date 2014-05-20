@@ -1,4 +1,4 @@
-module class_ewald_real
+module class_ewald_summation_real
 
 use data_precisions, only: DP
 use data_constants, only: PI
@@ -13,7 +13,7 @@ implicit none
 
 private
 
-    type, public :: Ewald_Real
+    type, public :: Ewald_Summation_Real
     
         real(DP) :: min_distance
         real(DP) :: range_cut
@@ -25,22 +25,22 @@ private
     
     contains
     
-        procedure :: construct => Ewald_Real_construct
-        procedure, private :: set_parameters => Ewald_Real_set_parameters
-        procedure, private :: set_tabulation => Ewald_Real_set_tabulation
-        procedure :: destroy => Ewald_Real_destroy
-        procedure :: write => Ewald_Real_write
-        procedure :: total => Ewald_Real_total
-        procedure :: solo => Ewald_Real_solo
-        procedure, private :: pair => Ewald_Real_pair
-        procedure, private :: interpolation => Ewald_Real_interpolation
+        procedure :: construct => Ewald_Summation_Real_construct
+        procedure, private :: set_parameters => Ewald_Summation_Real_set_parameters
+        procedure, private :: set_tabulation => Ewald_Summation_Real_set_tabulation
+        procedure :: destroy => Ewald_Summation_Real_destroy
+        procedure :: write => Ewald_Summation_Real_write
+        procedure :: total => Ewald_Summation_Real_total
+        procedure :: solo => Ewald_Summation_Real_solo
+        procedure, private :: pair => Ewald_Summation_Real_pair
+        procedure, private :: interpolation => Ewald_Summation_Real_interpolation
     
-    end type Ewald_Real
+    end type Ewald_Summation_Real
 
 contains
 
-    subroutine Ewald_Real_construct(this, Box_size, alpha, min_distance, json)
-        class(Ewald_Real), intent(inout) :: this
+    subroutine Ewald_Summation_Real_construct(this, Box_size, alpha, min_distance, json)
+        class(Ewald_Summation_Real), intent(inout) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         real(DP), intent(in) :: alpha
         real(DP), intent(in) :: min_distance
@@ -53,10 +53,10 @@ contains
 
         call this%set_tabulation(alpha)
 
-    end subroutine Ewald_Real_construct
+    end subroutine Ewald_Summation_Real_construct
 
-    subroutine Ewald_Real_set_parameters(this, Box_size, min_distance, json)
-        class(Ewald_Real), intent(inout) :: this
+    subroutine Ewald_Summation_Real_set_parameters(this, Box_size, min_distance, json)
+        class(Ewald_Summation_Real), intent(inout) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         real(DP), intent(in) :: min_distance
         type(json_file), intent(inout) :: json
@@ -81,11 +81,11 @@ contains
         this%i_min_distance = int(this%min_distance/this%delta)
         this%i_range_cut = int(this%range_cut/this%delta) + 1
 
-    end subroutine Ewald_Real_set_parameters
+    end subroutine Ewald_Summation_Real_set_parameters
 
-    pure subroutine Ewald_Real_set_tabulation(this, alpha)
+    pure subroutine Ewald_Summation_Real_set_tabulation(this, alpha)
 
-        class(Ewald_Real), intent(inout) :: this
+        class(Ewald_Summation_Real), intent(inout) :: this
         real(DP), intent(in) :: alpha
 
         integer :: i_distance
@@ -102,17 +102,17 @@ contains
         this%tabulation(:, 1) = this%tabulation(:, 1) - this%tabulation(this%i_range_cut, 1)
         this%tabulation(:, 2) = this%tabulation(:, 2) - this%tabulation(this%i_range_cut, 2)
 
-    end subroutine Ewald_Real_set_tabulation
+    end subroutine Ewald_Summation_Real_set_tabulation
 
-    subroutine Ewald_Real_destroy(this)
-        class(Ewald_Real), intent(inout) :: this
+    subroutine Ewald_Summation_Real_destroy(this)
+        class(Ewald_Summation_Real), intent(inout) :: this
 
         if (allocated(this%tabulation)) deallocate(this%tabulation)
 
-    end subroutine Ewald_Real_destroy
+    end subroutine Ewald_Summation_Real_destroy
 
-    subroutine Ewald_Real_write(this, potential_unit)
-        class(Ewald_Real), intent(in) :: this
+    subroutine Ewald_Summation_Real_write(this, potential_unit)
+        class(Ewald_Summation_Real), intent(in) :: this
         integer, intent(in) :: potential_unit
 
         integer :: i_distance
@@ -123,11 +123,11 @@ contains
             write(potential_unit, *) distance_i, this%tabulation(i_distance, :)
         end do
 
-    end subroutine Ewald_Real_write
+    end subroutine Ewald_Summation_Real_write
 
-    pure function Ewald_Real_total(this, Box_size, this_spheres) result(total)
+    pure function Ewald_Summation_Real_total(this, Box_size, this_spheres) result(total)
 
-        class(Ewald_Real), intent(in) :: this
+        class(Ewald_Summation_Real), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         type(Dipolar_Spheres), intent(in) :: this_spheres
         real(DP) :: total
@@ -146,13 +146,13 @@ contains
 
         total = total/2._DP
 
-    end function Ewald_Real_total
+    end function Ewald_Summation_Real_total
 
     !> Energy of 1 dipole with others
 
-    pure function Ewald_Real_solo(this, Box_size, this_spheres, particle) result(solo)
+    pure function Ewald_Summation_Real_solo(this, Box_size, this_spheres, particle) result(solo)
 
-        class(Ewald_Real), intent(in) :: this
+        class(Ewald_Summation_Real), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         type(Dipolar_Spheres), intent(in) :: this_spheres
         type(Particle_Index), intent(in) :: particle
@@ -179,15 +179,15 @@ contains
             end if
         end do
 
-    end function Ewald_Real_solo
+    end function Ewald_Summation_Real_solo
 
     !> Between 2 particles
     !> \f[ (\vec{\mu}_i\cdot\vec{\mu}_j) B(r_{ij}) -
     !>     (\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij}) C(r_{ij}) \f]
 
-    pure function Ewald_Real_pair(this, orientation_i, orientation_j, vector_ij, distance_ij) &
+    pure function Ewald_Summation_Real_pair(this, orientation_i, orientation_j, vector_ij, distance_ij) &
                   result(pair)
-        class(Ewald_Real), intent(in) :: this
+        class(Ewald_Summation_Real), intent(in) :: this
         real(DP), dimension(:), intent(in) :: orientation_i, orientation_j
         real(DP), dimension(:), intent(in) :: vector_ij
         real(DP), intent(in) :: distance_ij
@@ -200,12 +200,12 @@ contains
 
         pair = dot_product(coefficient, this%interpolation(distance_ij))
 
-    end function Ewald_Real_pair
+    end function Ewald_Summation_Real_pair
 
     !> Linear interpolation
 
-    pure function Ewald_Real_interpolation(this, distance) result(interpolation)
-        class(Ewald_Real), intent(in) :: this
+    pure function Ewald_Summation_Real_interpolation(this, distance) result(interpolation)
+        class(Ewald_Summation_Real), intent(in) :: this
         real(DP), intent(in) :: distance
         real(DP), dimension(2) :: interpolation
 
@@ -221,6 +221,6 @@ contains
             interpolation(:) = 0._DP
         end if
 
-    end function Ewald_Real_interpolation
+    end function Ewald_Summation_Real_interpolation
 
-end module class_ewald_real
+end module class_ewald_summation_real

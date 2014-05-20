@@ -6,7 +6,7 @@ use class_neighbour_cells
 use class_small_move
 use class_small_rotation
 use class_hard_spheres_potential
-use class_ewald_real
+use class_ewald_summation_real
 
 implicit none
 
@@ -18,7 +18,7 @@ implicit none
     
     type, public, extends(Hard_Spheres_Macro) :: Dipolar_Spheres_Macro
         type(Small_Rotation) :: rotation
-        type(Ewald_Real) :: short      
+        type(Ewald_Summation_Real) :: ewald_real      
     end type Dipolar_Spheres_Macro
 
 end module module_types_macro
