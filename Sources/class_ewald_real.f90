@@ -26,8 +26,7 @@ private
         procedure, private :: set_parameters => Ewald_Real_set_parameters
         procedure, private :: set_tabulation => Ewald_Real_set_tabulation
         procedure :: destroy => Ewald_Real_destroy
-        !procedure, private :: set => Ewald_Real_set
-        !procedure :: write => Ewald_Real_write
+        procedure :: write => Ewald_Real_write
         !procedure, private :: interpolation => Ewald_Real_interpolation
         !procedure, private :: pair => Ewald_Real_pair
         !procedure :: solo => Ewald_Real_solo
@@ -112,5 +111,22 @@ contains
         if (allocated(this%tabulation)) deallocate(this%tabulation)
 
     end subroutine Ewald_Real_destroy
+
+    !> Write the tabulated values
+
+    subroutine Ewald_Real_write(this, potential_unit)
+
+        class(Ewald_Real), intent(in) :: this
+        integer, intent(in) :: potential_unit
+
+        integer :: i_distance
+        real(DP) :: distance_i
+
+        do i_distance = this%i_min_distance, this%i_range_cut
+            distance_i = real(i_distance, DP)*this%delta
+            write(potential_unit, *) distance_i, this%tabulation(i_distance, :)
+        end do
+
+    end subroutine Ewald_Real_write
 
 end module class_ewald_real
