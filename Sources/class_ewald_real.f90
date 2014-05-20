@@ -27,8 +27,8 @@ private
         procedure, private :: set_tabulation => Ewald_Real_set_tabulation
         procedure :: destroy => Ewald_Real_destroy
         procedure :: write => Ewald_Real_write
+        procedure, private :: pair => Ewald_Real_pair
         procedure, private :: interpolation => Ewald_Real_interpolation
-        !procedure, private :: pair => Ewald_Real_pair
         !procedure :: solo => Ewald_Real_solo
         !procedure, private :: Epot_real => Ewald_Real_Epot_real
     
@@ -115,7 +115,6 @@ contains
     !> Write the tabulated values
 
     subroutine Ewald_Real_write(this, potential_unit)
-
         class(Ewald_Real), intent(in) :: this
         integer, intent(in) :: potential_unit
 
@@ -129,10 +128,30 @@ contains
 
     end subroutine Ewald_Real_write
 
+    !> Between 2 particles
+    !> \f[ (\vec{\mu}_i\cdot\vec{\mu}_j) B(r_{ij}) -
+    !>     (\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij}) C(r_{ij}) \f]
+
+    pure function Ewald_Real_pair(this, orientation_i, orientation_j, vector_ij, distance_ij) &
+                  result(pair)
+        class(Ewald_Real), intent(in) :: this
+        real(DP), dimension(:), intent(in) :: orientation_i, orientation_j
+        real(DP), dimension(:), intent(in) :: vector_ij
+        real(DP), intent(in) :: distance_ij
+        real(DP) :: pair
+
+        real(DP), dimension(2) :: coefficient
+
+        coefficient(1) = dot_product(orientation_i, orientation_j)
+        coefficient(2) =-dot_product(orientation_i, vector_ij) * dot_product(orientation_j, vector_ij)
+
+        pair = dot_product(coefficient, this%interpolation(distance_ij))
+
+    end function Ewald_Real_pair
+
     !> Linear interpolation
 
     pure function Ewald_Real_interpolation(this, distance) result(interpolation)
-
         class(Ewald_Real), intent(in) :: this
         real(DP), intent(in) :: distance
         real(DP), dimension(2) :: interpolation
