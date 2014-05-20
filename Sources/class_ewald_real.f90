@@ -172,6 +172,7 @@ contains
                 vector_ij = distVec_PBC(Box_size, particle%position, position_j)
                 distance_ij = norm2(vector_ij)
                 orientation_j(:) = this_spheres%get_orientation(j_particle)
+                ! optimize without intermediate ?
 
                 solo = solo + this%pair(particle%orientation, orientation_j, vector_ij, distance_ij)
 
