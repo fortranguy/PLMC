@@ -2,7 +2,9 @@ module class_ewald_real
 
 use data_precisions, only: DP
 use data_constants, only: PI
-use module_physics_micro, only: ewald_real_B, ewald_real_C
+use json_module, only: json_file
+use module_physics_micro, only: set_discrete_length, ewald_real_B, ewald_real_C
+use module_data, only: test_data_found
 
 implicit none
 
@@ -38,16 +40,34 @@ contains
 
     !> Initialisation
 
-    subroutine Ewald_Real_set_parameters(this, Box_size)
-
+    subroutine Ewald_Real_set_parameters(this, Box_size, json, diameter)
         class(Ewald_Real), intent(inout) :: this
         real(DP), dimension(:), intent(in) :: Box_size
+        type(json_file), intent(inout) :: json
+        real(DP), intent(in) :: diameter
 
-        !this%range_cut = dipol_real_rCut_factor * Box_size(1)
-        !this%delta = dipol_real_dr
-        !call set_discrete_length(this%min_distance, this%delta)
-        !this%i_min_distance = int(this%min_distance/this%delta)
-        !this%i_range_cut = int(this%range_cut/this%delta) + 1
+        character(len=4096) :: data_name
+        logical :: found
+
+        real(DP) :: min_distance_factor, range_cut_factor
+
+        data_name = "Potential.Dipoles.minimum distance factor"
+        call json%get(data_name, min_distance_factor, found)
+        call test_data_found(data_name, found)
+        this%min_distance = min_distance_factor * diameter
+
+        data_name = "Potential.Dipoles.Ewald summation.real.range cut factor"
+        call json%get(data_name, range_cut_factor, found)
+        call test_data_found(data_name, found)
+        this%range_cut = range_cut_factor * Box_size(1)
+
+        data_name = "Potential.Dipoles.Ewald summation.real.delta"
+        call json%get(data_name, this%delta, found)
+        call test_data_found(data_name, found)
+        call set_discrete_length(this%min_distance, this%delta)
+        
+        this%i_min_distance = int(this%min_distance/this%delta)
+        this%i_range_cut = int(this%range_cut/this%delta) + 1
 
     end subroutine Ewald_Real_set_parameters
 
