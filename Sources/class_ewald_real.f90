@@ -2,9 +2,12 @@ module class_ewald_real
 
 use data_precisions, only: DP
 use data_constants, only: PI
+use data_box, only: Ndim
 use json_module, only: json_file
-use module_physics_micro, only: set_discrete_length, ewald_real_B, ewald_real_C
+use module_types_micro, only: Particle_Index
+use module_physics_micro, only: set_discrete_length, distVec_PBC, ewald_real_B, ewald_real_C
 use module_data, only: test_data_found
+use class_dipolar_spheres
 
 implicit none
 
@@ -127,6 +130,38 @@ contains
         end do
 
     end subroutine Ewald_Real_write
+
+    !> Energy of 1 dipole with others
+
+    pure function Ewald_Real_solo(this, Box_size, this_spheres, particle) result(solo)
+
+        class(Ewald_Real), intent(in) :: this
+        real(DP), dimension(:), intent(in) :: Box_size
+        type(Dipolar_Spheres), intent(in) :: this_spheres
+        type(Particle_Index), intent(in) :: particle
+        real(DP) :: solo
+
+        integer :: j_particle
+        real(DP), dimension(Ndim) :: position_j
+        real(DP), dimension(Ndim) :: orientation_j
+        real(DP), dimension(Ndim) :: vector_ij
+        real(DP) :: distance_ij
+
+        solo = 0._DP
+        do j_particle = 1, this_spheres%get_num_particles()
+            if (j_particle /= particle%number) then
+
+                position_j(:) = this_spheres%get_position(j_particle)
+                vector_ij = distVec_PBC(Box_size, particle%position, position_j)
+                distance_ij = norm2(vector_ij)
+                orientation_j(:) = this_spheres%get_orientation(j_particle)
+
+                solo = solo + this%pair(particle%orientation, orientation_j, vector_ij, distance_ij)
+
+            end if
+        end do
+
+    end function Ewald_Real_solo
 
     !> Between 2 particles
     !> \f[ (\vec{\mu}_i\cdot\vec{\mu}_j) B(r_{ij}) -
