@@ -27,7 +27,7 @@ private
         procedure, private :: set_tabulation => Ewald_Real_set_tabulation
         procedure :: destroy => Ewald_Real_destroy
         procedure :: write => Ewald_Real_write
-        !procedure, private :: interpolation => Ewald_Real_interpolation
+        procedure, private :: interpolation => Ewald_Real_interpolation
         !procedure, private :: pair => Ewald_Real_pair
         !procedure :: solo => Ewald_Real_solo
         !procedure, private :: Epot_real => Ewald_Real_Epot_real
@@ -128,5 +128,27 @@ contains
         end do
 
     end subroutine Ewald_Real_write
+
+    !> Linear interpolation
+
+    pure function Ewald_Real_interpolation(this, distance) result(interpolation)
+
+        class(Ewald_Real), intent(in) :: this
+        real(DP), intent(in) :: distance
+        real(DP), dimension(2) :: interpolation
+
+        integer :: i_distance
+        real(DP) :: distance_i
+
+        if (distance < this%range_cut) then
+            i_distance = int(distance/this%delta)
+            distance_i = real(i_distance, DP)*this%delta
+            interpolation(:) = this%tabulation(i_distance, :) + (distance-distance_i)/this%delta * &
+                              (this%tabulation(i_distance+1, :) - this%tabulation(i_distance, :))
+        else
+            interpolation(:) = 0._DP
+        end if
+
+    end function Ewald_Real_interpolation
 
 end module class_ewald_real
