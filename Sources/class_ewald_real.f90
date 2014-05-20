@@ -22,11 +22,10 @@ private
     
     contains
     
-        !procedure :: construct => Ewald_Real_construct
-        !procedure :: destroy => Ewald_Real_destroy
-        
+        procedure :: construct => Ewald_Real_construct
         procedure, private :: set_parameters => Ewald_Real_set_parameters
         procedure, private :: set_tabulation => Ewald_Real_set_tabulation
+        procedure :: destroy => Ewald_Real_destroy
         !procedure, private :: set => Ewald_Real_set
         !procedure :: write => Ewald_Real_write
         !procedure, private :: interpolation => Ewald_Real_interpolation
@@ -38,23 +37,36 @@ private
 
 contains
 
-    !> Initialisation
-
-    subroutine Ewald_Real_set_parameters(this, Box_size, json, diameter)
+    subroutine Ewald_Real_construct(this, Box_size, alpha, min_distance, json)
         class(Ewald_Real), intent(inout) :: this
         real(DP), dimension(:), intent(in) :: Box_size
+        real(DP), intent(in) :: alpha
+        real(DP), intent(in) :: min_distance
         type(json_file), intent(inout) :: json
-        real(DP), intent(in) :: diameter
+
+        call this%set_parameters(Box_size, min_distance, json)
+
+        if (allocated(this%tabulation)) deallocate(this%tabulation)
+        allocate(this%tabulation(this%i_min_distance:this%i_range_cut, 2))
+
+        call this%set_tabulation(alpha)
+
+    end subroutine Ewald_Real_construct
+
+    !> Initialisation
+
+    subroutine Ewald_Real_set_parameters(this, Box_size, min_distance, json)
+        class(Ewald_Real), intent(inout) :: this
+        real(DP), dimension(:), intent(in) :: Box_size
+        real(DP), intent(in) :: min_distance
+        type(json_file), intent(inout) :: json
 
         character(len=4096) :: data_name
         logical :: found
 
-        real(DP) :: min_distance_factor, range_cut_factor
-
-        data_name = "Potential.Dipoles.minimum distance factor"
-        call json%get(data_name, min_distance_factor, found)
-        call test_data_found(data_name, found)
-        this%min_distance = min_distance_factor * diameter
+        real(DP) :: range_cut_factor
+        
+        this%min_distance = min_distance
 
         data_name = "Potential.Dipoles.Ewald summation.real.range cut factor"
         call json%get(data_name, range_cut_factor, found)
@@ -93,5 +105,12 @@ contains
         this%tabulation(:, 2) = this%tabulation(:, 2) - this%tabulation(this%i_range_cut, 2)
 
     end subroutine Ewald_Real_set_tabulation
+
+    subroutine Ewald_Real_destroy(this)
+        class(Ewald_Real), intent(inout) :: this
+
+        if (allocated(this%tabulation)) deallocate(this%tabulation)
+
+    end subroutine Ewald_Real_destroy
 
 end module class_ewald_real
