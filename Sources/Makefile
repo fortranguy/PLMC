@@ -74,6 +74,8 @@ class_hard_spheres_potential.o: class_hard_spheres_potential.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_ewald_summation_real.o: class_ewald_summation_real.f90
 	$(FC) -c $(FFLAGS) $< -o $@
+class_ewald_summation_reci.o: class_ewald_summation_reci.f90
+	$(FC) -c $(FFLAGS) $< -o $@
 class_mixing_potential.o: class_mixing_potential.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_observables.o: class_observables.f90
@@ -108,7 +110,7 @@ $(EXEC1): data.o \
           class_small_move.o class_small_rotation.o\
           class_hard_spheres.o class_dipolar_hard_spheres.o \
           class_neighbour_cells.o \
-          class_hard_spheres_potential.o class_ewald_summation_real.o\
+          class_hard_spheres_potential.o class_ewald_summation_real.o class_ewald_summation_reci.o\
           class_mixing_potential.o \
           class_observables.o class_units.o \
           module_types_macro.o \
