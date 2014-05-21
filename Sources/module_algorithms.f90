@@ -59,8 +59,8 @@ contains
         
         if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
             new%same_iCell = this_macro%same_cells%index_from_position(new%position)
-            call this_macro%hard_potential%neighCells(Box%size, this_spheres, this_macro%same_cells, new, &
-                                                overlap, this_EpotNew)
+            call this_macro%hard_potential%neighCells(Box%size, this_spheres, this_macro%same_cells, &
+                                                      new, overlap, this_EpotNew)
         else
             new%mix_iCell = other_mix_cells%index_from_position(new%position)
             call mix%Epot_neighCells(Box%size, new, this_macro%mix_cells, other_spheres, overlap, &
@@ -75,8 +75,9 @@ contains
                                          mix_EpotNew)
             else
                 new%same_iCell = this_macro%same_cells%index_from_position(new%position)
-                call this_macro%hard_potential%neighCells(Box%size, this_spheres, this_macro%same_cells, new, &
-                                                    overlap, this_EpotNew)
+                call this_macro%hard_potential%neighCells(Box%size, this_spheres, &
+                                                          this_macro%same_cells, new, overlap, &
+                                                          this_EpotNew)
             end if
                         
             if (.not. overlap) then
@@ -90,9 +91,9 @@ contains
                             type is (Dipolar_Hard_Spheres_Macro)
                                 this_EpotNew_real = this_macro%ewald_real%solo(Box%size, this_spheres, new)
                                 this_EpotOld_real = this_macro%ewald_real%solo(Box%size, this_spheres, old)
+                                this_deltaEpot = (this_EpotNew_real - this_EpotOld_real) + &
+                                                  this_macro%ewald_reci%move(Box, old, new)
                         end select
-                        this_deltaEpot = (this_EpotNew_real - this_EpotOld_real) + &
-                                         this_spheres%deltaEpot_reci_move(Box, old, new)
                     class default
                         call this_macro%hard_potential%neighCells(Box%size, this_spheres, this_macro%same_cells, &
                                                             old, overlap, this_EpotOld)
@@ -110,9 +111,9 @@ contains
                 call random_number(random)
                 if (random < exp(-deltaEpot/Box%temperature)) then
                 
-                    select type (this_spheres)
-                        type is (Dipolar_Hard_Spheres)
-                            call this_spheres%reci_update_structure_move(Box, old, new)
+                    select type (this_macro)
+                        type is (Dipolar_Hard_Spheres_Macro)
+                            call this_macro%ewald_reci%update_structure_move(Box, old, new)
                     end select
                 
                     call this_spheres%set_position(old%number, new%position)
@@ -203,10 +204,10 @@ contains
                             test%orientation(:) = random_surface()
                             select type (this_macro)
                                 type is (Dipolar_Hard_Spheres_Macro)                                
-                                    this_EpotTest = this_macro%ewald_real%solo(Box%size, this_spheres, test)
+                                    this_EpotTest = this_macro%ewald_real%solo(Box%size, this_spheres, test) + &
+                                                    this_macro%ewald_reci%exchange(Box, test)
                             end select
-                            this_EpotTest = this_EpotTest + &
-                                            this_spheres%deltaEpot_reci_exchange(Box, test) - &
+                            this_EpotTest = this_EpotTest - &
                                             this_spheres%Epot_self_solo(test%orientation) + &
                                             this_spheres%deltaEpot_bound_exchange(Box%size, &
                                                                                   test%orientation)
@@ -305,10 +306,10 @@ contains
                 if (random < exp(-deltaEpot/Box%temperature)) then
                 
                     call after_switch_update(Box, &
-                                             type1_spheres, type1_macro%same_cells, old1, new1, &
+                                             type1_spheres, type1_macro, old1, new1, &
                                              type2_macro%mix_cells)
                     call after_switch_update(Box, &
-                                             type2_spheres, type2_macro%same_cells, old2, new2, &
+                                             type2_spheres, type2_macro, old2, new2, &
                                              type1_macro%mix_cells)
                                              
                     type1_obs%Epot = type1_obs%Epot + type1_deltaEpot
@@ -411,10 +412,10 @@ contains
                         new%orientation(:) = this_spheres%get_orientation(new%number)
                         select type (this_macro)
                             type is (Dipolar_Hard_Spheres_Macro)
-                                EpotNew%same = this_macro%ewald_real%solo(Box%size, this_spheres, new)
+                                EpotNew%same = this_macro%ewald_real%solo(Box%size, this_spheres, new) + &
+                                               this_macro%ewald_reci%move(Box, old, new)
                         end select
-                        EpotNew%same = EpotNew%same + &
-                                       this_spheres%deltaEpot_reci_move(Box, old, new)
+                                       
                 end select
             
             end if
@@ -424,24 +425,25 @@ contains
     end subroutine after_switch_energy
     
     subroutine after_switch_update(Box, &
-                                   this_spheres, this_same_cells, old, new, &
+                                   this_spheres, this_macro, old, new, &
                                    other_mix_cells)
 
         type(Box_Dimensions), intent(in) :: Box
         class(Hard_Spheres), intent(inout) :: this_spheres
-        class(Neighbour_Cells), intent(inout) :: this_same_cells, other_mix_cells
+        class(Hard_Spheres_Macro), intent(inout) :: this_macro
+        class(Neighbour_Cells), intent(inout) :: other_mix_cells
         type(Particle_Index), intent(in) :: old, new
         
         call this_spheres%set_position(old%number, new%position)
         
-        select type (this_spheres)
-            type is (Dipolar_Hard_Spheres)
-                call this_spheres%reci_update_structure_move(Box, old, new)
+        select type (this_macro)
+            type is (Dipolar_Hard_Spheres_Macro)
+                call this_macro%ewald_reci%update_structure_move(Box, old, new)
         end select
         
         if (old%same_iCell /= new%same_iCell) then
-            call this_same_cells%remove_col_from_cell(old%number, old%same_iCell)
-            call this_same_cells%add_col_to_cell(new%number, new%same_iCell)
+            call this_macro%same_cells%remove_col_from_cell(old%number, old%same_iCell)
+            call this_macro%same_cells%add_col_to_cell(new%number, new%same_iCell)
         end if
         if (old%mix_iCell /= new%mix_iCell) then
             call other_mix_cells%remove_col_from_cell(old%number, old%mix_iCell)
@@ -457,7 +459,7 @@ contains
     
         type(Box_Dimensions), intent(in) :: Box
         class(Dipolar_Hard_Spheres), intent(inout) :: spheres
-        class(Dipolar_Hard_Spheres_Macro), intent(in) :: macro
+        class(Dipolar_Hard_Spheres_Macro), intent(inout) :: macro
         class(MoreObservables), intent(inout) :: obs
         
         real(DP) :: random
@@ -484,14 +486,14 @@ contains
         
         deltaEpot_self = spheres%Epot_self_solo(new%orientation) - spheres%Epot_self_solo(old%orientation)
         
-        deltaEpot = deltaEpot_real + spheres%deltaEpot_reci_rotate(Box, old, new) - &
+        deltaEpot = deltaEpot_real + macro%ewald_reci%rotation(Box, old, new) - &
                     deltaEpot_self + spheres%deltaEpot_bound_rotate(Box%size, old%orientation, &
                                                                     new%orientation)
         
         call random_number(random)
         if (random < exp(-deltaEpot/Box%temperature)) then
         
-            call spheres%reci_update_structure_rotate(Box, old, new)
+            call macro%ewald_reci%update_structure_rotation(Box, old, new)
             call spheres%update_totalMoment_rotate(old%orientation, new%orientation)
             call spheres%set_orientation(old%number, new%orientation)
             
