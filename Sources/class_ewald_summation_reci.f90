@@ -21,7 +21,7 @@ private
     
     contains
     
-        procedure, private :: construct => Ewald_Summation_Reci_construct
+        procedure :: construct => Ewald_Summation_Reci_construct
         procedure, private :: set_weight => Ewald_Summation_Reci_set_weight
         procedure, private :: set_structure => Ewald_Summation_Reci_set_structure
         procedure :: reset_structure => Ewald_Summation_Reci_reset_structure

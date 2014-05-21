@@ -307,7 +307,7 @@ contains
                         this%mix)
         call init_hard_potential(this%type1_macro%hard_potential, "Dipoles", &
                                  this%type1_spheres%get_diameter(), json)
-        call init_ewald(this%Box, this%type1_spheres, this%type1_macro, json)
+        call init_ewald(this%Box, this%type1_spheres, this%type1_macro, json, this%type1_units)
         this%type1_obs%Epot = this%type1_macro%hard_potential%total(this%Box%size, this%type1_spheres)
                         
         call init_spheres(this%Box, this%type2_spheres, this%type2_units)

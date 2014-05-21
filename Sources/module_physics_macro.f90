@@ -315,12 +315,13 @@ contains
                                                        
     end subroutine init_hard_potential
     
-    subroutine init_ewald(Box, this_spheres, this_macro, json)
+    subroutine init_ewald(Box, this_spheres, this_macro, json, this_units)
     
         type(Box_Dimensions), intent(in) :: Box
         class(Dipolar_Hard_Spheres), intent(in) :: this_spheres
         class(Dipolar_Hard_Spheres_Macro), intent(inout) :: this_macro
         type(json_file), intent(inout) :: json
+        class(MoreUnits), intent(in) :: this_units
         
         character(len=4096) :: data_name
         logical :: found
@@ -335,6 +336,9 @@ contains
         alpha = alpha_factor * Box%size(1)
         min_distance = this_macro%hard_potential%get_min_distance()
         call this_macro%ewald_real%construct(Box%size, alpha, min_distance, json)
+        
+        call this_macro%ewald_reci%construct(Box, alpha, this_spheres)
+        call this_macro%ewald_reci%count_wave_vectors(Box%wave, this_units%waveVectors)
     
     end subroutine init_ewald
     
