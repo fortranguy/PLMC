@@ -27,6 +27,7 @@ private
         procedure :: reset_structure => Ewald_Summation_Reci_reset_structure
         procedure, private :: get_structure_modulus => Ewald_Summation_Reci_get_structure_modulus
         procedure :: count_wave_vectors => Ewald_Summation_Reci_count_wave_vectors
+        procedure :: total => Ewald_Summation_Reci_total
         
         procedure :: move => Ewald_Summation_Reci_move
         procedure :: update_structure_move => Ewald_Summation_Reci_update_structure_move
@@ -230,6 +231,29 @@ contains
 
     end subroutine Ewald_Summation_Reci_count_wave_vectors
     
+    pure function Ewald_Summation_Reci_total(this, Box) result(total)
+        
+        class(Ewald_Summation_Reci), intent(in) :: this
+        type(Box_Dimensions), intent(in) :: Box
+        real(DP) :: total
+
+        integer :: kx, ky, kz
+
+        total = 0._DP
+
+        do kz = -Box%wave(3), Box%wave(3)
+            do ky = -Box%wave(2), Box%wave(2)
+                do kx = -Box%wave(1), Box%wave(1)
+                    total = total + this%weight(kx, ky, kz) * real(this%structure(kx, ky, kz) * &
+                                                              conjg(this%structure(kx, ky, kz)), DP)
+                end do
+            end do
+        end do
+        
+        total = 2._DP*PI / product(Box%size) * total
+        
+    end function Ewald_Summation_Reci_total
+    
     !> Move
 
     !> Difference of Energy \f[ \Delta U = \frac{2\pi}{V} \sum_{\vec{k} \neq 0} \Delta S^2
@@ -308,7 +332,7 @@ contains
         
         end do
 
-        move = 4._DP*PI/product(Box%size) * move
+        move = 4._DP*PI / product(Box%size) * move
 
     end function Ewald_Summation_Reci_move
 
@@ -450,7 +474,7 @@ contains
 
         end do
 
-        rotation = 4._DP*PI/product(Box%size) * rotation
+        rotation = 4._DP*PI / product(Box%size) * rotation
 
     end function Ewald_Summation_Reci_rotation
 
@@ -579,7 +603,7 @@ contains
         
         end do
         
-        exchange = 4._DP*PI/product(Box%size) * exchange
+        exchange = 4._DP*PI / product(Box%size) * exchange
 
     end function Ewald_Summation_Reci_exchange
     
@@ -646,7 +670,7 @@ contains
         
         end do
         
-        exchange = 4._DP*PI/product(Box%size) * exchange
+        exchange = 4._DP*PI / product(Box%size) * exchange
 
     end subroutine Ewald_Summation_Reci_update_structure_exchange
 
