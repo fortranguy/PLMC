@@ -24,6 +24,7 @@ private
         procedure :: construct => Ewald_Summation_Reci_construct
         procedure, private :: set_weight => Ewald_Summation_Reci_set_weight
         procedure, private :: set_structure => Ewald_Summation_Reci_set_structure
+        procedure :: destroy => Ewald_Summation_Reci_destroy
         procedure :: reset_structure => Ewald_Summation_Reci_reset_structure
         procedure, private :: get_structure_modulus => Ewald_Summation_Reci_get_structure_modulus
         procedure :: count_wave_vectors => Ewald_Summation_Reci_count_wave_vectors
@@ -163,6 +164,15 @@ contains
         end do
 
     end subroutine Ewald_Summation_Reci_set_structure
+    
+    subroutine Ewald_Summation_Reci_destroy(this)
+    
+        class(Ewald_Summation_Reci), intent(inout) :: this
+        
+        if (allocated(this%weight)) deallocate(this%weight)
+        if (allocated(this%structure)) deallocate(this%structure)
+    
+    end subroutine Ewald_Summation_Reci_destroy
     
     subroutine Ewald_Summation_Reci_reset_structure(this, Box, this_spheres, i_step, modulus_unit)
     
