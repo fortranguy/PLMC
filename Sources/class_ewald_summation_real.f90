@@ -7,7 +7,7 @@ use json_module, only: json_file
 use module_types_micro, only: Particle_Index
 use module_physics_micro, only: set_discrete_length, distVec_PBC, ewald_real_B, ewald_real_C
 use module_data, only: test_data_found
-use class_dipolar_spheres
+use class_dipolar_hard_spheres
 
 implicit none
 
@@ -129,7 +129,7 @@ contains
 
         class(Ewald_Summation_Real), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
-        type(Dipolar_Spheres), intent(in) :: this_spheres
+        type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
         real(DP) :: total
 
         integer :: i_particle
@@ -154,7 +154,7 @@ contains
 
         class(Ewald_Summation_Real), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
-        type(Dipolar_Spheres), intent(in) :: this_spheres
+        type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
         type(Particle_Index), intent(in) :: particle
         real(DP) :: solo
 

@@ -7,10 +7,10 @@ use module_physics_micro, only: random_surface, markov_surface
 use class_neighbour_cells
 use class_hard_spheres
 use class_small_move
-use class_dipolar_spheres
+use class_dipolar_hard_spheres
 use class_hard_spheres_potential
 use class_small_rotation
-use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Spheres_Macro
+use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
 use class_mixing_potential
 use class_observables
 
@@ -83,7 +83,7 @@ contains
     
                 old%same_iCell = this_macro%same_cells%index_from_position(old%position)
                 select type (this_spheres)
-                    type is (Dipolar_Spheres)
+                    type is (Dipolar_Hard_Spheres)
                         old%orientation(:) = this_spheres%get_orientation(old%number)
                         new%orientation(:) = old%orientation(:)
                         this_EpotNew_real = this_spheres%Epot_real_solo(Box%size, new)
@@ -108,7 +108,7 @@ contains
                 if (random < exp(-deltaEpot/Box%temperature)) then
                 
                     select type (this_spheres)
-                        type is (Dipolar_Spheres)
+                        type is (Dipolar_Hard_Spheres)
                             call this_spheres%reci_update_structure_move(Box, old, new)
                     end select
                 
@@ -195,7 +195,7 @@ contains
                 if (.not. overlap) then
                 
                     select type (this_spheres)
-                        type is (Dipolar_Spheres)
+                        type is (Dipolar_Hard_Spheres)
                             test%add = .true.
                             test%orientation(:) = random_surface()
                             this_EpotTest = this_spheres%Epot_real_solo(Box%size, test) + &
@@ -341,7 +341,7 @@ contains
         
         old%same_iCell = this_macro%same_cells%index_from_position(old%position)
         select type (this_spheres)
-            type is (Dipolar_Spheres)
+            type is (Dipolar_Hard_Spheres)
                 old%orientation(:) = this_spheres%get_orientation(old%number)
                 EpotOld%same = this_spheres%Epot_real_solo(Box_size, old)
                                ! Epot_reci: cf. after_switch_energy
@@ -397,7 +397,7 @@ contains
             if (.not. overlap) then
             
                 select type (this_spheres)
-                    type is (Dipolar_Spheres)
+                    type is (Dipolar_Hard_Spheres)
                         new%orientation(:) = this_spheres%get_orientation(new%number)
                         EpotNew%same = this_spheres%Epot_real_solo(Box%size, new) + &
                                        this_spheres%deltaEpot_reci_move(Box, old, new)
@@ -421,7 +421,7 @@ contains
         call this_spheres%set_position(old%number, new%position)
         
         select type (this_spheres)
-            type is (Dipolar_Spheres)
+            type is (Dipolar_Hard_Spheres)
                 call this_spheres%reci_update_structure_move(Box, old, new)
         end select
         
@@ -442,7 +442,7 @@ contains
                       spheres, rotation, obs)
     
         type(Box_Dimensions), intent(in) :: Box
-        class(Dipolar_Spheres), intent(inout) :: spheres
+        class(Dipolar_Hard_Spheres), intent(inout) :: spheres
         class(Small_Rotation), intent(in) :: rotation
         class(MoreObservables), intent(inout) :: obs
         

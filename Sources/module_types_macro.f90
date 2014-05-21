@@ -16,9 +16,9 @@ implicit none
         type(Hard_Spheres_Potential) :: hard_potential
     end type Hard_Spheres_Macro
     
-    type, public, extends(Hard_Spheres_Macro) :: Dipolar_Spheres_Macro
+    type, public, extends(Hard_Spheres_Macro) :: Dipolar_Hard_Spheres_Macro
         type(Small_Rotation) :: rotation
         type(Ewald_Summation_Real) :: ewald_real      
-    end type Dipolar_Spheres_Macro
+    end type Dipolar_Hard_Spheres_Macro
 
 end module module_types_macro

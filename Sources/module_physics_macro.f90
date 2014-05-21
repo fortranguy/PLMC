@@ -14,8 +14,8 @@ use class_hard_spheres
 use class_hard_spheres_potential
 use class_small_move
 use class_small_rotation
-use class_dipolar_spheres
-use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Spheres_Macro
+use class_dipolar_hard_spheres
+use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
 use class_mixing_potential
 use class_observables
 use class_units
@@ -79,7 +79,7 @@ contains
         
         real(DP), dimension(:), intent(in) :: Box_size
         type(Argument_Initial), intent(in) :: arg_init
-        class(Dipolar_Spheres), intent(inout) :: dipolar
+        class(Dipolar_Hard_Spheres), intent(inout) :: dipolar
         class(Hard_Spheres), intent(inout) :: spherical
         real(DP), intent(in) :: mix_min_distance
         integer, intent(in) :: report_unit
@@ -173,7 +173,7 @@ contains
     
     subroutine random_orientations(spheres, num_particles)
     
-        class(Dipolar_Spheres), intent(inout) :: spheres
+        class(Dipolar_Hard_Spheres), intent(inout) :: spheres
         integer, intent(in) :: num_particles
         
         integer :: i_particle
@@ -221,7 +221,7 @@ contains
                         coordinate_norm = norm2(spheres%get_position(i_particle))
                     case("orientations")
                         select type(spheres)
-                            type is (Dipolar_Spheres)
+                            type is (Dipolar_Hard_Spheres)
                                 call spheres%set_orientation(i_particle, coordinate)
                                 coordinate_norm = norm2(spheres%get_orientation(i_particle))
                         end select
@@ -261,7 +261,7 @@ contains
         call this_spheres%write_snap_positions(0, this_units%snapIni_positions)
         
         select type (this_spheres)
-            type is (Dipolar_Spheres)
+            type is (Dipolar_Hard_Spheres)
                 !call this_spheres%set_Epot(Box) ! ugly !
                 !this_Epot = this_Epot + this_spheres%Epot_conf(Box) ! temp
                 select type (this_units)
@@ -326,7 +326,7 @@ contains
         
         call this%test_overlap(Box%size)
         select type (this)
-            type is (Dipolar_Spheres)
+            type is (Dipolar_Hard_Spheres)
                 call this%set_Epot(Box) ! ugly !
                 call test_consist(this_obs%Epot, this%Epot_conf(Box), this_units%report)
                 ! for HS too ?
@@ -334,7 +334,7 @@ contains
         call this%write_snap_positions(0, this_units%snapFin_positions)
         
         select type (this)
-            type is (Dipolar_Spheres)
+            type is (Dipolar_Hard_Spheres)
                 select type (this_units)
                     type is (MoreUnits)
                         call this%write_snap_orientations(0, this_units%snapFin_orientations)

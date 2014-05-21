@@ -8,9 +8,9 @@ use json_module, only: json_file, json_initialize
 use module_types_micro, only: Box_Dimensions, Monte_Carlo_Arguments
 use module_physics_micro, only: NwaveVectors
 use module_data, only: test_data_found
-use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Spheres_Macro
+use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
 use class_hard_spheres
-use class_dipolar_spheres
+use class_dipolar_hard_spheres
 use class_mixing_potential
 use class_observables
 use class_units
@@ -41,8 +41,8 @@ private
         integer :: decorrelFactor, Nchange, Nmove, Nswitch, Nrotate
         
         ! Type 1: Dipolar spheres
-        type(Dipolar_Spheres) :: type1_spheres
-        type(Dipolar_Spheres_Macro) :: type1_macro
+        type(Dipolar_Hard_Spheres) :: type1_spheres
+        type(Dipolar_Hard_Spheres_Macro) :: type1_macro
         type(MoreObservables) :: type1_obs
         type(MoreUnits) :: type1_units
         
