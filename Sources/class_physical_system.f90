@@ -16,7 +16,8 @@ use class_observables
 use class_units
 use module_monte_carlo_arguments, only: read_arguments
 use module_physics_macro, only: init_random_seed, set_initial_configuration, &
-                                init_spheres, init_cells, init_hard_potential, final_spheres, &
+                                init_spheres, init_cells, init_hard_potential, init_ewald, &
+                                final_spheres, &
                                 init_mix, mix_final, &
                                 adapt_move, adapt_rotation, test_consist
 use module_algorithms, only: move, widom, switch, rotate
@@ -306,6 +307,7 @@ contains
                         this%mix)
         call init_hard_potential(this%type1_macro%hard_potential, "Dipoles", &
                                  this%type1_spheres%get_diameter(), json)
+        call init_ewald(this%Box, this%type1_spheres, this%type1_macro, json)
         this%type1_obs%Epot = this%type1_macro%hard_potential%total(this%Box%size, this%type1_spheres)
                         
         call init_spheres(this%Box, this%type2_spheres, this%type2_units)

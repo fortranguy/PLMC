@@ -22,6 +22,7 @@ private
     
         procedure :: construct => Hard_Spheres_Potential_construct
         procedure :: write => Hard_Spheres_Potential_write
+        procedure :: get_min_distance => Hard_Spheres_Potential_get_min_distance
         procedure :: get_range_cut => Hard_Spheres_Potential_get_range_cut
         procedure :: neighCells => Hard_Spheres_Potential_neighCells
         procedure :: total => Hard_Spheres_Potential_total
@@ -48,6 +49,13 @@ contains
         write(unit, *) this%range_cut, 0._DP
     
     end subroutine Hard_Spheres_Potential_write
+    
+    pure function Hard_Spheres_Potential_get_min_distance(this) result(get_min_distance)
+        class(Hard_Spheres_Potential), intent(in) :: this
+        real(DP) :: get_min_distance
+        
+        get_min_distance = this%min_distance
+    end function Hard_Spheres_Potential_get_min_distance
     
     pure function Hard_Spheres_Potential_get_range_cut(this) result(get_range_cut)
         class(Hard_Spheres_Potential), intent(in) :: this

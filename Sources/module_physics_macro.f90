@@ -23,7 +23,7 @@ use class_units
 implicit none
 private
 public init_random_seed, set_initial_configuration, &
-       init_spheres, init_cells, init_hard_potential, final_spheres, init_mix, mix_final, &
+       init_spheres, init_cells, init_hard_potential, init_ewald, final_spheres, init_mix, mix_final, &
        adapt_move, adapt_rotation, test_consist
 
 contains
@@ -266,8 +266,8 @@ contains
                 !this_Epot = this_Epot + this_spheres%Epot_conf(Box) ! temp
                 select type (this_units)
                     type is (MoreUnits)
-                        !call this_spheres%write_snap_data(this_units%snap_orientations)
-                        !call this_spheres%write_snap_orientations(0, this_units%snapIni_orientations)
+                        call this_spheres%write_snap_data(this_units%snap_orientations)
+                        call this_spheres%write_snap_orientations(0, this_units%snapIni_orientations)
                         !if (write_potential) then
                         !    call this_spheres%write_Epot_real(this_units%Epot_real)
                         !end if
@@ -314,6 +314,29 @@ contains
         call this_hard_potential%construct(min_distance_factor, this_diameter)
                                                        
     end subroutine init_hard_potential
+    
+    subroutine init_ewald(Box, this_spheres, this_macro, json)
+    
+        type(Box_Dimensions), intent(in) :: Box
+        class(Dipolar_Hard_Spheres), intent(in) :: this_spheres
+        class(Dipolar_Hard_Spheres_Macro), intent(inout) :: this_macro
+        type(json_file), intent(inout) :: json
+        
+        character(len=4096) :: data_name
+        logical :: found
+        
+        real(DP) :: alpha_factor, alpha
+        real(DP) :: min_distance
+        
+        data_name = "Potential.Dipoles.Ewald summation.alpha factor"
+        call json%get(data_name, alpha_factor, found)
+        call test_data_found(data_name, found)
+        
+        alpha = alpha_factor * Box%size(1)
+        min_distance = this_macro%hard_potential%get_min_distance()
+        call this_macro%ewald_real%construct(Box%size, alpha, min_distance, json)
+    
+    end subroutine init_ewald
     
     !> Spheres finalizations
     
