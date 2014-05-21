@@ -4,7 +4,7 @@ use data_precisions, only: DP
 use data_box, only: Ndim
 use data_neighbour_cells, only: NnearCell
 use module_types_micro, only: Box_Dimensions, Node, Particle_Index
-use module_physics_micro, only: dist_PBC
+use module_physics_micro, only: PBC_distance
 use class_neighbour_cells
 use class_hard_spheres
 
@@ -94,7 +94,7 @@ contains
                 next => current%next
             
                 if (current%number /= particle%number) then
-                    r_ij = dist_PBC(Box_size, particle%position, &
+                    r_ij = PBC_distance(Box_size, particle%position, &
                                     this_spheres%get_position(current%number))
                     if (r_ij < this%min_distance) then
                         overlap = .true.
@@ -152,7 +152,7 @@ contains
             if (j_particle /= particle%number) then
             
                 position_j(:) = this_spheres%get_position(j_particle)
-                distance_ij = dist_PBC(Box_size, particle%position, position_j)
+                distance_ij = PBC_distance(Box_size, particle%position, position_j)
                 
                 solo = solo + this%pair(distance_ij)
             

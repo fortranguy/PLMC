@@ -9,7 +9,7 @@ use data_box, only: Ndim
 use json_module, only: json_file
 use data_distribution, only: snap_ratio
 use module_types_micro, only: Box_Dimensions, Node, Particle_Index
-use module_physics_micro, only: dist_PBC
+use module_physics_micro, only: PBC_distance
 use module_data, only: test_data_found
 
 implicit none
@@ -253,7 +253,7 @@ contains
             
                 position_i(:) = this%all_positions(:, i_particle)
                 position_j(:) = this%all_positions(:, j_particle)
-                r_ij = dist_PBC(Box_size, position_i, position_j)
+                r_ij = PBC_distance(Box_size, position_i, position_j)
                 
                 if (r_ij < this%diameter) then
                     write(error_unit, *) this%name, "    Overlap !", i_particle, j_particle

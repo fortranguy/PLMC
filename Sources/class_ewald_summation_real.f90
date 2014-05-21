@@ -5,7 +5,7 @@ use data_constants, only: PI
 use data_box, only: Ndim
 use json_module, only: json_file
 use module_types_micro, only: Particle_Index
-use module_physics_micro, only: set_discrete_length, distVec_PBC, ewald_real_B, ewald_real_C
+use module_physics_micro, only: set_discrete_length, PBC_vector, ewald_real_B, ewald_real_C
 use module_data, only: test_data_found
 use class_dipolar_hard_spheres
 
@@ -170,7 +170,7 @@ contains
             if (j_particle /= particle%number) then
 
                 position_j(:) = this_spheres%get_position(j_particle)
-                vector_ij = distVec_PBC(Box_size, particle%position, position_j)
+                vector_ij = PBC_vector(Box_size, particle%position, position_j)
                 distance_ij = norm2(vector_ij)
                 orientation_j(:) = this_spheres%get_orientation(j_particle)
                 ! optimize without intermediate ?

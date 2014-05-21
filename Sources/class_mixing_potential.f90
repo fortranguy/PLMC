@@ -9,7 +9,7 @@ use data_potential, only: mix_rMin_factor, mix_rCut, mix_dr, mix_epsilon, mix_al
 use data_neighbour_cells, only: NnearCell
 use json_module, only: json_file
 use module_types_micro, only: Node, Particle_Index
-use module_physics_micro, only: set_discrete_length, dist_PBC, Epot_yukawa
+use module_physics_micro, only: set_discrete_length, PBC_distance, Epot_yukawa
 use module_data, only: test_data_found
 use class_neighbour_cells
 use class_hard_spheres
@@ -150,7 +150,7 @@ contains
                     
                 type1_xCol(:) = type1%get_position(type1_i_particle)
                 type2_xCol(:) = type2%get_position(type2_i_particle)
-                r_mix = dist_PBC(Box_size, type1_xCol, type2_xCol)
+                r_mix = PBC_distance(Box_size, type1_xCol, type2_xCol)
                 if (r_mix < this%rMin) then
                     write(error_unit, *) this%name, ":    Overlap !", type1_i_particle, type2_i_particle
                     write(error_unit, *) "    r_mix = ", r_mix
@@ -252,7 +252,7 @@ contains
                 
                 type1_xCol(:) = type1%get_position(type1_i_particle)
                 type2_xCol(:) = type2%get_position(type2_i_particle)
-                r_mix = dist_PBC(Box_size, type1_xCol, type2_xCol)
+                r_mix = PBC_distance(Box_size, type1_xCol, type2_xCol)
                 Epot_conf = Epot_conf + this%Epot_pair(r_mix)
 
             end do
@@ -290,7 +290,7 @@ contains
                 next => current%next
 
                 if (current%number /= particle%other_number) then
-                    r = dist_PBC(Box_size, particle%position, other%get_position(current%number))
+                    r = PBC_distance(Box_size, particle%position, other%get_position(current%number))
                     if (r < this%rMin) then
                         overlap = .true.
                         return

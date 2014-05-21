@@ -7,7 +7,7 @@ use data_precisions, only: DP
 use data_box, only: Ndim, Box_size
 use data_monte_carlo, only: Nstep
 use data_distribution, only: snap, dist_dr
-use module_physics_micro, only: sphere_volume, dist_PBC
+use module_physics_micro, only: sphere_volume, PBC_distance
 !$ use omp_lib
 
 implicit none
@@ -111,7 +111,7 @@ implicit none
         do i_particle = 1, num_particles
             do j_particle = i_particle + 1, num_particles
 
-                r_ij = dist_PBC(Box_size, positions(:, i_particle), positions(:, j_particle))
+                r_ij = PBC_distance(Box_size, positions(:, i_particle), positions(:, j_particle))
                 iDist =  int(r_ij/dist_dr)
                 dist_sum(iDist) = dist_sum(iDist) + 1
 

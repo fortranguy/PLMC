@@ -10,7 +10,7 @@ use data_box, only: Ndim
 
 implicit none
 private
-public set_discrete_length, sphere_volume, distVec_PBC, dist_PBC, random_surface, markov_surface, &
+public set_discrete_length, sphere_volume, PBC_vector, PBC_distance, random_surface, markov_surface, &
        ewald_real_B, ewald_real_C, &
        NwaveVectors, Box_wave1_sym, Box_wave2_sym, fourier_i, exchange_sign, &
        index_from_coord, coord_PBC, &
@@ -44,26 +44,26 @@ contains
     !> Distance between 2 positions with Periodic Boundary Conditions
     !> from SMAC, algorithm 2.5 & 2.6, p.91
     
-    pure function distVec_PBC(Box_size, xCol1, xCol2)
+    pure function PBC_vector(Box_size, xCol1, xCol2)
     
         real(DP), dimension(:), intent(in) :: Box_size
         real(DP), dimension(:), intent(in) :: xCol1, xCol2
-        real(DP), dimension(Ndim) :: distVec_PBC
+        real(DP), dimension(Ndim) :: PBC_vector
         
-        distVec_PBC(:) = modulo(xCol2(:)-xCol1(:), Box_size(:))
+        PBC_vector(:) = modulo(xCol2(:)-xCol1(:), Box_size(:))
         
-        where(distVec_PBC(:) > Box_size(:)/2._DP)
-            distVec_PBC(:) = distVec_PBC(:) - Box_size(:)
+        where(PBC_vector(:) > Box_size(:)/2._DP)
+            PBC_vector(:) = PBC_vector(:) - Box_size(:)
         end where
         
-    end function distVec_PBC
+    end function PBC_vector
     
-    pure function dist_PBC(Box_size, xCol1, xCol2)
+    pure function PBC_distance(Box_size, xCol1, xCol2)
         real(DP), dimension(:), intent(in) :: Box_size
         real(DP), dimension(:), intent(in) :: xCol1, xCol2
-        real(DP) :: dist_PBC
-        dist_PBC = norm2(distVec_PBC(Box_size, xCol1, xCol2))
-    end function dist_PBC
+        real(DP) :: PBC_distance
+        PBC_distance = norm2(PBC_vector(Box_size, xCol1, xCol2))
+    end function PBC_distance
     
     !> Rotation
     !> From SMAC, Algorithm 1.19, p.39

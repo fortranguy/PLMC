@@ -7,7 +7,7 @@ use data_precisions, only: DP, real_zero, io_tiny, consist_tiny
 use data_box, only: Ndim
 use json_module, only: json_file
 use module_types_micro, only: Box_Dimensions, Argument_Random, Argument_Initial
-use module_physics_micro, only: dist_PBC, random_surface
+use module_physics_micro, only: PBC_distance, random_surface
 use module_data, only: test_data_found
 use class_neighbour_cells
 use class_hard_spheres
@@ -133,7 +133,7 @@ contains
             position(:) = spheres1%get_position(i_particle)
             do i_particle_test = 1, i_particle-1
                 position_test(:) = spheres1%get_position(i_particle_test)
-                rTest = dist_PBC(Box_size, position, position_test)
+                rTest = PBC_distance(Box_size, position, position_test)
                 if (rTest < spheres1%get_diameter()) then
                     goto 7101
                 end if
@@ -151,7 +151,7 @@ contains
             position(:) = spheres2%get_position(i_particle)
             do i_particle_test = 1, spheres1%get_num_particles()
                 position_test(:) = spheres1%get_position(i_particle_test)
-                rTest = dist_PBC(Box_size, position, position_test)
+                rTest = PBC_distance(Box_size, position, position_test)
                 if (rTest < mix_min_distance) then
                     goto 7102
                 end if
@@ -159,7 +159,7 @@ contains
             
             do i_particle_test = 1, i_particle-1
                 position_test(:) = spheres2%get_position(i_particle_test)
-                rTest = dist_PBC(Box_size, position, position_test)
+                rTest = PBC_distance(Box_size, position, position_test)
                 if (rTest < spheres2%get_diameter()) then
                     goto 7102
                 end if

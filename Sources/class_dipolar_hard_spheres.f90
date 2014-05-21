@@ -12,7 +12,7 @@ use data_potential, only: dipol_rMin_factor, dipol_real_rCut_factor, dipol_real_
 use data_neighbour_cells, only: NnearCell
 use data_distribution, only: snap_ratio
 use module_types_micro, only: Box_Dimensions, Particle_Index
-use module_physics_micro, only: set_discrete_length, distVec_PBC, Box_wave1_sym, Box_wave2_sym, &
+use module_physics_micro, only: set_discrete_length, PBC_vector, Box_wave1_sym, Box_wave2_sym, &
                                 fourier_i, exchange_sign
 use module_data, only: test_data_found
 use class_hard_spheres
@@ -367,7 +367,7 @@ contains
             if (j_particle /= particle%number) then
             
                 xCol_j(:) = this%all_positions(:, j_particle)
-                rVec_ij = distVec_PBC(Box_size, particle%position, xCol_j)
+                rVec_ij = PBC_vector(Box_size, particle%position, xCol_j)
                 r_ij = norm2(rVec_ij)
                 mCol_j(:) = this%all_orientations(:, j_particle)
 
