@@ -30,6 +30,8 @@ private
         
         procedure :: move => Ewald_Summation_Reci_move
         procedure :: update_structure_move => Ewald_Summation_Reci_update_structure_move
+        procedure :: rotation => Ewald_Summation_Reci_rotation
+        procedure :: update_structure_rotation => Ewald_Summation_Reci_update_structure_rotation
     
     end type Ewald_Summation_Reci
     
@@ -265,17 +267,17 @@ contains
         real(DP) :: wave_dot_orientation
         integer :: kx, ky, kz
 
-        new_position_div_box(:) = 2._DP*PI * new%position(:)/Box%size(:)
+        new_position_div_box(:) = 2._DP*PI * new%position(:) / Box%size(:)
         call fourier_i(Box%wave(1), new_position_div_box(1), exp_IkxNew_1)
         call fourier_i(Box%wave(2), new_position_div_box(2), exp_IkxNew_2)
         call fourier_i(Box%wave(3), new_position_div_box(3), exp_IkxNew_3)
         
-        old_position_div_box(:) = 2._DP*PI * old%position(:)/Box%size(:)
+        old_position_div_box(:) = 2._DP*PI * old%position(:) / Box%size(:)
         call fourier_i(Box%wave(1), old_position_div_box(1), exp_IkxOld_1)
         call fourier_i(Box%wave(2), old_position_div_box(2), exp_IkxOld_2)
         call fourier_i(Box%wave(3), old_position_div_box(3), exp_IkxOld_3)
 
-        orientation_div_box(:) = new%orientation(:)/Box%size(:)
+        orientation_div_box(:) = new%orientation(:) / Box%size(:)
 
         move = 0._DP
 
@@ -339,17 +341,17 @@ contains
         real(DP) :: wave_dot_orientation
         integer :: kx, ky, kz
 
-        new_position_div_box(:) = 2._DP*PI * new%position(:)/Box%size(:)
+        new_position_div_box(:) = 2._DP*PI * new%position(:) / Box%size(:)
         call fourier_i(Box%wave(1), new_position_div_box(1), exp_IkxNew_1)
         call fourier_i(Box%wave(2), new_position_div_box(2), exp_IkxNew_2)
         call fourier_i(Box%wave(3), new_position_div_box(3), exp_IkxNew_3)
         
-        old_position_div_box(:) = 2._DP*PI * old%position(:)/Box%size(:)
+        old_position_div_box(:) = 2._DP*PI * old%position(:) / Box%size(:)
         call fourier_i(Box%wave(1), old_position_div_box(1), exp_IkxOld_1)
         call fourier_i(Box%wave(2), old_position_div_box(2), exp_IkxOld_2)
         call fourier_i(Box%wave(3), old_position_div_box(3), exp_IkxOld_3)
 
-        orientation_div_box(:) = new%orientation(:)/Box%size(:)
+        orientation_div_box(:) = new%orientation(:) / Box%size(:)
 
         do kz = 0, Box%wave(3)
             wave_vector(3) = real(kz, DP)
@@ -375,5 +377,138 @@ contains
         end do
 
     end subroutine Ewald_Summation_Reci_update_structure_move
+    
+    !> Rotation
+
+    !> Difference of Energy \f[ \Delta U = \frac{2\pi}{V} \sum_{\vec{k} \neq 0} \Delta S^2
+    !>                                       w(\alpha, \vec{k}) \f]
+    !> \f[
+    !>  \Delta S^2 = (\vec{k} \cdot \vec{\mu}_l^\prime)^2 - (\vec{k} \cdot \vec{\mu}_l)^2 +
+    !>               2\Re\{
+    !>                  [(\vec{k} \cdot \vec{\mu}_l^\prime) - (\vec{k} \cdot \vec{\mu}_l)]
+    !>                  e^{-i \vec{k} \cdot \vec{x}_l} S_\underline{l}(\vec{k})
+    !>               \}
+    !> \f]
+    
+    pure function Ewald_Summation_Reci_rotation(this, Box, old, new) &
+                  result(rotation)
+
+        class(Ewald_Summation_Reci), intent(in) :: this
+        type(Box_Dimensions), intent(in) :: Box
+        type(Particle_Index), intent(in) :: old, new
+        real(DP) :: rotation
+
+        real(DP), dimension(Ndim) :: position_div_box
+        real(DP), dimension(Ndim) :: new_orientation_div_box, old_orientation_div_box
+
+        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxCol_1
+        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxCol_2
+        complex(DP), dimension(-Box%wave(3):Box%wave(3)) :: exp_IkxCol_3
+        complex(DP) :: exp_IkxCol
+
+        real(DP) :: real_part
+        
+        real(DP), dimension(Ndim) :: wave_vector
+        real(DP) :: wave_dot_new_orientation, wave_dot_old_orientation
+        integer :: kx, ky, kz
+
+        position_div_box(:) = 2._DP*PI * new%position(:) / Box%size(:)
+        call fourier_i(Box%wave(1), position_div_box(1), exp_IkxCol_1)
+        call fourier_i(Box%wave(2), position_div_box(2), exp_IkxCol_2)
+        call fourier_i(Box%wave(3), position_div_box(3), exp_IkxCol_3)
+
+        new_orientation_div_box(:) = new%orientation(:) / Box%size(:)
+        old_orientation_div_box(:) = old%orientation(:) / Box%size(:)
+
+        rotation = 0._DP
+
+        do kz = 0, Box%wave(3)
+            wave_vector(3) = real(kz, DP)
+
+            do ky = -Box_wave2_sym(Box%wave, kz), Box%wave(2)
+                wave_vector(2) = real(ky, DP)
+            
+                do kx = -Box_wave1_sym(Box%wave, ky, kz), Box%wave(1)
+                    wave_vector(1) = real(kx, DP)
+
+                    wave_dot_new_orientation = dot_product(wave_vector, new_orientation_div_box)
+                    wave_dot_old_orientation = dot_product(wave_vector, old_orientation_div_box)
+                    exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky) * exp_IkxCol_3(kz)
+
+                    real_part = wave_dot_new_orientation**2 - wave_dot_old_orientation**2
+                    real_part = real_part + &
+                                2._DP * (wave_dot_new_orientation - wave_dot_old_orientation) * &
+                                real(conjg(exp_IkxCol) * &
+                                (this%structure(kx, ky, kz) - &
+                                wave_dot_old_orientation * exp_IkxCol), DP)
+
+                    rotation = rotation + this%weight(kx, ky, kz) * real_part
+
+                end do
+
+            end do
+
+        end do
+
+        rotation = 4._DP*PI/product(Box%size) * rotation
+
+    end function Ewald_Summation_Reci_rotation
+
+    !> Update moment -> update the ``structure factor''
+    !>  \f[
+    !>      \Delta S(\vec{k}) = [\vec{k}\cdot(\vec{\mu}_l^\prime - \vec{\mu}_l)]
+    !>                          e^{+i\vec{k}\cdot\vec{x}_l}
+    !>  \f]
+    !>
+
+    pure subroutine Ewald_Summation_Reci_update_structure_rotation(this, Box, old, new)
+
+        class(Ewald_Summation_Reci), intent(inout) :: this
+        type(Box_Dimensions), intent(in) :: Box
+        type(Particle_Index), intent(in) :: old, new
+
+        real(DP), dimension(Ndim) :: position_div_box
+        real(DP), dimension(Ndim) :: new_orientation_div_box, old_orientation_div_box
+
+        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxCol_1
+        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxCol_2
+        complex(DP), dimension(-Box%wave(3):Box%wave(3)) :: exp_IkxCol_3
+        complex(DP) :: exp_IkxCol
+
+        real(DP), dimension(Ndim) :: wave_vector
+        real(DP) :: k_dot_deltaMcol
+        integer :: kx, ky, kz
+
+        position_div_box(:) = 2._DP*PI * new%position(:)/Box%size(:)
+        call fourier_i(Box%wave(1), position_div_box(1), exp_IkxCol_1)
+        call fourier_i(Box%wave(2), position_div_box(2), exp_IkxCol_2)
+        call fourier_i(Box%wave(3), position_div_box(3), exp_IkxCol_3)
+
+        new_orientation_div_box(:) = new%orientation(:)/Box%size(:)
+        old_orientation_div_box(:) = old%orientation(:)/Box%size(:)
+
+        do kz = 0, Box%wave(3)
+            wave_vector(3) = real(kz, DP)
+
+            do ky = -Box_wave2_sym(Box%wave, kz), Box%wave(2)
+                wave_vector(2) = real(ky, DP)
+
+                do kx = -Box_wave1_sym(Box%wave, ky, kz), Box%wave(1)
+                    wave_vector(1) = real(kx, DP)
+                    
+                    k_dot_deltaMcol = dot_product(wave_vector, &
+                                      new_orientation_div_box - old_orientation_div_box)
+                    exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky) * exp_IkxCol_3(kz)
+
+                    this%structure(kx, ky, kz) = this%structure(kx, ky, kz) + &
+                                                 cmplx(k_dot_deltaMcol, 0._DP, DP) * exp_IkxCol
+
+                end do
+                
+            end do
+            
+        end do
+
+    end subroutine Ewald_Summation_Reci_update_structure_rotation
 
 end module class_ewald_summation_reci
