@@ -159,23 +159,18 @@ contains
         real(DP) :: solo
 
         integer :: j_particle
-        real(DP), dimension(Ndim) :: position_j
-        real(DP), dimension(Ndim) :: orientation_j
         real(DP), dimension(Ndim) :: vector_ij
-        real(DP) :: distance_ij
 
         solo = 0._DP
         
         do j_particle = 1, this_spheres%get_num_particles()
             if (j_particle /= particle%number) then
-
-                position_j(:) = this_spheres%get_position(j_particle)
-                vector_ij = PBC_vector(Box_size, particle%position, position_j)
-                distance_ij = norm2(vector_ij)
-                orientation_j(:) = this_spheres%get_orientation(j_particle)
-                ! optimize without intermediate ?
-
-                solo = solo + this%pair(particle%orientation, orientation_j, vector_ij, distance_ij)
+            
+                vector_ij = PBC_vector(Box_size, &
+                                       particle%position, this_spheres%get_position(j_particle))
+                solo = solo + this%pair(particle%orientation, &
+                                        this_spheres%get_orientation(j_particle), &
+                                        vector_ij)
 
             end if
         end do
@@ -186,12 +181,11 @@ contains
     !> \f[ (\vec{\mu}_i\cdot\vec{\mu}_j) B(r_{ij}) -
     !>     (\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij}) C(r_{ij}) \f]
 
-    pure function Ewald_Summation_Real_pair(this, orientation_i, orientation_j, vector_ij, distance_ij) &
+    pure function Ewald_Summation_Real_pair(this, orientation_i, orientation_j, vector_ij) &
                   result(pair)
         class(Ewald_Summation_Real), intent(in) :: this
         real(DP), dimension(:), intent(in) :: orientation_i, orientation_j
         real(DP), dimension(:), intent(in) :: vector_ij
-        real(DP), intent(in) :: distance_ij
         real(DP) :: pair
 
         real(DP), dimension(2) :: coefficient
@@ -199,7 +193,7 @@ contains
         coefficient(1) = dot_product(orientation_i, orientation_j)
         coefficient(2) =-dot_product(orientation_i, vector_ij) * dot_product(orientation_j, vector_ij)
 
-        pair = dot_product(coefficient, this%interpolation(distance_ij))
+        pair = dot_product(coefficient, this%interpolation(norm2(vector_ij)))
 
     end function Ewald_Summation_Real_pair
 
