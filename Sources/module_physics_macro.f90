@@ -5,8 +5,10 @@ module module_physics_macro
 use, intrinsic :: iso_fortran_env, only: output_unit, error_unit, iostat_end
 use data_precisions, only: DP, real_zero, io_tiny, consist_tiny
 use data_box, only: Ndim
+use json_module, only: json_file
 use module_types_micro, only: Box_Dimensions, Argument_Random, Argument_Initial
 use module_physics_micro, only: dist_PBC, random_surface
+use module_data, only: test_data_found
 use class_neighbour_cells
 use class_hard_spheres
 use class_hard_spheres_potential
@@ -21,7 +23,7 @@ use class_units
 implicit none
 private
 public init_random_seed, set_initial_configuration, &
-       init_spheres, init_cells, final_spheres, init_mix, mix_final, &
+       init_spheres, init_cells, init_hard_potential, final_spheres, init_mix, mix_final, &
        adapt_move, adapt_rotation, test_consist
 
 contains
@@ -248,49 +250,35 @@ contains
     
     !> Spheres initialisations
     
-    subroutine init_spheres(Box, this, this_macro, write_potential, this_units, this_Epot) ! separate ?
-    
+    subroutine init_spheres(Box, this_spheres, this_units)
+        
         type(Box_Dimensions), intent(in) :: Box
-        class(Hard_Spheres), intent(inout) :: this
-        class(Hard_Spheres_Macro), intent(inout) :: this_macro
-        logical, intent(in) :: write_potential
+        class(Hard_Spheres), intent(inout) :: this_spheres
         class(Units), intent(in) :: this_units
-        real(DP), intent(out) :: this_Epot
         
-        call this%test_overlap(Box%size)
-        call this%write_snap_data(this_units%snap_positions)
-        call this%write_snap_positions(0, this_units%snapIni_positions)
-        call this_macro%hard_potential%construct(this%get_diameter())
-        this_Epot = this_macro%hard_potential%conf()
+        call this_spheres%test_overlap(Box%size)
+        call this_spheres%write_snap_data(this_units%snap_positions)
+        call this_spheres%write_snap_positions(0, this_units%snapIni_positions)
         
-        if (write_potential) then
-            call this_macro%hard_potential%write(this_units%Epot)
-        end if
-        
-        select type (this)
+        select type (this_spheres)
             type is (Dipolar_Spheres)
-                call this%set_Epot(Box) ! ugly !
-                this_Epot = this_Epot + this%Epot_conf(Box) ! temp
+                !call this_spheres%set_Epot(Box) ! ugly !
+                !this_Epot = this_Epot + this_spheres%Epot_conf(Box) ! temp
                 select type (this_units)
                     type is (MoreUnits)
-                        call this%write_snap_data(this_units%snap_orientations)
-                        call this%write_snap_orientations(0, this_units%snapIni_orientations)
-                        if (write_potential) then
-                            call this%write_Epot_real(this_units%Epot_real)
-                        end if
-                        call this%Epot_reci_count_waveVectors(Box%wave, this_units%waveVectors)
+                        !call this_spheres%write_snap_data(this_units%snap_orientations)
+                        !call this_spheres%write_snap_orientations(0, this_units%snapIni_orientations)
+                        !if (write_potential) then
+                        !    call this_spheres%write_Epot_real(this_units%Epot_real)
+                        !end if
+                        !call this_spheres%Epot_reci_count_waveVectors(Box%wave, this_units%waveVectors)
                 end select
-        end select
-        
-        select type (this_macro)
-            type is (Dipolar_Spheres_Macro)
-                !this_macro%ewald%construct()
         end select
     
     end subroutine init_spheres
     
-    subroutine init_cells(Box_size, this_spheres, this_macro, other_spheres, mix)
-    
+    subroutine init_cells(Box_size, this_spheres, this_macro, other_spheres, mix)  
+      
         real(DP), dimension(:), intent(in) :: Box_size
         class(Hard_Spheres), intent(in) :: this_spheres, other_spheres
         class(Hard_Spheres_Macro), intent(inout) :: this_macro
@@ -307,6 +295,25 @@ contains
         call this_macro%mix_cells%all_cols_to_cells(other_spheres%get_num_particles(), other_spheres)
 
     end subroutine init_cells
+    
+    subroutine init_hard_potential(this_hard_potential, type_name, this_diameter, json)
+    
+        class(Hard_Spheres_Potential), intent(inout) :: this_hard_potential
+        character(len=*), intent(in) :: type_name
+        real(DP), intent(in) :: this_diameter 
+        type(json_file), intent(inout) :: json
+        
+        character(len=4096) :: data_name
+        logical :: found
+        
+        real(DP) :: min_distance_factor
+    
+        data_name = "Potential."//type_name//".minimum distance factor"
+        call json%get(data_name, min_distance_factor, found)
+        call test_data_found(data_name, found)
+        call this_hard_potential%construct(min_distance_factor, this_diameter)
+                                                       
+    end subroutine init_hard_potential
     
     !> Spheres finalizations
     

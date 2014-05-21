@@ -1,7 +1,7 @@
 module class_hard_spheres_potential
 
 use data_precisions, only: DP
-use data_potential, only: hard_rMin_factor
+use data_box, only: Ndim
 use data_neighbour_cells, only: NnearCell
 use module_types_micro, only: Box_Dimensions, Node, Particle_Index
 use module_physics_micro, only: dist_PBC
@@ -24,17 +24,19 @@ private
         procedure :: write => Hard_Spheres_Potential_write
         procedure :: get_range_cut => Hard_Spheres_Potential_get_range_cut
         procedure :: neighCells => Hard_Spheres_Potential_neighCells
-        procedure :: conf => Hard_Spheres_Potential_conf
+        procedure :: total => Hard_Spheres_Potential_total
+        procedure, private :: solo => Hard_Spheres_Potential_solo
+        procedure, private :: pair => Hard_Spheres_Potential_pair
         
     end type Hard_Spheres_Potential
     
 contains
 
-    subroutine Hard_Spheres_Potential_construct(this, diameter)    
+    subroutine Hard_Spheres_Potential_construct(this, min_distance_factor, diameter)    
         class(Hard_Spheres_Potential), intent(inout) :: this
-        real(DP), intent(in) :: diameter
+        real(DP), intent(in) ::  min_distance_factor, diameter
         
-        this%min_distance = hard_rMin_factor * diameter ! careful for Dipoles !
+        this%min_distance = min_distance_factor * diameter
         this%range_cut = this%min_distance
         
     end subroutine Hard_Spheres_Potential_construct
@@ -112,13 +114,67 @@ contains
     
     !> Total potential energy: dummy
     
-    pure function Hard_Spheres_Potential_conf(this) result(conf)
+    pure function Hard_Spheres_Potential_total(this, Box_size, this_spheres) result(total)
     
         class(Hard_Spheres_Potential), intent(in) :: this
-        real(DP) :: conf
-    
-        conf = 0._DP
+        real(DP), dimension(:), intent(in) :: Box_size
+        class(Hard_Spheres), intent(in) :: this_spheres
+        real(DP) :: total
         
-    end function Hard_Spheres_Potential_conf
+        integer :: i_particle
+        type(Particle_Index) :: particle
+    
+        total = 0._DP
+        
+        do i_particle = 1, this_spheres%get_num_particles()
+            particle%number = i_particle
+            particle%position(:) = this_spheres%get_position(particle%number)
+            total = total + this%solo(Box_size, this_spheres, particle)
+        end do
+        
+    end function Hard_Spheres_Potential_total
+    
+    pure function Hard_Spheres_Potential_solo(this, Box_size, this_spheres, particle) result(solo)
+    
+        class(Hard_Spheres_Potential), intent(in) :: this
+        real(DP), dimension(:), intent(in) :: Box_size
+        class(Hard_Spheres), intent(in) :: this_spheres
+        type(Particle_Index), intent(in) :: particle
+        real(DP) :: solo
+        
+        integer :: j_particle
+        real(DP), dimension(Ndim) :: position_j
+        real(DP) :: distance_ij
+        
+        solo = 0._DP
+        
+        do j_particle = 1, this_spheres%get_num_particles()
+            if (j_particle /= particle%number) then
+            
+                position_j(:) = this_spheres%get_position(j_particle)
+                distance_ij = dist_PBC(Box_size, particle%position, position_j)
+                
+                solo = solo + this%pair(distance_ij)
+            
+            end if            
+        end do
+    
+    end function Hard_Spheres_Potential_solo
+    
+    !> Dummy
+    
+    pure function Hard_Spheres_Potential_pair(this, distance) result(pair)
+    
+        class(Hard_Spheres_Potential), intent(in) :: this
+        real(DP), intent(in) :: distance
+        real(DP) :: pair
+        
+        if (distance < this%range_cut) then
+            pair = 0._DP
+        else
+            pair = 0._DP
+        end if
+    
+    end function Hard_Spheres_Potential_pair
 
 end module class_hard_spheres_potential

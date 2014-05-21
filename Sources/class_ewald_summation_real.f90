@@ -165,6 +165,7 @@ contains
         real(DP) :: distance_ij
 
         solo = 0._DP
+        
         do j_particle = 1, this_spheres%get_num_particles()
             if (j_particle /= particle%number) then
 

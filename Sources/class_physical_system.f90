@@ -16,7 +16,8 @@ use class_observables
 use class_units
 use module_monte_carlo_arguments, only: read_arguments
 use module_physics_macro, only: init_random_seed, set_initial_configuration, &
-                                init_spheres, init_cells, final_spheres, init_mix, mix_final, &
+                                init_spheres, init_cells, init_hard_potential, final_spheres, &
+                                init_mix, mix_final, &
                                 adapt_move, adapt_rotation, test_consist
 use module_algorithms, only: move, widom, switch, rotate
 use module_write, only: open_units, write_data, mix_open_units, write_results, mix_write_results
@@ -285,8 +286,6 @@ contains
         call test_data_found(data_name, found)
         this%reset_iStep = this%reset_iStep / this%decorrelFactor
         
-        call json%destroy()
-        
         write(output_unit, *) "Monte-Carlo Simulation: Canonical ensemble"
         
         call this%open_all_units()
@@ -296,25 +295,38 @@ contains
         call set_initial_configuration(this%Box%size, args%initial, this%type1_spheres, &
                                        this%type2_spheres, this%mix%get_min_distance(), &
                                        this%report_unit)
+                                       
         this%mix_EpotSum = 0._DP        
         call init_mix(this%Box%size, this%mix, this%type1_spheres, this%type2_spheres, &
                       this%write_potential, this%mix_Epot_tab_unit, this%mix_Epot)
         call this%mix%write_report(this%mix_report_unit)
-        call init_spheres(this%Box, this%type1_spheres, this%type1_macro, this%write_potential, &
-                          this%type1_units, this%type1_obs%Epot)
+        
+        call init_spheres(this%Box, this%type1_spheres, this%type1_units)
         call init_cells(this%Box%size, this%type1_spheres, this%type1_macro, this%type2_spheres, &
                         this%mix)
-        call init_spheres(this%Box, this%type2_spheres, this%type2_macro, this%write_potential, &
-                          this%type2_units, this%type2_obs%Epot)
+        call init_hard_potential(this%type1_macro%hard_potential, "Dipoles", &
+                                 this%type1_spheres%get_diameter(), json)
+        this%type1_obs%Epot = this%type1_macro%hard_potential%total(this%Box%size, this%type1_spheres)
+                        
+        call init_spheres(this%Box, this%type2_spheres, this%type2_units)
         call init_cells(this%Box%size, this%type2_spheres, this%type2_macro, this%type1_spheres, &
                         this%mix)
+        call init_hard_potential(this%type2_macro%hard_potential, "Hard Spheres", &
+                                 this%type2_spheres%get_diameter(), json)
+        this%type2_obs%Epot = this%type2_macro%hard_potential%total(this%Box%size, this%type2_spheres)
                         
         call this%write_all_reports()
+        if (this%write_potential) then
+            call this%type1_macro%hard_potential%write(this%type1_units%Epot)
+            call this%type2_macro%hard_potential%write(this%type2_units%Epot)
+        end if
         
         this%EpotSum = 0._DP
         Epot_conf = this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
         write(output_unit, *) "Initial potential energy =", Epot_conf
         write(this%obsThermal_unit, *) 0, Epot_conf
+        
+        call json%destroy()
     
     end subroutine Physical_System_init
     
@@ -416,7 +428,8 @@ contains
         
         Epot = this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
         Epot_conf = this%type1_spheres%Epot_conf(this%Box) + &
-                    this%type2_macro%hard_potential%conf() + this%mix_Epot_conf
+                    this%type2_macro%hard_potential%total(this%Box%size, this%type2_spheres) + &
+                    this%mix_Epot_conf
         call test_consist(Epot, Epot_conf, this%report_unit)
         this%EpotSum = this%type1_obs%EpotSum + this%type2_obs%EpotSum + this%mix_EpotSum
         duration = this%time_end - this%time_start
