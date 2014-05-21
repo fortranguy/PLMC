@@ -339,6 +339,8 @@ contains
         
         call this_macro%ewald_reci%construct(Box, alpha, this_spheres)
         call this_macro%ewald_reci%count_wave_vectors(Box%wave, this_units%waveVectors)
+        
+        call this_macro%ewald_self%set_alpha(alpha)
     
     end subroutine init_ewald
     

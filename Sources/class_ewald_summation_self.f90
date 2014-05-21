@@ -11,21 +11,21 @@ private
     type, public :: Ewald_Summation_Self
         real(DP) :: alpha
     contains
-        procedure :: construct
+        procedure :: set_alpha => Ewald_Summation_Self_set_alpha
         procedure :: total => Ewald_Summation_Self_total
         procedure :: solo => Ewald_Summation_Self_solo
     end type Ewald_Summation_Self
     
 contains
-
-    pure subroutine Ewald_Summation_Self_construct(this, alpha)
+    
+    pure subroutine Ewald_Summation_Self_set_alpha(this, alpha)
     
         class(Ewald_Summation_Self), intent(inout) :: this
         real(DP), intent(in) :: alpha
-        
+    
         this%alpha = alpha
     
-    end subroutine Ewald_Summation_Self_construct
+    end subroutine Ewald_Summation_Self_set_alpha
     
     !> Total self energy
     !> \f[ \frac{2}{3}\frac{\alpha^3}{\sqrt{\pi}} \sum_i \vec{\mu}_i\cdot\vec{\mu}_i \f]

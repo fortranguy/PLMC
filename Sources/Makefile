@@ -113,7 +113,7 @@ $(EXEC1): data.o \
           class_hard_spheres.o class_dipolar_hard_spheres.o \
           class_neighbour_cells.o \
           class_hard_spheres_potential.o class_ewald_summation_real.o class_ewald_summation_reci.o\
-          class_ewald_summation_reci.o \
+          class_ewald_summation_self.o \
           class_mixing_potential.o \
           class_observables.o class_units.o \
           module_types_macro.o \
