@@ -86,8 +86,11 @@ contains
                     type is (Dipolar_Hard_Spheres)
                         old%orientation(:) = this_spheres%get_orientation(old%number)
                         new%orientation(:) = old%orientation(:)
-                        this_EpotNew_real = this_spheres%Epot_real_solo(Box%size, new)
-                        this_EpotOld_real = this_spheres%Epot_real_solo(Box%size, old)
+                        select type (this_macro)
+                            type is (Dipolar_Hard_Spheres_Macro)
+                                this_EpotNew_real = this_macro%ewald_real%solo(Box%size, this_spheres, new)
+                                this_EpotOld_real = this_macro%ewald_real%solo(Box%size, this_spheres, old)
+                        end select
                         this_deltaEpot = (this_EpotNew_real - this_EpotOld_real) + &
                                          this_spheres%deltaEpot_reci_move(Box, old, new)
                     class default
@@ -198,7 +201,11 @@ contains
                         type is (Dipolar_Hard_Spheres)
                             test%add = .true.
                             test%orientation(:) = random_surface()
-                            this_EpotTest = this_spheres%Epot_real_solo(Box%size, test) + &
+                            select type (this_macro)
+                                type is (Dipolar_Hard_Spheres_Macro)                                
+                                    this_EpotTest = this_macro%ewald_real%solo(Box%size, this_spheres, test)
+                            end select
+                            this_EpotTest = this_EpotTest + &
                                             this_spheres%deltaEpot_reci_exchange(Box, test) - &
                                             this_spheres%Epot_self_solo(test%orientation) + &
                                             this_spheres%deltaEpot_bound_exchange(Box%size, &
@@ -343,8 +350,11 @@ contains
         select type (this_spheres)
             type is (Dipolar_Hard_Spheres)
                 old%orientation(:) = this_spheres%get_orientation(old%number)
-                EpotOld%same = this_spheres%Epot_real_solo(Box_size, old)
+                select type (this_macro)
+                    type is (Dipolar_Hard_Spheres_Macro)
+                        EpotOld%same = this_macro%ewald_real%solo(Box_size, this_spheres, old)
                                ! Epot_reci: cf. after_switch_energy
+                end select
             type is (Hard_Spheres)
                 EpotOld%same = 0._DP
         end select
@@ -399,7 +409,11 @@ contains
                 select type (this_spheres)
                     type is (Dipolar_Hard_Spheres)
                         new%orientation(:) = this_spheres%get_orientation(new%number)
-                        EpotNew%same = this_spheres%Epot_real_solo(Box%size, new) + &
+                        select type (this_macro)
+                            type is (Dipolar_Hard_Spheres_Macro)
+                                EpotNew%same = this_macro%ewald_real%solo(Box%size, this_spheres, new)
+                        end select
+                        EpotNew%same = EpotNew%same + &
                                        this_spheres%deltaEpot_reci_move(Box, old, new)
                 end select
             
@@ -439,11 +453,11 @@ contains
     !> Dipole rotation
     
     subroutine rotate(Box, &
-                      spheres, rotation, obs)
+                      spheres, macro, obs)
     
         type(Box_Dimensions), intent(in) :: Box
         class(Dipolar_Hard_Spheres), intent(inout) :: spheres
-        class(Small_Rotation), intent(in) :: rotation
+        class(Dipolar_Hard_Spheres_Macro), intent(in) :: macro
         class(MoreObservables), intent(inout) :: obs
         
         real(DP) :: random
@@ -462,10 +476,10 @@ contains
         new%number = old%number
         new%position(:) = old%position(:)
         new%orientation(:) = old%orientation(:)
-        call markov_surface(new%orientation, rotation%get_delta())
+        call markov_surface(new%orientation, macro%rotation%get_delta())
         
-        real_EpotOld = spheres%Epot_real_solo(Box%size, old)
-        real_EpotNew = spheres%Epot_real_solo(Box%size, new)
+        real_EpotOld = macro%ewald_real%solo(Box%size, spheres, old)
+        real_EpotNew = macro%ewald_real%solo(Box%size, spheres, new)
         deltaEpot_real = real_EpotNew - real_EpotOld
         
         deltaEpot_self = spheres%Epot_self_solo(new%orientation) - spheres%Epot_self_solo(old%orientation)

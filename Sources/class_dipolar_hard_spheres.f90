@@ -28,13 +28,7 @@ private
         ! Particles
         real(DP), dimension(:, :), allocatable, public :: all_orientations
         ! Potential
-        real(DP) :: real_rMin
-        real(DP) :: real_rCut !< real space potential cut
-        real(DP) :: real_dr !< discretisation step
-        integer :: real_iMin !< minimum index of tabulation: minimum distance
-        integer :: real_iCut !< maximum index of tabulation: until potential cut
         real(DP) :: alpha !< coefficient of Ewald summation
-        real(DP), dimension(:, :), allocatable :: Epot_real_tab !< tabulation: real short-range
         real(DP), dimension(:, :, :), allocatable :: Epot_reci_weight
         integer :: NwaveVectors
         complex(DP), dimension(:, :, :), allocatable :: Epot_reci_structure
@@ -60,15 +54,6 @@ private
         
         !> Potential energy
         !>     Real
-        procedure, private :: Epot_real_true => Dipolar_Hard_Spheres_Epot_real_true
-        procedure, private :: set_Epot_real_parameters => Dipolar_Hard_Spheres_set_Epot_real_parameters
-        procedure, private :: set_Epot_real_tab => Dipolar_Hard_Spheres_set_Epot_real_tab
-        procedure, private :: set_Epot_real => Dipolar_Hard_Spheres_set_Epot_real
-        procedure :: write_Epot_real => Dipolar_Hard_Spheres_write_Epot_real
-        procedure, private :: Epot_real_interpol => Dipolar_Hard_Spheres_Epot_real_interpol
-        procedure, private :: Epot_real_pair => Dipolar_Hard_Spheres_Epot_real_pair
-        procedure :: Epot_real_solo => Dipolar_Hard_Spheres_Epot_real_solo
-        procedure, private :: Epot_real => Dipolar_Hard_Spheres_Epot_real
         !>     Reciprocal: init
         procedure, private :: set_Epot_reci_weight => Dipolar_Hard_Spheres_set_Epot_reci_weight
         procedure, private :: set_Epot_reci_structure => Dipolar_Hard_Spheres_set_Epot_reci_structure
@@ -145,7 +130,6 @@ contains
         
         call this%Hard_Spheres%destroy()
         if (allocated(this%all_orientations)) deallocate(this%all_orientations)
-        if (allocated(this%Epot_real_tab)) deallocate(this%Epot_real_tab)
         if (allocated(this%Epot_reci_weight)) deallocate(this%Epot_reci_weight)
         if (allocated(this%Epot_reci_structure)) deallocate(this%Epot_reci_structure)    
     end subroutine Dipolar_Hard_Spheres_destroy
@@ -160,7 +144,6 @@ contains
         call this%Hard_Spheres%write_report(report_unit)
 
         write(report_unit, *) "    alpha = ", this%alpha
-        write(report_unit, *) "    dr = ", this%real_dr
         write(report_unit, *) "    NwaveVectors = ", this%NwaveVectors
         
     end subroutine Dipolar_Hard_Spheres_write_report
@@ -207,202 +190,7 @@ contains
         end if
 
     end subroutine Dipolar_Hard_Spheres_write_snap_orientations    
-
-    ! Real: short-range interaction ---------------------------------------------------------------
-
-    !> \f[ B(r) = \frac{\mathrm{erfc}(\alpha r)}{r^3} +
-    !>           2\frac{\alpha}{\sqrt{\pi}}\frac{e^{-\alpha^2 r^2}}{r^2} \f]
-    !> \f[ C(r) = 3\frac{\mathrm{erfc}(\alpha r)}{r^5} +
-    !>            2\frac{\alpha}{\sqrt{\pi}}\left(2\alpha^2 + \frac{3}{r^2}\right)
-    !>                                     \frac{e^{-\alpha^2 r^2}}{r^2} \f]
-
-    pure function Dipolar_Hard_Spheres_Epot_real_true(this, r) result(Epot_real_true)
-
-        class(Dipolar_Hard_Spheres), intent(in) :: this
-        real(DP), intent(in) :: r
-        real(DP), dimension(2) :: Epot_real_true
-
-        real(DP) :: alpha
-
-        alpha = this%alpha
-
-        Epot_real_true(1) = erfc(alpha*r)/r**3 + 2._DP*alpha/sqrt(PI) * exp(-alpha**2*r**2) / r**2
-
-        Epot_real_true(2) = 3._DP*erfc(alpha*r)/r**5 + &
-                            2._DP*alpha/sqrt(PI) * (2._DP*alpha**2+3._DP/r**2) * &
-                            exp(-alpha**2*r**2) / r**2
-
-    end function Dipolar_Hard_Spheres_Epot_real_true
     
-    !> Initialisation: look-up (tabulation) table
-    
-    pure subroutine Dipolar_Hard_Spheres_set_Epot_real_tab(this)
-    
-        class(Dipolar_Hard_Spheres), intent(inout) :: this
-
-        integer :: i
-        real(DP) :: r_i
-        real(DP) :: alpha
-        
-        alpha = this%alpha
-       
-        ! cut
-        do i = this%real_iMin, this%real_iCut
-            r_i = real(i, DP)*this%real_dr
-            this%Epot_real_tab(i, :) = this%Epot_real_true(r_i)
-        end do
-        
-        ! shift
-        this%Epot_real_tab(:, 1) = this%Epot_real_tab(:, 1) - this%Epot_real_tab(this%real_iCut, 1)
-        this%Epot_real_tab(:, 2) = this%Epot_real_tab(:, 2) - this%Epot_real_tab(this%real_iCut, 2)
-
-    end subroutine Dipolar_Hard_Spheres_set_Epot_real_tab
-    
-    !> Initialisation
-    
-    subroutine Dipolar_Hard_Spheres_set_Epot_real_parameters(this, Box_size)
-        
-        class(Dipolar_Hard_Spheres), intent(inout) :: this
-        real(DP), dimension(:), intent(in) :: Box_size
-        
-        this%real_rCut = dipol_real_rCut_factor * Box_size(1)
-        this%real_dr = dipol_real_dr
-        call set_discrete_length(this%real_rMin, this%real_dr)
-        this%real_iMin = int(this%real_rMin/this%real_dr)
-        this%real_iCut = int(this%real_rCut/this%real_dr) + 1
-    end subroutine Dipolar_Hard_Spheres_set_Epot_real_parameters
-    
-    subroutine Dipolar_Hard_Spheres_set_Epot_real(this, Box_size)
-    
-        class(Dipolar_Hard_Spheres), intent(inout) :: this
-        real(DP), dimension(:), intent(in) :: Box_size
-        
-        call this%set_Epot_real_parameters(Box_size)
-        
-        if (allocated(this%Epot_real_tab)) deallocate(this%Epot_real_tab)
-        allocate(this%Epot_real_tab(this%real_iMin:this%real_iCut, 2))
-        
-        call this%set_Epot_real_tab()
-    
-    end subroutine Dipolar_Hard_Spheres_set_Epot_real
-
-    !> Write the tabulated values
-    
-    subroutine Dipolar_Hard_Spheres_write_Epot_real(this, Epot_unit)
-
-        class(Dipolar_Hard_Spheres), intent(in) :: this
-        integer, intent(in) :: Epot_unit
-
-        integer :: i
-        real(DP) :: r_i
-
-        do i = this%real_iMin, this%real_iCut
-            r_i = real(i, DP)*this%real_dr
-            write(Epot_unit, *) r_i, this%Epot_real_tab(i, :)
-        end do
-
-    end subroutine Dipolar_Hard_Spheres_write_Epot_real
-    
-    !> Linear interpolation
-
-    pure function Dipolar_Hard_Spheres_Epot_real_interpol(this, r) result(Epot_real_interpol)
-        
-        class(Dipolar_Hard_Spheres), intent(in) :: this
-        real(DP), intent(in) :: r
-        real(DP), dimension(2) :: Epot_real_interpol
-        
-        integer :: i
-        real(DP) :: r_i
-       
-        if (r < this%real_rCut) then
-            i = int(r/this%real_dr)
-            r_i = real(i, DP)*this%real_dr
-            Epot_real_interpol(:) = this%Epot_real_tab(i, :) + (r-r_i)/this%real_dr * &
-                                   (this%Epot_real_tab(i+1, :) - this%Epot_real_tab(i, :))
-        else
-            Epot_real_interpol(:) = 0._DP
-        end if
-        
-    end function Dipolar_Hard_Spheres_Epot_real_interpol
-
-    !> Between 2 particles
-    !> \f[ (\vec{\mu}_i\cdot\vec{\mu}_j) B(r_{ij}) -
-    !>     (\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij}) C(r_{ij}) \f]
-    
-    pure function Dipolar_Hard_Spheres_Epot_real_pair(this, mCol_i, mCol_j, rVec_ij, r_ij) &
-                  result(Epot_real_pair)
-    
-        class(Dipolar_Hard_Spheres), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: mCol_i, mCol_j
-        real(DP), dimension(:), intent(in) :: rVec_ij
-        real(DP), intent(in) :: r_ij
-        real(DP) :: Epot_real_pair
-        
-        real(DP), dimension(2) :: Epot_coeff
-        
-        Epot_coeff(1) = dot_product(mCol_i, mCol_j)
-        Epot_coeff(2) =-dot_product(mCol_i, rVec_ij) * dot_product(mCol_j, rVec_ij)
-        
-        Epot_real_pair = dot_product(Epot_coeff, this%Epot_real_interpol(r_ij))
-    
-    end function Dipolar_Hard_Spheres_Epot_real_pair
-    
-    !> Energy of 1 dipole with others
-    
-    pure function Dipolar_Hard_Spheres_Epot_real_solo(this, Box_size, particle) result(Epot_real_solo)
-
-        class(Dipolar_Hard_Spheres), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: Box_size
-        type(Particle_Index), intent(in) :: particle
-        real(DP) :: Epot_real_solo
-
-        integer :: j_particle
-        real(DP), dimension(Ndim) :: xCol_j
-        real(DP), dimension(Ndim) :: mCol_j
-        real(DP), dimension(Ndim) :: rVec_ij
-        real(DP) :: r_ij
-        
-        Epot_real_solo = 0._DP
-        do j_particle = 1, this%num_particles
-            if (j_particle /= particle%number) then
-            
-                xCol_j(:) = this%all_positions(:, j_particle)
-                rVec_ij = PBC_vector(Box_size, particle%position, xCol_j)
-                r_ij = norm2(rVec_ij)
-                mCol_j(:) = this%all_orientations(:, j_particle)
-
-                Epot_real_solo = Epot_real_solo + this%Epot_real_pair(particle%orientation, mCol_j, &
-                                                                      rVec_ij, r_ij)
-
-            end if
-        end do
-        
-    end function Dipolar_Hard_Spheres_Epot_real_solo
-    
-    !> Total real energy
-    
-    pure function Dipolar_Hard_Spheres_Epot_real(this, Box_size) result(Epot_real)
-    
-        class(Dipolar_Hard_Spheres), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: Box_size
-        real(DP) :: Epot_real
-        
-        integer :: i_particle
-        type(Particle_Index) :: particle
-    
-        Epot_real = 0._DP
-        
-        do i_particle = 1, this%num_particles
-            particle%number = i_particle
-            particle%position(:) = this%all_positions(:, particle%number)
-            particle%orientation(:) = this%all_orientations(:, particle%number)
-            Epot_real = Epot_real + this%Epot_real_solo(Box_size, particle)
-        end do
-
-        Epot_real = Epot_real/2._DP
-    
-    end function Dipolar_Hard_Spheres_Epot_real
-
     ! Reciprocal: long-range interaction ----------------------------------------------------------
     
     !> \f[
@@ -1142,11 +930,7 @@ contains
         class(Dipolar_Hard_Spheres), intent(inout) :: this
         type(Box_Dimensions), intent(in) :: Box
         
-
-        this%real_rMin = dipol_rMin_factor * this%diameter
-        
         call this%Epot_set_alpha(Box%size)
-        call this%set_Epot_real(Box%size)
         call this%set_Epot_reci(Box)
         call this%set_totalMoment()
         
@@ -1160,8 +944,8 @@ contains
         type(Box_Dimensions), intent(in) :: Box
         real(DP) :: Epot_conf
         
-        Epot_conf = this%Epot_real(Box%size) + this%Epot_reci(Box) - this%Epot_self() + &
-                    this%Epot_bound(Box%size)
+        Epot_conf = this%Epot_reci(Box) - this%Epot_self() + &
+                    this%Epot_bound(Box%size) ! this%Epot_real(Box%size)
     
     end function Dipolar_Hard_Spheres_Epot_conf
 

@@ -542,7 +542,7 @@ contains
                 this%switch_Nhit = this%switch_Nhit + 1
             else
                 call rotate(this%Box, &
-                            this%type1_spheres, this%type1_macro%rotation, this%type1_obs)
+                            this%type1_spheres, this%type1_macro, this%type1_obs)
             end if
             
         end do MC_Change
