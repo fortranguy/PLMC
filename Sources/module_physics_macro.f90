@@ -248,11 +248,11 @@ contains
     
     !> Spheres initialisations
     
-    subroutine init_spheres(Box, this, this_potential, write_potential, this_units, this_Epot) ! separate ?
+    subroutine init_spheres(Box, this, this_macro, write_potential, this_units, this_Epot) ! separate ?
     
         type(Box_Dimensions), intent(in) :: Box
         class(Hard_Spheres), intent(inout) :: this
-        class(Hard_Spheres_Potential), intent(inout) :: this_potential
+        class(Hard_Spheres_Macro), intent(inout) :: this_macro
         logical, intent(in) :: write_potential
         class(Units), intent(in) :: this_units
         real(DP), intent(out) :: this_Epot
@@ -260,12 +260,13 @@ contains
         call this%test_overlap(Box%size)
         call this%write_snap_data(this_units%snap_positions)
         call this%write_snap_positions(0, this_units%snapIni_positions)
-        call this_potential%construct(this%get_diameter())
-        this_Epot = this_potential%conf()
+        call this_macro%hard_potential%construct(this%get_diameter())
+        this_Epot = this_macro%hard_potential%conf()
         
         if (write_potential) then
-            call this_potential%write(this_units%Epot)
+            call this_macro%hard_potential%write(this_units%Epot)
         end if
+        
         select type (this)
             type is (Dipolar_Spheres)
                 call this%set_Epot(Box) ! ugly !
@@ -279,6 +280,11 @@ contains
                         end if
                         call this%Epot_reci_count_waveVectors(Box%wave, this_units%waveVectors)
                 end select
+        end select
+        
+        select type (this_macro)
+            type is (Dipolar_Spheres_Macro)
+                !this_macro%ewald%construct()
         end select
     
     end subroutine init_spheres

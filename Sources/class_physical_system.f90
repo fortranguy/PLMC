@@ -300,12 +300,12 @@ contains
         call init_mix(this%Box%size, this%mix, this%type1_spheres, this%type2_spheres, &
                       this%write_potential, this%mix_Epot_tab_unit, this%mix_Epot)
         call this%mix%write_report(this%mix_report_unit)
-        call init_spheres(this%Box, this%type1_spheres, this%type1_macro%hard_potential, &
-                          this%write_potential, this%type1_units, this%type1_obs%Epot)
+        call init_spheres(this%Box, this%type1_spheres, this%type1_macro, this%write_potential, &
+                          this%type1_units, this%type1_obs%Epot)
         call init_cells(this%Box%size, this%type1_spheres, this%type1_macro, this%type2_spheres, &
                         this%mix)
-        call init_spheres(this%Box, this%type2_spheres, this%type2_macro%hard_potential, &
-                          this%write_potential, this%type2_units, this%type2_obs%Epot)
+        call init_spheres(this%Box, this%type2_spheres, this%type2_macro, this%write_potential, &
+                          this%type2_units, this%type2_obs%Epot)
         call init_cells(this%Box%size, this%type2_spheres, this%type2_macro, this%type1_spheres, &
                         this%mix)
                         
