@@ -84,7 +84,7 @@ contains
                 k_dot_mCol = dot_product(wave_vector, orientation_div_box)
                           
                 this%structure(kx, ky, kz) = this%structure(kx, ky, kz) + &
-                                                       cmplx(k_dot_mCol, 0._DP, DP) * exp_IkxCol
+                                             cmplx(k_dot_mCol, 0._DP, DP) * exp_IkxCol
             
             end do
             
