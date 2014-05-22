@@ -304,18 +304,18 @@ contains
         call this%mix%write_report(this%mix_report_unit)
         
         call init_spheres(this%Box, this%type1_spheres, this%type1_units)
-        call init_cells(this%Box%size, this%type1_spheres, this%type1_macro, this%type2_spheres, &
-                        this%mix)
         call init_hard_potential(this%type1_macro%hard_potential, "Dipoles", &
                                  this%type1_spheres%get_diameter(), json)
+        call init_cells(this%Box%size, this%type1_spheres, this%type1_macro, this%type2_spheres, &
+                        this%mix)
         call set_ewald(this%Box, this%type1_spheres, this%type1_macro, json, this%type1_units)
         this%type1_obs%Epot = total_energy(this%Box, this%type1_spheres, this%type1_macro)
                         
         call init_spheres(this%Box, this%type2_spheres, this%type2_units)
-        call init_cells(this%Box%size, this%type2_spheres, this%type2_macro, this%type1_spheres, &
-                        this%mix)
         call init_hard_potential(this%type2_macro%hard_potential, "Hard Spheres", &
                                  this%type2_spheres%get_diameter(), json)
+        call init_cells(this%Box%size, this%type2_spheres, this%type2_macro, this%type1_spheres, &
+                        this%mix)        
         this%type2_obs%Epot = total_energy(this%Box, this%type2_spheres, this%type2_macro)
                         
         call this%write_all_reports()
