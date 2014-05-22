@@ -295,7 +295,7 @@ contains
         
         call init_random_seed(args%random, this%report_unit)
         call set_initial_configuration(this%Box%size, args%initial, this%type1_spheres, &
-                                       this%type2_spheres, this%mix%get_min_distance(), &
+                                       this%type2_spheres, this%mix%get_diameter(), &
                                        this%report_unit)
                                        
         this%mix_EpotSum = 0._DP        

@@ -5,7 +5,6 @@ module class_mixing_potential
 use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
 use data_precisions, only: DP, real_zero
 use data_box, only: Ndim
-use data_potential, only: mix_rMin_factor, mix_rCut, mix_dr, mix_epsilon, mix_alpha
 use data_neighbour_cells, only: NnearCell
 use json_module, only: json_file
 use module_types_micro, only: Node, Particle_Index
@@ -24,16 +23,16 @@ private
         
         character(len=5) :: name
         
-        real(DP) :: delta !< demixing length
+        real(DP) :: non_additivity
+        real(DP) :: diameter
         real(DP) :: min_distance
-        real(DP) :: rMin !< minimum distance between two particles
-        real(DP) :: rCut !< short-range cut
-        real(DP) :: dr !< discretisation step
-        integer :: iMin !< minimum index of tabulation: minimum distance
-        integer :: iCut !< maximum index of tabulation: until potential cut
+        real(DP) :: range_cut
+        real(DP) :: delta
+        integer :: i_min_distance
+        integer :: i_range_cut
         real(DP) :: epsilon !< factor in Yukawa
         real(DP) :: alpha !< coefficient in Yukawa
-        real(DP), dimension(:), allocatable :: Epot_tab !< tabulation
+        real(DP), dimension(:), allocatable :: tabulation !< tabulation
         
         real(DP), dimension(Ndim) :: cell_size
 
@@ -43,15 +42,14 @@ private
         procedure :: destroy => Mixing_Potential_destroy
         procedure :: write_report => Mixing_Potential_write_report
 
-        procedure :: get_min_distance => Mixing_Potential_get_min_distance
-        procedure :: get_rCut => Mixing_Potential_get_rCut
+        procedure :: get_diameter => Mixing_Potential_get_diameter
+        procedure :: get_range_cut => Mixing_Potential_get_range_cut
         procedure :: set_cell_size => Mixing_Potential_set_cell_size
         procedure :: get_cell_size => Mixing_Potential_get_cell_size
         
         procedure :: test_overlap => Mixing_Potential_test_overlap
-        procedure, private :: set_Epot_tab => Mixing_Potential_set_Epot_tab
-        procedure :: set_Epot => Mixing_Potential_set_Epot
-        procedure :: write_Epot => Mixing_Potential_write_Epot
+        procedure, private :: set_tabulation => Mixing_Potential_set_tabulation
+        procedure :: write => Mixing_Potential_write
         procedure, private :: Epot_pair => Mixing_Potential_Epot_pair
         procedure :: Epot_neighCells => Mixing_Potential_Epot_neighCells
         procedure :: Epot_conf => Mixing_Potential_Epot_conf
@@ -69,14 +67,46 @@ contains
         character(len=4096) :: data_name
         logical :: found
         
+        real(DP) :: min_distance_factor
+        
         this%name = "[mix]"
         write(output_unit, *) this%name, " class construction"
         
         data_name = "Particles.Mixing.non addivity"
+        call json%get(data_name, this%non_additivity, found)
+        call test_data_found(data_name, found)        
+        this%diameter = (type1_diameter + type2_diameter)/2._DP + this%non_additivity
+        
+        data_name = "Potential.Mixing.minimum distance factor"
+        call json%get(data_name, min_distance_factor, found)
+        call test_data_found(data_name, found)        
+        this%min_distance = min_distance_factor * this%diameter
+        
+        data_name = "Potential.Mixing.range cut"
+        call json%get(data_name, this%range_cut, found)
+        call test_data_found(data_name, found)        
+        if (this%range_cut < this%min_distance) then
+            this%range_cut = this%min_distance
+        end if
+        
+        data_name = "Potential.Mixing.delta"
         call json%get(data_name, this%delta, found)
+        call test_data_found(data_name, found)        
+        call set_discrete_length(this%min_distance, this%delta)
+        this%i_min_distance = int(this%min_distance/this%delta)
+        this%i_range_cut = int(this%range_cut/this%delta) + 1
+        
+        data_name = "Potential.Mixing.Yukawa.epsilon"
+        call json%get(data_name, this%epsilon, found)
         call test_data_found(data_name, found)
         
-        this%min_distance = (type1_diameter + type2_diameter)/2._DP + this%delta
+        data_name = "Potential.Mixing.Yukawa.alpha"
+        call json%get(data_name, this%alpha, found)
+        call test_data_found(data_name, found)
+        
+        if (allocated(this%tabulation)) deallocate(this%tabulation)
+        allocate(this%tabulation(this%i_min_distance:this%i_range_cut))
+        call this%set_tabulation()
 
     end subroutine Mixing_Potential_construct
 
@@ -86,7 +116,7 @@ contains
         
         write(output_unit, *) this%name, " class destruction"
         
-        if (allocated(this%Epot_tab)) deallocate(this%Epot_tab)
+        if (allocated(this%tabulation)) deallocate(this%tabulation)
     
     end subroutine Mixing_Potential_destroy
     
@@ -99,32 +129,32 @@ contains
         
         write(report_unit, *) "Data: "
         
-        write(report_unit, *) "    delta = ", this%delta
+        write(report_unit, *) "    non_additivity = ", this%non_additivity
         
         write(report_unit, *) "    epsilon = ", this%epsilon
         write(report_unit, *) "    alpha = ", this%alpha
-        write(report_unit, *) "    rCut = ", this%rCut
-        write(report_unit, *) "    dr = ", this%dr
+        write(report_unit, *) "    range_cut = ", this%range_cut
+        write(report_unit, *) "    delta = ", this%delta
         
     end subroutine Mixing_Potential_write_report
 
     !> Accessors & Mutators
 
-    pure function Mixing_Potential_get_min_distance(this) result(get_min_distance)
+    pure function Mixing_Potential_get_diameter(this) result(get_diameter)
         class(Mixing_Potential), intent(in) :: this
-        real(DP) :: get_min_distance
-        get_min_distance = this%min_distance
-    end function Mixing_Potential_get_min_distance
+        real(DP) :: get_diameter
+        get_diameter = this%diameter
+    end function Mixing_Potential_get_diameter
     
-    pure function Mixing_Potential_get_rCut(this) result(get_rCut)
+    pure function Mixing_Potential_get_range_cut(this) result(get_range_cut)
         class(Mixing_Potential), intent(in) :: this
-        real(DP) :: get_rCut
-        get_rCut = this%rCut
-    end function Mixing_Potential_get_rCut
+        real(DP) :: get_range_cut
+        get_range_cut = this%range_cut
+    end function Mixing_Potential_get_range_cut
     
     pure subroutine Mixing_Potential_set_cell_size(this)
         class(Mixing_Potential), intent(inout) :: this
-        this%cell_size(:) = this%rCut
+        this%cell_size(:) = this%range_cut
     end subroutine Mixing_Potential_set_cell_size
     
     pure function Mixing_Potential_get_cell_size(this) result(get_cell_size)
@@ -151,7 +181,7 @@ contains
                 type1_xCol(:) = type1%get_position(type1_i_particle)
                 type2_xCol(:) = type2%get_position(type2_i_particle)
                 r_mix = PBC_distance(Box_size, type1_xCol, type2_xCol)
-                if (r_mix < this%rMin) then
+                if (r_mix < this%min_distance) then
                     write(error_unit, *) this%name, ":    Overlap !", type1_i_particle, type2_i_particle
                     write(error_unit, *) "    r_mix = ", r_mix
                     error stop
@@ -163,37 +193,11 @@ contains
         write(output_unit, *) this%name, ":    Overlap test: OK !"
     
     end subroutine Mixing_Potential_test_overlap
-
-    !> Mixing_Potential energy
-    
-    subroutine Mixing_Potential_set_Epot(this)
-    
-        class(Mixing_Potential), intent(inout) :: this
-
-        this%rMin = mix_rMin_factor * this%min_distance
-        this%rCut = mix_rCut
-        
-        if (this%rCut < this%rMin) then
-            this%rCut = this%rMin
-        end if
-        
-        this%dr = mix_dr
-        call set_discrete_length(this%rMin, this%dr)
-        this%iMin = int(this%rMin/this%dr)
-        this%iCut = int(this%rCut/this%dr) + 1
-        this%epsilon = mix_epsilon
-        this%alpha = mix_alpha
-        
-        if (allocated(this%Epot_tab)) deallocate(this%Epot_tab)
-        allocate(this%Epot_tab(this%iMin:this%iCut))
-        call this%set_Epot_tab()
-        
-    end subroutine Mixing_Potential_set_Epot
     
     !> Tabulation of Yukawa potential
     !> \f[ \epsilon \frac{e^{-\alpha (r-r_{min})}}{r} \f]
     
-    pure subroutine Mixing_Potential_set_Epot_tab(this)
+    pure subroutine Mixing_Potential_set_tabulation(this)
     
         class(Mixing_Potential), intent(inout) :: this
 
@@ -201,19 +205,19 @@ contains
         real(DP) :: r_i
        
         ! cut
-        do i = this%iMin, this%iCut
-            r_i = real(i, DP)*this%dr
-            this%Epot_tab(i) = Epot_yukawa(this%epsilon, this%alpha, this%rMin, r_i)
+        do i = this%i_min_distance, this%i_range_cut
+            r_i = real(i, DP)*this%delta
+            this%tabulation(i) = Epot_yukawa(this%epsilon, this%alpha, this%min_distance, r_i)
         end do
         
         ! shift
-        this%Epot_tab(:) = this%Epot_tab(:) - this%Epot_tab(this%iCut)
+        this%tabulation(:) = this%tabulation(:) - this%tabulation(this%i_range_cut)
 
-    end subroutine Mixing_Potential_set_Epot_tab
+    end subroutine Mixing_Potential_set_tabulation
     
     !> Write the tabulated potential
     
-    subroutine Mixing_Potential_write_Epot(this, Epot_unit)
+    subroutine Mixing_Potential_write(this, Epot_unit)
 
         class(Mixing_Potential), intent(in) :: this
         integer, intent(in) :: Epot_unit
@@ -221,12 +225,12 @@ contains
         integer :: i
         real(DP) :: r_i
 
-        do i = this%iMin, this%iCut
-            r_i = real(i, DP)*this%dr
-            write(Epot_unit, *) r_i, this%Epot_tab(i)
+        do i = this%i_min_distance, this%i_range_cut
+            r_i = real(i, DP)*this%delta
+            write(Epot_unit, *) r_i, this%tabulation(i)
         end do
 
-    end subroutine Mixing_Potential_write_Epot
+    end subroutine Mixing_Potential_write
     
     !> Total potential energy
     
@@ -291,7 +295,7 @@ contains
 
                 if (current%number /= particle%other_number) then
                     r = PBC_distance(Box_size, particle%position, other%get_position(current%number))
-                    if (r < this%rMin) then
+                    if (r < this%min_distance) then
                         overlap = .true.
                         return
                     end if
@@ -317,10 +321,10 @@ contains
         integer :: i
         real(DP) :: r_i
        
-        if (r < this%rCut) then
-            i = int(r/this%dr)
-            r_i = real(i, DP)*this%dr
-            Epot_pair = this%Epot_tab(i) + (r-r_i)/this%dr * (this%Epot_tab(i+1)-this%Epot_tab(i))
+        if (r < this%range_cut) then
+            i = int(r/this%delta)
+            r_i = real(i, DP)*this%delta
+            Epot_pair = this%tabulation(i) + (r-r_i)/this%delta * (this%tabulation(i+1)-this%tabulation(i))
         else
             Epot_pair = 0._DP
         end if

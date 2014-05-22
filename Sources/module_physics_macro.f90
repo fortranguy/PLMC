@@ -286,7 +286,7 @@ contains
                                              this_macro%hard_potential%get_range_cut())
         call this_macro%same_cells%all_cols_to_cells(this_spheres%get_num_particles(), this_spheres)
         
-        call this_macro%mix_cells%construct(Box_size, mix%get_cell_size(), mix%get_rCut())
+        call this_macro%mix_cells%construct(Box_size, mix%get_cell_size(), mix%get_range_cut())
         call this_macro%mix_cells%all_cols_to_cells(other_spheres%get_num_particles(), other_spheres)
 
     end subroutine init_cells
@@ -394,9 +394,8 @@ contains
         real(DP), intent(out) :: mix_Epot
     
         call mix%test_overlap(Box_size, spheres1, spheres2)
-        call mix%set_Epot()
         if (write_potential) then
-            call mix%write_Epot(mix_Epot_unit)
+            call mix%write(mix_Epot_unit)
         end if
         call mix%set_cell_size()
         mix_Epot = mix%Epot_conf(Box_size, spheres1, spheres2)
@@ -415,7 +414,6 @@ contains
         real(DP), intent(out) :: mix_Epot_conf
         
         call mix%test_overlap(Box_size, spheres1, spheres2)
-        call mix%set_Epot()
         mix_Epot_conf = mix%Epot_conf(Box_size, spheres1, spheres2)
         call test_consist(mix_Epot, mix_Epot_conf, mix_report_unit)
     
