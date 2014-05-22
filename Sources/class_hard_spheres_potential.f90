@@ -62,8 +62,7 @@ contains
         real(DP) :: get_range_cut
         
         get_range_cut = this%range_cut
-    end function Hard_Spheres_Potential_get_range_cut
-    
+    end function Hard_Spheres_Potential_get_range_cut    
     
     subroutine Hard_Spheres_write_report(this, unit)
         class(Hard_Spheres_Potential), intent(in) :: this
