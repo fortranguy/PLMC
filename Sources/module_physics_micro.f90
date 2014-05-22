@@ -157,9 +157,9 @@ contains
     !>           2\frac{\alpha}{\sqrt{\pi}}\frac{e^{-\alpha^2 r^2}}{r^2} \f]
     
     pure function ewald_real_B(alpha, r)    
-        real(DP) :: ewald_real_B
         real(DP), intent(in) :: alpha
         real(DP), intent(in) :: r
+        real(DP) :: ewald_real_B
     
         ewald_real_B = erfc(alpha*r)/r**3 + 2._DP*alpha/sqrt(PI) * exp(-alpha**2*r**2) / r**2
     
@@ -170,9 +170,9 @@ contains
     !>                                     \frac{e^{-\alpha^2 r^2}}{r^2} \f]
     
     pure function ewald_real_C(alpha, r)    
-        real(DP) :: ewald_real_C
         real(DP), intent(in) :: alpha
         real(DP), intent(in) :: r
+        real(DP) :: ewald_real_C
     
         ewald_real_C = 3._DP*erfc(alpha*r)/r**5 + &
                        2._DP*alpha/sqrt(PI) * (2._DP*alpha**2+3._DP/r**2) * &
