@@ -328,7 +328,7 @@ contains
         call json%get(data_name, alpha_factor, found)
         call test_data_found(data_name, found)
         
-        alpha = alpha_factor * Box%size(1)
+        alpha = alpha_factor / Box%size(1)
         min_distance = this_macro%hard_potential%get_min_distance()
         call this_macro%ewald_real%construct(Box%size, alpha, min_distance, json)
         call this_macro%ewald_reci%construct(Box, alpha, this_spheres)
