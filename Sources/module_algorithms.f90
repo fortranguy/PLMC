@@ -205,10 +205,11 @@ contains
                             select type (this_macro)
                                 type is (Dipolar_Hard_Spheres_Macro)                                
                                     this_EpotTest = this_macro%ewald_real%solo(Box%size, this_spheres, test) + &
-                                                    this_macro%ewald_reci%exchange(Box, test)
+                                                    this_macro%ewald_reci%exchange(Box, test) - &
+                                                    this_macro%ewald_self%solo(test%orientation)
+                                                    
                             end select
-                            this_EpotTest = this_EpotTest - &
-                                            this_spheres%Epot_self_solo(test%orientation) + &
+                            this_EpotTest = this_EpotTest + &
                                             this_spheres%deltaEpot_bound_exchange(Box%size, &
                                                                                   test%orientation)
                     end select
@@ -484,7 +485,7 @@ contains
         real_EpotNew = macro%ewald_real%solo(Box%size, spheres, new)
         deltaEpot_real = real_EpotNew - real_EpotOld
         
-        deltaEpot_self = spheres%Epot_self_solo(new%orientation) - spheres%Epot_self_solo(old%orientation)
+        deltaEpot_self = macro%ewald_self%solo(new%orientation) - macro%ewald_self%solo(old%orientation)
         
         deltaEpot = deltaEpot_real + macro%ewald_reci%rotation(Box, old, new) - &
                     deltaEpot_self + spheres%deltaEpot_bound_rotate(Box%size, old%orientation, &

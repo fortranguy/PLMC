@@ -53,8 +53,6 @@ private
         !>     Real
         !>     Reciprocal
         !>     Self
-        procedure :: Epot_self_solo => Dipolar_Hard_Spheres_Epot_self_solo
-        procedure, private :: Epot_self => Dipolar_Hard_Spheres_Epot_self
         !>     Total moment
         procedure, private :: set_totalMoment => Dipolar_Hard_Spheres_set_totalMoment
         procedure :: reset_totalMoment => Dipolar_Hard_Spheres_reset_totalMoment
@@ -167,38 +165,6 @@ contains
         end if
 
     end subroutine Dipolar_Hard_Spheres_write_snap_orientations
-    
-    ! Self: correction ----------------------------------------------------------------------------
-    
-    !> Self energy of 1 dipole
-    !> \f[ \frac{2}{3}\frac{\alpha^3}{\sqrt{\pi}} \vec{\mu}_i\cdot\vec{\mu}_i \f]
-    
-    pure function Dipolar_Hard_Spheres_Epot_self_solo(this, mCol) result(Epot_self_solo)
-    
-        class(Dipolar_Hard_Spheres), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: mCol
-        real(DP) :: Epot_self_solo
-        
-        Epot_self_solo = 2._DP/3._DP * this%alpha**3/sqrt(PI) * dot_product(mCol, mCol)
-    
-    end function Dipolar_Hard_Spheres_Epot_self_solo
-    
-    !> Total self energy
-    !> \f[ \frac{2}{3}\frac{\alpha^3}{\sqrt{\pi}} \sum_i \vec{\mu}_i\cdot\vec{\mu}_i \f]
-    
-    pure function Dipolar_Hard_Spheres_Epot_self(this) result(Epot_self)
-    
-        class(Dipolar_Hard_Spheres), intent(in) :: this
-        real(DP) :: Epot_self
-
-        integer :: i_particle
-        
-        Epot_self = 0._DP
-        do i_particle = 1, this%num_particles
-            Epot_self = Epot_self + this%Epot_self_solo(this%all_orientations(:, i_particle))
-        end do
-        
-    end function Dipolar_Hard_Spheres_Epot_self
 
     ! Total moment ---------------------------------------------------------------------------------
 
@@ -347,8 +313,8 @@ contains
         type(Box_Dimensions), intent(in) :: Box
         real(DP) :: Epot_conf
         
-        Epot_conf = - this%Epot_self() + &
-                    this%Epot_bound(Box%size) ! this%Epot_real(Box%size) + this%Epot_reci(Box)
+        Epot_conf = this%Epot_bound(Box%size) ! this%Epot_real(Box%size) + this%Epot_reci(Box) -
+                                              ! this%Epot_self()
     
     end function Dipolar_Hard_Spheres_Epot_conf
 
