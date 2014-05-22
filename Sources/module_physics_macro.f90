@@ -23,7 +23,8 @@ use class_units
 implicit none
 private
 public init_random_seed, set_initial_configuration, &
-       init_spheres, init_cells, init_hard_potential, init_ewald, final_spheres, init_mix, mix_final, &
+       init_spheres, init_cells, init_hard_potential, init_ewald, total_energy, & 
+       final_spheres, init_mix, mix_final, &
        adapt_move, adapt_rotation, test_consist
 
 contains
@@ -343,6 +344,29 @@ contains
         call this_macro%ewald_self%set_alpha(alpha)
     
     end subroutine init_ewald
+    
+    pure function total_energy(Box, this_spheres, this_macro)
+    
+        type(Box_Dimensions), intent(in) :: Box
+        class(Hard_Spheres), intent(in) :: this_spheres
+        class(Hard_Spheres_Macro), intent(in) :: this_macro
+        real(DP) :: total_energy
+        
+        total_energy = this_macro%hard_potential%total(Box%size, this_spheres)
+        
+        select type (this_spheres)
+            type is (Dipolar_Hard_Spheres)
+                select type (this_macro)
+                    type is (Dipolar_Hard_Spheres_Macro)
+                        total_energy = total_energy + &
+                                       this_macro%ewald_real%total(Box%size, this_spheres) + &
+                                       this_macro%ewald_reci%total(Box) - &
+                                       this_macro%ewald_self%total(this_spheres) + &
+                                       this_macro%ewald_bound%total(Box%size)
+                end select
+        end select
+        
+    end function total_energy
     
     !> Spheres finalizations
     

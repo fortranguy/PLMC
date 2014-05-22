@@ -17,6 +17,7 @@ use class_units
 use module_monte_carlo_arguments, only: read_arguments
 use module_physics_macro, only: init_random_seed, set_initial_configuration, &
                                 init_spheres, init_cells, init_hard_potential, init_ewald, &
+                                total_energy, &
                                 final_spheres, &
                                 init_mix, mix_final, &
                                 adapt_move, adapt_rotation, test_consist
@@ -308,14 +309,14 @@ contains
         call init_hard_potential(this%type1_macro%hard_potential, "Dipoles", &
                                  this%type1_spheres%get_diameter(), json)
         call init_ewald(this%Box, this%type1_spheres, this%type1_macro, json, this%type1_units)
-        this%type1_obs%Epot = this%type1_macro%hard_potential%total(this%Box%size, this%type1_spheres)
+        this%type1_obs%Epot = total_energy(this%Box, this%type1_spheres, this%type1_macro)
                         
         call init_spheres(this%Box, this%type2_spheres, this%type2_units)
         call init_cells(this%Box%size, this%type2_spheres, this%type2_macro, this%type1_spheres, &
                         this%mix)
         call init_hard_potential(this%type2_macro%hard_potential, "Hard Spheres", &
                                  this%type2_spheres%get_diameter(), json)
-        this%type2_obs%Epot = this%type2_macro%hard_potential%total(this%Box%size, this%type2_spheres)
+        this%type2_obs%Epot = total_energy(this%Box, this%type2_spheres, this%type2_macro)
                         
         call this%write_all_reports()
         if (this%write_potential) then
