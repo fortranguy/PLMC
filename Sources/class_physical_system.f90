@@ -675,7 +675,8 @@ contains
         if (modulo(iStep, this%reset_iStep) == 0) then
             call this%type1_macro%ewald_reci%reset_structure(this%Box, this%type1_spheres, iStep, &
                                                              this%type1_units%structure_modulus)
-            call this%type1_spheres%reset_totalMoment(iStep, this%type1_units%totalMoment_modulus)
+            call this%type1_macro%ewald_bound%reset_total_moment(this%type1_spheres, iStep, &
+                 this%type1_units%totalMoment_modulus)
         end if
         
     end subroutine Physical_System_reinitialize_quantites

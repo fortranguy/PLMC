@@ -29,7 +29,6 @@ private
         real(DP), dimension(:, :), allocatable, public :: all_orientations
         ! Potential
         real(DP) :: alpha !< coefficient of Ewald summation
-        real(DP), dimension(Ndim) :: totalMoment
         
     contains
 
@@ -54,13 +53,7 @@ private
         !>     Reciprocal
         !>     Self
         !>     Total moment
-        procedure, private :: set_totalMoment => Dipolar_Hard_Spheres_set_totalMoment
-        procedure :: reset_totalMoment => Dipolar_Hard_Spheres_reset_totalMoment
-        procedure :: update_totalMoment_rotate => Dipolar_Hard_Spheres_update_totalMoment_rotate
         !>     Boundary conditions
-        procedure :: deltaEpot_bound_rotate => Dipolar_Hard_Spheres_deltaEpot_bound_rotate
-        procedure :: deltaEpot_bound_exchange => Dipolar_Hard_Spheres_deltaEpot_bound_exchange
-        procedure, private :: Epot_bound => Dipolar_Hard_Spheres_Epot_bound
         !>     Total
         procedure :: set_Epot => Dipolar_Hard_Spheres_set_Epot
         procedure :: Epot_conf => Dipolar_Hard_Spheres_Epot_conf
@@ -165,131 +158,6 @@ contains
         end if
 
     end subroutine Dipolar_Hard_Spheres_write_snap_orientations
-
-    ! Total moment ---------------------------------------------------------------------------------
-
-    !> Total dipole moment :
-    !> \f[ \vec{M} = \sum_j \vec{\mu}_j \f]
-    !> \f[ \vec{M}_\underline{l} = \sum_{j \neq l} \vec{\mu}_j \f]
-    
-    pure subroutine Dipolar_Hard_Spheres_set_totalMoment(this)
-        class(Dipolar_Hard_Spheres), intent(inout) :: this
-        integer :: i_particle
-        this%totalMoment(:) = 0._DP
-        do i_particle = 1, this%num_particles
-            this%totalMoment(:) = this%totalMoment(:) + this%all_orientations(:, i_particle)
-        end do
-    end subroutine Dipolar_Hard_Spheres_set_totalMoment
-
-    !> Reinitialise the total moment factor and write the drift
-
-    subroutine Dipolar_Hard_Spheres_reset_totalMoment(this, iStep, modulus_unit)
-
-        class(Dipolar_Hard_Spheres), intent(inout) :: this
-        integer, intent(in) :: iStep
-        integer, intent(in) :: modulus_unit
-
-        real(DP) :: modulus_drifted, modulus_reInit
-
-        modulus_drifted = norm2(this%totalMoment(:))
-        call this%set_totalMoment()
-        modulus_reInit = norm2(this%totalMoment(:))
-
-        write(modulus_unit, *) iStep, abs(modulus_reInit - modulus_drifted)
-
-    end subroutine Dipolar_Hard_Spheres_reset_totalMoment
-
-    !> Rotation
-
-    !> Update the total moment
-    !> \f[
-    !>      \Delta \vec{M} = \vec{\mu}^\prime_l - \vec{\mu}_l
-    !> \f]
-
-    pure subroutine Dipolar_Hard_Spheres_update_totalMoment_rotate(this, mOld, mNew)
-
-        class(Dipolar_Hard_Spheres), intent(inout) :: this
-        real(DP), dimension(:), intent(in) :: mOld, mNew
-
-        this%totalMoment(:) = this%totalMoment(:) + mNew(:) - mOld(:)
-
-    end subroutine Dipolar_Hard_Spheres_update_totalMoment_rotate
-
-    ! Boundary conditions: shape-dependent -------------------------------------------------------
-    
-    !> Exchange
-    
-    !> Difference of Energy: add
-    !> \f[
-    !>      \Delta U_{N \rightarrow N+1} = \frac{2\pi}{3V} [
-    !>                                         (\vec{\mu}_{N+1} \cdot \vec{\mu}_{N+1})
-    !>                                          +2(\vec{\mu} \cdot \vec{M}_N)
-    !>                                     ]
-    !> \f]
-    
-    !> Difference of Energy: remove
-    !> \f[
-    !>      \Delta U_{N \rightarrow N-1} = \frac{2\pi}{3V} [
-    !>                                          (\vec{\mu}_{N+1} \cdot \vec{\mu}_{N+1})
-    !>                                          -2(\vec{\mu} \cdot \vec{M}_N)
-    !>                                      ]
-    !> \f]
-    
-    pure function Dipolar_Hard_Spheres_deltaEpot_bound_exchange(this, Box_size, mCol) &
-                  result (deltaEpot_bound_exchange)
-    
-        class(Dipolar_Hard_Spheres), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: Box_size
-        real(DP), dimension(:), intent(in) :: mCol
-        real(DP) :: deltaEpot_bound_exchange
-        
-        deltaEpot_bound_exchange = dot_product(mCol, mCol) + &
-                                   2._DP * dot_product(mCol, this%totalMoment)
-                          
-        deltaEpot_bound_exchange = 2._DP*PI/3._DP/product(Box_size) * deltaEpot_bound_exchange
-    
-    end function Dipolar_Hard_Spheres_deltaEpot_bound_exchange
-    
-    !> Rotation
-    
-    !> Difference of Energy
-    !> \f[
-    !>      \Delta U = \frac{2\pi}{3V} [
-    !>                      (\vec{\mu}^\prime_l \cdot \vec{\mu}^\prime_l) -
-    !>                      (\vec{\mu}_l \cdot \vec{\mu}_l) +
-    !>                      2 (\vec{\mu}^\prime_l - \vec{\mu}_l) \cdot \vec{M}_\underline{l}
-    !>                 ]
-    !> \f]
-    
-    pure function Dipolar_Hard_Spheres_deltaEpot_bound_rotate(this, Box_size, mOld, mNew) &
-                  result (deltaEpot_bound_rotate)
-    
-        class(Dipolar_Hard_Spheres), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: Box_size
-        real(DP), dimension(:), intent(in) :: mOld, mNew
-        real(DP) :: deltaEpot_bound_rotate
-        
-        deltaEpot_bound_rotate = dot_product(mNew, mNew) - dot_product(mOld, mOld) + &
-                                 2._DP*dot_product(mNew-mOld, this%totalMoment-mOld)
-                          
-        deltaEpot_bound_rotate = 2._DP*PI/3._DP/product(Box_size) * deltaEpot_bound_rotate
-    
-    end function Dipolar_Hard_Spheres_deltaEpot_bound_rotate
-    
-    !> Total shape dependent term
-    !> \f[
-    !>      J(\vec{M}, S) = \frac{2\pi}{3V} | \vec{M}|^2
-    !> \f]
-    
-    pure function Dipolar_Hard_Spheres_Epot_bound(this, Box_size) result(Epot_bound)
-    
-        class(Dipolar_Hard_Spheres), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: Box_size
-        real(DP) :: Epot_bound
-        
-        Epot_bound = 2._DP*PI/3._DP/product(Box_size) * dot_product(this%totalMoment, this%totalMoment)
-    
-    end function Dipolar_Hard_Spheres_Epot_bound
     
     ! Total potential energy ----------------------------------------------------------------------
     
@@ -301,7 +169,6 @@ contains
         type(Box_Dimensions), intent(in) :: Box
         
         call this%Epot_set_alpha(Box%size)
-        call this%set_totalMoment()
         
     end subroutine Dipolar_Hard_Spheres_set_Epot
 
@@ -313,8 +180,8 @@ contains
         type(Box_Dimensions), intent(in) :: Box
         real(DP) :: Epot_conf
         
-        Epot_conf = this%Epot_bound(Box%size) ! this%Epot_real(Box%size) + this%Epot_reci(Box) -
-                                              ! this%Epot_self()
+        Epot_conf = 0 ! this%Epot_real(Box%size) + this%Epot_reci(Box) - this%Epot_self() + &
+                      ! this%Epot_bound(Box%size)
     
     end function Dipolar_Hard_Spheres_Epot_conf
 

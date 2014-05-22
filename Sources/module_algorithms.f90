@@ -204,14 +204,14 @@ contains
                             test%orientation(:) = random_surface()
                             select type (this_macro)
                                 type is (Dipolar_Hard_Spheres_Macro)                                
-                                    this_EpotTest = this_macro%ewald_real%solo(Box%size, this_spheres, test) + &
+                                    this_EpotTest = this_macro%ewald_real%solo(Box%size, this_spheres, &
+                                                                               test) + &
                                                     this_macro%ewald_reci%exchange(Box, test) - &
-                                                    this_macro%ewald_self%solo(test%orientation)
-                                                    
-                            end select
-                            this_EpotTest = this_EpotTest + &
-                                            this_spheres%deltaEpot_bound_exchange(Box%size, &
+                                                    this_macro%ewald_self%solo(test%orientation) + &
+                                                    this_macro%ewald_bound%exchange(Box%size, &
                                                                                   test%orientation)
+                                                    
+                            end select                                            
                     end select
                 
                     EpotTest = this_EpotTest + mix_EpotTest
@@ -488,14 +488,14 @@ contains
         deltaEpot_self = macro%ewald_self%solo(new%orientation) - macro%ewald_self%solo(old%orientation)
         
         deltaEpot = deltaEpot_real + macro%ewald_reci%rotation(Box, old, new) - &
-                    deltaEpot_self + spheres%deltaEpot_bound_rotate(Box%size, old%orientation, &
-                                                                    new%orientation)
+                    deltaEpot_self + macro%ewald_bound%rotation(Box%size, old%orientation, &
+                                                                          new%orientation)
         
         call random_number(random)
         if (random < exp(-deltaEpot/Box%temperature)) then
         
             call macro%ewald_reci%update_structure_rotation(Box, old, new)
-            call spheres%update_totalMoment_rotate(old%orientation, new%orientation)
+            call macro%ewald_bound%update_total_moment_rotation(old%orientation, new%orientation)
             call spheres%set_orientation(old%number, new%orientation)
             
             obs%Epot = obs%Epot + deltaEpot
