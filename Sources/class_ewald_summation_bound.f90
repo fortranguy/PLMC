@@ -15,9 +15,11 @@ private
         procedure :: set_total_moment => Ewald_Summation_Bound_set_total_moment
         procedure :: reset_total_moment => Ewald_Summation_Bound_reset_total_moment
         procedure :: total => Ewald_Summation_Bound_total
+        
         procedure :: rotation => Ewald_Summation_Bound_rotation
         procedure :: update_total_moment_rotation => Ewald_Summation_Bound_update_total_moment_rotation
         procedure :: exchange => Ewald_Summation_Bound_exchange
+        procedure :: update_total_moment_exchange => Ewald_Summation_Bound_update_total_moment_exchange
     end type Ewald_Summation_Bound
 
 contains
@@ -144,6 +146,27 @@ contains
                           
         exchange = 2._DP*PI/3._DP / product(Box_size) * exchange
     
-    end function Ewald_Summation_Bound_exchange    
+    end function Ewald_Summation_Bound_exchange   
+    
+    !> Exchange
+
+    !> Update the total moment: add
+    !> \f[
+    !>      \Delta \vec{M} = +\vec{\mu}_l
+    !> \f]
+
+    !> Update the total moment: remove
+    !> \f[
+    !>      \Delta \vec{M} = -\vec{\mu}_l
+    !> \f]
+
+    pure subroutine Ewald_Summation_Bound_update_total_moment_exchange(this, orientation)
+
+        class(Ewald_Summation_Bound), intent(inout) :: this
+        real(DP), dimension(:), intent(in) :: orientation
+
+        this%total_moment(:) = this%total_moment(:) + orientation(:)
+
+    end subroutine Ewald_Summation_Bound_update_total_moment_exchange 
 
 end module class_ewald_summation_bound
