@@ -16,7 +16,7 @@ use class_observables
 use class_units
 use module_monte_carlo_arguments, only: read_arguments
 use module_physics_macro, only: init_random_seed, set_initial_configuration, &
-                                init_spheres, init_cells, init_hard_potential, init_ewald, &
+                                init_spheres, init_cells, init_hard_potential, set_ewald, &
                                 total_energy, &
                                 final_spheres, &
                                 init_mix, mix_final, &
@@ -308,7 +308,7 @@ contains
                         this%mix)
         call init_hard_potential(this%type1_macro%hard_potential, "Dipoles", &
                                  this%type1_spheres%get_diameter(), json)
-        call init_ewald(this%Box, this%type1_spheres, this%type1_macro, json, this%type1_units)
+        call set_ewald(this%Box, this%type1_spheres, this%type1_macro, json, this%type1_units)
         this%type1_obs%Epot = total_energy(this%Box, this%type1_spheres, this%type1_macro)
                         
         call init_spheres(this%Box, this%type2_spheres, this%type2_units)
@@ -321,6 +321,7 @@ contains
         call this%write_all_reports()
         if (this%write_potential) then
             call this%type1_macro%hard_potential%write(this%type1_units%Epot)
+            call this%type1_macro%ewald_real%write(this%type1_units%Epot_real)
             call this%type2_macro%hard_potential%write(this%type2_units%Epot)
         end if
         
@@ -400,15 +401,31 @@ contains
     ! Finalisation
     
     subroutine Physical_System_final(this)    
+    
         class(Physical_System), intent(inout) :: this
         
-        call final_spheres(this%Box, this%type1_spheres, this%type1_units, this%type1_obs)
-        call final_spheres(this%Box, this%type2_spheres, this%type2_units, this%type2_obs)
+        type(json_file) :: json        
+        real(DP) :: type1_energy, type2_energy
+        
+        call json_initialize()
+        call json%load_file(filename = "data.json")
+        
+        call final_spheres(this%Box, this%type1_spheres, this%type1_units)
+        call set_ewald(this%Box, this%type1_spheres, this%type1_macro, json, this%type1_units)
+        type1_energy = total_energy(this%Box, this%type1_spheres, this%type1_macro)
+        call test_consist(this%type1_obs%Epot, type1_energy, this%type1_units%report)
+        
+        call final_spheres(this%Box, this%type2_spheres, this%type2_units)
+        type2_energy = total_energy(this%Box, this%type2_spheres, this%type2_macro)
+        call test_consist(this%type2_obs%Epot, type2_energy, this%type2_units%report)
+        
         call mix_final(this%Box%size, this%mix, this%type1_spheres, this%type2_spheres, &
                        this%mix_report_unit, this%mix_Epot, this%mix_Epot_conf)
         
         call this%write_all_results()
         call this%close_units()
+        
+        call json%destroy()
     
     end subroutine Physical_System_final
     
@@ -430,8 +447,8 @@ contains
         real(DP) :: duration
         
         Epot = this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
-        Epot_conf = this%type1_spheres%Epot_conf(this%Box) + &
-                    this%type2_macro%hard_potential%total(this%Box%size, this%type2_spheres) + &
+        Epot_conf = total_energy(this%Box, this%type1_spheres, this%type1_macro) + &
+                    total_energy(this%Box, this%type2_spheres, this%type2_macro) + &
                     this%mix_Epot_conf
         call test_consist(Epot, Epot_conf, this%report_unit)
         this%EpotSum = this%type1_obs%EpotSum + this%type2_obs%EpotSum + this%mix_EpotSum

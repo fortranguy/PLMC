@@ -23,7 +23,7 @@ use class_units
 implicit none
 private
 public init_random_seed, set_initial_configuration, &
-       init_spheres, init_cells, init_hard_potential, init_ewald, total_energy, & 
+       init_spheres, init_cells, init_hard_potential, set_ewald, total_energy, & 
        final_spheres, init_mix, mix_final, &
        adapt_move, adapt_rotation, test_consist
 
@@ -263,16 +263,10 @@ contains
         
         select type (this_spheres)
             type is (Dipolar_Hard_Spheres)
-                !call this_spheres%set_Epot(Box) ! ugly !
-                !this_Epot = this_Epot + this_spheres%Epot_conf(Box) ! temp
                 select type (this_units)
                     type is (MoreUnits)
                         call this_spheres%write_snap_data(this_units%snap_orientations)
                         call this_spheres%write_snap_orientations(0, this_units%snapIni_orientations)
-                        !if (write_potential) then
-                        !    call this_spheres%write_Epot_real(this_units%Epot_real)
-                        !end if
-                        !call this_spheres%Epot_reci_count_waveVectors(Box%wave, this_units%waveVectors)
                 end select
         end select
     
@@ -316,7 +310,7 @@ contains
                                                        
     end subroutine init_hard_potential
     
-    subroutine init_ewald(Box, this_spheres, this_macro, json, this_units)
+    subroutine set_ewald(Box, this_spheres, this_macro, json, this_units)
     
         type(Box_Dimensions), intent(in) :: Box
         class(Dipolar_Hard_Spheres), intent(in) :: this_spheres
@@ -337,13 +331,12 @@ contains
         alpha = alpha_factor * Box%size(1)
         min_distance = this_macro%hard_potential%get_min_distance()
         call this_macro%ewald_real%construct(Box%size, alpha, min_distance, json)
-        
         call this_macro%ewald_reci%construct(Box, alpha, this_spheres)
-        call this_macro%ewald_reci%count_wave_vectors(Box%wave, this_units%waveVectors)
-        
-        call this_macro%ewald_self%set_alpha(alpha)
+        call this_macro%ewald_reci%count_wave_vectors(Box%wave, this_units%waveVectors)        
+        call this_macro%ewald_self%set_alpha(alpha)        
+        call this_macro%ewald_bound%set_total_moment(this_spheres)
     
-    end subroutine init_ewald
+    end subroutine set_ewald
     
     pure function total_energy(Box, this_spheres, this_macro)
     
@@ -370,27 +363,20 @@ contains
     
     !> Spheres finalizations
     
-    subroutine final_spheres(Box, this, this_units, this_obs)
+    subroutine final_spheres(Box, this_spheres, this_units)
     
         type(Box_Dimensions), intent(in) :: Box
-        class(Hard_Spheres), intent(inout) :: this
+        class(Hard_Spheres), intent(inout) :: this_spheres
         class(Units), intent(in) :: this_units
-        class(Observables), intent(in) :: this_obs
         
-        call this%test_overlap(Box%size)
-        select type (this)
-            type is (Dipolar_Hard_Spheres)
-                call this%set_Epot(Box) ! ugly !
-                call test_consist(this_obs%Epot, this%Epot_conf(Box), this_units%report)
-                ! for HS too ?
-        end select
-        call this%write_snap_positions(0, this_units%snapFin_positions)
+        call this_spheres%test_overlap(Box%size)
+        call this_spheres%write_snap_positions(0, this_units%snapFin_positions)
         
-        select type (this)
+        select type (this_spheres)
             type is (Dipolar_Hard_Spheres)
                 select type (this_units)
                     type is (MoreUnits)
-                        call this%write_snap_orientations(0, this_units%snapFin_orientations)
+                        call this_spheres%write_snap_orientations(0, this_units%snapFin_orientations)
                 end select
         end select
     

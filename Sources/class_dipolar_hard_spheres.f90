@@ -55,8 +55,6 @@ private
         !>     Total moment
         !>     Boundary conditions
         !>     Total
-        procedure :: set_Epot => Dipolar_Hard_Spheres_set_Epot
-        procedure :: Epot_conf => Dipolar_Hard_Spheres_Epot_conf
         
     end type Dipolar_Hard_Spheres
     
@@ -158,31 +156,5 @@ contains
         end if
 
     end subroutine Dipolar_Hard_Spheres_write_snap_orientations
-    
-    ! Total potential energy ----------------------------------------------------------------------
-    
-    !> Potential energy initialisation
-    
-    subroutine Dipolar_Hard_Spheres_set_Epot(this, Box)
-    
-        class(Dipolar_Hard_Spheres), intent(inout) :: this
-        type(Box_Dimensions), intent(in) :: Box
-        
-        call this%Epot_set_alpha(Box%size)
-        
-    end subroutine Dipolar_Hard_Spheres_set_Epot
-
-    !> Total potential energy of a configuration
-    
-    pure function Dipolar_Hard_Spheres_Epot_conf(this, Box) result(Epot_conf)
-    
-        class(Dipolar_Hard_Spheres), intent(in) :: this
-        type(Box_Dimensions), intent(in) :: Box
-        real(DP) :: Epot_conf
-        
-        Epot_conf = 0 ! this%Epot_real(Box%size) + this%Epot_reci(Box) - this%Epot_self() + &
-                      ! this%Epot_bound(Box%size)
-    
-    end function Dipolar_Hard_Spheres_Epot_conf
 
 end module class_dipolar_hard_spheres
