@@ -47,15 +47,8 @@ implicit none
     
     integer, parameter :: Ndim = 3
     
-    real(DP), parameter :: Box_size1 = 25._DP ! u_length
-    real(DP), parameter :: Box_size2 = Box_size1 ! u_length
-    real(DP), parameter :: Box_size3 = Box_size1 ! u_length
-    real(DP), dimension(Ndim), parameter :: Box_size = [Box_size1, Box_size2, Box_size3] ! u_length
-
-    integer, parameter :: Box_wave1 = 8 ! 1/u_length
-    integer, parameter :: Box_wave2 = Box_wave1 ! 1/u_length
-    integer, parameter :: Box_wave3 = Box_wave1 ! 1/u_length
-    integer, dimension(Ndim), parameter :: Box_wave = [Box_wave1, Box_wave2, Box_wave3] ! 1/u_length
+    real(DP), dimension(Ndim), parameter :: Box_size = 25._DP
+    integer, dimension(Ndim), parameter :: Box_wave = 8
     
 end module data_box
 !***************************************************************************************************
@@ -71,58 +64,9 @@ use data_box, only: Ndim
 
 implicit none
 
-    integer, parameter :: decorrelFactor = 2**0
-    integer, parameter :: switch_factor = 1
-    integer, parameter :: Nthermal = 2**15/decorrelFactor
-    integer, parameter :: Nadapt = 2**10
     integer, parameter :: Nstep = 2**16
-    integer, parameter :: reset_iStep = 2**13/decorrelFactor
-    
-    ! move
-    real(DP), dimension(Ndim), parameter :: dipol_move_delta = 0.3_DP ! u_length, adaptation
-    real(DP), parameter :: dipol_move_rejectFix = 0.5_DP
-    ! rotate
-    real(DP), parameter :: dipol_rotate_delta = 30._DP ! u_moment, adaptation
-    real(DP), parameter :: dipol_rotate_deltaMax = 75._DP
-    real(DP), parameter :: dipol_rotate_rejectFix = 0.17_DP    
-    
-    real(DP), dimension(Ndim), parameter :: hard_move_delta = 0.5_DP ! u_length, adaptation
-    real(DP), parameter :: hard_move_rejectFix = 0.5_DP
     
 end module data_monte_carlo
-!***************************************************************************************************
-
-!***************************************************************************************************
-!> \brief Potential data :
-!> declaration of the potential energy parameters
-
-!> The dipolar spheres interaction uses the Ewald sums methods.
-
-!> The mixing potential (mix) is composed of 3 parts :
-!> hard sphere (HS) + Yukawa + cut.
-!***************************************************************************************************
-module data_potential
-
-use data_precisions, only: DP
-
-implicit none
-
-    real(DP), parameter :: dipol_rMin_factor = 1._DP
-    real(DP), parameter :: dipol_real_rCut_factor = 0.5_DP ! * Box_size(1)
-    real(DP), parameter :: dipol_real_dr = 5.E-5_DP ! u_length
-    real(DP), parameter :: dipol_alpha_factor = 7._DP ! / Box_size(1)
-
-    real(DP), parameter :: hard_rMin_factor = 1._DP
-
-    real(DP), parameter :: mix_rMin_factor = 1._dP
-    real(DP), parameter :: mix_rCut = 1._DP ! u_length, adaptation
-    real(DP), parameter :: mix_dr = 1._DP ! u_length
-    real(DP), parameter :: mix_epsilon = 0._DP ! u_energy * u_length
-    real(DP), parameter :: mix_alpha = 1._DP ! 1/u_length
-    
-    logical, parameter :: write_potential = .true.
-        
-end module data_potential
 !***************************************************************************************************
 
 !***************************************************************************************************
