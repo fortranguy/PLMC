@@ -93,7 +93,7 @@ contains
         do iNearCell = 1, NnearCell
         
             nearCell_index = this_cells%near_among_total(iNearCell, particle%same_iCell)
-            call this_cells%point_to_begin(current, nearCell_index)
+            current => this_cells%beginCells(nearCell_index)%particle%next
             if (.not. associated(current%next)) cycle
             
             do
