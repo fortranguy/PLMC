@@ -3,6 +3,7 @@
 program monte_carlo_canonical_bulk
 
 use, intrinsic :: iso_fortran_env, only: output_unit
+use json_module, only: json_file, json_initialize
 use module_types_micro, only: Monte_Carlo_Arguments
 use module_monte_carlo_arguments, only: read_arguments
 use class_physical_system
@@ -11,12 +12,15 @@ implicit none
     
     type(Physical_System) :: sys
     type(Monte_Carlo_Arguments) :: args
+    type(json_file) :: json
     
     integer :: iStep
 
+    call json_initialize()
+    call json%load_file(filename = "data.json")
     call read_arguments(args)
-    call sys%construct()
-    call sys%init(args)
+    call sys%construct(json)
+    call sys%init(json, args)
         
     write(output_unit, *) "Beginning of cycles"
     
@@ -52,7 +56,8 @@ implicit none
 
     write(output_unit, *) "End of cycles"
     
-    call sys%final()
+    call sys%final(json)
     call sys%destroy()
+    call json%destroy()
     
 end program monte_carlo_canonical_bulk

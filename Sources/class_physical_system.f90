@@ -4,7 +4,7 @@ module class_physical_system
 
 use, intrinsic :: iso_fortran_env, only: output_unit
 use data_precisions, only: DP
-use json_module, only: json_file, json_initialize
+use json_module, only: json_file
 use module_types_micro, only: Box_Dimensions, Monte_Carlo_Arguments
 use module_physics_micro, only: NwaveVectors
 use module_data, only: test_data_found
@@ -120,15 +120,13 @@ contains
 
     ! Construction
     
-    subroutine Physical_System_construct(this)        
+    subroutine Physical_System_construct(this, json)
+            
         class(Physical_System), intent(out) :: this
+        type(json_file), intent(inout) :: json
         
         character(len=4096) :: data_name
         logical :: found
-        
-        type(json_file) :: json
-        call json_initialize()
-        call json%load_file(filename = "data.json")
         
         this%name = "sys"
         write(output_unit, *) this%name, " class construction"
@@ -146,12 +144,11 @@ contains
                                       this%type2_spheres%get_diameter())
         
         call this%set_monte_carlo_changes(json)
-    
-        call json%destroy()
         
     end subroutine Physical_System_construct
     
     subroutine Physical_System_set_box(this, json)
+    
         class(Physical_System), intent(inout) :: this    
         type(json_file), intent(inout) :: json    
         
@@ -200,6 +197,7 @@ contains
     end subroutine Physical_System_set_monte_carlo_steps
     
     subroutine Physical_System_set_monte_carlo_changes(this, json)
+    
         class(Physical_System), intent(inout) :: this
         type(json_file), intent(inout) :: json
         
@@ -266,18 +264,16 @@ contains
     
     ! Initialization
     
-    subroutine Physical_System_init(this, args)    
+    subroutine Physical_System_init(this, json, args)   
+     
         class(Physical_System), intent(inout) :: this
+        type(json_file), intent(inout) :: json
         type(Monte_Carlo_Arguments), intent(in) :: args
         
         real(DP) :: Epot_conf      
         
         character(len=4096) :: data_name
         logical :: found  
-        
-        type(json_file) :: json
-        call json_initialize()
-        call json%load_file(filename = "data.json")
         
         data_name = "Distribution.take snapshot"
         call json%get(data_name, this%snap, found)
@@ -329,8 +325,6 @@ contains
         Epot_conf = this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
         write(output_unit, *) "Initial potential energy =", Epot_conf
         write(this%obsThermal_unit, *) 0, Epot_conf
-        
-        call json%destroy()
     
     end subroutine Physical_System_init
     
@@ -400,15 +394,12 @@ contains
     
     ! Finalisation
     
-    subroutine Physical_System_final(this)    
+    subroutine Physical_System_final(this, json)    
     
         class(Physical_System), intent(inout) :: this
+        type(json_file), intent(inout) :: json
         
-        type(json_file) :: json        
         real(DP) :: type1_energy, type2_energy
-        
-        call json_initialize()
-        call json%load_file(filename = "data.json")
         
         call final_spheres(this%Box, this%type1_spheres, this%type1_units)
         call set_ewald(this%Box, this%type1_spheres, this%type1_macro, json, this%type1_units)
@@ -424,8 +415,6 @@ contains
         
         call this%write_all_results()
         call this%close_units()
-        
-        call json%destroy()
     
     end subroutine Physical_System_final
     
