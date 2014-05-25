@@ -64,7 +64,7 @@ use data_box, only: Ndim
 
 implicit none
 
-    integer, parameter :: Nstep = 2**16
+    integer, parameter :: num_steps = 2**16
     
 end module data_monte_carlo
 !***************************************************************************************************

@@ -25,17 +25,17 @@ implicit none
     write(output_unit, *) "Beginning of cycles"
     
     call sys%set_time_start()
-    MC_Cycle: do iStep = 1, sys%get_Nthermal() + sys%get_Nstep()
+    MC_Cycle: do iStep = 1, sys%get_num_thermalisation_steps() + sys%get_num_steps()
     
         call sys%random_changes()
         call sys%update_rejections()
         
-        MC_Regime: if (iStep <= sys%get_Nthermal()) then
+        MC_Regime: if (iStep <= sys%get_num_thermalisation_steps()) then
             
             call sys%adapt_changes(iStep)
             call sys%write_observables_thermalisation(iStep)
             
-            if (iStep == sys%get_Nthermal()) then
+            if (iStep == sys%get_num_thermalisation_steps()) then
                 write(output_unit, *) "Thermalisation: over"
                 call sys%fix_changes()
             end if

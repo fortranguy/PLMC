@@ -101,26 +101,26 @@ contains
     
     !> Results
     
-    subroutine Observables_write_results(this, temperature, Nstep, report_unit)
+    subroutine Observables_write_results(this, temperature, num_steps, report_unit)
 
         class(Observables), intent(in) :: this
         real(DP), intent(in) :: temperature
-        integer, intent(in) :: Nstep
+        integer, intent(in) :: num_steps
         integer, intent(in) :: report_unit
         
         real(DP) :: potChiEx
             
         write(report_unit, *) "Results: "
         
-        write(report_unit, *) "    average energy = ", this%EpotSum/real(Nstep, DP)
-        potChiEx = -temperature*log(this%activSum/real(Nstep, DP))
+        write(report_unit, *) "    average energy = ", this%EpotSum/real(num_steps, DP)
+        potChiEx = -temperature*log(this%activSum/real(num_steps, DP))
         write(report_unit, *) "    average excess chemical potential = ", potChiEx
-        write(report_unit, *) "    move rejection rate = ", this%move_rejectSum/real(Nstep, DP)
+        write(report_unit, *) "    move rejection rate = ", this%move_rejectSum/real(num_steps, DP)
         
         select type (this)
             type is (MoreObservables)
                 write(report_unit, *) "    rotate rejection rate = ", &
-                                      this%rotate_rejectSum/real(Nstep, DP)
+                                      this%rotate_rejectSum/real(num_steps, DP)
         end select
     
     end subroutine Observables_write_results

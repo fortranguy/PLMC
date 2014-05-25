@@ -4,7 +4,7 @@ program histogram
 
 use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
 use data_precisions, only: DP
-use data_monte_carlo, only: Nstep
+use data_monte_carlo, only: num_steps
 use data_histogram, only: hist_dE
 
 implicit none
@@ -37,13 +37,13 @@ implicit none
     read(obs_unit, *) comment_symbol, Nobs
     write(output_unit, *) "Nobs = ", Nobs
     
-    allocate(observables(Nobs, Nstep))
+    allocate(observables(Nobs, num_steps))
     allocate(limit_values(2, Nobs))
     allocate(Ndists(2, Nobs))
     
-    write(output_unit, *) "Nstep = ", Nstep
+    write(output_unit, *) "num_steps = ", num_steps
     
-    do iStep = 1, Nstep
+    do iStep = 1, num_steps
         read(obs_unit, *) iStepIn, observables(:, iStep)
     end do
     
@@ -55,11 +55,11 @@ implicit none
     allocate(dist_funct_energy(Ndists(1, 1): Ndists(2, 1)))
     
     dist_funct_energy(:) = 0._DP
-    do iStep = 1, Nstep
+    do iStep = 1, num_steps
         iDist = int(observables(1, iStep)/hist_dE)
         dist_funct_energy(iDist) = dist_funct_energy(iDist) + 1._DP
     end do
-    dist_funct_energy(:) = dist_funct_energy(:) / real(Nstep, DP) / hist_dE
+    dist_funct_energy(:) = dist_funct_energy(:) / real(num_steps, DP) / hist_dE
     
     open(newunit=histo_unit, recl=4096, file=file(1:length-4)//"_histo.out", action='write')
     do iDist = Ndists(1, 1), Ndists(2, 1)

@@ -39,8 +39,8 @@ private
         integer :: num_particles
         
         ! Monte-Carlo
-        integer :: Nthermal, Nadapt, Nstep
-        integer :: decorrelFactor, Nchange, Nmove, Nswitch, Nrotate
+        integer :: num_thermalisation_steps, num_adaptation_steps, num_steps
+        integer :: decorrelation_factor, num_changes, num_moves, num_switches, num_rotations
         
         ! Type 1: Dipolar spheres
         type(Dipolar_Hard_Spheres) :: type1_spheres
@@ -96,8 +96,8 @@ private
         procedure, private :: close_units => Physical_System_close_units
         
         !> Accessors & Mutators
-        procedure :: get_Nthermal => Physical_System_get_Nthermal
-        procedure :: get_Nstep => Physical_System_get_Nstep
+        procedure :: get_num_thermalisation_steps => Physical_System_get_num_thermalisation_steps
+        procedure :: get_num_steps => Physical_System_get_num_steps
         procedure :: set_time_start => Physical_System_set_time_start
         procedure :: set_time_end => Physical_System_set_time_end
         
@@ -183,15 +183,15 @@ contains
         logical :: found
         
         data_name = "Monte Carlo.number of thermalisation steps"
-        call json%get(data_name, this%Nthermal, found)
+        call json%get(data_name, this%num_thermalisation_steps, found)
         call test_data_found(data_name, found)
         
         data_name = "Monte Carlo.period of adaptation"
-        call json%get(data_name, this%Nadapt, found)
+        call json%get(data_name, this%num_adaptation_steps, found)
         call test_data_found(data_name, found)
         
         data_name = "Monte Carlo.number of equilibrium steps"
-        call json%get(data_name, this%Nstep, found)
+        call json%get(data_name, this%num_steps, found)
         call test_data_found(data_name, found)
         
     end subroutine Physical_System_set_monte_carlo_steps
@@ -212,18 +212,18 @@ contains
         this%num_particles = this%type1_spheres%get_num_particles() + &
                              this%type2_spheres%get_num_particles()
         data_name = "Monte Carlo.decorrelation factor"
-        call json%get(data_name, this%decorrelFactor, found)
+        call json%get(data_name, this%decorrelation_factor, found)
         call test_data_found(data_name, found)
         
-        this%Nmove = this%decorrelFactor * this%num_particles
+        this%num_moves = this%decorrelation_factor * this%num_particles
         
         data_name = "Monte Carlo.switch factor"
         call json%get(data_name, switch_factor, found)
         call test_data_found(data_name, found)
         
-        this%Nswitch = switch_factor * this%decorrelFactor * this%type1_spheres%get_num_particles()
-        this%Nrotate = this%decorrelFactor * this%type1_spheres%get_num_particles()
-        this%Nchange = this%Nmove + this%Nswitch + this%Nrotate
+        this%num_switches = switch_factor * this%decorrelation_factor * this%type1_spheres%get_num_particles()
+        this%num_rotations = this%decorrelation_factor * this%type1_spheres%get_num_particles()
+        this%num_changes = this%num_moves + this%num_switches + this%num_rotations
         
         data_name = "Monte Carlo.Dipoles.move.initial delta"
         call json%get(data_name, type1_move_delta, found)
@@ -282,7 +282,7 @@ contains
         data_name = "Monte Carlo.period of reset"
         call json%get(data_name, this%reset_iStep, found)
         call test_data_found(data_name, found)
-        this%reset_iStep = this%reset_iStep / this%decorrelFactor
+        this%reset_iStep = this%reset_iStep / this%decorrelation_factor
         
         write(output_unit, *) "Monte-Carlo Simulation: Canonical ensemble"
         
@@ -370,12 +370,12 @@ contains
         write(report_unit ,*) "    Temperature = ", this%Box%temperature
         write(report_unit ,*) "    num_particles = ", this%num_particles        
         
-        write(report_unit, *) "    Nstep = ", this%Nstep
-        write(report_unit, *) "    Nthermal = ", this%Nthermal
-        write(report_unit, *) "    decorrelFactor = ", this%decorrelFactor
-        write(report_unit, *) "    Nmove = ", this%Nmove
-        write(report_unit, *) "    Nswitch = ", this%Nswitch
-        write(report_unit, *) "    Nrotate = ", this%Nrotate
+        write(report_unit, *) "    num_steps = ", this%num_steps
+        write(report_unit, *) "    num_thermalisation_steps = ", this%num_thermalisation_steps
+        write(report_unit, *) "    decorrelation_factor = ", this%decorrelation_factor
+        write(report_unit, *) "    num_moves = ", this%num_moves
+        write(report_unit, *) "    num_switches = ", this%num_switches
+        write(report_unit, *) "    num_rotations = ", this%num_rotations
         
         write(report_unit, *) "    reset_iStep = ", this%reset_iStep
         write(report_unit, *) "    write_potential = ", this%write_potential
@@ -421,9 +421,9 @@ contains
     subroutine Physical_System_write_all_results(this)
         class(Physical_System), intent(inout) :: this
         
-        call this%type1_obs%write_results(this%Box%temperature, this%Nstep, this%type1_units%report)
-        call this%type2_obs%write_results(this%Box%temperature, this%Nstep, this%type2_units%report)
-        call mix_write_results(this%Nstep, this%mix_EpotSum, this%mix_report_unit)
+        call this%type1_obs%write_results(this%Box%temperature, this%num_steps, this%type1_units%report)
+        call this%type2_obs%write_results(this%Box%temperature, this%num_steps, this%type2_units%report)
+        call mix_write_results(this%num_steps, this%mix_EpotSum, this%mix_report_unit)
         
         call this%write_results()
     
@@ -442,7 +442,7 @@ contains
         call test_consist(Epot, Epot_conf, this%report_unit)
         this%EpotSum = this%type1_obs%EpotSum + this%type2_obs%EpotSum + this%mix_EpotSum
         duration = this%time_end - this%time_start
-        call write_results(this%num_particles, this%Nstep, this%EpotSum, this%switch_rejectSum,&
+        call write_results(this%num_particles, this%num_steps, this%EpotSum, this%switch_rejectSum,&
                            duration, this%report_unit)
     
     end subroutine Physical_System_write_results
@@ -479,21 +479,22 @@ contains
     
     ! Accessors
     
-    pure function Physical_System_get_Nthermal(this) result(get_Nthermal)
+    pure function Physical_System_get_num_thermalisation_steps(this) &
+         result(get_num_thermalisation_steps)
         class(Physical_System), intent(in) :: this
-        integer :: get_Nthermal
+        integer :: get_num_thermalisation_steps
                 
-        get_Nthermal = this%Nthermal
+        get_num_thermalisation_steps = this%num_thermalisation_steps
         
-    end function Physical_System_get_Nthermal
+    end function Physical_System_get_num_thermalisation_steps
     
-    pure function Physical_System_get_Nstep(this) result(get_Nstep)
+    pure function Physical_System_get_num_steps(this) result(get_num_steps)
         class(Physical_System), intent(in) :: this
-        integer :: get_Nstep
+        integer :: get_num_steps
                 
-        get_Nstep = this%Nstep
+        get_num_steps = this%num_steps
         
-    end function Physical_System_get_Nstep
+    end function Physical_System_get_num_steps
     
     ! Mutators
     
@@ -519,13 +520,13 @@ contains
         integer :: iChange, iChangeRand, iColRand
         real(DP) :: rand
         
-        MC_Change: do iChange = 1, this%Nchange
+        MC_Change: do iChange = 1, this%num_changes
         
             ! Randomly choosing the change
             call random_number(rand)
-            iChangeRand = int(rand*real(this%Nchange, DP)) + 1
+            iChangeRand = int(rand*real(this%num_changes, DP)) + 1
             
-            if (iChangeRand <= this%Nmove) then
+            if (iChangeRand <= this%num_moves) then
                 ! Randomly choosing the type
                 call random_number(rand)
                 iColRand = int(rand*real(this%num_particles, DP)) + 1
@@ -540,7 +541,7 @@ contains
                               this%type1_spheres, this%type1_macro%mix_cells, &
                               this%mix, this%mix_Epot)
                 end if
-            else if (iChangeRand <= this%Nmove + this%Nswitch) then
+            else if (iChangeRand <= this%num_moves + this%num_switches) then
                 call switch(this%Box, &
                             this%type1_spheres, this%type1_macro, this%type1_obs, &
                             this%type2_spheres, this%type2_macro, this%type2_obs, &
@@ -572,7 +573,7 @@ contains
         class(Physical_System), intent(inout) :: this
         integer, intent(in) :: iStep
         
-        if (mod(iStep, this%Nadapt) /= 0) then ! Rejections accumulation
+        if (mod(iStep, this%num_adaptation_steps) /= 0) then ! Rejections accumulation
             this%type1_obs%move_rejectAdapt = this%type1_obs%move_rejectAdapt + &
                                               this%type1_obs%move_reject
             this%type1_obs%rotate_rejectAdapt = this%type1_obs%rotate_rejectAdapt + &
@@ -580,11 +581,19 @@ contains
             this%type2_obs%move_rejectAdapt = this%type2_obs%move_rejectAdapt + &
                                               this%type2_obs%move_reject
         else ! Average & adaptation
-            call adapt_move(this%Box%size, this%type1_macro%move, this%Nadapt, iStep, this%type1_obs, &
+            call adapt_move(this%Box%size, &
+                            this%type1_macro%move, &
+                            this%num_adaptation_steps, iStep, &
+                            this%type1_obs, &
                             this%type1_units%move_delta)
-            call adapt_rotation(this%type1_macro%rotation, this%Nadapt, iStep, this%type1_obs, &
+            call adapt_rotation(this%type1_macro%rotation, &
+                                this%num_adaptation_steps, iStep, &
+                                this%type1_obs, &
                                 this%type1_units%rotate_delta)
-            call adapt_move(this%Box%size, this%type2_macro%move, this%Nadapt, iStep, this%type2_obs, &
+            call adapt_move(this%Box%size, &
+                            this%type2_macro%move, &
+                            this%num_adaptation_steps, iStep, &
+                            this%type2_obs, &
                             this%type2_units%move_delta)
         end if
         
