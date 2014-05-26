@@ -28,6 +28,7 @@ private
 contains
 
     pure subroutine Small_Move_init(this, delta, rejectFix)
+    
         class(Small_Move), intent(out) :: this
         real(DP), intent(in) :: delta
         real(DP), intent(in) :: rejectFix
@@ -35,6 +36,7 @@ contains
         this%delta(:) = delta
         this%deltaSave(:) = this%delta(:)
         this%rejectFix = rejectFix
+        
     end subroutine Small_Move_init
     
     pure function Small_Move_get_delta(this) result(get_delta)

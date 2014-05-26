@@ -26,6 +26,7 @@ private
 contains
 
     pure subroutine Small_Rotation_init(this, delta, deltaMax, rejectFix)
+    
         class(Small_Rotation), intent(out) :: this
         real(DP), intent(in) :: delta, deltaMax
         real(DP), intent(in) :: rejectFix
@@ -34,6 +35,7 @@ contains
         this%deltaSave = this%delta
         this%deltaMax = deltaMax
         this%rejectFix = rejectFix    
+        
     end subroutine Small_Rotation_init
 
     pure function Small_Rotation_get_delta(this) result(get_delta)
