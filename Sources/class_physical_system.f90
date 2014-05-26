@@ -470,11 +470,19 @@ contains
     subroutine Physical_System_destroy(this)    
         class(Physical_System), intent(inout) :: this
         
-        write(output_unit, *) this%name, " class destruction"
-        
-        call this%type1_spheres%destroy()
-        call this%type2_spheres%destroy()
         call this%mix%destroy()
+        
+        call this%type2_macro%mix_cells%destroy()
+        call this%type2_macro%same_cells%destroy()        
+        call this%type2_spheres%destroy()
+        
+        call this%type1_macro%ewald_reci%destroy()
+        call this%type1_macro%ewald_real%destroy()
+        call this%type1_macro%mix_cells%destroy()
+        call this%type1_macro%same_cells%destroy()        
+        call this%type1_spheres%destroy()
+        
+        write(output_unit, *) this%name, " class destruction"
     
     end subroutine Physical_System_destroy
     

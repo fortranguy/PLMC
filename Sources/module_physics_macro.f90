@@ -23,7 +23,8 @@ implicit none
 private
 public init_random_seed, set_initial_configuration, &
        init_spheres, init_hard_potential, init_cells, &
-       set_ewald, total_energy, & 
+       set_ewald, &
+       total_energy, & 
        final_spheres, init_mix, mix_final, &
        adapt_move, adapt_rotation, test_consist
 

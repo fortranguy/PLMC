@@ -169,8 +169,8 @@ contains
     
         class(Ewald_Summation_Reci), intent(inout) :: this
         
-        if (allocated(this%weight)) deallocate(this%weight)
         if (allocated(this%structure)) deallocate(this%structure)
+        if (allocated(this%weight)) deallocate(this%weight)
     
     end subroutine Ewald_Summation_Reci_destroy
     
