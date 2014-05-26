@@ -8,7 +8,7 @@ use data_box, only: Ndim
 use data_neighbour_cells, only: NnearCell_dim, NnearCell
 use module_types_micro, only: Node, Linked_List
 use module_physics_micro, only: index_from_coord, coord_PBC
-use class_hard_spheres
+use class_hard_spheres, only: Hard_Spheres
 
 implicit none
 private

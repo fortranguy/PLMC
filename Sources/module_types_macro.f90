@@ -2,14 +2,14 @@
 
 module module_types_macro
 
-use class_neighbour_cells
-use class_small_move
-use class_small_rotation
-use class_hard_spheres_potential
-use class_ewald_summation_real
-use class_ewald_summation_reci
-use class_ewald_summation_self
-use class_ewald_summation_bound
+use class_neighbour_cells, only: Neighbour_Cells
+use class_small_move, only: Small_Move
+use class_small_rotation, only: Small_Rotation
+use class_hard_spheres_potential, only: Hard_Spheres_Potential
+use class_ewald_summation_real, only: Ewald_Summation_Real
+use class_ewald_summation_reci, only: Ewald_Summation_Reci
+use class_ewald_summation_self, only: Ewald_Summation_Self
+use class_ewald_summation_bound, only: Ewald_Summation_Bound
 
 implicit none
 

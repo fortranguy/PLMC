@@ -10,8 +10,9 @@ use json_module, only: json_file
 use module_types_micro, only: Node, Particle_Index
 use module_physics_micro, only: set_discrete_length, PBC_distance, Epot_yukawa
 use module_data, only: test_data_found
-use class_neighbour_cells
-use class_hard_spheres
+use class_hard_spheres, only: Hard_Spheres
+use class_neighbour_cells, only: Neighbour_Cells
+
 
 implicit none
 
