@@ -5,7 +5,7 @@ program distribution
 use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
 use data_precisions, only: DP
 use data_box, only: Ndim, Box_size
-use data_monte_carlo, only: num_steps
+use data_monte_carlo, only: num_equilibrium_steps
 use data_distribution, only: snap, dist_dr
 use module_physics_micro, only: sphere_volume, PBC_distance
 !$ use omp_lib
@@ -92,7 +92,7 @@ implicit none
     !$ tIni_para = omp_get_wtime()
     !$omp parallel do schedule(static) reduction(+:dist_sum) private(positions, i_particle, j_particle, &
     !$ r_ij, iDist)
-    do iStep = 1, num_steps/snap_factor
+    do iStep = 1, num_equilibrium_steps/snap_factor
 
         ! Read
         !$omp critical
@@ -140,7 +140,7 @@ implicit none
             r_iMinus = real(iDist, DP) * dist_dr
             r_iPlus = real(iDist + 1, DP) * dist_dr
             
-            dist_function(iDist) = 2._DP * real(dist_sum(iDist), DP) / real(num_steps/snap_factor, DP) / &
+            dist_function(iDist) = 2._DP * real(dist_sum(iDist), DP) / real(num_equilibrium_steps/snap_factor, DP) / &
                 real(num_particles, DP) / (sphere_volume(r_iPlus)-sphere_volume(r_iMinus)) / density
             write(distrib_unit, *) r_iDist, dist_function(iDist)
             

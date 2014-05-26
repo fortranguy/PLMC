@@ -424,17 +424,17 @@ contains
     
     subroutine adapt_move(Box_size, &
                           this, &
-                          num_adaptation_steps, iStep, &
+                          period_adaptation, iStep, &
                           obs, &
                           move_unit)
     
         real(DP), dimension(:), intent(in) :: Box_size
         class(Small_Move), intent(inout) :: this
-        integer, intent(in) :: num_adaptation_steps, iStep
+        integer, intent(in) :: period_adaptation, iStep
         class(Observables), intent(inout) :: obs
         integer, intent(in) :: move_unit
     
-        obs%move_rejectAvg = obs%move_rejectAdapt / real(num_adaptation_steps-1, DP)
+        obs%move_rejectAvg = obs%move_rejectAdapt / real(period_adaptation-1, DP)
         obs%move_rejectAdapt = 0._DP
         call this%adapt_delta(Box_size, obs%move_rejectAvg)
         write(move_unit, *) iStep, this%get_delta_scalar(), obs%move_rejectAvg
@@ -442,16 +442,16 @@ contains
     end subroutine adapt_move
     
     subroutine adapt_rotation(this, &
-                              num_adaptation_steps, iStep, &
+                              period_adaptation, iStep, &
                               obs, &
                               rotate_unit)
     
         class(Small_Rotation), intent(inout) :: this
-        integer, intent(in) :: num_adaptation_steps, iStep
+        integer, intent(in) :: period_adaptation, iStep
         class(MoreObservables), intent(inout) :: obs
         integer, intent(in) :: rotate_unit
         
-        obs%rotate_rejectAvg = obs%rotate_rejectAdapt / real(num_adaptation_steps-1, DP)
+        obs%rotate_rejectAvg = obs%rotate_rejectAdapt / real(period_adaptation-1, DP)
         obs%rotate_rejectAdapt = 0._DP
         call this%adapt_delta(obs%rotate_rejectAvg)
         write(rotate_unit, *) iStep, this%get_delta(), obs%rotate_rejectAvg

@@ -4,7 +4,7 @@ program bunching
 
 use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
 use data_precisions, only: DP
-use data_monte_carlo, only: num_steps
+use data_monte_carlo, only: num_equilibrium_steps
 
 implicit none
 
@@ -20,7 +20,7 @@ implicit none
     
     integer :: obs_unit, bunch_unit
     character(len=1) :: comment_symbol
-    integer, parameter :: NdataMi = num_steps/2
+    integer, parameter :: NdataMi = num_equilibrium_steps/2
     real(DP), dimension(:, :), allocatable :: dataIn
     real(DP), dimension(:, :), allocatable :: dataOut
     
@@ -47,11 +47,11 @@ implicit none
     allocate(dataIn(Nobs, 2*NdataMi))
     allocate(dataOut(Nobs, NdataMi))
     
-    write(output_unit, *) "num_steps = ", num_steps
-    Nbunching = int(log(real(num_steps, DP))/log(2._DP))
+    write(output_unit, *) "num_equilibrium_steps = ", num_equilibrium_steps
+    Nbunching = int(log(real(num_equilibrium_steps, DP))/log(2._DP))
     write(output_unit, *) "Nbunching = ", Nbunching
 
-    NstepVar = num_steps
+    NstepVar = num_equilibrium_steps
     
     open(newunit=bunch_unit, recl=4096, file=file(1:length-4)//"_bunched.out", action='write')
     

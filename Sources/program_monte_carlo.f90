@@ -25,7 +25,7 @@ implicit none
     write(output_unit, *) "Beginning of cycles"
     
     call sys%set_time_start()
-    MC_Cycle: do iStep = 1, sys%get_num_thermalisation_steps() + sys%get_num_steps()
+    MC_Cycle: do iStep = 1, sys%get_num_thermalisation_steps() + sys%get_num_equilibrium_steps()
     
         call sys%random_changes()
         call sys%update_rejections()

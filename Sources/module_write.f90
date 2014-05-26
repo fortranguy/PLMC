@@ -66,32 +66,32 @@ contains
     
     !> Total: Results
     
-    subroutine write_results(num_particles, num_steps, EpotSum, switch_rejectSum, duration, report_unit)
+    subroutine write_results(num_particles, num_equilibrium_steps, EpotSum, switch_rejectSum, duration, report_unit)
     
-        integer, intent(in) :: num_particles, num_steps
+        integer, intent(in) :: num_particles, num_equilibrium_steps
         real(DP), intent(in) :: EpotSum, switch_rejectSum
         real(DP), intent(in) :: duration
         integer, intent(in) :: report_unit
             
         write(report_unit, *) "Results: "
-        write(report_unit, *) "    average energy = ", EpotSum/real(num_steps, DP)
+        write(report_unit, *) "    average energy = ", EpotSum/real(num_equilibrium_steps, DP)
         write(report_unit, *) "    average energy per particule = ", &
-                                   EpotSum/real(num_steps, DP)/real(num_particles, DP)
-        write(report_unit, *) "    switch rejection rate = ", switch_rejectSum/real(num_steps, DP)
+                                   EpotSum/real(num_equilibrium_steps, DP)/real(num_particles, DP)
+        write(report_unit, *) "    switch rejection rate = ", switch_rejectSum/real(num_equilibrium_steps, DP)
         write(report_unit, *) "    duration =", duration/60._DP, "min"
     
     end subroutine write_results
     
     !> Mix: Results
     
-    subroutine mix_write_results(num_steps, EpotSum, report_unit)
+    subroutine mix_write_results(num_equilibrium_steps, EpotSum, report_unit)
     
-        integer, intent(in) :: num_steps
+        integer, intent(in) :: num_equilibrium_steps
         real(DP), intent(in) :: EpotSum
         integer, intent(in) :: report_unit
     
         write(report_unit, *) "Results: "
-        write(report_unit, *) "    average energy = ", EpotSum/real(num_steps, DP)
+        write(report_unit, *) "    average energy = ", EpotSum/real(num_equilibrium_steps, DP)
     
     end subroutine mix_write_results
     

@@ -40,7 +40,7 @@ private
         integer :: num_particles
         
         ! Monte-Carlo
-        integer :: num_thermalisation_steps, num_adaptation_steps, num_steps
+        integer :: num_thermalisation_steps, period_adaptation, num_equilibrium_steps
         integer :: decorrelation_factor, num_changes, num_moves, num_switches, num_rotations
         
         ! Type 1: Dipolar spheres
@@ -98,7 +98,7 @@ private
         
         !> Accessors & Mutators
         procedure :: get_num_thermalisation_steps => Physical_System_get_num_thermalisation_steps
-        procedure :: get_num_steps => Physical_System_get_num_steps
+        procedure :: get_num_equilibrium_steps => Physical_System_get_num_equilibrium_steps
         procedure :: set_time_start => Physical_System_set_time_start
         procedure :: set_time_end => Physical_System_set_time_end
         
@@ -188,11 +188,11 @@ contains
         call test_data_found(data_name, found)
         
         data_name = "Monte Carlo.period of adaptation"
-        call json%get(data_name, this%num_adaptation_steps, found)
+        call json%get(data_name, this%period_adaptation, found)
         call test_data_found(data_name, found)
         
         data_name = "Monte Carlo.number of equilibrium steps"
-        call json%get(data_name, this%num_steps, found)
+        call json%get(data_name, this%num_equilibrium_steps, found)
         call test_data_found(data_name, found)
         
     end subroutine Physical_System_set_monte_carlo_steps
@@ -371,7 +371,7 @@ contains
         write(report_unit ,*) "    Temperature = ", this%Box%temperature
         write(report_unit ,*) "    num_particles = ", this%num_particles        
         
-        write(report_unit, *) "    num_steps = ", this%num_steps
+        write(report_unit, *) "    num_equilibrium_steps = ", this%num_equilibrium_steps
         write(report_unit, *) "    num_thermalisation_steps = ", this%num_thermalisation_steps
         write(report_unit, *) "    decorrelation_factor = ", this%decorrelation_factor
         write(report_unit, *) "    num_moves = ", this%num_moves
@@ -422,9 +422,9 @@ contains
     subroutine Physical_System_write_all_results(this)
         class(Physical_System), intent(inout) :: this
         
-        call this%type1_obs%write_results(this%Box%temperature, this%num_steps, this%type1_units%report)
-        call this%type2_obs%write_results(this%Box%temperature, this%num_steps, this%type2_units%report)
-        call mix_write_results(this%num_steps, this%mix_EpotSum, this%mix_report_unit)
+        call this%type1_obs%write_results(this%Box%temperature, this%num_equilibrium_steps, this%type1_units%report)
+        call this%type2_obs%write_results(this%Box%temperature, this%num_equilibrium_steps, this%type2_units%report)
+        call mix_write_results(this%num_equilibrium_steps, this%mix_EpotSum, this%mix_report_unit)
         
         call this%write_results()
     
@@ -443,7 +443,7 @@ contains
         call test_consist(Epot, Epot_conf, this%report_unit)
         this%EpotSum = this%type1_obs%EpotSum + this%type2_obs%EpotSum + this%mix_EpotSum
         duration = this%time_end - this%time_start
-        call write_results(this%num_particles, this%num_steps, this%EpotSum, this%switch_rejectSum,&
+        call write_results(this%num_particles, this%num_equilibrium_steps, this%EpotSum, this%switch_rejectSum,&
                            duration, this%report_unit)
     
     end subroutine Physical_System_write_results
@@ -489,13 +489,13 @@ contains
         
     end function Physical_System_get_num_thermalisation_steps
     
-    pure function Physical_System_get_num_steps(this) result(get_num_steps)
+    pure function Physical_System_get_num_equilibrium_steps(this) result(get_num_equilibrium_steps)
         class(Physical_System), intent(in) :: this
-        integer :: get_num_steps
+        integer :: get_num_equilibrium_steps
                 
-        get_num_steps = this%num_steps
+        get_num_equilibrium_steps = this%num_equilibrium_steps
         
-    end function Physical_System_get_num_steps
+    end function Physical_System_get_num_equilibrium_steps
     
     ! Mutators
     
@@ -574,7 +574,7 @@ contains
         class(Physical_System), intent(inout) :: this
         integer, intent(in) :: iStep
         
-        if (mod(iStep, this%num_adaptation_steps) /= 0) then ! Rejections accumulation
+        if (mod(iStep, this%period_adaptation) /= 0) then ! Rejections accumulation
             this%type1_obs%move_rejectAdapt = this%type1_obs%move_rejectAdapt + &
                                               this%type1_obs%move_reject
             this%type1_obs%rotate_rejectAdapt = this%type1_obs%rotate_rejectAdapt + &
@@ -584,16 +584,16 @@ contains
         else ! Average & adaptation
             call adapt_move(this%Box%size, &
                             this%type1_macro%move, &
-                            this%num_adaptation_steps, iStep, &
+                            this%period_adaptation, iStep, &
                             this%type1_obs, &
                             this%type1_units%move_delta)
             call adapt_rotation(this%type1_macro%rotation, &
-                                this%num_adaptation_steps, iStep, &
+                                this%period_adaptation, iStep, &
                                 this%type1_obs, &
                                 this%type1_units%rotate_delta)
             call adapt_move(this%Box%size, &
                             this%type2_macro%move, &
-                            this%num_adaptation_steps, iStep, &
+                            this%period_adaptation, iStep, &
                             this%type2_obs, &
                             this%type2_units%move_delta)
         end if
