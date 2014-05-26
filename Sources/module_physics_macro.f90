@@ -18,7 +18,7 @@ use class_dipolar_hard_spheres
 use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
 use class_mixing_potential
 use class_hard_spheres_observables
-use class_units
+use class_hard_spheres_units
 
 implicit none
 private
@@ -256,7 +256,7 @@ contains
         
         type(Box_Dimensions), intent(in) :: Box
         class(Hard_Spheres), intent(inout) :: this_spheres
-        class(Units), intent(in) :: this_units
+        class(Hard_Spheres_Units), intent(in) :: this_units
         
         call this_spheres%test_overlap(Box%size)
         call this_spheres%write_snap_data(this_units%snap_positions)
@@ -265,7 +265,7 @@ contains
         select type (this_spheres)
             type is (Dipolar_Hard_Spheres)
                 select type (this_units)
-                    type is (MoreUnits)
+                    type is (Dipolar_Hard_Spheres_Units)
                         call this_spheres%write_snap_data(this_units%snap_orientations)
                         call this_spheres%write_snap_orientations(0, this_units%snapIni_orientations)
                 end select
@@ -317,7 +317,7 @@ contains
         class(Dipolar_Hard_Spheres), intent(in) :: this_spheres
         class(Dipolar_Hard_Spheres_Macro), intent(inout) :: this_macro
         type(json_file), intent(inout) :: json
-        class(MoreUnits), intent(in) :: this_units
+        class(Dipolar_Hard_Spheres_Units), intent(in) :: this_units
         
         character(len=4096) :: data_name
         logical :: found
@@ -368,7 +368,7 @@ contains
     
         type(Box_Dimensions), intent(in) :: Box
         class(Hard_Spheres), intent(inout) :: this_spheres
-        class(Units), intent(in) :: this_units
+        class(Hard_Spheres_Units), intent(in) :: this_units
         
         call this_spheres%test_overlap(Box%size)
         call this_spheres%write_snap_positions(0, this_units%snapFin_positions)
@@ -376,7 +376,7 @@ contains
         select type (this_spheres)
             type is (Dipolar_Hard_Spheres)
                 select type (this_units)
-                    type is (MoreUnits)
+                    type is (Dipolar_Hard_Spheres_Units)
                         call this_spheres%write_snap_orientations(0, this_units%snapFin_orientations)
                 end select
         end select

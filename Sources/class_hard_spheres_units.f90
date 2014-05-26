@@ -1,11 +1,11 @@
-!> \brief Description of the Units class
+!> \brief Description of the Hard_Spheres_Units class
 
-module class_Units
+module class_hard_spheres_units
 
 implicit none
 private
 
-    type, public :: Units
+    type, public :: Hard_Spheres_Units
     
         integer :: obsThermal
         integer :: obsEquilib
@@ -20,12 +20,12 @@ private
     
     contains
     
-        procedure :: open => Units_open
-        procedure :: close => Units_close
+        procedure :: open => Hard_Spheres_Units_open
+        procedure :: close => Hard_Spheres_Units_close
     
-    end type Units
+    end type Hard_Spheres_Units
     
-    type, extends(Units), public :: MoreUnits
+    type, extends(Hard_Spheres_Units), public :: Dipolar_Hard_Spheres_Units
     
         integer :: rotate_delta
 
@@ -40,13 +40,13 @@ private
         
         integer :: totalMoment_modulus
     
-    end type MoreUnits
+    end type Dipolar_Hard_Spheres_Units
     
 contains
 
-    subroutine Units_open(this, name)
+    subroutine Hard_Spheres_Units_open(this, name)
     
-        class(Units), intent(out) :: this
+        class(Hard_Spheres_Units), intent(out) :: this
         character(len=*), intent(in) :: name
         
         open(newunit=this%obsThermal, recl=4096, file=name//"_obsThermal.out", status='new', &
@@ -68,7 +68,7 @@ contains
         
         select type (this)
 
-            type is (MoreUnits)
+            type is (Dipolar_Hard_Spheres_Units)
             
                 open(newunit=this%rotate_delta, recl=4096, file=name//"_rotate_delta.out", &
                     status='new', action='write')
@@ -99,11 +99,11 @@ contains
                 
         end select
         
-    end subroutine Units_open
+    end subroutine Hard_Spheres_Units_open
     
-    subroutine Units_close(this)
+    subroutine Hard_Spheres_Units_close(this)
     
-        class(Units), intent(inout) :: this
+        class(Hard_Spheres_Units), intent(inout) :: this
         
         close(this%obsThermal)
         close(this%obsEquilib)
@@ -118,7 +118,7 @@ contains
         
         select type (this)
             
-            type is (MoreUnits)
+            type is (Dipolar_Hard_Spheres_Units)
             
                 close(this%rotate_delta)
         
@@ -135,6 +135,6 @@ contains
                 
         end select
     
-    end subroutine Units_close
+    end subroutine Hard_Spheres_Units_close
 
-end module class_Units
+end module class_hard_spheres_units

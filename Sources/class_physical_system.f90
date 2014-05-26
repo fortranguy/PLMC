@@ -13,7 +13,7 @@ use class_hard_spheres
 use class_dipolar_hard_spheres
 use class_mixing_potential
 use class_hard_spheres_observables
-use class_units
+use class_hard_spheres_units
 use module_monte_carlo_arguments, only: read_arguments
 use module_physics_macro, only: init_random_seed, set_initial_configuration, &
                                 init_spheres, init_hard_potential, init_cells, &
@@ -47,13 +47,13 @@ private
         type(Dipolar_Hard_Spheres) :: type1_spheres
         type(Dipolar_Hard_Spheres_Macro) :: type1_macro
         type(Dipolar_Hard_Spheres_Observables) :: type1_obs
-        type(MoreUnits) :: type1_units
+        type(Dipolar_Hard_Spheres_Units) :: type1_units
         
         ! Type 2: Hard spheres
         type(Hard_Spheres) :: type2_spheres
         type(Hard_Spheres_Macro) :: type2_macro
         type(Hard_Spheres_Observables) :: type2_obs
-        type(Units) :: type2_units
+        type(Hard_Spheres_Units) :: type2_units
         
         ! Mixing potential
         type(Mixing_Potential) :: mix
