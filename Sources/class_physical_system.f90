@@ -10,7 +10,6 @@ use module_physics_micro, only: NwaveVectors
 use module_data, only: test_data_found
 use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
 use class_hard_spheres
-use class_dipolar_hard_spheres
 use class_mixing_potential
 use class_hard_spheres_observables
 use class_hard_spheres_units

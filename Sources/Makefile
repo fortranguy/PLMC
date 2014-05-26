@@ -66,8 +66,6 @@ class_small_rotation.o: class_small_rotation.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_hard_spheres.o: class_hard_spheres.f90
 	$(FC) -c $(FFLAGS) $< -o $@
-class_dipolar_hard_spheres.o: class_dipolar_hard_spheres.f90
-	$(FC) -c $(FFLAGS) $< -o $@
 class_neighbour_cells.o: class_neighbour_cells.f90
 	$(FC) -c $(FFLAGS) $< -o $@
 class_hard_spheres_potential.o: class_hard_spheres_potential.f90
@@ -112,7 +110,7 @@ program_distribution.o: program_distribution.f90
 $(EXEC1): data.o \
           module_types_micro.o module_physics_micro.o module_data.o\
           class_small_move.o class_small_rotation.o\
-          class_hard_spheres.o class_dipolar_hard_spheres.o \
+          class_hard_spheres.o \
           class_neighbour_cells.o \
           class_hard_spheres_potential.o class_ewald_summation_real.o class_ewald_summation_reci.o\
           class_ewald_summation_self.o class_ewald_summation_bound.o\

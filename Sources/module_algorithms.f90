@@ -7,7 +7,6 @@ use module_physics_micro, only: random_surface, markov_surface
 use class_neighbour_cells
 use class_hard_spheres
 use class_small_move
-use class_dipolar_hard_spheres
 use class_hard_spheres_potential
 use class_small_rotation
 use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro

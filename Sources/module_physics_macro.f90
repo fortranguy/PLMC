@@ -14,7 +14,6 @@ use class_hard_spheres
 use class_hard_spheres_potential
 use class_small_move
 use class_small_rotation
-use class_dipolar_hard_spheres
 use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
 use class_mixing_potential
 use class_hard_spheres_observables

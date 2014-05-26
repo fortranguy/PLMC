@@ -3,11 +3,10 @@
 module class_hard_spheres
 
 use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
-use data_precisions, only: DP, real_zero
+use data_precisions, only: DP
 use data_constants, only: PI
 use data_box, only: Ndim
 use json_module, only: json_file
-use data_distribution, only: snap_ratio
 use module_types_micro, only: Box_Dimensions, Node, Particle_Index
 use module_physics_micro, only: PBC_distance
 use module_data, only: test_data_found
@@ -17,10 +16,8 @@ implicit none
 private
 
     type, public :: Hard_Spheres
-    
-        ! private
-        ! The attributes must be private according to the encapsulation principle.
-        ! Nevertheless, it is public for inheritance.
+        
+        private
     
         character(len=5) :: name
 
@@ -61,9 +58,32 @@ private
         
     end type Hard_Spheres
     
+    type, extends(Hard_Spheres), public :: Dipolar_Hard_Spheres
+
+        private
+        
+        ! Particles
+        real(DP), dimension(:, :), allocatable, public :: all_orientations
+        
+    contains
+
+        !> Construction and destruction of the class
+        procedure :: construct => Dipolar_Hard_Spheres_construct
+        procedure, private :: set_particles => Dipolar_Hard_Spheres_set_particles
+        procedure :: destroy => Dipolar_Hard_Spheres_destroy
+        
+        !> Accessor & Mutator
+        procedure :: get_orientation => Dipolar_Hard_Spheres_get_orientation
+        procedure :: set_orientation => Dipolar_Hard_Spheres_set_orientation
+        
+        procedure :: write_snap_orientations => Dipolar_Hard_Spheres_write_snap_orientations
+        
+    end type Dipolar_Hard_Spheres
+    
 contains
 
     subroutine Hard_Spheres_construct(this, json)    
+    
         class(Hard_Spheres), intent(out) :: this
         type(json_file), intent(inout) :: json
         
@@ -75,7 +95,21 @@ contains
         
     end subroutine Hard_Spheres_construct
     
+    subroutine Dipolar_Hard_Spheres_construct(this, json)
+    
+        class(Dipolar_Hard_Spheres), intent(out) :: this
+        type(json_file), intent(inout) :: json
+        
+        this%name = "dipol"
+        write(output_unit, *) this%name, " class construction"
+    
+        call this%set_particles(json)        
+        call this%Hard_Spheres%set_snap(json)
+    
+    end subroutine Dipolar_Hard_Spheres_construct
+    
     subroutine Hard_Spheres_set_particles(this, json)
+    
         class(Hard_Spheres), intent(inout) :: this
         type(json_file), intent(inout) :: json
         
@@ -96,6 +130,28 @@ contains
         call test_data_found(data_name, found)
         
     end subroutine Hard_Spheres_set_particles
+    
+    subroutine Dipolar_Hard_Spheres_set_particles(this, json)
+    
+        class(Dipolar_Hard_Spheres), intent(inout) :: this
+        type(json_file), intent(inout) :: json
+        
+        character(len=4096) :: data_name
+        logical :: found
+        
+        this%diameter = 1._DP ! = u_length
+        
+        data_name = "Particles.Dipoles.number of particles"
+        call json%get(data_name, this%num_particles, found)
+        call test_data_found(data_name, found)
+        allocate(this%all_positions(Ndim, this%num_particles))
+        allocate(this%all_orientations(Ndim, this%num_particles))
+        
+        data_name = "Particles.Dipoles.number of Widom particles"
+        call json%get(data_name, this%widom_num_particles, found)
+        call test_data_found(data_name, found)
+        
+    end subroutine Dipolar_Hard_Spheres_set_particles
     
     subroutine Hard_Spheres_set_snap(this, json)
     
@@ -124,51 +180,92 @@ contains
     
     end subroutine Hard_Spheres_destroy
     
+    subroutine Dipolar_Hard_Spheres_destroy(this)    
+    
+        class(Dipolar_Hard_Spheres), intent(inout) :: this
+        
+        call this%Hard_Spheres%destroy()
+        if (allocated(this%all_orientations)) deallocate(this%all_orientations) 
+          
+    end subroutine Dipolar_Hard_Spheres_destroy
+    
     !> Accessors
     
     pure function Hard_Spheres_get_name(this) result(get_name)
+    
         class(Hard_Spheres), intent(in) :: this
         character(len=5) :: get_name
         
         get_name = this%name
+        
     end function Hard_Spheres_get_name
 
     pure function Hard_Spheres_get_num_particles(this) result(get_num_particles)
+    
         class(Hard_Spheres), intent(in) :: this
         integer :: get_num_particles
         
         get_num_particles = this%num_particles
+        
     end function Hard_Spheres_get_num_particles
 
     pure function Hard_Spheres_get_widom_num_particles(this) result(get_widom_num_particles)
+    
         class(Hard_Spheres), intent(in) :: this
         integer :: get_widom_num_particles
         
         get_widom_num_particles = this%widom_num_particles
+        
     end function Hard_Spheres_get_widom_num_particles
     
     pure function Hard_Spheres_get_diameter(this) result(get_diameter)
+    
         class(Hard_Spheres), intent(in) :: this
         real(DP) :: get_diameter
         
         get_diameter = this%diameter
+        
     end function Hard_Spheres_get_diameter
     
     pure function Hard_Spheres_get_position(this, i_particle) result(get_position)
+    
         class(Hard_Spheres), intent(in) :: this
         integer, intent(in) :: i_particle
         real(DP), dimension(Ndim) :: get_position
         
         get_position(:) = this%all_positions(:, i_particle)
+        
     end function Hard_Spheres_get_position
     
     subroutine Hard_Spheres_set_position(this, i_particle, position)
+    
         class(Hard_Spheres), intent(inout) :: this
         integer, intent(in) :: i_particle
         real(DP), dimension(:), intent(in) :: position
     
         this%all_positions(:, i_particle) = position(:)
+        
     end subroutine Hard_Spheres_set_position
+    
+    pure function Dipolar_Hard_Spheres_get_orientation(this, i_particle) result(get_orientation)
+    
+        class(Dipolar_Hard_Spheres), intent(in) :: this
+        integer, intent(in) :: i_particle
+        real(DP), dimension(Ndim) :: get_orientation
+        
+        get_orientation(:) = this%all_orientations(:, i_particle)
+        
+    end function Dipolar_Hard_Spheres_get_orientation
+    
+    subroutine Dipolar_Hard_Spheres_set_orientation(this, i_particle, orientation)
+    
+        class(Dipolar_Hard_Spheres), intent(inout) :: this
+        integer, intent(in) :: i_particle
+        real(DP), dimension(:), intent(in) :: orientation
+        
+        this%all_orientations(:, i_particle) = orientation(:)
+        
+    end subroutine Dipolar_Hard_Spheres_set_orientation
     
     !> Write density and compacity
     
@@ -207,9 +304,7 @@ contains
         
     end subroutine Hard_Spheres_write_report
     
-    !> Take a snap shot of the configuration: positions
-    
-    !> Tag the snapshots
+    !> Take a snap shot of the configuration
     
     subroutine Hard_Spheres_write_snap_data(this, snap_unit)
         class(Hard_Spheres), intent(in) :: this
@@ -218,8 +313,6 @@ contains
         write(snap_unit, *) this%name, this%num_particles, this%snap_factor
         
     end subroutine Hard_Spheres_write_snap_data
-    
-    !> Configuration state: positions
       
     subroutine Hard_Spheres_write_snap_positions(this, iStep, snap_unit)
         
@@ -236,6 +329,22 @@ contains
         end if
 
     end subroutine Hard_Spheres_write_snap_positions
+    
+    subroutine Dipolar_Hard_Spheres_write_snap_orientations(this, iStep, snap_unit)
+        
+        class(Dipolar_Hard_Spheres), intent(in) :: this
+        integer, intent(in) :: iStep
+        integer, intent(in) :: snap_unit
+    
+        integer :: i_particle
+        
+        if (modulo(iStep, this%snap_factor) == 0) then
+            do i_particle = 1, this%num_particles
+                write(snap_unit, *) this%all_orientations(:, i_particle)
+            end do
+        end if
+
+    end subroutine Dipolar_Hard_Spheres_write_snap_orientations
     
     !> Do an overlap test
     

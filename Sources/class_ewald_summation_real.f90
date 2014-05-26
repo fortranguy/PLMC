@@ -7,7 +7,7 @@ use json_module, only: json_file
 use module_types_micro, only: Particle_Index
 use module_physics_micro, only: set_discrete_length, PBC_vector, ewald_real_B, ewald_real_C
 use module_data, only: test_data_found
-use class_dipolar_hard_spheres
+use class_hard_spheres, only: Dipolar_Hard_Spheres
 
 implicit none
 

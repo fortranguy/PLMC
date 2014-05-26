@@ -2,7 +2,7 @@ module class_ewald_summation_self
 
 use data_precisions, only: DP
 use data_constants, only: PI
-use class_dipolar_hard_spheres
+use class_hard_spheres, only: Dipolar_Hard_Spheres
 
 implicit none
 
