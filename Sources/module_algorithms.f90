@@ -12,7 +12,7 @@ use class_hard_spheres_potential
 use class_small_rotation
 use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
 use class_mixing_potential
-use class_observables
+use class_hard_spheres_observables
 
 implicit none
 private
@@ -31,7 +31,7 @@ contains
         class(Hard_Spheres), intent(inout) :: this_spheres, other_spheres
         class(Hard_Spheres_Macro), intent(inout) :: this_macro
         class(Neighbour_Cells), intent(inout) :: other_mix_cells
-        class(Observables), intent(inout) :: this_obs
+        class(Hard_Spheres_Observables), intent(inout) :: this_obs
         class(Mixing_Potential), intent(in) :: mix
         real(DP), intent(inout) :: mix_Epot
         
@@ -96,7 +96,7 @@ contains
                         end select
                     class default
                         call this_macro%hard_potential%neighCells(Box%size, this_spheres, this_macro%same_cells, &
-                                                            old, overlap, this_EpotOld)
+                                                                  old, overlap, this_EpotOld)
                         this_deltaEpot = this_EpotNew - this_EpotOld
                 end select
                     
@@ -154,7 +154,7 @@ contains
         class(Hard_Spheres), intent(in) :: this_spheres
         class(Hard_Spheres_Macro), intent(in) :: this_macro
         class(Neighbour_Cells), intent(in) ::  other_mix_cells
-        class(Observables), intent(inout) :: this_obs
+        class(Hard_Spheres_Observables), intent(inout) :: this_obs
         class(Hard_Spheres), intent(in) :: other_spheres
         class(Mixing_Potential), intent(in) :: mix
         
@@ -177,7 +177,7 @@ contains
             if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
                 test%same_iCell = this_macro%same_cells%index_from_position(test%position)
                 call this_macro%hard_potential%neighCells(Box%size, this_spheres, this_macro%same_cells, test, &
-                                                    overlap, this_EpotTest)
+                                                          overlap, this_EpotTest)
             else
                 test%mix_iCell = other_mix_cells%index_from_position(test%position)
                 call mix%Epot_neighCells(Box%size, test, this_macro%mix_cells, other_spheres, overlap, &
@@ -193,7 +193,7 @@ contains
                 else
                     test%same_iCell = this_macro%same_cells%index_from_position(test%position)
                     call this_macro%hard_potential%neighCells(Box%size, this_spheres, this_macro%same_cells, test, &
-                                                        overlap, this_EpotTest)
+                                                              overlap, this_EpotTest)
                 end if
                 
                 if (.not. overlap) then
@@ -238,7 +238,7 @@ contains
         type(Box_Dimensions), intent(in) :: Box
         class(Hard_Spheres), intent(inout) :: type1_spheres, type2_spheres
         class(Hard_Spheres_Macro), intent(inout) :: type1_macro, type2_macro
-        class(Observables), intent(inout) :: type1_obs, type2_obs
+        class(Hard_Spheres_Observables), intent(inout) :: type1_obs, type2_obs
         class(Mixing_Potential), intent(in) :: mix
         real(DP), intent(inout) :: mix_Epot
         integer, intent(inout) :: switch_Nreject
@@ -461,7 +461,7 @@ contains
         type(Box_Dimensions), intent(in) :: Box
         class(Dipolar_Hard_Spheres), intent(inout) :: spheres
         class(Dipolar_Hard_Spheres_Macro), intent(inout) :: macro
-        class(MoreObservables), intent(inout) :: obs
+        class(Dipolar_Hard_Spheres_Observables), intent(inout) :: obs
         
         real(DP) :: random
         type(Particle_Index) :: old, new

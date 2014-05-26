@@ -1,13 +1,13 @@
-!> \brief Description of the Observables class
+!> \brief Description of the Hard_Spheres_Observables class
 
-module class_observables
+module class_hard_spheres_observables
 
 use data_precisions, only: DP
 
 implicit none
 private
 
-    type, public :: Observables
+    type, public :: Hard_Spheres_Observables
     
         ! Move
         integer :: move_Nhit = 0
@@ -27,14 +27,14 @@ private
     
     contains
     
-        procedure :: update_rejections => Observables_update_rejections
-        procedure :: write => Observables_write
-        procedure :: accumulate => Observables_accumulate
-        procedure :: write_results => Observables_write_results
+        procedure :: update_rejections => Hard_Spheres_Observables_update_rejections
+        procedure :: write => Hard_Spheres_Observables_write
+        procedure :: accumulate => Hard_Spheres_Observables_accumulate
+        procedure :: write_results => Hard_Spheres_Observables_write_results
     
-    end type Observables
+    end type Hard_Spheres_Observables
     
-    type, extends(Observables), public :: MoreObservables
+    type, extends(Hard_Spheres_Observables), public :: Dipolar_Hard_Spheres_Observables
         
         ! Rotate
         integer :: rotate_Nhit = 0
@@ -44,66 +44,67 @@ private
         real(DP) :: rotate_rejectAdapt = 0._DP
         real(DP) :: rotate_rejectAvg = 0._DP
         
-    end type MoreObservables
+    end type Dipolar_Hard_Spheres_Observables
     
 contains
     
     !> Update rejection
     
-    pure subroutine Observables_update_rejections(this)
+    pure subroutine Hard_Spheres_Observables_update_rejections(this)
     
-        class(Observables), intent(inout) :: this
+        class(Hard_Spheres_Observables), intent(inout) :: this
         
         this%move_reject = real(this%move_Nreject, DP)/real(this%move_Nhit, DP)
         this%move_Nreject = 0
         this%move_Nhit = 0
         
          select type (this)
-            type is (MoreObservables)
+            type is (Dipolar_Hard_Spheres_Observables)
                 this%rotate_reject = real(this%rotate_Nreject, DP)/real(this%rotate_Nhit, DP)
                 this%rotate_Nreject = 0
                 this%rotate_Nhit = 0
         end select
     
-    end subroutine Observables_update_rejections
+    end subroutine Hard_Spheres_Observables_update_rejections
     
-    subroutine Observables_write(this, iStep, obs_unit)
+    subroutine Hard_Spheres_Observables_write(this, iStep, obs_unit)
     
-        class(Observables), intent(in) :: this
+        class(Hard_Spheres_Observables), intent(in) :: this
         integer, intent(in) :: iStep, obs_unit
         
         select type (this)
-            type is (MoreObservables)
+            type is (Dipolar_Hard_Spheres_Observables)
                 write(obs_unit, *) iStep, this%Epot, this%activ, this%move_reject, &
                                    this%rotate_reject
             class default
                 write(obs_unit, *) iStep, this%Epot, this%activ, this%move_reject
         end select
     
-    end subroutine Observables_write
+    end subroutine Hard_Spheres_Observables_write
     
     !> Accumulations
     
-    pure subroutine Observables_accumulate(this)
+    pure subroutine Hard_Spheres_Observables_accumulate(this)
     
-        class(Observables), intent(inout) :: this
+        class(Hard_Spheres_Observables), intent(inout) :: this
         
         this%EpotSum = this%EpotSum + this%Epot
         this%activSum = this%activSum + this%activ
         this%move_rejectSum = this%move_rejectSum + this%move_reject
         
         select type (this)
-            type is (MoreObservables)
+            type is (Dipolar_Hard_Spheres_Observables)
                 this%rotate_rejectSum = this%rotate_rejectSum + this%rotate_reject
         end select
     
-    end subroutine Observables_accumulate
+    end subroutine Hard_Spheres_Observables_accumulate
     
     !> Results
     
-    subroutine Observables_write_results(this, temperature, num_equilibrium_steps, report_unit)
+    subroutine Hard_Spheres_Observables_write_results(this, temperature, num_equilibrium_steps, &
+                                                      report_unit)
 
-        class(Observables), intent(in) :: this
+        class(Hard_Spheres_Observables), intent(in) :: this
         real(DP), intent(in) :: temperature
         integer, intent(in) :: num_equilibrium_steps
         integer, intent(in) :: report_unit
@@ -119,11 +120,11 @@ contains
                                    this%move_rejectSum/real(num_equilibrium_steps, DP)
         
         select type (this)
-            type is (MoreObservables)
+            type is (Dipolar_Hard_Spheres_Observables)
                 write(report_unit, *) "    rotate rejection rate = ", &
                                       this%rotate_rejectSum/real(num_equilibrium_steps, DP)
         end select
     
-    end subroutine Observables_write_results
+    end subroutine Hard_Spheres_Observables_write_results
 
-end module class_observables
+end module class_hard_spheres_observables

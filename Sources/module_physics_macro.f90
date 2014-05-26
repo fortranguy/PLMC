@@ -17,7 +17,7 @@ use class_small_rotation
 use class_dipolar_hard_spheres
 use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
 use class_mixing_potential
-use class_observables
+use class_hard_spheres_observables
 use class_units
 
 implicit none
@@ -431,7 +431,7 @@ contains
         real(DP), dimension(:), intent(in) :: Box_size
         class(Small_Move), intent(inout) :: this
         integer, intent(in) :: period_adaptation, iStep
-        class(Observables), intent(inout) :: obs
+        class(Hard_Spheres_Observables), intent(inout) :: obs
         integer, intent(in) :: move_unit
     
         obs%move_rejectAvg = obs%move_rejectAdapt / real(period_adaptation-1, DP)
@@ -448,7 +448,7 @@ contains
     
         class(Small_Rotation), intent(inout) :: this
         integer, intent(in) :: period_adaptation, iStep
-        class(MoreObservables), intent(inout) :: obs
+        class(Dipolar_Hard_Spheres_Observables), intent(inout) :: obs
         integer, intent(in) :: rotate_unit
         
         obs%rotate_rejectAvg = obs%rotate_rejectAdapt / real(period_adaptation-1, DP)

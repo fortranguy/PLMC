@@ -12,7 +12,7 @@ use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
 use class_hard_spheres
 use class_dipolar_hard_spheres
 use class_mixing_potential
-use class_observables
+use class_hard_spheres_observables
 use class_units
 use module_monte_carlo_arguments, only: read_arguments
 use module_physics_macro, only: init_random_seed, set_initial_configuration, &
@@ -46,13 +46,13 @@ private
         ! Type 1: Dipolar spheres
         type(Dipolar_Hard_Spheres) :: type1_spheres
         type(Dipolar_Hard_Spheres_Macro) :: type1_macro
-        type(MoreObservables) :: type1_obs
+        type(Dipolar_Hard_Spheres_Observables) :: type1_obs
         type(MoreUnits) :: type1_units
         
         ! Type 2: Hard spheres
         type(Hard_Spheres) :: type2_spheres
         type(Hard_Spheres_Macro) :: type2_macro
-        type(Observables) :: type2_obs
+        type(Hard_Spheres_Observables) :: type2_obs
         type(Units) :: type2_units
         
         ! Mixing potential
@@ -222,7 +222,8 @@ contains
         call json%get(data_name, switch_factor, found)
         call test_data_found(data_name, found)
         
-        this%num_switches = switch_factor * this%decorrelation_factor * this%type1_spheres%get_num_particles()
+        this%num_switches = switch_factor * this%decorrelation_factor * &
+                            this%type1_spheres%get_num_particles()
         this%num_rotations = this%decorrelation_factor * this%type1_spheres%get_num_particles()
         this%num_changes = this%num_moves + this%num_switches + this%num_rotations
         
