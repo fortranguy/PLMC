@@ -16,7 +16,8 @@ use class_observables
 use class_units
 use module_monte_carlo_arguments, only: read_arguments
 use module_physics_macro, only: init_random_seed, set_initial_configuration, &
-                                init_spheres, init_cells, init_hard_potential, set_ewald, &
+                                init_spheres, init_hard_potential, init_cells, &
+                                set_ewald, &
                                 total_energy, &
                                 final_spheres, &
                                 init_mix, mix_final, &

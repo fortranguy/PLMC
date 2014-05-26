@@ -23,7 +23,8 @@ use class_units
 implicit none
 private
 public init_random_seed, set_initial_configuration, &
-       init_spheres, init_cells, init_hard_potential, set_ewald, total_energy, & 
+       init_spheres, init_hard_potential, init_cells, &
+       set_ewald, total_energy, & 
        final_spheres, init_mix, mix_final, &
        adapt_move, adapt_rotation, test_consist
 
@@ -270,7 +271,26 @@ contains
                 end select
         end select
     
-    end subroutine init_spheres
+    end subroutine init_spheres    
+        
+    subroutine init_hard_potential(this_hard_potential, type_name, this_diameter, json)
+    
+        class(Hard_Spheres_Potential), intent(inout) :: this_hard_potential
+        character(len=*), intent(in) :: type_name
+        real(DP), intent(in) :: this_diameter 
+        type(json_file), intent(inout) :: json
+        
+        character(len=4096) :: data_name
+        logical :: found
+        
+        real(DP) :: min_distance_factor
+    
+        data_name = "Potential."//type_name//".minimum distance factor"
+        call json%get(data_name, min_distance_factor, found)
+        call test_data_found(data_name, found)
+        call this_hard_potential%construct(min_distance_factor, this_diameter)
+                                                       
+    end subroutine init_hard_potential
     
     subroutine init_cells(Box_size, this_spheres, this_macro, other_spheres, mix)  
       
@@ -290,25 +310,6 @@ contains
         call this_macro%mix_cells%all_cols_to_cells(other_spheres%get_num_particles(), other_spheres)
 
     end subroutine init_cells
-    
-    subroutine init_hard_potential(this_hard_potential, type_name, this_diameter, json)
-    
-        class(Hard_Spheres_Potential), intent(inout) :: this_hard_potential
-        character(len=*), intent(in) :: type_name
-        real(DP), intent(in) :: this_diameter 
-        type(json_file), intent(inout) :: json
-        
-        character(len=4096) :: data_name
-        logical :: found
-        
-        real(DP) :: min_distance_factor
-    
-        data_name = "Potential."//type_name//".minimum distance factor"
-        call json%get(data_name, min_distance_factor, found)
-        call test_data_found(data_name, found)
-        call this_hard_potential%construct(min_distance_factor, this_diameter)
-                                                       
-    end subroutine init_hard_potential
     
     subroutine set_ewald(Box, this_spheres, this_macro, json, this_units)
     
