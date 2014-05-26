@@ -8,7 +8,7 @@ use data_box, only: Ndim
 use data_neighbour_cells, only: NnearCell
 use json_module, only: json_file
 use module_types_micro, only: Node, Particle_Index
-use module_physics_micro, only: set_discrete_length, PBC_distance, Epot_yukawa
+use module_physics_micro, only: set_discrete_length, PBC_distance, potential_yukawa
 use module_data, only: test_data_found
 use class_hard_spheres, only: Hard_Spheres
 use class_neighbour_cells, only: Neighbour_Cells
@@ -51,9 +51,9 @@ private
         procedure :: test_overlap => Mixing_Potential_test_overlap
         procedure, private :: set_tabulation => Mixing_Potential_set_tabulation
         procedure :: write => Mixing_Potential_write
-        procedure, private :: Epot_pair => Mixing_Potential_Epot_pair
-        procedure :: Epot_neighCells => Mixing_Potential_Epot_neighCells
-        procedure :: Epot_conf => Mixing_Potential_Epot_conf
+        procedure, private :: potential_pair => Mixing_Potential_potential_pair
+        procedure :: potential_neighCells => Mixing_Potential_potential_neighCells
+        procedure :: potential_conf => Mixing_Potential_potential_conf
 
     end type
 
@@ -208,7 +208,7 @@ contains
         ! cut
         do i = this%i_min_distance, this%i_range_cut
             r_i = real(i, DP)*this%delta
-            this%tabulation(i) = Epot_yukawa(this%epsilon, this%alpha, this%min_distance, r_i)
+            this%tabulation(i) = potential_yukawa(this%epsilon, this%alpha, this%min_distance, r_i)
         end do
         
         ! shift
@@ -218,35 +218,35 @@ contains
     
     !> Write the tabulated potential
     
-    subroutine Mixing_Potential_write(this, Epot_unit)
+    subroutine Mixing_Potential_write(this, potential_unit)
 
         class(Mixing_Potential), intent(in) :: this
-        integer, intent(in) :: Epot_unit
+        integer, intent(in) :: potential_unit
 
         integer :: i
         real(DP) :: r_i
 
         do i = this%i_min_distance, this%i_range_cut
             r_i = real(i, DP)*this%delta
-            write(Epot_unit, *) r_i, this%tabulation(i)
+            write(potential_unit, *) r_i, this%tabulation(i)
         end do
 
     end subroutine Mixing_Potential_write
     
     !> Total potential energy
     
-    pure function Mixing_Potential_Epot_conf(this, Box_size, type1, type2) result(Epot_conf)
+    pure function Mixing_Potential_potential_conf(this, Box_size, type1, type2) result(potential_conf)
     
         class(Mixing_Potential), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         class(Hard_Spheres), intent(in) :: type1, type2
-        real(DP) :: Epot_conf
+        real(DP) :: potential_conf
 
         integer :: type1_i_particle, type2_i_particle
         real(DP) :: r_mix
         real(DP), dimension(Ndim) :: type1_xCol, type2_xCol
 
-        Epot_conf = 0._DP
+        potential_conf = 0._DP
         
         if (this%epsilon < real_zero) then
             return
@@ -258,14 +258,14 @@ contains
                 type1_xCol(:) = type1%get_position(type1_i_particle)
                 type2_xCol(:) = type2%get_position(type2_i_particle)
                 r_mix = PBC_distance(Box_size, type1_xCol, type2_xCol)
-                Epot_conf = Epot_conf + this%Epot_pair(r_mix)
+                potential_conf = potential_conf + this%potential_pair(r_mix)
 
             end do
         end do
     
-    end function Mixing_Potential_Epot_conf
+    end function Mixing_Potential_potential_conf
     
-    subroutine Mixing_Potential_Epot_neighCells(this, Box_size, particle, this_cells, other, overlap, &
+    subroutine Mixing_Potential_potential_neighCells(this, Box_size, particle, this_cells, other, overlap, &
                                                 energ)
         
         class(Mixing_Potential), intent(in) :: this
@@ -300,7 +300,7 @@ contains
                         overlap = .true.
                         return
                     end if
-                    energ = energ + this%Epot_pair(r)
+                    energ = energ + this%potential_pair(r)
                 end if
                 
                 if (.not. associated(next%next)) exit
@@ -311,13 +311,13 @@ contains
             
         end do
     
-    end subroutine Mixing_Potential_Epot_neighCells
+    end subroutine Mixing_Potential_potential_neighCells
     
-    pure function Mixing_Potential_Epot_pair(this, r) result(Epot_pair)
+    pure function Mixing_Potential_potential_pair(this, r) result(potential_pair)
         
         class(Mixing_Potential), intent(in) :: this
         real(DP), intent(in) :: r
-        real(DP) :: Epot_pair
+        real(DP) :: potential_pair
         
         integer :: i
         real(DP) :: r_i
@@ -325,11 +325,11 @@ contains
         if (r < this%range_cut) then
             i = int(r/this%delta)
             r_i = real(i, DP)*this%delta
-            Epot_pair = this%tabulation(i) + (r-r_i)/this%delta * (this%tabulation(i+1)-this%tabulation(i))
+            potential_pair = this%tabulation(i) + (r-r_i)/this%delta * (this%tabulation(i+1)-this%tabulation(i))
         else
-            Epot_pair = 0._DP
+            potential_pair = 0._DP
         end if
         
-    end function Mixing_Potential_Epot_pair
+    end function Mixing_Potential_potential_pair
 
 end module class_mixing_potential

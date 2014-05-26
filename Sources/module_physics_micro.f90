@@ -14,7 +14,7 @@ public set_discrete_length, sphere_volume, PBC_vector, PBC_distance, random_surf
        ewald_real_B, ewald_real_C, &
        NwaveVectors, Box_wave1_sym, Box_wave2_sym, fourier_i, exchange_sign, &
        index_from_coord, coord_PBC, &
-       Epot_lennardJones, Epot_yukawa
+       potential_lennardJones, potential_yukawa
 
 contains
 
@@ -301,27 +301,27 @@ contains
     !> \f[
     !>      4\epsilon\left[\left(\frac{\sigma}{r}\right)^{12} - \left(\frac{\sigma}{r}\right)^6\right]
     !> \f]
-    pure function Epot_lennardJones(epsilon, sigma, r)
+    pure function potential_lennardJones(epsilon, sigma, r)
     
         real(DP), intent(in) :: epsilon
         real(DP), intent(in) :: sigma, r
-        real(DP) :: Epot_lennardJones
+        real(DP) :: potential_lennardJones
         
-        Epot_lennardJones = 4._DP * epsilon * ((sigma/r)**12 - (sigma/r)**6)
+        potential_lennardJones = 4._DP * epsilon * ((sigma/r)**12 - (sigma/r)**6)
     
-    end function Epot_lennardJones
+    end function potential_lennardJones
     
     !> Yukawa potential
     !> \f[ \epsilon \frac{e^{-\alpha (r-r_0)}}{r} \f]
     
-    pure function Epot_yukawa(epsilon, alpha, r_0, r)
+    pure function potential_yukawa(epsilon, alpha, r_0, r)
     
         real(DP), intent(in) :: epsilon, alpha
         real(DP), intent(in) :: r_0, r
-        real(DP) :: Epot_yukawa
+        real(DP) :: potential_yukawa
         
-        Epot_yukawa = epsilon * exp(-alpha*(r-r_0)) / r
+        potential_yukawa = epsilon * exp(-alpha*(r-r_0)) / r
     
-    end function Epot_yukawa
+    end function potential_yukawa
 
 end module module_physics_micro

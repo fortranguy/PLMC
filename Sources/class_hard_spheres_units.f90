@@ -16,7 +16,7 @@ private
         integer :: snap_positions
         
         integer :: report
-        integer :: Epot
+        integer :: potential
     
     contains
     
@@ -33,7 +33,7 @@ private
         integer :: snapFin_orientations
         integer :: snap_orientations
         
-        integer :: Epot_real
+        integer :: potential_real
 
         integer :: waveVectors
         integer :: structure_modulus
@@ -64,7 +64,7 @@ contains
              status='new', action='write')
         
         open(newunit=this%report, recl=4096, file=name//"_report.txt", status='new', action='write')
-        open(newunit=this%Epot, recl=4096, file=name//"_Epot.tmp", status='new', action='write')
+        open(newunit=this%potential, recl=4096, file=name//"_potential.tmp", status='new', action='write')
         
         select type (this)
 
@@ -80,7 +80,7 @@ contains
                 open(newunit=this%snap_orientations, recl=4096, &
                      file=name//"_snap_orientations.shots", status='new', action='write')
                      
-                open(newunit=this%Epot_real, recl=4096, file=name//"_Epot_real.tmp", status='new', &
+                open(newunit=this%potential_real, recl=4096, file=name//"_potential_real.tmp", status='new', &
                      action='write')
 
                 open(newunit=this%structure_modulus, recl=4096, file=name//"_structure_modulus.out", &
@@ -114,7 +114,7 @@ contains
         close(this%snap_positions)
         
         close(this%report)
-        close(this%Epot)
+        close(this%potential)
         
         select type (this)
             
@@ -126,7 +126,7 @@ contains
                 close(this%snapFin_orientations)
                 close(this%snap_orientations)
                 
-                close(this%Epot_real)
+                close(this%potential_real)
 
                 close(this%waveVectors)
                 close(this%structure_modulus)

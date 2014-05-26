@@ -18,8 +18,8 @@ private
         real(DP) :: move_rejectAvg = 0._DP
         
         ! Potential energy
-        real(DP) :: Epot
-        real(DP) :: EpotSum = 0._DP
+        real(DP) :: potential
+        real(DP) :: potential_sum = 0._DP
         
         ! Inverse of activity
         real(DP) :: activ
@@ -74,10 +74,10 @@ contains
         
         select type (this)
             type is (Dipolar_Hard_Spheres_Observables)
-                write(obs_unit, *) iStep, this%Epot, this%activ, this%move_reject, &
+                write(obs_unit, *) iStep, this%potential, this%activ, this%move_reject, &
                                    this%rotate_reject
             class default
-                write(obs_unit, *) iStep, this%Epot, this%activ, this%move_reject
+                write(obs_unit, *) iStep, this%potential, this%activ, this%move_reject
         end select
     
     end subroutine Hard_Spheres_Observables_write
@@ -88,7 +88,7 @@ contains
     
         class(Hard_Spheres_Observables), intent(inout) :: this
         
-        this%EpotSum = this%EpotSum + this%Epot
+        this%potential_sum = this%potential_sum + this%potential
         this%activSum = this%activSum + this%activ
         this%move_rejectSum = this%move_rejectSum + this%move_reject
         
@@ -113,7 +113,7 @@ contains
             
         write(report_unit, *) "Results: "
         
-        write(report_unit, *) "    average energy = ", this%EpotSum/real(num_equilibrium_steps, DP)
+        write(report_unit, *) "    average energy = ", this%potential_sum/real(num_equilibrium_steps, DP)
         potChiEx = -temperature*log(this%activSum/real(num_equilibrium_steps, DP))
         write(report_unit, *) "    average excess chemical potential = ", potChiEx
         write(report_unit, *) "    move rejection rate = ", &

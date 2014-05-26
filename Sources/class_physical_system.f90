@@ -56,13 +56,13 @@ private
         
         ! Mixing potential
         type(Mixing_Potential) :: mix
-        real(DP) :: mix_Epot, mix_EpotSum, mix_Epot_conf
+        real(DP) :: mix_potential, mix_potential_sum, mix_potential_conf
         integer :: mix_report_unit
-        integer :: mix_Epot_tab_unit
+        integer :: mix_potential_tab_unit
         integer :: mix_obsThermal_unit, mix_obsEquilib_unit
         
         ! Observables: write to files
-        real(DP) :: Epot, EpotSum
+        real(DP) :: potential, potential_sum
         integer :: report_unit
         integer :: obsThermal_unit, obsEquilib_unit
         
@@ -271,7 +271,7 @@ contains
         type(json_file), intent(inout) :: json
         type(Monte_Carlo_Arguments), intent(in) :: args
         
-        real(DP) :: Epot_conf      
+        real(DP) :: potential_conf      
         
         character(len=4096) :: data_name
         logical :: found  
@@ -295,9 +295,9 @@ contains
                                        this%type2_spheres, this%mix%get_diameter(), &
                                        this%report_unit)
                                        
-        this%mix_EpotSum = 0._DP        
+        this%mix_potential_sum = 0._DP        
         call init_mix(this%Box%size, this%mix, this%type1_spheres, this%type2_spheres, &
-                      this%write_potential, this%mix_Epot_tab_unit, this%mix_Epot)
+                      this%write_potential, this%mix_potential_tab_unit, this%mix_potential)
         call this%mix%write_report(this%mix_report_unit)
         
         call init_spheres(this%Box, this%type1_spheres, this%type1_units)
@@ -306,26 +306,26 @@ contains
         call init_cells(this%Box%size, this%type1_spheres, this%type1_macro, this%type2_spheres, &
                         this%mix)
         call set_ewald(this%Box, this%type1_spheres, this%type1_macro, json, this%type1_units)
-        this%type1_obs%Epot = total_energy(this%Box, this%type1_spheres, this%type1_macro)
+        this%type1_obs%potential = total_energy(this%Box, this%type1_spheres, this%type1_macro)
                         
         call init_spheres(this%Box, this%type2_spheres, this%type2_units)
         call init_hard_potential(this%type2_macro%hard_potential, "Hard Spheres", &
                                  this%type2_spheres%get_diameter(), json)
         call init_cells(this%Box%size, this%type2_spheres, this%type2_macro, this%type1_spheres, &
                         this%mix)        
-        this%type2_obs%Epot = total_energy(this%Box, this%type2_spheres, this%type2_macro)
+        this%type2_obs%potential = total_energy(this%Box, this%type2_spheres, this%type2_macro)
                         
         call this%write_all_reports()
         if (this%write_potential) then
-            call this%type1_macro%hard_potential%write(this%type1_units%Epot)
-            call this%type1_macro%ewald_real%write(this%type1_units%Epot_real)
-            call this%type2_macro%hard_potential%write(this%type2_units%Epot)
+            call this%type1_macro%hard_potential%write(this%type1_units%potential)
+            call this%type1_macro%ewald_real%write(this%type1_units%potential_real)
+            call this%type2_macro%hard_potential%write(this%type2_units%potential)
         end if
         
-        this%EpotSum = 0._DP
-        Epot_conf = this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
-        write(output_unit, *) "Initial potential energy =", Epot_conf
-        write(this%obsThermal_unit, *) 0, Epot_conf
+        this%potential_sum = 0._DP
+        potential_conf = this%type1_obs%potential + this%type2_obs%potential + this%mix_potential
+        write(output_unit, *) "Initial potential energy =", potential_conf
+        write(this%obsThermal_unit, *) 0, potential_conf
     
     end subroutine Physical_System_init
     
@@ -335,7 +335,7 @@ contains
         call open_units(this%report_unit, this%obsThermal_unit, this%obsEquilib_unit)        
         call this%type1_units%open(this%type1_spheres%get_name())           
         call this%type2_units%open(this%type2_spheres%get_name())       
-        call mix_open_units(this%mix_report_unit, this%mix_Epot_tab_unit, this%mix_obsThermal_unit, &
+        call mix_open_units(this%mix_report_unit, this%mix_potential_tab_unit, this%mix_obsThermal_unit, &
                             this%mix_obsEquilib_unit)        
     
     end subroutine Physical_System_open_all_units
@@ -405,14 +405,14 @@ contains
         call final_spheres(this%Box, this%type1_spheres, this%type1_units)
         call set_ewald(this%Box, this%type1_spheres, this%type1_macro, json, this%type1_units)
         type1_energy = total_energy(this%Box, this%type1_spheres, this%type1_macro)
-        call test_consist(this%type1_obs%Epot, type1_energy, this%type1_units%report)
+        call test_consist(this%type1_obs%potential, type1_energy, this%type1_units%report)
         
         call final_spheres(this%Box, this%type2_spheres, this%type2_units)
         type2_energy = total_energy(this%Box, this%type2_spheres, this%type2_macro)
-        call test_consist(this%type2_obs%Epot, type2_energy, this%type2_units%report)
+        call test_consist(this%type2_obs%potential, type2_energy, this%type2_units%report)
         
         call mix_final(this%Box%size, this%mix, this%type1_spheres, this%type2_spheres, &
-                       this%mix_report_unit, this%mix_Epot, this%mix_Epot_conf)
+                       this%mix_report_unit, this%mix_potential, this%mix_potential_conf)
         
         call this%write_all_results()
         call this%close_units()
@@ -424,7 +424,7 @@ contains
         
         call this%type1_obs%write_results(this%Box%temperature, this%num_equilibrium_steps, this%type1_units%report)
         call this%type2_obs%write_results(this%Box%temperature, this%num_equilibrium_steps, this%type2_units%report)
-        call mix_write_results(this%num_equilibrium_steps, this%mix_EpotSum, this%mix_report_unit)
+        call mix_write_results(this%num_equilibrium_steps, this%mix_potential_sum, this%mix_report_unit)
         
         call this%write_results()
     
@@ -433,17 +433,17 @@ contains
     subroutine Physical_System_write_results(this)    
         class(Physical_System), intent(inout) :: this
         
-        real(DP) :: Epot, Epot_conf
+        real(DP) :: potential, potential_conf
         real(DP) :: duration
         
-        Epot = this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
-        Epot_conf = total_energy(this%Box, this%type1_spheres, this%type1_macro) + &
+        potential = this%type1_obs%potential + this%type2_obs%potential + this%mix_potential
+        potential_conf = total_energy(this%Box, this%type1_spheres, this%type1_macro) + &
                     total_energy(this%Box, this%type2_spheres, this%type2_macro) + &
-                    this%mix_Epot_conf
-        call test_consist(Epot, Epot_conf, this%report_unit)
-        this%EpotSum = this%type1_obs%EpotSum + this%type2_obs%EpotSum + this%mix_EpotSum
+                    this%mix_potential_conf
+        call test_consist(potential, potential_conf, this%report_unit)
+        this%potential_sum = this%type1_obs%potential_sum + this%type2_obs%potential_sum + this%mix_potential_sum
         duration = this%time_end - this%time_start
-        call write_results(this%num_particles, this%num_equilibrium_steps, this%EpotSum, this%switch_rejectSum,&
+        call write_results(this%num_particles, this%num_equilibrium_steps, this%potential_sum, this%switch_rejectSum,&
                            duration, this%report_unit)
     
     end subroutine Physical_System_write_results
@@ -455,7 +455,7 @@ contains
         call this%type2_units%close()
         
         close(this%mix_report_unit)
-        close(this%mix_Epot_tab_unit)
+        close(this%mix_potential_tab_unit)
         close(this%mix_obsThermal_unit)
         close(this%mix_obsEquilib_unit)
         
@@ -543,18 +543,18 @@ contains
                     call move(this%Box, &
                               this%type1_spheres, this%type1_macro, this%type1_obs, &
                               this%type2_spheres, this%type2_macro%mix_cells, &
-                              this%mix, this%mix_Epot)
+                              this%mix, this%mix_potential)
                 else
                     call move(this%Box, &
                               this%type2_spheres, this%type2_macro, this%type2_obs, &
                               this%type1_spheres, this%type1_macro%mix_cells, &
-                              this%mix, this%mix_Epot)
+                              this%mix, this%mix_potential)
                 end if
             else if (iChangeRand <= this%num_moves + this%num_switches) then
                 call switch(this%Box, &
                             this%type1_spheres, this%type1_macro, this%type1_obs, &
                             this%type2_spheres, this%type2_macro, this%type2_obs, &
-                            this%mix, this%mix_Epot, &
+                            this%mix, this%mix_potential, &
                             this%switch_Nreject)
                 this%switch_Nhit = this%switch_Nhit + 1
             else
@@ -615,8 +615,8 @@ contains
         call this%type1_obs%write(iStep, this%type1_units%obsThermal)
         call this%type2_obs%write(iStep, this%type2_units%obsThermal)
         
-        write(this%mix_obsThermal_unit, *) iStep, this%mix_Epot
-        write(this%obsThermal_unit, *) iStep, this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
+        write(this%mix_obsThermal_unit, *) iStep, this%mix_potential
+        write(this%obsThermal_unit, *) iStep, this%type1_obs%potential + this%type2_obs%potential + this%mix_potential
             
     end subroutine Physical_System_write_observables_thermalisation
     
@@ -659,7 +659,7 @@ contains
         call this%type1_obs%accumulate()
         call this%type2_obs%accumulate()
         
-        this%mix_EpotSum = this%mix_EpotSum + this%mix_Epot
+        this%mix_potential_sum = this%mix_potential_sum + this%mix_potential
         this%switch_rejectSum = this%switch_rejectSum + this%switch_reject
             
     end subroutine Physical_System_accumulate_observables
@@ -672,8 +672,8 @@ contains
         call this%type1_obs%write(iStep, this%type1_units%obsEquilib)
         call this%type2_obs%write(iStep, this%type2_units%obsEquilib)
         
-        write(this%mix_obsEquilib_unit, *) iStep, this%mix_Epot
-        write(this%obsEquilib_unit, *) iStep, this%type1_obs%Epot + this%type2_obs%Epot + this%mix_Epot
+        write(this%mix_obsEquilib_unit, *) iStep, this%mix_potential
+        write(this%obsEquilib_unit, *) iStep, this%type1_obs%potential + this%type2_obs%potential + this%mix_potential
             
     end subroutine Physical_System_write_observables_equilibrium
     

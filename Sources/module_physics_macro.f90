@@ -385,38 +385,38 @@ contains
     
     !> Mix initialisation
     
-    subroutine init_mix(Box_size, mix, spheres1, spheres2, write_potential, mix_Epot_unit, mix_Epot)
+    subroutine init_mix(Box_size, mix, spheres1, spheres2, write_potential, mix_potential_unit, mix_potential)
     
         real(DP), dimension(:), intent(in) :: Box_size
         class(Mixing_Potential), intent(inout) :: mix
         class(Hard_Spheres), intent(in) :: spheres1, spheres2
         logical, intent(in) :: write_potential
-        integer, intent(in) :: mix_Epot_unit
-        real(DP), intent(out) :: mix_Epot
+        integer, intent(in) :: mix_potential_unit
+        real(DP), intent(out) :: mix_potential
     
         call mix%test_overlap(Box_size, spheres1, spheres2)
         if (write_potential) then
-            call mix%write(mix_Epot_unit)
+            call mix%write(mix_potential_unit)
         end if
         call mix%set_cell_size()
-        mix_Epot = mix%Epot_conf(Box_size, spheres1, spheres2)
+        mix_potential = mix%potential_conf(Box_size, spheres1, spheres2)
     
     end subroutine init_mix
     
     !> Mix finalization
     
-    subroutine mix_final(Box_size, mix, spheres1, spheres2, mix_report_unit, mix_Epot, mix_Epot_conf)
+    subroutine mix_final(Box_size, mix, spheres1, spheres2, mix_report_unit, mix_potential, mix_potential_conf)
     
         real(DP), dimension(:), intent(in) :: Box_size
         class(Mixing_Potential), intent(inout) :: mix
         class(Hard_Spheres), intent(in) :: spheres1, spheres2
         integer, intent(in) :: mix_report_unit
-        real(DP), intent(in) :: mix_Epot
-        real(DP), intent(out) :: mix_Epot_conf
+        real(DP), intent(in) :: mix_potential
+        real(DP), intent(out) :: mix_potential_conf
         
         call mix%test_overlap(Box_size, spheres1, spheres2)
-        mix_Epot_conf = mix%Epot_conf(Box_size, spheres1, spheres2)
-        call test_consist(mix_Epot, mix_Epot_conf, mix_report_unit)
+        mix_potential_conf = mix%potential_conf(Box_size, spheres1, spheres2)
+        call test_consist(mix_potential, mix_potential_conf, mix_report_unit)
     
     end subroutine mix_final
     
@@ -460,22 +460,22 @@ contains
     
     !> Consistency test
     
-    subroutine test_consist(Epot, Epot_conf, report_unit)
+    subroutine test_consist(potential, potential_conf, report_unit)
     
-        real(DP), intent(in) :: Epot, Epot_conf
+        real(DP), intent(in) :: potential, potential_conf
         integer, intent(in) :: report_unit
         
         real(DP) :: difference
         
         write(report_unit, *) "Consistency test: "
-        write(report_unit, *) "    Epot = ", Epot
-        write(report_unit, *) "    Epot_conf = ", Epot_conf
+        write(report_unit, *) "    potential = ", potential
+        write(report_unit, *) "    potential_conf = ", potential_conf
         
-        if (abs(Epot_conf) < real_zero) then
-            difference = abs(Epot_conf-Epot)
+        if (abs(potential_conf) < real_zero) then
+            difference = abs(potential_conf-potential)
             write(report_unit, *) "    absolute difference = ", difference
         else
-            difference = abs((Epot_conf-Epot)/Epot_conf)
+            difference = abs((potential_conf-potential)/potential_conf)
             write(report_unit, *) "    relative difference = ", difference
         end if
         
