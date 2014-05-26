@@ -422,7 +422,11 @@ contains
     
     !> Change: average & adaptation
     
-    subroutine adapt_move(Box_size, this, num_adaptation_steps, iStep, obs, move_unit)
+    subroutine adapt_move(Box_size, &
+                          this, &
+                          num_adaptation_steps, iStep, &
+                          obs, &
+                          move_unit)
     
         real(DP), dimension(:), intent(in) :: Box_size
         class(Small_Move), intent(inout) :: this
@@ -437,7 +441,10 @@ contains
     
     end subroutine adapt_move
     
-    subroutine adapt_rotation(this, num_adaptation_steps, iStep, obs, rotate_unit)
+    subroutine adapt_rotation(this, &
+                              num_adaptation_steps, iStep, &
+                              obs, &
+                              rotate_unit)
     
         class(Small_Rotation), intent(inout) :: this
         integer, intent(in) :: num_adaptation_steps, iStep
