@@ -52,61 +52,6 @@ all: $(EXEC1) $(EXEC2) $(EXEC3) $(EXEC4)
 
 #---------------------------------------------------------------------------------------------------
 
-data.o: data.f90
-	$(FC) -c $(FFLAGS) $< -o $@
-module_types_micro.o: module_types_micro.f90
-	$(FC) -c $(FFLAGS) $< -o $@
-module_physics_micro.o: module_physics_micro.f90
-	$(FC) -c $(FFLAGS) $< -o $@
-module_data.o: module_data.f90
-	$(FC) -c $(FFLAGS) $< -o $@
-class_small_move.o: class_small_move.f90
-	$(FC) -c $(FFLAGS) $< -o $@
-class_small_rotation.o: class_small_rotation.f90
-	$(FC) -c $(FFLAGS) $< -o $@
-class_hard_spheres.o: class_hard_spheres.f90
-	$(FC) -c $(FFLAGS) $< -o $@
-class_neighbour_cells.o: class_neighbour_cells.f90
-	$(FC) -c $(FFLAGS) $< -o $@
-class_hard_spheres_potential.o: class_hard_spheres_potential.f90
-	$(FC) -c $(FFLAGS) $< -o $@
-class_ewald_summation_real.o: class_ewald_summation_real.f90
-	$(FC) -c $(FFLAGS) $< -o $@
-class_ewald_summation_reci.o: class_ewald_summation_reci.f90
-	$(FC) -c $(FFLAGS) $< -o $@
-class_ewald_summation_self.o: class_ewald_summation_self.f90
-	$(FC) -c $(FFLAGS) $< -o $@
-class_ewald_summation_bound.o: class_ewald_summation_bound.f90
-	$(FC) -c $(FFLAGS) $< -o $@
-class_mixing_potential.o: class_mixing_potential.f90
-	$(FC) -c $(FFLAGS) $< -o $@
-class_hard_spheres_observables.o: class_hard_spheres_observables.f90
-	$(FC) -c $(FFLAGS) $< -o $@
-class_hard_spheres_units.o: class_hard_spheres_units.f90
-	$(FC) -c $(FFLAGS) $< -o $@
-module_types_macro.o: module_types_macro.f90
-	$(FC) -c $(FFLAGS) $< -o $@
-module_physics_macro.o: module_physics_macro.f90
-	$(FC) -c $(FFLAGS) $< -o $@
-module_algorithms.o: module_algorithms.f90
-	$(FC) -c $(FFLAGS) $< -o $@
-module_write.o: module_write.f90
-	$(FC) -c $(FFLAGS) $< -o $@
-module_monte_carlo_arguments.o: module_monte_carlo_arguments.f90
-	$(FC) -c $(FFLAGS) $< -o $@
-class_physical_system.o: class_physical_system.f90
-	$(FC) -c $(FFLAGS) $< -o $@
-program_monte_carlo.o: program_monte_carlo.f90
-	$(FC) -c $(FFLAGS) $< -o $@
-program_bunching.o: program_bunching.f90
-	$(FC) -c $(FFLAGS) $< -o $@
-program_histogram.o: program_histogram.f90
-	$(FC) -c $(FFLAGS) $< -o $@
-program_distribution.o: program_distribution.f90
-	$(FC) -c $(FFLAGS) $< -o $@
-	
-# ------------------------------------------------------------------------
-
 $(EXEC1): data.o \
           module_types_micro.o module_physics_micro.o module_data.o\
           class_small_move.o class_small_rotation.o\
@@ -130,6 +75,11 @@ $(EXEC3): data.o program_histogram.o
 	
 $(EXEC4): data.o module_physics_micro.o program_distribution.o
 	$(FC) $^ -o $@ $(LDFLAGS)
+	
+# ------------------------------------------------------------------------
+
+%.o: %.f90
+	$(FC) $(FFLAGS) -c $< -o $@
 
 # --------------------------------------------------------------------------------------------------
 .PHONY: clean mrproper remove
