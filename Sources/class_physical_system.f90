@@ -67,8 +67,8 @@ private
         integer :: obsThermal_unit, obsEquilib_unit
         
         ! Switch
-        integer :: switch_num_hits, switch_Nreject
-        real(DP) :: switch_reject, switch_rejectSum
+        integer :: switch_num_hits, switch_num_rejections
+        real(DP) :: switch_rejection_rate, switch_sum_rejection
         
         logical :: write_potential, snap
         integer :: reset_i_step
@@ -387,9 +387,9 @@ contains
         class(Physical_System), intent(inout) :: this
         
         this%switch_num_hits = 0
-        this%switch_Nreject = 0
-        this%switch_reject = 0._DP
-        this%switch_rejectSum = 0._DP
+        this%switch_num_rejections = 0
+        this%switch_rejection_rate = 0._DP
+        this%switch_sum_rejection = 0._DP
         
     end subroutine Physical_System_init_switch
     
@@ -443,7 +443,7 @@ contains
         call test_consist(potential, potential_conf, this%report_unit)
         this%potential_sum = this%type1_obs%potential_sum + this%type2_obs%potential_sum + this%mix_potential_sum
         duration = this%time_end - this%time_start
-        call write_results(this%num_particles, this%num_equilibrium_steps, this%potential_sum, this%switch_rejectSum,&
+        call write_results(this%num_particles, this%num_equilibrium_steps, this%potential_sum, this%switch_sum_rejection,&
                            duration, this%report_unit)
     
     end subroutine Physical_System_write_results
@@ -555,7 +555,7 @@ contains
                             this%type1_spheres, this%type1_macro, this%type1_obs, &
                             this%type2_spheres, this%type2_macro, this%type2_obs, &
                             this%mix, this%mix_potential, &
-                            this%switch_Nreject)
+                            this%switch_num_rejections)
                 this%switch_num_hits = this%switch_num_hits + 1
             else
                 call rotate(this%Box, &
@@ -572,8 +572,8 @@ contains
         call this%type1_obs%update_rejections()
         call this%type2_obs%update_rejections()
         
-        this%switch_reject = real(this%switch_Nreject, DP)/real(this%switch_num_hits, DP)
-        this%switch_Nreject = 0
+        this%switch_rejection_rate = real(this%switch_num_rejections, DP)/real(this%switch_num_hits, DP)
+        this%switch_num_rejections = 0
         this%switch_num_hits = 0
         
     end subroutine Physical_System_update_rejections
@@ -583,12 +583,12 @@ contains
         integer, intent(in) :: i_step
         
         if (mod(i_step, this%period_adaptation) /= 0) then ! Rejections accumulation
-            this%type1_obs%move_rejectAdapt = this%type1_obs%move_rejectAdapt + &
-                                              this%type1_obs%move_reject
-            this%type1_obs%rotate_rejectAdapt = this%type1_obs%rotate_rejectAdapt + &
-                                                this%type1_obs%rotate_reject
-            this%type2_obs%move_rejectAdapt = this%type2_obs%move_rejectAdapt + &
-                                              this%type2_obs%move_reject
+            this%type1_obs%move_rejection_adapt = this%type1_obs%move_rejection_adapt + &
+                                                  this%type1_obs%move_rejection_rate
+            this%type1_obs%rotate_rejection_adapt = this%type1_obs%rotate_rejection_adapt + &
+                                                    this%type1_obs%rotate_rejection_rate
+            this%type2_obs%move_rejection_adapt = this%type2_obs%move_rejection_adapt + &
+                                                  this%type2_obs%move_rejection_rate
         else ! Average & adaptation
             call adapt_move(this%Box%size, &
                             this%type1_macro%move, &
@@ -627,13 +627,16 @@ contains
         character(len=5) :: type_name
         
         type_name = this%type1_spheres%get_name()
-        call this%type1_macro%move%set_delta(type_name, this%Box%size, this%type1_obs%move_rejectAvg, &
-                                       this%type1_units%report)
-        call this%type1_macro%rotation%set_delta(type_name, this%type1_obs%rotate_rejectAvg, &
-                                           this%type1_units%report)
+        call this%type1_macro%move%set_delta(type_name, this%Box%size, &
+                                             this%type1_obs%move_rejection_average, &
+                                             this%type1_units%report)
+        call this%type1_macro%rotation%set_delta(type_name, &
+                                                 this%type1_obs%rotate_rejection_average, &
+                                                 this%type1_units%report)
         type_name = this%type2_spheres%get_name()
-        call this%type2_macro%move%set_delta(type_name, this%Box%size, this%type2_obs%move_rejectAvg, &
-                                       this%type2_units%report)
+        call this%type2_macro%move%set_delta(type_name, this%Box%size, &
+                                             this%type2_obs%move_rejection_average, &
+                                             this%type2_units%report)
     
     end subroutine Physical_System_fix_changes
     
@@ -660,7 +663,7 @@ contains
         call this%type2_obs%accumulate()
         
         this%mix_potential_sum = this%mix_potential_sum + this%mix_potential
-        this%switch_rejectSum = this%switch_rejectSum + this%switch_reject
+        this%switch_sum_rejection = this%switch_sum_rejection + this%switch_rejection_rate
             
     end subroutine Physical_System_accumulate_observables
     

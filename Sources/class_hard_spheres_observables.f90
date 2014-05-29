@@ -11,19 +11,19 @@ private
     
         ! Move
         integer :: move_num_hits = 0
-        integer :: move_Nreject = 0
-        real(DP) :: move_reject = 0._DP
-        real(DP) :: move_rejectSum = 0._DP
-        real(DP) :: move_rejectAdapt = 0._DP
-        real(DP) :: move_rejectAvg = 0._DP
+        integer :: move_num_rejections = 0
+        real(DP) :: move_rejection_rate = 0._DP
+        real(DP) :: move_sum_rejection = 0._DP
+        real(DP) :: move_rejection_adapt = 0._DP
+        real(DP) :: move_rejection_average = 0._DP
         
         ! Potential energy
         real(DP) :: potential
         real(DP) :: potential_sum = 0._DP
         
         ! Inverse of activity
-        real(DP) :: activ
-        real(DP) :: activSum = 0._DP
+        real(DP) :: inv_activity
+        real(DP) :: sum_inv_activity = 0._DP
     
     contains
     
@@ -38,11 +38,11 @@ private
         
         ! Rotate
         integer :: rotate_num_hits = 0
-        integer :: rotate_Nreject = 0
-        real(DP) :: rotate_reject = 0._DP
-        real(DP) :: rotate_rejectSum = 0._DP
-        real(DP) :: rotate_rejectAdapt = 0._DP
-        real(DP) :: rotate_rejectAvg = 0._DP
+        integer :: rotate_num_rejections = 0
+        real(DP) :: rotate_rejection_rate = 0._DP
+        real(DP) :: rotate_sum_rejection = 0._DP
+        real(DP) :: rotate_rejection_adapt = 0._DP
+        real(DP) :: rotate_rejection_average = 0._DP
         
     end type Dipolar_Hard_Spheres_Observables
     
@@ -54,14 +54,14 @@ contains
     
         class(Hard_Spheres_Observables), intent(inout) :: this
         
-        this%move_reject = real(this%move_Nreject, DP)/real(this%move_num_hits, DP)
-        this%move_Nreject = 0
+        this%move_rejection_rate = real(this%move_num_rejections, DP)/real(this%move_num_hits, DP)
+        this%move_num_rejections = 0
         this%move_num_hits = 0
         
          select type (this)
             type is (Dipolar_Hard_Spheres_Observables)
-                this%rotate_reject = real(this%rotate_Nreject, DP)/real(this%rotate_num_hits, DP)
-                this%rotate_Nreject = 0
+                this%rotate_rejection_rate = real(this%rotate_num_rejections, DP)/real(this%rotate_num_hits, DP)
+                this%rotate_num_rejections = 0
                 this%rotate_num_hits = 0
         end select
     
@@ -74,10 +74,10 @@ contains
         
         select type (this)
             type is (Dipolar_Hard_Spheres_Observables)
-                write(obs_unit, *) i_step, this%potential, this%activ, this%move_reject, &
-                                   this%rotate_reject
+                write(obs_unit, *) i_step, this%potential, this%inv_activity, this%move_rejection_rate, &
+                                   this%rotate_rejection_rate
             class default
-                write(obs_unit, *) i_step, this%potential, this%activ, this%move_reject
+                write(obs_unit, *) i_step, this%potential, this%inv_activity, this%move_rejection_rate
         end select
     
     end subroutine Hard_Spheres_Observables_write
@@ -89,12 +89,12 @@ contains
         class(Hard_Spheres_Observables), intent(inout) :: this
         
         this%potential_sum = this%potential_sum + this%potential
-        this%activSum = this%activSum + this%activ
-        this%move_rejectSum = this%move_rejectSum + this%move_reject
+        this%sum_inv_activity = this%sum_inv_activity + this%inv_activity
+        this%move_sum_rejection = this%move_sum_rejection + this%move_rejection_rate
         
         select type (this)
             type is (Dipolar_Hard_Spheres_Observables)
-                this%rotate_rejectSum = this%rotate_rejectSum + this%rotate_reject
+                this%rotate_sum_rejection = this%rotate_sum_rejection + this%rotate_rejection_rate
         end select
     
     end subroutine Hard_Spheres_Observables_accumulate
@@ -114,15 +114,15 @@ contains
         write(report_unit, *) "Results: "
         
         write(report_unit, *) "    average energy = ", this%potential_sum/real(num_equilibrium_steps, DP)
-        potChiEx = -temperature*log(this%activSum/real(num_equilibrium_steps, DP))
+        potChiEx = -temperature*log(this%sum_inv_activity/real(num_equilibrium_steps, DP))
         write(report_unit, *) "    average excess chemical potential = ", potChiEx
         write(report_unit, *) "    move rejection rate = ", &
-                                   this%move_rejectSum/real(num_equilibrium_steps, DP)
+                                   this%move_sum_rejection/real(num_equilibrium_steps, DP)
         
         select type (this)
             type is (Dipolar_Hard_Spheres_Observables)
                 write(report_unit, *) "    rotate rejection rate = ", &
-                                      this%rotate_rejectSum/real(num_equilibrium_steps, DP)
+                                      this%rotate_sum_rejection/real(num_equilibrium_steps, DP)
         end select
     
     end subroutine Hard_Spheres_Observables_write_results

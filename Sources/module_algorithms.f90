@@ -128,15 +128,15 @@ contains
                     end if
                     
                 else
-                    this_obs%move_Nreject = this_obs%move_Nreject + 1
+                    this_obs%move_num_rejections = this_obs%move_num_rejections + 1
                 end if
          
             else
-                this_obs%move_Nreject = this_obs%move_Nreject + 1
+                this_obs%move_num_rejections = this_obs%move_num_rejections + 1
             end if
             
         else
-            this_obs%move_Nreject = this_obs%move_Nreject + 1
+            this_obs%move_num_rejections = this_obs%move_num_rejections + 1
         end if
     
     end subroutine move
@@ -221,7 +221,7 @@ contains
             
         end do
         
-        this_obs%activ = widTestSum/real(this_spheres%get_widom_num_particles(), DP)
+        this_obs%inv_activity = widTestSum/real(this_spheres%get_widom_num_particles(), DP)
         
     end subroutine widom
     
@@ -231,7 +231,7 @@ contains
                       type1_spheres, type1_macro, type1_obs, &
                       type2_spheres, type2_macro, type2_obs, &
                       mix, mix_potential, &
-                      switch_Nreject)
+                      switch_num_rejections)
     
         type(Box_Dimensions), intent(in) :: Box
         class(Hard_Spheres), intent(inout) :: type1_spheres, type2_spheres
@@ -239,7 +239,7 @@ contains
         class(Hard_Spheres_Observables), intent(inout) :: type1_obs, type2_obs
         class(Mixing_Potential), intent(in) :: mix
         real(DP), intent(inout) :: mix_potential
-        integer, intent(inout) :: switch_Nreject
+        integer, intent(inout) :: switch_num_rejections
         
         real(DP) :: random
         type(Particle_Index) :: old1, old2
@@ -251,7 +251,7 @@ contains
         type(Particle_Energy) :: type2_EpotOld, type2_EpotNew
         
         if (type1_spheres%get_num_particles()==0 .or. type2_spheres%get_num_particles()==0) then
-            switch_Nreject = switch_Nreject + 1
+            switch_num_rejections = switch_num_rejections + 1
             return
         end if
         
@@ -316,15 +316,15 @@ contains
                     mix_potential = mix_potential + type1_mix_deltaEpot + type2_mix_deltaEpot
                     
                 else
-                    switch_Nreject = switch_Nreject + 1
+                    switch_num_rejections = switch_num_rejections + 1
                 end if
                 
             else
-                switch_Nreject = switch_Nreject + 1
+                switch_num_rejections = switch_num_rejections + 1
             end if
             
         else
-            switch_Nreject = switch_Nreject + 1
+            switch_num_rejections = switch_num_rejections + 1
         end if
         
     end subroutine switch
@@ -499,7 +499,7 @@ contains
             obs%potential = obs%potential + deltaEpot
             
         else
-            obs%rotate_Nreject = obs%rotate_Nreject + 1
+            obs%rotate_num_rejections = obs%rotate_num_rejections + 1
         end if
     
     end subroutine rotate
