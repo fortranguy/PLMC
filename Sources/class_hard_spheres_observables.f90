@@ -10,7 +10,7 @@ private
     type, public :: Hard_Spheres_Observables
     
         ! Move
-        integer :: move_Nhit = 0
+        integer :: move_num_hits = 0
         integer :: move_Nreject = 0
         real(DP) :: move_reject = 0._DP
         real(DP) :: move_rejectSum = 0._DP
@@ -37,7 +37,7 @@ private
     type, extends(Hard_Spheres_Observables), public :: Dipolar_Hard_Spheres_Observables
         
         ! Rotate
-        integer :: rotate_Nhit = 0
+        integer :: rotate_num_hits = 0
         integer :: rotate_Nreject = 0
         real(DP) :: rotate_reject = 0._DP
         real(DP) :: rotate_rejectSum = 0._DP
@@ -54,15 +54,15 @@ contains
     
         class(Hard_Spheres_Observables), intent(inout) :: this
         
-        this%move_reject = real(this%move_Nreject, DP)/real(this%move_Nhit, DP)
+        this%move_reject = real(this%move_Nreject, DP)/real(this%move_num_hits, DP)
         this%move_Nreject = 0
-        this%move_Nhit = 0
+        this%move_num_hits = 0
         
          select type (this)
             type is (Dipolar_Hard_Spheres_Observables)
-                this%rotate_reject = real(this%rotate_Nreject, DP)/real(this%rotate_Nhit, DP)
+                this%rotate_reject = real(this%rotate_Nreject, DP)/real(this%rotate_num_hits, DP)
                 this%rotate_Nreject = 0
-                this%rotate_Nhit = 0
+                this%rotate_num_hits = 0
         end select
     
     end subroutine Hard_Spheres_Observables_update_rejections

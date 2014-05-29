@@ -44,7 +44,7 @@ contains
         
         real(DP) :: this_EpotNew_real, this_EpotOld_real
         
-        this_obs%move_Nhit = this_obs%move_Nhit + 1
+        this_obs%move_num_hits = this_obs%move_num_hits + 1
         
         call random_number(random)
         old%number = int(random*this_spheres%get_num_particles()) + 1
@@ -467,7 +467,7 @@ contains
         real(DP) :: deltaEpot_real, deltaEpot_self
         real(DP) :: real_EpotNew, real_EpotOld
         
-        obs%rotate_Nhit = obs%rotate_Nhit + 1
+        obs%rotate_num_hits = obs%rotate_num_hits + 1
 
         call random_number(random)
         old%number = int(random*spheres%get_num_particles()) + 1

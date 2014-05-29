@@ -67,7 +67,7 @@ private
         integer :: obsThermal_unit, obsEquilib_unit
         
         ! Switch
-        integer :: switch_Nhit, switch_Nreject
+        integer :: switch_num_hits, switch_Nreject
         real(DP) :: switch_reject, switch_rejectSum
         
         logical :: write_potential, snap
@@ -386,7 +386,7 @@ contains
     pure subroutine Physical_System_init_switch(this)
         class(Physical_System), intent(inout) :: this
         
-        this%switch_Nhit = 0
+        this%switch_num_hits = 0
         this%switch_Nreject = 0
         this%switch_reject = 0._DP
         this%switch_rejectSum = 0._DP
@@ -556,7 +556,7 @@ contains
                             this%type2_spheres, this%type2_macro, this%type2_obs, &
                             this%mix, this%mix_potential, &
                             this%switch_Nreject)
-                this%switch_Nhit = this%switch_Nhit + 1
+                this%switch_num_hits = this%switch_num_hits + 1
             else
                 call rotate(this%Box, &
                             this%type1_spheres, this%type1_macro, this%type1_obs)
@@ -572,9 +572,9 @@ contains
         call this%type1_obs%update_rejections()
         call this%type2_obs%update_rejections()
         
-        this%switch_reject = real(this%switch_Nreject, DP)/real(this%switch_Nhit, DP)
+        this%switch_reject = real(this%switch_Nreject, DP)/real(this%switch_num_hits, DP)
         this%switch_Nreject = 0
-        this%switch_Nhit = 0
+        this%switch_num_hits = 0
         
     end subroutine Physical_System_update_rejections
     
