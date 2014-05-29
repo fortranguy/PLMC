@@ -12,7 +12,7 @@ implicit none
     
     integer :: Nobs
     integer :: iBunching, Nbunching
-    integer :: iStep, iStepIn, NstepVar
+    integer :: i_step, iStepIn, NstepVar
     real(DP), dimension(:), allocatable :: sumVal, sumValSqr
     real(DP), dimension(:), allocatable :: error
 
@@ -61,12 +61,12 @@ implicit none
         
         ! Read
         if (iBunching == 1) then
-            do iStep = 1, 2*NstepVar
-                read(obs_unit, *) iStepIn, dataIn(:, iStep)
+            do i_step = 1, 2*NstepVar
+                read(obs_unit, *) iStepIn, dataIn(:, i_step)
             end do
         else
-            do iStep = 1, 2*NstepVar
-                dataIn(:, iStep) = dataOut(:, iStep)
+            do i_step = 1, 2*NstepVar
+                dataIn(:, i_step) = dataOut(:, i_step)
             end do
         end if
     
@@ -74,10 +74,10 @@ implicit none
         sumVal = 0.
         sumValSqr = 0.
         
-        do iStep = 1, NstepVar
-            sumVal(:) = sumVal(:) + dataIn(:, 2*iStep-1) + dataIn(:, 2*iStep)
-            sumValSqr(:) = sumValSqr(:) + dataIn(:, 2*iStep-1)**2 + dataIn(:, 2*iStep)**2
-            dataOut(:, iStep) = (dataIn(:, 2*iStep-1) + dataIn(:, 2*iStep))/2.
+        do i_step = 1, NstepVar
+            sumVal(:) = sumVal(:) + dataIn(:, 2*i_step-1) + dataIn(:, 2*i_step)
+            sumValSqr(:) = sumValSqr(:) + dataIn(:, 2*i_step-1)**2 + dataIn(:, 2*i_step)**2
+            dataOut(:, i_step) = (dataIn(:, 2*i_step-1) + dataIn(:, 2*i_step))/2.
         end do
         
         error(:) = sumValSqr(:)/real(2*NstepVar, DP) - (sumVal(:)/real(2*NstepVar, DP))**2

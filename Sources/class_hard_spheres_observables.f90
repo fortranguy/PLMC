@@ -67,17 +67,17 @@ contains
     
     end subroutine Hard_Spheres_Observables_update_rejections
     
-    subroutine Hard_Spheres_Observables_write(this, iStep, obs_unit)
+    subroutine Hard_Spheres_Observables_write(this, i_step, obs_unit)
     
         class(Hard_Spheres_Observables), intent(in) :: this
-        integer, intent(in) :: iStep, obs_unit
+        integer, intent(in) :: i_step, obs_unit
         
         select type (this)
             type is (Dipolar_Hard_Spheres_Observables)
-                write(obs_unit, *) iStep, this%potential, this%activ, this%move_reject, &
+                write(obs_unit, *) i_step, this%potential, this%activ, this%move_reject, &
                                    this%rotate_reject
             class default
-                write(obs_unit, *) iStep, this%potential, this%activ, this%move_reject
+                write(obs_unit, *) i_step, this%potential, this%activ, this%move_reject
         end select
     
     end subroutine Hard_Spheres_Observables_write

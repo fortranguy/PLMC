@@ -10,7 +10,7 @@ use data_histogram, only: hist_dE
 implicit none
 
     integer :: Nobs
-    integer :: iStep, iStepIn
+    integer :: i_step, iStepIn
     integer :: iObs, iDist
     real(DP), dimension(:, :), allocatable :: limit_values
     integer, dimension(:, :), allocatable :: Ndists
@@ -43,8 +43,8 @@ implicit none
     
     write(output_unit, *) "num_equilibrium_steps = ", num_equilibrium_steps
     
-    do iStep = 1, num_equilibrium_steps
-        read(obs_unit, *) iStepIn, observables(:, iStep)
+    do i_step = 1, num_equilibrium_steps
+        read(obs_unit, *) iStepIn, observables(:, i_step)
     end do
     
     do iObs = 1, Nobs
@@ -55,8 +55,8 @@ implicit none
     allocate(dist_funct_energy(Ndists(1, 1): Ndists(2, 1)))
     
     dist_funct_energy(:) = 0._DP
-    do iStep = 1, num_equilibrium_steps
-        iDist = int(observables(1, iStep)/hist_dE)
+    do i_step = 1, num_equilibrium_steps
+        iDist = int(observables(1, i_step)/hist_dE)
         dist_funct_energy(iDist) = dist_funct_energy(iDist) + 1._DP
     end do
     dist_funct_energy(:) = dist_funct_energy(:) / real(num_equilibrium_steps, DP) / hist_dE

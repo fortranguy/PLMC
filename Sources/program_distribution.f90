@@ -21,7 +21,7 @@ implicit none
 
     real(DP) :: rMax
     integer :: Ndist
-    integer :: iStep
+    integer :: i_step
     integer :: i_particle, j_particle
     real(DP) :: r_ij
     integer :: iDist
@@ -92,7 +92,7 @@ implicit none
     !$ tIni_para = omp_get_wtime()
     !$omp parallel do schedule(static) reduction(+:dist_sum) private(positions, i_particle, j_particle, &
     !$ r_ij, iDist)
-    do iStep = 1, num_equilibrium_steps/snap_factor
+    do i_step = 1, num_equilibrium_steps/snap_factor
 
         ! Read
         !$omp critical

@@ -14,7 +14,7 @@ implicit none
     type(Monte_Carlo_Arguments) :: args
     type(json_file) :: json
     
-    integer :: iStep
+    integer :: i_step
 
     call json_initialize()
     call json%load_file(filename = "data.json")
@@ -25,17 +25,17 @@ implicit none
     write(output_unit, *) "Beginning of cycles"
     
     call sys%set_time_start()
-    MC_Cycle: do iStep = 1, sys%get_num_thermalisation_steps() + sys%get_num_equilibrium_steps()
+    MC_Cycle: do i_step = 1, sys%get_num_thermalisation_steps() + sys%get_num_equilibrium_steps()
     
         call sys%random_changes()
         call sys%update_rejections()
         
-        MC_Regime: if (iStep <= sys%get_num_thermalisation_steps()) then
+        MC_Regime: if (i_step <= sys%get_num_thermalisation_steps()) then
             
-            call sys%adapt_changes(iStep)
-            call sys%write_observables_thermalisation(iStep)
+            call sys%adapt_changes(i_step)
+            call sys%write_observables_thermalisation(i_step)
             
-            if (iStep == sys%get_num_thermalisation_steps()) then
+            if (i_step == sys%get_num_thermalisation_steps()) then
                 write(output_unit, *) "Thermalisation: over"
                 call sys%fix_changes()
             end if
@@ -44,12 +44,12 @@ implicit none
         
             call sys%measure_chemical_potentials()
             call sys%accumulate_observables()
-            call sys%write_observables_equilibrium(iStep)
-            call sys%take_snapshots(iStep)
+            call sys%write_observables_equilibrium(i_step)
+            call sys%take_snapshots(i_step)
             
         end if MC_Regime
         
-        call sys%reinitialize_quantites(iStep)
+        call sys%reinitialize_quantites(i_step)
     
     end do MC_Cycle
     call sys%set_time_end()

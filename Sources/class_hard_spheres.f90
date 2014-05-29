@@ -314,15 +314,15 @@ contains
         
     end subroutine Hard_Spheres_write_snap_data
       
-    subroutine Hard_Spheres_write_snap_positions(this, iStep, snap_unit)
+    subroutine Hard_Spheres_write_snap_positions(this, i_step, snap_unit)
         
         class(Hard_Spheres), intent(in) :: this
-        integer, intent(in) :: iStep
+        integer, intent(in) :: i_step
         integer, intent(in) :: snap_unit
     
         integer :: i_particle
         
-        if (modulo(iStep, this%snap_factor) == 0) then
+        if (modulo(i_step, this%snap_factor) == 0) then
             do i_particle = 1, this%num_particles
                 write(snap_unit, *) this%all_positions(:, i_particle)
             end do
@@ -330,15 +330,15 @@ contains
 
     end subroutine Hard_Spheres_write_snap_positions
     
-    subroutine Dipolar_Hard_Spheres_write_snap_orientations(this, iStep, snap_unit)
+    subroutine Dipolar_Hard_Spheres_write_snap_orientations(this, i_step, snap_unit)
         
         class(Dipolar_Hard_Spheres), intent(in) :: this
-        integer, intent(in) :: iStep
+        integer, intent(in) :: i_step
         integer, intent(in) :: snap_unit
     
         integer :: i_particle
         
-        if (modulo(iStep, this%snap_factor) == 0) then
+        if (modulo(i_step, this%snap_factor) == 0) then
             do i_particle = 1, this%num_particles
                 write(snap_unit, *) this%all_orientations(:, i_particle)
             end do

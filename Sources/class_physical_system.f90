@@ -71,7 +71,7 @@ private
         real(DP) :: switch_reject, switch_rejectSum
         
         logical :: write_potential, snap
-        integer :: reset_iStep
+        integer :: reset_i_step
         real(DP) :: time_start, time_end
     
     contains
@@ -281,9 +281,9 @@ contains
         call test_data_found(data_name, found)
         
         data_name = "Monte Carlo.period of reset"
-        call json%get(data_name, this%reset_iStep, found)
+        call json%get(data_name, this%reset_i_step, found)
         call test_data_found(data_name, found)
-        this%reset_iStep = this%reset_iStep / this%decorrelation_factor
+        this%reset_i_step = this%reset_i_step / this%decorrelation_factor
         
         write(output_unit, *) "Monte-Carlo Simulation: Canonical ensemble"
         
@@ -378,7 +378,7 @@ contains
         write(report_unit, *) "    num_switches = ", this%num_switches
         write(report_unit, *) "    num_rotations = ", this%num_rotations
         
-        write(report_unit, *) "    reset_iStep = ", this%reset_iStep
+        write(report_unit, *) "    reset_i_step = ", this%reset_i_step
         write(report_unit, *) "    write_potential = ", this%write_potential
     
     end subroutine Physical_System_write_report
@@ -578,11 +578,11 @@ contains
         
     end subroutine Physical_System_update_rejections
     
-    subroutine Physical_System_adapt_changes(this, iStep)    
+    subroutine Physical_System_adapt_changes(this, i_step)    
         class(Physical_System), intent(inout) :: this
-        integer, intent(in) :: iStep
+        integer, intent(in) :: i_step
         
-        if (mod(iStep, this%period_adaptation) /= 0) then ! Rejections accumulation
+        if (mod(i_step, this%period_adaptation) /= 0) then ! Rejections accumulation
             this%type1_obs%move_rejectAdapt = this%type1_obs%move_rejectAdapt + &
                                               this%type1_obs%move_reject
             this%type1_obs%rotate_rejectAdapt = this%type1_obs%rotate_rejectAdapt + &
@@ -592,31 +592,31 @@ contains
         else ! Average & adaptation
             call adapt_move(this%Box%size, &
                             this%type1_macro%move, &
-                            this%period_adaptation, iStep, &
+                            this%period_adaptation, i_step, &
                             this%type1_obs, &
                             this%type1_units%move_delta)
             call adapt_rotation(this%type1_macro%rotation, &
-                                this%period_adaptation, iStep, &
+                                this%period_adaptation, i_step, &
                                 this%type1_obs, &
                                 this%type1_units%rotate_delta)
             call adapt_move(this%Box%size, &
                             this%type2_macro%move, &
-                            this%period_adaptation, iStep, &
+                            this%period_adaptation, i_step, &
                             this%type2_obs, &
                             this%type2_units%move_delta)
         end if
         
     end subroutine Physical_System_adapt_changes
     
-    subroutine Physical_System_write_observables_thermalisation(this, iStep)    
+    subroutine Physical_System_write_observables_thermalisation(this, i_step)    
         class(Physical_System), intent(inout) :: this
-        integer, intent(in) :: iStep
+        integer, intent(in) :: i_step
     
-        call this%type1_obs%write(iStep, this%type1_units%obsThermal)
-        call this%type2_obs%write(iStep, this%type2_units%obsThermal)
+        call this%type1_obs%write(i_step, this%type1_units%obsThermal)
+        call this%type2_obs%write(i_step, this%type2_units%obsThermal)
         
-        write(this%mix_obsThermal_unit, *) iStep, this%mix_potential
-        write(this%obsThermal_unit, *) iStep, this%type1_obs%potential + this%type2_obs%potential + this%mix_potential
+        write(this%mix_obsThermal_unit, *) i_step, this%mix_potential
+        write(this%obsThermal_unit, *) i_step, this%type1_obs%potential + this%type2_obs%potential + this%mix_potential
             
     end subroutine Physical_System_write_observables_thermalisation
     
@@ -664,43 +664,43 @@ contains
             
     end subroutine Physical_System_accumulate_observables
     
-    subroutine Physical_System_write_observables_equilibrium(this, iStep)
+    subroutine Physical_System_write_observables_equilibrium(this, i_step)
     
         class(Physical_System), intent(inout) :: this
-        integer, intent(in) :: iStep
+        integer, intent(in) :: i_step
     
-        call this%type1_obs%write(iStep, this%type1_units%obsEquilib)
-        call this%type2_obs%write(iStep, this%type2_units%obsEquilib)
+        call this%type1_obs%write(i_step, this%type1_units%obsEquilib)
+        call this%type2_obs%write(i_step, this%type2_units%obsEquilib)
         
-        write(this%mix_obsEquilib_unit, *) iStep, this%mix_potential
-        write(this%obsEquilib_unit, *) iStep, this%type1_obs%potential + this%type2_obs%potential + this%mix_potential
+        write(this%mix_obsEquilib_unit, *) i_step, this%mix_potential
+        write(this%obsEquilib_unit, *) i_step, this%type1_obs%potential + this%type2_obs%potential + this%mix_potential
             
     end subroutine Physical_System_write_observables_equilibrium
     
-    subroutine Physical_System_take_snapshots(this, iStep)
+    subroutine Physical_System_take_snapshots(this, i_step)
     
         class(Physical_System), intent(inout) :: this
-        integer, intent(in) :: iStep
+        integer, intent(in) :: i_step
         
         if (this%snap) then ! Snap shots of the configuration
-            call this%type1_spheres%write_snap_positions(iStep, this%type1_units%snap_positions)
-            call this%type1_spheres%write_snap_orientations(iStep, &
+            call this%type1_spheres%write_snap_positions(i_step, this%type1_units%snap_positions)
+            call this%type1_spheres%write_snap_orientations(i_step, &
                                                             this%type1_units%snap_orientations)
-            call this%type2_spheres%write_snap_positions(iStep, this%type2_units%snap_positions)
+            call this%type2_spheres%write_snap_positions(i_step, this%type2_units%snap_positions)
         end if
         
     end subroutine Physical_System_take_snapshots
     
     !> Reinitialize summed quantities to prevent them from drifting.
-    subroutine Physical_System_reinitialize_quantites(this, iStep)
+    subroutine Physical_System_reinitialize_quantites(this, i_step)
     
         class(Physical_System), intent(inout) :: this
-        integer, intent(in) :: iStep
+        integer, intent(in) :: i_step
     
-        if (modulo(iStep, this%reset_iStep) == 0) then
-            call this%type1_macro%ewald_reci%reset_structure(this%Box, this%type1_spheres, iStep, &
+        if (modulo(i_step, this%reset_i_step) == 0) then
+            call this%type1_macro%ewald_reci%reset_structure(this%Box, this%type1_spheres, i_step, &
                                                              this%type1_units%structure_modulus)
-            call this%type1_macro%ewald_bound%reset_total_moment(this%type1_spheres, iStep, &
+            call this%type1_macro%ewald_bound%reset_total_moment(this%type1_spheres, i_step, &
                  this%type1_units%totalMoment_modulus)
         end if
         
