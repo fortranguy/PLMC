@@ -55,9 +55,10 @@ contains
                                 mix_observables_equilibrium_unit
     
         open(newunit=mix_report_unit, recl=4096, file="mix_report.txt", status='new', action='write')
-        open(newunit=mix_potential_energy_unit, recl=4096, file="mix_potential_energy.tmp", status='new', action='write')
-        open(newunit=mix_observables_thermalisation_unit, recl=4096, file="mix_observables_thermalisation.out", &
-             status='new', action='write')
+        open(newunit=mix_potential_energy_unit, recl=4096, file="mix_potential_energy.tmp", status='new', &
+            action='write')
+        open(newunit=mix_observables_thermalisation_unit, recl=4096, &
+             file="mix_observables_thermalisation.out", status='new', action='write')
         open(newunit=mix_observables_equilibrium_unit, recl=4096, file="mix_observables_equilibrium.out", &
              status='new', action='write')
         write(mix_observables_equilibrium_unit, *) "#", 1 ! 1 observable: energy
@@ -66,7 +67,8 @@ contains
     
     !> Total: Results
     
-    subroutine write_results(num_particles, num_equilibrium_steps, potential_energy_sum, switch_rejectSum, duration, report_unit)
+    subroutine write_results(num_particles, num_equilibrium_steps, potential_energy_sum, switch_rejectSum, &
+                             duration, report_unit)
     
         integer, intent(in) :: num_particles, num_equilibrium_steps
         real(DP), intent(in) :: potential_energy_sum, switch_rejectSum
@@ -76,8 +78,10 @@ contains
         write(report_unit, *) "Results: "
         write(report_unit, *) "    average energy = ", potential_energy_sum/real(num_equilibrium_steps, DP)
         write(report_unit, *) "    average energy per particule = ", &
-                                   potential_energy_sum/real(num_equilibrium_steps, DP)/real(num_particles, DP)
-        write(report_unit, *) "    switch rejection rate = ", switch_rejectSum/real(num_equilibrium_steps, DP)
+                                   potential_energy_sum / real(num_equilibrium_steps, DP) / &
+                                   real(num_particles, DP)
+        write(report_unit, *) "    switch rejection rate = ", switch_rejectSum / &
+                                   real(num_equilibrium_steps, DP)
         write(report_unit, *) "    duration =", duration/60._DP, "min"
     
     end subroutine write_results
