@@ -36,7 +36,7 @@ private
         !> Construction and destruction of the class
         procedure :: construct => Hard_Spheres_construct
         procedure, private :: set_particles => Hard_Spheres_set_particles
-        procedure :: set_snap => Hard_Spheres_set_snap
+        procedure, private :: set_snap => Hard_Spheres_set_snap
         procedure :: destroy => Hard_Spheres_destroy
         
         !> Accessors & Mutators
