@@ -7,7 +7,6 @@ use data_precisions, only: DP
 use data_constants, only: PI
 use data_box, only: Ndim
 use json_module, only: json_file
-use module_types_micro, only: Box_Dimensions, Node, Particle_Index
 use module_physics_micro, only: PBC_distance
 use module_data, only: test_data_found
 
