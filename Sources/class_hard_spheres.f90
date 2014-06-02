@@ -45,9 +45,8 @@ private
         procedure :: get_widom_num_particles => Hard_Spheres_get_widom_num_particles
         procedure :: get_diameter => Hard_Spheres_get_diameter
         procedure :: get_position => Hard_Spheres_get_position
-        procedure :: set_position => Hard_Spheres_set_position    
+        procedure :: set_position => Hard_Spheres_set_position
         
-        procedure :: write_density => Hard_Spheres_write_density
         procedure :: write_report => Hard_Spheres_write_report
         
         procedure :: write_snap_data => Hard_Spheres_write_snap_data
@@ -265,27 +264,6 @@ contains
         this%all_orientations(:, i_particle) = orientation(:)
         
     end subroutine Dipolar_Hard_Spheres_set_orientation
-    
-    !> Write density and compacity
-    
-    subroutine Hard_Spheres_write_density(this, Box_size, total_num_particles, report_unit)
-    
-        class(Hard_Spheres), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: Box_size ! warning: average ?
-        integer, intent(in) :: total_num_particles
-        integer, intent(in) :: report_unit
-        
-        real(DP) :: density, compacity, concentration
-        
-        density = real(this%num_particles + 1, DP) / product(Box_size) ! cheating ? cf. Widom
-        compacity = 4._DP/3._DP*PI*(this%diameter/2._DP)**3 * density
-        concentration = real(this%num_particles, DP) / real(total_num_particles, DP)
-        
-        write(report_unit, *) "    density = ", density
-        write(report_unit, *) "    compacity = ", compacity
-        write(report_unit, *) "    concentration = ", concentration
-    
-    end subroutine Hard_Spheres_write_density
     
     !> Write a report of the component in a file
     

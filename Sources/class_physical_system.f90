@@ -22,7 +22,8 @@ use module_physics_macro, only: init_random_seed, set_initial_configuration, &
                                 init_mix, mix_final, &
                                 adapt_move, adapt_rotation, test_consist
 use module_algorithms, only: move, widom, switch, rotate
-use module_write, only: open_units, write_data, mix_open_units, write_results, mix_write_results
+use module_write, only: open_units, write_data, mix_open_units, write_results, mix_write_results, &
+                        write_spheres_density
 
 implicit none
 
@@ -349,12 +350,12 @@ contains
         call write_data(this%report_unit)
         call this%write_report(this%report_unit)
         
-        call this%type1_spheres%write_density(this%Box%size, this%num_particles, &
-                                              this%type1_units%report)
+        call write_spheres_density(this%Box%size, this%type1_spheres, this%num_particles, &
+                                   this%type1_units%report)
         call this%type1_spheres%write_report(this%type1_units%report)
         
-        call this%type2_spheres%write_density(this%Box%size, this%num_particles, &
-                                              this%type2_units%report)
+        call write_spheres_density(this%Box%size, this%type2_spheres, this%num_particles, &
+                                   this%type2_units%report)
         call this%type2_spheres%write_report(this%type2_units%report)
         
         call this%mix%write_report(this%mix_report_unit)
