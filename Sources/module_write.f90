@@ -48,11 +48,11 @@ contains
 
     !> Mix: open units
     
-    subroutine mix_open_units(mix_report_unit, mix_potential_energy_unit, mix_observables_thermalisation_unit, &
-                              mix_observables_equilibrium_unit)
+    subroutine mix_open_units(mix_report_unit, mix_potential_energy_unit, &
+                              mix_observables_thermalisation_unit, mix_observables_equilibrium_unit)
                                   
-        integer, intent(out) :: mix_report_unit, mix_potential_energy_unit, mix_observables_thermalisation_unit, &
-                                mix_observables_equilibrium_unit
+        integer, intent(out) :: mix_report_unit, mix_potential_energy_unit, &
+                                mix_observables_thermalisation_unit, mix_observables_equilibrium_unit
     
         open(newunit=mix_report_unit, recl=4096, file="mix_report.txt", status='new', action='write')
         open(newunit=mix_potential_energy_unit, recl=4096, file="mix_potential_energy.tmp", status='new', &
