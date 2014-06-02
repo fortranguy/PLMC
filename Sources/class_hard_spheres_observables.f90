@@ -18,8 +18,8 @@ private
         real(DP) :: move_rejection_average = 0._DP
         
         ! Potential energy
-        real(DP) :: potential
-        real(DP) :: potential_sum = 0._DP
+        real(DP) :: potential_energy
+        real(DP) :: potential_energy_sum = 0._DP
         
         ! Inverse of activity
         real(DP) :: inv_activity
@@ -74,10 +74,10 @@ contains
         
         select type (this)
             type is (Dipolar_Hard_Spheres_Observables)
-                write(observables_unit, *) i_step, this%potential, this%inv_activity, this%move_rejection_rate, &
+                write(observables_unit, *) i_step, this%potential_energy, this%inv_activity, this%move_rejection_rate, &
                                    this%rotate_rejection_rate
             class default
-                write(observables_unit, *) i_step, this%potential, this%inv_activity, this%move_rejection_rate
+                write(observables_unit, *) i_step, this%potential_energy, this%inv_activity, this%move_rejection_rate
         end select
     
     end subroutine Hard_Spheres_Observables_write
@@ -88,7 +88,7 @@ contains
     
         class(Hard_Spheres_Observables), intent(inout) :: this
         
-        this%potential_sum = this%potential_sum + this%potential
+        this%potential_energy_sum = this%potential_energy_sum + this%potential_energy
         this%sum_inv_activity = this%sum_inv_activity + this%inv_activity
         this%move_sum_rejection = this%move_sum_rejection + this%move_rejection_rate
         
@@ -113,7 +113,7 @@ contains
             
         write(report_unit, *) "Results: "
         
-        write(report_unit, *) "    average energy = ", this%potential_sum/real(num_equilibrium_steps, DP)
+        write(report_unit, *) "    average energy = ", this%potential_energy_sum/real(num_equilibrium_steps, DP)
         potChiEx = -temperature*log(this%sum_inv_activity/real(num_equilibrium_steps, DP))
         write(report_unit, *) "    average excess chemical potential = ", potChiEx
         write(report_unit, *) "    move rejection rate = ", &

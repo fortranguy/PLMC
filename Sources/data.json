@@ -43,7 +43,7 @@
             }
         }
     },
-    "Potential": {
+    "Potential Energy": {
         "Dipoles": {
             "minimum distance factor": 1.0,
             "Ewald summation": {

@@ -68,12 +68,12 @@ contains
         
         this%min_distance = min_distance
 
-        data_name = "Potential.Dipoles.Ewald summation.real.range cut factor"
+        data_name = "Potential Energy.Dipoles.Ewald summation.real.range cut factor"
         call json%get(data_name, range_cut_factor, found)
         call test_data_found(data_name, found)
         this%range_cut = range_cut_factor * Box_size(1)
 
-        data_name = "Potential.Dipoles.Ewald summation.real.delta"
+        data_name = "Potential Energy.Dipoles.Ewald summation.real.delta"
         call json%get(data_name, this%delta, found)
         call test_data_found(data_name, found)
         call set_discrete_length(this%min_distance, this%delta)
@@ -111,16 +111,16 @@ contains
 
     end subroutine Ewald_Summation_Real_destroy
 
-    subroutine Ewald_Summation_Real_write(this, potential_unit)
+    subroutine Ewald_Summation_Real_write(this, potential_energy_unit)
         class(Ewald_Summation_Real), intent(in) :: this
-        integer, intent(in) :: potential_unit
+        integer, intent(in) :: potential_energy_unit
 
         integer :: i_distance
         real(DP) :: distance_i
 
         do i_distance = this%i_min_distance, this%i_range_cut
             distance_i = real(i_distance, DP)*this%delta
-            write(potential_unit, *) distance_i, this%tabulation(i_distance, :)
+            write(potential_energy_unit, *) distance_i, this%tabulation(i_distance, :)
         end do
 
     end subroutine Ewald_Summation_Real_write

@@ -10,12 +10,12 @@ use module_physics_micro, only: NwaveVectors
 use module_data, only: test_data_found
 use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
 use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres
-use class_mixing_potential, only: Mixing_Potential
+use class_mixing_potential_energy, only: Mixing_Potential_Energy
 use class_hard_spheres_observables, only: Hard_Spheres_Observables, Dipolar_Hard_Spheres_Observables
 use class_hard_spheres_units, only: Hard_Spheres_Units, Dipolar_Hard_Spheres_Units
 use module_monte_carlo_arguments, only: read_arguments
 use module_physics_macro, only: init_random_seed, set_initial_configuration, &
-                                init_spheres, init_hard_potential, init_cells, &
+                                init_spheres, init_hard_potential_energy, init_cells, &
                                 set_ewald, &
                                 total_energy, &
                                 final_spheres, &
@@ -54,15 +54,15 @@ private
         type(Hard_Spheres_Observables) :: type2_observables
         type(Hard_Spheres_Units) :: type2_units
         
-        ! Mixing potential
-        type(Mixing_Potential) :: mix
-        real(DP) :: mix_potential, mix_potential_sum, mix_potential_conf
+        ! Mixing potential_energy
+        type(Mixing_Potential_Energy) :: mix
+        real(DP) :: mix_potential_energy, mix_potential_energy_sum, mix_potential_energy_conf
         integer :: mix_report_unit
-        integer :: mix_potential_tab_unit
+        integer :: mix_potential_energy_tab_unit
         integer :: mix_observables_thermalisation_unit, mix_observables_equilibrium_unit
         
         ! Observables: write to files
-        real(DP) :: potential, potential_sum
+        real(DP) :: potential_energy, potential_energy_sum
         integer :: report_unit
         integer :: observables_thermalisation_unit, observables_equilibrium_unit
         
@@ -70,7 +70,7 @@ private
         integer :: switch_num_hits, switch_num_rejections
         real(DP) :: switch_rejection_rate, switch_sum_rejection
         
-        logical :: write_potential, snap
+        logical :: write_potential_energy, snap
         integer :: reset_i_step
         real(DP) :: time_start, time_end
     
@@ -134,8 +134,8 @@ contains
         call this%set_box(json)
         call this%set_monte_carlo_steps(json)
         
-        data_name = "Potential.write"
-        call json%get(data_name, this%write_potential, found)
+        data_name = "Potential Energy.write"
+        call json%get(data_name, this%write_potential_energy, found)
         call test_data_found(data_name, found)
         
         call this%type1_spheres%construct(json)
@@ -271,7 +271,7 @@ contains
         type(json_file), intent(inout) :: json
         type(Monte_Carlo_Arguments), intent(in) :: args
         
-        real(DP) :: potential_conf      
+        real(DP) :: potential_energy_conf      
         
         character(len=4096) :: data_name
         logical :: found  
@@ -295,38 +295,38 @@ contains
                                        this%type2_spheres, this%mix%get_diameter(), &
                                        this%report_unit)
                                        
-        this%mix_potential_sum = 0._DP        
+        this%mix_potential_energy_sum = 0._DP        
         call init_mix(this%Box%size, this%mix, this%type1_spheres, this%type2_spheres, &
-                      this%write_potential, this%mix_potential_tab_unit, this%mix_potential)
+                      this%write_potential_energy, this%mix_potential_energy_tab_unit, this%mix_potential_energy)
         call this%mix%write_report(this%mix_report_unit)
         
         call init_spheres(this%Box, this%type1_spheres, this%type1_units)
-        call init_hard_potential(this%type1_macro%hard_potential, "Dipoles", &
+        call init_hard_potential_energy(this%type1_macro%hard_potential_energy, "Dipoles", &
                                  this%type1_spheres%get_diameter(), json)
         call init_cells(this%Box%size, this%type1_spheres, this%type1_macro, this%type2_spheres, &
                         this%mix)
         call set_ewald(this%Box, this%type1_spheres, this%type1_macro, json, this%type1_units)
-        this%type1_observables%potential = total_energy(this%Box, this%type1_spheres, this%type1_macro)
+        this%type1_observables%potential_energy = total_energy(this%Box, this%type1_spheres, this%type1_macro)
                         
         call init_spheres(this%Box, this%type2_spheres, this%type2_units)
-        call init_hard_potential(this%type2_macro%hard_potential, "Hard Spheres", &
+        call init_hard_potential_energy(this%type2_macro%hard_potential_energy, "Hard Spheres", &
                                  this%type2_spheres%get_diameter(), json)
         call init_cells(this%Box%size, this%type2_spheres, this%type2_macro, this%type1_spheres, &
                         this%mix)        
-        this%type2_observables%potential = total_energy(this%Box, this%type2_spheres, this%type2_macro)
+        this%type2_observables%potential_energy = total_energy(this%Box, this%type2_spheres, this%type2_macro)
                         
         call this%write_all_reports()
-        if (this%write_potential) then
-            call this%type1_macro%hard_potential%write(this%type1_units%potential)
-            call this%type1_macro%ewald_real%write(this%type1_units%potential_real)
-            call this%type2_macro%hard_potential%write(this%type2_units%potential)
+        if (this%write_potential_energy) then
+            call this%type1_macro%hard_potential_energy%write(this%type1_units%potential_energy)
+            call this%type1_macro%ewald_real%write(this%type1_units%potential_energy_real)
+            call this%type2_macro%hard_potential_energy%write(this%type2_units%potential_energy)
         end if
         
-        this%potential_sum = 0._DP
-        potential_conf = this%type1_observables%potential + this%type2_observables%potential + &
-                         this%mix_potential
-        write(output_unit, *) "Initial potential energy =", potential_conf
-        write(this%observables_thermalisation_unit, *) 0, potential_conf
+        this%potential_energy_sum = 0._DP
+        potential_energy_conf = this%type1_observables%potential_energy + this%type2_observables%potential_energy + &
+                         this%mix_potential_energy
+        write(output_unit, *) "Initial potential_energy energy =", potential_energy_conf
+        write(this%observables_thermalisation_unit, *) 0, potential_energy_conf
     
     end subroutine Physical_System_init
     
@@ -337,7 +337,7 @@ contains
                         this%observables_equilibrium_unit)        
         call this%type1_units%open(this%type1_spheres%get_name())           
         call this%type2_units%open(this%type2_spheres%get_name())       
-        call mix_open_units(this%mix_report_unit, this%mix_potential_tab_unit, &
+        call mix_open_units(this%mix_report_unit, this%mix_potential_energy_tab_unit, &
                             this%mix_observables_thermalisation_unit, &
                             this%mix_observables_equilibrium_unit)        
     
@@ -382,7 +382,7 @@ contains
         write(report_unit, *) "    num_rotations = ", this%num_rotations
         
         write(report_unit, *) "    reset_i_step = ", this%reset_i_step
-        write(report_unit, *) "    write_potential = ", this%write_potential
+        write(report_unit, *) "    write_potential_energy = ", this%write_potential_energy
     
     end subroutine Physical_System_write_report
     
@@ -408,14 +408,14 @@ contains
         call final_spheres(this%Box, this%type1_spheres, this%type1_units)
         call set_ewald(this%Box, this%type1_spheres, this%type1_macro, json, this%type1_units)
         type1_energy = total_energy(this%Box, this%type1_spheres, this%type1_macro)
-        call test_consist(this%type1_observables%potential, type1_energy, this%type1_units%report)
+        call test_consist(this%type1_observables%potential_energy, type1_energy, this%type1_units%report)
         
         call final_spheres(this%Box, this%type2_spheres, this%type2_units)
         type2_energy = total_energy(this%Box, this%type2_spheres, this%type2_macro)
-        call test_consist(this%type2_observables%potential, type2_energy, this%type2_units%report)
+        call test_consist(this%type2_observables%potential_energy, type2_energy, this%type2_units%report)
         
         call mix_final(this%Box%size, this%mix, this%type1_spheres, this%type2_spheres, &
-                       this%mix_report_unit, this%mix_potential, this%mix_potential_conf)
+                       this%mix_report_unit, this%mix_potential_energy, this%mix_potential_energy_conf)
         
         call this%write_all_results()
         call this%close_units()
@@ -427,7 +427,7 @@ contains
         
         call this%type1_observables%write_results(this%Box%temperature, this%num_equilibrium_steps, this%type1_units%report)
         call this%type2_observables%write_results(this%Box%temperature, this%num_equilibrium_steps, this%type2_units%report)
-        call mix_write_results(this%num_equilibrium_steps, this%mix_potential_sum, this%mix_report_unit)
+        call mix_write_results(this%num_equilibrium_steps, this%mix_potential_energy_sum, this%mix_report_unit)
         
         call this%write_results()
     
@@ -436,20 +436,20 @@ contains
     subroutine Physical_System_write_results(this)    
         class(Physical_System), intent(inout) :: this
         
-        real(DP) :: potential, potential_conf
+        real(DP) :: potential_energy, potential_energy_conf
         real(DP) :: duration
         
-        potential = this%type1_observables%potential + this%type2_observables%potential + &
-                    this%mix_potential
-        potential_conf = total_energy(this%Box, this%type1_spheres, this%type1_macro) + &
+        potential_energy = this%type1_observables%potential_energy + this%type2_observables%potential_energy + &
+                    this%mix_potential_energy
+        potential_energy_conf = total_energy(this%Box, this%type1_spheres, this%type1_macro) + &
                     total_energy(this%Box, this%type2_spheres, this%type2_macro) + &
-                    this%mix_potential_conf
-        call test_consist(potential, potential_conf, this%report_unit)
-        this%potential_sum = this%type1_observables%potential_sum + &
-                             this%type2_observables%potential_sum + &
-                             this%mix_potential_sum
+                    this%mix_potential_energy_conf
+        call test_consist(potential_energy, potential_energy_conf, this%report_unit)
+        this%potential_energy_sum = this%type1_observables%potential_energy_sum + &
+                             this%type2_observables%potential_energy_sum + &
+                             this%mix_potential_energy_sum
         duration = this%time_end - this%time_start
-        call write_results(this%num_particles, this%num_equilibrium_steps, this%potential_sum, &
+        call write_results(this%num_particles, this%num_equilibrium_steps, this%potential_energy_sum, &
                            this%switch_sum_rejection, duration, this%report_unit)
     
     end subroutine Physical_System_write_results
@@ -461,7 +461,7 @@ contains
         call this%type2_units%close()
         
         close(this%mix_report_unit)
-        close(this%mix_potential_tab_unit)
+        close(this%mix_potential_energy_tab_unit)
         close(this%mix_observables_thermalisation_unit)
         close(this%mix_observables_equilibrium_unit)
         
@@ -549,18 +549,18 @@ contains
                     call move(this%Box, &
                               this%type1_spheres, this%type1_macro, this%type1_observables, &
                               this%type2_spheres, this%type2_macro%mix_cells, &
-                              this%mix, this%mix_potential)
+                              this%mix, this%mix_potential_energy)
                 else
                     call move(this%Box, &
                               this%type2_spheres, this%type2_macro, this%type2_observables, &
                               this%type1_spheres, this%type1_macro%mix_cells, &
-                              this%mix, this%mix_potential)
+                              this%mix, this%mix_potential_energy)
                 end if
             else if (iChangeRand <= this%num_moves + this%num_switches) then
                 call switch(this%Box, &
                             this%type1_spheres, this%type1_macro, this%type1_observables, &
                             this%type2_spheres, this%type2_macro, this%type2_observables, &
-                            this%mix, this%mix_potential, &
+                            this%mix, this%mix_potential_energy, &
                             this%switch_num_rejections)
                 this%switch_num_hits = this%switch_num_hits + 1
             else
@@ -621,8 +621,8 @@ contains
         call this%type1_observables%write(i_step, this%type1_units%observables_thermalisation)
         call this%type2_observables%write(i_step, this%type2_units%observables_thermalisation)
         
-        write(this%mix_observables_thermalisation_unit, *) i_step, this%mix_potential
-        write(this%observables_thermalisation_unit, *) i_step, this%type1_observables%potential + this%type2_observables%potential + this%mix_potential
+        write(this%mix_observables_thermalisation_unit, *) i_step, this%mix_potential_energy
+        write(this%observables_thermalisation_unit, *) i_step, this%type1_observables%potential_energy + this%type2_observables%potential_energy + this%mix_potential_energy
             
     end subroutine Physical_System_write_observables_thermalisation
     
@@ -668,7 +668,7 @@ contains
         call this%type1_observables%accumulate()
         call this%type2_observables%accumulate()
         
-        this%mix_potential_sum = this%mix_potential_sum + this%mix_potential
+        this%mix_potential_energy_sum = this%mix_potential_energy_sum + this%mix_potential_energy
         this%switch_sum_rejection = this%switch_sum_rejection + this%switch_rejection_rate
             
     end subroutine Physical_System_accumulate_observables
@@ -681,10 +681,10 @@ contains
         call this%type1_observables%write(i_step, this%type1_units%observables_equilibrium)
         call this%type2_observables%write(i_step, this%type2_units%observables_equilibrium)
         
-        write(this%mix_observables_equilibrium_unit, *) i_step, this%mix_potential
-        write(this%observables_equilibrium_unit, *) i_step, this%type1_observables%potential + &
-                                                            this%type2_observables%potential + &
-                                                            this%mix_potential
+        write(this%mix_observables_equilibrium_unit, *) i_step, this%mix_potential_energy
+        write(this%observables_equilibrium_unit, *) i_step, this%type1_observables%potential_energy + &
+                                                            this%type2_observables%potential_energy + &
+                                                            this%mix_potential_energy
             
     end subroutine Physical_System_write_observables_equilibrium
     

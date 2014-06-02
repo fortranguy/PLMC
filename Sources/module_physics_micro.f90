@@ -14,7 +14,7 @@ public set_discrete_length, sphere_volume, PBC_vector, PBC_distance, random_surf
        ewald_real_B, ewald_real_C, &
        NwaveVectors, Box_wave1_sym, Box_wave2_sym, fourier_i, exchange_sign, &
        index_from_coord, coord_PBC, &
-       potential_lennardJones, potential_yukawa
+       potential_energy_lennardJones, potential_energy_yukawa
 
 contains
 
@@ -301,27 +301,27 @@ contains
     !> \f[
     !>      4\epsilon\left[\left(\frac{\sigma}{r}\right)^{12} - \left(\frac{\sigma}{r}\right)^6\right]
     !> \f]
-    pure function potential_lennardJones(epsilon, sigma, r)
+    pure function potential_energy_lennardJones(epsilon, sigma, r)
     
         real(DP), intent(in) :: epsilon
         real(DP), intent(in) :: sigma, r
-        real(DP) :: potential_lennardJones
+        real(DP) :: potential_energy_lennardJones
         
-        potential_lennardJones = 4._DP * epsilon * ((sigma/r)**12 - (sigma/r)**6)
+        potential_energy_lennardJones = 4._DP * epsilon * ((sigma/r)**12 - (sigma/r)**6)
     
-    end function potential_lennardJones
+    end function potential_energy_lennardJones
     
-    !> Yukawa potential
+    !> Yukawa potential_energy
     !> \f[ \epsilon \frac{e^{-\alpha (r-r_0)}}{r} \f]
     
-    pure function potential_yukawa(epsilon, alpha, r_0, r)
+    pure function potential_energy_yukawa(epsilon, alpha, r_0, r)
     
         real(DP), intent(in) :: epsilon, alpha
         real(DP), intent(in) :: r_0, r
-        real(DP) :: potential_yukawa
+        real(DP) :: potential_energy_yukawa
         
-        potential_yukawa = epsilon * exp(-alpha*(r-r_0)) / r
+        potential_energy_yukawa = epsilon * exp(-alpha*(r-r_0)) / r
     
-    end function potential_yukawa
+    end function potential_energy_yukawa
 
 end module module_physics_micro

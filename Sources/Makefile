@@ -57,9 +57,9 @@ $(EXEC1): data.o \
           class_small_move.o class_small_rotation.o\
           class_hard_spheres.o \
           class_neighbour_cells.o \
-          class_hard_spheres_potential.o class_ewald_summation_real.o class_ewald_summation_reci.o\
+          class_hard_spheres_potential_energy.o class_ewald_summation_real.o class_ewald_summation_reci.o\
           class_ewald_summation_self.o class_ewald_summation_bound.o\
-          class_mixing_potential.o \
+          class_mixing_potential_energy.o \
           class_hard_spheres_observables.o class_hard_spheres_units.o \
           module_types_macro.o \
           module_physics_macro.o module_algorithms.o module_write.o module_monte_carlo_arguments.o\
