@@ -7,8 +7,8 @@ private
 
     type, public :: Hard_Spheres_Units
     
-        integer :: obsThermal
-        integer :: obsEquilib
+        integer :: observables_thermalisation
+        integer :: observables_equilibrium
         integer :: move_delta
 
         integer :: snapIni_positions
@@ -49,9 +49,9 @@ contains
         class(Hard_Spheres_Units), intent(out) :: this
         character(len=*), intent(in) :: name
         
-        open(newunit=this%obsThermal, recl=4096, file=name//"_obsThermal.out", status='new', &
+        open(newunit=this%observables_thermalisation, recl=4096, file=name//"_observables_thermalisation.out", status='new', &
              action='write')
-        open(newunit=this%obsEquilib, recl=4096, file=name//"_obsEquilib.out", status='new', &
+        open(newunit=this%observables_equilibrium, recl=4096, file=name//"_observables_equilibrium.out", status='new', &
              action='write')
         open(newunit=this%move_delta, recl=4096, file=name//"_move_delta.out", status='new', &
             action='write')
@@ -91,11 +91,11 @@ contains
                 open(newunit=this%totalMoment_modulus, recl=4096, &
                      file=name//"_totalMoment_modulus.out", status='new', action='write')
                 
-                write(this%obsEquilib, *) "#", 4 ! 4 observables
+                write(this%observables_equilibrium, *) "#", 4 ! 4 observables
                 
             class default
             
-                write(this%obsEquilib, *) "#", 3 ! 3 observables
+                write(this%observables_equilibrium, *) "#", 3 ! 3 observables
                 
         end select
         
@@ -105,8 +105,8 @@ contains
     
         class(Hard_Spheres_Units), intent(inout) :: this
         
-        close(this%obsThermal)
-        close(this%obsEquilib)
+        close(this%observables_thermalisation)
+        close(this%observables_equilibrium)
         close(this%move_delta)
 
         close(this%snapIni_positions)

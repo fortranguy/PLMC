@@ -15,16 +15,16 @@ contains
 
     !> Total: open units
     
-    subroutine open_units(report_unit, obsThermal_unit, obsEquilib_unit)
+    subroutine open_units(report_unit, observables_thermalisation_unit, observables_equilibrium_unit)
     
-        integer, intent(out) :: report_unit, obsThermal_unit, obsEquilib_unit
+        integer, intent(out) :: report_unit, observables_thermalisation_unit, observables_equilibrium_unit
     
         open(newunit=report_unit, recl=4096, file="report.txt", status='new', action='write')
-        open(newunit=obsThermal_unit, recl=4096, file="obsThermal.out", status='new', &
-             action='write')
-        open(newunit=obsEquilib_unit, recl=4096, file="obsEquilib.out", status='new', &
-             action='write')
-        write(obsEquilib_unit, *) "#", 1 ! 1 observable: energy
+        open(newunit=observables_thermalisation_unit, recl=4096, file="observables_thermalisation.out", &
+             status='new', action='write')
+        open(newunit=observables_equilibrium_unit, recl=4096, file="observables_equilibrium.out", &
+             status='new', action='write')
+        write(observables_equilibrium_unit, *) "#", 1 ! 1 observable: energy
         
     end subroutine open_units
 
@@ -48,19 +48,19 @@ contains
 
     !> Mix: open units
     
-    subroutine mix_open_units(mix_report_unit, mix_potential_unit, mix_obsThermal_unit, &
-                              mix_obsEquilib_unit)
+    subroutine mix_open_units(mix_report_unit, mix_potential_unit, mix_observables_thermalisation_unit, &
+                              mix_observables_equilibrium_unit)
                                   
-        integer, intent(out) :: mix_report_unit, mix_potential_unit, mix_obsThermal_unit, &
-                                mix_obsEquilib_unit
+        integer, intent(out) :: mix_report_unit, mix_potential_unit, mix_observables_thermalisation_unit, &
+                                mix_observables_equilibrium_unit
     
         open(newunit=mix_report_unit, recl=4096, file="mix_report.txt", status='new', action='write')
         open(newunit=mix_potential_unit, recl=4096, file="mix_potential.tmp", status='new', action='write')
-        open(newunit=mix_obsThermal_unit, recl=4096, file="mix_obsThermal.out", &
+        open(newunit=mix_observables_thermalisation_unit, recl=4096, file="mix_observables_thermalisation.out", &
              status='new', action='write')
-        open(newunit=mix_obsEquilib_unit, recl=4096, file="mix_obsEquilib.out", status='new', &
-             action='write')
-        write(mix_obsEquilib_unit, *) "#", 1 ! 1 observable: energy
+        open(newunit=mix_observables_equilibrium_unit, recl=4096, file="mix_observables_equilibrium.out", &
+             status='new', action='write')
+        write(mix_observables_equilibrium_unit, *) "#", 1 ! 1 observable: energy
         
      end subroutine mix_open_units
     

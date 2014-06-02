@@ -425,36 +425,36 @@ contains
     subroutine adapt_move(Box_size, &
                           this, &
                           period_adaptation, i_step, &
-                          obs, &
+                          observables, &
                           move_unit)
     
         real(DP), dimension(:), intent(in) :: Box_size
         class(Small_Move), intent(inout) :: this
         integer, intent(in) :: period_adaptation, i_step
-        class(Hard_Spheres_Observables), intent(inout) :: obs
+        class(Hard_Spheres_Observables), intent(inout) :: observables
         integer, intent(in) :: move_unit
     
-        obs%move_rejection_average = obs%move_rejection_adapt / real(period_adaptation-1, DP)
-        obs%move_rejection_adapt = 0._DP
-        call this%adapt_delta(Box_size, obs%move_rejection_average)
-        write(move_unit, *) i_step, this%get_delta_scalar(), obs%move_rejection_average
+        observables%move_rejection_average = observables%move_rejection_adapt / real(period_adaptation-1, DP)
+        observables%move_rejection_adapt = 0._DP
+        call this%adapt_delta(Box_size, observables%move_rejection_average)
+        write(move_unit, *) i_step, this%get_delta_scalar(), observables%move_rejection_average
     
     end subroutine adapt_move
     
     subroutine adapt_rotation(this, &
                               period_adaptation, i_step, &
-                              obs, &
+                              observables, &
                               rotate_unit)
     
         class(Small_Rotation), intent(inout) :: this
         integer, intent(in) :: period_adaptation, i_step
-        class(Dipolar_Hard_Spheres_Observables), intent(inout) :: obs
+        class(Dipolar_Hard_Spheres_Observables), intent(inout) :: observables
         integer, intent(in) :: rotate_unit
         
-        obs%rotate_rejection_average = obs%rotate_rejection_adapt / real(period_adaptation-1, DP)
-        obs%rotate_rejection_adapt = 0._DP
-        call this%adapt_delta(obs%rotate_rejection_average)
-        write(rotate_unit, *) i_step, this%get_delta(), obs%rotate_rejection_average
+        observables%rotate_rejection_average = observables%rotate_rejection_adapt / real(period_adaptation-1, DP)
+        observables%rotate_rejection_adapt = 0._DP
+        call this%adapt_delta(observables%rotate_rejection_average)
+        write(rotate_unit, *) i_step, this%get_delta(), observables%rotate_rejection_average
         
     end subroutine adapt_rotation
     

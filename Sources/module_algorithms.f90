@@ -21,7 +21,7 @@ contains
     !> Particle move
     
     subroutine move(Box, &
-                    this_spheres, this_macro, this_obs, &
+                    this_spheres, this_macro, this_observables, &
                     other_spheres, other_mix_cells, &
                     mix, mix_potential)
     
@@ -29,7 +29,7 @@ contains
         class(Hard_Spheres), intent(inout) :: this_spheres, other_spheres
         class(Hard_Spheres_Macro), intent(inout) :: this_macro
         class(Neighbour_Cells), intent(inout) :: other_mix_cells
-        class(Hard_Spheres_Observables), intent(inout) :: this_obs
+        class(Hard_Spheres_Observables), intent(inout) :: this_observables
         class(Mixing_Potential), intent(in) :: mix
         real(DP), intent(inout) :: mix_potential
         
@@ -44,7 +44,7 @@ contains
         
         real(DP) :: this_EpotNew_real, this_EpotOld_real
         
-        this_obs%move_num_hits = this_obs%move_num_hits + 1
+        this_observables%move_num_hits = this_observables%move_num_hits + 1
         
         call random_number(random)
         old%number = int(random*this_spheres%get_num_particles()) + 1
@@ -115,7 +115,7 @@ contains
                     end select
                 
                     call this_spheres%set_position(old%number, new%position)
-                    this_obs%potential = this_obs%potential + this_deltaEpot
+                    this_observables%potential = this_observables%potential + this_deltaEpot
                     mix_potential = mix_potential + mix_deltaEpot
                     
                     if (old%same_iCell /= new%same_iCell) then
@@ -128,15 +128,15 @@ contains
                     end if
                     
                 else
-                    this_obs%move_num_rejections = this_obs%move_num_rejections + 1
+                    this_observables%move_num_rejections = this_observables%move_num_rejections + 1
                 end if
          
             else
-                this_obs%move_num_rejections = this_obs%move_num_rejections + 1
+                this_observables%move_num_rejections = this_observables%move_num_rejections + 1
             end if
             
         else
-            this_obs%move_num_rejections = this_obs%move_num_rejections + 1
+            this_observables%move_num_rejections = this_observables%move_num_rejections + 1
         end if
     
     end subroutine move
@@ -144,7 +144,7 @@ contains
     !> Widom's method
 
     subroutine widom(Box, &
-                     this_spheres, this_macro, this_obs, &
+                     this_spheres, this_macro, this_observables, &
                      other_spheres, other_mix_cells, &
                      mix)
         
@@ -152,7 +152,7 @@ contains
         class(Hard_Spheres), intent(in) :: this_spheres
         class(Hard_Spheres_Macro), intent(in) :: this_macro
         class(Neighbour_Cells), intent(in) ::  other_mix_cells
-        class(Hard_Spheres_Observables), intent(inout) :: this_obs
+        class(Hard_Spheres_Observables), intent(inout) :: this_observables
         class(Hard_Spheres), intent(in) :: other_spheres
         class(Mixing_Potential), intent(in) :: mix
         
@@ -221,22 +221,22 @@ contains
             
         end do
         
-        this_obs%inv_activity = widTestSum/real(this_spheres%get_widom_num_particles(), DP)
+        this_observables%inv_activity = widTestSum/real(this_spheres%get_widom_num_particles(), DP)
         
     end subroutine widom
     
     !> Particle switch
     
     subroutine switch(Box, &
-                      type1_spheres, type1_macro, type1_obs, &
-                      type2_spheres, type2_macro, type2_obs, &
+                      type1_spheres, type1_macro, type1_observables, &
+                      type2_spheres, type2_macro, type2_observables, &
                       mix, mix_potential, &
                       switch_num_rejections)
     
         type(Box_Dimensions), intent(in) :: Box
         class(Hard_Spheres), intent(inout) :: type1_spheres, type2_spheres
         class(Hard_Spheres_Macro), intent(inout) :: type1_macro, type2_macro
-        class(Hard_Spheres_Observables), intent(inout) :: type1_obs, type2_obs
+        class(Hard_Spheres_Observables), intent(inout) :: type1_observables, type2_observables
         class(Mixing_Potential), intent(in) :: mix
         real(DP), intent(inout) :: mix_potential
         integer, intent(inout) :: switch_num_rejections
@@ -311,8 +311,8 @@ contains
                                              type2_spheres, type2_macro, old2, new2, &
                                              type1_macro%mix_cells)
                                              
-                    type1_obs%potential = type1_obs%potential + type1_deltaEpot
-                    type2_obs%potential = type2_obs%potential + type2_deltaEpot
+                    type1_observables%potential = type1_observables%potential + type1_deltaEpot
+                    type2_observables%potential = type2_observables%potential + type2_deltaEpot
                     mix_potential = mix_potential + type1_mix_deltaEpot + type2_mix_deltaEpot
                     
                 else
@@ -454,12 +454,12 @@ contains
     !> Dipole rotation
     
     subroutine rotate(Box, &
-                      spheres, macro, obs)
+                      this_spheres, this_macro, this_observables)
     
         type(Box_Dimensions), intent(in) :: Box
-        class(Dipolar_Hard_Spheres), intent(inout) :: spheres
-        class(Dipolar_Hard_Spheres_Macro), intent(inout) :: macro
-        class(Dipolar_Hard_Spheres_Observables), intent(inout) :: obs
+        class(Dipolar_Hard_spheres), intent(inout) :: this_spheres
+        class(Dipolar_Hard_spheres_Macro), intent(inout) :: this_macro
+        class(Dipolar_Hard_spheres_Observables), intent(inout) :: this_observables
         
         real(DP) :: random
         type(Particle_Index) :: old, new
@@ -467,39 +467,40 @@ contains
         real(DP) :: deltaEpot_real, deltaEpot_self
         real(DP) :: real_EpotNew, real_EpotOld
         
-        obs%rotate_num_hits = obs%rotate_num_hits + 1
+        this_observables%rotate_num_hits = this_observables%rotate_num_hits + 1
 
         call random_number(random)
-        old%number = int(random*spheres%get_num_particles()) + 1
-        old%position(:) = spheres%get_position(old%number)
-        old%orientation(:) = spheres%get_orientation(old%number)
+        old%number = int(random*this_spheres%get_num_particles()) + 1
+        old%position(:) = this_spheres%get_position(old%number)
+        old%orientation(:) = this_spheres%get_orientation(old%number)
         
         new%number = old%number
         new%position(:) = old%position(:)
         new%orientation(:) = old%orientation(:)
-        call markov_surface(new%orientation, macro%rotation%get_delta())
+        call markov_surface(new%orientation, this_macro%rotation%get_delta())
         
-        real_EpotOld = macro%ewald_real%solo(Box%size, spheres, old)
-        real_EpotNew = macro%ewald_real%solo(Box%size, spheres, new)
+        real_EpotOld = this_macro%ewald_real%solo(Box%size, this_spheres, old)
+        real_EpotNew = this_macro%ewald_real%solo(Box%size, this_spheres, new)
         deltaEpot_real = real_EpotNew - real_EpotOld
         
-        deltaEpot_self = macro%ewald_self%solo(new%orientation) - macro%ewald_self%solo(old%orientation)
+        deltaEpot_self = this_macro%ewald_self%solo(new%orientation) - &
+                         this_macro%ewald_self%solo(old%orientation)
         
-        deltaEpot = deltaEpot_real + macro%ewald_reci%rotation(Box, old, new) - &
-                    deltaEpot_self + macro%ewald_bound%rotation(Box%size, old%orientation, &
-                                                                          new%orientation)
+        deltaEpot = deltaEpot_real + this_macro%ewald_reci%rotation(Box, old, new) - &
+                    deltaEpot_self + this_macro%ewald_bound%rotation(Box%size, old%orientation, &
+                                                                               new%orientation)
         
         call random_number(random)
         if (random < exp(-deltaEpot/Box%temperature)) then
         
-            call macro%ewald_reci%update_structure_rotation(Box, old, new)
-            call macro%ewald_bound%update_total_moment_rotation(old%orientation, new%orientation)
-            call spheres%set_orientation(old%number, new%orientation)
+            call this_macro%ewald_reci%update_structure_rotation(Box, old, new)
+            call this_macro%ewald_bound%update_total_moment_rotation(old%orientation, new%orientation)
+            call this_spheres%set_orientation(old%number, new%orientation)
             
-            obs%potential = obs%potential + deltaEpot
+            this_observables%potential = this_observables%potential + deltaEpot
             
         else
-            obs%rotate_num_rejections = obs%rotate_num_rejections + 1
+            this_observables%rotate_num_rejections = this_observables%rotate_num_rejections + 1
         end if
     
     end subroutine rotate
