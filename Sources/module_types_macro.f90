@@ -13,7 +13,7 @@ use class_ewald_summation_bound, only: Ewald_Summation_Bound
 
 implicit none
 
-    type :: Hard_Spheres_Macro
+    type, public :: Hard_Spheres_Macro
         type(Neighbour_Cells) :: same_cells, mix_cells
         type(Small_Move) :: move
         type(Hard_Spheres_Potential_Energy) :: hard_potential_energy
