@@ -274,9 +274,6 @@ contains
         
         write(report_unit, *) "Data: "
         
-        write(report_unit ,*) "    num_particles = ", this%num_particles
-        write(report_unit ,*) "    widom_num_particles = ", this%widom_num_particles
-        
         write(report_unit, *) "    snap_factor = ", this%snap_factor
         
     end subroutine Hard_Spheres_write_report
