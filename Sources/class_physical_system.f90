@@ -10,19 +10,19 @@ use module_physics_micro, only: NwaveVectors
 use module_data, only: test_data_found
 use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
 use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres
-use class_mixing_potential_energy, only: Mixing_Potential_Energy
+use class_between_spheres_potential_energy, only: Between_Spheres_Potential_Energy
 use class_hard_spheres_observables, only: Hard_Spheres_Observables, Dipolar_Hard_Spheres_Observables
 use class_hard_spheres_units, only: Hard_Spheres_Units, Dipolar_Hard_Spheres_Units
 use module_monte_carlo_arguments, only: read_arguments
 use module_physics_macro, only: init_random_seed, set_initial_configuration, &
-                                init_spheres, init_hard_potential_energy, init_cells, &
+                                init_spheres, init_hard_potential, init_cells, &
                                 set_ewald, &
                                 total_energy, &
                                 final_spheres, &
-                                init_mix, mix_final, &
+                                init_between_spheres, final_between_spheres, &
                                 adapt_move, adapt_rotation, test_consist
 use module_algorithms, only: move, widom, switch, rotate
-use module_write, only: open_units, write_data, mix_open_units, write_results, mix_write_results, &
+use module_write, only: open_units, write_data, between_potential_open_units, write_results, between_potential_write_results, &
                         write_spheres_density
 
 implicit none
@@ -55,8 +55,8 @@ private
         type(Hard_Spheres_Observables) :: type2_observables
         type(Hard_Spheres_Units) :: type2_units
         
-        ! Mixing potential_energy
-        type(Mixing_Potential_Energy) :: mix
+        ! Between Spheres potential_energy
+        type(Between_Spheres_Potential_Energy) :: mix
         real(DP) :: mix_potential_energy, mix_potential_energy_sum, mix_potential_energy_conf
         integer :: mix_report_unit
         integer :: mix_potential_energy_tab_unit
@@ -297,12 +297,11 @@ contains
                                        this%report_unit)
                                        
         this%mix_potential_energy_sum = 0._DP        
-        call init_mix(this%Box%size, this%mix, this%type1_spheres, this%type2_spheres, &
+        call init_between_spheres(this%Box%size, this%mix, this%type1_spheres, this%type2_spheres, &
                       this%write_potential_energy, this%mix_potential_energy_tab_unit, this%mix_potential_energy)
-        call this%mix%write_report(this%mix_report_unit)
         
         call init_spheres(this%Box, this%type1_spheres, this%type1_units)
-        call init_hard_potential_energy(this%type1_macro%hard_potential_energy, "Dipolar Hard Spheres", &
+        call init_hard_potential(this%type1_macro%hard_potential, "Dipolar Hard Spheres", &
                                  this%type1_spheres%get_diameter(), json)
         call init_cells(this%Box%size, this%type1_spheres, this%type1_macro, this%type2_spheres, &
                         this%mix)
@@ -310,7 +309,7 @@ contains
         this%type1_observables%potential_energy = total_energy(this%Box, this%type1_spheres, this%type1_macro)
                         
         call init_spheres(this%Box, this%type2_spheres, this%type2_units)
-        call init_hard_potential_energy(this%type2_macro%hard_potential_energy, "Hard Spheres", &
+        call init_hard_potential(this%type2_macro%hard_potential, "Hard Spheres", &
                                  this%type2_spheres%get_diameter(), json)
         call init_cells(this%Box%size, this%type2_spheres, this%type2_macro, this%type1_spheres, &
                         this%mix)        
@@ -318,9 +317,9 @@ contains
                         
         call this%write_all_reports()
         if (this%write_potential_energy) then
-            call this%type1_macro%hard_potential_energy%write(this%type1_units%potential_energy)
+            call this%type1_macro%hard_potential%write(this%type1_units%potential_energy)
             call this%type1_macro%ewald_real%write(this%type1_units%potential_energy_real)
-            call this%type2_macro%hard_potential_energy%write(this%type2_units%potential_energy)
+            call this%type2_macro%hard_potential%write(this%type2_units%potential_energy)
         end if
         
         this%potential_energy_sum = 0._DP
@@ -338,7 +337,7 @@ contains
                         this%observables_equilibrium_unit)        
         call this%type1_units%open(this%type1_spheres%get_name())           
         call this%type2_units%open(this%type2_spheres%get_name())       
-        call mix_open_units(this%mix_report_unit, this%mix_potential_energy_tab_unit, &
+        call between_potential_open_units(this%mix_report_unit, this%mix_potential_energy_tab_unit, &
                             this%mix_observables_thermalisation_unit, &
                             this%mix_observables_equilibrium_unit)        
     
@@ -357,8 +356,6 @@ contains
         call write_spheres_density(this%Box%size, this%type2_spheres, this%num_particles, &
                                    this%type2_units%report)
         call this%type2_spheres%write_report(this%type2_units%report)
-        
-        call this%mix%write_report(this%mix_report_unit)
     
     end subroutine Physical_System_write_all_reports
     
@@ -415,7 +412,7 @@ contains
         type2_energy = total_energy(this%Box, this%type2_spheres, this%type2_macro)
         call test_consist(this%type2_observables%potential_energy, type2_energy, this%type2_units%report)
         
-        call mix_final(this%Box%size, this%mix, this%type1_spheres, this%type2_spheres, &
+        call final_between_spheres(this%Box%size, this%mix, this%type1_spheres, this%type2_spheres, &
                        this%mix_report_unit, this%mix_potential_energy, this%mix_potential_energy_conf)
         
         call this%write_all_results()
@@ -428,7 +425,7 @@ contains
         
         call this%type1_observables%write_results(this%Box%temperature, this%num_equilibrium_steps, this%type1_units%report)
         call this%type2_observables%write_results(this%Box%temperature, this%num_equilibrium_steps, this%type2_units%report)
-        call mix_write_results(this%num_equilibrium_steps, this%mix_potential_energy_sum, this%mix_report_unit)
+        call between_potential_write_results(this%num_equilibrium_steps, this%mix_potential_energy_sum, this%mix_report_unit)
         
         call this%write_results()
     

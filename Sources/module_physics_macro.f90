@@ -15,17 +15,17 @@ use class_hard_spheres_potential_energy, only: Hard_Spheres_Potential_Energy
 use class_small_move, only: Small_Move
 use class_small_rotation, only: Small_Rotation
 use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
-use class_mixing_potential_energy, only: Mixing_Potential_Energy
+use class_between_spheres_potential_energy, only: Between_Spheres_Potential_Energy
 use class_hard_spheres_observables, only: Hard_Spheres_Observables, Dipolar_Hard_Spheres_Observables
 use class_hard_spheres_units, only: Hard_Spheres_Units, Dipolar_Hard_Spheres_Units
 
 implicit none
 private
 public init_random_seed, set_initial_configuration, &
-       init_spheres, init_hard_potential_energy, init_cells, &
+       init_spheres, init_hard_potential, init_cells, &
        set_ewald, &
        total_energy, & 
-       final_spheres, init_mix, mix_final, &
+       final_spheres, init_between_spheres, final_between_spheres, &
        adapt_move, adapt_rotation, test_consist
 
 contains
@@ -273,9 +273,9 @@ contains
     
     end subroutine init_spheres    
         
-    subroutine init_hard_potential_energy(this_hard_potential_energy, type_name, this_diameter, json)
+    subroutine init_hard_potential(this_hard_potential, type_name, this_diameter, json)
     
-        class(Hard_Spheres_Potential_Energy), intent(inout) :: this_hard_potential_energy
+        class(Hard_Spheres_Potential_Energy), intent(inout) :: this_hard_potential
         character(len=*), intent(in) :: type_name
         real(DP), intent(in) :: this_diameter 
         type(json_file), intent(inout) :: json
@@ -288,22 +288,22 @@ contains
         data_name = "Potential Energy."//type_name//".minimum distance factor"
         call json%get(data_name, min_distance_factor, found)
         call test_data_found(data_name, found)
-        call this_hard_potential_energy%construct(min_distance_factor, this_diameter)
+        call this_hard_potential%construct(min_distance_factor, this_diameter)
                                                        
-    end subroutine init_hard_potential_energy
+    end subroutine init_hard_potential
     
     subroutine init_cells(Box_size, this_spheres, this_macro, other_spheres, mix)  
       
         real(DP), dimension(:), intent(in) :: Box_size
         class(Hard_Spheres), intent(in) :: this_spheres, other_spheres
         class(Hard_Spheres_Macro), intent(inout) :: this_macro
-        class(Mixing_Potential_Energy), intent(in) :: mix
+        class(Between_Spheres_Potential_Energy), intent(in) :: mix
         
         real(DP), dimension(Ndim) :: same_cell_size
         
-        same_cell_size(:) = this_macro%hard_potential_energy%get_range_cut()
+        same_cell_size(:) = this_macro%hard_potential%get_range_cut()
         call this_macro%same_cells%construct(Box_size, same_cell_size, &
-                                             this_macro%hard_potential_energy%get_range_cut())
+                                             this_macro%hard_potential%get_range_cut())
         call this_macro%same_cells%all_cols_to_cells(this_spheres%get_num_particles(), this_spheres)
         
         call this_macro%mix_cells%construct(Box_size, mix%get_cell_size(), mix%get_range_cut())
@@ -330,7 +330,7 @@ contains
         call test_data_found(data_name, found)
         
         alpha = alpha_factor / Box%size(1)
-        min_distance = this_macro%hard_potential_energy%get_min_distance()
+        min_distance = this_macro%hard_potential%get_min_distance()
         call this_macro%ewald_real%construct(Box%size, alpha, min_distance, json)
         call this_macro%ewald_reci%construct(Box, alpha, this_spheres)
         call this_macro%ewald_reci%count_wave_vectors(Box%wave, this_units%waveVectors)        
@@ -346,7 +346,7 @@ contains
         class(Hard_Spheres_Macro), intent(in) :: this_macro
         real(DP) :: total_energy
         
-        total_energy = this_macro%hard_potential_energy%total(Box%size, this_spheres)
+        total_energy = this_macro%hard_potential%total(Box%size, this_spheres)
         
         select type (this_spheres)
             type is (Dipolar_Hard_Spheres)
@@ -385,10 +385,10 @@ contains
     
     !> Mix initialisation
     
-    subroutine init_mix(Box_size, mix, spheres1, spheres2, write_potential_energy, mix_potential_energy_unit, mix_potential_energy)
+    subroutine init_between_spheres(Box_size, mix, spheres1, spheres2, write_potential_energy, mix_potential_energy_unit, mix_potential_energy)
     
         real(DP), dimension(:), intent(in) :: Box_size
-        class(Mixing_Potential_Energy), intent(inout) :: mix
+        class(Between_Spheres_Potential_Energy), intent(inout) :: mix
         class(Hard_Spheres), intent(in) :: spheres1, spheres2
         logical, intent(in) :: write_potential_energy
         integer, intent(in) :: mix_potential_energy_unit
@@ -399,26 +399,26 @@ contains
             call mix%write(mix_potential_energy_unit)
         end if
         call mix%set_cell_size()
-        mix_potential_energy = mix%potential_energy_conf(Box_size, spheres1, spheres2)
+        mix_potential_energy = mix%conf(Box_size, spheres1, spheres2)
     
-    end subroutine init_mix
+    end subroutine init_between_spheres
     
     !> Mix finalization
     
-    subroutine mix_final(Box_size, mix, spheres1, spheres2, mix_report_unit, mix_potential_energy, mix_potential_energy_conf)
+    subroutine final_between_spheres(Box_size, mix, spheres1, spheres2, mix_report_unit, mix_potential_energy, mix_potential_energy_conf)
     
         real(DP), dimension(:), intent(in) :: Box_size
-        class(Mixing_Potential_Energy), intent(inout) :: mix
+        class(Between_Spheres_Potential_Energy), intent(inout) :: mix
         class(Hard_Spheres), intent(in) :: spheres1, spheres2
         integer, intent(in) :: mix_report_unit
         real(DP), intent(in) :: mix_potential_energy
         real(DP), intent(out) :: mix_potential_energy_conf
         
         call mix%test_overlap(Box_size, spheres1, spheres2)
-        mix_potential_energy_conf = mix%potential_energy_conf(Box_size, spheres1, spheres2)
+        mix_potential_energy_conf = mix%conf(Box_size, spheres1, spheres2)
         call test_consist(mix_potential_energy, mix_potential_energy_conf, mix_report_unit)
     
-    end subroutine mix_final
+    end subroutine final_between_spheres
     
     !> Change: average & adaptation
     

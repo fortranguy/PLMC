@@ -16,7 +16,7 @@ implicit none
     type, public :: Hard_Spheres_Macro
         type(Neighbour_Cells) :: same_cells, mix_cells
         type(Small_Move) :: move
-        type(Hard_Spheres_Potential_Energy) :: hard_potential_energy
+        type(Hard_Spheres_Potential_Energy) :: hard_potential
     end type Hard_Spheres_Macro
     
     type, public, extends(Hard_Spheres_Macro) :: Dipolar_Hard_Spheres_Macro

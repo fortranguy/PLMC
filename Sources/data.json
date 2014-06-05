@@ -17,7 +17,7 @@
             "number of particles": 6750,
             "number of Widom particles": 500
         },
-        "Mixing": {
+        "Between Spheres": {
             "non addivity": 0.2
         }
     },
@@ -60,7 +60,7 @@
         "Hard Spheres": {
             "minimum distance factor": 1.0
         },
-        "Mixing": {
+        "Between Spheres": {
             "minimum distance factor": 1.0,
             "range cut": 1.0,
             "delta": 1.0,
