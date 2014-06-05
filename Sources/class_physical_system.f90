@@ -10,7 +10,7 @@ use module_physics_micro, only: NwaveVectors
 use module_data, only: test_data_found
 use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
 use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres
-use class_between_spheres_potential_energy, only: Between_Spheres_Potential_Energy
+use class_between_spheres_potential, only: Between_Spheres_Potential_Energy
 use class_hard_spheres_observables, only: Hard_Spheres_Observables, Dipolar_Hard_Spheres_Observables
 use class_hard_spheres_units, only: Hard_Spheres_Units, Dipolar_Hard_Spheres_Units
 use module_monte_carlo_arguments, only: read_arguments

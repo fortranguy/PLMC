@@ -1,6 +1,6 @@
 !> \brief Description of the Between Spheres Potential_Energy class
 
-module class_between_spheres_potential_energy
+module class_between_spheres_potential
 
 use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
 use data_precisions, only: DP, real_zero
@@ -313,4 +313,4 @@ contains
         
     end function Between_Spheres_Potential_Energy_pair
 
-end module class_between_spheres_potential_energy
+end module class_between_spheres_potential

@@ -1,4 +1,4 @@
-module class_hard_spheres_potential_energy
+module class_hard_spheres_potential
 
 use data_precisions, only: DP
 use data_box, only: Ndim
@@ -184,4 +184,4 @@ contains
     
     end function Hard_Spheres_Potential_Energy_pair
 
-end module class_hard_spheres_potential_energy
+end module class_hard_spheres_potential
