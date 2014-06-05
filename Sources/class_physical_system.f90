@@ -22,7 +22,7 @@ use module_physics_macro, only: init_random_seed, set_initial_configuration, &
                                 init_between_spheres, final_between_spheres, &
                                 adapt_move, adapt_rotation, test_consist
 use module_algorithms, only: move, widom, switch, rotate
-use module_write, only: open_units, write_data, between_potential_open_units, write_results, between_potential_write_results, &
+use module_write, only: open_units, write_data, between_spheres_open_units, write_results, between_spheres_write_results, &
                         write_spheres_density
 
 implicit none
@@ -337,7 +337,7 @@ contains
                         this%observables_equilibrium_unit)        
         call this%type1_units%open(this%type1_spheres%get_name())           
         call this%type2_units%open(this%type2_spheres%get_name())       
-        call between_potential_open_units(this%mix_report_unit, this%mix_potential_energy_tab_unit, &
+        call between_spheres_open_units(this%mix_report_unit, this%mix_potential_energy_tab_unit, &
                             this%mix_observables_thermalisation_unit, &
                             this%mix_observables_equilibrium_unit)        
     
@@ -425,7 +425,7 @@ contains
         
         call this%type1_observables%write_results(this%Box%temperature, this%num_equilibrium_steps, this%type1_units%report)
         call this%type2_observables%write_results(this%Box%temperature, this%num_equilibrium_steps, this%type2_units%report)
-        call between_potential_write_results(this%num_equilibrium_steps, this%mix_potential_energy_sum, this%mix_report_unit)
+        call between_spheres_write_results(this%num_equilibrium_steps, this%mix_potential_energy_sum, this%mix_report_unit)
         
         call this%write_results()
     

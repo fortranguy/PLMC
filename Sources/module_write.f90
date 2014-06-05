@@ -10,7 +10,7 @@ use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres
 implicit none
 
 private
-public open_units, write_data, between_potential_open_units, write_spheres_density, write_results, between_potential_write_results
+public open_units, write_data, between_spheres_open_units, write_spheres_density, write_results, between_spheres_write_results
 
 contains
 
@@ -49,7 +49,7 @@ contains
 
     !> Mix: open units
     
-    subroutine between_potential_open_units(mix_report_unit, mix_potential_energy_unit, &
+    subroutine between_spheres_open_units(mix_report_unit, mix_potential_energy_unit, &
                               mix_observables_thermalisation_unit, mix_observables_equilibrium_unit)
                                   
         integer, intent(out) :: mix_report_unit, mix_potential_energy_unit, &
@@ -64,7 +64,7 @@ contains
              status='new', action='write')
         write(mix_observables_equilibrium_unit, *) "#", 1 ! 1 observable: energy
         
-     end subroutine between_potential_open_units
+     end subroutine between_spheres_open_units
     
     !> Total: Results
     
@@ -89,7 +89,7 @@ contains
     
     !> Mix: Results
     
-    subroutine between_potential_write_results(num_equilibrium_steps, potential_energy_sum, report_unit)
+    subroutine between_spheres_write_results(num_equilibrium_steps, potential_energy_sum, report_unit)
     
         integer, intent(in) :: num_equilibrium_steps
         real(DP), intent(in) :: potential_energy_sum
@@ -98,7 +98,7 @@ contains
         write(report_unit, *) "Results: "
         write(report_unit, *) "    average energy = ", potential_energy_sum/real(num_equilibrium_steps, DP)
     
-    end subroutine between_potential_write_results
+    end subroutine between_spheres_write_results
     
     !> Write density and compacity
     
