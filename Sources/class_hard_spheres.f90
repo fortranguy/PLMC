@@ -18,7 +18,7 @@ private
         
         private
     
-        character(len=5) :: name
+        character(len=:), allocatable :: name
 
         ! Particles
         real(DP) :: diameter
@@ -85,7 +85,13 @@ contains
         class(Hard_Spheres), intent(out) :: this
         type(json_file), intent(inout) :: json
         
-        this%name = "hardS"
+        character(len=4096) :: data_name
+        logical :: found
+        
+        data_name = "Particles.Hard Spheres.name"
+        call json%get(data_name, this%name, found)
+        call test_data_found(data_name, found)
+        
         write(output_unit, *) this%name, " class construction"
         
         call this%set_particles(json)
@@ -98,7 +104,13 @@ contains
         class(Dipolar_Hard_Spheres), intent(out) :: this
         type(json_file), intent(inout) :: json
         
-        this%name = "dipol"
+        character(len=4096) :: data_name
+        logical :: found
+        
+        data_name = "Particles.Dipolar Hard Spheres.name"
+        call json%get(data_name, this%name, found)
+        call test_data_found(data_name, found)
+        
         write(output_unit, *) this%name, " class construction"
     
         call this%set_particles(json)        
@@ -139,13 +151,13 @@ contains
         
         this%diameter = 1._DP ! = u_length
         
-        data_name = "Particles.Dipoles.number of particles"
+        data_name = "Particles.Dipolar Hard Spheres.number of particles"
         call json%get(data_name, this%num_particles, found)
         call test_data_found(data_name, found)
         allocate(this%all_positions(Ndim, this%num_particles))
         allocate(this%all_orientations(Ndim, this%num_particles))
         
-        data_name = "Particles.Dipoles.number of Widom particles"
+        data_name = "Particles.Dipolar Hard Spheres.number of Widom particles"
         call json%get(data_name, this%widom_num_particles, found)
         call test_data_found(data_name, found)
         
@@ -175,6 +187,7 @@ contains
         write(output_unit, *) this%name, " class destruction"
         
         if (allocated(this%all_positions)) deallocate(this%all_positions)
+        if (allocated(this%name)) deallocate(this%name)
     
     end subroutine Hard_Spheres_destroy
     
@@ -192,7 +205,7 @@ contains
     pure function Hard_Spheres_get_name(this) result(get_name)
     
         class(Hard_Spheres), intent(in) :: this
-        character(len=5) :: get_name
+        character(len=len(this%name)) :: get_name
         
         get_name = this%name
         

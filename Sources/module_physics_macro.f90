@@ -325,7 +325,7 @@ contains
         real(DP) :: alpha_factor, alpha
         real(DP) :: min_distance
         
-        data_name = "Potential Energy.Dipoles.Ewald summation.alpha factor"
+        data_name = "Potential Energy.Dipolar Hard Spheres.Ewald summation.alpha factor"
         call json%get(data_name, alpha_factor, found)
         call test_data_found(data_name, found)
         

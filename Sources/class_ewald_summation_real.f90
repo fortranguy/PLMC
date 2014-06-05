@@ -68,12 +68,12 @@ contains
         
         this%min_distance = min_distance
 
-        data_name = "Potential Energy.Dipoles.Ewald summation.real.range cut factor"
+        data_name = "Potential Energy.Dipolar Hard Spheres.Ewald summation.real.range cut factor"
         call json%get(data_name, range_cut_factor, found)
         call test_data_found(data_name, found)
         this%range_cut = range_cut_factor * Box_size(1)
 
-        data_name = "Potential Energy.Dipoles.Ewald summation.real.delta"
+        data_name = "Potential Energy.Dipolar Hard Spheres.Ewald summation.real.delta"
         call json%get(data_name, this%delta, found)
         call test_data_found(data_name, found)
         call set_discrete_length(this%min_distance, this%delta)

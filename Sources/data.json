@@ -1,15 +1,18 @@
 {
     "Box": {
+        "name": "sys",
         "size": [25, 25, 25],
         "wave": [8, 8, 8],
         "temperature": 1.0
     },
     "Particles": {
-        "Dipoles": {
+        "Dipolar Hard Spheres": {
+            "name": "DHS",
             "number of particles": 281,
             "number of Widom particles": 500
         },
         "Hard Spheres": {
+            "name": "HS",
             "diameter": 1.0,
             "number of particles": 6750,
             "number of Widom particles": 500
@@ -25,7 +28,7 @@
         "period of reset": 8192,
         "decorrelation factor": 1,
         "switch factor": 1,
-        "Dipoles": {
+        "Dipolar Hard Spheres": {
             "move": {
                 "initial delta": 0.3,
                 "wanted rejection": 0.5
@@ -44,14 +47,14 @@
         }
     },
     "Potential Energy": {
-        "Dipoles": {
+        "Dipolar Hard Spheres": {
             "minimum distance factor": 1.0,
             "Ewald summation": {
                 "alpha factor": 7.0,
                 "real": {
                     "range cut factor": 0.5,
                     "delta": 5.0e-5
-                } 
+                }
             }
         },
         "Hard Spheres": {

@@ -227,25 +227,25 @@ contains
         this%num_rotations = this%decorrelation_factor * this%type1_spheres%get_num_particles()
         this%num_changes = this%num_moves + this%num_switches + this%num_rotations
         
-        data_name = "Monte Carlo.Dipoles.move.initial delta"
+        data_name = "Monte Carlo.Dipolar Hard Spheres.move.initial delta"
         call json%get(data_name, type1_move_delta, found)
         call test_data_found(data_name, found)
         
-        data_name = "Monte Carlo.Dipoles.move.wanted rejection"
+        data_name = "Monte Carlo.Dipolar Hard Spheres.move.wanted rejection"
         call json%get(data_name, type1_move_rejection, found)
         call test_data_found(data_name, found)
         
         call this%type1_macro%move%init(type1_move_delta, type1_move_rejection)
         
-        data_name = "Monte Carlo.Dipoles.rotation.initial delta"
+        data_name = "Monte Carlo.Dipolar Hard Spheres.rotation.initial delta"
         call json%get(data_name, type1_rotation_delta, found)
         call test_data_found(data_name, found)
         
-        data_name = "Monte Carlo.Dipoles.rotation.maximum delta"
+        data_name = "Monte Carlo.Dipolar Hard Spheres.rotation.maximum delta"
         call json%get(data_name, type1_rotation_delta_max, found)
         call test_data_found(data_name, found)
         
-        data_name = "Monte Carlo.Dipoles.rotation.wanted rejection"
+        data_name = "Monte Carlo.Dipolar Hard Spheres.rotation.wanted rejection"
         call json%get(data_name, type1_rotation_rejection, found)
         call test_data_found(data_name, found)
         
@@ -302,7 +302,7 @@ contains
         call this%mix%write_report(this%mix_report_unit)
         
         call init_spheres(this%Box, this%type1_spheres, this%type1_units)
-        call init_hard_potential_energy(this%type1_macro%hard_potential_energy, "Dipoles", &
+        call init_hard_potential_energy(this%type1_macro%hard_potential_energy, "Dipolar Hard Spheres", &
                                  this%type1_spheres%get_diameter(), json)
         call init_cells(this%Box%size, this%type1_spheres, this%type1_macro, this%type2_spheres, &
                         this%mix)
