@@ -9,7 +9,7 @@ use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres
 use class_small_move, only: Small_Move
 use class_small_rotation, only: Small_Rotation
 use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
-use class_between_spheres_potential, only: Between_Spheres_Potential_Energy
+use class_between_spheres_potential, only: Between_Hard_Spheres_Potential_Energy
 use class_hard_spheres_observables, only: Hard_Spheres_Observables, Dipolar_Hard_Spheres_Observables
 
 implicit none
@@ -30,7 +30,7 @@ contains
         class(Hard_Spheres_Macro), intent(inout) :: this_macro
         class(Neighbour_Cells), intent(inout) :: other_mix_cells
         class(Hard_Spheres_Observables), intent(inout) :: this_observables
-        class(Between_Spheres_Potential_Energy), intent(in) :: mix
+        class(Between_Hard_Spheres_Potential_Energy), intent(in) :: mix
         real(DP), intent(inout) :: mix_potential_energy
         
         real(DP) :: random
@@ -154,7 +154,7 @@ contains
         class(Neighbour_Cells), intent(in) ::  other_mix_cells
         class(Hard_Spheres_Observables), intent(inout) :: this_observables
         class(Hard_Spheres), intent(in) :: other_spheres
-        class(Between_Spheres_Potential_Energy), intent(in) :: mix
+        class(Between_Hard_Spheres_Potential_Energy), intent(in) :: mix
         
         integer :: iWidom
         real(DP) :: widTestSum
@@ -237,7 +237,7 @@ contains
         class(Hard_Spheres), intent(inout) :: type1_spheres, type2_spheres
         class(Hard_Spheres_Macro), intent(inout) :: type1_macro, type2_macro
         class(Hard_Spheres_Observables), intent(inout) :: type1_observables, type2_observables
-        class(Between_Spheres_Potential_Energy), intent(in) :: mix
+        class(Between_Hard_Spheres_Potential_Energy), intent(in) :: mix
         real(DP), intent(inout) :: mix_potential_energy
         integer, intent(inout) :: switch_num_rejections
         
@@ -340,7 +340,7 @@ contains
         class(Hard_Spheres_Macro), intent(in) :: this_macro
         class(Neighbour_Cells), intent(in) :: other_mix_cells
         type(Particle_Index), intent(inout) :: old
-        class(Between_Spheres_Potential_Energy), intent(in) :: mix
+        class(Between_Hard_Spheres_Potential_Energy), intent(in) :: mix
         type(Particle_Energy), intent(out) :: EpotOld
         logical :: overlap
         
@@ -377,7 +377,7 @@ contains
         class(Neighbour_Cells), intent(in) :: other_mix_cells
         type(Particle_Index), intent(in) :: old
         type(Particle_Index), intent(inout) :: new
-        class(Between_Spheres_Potential_Energy), intent(in) :: mix
+        class(Between_Hard_Spheres_Potential_Energy), intent(in) :: mix
         logical, intent(out) :: overlap
         type(Particle_Energy), intent(out) :: EpotNew
         

@@ -10,7 +10,7 @@ use module_physics_micro, only: NwaveVectors
 use module_data, only: test_data_found
 use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
 use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres
-use class_between_spheres_potential, only: Between_Spheres_Potential_Energy
+use class_between_spheres_potential, only: Between_Hard_Spheres_Potential_Energy
 use class_hard_spheres_observables, only: Hard_Spheres_Observables, Dipolar_Hard_Spheres_Observables
 use class_hard_spheres_units, only: Hard_Spheres_Units, Dipolar_Hard_Spheres_Units
 use module_monte_carlo_arguments, only: read_arguments
@@ -56,7 +56,7 @@ private
         type(Hard_Spheres_Units) :: type2_units
         
         ! Between Spheres potential_energy
-        type(Between_Spheres_Potential_Energy) :: mix
+        type(Between_Hard_Spheres_Potential_Energy) :: between_spheres_potential
         real(DP) :: mix_potential_energy, mix_potential_energy_sum, mix_potential_energy_conf
         integer :: mix_report_unit
         integer :: mix_potential_energy_tab_unit
@@ -141,8 +141,8 @@ contains
         
         call this%type1_spheres%construct(json)
         call this%type2_spheres%construct(json)
-        call this%mix%construct(json, this%type1_spheres%get_diameter(), &
-                                      this%type2_spheres%get_diameter())
+        call this%between_spheres_potential%construct(json, this%type1_spheres%get_diameter(), &
+                                                      this%type2_spheres%get_diameter())
         
         call this%set_monte_carlo_changes(json)
         
@@ -292,19 +292,22 @@ contains
         call this%init_switch()
         
         call init_random_seed(args%random, this%report_unit)
-        call set_initial_configuration(this%Box%size, args%initial, this%type1_spheres, &
-                                       this%type2_spheres, this%mix%get_diameter(), &
+        call set_initial_configuration(this%Box%size, args%initial, &
+                                       this%type1_spheres, this%type2_spheres, &
+                                       this%between_spheres_potential%get_diameter(), &
                                        this%report_unit)
                                        
         this%mix_potential_energy_sum = 0._DP        
-        call init_between_spheres(this%Box%size, this%mix, this%type1_spheres, this%type2_spheres, &
-                      this%write_potential_energy, this%mix_potential_energy_tab_unit, this%mix_potential_energy)
+        call init_between_spheres(this%Box%size, this%between_spheres_potential, &
+                                  this%type1_spheres, this%type2_spheres, &
+                                  this%write_potential_energy, this%mix_potential_energy_tab_unit, &
+                                  this%mix_potential_energy)
         
         call init_spheres(this%Box, this%type1_spheres, this%type1_units)
         call init_hard_potential(this%type1_macro%hard_potential, "Dipolar Hard Spheres", &
                                  this%type1_spheres%get_diameter(), json)
         call init_cells(this%Box%size, this%type1_spheres, this%type1_macro, this%type2_spheres, &
-                        this%mix)
+                        this%between_spheres_potential)
         call set_ewald(this%Box, this%type1_spheres, this%type1_macro, json, this%type1_units)
         this%type1_observables%potential_energy = total_energy(this%Box, this%type1_spheres, this%type1_macro)
                         
@@ -312,7 +315,7 @@ contains
         call init_hard_potential(this%type2_macro%hard_potential, "Hard Spheres", &
                                  this%type2_spheres%get_diameter(), json)
         call init_cells(this%Box%size, this%type2_spheres, this%type2_macro, this%type1_spheres, &
-                        this%mix)        
+                        this%between_spheres_potential)        
         this%type2_observables%potential_energy = total_energy(this%Box, this%type2_spheres, this%type2_macro)
                         
         call this%write_all_reports()
@@ -412,8 +415,10 @@ contains
         type2_energy = total_energy(this%Box, this%type2_spheres, this%type2_macro)
         call test_consist(this%type2_observables%potential_energy, type2_energy, this%type2_units%report)
         
-        call final_between_spheres(this%Box%size, this%mix, this%type1_spheres, this%type2_spheres, &
-                       this%mix_report_unit, this%mix_potential_energy, this%mix_potential_energy_conf)
+        call final_between_spheres(this%Box%size, this%between_spheres_potential, &
+                                   this%type1_spheres, this%type2_spheres, &
+                                   this%mix_report_unit, &
+                                   this%mix_potential_energy, this%mix_potential_energy_conf)
         
         call this%write_all_results()
         call this%close_units()
@@ -471,10 +476,11 @@ contains
     
     ! Destruction
     
-    subroutine Physical_System_destroy(this)    
+    subroutine Physical_System_destroy(this)   
+     
         class(Physical_System), intent(inout) :: this
         
-        call this%mix%destroy()
+        call this%between_spheres_potential%destroy()
         
         call this%type2_macro%mix_cells%destroy()
         call this%type2_macro%same_cells%destroy()        
@@ -492,8 +498,9 @@ contains
     
     ! Accessors
     
-    pure function Physical_System_get_num_thermalisation_steps(this) &
-         result(get_num_thermalisation_steps)
+    pure function Physical_System_get_num_thermalisation_steps(this) &    
+                  result(get_num_thermalisation_steps)
+        
         class(Physical_System), intent(in) :: this
         integer :: get_num_thermalisation_steps
                 
@@ -547,18 +554,18 @@ contains
                     call move(this%Box, &
                               this%type1_spheres, this%type1_macro, this%type1_observables, &
                               this%type2_spheres, this%type2_macro%mix_cells, &
-                              this%mix, this%mix_potential_energy)
+                              this%between_spheres_potential, this%mix_potential_energy)
                 else
                     call move(this%Box, &
                               this%type2_spheres, this%type2_macro, this%type2_observables, &
                               this%type1_spheres, this%type1_macro%mix_cells, &
-                              this%mix, this%mix_potential_energy)
+                              this%between_spheres_potential, this%mix_potential_energy)
                 end if
             else if (iChangeRand <= this%num_moves + this%num_switches) then
                 call switch(this%Box, &
                             this%type1_spheres, this%type1_macro, this%type1_observables, &
                             this%type2_spheres, this%type2_macro, this%type2_observables, &
-                            this%mix, this%mix_potential_energy, &
+                            this%between_spheres_potential, this%mix_potential_energy, &
                             this%switch_num_rejections)
                 this%switch_num_hits = this%switch_num_hits + 1
             else
@@ -651,11 +658,11 @@ contains
         call widom(this%Box, &
                    this%type1_spheres, this%type1_macro, this%type1_observables, &
                    this%type2_spheres, this%type2_macro%mix_cells, &
-                   this%mix)
+                   this%between_spheres_potential)
         call widom(this%Box, &
                    this%type2_spheres, this%type2_macro, this%type2_observables, &
                    this%type1_spheres, this%type1_macro%mix_cells, &
-                   this%mix)
+                   this%between_spheres_potential)
     
     end subroutine Physical_System_measure_chemical_potentials
     

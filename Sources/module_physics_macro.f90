@@ -15,7 +15,7 @@ use class_hard_spheres_potential, only: Hard_Spheres_Potential_Energy
 use class_small_move, only: Small_Move
 use class_small_rotation, only: Small_Rotation
 use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
-use class_between_spheres_potential, only: Between_Spheres_Potential_Energy
+use class_between_spheres_potential, only: Between_Hard_Spheres_Potential_Energy
 use class_hard_spheres_observables, only: Hard_Spheres_Observables, Dipolar_Hard_Spheres_Observables
 use class_hard_spheres_units, only: Hard_Spheres_Units, Dipolar_Hard_Spheres_Units
 
@@ -297,7 +297,7 @@ contains
         real(DP), dimension(:), intent(in) :: Box_size
         class(Hard_Spheres), intent(in) :: this_spheres, other_spheres
         class(Hard_Spheres_Macro), intent(inout) :: this_macro
-        class(Between_Spheres_Potential_Energy), intent(in) :: mix
+        class(Between_Hard_Spheres_Potential_Energy), intent(in) :: mix
         
         real(DP), dimension(Ndim) :: same_cell_size
         
@@ -388,7 +388,7 @@ contains
     subroutine init_between_spheres(Box_size, mix, spheres1, spheres2, write_potential_energy, mix_potential_energy_unit, mix_potential_energy)
     
         real(DP), dimension(:), intent(in) :: Box_size
-        class(Between_Spheres_Potential_Energy), intent(inout) :: mix
+        class(Between_Hard_Spheres_Potential_Energy), intent(inout) :: mix
         class(Hard_Spheres), intent(in) :: spheres1, spheres2
         logical, intent(in) :: write_potential_energy
         integer, intent(in) :: mix_potential_energy_unit
@@ -408,7 +408,7 @@ contains
     subroutine final_between_spheres(Box_size, mix, spheres1, spheres2, mix_report_unit, mix_potential_energy, mix_potential_energy_conf)
     
         real(DP), dimension(:), intent(in) :: Box_size
-        class(Between_Spheres_Potential_Energy), intent(inout) :: mix
+        class(Between_Hard_Spheres_Potential_Energy), intent(inout) :: mix
         class(Hard_Spheres), intent(in) :: spheres1, spheres2
         integer, intent(in) :: mix_report_unit
         real(DP), intent(in) :: mix_potential_energy

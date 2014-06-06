@@ -46,6 +46,10 @@ private
         
     end type Dipolar_Hard_Spheres_Observables
     
+    type Between_Hard_Spheres_Observables
+    
+    end type Between_Hard_Spheres_Observables
+    
 contains
     
     !> Update rejection

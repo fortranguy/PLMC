@@ -18,7 +18,7 @@ implicit none
 
 private
 
-    type, public :: Between_Spheres_Potential_Energy
+    type, public :: Between_Hard_Spheres_Potential_Energy
 
         private
         
@@ -39,28 +39,28 @@ private
 
     contains
     
-        procedure :: construct => Between_Spheres_Potential_Energy_construct
-        procedure :: destroy => Between_Spheres_Potential_Energy_destroy
+        procedure :: construct => Between_Hard_Spheres_Potential_Energy_construct
+        procedure :: destroy => Between_Hard_Spheres_Potential_Energy_destroy
 
-        procedure :: get_diameter => Between_Spheres_Potential_Energy_get_diameter
-        procedure :: get_range_cut => Between_Spheres_Potential_Energy_get_range_cut
-        procedure :: set_cell_size => Between_Spheres_Potential_Energy_set_cell_size
-        procedure :: get_cell_size => Between_Spheres_Potential_Energy_get_cell_size
+        procedure :: get_diameter => Between_Hard_Spheres_Potential_Energy_get_diameter
+        procedure :: get_range_cut => Between_Hard_Spheres_Potential_Energy_get_range_cut
+        procedure :: set_cell_size => Between_Hard_Spheres_Potential_Energy_set_cell_size
+        procedure :: get_cell_size => Between_Hard_Spheres_Potential_Energy_get_cell_size
         
-        procedure :: test_overlap => Between_Spheres_Potential_Energy_test_overlap
-        procedure, private :: set_tabulation => Between_Spheres_Potential_Energy_set_tabulation
-        procedure :: write => Between_Spheres_Potential_Energy_write
-        procedure, private :: pair => Between_Spheres_Potential_Energy_pair
-        procedure :: neighCells => Between_Spheres_Potential_Energy_neighCells
-        procedure :: conf => Between_Spheres_Potential_Energy_conf
+        procedure :: test_overlap => Between_Hard_Spheres_Potential_Energy_test_overlap
+        procedure, private :: set_tabulation => Between_Hard_Spheres_Potential_Energy_set_tabulation
+        procedure :: write => Between_Hard_Spheres_Potential_Energy_write
+        procedure, private :: pair => Between_Hard_Spheres_Potential_Energy_pair
+        procedure :: neighCells => Between_Hard_Spheres_Potential_Energy_neighCells
+        procedure :: conf => Between_Hard_Spheres_Potential_Energy_conf
 
     end type
 
 contains
 
-    subroutine Between_Spheres_Potential_Energy_construct(this, json, type1_diameter, type2_diameter)
+    subroutine Between_Hard_Spheres_Potential_Energy_construct(this, json, type1_diameter, type2_diameter)
 
-        class(Between_Spheres_Potential_Energy), intent(out) :: this
+        class(Between_Hard_Spheres_Potential_Energy), intent(out) :: this
         type(json_file), intent(inout) :: json
         real(DP), intent(in) :: type1_diameter, type2_diameter
         
@@ -108,48 +108,48 @@ contains
         allocate(this%tabulation(this%i_min_distance:this%i_range_cut))
         call this%set_tabulation()
 
-    end subroutine Between_Spheres_Potential_Energy_construct
+    end subroutine Between_Hard_Spheres_Potential_Energy_construct
 
-    subroutine Between_Spheres_Potential_Energy_destroy(this)
+    subroutine Between_Hard_Spheres_Potential_Energy_destroy(this)
     
-        class(Between_Spheres_Potential_Energy), intent(inout) :: this
+        class(Between_Hard_Spheres_Potential_Energy), intent(inout) :: this
         
         write(output_unit, *) this%name, " class destruction"
         
         if (allocated(this%tabulation)) deallocate(this%tabulation)
     
-    end subroutine Between_Spheres_Potential_Energy_destroy
+    end subroutine Between_Hard_Spheres_Potential_Energy_destroy
 
     !> Accessors & Mutators
 
-    pure function Between_Spheres_Potential_Energy_get_diameter(this) result(get_diameter)
-        class(Between_Spheres_Potential_Energy), intent(in) :: this
+    pure function Between_Hard_Spheres_Potential_Energy_get_diameter(this) result(get_diameter)
+        class(Between_Hard_Spheres_Potential_Energy), intent(in) :: this
         real(DP) :: get_diameter
         get_diameter = this%diameter
-    end function Between_Spheres_Potential_Energy_get_diameter
+    end function Between_Hard_Spheres_Potential_Energy_get_diameter
     
-    pure function Between_Spheres_Potential_Energy_get_range_cut(this) result(get_range_cut)
-        class(Between_Spheres_Potential_Energy), intent(in) :: this
+    pure function Between_Hard_Spheres_Potential_Energy_get_range_cut(this) result(get_range_cut)
+        class(Between_Hard_Spheres_Potential_Energy), intent(in) :: this
         real(DP) :: get_range_cut
         get_range_cut = this%range_cut
-    end function Between_Spheres_Potential_Energy_get_range_cut
+    end function Between_Hard_Spheres_Potential_Energy_get_range_cut
     
-    pure subroutine Between_Spheres_Potential_Energy_set_cell_size(this)
-        class(Between_Spheres_Potential_Energy), intent(inout) :: this
+    pure subroutine Between_Hard_Spheres_Potential_Energy_set_cell_size(this)
+        class(Between_Hard_Spheres_Potential_Energy), intent(inout) :: this
         this%cell_size(:) = this%range_cut
-    end subroutine Between_Spheres_Potential_Energy_set_cell_size
+    end subroutine Between_Hard_Spheres_Potential_Energy_set_cell_size
     
-    pure function Between_Spheres_Potential_Energy_get_cell_size(this) result(get_cell_size)
-        class(Between_Spheres_Potential_Energy), intent(in) :: this
+    pure function Between_Hard_Spheres_Potential_Energy_get_cell_size(this) result(get_cell_size)
+        class(Between_Hard_Spheres_Potential_Energy), intent(in) :: this
         real(DP), dimension(Ndim) :: get_cell_size
         get_cell_size(:) = this%cell_size(:)
-   end function Between_Spheres_Potential_Energy_get_cell_size
+   end function Between_Hard_Spheres_Potential_Energy_get_cell_size
     
     !> Overlapt test
     
-    subroutine Between_Spheres_Potential_Energy_test_overlap(this, Box_size, type1, type2)
+    subroutine Between_Hard_Spheres_Potential_Energy_test_overlap(this, Box_size, type1, type2)
     
-        class(Between_Spheres_Potential_Energy), intent(in) :: this
+        class(Between_Hard_Spheres_Potential_Energy), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         class(Hard_Spheres), intent(in) :: type1, type2
         
@@ -174,14 +174,14 @@ contains
 
         write(output_unit, *) this%name, ":    Overlap test: OK !"
     
-    end subroutine Between_Spheres_Potential_Energy_test_overlap
+    end subroutine Between_Hard_Spheres_Potential_Energy_test_overlap
     
     !> Tabulation of Yukawa potential_energy
     !> \f[ \epsilon \frac{e^{-\alpha (r-r_{min})}}{r} \f]
     
-    pure subroutine Between_Spheres_Potential_Energy_set_tabulation(this)
+    pure subroutine Between_Hard_Spheres_Potential_Energy_set_tabulation(this)
     
-        class(Between_Spheres_Potential_Energy), intent(inout) :: this
+        class(Between_Hard_Spheres_Potential_Energy), intent(inout) :: this
 
         integer :: i
         real(DP) :: r_i
@@ -195,13 +195,13 @@ contains
         ! shift
         this%tabulation(:) = this%tabulation(:) - this%tabulation(this%i_range_cut)
 
-    end subroutine Between_Spheres_Potential_Energy_set_tabulation
+    end subroutine Between_Hard_Spheres_Potential_Energy_set_tabulation
     
     !> Write the tabulated potential_energy
     
-    subroutine Between_Spheres_Potential_Energy_write(this, potential_energy_unit)
+    subroutine Between_Hard_Spheres_Potential_Energy_write(this, potential_energy_unit)
 
-        class(Between_Spheres_Potential_Energy), intent(in) :: this
+        class(Between_Hard_Spheres_Potential_Energy), intent(in) :: this
         integer, intent(in) :: potential_energy_unit
 
         integer :: i
@@ -212,13 +212,13 @@ contains
             write(potential_energy_unit, *) r_i, this%tabulation(i)
         end do
 
-    end subroutine Between_Spheres_Potential_Energy_write
+    end subroutine Between_Hard_Spheres_Potential_Energy_write
     
     !> Total potential_energy energy
     
-    pure function Between_Spheres_Potential_Energy_conf(this, Box_size, type1, type2) result(conf)
+    pure function Between_Hard_Spheres_Potential_Energy_conf(this, Box_size, type1, type2) result(conf)
     
-        class(Between_Spheres_Potential_Energy), intent(in) :: this
+        class(Between_Hard_Spheres_Potential_Energy), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         class(Hard_Spheres), intent(in) :: type1, type2
         real(DP) :: conf
@@ -244,12 +244,12 @@ contains
             end do
         end do
     
-    end function Between_Spheres_Potential_Energy_conf
+    end function Between_Hard_Spheres_Potential_Energy_conf
     
-    subroutine Between_Spheres_Potential_Energy_neighCells(this, Box_size, particle, this_cells, other, overlap, &
+    subroutine Between_Hard_Spheres_Potential_Energy_neighCells(this, Box_size, particle, this_cells, other, overlap, &
                                                 energ)
         
-        class(Between_Spheres_Potential_Energy), intent(in) :: this
+        class(Between_Hard_Spheres_Potential_Energy), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         type(Particle_Index), intent(in) :: particle
         type(Neighbour_Cells), intent(in) :: this_cells
@@ -292,11 +292,11 @@ contains
             
         end do
     
-    end subroutine Between_Spheres_Potential_Energy_neighCells
+    end subroutine Between_Hard_Spheres_Potential_Energy_neighCells
     
-    pure function Between_Spheres_Potential_Energy_pair(this, r) result(pair)
+    pure function Between_Hard_Spheres_Potential_Energy_pair(this, r) result(pair)
         
-        class(Between_Spheres_Potential_Energy), intent(in) :: this
+        class(Between_Hard_Spheres_Potential_Energy), intent(in) :: this
         real(DP), intent(in) :: r
         real(DP) :: pair
         
@@ -311,6 +311,6 @@ contains
             pair = 0._DP
         end if
         
-    end function Between_Spheres_Potential_Energy_pair
+    end function Between_Hard_Spheres_Potential_Energy_pair
 
 end module class_between_spheres_potential
