@@ -46,13 +46,20 @@ private
         
     end type Dipolar_Hard_Spheres_Observables
     
-    type Between_Hard_Spheres_Observables
+    type, public :: Between_Hard_Spheres_Observables
+    
+        real(DP) :: potential_energy
+        real(DP) :: potential_energy_sum = 0._DP
+        real(DP) :: potential_energy_conf
+        
+    contains
+    
+        procedure :: write => Between_Hard_Spheres_Observables_write
+        procedure :: accumulate => Between_Hard_Spheres_Observables_accumulate
     
     end type Between_Hard_Spheres_Observables
     
 contains
-    
-    !> Update rejection
     
     pure subroutine Hard_Spheres_Observables_update_rejections(this)
     
@@ -64,12 +71,15 @@ contains
         
          select type (this)
             type is (Dipolar_Hard_Spheres_Observables)
-                this%rotate_rejection_rate = real(this%rotate_num_rejections, DP)/real(this%rotate_num_hits, DP)
+                this%rotate_rejection_rate = real(this%rotate_num_rejections, DP) / &
+                                             real(this%rotate_num_hits, DP)
                 this%rotate_num_rejections = 0
                 this%rotate_num_hits = 0
         end select
     
     end subroutine Hard_Spheres_Observables_update_rejections
+    
+    ! Write
     
     subroutine Hard_Spheres_Observables_write(this, i_step, observables_unit)
     
@@ -78,13 +88,23 @@ contains
         
         select type (this)
             type is (Dipolar_Hard_Spheres_Observables)
-                write(observables_unit, *) i_step, this%potential_energy, this%inv_activity, this%move_rejection_rate, &
-                                   this%rotate_rejection_rate
+                write(observables_unit, *) i_step, this%potential_energy, this%inv_activity, &
+                                           this%move_rejection_rate, this%rotate_rejection_rate
             class default
-                write(observables_unit, *) i_step, this%potential_energy, this%inv_activity, this%move_rejection_rate
+                write(observables_unit, *) i_step, this%potential_energy, this%inv_activity, &
+                                           this%move_rejection_rate
         end select
     
     end subroutine Hard_Spheres_Observables_write
+    
+    subroutine Between_Hard_Spheres_Observables_write(this, i_step, observables_unit)
+    
+        class(Between_Hard_Spheres_Observables), intent(in) :: this
+        integer, intent(in) :: i_step, observables_unit
+        
+        write(observables_unit, *) i_step, this%potential_energy
+    
+    end subroutine Between_Hard_Spheres_Observables_write
     
     !> Accumulations
     
@@ -102,6 +122,14 @@ contains
         end select
     
     end subroutine Hard_Spheres_Observables_accumulate
+    
+    pure subroutine Between_Hard_Spheres_Observables_accumulate(this)
+    
+        class(Between_Hard_Spheres_Observables), intent(inout) :: this
+        
+        this%potential_energy_sum = this%potential_energy_sum + this%potential_energy
+    
+    end subroutine Between_Hard_Spheres_Observables_accumulate
     
     !> Results
     

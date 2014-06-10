@@ -11,7 +11,8 @@ use module_data, only: test_data_found
 use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
 use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres
 use class_between_spheres_potential, only: Between_Hard_Spheres_Potential_Energy
-use class_hard_spheres_observables, only: Hard_Spheres_Observables, Dipolar_Hard_Spheres_Observables
+use class_hard_spheres_observables, only: Hard_Spheres_Observables, Dipolar_Hard_Spheres_Observables, &
+                                          Between_Hard_Spheres_Observables
 use class_hard_spheres_units, only: Hard_Spheres_Units, Dipolar_Hard_Spheres_Units
 use module_monte_carlo_arguments, only: read_arguments
 use module_physics_macro, only: init_random_seed, set_initial_configuration, &
@@ -57,7 +58,7 @@ private
         
         ! Between Spheres potential_energy
         type(Between_Hard_Spheres_Potential_Energy) :: between_spheres_potential
-        real(DP) :: mix_potential_energy, mix_potential_energy_sum, mix_potential_energy_conf
+        type(Between_Hard_Spheres_Observables) :: between_spheres_observables
         integer :: mix_report_unit
         integer :: mix_potential_energy_tab_unit
         integer :: mix_observables_thermalisation_unit, mix_observables_equilibrium_unit
@@ -297,11 +298,11 @@ contains
                                        this%between_spheres_potential%get_diameter(), &
                                        this%report_unit)
                                        
-        this%mix_potential_energy_sum = 0._DP        
+        this%between_spheres_observables%potential_energy_sum = 0._DP        
         call init_between_spheres(this%Box%size, this%between_spheres_potential, &
                                   this%type1_spheres, this%type2_spheres, &
                                   this%write_potential_energy, this%mix_potential_energy_tab_unit, &
-                                  this%mix_potential_energy)
+                                  this%between_spheres_observables%potential_energy)
         
         call init_spheres(this%Box, this%type1_spheres, this%type1_units)
         call init_hard_potential(this%type1_macro%hard_potential, "Dipolar Hard Spheres", &
@@ -326,8 +327,9 @@ contains
         end if
         
         this%potential_energy_sum = 0._DP
-        potential_energy_conf = this%type1_observables%potential_energy + this%type2_observables%potential_energy + &
-                         this%mix_potential_energy
+        potential_energy_conf = this%type1_observables%potential_energy + &
+                                this%type2_observables%potential_energy + &
+                                this%between_spheres_observables%potential_energy
         write(output_unit, *) "Initial potential_energy energy =", potential_energy_conf
         write(this%observables_thermalisation_unit, *) 0, potential_energy_conf
     
@@ -418,7 +420,8 @@ contains
         call final_between_spheres(this%Box%size, this%between_spheres_potential, &
                                    this%type1_spheres, this%type2_spheres, &
                                    this%mix_report_unit, &
-                                   this%mix_potential_energy, this%mix_potential_energy_conf)
+                                   this%between_spheres_observables%potential_energy, &
+                                   this%between_spheres_observables%potential_energy_conf)
         
         call this%write_all_results()
         call this%close_units()
@@ -428,9 +431,13 @@ contains
     subroutine Physical_System_write_all_results(this)
         class(Physical_System), intent(inout) :: this
         
-        call this%type1_observables%write_results(this%Box%temperature, this%num_equilibrium_steps, this%type1_units%report)
-        call this%type2_observables%write_results(this%Box%temperature, this%num_equilibrium_steps, this%type2_units%report)
-        call between_spheres_write_results(this%num_equilibrium_steps, this%mix_potential_energy_sum, this%mix_report_unit)
+        call this%type1_observables%write_results(this%Box%temperature, this%num_equilibrium_steps, &
+                                                  this%type1_units%report)
+        call this%type2_observables%write_results(this%Box%temperature, this%num_equilibrium_steps, &
+                                                  this%type2_units%report)
+        call between_spheres_write_results(this%num_equilibrium_steps, &
+                                           this%between_spheres_observables%potential_energy_sum, &
+                                           this%mix_report_unit)
         
         call this%write_results()
     
@@ -442,15 +449,16 @@ contains
         real(DP) :: potential_energy, potential_energy_conf
         real(DP) :: duration
         
-        potential_energy = this%type1_observables%potential_energy + this%type2_observables%potential_energy + &
-                    this%mix_potential_energy
+        potential_energy = this%type1_observables%potential_energy + &
+                           this%type2_observables%potential_energy + &
+                           this%between_spheres_observables%potential_energy
         potential_energy_conf = total_energy(this%Box, this%type1_spheres, this%type1_macro) + &
-                    total_energy(this%Box, this%type2_spheres, this%type2_macro) + &
-                    this%mix_potential_energy_conf
+                                total_energy(this%Box, this%type2_spheres, this%type2_macro) + &
+                                this%between_spheres_observables%potential_energy_conf
         call test_consist(potential_energy, potential_energy_conf, this%report_unit)
         this%potential_energy_sum = this%type1_observables%potential_energy_sum + &
-                             this%type2_observables%potential_energy_sum + &
-                             this%mix_potential_energy_sum
+                                    this%type2_observables%potential_energy_sum + &
+                                    this%between_spheres_observables%potential_energy_sum
         duration = this%time_end - this%time_start
         call write_results(this%num_particles, this%num_equilibrium_steps, this%potential_energy_sum, &
                            this%switch_sum_rejection, duration, this%report_unit)
@@ -554,18 +562,21 @@ contains
                     call move(this%Box, &
                               this%type1_spheres, this%type1_macro, this%type1_observables, &
                               this%type2_spheres, this%type2_macro%mix_cells, &
-                              this%between_spheres_potential, this%mix_potential_energy)
+                              this%between_spheres_potential, &
+                              this%between_spheres_observables%potential_energy)
                 else
                     call move(this%Box, &
                               this%type2_spheres, this%type2_macro, this%type2_observables, &
                               this%type1_spheres, this%type1_macro%mix_cells, &
-                              this%between_spheres_potential, this%mix_potential_energy)
+                              this%between_spheres_potential, &
+                              this%between_spheres_observables%potential_energy)
                 end if
             else if (iChangeRand <= this%num_moves + this%num_switches) then
                 call switch(this%Box, &
                             this%type1_spheres, this%type1_macro, this%type1_observables, &
                             this%type2_spheres, this%type2_macro, this%type2_observables, &
-                            this%between_spheres_potential, this%mix_potential_energy, &
+                            this%between_spheres_potential, &
+                            this%between_spheres_observables%potential_energy, &
                             this%switch_num_rejections)
                 this%switch_num_hits = this%switch_num_hits + 1
             else
@@ -625,9 +636,12 @@ contains
     
         call this%type1_observables%write(i_step, this%type1_units%observables_thermalisation)
         call this%type2_observables%write(i_step, this%type2_units%observables_thermalisation)
+        call this%between_spheres_observables%write(i_step, this%mix_observables_thermalisation_unit)
         
-        write(this%mix_observables_thermalisation_unit, *) i_step, this%mix_potential_energy
-        write(this%observables_thermalisation_unit, *) i_step, this%type1_observables%potential_energy + this%type2_observables%potential_energy + this%mix_potential_energy
+        write(this%observables_thermalisation_unit, *) i_step, &
+            this%type1_observables%potential_energy + &
+            this%type2_observables%potential_energy + &
+            this%between_spheres_observables%potential_energy
             
     end subroutine Physical_System_write_observables_thermalisation
     
@@ -672,8 +686,8 @@ contains
     
         call this%type1_observables%accumulate()
         call this%type2_observables%accumulate()
+        call this%between_spheres_observables%accumulate()
         
-        this%mix_potential_energy_sum = this%mix_potential_energy_sum + this%mix_potential_energy
         this%switch_sum_rejection = this%switch_sum_rejection + this%switch_rejection_rate
             
     end subroutine Physical_System_accumulate_observables
@@ -685,11 +699,12 @@ contains
     
         call this%type1_observables%write(i_step, this%type1_units%observables_equilibrium)
         call this%type2_observables%write(i_step, this%type2_units%observables_equilibrium)
+        call this%between_spheres_observables%write(i_step, this%mix_observables_equilibrium_unit)
         
-        write(this%mix_observables_equilibrium_unit, *) i_step, this%mix_potential_energy
-        write(this%observables_equilibrium_unit, *) i_step, this%type1_observables%potential_energy + &
-                                                            this%type2_observables%potential_energy + &
-                                                            this%mix_potential_energy
+        write(this%observables_equilibrium_unit, *) i_step, &
+            this%type1_observables%potential_energy + &
+            this%type2_observables%potential_energy + &
+            this%between_spheres_observables%potential_energy
             
     end subroutine Physical_System_write_observables_equilibrium
     
