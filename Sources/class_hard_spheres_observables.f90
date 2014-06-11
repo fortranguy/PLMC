@@ -145,7 +145,8 @@ contains
             
         write(report_unit, *) "Results: "
         
-        write(report_unit, *) "    average energy = ", this%potential_energy_sum/real(num_equilibrium_steps, DP)
+        write(report_unit, *) "    average energy = ", this%potential_energy_sum / &
+                                                       real(num_equilibrium_steps, DP)
         potChiEx = -temperature*log(this%sum_inv_activity/real(num_equilibrium_steps, DP))
         write(report_unit, *) "    average excess chemical potential = ", potChiEx
         write(report_unit, *) "    move rejection rate = ", &
