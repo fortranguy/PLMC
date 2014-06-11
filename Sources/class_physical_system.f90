@@ -8,16 +8,16 @@ use json_module, only: json_file
 use module_types_micro, only: Box_Dimensions, Monte_Carlo_Arguments
 use module_physics_micro, only: NwaveVectors
 use module_data, only: test_data_found
-use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
 use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres, Between_Hard_Spheres
-use class_between_spheres_potential, only: Between_Hard_Spheres_Potential_Energy
+use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
+use class_hard_spheres_potential, only: Between_Hard_Spheres_Potential_Energy
 use class_hard_spheres_observables, only: Hard_Spheres_Observables, Dipolar_Hard_Spheres_Observables, &
                                           Between_Hard_Spheres_Observables
 use class_hard_spheres_units, only: Hard_Spheres_Units, Dipolar_Hard_Spheres_Units, &
                                     Between_Hard_Spheres_Units
 use module_monte_carlo_arguments, only: read_arguments
 use module_physics_macro, only: init_random_seed, set_initial_configuration, &
-                                init_spheres, init_hard_potential, init_cells, &
+                                init_spheres, init_cells, &
                                 set_ewald, &
                                 total_energy, &
                                 final_spheres, &
@@ -304,7 +304,8 @@ contains
         call this%between_spheres%test_overlap(this%Box%size, &
                                                this%type1_spheres, this%type2_spheres)
         this%between_spheres_observables%potential_energy_sum = 0._DP
-        call this%between_spheres_potential%construct(json, this%between_spheres%get_diameter())
+        call this%between_spheres_potential%construct(json, "Between Spheres", &
+                                                      this%between_spheres%get_diameter())
         call init_between_spheres_potential(this%Box%size, this%between_spheres_potential, &
                                             this%type1_spheres, this%type2_spheres, &
                                             this%write_potential_energy, &
@@ -312,17 +313,17 @@ contains
                                             this%between_spheres_units%potential_energy_tabulation)
         
         call init_spheres(this%Box, this%type1_spheres, this%type1_units)
-        call init_hard_potential(this%type1_macro%hard_potential, "Dipolar Hard Spheres", &
-                                 this%type1_spheres%get_diameter(), json)
+        call this%type1_macro%hard_potential%construct(json, "Dipolar Hard Spheres", &
+                                                       this%type1_spheres%get_diameter())
         call init_cells(this%Box%size, this%type1_spheres, this%type1_macro, this%type2_spheres, &
                         this%between_spheres_potential)
         call set_ewald(this%Box, this%type1_spheres, this%type1_macro, json, this%type1_units)
         this%type1_observables%potential_energy = total_energy(this%Box, this%type1_spheres, &
                                                                this%type1_macro)
                         
-        call init_spheres(this%Box, this%type2_spheres, this%type2_units)
-        call init_hard_potential(this%type2_macro%hard_potential, "Hard Spheres", &
-                                 this%type2_spheres%get_diameter(), json)
+        call init_spheres(this%Box, this%type2_spheres, this%type2_units)                                 
+        call this%type1_macro%hard_potential%construct(json, "Hard Spheres", &
+                                                       this%type1_spheres%get_diameter())
         call init_cells(this%Box%size, this%type2_spheres, this%type2_macro, this%type1_spheres, &
                         this%between_spheres_potential)        
         this%type2_observables%potential_energy = total_energy(this%Box, this%type2_spheres, &

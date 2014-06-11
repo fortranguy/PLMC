@@ -59,7 +59,6 @@ $(EXEC1): data.o \
           class_neighbour_cells.o \
           class_hard_spheres_potential.o class_ewald_summation_real.o class_ewald_summation_reci.o\
           class_ewald_summation_self.o class_ewald_summation_bound.o\
-          class_between_spheres_potential.o \
           class_hard_spheres_observables.o class_hard_spheres_units.o \
           module_types_macro.o \
           module_physics_macro.o module_algorithms.o module_write.o module_monte_carlo_arguments.o\

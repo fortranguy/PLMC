@@ -9,7 +9,7 @@ use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres
 use class_small_move, only: Small_Move
 use class_small_rotation, only: Small_Rotation
 use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
-use class_between_spheres_potential, only: Between_Hard_Spheres_Potential_Energy
+use class_hard_spheres_potential, only: Between_Hard_Spheres_Potential_Energy
 use class_hard_spheres_observables, only: Hard_Spheres_Observables, Dipolar_Hard_Spheres_Observables
 
 implicit none

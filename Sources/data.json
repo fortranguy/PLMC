@@ -62,13 +62,7 @@
             "minimum distance factor": 1.0
         },
         "Between Spheres": {
-            "minimum distance factor": 1.0,
-            "range cut": 1.0,
-            "delta": 1.0,
-            "Yukawa": {
-                "epsilon": 0.0,
-                "alpha": 1.0
-            }
+            "minimum distance factor": 1.0
         },
         "write": true
     },

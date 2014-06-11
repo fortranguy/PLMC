@@ -11,18 +11,18 @@ use module_physics_micro, only: PBC_distance, random_surface
 use module_data, only: test_data_found
 use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres
 use class_neighbour_cells, only: Neighbour_Cells
-use class_hard_spheres_potential, only: Hard_Spheres_Potential_Energy
+use class_hard_spheres_potential, only: Hard_Spheres_Potential_Energy, &
+                                        Between_Hard_Spheres_Potential_Energy
 use class_small_move, only: Small_Move
 use class_small_rotation, only: Small_Rotation
 use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
-use class_between_spheres_potential, only: Between_Hard_Spheres_Potential_Energy
 use class_hard_spheres_observables, only: Hard_Spheres_Observables, Dipolar_Hard_Spheres_Observables
 use class_hard_spheres_units, only: Hard_Spheres_Units, Dipolar_Hard_Spheres_Units
 
 implicit none
 private
 public init_random_seed, set_initial_configuration, &
-       init_spheres, init_hard_potential, init_cells, &
+       init_spheres, init_cells, &
        set_ewald, &
        total_energy, & 
        final_spheres, init_between_spheres_potential, final_between_spheres_potential, &
@@ -272,25 +272,6 @@ contains
         end select
     
     end subroutine init_spheres    
-        
-    subroutine init_hard_potential(this_hard_potential, type_name, this_diameter, json)
-    
-        class(Hard_Spheres_Potential_Energy), intent(inout) :: this_hard_potential
-        character(len=*), intent(in) :: type_name
-        real(DP), intent(in) :: this_diameter 
-        type(json_file), intent(inout) :: json
-        
-        character(len=4096) :: data_name
-        logical :: found
-        
-        real(DP) :: min_distance_factor
-    
-        data_name = "Potential Energy."//type_name//".minimum distance factor"
-        call json%get(data_name, min_distance_factor, found)
-        call test_data_found(data_name, found)
-        call this_hard_potential%construct(min_distance_factor, this_diameter)
-                                                       
-    end subroutine init_hard_potential
     
     subroutine init_cells(Box_size, this_spheres, this_macro, other_spheres, mix)  
       
