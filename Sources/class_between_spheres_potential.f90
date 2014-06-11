@@ -30,8 +30,6 @@ private
         real(DP) :: epsilon !< factor in Yukawa
         real(DP) :: alpha !< coefficient in Yukawa
         real(DP), dimension(:), allocatable :: tabulation
-        
-        real(DP), dimension(Ndim) :: cell_size
 
     contains
     
