@@ -301,8 +301,9 @@ contains
         this%between_spheres_observables%potential_energy_sum = 0._DP        
         call init_between_spheres(this%Box%size, this%between_spheres_potential, &
                                   this%type1_spheres, this%type2_spheres, &
-                                  this%write_potential_energy, this%mix_potential_energy_tab_unit, &
-                                  this%between_spheres_observables%potential_energy)
+                                  this%write_potential_energy, &
+                                  this%between_spheres_observables%potential_energy, &
+                                  this%mix_potential_energy_tab_unit)
         
         call init_spheres(this%Box, this%type1_spheres, this%type1_units)
         call init_hard_potential(this%type1_macro%hard_potential, "Dipolar Hard Spheres", &
@@ -310,14 +311,16 @@ contains
         call init_cells(this%Box%size, this%type1_spheres, this%type1_macro, this%type2_spheres, &
                         this%between_spheres_potential)
         call set_ewald(this%Box, this%type1_spheres, this%type1_macro, json, this%type1_units)
-        this%type1_observables%potential_energy = total_energy(this%Box, this%type1_spheres, this%type1_macro)
+        this%type1_observables%potential_energy = total_energy(this%Box, this%type1_spheres, &
+                                                               this%type1_macro)
                         
         call init_spheres(this%Box, this%type2_spheres, this%type2_units)
         call init_hard_potential(this%type2_macro%hard_potential, "Hard Spheres", &
                                  this%type2_spheres%get_diameter(), json)
         call init_cells(this%Box%size, this%type2_spheres, this%type2_macro, this%type1_spheres, &
                         this%between_spheres_potential)        
-        this%type2_observables%potential_energy = total_energy(this%Box, this%type2_spheres, this%type2_macro)
+        this%type2_observables%potential_energy = total_energy(this%Box, this%type2_spheres, &
+                                                               this%type2_macro)
                         
         call this%write_all_reports()
         if (this%write_potential_energy) then
@@ -411,17 +414,18 @@ contains
         call final_spheres(this%Box, this%type1_spheres, this%type1_units)
         call set_ewald(this%Box, this%type1_spheres, this%type1_macro, json, this%type1_units)
         type1_energy = total_energy(this%Box, this%type1_spheres, this%type1_macro)
-        call test_consist(this%type1_observables%potential_energy, type1_energy, this%type1_units%report)
+        call test_consist(this%type1_observables%potential_energy, type1_energy, &
+                          this%type1_units%report)
         
         call final_spheres(this%Box, this%type2_spheres, this%type2_units)
         type2_energy = total_energy(this%Box, this%type2_spheres, this%type2_macro)
-        call test_consist(this%type2_observables%potential_energy, type2_energy, this%type2_units%report)
+        call test_consist(this%type2_observables%potential_energy, type2_energy, &
+                          this%type2_units%report)
         
         call final_between_spheres(this%Box%size, this%between_spheres_potential, &
                                    this%type1_spheres, this%type2_spheres, &
-                                   this%mix_report_unit, &
                                    this%between_spheres_observables%potential_energy, &
-                                   this%between_spheres_observables%potential_energy_conf)
+                                   this%mix_report_unit)
         
         call this%write_all_results()
         call this%close_units()
@@ -454,7 +458,9 @@ contains
                            this%between_spheres_observables%potential_energy
         potential_energy_conf = total_energy(this%Box, this%type1_spheres, this%type1_macro) + &
                                 total_energy(this%Box, this%type2_spheres, this%type2_macro) + &
-                                this%between_spheres_observables%potential_energy_conf
+                                this%between_spheres_potential%conf(this%Box%size, &
+                                                                    this%type1_spheres, &
+                                                                    this%type2_spheres)
         call test_consist(potential_energy, potential_energy_conf, this%report_unit)
         this%potential_energy_sum = this%type1_observables%potential_energy_sum + &
                                     this%type2_observables%potential_energy_sum + &

@@ -50,7 +50,6 @@ private
     
         real(DP) :: potential_energy
         real(DP) :: potential_energy_sum = 0._DP
-        real(DP) :: potential_energy_conf
         
     contains
     

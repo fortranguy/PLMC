@@ -385,38 +385,41 @@ contains
     
     !> Mix initialisation
     
-    subroutine init_between_spheres(Box_size, mix, spheres1, spheres2, write_potential_energy, mix_potential_energy_unit, mix_potential_energy)
+    subroutine init_between_spheres(Box_size, mix, spheres1, spheres2, write_potential_energy, &
+                                    potential_energy, potential_energy_unit)
     
         real(DP), dimension(:), intent(in) :: Box_size
         class(Between_Hard_Spheres_Potential_Energy), intent(inout) :: mix
         class(Hard_Spheres), intent(in) :: spheres1, spheres2
         logical, intent(in) :: write_potential_energy
-        integer, intent(in) :: mix_potential_energy_unit
-        real(DP), intent(out) :: mix_potential_energy
+        real(DP), intent(out) :: potential_energy
+        integer, intent(in) :: potential_energy_unit
     
         call mix%test_overlap(Box_size, spheres1, spheres2)
         if (write_potential_energy) then
-            call mix%write(mix_potential_energy_unit)
+            call mix%write(potential_energy_unit)
         end if
         call mix%set_cell_size()
-        mix_potential_energy = mix%conf(Box_size, spheres1, spheres2)
+        potential_energy = mix%conf(Box_size, spheres1, spheres2)
     
     end subroutine init_between_spheres
     
     !> Mix finalization
     
-    subroutine final_between_spheres(Box_size, mix, spheres1, spheres2, mix_report_unit, mix_potential_energy, mix_potential_energy_conf)
+    subroutine final_between_spheres(Box_size, mix, spheres1, spheres2, potential_energy, &
+                                     mix_report_unit)
     
         real(DP), dimension(:), intent(in) :: Box_size
         class(Between_Hard_Spheres_Potential_Energy), intent(inout) :: mix
         class(Hard_Spheres), intent(in) :: spheres1, spheres2
+        real(DP), intent(in) :: potential_energy
         integer, intent(in) :: mix_report_unit
-        real(DP), intent(in) :: mix_potential_energy
-        real(DP), intent(out) :: mix_potential_energy_conf
+        
+        real(DP) :: potential_energy_conf
         
         call mix%test_overlap(Box_size, spheres1, spheres2)
-        mix_potential_energy_conf = mix%conf(Box_size, spheres1, spheres2)
-        call test_consist(mix_potential_energy, mix_potential_energy_conf, mix_report_unit)
+        potential_energy_conf = mix%conf(Box_size, spheres1, spheres2)
+        call test_consist(potential_energy, potential_energy_conf, mix_report_unit)
     
     end subroutine final_between_spheres
     
