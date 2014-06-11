@@ -465,9 +465,9 @@ contains
                            this%between_spheres_observables%potential_energy
         potential_energy_conf = total_energy(this%Box, this%type1_spheres, this%type1_macro) + &
                                 total_energy(this%Box, this%type2_spheres, this%type2_macro) + &
-                                this%between_spheres_potential%conf(this%Box%size, &
-                                                                    this%type1_spheres, &
-                                                                    this%type2_spheres)
+                                this%between_spheres_potential%total(this%Box%size, &
+                                                                     this%type1_spheres, &
+                                                                     this%type2_spheres)
         call test_consist(potential_energy, potential_energy_conf, this%report_unit)
         this%potential_energy_sum = this%type1_observables%potential_energy_sum + &
                                     this%type2_observables%potential_energy_sum + &
@@ -499,7 +499,6 @@ contains
         
         write(output_unit, *) this%name, " class destruction"
         
-        call this%between_spheres_potential%destroy()
         call this%between_spheres%destroy()
         
         call this%type2_macro%mix_cells%destroy()

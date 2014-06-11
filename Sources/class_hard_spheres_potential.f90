@@ -6,6 +6,7 @@ use data_neighbour_cells, only: NnearCell
 use json_module, only: json_file
 use module_types_micro, only: Box_Dimensions, Node, Particle_Index
 use module_physics_micro, only: PBC_distance
+use module_data, only: test_data_found
 use class_neighbour_cells, only: Neighbour_Cells
 use class_hard_spheres, only: Hard_Spheres
 
