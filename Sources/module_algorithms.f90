@@ -56,11 +56,11 @@ contains
         new%position(:) = modulo(new%position(:), Box%size(:))
         
         if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
-            new%same_iCell = this_macro%same_cells%index_from_position(new%position)
+            new%same_i_cell = this_macro%same_cells%index_from_position(new%position)
             call this_macro%hard_potential%neighCells(Box%size, this_spheres, this_macro%same_cells, &
                                                       new, overlap, this_EpotNew)
         else
-            new%mix_iCell = other_mix_cells%index_from_position(new%position)
+            new%between_i_cell = other_mix_cells%index_from_position(new%position)
             call mix%neighCells(Box%size, new, this_macro%mix_cells, other_spheres, overlap, &
                                      mix_EpotNew)
         end if
@@ -68,11 +68,11 @@ contains
         if (.not. overlap) then
         
             if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
-                new%mix_iCell = other_mix_cells%index_from_position(new%position)
+                new%between_i_cell = other_mix_cells%index_from_position(new%position)
                 call mix%neighCells(Box%size, new, this_macro%mix_cells, other_spheres, overlap, &
                                          mix_EpotNew)
             else
-                new%same_iCell = this_macro%same_cells%index_from_position(new%position)
+                new%same_i_cell = this_macro%same_cells%index_from_position(new%position)
                 call this_macro%hard_potential%neighCells(Box%size, this_spheres, &
                                                           this_macro%same_cells, new, overlap, &
                                                           this_EpotNew)
@@ -80,7 +80,7 @@ contains
                         
             if (.not. overlap) then
     
-                old%same_iCell = this_macro%same_cells%index_from_position(old%position)
+                old%same_i_cell = this_macro%same_cells%index_from_position(old%position)
                 select type (this_spheres)
                     type is (Dipolar_Hard_Spheres)
                         old%orientation(:) = this_spheres%get_orientation(old%number)
@@ -98,7 +98,7 @@ contains
                         this_deltaEpot = this_EpotNew - this_EpotOld
                 end select
                     
-                old%mix_iCell = other_mix_cells%index_from_position(old%position)
+                old%between_i_cell = other_mix_cells%index_from_position(old%position)
                 call mix%neighCells(Box%size, old, this_macro%mix_cells, other_spheres, overlap, &
                                          mix_EpotOld)
                 
@@ -118,13 +118,13 @@ contains
                     this_observables%potential_energy = this_observables%potential_energy + this_deltaEpot
                     mix_potential_energy = mix_potential_energy + mix_deltaEpot
                     
-                    if (old%same_iCell /= new%same_iCell) then
-                        call this_macro%same_cells%remove_col_from_cell(old%number, old%same_iCell)
-                        call this_macro%same_cells%add_col_to_cell(new%number, new%same_iCell)
+                    if (old%same_i_cell /= new%same_i_cell) then
+                        call this_macro%same_cells%remove_col_from_cell(old%number, old%same_i_cell)
+                        call this_macro%same_cells%add_col_to_cell(new%number, new%same_i_cell)
                     end if
-                    if (old%mix_iCell /= new%mix_iCell) then
-                        call other_mix_cells%remove_col_from_cell(old%number, old%mix_iCell)
-                        call other_mix_cells%add_col_to_cell(new%number, new%mix_iCell)
+                    if (old%between_i_cell /= new%between_i_cell) then
+                        call other_mix_cells%remove_col_from_cell(old%number, old%between_i_cell)
+                        call other_mix_cells%add_col_to_cell(new%number, new%between_i_cell)
                     end if
                     
                 else
@@ -173,11 +173,11 @@ contains
             test%position(:) = Box%size(:) * xRand(:)
 
             if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
-                test%same_iCell = this_macro%same_cells%index_from_position(test%position)
+                test%same_i_cell = this_macro%same_cells%index_from_position(test%position)
                 call this_macro%hard_potential%neighCells(Box%size, this_spheres, this_macro%same_cells, test, &
                                                           overlap, this_EpotTest)
             else
-                test%mix_iCell = other_mix_cells%index_from_position(test%position)
+                test%between_i_cell = other_mix_cells%index_from_position(test%position)
                 call mix%neighCells(Box%size, test, this_macro%mix_cells, other_spheres, overlap, &
                                          mix_EpotTest)
             end if
@@ -185,11 +185,11 @@ contains
             if (.not. overlap) then
             
                 if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
-                    test%mix_iCell = other_mix_cells%index_from_position(test%position)
+                    test%between_i_cell = other_mix_cells%index_from_position(test%position)
                     call mix%neighCells(Box%size, test, this_macro%mix_cells, other_spheres, overlap, &
                                              mix_EpotTest)
                 else
-                    test%same_iCell = this_macro%same_cells%index_from_position(test%position)
+                    test%same_i_cell = this_macro%same_cells%index_from_position(test%position)
                     call this_macro%hard_potential%neighCells(Box%size, this_spheres, this_macro%same_cells, test, &
                                                               overlap, this_EpotTest)
                 end if
@@ -346,7 +346,7 @@ contains
         
         old%position(:) = this_spheres%get_position(old%number)
         
-        old%same_iCell = this_macro%same_cells%index_from_position(old%position)
+        old%same_i_cell = this_macro%same_cells%index_from_position(old%position)
         select type (this_spheres)
             type is (Dipolar_Hard_Spheres)
                 old%orientation(:) = this_spheres%get_orientation(old%number)
@@ -359,7 +359,7 @@ contains
                 EpotOld%same = 0._DP
         end select
         
-        old%mix_iCell = other_mix_cells%index_from_position(old%position)
+        old%between_i_cell = other_mix_cells%index_from_position(old%position)
         call mix%neighCells(Box_size, old, this_macro%mix_cells, other_spheres, overlap, EpotOld%mix)
         
     end subroutine before_switch_energy
@@ -384,22 +384,22 @@ contains
         new%position(:) = other_spheres%get_position(new%other_number)
         
         if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
-            new%same_iCell = this_macro%same_cells%index_from_position(new%position)
+            new%same_i_cell = this_macro%same_cells%index_from_position(new%position)
             call this_macro%hard_potential%neighCells(Box%size, this_spheres, this_macro%same_cells, new, overlap, &
                                                       EpotNew%same)
         else
-            new%mix_iCell = other_mix_cells%index_from_position(new%position)
+            new%between_i_cell = other_mix_cells%index_from_position(new%position)
             call mix%neighCells(Box%size, new, this_macro%mix_cells, other_spheres, overlap, EpotNew%mix)
         end if
         
         if (.not. overlap) then
         
             if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
-                new%mix_iCell = other_mix_cells%index_from_position(new%position)
+                new%between_i_cell = other_mix_cells%index_from_position(new%position)
                 call mix%neighCells(Box%size, new, this_macro%mix_cells, other_spheres, overlap, &
                                          EpotNew%mix)
             else
-                new%same_iCell = this_macro%same_cells%index_from_position(new%position)
+                new%same_i_cell = this_macro%same_cells%index_from_position(new%position)
                 call this_macro%hard_potential%neighCells(Box%size, this_spheres, this_macro%same_cells, new, &
                                                     overlap, EpotNew%same)
             end if
@@ -440,13 +440,13 @@ contains
                 call this_macro%ewald_reci%update_structure_move(Box, old, new)
         end select
         
-        if (old%same_iCell /= new%same_iCell) then
-            call this_macro%same_cells%remove_col_from_cell(old%number, old%same_iCell)
-            call this_macro%same_cells%add_col_to_cell(new%number, new%same_iCell)
+        if (old%same_i_cell /= new%same_i_cell) then
+            call this_macro%same_cells%remove_col_from_cell(old%number, old%same_i_cell)
+            call this_macro%same_cells%add_col_to_cell(new%number, new%same_i_cell)
         end if
-        if (old%mix_iCell /= new%mix_iCell) then
-            call other_mix_cells%remove_col_from_cell(old%number, old%mix_iCell)
-            call other_mix_cells%add_col_to_cell(new%number, new%mix_iCell)
+        if (old%between_i_cell /= new%between_i_cell) then
+            call other_mix_cells%remove_col_from_cell(old%number, old%between_i_cell)
+            call other_mix_cells%add_col_to_cell(new%number, new%between_i_cell)
         end if
         
     end subroutine after_switch_update

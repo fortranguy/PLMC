@@ -33,8 +33,8 @@ implicit none
         integer :: other_number = 0
         real(DP), dimension(Ndim) :: position
         real(DP), dimension(Ndim) :: orientation
-        integer :: same_iCell
-        integer :: mix_iCell
+        integer :: same_i_cell
+        integer :: between_i_cell
         logical :: add
     end type Particle_Index
     

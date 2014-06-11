@@ -121,7 +121,7 @@ contains
     
         do iNearCell = 1, NnearCell
         
-            nearCell_index = this_cells%near_among_total(iNearCell, particle%same_iCell)
+            nearCell_index = this_cells%near_among_total(iNearCell, particle%same_i_cell)
             current => this_cells%beginCells(nearCell_index)%particle%next
             if (.not. associated(current%next)) cycle
             
@@ -169,7 +169,7 @@ contains
         
         do iNearCell = 1, NnearCell
         
-            nearCell_index = this_cells%near_among_total(iNearCell, particle%mix_iCell)
+            nearCell_index = this_cells%near_among_total(iNearCell, particle%between_i_cell)
             current => this_cells%beginCells(nearCell_index)%particle%next
             if (.not. associated(current%next)) cycle
             

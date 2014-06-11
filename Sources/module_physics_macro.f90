@@ -76,14 +76,15 @@ contains
     
     !> Initial configuration
     
-    subroutine set_initial_configuration(Box_size, arg_init, dipolar, spherical, mix_min_distance, &
+    subroutine set_initial_configuration(Box_size, arg_init, dipolar, spherical, &
+                                         between_sphere_min_distance, &
                                          report_unit)
         
         real(DP), dimension(:), intent(in) :: Box_size
         type(Argument_Initial), intent(in) :: arg_init
         class(Dipolar_Hard_Spheres), intent(inout) :: dipolar
         class(Hard_Spheres), intent(inout) :: spherical
-        real(DP), intent(in) :: mix_min_distance
+        real(DP), intent(in) :: between_sphere_min_distance
         integer, intent(in) :: report_unit
         
         write(report_unit, *) "Initial configuration: "
@@ -91,7 +92,7 @@ contains
         select case (arg_init%choice)
         
             case ('r')
-                call random_depositions(Box_size, dipolar, spherical, mix_min_distance)
+                call random_depositions(Box_size, dipolar, spherical, between_sphere_min_distance)
                 call random_orientations(dipolar, dipolar%get_num_particles())
                 write(output_unit, *) "Random depositions + random orientations"
                 write(report_unit, *) "    Random depositions + random orientations"
@@ -115,11 +116,11 @@ contains
 
     !> Random depositions configuration
     
-    subroutine random_depositions(Box_size, spheres1, spheres2, mix_min_distance)
+    subroutine random_depositions(Box_size, spheres1, spheres2, between_sphere_min_distance)
 
         real(DP), dimension(:), intent(in) :: Box_size
         class(Hard_Spheres), intent(inout) :: spheres1, spheres2
-        real(DP), intent(in) :: mix_min_distance
+        real(DP), intent(in) :: between_sphere_min_distance
 
         integer :: i_particle, i_particle_test
         real(DP), dimension(Ndim) :: xRand, position, position_test
@@ -154,7 +155,7 @@ contains
             do i_particle_test = 1, spheres1%get_num_particles()
                 position_test(:) = spheres1%get_position(i_particle_test)
                 rTest = PBC_distance(Box_size, position, position_test)
-                if (rTest < mix_min_distance) then
+                if (rTest < between_sphere_min_distance) then
                     goto 7102
                 end if
             end do
@@ -273,12 +274,12 @@ contains
     
     end subroutine init_spheres    
     
-    subroutine init_cells(Box_size, this_spheres, this_macro, other_spheres, mix)  
+    subroutine init_cells(Box_size, this_spheres, this_macro, other_spheres, between_sphere_potential)  
       
         real(DP), dimension(:), intent(in) :: Box_size
         class(Hard_Spheres), intent(in) :: this_spheres, other_spheres
         class(Hard_Spheres_Macro), intent(inout) :: this_macro
-        class(Between_Hard_Spheres_Potential_Energy), intent(in) :: mix
+        class(Between_Hard_Spheres_Potential_Energy), intent(in) :: between_sphere_potential
         
         real(DP), dimension(Ndim) :: same_cell_size, between_cell_size
         
@@ -287,8 +288,9 @@ contains
                                              this_macro%hard_potential%get_range_cut())
         call this_macro%same_cells%all_cols_to_cells(this_spheres%get_num_particles(), this_spheres)
         
-        between_cell_size = mix%get_range_cut()
-        call this_macro%mix_cells%construct(Box_size, between_cell_size, mix%get_range_cut())
+        between_cell_size = between_sphere_potential%get_range_cut()
+        call this_macro%mix_cells%construct(Box_size, between_cell_size, &
+                                            between_sphere_potential%get_range_cut())
         call this_macro%mix_cells%all_cols_to_cells(other_spheres%get_num_particles(), other_spheres)
 
     end subroutine init_cells
@@ -367,39 +369,39 @@ contains
     
     !> Mix initialisation
     
-    subroutine init_between_spheres_potential(Box_size, mix, spheres1, spheres2, &
+    subroutine init_between_spheres_potential(Box_size, between_sphere_potential, spheres1, spheres2, &
                                               write_potential_energy, &
                                               potential_energy, potential_energy_unit)
     
         real(DP), dimension(:), intent(in) :: Box_size
-        class(Between_Hard_Spheres_Potential_Energy), intent(inout) :: mix
+        class(Between_Hard_Spheres_Potential_Energy), intent(inout) :: between_sphere_potential
         class(Hard_Spheres), intent(in) :: spheres1, spheres2
         logical, intent(in) :: write_potential_energy
         real(DP), intent(out) :: potential_energy
         integer, intent(in) :: potential_energy_unit
         
         if (write_potential_energy) then
-            call mix%write(potential_energy_unit)
+            call between_sphere_potential%write(potential_energy_unit)
         end if
-        potential_energy = mix%conf(Box_size, spheres1, spheres2)
+        potential_energy = between_sphere_potential%total(Box_size, spheres1, spheres2)
     
     end subroutine init_between_spheres_potential
     
     !> Mix finalization
     
-    subroutine final_between_spheres_potential(Box_size, mix, spheres1, spheres2, potential_energy, &
-                                               mix_report_unit)
+    subroutine final_between_spheres_potential(Box_size, between_sphere_potential, spheres1, spheres2, potential_energy, &
+                                               between_sphere_report_unit)
     
         real(DP), dimension(:), intent(in) :: Box_size
-        class(Between_Hard_Spheres_Potential_Energy), intent(inout) :: mix
+        class(Between_Hard_Spheres_Potential_Energy), intent(inout) :: between_sphere_potential
         class(Hard_Spheres), intent(in) :: spheres1, spheres2
         real(DP), intent(in) :: potential_energy
-        integer, intent(in) :: mix_report_unit
+        integer, intent(in) :: between_sphere_report_unit
         
         real(DP) :: potential_energy_conf
         
-        potential_energy_conf = mix%conf(Box_size, spheres1, spheres2)
-        call test_consist(potential_energy, potential_energy_conf, mix_report_unit)
+        potential_energy_conf = between_sphere_potential%total(Box_size, spheres1, spheres2)
+        call test_consist(potential_energy, potential_energy_conf, between_sphere_report_unit)
     
     end subroutine final_between_spheres_potential
     
