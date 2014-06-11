@@ -26,7 +26,7 @@ private
         procedure :: write => Hard_Spheres_Potential_Energy_write
         procedure :: get_min_distance => Hard_Spheres_Potential_Energy_get_min_distance
         procedure :: get_range_cut => Hard_Spheres_Potential_Energy_get_range_cut
-        procedure :: neighCells => Hard_Spheres_Potential_Energy_neighCells
+        procedure :: neighbours => Hard_Spheres_Potential_Energy_neighbours
         procedure :: total => Hard_Spheres_Potential_Energy_total
         procedure, private :: solo => Hard_Spheres_Potential_Energy_solo
         procedure, private :: pair => Hard_Spheres_Potential_Energy_pair
@@ -37,7 +37,7 @@ private
     
     contains
     
-        procedure :: neighCells => Between_Hard_Spheres_Potential_Energy_neighCells
+        procedure :: neighbours => Between_Hard_Spheres_Potential_Energy_neighbours
         procedure :: total => Between_Hard_Spheres_Potential_Energy_total
         procedure, private :: solo => Between_Hard_Spheres_Potential_Energy_solo
     
@@ -101,7 +101,7 @@ contains
         
     end subroutine Hard_Spheres_write_report
     
-    subroutine Hard_Spheres_Potential_Energy_neighCells(this, Box_size, spheres, this_cells, &
+    subroutine Hard_Spheres_Potential_Energy_neighbours(this, Box_size, spheres, this_cells, &
                                                         particle, overlap, energ)
         
         class(Hard_Spheres_Potential_Energy), intent(in) :: this
@@ -147,9 +147,9 @@ contains
             
         end do
     
-    end subroutine Hard_Spheres_Potential_Energy_neighCells
+    end subroutine Hard_Spheres_Potential_Energy_neighbours
     
-    subroutine Between_Hard_Spheres_Potential_Energy_neighCells(this, Box_size, spheres, &
+    subroutine Between_Hard_Spheres_Potential_Energy_neighbours(this, Box_size, spheres, &
                                                                 this_cells, particle, overlap, energ)
         
         class(Between_Hard_Spheres_Potential_Energy), intent(in) :: this
@@ -196,7 +196,7 @@ contains
             
         end do
     
-    end subroutine Between_Hard_Spheres_Potential_Energy_neighCells
+    end subroutine Between_Hard_Spheres_Potential_Energy_neighbours
     
     !> Total potential_energy energy: dummy
     

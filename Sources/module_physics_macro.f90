@@ -289,9 +289,9 @@ contains
         call this_macro%same_cells%all_cols_to_cells(this_spheres%get_num_particles(), this_spheres)
         
         between_cell_size = between_spheres_potential%get_range_cut()
-        call this_macro%mix_cells%construct(Box_size, between_cell_size, &
-                                            between_spheres_potential%get_range_cut())
-        call this_macro%mix_cells%all_cols_to_cells(other_spheres%get_num_particles(), other_spheres)
+        call this_macro%between_cells%construct(Box_size, between_cell_size, &
+                                                between_spheres_potential%get_range_cut())
+        call this_macro%between_cells%all_cols_to_cells(other_spheres%get_num_particles(), other_spheres)
 
     end subroutine init_cells
     
@@ -389,7 +389,8 @@ contains
     
     !> Mix finalization
     
-    subroutine final_between_spheres_potential(Box_size, between_spheres_potential, spheres1, spheres2, potential_energy, &
+    subroutine final_between_spheres_potential(Box_size, between_spheres_potential, &
+                                               spheres1, spheres2, potential_energy, &
                                                between_spheres_report_unit)
     
         real(DP), dimension(:), intent(in) :: Box_size
@@ -419,7 +420,8 @@ contains
         class(Hard_Spheres_Observables), intent(inout) :: observables
         integer, intent(in) :: move_unit
     
-        observables%move_rejection_average = observables%move_rejection_adapt / real(period_adaptation-1, DP)
+        observables%move_rejection_average = observables%move_rejection_adapt / &
+                                             real(period_adaptation - 1, DP)
         observables%move_rejection_adapt = 0._DP
         call this%adapt_delta(Box_size, observables%move_rejection_average)
         write(move_unit, *) i_step, this%get_delta_scalar(), observables%move_rejection_average
@@ -436,7 +438,8 @@ contains
         class(Dipolar_Hard_Spheres_Observables), intent(inout) :: observables
         integer, intent(in) :: rotate_unit
         
-        observables%rotate_rejection_average = observables%rotate_rejection_adapt / real(period_adaptation-1, DP)
+        observables%rotate_rejection_average = observables%rotate_rejection_adapt / &
+                                               real(period_adaptation - 1, DP)
         observables%rotate_rejection_adapt = 0._DP
         call this%adapt_delta(observables%rotate_rejection_average)
         write(rotate_unit, *) i_step, this%get_delta(), observables%rotate_rejection_average

@@ -501,13 +501,13 @@ contains
         
         call this%between_spheres%destroy()
         
-        call this%type2_macro%mix_cells%destroy()
+        call this%type2_macro%between_cells%destroy()
         call this%type2_macro%same_cells%destroy()        
         call this%type2_spheres%destroy()
         
         call this%type1_macro%ewald_reci%destroy()
         call this%type1_macro%ewald_real%destroy()
-        call this%type1_macro%mix_cells%destroy()
+        call this%type1_macro%between_cells%destroy()
         call this%type1_macro%same_cells%destroy()        
         call this%type1_spheres%destroy()
         
@@ -572,13 +572,13 @@ contains
                 if (iColRand <= this%type1_spheres%get_num_particles()) then                    
                     call move(this%Box, &
                               this%type1_spheres, this%type1_macro, this%type1_observables, &
-                              this%type2_spheres, this%type2_macro%mix_cells, &
+                              this%type2_spheres, this%type2_macro%between_cells, &
                               this%between_spheres_potential, &
                               this%between_spheres_observables%potential_energy)
                 else
                     call move(this%Box, &
                               this%type2_spheres, this%type2_macro, this%type2_observables, &
-                              this%type1_spheres, this%type1_macro%mix_cells, &
+                              this%type1_spheres, this%type1_macro%between_cells, &
                               this%between_spheres_potential, &
                               this%between_spheres_observables%potential_energy)
                 end if
@@ -683,11 +683,11 @@ contains
     
         call widom(this%Box, &
                    this%type1_spheres, this%type1_macro, this%type1_observables, &
-                   this%type2_spheres, this%type2_macro%mix_cells, &
+                   this%type2_spheres, this%type2_macro%between_cells, &
                    this%between_spheres_potential)
         call widom(this%Box, &
                    this%type2_spheres, this%type2_macro, this%type2_observables, &
-                   this%type1_spheres, this%type1_macro%mix_cells, &
+                   this%type1_spheres, this%type1_macro%between_cells, &
                    this%between_spheres_potential)
     
     end subroutine Physical_System_measure_chemical_potentials
