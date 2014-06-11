@@ -635,7 +635,8 @@ contains
     
         call this%type1_observables%write(i_step, this%type1_units%observables_thermalisation)
         call this%type2_observables%write(i_step, this%type2_units%observables_thermalisation)
-        call this%between_spheres_observables%write(i_step, this%between_spheres_units%observables_thermalisation)
+        call this%between_spheres_observables%write(i_step, &
+            this%between_spheres_units%observables_thermalisation)
         
         write(this%observables_thermalisation_unit, *) i_step, &
             this%type1_observables%potential_energy + &
