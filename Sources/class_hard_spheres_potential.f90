@@ -37,7 +37,7 @@ private
     contains
     
         procedure :: neighCells => Between_Hard_Spheres_Potential_Energy_neighCells
-        procedure :: conf => Between_Hard_Spheres_Potential_Energy_conf
+        procedure :: total => Between_Hard_Spheres_Potential_Energy_total
         procedure, private :: solo => Between_Hard_Spheres_Potential_Energy_solo
     
     end type Between_Hard_Spheres_Potential_Energy
@@ -100,12 +100,12 @@ contains
         
     end subroutine Hard_Spheres_write_report
     
-    subroutine Hard_Spheres_Potential_Energy_neighCells(this, Box_size, this_spheres, this_cells, &
+    subroutine Hard_Spheres_Potential_Energy_neighCells(this, Box_size, spheres, this_cells, &
                                                         particle, overlap, energ)
         
         class(Hard_Spheres_Potential_Energy), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
-        class(Hard_Spheres), intent(in) :: this_spheres
+        class(Hard_Spheres), intent(in) :: spheres
         class(Neighbour_Cells), intent(in) :: this_cells
         type(Particle_Index), intent(in) :: particle
         logical, intent(out) :: overlap
@@ -131,7 +131,7 @@ contains
             
                 if (current%number /= particle%number) then
                     r_ij = PBC_distance(Box_size, particle%position, &
-                                    this_spheres%get_position(current%number))
+                                    spheres%get_position(current%number))
                     if (r_ij < this%min_distance) then
                         overlap = .true.
                         return
@@ -148,14 +148,14 @@ contains
     
     end subroutine Hard_Spheres_Potential_Energy_neighCells
     
-    subroutine Between_Hard_Spheres_Potential_Energy_neighCells(this, Box_size, particle, this_cells, &
-                                                                other, overlap, energ)
+    subroutine Between_Hard_Spheres_Potential_Energy_neighCells(this, Box_size, spheres, &
+                                                                this_cells, particle, overlap, energ)
         
         class(Between_Hard_Spheres_Potential_Energy), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
-        type(Particle_Index), intent(in) :: particle
+        type(Hard_Spheres), intent(in) :: spheres
         type(Neighbour_Cells), intent(in) :: this_cells
-        type(Hard_Spheres), intent(in) :: other
+        type(Particle_Index), intent(in) :: particle
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energ
     
@@ -178,7 +178,8 @@ contains
                 next => current%next
 
                 if (current%number /= particle%other_number) then
-                    r = PBC_distance(Box_size, particle%position, other%get_position(current%number))
+                    r = PBC_distance(Box_size, particle%position, &
+                                               spheres%get_position(current%number))
                     if (r < this%min_distance) then
                         overlap = .true.
                         return
@@ -198,31 +199,35 @@ contains
     
     !> Total potential_energy energy: dummy
     
-    pure function Hard_Spheres_Potential_Energy_total(this, Box_size, this_spheres) result(total)
+    pure function Hard_Spheres_Potential_Energy_total(this, Box_size, spheres, other_spheres) &
+        result(total)
     
         class(Hard_Spheres_Potential_Energy), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
-        class(Hard_Spheres), intent(in) :: this_spheres
+        class(Hard_Spheres), intent(in) :: spheres
+        class(Hard_Spheres), intent(in), optional :: other_spheres
         real(DP) :: total
         
         integer :: i_particle
         type(Particle_Index) :: particle
-    
+        
         total = 0._DP
         
-        do i_particle = 1, this_spheres%get_num_particles()
-            particle%number = i_particle
-            particle%position(:) = this_spheres%get_position(particle%number)
-            total = total + this%solo(Box_size, this_spheres, particle)
-        end do
+        if (.not.present(other_spheres)) then            
+            do i_particle = 1, spheres%get_num_particles()
+                particle%number = i_particle
+                particle%position(:) = spheres%get_position(particle%number)
+                total = total + this%solo(Box_size, spheres, particle)
+            end do            
+        end if
         
     end function Hard_Spheres_Potential_Energy_total
     
-    pure function Hard_Spheres_Potential_Energy_solo(this, Box_size, this_spheres, particle) result(solo)
+    pure function Hard_Spheres_Potential_Energy_solo(this, Box_size, spheres, particle) result(solo)
     
         class(Hard_Spheres_Potential_Energy), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
-        class(Hard_Spheres), intent(in) :: this_spheres
+        class(Hard_Spheres), intent(in) :: spheres
         type(Particle_Index), intent(in) :: particle
         real(DP) :: solo
         
@@ -232,10 +237,10 @@ contains
         
         solo = 0._DP
         
-        do j_particle = 1, this_spheres%get_num_particles()
+        do j_particle = 1, spheres%get_num_particles()
             if (j_particle /= particle%number) then
             
-                position_j(:) = this_spheres%get_position(j_particle)
+                position_j(:) = spheres%get_position(j_particle)
                 distance_ij = PBC_distance(Box_size, particle%position, position_j)
                 
                 solo = solo + this%pair(distance_ij)
@@ -245,37 +250,37 @@ contains
     
     end function Hard_Spheres_Potential_Energy_solo
     
-    pure function Between_Hard_Spheres_Potential_Energy_conf(this, Box_size, &
-                                                             type1_spheres, type2_spheres) result(conf)
+    pure function Between_Hard_Spheres_Potential_Energy_total(this, Box_size, spheres, other_spheres) &
+        result(total)
     
         class(Between_Hard_Spheres_Potential_Energy), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
-        class(Hard_Spheres), intent(in) :: type1_spheres, type2_spheres
-        real(DP) :: conf
+        class(Hard_Spheres), intent(in) :: spheres
+        class(Hard_Spheres), intent(in), optional :: other_spheres
+        real(DP) :: total
         
         integer :: i_particle
         type(Particle_Index) :: type1_particle
     
         total = 0._DP
         
-        do i_particle = 1, type1_spheres%get_num_particles()
+        if (present(other_spheres)) then        
+            do i_particle = 1, spheres%get_num_particles()            
+                type1_particle%number = i_particle
+                type1_particle%position(:) = spheres%get_position(type1_particle%number)
+                total = total + this%solo(Box_size, other_spheres, type1_particle)                
+            end do            
+        end if
         
-            type1_particle%number = i_particle
-            type1_particle%position(:) = type1_spheres%get_position(type1_particle%number)
-            total = total + this%solo(Box_size, type2_spheres, type1_particle)
-            
-        end do
-        
-    end function Between_Hard_Spheres_Potential_Energy_conf
+    end function Between_Hard_Spheres_Potential_Energy_total
     
-    pure function Between_Hard_Spheres_Potential_Energy_solo(this, Box_size, &
-                                                             other_spheres, this_particle) &
+    pure function Between_Hard_Spheres_Potential_Energy_solo(this, Box_size, spheres, particle) &
         result(solo)
     
         class(Between_Hard_Spheres_Potential_Energy), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
-        class(Hard_Spheres), intent(in) :: other_spheres
-        type(Particle_Index), intent(in) :: this_particle
+        class(Hard_Spheres), intent(in) :: spheres
+        type(Particle_Index), intent(in) :: particle
         real(DP) :: solo
         
         integer :: j_particle
@@ -284,10 +289,10 @@ contains
         
         solo = 0._DP
         
-        do j_particle = 1, other_spheres%get_num_particles()
+        do j_particle = 1, spheres%get_num_particles()
             
-            position_j(:) = other_spheres%get_position(j_particle)
-            distance_ij = PBC_distance(Box_size, this_particle%position, position_j)
+            position_j(:) = spheres%get_position(j_particle)
+            distance_ij = PBC_distance(Box_size, particle%position, position_j)
             
             solo = solo + this%pair(distance_ij)
                       
