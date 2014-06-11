@@ -303,7 +303,6 @@ contains
                                        
         call this%between_spheres%test_overlap(this%Box%size, &
                                                this%type1_spheres, this%type2_spheres)
-        this%between_spheres_observables%potential_energy_sum = 0._DP
         call this%between_spheres_potential%construct(json, "Between Spheres", &
                                                       this%between_spheres%get_diameter())
         call init_between_spheres_potential(this%Box%size, this%between_spheres_potential, &
