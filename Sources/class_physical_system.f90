@@ -321,8 +321,8 @@ contains
                                                                this%type1_macro)
                         
         call init_spheres(this%Box, this%type2_spheres, this%type2_units)                                 
-        call this%type1_macro%hard_potential%construct(json, "Hard Spheres", &
-                                                       this%type1_spheres%get_diameter())
+        call this%type2_macro%hard_potential%construct(json, "Hard Spheres", &
+                                                       this%type2_spheres%get_diameter())
         call init_cells(this%Box%size, this%type2_spheres, this%type2_macro, this%type1_spheres, &
                         this%between_spheres_potential)        
         this%type2_observables%potential_energy = total_energy(this%Box, this%type2_spheres, &
