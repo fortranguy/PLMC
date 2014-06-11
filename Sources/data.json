@@ -18,6 +18,7 @@
             "number of Widom particles": 500
         },
         "Between Spheres": {
+            "name": "BetweenHS",
             "non addivity": 0.2
         }
     },

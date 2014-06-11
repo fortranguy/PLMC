@@ -9,7 +9,7 @@ use module_types_micro, only: Box_Dimensions, Monte_Carlo_Arguments
 use module_physics_micro, only: NwaveVectors
 use module_data, only: test_data_found
 use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
-use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres
+use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres, Between_Hard_Spheres
 use class_between_spheres_potential, only: Between_Hard_Spheres_Potential_Energy
 use class_hard_spheres_observables, only: Hard_Spheres_Observables, Dipolar_Hard_Spheres_Observables, &
                                           Between_Hard_Spheres_Observables
@@ -21,7 +21,7 @@ use module_physics_macro, only: init_random_seed, set_initial_configuration, &
                                 set_ewald, &
                                 total_energy, &
                                 final_spheres, &
-                                init_between_spheres, final_between_spheres, &
+                                init_between_spheres_potential, final_between_spheres_potential, &
                                 adapt_move, adapt_rotation, test_consist
 use module_algorithms, only: move, widom, switch, rotate
 use module_write, only: open_units, write_data, write_results, between_spheres_write_results, &
@@ -35,7 +35,7 @@ private
     
         private
         
-        character(len=5) :: name
+        character(len=:), allocatable :: name
         
         ! Box
         type(Box_Dimensions) :: Box
@@ -58,6 +58,7 @@ private
         type(Hard_Spheres_Units) :: type2_units
         
         ! Between Spheres potential_energy
+        type(Between_Hard_Spheres) :: between_spheres
         type(Between_Hard_Spheres_Potential_Energy) :: between_spheres_potential
         type(Between_Hard_Spheres_Observables) :: between_spheres_observables
         type(Between_Hard_Spheres_Units) :: between_spheres_units
@@ -129,7 +130,9 @@ contains
         character(len=4096) :: data_name
         logical :: found
         
-        this%name = "sys"
+        data_name = "Box.name"
+        call json%get(data_name, this%name, found)
+        call test_data_found(data_name, found)
         write(output_unit, *) this%name, " class construction"
         
         call this%set_box(json)
@@ -141,8 +144,9 @@ contains
         
         call this%type1_spheres%construct(json)
         call this%type2_spheres%construct(json)
-        call this%between_spheres_potential%construct(json, this%type1_spheres%get_diameter(), &
-                                                      this%type2_spheres%get_diameter())
+        call this%between_spheres%construct(json, &
+                                            this%type1_spheres%get_diameter(), &
+                                            this%type2_spheres%get_diameter())
         
         call this%set_monte_carlo_changes(json)
         
@@ -294,15 +298,18 @@ contains
         call init_random_seed(args%random, this%report_unit)
         call set_initial_configuration(this%Box%size, args%initial, &
                                        this%type1_spheres, this%type2_spheres, &
-                                       this%between_spheres_potential%get_diameter(), &
+                                       this%between_spheres%get_diameter(), &
                                        this%report_unit)
                                        
-        this%between_spheres_observables%potential_energy_sum = 0._DP        
-        call init_between_spheres(this%Box%size, this%between_spheres_potential, &
-                                  this%type1_spheres, this%type2_spheres, &
-                                  this%write_potential_energy, &
-                                  this%between_spheres_observables%potential_energy, &
-                                  this%between_spheres_units%potential_energy_tabulation)
+        call this%between_spheres%test_overlap(this%Box%size, &
+                                               this%type1_spheres, this%type2_spheres)
+        this%between_spheres_observables%potential_energy_sum = 0._DP
+        call this%between_spheres_potential%construct(json, this%between_spheres%get_diameter())
+        call init_between_spheres_potential(this%Box%size, this%between_spheres_potential, &
+                                            this%type1_spheres, this%type2_spheres, &
+                                            this%write_potential_energy, &
+                                            this%between_spheres_observables%potential_energy, &
+                                            this%between_spheres_units%potential_energy_tabulation)
         
         call init_spheres(this%Box, this%type1_spheres, this%type1_units)
         call init_hard_potential(this%type1_macro%hard_potential, "Dipolar Hard Spheres", &
@@ -344,7 +351,7 @@ contains
                         this%observables_equilibrium_unit)        
         call this%type1_units%open(this%type1_spheres%get_name())           
         call this%type2_units%open(this%type2_spheres%get_name())      
-        call this%between_spheres_units%open("BetweenHS") ! to change        
+        call this%between_spheres_units%open(this%between_spheres%get_name())
     
     end subroutine Physical_System_open_all_units
     
@@ -419,10 +426,12 @@ contains
         call test_consist(this%type2_observables%potential_energy, type2_energy, &
                           this%type2_units%report)
         
-        call final_between_spheres(this%Box%size, this%between_spheres_potential, &
-                                   this%type1_spheres, this%type2_spheres, &
-                                   this%between_spheres_observables%potential_energy, &
-                                   this%between_spheres_units%report)
+        call this%between_spheres%test_overlap(this%Box%size, &
+                                               this%type1_spheres, this%type2_spheres)
+        call final_between_spheres_potential(this%Box%size, this%between_spheres_potential, &
+                                             this%type1_spheres, this%type2_spheres, &
+                                             this%between_spheres_observables%potential_energy, &
+                                             this%between_spheres_units%report)
         
         call this%write_all_results()
         call this%close_units()
@@ -487,7 +496,10 @@ contains
      
         class(Physical_System), intent(inout) :: this
         
+        write(output_unit, *) this%name, " class destruction"
+        
         call this%between_spheres_potential%destroy()
+        call this%between_spheres%destroy()
         
         call this%type2_macro%mix_cells%destroy()
         call this%type2_macro%same_cells%destroy()        
@@ -499,7 +511,7 @@ contains
         call this%type1_macro%same_cells%destroy()        
         call this%type1_spheres%destroy()
         
-        write(output_unit, *) this%name, " class destruction"
+        if (allocated(this%name)) deallocate(this%name)
     
     end subroutine Physical_System_destroy
     

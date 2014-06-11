@@ -78,6 +78,23 @@ private
         
     end type Dipolar_Hard_Spheres
     
+    type, public :: Between_Hard_Spheres
+    
+        character(len=:), allocatable :: name
+        real(DP) :: non_additivity
+        real(DP) :: diameter
+        
+    contains
+        
+        procedure :: construct => Between_Hard_Spheres_construct
+        procedure :: destroy => Between_Hard_Spheres_destroy
+        
+        procedure :: get_name => Between_Hard_Spheres_get_name
+        procedure :: get_diameter => Between_Hard_Spheres_get_diameter
+        procedure :: test_overlap => Between_Hard_Spheres_test_overlap
+    
+    end type Between_Hard_Spheres
+    
 contains
 
     subroutine Hard_Spheres_construct(this, json)    
@@ -180,12 +197,33 @@ contains
     
     end subroutine Hard_Spheres_set_snap
     
+    subroutine Between_Hard_Spheres_construct(this, json, type1_diameter, type2_diameter)
+    
+        class(Between_Hard_Spheres), intent(out) :: this
+        type(json_file), intent(inout) :: json
+        real(DP), intent(in) :: type1_diameter, type2_diameter
+        
+        character(len=4096) :: data_name
+        logical :: found
+        
+        data_name = "Particles.Between Spheres.name"
+        call json%get(data_name, this%name, found)
+        call test_data_found(data_name, found)
+        
+        write(output_unit, *) this%name, " class construction"
+        
+        data_name = "Particles.Between Spheres.non addivity"
+        call json%get(data_name, this%non_additivity, found)
+        call test_data_found(data_name, found)        
+        this%diameter = (type1_diameter + type2_diameter)/2._DP + this%non_additivity
+        
+    end subroutine Between_Hard_Spheres_construct
+    
     subroutine Hard_Spheres_destroy(this)
     
         class(Hard_Spheres), intent(inout) :: this
         
-        write(output_unit, *) this%name, " class destruction"
-        
+        write(output_unit, *) this%name, " class destruction"        
         if (allocated(this%all_positions)) deallocate(this%all_positions)
         if (allocated(this%name)) deallocate(this%name)
     
@@ -200,6 +238,15 @@ contains
           
     end subroutine Dipolar_Hard_Spheres_destroy
     
+    subroutine Between_Hard_Spheres_destroy(this)
+    
+        class(Between_Hard_Spheres), intent(inout) :: this
+        
+        write(output_unit, *) this%name, " class destruction"        
+        if (allocated(this%name)) deallocate(this%name)
+    
+    end subroutine Between_Hard_Spheres_destroy
+    
     !> Accessors
     
     pure function Hard_Spheres_get_name(this) result(get_name)
@@ -210,6 +257,15 @@ contains
         get_name = this%name
         
     end function Hard_Spheres_get_name
+    
+    pure function Between_Hard_Spheres_get_name(this) result(get_name)
+    
+        class(Between_Hard_Spheres), intent(in) :: this
+        character(len=len(this%name)) :: get_name
+        
+        get_name = this%name
+        
+    end function Between_Hard_Spheres_get_name
 
     pure function Hard_Spheres_get_num_particles(this) result(get_num_particles)
     
@@ -277,6 +333,15 @@ contains
         this%all_orientations(:, i_particle) = orientation(:)
         
     end subroutine Dipolar_Hard_Spheres_set_orientation
+    
+    pure function Between_Hard_Spheres_get_diameter(this) result(get_diameter)
+    
+        class(Between_Hard_Spheres), intent(in) :: this
+        real(DP) :: get_diameter
+        
+        get_diameter = this%diameter
+        
+    end function Between_Hard_Spheres_get_diameter
     
     !> Write a report of the component in a file
     
@@ -363,5 +428,34 @@ contains
         write(output_unit, *) this%name, ":    Overlap test: OK !"
     
     end subroutine Hard_Spheres_test_overlap
+    
+    subroutine Between_Hard_Spheres_test_overlap(this, Box_size, type1, type2)
+    
+        class(Between_Hard_Spheres), intent(in) :: this
+        real(DP), dimension(:), intent(in) :: Box_size
+        class(Hard_Spheres), intent(in) :: type1, type2
+        
+        integer :: type1_i_particle, type2_i_particle
+        real(DP) :: r_mix
+        real(DP), dimension(Ndim) :: type1_xCol, type2_xCol
+        
+        do type1_i_particle = 1, type1%get_num_particles()
+            do type2_i_particle = 1, type2%get_num_particles()
+                    
+                type1_xCol(:) = type1%get_position(type1_i_particle)
+                type2_xCol(:) = type2%get_position(type2_i_particle)
+                r_mix = PBC_distance(Box_size, type1_xCol, type2_xCol)
+                if (r_mix < this%diameter) then
+                    write(error_unit, *) this%name, ":    Overlap !", type1_i_particle, type2_i_particle
+                    write(error_unit, *) "    r_mix = ", r_mix
+                    error stop
+                end if
+
+            end do
+        end do
+
+        write(output_unit, *) this%name, ":    Overlap test: OK !"
+    
+    end subroutine Between_Hard_Spheres_test_overlap
 
 end module class_hard_spheres

@@ -25,7 +25,7 @@ public init_random_seed, set_initial_configuration, &
        init_spheres, init_hard_potential, init_cells, &
        set_ewald, &
        total_energy, & 
-       final_spheres, init_between_spheres, final_between_spheres, &
+       final_spheres, init_between_spheres_potential, final_between_spheres_potential, &
        adapt_move, adapt_rotation, test_consist
 
 contains
@@ -299,14 +299,15 @@ contains
         class(Hard_Spheres_Macro), intent(inout) :: this_macro
         class(Between_Hard_Spheres_Potential_Energy), intent(in) :: mix
         
-        real(DP), dimension(Ndim) :: same_cell_size
+        real(DP), dimension(Ndim) :: same_cell_size, between_cell_size
         
         same_cell_size(:) = this_macro%hard_potential%get_range_cut()
         call this_macro%same_cells%construct(Box_size, same_cell_size, &
                                              this_macro%hard_potential%get_range_cut())
         call this_macro%same_cells%all_cols_to_cells(this_spheres%get_num_particles(), this_spheres)
         
-        call this_macro%mix_cells%construct(Box_size, mix%get_cell_size(), mix%get_range_cut())
+        between_cell_size = mix%get_range_cut()
+        call this_macro%mix_cells%construct(Box_size, between_cell_size, mix%get_range_cut())
         call this_macro%mix_cells%all_cols_to_cells(other_spheres%get_num_particles(), other_spheres)
 
     end subroutine init_cells
@@ -385,8 +386,9 @@ contains
     
     !> Mix initialisation
     
-    subroutine init_between_spheres(Box_size, mix, spheres1, spheres2, write_potential_energy, &
-                                    potential_energy, potential_energy_unit)
+    subroutine init_between_spheres_potential(Box_size, mix, spheres1, spheres2, &
+                                              write_potential_energy, &
+                                              potential_energy, potential_energy_unit)
     
         real(DP), dimension(:), intent(in) :: Box_size
         class(Between_Hard_Spheres_Potential_Energy), intent(inout) :: mix
@@ -394,20 +396,18 @@ contains
         logical, intent(in) :: write_potential_energy
         real(DP), intent(out) :: potential_energy
         integer, intent(in) :: potential_energy_unit
-    
-        call mix%test_overlap(Box_size, spheres1, spheres2)
+        
         if (write_potential_energy) then
             call mix%write(potential_energy_unit)
         end if
-        call mix%set_cell_size()
         potential_energy = mix%conf(Box_size, spheres1, spheres2)
     
-    end subroutine init_between_spheres
+    end subroutine init_between_spheres_potential
     
     !> Mix finalization
     
-    subroutine final_between_spheres(Box_size, mix, spheres1, spheres2, potential_energy, &
-                                     mix_report_unit)
+    subroutine final_between_spheres_potential(Box_size, mix, spheres1, spheres2, potential_energy, &
+                                               mix_report_unit)
     
         real(DP), dimension(:), intent(in) :: Box_size
         class(Between_Hard_Spheres_Potential_Energy), intent(inout) :: mix
@@ -417,11 +417,10 @@ contains
         
         real(DP) :: potential_energy_conf
         
-        call mix%test_overlap(Box_size, spheres1, spheres2)
         potential_energy_conf = mix%conf(Box_size, spheres1, spheres2)
         call test_consist(potential_energy, potential_energy_conf, mix_report_unit)
     
-    end subroutine final_between_spheres
+    end subroutine final_between_spheres_potential
     
     !> Change: average & adaptation
     

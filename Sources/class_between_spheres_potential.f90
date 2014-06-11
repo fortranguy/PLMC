@@ -20,12 +20,8 @@ private
 
     type, public :: Between_Hard_Spheres_Potential_Energy
 
-        private
+        private       
         
-        character(len=5) :: name
-        
-        real(DP) :: non_additivity
-        real(DP) :: diameter
         real(DP) :: min_distance
         real(DP) :: range_cut
         real(DP) :: delta
@@ -41,13 +37,9 @@ private
     
         procedure :: construct => Between_Hard_Spheres_Potential_Energy_construct
         procedure :: destroy => Between_Hard_Spheres_Potential_Energy_destroy
-
-        procedure :: get_diameter => Between_Hard_Spheres_Potential_Energy_get_diameter
-        procedure :: get_range_cut => Between_Hard_Spheres_Potential_Energy_get_range_cut
-        procedure :: set_cell_size => Between_Hard_Spheres_Potential_Energy_set_cell_size
-        procedure :: get_cell_size => Between_Hard_Spheres_Potential_Energy_get_cell_size
         
-        procedure :: test_overlap => Between_Hard_Spheres_Potential_Energy_test_overlap
+        procedure :: get_range_cut => Between_Hard_Spheres_Potential_Energy_get_range_cut        
+        
         procedure, private :: set_tabulation => Between_Hard_Spheres_Potential_Energy_set_tabulation
         procedure :: write => Between_Hard_Spheres_Potential_Energy_write
         procedure, private :: pair => Between_Hard_Spheres_Potential_Energy_pair
@@ -58,29 +50,21 @@ private
 
 contains
 
-    subroutine Between_Hard_Spheres_Potential_Energy_construct(this, json, type1_diameter, type2_diameter)
+    subroutine Between_Hard_Spheres_Potential_Energy_construct(this, json, diameter)
 
         class(Between_Hard_Spheres_Potential_Energy), intent(out) :: this
         type(json_file), intent(inout) :: json
-        real(DP), intent(in) :: type1_diameter, type2_diameter
+        real(DP), intent(in) :: diameter
         
         character(len=4096) :: data_name
         logical :: found
         
         real(DP) :: min_distance_factor
         
-        this%name = "[mix]"
-        write(output_unit, *) this%name, " class construction"
-        
-        data_name = "Particles.Between Spheres.non addivity"
-        call json%get(data_name, this%non_additivity, found)
-        call test_data_found(data_name, found)        
-        this%diameter = (type1_diameter + type2_diameter)/2._DP + this%non_additivity
-        
         data_name = "Potential Energy.Between Spheres.minimum distance factor"
         call json%get(data_name, min_distance_factor, found)
         call test_data_found(data_name, found)        
-        this%min_distance = min_distance_factor * this%diameter
+        this%min_distance = min_distance_factor * diameter
         
         data_name = "Potential Energy.Between Spheres.range cut"
         call json%get(data_name, this%range_cut, found)
@@ -114,67 +98,17 @@ contains
     
         class(Between_Hard_Spheres_Potential_Energy), intent(inout) :: this
         
-        write(output_unit, *) this%name, " class destruction"
-        
         if (allocated(this%tabulation)) deallocate(this%tabulation)
     
     end subroutine Between_Hard_Spheres_Potential_Energy_destroy
 
     !> Accessors & Mutators
-
-    pure function Between_Hard_Spheres_Potential_Energy_get_diameter(this) result(get_diameter)
-        class(Between_Hard_Spheres_Potential_Energy), intent(in) :: this
-        real(DP) :: get_diameter
-        get_diameter = this%diameter
-    end function Between_Hard_Spheres_Potential_Energy_get_diameter
     
     pure function Between_Hard_Spheres_Potential_Energy_get_range_cut(this) result(get_range_cut)
         class(Between_Hard_Spheres_Potential_Energy), intent(in) :: this
         real(DP) :: get_range_cut
         get_range_cut = this%range_cut
     end function Between_Hard_Spheres_Potential_Energy_get_range_cut
-    
-    pure subroutine Between_Hard_Spheres_Potential_Energy_set_cell_size(this)
-        class(Between_Hard_Spheres_Potential_Energy), intent(inout) :: this
-        this%cell_size(:) = this%range_cut
-    end subroutine Between_Hard_Spheres_Potential_Energy_set_cell_size
-    
-    pure function Between_Hard_Spheres_Potential_Energy_get_cell_size(this) result(get_cell_size)
-        class(Between_Hard_Spheres_Potential_Energy), intent(in) :: this
-        real(DP), dimension(Ndim) :: get_cell_size
-        get_cell_size(:) = this%cell_size(:)
-   end function Between_Hard_Spheres_Potential_Energy_get_cell_size
-    
-    !> Overlapt test
-    
-    subroutine Between_Hard_Spheres_Potential_Energy_test_overlap(this, Box_size, type1, type2)
-    
-        class(Between_Hard_Spheres_Potential_Energy), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: Box_size
-        class(Hard_Spheres), intent(in) :: type1, type2
-        
-        integer :: type1_i_particle, type2_i_particle
-        real(DP) :: r_mix
-        real(DP), dimension(Ndim) :: type1_xCol, type2_xCol
-        
-        do type1_i_particle = 1, type1%get_num_particles()
-            do type2_i_particle = 1, type2%get_num_particles()
-                    
-                type1_xCol(:) = type1%get_position(type1_i_particle)
-                type2_xCol(:) = type2%get_position(type2_i_particle)
-                r_mix = PBC_distance(Box_size, type1_xCol, type2_xCol)
-                if (r_mix < this%min_distance) then
-                    write(error_unit, *) this%name, ":    Overlap !", type1_i_particle, type2_i_particle
-                    write(error_unit, *) "    r_mix = ", r_mix
-                    error stop
-                end if
-
-            end do
-        end do
-
-        write(output_unit, *) this%name, ":    Overlap test: OK !"
-    
-    end subroutine Between_Hard_Spheres_Potential_Energy_test_overlap
     
     !> Tabulation of Yukawa potential_energy
     !> \f[ \epsilon \frac{e^{-\alpha (r-r_{min})}}{r} \f]
