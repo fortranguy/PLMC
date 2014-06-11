@@ -13,7 +13,8 @@ use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres
 use class_between_spheres_potential, only: Between_Hard_Spheres_Potential_Energy
 use class_hard_spheres_observables, only: Hard_Spheres_Observables, Dipolar_Hard_Spheres_Observables, &
                                           Between_Hard_Spheres_Observables
-use class_hard_spheres_units, only: Hard_Spheres_Units, Dipolar_Hard_Spheres_Units
+use class_hard_spheres_units, only: Hard_Spheres_Units, Dipolar_Hard_Spheres_Units, &
+                                    Between_Hard_Spheres_Units
 use module_monte_carlo_arguments, only: read_arguments
 use module_physics_macro, only: init_random_seed, set_initial_configuration, &
                                 init_spheres, init_hard_potential, init_cells, &
@@ -23,7 +24,7 @@ use module_physics_macro, only: init_random_seed, set_initial_configuration, &
                                 init_between_spheres, final_between_spheres, &
                                 adapt_move, adapt_rotation, test_consist
 use module_algorithms, only: move, widom, switch, rotate
-use module_write, only: open_units, write_data, between_spheres_open_units, write_results, between_spheres_write_results, &
+use module_write, only: open_units, write_data, write_results, between_spheres_write_results, &
                         write_spheres_density
 
 implicit none
@@ -59,9 +60,7 @@ private
         ! Between Spheres potential_energy
         type(Between_Hard_Spheres_Potential_Energy) :: between_spheres_potential
         type(Between_Hard_Spheres_Observables) :: between_spheres_observables
-        integer :: mix_report_unit
-        integer :: mix_potential_energy_tab_unit
-        integer :: mix_observables_thermalisation_unit, mix_observables_equilibrium_unit
+        type(Between_Hard_Spheres_Units) :: between_spheres_units
         
         ! Observables: write to files
         real(DP) :: potential_energy, potential_energy_sum
@@ -303,7 +302,7 @@ contains
                                   this%type1_spheres, this%type2_spheres, &
                                   this%write_potential_energy, &
                                   this%between_spheres_observables%potential_energy, &
-                                  this%mix_potential_energy_tab_unit)
+                                  this%between_spheres_units%potential_energy_tabulation)
         
         call init_spheres(this%Box, this%type1_spheres, this%type1_units)
         call init_hard_potential(this%type1_macro%hard_potential, "Dipolar Hard Spheres", &
@@ -344,10 +343,8 @@ contains
         call open_units(this%report_unit, this%observables_thermalisation_unit, &
                         this%observables_equilibrium_unit)        
         call this%type1_units%open(this%type1_spheres%get_name())           
-        call this%type2_units%open(this%type2_spheres%get_name())       
-        call between_spheres_open_units(this%mix_report_unit, this%mix_potential_energy_tab_unit, &
-                            this%mix_observables_thermalisation_unit, &
-                            this%mix_observables_equilibrium_unit)        
+        call this%type2_units%open(this%type2_spheres%get_name())      
+        call this%between_spheres_units%open("BetweenHS") ! to change        
     
     end subroutine Physical_System_open_all_units
     
@@ -425,7 +422,7 @@ contains
         call final_between_spheres(this%Box%size, this%between_spheres_potential, &
                                    this%type1_spheres, this%type2_spheres, &
                                    this%between_spheres_observables%potential_energy, &
-                                   this%mix_report_unit)
+                                   this%between_spheres_units%report)
         
         call this%write_all_results()
         call this%close_units()
@@ -441,7 +438,7 @@ contains
                                                   this%type2_units%report)
         call between_spheres_write_results(this%num_equilibrium_steps, &
                                            this%between_spheres_observables%potential_energy_sum, &
-                                           this%mix_report_unit)
+                                           this%between_spheres_units%report)
         
         call this%write_results()
     
@@ -476,11 +473,7 @@ contains
     
         call this%type1_units%close()
         call this%type2_units%close()
-        
-        close(this%mix_report_unit)
-        close(this%mix_potential_energy_tab_unit)
-        close(this%mix_observables_thermalisation_unit)
-        close(this%mix_observables_equilibrium_unit)
+        call this%between_spheres_units%close()        
         
         close(this%report_unit)
         close(this%observables_thermalisation_unit)
@@ -642,7 +635,7 @@ contains
     
         call this%type1_observables%write(i_step, this%type1_units%observables_thermalisation)
         call this%type2_observables%write(i_step, this%type2_units%observables_thermalisation)
-        call this%between_spheres_observables%write(i_step, this%mix_observables_thermalisation_unit)
+        call this%between_spheres_observables%write(i_step, this%between_spheres_units%observables_thermalisation)
         
         write(this%observables_thermalisation_unit, *) i_step, &
             this%type1_observables%potential_energy + &
@@ -705,7 +698,7 @@ contains
     
         call this%type1_observables%write(i_step, this%type1_units%observables_equilibrium)
         call this%type2_observables%write(i_step, this%type2_units%observables_equilibrium)
-        call this%between_spheres_observables%write(i_step, this%mix_observables_equilibrium_unit)
+        call this%between_spheres_observables%write(i_step, this%between_spheres_units%observables_equilibrium)
         
         write(this%observables_equilibrium_unit, *) i_step, &
             this%type1_observables%potential_energy + &

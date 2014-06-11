@@ -10,7 +10,7 @@ use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres
 implicit none
 
 private
-public open_units, write_data, between_spheres_open_units, write_spheres_density, write_results, between_spheres_write_results
+public open_units, write_data, write_spheres_density, write_results, between_spheres_write_results
 
 contains
 
@@ -46,25 +46,6 @@ contains
         write(report_unit ,*) "    Sigma3d = ", sigma3d
 
     end subroutine write_data
-
-    !> Mix: open units
-    
-    subroutine between_spheres_open_units(mix_report_unit, mix_potential_energy_unit, &
-                              mix_observables_thermalisation_unit, mix_observables_equilibrium_unit)
-                                  
-        integer, intent(out) :: mix_report_unit, mix_potential_energy_unit, &
-                                mix_observables_thermalisation_unit, mix_observables_equilibrium_unit
-    
-        open(newunit=mix_report_unit, recl=4096, file="mix_report.txt", status='new', action='write')
-        open(newunit=mix_potential_energy_unit, recl=4096, file="mix_potential_energy.tmp", status='new', &
-            action='write')
-        open(newunit=mix_observables_thermalisation_unit, recl=4096, &
-             file="mix_observables_thermalisation.out", status='new', action='write')
-        open(newunit=mix_observables_equilibrium_unit, recl=4096, file="mix_observables_equilibrium.out", &
-             status='new', action='write')
-        write(mix_observables_equilibrium_unit, *) "#", 1 ! 1 observable: energy
-        
-     end subroutine between_spheres_open_units
     
     !> Total: Results
     
