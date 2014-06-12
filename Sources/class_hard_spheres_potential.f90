@@ -132,7 +132,7 @@ contains
             
                 if (current%number /= particle%number) then
                     r_ij = PBC_distance(Box_size, particle%position, &
-                                    spheres%get_position(current%number))
+                                        spheres%get_position(current%number))
                     if (r_ij < this%min_distance) then
                         overlap = .true.
                         return
@@ -185,7 +185,6 @@ contains
                         overlap = .true.
                         return
                     end if
-                    energ = energ + this%pair(r)
                 end if
                 
                 if (.not. associated(next%next)) exit
