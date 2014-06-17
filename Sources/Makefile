@@ -72,7 +72,7 @@ $(EXEC2): data.o program_bunching.o
 $(EXEC3): data.o program_histogram.o
 	$(FC) $^ -o $@ $(LDFLAGS)
 	
-$(EXEC4): data.o module_physics_micro.o program_distribution.o
+$(EXEC4): data.o module_physics_micro.o module_post_processing_arguments.o program_distribution.o
 	$(FC) $^ -o $@ $(LDFLAGS)
 	
 # ------------------------------------------------------------------------

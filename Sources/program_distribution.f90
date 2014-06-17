@@ -8,6 +8,7 @@ use data_box, only: num_dimensions, Box_size
 use data_monte_carlo, only: num_equilibrium_steps
 use data_distribution, only: snap, dist_dr
 use module_physics_micro, only: sphere_volume, PBC_distance
+use module_post_processing_arguments, only: argument_to_file
 !$ use omp_lib
 
 implicit none
@@ -32,21 +33,14 @@ implicit none
     logical :: withOrientations
     
     character(len=4096) :: file
-    integer :: length, time_unit, stat
-    logical :: exist
+    integer :: length, time_unit
 
     real(DP) :: tIni, tFin
     !$ real(DP) :: tIni_para, tFin_para
 
     if (.not.snap) stop "Snap désactivé."
     
-    call get_command_argument(1, file, length, stat)
-    if (stat /= 0) error stop "error get_command_argument"
-    inquire(file=file(1:length), exist=exist)
-    if (.not.exist) then
-        write(error_unit, *) "missing file: ", file(1:length)
-        error stop
-    end if
+    call argument_to_file(1, file, length)
     
     open(newunit=positions_unit, recl=4096, file=file(1:length), status='old', action='read')
     
@@ -66,13 +60,7 @@ implicit none
     
     if (withOrientations) then
     
-        call get_command_argument(2, file, length, stat)
-        if (stat /= 0) error stop "error get_command_argument"
-        inquire(file=file(1:length), exist=exist)
-        if (.not.exist) then
-            write(error_unit, *) "missing file: ", file(1:length)
-            error stop
-        end if
+        call argument_to_file(2, file, length)
         
         open(newunit=orientations_unit, recl=4096, file=file(1:length), status='old', &
         action='read')
@@ -140,8 +128,10 @@ implicit none
             r_iMinus = real(iDist, DP) * dist_dr
             r_iPlus = real(iDist + 1, DP) * dist_dr
             
-            dist_function(iDist) = 2._DP * real(dist_sum(iDist), DP) / real(num_equilibrium_steps/snap_factor, DP) / &
-                real(num_particles, DP) / (sphere_volume(r_iPlus)-sphere_volume(r_iMinus)) / density
+            dist_function(iDist) = 2._DP * real(dist_sum(iDist), DP) / &
+                                   real(num_equilibrium_steps/snap_factor, DP) / &
+                                   real(num_particles, DP) / &
+                                   (sphere_volume(r_iPlus) - sphere_volume(r_iMinus)) / density
             write(distrib_unit, *) r_iDist, dist_function(iDist)
             
         end do
