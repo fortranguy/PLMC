@@ -289,13 +289,10 @@ contains
         
         solo = 0._DP
         
-        do j_particle = 1, spheres%get_num_particles()
-            
+        do j_particle = 1, spheres%get_num_particles()            
             position_j(:) = spheres%get_position(j_particle)
-            distance_ij = PBC_distance(Box_size, particle%position, position_j)
-            
-            solo = solo + this%pair(distance_ij)
-                      
+            distance_ij = PBC_distance(Box_size, particle%position, position_j)            
+            solo = solo + this%pair(distance_ij)                      
         end do
     
     end function Between_Hard_Spheres_Potential_Energy_solo
