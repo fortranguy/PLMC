@@ -13,7 +13,7 @@ use module_post_processing_arguments, only: argument_to_file
 
 implicit none
 
-    character(len=5) :: name, name_bis
+    character(len=4096) :: name, name_bis
     integer :: num_particles, num_particles_bis
     integer :: snap_factor, snap_factor_bis
     real(DP) :: density
@@ -71,7 +71,7 @@ implicit none
     open(newunit=positions_unit, recl=4096, file=file_name(1:length), status='old', action='read')
     
     read(positions_unit, *) name, num_particles, snap_factor
-    write(output_unit, *) name, num_particles, snap_factor
+    write(output_unit, *) trim(name), num_particles, snap_factor
     
     max_distance = norm2(Box_size/2._DP)
     num_distribution = int(max_distance/delta)
@@ -145,7 +145,7 @@ implicit none
         deallocate(orientations)
     end if
 
-    open(newunit=distrib_unit, file=name//"_distribution_function.out", action="write")
+    open(newunit=distrib_unit, file=trim(name)//"_distribution_function.out", action="write")
     
         do i_distribution = 1, num_distribution
         
@@ -163,7 +163,7 @@ implicit none
         
     close(distrib_unit)
     
-    open(newunit=time_unit, file=name//"_distribution_time.out")
+    open(newunit=time_unit, file=trim(name)//"_distribution_time.out")
         write(time_unit, *) "pseudo serial time", time_final - time_init
         !$ write(time_unit, *) "parallel time", time_final_para - time_init_para
         !$omp parallel
