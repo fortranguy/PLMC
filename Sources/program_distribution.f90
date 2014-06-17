@@ -4,9 +4,9 @@ program distribution
 
 use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
 use data_precisions, only: DP
-use data_box, only: num_dimensions, Box_size
-use data_monte_carlo, only: num_equilibrium_steps
-use data_distribution, only: snap, dist_dr
+use json_module, only: json_file, json_initialize
+use module_data, only: test_data_found
+use data_box, only: num_dimensions
 use module_physics_micro, only: sphere_volume, PBC_distance
 use module_post_processing_arguments, only: argument_to_file
 !$ use omp_lib
@@ -17,51 +17,76 @@ implicit none
     integer :: num_particles, num_particles_bis
     integer :: snap_factor, snap_factor_bis
     real(DP) :: density
-    integer, dimension(:), allocatable :: dist_sum
+    integer, dimension(:), allocatable :: distribution_sum
     integer :: positions_unit, orientations_unit, distrib_unit
 
-    real(DP) :: rMax
-    integer :: Ndist
+    real(DP), dimension(:), allocatable :: Box_size
+    integer :: num_equilibrium_steps
+    
+    real(DP) :: max_distance, delta
+    integer :: num_distribution
     integer :: i_step
     integer :: i_particle, j_particle
-    real(DP) :: r_ij
-    integer :: iDist
-    real(DP) :: r_iDist, r_iMinus, r_iPlus
-    real(DP), dimension(:), allocatable :: dist_function
+    real(DP) :: distance_ij
+    integer :: i_distribution
+    real(DP) :: distance_i_distribution, distance_i_minus, distance_i_plus
+    real(DP), dimension(:), allocatable :: distribution_function
     real(DP), dimension(:, :), allocatable :: positions, orientations
     
-    logical :: withOrientations
+    logical :: with_orientations
     
+    type(json_file) :: json
+    character(len=4096) :: data_name
+    logical :: found
     character(len=4096) :: file
     integer :: length, time_unit
+    logical :: take_snapshot
 
-    real(DP) :: tIni, tFin
-    !$ real(DP) :: tIni_para, tFin_para
+    real(DP) :: time_init, time_final
+    !$ real(DP) :: time_init_para, time_final_para
+    
+    call json_initialize()
+    call json%load_file(filename = "data.json")
+    
+    data_name = "Distribution.take snapshot"
+    call json%get(data_name, take_snapshot, found)
+    call test_data_found(data_name, found)
 
-    if (.not.snap) stop "Snap désactivé."
+    if (.not.take_snapshot) stop "No snap shots taken."
     
-    call argument_to_file(1, file, length)
+    data_name = "Box.size"
+    call json%get(data_name, Box_size, found)
+    call test_data_found(data_name, found)
+    if (size(Box_size) /= num_dimensions) error stop "Box size dimension"
     
+    data_name = "Monte Carlo.number of equilibrium steps"
+    call json%get(data_name, num_equilibrium_steps, found)
+    call test_data_found(data_name, found)
+    
+    data_name = "Distribution.delta"
+    call json%get(data_name, delta, found)
+    call test_data_found(data_name, found)
+    
+    call argument_to_file(1, file, length)    
     open(newunit=positions_unit, recl=4096, file=file(1:length), status='old', action='read')
     
     read(positions_unit, *) name, num_particles, snap_factor
     write(output_unit, *) name, num_particles, snap_factor
     
-    rMax = norm2(Box_size/2._DP)
-    Ndist = int(rMax/dist_dr)
-    allocate(dist_sum(Ndist))
-    allocate(dist_function(Ndist))
+    max_distance = norm2(Box_size/2._DP)
+    num_distribution = int(max_distance/delta)
+    allocate(distribution_sum(num_distribution))
+    allocate(distribution_function(num_distribution))
     allocate(positions(num_dimensions, num_particles))
     density = real(num_particles, DP) / product(Box_size)
 
-    dist_sum(:) = 0
+    distribution_sum(:) = 0
     
-    withOrientations = (name == "dipol" .and. command_argument_count() == 2)
+    with_orientations = (command_argument_count() == 2)
     
-    if (withOrientations) then
+    if (with_orientations) then
     
-        call argument_to_file(2, file, length)
-        
+        call argument_to_file(2, file, length)        
         open(newunit=orientations_unit, recl=4096, file=file(1:length), status='old', &
         action='read')
         
@@ -76,10 +101,10 @@ implicit none
     end if
 
     write(output_unit, *) "Start !"
-    call cpu_time(tIni)
-    !$ tIni_para = omp_get_wtime()
-    !$omp parallel do schedule(static) reduction(+:dist_sum) private(positions, i_particle, j_particle, &
-    !$ r_ij, iDist)
+    call cpu_time(time_init)
+    !$ time_init_para = omp_get_wtime()
+    !$omp parallel do schedule(static) reduction(+:distribution_sum) &
+    !$ private(positions, i_particle, j_particle, distance_ij, i_distribution)
     do i_step = 1, num_equilibrium_steps/snap_factor
 
         ! Read
@@ -88,7 +113,7 @@ implicit none
             read(positions_unit, *) positions(:, i_particle)
         end do
         
-        if (withOrientations) then
+        if (with_orientations) then
             do i_particle = 1, num_particles
                 read(orientations_unit, *) orientations(:, i_particle)
             end do
@@ -99,58 +124,61 @@ implicit none
         do i_particle = 1, num_particles
             do j_particle = i_particle + 1, num_particles
 
-                r_ij = PBC_distance(Box_size, positions(:, i_particle), positions(:, j_particle))
-                iDist =  int(r_ij/dist_dr)
-                dist_sum(iDist) = dist_sum(iDist) + 1
+                distance_ij = PBC_distance(Box_size, positions(:, i_particle), positions(:, j_particle))
+                i_distribution =  int(distance_ij/delta)
+                distribution_sum(i_distribution) = distribution_sum(i_distribution) + 1
 
             end do
         end do
 
     end do
     !$omp end parallel do
-    !$ tFin_para = omp_get_wtime()
-    call cpu_time(tFin)
+    !$ time_final_para = omp_get_wtime()
+    call cpu_time(time_final)
     write(output_unit, *) "Finish !"
 
     close(positions_unit)
     deallocate(positions)
     
-    if (withOrientations) then
+    if (with_orientations) then
         close(orientations_unit)
         deallocate(orientations)
     end if
 
-    open(newunit=distrib_unit, file=name//"_dist_function.out", action="write")
+    open(newunit=distrib_unit, file=name//"_distribution_function.out", action="write")
     
-        do iDist = 1, Ndist
+        do i_distribution = 1, num_distribution
         
-            r_iDist = (real(iDist, DP) + 0.5_DP) * dist_dr
-            r_iMinus = real(iDist, DP) * dist_dr
-            r_iPlus = real(iDist + 1, DP) * dist_dr
+            distance_i_distribution = (real(i_distribution, DP) + 0.5_DP) * delta
+            distance_i_minus = real(i_distribution, DP) * delta
+            distance_i_plus = real(i_distribution + 1, DP) * delta
             
-            dist_function(iDist) = 2._DP * real(dist_sum(iDist), DP) / &
-                                   real(num_equilibrium_steps/snap_factor, DP) / &
-                                   real(num_particles, DP) / &
-                                   (sphere_volume(r_iPlus) - sphere_volume(r_iMinus)) / density
-            write(distrib_unit, *) r_iDist, dist_function(iDist)
+            distribution_function(i_distribution) = &
+                2._DP * real(distribution_sum(i_distribution), DP) / real(num_equilibrium_steps / &
+                snap_factor, DP) / real(num_particles, DP) / &
+                (sphere_volume(distance_i_plus) - sphere_volume(distance_i_minus)) / density
+            write(distrib_unit, *) distance_i_distribution, distribution_function(i_distribution)
             
         end do
         
     close(distrib_unit)
     
-    open(newunit=time_unit, file=name//"_dist_time.out")
-        write(time_unit, *) "pseudo serial time", tFin - tIni
-        !$ write(time_unit, *) "parallel time", tFin_para - tIni_para
+    open(newunit=time_unit, file=name//"_distribution_time.out")
+        write(time_unit, *) "pseudo serial time", time_final - time_init
+        !$ write(time_unit, *) "parallel time", time_final_para - time_init_para
         !$omp parallel
             !$omp master
                 !$ write(time_unit, *) "number of threads =", omp_get_num_threads()
             !$omp end master
         !$omp end parallel
-        !$ write(time_unit, *) "ratio =", (tFin-tIni)/(tFin_para-tIni_para)
+        !$ write(time_unit, *) "ratio =", (time_final-time_init)/(time_final_para-time_init_para)
             ! fake ?
     close(time_unit)
     
-    deallocate(dist_function)
-    deallocate(dist_sum)
+    deallocate(distribution_function)
+    deallocate(distribution_sum)
+    
+    deallocate(Box_size)    
+    call json%destroy()
 
 end program distribution
