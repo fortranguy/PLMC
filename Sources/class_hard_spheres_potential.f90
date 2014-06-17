@@ -1,7 +1,7 @@
 module class_hard_spheres_potential
 
 use data_precisions, only: DP
-use data_box, only: Ndim
+use data_box, only: num_dimensions
 use data_neighbour_cells, only: num_near_cells
 use json_module, only: json_file
 use module_types_micro, only: Box_Dimensions, Node, Particle_Index
@@ -132,7 +132,7 @@ contains
         do i_near_cell = 1, num_near_cells
         
             i_cell = this_cells%near_among_total(i_near_cell, i_total_cell)
-            current => this_cells%beginCells(i_cell)%particle%next
+            current => this_cells%begin_cells(i_cell)%particle%next
             if (.not. associated(current%next)) cycle
             
             do
@@ -193,7 +193,7 @@ contains
         real(DP) :: solo
         
         integer :: j_particle
-        real(DP), dimension(Ndim) :: position_j
+        real(DP), dimension(num_dimensions) :: position_j
         real(DP) :: distance_ij
         
         solo = 0._DP
@@ -242,7 +242,7 @@ contains
         real(DP) :: solo
         
         integer :: j_particle
-        real(DP), dimension(Ndim) :: position_j
+        real(DP), dimension(num_dimensions) :: position_j
         real(DP) :: distance_ij
         
         solo = 0._DP

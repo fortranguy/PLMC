@@ -3,15 +3,15 @@
 module module_types_micro
 
 use data_precisions, only: DP
-use data_box, only: Ndim
+use data_box, only: num_dimensions
 
 implicit none
 
     ! System Box
     
     type, public :: Box_Dimensions
-        real(DP), dimension(Ndim) :: size
-        integer, dimension(Ndim) :: wave
+        real(DP), dimension(num_dimensions) :: size
+        integer, dimension(num_dimensions) :: wave
         real(DP) :: temperature
     end type Box_Dimensions
 
@@ -31,8 +31,8 @@ implicit none
     type, public :: Particle_Index
         integer :: number
         integer :: other_number = 0
-        real(DP), dimension(Ndim) :: position
-        real(DP), dimension(Ndim) :: orientation
+        real(DP), dimension(num_dimensions) :: position
+        real(DP), dimension(num_dimensions) :: orientation
         integer :: same_i_cell
         integer :: between_i_cell
         logical :: add

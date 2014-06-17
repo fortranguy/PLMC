@@ -1,7 +1,7 @@
 module module_algorithms
 
 use data_precisions, only: DP
-use data_box, only: Ndim
+use data_box, only: num_dimensions
 use module_types_micro, only: Box_Dimensions, Particle_Index, Particle_Energy
 use module_physics_micro, only: random_surface, markov_surface
 use class_neighbour_cells, only: Neighbour_Cells
@@ -34,7 +34,7 @@ contains
         real(DP), intent(inout) :: mix_potential_energy
         
         real(DP) :: random
-        real(DP), dimension(Ndim) :: xRand
+        real(DP), dimension(num_dimensions) :: xRand
         type(Particle_Index) :: old, new
         logical :: overlap
         real(DP) :: deltaEpot
@@ -161,7 +161,7 @@ contains
         
         integer :: iWidom
         real(DP) :: widTestSum
-        real(DP), dimension(Ndim) :: xRand
+        real(DP), dimension(num_dimensions) :: xRand
         type(Particle_Index) :: test
         logical :: overlap
         real(DP) :: EpotTest

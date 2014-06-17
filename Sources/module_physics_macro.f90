@@ -4,7 +4,7 @@ module module_physics_macro
 
 use, intrinsic :: iso_fortran_env, only: output_unit, error_unit, iostat_end
 use data_precisions, only: DP, real_zero, io_tiny, consist_tiny
-use data_box, only: Ndim
+use data_box, only: num_dimensions
 use json_module, only: json_file
 use module_types_micro, only: Box_Dimensions, Argument_Random, Argument_Initial
 use module_physics_micro, only: PBC_distance, random_surface
@@ -123,7 +123,7 @@ contains
         real(DP), intent(in) :: between_spheres_min_distance
 
         integer :: i_particle, i_particle_test
-        real(DP), dimension(Ndim) :: xRand, position, position_test
+        real(DP), dimension(num_dimensions) :: xRand, position, position_test
         real(DP) :: rTest
         
         ! Type 1
@@ -200,7 +200,7 @@ contains
         integer :: file_unit, readStat
 
         integer :: i_particle
-        real(DP), dimension(Ndim) :: coordinate
+        real(DP), dimension(num_dimensions) :: coordinate
         real(DP) :: coordinate_norm
         
         write(output_unit, *) spheres%get_name()//coordinates_name, " <- ", file(1:length)
@@ -281,7 +281,7 @@ contains
         class(Hard_Spheres_Macro), intent(inout) :: this_macro
         class(Between_Hard_Spheres_Potential_Energy), intent(in) :: between_spheres_potential
         
-        real(DP), dimension(Ndim) :: same_cell_size, between_cell_size
+        real(DP), dimension(num_dimensions) :: same_cell_size, between_cell_size
         
         same_cell_size(:) = this_macro%hard_potential%get_range_cut()
         call this_macro%same_cells%construct(Box_size, same_cell_size, &

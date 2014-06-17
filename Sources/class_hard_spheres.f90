@@ -5,7 +5,7 @@ module class_hard_spheres
 use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
 use data_precisions, only: DP
 use data_constants, only: PI
-use data_box, only: Ndim
+use data_box, only: num_dimensions
 use json_module, only: json_file
 use module_physics_micro, only: PBC_distance
 use module_data, only: test_data_found
@@ -150,7 +150,7 @@ contains
         data_name = "Particles.Hard Spheres.number of particles"
         call json%get(data_name, this%num_particles, found)
         call test_data_found(data_name, found)        
-        allocate(this%all_positions(Ndim, this%num_particles))
+        allocate(this%all_positions(num_dimensions, this%num_particles))
         
         data_name = "Particles.Hard Spheres.number of Widom particles"
         call json%get(data_name, this%widom_num_particles, found)
@@ -171,8 +171,8 @@ contains
         data_name = "Particles.Dipolar Hard Spheres.number of particles"
         call json%get(data_name, this%num_particles, found)
         call test_data_found(data_name, found)
-        allocate(this%all_positions(Ndim, this%num_particles))
-        allocate(this%all_orientations(Ndim, this%num_particles))
+        allocate(this%all_positions(num_dimensions, this%num_particles))
+        allocate(this%all_orientations(num_dimensions, this%num_particles))
         
         data_name = "Particles.Dipolar Hard Spheres.number of Widom particles"
         call json%get(data_name, this%widom_num_particles, found)
@@ -298,7 +298,7 @@ contains
     
         class(Hard_Spheres), intent(in) :: this
         integer, intent(in) :: i_particle
-        real(DP), dimension(Ndim) :: get_position
+        real(DP), dimension(num_dimensions) :: get_position
         
         get_position(:) = this%all_positions(:, i_particle)
         
@@ -318,7 +318,7 @@ contains
     
         class(Dipolar_Hard_Spheres), intent(in) :: this
         integer, intent(in) :: i_particle
-        real(DP), dimension(Ndim) :: get_orientation
+        real(DP), dimension(num_dimensions) :: get_orientation
         
         get_orientation(:) = this%all_orientations(:, i_particle)
         
@@ -406,7 +406,7 @@ contains
         real(DP), dimension(:), intent(in) :: Box_size
     
         integer :: i_particle, j_particle
-        real(DP), dimension(Ndim) :: position_i, position_j
+        real(DP), dimension(num_dimensions) :: position_i, position_j
         real(DP) :: r_ij
     
         do j_particle = 1, this%num_particles
@@ -437,7 +437,7 @@ contains
         
         integer :: type1_i_particle, type2_i_particle
         real(DP) :: r_mix
-        real(DP), dimension(Ndim) :: type1_xCol, type2_xCol
+        real(DP), dimension(num_dimensions) :: type1_xCol, type2_xCol
         
         do type1_i_particle = 1, type1%get_num_particles()
             do type2_i_particle = 1, type2%get_num_particles()

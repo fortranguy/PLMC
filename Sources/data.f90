@@ -45,10 +45,10 @@ use data_precisions, only: DP
 
 implicit none
     
-    integer, parameter :: Ndim = 3
+    integer, parameter :: num_dimensions = 3
     
-    real(DP), dimension(Ndim), parameter :: Box_size = 25._DP
-    integer, dimension(Ndim), parameter :: Box_wave = 8
+    real(DP), dimension(num_dimensions), parameter :: Box_size = 25._DP
+    integer, dimension(num_dimensions), parameter :: Box_wave = 8
     
 end module data_box
 !***************************************************************************************************
@@ -60,7 +60,7 @@ end module data_box
 module data_monte_carlo
 
 use data_precisions, only: DP
-use data_box, only: Ndim
+use data_box, only: num_dimensions
 
 implicit none
 
@@ -76,11 +76,11 @@ end module data_monte_carlo
 module data_neighbour_cells
 
 use data_precisions, only: DP
-use data_box, only: Ndim
+use data_box, only: num_dimensions
 
 implicit none
 
-    integer, dimension(Ndim), parameter :: num_near_cells_dim = 3 !< Number of nearest neighbour cells
+    integer, dimension(num_dimensions), parameter :: num_near_cells_dim = 3 !< Number of nearest neighbour cells
                                                              !< in each direction
     integer, parameter :: num_near_cells = num_near_cells_dim(1) * num_near_cells_dim(2) * &
                                            num_near_cells_dim(3)

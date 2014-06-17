@@ -2,7 +2,7 @@ module class_small_move
 
 use, intrinsic :: iso_fortran_env, only: error_unit
 use data_precisions, only: DP, real_zero
-use data_box, only: Ndim
+use data_box, only: num_dimensions
 
 implicit none
 
@@ -11,8 +11,8 @@ private
     type, public :: Small_Move
     
         private
-        real(DP), dimension(Ndim) :: delta
-        real(DP), dimension(Ndim) :: deltaSave
+        real(DP), dimension(num_dimensions) :: delta
+        real(DP), dimension(num_dimensions) :: deltaSave
         real(DP) :: rejectFix
     
     contains
@@ -41,7 +41,7 @@ contains
     
     pure function Small_Move_get_delta(this) result(get_delta)
         class(Small_Move), intent(in) :: this
-        real(DP), dimension(Ndim) :: get_delta
+        real(DP), dimension(num_dimensions) :: get_delta
         
         get_delta(:) = this%delta(:)
     end function Small_Move_get_delta

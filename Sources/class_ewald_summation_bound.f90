@@ -2,7 +2,7 @@ module class_ewald_summation_bound
 
 use data_precisions, only: DP
 use data_constants, only: PI
-use data_box, only: Ndim
+use data_box, only: num_dimensions
 use class_hard_spheres, only: Dipolar_Hard_Spheres
 
 implicit none
@@ -10,7 +10,7 @@ implicit none
 private
 
     type, public :: Ewald_Summation_Bound
-        real(DP), dimension(Ndim) :: total_moment
+        real(DP), dimension(num_dimensions) :: total_moment
     contains
         procedure :: set_total_moment => Ewald_Summation_Bound_set_total_moment
         procedure :: reset_total_moment => Ewald_Summation_Bound_reset_total_moment

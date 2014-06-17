@@ -2,7 +2,7 @@ module class_ewald_summation_reci
 
 use data_precisions, only: DP
 use data_constants, only: PI
-use data_box, only: Ndim
+use data_box, only: num_dimensions
 use json_module, only: json_file
 use module_data, only: test_data_found
 use module_types_micro, only: Box_Dimensions, Particle_Index
@@ -75,7 +75,7 @@ contains
         real(DP), intent(in) :: alpha
         
         integer :: kx, ky, kz
-        real(DP), dimension(Ndim) :: wave_vector
+        real(DP), dimension(num_dimensions) :: wave_vector
         real(DP) :: wave_div_box
 
         do kz = -Box%wave(3), Box%wave(3)
@@ -123,8 +123,8 @@ contains
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_2
         complex(DP), dimension(-Box%wave(3):Box%wave(3)) :: exp_Ikx_3
 
-        real(DP), dimension(Ndim) :: position_div_box, orientation_div_box
-        real(DP), dimension(Ndim) :: wave_vector
+        real(DP), dimension(num_dimensions) :: position_div_box, orientation_div_box
+        real(DP), dimension(num_dimensions) :: wave_vector
         real(DP) :: wave_dot_orientation
         integer :: kx, ky, kz
         integer :: i_particle
@@ -283,8 +283,8 @@ contains
         type(Particle_Index), intent(in) :: old, new
         real(DP) :: move
         
-        real(DP), dimension(Ndim) :: new_position_div_box, old_position_div_box
-        real(DP), dimension(Ndim) :: orientation_div_box
+        real(DP), dimension(num_dimensions) :: new_position_div_box, old_position_div_box
+        real(DP), dimension(num_dimensions) :: orientation_div_box
 
         complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxNew_1
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxNew_2
@@ -298,7 +298,7 @@ contains
 
         real(DP) :: real_part
         
-        real(DP), dimension(Ndim) :: wave_vector
+        real(DP), dimension(num_dimensions) :: wave_vector
         real(DP) :: wave_dot_orientation
         integer :: kx, ky, kz
 
@@ -359,8 +359,8 @@ contains
         type(Box_Dimensions), intent(in) :: Box
         type(Particle_Index), intent(in) :: old, new
         
-        real(DP), dimension(Ndim) :: new_position_div_box, old_position_div_box
-        real(DP), dimension(Ndim) :: orientation_div_box
+        real(DP), dimension(num_dimensions) :: new_position_div_box, old_position_div_box
+        real(DP), dimension(num_dimensions) :: orientation_div_box
 
         complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxNew_1
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxNew_2
@@ -372,7 +372,7 @@ contains
         complex(DP), dimension(-Box%wave(3):Box%wave(3)) :: exp_IkxOld_3
         complex(DP) :: exp_IkxOld
 
-        real(DP), dimension(Ndim) :: wave_vector
+        real(DP), dimension(num_dimensions) :: wave_vector
         real(DP) :: wave_dot_orientation
         integer :: kx, ky, kz
 
@@ -432,8 +432,8 @@ contains
         type(Particle_Index), intent(in) :: old, new
         real(DP) :: rotation
 
-        real(DP), dimension(Ndim) :: position_div_box
-        real(DP), dimension(Ndim) :: new_orientation_div_box, old_orientation_div_box
+        real(DP), dimension(num_dimensions) :: position_div_box
+        real(DP), dimension(num_dimensions) :: new_orientation_div_box, old_orientation_div_box
 
         complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_1
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_2
@@ -442,7 +442,7 @@ contains
 
         real(DP) :: real_part
         
-        real(DP), dimension(Ndim) :: wave_vector
+        real(DP), dimension(num_dimensions) :: wave_vector
         real(DP) :: wave_dot_new_orientation, wave_dot_old_orientation
         integer :: kx, ky, kz
 
@@ -501,15 +501,15 @@ contains
         type(Box_Dimensions), intent(in) :: Box
         type(Particle_Index), intent(in) :: old, new
 
-        real(DP), dimension(Ndim) :: position_div_box
-        real(DP), dimension(Ndim) :: new_orientation_div_box, old_orientation_div_box
+        real(DP), dimension(num_dimensions) :: position_div_box
+        real(DP), dimension(num_dimensions) :: new_orientation_div_box, old_orientation_div_box
 
         complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_1
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_2
         complex(DP), dimension(-Box%wave(3):Box%wave(3)) :: exp_Ikx_3
         complex(DP) :: exp_Ikx
 
-        real(DP), dimension(Ndim) :: wave_vector
+        real(DP), dimension(num_dimensions) :: wave_vector
         real(DP) :: k_dot_deltaMcol
         integer :: kx, ky, kz
 
@@ -567,8 +567,8 @@ contains
         type(Particle_Index), intent(in) :: particle
         real(DP) :: exchange
         
-        real(DP), dimension(Ndim) :: position_div_box
-        real(DP), dimension(Ndim) :: orientation_div_box
+        real(DP), dimension(num_dimensions) :: position_div_box
+        real(DP), dimension(num_dimensions) :: orientation_div_box
         
         complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_1
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_2
@@ -577,7 +577,7 @@ contains
         
         real(DP) :: real_part
         
-        real(DP), dimension(Ndim) :: wave_vector
+        real(DP), dimension(num_dimensions) :: wave_vector
         real(DP) :: wave_dot_orientation
         integer :: kx, ky, kz
         
@@ -638,15 +638,15 @@ contains
         type(Particle_Index), intent(in) :: particle
         real(DP) :: exchange
         
-        real(DP), dimension(Ndim) :: position_div_box
-        real(DP), dimension(Ndim) :: orientation_div_box
+        real(DP), dimension(num_dimensions) :: position_div_box
+        real(DP), dimension(num_dimensions) :: orientation_div_box
         
         complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_1
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_2
         complex(DP), dimension(-Box%wave(3):Box%wave(3)) :: exp_Ikx_3
         complex(DP) :: exp_Ikx
         
-        real(DP), dimension(Ndim) :: wave_vector
+        real(DP), dimension(num_dimensions) :: wave_vector
         real(DP) :: wave_dot_orientation
         integer :: kx, ky, kz
         

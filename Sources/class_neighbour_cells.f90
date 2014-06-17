@@ -4,7 +4,7 @@ module class_neighbour_cells
 
 use, intrinsic :: iso_fortran_env, only: error_unit
 use data_precisions, only: DP, real_zero
-use data_box, only: Ndim
+use data_box, only: num_dimensions
 use data_neighbour_cells, only: num_near_cells_dim, num_near_cells
 use module_types_micro, only: Node, Linked_List
 use module_physics_micro, only: index_from_coord, coord_PBC
@@ -17,13 +17,12 @@ private
     
         private
         
-        real(DP), dimension(Ndim) :: cell_size
-        integer, dimension(Ndim) :: num_total_cell_dim
-        integer :: NtotalCell
+        integer :: num_total_cell
+        integer, dimension(num_dimensions) :: num_total_cell_dim
+        real(DP), dimension(num_dimensions) :: cell_size        
         integer, dimension(:, :), allocatable, public :: near_among_total
-        type(Linked_List), dimension(:), allocatable, public :: beginCells
-        type(Linked_List), dimension(:), allocatable :: currentCells
-        type(Linked_List), dimension(:), allocatable :: nextCells
+        type(Linked_List), dimension(:), allocatable, public :: begin_cells
+        type(Linked_List), dimension(:), allocatable :: current_cells, next_cells
         
     contains
     
@@ -46,20 +45,20 @@ private
     
 contains
 
-    subroutine Neighbour_Cells_construct(this, Box_size, proposed_cell_size, rCut)
+    subroutine Neighbour_Cells_construct(this, Box_size, proposed_cell_size, range_cut)
     
         class(Neighbour_Cells), intent(out) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         real(DP), dimension(:), intent(in) :: proposed_cell_size
-        real(DP), intent(in) :: rCut
+        real(DP), intent(in) :: range_cut
         
         this%num_total_cell_dim(:) = floor(Box_size(:)/proposed_cell_size(:))
-        this%NtotalCell = product(this%num_total_cell_dim)
+        this%num_total_cell = product(this%num_total_cell_dim)
         this%cell_size(:) = Box_size(:)/real(this%num_total_cell_dim(:), DP)
         
-        allocate(this%near_among_total(num_near_cells, this%NtotalCell))
+        allocate(this%near_among_total(num_near_cells, this%num_total_cell))
             
-        call this%check_CellsSize(Box_size, rCut)
+        call this%check_CellsSize(Box_size, range_cut)
         call this%alloc_cells()
         call this%init_near_among_total()
     
@@ -80,18 +79,18 @@ contains
     
         class(Neighbour_Cells), intent(inout) :: this
     
-        integer :: iCell
+        integer :: i_cell
     
-        do iCell = 1, this%NtotalCell
+        do i_cell = 1, this%num_total_cell
 
-            allocate(this%beginCells(iCell)%particle)
-            this%currentCells(iCell)%particle => this%beginCells(iCell)%particle
-            this%currentCells(iCell)%particle%number = 0
+            allocate(this%begin_cells(i_cell)%particle)
+            this%current_cells(i_cell)%particle => this%begin_cells(i_cell)%particle
+            this%current_cells(i_cell)%particle%number = 0
             
-            allocate(this%nextCells(iCell)%particle)
-            this%nextCells(iCell)%particle%number = 0
-            this%currentCells(iCell)%particle%next => this%nextCells(iCell)%particle
-            this%currentCells(iCell)%particle => this%nextCells(iCell)%particle
+            allocate(this%next_cells(i_cell)%particle)
+            this%next_cells(i_cell)%particle%number = 0
+            this%current_cells(i_cell)%particle%next => this%next_cells(i_cell)%particle
+            this%current_cells(i_cell)%particle => this%next_cells(i_cell)%particle
     
         end do
     
@@ -101,9 +100,9 @@ contains
     
         class(Neighbour_Cells), intent(inout) :: this
 
-        allocate(this%beginCells(this%NtotalCell))
-        allocate(this%currentCells(this%NtotalCell))
-        allocate(this%nextCells(this%NtotalCell))
+        allocate(this%begin_cells(this%num_total_cell))
+        allocate(this%current_cells(this%num_total_cell))
+        allocate(this%next_cells(this%num_total_cell))
         
         call this%alloc_nodes()
         
@@ -126,11 +125,11 @@ contains
     
         class(Neighbour_Cells), intent(inout) :: this
     
-        integer :: iCell
+        integer :: i_cell
 
-        do iCell = 1, this%NtotalCell
-            if (associated(this%beginCells(iCell)%particle)) then
-                call free_link(this%beginCells(iCell)%particle)
+        do i_cell = 1, this%num_total_cell
+            if (associated(this%begin_cells(i_cell)%particle)) then
+                call free_link(this%begin_cells(i_cell)%particle)
             end if
         end do
     
@@ -142,44 +141,45 @@ contains
         
         call this%dealloc_nodes()
         
-        if (allocated(this%beginCells)) deallocate(this%beginCells)
-        if (allocated(this%currentCells)) deallocate(this%currentCells)
-        if (allocated(this%nextCells)) deallocate(this%nextCells)
+        if (allocated(this%begin_cells)) deallocate(this%begin_cells)
+        if (allocated(this%current_cells)) deallocate(this%current_cells)
+        if (allocated(this%next_cells)) deallocate(this%next_cells)
     
     end subroutine Neighbour_Cells_dealloc_cells
     
     ! Neighbour_Cells cells size check
     
-    subroutine Neighbour_Cells_check_cellsSize(this, Box_size, rCut)
+    subroutine Neighbour_Cells_check_cellsSize(this, Box_size, range_cut)
     
         class(Neighbour_Cells), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
-        real(DP), intent(in) :: rCut
+        real(DP), intent(in) :: range_cut
         
-        integer :: jDim
+        integer :: i_dim
         real(DP) :: Box_size_mod_cell_size
         
-        do jDim = 1, Ndim
+        do i_dim = 1, num_dimensions
         
-            if (this%cell_size(jDim) < rCut) then
-                write(error_unit, *) "    rCut too big in the dimension", jDim, ": "
-                write(error_unit, *) "    ", this%cell_size(jDim), "<", rCut
+            if (this%cell_size(i_dim) < range_cut) then
+                write(error_unit, *) "    range_cut too big in the dimension", i_dim, ": "
+                write(error_unit, *) "    ", this%cell_size(i_dim), "<", range_cut
                 error stop
             end if
             
-            if (this%num_total_cell_dim(jDim) < num_near_cells_dim(jDim)) then
-                write(error_unit, *) "    Too few cells in the dimension", jDim, ": "
-                write(error_unit, *) "    ", this%num_total_cell_dim(jDim), "<", num_near_cells_dim(jDim)
+            if (this%num_total_cell_dim(i_dim) < num_near_cells_dim(i_dim)) then
+                write(error_unit, *) "    Too few cells in the dimension", i_dim, ": "
+                write(error_unit, *) "    ", this%num_total_cell_dim(i_dim), "<", &
+                                             num_near_cells_dim(i_dim)
                 stop
             end if
             
-            Box_size_mod_cell_size = modulo(Box_size(jDim), this%cell_size(jDim))
+            Box_size_mod_cell_size = modulo(Box_size(i_dim), this%cell_size(i_dim))
             if (Box_size_mod_cell_size > real_zero .and. &
-            abs(Box_size_mod_cell_size - this%cell_size(jDim)) > real_zero) then
+            abs(Box_size_mod_cell_size - this%cell_size(i_dim)) > real_zero) then
                 write(error_unit, *) "    Cell size is not a divisor of the system size"
-                write(error_unit, *) "    in the dimension", jDim, ": "
-                write(error_unit, *) "    Box_size", Box_size(jDim)
-                write(error_unit, *) "    cell_size", this%cell_size(jDim)
+                write(error_unit, *) "    in the dimension", i_dim, ": "
+                write(error_unit, *) "    Box_size", Box_size(i_dim)
+                write(error_unit, *) "    cell_size", this%cell_size(i_dim)
                 write(error_unit, *) "    modulo(Box_size, cell_size) = ", Box_size_mod_cell_size
                 stop
             end if
@@ -196,7 +196,7 @@ contains
         real(DP), dimension(:), intent(in) :: xCol
         integer :: index_from_position
         
-        integer, dimension(Ndim) :: cell_coord
+        integer, dimension(num_dimensions) :: cell_coord
     
         cell_coord(:) = int(xCol(:)/this%cell_size(:)) + 1
         index_from_position = cell_coord(1) + this%num_total_cell_dim(1)*(cell_coord(2)-1) + &
@@ -211,37 +211,37 @@ contains
         class(Hard_Spheres), intent(in) :: spheres
     
         integer :: i_particle
-        integer :: iCell
+        integer :: i_cell
     
         do i_particle = 1, num_particles
     
-            iCell = this%index_from_position(spheres%get_position(i_particle))
-            this%currentCells(iCell)%particle%number = i_particle
+            i_cell = this%index_from_position(spheres%get_position(i_particle))
+            this%current_cells(i_cell)%particle%number = i_particle
             
-            allocate(this%nextCells(iCell)%particle)
-            this%nextCells(iCell)%particle%number = 0
-            this%currentCells(iCell)%particle%next => this%nextCells(iCell)%particle
-            this%currentCells(iCell)%particle => this%nextCells(iCell)%particle
+            allocate(this%next_cells(i_cell)%particle)
+            this%next_cells(i_cell)%particle%number = 0
+            this%current_cells(i_cell)%particle%next => this%next_cells(i_cell)%particle
+            this%current_cells(i_cell)%particle => this%next_cells(i_cell)%particle
             
         end do
         
-        do iCell = 1, this%NtotalCell
-            this%currentCells(iCell)%particle%next => null()
+        do i_cell = 1, this%num_total_cell
+            this%current_cells(i_cell)%particle%next => null()
         end do
         
     end subroutine Neighbour_Cells_all_cols_to_cells
     
     ! Neighbour cells update
     
-    subroutine Neighbour_Cells_remove_col_from_cell(this, i_particle, iCellOld)
+    subroutine Neighbour_Cells_remove_col_from_cell(this, i_particle, i_cellOld)
     
         class(Neighbour_Cells), intent(inout) :: this
-        integer, intent(in) :: i_particle, iCellOld
+        integer, intent(in) :: i_particle, i_cellOld
         
         type(Node), pointer :: current => null()
         type(Node), pointer :: next => null(), previous => null()
     
-        previous => this%beginCells(iCellOld)%particle
+        previous => this%begin_cells(i_cellOld)%particle
         current => previous%next
         
         do
@@ -263,15 +263,15 @@ contains
             
     end subroutine Neighbour_Cells_remove_col_from_cell
     
-    subroutine Neighbour_Cells_add_col_to_cell(this, i_particle, iCellNew)
+    subroutine Neighbour_Cells_add_col_to_cell(this, i_particle, i_cellNew)
     
         class(Neighbour_Cells), intent(inout) :: this
-        integer, intent(in) :: i_particle, iCellNew
+        integer, intent(in) :: i_particle, i_cellNew
     
         type(Node), pointer :: new => null()
         type(Node), pointer :: next => null(), previous => null()
         
-        previous => this%beginCells(iCellNew)%particle
+        previous => this%begin_cells(i_cellNew)%particle
         next => previous%next
 
         allocate(new)
@@ -289,7 +289,7 @@ contains
     
         integer :: i1_total_cell, i2_total_cell, i3_total_cell, i_total_cell
         integer :: i1_near_cell, i2_near_cell, i3_near_cell, i_near_cell
-        integer, dimension(Ndim) :: total_cell_coord, near_cell_coord
+        integer, dimension(num_dimensions) :: total_cell_coord, near_cell_coord
         
         do i3_total_cell = 1, this%num_total_cell_dim(3)
         do i2_total_cell = 1, this%num_total_cell_dim(2)

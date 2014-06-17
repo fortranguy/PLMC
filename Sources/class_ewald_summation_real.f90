@@ -2,7 +2,7 @@ module class_ewald_summation_real
 
 use data_precisions, only: DP
 use data_constants, only: PI
-use data_box, only: Ndim
+use data_box, only: num_dimensions
 use json_module, only: json_file
 use module_types_micro, only: Particle_Index
 use module_physics_micro, only: set_discrete_length, PBC_vector, ewald_real_B, ewald_real_C
@@ -159,7 +159,7 @@ contains
         real(DP) :: solo
 
         integer :: j_particle
-        real(DP), dimension(Ndim) :: vector_ij
+        real(DP), dimension(num_dimensions) :: vector_ij
 
         solo = 0._DP
         

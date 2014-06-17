@@ -5,7 +5,7 @@ module module_physics_micro
 use, intrinsic :: iso_fortran_env, only: error_unit
 use data_precisions, only: DP
 use data_constants, only: PI, sigma3d
-use data_box, only: Ndim
+use data_box, only: num_dimensions
 !$ use omp_lib
 
 implicit none
@@ -48,7 +48,7 @@ contains
     
         real(DP), dimension(:), intent(in) :: Box_size
         real(DP), dimension(:), intent(in) :: xCol1, xCol2
-        real(DP), dimension(Ndim) :: PBC_vector
+        real(DP), dimension(num_dimensions) :: PBC_vector
         
         PBC_vector(:) = modulo(xCol2(:)-xCol1(:), Box_size(:))
         
@@ -113,12 +113,12 @@ contains
     
     function random_surface()
         
-        real(DP), dimension(Ndim) :: random_surface
+        real(DP), dimension(num_dimensions) :: random_surface
         
-        integer :: jDim
+        integer :: i_dim
         
-        do jDim = 1, Ndim
-            random_surface(jDim) = gauss()
+        do i_dim = 1, num_dimensions
+            random_surface(i_dim) = gauss()
         end do
         
         random_surface(:) = random_surface(:) / norm2(random_surface)
@@ -132,13 +132,13 @@ contains
         real(DP), dimension(:), intent(inout) :: mCol
         real(DP), intent(in) :: deltaM
         
-        real(DP), dimension(Ndim) :: rotation
+        real(DP), dimension(num_dimensions) :: rotation
         real(DP) :: rotation_dot_mCol
         real(DP) :: amplitude, random
-        integer :: jDim
+        integer :: i_dim
         
-        do jDim = 1, Ndim
-            rotation(jDim) = gauss()
+        do i_dim = 1, num_dimensions
+            rotation(i_dim) = gauss()
         end do
         
         rotation_dot_mCol = dot_product(rotation, mCol)
@@ -187,11 +187,11 @@ contains
         integer, dimension(:), intent(in) :: Kmax
         integer :: NwaveVectors
         
-        integer :: jDim
+        integer :: i_dim
         
         NwaveVectors = 1
-        do jDim = 1, Ndim
-            NwaveVectors = NwaveVectors * (2*Kmax(jDim) + 1)
+        do i_dim = 1, num_dimensions
+            NwaveVectors = NwaveVectors * (2*Kmax(i_dim) + 1)
         end do
     
     end function NwaveVectors
@@ -281,7 +281,7 @@ contains
     pure function coord_PBC(cell_coord,  maxCell_coord)
     
         integer, dimension(:), intent(in) :: cell_coord, maxCell_coord
-        integer, dimension(Ndim) :: coord_PBC
+        integer, dimension(num_dimensions) :: coord_PBC
         
         coord_PBC(:) = cell_coord(:)
         

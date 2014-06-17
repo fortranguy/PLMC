@@ -4,7 +4,7 @@ program distribution
 
 use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
 use data_precisions, only: DP
-use data_box, only: Ndim, Box_size
+use data_box, only: num_dimensions, Box_size
 use data_monte_carlo, only: num_equilibrium_steps
 use data_distribution, only: snap, dist_dr
 use module_physics_micro, only: sphere_volume, PBC_distance
@@ -57,7 +57,7 @@ implicit none
     Ndist = int(rMax/dist_dr)
     allocate(dist_sum(Ndist))
     allocate(dist_function(Ndist))
-    allocate(positions(Ndim, num_particles))
+    allocate(positions(num_dimensions, num_particles))
     density = real(num_particles, DP) / product(Box_size)
 
     dist_sum(:) = 0
@@ -83,7 +83,7 @@ implicit none
             error stop
         end if
         
-        allocate(orientations(Ndim, num_particles))
+        allocate(orientations(num_dimensions, num_particles))
         
     end if
 

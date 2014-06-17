@@ -4,7 +4,7 @@ module module_write
 
 use data_precisions, only: DP, real_zero, io_tiny, consist_tiny
 use data_constants, only: PI, sigma3d
-use data_box, only: Ndim
+use data_box, only: num_dimensions
 use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres
 
 implicit none
