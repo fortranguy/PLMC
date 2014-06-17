@@ -5,7 +5,7 @@ module class_neighbour_cells
 use, intrinsic :: iso_fortran_env, only: error_unit
 use data_precisions, only: DP, real_zero
 use data_box, only: Ndim
-use data_neighbour_cells, only: NnearCell_dim, NnearCell
+use data_neighbour_cells, only: num_near_cells_dim, num_near_cells
 use module_types_micro, only: Node, Linked_List
 use module_physics_micro, only: index_from_coord, coord_PBC
 use class_hard_spheres, only: Hard_Spheres
@@ -18,7 +18,7 @@ private
         private
         
         real(DP), dimension(Ndim) :: cell_size
-        integer, dimension(Ndim) :: NtotalCell_dim
+        integer, dimension(Ndim) :: num_total_cell_dim
         integer :: NtotalCell
         integer, dimension(:, :), allocatable, public :: near_among_total
         type(Linked_List), dimension(:), allocatable, public :: beginCells
@@ -29,10 +29,6 @@ private
     
         procedure :: construct => Neighbour_Cells_construct
         procedure :: destroy => Neighbour_Cells_destroy
-        
-        procedure :: get_cell_size => Neighbour_Cells_get_cell_size
-        procedure :: get_NtotalCell_dim => Neighbour_Cells_get_NtotalCell_dim
-        procedure :: point_to_begin => Neighbour_Cells_point_to_begin
         
         procedure :: alloc_nodes => Neighbour_Cells_alloc_nodes
         procedure :: alloc_cells => Neighbour_Cells_alloc_cells
@@ -57,11 +53,11 @@ contains
         real(DP), dimension(:), intent(in) :: proposed_cell_size
         real(DP), intent(in) :: rCut
         
-        this%NtotalCell_dim(:) = floor(Box_size(:)/proposed_cell_size(:))
-        this%NtotalCell = product(this%NtotalCell_dim)
-        this%cell_size(:) = Box_size(:)/real(this%NtotalCell_dim(:), DP)
+        this%num_total_cell_dim(:) = floor(Box_size(:)/proposed_cell_size(:))
+        this%NtotalCell = product(this%num_total_cell_dim)
+        this%cell_size(:) = Box_size(:)/real(this%num_total_cell_dim(:), DP)
         
-        allocate(this%near_among_total(NnearCell, this%NtotalCell))
+        allocate(this%near_among_total(num_near_cells, this%NtotalCell))
             
         call this%check_CellsSize(Box_size, rCut)
         call this%alloc_cells()
@@ -73,34 +69,11 @@ contains
     
         class(Neighbour_Cells), intent(inout) :: this
         
-        if (allocated(this%near_among_total)) deallocate(this%near_among_total)
-        
+        if (allocated(this%near_among_total)) deallocate(this%near_among_total)        
         call this%dealloc_cells()
         
     end subroutine Neighbour_Cells_destroy
     
-    !> Accessors:
-    
-    pure function Neighbour_Cells_get_cell_size(this) result(get_cell_size)
-        class(Neighbour_Cells), intent(in) :: this
-        real(DP), dimension(Ndim) :: get_cell_size
-        get_cell_size(:) = this%cell_size(:)
-    end function Neighbour_Cells_get_cell_size
-    
-    pure function Neighbour_Cells_get_NtotalCell_dim(this) result(get_NtotalCell_dim)
-        class(Neighbour_Cells), intent(in) :: this
-        integer, dimension(Ndim) :: get_NtotalCell_dim
-        get_NtotalCell_dim(:) = this%NtotalCell_dim(:)
-    end function Neighbour_Cells_get_NtotalCell_dim
-    
-    subroutine Neighbour_Cells_point_to_begin(this, current, index)
-        class(Neighbour_Cells), intent(in) :: this
-        type(Node), pointer, intent(out) :: current
-        integer, intent(in) :: index
-        
-        current => this%beginCells(index)%particle%next
-    end subroutine Neighbour_Cells_point_to_begin
-
     !> Linked-list allocation
     
     subroutine Neighbour_Cells_alloc_nodes(this)
@@ -194,9 +167,9 @@ contains
                 error stop
             end if
             
-            if (this%NtotalCell_dim(jDim) < NnearCell_dim(jDim)) then
+            if (this%num_total_cell_dim(jDim) < num_near_cells_dim(jDim)) then
                 write(error_unit, *) "    Too few cells in the dimension", jDim, ": "
-                write(error_unit, *) "    ", this%NtotalCell_dim(jDim), "<", NnearCell_dim(jDim)
+                write(error_unit, *) "    ", this%num_total_cell_dim(jDim), "<", num_near_cells_dim(jDim)
                 stop
             end if
             
@@ -226,8 +199,8 @@ contains
         integer, dimension(Ndim) :: cell_coord
     
         cell_coord(:) = int(xCol(:)/this%cell_size(:)) + 1
-        index_from_position = cell_coord(1) + this%NtotalCell_dim(1)*(cell_coord(2)-1) + &
-                             this%NtotalCell_dim(1)*this%NtotalCell_dim(2)*(cell_coord(3)-1)
+        index_from_position = cell_coord(1) + this%num_total_cell_dim(1)*(cell_coord(2)-1) + &
+                             this%num_total_cell_dim(1)*this%num_total_cell_dim(2)*(cell_coord(3)-1)
     
     end function Neighbour_Cells_index_from_position
     
@@ -314,31 +287,32 @@ contains
     
         class(Neighbour_Cells), intent(inout) :: this
     
-        integer :: iTotalCell, jTotalCell, kTotalCell, totalCell_index
-        integer :: iNearCell, jNearCell, kNearCell, nearCell_index
-        integer, dimension(Ndim) :: totalCell_coord, nearCell_coord
+        integer :: i1_total_cell, i2_total_cell, i3_total_cell, i_total_cell
+        integer :: i1_near_cell, i2_near_cell, i3_near_cell, i_near_cell
+        integer, dimension(Ndim) :: total_cell_coord, near_cell_coord
         
-        do kTotalCell = 1, this%NtotalCell_dim(3)
-        do jTotalCell = 1, this%NtotalCell_dim(2)
-        do iTotalCell = 1, this%NtotalCell_dim(1)
+        do i3_total_cell = 1, this%num_total_cell_dim(3)
+        do i2_total_cell = 1, this%num_total_cell_dim(2)
+        do i1_total_cell = 1, this%num_total_cell_dim(1)
             
-            totalCell_index = index_from_coord([iTotalCell, jTotalCell, kTotalCell], &
-                                               this%NtotalCell_dim)
+            i_total_cell = index_from_coord([i1_total_cell, i2_total_cell, i3_total_cell], &
+                                            this%num_total_cell_dim)
 
-            do kNearCell = 1, NnearCell_dim(3)
-            do jNearCell = 1, NnearCell_dim(2)
-            do iNearCell = 1, NnearCell_dim(1)
+            do i3_near_cell = 1, num_near_cells_dim(3)
+            do i2_near_cell = 1, num_near_cells_dim(2)
+            do i1_near_cell = 1, num_near_cells_dim(1)
             
-                nearCell_coord(:) = [iNearCell, jNearCell, kNearCell]
-                nearCell_index = index_from_coord(nearCell_coord, NnearCell_dim)
-                nearCell_coord(:) = nearCell_coord(:) - NnearCell_dim(:) + 1
-                    ! with respect to the center (?) [iTotalCell, jTotalCell, kTotalCell]
+                near_cell_coord(:) = [i1_near_cell, i2_near_cell, i3_near_cell]
+                i_near_cell = index_from_coord(near_cell_coord, num_near_cells_dim)
+                near_cell_coord(:) = near_cell_coord(:) - num_near_cells_dim(:) + 1
+                    ! symmetry: to the center
                 
-                totalCell_coord(:) = [iTotalCell, jTotalCell, kTotalCell] + nearCell_coord(:)
-                totalCell_coord(:) = coord_PBC(totalCell_coord, this%NtotalCell_dim)
+                total_cell_coord(:) = [i1_total_cell, i2_total_cell, i3_total_cell] + &
+                                      near_cell_coord(:)
+                total_cell_coord(:) = coord_PBC(total_cell_coord, this%num_total_cell_dim)
                 
-                this%near_among_total(nearCell_index, totalCell_index) = &
-                    index_from_coord(totalCell_coord, this%NtotalCell_dim)
+                this%near_among_total(i_near_cell, i_total_cell) = &
+                    index_from_coord(total_cell_coord, this%num_total_cell_dim)
                     
             end do
             end do

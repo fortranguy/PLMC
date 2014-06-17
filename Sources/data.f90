@@ -80,9 +80,10 @@ use data_box, only: Ndim
 
 implicit none
 
-    integer, dimension(Ndim), parameter :: NnearCell_dim = 3 !< Number of nearest neighbour cells
+    integer, dimension(Ndim), parameter :: num_near_cells_dim = 3 !< Number of nearest neighbour cells
                                                              !< in each direction
-    integer, parameter :: NnearCell = NnearCell_dim(1) * NnearCell_dim(2) * NnearCell_dim(3)
+    integer, parameter :: num_near_cells = num_near_cells_dim(1) * num_near_cells_dim(2) * &
+                                           num_near_cells_dim(3)
                           !< Total number of nearest neighbour cells, including itself
 
 end module data_neighbour_cells

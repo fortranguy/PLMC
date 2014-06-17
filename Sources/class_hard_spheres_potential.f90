@@ -2,7 +2,7 @@ module class_hard_spheres_potential
 
 use data_precisions, only: DP
 use data_box, only: Ndim
-use data_neighbour_cells, only: NnearCell
+use data_neighbour_cells, only: num_near_cells
 use json_module, only: json_file
 use module_types_micro, only: Box_Dimensions, Node, Particle_Index
 use module_physics_micro, only: PBC_distance
@@ -111,8 +111,7 @@ contains
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energ
     
-        integer :: iNearCell,  nearCell_index
-        integer :: total_i_cell
+        integer :: i_cell, i_total_cell, i_near_cell
         integer :: particule_number
         real(DP) :: r_ij
     
@@ -123,17 +122,17 @@ contains
         
         select type (this)
             type is (Hard_Spheres_Potential_Energy)
-                total_i_cell = particle%same_i_cell
+                i_total_cell = particle%same_i_cell
                 particule_number = particle%number
             type is (Between_Hard_Spheres_Potential_Energy)
-                total_i_cell = particle%between_i_cell
+                i_total_cell = particle%between_i_cell
                 particule_number = particle%other_number
         end select 
     
-        do iNearCell = 1, NnearCell
+        do i_near_cell = 1, num_near_cells
         
-            nearCell_index = this_cells%near_among_total(iNearCell, total_i_cell)
-            current => this_cells%beginCells(nearCell_index)%particle%next
+            i_cell = this_cells%near_among_total(i_near_cell, i_total_cell)
+            current => this_cells%beginCells(i_cell)%particle%next
             if (.not. associated(current%next)) cycle
             
             do
