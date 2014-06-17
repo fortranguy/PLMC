@@ -37,7 +37,6 @@ private
     
     contains
     
-        procedure :: neighbours => Between_Hard_Spheres_Potential_Energy_neighbours
         procedure :: total => Between_Hard_Spheres_Potential_Energy_total
         procedure, private :: solo => Between_Hard_Spheres_Potential_Energy_solo
     
@@ -113,16 +112,27 @@ contains
         real(DP), intent(out) :: energ
     
         integer :: iNearCell,  nearCell_index
+        integer :: total_i_cell
+        integer :: particule_number
         real(DP) :: r_ij
     
         type(Node), pointer :: current => null(), next => null()
         
         overlap = .false.
         energ = 0._DP
+        
+        select type (this)
+            type is (Hard_Spheres_Potential_Energy)
+                total_i_cell = particle%same_i_cell
+                particule_number = particle%number
+            type is (Between_Hard_Spheres_Potential_Energy)
+                total_i_cell = particle%between_i_cell
+                particule_number = particle%other_number
+        end select 
     
         do iNearCell = 1, NnearCell
         
-            nearCell_index = this_cells%near_among_total(iNearCell, particle%same_i_cell)
+            nearCell_index = this_cells%near_among_total(iNearCell, total_i_cell)
             current => this_cells%beginCells(nearCell_index)%particle%next
             if (.not. associated(current%next)) cycle
             
@@ -130,7 +140,7 @@ contains
             
                 next => current%next
             
-                if (current%number /= particle%number) then
+                if (current%number /= particule_number) then
                     r_ij = PBC_distance(Box_size, particle%position, &
                                         spheres%get_position(current%number))
                     if (r_ij < this%min_distance) then
@@ -148,54 +158,6 @@ contains
         end do
     
     end subroutine Hard_Spheres_Potential_Energy_neighbours
-    
-    subroutine Between_Hard_Spheres_Potential_Energy_neighbours(this, Box_size, spheres, &
-                                                                this_cells, particle, overlap, energ)
-        
-        class(Between_Hard_Spheres_Potential_Energy), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: Box_size
-        type(Hard_Spheres), intent(in) :: spheres
-        type(Neighbour_Cells), intent(in) :: this_cells
-        type(Particle_Index), intent(in) :: particle
-        logical, intent(out) :: overlap
-        real(DP), intent(out) :: energ
-    
-        integer :: iNearCell,  nearCell_index
-        real(DP) :: r
-    
-        type(Node), pointer :: current => null(), next => null()
-        
-        overlap = .false.
-        energ = 0._DP
-        
-        do iNearCell = 1, NnearCell
-        
-            nearCell_index = this_cells%near_among_total(iNearCell, particle%between_i_cell)
-            current => this_cells%beginCells(nearCell_index)%particle%next
-            if (.not. associated(current%next)) cycle
-            
-            do
-            
-                next => current%next
-
-                if (current%number /= particle%other_number) then
-                    r = PBC_distance(Box_size, particle%position, &
-                                               spheres%get_position(current%number))
-                    if (r < this%min_distance) then
-                        overlap = .true.
-                        return
-                    end if
-                end if
-                
-                if (.not. associated(next%next)) exit
-                
-                current => next
-            
-            end do
-            
-        end do
-    
-    end subroutine Between_Hard_Spheres_Potential_Energy_neighbours
     
     !> Total potential_energy energy: dummy
     
@@ -238,13 +200,10 @@ contains
         solo = 0._DP
         
         do j_particle = 1, spheres%get_num_particles()
-            if (j_particle /= particle%number) then
-            
+            if (j_particle /= particle%number) then            
                 position_j(:) = spheres%get_position(j_particle)
-                distance_ij = PBC_distance(Box_size, particle%position, position_j)
-                
-                solo = solo + this%pair(distance_ij)
-            
+                distance_ij = PBC_distance(Box_size, particle%position, position_j)                
+                solo = solo + this%pair(distance_ij)            
             end if            
         end do
     
