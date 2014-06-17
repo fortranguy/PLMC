@@ -38,7 +38,7 @@ implicit none
     type(json_file) :: json
     character(len=4096) :: data_name
     logical :: found
-    character(len=4096) :: file
+    character(len=4096) :: file_name
     integer :: length, time_unit
     logical :: take_snapshot
 
@@ -67,8 +67,8 @@ implicit none
     call json%get(data_name, delta, found)
     call test_data_found(data_name, found)
     
-    call argument_to_file(1, file, length)    
-    open(newunit=positions_unit, recl=4096, file=file(1:length), status='old', action='read')
+    call argument_to_file(1, file_name, length)    
+    open(newunit=positions_unit, recl=4096, file=file_name(1:length), status='old', action='read')
     
     read(positions_unit, *) name, num_particles, snap_factor
     write(output_unit, *) name, num_particles, snap_factor
@@ -86,8 +86,8 @@ implicit none
     
     if (with_orientations) then
     
-        call argument_to_file(2, file, length)        
-        open(newunit=orientations_unit, recl=4096, file=file(1:length), status='old', &
+        call argument_to_file(2, file_name, length)        
+        open(newunit=orientations_unit, recl=4096, file=file_name(1:length), status='old', &
         action='read')
         
         read(orientations_unit, *) name_bis, num_particles_bis, snap_factor_bis
