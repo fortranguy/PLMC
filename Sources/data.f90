@@ -1,6 +1,3 @@
-!> Base units
-!>  u_length, u_moment, u_permittivity
-
 !***************************************************************************************************
 !> \brief Precisions data :
 !> declaration of precisions parameters
