@@ -66,7 +66,8 @@ $(EXEC1): data.o \
           program_monte_carlo.o
 	$(FC) $^ -o $@ $(LDFLAGS)
 	
-$(EXEC2): data.o program_bunching.o
+$(EXEC2): data.o \
+          module_data.o module_post_processing_arguments.o program_bunching.o
 	$(FC) $^ -o $@ $(LDFLAGS)
 	
 $(EXEC3): data.o program_histogram.o

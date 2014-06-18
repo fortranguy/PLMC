@@ -9,7 +9,7 @@ use data_histogram, only: hist_dE
 
 implicit none
 
-    integer :: Nobs
+    integer :: num_observables
     integer :: i_step, iStepIn
     integer :: iObs, iDist
     real(DP), dimension(:, :), allocatable :: limit_values
@@ -34,12 +34,12 @@ implicit none
     end if
     
     open(newunit=obs_unit, recl=4096, file=file(1:length), status='old', action='read')
-    read(obs_unit, *) comment_symbol, Nobs
-    write(output_unit, *) "Nobs = ", Nobs
+    read(obs_unit, *) comment_symbol, num_observables
+    write(output_unit, *) "num_observables = ", num_observables
     
-    allocate(observables(Nobs, num_equilibrium_steps))
-    allocate(limit_values(2, Nobs))
-    allocate(Ndists(2, Nobs))
+    allocate(observables(num_observables, num_equilibrium_steps))
+    allocate(limit_values(2, num_observables))
+    allocate(Ndists(2, num_observables))
     
     write(output_unit, *) "num_equilibrium_steps = ", num_equilibrium_steps
     
@@ -47,7 +47,7 @@ implicit none
         read(obs_unit, *) iStepIn, observables(:, i_step)
     end do
     
-    do iObs = 1, Nobs
+    do iObs = 1, num_observables
         limit_values(1, iObs) = minval(observables(iObs, :))
         limit_values(2, iObs) = maxval(observables(iObs, :))
     end do
