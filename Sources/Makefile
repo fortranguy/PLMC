@@ -67,10 +67,13 @@ $(EXEC1): data.o \
 	$(FC) $^ -o $@ $(LDFLAGS)
 	
 $(EXEC2): data.o \
-          module_data.o module_post_processing_arguments.o program_bunching.o
+          module_data.o module_post_processing_arguments.o \
+          program_bunching.o
 	$(FC) $^ -o $@ $(LDFLAGS)
 	
-$(EXEC3): data.o program_histogram.o
+$(EXEC3): data.o \
+          module_data.o module_post_processing_arguments.o \
+          program_histogram.o
 	$(FC) $^ -o $@ $(LDFLAGS)
 	
 $(EXEC4): data.o \

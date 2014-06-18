@@ -39,6 +39,8 @@ implicit none
     call json%get(data_name, num_steps, found)
     call test_data_found(data_name, found)
     
+    call json%destroy()
+    
     call argument_to_file(1, file_name, length) 
     
     open(newunit=observables_unit, recl=4096, file=file_name(1:length), status='old', action='read')
@@ -101,7 +103,5 @@ implicit none
     deallocate(values_sum)
     
     close(observables_unit)
-    
-    call json%destroy()
 
 end program bunching

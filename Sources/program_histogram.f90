@@ -4,74 +4,87 @@ program histogram
 
 use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
 use data_precisions, only: DP
-use data_monte_carlo, only: num_equilibrium_steps
-use data_histogram, only: hist_dE
+use json_module, only: json_file, json_initialize
+use module_data, only: test_data_found
+use module_post_processing_arguments, only: argument_to_file
 
 implicit none
 
     integer :: num_observables
-    integer :: i_step, iStepIn
-    integer :: iObs, iDist
+    integer :: num_steps, i_step, i_step_in
+    integer :: i_obsersable, i_distribution
     real(DP), dimension(:, :), allocatable :: limit_values
-    integer, dimension(:, :), allocatable :: Ndists
-    real(DP), dimension(:), allocatable :: dist_funct_energy
-    real(DP) :: x_i
+    integer, dimension(:, :), allocatable :: num_distribution
+    real(DP), dimension(:), allocatable :: energy_distribution_function
+    real(DP) :: energy_i, energy_delta
     
-    integer :: obs_unit, histo_unit
+    integer :: observables_unit, histogram_unit
     character(len=1) :: comment_symbol
     real(DP), dimension(:, :), allocatable :: observables
     
-    character(len=4096) :: file
-    integer :: length, stat
-    logical :: exist
+    type(json_file) :: json
+    character(len=4096) :: data_name
+    logical :: found
+    character(len=4096) :: file_name
+    integer :: length
     
-    call get_command_argument(1, file, length, stat)
-    if (stat /= 0) error stop "error get_command_argument"
-    inquire(file=file(1:length), exist=exist)
-    if (.not.exist) then
-        write(error_unit, *) "missing file: ", file(1:length)
-        error stop
-    end if
+    call json_initialize()
+    call json%load_file(filename = "data.json")
     
-    open(newunit=obs_unit, recl=4096, file=file(1:length), status='old', action='read')
-    read(obs_unit, *) comment_symbol, num_observables
+    data_name = "Monte Carlo.number of equilibrium steps"
+    call json%get(data_name, num_steps, found)
+    call test_data_found(data_name, found)
+    
+    data_name = "Histogram.energy delta"
+    call json%get(data_name, energy_delta, found)
+    call test_data_found(data_name, found)
+    
+    call json%destroy()
+    
+    call argument_to_file(1, file_name, length)  
+    
+    open(newunit=observables_unit, recl=4096, file=file_name(1:length), status='old', action='read')
+    read(observables_unit, *) comment_symbol, num_observables
     write(output_unit, *) "num_observables = ", num_observables
     
-    allocate(observables(num_observables, num_equilibrium_steps))
+    allocate(observables(num_observables, num_steps))
     allocate(limit_values(2, num_observables))
-    allocate(Ndists(2, num_observables))
+    allocate(num_distribution(2, num_observables))
     
-    write(output_unit, *) "num_equilibrium_steps = ", num_equilibrium_steps
+    write(output_unit, *) "num_steps = ", num_steps
     
-    do i_step = 1, num_equilibrium_steps
-        read(obs_unit, *) iStepIn, observables(:, i_step)
+    do i_step = 1, num_steps
+        read(observables_unit, *) i_step_in, observables(:, i_step)
     end do
     
-    do iObs = 1, num_observables
-        limit_values(1, iObs) = minval(observables(iObs, :))
-        limit_values(2, iObs) = maxval(observables(iObs, :))
+    do i_obsersable = 1, num_observables
+        limit_values(1, i_obsersable) = minval(observables(i_obsersable, :))
+        limit_values(2, i_obsersable) = maxval(observables(i_obsersable, :))
     end do
-    Ndists(:, 1) = int(limit_values(:, 1)/hist_dE)
-    allocate(dist_funct_energy(Ndists(1, 1): Ndists(2, 1)))
+    num_distribution(:, 1) = int(limit_values(:, 1)/energy_delta)
+    allocate(energy_distribution_function(num_distribution(1, 1): num_distribution(2, 1)))
     
-    dist_funct_energy(:) = 0._DP
-    do i_step = 1, num_equilibrium_steps
-        iDist = int(observables(1, i_step)/hist_dE)
-        dist_funct_energy(iDist) = dist_funct_energy(iDist) + 1._DP
+    energy_distribution_function(:) = 0._DP
+    do i_step = 1, num_steps
+        i_distribution = int(observables(1, i_step)/energy_delta)
+        energy_distribution_function(i_distribution) = &
+            energy_distribution_function(i_distribution) + 1._DP
     end do
-    dist_funct_energy(:) = dist_funct_energy(:) / real(num_equilibrium_steps, DP) / hist_dE
+    energy_distribution_function(:) = energy_distribution_function(:) /  real(num_steps, DP) / &
+                                      energy_delta
     
-    open(newunit=histo_unit, recl=4096, file=file(1:length-4)//"_histo.out", action='write')
-    do iDist = Ndists(1, 1), Ndists(2, 1)
-        x_i = (real(iDist, DP)+0.5_DP) * hist_dE
-        write(histo_unit, *) x_i, dist_funct_energy(iDist)
+    open(newunit=histogram_unit, recl=4096, file=file_name(1:length-4)//"_energy_histogram.out", &
+         action='write')
+    do i_distribution = num_distribution(1, 1), num_distribution(2, 1)
+        energy_i = (real(i_distribution, DP)+0.5_DP) * energy_delta
+        write(histogram_unit, *) energy_i, energy_distribution_function(i_distribution)
     end do
     
-    close(histo_unit)
-    close(obs_unit)
+    close(histogram_unit)
+    close(observables_unit)
     
-    deallocate(dist_funct_energy)
-    deallocate(Ndists)
+    deallocate(energy_distribution_function)
+    deallocate(num_distribution)
     deallocate(limit_values)
     deallocate(observables)
 

@@ -67,6 +67,8 @@ implicit none
     call json%get(data_name, delta, found)
     call test_data_found(data_name, found)
     
+    call json%destroy()
+    
     call argument_to_file(1, file_name, length)    
     open(newunit=positions_unit, recl=4096, file=file_name(1:length), status='old', action='read')
     
@@ -178,7 +180,6 @@ implicit none
     deallocate(distribution_function)
     deallocate(distribution_sum)
     
-    deallocate(Box_size)    
-    call json%destroy()
+    deallocate(Box_size)
 
 end program distribution
