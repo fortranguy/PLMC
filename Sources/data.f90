@@ -47,26 +47,7 @@ implicit none
     
     integer, parameter :: num_dimensions = 3
     
-    real(DP), dimension(num_dimensions), parameter :: Box_size = 25._DP
-    integer, dimension(num_dimensions), parameter :: Box_wave = 8
-    
 end module data_box
-!***************************************************************************************************
-    
-!***************************************************************************************************
-!> \brief Monte-Carlo data :
-!> declaration of the Monte-Carlo parameters
-!***************************************************************************************************
-module data_monte_carlo
-
-use data_precisions, only: DP
-use data_box, only: num_dimensions
-
-implicit none
-
-    integer, parameter :: num_equilibrium_steps = 2**16
-    
-end module data_monte_carlo
 !***************************************************************************************************
 
 !***************************************************************************************************
@@ -80,26 +61,12 @@ use data_box, only: num_dimensions
 
 implicit none
 
-    integer, dimension(num_dimensions), parameter :: num_near_cells_dim = 3 !< Number of nearest neighbour cells
-                                                             !< in each direction
+    integer, dimension(num_dimensions), parameter :: num_near_cells_dim = 3 !< Number of nearest
+                                                                            !< neighbour cells
+                                                                            !< in each direction
     integer, parameter :: num_near_cells = num_near_cells_dim(1) * num_near_cells_dim(2) * &
-                                           num_near_cells_dim(3)
-                          !< Total number of nearest neighbour cells, including itself
+                                           num_near_cells_dim(3) !< Total number of nearest neighbour
+                                                                 !< cells, including itself
 
 end module data_neighbour_cells
-!***************************************************************************************************
-
-!***************************************************************************************************
-!> \brief Histogram data :
-!> declaration of the histogram function parameters
-!***************************************************************************************************
-module data_histogram
-
-use data_precisions, only: DP
-
-implicit none
-
-    real(DP), parameter :: hist_dE = 1._DP
-
-end module data_histogram
 !***************************************************************************************************
