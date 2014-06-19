@@ -8,7 +8,7 @@ use json_module, only: json_file, json_initialize
 use module_data, only: test_data_found
 use data_box, only: num_dimensions
 use module_physics_micro, only: sphere_volume, PBC_distance
-use module_arguments, only: argument_to_file
+use module_arguments, only: arg_to_file
 !$ use omp_lib
 
 implicit none
@@ -69,7 +69,7 @@ implicit none
     
     call json%destroy()
     
-    call argument_to_file(1, file_name, length)    
+    call arg_to_file(1, file_name, length)    
     open(newunit=positions_unit, recl=4096, file=file_name(1:length), status='old', action='read')
     
     read(positions_unit, *) name, num_particles, snap_factor
@@ -88,7 +88,7 @@ implicit none
     
     if (with_orientations) then
     
-        call argument_to_file(2, file_name, length)        
+        call arg_to_file(2, file_name, length)        
         open(newunit=orientations_unit, recl=4096, file=file_name(1:length), status='old', &
         action='read')
         

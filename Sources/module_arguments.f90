@@ -3,11 +3,11 @@ module module_arguments
 use, intrinsic :: iso_fortran_env, only: error_unit
 
 private
-public argument_to_file
+public arg_to_file
 
 contains
 
-    subroutine argument_to_file(arg_num, file_name, length)
+    subroutine arg_to_file(arg_num, file_name, length)
         
         integer, intent(in) :: arg_num
         character(len=4096), intent(inout) :: file_name
@@ -24,6 +24,6 @@ contains
             error stop
         end if
         
-    end subroutine argument_to_file
+    end subroutine arg_to_file
 
 end module module_arguments

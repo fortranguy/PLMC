@@ -4,7 +4,7 @@ module module_arguments_monte_carlo
 
 use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
 use module_types_micro, only: Argument_Random, Argument_Initial, Monte_Carlo_Arguments
-use module_arguments, 
+use module_arguments, only: arg_to_file
 
 implicit none
 
@@ -34,33 +34,26 @@ contains
     
     end subroutine write_help
 
-    subroutine read_init_files(iArg, arg_init)
+    subroutine read_init_files(i_arg, arg_init)
 
-        integer, intent(inout) :: iArg
+        integer, intent(inout) :: i_arg
         type(Argument_Initial), intent(inout) :: arg_init
 
         character(len=4096) :: file
-        integer :: iFile, length, status
-        logical :: exist
+        integer :: i_file, length
 
-        do iFile = 1, 3
-            iArg = iArg + 1
-            call get_command_argument(iArg, file, length, status)
-            if (status /= 0) error stop "no file"
-            inquire(file=file(1:length), exist=exist)
-            if (.not.exist) then
-                write(error_unit, *) "missing file: ", file(1:length)
-                error stop
-            end if
-            arg_init%files(iFile) = file
-            arg_init%length(iFile) = length
+        do i_file = 1, 3
+            i_arg = i_arg + 1
+            call arg_to_file(i_arg, file, length)
+            arg_init%files(i_file) = file
+            arg_init%length(i_file) = length
         end do
         
     end subroutine read_init_files
 
-    subroutine read_seed_put(iArg, arg_rand)
+    subroutine read_seed_put(i_arg, arg_rand)
 
-        integer, intent(inout) :: iArg
+        integer, intent(inout) :: i_arg
         type(Argument_Random), intent(inout) :: arg_rand
         
         character(len=4096) :: argument
@@ -68,8 +61,8 @@ contains
         integer :: seed_size, arg_rand_size
         integer :: iSeed, arg_rand_i
         
-        iArg = iArg + 1
-        call get_command_argument(iArg, argument, length, status)
+        i_arg = i_arg + 1
+        call get_command_argument(i_arg, argument, length, status)
         if (status /= 0) error stop "Error: read_seed_put"
         read(argument(1:length), '(i3)') arg_rand_size ! limits ?
 
@@ -79,8 +72,8 @@ contains
         allocate(arg_rand%seed(seed_size))
 
         do iSeed = 1, seed_size
-            iArg = iArg + 1
-            call get_command_argument(iArg, argument, length, status)
+            i_arg = i_arg + 1
+            call get_command_argument(i_arg, argument, length, status)
             if (status /= 0) error stop "Error: read_seed_put: component"
             read(argument(1:length), '(i11)') arg_rand_i ! limits ?
             arg_rand%seed(iSeed) = arg_rand_i
@@ -95,7 +88,7 @@ contains
         type(Monte_Carlo_Arguments), intent(out) :: args
 
         character(len=4096) :: argument, sub_argument
-        integer :: iArg, length, status
+        integer :: i_arg, length, status
         logical :: rand_redefined, init_redefined
 
         args%random%choice = 'v'
@@ -104,10 +97,10 @@ contains
         rand_redefined = .false.
         init_redefined = .false.
 
-        iArg = 1
-        do while(iArg <= command_argument_count())
+        i_arg = 1
+        do while(i_arg <= command_argument_count())
 
-            call get_command_argument(iArg, argument, length, status)
+            call get_command_argument(i_arg, argument, length, status)
             if (status /= 0) error stop "Error: read_arguments"
 
             select case (argument)
@@ -118,14 +111,14 @@ contains
 
                 case ("-i", "--initial")
                     if (init_redefined) error stop "Error: initial configuration already defined."
-                    iArg = iArg + 1
-                    call get_command_argument(iArg, sub_argument, length, status)
+                    i_arg = i_arg + 1
+                    call get_command_argument(i_arg, sub_argument, length, status)
                     if (status /= 0) error stop "Enter initial configuration, cf. help."
                     select case (sub_argument)
                         case ("r", "random")
                         case ("f", "files")
                             args%initial%choice = 'f'
-                            call read_init_files(iArg, args%initial)
+                            call read_init_files(i_arg, args%initial)
                         case default
                             call write_help()
                             error stop
@@ -134,8 +127,8 @@ contains
 
                 case ("-r", "--random")
                     if (rand_redefined) error stop "Error: random seed already defined."
-                    iArg = iArg + 1
-                    call get_command_argument(iArg, sub_argument, length, status)
+                    i_arg = i_arg + 1
+                    call get_command_argument(i_arg, sub_argument, length, status)
                     if (status /= 0) error stop "Enter random seed choice, cf. help."
                     select case (sub_argument)
                         case ("v", "variable")
@@ -143,7 +136,7 @@ contains
                             args%random%choice = 'f'
                         case ("p", "put")
                             args%random%choice = 'p'
-                            call read_seed_put(iArg, args%random)
+                            call read_seed_put(i_arg, args%random)
                         case default
                             call write_help()
                             error stop
@@ -156,7 +149,7 @@ contains
 
             end select
 
-            iArg = iArg + 1
+            i_arg = i_arg + 1
 
         end do
 

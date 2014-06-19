@@ -6,7 +6,7 @@ use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
 use data_precisions, only: DP
 use json_module, only: json_file, json_initialize
 use module_data, only: test_data_found
-use module_arguments, only: argument_to_file
+use module_arguments, only: arg_to_file
 
 implicit none
 
@@ -41,8 +41,7 @@ implicit none
     
     call json%destroy()
     
-    call argument_to_file(1, file_name, length) 
-    
+    call arg_to_file(1, file_name, length)
     open(newunit=observables_unit, recl=4096, file=file_name(1:length), status='old', action='read')
     read(observables_unit, *) comment_symbol, num_observables
     write(output_unit, *) "num_observables = ", num_observables

@@ -62,7 +62,7 @@ mc_cano_bulk: data_precisions.o data_constants.o data_box.o data_neighbour_cells
               module_types_macro.o \
               class_hard_spheres_observables.o class_hard_spheres_units.o \
               module_physics_macro.o module_algorithms.o module_write.o \
-              class_physical_system.o module_arguments_monte_carlo.o \
+              class_physical_system.o module_arguments.o module_arguments_monte_carlo.o \
               program_monte_carlo.o
 	$(FC) $^ -o $@ $(LDFLAGS)
 	
