@@ -7,7 +7,7 @@ use data_precisions, only: DP
 use json_module, only: json_file
 use module_data, only: test_data_found
 use module_types_micro, only: Box_Dimensions, Monte_Carlo_Arguments
-use module_physics_micro, only: NwaveVectors
+use module_physics_micro, only: num_wave_vectors
 use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres, Between_Hard_Spheres
 use class_hard_spheres_potential, only: Between_Hard_Spheres_Potential_Energy
 use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
@@ -377,7 +377,7 @@ contains
         write(report_unit ,*) "    Box_size(:) = ", this%Box%size(:)
         write(report_unit ,*) "    Volume = ", product(this%Box%size)
         write(report_unit ,*) "    Box_wave(:) = ", this%Box%wave(:)
-        write(report_unit ,*) "    NwaveVectors =", NwaveVectors(this%Box%wave)
+        write(report_unit ,*) "    num_wave_vectors =", num_wave_vectors(this%Box%wave)
         write(report_unit ,*) "    Temperature = ", this%Box%temperature
         write(report_unit ,*) "    num_particles = ", this%num_particles        
         

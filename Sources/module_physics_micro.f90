@@ -11,7 +11,7 @@ implicit none
 private
 public set_discrete_length, sphere_volume, PBC_vector, PBC_distance, random_surface, markov_surface, &
        ewald_real_B, ewald_real_C, &
-       NwaveVectors, Box_wave1_sym, Box_wave2_sym, fourier_i, exchange_sign, &
+       num_wave_vectors, Box_wave1_sym, Box_wave2_sym, fourier_i, exchange_sign, &
        index_from_coord, coord_PBC, &
        potential_energy_lennardJones, potential_energy_yukawa
 
@@ -181,59 +181,59 @@ contains
     
     !> Number of wave vectors
     
-    pure function NwaveVectors(Kmax)
+    pure function num_wave_vectors(Box_wave)
     
-        integer, dimension(:), intent(in) :: Kmax
-        integer :: NwaveVectors
+        integer, dimension(:), intent(in) :: Box_wave
+        integer :: num_wave_vectors
         
         integer :: i_dim
         
-        NwaveVectors = 1
+        num_wave_vectors = 1
         do i_dim = 1, num_dimensions
-            NwaveVectors = NwaveVectors * (2*Kmax(i_dim) + 1)
+            num_wave_vectors = num_wave_vectors * (2*Box_wave(i_dim) + 1)
         end do
     
-    end function NwaveVectors
+    end function num_wave_vectors
 
-    !> Symmetry: half wave vectors in do loop: Kmax1
+    !> Symmetry: half wave vectors in do loop: Box_wave1
 
-    pure function Box_wave1_sym(Kmax, ky, kz)
+    pure function Box_wave1_sym(Box_wave, ky, kz)
 
-        integer, dimension(:), intent(in) :: Kmax
+        integer, dimension(:), intent(in) :: Box_wave
         integer, intent(in) :: ky, kz
         integer :: Box_wave1_sym
 
         if (ky == 0 .and. kz == 0) then
             Box_wave1_sym = 0
         else
-            Box_wave1_sym = Kmax(1)
+            Box_wave1_sym = Box_wave(1)
         end if
 
     end function Box_wave1_sym
 
-    !> Symmetry: half wave vectors in do loop: Kmax2
+    !> Symmetry: half wave vectors in do loop: Box_wave2
 
-    pure function Box_wave2_sym(Kmax, kz)
+    pure function Box_wave2_sym(Box_wave, kz)
     
-        integer, dimension(:), intent(in) :: Kmax
+        integer, dimension(:), intent(in) :: Box_wave
         integer, intent(in) :: kz
         integer :: Box_wave2_sym
 
         if (kz == 0) then
             Box_wave2_sym = 0
         else
-            Box_wave2_sym = Kmax(2)
+            Box_wave2_sym = Box_wave(2)
         end if
 
     end function Box_wave2_sym
     
     !> Fourier coefficients (bases)
     
-    pure subroutine fourier_i(Kmax_i, xColOverL_i, exp_Ikx_i)
+    pure subroutine fourier_i(Box_wave_i, xColOverL_i, exp_Ikx_i)
     
-        integer, intent(in) :: Kmax_i
+        integer, intent(in) :: Box_wave_i
         real(DP), intent(in) :: xColOverL_i
-        complex(DP), dimension(-Kmax_i:Kmax_i), intent(out) :: exp_Ikx_i
+        complex(DP), dimension(-Box_wave_i:Box_wave_i), intent(out) :: exp_Ikx_i
         
         integer :: kx_i
         
@@ -241,7 +241,7 @@ contains
         exp_Ikx_i(1) = cmplx(cos(xColOverL_i), sin(xColOverL_i), DP)
         exp_Ikx_i(-1) = conjg(exp_Ikx_i(1))
         
-        do kx_i = 2, Kmax_i
+        do kx_i = 2, Box_wave_i
             exp_Ikx_i(kx_i) = exp_Ikx_i(kx_i-1) * exp_Ikx_i(1)
             exp_Ikx_i(-kx_i) = conjg(exp_Ikx_i(kx_i))
         end do
