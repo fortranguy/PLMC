@@ -100,7 +100,7 @@ contains
         write(report_unit, *) "Displacement: "
         write(report_unit, *) "    delta(:) = ", this%delta(:)
         write(report_unit, *) "    rejection relative difference = ", &
-                                    abs(reject-this%rejectFix)/this%rejectFix
+                                   abs(reject-this%rejectFix)/this%rejectFix
     
     end subroutine Small_Move_set_delta
 
