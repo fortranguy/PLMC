@@ -59,7 +59,7 @@ contains
         character(len=4096) :: argument
         integer :: length, status
         integer :: seed_size, arg_rand_size
-        integer :: iSeed, arg_rand_i
+        integer :: i_seed, arg_rand_i
         
         i_arg = i_arg + 1
         call get_command_argument(i_arg, argument, length, status)
@@ -71,12 +71,12 @@ contains
 
         allocate(arg_rand%seed(seed_size))
 
-        do iSeed = 1, seed_size
+        do i_seed = 1, seed_size
             i_arg = i_arg + 1
             call get_command_argument(i_arg, argument, length, status)
             if (status /= 0) error stop "Error: read_seed_put: component"
             read(argument(1:length), '(i11)') arg_rand_i ! limits ?
-            arg_rand%seed(iSeed) = arg_rand_i
+            arg_rand%seed(i_seed) = arg_rand_i
         end do
 
     end subroutine read_seed_put

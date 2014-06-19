@@ -157,7 +157,7 @@ contains
         class(Hard_Spheres), intent(in) :: other_spheres
         class(Between_Hard_Spheres_Potential_Energy), intent(in) :: between_spheres_potential
         
-        integer :: iWidom
+        integer :: i_widom_particule
         real(DP) :: widTestSum
         real(DP), dimension(num_dimensions) :: xRand
         type(Particle_Index) :: test
@@ -168,7 +168,7 @@ contains
         widTestSum = 0._DP
         test%number = 0
         
-        do iWidom = 1, this_spheres%get_widom_num_particles()
+        do i_widom_particule = 1, this_spheres%get_widom_num_particles()
             
             call random_number(xRand)
             test%position(:) = Box%size(:) * xRand(:)

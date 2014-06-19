@@ -552,20 +552,20 @@ contains
     subroutine Physical_System_random_changes(this)    
         class(Physical_System), intent(inout) :: this
         
-        integer :: iChange, iChangeRand, iColRand
+        integer :: i_change, i_change_rand, i_particule_rand
         real(DP) :: rand
         
-        MC_Change: do iChange = 1, this%num_changes
+        MC_Change: do i_change = 1, this%num_changes
         
             ! Randomly choosing the change
             call random_number(rand)
-            iChangeRand = int(rand*real(this%num_changes, DP)) + 1
+            i_change_rand = int(rand*real(this%num_changes, DP)) + 1
             
-            if (iChangeRand <= this%num_moves) then
+            if (i_change_rand <= this%num_moves) then
                 ! Randomly choosing the type
                 call random_number(rand)
-                iColRand = int(rand*real(this%num_particles, DP)) + 1
-                if (iColRand <= this%type1_spheres%get_num_particles()) then                    
+                i_particule_rand = int(rand*real(this%num_particles, DP)) + 1
+                if (i_particule_rand <= this%type1_spheres%get_num_particles()) then                    
                     call move(this%Box, &
                               this%type1_spheres, this%type1_macro, this%type1_observables, &
                               this%type2_spheres, this%type2_macro%between_cells, &
@@ -578,7 +578,7 @@ contains
                               this%between_spheres_potential, &
                               this%between_spheres_observables%potential_energy)
                 end if
-            else if (iChangeRand <= this%num_moves + this%num_switches) then
+            else if (i_change_rand <= this%num_moves + this%num_switches) then
                 call switch(this%Box, &
                             this%type1_spheres, this%type1_macro, this%type1_observables, &
                             this%type2_spheres, this%type2_macro, this%type2_observables, &
@@ -707,7 +707,8 @@ contains
     
         call this%type1_observables%write(i_step, this%type1_units%observables_equilibrium)
         call this%type2_observables%write(i_step, this%type2_units%observables_equilibrium)
-        call this%between_spheres_observables%write(i_step, this%between_spheres_units%observables_equilibrium)
+        call this%between_spheres_observables%write(i_step, &
+                                                    this%between_spheres_units%observables_equilibrium)
         
         write(this%observables_equilibrium_unit, *) i_step, &
             this%type1_observables%potential_energy + &

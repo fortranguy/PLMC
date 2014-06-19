@@ -140,14 +140,15 @@ contains
         integer, intent(in) :: num_equilibrium_steps
         integer, intent(in) :: report_unit
         
-        real(DP) :: potChiEx
+        real(DP) :: chemical_potential_excess
             
         write(report_unit, *) "Results: "
         
         write(report_unit, *) "    average energy = ", this%potential_energy_sum / &
                                                        real(num_equilibrium_steps, DP)
-        potChiEx = -temperature*log(this%sum_inv_activity/real(num_equilibrium_steps, DP))
-        write(report_unit, *) "    average excess chemical potential = ", potChiEx
+        chemical_potential_excess = -temperature * log(this%sum_inv_activity / &
+                                    real(num_equilibrium_steps, DP))
+        write(report_unit, *) "    average excess chemical potential = ", chemical_potential_excess
         write(report_unit, *) "    move rejection rate = ", &
                                    this%move_sum_rejection/real(num_equilibrium_steps, DP)
         
