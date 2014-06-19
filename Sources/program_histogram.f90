@@ -2,7 +2,7 @@
 
 program histogram
 
-use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
+use, intrinsic :: iso_fortran_env, only: output_unit
 use data_precisions, only: DP
 use json_module, only: json_file, json_initialize
 use module_data, only: test_data_found

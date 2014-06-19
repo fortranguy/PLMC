@@ -66,19 +66,19 @@ mc_cano_bulk: data_precisions.o data_constants.o data_box.o data_neighbour_cells
               program_monte_carlo.o
 	$(FC) $^ -o $@ $(LDFLAGS)
 	
-mc_bunching: data.o \
-          module_data.o module_arguments.o \
-          program_bunching.o
+mc_bunching: data_precisions.o \
+             module_data.o module_arguments.o \
+             program_bunching.o
 	$(FC) $^ -o $@ $(LDFLAGS)
 	
-mc_histogram: data.o \
-          module_data.o module_arguments.o \
-          program_histogram.o
+mc_histogram: data_precisions.o \
+              module_data.o module_arguments.o \
+              program_histogram.o
 	$(FC) $^ -o $@ $(LDFLAGS)
 	
-mc_distribution: data.o \
-          module_data.o module_physics_micro.o module_arguments.o \
-          program_distribution.o
+mc_distribution: data_precisions.o data_constants.o data_box.o \
+                 module_data.o module_physics_micro.o module_arguments.o \
+                 program_distribution.o
 	$(FC) $^ -o $@ $(LDFLAGS)
 	
 # ------------------------------------------------------------------------
