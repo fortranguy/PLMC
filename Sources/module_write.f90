@@ -5,7 +5,7 @@ module module_write
 use data_precisions, only: DP, real_zero, io_tiny, consist_tiny
 use data_constants, only: PI, sigma3d
 use data_box, only: num_dimensions
-use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres
+use class_hard_spheres, only: Hard_Spheres
 
 implicit none
 
@@ -41,6 +41,8 @@ contains
         write(report_unit ,*) "    Real zero = ", real_zero
         write(report_unit ,*) "    I/O tiny = ", io_tiny
         write(report_unit ,*) "    Energy consistency tiny = ", consist_tiny
+        
+        write(report_unit ,*) "    Number of dimensions = ", num_dimensions
 
         write(report_unit ,*) "    Pi = ", PI
         write(report_unit ,*) "    Sigma3d = ", sigma3d

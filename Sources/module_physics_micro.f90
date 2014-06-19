@@ -6,7 +6,6 @@ use, intrinsic :: iso_fortran_env, only: error_unit
 use data_precisions, only: DP
 use data_constants, only: PI, sigma3d
 use data_box, only: num_dimensions
-!$ use omp_lib
 
 implicit none
 private

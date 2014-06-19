@@ -1,4 +1,4 @@
-module module_post_processing_arguments
+module module_arguments
 
 use, intrinsic :: iso_fortran_env, only: error_unit
 
@@ -26,4 +26,4 @@ contains
         
     end subroutine argument_to_file
 
-end module module_post_processing_arguments
+end module module_arguments

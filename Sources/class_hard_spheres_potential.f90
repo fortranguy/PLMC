@@ -4,11 +4,11 @@ use data_precisions, only: DP
 use data_box, only: num_dimensions
 use data_neighbour_cells, only: num_near_cells
 use json_module, only: json_file
-use module_types_micro, only: Box_Dimensions, Node, Particle_Index
-use module_physics_micro, only: PBC_distance
 use module_data, only: test_data_found
-use class_neighbour_cells, only: Neighbour_Cells
+use module_types_micro, only: Node, Particle_Index
+use module_physics_micro, only: PBC_distance
 use class_hard_spheres, only: Hard_Spheres
+use class_neighbour_cells, only: Neighbour_Cells
 
 implicit none
 

@@ -4,12 +4,10 @@ use data_precisions, only: DP
 use data_box, only: num_dimensions
 use module_types_micro, only: Box_Dimensions, Particle_Index, Particle_Energy
 use module_physics_micro, only: random_surface, markov_surface
-use class_neighbour_cells, only: Neighbour_Cells
 use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres
-use class_small_move, only: Small_Move
-use class_small_rotation, only: Small_Rotation
-use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
+use class_neighbour_cells, only: Neighbour_Cells
 use class_hard_spheres_potential, only: Between_Hard_Spheres_Potential_Energy
+use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
 use class_hard_spheres_observables, only: Hard_Spheres_Observables, Dipolar_Hard_Spheres_Observables
 
 implicit none

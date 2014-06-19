@@ -3,8 +3,6 @@ module class_ewald_summation_reci
 use data_precisions, only: DP
 use data_constants, only: PI
 use data_box, only: num_dimensions
-use json_module, only: json_file
-use module_data, only: test_data_found
 use module_types_micro, only: Box_Dimensions, Particle_Index
 use module_physics_micro, only: fourier_i, Box_wave1_sym, Box_wave2_sym, exchange_sign
 use class_hard_spheres, only: Dipolar_Hard_Spheres

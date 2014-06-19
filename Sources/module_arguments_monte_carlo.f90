@@ -1,9 +1,10 @@
 !> \brief Subroutines for the main program
 
-module module_monte_carlo_arguments
+module module_arguments_monte_carlo
 
 use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
-use module_types_micro, only: argument_random, Argument_Initial, Monte_Carlo_Arguments
+use module_types_micro, only: Argument_Random, Argument_Initial, Monte_Carlo_Arguments
+use module_arguments, 
 
 implicit none
 
@@ -60,7 +61,7 @@ contains
     subroutine read_seed_put(iArg, arg_rand)
 
         integer, intent(inout) :: iArg
-        type(argument_random), intent(inout) :: arg_rand
+        type(Argument_Random), intent(inout) :: arg_rand
         
         character(len=4096) :: argument
         integer :: length, status
@@ -161,4 +162,4 @@ contains
 
     end subroutine read_arguments
 
-end module module_monte_carlo_arguments
+end module module_arguments_monte_carlo

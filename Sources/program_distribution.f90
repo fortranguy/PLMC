@@ -8,7 +8,7 @@ use json_module, only: json_file, json_initialize
 use module_data, only: test_data_found
 use data_box, only: num_dimensions
 use module_physics_micro, only: sphere_volume, PBC_distance
-use module_post_processing_arguments, only: argument_to_file
+use module_arguments, only: argument_to_file
 !$ use omp_lib
 
 implicit none

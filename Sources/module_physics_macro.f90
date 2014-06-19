@@ -6,15 +6,13 @@ use, intrinsic :: iso_fortran_env, only: output_unit, error_unit, iostat_end
 use data_precisions, only: DP, real_zero, io_tiny, consist_tiny
 use data_box, only: num_dimensions
 use json_module, only: json_file
+use module_data, only: test_data_found
 use module_types_micro, only: Box_Dimensions, Argument_Random, Argument_Initial
 use module_physics_micro, only: PBC_distance, random_surface
-use module_data, only: test_data_found
 use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres
-use class_neighbour_cells, only: Neighbour_Cells
-use class_hard_spheres_potential, only: Hard_Spheres_Potential_Energy, &
-                                        Between_Hard_Spheres_Potential_Energy
 use class_small_move, only: Small_Move
 use class_small_rotation, only: Small_Rotation
+use class_hard_spheres_potential, only: Between_Hard_Spheres_Potential_Energy
 use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
 use class_hard_spheres_observables, only: Hard_Spheres_Observables, Dipolar_Hard_Spheres_Observables
 use class_hard_spheres_units, only: Hard_Spheres_Units, Dipolar_Hard_Spheres_Units

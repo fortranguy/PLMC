@@ -5,8 +5,8 @@ program monte_carlo_canonical_bulk
 use, intrinsic :: iso_fortran_env, only: output_unit
 use json_module, only: json_file, json_initialize
 use module_types_micro, only: Monte_Carlo_Arguments
-use module_monte_carlo_arguments, only: read_arguments
 use class_physical_system, only: Physical_System
+use module_arguments_monte_carlo, only: read_arguments
 
 implicit none
     

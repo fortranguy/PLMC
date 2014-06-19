@@ -6,7 +6,7 @@ use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
 use data_precisions, only: DP
 use json_module, only: json_file, json_initialize
 use module_data, only: test_data_found
-use module_post_processing_arguments, only: argument_to_file
+use module_arguments, only: argument_to_file
 
 implicit none
 

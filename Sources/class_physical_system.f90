@@ -5,21 +5,18 @@ module class_physical_system
 use, intrinsic :: iso_fortran_env, only: output_unit
 use data_precisions, only: DP
 use json_module, only: json_file
+use module_data, only: test_data_found
 use module_types_micro, only: Box_Dimensions, Monte_Carlo_Arguments
 use module_physics_micro, only: NwaveVectors
-use module_data, only: test_data_found
 use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres, Between_Hard_Spheres
-use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
 use class_hard_spheres_potential, only: Between_Hard_Spheres_Potential_Energy
+use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
 use class_hard_spheres_observables, only: Hard_Spheres_Observables, Dipolar_Hard_Spheres_Observables, &
                                           Between_Hard_Spheres_Observables
 use class_hard_spheres_units, only: Hard_Spheres_Units, Dipolar_Hard_Spheres_Units, &
                                     Between_Hard_Spheres_Units
-use module_monte_carlo_arguments, only: read_arguments
 use module_physics_macro, only: init_random_seed, set_initial_configuration, &
-                                init_spheres, init_cells, &
-                                set_ewald, &
-                                total_energy, &
+                                init_spheres, init_cells, set_ewald, total_energy, &
                                 final_spheres, &
                                 init_between_spheres_potential, final_between_spheres_potential, &
                                 adapt_move, adapt_rotation, test_consist
