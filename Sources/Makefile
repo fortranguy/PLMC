@@ -30,8 +30,8 @@ else
     endif
 endif
 
-FFLAGS += -I${HOME}/json-fortran/include
-LDFLAGS += -L${HOME}/json-fortran/lib -ljson
+FFLAGS += -I${HOME}/usr/json-fortran_intel/include
+LDFLAGS += -L${HOME}/usr/json-fortran_intel/lib -ljsonfortran
 
 # Default
 compiler = ifort
