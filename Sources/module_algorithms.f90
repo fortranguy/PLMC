@@ -493,8 +493,8 @@ contains
         new%orientation(:) = old%orientation(:)
         call markov_surface(new%orientation, this_macro%rotation%get_delta())
         
-        energy_real_delta = this_macro%ewald_real%solo(Box%size, this_spheres, old) - &
-                            this_macro%ewald_real%solo(Box%size, this_spheres, new)
+        energy_real_delta = this_macro%ewald_real%solo(Box%size, this_spheres, new) - &
+                            this_macro%ewald_real%solo(Box%size, this_spheres, old)
         
         energy_self_delta = this_macro%ewald_self%solo(new%orientation) - &
                             this_macro%ewald_self%solo(old%orientation)
