@@ -121,15 +121,15 @@ contains
         real(DP), intent(in) :: between_spheres_min_distance
 
         integer :: i_particle, i_particle_test
-        real(DP), dimension(num_dimensions) :: xRand, position, position_test
+        real(DP), dimension(num_dimensions) :: random_position, position, position_test
         real(DP) :: rTest
         
         ! Type 1
         do i_particle = 1, spheres1%get_num_particles()
         
 7101        continue
-            call random_number(xRand)
-            call spheres1%set_position(i_particle, xRand*Box_size)
+            call random_number(random_position)
+            call spheres1%set_position(i_particle, random_position*Box_size)
             
             position(:) = spheres1%get_position(i_particle)
             do i_particle_test = 1, i_particle-1
@@ -146,8 +146,8 @@ contains
         do i_particle = 1, spheres2%get_num_particles()
         
 7102        continue
-            call random_number(xRand)
-            call spheres2%set_position(i_particle, xRand*Box_size)
+            call random_number(random_position)
+            call spheres2%set_position(i_particle, random_position*Box_size)
             
             position(:) = spheres2%get_position(i_particle)
             do i_particle_test = 1, spheres1%get_num_particles()

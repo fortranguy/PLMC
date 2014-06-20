@@ -32,15 +32,15 @@ contains
         real(DP), intent(inout) :: mix_potential_energy
         
         real(DP) :: random
-        real(DP), dimension(num_dimensions) :: xRand
+        real(DP), dimension(num_dimensions) :: random_position
         type(Particle_Index) :: old, new
         logical :: overlap
-        real(DP) :: deltaEpot
-        real(DP) :: this_deltaEpot, mix_deltaEpot
-        real(DP) :: this_EpotNew, this_EpotOld
-        real(DP) :: mix_EpotNew, mix_EpotOld
+        real(DP) :: energy_delta
+        real(DP) :: this_energy_delta, mix_energy_delta
+        real(DP) :: this_energy_new, this_energy_old
+        real(DP) :: mix_energy_new, mix_energy_old
         
-        real(DP) :: this_EpotNew_real, this_EpotOld_real
+        real(DP) :: this_energy_real_new, this_energy_real_old
         
         this_observables%move_num_hits = this_observables%move_num_hits + 1
         
@@ -49,18 +49,18 @@ contains
         old%position(:) = this_spheres%get_position(old%number)
         
         new%number = old%number
-        call random_number(xRand)
-        new%position(:) = old%position(:) + (xRand(:)-0.5_DP) * this_macro%move%get_delta()
+        call random_number(random_position)
+        new%position(:) = old%position(:) + (random_position(:)-0.5_DP) * this_macro%move%get_delta()
         new%position(:) = modulo(new%position(:), Box%size(:))
         
         if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
             new%same_i_cell = this_macro%same_cells%index_from_position(new%position)
             call this_macro%hard_potential%neighbours(Box%size, this_spheres, this_macro%same_cells, &
-                                                      new, overlap, this_EpotNew)
+                                                      new, overlap, this_energy_new)
         else
             new%between_i_cell = other_between_cells%index_from_position(new%position)
             call between_spheres_potential%neighbours(Box%size, other_spheres, this_macro%between_cells, &
-                                                      new, overlap, mix_EpotNew)
+                                                      new, overlap, mix_energy_new)
         end if
         
         if (.not. overlap) then
@@ -69,12 +69,12 @@ contains
                 new%between_i_cell = other_between_cells%index_from_position(new%position)
                 call between_spheres_potential%neighbours(Box%size, other_spheres, &
                                                           this_macro%between_cells, &
-                                                          new, overlap, mix_EpotNew)
+                                                          new, overlap, mix_energy_new)
             else
                 new%same_i_cell = this_macro%same_cells%index_from_position(new%position)
                 call this_macro%hard_potential%neighbours(Box%size, this_spheres, &
                                                           this_macro%same_cells, new, overlap, &
-                                                          this_EpotNew)
+                                                          this_energy_new)
             end if
                         
             if (.not. overlap) then
@@ -86,29 +86,31 @@ contains
                         new%orientation(:) = old%orientation(:)
                         select type (this_macro)
                             type is (Dipolar_Hard_Spheres_Macro)
-                                this_EpotNew_real = this_macro%ewald_real%solo(Box%size, this_spheres, new)
-                                this_EpotOld_real = this_macro%ewald_real%solo(Box%size, this_spheres, old)
-                                this_deltaEpot = (this_EpotNew_real - this_EpotOld_real) + &
+                                this_energy_real_new = this_macro%ewald_real%solo(Box%size, &
+                                                                                  this_spheres, new)
+                                this_energy_real_old = this_macro%ewald_real%solo(Box%size, &
+                                                                                  this_spheres, old)
+                                this_energy_delta = (this_energy_real_new - this_energy_real_old) + &
                                                   this_macro%ewald_reci%move(Box, old, new)
                         end select
                     class default
                         call this_macro%hard_potential%neighbours(Box%size, this_spheres, &
                                                                   this_macro%same_cells, &
-                                                                  old, overlap, this_EpotOld)
-                        this_deltaEpot = this_EpotNew - this_EpotOld
+                                                                  old, overlap, this_energy_old)
+                        this_energy_delta = this_energy_new - this_energy_old
                 end select
                     
                 old%between_i_cell = other_between_cells%index_from_position(old%position)
                 call between_spheres_potential%neighbours(Box%size, other_spheres, &
                                                           this_macro%between_cells, &
-                                                          old, overlap, mix_EpotOld)
+                                                          old, overlap, mix_energy_old)
                 
-                mix_deltaEpot = mix_EpotNew - mix_EpotOld
+                mix_energy_delta = mix_energy_new - mix_energy_old
 
-                deltaEpot = this_deltaEpot + mix_deltaEpot
+                energy_delta = this_energy_delta + mix_energy_delta
                 
                 call random_number(random)
-                if (random < exp(-deltaEpot/Box%temperature)) then
+                if (random < exp(-energy_delta/Box%temperature)) then
                 
                     select type (this_macro)
                         type is (Dipolar_Hard_Spheres_Macro)
@@ -116,8 +118,9 @@ contains
                     end select
                 
                     call this_spheres%set_position(old%number, new%position)
-                    this_observables%potential_energy = this_observables%potential_energy + this_deltaEpot
-                    mix_potential_energy = mix_potential_energy + mix_deltaEpot
+                    this_observables%potential_energy = this_observables%potential_energy + &
+                                                        this_energy_delta
+                    mix_potential_energy = mix_potential_energy + mix_energy_delta
                     
                     if (old%same_i_cell /= new%same_i_cell) then
                         call this_macro%same_cells%remove_col_from_cell(old%number, old%same_i_cell)
@@ -158,31 +161,31 @@ contains
         class(Between_Hard_Spheres_Potential_Energy), intent(in) :: between_spheres_potential
         
         integer :: i_widom_particule
-        real(DP) :: widTestSum
-        real(DP), dimension(num_dimensions) :: xRand
+        real(DP) :: inv_activity_sum
+        real(DP), dimension(num_dimensions) :: random_position
         type(Particle_Index) :: test
         logical :: overlap
-        real(DP) :: EpotTest
-        real(DP) :: this_EpotTest, mix_EpotTest
+        real(DP) :: energy_test
+        real(DP) :: this_energy_test, mix_energy_test
         
-        widTestSum = 0._DP
+        inv_activity_sum = 0._DP
         test%number = 0
         
         do i_widom_particule = 1, this_spheres%get_widom_num_particles()
             
-            call random_number(xRand)
-            test%position(:) = Box%size(:) * xRand(:)
+            call random_number(random_position)
+            test%position(:) = Box%size(:) * random_position(:)
 
             if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
                 test%same_i_cell = this_macro%same_cells%index_from_position(test%position)
                 call this_macro%hard_potential%neighbours(Box%size, this_spheres, &
                                                           this_macro%same_cells, test, &
-                                                          overlap, this_EpotTest)
+                                                          overlap, this_energy_test)
             else
                 test%between_i_cell = other_between_cells%index_from_position(test%position)
                 call between_spheres_potential%neighbours(Box%size, other_spheres, &
                                                           this_macro%between_cells, &
-                                                          test, overlap, mix_EpotTest)
+                                                          test, overlap, mix_energy_test)
             end if
             
             if (.not. overlap) then
@@ -191,12 +194,12 @@ contains
                     test%between_i_cell = other_between_cells%index_from_position(test%position)
                     call between_spheres_potential%neighbours(Box%size, other_spheres, &
                                                               this_macro%between_cells, test, overlap, &
-                                                              mix_EpotTest)
+                                                              mix_energy_test)
                 else
                     test%same_i_cell = this_macro%same_cells%index_from_position(test%position)
                     call this_macro%hard_potential%neighbours(Box%size, this_spheres, &
                                                               this_macro%same_cells, test, &
-                                                              overlap, this_EpotTest)
+                                                              overlap, this_energy_test)
                 end if
                 
                 if (.not. overlap) then
@@ -207,18 +210,18 @@ contains
                             test%orientation(:) = random_surface()
                             select type (this_macro)
                                 type is (Dipolar_Hard_Spheres_Macro)                                
-                                    this_EpotTest = this_macro%ewald_real%solo(Box%size, this_spheres, &
-                                                                               test) + &
-                                                    this_macro%ewald_reci%exchange(Box, test) - &
-                                                    this_macro%ewald_self%solo(test%orientation) + &
-                                                    this_macro%ewald_bound%exchange(Box%size, &
-                                                                                  test%orientation)
+                                    this_energy_test = this_macro%ewald_real%solo(Box%size, &
+                                                                                  this_spheres, test) + &
+                                                       this_macro%ewald_reci%exchange(Box, test) - &
+                                                       this_macro%ewald_self%solo(test%orientation) + &
+                                                       this_macro%ewald_bound%exchange(Box%size, &
+                                                                                       test%orientation)
                                                     
                             end select                                            
                     end select
                 
-                    EpotTest = this_EpotTest + mix_EpotTest
-                    widTestSum = widTestSum + exp(-EpotTest/Box%temperature)
+                    energy_test = this_energy_test + mix_energy_test
+                    inv_activity_sum = inv_activity_sum + exp(-energy_test/Box%temperature)
                     
                 end if
                 
@@ -226,7 +229,7 @@ contains
             
         end do
         
-        this_observables%inv_activity = widTestSum/real(this_spheres%get_widom_num_particles(), DP)
+        this_observables%inv_activity = inv_activity_sum/real(this_spheres%get_widom_num_particles(), DP)
         
     end subroutine widom
     
@@ -250,10 +253,10 @@ contains
         type(Particle_Index) :: old1, old2
         type(Particle_Index) :: new1, new2
         logical :: overlap
-        real(DP) :: deltaEpot, type1_deltaEpot, type2_deltaEpot
-        real(DP) :: type1_mix_deltaEpot, type2_mix_deltaEpot
-        type(Particle_Energy) :: type1_EpotOld, type1_EpotNew
-        type(Particle_Energy) :: type2_EpotOld, type2_EpotNew
+        real(DP) :: energy_delta, type1_energy_delta, type2_energy_delta
+        real(DP) :: type1_mix_energy_delta, type2_mix_energy_delta
+        type(Particle_Energy) :: type1_energy_old, type1_energy_new
+        type(Particle_Energy) :: type2_energy_old, type2_energy_new
         
         if (type1_spheres%get_num_particles()==0 .or. type2_spheres%get_num_particles()==0) then
             switch_num_rejections = switch_num_rejections + 1
@@ -274,19 +277,19 @@ contains
                                   type1_spheres, type1_macro, old1, &
                                   type2_spheres, type2_macro%between_cells, &
                                   between_spheres_potential, &
-                                  type1_EpotOld)
+                                  type1_energy_old)
         call before_switch_energy(Box%size, &
                                   type2_spheres, type2_macro, old2, &
                                   type1_spheres, type1_macro%between_cells, &
                                   between_spheres_potential, &
-                                  type2_EpotOld)
+                                  type2_energy_old)
              
         call after_switch_energy(Box, &
                                  type1_spheres, type1_macro, old1, new1, &
                                  type2_spheres, type2_macro%between_cells, &
                                  between_spheres_potential, &
                                  overlap, &
-                                 type1_EpotNew)
+                                 type1_energy_new)
         
         if (.not. overlap) then
         
@@ -295,19 +298,19 @@ contains
                                      type1_spheres, type1_macro%between_cells, &
                                      between_spheres_potential, &
                                      overlap, &
-                                     type2_EpotNew)
+                                     type2_energy_new)
             
             if (.not. overlap) then
 
-                type1_deltaEpot = type1_EpotNew%same - type1_EpotOld%same
-                type1_mix_deltaEpot = type1_EpotNew%mix - type1_EpotOld%mix
-                type2_deltaEpot = type2_EpotNew%same - type2_EpotOld%same
-                type2_mix_deltaEpot = type2_EpotNew%mix - type2_EpotOld%mix
-                deltaEpot = type1_deltaEpot + type1_mix_deltaEpot + type2_deltaEpot + &
-                            type2_mix_deltaEpot
+                type1_energy_delta = type1_energy_new%same - type1_energy_old%same
+                type1_mix_energy_delta = type1_energy_new%mix - type1_energy_old%mix
+                type2_energy_delta = type2_energy_new%same - type2_energy_old%same
+                type2_mix_energy_delta = type2_energy_new%mix - type2_energy_old%mix
+                energy_delta = type1_energy_delta + type1_mix_energy_delta + type2_energy_delta + &
+                               type2_mix_energy_delta
                 
                 call random_number(random)
-                if (random < exp(-deltaEpot/Box%temperature)) then
+                if (random < exp(-energy_delta/Box%temperature)) then
                 
                     call after_switch_update(Box, &
                                              type1_spheres, type1_macro, old1, new1, &
@@ -317,11 +320,11 @@ contains
                                              type1_macro%between_cells)
                                              
                     type1_observables%potential_energy = type1_observables%potential_energy + &
-                                                         type1_deltaEpot
+                                                         type1_energy_delta
                     type2_observables%potential_energy = type2_observables%potential_energy + &
-                                                         type2_deltaEpot
-                    mix_potential_energy = mix_potential_energy + type1_mix_deltaEpot + & 
-                                                                  type2_mix_deltaEpot
+                                                         type2_energy_delta
+                    mix_potential_energy = mix_potential_energy + type1_mix_energy_delta + & 
+                                                                  type2_mix_energy_delta
                     
                 else
                     switch_num_rejections = switch_num_rejections + 1
@@ -341,7 +344,7 @@ contains
                                     this_spheres, this_macro, old, &
                                     other_spheres, other_between_cells, &
                                     between_spheres_potential, &
-                                    EpotOld)
+                                    energy_old)
         
         real(DP), dimension(:), intent(in) :: Box_size
         class(Hard_Spheres), intent(in) :: this_spheres, other_spheres
@@ -349,7 +352,7 @@ contains
         class(Neighbour_Cells), intent(in) :: other_between_cells
         type(Particle_Index), intent(inout) :: old
         class(Between_Hard_Spheres_Potential_Energy), intent(in) :: between_spheres_potential
-        type(Particle_Energy), intent(out) :: EpotOld
+        type(Particle_Energy), intent(out) :: energy_old
         logical :: overlap
         
         old%position(:) = this_spheres%get_position(old%number)
@@ -360,16 +363,16 @@ contains
                 old%orientation(:) = this_spheres%get_orientation(old%number)
                 select type (this_macro)
                     type is (Dipolar_Hard_Spheres_Macro)
-                        EpotOld%same = this_macro%ewald_real%solo(Box_size, this_spheres, old)
+                        energy_old%same = this_macro%ewald_real%solo(Box_size, this_spheres, old)
                                ! potential_energy_reci: cf. after_switch_energy
                 end select
             type is (Hard_Spheres)
-                EpotOld%same = 0._DP
+                energy_old%same = 0._DP
         end select
         
         old%between_i_cell = other_between_cells%index_from_position(old%position)
         call between_spheres_potential%neighbours(Box_size, other_spheres, this_macro%between_cells, &
-                                                  old, overlap, EpotOld%mix)
+                                                  old, overlap, energy_old%mix)
         
     end subroutine before_switch_energy
     
@@ -378,7 +381,7 @@ contains
                                    other_spheres, other_between_cells, &
                                    between_spheres_potential, &
                                    overlap, &
-                                   EpotNew)
+                                   energy_new)
 
         type(Box_Dimensions), intent(in) :: Box
         class(Hard_Spheres), intent(in) :: this_spheres, other_spheres
@@ -388,18 +391,18 @@ contains
         type(Particle_Index), intent(inout) :: new
         class(Between_Hard_Spheres_Potential_Energy), intent(in) :: between_spheres_potential
         logical, intent(out) :: overlap
-        type(Particle_Energy), intent(out) :: EpotNew
+        type(Particle_Energy), intent(out) :: energy_new
         
         new%position(:) = other_spheres%get_position(new%other_number)
         
         if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
             new%same_i_cell = this_macro%same_cells%index_from_position(new%position)
             call this_macro%hard_potential%neighbours(Box%size, this_spheres, this_macro%same_cells, &
-                                                      new, overlap, EpotNew%same)
+                                                      new, overlap, energy_new%same)
         else
             new%between_i_cell = other_between_cells%index_from_position(new%position)
             call between_spheres_potential%neighbours(Box%size, other_spheres, this_macro%between_cells, &
-                                                      new, overlap, EpotNew%mix)
+                                                      new, overlap, energy_new%mix)
         end if
         
         if (.not. overlap) then
@@ -408,12 +411,12 @@ contains
                 new%between_i_cell = other_between_cells%index_from_position(new%position)
                 call between_spheres_potential%neighbours(Box%size, other_spheres, &
                                                           this_macro%between_cells, &
-                                                          new, overlap, EpotNew%mix)
+                                                          new, overlap, energy_new%mix)
             else
                 new%same_i_cell = this_macro%same_cells%index_from_position(new%position)
                 call this_macro%hard_potential%neighbours(Box%size, this_spheres, &
                                                           this_macro%same_cells, new, &
-                                                          overlap, EpotNew%same)
+                                                          overlap, energy_new%same)
             end if
             
             if (.not. overlap) then
@@ -423,7 +426,7 @@ contains
                         new%orientation(:) = this_spheres%get_orientation(new%number)
                         select type (this_macro)
                             type is (Dipolar_Hard_Spheres_Macro)
-                                EpotNew%same = this_macro%ewald_real%solo(Box%size, this_spheres, new) + &
+                                energy_new%same = this_macro%ewald_real%solo(Box%size, this_spheres, new) + &
                                                this_macro%ewald_reci%move(Box, old, new)
                         end select
                                        
@@ -475,9 +478,8 @@ contains
         
         real(DP) :: random
         type(Particle_Index) :: old, new
-        real(DP) :: deltaEpot
-        real(DP) :: deltaEpot_real, deltaEpot_self
-        real(DP) :: real_EpotNew, real_EpotOld
+        real(DP) :: energy_delta
+        real(DP) :: energy_real_delta, energy_self_delta
         
         this_observables%rotate_num_hits = this_observables%rotate_num_hits + 1
 
@@ -491,25 +493,24 @@ contains
         new%orientation(:) = old%orientation(:)
         call markov_surface(new%orientation, this_macro%rotation%get_delta())
         
-        real_EpotOld = this_macro%ewald_real%solo(Box%size, this_spheres, old)
-        real_EpotNew = this_macro%ewald_real%solo(Box%size, this_spheres, new)
-        deltaEpot_real = real_EpotNew - real_EpotOld
+        energy_real_delta = this_macro%ewald_real%solo(Box%size, this_spheres, old) - &
+                            this_macro%ewald_real%solo(Box%size, this_spheres, new)
         
-        deltaEpot_self = this_macro%ewald_self%solo(new%orientation) - &
-                         this_macro%ewald_self%solo(old%orientation)
+        energy_self_delta = this_macro%ewald_self%solo(new%orientation) - &
+                            this_macro%ewald_self%solo(old%orientation)
         
-        deltaEpot = deltaEpot_real + this_macro%ewald_reci%rotation(Box, old, new) - &
-                    deltaEpot_self + this_macro%ewald_bound%rotation(Box%size, old%orientation, &
-                                                                               new%orientation)
+        energy_delta = energy_real_delta + this_macro%ewald_reci%rotation(Box, old, new) - &
+                       energy_self_delta + this_macro%ewald_bound%rotation(Box%size, old%orientation, &
+                                                                                     new%orientation)
         
         call random_number(random)
-        if (random < exp(-deltaEpot/Box%temperature)) then
+        if (random < exp(-energy_delta/Box%temperature)) then
         
             call this_macro%ewald_reci%update_structure_rotation(Box, old, new)
             call this_macro%ewald_bound%update_total_moment_rotation(old%orientation, new%orientation)
             call this_spheres%set_orientation(old%number, new%orientation)
             
-            this_observables%potential_energy = this_observables%potential_energy + deltaEpot
+            this_observables%potential_energy = this_observables%potential_energy + energy_delta
             
         else
             this_observables%rotate_num_rejections = this_observables%rotate_num_rejections + 1
