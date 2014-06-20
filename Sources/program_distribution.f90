@@ -24,12 +24,11 @@ implicit none
     integer :: num_equilibrium_steps
     
     real(DP) :: max_distance, delta
-    integer :: num_distribution
     integer :: i_step
     integer :: i_particle, j_particle
     real(DP) :: distance_ij
-    integer :: i_distribution
     real(DP) :: distance_i_distribution, distance_i_minus, distance_i_plus
+    integer :: num_distribution, i_distribution
     real(DP), dimension(:), allocatable :: distribution_function
     real(DP), dimension(:, :), allocatable :: positions, orientations
     
