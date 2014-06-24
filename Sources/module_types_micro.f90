@@ -9,11 +9,12 @@ implicit none
 
     ! System Box
     
-    type, public :: Box_Dimensions
+    type, public :: Box_Parameters
         real(DP), dimension(num_dimensions) :: size
         integer, dimension(num_dimensions) :: wave
         real(DP) :: temperature
-    end type Box_Dimensions
+        integer :: num_particles
+    end type Box_Parameters
 
     ! For neighbour cells
 

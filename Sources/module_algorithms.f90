@@ -2,7 +2,7 @@ module module_algorithms
 
 use data_precisions, only: DP
 use data_box, only: num_dimensions
-use module_types_micro, only: Box_Dimensions, Particle_Index, Particle_Energy
+use module_types_micro, only: Box_Parameters, Particle_Index, Particle_Energy
 use module_physics_micro, only: random_surface, markov_surface
 use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres
 use class_neighbour_cells, only: Neighbour_Cells
@@ -23,7 +23,7 @@ contains
                     other_spheres, other_between_cells, &
                     between_spheres_potential, mix_potential_energy)
     
-        type(Box_Dimensions), intent(in) :: Box
+        type(Box_Parameters), intent(in) :: Box
         class(Hard_Spheres), intent(inout) :: this_spheres, other_spheres
         class(Hard_Spheres_Macro), intent(inout) :: this_macro
         class(Neighbour_Cells), intent(inout) :: other_between_cells
@@ -152,7 +152,7 @@ contains
                      other_spheres, other_between_cells, &
                      between_spheres_potential)
         
-        type(Box_Dimensions), intent(in) :: Box
+        type(Box_Parameters), intent(in) :: Box
         class(Hard_Spheres), intent(in) :: this_spheres
         class(Hard_Spheres_Macro), intent(in) :: this_macro
         class(Neighbour_Cells), intent(in) ::  other_between_cells
@@ -241,7 +241,7 @@ contains
                       between_spheres_potential, mix_potential_energy, &
                       switch_num_rejections)
     
-        type(Box_Dimensions), intent(in) :: Box
+        type(Box_Parameters), intent(in) :: Box
         class(Hard_Spheres), intent(inout) :: type1_spheres, type2_spheres
         class(Hard_Spheres_Macro), intent(inout) :: type1_macro, type2_macro
         class(Hard_Spheres_Observables), intent(inout) :: type1_observables, type2_observables
@@ -383,7 +383,7 @@ contains
                                    overlap, &
                                    energy_new)
 
-        type(Box_Dimensions), intent(in) :: Box
+        type(Box_Parameters), intent(in) :: Box
         class(Hard_Spheres), intent(in) :: this_spheres, other_spheres
         class(Hard_Spheres_Macro), intent(in) :: this_macro
         class(Neighbour_Cells), intent(in) :: other_between_cells
@@ -442,7 +442,7 @@ contains
                                    this_spheres, this_macro, old, new, &
                                    other_between_cells)
 
-        type(Box_Dimensions), intent(in) :: Box
+        type(Box_Parameters), intent(in) :: Box
         class(Hard_Spheres), intent(inout) :: this_spheres
         class(Hard_Spheres_Macro), intent(inout) :: this_macro
         class(Neighbour_Cells), intent(inout) :: other_between_cells
@@ -471,7 +471,7 @@ contains
     subroutine rotate(Box, &
                       this_spheres, this_macro, this_observables)
     
-        type(Box_Dimensions), intent(in) :: Box
+        type(Box_Parameters), intent(in) :: Box
         class(Dipolar_Hard_spheres), intent(inout) :: this_spheres
         class(Dipolar_Hard_spheres_Macro), intent(inout) :: this_macro
         class(Dipolar_Hard_spheres_Observables), intent(inout) :: this_observables

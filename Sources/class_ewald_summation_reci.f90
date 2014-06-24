@@ -3,7 +3,7 @@ module class_ewald_summation_reci
 use data_precisions, only: DP
 use data_constants, only: PI
 use data_box, only: num_dimensions
-use module_types_micro, only: Box_Dimensions, Particle_Index
+use module_types_micro, only: Box_Parameters, Particle_Index
 use module_physics_micro, only: fourier_i, Box_wave1_sym, Box_wave2_sym, exchange_sign
 use class_hard_spheres, only: Dipolar_Hard_Spheres
 
@@ -42,7 +42,7 @@ contains
     pure subroutine Ewald_Summation_Reci_construct(this, Box, alpha, this_spheres)
         
         class(Ewald_Summation_Reci), intent(inout) :: this
-        type(Box_Dimensions), intent(in) :: Box
+        type(Box_Parameters), intent(in) :: Box
         real(DP), intent(in) :: alpha
         type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
         
@@ -69,7 +69,7 @@ contains
     pure subroutine Ewald_Summation_Reci_set_weight(this, Box, alpha)
         
         class(Ewald_Summation_Reci), intent(inout) :: this
-        type(Box_Dimensions), intent(in) :: Box
+        type(Box_Parameters), intent(in) :: Box
         real(DP), intent(in) :: alpha
         
         integer :: kx, ky, kz
@@ -113,7 +113,7 @@ contains
     pure subroutine Ewald_Summation_Reci_set_structure(this, Box, this_spheres)
 
         class(Ewald_Summation_Reci), intent(inout) :: this
-        type(Box_Dimensions), intent(in) :: Box
+        type(Box_Parameters), intent(in) :: Box
         type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
 
         complex(DP) :: exp_Ikx
@@ -175,7 +175,7 @@ contains
     subroutine Ewald_Summation_Reci_reset_structure(this, Box, this_spheres, i_step, modulus_unit)
     
         class(Ewald_Summation_Reci), intent(inout) :: this
-        type(Box_Dimensions), intent(in) :: Box
+        type(Box_Parameters), intent(in) :: Box
         type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
         integer, intent(in) :: i_step
         integer, intent(in) :: modulus_unit
@@ -242,7 +242,7 @@ contains
     pure function Ewald_Summation_Reci_total(this, Box) result(total)
         
         class(Ewald_Summation_Reci), intent(in) :: this
-        type(Box_Dimensions), intent(in) :: Box
+        type(Box_Parameters), intent(in) :: Box
         real(DP) :: total
 
         integer :: kx, ky, kz
@@ -277,7 +277,7 @@ contains
     pure function Ewald_Summation_Reci_move(this, Box, old, new) result(move)
 
         class(Ewald_Summation_Reci), intent(in) :: this
-        type(Box_Dimensions), intent(in) :: Box
+        type(Box_Parameters), intent(in) :: Box
         type(Particle_Index), intent(in) :: old, new
         real(DP) :: move
         
@@ -354,7 +354,7 @@ contains
     pure subroutine Ewald_Summation_Reci_update_structure_move(this, Box, old, new)
 
         class(Ewald_Summation_Reci), intent(inout) :: this
-        type(Box_Dimensions), intent(in) :: Box
+        type(Box_Parameters), intent(in) :: Box
         type(Particle_Index), intent(in) :: old, new
         
         real(DP), dimension(num_dimensions) :: new_position_div_box, old_position_div_box
@@ -426,7 +426,7 @@ contains
     pure function Ewald_Summation_Reci_rotation(this, Box, old, new) result(rotation)
 
         class(Ewald_Summation_Reci), intent(in) :: this
-        type(Box_Dimensions), intent(in) :: Box
+        type(Box_Parameters), intent(in) :: Box
         type(Particle_Index), intent(in) :: old, new
         real(DP) :: rotation
 
@@ -496,7 +496,7 @@ contains
     pure subroutine Ewald_Summation_Reci_update_structure_rotation(this, Box, old, new)
 
         class(Ewald_Summation_Reci), intent(inout) :: this
-        type(Box_Dimensions), intent(in) :: Box
+        type(Box_Parameters), intent(in) :: Box
         type(Particle_Index), intent(in) :: old, new
 
         real(DP), dimension(num_dimensions) :: position_div_box
@@ -561,7 +561,7 @@ contains
     pure function Ewald_Summation_Reci_exchange(this, Box, particle) result(exchange)
 
         class(Ewald_Summation_Reci), intent(in) :: this
-        type(Box_Dimensions), intent(in) :: Box
+        type(Box_Parameters), intent(in) :: Box
         type(Particle_Index), intent(in) :: particle
         real(DP) :: exchange
         
@@ -632,7 +632,7 @@ contains
     pure subroutine Ewald_Summation_Reci_update_structure_exchange(this, Box, particle)
 
         class(Ewald_Summation_Reci), intent(inout) :: this
-        type(Box_Dimensions), intent(in) :: Box
+        type(Box_Parameters), intent(in) :: Box
         type(Particle_Index), intent(in) :: particle
         real(DP) :: exchange
         

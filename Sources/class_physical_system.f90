@@ -6,7 +6,7 @@ use, intrinsic :: iso_fortran_env, only: output_unit
 use data_precisions, only: DP
 use json_module, only: json_file
 use module_data, only: test_data_found
-use module_types_micro, only: Box_Dimensions, Monte_Carlo_Arguments
+use module_types_micro, only: Box_Parameters, Monte_Carlo_Arguments
 use module_physics_micro, only: num_wave_vectors
 use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres, Between_Hard_Spheres
 use class_hard_spheres_potential, only: Between_Hard_Spheres_Potential_Energy
@@ -35,8 +35,7 @@ private
         character(len=:), allocatable :: name
         
         ! Box
-        type(Box_Dimensions) :: Box
-        integer :: num_particles
+        type(Box_Parameters) :: Box
         
         ! Monte-Carlo
         integer :: num_thermalisation_steps, period_adaptation, num_equilibrium_steps
@@ -211,13 +210,13 @@ contains
         character(len=4096) :: data_name
         logical :: found
         
-        this%num_particles = this%type1_spheres%get_num_particles() + &
-                             this%type2_spheres%get_num_particles()
+        this%Box%num_particles = this%type1_spheres%get_num_particles() + &
+                                 this%type2_spheres%get_num_particles()
         data_name = "Monte Carlo.decorrelation factor"
         call json%get(data_name, this%decorrelation_factor, found)
         call test_data_found(data_name, found)
         
-        this%num_moves = this%decorrelation_factor * this%num_particles
+        this%num_moves = this%decorrelation_factor * this%Box%num_particles
         
         data_name = "Monte Carlo.switch factor"
         call json%get(data_name, switch_factor, found)
@@ -358,12 +357,10 @@ contains
         call write_data(this%report_unit)
         call this%write_report(this%report_unit)
         
-        call write_spheres_density(this%Box%size, this%type1_spheres, this%num_particles, &
-                                   this%type1_units%report)
+        call write_spheres_density(this%Box, this%type1_spheres, this%type1_units%report)
         call this%type1_spheres%write_report(this%type1_units%report)
         
-        call write_spheres_density(this%Box%size, this%type2_spheres, this%num_particles, &
-                                   this%type2_units%report)
+        call write_spheres_density(this%Box, this%type2_spheres, this%type2_units%report)
         call this%type2_spheres%write_report(this%type2_units%report)
     
     end subroutine Physical_System_write_all_reports
@@ -379,7 +376,7 @@ contains
         write(report_unit ,*) "    Box_wave(:) = ", this%Box%wave(:)
         write(report_unit ,*) "    num_wave_vectors =", num_wave_vectors(this%Box%wave)
         write(report_unit ,*) "    Temperature = ", this%Box%temperature
-        write(report_unit ,*) "    num_particles = ", this%num_particles        
+        write(report_unit ,*) "    num_particles = ", this%Box%num_particles        
         
         write(report_unit, *) "    num_equilibrium_steps = ", this%num_equilibrium_steps
         write(report_unit, *) "    num_thermalisation_steps = ", this%num_thermalisation_steps
@@ -469,7 +466,7 @@ contains
                                     this%type2_observables%potential_energy_sum + &
                                     this%between_spheres_observables%potential_energy_sum
         duration = this%time_end - this%time_start
-        call write_results(this%num_particles, this%num_equilibrium_steps, this%potential_energy_sum, &
+        call write_results(this%Box%num_particles, this%num_equilibrium_steps, this%potential_energy_sum, &
                            this%switch_sum_rejection, duration, this%report_unit)
     
     end subroutine Physical_System_write_results
@@ -564,7 +561,7 @@ contains
             if (i_change_rand <= this%num_moves) then
                 ! Randomly choosing the type
                 call random_number(rand)
-                i_particule_rand = int(rand*real(this%num_particles, DP)) + 1
+                i_particule_rand = int(rand*real(this%Box%num_particles, DP)) + 1
                 if (i_particule_rand <= this%type1_spheres%get_num_particles()) then                    
                     call move(this%Box, &
                               this%type1_spheres, this%type1_macro, this%type1_observables, &

@@ -5,6 +5,7 @@ module module_write
 use data_precisions, only: DP, real_zero, io_tiny, consist_tiny
 use data_constants, only: PI, sigma3d
 use data_box, only: num_dimensions
+use module_types_micro, only: Box_Parameters
 use class_hard_spheres, only: Hard_Spheres
 
 implicit none
@@ -85,18 +86,17 @@ contains
     
     !> Write density and compacity
     
-    subroutine write_spheres_density(Box_size, this_spheres, total_num_particles, report_unit)
+    subroutine write_spheres_density(Box, this_spheres, report_unit)
     
-        real(DP), dimension(:), intent(in) :: Box_size
+        type(Box_Parameters), intent(in) :: Box
         class(Hard_Spheres), intent(in) :: this_spheres
-        integer, intent(in) :: total_num_particles
         integer, intent(in) :: report_unit
         
         real(DP) :: density, compacity, concentration
         
-        density = real(this_spheres%get_num_particles() + 1, DP) / product(Box_size) ! cheating ? cf. Widom
+        density = real(this_spheres%get_num_particles() + 1, DP) / product(Box%size) ! cheating ? cf. Widom
         compacity = 4._DP/3._DP*PI*(this_spheres%get_diameter()/2._DP)**3 * density
-        concentration = real(this_spheres%get_num_particles(), DP) / real(total_num_particles, DP)
+        concentration = real(this_spheres%get_num_particles(), DP) / real(Box%num_particles, DP)
         
         write(report_unit, *) "    density = ", density
         write(report_unit, *) "    compacity = ", compacity

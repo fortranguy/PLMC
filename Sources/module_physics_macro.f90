@@ -7,7 +7,7 @@ use data_precisions, only: DP, real_zero, io_tiny, consist_tiny
 use data_box, only: num_dimensions
 use json_module, only: json_file
 use module_data, only: test_data_found
-use module_types_micro, only: Box_Dimensions, Argument_Random, Argument_Initial
+use module_types_micro, only: Box_Parameters, Argument_Random, Argument_Initial
 use module_physics_micro, only: PBC_distance, random_surface
 use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres
 use class_small_move, only: Small_Move
@@ -253,7 +253,7 @@ contains
     
     subroutine init_spheres(Box, this_spheres, this_units)
         
-        type(Box_Dimensions), intent(in) :: Box
+        type(Box_Parameters), intent(in) :: Box
         class(Hard_Spheres), intent(inout) :: this_spheres
         class(Hard_Spheres_Units), intent(in) :: this_units
         
@@ -295,7 +295,7 @@ contains
     
     subroutine set_ewald(Box, this_spheres, this_macro, json, this_units)
     
-        type(Box_Dimensions), intent(in) :: Box
+        type(Box_Parameters), intent(in) :: Box
         class(Dipolar_Hard_Spheres), intent(in) :: this_spheres
         class(Dipolar_Hard_Spheres_Macro), intent(inout) :: this_macro
         type(json_file), intent(inout) :: json
@@ -323,7 +323,7 @@ contains
     
     pure function total_energy(Box, this_spheres, this_macro)
     
-        type(Box_Dimensions), intent(in) :: Box
+        type(Box_Parameters), intent(in) :: Box
         class(Hard_Spheres), intent(in) :: this_spheres
         class(Hard_Spheres_Macro), intent(in) :: this_macro
         real(DP) :: total_energy
@@ -348,7 +348,7 @@ contains
     
     subroutine final_spheres(Box, this_spheres, this_units)
     
-        type(Box_Dimensions), intent(in) :: Box
+        type(Box_Parameters), intent(in) :: Box
         class(Hard_Spheres), intent(inout) :: this_spheres
         class(Hard_Spheres_Units), intent(in) :: this_units
         
