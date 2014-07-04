@@ -38,11 +38,6 @@ endif
 compiler = ifort
 mode = debug
 
-EXEC1 = mc_cano_bulk
-EXEC2 = mc_bunching
-EXEC3 = mc_histogram
-EXEC4 = mc_distribution
-
 all: mc_cano_bulk mc_bunching mc_histogram mc_distribution
 	# Report
 	git log | head -n3 > make_report.txt
