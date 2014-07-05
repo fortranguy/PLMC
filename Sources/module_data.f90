@@ -22,7 +22,7 @@ contains
         call test_data_found(data_name, found)
         
         if (len(json_get_string) == 0) then
-            write(error_unit, *) trim(data_name), ": String is empty."
+            write(error_unit, *) trim(data_name), ": string is empty."
             error stop
         end if
         
