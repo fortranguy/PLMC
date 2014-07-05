@@ -10,31 +10,23 @@ public json_get_string, test_data_found
 
 contains
 
-    subroutine json_get_string(json, data_name, string)
+    function json_get_string(json, data_name)
     
         type(json_file), intent(inout) :: json
         character(len=*), intent(in) :: data_name
-        character(len=:), allocatable, intent(out) :: string
+        character(len=:), allocatable :: json_get_string
         
-        character(len=:), allocatable :: string_dummy
         logical :: found
         
-        call json%get(data_name, string_dummy, found)
+        call json%get(data_name, json_get_string, found)
         call test_data_found(data_name, found)
         
-        write(*, *) "string_dummy: ", string_dummy
-        
-        if (len(string_dummy) == 0) then
-            write(error_unit, *) "String is empty."
+        if (len(json_get_string) == 0) then
+            write(error_unit, *) trim(data_name), ": String is empty."
             error stop
-        else
-            string = string_dummy
-            if (allocated(string_dummy)) deallocate(string_dummy)
         end if
         
-        string = "blog !"
-        
-    end subroutine json_get_string 
+    end function json_get_string 
 
     subroutine test_data_found(data_name, found)
     

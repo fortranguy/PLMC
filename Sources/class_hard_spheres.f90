@@ -104,7 +104,7 @@ contains
         character(len=4096) :: data_name
         
         data_name = "Particles.Hard Spheres.name"
-        call json_get_string(json, data_name, this%name)
+        this%name = json_get_string(json, data_name)
         
         write(output_unit, *) this%name, " class construction"
         
@@ -121,7 +121,7 @@ contains
         character(len=4096) :: data_name
         
         data_name = "Particles.Dipolar Hard Spheres.name"
-        call json_get_string(json, data_name, this%name)
+        this%name = json_get_string(json, data_name)
         
         write(output_unit, *) this%name, " class construction"
     
@@ -202,7 +202,7 @@ contains
         logical :: found
         
         data_name = "Particles.Between Spheres.name"
-        call json_get_string(json, data_name, this%name)
+        this%name = json_get_string(json, data_name)
         
         write(output_unit, *) this%name, " class construction"
         

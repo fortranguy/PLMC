@@ -127,7 +127,7 @@ contains
         logical :: found
         
         data_name = "Box.name"
-        call json_get_string(json, data_name, this%name)
+        this%name = json_get_string(json, data_name)
         write(output_unit, *) this%name, " class construction"
         
         call this%set_box(json)
