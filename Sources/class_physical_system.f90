@@ -5,7 +5,7 @@ module class_physical_system
 use, intrinsic :: iso_fortran_env, only: output_unit
 use data_precisions, only: DP
 use json_module, only: json_file
-use module_data, only: test_data_found
+use module_data, only: json_get_string, test_data_found
 use module_types_micro, only: Box_Parameters, Monte_Carlo_Arguments
 use module_physics_micro, only: num_wave_vectors
 use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres, Between_Hard_Spheres
@@ -126,13 +126,8 @@ contains
         character(len=4096) :: data_name
         logical :: found
         
-        character(len=:), allocatable :: this_name ! a workaround for gfortran which can't use this%name
-        
         data_name = "Box.name"
-        call json%get(data_name, this_name, found)
-        call test_data_found(data_name, found)
-        this%name = this_name
-        if(allocated(this_name)) deallocate(this_name)
+        call json_get_string(json, data_name, this%name)
         write(output_unit, *) this%name, " class construction"
         
         call this%set_box(json)
