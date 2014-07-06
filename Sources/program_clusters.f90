@@ -32,9 +32,9 @@ implicit none
     integer :: cluster_size, cluster_size_max
     integer :: num_clusters, i_cluster
     integer :: num_pairs
-    integer, dimension(:), allocatable :: clusters_size
+    integer, dimension(:), allocatable :: clusters_sizes
     integer, dimension(:, :), allocatable :: all_pairs
-    real(DP), dimension(:), allocatable :: clusters_size_distribution
+    real(DP), dimension(:), allocatable :: clusters_sizes_distribution
     integer :: clusters_distribution_unit
     
     type(json_file) :: json
@@ -62,9 +62,9 @@ implicit none
     write(output_unit, *) name, num_particles, snap_factor
     allocate(all_positions(Ndim, num_particles))
     num_pairs = num_particles * (num_particles - 1) / 2
-    allocate(clusters_size(num_pairs))
+    allocate(clusters_sizes(num_pairs))
     allocate(all_pairs(2, num_pairs))
-    allocate(clusters_size_distribution(num_pairs))
+    allocate(clusters_sizes_distribution(num_pairs))
     
     call arg_to_file(2, file, length) 
     open(newunit=orientations_unit, recl=4096, file=file(1:length), status='old', &
@@ -76,10 +76,10 @@ implicit none
     end if
     allocate(all_orientations(Ndim, num_particles))
     
-    clusters_size_distribution(:) = 0
+    clusters_sizes_distribution(:) = 0
     cluster_size_max = 0
     
-    clusters_size(:) = 0
+    clusters_sizes(:) = 0
     
     write(output_unit, *) "Start !"
     do i_step = 1, num_steps/snap_factor
@@ -109,30 +109,30 @@ implicit none
             end do
         end do
         
-        call pairs_to_clusters(num_particles, all_pairs, num_pairs, clusters_size, num_clusters)
+        call pairs_to_clusters(num_particles, all_pairs, num_pairs, clusters_sizes, num_clusters)
         
         do i_cluster = 1, num_clusters
-            cluster_size = clusters_size(i_cluster)
-            clusters_size_distribution(cluster_size) = clusters_size_distribution(cluster_size) + 1._DP
+            cluster_size = clusters_sizes(i_cluster)
+            clusters_sizes_distribution(cluster_size) = clusters_sizes_distribution(cluster_size) + 1._DP
             if (cluster_size_max < cluster_size) cluster_size_max = cluster_size
         end do
     
     end do
     write(output_unit, *) "Finish !"
     
-    clusters_size_distribution(1:cluster_size_max) = clusters_size_distribution(1:cluster_size_max) / &
+    clusters_sizes_distribution(1:cluster_size_max) = clusters_sizes_distribution(1:cluster_size_max) / &
                                                      real(num_steps/snap_factor, DP)
     
-    open(newunit=clusters_distribution_unit, file="clusters_size_distribution.out", action="write")
+    open(newunit=clusters_distribution_unit, file="clusters_sizes_distribution.out", action="write")
     do cluster_size = 1, cluster_size_max
-        write(clusters_distribution_unit, *) cluster_size, clusters_size_distribution(cluster_size)
+        write(clusters_distribution_unit, *) cluster_size, clusters_sizes_distribution(cluster_size)
     end do
     close(clusters_distribution_unit)
     
     deallocate(all_orientations)
-    deallocate(clusters_size_distribution)
+    deallocate(clusters_sizes_distribution)
     deallocate(all_pairs)
-    deallocate(clusters_size)
+    deallocate(clusters_sizes)
     deallocate(all_positions)
     
     close(orientations_unit)
