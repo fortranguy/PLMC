@@ -103,11 +103,14 @@ contains
         
         character(len=4096) :: data_name
         logical :: found
+        character(len=:), allocatable :: this_name
         
         data_name = "Particles.Hard Spheres.name"
-        call json%get(data_name, this%name, found)
+        call json%get(data_name, this_name, found)
         call test_data_found(data_name, found)
-        call test_empty_string(data_name, this%name)        
+        call test_empty_string(data_name, this_name)
+        this%name = this_name
+        if (allocated(this_name)) deallocate(this_name)        
         write(output_unit, *) this%name, " class construction"
         
         call this%set_particles(json)
@@ -122,11 +125,14 @@ contains
         
         character(len=4096) :: data_name
         logical :: found
+        character(len=:), allocatable :: this_name
         
         data_name = "Particles.Dipolar Hard Spheres.name"
-        call json%get(data_name, this%name, found)
+        call json%get(data_name, this_name, found)
         call test_data_found(data_name, found)
-        call test_empty_string(data_name, this%name)        
+        call test_empty_string(data_name, this_name)
+        this%name = this_name
+        if (allocated(this_name)) deallocate(this_name)       
         write(output_unit, *) this%name, " class construction"
     
         call this%set_particles(json)        
@@ -204,11 +210,14 @@ contains
         
         character(len=4096) :: data_name
         logical :: found
+        character(len=:), allocatable :: this_name
         
         data_name = "Particles.Between Spheres.name"
-        call json%get(data_name, this%name, found)
+        call json%get(data_name, this_name, found)
         call test_data_found(data_name, found)
-        call test_empty_string(data_name, this%name)        
+        call test_empty_string(data_name, this_name)
+        this%name = this_name
+        if (allocated(this_name)) deallocate(this_name)       
         write(output_unit, *) this%name, " class construction"
         
         data_name = "Particles.Between Spheres.non addivity"

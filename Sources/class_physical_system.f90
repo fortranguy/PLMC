@@ -125,11 +125,14 @@ contains
         
         character(len=4096) :: data_name
         logical :: found
+        character(len=:), allocatable :: this_name
         
         data_name = "Box.name"
-        call json%get(data_name, this%name, found)
+        call json%get(data_name, this_name, found)
         call test_data_found(data_name, found)
-        call test_empty_string(data_name, this%name)
+        call test_empty_string(data_name, this_name)
+        this%name = this_name
+        if (allocated(this_name)) deallocate(this_name)
         write(output_unit, *) this%name, " class construction"
         
         call this%set_box(json)
@@ -164,12 +167,14 @@ contains
         call test_data_found(data_name, found)
         if (size(Box_size) /= size (this%Box%size)) error stop "Box size dimension"
         this%Box%size(:) = Box_size(:)
+        if (allocated(Box_size)) deallocate(Box_size)
         
         data_name = "Box.wave"
         call json%get(data_name, Box_wave, found)
         call test_data_found(data_name, found)
         if (size(Box_wave) /= size (this%Box%wave)) error stop "Box wave dimension"
         this%Box%wave(:) = Box_wave(:)
+        if (allocated(Box_wave)) deallocate(Box_wave)
         
         data_name = "Box.temperature"
         call json%get(data_name, this%Box%temperature, found)
