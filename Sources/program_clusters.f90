@@ -4,14 +4,16 @@ use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
 use data_precisions, only: DP
 use data_box, only: num_dimensions
 use json_module, only: json_file, json_initialize
+use module_data, only: test_data_found
 use module_physics_micro, only: PBC_vector, dipolar_pair_energy
 use module_clusters, only: pairs_to_clusters
 use module_arguments, only: arg_to_file
 
 implicit none
 
+    logical :: take_snapshot
+    real(DP), dimension(:), allocatable :: Box_size
     integer :: num_steps
-    logical :: snap
 
     character(len=5) :: name, name_bis
     integer :: num_particles, num_particles_bis
@@ -27,7 +29,7 @@ implicit none
     real(DP), parameter :: range_cut = 1.3_DP
     
     real(DP) :: pair_energy
-    real(DP), dimension(Ndim) :: vector_ij
+    real(DP), dimension(num_dimensions) :: vector_ij
 
     integer :: cluster_size, cluster_size_max
     integer :: num_clusters, i_cluster
@@ -44,23 +46,28 @@ implicit none
     call json_initialize()
     call json%load_file(filename = "data.json")
     
+    data_name = "Distribution.take snapshot"
+    call json%get(data_name, take_snapshot, found)
+    call test_data_found(data_name, found)
+    
+    if (.not.take_snapshot) stop "No snap shots taken."
+    
+    data_name = "Box.size"
+    call json%get(data_name, Box_size, found)
+    call test_data_found(data_name, found)
+    if (size(Box_size) /= num_dimensions) error stop "Box size dimension"
+    
     data_name = "Monte Carlo.number of equilibrium steps"
     call json%get(data_name, num_steps, found)
     call test_data_found(data_name, found)
     
-    data_name = "Distribution.take snapshot"
-    call json%get(data_name, snap, found)
-    call test_data_found(data_name, found)
-    
     call json%destroy()
-    
-    if (.not.snap) stop "no snap"
 
     call arg_to_file(1, file, length)    
     open(newunit=positions_unit, recl=4096, file=file(1:length), status='old', action='read')    
     read(positions_unit, *) name, num_particles, snap_factor
     write(output_unit, *) name, num_particles, snap_factor
-    allocate(all_positions(Ndim, num_particles))
+    allocate(all_positions(num_dimensions, num_particles))
     num_pairs = num_particles * (num_particles - 1) / 2
     allocate(clusters_sizes(num_pairs))
     allocate(all_pairs(2, num_pairs))
@@ -74,7 +81,7 @@ implicit none
         write(error_unit, *) "Error: positions and orientations tags don't match."
         error stop
     end if
-    allocate(all_orientations(Ndim, num_particles))
+    allocate(all_orientations(num_dimensions, num_particles))
     
     clusters_sizes_distribution(:) = 0
     cluster_size_max = 0
@@ -95,7 +102,8 @@ implicit none
         do i_particle = 1, num_particles
             do j_particle = i_particle + 1, num_particles
                 
-                vector_ij(:) = PBC_vector(all_positions(:, i_particle), all_positions(:, j_particle))
+                vector_ij(:) = PBC_vector(Box_size, &
+                                          all_positions(:, i_particle), all_positions(:, j_particle))
                 if (norm2(vector_ij) < range_cut) then
                     pair_energy = dipolar_pair_energy(all_orientations(:, i_particle), &
                                                       all_orientations(:, j_particle), &
@@ -137,5 +145,7 @@ implicit none
     
     close(orientations_unit)
     close(positions_unit)
+    
+    deallocate(Box_size)
 
 end program cluster

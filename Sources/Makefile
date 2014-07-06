@@ -88,8 +88,9 @@ mc_distribution: data_precisions.o data_constants.o data_box.o \
 	$(FC) $^ -o $@ $(LDFLAGS)
 
 mc_clusters: data_precisions.o data_constants.o data_box.o \
-              module_physics_micro.o connected_components.o module_clusters.o module_arguments.o \
-              program_clusters.o
+             module_data.o module_physics_micro.o connected_components.o module_clusters.o \
+             module_arguments.o \
+             program_clusters.o
 	$(FC) $^ $(LDFLAGS) -o $@ $(LDLIBS)
 	
 # ------------------------------------------------------------------------

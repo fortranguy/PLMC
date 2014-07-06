@@ -13,15 +13,16 @@ use module_arguments, only: arg_to_file
 
 implicit none
 
+    logical :: take_snapshot
+    real(DP), dimension(:), allocatable :: Box_size
+    integer :: num_steps
+
     character(len=4096) :: name, name_bis
     integer :: num_particles, num_particles_bis
     integer :: snap_factor, snap_factor_bis
     real(DP) :: density
     integer, dimension(:), allocatable :: distribution_sum
     integer :: positions_unit, orientations_unit, distrib_unit
-
-    real(DP), dimension(:), allocatable :: Box_size
-    integer :: num_equilibrium_steps
     
     real(DP) :: max_distance, delta
     integer :: i_step
@@ -39,7 +40,6 @@ implicit none
     logical :: found
     character(len=4096) :: file_name
     integer :: length, time_unit
-    logical :: take_snapshot
 
     real(DP) :: time_init, time_final
     !$ real(DP) :: time_init_para, time_final_para
@@ -59,7 +59,7 @@ implicit none
     if (size(Box_size) /= num_dimensions) error stop "Box size dimension"
     
     data_name = "Monte Carlo.number of equilibrium steps"
-    call json%get(data_name, num_equilibrium_steps, found)
+    call json%get(data_name, num_steps, found)
     call test_data_found(data_name, found)
     
     data_name = "Distribution.delta"
@@ -106,7 +106,7 @@ implicit none
     !$ time_init_para = omp_get_wtime()
     !$omp parallel do schedule(static) reduction(+:distribution_sum) &
     !$ private(positions, i_particle, j_particle, distance_ij, i_distribution)
-    do i_step = 1, num_equilibrium_steps/snap_factor
+    do i_step = 1, num_steps/snap_factor
 
         ! Read
         !$omp critical
@@ -155,7 +155,7 @@ implicit none
             distance_i_plus = real(i_distribution + 1, DP) * delta
             
             distribution_function(i_distribution) = &
-                2._DP * real(distribution_sum(i_distribution), DP) / real(num_equilibrium_steps / &
+                2._DP * real(distribution_sum(i_distribution), DP) / real(num_steps / &
                 snap_factor, DP) / real(num_particles, DP) / &
                 (sphere_volume(distance_i_plus) - sphere_volume(distance_i_minus)) / density
             write(distrib_unit, *) distance_i_distribution, distribution_function(i_distribution)
