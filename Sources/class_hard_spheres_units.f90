@@ -11,8 +11,8 @@ private
         integer :: observables_equilibrium
         integer :: move_delta
 
-        integer :: snapIni_positions
-        integer :: snapFin_positions
+        integer :: snap_initial_positions
+        integer :: snap_final_positions
         integer :: snap_positions
         
         integer :: report
@@ -29,8 +29,8 @@ private
     
         integer :: rotate_delta
 
-        integer :: snapIni_orientations
-        integer :: snapFin_orientations
+        integer :: snap_initial_orientations
+        integer :: snap_final_orientations
         integer :: snap_orientations
         
         integer :: potential_energy_real
@@ -71,9 +71,9 @@ contains
         open(newunit=this%move_delta, recl=4096, file=name//"_move_delta.out", status='new', &
             action='write')
         
-        open(newunit=this%snapIni_positions, recl=4096, file=name//"_snapIni_positions.out", &
+        open(newunit=this%snap_initial_positions, recl=4096, file=name//"_snap_initial_positions.out", &
              status='new', action='write')
-        open(newunit=this%snapFin_positions, recl=4096, file=name//"_snapFin_positions.out", &
+        open(newunit=this%snap_final_positions, recl=4096, file=name//"_snap_final_positions.out", &
              status='new', action='write')
         open(newunit=this%snap_positions, recl=4096, file=name//"_snap_positions.shots", &
              status='new', action='write')
@@ -89,10 +89,10 @@ contains
                 open(newunit=this%rotate_delta, recl=4096, file=name//"_rotate_delta.out", &
                     status='new', action='write')
                 
-                open(newunit=this%snapIni_orientations, recl=4096, &
-                     file=name//"_snapIni_orientations.out", status='new', action='write')
-                open(newunit=this%snapFin_orientations, recl=4096, &
-                     file=name//"_snapFin_orientations.out", status='new', action='write')
+                open(newunit=this%snap_initial_orientations, recl=4096, &
+                     file=name//"_snap_initial_orientations.out", status='new', action='write')
+                open(newunit=this%snap_final_orientations, recl=4096, &
+                     file=name//"_snap_final_orientations.out", status='new', action='write')
                 open(newunit=this%snap_orientations, recl=4096, &
                      file=name//"_snap_orientations.shots", status='new', action='write')
                      
@@ -143,8 +143,8 @@ contains
         close(this%observables_equilibrium)
         close(this%move_delta)
 
-        close(this%snapIni_positions)
-        close(this%snapFin_positions)
+        close(this%snap_initial_positions)
+        close(this%snap_final_positions)
         close(this%snap_positions)
         
         close(this%report)
@@ -156,8 +156,8 @@ contains
             
                 close(this%rotate_delta)
         
-                close(this%snapIni_orientations)
-                close(this%snapFin_orientations)
+                close(this%snap_initial_orientations)
+                close(this%snap_final_orientations)
                 close(this%snap_orientations)
                 
                 close(this%potential_energy_real)
