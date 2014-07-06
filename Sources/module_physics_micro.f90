@@ -10,7 +10,7 @@ use data_box, only: num_dimensions
 implicit none
 private
 public set_discrete_length, sphere_volume, PBC_vector, PBC_distance, random_surface, markov_surface, &
-       ewald_real_B, ewald_real_C, &
+       dipolar_pair_energy, ewald_real_B, ewald_real_C, &
        num_wave_vectors, Box_wave1_sym, Box_wave2_sym, fourier_i, exchange_sign, &
        index_from_coord, coord_PBC, &
        potential_energy_lennardJones, potential_energy_yukawa
@@ -151,6 +151,26 @@ contains
         mCol(:) = mCol(:) / norm2(mCol)
     
     end subroutine markov_surface
+
+    !> \f[
+    !>      \frac{(\vec{\mu}_i\cdot\vec{\mu_j})}{r^3} - 
+    !>     3\frac{(\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij})}{r^5}
+    !> \f]
+    
+    pure function dipolar_pair_energy(orientation_i, orientation_j, vector_ij)
+    
+        real(DP), dimension(:), intent(in) :: orientation_i, orientation_j
+        real(DP), dimension(:), intent(in) :: vector_ij
+        real(DP) :: dipolar_pair_energy
+        
+        real(DP) :: distance_ij
+        
+        distance_ij = norm2(vector_ij)        
+        dipolar_pair_energy = dot_product(orientation_i, orientation_j) / distance_ij**3 - &
+                              3._DP * dot_product(orientation_i, vector_ij) * &
+                                      dot_product(orientation_j, vector_ij) / distance_ij**5
+        
+    end function dipolar_pair_energy
     
     !> \f[ B(r) = \frac{\mathrm{erfc}(\alpha r)}{r^3} +
     !>           2\frac{\alpha}{\sqrt{\pi}}\frac{e^{-\alpha^2 r^2}}{r^2} \f]

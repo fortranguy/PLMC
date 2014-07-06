@@ -4,9 +4,9 @@ use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
 use data_precisions, only: DP
 use data_box, only: num_dimensions
 use json_module, only: json_file, json_initialize
-use module_arguments, only: arg_to_file
 use module_physics_micro, only: PBC_vector, dipolar_pair_energy
 use module_clusters, only: pairs_to_clusters
+use module_arguments, only: arg_to_file
 
 implicit none
 
