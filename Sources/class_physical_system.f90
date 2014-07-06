@@ -16,8 +16,7 @@ use class_hard_spheres_observables, only: Hard_Spheres_Observables, Dipolar_Hard
 use class_hard_spheres_units, only: Hard_Spheres_Units, Dipolar_Hard_Spheres_Units, &
                                     Between_Hard_Spheres_Units
 use module_physics_macro, only: init_random_seed, set_initial_configuration, &
-                                init_spheres, init_cells, set_ewald, total_energy, &
-                                final_spheres, &
+                                init_spheres, init_cells, set_ewald, total_energy, final_spheres, &
                                 init_between_spheres_potential, final_between_spheres_potential, &
                                 test_consist
 use module_algorithms, only: move, widom, switch, rotate
