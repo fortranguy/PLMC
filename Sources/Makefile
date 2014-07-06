@@ -1,44 +1,44 @@
 # Monte-Carlo simulation Makefile
 
 ifeq ($(compiler), gfortran)
-	FC = gfortran
-	CPPC = g++
-	# default: debug
-	FFLAGS = -W -Wall -fbounds-check -g
-	CPPFLAGS = -W -Wall -g
-	ifeq ($(mode), release)
-		FFLAGS = -O2 -g
-		CPPFLAGS = -O2
-	endif
-	ifeq ($(mode), fast)
-		FFLAGS = -Ofast
-	endif
-	ifeq ($(omp), true)
-		FFLAGS += -fopenmp
-		LDFLAGS = -fopenmp
-	endif
-	FFLAGS += -I${HOME}/usr/json-fortran_gfortran/include
-	LDFLAGS += -L${HOME}/usr/json-fortran_gfortran/lib -ljsonfortran
+    FC = gfortran
+    CPPC = g++
+    # default: debug
+    FFLAGS = -W -Wall -fbounds-check -g
+    CPPFLAGS = -W -Wall -g
+    ifeq ($(mode), release)
+        FFLAGS = -O2 -g
+        CPPFLAGS = -O2
+    endif
+    ifeq ($(mode), fast)
+        FFLAGS = -Ofast
+    endif
+    ifeq ($(omp), true)
+        FFLAGS += -fopenmp
+        LDFLAGS = -fopenmp
+    endif
+    FFLAGS += -I${HOME}/usr/json-fortran_gfortran/include
+    LDFLAGS += -L${HOME}/usr/json-fortran_gfortran/lib -ljsonfortran
 else
-	FC = ifort
-	CPPC = icpc
-	# default: debug
-	FFLAGS = -warn all -check all -check noarg_temp_created -fltconsistency -g -traceback
-	CPPFLAGS = -W -Wall -g
-	ifeq ($(mode), release)
-		FFLAGS =  -fltconsistency -g
-		CPPFLAGS = -O2
-	endif
-	ifeq ($(mode), fast)
-		FFLAGS = -fast
-		CPPFLAGS = -O3
-	endif
-	ifeq ($(omp), true)
-		FFLAGS += -openmp
-		LDFLAGS = -openmp
-	endif
-	FFLAGS += -I${HOME}/usr/json-fortran_intel/include
-	LDFLAGS += -L${HOME}/usr/json-fortran_intel/lib -ljsonfortran
+    FC = ifort
+    CPPC = icpc
+    # default: debug
+    FFLAGS = -warn all -check all -check noarg_temp_created -fltconsistency -g -traceback
+    CPPFLAGS = -W -Wall -g
+    ifeq ($(mode), release)
+        FFLAGS =  -fltconsistency -g
+        CPPFLAGS = -O2
+    endif
+    ifeq ($(mode), fast)
+        FFLAGS = -fast
+        CPPFLAGS = -O3
+    endif
+    ifeq ($(omp), true)
+        FFLAGS += -openmp
+        LDFLAGS = -openmp
+    endif
+    FFLAGS += -I${HOME}/usr/json-fortran_intel/include
+    LDFLAGS += -L${HOME}/usr/json-fortran_intel/lib -ljsonfortran
 endif
 
 CPPFLAGS += -I${HOME}/usr/lib/boost_1_55_0
@@ -71,17 +71,17 @@ mc_cano_bulk: data_precisions.o data_constants.o data_box.o data_neighbour_cells
               class_physical_system.o module_arguments.o module_arguments_monte_carlo.o \
               program_monte_carlo.o
 	$(FC) $^ -o $@ $(LDFLAGS)
-	
+
 mc_bunching: data_precisions.o \
              module_data.o module_arguments.o \
              program_bunching.o
 	$(FC) $^ -o $@ $(LDFLAGS)
-	
+
 mc_histogram: data_precisions.o \
               module_data.o module_arguments.o \
               program_histogram.o
 	$(FC) $^ -o $@ $(LDFLAGS)
-	
+
 mc_distribution: data_precisions.o data_constants.o data_box.o \
                  module_data.o module_physics_micro.o module_arguments.o \
                  program_distribution.o
@@ -92,7 +92,7 @@ mc_clusters: data_precisions.o data_constants.o data_box.o \
              module_arguments.o \
              program_clusters.o
 	$(FC) $^ $(LDFLAGS) -o $@ $(LDLIBS)
-	
+
 # ------------------------------------------------------------------------
 
 %.o: %.f90
