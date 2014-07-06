@@ -714,10 +714,12 @@ contains
         integer, intent(in) :: i_step
         
         if (this%snap) then ! Snap shots of the configuration
-            call this%type1_spheres%write_snap_positions(i_step, this%type1_units%snap_positions)
+            call this%type1_spheres%write_snap_positions(i_step, &
+                 this%type1_units%snap_equilibrium_positions)
             call this%type1_spheres%write_snap_orientations(i_step, &
-                                                            this%type1_units%snap_orientations)
-            call this%type2_spheres%write_snap_positions(i_step, this%type2_units%snap_positions)
+                 this%type1_units%snap_equilibrium_orientations)
+            call this%type2_spheres%write_snap_positions(i_step, &
+                 this%type2_units%snap_equilibrium_positions)
         end if
         
     end subroutine Physical_System_take_snapshots

@@ -258,16 +258,16 @@ contains
         class(Hard_Spheres_Units), intent(in) :: this_units
         
         call this_spheres%test_overlap(Box%size)
-        call this_spheres%write_snap_data(this_units%snap_positions)
+        call this_spheres%write_snap_data(this_units%snap_equilibrium_positions)
         call this_spheres%write_snap_positions(0, this_units%snap_initial_positions)
         
         select type (this_spheres)
             type is (Dipolar_Hard_Spheres)
                 select type (this_units)
                     type is (Dipolar_Hard_Spheres_Units)
-                        call this_spheres%write_snap_data(this_units%snap_orientations)
+                        call this_spheres%write_snap_data(this_units%snap_equilibrium_orientations)
                         call this_spheres%write_snap_orientations(0, &
-                                                                  this_units%snap_initial_orientations)
+                             this_units%snap_initial_orientations)
                 end select
         end select
     
@@ -290,7 +290,8 @@ contains
         between_cell_size = between_spheres_potential%get_range_cut()
         call this_macro%between_cells%construct(Box_size, between_cell_size, &
                                                 between_spheres_potential%get_range_cut())
-        call this_macro%between_cells%all_cols_to_cells(other_spheres%get_num_particles(), other_spheres)
+        call this_macro%between_cells%all_cols_to_cells(other_spheres%get_num_particles(), &
+                                                        other_spheres)
 
     end subroutine init_cells
     

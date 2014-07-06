@@ -13,7 +13,7 @@ private
 
         integer :: snap_initial_positions
         integer :: snap_final_positions
-        integer :: snap_positions
+        integer :: snap_equilibrium_positions
         
         integer :: report
         integer :: potential_energy
@@ -31,7 +31,7 @@ private
 
         integer :: snap_initial_orientations
         integer :: snap_final_orientations
-        integer :: snap_orientations
+        integer :: snap_equilibrium_orientations
         
         integer :: potential_energy_real
 
@@ -75,8 +75,8 @@ contains
              status='new', action='write')
         open(newunit=this%snap_final_positions, recl=4096, file=name//"_snap_final_positions.out", &
              status='new', action='write')
-        open(newunit=this%snap_positions, recl=4096, file=name//"_snap_positions.shots", &
-             status='new', action='write')
+        open(newunit=this%snap_equilibrium_positions, recl=4096, &
+             file=name//"_snap_equilibrium_positions.shots", status='new', action='write')
         
         open(newunit=this%report, recl=4096, file=name//"_report.txt", status='new', action='write')
         open(newunit=this%potential_energy, recl=4096, &
@@ -93,8 +93,8 @@ contains
                      file=name//"_snap_initial_orientations.out", status='new', action='write')
                 open(newunit=this%snap_final_orientations, recl=4096, &
                      file=name//"_snap_final_orientations.out", status='new', action='write')
-                open(newunit=this%snap_orientations, recl=4096, &
-                     file=name//"_snap_orientations.shots", status='new', action='write')
+                open(newunit=this%snap_equilibrium_orientations, recl=4096, &
+                     file=name//"_snap_equilibrium_orientations.shots", status='new', action='write')
                      
                 open(newunit=this%potential_energy_real, recl=4096, &
                      file=name//"_potential_energy_real.tmp", status='new', action='write')
@@ -145,7 +145,7 @@ contains
 
         close(this%snap_initial_positions)
         close(this%snap_final_positions)
-        close(this%snap_positions)
+        close(this%snap_equilibrium_positions)
         
         close(this%report)
         close(this%potential_energy)
@@ -158,7 +158,7 @@ contains
         
                 close(this%snap_initial_orientations)
                 close(this%snap_final_orientations)
-                close(this%snap_orientations)
+                close(this%snap_equilibrium_orientations)
                 
                 close(this%potential_energy_real)
 
