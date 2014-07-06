@@ -22,7 +22,7 @@ private
 public init_random_seed, set_initial_configuration, &
        init_spheres, init_cells, &
        set_ewald, &
-       total_energy, & 
+       total_energy, &
        final_spheres, init_between_spheres_potential, final_between_spheres_potential, &
        adapt_move, adapt_rotation, test_consist
 
@@ -270,9 +270,9 @@ contains
                 end select
         end select
     
-    end subroutine init_spheres    
+    end subroutine init_spheres
     
-    subroutine init_cells(Box_size, this_spheres, this_macro, other_spheres, between_spheres_potential)  
+    subroutine init_cells(Box_size, this_spheres, this_macro, other_spheres, between_spheres_potential)
       
         real(DP), dimension(:), intent(in) :: Box_size
         class(Hard_Spheres), intent(in) :: this_spheres, other_spheres
@@ -315,8 +315,8 @@ contains
         min_distance = this_macro%hard_potential%get_min_distance()
         call this_macro%ewald_real%construct(Box%size, alpha, min_distance, json)
         call this_macro%ewald_reci%construct(Box, alpha, this_spheres)
-        call this_macro%ewald_reci%count_wave_vectors(Box%wave, this_units%waveVectors)        
-        call this_macro%ewald_self%set_alpha(alpha)        
+        call this_macro%ewald_reci%count_wave_vectors(Box%wave, this_units%waveVectors)
+        call this_macro%ewald_self%set_alpha(alpha)
         call this_macro%ewald_bound%set_total_moment(this_spheres)
     
     end subroutine set_ewald

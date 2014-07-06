@@ -34,7 +34,7 @@ contains
         this%delta = delta
         this%deltaSave = this%delta
         this%deltaMax = deltaMax
-        this%rejectFix = rejectFix    
+        this%rejectFix = rejectFix
         
     end subroutine Small_Rotation_init
 

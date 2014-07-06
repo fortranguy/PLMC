@@ -155,7 +155,7 @@ contains
     !> \f[ B(r) = \frac{\mathrm{erfc}(\alpha r)}{r^3} +
     !>           2\frac{\alpha}{\sqrt{\pi}}\frac{e^{-\alpha^2 r^2}}{r^2} \f]
     
-    pure function ewald_real_B(alpha, r)    
+    pure function ewald_real_B(alpha, r)
         real(DP), intent(in) :: alpha
         real(DP), intent(in) :: r
         real(DP) :: ewald_real_B
@@ -168,7 +168,7 @@ contains
     !>            2\frac{\alpha}{\sqrt{\pi}}\left(2\alpha^2 + \frac{3}{r^2}\right)
     !>                                     \frac{e^{-\alpha^2 r^2}}{r^2} \f]
     
-    pure function ewald_real_C(alpha, r)    
+    pure function ewald_real_C(alpha, r)
         real(DP), intent(in) :: alpha
         real(DP), intent(in) :: r
         real(DP) :: ewald_real_C

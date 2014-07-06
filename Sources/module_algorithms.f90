@@ -209,7 +209,7 @@ contains
                             test%add = .true.
                             test%orientation(:) = random_surface()
                             select type (this_macro)
-                                type is (Dipolar_Hard_Spheres_Macro)                                
+                                type is (Dipolar_Hard_Spheres_Macro)
                                     this_energy_test = this_macro%ewald_real%solo(Box%size, &
                                                                                   this_spheres, test) + &
                                                        this_macro%ewald_reci%exchange(Box, test) - &
@@ -217,7 +217,7 @@ contains
                                                        this_macro%ewald_bound%exchange(Box%size, &
                                                                                        test%orientation)
                                                     
-                            end select                                            
+                            end select
                     end select
                 
                     energy_test = this_energy_test + mix_energy_test
@@ -323,7 +323,7 @@ contains
                                                          type1_energy_delta
                     type2_observables%potential_energy = type2_observables%potential_energy + &
                                                          type2_energy_delta
-                    mix_potential_energy = mix_potential_energy + type1_mix_energy_delta + & 
+                    mix_potential_energy = mix_potential_energy + type1_mix_energy_delta + &
                                                                   type2_mix_energy_delta
                     
                 else

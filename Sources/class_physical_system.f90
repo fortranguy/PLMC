@@ -79,7 +79,7 @@ private
         procedure, private :: set_box => Physical_System_set_box
         procedure, private :: set_monte_carlo_steps => Physical_System_set_monte_carlo_steps
         procedure, private :: set_monte_carlo_changes => &
-                              Physical_System_set_monte_carlo_changes        
+                              Physical_System_set_monte_carlo_changes
         procedure :: destroy => Physical_System_destroy
         
         !> Initialization & Finalisation
@@ -87,7 +87,7 @@ private
         procedure, private :: open_all_units => Physical_System_open_all_units
         procedure, private :: write_all_reports => Physical_System_write_all_reports
         procedure, private :: write_report => Physical_System_write_report
-        procedure, private :: init_switch => Physical_System_init_switch              
+        procedure, private :: init_switch => Physical_System_init_switch
         procedure :: final => Physical_System_final
         procedure, private :: write_all_results => Physical_System_write_all_results
         procedure, private :: write_results => Physical_System_write_results
@@ -154,8 +154,8 @@ contains
     
     subroutine Physical_System_set_box(this, json)
     
-        class(Physical_System), intent(inout) :: this    
-        type(json_file), intent(inout) :: json    
+        class(Physical_System), intent(inout) :: this
+        type(json_file), intent(inout) :: json
         
         character(len=4096) :: data_name
         logical :: found
@@ -178,13 +178,13 @@ contains
         
         data_name = "Box.temperature"
         call json%get(data_name, this%Box%temperature, found)
-        call test_data_found(data_name, found)                
+        call test_data_found(data_name, found)
         
     end subroutine Physical_System_set_box
     
     subroutine Physical_System_set_monte_carlo_steps(this, json)
         class(Physical_System), intent(inout) :: this
-        type(json_file), intent(inout) :: json 
+        type(json_file), intent(inout) :: json
         
         character(len=4096) :: data_name
         logical :: found
@@ -272,16 +272,16 @@ contains
     
     ! Initialization
     
-    subroutine Physical_System_init(this, json, args)   
+    subroutine Physical_System_init(this, json, args)
      
         class(Physical_System), intent(inout) :: this
         type(json_file), intent(inout) :: json
         type(Monte_Carlo_Arguments), intent(in) :: args
         
-        real(DP) :: potential_energy_conf      
+        real(DP) :: potential_energy_conf
         
         character(len=4096) :: data_name
-        logical :: found  
+        logical :: found
         
         data_name = "Distribution.take snapshot"
         call json%get(data_name, this%snap, found)
@@ -322,11 +322,11 @@ contains
         this%type1_observables%potential_energy = total_energy(this%Box, this%type1_spheres, &
                                                                this%type1_macro)
                         
-        call init_spheres(this%Box, this%type2_spheres, this%type2_units)                                 
+        call init_spheres(this%Box, this%type2_spheres, this%type2_units)
         call this%type2_macro%hard_potential%construct(json, "Hard Spheres", &
                                                        this%type2_spheres%get_diameter())
         call init_cells(this%Box%size, this%type2_spheres, this%type2_macro, this%type1_spheres, &
-                        this%between_spheres_potential)        
+                        this%between_spheres_potential)
         this%type2_observables%potential_energy = total_energy(this%Box, this%type2_spheres, &
                                                                this%type2_macro)
                         
@@ -346,18 +346,18 @@ contains
     
     end subroutine Physical_System_init
     
-    subroutine Physical_System_open_all_units(this)    
+    subroutine Physical_System_open_all_units(this)
         class(Physical_System), intent(inout) :: this
         
         call open_units(this%report_unit, this%observables_thermalisation_unit, &
-                        this%observables_equilibrium_unit)        
-        call this%type1_units%open(this%type1_spheres%get_name())           
-        call this%type2_units%open(this%type2_spheres%get_name())      
+                        this%observables_equilibrium_unit)
+        call this%type1_units%open(this%type1_spheres%get_name())
+        call this%type2_units%open(this%type2_spheres%get_name())
         call this%between_spheres_units%open(this%between_spheres%get_name())
     
     end subroutine Physical_System_open_all_units
     
-    subroutine Physical_System_write_all_reports(this)    
+    subroutine Physical_System_write_all_reports(this)
         class(Physical_System), intent(in) :: this
         
         call write_data(this%report_unit)
@@ -375,7 +375,7 @@ contains
     
     end subroutine Physical_System_write_all_reports
     
-    subroutine Physical_System_write_report(this, report_unit)    
+    subroutine Physical_System_write_report(this, report_unit)
         class(Physical_System), intent(in) :: this
         integer, intent(in) :: report_unit
 
@@ -386,7 +386,7 @@ contains
         write(report_unit ,*) "    Box_wave(:) = ", this%Box%wave(:)
         write(report_unit ,*) "    num_wave_vectors =", num_wave_vectors(this%Box%wave)
         write(report_unit ,*) "    Temperature = ", this%Box%temperature
-        write(report_unit ,*) "    num_particles = ", this%Box%num_particles        
+        write(report_unit ,*) "    num_particles = ", this%Box%num_particles
         
         write(report_unit, *) "    num_equilibrium_steps = ", this%num_equilibrium_steps
         write(report_unit, *) "    num_thermalisation_steps = ", this%num_thermalisation_steps
@@ -412,7 +412,7 @@ contains
     
     ! Finalisation
     
-    subroutine Physical_System_final(this, json)    
+    subroutine Physical_System_final(this, json)
     
         class(Physical_System), intent(inout) :: this
         type(json_file), intent(inout) :: json
@@ -457,7 +457,7 @@ contains
     
     end subroutine Physical_System_write_all_results
     
-    subroutine Physical_System_write_results(this)    
+    subroutine Physical_System_write_results(this)
         class(Physical_System), intent(inout) :: this
         
         real(DP) :: potential_energy, potential_energy_conf
@@ -481,12 +481,12 @@ contains
     
     end subroutine Physical_System_write_results
     
-    subroutine Physical_System_close_units(this)    
+    subroutine Physical_System_close_units(this)
         class(Physical_System), intent(inout) :: this
     
         call this%type1_units%close()
         call this%type2_units%close()
-        call this%between_spheres_units%close()        
+        call this%between_spheres_units%close()
         
         close(this%report_unit)
         close(this%observables_thermalisation_unit)
@@ -496,7 +496,7 @@ contains
     
     ! Destruction
     
-    subroutine Physical_System_destroy(this)   
+    subroutine Physical_System_destroy(this)
      
         class(Physical_System), intent(inout) :: this
         
@@ -505,13 +505,13 @@ contains
         call this%between_spheres%destroy()
         
         call this%type2_macro%between_cells%destroy()
-        call this%type2_macro%same_cells%destroy()        
+        call this%type2_macro%same_cells%destroy()
         call this%type2_spheres%destroy()
         
         call this%type1_macro%ewald_reci%destroy()
         call this%type1_macro%ewald_real%destroy()
         call this%type1_macro%between_cells%destroy()
-        call this%type1_macro%same_cells%destroy()        
+        call this%type1_macro%same_cells%destroy()
         call this%type1_spheres%destroy()
         
         if (allocated(this%name)) deallocate(this%name)
@@ -520,7 +520,7 @@ contains
     
     ! Accessors
     
-    pure function Physical_System_get_num_thermalisation_steps(this) &    
+    pure function Physical_System_get_num_thermalisation_steps(this) &
                   result(get_num_thermalisation_steps)
         
         class(Physical_System), intent(in) :: this
@@ -541,14 +541,14 @@ contains
     ! Mutators
     
     subroutine Physical_System_set_time_start(this)
-        class(Physical_System), intent(inout) :: this  
+        class(Physical_System), intent(inout) :: this
               
         call cpu_time(this%time_start)
         
     end subroutine Physical_System_set_time_start
     
     subroutine Physical_System_set_time_end(this)
-        class(Physical_System), intent(inout) :: this  
+        class(Physical_System), intent(inout) :: this
               
         call cpu_time(this%time_end)
         
@@ -556,7 +556,7 @@ contains
     
     ! Random changes
     
-    subroutine Physical_System_random_changes(this)    
+    subroutine Physical_System_random_changes(this)
         class(Physical_System), intent(inout) :: this
         
         integer :: i_change, i_change_rand, i_particule_rand
@@ -572,7 +572,7 @@ contains
                 ! Randomly choosing the type
                 call random_number(rand)
                 i_particule_rand = int(rand*real(this%Box%num_particles, DP)) + 1
-                if (i_particule_rand <= this%type1_spheres%get_num_particles()) then                    
+                if (i_particule_rand <= this%type1_spheres%get_num_particles()) then
                     call move(this%Box, &
                               this%type1_spheres, this%type1_macro, this%type1_observables, &
                               this%type2_spheres, this%type2_macro%between_cells, &
@@ -602,7 +602,7 @@ contains
     
     end subroutine Physical_System_random_changes
     
-    subroutine Physical_System_update_rejections(this)    
+    subroutine Physical_System_update_rejections(this)
         class(Physical_System), intent(inout) :: this
     
         call this%type1_observables%update_rejections()
@@ -614,7 +614,7 @@ contains
         
     end subroutine Physical_System_update_rejections
     
-    subroutine Physical_System_adapt_changes(this, i_step)    
+    subroutine Physical_System_adapt_changes(this, i_step)
         class(Physical_System), intent(inout) :: this
         integer, intent(in) :: i_step
         
@@ -644,7 +644,7 @@ contains
         
     end subroutine Physical_System_adapt_changes
     
-    subroutine Physical_System_write_observables_thermalisation(this, i_step)    
+    subroutine Physical_System_write_observables_thermalisation(this, i_step)
         class(Physical_System), intent(inout) :: this
         integer, intent(in) :: i_step
     

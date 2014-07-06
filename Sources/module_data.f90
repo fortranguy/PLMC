@@ -24,7 +24,7 @@ contains
     subroutine test_empty_string(data_name, string)
     
         character(len=*), intent(in) :: data_name
-        character(len=*) :: string        
+        character(len=*) :: string
         
         if (len(string) == 0) then
             write(error_unit, *) trim(data_name), ": string is empty."

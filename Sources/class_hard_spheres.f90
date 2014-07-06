@@ -96,7 +96,7 @@ private
     
 contains
 
-    subroutine Hard_Spheres_construct(this, json)    
+    subroutine Hard_Spheres_construct(this, json)
     
         class(Hard_Spheres), intent(out) :: this
         type(json_file), intent(inout) :: json
@@ -110,7 +110,7 @@ contains
         call test_data_found(data_name, found)
         call test_empty_string(data_name, this_name)
         this%name = this_name
-        if (allocated(this_name)) deallocate(this_name)        
+        if (allocated(this_name)) deallocate(this_name)
         write(output_unit, *) this%name, " class construction"
         
         call this%set_particles(json)
@@ -132,10 +132,10 @@ contains
         call test_data_found(data_name, found)
         call test_empty_string(data_name, this_name)
         this%name = this_name
-        if (allocated(this_name)) deallocate(this_name)       
+        if (allocated(this_name)) deallocate(this_name)
         write(output_unit, *) this%name, " class construction"
     
-        call this%set_particles(json)        
+        call this%set_particles(json)
         call this%Hard_Spheres%set_snap(json)
     
     end subroutine Dipolar_Hard_Spheres_construct
@@ -154,7 +154,7 @@ contains
         
         data_name = "Particles.Hard Spheres.number of particles"
         call json%get(data_name, this%num_particles, found)
-        call test_data_found(data_name, found)        
+        call test_data_found(data_name, found)
         allocate(this%all_positions(num_dimensions, this%num_particles))
         
         data_name = "Particles.Hard Spheres.number of Widom particles"
@@ -217,12 +217,12 @@ contains
         call test_data_found(data_name, found)
         call test_empty_string(data_name, this_name)
         this%name = this_name
-        if (allocated(this_name)) deallocate(this_name)       
+        if (allocated(this_name)) deallocate(this_name)
         write(output_unit, *) this%name, " class construction"
         
         data_name = "Particles.Between Spheres.non addivity"
         call json%get(data_name, this%non_additivity, found)
-        call test_data_found(data_name, found)        
+        call test_data_found(data_name, found)
         this%diameter = (type1_diameter + type2_diameter)/2._DP + this%non_additivity
         
     end subroutine Between_Hard_Spheres_construct
@@ -231,18 +231,18 @@ contains
     
         class(Hard_Spheres), intent(inout) :: this
         
-        write(output_unit, *) this%name, " class destruction"        
+        write(output_unit, *) this%name, " class destruction"
         if (allocated(this%all_positions)) deallocate(this%all_positions)
         if (allocated(this%name)) deallocate(this%name)
     
     end subroutine Hard_Spheres_destroy
     
-    subroutine Dipolar_Hard_Spheres_destroy(this)    
+    subroutine Dipolar_Hard_Spheres_destroy(this)
     
         class(Dipolar_Hard_Spheres), intent(inout) :: this
         
         call this%Hard_Spheres%destroy()
-        if (allocated(this%all_orientations)) deallocate(this%all_orientations) 
+        if (allocated(this%all_orientations)) deallocate(this%all_orientations)
           
     end subroutine Dipolar_Hard_Spheres_destroy
     
@@ -250,7 +250,7 @@ contains
     
         class(Between_Hard_Spheres), intent(inout) :: this
         
-        write(output_unit, *) this%name, " class destruction"        
+        write(output_unit, *) this%name, " class destruction"
         if (allocated(this%name)) deallocate(this%name)
     
     end subroutine Between_Hard_Spheres_destroy
@@ -358,7 +358,7 @@ contains
         class(Hard_Spheres), intent(in) :: this
         integer, intent(in) :: report_unit
         
-        write(report_unit, *) "Snap: "        
+        write(report_unit, *) "Snap: "
         write(report_unit, *) "    snap_factor = ", this%snap_factor
         
     end subroutine Hard_Spheres_write_report

@@ -47,7 +47,7 @@ private
     
 contains
 
-    subroutine Hard_Spheres_Potential_Energy_construct(this, json, type_name, diameter)  
+    subroutine Hard_Spheres_Potential_Energy_construct(this, json, type_name, diameter)
     
         class(Hard_Spheres_Potential_Energy), intent(inout) :: this
         type(json_file), intent(inout) :: json
@@ -67,7 +67,7 @@ contains
         
     end subroutine Hard_Spheres_Potential_Energy_construct
     
-    subroutine Hard_Spheres_Potential_Energy_write(this, unit)    
+    subroutine Hard_Spheres_Potential_Energy_write(this, unit)
     
         class(Hard_Spheres_Potential_Energy), intent(in) :: this
         integer, intent(in) :: unit
@@ -92,7 +92,7 @@ contains
         
         get_range_cut = this%range_cut
         
-    end function Hard_Spheres_Potential_Energy_get_range_cut    
+    end function Hard_Spheres_Potential_Energy_get_range_cut
     
     subroutine Hard_Spheres_write_report(this, report_unit)
     
@@ -131,7 +131,7 @@ contains
             type is (Between_Hard_Spheres_Potential_Energy)
                 i_total_cell = particle%between_i_cell
                 particule_number = particle%other_number
-        end select 
+        end select
     
         do i_near_cell = 1, num_near_cells
         
@@ -178,12 +178,12 @@ contains
         
         total = 0._DP
         
-        if (.not.present(other_spheres)) then            
+        if (.not.present(other_spheres)) then
             do i_particle = 1, spheres%get_num_particles()
                 particle%number = i_particle
                 particle%position(:) = spheres%get_position(particle%number)
                 total = total + this%solo(Box_size, spheres, particle)
-            end do            
+            end do
         end if
         
     end function Hard_Spheres_Potential_Energy_total
@@ -203,11 +203,11 @@ contains
         solo = 0._DP
         
         do j_particle = 1, spheres%get_num_particles()
-            if (j_particle /= particle%number) then            
+            if (j_particle /= particle%number) then
                 position_j(:) = spheres%get_position(j_particle)
-                distance_ij = PBC_distance(Box_size, particle%position, position_j)                
-                solo = solo + this%pair(distance_ij)            
-            end if            
+                distance_ij = PBC_distance(Box_size, particle%position, position_j)
+                solo = solo + this%pair(distance_ij)
+            end if
         end do
     
     end function Hard_Spheres_Potential_Energy_solo
@@ -226,12 +226,12 @@ contains
     
         total = 0._DP
         
-        if (present(other_spheres)) then        
-            do i_particle = 1, spheres%get_num_particles()            
+        if (present(other_spheres)) then
+            do i_particle = 1, spheres%get_num_particles()
                 type1_particle%number = i_particle
                 type1_particle%position(:) = spheres%get_position(type1_particle%number)
-                total = total + this%solo(Box_size, other_spheres, type1_particle)                
-            end do            
+                total = total + this%solo(Box_size, other_spheres, type1_particle)
+            end do
         end if
         
     end function Between_Hard_Spheres_Potential_Energy_total
@@ -251,10 +251,10 @@ contains
         
         solo = 0._DP
         
-        do j_particle = 1, spheres%get_num_particles()            
+        do j_particle = 1, spheres%get_num_particles()
             position_j(:) = spheres%get_position(j_particle)
-            distance_ij = PBC_distance(Box_size, particle%position, position_j)            
-            solo = solo + this%pair(distance_ij)                      
+            distance_ij = PBC_distance(Box_size, particle%position, position_j)
+            solo = solo + this%pair(distance_ij)
         end do
     
     end function Between_Hard_Spheres_Potential_Energy_solo
@@ -271,6 +271,6 @@ contains
             pair = 0._DP
         end if
     
-    end function Hard_Spheres_Potential_Energy_pair    
+    end function Hard_Spheres_Potential_Energy_pair
 
 end module class_hard_spheres_potential

@@ -15,7 +15,7 @@ implicit none
     integer :: num_steps
     integer :: i_step, i_step_in
     integer :: num_observables
-    integer :: i_bunching, num_bunching     
+    integer :: i_bunching, num_bunching
     real(DP), dimension(:), allocatable :: values_sum, values_sqr_sum
     real(DP), dimension(:), allocatable :: error
 

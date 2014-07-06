@@ -68,7 +68,7 @@ implicit none
     
     call json%destroy()
     
-    call arg_to_file(1, file_name, length)    
+    call arg_to_file(1, file_name, length)
     open(newunit=positions_unit, recl=4096, file=file_name(1:length), status='old', action='read')
     
     read(positions_unit, *) name, num_particles, snap_factor
@@ -87,7 +87,7 @@ implicit none
     
     if (with_orientations) then
     
-        call arg_to_file(2, file_name, length)        
+        call arg_to_file(2, file_name, length)
         open(newunit=orientations_unit, recl=4096, file=file_name(1:length), status='old', &
         action='read')
         

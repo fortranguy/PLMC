@@ -146,7 +146,7 @@ contains
                           
         exchange = 2._DP*PI/3._DP / product(Box_size) * exchange
     
-    end function Ewald_Summation_Bound_exchange   
+    end function Ewald_Summation_Bound_exchange
     
     !> Exchange
 
@@ -167,6 +167,6 @@ contains
 
         this%total_moment(:) = this%total_moment(:) + orientation(:)
 
-    end subroutine Ewald_Summation_Bound_update_total_moment_exchange 
+    end subroutine Ewald_Summation_Bound_update_total_moment_exchange
 
 end module class_ewald_summation_bound

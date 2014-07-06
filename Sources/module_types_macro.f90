@@ -22,7 +22,7 @@ implicit none
     type, public, extends(Hard_Spheres_Macro) :: Dipolar_Hard_Spheres_Macro
         type(Small_Rotation) :: rotation
         type(Ewald_Summation_Real) :: ewald_real
-        type(Ewald_Summation_Reci) :: ewald_reci  
+        type(Ewald_Summation_Reci) :: ewald_reci
         type(Ewald_Summation_Self) :: ewald_self
         type(Ewald_Summation_Bound) :: ewald_bound
     end type Dipolar_Hard_Spheres_Macro

@@ -19,7 +19,7 @@ private
         
         integer :: num_total_cell
         integer, dimension(num_dimensions) :: num_total_cell_dim
-        real(DP), dimension(num_dimensions) :: cell_size        
+        real(DP), dimension(num_dimensions) :: cell_size
         integer, dimension(:, :), allocatable, public :: near_among_total
         type(Linked_List), dimension(:), allocatable, public :: begin_cells
         type(Linked_List), dimension(:), allocatable :: current_cells, next_cells
@@ -68,7 +68,7 @@ contains
     
         class(Neighbour_Cells), intent(inout) :: this
         
-        if (allocated(this%near_among_total)) deallocate(this%near_among_total)        
+        if (allocated(this%near_among_total)) deallocate(this%near_among_total)
         call this%dealloc_cells()
         
     end subroutine Neighbour_Cells_destroy
