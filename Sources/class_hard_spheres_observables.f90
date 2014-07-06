@@ -3,7 +3,7 @@
 module class_hard_spheres_observables
 
 use data_precisions, only: DP
-use module_types_micro, only: Adapting_Discrete_Observables
+use class_discrete_observable, only: Adapting_Discrete_Observables
 
 implicit none
 private
