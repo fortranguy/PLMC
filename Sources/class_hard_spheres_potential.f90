@@ -26,6 +26,9 @@ private
         procedure :: write => Hard_Spheres_Potential_Energy_write
         procedure :: get_min_distance => Hard_Spheres_Potential_Energy_get_min_distance
         procedure :: get_range_cut => Hard_Spheres_Potential_Energy_get_range_cut
+        
+        procedure :: write_report => Hard_Spheres_write_report
+        
         procedure :: neighbours => Hard_Spheres_Potential_Energy_neighbours
         procedure :: total => Hard_Spheres_Potential_Energy_total
         procedure, private :: solo => Hard_Spheres_Potential_Energy_solo
@@ -91,12 +94,13 @@ contains
         
     end function Hard_Spheres_Potential_Energy_get_range_cut    
     
-    subroutine Hard_Spheres_write_report(this, unit)
+    subroutine Hard_Spheres_write_report(this, report_unit)
     
         class(Hard_Spheres_Potential_Energy), intent(in) :: this
-        integer, intent(in) :: unit
-    
-        write(unit, *) "    range_cut = ", this%range_cut
+        integer, intent(in) :: report_unit
+        
+        write(report_unit, *) "Potential: "
+        write(report_unit, *) "    range_cut = ", this%range_cut
         
     end subroutine Hard_Spheres_write_report
     

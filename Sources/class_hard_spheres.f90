@@ -358,8 +358,7 @@ contains
         class(Hard_Spheres), intent(in) :: this
         integer, intent(in) :: report_unit
         
-        write(report_unit, *) "Data: "
-        
+        write(report_unit, *) "Snap: "        
         write(report_unit, *) "    snap_factor = ", this%snap_factor
         
     end subroutine Hard_Spheres_write_report

@@ -98,6 +98,7 @@ contains
         compacity = 4._DP/3._DP*PI*(this_spheres%get_diameter()/2._DP)**3 * density
         concentration = real(this_spheres%get_num_particles(), DP) / real(Box%num_particles, DP)
         
+        write(report_unit, *) "Density: "
         write(report_unit, *) "    density = ", density
         write(report_unit, *) "    compacity = ", compacity
         write(report_unit, *) "    concentration = ", concentration
