@@ -15,19 +15,8 @@ implicit none
         real(DP) :: temperature
         integer :: num_particles
     end type Box_Parameters
-
-    ! For neighbour cells
-
-    type, public :: Node
-        integer :: number
-        type(Node), pointer :: next => null()
-    end type Node
-
-    type, public :: Linked_List
-        type(Node), pointer :: particle => null()
-    end type Linked_List
     
-    ! For algorithms
+    ! Algorithms
     
     type, public :: Particle_Index
         integer :: number
@@ -43,8 +32,34 @@ implicit none
         real(DP) :: same
         real(DP) :: mix
     end type Particle_Energy
+    
+    ! Observables
 
-    ! For main program
+    type, public :: Observables_Changes
+        integer :: num_hits = 0
+        integer :: num_rejections = 0
+        real(DP) :: rejection_rate = 0._DP
+        real(DP) :: sum_rejection = 0._DP
+        real(DP) :: rejection_adapt = 0._DP
+        real(DP) :: rejection_average = 0._DP
+    contains
+        procedure :: update_rejection => Observables_Changes_update_rejection
+        procedure :: accumulate_rejection => Observables_Changes_accumulate_rejection
+        procedure :: average_rejection =>Observables_Changes_average_rejection
+    end type Observables_Changes 
+    
+    ! Neighbour cells
+
+    type, public :: Node
+        integer :: number
+        type(Node), pointer :: next => null()
+    end type Node
+
+    type, public :: Linked_List
+        type(Node), pointer :: particle => null()
+    end type Linked_List
+
+    ! Arguments
 
     type, public :: Argument_Random
         character(len=1) :: choice
@@ -62,5 +77,35 @@ implicit none
         type(Argument_Random) :: random
         type(Argument_Initial) :: initial
     end type Monte_Carlo_Arguments
+    
+contains
+
+    subroutine Observables_Changes_update_rejection(this)
+    
+        class(Observables_Changes), intent(inout) :: this    
+
+        this%rejection_rate = real(this%num_rejections, DP) / real(this%num_hits, DP)
+        this%num_rejections = 0
+        this%num_hits = 0
+        
+    end subroutine Observables_Changes_update_rejection
+    
+    subroutine Observables_Changes_accumulate_rejection(this)
+    
+        class(Observables_Changes), intent(inout) :: this   
+    
+        this%rejection_adapt = this%rejection_adapt + this%rejection_rate
+        
+    end subroutine Observables_Changes_accumulate_rejection
+    
+    subroutine Observables_Changes_average_rejection(this, period_adaptation)
+    
+        class(Observables_Changes), intent(inout) :: this
+        integer, intent(in) :: period_adaptation
+    
+        this%rejection_average = this%rejection_adapt / real(period_adaptation - 1, DP)
+        this%rejection_adapt = 0._DP
+        
+    end subroutine Observables_Changes_average_rejection
 
 end module module_types_micro

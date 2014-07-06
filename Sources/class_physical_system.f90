@@ -19,7 +19,7 @@ use module_physics_macro, only: init_random_seed, set_initial_configuration, &
                                 init_spheres, init_cells, set_ewald, total_energy, &
                                 final_spheres, &
                                 init_between_spheres_potential, final_between_spheres_potential, &
-                                adapt_move, adapt_rotation, test_consist
+                                test_consist
 use module_algorithms, only: move, widom, switch, rotate
 use module_write, only: open_units, write_data, write_results, between_spheres_write_results, &
                         write_spheres_density
@@ -605,10 +605,12 @@ contains
     subroutine Physical_System_update_rejections(this)
         class(Physical_System), intent(inout) :: this
     
-        call this%type1_observables%update_rejections()
-        call this%type2_observables%update_rejections()
+        call this%type1_observables%move%update_rejection()
+        call this%type1_observables%rotation%update_rejection()
+        call this%type2_observables%move%update_rejection()
         
-        this%switch_rejection_rate = real(this%switch_num_rejections, DP)/real(this%switch_num_hits, DP)
+        this%switch_rejection_rate = real(this%switch_num_rejections, DP) / &
+                                     real(this%switch_num_hits, DP)
         this%switch_num_rejections = 0
         this%switch_num_hits = 0
         
@@ -618,28 +620,28 @@ contains
         class(Physical_System), intent(inout) :: this
         integer, intent(in) :: i_step
         
-        if (mod(i_step, this%period_adaptation) /= 0) then ! Rejections accumulation
-            this%type1_observables%move_rejection_adapt = this%type1_observables%move_rejection_adapt + &
-                                                  this%type1_observables%move_rejection_rate
-            this%type1_observables%rotate_rejection_adapt = this%type1_observables%rotate_rejection_adapt + &
-                                                    this%type1_observables%rotate_rejection_rate
-            this%type2_observables%move_rejection_adapt = this%type2_observables%move_rejection_adapt + &
-                                                  this%type2_observables%move_rejection_rate
-        else ! Average & adaptation
-            call adapt_move(this%Box%size, &
-                            this%type1_macro%move, &
-                            this%period_adaptation, i_step, &
-                            this%type1_observables, &
-                            this%type1_units%move_delta)
-            call adapt_rotation(this%type1_macro%rotation, &
-                                this%period_adaptation, i_step, &
-                                this%type1_observables, &
-                                this%type1_units%rotate_delta)
-            call adapt_move(this%Box%size, &
-                            this%type2_macro%move, &
-                            this%period_adaptation, i_step, &
-                            this%type2_observables, &
-                            this%type2_units%move_delta)
+        if (mod(i_step, this%period_adaptation) /= 0) then
+            call this%type1_observables%move%accumulate_rejection()
+            call this%type1_observables%rotation%accumulate_rejection()
+            call this%type2_observables%move%accumulate_rejection()
+        else
+            call this%type1_observables%move%average_rejection(this%period_adaptation)
+            call this%type1_macro%move%adapt_delta(this%Box%size, &
+                this%type1_observables%move%rejection_average)
+            write(this%type1_units%move_delta, *) i_step, this%type1_macro%move%get_delta_scalar(), &
+                                                  this%type1_observables%move%rejection_average
+                            
+            call this%type1_observables%rotation%average_rejection(this%period_adaptation)
+            call this%type1_macro%rotation%adapt_delta(&
+                 this%type1_observables%rotation%rejection_average)
+            write(this%type1_units%rotate_delta, *) i_step, this%type1_macro%rotation%get_delta(), &
+                                                    this%type1_observables%rotation%rejection_average
+                                
+            call this%type2_observables%move%average_rejection(this%period_adaptation)
+            call this%type2_macro%move%adapt_delta(this%Box%size, &
+                this%type2_observables%move%rejection_average)
+            write(this%type2_units%move_delta, *) i_step, this%type2_macro%move%get_delta_scalar(), &
+                                                  this%type2_observables%move%rejection_average
         end if
         
     end subroutine Physical_System_adapt_changes
@@ -668,14 +670,14 @@ contains
         
         type_name = this%type1_spheres%get_name()
         call this%type1_macro%move%set_delta(type_name, this%Box%size, &
-                                             this%type1_observables%move_rejection_average, &
+                                             this%type1_observables%move%rejection_average, &
                                              this%type1_units%report)
         call this%type1_macro%rotation%set_delta(type_name, &
-                                                 this%type1_observables%rotate_rejection_average, &
+                                                 this%type1_observables%rotation%rejection_average, &
                                                  this%type1_units%report)
         type_name = this%type2_spheres%get_name()
         call this%type2_macro%move%set_delta(type_name, this%Box%size, &
-                                             this%type2_observables%move_rejection_average, &
+                                             this%type2_observables%move%rejection_average, &
                                              this%type2_units%report)
     
     end subroutine Physical_System_fix_changes

@@ -42,7 +42,7 @@ contains
         
         real(DP) :: this_energy_real_new, this_energy_real_old
         
-        this_observables%move_num_hits = this_observables%move_num_hits + 1
+        this_observables%move%num_hits = this_observables%move%num_hits + 1
         
         call random_number(random)
         old%number = int(random*this_spheres%get_num_particles()) + 1
@@ -132,15 +132,15 @@ contains
                     end if
                     
                 else
-                    this_observables%move_num_rejections = this_observables%move_num_rejections + 1
+                    this_observables%move%num_rejections = this_observables%move%num_rejections + 1
                 end if
          
             else
-                this_observables%move_num_rejections = this_observables%move_num_rejections + 1
+                this_observables%move%num_rejections = this_observables%move%num_rejections + 1
             end if
             
         else
-            this_observables%move_num_rejections = this_observables%move_num_rejections + 1
+            this_observables%move%num_rejections = this_observables%move%num_rejections + 1
         end if
     
     end subroutine move
@@ -481,7 +481,7 @@ contains
         real(DP) :: energy_delta
         real(DP) :: energy_real_delta, energy_self_delta
         
-        this_observables%rotate_num_hits = this_observables%rotate_num_hits + 1
+        this_observables%rotation%num_hits = this_observables%rotation%num_hits + 1
 
         call random_number(random)
         old%number = int(random*this_spheres%get_num_particles()) + 1
@@ -513,7 +513,7 @@ contains
             this_observables%potential_energy = this_observables%potential_energy + energy_delta
             
         else
-            this_observables%rotate_num_rejections = this_observables%rotate_num_rejections + 1
+            this_observables%rotation%num_rejections = this_observables%rotation%num_rejections + 1
         end if
     
     end subroutine rotate

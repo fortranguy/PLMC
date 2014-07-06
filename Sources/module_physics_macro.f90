@@ -24,7 +24,7 @@ public init_random_seed, set_initial_configuration, &
        set_ewald, &
        total_energy, &
        final_spheres, init_between_spheres_potential, final_between_spheres_potential, &
-       adapt_move, adapt_rotation, test_consist
+       test_consist
 
 contains
 
@@ -403,46 +403,6 @@ contains
         call test_consist(potential_energy, potential_energy_conf, between_spheres_report_unit)
     
     end subroutine final_between_spheres_potential
-    
-    !> Change: average & adaptation
-    
-    subroutine adapt_move(Box_size, &
-                          this, &
-                          period_adaptation, i_step, &
-                          observables, &
-                          move_unit)
-    
-        real(DP), dimension(:), intent(in) :: Box_size
-        class(Small_Move), intent(inout) :: this
-        integer, intent(in) :: period_adaptation, i_step
-        class(Hard_Spheres_Observables), intent(inout) :: observables
-        integer, intent(in) :: move_unit
-    
-        observables%move_rejection_average = observables%move_rejection_adapt / &
-                                             real(period_adaptation - 1, DP)
-        observables%move_rejection_adapt = 0._DP
-        call this%adapt_delta(Box_size, observables%move_rejection_average)
-        write(move_unit, *) i_step, this%get_delta_scalar(), observables%move_rejection_average
-    
-    end subroutine adapt_move
-    
-    subroutine adapt_rotation(this, &
-                              period_adaptation, i_step, &
-                              observables, &
-                              rotate_unit)
-    
-        class(Small_Rotation), intent(inout) :: this
-        integer, intent(in) :: period_adaptation, i_step
-        class(Dipolar_Hard_Spheres_Observables), intent(inout) :: observables
-        integer, intent(in) :: rotate_unit
-        
-        observables%rotate_rejection_average = observables%rotate_rejection_adapt / &
-                                               real(period_adaptation - 1, DP)
-        observables%rotate_rejection_adapt = 0._DP
-        call this%adapt_delta(observables%rotate_rejection_average)
-        write(rotate_unit, *) i_step, this%get_delta(), observables%rotate_rejection_average
-        
-    end subroutine adapt_rotation
     
     !> Consistency test
     
