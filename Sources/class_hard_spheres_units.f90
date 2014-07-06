@@ -35,10 +35,10 @@ private
         
         integer :: potential_energy_real
 
-        integer :: waveVectors
+        integer :: wave_vectors
         integer :: structure_modulus
         
-        integer :: totalMoment_modulus
+        integer :: total_moment_modulus
     
     end type Dipolar_Hard_Spheres_Units
     
@@ -101,11 +101,11 @@ contains
 
                 open(newunit=this%structure_modulus, recl=4096, file=name//"_structure_modulus.out", &
                      status='new', action='write')
-                open(newunit=this%waveVectors, recl=4096, file=name//"_waveVectors.tmp", &
+                open(newunit=this%wave_vectors, recl=4096, file=name//"_wave_vectors.tmp", &
                      status='new', action='write')
                      
-                open(newunit=this%totalMoment_modulus, recl=4096, &
-                     file=name//"_totalMoment_modulus.out", status='new', action='write')
+                open(newunit=this%total_moment_modulus, recl=4096, &
+                     file=name//"_total_moment_modulus.out", status='new', action='write')
                 
                 write(this%observables_equilibrium, *) "#", 4 ! 4 observables
                 
@@ -162,10 +162,10 @@ contains
                 
                 close(this%potential_energy_real)
 
-                close(this%waveVectors)
+                close(this%wave_vectors)
                 close(this%structure_modulus)
                 
-                close(this%totalMoment_modulus)
+                close(this%total_moment_modulus)
                 
         end select
     

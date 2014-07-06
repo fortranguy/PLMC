@@ -317,7 +317,7 @@ contains
         min_distance = this_macro%hard_potential%get_min_distance()
         call this_macro%ewald_real%construct(Box%size, alpha, min_distance, json)
         call this_macro%ewald_reci%construct(Box, alpha, this_spheres)
-        call this_macro%ewald_reci%count_wave_vectors(Box%wave, this_units%waveVectors)
+        call this_macro%ewald_reci%count_wave_vectors(Box%wave, this_units%wave_vectors)
         call this_macro%ewald_self%set_alpha(alpha)
         call this_macro%ewald_bound%set_total_moment(this_spheres)
     

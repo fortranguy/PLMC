@@ -734,7 +734,7 @@ contains
             call this%type1_macro%ewald_reci%reset_structure(this%Box, this%type1_spheres, i_step, &
                                                              this%type1_units%structure_modulus)
             call this%type1_macro%ewald_bound%reset_total_moment(this%type1_spheres, i_step, &
-                 this%type1_units%totalMoment_modulus)
+                 this%type1_units%total_moment_modulus)
         end if
         
     end subroutine Physical_System_reinitialize_quantites
