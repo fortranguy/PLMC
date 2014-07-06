@@ -35,18 +35,22 @@ implicit none
     
     ! Observables
 
-    type, public :: Observables_Changes
+    type, public :: Discrete_Observables
         integer :: num_hits = 0
         integer :: num_rejections = 0
         real(DP) :: rejection_rate = 0._DP
         real(DP) :: sum_rejection = 0._DP
+    contains
+        procedure :: update_rejection => Discrete_Observables_update_rejection
+    end type Discrete_Observables
+    
+    type, extends(Discrete_Observables), public :: Adapting_Discrete_Observables
         real(DP) :: rejection_adapt = 0._DP
         real(DP) :: rejection_average = 0._DP
     contains
-        procedure :: update_rejection => Observables_Changes_update_rejection
-        procedure :: accumulate_rejection => Observables_Changes_accumulate_rejection
-        procedure :: average_rejection =>Observables_Changes_average_rejection
-    end type Observables_Changes 
+        procedure :: accumulate_rejection => Adapting_Discrete_Observables_accumulate_rejection
+        procedure :: average_rejection => Adapting_Discrete_Observables_average_rejection
+    end type Adapting_Discrete_Observables
     
     ! Neighbour cells
 
@@ -80,32 +84,32 @@ implicit none
     
 contains
 
-    subroutine Observables_Changes_update_rejection(this)
+    subroutine Discrete_Observables_update_rejection(this)
     
-        class(Observables_Changes), intent(inout) :: this    
+        class(Discrete_Observables), intent(inout) :: this    
 
         this%rejection_rate = real(this%num_rejections, DP) / real(this%num_hits, DP)
         this%num_rejections = 0
         this%num_hits = 0
         
-    end subroutine Observables_Changes_update_rejection
+    end subroutine Discrete_Observables_update_rejection
     
-    subroutine Observables_Changes_accumulate_rejection(this)
+    subroutine Adapting_Discrete_Observables_accumulate_rejection(this)
     
-        class(Observables_Changes), intent(inout) :: this   
+        class(Adapting_Discrete_Observables), intent(inout) :: this   
     
         this%rejection_adapt = this%rejection_adapt + this%rejection_rate
         
-    end subroutine Observables_Changes_accumulate_rejection
+    end subroutine Adapting_Discrete_Observables_accumulate_rejection
     
-    subroutine Observables_Changes_average_rejection(this, period_adaptation)
+    subroutine Adapting_Discrete_Observables_average_rejection(this, period_adaptation)
     
-        class(Observables_Changes), intent(inout) :: this
+        class(Adapting_Discrete_Observables), intent(inout) :: this
         integer, intent(in) :: period_adaptation
     
         this%rejection_average = this%rejection_adapt / real(period_adaptation - 1, DP)
         this%rejection_adapt = 0._DP
         
-    end subroutine Observables_Changes_average_rejection
+    end subroutine Adapting_Discrete_Observables_average_rejection
 
 end module module_types_micro

@@ -6,7 +6,7 @@ use, intrinsic :: iso_fortran_env, only: output_unit
 use data_precisions, only: DP
 use json_module, only: json_file
 use module_data, only: test_data_found, test_empty_string
-use module_types_micro, only: Box_Parameters, Monte_Carlo_Arguments
+use module_types_micro, only: Box_Parameters, Discrete_Observables, Monte_Carlo_Arguments
 use module_physics_micro, only: num_wave_vectors
 use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres, Between_Hard_Spheres
 use class_hard_spheres_potential, only: Between_Hard_Spheres_Potential_Energy
@@ -59,14 +59,12 @@ private
         type(Between_Hard_Spheres_Observables) :: between_spheres_observables
         type(Between_Hard_Spheres_Units) :: between_spheres_units
         
-        ! Observables: write to files
+        ! Observables and files units
         real(DP) :: potential_energy, potential_energy_sum
         integer :: report_unit
         integer :: observables_thermalisation_unit, observables_equilibrium_unit
         
-        ! Switch
-        integer :: switch_num_hits, switch_num_rejections
-        real(DP) :: switch_rejection_rate, switch_sum_rejection
+        type(Discrete_Observables) :: switch_observable
         
         logical :: write_potential_energy, snap
         integer :: reset_i_step
@@ -87,7 +85,6 @@ private
         procedure, private :: open_all_units => Physical_System_open_all_units
         procedure, private :: write_all_reports => Physical_System_write_all_reports
         procedure, private :: write_report => Physical_System_write_report
-        procedure, private :: init_switch => Physical_System_init_switch
         procedure :: final => Physical_System_final
         procedure, private :: write_all_results => Physical_System_write_all_results
         procedure, private :: write_results => Physical_System_write_results
@@ -295,7 +292,6 @@ contains
         write(output_unit, *) "Monte-Carlo Simulation: Canonical ensemble"
         
         call this%open_all_units()
-        call this%init_switch()
         
         call init_random_seed(args%random, this%report_unit)
         call set_initial_configuration(this%Box%size, args%initial, &
@@ -400,16 +396,6 @@ contains
     
     end subroutine Physical_System_write_report
     
-    pure subroutine Physical_System_init_switch(this)
-        class(Physical_System), intent(inout) :: this
-        
-        this%switch_num_hits = 0
-        this%switch_num_rejections = 0
-        this%switch_rejection_rate = 0._DP
-        this%switch_sum_rejection = 0._DP
-        
-    end subroutine Physical_System_init_switch
-    
     ! Finalisation
     
     subroutine Physical_System_final(this, json)
@@ -476,8 +462,9 @@ contains
                                     this%type2_observables%potential_energy_sum + &
                                     this%between_spheres_observables%potential_energy_sum
         duration = this%time_end - this%time_start
-        call write_results(this%Box%num_particles, this%num_equilibrium_steps, this%potential_energy_sum, &
-                           this%switch_sum_rejection, duration, this%report_unit)
+        call write_results(this%Box%num_particles, this%num_equilibrium_steps, &
+                           this%potential_energy_sum, this%switch_observable%sum_rejection, duration, &
+                           this%report_unit)
     
     end subroutine Physical_System_write_results
     
@@ -591,8 +578,7 @@ contains
                             this%type2_spheres, this%type2_macro, this%type2_observables, &
                             this%between_spheres_potential, &
                             this%between_spheres_observables%potential_energy, &
-                            this%switch_num_rejections)
-                this%switch_num_hits = this%switch_num_hits + 1
+                            this%switch_observable)
             else
                 call rotate(this%Box, &
                             this%type1_spheres, this%type1_macro, this%type1_observables)
@@ -608,11 +594,7 @@ contains
         call this%type1_observables%move%update_rejection()
         call this%type1_observables%rotation%update_rejection()
         call this%type2_observables%move%update_rejection()
-        
-        this%switch_rejection_rate = real(this%switch_num_rejections, DP) / &
-                                     real(this%switch_num_hits, DP)
-        this%switch_num_rejections = 0
-        this%switch_num_hits = 0
+        call this%switch_observable%update_rejection()
         
     end subroutine Physical_System_update_rejections
     
@@ -703,9 +685,9 @@ contains
     
         call this%type1_observables%accumulate()
         call this%type2_observables%accumulate()
-        call this%between_spheres_observables%accumulate()
-        
-        this%switch_sum_rejection = this%switch_sum_rejection + this%switch_rejection_rate
+        call this%between_spheres_observables%accumulate()        
+        this%switch_observable%sum_rejection = this%switch_observable%sum_rejection + &
+                                               this%switch_observable%rejection_rate
             
     end subroutine Physical_System_accumulate_observables
     

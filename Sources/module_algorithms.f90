@@ -2,7 +2,7 @@ module module_algorithms
 
 use data_precisions, only: DP
 use data_box, only: num_dimensions
-use module_types_micro, only: Box_Parameters, Particle_Index, Particle_Energy
+use module_types_micro, only: Box_Parameters, Particle_Index, Particle_Energy, Discrete_Observables
 use module_physics_micro, only: random_surface, markov_surface
 use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres
 use class_neighbour_cells, only: Neighbour_Cells
@@ -239,7 +239,7 @@ contains
                       type1_spheres, type1_macro, type1_observables, &
                       type2_spheres, type2_macro, type2_observables, &
                       between_spheres_potential, mix_potential_energy, &
-                      switch_num_rejections)
+                      switch_observable)
     
         type(Box_Parameters), intent(in) :: Box
         class(Hard_Spheres), intent(inout) :: type1_spheres, type2_spheres
@@ -247,7 +247,7 @@ contains
         class(Hard_Spheres_Observables), intent(inout) :: type1_observables, type2_observables
         class(Between_Hard_Spheres_Potential_Energy), intent(in) :: between_spheres_potential
         real(DP), intent(inout) :: mix_potential_energy
-        integer, intent(inout) :: switch_num_rejections
+        type(Discrete_Observables), intent(inout) :: switch_observable
         
         real(DP) :: random
         type(Particle_Index) :: old1, old2
@@ -258,8 +258,10 @@ contains
         type(Particle_Energy) :: type1_energy_old, type1_energy_new
         type(Particle_Energy) :: type2_energy_old, type2_energy_new
         
+        switch_observable%num_hits = switch_observable%num_hits + 1
+        
         if (type1_spheres%get_num_particles()==0 .or. type2_spheres%get_num_particles()==0) then
-            switch_num_rejections = switch_num_rejections + 1
+            switch_observable%num_rejections = switch_observable%num_rejections + 1
             return
         end if
         
@@ -327,15 +329,15 @@ contains
                                                                   type2_mix_energy_delta
                     
                 else
-                    switch_num_rejections = switch_num_rejections + 1
+                    switch_observable%num_rejections = switch_observable%num_rejections + 1
                 end if
                 
             else
-                switch_num_rejections = switch_num_rejections + 1
+                switch_observable%num_rejections = switch_observable%num_rejections + 1
             end if
             
         else
-            switch_num_rejections = switch_num_rejections + 1
+            switch_observable%num_rejections = switch_observable%num_rejections + 1
         end if
         
     end subroutine switch

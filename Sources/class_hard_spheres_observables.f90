@@ -3,14 +3,14 @@
 module class_hard_spheres_observables
 
 use data_precisions, only: DP
-use module_types_micro, only: Observables_Changes
+use module_types_micro, only: Adapting_Discrete_Observables
 
 implicit none
 private
 
     type, public :: Hard_Spheres_Observables
     
-        type(Observables_Changes) :: move
+        type(Adapting_Discrete_Observables) :: move
         
         real(DP) :: potential_energy
         real(DP) :: potential_energy_sum = 0._DP
@@ -28,7 +28,7 @@ private
     
     type, extends(Hard_Spheres_Observables), public :: Dipolar_Hard_Spheres_Observables
         
-        type(Observables_Changes) :: rotation
+        type(Adapting_Discrete_Observables) :: rotation
         
     end type Dipolar_Hard_Spheres_Observables
     
