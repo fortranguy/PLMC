@@ -5,7 +5,7 @@ module class_physical_system
 use, intrinsic :: iso_fortran_env, only: output_unit
 use data_precisions, only: DP
 use json_module, only: json_file
-use module_data, only: json_get_string, test_data_found
+use module_data, only: test_data_found, test_empty_string
 use module_types_micro, only: Box_Parameters, Monte_Carlo_Arguments
 use module_physics_micro, only: num_wave_vectors
 use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres, Between_Hard_Spheres
@@ -127,7 +127,9 @@ contains
         logical :: found
         
         data_name = "Box.name"
-        this%name = json_get_string(json, data_name)
+        call json%get(data_name, this%name, found)
+        call test_data_found(data_name, found)
+        call test_empty_string(data_name, this%name)
         write(output_unit, *) this%name, " class construction"
         
         call this%set_box(json)
@@ -140,8 +142,8 @@ contains
         call this%type1_spheres%construct(json)
         call this%type2_spheres%construct(json)
         call this%between_spheres%construct(json, &
-                                                                       this%type1_spheres%get_diameter(), &
-                                                                       this%type2_spheres%get_diameter())
+                                            this%type1_spheres%get_diameter(), &
+                                            this%type2_spheres%get_diameter())
         
         call this%set_monte_carlo_changes(json)
         
