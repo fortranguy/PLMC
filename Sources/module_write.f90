@@ -2,7 +2,8 @@
 
 module module_write
 
-use data_precisions, only: DP, real_zero, io_tiny, consist_tiny
+use, intrinsic :: iso_fortran_env, only: DP => REAL64
+use data_precisions, only: real_zero, io_tiny, consist_tiny
 use data_constants, only: PI, sigma3d
 use data_box, only: num_dimensions
 use module_types_micro, only: Box_Parameters

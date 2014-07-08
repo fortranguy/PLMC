@@ -1,6 +1,6 @@
 module class_hard_spheres_potential
 
-use data_precisions, only: DP
+use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_box, only: num_dimensions
 use data_neighbour_cells, only: num_near_cells
 use json_module, only: json_file

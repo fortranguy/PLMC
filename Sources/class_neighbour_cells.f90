@@ -2,8 +2,8 @@
 
 module class_neighbour_cells
 
-use, intrinsic :: iso_fortran_env, only: error_unit
-use data_precisions, only: DP, real_zero
+use, intrinsic :: iso_fortran_env, only: DP => REAL64, error_unit
+use data_precisions, only: real_zero
 use data_box, only: num_dimensions
 use data_neighbour_cells, only: num_near_cells_dim, num_near_cells
 use module_types_micro, only: Node, Linked_List

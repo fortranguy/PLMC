@@ -72,17 +72,15 @@ mc_cano_bulk: data_precisions.o data_constants.o data_box.o data_neighbour_cells
               program_monte_carlo.o
 	$(FC) $^ -o $@ $(LDFLAGS)
 
-mc_bunching: data_precisions.o \
-             module_data.o module_arguments.o \
+mc_bunching: module_data.o module_arguments.o \
              program_bunching.o
 	$(FC) $^ -o $@ $(LDFLAGS)
 
-mc_histogram: data_precisions.o \
-              module_data.o module_arguments.o \
+mc_histogram: module_data.o module_arguments.o \
               program_histogram.o
 	$(FC) $^ -o $@ $(LDFLAGS)
 
-mc_distribution: data_precisions.o data_constants.o data_box.o \
+mc_distribution: data_constants.o data_box.o \
                  module_data.o module_physics_micro.o module_arguments.o \
                  program_distribution.o
 	$(FC) $^ -o $@ $(LDFLAGS)

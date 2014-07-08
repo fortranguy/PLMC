@@ -1,7 +1,6 @@
 program cluster
 
-use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
-use data_precisions, only: DP
+use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit, error_unit
 use data_box, only: num_dimensions
 use json_module, only: json_file, json_initialize
 use module_data, only: test_data_found

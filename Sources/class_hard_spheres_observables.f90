@@ -2,7 +2,7 @@
 
 module class_hard_spheres_observables
 
-use data_precisions, only: DP
+use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use class_discrete_observable, only: Adapting_Discrete_Observables
 
 implicit none

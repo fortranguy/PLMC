@@ -1,7 +1,7 @@
 module class_small_rotation
 
-use, intrinsic :: iso_fortran_env, only: error_unit
-use data_precisions, only: DP, real_zero
+use, intrinsic :: iso_fortran_env, only: DP => REAL64, error_unit
+use data_precisions, only: real_zero
 
 implicit none
 

@@ -1,7 +1,7 @@
 module class_small_move
 
-use, intrinsic :: iso_fortran_env, only: error_unit
-use data_precisions, only: DP, real_zero
+use, intrinsic :: iso_fortran_env, only: DP => REAL64, error_unit
+use data_precisions, only: real_zero
 use data_box, only: num_dimensions
 
 implicit none

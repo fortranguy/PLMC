@@ -1,6 +1,6 @@
 module module_algorithms
 
-use data_precisions, only: DP
+use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_box, only: num_dimensions
 use module_types_micro, only: Box_Parameters, Particle_Index, Particle_Energy
 use module_physics_micro, only: random_surface, markov_surface

@@ -1,6 +1,6 @@
 module class_ewald_summation_reci
 
-use data_precisions, only: DP
+use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: PI
 use data_box, only: num_dimensions
 use module_types_micro, only: Box_Parameters, Particle_Index

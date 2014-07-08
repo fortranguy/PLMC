@@ -1,6 +1,6 @@
 module class_discrete_observable
 
-use data_precisions, only: DP
+use, intrinsic :: iso_fortran_env, only: DP => REAL64
 
 implicit none
 
