@@ -259,7 +259,8 @@ contains
         
         call this_spheres%test_overlap(Box%size)
         call this_spheres%write_snap_data(this_units%snap_equilibrium_positions)
-        call this_spheres%write_snap_positions(0, this_units%snap_initial_positions)
+        call this_spheres%write_snap_positions(0, this_units%snap_initial_positions, &
+                                               double_precision=.true.)
         
         select type (this_spheres)
             type is (Dipolar_Hard_Spheres)
@@ -267,7 +268,7 @@ contains
                     type is (Dipolar_Hard_Spheres_Units)
                         call this_spheres%write_snap_data(this_units%snap_equilibrium_orientations)
                         call this_spheres%write_snap_orientations(0, &
-                             this_units%snap_initial_orientations)
+                             this_units%snap_initial_orientations, double_precision=.true.)
                 end select
         end select
     
@@ -355,14 +356,15 @@ contains
         class(Hard_Spheres_Units), intent(in) :: this_units
         
         call this_spheres%test_overlap(Box%size)
-        call this_spheres%write_snap_positions(0, this_units%snap_final_positions)
+        call this_spheres%write_snap_positions(0, this_units%snap_final_positions, &
+                                               double_precision=.true.)
         
         select type (this_spheres)
             type is (Dipolar_Hard_Spheres)
                 select type (this_units)
                     type is (Dipolar_Hard_Spheres_Units)
                         call this_spheres%write_snap_orientations(0, &
-                                                                  this_units%snap_final_orientations)
+                             this_units%snap_final_orientations, double_precision=.true.)
                 end select
         end select
     

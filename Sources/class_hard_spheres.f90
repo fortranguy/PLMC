@@ -5,6 +5,7 @@ module class_hard_spheres
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit, error_unit
 use data_box, only: num_dimensions
 use json_module, only: json_file
+use data_write, only: simple_precision_format, double_precision_format
 use module_data, only: test_data_found, test_empty_string
 use module_physics_micro, only: PBC_distance
 
@@ -372,33 +373,53 @@ contains
         
     end subroutine Hard_Spheres_write_snap_data
       
-    subroutine Hard_Spheres_write_snap_positions(this, i_step, snap_unit)
+    subroutine Hard_Spheres_write_snap_positions(this, i_step, snap_unit, double_precision)
         
         class(Hard_Spheres), intent(in) :: this
         integer, intent(in) :: i_step
         integer, intent(in) :: snap_unit
+        logical, intent(in), optional :: double_precision
     
         integer :: i_particle
+        character(len=len(double_precision_format)) :: output_format
+        
+        output_format = simple_precision_format
+        
+        if (present(double_precision)) then
+            if (double_precision) then
+                output_format = double_precision_format
+            end if
+        end if
         
         if (modulo(i_step, this%snap_factor) == 0) then
             do i_particle = 1, this%num_particles
-                write(snap_unit, *) this%all_positions(:, i_particle)
+                write(snap_unit, output_format) this%all_positions(:, i_particle)
             end do
         end if
 
     end subroutine Hard_Spheres_write_snap_positions
     
-    subroutine Dipolar_Hard_Spheres_write_snap_orientations(this, i_step, snap_unit)
+    subroutine Dipolar_Hard_Spheres_write_snap_orientations(this, i_step, snap_unit, double_precision)
         
         class(Dipolar_Hard_Spheres), intent(in) :: this
         integer, intent(in) :: i_step
         integer, intent(in) :: snap_unit
+        logical, intent(in), optional :: double_precision
     
         integer :: i_particle
+        character(len=len(double_precision_format)) :: output_format
+        
+        output_format = simple_precision_format
+        
+        if (present(double_precision)) then
+            if (double_precision) then
+                output_format = double_precision_format
+            end if
+        end if
         
         if (modulo(i_step, this%snap_factor) == 0) then
             do i_particle = 1, this%num_particles
-                write(snap_unit, *) this%all_orientations(:, i_particle)
+                write(snap_unit, output_format) this%all_orientations(:, i_particle)
             end do
         end if
 
