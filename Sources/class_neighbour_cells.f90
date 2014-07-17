@@ -20,7 +20,7 @@ private
         integer :: num_total_cell
         integer, dimension(num_dimensions) :: num_total_cell_dim
         real(DP), dimension(num_dimensions) :: cell_size
-        integer, dimension(:, :), allocatable, public :: near_among_total
+        integer, dimension(:, :), allocatable :: near_among_total
         type(Linked_List), dimension(:), allocatable :: begin_cells
         type(Linked_List), dimension(:), allocatable :: current_cells, next_cells
         
@@ -233,12 +233,15 @@ contains
         
     end subroutine Neighbour_Cells_all_cols_to_cells
     
-    subroutine Neighbour_Cells_point_to_begin(this, current, i_cell)
+    subroutine Neighbour_Cells_point_to_begin(this, current, i_near_cell, i_total_cell)
     
         class(Neighbour_Cells), intent(in) :: this
         type(Node), pointer, intent(out) :: current
-        integer, intent(in) :: i_cell
+        integer, intent(in) :: i_near_cell, i_total_cell
         
+        integer :: i_cell
+                
+        i_cell = this%near_among_total(i_near_cell, i_total_cell)        
         current => this%begin_cells(i_cell)%particle%next
         
     end subroutine Neighbour_Cells_point_to_begin

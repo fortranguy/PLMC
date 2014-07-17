@@ -115,7 +115,7 @@ contains
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energ
     
-        integer :: i_cell, i_total_cell, i_near_cell
+        integer :: i_total_cell, i_near_cell
         integer :: particule_number
         real(DP) :: r_ij
     
@@ -135,8 +135,7 @@ contains
     
         do i_near_cell = 1, num_near_cells
         
-            i_cell = this_cells%near_among_total(i_near_cell, i_total_cell)
-            call this_cells%point_to_begin(current, i_cell)
+            call this_cells%point_to_begin(current, i_near_cell, i_total_cell)
             if (.not. associated(current%next)) cycle
             
             do
