@@ -21,7 +21,7 @@ private
         ! Particles
         real(DP) :: diameter
         integer ::  num_particles
-        real(DP), dimension(:, :), allocatable, public :: all_positions
+        real(DP), dimension(:, :), allocatable :: all_positions
         
         ! Snashot
         integer :: snap_factor
