@@ -12,7 +12,7 @@ public set_discrete_length, sphere_volume, PBC_vector, PBC_distance, random_surf
        dipolar_pair_energy, ewald_real_B, ewald_real_C, &
        num_wave_vectors, Box_wave1_sym, Box_wave2_sym, fourier_i, exchange_sign, &
        index_from_coord, coord_PBC, &
-       potential_energy_lennardJones, potential_energy_yukawa
+       potential_energy_lennard_jones, potential_energy_yukawa
 
 contains
 
@@ -42,13 +42,13 @@ contains
     !> Distance between 2 positions with Periodic Boundary Conditions
     !> from SMAC, algorithm 2.5 & 2.6, p.91
     
-    pure function PBC_vector(Box_size, xCol1, xCol2)
+    pure function PBC_vector(Box_size, position1, position2)
     
         real(DP), dimension(:), intent(in) :: Box_size
-        real(DP), dimension(:), intent(in) :: xCol1, xCol2
+        real(DP), dimension(:), intent(in) :: position1, position2
         real(DP), dimension(num_dimensions) :: PBC_vector
         
-        PBC_vector(:) = modulo(xCol2(:)-xCol1(:), Box_size(:))
+        PBC_vector(:) = modulo(position2(:)-position1(:), Box_size(:))
         
         where(PBC_vector(:) > Box_size(:)/2._DP)
             PBC_vector(:) = PBC_vector(:) - Box_size(:)
@@ -56,11 +56,11 @@ contains
         
     end function PBC_vector
     
-    pure function PBC_distance(Box_size, xCol1, xCol2)
+    pure function PBC_distance(Box_size, position1, position2)
         real(DP), dimension(:), intent(in) :: Box_size
-        real(DP), dimension(:), intent(in) :: xCol1, xCol2
+        real(DP), dimension(:), intent(in) :: position1, position2
         real(DP) :: PBC_distance
-        PBC_distance = norm2(PBC_vector(Box_size, xCol1, xCol2))
+        PBC_distance = norm2(PBC_vector(Box_size, position1, position2))
     end function PBC_distance
     
     !> Rotation
@@ -73,7 +73,7 @@ contains
         real(DP) :: x, y
         real(DP) :: normSqr, factor
         
-        real(DP), save :: gaussSave
+        real(DP), save :: gauss_save
         integer, save :: switch = 0
         
         if (switch == 0) then
@@ -93,14 +93,14 @@ contains
             
             factor = sqrt(-2._DP * log(normSqr) / normSqr)
             
-            gaussSave = sigma3d * factor * x
+            gauss_save = sigma3d * factor * x
             gauss = sigma3d * factor * y
             
             switch = 1
             
         else
         
-            gauss = gaussSave
+            gauss = gauss_save
             switch = 0
             
         end if
@@ -125,13 +125,13 @@ contains
     
     !> From SMAC, Algorithm 1.24, p.44
     
-    subroutine markov_surface(mCol, deltaM)
+    subroutine markov_surface(orientation, orientation_delta)
     
-        real(DP), dimension(:), intent(inout) :: mCol
-        real(DP), intent(in) :: deltaM
+        real(DP), dimension(:), intent(inout) :: orientation
+        real(DP), intent(in) :: orientation_delta
         
         real(DP), dimension(num_dimensions) :: rotation
-        real(DP) :: rotation_dot_mCol
+        real(DP) :: rotation_dot_orientation
         real(DP) :: amplitude, random
         integer :: i_dim
         
@@ -139,15 +139,15 @@ contains
             rotation(i_dim) = gauss()
         end do
         
-        rotation_dot_mCol = dot_product(rotation, mCol)
-        rotation(:) = rotation(:) - rotation_dot_mCol * mCol(:)
+        rotation_dot_orientation = dot_product(rotation, orientation)
+        rotation(:) = rotation(:) - rotation_dot_orientation * orientation(:)
         rotation(:) = rotation(:) / norm2(rotation)
         
         call random_number(random)
-        amplitude = deltaM * (random - 0.5_DP)
+        amplitude = orientation_delta * (random - 0.5_DP)
         
-        mCol(:) = mCol(:) + amplitude * rotation(:)
-        mCol(:) = mCol(:) / norm2(mCol)
+        orientation(:) = orientation(:) + amplitude * rotation(:)
+        orientation(:) = orientation(:) / norm2(orientation)
     
     end subroutine markov_surface
 
@@ -248,16 +248,16 @@ contains
     
     !> Fourier coefficients (bases)
     
-    pure subroutine fourier_i(Box_wave_i, xColOverL_i, exp_Ikx_i)
+    pure subroutine fourier_i(Box_wave_i, position_div_box_i, exp_Ikx_i)
     
         integer, intent(in) :: Box_wave_i
-        real(DP), intent(in) :: xColOverL_i
+        real(DP), intent(in) :: position_div_box_i
         complex(DP), dimension(-Box_wave_i:Box_wave_i), intent(out) :: exp_Ikx_i
         
         integer :: kx_i
         
         exp_Ikx_i(0) = (1._DP, 0._DP)
-        exp_Ikx_i(1) = cmplx(cos(xColOverL_i), sin(xColOverL_i), DP)
+        exp_Ikx_i(1) = cmplx(cos(position_div_box_i), sin(position_div_box_i), DP)
         exp_Ikx_i(-1) = conjg(exp_Ikx_i(1))
         
         do kx_i = 2, Box_wave_i
@@ -284,31 +284,31 @@ contains
 
     !> 3D index to 1D index
     
-    pure function index_from_coord(cell_coord, maxCell_coord)
+    pure function index_from_coord(cell_coord, max_cell_coord)
     
-        integer, dimension(:), intent(in) :: cell_coord, maxCell_coord
+        integer, dimension(:), intent(in) :: cell_coord, max_cell_coord
         integer :: index_from_coord
         
-        index_from_coord = cell_coord(1) + maxCell_coord(1)*(cell_coord(2)-1) + &
-                           maxCell_coord(1)*maxCell_coord(2)*(cell_coord(3)-1)
+        index_from_coord = cell_coord(1) + max_cell_coord(1)*(cell_coord(2)-1) + &
+                           max_cell_coord(1)*max_cell_coord(2)*(cell_coord(3)-1)
     
     end function index_from_coord
     
     !> 3d index Periodic Boundary Conditions
     
-    pure function coord_PBC(cell_coord,  maxCell_coord)
+    pure function coord_PBC(cell_coord,  max_cell_coord)
     
-        integer, dimension(:), intent(in) :: cell_coord, maxCell_coord
+        integer, dimension(:), intent(in) :: cell_coord, max_cell_coord
         integer, dimension(num_dimensions) :: coord_PBC
         
         coord_PBC(:) = cell_coord(:)
         
         where (coord_PBC(:) < 1)
-            coord_PBC(:) = coord_PBC(:) + maxCell_coord(:)
+            coord_PBC(:) = coord_PBC(:) + max_cell_coord(:)
         end where
         
-        where (coord_PBC(:) > maxCell_coord(:))
-            coord_PBC(:) = coord_PBC(:) - maxCell_coord(:)
+        where (coord_PBC(:) > max_cell_coord(:))
+            coord_PBC(:) = coord_PBC(:) - max_cell_coord(:)
         end where
     
     end function coord_PBC
@@ -319,15 +319,15 @@ contains
     !> \f[
     !>      4\epsilon\left[\left(\frac{\sigma}{r}\right)^{12} - \left(\frac{\sigma}{r}\right)^6\right]
     !> \f]
-    pure function potential_energy_lennardJones(epsilon, sigma, r)
+    pure function potential_energy_lennard_jones(epsilon, sigma, r)
     
         real(DP), intent(in) :: epsilon
         real(DP), intent(in) :: sigma, r
-        real(DP) :: potential_energy_lennardJones
+        real(DP) :: potential_energy_lennard_jones
         
-        potential_energy_lennardJones = 4._DP * epsilon * ((sigma/r)**12 - (sigma/r)**6)
+        potential_energy_lennard_jones = 4._DP * epsilon * ((sigma/r)**12 - (sigma/r)**6)
     
-    end function potential_energy_lennardJones
+    end function potential_energy_lennard_jones
     
     !> Yukawa potential_energy
     !> \f[ \epsilon \frac{e^{-\alpha (r-r_0)}}{r} \f]

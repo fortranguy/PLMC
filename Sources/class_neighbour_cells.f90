@@ -192,15 +192,15 @@ contains
     
     ! Assignment: particle -> cell
     
-    pure function Neighbour_Cells_index_from_position(this, xCol) result(index_from_position)
+    pure function Neighbour_Cells_index_from_position(this, position) result(index_from_position)
     
         class(Neighbour_Cells), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: xCol
+        real(DP), dimension(:), intent(in) :: position
         integer :: index_from_position
         
         integer, dimension(num_dimensions) :: cell_coord
     
-        cell_coord(:) = int(xCol(:)/this%cell_size(:)) + 1
+        cell_coord(:) = int(position(:)/this%cell_size(:)) + 1
         index_from_position = cell_coord(1) + this%num_total_cell_dim(1)*(cell_coord(2)-1) + &
                              this%num_total_cell_dim(1)*this%num_total_cell_dim(2)*(cell_coord(3)-1)
     

@@ -187,12 +187,12 @@ contains
     
     !> From an old configuration
     
-    subroutine old_configuration(file, length, spheres, normMax, coordinates_name)
+    subroutine old_configuration(file, length, spheres, norm_max, coordinates_name)
     
         character(len=*), intent(in) :: file
         integer, intent(in) :: length
         class(Hard_Spheres), intent(inout) :: spheres
-        real(DP), intent(in) :: normMax
+        real(DP), intent(in) :: norm_max
         character(len=*), intent(in) :: coordinates_name
         
         integer :: file_unit, readStat
@@ -231,7 +231,7 @@ contains
                         error stop
                 end select
                 
-                if (coordinate_norm > normMax+io_tiny) then
+                if (coordinate_norm > norm_max+io_tiny) then
                     write(error_unit, *) "Norm error in file: ", file(1:length)
                     write(error_unit, *) "Index ", i_particle
                     write(error_unit, *) "Norm =", coordinate_norm

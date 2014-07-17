@@ -117,7 +117,7 @@ contains
     
         integer :: i_total_cell, i_near_cell
         integer :: particule_number
-        real(DP) :: r_ij
+        real(DP) :: distance_ij
     
         type(Node), pointer :: current => null(), next => null()
         
@@ -143,9 +143,9 @@ contains
                 next => current%next
             
                 if (current%number /= particule_number) then
-                    r_ij = PBC_distance(Box_size, particle%position, &
+                    distance_ij = PBC_distance(Box_size, particle%position, &
                                         spheres%get_position(current%number))
-                    if (r_ij < this%min_distance) then
+                    if (distance_ij < this%min_distance) then
                         overlap = .true.
                         return
                     end if

@@ -10,9 +10,9 @@ private
     type, public :: Small_Rotation
     
         real(DP) :: delta
-        real(DP) :: deltaSave
-        real(DP) :: deltaMax
-        real(DP) :: rejectFix
+        real(DP) :: delta_save
+        real(DP) :: delta_max
+        real(DP) :: reject_fix
         
     contains
     
@@ -25,16 +25,16 @@ private
     
 contains
 
-    pure subroutine Small_Rotation_init(this, delta, deltaMax, rejectFix)
+    pure subroutine Small_Rotation_init(this, delta, delta_max, reject_fix)
     
         class(Small_Rotation), intent(out) :: this
-        real(DP), intent(in) :: delta, deltaMax
-        real(DP), intent(in) :: rejectFix
+        real(DP), intent(in) :: delta, delta_max
+        real(DP), intent(in) :: reject_fix
         
         this%delta = delta
-        this%deltaSave = this%delta
-        this%deltaMax = deltaMax
-        this%rejectFix = rejectFix
+        this%delta_save = this%delta
+        this%delta_max = delta_max
+        this%reject_fix = reject_fix
         
     end subroutine Small_Rotation_init
 
@@ -57,12 +57,12 @@ contains
         real(DP), parameter :: more = 1._DP+delta_eps
         real(DP), parameter :: less = 1._DP-delta_eps
         
-        if (reject < this%rejectFix - reject_eps) then
+        if (reject < this%reject_fix - reject_eps) then
             this%delta = this%delta * more
-            if (this%delta > this%deltaMax) then
-                this%delta = this%deltaMax
+            if (this%delta > this%delta_max) then
+                this%delta = this%delta_max
             end if
-        else if (reject > this%rejectFix + reject_eps) then
+        else if (reject > this%reject_fix + reject_eps) then
             this%delta = this%delta * less
         end if
     
@@ -77,20 +77,20 @@ contains
         
         if (reject < real_zero) then
             write(error_unit, *) type_name, ":    Warning: delta adaptation problem."
-            this%delta = this%deltaSave
+            this%delta = this%delta_save
             write(error_unit, *) "default delta: ", this%delta
         end if
         
-        if (this%delta > this%deltaMax) then
+        if (this%delta > this%delta_max) then
             write(error_unit, *) type_name, ":   Warning: delta too big."
-            this%delta = this%deltaMax
+            this%delta = this%delta_max
             write(error_unit, *) "big delta: ", this%delta
         end if
         
         write(report_unit, *) "Rotation: "
         write(report_unit, *) "    delta = ", this%delta
         write(report_unit, *) "    rejection relative difference = ", &
-                                    abs(reject-this%rejectFix)/this%rejectFix
+                                    abs(reject-this%reject_fix)/this%reject_fix
     
     end subroutine Small_Rotation_set_delta
 

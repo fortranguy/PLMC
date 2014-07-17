@@ -12,8 +12,8 @@ private
     
         private
         real(DP), dimension(num_dimensions) :: delta
-        real(DP), dimension(num_dimensions) :: deltaSave
-        real(DP) :: rejectFix
+        real(DP), dimension(num_dimensions) :: delta_save
+        real(DP) :: reject_fix
     
     contains
     
@@ -27,15 +27,15 @@ private
     
 contains
 
-    pure subroutine Small_Move_init(this, delta, rejectFix)
+    pure subroutine Small_Move_init(this, delta, reject_fix)
     
         class(Small_Move), intent(out) :: this
         real(DP), intent(in) :: delta
-        real(DP), intent(in) :: rejectFix
+        real(DP), intent(in) :: reject_fix
         
         this%delta(:) = delta
-        this%deltaSave(:) = this%delta(:)
-        this%rejectFix = rejectFix
+        this%delta_save(:) = this%delta(:)
+        this%reject_fix = reject_fix
         
     end subroutine Small_Move_init
     
@@ -66,12 +66,12 @@ contains
         real(DP), parameter :: more = 1._DP+delta_eps
         real(DP), parameter :: less = 1._DP-delta_eps
         
-        if (reject < this%rejectFix - reject_eps) then
+        if (reject < this%reject_fix - reject_eps) then
             this%delta(:) = this%delta(:) * more
             if (norm2(this%delta) > norm2(Box_size)) then
                 this%delta(:) = Box_size(:)
             end if
-        else if (reject > this%rejectFix + reject_eps) then
+        else if (reject > this%reject_fix + reject_eps) then
             this%delta(:) = this%delta(:) * less
         end if
     
@@ -87,7 +87,7 @@ contains
 
         if (reject < real_zero) then
             write(error_unit, *) type_name, ":    Warning: delta adaptation problem."
-            this%delta(:) = this%deltaSave(:)
+            this%delta(:) = this%delta_save(:)
             write(error_unit, *) "default delta: ", this%delta(:)
         end if
 
@@ -100,7 +100,7 @@ contains
         write(report_unit, *) "Displacement: "
         write(report_unit, *) "    delta(:) = ", this%delta(:)
         write(report_unit, *) "    rejection relative difference = ", &
-                                   abs(reject-this%rejectFix)/this%rejectFix
+                                   abs(reject-this%reject_fix)/this%reject_fix
     
     end subroutine Small_Move_set_delta
 

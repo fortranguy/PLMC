@@ -413,25 +413,25 @@ contains
     
         integer :: i_particle, j_particle
         real(DP), dimension(num_dimensions) :: position_i, position_j
-        real(DP) :: r_ij
+        real(DP) :: distance_ij
     
         do j_particle = 1, this%num_particles
             do i_particle = j_particle+1, this%num_particles
             
                 position_i(:) = this%all_positions(:, i_particle)
                 position_j(:) = this%all_positions(:, j_particle)
-                r_ij = PBC_distance(Box_size, position_i, position_j)
+                distance_ij = PBC_distance(Box_size, position_i, position_j)
                 
-                if (r_ij < this%diameter) then
-                    write(error_unit, *) this%name, "    Overlap !", i_particle, j_particle
-                    write(error_unit, *) "    r_ij = ", r_ij
+                if (distance_ij < this%diameter) then
+                    write(error_unit, *) this%name, " Overlap !", i_particle, j_particle
+                    write(error_unit, *) " distance_ij = ", distance_ij
                     error stop
                 end if
                     
             end do
         end do
         
-        write(output_unit, *) this%name, ":    Overlap test: OK !"
+        write(output_unit, *) this%name, ": Overlap test: OK !"
     
     end subroutine Hard_Spheres_test_overlap
     
@@ -442,25 +442,25 @@ contains
         class(Hard_Spheres), intent(in) :: type1, type2
         
         integer :: type1_i_particle, type2_i_particle
-        real(DP) :: r_mix
-        real(DP), dimension(num_dimensions) :: type1_xCol, type2_xCol
+        real(DP) :: distance_between
+        real(DP), dimension(num_dimensions) :: type1_position, type2_position
         
         do type1_i_particle = 1, type1%get_num_particles()
             do type2_i_particle = 1, type2%get_num_particles()
                     
-                type1_xCol(:) = type1%get_position(type1_i_particle)
-                type2_xCol(:) = type2%get_position(type2_i_particle)
-                r_mix = PBC_distance(Box_size, type1_xCol, type2_xCol)
-                if (r_mix < this%diameter) then
-                    write(error_unit, *) this%name, ":    Overlap !", type1_i_particle, type2_i_particle
-                    write(error_unit, *) "    r_mix = ", r_mix
+                type1_position(:) = type1%get_position(type1_i_particle)
+                type2_position(:) = type2%get_position(type2_i_particle)
+                distance_between = PBC_distance(Box_size, type1_position, type2_position)
+                if (distance_between < this%diameter) then
+                    write(error_unit, *) this%name, ": Overlap !", type1_i_particle, type2_i_particle
+                    write(error_unit, *) " distance_between = ", distance_between
                     error stop
                 end if
 
             end do
         end do
 
-        write(output_unit, *) this%name, ":    Overlap test: OK !"
+        write(output_unit, *) this%name, ": Overlap test: OK !"
     
     end subroutine Between_Hard_Spheres_test_overlap
 
