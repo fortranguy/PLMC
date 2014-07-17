@@ -136,7 +136,7 @@ contains
         do i_near_cell = 1, num_near_cells
         
             i_cell = this_cells%near_among_total(i_near_cell, i_total_cell)
-            current => this_cells%begin_cells(i_cell)%particle%next
+            call this_cells%point_to_begin(current, i_cell)
             if (.not. associated(current%next)) cycle
             
             do

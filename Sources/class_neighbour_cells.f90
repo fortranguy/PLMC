@@ -21,7 +21,7 @@ private
         integer, dimension(num_dimensions) :: num_total_cell_dim
         real(DP), dimension(num_dimensions) :: cell_size
         integer, dimension(:, :), allocatable, public :: near_among_total
-        type(Linked_List), dimension(:), allocatable, public :: begin_cells
+        type(Linked_List), dimension(:), allocatable :: begin_cells
         type(Linked_List), dimension(:), allocatable :: current_cells, next_cells
         
     contains
@@ -32,10 +32,12 @@ private
         procedure :: alloc_nodes => Neighbour_Cells_alloc_nodes
         procedure :: alloc_cells => Neighbour_Cells_alloc_cells
         procedure :: dealloc_nodes => Neighbour_Cells_dealloc_nodes
-        procedure :: dealloc_cells => Neighbour_Cells_dealloc_cells
+        procedure :: dealloc_cells => Neighbour_Cells_dealloc_cells        
         procedure :: check_cellsSize => Neighbour_Cells_check_cellsSize
         procedure :: index_from_position => Neighbour_Cells_index_from_position
         procedure :: all_cols_to_cells => Neighbour_Cells_all_cols_to_cells
+        
+        procedure :: point_to_begin => Neighbour_Cells_point_to_begin
         procedure :: remove_col_from_cell => Neighbour_Cells_remove_col_from_cell
         procedure :: add_col_to_cell => Neighbour_Cells_add_col_to_cell
         procedure, private :: init_near_among_total => &
@@ -230,6 +232,16 @@ contains
         end do
         
     end subroutine Neighbour_Cells_all_cols_to_cells
+    
+    subroutine Neighbour_Cells_point_to_begin(this, current, i_cell)
+    
+        class(Neighbour_Cells), intent(in) :: this
+        type(Node), pointer, intent(out) :: current
+        integer, intent(in) :: i_cell
+        
+        current => this%begin_cells(i_cell)%particle%next
+        
+    end subroutine Neighbour_Cells_point_to_begin
     
     ! Neighbour cells update
     
