@@ -88,6 +88,7 @@ implicit none
     
     write(output_unit, *) "Start !"
     call cpu_time(initial_time)
+    distribution_function(:) = 0._DP
     do i_step = 1, num_steps / snap_factors_lcm
         
         call jump_snap(snap_factors_lcm, type1_snap_factor, type1_num_particles, type1_positions_unit)
@@ -108,15 +109,12 @@ implicit none
                 distance_12 = PBC_distance(Box_size, &
                                            type1_positions(:, type1_i_particle), &
                                            type2_positions(:, type2_i_particle))
-                if (distance_12 <= distance_max) then
-                    i_distribution = int(distance_12 / delta)
-                    distribution_step(i_distribution) = distribution_step(i_distribution) + 1._DP
-                end if
+                i_distribution = int(distance_12 / delta)
+                distribution_step(i_distribution) = distribution_step(i_distribution) + 1._DP
             end do
             
         end do
         
-        distribution_step(:) = distribution_step(:) / real(type1_num_particles, DP)
         distribution_function(:) = distribution_function(:) + distribution_step(:)
     
     end do
@@ -137,7 +135,8 @@ implicit none
     open(newunit=distrib_unit, file=trim(type1_name)//"-"//trim(type2_name)//"_mix_distribution.out", &
          action="write")
     
-        distribution_function(:) = distribution_function(:) / real(num_steps/snap_factors_lcm, DP)
+        distribution_function(:) = distribution_function(:) / real(num_steps/snap_factors_lcm, DP) / &
+                                   real(type1_num_particles, DP)
     
         do i_distribution = 1, num_distribution
         
