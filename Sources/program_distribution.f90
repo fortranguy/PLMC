@@ -20,7 +20,6 @@ implicit none
     integer :: num_particles, num_particles_bis
     integer :: snap_factor, snap_factor_bis
     real(DP) :: density
-    integer, dimension(:), allocatable :: distribution_sum
     integer :: positions_unit, orientations_unit, distrib_unit
      
     integer :: num_steps, i_step
@@ -28,6 +27,7 @@ implicit none
     real(DP) :: distance_ij, distance_max, delta
     real(DP) :: distance_i_distribution, distance_i_minus, distance_i_plus
     integer :: num_distribution, i_distribution
+    real(DP), dimension(:), allocatable :: distribution_step
     real(DP), dimension(:), allocatable :: distribution_function
     real(DP), dimension(:, :), allocatable :: positions, orientations
     
@@ -68,7 +68,7 @@ implicit none
     
     distance_max = norm2(Box_size / 2._DP)
     num_distribution = int(distance_max/delta)
-    allocate(distribution_sum(num_distribution))
+    allocate(distribution_step(num_distribution))
     allocate(distribution_function(num_distribution))
     
     call arg_to_file(1, file_name, length)
@@ -79,8 +79,6 @@ implicit none
     
     allocate(positions(num_dimensions, num_particles))
     density = real(num_particles, DP) / product(Box_size)
-
-    distribution_sum(:) = 0
     
     with_orientations = (command_argument_count() == 2)
     
@@ -103,8 +101,9 @@ implicit none
     write(output_unit, *) "Start !"
     call cpu_time(time_init)
     !$ time_init_para = omp_get_wtime()
-    !$omp parallel do schedule(static) reduction(+:distribution_sum) &
-    !$ private(positions, i_particle, j_particle, distance_ij, i_distribution)
+    !$omp parallel do schedule(static) reduction(+:distribution_function) &
+    !$ private(positions, i_particle, j_particle, distance_ij, i_distribution, distribution_step)
+    distribution_function(:) = 0._DP
     do i_step = 1, num_steps/snap_factor
 
         ! Read
@@ -121,15 +120,16 @@ implicit none
         !$omp end critical
 
         ! Fill
+        distribution_step(:) = 0
         do i_particle = 1, num_particles
             do j_particle = i_particle + 1, num_particles
-
                 distance_ij = PBC_distance(Box_size, positions(:, i_particle), positions(:, j_particle))
                 i_distribution =  int(distance_ij/delta)
-                distribution_sum(i_distribution) = distribution_sum(i_distribution) + 1
-
+                distribution_step(i_distribution) = distribution_step(i_distribution) + 1._DP
             end do
         end do
+        
+        distribution_function(:) = distribution_function(:) + distribution_step(:)
 
     end do
     !$omp end parallel do
@@ -147,16 +147,18 @@ implicit none
 
     open(newunit=distrib_unit, file=trim(name)//"_distribution_function.out", action="write")
     
+        distribution_function(:) = 2._DP * distribution_function(:) / &
+                                   real(num_steps/snap_factor, DP) / &
+                                   real(num_particles, DP)
+    
         do i_distribution = 1, num_distribution
         
             distance_i_distribution = (real(i_distribution, DP) + 0.5_DP) * delta
             distance_i_minus = real(i_distribution, DP) * delta
             distance_i_plus = real(i_distribution + 1, DP) * delta
             
-            distribution_function(i_distribution) = &
-                2._DP * real(distribution_sum(i_distribution), DP) / real(num_steps / &
-                snap_factor, DP) / real(num_particles, DP) / &
-                (sphere_volume(distance_i_plus) - sphere_volume(distance_i_minus)) / density
+            distribution_function(i_distribution) = distribution_function(i_distribution) / &
+                density / (sphere_volume(distance_i_plus) - sphere_volume(distance_i_minus))
             write(distrib_unit, *) distance_i_distribution, distribution_function(i_distribution)
             
         end do
@@ -176,7 +178,7 @@ implicit none
     close(time_unit)
     
     deallocate(distribution_function)
-    deallocate(distribution_sum)
+    deallocate(distribution_step)
     
     deallocate(Box_size)
 

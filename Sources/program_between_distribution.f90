@@ -65,8 +65,8 @@ implicit none
     
     call json%destroy()
     
-    distance_max = norm2(Box_size / 2._DP)
-    num_distribution = int(distance_max / delta)
+    distance_max = norm2(Box_size/2._DP)
+    num_distribution = int(distance_max/delta)
     allocate(distribution_step(num_distribution))
     allocate(distribution_function(num_distribution))
     
@@ -89,7 +89,7 @@ implicit none
     write(output_unit, *) "Start !"
     call cpu_time(initial_time)
     distribution_function(:) = 0._DP
-    do i_step = 1, num_steps / snap_factors_lcm
+    do i_step = 1, num_steps/snap_factors_lcm
         
         call jump_snap(snap_factors_lcm, type1_snap_factor, type1_num_particles, type1_positions_unit)
         do type1_i_particle = 1, type1_num_particles
@@ -101,18 +101,15 @@ implicit none
             read(type2_positions_unit, *) type2_positions(:, type2_i_particle)
         end do
         
-        distribution_step(:) = 0._DP
-        
-        do type1_i_particle = 1, type1_num_particles
-        
+        distribution_step(:) = 0._DP        
+        do type1_i_particle = 1, type1_num_particles        
             do type2_i_particle = 1, type2_num_particles                
                 distance_12 = PBC_distance(Box_size, &
                                            type1_positions(:, type1_i_particle), &
                                            type2_positions(:, type2_i_particle))
-                i_distribution = int(distance_12 / delta)
+                i_distribution = int(distance_12/delta)
                 distribution_step(i_distribution) = distribution_step(i_distribution) + 1._DP
-            end do
-            
+            end do            
         end do
         
         distribution_function(:) = distribution_function(:) + distribution_step(:)
@@ -127,12 +124,12 @@ implicit none
     deallocate(type1_positions) 
     close(type1_positions_unit)
     
-    open(newunit=report_unit, file=trim(type1_name)//"-"//trim(type2_name)//"_mix_distribution_report.txt", &
+    open(newunit=report_unit, file=trim(type1_name)//"-"//trim(type2_name)//"_distribution_report.txt", &
          action="write")
          write(report_unit, *) "Duration =", (final_time - initial_time) / 60._DP, "min"
     close(report_unit)
     
-    open(newunit=distrib_unit, file=trim(type1_name)//"-"//trim(type2_name)//"_mix_distribution.out", &
+    open(newunit=distrib_unit, file=trim(type1_name)//"-"//trim(type2_name)//"_distribution_function.out", &
          action="write")
     
         distribution_function(:) = distribution_function(:) / real(num_steps/snap_factors_lcm, DP) / &
