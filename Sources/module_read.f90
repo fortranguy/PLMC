@@ -1,6 +1,7 @@
 module module_read
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
+use data_box, only: num_dimensions
 
 implicit none
 
@@ -18,7 +19,7 @@ contains
         integer :: snap_factor_jump
         integer :: i_jump
         integer :: i_particle
-        real(DP), dimension(Ndim) :: dummy_position
+        real(DP), dimension(num_dimensions) :: dummy_position
         
         snap_factor_jump = snap_factors_lcm / snap_factor
 

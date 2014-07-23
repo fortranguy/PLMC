@@ -23,7 +23,7 @@ implicit none
     integer, dimension(:), allocatable :: distribution_sum
     integer :: positions_unit, orientations_unit, distrib_unit
     
-    real(DP) :: max_distance, delta
+    real(DP) :: distance_max, delta
     integer :: i_step
     integer :: i_particle, j_particle
     real(DP) :: distance_ij
@@ -67,16 +67,17 @@ implicit none
     
     call json%destroy()
     
+    distance_max = norm2(Box_size / 2._DP)
+    num_distribution = int(distance_max/delta)
+    allocate(distribution_sum(num_distribution))
+    allocate(distribution_function(num_distribution))
+    
     call arg_to_file(1, file_name, length)
     open(newunit=positions_unit, recl=4096, file=file_name(1:length), status='old', action='read')
     
     read(positions_unit, *) name, num_particles, snap_factor
-    write(output_unit, *) trim(name), num_particles, snap_factor
+    write(output_unit, *) trim(name), num_particles, snap_factor    
     
-    max_distance = norm2(Box_size/2._DP)
-    num_distribution = int(max_distance/delta)
-    allocate(distribution_sum(num_distribution))
-    allocate(distribution_function(num_distribution))
     allocate(positions(num_dimensions, num_particles))
     density = real(num_particles, DP) / product(Box_size)
 

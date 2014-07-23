@@ -48,7 +48,7 @@ LDLIBS = -lstdc++
 compiler = ifort
 mode = debug
 
-all: mc_cano_bulk mc_bunching mc_histogram mc_distribution mc_clusters
+all: mc_cano_bulk mc_bunching mc_histogram mc_distribution mc_between_distribution mc_clusters
 	# Report
 	git log | head -n3 > make_report.txt
 	git diff --color-words >> make_report.txt
@@ -72,7 +72,8 @@ mc_cano_bulk: data_precisions.o data_constants.o data_box.o data_neighbour_cells
               program_monte_carlo.o
 	$(FC) $^ -o $@ $(LDFLAGS)
 
-mc_bunching: module_data.o module_arguments.o \
+mc_bunching: module_data.o \
+             module_arguments.o \
              program_bunching.o
 	$(FC) $^ -o $@ $(LDFLAGS)
 
@@ -81,8 +82,15 @@ mc_histogram: module_data.o module_arguments.o \
 	$(FC) $^ -o $@ $(LDFLAGS)
 
 mc_distribution: data_constants.o data_box.o \
-                 module_data.o module_physics_micro.o module_arguments.o \
+                 module_data.o module_physics_micro.o \
+                 module_arguments.o \
                  program_distribution.o
+	$(FC) $^ -o $@ $(LDFLAGS)
+	
+mc_between_distribution: data_constants.o data_box.o \
+                         module_data.o module_maths.o module_physics_micro.o \
+                         module_arguments.o module_read \
+                         program_between_distribution.o
 	$(FC) $^ -o $@ $(LDFLAGS)
 
 mc_clusters: data_precisions.o data_constants.o data_box.o \
@@ -105,7 +113,7 @@ clean:
 	rm -f *.o *.mod
 
 mrproper: clean
-	rm -f mc_cano_bulk mc_bunching mc_histogram mc_distribution mc_clusters
+	rm -f mc_cano_bulk mc_bunching mc_histogram mc_distribution mc_between_distribution mc_clusters
 
 remove:
 	rm -f *.out *.txt *.shots *.tmp
