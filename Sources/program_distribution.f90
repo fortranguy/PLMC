@@ -14,7 +14,7 @@ implicit none
 
     logical :: take_snapshot
     real(DP), dimension(:), allocatable :: Box_size
-    integer :: num_steps
+    
 
     character(len=4096) :: name, name_bis
     integer :: num_particles, num_particles_bis
@@ -22,11 +22,10 @@ implicit none
     real(DP) :: density
     integer, dimension(:), allocatable :: distribution_sum
     integer :: positions_unit, orientations_unit, distrib_unit
-    
-    real(DP) :: distance_max, delta
-    integer :: i_step
+     
+    integer :: num_steps, i_step
     integer :: i_particle, j_particle
-    real(DP) :: distance_ij
+    real(DP) :: distance_ij, distance_max, delta
     real(DP) :: distance_i_distribution, distance_i_minus, distance_i_plus
     integer :: num_distribution, i_distribution
     real(DP), dimension(:), allocatable :: distribution_function

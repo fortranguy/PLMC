@@ -89,7 +89,7 @@ mc_distribution: data_constants.o data_box.o \
 	
 mc_between_distribution: data_constants.o data_box.o \
                          module_data.o module_maths.o module_physics_micro.o \
-                         module_arguments.o module_read \
+                         module_arguments.o module_read.o \
                          program_between_distribution.o
 	$(FC) $^ -o $@ $(LDFLAGS)
 

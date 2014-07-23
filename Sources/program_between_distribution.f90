@@ -28,9 +28,8 @@ implicit none
     integer :: num_distribution, i_distribution
     integer :: num_steps, i_step
     integer :: type1_i_particle, type2_i_particle
-    real(DP) :: distance_12
+    real(DP) :: distance_12, distance_max, delta
     real(DP) :: distance_i, distance_minus, distance_plus
-    real(DP), parameter :: distance_max
     real(DP), dimension(:), allocatable :: distribution_step
     real(DP), dimension(:), allocatable :: distribution_function
     real(DP), dimension(:, :), allocatable :: type1_positions, type2_positions
@@ -71,18 +70,18 @@ implicit none
     allocate(distribution_step(num_distribution))
     allocate(distribution_function(num_distribution))
     
-    call arg_to_file(1, file, length)
-    open(newunit=type1_positions_unit, recl=4096, file=file(1:length), status='old', action='read')    
+    call arg_to_file(1, file_name, length)
+    open(newunit=type1_positions_unit, recl=4096, file=file_name(1:length), status='old', action='read')    
     read(type1_positions_unit, *) type1_name, type1_num_particles, type1_snap_factor
     write(output_unit, *) "type 1: ", type1_name, type1_num_particles, type1_snap_factor
-    allocate(type1_positions(Ndim, type1_num_particles))
+    allocate(type1_positions(num_dimensions, type1_num_particles))
     type1_density = type1_num_particles / product(Box_size)
     
-    call arg_to_file(2, file, length)
-    open(newunit=type2_positions_unit, recl=4096, file=file(1:length), status='old', action='read')    
+    call arg_to_file(2, file_name, length)
+    open(newunit=type2_positions_unit, recl=4096, file=file_name(1:length), status='old', action='read')    
     read(type2_positions_unit, *) type2_name, type2_num_particles, type2_snap_factor
     write(output_unit, *) "type 1: ", type2_name, type2_num_particles, type2_snap_factor
-    allocate(type2_positions(Ndim, type2_num_particles))
+    allocate(type2_positions(num_dimensions, type2_num_particles))
     type2_density = type2_num_particles / product(Box_size)
     
     snap_factors_lcm = lcm(type1_snap_factor, type2_snap_factor)
@@ -104,19 +103,17 @@ implicit none
         distribution_step(:) = 0._DP
         
         do type1_i_particle = 1, type1_num_particles
-            if (type1_paricles_inside(type1_i_particle))  then
+        
+            do type2_i_particle = 1, type2_num_particles                
+                distance_12 = PBC_distance(Box_size, &
+                                           type1_positions(:, type1_i_particle), &
+                                           type2_positions(:, type2_i_particle))
+                if (distance_12 <= distance_max) then
+                    i_distribution = int(distance_12 / delta)
+                    distribution_step(i_distribution) = distribution_step(i_distribution) + 1._DP
+                end if
+            end do
             
-                do type2_i_particle = 1, type2_num_particles                
-                    distance_12 = PBC_distance(Box_size, &
-                                               type1_positions(:, type1_i_particle), &
-                                               type2_positions(:, type2_i_particle))
-                    if (distance_12 <= distance_max) then
-                        i_distribution = int(distance_12 / delta)
-                        distribution_step(i_distribution) = distribution_step(i_distribution) + 1._DP
-                    end if
-                end do
-                
-            end if
         end do
         
         distribution_step(:) = distribution_step(:) / real(type1_num_particles, DP)
