@@ -73,14 +73,14 @@ implicit none
     call arg_to_file(1, file_name, length)
     open(newunit=type1_positions_unit, recl=4096, file=file_name(1:length), status='old', action='read')    
     read(type1_positions_unit, *) type1_name, type1_num_particles, type1_snap_factor
-    write(output_unit, *) "type 1: ", type1_name, type1_num_particles, type1_snap_factor
+    write(output_unit, *) "type 1: ", trim(type1_name), type1_num_particles, type1_snap_factor
     allocate(type1_positions(num_dimensions, type1_num_particles))
     type1_density = type1_num_particles / product(Box_size)
     
     call arg_to_file(2, file_name, length)
     open(newunit=type2_positions_unit, recl=4096, file=file_name(1:length), status='old', action='read')    
     read(type2_positions_unit, *) type2_name, type2_num_particles, type2_snap_factor
-    write(output_unit, *) "type 1: ", type2_name, type2_num_particles, type2_snap_factor
+    write(output_unit, *) "type 1: ", trim(type2_name), type2_num_particles, type2_snap_factor
     allocate(type2_positions(num_dimensions, type2_num_particles))
     type2_density = type2_num_particles / product(Box_size)
     
@@ -129,12 +129,12 @@ implicit none
     deallocate(type1_positions) 
     close(type1_positions_unit)
     
-    open(newunit=report_unit, file=type1_name//"-"//type2_name//"_mix_distribution_report.txt", &
+    open(newunit=report_unit, file=trim(type1_name)//"-"//trim(type2_name)//"_mix_distribution_report.txt", &
          action="write")
          write(report_unit, *) "Duration =", (final_time - initial_time) / 60._DP, "min"
     close(report_unit)
     
-    open(newunit=distrib_unit, file=type1_name//"-"//type2_name//"_mix_distribution.out", &
+    open(newunit=distrib_unit, file=trim(type1_name)//"-"//trim(type2_name)//"_mix_distribution.out", &
          action="write")
     
         distribution_function(:) = distribution_function(:) / real(num_steps/snap_factors_lcm, DP)
