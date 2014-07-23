@@ -80,7 +80,7 @@ implicit none
     call arg_to_file(2, file_name, length)
     open(newunit=type2_positions_unit, recl=4096, file=file_name(1:length), status='old', action='read')    
     read(type2_positions_unit, *) type2_name, type2_num_particles, type2_snap_factor
-    write(output_unit, *) "type 1: ", trim(type2_name), type2_num_particles, type2_snap_factor
+    write(output_unit, *) "type 2: ", trim(type2_name), type2_num_particles, type2_snap_factor
     allocate(type2_positions(num_dimensions, type2_num_particles))
     type2_density = type2_num_particles / product(Box_size)
     
