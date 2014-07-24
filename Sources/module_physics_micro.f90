@@ -4,7 +4,7 @@ module module_physics_micro
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, error_unit
 use data_constants, only: PI, sigma3d
-use data_box, only: num_dimensions
+use data_box, only: num_dimensions, bulk, slab
 
 implicit none
 private
@@ -48,11 +48,28 @@ contains
         real(DP), dimension(:), intent(in) :: position1, position2
         real(DP), dimension(num_dimensions) :: PBC_vector
         
-        PBC_vector(:) = modulo(position2(:)-position1(:), Box_size(:))
+        if (bulk) then
         
-        where(PBC_vector(:) > Box_size(:)/2._DP)
-            PBC_vector(:) = PBC_vector(:) - Box_size(:)
-        end where
+            PBC_vector(:) = modulo(position2(:)-position1(:), Box_size(:))
+            
+            where(PBC_vector(:) > Box_size(:)/2._DP)
+                PBC_vector(:) = PBC_vector(:) - Box_size(:)
+            end where
+            
+        else if (slab) then
+        
+            PBC_vector(1:num_dimensions-1) = &
+                modulo(position2(1:num_dimensions-1) - position1(1:num_dimensions-1), &
+                       Box_size(1:num_dimensions-1))
+
+            where(PBC_vector(1:num_dimensions-1) > Box_size(1:num_dimensions-1)/2._DP)
+                PBC_vector(1:num_dimensions-1) = &
+                    PBC_vector(1:num_dimensions-1) - Box_size(1:num_dimensions-1)
+            end where
+
+            PBC_vector(num_dimensions) = position2(num_dimensions) - position1(num_dimensions)
+        
+        end if
         
     end function PBC_vector
     
