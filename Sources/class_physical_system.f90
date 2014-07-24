@@ -4,6 +4,7 @@ module class_physical_system
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file
+use data_box, only: bulk, slab
 use module_data, only: test_data_found, test_empty_string
 use module_types_micro, only: Box_Parameters, Monte_Carlo_Arguments
 use module_physics_micro, only: num_wave_vectors
@@ -122,6 +123,14 @@ contains
         character(len=4096) :: data_name
         logical :: found
         character(len=:), allocatable :: this_name
+        
+        data_name = "Box.bulk"
+        call json%get(data_name, bulk, found)
+        call test_data_found(data_name, found)
+        
+        data_name = "Box.slab"
+        call json%get(data_name, slab, found)
+        call test_data_found(data_name, found)
         
         data_name = "Box.name"
         call json%get(data_name, this_name, found)

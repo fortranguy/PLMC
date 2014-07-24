@@ -3,7 +3,6 @@ module data_box
 implicit none
     
     integer, parameter :: num_dimensions = 3
-    logical, parameter :: bulk = .true.
-    logical, parameter :: slab = .false.
+    logical :: bulk, slab
     
 end module data_box
