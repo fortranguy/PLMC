@@ -19,7 +19,7 @@ implicit none
     call json_initialize()
     call json%load_file(filename = "data.json")
     call read_arguments(args)
-    call sys%construct(json)
+    call sys%construct(json, args)
     call sys%init(json, args)
         
     write(output_unit, *) "Beginning of cycles"

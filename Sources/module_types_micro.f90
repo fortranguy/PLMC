@@ -66,6 +66,7 @@ implicit none
     end type Argument_Initial
     
     type, public :: Monte_Carlo_Arguments
+        character(len=4) :: geometry
         type(Argument_Random) :: random
         type(Argument_Initial) :: initial
     end type Monte_Carlo_Arguments

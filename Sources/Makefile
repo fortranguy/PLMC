@@ -48,7 +48,7 @@ LDLIBS = -lstdc++
 compiler = ifort
 mode = debug
 
-all: mc_cano_bulk mc_bunching mc_histogram mc_distribution mc_between_distribution mc_clusters
+all: mc_cano mc_bunching mc_histogram mc_distribution mc_between_distribution mc_clusters
 	# Report
 	git log | head -n3 > make_report.txt
 	git diff --color-words >> make_report.txt
@@ -58,18 +58,18 @@ all: mc_cano_bulk mc_bunching mc_histogram mc_distribution mc_between_distributi
 
 #---------------------------------------------------------------------------------------------------
 
-mc_cano_bulk: data_precisions.o data_constants.o data_box.o data_neighbour_cells.o data_write.o \
-              module_data.o module_types_micro.o module_geometry.o module_physics_micro.o \
-              class_hard_spheres.o \
-              class_small_move.o class_small_rotation.o \
-              class_neighbour_cells.o class_hard_spheres_potential.o \
-              class_ewald_summation_real.o class_ewald_summation_reci.o \
-              class_ewald_summation_self.o class_ewald_summation_bound.o \
-              module_types_macro.o \
-              class_discrete_observable.o class_hard_spheres_observables.o class_hard_spheres_units.o \
-              module_physics_macro.o module_algorithms.o module_write.o \
-              class_physical_system.o module_arguments.o module_arguments_monte_carlo.o \
-              program_monte_carlo.o
+mc_cano: data_precisions.o data_constants.o data_box.o data_neighbour_cells.o data_write.o \
+         module_data.o module_types_micro.o module_geometry.o module_physics_micro.o \
+         class_hard_spheres.o \
+         class_small_move.o class_small_rotation.o \
+         class_neighbour_cells.o class_hard_spheres_potential.o \
+         class_ewald_summation_real.o class_ewald_summation_reci.o \
+         class_ewald_summation_self.o class_ewald_summation_bound.o \
+         module_types_macro.o \
+         class_discrete_observable.o class_hard_spheres_observables.o class_hard_spheres_units.o \
+         module_physics_macro.o module_algorithms.o module_write.o \
+         class_physical_system.o module_arguments.o module_arguments_monte_carlo.o \
+         program_monte_carlo.o
 	$(FC) $^ -o $@ $(LDFLAGS)
 
 mc_bunching: module_data.o \
@@ -114,7 +114,7 @@ clean:
 	rm -f *.o *.mod
 
 mrproper: clean
-	rm -f mc_cano_bulk mc_bunching mc_histogram mc_distribution mc_between_distribution mc_clusters
+	rm -f mc_cano mc_bunching mc_histogram mc_distribution mc_between_distribution mc_clusters
 
 remove:
 	rm -f *.out *.txt *.shots *.tmp

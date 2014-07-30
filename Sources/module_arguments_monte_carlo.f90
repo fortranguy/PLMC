@@ -15,8 +15,10 @@ contains
 
     subroutine write_help()
     
-        write(output_unit, *) "Usage: mc_[ENSEMBLE]_[GEOMETRY] [OPTION]"
+        write(output_unit, *) "Usage: mc_[ENSEMBLE] [GEOMETRY] [OPTION]"
         write(output_unit, *) "Run ENSEMBLE Monte-Carlo simulation in GEOMETRY."
+        write(output_unit, *)
+        write(output_unit, *) "GEOMETRY = 'cano', 'slab'"
         write(output_unit, *)
         write(output_unit, *) "Mandatory arguments to long options are mandatory for short options too."
         write(output_unit, *) "    -h, --help"
@@ -89,13 +91,14 @@ contains
 
         character(len=4096) :: argument, sub_argument
         integer :: i_arg, length, status
-        logical :: rand_redefined, init_redefined
+        logical :: geometry_defined, rand_defined, init_defined
 
         args%random%choice = 'v'
         args%initial%choice = 'r'
-
-        rand_redefined = .false.
-        init_redefined = .false.
+        
+        geometry_defined = .false.
+        rand_defined = .false.
+        init_defined = .false.
 
         i_arg = 1
         do while(i_arg <= command_argument_count())
@@ -104,13 +107,23 @@ contains
             if (status /= 0) error stop "Error: read_arguments"
 
             select case (argument)
+            
+                case ("bulk")
+                    if (geometry_defined) error stop "Error: geometry already defined."
+                    args%geometry = "bulk"
+                    geometry_defined = .true.
+                
+                case ("slab")
+                    if (geometry_defined) error stop "Error: geometry already defined."
+                    args%geometry = "slab"
+                    geometry_defined = .true.
 
                 case ("-h", "--help")
                     call write_help()
                     stop
 
                 case ("-i", "--initial")
-                    if (init_redefined) error stop "Error: initial configuration already defined."
+                    if (init_defined) error stop "Error: initial configuration already defined."
                     i_arg = i_arg + 1
                     call get_command_argument(i_arg, sub_argument, length, status)
                     if (status /= 0) error stop "Enter initial configuration, cf. help."
@@ -123,10 +136,10 @@ contains
                             call write_help()
                             error stop
                     end select
-                    init_redefined = .true.
+                    init_defined = .true.
 
                 case ("-r", "--random")
-                    if (rand_redefined) error stop "Error: random seed already defined."
+                    if (rand_defined) error stop "Error: random seed already defined."
                     i_arg = i_arg + 1
                     call get_command_argument(i_arg, sub_argument, length, status)
                     if (status /= 0) error stop "Enter random seed choice, cf. help."
@@ -141,7 +154,7 @@ contains
                             call write_help()
                             error stop
                     end select
-                    rand_redefined = .true.
+                    rand_defined = .true.
 
                 case default
                     write(error_unit, *) "Unknown option: '", trim(argument), "'"
@@ -152,6 +165,8 @@ contains
             i_arg = i_arg + 1
 
         end do
+        
+        if (.not. geometry_defined) error stop "Error: geometry is not defined." 
 
     end subroutine read_arguments
 
