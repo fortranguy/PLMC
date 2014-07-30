@@ -4,7 +4,7 @@ use module_types_micro, only: System_Geometry
 
 implicit none
 private
-public set_geometry
+public geometry, set_geometry
 
     type(System_Geometry), protected :: geometry
     

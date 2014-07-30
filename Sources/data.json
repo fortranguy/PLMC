@@ -1,7 +1,5 @@
 {
     "Box": {
-        "bulk": true,
-        "slab": false,
         "name": "sys",
         "size": [25, 25, 25],
         "wave": [8, 8, 8],
