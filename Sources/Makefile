@@ -59,7 +59,7 @@ all: mc_cano_bulk mc_bunching mc_histogram mc_distribution mc_between_distributi
 #---------------------------------------------------------------------------------------------------
 
 mc_cano_bulk: data_precisions.o data_constants.o data_box.o data_neighbour_cells.o data_write.o \
-              module_data.o module_types_micro.o module_physics_micro.o \
+              module_data.o module_types_micro.o module_geometry.o module_physics_micro.o \
               class_hard_spheres.o \
               class_small_move.o class_small_rotation.o \
               class_neighbour_cells.o class_hard_spheres_potential.o \

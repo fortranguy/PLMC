@@ -6,6 +6,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file
 use data_box, only: bulk, slab
 use module_data, only: test_data_found, test_empty_string
+use module_geometry, only: set_geometry
 use module_types_micro, only: Box_Parameters, Monte_Carlo_Arguments
 use module_physics_micro, only: num_wave_vectors
 use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres, Between_Hard_Spheres
@@ -123,6 +124,8 @@ contains
         character(len=4096) :: data_name
         logical :: found
         character(len=:), allocatable :: this_name
+        
+        call set_geometry()
         
         data_name = "Box.bulk"
         call json%get(data_name, bulk, found)
