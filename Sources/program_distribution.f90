@@ -37,7 +37,7 @@ implicit none
     character(len=4096) :: file_name
     integer :: length, time_unit
 
-    real(DP) :: time_init, time_final
+    real(DP) :: time_start, time_end
     
     call json_initialize()
     call json%load_file(filename = "data.json")
@@ -82,7 +82,7 @@ implicit none
     density = real(num_particles, DP) / product(Box_size)
 
     write(output_unit, *) "Start !"
-    call cpu_time(time_init)
+    call cpu_time(time_start)
     distribution_function(:) = 0._DP
     num_steps = 0
     do i_step = num_thermalisation_steps + 1, num_thermalisation_steps + num_equilibrium_steps    
@@ -109,7 +109,7 @@ implicit none
         
         end if
     end do
-    call cpu_time(time_final)
+    call cpu_time(time_end)
     write(output_unit, *) "Finish !"
 
     close(positions_unit)
@@ -134,8 +134,8 @@ implicit none
         
     close(distrib_unit)
     
-    open(newunit=time_unit, file=trim(name)//"_distribution_duration.txt")
-        write(time_unit, *) "duration", time_final - time_init
+    open(newunit=time_unit, file=trim(name)//"_distribution_report.txt")
+        write(time_unit, *) "Duration =", (time_end - time_start) / 60._DP, "min"
     close(time_unit)
     
     deallocate(distribution_function)

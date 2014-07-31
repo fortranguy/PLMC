@@ -36,7 +36,7 @@ implicit none
     logical :: found
     character(len=4096) :: file_name
     integer :: length
-    real(DP) :: initial_time, final_time
+    real(DP) :: time_start, time_end
     
     call json_initialize()
     call json%load_file(filename = "data.json")
@@ -86,7 +86,7 @@ implicit none
     type2_density = type2_num_particles / product(Box_size)
     
     write(output_unit, *) "Start !"
-    call cpu_time(initial_time)
+    call cpu_time(time_start)
     distribution_function(:) = 0._DP
     num_common_steps = 0
     do i_step = num_thermalisation_steps + 1, num_thermalisation_steps + num_equilibrium_steps
@@ -119,7 +119,7 @@ implicit none
         end if
     
     end do
-    call cpu_time(final_time)
+    call cpu_time(time_end)
     write(output_unit, *) "Finish !"
     
     deallocate(type2_positions) 
@@ -130,7 +130,7 @@ implicit none
     
     open(newunit=report_unit, file=trim(type1_name)//"-"//trim(type2_name)//"_distribution_report.txt", &
          action="write")
-         write(report_unit, *) "Duration =", (final_time - initial_time) / 60._DP, "min"
+         write(report_unit, *) "Duration =", (time_end - time_start) / 60._DP, "min"
     close(report_unit)
     
     open(newunit=distrib_unit, file=trim(type1_name)//"-"//trim(type2_name)//"_distribution_function.out", &
