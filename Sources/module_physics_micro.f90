@@ -11,7 +11,7 @@ implicit none
 private
 public set_discrete_length, sphere_volume, PBC_vector, PBC_distance, random_surface, markov_surface, &
        dipolar_pair_energy, ewald_real_B, ewald_real_C, &
-       num_wave_vectors, Box_wave1_sym, Box_wave2_sym, fourier_i, exchange_sign, &
+       num_wave_vectors, Box_wave1_sym, Box_wave2_sym, fourier_i, set_exp_kz, exchange_sign, &
        index_from_coord, coord_PBC, &
        potential_energy_lennard_jones, potential_energy_yukawa
 
@@ -284,6 +284,29 @@ contains
         end do
     
     end subroutine fourier_i
+    
+    pure subroutine set_exp_kz(Box_wave, norm_k, zCol, exp_kzCol_tab)
+    
+        integer, dimension(:), intent(in) :: Box_wave
+        real(DP), dimension(-Box_wave(1):Box_wave(1), -Box_wave(2):Box_wave(2)), intent(in) :: norm_k
+        real(DP), intent(in) :: zCol
+        real(DP), dimension(0:Box_wave(1), 0:Box_wave(2)), intent(out) :: exp_kzCol_tab
+
+        integer :: kx, ky
+
+        do ky = 0, Box_wave(2)
+        
+            do kx = ky, Box_wave(1)
+                exp_kzCol_tab(kx, ky) = exp(norm_k(kx, ky) * zCol)
+            end do
+            
+            do kx = 0, ky-1
+                exp_kzCol_tab(kx, ky) = exp_kzCol_tab(ky, kx)
+            end do
+            
+        end do
+
+    end subroutine set_exp_kz
     
     !> Exchange : + or -
     
