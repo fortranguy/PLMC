@@ -13,10 +13,6 @@ ifeq ($(compiler), gfortran)
     ifeq ($(mode), fast)
         FFLAGS = -Ofast
     endif
-    ifeq ($(omp), true)
-        FFLAGS += -fopenmp
-        LDFLAGS = -fopenmp
-    endif
     FFLAGS += -I${HOME}/usr/json-fortran_gfortran/include
     LDFLAGS += -L${HOME}/usr/json-fortran_gfortran/lib -ljsonfortran
 else
@@ -32,10 +28,6 @@ else
     ifeq ($(mode), fast)
         FFLAGS = -fast
         CPPFLAGS = -O3
-    endif
-    ifeq ($(omp), true)
-        FFLAGS += -openmp
-        LDFLAGS = -openmp
     endif
     FFLAGS += -I${HOME}/usr/json-fortran_intel/include
     LDFLAGS += -L${HOME}/usr/json-fortran_intel/lib -ljsonfortran
