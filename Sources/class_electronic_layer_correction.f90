@@ -17,15 +17,18 @@ private
 
         private
         
-        integer :: NwaveVectors
-        real(DP), dimension(-Kmax(1):Kmax(1), -Kmax(2):Kmax(2)) :: norm_k
-        real(DP), dimension(-Kmax(1):Kmax(1), -Kmax(2):Kmax(2)) :: weight
-        complex(DP), dimension(-Kmax(1):Kmax(1), -Kmax(2):Kmax(2)) :: structure_plus, structure_minus
+        integer :: num_wave_vectors
+        real(DP), dimension(:, :), allocatable :: wave_norm
+        real(DP), dimension(:, :), allocatable :: weight
+        complex(DP), dimension(:, :), allocatable :: structure_plus, structure_minus
         
     contains
+    
+        procedure :: construct => Electronic_Layer_Correction_construct
+        procedure :: destroy => Electronic_Layer_Correction_destroy
 
         !>     ELC: init
-        procedure, private :: init_norm_k => Electronic_Layer_Correction_init_norm_k
+        procedure, private :: init_wave_norm => Electronic_Layer_Correction_init_wave_norm
         procedure, private :: init_weight => Electronic_Layer_Correction_init_weight
         procedure, private :: init_structures => Electronic_Layer_Correction_init_structures
         procedure, private :: init => Electronic_Layer_Correction_init
@@ -47,10 +50,44 @@ private
     end type Electronic_Layer_Correction
     
 contains
+
+    pure subroutine Electronic_Layer_Correction_construct(this, Box, this_spheres)
+        
+        class(Electronic_Layer_Correction), intent(inout) :: this
+        type(Box_Parameters), intent(in) :: Box
+        real(DP), intent(in) :: alpha
+        type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
+        
+        if (allocated(this%wave_norm)) deallocate(this%wave_norm)
+        allocate(this%wave_norm(-Box%wave(1):Box%wave(1), &
+                                -Box%wave(2):Box%wave(2)))
+        
+        if (allocated(this%weight)) deallocate(this%weight)
+        allocate(this%weight(-Box%wave(1):Box%wave(1), &
+                             -Box%wave(2):Box%wave(2)))
+                                
+        if (allocated(this%structure_plus)) deallocate(this%structure_plus)
+        allocate(this%structure_plus(-Box%wave(1):Box%wave(1), &
+                                     -Box%wave(2):Box%wave(2)))
+                                     
+        if (allocated(this%structure_minus)) deallocate(this%structure_minus)
+        allocate(this%structure_minus(-Box%wave(1):Box%wave(1), &
+                                      -Box%wave(2):Box%wave(2)))
     
-    !> Initialisation of the ``structure factors''
+    end subroutine Electronic_Layer_Correction_construct
     
-    pure subroutine Electronic_Layer_Correction_init_norm_k(this)
+    subroutine Electronic_Layer_Correction_destroy(this)
+    
+        class(Electronic_Layer_Correction), intent(inout) :: this
+        
+        if (allocated(this%wave_norm)) deallocate(this%wave_norm)
+        if (allocated(this%weight)) deallocate(this%weight)
+        if (allocated(this%structure_plus)) deallocate(this%structure_plus)
+        if (allocated(this%structure_minus)) deallocate(this%structure_minus)
+    
+    end subroutine Electronic_Layer_Correction_destroy
+    
+    pure subroutine Electronic_Layer_Correction_init_wave_norm(this)
     
         class(Electronic_Layer_Correction), intent(inout) :: this
     
@@ -63,13 +100,13 @@ contains
         do kx = -Kmax(1), Kmax(1)
             waveVector(1) = real(kx, DP)
             
-            this%norm_k(kx, ky) = 2._DP*PI * norm2(waveVector(:)/Lsize(1:Ndim-1))
+            this%wave_norm(kx, ky) = 2._DP*PI * norm2(waveVector(:)/Lsize(1:Ndim-1))
             
         end do
         
         end do
     
-    end subroutine Electronic_Layer_Correction_init_norm_k
+    end subroutine Electronic_Layer_Correction_init_wave_norm
     
     !> \f[
     !>      w(\vec{k}^{2D}) = \frac{1}{k^{2D}(e^{k^{2D}L_z} - 1)}
@@ -87,8 +124,8 @@ contains
 
             if (kx**2 + ky**2 /= 0) then
 
-                this%weight(kx, ky) = 1._DP / this%norm_k(kx, ky) / &
-                                               (exp(this%norm_k(kx, ky)*Lsize(3)) - 1._DP)
+                this%weight(kx, ky) = 1._DP / this%wave_norm(kx, ky) / &
+                                               (exp(this%wave_norm(kx, ky)*Lsize(3)) - 1._DP)
 
             else
 
@@ -150,10 +187,10 @@ contains
                 waveVector(1) = real(kx, DP)
             
                 exp_IkxCol = exp_Ikx_1(kx) * exp_Ikx_2(ky)
-                exp_kzCol = exp(this%norm_k(kx, ky) * this%positions(3, iCol))
+                exp_kzCol = exp(this%wave_norm(kx, ky) * this%positions(3, iCol))
 
                 k_dot_mCol = dot_product(waveVector, mColOverL)
-                kMcol_z = this%norm_k(kx, ky) * this%orientations(3, iCol)
+                kMcol_z = this%wave_norm(kx, ky) * this%orientations(3, iCol)
                           
                 this%structure_plus(kx, ky) = this%structure_plus(kx, ky) + &
                                               cmplx(+kMcol_z, k_dot_mCol, DP) * &
@@ -177,7 +214,7 @@ contains
     
         class(Electronic_Layer_Correction), intent(inout) :: this
     
-        call this%init_norm_k()
+        call this%init_wave_norm()
         call this%init_weight()
         call this%init_structures()
     
@@ -233,7 +270,7 @@ contains
         
         integer :: kx, ky
 
-        this%NwaveVectors = 0
+        this%num_wave_vectors = 0
 
         do ky = 0, Kmax(2)
             do kx = -Kmax1_sym(ky, 0), Kmax(1)
@@ -242,7 +279,7 @@ contains
                     write(waveVectors_unit, *)
                     write(waveVectors_unit, *)
 
-                    this%NwaveVectors = this%NwaveVectors + 1
+                    this%num_wave_vectors = this%num_wave_vectors + 1
 
                 end if
             end do
@@ -303,12 +340,12 @@ contains
         xNewOverL(:) = 2._DP*PI * xNew(1:Ndim-1)/Lsize(1:Ndim-1)
         call fourier_i(Kmax(1), xNewOverL(1), exp_IkxNew_1)
         call fourier_i(Kmax(2), xNewOverL(2), exp_IkxNew_2)
-        call set_exp_kz(this%norm_k, xNew(3), exp_kzNew_tab)
+        call set_exp_kz(this%wave_norm, xNew(3), exp_kzNew_tab)
         
         xOldOverL(:) = 2._DP*PI * xOld(1:Ndim-1)/Lsize(1:Ndim-1)
         call fourier_i(Kmax(1), xOldOverL(1), exp_IkxOld_1)
         call fourier_i(Kmax(2), xOldOverL(2), exp_IkxOld_2)
-        call set_exp_kz(this%norm_k, xOld(3), exp_kzOld_tab)
+        call set_exp_kz(this%wave_norm, xOld(3), exp_kzOld_tab)
 
         mColOverL(:) = 2._DP*PI * mCol(1:Ndim-1)/Lsize(1:Ndim-1)
 
@@ -320,7 +357,7 @@ contains
             do kx = -Kmax1_sym(ky, 0), Kmax(1)
                 waveVector(1) = real(kx, DP)
                 
-                kMcol_z = this%norm_k(kx, ky) * mCol(3)
+                kMcol_z = this%wave_norm(kx, ky) * mCol(3)
                 k_dot_mCol = dot_product(waveVector, mColOverL)
                 
                 exp_IkxNew = exp_IkxNew_1(kx) * exp_IkxNew_2(ky)
@@ -396,12 +433,12 @@ contains
         xNewOverL(:) = 2._DP*PI * xNew(1:Ndim-1)/Lsize(1:Ndim-1)
         call fourier_i(Kmax(1), xNewOverL(1), exp_IkxNew_1)
         call fourier_i(Kmax(2), xNewOverL(2), exp_IkxNew_2)
-        call set_exp_kz(this%norm_k, xNew(3), exp_kzNew_tab)
+        call set_exp_kz(this%wave_norm, xNew(3), exp_kzNew_tab)
         
         xOldOverL(:) = 2._DP*PI * xOld(1:Ndim-1)/Lsize(1:Ndim-1)
         call fourier_i(Kmax(1), xOldOverL(1), exp_IkxOld_1)
         call fourier_i(Kmax(2), xOldOverL(2), exp_IkxOld_2)
-        call set_exp_kz(this%norm_k, xOld(3), exp_kzOld_tab)
+        call set_exp_kz(this%wave_norm, xOld(3), exp_kzOld_tab)
 
         mColOverL(:) = 2._DP*PI * mCol(1:Ndim-1)/Lsize(1:Ndim-1)
 
@@ -412,7 +449,7 @@ contains
                 waveVector(1) = real(kx, DP)
 
                 k_dot_mCol = dot_product(waveVector, mColOverL)
-                kMcol_z = this%norm_k(kx, ky) * mCol(3)
+                kMcol_z = this%wave_norm(kx, ky) * mCol(3)
 
                 exp_IkxNew = exp_IkxNew_1(kx) * exp_IkxNew_2(ky)
                 exp_kzNew = exp_kzNew_tab(abs(kx), ky)
@@ -482,7 +519,7 @@ contains
         xColOverL(:) = 2._DP*PI * xCol(1:2)/Lsize(1:2)
         call fourier_i(Kmax(1), xColOverL(1), exp_IkxCol_1)
         call fourier_i(Kmax(2), xColOverL(2), exp_IkxCol_2)
-        call set_exp_kz(this%norm_k, xCol(3), exp_kzCol_tab)
+        call set_exp_kz(this%wave_norm, xCol(3), exp_kzCol_tab)
 
         mNewOverL(:) = 2._DP*PI * mNew(1:2)/Lsize(1:2)
         mOldOverL(:) = 2._DP*PI * mOld(1:2)/Lsize(1:2)
@@ -495,10 +532,10 @@ contains
             do kx = -Kmax1_sym(ky, 0), Kmax(1)
                 waveVector(1) = real(kx, DP)
 
-                kMnew_z = this%norm_k(kx, ky) * mNew(3)
+                kMnew_z = this%wave_norm(kx, ky) * mNew(3)
                 k_dot_mNew = dot_product(waveVector, mNewOverL)
                 
-                kMold_z = this%norm_k(kx, ky) * mOld(3)
+                kMold_z = this%wave_norm(kx, ky) * mOld(3)
                 k_dot_mOld = dot_product(waveVector, mOldOverL)
 
                 exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky)
@@ -571,7 +608,7 @@ contains
         xColOverL(:) = 2._DP*PI * xCol(1:Ndim-1)/Lsize(1:Ndim-1)
         call fourier_i(Kmax(1), xColOverL(1), exp_IkxCol_1)
         call fourier_i(Kmax(2), xColOverL(2), exp_IkxCol_2)
-        call set_exp_kz(this%norm_k, xCol(3), exp_kzCol_tab)
+        call set_exp_kz(this%wave_norm, xCol(3), exp_kzCol_tab)
 
         mNewOverL(:) = 2._DP*PI * mNew(1:Ndim-1)/Lsize(1:Ndim-1)
         mOldOverL(:) = 2._DP*PI * mOld(1:Ndim-1)/Lsize(1:Ndim-1)
@@ -585,7 +622,7 @@ contains
                 exp_kzCol = exp_kzCol_tab(abs(kx), ky)
                 exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky)
 
-                kdeltaMcol_z = this%norm_k(kx, ky) * (mNew(3) - mOld(3))
+                kdeltaMcol_z = this%wave_norm(kx, ky) * (mNew(3) - mOld(3))
                 k_dot_deltaMcol = dot_product(waveVector, mNewOverL - mOldOverL)
                 
                 this%structure_plus(kx, ky) = this%structure_plus(kx, ky) + &
@@ -650,7 +687,7 @@ contains
         xColOverL(:) = 2._DP*PI * xCol(1:2)/Lsize(1:2)
         call fourier_i(Kmax(1), xColOverL(1), exp_IkxCol_1)
         call fourier_i(Kmax(2), xColOverL(2), exp_IkxCol_2)
-        call set_exp_kz(this%norm_k, xCol(3), exp_kzCol_tab)
+        call set_exp_kz(this%wave_norm, xCol(3), exp_kzCol_tab)
         
         mColOverL(:) = 2._DP*PI * mCol(1:2)/Lsize(1:2)
         
@@ -662,7 +699,7 @@ contains
             do kx = -Kmax1_sym(ky, 0), Kmax(1)
                 waveVector(1) = real(kx, DP)
                 
-                kMcol_z = this%norm_k(kx, ky) * mCol(3)
+                kMcol_z = this%wave_norm(kx, ky) * mCol(3)
                 k_dot_mCol = dot_product(waveVector, mColOverL)
                                                 
                 exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky)

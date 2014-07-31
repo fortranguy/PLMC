@@ -285,10 +285,10 @@ contains
     
     end subroutine fourier_i
     
-    pure subroutine set_exp_kz(Box_wave, norm_k, zCol, exp_kzCol_tab)
+    pure subroutine set_exp_kz(Box_wave, wave_norm, zCol, exp_kzCol_tab)
     
         integer, dimension(:), intent(in) :: Box_wave
-        real(DP), dimension(-Box_wave(1):Box_wave(1), -Box_wave(2):Box_wave(2)), intent(in) :: norm_k
+        real(DP), dimension(-Box_wave(1):Box_wave(1), -Box_wave(2):Box_wave(2)), intent(in) :: wave_norm
         real(DP), intent(in) :: zCol
         real(DP), dimension(0:Box_wave(1), 0:Box_wave(2)), intent(out) :: exp_kzCol_tab
 
@@ -297,7 +297,7 @@ contains
         do ky = 0, Box_wave(2)
         
             do kx = ky, Box_wave(1)
-                exp_kzCol_tab(kx, ky) = exp(norm_k(kx, ky) * zCol)
+                exp_kzCol_tab(kx, ky) = exp(wave_norm(kx, ky) * zCol)
             end do
             
             do kx = 0, ky-1
