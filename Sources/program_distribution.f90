@@ -8,7 +8,6 @@ use json_module, only: json_file, json_initialize
 use module_data, only: test_data_found
 use module_physics_micro, only: sphere_volume, PBC_distance
 use module_arguments, only: arg_to_file
-!$ use omp_lib
 
 implicit none
 
@@ -16,22 +15,21 @@ implicit none
     real(DP), dimension(:), allocatable :: Box_size
     
 
-    character(len=4096) :: name, name_bis
-    integer :: num_particles, num_particles_bis
-    integer :: snap_factor, snap_factor_bis
+    character(len=4096) :: name
+    integer :: num_particles
+    integer :: snap_factor
     real(DP) :: density
-    integer :: positions_unit, orientations_unit, distrib_unit
-     
-    integer :: num_steps, i_step
+    integer :: positions_unit, distrib_unit
+    
+    integer :: num_thermalisation_steps
+    integer :: num_equilibrium_steps, i_step, num_steps
     integer :: i_particle, j_particle
     real(DP) :: distance_ij, distance_max, delta
     real(DP) :: distance_i_distribution, distance_i_minus, distance_i_plus
     integer :: num_distribution, i_distribution
     real(DP), dimension(:), allocatable :: distribution_step
     real(DP), dimension(:), allocatable :: distribution_function
-    real(DP), dimension(:, :), allocatable :: positions, orientations
-    
-    logical :: with_orientations
+    real(DP), dimension(:, :), allocatable :: positions
     
     type(json_file) :: json
     character(len=4096) :: data_name
@@ -39,8 +37,7 @@ implicit none
     character(len=4096) :: file_name
     integer :: length, time_unit
 
-    real(DP) :: time_init, time_final
-    !$ real(DP) :: time_init_para, time_final_para
+    real(DP) :: time_start, time_end
     
     call json_initialize()
     call json%load_file(filename = "data.json")
@@ -56,8 +53,12 @@ implicit none
     call test_data_found(data_name, found)
     if (size(Box_size) /= num_dimensions) error stop "Box size dimension"
     
+    data_name = "Monte Carlo.number of thermalisation steps"
+    call json%get(data_name, num_thermalisation_steps, found)
+    call test_data_found(data_name, found)
+    
     data_name = "Monte Carlo.number of equilibrium steps"
-    call json%get(data_name, num_steps, found)
+    call json%get(data_name, num_equilibrium_steps, found)
     call test_data_found(data_name, found)
     
     data_name = "Distribution.delta"
@@ -79,76 +80,44 @@ implicit none
     
     allocate(positions(num_dimensions, num_particles))
     density = real(num_particles, DP) / product(Box_size)
-    
-    with_orientations = (command_argument_count() == 2)
-    
-    if (with_orientations) then
-    
-        call arg_to_file(2, file_name, length)
-        open(newunit=orientations_unit, recl=4096, file=file_name(1:length), status='old', &
-        action='read')
-        
-        read(orientations_unit, *) name_bis, num_particles_bis, snap_factor_bis
-        if (name_bis/=name .or. num_particles_bis/=num_particles .or. snap_factor_bis/=snap_factor) then
-            write(error_unit, *) "Error: positions and orientations tags don't match."
-            error stop
-        end if
-        
-        allocate(orientations(num_dimensions, num_particles))
-        
-    end if
 
     write(output_unit, *) "Start !"
-    call cpu_time(time_init)
-    !$ time_init_para = omp_get_wtime()
-    !$omp parallel do schedule(static) reduction(+:distribution_function) &
-    !$ private(positions, i_particle, j_particle, distance_ij, i_distribution, distribution_step)
+    call cpu_time(time_start)
     distribution_function(:) = 0._DP
-    do i_step = 1, num_steps/snap_factor
-
-        ! Read
-        !$omp critical
-        do i_particle = 1, num_particles
-            read(positions_unit, *) positions(:, i_particle)
-        end do
+    num_steps = 0
+    do i_step = num_thermalisation_steps + 1, num_thermalisation_steps + num_equilibrium_steps    
+        if (modulo(i_step, snap_factor) == 0) then
         
-        if (with_orientations) then
+            num_steps = num_steps + 1
+        
             do i_particle = 1, num_particles
-                read(orientations_unit, *) orientations(:, i_particle)
+                read(positions_unit, *) positions(:, i_particle)
             end do
-        end if
-        !$omp end critical
 
-        ! Fill
-        distribution_step(:) = 0
-        do i_particle = 1, num_particles
-            do j_particle = i_particle + 1, num_particles
-                distance_ij = PBC_distance(Box_size, positions(:, i_particle), positions(:, j_particle))
-                i_distribution =  int(distance_ij/delta)
-                distribution_step(i_distribution) = distribution_step(i_distribution) + 1._DP
+            ! Fill
+            distribution_step(:) = 0
+            do i_particle = 1, num_particles
+                do j_particle = i_particle + 1, num_particles
+                    distance_ij = PBC_distance(Box_size, positions(:, i_particle), &
+                                                         positions(:, j_particle))
+                    i_distribution =  int(distance_ij/delta)
+                    distribution_step(i_distribution) = distribution_step(i_distribution) + 1._DP
+                end do
             end do
-        end do
+            
+            distribution_function(:) = distribution_function(:) + distribution_step(:)
         
-        distribution_function(:) = distribution_function(:) + distribution_step(:)
-
+        end if
     end do
-    !$omp end parallel do
-    !$ time_final_para = omp_get_wtime()
-    call cpu_time(time_final)
+    call cpu_time(time_end)
     write(output_unit, *) "Finish !"
 
     close(positions_unit)
     deallocate(positions)
-    
-    if (with_orientations) then
-        close(orientations_unit)
-        deallocate(orientations)
-    end if
 
     open(newunit=distrib_unit, file=trim(name)//"_distribution_function.out", action="write")
     
-        distribution_function(:) = 2._DP * distribution_function(:) / &
-                                   real(num_steps/snap_factor, DP) / &
+        distribution_function(:) = 2._DP * distribution_function(:) / real(num_steps, DP) / &
                                    real(num_particles, DP)
     
         do i_distribution = 1, num_distribution
@@ -165,16 +134,8 @@ implicit none
         
     close(distrib_unit)
     
-    open(newunit=time_unit, file=trim(name)//"_distribution_time.out")
-        write(time_unit, *) "pseudo serial time", time_final - time_init
-        !$ write(time_unit, *) "parallel time", time_final_para - time_init_para
-        !$omp parallel
-            !$omp master
-                !$ write(time_unit, *) "number of threads =", omp_get_num_threads()
-            !$omp end master
-        !$omp end parallel
-        !$ write(time_unit, *) "ratio =", (time_final-time_init)/(time_final_para-time_init_para)
-            ! fake ?
+    open(newunit=time_unit, file=trim(name)//"_distribution_report.txt")
+        write(time_unit, *) "Duration =", (time_end - time_start) / 60._DP, "min"
     close(time_unit)
     
     deallocate(distribution_function)

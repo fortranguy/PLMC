@@ -6,11 +6,8 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit, error_unit
 use data_box, only: num_dimensions
 use json_module, only: json_file, json_initialize
 use module_data, only: test_data_found
-use module_maths, only: lcm
 use module_physics_micro, only: sphere_volume, PBC_distance
 use module_arguments, only: arg_to_file
-use module_read, only: jump_snap
-!$ use omp_lib
 
 implicit none
    
@@ -21,12 +18,12 @@ implicit none
     integer :: type1_num_particles, type2_num_particles
     integer :: type1_snap_factor, type2_snap_factor
     real(DP) :: type1_density, type2_density
-    integer :: type1_positions_unit, type2_positions_unit
-    integer :: snap_factors_lcm
+    integer :: type1_positions_unit, type2_positions_unit 
     
     integer :: report_unit, distrib_unit
     integer :: num_distribution, i_distribution
-    integer :: num_steps, i_step
+    integer :: num_thermalisation_steps
+    integer :: num_equilibrium_steps, i_step, num_common_steps    
     integer :: type1_i_particle, type2_i_particle
     real(DP) :: distance_12, distance_max, delta
     real(DP) :: distance_i, distance_minus, distance_plus
@@ -39,7 +36,7 @@ implicit none
     logical :: found
     character(len=4096) :: file_name
     integer :: length
-    real(DP) :: initial_time, final_time
+    real(DP) :: time_start, time_end
     
     call json_initialize()
     call json%load_file(filename = "data.json")
@@ -55,8 +52,12 @@ implicit none
     call test_data_found(data_name, found)
     if (size(Box_size) /= num_dimensions) error stop "Box size dimension"
     
+    data_name = "Monte Carlo.number of thermalisation steps"
+    call json%get(data_name, num_thermalisation_steps, found)
+    call test_data_found(data_name, found)
+    
     data_name = "Monte Carlo.number of equilibrium steps"
-    call json%get(data_name, num_steps, found)
+    call json%get(data_name, num_equilibrium_steps, found)
     call test_data_found(data_name, found)
     
     data_name = "Distribution.delta"
@@ -84,38 +85,41 @@ implicit none
     allocate(type2_positions(num_dimensions, type2_num_particles))
     type2_density = type2_num_particles / product(Box_size)
     
-    snap_factors_lcm = lcm(type1_snap_factor, type2_snap_factor)
-    
     write(output_unit, *) "Start !"
-    call cpu_time(initial_time)
+    call cpu_time(time_start)
     distribution_function(:) = 0._DP
-    do i_step = 1, num_steps/snap_factors_lcm
+    num_common_steps = 0
+    do i_step = num_thermalisation_steps + 1, num_thermalisation_steps + num_equilibrium_steps
         
-        call jump_snap(snap_factors_lcm, type1_snap_factor, type1_num_particles, type1_positions_unit)
-        do type1_i_particle = 1, type1_num_particles
-            read(type1_positions_unit, *) type1_positions(:, type1_i_particle)
-        end do
-
-        call jump_snap(snap_factors_lcm, type2_snap_factor, type2_num_particles, type2_positions_unit)
-        do type2_i_particle = 1, type2_num_particles
-            read(type2_positions_unit, *) type2_positions(:, type2_i_particle)
-        end do
+        if (modulo(i_step, type1_snap_factor) == 0) then        
+            do type1_i_particle = 1, type1_num_particles
+                read(type1_positions_unit, *) type1_positions(:, type1_i_particle)
+            end do
+        end if
         
-        distribution_step(:) = 0._DP        
-        do type1_i_particle = 1, type1_num_particles        
-            do type2_i_particle = 1, type2_num_particles                
-                distance_12 = PBC_distance(Box_size, &
-                                           type1_positions(:, type1_i_particle), &
-                                           type2_positions(:, type2_i_particle))
-                i_distribution = int(distance_12/delta)
-                distribution_step(i_distribution) = distribution_step(i_distribution) + 1._DP
+        if (modulo(i_step, type2_snap_factor) == 0) then  
+            do type2_i_particle = 1, type2_num_particles
+                read(type2_positions_unit, *) type2_positions(:, type2_i_particle)
+            end do
+        end if
+        
+        if (modulo(i_step, type1_snap_factor) == 0 .and. modulo(i_step, type2_snap_factor) == 0) then        
+            num_common_steps = num_common_steps + 1
+            distribution_step(:) = 0._DP        
+            do type1_i_particle = 1, type1_num_particles        
+                do type2_i_particle = 1, type2_num_particles                
+                    distance_12 = PBC_distance(Box_size, &
+                                               type1_positions(:, type1_i_particle), &
+                                               type2_positions(:, type2_i_particle))
+                    i_distribution = int(distance_12/delta)
+                    distribution_step(i_distribution) = distribution_step(i_distribution) + 1._DP
+                end do            
             end do            
-        end do
-        
-        distribution_function(:) = distribution_function(:) + distribution_step(:)
+            distribution_function(:) = distribution_function(:) + distribution_step(:)
+        end if
     
     end do
-    call cpu_time(final_time)
+    call cpu_time(time_end)
     write(output_unit, *) "Finish !"
     
     deallocate(type2_positions) 
@@ -126,13 +130,13 @@ implicit none
     
     open(newunit=report_unit, file=trim(type1_name)//"-"//trim(type2_name)//"_distribution_report.txt", &
          action="write")
-         write(report_unit, *) "Duration =", (final_time - initial_time) / 60._DP, "min"
+         write(report_unit, *) "Duration =", (time_end - time_start) / 60._DP, "min"
     close(report_unit)
     
     open(newunit=distrib_unit, file=trim(type1_name)//"-"//trim(type2_name)//"_distribution_function.out", &
          action="write")
     
-        distribution_function(:) = distribution_function(:) / real(num_steps/snap_factors_lcm, DP) / &
+        distribution_function(:) = distribution_function(:) / real(num_common_steps, DP) / &
                                    real(type1_num_particles, DP)
     
         do i_distribution = 1, num_distribution
