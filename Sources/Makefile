@@ -94,7 +94,7 @@ mc_clusters: data_precisions.o data_constants.o data_box.o \
 
 # ------------------------------------------------------------------------
 
-%.o: %.f90
+%.o %.mod: %.f90
 	$(FC) $(FFLAGS) -c $< -o $@
 %.o: %.cpp
 	$(CPPC) -c $(CPPFLAGS) $< -o $@
