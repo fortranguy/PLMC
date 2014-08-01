@@ -14,11 +14,11 @@ contains
     
         character(len=*), intent(in) :: geometry_input
         
-        geometry.bulk = .false.
-        geometry.slab = .false.
+        geometry%bulk = .false.
+        geometry%slab = .false.
         
-        if (geometry_input == "bulk") geometry.bulk = .true.
-        if (geometry_input == "slab") geometry.slab = .true.
+        if (geometry_input == "bulk") geometry%bulk = .true.
+        if (geometry_input == "slab") geometry%slab = .true.
     
     end subroutine set_geometry
     
