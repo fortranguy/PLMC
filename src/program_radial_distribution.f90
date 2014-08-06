@@ -1,6 +1,6 @@
 !> \brief Calculate and write the distribution function
 
-program distribution
+program radial_distribution
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit, error_unit
 use data_box, only: num_dimensions
@@ -143,4 +143,4 @@ implicit none
     
     deallocate(Box_size)
 
-end program distribution
+end program radial_distribution

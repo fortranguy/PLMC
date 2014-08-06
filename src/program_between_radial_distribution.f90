@@ -1,6 +1,6 @@
 !> \brief Calculate and print the distribution function between 2 types.
 
-program between_distribution
+program between_radial_distribution
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit, error_unit
 use data_box, only: num_dimensions
@@ -156,4 +156,4 @@ implicit none
     deallocate(distribution_function)
     deallocate(distribution_step)
 
-end program between_distribution
+end program between_radial_distribution
