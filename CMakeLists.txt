@@ -6,7 +6,7 @@ project(
     CXX
 )
 
-set(executable_prefix "mc")
+set(executable_prefix mc)
 
 set(EXECUTABLE_OUTPUT_PATH bin/${CMAKE_BUILD_TYPE})
 
@@ -25,21 +25,21 @@ find_package(
 file(
     GLOB_RECURSE
     programs_source_files
-    "src/program_*.f90"
+    src/program_*.f90
 )
 
 file(
     GLOB_RECURSE
     modules_source_files
-    "src/data_*.f90"
-    "src/module_*.f90"
-    "src/class_*.f90"
-    "src/*.cpp"
+    src/data_*.f90
+    src/module_*.f90
+    src/class_*.f90
+    src/*.cpp
 )
 
 foreach(program_source ${programs_source_files})
     get_filename_component(program_name ${program_source} NAME_WE)
-    string(REGEX REPLACE "^program_" "" program_name ${program_name})
+    string(REGEX REPLACE ^program_ ""  program_name ${program_name})
     include_directories(${Boost_INCLUDE_DIRS})
     add_executable(
         ${executable_prefix}_${program_name}
