@@ -16,15 +16,16 @@ find_package(
     REQUIRED
 )
 
+find_package(
+    Boost
+    1.55.0
+    REQUIRED
+)
+
 file(
     GLOB_RECURSE
     programs_source_files
     "src/program_*.f90"
-)
-
-message(
-    STATUS
-    programs_source_files
 )
 
 file(
@@ -39,22 +40,20 @@ file(
 foreach(program_source ${programs_source_files})
     get_filename_component(program_name ${program_source} NAME_WE)
     string(REGEX REPLACE "^program_" "" program_name ${program_name})
+    include_directories(${Boost_INCLUDE_DIRS})
     add_executable(
         ${executable_prefix}_${program_name}
         ${program_source}
         ${modules_source_files}
     )
-
     target_include_directories(
         ${executable_prefix}_${program_name}
         BEFORE
         PUBLIC
         ${jsonfortran_INCLUDE_DIRS}
     )
-
     target_link_libraries(
         ${executable_prefix}_${program_name}
         jsonfortran
     )
 endforeach(program_source)
-
