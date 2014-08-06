@@ -40,7 +40,7 @@ LDLIBS = -lstdc++
 compiler = ifort
 mode = debug
 
-all: mc_cano mc_bunching mc_histogram mc_distribution mc_between_distribution mc_clusters
+all: mc_cano mc_bunching mc_histogram mc_radial_distribution mc_between_radial_distribution mc_clusters
 	# Report
 	git log | head -n3 > make_report.txt
 	git diff --color-words >> make_report.txt
@@ -73,16 +73,16 @@ mc_histogram: module_data.o module_arguments.o \
               program_histogram.o
 	$(FC) $^ -o $@ $(LDFLAGS)
 
-mc_distribution: data_constants.o data_box.o \
+mc_radial_distribution: data_constants.o data_box.o \
                  module_data.o module_geometry.o module_physics_micro.o \
                  module_arguments.o \
-                 program_distribution.o
+                 program_radial_distribution.o
 	$(FC) $^ -o $@ $(LDFLAGS)
 	
-mc_between_distribution: data_constants.o data_box.o \
+mc_between_radial_distribution: data_constants.o data_box.o \
                          module_data.o module_geometry.o module_physics_micro.o \
                          module_arguments.o \
-                         program_between_distribution.o
+                         program_between_radial_distribution.o
 	$(FC) $^ -o $@ $(LDFLAGS)
 
 mc_clusters: data_precisions.o data_constants.o data_box.o \
@@ -106,7 +106,7 @@ clean:
 	rm -f *.o *.mod
 
 mrproper: clean
-	rm -f mc_cano mc_bunching mc_histogram mc_distribution mc_between_distribution mc_clusters
+	rm -f mc_cano mc_bunching mc_histogram mc_radial_distribution mc_between_radial_distribution mc_clusters
 
 remove:
 	rm -f *.out *.txt *.shots *.tmp

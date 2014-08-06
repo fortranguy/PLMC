@@ -37,10 +37,11 @@ file(
     src/*.cpp
 )
 
+include_directories(${Boost_INCLUDE_DIRS})
+
 foreach(program_source ${programs_source_files})
     get_filename_component(program_name ${program_source} NAME_WE)
     string(REGEX REPLACE ^program_ ""  program_name ${program_name})
-    include_directories(${Boost_INCLUDE_DIRS})
     add_executable(
         ${executable_prefix}_${program_name}
         ${program_source}
