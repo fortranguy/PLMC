@@ -1,3 +1,4 @@
 [submodule "lib/json-fortran"]
 	path = lib/json-fortran
 	url = https://github.com/jacobwilliams/json-fortran.git
+	ignore = dirty
