@@ -33,12 +33,7 @@ add_library(
 
 include_directories(${Boost_INCLUDE_DIRS})
 
-target_include_directories(
-    mc_meta_module
-    BEFORE
-    PUBLIC
-    ${jsonfortran_INCLUDE_DIRS}
-)
+include_directories(${jsonfortran_INCLUDE_DIRS})
 
 target_link_libraries(
     mc_meta_module
