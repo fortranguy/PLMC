@@ -20,6 +20,8 @@ find_package(
     REQUIRED
 )
 
+include_directories(${jsonfortran_INCLUDE_DIRS})
+
 file(
     GLOB_RECURSE
     programs_source_files
@@ -36,12 +38,6 @@ foreach(program_source ${programs_source_files})
     set_property(
         TARGET ${executable_prefix}_${program_name}
         PROPERTY LINKER_LANGUAGE Fortran
-    )
-    target_include_directories(
-        ${executable_prefix}_${program_name}
-        BEFORE
-        PUBLIC
-        ${jsonfortran_INCLUDE_DIRS}
     )
     target_link_libraries(
         ${executable_prefix}_${program_name}
