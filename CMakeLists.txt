@@ -47,6 +47,10 @@ foreach(program_source ${programs_source_files})
         ${modules_source_files}
         ${program_source}
     )
+    set_property(
+        TARGET ${executable_prefix}_${program_name}
+        PROPERTY LINKER_LANGUAGE Fortran
+    )
     target_include_directories(
         ${executable_prefix}_${program_name}
         BEFORE
