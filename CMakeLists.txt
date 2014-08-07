@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 
 project(
     Monte-Carlo
@@ -8,7 +8,7 @@ project(
 
 set(executable_prefix mc)
 
-set(EXECUTABLE_OUTPUT_PATH bin/${CMAKE_BUILD_TYPE})
+    set(EXECUTABLE_OUTPUT_PATH bin/${CMAKE_BUILD_TYPE})
 
 add_subdirectory(mod ${CMAKE_CURRENT_BINARY_DIR}/mod)
 
