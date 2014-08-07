@@ -44,8 +44,8 @@ foreach(program_source ${programs_source_files})
     string(REGEX REPLACE ^program_ ""  program_name ${program_name})
     add_executable(
         ${executable_prefix}_${program_name}
-        ${program_source}
         ${modules_source_files}
+        ${program_source}
     )
     target_include_directories(
         ${executable_prefix}_${program_name}
