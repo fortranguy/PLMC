@@ -2,6 +2,7 @@ module module_arguments
 
 use, intrinsic :: iso_fortran_env, only: error_unit
 
+implicit none
 private
 public arg_to_file
 

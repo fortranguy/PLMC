@@ -18,7 +18,7 @@ contains
         write(output_unit, *) "Usage: mc_[ENSEMBLE] [GEOMETRY] [OPTION]"
         write(output_unit, *) "Run ENSEMBLE Monte-Carlo simulation in GEOMETRY."
         write(output_unit, *)
-        write(output_unit, *) "GEOMETRY = 'cano', 'slab'"
+        write(output_unit, *) "GEOMETRY = 'bulk', 'slab'"
         write(output_unit, *)
         write(output_unit, *) "Mandatory arguments to long options are mandatory for short options too."
         write(output_unit, *) "    -h, --help"
