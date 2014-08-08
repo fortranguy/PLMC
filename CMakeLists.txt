@@ -5,61 +5,15 @@ project(
     Fortran CXX
 )
 
-if (NOT CMAKE_BUILD_TYPE)
-    set(
-        CMAKE_BUILD_TYPE "Debug" CACHE STRING
-        "Options are: Debug, Release or Fast. Default: Debug."
-        FORCE
-    )
-endif (NOT CMAKE_BUILD_TYPE)
-set_property(
-    CACHE CMAKE_BUILD_TYPE PROPERTY
-    STRINGS "Debug" "Release" "Fast"
-)
-
+include(cmake/SelectBuildType.cmake)
 include(cmake/CMakeMacroForceAddFlags.cmake)
-
-if (${CMAKE_Fortran_COMPILER_ID} MATCHES "GNU")
-    force_add_flags(CMAKE_Fortran_FLAGS_DEBUG "-W -Wall -fbounds-check")
-    set(CMAKE_Fortran_FLAGS_FAST "-Ofast")
-elseif (${CMAKE_Fortran_COMPILER_ID} MATCHES "Intel")
-    force_add_flags(CMAKE_Fortran_FLAGS_DEBUG
-        "-warn all -check all -check noarg_temp_created -fltconsistency -traceback"
-    )
-    set(CMAKE_Fortran_FLAGS_FAST "-ipo -O3 -static-intel -no-prec-div -xHost")
-endif (${CMAKE_Fortran_COMPILER_ID} MATCHES "GNU")
-
-if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
-    force_add_flags(CMAKE_CXX_FLAGS_DEBUG "-W -Wall") 
-    set(CMAKE_CXX_FLAGS_FAST "-Ofast")
-elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Intel")
-    force_add_flags(CMAKE_CXX_FLAGS_DEBUG "-W -Wall")
-    set(CMAKE_CXX_FLAGS_FAST "-O3 -static-intel -no-prec-div -xHost")
-endif (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
-
-mark_as_advanced(
-    CMAKE_Fortran_FLAGS_FAST
-    CMAKE_CXX_FLAGS_FAST
-)
-
-find_program(XIAR xiar)
-if(XIAR)
-    set(CMAKE_AR "${XIAR}")
-endif(XIAR)
-mark_as_advanced(XIAR)
-
-find_program(XILD xild)
-if(XILD)
-    set(CMAKE_LINKER "${XILD}")
-endif(XILD)
-mark_as_advanced(XILD)
+include(cmake/SetCompilerFlags.cmake)
+include(cmake/SetArchiverAndLinkingTool.cmake)
 
 set(executable_prefix mc)
-
 set(EXECUTABLE_OUTPUT_PATH bin/${CMAKE_BUILD_TYPE})
 
 add_subdirectory(mod ${CMAKE_CURRENT_BINARY_DIR}/mod)
-
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/mod)
 
 find_package(
@@ -67,7 +21,6 @@ find_package(
     1.0.0
     REQUIRED
 )
-
 include_directories(${jsonfortran_INCLUDE_DIRS})
 
 file(
