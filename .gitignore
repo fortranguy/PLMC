@@ -1,4 +1,5 @@
-Binaries/
-Documentation/
+bin/
+build/
+doc/
 *.txt~
 .gitignore~
