@@ -35,6 +35,10 @@ include_directories(${Boost_INCLUDE_DIRS})
 
 include_directories(${jsonfortran_INCLUDE_DIRS})
 
+set_property(
+    TARGET mc_meta_module
+    PROPERTY LINKER_LANGUAGE Fortran
+)
 target_link_libraries(
     mc_meta_module
     jsonfortran-static
