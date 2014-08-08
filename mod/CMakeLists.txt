@@ -1,7 +1,6 @@
 project(
     Monte-CarloMetaModule
-    Fortran
-    CXX
+    Fortran CXX
 )
 
 find_package(
