@@ -8,32 +8,37 @@ project(
 if (NOT CMAKE_BUILD_TYPE)
     set(
         CMAKE_BUILD_TYPE Debug CACHE STRING
-        "Options are: Debug Release. Default: Debug."
+        "Options are: Debug, Release or Fast. Default: Debug."
         FORCE
     )
 endif (NOT CMAKE_BUILD_TYPE)
 set_property(
     CACHE CMAKE_BUILD_TYPE PROPERTY
-    STRINGS "Debug" "Release"
+    STRINGS "Debug" "Release" "Fast"
 )
 
 if (${CMAKE_Fortran_COMPILER_ID} MATCHES "GNU")
     set(CMAKE_Fortran_FLAGS_DEBUG   "-W -Wall -fbounds-check -g")  
-    set(CMAKE_Fortran_FLAGS_RELEASE "-Ofast")
+    set(CMAKE_Fortran_FLAGS_FAST "-Ofast")
 elseif (${CMAKE_Fortran_COMPILER_ID} MATCHES "Intel")
     set(CMAKE_Fortran_FLAGS_DEBUG 
         "-warn all -check all -check noarg_temp_created -fltconsistency -g -traceback"
     )
-    set(CMAKE_Fortran_FLAGS_RELEASE "-ipo -O3 -static-intel -no-prec-div -xHost")
+    set(CMAKE_Fortran_FLAGS_FAST "-ipo -O3 -static-intel -no-prec-div -xHost")
 endif (${CMAKE_Fortran_COMPILER_ID} MATCHES "GNU")
 
 if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
     set(CMAKE_CXX_FLAGS_DEBUG   "-W -Wall -g") 
-    set(CMAKE_CXX_FLAGS_RELEASE "-Ofast")
+    set(CMAKE_CXX_FLAGS_FAST "-Ofast")
 elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Intel")
     set(CMAKE_CXX_FLAGS_DEBUG   "-W -Wall -g")
-    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -static-intel -no-prec-div -xHost")
+    set(CMAKE_CXX_FLAGS_FAST "-O3 -static-intel -no-prec-div -xHost")
 endif (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
+
+mark_as_advanced(
+    CMAKE_Fortran_FLAGS_FAST
+    CMAKE_CXX_FLAGS_FAST
+)
 
 find_program(XIAR xiar)
 if(XIAR)
