@@ -5,6 +5,7 @@ project(
     Fortran CXX
 )
 
+include(cmake/CheckCompilerVersion.cmake)
 include(cmake/SelectBuildType.cmake)
 include(cmake/CMakeMacroForceAddFlags.cmake)
 include(cmake/SetCompilerFlags.cmake)
