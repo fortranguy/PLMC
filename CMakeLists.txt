@@ -6,9 +6,11 @@ project(
     CXX
 )
 
+set(CMAKE_Fortran_FLAGS "-fast -no-intel-extensions")
+
 set(executable_prefix mc)
 
-    set(EXECUTABLE_OUTPUT_PATH bin/${CMAKE_BUILD_TYPE})
+set(EXECUTABLE_OUTPUT_PATH bin/${CMAKE_BUILD_TYPE})
 
 add_subdirectory(mod ${CMAKE_CURRENT_BINARY_DIR}/mod)
 
@@ -41,7 +43,7 @@ foreach(program_source ${programs_source_files})
     )
     target_link_libraries(
         ${executable_prefix}_${program_name}
-        jsonfortran
+        jsonfortran-static
         mc_meta_module
     )
 endforeach(program_source)

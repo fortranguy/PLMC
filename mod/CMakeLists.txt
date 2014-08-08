@@ -4,6 +4,9 @@ project(
     CXX
 )
 
+set(CMAKE_Fortran_FLAGS "-fast -no-intel-extensions")
+set(CMAKE_CXX_FLAGS "-O3 -ipo")
+
 find_package(
     jsonfortran-${CMAKE_Fortran_COMPILER_ID}
     1.0.0
@@ -37,5 +40,5 @@ include_directories(${jsonfortran_INCLUDE_DIRS})
 
 target_link_libraries(
     mc_meta_module
-    jsonfortran
+    jsonfortran-static
 )
