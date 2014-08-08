@@ -37,5 +37,5 @@ include_directories(${jsonfortran_INCLUDE_DIRS})
 
 target_link_libraries(
     mc_meta_module
-    jsonfortran
+    jsonfortran-static
 )

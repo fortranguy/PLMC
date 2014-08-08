@@ -16,22 +16,24 @@ endif (NOT CMAKE_BUILD_TYPE)
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
 
 if (${CMAKE_Fortran_COMPILER_ID} MATCHES "GNU")
-    set(CMAKE_Fortran_FLAGS_RELEASE "-Ofast")
     set(CMAKE_Fortran_FLAGS_DEBUG   "-W -Wall -fbounds-check -g")  
+    set(CMAKE_Fortran_FLAGS_RELEASE "-Ofast")
 elseif (${CMAKE_Fortran_COMPILER_ID} MATCHES "Intel")
-    set(CMAKE_Fortran_FLAGS_RELEASE "-fast")
     set(CMAKE_Fortran_FLAGS_DEBUG   "-warn all -check all -check noarg_temp_created -fltconsistency -g -traceback")
-else (${CMAKE_Fortran_COMPILER_ID} MATCHES "GNU")
-    message ("CMAKE_Fortran_COMPILER full path: " ${CMAKE_Fortran_COMPILER})
-    message ("Fortran compiler: " ${Fortran_COMPILER_NAME})
-    message ("No optimized Fortran compiler flags are known, we just try -O2.")
-    set (CMAKE_Fortran_FLAGS_RELEASE "-O2")
-    set (CMAKE_Fortran_FLAGS_DEBUG   "-O0 -g")
+    set(CMAKE_Fortran_FLAGS_RELEASE "-fast")
 endif (${CMAKE_Fortran_COMPILER_ID} MATCHES "GNU")
+
+if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
+    set(CMAKE_CXX_FLAGS_DEBUG   "-W -Wall -g") 
+    set(CMAKE_CXX_FLAGS_RELEASE "-Ofast")
+elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Intel")
+    set(CMAKE_CXX_FLAGS_DEBUG   "-W -Wall -g")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+endif (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
 
 set(executable_prefix mc)
 
-    set(EXECUTABLE_OUTPUT_PATH bin/${CMAKE_BUILD_TYPE})
+set(EXECUTABLE_OUTPUT_PATH bin/${CMAKE_BUILD_TYPE})
 
 add_subdirectory(mod ${CMAKE_CURRENT_BINARY_DIR}/mod)
 
@@ -64,7 +66,7 @@ foreach(program_source ${programs_source_files})
     )
     target_link_libraries(
         ${executable_prefix}_${program_name}
-        jsonfortran
+        jsonfortran-static
         mc_meta_module
     )
 endforeach(program_source)
