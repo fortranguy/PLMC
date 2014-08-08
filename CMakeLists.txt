@@ -9,34 +9,25 @@ project(
 if (NOT CMAKE_BUILD_TYPE)
     set(
         CMAKE_BUILD_TYPE Debug CACHE STRING
-        "Choose the type of build, options are: None Debug Release Fast."
+        "Options are: Debug Release. Default: Debug."
         FORCE
     )
 endif (NOT CMAKE_BUILD_TYPE)
+set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
 
-#option(CMAKE_BUILD_TYPE)
-
-set(
-    CMAKE_INSTALL_PREFIX /usr/local CACHE STRING
-    "Choose the installation directory; by default it installs in /usr/local."
-    FORCE
-)
-
-get_filename_component(Fortran_COMPILER_NAME ${CMAKE_Fortran_COMPILER} NAME)
-
-if (Fortran_COMPILER_NAME MATCHES "gfortran.*")
-  set (CMAKE_Fortran_FLAGS_RELEASE "-funroll-all-loops -fno-f2c -O3")
-  set (CMAKE_Fortran_FLAGS_DEBUG   "-fno-f2c -O0 -g")
-elseif (Fortran_COMPILER_NAME MATCHES "ifort.*")
-  set (CMAKE_Fortran_FLAGS_RELEASE "-f77rtl -O3")
-  set (CMAKE_Fortran_FLAGS_DEBUG   "-f77rtl -O0 -g")
-else (Fortran_COMPILER_NAME MATCHES "gfortran.*")
-  message ("CMAKE_Fortran_COMPILER full path: " ${CMAKE_Fortran_COMPILER})
-  message ("Fortran compiler: " ${Fortran_COMPILER_NAME})
-  message ("No optimized Fortran compiler flags are known, we just try -O2...")
-  set (CMAKE_Fortran_FLAGS_RELEASE "-O2")
-  set (CMAKE_Fortran_FLAGS_DEBUG   "-O0 -g")
-endif (Fortran_COMPILER_NAME MATCHES "gfortran.*")
+if (${CMAKE_Fortran_COMPILER_ID} MATCHES "GNU")
+    set(CMAKE_Fortran_FLAGS_RELEASE "-Ofast")
+    set(CMAKE_Fortran_FLAGS_DEBUG   "-W -Wall -fbounds-check -g")  
+elseif (${CMAKE_Fortran_COMPILER_ID} MATCHES "Intel")
+    set(CMAKE_Fortran_FLAGS_RELEASE "-fast")
+    set(CMAKE_Fortran_FLAGS_DEBUG   "-warn all -check all -check noarg_temp_created -fltconsistency -g -traceback")  
+else (${CMAKE_Fortran_COMPILER_ID} MATCHES "GNU")
+    message ("CMAKE_Fortran_COMPILER full path: " ${CMAKE_Fortran_COMPILER})
+    message ("Fortran compiler: " ${Fortran_COMPILER_NAME})
+    message ("No optimized Fortran compiler flags are known, we just try -O2.")
+    set (CMAKE_Fortran_FLAGS_RELEASE "-O2")
+    set (CMAKE_Fortran_FLAGS_DEBUG   "-O0 -g")
+endif (${CMAKE_Fortran_COMPILER_ID} MATCHES "GNU")
 
 set(executable_prefix mc)
 
