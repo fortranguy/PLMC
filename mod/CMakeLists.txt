@@ -4,9 +4,6 @@ project(
     CXX
 )
 
-set(CMAKE_Fortran_FLAGS "-fast -no-intel-extensions")
-set(CMAKE_CXX_FLAGS "-O3 -ipo")
-
 find_package(
     jsonfortran-${CMAKE_Fortran_COMPILER_ID}
     1.0.0

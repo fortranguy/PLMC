@@ -6,7 +6,8 @@ project(
     CXX
 )
 
-set(CMAKE_Fortran_FLAGS "-fast -no-intel-extensions")
+set(CMAKE_Fortran_FLAGS "-ipo -O3 -static-intel -no-prec-div -xHost")
+set(CMAKE_CXX_FLAGS "-O3 -static-intel")
 
 set(executable_prefix mc)
 
