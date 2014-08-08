@@ -7,7 +7,7 @@ project(
 
 if (NOT CMAKE_BUILD_TYPE)
     set(
-        CMAKE_BUILD_TYPE Debug CACHE STRING
+        CMAKE_BUILD_TYPE "Debug" CACHE STRING
         "Options are: Debug, Release or Fast. Default: Debug."
         FORCE
     )
@@ -17,21 +17,23 @@ set_property(
     STRINGS "Debug" "Release" "Fast"
 )
 
+include(cmake/CMakeMacroForceAddFlags.cmake)
+
 if (${CMAKE_Fortran_COMPILER_ID} MATCHES "GNU")
-    set(CMAKE_Fortran_FLAGS_DEBUG   "-W -Wall -fbounds-check -g")  
+    force_add_flags(CMAKE_Fortran_FLAGS_DEBUG "-W -Wall -fbounds-check")
     set(CMAKE_Fortran_FLAGS_FAST "-Ofast")
 elseif (${CMAKE_Fortran_COMPILER_ID} MATCHES "Intel")
-    set(CMAKE_Fortran_FLAGS_DEBUG 
-        "-warn all -check all -check noarg_temp_created -fltconsistency -g -traceback"
+    force_add_flags(CMAKE_Fortran_FLAGS_DEBUG
+        "-warn all -check all -check noarg_temp_created -fltconsistency -traceback"
     )
     set(CMAKE_Fortran_FLAGS_FAST "-ipo -O3 -static-intel -no-prec-div -xHost")
 endif (${CMAKE_Fortran_COMPILER_ID} MATCHES "GNU")
 
 if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
-    set(CMAKE_CXX_FLAGS_DEBUG   "-W -Wall -g") 
+    force_add_flags(CMAKE_CXX_FLAGS_DEBUG "-W -Wall") 
     set(CMAKE_CXX_FLAGS_FAST "-Ofast")
 elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Intel")
-    set(CMAKE_CXX_FLAGS_DEBUG   "-W -Wall -g")
+    force_add_flags(CMAKE_CXX_FLAGS_DEBUG "-W -Wall")
     set(CMAKE_CXX_FLAGS_FAST "-O3 -static-intel -no-prec-div -xHost")
 endif (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
 
