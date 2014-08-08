@@ -7,7 +7,19 @@ project(
 )
 
 set(CMAKE_Fortran_FLAGS "-ipo -O3 -static-intel -no-prec-div -xHost")
-set(CMAKE_CXX_FLAGS "-O3 -static-intel")
+set(CMAKE_CXX_FLAGS "-O3 -static-intel -no-prec-div -xHost")
+
+find_program(XIAR xiar)
+if(XIAR)
+  set(CMAKE_AR "${XIAR}")
+endif(XIAR)
+mark_as_advanced(XIAR)
+
+find_program(XILD xild)
+if(XILD)
+  set(CMAKE_LINKER "${XILD}")
+endif(XILD)
+mark_as_advanced(XILD)
 
 set(executable_prefix mc)
 
