@@ -2,8 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 
 project(
     Monte-Carlo
-    Fortran
-    CXX
+    Fortran CXX
 )
 
 if (NOT CMAKE_BUILD_TYPE)
@@ -13,14 +12,19 @@ if (NOT CMAKE_BUILD_TYPE)
         FORCE
     )
 endif (NOT CMAKE_BUILD_TYPE)
-set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
+set_property(
+    CACHE CMAKE_BUILD_TYPE PROPERTY
+    STRINGS "Debug" "Release"
+)
 
 if (${CMAKE_Fortran_COMPILER_ID} MATCHES "GNU")
     set(CMAKE_Fortran_FLAGS_DEBUG   "-W -Wall -fbounds-check -g")  
     set(CMAKE_Fortran_FLAGS_RELEASE "-Ofast")
 elseif (${CMAKE_Fortran_COMPILER_ID} MATCHES "Intel")
-    set(CMAKE_Fortran_FLAGS_DEBUG   "-warn all -check all -check noarg_temp_created -fltconsistency -g -traceback")
-    set(CMAKE_Fortran_FLAGS_RELEASE "ipo -O3 -static-intel -no-prec-div -xHost")
+    set(CMAKE_Fortran_FLAGS_DEBUG 
+        "-warn all -check all -check noarg_temp_created -fltconsistency -g -traceback"
+    )
+    set(CMAKE_Fortran_FLAGS_RELEASE "-ipo -O3 -static-intel -no-prec-div -xHost")
 endif (${CMAKE_Fortran_COMPILER_ID} MATCHES "GNU")
 
 if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
@@ -33,13 +37,13 @@ endif (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
 
 find_program(XIAR xiar)
 if(XIAR)
-  set(CMAKE_AR "${XIAR}")
+    set(CMAKE_AR "${XIAR}")
 endif(XIAR)
 mark_as_advanced(XIAR)
 
 find_program(XILD xild)
 if(XILD)
-  set(CMAKE_LINKER "${XILD}")
+    set(CMAKE_LINKER "${XILD}")
 endif(XILD)
 mark_as_advanced(XILD)
 
