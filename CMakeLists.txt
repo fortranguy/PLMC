@@ -5,15 +5,15 @@ project(
     Fortran CXX
 )
 
-include(cmake/SelectBuildType.cmake)
-include(cmake/CMakeMacroForceAddFlags.cmake)
-include(cmake/SetCompilerFlags.cmake)
-include(cmake/SetArchiverAndLinkingTool.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/SelectBuildType.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CMakeMacroForceAddFlags.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/SetCompilerFlags.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/SetArchiverAndLinkingTool.cmake)
 
 set(executable_prefix mc)
 set(EXECUTABLE_OUTPUT_PATH bin/${CMAKE_BUILD_TYPE})
 
-add_subdirectory(mod ${CMAKE_CURRENT_BINARY_DIR}/mod)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/mod ${CMAKE_CURRENT_BINARY_DIR}/mod)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/mod)
 
 find_package(
