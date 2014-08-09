@@ -45,5 +45,30 @@ foreach(program_source ${programs_source_files})
         jsonfortran-static
         mc_meta_module
     )
+    INSTALL(TARGETS ${executable_prefix}_${program_name} DESTINATION monte-carlo)
 endforeach(program_source)
+
+# uninstall target
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/CMakeUninstall.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/CMakeUninstall.cmake"
+    IMMEDIATE @ONLY
+)
+
+add_custom_target(
+    uninstall
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/CMakeUninstall.cmake
+)
+
+set(CPACK_PACKAGE_NAME "Monte-Carlo")
+set(CPACK_PACKAGE_VENDOR "PLMC")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Monte-Carlo Simulation")
+set(CPACK_PACKAGE_VERSION "1.0.0")
+set(CPACK_PACKAGE_VERSION_MAJOR "1")
+set(CPACK_PACKAGE_VERSION_MINOR "0")
+set(CPACK_PACKAGE_VERSION_PATCH "0")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "/usr/local")
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "salomon.chung@u-pe.frrm")
+
+include(CPack)
 
