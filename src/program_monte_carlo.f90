@@ -12,15 +12,16 @@ implicit none
     
     type(Physical_System) :: sys
     type(Monte_Carlo_Arguments) :: args
-    type(json_file) :: json
+    type(json_file) :: data_json
+    !logical :: json
     
     integer :: i_step
 
     call json_initialize()
-    call json%load_file(filename = "data.json")
+    call data_json%load_file(filename = "data.json")
     call read_arguments(args)
-    call sys%construct(json, args)
-    call sys%init(json, args)
+    call sys%construct(data_json, args)
+    call sys%init(data_json, args)
         
     write(output_unit, *) "Beginning of cycles"
     
@@ -56,8 +57,8 @@ implicit none
 
     write(output_unit, *) "End of cycles"
     
-    call sys%final(json)
+    call sys%final(data_json)
     call sys%destroy()
-    call json%destroy()
+    call data_json%destroy()
     
 end program monte_carlo_canonical_bulk

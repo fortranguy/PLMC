@@ -38,14 +38,14 @@ private
 
 contains
 
-    subroutine Ewald_Summation_Real_construct(this, Box_size, alpha, min_distance, json)
+    subroutine Ewald_Summation_Real_construct(this, Box_size, alpha, min_distance, data_json)
         class(Ewald_Summation_Real), intent(inout) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         real(DP), intent(in) :: alpha
         real(DP), intent(in) :: min_distance
-        type(json_file), intent(inout) :: json
+        type(json_file), intent(inout) :: data_json
 
-        call this%set_parameters(Box_size, min_distance, json)
+        call this%set_parameters(Box_size, min_distance, data_json)
 
         if (allocated(this%tabulation)) deallocate(this%tabulation)
         allocate(this%tabulation(this%i_min_distance:this%i_range_cut, 2))
@@ -54,11 +54,11 @@ contains
 
     end subroutine Ewald_Summation_Real_construct
 
-    subroutine Ewald_Summation_Real_set_parameters(this, Box_size, min_distance, json)
+    subroutine Ewald_Summation_Real_set_parameters(this, Box_size, min_distance, data_json)
         class(Ewald_Summation_Real), intent(inout) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         real(DP), intent(in) :: min_distance
-        type(json_file), intent(inout) :: json
+        type(json_file), intent(inout) :: data_json
 
         character(len=4096) :: data_name
         logical :: found
@@ -68,12 +68,12 @@ contains
         this%min_distance = min_distance
 
         data_name = "Potential Energy.Dipolar Hard Spheres.Ewald summation.real.range cut factor"
-        call json%get(data_name, range_cut_factor, found)
+        call data_json%get(data_name, range_cut_factor, found)
         call test_data_found(data_name, found)
         this%range_cut = range_cut_factor * Box_size(1)
 
         data_name = "Potential Energy.Dipolar Hard Spheres.Ewald summation.real.delta"
-        call json%get(data_name, this%delta, found)
+        call data_json%get(data_name, this%delta, found)
         call test_data_found(data_name, found)
         call set_discrete_length(this%min_distance, this%delta)
         

@@ -25,20 +25,20 @@ implicit none
     real(DP), dimension(:, :), allocatable :: data_in
     real(DP), dimension(:, :), allocatable :: data_out
     
-    type(json_file) :: json
+    type(json_file) :: data_json
     character(len=4096) :: data_name
     logical :: found
     character(len=4096) :: file_name
     integer :: length
     
     call json_initialize()
-    call json%load_file(filename = "data.json")
+    call data_json%load_file(filename = "data.json")
     
     data_name = "Monte Carlo.number of equilibrium steps"
-    call json%get(data_name, num_steps, found)
+    call data_json%get(data_name, num_steps, found)
     call test_data_found(data_name, found)
     
-    call json%destroy()
+    call data_json%destroy()
     
     call arg_to_file(1, file_name, length)
     open(newunit=observables_unit, recl=4096, file=file_name(1:length), status='old', action='read')

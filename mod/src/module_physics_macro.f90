@@ -296,12 +296,12 @@ contains
 
     end subroutine init_cells
     
-    subroutine set_ewald(Box, this_spheres, this_macro, json, this_units)
+    subroutine set_ewald(Box, this_spheres, this_macro, data_json, this_units)
     
         type(Box_Parameters), intent(in) :: Box
         class(Dipolar_Hard_Spheres), intent(in) :: this_spheres
         class(Dipolar_Hard_Spheres_Macro), intent(inout) :: this_macro
-        type(json_file), intent(inout) :: json
+        type(json_file), intent(inout) :: data_json
         class(Dipolar_Hard_Spheres_Units), intent(in) :: this_units
         
         character(len=4096) :: data_name
@@ -311,12 +311,12 @@ contains
         real(DP) :: min_distance
         
         data_name = "Potential Energy.Dipolar Hard Spheres.Ewald summation.alpha factor"
-        call json%get(data_name, alpha_factor, found)
+        call data_json%get(data_name, alpha_factor, found)
         call test_data_found(data_name, found)
         
         alpha = alpha_factor / Box%size(1)
         min_distance = this_macro%hard_potential%get_min_distance()
-        call this_macro%ewald_real%construct(Box%size, alpha, min_distance, json)
+        call this_macro%ewald_real%construct(Box%size, alpha, min_distance, data_json)
         call this_macro%ewald_reci%construct(Box, alpha, this_spheres)
         call this_macro%ewald_reci%count_wave_vectors(Box%wave, this_units%wave_vectors)
         call this_macro%ewald_self%set_alpha(alpha)

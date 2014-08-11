@@ -47,10 +47,10 @@ private
     
 contains
 
-    subroutine Hard_Spheres_Potential_Energy_construct(this, json, type_name, diameter)
+    subroutine Hard_Spheres_Potential_Energy_construct(this, data_json, type_name, diameter)
     
         class(Hard_Spheres_Potential_Energy), intent(inout) :: this
-        type(json_file), intent(inout) :: json
+        type(json_file), intent(inout) :: data_json
         character(len=*), intent(in) :: type_name
         real(DP), intent(in) ::  diameter
         
@@ -59,7 +59,7 @@ contains
         real(DP) :: min_distance_factor
         
         data_name = "Potential Energy."//type_name//".minimum distance factor"
-        call json%get(data_name, min_distance_factor, found)
+        call data_json%get(data_name, min_distance_factor, found)
         call test_data_found(data_name, found)
         
         this%min_distance = min_distance_factor * diameter

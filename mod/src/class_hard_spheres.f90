@@ -96,77 +96,77 @@ private
     
 contains
 
-    subroutine Hard_Spheres_construct(this, json)
+    subroutine Hard_Spheres_construct(this, data_json)
     
         class(Hard_Spheres), intent(out) :: this
-        type(json_file), intent(inout) :: json
+        type(json_file), intent(inout) :: data_json
         
         character(len=4096) :: data_name
         logical :: found
         character(len=:), allocatable :: this_name
         
         data_name = "Particles.Hard Spheres.name"
-        call json%get(data_name, this_name, found)
+        call data_json%get(data_name, this_name, found)
         call test_data_found(data_name, found)
         call test_empty_string(data_name, this_name)
         this%name = this_name
         if (allocated(this_name)) deallocate(this_name)
         write(output_unit, *) this%name, " class construction"
         
-        call this%set_particles(json)
-        call this%set_snap(json)
+        call this%set_particles(data_json)
+        call this%set_snap(data_json)
         
     end subroutine Hard_Spheres_construct
     
-    subroutine Dipolar_Hard_Spheres_construct(this, json)
+    subroutine Dipolar_Hard_Spheres_construct(this, data_json)
     
         class(Dipolar_Hard_Spheres), intent(out) :: this
-        type(json_file), intent(inout) :: json
+        type(json_file), intent(inout) :: data_json
         
         character(len=4096) :: data_name
         logical :: found
         character(len=:), allocatable :: this_name
         
         data_name = "Particles.Dipolar Hard Spheres.name"
-        call json%get(data_name, this_name, found)
+        call data_json%get(data_name, this_name, found)
         call test_data_found(data_name, found)
         call test_empty_string(data_name, this_name)
         this%name = this_name
         if (allocated(this_name)) deallocate(this_name)
         write(output_unit, *) this%name, " class construction"
     
-        call this%set_particles(json)
-        call this%Hard_Spheres%set_snap(json)
+        call this%set_particles(data_json)
+        call this%Hard_Spheres%set_snap(data_json)
     
     end subroutine Dipolar_Hard_Spheres_construct
     
-    subroutine Hard_Spheres_set_particles(this, json)
+    subroutine Hard_Spheres_set_particles(this, data_json)
     
         class(Hard_Spheres), intent(inout) :: this
-        type(json_file), intent(inout) :: json
+        type(json_file), intent(inout) :: data_json
         
         character(len=4096) :: data_name
         logical :: found
         
         data_name = "Particles.Hard Spheres.diameter"
-        call json%get(data_name, this%diameter, found)
+        call data_json%get(data_name, this%diameter, found)
         call test_data_found(data_name, found)
         
         data_name = "Particles.Hard Spheres.number of particles"
-        call json%get(data_name, this%num_particles, found)
+        call data_json%get(data_name, this%num_particles, found)
         call test_data_found(data_name, found)
         allocate(this%all_positions(num_dimensions, this%num_particles))
         
         data_name = "Particles.Hard Spheres.number of Widom particles"
-        call json%get(data_name, this%widom_num_particles, found)
+        call data_json%get(data_name, this%widom_num_particles, found)
         call test_data_found(data_name, found)
         
     end subroutine Hard_Spheres_set_particles
     
-    subroutine Dipolar_Hard_Spheres_set_particles(this, json)
+    subroutine Dipolar_Hard_Spheres_set_particles(this, data_json)
     
         class(Dipolar_Hard_Spheres), intent(inout) :: this
-        type(json_file), intent(inout) :: json
+        type(json_file), intent(inout) :: data_json
         
         character(len=4096) :: data_name
         logical :: found
@@ -174,38 +174,38 @@ contains
         this%diameter = 1._DP ! = u_length
         
         data_name = "Particles.Dipolar Hard Spheres.number of particles"
-        call json%get(data_name, this%num_particles, found)
+        call data_json%get(data_name, this%num_particles, found)
         call test_data_found(data_name, found)
         allocate(this%all_positions(num_dimensions, this%num_particles))
         allocate(this%all_orientations(num_dimensions, this%num_particles))
         
         data_name = "Particles.Dipolar Hard Spheres.number of Widom particles"
-        call json%get(data_name, this%widom_num_particles, found)
+        call data_json%get(data_name, this%widom_num_particles, found)
         call test_data_found(data_name, found)
         
     end subroutine Dipolar_Hard_Spheres_set_particles
     
-    subroutine Hard_Spheres_set_snap(this, json)
+    subroutine Hard_Spheres_set_snap(this, data_json)
     
         class(Hard_Spheres), intent(inout) :: this
-        type(json_file), intent(inout) :: json
+        type(json_file), intent(inout) :: data_json
         
         character(len=4096) :: data_name
         logical :: found
         integer :: snap_ratio
         
         data_name = "Distribution.number of particles"
-        call json%get(data_name, snap_ratio, found)
+        call data_json%get(data_name, snap_ratio, found)
         call test_data_found(data_name, found)
         this%snap_factor = this%num_particles/snap_ratio
         if (this%snap_factor == 0) this%snap_factor = 1
     
     end subroutine Hard_Spheres_set_snap
     
-    subroutine Between_Hard_Spheres_construct(this, json, type1_diameter, type2_diameter)
+    subroutine Between_Hard_Spheres_construct(this, data_json, type1_diameter, type2_diameter)
     
         class(Between_Hard_Spheres), intent(out) :: this
-        type(json_file), intent(inout) :: json
+        type(json_file), intent(inout) :: data_json
         real(DP), intent(in) :: type1_diameter, type2_diameter
         
         character(len=4096) :: data_name
@@ -213,7 +213,7 @@ contains
         character(len=:), allocatable :: this_name
         
         data_name = "Particles.Between Spheres.name"
-        call json%get(data_name, this_name, found)
+        call data_json%get(data_name, this_name, found)
         call test_data_found(data_name, found)
         call test_empty_string(data_name, this_name)
         this%name = this_name
@@ -221,7 +221,7 @@ contains
         write(output_unit, *) this%name, " class construction"
         
         data_name = "Particles.Between Spheres.non addivity"
-        call json%get(data_name, this%non_additivity, found)
+        call data_json%get(data_name, this%non_additivity, found)
         call test_data_found(data_name, found)
         this%diameter = (type1_diameter + type2_diameter)/2._DP + this%non_additivity
         

@@ -115,10 +115,10 @@ contains
 
     ! Construction
     
-    subroutine Physical_System_construct(this, json, args)
+    subroutine Physical_System_construct(this, data_json, args)
             
         class(Physical_System), intent(out) :: this
-        type(json_file), intent(inout) :: json
+        type(json_file), intent(inout) :: data_json
         type(Monte_Carlo_Arguments), intent(in) :: args
         
         character(len=4096) :: data_name
@@ -128,34 +128,34 @@ contains
         call set_geometry(args%geometry)
         
         data_name = "Box.name"
-        call json%get(data_name, this_name, found)
+        call data_json%get(data_name, this_name, found)
         call test_data_found(data_name, found)
         call test_empty_string(data_name, this_name)
         this%name = this_name
         if (allocated(this_name)) deallocate(this_name)
         write(output_unit, *) this%name, " class construction"
         
-        call this%set_box(json)
-        call this%set_monte_carlo_steps(json)
+        call this%set_box(data_json)
+        call this%set_monte_carlo_steps(data_json)
         
         data_name = "Potential Energy.write"
-        call json%get(data_name, this%write_potential_energy, found)
+        call data_json%get(data_name, this%write_potential_energy, found)
         call test_data_found(data_name, found)
         
-        call this%type1_spheres%construct(json)
-        call this%type2_spheres%construct(json)
-        call this%between_spheres%construct(json, &
+        call this%type1_spheres%construct(data_json)
+        call this%type2_spheres%construct(data_json)
+        call this%between_spheres%construct(data_json, &
                                             this%type1_spheres%get_diameter(), &
                                             this%type2_spheres%get_diameter())
         
-        call this%set_monte_carlo_changes(json)
+        call this%set_monte_carlo_changes(data_json)
         
     end subroutine Physical_System_construct
     
-    subroutine Physical_System_set_box(this, json)
+    subroutine Physical_System_set_box(this, data_json)
     
         class(Physical_System), intent(inout) :: this
-        type(json_file), intent(inout) :: json
+        type(json_file), intent(inout) :: data_json
         
         character(len=4096) :: data_name
         logical :: found
@@ -163,50 +163,50 @@ contains
         integer, dimension(:), allocatable :: Box_wave
         
         data_name = "Box.size"
-        call json%get(data_name, Box_size, found)
+        call data_json%get(data_name, Box_size, found)
         call test_data_found(data_name, found)
         if (size(Box_size) /= size (this%Box%size)) error stop "Box size dimension"
         this%Box%size(:) = Box_size(:)
         if (allocated(Box_size)) deallocate(Box_size)
         
         data_name = "Box.wave"
-        call json%get(data_name, Box_wave, found)
+        call data_json%get(data_name, Box_wave, found)
         call test_data_found(data_name, found)
         if (size(Box_wave) /= size (this%Box%wave)) error stop "Box wave dimension"
         this%Box%wave(:) = Box_wave(:)
         if (allocated(Box_wave)) deallocate(Box_wave)
         
         data_name = "Box.temperature"
-        call json%get(data_name, this%Box%temperature, found)
+        call data_json%get(data_name, this%Box%temperature, found)
         call test_data_found(data_name, found)
         
     end subroutine Physical_System_set_box
     
-    subroutine Physical_System_set_monte_carlo_steps(this, json)
+    subroutine Physical_System_set_monte_carlo_steps(this, data_json)
         class(Physical_System), intent(inout) :: this
-        type(json_file), intent(inout) :: json
+        type(json_file), intent(inout) :: data_json
         
         character(len=4096) :: data_name
         logical :: found
         
         data_name = "Monte Carlo.number of thermalisation steps"
-        call json%get(data_name, this%num_thermalisation_steps, found)
+        call data_json%get(data_name, this%num_thermalisation_steps, found)
         call test_data_found(data_name, found)
         
         data_name = "Monte Carlo.period of adaptation"
-        call json%get(data_name, this%period_adaptation, found)
+        call data_json%get(data_name, this%period_adaptation, found)
         call test_data_found(data_name, found)
         
         data_name = "Monte Carlo.number of equilibrium steps"
-        call json%get(data_name, this%num_equilibrium_steps, found)
+        call data_json%get(data_name, this%num_equilibrium_steps, found)
         call test_data_found(data_name, found)
         
     end subroutine Physical_System_set_monte_carlo_steps
     
-    subroutine Physical_System_set_monte_carlo_changes(this, json)
+    subroutine Physical_System_set_monte_carlo_changes(this, data_json)
     
         class(Physical_System), intent(inout) :: this
-        type(json_file), intent(inout) :: json
+        type(json_file), intent(inout) :: data_json
         
         integer :: switch_factor
         real(DP) :: type1_move_delta, type1_move_rejection
@@ -219,13 +219,13 @@ contains
         this%Box%num_particles = this%type1_spheres%get_num_particles() + &
                                  this%type2_spheres%get_num_particles()
         data_name = "Monte Carlo.decorrelation factor"
-        call json%get(data_name, this%decorrelation_factor, found)
+        call data_json%get(data_name, this%decorrelation_factor, found)
         call test_data_found(data_name, found)
         
         this%num_moves = this%decorrelation_factor * this%Box%num_particles
         
         data_name = "Monte Carlo.switch factor"
-        call json%get(data_name, switch_factor, found)
+        call data_json%get(data_name, switch_factor, found)
         call test_data_found(data_name, found)
         
         this%num_switches = switch_factor * this%decorrelation_factor * &
@@ -234,36 +234,36 @@ contains
         this%num_changes = this%num_moves + this%num_switches + this%num_rotations
         
         data_name = "Monte Carlo.Dipolar Hard Spheres.move.initial delta"
-        call json%get(data_name, type1_move_delta, found)
+        call data_json%get(data_name, type1_move_delta, found)
         call test_data_found(data_name, found)
         
         data_name = "Monte Carlo.Dipolar Hard Spheres.move.wanted rejection"
-        call json%get(data_name, type1_move_rejection, found)
+        call data_json%get(data_name, type1_move_rejection, found)
         call test_data_found(data_name, found)
         
         call this%type1_macro%move%init(type1_move_delta, type1_move_rejection)
         
         data_name = "Monte Carlo.Dipolar Hard Spheres.rotation.initial delta"
-        call json%get(data_name, type1_rotation_delta, found)
+        call data_json%get(data_name, type1_rotation_delta, found)
         call test_data_found(data_name, found)
         
         data_name = "Monte Carlo.Dipolar Hard Spheres.rotation.maximum delta"
-        call json%get(data_name, type1_rotation_delta_max, found)
+        call data_json%get(data_name, type1_rotation_delta_max, found)
         call test_data_found(data_name, found)
         
         data_name = "Monte Carlo.Dipolar Hard Spheres.rotation.wanted rejection"
-        call json%get(data_name, type1_rotation_rejection, found)
+        call data_json%get(data_name, type1_rotation_rejection, found)
         call test_data_found(data_name, found)
         
         call this%type1_macro%rotation%init(type1_rotation_delta, type1_rotation_delta_max, &
                                             type1_rotation_rejection)
                       
         data_name = "Monte Carlo.Hard Spheres.move.initial delta"
-        call json%get(data_name, type2_move_delta, found)
+        call data_json%get(data_name, type2_move_delta, found)
         call test_data_found(data_name, found)
         
         data_name = "Monte Carlo.Hard Spheres.move.wanted rejection"
-        call json%get(data_name, type2_move_rejection, found)
+        call data_json%get(data_name, type2_move_rejection, found)
         call test_data_found(data_name, found)
         
         call this%type2_macro%move%init(type2_move_delta, type2_move_rejection)
@@ -272,10 +272,10 @@ contains
     
     ! Initialization
     
-    subroutine Physical_System_init(this, json, args)
+    subroutine Physical_System_init(this, data_json, args)
      
         class(Physical_System), intent(inout) :: this
-        type(json_file), intent(inout) :: json
+        type(json_file), intent(inout) :: data_json
         type(Monte_Carlo_Arguments), intent(in) :: args
         
         real(DP) :: potential_energy_conf
@@ -284,11 +284,11 @@ contains
         logical :: found
         
         data_name = "Distribution.take snapshot"
-        call json%get(data_name, this%snap, found)
+        call data_json%get(data_name, this%snap, found)
         call test_data_found(data_name, found)
         
         data_name = "Monte Carlo.period of reset"
-        call json%get(data_name, this%reset_i_step, found)
+        call data_json%get(data_name, this%reset_i_step, found)
         call test_data_found(data_name, found)
         this%reset_i_step = this%reset_i_step / this%decorrelation_factor
         
@@ -305,7 +305,7 @@ contains
                                        
         call this%between_spheres%test_overlap(this%Box%size, &
                                                this%type1_spheres, this%type2_spheres)
-        call this%between_spheres_potential%construct(json, "Between Spheres", &
+        call this%between_spheres_potential%construct(data_json, "Between Spheres", &
                                                       this%between_spheres%get_diameter())
         call init_between_spheres_potential(this%Box%size, this%between_spheres_potential, &
                                             this%type1_spheres, this%type2_spheres, &
@@ -314,16 +314,16 @@ contains
                                             this%between_spheres_units%potential_energy_tabulation)
         
         call init_spheres(this%Box, this%type1_spheres, this%type1_units)
-        call this%type1_macro%hard_potential%construct(json, "Dipolar Hard Spheres", &
+        call this%type1_macro%hard_potential%construct(data_json, "Dipolar Hard Spheres", &
                                                        this%type1_spheres%get_diameter())
         call init_cells(this%Box%size, this%type1_spheres, this%type1_macro, this%type2_spheres, &
                         this%between_spheres_potential)
-        call set_ewald(this%Box, this%type1_spheres, this%type1_macro, json, this%type1_units)
+        call set_ewald(this%Box, this%type1_spheres, this%type1_macro, data_json, this%type1_units)
         this%type1_observables%potential_energy = total_energy(this%Box, this%type1_spheres, &
                                                                this%type1_macro)
                         
         call init_spheres(this%Box, this%type2_spheres, this%type2_units)
-        call this%type2_macro%hard_potential%construct(json, "Hard Spheres", &
+        call this%type2_macro%hard_potential%construct(data_json, "Hard Spheres", &
                                                        this%type2_spheres%get_diameter())
         call init_cells(this%Box%size, this%type2_spheres, this%type2_macro, this%type1_spheres, &
                         this%between_spheres_potential)
@@ -402,15 +402,15 @@ contains
     
     ! Finalisation
     
-    subroutine Physical_System_final(this, json)
+    subroutine Physical_System_final(this, data_json)
     
         class(Physical_System), intent(inout) :: this
-        type(json_file), intent(inout) :: json
+        type(json_file), intent(inout) :: data_json
         
         real(DP) :: type1_energy, type2_energy
         
         call final_spheres(this%Box, this%type1_spheres, this%type1_units)
-        call set_ewald(this%Box, this%type1_spheres, this%type1_macro, json, this%type1_units)
+        call set_ewald(this%Box, this%type1_spheres, this%type1_macro, data_json, this%type1_units)
         type1_energy = total_energy(this%Box, this%type1_spheres, this%type1_macro)
         call test_consist(this%type1_observables%potential_energy, type1_energy, &
                           this%type1_units%report)

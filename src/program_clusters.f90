@@ -38,29 +38,29 @@ implicit none
     real(DP), dimension(:), allocatable :: clusters_sizes_distribution
     integer :: clusters_distribution_unit
     
-    type(json_file) :: json
+    type(json_file) :: data_json
     character(len=4096) :: data_name
     logical :: found
     
     call json_initialize()
-    call json%load_file(filename = "data.json")
+    call data_json%load_file(filename = "data.json")
     
     data_name = "Distribution.take snapshot"
-    call json%get(data_name, take_snapshot, found)
+    call data_json%get(data_name, take_snapshot, found)
     call test_data_found(data_name, found)
     
     if (.not.take_snapshot) stop "No snap shots taken."
     
     data_name = "Box.size"
-    call json%get(data_name, Box_size, found)
+    call data_json%get(data_name, Box_size, found)
     call test_data_found(data_name, found)
     if (size(Box_size) /= num_dimensions) error stop "Box size dimension"
     
     data_name = "Monte Carlo.number of equilibrium steps"
-    call json%get(data_name, num_steps, found)
+    call data_json%get(data_name, num_steps, found)
     call test_data_found(data_name, found)
     
-    call json%destroy()
+    call data_json%destroy()
 
     call arg_to_file(1, file, length)    
     open(newunit=positions_unit, recl=4096, file=file(1:length), status='old', action='read')    

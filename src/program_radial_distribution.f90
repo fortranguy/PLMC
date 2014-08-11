@@ -31,7 +31,7 @@ implicit none
     real(DP), dimension(:), allocatable :: distribution_function
     real(DP), dimension(:, :), allocatable :: positions
     
-    type(json_file) :: json
+    type(json_file) :: data_json
     character(len=4096) :: data_name
     logical :: found
     character(len=4096) :: file_name
@@ -40,32 +40,32 @@ implicit none
     real(DP) :: time_start, time_end
     
     call json_initialize()
-    call json%load_file(filename = "data.json")
+    call data_json%load_file(filename = "data.json")
     
     data_name = "Distribution.take snapshot"
-    call json%get(data_name, take_snapshot, found)
+    call data_json%get(data_name, take_snapshot, found)
     call test_data_found(data_name, found)
 
     if (.not.take_snapshot) stop "No snap shots taken."
     
     data_name = "Box.size"
-    call json%get(data_name, Box_size, found)
+    call data_json%get(data_name, Box_size, found)
     call test_data_found(data_name, found)
     if (size(Box_size) /= num_dimensions) error stop "Box size dimension"
     
     data_name = "Monte Carlo.number of thermalisation steps"
-    call json%get(data_name, num_thermalisation_steps, found)
+    call data_json%get(data_name, num_thermalisation_steps, found)
     call test_data_found(data_name, found)
     
     data_name = "Monte Carlo.number of equilibrium steps"
-    call json%get(data_name, num_equilibrium_steps, found)
+    call data_json%get(data_name, num_equilibrium_steps, found)
     call test_data_found(data_name, found)
     
     data_name = "Distribution.delta"
-    call json%get(data_name, delta, found)
+    call data_json%get(data_name, delta, found)
     call test_data_found(data_name, found)
     
-    call json%destroy()
+    call data_json%destroy()
     
     distance_max = norm2(Box_size / 2._DP)
     num_distribution = int(distance_max/delta)
