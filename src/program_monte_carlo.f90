@@ -2,8 +2,9 @@
 
 program monte_carlo_canonical_bulk
 
-use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
+use, intrinsic :: iso_fortran_env, only: output_unit
 use json_module, only: json_file, json_initialize
+use module_data, only: test_data_file_exists
 use module_types_micro, only: Monte_Carlo_Arguments
 use class_physical_system, only: Physical_System
 use module_arguments_monte_carlo, only: read_arguments
@@ -14,15 +15,10 @@ implicit none
     type(Monte_Carlo_Arguments) :: args
     type(json_file) :: data_json
     character(len=*), parameter :: data_filename = "data.json"
-    logical :: data_exists
     
     integer :: i_step
 
-    inquire(file=data_filename, exist=data_exists)
-    if (.not. data_exists) then
-        write(error_unit, *) data_filename, " doesn't exist."
-        error stop
-    end if
+    call test_data_file_exists(data_filename)
 
     call json_initialize()
     call data_json%load_file(filename = data_filename)
