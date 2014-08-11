@@ -34,7 +34,7 @@ implicit none
     type(json_file) :: data_json
     character(len=4096) :: data_name
     logical :: found
-    character(len=4096) :: file_name
+    character(len=4096) :: filename
     integer :: length, time_unit
 
     real(DP) :: time_start, time_end
@@ -72,8 +72,8 @@ implicit none
     allocate(distribution_step(num_distribution))
     allocate(distribution_function(num_distribution))
     
-    call arg_to_file(1, file_name, length)
-    open(newunit=positions_unit, recl=4096, file=file_name(1:length), status='old', action='read')
+    call arg_to_file(1, filename, length)
+    open(newunit=positions_unit, recl=4096, file=filename(1:length), status='old', action='read')
     
     read(positions_unit, *) name, num_particles, snap_factor
     write(output_unit, *) trim(name), num_particles, snap_factor    

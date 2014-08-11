@@ -34,7 +34,7 @@ implicit none
     type(json_file) :: data_json
     character(len=4096) :: data_name
     logical :: found
-    character(len=4096) :: file_name
+    character(len=4096) :: filename
     integer :: length
     real(DP) :: time_start, time_end
     
@@ -71,15 +71,15 @@ implicit none
     allocate(distribution_step(num_distribution))
     allocate(distribution_function(num_distribution))
     
-    call arg_to_file(1, file_name, length)
-    open(newunit=type1_positions_unit, recl=4096, file=file_name(1:length), status='old', action='read')    
+    call arg_to_file(1, filename, length)
+    open(newunit=type1_positions_unit, recl=4096, file=filename(1:length), status='old', action='read')    
     read(type1_positions_unit, *) type1_name, type1_num_particles, type1_snap_factor
     write(output_unit, *) "type 1: ", trim(type1_name), type1_num_particles, type1_snap_factor
     allocate(type1_positions(num_dimensions, type1_num_particles))
     type1_density = type1_num_particles / product(Box_size)
     
-    call arg_to_file(2, file_name, length)
-    open(newunit=type2_positions_unit, recl=4096, file=file_name(1:length), status='old', action='read')    
+    call arg_to_file(2, filename, length)
+    open(newunit=type2_positions_unit, recl=4096, file=filename(1:length), status='old', action='read')    
     read(type2_positions_unit, *) type2_name, type2_num_particles, type2_snap_factor
     write(output_unit, *) "type 2: ", trim(type2_name), type2_num_particles, type2_snap_factor
     allocate(type2_positions(num_dimensions, type2_num_particles))

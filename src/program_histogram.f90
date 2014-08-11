@@ -24,7 +24,7 @@ implicit none
     type(json_file) :: data_json
     character(len=4096) :: data_name
     logical :: found
-    character(len=4096) :: file_name
+    character(len=4096) :: filename
     integer :: length
     
     call json_initialize()
@@ -40,8 +40,8 @@ implicit none
     
     call data_json%destroy()
     
-    call arg_to_file(1, file_name, length)
-    open(newunit=observables_unit, recl=4096, file=file_name(1:length), status='old', action='read')
+    call arg_to_file(1, filename, length)
+    open(newunit=observables_unit, recl=4096, file=filename(1:length), status='old', action='read')
     read(observables_unit, *) comment_symbol, num_observables
     write(output_unit, *) "num_observables = ", num_observables
     
@@ -71,7 +71,7 @@ implicit none
     energy_distribution_function(:) = energy_distribution_function(:) /  real(num_steps, DP) / &
                                       energy_delta
     
-    open(newunit=histogram_unit, recl=4096, file=file_name(1:length-4)//"_energy_histogram.out", &
+    open(newunit=histogram_unit, recl=4096, file=filename(1:length-4)//"_energy_histogram.out", &
          action='write')
     do i_distribution = num_distribution(1, 1), num_distribution(2, 1)
         energy_i = (real(i_distribution, DP)+0.5_DP) * energy_delta

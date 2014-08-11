@@ -8,20 +8,20 @@ public arg_to_file
 
 contains
 
-    subroutine arg_to_file(arg_num, file_name, length)
+    subroutine arg_to_file(arg_num, filename, length)
         
         integer, intent(in) :: arg_num
-        character(len=4096), intent(inout) :: file_name
+        character(len=4096), intent(inout) :: filename
         integer, intent(inout) :: length
         
         integer :: stat
         logical :: exist
 
-        call get_command_argument(arg_num, file_name, length, stat)
+        call get_command_argument(arg_num, filename, length, stat)
         if (stat /= 0) error stop "error get_command_argument"
-        inquire(file=file_name(1:length), exist=exist)
+        inquire(file=filename(1:length), exist=exist)
         if (.not. exist) then
-            write(error_unit, *) "missing file: ", file_name(1:length)
+            write(error_unit, *) "missing file: ", filename(1:length)
             error stop
         end if
         
