@@ -409,36 +409,42 @@ contains
         real(DP) :: potential_energy_conf
         
         potential_energy_conf = between_spheres_potential%total(Box_size, spheres1, spheres2)
-        call test_consistency(potential_energy, potential_energy_conf, between_spheres_report_unit)
+        !call test_consistency(potential_energy, potential_energy_conf, between_spheres_report_unit)
     
     end subroutine final_between_spheres_potential
     
     !> Consistency test
     
-    subroutine test_consistency(potential_energy, potential_energy_conf, report_unit)
+    subroutine test_consistency(potential_energy, potential_energy_conf, report_json)
     
         real(DP), intent(in) :: potential_energy, potential_energy_conf
-        integer, intent(in) :: report_unit
+        type(json_value), pointer, intent(inout) :: report_json
         
         real(DP) :: difference
-        
-        write(report_unit, *) "Consistency test: "
-        write(report_unit, *) "    potential_energy = ", potential_energy
-        write(report_unit, *) "    potential_energy_conf = ", potential_energy_conf
+        type(json_value), pointer :: consistency_json
+
+        call json_value_create(consistency_json)
+        call to_object(consistency_json, "Consistency")
+        call json_value_add(report_json, consistency_json)
+
+        call json_value_add(consistency_json, "potential energy (MC)", potential_energy)
+        call json_value_add(consistency_json, "potential energy (Last)", potential_energy_conf)
         
         if (abs(potential_energy_conf) < real_zero) then
             difference = abs(potential_energy_conf-potential_energy)
-            write(report_unit, *) "    absolute difference = ", difference
+            call json_value_add(consistency_json, "absolute difference", difference)
         else
             difference = abs((potential_energy_conf-potential_energy)/potential_energy_conf)
-            write(report_unit, *) "    relative difference = ", difference
+            call json_value_add(consistency_json, "relative difference", difference)
         end if
         
         if (difference > consistency_tiny) then ! not sufficient for HS ?
-            write(report_unit, *) "    WARNING !"
+            call json_value_add(consistency_json, "pass", .false.)
         else
-            write(report_unit, *) "    OK !"
+            call json_value_add(consistency_json, "pass", .true.)
         end if
+
+        nullify(consistency_json)
     
     end subroutine test_consistency
 

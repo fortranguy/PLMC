@@ -425,13 +425,13 @@ contains
         call final_spheres(this%Box, this%type1_spheres, this%type1_units)
         call set_ewald(this%Box, this%type1_spheres, this%type1_macro, this%data_json, this%type1_units)
         type1_energy = total_energy(this%Box, this%type1_spheres, this%type1_macro)
-        call test_consistency(this%type1_observables%potential_energy, type1_energy, &
-                          this%type1_units%report)
+        !call test_consistency(this%type1_observables%potential_energy, type1_energy, &
+        !                      this%type1_units%report)
         
         call final_spheres(this%Box, this%type2_spheres, this%type2_units)
         type2_energy = total_energy(this%Box, this%type2_spheres, this%type2_macro)
-        call test_consistency(this%type2_observables%potential_energy, type2_energy, &
-                          this%type2_units%report)
+        !call test_consistency(this%type2_observables%potential_energy, type2_energy, &
+        !                      this%type2_units%report)
         
         call this%between_spheres%test_overlap(this%Box%size, &
                                                this%type1_spheres, this%type2_spheres)
@@ -477,7 +477,8 @@ contains
                                 this%between_spheres_potential%total(this%Box%size, &
                                                                      this%type1_spheres, &
                                                                      this%type2_spheres)
-        call test_consistency(potential_energy, potential_energy_conf, this%report_unit)
+        
+        call test_consistency(potential_energy, potential_energy_conf, this%report_json)        
         this%potential_energy_sum = this%type1_observables%potential_energy_sum + &
                                     this%type2_observables%potential_energy_sum + &
                                     this%between_spheres_observables%potential_energy_sum
@@ -485,6 +486,8 @@ contains
         call write_results(this%Box%num_particles, this%num_equilibrium_steps, &
                            this%potential_energy_sum, this%switch_observable%sum_rejection, duration, &
                            this%report_unit)
+
+        call json_print(this%report_json, this%report_unit)
     
     end subroutine Physical_System_write_results
     
