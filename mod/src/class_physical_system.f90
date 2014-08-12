@@ -21,7 +21,7 @@ use class_hard_spheres_units, only: Hard_Spheres_Units, Dipolar_Hard_Spheres_Uni
 use module_physics_macro, only: init_random_seed, set_initial_configuration, &
                                 init_spheres, init_cells, set_ewald, total_energy, final_spheres, &
                                 init_between_spheres_potential, final_between_spheres_potential, &
-                                test_consist
+                                test_consistency
 use module_algorithms, only: move, widom, switch, rotate
 use module_write, only: write_results, between_spheres_write_results, write_spheres_density
 
@@ -425,12 +425,12 @@ contains
         call final_spheres(this%Box, this%type1_spheres, this%type1_units)
         call set_ewald(this%Box, this%type1_spheres, this%type1_macro, this%data_json, this%type1_units)
         type1_energy = total_energy(this%Box, this%type1_spheres, this%type1_macro)
-        call test_consist(this%type1_observables%potential_energy, type1_energy, &
+        call test_consistency(this%type1_observables%potential_energy, type1_energy, &
                           this%type1_units%report)
         
         call final_spheres(this%Box, this%type2_spheres, this%type2_units)
         type2_energy = total_energy(this%Box, this%type2_spheres, this%type2_macro)
-        call test_consist(this%type2_observables%potential_energy, type2_energy, &
+        call test_consistency(this%type2_observables%potential_energy, type2_energy, &
                           this%type2_units%report)
         
         call this%between_spheres%test_overlap(this%Box%size, &
@@ -477,7 +477,7 @@ contains
                                 this%between_spheres_potential%total(this%Box%size, &
                                                                      this%type1_spheres, &
                                                                      this%type2_spheres)
-        call test_consist(potential_energy, potential_energy_conf, this%report_unit)
+        call test_consistency(potential_energy, potential_energy_conf, this%report_unit)
         this%potential_energy_sum = this%type1_observables%potential_energy_sum + &
                                     this%type2_observables%potential_energy_sum + &
                                     this%between_spheres_observables%potential_energy_sum

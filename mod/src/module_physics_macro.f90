@@ -3,7 +3,7 @@
 module module_physics_macro
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit, error_unit, iostat_end
-use data_precisions, only: real_zero, io_tiny, consist_tiny
+use data_precisions, only: real_zero, io_tiny, consistency_tiny
 use data_box, only: num_dimensions
 use json_module, only: json_file, json_value, json_value_create, to_object, json_value_add
 use module_data, only: test_data_found
@@ -24,7 +24,7 @@ public init_random_seed, set_initial_configuration, &
        set_ewald, &
        total_energy, &
        final_spheres, init_between_spheres_potential, final_between_spheres_potential, &
-       test_consist
+       test_consistency
 
 contains
 
@@ -409,13 +409,13 @@ contains
         real(DP) :: potential_energy_conf
         
         potential_energy_conf = between_spheres_potential%total(Box_size, spheres1, spheres2)
-        call test_consist(potential_energy, potential_energy_conf, between_spheres_report_unit)
+        call test_consistency(potential_energy, potential_energy_conf, between_spheres_report_unit)
     
     end subroutine final_between_spheres_potential
     
     !> Consistency test
     
-    subroutine test_consist(potential_energy, potential_energy_conf, report_unit)
+    subroutine test_consistency(potential_energy, potential_energy_conf, report_unit)
     
         real(DP), intent(in) :: potential_energy, potential_energy_conf
         integer, intent(in) :: report_unit
@@ -434,12 +434,12 @@ contains
             write(report_unit, *) "    relative difference = ", difference
         end if
         
-        if (difference > consist_tiny) then ! not sufficient for HS ?
+        if (difference > consistency_tiny) then ! not sufficient for HS ?
             write(report_unit, *) "    WARNING !"
         else
             write(report_unit, *) "    OK !"
         end if
     
-    end subroutine test_consist
+    end subroutine test_consistency
 
 end module module_physics_macro
