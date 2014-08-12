@@ -5,7 +5,7 @@ module module_physics_macro
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit, error_unit, iostat_end
 use data_precisions, only: real_zero, io_tiny, consist_tiny
 use data_box, only: num_dimensions
-use json_module, only: json_file
+use json_module, only: json_file, json_value, json_value_create, to_object, json_value_add
 use module_data, only: test_data_found
 use module_types_micro, only: Box_Parameters, Argument_Random, Argument_Initial
 use module_physics_micro, only: PBC_distance, random_surface
@@ -30,16 +30,21 @@ contains
 
     !> Random number generator: seed
     
-    subroutine init_random_seed(arg_rand, report_unit)
+    subroutine init_random_seed(arg_rand, report_json)
     
         type(Argument_Random) :: arg_rand
-        integer, intent(in) :: report_unit
+        type(json_value), pointer, intent(inout) :: report_json
     
         integer :: i, n, clock
         integer, dimension(:), allocatable :: seed
+        type(json_value), pointer :: random_json
 
         call random_seed(size = n)
         allocate(seed(n))
+
+        call json_value_create(random_json)
+        call to_object(random_json, "RNG seed")
+        call json_value_add(report_json, random_json)
 
         select case (arg_rand%choice)
         
@@ -50,14 +55,14 @@ contains
                 call random_seed(put = seed)
                 ! not sufficent ? cf.
                 ! http://gcc.gnu.org/onlinedocs/gfortran/RANDOM_005fSEED.html
-                write(report_unit, *) "Random number generator: variable"
+                call json_value_add(random_json, "type", "variable")
 
             case ('p')
                 call random_seed(put = arg_rand%seed)
-                write(report_unit, *) "Random number generator: put"
+                call json_value_add(random_json, "type", "put")
                 
             case ('f')
-                write(report_unit, *) "Random number generator: fix"
+                call json_value_add(random_json, "type", "fixed")
 
             case default
                 error stop "Error: init_random_seed"
@@ -65,8 +70,8 @@ contains
         end select
 
         call random_seed(get = seed)
-        write(report_unit ,*) "    size = ", n
-        write(report_unit ,*) "    seed = ", seed(:)
+        call json_value_add(random_json, "size", n)
+        call json_value_add(random_json, "value", seed)
 
         deallocate(seed)
         

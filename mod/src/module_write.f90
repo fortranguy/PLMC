@@ -12,24 +12,9 @@ use class_hard_spheres, only: Hard_Spheres
 implicit none
 
 private
-public open_units, write_data, write_spheres_density, write_results, between_spheres_write_results
+public write_data, write_spheres_density, write_results, between_spheres_write_results
 
 contains
-
-    !> Total: open units
-    
-    subroutine open_units(report_unit, observables_thermalisation_unit, observables_equilibrium_unit)
-    
-        integer, intent(out) :: report_unit, observables_thermalisation_unit, observables_equilibrium_unit
-    
-        open(newunit=report_unit, recl=4096, file="report.txt", status='new', action='write')
-        open(newunit=observables_thermalisation_unit, recl=4096, file="observables_thermalisation.out", &
-             status='new', action='write')
-        open(newunit=observables_equilibrium_unit, recl=4096, file="observables_equilibrium.out", &
-             status='new', action='write')
-        write(observables_equilibrium_unit, *) "#", 1 ! 1 observable: energy
-        
-    end subroutine open_units
 
     !> Data: low level
 

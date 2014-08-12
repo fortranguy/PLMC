@@ -3,7 +3,8 @@
 module class_physical_system
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
-use json_module, only: json_file, json_initialize, json_value
+use json_module, only: json_file, json_initialize, json_destroy, &
+                       json_value, json_value_create, to_object, json_print
 use module_data, only: test_data_file_exists, test_data_found, test_empty_string
 use module_geometry, only: set_geometry, print_geometry
 use module_types_micro, only: Box_Parameters, Monte_Carlo_Arguments
@@ -21,7 +22,7 @@ use module_physics_macro, only: init_random_seed, set_initial_configuration, &
                                 init_between_spheres_potential, final_between_spheres_potential, &
                                 test_consist
 use module_algorithms, only: move, widom, switch, rotate
-use module_write, only: open_units, write_data, write_results, between_spheres_write_results, &
+use module_write, only: write_data, write_results, between_spheres_write_results, &
                         write_spheres_density
 
 implicit none
@@ -303,8 +304,10 @@ contains
         call print_geometry(args%geometry)
         
         call this%open_all_units()
+        call json_value_create(this%report_json)
+        call to_object(this%report_json)
         
-        call init_random_seed(args%random, this%report_unit)
+        call init_random_seed(args%random, this%report_json)
         call set_initial_configuration(this%Box%size, args%initial, &
                                        this%type1_spheres, this%type2_spheres, &
                                        this%between_spheres%get_diameter(), &
@@ -350,14 +353,22 @@ contains
                                 this%between_spheres_observables%potential_energy
         write(output_unit, *) "Initial potential_energy energy =", potential_energy_conf
         write(this%observables_thermalisation_unit, *) 0, potential_energy_conf
+
+        call json_print(this%report_json, this%report_unit)
     
     end subroutine Physical_System_init
     
     subroutine Physical_System_open_all_units(this)
         class(Physical_System), intent(inout) :: this
+
+        open(newunit=this%report_unit, recl=4096, file="report.json", &
+             status='new', action='write')
+        open(newunit=this%observables_thermalisation_unit, recl=4096, &
+             file="observables_thermalisation.out", status='new', action='write')
+        open(newunit=this%observables_equilibrium_unit, recl=4096, &
+             file="observables_equilibrium.out", status='new', action='write')
+        write(this%observables_equilibrium_unit, *) "#", 1 ! 1 observable: energy
         
-        call open_units(this%report_unit, this%observables_thermalisation_unit, &
-                        this%observables_equilibrium_unit)
         call this%type1_units%open(this%type1_spheres%get_name())
         call this%type2_units%open(this%type2_spheres%get_name())
         call this%between_spheres_units%open(this%between_spheres%get_name())
@@ -427,6 +438,7 @@ contains
         call this%write_all_results()
         call this%close_units()
 
+        call json_destroy(this%report_json)
         call this%data_json%destroy()
     
     end subroutine Physical_System_final
