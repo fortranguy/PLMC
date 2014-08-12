@@ -354,6 +354,7 @@ contains
         write(output_unit, *) "Initial potential_energy energy =", potential_energy_conf
         write(this%observables_thermalisation_unit, *) 0, potential_energy_conf
 
+        rewind(this%report_unit)
         call json_print(this%report_json, this%report_unit)
     
     end subroutine Physical_System_init
@@ -485,8 +486,9 @@ contains
         duration = this%time_end - this%time_start
         call write_results(this%Box%num_particles, this%num_equilibrium_steps, &
                            this%potential_energy_sum, this%switch_observable%sum_rejection, duration, &
-                           this%report_unit)
+                           this%report_json)
 
+        rewind(this%report_unit)
         call json_print(this%report_json, this%report_unit)
     
     end subroutine Physical_System_write_results
