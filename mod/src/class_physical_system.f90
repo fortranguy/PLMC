@@ -361,7 +361,7 @@ contains
     subroutine Physical_System_open_all_units(this)
         class(Physical_System), intent(inout) :: this
 
-        open(newunit=this%report_unit, recl=4096, file="report.json", &
+        open(newunit=this%report_unit, recl=4096, file=report_filename, &
              status='new', action='write')
         open(newunit=this%observables_thermalisation_unit, recl=4096, &
              file="observables_thermalisation.out", status='new', action='write')
