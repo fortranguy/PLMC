@@ -74,6 +74,7 @@ contains
         call json_value_add(random_json, "value", seed)
 
         deallocate(seed)
+        nullify(random_json)
         
     end subroutine init_random_seed
     
@@ -81,28 +82,26 @@ contains
     
     subroutine set_initial_configuration(Box_size, arg_init, dipolar, spherical, &
                                          between_spheres_min_distance, &
-                                         report_unit)
+                                         report_json)
         
         real(DP), dimension(:), intent(in) :: Box_size
         type(Argument_Initial), intent(in) :: arg_init
         class(Dipolar_Hard_Spheres), intent(inout) :: dipolar
         class(Hard_Spheres), intent(inout) :: spherical
         real(DP), intent(in) :: between_spheres_min_distance
-        integer, intent(in) :: report_unit
-        
-        write(report_unit, *) "Initial configuration: "
+        type(json_value), pointer, intent(inout) :: report_json
         
         select case (arg_init%choice)
         
             case ('r')
                 call random_depositions(Box_size, dipolar, spherical, between_spheres_min_distance)
                 call random_orientations(dipolar, dipolar%get_num_particles())
-                write(output_unit, *) "Random depositions + random orientations"
-                write(report_unit, *) "    Random depositions + random orientations"
+                call json_value_add(report_json, "Initial configuration", &
+                                                 "Random depositions + random orientations")
                 
             case ('f')
-                write(output_unit, *) "Old configuration"
-                write(report_unit, *) "    Old configuration"
+                call json_value_add(report_json, "Initial configuration", &
+                                                 "Old configuration")
                 call old_configuration(arg_init%files(1), arg_init%length(1), dipolar, &
                                        norm2(Box_size), "positions")
                 call old_configuration(arg_init%files(2), arg_init%length(2), dipolar, &

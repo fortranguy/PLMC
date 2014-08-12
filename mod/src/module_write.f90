@@ -12,29 +12,9 @@ use class_hard_spheres, only: Hard_Spheres
 implicit none
 
 private
-public write_data, write_spheres_density, write_results, between_spheres_write_results
+public write_spheres_density, write_results, between_spheres_write_results
 
 contains
-
-    !> Data: low level
-
-    subroutine write_data(report_unit)
-    
-        integer, intent(in) :: report_unit
-
-        write(report_unit, *) "Data micro: "
-
-        write(report_unit ,*) "    Precision = ", DP
-        write(report_unit ,*) "    Real zero = ", real_zero
-        write(report_unit ,*) "    I/O tiny = ", io_tiny
-        write(report_unit ,*) "    Energy consistency tiny = ", consist_tiny
-        
-        write(report_unit ,*) "    Number of dimensions = ", num_dimensions
-
-        write(report_unit ,*) "    Pi = ", PI
-        write(report_unit ,*) "    Sigma3d = ", sigma3d
-
-    end subroutine write_data
     
     !> Total: Results
     

@@ -4,7 +4,8 @@ module class_physical_system
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file, json_initialize, json_destroy, &
-                       json_value, json_value_create, to_object, json_print
+                       json_value, json_value_create, to_object, json_value_add, &
+                       json_print
 use module_data, only: test_data_file_exists, test_data_found, test_empty_string
 use module_geometry, only: set_geometry, print_geometry
 use module_types_micro, only: Box_Parameters, Monte_Carlo_Arguments
@@ -22,8 +23,7 @@ use module_physics_macro, only: init_random_seed, set_initial_configuration, &
                                 init_between_spheres_potential, final_between_spheres_potential, &
                                 test_consist
 use module_algorithms, only: move, widom, switch, rotate
-use module_write, only: write_data, write_results, between_spheres_write_results, &
-                        write_spheres_density
+use module_write, only: write_results, between_spheres_write_results, write_spheres_density
 
 implicit none
 
@@ -311,7 +311,7 @@ contains
         call set_initial_configuration(this%Box%size, args%initial, &
                                        this%type1_spheres, this%type2_spheres, &
                                        this%between_spheres%get_diameter(), &
-                                       this%report_unit)
+                                       this%report_json)
                                        
         call this%between_spheres%test_overlap(this%Box%size, &
                                                this%type1_spheres, this%type2_spheres)
@@ -359,6 +359,7 @@ contains
     end subroutine Physical_System_init
     
     subroutine Physical_System_open_all_units(this)
+    
         class(Physical_System), intent(inout) :: this
 
         open(newunit=this%report_unit, recl=4096, file=report_filename, &
@@ -378,8 +379,7 @@ contains
     subroutine Physical_System_write_all_reports(this)
         class(Physical_System), intent(in) :: this
         
-        call write_data(this%report_unit)
-        call this%write_report(this%report_unit)
+        call this%write_report()
         
         call write_spheres_density(this%Box, this%type1_spheres, this%type1_units%report)
         call this%type1_spheres%write_report(this%type1_units%report)
@@ -393,19 +393,24 @@ contains
     
     end subroutine Physical_System_write_all_reports
     
-    subroutine Physical_System_write_report(this, report_unit)
+    subroutine Physical_System_write_report(this)
         class(Physical_System), intent(in) :: this
-        integer, intent(in) :: report_unit
 
-        write(report_unit, *) "Data macro: "
-        
-        write(report_unit ,*) "    Volume = ", product(this%Box%size)
-        write(report_unit ,*) "    num_wave_vectors =", num_wave_vectors(this%Box%wave)
-        write(report_unit ,*) "    num_particles = ", this%Box%num_particles
-        
-        write(report_unit, *) "    num_moves = ", this%num_moves
-        write(report_unit, *) "    num_switches = ", this%num_switches
-        write(report_unit, *) "    num_rotations = ", this%num_rotations
+        type(json_value), pointer :: system_json
+
+        call json_value_create(system_json)
+        call to_object(system_json, "System")
+        call json_value_add(this%report_json, system_json)
+
+        call json_value_add(system_json, "volume", product(this%Box%size))
+        call json_value_add(system_json, "number of wave vectors", num_wave_vectors(this%Box%wave))
+        call json_value_add(system_json, "number of particles", this%Box%num_particles)
+
+        call json_value_add(system_json, "number of moves", this%num_moves)
+        call json_value_add(system_json, "number of switches", this%num_switches)
+        call json_value_add(system_json, "number of rotations", this%num_rotations)
+
+        nullify(system_json)
         
     end subroutine Physical_System_write_report
     
