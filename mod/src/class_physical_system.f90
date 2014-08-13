@@ -7,7 +7,7 @@ use json_module, only: json_file, json_initialize, json_destroy, &
                        json_value, json_value_create, to_object, json_value_add, &
                        json_print
 use module_data, only: test_data_file_exists, test_data_found, test_empty_string
-use module_geometry, only: set_geometry, print_geometry
+use module_geometry, only: set_geometry
 use module_types_micro, only: Box_Parameters, Monte_Carlo_Arguments
 use module_physics_micro, only: num_wave_vectors
 use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres, Between_Hard_Spheres
@@ -307,7 +307,6 @@ contains
         this%reset_i_step = this%reset_i_step / this%decorrelation_factor
         
         write(output_unit, *) "Monte-Carlo Simulation: Canonical ensemble "
-        call print_geometry(args%geometry)
         
         call this%open_all_units()
         call this%json_create_all_values()
@@ -345,7 +344,7 @@ contains
         this%type2_observables%potential_energy = total_energy(this%Box, this%type2_spheres, &
                                                                this%type2_macro)
                         
-        call this%write_all_reports()
+        call this%write_all_reports(args%geometry)
         if (this%write_potential_energy) then
             call this%type1_macro%hard_potential%write(this%type1_units%potential_energy)
             call this%type1_macro%ewald_real%write(this%type1_units%potential_energy_real)
@@ -356,7 +355,6 @@ contains
         potential_energy_conf = this%type1_observables%potential_energy + &
                                 this%type2_observables%potential_energy + &
                                 this%between_spheres_observables%potential_energy
-        write(output_unit, *) "Initial potential_energy energy =", potential_energy_conf
         write(this%observables_thermalisation_unit, *) 0, potential_energy_conf
 
         rewind(this%report_unit)
@@ -414,11 +412,12 @@ contains
         
     end subroutine Physical_System_json_create_all_values
     
-    subroutine Physical_System_write_all_reports(this)
+    subroutine Physical_System_write_all_reports(this, geometry)
     
         class(Physical_System), intent(in) :: this
+        character(len=*), intent(in) :: geometry
         
-        call this%write_report()
+        call this%write_report(geometry)
         
         call this%type1_spheres%write_report(this%Box, this%type1_report_json)
         call this%type1_macro%hard_potential%write_report(this%type1_report_json)
@@ -430,17 +429,34 @@ contains
     
     end subroutine Physical_System_write_all_reports
     
-    subroutine Physical_System_write_report(this)
+    subroutine Physical_System_write_report(this, geometry)
     
         class(Physical_System), intent(in) :: this
+        character(len=*), intent(in) :: geometry
 
-        call json_value_add(this%system_json, "volume of the box", product(this%Box%size))
-        call json_value_add(this%system_json, "number of wave vectors", num_wave_vectors(this%Box%wave))
-        call json_value_add(this%system_json, "number of particles", this%Box%num_particles)
+        type(json_value), pointer :: box_json, changes_json
 
-        call json_value_add(this%system_json, "number of moves", this%num_moves)
-        call json_value_add(this%system_json, "number of switches", this%num_switches)
-        call json_value_add(this%system_json, "number of rotations", this%num_rotations)
+        call json_value_create(box_json)
+        call to_object(box_json, "Box")
+        call json_value_add(this%system_json, box_json)
+
+        call json_value_add(box_json, "volume", product(this%Box%size))
+        call json_value_add(box_json, "geometry", geometry)
+        call json_value_add(box_json, "number of wave vectors", &
+                                       num_wave_vectors(this%Box%wave))
+        call json_value_add(box_json, "number of particles", this%Box%num_particles)
+
+        nullify(box_json)
+
+        call json_value_create(changes_json)
+        call to_object(changes_json, "Changes")
+        call json_value_add(this%system_json, changes_json)
+
+        call json_value_add(changes_json, "number of moves", this%num_moves)
+        call json_value_add(changes_json, "number of switches", this%num_switches)
+        call json_value_add(changes_json, "number of rotations", this%num_rotations)
+
+        nullify(changes_json)
         
     end subroutine Physical_System_write_report
     

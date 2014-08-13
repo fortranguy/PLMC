@@ -96,12 +96,12 @@ contains
             case ('r')
                 call random_depositions(Box_size, dipolar, spherical, between_spheres_min_distance)
                 call random_orientations(dipolar, dipolar%get_num_particles())
-                call json_value_add(report_json, "Initial configuration", &
-                                                 "Random depositions + random orientations")
+                call json_value_add(report_json, "initial configuration", &
+                                                 "random depositions + random orientations")
                 
             case ('f')
-                call json_value_add(report_json, "Initial configuration", &
-                                                 "Old configuration")
+                call json_value_add(report_json, "initial configuration", &
+                                                 "old configuration")
                 call old_configuration(arg_init%files(1), arg_init%length(1), dipolar, &
                                        norm2(Box_size), "positions")
                 call old_configuration(arg_init%files(2), arg_init%length(2), dipolar, &
