@@ -43,14 +43,22 @@ contains
     
     !> Mix: Results
     
-    subroutine between_spheres_write_results(num_equilibrium_steps, potential_energy_sum, report_unit)
+    subroutine between_spheres_write_results(num_equilibrium_steps, potential_energy_sum, report_json)
     
         integer, intent(in) :: num_equilibrium_steps
         real(DP), intent(in) :: potential_energy_sum
-        integer, intent(in) :: report_unit
-    
-        write(report_unit, *) "Results: "
-        write(report_unit, *) "    average energy = ", potential_energy_sum/real(num_equilibrium_steps, DP)
+        type(json_value), pointer, intent(in) :: report_json
+
+        type(json_value), pointer :: results_json
+
+        call json_value_create(results_json)
+        call to_object(results_json, "Results")
+        call json_value_add(report_json, results_json)
+
+        call json_value_add(results_json, "average energy", &
+                                          potential_energy_sum/real(num_equilibrium_steps, DP))
+        
+        nullify(results_json)
     
     end subroutine between_spheres_write_results
     

@@ -3,6 +3,7 @@
 module class_hard_spheres_observables
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
+use json_module, only: json_value, json_value_create, to_object, json_value_add
 use class_discrete_observable, only: Adapting_Discrete_Observables
 
 implicit none
@@ -96,30 +97,37 @@ contains
     end subroutine Between_Hard_Spheres_Observables_accumulate
     
     subroutine Hard_Spheres_Observables_write_results(this, temperature, num_equilibrium_steps, &
-                                                      report_unit)
+                                                      report_json)
 
         class(Hard_Spheres_Observables), intent(in) :: this
         real(DP), intent(in) :: temperature
         integer, intent(in) :: num_equilibrium_steps
-        integer, intent(in) :: report_unit
+        type(json_value), pointer, intent(in) :: report_json
         
         real(DP) :: chemical_potential_excess
-            
-        write(report_unit, *) "Results: "
-        
-        write(report_unit, *) "    average energy = ", this%potential_energy_sum / &
-                                                       real(num_equilibrium_steps, DP)
+        type(json_value), pointer :: results_json
+
+        call json_value_create(results_json)
+        call to_object(results_json, "Results")
+        call json_value_add(report_json, results_json)
+
+        call json_value_add(results_json, "average energy", &
+                                          this%potential_energy_sum / real(num_equilibrium_steps, DP))
         chemical_potential_excess = -temperature * log(this%sum_inv_activity / &
-                                    real(num_equilibrium_steps, DP))
-        write(report_unit, *) "    average excess chemical potential = ", chemical_potential_excess
-        write(report_unit, *) "    move rejection rate = ", &
-                                   this%move%sum_rejection/real(num_equilibrium_steps, DP)
-        
+                                                       real(num_equilibrium_steps, DP))
+        call json_value_add(results_json, "average excess chemical potential", &
+                                          chemical_potential_excess)
+        call json_value_add(results_json, "move rejection rate", &
+                                          this%move%sum_rejection / real(num_equilibrium_steps, DP))
+
         select type (this)
             type is (Dipolar_Hard_Spheres_Observables)
-                write(report_unit, *) "    rotation rejection rate = ", &
-                                      this%rotation%sum_rejection/real(num_equilibrium_steps, DP)
+                call json_value_add(results_json, "rotation rejection rate", &
+                                                   this%rotation%sum_rejection / &
+                                                   real(num_equilibrium_steps, DP))
         end select
+
+        nullify(results_json)
     
     end subroutine Hard_Spheres_Observables_write_results
 

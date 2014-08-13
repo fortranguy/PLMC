@@ -480,12 +480,12 @@ contains
         class(Physical_System), intent(inout) :: this
         
         call this%type1_observables%write_results(this%Box%temperature, this%num_equilibrium_steps, &
-                                                  this%type1_units%report)
+                                                  this%type1_report_json)
         call this%type2_observables%write_results(this%Box%temperature, this%num_equilibrium_steps, &
-                                                  this%type2_units%report)
+                                                  this%type2_report_json)
         call between_spheres_write_results(this%num_equilibrium_steps, &
                                            this%between_spheres_observables%potential_energy_sum, &
-                                           this%between_spheres_units%report)
+                                           this%between_spheres_report_json)
         
         call this%write_results()
     
