@@ -2,6 +2,7 @@ module class_small_rotation
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, error_unit
 use data_precisions, only: real_zero
+use json_module, only: json_value, json_value_create, to_object, json_value_add
 
 implicit none
 
@@ -68,12 +69,14 @@ contains
     
     end subroutine Small_Rotation_adapt_delta
     
-    subroutine Small_Rotation_set_delta(this, type_name, reject, report_unit)
+    subroutine Small_Rotation_set_delta(this, type_name, reject, report_json)
     
         class(Small_Rotation), intent(inout) :: this
         character(len=*), intent(in) :: type_name
         real(DP), intent(in) :: reject
-        integer, intent(in) :: report_unit
+        type(json_value), pointer, intent(inout) :: report_json
+
+        type(json_value), pointer :: rotation_json
         
         if (reject < real_zero) then
             write(error_unit, *) type_name, ":    Warning: delta adaptation problem."
@@ -86,11 +89,16 @@ contains
             this%delta = this%delta_max
             write(error_unit, *) "big delta: ", this%delta
         end if
+
+        call json_value_create(rotation_json)
+        call to_object(rotation_json, "Rotation")
+        call json_value_add(report_json, rotation_json)
         
-        write(report_unit, *) "Rotation: "
-        write(report_unit, *) "    delta = ", this%delta
-        write(report_unit, *) "    rejection relative difference = ", &
-                                    abs(reject-this%reject_fix)/this%reject_fix
+        call json_value_add(rotation_json, "delta", this%delta)
+        call json_value_add(rotation_json, "rejection relative difference", &
+                                           abs(reject-this%reject_fix)/this%reject_fix)
+        
+        nullify(rotation_json)
     
     end subroutine Small_Rotation_set_delta
 

@@ -721,14 +721,14 @@ contains
         type_name = this%type1_spheres%get_name()
         call this%type1_macro%move%set_delta(type_name, this%Box%size, &
                                              this%type1_observables%move%rejection_average, &
-                                             this%type1_units%report)
+                                             this%type1_report_json)
         call this%type1_macro%rotation%set_delta(type_name, &
                                                  this%type1_observables%rotation%rejection_average, &
-                                                 this%type1_units%report)
+                                                 this%type1_report_json)
         type_name = this%type2_spheres%get_name()
         call this%type2_macro%move%set_delta(type_name, this%Box%size, &
                                              this%type2_observables%move%rejection_average, &
-                                             this%type2_units%report)
+                                             this%type2_report_json)
     
     end subroutine Physical_System_fix_changes
     

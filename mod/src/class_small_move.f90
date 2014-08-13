@@ -3,6 +3,7 @@ module class_small_move
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, error_unit
 use data_precisions, only: real_zero
 use data_box, only: num_dimensions
+use json_module, only: json_value, json_value_create, to_object, json_value_add
 
 implicit none
 
@@ -77,13 +78,15 @@ contains
     
     end subroutine Small_Move_adapt_delta
     
-    subroutine Small_Move_set_delta(this, type_name, Box_size, reject, report_unit)
+    subroutine Small_Move_set_delta(this, type_name, Box_size, reject, report_json)
     
         class(Small_Move), intent(inout) :: this
         character(len=*), intent(in) :: type_name
         real(DP), dimension(:), intent(in) :: Box_size ! warning: average ?
         real(DP), intent(in) :: reject
-        integer, intent(in) :: report_unit
+        type(json_value), pointer, intent(inout) :: report_json
+
+        type(json_value), pointer :: displacement_json
 
         if (reject < real_zero) then
             write(error_unit, *) type_name, ":    Warning: delta adaptation problem."
@@ -97,10 +100,15 @@ contains
             write(error_unit, *) "big delta: ", this%delta(:)
         end if
 
-        write(report_unit, *) "Displacement: "
-        write(report_unit, *) "    delta(:) = ", this%delta(:)
-        write(report_unit, *) "    rejection relative difference = ", &
-                                   abs(reject-this%reject_fix)/this%reject_fix
+        call json_value_create(displacement_json)
+        call to_object(displacement_json, "Displacement")
+        call json_value_add(report_json, displacement_json)
+
+        call json_value_add(displacement_json, "delta", this%delta)
+        call json_value_add(displacement_json, "rejection relative difference", &
+                                               abs(reject-this%reject_fix)/this%reject_fix)
+
+        nullify(displacement_json)
     
     end subroutine Small_Move_set_delta
 
