@@ -3,7 +3,7 @@ module class_hard_spheres_potential
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_box, only: num_dimensions
 use data_neighbour_cells, only: num_near_cells
-use json_module, only: json_file
+use json_module, only: json_file, json_value, json_value_create, to_object, json_value_add
 use module_data, only: test_data_found
 use module_types_micro, only: Node, Particle_Index
 use module_physics_micro, only: PBC_distance
@@ -27,7 +27,7 @@ private
         procedure :: get_min_distance => Hard_Spheres_Potential_Energy_get_min_distance
         procedure :: get_range_cut => Hard_Spheres_Potential_Energy_get_range_cut
         
-        procedure :: write_report => Hard_Spheres_write_report
+        procedure :: write_report => Hard_Spheres_Potential_Energy_write_report
         
         procedure :: neighbours => Hard_Spheres_Potential_Energy_neighbours
         procedure :: total => Hard_Spheres_Potential_Energy_total
@@ -94,15 +94,22 @@ contains
         
     end function Hard_Spheres_Potential_Energy_get_range_cut
     
-    subroutine Hard_Spheres_write_report(this, report_unit)
+    subroutine Hard_Spheres_Potential_Energy_write_report(this, report_json)
     
         class(Hard_Spheres_Potential_Energy), intent(in) :: this
-        integer, intent(in) :: report_unit
+        type(json_value), pointer, intent(in) :: report_json
+
+        type(json_value), pointer :: potential_json
         
-        write(report_unit, *) "Potential: "
-        write(report_unit, *) "    range_cut = ", this%range_cut
+        call json_value_create(potential_json)
+        call to_object(potential_json, "Potential")
+        call json_value_add(report_json, potential_json)
+
+        call json_value_add(potential_json, "cutoff", this%range_cut)
         
-    end subroutine Hard_Spheres_write_report
+        nullify(potential_json)
+        
+    end subroutine Hard_Spheres_Potential_Energy_write_report
     
     subroutine Hard_Spheres_Potential_Energy_neighbours(this, Box_size, spheres, this_cells, &
                                                         particle, overlap, energ)

@@ -421,12 +421,12 @@ contains
         call this%write_report()
         
         call this%type1_spheres%write_report(this%Box, this%type1_report_json)
-        call this%type1_macro%hard_potential%write_report(this%type1_units%report)
+        call this%type1_macro%hard_potential%write_report(this%type1_report_json)
         
         call this%type2_spheres%write_report(this%Box, this%type2_report_json)
-        call this%type2_macro%hard_potential%write_report(this%type2_units%report)
+        call this%type2_macro%hard_potential%write_report(this%type2_report_json)
         
-        call this%between_spheres_potential%write_report(this%between_spheres_units%report)
+        call this%between_spheres_potential%write_report(this%between_spheres_report_json)
     
     end subroutine Physical_System_write_all_reports
     
