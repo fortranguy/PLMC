@@ -79,13 +79,13 @@ contains
         type(json_value), pointer :: rotation_json
         
         if (reject < real_zero) then
-            write(error_unit, *) type_name, ":    Warning: delta adaptation problem."
+            write(error_unit, *) type_name, ": Warning: delta adaptation problem."
             this%delta = this%delta_save
             write(error_unit, *) "default delta: ", this%delta
         end if
         
         if (this%delta > this%delta_max) then
-            write(error_unit, *) type_name, ":   Warning: delta too big."
+            write(error_unit, *) type_name, ": Warning: delta too big."
             this%delta = this%delta_max
             write(error_unit, *) "big delta: ", this%delta
         end if

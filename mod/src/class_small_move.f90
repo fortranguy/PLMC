@@ -78,24 +78,24 @@ contains
     
     end subroutine Small_Move_adapt_delta
     
-    subroutine Small_Move_set_delta(this, type_name, Box_size, reject, report_json)
+    subroutine Small_Move_set_delta(this, Box_size, type_name, reject, report_json)
     
         class(Small_Move), intent(inout) :: this
-        character(len=*), intent(in) :: type_name
         real(DP), dimension(:), intent(in) :: Box_size ! warning: average ?
+        character(len=*), intent(in) :: type_name
         real(DP), intent(in) :: reject
         type(json_value), pointer, intent(inout) :: report_json
 
         type(json_value), pointer :: displacement_json
 
         if (reject < real_zero) then
-            write(error_unit, *) type_name, ":    Warning: delta adaptation problem."
+            write(error_unit, *) type_name, ": Warning: delta adaptation problem."
             this%delta(:) = this%delta_save(:)
             write(error_unit, *) "default delta: ", this%delta(:)
         end if
 
         if (norm2(this%delta) > norm2(Box_size)) then
-            write(error_unit, *) type_name, ":   Warning: delta too big."
+            write(error_unit, *) type_name, ": Warning: delta too big."
             this%delta(:) = Box_size(:)
             write(error_unit, *) "big delta: ", this%delta(:)
         end if
