@@ -6,6 +6,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit, error_unit
 use data_box, only: num_dimensions
 use json_module, only: json_file, json_initialize
 use module_data, only: test_data_found
+use module_geometry, only: set_geometry
 use module_physics_micro, only: sphere_volume, PBC_distance
 use module_arguments, only: arg_to_file
 
@@ -31,12 +32,14 @@ implicit none
     real(DP), dimension(:), allocatable :: distribution_function
     real(DP), dimension(:, :), allocatable :: type1_positions, type2_positions
     
-    type(json_file) :: data_json
+    type(json_file) :: data_json, report_json
     character(len=4096) :: data_name
     logical :: found
     character(len=4096) :: filename
     integer :: length
     real(DP) :: time_start, time_end
+
+    character(len=:), allocatable :: geometry
     
     call json_initialize()
     call data_json%load_file(filename = "data.json")
@@ -46,6 +49,16 @@ implicit none
     call test_data_found(data_name, found)
     
     if (.not.take_snapshot) stop "No snap shots taken."
+
+    call report_json%load_file(filename = "report.json")
+
+    data_name = "System.Box.geometry"
+    call report_json%get(data_name, geometry, found)
+    call test_data_found(data_name, found)
+    call set_geometry(geometry)
+    if (allocated(geometry)) deallocate(geometry)
+
+    call report_json%destroy()
     
     data_name = "Box.size"
     call data_json%get(data_name, Box_size, found)
