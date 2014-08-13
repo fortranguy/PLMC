@@ -84,7 +84,7 @@ contains
         real(DP), dimension(:), intent(in) :: Box_size ! warning: average ?
         character(len=*), intent(in) :: type_name
         real(DP), intent(in) :: reject
-        type(json_value), pointer, intent(inout) :: report_json
+        type(json_value), pointer, intent(in) :: report_json
 
         type(json_value), pointer :: displacement_json
 

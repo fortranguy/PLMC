@@ -15,7 +15,6 @@ private
         integer :: snap_final_positions
         integer :: snap_equilibrium_positions
         
-        integer :: report
         integer :: potential_energy
     
     contains
@@ -48,7 +47,6 @@ private
         integer :: observables_equilibrium
         
         integer :: potential_energy_tabulation
-        integer :: report
         
     contains
         
@@ -78,7 +76,6 @@ contains
         open(newunit=this%snap_equilibrium_positions, recl=4096, &
              file=name//"_snap_equilibrium_positions.shots", status='new', action='write')
         
-        open(newunit=this%report, recl=4096, file=name//"_report.txt", status='new', action='write')
         open(newunit=this%potential_energy, recl=4096, &
              file=name//"_potential_energy.tmp", status='new', action='write')
         
@@ -131,7 +128,6 @@ contains
         
         open(newunit=this%potential_energy_tabulation, recl=4096, &
              file=name//"_potential_energy_tabulation.tmp", status='new', action='write')
-        open(newunit=this%report, recl=4096, file=name//"_report.txt", status='new', action='write')
         
     end subroutine Between_Hard_Spheres_Units_open
     
@@ -147,7 +143,6 @@ contains
         close(this%snap_final_positions)
         close(this%snap_equilibrium_positions)
         
-        close(this%report)
         close(this%potential_energy)
         
         select type (this)
@@ -175,7 +170,6 @@ contains
     
         class(Between_Hard_Spheres_Units), intent(inout) :: this
         
-        close(this%report)
         close(this%potential_energy_tabulation)
         close(this%observables_thermalisation)
         close(this%observables_equilibrium)

@@ -359,7 +359,7 @@ contains
     
         class(Hard_Spheres), intent(in) :: this
         type(Box_Parameters), intent(in) :: Box
-        type(json_value), pointer, intent(inout) :: report_json
+        type(json_value), pointer, intent(in) :: report_json
 
         type(json_value), pointer :: properties_json, snap_json
         real(DP) :: density, compacity, concentration

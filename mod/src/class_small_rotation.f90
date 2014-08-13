@@ -74,7 +74,7 @@ contains
         class(Small_Rotation), intent(inout) :: this
         character(len=*), intent(in) :: type_name
         real(DP), intent(in) :: reject
-        type(json_value), pointer, intent(inout) :: report_json
+        type(json_value), pointer, intent(in) :: report_json
 
         type(json_value), pointer :: rotation_json
         

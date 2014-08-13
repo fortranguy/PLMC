@@ -455,20 +455,20 @@ contains
         call final_spheres(this%Box, this%type1_spheres, this%type1_units)
         call set_ewald(this%Box, this%type1_spheres, this%type1_macro, this%data_json, this%type1_units)
         type1_energy = total_energy(this%Box, this%type1_spheres, this%type1_macro)
-        !call test_consistency(this%type1_observables%potential_energy, type1_energy, &
-        !                      this%type1_units%report)
+        call test_consistency(this%type1_observables%potential_energy, type1_energy, &
+                              this%type1_report_json)
         
         call final_spheres(this%Box, this%type2_spheres, this%type2_units)
         type2_energy = total_energy(this%Box, this%type2_spheres, this%type2_macro)
-        !call test_consistency(this%type2_observables%potential_energy, type2_energy, &
-        !                      this%type2_units%report)
+        call test_consistency(this%type2_observables%potential_energy, type2_energy, &
+                              this%type2_report_json)
         
         call this%between_spheres%test_overlap(this%Box%size, &
                                                this%type1_spheres, this%type2_spheres)
         call final_between_spheres_potential(this%Box%size, this%between_spheres_potential, &
                                              this%type1_spheres, this%type2_spheres, &
                                              this%between_spheres_observables%potential_energy, &
-                                             this%between_spheres_units%report)
+                                             this%between_spheres_report_json)
         
         call this%write_all_results()
         call this%json_destroy_all_values()
