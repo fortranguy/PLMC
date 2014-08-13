@@ -52,22 +52,25 @@ private
         type(Dipolar_Hard_Spheres_Macro) :: type1_macro
         type(Dipolar_Hard_Spheres_Observables) :: type1_observables
         type(Dipolar_Hard_Spheres_Units) :: type1_units
+        type(json_value), pointer :: type1_report_json
         
         ! Type 2: Hard spheres
         type(Hard_Spheres) :: type2_spheres
         type(Hard_Spheres_Macro) :: type2_macro
         type(Hard_Spheres_Observables) :: type2_observables
         type(Hard_Spheres_Units) :: type2_units
+        type(json_value), pointer :: type2_report_json
         
         ! Between Spheres potential_energy
         type(Between_Hard_Spheres) :: between_spheres
         type(Between_Hard_Spheres_Potential_Energy) :: between_spheres_potential
         type(Between_Hard_Spheres_Observables) :: between_spheres_observables
         type(Between_Hard_Spheres_Units) :: between_spheres_units
+        type(json_value), pointer :: between_spheres_report_json
         
         ! Observables and files units
         real(DP) :: potential_energy, potential_energy_sum
-        type(json_value), pointer :: report_json
+        type(json_value), pointer :: report_json, system_json
         integer :: report_unit
         integer :: observables_thermalisation_unit, observables_equilibrium_unit
         
@@ -90,11 +93,14 @@ private
         !> Initialization & Finalisation
         procedure :: init => Physical_System_init
         procedure, private :: open_all_units => Physical_System_open_all_units
+        procedure, private :: open_units => Physical_System_open_units
+        procedure, private :: json_create_all_values => Physical_System_json_create_all_values
         procedure, private :: write_all_reports => Physical_System_write_all_reports
         procedure, private :: write_report => Physical_System_write_report
         procedure :: final => Physical_System_final
         procedure, private :: write_all_results => Physical_System_write_all_results
         procedure, private :: write_results => Physical_System_write_results
+        procedure, private :: json_destroy_all_values => Physical_System_json_destroy_all_values
         procedure, private :: close_units => Physical_System_close_units
         
         !> Accessors & Mutators
@@ -304,8 +310,7 @@ contains
         call print_geometry(args%geometry)
         
         call this%open_all_units()
-        call json_value_create(this%report_json)
-        call to_object(this%report_json)
+        call this%json_create_all_values()
         
         call init_random_seed(args%random, this%report_json)
         call set_initial_configuration(this%Box%size, args%initial, &
@@ -363,6 +368,17 @@ contains
     
         class(Physical_System), intent(inout) :: this
 
+        call this%open_units()
+        call this%type1_units%open(this%type1_spheres%get_name())
+        call this%type2_units%open(this%type2_spheres%get_name())
+        call this%between_spheres_units%open(this%between_spheres%get_name())
+    
+    end subroutine Physical_System_open_all_units
+
+    subroutine Physical_System_open_units(this)
+
+        class(Physical_System), intent(inout) :: this
+
         open(newunit=this%report_unit, recl=4096, file=report_filename, &
              status='new', action='write')
         open(newunit=this%observables_thermalisation_unit, recl=4096, &
@@ -370,14 +386,36 @@ contains
         open(newunit=this%observables_equilibrium_unit, recl=4096, &
              file="observables_equilibrium.out", status='new', action='write')
         write(this%observables_equilibrium_unit, *) "#", 1 ! 1 observable: energy
+
+    end subroutine Physical_System_open_units
+
+    subroutine Physical_System_json_create_all_values(this)
+
+        class(Physical_System), intent(inout) :: this
+
+        call json_value_create(this%report_json)
+        call to_object(this%report_json)
+
+        call json_value_create(this%system_json)
+        call to_object(this%system_json, "System")
+        call json_value_add(this%report_json, this%system_json)
+
+        call json_value_create(this%between_spheres_report_json)
+        call to_object(this%between_spheres_report_json, "Between Spheres")
+        call json_value_add(this%report_json, this%between_spheres_report_json)
+
+        call json_value_create(this%type1_report_json)
+        call to_object(this%type1_report_json, "Dipolar Hard Spheres")
+        call json_value_add(this%report_json, this%type1_report_json)
+
+        call json_value_create(this%type2_report_json)
+        call to_object(this%type2_report_json, "Hard Spheres")
+        call json_value_add(this%report_json, this%type2_report_json)
         
-        call this%type1_units%open(this%type1_spheres%get_name())
-        call this%type2_units%open(this%type2_spheres%get_name())
-        call this%between_spheres_units%open(this%between_spheres%get_name())
-    
-    end subroutine Physical_System_open_all_units
+    end subroutine Physical_System_json_create_all_values
     
     subroutine Physical_System_write_all_reports(this)
+    
         class(Physical_System), intent(in) :: this
         
         call this%write_report()
@@ -395,23 +433,16 @@ contains
     end subroutine Physical_System_write_all_reports
     
     subroutine Physical_System_write_report(this)
+    
         class(Physical_System), intent(in) :: this
 
-        type(json_value), pointer :: system_json
+        call json_value_add(this%system_json, "volume", product(this%Box%size))
+        call json_value_add(this%system_json, "number of wave vectors", num_wave_vectors(this%Box%wave))
+        call json_value_add(this%system_json, "number of particles", this%Box%num_particles)
 
-        call json_value_create(system_json)
-        call to_object(system_json, "System")
-        call json_value_add(this%report_json, system_json)
-
-        call json_value_add(system_json, "volume", product(this%Box%size))
-        call json_value_add(system_json, "number of wave vectors", num_wave_vectors(this%Box%wave))
-        call json_value_add(system_json, "number of particles", this%Box%num_particles)
-
-        call json_value_add(system_json, "number of moves", this%num_moves)
-        call json_value_add(system_json, "number of switches", this%num_switches)
-        call json_value_add(system_json, "number of rotations", this%num_rotations)
-
-        nullify(system_json)
+        call json_value_add(this%system_json, "number of moves", this%num_moves)
+        call json_value_add(this%system_json, "number of switches", this%num_switches)
+        call json_value_add(this%system_json, "number of rotations", this%num_rotations)
         
     end subroutine Physical_System_write_report
     
@@ -442,10 +473,8 @@ contains
                                              this%between_spheres_units%report)
         
         call this%write_all_results()
+        call this%json_destroy_all_values()
         call this%close_units()
-
-        call json_destroy(this%report_json)
-        call this%data_json%destroy()
     
     end subroutine Physical_System_final
     
@@ -492,8 +521,22 @@ contains
         call json_print(this%report_json, this%report_unit)
     
     end subroutine Physical_System_write_results
+
+    subroutine Physical_System_json_destroy_all_values(this)
+
+        class(Physical_System), intent(inout) :: this
+
+        nullify(this%type2_report_json)
+        nullify(this%type1_report_json)
+        nullify(this%between_spheres_report_json)
+        nullify(this%system_json)
+        
+        call json_destroy(this%report_json)
+    
+    end subroutine Physical_System_json_destroy_all_values
     
     subroutine Physical_System_close_units(this)
+    
         class(Physical_System), intent(inout) :: this
     
         call this%type1_units%close()
@@ -527,6 +570,8 @@ contains
         call this%type1_spheres%destroy()
         
         if (allocated(this%name)) deallocate(this%name)
+
+        call this%data_json%destroy()
     
     end subroutine Physical_System_destroy
     
