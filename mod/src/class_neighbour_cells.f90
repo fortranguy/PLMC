@@ -47,12 +47,12 @@ private
     
 contains
 
-    subroutine Neighbour_Cells_construct(this, Box_size, proposed_cell_size, range_cut)
+    subroutine Neighbour_Cells_construct(this, Box_size, proposed_cell_size, cutoff)
     
         class(Neighbour_Cells), intent(out) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         real(DP), dimension(:), intent(in) :: proposed_cell_size
-        real(DP), intent(in) :: range_cut
+        real(DP), intent(in) :: cutoff
         
         this%num_total_cell_dim(:) = floor(Box_size(:)/proposed_cell_size(:))
         this%num_total_cell = product(this%num_total_cell_dim)
@@ -60,7 +60,7 @@ contains
         
         allocate(this%near_among_total(num_near_cells, this%num_total_cell))
             
-        call this%check_CellsSize(Box_size, range_cut)
+        call this%check_CellsSize(Box_size, cutoff)
         call this%alloc_cells()
         call this%init_near_among_total()
     
@@ -151,20 +151,20 @@ contains
     
     ! Neighbour_Cells cells size check
     
-    subroutine Neighbour_Cells_check_cellsSize(this, Box_size, range_cut)
+    subroutine Neighbour_Cells_check_cellsSize(this, Box_size, cutoff)
     
         class(Neighbour_Cells), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
-        real(DP), intent(in) :: range_cut
+        real(DP), intent(in) :: cutoff
         
         integer :: i_dim
         real(DP) :: Box_size_mod_cell_size
         
         do i_dim = 1, num_dimensions
         
-            if (this%cell_size(i_dim) < range_cut) then
-                write(error_unit, *) "    range_cut too big in the dimension", i_dim, ": "
-                write(error_unit, *) "    ", this%cell_size(i_dim), "<", range_cut
+            if (this%cell_size(i_dim) < cutoff) then
+                write(error_unit, *) "    cutoff too big in the dimension", i_dim, ": "
+                write(error_unit, *) "    ", this%cell_size(i_dim), "<", cutoff
                 error stop
             end if
             

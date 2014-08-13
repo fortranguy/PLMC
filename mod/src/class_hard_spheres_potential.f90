@@ -18,14 +18,14 @@ private
     
         private
         real(DP) :: min_distance
-        real(DP) :: range_cut
+        real(DP) :: cutoff
         
     contains
     
         procedure :: construct => Hard_Spheres_Potential_Energy_construct
         procedure :: write => Hard_Spheres_Potential_Energy_write
         procedure :: get_min_distance => Hard_Spheres_Potential_Energy_get_min_distance
-        procedure :: get_range_cut => Hard_Spheres_Potential_Energy_get_range_cut
+        procedure :: get_cutoff => Hard_Spheres_Potential_Energy_get_cutoff
         
         procedure :: write_report => Hard_Spheres_Potential_Energy_write_report
         
@@ -63,7 +63,7 @@ contains
         call test_data_found(data_name, found)
         
         this%min_distance = min_distance_factor * diameter
-        this%range_cut = this%min_distance
+        this%cutoff = this%min_distance
         
     end subroutine Hard_Spheres_Potential_Energy_construct
     
@@ -72,7 +72,7 @@ contains
         class(Hard_Spheres_Potential_Energy), intent(in) :: this
         integer, intent(in) :: unit
 
-        write(unit, *) this%range_cut, this%pair(this%range_cut)
+        write(unit, *) this%cutoff, this%pair(this%cutoff)
     
     end subroutine Hard_Spheres_Potential_Energy_write
     
@@ -85,14 +85,14 @@ contains
         
     end function Hard_Spheres_Potential_Energy_get_min_distance
     
-    pure function Hard_Spheres_Potential_Energy_get_range_cut(this) result(get_range_cut)
+    pure function Hard_Spheres_Potential_Energy_get_cutoff(this) result(get_cutoff)
     
         class(Hard_Spheres_Potential_Energy), intent(in) :: this
-        real(DP) :: get_range_cut
+        real(DP) :: get_cutoff
         
-        get_range_cut = this%range_cut
+        get_cutoff = this%cutoff
         
-    end function Hard_Spheres_Potential_Energy_get_range_cut
+    end function Hard_Spheres_Potential_Energy_get_cutoff
     
     subroutine Hard_Spheres_Potential_Energy_write_report(this, report_json)
     
@@ -105,7 +105,7 @@ contains
         call to_object(potential_json, "Potential")
         call json_value_add(report_json, potential_json)
 
-        call json_value_add(potential_json, "cutoff", this%range_cut)
+        call json_value_add(potential_json, "cutoff", this%cutoff)
         
         nullify(potential_json)
         

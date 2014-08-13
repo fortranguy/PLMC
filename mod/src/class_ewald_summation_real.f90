@@ -15,11 +15,11 @@ private
     type, public :: Ewald_Summation_Real
     
         real(DP) :: min_distance
-        real(DP) :: range_cut
+        real(DP) :: cutoff
         real(DP) :: delta
         
         integer :: i_min_distance
-        integer :: i_range_cut
+        integer :: i_cutoff
         real(DP), dimension(:, :), allocatable :: tabulation
     
     contains
@@ -48,7 +48,7 @@ contains
         call this%set_parameters(Box_size, min_distance, data_json)
 
         if (allocated(this%tabulation)) deallocate(this%tabulation)
-        allocate(this%tabulation(this%i_min_distance:this%i_range_cut, 2))
+        allocate(this%tabulation(this%i_min_distance:this%i_cutoff, 2))
 
         call this%set_tabulation(alpha)
 
@@ -63,14 +63,14 @@ contains
         character(len=4096) :: data_name
         logical :: found
 
-        real(DP) :: range_cut_factor
+        real(DP) :: cutoff_factor
         
         this%min_distance = min_distance
 
-        data_name = "Potential Energy.Dipolar Hard Spheres.Ewald summation.real.range cut factor"
-        call data_json%get(data_name, range_cut_factor, found)
+        data_name = "Potential Energy.Dipolar Hard Spheres.Ewald summation.real.cut off factor"
+        call data_json%get(data_name, cutoff_factor, found)
         call test_data_found(data_name, found)
-        this%range_cut = range_cut_factor * Box_size(1)
+        this%cutoff = cutoff_factor * Box_size(1)
 
         data_name = "Potential Energy.Dipolar Hard Spheres.Ewald summation.real.delta"
         call data_json%get(data_name, this%delta, found)
@@ -78,7 +78,7 @@ contains
         call set_discrete_length(this%min_distance, this%delta)
         
         this%i_min_distance = int(this%min_distance/this%delta)
-        this%i_range_cut = int(this%range_cut/this%delta) + 1
+        this%i_cutoff = int(this%cutoff/this%delta) + 1
 
     end subroutine Ewald_Summation_Real_set_parameters
 
@@ -91,15 +91,15 @@ contains
         real(DP) :: distance_i
         
         ! cut
-        do i_distance = this%i_min_distance, this%i_range_cut
+        do i_distance = this%i_min_distance, this%i_cutoff
             distance_i = real(i_distance, DP)*this%delta
             this%tabulation(i_distance, 1) = ewald_real_B(alpha, distance_i)
             this%tabulation(i_distance, 2) = ewald_real_C(alpha, distance_i)
         end do
 
         ! shift
-        this%tabulation(:, 1) = this%tabulation(:, 1) - this%tabulation(this%i_range_cut, 1)
-        this%tabulation(:, 2) = this%tabulation(:, 2) - this%tabulation(this%i_range_cut, 2)
+        this%tabulation(:, 1) = this%tabulation(:, 1) - this%tabulation(this%i_cutoff, 1)
+        this%tabulation(:, 2) = this%tabulation(:, 2) - this%tabulation(this%i_cutoff, 2)
 
     end subroutine Ewald_Summation_Real_set_tabulation
 
@@ -117,7 +117,7 @@ contains
         integer :: i_distance
         real(DP) :: distance_i
 
-        do i_distance = this%i_min_distance, this%i_range_cut
+        do i_distance = this%i_min_distance, this%i_cutoff
             distance_i = real(i_distance, DP)*this%delta
             write(potential_energy_unit, *) distance_i, this%tabulation(i_distance, :)
         end do
@@ -206,7 +206,7 @@ contains
         integer :: i_distance
         real(DP) :: distance_i
 
-        if (distance < this%range_cut) then
+        if (distance < this%cutoff) then
             i_distance = int(distance/this%delta)
             distance_i = real(i_distance, DP)*this%delta
             interpolation(:) = this%tabulation(i_distance, :) + (distance-distance_i)/this%delta * &

@@ -287,14 +287,14 @@ contains
         
         real(DP), dimension(num_dimensions) :: same_cell_size, between_cell_size
         
-        same_cell_size(:) = this_macro%hard_potential%get_range_cut()
+        same_cell_size(:) = this_macro%hard_potential%get_cutoff()
         call this_macro%same_cells%construct(Box_size, same_cell_size, &
-                                             this_macro%hard_potential%get_range_cut())
+                                             this_macro%hard_potential%get_cutoff())
         call this_macro%same_cells%all_cols_to_cells(this_spheres%get_num_particles(), this_spheres)
         
-        between_cell_size = between_spheres_potential%get_range_cut()
+        between_cell_size = between_spheres_potential%get_cutoff()
         call this_macro%between_cells%construct(Box_size, between_cell_size, &
-                                                between_spheres_potential%get_range_cut())
+                                                between_spheres_potential%get_cutoff())
         call this_macro%between_cells%all_cols_to_cells(other_spheres%get_num_particles(), &
                                                         other_spheres)
 

@@ -25,7 +25,7 @@ implicit none
     
     integer :: i_step
     real(DP), dimension(:, :), allocatable :: all_positions, all_orientations
-    real(DP), parameter :: range_cut = 1.3_DP
+    real(DP), parameter :: cutoff = 1.3_DP
     
     real(DP) :: pair_energy
     real(DP), dimension(num_dimensions) :: vector_ij
@@ -103,7 +103,7 @@ implicit none
                 
                 vector_ij(:) = PBC_vector(Box_size, &
                                           all_positions(:, i_particle), all_positions(:, j_particle))
-                if (norm2(vector_ij) < range_cut) then
+                if (norm2(vector_ij) < cutoff) then
                     pair_energy = dipolar_pair_energy(all_orientations(:, i_particle), &
                                                       all_orientations(:, j_particle), &
                                                       vector_ij)
