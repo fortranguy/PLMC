@@ -3,10 +3,12 @@
 module class_hard_spheres
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit, error_unit
+use data_constants, only: PI
 use data_box, only: num_dimensions
-use json_module, only: json_file
+use json_module, only: json_file, json_value, json_value_create, to_object, json_value_add
 use data_write, only: simple_precision_format, double_precision_format
 use module_data, only: test_data_found, test_empty_string
+use module_types_micro, only: Box_Parameters
 use module_physics_micro, only: PBC_distance
 
 implicit none
@@ -353,13 +355,36 @@ contains
     
     !> Write a report of the component in a file
     
-    subroutine Hard_Spheres_write_report(this, report_unit)
+    subroutine Hard_Spheres_write_report(this, Box, report_json)
     
         class(Hard_Spheres), intent(in) :: this
-        integer, intent(in) :: report_unit
-        
-        write(report_unit, *) "Snap: "
-        write(report_unit, *) "    snap_factor = ", this%snap_factor
+        type(Box_Parameters), intent(in) :: Box
+        type(json_value), pointer, intent(inout) :: report_json
+
+        type(json_value), pointer :: properties_json, snap_json
+        real(DP) :: density, compacity, concentration
+
+        call json_value_create(properties_json)
+        call to_object(properties_json, "Properties")
+        call json_value_add(report_json, properties_json)
+
+        density = real(this%num_particles + 1, DP) / product(Box%size)
+            ! cheating ? cf. Widom
+        call json_value_add(properties_json, "density", density)
+        compacity = 4._DP/3._DP*PI*(this%diameter/2._DP)**3 * density
+        call json_value_add(properties_json, "compacity", compacity)
+        concentration = real(this%num_particles, DP) / real(Box%num_particles, DP)
+        call json_value_add(properties_json, "concentration", concentration)
+
+        nullify(properties_json)
+
+        call json_value_create(snap_json)
+        call to_object(snap_json, "Snap")
+        call json_value_add(report_json, snap_json)
+
+        call json_value_add(snap_json, "factor", this%snap_factor)
+
+        nullify(snap_json)
         
     end subroutine Hard_Spheres_write_report
     

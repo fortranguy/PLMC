@@ -23,7 +23,7 @@ use module_physics_macro, only: init_random_seed, set_initial_configuration, &
                                 init_between_spheres_potential, final_between_spheres_potential, &
                                 test_consistency
 use module_algorithms, only: move, widom, switch, rotate
-use module_write, only: write_results, between_spheres_write_results, write_spheres_density
+use module_write, only: write_results, between_spheres_write_results
 
 implicit none
 
@@ -420,12 +420,10 @@ contains
         
         call this%write_report()
         
-        call write_spheres_density(this%Box, this%type1_spheres, this%type1_units%report)
-        call this%type1_spheres%write_report(this%type1_units%report)
+        call this%type1_spheres%write_report(this%Box, this%type1_report_json)
         call this%type1_macro%hard_potential%write_report(this%type1_units%report)
         
-        call write_spheres_density(this%Box, this%type2_spheres, this%type2_units%report)
-        call this%type2_spheres%write_report(this%type2_units%report)
+        call this%type2_spheres%write_report(this%Box, this%type2_report_json)
         call this%type2_macro%hard_potential%write_report(this%type2_units%report)
         
         call this%between_spheres_potential%write_report(this%between_spheres_units%report)
@@ -436,7 +434,7 @@ contains
     
         class(Physical_System), intent(in) :: this
 
-        call json_value_add(this%system_json, "volume", product(this%Box%size))
+        call json_value_add(this%system_json, "volume of the box", product(this%Box%size))
         call json_value_add(this%system_json, "number of wave vectors", num_wave_vectors(this%Box%wave))
         call json_value_add(this%system_json, "number of particles", this%Box%num_particles)
 
