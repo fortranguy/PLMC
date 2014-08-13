@@ -21,7 +21,6 @@ implicit none
     real(DP) :: type1_density, type2_density
     integer :: type1_positions_unit, type2_positions_unit 
     
-    integer :: report_unit, distrib_unit
     integer :: num_distribution, i_distribution
     integer :: num_thermalisation_steps
     integer :: num_equilibrium_steps, i_step, num_common_steps    
@@ -37,6 +36,7 @@ implicit none
     logical :: found
     character(len=4096) :: filename
     integer :: length
+    integer :: report_unit, distrib_unit
     real(DP) :: time_start, time_end
 
     character(len=:), allocatable :: geometry
@@ -141,12 +141,7 @@ implicit none
     deallocate(type1_positions) 
     close(type1_positions_unit)
     
-    open(newunit=report_unit, file=trim(type1_name)//"-"//trim(type2_name)//"_distribution_report.txt", &
-         action="write")
-         write(report_unit, *) "Duration =", (time_end - time_start) / 60._DP, "min"
-    close(report_unit)
-    
-    open(newunit=distrib_unit, file=trim(type1_name)//"-"//trim(type2_name)//"_distribution_function.out", &
+    open(newunit=distrib_unit, file=trim(type1_name)//"-"//trim(type2_name)//"_radial_distribution_function.out", &
          action="write")
     
         distribution_function(:) = distribution_function(:) / real(num_common_steps, DP) / &
@@ -165,6 +160,11 @@ implicit none
         end do
         
     close(distrib_unit)
+
+    open(newunit=report_unit, file=trim(type1_name)//"-"//trim(type2_name)//"_radial_distribution_report.txt", &
+         action="write")
+         write(report_unit, *) "Duration =", (time_end - time_start) / 60._DP, "min"
+    close(report_unit)
     
     deallocate(distribution_function)
     deallocate(distribution_step)

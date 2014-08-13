@@ -4,6 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit, error_unit
 use data_box, only: num_dimensions
 use json_module, only: json_file, json_initialize
 use module_data, only: test_data_found
+use module_geometry, only: set_geometry
 use module_physics_micro, only: PBC_vector, dipolar_pair_energy
 use module_clusters, only: pairs_to_clusters
 use module_arguments, only: arg_to_file
@@ -14,14 +15,14 @@ implicit none
     real(DP), dimension(:), allocatable :: Box_size
     integer :: num_steps
 
-    character(len=5) :: name, name_bis
+    character(len=4096) :: name, name_bis
     integer :: num_particles, num_particles_bis
     integer :: i_particle, j_particle
     integer :: snap_factor, snap_factorBis
     integer :: positions_unit, orientations_unit
     
     character(len=4096) :: file
-    integer :: length 
+    integer :: length
     
     integer :: i_step
     real(DP), dimension(:, :), allocatable :: all_positions, all_orientations
@@ -38,9 +39,13 @@ implicit none
     real(DP), dimension(:), allocatable :: clusters_sizes_distribution
     integer :: clusters_distribution_unit
     
-    type(json_file) :: data_json
+    type(json_file) :: data_json, report_json
     character(len=4096) :: data_name
     logical :: found
+    integer :: report_unit
+    real(DP) :: time_start, time_end
+
+    character(len=:), allocatable :: geometry
     
     call json_initialize()
     call data_json%load_file(filename = "data.json")
@@ -50,6 +55,16 @@ implicit none
     call test_data_found(data_name, found)
     
     if (.not.take_snapshot) stop "No snap shots taken."
+
+    call report_json%load_file(filename = "report.json")
+
+    data_name = "System.Box.geometry"
+    call report_json%get(data_name, geometry, found)
+    call test_data_found(data_name, found)
+    call set_geometry(geometry)
+    if (allocated(geometry)) deallocate(geometry)
+
+    call report_json%destroy()
     
     data_name = "Box.size"
     call data_json%get(data_name, Box_size, found)
@@ -65,7 +80,7 @@ implicit none
     call arg_to_file(1, file, length)    
     open(newunit=positions_unit, recl=4096, file=file(1:length), status='old', action='read')    
     read(positions_unit, *) name, num_particles, snap_factor
-    write(output_unit, *) name, num_particles, snap_factor
+    write(output_unit, *) trim(name), num_particles, snap_factor
     allocate(all_positions(num_dimensions, num_particles))
     num_pairs = num_particles * (num_particles - 1) / 2
     allocate(clusters_sizes(num_pairs))
@@ -88,6 +103,7 @@ implicit none
     clusters_sizes(:) = 0
     
     write(output_unit, *) "Start !"
+    call cpu_time(time_start)
     do i_step = 1, num_steps/snap_factor
     
         do i_particle = 1, num_particles
@@ -125,16 +141,23 @@ implicit none
         end do
     
     end do
+    call cpu_time(time_end)
     write(output_unit, *) "Finish !"
     
     clusters_sizes_distribution(1:cluster_size_max) = clusters_sizes_distribution(1:cluster_size_max) / &
                                                      real(num_steps/snap_factor, DP)
     
-    open(newunit=clusters_distribution_unit, file="clusters_sizes_distribution.out", action="write")
+    open(newunit=clusters_distribution_unit, &
+         file=trim(name)//"_clusters_sizes_distribution_histogram.out", action="write")
     do cluster_size = 1, cluster_size_max
         write(clusters_distribution_unit, *) cluster_size, clusters_sizes_distribution(cluster_size)
     end do
     close(clusters_distribution_unit)
+
+    open(newunit=report_unit, file=trim(name)//"_clusters_sizes_distribution_report.txt", &
+         action="write")
+        write(report_unit, *) "Duration =", (time_end - time_start) / 60._DP, "min"
+    close(report_unit)
     
     deallocate(all_orientations)
     deallocate(clusters_sizes_distribution)

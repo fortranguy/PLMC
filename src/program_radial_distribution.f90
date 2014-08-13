@@ -35,7 +35,8 @@ implicit none
     character(len=4096) :: data_name
     logical :: found
     character(len=4096) :: filename
-    integer :: length, time_unit
+    integer :: length
+    integer :: report_unit
     real(DP) :: time_start, time_end
 
     character(len=:), allocatable :: geometry
@@ -126,7 +127,8 @@ implicit none
     close(positions_unit)
     deallocate(positions)
 
-    open(newunit=distrib_unit, file=trim(name)//"_distribution_function.out", action="write")
+    open(newunit=distrib_unit, file=trim(name)//"_radial_distribution_function.out", &
+         action="write")
     
         distribution_function(:) = 2._DP * distribution_function(:) / real(num_steps, DP) / &
                                    real(num_particles, DP)
@@ -145,9 +147,10 @@ implicit none
         
     close(distrib_unit)
     
-    open(newunit=time_unit, file=trim(name)//"_distribution_report.txt")
-        write(time_unit, *) "Duration =", (time_end - time_start) / 60._DP, "min"
-    close(time_unit)
+    open(newunit=report_unit, file=trim(name)//"_radial_distribution_report.txt", &
+         action="write")
+        write(report_unit, *) "Duration =", (time_end - time_start) / 60._DP, "min"
+    close(report_unit)
     
     deallocate(distribution_function)
     deallocate(distribution_step)
