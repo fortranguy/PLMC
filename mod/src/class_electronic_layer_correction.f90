@@ -694,13 +694,15 @@ contains
         real(DP), dimension(num_dimensions-1) :: wave_vector
         real(DP) :: wave_orientation_z, wave_dot_orientation
         integer :: kx, ky
+        real(DP) :: exchg_sign
         
         position_div_box(:) = 2._DP*PI * particle%position(1:2) / Box%size(1:2)
         call fourier_i(Box%wave(1), position_div_box(1), exp_Ikx_1)
         call fourier_i(Box%wave(2), position_div_box(2), exp_Ikx_2)
         call set_exp_kz(Box%wave, this%wave_norm, particle%position(3), exp_Ikz_tab)
         
-        orientation_div_box(:) = 2._DP*PI*exchange_sign(particle%add) * particle%orientation(1:2) / Box%size(1:2)
+        exchg_sign = exchange_sign(particle%add)
+        orientation_div_box(:) = 2._DP*PI*exchg_sign * particle%orientation(1:2) / Box%size(1:2)
         
         exchange = 0._DP
 
@@ -710,7 +712,7 @@ contains
             do kx = -Box_wave1_sym(Box%wave, ky, 0), Box%wave(1)
                 wave_vector(1) = real(kx, DP)
                 
-                wave_orientation_z = this%wave_norm(kx, ky) * particle%orientation(3)
+                wave_orientation_z = this%wave_norm(kx, ky) * exchg_sign * particle%orientation(3)
                 wave_dot_orientation = dot_product(wave_vector, orientation_div_box)
                                                 
                 exp_Ikx = exp_Ikx_1(kx) * exp_Ikx_2(ky)
@@ -770,13 +772,15 @@ contains
         real(DP), dimension(num_dimensions-1) :: wave_vector
         real(DP) :: wave_orientation_z, wave_dot_orientation
         integer :: kx, ky
+        real(DP) :: exchg_sign
 
         position_div_box(:) = 2._DP*PI * particle%position(1:2) / Box%size(1:2)
         call fourier_i(Box%wave(1), position_div_box(1), exp_Ikx_1)
         call fourier_i(Box%wave(2), position_div_box(2), exp_Ikx_2)
         call set_exp_kz(Box%wave, this%wave_norm, particle%position(3), exp_Ikz_tab)
-
-        orientation_div_box(:) = 2._DP*PI*exchange_sign(particle%add) * particle%orientation(1:2) / Box%size(1:2)
+        
+        exchg_sign = exchange_sign(particle%add)
+        orientation_div_box(:) = 2._DP*PI*exchg_sign * particle%orientation(1:2) / Box%size(1:2)
 
         do ky = 0, Box%wave(2)
 
@@ -786,7 +790,7 @@ contains
 
                 wave_vector(1) = real(kx, DP)
 
-                wave_orientation_z = this%wave_norm(kx, ky) * particle%orientation(3)
+                wave_orientation_z = this%wave_norm(kx, ky) * exchg_sign * particle%orientation(3)
                 wave_dot_orientation = dot_product(wave_vector, orientation_div_box)
                 
                 exp_Ikx = exp_Ikx_1(kx) * exp_Ikx_2(ky)
