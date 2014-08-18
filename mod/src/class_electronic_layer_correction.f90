@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: PI
 use data_box, only: num_dimensions
 use module_types_micro, only: Box_Parameters, Particle_Index
-use module_physics_micro, only: fourier_i, Box_wave1_sym, Box_wave2_sym, exchange_sign, set_exp_kz
+use module_physics_micro, only: fourier_i, Box_wave1_sym, exchange_sign, set_exp_kz
 use class_hard_spheres, only: Dipolar_Hard_Spheres
 
 implicit none
@@ -84,15 +84,15 @@ contains
         type(Box_Parameters), intent(in) :: Box
     
         integer :: kx, ky
-        real(DP), dimension(num_dimensions-1) :: waveVector
+        real(DP), dimension(num_dimensions-1) :: wave_vector
         
         do ky = -Box%wave(2), Box%wave(2)
-            waveVector(2) = real(ky, DP)
+            wave_vector(2) = real(ky, DP)
         
         do kx = -Box%wave(1), Box%wave(1)
-            waveVector(1) = real(kx, DP)
+            wave_vector(1) = real(kx, DP)
             
-            this%wave_norm(kx, ky) = 2._DP*PI * norm2(waveVector(:)/Box%size(1:num_dimensions-1))
+            this%wave_norm(kx, ky) = 2._DP*PI * norm2(wave_vector(:)/Box%size(1:num_dimensions-1))
             
         end do
         
@@ -118,7 +118,7 @@ contains
             if (kx**2 + ky**2 /= 0) then
 
                 this%weight(kx, ky) = 1._DP / this%wave_norm(kx, ky) / &
-                                               (exp(this%wave_norm(kx, ky)*Box%size(3)) - 1._DP)
+                                              (exp(this%wave_norm(kx, ky)*Box%size(3)) - 1._DP)
 
             else
 
@@ -157,7 +157,7 @@ contains
 
         real(DP), dimension(num_dimensions-1) :: xColOverL
         real(DP), dimension(num_dimensions-1) :: mColOverL
-        real(DP), dimension(num_dimensions-1) :: waveVector
+        real(DP), dimension(num_dimensions-1) :: wave_vector
         real(DP) :: k_dot_mCol, kMcol_z
         integer :: kx, ky
         integer :: iCol
@@ -175,16 +175,16 @@ contains
         
             do ky = -Box%wave(2), Box%wave(2)
 
-                waveVector(2) = real(ky, DP)
+                wave_vector(2) = real(ky, DP)
 
             do kx = -Box%wave(1), Box%wave(1)
 
-                waveVector(1) = real(kx, DP)
+                wave_vector(1) = real(kx, DP)
             
                 exp_IkxCol = exp_Ikx_1(kx) * exp_Ikx_2(ky)
                 exp_kzCol = exp(this%wave_norm(kx, ky) * this_spheres%get_position_z(iCol))
 
-                k_dot_mCol = dot_product(waveVector, mColOverL)
+                k_dot_mCol = dot_product(wave_vector, mColOverL)
                 kMcol_z = this%wave_norm(kx, ky) * this_spheres%get_orientation_z(iCol)
                           
                 this%structure_plus(kx, ky) = this%structure_plus(kx, ky) + &
@@ -355,7 +355,7 @@ contains
         
         real(DP) :: realPart1, realPart2
         
-        real(DP), dimension(num_dimensions-1) :: waveVector
+        real(DP), dimension(num_dimensions-1) :: wave_vector
         real(DP) :: k_dot_mCol, kMcol_z
         integer :: kx, ky
 
@@ -374,13 +374,13 @@ contains
         move = 0._DP
 
         do ky = 0, Box%wave(2)
-            waveVector(2) = real(ky, DP)
+            wave_vector(2) = real(ky, DP)
         
             do kx = -Box_wave1_sym(Box%wave, ky, 0), Box%wave(1)
-                waveVector(1) = real(kx, DP)
+                wave_vector(1) = real(kx, DP)
                 
                 kMcol_z = this%wave_norm(kx, ky) * mCol(3)
-                k_dot_mCol = dot_product(waveVector, mColOverL)
+                k_dot_mCol = dot_product(wave_vector, mColOverL)
                 
                 exp_IkxNew = exp_IkxNew_1(kx) * exp_IkxNew_2(ky)
                 exp_kzNew = exp_kzNew_tab(abs(kx), ky)
@@ -449,7 +449,7 @@ contains
         real(DP), dimension(0:Box%wave(1), 0:Box%wave(2)) :: exp_kzOld_tab
         real(DP) :: exp_kzOld
 
-        real(DP), dimension(num_dimensions-1) :: waveVector
+        real(DP), dimension(num_dimensions-1) :: wave_vector
         real(DP) :: k_dot_mCol, kMcol_z
         integer :: kx, ky
 
@@ -466,12 +466,12 @@ contains
         mColOverL(:) = 2._DP*PI * mCol(1:num_dimensions-1)/Box%size(1:num_dimensions-1)
 
         do ky = 0, Box%wave(2)
-            waveVector(2) = real(ky, DP)
+            wave_vector(2) = real(ky, DP)
 
             do kx = -Box_wave1_sym(Box%wave, ky, 0), Box%wave(1)
-                waveVector(1) = real(kx, DP)
+                wave_vector(1) = real(kx, DP)
 
-                k_dot_mCol = dot_product(waveVector, mColOverL)
+                k_dot_mCol = dot_product(wave_vector, mColOverL)
                 kMcol_z = this%wave_norm(kx, ky) * mCol(3)
 
                 exp_IkxNew = exp_IkxNew_1(kx) * exp_IkxNew_2(ky)
@@ -534,7 +534,7 @@ contains
         complex(DP) :: structure_i, delta_structure_i
         real(DP) :: realPart0, realPart1, realPart2
         
-        real(DP), dimension(num_dimensions-1) :: waveVector
+        real(DP), dimension(num_dimensions-1) :: wave_vector
         real(DP) :: kMnew_z, kMold_z
         real(DP) :: k_dot_mNew, k_dot_mOld
         integer :: kx, ky
@@ -550,16 +550,16 @@ contains
         rotation = 0._DP
 
         do ky = 0, Box%wave(2)
-            waveVector(2) = real(ky, DP)
+            wave_vector(2) = real(ky, DP)
         
             do kx = -Box_wave1_sym(Box%wave, ky, 0), Box%wave(1)
-                waveVector(1) = real(kx, DP)
+                wave_vector(1) = real(kx, DP)
 
                 kMnew_z = this%wave_norm(kx, ky) * mNew(3)
-                k_dot_mNew = dot_product(waveVector, mNewOverL)
+                k_dot_mNew = dot_product(wave_vector, mNewOverL)
                 
                 kMold_z = this%wave_norm(kx, ky) * mOld(3)
-                k_dot_mOld = dot_product(waveVector, mOldOverL)
+                k_dot_mOld = dot_product(wave_vector, mOldOverL)
 
                 exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky)
                 exp_kzCol = exp_kzCol_tab(abs(kx), ky)
@@ -625,7 +625,7 @@ contains
         real(DP), dimension(0:Box%wave(1), 0:Box%wave(2)) :: exp_kzCol_tab
         real(DP) :: exp_kzCol
 
-        real(DP), dimension(num_dimensions-1) :: waveVector
+        real(DP), dimension(num_dimensions-1) :: wave_vector
         real(DP) :: kdeltaMcol_z, k_dot_deltaMcol
         integer :: kx, ky
 
@@ -638,16 +638,16 @@ contains
         mOldOverL(:) = 2._DP*PI * mOld(1:num_dimensions-1)/Box%size(1:num_dimensions-1)
 
         do ky = 0, Box%wave(2)
-            waveVector(2) = real(ky, DP)
+            wave_vector(2) = real(ky, DP)
 
             do kx = -Box_wave1_sym(Box%wave, ky, 0), Box%wave(1)
-                waveVector(1) = real(kx, DP)
+                wave_vector(1) = real(kx, DP)
 
                 exp_kzCol = exp_kzCol_tab(abs(kx), ky)
                 exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky)
 
                 kdeltaMcol_z = this%wave_norm(kx, ky) * (mNew(3) - mOld(3))
-                k_dot_deltaMcol = dot_product(waveVector, mNewOverL - mOldOverL)
+                k_dot_deltaMcol = dot_product(wave_vector, mNewOverL - mOldOverL)
                 
                 this%structure_plus(kx, ky) = this%structure_plus(kx, ky) + &
                     cmplx(+kdeltaMcol_z, k_dot_deltaMcol, DP) * &
@@ -704,7 +704,7 @@ contains
         complex(DP) :: structure_i
         real(DP) :: realPart0, realPart1, realPart2
         
-        real(DP), dimension(num_dimensions-1) :: waveVector
+        real(DP), dimension(num_dimensions-1) :: wave_vector
         real(DP) :: kMcol_z, k_dot_mCol
         integer :: kx, ky
         
@@ -718,13 +718,13 @@ contains
         exchange = 0._DP
 
         do ky = 0, Box%wave(2)
-            waveVector(2) = real(ky, DP)
+            wave_vector(2) = real(ky, DP)
         
             do kx = -Box_wave1_sym(Box%wave, ky, 0), Box%wave(1)
-                waveVector(1) = real(kx, DP)
+                wave_vector(1) = real(kx, DP)
                 
                 kMcol_z = this%wave_norm(kx, ky) * mCol(3)
-                k_dot_mCol = dot_product(waveVector, mColOverL)
+                k_dot_mCol = dot_product(wave_vector, mColOverL)
                                                 
                 exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky)
                 exp_kzCol = exp_kzCol_tab(abs(kx), ky)
@@ -781,7 +781,7 @@ contains
         real(DP), dimension(0:Box%wave(1), 0:Box%wave(2)) :: exp_kzCol_tab
         real(DP) :: exp_kzCol
 
-        real(DP), dimension(num_dimensions-1) :: waveVector
+        real(DP), dimension(num_dimensions-1) :: wave_vector
         real(DP) :: kMcol_z, k_dot_mCol
         integer :: kx, ky
 
@@ -794,14 +794,14 @@ contains
 
         do ky = 0, Box%wave(2)
 
-            waveVector(2) = real(ky, DP)
+            wave_vector(2) = real(ky, DP)
 
             do kx = -Box_wave1_sym(Box%wave, ky, 0), Box%wave(1)
 
-                waveVector(1) = real(kx, DP)
+                wave_vector(1) = real(kx, DP)
 
                 kMcol_z = this%wave_norm(kx, ky) * mCol(3)
-                k_dot_mCol = dot_product(waveVector, mColOverL)
+                k_dot_mCol = dot_product(wave_vector, mColOverL)
                 
                 exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky)
                 exp_kzCol = exp_kzCol_tab(abs(kx), ky)
