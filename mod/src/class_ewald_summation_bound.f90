@@ -48,13 +48,13 @@ contains
         integer, intent(in) :: i_step
         integer, intent(in) :: modulus_unit
 
-        real(DP) :: modulus_drifted, modulus_reinit
+        real(DP) :: modulus_drifted, modulus_reset
 
         modulus_drifted = norm2(this%total_moment(:))
         call this%set_total_moment(this_spheres)
-        modulus_reinit = norm2(this%total_moment(:))
+        modulus_reset = norm2(this%total_moment(:))
 
-        write(modulus_unit, *) i_step, abs(modulus_reinit - modulus_drifted)
+        write(modulus_unit, *) i_step, abs(modulus_reset - modulus_drifted)
 
     end subroutine Ewald_Summation_Bound_reset_total_moment
     

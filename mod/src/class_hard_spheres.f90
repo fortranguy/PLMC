@@ -46,6 +46,8 @@ private
         procedure :: get_widom_num_particles => Hard_Spheres_get_widom_num_particles
         procedure :: get_diameter => Hard_Spheres_get_diameter
         procedure :: get_position => Hard_Spheres_get_position
+        procedure :: get_position_2d => Hard_Spheres_get_position_2d
+        procedure :: get_position_z => Hard_Spheres_get_position_z
         procedure :: set_position => Hard_Spheres_set_position
         
         procedure :: write_report => Hard_Spheres_write_report
@@ -73,6 +75,8 @@ private
         
         !> Accessor & Mutator
         procedure :: get_orientation => Dipolar_Hard_Spheres_get_orientation
+        procedure :: get_orientation_2d => Dipolar_Hard_Spheres_get_orientation_2d
+        procedure :: get_orientation_z => Dipolar_Hard_Spheres_get_orientation_z
         procedure :: set_orientation => Dipolar_Hard_Spheres_set_orientation
         
         procedure :: write_snap_orientations => Dipolar_Hard_Spheres_write_snap_orientations
@@ -314,6 +318,26 @@ contains
         
     end function Hard_Spheres_get_position
     
+    pure function Hard_Spheres_get_position_2d(this, i_particle) result(get_position_2d)
+    
+        class(Hard_Spheres), intent(in) :: this
+        integer, intent(in) :: i_particle
+        real(DP), dimension(num_dimensions-1) :: get_position_2d
+        
+        get_position_2d(:) = this%all_positions(1:num_dimensions-1, i_particle)
+        
+    end function Hard_Spheres_get_position_2d
+    
+    pure function Hard_Spheres_get_position_z(this, i_particle) result(get_position_z)
+    
+        class(Hard_Spheres), intent(in) :: this
+        integer, intent(in) :: i_particle
+        real(DP) :: get_position_z
+        
+        get_position_z = this%all_positions(num_dimensions, i_particle)
+        
+    end function Hard_Spheres_get_position_z
+    
     subroutine Hard_Spheres_set_position(this, i_particle, position)
     
         class(Hard_Spheres), intent(inout) :: this
@@ -333,6 +357,26 @@ contains
         get_orientation(:) = this%all_orientations(:, i_particle)
         
     end function Dipolar_Hard_Spheres_get_orientation
+    
+    pure function Dipolar_Hard_Spheres_get_orientation_2d(this, i_particle) result(get_orientation_2d)
+    
+        class(Dipolar_Hard_Spheres), intent(in) :: this
+        integer, intent(in) :: i_particle
+        real(DP), dimension(num_dimensions-1) :: get_orientation_2d
+        
+        get_orientation_2d(:) = this%all_orientations(1:num_dimensions-1, i_particle)
+        
+    end function Dipolar_Hard_Spheres_get_orientation_2d
+    
+    pure function Dipolar_Hard_Spheres_get_orientation_z(this, i_particle) result(get_orientation_z)
+    
+        class(Dipolar_Hard_Spheres), intent(in) :: this
+        integer, intent(in) :: i_particle
+        real(DP) :: get_orientation_z
+        
+        get_orientation_z = this%all_orientations(num_dimensions, i_particle)
+        
+    end function Dipolar_Hard_Spheres_get_orientation_z
     
     subroutine Dipolar_Hard_Spheres_set_orientation(this, i_particle, orientation)
     

@@ -180,13 +180,13 @@ contains
         integer, intent(in) :: i_step
         integer, intent(in) :: modulus_unit
 
-        real(DP) :: modulus_drifted, modulus_reinit
+        real(DP) :: modulus_drifted, modulus_reset
         
         modulus_drifted = this%get_structure_modulus(Box%wave)
         call this%set_structure(Box, this_spheres)
-        modulus_reinit = this%get_structure_modulus(Box%wave)
+        modulus_reset = this%get_structure_modulus(Box%wave)
         
-        write(modulus_unit, *) i_step, abs(modulus_reinit - modulus_drifted)
+        write(modulus_unit, *) i_step, abs(modulus_reset - modulus_drifted)
     
     end subroutine Ewald_Summation_Reci_reset_structure
 

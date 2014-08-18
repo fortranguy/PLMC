@@ -120,7 +120,7 @@ private
         procedure :: accumulate_observables => Physical_System_accumulate_observables
         procedure :: write_observables_equilibrium => Physical_System_write_observables_equilibrium
         procedure :: take_snapshots => Physical_System_take_snapshots
-        procedure :: reinitialize_quantites => Physical_System_reinitialize_quantites
+        procedure :: reset_quantites => Physical_System_reset_quantites
     
     end type Physical_System
     
@@ -806,8 +806,8 @@ contains
         
     end subroutine Physical_System_take_snapshots
     
-    !> Reinitialize summed quantities to prevent them from drifting.
-    subroutine Physical_System_reinitialize_quantites(this, i_step)
+    !> Reset summed quantities to prevent them from drifting.
+    subroutine Physical_System_reset_quantites(this, i_step)
     
         class(Physical_System), intent(inout) :: this
         integer, intent(in) :: i_step
@@ -819,6 +819,6 @@ contains
                  this%type1_units%total_moment_modulus)
         end if
         
-    end subroutine Physical_System_reinitialize_quantites
+    end subroutine Physical_System_reset_quantites
 
 end module class_physical_system

@@ -1,5 +1,3 @@
-!> \brief Description of the Electronic Layer Correction class
-
 module class_dipolarSpheres
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
@@ -25,27 +23,26 @@ private
     contains
     
         procedure :: construct => Electronic_Layer_Correction_construct
+        procedure, private :: set_wave_norm => Electronic_Layer_Correction_set_wave_norm
+        procedure, private :: set_weight => Electronic_Layer_Correction_set_weight
+        procedure, private :: set_structures => Electronic_Layer_Correction_set_structures
         procedure :: destroy => Electronic_Layer_Correction_destroy
-
-        !>     ELC: init
-        procedure, private :: init_wave_norm => Electronic_Layer_Correction_init_wave_norm
-        procedure, private :: init_weight => Electronic_Layer_Correction_init_weight
-        procedure, private :: init_structures => Electronic_Layer_Correction_init_structures
-        procedure, private :: init => Electronic_Layer_Correction_init
+        procedure :: reset_structures => Electronic_Layer_Correction_reset_structures
         procedure, private :: get_structures_modulus => &
                               Electronic_Layer_Correction_get_structures_modulus
-        procedure :: reInit_structures => Electronic_Layer_Correction_reInit_structures
-        procedure :: count_waveVectors => Electronic_Layer_Correction_count_waveVectors
+        procedure :: count_wave_vectors => Electronic_Layer_Correction_count_wave_vectors
+        procedure, private :: total => Electronic_Layer_Correction_total
+        
         !>     ELC: delta
-        procedure :: deltamove => Electronic_Layer_Correction_deltamove
+        procedure :: move => Electronic_Layer_Correction_move
         procedure :: update_structures_move => &
                      Electronic_Layer_Correction_update_structures_move
-        procedure :: deltarotate => Electronic_Layer_Correction_deltarotate
+        procedure :: rotation => Electronic_Layer_Correction_rotation
         procedure :: update_structures_rotate => &
                      Electronic_Layer_Correction_update_structures_rotate
-        procedure :: deltaexchange => Electronic_Layer_Correction_deltaexchange
+        procedure :: exchange => Electronic_Layer_Correction_exchange
         !>     ELC: total
-        procedure, private :: ELC => Electronic_Layer_Correction_ELC
+        
         
     end type Electronic_Layer_Correction
     
@@ -55,7 +52,6 @@ contains
         
         class(Electronic_Layer_Correction), intent(inout) :: this
         type(Box_Parameters), intent(in) :: Box
-        real(DP), intent(in) :: alpha
         type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
         
         if (allocated(this%wave_norm)) deallocate(this%wave_norm)
@@ -73,59 +69,54 @@ contains
         if (allocated(this%structure_minus)) deallocate(this%structure_minus)
         allocate(this%structure_minus(-Box%wave(1):Box%wave(1), &
                                       -Box%wave(2):Box%wave(2)))
+                                      
+        call this%set_wave_norm(Box)
+        call this%set_weight(Box)
+        call this%set_structures(Box, this_spheres)
     
     end subroutine Electronic_Layer_Correction_construct
     
-    subroutine Electronic_Layer_Correction_destroy(this)
+    pure subroutine Electronic_Layer_Correction_set_wave_norm(this, Box)
     
         class(Electronic_Layer_Correction), intent(inout) :: this
-        
-        if (allocated(this%wave_norm)) deallocate(this%wave_norm)
-        if (allocated(this%weight)) deallocate(this%weight)
-        if (allocated(this%structure_plus)) deallocate(this%structure_plus)
-        if (allocated(this%structure_minus)) deallocate(this%structure_minus)
-    
-    end subroutine Electronic_Layer_Correction_destroy
-    
-    pure subroutine Electronic_Layer_Correction_init_wave_norm(this)
-    
-        class(Electronic_Layer_Correction), intent(inout) :: this
+        type(Box_Parameters), intent(in) :: Box
     
         integer :: kx, ky
-        real(DP), dimension(Ndim-1) :: waveVector
+        real(DP), dimension(num_dimensions-1) :: waveVector
         
-        do ky = -Kmax(2), Kmax(2)
+        do ky = -Box%wave(2), Box%wave(2)
             waveVector(2) = real(ky, DP)
         
-        do kx = -Kmax(1), Kmax(1)
+        do kx = -Box%wave(1), Box%wave(1)
             waveVector(1) = real(kx, DP)
             
-            this%wave_norm(kx, ky) = 2._DP*PI * norm2(waveVector(:)/Lsize(1:Ndim-1))
+            this%wave_norm(kx, ky) = 2._DP*PI * norm2(waveVector(:)/Box%size(1:num_dimensions-1))
             
         end do
         
         end do
     
-    end subroutine Electronic_Layer_Correction_init_wave_norm
+    end subroutine Electronic_Layer_Correction_set_wave_norm
     
     !> \f[
     !>      w(\vec{k}^{2D}) = \frac{1}{k^{2D}(e^{k^{2D}L_z} - 1)}
     !> \f]
     
-    pure subroutine Electronic_Layer_Correction_init_weight(this)
+    pure subroutine Electronic_Layer_Correction_set_weight(this, Box)
         
         class(Electronic_Layer_Correction), intent(inout) :: this
+        type(Box_Parameters), intent(in) :: Box
         
         integer :: kx, ky
         
-        do ky = -Kmax(2), Kmax(2)
+        do ky = -Box%wave(2), Box%wave(2)
         
-        do kx = -Kmax(1), Kmax(1)
+        do kx = -Box%wave(1), Box%wave(1)
 
             if (kx**2 + ky**2 /= 0) then
 
                 this%weight(kx, ky) = 1._DP / this%wave_norm(kx, ky) / &
-                                               (exp(this%wave_norm(kx, ky)*Lsize(3)) - 1._DP)
+                                               (exp(this%wave_norm(kx, ky)*Box%size(3)) - 1._DP)
 
             else
 
@@ -137,32 +128,34 @@ contains
             
         end do
         
-    end subroutine Electronic_Layer_Correction_init_weight
+    end subroutine Electronic_Layer_Correction_set_weight
     
-    !> Structure factor init :
+    !> Structure factor set :
     !> \f[
     !>      S_+(\vec{k}) = \sum_{i} (+\mu_{z,i}k^{2D} + i\vec{\mu}^{2D}_i\cdot\vec{k}^{2D})
     !>                     e^{+i\vec{k}^{2D}\cdot\vec{x}^{2D}_i} e^{+k^{2D}z_i}
     !> \f]
-    !> We will also use a restricted definition later :
+    !> We will also use a restricted defsetion later :
     !> \f[
     !>      S_{+, \underline{l}}(\vec{k}) = \sum_{i \neq l}
     !>                                      (+\mu_{z,i}k^{2D} + i\vec{\mu}^{2D}_i\cdot\vec{k}^{2D})
     !>                                      e^{+i\vec{k}^{2D}\cdot\vec{x}^{2D}_i} e^{+k^{2D}z_i}
     !> \f].
 
-    pure subroutine Electronic_Layer_Correction_init_structures(this)
+    pure subroutine Electronic_Layer_Correction_set_structures(this, Box, this_spheres)
 
         class(Electronic_Layer_Correction), intent(inout) :: this
+        type(Box_Parameters), intent(in) :: Box
+        type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
 
         complex(DP) :: exp_IkxCol
-        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_Ikx_1
-        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_Ikx_2
+        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_1
+        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_2
         real(DP) :: exp_kzCol
 
-        real(DP), dimension(Ndim-1) :: xColOverL
-        real(DP), dimension(Ndim-1) :: mColOverL
-        real(DP), dimension(Ndim-1) :: waveVector
+        real(DP), dimension(num_dimensions-1) :: xColOverL
+        real(DP), dimension(num_dimensions-1) :: mColOverL
+        real(DP), dimension(num_dimensions-1) :: waveVector
         real(DP) :: k_dot_mCol, kMcol_z
         integer :: kx, ky
         integer :: iCol
@@ -170,27 +163,27 @@ contains
         this%structure_plus(:, :) = cmplx(0._DP, 0._DP, DP)
         this%structure_minus(:, :) = cmplx(0._DP, 0._DP, DP)
 
-        do iCol = 1, this%Ncol
+        do iCol = 1, this_spheres%get_num_particles()
         
-            xColOverL(:) = 2._DP*PI * this%positions(1:2, iCol)/Lsize(1:2)
-            call fourier_i(Kmax(1), xColOverL(1), exp_Ikx_1)
-            call fourier_i(Kmax(2), xColOverL(2), exp_Ikx_2)
+            xColOverL(:) = 2._DP*PI * this_spheres%get_position_2d(iCol)/Box%size(1:2)
+            call fourier_i(Box%wave(1), xColOverL(1), exp_Ikx_1)
+            call fourier_i(Box%wave(2), xColOverL(2), exp_Ikx_2)
             
-            mColOverL(:) = 2._DP*PI * this%orientations(1:2, iCol)/Lsize(1:2)
+            mColOverL(:) = 2._DP*PI * this_spheres%get_orientation_2d(iCol)/Box%size(1:2)
         
-            do ky = -Kmax(2), Kmax(2)
+            do ky = -Box%wave(2), Box%wave(2)
 
                 waveVector(2) = real(ky, DP)
 
-            do kx = -Kmax(1), Kmax(1)
+            do kx = -Box%wave(1), Box%wave(1)
 
                 waveVector(1) = real(kx, DP)
             
                 exp_IkxCol = exp_Ikx_1(kx) * exp_Ikx_2(ky)
-                exp_kzCol = exp(this%wave_norm(kx, ky) * this%positions(3, iCol))
+                exp_kzCol = exp(this%wave_norm(kx, ky) * this_spheres%get_position_z(iCol))
 
                 k_dot_mCol = dot_product(waveVector, mColOverL)
-                kMcol_z = this%wave_norm(kx, ky) * this%orientations(3, iCol)
+                kMcol_z = this%wave_norm(kx, ky) * this_spheres%get_orientation_z(iCol)
                           
                 this%structure_plus(kx, ky) = this%structure_plus(kx, ky) + &
                                               cmplx(+kMcol_z, k_dot_mCol, DP) * &
@@ -206,34 +199,54 @@ contains
             
         end do
 
-    end subroutine Electronic_Layer_Correction_init_structures
+    end subroutine Electronic_Layer_Correction_set_structures
     
-    !> Initialisation
-    
-    subroutine Electronic_Layer_Correction_init(this)
+    subroutine Electronic_Layer_Correction_destroy(this)
     
         class(Electronic_Layer_Correction), intent(inout) :: this
+        
+        if (allocated(this%wave_norm)) deallocate(this%wave_norm)
+        if (allocated(this%weight)) deallocate(this%weight)
+        if (allocated(this%structure_plus)) deallocate(this%structure_plus)
+        if (allocated(this%structure_minus)) deallocate(this%structure_minus)
     
-        call this%init_wave_norm()
-        call this%init_weight()
-        call this%init_structures()
+    end subroutine Electronic_Layer_Correction_destroy
     
-    end subroutine Electronic_Layer_Correction_init
+    !> Reset the structure factor and print the drift
+    
+    subroutine Electronic_Layer_Correction_reset_structures(this, Box, this_spheres, iStep, modulus_unit)
+    
+        class(Electronic_Layer_Correction), intent(inout) :: this
+        type(Box_Parameters), intent(in) :: Box
+        type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
+        integer, intent(in) :: iStep
+        integer, intent(in) :: modulus_unit
+
+        real(DP), dimension(2) :: modulus_drifted, modulus_reset
+        
+        modulus_drifted(:) = this%get_structures_modulus(Box%wave)
+        call this%set_structures(Box, this_spheres)
+        modulus_reset(:) = this%get_structures_modulus(Box%wave)
+        
+        write(modulus_unit, *) iStep, abs(modulus_reset(:) - modulus_drifted(:))
+    
+    end subroutine Electronic_Layer_Correction_reset_structures
     
     !> To calculate the drift of the structure factor
 
-    pure function Electronic_Layer_Correction_get_structures_modulus(this) &
+    pure function Electronic_Layer_Correction_get_structures_modulus(this, Box_wave) &
                   result(get_structures_modulus)
 
         class(Electronic_Layer_Correction), intent(in) :: this
+        integer, dimension(:), intent(in) :: Box_wave
         real(DP), dimension(2) :: get_structures_modulus
 
         integer :: kx, ky
 
         get_structures_modulus(:) = 0._DP
 
-        do ky = 0, Kmax(2)
-            do kx = -Kmax1_sym(ky, 0), Kmax(1)
+        do ky = 0, Box_wave(2)
+            do kx = -Box_wave1_sym(Box_wave, ky, 0), Box_wave(1)
                 get_structures_modulus(1) = get_structures_modulus(1) + &
                                                      abs(this%structure_plus(kx, ky))
                 get_structures_modulus(2) = get_structures_modulus(2) + &
@@ -243,41 +256,24 @@ contains
 
     end function Electronic_Layer_Correction_get_structures_modulus
     
-    !> Reinitialise the structure factor and print the drift
-    
-    subroutine Electronic_Layer_Correction_reInit_structures(this, iStep, modulus_unit)
-    
-        class(Electronic_Layer_Correction), intent(inout) :: this
-        integer, intent(in) :: iStep
-        integer, intent(in) :: modulus_unit
-
-        real(DP), dimension(2) :: modulus_drifted, modulus_reInit
-        
-        modulus_drifted(:) = this%get_structures_modulus()
-        call this%init_structures()
-        modulus_reInit(:) = this%get_structures_modulus()
-        
-        write(modulus_unit, *) iStep, abs(modulus_reInit(:) - modulus_drifted(:))
-    
-    end subroutine Electronic_Layer_Correction_reInit_structures
-    
     ! Count the number of wave vectors
 
-    subroutine Electronic_Layer_Correction_count_waveVectors(this, waveVectors_unit)
+    subroutine Electronic_Layer_Correction_count_wave_vectors(this, Box_wave, wave_vectors_unit)
 
         class(Electronic_Layer_Correction), intent(inout) :: this
-        integer, intent(in) :: waveVectors_unit
+        integer, dimension(:), intent(in) :: Box_wave
+        integer, intent(in) :: wave_vectors_unit
         
         integer :: kx, ky
 
         this%num_wave_vectors = 0
 
-        do ky = 0, Kmax(2)
-            do kx = -Kmax1_sym(ky, 0), Kmax(1)
+        do ky = 0, Box_wave(2)
+            do kx = -Box_wave1_sym(Box_wave, ky, 0), Box_wave(1)
                 if (kx**2 + ky**2 /= 0) then
-                    write(waveVectors_unit, *) kx, ky
-                    write(waveVectors_unit, *)
-                    write(waveVectors_unit, *)
+                    write(wave_vectors_unit, *) kx, ky
+                    write(wave_vectors_unit, *)
+                    write(wave_vectors_unit, *)
 
                     this%num_wave_vectors = this%num_wave_vectors + 1
 
@@ -285,7 +281,31 @@ contains
             end do
         end do
 
-    end subroutine Electronic_Layer_Correction_count_waveVectors
+    end subroutine Electronic_Layer_Correction_count_wave_vectors
+    
+    !> Total ELC energy
+    
+    pure function Electronic_Layer_Correction_total(this, Box) result(total)
+        
+        class(Electronic_Layer_Correction), intent(in) :: this
+        type(Box_Parameters), intent(in) :: Box
+        real(DP) :: total
+
+        complex(DP) :: structure_product
+        integer kx, ky
+
+        total = 0._DP
+
+        do ky = -Box%wave(2), Box%wave(2)
+            do kx = -Box%wave(1), Box%wave(1)
+                structure_product = this%structure_plus(kx, ky)*conjg(this%structure_minus(kx, ky))
+                total = total + this%weight(kx, ky) * 2._DP*real(structure_product, DP)
+            end do
+        end do
+        
+        total = PI/product(Box%size(1:2)) * total
+        
+    end function Electronic_Layer_Correction_total
     
     !> Move
 
@@ -306,55 +326,55 @@ contains
     !>               )
     !> \f]
 
-    pure function Electronic_Layer_Correction_deltamove(this, xOld, xNew, mCol) &
-                  result(deltamove)
+    pure function Electronic_Layer_Correction_move(this, Box, xOld, xNew, mCol) result(move)
 
         class(Electronic_Layer_Correction), intent(in) :: this
+        type(Box_Parameters), intent(in) :: Box
         real(DP), dimension(:), intent(in) :: xOld, xNew
         real(DP), dimension(:), intent(in) :: mCol
-        real(DP) :: deltamove
+        real(DP) :: move
 
-        real(DP), dimension(Ndim-1) :: xNewOverL, xOldOverL
-        real(DP), dimension(Ndim-1) :: mColOverL
+        real(DP), dimension(num_dimensions-1) :: xNewOverL, xOldOverL
+        real(DP), dimension(num_dimensions-1) :: mColOverL
 
-        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxNew_1
-        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxNew_2
+        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxNew_1
+        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxNew_2
         complex(DP) :: exp_IkxNew
-        real(DP), dimension(0:Kmax(1), 0:Kmax(2)) :: exp_kzNew_tab
+        real(DP), dimension(0:Box%wave(1), 0:Box%wave(2)) :: exp_kzNew_tab
         real(DP) :: exp_kzNew
 
-        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxOld_1
-        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxOld_2
+        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxOld_1
+        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxOld_2
         complex(DP) :: exp_IkxOld
-        real(DP), dimension(0:Kmax(1), 0:Kmax(2)) :: exp_kzOld_tab
+        real(DP), dimension(0:Box%wave(1), 0:Box%wave(2)) :: exp_kzOld_tab
         real(DP) :: exp_kzOld
 
         complex(DP) :: structure_i, delta_structure_i
         
         real(DP) :: realPart1, realPart2
         
-        real(DP), dimension(Ndim-1) :: waveVector
+        real(DP), dimension(num_dimensions-1) :: waveVector
         real(DP) :: k_dot_mCol, kMcol_z
         integer :: kx, ky
 
-        xNewOverL(:) = 2._DP*PI * xNew(1:Ndim-1)/Lsize(1:Ndim-1)
-        call fourier_i(Kmax(1), xNewOverL(1), exp_IkxNew_1)
-        call fourier_i(Kmax(2), xNewOverL(2), exp_IkxNew_2)
-        call set_exp_kz(this%wave_norm, xNew(3), exp_kzNew_tab)
+        xNewOverL(:) = 2._DP*PI * xNew(1:num_dimensions-1)/Box%size(1:num_dimensions-1)
+        call fourier_i(Box%wave(1), xNewOverL(1), exp_IkxNew_1)
+        call fourier_i(Box%wave(2), xNewOverL(2), exp_IkxNew_2)
+        call set_exp_kz(Box%wave, this%wave_norm, xNew(3), exp_kzNew_tab)
         
-        xOldOverL(:) = 2._DP*PI * xOld(1:Ndim-1)/Lsize(1:Ndim-1)
-        call fourier_i(Kmax(1), xOldOverL(1), exp_IkxOld_1)
-        call fourier_i(Kmax(2), xOldOverL(2), exp_IkxOld_2)
-        call set_exp_kz(this%wave_norm, xOld(3), exp_kzOld_tab)
+        xOldOverL(:) = 2._DP*PI * xOld(1:num_dimensions-1)/Box%size(1:num_dimensions-1)
+        call fourier_i(Box%wave(1), xOldOverL(1), exp_IkxOld_1)
+        call fourier_i(Box%wave(2), xOldOverL(2), exp_IkxOld_2)
+        call set_exp_kz(Box%wave, this%wave_norm, xOld(3), exp_kzOld_tab)
 
-        mColOverL(:) = 2._DP*PI * mCol(1:Ndim-1)/Lsize(1:Ndim-1)
+        mColOverL(:) = 2._DP*PI * mCol(1:num_dimensions-1)/Box%size(1:num_dimensions-1)
 
-        deltamove = 0._DP
+        move = 0._DP
 
-        do ky = 0, Kmax(2)
+        do ky = 0, Box%wave(2)
             waveVector(2) = real(ky, DP)
         
-            do kx = -Kmax1_sym(ky, 0), Kmax(1)
+            do kx = -Box_wave1_sym(Box%wave, ky, 0), Box%wave(1)
                 waveVector(1) = real(kx, DP)
                 
                 kMcol_z = this%wave_norm(kx, ky) * mCol(3)
@@ -387,16 +407,16 @@ contains
                             
                 !   Accumulation
                 
-                deltamove = deltamove + this%weight(kx, ky) * 2._DP * &
+                move = move + this%weight(kx, ky) * 2._DP * &
                                      (realPart1 + realPart2)
 
             end do
         
         end do
 
-        deltamove = 2._DP * PI/product(Lsize(1:2)) * deltamove
+        move = 2._DP * PI/product(Box%size(1:2)) * move
 
-    end function Electronic_Layer_Correction_deltamove
+    end function Electronic_Layer_Correction_move
 
     !> Update position -> update the ``structure factors''
     !>  \f[
@@ -405,47 +425,48 @@ contains
     !>                        e^{\pm k^{2D}z_l} e^{i(\vec{k}^{2D}\cdot\vec{x}^{2D}_l)})
     !>  \f]
 
-    pure subroutine Electronic_Layer_Correction_update_structures_move(this, xOld, xNew, mCol)
+    pure subroutine Electronic_Layer_Correction_update_structures_move(this, Box, xOld, xNew, mCol)
 
         class(Electronic_Layer_Correction), intent(inout) :: this
+        type(Box_Parameters), intent(in) :: Box
         real(DP), dimension(:), intent(in) :: xOld, xNew
         real(DP), dimension(:), intent(in) :: mCol
         
-        real(DP), dimension(Ndim-1) :: xNewOverL, xOldOverL
-        real(DP), dimension(Ndim-1) :: mColOverL
+        real(DP), dimension(num_dimensions-1) :: xNewOverL, xOldOverL
+        real(DP), dimension(num_dimensions-1) :: mColOverL
 
-        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxNew_1
-        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxNew_2
+        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxNew_1
+        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxNew_2
         complex(DP) :: exp_IkxNew
-        real(DP), dimension(0:Kmax(1), 0:Kmax(2)) :: exp_kzNew_tab
+        real(DP), dimension(0:Box%wave(1), 0:Box%wave(2)) :: exp_kzNew_tab
         real(DP) :: exp_kzNew
 
-        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxOld_1
-        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxOld_2
+        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxOld_1
+        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxOld_2
         complex(DP) :: exp_IkxOld
-        real(DP), dimension(0:Kmax(1), 0:Kmax(2)) :: exp_kzOld_tab
+        real(DP), dimension(0:Box%wave(1), 0:Box%wave(2)) :: exp_kzOld_tab
         real(DP) :: exp_kzOld
 
-        real(DP), dimension(Ndim-1) :: waveVector
+        real(DP), dimension(num_dimensions-1) :: waveVector
         real(DP) :: k_dot_mCol, kMcol_z
         integer :: kx, ky
 
-        xNewOverL(:) = 2._DP*PI * xNew(1:Ndim-1)/Lsize(1:Ndim-1)
-        call fourier_i(Kmax(1), xNewOverL(1), exp_IkxNew_1)
-        call fourier_i(Kmax(2), xNewOverL(2), exp_IkxNew_2)
-        call set_exp_kz(this%wave_norm, xNew(3), exp_kzNew_tab)
+        xNewOverL(:) = 2._DP*PI * xNew(1:num_dimensions-1)/Box%size(1:num_dimensions-1)
+        call fourier_i(Box%wave(1), xNewOverL(1), exp_IkxNew_1)
+        call fourier_i(Box%wave(2), xNewOverL(2), exp_IkxNew_2)
+        call set_exp_kz(Box%wave, this%wave_norm, xNew(3), exp_kzNew_tab)
         
-        xOldOverL(:) = 2._DP*PI * xOld(1:Ndim-1)/Lsize(1:Ndim-1)
-        call fourier_i(Kmax(1), xOldOverL(1), exp_IkxOld_1)
-        call fourier_i(Kmax(2), xOldOverL(2), exp_IkxOld_2)
-        call set_exp_kz(this%wave_norm, xOld(3), exp_kzOld_tab)
+        xOldOverL(:) = 2._DP*PI * xOld(1:num_dimensions-1)/Box%size(1:num_dimensions-1)
+        call fourier_i(Box%wave(1), xOldOverL(1), exp_IkxOld_1)
+        call fourier_i(Box%wave(2), xOldOverL(2), exp_IkxOld_2)
+        call set_exp_kz(Box%wave, this%wave_norm, xOld(3), exp_kzOld_tab)
 
-        mColOverL(:) = 2._DP*PI * mCol(1:Ndim-1)/Lsize(1:Ndim-1)
+        mColOverL(:) = 2._DP*PI * mCol(1:num_dimensions-1)/Box%size(1:num_dimensions-1)
 
-        do ky = 0, Kmax(2)
+        do ky = 0, Box%wave(2)
             waveVector(2) = real(ky, DP)
 
-            do kx = -Kmax1_sym(ky, 0), Kmax(1)
+            do kx = -Box_wave1_sym(Box%wave, ky, 0), Box%wave(1)
                 waveVector(1) = real(kx, DP)
 
                 k_dot_mCol = dot_product(waveVector, mColOverL)
@@ -491,45 +512,45 @@ contains
     !>               )
     !> \f]
     
-    pure function Electronic_Layer_Correction_deltarotate(this, xCol, mOld, mNew) &
-                  result(deltarotate)
+    pure function Electronic_Layer_Correction_rotation(this, Box, xCol, mOld, mNew) result(rotation)
 
         class(Electronic_Layer_Correction), intent(in) :: this
+        type(Box_Parameters), intent(in) :: Box
         real(DP), dimension(:), intent(in) :: xCol
         real(DP), dimension(:), intent(in) :: mOld, mNew
-        real(DP) :: deltarotate
+        real(DP) :: rotation
 
-        real(DP), dimension(Ndim-1) :: xColOverL
-        real(DP), dimension(Ndim-1) :: mNewOverL, mOldOverL
+        real(DP), dimension(num_dimensions-1) :: xColOverL
+        real(DP), dimension(num_dimensions-1) :: mNewOverL, mOldOverL
 
-        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxCol_1
-        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxCol_2
+        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxCol_1
+        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxCol_2
         complex(DP) :: exp_IkxCol
-        real(DP), dimension(0:Kmax(1), 0:Kmax(2)) :: exp_kzCol_tab
+        real(DP), dimension(0:Box%wave(1), 0:Box%wave(2)) :: exp_kzCol_tab
         real(DP) :: exp_kzCol
 
         complex(DP) :: structure_i, delta_structure_i
         real(DP) :: realPart0, realPart1, realPart2
         
-        real(DP), dimension(Ndim-1) :: waveVector
+        real(DP), dimension(num_dimensions-1) :: waveVector
         real(DP) :: kMnew_z, kMold_z
         real(DP) :: k_dot_mNew, k_dot_mOld
         integer :: kx, ky
 
-        xColOverL(:) = 2._DP*PI * xCol(1:2)/Lsize(1:2)
-        call fourier_i(Kmax(1), xColOverL(1), exp_IkxCol_1)
-        call fourier_i(Kmax(2), xColOverL(2), exp_IkxCol_2)
-        call set_exp_kz(this%wave_norm, xCol(3), exp_kzCol_tab)
+        xColOverL(:) = 2._DP*PI * xCol(1:2)/Box%size(1:2)
+        call fourier_i(Box%wave(1), xColOverL(1), exp_IkxCol_1)
+        call fourier_i(Box%wave(2), xColOverL(2), exp_IkxCol_2)
+        call set_exp_kz(Box%wave, this%wave_norm, xCol(3), exp_kzCol_tab)
 
-        mNewOverL(:) = 2._DP*PI * mNew(1:2)/Lsize(1:2)
-        mOldOverL(:) = 2._DP*PI * mOld(1:2)/Lsize(1:2)
+        mNewOverL(:) = 2._DP*PI * mNew(1:2)/Box%size(1:2)
+        mOldOverL(:) = 2._DP*PI * mOld(1:2)/Box%size(1:2)
 
-        deltarotate = 0._DP
+        rotation = 0._DP
 
-        do ky = 0, Kmax(2)
+        do ky = 0, Box%wave(2)
             waveVector(2) = real(ky, DP)
         
-            do kx = -Kmax1_sym(ky, 0), Kmax(1)
+            do kx = -Box_wave1_sym(Box%wave, ky, 0), Box%wave(1)
                 waveVector(1) = real(kx, DP)
 
                 kMnew_z = this%wave_norm(kx, ky) * mNew(3)
@@ -567,16 +588,16 @@ contains
                             
                 !   Accumulation
 
-                deltarotate = deltarotate + this%weight(kx, ky) * 2._DP * &
+                rotation = rotation + this%weight(kx, ky) * 2._DP * &
                                      (realPart0 + realPart1 + realPart2)
 
             end do
 
         end do
 
-        deltarotate = 2._DP * PI/product(Lsize(1:2)) * deltarotate
+        rotation = 2._DP * PI/product(Box%size(1:2)) * rotation
 
-    end function Electronic_Layer_Correction_deltarotate
+    end function Electronic_Layer_Correction_rotation
 
     !> Update moment -> update the ``structure factors''
     !>  \f[
@@ -586,37 +607,38 @@ contains
     !>                       e^{\pm k^{2D}z_l} e^{i(\vec{k}^{2D}\cdot\vec{x}^{2D}_l)}
     !>  \f]
 
-    pure subroutine Electronic_Layer_Correction_update_structures_rotate(this, xCol, mOld, mNew)
+    pure subroutine Electronic_Layer_Correction_update_structures_rotate(this, Box, xCol, mOld, mNew)
 
         class(Electronic_Layer_Correction), intent(inout) :: this
+        type(Box_Parameters), intent(in) :: Box
         real(DP), dimension(:), intent(in) :: xCol
         real(DP), dimension(:), intent(in) :: mOld, mNew
 
-        real(DP), dimension(Ndim-1) :: xColOverL
-        real(DP), dimension(Ndim-1) :: mNewOverL, mOldOverL
+        real(DP), dimension(num_dimensions-1) :: xColOverL
+        real(DP), dimension(num_dimensions-1) :: mNewOverL, mOldOverL
 
-        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxCol_1
-        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxCol_2
+        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxCol_1
+        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxCol_2
         complex(DP) :: exp_IkxCol
-        real(DP), dimension(0:Kmax(1), 0:Kmax(2)) :: exp_kzCol_tab
+        real(DP), dimension(0:Box%wave(1), 0:Box%wave(2)) :: exp_kzCol_tab
         real(DP) :: exp_kzCol
 
-        real(DP), dimension(Ndim-1) :: waveVector
+        real(DP), dimension(num_dimensions-1) :: waveVector
         real(DP) :: kdeltaMcol_z, k_dot_deltaMcol
         integer :: kx, ky
 
-        xColOverL(:) = 2._DP*PI * xCol(1:Ndim-1)/Lsize(1:Ndim-1)
-        call fourier_i(Kmax(1), xColOverL(1), exp_IkxCol_1)
-        call fourier_i(Kmax(2), xColOverL(2), exp_IkxCol_2)
-        call set_exp_kz(this%wave_norm, xCol(3), exp_kzCol_tab)
+        xColOverL(:) = 2._DP*PI * xCol(1:num_dimensions-1)/Box%size(1:num_dimensions-1)
+        call fourier_i(Box%wave(1), xColOverL(1), exp_IkxCol_1)
+        call fourier_i(Box%wave(2), xColOverL(2), exp_IkxCol_2)
+        call set_exp_kz(Box%wave, this%wave_norm, xCol(3), exp_kzCol_tab)
 
-        mNewOverL(:) = 2._DP*PI * mNew(1:Ndim-1)/Lsize(1:Ndim-1)
-        mOldOverL(:) = 2._DP*PI * mOld(1:Ndim-1)/Lsize(1:Ndim-1)
+        mNewOverL(:) = 2._DP*PI * mNew(1:num_dimensions-1)/Box%size(1:num_dimensions-1)
+        mOldOverL(:) = 2._DP*PI * mOld(1:num_dimensions-1)/Box%size(1:num_dimensions-1)
 
-        do ky = 0, Kmax(2)
+        do ky = 0, Box%wave(2)
             waveVector(2) = real(ky, DP)
 
-            do kx = -Kmax1_sym(ky, 0), Kmax(1)
+            do kx = -Box_wave1_sym(Box%wave, ky, 0), Box%wave(1)
                 waveVector(1) = real(kx, DP)
 
                 exp_kzCol = exp_kzCol_tab(abs(kx), ky)
@@ -660,43 +682,43 @@ contains
     
     !> Summary: only the sign of \f[\vec{\mu}\f] changes.
 
-    pure function Electronic_Layer_Correction_deltaexchange(this, xCol, mCol) &
-                  result(deltaexchange)
+    pure function Electronic_Layer_Correction_exchange(this, Box, xCol, mCol) result(exchange)
 
         class(Electronic_Layer_Correction), intent(in) :: this
+        type(Box_Parameters), intent(in) :: Box
         real(DP), dimension(:), intent(in) :: xCol
         real(DP), dimension(:), intent(in) :: mCol
-        real(DP) :: deltaexchange
+        real(DP) :: exchange
         
-        real(DP), dimension(Ndim-1) :: xColOverL
-        real(DP), dimension(Ndim-1) :: mColOverL
+        real(DP), dimension(num_dimensions-1) :: xColOverL
+        real(DP), dimension(num_dimensions-1) :: mColOverL
         
-        complex(DP), dimension(-Kmax(1):Kmax(1)) :: exp_IkxCol_1
-        complex(DP), dimension(-Kmax(2):Kmax(2)) :: exp_IkxCol_2
+        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxCol_1
+        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxCol_2
         complex(DP) :: exp_IkxCol
-        real(DP), dimension(0:Kmax(1), 0:Kmax(2)) :: exp_kzCol_tab
+        real(DP), dimension(0:Box%wave(1), 0:Box%wave(2)) :: exp_kzCol_tab
         real(DP) :: exp_kzCol
         
         complex(DP) :: structure_i
         real(DP) :: realPart0, realPart1, realPart2
         
-        real(DP), dimension(Ndim-1) :: waveVector
+        real(DP), dimension(num_dimensions-1) :: waveVector
         real(DP) :: kMcol_z, k_dot_mCol
         integer :: kx, ky
         
-        xColOverL(:) = 2._DP*PI * xCol(1:2)/Lsize(1:2)
-        call fourier_i(Kmax(1), xColOverL(1), exp_IkxCol_1)
-        call fourier_i(Kmax(2), xColOverL(2), exp_IkxCol_2)
-        call set_exp_kz(this%wave_norm, xCol(3), exp_kzCol_tab)
+        xColOverL(:) = 2._DP*PI * xCol(1:2)/Box%size(1:2)
+        call fourier_i(Box%wave(1), xColOverL(1), exp_IkxCol_1)
+        call fourier_i(Box%wave(2), xColOverL(2), exp_IkxCol_2)
+        call set_exp_kz(Box%wave, this%wave_norm, xCol(3), exp_kzCol_tab)
         
-        mColOverL(:) = 2._DP*PI * mCol(1:2)/Lsize(1:2)
+        mColOverL(:) = 2._DP*PI * mCol(1:2)/Box%size(1:2)
         
-        deltaexchange = 0._DP
+        exchange = 0._DP
 
-        do ky = 0, Kmax(2)
+        do ky = 0, Box%wave(2)
             waveVector(2) = real(ky, DP)
         
-            do kx = -Kmax1_sym(ky, 0), Kmax(1)
+            do kx = -Box_wave1_sym(Box%wave, ky, 0), Box%wave(1)
                 waveVector(1) = real(kx, DP)
                 
                 kMcol_z = this%wave_norm(kx, ky) * mCol(3)
@@ -721,38 +743,15 @@ contains
                 
                 !   Accumulation
 
-                deltaexchange = deltaexchange + this%weight(kx, ky) * &
+                exchange = exchange + this%weight(kx, ky) * &
                                          2._DP * (realPart0 + realPart1 + realPart2)
                 
             end do
         
         end do
 
-        deltaexchange = 2._DP * PI/product(Lsize(1:2)) * deltaexchange
+        exchange = 2._DP * PI/product(Box%size(1:2)) * exchange
 
-    end function Electronic_Layer_Correction_deltaexchange
-    
-    !> Total ELC energy
-    
-    pure function Electronic_Layer_Correction_ELC(this) result(ELC)
-        
-        class(Electronic_Layer_Correction), intent(in) :: this
-        real(DP) :: ELC
-
-        complex(DP) :: structure_product
-        integer kx, ky
-
-        ELC = 0._DP
-
-        do ky = -Kmax(2), Kmax(2)
-            do kx = -Kmax(1), Kmax(1)
-                structure_product = this%structure_plus(kx, ky)*conjg(this%structure_minus(kx, ky))
-                ELC = ELC + this%weight(kx, ky) * 2._DP*real(structure_product, DP)
-            end do
-        end do
-        
-        ELC = PI/product(Lsize(1:2)) * ELC
-        
-    end function Electronic_Layer_Correction_ELC
+    end function Electronic_Layer_Correction_exchange
 
 end module class_dipolarSpheres
