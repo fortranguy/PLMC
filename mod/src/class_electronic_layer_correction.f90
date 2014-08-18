@@ -41,6 +41,8 @@ private
         procedure :: update_structures_rotate => &
                      Electronic_Layer_Correction_update_structures_rotate
         procedure :: exchange => Electronic_Layer_Correction_exchange
+        procedure :: update_structures_exchange => &
+                     Electronic_Layer_Correction_update_structures_exchange
         !>     ELC: total
         
         
@@ -753,5 +755,69 @@ contains
         exchange = 2._DP * PI/product(Box%size(1:2)) * exchange
 
     end function Electronic_Layer_Correction_exchange
+    
+    !> Exchange a particle -> update the ``structure factor''
+    
+    !> Add particle
+    !>  \f[
+    !>      \Delta S_{\pm} = [\pm k^{2D}\mu_{N+1 ,z} + i(\vec{k}^{2D}\cdot\vec{\mu}^{2D}_{N+1})]
+    !>                       e^{\pm k^{2D}z_{N+1}} e^{i(\vec{k}^{2D}\cdot\vec{x}^{2D}_{N+1})}
+    !>  \f]
+    !>
+
+    pure subroutine Electronic_Layer_Correction_update_structures_exchange(this, Box, xCol, mCol)
+
+        class(Electronic_Layer_Correction), intent(inout) :: this
+        type(Box_Parameters), intent(in) :: Box
+        real(DP), dimension(:), intent(in) :: xCol
+        real(DP), dimension(:), intent(in) :: mCol
+        
+        real(DP), dimension(num_dimensions-1) :: xColOverL
+        real(DP), dimension(num_dimensions-1) :: mColOverL
+
+        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxCol_1
+        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxCol_2
+        complex(DP) :: exp_IkxCol
+        real(DP), dimension(0:Box%wave(1), 0:Box%wave(2)) :: exp_kzCol_tab
+        real(DP) :: exp_kzCol
+
+        real(DP), dimension(num_dimensions-1) :: waveVector
+        real(DP) :: kMcol_z, k_dot_mCol
+        integer :: kx, ky
+
+        xColOverL(:) = 2._DP*PI * xCol(1:2)/Box%size(1:2)
+        call fourier_i(Box%wave(1), xColOverL(1), exp_IkxCol_1)
+        call fourier_i(Box%wave(2), xColOverL(2), exp_IkxCol_2)
+        call set_exp_kz(Box%wave, this%wave_norm, xCol(3), exp_kzCol_tab)
+
+        mColOverL(:) = 2._DP*PI * mCol(1:2)/Box%size(1:2)
+
+        do ky = 0, Box%wave(2)
+
+            waveVector(2) = real(ky, DP)
+
+            do kx = -Box_wave1_sym(Box%wave, ky, 0), Box%wave(1)
+
+                waveVector(1) = real(kx, DP)
+
+                kMcol_z = this%wave_norm(kx, ky) * mCol(3)
+                k_dot_mCol = dot_product(waveVector, mColOverL)
+                
+                exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky)
+                exp_kzCol = exp_kzCol_tab(abs(kx), ky)
+                
+                this%structure_plus(kx, ky) = this%structure_plus(kx, ky) + &
+                                              cmplx(+kMcol_z, k_dot_mCol, DP) * &
+                                              exp_IkxCol * cmplx(exp_kzCol, 0._DP, DP)
+                
+                this%structure_minus(kx, ky) = this%structure_minus(kx, ky) + &
+                                               cmplx(-kMcol_z, k_dot_mCol, DP) * &
+                                               exp_IkxCol / cmplx(exp_kzCol, 0._DP, DP)
+
+            end do
+            
+        end do
+
+    end subroutine Electronic_Layer_Correction_update_structures_exchange
 
 end module class_dipolarSpheres
