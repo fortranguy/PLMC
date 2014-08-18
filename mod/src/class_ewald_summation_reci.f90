@@ -121,7 +121,8 @@ contains
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_2
         complex(DP), dimension(-Box%wave(3):Box%wave(3)) :: exp_Ikx_3
 
-        real(DP), dimension(num_dimensions) :: position_div_box, orientation_div_box
+        real(DP), dimension(num_dimensions) :: position_div_box
+        real(DP), dimension(num_dimensions) :: orientation_div_box
         real(DP), dimension(num_dimensions) :: wave_vector
         real(DP) :: wave_dot_orientation
         integer :: kx, ky, kz

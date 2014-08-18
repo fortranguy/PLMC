@@ -33,7 +33,6 @@ private
         procedure :: count_wave_vectors => Electronic_Layer_Correction_count_wave_vectors
         procedure, private :: total => Electronic_Layer_Correction_total
         
-        !>     ELC: delta
         procedure :: move => Electronic_Layer_Correction_move
         procedure :: update_structures_move => &
                      Electronic_Layer_Correction_update_structures_move
@@ -43,8 +42,6 @@ private
         procedure :: exchange => Electronic_Layer_Correction_exchange
         procedure :: update_structures_exchange => &
                      Electronic_Layer_Correction_update_structures_exchange
-        !>     ELC: total
-        
         
     end type Electronic_Layer_Correction
     
@@ -66,8 +63,7 @@ contains
                                 
         if (allocated(this%structure_plus)) deallocate(this%structure_plus)
         allocate(this%structure_plus(-Box%wave(1):Box%wave(1), &
-                                     -Box%wave(2):Box%wave(2)))
-                                     
+                                     -Box%wave(2):Box%wave(2)))                                     
         if (allocated(this%structure_minus)) deallocate(this%structure_minus)
         allocate(this%structure_minus(-Box%wave(1):Box%wave(1), &
                                       -Box%wave(2):Box%wave(2)))
@@ -116,14 +112,10 @@ contains
         do kx = -Box%wave(1), Box%wave(1)
 
             if (kx**2 + ky**2 /= 0) then
-
                 this%weight(kx, ky) = 1._DP / this%wave_norm(kx, ky) / &
                                               (exp(this%wave_norm(kx, ky)*Box%size(3)) - 1._DP)
-
             else
-
                 this%weight(kx, ky) = 0._DP
-
             end if
 
         end do
@@ -137,7 +129,7 @@ contains
     !>      S_+(\vec{k}) = \sum_{i} (+\mu_{z,i}k^{2D} + i\vec{\mu}^{2D}_i\cdot\vec{k}^{2D})
     !>                     e^{+i\vec{k}^{2D}\cdot\vec{x}^{2D}_i} e^{+k^{2D}z_i}
     !> \f]
-    !> We will also use a restricted defsetion later :
+    !> We will also use a restricted definition later :
     !> \f[
     !>      S_{+, \underline{l}}(\vec{k}) = \sum_{i \neq l}
     !>                                      (+\mu_{z,i}k^{2D} + i\vec{\mu}^{2D}_i\cdot\vec{k}^{2D})
@@ -150,50 +142,48 @@ contains
         type(Box_Parameters), intent(in) :: Box
         type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
 
-        complex(DP) :: exp_IkxCol
+        complex(DP) :: exp_Ikx
         complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_1
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_2
-        real(DP) :: exp_kzCol
+        real(DP) :: exp_Ikz
 
-        real(DP), dimension(num_dimensions-1) :: xColOverL
-        real(DP), dimension(num_dimensions-1) :: mColOverL
+        real(DP), dimension(num_dimensions-1) :: position_div_box
+        real(DP), dimension(num_dimensions-1) :: orientation_div_box
         real(DP), dimension(num_dimensions-1) :: wave_vector
-        real(DP) :: k_dot_mCol, kMcol_z
+        real(DP) :: wave_dot_orientation, wave_orientation_z
         integer :: kx, ky
-        integer :: iCol
+        integer :: i_particle
 
         this%structure_plus(:, :) = cmplx(0._DP, 0._DP, DP)
         this%structure_minus(:, :) = cmplx(0._DP, 0._DP, DP)
 
-        do iCol = 1, this_spheres%get_num_particles()
+        do i_particle = 1, this_spheres%get_num_particles()
         
-            xColOverL(:) = 2._DP*PI * this_spheres%get_position_2d(iCol)/Box%size(1:2)
-            call fourier_i(Box%wave(1), xColOverL(1), exp_Ikx_1)
-            call fourier_i(Box%wave(2), xColOverL(2), exp_Ikx_2)
+            position_div_box(:) = 2._DP*PI * this_spheres%get_position_2d(i_particle)/Box%size(1:2)
+            call fourier_i(Box%wave(1), position_div_box(1), exp_Ikx_1)
+            call fourier_i(Box%wave(2), position_div_box(2), exp_Ikx_2)
             
-            mColOverL(:) = 2._DP*PI * this_spheres%get_orientation_2d(iCol)/Box%size(1:2)
+            orientation_div_box(:) = 2._DP*PI * this_spheres%get_orientation_2d(i_particle)/Box%size(1:2)
         
             do ky = -Box%wave(2), Box%wave(2)
-
                 wave_vector(2) = real(ky, DP)
-
+                
             do kx = -Box%wave(1), Box%wave(1)
-
                 wave_vector(1) = real(kx, DP)
             
-                exp_IkxCol = exp_Ikx_1(kx) * exp_Ikx_2(ky)
-                exp_kzCol = exp(this%wave_norm(kx, ky) * this_spheres%get_position_z(iCol))
+                exp_Ikx = exp_Ikx_1(kx) * exp_Ikx_2(ky)
+                exp_Ikz = exp(this%wave_norm(kx, ky) * this_spheres%get_position_z(i_particle))
 
-                k_dot_mCol = dot_product(wave_vector, mColOverL)
-                kMcol_z = this%wave_norm(kx, ky) * this_spheres%get_orientation_z(iCol)
+                wave_dot_orientation = dot_product(wave_vector, orientation_div_box)
+                wave_orientation_z = this%wave_norm(kx, ky) * this_spheres%get_orientation_z(i_particle)
                           
                 this%structure_plus(kx, ky) = this%structure_plus(kx, ky) + &
-                                              cmplx(+kMcol_z, k_dot_mCol, DP) * &
-                                              exp_IkxCol * cmplx(exp_kzCol, 0._DP, DP)
+                                              cmplx(+wave_orientation_z, wave_dot_orientation, DP) * &
+                                              exp_Ikx * cmplx(exp_Ikz, 0._DP, DP)
 
                 this%structure_minus(kx, ky) = this%structure_minus(kx, ky) + &
-                                               cmplx(-kMcol_z, k_dot_mCol, DP) * &
-                                               exp_IkxCol / cmplx(exp_kzCol, 0._DP, DP)
+                                               cmplx(-wave_orientation_z, wave_dot_orientation, DP) * &
+                                               exp_Ikx / cmplx(exp_Ikz, 0._DP, DP)
             
             end do
             
@@ -216,12 +206,12 @@ contains
     
     !> Reset the structure factor and print the drift
     
-    subroutine Electronic_Layer_Correction_reset_structures(this, Box, this_spheres, iStep, modulus_unit)
+    subroutine Electronic_Layer_Correction_reset_structures(this, Box, this_spheres, i_step, modulus_unit)
     
         class(Electronic_Layer_Correction), intent(inout) :: this
         type(Box_Parameters), intent(in) :: Box
         type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
-        integer, intent(in) :: iStep
+        integer, intent(in) :: i_step
         integer, intent(in) :: modulus_unit
 
         real(DP), dimension(2) :: modulus_drifted, modulus_reset
@@ -230,7 +220,7 @@ contains
         call this%set_structures(Box, this_spheres)
         modulus_reset(:) = this%get_structures_modulus(Box%wave)
         
-        write(modulus_unit, *) iStep, abs(modulus_reset(:) - modulus_drifted(:))
+        write(modulus_unit, *) i_step, abs(modulus_reset(:) - modulus_drifted(:))
     
     end subroutine Electronic_Layer_Correction_reset_structures
     
@@ -260,11 +250,11 @@ contains
     
     ! Count the number of wave vectors
 
-    subroutine Electronic_Layer_Correction_count_wave_vectors(this, Box_wave, wave_vectors_unit)
+    subroutine Electronic_Layer_Correction_count_wave_vectors(this, Box_wave, wave_unit)
 
         class(Electronic_Layer_Correction), intent(inout) :: this
         integer, dimension(:), intent(in) :: Box_wave
-        integer, intent(in) :: wave_vectors_unit
+        integer, intent(in) :: wave_unit
         
         integer :: kx, ky
 
@@ -273,9 +263,10 @@ contains
         do ky = 0, Box_wave(2)
             do kx = -Box_wave1_sym(Box_wave, ky, 0), Box_wave(1)
                 if (kx**2 + ky**2 /= 0) then
-                    write(wave_vectors_unit, *) kx, ky
-                    write(wave_vectors_unit, *)
-                    write(wave_vectors_unit, *)
+
+                    write(wave_unit, *) kx, ky
+                    write(wave_unit, *)
+                    write(wave_unit, *)
 
                     this%num_wave_vectors = this%num_wave_vectors + 1
 
@@ -305,7 +296,7 @@ contains
             end do
         end do
         
-        total = PI/product(Box%size(1:2)) * total
+        total = PI / product(Box%size(1:2)) * total
         
     end function Electronic_Layer_Correction_total
     
@@ -337,7 +328,7 @@ contains
         real(DP) :: move
 
         real(DP), dimension(num_dimensions-1) :: xNewOverL, xOldOverL
-        real(DP), dimension(num_dimensions-1) :: mColOverL
+        real(DP), dimension(num_dimensions-1) :: orientation_div_box
 
         complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxNew_1
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxNew_2
@@ -356,7 +347,7 @@ contains
         real(DP) :: realPart1, realPart2
         
         real(DP), dimension(num_dimensions-1) :: wave_vector
-        real(DP) :: k_dot_mCol, kMcol_z
+        real(DP) :: wave_dot_orientation, wave_orientation_z
         integer :: kx, ky
 
         xNewOverL(:) = 2._DP*PI * xNew(1:num_dimensions-1)/Box%size(1:num_dimensions-1)
@@ -369,7 +360,7 @@ contains
         call fourier_i(Box%wave(2), xOldOverL(2), exp_IkxOld_2)
         call set_exp_kz(Box%wave, this%wave_norm, xOld(3), exp_kzOld_tab)
 
-        mColOverL(:) = 2._DP*PI * mCol(1:num_dimensions-1)/Box%size(1:num_dimensions-1)
+        orientation_div_box(:) = 2._DP*PI * mCol(1:num_dimensions-1)/Box%size(1:num_dimensions-1)
 
         move = 0._DP
 
@@ -379,8 +370,8 @@ contains
             do kx = -Box_wave1_sym(Box%wave, ky, 0), Box%wave(1)
                 wave_vector(1) = real(kx, DP)
                 
-                kMcol_z = this%wave_norm(kx, ky) * mCol(3)
-                k_dot_mCol = dot_product(wave_vector, mColOverL)
+                wave_orientation_z = this%wave_norm(kx, ky) * mCol(3)
+                wave_dot_orientation = dot_product(wave_vector, orientation_div_box)
                 
                 exp_IkxNew = exp_IkxNew_1(kx) * exp_IkxNew_2(ky)
                 exp_kzNew = exp_kzNew_tab(abs(kx), ky)
@@ -389,9 +380,9 @@ contains
 
                 ! S_{+,\underline{l}} (s_{-,l}^{\prime*} - s_{-,l}^*) +
 
-                structure_i = cmplx(+kMcol_z, k_dot_mCol, DP) * exp_IkxOld*cmplx(exp_kzOld, 0._DP, DP)
+                structure_i = cmplx(+wave_orientation_z, wave_dot_orientation, DP) * exp_IkxOld*cmplx(exp_kzOld, 0._DP, DP)
 
-                delta_structure_i = cmplx(-kMcol_z, k_dot_mCol, DP) * &
+                delta_structure_i = cmplx(-wave_orientation_z, wave_dot_orientation, DP) * &
                 (exp_IkxNew/cmplx(exp_kzNew, 0._DP, DP) - exp_IkxOld/cmplx(exp_kzOld, 0._DP, DP))
 
                 realPart1 = real((this%structure_plus(kx, ky) - structure_i) * &
@@ -399,9 +390,9 @@ contains
 
                 ! S_{-,\underline{l}}^* (s_{+,l}^{\prime} - s_{+,l})
                 
-                structure_i = cmplx(-kMcol_z, k_dot_mCol, DP) * exp_IkxOld/cmplx(exp_kzOld, 0._DP, DP)
+                structure_i = cmplx(-wave_orientation_z, wave_dot_orientation, DP) * exp_IkxOld/cmplx(exp_kzOld, 0._DP, DP)
 
-                delta_structure_i = cmplx(+kMcol_z, k_dot_mCol, DP) * &
+                delta_structure_i = cmplx(+wave_orientation_z, wave_dot_orientation, DP) * &
                 (exp_IkxNew*cmplx(exp_kzNew, 0._DP, DP) - exp_IkxOld*cmplx(exp_kzOld, 0._DP, DP))
 
                 realPart2 = real(conjg(this%structure_minus(kx, ky) - structure_i) * &
@@ -435,7 +426,7 @@ contains
         real(DP), dimension(:), intent(in) :: mCol
         
         real(DP), dimension(num_dimensions-1) :: xNewOverL, xOldOverL
-        real(DP), dimension(num_dimensions-1) :: mColOverL
+        real(DP), dimension(num_dimensions-1) :: orientation_div_box
 
         complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxNew_1
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxNew_2
@@ -450,7 +441,7 @@ contains
         real(DP) :: exp_kzOld
 
         real(DP), dimension(num_dimensions-1) :: wave_vector
-        real(DP) :: k_dot_mCol, kMcol_z
+        real(DP) :: wave_dot_orientation, wave_orientation_z
         integer :: kx, ky
 
         xNewOverL(:) = 2._DP*PI * xNew(1:num_dimensions-1)/Box%size(1:num_dimensions-1)
@@ -463,7 +454,7 @@ contains
         call fourier_i(Box%wave(2), xOldOverL(2), exp_IkxOld_2)
         call set_exp_kz(Box%wave, this%wave_norm, xOld(3), exp_kzOld_tab)
 
-        mColOverL(:) = 2._DP*PI * mCol(1:num_dimensions-1)/Box%size(1:num_dimensions-1)
+        orientation_div_box(:) = 2._DP*PI * mCol(1:num_dimensions-1)/Box%size(1:num_dimensions-1)
 
         do ky = 0, Box%wave(2)
             wave_vector(2) = real(ky, DP)
@@ -471,8 +462,8 @@ contains
             do kx = -Box_wave1_sym(Box%wave, ky, 0), Box%wave(1)
                 wave_vector(1) = real(kx, DP)
 
-                k_dot_mCol = dot_product(wave_vector, mColOverL)
-                kMcol_z = this%wave_norm(kx, ky) * mCol(3)
+                wave_dot_orientation = dot_product(wave_vector, orientation_div_box)
+                wave_orientation_z = this%wave_norm(kx, ky) * mCol(3)
 
                 exp_IkxNew = exp_IkxNew_1(kx) * exp_IkxNew_2(ky)
                 exp_kzNew = exp_kzNew_tab(abs(kx), ky)
@@ -481,11 +472,11 @@ contains
                 exp_kzOld = exp_kzOld_tab(abs(kx), ky)
                 
                 this%structure_plus(kx, ky) = this%structure_plus(kx, ky) + &
-                    cmplx(+kMcol_z, k_dot_mCol, DP) * &
+                    cmplx(+wave_orientation_z, wave_dot_orientation, DP) * &
                     (exp_IkxNew*cmplx(exp_kzNew, 0._DP, DP) - exp_IkxOld*cmplx(exp_kzOld, 0._DP, DP))
                                               
                 this%structure_minus(kx, ky) = this%structure_minus(kx, ky) + &
-                    cmplx(-kMcol_z, k_dot_mCol, DP) * &
+                    cmplx(-wave_orientation_z, wave_dot_orientation, DP) * &
                     (exp_IkxNew/cmplx(exp_kzNew, 0._DP, DP) - exp_IkxOld/cmplx(exp_kzOld, 0._DP, DP))
 
             end do
@@ -522,14 +513,14 @@ contains
         real(DP), dimension(:), intent(in) :: mOld, mNew
         real(DP) :: rotation
 
-        real(DP), dimension(num_dimensions-1) :: xColOverL
+        real(DP), dimension(num_dimensions-1) :: position_div_box
         real(DP), dimension(num_dimensions-1) :: mNewOverL, mOldOverL
 
-        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxCol_1
-        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxCol_2
-        complex(DP) :: exp_IkxCol
-        real(DP), dimension(0:Box%wave(1), 0:Box%wave(2)) :: exp_kzCol_tab
-        real(DP) :: exp_kzCol
+        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_1
+        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_2
+        complex(DP) :: exp_Ikx
+        real(DP), dimension(0:Box%wave(1), 0:Box%wave(2)) :: exp_Ikz_tab
+        real(DP) :: exp_Ikz
 
         complex(DP) :: structure_i, delta_structure_i
         real(DP) :: realPart0, realPart1, realPart2
@@ -539,10 +530,10 @@ contains
         real(DP) :: k_dot_mNew, k_dot_mOld
         integer :: kx, ky
 
-        xColOverL(:) = 2._DP*PI * xCol(1:2)/Box%size(1:2)
-        call fourier_i(Box%wave(1), xColOverL(1), exp_IkxCol_1)
-        call fourier_i(Box%wave(2), xColOverL(2), exp_IkxCol_2)
-        call set_exp_kz(Box%wave, this%wave_norm, xCol(3), exp_kzCol_tab)
+        position_div_box(:) = 2._DP*PI * xCol(1:2)/Box%size(1:2)
+        call fourier_i(Box%wave(1), position_div_box(1), exp_Ikx_1)
+        call fourier_i(Box%wave(2), position_div_box(2), exp_Ikx_2)
+        call set_exp_kz(Box%wave, this%wave_norm, xCol(3), exp_Ikz_tab)
 
         mNewOverL(:) = 2._DP*PI * mNew(1:2)/Box%size(1:2)
         mOldOverL(:) = 2._DP*PI * mOld(1:2)/Box%size(1:2)
@@ -561,8 +552,8 @@ contains
                 kMold_z = this%wave_norm(kx, ky) * mOld(3)
                 k_dot_mOld = dot_product(wave_vector, mOldOverL)
 
-                exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky)
-                exp_kzCol = exp_kzCol_tab(abs(kx), ky)
+                exp_Ikx = exp_Ikx_1(kx) * exp_Ikx_2(ky)
+                exp_Ikz = exp_Ikz_tab(abs(kx), ky)
                 
                 ! s_{+,l}^{\prime} s_{-,l}^{\prime*} - s_{+,l} s_{-,l}^*
                 
@@ -570,20 +561,20 @@ contains
 
                 ! S_{+,\underline{l}} (s_{-,l}^{\prime*} - s_{-,l}^*)
 
-                structure_i = cmplx(+kMold_z, k_dot_mOld, DP) * exp_IkxCol*cmplx(exp_kzCol, 0._DP, DP)
+                structure_i = cmplx(+kMold_z, k_dot_mOld, DP) * exp_Ikx*cmplx(exp_Ikz, 0._DP, DP)
 
                 delta_structure_i = cmplx(-kMnew_z, k_dot_mNew, DP) - cmplx(-kMold_z, k_dot_mOld, DP)
-                delta_structure_i = delta_structure_i * exp_IkxCol / cmplx(exp_kzCol, 0._DP, DP)
+                delta_structure_i = delta_structure_i * exp_Ikx / cmplx(exp_Ikz, 0._DP, DP)
 
                 realPart1 = real((this%structure_plus(kx, ky) - structure_i) * &
                             conjg(delta_structure_i), DP)
 
                 ! S_{-,\underline{l}}^* (s_{+,l}^{\prime} - s_{+,l})
                                  
-                structure_i = cmplx(-kMold_z, k_dot_mOld, DP) * exp_IkxCol / cmplx(exp_kzCol, 0._DP, DP)
+                structure_i = cmplx(-kMold_z, k_dot_mOld, DP) * exp_Ikx / cmplx(exp_Ikz, 0._DP, DP)
 
                 delta_structure_i = cmplx(+kMnew_z, k_dot_mNew, DP) - cmplx(+kMold_z, k_dot_mOld, DP)
-                delta_structure_i = delta_structure_i * exp_IkxCol * cmplx(exp_kzCol, 0._DP, DP)
+                delta_structure_i = delta_structure_i * exp_Ikx * cmplx(exp_Ikz, 0._DP, DP)
 
                 realPart2 = real(conjg(this%structure_minus(kx, ky) - structure_i) * &
                             delta_structure_i, DP)
@@ -616,23 +607,23 @@ contains
         real(DP), dimension(:), intent(in) :: xCol
         real(DP), dimension(:), intent(in) :: mOld, mNew
 
-        real(DP), dimension(num_dimensions-1) :: xColOverL
+        real(DP), dimension(num_dimensions-1) :: position_div_box
         real(DP), dimension(num_dimensions-1) :: mNewOverL, mOldOverL
 
-        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxCol_1
-        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxCol_2
-        complex(DP) :: exp_IkxCol
-        real(DP), dimension(0:Box%wave(1), 0:Box%wave(2)) :: exp_kzCol_tab
-        real(DP) :: exp_kzCol
+        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_1
+        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_2
+        complex(DP) :: exp_Ikx
+        real(DP), dimension(0:Box%wave(1), 0:Box%wave(2)) :: exp_Ikz_tab
+        real(DP) :: exp_Ikz
 
         real(DP), dimension(num_dimensions-1) :: wave_vector
         real(DP) :: kdeltaMcol_z, k_dot_deltaMcol
         integer :: kx, ky
 
-        xColOverL(:) = 2._DP*PI * xCol(1:num_dimensions-1)/Box%size(1:num_dimensions-1)
-        call fourier_i(Box%wave(1), xColOverL(1), exp_IkxCol_1)
-        call fourier_i(Box%wave(2), xColOverL(2), exp_IkxCol_2)
-        call set_exp_kz(Box%wave, this%wave_norm, xCol(3), exp_kzCol_tab)
+        position_div_box(:) = 2._DP*PI * xCol(1:num_dimensions-1)/Box%size(1:num_dimensions-1)
+        call fourier_i(Box%wave(1), position_div_box(1), exp_Ikx_1)
+        call fourier_i(Box%wave(2), position_div_box(2), exp_Ikx_2)
+        call set_exp_kz(Box%wave, this%wave_norm, xCol(3), exp_Ikz_tab)
 
         mNewOverL(:) = 2._DP*PI * mNew(1:num_dimensions-1)/Box%size(1:num_dimensions-1)
         mOldOverL(:) = 2._DP*PI * mOld(1:num_dimensions-1)/Box%size(1:num_dimensions-1)
@@ -643,19 +634,19 @@ contains
             do kx = -Box_wave1_sym(Box%wave, ky, 0), Box%wave(1)
                 wave_vector(1) = real(kx, DP)
 
-                exp_kzCol = exp_kzCol_tab(abs(kx), ky)
-                exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky)
+                exp_Ikz = exp_Ikz_tab(abs(kx), ky)
+                exp_Ikx = exp_Ikx_1(kx) * exp_Ikx_2(ky)
 
                 kdeltaMcol_z = this%wave_norm(kx, ky) * (mNew(3) - mOld(3))
                 k_dot_deltaMcol = dot_product(wave_vector, mNewOverL - mOldOverL)
                 
                 this%structure_plus(kx, ky) = this%structure_plus(kx, ky) + &
                     cmplx(+kdeltaMcol_z, k_dot_deltaMcol, DP) * &
-                    exp_IkxCol * cmplx(exp_kzCol, 0._DP, DP)
+                    exp_Ikx * cmplx(exp_Ikz, 0._DP, DP)
 
                 this%structure_minus(kx, ky) = this%structure_minus(kx, ky) + &
                     cmplx(-kdeltaMcol_z, k_dot_deltaMcol, DP) * &
-                    exp_IkxCol / cmplx(exp_kzCol, 0._DP, DP)
+                    exp_Ikx / cmplx(exp_Ikz, 0._DP, DP)
 
             end do
             
@@ -692,28 +683,28 @@ contains
         real(DP), dimension(:), intent(in) :: mCol
         real(DP) :: exchange
         
-        real(DP), dimension(num_dimensions-1) :: xColOverL
-        real(DP), dimension(num_dimensions-1) :: mColOverL
+        real(DP), dimension(num_dimensions-1) :: position_div_box
+        real(DP), dimension(num_dimensions-1) :: orientation_div_box
         
-        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxCol_1
-        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxCol_2
-        complex(DP) :: exp_IkxCol
-        real(DP), dimension(0:Box%wave(1), 0:Box%wave(2)) :: exp_kzCol_tab
-        real(DP) :: exp_kzCol
+        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_1
+        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_2
+        complex(DP) :: exp_Ikx
+        real(DP), dimension(0:Box%wave(1), 0:Box%wave(2)) :: exp_Ikz_tab
+        real(DP) :: exp_Ikz
         
         complex(DP) :: structure_i
         real(DP) :: realPart0, realPart1, realPart2
         
         real(DP), dimension(num_dimensions-1) :: wave_vector
-        real(DP) :: kMcol_z, k_dot_mCol
+        real(DP) :: wave_orientation_z, wave_dot_orientation
         integer :: kx, ky
         
-        xColOverL(:) = 2._DP*PI * xCol(1:2)/Box%size(1:2)
-        call fourier_i(Box%wave(1), xColOverL(1), exp_IkxCol_1)
-        call fourier_i(Box%wave(2), xColOverL(2), exp_IkxCol_2)
-        call set_exp_kz(Box%wave, this%wave_norm, xCol(3), exp_kzCol_tab)
+        position_div_box(:) = 2._DP*PI * xCol(1:2)/Box%size(1:2)
+        call fourier_i(Box%wave(1), position_div_box(1), exp_Ikx_1)
+        call fourier_i(Box%wave(2), position_div_box(2), exp_Ikx_2)
+        call set_exp_kz(Box%wave, this%wave_norm, xCol(3), exp_Ikz_tab)
         
-        mColOverL(:) = 2._DP*PI * mCol(1:2)/Box%size(1:2)
+        orientation_div_box(:) = 2._DP*PI * mCol(1:2)/Box%size(1:2)
         
         exchange = 0._DP
 
@@ -723,24 +714,24 @@ contains
             do kx = -Box_wave1_sym(Box%wave, ky, 0), Box%wave(1)
                 wave_vector(1) = real(kx, DP)
                 
-                kMcol_z = this%wave_norm(kx, ky) * mCol(3)
-                k_dot_mCol = dot_product(wave_vector, mColOverL)
+                wave_orientation_z = this%wave_norm(kx, ky) * mCol(3)
+                wave_dot_orientation = dot_product(wave_vector, orientation_div_box)
                                                 
-                exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky)
-                exp_kzCol = exp_kzCol_tab(abs(kx), ky)
+                exp_Ikx = exp_Ikx_1(kx) * exp_Ikx_2(ky)
+                exp_Ikz = exp_Ikz_tab(abs(kx), ky)
                 
                 ! s_{+, N+1} s_{-, N+1}^*
                 
-                realPart0 = -kMcol_z**2 + k_dot_mCol**2
+                realPart0 = -wave_orientation_z**2 + wave_dot_orientation**2
                 
                 ! S_+^N s_{-, N+1}^*
                 
-                structure_i = cmplx(-kMcol_z, k_dot_mCol, DP) * exp_IkxCol/cmplx(exp_kzCol, 0._DP, DP)
+                structure_i = cmplx(-wave_orientation_z, wave_dot_orientation, DP) * exp_Ikx/cmplx(exp_Ikz, 0._DP, DP)
                 realPart1 = real(this%structure_plus(kx, ky) * conjg(structure_i), DP)
                 
                 ! S_{-}^{N*} s_{+, N+1}
                 
-                structure_i = cmplx(kMcol_z, k_dot_mCol, DP) * exp_IkxCol*cmplx(exp_kzCol, 0._DP, DP)
+                structure_i = cmplx(wave_orientation_z, wave_dot_orientation, DP) * exp_Ikx*cmplx(exp_Ikz, 0._DP, DP)
                 realPart2 = real(conjg(this%structure_minus(kx, ky)) * structure_i, DP)
                 
                 !   Accumulation
@@ -772,25 +763,25 @@ contains
         real(DP), dimension(:), intent(in) :: xCol
         real(DP), dimension(:), intent(in) :: mCol
         
-        real(DP), dimension(num_dimensions-1) :: xColOverL
-        real(DP), dimension(num_dimensions-1) :: mColOverL
+        real(DP), dimension(num_dimensions-1) :: position_div_box
+        real(DP), dimension(num_dimensions-1) :: orientation_div_box
 
-        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxCol_1
-        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxCol_2
-        complex(DP) :: exp_IkxCol
-        real(DP), dimension(0:Box%wave(1), 0:Box%wave(2)) :: exp_kzCol_tab
-        real(DP) :: exp_kzCol
+        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_1
+        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_2
+        complex(DP) :: exp_Ikx
+        real(DP), dimension(0:Box%wave(1), 0:Box%wave(2)) :: exp_Ikz_tab
+        real(DP) :: exp_Ikz
 
         real(DP), dimension(num_dimensions-1) :: wave_vector
-        real(DP) :: kMcol_z, k_dot_mCol
+        real(DP) :: wave_orientation_z, wave_dot_orientation
         integer :: kx, ky
 
-        xColOverL(:) = 2._DP*PI * xCol(1:2)/Box%size(1:2)
-        call fourier_i(Box%wave(1), xColOverL(1), exp_IkxCol_1)
-        call fourier_i(Box%wave(2), xColOverL(2), exp_IkxCol_2)
-        call set_exp_kz(Box%wave, this%wave_norm, xCol(3), exp_kzCol_tab)
+        position_div_box(:) = 2._DP*PI * xCol(1:2)/Box%size(1:2)
+        call fourier_i(Box%wave(1), position_div_box(1), exp_Ikx_1)
+        call fourier_i(Box%wave(2), position_div_box(2), exp_Ikx_2)
+        call set_exp_kz(Box%wave, this%wave_norm, xCol(3), exp_Ikz_tab)
 
-        mColOverL(:) = 2._DP*PI * mCol(1:2)/Box%size(1:2)
+        orientation_div_box(:) = 2._DP*PI * mCol(1:2)/Box%size(1:2)
 
         do ky = 0, Box%wave(2)
 
@@ -800,19 +791,19 @@ contains
 
                 wave_vector(1) = real(kx, DP)
 
-                kMcol_z = this%wave_norm(kx, ky) * mCol(3)
-                k_dot_mCol = dot_product(wave_vector, mColOverL)
+                wave_orientation_z = this%wave_norm(kx, ky) * mCol(3)
+                wave_dot_orientation = dot_product(wave_vector, orientation_div_box)
                 
-                exp_IkxCol = exp_IkxCol_1(kx) * exp_IkxCol_2(ky)
-                exp_kzCol = exp_kzCol_tab(abs(kx), ky)
+                exp_Ikx = exp_Ikx_1(kx) * exp_Ikx_2(ky)
+                exp_Ikz = exp_Ikz_tab(abs(kx), ky)
                 
                 this%structure_plus(kx, ky) = this%structure_plus(kx, ky) + &
-                                              cmplx(+kMcol_z, k_dot_mCol, DP) * &
-                                              exp_IkxCol * cmplx(exp_kzCol, 0._DP, DP)
+                                              cmplx(+wave_orientation_z, wave_dot_orientation, DP) * &
+                                              exp_Ikx * cmplx(exp_Ikz, 0._DP, DP)
                 
                 this%structure_minus(kx, ky) = this%structure_minus(kx, ky) + &
-                                               cmplx(-kMcol_z, k_dot_mCol, DP) * &
-                                               exp_IkxCol / cmplx(exp_kzCol, 0._DP, DP)
+                                               cmplx(-wave_orientation_z, wave_dot_orientation, DP) * &
+                                               exp_Ikx / cmplx(exp_Ikz, 0._DP, DP)
 
             end do
             
