@@ -95,7 +95,7 @@ contains
                                 this_energy_delta = (this_energy_real_new - this_energy_real_old) + &
                                                     this_macro%ewald_reci%move(Box, old, new)
                                 if (geometry%slab) then
-                                    this_energy_delta = this_energy_delta + &
+                                    this_energy_delta = this_energy_delta - &
                                                         this_macro%elc%move(Box, old, new)
                                 end if
                         end select
@@ -226,7 +226,7 @@ contains
                                                        this_macro%ewald_bound%exchange(Box%size, &
                                                                                        test%orientation)
                                     if (geometry%slab) then
-                                        this_energy_test = this_energy_test + &
+                                        this_energy_test = this_energy_test - &
                                                            this_macro%elc%exchange(Box, test)
                                     end if
                                                     
@@ -444,7 +444,7 @@ contains
                                 energy_new%same = this_macro%ewald_real%solo(Box%size, this_spheres, new) + &
                                                   this_macro%ewald_reci%move(Box, old, new)
                                 if (geometry%slab) then
-                                    energy_new%same = energy_new%same + &
+                                    energy_new%same = energy_new%same - &
                                                       this_macro%elc%move(Box, old, new)
                                 end if 
                         end select
@@ -525,7 +525,7 @@ contains
                        energy_self_delta + this_macro%ewald_bound%rotation(Box%size, old%orientation, &
                                                                                      new%orientation)
         if (geometry%slab) then
-            energy_delta = energy_delta + this_macro%elc%rotation(Box, old, new)
+            energy_delta = energy_delta - this_macro%elc%rotation(Box, old, new)
         end if
         
         call random_number(random)

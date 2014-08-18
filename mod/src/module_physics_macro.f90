@@ -352,7 +352,7 @@ contains
                                        this_macro%ewald_self%total(this_spheres) + &
                                        this_macro%ewald_bound%total(Box%size)
                         if (geometry%slab) then
-                            total_energy = total_energy + this_macro%elc%total(Box)
+                            total_energy = total_energy - this_macro%elc%total(Box)
                         end if
                 end select
         end select
