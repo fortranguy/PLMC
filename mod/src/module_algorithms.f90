@@ -2,6 +2,7 @@ module module_algorithms
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_box, only: num_dimensions
+use module_geometry, only: geometry
 use module_types_micro, only: Box_Parameters, Particle_Index, Particle_Energy
 use module_physics_micro, only: random_surface, markov_surface
 use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres
@@ -92,7 +93,11 @@ contains
                                 this_energy_real_old = this_macro%ewald_real%solo(Box%size, &
                                                                                   this_spheres, old)
                                 this_energy_delta = (this_energy_real_new - this_energy_real_old) + &
-                                                  this_macro%ewald_reci%move(Box, old, new)
+                                                    this_macro%ewald_reci%move(Box, old, new)
+                                if (geometry%slab) then
+                                    this_energy_delta = this_energy_delta + &
+                                                        this_macro%elc%move(Box, old, new)
+                                end if
                         end select
                     class default
                         call this_macro%hard_potential%neighbours(Box%size, this_spheres, &
@@ -116,6 +121,9 @@ contains
                     select type (this_macro)
                         type is (Dipolar_Hard_Spheres_Macro)
                             call this_macro%ewald_reci%update_structure_move(Box, old, new)
+                            if (geometry%slab) then
+                                call this_macro%elc%update_structure_move(Box, old, new)
+                            end if
                     end select
                 
                     call this_spheres%set_position(old%number, new%position)
@@ -217,6 +225,10 @@ contains
                                                        this_macro%ewald_self%solo(test%orientation) + &
                                                        this_macro%ewald_bound%exchange(Box%size, &
                                                                                        test%orientation)
+                                    if (geometry%slab) then
+                                        this_energy_test = this_energy_test + &
+                                                           this_macro%elc%exchange(Box, test)
+                                    end if
                                                     
                             end select
                     end select
@@ -430,7 +442,11 @@ contains
                         select type (this_macro)
                             type is (Dipolar_Hard_Spheres_Macro)
                                 energy_new%same = this_macro%ewald_real%solo(Box%size, this_spheres, new) + &
-                                               this_macro%ewald_reci%move(Box, old, new)
+                                                  this_macro%ewald_reci%move(Box, old, new)
+                                if (geometry%slab) then
+                                    energy_new%same = energy_new%same + &
+                                                      this_macro%elc%move(Box, old, new)
+                                end if 
                         end select
                                        
                 end select
@@ -456,6 +472,9 @@ contains
         select type (this_macro)
             type is (Dipolar_Hard_Spheres_Macro)
                 call this_macro%ewald_reci%update_structure_move(Box, old, new)
+                if (geometry%slab) then
+                    call this_macro%elc%update_structure_move(Box, old, new)
+                end if
         end select
         
         if (old%same_i_cell /= new%same_i_cell) then
@@ -505,6 +524,9 @@ contains
         energy_delta = energy_real_delta + this_macro%ewald_reci%rotation(Box, old, new) - &
                        energy_self_delta + this_macro%ewald_bound%rotation(Box%size, old%orientation, &
                                                                                      new%orientation)
+        if (geometry%slab) then
+            energy_delta = energy_delta + this_macro%elc%rotation(Box, old, new)
+        end if
         
         call random_number(random)
         if (random < exp(-energy_delta/Box%temperature)) then
@@ -512,6 +534,9 @@ contains
             call this_macro%ewald_reci%update_structure_rotation(Box, old, new)
             call this_macro%ewald_bound%update_total_moment_rotation(old%orientation, new%orientation)
             call this_spheres%set_orientation(old%number, new%orientation)
+            if (geometry%slab) then
+                call this_macro%elc%update_structure_rotation(Box, old, new)
+            end if
             
             this_observables%potential_energy = this_observables%potential_energy + energy_delta
             

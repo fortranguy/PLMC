@@ -2,6 +2,8 @@
 
 module class_hard_spheres_units
 
+use module_geometry, only: geometry
+
 implicit none
 private
 
@@ -35,7 +37,9 @@ private
         integer :: potential_energy_real
 
         integer :: wave_vectors
+        integer :: ELC_wave_vectors
         integer :: structure_modulus
+        integer :: ELC_structure_modulus
         
         integer :: total_moment_modulus
     
@@ -100,6 +104,12 @@ contains
                      status='new', action='write')
                 open(newunit=this%wave_vectors, recl=4096, file=name//"_wave_vectors.tmp", &
                      status='new', action='write')
+                if (geometry%slab) then
+                    open(newunit=this%ELC_structure_modulus, recl=4096, &
+                         file=name//"_ELC_structure_modulus.out", status='new', action='write')
+                    open(newunit=this%ELC_wave_vectors, recl=4096, file=name//"_ELC_wave_vectors.tmp", &
+                        status='new', action='write')
+                end if
                      
                 open(newunit=this%total_moment_modulus, recl=4096, &
                      file=name//"_total_moment_modulus.out", status='new', action='write')
@@ -156,9 +166,13 @@ contains
                 close(this%snap_equilibrium_orientations)
                 
                 close(this%potential_energy_real)
-
-                close(this%wave_vectors)
+                
                 close(this%structure_modulus)
+                close(this%wave_vectors)
+                if (geometry%slab) then
+                    close(this%ELC_structure_modulus)
+                    close(this%ELC_wave_vectors)
+                end if
                 
                 close(this%total_moment_modulus)
                 

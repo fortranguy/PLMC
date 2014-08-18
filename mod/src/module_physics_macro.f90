@@ -7,6 +7,7 @@ use data_precisions, only: real_zero, io_tiny, consistency_tiny
 use data_box, only: num_dimensions
 use json_module, only: json_file, json_value, json_value_create, to_object, json_value_add
 use module_data, only: test_data_found
+use module_geometry, only: geometry
 use module_types_micro, only: Box_Parameters, Argument_Random, Argument_Initial
 use module_physics_micro, only: PBC_distance, random_surface
 use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres
@@ -325,6 +326,10 @@ contains
         call this_macro%ewald_reci%count_wave_vectors(Box%wave, this_units%wave_vectors)
         call this_macro%ewald_self%set_alpha(alpha)
         call this_macro%ewald_bound%set_total_moment(this_spheres)
+        if (geometry%slab) then
+            call this_macro%elc%construct(Box, this_spheres)
+            call this_macro%elc%count_wave_vectors(Box%wave, this_units%ELC_wave_vectors)
+        end if
     
     end subroutine set_ewald
     
@@ -346,6 +351,9 @@ contains
                                        this_macro%ewald_reci%total(Box) - &
                                        this_macro%ewald_self%total(this_spheres) + &
                                        this_macro%ewald_bound%total(Box%size)
+                        if (geometry%slab) then
+                            total_energy = total_energy + this_macro%elc%total(Box)
+                        end if
                 end select
         end select
         

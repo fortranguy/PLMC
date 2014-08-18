@@ -10,6 +10,7 @@ use class_ewald_summation_real, only: Ewald_Summation_Real
 use class_ewald_summation_reci, only: Ewald_Summation_Reci
 use class_ewald_summation_self, only: Ewald_Summation_Self
 use class_ewald_summation_bound, only: Ewald_Summation_Bound
+use class_electronic_layer_correction, only: Electronic_Layer_Correction
 
 implicit none
 
@@ -25,6 +26,7 @@ implicit none
         type(Ewald_Summation_Reci) :: ewald_reci
         type(Ewald_Summation_Self) :: ewald_self
         type(Ewald_Summation_Bound) :: ewald_bound
+        type(Electronic_Layer_Correction) :: elc
     end type Dipolar_Hard_Spheres_Macro
 
 end module module_types_macro

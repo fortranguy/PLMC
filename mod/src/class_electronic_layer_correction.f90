@@ -1,4 +1,4 @@
-module class_dipolarSpheres
+module class_electronic_layer_correction
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: PI
@@ -25,23 +25,23 @@ private
         procedure :: construct => Electronic_Layer_Correction_construct
         procedure, private :: set_wave_norm => Electronic_Layer_Correction_set_wave_norm
         procedure, private :: set_weight => Electronic_Layer_Correction_set_weight
-        procedure, private :: set_structures => Electronic_Layer_Correction_set_structures
+        procedure, private :: set_structure => Electronic_Layer_Correction_set_structure
         procedure :: destroy => Electronic_Layer_Correction_destroy
-        procedure :: reset_structures => Electronic_Layer_Correction_reset_structures
-        procedure, private :: get_structures_modulus => &
-                              Electronic_Layer_Correction_get_structures_modulus
+        procedure :: reset_structure => Electronic_Layer_Correction_reset_structure
+        procedure, private :: get_structure_modulus => &
+                              Electronic_Layer_Correction_get_structure_modulus
         procedure :: count_wave_vectors => Electronic_Layer_Correction_count_wave_vectors
-        procedure, private :: total => Electronic_Layer_Correction_total
+        procedure :: total => Electronic_Layer_Correction_total
         
         procedure :: move => Electronic_Layer_Correction_move
-        procedure :: update_structures_move => &
-                     Electronic_Layer_Correction_update_structures_move
+        procedure :: update_structure_move => &
+                     Electronic_Layer_Correction_update_structure_move
         procedure :: rotation => Electronic_Layer_Correction_rotation
-        procedure :: update_structures_rotate => &
-                     Electronic_Layer_Correction_update_structures_rotate
+        procedure :: update_structure_rotation => &
+                     Electronic_Layer_Correction_update_structure_rotation
         procedure :: exchange => Electronic_Layer_Correction_exchange
-        procedure :: update_structures_exchange => &
-                     Electronic_Layer_Correction_update_structures_exchange
+        procedure :: update_structure_exchange => &
+                     Electronic_Layer_Correction_update_structure_exchange
         
     end type Electronic_Layer_Correction
     
@@ -70,7 +70,7 @@ contains
                                       
         call this%set_wave_norm(Box)
         call this%set_weight(Box)
-        call this%set_structures(Box, this_spheres)
+        call this%set_structure(Box, this_spheres)
     
     end subroutine Electronic_Layer_Correction_construct
     
@@ -136,7 +136,7 @@ contains
     !>                                      e^{+i\vec{k}^{2D}\cdot\vec{x}^{2D}_i} e^{+k^{2D}z_i}
     !> \f].
 
-    pure subroutine Electronic_Layer_Correction_set_structures(this, Box, this_spheres)
+    pure subroutine Electronic_Layer_Correction_set_structure(this, Box, this_spheres)
 
         class(Electronic_Layer_Correction), intent(inout) :: this
         type(Box_Parameters), intent(in) :: Box
@@ -191,7 +191,7 @@ contains
             
         end do
 
-    end subroutine Electronic_Layer_Correction_set_structures
+    end subroutine Electronic_Layer_Correction_set_structure
     
     subroutine Electronic_Layer_Correction_destroy(this)
     
@@ -206,7 +206,7 @@ contains
     
     !> Reset the structure factor and print the drift
     
-    subroutine Electronic_Layer_Correction_reset_structures(this, Box, this_spheres, i_step, modulus_unit)
+    subroutine Electronic_Layer_Correction_reset_structure(this, Box, this_spheres, i_step, modulus_unit)
     
         class(Electronic_Layer_Correction), intent(inout) :: this
         type(Box_Parameters), intent(in) :: Box
@@ -216,37 +216,37 @@ contains
 
         real(DP), dimension(2) :: modulus_drifted, modulus_reset
         
-        modulus_drifted(:) = this%get_structures_modulus(Box%wave)
-        call this%set_structures(Box, this_spheres)
-        modulus_reset(:) = this%get_structures_modulus(Box%wave)
+        modulus_drifted(:) = this%get_structure_modulus(Box%wave)
+        call this%set_structure(Box, this_spheres)
+        modulus_reset(:) = this%get_structure_modulus(Box%wave)
         
         write(modulus_unit, *) i_step, abs(modulus_reset(:) - modulus_drifted(:))
     
-    end subroutine Electronic_Layer_Correction_reset_structures
+    end subroutine Electronic_Layer_Correction_reset_structure
     
     !> To calculate the drift of the structure factor
 
-    pure function Electronic_Layer_Correction_get_structures_modulus(this, Box_wave) &
-                  result(get_structures_modulus)
+    pure function Electronic_Layer_Correction_get_structure_modulus(this, Box_wave) &
+                  result(get_structure_modulus)
 
         class(Electronic_Layer_Correction), intent(in) :: this
         integer, dimension(:), intent(in) :: Box_wave
-        real(DP), dimension(2) :: get_structures_modulus
+        real(DP), dimension(2) :: get_structure_modulus
 
         integer :: kx, ky
 
-        get_structures_modulus(:) = 0._DP
+        get_structure_modulus(:) = 0._DP
 
         do ky = 0, Box_wave(2)
             do kx = -Box_wave1_sym(Box_wave, ky, 0), Box_wave(1)
-                get_structures_modulus(1) = get_structures_modulus(1) + &
+                get_structure_modulus(1) = get_structure_modulus(1) + &
                                                      abs(this%structure_plus(kx, ky))
-                get_structures_modulus(2) = get_structures_modulus(2) + &
+                get_structure_modulus(2) = get_structure_modulus(2) + &
                                                      abs(this%structure_minus(kx, ky))
             end do
         end do
 
-    end function Electronic_Layer_Correction_get_structures_modulus
+    end function Electronic_Layer_Correction_get_structure_modulus
     
     ! Count the number of wave vectors
 
@@ -416,7 +416,7 @@ contains
     !>                        e^{\pm k^{2D}z_l} e^{i(\vec{k}^{2D}\cdot\vec{x}^{2D}_l)})
     !>  \f]
 
-    pure subroutine Electronic_Layer_Correction_update_structures_move(this, Box, old, new)
+    pure subroutine Electronic_Layer_Correction_update_structure_move(this, Box, old, new)
 
         class(Electronic_Layer_Correction), intent(inout) :: this
         type(Box_Parameters), intent(in) :: Box
@@ -481,7 +481,7 @@ contains
             
         end do
 
-    end subroutine Electronic_Layer_Correction_update_structures_move
+    end subroutine Electronic_Layer_Correction_update_structure_move
     
     !> Rotate
 
@@ -598,7 +598,7 @@ contains
     !>                       e^{\pm k^{2D}z_l} e^{i(\vec{k}^{2D}\cdot\vec{x}^{2D}_l)}
     !>  \f]
 
-    pure subroutine Electronic_Layer_Correction_update_structures_rotate(this, Box, old, new)
+    pure subroutine Electronic_Layer_Correction_update_structure_rotation(this, Box, old, new)
 
         class(Electronic_Layer_Correction), intent(inout) :: this
         type(Box_Parameters), intent(in) :: Box
@@ -649,7 +649,7 @@ contains
             
         end do
 
-    end subroutine Electronic_Layer_Correction_update_structures_rotate
+    end subroutine Electronic_Layer_Correction_update_structure_rotation
     
     !> Energy of 1 dipole with others
     
@@ -754,7 +754,7 @@ contains
     !>  \f]
     !>
 
-    pure subroutine Electronic_Layer_Correction_update_structures_exchange(this, Box, particle)
+    pure subroutine Electronic_Layer_Correction_update_structure_exchange(this, Box, particle)
 
         class(Electronic_Layer_Correction), intent(inout) :: this
         type(Box_Parameters), intent(in) :: Box
@@ -808,6 +808,6 @@ contains
             
         end do
 
-    end subroutine Electronic_Layer_Correction_update_structures_exchange
+    end subroutine Electronic_Layer_Correction_update_structure_exchange
 
-end module class_dipolarSpheres
+end module class_electronic_layer_correction
