@@ -3,6 +3,7 @@
 module class_physical_system
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
+use data_box, only: num_dimensions
 use json_module, only: json_file, json_initialize, json_destroy, &
                        json_value, json_value_create, to_object, json_value_add, &
                        json_print
@@ -177,20 +178,47 @@ contains
         logical :: found
         real(DP), dimension(:), allocatable :: Box_size
         integer, dimension(:), allocatable :: Box_wave
+
+        real(DP) :: z_ratio
         
         data_name = "Box.size"
         call this%data_json%get(data_name, Box_size, found)
         call test_data_found(data_name, found)
-        if (size(Box_size) /= size (this%Box%size)) error stop "Box size dimension"
-        this%Box%size(:) = Box_size(:)
+        if (geometry%bulk) then
+            if (size(Box_size) /= num_dimensions) error stop "Box size dimension"
+            this%Box%size(:) = Box_size(:)
+        else if (geometry%slab) then
+            if (size(Box_size) /= num_dimensions-1) error stop "Box size dimension"
+            this%Box%size(1:2) = Box_size(:)
+        end if
         if (allocated(Box_size)) deallocate(Box_size)
         
         data_name = "Box.wave"
         call this%data_json%get(data_name, Box_wave, found)
         call test_data_found(data_name, found)
-        if (size(Box_wave) /= size (this%Box%wave)) error stop "Box wave dimension"
-        this%Box%wave(:) = Box_wave(:)
+        if (geometry%bulk) then
+            if (size(Box_wave) /= num_dimensions) error stop "Box wave dimension"
+            this%Box%wave(:) = Box_wave(:)
+        else if (geometry%slab) then
+            if (size(Box_wave) /= num_dimensions-1) error stop "Box wave dimension"
+            this%Box%wave(1:2) = Box_wave(:)
+        end if
         if (allocated(Box_wave)) deallocate(Box_wave)
+
+        if (geometry%slab) then
+        
+            data_name = "Box.height"
+            call this%data_json%get(data_name, this%Box%height, found)
+            call test_data_found(data_name, found)
+            
+            data_name = "Box.ratio in z"
+            call this%data_json%get(data_name, z_ratio, found)
+            call test_data_found(data_name, found)
+            
+            this%Box%size(num_dimensions) = z_ratio * this%Box%size(1)
+            this%Box%wave(num_dimensions) = ceiling(z_ratio * real(this%Box%wave(1), DP))
+            
+        end if
         
         data_name = "Box.temperature"
         call this%data_json%get(data_name, this%Box%temperature, found)
