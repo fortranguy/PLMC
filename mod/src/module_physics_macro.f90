@@ -81,11 +81,11 @@ contains
     
     !> Initial configuration
     
-    subroutine set_initial_configuration(Box_size, arg_init, dipolar, spherical, &
+    subroutine set_initial_configuration(Box, arg_init, dipolar, spherical, &
                                          between_spheres_min_distance, &
                                          report_json)
         
-        real(DP), dimension(:), intent(in) :: Box_size
+        type(Box_Parameters), intent(in) :: Box
         type(Argument_Initial), intent(in) :: arg_init
         class(Dipolar_Hard_Spheres), intent(inout) :: dipolar
         class(Hard_Spheres), intent(inout) :: spherical
@@ -95,7 +95,7 @@ contains
         select case (arg_init%choice)
         
             case ('r')
-                call random_depositions(Box_size, dipolar, spherical, between_spheres_min_distance)
+                call random_depositions(Box%size, dipolar, spherical, between_spheres_min_distance)
                 call random_orientations(dipolar, dipolar%get_num_particles())
                 call json_value_add(report_json, "initial configuration", &
                                                  "random depositions + random orientations")
@@ -104,16 +104,19 @@ contains
                 call json_value_add(report_json, "initial configuration", &
                                                  "old configuration")
                 call old_configuration(arg_init%files(1), arg_init%length(1), dipolar, &
-                                       norm2(Box_size), "positions")
+                                       norm2(Box%size), "positions")
                 call old_configuration(arg_init%files(2), arg_init%length(2), dipolar, &
                                        1._DP, "orientations")
                 call old_configuration(arg_init%files(3), arg_init%length(3), spherical, &
-                                       norm2(Box_size), "positions")
+                                       norm2(Box%size), "positions")
             
             case default
                 error stop "Error: in setting new configuration"
                 
         end select
+
+        call check_spheres_in_box(Box, dipolar)
+        call check_spheres_in_box(Box, spherical)
         
     end subroutine set_initial_configuration
 
@@ -253,6 +256,41 @@ contains
         close(file_unit)
         
     end subroutine old_configuration
+
+    subroutine check_spheres_in_box(Box, this_spheres)
+
+        type(Box_Parameters), intent(in) :: Box
+        class(Hard_Spheres), intent(in) :: this_spheres
+
+        logical :: lower_bounds_ok, upper_bounds_ok
+        
+        integer :: i_particle
+
+        do i_particle = 1, this_spheres%get_num_particles()
+
+            if (geometry%bulk) then
+                lower_bounds_ok = all(0._DP < this_spheres%get_position(i_particle))
+                upper_bounds_ok = all(this_spheres%get_position(i_particle) < Box%size)
+            end if
+
+            if (geometry%slab) then
+                lower_bounds_ok = all(0._DP < this_spheres%get_position_2d(i_particle)) .and. &
+                                (this_spheres%get_diameter()/2._DP < &
+                                this_spheres%get_position_z(i_particle))
+                upper_bounds_ok = all(this_spheres%get_position_2d(i_particle) < Box%size(1:2)) .and. &
+                                (this_spheres%get_position_z(i_particle) < &
+                                Box%height - this_spheres%get_diameter()/2._DP)
+            end if
+
+            if (.not.lower_bounds_ok .or. .not.upper_bounds_ok) then
+                write(error_unit, *) this_spheres%get_name(), " number ", i_particle, &
+                                     " is not in the box."
+                error stop
+            end if
+
+        end do
+
+    end subroutine check_spheres_in_box
     
     !> Spheres initialisations
     

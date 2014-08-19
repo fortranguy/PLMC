@@ -312,7 +312,7 @@ contains
         call this%json_create_all_values()
         
         call init_random_seed(args%random, this%report_json)
-        call set_initial_configuration(this%Box%size, args%initial, &
+        call set_initial_configuration(this%Box, args%initial, &
                                        this%type1_spheres, this%type2_spheres, &
                                        this%between_spheres%get_diameter(), &
                                        this%report_json)

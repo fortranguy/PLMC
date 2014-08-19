@@ -18,6 +18,7 @@ implicit none
     
     type, public :: Box_Parameters
         real(DP), dimension(num_dimensions) :: size
+        real(DP) :: height
         integer, dimension(num_dimensions) :: wave
         real(DP) :: temperature
         integer :: num_particles
