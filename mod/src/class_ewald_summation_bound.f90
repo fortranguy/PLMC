@@ -3,6 +3,7 @@ module class_ewald_summation_bound
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: PI
 use data_box, only: num_dimensions
+use module_geometry, only: geometry
 use module_types_micro, only: Particle_Index
 use module_physics_micro, only: exchange_sign
 use class_hard_spheres, only: Dipolar_Hard_Spheres
@@ -62,7 +63,10 @@ contains
     
     !> Total shape dependent term
     !> \f[
-    !>      J(\vec{M}, S) = \frac{2\pi}{3V} | \vec{M}|^2
+    !>      J(\vec{M}, S) = \frac{2\pi}{3V} |\vec{M}|^2
+    !> \f]
+    !> \f[
+    !>      J(\vec{M}, R) = \frac{2\pi}{V} |M_z|^2
     !> \f]
     
     pure function Ewald_Summation_Bound_total(this, Box_size) result(total)
@@ -70,19 +74,31 @@ contains
         class(Ewald_Summation_Bound), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         real(DP) :: total
-        
-        total = 2._DP*PI/3._DP / product(Box_size) * dot_product(this%total_moment, this%total_moment)
+
+        if (geometry%bulk) then
+            total = 2._DP*PI/3._DP / product(Box_size) * dot_product(this%total_moment, this%total_moment)
+        else if(geometry%slab) then
+            total = 2._DP*PI / product(Box_size) * this%total_moment(3)**2
+        end if
     
     end function Ewald_Summation_Bound_total
 
     !> Rotation
     
     !> Difference of Energy
+    !> Bulk:
     !> \f[
     !>      \Delta U = \frac{2\pi}{3V} [
     !>                      (\vec{\mu}^\prime_l \cdot \vec{\mu}^\prime_l) -
     !>                      (\vec{\mu}_l \cdot \vec{\mu}_l) +
     !>                      2 (\vec{\mu}^\prime_l - \vec{\mu}_l) \cdot \vec{M}_\underline{l}
+    !>                 ]
+    !> \f]
+    !> Slab:
+    !> \f[
+    !>      \Delta U = \frac{2\pi}{V} [
+    !>                      \mu^\prime_{l, z} \mu^\prime_{l, z} - \mu_{l, z} \mu_{l, z} +
+    !>                      2 (\mu^\prime_{l, z} - \mu_{l, z}) M_{l, z}
     !>                 ]
     !> \f]
     
@@ -93,13 +109,25 @@ contains
         real(DP), dimension(:), intent(in) :: Box_size
         real(DP), dimension(:), intent(in) :: old_orientation, new_orientation
         real(DP) :: rotation
+
+        if (geometry%bulk) then
         
-        rotation = dot_product(new_orientation, new_orientation) - &
-                   dot_product(old_orientation, old_orientation) + &
-                   2._DP * dot_product(new_orientation - old_orientation, &
-                   this%total_moment - old_orientation)
-                          
-        rotation = 2._DP*PI/3._DP / product(Box_size) * rotation
+            rotation = dot_product(new_orientation, new_orientation) - &
+                       dot_product(old_orientation, old_orientation) + &
+                       2._DP * dot_product(new_orientation - old_orientation, &
+                                           this%total_moment - old_orientation)
+
+            rotation = 2._DP*PI/3._DP / product(Box_size) * rotation
+
+        else if (geometry%slab) then
+
+            rotation = new_orientation(3)**2 - old_orientation(3)**2 + &
+                       2._DP * (new_orientation(3) - old_orientation(3)) * &
+                               (this%total_moment(3)-old_orientation(3))
+
+            rotation = 2._DP*PI / product(Box_size) * rotation
+
+        end if
     
     end function Ewald_Summation_Bound_rotation
 
@@ -109,7 +137,7 @@ contains
     !> \f]
 
     pure subroutine Ewald_Summation_Bound_update_total_moment_rotation(this, old_orientation, &
-                                                                           new_orientation)
+                                                                             new_orientation)
                                                                            
         class(Ewald_Summation_Bound), intent(inout) :: this
         real(DP), dimension(:), intent(in) :: old_orientation, new_orientation
@@ -121,18 +149,33 @@ contains
     !> Exchange
     
     !> Difference of Energy: add
+    !> Bulk:
     !> \f[
     !>      \Delta U_{N \rightarrow N+1} = \frac{2\pi}{3V} [
     !>                                         (\vec{\mu}_{N+1} \cdot \vec{\mu}_{N+1})
     !>                                          +2(\vec{\mu} \cdot \vec{M}_N)
     !>                                     ]
-    !> \f]
-    
+    !> \f]    
     !> Difference of Energy: remove
     !> \f[
     !>      \Delta U_{N \rightarrow N-1} = \frac{2\pi}{3V} [
     !>                                          (\vec{\mu}_{N+1} \cdot \vec{\mu}_{N+1})
     !>                                          -2(\vec{\mu} \cdot \vec{M}_N)
+    !>                                      ]
+    !> \f]
+    !> Slab:
+    !> Difference of Energy: add
+    !> \f[
+    !>      \Delta U_{N \rightarrow N+1} = \frac{2\pi}{V} [
+    !>                                          \mu_{N+1, z} \mu_{N+1, z} +
+    !>                                          2\mu_{N+1, z} M_z^N
+    !>                                     ]
+    !> \f]
+    !> Difference of Energy: remove
+    !> \f[
+    !>      \Delta U_{N \rightarrow N-1} = \frac{2\pi}{V} [
+    !>                                          \mu_{N, z} \mu_{N, z} -
+    !>                                          2\mu_{N, z} M_z^N
     !>                                      ]
     !> \f]
     
@@ -142,13 +185,25 @@ contains
         real(DP), dimension(:), intent(in) :: Box_size
         type(Particle_Index), intent(in) :: particle
         real(DP) :: exchange
+
+        if (geometry%bulk) then
         
-        exchange = dot_product(particle%orientation, particle%orientation) + &
-                   2._DP * exchange_sign(particle%add) * &
-                           dot_product(particle%orientation, this%total_moment)
-                          
-        exchange = 2._DP*PI/3._DP / product(Box_size) * exchange
-    
+            exchange = dot_product(particle%orientation, particle%orientation) + &
+                       2._DP * exchange_sign(particle%add) * &
+                       dot_product(particle%orientation, this%total_moment)
+
+            exchange = 2._DP*PI/3._DP / product(Box_size) * exchange
+
+        else if(geometry%slab) then
+
+            exchange = particle%orientation(3)**2 + &
+                       2._DP * exchange_sign(particle%add) * &
+                       particle%orientation(3) * this%total_moment(3)
+
+            exchange = 2._DP*PI / product(Box_size) * exchange
+
+        end if
+
     end function Ewald_Summation_Bound_exchange
     
     !> Exchange
