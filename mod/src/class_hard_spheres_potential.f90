@@ -6,6 +6,7 @@ use data_neighbour_cells, only: num_near_cells
 use json_module, only: json_file, json_value, json_value_create, to_object, json_value_add
 use module_data, only: test_data_found
 use module_types_micro, only: Node, Particle_Index
+use module_geometry, geometry
 use module_physics_micro, only: PBC_distance
 use class_hard_spheres, only: Hard_Spheres
 use class_neighbour_cells, only: Neighbour_Cells
@@ -123,6 +124,7 @@ contains
         real(DP), intent(out) :: energ
     
         integer :: i_total_cell, i_near_cell
+        integer :: i_near_cell_min, i_near_cell_max
         integer :: particule_number
         real(DP) :: distance_ij
     
@@ -139,8 +141,15 @@ contains
                 i_total_cell = particle%between_i_cell
                 particule_number = particle%other_number
         end select
+
+        i_near_cell_min = 1
+        i_near_cell_max = num_near_cells
+
+        if (geometry%slab) then
+            i_near_cell_min = 
+        end if
     
-        do i_near_cell = 1, num_near_cells
+        do i_near_cell = i_near_cell_min, i_near_cell_min_max
         
             call this_cells%point_to_begin(current, i_near_cell, i_total_cell)
             if (.not. associated(current%next)) cycle

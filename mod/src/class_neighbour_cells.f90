@@ -18,7 +18,7 @@ private
     
         private
         
-        integer :: num_total_cell
+        integer :: num_total_cell, num_total_cell_layer
         integer, dimension(num_dimensions) :: num_total_cell_dim
         real(DP), dimension(num_dimensions) :: cell_size
         integer, dimension(:, :), allocatable :: near_among_total
