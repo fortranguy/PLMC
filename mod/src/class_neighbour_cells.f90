@@ -37,7 +37,8 @@ private
         procedure :: check_cellsSize => Neighbour_Cells_check_cellsSize
         procedure :: index_from_position => Neighbour_Cells_index_from_position
         procedure :: all_cols_to_cells => Neighbour_Cells_all_cols_to_cells
-        
+
+        procedure :: near_cell_bounds => Neighbour_Cells_near_cell_bounds
         procedure :: point_to_begin => Neighbour_Cells_point_to_begin
         procedure :: remove_col_from_cell => Neighbour_Cells_remove_col_from_cell
         procedure :: add_col_to_cell => Neighbour_Cells_add_col_to_cell
@@ -233,6 +234,25 @@ contains
         end do
         
     end subroutine Neighbour_Cells_all_cols_to_cells
+
+    function Neighbour_Cells_near_cell_bounds(this, i_total_cell) result(near_cell_bounds)
+
+        class(Neighbour_Cells), intent(in) :: this
+        integer, intent(in) :: i_total_cell
+        integer, dimension(2) :: near_cell_bounds
+
+        near_cell_bounds(1) = 1
+        near_cell_bounds(2) = num_near_cells
+
+         if (geometry%slab) then
+            if (i_total_cell <= this%num_total_cell_layer) then
+                near_cell_bounds(1) = this%num_total_cell_layer + 1
+            else if ((this%num_total_cell-i_total_cell) < this%num_total_cell_layer) then
+                near_cell_bounds(2) = (num_dimensions-1) * this%num_total_cell_layer
+            end if
+        end if     
+
+    end function Neighbour_Cells_near_cell_bounds
     
     subroutine Neighbour_Cells_point_to_begin(this, current, i_near_cell, i_total_cell)
     

@@ -17,6 +17,21 @@ density = Ncol_avg / this%Volume
         end if
     
         do iNearCell = iNearCell_min, iNearCell_max
+
+class mix
+
+        iNearCell_min = 1
+        iNearCell_max = NnearCell
+        NtotalCell_layer = neighCells%get_NtotalCell_layer()
+        
+        if (iTotalCell <= NtotalCell_layer) then
+            iNearCell_min = NnearCell_layer + 1
+        else if ((neighCells%get_NtotalCell()-iTotalCell) < NtotalCell_layer) then
+            iNearCell_max = (Ndim-1) * NnearCell_layer
+        end if
+    
+        do iNearCell = iNearCell_min, iNearCell_max
+        
         
 class neigh
 
