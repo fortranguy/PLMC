@@ -305,16 +305,31 @@ contains
     
         integer :: i1_total_cell, i2_total_cell, i3_total_cell, i_total_cell
         integer :: i1_near_cell, i2_near_cell, i3_near_cell, i_near_cell
+        integer :: i3_near_cell_min, i3_near_cell_max
         integer, dimension(num_dimensions) :: total_cell_coord, near_cell_coord
         
         do i3_total_cell = 1, this%num_total_cell_dim(3)
+
+            i3_near_cell_min = 1
+            i3_near_cell_max = num_near_cells_dim(3)
+
+            if (geometry%slab) then
+                if (i3_total_cell == 1) then
+                    i3_near_cell_min = num_near_cells_dim(3) - 1
+                    i3_near_cell_max = num_near_cells_dim(3)
+                else if (i3_total_cell == this%num_total_cell_dim(3)) then
+                    i3_near_cell_min = 1
+                    i3_near_cell_max = 2
+                end if
+            end if
+            
         do i2_total_cell = 1, this%num_total_cell_dim(2)
         do i1_total_cell = 1, this%num_total_cell_dim(1)
             
             i_total_cell = index_from_coord([i1_total_cell, i2_total_cell, i3_total_cell], &
                                             this%num_total_cell_dim)
 
-            do i3_near_cell = 1, num_near_cells_dim(3)
+            do i3_near_cell = i3_near_cell_min,  i3_near_cell_max
             do i2_near_cell = 1, num_near_cells_dim(2)
             do i1_near_cell = 1, num_near_cells_dim(1)
             
