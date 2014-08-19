@@ -220,11 +220,10 @@ contains
                             select type (this_macro)
                                 type is (Dipolar_Hard_Spheres_Macro)
                                     this_energy_test = this_macro%ewald_real%solo(Box%size, &
-                                                                                  this_spheres, test) + &
+                                                            this_spheres, test) + &
                                                        this_macro%ewald_reci%exchange(Box, test) - &
                                                        this_macro%ewald_self%solo(test%orientation) + &
-                                                       this_macro%ewald_bound%exchange(Box%size, &
-                                                                                       test%orientation)
+                                                       this_macro%ewald_bound%exchange(Box%size, test)
                                     if (geometry%slab) then
                                         this_energy_test = this_energy_test - &
                                                            this_macro%elc%exchange(Box, test)

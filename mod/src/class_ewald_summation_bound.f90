@@ -3,6 +3,8 @@ module class_ewald_summation_bound
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: PI
 use data_box, only: num_dimensions
+use module_types_micro, only: Particle_Index
+use module_physics_micro, only: exchange_sign
 use class_hard_spheres, only: Dipolar_Hard_Spheres
 
 implicit none
@@ -134,15 +136,16 @@ contains
     !>                                      ]
     !> \f]
     
-    pure function Ewald_Summation_Bound_exchange(this, Box_size, orientation) result (exchange)
+    pure function Ewald_Summation_Bound_exchange(this, Box_size, particle) result (exchange)
     
         class(Ewald_Summation_Bound), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
-        real(DP), dimension(:), intent(in) :: orientation
+        type(Particle_Index), intent(in) :: particle
         real(DP) :: exchange
         
-        exchange = dot_product(orientation, orientation) + &
-                   2._DP * dot_product(orientation, this%total_moment)
+        exchange = dot_product(particle%orientation, particle%orientation) + &
+                   2._DP * exchange_sign(particle%add) * &
+                           dot_product(particle%orientation, this%total_moment)
                           
         exchange = 2._DP*PI/3._DP / product(Box_size) * exchange
     
@@ -160,12 +163,13 @@ contains
     !>      \Delta \vec{M} = -\vec{\mu}_l
     !> \f]
 
-    pure subroutine Ewald_Summation_Bound_update_total_moment_exchange(this, orientation)
+    pure subroutine Ewald_Summation_Bound_update_total_moment_exchange(this, particle)
 
         class(Ewald_Summation_Bound), intent(inout) :: this
-        real(DP), dimension(:), intent(in) :: orientation
+        type(Particle_Index), intent(in) :: particle
 
-        this%total_moment(:) = this%total_moment(:) + orientation(:)
+        this%total_moment(:) = this%total_moment(:) + &
+                               exchange_sign(particle%add) * particle%orientation(:)
 
     end subroutine Ewald_Summation_Bound_update_total_moment_exchange
 
