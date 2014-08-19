@@ -235,7 +235,7 @@ contains
         
     end subroutine Neighbour_Cells_all_cols_to_cells
 
-    function Neighbour_Cells_near_cell_bounds(this, i_total_cell) result(near_cell_bounds)
+    pure function Neighbour_Cells_near_cell_bounds(this, i_total_cell) result(near_cell_bounds)
 
         class(Neighbour_Cells), intent(in) :: this
         integer, intent(in) :: i_total_cell
