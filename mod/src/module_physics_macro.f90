@@ -114,9 +114,6 @@ contains
                 error stop "Error: in setting new configuration"
                 
         end select
-
-        call check_spheres_in_box(Box, dipolar)
-        call check_spheres_in_box(Box, spherical)
         
     end subroutine set_initial_configuration
 
@@ -270,6 +267,32 @@ contains
         close(file_unit)
         
     end subroutine old_configuration
+    
+    !> Spheres initialisations
+    
+    subroutine init_spheres(Box, this_spheres, this_units)
+        
+        type(Box_Parameters), intent(in) :: Box
+        class(Hard_Spheres), intent(inout) :: this_spheres
+        class(Hard_Spheres_Units), intent(in) :: this_units
+
+        call check_spheres_in_box(Box, this_spheres)
+        call this_spheres%test_overlap(Box%size)
+        call this_spheres%write_snap_data(this_units%snap_equilibrium_positions)
+        call this_spheres%write_snap_positions(0, this_units%snap_initial_positions, &
+                                               double_precision=.true.)
+        
+        select type (this_spheres)
+            type is (Dipolar_Hard_Spheres)
+                select type (this_units)
+                    type is (Dipolar_Hard_Spheres_Units)
+                        call this_spheres%write_snap_data(this_units%snap_equilibrium_orientations)
+                        call this_spheres%write_snap_orientations(0, &
+                             this_units%snap_initial_orientations, double_precision=.true.)
+                end select
+        end select
+    
+    end subroutine init_spheres
 
     subroutine check_spheres_in_box(Box, this_spheres)
 
@@ -277,7 +300,7 @@ contains
         class(Hard_Spheres), intent(in) :: this_spheres
 
         logical :: lower_bounds_ok, upper_bounds_ok
-        
+
         integer :: i_particle
 
         do i_particle = 1, this_spheres%get_num_particles()
@@ -305,31 +328,6 @@ contains
         end do
 
     end subroutine check_spheres_in_box
-    
-    !> Spheres initialisations
-    
-    subroutine init_spheres(Box, this_spheres, this_units)
-        
-        type(Box_Parameters), intent(in) :: Box
-        class(Hard_Spheres), intent(inout) :: this_spheres
-        class(Hard_Spheres_Units), intent(in) :: this_units
-        
-        call this_spheres%test_overlap(Box%size)
-        call this_spheres%write_snap_data(this_units%snap_equilibrium_positions)
-        call this_spheres%write_snap_positions(0, this_units%snap_initial_positions, &
-                                               double_precision=.true.)
-        
-        select type (this_spheres)
-            type is (Dipolar_Hard_Spheres)
-                select type (this_units)
-                    type is (Dipolar_Hard_Spheres_Units)
-                        call this_spheres%write_snap_data(this_units%snap_equilibrium_orientations)
-                        call this_spheres%write_snap_orientations(0, &
-                             this_units%snap_initial_orientations, double_precision=.true.)
-                end select
-        end select
-    
-    end subroutine init_spheres
     
     subroutine init_cells(Box_size, this_spheres, this_macro, other_spheres, between_spheres_potential)
       
@@ -418,7 +416,8 @@ contains
         type(Box_Parameters), intent(in) :: Box
         class(Hard_Spheres), intent(inout) :: this_spheres
         class(Hard_Spheres_Units), intent(in) :: this_units
-        
+
+        call check_spheres_in_box(Box, this_spheres)
         call this_spheres%test_overlap(Box%size)
         call this_spheres%write_snap_positions(0, this_units%snap_final_positions, &
                                                double_precision=.true.)
