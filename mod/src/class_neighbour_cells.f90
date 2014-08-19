@@ -7,6 +7,7 @@ use data_precisions, only: real_zero
 use data_box, only: num_dimensions
 use data_neighbour_cells, only: num_near_cells_dim, num_near_cells
 use module_types_micro, only: Node, Linked_List
+use module_geometry, only: geometry
 use module_physics_micro, only: index_from_coord, coord_PBC
 use class_hard_spheres, only: Hard_Spheres
 

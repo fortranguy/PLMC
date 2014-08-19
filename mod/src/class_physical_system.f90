@@ -8,8 +8,8 @@ use json_module, only: json_file, json_initialize, json_destroy, &
                        json_value, json_value_create, to_object, json_value_add, &
                        json_print
 use module_data, only: test_data_file_exists, test_data_found, test_empty_string
-use module_geometry, only: geometry, set_geometry
 use module_types_micro, only: Box_Parameters, Monte_Carlo_Arguments
+use module_geometry, only: geometry, set_geometry
 use module_physics_micro, only: num_wave_vectors
 use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres, Between_Hard_Spheres
 use class_hard_spheres_potential, only: Between_Hard_Spheres_Potential_Energy

@@ -7,8 +7,8 @@ use data_precisions, only: real_zero, io_tiny, consistency_tiny
 use data_box, only: num_dimensions
 use json_module, only: json_file, json_value, json_value_create, to_object, json_value_add
 use module_data, only: test_data_found
-use module_geometry, only: geometry
 use module_types_micro, only: Box_Parameters, Argument_Random, Argument_Initial
+use module_geometry, only: geometry
 use module_physics_micro, only: PBC_distance, random_surface
 use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres
 use class_small_move, only: Small_Move

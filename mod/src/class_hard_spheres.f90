@@ -5,11 +5,11 @@ module class_hard_spheres
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit, error_unit
 use data_constants, only: PI
 use data_box, only: num_dimensions
-use module_geometry, only: geometry
 use json_module, only: json_file, json_value, json_value_create, to_object, json_value_add
 use data_write, only: simple_precision_format, double_precision_format
 use module_data, only: test_data_found, test_empty_string
 use module_types_micro, only: Box_Parameters
+use module_geometry, only: geometry
 use module_physics_micro, only: PBC_distance
 
 implicit none
