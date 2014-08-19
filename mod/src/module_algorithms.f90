@@ -34,7 +34,7 @@ contains
         real(DP), intent(inout) :: mix_potential_energy
         
         real(DP) :: random
-        real(DP), dimension(num_dimensions) :: random_position
+        real(DP), dimension(num_dimensions) :: random_vector
         type(Particle_Index) :: old, new
         logical :: overlap
         real(DP) :: energy_delta
@@ -51,8 +51,8 @@ contains
         old%position(:) = this_spheres%get_position(old%number)
         
         new%number = old%number
-        call random_number(random_position)
-        new%position(:) = old%position(:) + (random_position(:)-0.5_DP) * this_macro%move%get_delta()
+        call random_number(random_vector)
+        new%position(:) = old%position(:) + (random_vector(:)-0.5_DP) * this_macro%move%get_delta()
         new%position(:) = modulo(new%position(:), Box%size(:))
         
         if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
@@ -171,7 +171,7 @@ contains
         
         integer :: i_widom_particule
         real(DP) :: inv_activity_sum
-        real(DP), dimension(num_dimensions) :: random_position
+        real(DP), dimension(num_dimensions) :: random_vector
         type(Particle_Index) :: test
         logical :: overlap
         real(DP) :: energy_test
@@ -182,8 +182,8 @@ contains
         
         do i_widom_particule = 1, this_spheres%get_widom_num_particles()
             
-            call random_number(random_position)
-            test%position(:) = Box%size(:) * random_position(:)
+            call random_number(random_vector)
+            test%position(:) = Box%size(:) * random_vector(:)
 
             if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
                 test%same_i_cell = this_macro%same_cells%index_from_position(test%position)

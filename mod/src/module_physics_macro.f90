@@ -95,7 +95,7 @@ contains
         select case (arg_init%choice)
         
             case ('r')
-                call random_depositions(Box%size, dipolar, spherical, between_spheres_min_distance)
+                call random_depositions(Box, dipolar, spherical, between_spheres_min_distance)
                 call random_orientations(dipolar, dipolar%get_num_particles())
                 call json_value_add(report_json, "initial configuration", &
                                                  "random depositions + random orientations")
@@ -122,27 +122,34 @@ contains
 
     !> Random depositions configuration
     
-    subroutine random_depositions(Box_size, spheres1, spheres2, between_spheres_min_distance)
+    subroutine random_depositions(Box, spheres1, spheres2, between_spheres_min_distance)
 
-        real(DP), dimension(:), intent(in) :: Box_size
+        type(Box_Parameters), intent(in) :: Box
         class(Hard_Spheres), intent(inout) :: spheres1, spheres2
         real(DP), intent(in) :: between_spheres_min_distance
 
         integer :: i_particle, i_particle_test
-        real(DP), dimension(num_dimensions) :: random_position, position, position_test
-        real(DP) :: rTest
+        real(DP), dimension(num_dimensions) :: random_vector, position, position_test
+        real(DP) :: rTest, position_z
         
         ! Type 1
         do i_particle = 1, spheres1%get_num_particles()
         
 7101        continue
-            call random_number(random_position)
-            call spheres1%set_position(i_particle, random_position*Box_size)
+            call random_number(random_vector)
+            if (geometry%bulk) then
+                call spheres1%set_position(i_particle, random_vector*Box%size)
+            else if (geometry%slab) then
+                call spheres1%set_position_2d(i_particle, random_vector(1:2)*Box%size(1:2))
+                position_z = (Box%height - spheres1%get_diameter()) * random_vector(3) + &
+                             spheres1%get_diameter()/2._DP
+                call spheres1%set_position_z(i_particle, position_z)                                            
+            end if
             
             position(:) = spheres1%get_position(i_particle)
             do i_particle_test = 1, i_particle-1
                 position_test(:) = spheres1%get_position(i_particle_test)
-                rTest = PBC_distance(Box_size, position, position_test)
+                rTest = PBC_distance(Box%size, position, position_test)
                 if (rTest < spheres1%get_diameter()) then
                     goto 7101
                 end if
@@ -154,13 +161,20 @@ contains
         do i_particle = 1, spheres2%get_num_particles()
         
 7102        continue
-            call random_number(random_position)
-            call spheres2%set_position(i_particle, random_position*Box_size)
+            call random_number(random_vector)
+            if (geometry%bulk) then
+                call spheres2%set_position(i_particle, random_vector*Box%size)
+            else if (geometry%slab) then
+                call spheres2%set_position_2d(i_particle, random_vector(1:2)*Box%size(1:2))
+                position_z = (Box%height - spheres2%get_diameter()) * random_vector(3) + &
+                             spheres2%get_diameter()/2._DP
+                call spheres2%set_position_z(i_particle, position_z)
+            end if
             
             position(:) = spheres2%get_position(i_particle)
             do i_particle_test = 1, spheres1%get_num_particles()
                 position_test(:) = spheres1%get_position(i_particle_test)
-                rTest = PBC_distance(Box_size, position, position_test)
+                rTest = PBC_distance(Box%size, position, position_test)
                 if (rTest < between_spheres_min_distance) then
                     goto 7102
                 end if
@@ -168,7 +182,7 @@ contains
             
             do i_particle_test = 1, i_particle-1
                 position_test(:) = spheres2%get_position(i_particle_test)
-                rTest = PBC_distance(Box_size, position, position_test)
+                rTest = PBC_distance(Box%size, position, position_test)
                 if (rTest < spheres2%get_diameter()) then
                     goto 7102
                 end if

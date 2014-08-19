@@ -49,6 +49,8 @@ private
         procedure :: get_position_2d => Hard_Spheres_get_position_2d
         procedure :: get_position_z => Hard_Spheres_get_position_z
         procedure :: set_position => Hard_Spheres_set_position
+        procedure :: set_position_2d => Hard_Spheres_set_position_2d
+        procedure :: set_position_z => Hard_Spheres_set_position_z
         
         procedure :: write_report => Hard_Spheres_write_report
         
@@ -347,6 +349,26 @@ contains
         this%all_positions(:, i_particle) = position(:)
         
     end subroutine Hard_Spheres_set_position
+
+    subroutine Hard_Spheres_set_position_2d(this, i_particle, position_2d)
+
+        class(Hard_Spheres), intent(inout) :: this
+        integer, intent(in) :: i_particle
+        real(DP), dimension(:), intent(in) :: position_2d
+
+        this%all_positions(1:2, i_particle) = position_2d(:)
+
+    end subroutine Hard_Spheres_set_position_2d
+
+    subroutine Hard_Spheres_set_position_z(this, i_particle, position_z)
+
+        class(Hard_Spheres), intent(inout) :: this
+        integer, intent(in) :: i_particle
+        real(DP), intent(in) :: position_z
+
+        this%all_positions(3, i_particle) = position_z
+
+    end subroutine Hard_Spheres_set_position_z
     
     pure function Dipolar_Hard_Spheres_get_orientation(this, i_particle) result(get_orientation)
     
