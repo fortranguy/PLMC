@@ -5,6 +5,7 @@ module class_hard_spheres
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit, error_unit
 use data_constants, only: PI
 use data_box, only: num_dimensions
+use module_geometry, only: geometry
 use json_module, only: json_file, json_value, json_value_create, to_object, json_value_add
 use data_write, only: simple_precision_format, double_precision_format
 use module_data, only: test_data_found, test_empty_string
@@ -25,6 +26,7 @@ private
         real(DP) :: diameter
         integer ::  num_particles
         real(DP), dimension(:, :), allocatable :: all_positions
+        real(DP) :: volume
         
         ! Snashot
         integer :: snap_factor
@@ -37,6 +39,7 @@ private
         !> Construction and destruction of the class
         procedure :: construct => Hard_Spheres_construct
         procedure, private :: set_particles => Hard_Spheres_set_particles
+        procedure, private :: set_volume => Hard_Spheres_set_volume
         procedure, private :: set_snap => Hard_Spheres_set_snap
         procedure :: destroy => Hard_Spheres_destroy
         
@@ -104,9 +107,10 @@ private
     
 contains
 
-    subroutine Hard_Spheres_construct(this, data_json)
+    subroutine Hard_Spheres_construct(this, Box, data_json)
     
         class(Hard_Spheres), intent(out) :: this
+        type(Box_Parameters), intent(in) :: Box
         type(json_file), intent(inout) :: data_json
         
         character(len=4096) :: data_name
@@ -122,13 +126,15 @@ contains
         write(output_unit, *) this%name, " class construction"
         
         call this%set_particles(data_json)
+        call this%set_volume(Box)
         call this%set_snap(data_json)
         
     end subroutine Hard_Spheres_construct
     
-    subroutine Dipolar_Hard_Spheres_construct(this, data_json)
+    subroutine Dipolar_Hard_Spheres_construct(this, Box, data_json)
     
         class(Dipolar_Hard_Spheres), intent(out) :: this
+        type(Box_Parameters), intent(in) :: Box
         type(json_file), intent(inout) :: data_json
         
         character(len=4096) :: data_name
@@ -144,6 +150,7 @@ contains
         write(output_unit, *) this%name, " class construction"
     
         call this%set_particles(data_json)
+        call this%Hard_Spheres%set_volume(Box)
         call this%Hard_Spheres%set_snap(data_json)
     
     end subroutine Dipolar_Hard_Spheres_construct
@@ -192,6 +199,19 @@ contains
         call test_data_found(data_name, found)
         
     end subroutine Dipolar_Hard_Spheres_set_particles
+
+    subroutine Hard_Spheres_set_volume(this, Box)
+
+        class(Hard_Spheres), intent(inout) :: this
+        type(Box_Parameters), intent(in) :: Box
+
+        if (geometry%bulk) then
+            this%volume = product(Box%size)
+        else if (geometry%slab) then
+            this%volume = product(Box%size(1:2)) * (Box%height - this%diameter)
+        end if
+
+    end subroutine Hard_Spheres_set_volume
     
     subroutine Hard_Spheres_set_snap(this, data_json)
     
@@ -421,10 +441,10 @@ contains
     
     !> Write a report of the component in a file
     
-    subroutine Hard_Spheres_write_report(this, Box, report_json)
+    subroutine Hard_Spheres_write_report(this, num_particles, report_json)
     
         class(Hard_Spheres), intent(in) :: this
-        type(Box_Parameters), intent(in) :: Box
+        integer, intent(in) :: num_particles
         type(json_value), pointer, intent(in) :: report_json
 
         type(json_value), pointer :: properties_json, snap_json
@@ -434,12 +454,12 @@ contains
         call to_object(properties_json, "Properties")
         call json_value_add(report_json, properties_json)
 
-        density = real(this%num_particles + 1, DP) / product(Box%size)
+        density = real(this%num_particles + 1, DP) / this%volume
             ! cheating ? cf. Widom
         call json_value_add(properties_json, "density", density)
         compacity = 4._DP/3._DP*PI*(this%diameter/2._DP)**3 * density
         call json_value_add(properties_json, "compacity", compacity)
-        concentration = real(this%num_particles, DP) / real(Box%num_particles, DP)
+        concentration = real(this%num_particles, DP) / real(num_particles, DP)
         call json_value_add(properties_json, "concentration", concentration)
 
         nullify(properties_json)

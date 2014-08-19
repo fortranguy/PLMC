@@ -160,8 +160,8 @@ contains
         call this%data_json%get(data_name, this%write_potential_energy, found)
         call test_data_found(data_name, found)
         
-        call this%type1_spheres%construct(this%data_json)
-        call this%type2_spheres%construct(this%data_json)
+        call this%type1_spheres%construct(this%Box, this%data_json)
+        call this%type2_spheres%construct(this%Box, this%data_json)
         call this%between_spheres%construct(this%data_json, &
                                             this%type1_spheres%get_diameter(), &
                                             this%type2_spheres%get_diameter())
@@ -447,10 +447,10 @@ contains
         
         call this%write_report(geometry)
         
-        call this%type1_spheres%write_report(this%Box, this%type1_report_json)
+        call this%type1_spheres%write_report(this%Box%num_particles, this%type1_report_json)
         call this%type1_macro%hard_potential%write_report(this%type1_report_json)
         
-        call this%type2_spheres%write_report(this%Box, this%type2_report_json)
+        call this%type2_spheres%write_report(this%Box%num_particles, this%type2_report_json)
         call this%type2_macro%hard_potential%write_report(this%type2_report_json)
         
         call this%between_spheres_potential%write_report(this%between_spheres_report_json)
