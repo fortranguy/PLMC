@@ -5,7 +5,7 @@ module class_neighbour_cells
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, error_unit
 use data_precisions, only: real_zero
 use data_box, only: num_dimensions
-use data_neighbour_cells, only: num_near_cells_dim, num_near_cells
+use data_neighbour_cells, only: num_near_cells_dim, num_near_cells_layer, num_near_cells
 use module_types_micro, only: Node, Linked_List
 use module_geometry, only: geometry
 use module_physics_micro, only: index_from_coord, coord_PBC
@@ -247,9 +247,9 @@ contains
 
          if (geometry%slab) then
             if (i_total_cell <= this%num_total_cell_layer) then
-                near_cell_bounds(1) = this%num_total_cell_layer + 1
+                near_cell_bounds(1) = num_near_cells_layer + 1
             else if ((this%num_total_cell-i_total_cell) < this%num_total_cell_layer) then
-                near_cell_bounds(2) = (num_dimensions-1) * this%num_total_cell_layer
+                near_cell_bounds(2) = (num_dimensions-1) * num_near_cells_layer
             end if
         end if     
 
