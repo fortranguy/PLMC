@@ -53,14 +53,16 @@ contains
         new%number = old%number
         call random_number(random_vector)
         new%position(:) = old%position(:) + (random_vector(:)-0.5_DP) * this_macro%move%get_delta()
-        new%position(:) = modulo(new%position(:), Box%size(:))
 
-        if (geometry%slab) then
+        if (geometry%bulk) then
+            new%position(:) = modulo(new%position(:), Box%size(:))
+        else if (geometry%slab) then
             if (new%position(3) < this_spheres%get_diameter()/2._DP .or. &
                 new%position(3) > Box%height-this_spheres%get_diameter()/2._DP) then
                 this_observables%move%num_rejections = this_observables%move%num_rejections + 1
                 return
             end if
+            new%position(1:2) = modulo(new%position(1:2), Box%size(1:2))
         end if
         
         if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
@@ -191,7 +193,13 @@ contains
         do i_widom_particule = 1, this_spheres%get_widom_num_particles()
             
             call random_number(random_vector)
-            test%position(:) = Box%size(:) * random_vector(:)
+            if (geometry%bulk) then
+                test%position(:) = Box%size(:) * random_vector(:)
+            else if (geometry%slab) then
+                test%position(1:2) = Box%size(1:2) * random_vector(1:2)
+                test%position(3) = (Box%height - this_spheres%get_diameter()) * random_vector(3) + &
+                                   this_spheres%get_diameter()/2._DP
+            end if
 
             if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
                 test%same_i_cell = this_macro%same_cells%index_from_position(test%position)
