@@ -58,6 +58,7 @@ contains
         
         this%num_total_cell_dim(:) = floor(Box_size(:)/proposed_cell_size(:))
         this%num_total_cell = product(this%num_total_cell_dim)
+        this%num_total_cell_layer = product(this%num_total_cell_dim(1:2))
         this%cell_size(:) = Box_size(:)/real(this%num_total_cell_dim(:), DP)
         
         allocate(this%near_among_total(num_near_cells, this%num_total_cell))
