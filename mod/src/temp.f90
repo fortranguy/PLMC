@@ -96,11 +96,18 @@ pure subroutine NeighbourCells_init_near_among_total(this)
     
 module algo
 
+C
+
 if (xNew(3)+this%get_sigma()/2._DP > Height .or. xNew(3)-this%get_sigma()/2._DP < 0._DP) then
             this_obs%move_Nreject = this_obs%move_Nreject + 1
             return
         end if
-        
+
+call random_number(xRand)
+            xTest(1:2) = Lsize(1:2) * xRand(1:2)
+            xTest(3) = (Height - this%get_sigma()) * xRand(3) + this%get_sigma()/2._DP
+
+GC
 xNew(1:2) = Lsize(1:2) * xRand(1:2)
         xNew(3) = (Height - this%get_sigma()) * xRand(3) + this%get_sigma()/2._DP
         this%Volume (GC)

@@ -54,6 +54,14 @@ contains
         call random_number(random_vector)
         new%position(:) = old%position(:) + (random_vector(:)-0.5_DP) * this_macro%move%get_delta()
         new%position(:) = modulo(new%position(:), Box%size(:))
+
+        if (geometry%slab) then
+            if (new%position(3) < this_spheres%get_diameter()/2._DP .or. &
+                new%position(3) > Box%height-this_spheres%get_diameter()/2._DP) then
+                this_observables%move%num_rejections = this_observables%move%num_rejections + 1
+                return
+            end if
+        end if
         
         if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
             new%same_i_cell = this_macro%same_cells%index_from_position(new%position)
