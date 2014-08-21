@@ -3,7 +3,8 @@
         "name": "sys",
         "size": [25.0, 25.0, 25.0],
         "wave": [8, 8, 8],
-        "temperature": 1.0
+        "temperature": 1.0,
+        "external field": [0.0, 0.0, 0.0]
     },
     "Particles": {
         "Dipolar Hard Spheres": {

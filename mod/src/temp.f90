@@ -1,111 +1,46 @@
-integer, parameter :: NnearCell_layer = NnearCell_dim(1) * NnearCell_dim(2)
-integer, parameter :: NnearCell = NnearCell_layer * NnearCell_dim(3)
+    ! External field ------------------------------------------------------------------------------
 
-class HS
-
-this%Volume = Lsize(1)*Lsize(2)*(Height - this%sigma)
-density = Ncol_avg / this%Volume
-
-        iNearCell_min = 1
-        iNearCell_max = NnearCell
-        NtotalCell_layer = this%sameCells%get_NtotalCell_layer()
-        
-        if (iTotalCell <= NtotalCell_layer) then
-            iNearCell_min = NnearCell_layer + 1
-        else if ((this%sameCells%get_NtotalCell()-iTotalCell) < NtotalCell_layer) then
-            iNearCell_max = (Ndim-1) * NnearCell_layer
-        end if
+    !> \f[ U_\text{field} = -(\vec{M} \cdot \vec{E}) \f]
     
-        do iNearCell = iNearCell_min, iNearCell_max
+    pure function DipolarSpheres_Epot_field(this) result(Epot_field)
 
-class mix
+        class(DipolarSpheres), intent(in) :: this
+        real(DP) :: Epot_field
 
-        iNearCell_min = 1
-        iNearCell_max = NnearCell
-        NtotalCell_layer = neighCells%get_NtotalCell_layer()
+        Epot_field = -dot_product(this%totalMoment, Field)
+
+    end function DipolarSpheres_Epot_field
+    + this%Epot_Field()
         
-        if (iTotalCell <= NtotalCell_layer) then
-            iNearCell_min = NnearCell_layer + 1
-        else if ((neighCells%get_NtotalCell()-iTotalCell) < NtotalCell_layer) then
-            iNearCell_max = (Ndim-1) * NnearCell_layer
-        end if
+        
+    real(DP), dimension(Ndim), parameter :: Field = [0._DP, 0._DP, 0._DP]
     
-        do iNearCell = iNearCell_min, iNearCell_max
-        
-        
-class neigh
+    use module_physics_micro, only: random_surface, markov_surface, deltaEpot_field_exchange, &
 
-integer :: NtotalCell, NtotalCell_layer
-        procedure :: get_NtotalCell => NeighbourCells_get_NtotalCell ?
-        procedure :: get_NtotalCell_layer => NeighbourCells_get_NtotalCell_layer ?
-this%NtotalCell_layer = this%NtotalCell_dim(1)  * this%NtotalCell_dim(2)
 
-pure subroutine NeighbourCells_init_near_among_total(this)
+deltaEpot_field_exchange(+mTest)
+
++ deltaEpot_field_rotate(mOld, mNew)
+
+    !> \Delta U_{N\rightarrow\N+1} = -(\vec{\mu}_{N+1} \cdot \vec{E})
+
+    pure function deltaEpot_field_exchange(mCol)
+
+        real(DP), dimension(:), intent(in) :: mCol
+        real(DP) :: deltaEpot_field_exchange
+
+        deltaEpot_field_exchange = -dot_product(mCol, Field)
+
+    end function deltaEpot_field_exchange
+
+    pure function deltaEpot_field_rotate(mOld, mNew)
     
-        class(NeighbourCells), intent(inout) :: this
-    
-        integer :: iTotalCell, jTotalCell, kTotalCell, totalCell_index
-        integer :: iNearCell, jNearCell, kNearCell, nearCell_index
-        integer, dimension(Ndim) :: totalCell_coord, nearCell_coord
-        integer :: kNearCell_min, kNearCell_max
-        
-        do kTotalCell = 1, this%NtotalCell_dim(3)
+        real(DP), dimension(:), intent(in) :: mOld, mNew
+        real(DP) :: deltaEpot_field_rotate
 
-            kNearCell_min = 1
-            kNearCell_max = NnearCell_dim(3)
-        
-            if (kTotalCell == 1) then
-                kNearCell_min = NnearCell_dim(3) - 1
-                kNearCell_max = NnearCell_dim(3)
-            else if (kTotalCell == this%NtotalCell_dim(3)) then
-                kNearCell_min = 1
-                kNearCell_max = 2
-            end if
-        
-            do jTotalCell = 1, this%NtotalCell_dim(2)
-            do iTotalCell = 1, this%NtotalCell_dim(1)
+        deltaEpot_field_rotate = -dot_product(mNew - mOld, Field)
 
-                totalCell_index = index_from_coord([iTotalCell, jTotalCell, kTotalCell], &
-                                                   this%NtotalCell_dim)
-
-                do kNearCell = kNearCell_min, kNearCell_max
-                do jNearCell = 1, NnearCell_dim(2)
-                do iNearCell = 1, NnearCell_dim(1)
-                
-                    nearCell_coord(:) = [iNearCell, jNearCell, kNearCell]
-                    nearCell_index = index_from_coord(nearCell_coord, NnearCell_dim)
-                    nearCell_coord(:) = nearCell_coord(:) - NnearCell_dim(:) + 1
-                        ! with respect to the center (?) [iTotalCell, jTotalCell, kTotalCell]
-                    
-                    totalCell_coord(:) = [iTotalCell, jTotalCell, kTotalCell] + nearCell_coord(:)
-                    totalCell_coord(:) = coord_PBC(totalCell_coord, this%NtotalCell_dim)
-  
-                    this%near_among_total(nearCell_index, totalCell_index) = &
-                        index_from_coord(totalCell_coord, this%NtotalCell_dim)
-                        
-                end do
-                end do
-                end do
-            
-            end do
-            end do
-            
-        end do
-            
-    end subroutine NeighbourCells_init_near_among_total
-    
-module algo
-
-C
-
-if (xNew(3)+this%get_sigma()/2._DP > Height .or. xNew(3)-this%get_sigma()/2._DP < 0._DP) then
-            this_obs%move_Nreject = this_obs%move_Nreject + 1
-            return
-        end if
-
-call random_number(xRand)
-            xTest(1:2) = Lsize(1:2) * xRand(1:2)
-            xTest(3) = (Height - this%get_sigma()) * xRand(3) + this%get_sigma()/2._DP
+    end function deltaEpot_field_rotate
 
 GC
 xNew(1:2) = Lsize(1:2) * xRand(1:2)

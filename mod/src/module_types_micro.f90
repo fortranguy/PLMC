@@ -22,6 +22,7 @@ implicit none
         integer, dimension(num_dimensions) :: wave
         real(DP) :: temperature
         integer :: num_particles
+        real(DP), dimension(num_dimensions) :: external_field
     end type Box_Parameters
     
     ! Algorithms

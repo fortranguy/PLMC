@@ -178,6 +178,7 @@ contains
         logical :: found
         real(DP), dimension(:), allocatable :: Box_size
         integer, dimension(:), allocatable :: Box_wave
+        real(DP), dimension(:), allocatable :: Box_external_field
 
         real(DP) :: z_ratio
         
@@ -223,6 +224,13 @@ contains
         data_name = "Box.temperature"
         call this%data_json%get(data_name, this%Box%temperature, found)
         call test_data_found(data_name, found)
+
+        data_name = "Box.external field"
+        call this%data_json%get(data_name, Box_external_field, found)
+        call test_data_found(data_name, found)
+        if (size(Box_external_field) /= num_dimensions) error stop "Box external field"
+        this%Box%external_field(:) = Box_external_field(:)
+        if (allocated(Box_external_field)) deallocate(Box_external_field)
         
     end subroutine Physical_System_set_box
     
