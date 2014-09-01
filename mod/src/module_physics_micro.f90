@@ -13,7 +13,8 @@ public set_discrete_length, sphere_volume, PBC_vector, PBC_distance, random_surf
        dipolar_pair_energy, ewald_real_B, ewald_real_C, &
        num_wave_vectors, Box_wave1_sym, Box_wave2_sym, fourier_i, set_exp_kz, exchange_sign, &
        index_from_coord, coord_PBC, &
-       potential_energy_lennard_jones, potential_energy_yukawa
+       potential_energy_lennard_jones, potential_energy_yukawa, &
+       field_dipole_exchange_energy, field_dipole_rotation_energy
 
 contains
 
@@ -382,5 +383,28 @@ contains
         potential_energy_yukawa = epsilon * exp(-alpha*(r-r_0)) / r
     
     end function potential_energy_yukawa
+
+    !> \Delta U_{N\rightarrow\N+1} = -(\vec{\mu}_{N+1} \cdot \vec{E})
+
+    pure function field_dipole_exchange_energy(field, particle)
+
+        type(Particle_Index), intent(in) :: particle
+        real(DP), dimension(:), intent(in) :: field
+        real(DP) :: field_dipole_exchange_energy
+
+        field_dipole_exchange_energy = -exchange_sign(particle%add) * &
+                                        dot_product(particle%orientation, Field)
+
+    end function field_dipole_exchange_energy
+
+    pure function field_dipole_rotation_energy(field, old_orientation, new_orientation)
+
+        real(DP), dimension(:), intent(in) :: old_orientation, new_orientation
+        real(DP), dimension(:), intent(in) :: field
+        real(DP) :: field_dipole_rotation_energy
+
+        field_dipole_rotation_energy = -dot_product(new_orientation - old_orientation, field)
+
+    end function field_dipole_rotation_energy
 
 end module module_physics_micro
