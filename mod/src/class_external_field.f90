@@ -13,6 +13,8 @@ private
         real(DP), dimension(num_dimensions) :: vector
     contains
         procedure :: set => External_Field_set
+        procedure :: total => External_Field_total
+        
         procedure :: rotation => External_Field_rotation
         procedure :: exchange => External_Field_exchange
     end type External_Field
@@ -27,6 +29,16 @@ contains
         this%vector(:) = vector
     
     end subroutine External_Field_set
+    
+    pure function External_Field_total(this, total_moment) result(total)
+    
+        class(External_Field), intent(in) :: this
+        real(DP), dimension(:), intent(in) :: total_moment
+        real(DP) :: total
+        
+        total = -dot_product(total_moment, this%vector)
+    
+    end function External_Field_total
     
     !> \f[ \Delta U = -(\vec{\mu}^\prime - \vec{\mu} \cdot \vec{E}) \f]
 

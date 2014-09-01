@@ -16,6 +16,7 @@ private
         real(DP), dimension(num_dimensions) :: total_moment
     contains
         procedure :: set_total_moment => Ewald_Summation_Bound_set_total_moment
+        procedure :: get_total_moment => Ewald_Summation_Bound_get_total_moment
         procedure :: reset_total_moment => Ewald_Summation_Bound_reset_total_moment
         procedure :: total => Ewald_Summation_Bound_total
         
@@ -43,6 +44,15 @@ contains
         end do
         
     end subroutine Ewald_Summation_Bound_set_total_moment
+    
+    pure function Ewald_Summation_Bound_get_total_moment(this) result(get_total_moment)
+    
+        class(Ewald_Summation_Bound), intent(in) :: this
+        real(DP), dimension(num_dimensions) :: get_total_moment
+        
+        get_total_moment(:) = this%total_moment(:)
+        
+    end function Ewald_Summation_Bound_get_total_moment
 
     subroutine Ewald_Summation_Bound_reset_total_moment(this, this_spheres, i_step, modulus_unit)
 

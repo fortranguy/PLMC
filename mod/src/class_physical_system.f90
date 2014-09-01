@@ -372,15 +372,14 @@ contains
                         this%between_spheres_potential)
         call set_ewald(this%Box, this%type1_spheres, this%type1_macro, this%data_json, this%type1_units)
         this%type1_observables%potential_energy = total_energy(this%Box, this%type1_spheres, &
-                                                               this%type1_macro)
+                                                               this%type1_macro, this%ext_field)
                         
         call init_spheres(this%Box, this%type2_spheres, this%type2_units)
         call this%type2_macro%hard_potential%construct(this%data_json, "Hard Spheres", &
                                                        this%type2_spheres%get_diameter())
         call init_cells(this%Box%size, this%type2_spheres, this%type2_macro, this%type1_spheres, &
                         this%between_spheres_potential)
-        this%type2_observables%potential_energy = total_energy(this%Box, this%type2_spheres, &
-                                                               this%type2_macro)
+        this%type2_observables%potential_energy = total_energy(this%Box, this%type2_spheres)
                         
         call this%write_all_reports(args%geometry)
         if (this%write_potential_energy) then
@@ -508,12 +507,12 @@ contains
         
         call final_spheres(this%Box, this%type1_spheres, this%type1_units)
         call set_ewald(this%Box, this%type1_spheres, this%type1_macro, this%data_json, this%type1_units)
-        type1_energy = total_energy(this%Box, this%type1_spheres, this%type1_macro)
+        type1_energy = total_energy(this%Box, this%type1_spheres, this%type1_macro, this%ext_field)
         call test_consistency(this%type1_observables%potential_energy, type1_energy, &
                               this%type1_report_json)
         
         call final_spheres(this%Box, this%type2_spheres, this%type2_units)
-        type2_energy = total_energy(this%Box, this%type2_spheres, this%type2_macro)
+        type2_energy = total_energy(this%Box, this%type2_spheres)
         call test_consistency(this%type2_observables%potential_energy, type2_energy, &
                               this%type2_report_json)
         
@@ -554,8 +553,9 @@ contains
         potential_energy = this%type1_observables%potential_energy + &
                            this%type2_observables%potential_energy + &
                            this%between_spheres_observables%potential_energy
-        potential_energy_conf = total_energy(this%Box, this%type1_spheres, this%type1_macro) + &
-                                total_energy(this%Box, this%type2_spheres, this%type2_macro) + &
+        potential_energy_conf = total_energy(this%Box, this%type1_spheres, this%type1_macro, &
+                                             this%ext_field) + &
+                                total_energy(this%Box, this%type2_spheres) + &
                                 this%between_spheres_potential%total(this%Box%size, &
                                                                      this%type1_spheres, &
                                                                      this%type2_spheres)

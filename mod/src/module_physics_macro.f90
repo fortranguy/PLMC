@@ -10,6 +10,7 @@ use module_data, only: test_data_found
 use module_types_micro, only: Box_Parameters, Argument_Random, Argument_Initial
 use module_geometry, only: geometry
 use module_physics_micro, only: PBC_distance, random_surface
+use class_external_field, only: External_Field
 use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres
 use class_small_move, only: Small_Move
 use class_small_rotation, only: Small_Rotation
@@ -383,28 +384,32 @@ contains
     
     end subroutine set_ewald
     
-    pure function total_energy(Box, this_spheres, this_macro)
+    function total_energy(Box, this_spheres, this_macro, ext_field)
     
         type(Box_Parameters), intent(in) :: Box
         class(Hard_Spheres), intent(in) :: this_spheres
-        class(Hard_Spheres_Macro), intent(in) :: this_macro
+        class(Hard_Spheres_Macro), intent(in), optional :: this_macro
+        class(External_Field), intent(in), optional :: ext_field
         real(DP) :: total_energy
         
         total_energy = this_macro%hard_potential%total(Box%size, this_spheres)
         
         select type (this_spheres)
             type is (Dipolar_Hard_Spheres)
+                if (.not. present(this_macro)) error stop "Macro argument missing for DHS"
+                if (.not. present(ext_field)) error stop "External field argument missing for DHS"
                 select type (this_macro)
                     type is (Dipolar_Hard_Spheres_Macro)
                         total_energy = total_energy + &
                                        this_macro%ewald_real%total(Box%size, this_spheres) + &
                                        this_macro%ewald_reci%total(Box) - &
                                        this_macro%ewald_self%total(this_spheres) + &
-                                       this_macro%ewald_bound%total(Box%size)
+                                       this_macro%ewald_bound%total(Box%size) + &
+                                       ext_field%total(this_macro%ewald_bound%get_total_moment())
                         if (geometry%slab) then
                             total_energy = total_energy - this_macro%elc%total(Box)
                         end if
-                end select
+                end select                    
         end select
         
     end function total_energy
