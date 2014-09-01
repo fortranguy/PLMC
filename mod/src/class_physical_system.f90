@@ -11,6 +11,7 @@ use module_data, only: test_data_file_exists, test_data_found, test_empty_string
 use module_types_micro, only: Box_Parameters, Monte_Carlo_Arguments
 use module_geometry, only: geometry, set_geometry
 use module_physics_micro, only: num_wave_vectors
+use class_external_field, only: External_Field
 use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres, Between_Hard_Spheres
 use class_hard_spheres_potential, only: Between_Hard_Spheres_Potential_Energy
 use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
@@ -43,6 +44,7 @@ private
         
         ! Box
         type(Box_Parameters) :: Box
+        type(External_Field) :: ext_field
         
         ! Monte-Carlo
         integer :: num_thermalisation_steps, period_adaptation, num_equilibrium_steps
@@ -178,7 +180,7 @@ contains
         logical :: found
         real(DP), dimension(:), allocatable :: Box_size
         integer, dimension(:), allocatable :: Box_wave
-        real(DP), dimension(:), allocatable :: Box_external_field
+        real(DP), dimension(:), allocatable :: external_field
 
         real(DP) :: z_ratio
         
@@ -226,11 +228,11 @@ contains
         call test_data_found(data_name, found)
 
         data_name = "Box.external field"
-        call this%data_json%get(data_name, Box_external_field, found)
+        call this%data_json%get(data_name, external_field, found)
         call test_data_found(data_name, found)
-        if (size(Box_external_field) /= num_dimensions) error stop "Box external field"
-        this%Box%external_field(:) = Box_external_field(:)
-        if (allocated(Box_external_field)) deallocate(Box_external_field)
+        if (size(external_field) /= num_dimensions) error stop "Box external field dimension"
+        call this%ext_field%set(external_field)
+        if (allocated(external_field)) deallocate(external_field)
         
     end subroutine Physical_System_set_box
     
