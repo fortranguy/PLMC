@@ -384,20 +384,18 @@ contains
     
     end subroutine set_ewald
     
-    function total_energy(Box, this_spheres, this_macro, ext_field)
+    pure function total_energy(Box, this_spheres, this_macro, ext_field)
     
         type(Box_Parameters), intent(in) :: Box
         class(Hard_Spheres), intent(in) :: this_spheres
-        class(Hard_Spheres_Macro), intent(in), optional :: this_macro
-        class(External_Field), intent(in), optional :: ext_field
+        class(Hard_Spheres_Macro), intent(in) :: this_macro
+        class(External_Field), intent(in) :: ext_field
         real(DP) :: total_energy
         
         total_energy = this_macro%hard_potential%total(Box%size, this_spheres)
         
         select type (this_spheres)
             type is (Dipolar_Hard_Spheres)
-                if (.not. present(this_macro)) error stop "Macro argument missing for DHS"
-                if (.not. present(ext_field)) error stop "External field argument missing for DHS"
                 select type (this_macro)
                     type is (Dipolar_Hard_Spheres_Macro)
                         total_energy = total_energy + &

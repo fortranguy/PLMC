@@ -379,7 +379,8 @@ contains
                                                        this%type2_spheres%get_diameter())
         call init_cells(this%Box%size, this%type2_spheres, this%type2_macro, this%type1_spheres, &
                         this%between_spheres_potential)
-        this%type2_observables%potential_energy = total_energy(this%Box, this%type2_spheres)
+        this%type2_observables%potential_energy = total_energy(this%Box, this%type2_spheres, &
+                                                               this%type2_macro, this%ext_field)
                         
         call this%write_all_reports(args%geometry)
         if (this%write_potential_energy) then
@@ -512,7 +513,7 @@ contains
                               this%type1_report_json)
         
         call final_spheres(this%Box, this%type2_spheres, this%type2_units)
-        type2_energy = total_energy(this%Box, this%type2_spheres)
+        type2_energy = total_energy(this%Box, this%type2_spheres, this%type2_macro, this%ext_field)
         call test_consistency(this%type2_observables%potential_energy, type2_energy, &
                               this%type2_report_json)
         
@@ -555,7 +556,8 @@ contains
                            this%between_spheres_observables%potential_energy
         potential_energy_conf = total_energy(this%Box, this%type1_spheres, this%type1_macro, &
                                              this%ext_field) + &
-                                total_energy(this%Box, this%type2_spheres) + &
+                                total_energy(this%Box, this%type2_spheres, this%type2_macro, &
+                                             this%ext_field) + &
                                 this%between_spheres_potential%total(this%Box%size, &
                                                                      this%type1_spheres, &
                                                                      this%type2_spheres)
