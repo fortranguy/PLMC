@@ -537,8 +537,7 @@ contains
                             this_macro%ewald_self%solo(old%orientation)
         
         energy_delta = energy_real_delta + this_macro%ewald_reci%rotation(Box, old, new) - &
-                       energy_self_delta + this_macro%ewald_bound%rotation(Box%size, old%orientation, &
-                                                                                     new%orientation)
+                       energy_self_delta + this_macro%ewald_bound%rotation(Box%size, old, new)
         if (geometry%slab) then
             energy_delta = energy_delta - this_macro%elc%rotation(Box, old, new)
         end if
@@ -547,7 +546,7 @@ contains
         if (random < exp(-energy_delta/Box%temperature)) then
         
             call this_macro%ewald_reci%update_structure_rotation(Box, old, new)
-            call this_macro%ewald_bound%update_total_moment_rotation(old%orientation, new%orientation)
+            call this_macro%ewald_bound%update_total_moment_rotation(old, new)
             call this_spheres%set_orientation(old%number, new%orientation)
             if (geometry%slab) then
                 call this_macro%elc%update_structure_rotation(Box, old, new)

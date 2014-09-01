@@ -102,28 +102,28 @@ contains
     !>                 ]
     !> \f]
     
-    pure function Ewald_Summation_Bound_rotation(this, Box_size, old_orientation, new_orientation) &
+    pure function Ewald_Summation_Bound_rotation(this, Box_size, old, new) &
                   result (rotation)
     
         class(Ewald_Summation_Bound), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
-        real(DP), dimension(:), intent(in) :: old_orientation, new_orientation
+        type(Particle_Index), intent(in) :: old, new
         real(DP) :: rotation
 
         if (geometry%bulk) then
         
-            rotation = dot_product(new_orientation, new_orientation) - &
-                       dot_product(old_orientation, old_orientation) + &
-                       2._DP * dot_product(new_orientation - old_orientation, &
-                                           this%total_moment - old_orientation)
+            rotation = dot_product(new%orientation, new%orientation) - &
+                       dot_product(old%orientation, old%orientation) + &
+                       2._DP * dot_product(new%orientation - old%orientation, &
+                                           this%total_moment - old%orientation)
 
             rotation = 2._DP*PI/3._DP / product(Box_size) * rotation
 
         else if (geometry%slab) then
 
-            rotation = new_orientation(3)**2 - old_orientation(3)**2 + &
-                       2._DP * (new_orientation(3) - old_orientation(3)) * &
-                               (this%total_moment(3)-old_orientation(3))
+            rotation = new%orientation(3)**2 - old%orientation(3)**2 + &
+                       2._DP * (new%orientation(3) - old%orientation(3)) * &
+                               (this%total_moment(3)-old%orientation(3))
 
             rotation = 2._DP*PI / product(Box_size) * rotation
 
@@ -136,13 +136,12 @@ contains
     !>      \Delta \vec{M} = \vec{\mu}^\prime_l - \vec{\mu}_l
     !> \f]
 
-    pure subroutine Ewald_Summation_Bound_update_total_moment_rotation(this, old_orientation, &
-                                                                             new_orientation)
+    pure subroutine Ewald_Summation_Bound_update_total_moment_rotation(this, old, new)
                                                                            
         class(Ewald_Summation_Bound), intent(inout) :: this
-        real(DP), dimension(:), intent(in) :: old_orientation, new_orientation
+        type(Particle_Index), intent(in) :: old, new
 
-        this%total_moment(:) = this%total_moment(:) + new_orientation(:) - old_orientation(:)
+        this%total_moment(:) = this%total_moment(:) + new%orientation(:) - old%orientation(:)
 
     end subroutine Ewald_Summation_Bound_update_total_moment_rotation
     
