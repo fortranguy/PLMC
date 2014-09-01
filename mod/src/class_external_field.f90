@@ -42,13 +42,13 @@ contains
     
     !> \f[ \Delta U = -(\vec{\mu}^\prime - \vec{\mu} \cdot \vec{E}) \f]
 
-    pure function External_Field_rotation(this, old_orientation, new_orientation) result(rotation)
+    pure function External_Field_rotation(this, old, new) result(rotation)
     
         class(External_Field), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: old_orientation, new_orientation
+        type(Particle_Index), intent(in) :: old, new
         real(DP) :: rotation
 
-        rotation = -dot_product(new_orientation - old_orientation, this%vector)
+        rotation = -dot_product(new%orientation - old%orientation, this%vector)
 
     end function External_Field_rotation
     

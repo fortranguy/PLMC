@@ -5,6 +5,7 @@ use data_box, only: num_dimensions
 use module_types_micro, only: Box_Parameters, Particle_Index, Particle_Energy
 use module_geometry, only: geometry
 use module_physics_micro, only: random_surface, markov_surface
+use class_external_field, only: External_Field
 use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres
 use class_neighbour_cells, only: Neighbour_Cells
 use class_hard_spheres_potential, only: Between_Hard_Spheres_Potential_Energy
@@ -166,12 +167,13 @@ contains
     
     !> Widom's method
 
-    subroutine widom(Box, &
+    subroutine widom(Box, ext_field, &
                      this_spheres, this_macro, this_observables, &
                      other_spheres, other_between_cells, &
                      between_spheres_potential)
         
         type(Box_Parameters), intent(in) :: Box
+        class(External_Field), intent(in) :: ext_field
         class(Hard_Spheres), intent(in) :: this_spheres
         class(Hard_Spheres_Macro), intent(in) :: this_macro
         class(Neighbour_Cells), intent(in) ::  other_between_cells
@@ -239,7 +241,9 @@ contains
                                                             this_spheres, test) + &
                                                        this_macro%ewald_reci%exchange(Box, test) - &
                                                        this_macro%ewald_self%solo(test%orientation) + &
-                                                       this_macro%ewald_bound%exchange(Box%size, test)
+                                                       this_macro%ewald_bound%exchange(Box%size, test) + &
+                                                       ext_field%exchange(test)
+                                                       
                                     if (geometry%slab) then
                                         this_energy_test = this_energy_test - &
                                                            this_macro%elc%exchange(Box, test)
@@ -505,10 +509,11 @@ contains
     
     !> Dipole rotation
     
-    subroutine rotate(Box, &
+    subroutine rotate(Box, ext_field, &
                       this_spheres, this_macro, this_observables)
     
         type(Box_Parameters), intent(in) :: Box
+        class(External_Field), intent(in) :: ext_field
         class(Dipolar_Hard_spheres), intent(inout) :: this_spheres
         class(Dipolar_Hard_spheres_Macro), intent(inout) :: this_macro
         class(Dipolar_Hard_spheres_Observables), intent(inout) :: this_observables
@@ -537,7 +542,8 @@ contains
                             this_macro%ewald_self%solo(old%orientation)
         
         energy_delta = energy_real_delta + this_macro%ewald_reci%rotation(Box, old, new) - &
-                       energy_self_delta + this_macro%ewald_bound%rotation(Box%size, old, new)
+                       energy_self_delta + this_macro%ewald_bound%rotation(Box%size, old, new) + &
+                       ext_field%rotation(old, new)
         if (geometry%slab) then
             energy_delta = energy_delta - this_macro%elc%rotation(Box, old, new)
         end if

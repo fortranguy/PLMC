@@ -703,7 +703,7 @@ contains
                             this%between_spheres_observables%potential_energy, &
                             this%switch_observable)
             else
-                call rotate(this%Box, &
+                call rotate(this%Box, this%ext_field, &
                             this%type1_spheres, this%type1_macro, this%type1_observables)
             end if
             
@@ -789,11 +789,11 @@ contains
     
         class(Physical_System), intent(inout) :: this
     
-        call widom(this%Box, &
+        call widom(this%Box, this%ext_field, &
                    this%type1_spheres, this%type1_macro, this%type1_observables, &
                    this%type2_spheres, this%type2_macro%between_cells, &
                    this%between_spheres_potential)
-        call widom(this%Box, &
+        call widom(this%Box, this%ext_field, &
                    this%type2_spheres, this%type2_macro, this%type2_observables, &
                    this%type1_spheres, this%type1_macro%between_cells, &
                    this%between_spheres_potential)
