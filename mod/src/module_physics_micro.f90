@@ -5,6 +5,7 @@ module module_physics_micro
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, error_unit
 use data_constants, only: PI, sigma3d
 use data_box, only: num_dimensions
+use module_types_micro, only: Particle_Index
 use module_geometry, only: geometry
 
 implicit none
