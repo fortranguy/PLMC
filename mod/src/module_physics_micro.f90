@@ -385,7 +385,7 @@ contains
     
     end function potential_energy_yukawa
 
-    !> \Delta U_{N\rightarrow\N+1} = -(\vec{\mu}_{N+1} \cdot \vec{E})
+    !> \f[ \Delta U_{N\rightarrow{}N+1} = -(\vec{\mu}_{N+1} \cdot \vec{E}) \f]
 
     pure function field_dipole_exchange_energy(field, particle)
 
@@ -397,6 +397,8 @@ contains
                                         dot_product(particle%orientation, Field)
 
     end function field_dipole_exchange_energy
+    
+    !> \f[ \Delta U = -(\vec{\mu}^\prime - \vec{\mu} \cdot \vec{E}) \f]
 
     pure function field_dipole_rotation_energy(field, old_orientation, new_orientation)
 
