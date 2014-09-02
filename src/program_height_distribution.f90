@@ -94,11 +94,12 @@ implicit none
     data_name = "Box.size"
     call data_json%get(data_name, Box_size, found)
     call test_data_found(data_name, found)
-    if (size(Box_size) /= num_dimensions) error stop "Box size dimension"
     
     if (geometry%bulk) then
+        if (size(Box_size) /= num_dimensions) error stop "Box size dimension"
         Box_height = Box_size(3)
     else if (geometry%slab) then
+        if (size(Box_size) /= num_dimensions-1) error stop "Box size dimension"
         data_name = "Box.height"
         call data_json%get(data_name, Box_height, found)
         call test_data_found(data_name, found)
@@ -144,8 +145,8 @@ implicit none
         open(newunit=orientations_unit, recl=4096, file=filename(1:length), &
              status='old', action='read')
         
-        read(positions_unit, *) orientations_name, orientations_num_particles, &
-                                orientations_snap_factor
+        read(orientations_unit, *) orientations_name, orientations_num_particles, &
+                                   orientations_snap_factor
         if ((positions_name /= orientations_name) .or. &
             (positions_num_particles /= orientations_num_particles) .or. &
             (positions_snap_factor /= orientations_snap_factor)) then
