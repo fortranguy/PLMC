@@ -28,7 +28,7 @@ use data_box, only: num_dimensions
 use json_module, only: json_file, json_initialize
 use module_data, only: test_data_found
 use module_geometry, only: set_geometry, geometry
-use module_mathematics, only: Identity_Matrix
+use class_identity_matrix, only: Identity_Matrix
 use module_physics_micro, only: PBC_distance
 use module_arguments, only: arg_to_file
 

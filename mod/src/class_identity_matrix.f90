@@ -1,4 +1,4 @@
-module module_mathematics
+module class_identity_matrix
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 
@@ -46,4 +46,4 @@ contains
     
     end function Identity_Matrix_get
 
-end module module_mathematics
+end module class_identity_matrix
