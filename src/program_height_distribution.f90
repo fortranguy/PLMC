@@ -1,5 +1,26 @@
 !> \brief Calculate and write the distribution function
 
+!> 1. Density profile:
+!> \f[
+!>      \rho(z) = \frac{\langle N(z) \rangle \sigma^3}{S\delta z}  
+!> \f]
+
+!> 2. Average orientation: different than II.40 ?
+!> \f[
+!>      Q_{zz}(z) = \left\langle \frac{\sum_{i=1}^N (3\mu_{i,z}^2/\mu_i^2 - 1)/2}
+!>                                    {N(z)}\right\rangle
+!> \f]
+
+!> 3. Preferred orientation:
+!> \f[
+!>      Q = \frac{3}{2N} \sum_{i=1}^N |\vec{\mu}_i)(\vec{\mu}_i| - \frac{1}{2}I
+!> \f]
+!> We look for the eigen vector associated with the highest eigen value of Q.
+!> \f[
+!>      Q = \sum_{d=1}^3 |\vec{q}_d) q_d (\vec{q}_d|
+!> \f]
+!> \f[ \vec{d} := \vec{q_d} | q_d \text{max}\f]
+
 program height_distribution
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit, error_unit
@@ -27,9 +48,14 @@ implicit none
     integer :: i_particle
     real(DP) :: distance_max, height_i, delta
     integer :: num_distribution, i_distribution
-    real(DP), dimension(:), allocatable :: distribution_step
-    real(DP), dimension(:), allocatable :: distribution_function
+    real(DP), dimension(:, :), allocatable :: distribution_step
+    real(DP), dimension(:, :), allocatable :: distribution_function
     real(DP), dimension(:, :), allocatable :: positions, orientations
+    
+    real(DP), dimension(num_dimensions) :: eigenvalues, preferred_orientation, &
+                                           normed_orientation
+    real(DP), dimension(num_dimensions, num_dimensions) :: orientation_matrix, &
+                                                           identity_matrix
     
     logical :: with_orientations
     
