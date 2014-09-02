@@ -43,7 +43,7 @@ implicit none
     integer :: positions_num_particles, orientations_num_particles
     integer :: positions_snap_factor, orientations_snap_factor
     real(DP) :: density
-    integer :: positions_unit, orientations_unit, distrib_unit
+    integer :: positions_unit, orientations_unit, distribution_unit
     
     integer :: num_thermalisation_steps
     integer :: num_equilibrium_steps, i_step, num_steps
@@ -117,8 +117,8 @@ implicit none
     
     distance_max = Box_height
     num_distribution = int(distance_max/delta)
-    allocate(distribution_step(num_distribution))
-    allocate(distribution_function(num_distribution))
+    allocate(distribution_step(num_distribution, 3))
+    allocate(distribution_function(num_distribution, 3))
     
     call arg_to_file(1, filename, length)
     open(newunit=positions_unit, recl=4096, file=filename(1:length), status='old', &
@@ -153,12 +153,10 @@ implicit none
         call identity%construct(num_dimensions)
     
     end if
-    
-    dist_function(:, :) = 0._DP
 
     write(output_unit, *) "Start !"
     call cpu_time(time_start)
-    distribution_function(:) = 0._DP
+    distribution_function(:, :) = 0._DP
     num_steps = 0
     do i_step = num_thermalisation_steps + 1, num_thermalisation_steps + num_equilibrium_steps    
         if (modulo(i_step, positions_snap_factor) == 0) then
@@ -168,19 +166,21 @@ implicit none
             do i_particle = 1, positions_num_particles
                 read(positions_unit, *) positions(:, i_particle)
             end do
+            
+            if (with_orientations) then
+                do i_particle = 1, orientations_num_particles
+                    read(orientations_unit, *) orientations(:, i_particle)
+                end do
+            end if
 
             ! Fill
-            distribution_step(:) = 0
+            distribution_step(:, :) = 0
             do i_particle = 1, positions_num_particles
-                do j_particle = i_particle + 1, positions_num_particles
-                    distance_ij = PBC_distance(Box_size, positions(:, i_particle), &
-                                                         positions(:, j_particle))
-                    i_distribution =  int(distance_ij/delta)
-                    distribution_step(i_distribution) = distribution_step(i_distribution) + 1._DP
-                end do
+                i_distribution =  int(positions(3, i_particle)/delta)
+                distribution_step(i_distribution, 1) = distribution_step(i_distribution, 1) + 1._DP
             end do
             
-            distribution_function(:) = distribution_function(:) + distribution_step(:)
+            distribution_function(:, :) = distribution_function(:, :) + distribution_step(:, :)
         
         end if
     end do
@@ -196,28 +196,25 @@ implicit none
     close(positions_unit)
     deallocate(positions)
 
-    open(newunit=distrib_unit, file=trim(positions_name)//"_height_distribution_function.out", &
-         action="write")
-    
-        distribution_function(:) = 2._DP * distribution_function(:) / real(num_steps, DP) / &
-                                   real(positions_num_particles, DP)
-    
+    open(newunit=distribution_unit, recl=4096, &
+         file=trim(positions_name)//"_height_distribution_function.out", action="write")
+         
+    if (with_orientations) then
         do i_distribution = 1, num_distribution
-        
-            distance_i_distribution = (real(i_distribution, DP) + 0.5_DP) * delta
-            distance_i_minus = real(i_distribution, DP) * delta
-            distance_i_plus = real(i_distribution + 1, DP) * delta
-            
-            distribution_function(i_distribution) = distribution_function(i_distribution) / &
-                density / (sphere_volume(distance_i_plus) - sphere_volume(distance_i_minus))
-            write(distrib_unit, *) distance_i_distribution, distribution_function(i_distribution)
-            
+            height_i = (real(i_distribution, DP) + 0.5_DP) * delta
+            write(distribution_unit, *) height_i, distribution_function(i_distribution, :)
         end do
+    else
+        do i_distribution = 1, num_distribution
+            height_i = (real(i_distribution, DP) + 0.5_DP) * delta
+            write(distribution_unit, *) height_i, distribution_function(i_distribution, 1)
+        end do
+    end if
         
-    close(distrib_unit)
+    close(distribution_unit)
     
-    open(newunit=report_unit, file=trim(positions_name)//"_height_distribution_report.txt", &
-         action="write")
+    open(newunit=report_unit, recl=4096, &
+         file=trim(positions_name)//"_height_distribution_report.txt", action="write")
         write(report_unit, *) "Duration =", (time_end - time_start) / 60._DP, "min"
     close(report_unit)
     
