@@ -27,13 +27,15 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit, error_unit
 use data_box, only: num_dimensions
 use json_module, only: json_file, json_initialize
 use module_data, only: test_data_found
-use module_geometry, only: set_geometry
+use module_geometry, only: set_geometry, geometry
+use module_mathematics, only: Identity_Matrix
 use module_physics_micro, only: PBC_distance
 use module_arguments, only: arg_to_file
 
 implicit none
 
     logical :: take_snapshot
+    character(len=:), allocatable :: Box_geometry
     real(DP), dimension(:), allocatable :: Box_size    
     real(DP) :: Box_height
 
@@ -54,8 +56,8 @@ implicit none
     
     real(DP), dimension(num_dimensions) :: eigenvalues, preferred_orientation, &
                                            normed_orientation
-    real(DP), dimension(num_dimensions, num_dimensions) :: orientation_matrix, &
-                                                           identity_matrix
+    real(DP), dimension(num_dimensions, num_dimensions) :: orientation_matrix
+    type(Identity_Matrix) :: identity
     
     logical :: with_orientations
     
@@ -66,8 +68,6 @@ implicit none
     integer :: length
     integer :: report_unit
     real(DP) :: time_start, time_end
-
-    character(len=:), allocatable :: geometry
     
     call json_initialize()
     call data_json%load_file(filename = "data.json")
@@ -81,10 +81,10 @@ implicit none
     call report_json%load_file(filename = "report.json")
     
     data_name = "System.Box.geometry"
-    call report_json%get(data_name, geometry, found)
+    call report_json%get(data_name, Box_geometry, found)
     call test_data_found(data_name, found)
-    call set_geometry(geometry)
-    if (allocated(geometry)) deallocate(geometry)
+    call set_geometry(Box_geometry)
+    if (allocated(Box_geometry)) deallocate(Box_geometry)
 
     call report_json%destroy()
     
@@ -93,9 +93,9 @@ implicit none
     call test_data_found(data_name, found)
     if (size(Box_size) /= num_dimensions) error stop "Box size dimension"
     
-    if (geometry == "bulk") then
+    if (geometry%bulk) then
         Box_height = Box_size(3)
-    else if (geometry == "slab") then
+    else if (geometry%slab) then
         data_name = "Box.height"
         call data_json%get(data_name, Box_height, found)
         call test_data_found(data_name, found)
@@ -127,7 +127,7 @@ implicit none
     read(positions_unit, *) positions_name, positions_num_particles, &
                             positions_snap_factor
     write(output_unit, *) trim(positions_name), positions_num_particles, &
-                          positions_snap_factor    
+                          positions_snap_factor
     
     allocate(positions(num_dimensions, positions_num_particles))
     density = real(positions_num_particles, DP) / product(Box_size)
@@ -150,8 +150,11 @@ implicit none
         end if
         
         allocate(orientations(num_dimensions, orientations_num_particles))
+        call identity%construct(num_dimensions)
     
     end if
+    
+    dist_function(:, :) = 0._DP
 
     write(output_unit, *) "Start !"
     call cpu_time(time_start)
@@ -186,6 +189,7 @@ implicit none
     
     if (with_orientations) then
         close(orientations_unit)
+        call identity%destroy()
         deallocate(orientations)    
     end if
 
