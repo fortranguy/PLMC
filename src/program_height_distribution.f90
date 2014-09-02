@@ -24,11 +24,13 @@
 program height_distribution
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit, error_unit
+use data_precisions, only: real_zero
 use data_box, only: num_dimensions
 use json_module, only: json_file, json_initialize
 use module_data, only: test_data_found
 use module_geometry, only: set_geometry, geometry
 use class_identity_matrix, only: Identity_Matrix
+use module_linear_algebra, only: eigen_symmetric
 use module_physics_micro, only: PBC_distance
 use module_arguments, only: arg_to_file
 
@@ -40,7 +42,7 @@ implicit none
     real(DP) :: Box_height
 
     character(len=4096) :: positions_name, orientations_name
-    integer :: positions_num_particles, orientations_num_particles
+    integer :: num_particles, positions_num_particles, orientations_num_particles
     integer :: positions_snap_factor, orientations_snap_factor
     real(DP) :: density
     integer :: positions_unit, orientations_unit, distribution_unit
@@ -58,6 +60,7 @@ implicit none
                                            normed_orientation
     real(DP), dimension(num_dimensions, num_dimensions) :: orientation_matrix
     type(Identity_Matrix) :: identity
+    real(DP) :: orientation_z_sqr
     
     logical :: with_orientations
     
@@ -129,8 +132,9 @@ implicit none
     write(output_unit, *) trim(positions_name), positions_num_particles, &
                           positions_snap_factor
     
-    allocate(positions(num_dimensions, positions_num_particles))
-    density = real(positions_num_particles, DP) / product(Box_size)
+    num_particles = positions_num_particles
+    allocate(positions(num_dimensions, num_particles))
+    density = real(num_particles, DP) / product(Box_size)
     
     with_orientations = (command_argument_count() == 2)
     
@@ -149,7 +153,7 @@ implicit none
             error stop
         end if
         
-        allocate(orientations(num_dimensions, orientations_num_particles))
+        allocate(orientations(num_dimensions, num_particles))
         call identity%construct(num_dimensions)
     
     end if
@@ -163,22 +167,57 @@ implicit none
         
             num_steps = num_steps + 1
         
-            do i_particle = 1, positions_num_particles
+            do i_particle = 1, num_particles
                 read(positions_unit, *) positions(:, i_particle)
             end do
             
             if (with_orientations) then
-                do i_particle = 1, orientations_num_particles
+                do i_particle = 1, num_particles
                     read(orientations_unit, *) orientations(:, i_particle)
                 end do
             end if
 
             ! Fill
             distribution_step(:, :) = 0
-            do i_particle = 1, positions_num_particles
+            do i_particle = 1, num_particles
                 i_distribution =  int(positions(3, i_particle)/delta)
                 distribution_step(i_distribution, 1) = distribution_step(i_distribution, 1) + 1._DP
             end do
+            
+            if (with_orientations) then
+            
+                orientation_matrix(:, :) = 0._DP
+                do i_particle = 1, num_particles
+                    orientation_matrix(:, :) = orientation_matrix(:, :) + &
+                    matmul(reshape(orientations(:, i_particle), [num_dimensions, 1]), &
+                           reshape(orientations(:, i_particle), [1, num_dimensions]))
+                end do
+                orientation_matrix(:, :) = 1.5_DP/real(num_particles, DP) * orientation_matrix(:, :) - &
+                                           0.5_DP * identity%get()
+                call eigen_symmetric(orientation_matrix, eigenvalues)
+                preferred_orientation(:) = orientation_matrix(:, num_dimensions) / &
+                                           norm2(orientation_matrix(:, num_dimensions))
+                                           
+                do i_particle = 1, num_particles
+                    i_distribution =  int(positions(3, i_particle)/delta)
+                    orientation_z_sqr = orientations(3, i_particle)**2 / &
+                                        dot_product(orientations(:, i_particle), &
+                                                    orientations(:, i_particle))
+                    distribution_step(i_distribution, 2) = distribution_step(i_distribution, 2) + &
+                                                           1.5_DP*orientation_z_sqr - 0.5_DP
+                    
+                    normed_orientation(:) = orientations(:, i_particle) / &
+                                            norm2(orientations(:, i_particle))
+                    distribution_step(i_distribution, 3) = distribution_step(i_distribution, 3) + &
+                                                           dot_product(normed_orientation, &
+                                                                       preferred_orientation)
+                end do
+                where(distribution_step(:, 1) > real_zero)
+                    distribution_step(:, 2) = distribution_step(:, 2) / distribution_step(:, 1)
+                    distribution_step(:, 3) = abs(distribution_step(:, 3)) / distribution_step(:, 1)
+                end where
+            
+            end if
             
             distribution_function(:, :) = distribution_function(:, :) + distribution_step(:, :)
         
@@ -195,6 +234,17 @@ implicit none
 
     close(positions_unit)
     deallocate(positions)
+    
+    distribution_function(:, :) = distribution_function(:, :) / real(num_steps, DP)
+    
+    open(newunit=report_unit, recl=4096, &
+         file=trim(positions_name)//"_height_distribution_report.txt", action="write")
+    write(report_unit, *) "Checking normalisation: "
+    write(report_unit, *) sum(distribution_function(:, 1)) / real(num_particles, DP)
+    write(report_unit, *) "Duration =", (time_end - time_start) / 60._DP, "min"
+    close(report_unit)
+
+    distribution_function(:, 1) = distribution_function(:, 1) / (Box_size(1)*Box_size(2)*delta)
 
     open(newunit=distribution_unit, recl=4096, &
          file=trim(positions_name)//"_height_distribution_function.out", action="write")
@@ -212,11 +262,6 @@ implicit none
     end if
         
     close(distribution_unit)
-    
-    open(newunit=report_unit, recl=4096, &
-         file=trim(positions_name)//"_height_distribution_report.txt", action="write")
-        write(report_unit, *) "Duration =", (time_end - time_start) / 60._DP, "min"
-    close(report_unit)
     
     deallocate(distribution_function)
     deallocate(distribution_step)

@@ -10,6 +10,12 @@ find_package(
 )
 
 find_package(
+    lapack
+    3.2
+    REQUIRED
+)
+
+find_package(
     Boost
     1.55.0
     REQUIRED
@@ -31,7 +37,7 @@ add_library(
 )
 
 include_directories(${Boost_INCLUDE_DIRS})
-
+include_directories(${lapack_INCLUDE_DIRS})
 include_directories(${jsonfortran_INCLUDE_DIRS})
 
 set_property(
@@ -41,4 +47,5 @@ set_property(
 target_link_libraries(
     mc_meta_module
     jsonfortran-static
+    lapack
 )
