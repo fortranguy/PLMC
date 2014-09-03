@@ -240,8 +240,7 @@ implicit none
     
     open(newunit=report_unit, recl=4096, &
          file=trim(positions_name)//"_height_distribution_report.txt", action="write")
-    write(report_unit, *) "Checking normalisation: "
-    write(report_unit, *) sum(distribution_function(:, 1)) / real(num_particles, DP)
+    write(report_unit, *) "Normalisation: ", sum(distribution_function(:, 1)) / real(num_particles, DP)
     write(report_unit, *) "Duration =", (time_end - time_start) / 60._DP, "min"
     close(report_unit)
 
