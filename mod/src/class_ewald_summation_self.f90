@@ -12,8 +12,8 @@ private
         real(DP) :: alpha
     contains
         procedure :: set_alpha => Ewald_Summation_Self_set_alpha
-        procedure :: total => Ewald_Summation_Self_total
-        procedure :: solo => Ewald_Summation_Self_solo
+        procedure :: total_energy => Ewald_Summation_Self_total_energy
+        procedure :: solo_energy => Ewald_Summation_Self_solo_energy
     end type Ewald_Summation_Self
     
 contains
@@ -30,32 +30,32 @@ contains
     !> Total self energy
     !> \f[ \frac{2}{3}\frac{\alpha^3}{\sqrt{\pi}} \sum_i \vec{\mu}_i\cdot\vec{\mu}_i \f]
     
-    pure function Ewald_Summation_Self_total(this, this_spheres) result(total)
+    pure function Ewald_Summation_Self_total_energy(this, this_spheres) result(total_energy)
     
         class(Ewald_Summation_Self), intent(in) :: this
         class(Dipolar_Hard_Spheres), intent(in) :: this_spheres
-        real(DP) :: total
+        real(DP) :: total_energy
 
         integer :: i_particle
         
-        total = 0._DP
+        total_energy = 0._DP
         do i_particle = 1, this_spheres%get_num_particles()
-            total = total + this%solo(this_spheres%get_orientation(i_particle))
+            total_energy = total_energy + this%solo_energy(this_spheres%get_orientation(i_particle))
         end do
         
-    end function Ewald_Summation_Self_total
+    end function Ewald_Summation_Self_total_energy
     
     !> Self energy of 1 dipole
     !> \f[ \frac{2}{3}\frac{\alpha^3}{\sqrt{\pi}} \vec{\mu}_i\cdot\vec{\mu}_i \f]
     
-    pure function Ewald_Summation_Self_solo(this, orientation) result(solo)
+    pure function Ewald_Summation_Self_solo_energy(this, orientation) result(solo_energy)
     
         class(Ewald_Summation_Self), intent(in) :: this
         real(DP), dimension(:), intent(in) :: orientation
-        real(DP) :: solo
+        real(DP) :: solo_energy
         
-        solo = 2._DP/3._DP * this%alpha**3/sqrt(PI) * dot_product(orientation, orientation)
+        solo_energy = 2._DP/3._DP * this%alpha**3/sqrt(PI) * dot_product(orientation, orientation)
     
-    end function Ewald_Summation_Self_solo
+    end function Ewald_Summation_Self_solo_energy
 
 end module class_ewald_summation_self

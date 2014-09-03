@@ -399,10 +399,10 @@ contains
                 select type (this_macro)
                     type is (Dipolar_Hard_Spheres_Macro)
                         total_energy = total_energy + &
-                                       this_macro%ewald_real%total(Box%size, this_spheres) + &
-                                       this_macro%ewald_reci%total(Box) - &
-                                       this_macro%ewald_self%total(this_spheres) + &
-                                       this_macro%ewald_bound%total(Box%size) + &
+                                       this_macro%ewald_real%total_energy(Box%size, this_spheres) + &
+                                       this_macro%ewald_reci%total_energy(Box) - &
+                                       this_macro%ewald_self%total_energy(this_spheres) + &
+                                       this_macro%ewald_bound%total_energy(Box%size) + &
                                        ext_field%total(this_macro%ewald_bound%get_total_moment())
                         if (geometry%slab) then
                             total_energy = total_energy - this_macro%elc%total(Box)

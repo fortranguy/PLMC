@@ -26,13 +26,13 @@ private
         procedure :: reset_structure => Ewald_Summation_Reci_reset_structure
         procedure, private :: get_structure_modulus => Ewald_Summation_Reci_get_structure_modulus
         procedure :: count_wave_vectors => Ewald_Summation_Reci_count_wave_vectors
-        procedure :: total => Ewald_Summation_Reci_total
+        procedure :: total_energy => Ewald_Summation_Reci_total_energy
         
-        procedure :: move => Ewald_Summation_Reci_move
+        procedure :: move_energy => Ewald_Summation_Reci_move_energy
         procedure :: update_structure_move => Ewald_Summation_Reci_update_structure_move
-        procedure :: rotation => Ewald_Summation_Reci_rotation
+        procedure :: rotation_energy => Ewald_Summation_Reci_rotation_energy
         procedure :: update_structure_rotation => Ewald_Summation_Reci_update_structure_rotation
-        procedure :: exchange => Ewald_Summation_Reci_exchange
+        procedure :: exchange_energy => Ewald_Summation_Reci_exchange_energy
         procedure :: update_structure_exchange => Ewald_Summation_Reci_update_structure_exchange
     
     end type Ewald_Summation_Reci
@@ -240,28 +240,29 @@ contains
 
     end subroutine Ewald_Summation_Reci_count_wave_vectors
     
-    pure function Ewald_Summation_Reci_total(this, Box) result(total)
+    pure function Ewald_Summation_Reci_total_energy(this, Box) result(total_energy)
         
         class(Ewald_Summation_Reci), intent(in) :: this
         type(Box_Parameters), intent(in) :: Box
-        real(DP) :: total
+        real(DP) :: total_energy
 
         integer :: kx, ky, kz
 
-        total = 0._DP
+        total_energy = 0._DP
 
         do kz = -Box%wave(3), Box%wave(3)
             do ky = -Box%wave(2), Box%wave(2)
                 do kx = -Box%wave(1), Box%wave(1)
-                    total = total + this%weight(kx, ky, kz) * real(this%structure(kx, ky, kz) * &
-                                                              conjg(this%structure(kx, ky, kz)), DP)
+                    total_energy = total_energy + this%weight(kx, ky, kz) * &
+                                                  real(this%structure(kx, ky, kz) * &
+                                                  conjg(this%structure(kx, ky, kz)), DP)
                 end do
             end do
         end do
         
-        total = 2._DP*PI / product(Box%size) * total
+        total_energy = 2._DP*PI / product(Box%size) * total_energy
         
-    end function Ewald_Summation_Reci_total
+    end function Ewald_Summation_Reci_total_energy
     
     !> Move
 
@@ -275,12 +276,12 @@ contains
     !>               ]
     !> \f]
 
-    pure function Ewald_Summation_Reci_move(this, Box, old, new) result(move)
+    pure function Ewald_Summation_Reci_move_energy(this, Box, old, new) result(move_energy)
 
         class(Ewald_Summation_Reci), intent(in) :: this
         type(Box_Parameters), intent(in) :: Box
         type(Particle_Index), intent(in) :: old, new
-        real(DP) :: move
+        real(DP) :: move_energy
         
         real(DP), dimension(num_dimensions) :: new_position_div_box, old_position_div_box
         real(DP), dimension(num_dimensions) :: orientation_div_box
@@ -313,7 +314,7 @@ contains
 
         orientation_div_box(:) = new%orientation(:) / Box%size(:)
 
-        move = 0._DP
+        move_energy = 0._DP
 
         do kz = 0, Box%wave(3) ! symmetry: half wave vectors -> double Energy
             wave_vector(3) = real(kz, DP)
@@ -333,7 +334,7 @@ contains
                                 (this%structure(kx, ky, kz) - cmplx(wave_dot_orientation, 0._DP, DP) * &
                                 exp_IkxOld), DP)
 
-                    move = move + 2._DP * this%weight(kx, ky, kz) * real_part
+                    move_energy = move_energy + 2._DP * this%weight(kx, ky, kz) * real_part
 
                 end do
             
@@ -341,9 +342,9 @@ contains
         
         end do
 
-        move = 4._DP*PI / product(Box%size) * move
+        move_energy = 4._DP*PI / product(Box%size) * move_energy
 
-    end function Ewald_Summation_Reci_move
+    end function Ewald_Summation_Reci_move_energy
 
     !> Update position -> update the ``structure factor''
     !>  \f[
@@ -424,12 +425,12 @@ contains
     !>               \}
     !> \f]
     
-    pure function Ewald_Summation_Reci_rotation(this, Box, old, new) result(rotation)
+    pure function Ewald_Summation_Reci_rotation_energy(this, Box, old, new) result(rotation_energy)
 
         class(Ewald_Summation_Reci), intent(in) :: this
         type(Box_Parameters), intent(in) :: Box
         type(Particle_Index), intent(in) :: old, new
-        real(DP) :: rotation
+        real(DP) :: rotation_energy
 
         real(DP), dimension(num_dimensions) :: position_div_box
         real(DP), dimension(num_dimensions) :: new_orientation_div_box, old_orientation_div_box
@@ -453,7 +454,7 @@ contains
         new_orientation_div_box(:) = new%orientation(:) / Box%size(:)
         old_orientation_div_box(:) = old%orientation(:) / Box%size(:)
 
-        rotation = 0._DP
+        rotation_energy = 0._DP
 
         do kz = 0, Box%wave(3)
             wave_vector(3) = real(kz, DP)
@@ -475,7 +476,7 @@ contains
                                 (this%structure(kx, ky, kz) - &
                                 wave_dot_old_orientation * exp_Ikx), DP)
 
-                    rotation = rotation + this%weight(kx, ky, kz) * real_part
+                    rotation_energy = rotation_energy + this%weight(kx, ky, kz) * real_part
 
                 end do
 
@@ -483,9 +484,9 @@ contains
 
         end do
 
-        rotation = 4._DP*PI / product(Box%size) * rotation
+        rotation_energy = 4._DP*PI / product(Box%size) * rotation_energy
 
-    end function Ewald_Summation_Reci_rotation
+    end function Ewald_Summation_Reci_rotation_energy
 
     !> Update moment -> update the ``structure factor''
     !>  \f[
@@ -559,12 +560,12 @@ contains
     
     !> Summary: only the sign of \f$\vec{\mu}\f$ changes.
 
-    pure function Ewald_Summation_Reci_exchange(this, Box, particle) result(exchange)
+    pure function Ewald_Summation_Reci_exchange_energy(this, Box, particle) result(exchange_energy)
 
         class(Ewald_Summation_Reci), intent(in) :: this
         type(Box_Parameters), intent(in) :: Box
         type(Particle_Index), intent(in) :: particle
-        real(DP) :: exchange
+        real(DP) :: exchange_energy
         
         real(DP), dimension(num_dimensions) :: position_div_box
         real(DP), dimension(num_dimensions) :: orientation_div_box
@@ -587,7 +588,7 @@ contains
         
         orientation_div_box(:) = exchange_sign(particle%add) * particle%orientation(:) / Box%size(:)
         
-        exchange = 0._DP
+        exchange_energy = 0._DP
         
         do kz = 0, Box%wave(3)
             wave_vector(3) = real(kz, DP)
@@ -604,7 +605,7 @@ contains
                     real_part = wave_dot_orientation * (wave_dot_orientation + 2._DP * &
                                 real(this%structure(kx, ky, kz) * conjg(exp_Ikx), DP))
 
-                    exchange = exchange + this%weight(kx, ky, kz) * real_part
+                    exchange_energy = exchange_energy + this%weight(kx, ky, kz) * real_part
                    
                 end do
             
@@ -612,9 +613,9 @@ contains
         
         end do
         
-        exchange = 4._DP*PI / product(Box%size) * exchange
+        exchange_energy = 4._DP*PI / product(Box%size) * exchange_energy
 
-    end function Ewald_Summation_Reci_exchange
+    end function Ewald_Summation_Reci_exchange_energy
     
     !> Exchange a particle -> update the ``structure factor''
     

@@ -18,11 +18,11 @@ private
         procedure :: set_total_moment => Ewald_Summation_Bound_set_total_moment
         procedure :: get_total_moment => Ewald_Summation_Bound_get_total_moment
         procedure :: reset_total_moment => Ewald_Summation_Bound_reset_total_moment
-        procedure :: total => Ewald_Summation_Bound_total
+        procedure :: total_energy => Ewald_Summation_Bound_total_energy
         
-        procedure :: rotation => Ewald_Summation_Bound_rotation
+        procedure :: rotation_energy => Ewald_Summation_Bound_rotation_energy
         procedure :: update_total_moment_rotation => Ewald_Summation_Bound_update_total_moment_rotation
-        procedure :: exchange => Ewald_Summation_Bound_exchange
+        procedure :: exchange_energy => Ewald_Summation_Bound_exchange_energy
         procedure :: update_total_moment_exchange => Ewald_Summation_Bound_update_total_moment_exchange
     end type Ewald_Summation_Bound
 
@@ -79,19 +79,20 @@ contains
     !>      J(\vec{M}, R) = \frac{2\pi}{V} |M_z|^2
     !> \f]
     
-    pure function Ewald_Summation_Bound_total(this, Box_size) result(total)
+    pure function Ewald_Summation_Bound_total_energy(this, Box_size) result(total_energy)
     
         class(Ewald_Summation_Bound), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
-        real(DP) :: total
+        real(DP) :: total_energy
 
         if (geometry%bulk) then
-            total = 2._DP*PI/3._DP / product(Box_size) * dot_product(this%total_moment, this%total_moment)
+            total_energy = 2._DP*PI/3._DP / product(Box_size) * &
+                           dot_product(this%total_moment, this%total_moment)
         else if(geometry%slab) then
-            total = 2._DP*PI / product(Box_size) * this%total_moment(3)**2
+            total_energy = 2._DP*PI / product(Box_size) * this%total_moment(3)**2
         end if
     
-    end function Ewald_Summation_Bound_total
+    end function Ewald_Summation_Bound_total_energy
 
     !> Rotation
     
@@ -112,34 +113,34 @@ contains
     !>                 ]
     !> \f]
     
-    pure function Ewald_Summation_Bound_rotation(this, Box_size, old, new) &
-                  result (rotation)
+    pure function Ewald_Summation_Bound_rotation_energy(this, Box_size, old, new) &
+                  result (rotation_energy)
     
         class(Ewald_Summation_Bound), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         type(Particle_Index), intent(in) :: old, new
-        real(DP) :: rotation
+        real(DP) :: rotation_energy
 
         if (geometry%bulk) then
         
-            rotation = dot_product(new%orientation, new%orientation) - &
-                       dot_product(old%orientation, old%orientation) + &
-                       2._DP * dot_product(new%orientation - old%orientation, &
-                                           this%total_moment - old%orientation)
+            rotation_energy = dot_product(new%orientation, new%orientation) - &
+                              dot_product(old%orientation, old%orientation) + &
+                              2._DP * dot_product(new%orientation - old%orientation, &
+                                                  this%total_moment - old%orientation)
 
-            rotation = 2._DP*PI/3._DP / product(Box_size) * rotation
+            rotation_energy = 2._DP*PI/3._DP / product(Box_size) * rotation_energy
 
         else if (geometry%slab) then
 
-            rotation = new%orientation(3)**2 - old%orientation(3)**2 + &
-                       2._DP * (new%orientation(3) - old%orientation(3)) * &
-                               (this%total_moment(3)-old%orientation(3))
+            rotation_energy = new%orientation(3)**2 - old%orientation(3)**2 + &
+                              2._DP * (new%orientation(3) - old%orientation(3)) * &
+                                      (this%total_moment(3) - old%orientation(3))
 
-            rotation = 2._DP*PI / product(Box_size) * rotation
+            rotation_energy = 2._DP*PI / product(Box_size) * rotation_energy
 
         end if
     
-    end function Ewald_Summation_Bound_rotation
+    end function Ewald_Summation_Bound_rotation_energy
 
     !> Update the total moment
     !> \f[
@@ -188,32 +189,33 @@ contains
     !>                                      ]
     !> \f]
     
-    pure function Ewald_Summation_Bound_exchange(this, Box_size, particle) result (exchange)
+    pure function Ewald_Summation_Bound_exchange_energy(this, Box_size, particle) &
+         result (exchange_energy)
     
         class(Ewald_Summation_Bound), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         type(Particle_Index), intent(in) :: particle
-        real(DP) :: exchange
+        real(DP) :: exchange_energy
 
         if (geometry%bulk) then
         
-            exchange = dot_product(particle%orientation, particle%orientation) + &
-                       2._DP * exchange_sign(particle%add) * &
-                       dot_product(particle%orientation, this%total_moment)
+            exchange_energy = dot_product(particle%orientation, particle%orientation) + &
+                              2._DP * exchange_sign(particle%add) * &
+                              dot_product(particle%orientation, this%total_moment)
 
-            exchange = 2._DP*PI/3._DP / product(Box_size) * exchange
+            exchange_energy = 2._DP*PI/3._DP / product(Box_size) * exchange_energy
 
         else if(geometry%slab) then
 
-            exchange = particle%orientation(3)**2 + &
-                       2._DP * exchange_sign(particle%add) * &
-                       particle%orientation(3) * this%total_moment(3)
+            exchange_energy = particle%orientation(3)**2 + &
+                              2._DP * exchange_sign(particle%add) * &
+                              particle%orientation(3) * this%total_moment(3)
 
-            exchange = 2._DP*PI / product(Box_size) * exchange
+            exchange_energy = 2._DP*PI / product(Box_size) * exchange_energy
 
         end if
 
-    end function Ewald_Summation_Bound_exchange
+    end function Ewald_Summation_Bound_exchange_energy
     
     !> Exchange
 

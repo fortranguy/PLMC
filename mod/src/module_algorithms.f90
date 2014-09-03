@@ -99,12 +99,12 @@ contains
                         new%orientation(:) = old%orientation(:)
                         select type (this_macro)
                             type is (Dipolar_Hard_Spheres_Macro)
-                                this_energy_real_new = this_macro%ewald_real%solo(Box%size, &
-                                                                                  this_spheres, new)
-                                this_energy_real_old = this_macro%ewald_real%solo(Box%size, &
-                                                                                  this_spheres, old)
+                                this_energy_real_new = this_macro%ewald_real%solo_energy(Box%size, &
+                                                           this_spheres, new)
+                                this_energy_real_old = this_macro%ewald_real%solo_energy(Box%size, &
+                                                           this_spheres, old)
                                 this_energy_delta = (this_energy_real_new - this_energy_real_old) + &
-                                                    this_macro%ewald_reci%move(Box, old, new)
+                                                    this_macro%ewald_reci%move_energy(Box, old, new)
                                 if (geometry%slab) then
                                     this_energy_delta = this_energy_delta - &
                                                         this_macro%elc%move(Box, old, new)
@@ -237,13 +237,14 @@ contains
                             test%orientation(:) = random_surface()
                             select type (this_macro)
                                 type is (Dipolar_Hard_Spheres_Macro)
-                                    this_energy_test = this_macro%ewald_real%solo(Box%size, &
-                                                            this_spheres, test) + &
-                                                       this_macro%ewald_reci%exchange(Box, test) - &
-                                                       this_macro%ewald_self%solo(test%orientation) + &
-                                                       this_macro%ewald_bound%exchange(Box%size, test) + &
-                                                       ext_field%exchange(test)
-                                                       
+                                    this_energy_test = &
+                                        this_macro%ewald_real%solo_energy(Box%size, &
+                                                                          this_spheres, test) + &
+                                        this_macro%ewald_reci%exchange_energy(Box, test) - &
+                                        this_macro%ewald_self%solo_energy(test%orientation) + &
+                                        this_macro%ewald_bound%exchange_energy(Box%size, test) + &
+                                        ext_field%exchange(test)
+                                       
                                     if (geometry%slab) then
                                         this_energy_test = this_energy_test - &
                                                            this_macro%elc%exchange(Box, test)
@@ -397,7 +398,7 @@ contains
                 old%orientation(:) = this_spheres%get_orientation(old%number)
                 select type (this_macro)
                     type is (Dipolar_Hard_Spheres_Macro)
-                        energy_old%same = this_macro%ewald_real%solo(Box_size, this_spheres, old)
+                        energy_old%same = this_macro%ewald_real%solo_energy(Box_size, this_spheres, old)
                                ! potential_energy_reci: cf. after_switch_energy
                 end select
             type is (Hard_Spheres)
@@ -460,8 +461,9 @@ contains
                         new%orientation(:) = this_spheres%get_orientation(new%number)
                         select type (this_macro)
                             type is (Dipolar_Hard_Spheres_Macro)
-                                energy_new%same = this_macro%ewald_real%solo(Box%size, this_spheres, new) + &
-                                                  this_macro%ewald_reci%move(Box, old, new)
+                                energy_new%same = this_macro%ewald_real%solo_energy(Box%size, &
+                                                      this_spheres, new) + &
+                                                  this_macro%ewald_reci%move_energy(Box, old, new)
                                 if (geometry%slab) then
                                     energy_new%same = energy_new%same - &
                                                       this_macro%elc%move(Box, old, new)
@@ -535,14 +537,14 @@ contains
         new%orientation(:) = old%orientation(:)
         call markov_surface(new%orientation, this_macro%rotation%get_delta())
         
-        energy_real_delta = this_macro%ewald_real%solo(Box%size, this_spheres, new) - &
-                            this_macro%ewald_real%solo(Box%size, this_spheres, old)
+        energy_real_delta = this_macro%ewald_real%solo_energy(Box%size, this_spheres, new) - &
+                            this_macro%ewald_real%solo_energy(Box%size, this_spheres, old)
         
-        energy_self_delta = this_macro%ewald_self%solo(new%orientation) - &
-                            this_macro%ewald_self%solo(old%orientation)
+        energy_self_delta = this_macro%ewald_self%solo_energy(new%orientation) - &
+                            this_macro%ewald_self%solo_energy(old%orientation)
         
-        energy_delta = energy_real_delta + this_macro%ewald_reci%rotation(Box, old, new) - &
-                       energy_self_delta + this_macro%ewald_bound%rotation(Box%size, old, new) + &
+        energy_delta = energy_real_delta + this_macro%ewald_reci%rotation_energy(Box, old, new) - &
+                       energy_self_delta + this_macro%ewald_bound%rotation_energy(Box%size, old, new) + &
                        ext_field%rotation(old, new)
         if (geometry%slab) then
             energy_delta = energy_delta - this_macro%elc%rotation(Box, old, new)
