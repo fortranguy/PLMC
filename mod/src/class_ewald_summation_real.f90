@@ -39,6 +39,7 @@ private
 contains
 
     subroutine Ewald_Summation_Real_construct(this, Box_size, alpha, min_distance, data_json)
+    
         class(Ewald_Summation_Real), intent(inout) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         real(DP), intent(in) :: alpha
@@ -55,6 +56,7 @@ contains
     end subroutine Ewald_Summation_Real_construct
 
     subroutine Ewald_Summation_Real_set_parameters(this, Box_size, min_distance, data_json)
+    
         class(Ewald_Summation_Real), intent(inout) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         real(DP), intent(in) :: min_distance
@@ -104,6 +106,7 @@ contains
     end subroutine Ewald_Summation_Real_set_tabulation
 
     subroutine Ewald_Summation_Real_destroy(this)
+    
         class(Ewald_Summation_Real), intent(inout) :: this
 
         if (allocated(this%tabulation)) deallocate(this%tabulation)
@@ -111,6 +114,7 @@ contains
     end subroutine Ewald_Summation_Real_destroy
 
     subroutine Ewald_Summation_Real_write(this, potential_energy_unit)
+    
         class(Ewald_Summation_Real), intent(in) :: this
         integer, intent(in) :: potential_energy_unit
 
@@ -184,6 +188,7 @@ contains
 
     pure function Ewald_Summation_Real_pair(this, orientation_i, orientation_j, vector_ij) &
                   result(pair)
+                  
         class(Ewald_Summation_Real), intent(in) :: this
         real(DP), dimension(:), intent(in) :: orientation_i, orientation_j
         real(DP), dimension(:), intent(in) :: vector_ij
@@ -201,6 +206,7 @@ contains
     !> Linear interpolation
 
     pure function Ewald_Summation_Real_interpolation(this, distance) result(interpolation)
+    
         class(Ewald_Summation_Real), intent(in) :: this
         real(DP), intent(in) :: distance
         real(DP), dimension(2) :: interpolation
