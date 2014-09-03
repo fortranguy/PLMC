@@ -403,9 +403,9 @@ contains
                                        this_macro%ewald_reci%total_energy(Box) - &
                                        this_macro%ewald_self%total_energy(this_spheres) + &
                                        this_macro%ewald_bound%total_energy(Box%size) + &
-                                       ext_field%total(this_macro%ewald_bound%get_total_moment())
+                                       ext_field%total_energy(this_macro%ewald_bound%get_total_moment())
                         if (geometry%slab) then
-                            total_energy = total_energy - this_macro%elc%total(Box)
+                            total_energy = total_energy - this_macro%elc%total_energy(Box)
                         end if
                 end select                    
         end select

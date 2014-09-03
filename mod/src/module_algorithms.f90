@@ -107,7 +107,7 @@ contains
                                                     this_macro%ewald_reci%move_energy(Box, old, new)
                                 if (geometry%slab) then
                                     this_energy_delta = this_energy_delta - &
-                                                        this_macro%elc%move(Box, old, new)
+                                                        this_macro%elc%move_energy(Box, old, new)
                                 end if
                         end select
                     class default
@@ -243,11 +243,11 @@ contains
                                         this_macro%ewald_reci%exchange_energy(Box, test) - &
                                         this_macro%ewald_self%solo_energy(test%orientation) + &
                                         this_macro%ewald_bound%exchange_energy(Box%size, test) + &
-                                        ext_field%exchange(test)
+                                        ext_field%exchange_energy(test)
                                        
                                     if (geometry%slab) then
                                         this_energy_test = this_energy_test - &
-                                                           this_macro%elc%exchange(Box, test)
+                                                           this_macro%elc%exchange_energy(Box, test)
                                     end if
                                                     
                             end select
@@ -466,7 +466,7 @@ contains
                                                   this_macro%ewald_reci%move_energy(Box, old, new)
                                 if (geometry%slab) then
                                     energy_new%same = energy_new%same - &
-                                                      this_macro%elc%move(Box, old, new)
+                                                      this_macro%elc%move_energy(Box, old, new)
                                 end if 
                         end select
                                        
@@ -545,9 +545,9 @@ contains
         
         energy_delta = energy_real_delta + this_macro%ewald_reci%rotation_energy(Box, old, new) - &
                        energy_self_delta + this_macro%ewald_bound%rotation_energy(Box%size, old, new) + &
-                       ext_field%rotation(old, new)
+                       ext_field%rotation_energy(old, new)
         if (geometry%slab) then
-            energy_delta = energy_delta - this_macro%elc%rotation(Box, old, new)
+            energy_delta = energy_delta - this_macro%elc%rotation_energy(Box, old, new)
         end if
         
         call random_number(random)

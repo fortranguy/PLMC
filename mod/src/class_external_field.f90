@@ -13,10 +13,10 @@ private
         real(DP), dimension(num_dimensions) :: vector
     contains
         procedure :: set => External_Field_set
-        procedure :: total => External_Field_total
+        procedure :: total_energy => External_Field_total_energy
         
-        procedure :: rotation => External_Field_rotation
-        procedure :: exchange => External_Field_exchange
+        procedure :: rotation_energy => External_Field_rotation_energy
+        procedure :: exchange_energy => External_Field_exchange_energy
     end type External_Field
 
 contains
@@ -30,38 +30,38 @@ contains
     
     end subroutine External_Field_set
     
-    pure function External_Field_total(this, total_moment) result(total)
+    pure function External_Field_total_energy(this, total_moment) result(total_energy)
     
         class(External_Field), intent(in) :: this
         real(DP), dimension(:), intent(in) :: total_moment
-        real(DP) :: total
+        real(DP) :: total_energy
         
-        total = -dot_product(total_moment, this%vector)
+        total_energy = -dot_product(total_moment, this%vector)
     
-    end function External_Field_total
+    end function External_Field_total_energy
     
     !> \f[ \Delta U = -(\vec{\mu}^\prime - \vec{\mu} \cdot \vec{E}) \f]
 
-    pure function External_Field_rotation(this, old, new) result(rotation)
+    pure function External_Field_rotation_energy(this, old, new) result(rotation_energy)
     
         class(External_Field), intent(in) :: this
         type(Particle_Index), intent(in) :: old, new
-        real(DP) :: rotation
+        real(DP) :: rotation_energy
 
-        rotation = -dot_product(new%orientation - old%orientation, this%vector)
+        rotation_energy = -dot_product(new%orientation - old%orientation, this%vector)
 
-    end function External_Field_rotation
+    end function External_Field_rotation_energy
     
     !> \f[ \Delta U_{N\rightarrow{}N+1} = -(\vec{\mu}_{N+1} \cdot \vec{E}) \f]
 
-    pure function External_Field_exchange(this, particle) result(exchange)
+    pure function External_Field_exchange_energy(this, particle) result(exchange_energy)
 
         class(External_Field), intent(in) :: this
         type(Particle_Index), intent(in) :: particle
-        real(DP) :: exchange
+        real(DP) :: exchange_energy
 
-        exchange = -exchange_sign(particle%add) * dot_product(particle%orientation, this%vector)
+        exchange_energy = -exchange_sign(particle%add) * dot_product(particle%orientation, this%vector)
 
-    end function External_Field_exchange
+    end function External_Field_exchange_energy
     
 end module class_external_field

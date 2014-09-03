@@ -31,15 +31,15 @@ private
         procedure, private :: get_structure_modulus => &
                               Electronic_Layer_Correction_get_structure_modulus
         procedure :: count_wave_vectors => Electronic_Layer_Correction_count_wave_vectors
-        procedure :: total => Electronic_Layer_Correction_total
+        procedure :: total_energy => Electronic_Layer_Correction_total_energy
         
-        procedure :: move => Electronic_Layer_Correction_move
+        procedure :: move_energy => Electronic_Layer_Correction_move_energy
         procedure :: update_structure_move => &
                      Electronic_Layer_Correction_update_structure_move
-        procedure :: rotation => Electronic_Layer_Correction_rotation
+        procedure :: rotation_energy => Electronic_Layer_Correction_rotation_energy
         procedure :: update_structure_rotation => &
                      Electronic_Layer_Correction_update_structure_rotation
-        procedure :: exchange => Electronic_Layer_Correction_exchange
+        procedure :: exchange_energy => Electronic_Layer_Correction_exchange_energy
         procedure :: update_structure_exchange => &
                      Electronic_Layer_Correction_update_structure_exchange
         
@@ -278,27 +278,27 @@ contains
     
     !> Total ELC energy
     
-    pure function Electronic_Layer_Correction_total(this, Box) result(total)
+    pure function Electronic_Layer_Correction_total_energy(this, Box) result(total_energy)
         
         class(Electronic_Layer_Correction), intent(in) :: this
         type(Box_Parameters), intent(in) :: Box
-        real(DP) :: total
+        real(DP) :: total_energy
 
         complex(DP) :: structure_product
         integer kx, ky
 
-        total = 0._DP
+        total_energy = 0._DP
 
         do ky = -Box%wave(2), Box%wave(2)
             do kx = -Box%wave(1), Box%wave(1)
                 structure_product = this%structure_plus(kx, ky)*conjg(this%structure_minus(kx, ky))
-                total = total + this%weight(kx, ky) * 2._DP*real(structure_product, DP)
+                total_energy = total_energy + this%weight(kx, ky) * 2._DP*real(structure_product, DP)
             end do
         end do
         
-        total = PI / product(Box%size(1:2)) * total
+        total_energy = PI / product(Box%size(1:2)) * total_energy
         
-    end function Electronic_Layer_Correction_total
+    end function Electronic_Layer_Correction_total_energy
     
     !> Move
 
@@ -319,12 +319,12 @@ contains
     !>               )
     !> \f]
 
-    pure function Electronic_Layer_Correction_move(this, Box, old, new) result(move)
+    pure function Electronic_Layer_Correction_move_energy(this, Box, old, new) result(move_energy)
 
         class(Electronic_Layer_Correction), intent(in) :: this
         type(Box_Parameters), intent(in) :: Box
         type(Particle_Index), intent(in) :: old, new
-        real(DP) :: move
+        real(DP) :: move_energy
 
         real(DP), dimension(num_dimensions-1) :: new_position_div_box, old_position_div_box
         real(DP), dimension(num_dimensions-1) :: orientation_div_box
@@ -361,7 +361,7 @@ contains
 
         orientation_div_box(:) = 2._DP*PI * new%orientation(1:num_dimensions-1) / Box%size(1:num_dimensions-1)
 
-        move = 0._DP
+        move_energy = 0._DP
 
         do ky = 0, Box%wave(2)
             wave_vector(2) = real(ky, DP)
@@ -399,15 +399,15 @@ contains
                             
                 !   Accumulation
                 
-                move = move + this%weight(kx, ky) * 2._DP * (real_part1 + real_part2)
+                move_energy = move_energy + this%weight(kx, ky) * 2._DP * (real_part1 + real_part2)
 
             end do
         
         end do
 
-        move = 2._DP*PI / product(Box%size(1:2)) * move
+        move_energy = 2._DP*PI / product(Box%size(1:2)) * move_energy
 
-    end function Electronic_Layer_Correction_move
+    end function Electronic_Layer_Correction_move_energy
 
     !> Update position -> update the ``structure factors''
     !>  \f[
@@ -503,12 +503,13 @@ contains
     !>               )
     !> \f]
     
-    pure function Electronic_Layer_Correction_rotation(this, Box, old, new) result(rotation)
+    pure function Electronic_Layer_Correction_rotation_energy(this, Box, old, new) &
+         result(rotation_energy)
 
         class(Electronic_Layer_Correction), intent(in) :: this
         type(Box_Parameters), intent(in) :: Box
         type(Particle_Index), intent(in) :: old, new
-        real(DP) :: rotation
+        real(DP) :: rotation_energy
 
         real(DP), dimension(num_dimensions-1) :: position_div_box
         real(DP), dimension(num_dimensions-1) :: new_orientation_div_box, old_orientation_div_box
@@ -536,7 +537,7 @@ contains
         new_orientation_div_box(:) = 2._DP*PI * new%orientation(1:2) / Box%size(1:2)
         old_orientation_div_box(:) = 2._DP*PI * old%orientation(1:2) / Box%size(1:2)
 
-        rotation = 0._DP
+        rotation_energy = 0._DP
 
         do ky = 0, Box%wave(2)
             wave_vector(2) = real(ky, DP)
@@ -579,16 +580,16 @@ contains
                             
                 !   Accumulation
 
-                rotation = rotation + this%weight(kx, ky) * 2._DP * &
-                                     (real_part0 + real_part1 + real_part2)
+                rotation_energy = rotation_energy + this%weight(kx, ky) * 2._DP * &
+                                  (real_part0 + real_part1 + real_part2)
 
             end do
 
         end do
 
-        rotation = 2._DP*PI / product(Box%size(1:2)) * rotation
+        rotation_energy = 2._DP*PI / product(Box%size(1:2)) * rotation_energy
 
-    end function Electronic_Layer_Correction_rotation
+    end function Electronic_Layer_Correction_rotation_energy
 
     !> Update moment -> update the ``structure factors''
     !>  \f[
@@ -672,12 +673,12 @@ contains
     
     !> Summary: only the sign of \f[\vec{\mu}\f] changes.
 
-    pure function Electronic_Layer_Correction_exchange(this, Box, particle) result(exchange)
+    pure function Electronic_Layer_Correction_exchange_energy(this, Box, particle) result(exchange_energy)
 
         class(Electronic_Layer_Correction), intent(in) :: this
         type(Box_Parameters), intent(in) :: Box
         type(Particle_Index), intent(in) :: particle
-        real(DP) :: exchange
+        real(DP) :: exchange_energy
         
         real(DP), dimension(num_dimensions-1) :: position_div_box
         real(DP), dimension(num_dimensions-1) :: orientation_div_box
@@ -704,7 +705,7 @@ contains
         exchg_sign = exchange_sign(particle%add)
         orientation_div_box(:) = 2._DP*PI*exchg_sign * particle%orientation(1:2) / Box%size(1:2)
         
-        exchange = 0._DP
+        exchange_energy = 0._DP
 
         do ky = 0, Box%wave(2)
             wave_vector(2) = real(ky, DP)
@@ -734,16 +735,16 @@ contains
                 
                 !   Accumulation
 
-                exchange = exchange + this%weight(kx, ky) * &
-                                         2._DP * (real_part0 + real_part1 + real_part2)
+                exchange_energy = exchange_energy + this%weight(kx, ky) * &
+                                                    2._DP * (real_part0 + real_part1 + real_part2)
                 
             end do
         
         end do
 
-        exchange = 2._DP * PI/product(Box%size(1:2)) * exchange
+        exchange_energy = 2._DP * PI/product(Box%size(1:2)) * exchange_energy
 
-    end function Electronic_Layer_Correction_exchange
+    end function Electronic_Layer_Correction_exchange_energy
     
     !> Exchange a particle -> update the ``structure factor''
     
