@@ -7,7 +7,8 @@ use data_box, only: num_dimensions
 use json_module, only: json_file, json_initialize, json_destroy, &
                        json_value, json_value_create, to_object, json_value_add, &
                        json_print
-use module_data, only: test_data_file_exists, test_data_found, test_empty_string
+use module_data, only: data_filename, report_filename, &
+                       test_file_exists, test_data_found, test_empty_string
 use module_types_micro, only: Box_Parameters, Monte_Carlo_Arguments
 use module_geometry, only: geometry, set_geometry
 use module_physics_micro, only: num_wave_vectors
@@ -30,9 +31,6 @@ use module_write, only: write_results, between_spheres_write_results
 implicit none
 
 private
-
-    character(len=*), parameter :: data_filename = "data.json"
-    character(len=*), parameter :: report_filename = "report.json"
 
     type, public :: Physical_System
     
@@ -140,9 +138,9 @@ contains
         logical :: found
         character(len=:), allocatable :: this_name
 
-        call test_data_file_exists(data_filename)
-
         call json_initialize()
+        
+        call test_file_exists(data_filename)
         call this%data_json%load_file(filename = data_filename)
         
         call set_geometry(args%geometry)

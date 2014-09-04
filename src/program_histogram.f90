@@ -4,7 +4,8 @@ program histogram
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file, json_initialize
-use module_data, only: test_data_found
+use module_data, only: data_filename, &
+                       test_file_exists, test_data_found
 use module_arguments, only: arg_to_file
 
 implicit none
@@ -28,7 +29,9 @@ implicit none
     integer :: length
     
     call json_initialize()
-    call data_json%load_file(filename = "data.json")
+    
+    call test_file_exists(data_filename)
+    call data_json%load_file(filename = data_filename)
     
     data_name = "Monte Carlo.number of equilibrium steps"
     call data_json%get(data_name, num_steps, found)

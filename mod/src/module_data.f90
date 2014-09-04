@@ -5,24 +5,28 @@ use, intrinsic :: iso_fortran_env, only: error_unit
 implicit none
 
 private
-public test_data_file_exists, test_data_found, test_empty_string
+public data_filename, report_filename, &
+       test_file_exists, test_data_found, test_empty_string
+
+    character(len=*), parameter :: data_filename = "data.json"
+    character(len=*), parameter :: report_filename = "report.json"
 
 contains
 
-    subroutine test_data_file_exists(data_filename)
+    subroutine test_file_exists(filename)
 
-        character(len=*), intent(in) :: data_filename
+        character(len=*), intent(in) :: filename
         
         logical :: data_exists
         
-        inquire(file=data_filename, exist=data_exists)
+        inquire(file=filename, exist=data_exists)
         
         if (.not. data_exists) then
-            write(error_unit, *) data_filename, " doesn't exist."
+            write(error_unit, *) filename, " doesn't exist."
             error stop
         end if
 
-    end subroutine test_data_file_exists
+    end subroutine test_file_exists
 
     subroutine test_data_found(data_name, found)
     

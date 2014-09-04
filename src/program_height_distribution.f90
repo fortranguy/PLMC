@@ -27,7 +27,8 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit, error_unit
 use data_precisions, only: real_zero
 use data_box, only: num_dimensions
 use json_module, only: json_file, json_initialize
-use module_data, only: test_data_found
+use module_data, only: data_filename, report_filename, &
+                       test_file_exists, test_data_found
 use module_geometry, only: set_geometry, geometry
 use class_identity_matrix, only: Identity_Matrix
 use module_linear_algebra, only: eigen_symmetric
@@ -73,15 +74,18 @@ implicit none
     real(DP) :: time_start, time_end
     
     call json_initialize()
-    call data_json%load_file(filename = "data.json")
+    
+    call test_file_exists(data_filename)
+    call data_json%load_file(filename = data_filename)
     
     data_name = "Distribution.take snapshot"
     call data_json%get(data_name, take_snapshot, found)
     call test_data_found(data_name, found)
 
     if (.not.take_snapshot) stop "No snap shots taken."
-
-    call report_json%load_file(filename = "report.json")
+    
+    call test_file_exists(report_filename)
+    call report_json%load_file(filename = report_filename)
     
     data_name = "System.Box.geometry"
     call report_json%get(data_name, Box_geometry, found)
