@@ -36,7 +36,7 @@ private
         procedure, private :: pair_energy => Ewald_Summation_Real_pair_energy
         
         procedure :: solo_field => Ewald_Summation_Real_solo_field
-        procedure :: pair_field_tensor => Ewald_Summation_Real_pair_field_tensor
+        procedure, private :: pair_field_tensor => Ewald_Summation_Real_pair_field_tensor
         
         procedure, private :: interpolation => Ewald_Summation_Real_interpolation
     
@@ -189,8 +189,8 @@ contains
     end function Ewald_Summation_Real_solo_energy
 
     !> Between 2 particles
-    !> \f[ (\vec{\mu}_i\cdot\vec{\mu}_j) B(r_{ij}) -
-    !>     (\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij}) C(r_{ij}) \f]
+    !> \f[ (\vec{\mu}_i\cdot\vec{\mu}_j) B_\alpha(r_{ij}) -
+    !>     (\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij}) C_\alpha(r_{ij}) \f]
 
     pure function Ewald_Summation_Real_pair_energy(this, orientation_i, orientation_j, vector_ij) &
                   result(pair_energy)
@@ -237,6 +237,9 @@ contains
     end function Ewald_Summation_Real_solo_field
     
     !> Between 2 particles
+    !> \f[
+    !>      T_{ij} = |\vec{r}_{ij})(\vec{r}_{ij}| C_\alpha(r_{ij}) - B_\alpha(r_{ij})
+    !> \f]
 
     pure function Ewald_Summation_Real_pair_field_tensor(this, vector_ij) result(pair_field_tensor)
                   
