@@ -238,7 +238,7 @@ contains
     
     !> Between 2 particles
     !> \f[
-    !>      T_{ij} = |\vec{r}_{ij})(\vec{r}_{ij}| C_\alpha(r_{ij}) - B_\alpha(r_{ij})
+    !>      T_{ij} = C_\alpha(r_{ij}) |\vec{r}_{ij})(\vec{r}_{ij}| - B_\alpha(r_{ij}) I
     !> \f]
 
     pure function Ewald_Summation_Real_pair_field_tensor(this, vector_ij) result(pair_field_tensor)
@@ -250,9 +250,9 @@ contains
         real(DP), dimension(2) :: interpolation
         
         interpolation = this%interpolation(norm2(vector_ij))
-        pair_field_tensor(:, :) = matmul(reshape(vector_ij, [num_dimensions, 1]), &
-                                         reshape(vector_ij, [1, num_dimensions])) * interpolation(2) &
-                                  - identity_matrix(num_dimensions) * interpolation(1)
+        pair_field_tensor(:, :) = interpolation(2) * matmul(reshape(vector_ij, [num_dimensions, 1]), &
+                                                            reshape(vector_ij, [1, num_dimensions])) &
+                                 - interpolation(1) * identity_matrix(num_dimensions)
 
     end function Ewald_Summation_Real_pair_field_tensor
     
