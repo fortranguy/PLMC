@@ -4,9 +4,21 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 
 implicit none
 private
-public eigen_symmetric
+public identity_matrix, eigen_symmetric
 
 contains
+
+    pure function identity_matrix(num_dimensions)
+    
+        integer, intent(in) :: num_dimensions
+        real(DP), dimension(num_dimensions, num_dimensions) :: identity_matrix
+        
+        integer :: i_dim
+        
+        identity_matrix(:, :) = 0._DP
+        forall (i_dim = 1:num_dimensions) identity_matrix(i_dim, i_dim) = 1._DP
+    
+    end function identity_matrix
 
     subroutine eigen_symmetric(matrix, eigenvalues)
     

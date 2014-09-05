@@ -30,8 +30,7 @@ use json_module, only: json_file, json_initialize
 use module_data, only: data_filename, report_filename, &
                        test_file_exists, test_data_found
 use module_geometry, only: set_geometry, geometry
-use class_identity_matrix, only: Identity_Matrix
-use module_linear_algebra, only: eigen_symmetric
+use module_linear_algebra, only: identity_matrix, eigen_symmetric
 use module_physics_micro, only: PBC_distance
 use module_arguments, only: arg_to_file
 
@@ -60,7 +59,6 @@ implicit none
     real(DP), dimension(num_dimensions) :: eigenvalues, preferred_orientation, &
                                            normed_orientation
     real(DP), dimension(num_dimensions, num_dimensions) :: orientation_matrix
-    type(Identity_Matrix) :: identity
     real(DP) :: orientation_z_sqr
     
     logical :: with_orientations
@@ -159,7 +157,6 @@ implicit none
         end if
         
         allocate(orientations(num_dimensions, num_particles))
-        call identity%construct(num_dimensions)
     
     end if
 
@@ -198,7 +195,7 @@ implicit none
                            reshape(orientations(:, i_particle), [1, num_dimensions]))
                 end do
                 orientation_matrix(:, :) = 1.5_DP/real(num_particles, DP) * orientation_matrix(:, :) - &
-                                           0.5_DP * identity%get()
+                                           0.5_DP * identity_matrix(num_dimensions)
                 call eigen_symmetric(orientation_matrix, eigenvalues)
                 preferred_orientation(:) = orientation_matrix(:, num_dimensions) / &
                                            norm2(orientation_matrix(:, num_dimensions))
@@ -233,7 +230,6 @@ implicit none
     
     if (with_orientations) then
         close(orientations_unit)
-        call identity%destroy()
         deallocate(orientations)    
     end if
 

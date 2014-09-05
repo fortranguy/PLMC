@@ -5,6 +5,7 @@ use data_box, only: num_dimensions
 use json_module, only: json_file
 use module_data, only: test_data_found
 use module_types_micro, only: Particle_Index
+use module_linear_algebra, only: identity_matrix
 use module_physics_micro, only: set_discrete_length, PBC_vector, ewald_real_B, ewald_real_C
 use class_hard_spheres, only: Dipolar_Hard_Spheres
 
@@ -33,9 +34,11 @@ private
         procedure :: total_energy => Ewald_Summation_Real_total_energy
         procedure :: solo_energy => Ewald_Summation_Real_solo_energy
         procedure, private :: pair_energy => Ewald_Summation_Real_pair_energy
-        procedure, private :: interpolation => Ewald_Summation_Real_interpolation
         
         procedure :: solo_field => Ewald_Summation_Real_solo_field
+        procedure :: pair_field_tensor => Ewald_Summation_Real_pair_field_tensor
+        
+        procedure, private :: interpolation => Ewald_Summation_Real_interpolation
     
     end type Ewald_Summation_Real
 
@@ -205,7 +208,51 @@ contains
         pair_energy = dot_product(coefficient, this%interpolation(norm2(vector_ij)))
 
     end function Ewald_Summation_Real_pair_energy
+    
+    pure function Ewald_Summation_Real_solo_field(this, Box_size, this_spheres, particle) &
+                  result(solo_field)
+    
+        class(Ewald_Summation_Real), intent(in) :: this
+        real(DP), dimension(:), intent(in) :: Box_size
+        type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
+        type(Particle_Index), intent(in) :: particle
+        real(DP), dimension(num_dimensions) :: solo_field
+        
+        integer :: j_particle
+        real(DP), dimension(num_dimensions) :: vector_ij
+        
+        solo_field(:) = 0._DP
+        
+        do j_particle = 1, this_spheres%get_num_particles()
+            if (j_particle /= particle%number) then
+            
+                vector_ij = PBC_vector(Box_size, &
+                                       particle%position, this_spheres%get_position(j_particle))
+                solo_field(:) = solo_field(:) + matmul(this%pair_field_tensor(vector_ij), &
+                                                       this_spheres%get_orientation(j_particle))
 
+            end if
+        end do
+    
+    end function Ewald_Summation_Real_solo_field
+    
+    !> Between 2 particles
+
+    pure function Ewald_Summation_Real_pair_field_tensor(this, vector_ij) result(pair_field_tensor)
+                  
+        class(Ewald_Summation_Real), intent(in) :: this
+        real(DP), dimension(:), intent(in) :: vector_ij
+        real(DP), dimension(num_dimensions, num_dimensions) :: pair_field_tensor
+        
+        real(DP), dimension(2) :: interpolation
+        
+        interpolation = this%interpolation(norm2(vector_ij))
+        pair_field_tensor(:, :) = matmul(reshape(vector_ij, [num_dimensions, 1]), &
+                                         reshape(vector_ij, [1, num_dimensions])) * interpolation(2) &
+                                  - identity_matrix(num_dimensions) * interpolation(1)
+
+    end function Ewald_Summation_Real_pair_field_tensor
+    
     !> Linear interpolation
 
     pure function Ewald_Summation_Real_interpolation(this, distance) &
@@ -228,30 +275,5 @@ contains
         end if
 
     end function Ewald_Summation_Real_interpolation
-    
-    pure function Ewald_Summation_Real_solo_field(this, Box_size, this_spheres, particle) &
-                  result(solo_field)
-    
-        class(Ewald_Summation_Real), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: Box_size
-        type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
-        type(Particle_Index), intent(in) :: particle
-        real(DP), dimension(num_dimensions) :: solo_field
-        
-        integer :: j_particle
-        real(DP), dimension(num_dimensions) :: vector_ij
-        
-        solo_field(:) = 0._DP
-        
-        do j_particle = 1, this_spheres%get_num_particles()
-            if (j_particle /= particle%number) then
-            
-                vector_ij = PBC_vector(Box_size, &
-                                       particle%position, this_spheres%get_position(j_particle))
-
-            end if
-        end do
-    
-    end function Ewald_Summation_Real_solo_field
 
 end module class_ewald_summation_real
