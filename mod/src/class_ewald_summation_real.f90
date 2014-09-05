@@ -29,10 +29,13 @@ private
         procedure, private :: set_tabulation => Ewald_Summation_Real_set_tabulation
         procedure :: destroy => Ewald_Summation_Real_destroy
         procedure :: write => Ewald_Summation_Real_write
+        
         procedure :: total_energy => Ewald_Summation_Real_total_energy
         procedure :: solo_energy => Ewald_Summation_Real_solo_energy
-        procedure, private :: pair => Ewald_Summation_Real_pair
+        procedure, private :: pair_energy => Ewald_Summation_Real_pair_energy
         procedure, private :: interpolation => Ewald_Summation_Real_interpolation
+        
+        procedure :: solo_field => Ewald_Summation_Real_solo_field
     
     end type Ewald_Summation_Real
 
@@ -129,7 +132,7 @@ contains
     end subroutine Ewald_Summation_Real_write
 
     pure function Ewald_Summation_Real_total_energy(this, Box_size, this_spheres) &
-         result(total_energy)
+                  result(total_energy)
 
         class(Ewald_Summation_Real), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
@@ -155,7 +158,7 @@ contains
     !> Energy of 1 dipole with others
 
     pure function Ewald_Summation_Real_solo_energy(this, Box_size, this_spheres, particle) &
-         result(solo_energy)
+                  result(solo_energy)
 
         class(Ewald_Summation_Real), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
@@ -173,7 +176,7 @@ contains
             
                 vector_ij = PBC_vector(Box_size, &
                                        particle%position, this_spheres%get_position(j_particle))
-                solo_energy = solo_energy + this%pair(particle%orientation, &
+                solo_energy = solo_energy + this%pair_energy(particle%orientation, &
                                                       this_spheres%get_orientation(j_particle), &
                                                       vector_ij)
 
@@ -186,26 +189,27 @@ contains
     !> \f[ (\vec{\mu}_i\cdot\vec{\mu}_j) B(r_{ij}) -
     !>     (\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij}) C(r_{ij}) \f]
 
-    pure function Ewald_Summation_Real_pair(this, orientation_i, orientation_j, vector_ij) &
-                  result(pair)
+    pure function Ewald_Summation_Real_pair_energy(this, orientation_i, orientation_j, vector_ij) &
+                  result(pair_energy)
                   
         class(Ewald_Summation_Real), intent(in) :: this
         real(DP), dimension(:), intent(in) :: orientation_i, orientation_j
         real(DP), dimension(:), intent(in) :: vector_ij
-        real(DP) :: pair
+        real(DP) :: pair_energy
 
         real(DP), dimension(2) :: coefficient
 
         coefficient(1) = dot_product(orientation_i, orientation_j)
         coefficient(2) =-dot_product(orientation_i, vector_ij) * dot_product(orientation_j, vector_ij)
 
-        pair = dot_product(coefficient, this%interpolation(norm2(vector_ij)))
+        pair_energy = dot_product(coefficient, this%interpolation(norm2(vector_ij)))
 
-    end function Ewald_Summation_Real_pair
+    end function Ewald_Summation_Real_pair_energy
 
     !> Linear interpolation
 
-    pure function Ewald_Summation_Real_interpolation(this, distance) result(interpolation)
+    pure function Ewald_Summation_Real_interpolation(this, distance) &
+                  result(interpolation)
     
         class(Ewald_Summation_Real), intent(in) :: this
         real(DP), intent(in) :: distance
@@ -224,5 +228,30 @@ contains
         end if
 
     end function Ewald_Summation_Real_interpolation
+    
+    pure function Ewald_Summation_Real_solo_field(this, Box_size, this_spheres, particle) &
+                  result(solo_field)
+    
+        class(Ewald_Summation_Real), intent(in) :: this
+        real(DP), dimension(:), intent(in) :: Box_size
+        type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
+        type(Particle_Index), intent(in) :: particle
+        real(DP), dimension(num_dimensions) :: solo_field
+        
+        integer :: j_particle
+        real(DP), dimension(num_dimensions) :: vector_ij
+        
+        solo_field(:) = 0._DP
+        
+        do j_particle = 1, this_spheres%get_num_particles()
+            if (j_particle /= particle%number) then
+            
+                vector_ij = PBC_vector(Box_size, &
+                                       particle%position, this_spheres%get_position(j_particle))
+
+            end if
+        end do
+    
+    end function Ewald_Summation_Real_solo_field
 
 end module class_ewald_summation_real
