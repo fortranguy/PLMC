@@ -251,8 +251,8 @@ contains
         
         interpolation = this%interpolation(norm2(vector_ij))
         pair_field_tensor(:, :) = interpolation(2) * matmul(reshape(vector_ij, [num_dimensions, 1]), &
-                                                            reshape(vector_ij, [1, num_dimensions])) &
-                                 - interpolation(1) * identity_matrix(num_dimensions)
+                                                            reshape(vector_ij, [1, num_dimensions])) - &
+                                  interpolation(1) * identity_matrix(num_dimensions)
 
     end function Ewald_Summation_Real_pair_field_tensor
     
