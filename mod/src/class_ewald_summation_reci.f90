@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: PI
 use data_box, only: num_dimensions
 use module_types_micro, only: Box_Parameters, Particle_Index
-use module_physics_micro, only: fourier_i, Box_wave1_sym, Box_wave2_sym, exchange_sign
+use module_physics_micro, only: PBC_vector, fourier_i, Box_wave1_sym, Box_wave2_sym, exchange_sign
 use class_hard_spheres, only: Dipolar_Hard_Spheres
 
 implicit none
@@ -27,6 +27,9 @@ private
         procedure, private :: get_structure_modulus => Ewald_Summation_Reci_get_structure_modulus
         procedure :: count_wave_vectors => Ewald_Summation_Reci_count_wave_vectors
         procedure :: total_energy => Ewald_Summation_Reci_total_energy
+
+        procedure :: solo_field => Ewald_Summation_Reci_solo_field
+        procedure :: pair_field_tensor => Ewald_Summation_Reci_pair_field_tensor
         
         procedure :: move_energy => Ewald_Summation_Reci_move_energy
         procedure :: update_structure_move => Ewald_Summation_Reci_update_structure_move
@@ -263,6 +266,50 @@ contains
         total_energy = 2._DP*PI / product(Box%size) * total_energy
         
     end function Ewald_Summation_Reci_total_energy
+
+    pure function Ewald_Summation_Reci_solo_field(this, Box_size, this_spheres, particle) &
+                  result(solo_field)
+
+        class(Ewald_Summation_Reci), intent(in) :: this
+        real(DP), dimension(:), intent(in) :: Box_size
+        type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
+        type(Particle_Index), intent(in) :: particle
+        real(DP), dimension(num_dimensions) :: solo_field
+
+        integer :: j_particle
+        real(DP), dimension(num_dimensions) :: vector_ij
+
+        solo_field(:) = 0._DP
+
+        do j_particle = 1, this_spheres%get_num_particles()
+            if (j_particle /= particle%number) then
+
+                vector_ij = PBC_vector(Box_size, &
+                                       particle%position, this_spheres%get_position(j_particle))
+                solo_field(:) = solo_field(:) + matmul(this%pair_field_tensor(vector_ij), &
+                                                       this_spheres%get_orientation(j_particle))
+
+            end if
+        end do
+
+    end function Ewald_Summation_Reci_solo_field
+
+    !> Between 2 particles
+    !> \f[
+    !>      T_{ij} = -\frac{2\pi}{V} \sum_{\vec{k}\neq\vec{0}}
+    !>                                      w(\alpha, \vec{k}) e^{-i\vec{k}\cdot\vec{r}_{ij}}
+    !>                                      |\vec{k}) (\vec{k}|
+    !> \f]
+
+    pure function Ewald_Summation_Reci_pair_field_tensor(this, vector_ij) result(pair_field_tensor)
+
+        class(Ewald_Summation_Reci), intent(in) :: this
+        real(DP), dimension(:), intent(in) :: vector_ij
+        real(DP), dimension(num_dimensions, num_dimensions) :: pair_field_tensor
+
+        pair_field_tensor(:, :) = 0._DP
+
+    end function Ewald_Summation_Reci_pair_field_tensor
     
     !> Move
 
