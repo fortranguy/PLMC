@@ -65,8 +65,8 @@ contains
     end subroutine Ewald_Summation_Reci_construct
     
     !> \f[
-    !>      w(\alpha, \vec{k}) = \frac{e^{-\frac{\pi^2}{\alpha^2} \sum_{d=1}^3 \frac{k_d^2}{L_d}}}
-    !>                                {\sum_{d=1}^3 \frac{k_d^2}{L_d}}
+    !>      w(\alpha, \vec{k}) = \frac{e^{-\frac{\pi^2}{\alpha^2} \sum_{d=1}^3 \frac{k_d^2}{L_d^2}}}
+    !>                                {\sum_{d=1}^3 \frac{k_d^2}{L_d^2}}
     !> \f]
     
     pure subroutine Ewald_Summation_Reci_set_weight(this, Box, alpha)
@@ -77,7 +77,7 @@ contains
         
         integer :: kx, ky, kz
         real(DP), dimension(num_dimensions) :: wave_vector
-        real(DP) :: wave_div_box
+        real(DP) :: wave_div_box_sqr
 
         do kz = -Box%wave(3), Box%wave(3)
             wave_vector(3) = real(kz, DP)
@@ -89,8 +89,8 @@ contains
             wave_vector(1) = real(kx, DP)
 
             if (kx**2 + ky**2 + kz**2 /= 0) then
-                wave_div_box = norm2(wave_vector(:)/Box%size(:))
-                this%weight(kx, ky, kz) = exp(-PI**2/alpha**2 * wave_div_box**2) / wave_div_box**2
+                wave_div_box_sqr = dot_product(wave_vector(:)/Box%size(:), wave_vector(:)/Box%size(:))
+                this%weight(kx, ky, kz) = exp(-PI**2/alpha**2 * wave_div_box_sqr) / wave_div_box_sqr
             else
                 this%weight(kx, ky, kz) = 0._DP
             end if
@@ -296,7 +296,7 @@ contains
 
     !> Between 2 particles
     !> \f[
-    !>      T_{ij} = -\frac{2\pi}{V} \sum_{\vec{k}\neq\vec{0}}
+    !>      T_{ij} = -\frac{4\pi}{V} \sum_{\vec{k}\neq\vec{0}}
     !>                                      w(\alpha, \vec{k}) e^{-i\vec{k}\cdot\vec{r}_{ij}}
     !>                                      |\vec{k}) (\vec{k}|
     !> \f]
