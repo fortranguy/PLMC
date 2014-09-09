@@ -254,13 +254,13 @@ contains
         total_energy = 0._DP
 
         do kz = -Box%wave(3), Box%wave(3)
-            do ky = -Box%wave(2), Box%wave(2)
-                do kx = -Box%wave(1), Box%wave(1)
-                    total_energy = total_energy + this%weight(kx, ky, kz) * &
-                                                  real(this%structure(kx, ky, kz) * &
-                                                  conjg(this%structure(kx, ky, kz)), DP)
-                end do
-            end do
+        do ky = -Box%wave(2), Box%wave(2)
+        do kx = -Box%wave(1), Box%wave(1)
+            total_energy = total_energy + this%weight(kx, ky, kz) * &
+                                          real(this%structure(kx, ky, kz) * &
+                                          conjg(this%structure(kx, ky, kz)), DP)
+        end do
+        end do
         end do
         
         total_energy = 2._DP*PI / product(Box%size) * total_energy
@@ -327,29 +327,29 @@ contains
         
         complex_tensor(:, :) = cmplx(0._DP, 0._DP, DP)
         
-        do kz = 0, Box%wave(3) ! symmetry: half wave vectors -> double tensor
+        do kz = -Box%wave(3), Box%wave(3)
             wave_vector(3) = real(kz, DP)
 
-            do ky = -Box_wave2_sym(Box%wave, kz), Box%wave(2)
-                wave_vector(2) = real(ky, DP)
+        do ky = -Box%wave(2), Box%wave(2)
+            wave_vector(2) = real(ky, DP)
             
-                do kx = -Box_wave1_sym(Box%wave, ky, kz), Box%wave(1)
-                    wave_vector(1) = real(kx, DP)
-                    
-                    exp_IkxVec = exp_IkxVec_1(kx) * exp_IkxVec_2(ky) * exp_IkxVec_3(kz)
-                    
-                    complex_tensor(:, :) = complex_tensor(:, :) + &
-                        cmplx(this%weight(kx, ky, kz), 0._DP, DP) * exp_IkxVec * &
-                        cmplx(matmul(reshape(wave_vector, [num_dimensions, 1]), &
-                                     reshape(wave_vector, [1, num_dimensions])), 0._DP, DP)
-                    
-                end do
+        do kx = -Box%wave(1), Box%wave(1)
+            wave_vector(1) = real(kx, DP)
                 
-            end do
+            exp_IkxVec = exp_IkxVec_1(kx) * exp_IkxVec_2(ky) * exp_IkxVec_3(kz)
+            
+            complex_tensor(:, :) = complex_tensor(:, :) + &
+                cmplx(this%weight(kx, ky, kz), 0._DP, DP) * exp_IkxVec * &
+                cmplx(matmul(reshape(wave_vector, [num_dimensions, 1]), &
+                             reshape(wave_vector, [1, num_dimensions])), 0._DP, DP)
+                    
+        end do
+            
+        end do
             
         end do
         
-        pair_field_tensor(:, :) =-8._DP*PI / product(Box%size) * real(complex_tensor(:,: ), DP) / &
+        pair_field_tensor(:, :) =-4._DP*PI / product(Box%size) * real(complex_tensor(:,: ), DP) / &
                                   dot_product(Box%size, Box%size)
         
 
