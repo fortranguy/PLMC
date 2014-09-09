@@ -320,7 +320,7 @@ contains
         
         integer :: kx, ky, kz
         
-        vector_div_box(:) = 2._DP*PI * vector_ij(:) / Box%size(:)
+        vector_div_box(:) = -2._DP*PI * vector_ij(:) / Box%size(:)
         call fourier_i(Box%wave(1), vector_div_box(1), exp_IkxVec_1)
         call fourier_i(Box%wave(2), vector_div_box(2), exp_IkxVec_2)
         call fourier_i(Box%wave(3), vector_div_box(3), exp_IkxVec_3)
