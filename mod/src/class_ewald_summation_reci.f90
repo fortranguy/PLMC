@@ -267,11 +267,10 @@ contains
         
     end function Ewald_Summation_Reci_total_energy
 
-    pure function Ewald_Summation_Reci_solo_field(this, Box_size, this_spheres, particle) &
-                  result(solo_field)
+    pure function Ewald_Summation_Reci_solo_field(this, Box, this_spheres, particle) result(solo_field)
 
         class(Ewald_Summation_Reci), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: Box_size
+        type(Box_Parameters), intent(in) :: Box
         type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
         type(Particle_Index), intent(in) :: particle
         real(DP), dimension(num_dimensions) :: solo_field
@@ -284,9 +283,9 @@ contains
         do j_particle = 1, this_spheres%get_num_particles()
             if (j_particle /= particle%number) then
 
-                vector_ij = PBC_vector(Box_size, &
+                vector_ij = PBC_vector(Box%size, &
                                        particle%position, this_spheres%get_position(j_particle))
-                solo_field(:) = solo_field(:) + matmul(this%pair_field_tensor(vector_ij), &
+                solo_field(:) = solo_field(:) + matmul(this%pair_field_tensor(Box, vector_ij), &
                                                        this_spheres%get_orientation(j_particle))
 
             end if
@@ -301,13 +300,58 @@ contains
     !>                                      |\vec{k}) (\vec{k}|
     !> \f]
 
-    pure function Ewald_Summation_Reci_pair_field_tensor(this, vector_ij) result(pair_field_tensor)
+    pure function Ewald_Summation_Reci_pair_field_tensor(this, Box, vector_ij) result(pair_field_tensor)
 
         class(Ewald_Summation_Reci), intent(in) :: this
+        type(Box_Parameters), intent(in) :: Box
         real(DP), dimension(:), intent(in) :: vector_ij
         real(DP), dimension(num_dimensions, num_dimensions) :: pair_field_tensor
+        
+        complex(DP), dimension(num_dimensions, num_dimensions) :: complex_tensor
+        
+        real(DP), dimension(num_dimensions) :: vector_div_box
+        
+        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxVec_1
+        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxVec_2
+        complex(DP), dimension(-Box%wave(3):Box%wave(3)) :: exp_IkxVec_3
+        complex(DP) :: exp_IkxVec
+        
+        real(DP), dimension(num_dimensions) :: wave_vector
+        
+        integer :: kx, ky, kz
+        
+        vector_div_box(:) = 2._DP*PI * vector_ij(:) / Box%size(:)
+        call fourier_i(Box%wave(1), vector_div_box(1), exp_IkxVec_1)
+        call fourier_i(Box%wave(2), vector_div_box(2), exp_IkxVec_2)
+        call fourier_i(Box%wave(3), vector_div_box(3), exp_IkxVec_3)
+        
+        complex_tensor(:, :) = cmplx(0._DP, 0._DP, DP)
+        
+        do kz = 0, Box%wave(3) ! symmetry: half wave vectors -> double tensor
+            wave_vector(3) = real(kz, DP)
 
-        pair_field_tensor(:, :) = 0._DP
+            do ky = -Box_wave2_sym(Box%wave, kz), Box%wave(2)
+                wave_vector(2) = real(ky, DP)
+            
+                do kx = -Box_wave1_sym(Box%wave, ky, kz), Box%wave(1)
+                    wave_vector(1) = real(kx, DP)
+                    
+                    exp_IkxVec = exp_IkxVec_1(kx) * exp_IkxVec_2(ky) * exp_IkxVec_3(kz)
+                    
+                    complex_tensor(:, :) = complex_tensor(:, :) + &
+                        cmplx(this%weight(kx, ky, kz), 0._DP, DP) * exp_IkxVec * &
+                        cmplx(matmul(reshape(wave_vector, [num_dimensions, 1]), &
+                                     reshape(wave_vector, [1, num_dimensions])), 0._DP, DP)
+                    
+                end do
+                
+            end do
+            
+        end do
+        
+        pair_field_tensor(:, :) =-8._DP*PI / product(Box%size) * real(complex_tensor(:,: ), DP) / &
+                                  dot_product(Box%size, Box%size)
+        
 
     end function Ewald_Summation_Reci_pair_field_tensor
     
