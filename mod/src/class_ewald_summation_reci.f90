@@ -66,7 +66,7 @@ contains
     
     !> \f[
     !>      w(\alpha, \vec{k}) = \frac{e^{-\frac{\pi^2}{\alpha^2} \sum_{d=1}^3 \frac{k_d^2}{L_d^2}}}
-    !>                                {\sum_{d=1}^3 \frac{k_d^2}{L_d^2}}
+    !>                                {\sum_{d=1}^3 k_d^2}
     !> \f]
     
     pure subroutine Ewald_Summation_Reci_set_weight(this, Box, alpha)
@@ -77,7 +77,7 @@ contains
         
         integer :: kx, ky, kz
         real(DP), dimension(num_dimensions) :: wave_vector
-        real(DP) :: wave_div_box_sqr
+        real(DP) :: wave_sqr, wave_div_box_sqr
 
         do kz = -Box%wave(3), Box%wave(3)
             wave_vector(3) = real(kz, DP)
@@ -89,8 +89,9 @@ contains
             wave_vector(1) = real(kx, DP)
 
             if (kx**2 + ky**2 + kz**2 /= 0) then
-                wave_div_box_sqr = dot_product(wave_vector(:)/Box%size(:), wave_vector(:)/Box%size(:))
-                this%weight(kx, ky, kz) = exp(-PI**2/alpha**2 * wave_div_box_sqr) / wave_div_box_sqr
+                wave_sqr = dot_product(wave_vector, wave_vector)
+                wave_div_box_sqr = dot_product(wave_vector/Box%size, wave_vector/Box%size)
+                this%weight(kx, ky, kz) = exp(-PI**2/alpha**2 * wave_div_box_sqr) / wave_sqr
             else
                 this%weight(kx, ky, kz) = 0._DP
             end if
@@ -125,7 +126,6 @@ contains
         complex(DP), dimension(-Box%wave(3):Box%wave(3)) :: exp_Ikx_3
 
         real(DP), dimension(num_dimensions) :: position_div_box
-        real(DP), dimension(num_dimensions) :: orientation_div_box
         real(DP), dimension(num_dimensions) :: wave_vector
         real(DP) :: wave_dot_orientation
         integer :: kx, ky, kz
@@ -139,8 +139,6 @@ contains
             call fourier_i(Box%wave(1), position_div_box(1), exp_Ikx_1)
             call fourier_i(Box%wave(2), position_div_box(2), exp_Ikx_2)
             call fourier_i(Box%wave(3), position_div_box(3), exp_Ikx_3)
-            
-            orientation_div_box(:) = this_spheres%get_orientation(i_particle)/Box%size(:)
         
             do kz = -Box%wave(3), Box%wave(3)
                 wave_vector(3) = real(kz, DP)
@@ -152,7 +150,8 @@ contains
                 wave_vector(1) = real(kx, DP)
                               
                 exp_Ikx = exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz)
-                wave_dot_orientation = dot_product(wave_vector, orientation_div_box)
+                wave_dot_orientation = dot_product(wave_vector, &
+                                                   this_spheres%get_orientation(i_particle))
                           
                 this%structure(kx, ky, kz) = this%structure(kx, ky, kz) + &
                                              cmplx(wave_dot_orientation, 0._DP, DP) * exp_Ikx
@@ -281,14 +280,12 @@ contains
         solo_field(:) = 0._DP
 
         do j_particle = 1, this_spheres%get_num_particles()
-            if (j_particle /= particle%number) then
 
-                vector_ij = PBC_vector(Box%size, &
-                                       particle%position, this_spheres%get_position(j_particle))
-                solo_field(:) = solo_field(:) + matmul(this%pair_field_tensor(Box, vector_ij), &
-                                                       this_spheres%get_orientation(j_particle))
+            vector_ij = PBC_vector(Box%size, &
+                                    particle%position, this_spheres%get_position(j_particle))
+            solo_field(:) = solo_field(:) + matmul(this%pair_field_tensor(Box, vector_ij), &
+                                                    this_spheres%get_orientation(j_particle))
 
-            end if
         end do
 
     end function Ewald_Summation_Reci_solo_field
@@ -349,9 +346,7 @@ contains
             
         end do
         
-        pair_field_tensor(:, :) =-4._DP*PI / product(Box%size) * real(complex_tensor(:,: ), DP) / &
-                                  dot_product(Box%size, Box%size)
-        
+        pair_field_tensor(:, :) =-4._DP*PI / product(Box%size) * real(complex_tensor(:,: ), DP)        
 
     end function Ewald_Summation_Reci_pair_field_tensor
     
@@ -375,7 +370,6 @@ contains
         real(DP) :: move_energy
         
         real(DP), dimension(num_dimensions) :: new_position_div_box, old_position_div_box
-        real(DP), dimension(num_dimensions) :: orientation_div_box
 
         complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxNew_1
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxNew_2
@@ -403,8 +397,6 @@ contains
         call fourier_i(Box%wave(2), old_position_div_box(2), exp_IkxOld_2)
         call fourier_i(Box%wave(3), old_position_div_box(3), exp_IkxOld_3)
 
-        orientation_div_box(:) = new%orientation(:) / Box%size(:)
-
         move_energy = 0._DP
 
         do kz = 0, Box%wave(3) ! symmetry: half wave vectors -> double Energy
@@ -416,7 +408,7 @@ contains
                 do kx = -Box_wave1_sym(Box%wave, ky, kz), Box%wave(1)
                     wave_vector(1) = real(kx, DP)
                     
-                    wave_dot_orientation = dot_product(wave_vector, orientation_div_box)
+                    wave_dot_orientation = dot_product(wave_vector, new%orientation)
 
                     exp_IkxNew = exp_IkxNew_1(kx) * exp_IkxNew_2(ky) * exp_IkxNew_3(kz)
                     exp_IkxOld = exp_IkxOld_1(kx) * exp_IkxOld_2(ky) * exp_IkxOld_3(kz)
@@ -451,7 +443,6 @@ contains
         type(Particle_Index), intent(in) :: old, new
         
         real(DP), dimension(num_dimensions) :: new_position_div_box, old_position_div_box
-        real(DP), dimension(num_dimensions) :: orientation_div_box
 
         complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxNew_1
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxNew_2
@@ -477,8 +468,6 @@ contains
         call fourier_i(Box%wave(2), old_position_div_box(2), exp_IkxOld_2)
         call fourier_i(Box%wave(3), old_position_div_box(3), exp_IkxOld_3)
 
-        orientation_div_box(:) = new%orientation(:) / Box%size(:)
-
         do kz = 0, Box%wave(3)
             wave_vector(3) = real(kz, DP)
 
@@ -488,7 +477,7 @@ contains
                 do kx = -Box_wave1_sym(Box%wave, ky, kz), Box%wave(1)
                     wave_vector(1) = real(kx, DP)
                     
-                    wave_dot_orientation = dot_product(wave_vector, orientation_div_box)
+                    wave_dot_orientation = dot_product(wave_vector, new%orientation)
                     exp_IkxNew = exp_IkxNew_1(kx) * exp_IkxNew_2(ky) * exp_IkxNew_3(kz)
                     exp_IkxOld = exp_IkxOld_1(kx) * exp_IkxOld_2(ky) * exp_IkxOld_3(kz)
                                                           
@@ -524,7 +513,6 @@ contains
         real(DP) :: rotation_energy
 
         real(DP), dimension(num_dimensions) :: position_div_box
-        real(DP), dimension(num_dimensions) :: new_orientation_div_box, old_orientation_div_box
 
         complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_1
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_2
@@ -542,9 +530,6 @@ contains
         call fourier_i(Box%wave(2), position_div_box(2), exp_Ikx_2)
         call fourier_i(Box%wave(3), position_div_box(3), exp_Ikx_3)
 
-        new_orientation_div_box(:) = new%orientation(:) / Box%size(:)
-        old_orientation_div_box(:) = old%orientation(:) / Box%size(:)
-
         rotation_energy = 0._DP
 
         do kz = 0, Box%wave(3)
@@ -556,8 +541,8 @@ contains
                 do kx = -Box_wave1_sym(Box%wave, ky, kz), Box%wave(1)
                     wave_vector(1) = real(kx, DP)
 
-                    wave_dot_new_orientation = dot_product(wave_vector, new_orientation_div_box)
-                    wave_dot_old_orientation = dot_product(wave_vector, old_orientation_div_box)
+                    wave_dot_new_orientation = dot_product(wave_vector, new%orientation)
+                    wave_dot_old_orientation = dot_product(wave_vector, old%orientation)
                     exp_Ikx = exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz)
 
                     real_part = wave_dot_new_orientation**2 - wave_dot_old_orientation**2
@@ -593,7 +578,6 @@ contains
         type(Particle_Index), intent(in) :: old, new
 
         real(DP), dimension(num_dimensions) :: position_div_box
-        real(DP), dimension(num_dimensions) :: new_orientation_div_box, old_orientation_div_box
 
         complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_1
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_2
@@ -609,9 +593,6 @@ contains
         call fourier_i(Box%wave(2), position_div_box(2), exp_Ikx_2)
         call fourier_i(Box%wave(3), position_div_box(3), exp_Ikx_3)
 
-        new_orientation_div_box(:) = new%orientation(:)/Box%size(:)
-        old_orientation_div_box(:) = old%orientation(:)/Box%size(:)
-
         do kz = 0, Box%wave(3)
             wave_vector(3) = real(kz, DP)
 
@@ -622,7 +603,7 @@ contains
                     wave_vector(1) = real(kx, DP)
                     
                     k_dot_deltaMcol = dot_product(wave_vector, &
-                                      new_orientation_div_box - old_orientation_div_box)
+                                                  new%orientation - old%orientation)
                     exp_Ikx = exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz)
 
                     this%structure(kx, ky, kz) = this%structure(kx, ky, kz) + &
@@ -659,7 +640,7 @@ contains
         real(DP) :: exchange_energy
         
         real(DP), dimension(num_dimensions) :: position_div_box
-        real(DP), dimension(num_dimensions) :: orientation_div_box
+        real(DP), dimension(num_dimensions) :: orientation
         
         complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_1
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_2
@@ -676,8 +657,8 @@ contains
         call fourier_i(Box%wave(1), position_div_box(1), exp_Ikx_1)
         call fourier_i(Box%wave(2), position_div_box(2), exp_Ikx_2)
         call fourier_i(Box%wave(3), position_div_box(3), exp_Ikx_3)
-        
-        orientation_div_box(:) = exchange_sign(particle%add) * particle%orientation(:) / Box%size(:)
+
+        orientation(:) = exchange_sign(particle%add) * particle%orientation(:)
         
         exchange_energy = 0._DP
         
@@ -690,7 +671,7 @@ contains
                 do kx = -Box_wave1_sym(Box%wave, ky, kz), Box%wave(1)
                     wave_vector(1) = real(kx, DP)
                     
-                    wave_dot_orientation = dot_product(wave_vector, orientation_div_box)
+                    wave_dot_orientation = dot_product(wave_vector, orientation)
                     exp_Ikx = exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz)
                     
                     real_part = wave_dot_orientation * (wave_dot_orientation + 2._DP * &
@@ -727,10 +708,9 @@ contains
         class(Ewald_Summation_Reci), intent(inout) :: this
         type(Box_Parameters), intent(in) :: Box
         type(Particle_Index), intent(in) :: particle
-        real(DP) :: exchange
         
         real(DP), dimension(num_dimensions) :: position_div_box
-        real(DP), dimension(num_dimensions) :: orientation_div_box
+        real(DP), dimension(num_dimensions) :: orientation
         
         complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_1
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_2
@@ -746,9 +726,7 @@ contains
         call fourier_i(Box%wave(2), position_div_box(2), exp_Ikx_2)
         call fourier_i(Box%wave(3), position_div_box(3), exp_Ikx_3)
         
-        orientation_div_box(:) = exchange_sign(particle%add) * particle%orientation(:) / Box%size(:)
-        
-        exchange = 0._DP
+        orientation(:) = exchange_sign(particle%add) * particle%orientation(:)
         
         do kz = 0, Box%wave(3)
             wave_vector(3) = real(kz, DP)
@@ -759,7 +737,7 @@ contains
                 do kx = -Box_wave1_sym(Box%wave, ky, kz), Box%wave(1)
                     wave_vector(1) = real(kx, DP)
                     
-                    wave_dot_orientation = dot_product(wave_vector, orientation_div_box)
+                    wave_dot_orientation = dot_product(wave_vector, orientation)
                     exp_Ikx = exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz)
                                                           
                     this%structure(kx, ky, kz) = this%structure(kx, ky, kz) + &
@@ -770,8 +748,6 @@ contains
             end do
         
         end do
-        
-        exchange = 4._DP*PI / product(Box%size) * exchange
 
     end subroutine Ewald_Summation_Reci_update_structure_exchange
 
