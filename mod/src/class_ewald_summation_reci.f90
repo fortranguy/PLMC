@@ -284,7 +284,7 @@ contains
             vector_ij = PBC_vector(Box%size, &
                                     particle%position, this_spheres%get_position(j_particle))
             solo_field(:) = solo_field(:) + matmul(this%pair_field_tensor(Box, vector_ij), &
-                                                    this_spheres%get_orientation(j_particle))
+                                                   this_spheres%get_orientation(j_particle))
 
         end do
 
@@ -346,7 +346,7 @@ contains
             
         end do
         
-        pair_field_tensor(:, :) =-4._DP*PI / product(Box%size) * real(complex_tensor(:,: ), DP)        
+        pair_field_tensor(:, :) =-4._DP*PI / product(Box%size) * real(complex_tensor(:, :), DP)
 
     end function Ewald_Summation_Reci_pair_field_tensor
     
