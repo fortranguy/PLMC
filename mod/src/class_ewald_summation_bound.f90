@@ -5,6 +5,7 @@ use data_constants, only: PI
 use data_box, only: num_dimensions
 use module_types_micro, only: Particle_Index
 use module_geometry, only: geometry
+use module_linear_algebra, only: projector_matrix
 use module_physics_micro, only: exchange_sign
 use class_hard_spheres, only: Dipolar_Hard_Spheres
 
@@ -19,6 +20,8 @@ private
         procedure :: get_total_moment => Ewald_Summation_Bound_get_total_moment
         procedure :: reset_total_moment => Ewald_Summation_Bound_reset_total_moment
         procedure :: total_energy => Ewald_Summation_Bound_total_energy
+        
+        procedure :: solo_field => Ewald_Summation_Bound_solo_field
         
         procedure :: rotation_energy => Ewald_Summation_Bound_rotation_energy
         procedure :: update_total_moment_rotation => Ewald_Summation_Bound_update_total_moment_rotation
@@ -93,6 +96,29 @@ contains
         end if
     
     end function Ewald_Summation_Bound_total_energy
+    
+    !> Field
+    !> \f[
+    !>      \vec{E}(\vec{M}, S) = - \frac{4\pi}{3V}  \vec{M}
+    !> \f]
+    !> \f[
+    !>      \vec{E}(\vec{M}, R) = - \frac{4\pi}{V}  |\vec{e}_z)(\vec{e}_z| \vec{M}
+    !> \f]
+    
+    pure function Ewald_Summation_Bound_solo_field(this, Box_size) result(solo_field)
+
+        class(Ewald_Summation_Bound), intent(in) :: this
+        real(DP), dimension(:), intent(in) :: Box_size
+        real(DP), dimension(num_dimensions) :: solo_field
+        
+        if (geometry%bulk) then
+            solo_field(:) = -4._DP/3._DP * PI/product(Box_size) * this%total_moment(:)
+        else if(geometry%slab) then
+            solo_field(:) = -4._DP * PI/product(Box_size) * &
+                            matmul(projector_matrix(num_dimensions, 3), this%total_moment)
+        end if
+
+    end function Ewald_Summation_Bound_solo_field
 
     !> Rotation
     
