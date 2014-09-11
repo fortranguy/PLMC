@@ -2,6 +2,7 @@ module class_ewald_summation_self
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: PI
+use data_box, only: num_dimensions
 use class_hard_spheres, only: Dipolar_Hard_Spheres
 
 implicit none
@@ -14,6 +15,7 @@ private
         procedure :: set_alpha => Ewald_Summation_Self_set_alpha
         procedure :: total_energy => Ewald_Summation_Self_total_energy
         procedure :: solo_energy => Ewald_Summation_Self_solo_energy
+        procedure :: solo_field => Ewald_Summation_Self_solo_field
     end type Ewald_Summation_Self
     
 contains
@@ -57,5 +59,16 @@ contains
         solo_energy = 2._DP/3._DP * this%alpha**3/sqrt(PI) * dot_product(orientation, orientation)
     
     end function Ewald_Summation_Self_solo_energy
+    
+    pure function Ewald_Summation_Self_solo_field(this, orientation) &
+                  result(solo_field)
+    
+        class(Ewald_Summation_Self), intent(in) :: this
+        real(DP), dimension(:), intent(in) :: orientation
+        real(DP), dimension(num_dimensions) :: solo_field
+        
+        solo_field(:) = 4._DP/3._DP * this%alpha**3/sqrt(PI) * orientation(:)
+    
+    end function Ewald_Summation_Self_solo_field
 
 end module class_ewald_summation_self
