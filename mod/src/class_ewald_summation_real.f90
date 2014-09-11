@@ -209,6 +209,11 @@ contains
 
     end function Ewald_Summation_Real_pair_energy
     
+    !> Field
+    !> \f[
+    !>      \vec{E}(\vec{r}_i) = \sum_{j \neq i} T_{ij} |\vec{\mu}_j)
+    !> \f]
+    
     pure function Ewald_Summation_Real_solo_field(this, Box_size, this_spheres, particle) &
                   result(solo_field)
     

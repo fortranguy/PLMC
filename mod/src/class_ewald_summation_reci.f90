@@ -265,6 +265,11 @@ contains
         total_energy = 2._DP*PI / product(Box%size) * total_energy
         
     end function Ewald_Summation_Reci_total_energy
+    
+    !> Field
+    !> \f[
+    !>      \vec{E}(\vec{r}_i) = \sum_j T_{ij} |\vec{\mu}_j)
+    !> \f]    
 
     pure function Ewald_Summation_Reci_solo_field(this, Box, this_spheres, particle) result(solo_field)
 
