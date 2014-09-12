@@ -83,12 +83,12 @@ contains
         real(DP), dimension(num_dimensions-1) :: wave_vector
         
         do ky = -Box%wave(2), Box%wave(2)
-            wave_vector(2) = real(ky, DP) / Box%size(2)
+            wave_vector(2) = 2._DP*PI * real(ky, DP) / Box%size(2)
         
         do kx = -Box%wave(1), Box%wave(1)
-            wave_vector(1) = real(kx, DP) / Box%size(1)
+            wave_vector(1) = 2._DP*PI * real(kx, DP) / Box%size(1)
             
-            this%wave_norm(kx, ky) = 2._DP*PI * norm2(wave_vector)
+            this%wave_norm(kx, ky) = norm2(wave_vector)
             
         end do
         
@@ -148,7 +148,6 @@ contains
         real(DP) :: exp_Ikz
 
         real(DP), dimension(num_dimensions-1) :: position_div_box
-        real(DP), dimension(num_dimensions-1) :: orientation_div_box
         real(DP), dimension(num_dimensions-1) :: wave_vector
         real(DP) :: wave_dot_orientation, wave_orientation_z
         integer :: kx, ky
@@ -162,19 +161,18 @@ contains
             position_div_box(:) = 2._DP*PI * this_spheres%get_position_2d(i_particle)/Box%size(1:2)
             call fourier_i(Box%wave(1), position_div_box(1), exp_Ikx_1)
             call fourier_i(Box%wave(2), position_div_box(2), exp_Ikx_2)
-            
-            orientation_div_box(:) = 2._DP*PI * this_spheres%get_orientation_2d(i_particle)/Box%size(1:2)
         
             do ky = -Box%wave(2), Box%wave(2)
-                wave_vector(2) = real(ky, DP)
+                wave_vector(2) = 2._DP*PI * real(ky, DP) / Box%size(2)
                 
             do kx = -Box%wave(1), Box%wave(1)
-                wave_vector(1) = real(kx, DP)
+                wave_vector(1) = 2._DP*PI * real(kx, DP) / Box%size(1)
             
                 exp_Ikx = exp_Ikx_1(kx) * exp_Ikx_2(ky)
                 exp_Ikz = exp(this%wave_norm(kx, ky) * this_spheres%get_position_z(i_particle))
 
-                wave_dot_orientation = dot_product(wave_vector, orientation_div_box)
+                wave_dot_orientation = dot_product(wave_vector, &
+                                                   this_spheres%get_orientation_2d(i_particle))
                 wave_orientation_z = this%wave_norm(kx, ky) * this_spheres%get_orientation_z(i_particle)
                           
                 this%structure_plus(kx, ky) = this%structure_plus(kx, ky) + &
@@ -327,7 +325,6 @@ contains
         real(DP) :: move_energy
 
         real(DP), dimension(num_dimensions-1) :: new_position_div_box, old_position_div_box
-        real(DP), dimension(num_dimensions-1) :: orientation_div_box
 
         complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxNew_1
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxNew_2
@@ -359,18 +356,16 @@ contains
         call fourier_i(Box%wave(2), old_position_div_box(2), exp_IkxOld_2)
         call set_exp_kz(Box%wave, this%wave_norm, old%position(3), exp_kzOld_tab)
 
-        orientation_div_box(:) = 2._DP*PI * new%orientation(1:num_dimensions-1) / Box%size(1:num_dimensions-1)
-
         move_energy = 0._DP
 
         do ky = 0, Box%wave(2)
-            wave_vector(2) = real(ky, DP)
+            wave_vector(2) = 2._DP*PI * real(ky, DP) / Box%size(2)
         
             do kx = -Box_wave1_sym(Box%wave, ky, 0), Box%wave(1)
-                wave_vector(1) = real(kx, DP)
+                wave_vector(1) = 2._DP*PI * real(kx, DP) / Box%size(1)
                 
                 wave_orientation_z = this%wave_norm(kx, ky) * new%orientation(3)
-                wave_dot_orientation = dot_product(wave_vector, orientation_div_box)
+                wave_dot_orientation = dot_product(wave_vector, new%orientation(1:num_dimensions-1))
                 
                 exp_IkxNew = exp_IkxNew_1(kx) * exp_IkxNew_2(ky)
                 exp_kzNew = exp_kzNew_tab(abs(kx), ky)
@@ -423,7 +418,6 @@ contains
         type(Particle_Index), intent(in) :: old, new
         
         real(DP), dimension(num_dimensions-1) :: new_position_div_box, old_position_div_box
-        real(DP), dimension(num_dimensions-1) :: orientation_div_box
 
         complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxNew_1
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxNew_2
@@ -452,15 +446,13 @@ contains
         call fourier_i(Box%wave(2), old_position_div_box(2), exp_IkxOld_2)
         call set_exp_kz(Box%wave, this%wave_norm, old%position(3), exp_kzOld_tab)
 
-        orientation_div_box(:) = 2._DP*PI * new%orientation(1:num_dimensions-1)/Box%size(1:num_dimensions-1)
-
         do ky = 0, Box%wave(2)
-            wave_vector(2) = real(ky, DP)
+            wave_vector(2) = 2._DP*PI * real(ky, DP) / Box%size(2)
 
             do kx = -Box_wave1_sym(Box%wave, ky, 0), Box%wave(1)
-                wave_vector(1) = real(kx, DP)
+                wave_vector(1) = 2._DP*PI * real(kx, DP) / Box%size(1)
 
-                wave_dot_orientation = dot_product(wave_vector, orientation_div_box)
+                wave_dot_orientation = dot_product(wave_vector, new%orientation(1:num_dimensions-1))
                 wave_orientation_z = this%wave_norm(kx, ky) * new%orientation(3)
 
                 exp_IkxNew = exp_IkxNew_1(kx) * exp_IkxNew_2(ky)
@@ -512,7 +504,6 @@ contains
         real(DP) :: rotation_energy
 
         real(DP), dimension(num_dimensions-1) :: position_div_box
-        real(DP), dimension(num_dimensions-1) :: new_orientation_div_box, old_orientation_div_box
 
         complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_1
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_2
@@ -534,22 +525,19 @@ contains
         call fourier_i(Box%wave(2), position_div_box(2), exp_Ikx_2)
         call set_exp_kz(Box%wave, this%wave_norm, new%position(3), exp_Ikz_tab)
 
-        new_orientation_div_box(:) = 2._DP*PI * new%orientation(1:2) / Box%size(1:2)
-        old_orientation_div_box(:) = 2._DP*PI * old%orientation(1:2) / Box%size(1:2)
-
         rotation_energy = 0._DP
 
         do ky = 0, Box%wave(2)
-            wave_vector(2) = real(ky, DP)
+            wave_vector(2) = 2._DP*PI * real(ky, DP) / Box%size(2)
         
             do kx = -Box_wave1_sym(Box%wave, ky, 0), Box%wave(1)
-                wave_vector(1) = real(kx, DP)
+                wave_vector(1) = 2._DP*PI * real(kx, DP) / Box%size(1)
 
                 kMnew_z = this%wave_norm(kx, ky) * new%orientation(3)
-                k_dot_mNew = dot_product(wave_vector, new_orientation_div_box)
+                k_dot_mNew = dot_product(wave_vector, new%orientation(1:2))
                 
                 kMold_z = this%wave_norm(kx, ky) * old%orientation(3)
-                k_dot_mOld = dot_product(wave_vector, old_orientation_div_box)
+                k_dot_mOld = dot_product(wave_vector, old%orientation(1:2))
 
                 exp_Ikx = exp_Ikx_1(kx) * exp_Ikx_2(ky)
                 exp_Ikz = exp_Ikz_tab(abs(kx), ky)
@@ -606,7 +594,6 @@ contains
         type(Particle_Index), intent(in) :: old, new
 
         real(DP), dimension(num_dimensions-1) :: position_div_box
-        real(DP), dimension(num_dimensions-1) :: new_orientation_div_box, old_orientation_div_box
 
         complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_1
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_2
@@ -623,20 +610,18 @@ contains
         call fourier_i(Box%wave(2), position_div_box(2), exp_Ikx_2)
         call set_exp_kz(Box%wave, this%wave_norm, new%position(3), exp_Ikz_tab)
 
-        new_orientation_div_box(:) = 2._DP*PI * new%orientation(1:num_dimensions-1) / Box%size(1:num_dimensions-1)
-        old_orientation_div_box(:) = 2._DP*PI * old%orientation(1:num_dimensions-1) / Box%size(1:num_dimensions-1)
-
         do ky = 0, Box%wave(2)
-            wave_vector(2) = real(ky, DP)
+            wave_vector(2) = 2._DP*PI * real(ky, DP) / Box%size(2)
 
             do kx = -Box_wave1_sym(Box%wave, ky, 0), Box%wave(1)
-                wave_vector(1) = real(kx, DP)
+                wave_vector(1) = 2._DP*PI * real(kx, DP) / Box%size(1)
 
                 exp_Ikz = exp_Ikz_tab(abs(kx), ky)
                 exp_Ikx = exp_Ikx_1(kx) * exp_Ikx_2(ky)
 
                 kdeltaMcol_z = this%wave_norm(kx, ky) * (new%orientation(3) - old%orientation(3))
-                k_dot_deltaMcol = dot_product(wave_vector, new_orientation_div_box - old_orientation_div_box)
+                k_dot_deltaMcol = dot_product(wave_vector, &
+                                              new%orientation(1:2) - old%orientation(1:2))
                 
                 this%structure_plus(kx, ky) = this%structure_plus(kx, ky) + &
                     cmplx(+kdeltaMcol_z, k_dot_deltaMcol, DP) * &
@@ -681,7 +666,6 @@ contains
         real(DP) :: exchange_energy
         
         real(DP), dimension(num_dimensions-1) :: position_div_box
-        real(DP), dimension(num_dimensions-1) :: orientation_div_box
         
         complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_1
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_2
@@ -703,18 +687,18 @@ contains
         call set_exp_kz(Box%wave, this%wave_norm, particle%position(3), exp_Ikz_tab)
         
         exchg_sign = exchange_sign(particle%add)
-        orientation_div_box(:) = 2._DP*PI*exchg_sign * particle%orientation(1:2) / Box%size(1:2)
         
         exchange_energy = 0._DP
 
         do ky = 0, Box%wave(2)
-            wave_vector(2) = real(ky, DP)
+            wave_vector(2) = 2._DP*PI * real(ky, DP) / Box%size(2)
         
             do kx = -Box_wave1_sym(Box%wave, ky, 0), Box%wave(1)
-                wave_vector(1) = real(kx, DP)
+                wave_vector(1) = 2._DP*PI * real(kx, DP) / Box%size(1)
                 
                 wave_orientation_z = this%wave_norm(kx, ky) * exchg_sign * particle%orientation(3)
-                wave_dot_orientation = dot_product(wave_vector, orientation_div_box)
+                wave_dot_orientation = dot_product(wave_vector, &
+                                                   exchg_sign * particle%orientation(1:2))
                                                 
                 exp_Ikx = exp_Ikx_1(kx) * exp_Ikx_2(ky)
                 exp_Ikz = exp_Ikz_tab(abs(kx), ky)
@@ -762,7 +746,6 @@ contains
         type(Particle_Index), intent(in) :: particle
         
         real(DP), dimension(num_dimensions-1) :: position_div_box
-        real(DP), dimension(num_dimensions-1) :: orientation_div_box
 
         complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_1
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_2
@@ -781,18 +764,18 @@ contains
         call set_exp_kz(Box%wave, this%wave_norm, particle%position(3), exp_Ikz_tab)
         
         exchg_sign = exchange_sign(particle%add)
-        orientation_div_box(:) = 2._DP*PI*exchg_sign * particle%orientation(1:2) / Box%size(1:2)
 
         do ky = 0, Box%wave(2)
 
-            wave_vector(2) = real(ky, DP)
+            wave_vector(2) = 2._DP*PI * real(ky, DP) / Box%size(2)
 
             do kx = -Box_wave1_sym(Box%wave, ky, 0), Box%wave(1)
 
-                wave_vector(1) = real(kx, DP)
+                wave_vector(1) = 2._DP*PI * real(kx, DP) / Box%size(1)
 
                 wave_orientation_z = this%wave_norm(kx, ky) * exchg_sign * particle%orientation(3)
-                wave_dot_orientation = dot_product(wave_vector, orientation_div_box)
+                wave_dot_orientation = dot_product(wave_vector, &
+                                                   exchg_sign * particle%orientation(1:2))
                 
                 exp_Ikx = exp_Ikx_1(kx) * exp_Ikx_2(ky)
                 exp_Ikz = exp_Ikz_tab(abs(kx), ky)
