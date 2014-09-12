@@ -83,12 +83,12 @@ contains
         real(DP), dimension(num_dimensions-1) :: wave_vector
         
         do ky = -Box%wave(2), Box%wave(2)
-            wave_vector(2) = real(ky, DP)
+            wave_vector(2) = real(ky, DP) / Box%size(2)
         
         do kx = -Box%wave(1), Box%wave(1)
-            wave_vector(1) = real(kx, DP)
+            wave_vector(1) = real(kx, DP) / Box%size(1)
             
-            this%wave_norm(kx, ky) = 2._DP*PI * norm2(wave_vector(:)/Box%size(1:num_dimensions-1))
+            this%wave_norm(kx, ky) = 2._DP*PI * norm2(wave_vector)
             
         end do
         
