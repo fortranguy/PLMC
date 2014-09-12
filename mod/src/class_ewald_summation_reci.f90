@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: PI
 use data_box, only: num_dimensions
 use module_types_micro, only: Box_Parameters, Particle_Index
-use module_physics_micro, only: PBC_vector, fourier_i, Box_wave1_sym, Box_wave2_sym, exchange_sign
+use module_physics_micro, only: fourier_i, Box_wave1_sym, Box_wave2_sym, exchange_sign
 use class_hard_spheres, only: Dipolar_Hard_Spheres
 
 implicit none
@@ -285,8 +285,7 @@ contains
 
         do j_particle = 1, this_spheres%get_num_particles()
 
-            vector_ij = PBC_vector(Box%size, &
-                                   particle%position, this_spheres%get_position(j_particle))
+            vector_ij = this_spheres%get_position(j_particle) - particle%position
             solo_field(:) = solo_field(:) + matmul(this%pair_field_tensor(Box, vector_ij), &
                                                    this_spheres%get_orientation(j_particle))
 
