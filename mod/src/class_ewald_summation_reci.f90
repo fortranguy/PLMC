@@ -80,17 +80,17 @@ contains
         real(DP) :: wave_sqr
 
         do kz = -Box%wave(3), Box%wave(3)
-            wave_vector(3) = real(kz, DP) / Box%size(3)
+            wave_vector(3) = 2._DP*PI * real(kz, DP) / Box%size(3)
         
         do ky = -Box%wave(2), Box%wave(2)
-            wave_vector(2) = real(ky, DP) / Box%size(2)
+            wave_vector(2) = 2._DP*PI * real(ky, DP) / Box%size(2)
         
         do kx = -Box%wave(1), Box%wave(1)
-            wave_vector(1) = real(kx, DP) / Box%size(1)
+            wave_vector(1) = 2._DP*PI * real(kx, DP) / Box%size(1)
 
             if (kx**2 + ky**2 + kz**2 /= 0) then
                 wave_sqr = dot_product(wave_vector, wave_vector)
-                this%weight(kx, ky, kz) = exp(-PI**2/alpha**2 * wave_sqr) / wave_sqr
+                this%weight(kx, ky, kz) = exp(-wave_sqr/alpha**2/4._DP) / wave_sqr
             else
                 this%weight(kx, ky, kz) = 0._DP
             end if
@@ -140,13 +140,13 @@ contains
             call fourier_i(Box%wave(3), position_div_box(3), exp_Ikx_3)
         
             do kz = -Box%wave(3), Box%wave(3)
-                wave_vector(3) = real(kz, DP) / Box%size(3)
+                wave_vector(3) = 2._DP*PI * real(kz, DP) / Box%size(3)
 
             do ky = -Box%wave(2), Box%wave(2)
-                wave_vector(2) = real(ky, DP) / Box%size(2)
+                wave_vector(2) = 2._DP*PI * real(ky, DP) / Box%size(2)
                 
             do kx = -Box%wave(1), Box%wave(1)
-                wave_vector(1) = real(kx, DP) / Box%size(1)
+                wave_vector(1) = 2._DP*PI * real(kx, DP) / Box%size(1)
                               
                 exp_Ikx = exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz)
                 wave_dot_orientation = dot_product(wave_vector, &
@@ -329,13 +329,13 @@ contains
         complex_tensor(:, :) = cmplx(0._DP, 0._DP, DP)
         
         do kz = -Box%wave(3), Box%wave(3)
-            wave_vector(3) = real(kz, DP) / Box%size(3)
+            wave_vector(3) = 2._DP*PI * real(kz, DP) / Box%size(3)
 
         do ky = -Box%wave(2), Box%wave(2)
-            wave_vector(2) = real(ky, DP) / Box%size(2)
+            wave_vector(2) = 2._DP*PI * real(ky, DP) / Box%size(2)
             
         do kx = -Box%wave(1), Box%wave(1)
-            wave_vector(1) = real(kx, DP) / Box%size(1)
+            wave_vector(1) = 2._DP*PI * real(kx, DP) / Box%size(1)
                 
             exp_IkxVec = exp_IkxVec_1(kx) * exp_IkxVec_2(ky) * exp_IkxVec_3(kz)
             
@@ -404,13 +404,13 @@ contains
         move_energy = 0._DP
 
         do kz = 0, Box%wave(3) ! symmetry: half wave vectors -> double Energy
-            wave_vector(3) = real(kz, DP) / Box%size(3)
+            wave_vector(3) = 2._DP*PI * real(kz, DP) / Box%size(3)
 
             do ky = -Box_wave2_sym(Box%wave, kz), Box%wave(2)
-                wave_vector(2) = real(ky, DP) / Box%size(2)
+                wave_vector(2) = 2._DP*PI * real(ky, DP) / Box%size(2)
             
                 do kx = -Box_wave1_sym(Box%wave, ky, kz), Box%wave(1)
-                    wave_vector(1) = real(kx, DP) / Box%size(1)
+                    wave_vector(1) = 2._DP*PI * real(kx, DP) / Box%size(1)
                     
                     wave_dot_orientation = dot_product(wave_vector, new%orientation)
 
@@ -473,13 +473,13 @@ contains
         call fourier_i(Box%wave(3), old_position_div_box(3), exp_IkxOld_3)
 
         do kz = 0, Box%wave(3)
-            wave_vector(3) = real(kz, DP) / Box%size(3)
+            wave_vector(3) = 2._DP*PI * real(kz, DP) / Box%size(3)
 
             do ky = -Box_wave2_sym(Box%wave, kz), Box%wave(2)
-                wave_vector(2) = real(ky, DP) / Box%size(2)
+                wave_vector(2) = 2._DP*PI * real(ky, DP) / Box%size(2)
 
                 do kx = -Box_wave1_sym(Box%wave, ky, kz), Box%wave(1)
-                    wave_vector(1) = real(kx, DP) / Box%size(1)
+                    wave_vector(1) = 2._DP*PI * real(kx, DP) / Box%size(1)
                     
                     wave_dot_orientation = dot_product(wave_vector, new%orientation)
                     exp_IkxNew = exp_IkxNew_1(kx) * exp_IkxNew_2(ky) * exp_IkxNew_3(kz)
@@ -537,13 +537,13 @@ contains
         rotation_energy = 0._DP
 
         do kz = 0, Box%wave(3)
-            wave_vector(3) = real(kz, DP) / Box%size(3)
+            wave_vector(3) = 2._DP*PI * real(kz, DP) / Box%size(3)
 
             do ky = -Box_wave2_sym(Box%wave, kz), Box%wave(2)
-                wave_vector(2) = real(ky, DP) / Box%size(2)
+                wave_vector(2) = 2._DP*PI * real(ky, DP) / Box%size(2)
             
                 do kx = -Box_wave1_sym(Box%wave, ky, kz), Box%wave(1)
-                    wave_vector(1) = real(kx, DP) / Box%size(1)
+                    wave_vector(1) = 2._DP*PI * real(kx, DP) / Box%size(1)
 
                     wave_dot_new_orientation = dot_product(wave_vector, new%orientation)
                     wave_dot_old_orientation = dot_product(wave_vector, old%orientation)
@@ -598,13 +598,13 @@ contains
         call fourier_i(Box%wave(3), position_div_box(3), exp_Ikx_3)
 
         do kz = 0, Box%wave(3)
-            wave_vector(3) = real(kz, DP) / Box%size(3)
+            wave_vector(3) = 2._DP*PI * real(kz, DP) / Box%size(3)
 
             do ky = -Box_wave2_sym(Box%wave, kz), Box%wave(2)
-                wave_vector(2) = real(ky, DP) / Box%size(2)
+                wave_vector(2) = 2._DP*PI * real(ky, DP) / Box%size(2)
 
                 do kx = -Box_wave1_sym(Box%wave, ky, kz), Box%wave(1)
-                    wave_vector(1) = real(kx, DP) / Box%size(1)
+                    wave_vector(1) = 2._DP*PI * real(kx, DP) / Box%size(1)
                     
                     k_dot_deltaMcol = dot_product(wave_vector, &
                                                   new%orientation - old%orientation)
@@ -667,13 +667,13 @@ contains
         exchange_energy = 0._DP
         
         do kz = 0, Box%wave(3)
-            wave_vector(3) = real(kz, DP) / Box%size(3)
+            wave_vector(3) = 2._DP*PI * real(kz, DP) / Box%size(3)
 
             do ky = -Box_wave2_sym(Box%wave, kz), Box%wave(2)
-                wave_vector(2) = real(ky, DP) / Box%size(2)
+                wave_vector(2) = 2._DP*PI * real(ky, DP) / Box%size(2)
             
                 do kx = -Box_wave1_sym(Box%wave, ky, kz), Box%wave(1)
-                    wave_vector(1) = real(kx, DP) / Box%size(1)
+                    wave_vector(1) = 2._DP*PI * real(kx, DP) / Box%size(1)
                     
                     wave_dot_orientation = dot_product(wave_vector, orientation)
                     exp_Ikx = exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz)
@@ -733,13 +733,13 @@ contains
         orientation(:) = exchange_sign(particle%add) * particle%orientation(:)
         
         do kz = 0, Box%wave(3)
-            wave_vector(3) = real(kz, DP) / Box%size(3)
+            wave_vector(3) = 2._DP*PI * real(kz, DP) / Box%size(3)
 
             do ky = -Box_wave2_sym(Box%wave, kz), Box%wave(2)
-                wave_vector(2) = real(ky, DP) / Box%size(2)
+                wave_vector(2) = 2._DP*PI * real(ky, DP) / Box%size(2)
             
                 do kx = -Box_wave1_sym(Box%wave, ky, kz), Box%wave(1)
-                    wave_vector(1) = real(kx, DP) / Box%size(1)
+                    wave_vector(1) = 2._DP*PI * real(kx, DP) / Box%size(1)
                     
                     wave_dot_orientation = dot_product(wave_vector, orientation)
                     exp_Ikx = exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz)
