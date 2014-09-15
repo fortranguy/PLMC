@@ -362,11 +362,13 @@ contains
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_i_2
         complex(DP) :: exp_Ikx_i
         real(DP), dimension(0:Box%wave(1), 0:Box%wave(2)) :: exp_kz_i_tab
+        real(DP) :: exp_kz_i
         
         complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_j_1
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_j_2
         complex(DP) :: exp_Ikx_j
         real(DP), dimension(0:Box%wave(1), 0:Box%wave(2)) :: exp_kz_j_tab
+        real(DP) :: exp_kz_j
         
         complex(DP), dimension(num_dimensions) :: wave_vector_plus, wave_vector_minus
         real(DP), dimension(2) :: wave_vector
@@ -391,8 +393,10 @@ contains
             wave_vector(1) = 2._DP*PI * real(kx, DP) / Box%size(1)
             
             exp_Ikx_i = exp_Ikx_i_1(kx) * exp_Ikx_i_2(ky)
+            exp_kz_i = exp_kz_i_tab(abs(kx), abs(ky))
             
             exp_Ikx_j = exp_Ikx_j_1(kx) * exp_Ikx_j_2(ky)
+            exp_kz_j = exp_kz_j_tab(abs(kx), abs(ky))
             
             wave_vector_plus(1:2) = cmplx(0._DP, wave_vector, DP)
             wave_vector_plus(3) = cmplx(+this%wave_norm(kx, ky), 0._DP, DP)
@@ -402,12 +406,12 @@ contains
             
             complex_tensor(:, :) = complex_tensor(:, :) + &
                 cmplx(this%weight(kx, ky), 0._DP, DP) * &
-                (exp_Ikx_i * cmplx(exp_kz_i_tab(abs(kx), ky), 0._DP, DP) * &
-                conjg(exp_Ikx_j) / cmplx(exp_kz_j_tab(abs(kx), ky), 0._DP, DP) * &
+                (exp_Ikx_i * cmplx(exp_kz_i, 0._DP, DP) * &
+                conjg(exp_Ikx_j) / cmplx(exp_kz_j, 0._DP, DP) * &
                 matmul(reshape(wave_vector_plus, [num_dimensions, 1]), &
                        reshape(conjg(wave_vector_minus), [1, num_dimensions])) + &
-                exp_Ikx_i / cmplx(exp_kz_i_tab(abs(kx), ky), 0._DP, DP) * &
-                conjg(exp_Ikx_j) * cmplx(exp_kz_j_tab(abs(kx), ky), 0._DP, DP) * &
+                exp_Ikx_i / cmplx(exp_kz_i, 0._DP, DP) * &
+                conjg(exp_Ikx_j) * cmplx(exp_kz_j, 0._DP, DP) * &
                 matmul(reshape(wave_vector_minus, [num_dimensions, 1]), &
                        reshape(conjg(wave_vector_plus), [1, num_dimensions])))
             
