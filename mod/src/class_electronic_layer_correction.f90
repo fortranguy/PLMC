@@ -386,10 +386,10 @@ contains
         
         complex_tensor(:, :) = cmplx(0._DP, 0._DP, DP)
         
-        do ky = 0, Box%wave(2)
+        do ky = -Box%wave(2), Box%wave(2)
             wave_vector(2) = 2._DP*PI * real(ky, DP) / Box%size(2)
         
-        do kx = 0, Box%wave(1)
+        do kx = -Box%wave(1), Box%wave(1)
             wave_vector(1) = 2._DP*PI * real(kx, DP) / Box%size(1)
             
             exp_Ikx_i = exp_Ikx_i_1(kx) * exp_Ikx_i_2(ky)
