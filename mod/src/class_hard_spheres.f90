@@ -344,9 +344,9 @@ contains
     
         class(Hard_Spheres), intent(in) :: this
         integer, intent(in) :: i_particle
-        real(DP), dimension(num_dimensions-1) :: get_position_2d
+        real(DP), dimension(2) :: get_position_2d
         
-        get_position_2d(:) = this%all_positions(1:num_dimensions-1, i_particle)
+        get_position_2d(:) = this%all_positions(1:2, i_particle)
         
     end function Hard_Spheres_get_position_2d
     
@@ -404,9 +404,9 @@ contains
     
         class(Dipolar_Hard_Spheres), intent(in) :: this
         integer, intent(in) :: i_particle
-        real(DP), dimension(num_dimensions-1) :: get_orientation_2d
+        real(DP), dimension(2) :: get_orientation_2d
         
-        get_orientation_2d(:) = this%all_orientations(1:num_dimensions-1, i_particle)
+        get_orientation_2d(:) = this%all_orientations(1:2, i_particle)
         
     end function Dipolar_Hard_Spheres_get_orientation_2d
     

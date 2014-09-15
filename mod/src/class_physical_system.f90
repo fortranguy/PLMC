@@ -189,7 +189,7 @@ contains
             if (size(Box_size) /= num_dimensions) error stop "Box size dimension"
             this%Box%size(:) = Box_size(:)
         else if (geometry%slab) then
-            if (size(Box_size) /= num_dimensions-1) error stop "Box size dimension"
+            if (size(Box_size) /= 2) error stop "Box size dimension"
             this%Box%size(1:2) = Box_size(:)
         end if
         if (allocated(Box_size)) deallocate(Box_size)
@@ -201,7 +201,7 @@ contains
             if (size(Box_wave) /= num_dimensions) error stop "Box wave dimension"
             this%Box%wave(:) = Box_wave(:)
         else if (geometry%slab) then
-            if (size(Box_wave) /= num_dimensions-1) error stop "Box wave dimension"
+            if (size(Box_wave) /= 2) error stop "Box wave dimension"
             this%Box%wave(1:2) = Box_wave(:)
         end if
         if (allocated(Box_wave)) deallocate(Box_wave)

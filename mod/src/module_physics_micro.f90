@@ -59,13 +59,10 @@ contains
             
         else if (geometry%slab) then
         
-            PBC_vector(1:num_dimensions-1) = &
-                modulo(position2(1:num_dimensions-1) - position1(1:num_dimensions-1), &
-                       Box_size(1:num_dimensions-1))
+            PBC_vector(1:2) = modulo(position2(1:2) - position1(1:2), Box_size(1:2))
 
-            where(PBC_vector(1:num_dimensions-1) > Box_size(1:num_dimensions-1)/2._DP)
-                PBC_vector(1:num_dimensions-1) = &
-                    PBC_vector(1:num_dimensions-1) - Box_size(1:num_dimensions-1)
+            where(PBC_vector(1:2) > Box_size(1:2)/2._DP)
+                PBC_vector(1:2) = PBC_vector(1:2) - Box_size(1:2)
             end where
 
             PBC_vector(num_dimensions) = position2(num_dimensions) - position1(num_dimensions)

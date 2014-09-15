@@ -83,7 +83,7 @@ contains
         type(Box_Parameters), intent(in) :: Box
     
         integer :: kx, ky
-        real(DP), dimension(num_dimensions-1) :: wave_vector
+        real(DP), dimension(2) :: wave_vector
         
         do ky = -Box%wave(2), Box%wave(2)
             wave_vector(2) = 2._DP*PI * real(ky, DP) / Box%size(2)
@@ -150,8 +150,8 @@ contains
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_2
         real(DP) :: exp_Ikz
 
-        real(DP), dimension(num_dimensions-1) :: position_div_box
-        real(DP), dimension(num_dimensions-1) :: wave_vector
+        real(DP), dimension(2) :: position_div_box
+        real(DP), dimension(2) :: wave_vector
         real(DP) :: wave_dot_orientation, wave_orientation_z
         integer :: kx, ky
         integer :: i_particle
@@ -354,7 +354,7 @@ contains
         
         complex(DP), dimension(num_dimensions, num_dimensions) :: complex_tensor
         
-        real(DP), dimension(num_dimensions-1) :: position_i_div_box, position_j_div_box
+        real(DP), dimension(2) :: position_i_div_box, position_j_div_box
         
         complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_i_1
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_i_2
@@ -444,7 +444,7 @@ contains
         type(Particle_Index), intent(in) :: old, new
         real(DP) :: move_energy
 
-        real(DP), dimension(num_dimensions-1) :: new_position_div_box, old_position_div_box
+        real(DP), dimension(2) :: new_position_div_box, old_position_div_box
 
         complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxNew_1
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxNew_2
@@ -462,16 +462,16 @@ contains
         
         real(DP) :: real_part1, real_part2
         
-        real(DP), dimension(num_dimensions-1) :: wave_vector
+        real(DP), dimension(2) :: wave_vector
         real(DP) :: wave_dot_orientation, wave_orientation_z
         integer :: kx, ky
 
-        new_position_div_box(:) = 2._DP*PI * new%position(1:num_dimensions-1)/Box%size(1:num_dimensions-1)
+        new_position_div_box(:) = 2._DP*PI * new%position(1:2)/Box%size(1:2)
         call fourier_i(Box%wave(1), new_position_div_box(1), exp_IkxNew_1)
         call fourier_i(Box%wave(2), new_position_div_box(2), exp_IkxNew_2)
         call set_exp_kz(Box%wave, this%wave_norm, new%position(3), exp_kzNew_tab)
         
-        old_position_div_box(:) = 2._DP*PI * old%position(1:num_dimensions-1)/Box%size(1:num_dimensions-1)
+        old_position_div_box(:) = 2._DP*PI * old%position(1:2)/Box%size(1:2)
         call fourier_i(Box%wave(1), old_position_div_box(1), exp_IkxOld_1)
         call fourier_i(Box%wave(2), old_position_div_box(2), exp_IkxOld_2)
         call set_exp_kz(Box%wave, this%wave_norm, old%position(3), exp_kzOld_tab)
@@ -485,7 +485,7 @@ contains
                 wave_vector(1) = 2._DP*PI * real(kx, DP) / Box%size(1)
                 
                 wave_orientation_z = this%wave_norm(kx, ky) * new%orientation(3)
-                wave_dot_orientation = dot_product(wave_vector, new%orientation(1:num_dimensions-1))
+                wave_dot_orientation = dot_product(wave_vector, new%orientation(1:2))
                 
                 exp_IkxNew = exp_IkxNew_1(kx) * exp_IkxNew_2(ky)
                 exp_kzNew = exp_kzNew_tab(abs(kx), ky)
@@ -539,7 +539,7 @@ contains
         type(Box_Parameters), intent(in) :: Box
         type(Particle_Index), intent(in) :: old, new
         
-        real(DP), dimension(num_dimensions-1) :: new_position_div_box, old_position_div_box
+        real(DP), dimension(2) :: new_position_div_box, old_position_div_box
 
         complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxNew_1
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxNew_2
@@ -554,16 +554,16 @@ contains
         real(DP), dimension(0:Box%wave(1), 0:Box%wave(2)) :: exp_kzOld_tab
         real(DP) :: exp_kzOld
 
-        real(DP), dimension(num_dimensions-1) :: wave_vector
+        real(DP), dimension(2) :: wave_vector
         real(DP) :: wave_dot_orientation, wave_orientation_z
         integer :: kx, ky
 
-        new_position_div_box(:) = 2._DP*PI * new%position(1:num_dimensions-1) / Box%size(1:num_dimensions-1)
+        new_position_div_box(:) = 2._DP*PI * new%position(1:2) / Box%size(1:2)
         call fourier_i(Box%wave(1), new_position_div_box(1), exp_IkxNew_1)
         call fourier_i(Box%wave(2), new_position_div_box(2), exp_IkxNew_2)
         call set_exp_kz(Box%wave, this%wave_norm, new%position(3), exp_kzNew_tab)
         
-        old_position_div_box(:) = 2._DP*PI * old%position(1:num_dimensions-1) / Box%size(1:num_dimensions-1)
+        old_position_div_box(:) = 2._DP*PI * old%position(1:2) / Box%size(1:2)
         call fourier_i(Box%wave(1), old_position_div_box(1), exp_IkxOld_1)
         call fourier_i(Box%wave(2), old_position_div_box(2), exp_IkxOld_2)
         call set_exp_kz(Box%wave, this%wave_norm, old%position(3), exp_kzOld_tab)
@@ -574,7 +574,7 @@ contains
             do kx = -Box_wave1_sym(Box%wave, ky, 0), Box%wave(1)
                 wave_vector(1) = 2._DP*PI * real(kx, DP) / Box%size(1)
 
-                wave_dot_orientation = dot_product(wave_vector, new%orientation(1:num_dimensions-1))
+                wave_dot_orientation = dot_product(wave_vector, new%orientation(1:2))
                 wave_orientation_z = this%wave_norm(kx, ky) * new%orientation(3)
 
                 exp_IkxNew = exp_IkxNew_1(kx) * exp_IkxNew_2(ky)
@@ -625,7 +625,7 @@ contains
         type(Particle_Index), intent(in) :: old, new
         real(DP) :: rotation_energy
 
-        real(DP), dimension(num_dimensions-1) :: position_div_box
+        real(DP), dimension(2) :: position_div_box
 
         complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_1
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_2
@@ -637,7 +637,7 @@ contains
         complex(DP) :: structure_i, delta_structure_i
         real(DP) :: real_part0, real_part1, real_part2
         
-        real(DP), dimension(num_dimensions-1) :: wave_vector
+        real(DP), dimension(2) :: wave_vector
         real(DP) :: kMnew_z, kMold_z
         real(DP) :: k_dot_mNew, k_dot_mOld
         integer :: kx, ky
@@ -715,7 +715,7 @@ contains
         type(Box_Parameters), intent(in) :: Box
         type(Particle_Index), intent(in) :: old, new
 
-        real(DP), dimension(num_dimensions-1) :: position_div_box
+        real(DP), dimension(2) :: position_div_box
 
         complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_1
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_2
@@ -723,11 +723,11 @@ contains
         real(DP), dimension(0:Box%wave(1), 0:Box%wave(2)) :: exp_Ikz_tab
         real(DP) :: exp_Ikz
 
-        real(DP), dimension(num_dimensions-1) :: wave_vector
+        real(DP), dimension(2) :: wave_vector
         real(DP) :: kdeltaMcol_z, k_dot_deltaMcol
         integer :: kx, ky
 
-        position_div_box(:) = 2._DP*PI * new%position(1:num_dimensions-1) / Box%size(1:num_dimensions-1)
+        position_div_box(:) = 2._DP*PI * new%position(1:2) / Box%size(1:2)
         call fourier_i(Box%wave(1), position_div_box(1), exp_Ikx_1)
         call fourier_i(Box%wave(2), position_div_box(2), exp_Ikx_2)
         call set_exp_kz(Box%wave, this%wave_norm, new%position(3), exp_Ikz_tab)
@@ -787,7 +787,7 @@ contains
         type(Particle_Index), intent(in) :: particle
         real(DP) :: exchange_energy
         
-        real(DP), dimension(num_dimensions-1) :: position_div_box
+        real(DP), dimension(2) :: position_div_box
         
         complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_1
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_2
@@ -798,7 +798,7 @@ contains
         complex(DP) :: structure_i
         real(DP) :: real_part0, real_part1, real_part2
         
-        real(DP), dimension(num_dimensions-1) :: wave_vector
+        real(DP), dimension(2) :: wave_vector
         real(DP) :: wave_orientation_z, wave_dot_orientation
         integer :: kx, ky
         real(DP) :: exchg_sign
@@ -867,7 +867,7 @@ contains
         type(Box_Parameters), intent(in) :: Box
         type(Particle_Index), intent(in) :: particle
         
-        real(DP), dimension(num_dimensions-1) :: position_div_box
+        real(DP), dimension(2) :: position_div_box
 
         complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_1
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_2
@@ -875,7 +875,7 @@ contains
         real(DP), dimension(0:Box%wave(1), 0:Box%wave(2)) :: exp_Ikz_tab
         real(DP) :: exp_Ikz
 
-        real(DP), dimension(num_dimensions-1) :: wave_vector
+        real(DP), dimension(2) :: wave_vector
         real(DP) :: wave_orientation_z, wave_dot_orientation
         integer :: kx, ky
         real(DP) :: exchg_sign

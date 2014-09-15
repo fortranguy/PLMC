@@ -249,7 +249,7 @@ contains
             if (i_total_cell <= this%num_total_cell_layer) then
                 near_cell_bounds(1) = num_near_cells_layer + 1
             else if ((this%num_total_cell-i_total_cell) < this%num_total_cell_layer) then
-                near_cell_bounds(2) = (num_dimensions-1) * num_near_cells_layer
+                near_cell_bounds(2) = (2) * num_near_cells_layer
             end if
         end if     
 
