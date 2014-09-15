@@ -352,6 +352,68 @@ contains
         real(DP), dimension(:), intent(in) :: position_i, position_j
         real(DP), dimension(num_dimensions, num_dimensions) :: pair_field_tensor
         
+        complex(DP), dimension(num_dimensions, num_dimensions) :: complex_tensor
+        
+        real(DP), dimension(num_dimensions-1) :: position_i_div_box, position_j_div_box
+        
+        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_i_1
+        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_i_2
+        complex(DP) :: exp_Ikx_i
+        real(DP), dimension(0:Box%wave(1), 0:Box%wave(2)) :: exp_kz_i_tab
+        
+        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_j_1
+        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_j_2
+        complex(DP) :: exp_Ikx_j
+        real(DP), dimension(0:Box%wave(1), 0:Box%wave(2)) :: exp_kz_j_tab
+        
+        complex(DP), dimension(num_dimensions) :: wave_vector_plus, wave_vector_minus
+        real(DP), dimension(2) :: wave_vector
+        integer :: kx, ky
+        
+        position_i_div_box(:) = 2._DP*PI * position_i(1:2)/Box%size(1:2)
+        call fourier_i(Box%wave(1), position_i_div_box(1), exp_Ikx_i_1)
+        call fourier_i(Box%wave(2), position_i_div_box(2), exp_Ikx_i_2)
+        call set_exp_kz(Box%wave, this%wave_norm, position_i(3), exp_kz_i_tab)
+        
+        position_j_div_box(:) = 2._DP*PI * position_j(1:2)/Box%size(1:2)
+        call fourier_i(Box%wave(1), position_j_div_box(1), exp_Ikx_j_1)
+        call fourier_i(Box%wave(2), position_j_div_box(2), exp_Ikx_j_2)
+        call set_exp_kz(Box%wave, this%wave_norm, position_j(3), exp_kz_j_tab)
+        
+        complex_tensor(:, :) = cmplx(0._DP, 0._DP, DP)
+        
+        do ky = 0, Box%wave(2)
+            wave_vector(2) = 2._DP*PI * real(ky, DP) / Box%size(2)
+        
+        do kx = 0, Box%wave(1)
+            wave_vector(1) = 2._DP*PI * real(kx, DP) / Box%size(1)
+            
+            exp_Ikx_i = exp_Ikx_i_1(kx) * exp_Ikx_i_2(ky)
+            
+            exp_Ikx_j = exp_Ikx_j_1(kx) * exp_Ikx_j_2(ky)
+            
+            wave_vector_plus(1:2) = cmplx(0._DP, wave_vector, DP)
+            wave_vector_plus(3) = cmplx(+this%wave_norm(kx, ky), 0._DP, DP)
+            
+            wave_vector_minus(1:2) = cmplx(0._DP, wave_vector, DP)
+            wave_vector_minus(3) = cmplx(-this%wave_norm(kx, ky), 0._DP, DP)
+            
+            complex_tensor(:, :) = complex_tensor(:, :) + &
+                cmplx(this%weight(kx, ky), 0._DP, DP) * &
+                (exp_Ikx_i * cmplx(exp_kz_i_tab(abs(kx), ky), 0._DP, DP) * &
+                conjg(exp_Ikx_j) / cmplx(exp_kz_j_tab(abs(kx), ky), 0._DP, DP) * &
+                matmul(reshape(wave_vector_plus, [num_dimensions, 1]), &
+                       reshape(conjg(wave_vector_minus), [1, num_dimensions])) + &
+                exp_Ikx_i / cmplx(exp_kz_i_tab(abs(kx), ky), 0._DP, DP) * &
+                conjg(exp_Ikx_j) * cmplx(exp_kz_j_tab(abs(kx), ky), 0._DP, DP) * &
+                matmul(reshape(wave_vector_minus, [num_dimensions, 1]), &
+                       reshape(conjg(wave_vector_plus), [1, num_dimensions])))
+            
+        end do
+        
+        end do
+        
+        pair_field_tensor(:, :) = 2._DP*PI / product(Box%size(1:2)) * real(complex_tensor(:, :), DP)
         
                   
     end function Electronic_Layer_Correction_pair_field_tensor
