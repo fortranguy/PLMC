@@ -19,7 +19,7 @@ implicit none
     character(len=4096) :: name, name_bis
     integer :: num_particles, num_particles_bis
     integer :: i_particle, j_particle
-    integer :: snap_factor, snap_factorBis
+    integer :: snap_factor, snap_factor_bis
     integer :: positions_unit, orientations_unit
     
     character(len=4096) :: file
@@ -27,10 +27,11 @@ implicit none
     
     integer :: i_step
     real(DP), dimension(:, :), allocatable :: all_positions, all_orientations
-    real(DP), parameter :: cutoff = 1.3_DP
+    real(DP) :: cutoff = 1.3_DP
     
     real(DP) :: pair_energy
     real(DP), dimension(num_dimensions) :: vector_ij
+    logical :: ij_linked
 
     integer :: cluster_size, cluster_size_max
     integer :: num_clusters, i_cluster
@@ -39,6 +40,8 @@ implicit none
     integer, dimension(:, :), allocatable :: all_pairs
     real(DP), dimension(:), allocatable :: clusters_sizes_distribution
     integer :: clusters_distribution_unit
+
+    logical :: with_orientations
     
     type(json_file) :: data_json, report_json
     character(len=4096) :: data_name
@@ -78,6 +81,10 @@ implicit none
     data_name = "Monte Carlo.number of equilibrium steps"
     call data_json%get(data_name, num_steps, found)
     call test_data_found(data_name, found)
+
+    data_name = "Clusters.cut off"
+    call data_json%get(data_name, cutoff, found)
+    call test_data_found(data_name, found)
     
     call data_json%destroy()
 
@@ -90,16 +97,22 @@ implicit none
     allocate(clusters_sizes(num_pairs))
     allocate(all_pairs(2, num_pairs))
     allocate(clusters_sizes_distribution(num_pairs))
+
+    with_orientations = (command_argument_count() == 2)
+
+    if (with_orientations) then
     
-    call arg_to_file(2, file, length) 
-    open(newunit=orientations_unit, recl=4096, file=file(1:length), status='old', &
-        action='read')    
-    read(orientations_unit, *) name_bis, num_particles_bis, snap_factorBis
-    if (name_bis/=name .or. num_particles_bis/=num_particles .or. snap_factorBis/=snap_factor) then
-        write(error_unit, *) "Error: positions and orientations tags don't match."
-        error stop
+        call arg_to_file(2, file, length)
+        open(newunit=orientations_unit, recl=4096, file=file(1:length), status='old', &
+            action='read')
+        read(orientations_unit, *) name_bis, num_particles_bis, snap_factor_bis
+        if (name_bis/=name .or. num_particles_bis/=num_particles .or. snap_factor_bis/=snap_factor) then
+            write(error_unit, *) "Error: positions and orientations tags don't match."
+            error stop
+        end if
+        allocate(all_orientations(num_dimensions, num_particles))
+
     end if
-    allocate(all_orientations(num_dimensions, num_particles))
     
     clusters_sizes_distribution(:) = 0
     cluster_size_max = 0
@@ -112,24 +125,34 @@ implicit none
     
         do i_particle = 1, num_particles
             read(positions_unit, *) all_positions(:, i_particle)
-        end do        
-        do i_particle = 1, num_particles
-            read(orientations_unit, *) all_orientations(:, i_particle)
         end do
+        if (with_orientations) then
+            do i_particle = 1, num_particles
+                read(orientations_unit, *) all_orientations(:, i_particle)
+            end do
+        end if
 
         num_pairs = 0
         do i_particle = 1, num_particles
             do j_particle = i_particle + 1, num_particles
-                
+
+                ij_linked = .false.
                 vector_ij(:) = PBC_vector(Box_size, &
                                           all_positions(:, i_particle), all_positions(:, j_particle))
                 if (norm2(vector_ij) < cutoff) then
-                    pair_energy = dipolar_pair_energy(all_orientations(:, i_particle), &
-                                                      all_orientations(:, j_particle), &
-                                                      vector_ij)
-                    if (pair_energy < 0._DP) then
+                    if (with_orientations) then
+                        pair_energy = dipolar_pair_energy(all_orientations(:, i_particle), &
+                                                        all_orientations(:, j_particle), &
+                                                        vector_ij)
+                        if (pair_energy < 0._DP) then
+                            ij_linked = .true.
+                        end if
+                    else
+                        ij_linked = .true.
+                    end if
+                    if (ij_linked) then
                         num_pairs = num_pairs + 1
-                        all_pairs(:, num_pairs) = [i_particle, j_particle]                        
+                        all_pairs(:, num_pairs) = [i_particle, j_particle]
                     end if
                 end if
                                                                 
@@ -162,14 +185,14 @@ implicit none
          action="write")
         write(report_unit, *) "Duration =", (time_end - time_start) / 60._DP, "min"
     close(report_unit)
-    
-    deallocate(all_orientations)
+
+    if (with_orientations) deallocate(all_orientations)
     deallocate(clusters_sizes_distribution)
     deallocate(all_pairs)
     deallocate(clusters_sizes)
     deallocate(all_positions)
     
-    close(orientations_unit)
+    if (with_orientations) close(orientations_unit)
     close(positions_unit)
     
     deallocate(Box_size)

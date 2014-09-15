@@ -74,5 +74,8 @@
         "take snapshot": true,
         "delta": 0.025,
         "number of particles": 400
+    },
+    "Clusters": {
+        "cut off": 1.3
     }
 }
