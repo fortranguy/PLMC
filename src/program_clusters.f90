@@ -181,7 +181,8 @@ implicit none
     open(newunit=clusters_distribution_unit, &
          file=trim(name)//"_clusters_sizes_distribution_histogram.out", action="write")
     do cluster_size = 1, cluster_size_max
-        write(clusters_distribution_unit, *) cluster_size, clusters_sizes_distribution(cluster_size)
+        write(clusters_distribution_unit, *) real(cluster_size, DP) / real(num_particles, DP), &
+                                             clusters_sizes_distribution(cluster_size)
     end do
     close(clusters_distribution_unit)
 
