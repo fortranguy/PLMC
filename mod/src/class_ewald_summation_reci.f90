@@ -279,15 +279,16 @@ contains
         real(DP), dimension(num_dimensions) :: solo_field
 
         integer :: j_particle
-        real(DP), dimension(num_dimensions) :: vector_ij
 
         solo_field(:) = 0._DP
 
         do j_particle = 1, this_spheres%get_num_particles()
-
-            vector_ij = this_spheres%get_position(j_particle) - particle%position
-            solo_field(:) = solo_field(:) + matmul(this%pair_field_tensor(Box, vector_ij), &
-                                                   this_spheres%get_orientation(j_particle))
+        
+            solo_field(:) = solo_field(:) + &
+                            matmul(this%pair_field_tensor(Box, &
+                                                          particle%position, &
+                                                          this_spheres%get_position(j_particle)), &
+                                   this_spheres%get_orientation(j_particle))
 
         end do
 
@@ -300,11 +301,12 @@ contains
     !>                                      |\vec{k}) (\vec{k}|
     !> \f]
 
-    pure function Ewald_Summation_Reci_pair_field_tensor(this, Box, vector_ij) result(pair_field_tensor)
+    pure function Ewald_Summation_Reci_pair_field_tensor(this, Box, position_i, position_j) &
+                  result(pair_field_tensor)
 
         class(Ewald_Summation_Reci), intent(in) :: this
         type(Box_Parameters), intent(in) :: Box
-        real(DP), dimension(:), intent(in) :: vector_ij
+        real(DP), dimension(:), intent(in) :: position_i, position_j
         real(DP), dimension(num_dimensions, num_dimensions) :: pair_field_tensor
         
         complex(DP), dimension(num_dimensions, num_dimensions) :: complex_tensor
@@ -320,7 +322,7 @@ contains
         
         integer :: kx, ky, kz
         
-        vector_div_box(:) = -2._DP*PI * vector_ij(:) / Box%size(:)
+        vector_div_box(:) = 2._DP*PI * (position_i(:) - position_j(:)) / Box%size(:)
         call fourier_i(Box%wave(1), vector_div_box(1), exp_IkxVec_1)
         call fourier_i(Box%wave(2), vector_div_box(2), exp_IkxVec_2)
         call fourier_i(Box%wave(3), vector_div_box(3), exp_IkxVec_3)
