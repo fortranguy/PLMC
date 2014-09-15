@@ -101,7 +101,7 @@ implicit none
         if (size(Box_size) /= num_dimensions) error stop "Box size dimension"
         Box_height = Box_size(3)
     else if (geometry%slab) then
-        if (size(Box_size) /= num_dimensions-1) error stop "Box size dimension"
+        if (size(Box_size) /= 2) error stop "Box size dimension"
         data_name = "Box.height"
         call data_json%get(data_name, Box_height, found)
         call test_data_found(data_name, found)

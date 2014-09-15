@@ -5,7 +5,7 @@ use data_box, only: num_dimensions
 use json_module, only: json_file, json_initialize
 use module_data, only: data_filename, report_filename, &
                        test_file_exists, test_data_found
-use module_geometry, only: set_geometry
+use module_geometry, only: set_geometry, geometry
 use module_physics_micro, only: PBC_vector, dipolar_pair_energy
 use module_clusters, only: pairs_to_clusters
 use module_arguments, only: arg_to_file
@@ -13,6 +13,7 @@ use module_arguments, only: arg_to_file
 implicit none
 
     logical :: take_snapshot
+    character(len=:), allocatable :: Box_geometry
     real(DP), dimension(:), allocatable :: Box_size
     integer :: num_steps
 
@@ -48,8 +49,6 @@ implicit none
     logical :: found
     integer :: report_unit
     real(DP) :: time_start, time_end
-
-    character(len=:), allocatable :: geometry
     
     call json_initialize()
     
@@ -66,17 +65,22 @@ implicit none
     call report_json%load_file(filename = report_filename)
 
     data_name = "System.Box.geometry"
-    call report_json%get(data_name, geometry, found)
+    call report_json%get(data_name, Box_geometry, found)
     call test_data_found(data_name, found)
-    call set_geometry(geometry)
-    if (allocated(geometry)) deallocate(geometry)
+    call set_geometry(Box_geometry)
+    if (allocated(Box_geometry)) deallocate(Box_geometry)
 
     call report_json%destroy()
     
     data_name = "Box.size"
     call data_json%get(data_name, Box_size, found)
     call test_data_found(data_name, found)
-    if (size(Box_size) /= num_dimensions) error stop "Box size dimension"
+    
+    if (geometry%bulk) then
+        if (size(Box_size) /= num_dimensions) error stop "Box size dimension"
+    else if (geometry%slab) then
+        if (size(Box_size) /= 2) error stop "Box size dimension"
+    end if
     
     data_name = "Monte Carlo.number of equilibrium steps"
     call data_json%get(data_name, num_steps, found)
