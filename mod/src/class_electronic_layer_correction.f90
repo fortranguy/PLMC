@@ -33,6 +33,9 @@ private
         procedure :: count_wave_vectors => Electronic_Layer_Correction_count_wave_vectors
         procedure :: total_energy => Electronic_Layer_Correction_total_energy
         
+        procedure :: solo_field => Electronic_Layer_Correction_solo_field
+        procedure :: pair_field_tensor => Electronic_Layer_Correction_pair_field_tensor
+        
         procedure :: move_energy => Electronic_Layer_Correction_move_energy
         procedure :: update_structure_move => &
                      Electronic_Layer_Correction_update_structure_move
@@ -297,6 +300,61 @@ contains
         total_energy = PI / product(Box%size(1:2)) * total_energy
         
     end function Electronic_Layer_Correction_total_energy
+    
+    !> Field
+    !> \f[
+    !>      \vec{E}(\vec{r}_i) = \sum_j T_{ij} |\vec{\mu}_j)
+    !> \f]    
+
+    pure function Electronic_Layer_Correction_solo_field(this, Box, this_spheres, particle)&
+                  result(solo_field)
+
+        class(Electronic_Layer_Correction), intent(in) :: this
+        type(Box_Parameters), intent(in) :: Box
+        type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
+        type(Particle_Index), intent(in) :: particle
+        real(DP), dimension(num_dimensions) :: solo_field
+
+        integer :: j_particle
+
+        solo_field(:) = 0._DP
+
+        do j_particle = 1, this_spheres%get_num_particles()
+        
+            solo_field(:) = solo_field(:) + &
+                            matmul(this%pair_field_tensor(Box, &
+                                                          particle%position, &
+                                                          this_spheres%get_position(j_particle)), &
+                                   this_spheres%get_orientation(j_particle))
+
+        end do
+
+    end function Electronic_Layer_Correction_solo_field
+    
+    !> Between 2 particles
+    !> \f[
+    !>      T_{ij} = \frac{2\pi}{S}
+    !>               \sum_{\vec{k}^{2D} \neq \vec{0}}
+    !>                      w(\vec{k}^{2D})
+    !>                      [
+    !>                          |\vec{K}_+) e^{\vec{K}_+ \cdot \vec{r}_i}
+    !>                          e^{\vec{K}_-^* \cdot \vec{r}_j} (\vec{K}_-^*| +
+    !>                          |\vec{K}_-) e^{\vec{K}_- \cdot \vec{r}_i} 
+    !>                          e^{\vec{K_+^*} \cdot \vec{r}_j} (\vec{K_+^*}|
+    !>                      ]
+    !> \f]
+    
+    pure function Electronic_Layer_Correction_pair_field_tensor(this, Box, position_i, position_j) &
+                  result(pair_field_tensor)
+                  
+        class(Electronic_Layer_Correction), intent(in) :: this
+        type(Box_Parameters), intent(in) :: Box
+        real(DP), dimension(:), intent(in) :: position_i, position_j
+        real(DP), dimension(num_dimensions, num_dimensions) :: pair_field_tensor
+        
+        
+                  
+    end function Electronic_Layer_Correction_pair_field_tensor
     
     !> Move
 
