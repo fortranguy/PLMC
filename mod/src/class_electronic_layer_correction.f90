@@ -494,7 +494,8 @@ contains
 
                 ! S_{+,\underline{l}} (s_{-,l}^{\prime*} - s_{-,l}^*) +
 
-                structure_i = cmplx(+wave_orientation_z, wave_dot_orientation, DP) * exp_IkxOld*cmplx(exp_kzOld, 0._DP, DP)
+                structure_i = cmplx(+wave_orientation_z, wave_dot_orientation, DP) * &
+                              exp_IkxOld*cmplx(exp_kzOld, 0._DP, DP)
 
                 delta_structure_i = cmplx(-wave_orientation_z, wave_dot_orientation, DP) * &
                 (exp_IkxNew/cmplx(exp_kzNew, 0._DP, DP) - exp_IkxOld/cmplx(exp_kzOld, 0._DP, DP))
@@ -504,7 +505,8 @@ contains
 
                 ! S_{-,\underline{l}}^* (s_{+,l}^{\prime} - s_{+,l})
                 
-                structure_i = cmplx(-wave_orientation_z, wave_dot_orientation, DP) * exp_IkxOld/cmplx(exp_kzOld, 0._DP, DP)
+                structure_i = cmplx(-wave_orientation_z, wave_dot_orientation, DP) * &
+                              exp_IkxOld/cmplx(exp_kzOld, 0._DP, DP)
 
                 delta_structure_i = cmplx(+wave_orientation_z, wave_dot_orientation, DP) * &
                 (exp_IkxNew*cmplx(exp_kzNew, 0._DP, DP) - exp_IkxOld*cmplx(exp_kzOld, 0._DP, DP))
