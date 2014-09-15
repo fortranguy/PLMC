@@ -183,6 +183,7 @@ implicit none
 
     open(newunit=report_unit, file=trim(name)//"_clusters_sizes_distribution_report.txt", &
          action="write")
+        write(report_unit, *) "With orientations: ", with_orientations
         write(report_unit, *) "Duration =", (time_end - time_start) / 60._DP, "min"
     close(report_unit)
 
