@@ -148,7 +148,8 @@ contains
         complex(DP) :: exp_Ikx
         complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_1
         complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_2
-        real(DP) :: exp_Ikz
+        real(DP), dimension(0:Box%wave(1), 0:Box%wave(2)) :: exp_kz_tab
+        real(DP) :: exp_kz
 
         real(DP), dimension(2) :: position_div_box
         real(DP), dimension(2) :: wave_vector
@@ -164,6 +165,7 @@ contains
             position_div_box(:) = 2._DP*PI * this_spheres%get_position_2d(i_particle)/Box%size(1:2)
             call fourier_i(Box%wave(1), position_div_box(1), exp_Ikx_1)
             call fourier_i(Box%wave(2), position_div_box(2), exp_Ikx_2)
+            call set_exp_kz(Box%wave, this%wave_norm, this_spheres%get_position_z(i_particle), exp_kz_tab)
         
             do ky = -Box%wave(2), Box%wave(2)
                 wave_vector(2) = 2._DP*PI * real(ky, DP) / Box%size(2)
@@ -172,7 +174,7 @@ contains
                 wave_vector(1) = 2._DP*PI * real(kx, DP) / Box%size(1)
             
                 exp_Ikx = exp_Ikx_1(kx) * exp_Ikx_2(ky)
-                exp_Ikz = exp(this%wave_norm(kx, ky) * this_spheres%get_position_z(i_particle))
+                exp_kz = exp_kz_tab(abs(kx), abs(ky))
 
                 wave_dot_orientation = dot_product(wave_vector, &
                                                    this_spheres%get_orientation_2d(i_particle))
@@ -180,11 +182,11 @@ contains
                           
                 this%structure_plus(kx, ky) = this%structure_plus(kx, ky) + &
                                               cmplx(+wave_orientation_z, wave_dot_orientation, DP) * &
-                                              exp_Ikx * cmplx(exp_Ikz, 0._DP, DP)
+                                              exp_Ikx * cmplx(exp_kz, 0._DP, DP)
 
                 this%structure_minus(kx, ky) = this%structure_minus(kx, ky) + &
                                                cmplx(-wave_orientation_z, wave_dot_orientation, DP) * &
-                                               exp_Ikx / cmplx(exp_Ikz, 0._DP, DP)
+                                               exp_Ikx / cmplx(exp_kz, 0._DP, DP)
             
             end do
             
