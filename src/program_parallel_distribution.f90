@@ -9,12 +9,13 @@ program parallel_distribution
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit, error_unit
 use data_precisions, only: real_zero
+use data_constants, only: PI
 use data_box, only: num_dimensions
 use json_module, only: json_file, json_initialize
 use module_data, only: data_filename, report_filename, &
                        test_file_exists, test_data_found
 use module_geometry, only: set_geometry, geometry
-use module_physics_micro, only: sphere_volume, PBC_distance
+use module_physics_micro, only: sphere_volume, PBC_vector
 use module_arguments, only: arg_to_file
 
 implicit none
@@ -25,7 +26,8 @@ implicit none
     real(DP) :: Box_height
 
     character(len=4096) :: name
-    integer :: num_particles
+    integer :: num_particles, num_particles_inside_sum, num_particles_inside
+    real(DP) :: num_particles_inside_avg
     integer :: snap_factor
     real(DP) :: diameter
     integer :: positions_unit, distrib_unit
@@ -33,7 +35,8 @@ implicit none
     integer :: num_thermalisation_steps
     integer :: num_equilibrium_steps, i_step, num_steps
     integer :: i_particle, j_particle
-    real(DP) :: distance_ij, distance_max, delta
+    real(DP) :: distance_max, delta
+    real(DP), dimension(num_dimensions) :: vector_ij
     real(DP) :: distance_i_distribution
     integer :: num_distribution, i_distribution
     real(DP), dimension(:), allocatable :: distribution_step
@@ -141,6 +144,7 @@ implicit none
 
     write(output_unit, *) "Start !"
     call cpu_time(time_start)
+    num_particles_inside_sum = 0
     distribution_function(:) = 0._DP
     num_steps = 0
     do i_step = num_thermalisation_steps + 1, num_thermalisation_steps + num_equilibrium_steps    
@@ -153,20 +157,23 @@ implicit none
             end do
 
             ! Fill
+            num_particles_inside = 0
             distribution_step(:) = 0
             do i_particle = 1, num_particles
                 if (z_min < positions(3, i_particle) .and. positions(3, i_particle) < z_max) then
+                    num_particles_inside = num_particles_inside + 1
                     do j_particle = i_particle + 1, num_particles
                         if (z_min < positions(3, i_particle) .and. positions(3, i_particle) < z_max) then
-                            distance_ij = PBC_distance(Box_size, positions(:, i_particle), &
-                                                                 positions(:, j_particle))
-                            i_distribution =  int(distance_ij/delta)
+                            vector_ij = PBC_vector(Box_size, positions(:, i_particle), &
+                                                             positions(:, j_particle)) 
+                            i_distribution =  int(norm2(vector_ij(1:2)) / delta)
                             distribution_step(i_distribution) = distribution_step(i_distribution) + 1._DP
                         end if
                     end do
                 end if
             end do
             
+            num_particles_inside_sum = num_particles_inside_sum + num_particles_inside
             distribution_function(:) = distribution_function(:) + distribution_step(:)
         
         end if
@@ -179,12 +186,16 @@ implicit none
 
     open(newunit=distrib_unit, file=trim(name)//"_parallel_distribution_function.out", &
          action="write")
-    
-        distribution_function(:) = 2._DP * distribution_function(:) / real(num_steps, DP) / &
-                                   real(num_particles, DP)
+         
+        num_particles_inside_avg = real(num_particles_inside_sum, DP) / real(num_steps, DP)
+        distribution_function(:) = 2._DP * distribution_function(:) / real(num_steps, DP)
+        distribution_function(:) = distribution_function(:) * product(Box_size(1:2)) / &
+                                   num_particles_inside_avg**2 / (2._DP*PI) / parallel_delta
     
         do i_distribution = 1, num_distribution
-            write(distrib_unit, *) distance_i_distribution, distribution_function(i_distribution)
+            distance_i_distribution = (real(i_distribution, DP) + 0.5_DP) * delta
+            write(distrib_unit, *) distance_i_distribution, distribution_function(i_distribution) / &
+                                                            distance_i_distribution
         end do
         
     close(distrib_unit)
