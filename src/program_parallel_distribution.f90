@@ -77,7 +77,7 @@ implicit none
     data_name = "Box.size"
     call data_json%get(data_name, Box_size, found)
     call test_data_found(data_name, found)
-    if (size(Box_size) /= num_dimensions) error stop "Box size dimension"
+    if (size(Box_size) /= 2) error stop "Box size dimension"
     
     data_name = "Box.height"
     call data_json%get(data_name, Box_height, found)
@@ -114,7 +114,8 @@ implicit none
     open(newunit=positions_unit, recl=4096, file=filename(1:length), status='old', action='read')
     
     read(positions_unit, *) name, num_particles, snap_factor
-    write(output_unit, *) trim(name), num_particles, snap_factor    
+    write(output_unit, *) trim(name), num_particles, snap_factor
+    diameter = 1._DP
     
     allocate(positions(num_dimensions, num_particles))
     
@@ -123,14 +124,14 @@ implicit none
     if (diameter/2._DP <= height .and. height < parallel_delta + diameter/2._DP) then
         z_min = height
         z_max = z_min + parallel_delta
-    else if (abs(height - 0._DP) < real_zero) then
+    else if (abs(height_ratio - 0._DP) < real_zero) then
         z_min = diameter/2._DP
         z_max = z_min + parallel_delta
     else if (Box_height - (parallel_delta + diameter/2._DP) < height .and. &
              height <= Box_height - diameter/2._DP) then
         z_max = height
         z_min = z_max - parallel_delta
-    else if (abs(height - 1._DP) < real_zero) then
+    else if (abs(height_ratio - 1._DP) < real_zero) then
         z_max = Box_height - diameter/2._DP
         z_min = z_max - parallel_delta
     else
