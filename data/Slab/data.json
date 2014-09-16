@@ -3,7 +3,7 @@
         "name": "sys",
         "size": [25.0, 25.0],
         "wave": [8, 8],
-        "   height": 25.0,
+        "height": 25.0,
         "ratio in z": 1.5,
         "temperature": 1.0,
         "external field": [0.0, 0.0, 0.0]
