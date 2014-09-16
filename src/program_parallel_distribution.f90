@@ -1,40 +1,46 @@
 !> \brief Calculate and write the distribution function
 
 !> \f[
-!>      g_{ii}(r) = \frac{\braket{N_\text{pair}(r) / N_i}}{\braket{\rho_i} \Delta V_\text{sphere}(r)}
+!>      g_\parallel(r^{2D}) = \frac{\braket{N_\text{pair}} S}
+!>                                 {\braket{N}_{\Delta z} 2\pi r^{2D} \Delta r^{2D}}
 !> \f]
 
-program radial_distribution
+program parallel_distribution
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit, error_unit
+use data_precisions, only: real_zero
 use data_box, only: num_dimensions
 use json_module, only: json_file, json_initialize
 use module_data, only: data_filename, report_filename, &
                        test_file_exists, test_data_found
-use module_geometry, only: set_geometry
+use module_geometry, only: set_geometry, geometry
 use module_physics_micro, only: sphere_volume, PBC_distance
 use module_arguments, only: arg_to_file
 
 implicit none
 
     logical :: take_snapshot
-    real(DP), dimension(:), allocatable :: Box_size    
+    character(len=:), allocatable :: Box_geometry
+    real(DP), dimension(:), allocatable :: Box_size
+    real(DP) :: Box_height
 
     character(len=4096) :: name
     integer :: num_particles
     integer :: snap_factor
-    real(DP) :: density
+    real(DP) :: diameter
     integer :: positions_unit, distrib_unit
     
     integer :: num_thermalisation_steps
     integer :: num_equilibrium_steps, i_step, num_steps
     integer :: i_particle, j_particle
     real(DP) :: distance_ij, distance_max, delta
-    real(DP) :: distance_i_distribution, distance_i_minus, distance_i_plus
+    real(DP) :: distance_i_distribution
     integer :: num_distribution, i_distribution
     real(DP), dimension(:), allocatable :: distribution_step
     real(DP), dimension(:), allocatable :: distribution_function
     real(DP), dimension(:, :), allocatable :: positions
+    real(DP) :: parallel_delta
+    real(DP) :: height_ratio, height, z_min, z_max    
     
     type(json_file) :: data_json, report_json
     character(len=4096) :: data_name
@@ -43,8 +49,6 @@ implicit none
     integer :: length
     integer :: report_unit
     real(DP) :: time_start, time_end
-
-    character(len=:), allocatable :: geometry
     
     call json_initialize()
     
@@ -61,10 +65,12 @@ implicit none
     call report_json%load_file(filename = report_filename)
     
     data_name = "System.Box.geometry"
-    call report_json%get(data_name, geometry, found)
+    call report_json%get(data_name, Box_geometry, found)
     call test_data_found(data_name, found)
-    call set_geometry(geometry)
-    if (allocated(geometry)) deallocate(geometry)
+    call set_geometry(Box_geometry)
+    if (allocated(Box_geometry)) deallocate(Box_geometry)
+    
+    if (.not. geometry%slab) error stop "For slab geometry only."
 
     call report_json%destroy()
     
@@ -72,6 +78,10 @@ implicit none
     call data_json%get(data_name, Box_size, found)
     call test_data_found(data_name, found)
     if (size(Box_size) /= num_dimensions) error stop "Box size dimension"
+    
+    data_name = "Box.height"
+    call data_json%get(data_name, Box_height, found)
+    call test_data_found(data_name, found)
     
     data_name = "Monte Carlo.number of thermalisation steps"
     call data_json%get(data_name, num_thermalisation_steps, found)
@@ -85,9 +95,17 @@ implicit none
     call data_json%get(data_name, delta, found)
     call test_data_found(data_name, found)
     
+    data_name = "Distribution.Parallel.height ratio"
+    call data_json%get(data_name, height_ratio, found)
+    call test_data_found(data_name, found)
+    
+    data_name = "Distribution.Parallel.delta"
+    call data_json%get(data_name, parallel_delta, found)
+    call test_data_found(data_name, found)    
+    
     call data_json%destroy()
     
-    distance_max = norm2(Box_size / 2._DP)
+    distance_max = norm2(Box_size(1:2) / 2._DP)
     num_distribution = int(distance_max/delta)
     allocate(distribution_step(num_distribution))
     allocate(distribution_function(num_distribution))
@@ -99,7 +117,26 @@ implicit none
     write(output_unit, *) trim(name), num_particles, snap_factor    
     
     allocate(positions(num_dimensions, num_particles))
-    density = real(num_particles, DP) / product(Box_size)
+    
+    height = height_ratio * Box_height ! 0. <= height_ratio <= 1.
+    
+    if (diameter/2._DP <= height .and. height < parallel_delta + diameter/2._DP) then
+        z_min = height
+        z_max = z_min + parallel_delta
+    else if (abs(height - 0._DP) < real_zero) then
+        z_min = diameter/2._DP
+        z_max = z_min + parallel_delta
+    else if (Box_height - (parallel_delta + diameter/2._DP) < height .and. &
+             height <= Box_height - diameter/2._DP) then
+        z_max = height
+        z_min = z_max - parallel_delta
+    else if (abs(height - 1._DP) < real_zero) then
+        z_max = Box_height - diameter/2._DP
+        z_min = z_max - parallel_delta
+    else
+        z_min = height - parallel_delta/2._DP
+        z_max = height + parallel_delta/2._DP
+    end if
 
     write(output_unit, *) "Start !"
     call cpu_time(time_start)
@@ -117,12 +154,16 @@ implicit none
             ! Fill
             distribution_step(:) = 0
             do i_particle = 1, num_particles
-                do j_particle = i_particle + 1, num_particles
-                    distance_ij = PBC_distance(Box_size, positions(:, i_particle), &
-                                                         positions(:, j_particle))
-                    i_distribution =  int(distance_ij/delta)
-                    distribution_step(i_distribution) = distribution_step(i_distribution) + 1._DP
-                end do
+                if (z_min < positions(3, i_particle) .and. positions(3, i_particle) < z_max) then
+                    do j_particle = i_particle + 1, num_particles
+                        if (z_min < positions(3, i_particle) .and. positions(3, i_particle) < z_max) then
+                            distance_ij = PBC_distance(Box_size, positions(:, i_particle), &
+                                                                 positions(:, j_particle))
+                            i_distribution =  int(distance_ij/delta)
+                            distribution_step(i_distribution) = distribution_step(i_distribution) + 1._DP
+                        end if
+                    end do
+                end if
             end do
             
             distribution_function(:) = distribution_function(:) + distribution_step(:)
@@ -135,27 +176,19 @@ implicit none
     close(positions_unit)
     deallocate(positions)
 
-    open(newunit=distrib_unit, file=trim(name)//"_radial_distribution_function.out", &
+    open(newunit=distrib_unit, file=trim(name)//"_parallel_distribution_function.out", &
          action="write")
     
         distribution_function(:) = 2._DP * distribution_function(:) / real(num_steps, DP) / &
                                    real(num_particles, DP)
     
         do i_distribution = 1, num_distribution
-        
-            distance_i_distribution = (real(i_distribution, DP) + 0.5_DP) * delta
-            distance_i_minus = real(i_distribution, DP) * delta
-            distance_i_plus = real(i_distribution + 1, DP) * delta
-            
-            distribution_function(i_distribution) = distribution_function(i_distribution) / &
-                density / (sphere_volume(distance_i_plus) - sphere_volume(distance_i_minus))
             write(distrib_unit, *) distance_i_distribution, distribution_function(i_distribution)
-            
         end do
         
     close(distrib_unit)
     
-    open(newunit=report_unit, file=trim(name)//"_radial_distribution_report.txt", &
+    open(newunit=report_unit, file=trim(name)//"_parallel_distribution_report.txt", &
          action="write")
         write(report_unit, *) "Duration =", (time_end - time_start) / 60._DP, "min"
     close(report_unit)
@@ -165,4 +198,4 @@ implicit none
     
     deallocate(Box_size)
 
-end program radial_distribution
+end program parallel_distribution

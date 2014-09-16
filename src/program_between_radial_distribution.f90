@@ -1,5 +1,10 @@
 !> \brief Calculate and print the distribution function between 2 types.
 
+!> \f[
+!>      g_{ij}(r) = \frac{\braket{N_\text{pair}(r_{ij}) / N_i}}
+!>                       {\braket{\rho_j} \DeltaV_\text{sphere}(r_{ij})}
+!> \f]
+
 program between_radial_distribution
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit, error_unit
