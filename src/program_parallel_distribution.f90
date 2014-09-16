@@ -42,7 +42,7 @@ implicit none
     real(DP), dimension(:), allocatable :: distribution_step
     real(DP), dimension(:), allocatable :: distribution_function
     real(DP), dimension(:, :), allocatable :: positions
-    real(DP) :: parallel_delta
+    real(DP) :: height_delta
     real(DP) :: height_ratio, height, z_min, z_max    
     
     type(json_file) :: data_json, report_json
@@ -102,8 +102,8 @@ implicit none
     call data_json%get(data_name, height_ratio, found)
     call test_data_found(data_name, found)
     
-    data_name = "Distribution.Parallel.delta"
-    call data_json%get(data_name, parallel_delta, found)
+    data_name = "Distribution.Parallel.height delta"
+    call data_json%get(data_name, height_delta, found)
     call test_data_found(data_name, found)    
     
     call data_json%destroy()
@@ -124,22 +124,22 @@ implicit none
     
     height = height_ratio * Box_height ! 0. <= height_ratio <= 1.
     
-    if (diameter/2._DP <= height .and. height < parallel_delta + diameter/2._DP) then
+    if (diameter/2._DP <= height .and. height < height_delta + diameter/2._DP) then
         z_min = height
-        z_max = z_min + parallel_delta
+        z_max = z_min + height_delta
     else if (abs(height_ratio - 0._DP) < real_zero) then
         z_min = diameter/2._DP
-        z_max = z_min + parallel_delta
-    else if (Box_height - (parallel_delta + diameter/2._DP) < height .and. &
+        z_max = z_min + height_delta
+    else if (Box_height - (height_delta + diameter/2._DP) < height .and. &
              height <= Box_height - diameter/2._DP) then
         z_max = height
-        z_min = z_max - parallel_delta
+        z_min = z_max - height_delta
     else if (abs(height_ratio - 1._DP) < real_zero) then
         z_max = Box_height - diameter/2._DP
-        z_min = z_max - parallel_delta
+        z_min = z_max - height_delta
     else
-        z_min = height - parallel_delta/2._DP
-        z_max = height + parallel_delta/2._DP
+        z_min = height - height_delta/2._DP
+        z_max = height + height_delta/2._DP
     end if
 
     write(output_unit, *) "Start !"
@@ -190,7 +190,7 @@ implicit none
         num_particles_inside_avg = real(num_particles_inside_sum, DP) / real(num_steps, DP)
         distribution_function(:) = 2._DP * distribution_function(:) / real(num_steps, DP)
         distribution_function(:) = distribution_function(:) * product(Box_size(1:2)) / &
-                                   num_particles_inside_avg**2 / (2._DP*PI) / parallel_delta
+                                   num_particles_inside_avg**2 / (2._DP*PI) / delta
     
         do i_distribution = 1, num_distribution
             distance_i_distribution = (real(i_distribution, DP) + 0.5_DP) * delta
