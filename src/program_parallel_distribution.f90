@@ -163,7 +163,7 @@ implicit none
                 if (z_min < positions(3, i_particle) .and. positions(3, i_particle) < z_max) then
                     num_particles_inside = num_particles_inside + 1
                     do j_particle = i_particle + 1, num_particles
-                        if (z_min < positions(3, i_particle) .and. positions(3, i_particle) < z_max) then
+                        if (z_min < positions(3, j_particle) .and. positions(3, j_particle) < z_max) then
                             vector_ij = PBC_vector(Box_size, positions(:, i_particle), &
                                                              positions(:, j_particle)) 
                             i_distribution =  int(norm2(vector_ij(1:2)) / delta)
