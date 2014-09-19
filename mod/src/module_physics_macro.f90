@@ -16,7 +16,8 @@ use class_small_move, only: Small_Move
 use class_small_rotation, only: Small_Rotation
 use class_hard_spheres_potential, only: Between_Hard_Spheres_Potential_Energy
 use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
-use class_hard_spheres_observables, only: Hard_Spheres_Observables, Dipolar_Hard_Spheres_Observables
+use class_hard_spheres_observables, only: Hard_Spheres_Monte_Carlo_Observables, &
+                                          Dipolar_Hard_Spheres_Monte_Carlo_Observables
 use class_hard_spheres_units, only: Hard_Spheres_Monte_Carlo_Units, &
                                     Dipolar_Hard_Spheres_Monte_Carlo_Units
 

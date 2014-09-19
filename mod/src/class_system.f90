@@ -17,8 +17,10 @@ use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres, Between_Hard_S
 use class_hard_spheres_potential, only: Between_Hard_Spheres_Potential_Energy
 use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
 use class_discrete_observable, only: Discrete_Observables
-use class_hard_spheres_observables, only: Hard_Spheres_Observables, Dipolar_Hard_Spheres_Observables, &
-                                          Between_Hard_Spheres_Observables
+use class_hard_spheres_observables, only: Hard_Spheres_Monte_Carlo_Observables, &
+                                          Dipolar_Hard_Spheres_Monte_Carlo_Observables, &
+                                          Between_Hard_Spheres_Monte_Carlo_Observables, &
+                                          Hard_Spheres_Post_Processing_Observables
 use class_hard_spheres_units, only: Hard_Spheres_Monte_Carlo_Units, &
                                     Dipolar_Hard_Spheres_Monte_Carlo_Units, &
                                     Between_Hard_Spheres_Monte_Carlo_Units, &
@@ -103,12 +105,12 @@ private
         integer :: decorrelation_factor, num_changes, num_moves, num_switches, num_rotations
         
         type(Dipolar_Hard_Spheres_Monte_Carlo_Units) :: type1_units
-        type(Dipolar_Hard_Spheres_Observables) :: type1_observables
+        type(Dipolar_Hard_Spheres_Monte_Carlo_Observables) :: type1_observables
         
         type(Hard_Spheres_Monte_Carlo_Units) :: type2_units
-        type(Hard_Spheres_Observables) :: type2_observables
+        type(Hard_Spheres_Monte_Carlo_Observables) :: type2_observables
         
-        type(Between_Hard_Spheres_Observables) :: between_spheres_observables
+        type(Between_Hard_Spheres_Monte_Carlo_Observables) :: between_spheres_observables
         type(Between_Hard_Spheres_Monte_Carlo_Units) :: between_spheres_units
         type(json_value), pointer :: between_spheres_report_json
         
@@ -148,8 +150,7 @@ private
     end type System_Monte_Carlo
     
     type, extends(System), public :: System_Post_Processing
-        type(Dipolar_Hard_Spheres_Observables) :: type1_observables ! to change !
-        type(Hard_Spheres_Observables) :: type2_observables
+        type(Hard_Spheres_Post_Processing_Observables) :: type1_observables, type2_observables
         type(Hard_Spheres_Post_Processing_Units) :: type1_units, type2_units
     contains
         procedure :: final => System_Post_Processing_final
@@ -633,10 +634,8 @@ contains
     
         class(System_Monte_Carlo), intent(inout) :: this
         
-        call this%type1_observables%write_results(this%Box%temperature, this%num_equilibrium_steps, &
-                                                  this%type1_report_json)
-        call this%type2_observables%write_results(this%Box%temperature, this%num_equilibrium_steps, &
-                                                  this%type2_report_json)
+        call this%type1_observables%write_results(this%num_equilibrium_steps, this%type1_report_json)
+        call this%type2_observables%write_results(this%num_equilibrium_steps, this%type2_report_json)
         call this%between_spheres_observables%write_results(this%num_equilibrium_steps, &
                                                             this%between_spheres_report_json)
         

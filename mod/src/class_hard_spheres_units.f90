@@ -125,11 +125,11 @@ contains
                 open(newunit=this%total_moment_modulus, recl=4096, &
                      file=name//"_total_moment_modulus.out", status='new', action='write')
                 
-                write(this%observables_equilibrium, *) "#", 4 ! 4 observables
+                write(this%observables_equilibrium, *) "#", 3 ! 3 observables
                 
             class default
             
-                write(this%observables_equilibrium, *) "#", 3 ! 3 observables
+                write(this%observables_equilibrium, *) "#", 2 ! 2 observables
                 
         end select
         

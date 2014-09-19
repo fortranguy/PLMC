@@ -11,7 +11,9 @@ use class_neighbour_cells, only: Neighbour_Cells
 use class_hard_spheres_potential, only: Between_Hard_Spheres_Potential_Energy
 use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
 use class_discrete_observable, only: Discrete_Observables
-use class_hard_spheres_observables, only: Hard_Spheres_Observables, Dipolar_Hard_Spheres_Observables
+use class_hard_spheres_observables, only: Hard_Spheres_Monte_Carlo_Observables, &
+                                          Dipolar_Hard_Spheres_Monte_Carlo_Observables, &
+                                          Hard_Spheres_Post_Processing_Observables
 
 implicit none
 private
@@ -30,7 +32,7 @@ contains
         class(Hard_Spheres), intent(inout) :: this_spheres, other_spheres
         class(Hard_Spheres_Macro), intent(inout) :: this_macro
         class(Neighbour_Cells), intent(inout) :: other_between_cells
-        class(Hard_Spheres_Observables), intent(inout) :: this_observables
+        class(Hard_Spheres_Monte_Carlo_Observables), intent(inout) :: this_observables
         class(Between_Hard_Spheres_Potential_Energy), intent(in) :: between_spheres_potential
         real(DP), intent(inout) :: mix_potential_energy
         
@@ -177,7 +179,7 @@ contains
         class(Hard_Spheres), intent(in) :: this_spheres
         class(Hard_Spheres_Macro), intent(in) :: this_macro
         class(Neighbour_Cells), intent(in) ::  other_between_cells
-        class(Hard_Spheres_Observables), intent(inout) :: this_observables
+        class(Hard_Spheres_Post_Processing_Observables), intent(inout) :: this_observables
         class(Hard_Spheres), intent(in) :: other_spheres
         class(Between_Hard_Spheres_Potential_Energy), intent(in) :: between_spheres_potential
         
@@ -277,7 +279,7 @@ contains
         type(Box_Parameters), intent(in) :: Box
         class(Hard_Spheres), intent(inout) :: type1_spheres, type2_spheres
         class(Hard_Spheres_Macro), intent(inout) :: type1_macro, type2_macro
-        class(Hard_Spheres_Observables), intent(inout) :: type1_observables, type2_observables
+        class(Hard_Spheres_Monte_Carlo_Observables), intent(inout) :: type1_observables, type2_observables
         class(Between_Hard_Spheres_Potential_Energy), intent(in) :: between_spheres_potential
         real(DP), intent(inout) :: mix_potential_energy
         type(Discrete_Observables), intent(inout) :: switch_observable
@@ -516,9 +518,9 @@ contains
     
         type(Box_Parameters), intent(in) :: Box
         class(External_Field), intent(in) :: ext_field
-        class(Dipolar_Hard_spheres), intent(inout) :: this_spheres
-        class(Dipolar_Hard_spheres_Macro), intent(inout) :: this_macro
-        class(Dipolar_Hard_spheres_Observables), intent(inout) :: this_observables
+        class(Dipolar_Hard_Spheres), intent(inout) :: this_spheres
+        class(Dipolar_Hard_Spheres_Macro), intent(inout) :: this_macro
+        class(Dipolar_Hard_Spheres_Monte_Carlo_Observables), intent(inout) :: this_observables
         
         real(DP) :: random
         type(Particle_Index) :: old, new
