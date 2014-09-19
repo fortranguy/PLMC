@@ -157,6 +157,7 @@ private
         procedure, private :: close_units => System_Post_Processing_close_units
         procedure :: measure_chemical_potentials => &
                      System_Post_Processing_measure_chemical_potentials
+        procedure :: accumulate_observables => System_Post_Processing_accumulate_observables
     end type System_Post_Processing
     
 contains
@@ -947,6 +948,15 @@ contains
                                                this%switch_observable%rejection_rate
             
     end subroutine System_Monte_Carlo_accumulate_observables
+
+    subroutine System_Post_Processing_accumulate_observables(this)
+
+        class(System_Post_Processing), intent(inout) :: this
+
+        call this%type1_observables%accumulate()
+        call this%type2_observables%accumulate()
+
+    end subroutine System_Post_Processing_accumulate_observables
     
     subroutine System_Monte_Carlo_write_observables_equilibrium(this, i_step)
     
