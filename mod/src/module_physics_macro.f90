@@ -17,7 +17,8 @@ use class_small_rotation, only: Small_Rotation
 use class_hard_spheres_potential, only: Between_Hard_Spheres_Potential_Energy
 use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
 use class_hard_spheres_observables, only: Hard_Spheres_Observables, Dipolar_Hard_Spheres_Observables
-use class_hard_spheres_units, only: Hard_Spheres_Units, Dipolar_Hard_Spheres_Units
+use class_hard_spheres_units, only: Hard_Spheres_Monte_Carlo_Units, &
+                                    Dipolar_Hard_Spheres_Monte_Carlo_Units
 
 implicit none
 private
@@ -275,7 +276,7 @@ contains
         
         type(Box_Parameters), intent(in) :: Box
         class(Hard_Spheres), intent(inout) :: this_spheres
-        class(Hard_Spheres_Units), intent(in) :: this_units
+        class(Hard_Spheres_Monte_Carlo_Units), intent(in) :: this_units
 
         call check_spheres_in_box(Box, this_spheres)
         call this_spheres%test_overlap(Box%size)
@@ -286,7 +287,7 @@ contains
         select type (this_spheres)
             type is (Dipolar_Hard_Spheres)
                 select type (this_units)
-                    type is (Dipolar_Hard_Spheres_Units)
+                    type is (Dipolar_Hard_Spheres_Monte_Carlo_Units)
                         call this_spheres%write_snap_data(this_units%snap_equilibrium_orientations)
                         call this_spheres%write_snap_orientations(0, &
                              this_units%snap_initial_orientations, double_precision=.true.)
@@ -358,7 +359,7 @@ contains
         class(Dipolar_Hard_Spheres), intent(in) :: this_spheres
         class(Dipolar_Hard_Spheres_Macro), intent(inout) :: this_macro
         type(json_file), intent(inout) :: data_json
-        class(Dipolar_Hard_Spheres_Units), intent(in), optional :: this_units
+        class(Dipolar_Hard_Spheres_Monte_Carlo_Units), intent(in), optional :: this_units
         
         character(len=4096) :: data_name
         logical :: found
@@ -422,7 +423,7 @@ contains
     
         type(Box_Parameters), intent(in) :: Box
         class(Hard_Spheres), intent(inout) :: this_spheres
-        class(Hard_Spheres_Units), intent(in) :: this_units
+        class(Hard_Spheres_Monte_Carlo_Units), intent(in) :: this_units
 
         call check_spheres_in_box(Box, this_spheres)
         call this_spheres%test_overlap(Box%size)
@@ -432,7 +433,7 @@ contains
         select type (this_spheres)
             type is (Dipolar_Hard_Spheres)
                 select type (this_units)
-                    type is (Dipolar_Hard_Spheres_Units)
+                    type is (Dipolar_Hard_Spheres_Monte_Carlo_Units)
                         call this_spheres%write_snap_orientations(0, &
                              this_units%snap_final_orientations, double_precision=.true.)
                 end select

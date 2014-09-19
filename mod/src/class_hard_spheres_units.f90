@@ -1,4 +1,4 @@
-!> \brief Description of the Hard_Spheres_Units class
+!> \brief Description of the Hard_Spheres_Monte_Carlo_Units class
 
 module class_hard_spheres_units
 
@@ -7,7 +7,7 @@ use module_geometry, only: geometry
 implicit none
 private
 
-    type, public :: Hard_Spheres_Units
+    type, public :: Hard_Spheres_Monte_Carlo_Units
     
         integer :: observables_thermalisation
         integer :: observables_equilibrium
@@ -21,12 +21,12 @@ private
     
     contains
     
-        procedure :: open => Hard_Spheres_Units_open
-        procedure :: close => Hard_Spheres_Units_close
+        procedure :: open => Hard_Spheres_Monte_Carlo_Units_open
+        procedure :: close => Hard_Spheres_Monte_Carlo_Units_close
     
-    end type Hard_Spheres_Units
+    end type Hard_Spheres_Monte_Carlo_Units
     
-    type, extends(Hard_Spheres_Units), public :: Dipolar_Hard_Spheres_Units
+    type, extends(Hard_Spheres_Monte_Carlo_Units), public :: Dipolar_Hard_Spheres_Monte_Carlo_Units
     
         integer :: rotate_delta
 
@@ -43,9 +43,9 @@ private
         
         integer :: total_moment_modulus
     
-    end type Dipolar_Hard_Spheres_Units
+    end type Dipolar_Hard_Spheres_Monte_Carlo_Units
     
-    type, public :: Between_Hard_Spheres_Units
+    type, public :: Between_Hard_Spheres_Monte_Carlo_Units
     
         integer :: observables_thermalisation
         integer :: observables_equilibrium
@@ -54,16 +54,27 @@ private
         
     contains
         
-        procedure :: open => Between_Hard_Spheres_Units_open
-        procedure :: close => Between_Hard_Spheres_Units_close
+        procedure :: open => Between_Hard_Spheres_Monte_Carlo_Units_open
+        procedure :: close => Between_Hard_Spheres_Monte_Carlo_Units_close
     
-    end type Between_Hard_Spheres_Units
+    end type Between_Hard_Spheres_Monte_Carlo_Units
+
+    type, public :: Hard_Spheres_Post_Processing_Units
+
+        integer :: inv_activity
+
+    contains
+
+        procedure :: open => Hard_Spheres_Post_Processing_Units_open
+        procedure :: close => Hard_Spheres_Post_Processing_Units_close
+
+    end type Hard_Spheres_Post_Processing_Units
     
 contains
 
-    subroutine Hard_Spheres_Units_open(this, name)
+    subroutine Hard_Spheres_Monte_Carlo_Units_open(this, name)
     
-        class(Hard_Spheres_Units), intent(out) :: this
+        class(Hard_Spheres_Monte_Carlo_Units), intent(out) :: this
         character(len=*), intent(in) :: name
         
         open(newunit=this%observables_thermalisation, recl=4096, &
@@ -85,7 +96,7 @@ contains
         
         select type (this)
 
-            type is (Dipolar_Hard_Spheres_Units)
+            type is (Dipolar_Hard_Spheres_Monte_Carlo_Units)
             
                 open(newunit=this%rotate_delta, recl=4096, file=name//"_rotate_delta.out", &
                     status='new', action='write')
@@ -122,11 +133,11 @@ contains
                 
         end select
         
-    end subroutine Hard_Spheres_Units_open
+    end subroutine Hard_Spheres_Monte_Carlo_Units_open
     
-    subroutine Between_Hard_Spheres_Units_open(this, name)
+    subroutine Between_Hard_Spheres_Monte_Carlo_Units_open(this, name)
     
-        class(Between_Hard_Spheres_Units), intent(out) :: this
+        class(Between_Hard_Spheres_Monte_Carlo_Units), intent(out) :: this
         character(len=*), intent(in) :: name
     
         open(newunit=this%observables_thermalisation, recl=4096, &
@@ -139,11 +150,21 @@ contains
         open(newunit=this%potential_energy_tabulation, recl=4096, &
              file=name//"_potential_energy_tabulation.tmp", status='new', action='write')
         
-    end subroutine Between_Hard_Spheres_Units_open
+    end subroutine Between_Hard_Spheres_Monte_Carlo_Units_open
+
+    subroutine Hard_Spheres_Post_Processing_Units_open(this, name)
+
+        class(Hard_Spheres_Post_Processing_Units), intent(out) :: this
+        character(len=*), intent(in) :: name
+
+        open(newunit=this%inv_activity, recl=4096, file=name//"_inv_activity.out", status='new', &
+             action='write')
+
+    end subroutine Hard_Spheres_Post_Processing_Units_open
     
-    subroutine Hard_Spheres_Units_close(this)
+    subroutine Hard_Spheres_Monte_Carlo_Units_close(this)
     
-        class(Hard_Spheres_Units), intent(inout) :: this
+        class(Hard_Spheres_Monte_Carlo_Units), intent(inout) :: this
         
         close(this%observables_thermalisation)
         close(this%observables_equilibrium)
@@ -157,7 +178,7 @@ contains
         
         select type (this)
             
-            type is (Dipolar_Hard_Spheres_Units)
+            type is (Dipolar_Hard_Spheres_Monte_Carlo_Units)
             
                 close(this%rotate_delta)
         
@@ -178,16 +199,24 @@ contains
                 
         end select
     
-    end subroutine Hard_Spheres_Units_close
+    end subroutine Hard_Spheres_Monte_Carlo_Units_close
     
-    subroutine Between_Hard_Spheres_Units_close(this)
+    subroutine Between_Hard_Spheres_Monte_Carlo_Units_close(this)
     
-        class(Between_Hard_Spheres_Units), intent(inout) :: this
+        class(Between_Hard_Spheres_Monte_Carlo_Units), intent(inout) :: this
         
         close(this%potential_energy_tabulation)
         close(this%observables_thermalisation)
         close(this%observables_equilibrium)
         
-    end subroutine Between_Hard_Spheres_Units_close
+    end subroutine Between_Hard_Spheres_Monte_Carlo_Units_close
+
+    subroutine Hard_Spheres_Post_Processing_Units_close(this)
+
+        class(Hard_Spheres_Post_Processing_Units), intent(inout) :: this
+
+        close(this%inv_activity)
+
+    end subroutine Hard_Spheres_Post_Processing_Units_close
 
 end module class_hard_spheres_units

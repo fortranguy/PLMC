@@ -19,8 +19,10 @@ use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
 use class_discrete_observable, only: Discrete_Observables
 use class_hard_spheres_observables, only: Hard_Spheres_Observables, Dipolar_Hard_Spheres_Observables, &
                                           Between_Hard_Spheres_Observables
-use class_hard_spheres_units, only: Hard_Spheres_Units, Dipolar_Hard_Spheres_Units, &
-                                    Between_Hard_Spheres_Units
+use class_hard_spheres_units, only: Hard_Spheres_Monte_Carlo_Units, &
+                                    Dipolar_Hard_Spheres_Monte_Carlo_Units, &
+                                    Between_Hard_Spheres_Monte_Carlo_Units, &
+                                    Hard_Spheres_Post_Processing_Units
 use module_physics_macro, only: init_random_seed, set_initial_configuration, &
                                 init_spheres, init_cells, set_ewald, total_energy, final_spheres, &
                                 init_between_spheres_potential, final_between_spheres_potential, &
@@ -84,7 +86,6 @@ private
         procedure :: final => System_final
         procedure, private :: write_all_results => System_write_all_results
         procedure, private :: json_destroy_all_values => System_json_destroy_all_values
-        procedure, private :: close_units => System_close_units
         
         !> Accessors & Mutators
         procedure :: get_num_thermalisation_steps => System_get_num_thermalisation_steps
@@ -101,14 +102,14 @@ private
         integer :: period_adaptation
         integer :: decorrelation_factor, num_changes, num_moves, num_switches, num_rotations
         
-        type(Dipolar_Hard_Spheres_Units) :: type1_units
+        type(Dipolar_Hard_Spheres_Monte_Carlo_Units) :: type1_units
         type(Dipolar_Hard_Spheres_Observables) :: type1_observables
         
-        type(Hard_Spheres_Units) :: type2_units
+        type(Hard_Spheres_Monte_Carlo_Units) :: type2_units
         type(Hard_Spheres_Observables) :: type2_observables
         
         type(Between_Hard_Spheres_Observables) :: between_spheres_observables
-        type(Between_Hard_Spheres_Units) :: between_spheres_units
+        type(Between_Hard_Spheres_Monte_Carlo_Units) :: between_spheres_units
         type(json_value), pointer :: between_spheres_report_json
         
         integer :: reset_i_step
@@ -129,6 +130,8 @@ private
         procedure :: final => System_Monte_Carlo_final
         procedure, private :: write_all_results => System_Monte_Carlo_write_all_results
         procedure, private :: write_results => System_Monte_Carlo_write_results
+        procedure, private :: json_destroy_all_values => System_Monte_Carlo_json_destroy_all_values
+        procedure, private :: close_units => System_Monte_Carlo_close_units
                 
         !> Simulation
         procedure :: random_changes => System_Monte_Carlo_random_changes
@@ -147,7 +150,10 @@ private
     type, extends(System), public :: System_Post_Processing
         type(Dipolar_Hard_Spheres_Observables) :: type1_observables ! to change !
         type(Hard_Spheres_Observables) :: type2_observables
+        type(Hard_Spheres_Post_Processing_Units) :: type1_units, type2_units
     contains
+        procedure :: final => System_Post_Processing_final
+        procedure, private :: close_units => System_Post_Processing_close_units
         procedure :: measure_chemical_potentials => &
                      System_Post_Processing_measure_chemical_potentials
     end type System_Post_Processing
@@ -414,8 +420,6 @@ contains
         call this%open_all_units()
         call this%json_create_all_values()
         
-        call this%System%init(args)
-        
         data_name = "Distribution.take snapshot"
         call this%data_json%get(data_name, this%snap, found)
         call test_data_found(data_name, found)
@@ -582,7 +586,7 @@ contains
         
         call this%write_all_results()
         call this%json_destroy_all_values()
-        call this%close_units()
+        close(this%report_unit)
         
     end subroutine System_final
     
@@ -619,7 +623,9 @@ contains
                                              this%between_spheres_observables%potential_energy, &
                                              this%between_spheres_report_json)
         
-        call this%System%final()
+        call this%write_all_results()
+        call this%json_destroy_all_values()
+        call this%close_units()
     
     end subroutine System_Monte_Carlo_final
     
@@ -676,33 +682,57 @@ contains
 
         nullify(this%type2_report_json)
         nullify(this%type1_report_json)
-        select type (this)
-            type is (System_Monte_Carlo)
-                nullify(this%between_spheres_report_json)
-                nullify(this%system_json)
-        end select
         
         call json_destroy(this%report_json)
     
     end subroutine System_json_destroy_all_values
 
-    subroutine System_close_units(this)
-    
-        class(System), intent(inout) :: this
+    subroutine System_Monte_Carlo_json_destroy_all_values(this)
+
+        class(System_Monte_Carlo), intent(inout) :: this
+
+        nullify(this%between_spheres_report_json)
+        nullify(this%system_json)
+
+        call this%System%json_destroy_all_values()
+
+    end subroutine System_Monte_Carlo_json_destroy_all_values
+
+    subroutine System_Monte_Carlo_close_units(this)
+
+        class(System_Monte_Carlo), intent(inout) :: this
+
+        call this%type1_units%close()
+        call this%type2_units%close()
+        call this%between_spheres_units%close()
         
-        select type (this)
-            type is (System_Monte_Carlo)
-                call this%type1_units%close()
-                call this%type2_units%close()
-                call this%between_spheres_units%close()
-                
-                close(this%observables_thermalisation_unit)
-                close(this%observables_equilibrium_unit)
-        end select            
-        
+        close(this%observables_thermalisation_unit)
+        close(this%observables_equilibrium_unit)        
+
         close(this%report_unit)
-        
-    end subroutine System_close_units
+    
+    end subroutine System_Monte_Carlo_close_units
+
+    subroutine System_Post_Processing_final(this)
+
+        class(System_Post_Processing), intent(inout) :: this
+
+        call this%write_all_results()
+        call this%json_destroy_all_values()
+        call this%close_units()
+
+    end subroutine System_Post_Processing_final
+
+    subroutine System_Post_Processing_close_units(this)
+
+        class(System_Post_Processing), intent(inout) :: this
+
+        call this%type1_units%close()
+        call this%type2_units%close()
+
+        close(this%report_unit)
+
+    end subroutine System_Post_Processing_close_units
     
     ! Destruction
     
