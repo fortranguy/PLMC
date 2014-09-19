@@ -1,6 +1,6 @@
 !> \brief Description of the Physical System class
 
-module class_physical_system
+module class_system
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use data_box, only: num_dimensions
@@ -899,4 +899,4 @@ contains
         
     end subroutine System_Monte_Carlo_reset_quantites
 
-end module class_physical_system
+end module class_system
