@@ -78,6 +78,7 @@ private
         
         !> Initialization & Finalisation
         procedure :: init => System_init
+        procedure, private :: set_potentials => System_set_potentials
         procedure, private :: open_all_units => System_open_all_units
         procedure, private :: json_create_all_values => System_json_create_all_values
         procedure :: final => System_final
@@ -362,6 +363,18 @@ contains
         call this%open_all_units()
         call this%json_create_all_values()
         
+        ! initial configuration
+        
+        call this%set_potentials()
+                        
+        call set_ewald(this%Box, this%type1_spheres, this%type1_macro, this%data_json)
+        
+    end subroutine System_init
+    
+    subroutine System_set_potentials(this)
+    
+        class(System), intent(inout) :: this
+        
         call this%between_spheres_potential%construct(this%data_json, "Between Spheres", &
                                                       this%between_spheres%get_diameter())
                                                       
@@ -375,15 +388,7 @@ contains
         call init_cells(this%Box%size, this%type2_spheres, this%type2_macro, this%type1_spheres, &
                         this%between_spheres_potential)
         
-        select type (this)
-            type is (System)
-                call set_ewald(this%Box, this%type1_spheres, this%type1_macro, this%data_json)
-            type is (System_Monte_Carlo)
-                call set_ewald(this%Box, this%type1_spheres, this%type1_macro, this%data_json, &
-                               this%type1_units)
-        end select
-        
-    end subroutine System_init
+    end subroutine System_set_potentials
     
     subroutine System_open_all_units(this)
     
@@ -406,6 +411,9 @@ contains
         character(len=4096) :: data_name
         logical :: found
         
+        call this%open_all_units()
+        call this%json_create_all_values()
+        
         call this%System%init(args)
         
         data_name = "Distribution.take snapshot"
@@ -424,6 +432,7 @@ contains
                                        this%type1_spheres, this%type2_spheres, &
                                        this%between_spheres%get_diameter(), &
                                        this%report_json)
+        call this%set_potentials()
                                        
         call this%between_spheres%test_overlap(this%Box%size, &
                                                this%type1_spheres, this%type2_spheres)
@@ -435,6 +444,8 @@ contains
                                             this%between_spheres_units%potential_energy_tabulation)
         
         call init_spheres(this%Box, this%type1_spheres, this%type1_units)
+        call set_ewald(this%Box, this%type1_spheres, this%type1_macro, this%data_json, &
+                       this%type1_units)
         this%type1_observables%potential_energy = total_energy(this%Box, this%type1_spheres, &
                                                                this%type1_macro, this%ext_field)
                         
