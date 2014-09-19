@@ -26,7 +26,7 @@ use module_physics_macro, only: init_random_seed, set_initial_configuration, &
                                 init_between_spheres_potential, final_between_spheres_potential, &
                                 test_consistency
 use module_algorithms, only: move, widom, switch, rotate
-use module_write, only: write_results, between_spheres_write_results
+use module_write, only: write_results
 
 implicit none
 
@@ -535,9 +535,8 @@ contains
                                                   this%type1_report_json)
         call this%type2_observables%write_results(this%Box%temperature, this%num_equilibrium_steps, &
                                                   this%type2_report_json)
-        call between_spheres_write_results(this%num_equilibrium_steps, &
-                                           this%between_spheres_observables%potential_energy_sum, &
-                                           this%between_spheres_report_json)
+        call this%between_spheres_observables%write_results(this%num_equilibrium_steps, &
+                                                            this%between_spheres_report_json)
         
         call this%write_results()
     

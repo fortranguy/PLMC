@@ -42,6 +42,7 @@ private
     
         procedure :: write => Between_Hard_Spheres_Observables_write
         procedure :: accumulate => Between_Hard_Spheres_Observables_accumulate
+        procedure :: write_results => Between_Hard_Spheres_Observables_write_results
     
     end type Between_Hard_Spheres_Observables
     
@@ -130,5 +131,25 @@ contains
         nullify(results_json)
     
     end subroutine Hard_Spheres_Observables_write_results
+    
+    subroutine Between_Hard_Spheres_Observables_write_results(this, num_equilibrium_steps, &
+                                                              report_json)
+                                          
+        class(Between_Hard_Spheres_Observables), intent(inout) :: this  
+        integer, intent(in) :: num_equilibrium_steps
+        type(json_value), pointer, intent(in) :: report_json
+
+        type(json_value), pointer :: results_json
+
+        call json_value_create(results_json)
+        call to_object(results_json, "Results")
+        call json_value_add(report_json, results_json)
+
+        call json_value_add(results_json, "average energy", &
+                                          this%potential_energy_sum / real(num_equilibrium_steps, DP))
+        
+        nullify(results_json)
+    
+    end subroutine Between_Hard_Spheres_Observables_write_results
 
 end module class_hard_spheres_observables
