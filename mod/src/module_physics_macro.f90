@@ -7,7 +7,7 @@ use data_precisions, only: real_zero, io_tiny, consistency_tiny
 use data_box, only: num_dimensions
 use json_module, only: json_file, json_value, json_value_create, to_object, json_value_add
 use module_data, only: test_data_found
-use module_types_micro, only: Box_Parameters, Argument_Random, Argument_Initial
+use module_types_micro, only: Box_Parameters, Argument_Random, Argument_Configurations
 use module_geometry, only: geometry
 use module_physics_micro, only: PBC_distance, random_surface
 use class_external_field, only: External_Field
@@ -82,18 +82,18 @@ contains
     
     !> Initial configuration
     
-    subroutine set_initial_configuration(Box, arg_init, dipolar, spherical, &
+    subroutine set_initial_configuration(Box, arg_conf, dipolar, spherical, &
                                          between_spheres_min_distance, &
                                          report_json)
         
         type(Box_Parameters), intent(in) :: Box
-        type(Argument_Initial), intent(in) :: arg_init
+        type(Argument_Configurations), intent(in) :: arg_conf
         class(Dipolar_Hard_Spheres), intent(inout) :: dipolar
         class(Hard_Spheres), intent(inout) :: spherical
         real(DP), intent(in) :: between_spheres_min_distance
         type(json_value), pointer, intent(inout) :: report_json
         
-        select case (arg_init%choice)
+        select case (arg_conf%choice)
         
             case ('r')
                 call random_depositions(Box, dipolar, spherical, between_spheres_min_distance)
@@ -104,11 +104,11 @@ contains
             case ('f')
                 call json_value_add(report_json, "initial configuration", &
                                                  "old configuration")
-                call old_configuration(arg_init%files(1), arg_init%length(1), dipolar, &
+                call old_configuration(arg_conf%files(1), arg_conf%length(1), dipolar, &
                                        norm2(Box%size), "positions")
-                call old_configuration(arg_init%files(2), arg_init%length(2), dipolar, &
+                call old_configuration(arg_conf%files(2), arg_conf%length(2), dipolar, &
                                        1._DP, "orientations")
-                call old_configuration(arg_init%files(3), arg_init%length(3), spherical, &
+                call old_configuration(arg_conf%files(3), arg_conf%length(3), spherical, &
                                        norm2(Box%size), "positions")
             
             case default

@@ -3,7 +3,7 @@
 module module_arguments_monte_carlo
 
 use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
-use module_types_micro, only: Argument_Random, Argument_Initial, Monte_Carlo_Arguments
+use module_types_micro, only: Argument_Random, Argument_Configurations, System_Arguments
 use module_arguments, only: arg_to_file
 
 implicit none
@@ -36,10 +36,10 @@ contains
     
     end subroutine write_help
 
-    subroutine read_init_files(i_arg, arg_init)
+    subroutine read_init_files(i_arg, arg_conf)
 
         integer, intent(inout) :: i_arg
-        type(Argument_Initial), intent(inout) :: arg_init
+        type(Argument_Configurations), intent(inout) :: arg_conf
 
         character(len=4096) :: file
         integer :: i_file, length
@@ -47,8 +47,8 @@ contains
         do i_file = 1, 3
             i_arg = i_arg + 1
             call arg_to_file(i_arg, file, length)
-            arg_init%files(i_file) = file
-            arg_init%length(i_file) = length
+            arg_conf%files(i_file) = file
+            arg_conf%length(i_file) = length
         end do
         
     end subroutine read_init_files
@@ -87,7 +87,7 @@ contains
 
     subroutine read_arguments(args)
     
-        type(Monte_Carlo_Arguments), intent(out) :: args
+        type(System_Arguments), intent(out) :: args
 
         character(len=4096) :: argument, sub_argument
         integer :: i_arg, length, status

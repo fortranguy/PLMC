@@ -9,7 +9,7 @@ use json_module, only: json_file, json_initialize, json_destroy, &
                        json_print
 use module_data, only: data_filename, report_filename, &
                        test_file_exists, test_data_found, test_empty_string
-use module_types_micro, only: Box_Parameters, Monte_Carlo_Arguments
+use module_types_micro, only: Box_Parameters, System_Arguments
 use module_geometry, only: geometry, set_geometry
 use module_physics_micro, only: num_wave_vectors
 use class_external_field, only: External_Field
@@ -151,7 +151,7 @@ contains
     subroutine System_construct(this, args)
             
         class(System), intent(out) :: this
-        type(Monte_Carlo_Arguments), intent(in) :: args
+        type(System_Arguments), intent(in) :: args
         
         character(len=4096) :: data_name
         logical :: found
@@ -347,7 +347,7 @@ contains
     subroutine System_init(this, args)
     
         class(System), intent(inout) :: this
-        type(Monte_Carlo_Arguments), intent(in) :: args
+        type(System_Arguments), intent(in) :: args
         
         call this%between_spheres_potential%construct(this%data_json, "Between Spheres", &
                                                       this%between_spheres%get_diameter())
@@ -368,7 +368,7 @@ contains
     subroutine System_Monte_Carlo_init(this, args)
      
         class(System_Monte_Carlo), intent(inout) :: this
-        type(Monte_Carlo_Arguments), intent(in) :: args
+        type(System_Arguments), intent(in) :: args
         
         real(DP) :: potential_energy_conf
         

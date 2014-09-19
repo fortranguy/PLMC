@@ -60,16 +60,16 @@ implicit none
         integer, dimension(:), allocatable :: seed
     end type Argument_Random
 
-    type, public :: Argument_Initial
+    type, public :: Argument_Configurations
         character(len=1) :: choice
         character(len=4096), dimension(3) :: files
         integer, dimension(3) :: length
-    end type Argument_Initial
+    end type Argument_Configurations
     
-    type, public :: Monte_Carlo_Arguments
+    type, public :: System_Arguments
         character(len=4) :: geometry
         type(Argument_Random) :: random
-        type(Argument_Initial) :: initial
-    end type Monte_Carlo_Arguments
+        type(Argument_Configurations) :: initial
+    end type System_Arguments
 
 end module module_types_micro
