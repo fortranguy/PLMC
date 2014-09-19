@@ -32,7 +32,7 @@ implicit none
 
 private
 
-    type, public :: Physical_System
+    type, public :: System
     
         private
         
@@ -82,31 +82,31 @@ private
     contains
     
         !> Construction & destruction of the class
-        procedure :: construct => Physical_System_construct
-        procedure, private :: set_box => Physical_System_set_box
-        procedure, private :: set_monte_carlo_steps => Physical_System_set_monte_carlo_steps
-        procedure :: destroy => Physical_System_destroy
+        procedure :: construct => System_construct
+        procedure, private :: set_box => System_set_box
+        procedure, private :: set_monte_carlo_steps => System_set_monte_carlo_steps
+        procedure :: destroy => System_destroy
         
         !> Initialization & Finalisation
-        procedure :: init => Physical_System_init
-        procedure, private :: open_all_units => Physical_System_open_all_units
-        procedure, private :: open_units => Physical_System_open_units
-        procedure, private :: json_create_all_values => Physical_System_json_create_all_values
-        procedure :: final => Physical_System_final
-        procedure, private :: write_all_results => Physical_System_write_all_results
-        procedure, private :: write_results => Physical_System_write_results
-        procedure, private :: json_destroy_all_values => Physical_System_json_destroy_all_values
-        procedure, private :: close_units => Physical_System_close_units
+        procedure :: init => System_init
+        procedure, private :: open_all_units => System_open_all_units
+        procedure, private :: open_units => System_open_units
+        procedure, private :: json_create_all_values => System_json_create_all_values
+        procedure :: final => System_final
+        procedure, private :: write_all_results => System_write_all_results
+        procedure, private :: write_results => System_write_results
+        procedure, private :: json_destroy_all_values => System_json_destroy_all_values
+        procedure, private :: close_units => System_close_units
         
         !> Accessors & Mutators
-        procedure :: get_num_thermalisation_steps => Physical_System_get_num_thermalisation_steps
-        procedure :: get_num_equilibrium_steps => Physical_System_get_num_equilibrium_steps
-        procedure :: set_time_start => Physical_System_set_time_start
-        procedure :: set_time_end => Physical_System_set_time_end
+        procedure :: get_num_thermalisation_steps => System_get_num_thermalisation_steps
+        procedure :: get_num_equilibrium_steps => System_get_num_equilibrium_steps
+        procedure :: set_time_start => System_set_time_start
+        procedure :: set_time_end => System_set_time_end
     
-    end type Physical_System
+    end type System
     
-    type, extends(Physical_System), public :: Physical_System_Monte_Carlo
+    type, extends(System), public :: System_Monte_Carlo
     
         private
     
@@ -117,40 +117,40 @@ private
         
     contains
     
-        procedure, private :: set_changes => Physical_System_Monte_Carlo_set_changes
-        procedure :: init => Physical_System_Monte_Carlo_init
+        procedure, private :: set_changes => System_Monte_Carlo_set_changes
+        procedure :: init => System_Monte_Carlo_init
         
-        procedure :: reset_quantites => Physical_System_Monte_Carlo_reset_quantites
+        procedure :: reset_quantites => System_Monte_Carlo_reset_quantites
         
-        procedure, private :: write_all_reports => Physical_System_Monte_Carlo_write_all_reports
-        procedure, private :: write_report => Physical_System_Monte_Carlo_write_report
+        procedure, private :: write_all_reports => System_Monte_Carlo_write_all_reports
+        procedure, private :: write_report => System_Monte_Carlo_write_report
         
         !> Simulation
-        procedure :: random_changes => Physical_System_Monte_Carlo_random_changes
-        procedure :: update_rejections => Physical_System_Monte_Carlo_update_rejections
-        procedure :: adapt_changes => Physical_System_Monte_Carlo_adapt_changes
+        procedure :: random_changes => System_Monte_Carlo_random_changes
+        procedure :: update_rejections => System_Monte_Carlo_update_rejections
+        procedure :: adapt_changes => System_Monte_Carlo_adapt_changes
         procedure :: write_observables_thermalisation => &
-                     Physical_System_Monte_Carlo_write_observables_thermalisation
-        procedure :: fix_changes => Physical_System_Monte_Carlo_fix_changes
-        procedure :: accumulate_observables => Physical_System_Monte_Carlo_accumulate_observables
-        procedure :: write_observables_equilibrium => Physical_System_Monte_Carlo_write_observables_equilibrium
-        procedure :: take_snapshots => Physical_System_Monte_Carlo_take_snapshots
+                     System_Monte_Carlo_write_observables_thermalisation
+        procedure :: fix_changes => System_Monte_Carlo_fix_changes
+        procedure :: accumulate_observables => System_Monte_Carlo_accumulate_observables
+        procedure :: write_observables_equilibrium => System_Monte_Carlo_write_observables_equilibrium
+        procedure :: take_snapshots => System_Monte_Carlo_take_snapshots
     
-    end type Physical_System_Monte_Carlo
+    end type System_Monte_Carlo
     
-    type, extends(Physical_System), public :: Physical_System_Post_Processing
+    type, extends(System), public :: System_Post_Processing
     contains
         procedure :: measure_chemical_potentials => &
-                     Physical_System_Post_Processing_measure_chemical_potentials
-    end type Physical_System_Post_Processing
+                     System_Post_Processing_measure_chemical_potentials
+    end type System_Post_Processing
     
 contains
 
     ! Construction
     
-    subroutine Physical_System_construct(this, args)
+    subroutine System_construct(this, args)
             
-        class(Physical_System), intent(out) :: this
+        class(System), intent(out) :: this
         type(Monte_Carlo_Arguments), intent(in) :: args
         
         character(len=4096) :: data_name
@@ -185,15 +185,15 @@ contains
                                             this%type1_spheres%get_diameter(), &
                                             this%type2_spheres%get_diameter())
         select type (this)
-            type is (Physical_System_Monte_Carlo)
+            type is (System_Monte_Carlo)
                 call this%set_changes()
         end select
         
-    end subroutine Physical_System_construct
+    end subroutine System_construct
     
-    subroutine Physical_System_set_box(this)
+    subroutine System_set_box(this)
     
-        class(Physical_System), intent(inout) :: this
+        class(System), intent(inout) :: this
         
         character(len=4096) :: data_name
         logical :: found
@@ -253,11 +253,11 @@ contains
         call this%ext_field%set(external_field)
         if (allocated(external_field)) deallocate(external_field)
         
-    end subroutine Physical_System_set_box
+    end subroutine System_set_box
     
-    subroutine Physical_System_set_monte_carlo_steps(this)
+    subroutine System_set_monte_carlo_steps(this)
     
-        class(Physical_System), intent(inout) :: this
+        class(System), intent(inout) :: this
         
         character(len=4096) :: data_name
         logical :: found
@@ -270,11 +270,11 @@ contains
         call this%data_json%get(data_name, this%num_equilibrium_steps, found)
         call test_data_found(data_name, found)
         
-    end subroutine Physical_System_set_monte_carlo_steps
+    end subroutine System_set_monte_carlo_steps
     
-    subroutine Physical_System_Monte_Carlo_set_changes(this)
+    subroutine System_Monte_Carlo_set_changes(this)
     
-        class(Physical_System_Monte_Carlo), intent(inout) :: this
+        class(System_Monte_Carlo), intent(inout) :: this
         
         integer :: switch_factor
         real(DP) :: type1_move_delta, type1_move_rejection
@@ -340,13 +340,13 @@ contains
         
         call this%type2_macro%move%init(type2_move_delta, type2_move_rejection)
         
-    end subroutine Physical_System_Monte_Carlo_set_changes
+    end subroutine System_Monte_Carlo_set_changes
     
     ! Initialization
     
-    subroutine Physical_System_init(this, args)
+    subroutine System_init(this, args)
     
-        class(Physical_System), intent(inout) :: this
+        class(System), intent(inout) :: this
         type(Monte_Carlo_Arguments), intent(in) :: args
         
         call this%between_spheres_potential%construct(this%data_json, "Between Spheres", &
@@ -363,11 +363,11 @@ contains
         call init_cells(this%Box%size, this%type2_spheres, this%type2_macro, this%type1_spheres, &
                         this%between_spheres_potential)
         
-    end subroutine Physical_System_init
+    end subroutine System_init
     
-    subroutine Physical_System_Monte_Carlo_init(this, args)
+    subroutine System_Monte_Carlo_init(this, args)
      
-        class(Physical_System_Monte_Carlo), intent(inout) :: this
+        class(System_Monte_Carlo), intent(inout) :: this
         type(Monte_Carlo_Arguments), intent(in) :: args
         
         real(DP) :: potential_energy_conf
@@ -428,22 +428,22 @@ contains
         rewind(this%report_unit)
         call json_print(this%report_json, this%report_unit)
     
-    end subroutine Physical_System_Monte_Carlo_init
+    end subroutine System_Monte_Carlo_init
     
-    subroutine Physical_System_open_all_units(this)
+    subroutine System_open_all_units(this)
     
-        class(Physical_System), intent(inout) :: this
+        class(System), intent(inout) :: this
 
         call this%open_units()
         call this%type1_units%open(this%type1_spheres%get_name())
         call this%type2_units%open(this%type2_spheres%get_name())
         call this%between_spheres_units%open(this%between_spheres%get_name())
     
-    end subroutine Physical_System_open_all_units
+    end subroutine System_open_all_units
 
-    subroutine Physical_System_open_units(this)
+    subroutine System_open_units(this)
 
-        class(Physical_System), intent(inout) :: this
+        class(System), intent(inout) :: this
 
         open(newunit=this%report_unit, recl=4096, file=report_filename, &
              status='new', action='write')
@@ -453,11 +453,11 @@ contains
              file="observables_equilibrium.out", status='new', action='write')
         write(this%observables_equilibrium_unit, *) "#", 1 ! 1 observable: energy
 
-    end subroutine Physical_System_open_units
+    end subroutine System_open_units
 
-    subroutine Physical_System_json_create_all_values(this)
+    subroutine System_json_create_all_values(this)
 
-        class(Physical_System), intent(inout) :: this
+        class(System), intent(inout) :: this
 
         call json_value_create(this%report_json)
         call to_object(this%report_json)
@@ -478,11 +478,11 @@ contains
         call to_object(this%type2_report_json, "Hard Spheres")
         call json_value_add(this%report_json, this%type2_report_json)
         
-    end subroutine Physical_System_json_create_all_values
+    end subroutine System_json_create_all_values
     
-    subroutine Physical_System_Monte_Carlo_write_all_reports(this, geometry)
+    subroutine System_Monte_Carlo_write_all_reports(this, geometry)
     
-        class(Physical_System_Monte_Carlo), intent(in) :: this
+        class(System_Monte_Carlo), intent(in) :: this
         character(len=*), intent(in) :: geometry
         
         call this%write_report(geometry)
@@ -495,11 +495,11 @@ contains
         
         call this%between_spheres_potential%write_report(this%between_spheres_report_json)
     
-    end subroutine Physical_System_Monte_Carlo_write_all_reports
+    end subroutine System_Monte_Carlo_write_all_reports
     
-    subroutine Physical_System_Monte_Carlo_write_report(this, geometry)
+    subroutine System_Monte_Carlo_write_report(this, geometry)
     
-        class(Physical_System_Monte_Carlo), intent(in) :: this
+        class(System_Monte_Carlo), intent(in) :: this
         character(len=*), intent(in) :: geometry
 
         type(json_value), pointer :: box_json, changes_json
@@ -526,13 +526,13 @@ contains
 
         nullify(changes_json)
         
-    end subroutine Physical_System_Monte_Carlo_write_report
+    end subroutine System_Monte_Carlo_write_report
     
     ! Finalisation
     
-    subroutine Physical_System_final(this)
+    subroutine System_final(this)
     
-        class(Physical_System), intent(inout) :: this
+        class(System), intent(inout) :: this
         
         real(DP) :: type1_energy, type2_energy
         
@@ -558,10 +558,10 @@ contains
         call this%json_destroy_all_values()
         call this%close_units()
     
-    end subroutine Physical_System_final
+    end subroutine System_final
     
-    subroutine Physical_System_write_all_results(this)
-        class(Physical_System), intent(inout) :: this
+    subroutine System_write_all_results(this)
+        class(System), intent(inout) :: this
         
         call this%type1_observables%write_results(this%Box%temperature, this%num_equilibrium_steps, &
                                                   this%type1_report_json)
@@ -572,10 +572,10 @@ contains
         
         call this%write_results()
     
-    end subroutine Physical_System_write_all_results
+    end subroutine System_write_all_results
     
-    subroutine Physical_System_write_results(this)
-        class(Physical_System), intent(inout) :: this
+    subroutine System_write_results(this)
+        class(System), intent(inout) :: this
         
         real(DP) :: potential_energy, potential_energy_conf
         real(DP) :: duration
@@ -603,11 +603,11 @@ contains
         rewind(this%report_unit)
         call json_print(this%report_json, this%report_unit)
     
-    end subroutine Physical_System_write_results
+    end subroutine System_write_results
 
-    subroutine Physical_System_json_destroy_all_values(this)
+    subroutine System_json_destroy_all_values(this)
 
-        class(Physical_System), intent(inout) :: this
+        class(System), intent(inout) :: this
 
         nullify(this%type2_report_json)
         nullify(this%type1_report_json)
@@ -616,11 +616,11 @@ contains
         
         call json_destroy(this%report_json)
     
-    end subroutine Physical_System_json_destroy_all_values
+    end subroutine System_json_destroy_all_values
     
-    subroutine Physical_System_close_units(this)
+    subroutine System_close_units(this)
     
-        class(Physical_System), intent(inout) :: this
+        class(System), intent(inout) :: this
     
         call this%type1_units%close()
         call this%type2_units%close()
@@ -630,13 +630,13 @@ contains
         close(this%observables_thermalisation_unit)
         close(this%observables_equilibrium_unit)
     
-    end subroutine Physical_System_close_units
+    end subroutine System_close_units
     
     ! Destruction
     
-    subroutine Physical_System_destroy(this)
+    subroutine System_destroy(this)
      
-        class(Physical_System), intent(inout) :: this
+        class(System), intent(inout) :: this
         
         write(output_unit, *) this%name, " class destruction"
         
@@ -657,49 +657,49 @@ contains
 
         call this%data_json%destroy()
     
-    end subroutine Physical_System_destroy
+    end subroutine System_destroy
     
     ! Accessors
     
-    pure function Physical_System_get_num_thermalisation_steps(this) &
+    pure function System_get_num_thermalisation_steps(this) &
                   result(get_num_thermalisation_steps)
         
-        class(Physical_System), intent(in) :: this
+        class(System), intent(in) :: this
         integer :: get_num_thermalisation_steps
                 
         get_num_thermalisation_steps = this%num_thermalisation_steps
         
-    end function Physical_System_get_num_thermalisation_steps
+    end function System_get_num_thermalisation_steps
     
-    pure function Physical_System_get_num_equilibrium_steps(this) result(get_num_equilibrium_steps)
-        class(Physical_System), intent(in) :: this
+    pure function System_get_num_equilibrium_steps(this) result(get_num_equilibrium_steps)
+        class(System), intent(in) :: this
         integer :: get_num_equilibrium_steps
                 
         get_num_equilibrium_steps = this%num_equilibrium_steps
         
-    end function Physical_System_get_num_equilibrium_steps
+    end function System_get_num_equilibrium_steps
     
     ! Mutators
     
-    subroutine Physical_System_set_time_start(this)
-        class(Physical_System), intent(inout) :: this
+    subroutine System_set_time_start(this)
+        class(System), intent(inout) :: this
               
         call cpu_time(this%time_start)
         
-    end subroutine Physical_System_set_time_start
+    end subroutine System_set_time_start
     
-    subroutine Physical_System_set_time_end(this)
-        class(Physical_System), intent(inout) :: this
+    subroutine System_set_time_end(this)
+        class(System), intent(inout) :: this
               
         call cpu_time(this%time_end)
         
-    end subroutine Physical_System_set_time_end
+    end subroutine System_set_time_end
     
     ! Random changes
     
-    subroutine Physical_System_Monte_Carlo_random_changes(this)
+    subroutine System_Monte_Carlo_random_changes(this)
     
-        class(Physical_System_Monte_Carlo), intent(inout) :: this
+        class(System_Monte_Carlo), intent(inout) :: this
         
         integer :: i_change, i_change_rand, i_particule_rand
         real(DP) :: rand
@@ -741,22 +741,22 @@ contains
             
         end do MC_Change
     
-    end subroutine Physical_System_Monte_Carlo_random_changes
+    end subroutine System_Monte_Carlo_random_changes
     
-    subroutine Physical_System_Monte_Carlo_update_rejections(this)
+    subroutine System_Monte_Carlo_update_rejections(this)
     
-        class(Physical_System_Monte_Carlo), intent(inout) :: this
+        class(System_Monte_Carlo), intent(inout) :: this
     
         call this%type1_observables%move%update_rejection()
         call this%type1_observables%rotation%update_rejection()
         call this%type2_observables%move%update_rejection()
         call this%switch_observable%update_rejection()
         
-    end subroutine Physical_System_Monte_Carlo_update_rejections
+    end subroutine System_Monte_Carlo_update_rejections
     
-    subroutine Physical_System_Monte_Carlo_adapt_changes(this, i_step)
+    subroutine System_Monte_Carlo_adapt_changes(this, i_step)
     
-        class(Physical_System_Monte_Carlo), intent(inout) :: this
+        class(System_Monte_Carlo), intent(inout) :: this
         integer, intent(in) :: i_step
         
         if (mod(i_step, this%period_adaptation) /= 0) then
@@ -783,11 +783,11 @@ contains
                                                   this%type2_observables%move%rejection_average
         end if
         
-    end subroutine Physical_System_Monte_Carlo_adapt_changes
+    end subroutine System_Monte_Carlo_adapt_changes
     
-    subroutine Physical_System_Monte_Carlo_write_observables_thermalisation(this, i_step)
+    subroutine System_Monte_Carlo_write_observables_thermalisation(this, i_step)
     
-        class(Physical_System_Monte_Carlo), intent(inout) :: this
+        class(System_Monte_Carlo), intent(inout) :: this
         integer, intent(in) :: i_step
     
         call this%type1_observables%write(i_step, this%type1_units%observables_thermalisation)
@@ -800,11 +800,11 @@ contains
             this%type2_observables%potential_energy + &
             this%between_spheres_observables%potential_energy
             
-    end subroutine Physical_System_Monte_Carlo_write_observables_thermalisation
+    end subroutine System_Monte_Carlo_write_observables_thermalisation
     
-    subroutine Physical_System_Monte_Carlo_fix_changes(this)
+    subroutine System_Monte_Carlo_fix_changes(this)
     
-        class(Physical_System_Monte_Carlo), intent(inout) :: this
+        class(System_Monte_Carlo), intent(inout) :: this
         
         call this%type1_macro%move%set_delta(this%Box%size, &
                                              this%type1_spheres%get_name(), &
@@ -818,11 +818,11 @@ contains
                                              this%type2_observables%move%rejection_average, &
                                              this%type2_report_json)
     
-    end subroutine Physical_System_Monte_Carlo_fix_changes
+    end subroutine System_Monte_Carlo_fix_changes
     
-    subroutine Physical_System_Post_Processing_measure_chemical_potentials(this)
+    subroutine System_Post_Processing_measure_chemical_potentials(this)
     
-        class(Physical_System_Post_Processing), intent(inout) :: this
+        class(System_Post_Processing), intent(inout) :: this
     
         call widom(this%Box, this%ext_field, &
                    this%type1_spheres, this%type1_macro, this%type1_observables, &
@@ -833,11 +833,11 @@ contains
                    this%type1_spheres, this%type1_macro%between_cells, &
                    this%between_spheres_potential)
     
-    end subroutine Physical_System_Post_Processing_measure_chemical_potentials
+    end subroutine System_Post_Processing_measure_chemical_potentials
     
-    subroutine Physical_System_Monte_Carlo_accumulate_observables(this)
+    subroutine System_Monte_Carlo_accumulate_observables(this)
     
-        class(Physical_System_Monte_Carlo), intent(inout) :: this
+        class(System_Monte_Carlo), intent(inout) :: this
     
         call this%type1_observables%accumulate()
         call this%type2_observables%accumulate()
@@ -845,11 +845,11 @@ contains
         this%switch_observable%sum_rejection = this%switch_observable%sum_rejection + &
                                                this%switch_observable%rejection_rate
             
-    end subroutine Physical_System_Monte_Carlo_accumulate_observables
+    end subroutine System_Monte_Carlo_accumulate_observables
     
-    subroutine Physical_System_Monte_Carlo_write_observables_equilibrium(this, i_step)
+    subroutine System_Monte_Carlo_write_observables_equilibrium(this, i_step)
     
-        class(Physical_System_Monte_Carlo), intent(inout) :: this
+        class(System_Monte_Carlo), intent(inout) :: this
         integer, intent(in) :: i_step
     
         call this%type1_observables%write(i_step, this%type1_units%observables_equilibrium)
@@ -862,11 +862,11 @@ contains
             this%type2_observables%potential_energy + &
             this%between_spheres_observables%potential_energy
             
-    end subroutine Physical_System_Monte_Carlo_write_observables_equilibrium
+    end subroutine System_Monte_Carlo_write_observables_equilibrium
     
-    subroutine Physical_System_Monte_Carlo_take_snapshots(this, i_step)
+    subroutine System_Monte_Carlo_take_snapshots(this, i_step)
     
-        class(Physical_System_Monte_Carlo), intent(inout) :: this
+        class(System_Monte_Carlo), intent(inout) :: this
         integer, intent(in) :: i_step
         
         if (this%snap) then ! Snap shots of the configuration
@@ -878,12 +878,12 @@ contains
                  this%type2_units%snap_equilibrium_positions)
         end if
         
-    end subroutine Physical_System_Monte_Carlo_take_snapshots
+    end subroutine System_Monte_Carlo_take_snapshots
     
     !> Reset summed quantities to prevent them from drifting.
-    subroutine Physical_System_Monte_Carlo_reset_quantites(this, i_step)
+    subroutine System_Monte_Carlo_reset_quantites(this, i_step)
     
-        class(Physical_System_Monte_Carlo), intent(inout) :: this
+        class(System_Monte_Carlo), intent(inout) :: this
         integer, intent(in) :: i_step
     
         if (modulo(i_step, this%reset_i_step) == 0) then
@@ -897,6 +897,6 @@ contains
             end if
         end if
         
-    end subroutine Physical_System_Monte_Carlo_reset_quantites
+    end subroutine System_Monte_Carlo_reset_quantites
 
 end module class_physical_system

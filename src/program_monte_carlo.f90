@@ -4,12 +4,12 @@ program monte_carlo_canonical_bulk
 
 use, intrinsic :: iso_fortran_env, only: output_unit
 use module_types_micro, only: Monte_Carlo_Arguments
-use class_physical_system, only: Physical_System_Monte_Carlo
+use class_physical_system, only: System_Monte_Carlo
 use module_arguments_monte_carlo, only: read_arguments
 
 implicit none
     
-    type(Physical_System_Monte_Carlo) :: sys
+    type(System_Monte_Carlo) :: sys
     type(Monte_Carlo_Arguments) :: args
     
     integer :: i_step
