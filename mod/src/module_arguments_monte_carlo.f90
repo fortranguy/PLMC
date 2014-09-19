@@ -9,7 +9,7 @@ use module_arguments, only: arg_to_file
 implicit none
 
 private
-public read_arguments
+public read_arguments_mc, read_arguments_post
 
 contains
 
@@ -36,7 +36,7 @@ contains
     
     end subroutine write_help
 
-    subroutine read_init_files(i_arg, arg_conf)
+    subroutine read_conf_files(i_arg, arg_conf)
 
         integer, intent(inout) :: i_arg
         type(Argument_Configurations), intent(inout) :: arg_conf
@@ -51,7 +51,7 @@ contains
             arg_conf%length(i_file) = length
         end do
         
-    end subroutine read_init_files
+    end subroutine read_conf_files
 
     subroutine read_seed_put(i_arg, arg_rand)
 
@@ -85,7 +85,7 @@ contains
 
     !> Read arguments
 
-    subroutine read_arguments(args)
+    subroutine read_arguments_mc(args)
     
         type(System_Arguments), intent(out) :: args
 
@@ -104,7 +104,7 @@ contains
         do while(i_arg <= command_argument_count())
 
             call get_command_argument(i_arg, argument, length, status)
-            if (status /= 0) error stop "Error: read_arguments"
+            if (status /= 0) error stop "Error: read_arguments_mc"
 
             select case (argument)
             
@@ -131,7 +131,7 @@ contains
                         case ("r", "random")
                         case ("f", "files")
                             args%initial%choice = 'f'
-                            call read_init_files(i_arg, args%initial)
+                            call read_conf_files(i_arg, args%initial)
                         case default
                             call write_help()
                             error stop
@@ -168,6 +168,39 @@ contains
         
         if (.not. geometry_defined) error stop "Error: geometry is not defined." 
 
-    end subroutine read_arguments
+    end subroutine read_arguments_mc
+
+    subroutine read_arguments_post(args)
+
+        type(System_Arguments), intent(out) :: args
+
+        character(len=4096) :: argument, sub_argument
+        integer :: i_arg, length, status
+
+        i_arg = 1
+        do while(i_arg <= command_argument_count())
+
+            call get_command_argument(i_arg, argument, length, status)
+            if (status /= 0) error stop "Error: read_arguments_mc"
+
+            select case (argument)
+            
+                case ("-s", "--snap")
+                    i_arg = i_arg + 1
+                    call get_command_argument(i_arg, sub_argument, length, status)
+                    if (status /= 0) error stop "Enter configurations, cf. help."
+                    call read_conf_files(i_arg, args%initial)
+
+                case default
+                    write(error_unit, *) "Unknown option: '", trim(argument), "'"
+                    error stop
+
+            end select
+
+            i_arg = i_arg + 1
+
+        end do
+
+    end subroutine read_arguments_post
 
 end module module_arguments_monte_carlo

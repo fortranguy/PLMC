@@ -80,13 +80,8 @@ private
         procedure, private :: set_monte_carlo_steps => System_set_monte_carlo_steps
         procedure :: destroy => System_destroy
         
-        !> Initialization & Finalisation
-        procedure :: init => System_init
         procedure, private :: set_potentials => System_set_potentials
-        procedure, private :: open_all_units => System_open_all_units
         procedure, private :: json_create_all_values => System_json_create_all_values
-        procedure :: final => System_final
-        procedure, private :: write_all_results => System_write_all_results
         procedure, private :: json_destroy_all_values => System_json_destroy_all_values
         
         !> Accessors & Mutators
@@ -150,10 +145,16 @@ private
     end type System_Monte_Carlo
     
     type, extends(System), public :: System_Post_Processing
+        type(json_file) :: data_report_json
         type(Hard_Spheres_Post_Processing_Observables) :: type1_observables, type2_observables
         type(Hard_Spheres_Post_Processing_Units) :: type1_units, type2_units
+        
     contains
+        !> Initialization & Finalisation
+        procedure :: init => System_Post_Processing_init
+        procedure, private :: open_all_units => System_Post_Processing_open_all_units
         procedure :: final => System_Post_Processing_final
+        procedure, private :: write_all_results => System_Post_Processing_write_all_results
         procedure, private :: close_units => System_Post_Processing_close_units
         procedure :: measure_chemical_potentials => &
                      System_Post_Processing_measure_chemical_potentials
@@ -172,13 +173,29 @@ contains
         character(len=4096) :: data_name
         logical :: found
         character(len=:), allocatable :: this_name
+        
+        character(len=:), allocatable :: Box_geometry
 
         call json_initialize()
         
         call test_file_exists(data_filename)
         call this%data_json%load_file(filename = data_filename)
-        
-        call set_geometry(args%geometry)
+
+        select type (this)
+            type is (System_Monte_Carlo)
+                call set_geometry(args%geometry)
+            type is (System_Post_Processing)
+            
+                call test_file_exists(report_filename)
+                call this%data_report_json%load_file(report_filename)
+                
+                data_name = "System.Box.geometry"
+                call this%data_report_json%get(data_name, Box_geometry, found)
+                call test_data_found(data_name, found)
+                call set_geometry(Box_geometry)
+                if (allocated(Box_geometry)) deallocate(Box_geometry)
+                
+        end select
         
         data_name = "Box.name"
         call this%data_json%get(data_name, this_name, found)
@@ -363,21 +380,21 @@ contains
     
     ! Initialization
     
-    subroutine System_init(this, args)
+    subroutine System_Post_Processing_init(this, args)
     
-        class(System), intent(inout) :: this
+        class(System_Post_Processing), intent(inout) :: this
         type(System_Arguments), intent(in) :: args
         
         call this%open_all_units()
         call this%json_create_all_values()
         
-        ! initial configuration
+        ! init conf
         
         call this%set_potentials()
                         
         call set_ewald(this%Box, this%type1_spheres, this%type1_macro, this%data_json)
         
-    end subroutine System_init
+    end subroutine System_Post_Processing_init
     
     subroutine System_set_potentials(this)
     
@@ -398,16 +415,16 @@ contains
         
     end subroutine System_set_potentials
     
-    subroutine System_open_all_units(this)
+    subroutine System_Post_Processing_open_all_units(this)
     
-        class(System), intent(inout) :: this
+        class(System_Post_Processing), intent(inout) :: this
 
         open(newunit=this%report_unit, recl=4096, file=report_post_filename, status='new', &
              action='write')
-        !call this%type1_units%open(this%type1_spheres%get_name())
-        !call this%type2_units%open(this%type2_spheres%get_name())
+        call this%type1_units%open(this%type1_spheres%get_name())
+        call this%type2_units%open(this%type2_spheres%get_name())
     
-    end subroutine System_open_all_units
+    end subroutine System_Post_Processing_open_all_units
     
     subroutine System_Monte_Carlo_init(this, args)
      
@@ -582,24 +599,14 @@ contains
     
     ! Finalisation
     
-    subroutine System_final(this)
+    subroutine System_Post_Processing_write_all_results(this)
     
-        class(System), intent(inout) :: this        
-        
-        call this%write_all_results()
-        call this%json_destroy_all_values()
-        close(this%report_unit)
-        
-    end subroutine System_final
-    
-    subroutine System_write_all_results(this)
-    
-        class(System), intent(inout) :: this
+        class(System_Post_Processing), intent(inout) :: this
         
         rewind(this%report_unit)
         call json_print(this%report_json, this%report_unit)
         
-    end subroutine System_write_all_results
+    end subroutine System_Post_Processing_write_all_results
     
     subroutine System_Monte_Carlo_final(this)
     
