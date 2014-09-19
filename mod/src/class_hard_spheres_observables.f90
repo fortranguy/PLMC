@@ -130,7 +130,6 @@ contains
         integer, intent(in) :: num_equilibrium_steps
         type(json_value), pointer, intent(in) :: report_json
         
-        real(DP) :: chemical_potential_excess
         type(json_value), pointer :: results_json
 
         call json_value_create(results_json)
