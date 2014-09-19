@@ -7,7 +7,7 @@ use data_box, only: num_dimensions
 use json_module, only: json_file, json_initialize, json_destroy, &
                        json_value, json_value_create, to_object, json_value_add, &
                        json_print
-use module_data, only: data_filename, report_filename, &
+use module_data, only: data_filename, report_filename, report_post_filename, &
                        test_file_exists, test_data_found, test_empty_string
 use module_types_micro, only: Box_Parameters, System_Arguments
 use module_geometry, only: geometry, set_geometry
@@ -90,11 +90,9 @@ private
         !> Initialization & Finalisation
         procedure :: init => System_init
         procedure, private :: open_all_units => System_open_all_units
-        procedure, private :: open_units => System_open_units
         procedure, private :: json_create_all_values => System_json_create_all_values
         procedure :: final => System_final
         procedure, private :: write_all_results => System_write_all_results
-        procedure, private :: write_results => System_write_results
         procedure, private :: json_destroy_all_values => System_json_destroy_all_values
         procedure, private :: close_units => System_close_units
         
@@ -109,7 +107,7 @@ private
     type, extends(System), public :: System_Monte_Carlo
     
         private
-    
+
         integer :: period_adaptation
         integer :: decorrelation_factor, num_changes, num_moves, num_switches, num_rotations
         
@@ -119,12 +117,14 @@ private
     
         procedure, private :: set_changes => System_Monte_Carlo_set_changes
         procedure :: init => System_Monte_Carlo_init
-        
-        procedure :: reset_quantites => System_Monte_Carlo_reset_quantites
-        
+        procedure, private :: open_all_units => System_Monte_Carlo_open_all_units
+        procedure, private :: open_units => System_Monte_Carlo_open_units
         procedure, private :: write_all_reports => System_Monte_Carlo_write_all_reports
         procedure, private :: write_report => System_Monte_Carlo_write_report
-        
+        procedure :: final => System_Monte_Carlo_final
+        procedure, private :: write_all_results => System_Monte_Carlo_write_all_results
+        procedure, private :: write_results => System_Monte_Carlo_write_results
+                
         !> Simulation
         procedure :: random_changes => System_Monte_Carlo_random_changes
         procedure :: update_rejections => System_Monte_Carlo_update_rejections
@@ -135,6 +135,7 @@ private
         procedure :: accumulate_observables => System_Monte_Carlo_accumulate_observables
         procedure :: write_observables_equilibrium => System_Monte_Carlo_write_observables_equilibrium
         procedure :: take_snapshots => System_Monte_Carlo_take_snapshots
+        procedure :: reset_quantites => System_Monte_Carlo_reset_quantites
     
     end type System_Monte_Carlo
     
@@ -184,6 +185,7 @@ contains
         call this%between_spheres%construct(this%data_json, &
                                             this%type1_spheres%get_diameter(), &
                                             this%type2_spheres%get_diameter())
+                                            
         select type (this)
             type is (System_Monte_Carlo)
                 call this%set_changes()
@@ -349,6 +351,9 @@ contains
         class(System), intent(inout) :: this
         type(System_Arguments), intent(in) :: args
         
+        call this%open_all_units()
+        call this%json_create_all_values()
+        
         call this%between_spheres_potential%construct(this%data_json, "Between Spheres", &
                                                       this%between_spheres%get_diameter())
                                                       
@@ -365,6 +370,17 @@ contains
         
     end subroutine System_init
     
+    subroutine System_open_all_units(this)
+    
+        class(System), intent(inout) :: this
+
+        open(newunit=this%report_unit, recl=4096, file=report_post_filename, status='new', &
+             action='write')
+        !call this%type1_units%open(this%type1_spheres%get_name())
+        !call this%type2_units%open(this%type2_spheres%get_name())
+    
+    end subroutine System_open_all_units
+    
     subroutine System_Monte_Carlo_init(this, args)
      
         class(System_Monte_Carlo), intent(inout) :: this
@@ -374,6 +390,8 @@ contains
         
         character(len=4096) :: data_name
         logical :: found
+        
+        call this%System%init(args)
         
         data_name = "Distribution.take snapshot"
         call this%data_json%get(data_name, this%snap, found)
@@ -385,9 +403,6 @@ contains
         this%reset_i_step = this%reset_i_step / this%decorrelation_factor
         
         write(output_unit, *) "Monte-Carlo Simulation: Canonical ensemble "
-        
-        call this%open_all_units()
-        call this%json_create_all_values()
         
         call init_random_seed(args%random, this%report_json)
         call set_initial_configuration(this%Box, args%initial, &
@@ -430,20 +445,20 @@ contains
     
     end subroutine System_Monte_Carlo_init
     
-    subroutine System_open_all_units(this)
+    subroutine System_Monte_Carlo_open_all_units(this)
     
-        class(System), intent(inout) :: this
+        class(System_Monte_Carlo), intent(inout) :: this
 
         call this%open_units()
         call this%type1_units%open(this%type1_spheres%get_name())
         call this%type2_units%open(this%type2_spheres%get_name())
         call this%between_spheres_units%open(this%between_spheres%get_name())
     
-    end subroutine System_open_all_units
+    end subroutine System_Monte_Carlo_open_all_units
 
-    subroutine System_open_units(this)
+    subroutine System_Monte_Carlo_open_units(this)
 
-        class(System), intent(inout) :: this
+        class(System_Monte_Carlo), intent(inout) :: this
 
         open(newunit=this%report_unit, recl=4096, file=report_filename, &
              status='new', action='write')
@@ -453,7 +468,7 @@ contains
              file="observables_equilibrium.out", status='new', action='write')
         write(this%observables_equilibrium_unit, *) "#", 1 ! 1 observable: energy
 
-    end subroutine System_open_units
+    end subroutine System_Monte_Carlo_open_units
 
     subroutine System_json_create_all_values(this)
 
@@ -532,7 +547,26 @@ contains
     
     subroutine System_final(this)
     
+        class(System), intent(inout) :: this        
+        
+        call this%write_all_results()
+        call this%json_destroy_all_values()
+        call this%close_units()
+        
+    end subroutine System_final
+    
+    subroutine System_write_all_results(this)
+    
         class(System), intent(inout) :: this
+        
+        rewind(this%report_unit)
+        call json_print(this%report_json, this%report_unit)
+        
+    end subroutine System_write_all_results
+    
+    subroutine System_Monte_Carlo_final(this)
+    
+        class(System_Monte_Carlo), intent(inout) :: this
         
         real(DP) :: type1_energy, type2_energy
         
@@ -554,14 +588,13 @@ contains
                                              this%between_spheres_observables%potential_energy, &
                                              this%between_spheres_report_json)
         
-        call this%write_all_results()
-        call this%json_destroy_all_values()
-        call this%close_units()
+        call this%System%final()
     
-    end subroutine System_final
+    end subroutine System_Monte_Carlo_final
     
-    subroutine System_write_all_results(this)
-        class(System), intent(inout) :: this
+    subroutine System_Monte_Carlo_write_all_results(this)
+    
+        class(System_Monte_Carlo), intent(inout) :: this
         
         call this%type1_observables%write_results(this%Box%temperature, this%num_equilibrium_steps, &
                                                   this%type1_report_json)
@@ -572,10 +605,11 @@ contains
         
         call this%write_results()
     
-    end subroutine System_write_all_results
+    end subroutine System_Monte_Carlo_write_all_results
     
-    subroutine System_write_results(this)
-        class(System), intent(inout) :: this
+    subroutine System_Monte_Carlo_write_results(this)
+    
+        class(System_Monte_Carlo), intent(inout) :: this
         
         real(DP) :: potential_energy, potential_energy_conf
         real(DP) :: duration
@@ -603,7 +637,7 @@ contains
         rewind(this%report_unit)
         call json_print(this%report_json, this%report_unit)
     
-    end subroutine System_write_results
+    end subroutine System_Monte_Carlo_write_results
 
     subroutine System_json_destroy_all_values(this)
 
@@ -617,19 +651,23 @@ contains
         call json_destroy(this%report_json)
     
     end subroutine System_json_destroy_all_values
-    
+
     subroutine System_close_units(this)
     
         class(System), intent(inout) :: this
-    
-        call this%type1_units%close()
-        call this%type2_units%close()
-        call this%between_spheres_units%close()
+        
+        select type (this)
+            type is (System_Monte_Carlo)
+                call this%type1_units%close()
+                call this%type2_units%close()
+                call this%between_spheres_units%close()
+                
+                close(this%observables_thermalisation_unit)
+                close(this%observables_equilibrium_unit)
+        end select            
         
         close(this%report_unit)
-        close(this%observables_thermalisation_unit)
-        close(this%observables_equilibrium_unit)
-    
+        
     end subroutine System_close_units
     
     ! Destruction
