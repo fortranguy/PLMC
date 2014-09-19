@@ -358,7 +358,7 @@ contains
         class(Dipolar_Hard_Spheres), intent(in) :: this_spheres
         class(Dipolar_Hard_Spheres_Macro), intent(inout) :: this_macro
         type(json_file), intent(inout) :: data_json
-        class(Dipolar_Hard_Spheres_Units), intent(in) :: this_units
+        class(Dipolar_Hard_Spheres_Units), intent(in), optional :: this_units
         
         character(len=4096) :: data_name
         logical :: found
@@ -374,12 +374,16 @@ contains
         min_distance = this_macro%hard_potential%get_min_distance()
         call this_macro%ewald_real%construct(Box%size, alpha, min_distance, data_json)
         call this_macro%ewald_reci%construct(Box, alpha, this_spheres)
-        call this_macro%ewald_reci%count_wave_vectors(Box%wave, this_units%wave_vectors)
+        if (present(this_units)) then
+            call this_macro%ewald_reci%count_wave_vectors(Box%wave, this_units%wave_vectors)
+        end if
         call this_macro%ewald_self%set_alpha(alpha)
         call this_macro%ewald_bound%set_total_moment(this_spheres)
         if (geometry%slab) then
             call this_macro%elc%construct(Box, this_spheres)
-            call this_macro%elc%count_wave_vectors(Box%wave, this_units%ELC_wave_vectors)
+            if (present(this_units)) then
+                call this_macro%elc%count_wave_vectors(Box%wave, this_units%ELC_wave_vectors)
+            end if
         end if
     
     end subroutine set_ewald

@@ -50,33 +50,22 @@ private
         ! Type 1: Dipolar spheres
         type(Dipolar_Hard_Spheres) :: type1_spheres
         type(Dipolar_Hard_Spheres_Macro) :: type1_macro
-        type(Dipolar_Hard_Spheres_Observables) :: type1_observables
-        type(Dipolar_Hard_Spheres_Units) :: type1_units
         type(json_value), pointer :: type1_report_json
         
         ! Type 2: Hard spheres
         type(Hard_Spheres) :: type2_spheres
         type(Hard_Spheres_Macro) :: type2_macro
-        type(Hard_Spheres_Observables) :: type2_observables
-        type(Hard_Spheres_Units) :: type2_units
         type(json_value), pointer :: type2_report_json
         
         ! Between Spheres potential_energy
         type(Between_Hard_Spheres) :: between_spheres
         type(Between_Hard_Spheres_Potential_Energy) :: between_spheres_potential
-        type(Between_Hard_Spheres_Observables) :: between_spheres_observables
-        type(Between_Hard_Spheres_Units) :: between_spheres_units
-        type(json_value), pointer :: between_spheres_report_json
         
         ! Observables and files units
-        real(DP) :: potential_energy, potential_energy_sum
-        type(json_value), pointer :: report_json, system_json
+        type(json_value), pointer :: report_json
         integer :: report_unit
-        integer :: observables_thermalisation_unit, observables_equilibrium_unit
         
-        type(Discrete_Observables) :: switch_observable
-        
-        logical :: write_potential_energy, snap
+        logical :: snap
         real(DP) :: time_start, time_end
     
     contains
@@ -111,7 +100,22 @@ private
         integer :: period_adaptation
         integer :: decorrelation_factor, num_changes, num_moves, num_switches, num_rotations
         
+        type(Dipolar_Hard_Spheres_Units) :: type1_units
+        type(Dipolar_Hard_Spheres_Observables) :: type1_observables
+        
+        type(Hard_Spheres_Units) :: type2_units
+        type(Hard_Spheres_Observables) :: type2_observables
+        
+        type(Between_Hard_Spheres_Observables) :: between_spheres_observables
+        type(Between_Hard_Spheres_Units) :: between_spheres_units
+        type(json_value), pointer :: between_spheres_report_json
+        
         integer :: reset_i_step
+        real(DP) :: potential_energy, potential_energy_sum
+        type(json_value), pointer :: system_json
+        integer :: observables_thermalisation_unit, observables_equilibrium_unit
+        type(Discrete_Observables) :: switch_observable
+        logical :: write_potential_energy
         
     contains
     
@@ -140,6 +144,8 @@ private
     end type System_Monte_Carlo
     
     type, extends(System), public :: System_Post_Processing
+        type(Dipolar_Hard_Spheres_Observables) :: type1_observables ! to change !
+        type(Hard_Spheres_Observables) :: type2_observables
     contains
         procedure :: measure_chemical_potentials => &
                      System_Post_Processing_measure_chemical_potentials
@@ -176,10 +182,6 @@ contains
         call this%set_box()
         call this%set_monte_carlo_steps()
         
-        data_name = "Potential Energy.write"
-        call this%data_json%get(data_name, this%write_potential_energy, found)
-        call test_data_found(data_name, found)
-        
         call this%type1_spheres%construct(this%Box, this%data_json)
         call this%type2_spheres%construct(this%Box, this%data_json)
         call this%between_spheres%construct(this%data_json, &
@@ -188,7 +190,13 @@ contains
                                             
         select type (this)
             type is (System_Monte_Carlo)
+            
+                data_name = "Potential Energy.write"
+                call this%data_json%get(data_name, this%write_potential_energy, found)
+                call test_data_found(data_name, found)
+                
                 call this%set_changes()
+                
         end select
         
     end subroutine System_construct
@@ -361,12 +369,19 @@ contains
                                                        this%type1_spheres%get_diameter())
         call init_cells(this%Box%size, this%type1_spheres, this%type1_macro, this%type2_spheres, &
                         this%between_spheres_potential)
-        call set_ewald(this%Box, this%type1_spheres, this%type1_macro, this%data_json, this%type1_units)
         
         call this%type2_macro%hard_potential%construct(this%data_json, "Hard Spheres", &
                                                        this%type2_spheres%get_diameter())
         call init_cells(this%Box%size, this%type2_spheres, this%type2_macro, this%type1_spheres, &
                         this%between_spheres_potential)
+        
+        select type (this)
+            type is (System)
+                call set_ewald(this%Box, this%type1_spheres, this%type1_macro, this%data_json)
+            type is (System_Monte_Carlo)
+                call set_ewald(this%Box, this%type1_spheres, this%type1_macro, this%data_json, &
+                               this%type1_units)
+        end select
         
     end subroutine System_init
     
@@ -476,14 +491,19 @@ contains
 
         call json_value_create(this%report_json)
         call to_object(this%report_json)
+        
+        select type (this)
+            type is (System_Monte_Carlo)
 
-        call json_value_create(this%system_json)
-        call to_object(this%system_json, "System")
-        call json_value_add(this%report_json, this%system_json)
+                call json_value_create(this%system_json)
+                call to_object(this%system_json, "System")
+                call json_value_add(this%report_json, this%system_json)
 
-        call json_value_create(this%between_spheres_report_json)
-        call to_object(this%between_spheres_report_json, "Between Spheres")
-        call json_value_add(this%report_json, this%between_spheres_report_json)
+                call json_value_create(this%between_spheres_report_json)
+                call to_object(this%between_spheres_report_json, "Between Spheres")
+                call json_value_add(this%report_json, this%between_spheres_report_json)
+                
+        end select
 
         call json_value_create(this%type1_report_json)
         call to_object(this%type1_report_json, "Dipolar Hard Spheres")
@@ -645,8 +665,11 @@ contains
 
         nullify(this%type2_report_json)
         nullify(this%type1_report_json)
-        nullify(this%between_spheres_report_json)
-        nullify(this%system_json)
+        select type (this)
+            type is (System_Monte_Carlo)
+                nullify(this%between_spheres_report_json)
+                nullify(this%system_json)
+        end select
         
         call json_destroy(this%report_json)
     
