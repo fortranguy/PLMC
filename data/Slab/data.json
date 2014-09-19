@@ -78,7 +78,7 @@
         "number of particles": 400,
         "Parallel": {
             "height ratio": 0.0,
-            "delta": 0.25,
+            "height delta": 0.25,
         }
     },
     "Clusters": {
