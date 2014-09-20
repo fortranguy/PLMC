@@ -54,6 +54,7 @@ private
         procedure :: set_position => Hard_Spheres_set_position
         procedure :: set_position_2d => Hard_Spheres_set_position_2d
         procedure :: set_position_z => Hard_Spheres_set_position_z
+        procedure :: set_all_positions => Hard_Spheres_set_all_positions
         
         procedure :: write_report => Hard_Spheres_write_report
         
@@ -83,6 +84,7 @@ private
         procedure :: get_orientation_2d => Dipolar_Hard_Spheres_get_orientation_2d
         procedure :: get_orientation_z => Dipolar_Hard_Spheres_get_orientation_z
         procedure :: set_orientation => Dipolar_Hard_Spheres_set_orientation
+        procedure :: set_all_orientations => Dipolar_Hard_Spheres_set_all_orientations
         
         procedure :: write_snap_orientations => Dipolar_Hard_Spheres_write_snap_orientations
         
@@ -438,6 +440,32 @@ contains
         get_diameter = this%diameter
         
     end function Between_Hard_Spheres_get_diameter
+
+    subroutine Hard_Spheres_set_all_positions(this, all_positions_unit)
+
+        class(Hard_Spheres), intent(inout) :: this
+        integer, intent(in) :: all_positions_unit
+
+        integer :: i_particle
+        
+        do i_particle = 1, this%num_particles
+            read(all_positions_unit, *) this%all_positions(:, i_particle)
+        end do
+
+    end subroutine Hard_Spheres_set_all_positions
+
+    subroutine Dipolar_Hard_Spheres_set_all_orientations(this, all_orientations_unit)
+
+        class(Dipolar_Hard_Spheres), intent(inout) :: this
+        integer, intent(in) :: all_orientations_unit
+
+        integer :: i_particle
+
+        do i_particle = 1, this%num_particles
+            read(all_orientations_unit, *) this%all_orientations(:, i_particle)
+        end do
+
+    end subroutine Dipolar_Hard_Spheres_set_all_orientations
     
     !> Write a report of the component in a file
     
