@@ -1,6 +1,6 @@
 !> \brief Monte Carlo simulation in canonical ensemble for a mixture
 
-program monte_carlo_canonical_bulk
+program monte_carlo_canonical
 
 use, intrinsic :: iso_fortran_env, only: output_unit
 use module_types_micro, only: System_Arguments
@@ -54,4 +54,4 @@ implicit none
     call sys%final()
     call sys%destroy()
     
-end program monte_carlo_canonical_bulk
+end program monte_carlo_canonical

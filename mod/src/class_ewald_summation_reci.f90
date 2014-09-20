@@ -180,15 +180,17 @@ contains
         type(Box_Parameters), intent(in) :: Box
         type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
         integer, intent(in) :: i_step
-        integer, intent(in) :: modulus_unit
+        integer, intent(in), optional :: modulus_unit
 
         real(DP) :: modulus_drifted, modulus_reset
         
         modulus_drifted = this%get_structure_modulus(Box%wave)
         call this%set_structure(Box, this_spheres)
         modulus_reset = this%get_structure_modulus(Box%wave)
-        
-        write(modulus_unit, *) i_step, abs(modulus_reset - modulus_drifted)
+
+        if (present(modulus_unit)) then
+            write(modulus_unit, *) i_step, abs(modulus_reset - modulus_drifted)
+        end if
     
     end subroutine Ewald_Summation_Reci_reset_structure
 

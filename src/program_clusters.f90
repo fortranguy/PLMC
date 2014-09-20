@@ -28,7 +28,7 @@ implicit none
     
     integer :: i_step
     real(DP), dimension(:, :), allocatable :: all_positions, all_orientations
-    real(DP) :: cutoff = 1.3_DP
+    real(DP) :: cutoff
     
     real(DP) :: pair_energy
     real(DP), dimension(num_dimensions) :: vector_ij

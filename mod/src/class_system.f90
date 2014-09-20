@@ -68,7 +68,8 @@ private
         ! Observables and files units
         type(json_value), pointer :: report_json
         integer :: report_unit
-        
+
+        integer :: reset_i_step
         logical :: snap
         real(DP) :: time_start, time_end
     
@@ -109,7 +110,6 @@ private
         type(Between_Hard_Spheres_Monte_Carlo_Units) :: between_spheres_units
         type(json_value), pointer :: between_spheres_report_json
         
-        integer :: reset_i_step
         real(DP) :: potential_energy, potential_energy_sum
         type(json_value), pointer :: system_json
         integer :: observables_thermalisation_unit, observables_equilibrium_unit
@@ -145,11 +145,13 @@ private
     end type System_Monte_Carlo
     
     type, extends(System), public :: System_Post_Processing
+    
         type(json_file) :: data_report_json
         type(Hard_Spheres_Post_Processing_Observables) :: type1_observables, type2_observables
         type(Hard_Spheres_Post_Processing_Units) :: type1_units, type2_units
         
     contains
+    
         !> Initialization & Finalisation
         procedure :: init => System_Post_Processing_init
         procedure, private :: open_all_units => System_Post_Processing_open_all_units
@@ -159,6 +161,8 @@ private
         procedure :: measure_chemical_potentials => &
                      System_Post_Processing_measure_chemical_potentials
         procedure :: accumulate_observables => System_Post_Processing_accumulate_observables
+        procedure :: reset_quantites => System_Post_Processing_reset_quantites
+        
     end type System_Post_Processing
     
 contains
@@ -387,6 +391,8 @@ contains
         
         call this%open_all_units()
         call this%json_create_all_values()
+
+        this%reset_i_step = 1
         
         ! init conf
         
@@ -1016,5 +1022,20 @@ contains
         end if
         
     end subroutine System_Monte_Carlo_reset_quantites
+
+    subroutine System_Post_Processing_reset_quantites(this, i_step)
+
+        class(System_Post_Processing), intent(inout) :: this
+        integer, intent(in) :: i_step
+
+        if (modulo(i_step, this%reset_i_step) == 0) then
+            call this%type1_macro%ewald_reci%reset_structure(this%Box, this%type1_spheres, i_step)
+            call this%type1_macro%ewald_bound%reset_total_moment(this%type1_spheres, i_step)
+            if (geometry%slab) then
+                call this%type1_macro%elc%reset_structure(this%Box, this%type1_spheres, i_step)
+            end if
+        end if
+
+    end subroutine System_Post_Processing_reset_quantites
 
 end module class_system

@@ -62,7 +62,7 @@ contains
         class(Ewald_Summation_Bound), intent(inout) :: this
         class(Dipolar_Hard_Spheres), intent(in) :: this_spheres
         integer, intent(in) :: i_step
-        integer, intent(in) :: modulus_unit
+        integer, intent(in), optional :: modulus_unit
 
         real(DP) :: modulus_drifted, modulus_reset
 
@@ -70,7 +70,9 @@ contains
         call this%set_total_moment(this_spheres)
         modulus_reset = norm2(this%total_moment(:))
 
-        write(modulus_unit, *) i_step, abs(modulus_reset - modulus_drifted)
+        if (present(modulus_unit)) then
+            write(modulus_unit, *) i_step, abs(modulus_reset - modulus_drifted)
+        end if
 
     end subroutine Ewald_Summation_Bound_reset_total_moment
     
