@@ -94,7 +94,7 @@ contains
         logical :: geometry_defined, rand_defined, init_defined
 
         args%random%choice = 'v'
-        args%initial%choice = 'r'
+        args%conf%choice = 'r'
         
         geometry_defined = .false.
         rand_defined = .false.
@@ -130,8 +130,8 @@ contains
                     select case (sub_argument)
                         case ("r", "random")
                         case ("f", "files")
-                            args%initial%choice = 'f'
-                            call read_conf_files(i_arg, args%initial)
+                            args%conf%choice = 'f'
+                            call read_conf_files(i_arg, args%conf)
                         case default
                             call write_help()
                             error stop
@@ -189,7 +189,7 @@ contains
                     i_arg = i_arg + 1
                     call get_command_argument(i_arg, sub_argument, length, status)
                     if (status /= 0) error stop "Enter configurations, cf. help."
-                    call read_conf_files(i_arg, args%initial)
+                    call read_conf_files(i_arg, args%conf)
 
                 case default
                     write(error_unit, *) "Unknown option: '", trim(argument), "'"

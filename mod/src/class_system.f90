@@ -25,7 +25,7 @@ use class_hard_spheres_units, only: Hard_Spheres_Monte_Carlo_Units, &
                                     Dipolar_Hard_Spheres_Monte_Carlo_Units, &
                                     Between_Hard_Spheres_Monte_Carlo_Units, &
                                     Hard_Spheres_Post_Processing_Units
-use module_physics_macro, only: init_random_seed, set_initial_configuration, &
+use module_physics_macro, only: init_random_seed, set_initial_configuration, set_data, &
                                 init_spheres, init_cells, set_ewald, total_energy, final_spheres, &
                                 init_between_spheres_potential, final_between_spheres_potential, &
                                 test_consistency
@@ -394,7 +394,7 @@ contains
 
         this%reset_i_step = 1
         
-        ! init conf
+        call set_data(args%conf, this%type1_spheres, this%type2_spheres)
         
         call this%set_potentials()
                         
@@ -457,7 +457,7 @@ contains
         write(output_unit, *) "Monte-Carlo Simulation: Canonical ensemble "
         
         call init_random_seed(args%random, this%report_json)
-        call set_initial_configuration(this%Box, args%initial, &
+        call set_initial_configuration(this%Box, args%conf, &
                                        this%type1_spheres, this%type2_spheres, &
                                        this%between_spheres%get_diameter(), &
                                        this%report_json)

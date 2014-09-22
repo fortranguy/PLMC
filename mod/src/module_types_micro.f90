@@ -69,7 +69,7 @@ implicit none
     type, public :: System_Arguments
         character(len=4) :: geometry
         type(Argument_Random) :: random
-        type(Argument_Configurations) :: initial
+        type(Argument_Configurations) :: conf
     end type System_Arguments
 
 end module module_types_micro
