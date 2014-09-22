@@ -9,7 +9,7 @@ use json_module, only: json_file, json_initialize, json_destroy, &
                        json_print
 use module_data, only: data_filename, report_filename, report_post_filename, &
                        test_file_exists, test_data_found, test_empty_string
-use module_types_micro, only: Box_Parameters, System_Arguments
+use module_types_micro, only: Box_Parameters, System_Arguments, Argument_Configurations
 use module_geometry, only: geometry, set_geometry
 use module_physics_micro, only: num_wave_vectors
 use class_external_field, only: External_Field
@@ -149,14 +149,17 @@ private
         type(json_file) :: data_report_json
         type(Hard_Spheres_Post_Processing_Observables) :: type1_observables, type2_observables
         type(Hard_Spheres_Post_Processing_Units) :: type1_units, type2_units
+        integer :: type1_positions_unit, type1_orientations_unit, type2_positions_unit
         
     contains
     
         !> Initialization & Finalisation
         procedure :: init => System_Post_Processing_init
+        procedure, private :: open_all_units_in => System_Post_Processing_open_all_units_in
         procedure, private :: open_all_units => System_Post_Processing_open_all_units
         procedure :: final => System_Post_Processing_final
         procedure, private :: write_all_results => System_Post_Processing_write_all_results
+        procedure, private :: close_units_in => System_Post_Processing_close_units_in
         procedure, private :: close_units => System_Post_Processing_close_units
         procedure :: measure_chemical_potentials => &
                      System_Post_Processing_measure_chemical_potentials
@@ -389,12 +392,13 @@ contains
         class(System_Post_Processing), intent(inout) :: this
         type(System_Arguments), intent(in) :: args
         
+        call this%open_all_units_in(args%conf)
         call this%open_all_units()
         call this%json_create_all_values()
 
         this%reset_i_step = 1
         
-        call set_data(args%conf, this%type1_spheres, this%type2_spheres)
+        !call set_data(args%conf, this%type1_spheres, this%type2_spheres)
         
         call this%set_potentials()
                         
@@ -420,6 +424,31 @@ contains
                         this%between_spheres_potential)
         
     end subroutine System_set_potentials
+    
+    subroutine System_Post_Processing_open_all_units_in(this, arg_conf)
+    
+        class(System_Post_Processing), intent(inout) :: this
+        type(Argument_Configurations), intent(in) :: arg_conf
+        
+        character(len=4096) :: filename
+        integer :: length
+        
+        filename = arg_conf%files(1)
+        length = arg_conf%length(1)
+        open(newunit=this%type1_positions_unit, recl=4096, file=filename(1:length), &
+             status='old', action='read')
+             
+        filename = arg_conf%files(2)
+        length = arg_conf%length(2)
+        open(newunit=this%type1_orientations_unit, recl=4096, file=filename(1:length), &
+             status='old', action='read')
+             
+        filename = arg_conf%files(3)
+        length = arg_conf%length(3)
+        open(newunit=this%type2_positions_unit, recl=4096, file=filename(1:length), &
+             status='old', action='read')
+        
+    end subroutine System_Post_Processing_open_all_units_in
     
     subroutine System_Post_Processing_open_all_units(this)
     
@@ -733,6 +762,7 @@ contains
         call this%write_all_results()
         call this%json_destroy_all_values()
         call this%close_units()
+        call this%close_units_in()
 
     end subroutine System_Post_Processing_final
 
@@ -746,6 +776,16 @@ contains
         close(this%report_unit)
 
     end subroutine System_Post_Processing_close_units
+    
+    subroutine System_Post_Processing_close_units_in(this)
+    
+        class(System_Post_Processing), intent(inout) :: this
+        
+        close(this%type2_positions_unit)
+        close(this%type1_orientations_unit)
+        close(this%type1_positions_unit)
+    
+    end subroutine System_Post_Processing_close_units_in
     
     ! Destruction
     
