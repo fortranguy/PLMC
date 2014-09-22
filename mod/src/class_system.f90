@@ -25,7 +25,7 @@ use class_hard_spheres_units, only: Hard_Spheres_Monte_Carlo_Units, &
                                     Dipolar_Hard_Spheres_Monte_Carlo_Units, &
                                     Between_Hard_Spheres_Monte_Carlo_Units, &
                                     Hard_Spheres_Post_Processing_Units
-use module_physics_macro, only: init_random_seed, set_initial_configuration, set_data, &
+use module_physics_macro, only: init_random_seed, set_initial_configuration, &
                                 init_spheres, init_cells, set_ewald, total_energy, final_spheres, &
                                 init_between_spheres_potential, final_between_spheres_potential, &
                                 test_consistency
@@ -387,80 +387,6 @@ contains
     
     ! Initialization
     
-    subroutine System_Post_Processing_init(this, args)
-    
-        class(System_Post_Processing), intent(inout) :: this
-        type(System_Arguments), intent(in) :: args
-        
-        call this%open_all_units_in(args%conf)
-        call this%open_all_units()
-        call this%json_create_all_values()
-
-        this%reset_i_step = 1
-        
-        !call set_data(args%conf, this%type1_spheres, this%type2_spheres)
-        
-        call this%set_potentials()
-                        
-        call set_ewald(this%Box, this%type1_spheres, this%type1_macro, this%data_json)
-        
-    end subroutine System_Post_Processing_init
-    
-    subroutine System_set_potentials(this)
-    
-        class(System), intent(inout) :: this
-        
-        call this%between_spheres_potential%construct(this%data_json, "Between Spheres", &
-                                                      this%between_spheres%get_diameter())
-                                                      
-        call this%type1_macro%hard_potential%construct(this%data_json, "Dipolar Hard Spheres", &
-                                                       this%type1_spheres%get_diameter())
-        call init_cells(this%Box%size, this%type1_spheres, this%type1_macro, this%type2_spheres, &
-                        this%between_spheres_potential)
-        
-        call this%type2_macro%hard_potential%construct(this%data_json, "Hard Spheres", &
-                                                       this%type2_spheres%get_diameter())
-        call init_cells(this%Box%size, this%type2_spheres, this%type2_macro, this%type1_spheres, &
-                        this%between_spheres_potential)
-        
-    end subroutine System_set_potentials
-    
-    subroutine System_Post_Processing_open_all_units_in(this, arg_conf)
-    
-        class(System_Post_Processing), intent(inout) :: this
-        type(Argument_Configurations), intent(in) :: arg_conf
-        
-        character(len=4096) :: filename
-        integer :: length
-        
-        filename = arg_conf%files(1)
-        length = arg_conf%length(1)
-        open(newunit=this%type1_positions_unit, recl=4096, file=filename(1:length), &
-             status='old', action='read')
-             
-        filename = arg_conf%files(2)
-        length = arg_conf%length(2)
-        open(newunit=this%type1_orientations_unit, recl=4096, file=filename(1:length), &
-             status='old', action='read')
-             
-        filename = arg_conf%files(3)
-        length = arg_conf%length(3)
-        open(newunit=this%type2_positions_unit, recl=4096, file=filename(1:length), &
-             status='old', action='read')
-        
-    end subroutine System_Post_Processing_open_all_units_in
-    
-    subroutine System_Post_Processing_open_all_units(this)
-    
-        class(System_Post_Processing), intent(inout) :: this
-
-        open(newunit=this%report_unit, recl=4096, file=report_post_filename, status='new', &
-             action='write')
-        call this%type1_units%open(this%type1_spheres%get_name())
-        call this%type2_units%open(this%type2_spheres%get_name())
-    
-    end subroutine System_Post_Processing_open_all_units
-    
     subroutine System_Monte_Carlo_init(this, args)
      
         class(System_Monte_Carlo), intent(inout) :: this
@@ -631,6 +557,82 @@ contains
         nullify(changes_json)
         
     end subroutine System_Monte_Carlo_write_report
+    
+    subroutine System_Post_Processing_init(this, args)
+    
+        class(System_Post_Processing), intent(inout) :: this
+        type(System_Arguments), intent(in) :: args
+        
+        call this%open_all_units_in(args%conf)
+        call this%open_all_units()
+        call this%json_create_all_values()
+
+        this%reset_i_step = 1
+        
+        call this%type1_spheres%set_data(this%type1_positions_unit)
+        call this%type1_spheres%set_data(this%type1_orientations_unit)
+        call this%type2_spheres%set_data(this%type2_positions_unit)
+        
+        call this%set_potentials()
+                        
+        call set_ewald(this%Box, this%type1_spheres, this%type1_macro, this%data_json)
+        
+    end subroutine System_Post_Processing_init
+    
+    subroutine System_set_potentials(this)
+    
+        class(System), intent(inout) :: this
+        
+        call this%between_spheres_potential%construct(this%data_json, "Between Spheres", &
+                                                      this%between_spheres%get_diameter())
+                                                      
+        call this%type1_macro%hard_potential%construct(this%data_json, "Dipolar Hard Spheres", &
+                                                       this%type1_spheres%get_diameter())
+        call init_cells(this%Box%size, this%type1_spheres, this%type1_macro, this%type2_spheres, &
+                        this%between_spheres_potential)
+        
+        call this%type2_macro%hard_potential%construct(this%data_json, "Hard Spheres", &
+                                                       this%type2_spheres%get_diameter())
+        call init_cells(this%Box%size, this%type2_spheres, this%type2_macro, this%type1_spheres, &
+                        this%between_spheres_potential)
+        
+    end subroutine System_set_potentials
+    
+    subroutine System_Post_Processing_open_all_units_in(this, arg_conf)
+    
+        class(System_Post_Processing), intent(inout) :: this
+        type(Argument_Configurations), intent(in) :: arg_conf
+        
+        character(len=4096) :: filename
+        integer :: length
+        
+        filename = arg_conf%files(1)
+        length = arg_conf%length(1)
+        open(newunit=this%type1_positions_unit, recl=4096, file=filename(1:length), &
+             status='old', action='read')
+             
+        filename = arg_conf%files(2)
+        length = arg_conf%length(2)
+        open(newunit=this%type1_orientations_unit, recl=4096, file=filename(1:length), &
+             status='old', action='read')
+             
+        filename = arg_conf%files(3)
+        length = arg_conf%length(3)
+        open(newunit=this%type2_positions_unit, recl=4096, file=filename(1:length), &
+             status='old', action='read')
+        
+    end subroutine System_Post_Processing_open_all_units_in
+    
+    subroutine System_Post_Processing_open_all_units(this)
+    
+        class(System_Post_Processing), intent(inout) :: this
+
+        open(newunit=this%report_unit, recl=4096, file=report_post_filename, status='new', &
+             action='write')
+        call this%type1_units%open(this%type1_spheres%get_name())
+        call this%type2_units%open(this%type2_spheres%get_name())
+    
+    end subroutine System_Post_Processing_open_all_units
     
     ! Finalisation
     

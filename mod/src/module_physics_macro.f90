@@ -23,7 +23,7 @@ use class_hard_spheres_units, only: Hard_Spheres_Monte_Carlo_Units, &
 
 implicit none
 private
-public init_random_seed, set_initial_configuration, set_data, &
+public init_random_seed, set_initial_configuration, &
        init_spheres, init_cells, &
        set_ewald, &
        total_energy, &
@@ -119,32 +119,6 @@ contains
         end select
         
     end subroutine set_initial_configuration
-    
-    subroutine set_data(arg_conf, dipolar, spherical)
-    
-        type(Argument_Configurations), intent(in) :: arg_conf
-        class(Dipolar_Hard_Spheres), intent(inout) :: dipolar
-        class(Hard_Spheres), intent(inout) :: spherical
-        
-        call set_data_coordinates(arg_conf%files(1), arg_conf%length(1), dipolar)
-        call set_data_coordinates(arg_conf%files(2), arg_conf%length(2), dipolar)
-        call set_data_coordinates(arg_conf%files(3), arg_conf%length(3), spherical)
-        
-    end subroutine set_data
-    
-    subroutine set_data_coordinates(filename, length, spheres)
-    
-        character(len=*), intent(in) :: filename
-        integer, intent(in) :: length
-        class(Hard_Spheres), intent(inout) :: spheres
-    
-        integer :: file_unit
-        
-        open(newunit=file_unit, recl=4096, file=filename(1:length), status='old', action='read')
-        call spheres%set_data(file_unit)
-        close(file_unit)
-    
-    end subroutine set_data_coordinates
 
     !> Random depositions configuration
     
