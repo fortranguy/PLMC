@@ -168,6 +168,7 @@ private
         procedure, private :: close_units => System_Post_Processing_close_units
         
         procedure :: get_first_set => System_Post_Processing_get_first_set
+        procedure :: write_observables => System_Post_Processing_write_observables
         
         procedure :: measure_chemical_potentials => &
                      System_Post_Processing_measure_chemical_potentials
@@ -1004,6 +1005,16 @@ contains
             this%between_spheres_observables%potential_energy
             
     end subroutine System_Monte_Carlo_write_observables_thermalisation
+    
+    subroutine System_Post_Processing_write_observables(this, i_step)
+    
+        class(System_Post_Processing), intent(inout) :: this
+        integer, intent(in) :: i_step
+    
+        call this%type1_observables%write(i_step, this%type1_units%inv_activity)
+        call this%type2_observables%write(i_step, this%type2_units%inv_activity)
+            
+    end subroutine System_Post_Processing_write_observables
     
     subroutine System_Monte_Carlo_fix_changes(this)
     

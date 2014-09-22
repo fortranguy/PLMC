@@ -31,7 +31,7 @@ implicit none
                 if (sys%get_first_set()) call sys%set_first()
                 call sys%measure_chemical_potentials()
                 call sys%accumulate_observables()
-                !call sys%write_observables(i_step)
+                call sys%write_observables(i_step)
                 call sys%reset_quantites(i_step)
             end if
     
