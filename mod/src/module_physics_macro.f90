@@ -24,7 +24,7 @@ use class_hard_spheres_units, only: Hard_Spheres_Monte_Carlo_Units, &
 implicit none
 private
 public init_random_seed, set_initial_configuration, &
-       init_spheres, init_cells, &
+       init_spheres, init_cells, reset_cells, &
        set_ewald, &
        total_energy, &
        final_spheres, init_between_spheres_potential, final_between_spheres_potential, &
@@ -352,6 +352,21 @@ contains
         call this_macro%between_cells%all_particles_to_cells(other_spheres)
 
     end subroutine init_cells
+
+    subroutine reset_cells(this_spheres, this_macro, other_spheres)
+
+        class(Hard_Spheres), intent(in) :: this_spheres, other_spheres
+        class(Hard_Spheres_Macro), intent(inout) :: this_macro
+
+        call this_macro%same_cells%dealloc_nodes()
+        call this_macro%same_cells%alloc_nodes()
+        call this_macro%same_cells%all_particles_to_cells(this_spheres)
+
+        call this_macro%between_cells%dealloc_nodes()
+        call this_macro%same_cells%alloc_nodes()
+        call this_macro%between_cells%all_particles_to_cells(other_spheres)
+
+    end subroutine reset_cells
     
     subroutine set_ewald(Box, this_spheres, this_macro, data_json, this_units)
     

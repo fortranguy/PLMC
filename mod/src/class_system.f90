@@ -26,7 +26,8 @@ use class_hard_spheres_units, only: Hard_Spheres_Monte_Carlo_Units, &
                                     Between_Hard_Spheres_Monte_Carlo_Units, &
                                     Hard_Spheres_Post_Processing_Units
 use module_physics_macro, only: init_random_seed, set_initial_configuration, &
-                                init_spheres, init_cells, set_ewald, total_energy, final_spheres, &
+                                init_spheres, init_cells, reset_cells, &
+                                set_ewald, total_energy, final_spheres, &
                                 init_between_spheres_potential, final_between_spheres_potential, &
                                 test_consistency
 use module_algorithms, only: move, widom, switch, rotate
@@ -1133,6 +1134,8 @@ contains
             if (geometry%slab) then
                 call this%type1_macro%elc%reset_structure(this%Box, this%type1_spheres, i_step)
             end if
+            call reset_cells(this%type1_spheres, this%type1_macro, this%type2_spheres)
+            call reset_cells(this%type2_spheres, this%type2_macro, this%type1_spheres)
         end if
 
     end subroutine System_Post_Processing_reset_potentials
