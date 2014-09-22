@@ -58,7 +58,6 @@ private
         procedure :: set_all_positions => Hard_Spheres_set_all_positions
         
         procedure :: write_report => Hard_Spheres_write_report
-        
         procedure :: write_data => Hard_Spheres_write_data
         procedure :: write_all_positions => Hard_Spheres_write_all_positions
         
