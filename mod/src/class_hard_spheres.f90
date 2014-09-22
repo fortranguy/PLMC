@@ -54,12 +54,13 @@ private
         procedure :: set_position => Hard_Spheres_set_position
         procedure :: set_position_2d => Hard_Spheres_set_position_2d
         procedure :: set_position_z => Hard_Spheres_set_position_z
+        procedure :: set_data => Hard_Spheres_set_data
         procedure :: set_all_positions => Hard_Spheres_set_all_positions
         
         procedure :: write_report => Hard_Spheres_write_report
         
-        procedure :: write_snap_data => Hard_Spheres_write_snap_data
-        procedure :: write_snap_positions => Hard_Spheres_write_snap_positions
+        procedure :: write_data => Hard_Spheres_write_data
+        procedure :: write_all_positions => Hard_Spheres_write_all_positions
         
         procedure :: test_overlap => Hard_Spheres_test_overlap
         
@@ -86,7 +87,7 @@ private
         procedure :: set_orientation => Dipolar_Hard_Spheres_set_orientation
         procedure :: set_all_orientations => Dipolar_Hard_Spheres_set_all_orientations
         
-        procedure :: write_snap_orientations => Dipolar_Hard_Spheres_write_snap_orientations
+        procedure :: write_all_orientations => Dipolar_Hard_Spheres_write_all_orientations
         
     end type Dipolar_Hard_Spheres
     
@@ -441,28 +442,45 @@ contains
         
     end function Between_Hard_Spheres_get_diameter
 
-    subroutine Hard_Spheres_set_all_positions(this, all_positions_unit)
+    subroutine Hard_Spheres_set_data(this, snap_unit)
+
+        class(Hard_Spheres), intent(in) :: this
+        integer, intent(in) :: snap_unit
+
+        character(len=4096) :: name
+        integer :: num_particles
+        integer :: snap_factor
+
+        read(snap_unit, *) name, num_particles, snap_factor
+
+        if (name /= this%name) write(error_unit, *) "Warning: names are different."
+        if (num_particles /= this%num_particles) error stop "Numbers of particles are different."
+        if (snap_factor /= this%snap_factor) error stop "Snap factors are different."
+
+    end subroutine Hard_Spheres_set_data
+
+    subroutine Hard_Spheres_set_all_positions(this, snap_unit)
 
         class(Hard_Spheres), intent(inout) :: this
-        integer, intent(in) :: all_positions_unit
+        integer, intent(in) :: snap_unit
 
         integer :: i_particle
         
         do i_particle = 1, this%num_particles
-            read(all_positions_unit, *) this%all_positions(:, i_particle)
+            read(snap_unit, *) this%all_positions(:, i_particle)
         end do
 
     end subroutine Hard_Spheres_set_all_positions
 
-    subroutine Dipolar_Hard_Spheres_set_all_orientations(this, all_orientations_unit)
+    subroutine Dipolar_Hard_Spheres_set_all_orientations(this, snap_unit)
 
         class(Dipolar_Hard_Spheres), intent(inout) :: this
-        integer, intent(in) :: all_orientations_unit
+        integer, intent(in) :: snap_unit
 
         integer :: i_particle
 
         do i_particle = 1, this%num_particles
-            read(all_orientations_unit, *) this%all_orientations(:, i_particle)
+            read(snap_unit, *) this%all_orientations(:, i_particle)
         end do
 
     end subroutine Dipolar_Hard_Spheres_set_all_orientations
@@ -504,15 +522,16 @@ contains
     
     !> Take a snap shot of the configuration
     
-    subroutine Hard_Spheres_write_snap_data(this, snap_unit)
+    subroutine Hard_Spheres_write_data(this, snap_unit)
+    
         class(Hard_Spheres), intent(in) :: this
         integer, intent(in) :: snap_unit
         
         write(snap_unit, *) this%name, this%num_particles, this%snap_factor
         
-    end subroutine Hard_Spheres_write_snap_data
+    end subroutine Hard_Spheres_write_data
       
-    subroutine Hard_Spheres_write_snap_positions(this, i_step, snap_unit, double_precision)
+    subroutine Hard_Spheres_write_all_positions(this, i_step, snap_unit, double_precision)
         
         class(Hard_Spheres), intent(in) :: this
         integer, intent(in) :: i_step
@@ -536,9 +555,9 @@ contains
             end do
         end if
 
-    end subroutine Hard_Spheres_write_snap_positions
+    end subroutine Hard_Spheres_write_all_positions
     
-    subroutine Dipolar_Hard_Spheres_write_snap_orientations(this, i_step, snap_unit, double_precision)
+    subroutine Dipolar_Hard_Spheres_write_all_orientations(this, i_step, snap_unit, double_precision)
         
         class(Dipolar_Hard_Spheres), intent(in) :: this
         integer, intent(in) :: i_step
@@ -562,7 +581,7 @@ contains
             end do
         end if
 
-    end subroutine Dipolar_Hard_Spheres_write_snap_orientations
+    end subroutine Dipolar_Hard_Spheres_write_all_orientations
     
     !> Do an overlap test
     

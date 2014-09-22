@@ -281,16 +281,16 @@ contains
 
         call check_spheres_in_box(Box, this_spheres)
         call this_spheres%test_overlap(Box%size)
-        call this_spheres%write_snap_data(this_units%snap_equilibrium_positions)
-        call this_spheres%write_snap_positions(0, this_units%snap_initial_positions, &
+        call this_spheres%write_data(this_units%snap_equilibrium_positions)
+        call this_spheres%write_all_positions(0, this_units%snap_initial_positions, &
                                                double_precision=.true.)
         
         select type (this_spheres)
             type is (Dipolar_Hard_Spheres)
                 select type (this_units)
                     type is (Dipolar_Hard_Spheres_Monte_Carlo_Units)
-                        call this_spheres%write_snap_data(this_units%snap_equilibrium_orientations)
-                        call this_spheres%write_snap_orientations(0, &
+                        call this_spheres%write_data(this_units%snap_equilibrium_orientations)
+                        call this_spheres%write_all_orientations(0, &
                              this_units%snap_initial_orientations, double_precision=.true.)
                 end select
         end select
@@ -428,14 +428,14 @@ contains
 
         call check_spheres_in_box(Box, this_spheres)
         call this_spheres%test_overlap(Box%size)
-        call this_spheres%write_snap_positions(0, this_units%snap_final_positions, &
+        call this_spheres%write_all_positions(0, this_units%snap_final_positions, &
                                                double_precision=.true.)
         
         select type (this_spheres)
             type is (Dipolar_Hard_Spheres)
                 select type (this_units)
                     type is (Dipolar_Hard_Spheres_Monte_Carlo_Units)
-                        call this_spheres%write_snap_orientations(0, &
+                        call this_spheres%write_all_orientations(0, &
                              this_units%snap_final_orientations, double_precision=.true.)
                 end select
         end select
