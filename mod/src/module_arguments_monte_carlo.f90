@@ -174,7 +174,7 @@ contains
 
         type(System_Arguments), intent(out) :: args
 
-        character(len=4096) :: argument, sub_argument
+        character(len=4096) :: argument
         integer :: i_arg, length, status
 
         i_arg = 1
@@ -186,9 +186,6 @@ contains
             select case (argument)
             
                 case ("-s", "--snap")
-                    i_arg = i_arg + 1
-                    call get_command_argument(i_arg, sub_argument, length, status)
-                    if (status /= 0) error stop "Enter configurations, cf. help."
                     call read_conf_files(i_arg, args%conf)
 
                 case default
