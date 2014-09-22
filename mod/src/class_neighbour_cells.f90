@@ -34,14 +34,14 @@ private
         procedure :: alloc_cells => Neighbour_Cells_alloc_cells
         procedure :: dealloc_nodes => Neighbour_Cells_dealloc_nodes
         procedure :: dealloc_cells => Neighbour_Cells_dealloc_cells
-        procedure :: check_cellsSize => Neighbour_Cells_check_cellsSize
+        procedure :: check_cells_size => Neighbour_Cells_check_cells_size
         procedure :: index_from_position => Neighbour_Cells_index_from_position
-        procedure :: all_cols_to_cells => Neighbour_Cells_all_cols_to_cells
+        procedure :: all_particles_to_cells => Neighbour_Cells_all_particles_to_cells
 
         procedure :: near_cell_bounds => Neighbour_Cells_near_cell_bounds
         procedure :: point_to_begin => Neighbour_Cells_point_to_begin
-        procedure :: remove_col_from_cell => Neighbour_Cells_remove_col_from_cell
-        procedure :: add_col_to_cell => Neighbour_Cells_add_col_to_cell
+        procedure :: remove_particle_from_cell => Neighbour_Cells_remove_particle_from_cell
+        procedure :: add_particle_to_cell => Neighbour_Cells_add_particle_to_cell
         procedure, private :: init_near_among_total => &
                               Neighbour_Cells_init_near_among_total
         
@@ -63,7 +63,7 @@ contains
         
         allocate(this%near_among_total(num_near_cells, this%num_total_cell))
             
-        call this%check_CellsSize(Box_size, cutoff)
+        call this%check_cells_size(Box_size, cutoff)
         call this%alloc_cells()
         call this%init_near_among_total()
     
@@ -154,7 +154,7 @@ contains
     
     ! Neighbour_Cells cells size check
     
-    subroutine Neighbour_Cells_check_cellsSize(this, Box_size, cutoff)
+    subroutine Neighbour_Cells_check_cells_size(this, Box_size, cutoff)
     
         class(Neighbour_Cells), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
@@ -191,7 +191,7 @@ contains
             
         end do
         
-    end subroutine Neighbour_Cells_check_cellsSize
+    end subroutine Neighbour_Cells_check_cells_size
     
     ! Assignment: particle -> cell
     
@@ -209,7 +209,7 @@ contains
     
     end function Neighbour_Cells_index_from_position
     
-    pure subroutine Neighbour_Cells_all_cols_to_cells(this, num_particles, spheres)
+    pure subroutine Neighbour_Cells_all_particles_to_cells(this, num_particles, spheres)
     
         class(Neighbour_Cells), intent(inout) :: this
         integer, intent(in) :: num_particles
@@ -234,7 +234,7 @@ contains
             this%current_cells(i_cell)%particle%next => null()
         end do
         
-    end subroutine Neighbour_Cells_all_cols_to_cells
+    end subroutine Neighbour_Cells_all_particles_to_cells
 
     pure function Neighbour_Cells_near_cell_bounds(this, i_total_cell) result(near_cell_bounds)
 
@@ -270,7 +270,7 @@ contains
     
     ! Neighbour cells update
     
-    subroutine Neighbour_Cells_remove_col_from_cell(this, i_particle, i_cellOld)
+    subroutine Neighbour_Cells_remove_particle_from_cell(this, i_particle, i_cellOld)
     
         class(Neighbour_Cells), intent(inout) :: this
         integer, intent(in) :: i_particle, i_cellOld
@@ -298,9 +298,9 @@ contains
         
         end do
             
-    end subroutine Neighbour_Cells_remove_col_from_cell
+    end subroutine Neighbour_Cells_remove_particle_from_cell
     
-    subroutine Neighbour_Cells_add_col_to_cell(this, i_particle, i_cellNew)
+    subroutine Neighbour_Cells_add_particle_to_cell(this, i_particle, i_cellNew)
     
         class(Neighbour_Cells), intent(inout) :: this
         integer, intent(in) :: i_particle, i_cellNew
@@ -316,7 +316,7 @@ contains
         previous%next => new
         new%number = i_particle
 
-    end subroutine Neighbour_Cells_add_col_to_cell
+    end subroutine Neighbour_Cells_add_particle_to_cell
     
     ! Neighbour cells initialisation
     

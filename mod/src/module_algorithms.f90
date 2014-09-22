@@ -145,12 +145,12 @@ contains
                     mix_potential_energy = mix_potential_energy + mix_energy_delta
                     
                     if (old%same_i_cell /= new%same_i_cell) then
-                        call this_macro%same_cells%remove_col_from_cell(old%number, old%same_i_cell)
-                        call this_macro%same_cells%add_col_to_cell(new%number, new%same_i_cell)
+                        call this_macro%same_cells%remove_particle_from_cell(old%number, old%same_i_cell)
+                        call this_macro%same_cells%add_particle_to_cell(new%number, new%same_i_cell)
                     end if
                     if (old%between_i_cell /= new%between_i_cell) then
-                        call other_between_cells%remove_col_from_cell(old%number, old%between_i_cell)
-                        call other_between_cells%add_col_to_cell(new%number, new%between_i_cell)
+                        call other_between_cells%remove_particle_from_cell(old%number, old%between_i_cell)
+                        call other_between_cells%add_particle_to_cell(new%number, new%between_i_cell)
                     end if
                     
                 else
@@ -501,12 +501,12 @@ contains
         end select
         
         if (old%same_i_cell /= new%same_i_cell) then
-            call this_macro%same_cells%remove_col_from_cell(old%number, old%same_i_cell)
-            call this_macro%same_cells%add_col_to_cell(new%number, new%same_i_cell)
+            call this_macro%same_cells%remove_particle_from_cell(old%number, old%same_i_cell)
+            call this_macro%same_cells%add_particle_to_cell(new%number, new%same_i_cell)
         end if
         if (old%between_i_cell /= new%between_i_cell) then
-            call other_between_cells%remove_col_from_cell(old%number, old%between_i_cell)
-            call other_between_cells%add_col_to_cell(new%number, new%between_i_cell)
+            call other_between_cells%remove_particle_from_cell(old%number, old%between_i_cell)
+            call other_between_cells%add_particle_to_cell(new%number, new%between_i_cell)
         end if
         
     end subroutine after_switch_update
