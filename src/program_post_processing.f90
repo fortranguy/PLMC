@@ -5,7 +5,7 @@ program monte_post_processing
 use, intrinsic :: iso_fortran_env, only: output_unit
 use module_types_micro, only: System_Arguments
 use class_system, only: System_Post_Processing
-use module_arguments_monte_carlo, only: read_arguments_post
+use module_arguments_system, only: read_arguments_post
 
 implicit none
     

@@ -1,6 +1,6 @@
 !> \brief Subroutines for the main program
 
-module module_arguments_monte_carlo
+module module_arguments_system
 
 use, intrinsic :: iso_fortran_env, only: output_unit, error_unit
 use module_types_micro, only: Argument_Random, Argument_Configurations, System_Arguments
@@ -203,4 +203,4 @@ contains
 
     end subroutine read_arguments_post
 
-end module module_arguments_monte_carlo
+end module module_arguments_system

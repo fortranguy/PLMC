@@ -5,7 +5,7 @@ program monte_carlo_canonical
 use, intrinsic :: iso_fortran_env, only: output_unit
 use module_types_micro, only: System_Arguments
 use class_system, only: System_Monte_Carlo
-use module_arguments_monte_carlo, only: read_arguments_mc
+use module_arguments_system, only: read_arguments_mc
 
 implicit none
     
