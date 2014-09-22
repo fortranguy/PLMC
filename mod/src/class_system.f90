@@ -510,6 +510,25 @@ contains
         
     end subroutine System_json_create_all_values
     
+    subroutine System_set_potentials(this)
+    
+        class(System), intent(inout) :: this
+        
+        call this%between_spheres_potential%construct(this%data_json, "Between Spheres", &
+                                                      this%between_spheres%get_diameter())
+                                                      
+        call this%type1_macro%hard_potential%construct(this%data_json, "Dipolar Hard Spheres", &
+                                                       this%type1_spheres%get_diameter())
+        call init_cells(this%Box%size, this%type1_spheres, this%type1_macro, this%type2_spheres, &
+                        this%between_spheres_potential)
+        
+        call this%type2_macro%hard_potential%construct(this%data_json, "Hard Spheres", &
+                                                       this%type2_spheres%get_diameter())
+        call init_cells(this%Box%size, this%type2_spheres, this%type2_macro, this%type1_spheres, &
+                        this%between_spheres_potential)
+        
+    end subroutine System_set_potentials
+    
     subroutine System_Monte_Carlo_write_all_reports(this, geometry)
     
         class(System_Monte_Carlo), intent(in) :: this
@@ -578,25 +597,6 @@ contains
         call set_ewald(this%Box, this%type1_spheres, this%type1_macro, this%data_json)
         
     end subroutine System_Post_Processing_init
-    
-    subroutine System_set_potentials(this)
-    
-        class(System), intent(inout) :: this
-        
-        call this%between_spheres_potential%construct(this%data_json, "Between Spheres", &
-                                                      this%between_spheres%get_diameter())
-                                                      
-        call this%type1_macro%hard_potential%construct(this%data_json, "Dipolar Hard Spheres", &
-                                                       this%type1_spheres%get_diameter())
-        call init_cells(this%Box%size, this%type1_spheres, this%type1_macro, this%type2_spheres, &
-                        this%between_spheres_potential)
-        
-        call this%type2_macro%hard_potential%construct(this%data_json, "Hard Spheres", &
-                                                       this%type2_spheres%get_diameter())
-        call init_cells(this%Box%size, this%type2_spheres, this%type2_macro, this%type1_spheres, &
-                        this%between_spheres_potential)
-        
-    end subroutine System_set_potentials
     
     subroutine System_Post_Processing_open_all_units_in(this, arg_conf)
     
