@@ -157,6 +157,7 @@ private
         procedure :: init => System_Post_Processing_init
         procedure, private :: open_all_units_in => System_Post_Processing_open_all_units_in
         procedure, private :: open_all_units => System_Post_Processing_open_all_units
+        procedure, private :: set_coordinates => System_Post_Processing_set_coordinates
         procedure :: final => System_Post_Processing_final
         procedure, private :: write_all_results => System_Post_Processing_write_all_results
         procedure, private :: close_units_in => System_Post_Processing_close_units_in
@@ -592,8 +593,8 @@ contains
         call this%type1_spheres%set_data(this%type1_orientations_unit)
         call this%type2_spheres%set_data(this%type2_positions_unit)
         
-        call this%set_potentials()
-                        
+        call this%set_coordinates()        
+        call this%set_potentials()                        
         call set_ewald(this%Box, this%type1_spheres, this%type1_macro, this%data_json)
         
     end subroutine System_Post_Processing_init
@@ -633,6 +634,16 @@ contains
         call this%type2_units%open(this%type2_spheres%get_name())
     
     end subroutine System_Post_Processing_open_all_units
+    
+    subroutine System_Post_Processing_set_coordinates(this)
+    
+        class(System_Post_Processing), intent(inout) :: this
+        
+        call this%type1_spheres%set_all_positions(this%type1_positions_unit)
+        call this%type1_spheres%set_all_orientations(this%type1_orientations_unit)
+        call this%type2_spheres%set_all_positions(this%type2_positions_unit)
+    
+    end subroutine System_Post_Processing_set_coordinates
     
     ! Finalisation
     
