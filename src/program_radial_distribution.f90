@@ -18,7 +18,7 @@ use module_arguments, only: arg_to_file
 implicit none
 
     logical :: take_snapshot
-    real(DP), dimension(:), allocatable :: Box_size    
+    real(DP), dimension(:), allocatable :: Box_size
 
     character(len=4096) :: name
     integer :: num_particles
@@ -96,7 +96,7 @@ implicit none
     open(newunit=positions_unit, recl=4096, file=filename(1:length), status='old', action='read')
     
     read(positions_unit, *) name, num_particles, snap_factor
-    write(output_unit, *) trim(name), num_particles, snap_factor    
+    write(output_unit, *) trim(name), num_particles, snap_factor
     
     allocate(positions(num_dimensions, num_particles))
     density = real(num_particles, DP) / product(Box_size)
@@ -105,7 +105,7 @@ implicit none
     call cpu_time(time_start)
     distribution_function(:) = 0._DP
     num_steps = 0
-    do i_step = num_thermalisation_steps + 1, num_thermalisation_steps + num_equilibrium_steps    
+    do i_step = num_thermalisation_steps + 1, num_thermalisation_steps + num_equilibrium_steps
         if (modulo(i_step, snap_factor) == 0) then
         
             num_steps = num_steps + 1

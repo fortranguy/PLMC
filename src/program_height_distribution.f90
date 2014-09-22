@@ -2,7 +2,7 @@
 
 !> 1. Density profile:
 !> \f[
-!>      \rho(z) = \frac{\langle N(z) \rangle \sigma^3}{S\delta z}  
+!>      \rho(z) = \frac{\langle N(z) \rangle \sigma^3}{S\delta z}
 !> \f]
 
 !> 2. Average orientation: different than II.40 ?
@@ -38,7 +38,7 @@ implicit none
 
     logical :: take_snapshot
     character(len=:), allocatable :: Box_geometry
-    real(DP), dimension(:), allocatable :: Box_size    
+    real(DP), dimension(:), allocatable :: Box_size
     real(DP) :: Box_height
 
     character(len=4096) :: positions_name, orientations_name
@@ -164,7 +164,7 @@ implicit none
     call cpu_time(time_start)
     distribution_function(:, :) = 0._DP
     num_steps = 0
-    do i_step = num_thermalisation_steps + 1, num_thermalisation_steps + num_equilibrium_steps    
+    do i_step = num_thermalisation_steps + 1, num_thermalisation_steps + num_equilibrium_steps
         if (modulo(i_step, positions_snap_factor) == 0) then
         
             num_steps = num_steps + 1
@@ -230,7 +230,7 @@ implicit none
     
     if (with_orientations) then
         close(orientations_unit)
-        deallocate(orientations)    
+        deallocate(orientations)
     end if
 
     close(positions_unit)

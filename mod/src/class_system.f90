@@ -675,7 +675,7 @@ contains
                                                                      this%type1_spheres, &
                                                                      this%type2_spheres)
         
-        call test_consistency(potential_energy, potential_energy_conf, this%report_json)        
+        call test_consistency(potential_energy, potential_energy_conf, this%report_json)
         this%potential_energy_sum = this%type1_observables%potential_energy_sum + &
                                     this%type2_observables%potential_energy_sum + &
                                     this%between_spheres_observables%potential_energy_sum
@@ -720,7 +720,7 @@ contains
         call this%between_spheres_units%close()
         
         close(this%observables_thermalisation_unit)
-        close(this%observables_equilibrium_unit)        
+        close(this%observables_equilibrium_unit)
 
         close(this%report_unit)
     
@@ -956,7 +956,7 @@ contains
     
         call this%type1_observables%accumulate()
         call this%type2_observables%accumulate()
-        call this%between_spheres_observables%accumulate()        
+        call this%between_spheres_observables%accumulate()
         this%switch_observable%sum_rejection = this%switch_observable%sum_rejection + &
                                                this%switch_observable%rejection_rate
             

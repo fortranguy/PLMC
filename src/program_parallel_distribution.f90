@@ -43,7 +43,7 @@ implicit none
     real(DP), dimension(:), allocatable :: distribution_function
     real(DP), dimension(:, :), allocatable :: positions
     real(DP) :: height_delta
-    real(DP) :: height_ratio, height, z_min, z_max    
+    real(DP) :: height_ratio, height, z_min, z_max
     
     type(json_file) :: data_json, report_json
     character(len=4096) :: data_name
@@ -104,7 +104,7 @@ implicit none
     
     data_name = "Distribution.Parallel.height delta"
     call data_json%get(data_name, height_delta, found)
-    call test_data_found(data_name, found)    
+    call test_data_found(data_name, found)
     
     call data_json%destroy()
     
@@ -147,7 +147,7 @@ implicit none
     num_particles_inside_sum = 0
     distribution_function(:) = 0._DP
     num_steps = 0
-    do i_step = num_thermalisation_steps + 1, num_thermalisation_steps + num_equilibrium_steps    
+    do i_step = num_thermalisation_steps + 1, num_thermalisation_steps + num_equilibrium_steps
         if (modulo(i_step, snap_factor) == 0) then
         
             num_steps = num_steps + 1
@@ -165,7 +165,7 @@ implicit none
                     do j_particle = i_particle + 1, num_particles
                         if (z_min < positions(3, j_particle) .and. positions(3, j_particle) < z_max) then
                             vector_ij = PBC_vector(Box_size, positions(:, i_particle), &
-                                                             positions(:, j_particle)) 
+                                                             positions(:, j_particle))
                             i_distribution =  int(norm2(vector_ij(1:2)) / delta)
                             distribution_step(i_distribution) = distribution_step(i_distribution) + 1._DP
                         end if

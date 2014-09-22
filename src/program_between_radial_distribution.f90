@@ -25,11 +25,11 @@ implicit none
     integer :: type1_num_particles, type2_num_particles
     integer :: type1_snap_factor, type2_snap_factor
     real(DP) :: type1_density, type2_density
-    integer :: type1_positions_unit, type2_positions_unit 
+    integer :: type1_positions_unit, type2_positions_unit
     
     integer :: num_distribution, i_distribution
     integer :: num_thermalisation_steps
-    integer :: num_equilibrium_steps, i_step, num_common_steps    
+    integer :: num_equilibrium_steps, i_step, num_common_steps
     integer :: type1_i_particle, type2_i_particle
     real(DP) :: distance_12, distance_max, delta
     real(DP) :: distance_i, distance_minus, distance_plus
@@ -94,14 +94,14 @@ implicit none
     allocate(distribution_function(num_distribution))
     
     call arg_to_file(1, filename, length)
-    open(newunit=type1_positions_unit, recl=4096, file=filename(1:length), status='old', action='read')    
+    open(newunit=type1_positions_unit, recl=4096, file=filename(1:length), status='old', action='read')
     read(type1_positions_unit, *) type1_name, type1_num_particles, type1_snap_factor
     write(output_unit, *) "type 1: ", trim(type1_name), type1_num_particles, type1_snap_factor
     allocate(type1_positions(num_dimensions, type1_num_particles))
     type1_density = type1_num_particles / product(Box_size)
     
     call arg_to_file(2, filename, length)
-    open(newunit=type2_positions_unit, recl=4096, file=filename(1:length), status='old', action='read')    
+    open(newunit=type2_positions_unit, recl=4096, file=filename(1:length), status='old', action='read')
     read(type2_positions_unit, *) type2_name, type2_num_particles, type2_snap_factor
     write(output_unit, *) "type 2: ", trim(type2_name), type2_num_particles, type2_snap_factor
     allocate(type2_positions(num_dimensions, type2_num_particles))
@@ -113,30 +113,30 @@ implicit none
     num_common_steps = 0
     do i_step = num_thermalisation_steps + 1, num_thermalisation_steps + num_equilibrium_steps
         
-        if (modulo(i_step, type1_snap_factor) == 0) then        
+        if (modulo(i_step, type1_snap_factor) == 0) then
             do type1_i_particle = 1, type1_num_particles
                 read(type1_positions_unit, *) type1_positions(:, type1_i_particle)
             end do
         end if
         
-        if (modulo(i_step, type2_snap_factor) == 0) then  
+        if (modulo(i_step, type2_snap_factor) == 0) then
             do type2_i_particle = 1, type2_num_particles
                 read(type2_positions_unit, *) type2_positions(:, type2_i_particle)
             end do
         end if
         
-        if (modulo(i_step, type1_snap_factor) == 0 .and. modulo(i_step, type2_snap_factor) == 0) then        
+        if (modulo(i_step, type1_snap_factor) == 0 .and. modulo(i_step, type2_snap_factor) == 0) then
             num_common_steps = num_common_steps + 1
-            distribution_step(:) = 0._DP        
-            do type1_i_particle = 1, type1_num_particles        
-                do type2_i_particle = 1, type2_num_particles                
+            distribution_step(:) = 0._DP
+            do type1_i_particle = 1, type1_num_particles
+                do type2_i_particle = 1, type2_num_particles
                     distance_12 = PBC_distance(Box_size, &
                                                type1_positions(:, type1_i_particle), &
                                                type2_positions(:, type2_i_particle))
                     i_distribution = int(distance_12/delta)
                     distribution_step(i_distribution) = distribution_step(i_distribution) + 1._DP
-                end do            
-            end do            
+                end do
+            end do
             distribution_function(:) = distribution_function(:) + distribution_step(:)
         end if
     
@@ -144,10 +144,10 @@ implicit none
     call cpu_time(time_end)
     write(output_unit, *) "Finish !"
     
-    deallocate(type2_positions) 
-    close(type2_positions_unit)   
+    deallocate(type2_positions)
+    close(type2_positions_unit)
     
-    deallocate(type1_positions) 
+    deallocate(type1_positions)
     close(type1_positions_unit)
     
     open(newunit=distrib_unit, file=trim(type1_name)//"-"//trim(type2_name)//"_radial_distribution_function.out", &

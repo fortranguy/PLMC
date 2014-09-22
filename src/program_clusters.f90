@@ -92,8 +92,8 @@ implicit none
     
     call data_json%destroy()
 
-    call arg_to_file(1, file, length)    
-    open(newunit=positions_unit, recl=4096, file=file(1:length), status='old', action='read')    
+    call arg_to_file(1, file, length)
+    open(newunit=positions_unit, recl=4096, file=file(1:length), status='old', action='read')
     read(positions_unit, *) name, num_particles, snap_factor
     write(output_unit, *) trim(name), num_particles, snap_factor
     allocate(all_positions(num_dimensions, num_particles))

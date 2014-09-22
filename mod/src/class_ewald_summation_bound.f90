@@ -193,7 +193,7 @@ contains
     !>                                         (\vec{\mu}_{N+1} \cdot \vec{\mu}_{N+1})
     !>                                          +2(\vec{\mu} \cdot \vec{M}_N)
     !>                                     ]
-    !> \f]    
+    !> \f]
     !> Difference of Energy: remove
     !> \f[
     !>      \Delta U_{N \rightarrow N-1} = \frac{2\pi}{3V} [

@@ -166,7 +166,7 @@ contains
 
         end do
         
-        if (.not. geometry_defined) error stop "Error: geometry is not defined." 
+        if (.not. geometry_defined) error stop "Error: geometry is not defined."
 
     end subroutine read_arguments_mc
 

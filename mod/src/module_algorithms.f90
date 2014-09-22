@@ -469,7 +469,7 @@ contains
                                 if (geometry%slab) then
                                     energy_new%same = energy_new%same - &
                                                       this_macro%elc%move_energy(Box, old, new)
-                                end if 
+                                end if
                         end select
                                        
                 end select

@@ -270,7 +270,7 @@ contains
     !> Field
     !> \f[
     !>      \vec{E}(\vec{r}_i) = \sum_j T_{ij} |\vec{\mu}_j)
-    !> \f]    
+    !> \f]
 
     pure function Ewald_Summation_Reci_solo_field(this, Box, this_spheres, particle) result(solo_field)
 

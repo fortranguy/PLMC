@@ -6,7 +6,7 @@
 extern "C" {
 
     void find_connected_components(const int &num_vertices, const int edges_array[][2],
-                                   const int &num_edges, int components_size[], 
+                                   const int &num_edges, int components_size[],
                                    int &num_components) {
                                    
         typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS> Graph;

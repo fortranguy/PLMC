@@ -37,7 +37,7 @@ contains
 
     subroutine Discrete_Observables_update_rejection(this)
     
-        class(Discrete_Observables), intent(inout) :: this    
+        class(Discrete_Observables), intent(inout) :: this
 
         this%rejection_rate = real(this%num_rejections, DP) / real(this%num_hits, DP)
         this%num_rejections = 0
@@ -47,7 +47,7 @@ contains
     
     subroutine Adapting_Discrete_Observables_accumulate_rejection(this)
     
-        class(Adapting_Discrete_Observables), intent(inout) :: this   
+        class(Adapting_Discrete_Observables), intent(inout) :: this
     
         this%rejection_adapt = this%rejection_adapt + this%rejection_rate
         

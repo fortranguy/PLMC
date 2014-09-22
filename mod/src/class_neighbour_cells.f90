@@ -33,7 +33,7 @@ private
         procedure :: alloc_nodes => Neighbour_Cells_alloc_nodes
         procedure :: alloc_cells => Neighbour_Cells_alloc_cells
         procedure :: dealloc_nodes => Neighbour_Cells_dealloc_nodes
-        procedure :: dealloc_cells => Neighbour_Cells_dealloc_cells        
+        procedure :: dealloc_cells => Neighbour_Cells_dealloc_cells
         procedure :: check_cellsSize => Neighbour_Cells_check_cellsSize
         procedure :: index_from_position => Neighbour_Cells_index_from_position
         procedure :: all_cols_to_cells => Neighbour_Cells_all_cols_to_cells
@@ -251,7 +251,7 @@ contains
             else if ((this%num_total_cell-i_total_cell) < this%num_total_cell_layer) then
                 near_cell_bounds(2) = (2) * num_near_cells_layer
             end if
-        end if     
+        end if
 
     end function Neighbour_Cells_near_cell_bounds
     
@@ -263,7 +263,7 @@ contains
         
         integer :: i_cell
                 
-        i_cell = this%near_among_total(i_near_cell, i_total_cell)        
+        i_cell = this%near_among_total(i_near_cell, i_total_cell)
         current => this%begin_cells(i_cell)%particle%next
         
     end subroutine Neighbour_Cells_point_to_begin

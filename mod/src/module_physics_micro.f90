@@ -167,7 +167,7 @@ contains
     end subroutine markov_surface
 
     !> \f[
-    !>      \frac{(\vec{\mu}_i\cdot\vec{\mu_j})}{r^3} - 
+    !>      \frac{(\vec{\mu}_i\cdot\vec{\mu_j})}{r^3} -
     !>     3\frac{(\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij})}{r^5}
     !> \f]
     
@@ -179,7 +179,7 @@ contains
         
         real(DP) :: distance_ij
         
-        distance_ij = norm2(vector_ij)        
+        distance_ij = norm2(vector_ij)
         dipolar_pair_energy = dot_product(orientation_i, orientation_j) / distance_ij**3 - &
                               3._DP * dot_product(orientation_i, vector_ij) * &
                                       dot_product(orientation_j, vector_ij) / distance_ij**5

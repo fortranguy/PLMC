@@ -155,7 +155,7 @@ contains
     subroutine Between_Hard_Spheres_Monte_Carlo_Observables_write_results(this, num_equilibrium_steps, &
                                                                           report_json)
                                           
-        class(Between_Hard_Spheres_Monte_Carlo_Observables), intent(inout) :: this  
+        class(Between_Hard_Spheres_Monte_Carlo_Observables), intent(inout) :: this
         integer, intent(in) :: num_equilibrium_steps
         type(json_value), pointer, intent(in) :: report_json
 

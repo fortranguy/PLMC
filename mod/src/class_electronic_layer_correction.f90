@@ -66,7 +66,7 @@ contains
                                 
         if (allocated(this%structure_plus)) deallocate(this%structure_plus)
         allocate(this%structure_plus(-Box%wave(1):Box%wave(1), &
-                                     -Box%wave(2):Box%wave(2)))                                     
+                                     -Box%wave(2):Box%wave(2)))
         if (allocated(this%structure_minus)) deallocate(this%structure_minus)
         allocate(this%structure_minus(-Box%wave(1):Box%wave(1), &
                                       -Box%wave(2):Box%wave(2)))
@@ -308,7 +308,7 @@ contains
     !> Field
     !> \f[
     !>      \vec{E}(\vec{r}_i) = \sum_j T_{ij} |\vec{\mu}_j)
-    !> \f]    
+    !> \f]
 
     pure function Electronic_Layer_Correction_solo_field(this, Box, this_spheres, particle)&
                   result(solo_field)
@@ -343,7 +343,7 @@ contains
     !>                      [
     !>                          |\vec{K}_+) e^{\vec{K}_+ \cdot \vec{r}_i}
     !>                          e^{\vec{K}_-^* \cdot \vec{r}_j} (\vec{K}_-^*| +
-    !>                          |\vec{K}_-) e^{\vec{K}_- \cdot \vec{r}_i} 
+    !>                          |\vec{K}_-) e^{\vec{K}_- \cdot \vec{r}_i}
     !>                          e^{\vec{K_+^*} \cdot \vec{r}_j} (\vec{K_+^*}|
     !>                      ]
     !> \f]

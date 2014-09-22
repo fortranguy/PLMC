@@ -139,7 +139,7 @@ contains
                 particule_number = particle%number
             type is (Between_Hard_Spheres_Potential_Energy)
                 i_total_cell = particle%between_i_cell
-                particule_number = particle%other_number                
+                particule_number = particle%other_number
         end select
 
         near_cell_bounds(:) = this_cells%near_cell_bounds(i_total_cell)

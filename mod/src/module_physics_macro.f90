@@ -169,7 +169,7 @@ contains
                 call spheres1%set_position_2d(i_particle, random_vector(1:2)*Box%size(1:2))
                 position_z = (Box%height - spheres1%get_diameter()) * random_vector(3) + &
                              spheres1%get_diameter()/2._DP
-                call spheres1%set_position_z(i_particle, position_z)                                            
+                call spheres1%set_position_z(i_particle, position_z)
             end if
             
             position(:) = spheres1%get_position(i_particle)
@@ -439,7 +439,7 @@ contains
                         if (geometry%slab) then
                             total_energy = total_energy - this_macro%elc%total_energy(Box)
                         end if
-                end select                    
+                end select
         end select
         
     end function total_energy
