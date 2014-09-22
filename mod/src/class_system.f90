@@ -140,7 +140,7 @@ private
         procedure :: accumulate_observables => System_Monte_Carlo_accumulate_observables
         procedure :: write_observables_equilibrium => System_Monte_Carlo_write_observables_equilibrium
         procedure :: take_snapshots => System_Monte_Carlo_take_snapshots
-        procedure :: reset_quantites => System_Monte_Carlo_reset_quantites
+        procedure :: reset_potentials => System_Monte_Carlo_reset_potentials
     
     end type System_Monte_Carlo
     
@@ -173,7 +173,7 @@ private
         procedure :: measure_chemical_potentials => &
                      System_Post_Processing_measure_chemical_potentials
         procedure :: accumulate_observables => System_Post_Processing_accumulate_observables
-        procedure :: reset_quantites => System_Post_Processing_reset_quantites
+        procedure :: reset_potentials => System_Post_Processing_reset_potentials
         
     end type System_Post_Processing
     
@@ -1104,7 +1104,7 @@ contains
     end subroutine System_Monte_Carlo_take_snapshots
     
     !> Reset summed quantities to prevent them from drifting.
-    subroutine System_Monte_Carlo_reset_quantites(this, i_step)
+    subroutine System_Monte_Carlo_reset_potentials(this, i_step)
     
         class(System_Monte_Carlo), intent(inout) :: this
         integer, intent(in) :: i_step
@@ -1120,9 +1120,9 @@ contains
             end if
         end if
         
-    end subroutine System_Monte_Carlo_reset_quantites
+    end subroutine System_Monte_Carlo_reset_potentials
 
-    subroutine System_Post_Processing_reset_quantites(this, i_step)
+    subroutine System_Post_Processing_reset_potentials(this, i_step)
 
         class(System_Post_Processing), intent(inout) :: this
         integer, intent(in) :: i_step
@@ -1135,6 +1135,6 @@ contains
             end if
         end if
 
-    end subroutine System_Post_Processing_reset_quantites
+    end subroutine System_Post_Processing_reset_potentials
 
 end module class_system

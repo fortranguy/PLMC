@@ -32,7 +32,7 @@ implicit none
                 call sys%measure_chemical_potentials()
                 call sys%accumulate_observables()
                 call sys%write_observables(i_step)
-                call sys%reset_quantites(i_step)
+                call sys%reset_potentials(i_step)
             end if
     
     end do MC_Cycle

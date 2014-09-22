@@ -44,7 +44,7 @@ implicit none
             
         end if MC_Regime
         
-        call sys%reset_quantites(i_step)
+        call sys%reset_potentials(i_step)
     
     end do MC_Cycle
     call sys%set_time_end()
