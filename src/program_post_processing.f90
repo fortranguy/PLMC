@@ -13,6 +13,7 @@ implicit none
     type(System_Arguments) :: args
     
     integer :: i_step
+    logical :: coordinates_set
 
     call read_arguments_post(args)
     call sys%construct(args)
@@ -23,11 +24,16 @@ implicit none
     call sys%set_time_start()
     MC_Cycle: do i_step = sys%get_num_thermalisation_steps() + 1, &
                           sys%get_num_thermalisation_steps() + sys%get_num_equilibrium_steps()
-
-            call sys%measure_chemical_potentials()
-            call sys%accumulate_observables()
-            !call sys%write_observables(i_step)
-            call sys%reset_quantites(i_step)
+                          
+            call sys%set_coordinates(i_step, coordinates_set)
+            
+            if (coordinates_set) then
+                if (sys%get_first_set()) call sys%set_first()
+                call sys%measure_chemical_potentials()
+                call sys%accumulate_observables()
+                !call sys%write_observables(i_step)
+                call sys%reset_quantites(i_step)
+            end if
     
     end do MC_Cycle
     call sys%set_time_end()

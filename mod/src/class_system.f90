@@ -146,22 +146,29 @@ private
     
     type, extends(System), public :: System_Post_Processing
     
+        private
+    
         type(json_file) :: data_report_json
         type(Hard_Spheres_Post_Processing_Observables) :: type1_observables, type2_observables
         type(Hard_Spheres_Post_Processing_Units) :: type1_units, type2_units
         integer :: type1_positions_unit, type1_orientations_unit, type2_positions_unit
+        logical :: first_set
         
     contains
     
         !> Initialization & Finalisation
         procedure :: init => System_Post_Processing_init
+        procedure :: set_first => System_Post_Processing_set_first
         procedure, private :: open_all_units_in => System_Post_Processing_open_all_units_in
         procedure, private :: open_all_units => System_Post_Processing_open_all_units
-        procedure, private :: set_coordinates => System_Post_Processing_set_coordinates
+        procedure :: set_coordinates => System_Post_Processing_set_coordinates
         procedure :: final => System_Post_Processing_final
         procedure, private :: write_all_results => System_Post_Processing_write_all_results
         procedure, private :: close_units_in => System_Post_Processing_close_units_in
         procedure, private :: close_units => System_Post_Processing_close_units
+        
+        procedure :: get_first_set => System_Post_Processing_get_first_set
+        
         procedure :: measure_chemical_potentials => &
                      System_Post_Processing_measure_chemical_potentials
         procedure :: accumulate_observables => System_Post_Processing_accumulate_observables
@@ -201,7 +208,7 @@ contains
                 call this%data_report_json%get(data_name, Box_geometry, found)
                 call test_data_found(data_name, found)
                 call set_geometry(Box_geometry)
-                if (allocated(Box_geometry)) deallocate(Box_geometry)
+                if (allocated(Box_geometry)) deallocate(Box_geometry)               
                 
         end select
         
@@ -586,18 +593,27 @@ contains
         call this%open_all_units_in(args%conf)
         call this%open_all_units()
         call this%json_create_all_values()
-
+        
         this%reset_i_step = 1
         
         call this%type1_spheres%set_data(this%type1_positions_unit)
         call this%type1_spheres%set_data(this%type1_orientations_unit)
         call this%type2_spheres%set_data(this%type2_positions_unit)
         
-        call this%set_coordinates()        
+        this%first_set = .true.
+        
+    end subroutine System_Post_Processing_init
+    
+    subroutine System_Post_Processing_set_first(this)
+    
+        class(System_Post_Processing), intent(inout) :: this
+        
         call this%set_potentials()                        
         call set_ewald(this%Box, this%type1_spheres, this%type1_macro, this%data_json)
         
-    end subroutine System_Post_Processing_init
+        this%first_set = .false.
+        
+    end subroutine System_Post_Processing_set_first
     
     subroutine System_Post_Processing_open_all_units_in(this, arg_conf)
     
@@ -635,13 +651,23 @@ contains
     
     end subroutine System_Post_Processing_open_all_units
     
-    subroutine System_Post_Processing_set_coordinates(this)
+    subroutine System_Post_Processing_set_coordinates(this, i_step, coordinates_set)
     
         class(System_Post_Processing), intent(inout) :: this
+        integer, intent(in) :: i_step
+        logical :: coordinates_set
         
-        call this%type1_spheres%set_all_positions(this%type1_positions_unit)
-        call this%type1_spheres%set_all_orientations(this%type1_orientations_unit)
-        call this%type2_spheres%set_all_positions(this%type2_positions_unit)
+        logical :: type1_positions_set, type1_orientations_set
+        logical :: type2_positions_set
+        
+        call this%type1_spheres%set_all_positions(this%type1_positions_unit, i_step, &
+                                                  type1_positions_set)
+        call this%type1_spheres%set_all_orientations(this%type1_orientations_unit, i_step, &
+                                                     type1_orientations_set)
+        call this%type2_spheres%set_all_positions(this%type2_positions_unit, i_step, &
+                                                  type2_positions_set)
+                                                  
+        coordinates_set = type1_positions_set .and. type1_orientations_set .and. type2_positions_set
     
     end subroutine System_Post_Processing_set_coordinates
     
@@ -799,6 +825,15 @@ contains
         close(this%type1_positions_unit)
     
     end subroutine System_Post_Processing_close_units_in
+    
+    pure function System_Post_Processing_get_first_set(this) result(get_first_set)
+    
+        class(System_Post_Processing), intent(in) :: this
+        logical :: get_first_set
+        
+        get_first_set = this%first_set
+    
+    end function System_Post_Processing_get_first_set
     
     ! Destruction
     

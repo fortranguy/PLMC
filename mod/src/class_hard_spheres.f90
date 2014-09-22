@@ -458,29 +458,41 @@ contains
 
     end subroutine Hard_Spheres_set_data
 
-    subroutine Hard_Spheres_set_all_positions(this, snap_unit)
+    subroutine Hard_Spheres_set_all_positions(this, i_step, snap_unit, positions_set)
 
         class(Hard_Spheres), intent(inout) :: this
-        integer, intent(in) :: snap_unit
+        integer, intent(in) :: i_step
+        integer, intent(in) :: snap_unit        
+        logical, intent(out) :: positions_set
 
         integer :: i_particle
         
-        do i_particle = 1, this%num_particles
-            read(snap_unit, *) this%all_positions(:, i_particle)
-        end do
+        positions_set = .false.
+        if (modulo(i_step, this%snap_factor) == 0) then
+            do i_particle = 1, this%num_particles
+                read(snap_unit, *) this%all_positions(:, i_particle)
+            end do      
+            positions_set = .true.      
+        end if
 
     end subroutine Hard_Spheres_set_all_positions
 
-    subroutine Dipolar_Hard_Spheres_set_all_orientations(this, snap_unit)
+    subroutine Dipolar_Hard_Spheres_set_all_orientations(this, i_step, snap_unit, orientations_set)
 
         class(Dipolar_Hard_Spheres), intent(inout) :: this
+        integer, intent(in) :: i_step
         integer, intent(in) :: snap_unit
+        logical, intent(out) :: orientations_set
 
         integer :: i_particle
-
-        do i_particle = 1, this%num_particles
-            read(snap_unit, *) this%all_orientations(:, i_particle)
-        end do
+        
+        orientations_set = .false.
+        if (modulo(i_step, this%snap_factor) == 0) then
+            do i_particle = 1, this%num_particles
+                read(snap_unit, *) this%all_orientations(:, i_particle)
+            end do
+            orientations_set = .true.
+        end if
 
     end subroutine Dipolar_Hard_Spheres_set_all_orientations
     
