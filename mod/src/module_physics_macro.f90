@@ -344,13 +344,12 @@ contains
         same_cell_size(:) = this_macro%hard_potential%get_cutoff()
         call this_macro%same_cells%construct(Box_size, same_cell_size, &
                                              this_macro%hard_potential%get_cutoff())
-        call this_macro%same_cells%all_particles_to_cells(this_spheres%get_num_particles(), this_spheres)
+        call this_macro%same_cells%all_particles_to_cells(this_spheres)
         
         between_cell_size = between_spheres_potential%get_cutoff()
         call this_macro%between_cells%construct(Box_size, between_cell_size, &
                                                 between_spheres_potential%get_cutoff())
-        call this_macro%between_cells%all_particles_to_cells(other_spheres%get_num_particles(), &
-                                                        other_spheres)
+        call this_macro%between_cells%all_particles_to_cells(other_spheres)
 
     end subroutine init_cells
     

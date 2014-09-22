@@ -209,16 +209,15 @@ contains
     
     end function Neighbour_Cells_index_from_position
     
-    pure subroutine Neighbour_Cells_all_particles_to_cells(this, num_particles, spheres)
+    pure subroutine Neighbour_Cells_all_particles_to_cells(this, spheres)
     
         class(Neighbour_Cells), intent(inout) :: this
-        integer, intent(in) :: num_particles
         class(Hard_Spheres), intent(in) :: spheres
     
         integer :: i_particle
         integer :: i_cell
     
-        do i_particle = 1, num_particles
+        do i_particle = 1, spheres%get_num_particles()
     
             i_cell = this%index_from_position(spheres%get_position(i_particle))
             this%current_cells(i_cell)%particle%number = i_particle
