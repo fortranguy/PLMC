@@ -24,15 +24,20 @@ implicit none
     call sys%set_time_start()
     MC_Cycle: do i_step = sys%get_num_thermalisation_steps() + 1, &
                           sys%get_num_thermalisation_steps() + sys%get_num_equilibrium_steps()
+
+            write(*, *) "i_step", i_step
                           
             call sys%set_coordinates(i_step, coordinates_set)
             
             if (coordinates_set) then
-                if (sys%get_first_set()) call sys%set_first()
+                if (sys%get_first_set()) then
+                    call sys%set_first()
+                else
+                    call sys%reset_potentials(i_step)
+                end if
                 call sys%measure_chemical_potentials()
                 call sys%accumulate_observables()
                 call sys%write_observables(i_step)
-                call sys%reset_potentials(i_step)
             end if
     
     end do MC_Cycle
