@@ -24,8 +24,6 @@ implicit none
     call sys%set_time_start()
     MC_Cycle: do i_step = sys%get_num_thermalisation_steps() + 1, &
                           sys%get_num_thermalisation_steps() + sys%get_num_equilibrium_steps()
-
-            write(*, *) "i_step", i_step
                           
             call sys%set_coordinates(i_step, coordinates_set)
             
