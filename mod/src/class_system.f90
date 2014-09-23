@@ -148,11 +148,14 @@ private
     type, extends(System), public :: System_Post_Processing
     
         private
-    
+
+        integer :: num_steps
         type(json_file) :: data_report_json
+        
         type(Hard_Spheres_Post_Processing_Observables) :: type1_observables, type2_observables
         type(Hard_Spheres_Post_Processing_Units) :: type1_units, type2_units
         integer :: type1_positions_unit, type1_orientations_unit, type2_positions_unit
+        
         logical :: first_set
         
     contains
@@ -595,7 +598,8 @@ contains
         call this%open_all_units_in(args%conf)
         call this%open_all_units()
         call this%json_create_all_values()
-        
+
+        this%num_steps = 0 
         this%reset_i_step = 1
         
         call this%type1_spheres%set_data(this%type1_positions_unit)
@@ -678,6 +682,11 @@ contains
     subroutine System_Post_Processing_write_all_results(this)
     
         class(System_Post_Processing), intent(inout) :: this
+
+        call this%type1_observables%write_results(this%Box%temperature, this%num_steps, &
+                                                  this%type1_report_json)
+        call this%type2_observables%write_results(this%Box%temperature, this%num_steps, &
+                                                  this%type2_report_json)
         
         rewind(this%report_unit)
         call json_print(this%report_json, this%report_unit)
@@ -1066,6 +1075,7 @@ contains
 
         class(System_Post_Processing), intent(inout) :: this
 
+        this%num_steps = this%num_steps + 1
         call this%type1_observables%accumulate()
         call this%type2_observables%accumulate()
 
