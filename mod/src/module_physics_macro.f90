@@ -363,7 +363,7 @@ contains
         call this_macro%same_cells%all_particles_to_cells(this_spheres)
 
         call this_macro%between_cells%dealloc_nodes()
-        call this_macro%same_cells%alloc_nodes()
+        call this_macro%between_cells%alloc_nodes()
         call this_macro%between_cells%all_particles_to_cells(other_spheres)
 
     end subroutine reset_cells
