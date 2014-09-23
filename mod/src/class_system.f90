@@ -662,11 +662,11 @@ contains
         logical :: type1_positions_set, type1_orientations_set
         logical :: type2_positions_set
         
-        call this%type1_spheres%set_all_positions(this%type1_positions_unit, i_step, &
+        call this%type1_spheres%set_all_positions(i_step, this%type1_positions_unit, &
                                                   type1_positions_set)
-        call this%type1_spheres%set_all_orientations(this%type1_orientations_unit, i_step, &
+        call this%type1_spheres%set_all_orientations(i_step, this%type1_orientations_unit, &
                                                      type1_orientations_set)
-        call this%type2_spheres%set_all_positions(this%type2_positions_unit, i_step, &
+        call this%type2_spheres%set_all_positions(i_step, this%type2_positions_unit, &
                                                   type2_positions_set)
                                                   
         coordinates_set = type1_positions_set .and. type1_orientations_set .and. type2_positions_set
