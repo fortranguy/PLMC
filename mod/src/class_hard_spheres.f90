@@ -458,19 +458,22 @@ contains
 
     end subroutine Hard_Spheres_set_data
 
-    subroutine Hard_Spheres_set_all_positions(this, i_step, snap_unit, positions_set)
+    subroutine Hard_Spheres_set_all_positions(this, Box_size, i_step, snap_unit, positions_set)
 
         class(Hard_Spheres), intent(inout) :: this
+        real(DP), dimension(:), intent(in) :: Box_size
         integer, intent(in) :: i_step
         integer, intent(in) :: snap_unit        
         logical, intent(out) :: positions_set
 
         integer :: i_particle
+        real(DP), dimension(num_dimensions) :: position_i
         
         positions_set = .false.
         if (modulo(i_step, this%snap_factor) == 0) then
             do i_particle = 1, this%num_particles
-                read(snap_unit, *) this%all_positions(:, i_particle)
+                read(snap_unit, *) position_i
+                this%all_positions(:, i_particle) = modulo(position_i, Box_size)
             end do      
             positions_set = .true.      
         end if
