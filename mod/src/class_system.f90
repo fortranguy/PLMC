@@ -84,6 +84,7 @@ private
         procedure, private :: set_potentials => System_set_potentials
         procedure, private :: json_create_all_values => System_json_create_all_values
         procedure, private :: json_destroy_all_values => System_json_destroy_all_values
+        procedure, private :: write_results_json => System_write_results_json
         
         !> Accessors & Mutators
         procedure :: get_num_thermalisation_steps => System_get_num_thermalisation_steps
@@ -127,7 +128,6 @@ private
         procedure :: final => System_Monte_Carlo_final
         procedure, private :: write_all_results => System_Monte_Carlo_write_all_results
         procedure, private :: write_results => System_Monte_Carlo_write_results
-        procedure, private :: write_results_json => System_Monte_Carlo_write_results_json
         procedure, private :: json_destroy_all_values => System_Monte_Carlo_json_destroy_all_values
         procedure, private :: close_units => System_Monte_Carlo_close_units
                 
@@ -683,18 +683,12 @@ contains
     
         class(System_Post_Processing), intent(inout) :: this
 
-        real(DP) :: duration
-
         call this%type1_observables%write_results(this%Box%temperature, this%num_steps, &
                                                   this%type1_report_json)
         call this%type2_observables%write_results(this%Box%temperature, this%num_steps, &
                                                   this%type2_report_json)
 
-
-        duration = this%time_end - this%time_start
-        
-        rewind(this%report_unit)
-        call json_print(this%report_json, this%report_unit)
+        call this%write_results_json()
         
     end subroutine System_Post_Processing_write_all_results
     
@@ -767,9 +761,9 @@ contains
     
     end subroutine System_Monte_Carlo_write_results
 
-    subroutine System_Monte_Carlo_write_results_json(this)
+    subroutine System_write_results_json(this)
 
-        class(System_Monte_Carlo), intent(inout) :: this
+        class(System), intent(inout) :: this
 
         type(json_value), pointer :: results_json
 
@@ -777,16 +771,22 @@ contains
         call to_object(results_json, "Results")
         call json_value_add(this%report_json, results_json)
 
-        call json_value_add(results_json, "average energy", &
-                                          this%potential_energy_sum / &
-                                          real(this%num_equilibrium_steps, DP))
-        call json_value_add(results_json, "average energy per particule", &
-                                          this%potential_energy_sum / &
-                                          real(this%num_equilibrium_steps, DP) / &
-                                          real(this%Box%num_particles, DP)) ! DHS only?
-        call json_value_add(results_json, "switch rejection rate", &
-                                          this%switch_observable%sum_rejection / &
-                                          real(this%num_equilibrium_steps, DP))
+        select type (this)
+            type is (System_Monte_Carlo)
+                call json_value_add(results_json, "average energy", &
+                                                this%potential_energy_sum / &
+                                                real(this%num_equilibrium_steps, DP))
+                call json_value_add(results_json, "average energy per particule", &
+                                                this%potential_energy_sum / &
+                                                real(this%num_equilibrium_steps, DP) / &
+                                                real(this%Box%num_particles, DP)) ! DHS only?
+                call json_value_add(results_json, "switch rejection rate", &
+                                                this%switch_observable%sum_rejection / &
+                                                real(this%num_equilibrium_steps, DP))
+            type is (System_Post_Processing)
+                call json_value_add(results_json, "number of steps", this%num_steps)
+        end select
+        
         call json_value_add(results_json, "duration (min)", &
                                           (this%time_end - this%time_start) / 60._DP)
 
@@ -795,7 +795,7 @@ contains
         rewind(this%report_unit)
         call json_print(this%report_json, this%report_unit)
 
-    end subroutine System_Monte_Carlo_write_results_json
+    end subroutine System_write_results_json
 
     subroutine System_json_destroy_all_values(this)
 
