@@ -176,6 +176,9 @@ contains
 
         character(len=4096) :: argument
         integer :: i_arg, length, status
+        logical :: snap_read
+
+        snap_read = .false.
 
         i_arg = 1
         do while(i_arg <= command_argument_count())
@@ -187,6 +190,7 @@ contains
             
                 case ("-s", "--snap")
                     call read_conf_files(i_arg, args%conf)
+                    snap_read = .true.
 
                 case default
                     write(error_unit, *) "Unknown option: '", trim(argument), "'"
@@ -197,6 +201,8 @@ contains
             i_arg = i_arg + 1
 
         end do
+
+        if (.not. snap_read) error stop "Snaps are not given."
 
     end subroutine read_arguments_post
 
