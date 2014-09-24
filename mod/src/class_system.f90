@@ -7,7 +7,7 @@ use data_box, only: num_dimensions
 use json_module, only: json_file, json_initialize, json_destroy, &
                        json_value, json_value_create, to_object, json_value_add, &
                        json_print
-use module_data, only: data_filename, report_filename, report_post_filename, &
+use module_data, only: data_filename, data_post_filename, report_filename, report_post_filename, &
                        test_file_exists, test_data_found, test_empty_string
 use module_types_micro, only: Box_Parameters, System_Arguments, Argument_Configurations
 use module_geometry, only: geometry, set_geometry
@@ -149,6 +149,8 @@ private
     
         private
 
+        type(json_file) :: data_post_json
+
         integer :: num_steps
         type(json_file) :: data_report_json
         
@@ -213,7 +215,10 @@ contains
                 call this%data_report_json%get(data_name, Box_geometry, found)
                 call test_data_found(data_name, found)
                 call set_geometry(Box_geometry)
-                if (allocated(Box_geometry)) deallocate(Box_geometry)               
+                if (allocated(Box_geometry)) deallocate(Box_geometry)
+
+                call test_file_exists(data_post_filename)
+                call this%data_post_json%load_file(filename = data_post_filename)
                 
         end select
         
@@ -228,8 +233,8 @@ contains
         call this%set_box()
         call this%set_monte_carlo_steps()
         
-        call this%type1_spheres%construct(this%Box, this%data_json)
-        call this%type2_spheres%construct(this%Box, this%data_json)
+        call this%type1_spheres%construct(this%Box, this%data_json, "Dipolar Hard Spheres")
+        call this%type2_spheres%construct(this%Box, this%data_json, "Hard Spheres")
         call this%between_spheres%construct(this%data_json, &
                                             this%type1_spheres%get_diameter(), &
                                             this%type2_spheres%get_diameter())
@@ -899,6 +904,11 @@ contains
         if (allocated(this%name)) deallocate(this%name)
 
         call this%data_json%destroy()
+
+        select type(this)
+            type is (System_Post_Processing)
+                call this%data_post_json%destroy()
+        end select
     
     end subroutine System_destroy
     

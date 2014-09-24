@@ -73,11 +73,6 @@ private
         real(DP), dimension(:, :), allocatable, public :: all_orientations
         
     contains
-
-        !> Construction and destruction of the class
-        procedure :: construct => Dipolar_Hard_Spheres_construct
-        procedure, private :: set_particles => Dipolar_Hard_Spheres_set_particles
-        procedure :: destroy => Dipolar_Hard_Spheres_destroy
         
         !> Accessor & Mutator
         procedure :: get_orientation => Dipolar_Hard_Spheres_get_orientation
@@ -109,17 +104,18 @@ private
     
 contains
 
-    subroutine Hard_Spheres_construct(this, Box, data_json)
+    subroutine Hard_Spheres_construct(this, Box, data_json, type_name)
     
         class(Hard_Spheres), intent(out) :: this
         type(Box_Parameters), intent(in) :: Box
         type(json_file), intent(inout) :: data_json
+        character(len=*), intent(in) :: type_name
         
         character(len=4096) :: data_name
         logical :: found
         character(len=:), allocatable :: this_name
         
-        data_name = "Particles.Hard Spheres.name"
+        data_name = "Particles."//type_name//".name"
         call data_json%get(data_name, this_name, found)
         call test_data_found(data_name, found)
         call test_empty_string(data_name, this_name)
@@ -127,80 +123,37 @@ contains
         if (allocated(this_name)) deallocate(this_name)
         write(output_unit, *) this%name, " class construction"
         
-        call this%set_particles(data_json)
+        call this%set_particles(data_json, type_name)
         call this%set_volume(Box)
         call this%set_snap(data_json)
         
     end subroutine Hard_Spheres_construct
     
-    subroutine Dipolar_Hard_Spheres_construct(this, Box, data_json)
-    
-        class(Dipolar_Hard_Spheres), intent(out) :: this
-        type(Box_Parameters), intent(in) :: Box
-        type(json_file), intent(inout) :: data_json
-        
-        character(len=4096) :: data_name
-        logical :: found
-        character(len=:), allocatable :: this_name
-        
-        data_name = "Particles.Dipolar Hard Spheres.name"
-        call data_json%get(data_name, this_name, found)
-        call test_data_found(data_name, found)
-        call test_empty_string(data_name, this_name)
-        this%name = this_name
-        if (allocated(this_name)) deallocate(this_name)
-        write(output_unit, *) this%name, " class construction"
-    
-        call this%set_particles(data_json)
-        call this%Hard_Spheres%set_volume(Box)
-        call this%Hard_Spheres%set_snap(data_json)
-    
-    end subroutine Dipolar_Hard_Spheres_construct
-    
-    subroutine Hard_Spheres_set_particles(this, data_json)
+    subroutine Hard_Spheres_set_particles(this, data_json, type_name)
     
         class(Hard_Spheres), intent(inout) :: this
         type(json_file), intent(inout) :: data_json
+        character(len=*), intent(in) :: type_name
         
         character(len=4096) :: data_name
         logical :: found
-        
-        data_name = "Particles.Hard Spheres.diameter"
-        call data_json%get(data_name, this%diameter, found)
-        call test_data_found(data_name, found)
-        
-        data_name = "Particles.Hard Spheres.number of particles"
+
+        data_name = "Particles."//type_name//".number of particles"
         call data_json%get(data_name, this%num_particles, found)
         call test_data_found(data_name, found)
         allocate(this%all_positions(num_dimensions, this%num_particles))
-        
-        data_name = "Particles.Hard Spheres.number of Widom particles"
-        call data_json%get(data_name, this%widom_num_particles, found)
-        call test_data_found(data_name, found)
+
+        select type (this)
+            type is (Hard_Spheres)
+                data_name = "Particles."//type_name//".diameter"
+                call data_json%get(data_name, this%diameter, found)
+                call test_data_found(data_name, found)
+            type is (Dipolar_Hard_Spheres)
+                this%diameter = 1._DP ! = u_length
+                allocate(this%all_orientations(num_dimensions, this%num_particles))
+        end select
         
     end subroutine Hard_Spheres_set_particles
-    
-    subroutine Dipolar_Hard_Spheres_set_particles(this, data_json)
-    
-        class(Dipolar_Hard_Spheres), intent(inout) :: this
-        type(json_file), intent(inout) :: data_json
-        
-        character(len=4096) :: data_name
-        logical :: found
-        
-        this%diameter = 1._DP ! = u_length
-        
-        data_name = "Particles.Dipolar Hard Spheres.number of particles"
-        call data_json%get(data_name, this%num_particles, found)
-        call test_data_found(data_name, found)
-        allocate(this%all_positions(num_dimensions, this%num_particles))
-        allocate(this%all_orientations(num_dimensions, this%num_particles))
-        
-        data_name = "Particles.Dipolar Hard Spheres.number of Widom particles"
-        call data_json%get(data_name, this%widom_num_particles, found)
-        call test_data_found(data_name, found)
-        
-    end subroutine Dipolar_Hard_Spheres_set_particles
 
     subroutine Hard_Spheres_set_volume(this, Box)
 
