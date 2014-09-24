@@ -253,10 +253,10 @@ contains
 
             type is (System_Post_Processing)
 
-                call this%type1_spheres%set_widom_num_particles(this%data_post_json, &
-                                                                "Dipolar Hard Spheres")
-                call this%type2_spheres%set_widom_num_particles(this%data_post_json, &
-                                                                "Hard Spheres")
+                call this%type1_spheres%set_test_num_particles(this%data_post_json, &
+                                                               "Dipolar Hard Spheres")
+                call this%type2_spheres%set_test_num_particles(this%data_post_json, &
+                                                               "Hard Spheres")
                 
         end select
         

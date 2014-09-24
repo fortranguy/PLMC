@@ -31,8 +31,9 @@ private
         ! Snashot
         integer :: snap_factor
 
-        ! Monte-Carlo
+        ! Post-Processing
         integer :: widom_num_particles
+        integer :: field_num_particles
         
     contains
 
@@ -47,6 +48,7 @@ private
         procedure :: get_name => Hard_Spheres_get_name
         procedure :: get_num_particles => Hard_Spheres_get_num_particles
         procedure :: get_widom_num_particles => Hard_Spheres_get_widom_num_particles
+        procedure :: get_field_num_particles => Hard_Spheres_get_field_num_particles
         procedure :: get_diameter => Hard_Spheres_get_diameter
         procedure :: get_position => Hard_Spheres_get_position
         procedure :: get_position_2d => Hard_Spheres_get_position_2d
@@ -56,7 +58,9 @@ private
         procedure :: set_position_z => Hard_Spheres_set_position_z
         procedure :: set_data => Hard_Spheres_set_data
         procedure :: set_all_positions => Hard_Spheres_set_all_positions
-        procedure :: set_widom_num_particles => Hard_Spheres_set_widom_num_particles
+        procedure :: set_test_num_particles => Hard_Spheres_set_test_num_particles
+        procedure, private :: set_widom_num_particles => Hard_Spheres_set_widom_num_particles
+        procedure, private :: set_field_num_particles => Hard_Spheres_set_field_num_particles
         
         procedure :: write_report => Hard_Spheres_write_report
         procedure :: write_data => Hard_Spheres_write_data
@@ -277,6 +281,15 @@ contains
         
     end function Hard_Spheres_get_widom_num_particles
     
+    pure function Hard_Spheres_get_field_num_particles(this) result(get_field_num_particles)
+    
+        class(Hard_Spheres), intent(in) :: this
+        integer :: get_field_num_particles
+        
+        get_field_num_particles = this%widom_num_particles
+        
+    end function Hard_Spheres_get_field_num_particles
+    
     pure function Hard_Spheres_get_diameter(this) result(get_diameter)
     
         class(Hard_Spheres), intent(in) :: this
@@ -452,6 +465,17 @@ contains
         end if
 
     end subroutine Dipolar_Hard_Spheres_set_all_orientations
+    
+    subroutine Hard_Spheres_set_test_num_particles(this, data_post_json, type_name)
+    
+        class(Hard_Spheres), intent(inout) :: this
+        type(json_file), intent(inout) :: data_post_json
+        character(len=*), intent(in) :: type_name
+        
+        call this%set_widom_num_particles(data_post_json, type_name)
+        call this%set_field_num_particles(data_post_json, type_name)
+        
+    end subroutine Hard_Spheres_set_test_num_particles
 
     subroutine Hard_Spheres_set_widom_num_particles(this, data_post_json, type_name)
 
@@ -467,6 +491,21 @@ contains
         call test_data_found(data_name, found)
 
     end subroutine Hard_Spheres_set_widom_num_particles
+    
+    subroutine Hard_Spheres_set_field_num_particles(this, data_post_json, type_name)
+
+        class(Hard_Spheres), intent(inout) :: this
+        type(json_file), intent(inout) :: data_post_json
+        character(len=*), intent(in) :: type_name
+
+        character(len=4096) :: data_name
+        logical :: found
+
+        data_name = "Particles."//type_name//".number of local field particles"
+        call data_post_json%get(data_name, this%field_num_particles, found)
+        call test_data_found(data_name, found)
+
+    end subroutine Hard_Spheres_set_field_num_particles
     
     !> Write a report of the component in a file
     

@@ -268,6 +268,27 @@ contains
         
     end subroutine widom
     
+    !> Local field: for DHS only (?)
+    
+    subroutine local_field(Box, this_spheres, this_macro)
+
+        type(Box_Parameters), intent(in) :: Box
+        class(Dipolar_Hard_Spheres), intent(in) :: this_spheres
+        class(Dipolar_Hard_Spheres_Macro), intent(in) :: this_macro
+        
+        real(DP), dimension(num_dimensions) :: field
+        real(DP), dimension(num_dimensions) :: random_vector
+        type(Particle_Index) :: test
+        integer :: i_field_particule
+        
+        test%number = 0
+        
+        do i_field_particule = 1, this_spheres%get_field_num_particles()
+        
+        end do
+        
+    end subroutine local_field
+    
     !> Particle switch
     
     subroutine switch(Box, &
