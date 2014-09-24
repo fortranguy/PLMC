@@ -25,7 +25,8 @@ use class_distribution_function, only: Distribution_Function
 use class_hard_spheres_units, only: Hard_Spheres_Monte_Carlo_Units, &
                                     Dipolar_Hard_Spheres_Monte_Carlo_Units, &
                                     Between_Hard_Spheres_Monte_Carlo_Units, &
-                                    Hard_Spheres_Post_Processing_Units
+                                    Hard_Spheres_Post_Processing_Units, &
+                                    Dipolar_Hard_Spheres_Post_Processing_Units
 use module_physics_macro, only: init_random_seed, set_initial_configuration, &
                                 init_spheres, init_cells, reset_cells, &
                                 set_ewald, total_energy, final_spheres, &
@@ -156,7 +157,8 @@ private
         type(json_file) :: data_report_json
         
         type(Hard_Spheres_Post_Processing_Observables) :: type1_observables, type2_observables
-        type(Hard_Spheres_Post_Processing_Units) :: type1_units, type2_units
+        type(Dipolar_Hard_Spheres_Post_Processing_Units) :: type1_units
+        type(Hard_Spheres_Post_Processing_Units) :: type2_units
         type(Distribution_Function) :: type1_field_distribution
         integer :: type1_positions_unit, type1_orientations_unit, type2_positions_unit
         

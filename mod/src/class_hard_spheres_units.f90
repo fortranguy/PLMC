@@ -62,7 +62,6 @@ private
     type, public :: Hard_Spheres_Post_Processing_Units
 
         integer :: inv_activity
-        integer :: local_field
 
     contains
 
@@ -70,6 +69,13 @@ private
         procedure :: close => Hard_Spheres_Post_Processing_Units_close
 
     end type Hard_Spheres_Post_Processing_Units
+    
+    type, extends(Hard_Spheres_Post_Processing_Units), public :: &
+        Dipolar_Hard_Spheres_Post_Processing_Units
+        
+        integer :: local_field
+        
+    end type Dipolar_Hard_Spheres_Post_Processing_Units
     
 contains
 
@@ -159,9 +165,13 @@ contains
         character(len=*), intent(in) :: name
 
         open(newunit=this%inv_activity, recl=4096, file=name//"_inv_activity.out", status='new', &
-             action='write')             
-        open(newunit=this%local_field, recl=4096, file=name//"_local_field.out", status='new', &
              action='write')
+             
+        select type (this)
+            type is (Dipolar_Hard_Spheres_Post_Processing_Units)
+                open(newunit=this%local_field, recl=4096, file=name//"_local_field.out", &
+                     status='new', action='write')
+        end select
 
     end subroutine Hard_Spheres_Post_Processing_Units_open
     
@@ -219,7 +229,11 @@ contains
         class(Hard_Spheres_Post_Processing_Units), intent(inout) :: this
 
         close(this%inv_activity)
-        close(this%local_field)
+        
+        select type (this)
+            type is (Dipolar_Hard_Spheres_Post_Processing_Units)
+                close(this%local_field)
+        end select
 
     end subroutine Hard_Spheres_Post_Processing_Units_close
 
