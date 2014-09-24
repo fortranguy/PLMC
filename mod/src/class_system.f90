@@ -157,7 +157,7 @@ private
         
         type(Hard_Spheres_Post_Processing_Observables) :: type1_observables, type2_observables
         type(Hard_Spheres_Post_Processing_Units) :: type1_units, type2_units
-        type(Distribution_Function) :: field_distribution
+        type(Distribution_Function) :: type1_field_distribution
         integer :: type1_positions_unit, type1_orientations_unit, type2_positions_unit
         
         logical :: first_set
@@ -265,7 +265,8 @@ contains
                 else if (geometry%slab) then
                     Box_height = this%Box%height
                 end if
-                call this%field_distribution%construct(this%data_post_json, Box_height, num_dimensions)
+                call this%type1_field_distribution%construct(this%data_post_json, Box_height, &
+                                                             num_dimensions)
                 
         end select
         
@@ -444,7 +445,7 @@ contains
 
         select type(this)
             type is (System_Post_Processing)
-                call this%field_distribution%destroy()
+                call this%type1_field_distribution%destroy()
                 call this%data_post_json%destroy()
         end select
 

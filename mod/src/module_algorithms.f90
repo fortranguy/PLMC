@@ -263,11 +263,12 @@ contains
     
     !> Local field: for DHS only (?)
     
-    subroutine measure_local_field(Box, this_spheres, this_macro)
+    subroutine measure_local_field(Box, this_spheres, this_macro, this_field_distribution)
 
         type(Box_Parameters), intent(in) :: Box
         class(Dipolar_Hard_Spheres), intent(in) :: this_spheres
         class(Dipolar_Hard_Spheres_Macro), intent(in) :: this_macro
+        class(Distribution_Function) :: this_field_distribution
         
         real(DP), dimension(num_dimensions) :: local_field
         type(Particle_Index) :: test
@@ -277,6 +278,7 @@ contains
         
         test%number = 0
         
+        call this_field_distribution%init_at_step()
         do i_field_particule = 1, this_spheres%get_field_num_particles()
         
             test%position(:) = random_position(Box, this_spheres%get_diameter())
@@ -296,6 +298,12 @@ contains
                     local_field(:) = local_field(:) - &
                                      this_macro%elc%solo_field(Box, this_spheres, test)
                 end if
+                
+                !i_distribution = int(positions(3, i_particle)/delta)
+                !distribution_step(i_distribution, 1) = distribution_step(i_distribution, 1) + 1._DP
+                !distribution_step(i_distribution, 2:num_dimensions+1) = &
+                !    distribution_step(i_distribution, 2:num_dimensions+1) + local_field(:)
+                call this_field_distribution%set_at_step(test%position(3), local_field)
             
             end if
         

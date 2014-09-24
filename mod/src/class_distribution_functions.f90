@@ -27,6 +27,9 @@ private
     
         procedure :: construct => Distribution_Function_construct
         procedure :: destroy => Distribution_Function_destroy
+        
+        procedure :: init_at_step => Distribution_Function_init_at_step
+        procedure :: set_at_step => Distribution_Function_set_at_step
     
     end type Distribution_Function
     
@@ -49,9 +52,11 @@ contains
         this%distance_max = distance_max
         this%num_distribution = int(this%distance_max/this%delta)
         
-        this%num_observables = num_observables
+        this%num_observables = num_observables + 1
         allocate(this%distribution_step(this%num_distribution, this%num_observables))
         allocate(this%distribution_function(this%num_distribution, this%num_observables))
+        
+        this%distribution_function(:, :) = 0._DP
     
     end subroutine Distribution_Function_construct
     
@@ -63,5 +68,29 @@ contains
         if (allocated(this%distribution_function)) deallocate(this%distribution_function)
         
     end subroutine Distribution_Function_destroy
+    
+    subroutine Distribution_Function_init_at_step(this)
+    
+        class(Distribution_Function), intent(inout) :: this
+        
+        this%distribution_step(:, :) = 0._DP
+    
+    end subroutine Distribution_Function_init_at_step
+    
+    subroutine Distribution_Function_set_at_step(this, distance, vector)
+    
+        class(Distribution_Function), intent(inout) :: this
+        real(DP), intent(in) :: distance
+        real(DP), dimension(:), intent(in) :: vector
+        
+        integer :: i_distribution
+        
+        i_distribution = int(distance/this%delta)
+        
+        this%distribution_step(i_distribution, 1) = this%distribution_step(i_distribution, 1) + 1._DP
+        this%distribution_step(i_distribution, 2:this%num_observables) = &
+            this%distribution_step(i_distribution, 2:this%num_observables) + vector(:)
+        
+    end subroutine Distribution_Function_set_at_step
 
 end module class_distribution_function
