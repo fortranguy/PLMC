@@ -45,7 +45,7 @@ contains
         character(len=4096) :: data_name
         logical :: found
         
-        data_name = "Distribution_Function.delta"
+        data_name = "Distribution.delta"
         call data_post_json%get(data_name, this%delta, found)
         call test_data_found(data_name, found)
         
