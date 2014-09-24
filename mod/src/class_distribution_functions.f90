@@ -13,12 +13,9 @@ private
     
         private
     
-        real(DP) :: distance_max
-        real(DP) :: distance_i
         real(DP) :: delta
         
         integer :: num_distribution
-        integer :: i_distribution
         
         real(DP), dimension(:, :), allocatable :: distribution_step
         real(DP), dimension(:, :), allocatable :: distribution_function
@@ -28,6 +25,7 @@ private
     
         procedure :: construct => Distribution_Function_construct
         procedure :: destroy => Distribution_Function_destroy
+        procedure :: write => Distribution_Function_write
         
         procedure :: step_init => Distribution_Function_step_init
         procedure :: particle_set => Distribution_Function_particle_set
@@ -51,8 +49,7 @@ contains
         call data_post_json%get(data_name, this%delta, found)
         call test_data_found(data_name, found)
         
-        this%distance_max = distance_max
-        this%num_distribution = int(this%distance_max/this%delta)
+        this%num_distribution = int(distance_max/this%delta)
         
         this%num_observables = num_observables + 1
         allocate(this%distribution_step(this%num_distribution, this%num_observables))
@@ -71,6 +68,25 @@ contains
         
     end subroutine Distribution_Function_destroy
     
+    subroutine Distribution_Function_write(this, num_steps, distribution_unit)
+    
+        class(Distribution_Function), intent(inout) :: this
+        integer, intent(in) :: num_steps
+        integer, intent(in) :: distribution_unit
+        
+        real(DP) :: distance_i
+        integer :: i_distribution
+        
+        this%distribution_function(:, :) = this%distribution_function(:, :) / real(num_steps, DP)
+        this%distribution_step(:, 1) = this%distribution_step(:, 1) / this%delta
+        
+        do i_distribution = 1, this%num_distribution
+            distance_i = (real(i_distribution, DP) + 0.5_DP) * this%delta
+            write(distribution_unit, *) distance_i, this%distribution_step(i_distribution, :)
+        end do
+    
+    end subroutine Distribution_Function_write
+    
     subroutine Distribution_Function_step_init(this)
     
         class(Distribution_Function), intent(inout) :: this
@@ -79,11 +95,11 @@ contains
     
     end subroutine Distribution_Function_step_init
     
-    subroutine Distribution_Function_particle_set(this, distance, vector)
+    subroutine Distribution_Function_particle_set(this, distance, data_vector)
     
         class(Distribution_Function), intent(inout) :: this
         real(DP), intent(in) :: distance
-        real(DP), dimension(:), intent(in) :: vector
+        real(DP), dimension(:), intent(in) :: data_vector
         
         integer :: i_distribution
         
@@ -91,7 +107,7 @@ contains
         
         this%distribution_step(i_distribution, 1) = this%distribution_step(i_distribution, 1) + 1._DP
         this%distribution_step(i_distribution, 2:this%num_observables) = &
-            this%distribution_step(i_distribution, 2:this%num_observables) + vector(:)
+            this%distribution_step(i_distribution, 2:this%num_observables) + data_vector(:)
         
     end subroutine Distribution_Function_particle_set
     
