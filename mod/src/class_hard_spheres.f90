@@ -33,7 +33,6 @@ private
 
         ! Post-Processing
         integer :: widom_num_particles
-        integer :: field_num_particles
         
     contains
 
@@ -60,7 +59,6 @@ private
         procedure :: set_all_positions => Hard_Spheres_set_all_positions
         procedure :: set_test_num_particles => Hard_Spheres_set_test_num_particles
         procedure, private :: set_widom_num_particles => Hard_Spheres_set_widom_num_particles
-        procedure, private :: set_field_num_particles => Hard_Spheres_set_field_num_particles
         
         procedure :: write_report => Hard_Spheres_write_report
         procedure :: write_data => Hard_Spheres_write_data
@@ -77,6 +75,9 @@ private
         ! Particles
         real(DP), dimension(:, :), allocatable, public :: all_orientations
         
+        ! Post-Processing
+        integer :: field_num_particles
+        
     contains
         
         !> Accessor & Mutator
@@ -85,6 +86,7 @@ private
         procedure :: get_orientation_z => Dipolar_Hard_Spheres_get_orientation_z
         procedure :: set_orientation => Dipolar_Hard_Spheres_set_orientation
         procedure :: set_all_orientations => Dipolar_Hard_Spheres_set_all_orientations
+        procedure, private :: set_field_num_particles => Dipolar_Hard_Spheres_set_field_num_particles
         
         procedure :: write_all_orientations => Dipolar_Hard_Spheres_write_all_orientations
         
@@ -466,6 +468,21 @@ contains
 
     end subroutine Dipolar_Hard_Spheres_set_all_orientations
     
+    subroutine Dipolar_Hard_Spheres_set_field_num_particles(this, data_post_json, type_name)
+
+        class(Dipolar_Hard_Spheres), intent(inout) :: this
+        type(json_file), intent(inout) :: data_post_json
+        character(len=*), intent(in) :: type_name
+
+        character(len=4096) :: data_name
+        logical :: found
+
+        data_name = "Particles."//type_name//".number of local field particles"
+        call data_post_json%get(data_name, this%field_num_particles, found)
+        call test_data_found(data_name, found)
+
+    end subroutine Dipolar_Hard_Spheres_set_field_num_particles
+    
     subroutine Hard_Spheres_set_test_num_particles(this, data_post_json, type_name)
     
         class(Hard_Spheres), intent(inout) :: this
@@ -473,7 +490,11 @@ contains
         character(len=*), intent(in) :: type_name
         
         call this%set_widom_num_particles(data_post_json, type_name)
-        call this%set_field_num_particles(data_post_json, type_name)
+        
+        select type (this)
+            type is (Dipolar_Hard_Spheres)
+                call this%set_field_num_particles(data_post_json, type_name)
+        end select
         
     end subroutine Hard_Spheres_set_test_num_particles
 
@@ -491,21 +512,6 @@ contains
         call test_data_found(data_name, found)
 
     end subroutine Hard_Spheres_set_widom_num_particles
-    
-    subroutine Hard_Spheres_set_field_num_particles(this, data_post_json, type_name)
-
-        class(Hard_Spheres), intent(inout) :: this
-        type(json_file), intent(inout) :: data_post_json
-        character(len=*), intent(in) :: type_name
-
-        character(len=4096) :: data_name
-        logical :: found
-
-        data_name = "Particles."//type_name//".number of local field particles"
-        call data_post_json%get(data_name, this%field_num_particles, found)
-        call test_data_found(data_name, found)
-
-    end subroutine Hard_Spheres_set_field_num_particles
     
     !> Write a report of the component in a file
     
