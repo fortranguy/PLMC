@@ -81,9 +81,9 @@ private
         procedure, private :: set_monte_carlo_steps => System_set_monte_carlo_steps
         procedure :: destroy => System_destroy
         
-        procedure, private :: set_potentials => System_set_potentials
         procedure, private :: json_create_all_values => System_json_create_all_values
         procedure, private :: json_destroy_all_values => System_json_destroy_all_values
+        procedure, private :: set_potentials => System_set_potentials
         procedure, private :: write_results_json => System_write_results_json
         
         !> Accessors & Mutators
@@ -174,18 +174,18 @@ private
         procedure, private :: close_units => System_Post_Processing_close_units
         
         procedure :: get_first_set => System_Post_Processing_get_first_set
-        procedure :: write_observables => System_Post_Processing_write_observables
         
         procedure :: measure_chemical_potentials => &
                      System_Post_Processing_measure_chemical_potentials
         procedure :: accumulate_observables => System_Post_Processing_accumulate_observables
+        procedure :: write_observables => System_Post_Processing_write_observables
         procedure :: reset_potentials => System_Post_Processing_reset_potentials
         
     end type System_Post_Processing
     
 contains
 
-    ! Construction
+    ! Construction & destruction of the class
     
     subroutine System_construct(this, args)
             
@@ -408,6 +408,36 @@ contains
         call this%type2_macro%move%init(type2_move_delta, type2_move_rejection)
         
     end subroutine System_Monte_Carlo_set_changes
+
+    subroutine System_destroy(this)
+
+        class(System), intent(inout) :: this
+
+        write(output_unit, *) this%name, " class destruction"
+
+        call this%between_spheres%destroy()
+
+        call this%type2_macro%between_cells%destroy()
+        call this%type2_macro%same_cells%destroy()
+        call this%type2_spheres%destroy()
+
+        if (geometry%slab) call this%type1_macro%elc%destroy()
+        call this%type1_macro%ewald_reci%destroy()
+        call this%type1_macro%ewald_real%destroy()
+        call this%type1_macro%between_cells%destroy()
+        call this%type1_macro%same_cells%destroy()
+        call this%type1_spheres%destroy()
+
+        if (allocated(this%name)) deallocate(this%name)
+
+        call this%data_json%destroy()
+
+        select type(this)
+            type is (System_Post_Processing)
+                call this%data_post_json%destroy()
+        end select
+
+    end subroutine System_destroy
     
     ! Initialization
     
@@ -690,19 +720,6 @@ contains
     
     ! Finalisation
     
-    subroutine System_Post_Processing_write_all_results(this)
-    
-        class(System_Post_Processing), intent(inout) :: this
-
-        call this%type1_observables%write_results(this%Box%temperature, this%num_steps, &
-                                                  this%type1_report_json)
-        call this%type2_observables%write_results(this%Box%temperature, this%num_steps, &
-                                                  this%type2_report_json)
-
-        call this%write_results_json()
-        
-    end subroutine System_Post_Processing_write_all_results
-    
     subroutine System_Monte_Carlo_final(this)
     
         class(System_Monte_Carlo), intent(inout) :: this
@@ -856,6 +873,29 @@ contains
 
     end subroutine System_Post_Processing_final
 
+    subroutine System_Post_Processing_write_all_results(this)
+
+        class(System_Post_Processing), intent(inout) :: this
+
+        call this%type1_observables%write_results(this%Box%temperature, this%num_steps, &
+                                                  this%type1_report_json)
+        call this%type2_observables%write_results(this%Box%temperature, this%num_steps, &
+                                                  this%type2_report_json)
+
+        call this%write_results_json()
+
+    end subroutine System_Post_Processing_write_all_results
+
+    subroutine System_Post_Processing_close_units_in(this)
+
+        class(System_Post_Processing), intent(inout) :: this
+
+        close(this%type2_positions_unit)
+        close(this%type1_orientations_unit)
+        close(this%type1_positions_unit)
+
+    end subroutine System_Post_Processing_close_units_in
+
     subroutine System_Post_Processing_close_units(this)
 
         class(System_Post_Processing), intent(inout) :: this
@@ -866,57 +906,6 @@ contains
         close(this%report_unit)
 
     end subroutine System_Post_Processing_close_units
-    
-    subroutine System_Post_Processing_close_units_in(this)
-    
-        class(System_Post_Processing), intent(inout) :: this
-        
-        close(this%type2_positions_unit)
-        close(this%type1_orientations_unit)
-        close(this%type1_positions_unit)
-    
-    end subroutine System_Post_Processing_close_units_in
-    
-    pure function System_Post_Processing_get_first_set(this) result(get_first_set)
-    
-        class(System_Post_Processing), intent(in) :: this
-        logical :: get_first_set
-        
-        get_first_set = this%first_set
-    
-    end function System_Post_Processing_get_first_set
-    
-    ! Destruction
-    
-    subroutine System_destroy(this)
-     
-        class(System), intent(inout) :: this
-        
-        write(output_unit, *) this%name, " class destruction"
-        
-        call this%between_spheres%destroy()
-        
-        call this%type2_macro%between_cells%destroy()
-        call this%type2_macro%same_cells%destroy()
-        call this%type2_spheres%destroy()
-
-        if (geometry%slab) call this%type1_macro%elc%destroy()
-        call this%type1_macro%ewald_reci%destroy()
-        call this%type1_macro%ewald_real%destroy()
-        call this%type1_macro%between_cells%destroy()
-        call this%type1_macro%same_cells%destroy()
-        call this%type1_spheres%destroy()
-        
-        if (allocated(this%name)) deallocate(this%name)
-
-        call this%data_json%destroy()
-
-        select type(this)
-            type is (System_Post_Processing)
-                call this%data_post_json%destroy()
-        end select
-    
-    end subroutine System_destroy
     
     ! Accessors
     
@@ -931,12 +920,22 @@ contains
     end function System_get_num_thermalisation_steps
     
     pure function System_get_num_equilibrium_steps(this) result(get_num_equilibrium_steps)
+    
         class(System), intent(in) :: this
         integer :: get_num_equilibrium_steps
                 
         get_num_equilibrium_steps = this%num_equilibrium_steps
         
     end function System_get_num_equilibrium_steps
+
+    pure function System_Post_Processing_get_first_set(this) result(get_first_set)
+
+        class(System_Post_Processing), intent(in) :: this
+        logical :: get_first_set
+
+        get_first_set = this%first_set
+
+    end function System_Post_Processing_get_first_set
     
     ! Mutators
     
@@ -953,8 +952,6 @@ contains
         call cpu_time(this%time_end)
         
     end subroutine System_set_time_end
-    
-    ! Random changes
     
     subroutine System_Monte_Carlo_random_changes(this)
     
@@ -1061,16 +1058,6 @@ contains
             
     end subroutine System_Monte_Carlo_write_observables_thermalisation
     
-    subroutine System_Post_Processing_write_observables(this, i_step)
-    
-        class(System_Post_Processing), intent(inout) :: this
-        integer, intent(in) :: i_step
-    
-        call this%type1_observables%write(i_step, this%type1_units%inv_activity)
-        call this%type2_observables%write(i_step, this%type2_units%inv_activity)
-            
-    end subroutine System_Post_Processing_write_observables
-    
     subroutine System_Monte_Carlo_fix_changes(this)
     
         class(System_Monte_Carlo), intent(inout) :: this
@@ -1088,11 +1075,11 @@ contains
                                              this%type2_report_json)
     
     end subroutine System_Monte_Carlo_fix_changes
-    
+
     subroutine System_Post_Processing_measure_chemical_potentials(this)
-    
+
         class(System_Post_Processing), intent(inout) :: this
-    
+
         call widom(this%Box, this%ext_field, &
                    this%type1_spheres, this%type1_macro, this%type1_observables, &
                    this%type2_spheres, this%type2_macro%between_cells, &
@@ -1101,7 +1088,7 @@ contains
                    this%type2_spheres, this%type2_macro, this%type2_observables, &
                    this%type1_spheres, this%type1_macro%between_cells, &
                    this%between_spheres_potential)
-    
+
     end subroutine System_Post_Processing_measure_chemical_potentials
     
     subroutine System_Monte_Carlo_accumulate_observables(this)
@@ -1142,6 +1129,16 @@ contains
             this%between_spheres_observables%potential_energy
             
     end subroutine System_Monte_Carlo_write_observables_equilibrium
+
+    subroutine System_Post_Processing_write_observables(this, i_step)
+
+        class(System_Post_Processing), intent(inout) :: this
+        integer, intent(in) :: i_step
+
+        call this%type1_observables%write(i_step, this%type1_units%inv_activity)
+        call this%type2_observables%write(i_step, this%type2_units%inv_activity)
+
+    end subroutine System_Post_Processing_write_observables
     
     subroutine System_Monte_Carlo_take_snapshots(this, i_step)
     
@@ -1159,7 +1156,6 @@ contains
         
     end subroutine System_Monte_Carlo_take_snapshots
     
-    !> Reset summed quantities to prevent them from drifting.
     subroutine System_Monte_Carlo_reset_potentials(this, i_step)
     
         class(System_Monte_Carlo), intent(inout) :: this
