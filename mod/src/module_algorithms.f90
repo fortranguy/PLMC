@@ -278,7 +278,7 @@ contains
         
         test%number = 0
         
-        call this_field_distribution%init_at_step()
+        call this_field_distribution%step_init()
         do i_field_particule = 1, this_spheres%get_field_num_particles()
         
             test%position(:) = random_position(Box, this_spheres%get_diameter())
@@ -299,15 +299,13 @@ contains
                                      this_macro%elc%solo_field(Box, this_spheres, test)
                 end if
                 
-                !i_distribution = int(positions(3, i_particle)/delta)
-                !distribution_step(i_distribution, 1) = distribution_step(i_distribution, 1) + 1._DP
-                !distribution_step(i_distribution, 2:num_dimensions+1) = &
-                !    distribution_step(i_distribution, 2:num_dimensions+1) + local_field(:)
-                call this_field_distribution%set_at_step(test%position(3), local_field)
+                call this_field_distribution%particle_set(test%position(3), local_field)
             
             end if
         
         end do
+        
+        call this_field_distribution%step_set()
         
     end subroutine measure_local_field
     

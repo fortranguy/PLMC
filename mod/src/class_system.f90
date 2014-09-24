@@ -84,8 +84,8 @@ private
         
         procedure, private :: json_create_all_values => System_json_create_all_values
         procedure, private :: json_destroy_all_values => System_json_destroy_all_values
+        procedure, private :: json_write_results => System_json_write_results
         procedure, private :: set_potentials => System_set_potentials
-        procedure, private :: write_results_json => System_write_results_json
         
         !> Accessors & Mutators
         procedure :: get_num_thermalisation_steps => System_get_num_thermalisation_steps
@@ -797,11 +797,11 @@ contains
                                     this%type2_observables%potential_energy_sum + &
                                     this%between_spheres_observables%potential_energy_sum
                                     
-        call this%write_results_json()
+        call this%json_write_results()
     
     end subroutine System_Monte_Carlo_write_results
 
-    subroutine System_write_results_json(this)
+    subroutine System_json_write_results(this)
 
         class(System), intent(inout) :: this
 
@@ -837,7 +837,7 @@ contains
         rewind(this%report_unit)
         call json_print(this%report_json, this%report_unit)
 
-    end subroutine System_write_results_json
+    end subroutine System_json_write_results
 
     subroutine System_json_destroy_all_values(this)
 
@@ -898,7 +898,7 @@ contains
                                                   this%type2_spheres%get_widom_num_particles(), &
                                                   this%type2_report_json)
 
-        call this%write_results_json()
+        call this%json_write_results()
 
     end subroutine System_Post_Processing_write_all_results
 

@@ -1,6 +1,7 @@
 module class_distribution_function
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
+use data_precisions, only: real_zero
 use json_module, only: json_file
 use module_data, only: test_data_found
 
@@ -28,8 +29,9 @@ private
         procedure :: construct => Distribution_Function_construct
         procedure :: destroy => Distribution_Function_destroy
         
-        procedure :: init_at_step => Distribution_Function_init_at_step
-        procedure :: set_at_step => Distribution_Function_set_at_step
+        procedure :: step_init => Distribution_Function_step_init
+        procedure :: particle_set => Distribution_Function_particle_set
+        procedure :: step_set => Distribution_Function_step_set
     
     end type Distribution_Function
     
@@ -69,15 +71,15 @@ contains
         
     end subroutine Distribution_Function_destroy
     
-    subroutine Distribution_Function_init_at_step(this)
+    subroutine Distribution_Function_step_init(this)
     
         class(Distribution_Function), intent(inout) :: this
         
         this%distribution_step(:, :) = 0._DP
     
-    end subroutine Distribution_Function_init_at_step
+    end subroutine Distribution_Function_step_init
     
-    subroutine Distribution_Function_set_at_step(this, distance, vector)
+    subroutine Distribution_Function_particle_set(this, distance, vector)
     
         class(Distribution_Function), intent(inout) :: this
         real(DP), intent(in) :: distance
@@ -91,6 +93,24 @@ contains
         this%distribution_step(i_distribution, 2:this%num_observables) = &
             this%distribution_step(i_distribution, 2:this%num_observables) + vector(:)
         
-    end subroutine Distribution_Function_set_at_step
+    end subroutine Distribution_Function_particle_set
+    
+    subroutine Distribution_Function_step_set(this)
+    
+        class(Distribution_Function), intent(inout) :: this
+        
+        integer :: i_observable
+        
+        do i_observable = 2, this%num_observables
+            where(this%distribution_step(:, 1) > real_zero)            
+                this%distribution_step(:, i_observable) = this%distribution_step(:, i_observable) / &
+                                                          this%distribution_step(:, 1)            
+            end where
+        end do
+        
+        this%distribution_function(:, :) = this%distribution_function(:, :) + &
+                                           this%distribution_step(:, :)
+        
+    end subroutine Distribution_Function_step_set
 
 end module class_distribution_function
