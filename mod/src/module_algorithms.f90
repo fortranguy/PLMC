@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_box, only: num_dimensions
 use module_types_micro, only: Box_Parameters, Particle_Index, Particle_Energy
 use module_geometry, only: geometry
-use module_physics_micro, only: random_surface, markov_surface
+use module_physics_micro, only: random_position, random_surface, markov_surface
 use class_external_field, only: External_Field
 use class_hard_spheres, only: Hard_Spheres, Dipolar_Hard_Spheres
 use class_neighbour_cells, only: Neighbour_Cells
@@ -14,6 +14,7 @@ use class_discrete_observable, only: Discrete_Observables
 use class_hard_spheres_observables, only: Hard_Spheres_Monte_Carlo_Observables, &
                                           Dipolar_Hard_Spheres_Monte_Carlo_Observables, &
                                           Hard_Spheres_Post_Processing_Observables
+use class_distribution_function, only: Distribution_Function
 
 implicit none
 private
@@ -185,7 +186,6 @@ contains
         
         integer :: i_widom_particule
         real(DP) :: inv_activity_sum
-        real(DP), dimension(num_dimensions) :: random_vector
         type(Particle_Index) :: test
         logical :: overlap
         real(DP) :: energy_test
@@ -196,14 +196,7 @@ contains
         
         do i_widom_particule = 1, this_spheres%get_widom_num_particles()
             
-            call random_number(random_vector)
-            if (geometry%bulk) then
-                test%position(:) = Box%size(:) * random_vector(:)
-            else if (geometry%slab) then
-                test%position(1:2) = Box%size(1:2) * random_vector(1:2)
-                test%position(3) = (Box%height - this_spheres%get_diameter()) * random_vector(3) + &
-                                   this_spheres%get_diameter()/2._DP
-            end if
+            test%position(:) = random_position(Box, this_spheres%get_diameter())
 
             if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
                 test%same_i_cell = this_macro%same_cells%index_from_position(test%position)
@@ -270,24 +263,45 @@ contains
     
     !> Local field: for DHS only (?)
     
-    subroutine local_field(Box, this_spheres, this_macro)
+    subroutine measure_local_field(Box, this_spheres, this_macro)
 
         type(Box_Parameters), intent(in) :: Box
         class(Dipolar_Hard_Spheres), intent(in) :: this_spheres
         class(Dipolar_Hard_Spheres_Macro), intent(in) :: this_macro
         
-        real(DP), dimension(num_dimensions) :: field
-        real(DP), dimension(num_dimensions) :: random_vector
+        real(DP), dimension(num_dimensions) :: local_field
         type(Particle_Index) :: test
         integer :: i_field_particule
+        logical :: overlap
+        real(DP) :: this_energy_test
         
         test%number = 0
         
         do i_field_particule = 1, this_spheres%get_field_num_particles()
         
+            test%position(:) = random_position(Box, this_spheres%get_diameter())
+            
+            test%same_i_cell = this_macro%same_cells%index_from_position(test%position)
+            call this_macro%hard_potential%neighbours(Box%size, this_spheres, &
+                                                      this_macro%same_cells, test, &
+                                                      overlap, this_energy_test)
+            if (.not. overlap) then
+            
+                test%orientation(:) = random_surface()
+                local_field(:) = this_macro%ewald_real%solo_field(Box%size, this_spheres, test) + &
+                                 this_macro%ewald_reci%solo_field(Box, this_spheres, test) - &
+                                 this_macro%ewald_self%solo_field(test%orientation) + &
+                                 this_macro%ewald_bound%solo_field(Box%size)
+                if (geometry%slab) then
+                    local_field(:) = local_field(:) - &
+                                     this_macro%elc%solo_field(Box, this_spheres, test)
+                end if
+            
+            end if
+        
         end do
         
-    end subroutine local_field
+    end subroutine measure_local_field
     
     !> Particle switch
     

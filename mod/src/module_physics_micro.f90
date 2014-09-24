@@ -6,10 +6,12 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64, error_unit
 use data_constants, only: PI, sigma3d
 use data_box, only: num_dimensions
 use module_geometry, only: geometry
+use module_types_micro, only: Box_Parameters
 
 implicit none
 private
-public set_discrete_length, sphere_volume, PBC_vector, PBC_distance, random_surface, markov_surface, &
+public set_discrete_length, sphere_volume, PBC_vector, PBC_distance, &
+       random_position, random_surface, markov_surface, &
        dipolar_pair_energy, ewald_real_B, ewald_real_C, &
        num_wave_vectors, Box_wave1_sym, Box_wave2_sym, fourier_i, set_exp_kz, exchange_sign, &
        index_from_coord, coord_PBC, &
@@ -35,9 +37,12 @@ contains
     !> Calculate the volume of the sphere
     
     pure function sphere_volume(radius)
+    
         real(DP), intent(in) :: radius
         real(DP) :: sphere_volume
+        
         sphere_volume = 4._DP/3._DP * PI * radius**3
+        
     end function sphere_volume
 
     !> Distance between 2 positions with Periodic Boundary Conditions
@@ -72,11 +77,33 @@ contains
     end function PBC_vector
     
     pure function PBC_distance(Box_size, position1, position2)
+    
         real(DP), dimension(:), intent(in) :: Box_size
         real(DP), dimension(:), intent(in) :: position1, position2
         real(DP) :: PBC_distance
+        
         PBC_distance = norm2(PBC_vector(Box_size, position1, position2))
+        
     end function PBC_distance
+    
+    function random_position(Box, particle_diameter)
+    
+        type(Box_Parameters), intent(in) :: Box
+        real(DP), intent(in) :: particle_diameter
+        real(DP), dimension(num_dimensions) :: random_position
+        
+        real(DP), dimension(num_dimensions) :: random_vector
+        
+        call random_number(random_vector)
+        if (geometry%bulk) then
+            random_position(:) = Box%size(:) * random_vector(:)
+        else if (geometry%slab) then
+            random_position(1:2) = Box%size(1:2) * random_vector(1:2)
+            random_position(3) = (Box%height - particle_diameter) * random_vector(3) + &
+                                 particle_diameter/2._DP
+        end if
+        
+    end function random_position
     
     !> Rotation
     !> From SMAC, Algorithm 1.19, p.39

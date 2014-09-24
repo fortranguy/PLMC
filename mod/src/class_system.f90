@@ -21,6 +21,7 @@ use class_hard_spheres_observables, only: Hard_Spheres_Monte_Carlo_Observables, 
                                           Dipolar_Hard_Spheres_Monte_Carlo_Observables, &
                                           Between_Hard_Spheres_Monte_Carlo_Observables, &
                                           Hard_Spheres_Post_Processing_Observables
+use class_distribution_function, only: Distribution_Function
 use class_hard_spheres_units, only: Hard_Spheres_Monte_Carlo_Units, &
                                     Dipolar_Hard_Spheres_Monte_Carlo_Units, &
                                     Between_Hard_Spheres_Monte_Carlo_Units, &
@@ -156,6 +157,7 @@ private
         
         type(Hard_Spheres_Post_Processing_Observables) :: type1_observables, type2_observables
         type(Hard_Spheres_Post_Processing_Units) :: type1_units, type2_units
+        type(Distribution_Function) :: field_distribution
         integer :: type1_positions_unit, type1_orientations_unit, type2_positions_unit
         
         logical :: first_set
@@ -197,6 +199,7 @@ contains
         character(len=:), allocatable :: this_name
         
         character(len=:), allocatable :: Box_geometry
+        real(DP) :: Box_height
 
         call json_initialize()
         
@@ -257,6 +260,12 @@ contains
                                                                "Dipolar Hard Spheres")
                 call this%type2_spheres%set_test_num_particles(this%data_post_json, &
                                                                "Hard Spheres")
+                if (geometry%bulk) then
+                    Box_height = this%Box%size(3)
+                else if (geometry%slab) then
+                    Box_height = this%Box%height
+                end if
+                call this%field_distribution%construct(this%data_post_json, Box_height, num_dimensions)
                 
         end select
         
@@ -435,6 +444,7 @@ contains
 
         select type(this)
             type is (System_Post_Processing)
+                call this%field_distribution%destroy()
                 call this%data_post_json%destroy()
         end select
 
