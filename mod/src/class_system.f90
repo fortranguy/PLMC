@@ -31,7 +31,7 @@ use module_physics_macro, only: init_random_seed, set_initial_configuration, &
                                 set_ewald, total_energy, final_spheres, &
                                 init_between_spheres_potential, final_between_spheres_potential, &
                                 test_consistency
-use module_algorithms, only: move, widom, switch, rotate
+use module_algorithms, only: move, widom, measure_local_field, switch, rotate
 
 implicit none
 
@@ -179,6 +179,8 @@ private
         
         procedure :: measure_chemical_potentials => &
                      System_Post_Processing_measure_chemical_potentials
+        procedure :: measure_local_field => &
+                     System_Post_Processing_measure_local_field
         procedure :: accumulate_observables => System_Post_Processing_accumulate_observables
         procedure :: write_observables => System_Post_Processing_write_observables
         procedure :: reset_potentials => System_Post_Processing_reset_potentials
@@ -1107,6 +1109,15 @@ contains
                    this%between_spheres_potential)
 
     end subroutine System_Post_Processing_measure_chemical_potentials
+    
+    subroutine System_Post_Processing_measure_local_field(this)
+
+        class(System_Post_Processing), intent(inout) :: this
+        
+        call measure_local_field(this%Box, this%type1_spheres, this%type1_macro, &
+                                 this%type1_field_distribution)
+        
+    end subroutine System_Post_Processing_measure_local_field
     
     subroutine System_Monte_Carlo_accumulate_observables(this)
     

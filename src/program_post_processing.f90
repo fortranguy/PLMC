@@ -34,6 +34,7 @@ implicit none
                     call sys%reset_potentials(i_step)
                 end if
                 call sys%measure_chemical_potentials()
+                call sys%measure_local_field()
                 call sys%accumulate_observables()
                 call sys%write_observables(i_step)
             end if

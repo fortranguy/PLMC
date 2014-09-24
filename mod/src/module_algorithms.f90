@@ -18,7 +18,7 @@ use class_distribution_function, only: Distribution_Function
 
 implicit none
 private
-public move, widom, switch, rotate
+public move, widom, measure_local_field, switch, rotate
 
 contains
 
@@ -261,7 +261,7 @@ contains
         
     end subroutine widom
     
-    !> Local field: for DHS only (?)
+    !> Local field: for DHS only
     
     subroutine measure_local_field(Box, this_spheres, this_macro, this_field_distribution)
 
