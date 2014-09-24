@@ -56,6 +56,7 @@ private
         procedure :: set_position_z => Hard_Spheres_set_position_z
         procedure :: set_data => Hard_Spheres_set_data
         procedure :: set_all_positions => Hard_Spheres_set_all_positions
+        procedure :: set_widom_num_particles => Hard_Spheres_set_widom_num_particles
         
         procedure :: write_report => Hard_Spheres_write_report
         procedure :: write_data => Hard_Spheres_write_data
@@ -451,6 +452,21 @@ contains
         end if
 
     end subroutine Dipolar_Hard_Spheres_set_all_orientations
+
+    subroutine Hard_Spheres_set_widom_num_particles(this, data_post_json, type_name)
+
+        class(Hard_Spheres), intent(inout) :: this
+        type(json_file), intent(inout) :: data_post_json
+        character(len=*), intent(in) :: type_name
+
+        character(len=4096) :: data_name
+        logical :: found
+
+        data_name = "Particles."//type_name//".number of Widom particles"
+        call data_post_json%get(data_name, this%widom_num_particles, found)
+        call test_data_found(data_name, found)
+
+    end subroutine Hard_Spheres_set_widom_num_particles
     
     !> Write a report of the component in a file
     
