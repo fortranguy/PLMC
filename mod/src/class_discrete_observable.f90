@@ -39,9 +39,11 @@ contains
     
         class(Discrete_Observables), intent(inout) :: this
 
-        this%rejection_rate = real(this%num_rejections, DP) / real(this%num_hits, DP)
-        this%num_rejections = 0
-        this%num_hits = 0
+        if (this%num_hits > 0) then
+            this%rejection_rate = real(this%num_rejections, DP) / real(this%num_hits, DP)
+            this%num_rejections = 0
+            this%num_hits = 0
+        end if
         
     end subroutine Discrete_Observables_update_rejection
     

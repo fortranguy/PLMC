@@ -174,11 +174,13 @@ contains
 
     subroutine Hard_Spheres_Post_Processing_Observables_write_results(this, temperature, &
                                                                       num_equilibrium_steps, &
+                                                                      widom_num_particles, &
                                                                       report_json)
 
         class(Hard_Spheres_Post_Processing_Observables), intent(in) :: this
         real(DP), intent(in) :: temperature
         integer, intent(in) :: num_equilibrium_steps
+        integer, intent(in) :: widom_num_particles
         type(json_value), pointer, intent(in) :: report_json
 
         real(DP) :: chemical_potential_excess
@@ -188,10 +190,12 @@ contains
         call to_object(results_json, "Results")
         call json_value_add(report_json, results_json)
 
-        chemical_potential_excess = -temperature * log(this%sum_inv_activity / &
-                                                   real(num_equilibrium_steps, DP))
-        call json_value_add(results_json, "average excess chemical potential", &
-                                          chemical_potential_excess)
+        if (widom_num_particles > 0) then
+            chemical_potential_excess = -temperature * log(this%sum_inv_activity / &
+                                                    real(num_equilibrium_steps, DP))
+            call json_value_add(results_json, "average excess chemical potential", &
+                                              chemical_potential_excess)
+        end if
 
         nullify(results_json)
 

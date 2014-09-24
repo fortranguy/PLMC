@@ -238,6 +238,9 @@ contains
         call this%between_spheres%construct(this%data_json, &
                                             this%type1_spheres%get_diameter(), &
                                             this%type2_spheres%get_diameter())
+
+        this%Box%num_particles = this%type1_spheres%get_num_particles() + &
+                                 this%type2_spheres%get_num_particles()
                                             
         select type (this)
             type is (System_Monte_Carlo)
@@ -351,8 +354,6 @@ contains
         character(len=4096) :: data_name
         logical :: found
         
-        this%Box%num_particles = this%type1_spheres%get_num_particles() + &
-                                 this%type2_spheres%get_num_particles()
         data_name = "Monte Carlo.decorrelation factor"
         call this%data_json%get(data_name, this%decorrelation_factor, found)
         call test_data_found(data_name, found)
@@ -804,10 +805,12 @@ contains
                 call json_value_add(results_json, "average energy", &
                                                 this%potential_energy_sum / &
                                                 real(this%num_equilibrium_steps, DP))
-                call json_value_add(results_json, "average energy per particule", &
-                                                this%potential_energy_sum / &
-                                                real(this%num_equilibrium_steps, DP) / &
-                                                real(this%Box%num_particles, DP)) ! DHS only?
+                if (this%Box%num_particles > 0) then
+                    call json_value_add(results_json, "average energy per particule", &
+                                                    this%potential_energy_sum / &
+                                                    real(this%num_equilibrium_steps, DP) / &
+                                                    real(this%Box%num_particles, DP)) ! DHS only?
+                end if
                 call json_value_add(results_json, "switch rejection rate", &
                                                 this%switch_observable%sum_rejection / &
                                                 real(this%num_equilibrium_steps, DP))
@@ -876,10 +879,12 @@ contains
     subroutine System_Post_Processing_write_all_results(this)
 
         class(System_Post_Processing), intent(inout) :: this
-
+        
         call this%type1_observables%write_results(this%Box%temperature, this%num_steps, &
+                                                  this%type1_spheres%get_widom_num_particles(), &
                                                   this%type1_report_json)
         call this%type2_observables%write_results(this%Box%temperature, this%num_steps, &
+                                                  this%type2_spheres%get_widom_num_particles(), &
                                                   this%type2_report_json)
 
         call this%write_results_json()

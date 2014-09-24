@@ -483,13 +483,14 @@ contains
         call to_object(properties_json, "Properties")
         call json_value_add(report_json, properties_json)
 
-        density = real(this%num_particles + 1, DP) / this%volume
-            ! cheating ? cf. Widom
-        call json_value_add(properties_json, "density", density)
-        compacity = 4._DP/3._DP*PI*(this%diameter/2._DP)**3 * density
-        call json_value_add(properties_json, "compacity", compacity)
-        concentration = real(this%num_particles, DP) / real(num_particles, DP)
-        call json_value_add(properties_json, "concentration", concentration)
+        if (this%num_particles > 0) then
+            density = real(this%num_particles + 1, DP) / this%volume ! cheating ? cf. Widom
+            call json_value_add(properties_json, "density", density)
+            compacity = 4._DP/3._DP*PI*(this%diameter/2._DP)**3 * density
+            call json_value_add(properties_json, "compacity", compacity)
+            concentration = real(this%num_particles, DP) / real(num_particles, DP)
+            call json_value_add(properties_json, "concentration", concentration)
+        end if
 
         nullify(properties_json)
 
