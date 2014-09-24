@@ -27,7 +27,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit, error_unit
 use data_precisions, only: real_zero
 use data_box, only: num_dimensions
 use json_module, only: json_file, json_initialize
-use module_data, only: data_filename, report_filename, &
+use module_data, only: data_filename, data_post_filename, report_filename, &
                        test_file_exists, test_data_found
 use module_geometry, only: set_geometry, geometry
 use module_linear_algebra, only: identity_matrix, eigen_symmetric
@@ -63,7 +63,7 @@ implicit none
     
     logical :: with_orientations
     
-    type(json_file) :: data_json, report_json
+    type(json_file) :: data_json, data_post_json, report_json
     character(len=4096) :: data_name
     logical :: found
     character(len=4096) :: filename
@@ -114,12 +114,17 @@ implicit none
     data_name = "Monte Carlo.number of equilibrium steps"
     call data_json%get(data_name, num_equilibrium_steps, found)
     call test_data_found(data_name, found)
+
+    call data_json%destroy()
+
+    call test_file_exists(data_post_filename)
+    call data_post_json%load_file(filename = data_post_filename)
     
     data_name = "Distribution.delta"
-    call data_json%get(data_name, delta, found)
+    call data_post_json%get(data_name, delta, found)
     call test_data_found(data_name, found)
-    
-    call data_json%destroy()
+
+    call data_post_json%destroy()
     
     distance_max = Box_height
     num_distribution = int(distance_max/delta)

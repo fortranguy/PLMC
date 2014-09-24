@@ -11,14 +11,12 @@
     "Particles": {
         "Dipolar Hard Spheres": {
             "name": "DHS",
-            "number of particles": 281,
-            "number of Widom particles": 500
+            "number of particles": 281
         },
         "Hard Spheres": {
             "name": "HS",
             "diameter": 1.0,
-            "number of particles": 6750,
-            "number of Widom particles": 500
+            "number of particles": 6750
         },
         "Between Spheres": {
             "name": "BetweenHS",
@@ -69,19 +67,8 @@
         },
         "write": true
     },
-    "Histogram": {
-        "energy delta": 1.0
-    },
     "Distribution": {
         "take snapshot": true,
-        "delta": 0.025,
-        "number of particles": 400,
-        "Parallel": {
-            "height ratio": 0.0,
-            "height delta": 0.25,
-        }
-    },
-    "Clusters": {
-        "cut off": 1.3
+        "number of particles": 400
     }
 }

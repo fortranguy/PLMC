@@ -1,0 +1,19 @@
+{
+    "Particles": {
+        "Dipolar Hard Spheres": {
+            "number of Widom particles": 500
+        },
+        "Hard Spheres": {
+            "number of Widom particles": 500
+        }
+    },
+    "Histogram": {
+        "delta": 1.0
+    },
+    "Distribution": {
+        "delta": 0.025,
+    },
+    "Clusters": {
+        "cut off": 1.3
+    }   
+}

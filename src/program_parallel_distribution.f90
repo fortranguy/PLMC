@@ -12,7 +12,7 @@ use data_precisions, only: real_zero
 use data_constants, only: PI
 use data_box, only: num_dimensions
 use json_module, only: json_file, json_initialize
-use module_data, only: data_filename, report_filename, &
+use module_data, only: data_filename, data_post_filename, report_filename, &
                        test_file_exists, test_data_found
 use module_geometry, only: set_geometry, geometry
 use module_physics_micro, only: sphere_volume, PBC_vector
@@ -45,7 +45,7 @@ implicit none
     real(DP) :: height_delta
     real(DP) :: height_ratio, height, z_min, z_max
     
-    type(json_file) :: data_json, report_json
+    type(json_file) :: data_json, data_post_json, report_json
     character(len=4096) :: data_name
     logical :: found
     character(len=4096) :: filename
@@ -93,20 +93,25 @@ implicit none
     data_name = "Monte Carlo.number of equilibrium steps"
     call data_json%get(data_name, num_equilibrium_steps, found)
     call test_data_found(data_name, found)
+
+    call data_json%destroy()
+
+    call test_file_exists(data_post_filename)
+    call data_post_json%load_file(filename = data_post_filename)
     
     data_name = "Distribution.delta"
-    call data_json%get(data_name, delta, found)
+    call data_post_json%get(data_name, delta, found)
     call test_data_found(data_name, found)
     
     data_name = "Distribution.Parallel.height ratio"
-    call data_json%get(data_name, height_ratio, found)
+    call data_post_json%get(data_name, height_ratio, found)
     call test_data_found(data_name, found)
     
     data_name = "Distribution.Parallel.height delta"
-    call data_json%get(data_name, height_delta, found)
+    call data_post_json%get(data_name, height_delta, found)
     call test_data_found(data_name, found)
-    
-    call data_json%destroy()
+
+    call data_post_json%destroy()
     
     distance_max = norm2(Box_size(1:2) / 2._DP)
     num_distribution = int(distance_max/delta)

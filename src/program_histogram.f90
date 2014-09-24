@@ -4,7 +4,7 @@ program histogram
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file, json_initialize
-use module_data, only: data_filename, &
+use module_data, only: data_filename, data_post_filename, &
                        test_file_exists, test_data_found
 use module_arguments, only: arg_to_file
 
@@ -22,7 +22,7 @@ implicit none
     character(len=1) :: comment_symbol
     real(DP), dimension(:, :), allocatable :: observables
     
-    type(json_file) :: data_json
+    type(json_file) :: data_json, data_post_json
     character(len=4096) :: data_name
     logical :: found
     character(len=4096) :: filename
@@ -36,12 +36,17 @@ implicit none
     data_name = "Monte Carlo.number of equilibrium steps"
     call data_json%get(data_name, num_steps, found)
     call test_data_found(data_name, found)
+
+    call data_json%destroy()
+
+    call test_file_exists(data_post_filename)
+    call data_post_json%load_file(filename = data_post_filename)
     
     data_name = "Histogram.energy delta"
-    call data_json%get(data_name, energy_delta, found)
+    call data_post_json%get(data_name, energy_delta, found)
     call test_data_found(data_name, found)
-    
-    call data_json%destroy()
+
+    call data_post_json%destroy()
     
     call arg_to_file(1, filename, length)
     open(newunit=observables_unit, recl=4096, file=filename(1:length), status='old', action='read')
