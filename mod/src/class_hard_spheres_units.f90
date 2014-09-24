@@ -62,6 +62,7 @@ private
     type, public :: Hard_Spheres_Post_Processing_Units
 
         integer :: inv_activity
+        integer :: local_field
 
     contains
 
@@ -158,6 +159,8 @@ contains
         character(len=*), intent(in) :: name
 
         open(newunit=this%inv_activity, recl=4096, file=name//"_inv_activity.out", status='new', &
+             action='write')             
+        open(newunit=this%local_field, recl=4096, file=name//"_local_field.out", status='new', &
              action='write')
 
     end subroutine Hard_Spheres_Post_Processing_Units_open
@@ -216,6 +219,7 @@ contains
         class(Hard_Spheres_Post_Processing_Units), intent(inout) :: this
 
         close(this%inv_activity)
+        close(this%local_field)
 
     end subroutine Hard_Spheres_Post_Processing_Units_close
 

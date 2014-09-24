@@ -894,6 +894,7 @@ contains
         call this%type1_observables%write_results(this%Box%temperature, this%num_steps, &
                                                   this%type1_spheres%get_widom_num_particles(), &
                                                   this%type1_report_json)
+        call this%type1_field_distribution%write(this%num_steps, this%type1_units%local_field)
         call this%type2_observables%write_results(this%Box%temperature, this%num_steps, &
                                                   this%type2_spheres%get_widom_num_particles(), &
                                                   this%type2_report_json)
