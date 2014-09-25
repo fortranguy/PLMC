@@ -187,7 +187,7 @@ implicit none
             ! Fill
             distribution_step(:, :) = 0
             do i_particle = 1, num_particles
-                i_distribution =  int(positions(3, i_particle)/delta) + 1
+                i_distribution = int(positions(3, i_particle)/delta) + 1
                 distribution_step(i_distribution, 1) = distribution_step(i_distribution, 1) + 1._DP
             end do
             
@@ -206,7 +206,7 @@ implicit none
                                            norm2(orientation_matrix(:, num_dimensions))
                                            
                 do i_particle = 1, num_particles
-                    i_distribution =  int(positions(3, i_particle)/delta)
+                    i_distribution = int(positions(3, i_particle)/delta) + 1
                     orientation_z_sqr = orientations(3, i_particle)**2 / &
                                         dot_product(orientations(:, i_particle), &
                                                     orientations(:, i_particle))
