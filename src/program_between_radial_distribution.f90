@@ -138,7 +138,7 @@ implicit none
                     distance_12 = PBC_distance(Box_size, &
                                                type1_positions(:, type1_i_particle), &
                                                type2_positions(:, type2_i_particle))
-                    i_distribution = int(distance_12/delta)
+                    i_distribution = int(distance_12/delta) + 1
                     distribution_step(i_distribution) = distribution_step(i_distribution) + 1._DP
                 end do
             end do

@@ -103,7 +103,7 @@ contains
         
         integer :: i_distribution
         
-        i_distribution = int(distance/this%delta)
+        i_distribution = int(distance/this%delta) + 1
         
         this%distribution_step(i_distribution, 1) = this%distribution_step(i_distribution, 1) + 1._DP
         this%distribution_step(i_distribution, 2:this%num_observables) = &

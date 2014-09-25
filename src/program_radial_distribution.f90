@@ -125,7 +125,7 @@ implicit none
                 do j_particle = i_particle + 1, num_particles
                     distance_ij = PBC_distance(Box_size, positions(:, i_particle), &
                                                          positions(:, j_particle))
-                    i_distribution =  int(distance_ij/delta)
+                    i_distribution =  int(distance_ij/delta) + 1
                     distribution_step(i_distribution) = distribution_step(i_distribution) + 1._DP
                 end do
             end do

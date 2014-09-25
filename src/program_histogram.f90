@@ -72,7 +72,7 @@ implicit none
     
     energy_distribution_function(:) = 0._DP
     do i_step = 1, num_steps
-        i_distribution = int(observables(1, i_step)/energy_delta)
+        i_distribution = int(observables(1, i_step)/energy_delta) + 1
         energy_distribution_function(i_distribution) = &
             energy_distribution_function(i_distribution) + 1._DP
     end do

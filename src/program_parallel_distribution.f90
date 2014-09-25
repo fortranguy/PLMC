@@ -171,7 +171,7 @@ implicit none
                         if (z_min < positions(3, j_particle) .and. positions(3, j_particle) < z_max) then
                             vector_ij = PBC_vector(Box_size, positions(:, i_particle), &
                                                              positions(:, j_particle))
-                            i_distribution =  int(norm2(vector_ij(1:2)) / delta)
+                            i_distribution =  int(norm2(vector_ij(1:2)) / delta) + 1
                             distribution_step(i_distribution) = distribution_step(i_distribution) + 1._DP
                         end if
                     end do
