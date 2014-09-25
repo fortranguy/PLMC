@@ -67,7 +67,7 @@ implicit none
         limit_values(1, i_obsersable) = minval(observables(i_obsersable, :))
         limit_values(2, i_obsersable) = maxval(observables(i_obsersable, :))
     end do
-    num_distribution(:, 1) = int(limit_values(:, 1)/energy_delta)
+    num_distribution(:, 1) = int(limit_values(:, 1)/energy_delta) + 1
     allocate(energy_distribution_function(num_distribution(1, 1): num_distribution(2, 1)))
     
     energy_distribution_function(:) = 0._DP

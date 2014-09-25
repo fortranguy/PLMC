@@ -49,7 +49,7 @@ contains
         call data_post_json%get(data_name, this%delta, found)
         call test_data_found(data_name, found)
         
-        this%num_distribution = int(distance_max/this%delta)
+        this%num_distribution = int(distance_max/this%delta) + 1
         
         this%num_observables = num_observables + 1
         allocate(this%distribution_step(this%num_distribution, this%num_observables))

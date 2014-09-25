@@ -127,7 +127,7 @@ implicit none
     call data_post_json%destroy()
     
     distance_max = Box_height
-    num_distribution = int(distance_max/delta)
+    num_distribution = int(distance_max/delta) + 1
     allocate(distribution_step(num_distribution, 3))
     allocate(distribution_function(num_distribution, 3))
     
