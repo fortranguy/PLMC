@@ -198,7 +198,7 @@ implicit none
                                    num_particles_inside_avg**2 / (2._DP*PI) / delta
     
         do i_distribution = 1, num_distribution
-            distance_i_distribution = (real(i_distribution, DP) + 0.5_DP) * delta
+            distance_i_distribution = (real(i_distribution, DP) - 0.5_DP) * delta
             write(distrib_unit, *) distance_i_distribution, distribution_function(i_distribution) / &
                                                             distance_i_distribution
         end do

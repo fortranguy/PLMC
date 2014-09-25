@@ -81,7 +81,7 @@ contains
         this%distribution_step(:, 1) = this%distribution_step(:, 1) / this%delta
         
         do i_distribution = 1, this%num_distribution
-            distance_i = (real(i_distribution, DP) + 0.5_DP) * this%delta
+            distance_i = (real(i_distribution, DP) - 0.5_DP) * this%delta
             write(distribution_unit, *) distance_i, this%distribution_step(i_distribution, :)
         end do
     

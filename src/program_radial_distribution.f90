@@ -148,9 +148,9 @@ implicit none
     
         do i_distribution = 1, num_distribution
         
-            distance_i_distribution = (real(i_distribution, DP) + 0.5_DP) * delta
-            distance_i_minus = real(i_distribution, DP) * delta
-            distance_i_plus = real(i_distribution + 1, DP) * delta
+            distance_i_distribution = (real(i_distribution, DP) - 0.5_DP) * delta
+            distance_i_minus = real(i_distribution - 1, DP) * delta
+            distance_i_plus = real(i_distribution, DP) * delta
             
             distribution_function(i_distribution) = distribution_function(i_distribution) / &
                 density / (sphere_volume(distance_i_plus) - sphere_volume(distance_i_minus))

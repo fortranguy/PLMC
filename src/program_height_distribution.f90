@@ -257,12 +257,12 @@ implicit none
          
     if (with_orientations) then
         do i_distribution = 1, num_distribution
-            height_i = (real(i_distribution, DP) + 0.5_DP) * delta
+            height_i = (real(i_distribution, DP) - 0.5_DP) * delta
             write(distribution_unit, *) height_i, distribution_function(i_distribution, :)
         end do
     else
         do i_distribution = 1, num_distribution
-            height_i = (real(i_distribution, DP) + 0.5_DP) * delta
+            height_i = (real(i_distribution, DP) - 0.5_DP) * delta
             write(distribution_unit, *) height_i, distribution_function(i_distribution, 1)
         end do
     end if
