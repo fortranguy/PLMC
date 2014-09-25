@@ -34,7 +34,6 @@ private
         procedure :: total_energy => Electronic_Layer_Correction_total_energy
         
         procedure :: solo_field => Electronic_Layer_Correction_solo_field
-        procedure :: pair_field_tensor => Electronic_Layer_Correction_pair_field_tensor
         
         procedure :: move_energy => Electronic_Layer_Correction_move_energy
         procedure :: update_structure_move => &
@@ -307,86 +306,41 @@ contains
     
     !> Field
     !> \f[
-    !>      \vec{E}(\vec{r}_i) = \sum_j T_{ij} |\vec{\mu}_j)
+    !>      \vec{E}(\vec{r}_{N+1}) = \frac{2\pi}{S} \sum_{\vec{k}^{2D} \neq \vec{0}} w(k^{2D}) \{
+    !>                                    \Re[ e^{(\vec{K}_+ \cdot \vec{r}_{N+1})} 
+    !>                                              S_-^*(\vec{k}^{2D}) |\vec{K}_+) +
+    !>                                         e^{(\vec{K}_-^* \cdot \vec{r}_{N+1})}
+    !>                                              S_+(\vec{k}^{2D}) |\vec{K}_-^*) ] +
+    !>                                    (\vec{\mu}_{N+1} \cdot \vec{K}_-^*)  |\vec{K}_+)
+    !>                               \}  
     !> \f]
-
-    pure function Electronic_Layer_Correction_solo_field(this, Box, this_spheres, particle)&
+    
+    pure function Electronic_Layer_Correction_solo_field(this, Box, particle) &
                   result(solo_field)
-
-        class(Electronic_Layer_Correction), intent(in) :: this
-        type(Box_Parameters), intent(in) :: Box
-        type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
-        type(Particle_Index), intent(in) :: particle
-        real(DP), dimension(num_dimensions) :: solo_field
-
-        integer :: j_particle
-
-        solo_field(:) = 0._DP
-
-        do j_particle = 1, this_spheres%get_num_particles()
-        
-            solo_field(:) = solo_field(:) + &
-                            matmul(this%pair_field_tensor(Box, &
-                                                          particle%position, &
-                                                          this_spheres%get_position(j_particle)), &
-                                   this_spheres%get_orientation(j_particle))
-
-        end do
-
-    end function Electronic_Layer_Correction_solo_field
-    
-    !> Between 2 particles
-    !> \f[
-    !>      T_{ij} = \frac{2\pi}{S}
-    !>               \sum_{\vec{k}^{2D} \neq \vec{0}}
-    !>                      w(\vec{k}^{2D})
-    !>                      [
-    !>                          |\vec{K}_+) e^{\vec{K}_+ \cdot \vec{r}_i}
-    !>                          e^{\vec{K}_-^* \cdot \vec{r}_j} (\vec{K}_-^*| +
-    !>                          |\vec{K}_-) e^{\vec{K}_- \cdot \vec{r}_i}
-    !>                          e^{\vec{K_+^*} \cdot \vec{r}_j} (\vec{K_+^*}|
-    !>                      ]
-    !> \f]
-    
-    pure function Electronic_Layer_Correction_pair_field_tensor(this, Box, position_i, position_j) &
-                  result(pair_field_tensor)
                   
         class(Electronic_Layer_Correction), intent(in) :: this
         type(Box_Parameters), intent(in) :: Box
-        real(DP), dimension(:), intent(in) :: position_i, position_j
-        real(DP), dimension(num_dimensions, num_dimensions) :: pair_field_tensor
+        type(Particle_Index), intent(in) :: particle
+        real(DP), dimension(num_dimensions) :: solo_field
         
-        complex(DP), dimension(num_dimensions, num_dimensions) :: complex_tensor
+        real(DP), dimension(2) :: position_div_box
         
-        real(DP), dimension(2) :: position_i_div_box, position_j_div_box
-        
-        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_i_1
-        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_i_2
-        complex(DP) :: exp_Ikx_i
-        real(DP), dimension(0:Box%wave(1), 0:Box%wave(2)) :: exp_kz_i_tab
-        real(DP) :: exp_kz_i
-        
-        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_j_1
-        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_j_2
-        complex(DP) :: exp_Ikx_j
-        real(DP), dimension(0:Box%wave(1), 0:Box%wave(2)) :: exp_kz_j_tab
-        real(DP) :: exp_kz_j
+        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_1
+        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_2
+        complex(DP) :: exp_Ikx
+        real(DP), dimension(0:Box%wave(1), 0:Box%wave(2)) :: exp_kz_tab
+        real(DP) :: exp_kz
         
         complex(DP), dimension(num_dimensions) :: wave_vector_plus, wave_vector_minus
         real(DP), dimension(2) :: wave_vector
         integer :: kx, ky
         
-        position_i_div_box(:) = 2._DP*PI * position_i(1:2)/Box%size(1:2)
-        call fourier_i(Box%wave(1), position_i_div_box(1), exp_Ikx_i_1)
-        call fourier_i(Box%wave(2), position_i_div_box(2), exp_Ikx_i_2)
-        call set_exp_kz(Box%wave, this%wave_norm, position_i(3), exp_kz_i_tab)
+        position_div_box(:) = 2._DP*PI * particle%position(1:2)/Box%size(1:2)
+        call fourier_i(Box%wave(1), position_div_box(1), exp_Ikx_1)
+        call fourier_i(Box%wave(2), position_div_box(2), exp_Ikx_2)
+        call set_exp_kz(Box%wave, this%wave_norm, particle%position(3), exp_kz_tab)
         
-        position_j_div_box(:) = 2._DP*PI * position_j(1:2)/Box%size(1:2)
-        call fourier_i(Box%wave(1), position_j_div_box(1), exp_Ikx_j_1)
-        call fourier_i(Box%wave(2), position_j_div_box(2), exp_Ikx_j_2)
-        call set_exp_kz(Box%wave, this%wave_norm, position_j(3), exp_kz_j_tab)
-        
-        complex_tensor(:, :) = cmplx(0._DP, 0._DP, DP)
+        solo_field(:) = 0._DP
         
         do ky = -Box%wave(2), Box%wave(2)
             wave_vector(2) = 2._DP*PI * real(ky, DP) / Box%size(2)
@@ -394,11 +348,8 @@ contains
         do kx = -Box%wave(1), Box%wave(1)
             wave_vector(1) = 2._DP*PI * real(kx, DP) / Box%size(1)
             
-            exp_Ikx_i = exp_Ikx_i_1(kx) * exp_Ikx_i_2(ky)
-            exp_kz_i = exp_kz_i_tab(abs(kx), abs(ky))
-            
-            exp_Ikx_j = exp_Ikx_j_1(kx) * exp_Ikx_j_2(ky)
-            exp_kz_j = exp_kz_j_tab(abs(kx), abs(ky))
+            exp_Ikx = exp_Ikx_1(kx) * exp_Ikx_2(ky)
+            exp_kz = exp_kz_tab(abs(kx), abs(ky))            
             
             wave_vector_plus(1:2) = cmplx(0._DP, wave_vector, DP)
             wave_vector_plus(3) = cmplx(+this%wave_norm(kx, ky), 0._DP, DP)
@@ -406,25 +357,21 @@ contains
             wave_vector_minus(1:2) = cmplx(0._DP, wave_vector, DP)
             wave_vector_minus(3) = cmplx(-this%wave_norm(kx, ky), 0._DP, DP)
             
-            complex_tensor(:, :) = complex_tensor(:, :) + &
-                cmplx(this%weight(kx, ky), 0._DP, DP) * &
-                (exp_Ikx_i * cmplx(exp_kz_i, 0._DP, DP) * &
-                conjg(exp_Ikx_j) / cmplx(exp_kz_j, 0._DP, DP) * &
-                matmul(reshape(wave_vector_plus, [num_dimensions, 1]), &
-                       reshape(conjg(wave_vector_minus), [1, num_dimensions])) + &
-                exp_Ikx_i / cmplx(exp_kz_i, 0._DP, DP) * &
-                conjg(exp_Ikx_j) * cmplx(exp_kz_j, 0._DP, DP) * &
-                matmul(reshape(wave_vector_minus, [num_dimensions, 1]), &
-                       reshape(conjg(wave_vector_plus), [1, num_dimensions])))
+            solo_field(:) = solo_field(:) + this%weight(kx, ky) * &
+                (real(exp_Ikx*cmplx(exp_kz, 0._DP, DP) * conjg(this%structure_minus(kx, ky)) * &
+                      wave_vector_plus(:) + &
+                      conjg(exp_Ikx)/cmplx(exp_kz, 0._DP, DP) * this%structure_plus(kx, ky) * &
+                      conjg(wave_vector_minus(:)) + &
+                      dot_product(particle%orientation, conjg(wave_vector_minus)) * &
+                      wave_vector_plus(:), DP))
             
         end do
         
         end do
         
-        pair_field_tensor(:, :) = 2._DP*PI / product(Box%size(1:2)) * real(complex_tensor(:, :), DP)
-        
+        solo_field(:) = 2._DP*PI / product(Box%size(1:2)) * solo_field(:)        
                   
-    end function Electronic_Layer_Correction_pair_field_tensor
+    end function Electronic_Layer_Correction_solo_field
     
     !> Move
 

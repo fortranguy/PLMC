@@ -295,8 +295,7 @@ contains
                                  this_macro%ewald_self%solo_field(test%orientation) + &
                                  this_macro%ewald_bound%solo_field(Box%size)
                 if (geometry%slab) then
-                    local_field(:) = local_field(:) - &
-                                     this_macro%elc%solo_field(Box, this_spheres, test)
+                    local_field(:) = local_field(:) - this_macro%elc%solo_field(Box, test)
                 end if
                 
                 call this_field_distribution%particle_set(test%position(3), local_field)
