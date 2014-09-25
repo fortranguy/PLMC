@@ -224,17 +224,13 @@ contains
         write(output_unit, *) this%name, " class destruction"
         if (allocated(this%all_positions)) deallocate(this%all_positions)
         if (allocated(this%name)) deallocate(this%name)
+
+        select type (this)
+            type is (Dipolar_Hard_Spheres)
+                if (allocated(this%all_orientations)) deallocate(this%all_orientations)
+        end select
     
     end subroutine Hard_Spheres_destroy
-    
-    subroutine Dipolar_Hard_Spheres_destroy(this)
-    
-        class(Dipolar_Hard_Spheres), intent(inout) :: this
-        
-        call this%Hard_Spheres%destroy()
-        if (allocated(this%all_orientations)) deallocate(this%all_orientations)
-          
-    end subroutine Dipolar_Hard_Spheres_destroy
     
     subroutine Between_Hard_Spheres_destroy(this)
     
