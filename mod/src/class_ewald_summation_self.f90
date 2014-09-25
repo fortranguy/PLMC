@@ -15,7 +15,7 @@ private
         procedure :: set_alpha => Ewald_Summation_Self_set_alpha
         procedure :: total_energy => Ewald_Summation_Self_total_energy
         procedure :: solo_energy => Ewald_Summation_Self_solo_energy
-        procedure :: solo_field => Ewald_Summation_Self_solo_field
+        procedure :: test_field => Ewald_Summation_Self_test_field
     end type Ewald_Summation_Self
     
 contains
@@ -60,15 +60,15 @@ contains
     
     end function Ewald_Summation_Self_solo_energy
     
-    pure function Ewald_Summation_Self_solo_field(this, orientation) &
-                  result(solo_field)
+    pure function Ewald_Summation_Self_test_field(this, orientation) &
+                  result(test_field)
     
         class(Ewald_Summation_Self), intent(in) :: this
         real(DP), dimension(:), intent(in) :: orientation
-        real(DP), dimension(num_dimensions) :: solo_field
+        real(DP), dimension(num_dimensions) :: test_field
         
-        solo_field(:) = -2._DP/3._DP * this%alpha**3/sqrt(PI) * orientation(:)
+        test_field(:) = -2._DP/3._DP * this%alpha**3/sqrt(PI) * orientation(:)
     
-    end function Ewald_Summation_Self_solo_field
+    end function Ewald_Summation_Self_test_field
 
 end module class_ewald_summation_self

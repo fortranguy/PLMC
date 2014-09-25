@@ -20,7 +20,7 @@ private
         procedure :: reset_total_moment => Ewald_Summation_Bound_reset_total_moment
         procedure :: total_energy => Ewald_Summation_Bound_total_energy
         
-        procedure :: solo_field => Ewald_Summation_Bound_solo_field
+        procedure :: test_field => Ewald_Summation_Bound_test_field
         
         procedure :: rotation_energy => Ewald_Summation_Bound_rotation_energy
         procedure :: update_total_moment_rotation => Ewald_Summation_Bound_update_total_moment_rotation
@@ -107,24 +107,24 @@ contains
     !>                            |\vec{e}_z)
     !> \f]
     
-    pure function Ewald_Summation_Bound_solo_field(this, Box_size, particle) result(solo_field)
+    pure function Ewald_Summation_Bound_test_field(this, Box_size, particle) result(test_field)
 
         class(Ewald_Summation_Bound), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         type(Particle_Index), intent(in) :: particle
-        real(DP), dimension(num_dimensions) :: solo_field
+        real(DP), dimension(num_dimensions) :: test_field
         
         if (geometry%bulk) then
-            solo_field(:) = -2._DP/3._DP * PI/product(Box_size) * (2._DP*this%total_moment(:) + &
+            test_field(:) = -2._DP/3._DP * PI/product(Box_size) * (2._DP*this%total_moment(:) + &
                             particle%orientation(:))
         else if(geometry%slab) then
-            solo_field(1:2) = 0._DP
-            solo_field(num_dimensions) = -2._DP*PI / product(Box_size) * &
+            test_field(1:2) = 0._DP
+            test_field(num_dimensions) = -2._DP*PI / product(Box_size) * &
                                          (2._DP*this%total_moment(num_dimensions) + &
                                           particle%orientation(num_dimensions))
         end if
 
-    end function Ewald_Summation_Bound_solo_field
+    end function Ewald_Summation_Bound_test_field
 
     !> Rotation
     

@@ -270,7 +270,7 @@ contains
         class(Dipolar_Hard_Spheres_Macro), intent(in) :: this_macro
         class(Distribution_Function) :: this_field_distribution
         
-        real(DP), dimension(num_dimensions) :: local_field
+        real(DP), dimension(num_dimensions) :: test_field
         type(Particle_Index) :: test
         integer :: i_field_particule
         logical :: overlap
@@ -290,15 +290,15 @@ contains
             if (.not. overlap) then
             
                 test%orientation(:) = random_surface()
-                local_field(:) = this_macro%ewald_real%solo_field(Box%size, this_spheres, test) + &
-                                 this_macro%ewald_reci%solo_field(Box, test) - &
-                                 this_macro%ewald_self%solo_field(test%orientation) + &
-                                 this_macro%ewald_bound%solo_field(Box%size, test)
+                test_field(:) = this_macro%ewald_real%test_field(Box%size, this_spheres, test) + &
+                                this_macro%ewald_reci%test_field(Box, test) - &
+                                this_macro%ewald_self%test_field(test%orientation) + &
+                                this_macro%ewald_bound%test_field(Box%size, test)
                 if (geometry%slab) then
-                    local_field(:) = local_field(:) - this_macro%elc%solo_field(Box, test)
+                    test_field(:) = test_field(:) - this_macro%elc%test_field(Box, test)
                 end if
                 
-                call this_field_distribution%particle_set(test%position(3), local_field)
+                call this_field_distribution%particle_set(test%position(3), test_field)
             
             end if
         

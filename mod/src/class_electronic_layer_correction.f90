@@ -33,7 +33,7 @@ private
         procedure :: count_wave_vectors => Electronic_Layer_Correction_count_wave_vectors
         procedure :: total_energy => Electronic_Layer_Correction_total_energy
         
-        procedure :: solo_field => Electronic_Layer_Correction_solo_field
+        procedure :: test_field => Electronic_Layer_Correction_test_field
         
         procedure :: move_energy => Electronic_Layer_Correction_move_energy
         procedure :: update_structure_move => &
@@ -315,13 +315,13 @@ contains
     !>                               \}  
     !> \f]
     
-    pure function Electronic_Layer_Correction_solo_field(this, Box, particle) &
-                  result(solo_field)
+    pure function Electronic_Layer_Correction_test_field(this, Box, particle) &
+                  result(test_field)
                   
         class(Electronic_Layer_Correction), intent(in) :: this
         type(Box_Parameters), intent(in) :: Box
         type(Particle_Index), intent(in) :: particle
-        real(DP), dimension(num_dimensions) :: solo_field
+        real(DP), dimension(num_dimensions) :: test_field
         
         real(DP), dimension(2) :: position_div_box
         
@@ -340,7 +340,7 @@ contains
         call fourier_i(Box%wave(2), position_div_box(2), exp_Ikx_2)
         call set_exp_kz(Box%wave, this%wave_norm, particle%position(3), exp_kz_tab)
         
-        solo_field(:) = 0._DP
+        test_field(:) = 0._DP
         
         do ky = -Box%wave(2), Box%wave(2)
             wave_vector(2) = 2._DP*PI * real(ky, DP) / Box%size(2)
@@ -357,7 +357,7 @@ contains
             wave_vector_minus(1:2) = cmplx(0._DP, wave_vector, DP)
             wave_vector_minus(3) = cmplx(-this%wave_norm(kx, ky), 0._DP, DP)
             
-            solo_field(:) = solo_field(:) + this%weight(kx, ky) * &
+            test_field(:) = test_field(:) + this%weight(kx, ky) * &
                 (real(conjg(this%structure_minus(kx, ky))*exp_Ikx*cmplx(exp_kz, 0._DP, DP) * &
                  wave_vector_plus(:) + &
                  this%structure_plus(kx, ky)*conjg(exp_Ikx)/cmplx(exp_kz, 0._DP, DP) * &
@@ -369,9 +369,9 @@ contains
         
         end do
         
-        solo_field(:) = -2._DP * PI / product(Box%size(1:2)) * solo_field(:)        
+        test_field(:) = -2._DP * PI / product(Box%size(1:2)) * test_field(:)        
                   
-    end function Electronic_Layer_Correction_solo_field
+    end function Electronic_Layer_Correction_test_field
     
     !> Move
 

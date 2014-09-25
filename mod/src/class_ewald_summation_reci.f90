@@ -27,7 +27,7 @@ private
         procedure, private :: get_structure_modulus => Ewald_Summation_Reci_get_structure_modulus
         procedure :: count_wave_vectors => Ewald_Summation_Reci_count_wave_vectors
         procedure :: total_energy => Ewald_Summation_Reci_total_energy
-        procedure :: solo_field => Ewald_Summation_Reci_solo_field
+        procedure :: test_field => Ewald_Summation_Reci_test_field
         
         procedure :: move_energy => Ewald_Summation_Reci_move_energy
         procedure :: update_structure_move => Ewald_Summation_Reci_update_structure_move
@@ -274,12 +274,12 @@ contains
     !>                               ] \vec{k}
     !> \f]
 
-    pure function Ewald_Summation_Reci_solo_field(this, Box, particle) result(solo_field)
+    pure function Ewald_Summation_Reci_test_field(this, Box, particle) result(test_field)
 
         class(Ewald_Summation_Reci), intent(in) :: this
         type(Box_Parameters), intent(in) :: Box
         type(Particle_Index), intent(in) :: particle
-        real(DP), dimension(num_dimensions) :: solo_field
+        real(DP), dimension(num_dimensions) :: test_field
 
         real(DP), dimension(num_dimensions) :: position_div_box
         
@@ -297,7 +297,7 @@ contains
         call fourier_i(Box%wave(2), position_div_box(2), exp_Ikx_2)
         call fourier_i(Box%wave(3), position_div_box(3), exp_Ikx_3)
 
-        solo_field(:) = 0._DP
+        test_field(:) = 0._DP
         
         do kz = -Box%wave(3), Box%wave(3)
             wave_vector(3) = 2._DP*PI * real(kz, DP) / Box%size(3)
@@ -310,7 +310,7 @@ contains
                 
             exp_Ikx = exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz)
 
-            solo_field(:) = solo_field(:) + &
+            test_field(:) = test_field(:) + &
                 this%weight(kx, ky, kz) * &
                 (2._DP*real(this%structure(kx, ky, kz) * conjg(exp_Ikx), DP) + &
                 dot_product(particle%orientation, wave_vector)) * wave_vector(:)
@@ -321,9 +321,9 @@ contains
             
         end do
         
-        solo_field(:) =-2._DP*PI / product(Box%size) * solo_field(:)
+        test_field(:) =-2._DP*PI / product(Box%size) * test_field(:)
 
-    end function Ewald_Summation_Reci_solo_field
+    end function Ewald_Summation_Reci_test_field
     
     !> Move
 
