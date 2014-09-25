@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 
 implicit none
 private
-public identity_matrix, projector_matrix, eigen_symmetric
+public identity_matrix, eigen_symmetric
 
 contains
 
@@ -19,16 +19,6 @@ contains
         forall (i_dim = 1:num_dimensions) identity_matrix(i_dim, i_dim) = 1._DP
     
     end function identity_matrix
-    
-    pure function projector_matrix(num_dimensions, i_dimension)
-    
-        integer, intent(in) :: num_dimensions, i_dimension
-        real(DP), dimension(num_dimensions, num_dimensions) :: projector_matrix
-        
-        projector_matrix(:, :) = 0._DP
-        projector_matrix(i_dimension, i_dimension) = 1._DP
-        
-    end function projector_matrix
 
     subroutine eigen_symmetric(matrix, eigenvalues)
     

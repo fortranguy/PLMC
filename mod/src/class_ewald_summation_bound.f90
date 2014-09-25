@@ -5,7 +5,6 @@ use data_constants, only: PI
 use data_box, only: num_dimensions
 use module_types_micro, only: Particle_Index
 use module_geometry, only: geometry
-use module_linear_algebra, only: projector_matrix
 use module_physics_micro, only: exchange_sign
 use class_hard_spheres, only: Dipolar_Hard_Spheres
 
@@ -118,9 +117,10 @@ contains
             solo_field(:) = -2._DP/3._DP * PI/product(Box_size) * (2._DP*this%total_moment(:) + &
                             particle%orientation(:))
         else if(geometry%slab) then
-            solo_field(:) = -2._DP * PI/product(Box_size) * &
-                            matmul(projector_matrix(num_dimensions, 3), 2._DP*this%total_moment + &
-                            particle%orientation)
+            solo_field(1:2) = 0._DP
+            solo_field(num_dimensions) = -2._DP*PI / product(Box_size) * &
+                                         (2._DP*this%total_moment(num_dimensions) + &
+                                          particle%orientation(num_dimensions))
         end if
 
     end function Ewald_Summation_Bound_solo_field

@@ -5,7 +5,6 @@ use data_box, only: num_dimensions
 use json_module, only: json_file
 use module_data, only: test_data_found
 use module_types_micro, only: Particle_Index
-use module_linear_algebra, only: identity_matrix
 use module_physics_micro, only: set_discrete_length, PBC_vector, ewald_real_B, ewald_real_C
 use class_hard_spheres, only: Dipolar_Hard_Spheres
 
