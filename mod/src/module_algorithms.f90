@@ -291,7 +291,7 @@ contains
             
                 test%orientation(:) = random_surface()
                 local_field(:) = this_macro%ewald_real%solo_field(Box%size, this_spheres, test) + &
-                                 this_macro%ewald_reci%solo_field(Box, this_spheres, test) - &
+                                 this_macro%ewald_reci%solo_field(Box, test) - &
                                  this_macro%ewald_self%solo_field(test%orientation) + &
                                  this_macro%ewald_bound%solo_field(Box%size)
                 if (geometry%slab) then

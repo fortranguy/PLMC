@@ -29,7 +29,6 @@ private
         procedure :: total_energy => Ewald_Summation_Reci_total_energy
 
         procedure :: solo_field => Ewald_Summation_Reci_solo_field
-        procedure :: pair_field_tensor => Ewald_Summation_Reci_pair_field_tensor
         
         procedure :: move_energy => Ewald_Summation_Reci_move_energy
         procedure :: update_structure_move => Ewald_Summation_Reci_update_structure_move
@@ -269,67 +268,37 @@ contains
     
     !> Field
     !> \f[
-    !>      \vec{E}(\vec{r}_i) = \sum_j T_{ij} |\vec{\mu}_j)
+    !>      \vec{E}(\vec{r}_{N+1}) = -\frac{4\pi}{V} \sum_{\vec{k} \neq 0} w(\alpha, \vec{k})
+    !>                               [
+    !>                                  \Re(S(\vec{k}) e^{-i(\vec{k}\cdot \vec{r}_{N+1})}) +
+    !>                                  (\vec{\mu}_{N+1} \cdot \vec{k})
+    !>                               ] \vec{k}
     !> \f]
 
-    pure function Ewald_Summation_Reci_solo_field(this, Box, this_spheres, particle) result(solo_field)
+    pure function Ewald_Summation_Reci_solo_field(this, Box, particle) result(solo_field)
 
         class(Ewald_Summation_Reci), intent(in) :: this
         type(Box_Parameters), intent(in) :: Box
-        type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
         type(Particle_Index), intent(in) :: particle
         real(DP), dimension(num_dimensions) :: solo_field
 
-        integer :: j_particle
-
-        solo_field(:) = 0._DP
-
-        do j_particle = 1, this_spheres%get_num_particles()
+        real(DP), dimension(num_dimensions) :: position_div_box
         
-            solo_field(:) = solo_field(:) + &
-                            matmul(this%pair_field_tensor(Box, &
-                                                          particle%position, &
-                                                          this_spheres%get_position(j_particle)), &
-                                   this_spheres%get_orientation(j_particle))
-
-        end do
-
-    end function Ewald_Summation_Reci_solo_field
-
-    !> Between 2 particles
-    !> \f[
-    !>      T_{ij} = -\frac{4\pi}{V} \sum_{\vec{k}\neq\vec{0}}
-    !>                                      w(\alpha, \vec{k}) e^{-i\vec{k}\cdot\vec{r}_{ij}}
-    !>                                      |\vec{k}) (\vec{k}|
-    !> \f]
-
-    pure function Ewald_Summation_Reci_pair_field_tensor(this, Box, position_i, position_j) &
-                  result(pair_field_tensor)
-
-        class(Ewald_Summation_Reci), intent(in) :: this
-        type(Box_Parameters), intent(in) :: Box
-        real(DP), dimension(:), intent(in) :: position_i, position_j
-        real(DP), dimension(num_dimensions, num_dimensions) :: pair_field_tensor
-        
-        complex(DP), dimension(num_dimensions, num_dimensions) :: complex_tensor
-        
-        real(DP), dimension(num_dimensions) :: vector_div_box
-        
-        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_IkxVec_1
-        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_IkxVec_2
-        complex(DP), dimension(-Box%wave(3):Box%wave(3)) :: exp_IkxVec_3
-        complex(DP) :: exp_IkxVec
+        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_1
+        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_2
+        complex(DP), dimension(-Box%wave(3):Box%wave(3)) :: exp_Ikx_3
+        complex(DP) :: exp_Ikx
         
         real(DP), dimension(num_dimensions) :: wave_vector
         
         integer :: kx, ky, kz
         
-        vector_div_box(:) = 2._DP*PI * (position_i(:) - position_j(:)) / Box%size(:)
-        call fourier_i(Box%wave(1), vector_div_box(1), exp_IkxVec_1)
-        call fourier_i(Box%wave(2), vector_div_box(2), exp_IkxVec_2)
-        call fourier_i(Box%wave(3), vector_div_box(3), exp_IkxVec_3)
-        
-        complex_tensor(:, :) = cmplx(0._DP, 0._DP, DP)
+        position_div_box(:) = 2._DP*PI * particle%position(:) / Box%size(:)
+        call fourier_i(Box%wave(1), position_div_box(1), exp_Ikx_1)
+        call fourier_i(Box%wave(2), position_div_box(2), exp_Ikx_2)
+        call fourier_i(Box%wave(3), position_div_box(3), exp_Ikx_3)
+
+        solo_field(:) = 0._DP
         
         do kz = -Box%wave(3), Box%wave(3)
             wave_vector(3) = 2._DP*PI * real(kz, DP) / Box%size(3)
@@ -340,12 +309,11 @@ contains
         do kx = -Box%wave(1), Box%wave(1)
             wave_vector(1) = 2._DP*PI * real(kx, DP) / Box%size(1)
                 
-            exp_IkxVec = exp_IkxVec_1(kx) * exp_IkxVec_2(ky) * exp_IkxVec_3(kz)
-            
-            complex_tensor(:, :) = complex_tensor(:, :) + &
-                cmplx(this%weight(kx, ky, kz), 0._DP, DP) * exp_IkxVec * &
-                cmplx(matmul(reshape(wave_vector, [num_dimensions, 1]), &
-                             reshape(wave_vector, [1, num_dimensions])), 0._DP, DP)
+            exp_Ikx = exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz)
+
+            solo_field(:) = solo_field(:) + &
+                this%weight(kx, ky, kz) * (real(this%structure(kx, ky, kz) * conjg(exp_Ikx), DP) + &
+                dot_product(particle%orientation, wave_vector)) * wave_vector(:)
                     
         end do
             
@@ -353,9 +321,9 @@ contains
             
         end do
         
-        pair_field_tensor(:, :) =-4._DP*PI / product(Box%size) * real(complex_tensor(:, :), DP)
+        solo_field(:) =-4._DP*PI / product(Box%size) * solo_field(:)
 
-    end function Ewald_Summation_Reci_pair_field_tensor
+    end function Ewald_Summation_Reci_solo_field
     
     !> Move
 
