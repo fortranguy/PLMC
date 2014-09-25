@@ -47,7 +47,6 @@ private
         procedure :: get_name => Hard_Spheres_get_name
         procedure :: get_num_particles => Hard_Spheres_get_num_particles
         procedure :: get_widom_num_particles => Hard_Spheres_get_widom_num_particles
-        procedure :: get_field_num_particles => Hard_Spheres_get_field_num_particles
         procedure :: get_diameter => Hard_Spheres_get_diameter
         procedure :: get_position => Hard_Spheres_get_position
         procedure :: get_position_2d => Hard_Spheres_get_position_2d
@@ -81,6 +80,7 @@ private
     contains
         
         !> Accessor & Mutator
+        procedure :: get_field_num_particles => Dipolar_Hard_Spheres_get_field_num_particles
         procedure :: get_orientation => Dipolar_Hard_Spheres_get_orientation
         procedure :: get_orientation_2d => Dipolar_Hard_Spheres_get_orientation_2d
         procedure :: get_orientation_z => Dipolar_Hard_Spheres_get_orientation_z
@@ -279,15 +279,6 @@ contains
         
     end function Hard_Spheres_get_widom_num_particles
     
-    pure function Hard_Spheres_get_field_num_particles(this) result(get_field_num_particles)
-    
-        class(Hard_Spheres), intent(in) :: this
-        integer :: get_field_num_particles
-        
-        get_field_num_particles = this%widom_num_particles
-        
-    end function Hard_Spheres_get_field_num_particles
-    
     pure function Hard_Spheres_get_diameter(this) result(get_diameter)
     
         class(Hard_Spheres), intent(in) :: this
@@ -386,6 +377,15 @@ contains
         get_orientation_z = this%all_orientations(num_dimensions, i_particle)
         
     end function Dipolar_Hard_Spheres_get_orientation_z
+
+    pure function Dipolar_Hard_Spheres_get_field_num_particles(this) result(get_field_num_particles)
+
+        class(Dipolar_Hard_Spheres), intent(in) :: this
+        integer :: get_field_num_particles
+
+        get_field_num_particles = this%field_num_particles
+
+    end function Dipolar_Hard_Spheres_get_field_num_particles
     
     subroutine Dipolar_Hard_Spheres_set_orientation(this, i_particle, orientation)
     
@@ -463,35 +463,20 @@ contains
         end if
 
     end subroutine Dipolar_Hard_Spheres_set_all_orientations
-    
-    subroutine Dipolar_Hard_Spheres_set_field_num_particles(this, data_post_json, type_name)
 
-        class(Dipolar_Hard_Spheres), intent(inout) :: this
-        type(json_file), intent(inout) :: data_post_json
-        character(len=*), intent(in) :: type_name
-
-        character(len=4096) :: data_name
-        logical :: found
-
-        data_name = "Particles."//type_name//".number of local field particles"
-        call data_post_json%get(data_name, this%field_num_particles, found)
-        call test_data_found(data_name, found)
-
-    end subroutine Dipolar_Hard_Spheres_set_field_num_particles
-    
     subroutine Hard_Spheres_set_test_num_particles(this, data_post_json, type_name)
-    
+
         class(Hard_Spheres), intent(inout) :: this
         type(json_file), intent(inout) :: data_post_json
         character(len=*), intent(in) :: type_name
-        
+
         call this%set_widom_num_particles(data_post_json, type_name)
-        
+
         select type (this)
             type is (Dipolar_Hard_Spheres)
                 call this%set_field_num_particles(data_post_json, type_name)
         end select
-        
+
     end subroutine Hard_Spheres_set_test_num_particles
 
     subroutine Hard_Spheres_set_widom_num_particles(this, data_post_json, type_name)
@@ -508,6 +493,21 @@ contains
         call test_data_found(data_name, found)
 
     end subroutine Hard_Spheres_set_widom_num_particles
+    
+    subroutine Dipolar_Hard_Spheres_set_field_num_particles(this, data_post_json, type_name)
+
+        class(Dipolar_Hard_Spheres), intent(inout) :: this
+        type(json_file), intent(inout) :: data_post_json
+        character(len=*), intent(in) :: type_name
+
+        character(len=4096) :: data_name
+        logical :: found
+
+        data_name = "Particles."//type_name//".number of local field particles"
+        call data_post_json%get(data_name, this%field_num_particles, found)
+        call test_data_found(data_name, found)
+
+    end subroutine Dipolar_Hard_Spheres_set_field_num_particles
     
     !> Write a report of the component in a file
     
