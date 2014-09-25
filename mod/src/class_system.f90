@@ -322,6 +322,8 @@ contains
             call test_data_found(data_name, found)
             
             this%Box%size(num_dimensions) = z_ratio * this%Box%size(1)
+            if (this%Box%size(num_dimensions) < this%Box%height) &
+                error stop "Box height is too high."
             this%Box%wave(num_dimensions) = ceiling(z_ratio * real(this%Box%wave(1), DP))
             
         end if
