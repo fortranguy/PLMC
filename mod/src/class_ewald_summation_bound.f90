@@ -100,10 +100,11 @@ contains
     
     !> Field
     !> \f[
-    !>      \vec{E}(\vec{M}, S) = - \frac{4\pi}{3V}  \vec{M}
+    !>      \vec{E}(\vec{M}, S) = -\frac{2\pi}{3V} (2\vec{M} + \vec{\mu}_{N+1})
     !> \f]
     !> \f[
-    !>      \vec{E}(\vec{M}, R) = - \frac{4\pi}{V}  |\vec{e}_z)(\vec{e}_z| \vec{M}
+    !>      \vec{E}(\vec{M}, R) = -\frac{2\pi}{V} (\vec{e}_z | 2\vec{M} + \vec{\mu}_{N+1})
+    !>                            |\vec{e}_z)
     !> \f]
     
     pure function Ewald_Summation_Bound_solo_field(this, Box_size, particle) result(solo_field)
