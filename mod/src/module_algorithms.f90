@@ -293,7 +293,7 @@ contains
                 local_field(:) = this_macro%ewald_real%solo_field(Box%size, this_spheres, test) + &
                                  this_macro%ewald_reci%solo_field(Box, test) - &
                                  this_macro%ewald_self%solo_field(test%orientation) + &
-                                 this_macro%ewald_bound%solo_field(Box%size)
+                                 this_macro%ewald_bound%solo_field(Box%size, test)
                 if (geometry%slab) then
                     local_field(:) = local_field(:) - this_macro%elc%solo_field(Box, test)
                 end if
