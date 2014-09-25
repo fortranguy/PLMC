@@ -27,7 +27,6 @@ private
         procedure, private :: get_structure_modulus => Ewald_Summation_Reci_get_structure_modulus
         procedure :: count_wave_vectors => Ewald_Summation_Reci_count_wave_vectors
         procedure :: total_energy => Ewald_Summation_Reci_total_energy
-
         procedure :: solo_field => Ewald_Summation_Reci_solo_field
         
         procedure :: move_energy => Ewald_Summation_Reci_move_energy
@@ -268,9 +267,9 @@ contains
     
     !> Field
     !> \f[
-    !>      \vec{E}(\vec{r}_{N+1}) = -\frac{4\pi}{V} \sum_{\vec{k} \neq 0} w(\alpha, \vec{k})
+    !>      \vec{E}(\vec{r}_{N+1}) = -\frac{2\pi}{V} \sum_{\vec{k} \neq 0} w(\alpha, \vec{k})
     !>                               [
-    !>                                  \Re(S(\vec{k}) e^{-i(\vec{k}\cdot \vec{r}_{N+1})}) +
+    !>                                  2\Re(S(\vec{k}) e^{-i(\vec{k}\cdot \vec{r}_{N+1})}) +
     !>                                  (\vec{\mu}_{N+1} \cdot \vec{k})
     !>                               ] \vec{k}
     !> \f]
@@ -312,7 +311,8 @@ contains
             exp_Ikx = exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz)
 
             solo_field(:) = solo_field(:) + &
-                this%weight(kx, ky, kz) * (real(this%structure(kx, ky, kz) * conjg(exp_Ikx), DP) + &
+                this%weight(kx, ky, kz) * &
+                (2._DP*real(this%structure(kx, ky, kz) * conjg(exp_Ikx), DP) + &
                 dot_product(particle%orientation, wave_vector)) * wave_vector(:)
                     
         end do
@@ -321,7 +321,7 @@ contains
             
         end do
         
-        solo_field(:) =-4._DP*PI / product(Box%size) * solo_field(:)
+        solo_field(:) =-2._DP*PI / product(Box%size) * solo_field(:)
 
     end function Ewald_Summation_Reci_solo_field
     

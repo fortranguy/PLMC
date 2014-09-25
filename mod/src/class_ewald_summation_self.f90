@@ -67,7 +67,7 @@ contains
         real(DP), dimension(:), intent(in) :: orientation
         real(DP), dimension(num_dimensions) :: solo_field
         
-        solo_field(:) = 4._DP/3._DP * this%alpha**3/sqrt(PI) * orientation(:)
+        solo_field(:) = -2._DP/3._DP * this%alpha**3/sqrt(PI) * orientation(:)
     
     end function Ewald_Summation_Self_solo_field
 

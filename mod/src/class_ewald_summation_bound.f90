@@ -107,17 +107,20 @@ contains
     !>      \vec{E}(\vec{M}, R) = - \frac{4\pi}{V}  |\vec{e}_z)(\vec{e}_z| \vec{M}
     !> \f]
     
-    pure function Ewald_Summation_Bound_solo_field(this, Box_size) result(solo_field)
+    pure function Ewald_Summation_Bound_solo_field(this, Box_size, particle) result(solo_field)
 
         class(Ewald_Summation_Bound), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
+        type(Particle_Index), intent(in) :: particle
         real(DP), dimension(num_dimensions) :: solo_field
         
         if (geometry%bulk) then
-            solo_field(:) = -4._DP/3._DP * PI/product(Box_size) * this%total_moment(:)
+            solo_field(:) = -2._DP/3._DP * PI/product(Box_size) * (2._DP*this%total_moment(:) + &
+                            particle%orientation(:))
         else if(geometry%slab) then
-            solo_field(:) = -4._DP * PI/product(Box_size) * &
-                            matmul(projector_matrix(num_dimensions, 3), this%total_moment)
+            solo_field(:) = -2._DP * PI/product(Box_size) * &
+                            matmul(projector_matrix(num_dimensions, 3), 2._DP*this%total_moment + &
+                            particle%orientation)
         end if
 
     end function Ewald_Summation_Bound_solo_field
