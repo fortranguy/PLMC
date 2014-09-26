@@ -284,8 +284,9 @@ contains
         call this_field_distribution%step_init()
         do i_field_particule = 1, this_spheres%get_field_num_particles()
         
-            test%position(:) = random_position(Box, this_spheres%get_diameter())
+            this_observables%local_field%num_hits = this_observables%local_field%num_hits + 1
             
+            test%position(:) = random_position(Box, this_spheres%get_diameter())            
             test%same_i_cell = this_macro%same_cells%index_from_position(test%position)
             call this_macro%hard_potential%neighbours(Box%size, this_spheres, &
                                                       this_macro%same_cells, test, &
