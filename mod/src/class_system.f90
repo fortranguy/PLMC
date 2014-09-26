@@ -1175,8 +1175,8 @@ contains
         class(System_Post_Processing), intent(inout) :: this
         integer, intent(in) :: i_step
 
-        call this%type1_observables%write(i_step, this%type1_units%inv_activity)
-        call this%type2_observables%write(i_step, this%type2_units%inv_activity)
+        call this%type1_observables%write(i_step, this%type1_units%observables_post)
+        call this%type2_observables%write(i_step, this%type2_units%observables_post)
 
     end subroutine System_Post_Processing_write_observables
     

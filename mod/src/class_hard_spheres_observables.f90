@@ -92,8 +92,13 @@ contains
 
         class(Hard_Spheres_Post_Processing_Observables), intent(in) :: this
         integer, intent(in) :: i_step, observables_unit
-
-        write(observables_unit, *) i_step, this%inv_activity
+        
+        select type (this)
+            type is (Hard_Spheres_Post_Processing_Observables)
+                write(observables_unit, *) i_step, this%inv_activity
+            type is (Dipolar_Hard_Spheres_Post_Processing_Observables)
+                write(observables_unit, *) i_step, this%inv_activity, this%local_field%rejection_rate
+        end select
 
     end subroutine Hard_Spheres_Post_Processing_Observables_write
     

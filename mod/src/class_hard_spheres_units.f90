@@ -61,7 +61,7 @@ private
 
     type, public :: Hard_Spheres_Post_Processing_Units
 
-        integer :: inv_activity
+        integer :: observables_post
 
     contains
 
@@ -164,8 +164,8 @@ contains
         class(Hard_Spheres_Post_Processing_Units), intent(out) :: this
         character(len=*), intent(in) :: name
 
-        open(newunit=this%inv_activity, recl=4096, file=name//"_inv_activity.out", status='new', &
-             action='write')
+        open(newunit=this%observables_post, recl=4096, file=name//"_observables_post.out", &
+             status='new', action='write')
              
         select type (this)
             type is (Dipolar_Hard_Spheres_Post_Processing_Units)
@@ -228,7 +228,7 @@ contains
 
         class(Hard_Spheres_Post_Processing_Units), intent(inout) :: this
 
-        close(this%inv_activity)
+        close(this%observables_post)
         
         select type (this)
             type is (Dipolar_Hard_Spheres_Post_Processing_Units)
