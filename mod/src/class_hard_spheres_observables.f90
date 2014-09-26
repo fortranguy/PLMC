@@ -4,7 +4,7 @@ module class_hard_spheres_observables
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_value, json_value_create, to_object, json_value_add
-use class_discrete_observable, only: Adapting_Discrete_Observables
+use class_discrete_observable, only: Discrete_Observables, Adapting_Discrete_Observables
 
 implicit none
 private
@@ -55,6 +55,11 @@ private
         procedure :: write_results => Hard_Spheres_Post_Processing_Observables_write_results
         
     end type Hard_Spheres_Post_Processing_Observables
+    
+    type, extends(Hard_Spheres_Post_Processing_Observables), public :: &
+        Dipolar_Hard_Spheres_Post_Processing_Observables
+        type(Discrete_Observables) :: local_field
+    end type Dipolar_Hard_Spheres_Post_Processing_Observables
     
 contains
     
@@ -120,6 +125,12 @@ contains
         class(Hard_Spheres_Post_Processing_Observables), intent(inout) :: this
 
         this%sum_inv_activity = this%sum_inv_activity + this%inv_activity
+        
+        select type (this)
+            type is (Dipolar_Hard_Spheres_Post_Processing_Observables)            
+                this%local_field%sum_rejection = this%local_field%sum_rejection + &
+                                                 this%local_field%rejection_rate
+        end select
 
     end subroutine Hard_Spheres_Post_Processing_Observables_accumulate
     
@@ -196,6 +207,12 @@ contains
             call json_value_add(results_json, "average excess chemical potential", &
                                               chemical_potential_excess)
         end if
+        
+        select type (this)
+            type is (Dipolar_Hard_Spheres_Post_Processing_Observables)
+                call json_value_add(results_json, "local field rejection rate", &
+                                    this%local_field%sum_rejection / real(num_equilibrium_steps, DP))
+        end select
 
         nullify(results_json)
 

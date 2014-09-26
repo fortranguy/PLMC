@@ -13,7 +13,8 @@ use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
 use class_discrete_observable, only: Discrete_Observables
 use class_hard_spheres_observables, only: Hard_Spheres_Monte_Carlo_Observables, &
                                           Dipolar_Hard_Spheres_Monte_Carlo_Observables, &
-                                          Hard_Spheres_Post_Processing_Observables
+                                          Hard_Spheres_Post_Processing_Observables, &
+                                          Dipolar_Hard_Spheres_Post_Processing_Observables
 use class_distribution_function, only: Distribution_Function
 
 implicit none
@@ -263,11 +264,13 @@ contains
     
     !> Local field: for DHS only
     
-    subroutine measure_local_field(Box, this_spheres, this_macro, this_field_distribution)
+    subroutine measure_local_field(Box, this_spheres, this_macro, this_observables, &
+                                        this_field_distribution)
 
         type(Box_Parameters), intent(in) :: Box
         class(Dipolar_Hard_Spheres), intent(in) :: this_spheres
         class(Dipolar_Hard_Spheres_Macro), intent(in) :: this_macro
+        class(Dipolar_Hard_Spheres_Post_Processing_Observables), intent(inout) :: this_observables
         class(Distribution_Function) :: this_field_distribution
         
         real(DP), dimension(num_dimensions) :: test_field
@@ -300,6 +303,9 @@ contains
                 
                 call this_field_distribution%particle_set(test%position(3), test_field)
             
+            else
+                this_observables%local_field%num_rejections = &
+                    this_observables%local_field%num_rejections + 1
             end if
         
         end do

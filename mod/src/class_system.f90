@@ -20,7 +20,8 @@ use class_discrete_observable, only: Discrete_Observables
 use class_hard_spheres_observables, only: Hard_Spheres_Monte_Carlo_Observables, &
                                           Dipolar_Hard_Spheres_Monte_Carlo_Observables, &
                                           Between_Hard_Spheres_Monte_Carlo_Observables, &
-                                          Hard_Spheres_Post_Processing_Observables
+                                          Hard_Spheres_Post_Processing_Observables, &
+                                          Dipolar_Hard_Spheres_Post_Processing_Observables
 use class_distribution_function, only: Distribution_Function
 use class_hard_spheres_units, only: Hard_Spheres_Monte_Carlo_Units, &
                                     Dipolar_Hard_Spheres_Monte_Carlo_Units, &
@@ -93,6 +94,8 @@ private
         procedure :: get_num_equilibrium_steps => System_get_num_equilibrium_steps
         procedure :: set_time_start => System_set_time_start
         procedure :: set_time_end => System_set_time_end
+        
+        procedure :: update_rejections => System_update_rejections
     
     end type System
     
@@ -135,7 +138,6 @@ private
                 
         !> Simulation
         procedure :: random_changes => System_Monte_Carlo_random_changes
-        procedure :: update_rejections => System_Monte_Carlo_update_rejections
         procedure :: adapt_changes => System_Monte_Carlo_adapt_changes
         procedure :: write_observables_thermalisation => &
                      System_Monte_Carlo_write_observables_thermalisation
@@ -156,7 +158,8 @@ private
         integer :: num_steps
         type(json_file) :: data_report_json
         
-        type(Hard_Spheres_Post_Processing_Observables) :: type1_observables, type2_observables
+        type(Dipolar_Hard_Spheres_Post_Processing_Observables) :: type1_observables
+        type(Hard_Spheres_Post_Processing_Observables) :: type2_observables
         type(Dipolar_Hard_Spheres_Post_Processing_Units) :: type1_units
         type(Hard_Spheres_Post_Processing_Units) :: type2_units
         type(Distribution_Function) :: type1_field_distribution
@@ -1022,16 +1025,21 @@ contains
     
     end subroutine System_Monte_Carlo_random_changes
     
-    subroutine System_Monte_Carlo_update_rejections(this)
+    subroutine System_update_rejections(this)
     
-        class(System_Monte_Carlo), intent(inout) :: this
+        class(System), intent(inout) :: this
     
-        call this%type1_observables%move%update_rejection()
-        call this%type1_observables%rotation%update_rejection()
-        call this%type2_observables%move%update_rejection()
-        call this%switch_observable%update_rejection()
+        select type (this)
+            type is (System_Monte_Carlo)
+                call this%type1_observables%move%update_rejection()
+                call this%type1_observables%rotation%update_rejection()
+                call this%type2_observables%move%update_rejection()
+                call this%switch_observable%update_rejection()
+            type is (System_Post_Processing)
+                call this%type1_observables%local_field%update_rejection()
+        end select
         
-    end subroutine System_Monte_Carlo_update_rejections
+    end subroutine System_update_rejections
     
     subroutine System_Monte_Carlo_adapt_changes(this, i_step)
     
@@ -1119,7 +1127,7 @@ contains
         class(System_Post_Processing), intent(inout) :: this
         
         call measure_local_field(this%Box, this%type1_spheres, this%type1_macro, &
-                                 this%type1_field_distribution)
+                                 this%type1_observables, this%type1_field_distribution)
         
     end subroutine System_Post_Processing_measure_local_field
     
