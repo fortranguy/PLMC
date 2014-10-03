@@ -420,10 +420,10 @@ contains
                     type is (Dipolar_Hard_Spheres_Macro)
                         total_energy = total_energy + &
                                        this_macro%ewald_real%total_energy(Box%size, this_spheres) + &
-                                       this_macro%ewald_reci%total_energy(Box) !- &
-                                       !this_macro%ewald_self%total_energy(this_spheres) + &
-                                       !this_macro%ewald_bound%total_energy(Box%size) + &
-                                       !ext_field%total_energy(this_macro%ewald_bound%get_total_moment())
+                                       this_macro%ewald_reci%total_energy(Box) - &
+                                       this_macro%ewald_self%total_energy(this_spheres) + &
+                                       this_macro%ewald_bound%total_energy(Box%size) + &
+                                       ext_field%total_energy(this_macro%ewald_bound%get_total_moment())
                         if (geometry%slab) then
                             total_energy = total_energy - this_macro%elc%total_energy(Box)
                         end if
@@ -446,10 +446,10 @@ contains
 
         total_energy_field = total_energy_field + &
             this_macro%ewald_real%total_energy(Box%size, this_spheres, using_field) + &
-            this_macro%ewald_reci%total_energy(Box, using_field, this_spheres) !- &
-            !this_macro%ewald_self%total_energy(this_spheres, using_field) + &
-            !this_macro%ewald_bound%total_energy(Box%size, using_field) + &
-            !ext_field%total_energy(this_macro%ewald_bound%get_total_moment())
+            this_macro%ewald_reci%total_energy(Box, using_field, this_spheres) - &
+            this_macro%ewald_self%total_energy(this_spheres, using_field) + &
+            this_macro%ewald_bound%total_energy(Box%size, using_field) + &
+            ext_field%total_energy(this_macro%ewald_bound%get_total_moment())
         if (geometry%slab) then
             total_energy_field = total_energy_field - &
                 this_macro%elc%total_energy(Box, using_field, this_spheres)
@@ -471,7 +471,7 @@ contains
         
         write(*, *) "energy", energy, "energy_field", energy_field
         
-        if (abs(energy - energy_field) > real_zero) then
+        if (abs(energy - energy_field) > consistency_tiny) then
             write(error_unit, *) this_spheres%get_name(), &
                                  ": Energy with and without field don't match."
             error stop

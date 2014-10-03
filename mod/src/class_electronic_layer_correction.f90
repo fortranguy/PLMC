@@ -348,7 +348,7 @@ contains
             particle%number = i_particle
             particle%position(:) = this_spheres%get_position(particle%number)
             particle%orientation(:) = this_spheres%get_orientation(particle%number)
-            total_energy_field = total_energy_field + &
+            total_energy_field = total_energy_field - &
                                  dot_product(particle%orientation, &
                                              this%solo_field(Box, particle))
         end do
@@ -359,12 +359,11 @@ contains
     
     !> Field
     !> \f[
-    !>      \vec{E}(\vec{r}_{N+1}) = \frac{2\pi}{S} \sum_{\vec{k}^{2D} \neq \vec{0}} w(k^{2D}) \{
-    !>                                    \Re[ e^{(\vec{K}_+ \cdot \vec{r}_{N+1})} 
+    !>      \vec{E}(\vec{r}_l) = \frac{2\pi}{S} \sum_{\vec{k}^{2D} \neq \vec{0}} w(k^{2D}) \{
+    !>                                    \Re[ e^{(\vec{K}_+ \cdot \vec{r}_l)} 
     !>                                              S_-^*(\vec{k}^{2D}) |\vec{K}_+) +
-    !>                                         e^{(\vec{K}_-^* \cdot \vec{r}_{N+1})}
-    !>                                              S_+(\vec{k}^{2D}) |\vec{K}_-^*) ] +
-    !>                                    (\vec{\mu}_{N+1} \cdot \vec{K}_-^*)  |\vec{K}_+)
+    !>                                         e^{(\vec{K}_-^* \cdot \vec{r}_l)}
+    !>                                              S_+(\vec{k}^{2D}) |\vec{K}_-^*) ]
     !>                               \}  
     !> \f]
     
@@ -412,17 +411,15 @@ contains
             
             solo_field(:) = solo_field(:) + this%weight(kx, ky) * &
                 (real(conjg(this%structure_minus(kx, ky))*exp_Ikx*cmplx(exp_kz, 0._DP, DP) * &
-                 wave_vector_plus(:) + &
-                 this%structure_plus(kx, ky)*conjg(exp_Ikx)/cmplx(exp_kz, 0._DP, DP) * &
-                 conjg(wave_vector_minus(:)) + &
-                 dot_product(particle%orientation, conjg(wave_vector_minus)) * &
-                 wave_vector_plus(:), DP))
+                     wave_vector_plus(:) + &
+                     this%structure_plus(kx, ky)*conjg(exp_Ikx)/cmplx(exp_kz, 0._DP, DP) * &
+                     conjg(wave_vector_minus(:)), DP))
             
         end do
         
         end do
         
-        solo_field(:) = 2._DP*PI / product(Box%size(1:2)) * solo_field(:)        
+        solo_field(:) = -2._DP*PI / product(Box%size(1:2)) * solo_field(:)        
                   
     end function Electronic_Layer_Correction_solo_field
 

@@ -318,11 +318,8 @@ contains
 
     !> Field
     !> \f[
-    !>      \vec{E}(\vec{r}_{N+1}) = -\frac{4\pi}{V} \sum_{\vec{k} \neq 0} w(\alpha, \vec{k})
-    !>                               [
-    !>                                  \Re(S(\vec{k}) e^{-i(\vec{k}\cdot \vec{r}_{N+1})}) +
-    !>                                  (\vec{\mu}_{N+1} \cdot \vec{k})
-    !>                               ] \vec{k}
+    !>      \vec{E}(\vec{r}_l) = -\frac{4\pi}{V} \sum_{\vec{k} \neq 0} w(\alpha, \vec{k})
+    !>                                      \Re(S(\vec{k}) e^{-i(\vec{k}\cdot \vec{r}_l)}) \vec{k}
     !> \f]
 
     pure function Ewald_Summation_Reci_solo_field(this, Box, particle) result(solo_field)
@@ -362,8 +359,8 @@ contains
             exp_Ikx = exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz)
 
             solo_field(:) = solo_field(:) + &
-                this%weight(kx, ky, kz) * (real(this%structure(kx, ky, kz) * conjg(exp_Ikx), DP) + &
-                dot_product(particle%orientation, wave_vector)) * wave_vector(:)
+                this%weight(kx, ky, kz) * real(this%structure(kx, ky, kz) * conjg(exp_Ikx), DP) * &
+                wave_vector(:)
                     
         end do
             
