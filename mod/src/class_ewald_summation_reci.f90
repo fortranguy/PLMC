@@ -308,9 +308,8 @@ contains
             particle%number = i_particle
             particle%position(:) = this_spheres%get_position(particle%number)
             particle%orientation(:) = this_spheres%get_orientation(particle%number)
-            total_energy_field = total_energy_field - &
-                           dot_product(particle%orientation, &
-                                       this%solo_field(Box, particle))
+            total_energy_field = total_energy_field - dot_product(particle%orientation, &
+                                                                  this%solo_field(Box, particle))
         end do
 
         total_energy_field = total_energy_field/2._DP
