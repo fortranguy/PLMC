@@ -469,8 +469,6 @@ contains
         energy = total_energy(Box, this_spheres, this_macro, ext_field)
         energy_field = total_energy_field(Box, this_spheres, this_macro, ext_field)
         
-        write(*, *) "energy", energy, "energy_field", energy_field
-        
         if (abs(energy - energy_field) > consistency_tiny) then
             write(error_unit, *) this_spheres%get_name(), &
                                  ": Energy with and without field don't match."
