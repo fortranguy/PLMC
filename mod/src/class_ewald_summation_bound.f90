@@ -19,6 +19,8 @@ private
         procedure :: get_total_moment => Ewald_Summation_Bound_get_total_moment
         procedure :: reset_total_moment => Ewald_Summation_Bound_reset_total_moment
         procedure :: total_energy => Ewald_Summation_Bound_total_energy
+        procedure, private :: total_energy_moment => Ewald_Summation_Bound_total_energy_moment
+        procedure, private :: total_energy_field => Ewald_Summation_Bound_total_energy_field
         
         procedure :: solo_field => Ewald_Summation_Bound_solo_field
         procedure :: test_field => Ewald_Summation_Bound_test_field
@@ -84,28 +86,47 @@ contains
     !>      J(\vec{M}, R) = \frac{2\pi}{V} |M_z|^2
     !> \f]
     
-    pure function Ewald_Summation_Bound_total_energy(this, Box_size) result(total_energy)
+    pure function Ewald_Summation_Bound_total_energy(this, Box_size, using_field) result(total_energy)
     
         class(Ewald_Summation_Bound), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
-        real(DP) :: total_energy
-
-        if (geometry%bulk) then
-            total_energy = 2._DP*PI/3._DP / product(Box_size) * &
-                           dot_product(this%total_moment, this%total_moment)
-        else if(geometry%slab) then
-            total_energy = 2._DP*PI / product(Box_size) * this%total_moment(3)**2
-        end if
-    
-    end function Ewald_Summation_Bound_total_energy
-
-    pure function Ewald_Summation_Bound_total_energy_field(this, Box_size) result(total_energy)
-    
-        class(Ewald_Summation_Bound), intent(in) :: this
-        real(DP), dimension(:), intent(in) :: Box_size
+        logical, intent(in), optional :: using_field
         real(DP) :: total_energy
         
-        total_energy = -dot_product(this%total_moment, this%solo_field(Box_size)) / 2._DP
+        if (present(using_field)) then
+            if (using_field) then
+                total_energy = this%total_energy_field(Box_size)
+            else
+                total_energy = this%total_energy_moment(Box_size)
+            end if
+        else
+            total_energy = this%total_energy_moment(Box_size)
+        end if
+        
+    end function Ewald_Summation_Bound_total_energy
+    
+    pure function Ewald_Summation_Bound_total_energy_moment(this, Box_size) result(total_energy_moment)
+    
+        class(Ewald_Summation_Bound), intent(in) :: this
+        real(DP), dimension(:), intent(in) :: Box_size
+        real(DP) :: total_energy_moment
+
+        if (geometry%bulk) then
+            total_energy_moment = 2._DP*PI/3._DP / product(Box_size) * &
+                           dot_product(this%total_moment, this%total_moment)
+        else if(geometry%slab) then
+            total_energy_moment = 2._DP*PI / product(Box_size) * this%total_moment(3)**2
+        end if
+    
+    end function Ewald_Summation_Bound_total_energy_moment
+
+    pure function Ewald_Summation_Bound_total_energy_field(this, Box_size) result(total_energy_field)
+    
+        class(Ewald_Summation_Bound), intent(in) :: this
+        real(DP), dimension(:), intent(in) :: Box_size
+        real(DP) :: total_energy_field
+        
+        total_energy_field = -dot_product(this%total_moment, this%solo_field(Box_size)) / 2._DP
     
     end function Ewald_Summation_Bound_total_energy_field
 

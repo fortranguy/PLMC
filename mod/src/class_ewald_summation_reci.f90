@@ -27,6 +27,8 @@ private
         procedure, private :: get_structure_modulus => Ewald_Summation_Reci_get_structure_modulus
         procedure :: count_wave_vectors => Ewald_Summation_Reci_count_wave_vectors
         procedure :: total_energy => Ewald_Summation_Reci_total_energy
+        procedure, private :: total_energy_structure => Ewald_Summation_Reci_total_energy_structure
+        procedure, private :: total_energy_field => Ewald_Summation_Reci_total_energy_field
 
         procedure :: solo_field => Ewald_Summation_Reci_solo_field
         procedure :: test_field => Ewald_Summation_Reci_test_field
@@ -243,52 +245,75 @@ contains
 
     end subroutine Ewald_Summation_Reci_count_wave_vectors
     
-    pure function Ewald_Summation_Reci_total_energy(this, Box) result(total_energy)
+    pure function Ewald_Summation_Reci_total_energy(this, Box, using_field, this_spheres) &
+                  result(total_energy)
         
         class(Ewald_Summation_Reci), intent(in) :: this
         type(Box_Parameters), intent(in) :: Box
+        logical, intent(in), optional :: using_field
+        type(Dipolar_Hard_Spheres), intent(in), optional :: this_spheres
         real(DP) :: total_energy
+        
+        if (present(using_field)) then
+            if (using_field .and. present(this_spheres)) then
+                total_energy = this%total_energy_field(Box, this_spheres)
+            else
+                total_energy = this%total_energy_structure(Box)
+            end if
+        else
+            total_energy = this%total_energy_structure(Box)
+        end if
+        
+    end function Ewald_Summation_Reci_total_energy
+    
+    pure function Ewald_Summation_Reci_total_energy_structure(this, Box) &
+                  result(total_energy_structure)
+        
+        class(Ewald_Summation_Reci), intent(in) :: this
+        type(Box_Parameters), intent(in) :: Box
+        real(DP) :: total_energy_structure
 
         integer :: kx, ky, kz
 
-        total_energy = 0._DP
+        total_energy_structure = 0._DP
 
         do kz = -Box%wave(3), Box%wave(3)
         do ky = -Box%wave(2), Box%wave(2)
         do kx = -Box%wave(1), Box%wave(1)
-            total_energy = total_energy + this%weight(kx, ky, kz) * &
+            total_energy_structure = total_energy_structure + this%weight(kx, ky, kz) * &
                                           real(this%structure(kx, ky, kz) * &
                                           conjg(this%structure(kx, ky, kz)), DP)
         end do
         end do
         end do
         
-        total_energy = 2._DP*PI / product(Box%size) * total_energy
+        total_energy_structure = 2._DP*PI / product(Box%size) * total_energy_structure
         
-    end function Ewald_Summation_Reci_total_energy
+    end function Ewald_Summation_Reci_total_energy_structure
 
-    pure function Ewald_Summation_Reci_total_energy_field(this, Box, this_spheres) result(total_energy)
+    pure function Ewald_Summation_Reci_total_energy_field(this, Box, this_spheres) &
+                  result(total_energy_field)
         
         class(Ewald_Summation_Reci), intent(in) :: this
         type(Box_Parameters), intent(in) :: Box
         type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
-        real(DP) :: total_energy
+        real(DP) :: total_energy_field
         
         integer :: i_particle
         type(Particle_Index) :: particle
 
-        total_energy = 0._DP
+        total_energy_field = 0._DP
 
         do i_particle = 1, this_spheres%get_num_particles()
             particle%number = i_particle
             particle%position(:) = this_spheres%get_position(particle%number)
             particle%orientation(:) = this_spheres%get_orientation(particle%number)
-            total_energy = total_energy - &
+            total_energy_field = total_energy_field - &
                            dot_product(particle%orientation, &
                                        this%solo_field(Box, particle))
         end do
 
-        total_energy = total_energy/2._DP
+        total_energy_field = total_energy_field/2._DP
         
     end function Ewald_Summation_Reci_total_energy_field
 

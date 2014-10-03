@@ -32,6 +32,9 @@ private
                               Electronic_Layer_Correction_get_structure_modulus
         procedure :: count_wave_vectors => Electronic_Layer_Correction_count_wave_vectors
         procedure :: total_energy => Electronic_Layer_Correction_total_energy
+        procedure, private :: total_energy_structure => &
+                              Electronic_Layer_Correction_total_energy_structure
+        procedure, private :: total_energy_field => Electronic_Layer_Correction_total_energy_field
         
         procedure :: solo_field => Electronic_Layer_Correction_solo_field
         procedure :: test_field => Electronic_Layer_Correction_test_field
@@ -283,50 +286,74 @@ contains
     
     !> Total ELC energy
     
-    pure function Electronic_Layer_Correction_total_energy(this, Box) result(total_energy)
+    pure function Electronic_Layer_Correction_total_energy(this, Box, using_field, this_spheres) &
+                  result(total_energy)
+    
+        class(Electronic_Layer_Correction), intent(in) :: this
+        type(Box_Parameters), intent(in) :: Box
+        logical, intent(in), optional :: using_field
+        type(Dipolar_Hard_Spheres), intent(in), optional :: this_spheres
+        real(DP) :: total_energy
+        
+        if (present(using_field)) then
+            if (using_field .and. present(this_spheres)) then
+                total_energy = this%total_energy_field(Box, this_spheres)
+            else
+                total_energy = this%total_energy_structure(Box)
+            end if
+        else
+            total_energy = this%total_energy_structure(Box)
+        end if
+    
+    end function Electronic_Layer_Correction_total_energy
+    
+    pure function Electronic_Layer_Correction_total_energy_structure(this, Box) &
+                  result(total_energy_structure)
         
         class(Electronic_Layer_Correction), intent(in) :: this
         type(Box_Parameters), intent(in) :: Box
-        real(DP) :: total_energy
+        real(DP) :: total_energy_structure
 
         complex(DP) :: structure_product
         integer kx, ky
 
-        total_energy = 0._DP
+        total_energy_structure = 0._DP
 
         do ky = -Box%wave(2), Box%wave(2)
             do kx = -Box%wave(1), Box%wave(1)
                 structure_product = this%structure_plus(kx, ky)*conjg(this%structure_minus(kx, ky))
-                total_energy = total_energy + this%weight(kx, ky) * 2._DP*real(structure_product, DP)
+                total_energy_structure = total_energy_structure + &
+                                         this%weight(kx, ky) * 2._DP*real(structure_product, DP)
             end do
         end do
         
-        total_energy = PI / product(Box%size(1:2)) * total_energy
+        total_energy_structure = PI / product(Box%size(1:2)) * total_energy_structure
         
-    end function Electronic_Layer_Correction_total_energy
+    end function Electronic_Layer_Correction_total_energy_structure
 
-    pure function Electronic_Layer_Correction_total_energy_field(this, Box, this_spheres) result(total_energy)
+    pure function Electronic_Layer_Correction_total_energy_field(this, Box, this_spheres) &
+                  result(total_energy_field)
         
         class(Electronic_Layer_Correction), intent(in) :: this
         type(Box_Parameters), intent(in) :: Box
         type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
-        real(DP) :: total_energy
+        real(DP) :: total_energy_field
         
         integer :: i_particle
         type(Particle_Index) :: particle
 
-        total_energy = 0._DP
+        total_energy_field = 0._DP
 
         do i_particle = 1, this_spheres%get_num_particles()
             particle%number = i_particle
             particle%position(:) = this_spheres%get_position(particle%number)
             particle%orientation(:) = this_spheres%get_orientation(particle%number)
-            total_energy = total_energy + &
-                           dot_product(particle%orientation, &
-                                       this%solo_field(Box, particle))
+            total_energy_field = total_energy_field + &
+                                 dot_product(particle%orientation, &
+                                             this%solo_field(Box, particle))
         end do
         
-        total_energy = total_energy/2._DP
+        total_energy_field = total_energy_field/2._DP
         
     end function Electronic_Layer_Correction_total_energy_field
     

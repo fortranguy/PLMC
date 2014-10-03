@@ -31,6 +31,8 @@ private
         procedure :: write => Ewald_Summation_Real_write
         
         procedure :: total_energy => Ewald_Summation_Real_total_energy
+        procedure, private :: total_energy_solo => Ewald_Summation_Real_total_energy_solo
+        procedure, private :: total_energy_field => Ewald_Summation_Real_total_energy_field
         procedure :: solo_energy => Ewald_Summation_Real_solo_energy
         procedure, private :: pair_energy => Ewald_Summation_Real_pair_energy        
         procedure :: solo_field => Ewald_Summation_Real_solo_field
@@ -130,54 +132,75 @@ contains
         end do
 
     end subroutine Ewald_Summation_Real_write
-
-    pure function Ewald_Summation_Real_total_energy(this, Box_size, this_spheres) &
+    
+    pure function Ewald_Summation_Real_total_energy(this, Box_size, this_spheres, using_field) &
                   result(total_energy)
+                  
+        class(Ewald_Summation_Real), intent(in) :: this
+        real(DP), dimension(:), intent(in) :: Box_size
+        type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
+        logical, intent(in), optional :: using_field
+        real(DP) :: total_energy
+        
+        if (present(using_field)) then
+            if (using_field) then
+                total_energy = this%total_energy_field(Box_size, this_spheres)
+            else
+                total_energy = this%total_energy_solo(Box_size, this_spheres)
+            end if        
+        else
+            total_energy = this%total_energy_solo(Box_size, this_spheres)
+        end if
+                  
+    end function Ewald_Summation_Real_total_energy 
+
+    pure function Ewald_Summation_Real_total_energy_solo(this, Box_size, this_spheres) &
+                  result(total_energy_solo)
 
         class(Ewald_Summation_Real), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
-        real(DP) :: total_energy
+        real(DP) :: total_energy_solo
 
         integer :: i_particle
         type(Particle_Index) :: particle
 
-        total_energy = 0._DP
+        total_energy_solo = 0._DP
         
         do i_particle = 1, this_spheres%get_num_particles()
             particle%number = i_particle
             particle%position(:) = this_spheres%get_position(particle%number)
             particle%orientation(:) = this_spheres%get_orientation(particle%number)
-            total_energy = total_energy + this%solo_energy(Box_size, this_spheres, particle)
+            total_energy_solo = total_energy_solo + this%solo_energy(Box_size, this_spheres, particle)
         end do
 
-        total_energy = total_energy/2._DP
+        total_energy_solo = total_energy_solo/2._DP
 
-    end function Ewald_Summation_Real_total_energy
+    end function Ewald_Summation_Real_total_energy_solo
 
     pure function Ewald_Summation_Real_total_energy_field(this, Box_size, this_spheres) &
-                  result(total_energy)
+                  result(total_energy_field)
 
         class(Ewald_Summation_Real), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
-        real(DP) :: total_energy
+        real(DP) :: total_energy_field
 
         integer :: i_particle
         type(Particle_Index) :: particle
 
-        total_energy = 0._DP
+        total_energy_field = 0._DP
         
         do i_particle = 1, this_spheres%get_num_particles()
             particle%number = i_particle
             particle%position(:) = this_spheres%get_position(particle%number)
             particle%orientation(:) = this_spheres%get_orientation(particle%number)
-            total_energy = total_energy - &
-                           dot_product(particle%orientation, &
-                                       this%solo_field(Box_size, this_spheres, particle))
+            total_energy_field = total_energy_field - &
+                                 dot_product(particle%orientation, &
+                                             this%solo_field(Box_size, this_spheres, particle))
         end do
 
-        total_energy = total_energy/2._DP
+        total_energy_field = total_energy_field/2._DP
 
     end function Ewald_Summation_Real_total_energy_field
 

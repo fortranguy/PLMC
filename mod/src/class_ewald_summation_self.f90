@@ -14,6 +14,8 @@ private
     contains
         procedure :: set_alpha => Ewald_Summation_Self_set_alpha
         procedure :: total_energy => Ewald_Summation_Self_total_energy
+        procedure, private :: total_energy_solo => Ewald_Summation_Self_total_energy_solo
+        procedure, private :: total_energy_field => Ewald_Summation_Self_total_energy_field
         procedure :: solo_energy => Ewald_Summation_Self_solo_energy
         procedure :: solo_field => Ewald_Summation_Self_solo_field
         procedure :: test_field => Ewald_Summation_Self_test_field
@@ -33,37 +35,60 @@ contains
     !> Total self energy
     !> \f[ \frac{2}{3}\frac{\alpha^3}{\sqrt{\pi}} \sum_i \vec{\mu}_i\cdot\vec{\mu}_i \f]
     
-    pure function Ewald_Summation_Self_total_energy(this, this_spheres) result(total_energy)
+    pure function Ewald_Summation_Self_total_energy(this, this_spheres, using_field) &
+                  result(total_energy)
     
         class(Ewald_Summation_Self), intent(in) :: this
         class(Dipolar_Hard_Spheres), intent(in) :: this_spheres
+        logical, intent(in), optional :: using_field
         real(DP) :: total_energy
+        
+        if (present(using_field)) then
+            if (using_field) then
+                total_energy = this%total_energy_field(this_spheres)
+            else
+                total_energy = this%total_energy_solo(this_spheres)
+            end if
+        else
+            total_energy = this%total_energy_solo(this_spheres)
+        end if
+    
+    end function Ewald_Summation_Self_total_energy 
+    
+    pure function Ewald_Summation_Self_total_energy_solo(this, this_spheres) &
+                  result(total_energy_solo)
+    
+        class(Ewald_Summation_Self), intent(in) :: this
+        class(Dipolar_Hard_Spheres), intent(in) :: this_spheres
+        real(DP) :: total_energy_solo
 
         integer :: i_particle
         
-        total_energy = 0._DP
+        total_energy_solo = 0._DP
         do i_particle = 1, this_spheres%get_num_particles()
-            total_energy = total_energy + this%solo_energy(this_spheres%get_orientation(i_particle))
+            total_energy_solo = total_energy_solo + &
+                                this%solo_energy(this_spheres%get_orientation(i_particle))
         end do
         
-    end function Ewald_Summation_Self_total_energy
+    end function Ewald_Summation_Self_total_energy_solo
 
-    pure function Ewald_Summation_Self_total_energy_field(this, this_spheres) result(total_energy)
+    pure function Ewald_Summation_Self_total_energy_field(this, this_spheres) &
+                  result(total_energy_field)
     
         class(Ewald_Summation_Self), intent(in) :: this
         class(Dipolar_Hard_Spheres), intent(in) :: this_spheres
-        real(DP) :: total_energy
+        real(DP) :: total_energy_field
 
         integer :: i_particle
         
-        total_energy = 0._DP
+        total_energy_field = 0._DP
         do i_particle = 1, this_spheres%get_num_particles()
-            total_energy = total_energy + &
+            total_energy_field = total_energy_field + &
                 dot_product(this_spheres%get_orientation(i_particle), &
                             this%solo_field(this_spheres%get_orientation(i_particle)))
         end do
         
-        total_energy = total_energy / 2._DP
+        total_energy_field = total_energy_field / 2._DP
         
     end function Ewald_Summation_Self_total_energy_field
     
