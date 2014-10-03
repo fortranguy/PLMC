@@ -30,7 +30,7 @@ use class_hard_spheres_units, only: Hard_Spheres_Monte_Carlo_Units, &
                                     Dipolar_Hard_Spheres_Post_Processing_Units
 use module_physics_macro, only: init_random_seed, set_initial_configuration, &
                                 init_spheres, init_cells, reset_cells, &
-                                set_ewald, total_energy, final_spheres, &
+                                set_ewald, total_energy, check_field_energy, final_spheres, &
                                 init_between_spheres_potential, final_between_spheres_potential, &
                                 test_consistency
 use module_algorithms, only: move, widom, measure_local_field, switch, rotate
@@ -505,6 +505,7 @@ contains
         call init_spheres(this%Box, this%type1_spheres, this%type1_units)
         call set_ewald(this%Box, this%type1_spheres, this%type1_macro, this%data_json, &
                        this%type1_units)
+        call check_field_energy(this%Box, this%type1_spheres, this%type1_macro, this%ext_field)
         this%type1_observables%potential_energy = total_energy(this%Box, this%type1_spheres, &
                                                                this%type1_macro, this%ext_field)
                         

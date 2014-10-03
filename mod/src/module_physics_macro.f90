@@ -26,7 +26,7 @@ private
 public init_random_seed, set_initial_configuration, &
        init_spheres, init_cells, reset_cells, &
        set_ewald, &
-       total_energy, &
+       total_energy, check_field_energy, &
        final_spheres, init_between_spheres_potential, final_between_spheres_potential, &
        test_consistency
 
@@ -431,6 +431,51 @@ contains
         end select
         
     end function total_energy
+    
+    pure function total_energy_field(Box, this_spheres, this_macro, ext_field)
+    
+        type(Box_Parameters), intent(in) :: Box
+        class(Dipolar_Hard_Spheres), intent(in) :: this_spheres
+        class(Dipolar_Hard_Spheres_Macro), intent(in) :: this_macro
+        class(External_Field), intent(in) :: ext_field
+        real(DP) :: total_energy_field
+        
+        logical, parameter :: using_field = .true.
+        
+        total_energy_field = this_macro%hard_potential%total(Box%size, this_spheres)
+
+        total_energy_field = total_energy_field + &
+            this_macro%ewald_real%total_energy(Box%size, this_spheres, using_field) + &
+            this_macro%ewald_reci%total_energy(Box, using_field, this_spheres) - &
+            this_macro%ewald_self%total_energy(this_spheres, using_field) + &
+            this_macro%ewald_bound%total_energy(Box%size, using_field) + &
+            ext_field%total_energy(this_macro%ewald_bound%get_total_moment())
+        if (geometry%slab) then
+            total_energy_field = total_energy_field - &
+                this_macro%elc%total_energy(Box, using_field, this_spheres)
+        end if
+
+    end function total_energy_field
+    
+    subroutine check_field_energy(Box, this_spheres, this_macro, ext_field)
+    
+        type(Box_Parameters), intent(in) :: Box
+        class(Dipolar_Hard_Spheres), intent(in) :: this_spheres
+        class(Dipolar_Hard_Spheres_Macro), intent(in) :: this_macro
+        class(External_Field), intent(in) :: ext_field
+        
+        real(DP) :: energy, energy_field
+        
+        energy = total_energy(Box, this_spheres, this_macro, ext_field)
+        energy_field = total_energy_field(Box, this_spheres, this_macro, ext_field)
+        
+        if (abs(energy - energy_field) > real_zero) then
+            write(error_unit, *) this_spheres%get_name(), &
+                                 ": Energy with and without field don't match."
+            error stop
+        end if
+        
+    end subroutine
     
     !> Spheres finalizations
     
