@@ -442,7 +442,53 @@ contains
         type(Particle_Index), intent(in) :: particle
         real(DP), dimension(num_dimensions) :: test_field
 
-        test_field(:) = -this%solo_field(Box, particle)
+        real(DP), dimension(2) :: position_div_box
+        
+        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_1
+        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_2
+        complex(DP) :: exp_Ikx
+        real(DP), dimension(0:Box%wave(1), 0:Box%wave(2)) :: exp_kz_tab
+        real(DP) :: exp_kz
+        
+        complex(DP), dimension(num_dimensions) :: wave_vector_plus, wave_vector_minus
+        real(DP), dimension(2) :: wave_vector
+        integer :: kx, ky
+        
+        position_div_box(:) = 2._DP*PI * particle%position(1:2)/Box%size(1:2)
+        call fourier_i(Box%wave(1), position_div_box(1), exp_Ikx_1)
+        call fourier_i(Box%wave(2), position_div_box(2), exp_Ikx_2)
+        call set_exp_kz(Box%wave, this%wave_norm, particle%position(3), exp_kz_tab)
+        
+        test_field(:) = 0._DP
+        
+        do ky = -Box%wave(2), Box%wave(2)
+            wave_vector(2) = 2._DP*PI * real(ky, DP) / Box%size(2)
+        
+        do kx = -Box%wave(1), Box%wave(1)
+            wave_vector(1) = 2._DP*PI * real(kx, DP) / Box%size(1)
+            
+            exp_Ikx = exp_Ikx_1(kx) * exp_Ikx_2(ky)
+            exp_kz = exp_kz_tab(abs(kx), abs(ky))            
+            
+            wave_vector_plus(1:2) = cmplx(0._DP, wave_vector, DP)
+            wave_vector_plus(3) = cmplx(+this%wave_norm(kx, ky), 0._DP, DP)
+            
+            wave_vector_minus(1:2) = cmplx(0._DP, wave_vector, DP)
+            wave_vector_minus(3) = cmplx(-this%wave_norm(kx, ky), 0._DP, DP)
+            
+            test_field(:) = test_field(:) + this%weight(kx, ky) * &
+                (real(conjg(this%structure_minus(kx, ky))*exp_Ikx*cmplx(exp_kz, 0._DP, DP) * &
+                 wave_vector_plus(:) + &
+                 this%structure_plus(kx, ky)*conjg(exp_Ikx)/cmplx(exp_kz, 0._DP, DP) * &
+                 conjg(wave_vector_minus(:)) + &
+                 dot_product(particle%orientation, conjg(wave_vector_minus)) * &
+                 wave_vector_plus(:), DP))
+            
+        end do
+        
+        end do
+        
+        test_field(:) =-2._DP*PI / product(Box%size(1:2)) * test_field(:)
 
     end function Electronic_Layer_Correction_test_field
     
