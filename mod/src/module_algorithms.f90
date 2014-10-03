@@ -294,7 +294,7 @@ contains
             if (.not. overlap) then
             
                 test%orientation(:) = random_surface()
-                test_field(:) = this_macro%ewald_real%test_field(Box%size, this_spheres, test) + &
+                test_field(:) = this_macro%ewald_real%solo_field(Box%size, this_spheres, test) + &
                                 this_macro%ewald_reci%test_field(Box, test) - &
                                 this_macro%ewald_self%test_field(test%orientation) + &
                                 this_macro%ewald_bound%test_field(Box%size, test)

@@ -33,7 +33,7 @@ private
         procedure :: total_energy => Ewald_Summation_Real_total_energy
         procedure :: solo_energy => Ewald_Summation_Real_solo_energy
         procedure, private :: pair_energy => Ewald_Summation_Real_pair_energy        
-        procedure :: test_field => Ewald_Summation_Real_test_field
+        procedure :: solo_field => Ewald_Summation_Real_solo_field
         
         procedure, private :: interpolation => Ewald_Summation_Real_interpolation
     
@@ -155,6 +155,33 @@ contains
 
     end function Ewald_Summation_Real_total_energy
 
+    pure function Ewald_Summation_Real_total_energy_field(this, Box_size, this_spheres) &
+                  result(total_energy)
+
+        class(Ewald_Summation_Real), intent(in) :: this
+        real(DP), dimension(:), intent(in) :: Box_size
+        type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
+        real(DP) :: total_energy
+
+        integer :: i_particle
+        type(Particle_Index) :: particle
+
+        total_energy = 0._DP
+        
+        do i_particle = 1, this_spheres%get_num_particles()
+            particle%number = i_particle
+            particle%position(:) = this_spheres%get_position(particle%number)
+            particle%orientation(:) = this_spheres%get_orientation(particle%number)
+            total_energy = total_energy - &
+                           dot_product(particle%orientation, &
+                                       this%solo_field(Box_size, this_spheres, particle))
+        end do
+
+        total_energy = total_energy/2._DP
+
+    end function Ewald_Summation_Real_total_energy_field
+
+
     !> Energy of 1 dipole with others
 
     pure function Ewald_Summation_Real_solo_energy(this, Box_size, this_spheres, particle) &
@@ -213,36 +240,35 @@ contains
     !>                                  (\vec{r}_{ij}\cdot\vec{\mu}_j) C_\alpha(r_{ij}) |\vec{r}_{ij})
     !> \f]
 
-    pure function Ewald_Summation_Real_test_field(this, Box_size, this_spheres, particle) &
-                  result(test_field)
+    pure function Ewald_Summation_Real_solo_field(this, Box_size, this_spheres, particle) &
+                  result(solo_field)
                   
         class(Ewald_Summation_Real), intent(in) :: this
         real(DP), dimension(:), intent(in) :: Box_size
         type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
         type(Particle_Index), intent(in) :: particle
-        real(DP), dimension(num_dimensions) :: test_field
+        real(DP), dimension(num_dimensions) :: solo_field
         
         real(DP), dimension(2) :: interpolation
         real(DP), dimension(num_dimensions) :: vector_ij
         integer :: j_particle
         
-        test_field(:) = 0._DP
+        solo_field(:) = 0._DP
         
         do j_particle = 1, this_spheres%get_num_particles()
-                
-            vector_ij(:) = PBC_vector(Box_size, &
-                                      particle%position, this_spheres%get_position(j_particle))
-                                      
-            interpolation = this%interpolation(norm2(vector_ij))
-            
-            test_field(:) = test_field(:) - &
-                interpolation(1) * this_spheres%get_orientation(j_particle) + &
-                dot_product(vector_ij, this_spheres%get_orientation(j_particle)) * interpolation(2) * &
-                vector_ij(:)
-                     
+            if (j_particle /= particle%number) then
+                vector_ij(:) = PBC_vector(Box_size, &
+                                          particle%position, this_spheres%get_position(j_particle))
+                                          
+                interpolation = this%interpolation(norm2(vector_ij))                
+                solo_field(:) = solo_field(:) - &
+                    interpolation(1) * this_spheres%get_orientation(j_particle) + &
+                    dot_product(vector_ij, this_spheres%get_orientation(j_particle)) * interpolation(2) * &
+                    vector_ij(:)
+            end if
         end do
 
-    end function Ewald_Summation_Real_test_field
+    end function Ewald_Summation_Real_solo_field
     
     !> Linear interpolation
 

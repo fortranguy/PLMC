@@ -27,6 +27,8 @@ private
         procedure, private :: get_structure_modulus => Ewald_Summation_Reci_get_structure_modulus
         procedure :: count_wave_vectors => Ewald_Summation_Reci_count_wave_vectors
         procedure :: total_energy => Ewald_Summation_Reci_total_energy
+
+        procedure :: solo_field => Ewald_Summation_Reci_solo_field
         procedure :: test_field => Ewald_Summation_Reci_test_field
         
         procedure :: move_energy => Ewald_Summation_Reci_move_energy
@@ -264,6 +266,90 @@ contains
         total_energy = 2._DP*PI / product(Box%size) * total_energy
         
     end function Ewald_Summation_Reci_total_energy
+
+    pure function Ewald_Summation_Reci_total_energy_field(this, Box, this_spheres) result(total_energy)
+        
+        class(Ewald_Summation_Reci), intent(in) :: this
+        type(Box_Parameters), intent(in) :: Box
+        type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
+        real(DP) :: total_energy
+        
+        integer :: i_particle
+        type(Particle_Index) :: particle
+
+        total_energy = 0._DP
+
+        do i_particle = 1, this_spheres%get_num_particles()
+            particle%number = i_particle
+            particle%position(:) = this_spheres%get_position(particle%number)
+            particle%orientation(:) = this_spheres%get_orientation(particle%number)
+            total_energy = total_energy - &
+                           dot_product(particle%orientation, &
+                                       this%solo_field(Box, particle))
+        end do
+
+        total_energy = total_energy/2._DP
+        
+    end function Ewald_Summation_Reci_total_energy_field
+
+    !> Field
+    !> \f[
+    !>      \vec{E}(\vec{r}_{N+1}) = -\frac{4\pi}{V} \sum_{\vec{k} \neq 0} w(\alpha, \vec{k})
+    !>                               [
+    !>                                  \Re(S(\vec{k}) e^{-i(\vec{k}\cdot \vec{r}_{N+1})}) +
+    !>                                  (\vec{\mu}_{N+1} \cdot \vec{k})
+    !>                               ] \vec{k}
+    !> \f]
+
+    pure function Ewald_Summation_Reci_solo_field(this, Box, particle) result(solo_field)
+
+        class(Ewald_Summation_Reci), intent(in) :: this
+        type(Box_Parameters), intent(in) :: Box
+        type(Particle_Index), intent(in) :: particle
+        real(DP), dimension(num_dimensions) :: solo_field
+
+        real(DP), dimension(num_dimensions) :: position_div_box
+        
+        complex(DP), dimension(-Box%wave(1):Box%wave(1)) :: exp_Ikx_1
+        complex(DP), dimension(-Box%wave(2):Box%wave(2)) :: exp_Ikx_2
+        complex(DP), dimension(-Box%wave(3):Box%wave(3)) :: exp_Ikx_3
+        complex(DP) :: exp_Ikx
+        
+        real(DP), dimension(num_dimensions) :: wave_vector
+        
+        integer :: kx, ky, kz
+        
+        position_div_box(:) = 2._DP*PI * particle%position(:) / Box%size(:)
+        call fourier_i(Box%wave(1), position_div_box(1), exp_Ikx_1)
+        call fourier_i(Box%wave(2), position_div_box(2), exp_Ikx_2)
+        call fourier_i(Box%wave(3), position_div_box(3), exp_Ikx_3)
+
+        solo_field(:) = 0._DP
+        
+        do kz = -Box%wave(3), Box%wave(3)
+            wave_vector(3) = 2._DP*PI * real(kz, DP) / Box%size(3)
+
+        do ky = -Box%wave(2), Box%wave(2)
+            wave_vector(2) = 2._DP*PI * real(ky, DP) / Box%size(2)
+            
+        do kx = -Box%wave(1), Box%wave(1)
+            wave_vector(1) = 2._DP*PI * real(kx, DP) / Box%size(1)
+                
+            exp_Ikx = exp_Ikx_1(kx) * exp_Ikx_2(ky) * exp_Ikx_3(kz)
+
+            solo_field(:) = solo_field(:) + &
+                this%weight(kx, ky, kz) * (real(this%structure(kx, ky, kz) * conjg(exp_Ikx), DP) + &
+                dot_product(particle%orientation, wave_vector)) * wave_vector(:)
+                    
+        end do
+            
+        end do
+            
+        end do
+        
+        solo_field(:) =-4._DP*PI / product(Box%size) * solo_field(:)
+
+    end function Ewald_Summation_Reci_solo_field
     
     !> Field
     !> \f[

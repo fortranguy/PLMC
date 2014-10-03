@@ -33,6 +33,7 @@ private
         procedure :: count_wave_vectors => Electronic_Layer_Correction_count_wave_vectors
         procedure :: total_energy => Electronic_Layer_Correction_total_energy
         
+        procedure :: solo_field => Electronic_Layer_Correction_solo_field
         procedure :: test_field => Electronic_Layer_Correction_test_field
         
         procedure :: move_energy => Electronic_Layer_Correction_move_energy
@@ -303,11 +304,36 @@ contains
         total_energy = PI / product(Box%size(1:2)) * total_energy
         
     end function Electronic_Layer_Correction_total_energy
+
+    pure function Electronic_Layer_Correction_total_energy_field(this, Box, this_spheres) result(total_energy)
+        
+        class(Electronic_Layer_Correction), intent(in) :: this
+        type(Box_Parameters), intent(in) :: Box
+        type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
+        real(DP) :: total_energy
+        
+        integer :: i_particle
+        type(Particle_Index) :: particle
+
+        total_energy = 0._DP
+
+        do i_particle = 1, this_spheres%get_num_particles()
+            particle%number = i_particle
+            particle%position(:) = this_spheres%get_position(particle%number)
+            particle%orientation(:) = this_spheres%get_orientation(particle%number)
+            total_energy = total_energy + &
+                           dot_product(particle%orientation, &
+                                       this%solo_field(Box, particle))
+        end do
+        
+        total_energy = total_energy/2._DP
+        
+    end function Electronic_Layer_Correction_total_energy_field
     
     !> Field
     !> \f[
     !>      \vec{E}(\vec{r}_{N+1}) = \frac{2\pi}{S} \sum_{\vec{k}^{2D} \neq \vec{0}} w(k^{2D}) \{
-    !>                                     \Re[ e^{(\vec{K}_+ \cdot \vec{r}_{N+1})} 
+    !>                                    \Re[ e^{(\vec{K}_+ \cdot \vec{r}_{N+1})} 
     !>                                              S_-^*(\vec{k}^{2D}) |\vec{K}_+) +
     !>                                         e^{(\vec{K}_-^* \cdot \vec{r}_{N+1})}
     !>                                              S_+(\vec{k}^{2D}) |\vec{K}_-^*) ] +
@@ -315,13 +341,13 @@ contains
     !>                               \}  
     !> \f]
     
-    pure function Electronic_Layer_Correction_test_field(this, Box, particle) &
-                  result(test_field)
+    pure function Electronic_Layer_Correction_solo_field(this, Box, particle) &
+                  result(solo_field)
                   
         class(Electronic_Layer_Correction), intent(in) :: this
         type(Box_Parameters), intent(in) :: Box
         type(Particle_Index), intent(in) :: particle
-        real(DP), dimension(num_dimensions) :: test_field
+        real(DP), dimension(num_dimensions) :: solo_field
         
         real(DP), dimension(2) :: position_div_box
         
@@ -340,7 +366,7 @@ contains
         call fourier_i(Box%wave(2), position_div_box(2), exp_Ikx_2)
         call set_exp_kz(Box%wave, this%wave_norm, particle%position(3), exp_kz_tab)
         
-        test_field(:) = 0._DP
+        solo_field(:) = 0._DP
         
         do ky = -Box%wave(2), Box%wave(2)
             wave_vector(2) = 2._DP*PI * real(ky, DP) / Box%size(2)
@@ -357,7 +383,7 @@ contains
             wave_vector_minus(1:2) = cmplx(0._DP, wave_vector, DP)
             wave_vector_minus(3) = cmplx(-this%wave_norm(kx, ky), 0._DP, DP)
             
-            test_field(:) = test_field(:) + this%weight(kx, ky) * &
+            solo_field(:) = solo_field(:) + this%weight(kx, ky) * &
                 (real(conjg(this%structure_minus(kx, ky))*exp_Ikx*cmplx(exp_kz, 0._DP, DP) * &
                  wave_vector_plus(:) + &
                  this%structure_plus(kx, ky)*conjg(exp_Ikx)/cmplx(exp_kz, 0._DP, DP) * &
@@ -369,8 +395,31 @@ contains
         
         end do
         
-        test_field(:) = -2._DP * PI / product(Box%size(1:2)) * test_field(:)        
+        solo_field(:) = 2._DP*PI / product(Box%size(1:2)) * solo_field(:)        
                   
+    end function Electronic_Layer_Correction_solo_field
+
+    !> Field
+    !> \f[
+    !>      \vec{E}(\vec{r}_{N+1}) =-\frac{2\pi}{S} \sum_{\vec{k}^{2D} \neq \vec{0}} w(k^{2D}) \{
+    !>                                    \Re[ e^{(\vec{K}_+ \cdot \vec{r}_{N+1})} 
+    !>                                              S_-^*(\vec{k}^{2D}) |\vec{K}_+) +
+    !>                                         e^{(\vec{K}_-^* \cdot \vec{r}_{N+1})}
+    !>                                              S_+(\vec{k}^{2D}) |\vec{K}_-^*) ] +
+    !>                                    (\vec{\mu}_{N+1} \cdot \vec{K}_-^*)  |\vec{K}_+)
+    !>                               \}  
+    !> \f]
+
+    pure function Electronic_Layer_Correction_test_field(this, Box, particle) &
+                  result(test_field)
+
+        class(Electronic_Layer_Correction), intent(in) :: this
+        type(Box_Parameters), intent(in) :: Box
+        type(Particle_Index), intent(in) :: particle
+        real(DP), dimension(num_dimensions) :: test_field
+
+        test_field(:) = -this%solo_field(Box, particle)
+
     end function Electronic_Layer_Correction_test_field
     
     !> Move

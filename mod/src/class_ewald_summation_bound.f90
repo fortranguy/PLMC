@@ -20,6 +20,7 @@ private
         procedure :: reset_total_moment => Ewald_Summation_Bound_reset_total_moment
         procedure :: total_energy => Ewald_Summation_Bound_total_energy
         
+        procedure :: solo_field => Ewald_Summation_Bound_solo_field
         procedure :: test_field => Ewald_Summation_Bound_test_field
         
         procedure :: rotation_energy => Ewald_Summation_Bound_rotation_energy
@@ -97,6 +98,39 @@ contains
         end if
     
     end function Ewald_Summation_Bound_total_energy
+
+    pure function Ewald_Summation_Bound_total_energy_field(this, Box_size) result(total_energy)
+    
+        class(Ewald_Summation_Bound), intent(in) :: this
+        real(DP), dimension(:), intent(in) :: Box_size
+        real(DP) :: total_energy
+        
+        total_energy = -dot_product(this%total_moment, this%solo_field(Box_size)) / 2._DP
+    
+    end function Ewald_Summation_Bound_total_energy_field
+
+    !> Field
+    !> \f[
+    !>      \vec{E}(\vec{M}, S) = - \frac{4\pi}{3V}  \vec{M}
+    !> \f]
+    !> \f[
+    !>      \vec{E}(\vec{M}, R) = - \frac{4\pi}{V}  |\vec{e}_z)(\vec{e}_z| \vec{M}
+    !> \f]
+    
+    pure function Ewald_Summation_Bound_solo_field(this, Box_size) result(solo_field)
+
+        class(Ewald_Summation_Bound), intent(in) :: this
+        real(DP), dimension(:), intent(in) :: Box_size
+        real(DP), dimension(num_dimensions) :: solo_field
+        
+        if (geometry%bulk) then
+            solo_field(:) = -4._DP/3._DP * PI/product(Box_size) * this%total_moment(:)
+        else if(geometry%slab) then
+            solo_field(1:2) = 0._DP
+            solo_field(3) = -4._DP * PI/product(Box_size) * this%total_moment(3)
+        end if
+
+    end function Ewald_Summation_Bound_solo_field
     
     !> Field
     !> \f[

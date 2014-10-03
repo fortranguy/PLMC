@@ -15,6 +15,7 @@ private
         procedure :: set_alpha => Ewald_Summation_Self_set_alpha
         procedure :: total_energy => Ewald_Summation_Self_total_energy
         procedure :: solo_energy => Ewald_Summation_Self_solo_energy
+        procedure :: solo_field => Ewald_Summation_Self_solo_field
         procedure :: test_field => Ewald_Summation_Self_test_field
     end type Ewald_Summation_Self
     
@@ -46,6 +47,25 @@ contains
         end do
         
     end function Ewald_Summation_Self_total_energy
+
+    pure function Ewald_Summation_Self_total_energy_field(this, this_spheres) result(total_energy)
+    
+        class(Ewald_Summation_Self), intent(in) :: this
+        class(Dipolar_Hard_Spheres), intent(in) :: this_spheres
+        real(DP) :: total_energy
+
+        integer :: i_particle
+        
+        total_energy = 0._DP
+        do i_particle = 1, this_spheres%get_num_particles()
+            total_energy = total_energy + &
+                dot_product(this_spheres%get_orientation(i_particle), &
+                            this%solo_field(this_spheres%get_orientation(i_particle)))
+        end do
+        
+        total_energy = total_energy / 2._DP
+        
+    end function Ewald_Summation_Self_total_energy_field
     
     !> Self energy of 1 dipole
     !> \f[ \frac{2}{3}\frac{\alpha^3}{\sqrt{\pi}} \vec{\mu}_i\cdot\vec{\mu}_i \f]
@@ -59,6 +79,17 @@ contains
         solo_energy = 2._DP/3._DP * this%alpha**3/sqrt(PI) * dot_product(orientation, orientation)
     
     end function Ewald_Summation_Self_solo_energy
+
+    pure function Ewald_Summation_Self_solo_field(this, orientation) &
+                  result(solo_field)
+    
+        class(Ewald_Summation_Self), intent(in) :: this
+        real(DP), dimension(:), intent(in) :: orientation
+        real(DP), dimension(num_dimensions) :: solo_field
+        
+        solo_field(:) = 4._DP/3._DP * this%alpha**3/sqrt(PI) * orientation(:)
+    
+    end function Ewald_Summation_Self_solo_field
     
     pure function Ewald_Summation_Self_test_field(this, orientation) &
                   result(test_field)
