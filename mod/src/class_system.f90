@@ -20,8 +20,7 @@ use class_discrete_observable, only: Discrete_Observables
 use class_hard_spheres_observables, only: Hard_Spheres_Monte_Carlo_Observables, &
                                           Dipolar_Hard_Spheres_Monte_Carlo_Observables, &
                                           Between_Hard_Spheres_Monte_Carlo_Observables, &
-                                          Hard_Spheres_Post_Processing_Observables, &
-                                          Dipolar_Hard_Spheres_Post_Processing_Observables
+                                          Hard_Spheres_Post_Processing_Observables
 use class_distribution_function, only: Distribution_Function
 use class_hard_spheres_units, only: Hard_Spheres_Monte_Carlo_Units, &
                                     Dipolar_Hard_Spheres_Monte_Carlo_Units, &
@@ -158,8 +157,7 @@ private
         integer :: num_steps
         type(json_file) :: data_report_json
         
-        type(Dipolar_Hard_Spheres_Post_Processing_Observables) :: type1_observables
-        type(Hard_Spheres_Post_Processing_Observables) :: type2_observables
+        type(Hard_Spheres_Post_Processing_Observables) :: type1_observables, type2_observables
         type(Dipolar_Hard_Spheres_Post_Processing_Units) :: type1_units
         type(Hard_Spheres_Post_Processing_Units) :: type2_units
         type(Distribution_Function) :: type1_field_distribution
@@ -1037,7 +1035,7 @@ contains
                 call this%type2_observables%move%update_rejection()
                 call this%switch_observable%update_rejection()
             type is (System_Post_Processing)
-                call this%type1_observables%local_field%update_rejection()
+                call this%type1_observables%widom%update_rejection()
         end select
         
     end subroutine System_update_rejections

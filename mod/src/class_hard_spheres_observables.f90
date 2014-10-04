@@ -45,6 +45,8 @@ private
 
     type, public :: Hard_Spheres_Post_Processing_Observables
 
+        type(Discrete_Observables) :: widom
+        
         real(DP) :: inv_activity
         real(DP) :: sum_inv_activity = 0._DP
 
@@ -55,11 +57,6 @@ private
         procedure :: write_results => Hard_Spheres_Post_Processing_Observables_write_results
         
     end type Hard_Spheres_Post_Processing_Observables
-    
-    type, extends(Hard_Spheres_Post_Processing_Observables), public :: &
-        Dipolar_Hard_Spheres_Post_Processing_Observables
-        type(Discrete_Observables) :: local_field
-    end type Dipolar_Hard_Spheres_Post_Processing_Observables
     
 contains
     
@@ -95,9 +92,7 @@ contains
         
         select type (this)
             type is (Hard_Spheres_Post_Processing_Observables)
-                write(observables_unit, *) i_step, this%inv_activity
-            type is (Dipolar_Hard_Spheres_Post_Processing_Observables)
-                write(observables_unit, *) i_step, this%inv_activity, this%local_field%rejection_rate
+                write(observables_unit, *) i_step, this%inv_activity, this%widom%rejection_rate
         end select
 
     end subroutine Hard_Spheres_Post_Processing_Observables_write
@@ -130,12 +125,7 @@ contains
         class(Hard_Spheres_Post_Processing_Observables), intent(inout) :: this
 
         this%sum_inv_activity = this%sum_inv_activity + this%inv_activity
-        
-        select type (this)
-            type is (Dipolar_Hard_Spheres_Post_Processing_Observables)            
-                this%local_field%sum_rejection = this%local_field%sum_rejection + &
-                                                 this%local_field%rejection_rate
-        end select
+        this%widom%sum_rejection = this%widom%sum_rejection + this%widom%rejection_rate
 
     end subroutine Hard_Spheres_Post_Processing_Observables_accumulate
     
@@ -211,13 +201,10 @@ contains
                                                     real(num_equilibrium_steps, DP))
             call json_value_add(results_json, "average excess chemical potential", &
                                               chemical_potential_excess)
+            call json_value_add(results_json, "widom rejection rate", &
+                                              this%widom%sum_rejection / &
+                                              real(num_equilibrium_steps, DP))
         end if
-        
-        select type (this)
-            type is (Dipolar_Hard_Spheres_Post_Processing_Observables)
-                call json_value_add(results_json, "local field rejection rate", &
-                                    this%local_field%sum_rejection / real(num_equilibrium_steps, DP))
-        end select
 
         nullify(results_json)
 
