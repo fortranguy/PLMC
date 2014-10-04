@@ -264,50 +264,36 @@ contains
     
     !> Local field: for DHS only
     
-    subroutine measure_local_field(Box, this_spheres, this_macro, this_observables, &
-                                        this_field_distribution)
+    subroutine measure_local_field(Box, ext_field, this_spheres, this_macro, this_field_distribution)
 
         type(Box_Parameters), intent(in) :: Box
+        class(External_Field), intent(in) :: ext_field
         class(Dipolar_Hard_Spheres), intent(in) :: this_spheres
         class(Dipolar_Hard_Spheres_Macro), intent(in) :: this_macro
-        class(Dipolar_Hard_Spheres_Post_Processing_Observables), intent(inout) :: this_observables
         class(Distribution_Function) :: this_field_distribution
         
-        real(DP), dimension(num_dimensions) :: test_field
-        type(Particle_Index) :: test
-        integer :: i_field_particule
-        logical :: overlap
-        real(DP) :: this_energy_test
-        
-        test%number = 0
+        real(DP), dimension(num_dimensions) :: local_field
+        type(Particle_Index) :: particle
+        integer :: i_particule
         
         call this_field_distribution%step_init()
-        do i_field_particule = 1, this_spheres%get_field_num_particles()
-        
-            this_observables%local_field%num_hits = this_observables%local_field%num_hits + 1
+        do i_particule = 1, this_spheres%get_num_particles()
+
+            particle%number = i_particule
+            particle%position(:) = this_spheres%get_position(particle%number)
+            particle%orientation(:) = this_spheres%get_position(particle%number)
             
-            test%position(:) = random_position(Box, this_spheres%get_diameter())            
-            test%same_i_cell = this_macro%same_cells%index_from_position(test%position)
-            call this_macro%hard_potential%neighbours(Box%size, this_spheres, &
-                                                      this_macro%same_cells, test, &
-                                                      overlap, this_energy_test)
-            if (.not. overlap) then
-            
-                test%orientation(:) = random_surface()
-                test_field(:) = this_macro%ewald_real%solo_field(Box%size, this_spheres, test) + &
-                                this_macro%ewald_reci%test_field(Box, test) - &
-                                this_macro%ewald_self%test_field(test%orientation) + &
-                                this_macro%ewald_bound%test_field(Box%size, test)
-                if (geometry%slab) then
-                    test_field(:) = test_field(:) - this_macro%elc%test_field(Box, test)
-                end if
-                
-                call this_field_distribution%particle_set(test%position(3), test_field)
-            
-            else
-                this_observables%local_field%num_rejections = &
-                    this_observables%local_field%num_rejections + 1
+            local_field(:) = this_macro%ewald_real%solo_field(Box%size, this_spheres, particle) + &
+                             this_macro%ewald_reci%solo_field(Box, particle) - &
+                             this_macro%ewald_self%solo_field(particle%orientation) + &
+                             this_macro%ewald_bound%solo_field(Box%size) + &
+                             ext_field%get()
+                            
+            if (geometry%slab) then
+                local_field(:) = local_field(:) - this_macro%elc%solo_field(Box, particle)
             end if
+
+            call this_field_distribution%particle_set(particle%position(3), local_field)
         
         end do
         

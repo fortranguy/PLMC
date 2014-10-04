@@ -1127,8 +1127,8 @@ contains
 
         class(System_Post_Processing), intent(inout) :: this
         
-        call measure_local_field(this%Box, this%type1_spheres, this%type1_macro, &
-                                 this%type1_observables, this%type1_field_distribution)
+        call measure_local_field(this%Box, this%ext_field, this%type1_spheres, this%type1_macro, &
+                                           this%type1_field_distribution)
         
     end subroutine System_Post_Processing_measure_local_field
     

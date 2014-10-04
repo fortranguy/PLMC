@@ -13,6 +13,7 @@ private
         real(DP), dimension(num_dimensions) :: vector
     contains
         procedure :: set => External_Field_set
+        procedure :: get => External_Field_get
         procedure :: total_energy => External_Field_total_energy
         
         procedure :: rotation_energy => External_Field_rotation_energy
@@ -29,6 +30,15 @@ contains
         this%vector(:) = vector
     
     end subroutine External_Field_set
+
+    pure function External_Field_get(this) result(get)
+
+        class(External_Field), intent(in) :: this
+        real(DP), dimension(num_dimensions) :: get
+
+        get(:) = this%vector(:)
+
+    end function External_Field_get
     
     pure function External_Field_total_energy(this, total_moment) result(total_energy)
     
