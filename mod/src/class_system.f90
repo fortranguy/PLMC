@@ -439,7 +439,7 @@ contains
         call this%type2_macro%same_cells%destroy()
         call this%type2_spheres%destroy()
 
-        if (geometry%slab) call this%type1_macro%elc%destroy()
+        if (geometry%slab) call this%type1_macro%dlc%destroy()
         call this%type1_macro%ewald_reci%destroy()
         call this%type1_macro%ewald_real%destroy()
         call this%type1_macro%between_cells%destroy()
@@ -1206,7 +1206,7 @@ contains
             call this%type1_macro%ewald_bound%reset_total_moment(this%type1_spheres, i_step, &
                  this%type1_units%total_moment_modulus)
             if (geometry%slab) then
-                call this%type1_macro%elc%reset_structure(this%Box, this%type1_spheres, i_step, &
+                call this%type1_macro%dlc%reset_structure(this%Box, this%type1_spheres, i_step, &
                                                           this%type1_units%ELC_structure_modulus)
             end if
         end if
@@ -1222,7 +1222,7 @@ contains
             call this%type1_macro%ewald_reci%reset_structure(this%Box, this%type1_spheres, i_step)
             call this%type1_macro%ewald_bound%reset_total_moment(this%type1_spheres, i_step)
             if (geometry%slab) then
-                call this%type1_macro%elc%reset_structure(this%Box, this%type1_spheres, i_step)
+                call this%type1_macro%dlc%reset_structure(this%Box, this%type1_spheres, i_step)
             end if
             call reset_cells(this%type1_spheres, this%type1_macro, this%type2_spheres)
             call reset_cells(this%type2_spheres, this%type2_macro, this%type1_spheres)

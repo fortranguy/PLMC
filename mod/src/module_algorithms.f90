@@ -110,7 +110,7 @@ contains
                                                     this_macro%ewald_reci%move_energy(Box, old, new)
                                 if (geometry%slab) then
                                     this_energy_delta = this_energy_delta - &
-                                                        this_macro%elc%move_energy(Box, old, new)
+                                                        this_macro%dlc%move_energy(Box, old, new)
                                 end if
                         end select
                     class default
@@ -136,7 +136,7 @@ contains
                         type is (Dipolar_Hard_Spheres_Macro)
                             call this_macro%ewald_reci%update_structure_move(Box, old, new)
                             if (geometry%slab) then
-                                call this_macro%elc%update_structure_move(Box, old, new)
+                                call this_macro%dlc%update_structure_move(Box, old, new)
                             end if
                     end select
                 
@@ -244,7 +244,7 @@ contains
                                        
                                     if (geometry%slab) then
                                         this_energy_test = this_energy_test - &
-                                                           this_macro%elc%exchange_energy(Box, test)
+                                                           this_macro%dlc%exchange_energy(Box, test)
                                     end if
                                                     
                             end select
@@ -295,7 +295,7 @@ contains
                              ext_field%get()
                             
             if (geometry%slab) then
-                local_field(:) = local_field(:) - this_macro%elc%solo_field(Box, particle)
+                local_field(:) = local_field(:) - this_macro%dlc%solo_field(Box, particle)
             end if
 
             call this_field_distribution%particle_set(particle%position(3), local_field)
@@ -506,7 +506,7 @@ contains
                                                   this_macro%ewald_reci%move_energy(Box, old, new)
                                 if (geometry%slab) then
                                     energy_new%same = energy_new%same - &
-                                                      this_macro%elc%move_energy(Box, old, new)
+                                                      this_macro%dlc%move_energy(Box, old, new)
                                 end if
                         end select
                                        
@@ -534,7 +534,7 @@ contains
             type is (Dipolar_Hard_Spheres_Macro)
                 call this_macro%ewald_reci%update_structure_move(Box, old, new)
                 if (geometry%slab) then
-                    call this_macro%elc%update_structure_move(Box, old, new)
+                    call this_macro%dlc%update_structure_move(Box, old, new)
                 end if
         end select
         
@@ -587,7 +587,7 @@ contains
                        energy_self_delta + this_macro%ewald_bound%rotation_energy(Box%size, old, new) + &
                        ext_field%rotation_energy(old, new)
         if (geometry%slab) then
-            energy_delta = energy_delta - this_macro%elc%rotation_energy(Box, old, new)
+            energy_delta = energy_delta - this_macro%dlc%rotation_energy(Box, old, new)
         end if
         
         call random_number(random)
@@ -597,7 +597,7 @@ contains
             call this_macro%ewald_bound%update_total_moment_rotation(old, new)
             call this_spheres%set_orientation(old%number, new%orientation)
             if (geometry%slab) then
-                call this_macro%elc%update_structure_rotation(Box, old, new)
+                call this_macro%dlc%update_structure_rotation(Box, old, new)
             end if
             
             this_observables%potential_energy = this_observables%potential_energy + energy_delta

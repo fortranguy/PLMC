@@ -1,4 +1,4 @@
-module class_electronic_layer_correction
+module class_dipolar_layer_correction
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: PI
@@ -11,7 +11,7 @@ implicit none
 
 private
 
-    type, public :: Electronic_Layer_Correction
+    type, public :: Dipolar_Layer_Correction
 
         private
         
@@ -22,40 +22,40 @@ private
         
     contains
     
-        procedure :: construct => Electronic_Layer_Correction_construct
-        procedure, private :: set_wave_norm => Electronic_Layer_Correction_set_wave_norm
-        procedure, private :: set_weight => Electronic_Layer_Correction_set_weight
-        procedure, private :: set_structure => Electronic_Layer_Correction_set_structure
-        procedure :: destroy => Electronic_Layer_Correction_destroy
-        procedure :: reset_structure => Electronic_Layer_Correction_reset_structure
+        procedure :: construct => Dipolar_Layer_Correction_construct
+        procedure, private :: set_wave_norm => Dipolar_Layer_Correction_set_wave_norm
+        procedure, private :: set_weight => Dipolar_Layer_Correction_set_weight
+        procedure, private :: set_structure => Dipolar_Layer_Correction_set_structure
+        procedure :: destroy => Dipolar_Layer_Correction_destroy
+        procedure :: reset_structure => Dipolar_Layer_Correction_reset_structure
         procedure, private :: get_structure_modulus => &
-                              Electronic_Layer_Correction_get_structure_modulus
-        procedure :: count_wave_vectors => Electronic_Layer_Correction_count_wave_vectors
-        procedure :: total_energy => Electronic_Layer_Correction_total_energy
+                              Dipolar_Layer_Correction_get_structure_modulus
+        procedure :: count_wave_vectors => Dipolar_Layer_Correction_count_wave_vectors
+        procedure :: total_energy => Dipolar_Layer_Correction_total_energy
         procedure, private :: total_energy_structure => &
-                              Electronic_Layer_Correction_total_energy_structure
-        procedure, private :: total_energy_field => Electronic_Layer_Correction_total_energy_field
+                              Dipolar_Layer_Correction_total_energy_structure
+        procedure, private :: total_energy_field => Dipolar_Layer_Correction_total_energy_field
         
-        procedure :: solo_field => Electronic_Layer_Correction_solo_field
-        procedure :: test_field => Electronic_Layer_Correction_test_field
+        procedure :: solo_field => Dipolar_Layer_Correction_solo_field
+        procedure :: test_field => Dipolar_Layer_Correction_test_field
         
-        procedure :: move_energy => Electronic_Layer_Correction_move_energy
+        procedure :: move_energy => Dipolar_Layer_Correction_move_energy
         procedure :: update_structure_move => &
-                     Electronic_Layer_Correction_update_structure_move
-        procedure :: rotation_energy => Electronic_Layer_Correction_rotation_energy
+                     Dipolar_Layer_Correction_update_structure_move
+        procedure :: rotation_energy => Dipolar_Layer_Correction_rotation_energy
         procedure :: update_structure_rotation => &
-                     Electronic_Layer_Correction_update_structure_rotation
-        procedure :: exchange_energy => Electronic_Layer_Correction_exchange_energy
+                     Dipolar_Layer_Correction_update_structure_rotation
+        procedure :: exchange_energy => Dipolar_Layer_Correction_exchange_energy
         procedure :: update_structure_exchange => &
-                     Electronic_Layer_Correction_update_structure_exchange
+                     Dipolar_Layer_Correction_update_structure_exchange
         
-    end type Electronic_Layer_Correction
+    end type Dipolar_Layer_Correction
     
 contains
 
-    pure subroutine Electronic_Layer_Correction_construct(this, Box, this_spheres)
+    pure subroutine Dipolar_Layer_Correction_construct(this, Box, this_spheres)
         
-        class(Electronic_Layer_Correction), intent(inout) :: this
+        class(Dipolar_Layer_Correction), intent(inout) :: this
         type(Box_Parameters), intent(in) :: Box
         type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
         
@@ -78,11 +78,11 @@ contains
         call this%set_weight(Box)
         call this%set_structure(Box, this_spheres)
     
-    end subroutine Electronic_Layer_Correction_construct
+    end subroutine Dipolar_Layer_Correction_construct
     
-    pure subroutine Electronic_Layer_Correction_set_wave_norm(this, Box)
+    pure subroutine Dipolar_Layer_Correction_set_wave_norm(this, Box)
     
-        class(Electronic_Layer_Correction), intent(inout) :: this
+        class(Dipolar_Layer_Correction), intent(inout) :: this
         type(Box_Parameters), intent(in) :: Box
     
         integer :: kx, ky
@@ -100,15 +100,15 @@ contains
         
         end do
     
-    end subroutine Electronic_Layer_Correction_set_wave_norm
+    end subroutine Dipolar_Layer_Correction_set_wave_norm
     
     !> \f[
     !>      w(\vec{k}^{2D}) = \frac{1}{k^{2D}(e^{k^{2D}L_z} - 1)}
     !> \f]
     
-    pure subroutine Electronic_Layer_Correction_set_weight(this, Box)
+    pure subroutine Dipolar_Layer_Correction_set_weight(this, Box)
         
-        class(Electronic_Layer_Correction), intent(inout) :: this
+        class(Dipolar_Layer_Correction), intent(inout) :: this
         type(Box_Parameters), intent(in) :: Box
         
         integer :: kx, ky
@@ -128,7 +128,7 @@ contains
             
         end do
         
-    end subroutine Electronic_Layer_Correction_set_weight
+    end subroutine Dipolar_Layer_Correction_set_weight
     
     !> Structure factor set :
     !> \f[
@@ -142,9 +142,9 @@ contains
     !>                                      e^{+i\vec{k}^{2D}\cdot\vec{x}^{2D}_i} e^{+k^{2D}z_i}
     !> \f].
 
-    pure subroutine Electronic_Layer_Correction_set_structure(this, Box, this_spheres)
+    pure subroutine Dipolar_Layer_Correction_set_structure(this, Box, this_spheres)
 
-        class(Electronic_Layer_Correction), intent(inout) :: this
+        class(Dipolar_Layer_Correction), intent(inout) :: this
         type(Box_Parameters), intent(in) :: Box
         type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
 
@@ -197,24 +197,24 @@ contains
             
         end do
 
-    end subroutine Electronic_Layer_Correction_set_structure
+    end subroutine Dipolar_Layer_Correction_set_structure
     
-    subroutine Electronic_Layer_Correction_destroy(this)
+    subroutine Dipolar_Layer_Correction_destroy(this)
     
-        class(Electronic_Layer_Correction), intent(inout) :: this
+        class(Dipolar_Layer_Correction), intent(inout) :: this
         
         if (allocated(this%wave_norm)) deallocate(this%wave_norm)
         if (allocated(this%weight)) deallocate(this%weight)
         if (allocated(this%structure_plus)) deallocate(this%structure_plus)
         if (allocated(this%structure_minus)) deallocate(this%structure_minus)
     
-    end subroutine Electronic_Layer_Correction_destroy
+    end subroutine Dipolar_Layer_Correction_destroy
     
     !> Reset the structure factor and print the drift
     
-    subroutine Electronic_Layer_Correction_reset_structure(this, Box, this_spheres, i_step, modulus_unit)
+    subroutine Dipolar_Layer_Correction_reset_structure(this, Box, this_spheres, i_step, modulus_unit)
     
-        class(Electronic_Layer_Correction), intent(inout) :: this
+        class(Dipolar_Layer_Correction), intent(inout) :: this
         type(Box_Parameters), intent(in) :: Box
         type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
         integer, intent(in) :: i_step
@@ -230,14 +230,14 @@ contains
             write(modulus_unit, *) i_step, abs(modulus_reset(:) - modulus_drifted(:))
         end if
     
-    end subroutine Electronic_Layer_Correction_reset_structure
+    end subroutine Dipolar_Layer_Correction_reset_structure
     
     !> To calculate the drift of the structure factor
 
-    pure function Electronic_Layer_Correction_get_structure_modulus(this, Box_wave) &
+    pure function Dipolar_Layer_Correction_get_structure_modulus(this, Box_wave) &
                   result(get_structure_modulus)
 
-        class(Electronic_Layer_Correction), intent(in) :: this
+        class(Dipolar_Layer_Correction), intent(in) :: this
         integer, dimension(:), intent(in) :: Box_wave
         real(DP), dimension(2) :: get_structure_modulus
 
@@ -254,13 +254,13 @@ contains
             end do
         end do
 
-    end function Electronic_Layer_Correction_get_structure_modulus
+    end function Dipolar_Layer_Correction_get_structure_modulus
     
     ! Count the number of wave vectors
 
-    subroutine Electronic_Layer_Correction_count_wave_vectors(this, Box_wave, wave_unit)
+    subroutine Dipolar_Layer_Correction_count_wave_vectors(this, Box_wave, wave_unit)
 
-        class(Electronic_Layer_Correction), intent(inout) :: this
+        class(Dipolar_Layer_Correction), intent(inout) :: this
         integer, dimension(:), intent(in) :: Box_wave
         integer, intent(in) :: wave_unit
         
@@ -282,14 +282,14 @@ contains
             end do
         end do
 
-    end subroutine Electronic_Layer_Correction_count_wave_vectors
+    end subroutine Dipolar_Layer_Correction_count_wave_vectors
     
     !> Total ELC energy
     
-    pure function Electronic_Layer_Correction_total_energy(this, Box, using_field, this_spheres) &
+    pure function Dipolar_Layer_Correction_total_energy(this, Box, using_field, this_spheres) &
                   result(total_energy)
     
-        class(Electronic_Layer_Correction), intent(in) :: this
+        class(Dipolar_Layer_Correction), intent(in) :: this
         type(Box_Parameters), intent(in) :: Box
         logical, intent(in), optional :: using_field
         type(Dipolar_Hard_Spheres), intent(in), optional :: this_spheres
@@ -305,12 +305,12 @@ contains
             total_energy = this%total_energy_structure(Box)
         end if
     
-    end function Electronic_Layer_Correction_total_energy
+    end function Dipolar_Layer_Correction_total_energy
     
-    pure function Electronic_Layer_Correction_total_energy_structure(this, Box) &
+    pure function Dipolar_Layer_Correction_total_energy_structure(this, Box) &
                   result(total_energy_structure)
         
-        class(Electronic_Layer_Correction), intent(in) :: this
+        class(Dipolar_Layer_Correction), intent(in) :: this
         type(Box_Parameters), intent(in) :: Box
         real(DP) :: total_energy_structure
 
@@ -329,12 +329,12 @@ contains
         
         total_energy_structure = PI / product(Box%size(1:2)) * total_energy_structure
         
-    end function Electronic_Layer_Correction_total_energy_structure
+    end function Dipolar_Layer_Correction_total_energy_structure
 
-    pure function Electronic_Layer_Correction_total_energy_field(this, Box, this_spheres) &
+    pure function Dipolar_Layer_Correction_total_energy_field(this, Box, this_spheres) &
                   result(total_energy_field)
         
-        class(Electronic_Layer_Correction), intent(in) :: this
+        class(Dipolar_Layer_Correction), intent(in) :: this
         type(Box_Parameters), intent(in) :: Box
         type(Dipolar_Hard_Spheres), intent(in) :: this_spheres
         real(DP) :: total_energy_field
@@ -355,7 +355,7 @@ contains
         
         total_energy_field = total_energy_field/2._DP
         
-    end function Electronic_Layer_Correction_total_energy_field
+    end function Dipolar_Layer_Correction_total_energy_field
     
     !> Field
     !> \f[
@@ -367,10 +367,10 @@ contains
     !>                               \}  
     !> \f]
     
-    pure function Electronic_Layer_Correction_solo_field(this, Box, particle) &
+    pure function Dipolar_Layer_Correction_solo_field(this, Box, particle) &
                   result(solo_field)
                   
-        class(Electronic_Layer_Correction), intent(in) :: this
+        class(Dipolar_Layer_Correction), intent(in) :: this
         type(Box_Parameters), intent(in) :: Box
         type(Particle_Index), intent(in) :: particle
         real(DP), dimension(num_dimensions) :: solo_field
@@ -421,7 +421,7 @@ contains
         
         solo_field(:) = -2._DP*PI / product(Box%size(1:2)) * solo_field(:)        
                   
-    end function Electronic_Layer_Correction_solo_field
+    end function Dipolar_Layer_Correction_solo_field
 
     !> Field
     !> \f[
@@ -434,10 +434,10 @@ contains
     !>                               \}  
     !> \f]
 
-    pure function Electronic_Layer_Correction_test_field(this, Box, particle) &
+    pure function Dipolar_Layer_Correction_test_field(this, Box, particle) &
                   result(test_field)
 
-        class(Electronic_Layer_Correction), intent(in) :: this
+        class(Dipolar_Layer_Correction), intent(in) :: this
         type(Box_Parameters), intent(in) :: Box
         type(Particle_Index), intent(in) :: particle
         real(DP), dimension(num_dimensions) :: test_field
@@ -490,7 +490,7 @@ contains
         
         test_field(:) =-2._DP*PI / product(Box%size(1:2)) * test_field(:)
 
-    end function Electronic_Layer_Correction_test_field
+    end function Dipolar_Layer_Correction_test_field
     
     !> Move
 
@@ -511,9 +511,9 @@ contains
     !>               )
     !> \f]
 
-    pure function Electronic_Layer_Correction_move_energy(this, Box, old, new) result(move_energy)
+    pure function Dipolar_Layer_Correction_move_energy(this, Box, old, new) result(move_energy)
 
-        class(Electronic_Layer_Correction), intent(in) :: this
+        class(Dipolar_Layer_Correction), intent(in) :: this
         type(Box_Parameters), intent(in) :: Box
         type(Particle_Index), intent(in) :: old, new
         real(DP) :: move_energy
@@ -598,7 +598,7 @@ contains
 
         move_energy = 2._DP*PI / product(Box%size(1:2)) * move_energy
 
-    end function Electronic_Layer_Correction_move_energy
+    end function Dipolar_Layer_Correction_move_energy
 
     !> Update position -> update the ``structure factors''
     !>  \f[
@@ -607,9 +607,9 @@ contains
     !>                        e^{\pm k^{2D}z_l} e^{i(\vec{k}^{2D}\cdot\vec{x}^{2D}_l)})
     !>  \f]
 
-    pure subroutine Electronic_Layer_Correction_update_structure_move(this, Box, old, new)
+    pure subroutine Dipolar_Layer_Correction_update_structure_move(this, Box, old, new)
 
-        class(Electronic_Layer_Correction), intent(inout) :: this
+        class(Dipolar_Layer_Correction), intent(inout) :: this
         type(Box_Parameters), intent(in) :: Box
         type(Particle_Index), intent(in) :: old, new
         
@@ -669,7 +669,7 @@ contains
             
         end do
 
-    end subroutine Electronic_Layer_Correction_update_structure_move
+    end subroutine Dipolar_Layer_Correction_update_structure_move
     
     !> Rotate
 
@@ -691,10 +691,10 @@ contains
     !>               )
     !> \f]
     
-    pure function Electronic_Layer_Correction_rotation_energy(this, Box, old, new) &
+    pure function Dipolar_Layer_Correction_rotation_energy(this, Box, old, new) &
          result(rotation_energy)
 
-        class(Electronic_Layer_Correction), intent(in) :: this
+        class(Dipolar_Layer_Correction), intent(in) :: this
         type(Box_Parameters), intent(in) :: Box
         type(Particle_Index), intent(in) :: old, new
         real(DP) :: rotation_energy
@@ -773,7 +773,7 @@ contains
 
         rotation_energy = 2._DP*PI / product(Box%size(1:2)) * rotation_energy
 
-    end function Electronic_Layer_Correction_rotation_energy
+    end function Dipolar_Layer_Correction_rotation_energy
 
     !> Update moment -> update the ``structure factors''
     !>  \f[
@@ -783,9 +783,9 @@ contains
     !>                       e^{\pm k^{2D}z_l} e^{i(\vec{k}^{2D}\cdot\vec{x}^{2D}_l)}
     !>  \f]
 
-    pure subroutine Electronic_Layer_Correction_update_structure_rotation(this, Box, old, new)
+    pure subroutine Dipolar_Layer_Correction_update_structure_rotation(this, Box, old, new)
 
-        class(Electronic_Layer_Correction), intent(inout) :: this
+        class(Dipolar_Layer_Correction), intent(inout) :: this
         type(Box_Parameters), intent(in) :: Box
         type(Particle_Index), intent(in) :: old, new
 
@@ -831,7 +831,7 @@ contains
             
         end do
 
-    end subroutine Electronic_Layer_Correction_update_structure_rotation
+    end subroutine Dipolar_Layer_Correction_update_structure_rotation
     
     !> Energy of 1 dipole with others
     
@@ -854,9 +854,9 @@ contains
     
     !> Summary: only the sign of \f[\vec{\mu}\f] changes.
 
-    pure function Electronic_Layer_Correction_exchange_energy(this, Box, particle) result(exchange_energy)
+    pure function Dipolar_Layer_Correction_exchange_energy(this, Box, particle) result(exchange_energy)
 
-        class(Electronic_Layer_Correction), intent(in) :: this
+        class(Dipolar_Layer_Correction), intent(in) :: this
         type(Box_Parameters), intent(in) :: Box
         type(Particle_Index), intent(in) :: particle
         real(DP) :: exchange_energy
@@ -924,7 +924,7 @@ contains
 
         exchange_energy = 2._DP * PI/product(Box%size(1:2)) * exchange_energy
 
-    end function Electronic_Layer_Correction_exchange_energy
+    end function Dipolar_Layer_Correction_exchange_energy
     
     !> Exchange a particle -> update the ``structure factor''
     
@@ -935,9 +935,9 @@ contains
     !>  \f]
     !>
 
-    pure subroutine Electronic_Layer_Correction_update_structure_exchange(this, Box, particle)
+    pure subroutine Dipolar_Layer_Correction_update_structure_exchange(this, Box, particle)
 
-        class(Electronic_Layer_Correction), intent(inout) :: this
+        class(Dipolar_Layer_Correction), intent(inout) :: this
         type(Box_Parameters), intent(in) :: Box
         type(Particle_Index), intent(in) :: particle
         
@@ -988,6 +988,6 @@ contains
             
         end do
 
-    end subroutine Electronic_Layer_Correction_update_structure_exchange
+    end subroutine Dipolar_Layer_Correction_update_structure_exchange
 
-end module class_electronic_layer_correction
+end module class_dipolar_layer_correction

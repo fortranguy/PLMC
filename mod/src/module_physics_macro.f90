@@ -396,9 +396,9 @@ contains
         call this_macro%ewald_self%set_alpha(alpha)
         call this_macro%ewald_bound%set_total_moment(this_spheres)
         if (geometry%slab) then
-            call this_macro%elc%construct(Box, this_spheres)
+            call this_macro%dlc%construct(Box, this_spheres)
             if (present(this_units)) then
-                call this_macro%elc%count_wave_vectors(Box%wave, this_units%ELC_wave_vectors)
+                call this_macro%dlc%count_wave_vectors(Box%wave, this_units%ELC_wave_vectors)
             end if
         end if
     
@@ -425,7 +425,7 @@ contains
                                        this_macro%ewald_bound%total_energy(Box%size) + &
                                        ext_field%total_energy(this_macro%ewald_bound%get_total_moment())
                         if (geometry%slab) then
-                            total_energy = total_energy - this_macro%elc%total_energy(Box)
+                            total_energy = total_energy - this_macro%dlc%total_energy(Box)
                         end if
                 end select
         end select
@@ -452,7 +452,7 @@ contains
             ext_field%total_energy(this_macro%ewald_bound%get_total_moment())
         if (geometry%slab) then
             total_energy_field = total_energy_field - &
-                this_macro%elc%total_energy(Box, using_field, this_spheres)
+                this_macro%dlc%total_energy(Box, using_field, this_spheres)
         end if
 
     end function total_energy_field
