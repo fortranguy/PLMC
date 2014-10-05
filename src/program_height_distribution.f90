@@ -5,9 +5,9 @@
 !>      \rho(z) = \frac{\langle N(z) \rangle \sigma^3}{S\delta z}
 !> \f]
 
-!> 2. Average orientation: different than II.40 ?
+!> 2. Average orientation:
 !> \f[
-!>      Q_{zz}(z) = \left\langle \frac{\sum_{i=1}^N (3\mu_{i,z}^2/\mu_i^2 - 1)/2}
+!>      Q_{zz}(z) = \left\langle \frac{\sum_{i=1}^{N(z)} (3\mu_{i,z}^2/\mu_i^2 - 1)/2}
 !>                                    {N(z)}\right\rangle
 !> \f]
 
