@@ -16,7 +16,8 @@
         "Parallel": {
             "height ratio": 0.0,
             "height delta": 0.25
-        }
+        },
+        "domain ratio": [1.0, 1.0, 1.0]
     },
     "Clusters": {
         "cut off": 1.3
