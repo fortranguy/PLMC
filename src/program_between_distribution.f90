@@ -27,7 +27,7 @@ implicit none
     character(len=4096) :: type1_name, type2_name
     integer :: type1_num_particles, type2_num_particles
     integer :: type1_snap_factor, type2_snap_factor
-    integer :: type1_num_particles_inside, type2_num_particles_inside
+    real(DP) :: type1_num_particles_inside, type2_num_particles_inside
     integer :: type1_num_particles_sum, type2_num_particles_sum
     integer :: type1_num_particles_step, type2_num_particles_step
     real(DP) :: type1_density_inside, type2_density_inside
