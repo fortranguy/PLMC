@@ -3,7 +3,7 @@
 module module_physics_macro
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit, error_unit, iostat_end
-use data_precisions, only: real_zero, io_tiny, consistency_tiny
+use data_precisions, only: real_zero, io_tiny, consistency_tiny, field_consistency_tiny
 use data_box, only: num_dimensions
 use json_module, only: json_file, json_value, json_value_create, to_object, json_value_add
 use module_data, only: test_data_found
@@ -469,9 +469,9 @@ contains
         energy = total_energy(Box, this_spheres, this_macro, ext_field)
         energy_field = total_energy_field(Box, this_spheres, this_macro, ext_field)
         
-        if (abs(energy - energy_field) > consistency_tiny) then
+        if (abs(energy - energy_field) > field_consistency_tiny) then
             write(error_unit, *) this_spheres%get_name(), &
-                                 ": Energy with and without field don't match."
+                                 ": Energy with and without field don't match: "
             error stop
         end if
         
