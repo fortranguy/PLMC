@@ -223,7 +223,7 @@ contains
         real(DP), dimension(num_dimensions) :: coordinate
         real(DP) :: coordinate_norm
         
-        write(output_unit, *) spheres%get_name()//coordinates_name, " <- ", file(1:length)
+        write(output_unit, *) spheres%get_name()//"."//coordinates_name, " <- ", file(1:length)
         open(newunit=file_unit, recl=4096, file=file(1:length), status='old', action='read')
         
         i_particle = 0
