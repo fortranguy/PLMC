@@ -164,6 +164,7 @@ private
         integer :: type1_positions_unit, type1_orientations_unit, type2_positions_unit
         
         logical :: first_set
+        logical :: type1_measure_local_field
         
     contains
     
@@ -265,13 +266,20 @@ contains
                                                                "Dipolar Hard Spheres")
                 call this%type2_spheres%set_widom_num_particles(this%data_post_json, &
                                                                "Hard Spheres")
+                                                               
+                data_name = "Particles.Dipolar Hard Spheres.measure local field"
+                call this%data_post_json%get(data_name, this%type1_measure_local_field, found)
+                call test_data_found(data_name, found)
+                
                 if (geometry%bulk) then
                     Box_height = this%Box%size(3)
                 else if (geometry%slab) then
                     Box_height = this%Box%height
                 end if
-                call this%type1_field_distribution%construct(this%data_post_json, Box_height, &
-                                                             num_dimensions)
+                if (this%type1_measure_local_field) then
+                    call this%type1_field_distribution%construct(this%data_post_json, Box_height, &
+                                                                 num_dimensions)
+                end if
                 
         end select
         
@@ -452,7 +460,9 @@ contains
 
         select type(this)
             type is (System_Post_Processing)
-                call this%type1_field_distribution%destroy()
+                if (this%type1_measure_local_field) then
+                    call this%type1_field_distribution%destroy()
+                end if
                 call this%data_post_json%destroy()
         end select
 
@@ -902,7 +912,9 @@ contains
         call this%type1_observables%write_results(this%Box%temperature, this%num_steps, &
                                                   this%type1_spheres%get_widom_num_particles(), &
                                                   this%type1_report_json)
-        call this%type1_field_distribution%write(this%num_steps, this%type1_units%local_field)
+        if (this%type1_measure_local_field) then
+            call this%type1_field_distribution%write(this%num_steps, this%type1_units%local_field)
+        end if
         call this%type2_observables%write_results(this%Box%temperature, this%num_steps, &
                                                   this%type2_spheres%get_widom_num_particles(), &
                                                   this%type2_report_json)
@@ -1125,8 +1137,10 @@ contains
 
         class(System_Post_Processing), intent(inout) :: this
         
-        call measure_local_field(this%Box, this%ext_field, this%type1_spheres, this%type1_macro, &
-                                           this%type1_field_distribution)
+        if (this%type1_measure_local_field) then
+            call measure_local_field(this%Box, this%ext_field, this%type1_spheres, this%type1_macro, &
+                                               this%type1_field_distribution)
+        end if
         
     end subroutine System_Post_Processing_measure_local_field
     
