@@ -21,7 +21,7 @@ extern "C" {
         for (int i_component = 0; i_component != num_components; i_component++)
             components_size[i_component] = 0;
         
-        for (int i_vertex = 0; i_vertex != components.size(); i_vertex++)
+        for (int i_vertex = 0; i_vertex != static_cast<int>(components.size()); i_vertex++)
             components_size[components[i_vertex]]++;
     
         return;
