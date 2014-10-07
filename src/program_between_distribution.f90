@@ -83,7 +83,6 @@ implicit none
     
     if (geometry%bulk) then
         if (size(Box_size) /= num_dimensions) error stop "Box size dimension"
-        Box_height = Box_size(3)
     else if (geometry%slab) then
         if (size(Box_size) /= 2) error stop "Box size dimension"
         data_name = "Box.height"
