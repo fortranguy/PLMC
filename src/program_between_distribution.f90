@@ -13,7 +13,8 @@ use json_module, only: json_file, json_initialize
 use module_data, only: data_filename, data_post_filename, report_filename, &
                        test_file_exists, test_data_found
 use module_geometry, only: set_geometry
-use module_physics_micro, only: sphere_volume, PBC_distance, test_particles_inside
+use module_physics_micro, only: sphere_volume, PBC_distance
+use module_physics_macro, only: test_particles_inside
 use module_arguments, only: arg_to_file
 
 implicit none
@@ -33,7 +34,6 @@ implicit none
     logical, dimension(:), allocatable :: type1_particles_inside, type2_particles_inside
     integer :: type1_positions_unit, type2_positions_unit    
     
-    integer :: report_unit, distrib_unit
     integer :: num_distribution, i_distribution
     integer :: num_thermalisation_steps
     integer :: num_equilibrium_steps, i_step, num_common_steps    
@@ -120,8 +120,8 @@ implicit none
     allocate(type1_positions(num_dimensions, type1_num_particles))    
     allocate(type1_particles_inside(type1_num_particles))
     
-    call arg_to_file(2, file_name, length)
-    open(newunit=type2_positions_unit, recl=4096, file=file_name(1:length), status='old', action='read')    
+    call arg_to_file(2, filename, length)
+    open(newunit=type2_positions_unit, recl=4096, file=filename(1:length), status='old', action='read')    
     read(type2_positions_unit, *) type2_name, type2_num_particles, type2_snap_factor
     write(output_unit, *) "type 2: ", trim(type2_name), type2_num_particles, type2_snap_factor
     allocate(type2_positions(num_dimensions, type2_num_particles))
