@@ -12,7 +12,7 @@ use data_box, only: num_dimensions
 use json_module, only: json_file, json_initialize
 use module_data, only: data_filename, data_post_filename, report_filename, &
                        test_file_exists, test_data_found
-use module_geometry, only: set_geometry
+use module_geometry, only: set_geometry, geometry
 use module_physics_micro, only: sphere_volume, PBC_distance
 use module_physics_macro, only: test_particles_inside
 use module_arguments, only: arg_to_file
@@ -21,6 +21,7 @@ implicit none
    
     logical :: take_snapshot
     real(DP), dimension(:), allocatable :: Box_size
+    real(DP) :: Box_height
     real(DP), dimension(:), allocatable :: domain_ratio
     real(DP), dimension(num_dimensions) :: Box_lower_bound, Box_upper_bound
 
@@ -52,7 +53,7 @@ implicit none
     integer :: report_unit, distrib_unit
     real(DP) :: time_start, time_end
 
-    character(len=:), allocatable :: geometry
+    character(len=:), allocatable :: Box_geometry
     
     call json_initialize()
     
@@ -69,17 +70,26 @@ implicit none
     call report_json%load_file(filename = report_filename)
 
     data_name = "System.Box.geometry"
-    call report_json%get(data_name, geometry, found)
+    call report_json%get(data_name, Box_geometry, found)
     call test_data_found(data_name, found)
-    call set_geometry(geometry)
-    if (allocated(geometry)) deallocate(geometry)
+    call set_geometry(Box_geometry)
+    if (allocated(Box_geometry)) deallocate(Box_geometry)
 
     call report_json%destroy()
     
     data_name = "Box.size"
     call data_json%get(data_name, Box_size, found)
     call test_data_found(data_name, found)
-    if (size(Box_size) /= num_dimensions) error stop "Box size dimension"
+    
+    if (geometry%bulk) then
+        if (size(Box_size) /= num_dimensions) error stop "Box size dimension"
+        Box_height = Box_size(3)
+    else if (geometry%slab) then
+        if (size(Box_size) /= 2) error stop "Box size dimension"
+        data_name = "Box.height"
+        call data_json%get(data_name, Box_height, found)
+        call test_data_found(data_name, found)
+    end if
     
     data_name = "Monte Carlo.number of thermalisation steps"
     call data_json%get(data_name, num_thermalisation_steps, found)
@@ -99,8 +109,15 @@ implicit none
     call test_data_found(data_name, found)
     if (size(domain_ratio) /= num_dimensions) error stop "domain ratio dimension"
     
-    Box_lower_bound(:) = Box_size(:)/2._DP * (1._DP - domain_ratio(:))
-    Box_upper_bound(:) = Box_size(:)/2._DP * (1._DP + domain_ratio(:))
+    if (geometry%bulk) then
+        Box_lower_bound(:) = Box_size(:)/2._DP * (1._DP - domain_ratio(:))
+        Box_upper_bound(:) = Box_size(:)/2._DP * (1._DP + domain_ratio(:))
+    else if (geometry%slab) then
+        Box_lower_bound(1:2) = Box_size(1:2)/2._DP * (1._DP - domain_ratio(1:2))
+        Box_lower_bound(3) = Box_height/2._DP * (1._DP - domain_ratio(3))
+        Box_upper_bound(1:2) = Box_size(1:2)/2._DP * (1._DP + domain_ratio(1:2))
+        Box_upper_bound(3) = Box_height/2._DP * (1._DP + domain_ratio(3))
+    end if
     
     data_name = "Distribution.delta"
     call data_post_json%get(data_name, delta, found)
@@ -214,6 +231,8 @@ implicit none
 
     open(newunit=report_unit, file=trim(type1_name)//"-"//trim(type2_name)//"_radial_distribution_report.txt", &
          action="write")
+         write(report_unit, *) "Box lower bound: ", Box_lower_bound(:)
+         write(report_unit, *) "Box upper bound: ", Box_upper_bound(:)
          write(report_unit, *) trim(type1_name), " inside density: ", type1_density_inside
          write(report_unit, *) trim(type2_name), " inside density: ", type2_density_inside
          write(report_unit, *) "Duration =", (time_end - time_start) / 60._DP, "min"
