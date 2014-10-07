@@ -36,7 +36,7 @@ implicit none
     
     integer :: num_distribution, i_distribution
     integer :: num_thermalisation_steps
-    integer :: num_equilibrium_steps, i_step, num_common_steps    
+    integer :: num_equilibrium_steps, i_step, num_common_steps
     integer :: type1_i_particle, type2_i_particle
     real(DP) :: distance_12, distance_max, delta
     real(DP) :: distance_i, distance_minus, distance_plus
@@ -121,7 +121,7 @@ implicit none
     allocate(type1_particles_inside(type1_num_particles))
     
     call arg_to_file(2, filename, length)
-    open(newunit=type2_positions_unit, recl=4096, file=filename(1:length), status='old', action='read')    
+    open(newunit=type2_positions_unit, recl=4096, file=filename(1:length), status='old', action='read')
     read(type2_positions_unit, *) type2_name, type2_num_particles, type2_snap_factor
     write(output_unit, *) "type 2: ", trim(type2_name), type2_num_particles, type2_snap_factor
     allocate(type2_positions(num_dimensions, type2_num_particles))
@@ -193,18 +193,10 @@ implicit none
     type2_num_particles_inside = real(type2_num_particles_sum, DP) / real(num_common_steps, DP)
     type2_density_inside = type2_num_particles_inside / product(Box_size * domain_ratio)
     
-    open(newunit=report_unit, file=trim(type1_name)//"-"//trim(type2_name)//"_radial_distribution_report.txt", &
-         action="write")
-         write(report_unit, *) trim(type1_name), " inside density: ", type1_density_inside
-         write(report_unit, *) trim(type2_name), " inside density: ", type2_density_inside
-         write(report_unit, *) "Duration =", (time_end - time_start) / 60._DP, "min"
-    close(report_unit)
-    
-    open(newunit=distrib_unit, file=trim(type1_name)//"-"//trim(type2_name)//"_distribution_function.out", &
+    open(newunit=distrib_unit, file=trim(type1_name)//"-"//trim(type2_name)//"_radial_distribution_function.out", &
          action="write")
     
-        distribution_function(:) = distribution_function(:) / real(num_common_steps, DP) / &
-                                   real(type1_num_particles, DP)
+        distribution_function(:) = distribution_function(:) / real(num_common_steps, DP)
     
         do i_distribution = 1, num_distribution
         
@@ -222,6 +214,8 @@ implicit none
 
     open(newunit=report_unit, file=trim(type1_name)//"-"//trim(type2_name)//"_radial_distribution_report.txt", &
          action="write")
+         write(report_unit, *) trim(type1_name), " inside density: ", type1_density_inside
+         write(report_unit, *) trim(type2_name), " inside density: ", type2_density_inside
          write(report_unit, *) "Duration =", (time_end - time_start) / 60._DP, "min"
     close(report_unit)
     
