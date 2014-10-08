@@ -13,6 +13,10 @@
     },
     "Distribution": {
         "delta": 0.025,
+        "Radial": {
+            "domain ratio": [1.0, 1.0, 1.0],
+            "cut off": 0.0
+        }
     },
     "Clusters": {
         "cut off": 1.3

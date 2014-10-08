@@ -28,7 +28,7 @@ public init_random_seed, set_initial_configuration, &
        set_ewald, &
        total_energy, check_field_energy, &
        final_spheres, init_between_spheres_potential, final_between_spheres_potential, &
-       test_consistency
+       test_consistency, test_particles_inside
 
 contains
 
@@ -571,5 +571,34 @@ contains
         nullify(consistency_json)
     
     end subroutine test_consistency
+    
+    subroutine test_particles_inside(Box_lower_bound, Box_upper_bound, &
+                                     num_particles, all_positions, particles_inside, num_particles_step)
+                                     
+        real(DP), dimension(:), intent(in) :: Box_lower_bound, Box_upper_bound
+        integer, intent(in) :: num_particles
+        real(DP), dimension(:, :), intent(in) :: all_positions
+        logical, dimension(:), intent(out) :: particles_inside
+        integer, intent(out) :: num_particles_step
+        
+        integer :: i_particle
+        logical, dimension(num_dimensions) :: position_inside
+        
+        num_particles_step = 0
+        do i_particle = 1, num_particles
+            
+            position_inside(:) = (Box_lower_bound(:) < all_positions(:, i_particle)) .and. &
+                                 (all_positions(:, i_particle) < Box_upper_bound(:))                                 
+            
+            if (all(position_inside)) then
+                particles_inside(i_particle) = .true.
+                num_particles_step = num_particles_step + 1
+            else
+                particles_inside(i_particle) = .false.
+            end if
+            
+        end do
+    
+    end subroutine test_particles_inside
 
 end module module_physics_macro
