@@ -118,7 +118,6 @@ implicit none
     if (geometry%bulk) then
         Box_lower_bound(:) = Box_size(:) * (1._DP - domain_ratio(:))/2._DP
         Box_upper_bound(:) = Box_size(:) * (1._DP + domain_ratio(:))/2._DP
-        Volume_inside = product(Box_size * domain_ratio)
     else if (geometry%slab) then
         Box_lower_bound(1:2) = Box_size(1:2) * (1._DP - domain_ratio(1:2))/2._DP
         Box_lower_bound(3) = (Box_height - 1._DP) * (1._DP - domain_ratio(3))/2._DP + &
@@ -126,9 +125,9 @@ implicit none
         Box_upper_bound(1:2) = Box_size(1:2) * (1._DP + domain_ratio(1:2))/2._DP 
         Box_upper_bound(3) = (Box_height - 1._DP) * (1._DP + domain_ratio(3))/2._DP + &
                              0.5_DP
-        Volume_inside = product(Box_size(1:2) * domain_ratio(1:2)) * &
-                        (Box_Height - 1._DP) * domain_ratio(3) ! sigma
     end if
+    
+    Volume_inside = product(Box_upper_bound - Box_lower_bound)
     
     data_name = "Distribution.Radial.cut off"
     call data_post_json%get(data_name, cutoff, found)
