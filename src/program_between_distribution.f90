@@ -8,6 +8,7 @@
 program between_radial_distribution
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit, error_unit
+use data_precisions, only: real_zero
 use data_box, only: num_dimensions
 use json_module, only: json_file, json_initialize
 use module_data, only: data_filename, data_post_filename, report_filename, &
@@ -41,6 +42,7 @@ implicit none
     integer :: type1_i_particle, type2_i_particle
     real(DP) :: distance_12, distance_max, delta
     real(DP) :: distance_i, distance_minus, distance_plus
+    real(DP) :: cutoff
     real(DP), dimension(:), allocatable :: distribution_step
     real(DP), dimension(:), allocatable :: distribution_function
     real(DP), dimension(:, :), allocatable :: type1_positions, type2_positions
@@ -102,8 +104,12 @@ implicit none
 
     call test_file_exists(data_post_filename)
     call data_post_json%load_file(filename = data_post_filename)
+    
+    data_name = "Distribution.delta"
+    call data_post_json%get(data_name, delta, found)
+    call test_data_found(data_name, found)
 
-    data_name = "Distribution.domain ratio"
+    data_name = "Distribution.Radial.domain ratio"
     call data_post_json%get(data_name, domain_ratio, found)
     call test_data_found(data_name, found)
     if (size(domain_ratio) /= num_dimensions) error stop "domain ratio dimension"
@@ -118,13 +124,24 @@ implicit none
         Box_upper_bound(3) = Box_height/2._DP * (1._DP + domain_ratio(3))
     end if
     
-    data_name = "Distribution.delta"
-    call data_post_json%get(data_name, delta, found)
+    data_name = "Distribution.Radial.cut off"
+    call data_post_json%get(data_name, cutoff, found)
     call test_data_found(data_name, found)
 
     call data_post_json%destroy()
     
-    distance_max = norm2(Box_size/2._DP)
+    if (geometry%bulk) then
+        distance_max = norm2(Box_size/2._DP)
+    else if (geometry%slab) then
+        distance_max = min(norm2(Box_size(1:2)), Box_height) /2._DP ! incorrect?
+    end if
+    
+    if (cutoff < real_zero .or. distance_max < cutoff) then
+        cutoff = distance_max
+    else 
+        distance_max = cutoff
+    end if
+    
     num_distribution = int(distance_max/delta) + 1
     allocate(distribution_step(num_distribution))
     allocate(distribution_function(num_distribution))
@@ -182,8 +199,11 @@ implicit none
                         distance_12 = PBC_distance(Box_size, &
                                                    type1_positions(:, type1_i_particle), &
                                                    type2_positions(:, type2_i_particle))
-                        i_distribution = int(distance_12/delta) + 1
-                        distribution_step(i_distribution) = distribution_step(i_distribution) + 1._DP
+                        if (distance_12 < cutoff) then
+                            i_distribution = int(distance_12/delta) + 1
+                            distribution_step(i_distribution) = &
+                                distribution_step(i_distribution) + 1._DP
+                        end if
                     end do   
                 end if         
             end do
@@ -234,6 +254,7 @@ implicit none
          write(report_unit, *) "Box upper bound: ", Box_upper_bound(:)
          write(report_unit, *) trim(type1_name), " inside density: ", type1_density_inside
          write(report_unit, *) trim(type2_name), " inside density: ", type2_density_inside
+         write(report_unit, *) "Cut off", cutoff
          write(report_unit, *) "Duration =", (time_end - time_start) / 60._DP, "min"
     close(report_unit)
     
