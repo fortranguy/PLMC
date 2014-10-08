@@ -207,6 +207,7 @@ implicit none
     
     open(newunit=report_unit, file=trim(name)//"_parallel_distribution_report.txt", &
          action="write")
+        write(report_unit, *) "Domain =", z_min, z_max
         write(report_unit, *) "Duration =", (time_end - time_start) / 60._DP, "min"
     close(report_unit)
     
