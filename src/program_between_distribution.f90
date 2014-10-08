@@ -25,6 +25,7 @@ implicit none
     real(DP) :: Box_height
     real(DP), dimension(:), allocatable :: domain_ratio
     real(DP), dimension(num_dimensions) :: Box_lower_bound, Box_upper_bound
+    real(DP) :: Volume_inside
 
     character(len=4096) :: type1_name, type2_name
     integer :: type1_num_particles, type2_num_particles
@@ -117,11 +118,14 @@ implicit none
     if (geometry%bulk) then
         Box_lower_bound(:) = Box_size(:)/2._DP * (1._DP - domain_ratio(:))
         Box_upper_bound(:) = Box_size(:)/2._DP * (1._DP + domain_ratio(:))
+        Volume_inside = product(Box_size * domain_ratio)
     else if (geometry%slab) then
         Box_lower_bound(1:2) = Box_size(1:2)/2._DP * (1._DP - domain_ratio(1:2))
         Box_lower_bound(3) = Box_height/2._DP * (1._DP - domain_ratio(3))
         Box_upper_bound(1:2) = Box_size(1:2)/2._DP * (1._DP + domain_ratio(1:2))
         Box_upper_bound(3) = Box_height/2._DP * (1._DP + domain_ratio(3))
+        Volume_inside = product(Box_size(1:2) * domain_ratio(1:2)) * &
+                        (Box_Height - 1._DP) * domain_ratio(3) ! sigma
     end if
     
     data_name = "Distribution.Radial.cut off"
@@ -229,9 +233,9 @@ implicit none
     close(type1_positions_unit)
     
     type1_num_particles_inside = real(type1_num_particles_sum, DP) / real(num_common_steps, DP)
-    type1_density_inside = type1_num_particles_inside / product(Box_size * domain_ratio)
+    type1_density_inside = type1_num_particles_inside / Volume_inside
     type2_num_particles_inside = real(type2_num_particles_sum, DP) / real(num_common_steps, DP)
-    type2_density_inside = type2_num_particles_inside / product(Box_size * domain_ratio)
+    type2_density_inside = type2_num_particles_inside / Volume_inside
     
     open(newunit=distrib_unit, file=trim(type1_name)//"-"//trim(type2_name)//"_radial_distribution_function.out", &
          action="write")
@@ -254,6 +258,7 @@ implicit none
 
     open(newunit=report_unit, file=trim(type1_name)//"-"//trim(type2_name)//"_radial_distribution_report.txt", &
          action="write")
+         write(report_unit, *) "Volume inside:", Volume_inside
          write(report_unit, *) "Box lower bound: ", Box_lower_bound(:)
          write(report_unit, *) "Box upper bound: ", Box_upper_bound(:)
          write(report_unit, *) trim(type1_name), " inside density: ", type1_density_inside
