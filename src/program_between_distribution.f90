@@ -183,7 +183,7 @@ implicit none
         if (modulo(i_step, type1_snap_factor) == 0 .and. modulo(i_step, type2_snap_factor) == 0) then
             num_common_steps = num_common_steps + 1
 
-            call test_particles_inside(Box_lower_bound, Box_upper_bound, &
+        call test_particles_inside(Box_lower_bound, Box_upper_bound, &
                                    type1_num_particles, type1_positions, type1_particles_inside, &
                                    type1_num_particles_step)
         type1_num_particles_sum = type1_num_particles_sum + type1_num_particles_step
