@@ -165,7 +165,7 @@ implicit none
     type1_num_particles_sum = 0
     type2_num_particles_sum = 0
     distribution_function(:) = 0._DP
-    num_common_steps = 0
+    num_common_steps = 0    
     do i_step = num_thermalisation_steps + 1, num_thermalisation_steps + num_equilibrium_steps
         
         if (modulo(i_step, type1_snap_factor) == 0) then
@@ -181,18 +181,19 @@ implicit none
         end if
         
         if (modulo(i_step, type1_snap_factor) == 0 .and. modulo(i_step, type2_snap_factor) == 0) then
+        
             num_common_steps = num_common_steps + 1
 
-        call test_particles_inside(Box_lower_bound, Box_upper_bound, &
-                                   type1_num_particles, type1_positions, type1_particles_inside, &
-                                   type1_num_particles_step)
-        type1_num_particles_sum = type1_num_particles_sum + type1_num_particles_step
-        call test_particles_inside(Box_lower_bound, Box_upper_bound, &
-                                   type2_num_particles, type2_positions, type2_particles_inside, &
-                                   type2_num_particles_step)
-        type2_num_particles_sum = type2_num_particles_sum + type2_num_particles_step
+            call test_particles_inside(Box_lower_bound, Box_upper_bound, &
+                                       type1_num_particles, type1_positions, type1_particles_inside, &
+                                       type1_num_particles_step)
+            type1_num_particles_sum = type1_num_particles_sum + type1_num_particles_step
+            call test_particles_inside(Box_lower_bound, Box_upper_bound, &
+                                       type2_num_particles, type2_positions, type2_particles_inside, &
+                                       type2_num_particles_step)
+            type2_num_particles_sum = type2_num_particles_sum + type2_num_particles_step
 
-            distribution_step(:) = 0._DP        
+            distribution_step(:) = 0._DP            
             do type1_i_particle = 1, type1_num_particles
                 if (type1_particles_inside(type1_i_particle)) then
                     do type2_i_particle = 1, type2_num_particles                
@@ -207,12 +208,15 @@ implicit none
                     end do   
                 end if         
             end do
-
-            distribution_step(:) = distribution_step(:) / real(type1_num_particles_step, DP)
-            distribution_function(:) = distribution_function(:) + distribution_step(:)
+            
+            if (type1_num_particles_step > 0) then
+                distribution_step(:) = distribution_step(:) / real(type1_num_particles_step, DP)
+                distribution_function(:) = distribution_function(:) + distribution_step(:)
+            end if
+                
         end if
-    
-    end do
+
+    end do    
     call cpu_time(time_end)
     write(output_unit, *) "Finish !"
     
