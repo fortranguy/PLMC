@@ -42,7 +42,7 @@ implicit none
     integer :: num_equilibrium_steps, i_step, num_common_steps
     integer :: type1_i_particle, type2_i_particle
     real(DP) :: distance_12, distance_max, delta
-    real(DP) :: distance_i, distance_minus, distance_plus
+    real(DP) :: distance_i, distance_i_minus, distance_i_plus
     real(DP) :: cutoff
     real(DP), dimension(:), allocatable :: distribution_step
     real(DP), dimension(:), allocatable :: distribution_function
@@ -246,11 +246,11 @@ implicit none
         do i_distribution = 1, num_distribution
         
             distance_i = (real(i_distribution, DP) - 0.5_DP) * delta
-            distance_minus = real(i_distribution - 1, DP) * delta
-            distance_plus = real(i_distribution, DP) * delta
+            distance_i_minus = real(i_distribution - 1, DP) * delta
+            distance_i_plus = real(i_distribution, DP) * delta
             
             distribution_function(i_distribution) = distribution_function(i_distribution) / &
-                type2_density_inside / (sphere_volume(distance_plus) - sphere_volume(distance_minus))
+                type2_density_inside / (sphere_volume(distance_i_plus) - sphere_volume(distance_i_minus))
             write(distrib_unit, *) distance_i, distribution_function(i_distribution)
             
         end do
@@ -262,8 +262,8 @@ implicit none
          write(report_unit, *) "Volume inside:", Volume_inside
          write(report_unit, *) "Box lower bound: ", Box_lower_bound(:)
          write(report_unit, *) "Box upper bound: ", Box_upper_bound(:)
-         write(report_unit, *) trim(type1_name), " inside density: ", type1_density_inside
-         write(report_unit, *) trim(type2_name), " inside density: ", type2_density_inside
+         write(report_unit, *) trim(type1_name), " Density inside: ", type1_density_inside
+         write(report_unit, *) trim(type2_name), " Density inside: ", type2_density_inside
          write(report_unit, *) "Cut off", cutoff
          write(report_unit, *) "Duration =", (time_end - time_start) / 60._DP, "min"
     close(report_unit)
