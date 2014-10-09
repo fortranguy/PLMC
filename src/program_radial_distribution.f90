@@ -23,7 +23,7 @@ implicit none
     real(DP), dimension(:), allocatable :: Box_size
     real(DP) :: Box_height
     real(DP), dimension(:), allocatable :: domain_ratio
-    real(DP), dimension(num_dimensions) :: Box_lower_bound, Box_upper_bounds
+    real(DP), dimension(num_dimensions) :: Box_lower_bounds, Box_upper_bounds
     real(DP) :: Volume_inside
 
     character(len=4096) :: name
@@ -113,8 +113,8 @@ implicit none
     call test_data_found(data_name, found)
     if (size(domain_ratio) /= num_dimensions) error stop "domain ratio dimension"
     
-    call set_bounds(Box_size, Box_height, Box_lower_bound, Box_upper_bounds, domain_ratio)
-    Volume_inside = product(Box_upper_bounds - Box_lower_bound)
+    call set_bounds(Box_size, Box_height, domain_ratio, Box_lower_bounds, Box_upper_bounds)
+    Volume_inside = product(Box_upper_bounds - Box_lower_bounds)
     
     data_name = "Distribution.Radial.cut off"
     call data_post_json%get(data_name, cutoff, found)
@@ -162,7 +162,7 @@ implicit none
                 read(positions_unit, *) positions(:, i_particle)
             end do
 
-            call test_particles_inside(Box_lower_bound, Box_upper_bounds, &
+            call test_particles_inside(Box_lower_bounds, Box_upper_bounds, &
                                        num_particles, positions, particles_inside, &
                                        num_particles_step)
             num_particles_sum = num_particles_sum + num_particles_step
@@ -221,7 +221,7 @@ implicit none
     open(newunit=report_unit, file=trim(name)//"_radial_distribution_report.txt", &
          action="write")
          write(report_unit, *) "Volume inside:", Volume_inside
-         write(report_unit, *) "Box lower bounds: ", Box_lower_bound(:)
+         write(report_unit, *) "Box lower bounds: ", Box_lower_bounds(:)
          write(report_unit, *) "Box upper bounds: ", Box_upper_bounds(:)
          write(report_unit, *) "Density inside: ", density_inside
          write(report_unit, *) "Cut off", cutoff

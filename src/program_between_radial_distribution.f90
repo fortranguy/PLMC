@@ -115,7 +115,7 @@ implicit none
     call test_data_found(data_name, found)
     if (size(domain_ratio) /= num_dimensions) error stop "domain ratio dimension"
     
-    call set_bounds(Box_size, Box_height, Box_lower_bounds, Box_upper_bounds, domain_ratio)    
+    call set_bounds(Box_size, Box_height, domain_ratio, Box_lower_bounds, Box_upper_bounds)    
     Volume_inside = product(Box_upper_bounds - Box_lower_bounds)
     
     data_name = "Distribution.Radial.cut off"
