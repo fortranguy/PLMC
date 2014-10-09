@@ -572,10 +572,10 @@ contains
     
     end subroutine test_consistency
     
-    subroutine test_particles_inside(Box_lower_bound, Box_upper_bound, &
+    subroutine test_particles_inside(Box_lower_bounds, Box_upper_bounds, &
                                      num_particles, all_positions, particles_inside, num_particles_step)
                                      
-        real(DP), dimension(:), intent(in) :: Box_lower_bound, Box_upper_bound
+        real(DP), dimension(:), intent(in) :: Box_lower_bounds, Box_upper_bounds
         integer, intent(in) :: num_particles
         real(DP), dimension(:, :), intent(in) :: all_positions
         logical, dimension(:), intent(out) :: particles_inside
@@ -587,8 +587,8 @@ contains
         num_particles_step = 0
         do i_particle = 1, num_particles
             
-            position_inside(:) = (Box_lower_bound(:) < all_positions(:, i_particle)) .and. &
-                                 (all_positions(:, i_particle) < Box_upper_bound(:))                                 
+            position_inside(:) = (Box_lower_bounds(:) < all_positions(:, i_particle)) .and. &
+                                 (all_positions(:, i_particle) < Box_upper_bounds(:))                                 
             
             if (all(position_inside)) then
                 particles_inside(i_particle) = .true.

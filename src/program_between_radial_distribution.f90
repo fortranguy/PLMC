@@ -14,7 +14,7 @@ use json_module, only: json_file, json_initialize
 use module_data, only: data_filename, data_post_filename, report_filename, &
                        test_file_exists, test_data_found
 use module_geometry, only: set_geometry, geometry
-use module_physics_micro, only: sphere_volume, PBC_distance
+use module_physics_micro, only: sphere_volume, PBC_distance, set_bounds
 use module_physics_macro, only: test_particles_inside
 use module_arguments, only: arg_to_file
 
@@ -24,7 +24,7 @@ implicit none
     real(DP), dimension(:), allocatable :: Box_size
     real(DP) :: Box_height
     real(DP), dimension(:), allocatable :: domain_ratio
-    real(DP), dimension(num_dimensions) :: Box_lower_bound, Box_upper_bound
+    real(DP), dimension(num_dimensions) :: Box_lower_bounds, Box_upper_bounds
     real(DP) :: Volume_inside
 
     character(len=4096) :: type1_name, type2_name
@@ -115,19 +115,8 @@ implicit none
     call test_data_found(data_name, found)
     if (size(domain_ratio) /= num_dimensions) error stop "domain ratio dimension"
     
-    if (geometry%bulk) then
-        Box_lower_bound(:) = Box_size(:) * (1._DP - domain_ratio(:))/2._DP
-        Box_upper_bound(:) = Box_size(:) * (1._DP + domain_ratio(:))/2._DP
-    else if (geometry%slab) then
-        Box_lower_bound(1:2) = Box_size(1:2) * (1._DP - domain_ratio(1:2))/2._DP
-        Box_lower_bound(3) = (Box_height - 1._DP) * (1._DP - domain_ratio(3))/2._DP + &
-                             0.5_DP
-        Box_upper_bound(1:2) = Box_size(1:2) * (1._DP + domain_ratio(1:2))/2._DP 
-        Box_upper_bound(3) = (Box_height - 1._DP) * (1._DP + domain_ratio(3))/2._DP + &
-                             0.5_DP
-    end if
-    
-    Volume_inside = product(Box_upper_bound - Box_lower_bound)
+    call set_bounds(Box_size, Box_height, Box_lower_bounds, Box_upper_bounds, domain_ratio)    
+    Volume_inside = product(Box_upper_bounds - Box_lower_bounds)
     
     data_name = "Distribution.Radial.cut off"
     call data_post_json%get(data_name, cutoff, found)
@@ -189,11 +178,11 @@ implicit none
         
             num_common_steps = num_common_steps + 1
 
-            call test_particles_inside(Box_lower_bound, Box_upper_bound, &
+            call test_particles_inside(Box_lower_bounds, Box_upper_bounds, &
                                        type1_num_particles, type1_positions, type1_particles_inside, &
                                        type1_num_particles_step)
             type1_num_particles_sum = type1_num_particles_sum + type1_num_particles_step
-            call test_particles_inside(Box_lower_bound, Box_upper_bound, &
+            call test_particles_inside(Box_lower_bounds, Box_upper_bounds, &
                                        type2_num_particles, type2_positions, type2_particles_inside, &
                                        type2_num_particles_step)
             type2_num_particles_sum = type2_num_particles_sum + type2_num_particles_step
@@ -260,8 +249,8 @@ implicit none
     open(newunit=report_unit, file=trim(type1_name)//"-"//trim(type2_name)//"_radial_distribution_report.txt", &
          action="write")
          write(report_unit, *) "Volume inside:", Volume_inside
-         write(report_unit, *) "Box lower bound: ", Box_lower_bound(:)
-         write(report_unit, *) "Box upper bound: ", Box_upper_bound(:)
+         write(report_unit, *) "Box lower bounds: ", Box_lower_bounds(:)
+         write(report_unit, *) "Box upper bounds: ", Box_upper_bounds(:)
          write(report_unit, *) trim(type1_name), " Density inside: ", type1_density_inside
          write(report_unit, *) trim(type2_name), " Density inside: ", type2_density_inside
          write(report_unit, *) "Cut off", cutoff

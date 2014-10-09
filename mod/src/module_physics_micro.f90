@@ -10,7 +10,7 @@ use module_types_micro, only: Box_Parameters
 
 implicit none
 private
-public set_discrete_length, sphere_volume, PBC_vector, PBC_distance, &
+public set_discrete_length, sphere_volume, PBC_vector, PBC_distance, set_bounds, &
        random_position, random_surface, markov_surface, &
        dipolar_pair_energy, ewald_real_B, ewald_real_C, &
        num_wave_vectors, Box_wave1_sym, Box_wave2_sym, fourier_i, set_exp_kz, exchange_sign, &
@@ -85,6 +85,27 @@ contains
         PBC_distance = norm2(PBC_vector(Box_size, position1, position2))
         
     end function PBC_distance
+    
+    pure subroutine set_bounds(Box_size, Box_height, domain_ratio, Box_lower_bounds, Box_upper_bounds)
+    
+        real(DP), dimension(:), intent(in) :: Box_size
+        real(DP), intent(in) :: Box_height
+        real(DP), dimension(:), intent(in) :: domain_ratio
+        real(DP), dimension(:), intent(out) :: Box_lower_bounds, Box_upper_bounds        
+        
+        if (geometry%bulk) then
+            Box_lower_bounds(:) = Box_size(:) * (1._DP - domain_ratio(:))/2._DP
+            Box_upper_bounds(:) = Box_size(:) * (1._DP + domain_ratio(:))/2._DP
+        else if (geometry%slab) then
+            Box_lower_bounds(1:2) = Box_size(1:2) * (1._DP - domain_ratio(1:2))/2._DP
+            Box_lower_bounds(3) = (Box_height - 1._DP) * (1._DP - domain_ratio(3))/2._DP + &
+                                 0.5_DP
+            Box_upper_bounds(1:2) = Box_size(1:2) * (1._DP + domain_ratio(1:2))/2._DP 
+            Box_upper_bounds(3) = (Box_height - 1._DP) * (1._DP + domain_ratio(3))/2._DP + &
+                                 0.5_DP
+        end if
+        
+    end subroutine set_bounds
     
     function random_position(Box, particle_diameter)
     
