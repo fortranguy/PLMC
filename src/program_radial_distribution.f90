@@ -1,7 +1,8 @@
 !> \brief Calculate and write the distribution function
 
 !> \f[
-!>      g_{ii}(r) = \frac{\braket{N_\text{pair}(r) / N_i}}{\braket{\rho_i} \Delta V_\text{sphere}(r)}
+!>      g_{ii}(r) = \frac{\braket{\mathrm{d} N_\text{pair}(r) / N_i}}{\braket{\rho_i}
+!>                        \mathrm{d} V_\text{sphere}(r)}
 !> \f]
 
 program radial_distribution
