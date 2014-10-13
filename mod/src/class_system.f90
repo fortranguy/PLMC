@@ -271,7 +271,7 @@ contains
                 call this%type2_spheres%set_test_num_particles(this%data_post_json, &
                                                                "Hard Spheres")
                                                                
-                data_name = "Particles.Dipolar Hard Spheres.measure local field"
+                data_name = "Local Field.Dipolar Hard Spheres.Internal.measure"
                 call this%data_post_json%get(data_name, this%type1_measure_field_internal, found)
                 call test_data_found(data_name, found)
                 

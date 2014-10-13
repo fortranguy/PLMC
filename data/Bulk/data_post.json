@@ -1,19 +1,31 @@
 {
-    "Particles": {
+    "Chemical Potential": {
         "Dipolar Hard Spheres": {
-            "number of Widom particles": 500,
-            "measure local field": true,
-            "number of local field particles": 500
+            "number of Widom particles": 500
         },
         "Hard Spheres": {
             "number of Widom particles": 500
         }
     },
+    "Local Field": {
+        "Dipolar Hard Spheres": {
+            "Internal": {
+                "measure": true
+            },
+            "External": {
+                "number of test particles": 500
+            }
+        }
+    },    
     "Histogram": {
         "delta": 1.0
     },
     "Distribution": {
         "delta": 0.025,
+        "Parallel": {
+            "height ratio": 0.0,
+            "height delta": 0.25
+        },
         "Radial": {
             "domain ratio": [1.0, 1.0, 1.0],
             "cut off": 0.0

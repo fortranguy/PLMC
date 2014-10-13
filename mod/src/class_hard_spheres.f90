@@ -488,7 +488,7 @@ contains
         character(len=4096) :: data_name
         logical :: found
 
-        data_name = "Particles."//type_name//".number of Widom particles"
+        data_name = "Chemical Potential."//type_name//".number of Widom particles"
         call data_post_json%get(data_name, this%widom_num_particles, found)
         call test_data_found(data_name, found)
 
@@ -503,7 +503,7 @@ contains
         character(len=4096) :: data_name
         logical :: found
 
-        data_name = "Particles."//type_name//".number of local field particles"
+        data_name = "Local Field."//type_name//".External.number of test particles"
         call data_post_json%get(data_name, this%field_num_particles, found)
         call test_data_found(data_name, found)
 
