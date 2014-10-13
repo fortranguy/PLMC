@@ -20,7 +20,8 @@ use class_discrete_observable, only: Discrete_Observables
 use class_hard_spheres_observables, only: Hard_Spheres_Monte_Carlo_Observables, &
                                           Dipolar_Hard_Spheres_Monte_Carlo_Observables, &
                                           Between_Hard_Spheres_Monte_Carlo_Observables, &
-                                          Hard_Spheres_Post_Processing_Observables
+                                          Hard_Spheres_Post_Processing_Observables, &
+                                          Dipolar_Hard_Spheres_Post_Processing_Observables
 use class_distribution_function, only: Distribution_Function
 use class_hard_spheres_units, only: Hard_Spheres_Monte_Carlo_Units, &
                                     Dipolar_Hard_Spheres_Monte_Carlo_Units, &
@@ -32,7 +33,8 @@ use module_physics_macro, only: init_random_seed, set_initial_configuration, &
                                 set_ewald, total_energy, check_field_energy, final_spheres, &
                                 init_between_spheres_potential, final_between_spheres_potential, &
                                 test_consistency
-use module_algorithms, only: move, widom, measure_local_field, switch, rotate
+use module_algorithms, only: move, switch, rotate, &
+                             widom, measure_field_internal, measure_field_external
 
 implicit none
 
@@ -157,14 +159,16 @@ private
         integer :: num_steps
         type(json_file) :: data_report_json
         
-        type(Hard_Spheres_Post_Processing_Observables) :: type1_observables, type2_observables
+        type(Dipolar_Hard_Spheres_Post_Processing_Observables) :: type1_observables
+        type(Hard_Spheres_Post_Processing_Observables) :: type2_observables
         type(Dipolar_Hard_Spheres_Post_Processing_Units) :: type1_units
         type(Hard_Spheres_Post_Processing_Units) :: type2_units
-        type(Distribution_Function) :: type1_field_distribution
+        type(Distribution_Function) :: type1_field_internal_distribution, &
+                                       type1_field_external_distribution
         integer :: type1_positions_unit, type1_orientations_unit, type2_positions_unit
         
         logical :: first_set
-        logical :: type1_measure_local_field
+        logical :: type1_measure_field_internal
         
     contains
     
@@ -262,13 +266,13 @@ contains
 
             type is (System_Post_Processing)
 
-                call this%type1_spheres%set_widom_num_particles(this%data_post_json, &
+                call this%type1_spheres%set_test_num_particles(this%data_post_json, &
                                                                "Dipolar Hard Spheres")
-                call this%type2_spheres%set_widom_num_particles(this%data_post_json, &
+                call this%type2_spheres%set_test_num_particles(this%data_post_json, &
                                                                "Hard Spheres")
                                                                
                 data_name = "Particles.Dipolar Hard Spheres.measure local field"
-                call this%data_post_json%get(data_name, this%type1_measure_local_field, found)
+                call this%data_post_json%get(data_name, this%type1_measure_field_internal, found)
                 call test_data_found(data_name, found)
                 
                 if (geometry%bulk) then
@@ -276,10 +280,12 @@ contains
                 else if (geometry%slab) then
                     Box_height = this%Box%height
                 end if
-                if (this%type1_measure_local_field) then
-                    call this%type1_field_distribution%construct(this%data_post_json, Box_height, &
-                                                                 num_dimensions)
+                if (this%type1_measure_field_internal) then
+                    call this%type1_field_internal_distribution%construct(this%data_post_json, &
+                        Box_height, num_dimensions)
                 end if
+                call this%type1_field_external_distribution%construct(this%data_post_json, &
+                                                                      Box_height, num_dimensions)
                 
         end select
         
@@ -460,8 +466,9 @@ contains
 
         select type(this)
             type is (System_Post_Processing)
-                if (this%type1_measure_local_field) then
-                    call this%type1_field_distribution%destroy()
+                call this%type1_field_external_distribution%destroy()
+                if (this%type1_measure_field_internal) then
+                    call this%type1_field_internal_distribution%destroy()
                 end if
                 call this%data_post_json%destroy()
         end select
@@ -912,9 +919,12 @@ contains
         call this%type1_observables%write_results(this%Box%temperature, this%num_steps, &
                                                   this%type1_spheres%get_widom_num_particles(), &
                                                   this%type1_report_json)
-        if (this%type1_measure_local_field) then
-            call this%type1_field_distribution%write(this%num_steps, this%type1_units%local_field)
+        if (this%type1_measure_field_internal) then
+            call this%type1_field_internal_distribution%write(this%num_steps, &
+                                                              this%type1_units%field_internal)
         end if
+        call this%type1_field_external_distribution%write(this%num_steps, &
+                                                          this%type1_units%field_external)
         call this%type2_observables%write_results(this%Box%temperature, this%num_steps, &
                                                   this%type2_spheres%get_widom_num_particles(), &
                                                   this%type2_report_json)
@@ -1048,6 +1058,8 @@ contains
                 call this%switch_observable%update_rejection()
             type is (System_Post_Processing)
                 call this%type1_observables%widom%update_rejection()
+                call this%type1_observables%field_external%update_rejection()
+                call this%type2_observables%widom%update_rejection()
         end select
         
     end subroutine System_update_rejections
@@ -1137,10 +1149,15 @@ contains
 
         class(System_Post_Processing), intent(inout) :: this
         
-        if (this%type1_measure_local_field) then
-            call measure_local_field(this%Box, this%ext_field, this%type1_spheres, this%type1_macro, &
-                                               this%type1_field_distribution)
+        if (this%type1_measure_field_internal) then
+            call measure_field_internal(this%Box, this%ext_field, &
+                                        this%type1_spheres, this%type1_macro, &
+                                        this%type1_field_internal_distribution)
         end if
+        
+        call measure_field_external(this%Box, this%ext_field, &
+                                    this%type1_spheres, this%type1_macro, this%type1_observables, &
+                                    this%type1_field_external_distribution)
         
     end subroutine System_Post_Processing_measure_local_field
     

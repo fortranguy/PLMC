@@ -73,7 +73,8 @@ private
     type, extends(Hard_Spheres_Post_Processing_Units), public :: &
         Dipolar_Hard_Spheres_Post_Processing_Units
         
-        integer :: local_field
+        integer :: field_internal
+        integer :: field_external
         
     end type Dipolar_Hard_Spheres_Post_Processing_Units
     
@@ -169,7 +170,9 @@ contains
              
         select type (this)
             type is (Dipolar_Hard_Spheres_Post_Processing_Units)
-                open(newunit=this%local_field, recl=4096, file=name//"_local_field.out", &
+                open(newunit=this%field_internal, recl=4096, file=name//"_field_internal.out", &
+                     status='new', action='write')
+                open(newunit=this%field_external, recl=4096, file=name//"_field_external.out", &
                      status='new', action='write')
         end select
 
@@ -232,7 +235,8 @@ contains
         
         select type (this)
             type is (Dipolar_Hard_Spheres_Post_Processing_Units)
-                close(this%local_field)
+                close(this%field_internal)
+                close(this%field_external)
         end select
 
     end subroutine Hard_Spheres_Post_Processing_Units_close

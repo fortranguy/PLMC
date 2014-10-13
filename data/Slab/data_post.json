@@ -3,6 +3,7 @@
         "Dipolar Hard Spheres": {
             "number of Widom particles": 500,
             "measure local field": true
+            "number of local field particles": 500
         },
         "Hard Spheres": {
             "number of Widom particles": 500

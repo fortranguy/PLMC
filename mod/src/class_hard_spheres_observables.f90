@@ -58,6 +58,11 @@ private
         
     end type Hard_Spheres_Post_Processing_Observables
     
+    type, extends(Hard_Spheres_Post_Processing_Observables), public :: &
+        Dipolar_Hard_Spheres_Post_Processing_Observables
+        type(Discrete_Observables) :: field_external
+    end type Dipolar_Hard_Spheres_Post_Processing_Observables
+    
 contains
     
     subroutine Hard_Spheres_Monte_Carlo_Observables_write(this, i_step, observables_unit)
@@ -93,6 +98,8 @@ contains
         select type (this)
             type is (Hard_Spheres_Post_Processing_Observables)
                 write(observables_unit, *) i_step, this%inv_activity, this%widom%rejection_rate
+            type is (Dipolar_Hard_Spheres_Post_Processing_Observables)
+                write(observables_unit, *) i_step, this%inv_activity, this%field_external%rejection_rate
         end select
 
     end subroutine Hard_Spheres_Post_Processing_Observables_write
@@ -126,6 +133,12 @@ contains
 
         this%sum_inv_activity = this%sum_inv_activity + this%inv_activity
         this%widom%sum_rejection = this%widom%sum_rejection + this%widom%rejection_rate
+        
+        select type (this)
+            type is (Dipolar_Hard_Spheres_Post_Processing_Observables)            
+                this%field_external%sum_rejection = this%field_external%sum_rejection + &
+                                                 this%field_external%rejection_rate
+        end select
 
     end subroutine Hard_Spheres_Post_Processing_Observables_accumulate
     
@@ -205,6 +218,12 @@ contains
                                               this%widom%sum_rejection / &
                                               real(num_equilibrium_steps, DP))
         end if
+        
+        select type (this)
+            type is (Dipolar_Hard_Spheres_Post_Processing_Observables)
+                call json_value_add(results_json, "local external field rejection rate", &
+                                    this%field_external%sum_rejection / real(num_equilibrium_steps, DP))
+        end select
 
         nullify(results_json)
 

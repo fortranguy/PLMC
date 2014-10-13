@@ -13,12 +13,14 @@ use module_types_macro, only: Hard_Spheres_Macro, Dipolar_Hard_Spheres_Macro
 use class_discrete_observable, only: Discrete_Observables
 use class_hard_spheres_observables, only: Hard_Spheres_Monte_Carlo_Observables, &
                                           Dipolar_Hard_Spheres_Monte_Carlo_Observables, &
-                                          Hard_Spheres_Post_Processing_Observables
+                                          Hard_Spheres_Post_Processing_Observables, &
+                                          Dipolar_Hard_Spheres_Post_Processing_Observables
 use class_distribution_function, only: Distribution_Function
 
 implicit none
 private
-public move, widom, measure_local_field, switch, rotate
+public move, switch, rotate, &
+       widom, measure_field_internal, measure_field_external
 
 contains
 
@@ -167,144 +169,6 @@ contains
         end if
     
     end subroutine move
-    
-    !> Widom's method
-
-    subroutine widom(Box, ext_field, &
-                     this_spheres, this_macro, this_observables, &
-                     other_spheres, other_between_cells, &
-                     between_spheres_potential)
-        
-        type(Box_Parameters), intent(in) :: Box
-        class(External_Field), intent(in) :: ext_field
-        class(Hard_Spheres), intent(in) :: this_spheres
-        class(Hard_Spheres_Macro), intent(in) :: this_macro
-        class(Neighbour_Cells), intent(in) ::  other_between_cells
-        class(Hard_Spheres_Post_Processing_Observables), intent(inout) :: this_observables
-        class(Hard_Spheres), intent(in) :: other_spheres
-        class(Between_Hard_Spheres_Potential_Energy), intent(in) :: between_spheres_potential
-        
-        integer :: i_widom_particule
-        real(DP) :: inv_activity_sum
-        type(Particle_Index) :: test
-        logical :: overlap
-        real(DP) :: energy_test
-        real(DP) :: this_energy_test, mix_energy_test
-        
-        inv_activity_sum = 0._DP
-        test%number = 0
-        
-        do i_widom_particule = 1, this_spheres%get_widom_num_particles()
-
-            this_observables%widom%num_hits = this_observables%widom%num_hits + 1
-            
-            test%position(:) = random_position(Box, this_spheres%get_diameter())
-
-            if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
-                test%same_i_cell = this_macro%same_cells%index_from_position(test%position)
-                call this_macro%hard_potential%neighbours(Box%size, this_spheres, &
-                                                          this_macro%same_cells, test, &
-                                                          overlap, this_energy_test)
-            else
-                test%between_i_cell = other_between_cells%index_from_position(test%position)
-                call between_spheres_potential%neighbours(Box%size, other_spheres, &
-                                                          this_macro%between_cells, &
-                                                          test, overlap, mix_energy_test)
-            end if
-            
-            if (.not. overlap) then
-            
-                if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
-                    test%between_i_cell = other_between_cells%index_from_position(test%position)
-                    call between_spheres_potential%neighbours(Box%size, other_spheres, &
-                                                              this_macro%between_cells, test, overlap, &
-                                                              mix_energy_test)
-                else
-                    test%same_i_cell = this_macro%same_cells%index_from_position(test%position)
-                    call this_macro%hard_potential%neighbours(Box%size, this_spheres, &
-                                                              this_macro%same_cells, test, &
-                                                              overlap, this_energy_test)
-                end if
-                
-                if (.not. overlap) then
-                
-                    select type (this_spheres)
-                        type is (Dipolar_Hard_Spheres)
-                            test%add = .true.
-                            test%orientation(:) = random_surface()
-                            select type (this_macro)
-                                type is (Dipolar_Hard_Spheres_Macro)
-                                    this_energy_test = &
-                                        this_macro%ewald_real%solo_energy(Box%size, &
-                                                                          this_spheres, test) + &
-                                        this_macro%ewald_reci%exchange_energy(Box, test) - &
-                                        this_macro%ewald_self%solo_energy(test%orientation) + &
-                                        this_macro%ewald_bound%exchange_energy(Box%size, test) + &
-                                        ext_field%exchange_energy(test)
-                                       
-                                    if (geometry%slab) then
-                                        this_energy_test = this_energy_test - &
-                                                           this_macro%dlc%exchange_energy(Box, test)
-                                    end if
-                                                    
-                            end select
-                    end select
-                
-                    energy_test = this_energy_test + mix_energy_test
-                    inv_activity_sum = inv_activity_sum + exp(-energy_test/Box%temperature)
-
-                else
-                    this_observables%widom%num_rejections = this_observables%widom%num_rejections + 1
-                end if
-
-            else
-                this_observables%widom%num_rejections = this_observables%widom%num_rejections + 1
-            end if
-            
-        end do
-        
-        this_observables%inv_activity = inv_activity_sum/real(this_spheres%get_widom_num_particles(), DP)
-        
-    end subroutine widom
-    
-    !> Local field: for DHS only
-    
-    subroutine measure_local_field(Box, ext_field, this_spheres, this_macro, this_field_distribution)
-
-        type(Box_Parameters), intent(in) :: Box
-        class(External_Field), intent(in) :: ext_field
-        class(Dipolar_Hard_Spheres), intent(in) :: this_spheres
-        class(Dipolar_Hard_Spheres_Macro), intent(in) :: this_macro
-        class(Distribution_Function) :: this_field_distribution
-        
-        real(DP), dimension(num_dimensions) :: local_field
-        type(Particle_Index) :: particle
-        integer :: i_particule
-        
-        call this_field_distribution%step_init()
-        do i_particule = 1, this_spheres%get_num_particles()
-
-            particle%number = i_particule
-            particle%position(:) = this_spheres%get_position(particle%number)
-            particle%orientation(:) = this_spheres%get_position(particle%number)
-            
-            local_field(:) = this_macro%ewald_real%solo_field(Box%size, this_spheres, particle) + &
-                             this_macro%ewald_reci%solo_field(Box, particle) - &
-                             this_macro%ewald_self%solo_field(particle%orientation) + &
-                             this_macro%ewald_bound%solo_field(Box%size) + &
-                             ext_field%get()
-                            
-            if (geometry%slab) then
-                local_field(:) = local_field(:) - this_macro%dlc%solo_field(Box, particle)
-            end if
-
-            call this_field_distribution%particle_set(particle%position(3), local_field)
-        
-        end do
-        
-        call this_field_distribution%step_set()
-        
-    end subroutine measure_local_field
     
     !> Particle switch
     
@@ -607,5 +471,199 @@ contains
         end if
     
     end subroutine rotate
+    
+        !> Widom's method
+
+    subroutine widom(Box, ext_field, &
+                     this_spheres, this_macro, this_observables, &
+                     other_spheres, other_between_cells, &
+                     between_spheres_potential)
+        
+        type(Box_Parameters), intent(in) :: Box
+        class(External_Field), intent(in) :: ext_field
+        class(Hard_Spheres), intent(in) :: this_spheres
+        class(Hard_Spheres_Macro), intent(in) :: this_macro
+        class(Neighbour_Cells), intent(in) ::  other_between_cells
+        class(Hard_Spheres_Post_Processing_Observables), intent(inout) :: this_observables
+        class(Hard_Spheres), intent(in) :: other_spheres
+        class(Between_Hard_Spheres_Potential_Energy), intent(in) :: between_spheres_potential
+        
+        integer :: i_widom_particule
+        real(DP) :: inv_activity_sum
+        type(Particle_Index) :: test
+        logical :: overlap
+        real(DP) :: energy_test
+        real(DP) :: this_energy_test, mix_energy_test
+        
+        inv_activity_sum = 0._DP
+        test%number = 0
+        
+        do i_widom_particule = 1, this_spheres%get_widom_num_particles()
+
+            this_observables%widom%num_hits = this_observables%widom%num_hits + 1
+            
+            test%position(:) = random_position(Box, this_spheres%get_diameter())
+
+            if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
+                test%same_i_cell = this_macro%same_cells%index_from_position(test%position)
+                call this_macro%hard_potential%neighbours(Box%size, this_spheres, &
+                                                          this_macro%same_cells, test, &
+                                                          overlap, this_energy_test)
+            else
+                test%between_i_cell = other_between_cells%index_from_position(test%position)
+                call between_spheres_potential%neighbours(Box%size, other_spheres, &
+                                                          this_macro%between_cells, &
+                                                          test, overlap, mix_energy_test)
+            end if
+            
+            if (.not. overlap) then
+            
+                if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
+                    test%between_i_cell = other_between_cells%index_from_position(test%position)
+                    call between_spheres_potential%neighbours(Box%size, other_spheres, &
+                                                              this_macro%between_cells, test, overlap, &
+                                                              mix_energy_test)
+                else
+                    test%same_i_cell = this_macro%same_cells%index_from_position(test%position)
+                    call this_macro%hard_potential%neighbours(Box%size, this_spheres, &
+                                                              this_macro%same_cells, test, &
+                                                              overlap, this_energy_test)
+                end if
+                
+                if (.not. overlap) then
+                
+                    select type (this_spheres)
+                        type is (Dipolar_Hard_Spheres)
+                            test%add = .true.
+                            test%orientation(:) = random_surface()
+                            select type (this_macro)
+                                type is (Dipolar_Hard_Spheres_Macro)
+                                    this_energy_test = &
+                                        this_macro%ewald_real%solo_energy(Box%size, &
+                                                                          this_spheres, test) + &
+                                        this_macro%ewald_reci%exchange_energy(Box, test) - &
+                                        this_macro%ewald_self%solo_energy(test%orientation) + &
+                                        this_macro%ewald_bound%exchange_energy(Box%size, test) + &
+                                        ext_field%exchange_energy(test)
+                                       
+                                    if (geometry%slab) then
+                                        this_energy_test = this_energy_test - &
+                                                           this_macro%dlc%exchange_energy(Box, test)
+                                    end if
+                                                    
+                            end select
+                    end select
+                
+                    energy_test = this_energy_test + mix_energy_test
+                    inv_activity_sum = inv_activity_sum + exp(-energy_test/Box%temperature)
+
+                else
+                    this_observables%widom%num_rejections = this_observables%widom%num_rejections + 1
+                end if
+
+            else
+                this_observables%widom%num_rejections = this_observables%widom%num_rejections + 1
+            end if
+            
+        end do
+        
+        this_observables%inv_activity = inv_activity_sum/real(this_spheres%get_widom_num_particles(), DP)
+        
+    end subroutine widom
+    
+    !> Local field: for DHS only
+    
+    subroutine measure_field_internal(Box, ext_field, &
+                                            this_spheres, this_macro, &
+                                            this_field_distribution)
+
+        type(Box_Parameters), intent(in) :: Box
+        class(External_Field), intent(in) :: ext_field
+        class(Dipolar_Hard_Spheres), intent(in) :: this_spheres
+        class(Dipolar_Hard_Spheres_Macro), intent(in) :: this_macro
+        class(Distribution_Function) :: this_field_distribution
+        
+        real(DP), dimension(num_dimensions) :: local_field
+        type(Particle_Index) :: particle
+        integer :: i_particule
+        
+        call this_field_distribution%step_init()
+        do i_particule = 1, this_spheres%get_num_particles()
+
+            particle%number = i_particule
+            particle%position(:) = this_spheres%get_position(particle%number)
+            particle%orientation(:) = this_spheres%get_position(particle%number)
+            
+            local_field(:) = this_macro%ewald_real%solo_field(Box%size, this_spheres, particle) + &
+                             this_macro%ewald_reci%solo_field(Box, particle) - &
+                             this_macro%ewald_self%solo_field(particle%orientation) + &
+                             this_macro%ewald_bound%solo_field(Box%size) + &
+                             ext_field%get()
+                            
+            if (geometry%slab) then
+                local_field(:) = local_field(:) - this_macro%dlc%solo_field(Box, particle)
+            end if
+
+            call this_field_distribution%particle_set(particle%position(3), local_field)
+        
+        end do
+        
+        call this_field_distribution%step_set()
+        
+    end subroutine measure_field_internal
+
+    subroutine measure_field_external(Box, ext_field, &
+                                            this_spheres, this_macro, this_observables, &
+                                            this_field_distribution)
+
+        type(Box_Parameters), intent(in) :: Box
+        class(External_Field), intent(in) :: ext_field
+        class(Dipolar_Hard_Spheres), intent(in) :: this_spheres
+        class(Dipolar_Hard_Spheres_Macro), intent(in) :: this_macro
+        class(Dipolar_Hard_Spheres_Post_Processing_Observables), intent(inout) :: this_observables
+        class(Distribution_Function) :: this_field_distribution
+        
+        real(DP), dimension(num_dimensions) :: test_field
+        type(Particle_Index) :: test
+        integer :: i_field_particule
+        logical :: overlap
+        real(DP) :: this_energy_test
+        
+        test%number = 0
+        
+        call this_field_distribution%step_init()
+        do i_field_particule = 1, this_spheres%get_field_num_particles()
+        
+            this_observables%field_external%num_hits = this_observables%field_external%num_hits + 1
+            
+            test%position(:) = random_position(Box, this_spheres%get_diameter())            
+            test%same_i_cell = this_macro%same_cells%index_from_position(test%position)
+            call this_macro%hard_potential%neighbours(Box%size, this_spheres, &
+                                                      this_macro%same_cells, test, &
+                                                      overlap, this_energy_test)
+            if (.not. overlap) then
+            
+                test%orientation(:) = random_surface()
+                test_field(:) = this_macro%ewald_real%test_field(Box%size, this_spheres, test) + &
+                                this_macro%ewald_reci%test_field(Box, test) - &
+                                this_macro%ewald_self%test_field(test%orientation) + &
+                                this_macro%ewald_bound%test_field(Box%size, test) + &
+                                ext_field%get()
+                if (geometry%slab) then
+                    test_field(:) = test_field(:) - this_macro%dlc%test_field(Box, test)
+                end if
+                
+                call this_field_distribution%particle_set(test%position(3), test_field)
+            
+            else
+                this_observables%field_external%num_rejections = &
+                    this_observables%field_external%num_rejections + 1
+            end if
+        
+        end do
+        
+        call this_field_distribution%step_set()
+        
+    end subroutine measure_field_external
 
 end module module_algorithms

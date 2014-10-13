@@ -36,6 +36,7 @@ private
         procedure :: solo_energy => Ewald_Summation_Real_solo_energy
         procedure, private :: pair_energy => Ewald_Summation_Real_pair_energy        
         procedure :: solo_field => Ewald_Summation_Real_solo_field
+        procedure :: test_field => Ewald_Summation_Real_solo_field
         
         procedure, private :: interpolation => Ewald_Summation_Real_interpolation
     
