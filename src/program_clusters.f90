@@ -41,6 +41,7 @@ implicit none
     integer, dimension(:), allocatable :: clusters_sizes
     integer, dimension(:, :), allocatable :: all_pairs
     real(DP), dimension(:), allocatable :: clusters_sizes_distribution
+    real(DP) :: delta
     integer :: clusters_distribution_unit
 
     logical :: with_orientations
@@ -98,7 +99,7 @@ implicit none
     
     data_name = "Clusters.number of sizes"
     call data_post_json%get(data_name, num_sizes, found)
-    call test_data_found(data_name, found)
+    call test_data_found(data_name, found)    
     
     call data_post_json%destroy()
 
@@ -108,6 +109,7 @@ implicit none
     write(output_unit, *) trim(name), num_particles, snap_factor
     allocate(all_positions(num_dimensions, num_particles))
     num_pairs = num_particles * (num_particles - 1) / 2
+    delta = real(num_sizes, DP) / real(num_particles, DP)
     allocate(clusters_sizes(num_pairs))
     allocate(all_pairs(2, num_pairs))
     allocate(clusters_sizes_distribution(0:num_sizes))
@@ -176,7 +178,7 @@ implicit none
         
         do i_cluster = 1, num_clusters
             cluster_size = clusters_sizes(i_cluster)
-            i_size = floor(real(cluster_size, DP) / real(num_particles, DP) * real(num_sizes, DP))
+            i_size = floor(real(cluster_size, DP) * delta)
             clusters_sizes_distribution(i_size) = clusters_sizes_distribution(i_size) + 1._DP
         end do
     
@@ -186,12 +188,15 @@ implicit none
     
     clusters_sizes_distribution(0:num_sizes) = clusters_sizes_distribution(0:num_sizes) / &
                                                real(num_steps/snap_factor, DP)
+    clusters_sizes_distribution(0:num_sizes) = clusters_sizes_distribution(0:num_sizes) / &
+sum(clusters_sizes_distribution(0:num_sizes))
     
     open(newunit=clusters_distribution_unit, &
          file=trim(name)//"_clusters_sizes_distribution_histogram.out", action="write")
     do i_size = 1, num_sizes
         write(clusters_distribution_unit, *) real(i_size, DP) / real(num_sizes, DP), &
-                                             clusters_sizes_distribution(i_size)
+                                             clusters_sizes_distribution(i_size) / delta
+                                             
     end do
     close(clusters_distribution_unit)
 
