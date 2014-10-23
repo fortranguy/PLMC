@@ -191,7 +191,7 @@ implicit none
     
     open(newunit=clusters_distribution_unit, &
          file=trim(name)//"_clusters_sizes_distribution_function.out", action="write")
-    do i_size = 1, num_sizes
+    do i_size = 0, num_sizes
         write(clusters_distribution_unit, *) (real(i_size, DP)+0.5_DP) / real(num_sizes, DP), &
                                              clusters_sizes_distribution(i_size) * real(num_sizes, DP)
                                              
