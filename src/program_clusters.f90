@@ -34,7 +34,8 @@ implicit none
     real(DP), dimension(num_dimensions) :: vector_ij
     logical :: ij_linked
 
-    integer :: cluster_size, cluster_size_max
+    integer :: num_sizes, i_size
+    integer :: cluster_size
     integer :: num_clusters, i_cluster
     integer :: num_pairs
     integer, dimension(:), allocatable :: clusters_sizes
@@ -95,6 +96,10 @@ implicit none
     call data_post_json%get(data_name, cutoff, found)
     call test_data_found(data_name, found)
     
+    data_name = "Clusters.number of sizes"
+    call data_post_json%get(data_name, num_sizes, found)
+    call test_data_found(data_name, found)
+    
     call data_post_json%destroy()
 
     call arg_to_file(1, file, length)
@@ -105,7 +110,7 @@ implicit none
     num_pairs = num_particles * (num_particles - 1) / 2
     allocate(clusters_sizes(num_pairs))
     allocate(all_pairs(2, num_pairs))
-    allocate(clusters_sizes_distribution(num_pairs))
+    allocate(clusters_sizes_distribution(0:num_sizes))
 
     with_orientations = (command_argument_count() == 2)
 
@@ -124,7 +129,6 @@ implicit none
     end if
     
     clusters_sizes_distribution(:) = 0
-    cluster_size_max = 0
     
     clusters_sizes(:) = 0
     
@@ -172,22 +176,22 @@ implicit none
         
         do i_cluster = 1, num_clusters
             cluster_size = clusters_sizes(i_cluster)
-            clusters_sizes_distribution(cluster_size) = clusters_sizes_distribution(cluster_size) + 1._DP
-            if (cluster_size_max < cluster_size) cluster_size_max = cluster_size
+            i_size = floor(real(cluster_size, DP) / real(num_particles, DP) * real(num_sizes, DP))
+            clusters_sizes_distribution(i_size) = clusters_sizes_distribution(i_size) + 1._DP
         end do
     
     end do
     call cpu_time(time_end)
     write(output_unit, *) "Finish !"
     
-    clusters_sizes_distribution(1:cluster_size_max) = clusters_sizes_distribution(1:cluster_size_max) / &
-                                                     real(num_steps/snap_factor, DP)
+    clusters_sizes_distribution(0:num_sizes) = clusters_sizes_distribution(0:num_sizes) / &
+                                               real(num_steps/snap_factor, DP)
     
     open(newunit=clusters_distribution_unit, &
          file=trim(name)//"_clusters_sizes_distribution_histogram.out", action="write")
-    do cluster_size = 1, cluster_size_max
-        write(clusters_distribution_unit, *) real(cluster_size, DP) / real(num_particles, DP), &
-                                             clusters_sizes_distribution(cluster_size)
+    do i_size = 1, num_sizes
+        write(clusters_distribution_unit, *) real(i_size, DP) / real(num_sizes, DP), &
+                                             clusters_sizes_distribution(i_size)
     end do
     close(clusters_distribution_unit)
 
