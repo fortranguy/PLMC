@@ -182,12 +182,14 @@ implicit none
     
     clusters_sizes_distribution(1:cluster_size_max) = clusters_sizes_distribution(1:cluster_size_max) / &
                                                      real(num_steps/snap_factor, DP)
+    clusters_sizes_distribution(1:cluster_size_max) = clusters_sizes_distribution(1:cluster_size_max) / &
+                                                      sum(clusters_sizes_distribution(1:cluster_size_max))
     
     open(newunit=clusters_distribution_unit, &
          file=trim(name)//"_clusters_sizes_distribution_histogram.out", action="write")
     do cluster_size = 1, cluster_size_max
         write(clusters_distribution_unit, *) real(cluster_size, DP) / real(num_particles, DP), &
-                                             clusters_sizes_distribution(cluster_size)
+                                             real(num_particles, DP) * clusters_sizes_distribution(cluster_size)
     end do
     close(clusters_distribution_unit)
 
