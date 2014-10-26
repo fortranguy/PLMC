@@ -1,7 +1,7 @@
 !> \brief Calculate and write the distribution function
 
 !> \f[
-!>      g_{ii}(r) = \frac{\braket{\mathrm{d} N_\text{pair}(r) / N_i}}{\braket{\rho_i}
+!>      g_{ii}(r) = 2 \frac{\braket{\mathrm{d} N_\text{pair}(r) / N_i}}{\braket{\rho_i}
 !>                        \mathrm{d} V_\text{sphere}(r)}
 !> \f]
 
