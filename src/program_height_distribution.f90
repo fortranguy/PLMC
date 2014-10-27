@@ -8,12 +8,12 @@
 !> 2. Average orientation:
 !> \f[
 !>      Q_{zz}(z) = \left\langle 
-!>                      \frac{\sum_{i=1}^{N(z)} (3\mu_{i,z}^2/\mu_i^2 - 1)/2}
-!>                           {N(z)}
+!>                      \frac{1}{N(z)} \sum_{i=1}^{N(z)} (3\mu_{i,z}^2/\mu_i^2 - 1)/2
 !>                  \right\rangle
 !> \f]
 
-!> 3. Preferred orientation \f$ \vec{d} \f$ and order parameter \f$ P_1 \f$:
+!> 3. Preferred orientation \f$ \vec{d} \f$, order parameter \f$ P_1 \f$ and 
+!>    local order parameter \f$ P_z(z) \f$:
 !> \f[
 !>      Q = \frac{3}{2N} \sum_{i=1}^N |\vec{\mu}_i)(\vec{\mu}_i| - \frac{1}{2}I
 !> \f]
@@ -25,6 +25,11 @@
 !> \f[
 !>      P_1 = \left\langle 
 !>                  \frac{1}{N} \left| \sum_{i=1}^N (\vec{\mu}_i | \vec{d}) \right|
+!>            \right\rangle
+!> \f]
+!> \f[
+!>      P_z(z) = \left\langle
+!>                  \frac{1}{N(z)} \left| \sum_{i=1}^{N(z)} (\vec{\mu}_i | \vec{d}) \right|
 !>            \right\rangle
 !> \f]
 
