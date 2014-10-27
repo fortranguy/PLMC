@@ -7,11 +7,13 @@
 
 !> 2. Average orientation:
 !> \f[
-!>      Q_{zz}(z) = \left\langle \frac{\sum_{i=1}^{N(z)} (3\mu_{i,z}^2/\mu_i^2 - 1)/2}
-!>                                    {N(z)}\right\rangle
+!>      Q_{zz}(z) = \left\langle 
+!>                      \frac{\sum_{i=1}^{N(z)} (3\mu_{i,z}^2/\mu_i^2 - 1)/2}
+!>                           {N(z)}
+!>                  \right\rangle
 !> \f]
 
-!> 3. Preferred orientation:
+!> 3. Preferred orientation \f$ \vec{d} \f$ and order parameter \f$ P_1 \f$:
 !> \f[
 !>      Q = \frac{3}{2N} \sum_{i=1}^N |\vec{\mu}_i)(\vec{\mu}_i| - \frac{1}{2}I
 !> \f]
@@ -20,6 +22,11 @@
 !>      Q = \sum_{d=1}^3 |\vec{q}_d) q_d (\vec{q}_d|
 !> \f]
 !> \f[ \vec{d} := \vec{q_d} | q_d \text{max}\f]
+!> \f[
+!>      P_1 = \left\langle 
+!>                  \frac{1}{N} \left| \sum_{i=1}^N (\vec{\mu}_i | \vec{d}) \right|
+!>            \right\rangle
+!> \f]
 
 program height_distribution
 
@@ -56,6 +63,7 @@ implicit none
     real(DP), dimension(:, :), allocatable :: distribution_function
     real(DP), dimension(:, :), allocatable :: positions, orientations
     
+    real(DP) :: order_parameter, order_parameter_step
     real(DP), dimension(num_dimensions) :: eigenvalues, preferred_orientation, &
                                            normed_orientation
     real(DP), dimension(num_dimensions, num_dimensions) :: orientation_matrix
@@ -168,6 +176,7 @@ implicit none
     write(output_unit, *) "Start !"
     call cpu_time(time_start)
     distribution_function(:, :) = 0._DP
+    order_parameter = 0._DP
     num_steps = 0
     do i_step = num_thermalisation_steps + 1, num_thermalisation_steps + num_equilibrium_steps
         if (modulo(i_step, positions_snap_factor) == 0) then
@@ -204,7 +213,8 @@ implicit none
                 call eigen_symmetric(orientation_matrix, eigenvalues)
                 preferred_orientation(:) = orientation_matrix(:, num_dimensions) / &
                                            norm2(orientation_matrix(:, num_dimensions))
-                                           
+                
+                order_parameter_step = 0._DP                   
                 do i_particle = 1, num_particles
                     i_distribution = int(positions(3, i_particle)/delta) + 1
                     orientation_z_sqr = orientations(3, i_particle)**2 / &
@@ -218,11 +228,15 @@ implicit none
                     distribution_step(i_distribution, 3) = distribution_step(i_distribution, 3) + &
                                                            dot_product(normed_orientation, &
                                                                        preferred_orientation)
+                    order_parameter_step = order_parameter_step + &
+                                           dot_product(normed_orientation, preferred_orientation)
                 end do
                 where(distribution_step(:, 1) > real_zero)
                     distribution_step(:, 2) = distribution_step(:, 2) / distribution_step(:, 1)
                     distribution_step(:, 3) = abs(distribution_step(:, 3)) / distribution_step(:, 1)
                 end where
+                
+                order_parameter = order_parameter + abs(order_parameter_step) / real(num_particles, DP)
             
             end if
             
@@ -242,11 +256,14 @@ implicit none
     deallocate(positions)
     
     distribution_function(:, :) = distribution_function(:, :) / real(num_steps, DP)
+    order_parameter = order_parameter / real(num_steps, DP)
     
     open(newunit=report_unit, recl=4096, &
          file=trim(positions_name)//"_height_distribution_report.txt", action="write")
-    write(report_unit, *) "Normalisation: ", sum(distribution_function(:, 1)) / real(num_particles, DP)
+    write(report_unit, *) "Density normalisation: ", &
+                           sum(distribution_function(:, 1)) / real(num_particles, DP)
     write(report_unit, *) "With orientations: ", with_orientations
+    write(report_unit, *) "Order parameter: ", order_parameter
     write(report_unit, *) "Duration =", (time_end - time_start) / 60._DP, "min"
     close(report_unit)
 
