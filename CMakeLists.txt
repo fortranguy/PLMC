@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 
 project(
-    Monte-Carlo
+    Monte-Carlo_Canonical
     Fortran CXX
 )
 
