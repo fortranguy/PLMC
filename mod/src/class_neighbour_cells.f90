@@ -31,19 +31,19 @@ private
         procedure :: destroy => Neighbour_Cells_destroy
         
         procedure :: alloc_nodes => Neighbour_Cells_alloc_nodes
-        procedure :: alloc_cells => Neighbour_Cells_alloc_cells
+        procedure, private :: alloc_cells => Neighbour_Cells_alloc_cells
         procedure :: dealloc_nodes => Neighbour_Cells_dealloc_nodes
-        procedure :: dealloc_cells => Neighbour_Cells_dealloc_cells
-        procedure :: check_cells_size => Neighbour_Cells_check_cells_size
+        procedure, private :: dealloc_cells => Neighbour_Cells_dealloc_cells
+        procedure, private :: check_cells_size => Neighbour_Cells_check_cells_size
         procedure :: index_from_position => Neighbour_Cells_index_from_position
         procedure :: all_particles_to_cells => Neighbour_Cells_all_particles_to_cells
+        procedure, private :: init_near_among_total => &
+                              Neighbour_Cells_init_near_among_total
 
         procedure :: near_cell_bounds => Neighbour_Cells_near_cell_bounds
         procedure :: point_to_begin => Neighbour_Cells_point_to_begin
         procedure :: remove_particle_from_cell => Neighbour_Cells_remove_particle_from_cell
         procedure :: add_particle_to_cell => Neighbour_Cells_add_particle_to_cell
-        procedure, private :: init_near_among_total => &
-                              Neighbour_Cells_init_near_among_total
         
     end type Neighbour_Cells
     
@@ -234,6 +234,64 @@ contains
         end do
         
     end subroutine Neighbour_Cells_all_particles_to_cells
+    
+    ! Neighbour cells initialisation
+    
+    pure subroutine Neighbour_Cells_init_near_among_total(this)
+    
+        class(Neighbour_Cells), intent(inout) :: this
+    
+        integer :: i1_total_cell, i2_total_cell, i3_total_cell, i_total_cell
+        integer :: i1_near_cell, i2_near_cell, i3_near_cell, i_near_cell
+        integer :: i3_near_cell_min, i3_near_cell_max
+        integer, dimension(num_dimensions) :: total_cell_coord, near_cell_coord
+        
+        do i3_total_cell = 1, this%num_total_cell_dim(3)
+
+            i3_near_cell_min = 1
+            i3_near_cell_max = num_near_cells_dim(3)
+
+            if (geometry%slab) then
+                if (i3_total_cell == 1) then
+                    i3_near_cell_min = num_near_cells_dim(3) - 1
+                    i3_near_cell_max = num_near_cells_dim(3)
+                else if (i3_total_cell == this%num_total_cell_dim(3)) then
+                    i3_near_cell_min = 1
+                    i3_near_cell_max = 2
+                end if
+            end if
+            
+        do i2_total_cell = 1, this%num_total_cell_dim(2)
+        do i1_total_cell = 1, this%num_total_cell_dim(1)
+            
+            i_total_cell = index_from_coord([i1_total_cell, i2_total_cell, i3_total_cell], &
+                                            this%num_total_cell_dim)
+
+            do i3_near_cell = i3_near_cell_min,  i3_near_cell_max
+            do i2_near_cell = 1, num_near_cells_dim(2)
+            do i1_near_cell = 1, num_near_cells_dim(1)
+            
+                near_cell_coord(:) = [i1_near_cell, i2_near_cell, i3_near_cell]
+                i_near_cell = index_from_coord(near_cell_coord, num_near_cells_dim)
+                near_cell_coord(:) = near_cell_coord(:) - num_near_cells_dim(:) + 1
+                    ! symmetry: to the center
+                
+                total_cell_coord(:) = [i1_total_cell, i2_total_cell, i3_total_cell] + &
+                                      near_cell_coord(:)
+                total_cell_coord(:) = coord_PBC(total_cell_coord, this%num_total_cell_dim)
+                
+                this%near_among_total(i_near_cell, i_total_cell) = &
+                    index_from_coord(total_cell_coord, this%num_total_cell_dim)
+                    
+            end do
+            end do
+            end do
+        
+        end do
+        end do
+        end do
+            
+    end subroutine Neighbour_Cells_init_near_among_total
 
     pure function Neighbour_Cells_near_cell_bounds(this, i_total_cell) result(near_cell_bounds)
 
@@ -316,63 +374,5 @@ contains
         new%number = i_particle
 
     end subroutine Neighbour_Cells_add_particle_to_cell
-    
-    ! Neighbour cells initialisation
-    
-    pure subroutine Neighbour_Cells_init_near_among_total(this)
-    
-        class(Neighbour_Cells), intent(inout) :: this
-    
-        integer :: i1_total_cell, i2_total_cell, i3_total_cell, i_total_cell
-        integer :: i1_near_cell, i2_near_cell, i3_near_cell, i_near_cell
-        integer :: i3_near_cell_min, i3_near_cell_max
-        integer, dimension(num_dimensions) :: total_cell_coord, near_cell_coord
-        
-        do i3_total_cell = 1, this%num_total_cell_dim(3)
-
-            i3_near_cell_min = 1
-            i3_near_cell_max = num_near_cells_dim(3)
-
-            if (geometry%slab) then
-                if (i3_total_cell == 1) then
-                    i3_near_cell_min = num_near_cells_dim(3) - 1
-                    i3_near_cell_max = num_near_cells_dim(3)
-                else if (i3_total_cell == this%num_total_cell_dim(3)) then
-                    i3_near_cell_min = 1
-                    i3_near_cell_max = 2
-                end if
-            end if
-            
-        do i2_total_cell = 1, this%num_total_cell_dim(2)
-        do i1_total_cell = 1, this%num_total_cell_dim(1)
-            
-            i_total_cell = index_from_coord([i1_total_cell, i2_total_cell, i3_total_cell], &
-                                            this%num_total_cell_dim)
-
-            do i3_near_cell = i3_near_cell_min,  i3_near_cell_max
-            do i2_near_cell = 1, num_near_cells_dim(2)
-            do i1_near_cell = 1, num_near_cells_dim(1)
-            
-                near_cell_coord(:) = [i1_near_cell, i2_near_cell, i3_near_cell]
-                i_near_cell = index_from_coord(near_cell_coord, num_near_cells_dim)
-                near_cell_coord(:) = near_cell_coord(:) - num_near_cells_dim(:) + 1
-                    ! symmetry: to the center
-                
-                total_cell_coord(:) = [i1_total_cell, i2_total_cell, i3_total_cell] + &
-                                      near_cell_coord(:)
-                total_cell_coord(:) = coord_PBC(total_cell_coord, this%num_total_cell_dim)
-                
-                this%near_among_total(i_near_cell, i_total_cell) = &
-                    index_from_coord(total_cell_coord, this%num_total_cell_dim)
-                    
-            end do
-            end do
-            end do
-        
-        end do
-        end do
-        end do
-            
-    end subroutine Neighbour_Cells_init_near_among_total
 
 end module class_neighbour_cells
