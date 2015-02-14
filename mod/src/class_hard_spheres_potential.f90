@@ -119,7 +119,7 @@ contains
         real(DP), dimension(:), intent(in) :: Box_size
         class(Hard_Spheres), intent(in) :: spheres
         class(Neighbour_Cells), intent(in) :: this_cells
-        type(Particle_Index), intent(in) :: particle
+        type(Particle_Index), intent(inout) :: particle
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energ
     
@@ -135,9 +135,11 @@ contains
         
         select type (this)
             type is (Hard_Spheres_Potential_Energy)
+                particle%same_i_cell = this_cells%index_from_position(particle%position)
                 i_total_cell = particle%same_i_cell
                 particule_number = particle%number
             type is (Between_Hard_Spheres_Potential_Energy)
+                particle%between_i_cell = this_cells%index_from_position(particle%position)
                 i_total_cell = particle%between_i_cell
                 particule_number = particle%other_number
         end select
