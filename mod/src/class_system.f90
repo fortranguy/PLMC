@@ -1136,11 +1136,11 @@ contains
 
         call widom(this%Box, this%ext_field, &
                    this%type1_spheres, this%type1_macro, this%type1_observables, &
-                   this%type2_spheres, this%type2_macro%between_cells, &
+                   this%type2_spheres, &
                    this%between_spheres_potential)
         call widom(this%Box, this%ext_field, &
                    this%type2_spheres, this%type2_macro, this%type2_observables, &
-                   this%type1_spheres, this%type1_macro%between_cells, &
+                   this%type1_spheres, &
                    this%between_spheres_potential)
 
     end subroutine System_Post_Processing_measure_chemical_potentials

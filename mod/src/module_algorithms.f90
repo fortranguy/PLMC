@@ -72,11 +72,9 @@ contains
         end if
         
         if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
-            new%same_i_cell = this_macro%same_cells%index_from_position(new%position)
             call this_macro%hard_potential%neighbours(Box%size, this_spheres, this_macro%same_cells, &
                                                       new, overlap, this_energy_new)
         else
-            new%between_i_cell = other_between_cells%index_from_position(new%position)
             call between_spheres_potential%neighbours(Box%size, other_spheres, this_macro%between_cells, &
                                                       new, overlap, mix_energy_new)
         end if
@@ -84,20 +82,21 @@ contains
         if (.not. overlap) then
         
             if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
-                new%between_i_cell = other_between_cells%index_from_position(new%position)
                 call between_spheres_potential%neighbours(Box%size, other_spheres, &
                                                           this_macro%between_cells, &
                                                           new, overlap, mix_energy_new)
             else
-                new%same_i_cell = this_macro%same_cells%index_from_position(new%position)
                 call this_macro%hard_potential%neighbours(Box%size, this_spheres, &
                                                           this_macro%same_cells, new, overlap, &
                                                           this_energy_new)
             end if
                         
             if (.not. overlap) then
-    
-                old%same_i_cell = this_macro%same_cells%index_from_position(old%position)
+            
+                call this_macro%hard_potential%neighbours(Box%size, this_spheres, &
+                                                          this_macro%same_cells, &
+                                                          old, overlap, this_energy_old)
+                this_energy_delta = this_energy_new - this_energy_old
                 select type (this_spheres)
                     type is (Dipolar_Hard_Spheres)
                         old%orientation(:) = this_spheres%get_orientation(old%number)
@@ -108,21 +107,16 @@ contains
                                                            this_spheres, new)
                                 this_energy_real_old = this_macro%ewald_real%solo_energy(Box%size, &
                                                            this_spheres, old)
-                                this_energy_delta = (this_energy_real_new - this_energy_real_old) + &
+                                this_energy_delta = this_energy_delta + (this_energy_real_new - &
+                                                    this_energy_real_old) + &
                                                     this_macro%ewald_reci%move_energy(Box, old, new)
                                 if (geometry%slab) then
                                     this_energy_delta = this_energy_delta - &
                                                         this_macro%dlc%move_energy(Box, old, new)
                                 end if
                         end select
-                    class default
-                        call this_macro%hard_potential%neighbours(Box%size, this_spheres, &
-                                                                  this_macro%same_cells, &
-                                                                  old, overlap, this_energy_old)
-                        this_energy_delta = this_energy_new - this_energy_old
                 end select
-                    
-                old%between_i_cell = other_between_cells%index_from_position(old%position)
+                
                 call between_spheres_potential%neighbours(Box%size, other_spheres, &
                                                           this_macro%between_cells, &
                                                           old, overlap, mix_energy_old)
@@ -214,18 +208,18 @@ contains
                 
         call before_switch_energy(Box%size, &
                                   type1_spheres, type1_macro, old1, &
-                                  type2_spheres, type2_macro%between_cells, &
+                                  type2_spheres, &
                                   between_spheres_potential, &
                                   type1_energy_old)
         call before_switch_energy(Box%size, &
                                   type2_spheres, type2_macro, old2, &
-                                  type1_spheres, type1_macro%between_cells, &
+                                  type1_spheres, &
                                   between_spheres_potential, &
                                   type2_energy_old)
              
         call after_switch_energy(Box, &
                                  type1_spheres, type1_macro, old1, new1, &
-                                 type2_spheres, type2_macro%between_cells, &
+                                 type2_spheres, &
                                  between_spheres_potential, &
                                  overlap, &
                                  type1_energy_new)
@@ -234,7 +228,7 @@ contains
         
             call after_switch_energy(Box, &
                                      type2_spheres, type2_macro, old2, new2, &
-                                     type1_spheres, type1_macro%between_cells, &
+                                     type1_spheres, &
                                      between_spheres_potential, &
                                      overlap, &
                                      type2_energy_new)
@@ -281,14 +275,13 @@ contains
     
     subroutine before_switch_energy(Box_size, &
                                     this_spheres, this_macro, old, &
-                                    other_spheres, other_between_cells, &
+                                    other_spheres, &
                                     between_spheres_potential, &
                                     energy_old)
         
         real(DP), dimension(:), intent(in) :: Box_size
         class(Hard_Spheres), intent(in) :: this_spheres, other_spheres
         class(Hard_Spheres_Macro), intent(in) :: this_macro
-        class(Neighbour_Cells), intent(in) :: other_between_cells
         type(Particle_Index), intent(inout) :: old
         class(Between_Hard_Spheres_Potential_Energy), intent(in) :: between_spheres_potential
         type(Particle_Energy), intent(out) :: energy_old
@@ -296,20 +289,19 @@ contains
         
         old%position(:) = this_spheres%get_position(old%number)
         
-        old%same_i_cell = this_macro%same_cells%index_from_position(old%position)
+        call this_macro%hard_potential%neighbours(Box_size, this_spheres, &
+                                                  this_macro%same_cells, &
+                                                  old, overlap, energy_old%same)
         select type (this_spheres)
             type is (Dipolar_Hard_Spheres)
                 old%orientation(:) = this_spheres%get_orientation(old%number)
                 select type (this_macro)
                     type is (Dipolar_Hard_Spheres_Macro)
-                        energy_old%same = this_macro%ewald_real%solo_energy(Box_size, this_spheres, old)
+                        energy_old%same = energy_old%same + this_macro%ewald_real%solo_energy(Box_size, this_spheres, old)
                                ! potential_energy_reci: cf. after_switch_energy
                 end select
-            type is (Hard_Spheres)
-                energy_old%same = 0._DP
         end select
         
-        old%between_i_cell = other_between_cells%index_from_position(old%position)
         call between_spheres_potential%neighbours(Box_size, other_spheres, this_macro%between_cells, &
                                                   old, overlap, energy_old%mix)
         
@@ -317,7 +309,7 @@ contains
     
     subroutine after_switch_energy(Box, &
                                    this_spheres, this_macro, old, new, &
-                                   other_spheres, other_between_cells, &
+                                   other_spheres, &
                                    between_spheres_potential, &
                                    overlap, &
                                    energy_new)
@@ -325,7 +317,6 @@ contains
         type(Box_Parameters), intent(in) :: Box
         class(Hard_Spheres), intent(in) :: this_spheres, other_spheres
         class(Hard_Spheres_Macro), intent(in) :: this_macro
-        class(Neighbour_Cells), intent(in) :: other_between_cells
         type(Particle_Index), intent(in) :: old
         type(Particle_Index), intent(inout) :: new
         class(Between_Hard_Spheres_Potential_Energy), intent(in) :: between_spheres_potential
@@ -335,11 +326,9 @@ contains
         new%position(:) = other_spheres%get_position(new%other_number)
         
         if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
-            new%same_i_cell = this_macro%same_cells%index_from_position(new%position)
             call this_macro%hard_potential%neighbours(Box%size, this_spheres, this_macro%same_cells, &
                                                       new, overlap, energy_new%same)
         else
-            new%between_i_cell = other_between_cells%index_from_position(new%position)
             call between_spheres_potential%neighbours(Box%size, other_spheres, this_macro%between_cells, &
                                                       new, overlap, energy_new%mix)
         end if
@@ -347,12 +336,10 @@ contains
         if (.not. overlap) then
         
             if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
-                new%between_i_cell = other_between_cells%index_from_position(new%position)
                 call between_spheres_potential%neighbours(Box%size, other_spheres, &
                                                           this_macro%between_cells, &
                                                           new, overlap, energy_new%mix)
             else
-                new%same_i_cell = this_macro%same_cells%index_from_position(new%position)
                 call this_macro%hard_potential%neighbours(Box%size, this_spheres, &
                                                           this_macro%same_cells, new, &
                                                           overlap, energy_new%same)
@@ -476,14 +463,13 @@ contains
 
     subroutine widom(Box, ext_field, &
                      this_spheres, this_macro, this_observables, &
-                     other_spheres, other_between_cells, &
+                     other_spheres, &
                      between_spheres_potential)
         
         type(Box_Parameters), intent(in) :: Box
         class(External_Field), intent(in) :: ext_field
         class(Hard_Spheres), intent(in) :: this_spheres
         class(Hard_Spheres_Macro), intent(in) :: this_macro
-        class(Neighbour_Cells), intent(in) ::  other_between_cells
         class(Hard_Spheres_Post_Processing_Observables), intent(inout) :: this_observables
         class(Hard_Spheres), intent(in) :: other_spheres
         class(Between_Hard_Spheres_Potential_Energy), intent(in) :: between_spheres_potential
@@ -505,12 +491,10 @@ contains
             test%position(:) = random_position(Box, this_spheres%get_diameter())
 
             if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
-                test%same_i_cell = this_macro%same_cells%index_from_position(test%position)
                 call this_macro%hard_potential%neighbours(Box%size, this_spheres, &
                                                           this_macro%same_cells, test, &
                                                           overlap, this_energy_test)
             else
-                test%between_i_cell = other_between_cells%index_from_position(test%position)
                 call between_spheres_potential%neighbours(Box%size, other_spheres, &
                                                           this_macro%between_cells, &
                                                           test, overlap, mix_energy_test)
@@ -519,12 +503,10 @@ contains
             if (.not. overlap) then
             
                 if (this_spheres%get_num_particles() >= other_spheres%get_num_particles()) then
-                    test%between_i_cell = other_between_cells%index_from_position(test%position)
                     call between_spheres_potential%neighbours(Box%size, other_spheres, &
                                                               this_macro%between_cells, test, overlap, &
                                                               mix_energy_test)
                 else
-                    test%same_i_cell = this_macro%same_cells%index_from_position(test%position)
                     call this_macro%hard_potential%neighbours(Box%size, this_spheres, &
                                                               this_macro%same_cells, test, &
                                                               overlap, this_energy_test)
@@ -637,7 +619,6 @@ contains
             this_observables%field_external%num_hits = this_observables%field_external%num_hits + 1
             
             test%position(:) = random_position(Box, this_spheres%get_diameter())            
-            test%same_i_cell = this_macro%same_cells%index_from_position(test%position)
             call this_macro%hard_potential%neighbours(Box%size, this_spheres, &
                                                       this_macro%same_cells, test, &
                                                       overlap, this_energy_test)
