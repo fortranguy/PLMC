@@ -1685,14 +1685,14 @@
            <startpoint startx="3200" starty="650"/>
            <endpoint endx="3130" endy="710"/>
           </linepath>
-          <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="0" showstereotype="1" y="690" text="total_moment" font="Ubuntu,9,-1,5,50,0,0,0,0,0" pretext="-" role="710" width="100" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="6JZ55uF6iYn4" height="20"/>
+          <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="3000" showstereotype="1" y="690" text="total_moment" font="Ubuntu,9,-1,5,50,0,0,0,0,0" pretext="-" role="710" width="100" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="6JZ55uF6iYn4" height="20"/>
          </assocwidget>
          <assocwidget indexa="4" linecolor="none" indexb="1" usesdiagramfillcolor="0" widgetbid="HphClKK54aYC" linewidth="none" usesdiagramusefillcolor="0" totalcounta="5" totalcountb="2" widgetaid="IwioHR7hUpWv" visibilityA="0" visibilityB="0" usefillcolor="0" fillcolor="#000000" changeabilityA="900" xmi.id="epnZQh9pwnaC" changeabilityB="900" type="510">
           <linepath>
            <startpoint startx="3370" starty="650"/>
            <endpoint endx="3480" endy="710"/>
           </linepath>
-          <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="0" showstereotype="1" y="690" text="ext_field" font="Ubuntu,9,-1,5,50,0,0,0,0,0" pretext="-" role="710" width="70" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="BjZmIudcdQYT" height="20"/>
+          <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" usesdiagramusefillcolor="1" x="3350" showstereotype="1" y="690" text="ext_field" font="Ubuntu,9,-1,5,50,0,0,0,0,0" pretext="-" role="710" width="70" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="BjZmIudcdQYT" height="20"/>
          </assocwidget>
         </associations>
        </diagram>
