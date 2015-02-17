@@ -370,6 +370,44 @@
                     \operation{testField(particle : Particle) : double[3]}
                 \end{class}
             \end{scope}
+
+            \begin{scope}[shift={($(DipolarInteraction.south) + (43 cm, -2 cm)$)}]
+                \begin{abstractclass}[text width=\mediumTextWidth]{AbstractTotalMoment}{0, 0}
+                    \operation[0]{getTotalMoment() : double[3]}
+                    \operation[0]{rotationUpdate()}
+                    \operation[0]{exchangeUpdate()}
+                \end{abstractclass}
+            \end{scope}
+
+            \begin{scope}[shift={($(DipolarInteraction.south) + (50 cm, -2 cm)$)}]
+                \begin{abstractclass}[text width=\largeTextWidth]{AbstractFieldInteraction}{0, 0}
+                    \inherit{AbstractDipolarInteraction}
+                \end{abstractclass}
+
+                \begin{class}[text width=\largeTextWidth]{NullFieldInteraction}{0, -2}
+                    \inherit{AbstractFieldInteraction}
+                    \operation{totalEnergy() : double}
+                    \operation{totalEnergyUsingField() : double}
+                    \operation{moveEnergy(old : Particle, new : Particle) : double}
+                    \operation{rotationEnergy(old : Particle, new : Particle) : double}
+                    \operation{exchangeEnergy(particle : Particle) : double}
+                    \operation{volumeChangeEnergy(dilation: double) : double}
+                    \operation{soloField(particle : Particle) : double[3]}
+                    \operation{testField(particle : Particle) : double[3]}
+                \end{class}
+
+                \begin{class}[text width=\largeTextWidth]{FieldInteraction}{0, -9}
+                    \inherit{AbstractFieldInteraction}
+                    \operation{totalEnergy() : double}
+                    \operation{totalEnergyUsingField() : double}
+                    \operation{moveEnergy(old : Particle, new : Particle) : double}
+                    \operation{rotationEnergy(old : Particle, new : Particle) : double}
+                    \operation{exchangeEnergy(particle : Particle) : double}
+                    \operation{volumeChangeEnergy(dilation: double) : double}
+                    \operation{soloField(particle : Particle) : double[3]}
+                    \operation{testField(particle : Particle) : double[3]}
+                \end{class}
+            \end{scope}
         
         \end{package}
     \end{scope}
