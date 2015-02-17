@@ -159,7 +159,7 @@
     \composition{AbstractNeighbourCells}{box}{1}{AbstractBoxGeometry}
     \composition{AbstractNeighbourCells}{spheres}{1}{AbstractSpheres}
     
-    \begin{scope}[shift={($(Material.north) + (30 cm, 30cm)$)}]
+    \begin{scope}[shift={($(Material.north) + (30 cm, 40cm)$)}]
         \begin{package}{Dipolar interaction}
         
             \begin{scope}[local bounding box=DipolarInteraction]
@@ -229,6 +229,18 @@
                     \operation{soloField(particle : Particle) : double[3]}
                     \operation{testField(particle : Particle) : double[3]}
                 \end{class}
+
+                \begin{class}[text width=\largeTextWidth]{InterEwaldReal}{0, -16}
+                    \inherit{AbstractEwaldReal}
+                    \operation{totalEnergy() : double}
+                    \operation{totalEnergyUsingField() : double}
+                    \operation{moveEnergy(old : Particle, new : Particle) : double}
+                    \operation{rotationEnergy(old : Particle, new : Particle) : double}
+                    \operation{exchangeEnergy(particle : Particle) : double}
+                    \operation{volumeChangeEnergy(dilation: double) : double}
+                    \operation{soloField(particle : Particle) : double[3]}
+                    \operation{testField(particle : Particle) : double[3]}
+                \end{class}
             \end{scope}
             
             \begin{scope}[shift={($(DipolarInteraction.south) + (-6.5 cm, -2 cm)$)}]
@@ -254,6 +266,23 @@
                 \end{class}
                 
                 \begin{class}[text width=\largeTextWidth]{EwaldReci}{0, -9}
+                    \inherit{AbstractEwaldReci}
+                    \operation{totalEnergy() : double}
+                    \operation{totalEnergyUsingField() : double}
+                    \operation{reset()}
+                    \operation{moveEnergy(old : Particle, new : Particle) : double}
+                    \operation{moveUpdate()}
+                    \operation{rotationEnergy(old : Particle, new : Particle) : double}
+                    \operation{rotationUpdate()}
+                    \operation{exchangeEnergy(particle : Particle) : double}
+                    \operation{exchangeUpdate()}
+                    \operation{volumeChangeEnergy(dilation: double) : double}
+                    \operation{volumeChangeUpdate()}
+                    \operation{soloField(particle : Particle) : double[3]}
+                    \operation{testField(particle : Particle) : double[3]}
+                \end{class}
+
+                \begin{class}[text width=\largeTextWidth]{InterEwaldReci}{0, -16}
                     \inherit{AbstractEwaldReci}
                     \operation{totalEnergy() : double}
                     \operation{totalEnergyUsingField() : double}
@@ -309,6 +338,23 @@
                     \operation{soloField(particle : Particle) : double[3]}
                     \operation{testField(particle : Particle) : double[3]}
                 \end{class}
+
+                \begin{class}[text width=\largeTextWidth]{InterDipolarLayerCorrection}{0, -16}
+                    \inherit{AbstractDipolarLayerCorrection}
+                    \operation{totalEnergy() : double}
+                    \operation{totalEnergyUsingField() : double}
+                    \operation{reset()}
+                    \operation{moveEnergy(old : Particle, new : Particle) : double}
+                    \operation{moveUpdate()}
+                    \operation{rotationEnergy(old : Particle, new : Particle) : double}
+                    \operation{rotationUpdate()}
+                    \operation{exchangeEnergy(particle : Particle) : double}
+                    \operation{exchangeUpdate()}
+                    \operation{volumeChangeEnergy(dilation: double) : double}
+                    \operation{volumeChangeUpdate()}
+                    \operation{soloField(particle : Particle) : double[3]}
+                    \operation{testField(particle : Particle) : double[3]}
+                \end{class}
             \end{scope}
             
             \begin{scope}[shift={($(DipolarInteraction.south) + (19.5 cm, -2 cm)$)}]
@@ -339,6 +385,7 @@
                     \operation{soloField(particle : Particle) : double[3]}
                     \operation{testField(particle : Particle) : double[3]}
                 \end{class}
+                
             \end{scope}
             
             \begin{scope}[shift={($(DipolarInteraction.south) + (32.5 cm, -2 cm)$)},
@@ -360,6 +407,18 @@
                 \end{class}
                 
                 \begin{class}[text width=\largeTextWidth]{EwaldBound}{0, -9}
+                    \inherit{AbstractEwaldBound}
+                    \operation{totalEnergy() : double}
+                    \operation{totalEnergyUsingField() : double}
+                    \operation{moveEnergy(old : Particle, new : Particle) : double}
+                    \operation{rotationEnergy(old : Particle, new : Particle) : double}
+                    \operation{exchangeEnergy(particle : Particle) : double}
+                    \operation{volumeChangeEnergy(dilation: double) : double}
+                    \operation{soloField(particle : Particle) : double[3]}
+                    \operation{testField(particle : Particle) : double[3]}
+                \end{class}
+
+                \begin{class}[text width=\largeTextWidth]{InterEwaldBound}{0, -16}
                     \inherit{AbstractEwaldBound}
                     \operation{totalEnergy() : double}
                     \operation{totalEnergyUsingField() : double}
@@ -403,7 +462,7 @@
                 \end{class}
             \end{scope}
 
-            \begin{scope}[shift={($(EwaldBound.south)!0.5!(FieldInteraction.south) + (0 cm, -2 cm)$)}]
+            \begin{scope}[shift={($(EwaldBound.south)!0.5!(FieldInteraction.south) + (0 cm, -4 cm)$)}]
                 \begin{abstractclass}[text width=\smallTextWidth]{AbstractTotalMoment}{0, 0}
                     \operation[0]{getTotalMoment() : double[3]}
                     \operation[0]{rotationUpdate()}
@@ -445,7 +504,6 @@
     \end{scope}
     
     \composition{AbstractDipolarInteraction}{box}{1}{AbstractBoxGeometry}
-    \composition{AbstractDipolarInteraction}{spheres}{1}{AbstractSpheres}
 
     \composition{AbstractEwaldBound}{totalMoment}{1}{AbstractTotalMoment}
     \composition{AbstractFieldInteraction}{totalMoment}{1}{AbstractTotalMoment}
