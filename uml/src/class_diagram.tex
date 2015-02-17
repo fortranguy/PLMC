@@ -87,20 +87,20 @@
     \begin{scope}[shift={($(Material.north) + (-15 cm, 15cm)$)}]
         
         \begin{scope}[local bounding box=ShortPotential]
-            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractShortInteraction}{0, 0}
+            \begin{abstractclass}[text width=\longTextWidth]{AbstractShortInteraction}{0, 0}
                 \operation{neighboursEnergy(particle : Particle, overlap : bool, enery : double)}
                 \operation[0]{totalEnergy() : double}
                 \operation{overlapTest()}
             \end{abstractclass}            
             \composition{AbstractShortInteraction}{box}{1}{AbstractBoxGeometry}
             
-            \begin{class}[text width=\mediumTextWidth]{IntraShortInteration}{0, -4}
+            \begin{class}[text width=\longTextWidth]{IntraShortInteration}{0, -4}
                 \inherit{AbstractShortInteraction}
                 \operation{totalEnergy() : double}
             \end{class}            
             \composition{IntraShortInteration}{spheres}{1}{AbstractSpheres}
             
-            \begin{class}[text width=\mediumTextWidth]{InterShortInteration}{0, -6}
+            \begin{class}[text width=\longTextWidth]{InterShortInteration}{0, -6}
                 \inherit{AbstractShortInteraction}
                 \operation{totalEnergy() : double}
             \end{class}
