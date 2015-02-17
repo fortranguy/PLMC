@@ -404,24 +404,40 @@
             \end{scope}
 
             \begin{scope}[shift={($(EwaldBound.south)!0.5!(FieldInteraction.south) + (0 cm, -2 cm)$)}]
-                \begin{abstractclass}[text width=\mediumTextWidth]{AbstractTotalMoment}{0, 0}
+                \begin{abstractclass}[text width=\smallTextWidth]{AbstractTotalMoment}{0, 0}
                     \operation[0]{getTotalMoment() : double[3]}
                     \operation[0]{rotationUpdate()}
                     \operation[0]{exchangeUpdate()}
                 \end{abstractclass}
 
-                \begin{class}[text width=\mediumTextWidth]{NullTotalMoment}{0, -3.5}
+                \begin{class}[text width=\smallTextWidth]{NullTotalMoment}{0, -3}
                     \inherit{AbstractTotalMoment}
                     \operation{getTotalMoment() : double[3]}
                     \operation{rotationUpdate()}
                     \operation{exchangeUpdate()}
                 \end{class}
 
-                \begin{class}[text width=\mediumTextWidth]{TotalMoment}{0, -6}
+                \begin{class}[text width=\smallTextWidth]{TotalMoment}{0, -5.5}
                     \inherit{AbstractTotalMoment}
                     \operation{getTotalMoment() : double[3]}
                     \operation{rotationUpdate()}
                     \operation{exchangeUpdate()}
+                \end{class}
+            \end{scope}
+
+            \begin{scope}[shift={($(EwaldBound.south)!0.5!(FieldInteraction.south) + (13 cm, -2 cm)$)}]
+                \begin{abstractclass}[text width=\smallTextWidth]{AbstractExternalField}{0, 0}
+                    \operation[0]{getTotalMoment() : double[3]}
+                \end{abstractclass}
+
+                \begin{class}[text width=\smallTextWidth]{ConstantExternalField}{0, -2.5}
+                    \inherit{AbstractExternalField}
+                    \operation{getTotalMoment() : double[3]}
+                \end{class}
+
+                \begin{class}[text width=\smallTextWidth]{NonUniformExternalField}{0, -4.5}
+                    \inherit{AbstractExternalField}
+                    \operation{getTotalMoment() : double[3]}
                 \end{class}
             \end{scope}
         
@@ -433,6 +449,7 @@
 
     \composition{AbstractEwaldBound}{totalMoment}{1}{AbstractTotalMoment}
     \composition{AbstractFieldInteraction}{totalMoment}{1}{AbstractTotalMoment}
+    \composition{AbstractFieldInteraction}{extField}{1}{AbstractExternalField}
 
     \composition{AbstractTotalMoment}{spheres}{1}{AbstractSpheres}
 
