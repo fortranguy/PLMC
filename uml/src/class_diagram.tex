@@ -62,9 +62,7 @@
                 \operation[0]{randomPosition() : double[3]}
                 \operation[0]{isInsideBox(position : double[3]) : bool}
                 \operation[0]{getAccessibleVolume() : double}
-            \end{abstractclass}            
-            \composition{AbstractBoxedSpheres}{spheres}{1}{AbstractSpheres}
-            \composition{AbstractBoxedSpheres}{box}{1}{AbstractBoxGeometry}
+            \end{abstractclass}
             
             \begin{class}[text width=\mediumTextWidth]{BulkBoxedSpheres}{0, -3}
                 \inherit{AbstractBoxedSpheres}
@@ -83,6 +81,9 @@
         
     \end{scope}
     
+    \composition{AbstractBoxedSpheres}{spheres}{1}{AbstractSpheres}
+    \composition{AbstractBoxedSpheres}{box}{1}{AbstractBoxGeometry}
+    
     %Short range interaction
     \begin{scope}[shift={($(Material.north) + (-15 cm, 15cm)$)}]
         
@@ -92,21 +93,53 @@
                 \operation[0]{totalEnergy() : double}
                 \operation{overlapTest()}
             \end{abstractclass}            
-            \composition{AbstractShortInteraction}{box}{1}{AbstractBoxGeometry}
             
             \begin{class}[text width=\longTextWidth]{IntraShortInteration}{0, -4}
                 \inherit{AbstractShortInteraction}
                 \operation{totalEnergy() : double}
             \end{class}            
-            \composition{IntraShortInteration}{spheres}{1}{AbstractSpheres}
             
             \begin{class}[text width=\longTextWidth]{InterShortInteration}{0, -6}
                 \inherit{AbstractShortInteraction}
                 \operation{totalEnergy() : double}
             \end{class}
-            \composition{InterShortInteration}{spheres}{2}{AbstractSpheres}
-            \composition{InterShortInteration}{interSpheres}{1}{AbstractInterSpheres}
         \end{scope}
+        
+        \begin{scope}[shift={($(ShortPotential.north) + (-12 cm, -5 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractNeighbourCells}{0, 0}
+                \operation{fill()}
+                \operation{index(position : double[3]) : int}
+                \operation[0]{bounds(iCell : int) : int[2]}
+                \operation{toBegin()}
+                \operation{add(iSphere : int, iCell : int)}
+                \operation{remove(iSphere : int, iCell : int)}
+            \end{abstractclass}
+            
+            \begin{class}[text width=\mediumTextWidth]{BulkNeighbourCells}{0, -5}
+                \inherit{AbstractNeighbourCells}
+                \operation{bounds(iCell : int) : int[2]}
+            \end{class}
+            
+            \begin{class}[text width=\mediumTextWidth]{SlabNeighbourCells}{0, -7}
+                \inherit{AbstractNeighbourCells}
+                \operation{bounds(iCell : int) : int[2]}
+            \end{class}
+        \end{scope}
+        
+        \begin{scope}[shift={($(ShortPotential.north) + (12 cm, -5 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractPairPotential}{0, 0}
+                \operation[0]{potential(distance : double) : double}
+            \end{abstractclass}
+        \end{scope}
+        
     \end{scope}
+    
+    \composition{AbstractShortInteraction}{box}{1}{AbstractBoxGeometry}
+    \composition{IntraShortInteration}{spheres}{1}{AbstractSpheres}
+    \composition{InterShortInteration}{spheres}{2}{AbstractSpheres}
+    \composition{InterShortInteration}{interSpheres}{1}{AbstractInterSpheres}
+    
+    \composition{AbstractNeighbourCells}{box}{1}{AbstractBoxGeometry}
+    \composition{AbstractNeighbourCells}{box}{1}{AbstractSpheres}
 
 \end{tikzpicture}
