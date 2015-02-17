@@ -85,7 +85,7 @@
     \composition{AbstractBoxedSpheres}{spheres}{1}{AbstractSpheres}
     \composition{AbstractBoxedSpheres}{box}{1}{AbstractBoxGeometry}
     
-    \begin{scope}[shift={($(Material.north) + (-23 cm, 17cm)$)}]
+    \begin{scope}[shift={($(Material.north) + (-20 cm, 30cm)$)}]
         \begin{package}{Short range interaction}
         
             \begin{scope}[local bounding box=ShortInteraction]
@@ -109,7 +109,7 @@
                 \end{class}
             \end{scope}
             
-            \begin{scope}[shift={($(ShortInteraction.north) + (-11 cm, -5 cm)$)}]
+            \begin{scope}[shift={($(ShortInteraction.south) + (-5 cm, -2 cm)$)}]
                 \begin{abstractclass}[text width=\mediumTextWidth]{AbstractNeighbourCells}{0, 0}
                     \operation{fill()}
                     \operation{index(position : double[3]) : int}
@@ -130,7 +130,7 @@
                 \end{class}
             \end{scope}
             
-            \begin{scope}[shift={($(ShortInteraction.north) + (11 cm, -5 cm)$)}]
+            \begin{scope}[shift={($(ShortInteraction.south) + (5 cm, -2 cm)$)}]
                 \begin{abstractclass}[text width=\mediumTextWidth]{AbstractPairPotential}{0, 0}
                     \operation[0]{potential(distance : double) : double}
                 \end{abstractclass}
@@ -341,7 +341,8 @@
                 \end{class}
             \end{scope}
             
-            \begin{scope}[shift={($(DipolarInteraction.south) + (32.5 cm, -2 cm)$)}]
+            \begin{scope}[shift={($(DipolarInteraction.south) + (32.5 cm, -2 cm)$)},
+                local bounding box=EwaldBound]
                 \begin{abstractclass}[text width=\largeTextWidth]{AbstractEwaldBound}{0, 0}
                     \inherit{AbstractDipolarInteraction}
                 \end{abstractclass}
@@ -371,15 +372,8 @@
                 \end{class}
             \end{scope}
 
-            \begin{scope}[shift={($(DipolarInteraction.south) + (43 cm, -2 cm)$)}]
-                \begin{abstractclass}[text width=\mediumTextWidth]{AbstractTotalMoment}{0, 0}
-                    \operation[0]{getTotalMoment() : double[3]}
-                    \operation[0]{rotationUpdate()}
-                    \operation[0]{exchangeUpdate()}
-                \end{abstractclass}
-            \end{scope}
-
-            \begin{scope}[shift={($(DipolarInteraction.south) + (50 cm, -2 cm)$)}]
+            \begin{scope}[shift={($(DipolarInteraction.south) + (45.5 cm, -2 cm)$)},
+                local bounding box=FieldInteraction]
                 \begin{abstractclass}[text width=\largeTextWidth]{AbstractFieldInteraction}{0, 0}
                     \inherit{AbstractDipolarInteraction}
                 \end{abstractclass}
@@ -408,11 +402,38 @@
                     \operation{testField(particle : Particle) : double[3]}
                 \end{class}
             \end{scope}
+
+            \begin{scope}[shift={($(EwaldBound.south)!0.5!(FieldInteraction.south) + (0 cm, -2 cm)$)}]
+                \begin{abstractclass}[text width=\mediumTextWidth]{AbstractTotalMoment}{0, 0}
+                    \operation[0]{getTotalMoment() : double[3]}
+                    \operation[0]{rotationUpdate()}
+                    \operation[0]{exchangeUpdate()}
+                \end{abstractclass}
+
+                \begin{class}[text width=\mediumTextWidth]{NullTotalMoment}{0, -3.5}
+                    \inherit{AbstractTotalMoment}
+                    \operation{getTotalMoment() : double[3]}
+                    \operation{rotationUpdate()}
+                    \operation{exchangeUpdate()}
+                \end{class}
+
+                \begin{class}[text width=\mediumTextWidth]{TotalMoment}{0, -6}
+                    \inherit{AbstractTotalMoment}
+                    \operation{getTotalMoment() : double[3]}
+                    \operation{rotationUpdate()}
+                    \operation{exchangeUpdate()}
+                \end{class}
+            \end{scope}
         
         \end{package}
     \end{scope}
     
     \composition{AbstractDipolarInteraction}{box}{1}{AbstractBoxGeometry}
     \composition{AbstractDipolarInteraction}{spheres}{1}{AbstractSpheres}
+
+    \composition{AbstractEwaldBound}{totalMoment}{1}{AbstractTotalMoment}
+    \composition{AbstractFieldInteraction}{totalMoment}{1}{AbstractTotalMoment}
+
+    \composition{AbstractTotalMoment}{spheres}{1}{AbstractSpheres}
 
 \end{tikzpicture}
