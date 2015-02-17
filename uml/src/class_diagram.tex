@@ -52,7 +52,7 @@
                 \operation{getDiameter() : double}
             \end{abstractclass}
             
-            \begin{class}[text width=\smallTextWidth]{InterSpheres}{0, -4}
+            \begin{class}[text width=\smallTextWidth]{InterSpheres}{0, -3}
                 \inherit{AbstractInterSpheres}
             \end{class}
         \end{scope}
@@ -91,17 +91,20 @@
             \begin{abstractclass}[text width=\longTextWidth]{AbstractShortInteraction}{0, 0}
                 \operation{neighboursEnergy(particle : Particle, overlap : bool, enery : double)}
                 \operation[0]{totalEnergy() : double}
+                \operation[0]{volumeChangeEnergy(dilation: double) : double}
                 \operation{overlapTest()}
             \end{abstractclass}            
             
-            \begin{class}[text width=\longTextWidth]{IntraShortInteration}{0, -4}
+            \begin{class}[text width=\longTextWidth]{IntraShortInteration}{0, -3.5}
                 \inherit{AbstractShortInteraction}
                 \operation{totalEnergy() : double}
+                \operation{volumeChangeEnergy(dilation: double) : double}
             \end{class}            
             
             \begin{class}[text width=\longTextWidth]{InterShortInteration}{0, -6}
                 \inherit{AbstractShortInteraction}
                 \operation{totalEnergy() : double}
+                \operation{volumeChangeEnergy(dilation: double) : double}
             \end{class}
         \end{scope}
         
@@ -115,12 +118,12 @@
                 \operation{remove(iSphere : int, iCell : int)}
             \end{abstractclass}
             
-            \begin{class}[text width=\mediumTextWidth]{BulkNeighbourCells}{0, -5}
+            \begin{class}[text width=\mediumTextWidth]{BulkNeighbourCells}{0, -4.5}
                 \inherit{AbstractNeighbourCells}
                 \operation{bounds(iCell : int) : int[2]}
             \end{class}
             
-            \begin{class}[text width=\mediumTextWidth]{SlabNeighbourCells}{0, -7}
+            \begin{class}[text width=\mediumTextWidth]{SlabNeighbourCells}{0, -6.5}
                 \inherit{AbstractNeighbourCells}
                 \operation{bounds(iCell : int) : int[2]}
             \end{class}
@@ -131,12 +134,12 @@
                 \operation[0]{potential(distance : double) : double}
             \end{abstractclass}
             
-            \begin{class}[text width=\mediumTextWidth]{LJpairPotential}{0, -3}
+            \begin{class}[text width=\mediumTextWidth]{LJpairPotential}{0, -2.5}
                 \inherit{AbstractPairPotential}
                 \operation{potential(distance : double) : double}
             \end{class}
             
-            \begin{class}[text width=\mediumTextWidth]{HardPairPotential}{0, -5}
+            \begin{class}[text width=\mediumTextWidth]{HardPairPotential}{0, -4.5}
                 \inherit{AbstractPairPotential}
                 \operation{potential(distance : double) : double}
             \end{class}
