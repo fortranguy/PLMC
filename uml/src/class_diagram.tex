@@ -4,8 +4,8 @@
     \pgfmathsetmacro{\mediumTextWidth}{7 cm}
     \pgfmathsetmacro{\longTextWidth}{11 cm}
     
-    % Physical objects
-    \begin{scope}
+    % Material
+    \begin{scope}[local bounding box=Material]
     
         \begin{scope}[local bounding box=Spheres]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractSpheres}{0, 0}
@@ -62,8 +62,7 @@
                 \operation[0]{randomPosition() : double[3]}
                 \operation[0]{isInsideBox(position : double[3]) : bool}
                 \operation[0]{getAccessibleVolume() : double}
-            \end{abstractclass}
-            
+            \end{abstractclass}            
             \composition{AbstractBoxedSpheres}{spheres}{1}{AbstractSpheres}
             \composition{AbstractBoxedSpheres}{box}{1}{AbstractBoxGeometry}
             
@@ -82,6 +81,32 @@
             \end{class}
         \end{scope}
         
+    \end{scope}
+    
+    %Short range interaction
+    \begin{scope}[shift={($(Material.north) + (-15 cm, 15cm)$)}]
+        
+        \begin{scope}[local bounding box=ShortPotential]
+            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractShortInteraction}{0, 0}
+                \operation{neighboursEnergy(particle : Particle, overlap : bool, enery : double)}
+                \operation[0]{totalEnergy() : double}
+                \operation{overlapTest()}
+            \end{abstractclass}            
+            \composition{AbstractShortInteraction}{box}{1}{AbstractBoxGeometry}
+            
+            \begin{class}[text width=\mediumTextWidth]{IntraShortInteration}{0, -4}
+                \inherit{AbstractShortInteraction}
+                \operation{totalEnergy() : double}
+            \end{class}            
+            \composition{IntraShortInteration}{spheres}{1}{AbstractSpheres}
+            
+            \begin{class}[text width=\mediumTextWidth]{InterShortInteration}{0, -6}
+                \inherit{AbstractShortInteraction}
+                \operation{totalEnergy() : double}
+            \end{class}
+            \composition{InterShortInteration}{spheres}{2}{AbstractSpheres}
+            \composition{InterShortInteration}{interSpheres}{1}{AbstractInterSpheres}
+        \end{scope}
     \end{scope}
 
 \end{tikzpicture}
