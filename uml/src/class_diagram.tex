@@ -1,5 +1,6 @@
 \begin{tikzpicture}
     
+    \pgfmathsetmacro{\smallTextWidth}{4 cm}
     \pgfmathsetmacro{\mediumTextWidth}{6 cm}
     \pgfmathsetmacro{\longTextWidth}{11 cm}
     
@@ -25,7 +26,7 @@
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(Spheres.north) - (10 cm, 0)$)}]
+        \begin{scope}[shift={($(Spheres.north) - (11 cm, 0)$)}]
             \begin{abstractclass}[text width=\longTextWidth]{AbstractBoxGeometry}{0, 0}
                 \operation{getSize() : double[3]}
                 \operation{getWave() : int[3]}
@@ -41,6 +42,17 @@
             \begin{class}[text width=\longTextWidth]{SlabGeometry}{0, -6}
                 \inherit{AbstractBoxGeometry}
                 \operation{vectorPBC(position1 : double[3], position2 : double[3]) : double[3]}
+            \end{class}
+        \end{scope}
+        
+        \begin{scope}[shift={($(Spheres.north) + (7 cm, 0)$)}]
+            \begin{abstractclass}[text width=\smallTextWidth]{AbstractInterSpheres}{0, 0}
+                \operation{getName() : String}
+                \operation{getDiameter() : double}
+            \end{abstractclass}
+            
+            \begin{class}[text width=\smallTextWidth]{InterSpheres}{0, -4}
+                \inherit{AbstractInterSpheres}
             \end{class}
         \end{scope}
         
