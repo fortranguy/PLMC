@@ -59,7 +59,7 @@
         
         \begin{scope}[shift={($(Spheres.north)!0.5!(BoxGeometry.north) + (0 cm, 10)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractBoxedSpheres}{0, 0}
-                \operation[0]{randomPositon() : double[3]}
+                \operation[0]{randomPosition() : double[3]}
                 \operation[0]{isInsideBox(position : double[3]) : bool}
                 \operation[0]{getAccessibleVolume() : double}
             \end{abstractclass}
@@ -69,14 +69,14 @@
             
             \begin{class}[text width=\mediumTextWidth]{BulkBoxedSpheres}{0, -3}
                 \inherit{AbstractBoxedSpheres}
-                \operation{randomPositon() : double[3]}
+                \operation{randomPosition() : double[3]}
                 \operation{isInsideBox(position : double[3]) : bool}
                 \operation{getAccessibleVolume() : double}
             \end{class}
             
             \begin{class}[text width=\mediumTextWidth]{SlabBoxedSpheres}{0, -6}
                 \inherit{AbstractBoxedSpheres}
-                \operation{randomPositon() : double[3]}
+                \operation{randomPosition() : double[3]}
                 \operation{isInsideBox(position : double[3]) : bool}
                 \operation{getAccessibleVolume() : double}
             \end{class}
