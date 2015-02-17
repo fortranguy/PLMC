@@ -1,28 +1,49 @@
 \begin{tikzpicture}
-
-    \pgfmathsetmacro{\middleTextWidth}{6cm}
     
-    \pgfmathsetmacro{\AbstractSpheresX}{0}
-    \pgfmathsetmacro{\AbstractSpheresY}{0}
-    \begin{abstractclass}[text width=\middleTextWidth]{AbstractSpheres}
-    {\AbstractSpheresX, \AbstractSpheresY}
-        \operation{getName() : String}
-        \operation{getNum() : int}
-        \operation{getDiameter() : double}
-        \operation{getPosition(iSphere : int) : double[3]}
-        \operation[0]{getMoment(iSphere : int) : double[3]}
-    \end{abstractclass}
+    \pgfmathsetmacro{\mediumTextWidth}{6 cm}
+    \pgfmathsetmacro{\longTextWidth}{11 cm}
     
-    \begin{class}[text width=\middleTextWidth]{ApolarSpheres}
-    {\AbstractSpheresX, \AbstractSpheresY-4}
-        \inherit{AbstractSpheres}
-        \operation{getMoment(iSphere : int) : double[3]}
-    \end{class}
+    \begin{scope}
     
-    \begin{class}[text width=\middleTextWidth]{DipolarSpheres}
-    {\AbstractSpheresX, \AbstractSpheresY-6}
-        \inherit{AbstractSpheres}
-        \operation{getMoment(iSphere : int) : double[3]}
-    \end{class}
+        \begin{scope}[local bounding box=Spheres]
+            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractSpheres}{0, 0}
+                \operation{getName() : String}
+                \operation{getNum() : int}
+                \operation{getDiameter() : double}
+                \operation{getPosition(iSphere : int) : double[3]}
+                \operation[0]{getMoment(iSphere : int) : double[3]}
+            \end{abstractclass}
+            
+            \begin{class}[text width=\mediumTextWidth]{ApolarSpheres}{0, -4}
+                \inherit{AbstractSpheres}
+                \operation{getMoment(iSphere : int) : double[3]}
+            \end{class}
+            
+            \begin{class}[text width=\mediumTextWidth]{DipolarSpheres}{0, -6}
+                \inherit{AbstractSpheres}
+                \operation{getMoment(iSphere : int) : double[3]}
+            \end{class}
+        \end{scope}
+        
+        \begin{scope}[shift={($(Spheres.north) - (10 cm, 0)$)}]
+            \begin{abstractclass}[text width=\longTextWidth]{AbstractBoxGeometry}{0, 0}
+                \operation{getSize() : double[3]}
+                \operation{getWave() : int[3]}
+                \operation[0]{vectorPBC(position1 : double[3], position2 : double[3]) : double[3]}
+                \operation{distancePBC(position1 : double[3], position2 : double[3]) : double}
+            \end{abstractclass}
+            
+            \begin{class}[text width=\longTextWidth]{BulkGeometry}{0, -4}
+                \inherit{AbstractBoxGeometry}
+                \operation{vectorPBC(position1 : double[3], position2 : double[3]) : double[3]}
+            \end{class}
+            
+            \begin{class}[text width=\longTextWidth]{SlabGeometry}{0, -6}
+                \inherit{AbstractBoxGeometry}
+                \operation{vectorPBC(position1 : double[3], position2 : double[3]) : double[3]}
+            \end{class}
+        \end{scope}
+        
+    \end{scope}
 
 \end{tikzpicture}
