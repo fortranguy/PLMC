@@ -163,27 +163,6 @@
         \begin{package}{Dipolar interaction}
         
             \begin{scope}[local bounding box=DipolarInteraction]
-                \begin{abstractclass}[text width=\largeTextWidth]{AbstractDipolarInteraction}{0, 0}
-                    \operation[0]{totalEnergy() : double}
-                    \operation[0]{totalEnergyUsingField() : double}
-                    \operation[0]{moveEnergy(old : Particle, new : Particle) : double}
-                    \operation[0]{rotationEnergy(old : Particle, new : Particle) : double}
-                    \operation[0]{exchangeEnergy(particle : Particle) : double}
-                    \operation[0]{volumeChangeEnergy(dilation: double) : double}
-                    \operation[0]{soloField(particle : Particle)}
-                    \operation[0]{testField(particle : Particle)}
-                \end{abstractclass}
-                
-                \begin{abstractclass}[text width=\largeTextWidth]{AbstractReciInteraction}{0, -6}
-                    \inherit{AbstractDipolarInteraction}
-                    \operation[0]{reset()}
-                    \operation[0]{countWaveVectors()}
-                    \operation[0]{moveUpdate()}
-                    \operation[0]{rotationUpdate()}
-                    \operation[0]{exchangeUpdate()}
-                    \operation[0]{volumeChangeUpdate()}
-                \end{abstractclass}
-                
                 \begin{class}[text width=\largeTextWidth]{DipolarInteractionFacade}{0, 8}
                     \operation{totalEnergy() : double}
                     \operation{totalEnergyUsingField() : double}
@@ -196,9 +175,70 @@
                     \operation{exchangeUpdate()}
                     \operation{volumeChangeEnergy(dilation: double) : double}
                     \operation{volumeChangeUpdate()}
-                    \operation{soloField(particle : Particle)}
-                    \operation{testField(particle : Particle)}
-                \end{class}                
+                    \operation{soloField(particle : Particle) : double[3]}
+                    \operation{testField(particle : Particle) : double[3]}
+                \end{class}
+                
+                \begin{abstractclass}[text width=\largeTextWidth]{AbstractDipolarInteraction}{0, 0}
+                    \operation[0]{totalEnergy() : double}
+                    \operation[0]{totalEnergyUsingField() : double}
+                    \operation[0]{moveEnergy(old : Particle, new : Particle) : double}
+                    \operation[0]{rotationEnergy(old : Particle, new : Particle) : double}
+                    \operation[0]{exchangeEnergy(particle : Particle) : double}
+                    \operation[0]{volumeChangeEnergy(dilation: double) : double}
+                    \operation[0]{soloField(particle : Particle) : double[3]}
+                    \operation[0]{testField(particle : Particle) : double[3]}
+                \end{abstractclass}
+                
+                \begin{abstractclass}[text width=\largeTextWidth]{AbstractReciInteraction}{0, -6}
+                    \inherit{AbstractDipolarInteraction}
+                    \operation[0]{reset()}
+                    \operation[0]{countWaveVectors()}
+                    \operation[0]{moveUpdate()}
+                    \operation[0]{rotationUpdate()}
+                    \operation[0]{exchangeUpdate()}
+                    \operation[0]{volumeChangeUpdate()}
+                \end{abstractclass}           
+            \end{scope}
+            
+            \begin{scope}[shift={($(DipolarInteraction.south) + (-7 cm, -2 cm)$)}]
+                \begin{abstractclass}[text width=\largeTextWidth]{AbstractEwaldReci}{0, 0}
+                    \inherit{AbstractReciInteraction}
+                \end{abstractclass}
+                
+                \begin{class}[text width=\largeTextWidth]{NullEwaldReci}{0, -2}
+                    \inherit{AbstractEwaldReci}
+                    \operation{totalEnergy() : double}
+                    \operation{totalEnergyUsingField() : double}
+                    \operation{reset()}
+                    \operation{moveEnergy(old : Particle, new : Particle) : double}
+                    \operation{moveUpdate()}
+                    \operation{rotationEnergy(old : Particle, new : Particle) : double}
+                    \operation{rotationUpdate()}
+                    \operation{exchangeEnergy(particle : Particle) : double}
+                    \operation{exchangeUpdate()}
+                    \operation{volumeChangeEnergy(dilation: double) : double}
+                    \operation{volumeChangeUpdate()}
+                    \operation{soloField(particle : Particle) : double[3]}
+                    \operation{testField(particle : Particle) : double[3]}
+                \end{class}
+                
+                \begin{class}[text width=\largeTextWidth]{EwaldReci}{0, -9}
+                    \inherit{AbstractEwaldReci}
+                    \operation{totalEnergy() : double}
+                    \operation{totalEnergyUsingField() : double}
+                    \operation{reset()}
+                    \operation{moveEnergy(old : Particle, new : Particle) : double}
+                    \operation{moveUpdate()}
+                    \operation{rotationEnergy(old : Particle, new : Particle) : double}
+                    \operation{rotationUpdate()}
+                    \operation{exchangeEnergy(particle : Particle) : double}
+                    \operation{exchangeUpdate()}
+                    \operation{volumeChangeEnergy(dilation: double) : double}
+                    \operation{volumeChangeUpdate()}
+                    \operation{soloField(particle : Particle) : double[3]}
+                    \operation{testField(particle : Particle) : double[3]}
+                \end{class}
             \end{scope}
         
         \end{package}
