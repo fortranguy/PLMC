@@ -1,9 +1,10 @@
 \begin{tikzpicture}
     
-    \pgfmathsetmacro{\smallTextWidth}{4 cm}
-    \pgfmathsetmacro{\mediumTextWidth}{6 cm}
+    \pgfmathsetmacro{\smallTextWidth}{5 cm}
+    \pgfmathsetmacro{\mediumTextWidth}{7 cm}
     \pgfmathsetmacro{\longTextWidth}{11 cm}
     
+    % Physical objects
     \begin{scope}
     
         \begin{scope}[local bounding box=Spheres]
@@ -26,7 +27,7 @@
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(Spheres.north) - (11 cm, 0)$)}]
+        \begin{scope}[shift={($(Spheres.north) - (11 cm, 0)$)}, local bounding box=BoxGeometry]
             \begin{abstractclass}[text width=\longTextWidth]{AbstractBoxGeometry}{0, 0}
                 \operation{getSize() : double[3]}
                 \operation{getWave() : int[3]}
@@ -45,7 +46,7 @@
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(Spheres.north) + (7 cm, 0)$)}]
+        \begin{scope}[shift={($(Spheres.north) + (8 cm, 0)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{AbstractInterSpheres}{0, 0}
                 \operation{getName() : String}
                 \operation{getDiameter() : double}
@@ -53,6 +54,31 @@
             
             \begin{class}[text width=\smallTextWidth]{InterSpheres}{0, -4}
                 \inherit{AbstractInterSpheres}
+            \end{class}
+        \end{scope}
+        
+        \begin{scope}[shift={($(Spheres.north)!0.5!(BoxGeometry.north) + (0 cm, 10)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractBoxedSpheres}{0, 0}
+                \operation[0]{randomPositon() : double[3]}
+                \operation[0]{isInsideBox(position : double[3]) : bool}
+                \operation[0]{getAccessibleVolume() : double}
+            \end{abstractclass}
+            
+            \composition{AbstractBoxedSpheres}{}{}{AbstractSpheres}
+            \composition{AbstractBoxedSpheres}{}{}{AbstractBoxGeometry}
+            
+            \begin{class}[text width=\mediumTextWidth]{BulkBoxedSpheres}{0, -3}
+                \inherit{AbstractBoxedSpheres}
+                \operation{randomPositon() : double[3]}
+                \operation{isInsideBox(position : double[3]) : bool}
+                \operation{getAccessibleVolume() : double}
+            \end{class}
+            
+            \begin{class}[text width=\mediumTextWidth]{SlabBoxedSpheres}{0, -6}
+                \inherit{AbstractBoxedSpheres}
+                \operation{randomPositon() : double[3]}
+                \operation{isInsideBox(position : double[3]) : bool}
+                \operation{getAccessibleVolume() : double}
             \end{class}
         \end{scope}
         
