@@ -57,15 +57,15 @@
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(Spheres.north)!0.5!(BoxGeometry.north) + (0 cm, 10)$)}]
+        \begin{scope}[shift={($(Spheres.north)!0.5!(BoxGeometry.north) + (0 cm, 11 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractBoxedSpheres}{0, 0}
                 \operation[0]{randomPosition() : double[3]}
                 \operation[0]{isInsideBox(position : double[3]) : bool}
                 \operation[0]{getAccessibleVolume() : double}
             \end{abstractclass}
             
-            \composition{AbstractBoxedSpheres}{}{}{AbstractSpheres}
-            \composition{AbstractBoxedSpheres}{}{}{AbstractBoxGeometry}
+            \composition{AbstractBoxedSpheres}{spheres}{1}{AbstractSpheres}
+            \composition{AbstractBoxedSpheres}{box}{1}{AbstractBoxGeometry}
             
             \begin{class}[text width=\mediumTextWidth]{BulkBoxedSpheres}{0, -3}
                 \inherit{AbstractBoxedSpheres}
