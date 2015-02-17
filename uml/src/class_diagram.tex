@@ -85,7 +85,7 @@
     \composition{AbstractBoxedSpheres}{box}{1}{AbstractBoxGeometry}
     
     %Short range interaction
-    \begin{scope}[shift={($(Material.north) + (-15 cm, 15cm)$)}]
+    \begin{scope}[shift={($(Material.north) + (-23 cm, 17cm)$)}]
         
         \begin{scope}[local bounding box=ShortPotential]
             \begin{abstractclass}[text width=\longTextWidth]{AbstractShortInteraction}{0, 0}
@@ -105,7 +105,7 @@
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(ShortPotential.north) + (-12 cm, -5 cm)$)}]
+        \begin{scope}[shift={($(ShortPotential.north) + (-11 cm, -5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractNeighbourCells}{0, 0}
                 \operation{fill()}
                 \operation{index(position : double[3]) : int}
@@ -126,7 +126,7 @@
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(ShortPotential.north) + (12 cm, -5 cm)$)}]
+        \begin{scope}[shift={($(ShortPotential.north) + (11 cm, -5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractPairPotential}{0, 0}
                 \operation[0]{potential(distance : double) : double}
             \end{abstractclass}
