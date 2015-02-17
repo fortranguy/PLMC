@@ -130,11 +130,23 @@
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractPairPotential}{0, 0}
                 \operation[0]{potential(distance : double) : double}
             \end{abstractclass}
+            
+            \begin{class}[text width=\mediumTextWidth]{LJpairPotential}{0, -3}
+                \inherit{AbstractPairPotential}
+                \operation{potential(distance : double) : double}
+            \end{class}
+            
+            \begin{class}[text width=\mediumTextWidth]{HardPairPotential}{0, -5}
+                \inherit{AbstractPairPotential}
+                \operation{potential(distance : double) : double}
+            \end{class}
         \end{scope}
         
     \end{scope}
     
     \composition{AbstractShortInteraction}{box}{1}{AbstractBoxGeometry}
+    \composition{AbstractShortInteraction}{neighbourCells}{1}{AbstractNeighbourCells}
+    \composition{AbstractShortInteraction}{pairPotential}{1}{AbstractPairPotential}
     \composition{IntraShortInteration}{spheres}{1}{AbstractSpheres}
     \composition{InterShortInteration}{spheres}{2}{AbstractSpheres}
     \composition{InterShortInteration}{interSpheres}{1}{AbstractInterSpheres}
