@@ -1,0 +1,28 @@
+\begin{tikzpicture}
+
+    \pgfmathsetmacro{\middleTextWidth}{6cm}
+    
+    \pgfmathsetmacro{\AbstractSpheresX}{0}
+    \pgfmathsetmacro{\AbstractSpheresY}{0}
+    \begin{abstractclass}[text width=\middleTextWidth]{AbstractSpheres}
+    {\AbstractSpheresX, \AbstractSpheresY}
+        \operation{getName() : String}
+        \operation{getNum() : int}
+        \operation{getDiameter() : double}
+        \operation{getPosition(iSphere : int) : double[3]}
+        \operation[0]{getMoment(iSphere : int) : double[3]}
+    \end{abstractclass}
+    
+    \begin{class}[text width=\middleTextWidth]{ApolarSpheres}
+    {\AbstractSpheresX, \AbstractSpheresY-4}
+        \inherit{AbstractSpheres}
+        \operation{getMoment(iSphere : int) : double[3]}
+    \end{class}
+    
+    \begin{class}[text width=\middleTextWidth]{DipolarSpheres}
+    {\AbstractSpheresX, \AbstractSpheresY-6}
+        \inherit{AbstractSpheres}
+        \operation{getMoment(iSphere : int) : double[3]}
+    \end{class}
+
+\end{tikzpicture}
