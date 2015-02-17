@@ -2,7 +2,7 @@
     
     \pgfmathsetmacro{\smallTextWidth}{5 cm}
     \pgfmathsetmacro{\mediumTextWidth}{7 cm}
-    \pgfmathsetmacro{\longTextWidth}{11 cm}
+    \pgfmathsetmacro{\largeTextWidth}{11 cm}
     
     \begin{scope}[local bounding box=Material]
         \begin{package}{Material}
@@ -28,19 +28,19 @@
             \end{scope}
             
             \begin{scope}[shift={($(Spheres.north) - (11 cm, 0)$)}, local bounding box=BoxGeometry]
-                \begin{abstractclass}[text width=\longTextWidth]{AbstractBoxGeometry}{0, 0}
+                \begin{abstractclass}[text width=\largeTextWidth]{AbstractBoxGeometry}{0, 0}
                     \operation{getSize() : double[3]}
                     \operation{getWave() : int[3]}
                     \operation[0]{vectorPBC(position1 : double[3], position2 : double[3]) : double[3]}
                     \operation{distancePBC(position1 : double[3], position2 : double[3]) : double}
                 \end{abstractclass}
                 
-                \begin{class}[text width=\longTextWidth]{BulkGeometry}{0, -4}
+                \begin{class}[text width=\largeTextWidth]{BulkGeometry}{0, -4}
                     \inherit{AbstractBoxGeometry}
                     \operation{vectorPBC(position1 : double[3], position2 : double[3]) : double[3]}
                 \end{class}
                 
-                \begin{class}[text width=\longTextWidth]{SlabGeometry}{0, -6}
+                \begin{class}[text width=\largeTextWidth]{SlabGeometry}{0, -6}
                     \inherit{AbstractBoxGeometry}
                     \operation{vectorPBC(position1 : double[3], position2 : double[3]) : double[3]}
                 \end{class}
@@ -88,28 +88,28 @@
     \begin{scope}[shift={($(Material.north) + (-23 cm, 17cm)$)}]
         \begin{package}{Short range interaction}
         
-            \begin{scope}[local bounding box=ShortPotential]
-                \begin{abstractclass}[text width=\longTextWidth]{AbstractShortInteraction}{0, 0}
+            \begin{scope}[local bounding box=ShortInteraction]
+                \begin{abstractclass}[text width=\largeTextWidth]{AbstractShortInteraction}{0, 0}
                     \operation{neighboursEnergy(particle : Particle, overlap : bool, enery : double)}
                     \operation[0]{totalEnergy() : double}
                     \operation[0]{volumeChangeEnergy(dilation: double) : double}
                     \operation{overlapTest()}
                 \end{abstractclass}            
                 
-                \begin{class}[text width=\longTextWidth]{IntraShortInteration}{0, -3.5}
+                \begin{class}[text width=\largeTextWidth]{IntraShortInteration}{0, -3.5}
                     \inherit{AbstractShortInteraction}
                     \operation{totalEnergy() : double}
                     \operation{volumeChangeEnergy(dilation: double) : double}
                 \end{class}            
                 
-                \begin{class}[text width=\longTextWidth]{InterShortInteration}{0, -6}
+                \begin{class}[text width=\largeTextWidth]{InterShortInteration}{0, -6}
                     \inherit{AbstractShortInteraction}
                     \operation{totalEnergy() : double}
                     \operation{volumeChangeEnergy(dilation: double) : double}
                 \end{class}
             \end{scope}
             
-            \begin{scope}[shift={($(ShortPotential.north) + (-11 cm, -5 cm)$)}]
+            \begin{scope}[shift={($(ShortInteraction.north) + (-11 cm, -5 cm)$)}]
                 \begin{abstractclass}[text width=\mediumTextWidth]{AbstractNeighbourCells}{0, 0}
                     \operation{fill()}
                     \operation{index(position : double[3]) : int}
@@ -130,7 +130,7 @@
                 \end{class}
             \end{scope}
             
-            \begin{scope}[shift={($(ShortPotential.north) + (11 cm, -5 cm)$)}]
+            \begin{scope}[shift={($(ShortInteraction.north) + (11 cm, -5 cm)$)}]
                 \begin{abstractclass}[text width=\mediumTextWidth]{AbstractPairPotential}{0, 0}
                     \operation[0]{potential(distance : double) : double}
                 \end{abstractclass}
@@ -157,6 +157,38 @@
     \composition{InterShortInteration}{interSpheres}{1}{AbstractInterSpheres}
     
     \composition{AbstractNeighbourCells}{box}{1}{AbstractBoxGeometry}
-    \composition{AbstractNeighbourCells}{box}{1}{AbstractSpheres}
+    \composition{AbstractNeighbourCells}{spheres}{1}{AbstractSpheres}
+    
+    \begin{scope}[shift={($(Material.north) + (25 cm, 20cm)$)}]
+        \begin{package}{Dipolar interaction}
+        
+            \begin{scope}[local bounding box=DipolarInteraction]
+                \begin{abstractclass}[text width=\largeTextWidth]{AbstractDipolarInteraction}{0, 0}
+                    \operation[0]{totalEnergy() : double}
+                    \operation[0]{totalEnergyUsingField() : double}
+                    \operation[0]{moveEnergy(old : Particle, new : Particle) : double}
+                    \operation[0]{rotationEnergy(old : Particle, new : Particle) : double}
+                    \operation[0]{exchangeEnergy(particle : Particle) : double}
+                    \operation[0]{volumeChangeEnergy(dilation: double) : double}
+                    \operation[0]{soloField(particle : Particle)}
+                    \operation[0]{testField(particle : Particle)}
+                \end{abstractclass}
+                
+                \begin{abstractclass}[text width=\largeTextWidth]{AbstractReciInteraction}{0, -6}
+                    \inherit{AbstractDipolarInteraction}
+                    \operation[0]{reset()}
+                    %\operation[0]{countWaveVectors()}
+                    \operation[0]{moveUpdate()}
+                    \operation[0]{rotationUpdate()}
+                    \operation[0]{exchangeUpdate()}
+                    \operation[0]{volumeChangeUpdate()}
+                \end{abstractclass}
+            \end{scope}
+        
+        \end{package}
+    \end{scope}
+    
+    \composition{AbstractDipolarInteraction}{box}{1}{AbstractBoxGeometry}
+    \composition{AbstractDipolarInteraction}{spheres}{1}{AbstractSpheres}
 
 \end{tikzpicture}
