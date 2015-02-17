@@ -4,147 +4,149 @@
     \pgfmathsetmacro{\mediumTextWidth}{7 cm}
     \pgfmathsetmacro{\longTextWidth}{11 cm}
     
-    % Material
     \begin{scope}[local bounding box=Material]
-    
-        \begin{scope}[local bounding box=Spheres]
-            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractSpheres}{0, 0}
-                \operation{getName() : String}
-                \operation{getNum() : int}
-                \operation{getDiameter() : double}
-                \operation{getPosition(iSphere : int) : double[3]}
-                \operation[0]{getMoment(iSphere : int) : double[3]}
-            \end{abstractclass}
-            
-            \begin{class}[text width=\mediumTextWidth]{ApolarSpheres}{0, -4}
-                \inherit{AbstractSpheres}
-                \operation{getMoment(iSphere : int) : double[3]}
-            \end{class}
-            
-            \begin{class}[text width=\mediumTextWidth]{DipolarSpheres}{0, -6}
-                \inherit{AbstractSpheres}
-                \operation{getMoment(iSphere : int) : double[3]}
-            \end{class}
-        \end{scope}
+        \begin{package}{Material}
         
-        \begin{scope}[shift={($(Spheres.north) - (11 cm, 0)$)}, local bounding box=BoxGeometry]
-            \begin{abstractclass}[text width=\longTextWidth]{AbstractBoxGeometry}{0, 0}
-                \operation{getSize() : double[3]}
-                \operation{getWave() : int[3]}
-                \operation[0]{vectorPBC(position1 : double[3], position2 : double[3]) : double[3]}
-                \operation{distancePBC(position1 : double[3], position2 : double[3]) : double}
-            \end{abstractclass}
+            \begin{scope}[local bounding box=Spheres]
+                \begin{abstractclass}[text width=\mediumTextWidth]{AbstractSpheres}{0, 0}
+                    \operation{getName() : String}
+                    \operation{getNum() : int}
+                    \operation{getDiameter() : double}
+                    \operation{getPosition(iSphere : int) : double[3]}
+                    \operation[0]{getMoment(iSphere : int) : double[3]}
+                \end{abstractclass}
+                
+                \begin{class}[text width=\mediumTextWidth]{ApolarSpheres}{0, -4}
+                    \inherit{AbstractSpheres}
+                    \operation{getMoment(iSphere : int) : double[3]}
+                \end{class}
+                
+                \begin{class}[text width=\mediumTextWidth]{DipolarSpheres}{0, -6}
+                    \inherit{AbstractSpheres}
+                    \operation{getMoment(iSphere : int) : double[3]}
+                \end{class}
+            \end{scope}
             
-            \begin{class}[text width=\longTextWidth]{BulkGeometry}{0, -4}
-                \inherit{AbstractBoxGeometry}
-                \operation{vectorPBC(position1 : double[3], position2 : double[3]) : double[3]}
-            \end{class}
+            \begin{scope}[shift={($(Spheres.north) - (11 cm, 0)$)}, local bounding box=BoxGeometry]
+                \begin{abstractclass}[text width=\longTextWidth]{AbstractBoxGeometry}{0, 0}
+                    \operation{getSize() : double[3]}
+                    \operation{getWave() : int[3]}
+                    \operation[0]{vectorPBC(position1 : double[3], position2 : double[3]) : double[3]}
+                    \operation{distancePBC(position1 : double[3], position2 : double[3]) : double}
+                \end{abstractclass}
+                
+                \begin{class}[text width=\longTextWidth]{BulkGeometry}{0, -4}
+                    \inherit{AbstractBoxGeometry}
+                    \operation{vectorPBC(position1 : double[3], position2 : double[3]) : double[3]}
+                \end{class}
+                
+                \begin{class}[text width=\longTextWidth]{SlabGeometry}{0, -6}
+                    \inherit{AbstractBoxGeometry}
+                    \operation{vectorPBC(position1 : double[3], position2 : double[3]) : double[3]}
+                \end{class}
+            \end{scope}
             
-            \begin{class}[text width=\longTextWidth]{SlabGeometry}{0, -6}
-                \inherit{AbstractBoxGeometry}
-                \operation{vectorPBC(position1 : double[3], position2 : double[3]) : double[3]}
-            \end{class}
-        \end{scope}
-        
-        \begin{scope}[shift={($(Spheres.north) + (8 cm, 0)$)}]
-            \begin{abstractclass}[text width=\smallTextWidth]{AbstractInterSpheres}{0, 0}
-                \operation{getName() : String}
-                \operation{getDiameter() : double}
-            \end{abstractclass}
+            \begin{scope}[shift={($(Spheres.north) + (8 cm, 0)$)}]
+                \begin{abstractclass}[text width=\smallTextWidth]{AbstractInterSpheres}{0, 0}
+                    \operation{getName() : String}
+                    \operation{getDiameter() : double}
+                \end{abstractclass}
+                
+                \begin{class}[text width=\smallTextWidth]{InterSpheres}{0, -3}
+                    \inherit{AbstractInterSpheres}
+                \end{class}
+            \end{scope}
             
-            \begin{class}[text width=\smallTextWidth]{InterSpheres}{0, -3}
-                \inherit{AbstractInterSpheres}
-            \end{class}
-        \end{scope}
-        
-        \begin{scope}[shift={($(Spheres.north)!0.5!(BoxGeometry.north) + (0 cm, 11 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractBoxedSpheres}{0, 0}
-                \operation[0]{randomPosition() : double[3]}
-                \operation[0]{isInsideBox(position : double[3]) : bool}
-                \operation[0]{getAccessibleVolume() : double}
-            \end{abstractclass}
+            \begin{scope}[shift={($(Spheres.north)!0.5!(BoxGeometry.north) + (0 cm, 11 cm)$)}]
+                \begin{abstractclass}[text width=\mediumTextWidth]{AbstractBoxedSpheres}{0, 0}
+                    \operation[0]{randomPosition() : double[3]}
+                    \operation[0]{isInsideBox(position : double[3]) : bool}
+                    \operation[0]{getAccessibleVolume() : double}
+                \end{abstractclass}
+                
+                \begin{class}[text width=\mediumTextWidth]{BulkBoxedSpheres}{0, -3}
+                    \inherit{AbstractBoxedSpheres}
+                    \operation{randomPosition() : double[3]}
+                    \operation{isInsideBox(position : double[3]) : bool}
+                    \operation{getAccessibleVolume() : double}
+                \end{class}
+                
+                \begin{class}[text width=\mediumTextWidth]{SlabBoxedSpheres}{0, -6}
+                    \inherit{AbstractBoxedSpheres}
+                    \operation{randomPosition() : double[3]}
+                    \operation{isInsideBox(position : double[3]) : bool}
+                    \operation{getAccessibleVolume() : double}
+                \end{class}
+            \end{scope}
             
-            \begin{class}[text width=\mediumTextWidth]{BulkBoxedSpheres}{0, -3}
-                \inherit{AbstractBoxedSpheres}
-                \operation{randomPosition() : double[3]}
-                \operation{isInsideBox(position : double[3]) : bool}
-                \operation{getAccessibleVolume() : double}
-            \end{class}
-            
-            \begin{class}[text width=\mediumTextWidth]{SlabBoxedSpheres}{0, -6}
-                \inherit{AbstractBoxedSpheres}
-                \operation{randomPosition() : double[3]}
-                \operation{isInsideBox(position : double[3]) : bool}
-                \operation{getAccessibleVolume() : double}
-            \end{class}
-        \end{scope}
-        
+        \end{package}
     \end{scope}
     
     \composition{AbstractBoxedSpheres}{spheres}{1}{AbstractSpheres}
     \composition{AbstractBoxedSpheres}{box}{1}{AbstractBoxGeometry}
     
-    %Short range interaction
     \begin{scope}[shift={($(Material.north) + (-23 cm, 17cm)$)}]
+        \begin{package}{Short range interaction}
         
-        \begin{scope}[local bounding box=ShortPotential]
-            \begin{abstractclass}[text width=\longTextWidth]{AbstractShortInteraction}{0, 0}
-                \operation{neighboursEnergy(particle : Particle, overlap : bool, enery : double)}
-                \operation[0]{totalEnergy() : double}
-                \operation[0]{volumeChangeEnergy(dilation: double) : double}
-                \operation{overlapTest()}
-            \end{abstractclass}            
+            \begin{scope}[local bounding box=ShortPotential]
+                \begin{abstractclass}[text width=\longTextWidth]{AbstractShortInteraction}{0, 0}
+                    \operation{neighboursEnergy(particle : Particle, overlap : bool, enery : double)}
+                    \operation[0]{totalEnergy() : double}
+                    \operation[0]{volumeChangeEnergy(dilation: double) : double}
+                    \operation{overlapTest()}
+                \end{abstractclass}            
+                
+                \begin{class}[text width=\longTextWidth]{IntraShortInteration}{0, -3.5}
+                    \inherit{AbstractShortInteraction}
+                    \operation{totalEnergy() : double}
+                    \operation{volumeChangeEnergy(dilation: double) : double}
+                \end{class}            
+                
+                \begin{class}[text width=\longTextWidth]{InterShortInteration}{0, -6}
+                    \inherit{AbstractShortInteraction}
+                    \operation{totalEnergy() : double}
+                    \operation{volumeChangeEnergy(dilation: double) : double}
+                \end{class}
+            \end{scope}
             
-            \begin{class}[text width=\longTextWidth]{IntraShortInteration}{0, -3.5}
-                \inherit{AbstractShortInteraction}
-                \operation{totalEnergy() : double}
-                \operation{volumeChangeEnergy(dilation: double) : double}
-            \end{class}            
+            \begin{scope}[shift={($(ShortPotential.north) + (-11 cm, -5 cm)$)}]
+                \begin{abstractclass}[text width=\mediumTextWidth]{AbstractNeighbourCells}{0, 0}
+                    \operation{fill()}
+                    \operation{index(position : double[3]) : int}
+                    \operation[0]{bounds(iCell : int) : int[2]}
+                    \operation{toBegin()}
+                    \operation{add(iSphere : int, iCell : int)}
+                    \operation{remove(iSphere : int, iCell : int)}
+                \end{abstractclass}
+                
+                \begin{class}[text width=\mediumTextWidth]{BulkNeighbourCells}{0, -4.5}
+                    \inherit{AbstractNeighbourCells}
+                    \operation{bounds(iCell : int) : int[2]}
+                \end{class}
+                
+                \begin{class}[text width=\mediumTextWidth]{SlabNeighbourCells}{0, -6.5}
+                    \inherit{AbstractNeighbourCells}
+                    \operation{bounds(iCell : int) : int[2]}
+                \end{class}
+            \end{scope}
             
-            \begin{class}[text width=\longTextWidth]{InterShortInteration}{0, -6}
-                \inherit{AbstractShortInteraction}
-                \operation{totalEnergy() : double}
-                \operation{volumeChangeEnergy(dilation: double) : double}
-            \end{class}
-        \end{scope}
+            \begin{scope}[shift={($(ShortPotential.north) + (11 cm, -5 cm)$)}]
+                \begin{abstractclass}[text width=\mediumTextWidth]{AbstractPairPotential}{0, 0}
+                    \operation[0]{potential(distance : double) : double}
+                \end{abstractclass}
+                
+                \begin{class}[text width=\mediumTextWidth]{LJpairPotential}{0, -2.5}
+                    \inherit{AbstractPairPotential}
+                    \operation{potential(distance : double) : double}
+                \end{class}
+                
+                \begin{class}[text width=\mediumTextWidth]{HardPairPotential}{0, -4.5}
+                    \inherit{AbstractPairPotential}
+                    \operation{potential(distance : double) : double}
+                \end{class}
+            \end{scope}
         
-        \begin{scope}[shift={($(ShortPotential.north) + (-11 cm, -5 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractNeighbourCells}{0, 0}
-                \operation{fill()}
-                \operation{index(position : double[3]) : int}
-                \operation[0]{bounds(iCell : int) : int[2]}
-                \operation{toBegin()}
-                \operation{add(iSphere : int, iCell : int)}
-                \operation{remove(iSphere : int, iCell : int)}
-            \end{abstractclass}
-            
-            \begin{class}[text width=\mediumTextWidth]{BulkNeighbourCells}{0, -4.5}
-                \inherit{AbstractNeighbourCells}
-                \operation{bounds(iCell : int) : int[2]}
-            \end{class}
-            
-            \begin{class}[text width=\mediumTextWidth]{SlabNeighbourCells}{0, -6.5}
-                \inherit{AbstractNeighbourCells}
-                \operation{bounds(iCell : int) : int[2]}
-            \end{class}
-        \end{scope}
-        
-        \begin{scope}[shift={($(ShortPotential.north) + (11 cm, -5 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractPairPotential}{0, 0}
-                \operation[0]{potential(distance : double) : double}
-            \end{abstractclass}
-            
-            \begin{class}[text width=\mediumTextWidth]{LJpairPotential}{0, -2.5}
-                \inherit{AbstractPairPotential}
-                \operation{potential(distance : double) : double}
-            \end{class}
-            
-            \begin{class}[text width=\mediumTextWidth]{HardPairPotential}{0, -4.5}
-                \inherit{AbstractPairPotential}
-                \operation{potential(distance : double) : double}
-            \end{class}
-        \end{scope}
-        
+        \end{package}
     \end{scope}
     
     \composition{AbstractShortInteraction}{box}{1}{AbstractBoxGeometry}
