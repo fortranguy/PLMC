@@ -97,7 +97,7 @@
         \composition{AbstractBoxedSpheres}{box}{1}{AbstractBoxGeometry}
     \end{scope}
     
-    \begin{scope}[shift={($(Material.north) + (-16 cm, 30cm)$)}]
+    \begin{scope}[shift={($(Material.north) + (-16 cm, 45.5 cm)$)}]
         \begin{package}{Short range interaction}
         
             \begin{scope}[local bounding box=ShortInteraction]
@@ -147,7 +147,7 @@
                     \operationsImplementation{}
                 \end{class}
                 
-                \begin{class}[text width=\largeTextWidth]{SlabNeighbourCells}{0, -7.5}
+                \begin{class}[text width=\largeTextWidth]{SlabNeighbourCells}{0, -8}
                     \inherit{AbstractNeighbourCells}
                     \operationsImplementation{}
                 \end{class}
@@ -175,20 +175,47 @@
             
             \begin{scope}[local bounding box=WallInteraction, 
                 shift={($(ShortInteraction.south) + (0 cm, -15 cm)$)}]
-                \begin{abstractclass}[text width=\mediumTextWidth]{AbstractWallInteraction}{0, 0}
+                \begin{abstractclass}[text width=\largeTextWidth]{AbstractWallInteraction}{0, 0}
                     \operation[0]{totalEnergy() : double}
                     \operation[0]{moveEnergy(particle : Particle) : double}
                     \operation[0]{exchangeEnergy(particle : Particle) : double}
+                    \operation[0]{volumeChangeEnergy(dilation : double) : double}
                 \end{abstractclass}
                 
                 \def\operationsImplementation{
                     \operation{totalEnergy() : double}
                     \operation{moveEnergy(particle : Particle) : double}
                     \operation{exchangeEnergy(particle : Particle) : double}
+                    \operation{volumeChangeEnergy(dilation : double) : double}
                 }
                 
-                \begin{class}[text width=\mediumTextWidth]{WallInteraction}{0, -3}
+                \begin{class}[text width=\largeTextWidth]{NullWallInteraction}{0, -4}
                     \inherit{AbstractWallInteraction}
+                    \operationsImplementation{}
+                \end{class}
+                
+                \begin{class}[text width=\largeTextWidth]{WallInteraction}{0, -7.5}
+                    \inherit{AbstractWallInteraction}
+                    \operationsImplementation{}
+                \end{class}
+            \end{scope}
+            
+            \begin{scope}[shift={($(WallInteraction.south) + (5 cm, -2.5 cm)$)}]
+                \begin{abstractclass}[text width=\mediumTextWidth]{AbstractWallPotential}{0, 0}
+                    \operation[0]{potential(height : double) : double}
+                \end{abstractclass}
+                
+                \def\operationsImplementation{
+                    \operation{potential(height : double) : double}
+                }
+                
+                \begin{class}[text width=\mediumTextWidth]{NullWallPotential}{0, -2.5}
+                    \inherit{AbstractWallPotential}
+                    \operationsImplementation{}
+                \end{class}
+                
+                \begin{class}[text width=\mediumTextWidth]{WallPotential}{0, -4.5}
+                    \inherit{AbstractWallPotential}
                     \operationsImplementation{}
                 \end{class}
             \end{scope}
@@ -206,6 +233,10 @@
 
         \composition{AbstractNeighbourCells}{box}{1}{AbstractBoxGeometry}
         \composition{AbstractNeighbourCells}{spheres}{1}{AbstractSpheres}
+        
+        \composition{AbstractWallInteraction}{wallPotential}{1}{AbstractWallPotential}
+        \composition{WallInteraction}{box}{1}{AbstractBoxGeometry}
+        \composition{WallInteraction}{spheres}{1}{AbstractSpheres}
     \end{scope}
     
     \begin{scope}[shift={($(Material.north) + (28 cm, 45cm)$)}]
