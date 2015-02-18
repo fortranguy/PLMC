@@ -85,7 +85,7 @@
     \composition{AbstractBoxedSpheres}{spheres}{1}{AbstractSpheres}
     \composition{AbstractBoxedSpheres}{box}{1}{AbstractBoxGeometry}
     
-    \begin{scope}[shift={($(Material.north) + (-20 cm, 30cm)$)}]
+    \begin{scope}[shift={($(Material.north) + (-18 cm, 30cm)$)}]
         \begin{package}{Short range interaction}
         
             \begin{scope}[local bounding box=ShortInteraction]
@@ -485,18 +485,18 @@
             \end{scope}
 
             \begin{scope}[shift={($(EwaldBound.south)!0.5!(FieldInteraction.south) + (13 cm, -7 cm)$)}]
-                \begin{abstractclass}[text width=\smallTextWidth]{AbstractExternalField}{0, 0}
-                    \operation[0]{getTotalMoment() : double[3]}
+                \begin{abstractclass}[text width=\mediumTextWidth]{AbstractExternalField}{0, 0}
+                    \operation[0]{field(position : double[3]) : double[3]}
                 \end{abstractclass}
 
-                \begin{class}[text width=\smallTextWidth]{ConstantExternalField}{0, -2.5}
+                \begin{class}[text width=\mediumTextWidth]{NullExternalField}{0, -2.5}
                     \inherit{AbstractExternalField}
-                    \operation{getTotalMoment() : double[3]}
+                    \operation{field(position : double[3]) : double[3]}
                 \end{class}
 
-                \begin{class}[text width=\smallTextWidth]{NonUniformExternalField}{0, -4.5}
+                \begin{class}[text width=\mediumTextWidth]{NonUniformExternalField}{0, -4.5}
                     \inherit{AbstractExternalField}
-                    \operation{getTotalMoment() : double[3]}
+                    \operation{field(position : double[3]) : double[3]}
                 \end{class}
             \end{scope}
         
