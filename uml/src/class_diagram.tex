@@ -502,6 +502,13 @@
         
         \end{package}
     \end{scope}
+
+    \composition{DipolarInteractionFacade}{ewaldRead}{1}{AbstractEwaldReal}
+    \composition{DipolarInteractionFacade}{ewaldReci}{1}{AbstractEwaldReci}
+    \composition{DipolarInteractionFacade}{dlc}{1}{AbstractDipolarLayerCorrection}
+    \composition{DipolarInteractionFacade}{ewaldSelf}{1}{AbstractEwaldSelf}
+    \composition{DipolarInteractionFacade}{ewaldBound}{1}{AbstractEwaldBound}
+    \composition{DipolarInteractionFacade}{fieldInteraction}{1}{AbstractFieldInteraction}
     
     \composition{AbstractDipolarInteraction}{box}{1}{AbstractBoxGeometry}
 
