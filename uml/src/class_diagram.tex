@@ -106,20 +106,22 @@
                     \operation[0]{totalEnergy() : double}
                     \operation[0]{volumeChangeEnergy(dilatation : double) : double}
                     \operation[0]{overlapTest()}
-                \end{abstractclass}            
-                
-                \begin{class}[text width=\largeTextWidth]{IntraShortInteration}{0, -3.5}
-                    \inherit{AbstractShortInteraction}
+                \end{abstractclass}
+
+                \def\operationsImplementation{
                     \operation{totalEnergy() : double}
                     \operation{volumeChangeEnergy(dilatation : double) : double}
                     \operation{overlapTest()}
+                }
+                
+                \begin{class}[text width=\largeTextWidth]{IntraShortInteration}{0, -3.5}
+                    \inherit{AbstractShortInteraction}
+                    \operationsImplementation{}
                 \end{class}            
                 
                 \begin{class}[text width=\largeTextWidth]{InterShortInteration}{0, -6}
                     \inherit{AbstractShortInteraction}
-                    \operation{totalEnergy() : double}
-                    \operation{volumeChangeEnergy(dilatation : double) : double}
-                    \operation{overlapTest()}
+                    \operationsImplementation{}
                 \end{class}
             \end{scope}
             
@@ -127,21 +129,27 @@
                 \begin{abstractclass}[text width=\largeTextWidth]{AbstractNeighbourCells}{0, 0}
                     \operation{fill()}
                     \operation{index(position : double[3]) : int}
-                    \operation[0]{bounds(iCell : int) : int[2]}
+                    \operation[0]{boundBegin(iCell : int) : int}
+                    \operation[0]{boundEnd(iCell : int) : int}
                     \operation{toBegin()}
                     \operation{add(iSphere : int, iCell : int)}
                     \operation{remove(iSphere : int, iCell : int)}
                     \operation{copy(iSphereSource : int, iSphereTarget : int, iCellTarget : int)}
                 \end{abstractclass}
+
+                \def\operationsImplementation{
+                    \operation{boundBegin(iCell : int) : int}
+                    \operation{boundEnd(iCell : int) : int}
+                }
                 
                 \begin{class}[text width=\largeTextWidth]{BulkNeighbourCells}{0, -5.5}
                     \inherit{AbstractNeighbourCells}
-                    \operation{bounds(iCell : int) : int[2]}
+                    \operationsImplementation{}
                 \end{class}
                 
                 \begin{class}[text width=\largeTextWidth]{SlabNeighbourCells}{0, -7.5}
                     \inherit{AbstractNeighbourCells}
-                    \operation{bounds(iCell : int) : int[2]}
+                    \operationsImplementation{}
                 \end{class}
             \end{scope}
             
@@ -149,15 +157,19 @@
                 \begin{abstractclass}[text width=\mediumTextWidth]{AbstractPairPotential}{0, 0}
                     \operation[0]{potential(distance : double) : double}
                 \end{abstractclass}
+
+                \def\operationsImplementation{
+                    \operation{potential(distance : double) : double}
+                }
                 
                 \begin{class}[text width=\mediumTextWidth]{LJpairPotential}{0, -2.5}
                     \inherit{AbstractPairPotential}
-                    \operation{potential(distance : double) : double}
+                    \operationsImplementation{}
                 \end{class}
                 
                 \begin{class}[text width=\mediumTextWidth]{HardPairPotential}{0, -4.5}
                     \inherit{AbstractPairPotential}
-                    \operation{potential(distance : double) : double}
+                    \operationsImplementation{}
                 \end{class}
             \end{scope}
         
@@ -422,18 +434,20 @@
                     \operation[0]{exchangeUpdate()}
                 \end{abstractclass}
 
-                \begin{class}[text width=\smallTextWidth]{NullTotalMoment}{0, -3}
-                    \inherit{AbstractTotalMoment}
+                \def\operationsImplementation{
                     \operation{getTotalMoment() : double[3]}
                     \operation{rotationUpdate()}
                     \operation{exchangeUpdate()}
+                }
+
+                \begin{class}[text width=\smallTextWidth]{NullTotalMoment}{0, -3}
+                    \inherit{AbstractTotalMoment}
+                    \operationsImplementation{}
                 \end{class}
 
                 \begin{class}[text width=\smallTextWidth]{TotalMoment}{0, -5.5}
                     \inherit{AbstractTotalMoment}
-                    \operation{getTotalMoment() : double[3]}
-                    \operation{rotationUpdate()}
-                    \operation{exchangeUpdate()}
+                    \operationsImplementation{}
                 \end{class}
             \end{scope}
 
@@ -442,14 +456,18 @@
                     \operation[0]{field(position : double[3]) : double[3]}
                 \end{abstractclass}
 
+                \def\operationsImplementation{
+                    \operation{field(position : double[3]) : double[3]}
+                }
+
                 \begin{class}[text width=\mediumTextWidth]{NullExternalField}{0, -2.5}
                     \inherit{AbstractExternalField}
-                    \operation{field(position : double[3]) : double[3]}
+                    \operationsImplementation{}
                 \end{class}
 
                 \begin{class}[text width=\mediumTextWidth]{NonUniformExternalField}{0, -4.5}
                     \inherit{AbstractExternalField}
-                    \operation{field(position : double[3]) : double[3]}
+                    \operationsImplementation{}
                 \end{class}
             \end{scope}
         
