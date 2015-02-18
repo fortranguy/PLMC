@@ -7,7 +7,11 @@
 \usepackage[simplified]{pgf-umlcd}
 \usetikzlibrary{calc, backgrounds}
 
-\usepackage[a4paper]{geometry}
+\usepackage[paper=A4,pagesize]{typearea}
+\usepackage{geometry}
+
+\usepackage{biblatex}
+\bibliography{references}
 
 \title{Emergence of Design Patterns in the architecture of a Monte-Carlo program
     simulating apolar and dipolar spheres mixture}
@@ -31,10 +35,23 @@
         Those patterns ensure the architecture of the program will be robust and flexible.
     \end{abstract}
 
+    \clearpage
+    \KOMAoptions{paper=A0, pagesize, paper=landscape}
+    \recalctypearea
+    \newgeometry{top=2cm, bottom=2cm, left=2.5cm, right=2.5cm}
+    
     \begin{figure}[htb]
         \centering
         \input class_diagram.tex
         \caption{UML class diagram}
     \end{figure}
+
+    \clearpage
+    \KOMAoptions{paper=A4, pagesize}
+    \restoregeometry
+    \recalctypearea
+
+    \nocite{*}
+    \printbibliography
 
 \end{document}
