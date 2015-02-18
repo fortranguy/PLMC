@@ -172,6 +172,26 @@
                     \operationsImplementation{}
                 \end{class}
             \end{scope}
+            
+            \begin{scope}[local bounding box=WallInteraction, 
+                shift={($(ShortInteraction.south) + (0 cm, -15 cm)$)}]
+                \begin{abstractclass}[text width=\mediumTextWidth]{AbstractWallInteraction}{0, 0}
+                    \operation[0]{totalEnergy() : double}
+                    \operation[0]{moveEnergy(particle : Particle) : double}
+                    \operation[0]{exchangeEnergy(particle : Particle) : double}
+                \end{abstractclass}
+                
+                \def\operationsImplementation{
+                    \operation{totalEnergy() : double}
+                    \operation{moveEnergy(particle : Particle) : double}
+                    \operation{exchangeEnergy(particle : Particle) : double}
+                }
+                
+                \begin{class}[text width=\mediumTextWidth]{WallInteraction}{0, -3}
+                    \inherit{AbstractWallInteraction}
+                    \operationsImplementation{}
+                \end{class}
+            \end{scope}
         
         \end{package}
     \end{scope}
