@@ -3,6 +3,7 @@
     \pgfmathsetmacro{\smallTextWidth}{5 cm}
     \pgfmathsetmacro{\mediumTextWidth}{7 cm}
     \pgfmathsetmacro{\largeTextWidth}{11 cm}
+    \pgfmathsetmacro{\extraLargeTextWidth}{13 cm}
     
     \begin{scope}[local bounding box=Material]
         \begin{package}{Material}
@@ -101,25 +102,27 @@
         \begin{package}{Short range interaction}
         
             \begin{scope}[local bounding box=ShortInteraction]
-                \begin{abstractclass}[text width=\largeTextWidth]{AbstractShortInteraction}{0, 0}
-                    \operation{neighboursEnergy(particle : Particle, overlap : bool, enery : double)}
+                \begin{abstractclass}[text width=\extraLargeTextWidth]{AbstractShortInteraction}{0, 0}
                     \operation[0]{totalEnergy() : double}
-                    \operation[0]{volumeChangeEnergy(dilatation : double) : double}
+                    \operation{soloEnergy(particle : Particle, overlap : bool, energy : double)}
+                    \operation[0]{volumeChangeEnergy(dilatation : double, overlap : bool, energy : double)}
+                    \operation[0]{volumeChangeRestoration(dilatation : double)}
                     \operation[0]{overlapTest()}
                 \end{abstractclass}
 
                 \def\operationsImplementation{
                     \operation{totalEnergy() : double}
-                    \operation{volumeChangeEnergy(dilatation : double) : double}
+                    \operation{volumeChangeEnergy(dilatation : double, overlap : bool, energy : double)}
+                    \operation{volumeChangeRestoration(dilatation : double)}
                     \operation{overlapTest()}
                 }
                 
-                \begin{class}[text width=\largeTextWidth]{IntraShortInteration}{0, -3.5}
+                \begin{class}[text width=\extraLargeTextWidth]{IntraShortInteration}{0, -4.5}
                     \inherit{AbstractShortInteraction}
                     \operationsImplementation{}
                 \end{class}            
                 
-                \begin{class}[text width=\largeTextWidth]{InterShortInteration}{0, -6}
+                \begin{class}[text width=\extraLargeTextWidth]{InterShortInteration}{0, -8}
                     \inherit{AbstractShortInteraction}
                     \operationsImplementation{}
                 \end{class}
@@ -175,26 +178,26 @@
             
             \begin{scope}[local bounding box=WallInteraction, 
                 shift={($(ShortInteraction.south) + (0 cm, -15 cm)$)}]
-                \begin{abstractclass}[text width=\largeTextWidth]{AbstractWallInteraction}{0, 0}
+                \begin{abstractclass}[text width=\extraLargeTextWidth]{AbstractWallInteraction}{0, 0}
                     \operation[0]{totalEnergy() : double}
-                    \operation[0]{moveEnergy(particle : Particle) : double}
-                    \operation[0]{exchangeEnergy(particle : Particle) : double}
-                    \operation[0]{volumeChangeEnergy(dilation : double) : double}
+                    \operation[0]{soloEnergy(particle : Particle, overlap : bool, energy : double)}
+                    \operation[0]{volumeChangeEnergy(dilatation : double, overlap : bool, energy : double)}
+                    \operation[0]{overlapTest()}
                 \end{abstractclass}
                 
                 \def\operationsImplementation{
                     \operation{totalEnergy() : double}
-                    \operation{moveEnergy(particle : Particle) : double}
-                    \operation{exchangeEnergy(particle : Particle) : double}
-                    \operation{volumeChangeEnergy(dilation : double) : double}
+                    \operation{soloEnergy(particle : Particle, overlap : bool, energy : double)}
+                    \operation{volumeChangeEnergy(dilatation : double, overlap : bool, energy : double)}
+                    \operation{overlapTest()}
                 }
                 
-                \begin{class}[text width=\largeTextWidth]{NullWallInteraction}{0, -4}
+                \begin{class}[text width=\extraLargeTextWidth]{NullWallInteraction}{0, -4}
                     \inherit{AbstractWallInteraction}
                     \operationsImplementation{}
                 \end{class}
                 
-                \begin{class}[text width=\largeTextWidth]{WallInteraction}{0, -7.5}
+                \begin{class}[text width=\extraLargeTextWidth]{WallInteraction}{0, -7.5}
                     \inherit{AbstractWallInteraction}
                     \operationsImplementation{}
                 \end{class}
