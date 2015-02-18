@@ -81,9 +81,11 @@
             
         \end{package}
     \end{scope}
-    
-    \composition{AbstractBoxedSpheres}{spheres}{1}{AbstractSpheres}
-    \composition{AbstractBoxedSpheres}{box}{1}{AbstractBoxGeometry}
+
+    \begin{scope}[on background layer]
+        \composition{AbstractBoxedSpheres}{spheres}{1}{AbstractSpheres}
+        \composition{AbstractBoxedSpheres}{box}{1}{AbstractBoxGeometry}
+    \end{scope}
     
     \begin{scope}[shift={($(Material.north) + (-18 cm, 30cm)$)}]
         \begin{package}{Short range interaction}
@@ -109,7 +111,7 @@
                 \end{class}
             \end{scope}
             
-            \begin{scope}[shift={($(ShortInteraction.south) + (-5 cm, -2 cm)$)}]
+            \begin{scope}[shift={($(ShortInteraction.south) + (-5 cm, -2.5 cm)$)}]
                 \begin{abstractclass}[text width=\mediumTextWidth]{AbstractNeighbourCells}{0, 0}
                     \operation{fill()}
                     \operation{index(position : double[3]) : int}
@@ -130,7 +132,7 @@
                 \end{class}
             \end{scope}
             
-            \begin{scope}[shift={($(ShortInteraction.south) + (5 cm, -2 cm)$)}]
+            \begin{scope}[shift={($(ShortInteraction.south) + (5 cm, -2.5 cm)$)}]
                 \begin{abstractclass}[text width=\mediumTextWidth]{AbstractPairPotential}{0, 0}
                     \operation[0]{potential(distance : double) : double}
                 \end{abstractclass}
@@ -148,16 +150,18 @@
         
         \end{package}
     \end{scope}
-    
-    \composition{AbstractShortInteraction}{box}{1}{AbstractBoxGeometry}
-    \composition{AbstractShortInteraction}{neighbourCells}{1}{AbstractNeighbourCells}
-    \composition{AbstractShortInteraction}{pairPotential}{1}{AbstractPairPotential}
-    \composition{IntraShortInteration}{spheres}{1}{AbstractSpheres}
-    \composition{InterShortInteration}{spheres}{2}{AbstractSpheres}
-    \composition{InterShortInteration}{interSpheres}{1}{AbstractInterSpheres}
-    
-    \composition{AbstractNeighbourCells}{box}{1}{AbstractBoxGeometry}
-    \composition{AbstractNeighbourCells}{spheres}{1}{AbstractSpheres}
+
+    \begin{scope}[on background layer]
+        \composition{AbstractShortInteraction}{box}{1}{AbstractBoxGeometry}
+        \composition{AbstractShortInteraction}{neighbourCells}{1}{AbstractNeighbourCells}
+        \composition{AbstractShortInteraction}{pairPotential}{1}{AbstractPairPotential}
+        \composition{IntraShortInteration}{spheres}{1}{AbstractSpheres}
+        \composition{InterShortInteration}{spheres}{2}{AbstractSpheres}
+        \composition{InterShortInteration}{interSpheres}{1}{AbstractInterSpheres}
+
+        \composition{AbstractNeighbourCells}{box}{1}{AbstractBoxGeometry}
+        \composition{AbstractNeighbourCells}{spheres}{1}{AbstractSpheres}
+    \end{scope}
     
     \begin{scope}[shift={($(Material.north) + (30 cm, 45cm)$)}]
         \begin{package}{Dipolar interaction}
@@ -503,33 +507,35 @@
         \end{package}
     \end{scope}
 
-    \composition{DipolarInteractionFacade}{ewaldRead}{1}{AbstractEwaldReal}
-    \composition{DipolarInteractionFacade}{ewaldReci}{1}{AbstractEwaldReci}
-    \composition{DipolarInteractionFacade}{dlc}{1}{AbstractDipolarLayerCorrection}
-    \composition{DipolarInteractionFacade}{ewaldSelf}{1}{AbstractEwaldSelf}
-    \composition{DipolarInteractionFacade}{ewaldBound}{1}{AbstractEwaldBound}
-    \composition{DipolarInteractionFacade}{fieldInteraction}{1}{AbstractFieldInteraction}
-    
-    \composition{AbstractDipolarInteraction}{box}{1}{AbstractBoxGeometry}
+    \begin{scope}[on background layer]
+        \composition{DipolarInteractionFacade}{ewaldRead}{1}{AbstractEwaldReal}
+        \composition{DipolarInteractionFacade}{ewaldReci}{1}{AbstractEwaldReci}
+        \composition{DipolarInteractionFacade}{dlc}{1}{AbstractDipolarLayerCorrection}
+        \composition{DipolarInteractionFacade}{ewaldSelf}{1}{AbstractEwaldSelf}
+        \composition{DipolarInteractionFacade}{ewaldBound}{1}{AbstractEwaldBound}
+        \composition{DipolarInteractionFacade}{fieldInteraction}{1}{AbstractFieldInteraction}
 
-    \composition{EwaldReal}{spheres}{1}{AbstractSpheres}
-    \composition{InterEwaldReal}{spheres}{2}{AbstractSpheres}
-    \composition{InterEwaldReal}{interSpheres}{1}{AbstractInterSpheres}
+        \composition{AbstractDipolarInteraction}{box}{1}{AbstractBoxGeometry}
 
-    \composition{EwaldReci}{spheres}{1}{AbstractSpheres}
-    \composition{InterEwaldReci}{spheres}{2}{AbstractSpheres}
+        \composition{EwaldReal}{spheres}{1}{AbstractSpheres}
+        \composition{InterEwaldReal}{spheres}{2}{AbstractSpheres}
+        \composition{InterEwaldReal}{interSpheres}{1}{AbstractInterSpheres}
 
-    \composition{DipolarLayerCorrection}{spheres}{1}{AbstractSpheres}
-    \composition{InterDipolarLayerCorrection}{spheres}{2}{AbstractSpheres}
+        \composition{EwaldReci}{spheres}{1}{AbstractSpheres}
+        \composition{InterEwaldReci}{spheres}{2}{AbstractSpheres}
 
-    \composition{EwaldSelf}{spheres}{1}{AbstractSpheres}
+        \composition{DipolarLayerCorrection}{spheres}{1}{AbstractSpheres}
+        \composition{InterDipolarLayerCorrection}{spheres}{2}{AbstractSpheres}
 
-    \composition{EwaldBound}{totalMoment}{1}{AbstractTotalMoment}
-    \composition{InterEwaldBound}{totalMoment}{2}{AbstractTotalMoment}
-    
-    \composition{FieldInteraction}{totalMoment}{1}{AbstractTotalMoment}
-    \composition{FieldInteraction}{extField}{1}{AbstractExternalField}
+        \composition{EwaldSelf}{spheres}{1}{AbstractSpheres}
 
-    \composition{AbstractTotalMoment}{spheres}{1}{AbstractSpheres}
+        \composition{EwaldBound}{totalMoment}{1}{AbstractTotalMoment}
+        \composition{InterEwaldBound}{totalMoment}{2}{AbstractTotalMoment}
+
+        \composition{FieldInteraction}{totalMoment}{1}{AbstractTotalMoment}
+        \composition{FieldInteraction}{extField}{1}{AbstractExternalField}
+
+        \composition{AbstractTotalMoment}{spheres}{1}{AbstractSpheres}
+    \end{scope}[on background layer]
 
 \end{tikzpicture}
