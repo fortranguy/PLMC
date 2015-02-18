@@ -7,17 +7,29 @@
 \usepackage[simplified]{pgf-umlcd}
 \usetikzlibrary{calc, backgrounds}
 
-\usepackage[a0paper, landscape]{geometry}
-\usepackage{fullpage}
+\usepackage[a4paper]{geometry}
 
-\title{Emergence of Design Patterns in the architecture of a Monte-Carlo program of
-    apolar and dipolar spheres mixture}
+\title{Emergence of Design Patterns in the architecture of a Monte-Carlo program
+    simulating apolar and dipolar spheres mixture}
 \author{Lucas Levrel and Salomon Chung}
 \date{February 17, 2015 - \today{}}
 
 \begin{document}
 
-\maketitle
+    \maketitle
+
+    \begin{abstract}
+        A classical Monte-Carlo simulation of liquids has a simple and well-defined structure:
+        1. Intialisation, 2. Iterations of move trial, 3. Results calculation.
+        However, some details may vary such as the geometry (e.g. Bulk / Slab),
+        the thermodynamic ensemble (e.g. Canonical / Grand canonical / Isobaric)
+        or the particles type and interactions (e.g. Hard or Soft Spheres /
+        Apolar or Dipolar Spheres).
+        This tension between constance and variability may be addressed by
+        the Object-Oriented paradigm (e.g. in Fortran, no kidding).
+        Following OOP principles, we notice the natural emergence of Design Patterns.
+        Those patterns ensure the architecture of the program will be robust and flexible.
+    \end{abstract}
 
     \begin{figure}[htb]
         \centering
