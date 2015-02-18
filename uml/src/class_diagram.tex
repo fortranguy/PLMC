@@ -15,15 +15,19 @@
                     \operation{getPosition(iSphere : int) : double[3]}
                     \operation[0]{getMoment(iSphere : int) : double[3]}
                 \end{abstractclass}
+
+                \def\operationsImplementation{
+                    \operation{getMoment(iSphere : int) : double[3]}
+                }
                 
                 \begin{class}[text width=\mediumTextWidth]{ApolarSpheres}{0, -4}
                     \inherit{AbstractSpheres}
-                    \operation{getMoment(iSphere : int) : double[3]}
+                    \operationsImplementation{}
                 \end{class}
                 
                 \begin{class}[text width=\mediumTextWidth]{DipolarSpheres}{0, -6}
                     \inherit{AbstractSpheres}
-                    \operation{getMoment(iSphere : int) : double[3]}
+                    \operationsImplementation{}
                 \end{class}
             \end{scope}
             
@@ -34,15 +38,19 @@
                     \operation[0]{vectorPBC(position1 : double[3], position2 : double[3]) : double[3]}
                     \operation{distancePBC(position1 : double[3], position2 : double[3]) : double}
                 \end{abstractclass}
+
+                \def\operationsImplementation{
+                    \operation{vectorPBC(position1 : double[3], position2 : double[3]) : double[3]}
+                }
                 
                 \begin{class}[text width=\largeTextWidth]{BulkGeometry}{0, -4}
                     \inherit{AbstractBoxGeometry}
-                    \operation{vectorPBC(position1 : double[3], position2 : double[3]) : double[3]}
+                    \operationsImplementation{}
                 \end{class}
                 
                 \begin{class}[text width=\largeTextWidth]{SlabGeometry}{0, -6}
                     \inherit{AbstractBoxGeometry}
-                    \operation{vectorPBC(position1 : double[3], position2 : double[3]) : double[3]}
+                    \operationsImplementation{}
                 \end{class}
             \end{scope}
             
@@ -63,19 +71,21 @@
                     \operation[0]{isInsideBox(position : double[3]) : bool}
                     \operation[0]{getAccessibleVolume() : double}
                 \end{abstractclass}
-                
-                \begin{class}[text width=\mediumTextWidth]{BulkBoxedSpheres}{0, -3}
-                    \inherit{AbstractBoxedSpheres}
+
+                \def\operationsImplementation{
                     \operation{randomPosition() : double[3]}
                     \operation{isInsideBox(position : double[3]) : bool}
                     \operation{getAccessibleVolume() : double}
+                }
+                
+                \begin{class}[text width=\mediumTextWidth]{BulkBoxedSpheres}{0, -3}
+                    \inherit{AbstractBoxedSpheres}
+                    \operationsImplementation{}
                 \end{class}
                 
                 \begin{class}[text width=\mediumTextWidth]{SlabBoxedSpheres}{0, -6}
                     \inherit{AbstractBoxedSpheres}
-                    \operation{randomPosition() : double[3]}
-                    \operation{isInsideBox(position : double[3]) : bool}
-                    \operation{getAccessibleVolume() : double}
+                    \operationsImplementation{}
                 \end{class}
             \end{scope}
             
