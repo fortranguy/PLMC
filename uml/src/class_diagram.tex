@@ -87,7 +87,7 @@
         \composition{AbstractBoxedSpheres}{box}{1}{AbstractBoxGeometry}
     \end{scope}
     
-    \begin{scope}[shift={($(Material.north) + (-18 cm, 30cm)$)}]
+    \begin{scope}[shift={($(Material.north) + (-16 cm, 30cm)$)}]
         \begin{package}{Short range interaction}
         
             \begin{scope}[local bounding box=ShortInteraction]
@@ -111,22 +111,23 @@
                 \end{class}
             \end{scope}
             
-            \begin{scope}[shift={($(ShortInteraction.south) + (-5 cm, -2.5 cm)$)}]
-                \begin{abstractclass}[text width=\mediumTextWidth]{AbstractNeighbourCells}{0, 0}
+            \begin{scope}[shift={($(ShortInteraction.south) + (-7 cm, -2.5 cm)$)}]
+                \begin{abstractclass}[text width=\largeTextWidth]{AbstractNeighbourCells}{0, 0}
                     \operation{fill()}
                     \operation{index(position : double[3]) : int}
                     \operation[0]{bounds(iCell : int) : int[2]}
                     \operation{toBegin()}
                     \operation{add(iSphere : int, iCell : int)}
                     \operation{remove(iSphere : int, iCell : int)}
+                    \operation{copy(iSphereSource : int, iSphereTarget : int, iCellTarget : int)}
                 \end{abstractclass}
                 
-                \begin{class}[text width=\mediumTextWidth]{BulkNeighbourCells}{0, -4.5}
+                \begin{class}[text width=\largeTextWidth]{BulkNeighbourCells}{0, -5.5}
                     \inherit{AbstractNeighbourCells}
                     \operation{bounds(iCell : int) : int[2]}
                 \end{class}
                 
-                \begin{class}[text width=\mediumTextWidth]{SlabNeighbourCells}{0, -6.5}
+                \begin{class}[text width=\largeTextWidth]{SlabNeighbourCells}{0, -7.5}
                     \inherit{AbstractNeighbourCells}
                     \operation{bounds(iCell : int) : int[2]}
                 \end{class}
@@ -163,7 +164,7 @@
         \composition{AbstractNeighbourCells}{spheres}{1}{AbstractSpheres}
     \end{scope}
     
-    \begin{scope}[shift={($(Material.north) + (30 cm, 45cm)$)}]
+    \begin{scope}[shift={($(Material.north) + (28 cm, 45cm)$)}]
         \begin{package}{Dipolar interaction}
         
             \begin{scope}[local bounding box=DipolarInteraction]
