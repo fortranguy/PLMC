@@ -505,9 +505,22 @@
     
     \composition{AbstractDipolarInteraction}{box}{1}{AbstractBoxGeometry}
 
-    \composition{AbstractEwaldBound}{totalMoment}{1}{AbstractTotalMoment}
-    \composition{AbstractFieldInteraction}{totalMoment}{1}{AbstractTotalMoment}
-    \composition{AbstractFieldInteraction}{extField}{1}{AbstractExternalField}
+    \composition{EwaldReal}{spheres}{1}{AbstractSpheres}
+    \composition{InterEwaldReal}{spheres}{2}{AbstractSpheres}
+
+    \composition{EwaldReci}{spheres}{1}{AbstractSpheres}
+    \composition{InterEwaldReci}{spheres}{2}{AbstractSpheres}
+
+    \composition{DipolarLayerCorrection}{spheres}{1}{AbstractSpheres}
+    \composition{InterDipolarLayerCorrection}{spheres}{2}{AbstractSpheres}
+
+    \composition{EwaldSelf}{spheres}{1}{AbstractSpheres}
+
+    \composition{EwaldBound}{totalMoment}{1}{AbstractTotalMoment}
+    \composition{InterEwaldBound}{totalMoment}{2}{AbstractTotalMoment}
+    
+    \composition{FieldInteraction}{totalMoment}{1}{AbstractTotalMoment}
+    \composition{FieldInteraction}{extField}{1}{AbstractExternalField}
 
     \composition{AbstractTotalMoment}{spheres}{1}{AbstractSpheres}
 
