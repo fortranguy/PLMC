@@ -94,21 +94,21 @@
                 \begin{abstractclass}[text width=\largeTextWidth]{AbstractShortInteraction}{0, 0}
                     \operation{neighboursEnergy(particle : Particle, overlap : bool, enery : double)}
                     \operation[0]{totalEnergy() : double}
-                    \operation[0]{volumeChangeEnergy(dilation: double) : double}
+                    \operation[0]{volumeChangeEnergy(dilatation : double) : double}
                     \operation[0]{overlapTest()}
                 \end{abstractclass}            
                 
                 \begin{class}[text width=\largeTextWidth]{IntraShortInteration}{0, -3.5}
                     \inherit{AbstractShortInteraction}
                     \operation{totalEnergy() : double}
-                    \operation{volumeChangeEnergy(dilation: double) : double}
+                    \operation{volumeChangeEnergy(dilatation : double) : double}
                     \operation{overlapTest()}
                 \end{class}            
                 
                 \begin{class}[text width=\largeTextWidth]{InterShortInteration}{0, -6}
                     \inherit{AbstractShortInteraction}
                     \operation{totalEnergy() : double}
-                    \operation{volumeChangeEnergy(dilation: double) : double}
+                    \operation{volumeChangeEnergy(dilatation : double) : double}
                     \operation{overlapTest()}
                 \end{class}
             \end{scope}
@@ -180,8 +180,8 @@
                     \operation{rotationUpdate()}
                     \operation{exchangeEnergy(particle : Particle) : double}
                     \operation{exchangeUpdate()}
-                    \operation{volumeChangeEnergy(dilation: double) : double}
-                    \operation{volumeChangeUpdate()}
+                    \operation{volumeChangeEnergy(dilatation : double) : double}
+                    \operation{volumeChangeUpdate(dilatation : double)}
                     \operation{soloField(particle : Particle) : double[3]}
                     \operation{testField(particle : Particle) : double[3]}
                 \end{class}
@@ -192,7 +192,7 @@
                     \operation[0]{moveEnergy(old : Particle, new : Particle) : double}
                     \operation[0]{rotationEnergy(old : Particle, new : Particle) : double}
                     \operation[0]{exchangeEnergy(particle : Particle) : double}
-                    \operation[0]{volumeChangeEnergy(dilation: double) : double}
+                    \operation[0]{volumeChangeEnergy(dilatation : double) : double}
                     \operation[0]{soloField(particle : Particle) : double[3]}
                     \operation[0]{testField(particle : Particle) : double[3]}
                 \end{abstractclass}
@@ -204,7 +204,7 @@
                     \operation[0]{moveUpdate()}
                     \operation[0]{rotationUpdate()}
                     \operation[0]{exchangeUpdate()}
-                    \operation[0]{volumeChangeUpdate()}
+                    \operation[0]{volumeChangeUpdate(dilatation : double)}
                 \end{abstractclass}           
             \end{scope}
             
@@ -220,31 +220,34 @@
                     \operation{moveEnergy(old : Particle, new : Particle) : double}
                     \operation{rotationEnergy(old : Particle, new : Particle) : double}
                     \operation{exchangeEnergy(particle : Particle) : double}
-                    \operation{volumeChangeEnergy(dilation: double) : double}
+                    \operation{volumeChangeEnergy(dilatation : double) : double}
+                    \operation{volumeChangeUpdate(dilatation : double)}
                     \operation{soloField(particle : Particle) : double[3]}
                     \operation{testField(particle : Particle) : double[3]}
                 \end{class}
                 
-                \begin{class}[text width=\largeTextWidth]{EwaldReal}{0, -7}
+                \begin{class}[text width=\largeTextWidth]{EwaldReal}{0, -7.5}
                     \inherit{AbstractEwaldReal}
                     \operation{totalEnergy() : double}
                     \operation{totalEnergyUsingField() : double}
                     \operation{moveEnergy(old : Particle, new : Particle) : double}
                     \operation{rotationEnergy(old : Particle, new : Particle) : double}
                     \operation{exchangeEnergy(particle : Particle) : double}
-                    \operation{volumeChangeEnergy(dilation: double) : double}
+                    \operation{volumeChangeEnergy(dilatation : double) : double}
+                    \operation{volumeChangeUpdate(dilatation : double)}
                     \operation{soloField(particle : Particle) : double[3]}
                     \operation{testField(particle : Particle) : double[3]}
                 \end{class}
 
-                \begin{class}[text width=\largeTextWidth]{InterEwaldReal}{0, -12}
+                \begin{class}[text width=\largeTextWidth]{InterEwaldReal}{0, -13}
                     \inherit{AbstractEwaldReal}
                     \operation{totalEnergy() : double}
                     \operation{totalEnergyUsingField() : double}
                     \operation{moveEnergy(old : Particle, new : Particle) : double}
                     \operation{rotationEnergy(old : Particle, new : Particle) : double}
                     \operation{exchangeEnergy(particle : Particle) : double}
-                    \operation{volumeChangeEnergy(dilation: double) : double}
+                    \operation{volumeChangeEnergy(dilatation : double) : double}
+                    \operation{volumeChangeUpdate(dilatation : double)}
                     \operation{soloField(particle : Particle) : double[3]}
                     \operation{testField(particle : Particle) : double[3]}
                 \end{class}
@@ -266,8 +269,8 @@
                     \operation{rotationUpdate()}
                     \operation{exchangeEnergy(particle : Particle) : double}
                     \operation{exchangeUpdate()}
-                    \operation{volumeChangeEnergy(dilation: double) : double}
-                    \operation{volumeChangeUpdate()}
+                    \operation{volumeChangeEnergy(dilatation : double) : double}
+                    \operation{volumeChangeUpdate(dilatation : double)}
                     \operation{soloField(particle : Particle) : double[3]}
                     \operation{testField(particle : Particle) : double[3]}
                 \end{class}
@@ -283,8 +286,8 @@
                     \operation{rotationUpdate()}
                     \operation{exchangeEnergy(particle : Particle) : double}
                     \operation{exchangeUpdate()}
-                    \operation{volumeChangeEnergy(dilation: double) : double}
-                    \operation{volumeChangeUpdate()}
+                    \operation{volumeChangeEnergy(dilatation : double) : double}
+                    \operation{volumeChangeUpdate(dilatation : double)}
                     \operation{soloField(particle : Particle) : double[3]}
                     \operation{testField(particle : Particle) : double[3]}
                 \end{class}
@@ -300,8 +303,8 @@
                     \operation{rotationUpdate()}
                     \operation{exchangeEnergy(particle : Particle) : double}
                     \operation{exchangeUpdate()}
-                    \operation{volumeChangeEnergy(dilation: double) : double}
-                    \operation{volumeChangeUpdate()}
+                    \operation{volumeChangeEnergy(dilatation : double) : double}
+                    \operation{volumeChangeUpdate(dilatation : double)}
                     \operation{soloField(particle : Particle) : double[3]}
                     \operation{testField(particle : Particle) : double[3]}
                 \end{class}
@@ -323,8 +326,8 @@
                     \operation{rotationUpdate()}
                     \operation{exchangeEnergy(particle : Particle) : double}
                     \operation{exchangeUpdate()}
-                    \operation{volumeChangeEnergy(dilation: double) : double}
-                    \operation{volumeChangeUpdate()}
+                    \operation{volumeChangeEnergy(dilatation : double) : double}
+                    \operation{volumeChangeUpdate(dilatation : double)}
                     \operation{soloField(particle : Particle) : double[3]}
                     \operation{testField(particle : Particle) : double[3]}
                 \end{class}
@@ -340,8 +343,8 @@
                     \operation{rotationUpdate()}
                     \operation{exchangeEnergy(particle : Particle) : double}
                     \operation{exchangeUpdate()}
-                    \operation{volumeChangeEnergy(dilation: double) : double}
-                    \operation{volumeChangeUpdate()}
+                    \operation{volumeChangeEnergy(dilatation : double) : double}
+                    \operation{volumeChangeUpdate(dilatation : double)}
                     \operation{soloField(particle : Particle) : double[3]}
                     \operation{testField(particle : Particle) : double[3]}
                 \end{class}
@@ -357,8 +360,8 @@
                     \operation{rotationUpdate()}
                     \operation{exchangeEnergy(particle : Particle) : double}
                     \operation{exchangeUpdate()}
-                    \operation{volumeChangeEnergy(dilation: double) : double}
-                    \operation{volumeChangeUpdate()}
+                    \operation{volumeChangeEnergy(dilatation : double) : double}
+                    \operation{volumeChangeUpdate(dilatation : double)}
                     \operation{soloField(particle : Particle) : double[3]}
                     \operation{testField(particle : Particle) : double[3]}
                 \end{class}
@@ -376,7 +379,7 @@
                     \operation{moveEnergy(old : Particle, new : Particle) : double}
                     \operation{rotationEnergy(old : Particle, new : Particle) : double}
                     \operation{exchangeEnergy(particle : Particle) : double}
-                    \operation{volumeChangeEnergy(dilation: double) : double}
+                    \operation{volumeChangeEnergy(dilatation : double) : double}
                     \operation{soloField(particle : Particle) : double[3]}
                     \operation{testField(particle : Particle) : double[3]}
                 \end{class}
@@ -388,7 +391,7 @@
                     \operation{moveEnergy(old : Particle, new : Particle) : double}
                     \operation{rotationEnergy(old : Particle, new : Particle) : double}
                     \operation{exchangeEnergy(particle : Particle) : double}
-                    \operation{volumeChangeEnergy(dilation: double) : double}
+                    \operation{volumeChangeEnergy(dilatation : double) : double}
                     \operation{soloField(particle : Particle) : double[3]}
                     \operation{testField(particle : Particle) : double[3]}
                 \end{class}
@@ -408,7 +411,7 @@
                     \operation{moveEnergy(old : Particle, new : Particle) : double}
                     \operation{rotationEnergy(old : Particle, new : Particle) : double}
                     \operation{exchangeEnergy(particle : Particle) : double}
-                    \operation{volumeChangeEnergy(dilation: double) : double}
+                    \operation{volumeChangeEnergy(dilatation : double) : double}
                     \operation{soloField(particle : Particle) : double[3]}
                     \operation{testField(particle : Particle) : double[3]}
                 \end{class}
@@ -420,7 +423,7 @@
                     \operation{moveEnergy(old : Particle, new : Particle) : double}
                     \operation{rotationEnergy(old : Particle, new : Particle) : double}
                     \operation{exchangeEnergy(particle : Particle) : double}
-                    \operation{volumeChangeEnergy(dilation: double) : double}
+                    \operation{volumeChangeEnergy(dilatation : double) : double}
                     \operation{soloField(particle : Particle) : double[3]}
                     \operation{testField(particle : Particle) : double[3]}
                 \end{class}
@@ -432,7 +435,7 @@
                     \operation{moveEnergy(old : Particle, new : Particle) : double}
                     \operation{rotationEnergy(old : Particle, new : Particle) : double}
                     \operation{exchangeEnergy(particle : Particle) : double}
-                    \operation{volumeChangeEnergy(dilation: double) : double}
+                    \operation{volumeChangeEnergy(dilatation : double) : double}
                     \operation{soloField(particle : Particle) : double[3]}
                     \operation{testField(particle : Particle) : double[3]}
                 \end{class}
@@ -451,7 +454,7 @@
                     \operation{moveEnergy(old : Particle, new : Particle) : double}
                     \operation{rotationEnergy(old : Particle, new : Particle) : double}
                     \operation{exchangeEnergy(particle : Particle) : double}
-                    \operation{volumeChangeEnergy(dilation: double) : double}
+                    \operation{volumeChangeEnergy(dilatation : double) : double}
                     \operation{soloField(particle : Particle) : double[3]}
                     \operation{testField(particle : Particle) : double[3]}
                 \end{class}
@@ -463,7 +466,7 @@
                     \operation{moveEnergy(old : Particle, new : Particle) : double}
                     \operation{rotationEnergy(old : Particle, new : Particle) : double}
                     \operation{exchangeEnergy(particle : Particle) : double}
-                    \operation{volumeChangeEnergy(dilation: double) : double}
+                    \operation{volumeChangeEnergy(dilatation : double) : double}
                     \operation{soloField(particle : Particle) : double[3]}
                     \operation{testField(particle : Particle) : double[3]}
                 \end{class}
