@@ -211,9 +211,10 @@
             \begin{scope}[shift={($(DipolarInteraction.south) + (-19.5 cm, -2 cm)$)}]
                 \begin{abstractclass}[text width=\largeTextWidth]{AbstractEwaldReal}{0, 0}
                     \inherit{AbstractDipolarInteraction}
+                    \operation[0]{volumeChangeUpdate(dilatation : double)}
                 \end{abstractclass}
                 
-                \begin{class}[text width=\largeTextWidth]{NullEwaldReal}{0, -2}
+                \begin{class}[text width=\largeTextWidth]{NullEwaldReal}{0, -2.5}
                     \inherit{AbstractEwaldReal}
                     \operation{totalEnergy() : double}
                     \operation{totalEnergyUsingField() : double}
@@ -226,7 +227,7 @@
                     \operation{testField(particle : Particle) : double[3]}
                 \end{class}
                 
-                \begin{class}[text width=\largeTextWidth]{EwaldReal}{0, -7.5}
+                \begin{class}[text width=\largeTextWidth]{EwaldReal}{0, -8}
                     \inherit{AbstractEwaldReal}
                     \operation{totalEnergy() : double}
                     \operation{totalEnergyUsingField() : double}
@@ -239,7 +240,7 @@
                     \operation{testField(particle : Particle) : double[3]}
                 \end{class}
 
-                \begin{class}[text width=\largeTextWidth]{InterEwaldReal}{0, -13}
+                \begin{class}[text width=\largeTextWidth]{InterEwaldReal}{0, -13.5}
                     \inherit{AbstractEwaldReal}
                     \operation{totalEnergy() : double}
                     \operation{totalEnergyUsingField() : double}
