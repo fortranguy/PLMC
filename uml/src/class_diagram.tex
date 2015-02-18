@@ -95,19 +95,21 @@
                     \operation{neighboursEnergy(particle : Particle, overlap : bool, enery : double)}
                     \operation[0]{totalEnergy() : double}
                     \operation[0]{volumeChangeEnergy(dilation: double) : double}
-                    \operation{overlapTest()}
+                    \operation[0]{overlapTest()}
                 \end{abstractclass}            
                 
                 \begin{class}[text width=\largeTextWidth]{IntraShortInteration}{0, -3.5}
                     \inherit{AbstractShortInteraction}
                     \operation{totalEnergy() : double}
                     \operation{volumeChangeEnergy(dilation: double) : double}
+                    \operation{overlapTest()}
                 \end{class}            
                 
                 \begin{class}[text width=\largeTextWidth]{InterShortInteration}{0, -6}
                     \inherit{AbstractShortInteraction}
                     \operation{totalEnergy() : double}
                     \operation{volumeChangeEnergy(dilation: double) : double}
+                    \operation{overlapTest()}
                 \end{class}
             \end{scope}
             
