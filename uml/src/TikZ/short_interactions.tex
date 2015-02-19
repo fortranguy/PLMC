@@ -1,0 +1,143 @@
+\begin{scope}[shift={($(Material.north) + (-16 cm, 50.5 cm)$)}]
+    \begin{package}{Short range interactions}
+    
+        \begin{scope}[local bounding box=ShortInteractions]
+            \begin{abstractclass}[text width=\extraLargeTextWidth]{AbstractShortInteractions}{0, 0}
+                \operation[0]{totalEnergy() : double}
+                \operation{soloEnergy(particle : Particle, overlap : bool, energy : double)}
+                \operation[0]{volumeChangeEnergy(dilatation : double, overlap : bool, energy : double)}
+                \operation[0]{volumeChangeRestoration(dilatation : double)}
+                \operation[0]{overlapTest()}
+            \end{abstractclass}
+
+            \def\operationsImplementation{
+                \operation{totalEnergy() : double}
+                \operation{volumeChangeEnergy(dilatation : double, overlap : bool, energy : double)}
+                \operation{volumeChangeRestoration(dilatation : double)}
+                \operation{overlapTest()}
+            }
+            
+            \begin{class}[text width=\extraLargeTextWidth]{IntraShortInteration}{0, -4.5}
+                \inherit{AbstractShortInteractions}
+                \operationsImplementation{}
+            \end{class}            
+            
+            \begin{class}[text width=\extraLargeTextWidth]{InterShortInteration}{0, -8}
+                \inherit{AbstractShortInteractions}
+                \operationsImplementation{}
+            \end{class}
+        \end{scope}
+        
+        \begin{scope}[shift={($(ShortInteractions.south) + (-7 cm, -2.5 cm)$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{AbstractNeighbourCells}{0, 0}
+                \operation{fill()}
+                \operation{index(position : double[3]) : int}
+                \operation[0]{boundBegin(iCell : int) : int}
+                \operation[0]{boundEnd(iCell : int) : int}
+                \operation{toBegin(current : Node, iNearCell : int, iTotalCell : int)}
+                \operation{add(iSphere : int, iCell : int)}
+                \operation{remove(iSphere : int, iCell : int)}
+                \operation{copy(iSphereSource : int, iSphereTarget : int, iCellTarget : int)}
+            \end{abstractclass}
+
+            \def\operationsImplementation{
+                \operation{boundBegin(iCell : int) : int}
+                \operation{boundEnd(iCell : int) : int}
+            }
+            
+            \begin{class}[text width=\largeTextWidth]{BulkNeighbourCells}{0, -5.5}
+                \inherit{AbstractNeighbourCells}
+                \operationsImplementation{}
+            \end{class}
+            
+            \begin{class}[text width=\largeTextWidth]{SlabNeighbourCells}{0, -8}
+                \inherit{AbstractNeighbourCells}
+                \operationsImplementation{}
+            \end{class}
+        \end{scope}
+        
+        \begin{scope}[shift={($(ShortInteractions.south) + (7 cm, -2.5 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractPairPotential}{0, 0}
+                \operation[0]{potential(distance : double) : double}
+            \end{abstractclass}
+
+            \def\operationsImplementation{
+                \operation{potential(distance : double) : double}
+            }
+            
+            \begin{class}[text width=\mediumTextWidth]{LJpairPotential}{0, -2.5}
+                \inherit{AbstractPairPotential}
+                \operationsImplementation{}
+            \end{class}
+            
+            \begin{class}[text width=\mediumTextWidth]{HardPairPotential}{0, -4.5}
+                \inherit{AbstractPairPotential}
+                \operationsImplementation{}
+            \end{class}
+        \end{scope}
+        
+        \begin{scope}[local bounding box=WallInteraction, 
+            shift={($(15 cm, 0 cm)$)}]
+            \begin{abstractclass}[text width=\extraLargeTextWidth]{AbstractWallInteraction}{0, 0}
+                \operation[0]{totalEnergy() : double}
+                \operation[0]{soloEnergy(particle : Particle, overlap : bool, energy : double)}
+                \operation[0]{volumeChangeEnergy(dilatation : double, overlap : bool, energy : double)}
+                \operation[0]{overlapTest()}
+            \end{abstractclass}
+            
+            \def\operationsImplementation{
+                \operation{totalEnergy() : double}
+                \operation{soloEnergy(particle : Particle, overlap : bool, energy : double)}
+                \operation{volumeChangeEnergy(dilatation : double, overlap : bool, energy : double)}
+                \operation{overlapTest()}
+            }
+            
+            \begin{class}[text width=\extraLargeTextWidth]{NullWallInteraction}{0, -4}
+                \inherit{AbstractWallInteraction}
+                \operationsImplementation{}
+            \end{class}
+            
+            \begin{class}[text width=\extraLargeTextWidth]{WallInteraction}{0, -7.5}
+                \inherit{AbstractWallInteraction}
+                \operationsImplementation{}
+            \end{class}
+        \end{scope}
+        
+        \begin{scope}[shift={($(WallInteraction.south) + (7 cm, -2.5 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractWallPotential}{0, 0}
+                \operation[0]{potential(height : double) : double}
+            \end{abstractclass}
+            
+            \def\operationsImplementation{
+                \operation{potential(height : double) : double}
+            }
+            
+            \begin{class}[text width=\mediumTextWidth]{NullWallPotential}{0, -2.5}
+                \inherit{AbstractWallPotential}
+                \operationsImplementation{}
+            \end{class}
+            
+            \begin{class}[text width=\mediumTextWidth]{IntegratedLJwallPotential}{0, -4.5}
+                \inherit{AbstractWallPotential}
+                \operationsImplementation{}
+            \end{class}
+        \end{scope}
+    
+    \end{package}
+\end{scope}
+
+\begin{scope}[on background layer]
+    \composition{AbstractShortInteractions}{box}{1}{AbstractBoxGeometry}
+    \composition{AbstractShortInteractions}{neighbourCells}{1}{AbstractNeighbourCells}
+    \composition{AbstractShortInteractions}{pairPotential}{1}{AbstractPairPotential}
+    \composition{IntraShortInteration}{spheres}{1}{AbstractSpheres}
+    \composition{InterShortInteration}{spheres}{2}{AbstractSpheres}
+    \composition{InterShortInteration}{interSpheres}{1}{AbstractInterSpheres}
+
+    \composition{AbstractNeighbourCells}{box}{1}{AbstractBoxGeometry}
+    \composition{AbstractNeighbourCells}{spheres}{1}{AbstractSpheres}
+    
+    \composition{AbstractWallInteraction}{wallPotential}{1}{AbstractWallPotential}
+    \composition{WallInteraction}{box}{1}{AbstractBoxGeometry}
+    \composition{WallInteraction}{spheres}{1}{AbstractSpheres}
+\end{scope}
