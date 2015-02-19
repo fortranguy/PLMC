@@ -1,13 +1,21 @@
 \begin{scope}[shift={($(Material.north) + (-20 cm, 55 cm)$)}]
     \begin{package}{Short range interactions}
     
-        \begin{scope}[local bounding box=ShortInteractions]
-            \begin{abstractclass}[text width=\extraLargeTextWidth]{AbstractShortInteractions}{0, 0}
+        \begin{scope}[local bounding box=ShortInteraction]
+            \begin{abstractclass}[text width=\extraLargeTextWidth]{AbstractShortInteraction}{0, 0}
                 \operation[0]{totalEnergy() : double}
-                \operation{soloEnergy(particle : Particle, overlap : bool, energy : double)}
+                \operation[0]{soloEnergy(particle : Particle, overlap : bool, energy : double)}
                 \operation[0]{volumeChangeEnergy(dilatation : double, overlap : bool, energy : double)}
-                \operation[0]{volumeChangeRestoration(dilatation : double)}
                 \operation[0]{overlapTest()}
+            \end{abstractclass}
+        \end{scope}
+    
+        \begin{scope}[local bounding box=PairInteractions,
+            shift={($(ShortInteraction.south) + (-8 cm, -2 cm)$)}]
+            \begin{abstractclass}[text width=\extraLargeTextWidth]{AbstractPairInteractions}{0, 0}
+                \inherit{AbstractShortInteraction}
+                \operation{soloEnergy(particle : Particle, overlap : bool, energy : double)}
+                \operation[0]{volumeChangeRestoration(dilatation : double)}                
             \end{abstractclass}
 
             \def\operationsImplementation{
@@ -17,18 +25,18 @@
                 \operation{overlapTest()}
             }
             
-            \begin{class}[text width=\extraLargeTextWidth]{IntraShortInteration}{0, -4.5}
-                \inherit{AbstractShortInteractions}
+            \begin{class}[text width=\extraLargeTextWidth]{IntraShortInteration}{0, -3}
+                \inherit{AbstractPairInteractions}
                 \operationsImplementation{}
             \end{class}            
             
-            \begin{class}[text width=\extraLargeTextWidth]{InterShortInteration}{0, -8}
-                \inherit{AbstractShortInteractions}
+            \begin{class}[text width=\extraLargeTextWidth]{InterShortInteration}{0, -6.5}
+                \inherit{AbstractPairInteractions}
                 \operationsImplementation{}
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(ShortInteractions.south) + (-8 cm, -3.5 cm)$)}]
+        \begin{scope}[shift={($(PairInteractions.south) + (-8 cm, -3.5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{AbstractNeighbourCells}{0, 0}
                 \operation{fill()}
                 \operation{index(position : double[3]) : int}
@@ -56,7 +64,7 @@
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(ShortInteractions.south) + (8 cm, -3.5 cm)$)}]
+        \begin{scope}[shift={($(PairInteractions.south) + (8 cm, -3.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractPairPotential}{0, 0}
                 \operation[0]{potential(distance : double) : double}
             \end{abstractclass}
@@ -77,12 +85,9 @@
         \end{scope}
         
         \begin{scope}[local bounding box=WallInteraction, 
-            shift={($(16 cm, 0 cm)$)}]
+            shift={($(ShortInteraction.south) + (8 cm, -2 cm)$)}]
             \begin{abstractclass}[text width=\extraLargeTextWidth]{AbstractWallInteraction}{0, 0}
-                \operation[0]{totalEnergy() : double}
-                \operation[0]{soloEnergy(particle : Particle, overlap : bool, energy : double)}
-                \operation[0]{volumeChangeEnergy(dilatation : double, overlap : bool, energy : double)}
-                \operation[0]{overlapTest()}
+                \inherit{AbstractShortInteraction}
             \end{abstractclass}
             
             \def\operationsImplementation{
@@ -92,12 +97,12 @@
                 \operation{overlapTest()}
             }
             
-            \begin{class}[text width=\extraLargeTextWidth]{NullWallInteraction}{0, -4.5}
+            \begin{class}[text width=\extraLargeTextWidth]{NullWallInteraction}{0, -3}
                 \inherit{AbstractWallInteraction}
                 \operationsImplementation{}
             \end{class}
             
-            \begin{class}[text width=\extraLargeTextWidth]{WallInteraction}{0, -8}
+            \begin{class}[text width=\extraLargeTextWidth]{WallInteraction}{0, -6.5}
                 \inherit{AbstractWallInteraction}
                 \operationsImplementation{}
             \end{class}
@@ -127,9 +132,9 @@
 \end{scope}
 
 \begin{scope}[on background layer]
-    \composition{AbstractShortInteractions}{box}{1}{AbstractBoxGeometry}
-    \composition{AbstractShortInteractions}{neighbourCells}{1}{AbstractNeighbourCells}
-    \composition{AbstractShortInteractions}{pairPotential}{1}{AbstractPairPotential}
+    \composition{AbstractPairInteractions}{box}{1}{AbstractBoxGeometry}
+    \composition{AbstractPairInteractions}{neighbourCells}{1}{AbstractNeighbourCells}
+    \composition{AbstractPairInteractions}{pairPotential}{1}{AbstractPairPotential}
     \composition{IntraShortInteration}{spheres}{1}{AbstractSpheres}
     \composition{InterShortInteration}{spheres}{2}{AbstractSpheres}
     \composition{InterShortInteration}{interSpheres}{1}{AbstractInterSpheres}
