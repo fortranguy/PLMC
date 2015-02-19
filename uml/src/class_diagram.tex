@@ -156,7 +156,7 @@
                 \end{class}
             \end{scope}
             
-            \begin{scope}[shift={($(ShortInteraction.south) + (5 cm, -2.5 cm)$)}]
+            \begin{scope}[shift={($(ShortInteraction.south) + (7 cm, -2.5 cm)$)}]
                 \begin{abstractclass}[text width=\mediumTextWidth]{AbstractPairPotential}{0, 0}
                     \operation[0]{potential(distance : double) : double}
                 \end{abstractclass}
@@ -177,7 +177,7 @@
             \end{scope}
             
             \begin{scope}[local bounding box=WallInteraction, 
-                shift={($(ShortInteraction.south) + (0 cm, -15 cm)$)}]
+                shift={($(15 cm, 0 cm)$)}]
                 \begin{abstractclass}[text width=\extraLargeTextWidth]{AbstractWallInteraction}{0, 0}
                     \operation[0]{totalEnergy() : double}
                     \operation[0]{soloEnergy(particle : Particle, overlap : bool, energy : double)}
@@ -203,7 +203,7 @@
                 \end{class}
             \end{scope}
             
-            \begin{scope}[shift={($(WallInteraction.south) + (5 cm, -2.5 cm)$)}]
+            \begin{scope}[shift={($(WallInteraction.south) + (7 cm, -2.5 cm)$)}]
                 \begin{abstractclass}[text width=\mediumTextWidth]{AbstractWallPotential}{0, 0}
                     \operation[0]{potential(height : double) : double}
                 \end{abstractclass}
