@@ -5,6 +5,8 @@
             \begin{class}[text width=\extraLargeTextWidth]{ShortInteractionFacade}{0, 4}
                 \operation{totalEnergy() : double}
                 \operation{soloEnergy(particle : Particle, overlap : bool, energy : double)}
+                \operation{moveUpdate(old : Particle, new : Particle)}
+                \operation{exchangeUpdate(particle : particle)}
                 \operation{volumeChangeEnergy(dilatation : double, overlap : bool, energy : double)}
                 \operation{volumeChangeRestoration(dilatation : double)}
                 \operation{overlapTest()}
@@ -23,11 +25,15 @@
             \begin{abstractclass}[text width=\extraLargeTextWidth]{AbstractPairInteraction}{0, 0}
                 \inherit{AbstractShortInteraction}
                 \operation{soloEnergy(particle : Particle, overlap : bool, energy : double)}
+                \operation[0]{moveUpdate(old : Particle, new : Particle)}
+                \operation[0]{exchangeUpdate(particle : particle)}
                 \operation[0]{volumeChangeRestoration(dilatation : double)}                
             \end{abstractclass}
 
             \def\operationsImplementation{
                 \operation{totalEnergy() : double}
+                \operation{moveUpdate(old : Particle, new : Particle)}
+                \operation{exchangeUpdate(particle : particle)}
                 \operation{volumeChangeEnergy(dilatation : double, overlap : bool, energy : double)}
                 \operation{volumeChangeRestoration(dilatation : double)}
                 \operation{overlapTest()}
