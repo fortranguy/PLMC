@@ -1,4 +1,4 @@
-\begin{scope}[shift={($(Material.north) + (-16 cm, 50.5 cm)$)}]
+\begin{scope}[shift={($(Material.north) + (-20 cm, 50 cm)$)}]
     \begin{package}{Short range interactions}
     
         \begin{scope}[local bounding box=ShortInteractions]
@@ -28,7 +28,7 @@
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(ShortInteractions.south) + (-7 cm, -2.5 cm)$)}]
+        \begin{scope}[shift={($(ShortInteractions.south) + (-8 cm, -3.5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{AbstractNeighbourCells}{0, 0}
                 \operation{fill()}
                 \operation{index(position : double[3]) : int}
@@ -56,7 +56,7 @@
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(ShortInteractions.south) + (7 cm, -2.5 cm)$)}]
+        \begin{scope}[shift={($(ShortInteractions.south) + (8 cm, -3.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractPairPotential}{0, 0}
                 \operation[0]{potential(distance : double) : double}
             \end{abstractclass}
@@ -77,7 +77,7 @@
         \end{scope}
         
         \begin{scope}[local bounding box=WallInteraction, 
-            shift={($(15 cm, 0 cm)$)}]
+            shift={($(16 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\extraLargeTextWidth]{AbstractWallInteraction}{0, 0}
                 \operation[0]{totalEnergy() : double}
                 \operation[0]{soloEnergy(particle : Particle, overlap : bool, energy : double)}
@@ -92,18 +92,18 @@
                 \operation{overlapTest()}
             }
             
-            \begin{class}[text width=\extraLargeTextWidth]{NullWallInteraction}{0, -4}
+            \begin{class}[text width=\extraLargeTextWidth]{NullWallInteraction}{0, -4.5}
                 \inherit{AbstractWallInteraction}
                 \operationsImplementation{}
             \end{class}
             
-            \begin{class}[text width=\extraLargeTextWidth]{WallInteraction}{0, -7.5}
+            \begin{class}[text width=\extraLargeTextWidth]{WallInteraction}{0, -8}
                 \inherit{AbstractWallInteraction}
                 \operationsImplementation{}
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(WallInteraction.south) + (7 cm, -2.5 cm)$)}]
+        \begin{scope}[shift={($(WallInteraction.south) + (8 cm, -3.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractWallPotential}{0, 0}
                 \operation[0]{potential(height : double) : double}
             \end{abstractclass}
