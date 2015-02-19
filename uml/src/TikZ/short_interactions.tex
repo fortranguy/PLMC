@@ -33,12 +33,12 @@
                 \operation{overlapTest()}
             }
             
-            \begin{class}[text width=\extraLargeTextWidth]{IntraShortInteration}{0, -3}
+            \begin{class}[text width=\extraLargeTextWidth]{IntraPairInteration}{0, -3}
                 \inherit{AbstractPairInteraction}
                 \operationsImplementation{}
             \end{class}            
             
-            \begin{class}[text width=\extraLargeTextWidth]{InterShortInteration}{0, -6.5}
+            \begin{class}[text width=\extraLargeTextWidth]{InterPairInteration}{0, -6.5}
                 \inherit{AbstractPairInteraction}
                 \operationsImplementation{}
             \end{class}
@@ -146,9 +146,9 @@
     \composition{AbstractPairInteraction}{box}{1}{AbstractBoxGeometry}
     \composition{AbstractPairInteraction}{neighbourCells}{1}{AbstractNeighbourCells}
     \composition{AbstractPairInteraction}{pairPotential}{1}{AbstractPairPotential}
-    \composition{IntraShortInteration}{spheres}{1}{AbstractSpheres}
-    \composition{InterShortInteration}{spheres}{2}{AbstractSpheres}
-    \composition{InterShortInteration}{interSpheres}{1}{AbstractInterSpheres}
+    \composition{IntraPairInteration}{spheres}{1}{AbstractSpheres}
+    \composition{InterPairInteration}{spheres}{2}{AbstractSpheres}
+    \composition{InterPairInteration}{interSpheres}{1}{AbstractInterSpheres}
 
     \composition{AbstractNeighbourCells}{box}{1}{AbstractBoxGeometry}
     \composition{AbstractNeighbourCells}{spheres}{1}{AbstractSpheres}
