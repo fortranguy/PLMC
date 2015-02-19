@@ -1,4 +1,4 @@
-\begin{scope}[shift={($(Material.north) + (40 cm, 45cm)$)}]
+\begin{scope}[shift={($(Material.north) + (50 cm, 55cm)$)}]
     \begin{package}{Dipolar interactions}
     
         \begin{scope}[local bounding box=DipolarInteractions]
@@ -40,7 +40,7 @@
             \end{abstractclass}           
         \end{scope}
         
-        \begin{scope}[shift={($(DipolarInteractions.south) + (-19.5 cm, -2 cm)$)}]
+        \begin{scope}[shift={($(DipolarInteractions.south) + (-19.5 cm, -5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{AbstractEwaldReal}{0, 0}
                 \inherit{AbstractDipolarInteractions}
                 \operation[0]{volumeChangeUpdate(dilatation : double)}
@@ -74,7 +74,7 @@
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(DipolarInteractions.south) + (-6.5 cm, -2 cm)$)}]
+        \begin{scope}[shift={($(DipolarInteractions.south) + (-6.5 cm, -5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{AbstractEwaldReci}{0, 0}
                 \inherit{AbstractReciInteraction}
             \end{abstractclass}
@@ -111,7 +111,7 @@
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(DipolarInteractions.south) + (6.5 cm, -2 cm)$)}]
+        \begin{scope}[shift={($(DipolarInteractions.south) + (6.5 cm, -5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{AbstractDipolarLayerCorrection}{0, 0}
                 \inherit{AbstractReciInteraction}
             \end{abstractclass}
@@ -148,7 +148,7 @@
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(DipolarInteractions.south) + (19.5 cm, -2 cm)$)}]
+        \begin{scope}[shift={($(DipolarInteractions.south) + (19.5 cm, -5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{AbstractEwaldSelf}{0, 0}
                 \inherit{AbstractDipolarInteractions}
             \end{abstractclass}
@@ -176,7 +176,7 @@
             
         \end{scope}
         
-        \begin{scope}[shift={($(DipolarInteractions.south) + (32.5 cm, -2 cm)$)},
+        \begin{scope}[shift={($(DipolarInteractions.south) + (32.5 cm, -5 cm)$)},
             local bounding box=EwaldBound]
             \begin{abstractclass}[text width=\largeTextWidth]{AbstractEwaldBound}{0, 0}
                 \inherit{AbstractDipolarInteractions}
@@ -209,7 +209,7 @@
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(DipolarInteractions.south) + (45.5 cm, -2 cm)$)},
+        \begin{scope}[shift={($(DipolarInteractions.south) + (45.5 cm, -5 cm)$)},
             local bounding box=FieldInteraction]
             \begin{abstractclass}[text width=\largeTextWidth]{AbstractFieldInteraction}{0, 0}
                 \inherit{AbstractDipolarInteractions}
