@@ -7,6 +7,21 @@
 \usepackage[simplified]{pgf-umlcd}
 \usetikzlibrary{calc, backgrounds}
 
+\newif\ifexternal
+\externalfalse
+
+\ifexternal
+\usetikzlibrary{external}
+\tikzexternalize[optimize=false, prefix=Figures/, mode=list and make]
+\tikzset{external/system call=
+    {pdflatex \tikzexternalcheckshellescape -halt-on-error -interaction=batchmode 
+    -jobname "\image" "\texsource" && pdftops -eps "\image".pdf}
+}
+\tikzset{external/figure name = Figure}
+\else
+\newcommand{\tikzsetnextfilename}[1]{}
+\fi
+
 \usepackage[paper=A4,pagesize]{typearea}
 \usepackage{geometry}
 
@@ -41,6 +56,7 @@
     \newgeometry{top=4cm, bottom=4cm, left=5cm, right=5cm}
     \thispagestyle{empty}
     
+    \tikzsetnextfilename{class_diagram}
     \begin{figure}[htb]
         \centering
         \input class_diagram.tex
