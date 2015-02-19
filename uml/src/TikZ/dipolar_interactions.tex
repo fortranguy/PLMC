@@ -7,11 +7,11 @@
                 \operation{totalEnergyUsingField() : double}
                 \operation{reset()}
                 \operation{moveEnergy(old : Particle, new : Particle) : double}
-                \operation{moveUpdate()}
+                \operation{moveUpdate(old : Particle, new : Particle)}
                 \operation{rotationEnergy(old : Particle, new : Particle) : double}
-                \operation{rotationUpdate()}
+                \operation{rotationUpdate(old : Particle, new : Particle)}
                 \operation{exchangeEnergy(particle : Particle) : double}
-                \operation{exchangeUpdate()}
+                \operation{exchangeUpdate(particle : Particle)}
                 \operation{volumeChangeEnergy(dilatation : double) : double}
                 \operation{volumeChangeUpdate(dilatation : double)}
                 \operation{soloField(particle : Particle) : double[3]}
@@ -33,9 +33,9 @@
                 \inherit{AbstractDipolarInteraction}
                 \operation[0]{reset()}
                 \operation[0]{countWaveVectors()}
-                \operation[0]{moveUpdate()}
-                \operation[0]{rotationUpdate()}
-                \operation[0]{exchangeUpdate()}
+                \operation[0]{moveUpdate(old : Particle, new : Particle)}
+                \operation[0]{rotationUpdate(old : Particle, new : Particle)}
+                \operation[0]{exchangeUpdate(particle : Particle)}
                 \operation[0]{volumeChangeUpdate(dilatation : double)}
             \end{abstractclass}           
         \end{scope}
@@ -84,11 +84,11 @@
                 \operation{totalEnergyUsingField() : double}
                 \operation{reset()}
                 \operation{moveEnergy(old : Particle, new : Particle) : double}
-                \operation{moveUpdate()}
+                \operation{moveUpdate(old : Particle, new : Particle)}
                 \operation{rotationEnergy(old : Particle, new : Particle) : double}
-                \operation{rotationUpdate()}
+                \operation{rotationUpdate(old : Particle, new : Particle)}
                 \operation{exchangeEnergy(particle : Particle) : double}
-                \operation{exchangeUpdate()}
+                \operation{exchangeUpdate(particle : Particle)}
                 \operation{volumeChangeEnergy(dilatation : double) : double}
                 \operation{volumeChangeUpdate(dilatation : double)}
                 \operation{soloField(particle : Particle) : double[3]}
@@ -121,11 +121,11 @@
                 \operation{totalEnergyUsingField() : double}
                 \operation{reset()}
                 \operation{moveEnergy(old : Particle, new : Particle) : double}
-                \operation{moveUpdate()}
+                \operation{moveUpdate(old : Particle, new : Particle)}
                 \operation{rotationEnergy(old : Particle, new : Particle) : double}
-                \operation{rotationUpdate()}
+                \operation{rotationUpdate(old : Particle, new : Particle)}
                 \operation{exchangeEnergy(particle : Particle) : double}
-                \operation{exchangeUpdate()}
+                \operation{exchangeUpdate(particle : Particle)}
                 \operation{volumeChangeEnergy(dilatation : double) : double}
                 \operation{volumeChangeUpdate(dilatation : double)}
                 \operation{soloField(particle : Particle) : double[3]}
@@ -240,14 +240,14 @@
         \begin{scope}[shift={($(EwaldBound.south)!0.5!(FieldInteraction.south) + (0 cm, -7.5 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{AbstractTotalMoment}{0, 0}
                 \operation[0]{getTotalMoment() : double[3]}
-                \operation[0]{rotationUpdate()}
-                \operation[0]{exchangeUpdate()}
+                \operation[0]{rotationUpdate(old : Particle, new : Particle)}
+                \operation[0]{exchangeUpdate(particle : Particle)}
             \end{abstractclass}
 
             \def\operationsImplementation{
                 \operation{getTotalMoment() : double[3]}
-                \operation{rotationUpdate()}
-                \operation{exchangeUpdate()}
+                \operation{rotationUpdate(old : Particle, new : Particle)}
+                \operation{exchangeUpdate(particle : Particle)}
             }
 
             \begin{class}[text width=\smallTextWidth]{NullTotalMoment}{0, -3}
