@@ -2,6 +2,14 @@
     \begin{package}{Short range interactions}
     
         \begin{scope}[local bounding box=ShortInteraction]
+            \begin{class}[text width=\extraLargeTextWidth]{ShortInteractionFacade}{0, 4}
+                \operation{totalEnergy() : double}
+                \operation{soloEnergy(particle : Particle, overlap : bool, energy : double)}
+                \operation{volumeChangeEnergy(dilatation : double, overlap : bool, energy : double)}
+                \operation{volumeChangeRestoration(dilatation : double)}
+                \operation{overlapTest()}
+            \end{class}
+        
             \begin{abstractclass}[text width=\extraLargeTextWidth]{AbstractShortInteraction}{0, 0}
                 \operation[0]{totalEnergy() : double}
                 \operation[0]{soloEnergy(particle : Particle, overlap : bool, energy : double)}
@@ -10,9 +18,9 @@
             \end{abstractclass}
         \end{scope}
     
-        \begin{scope}[local bounding box=PairInteractions,
-            shift={($(ShortInteraction.south) + (-8 cm, -2 cm)$)}]
-            \begin{abstractclass}[text width=\extraLargeTextWidth]{AbstractPairInteractions}{0, 0}
+        \begin{scope}[local bounding box=PairInteraction,
+            shift={($(ShortInteraction.south) + (-8 cm, -2.5 cm)$)}]
+            \begin{abstractclass}[text width=\extraLargeTextWidth]{AbstractPairInteraction}{0, 0}
                 \inherit{AbstractShortInteraction}
                 \operation{soloEnergy(particle : Particle, overlap : bool, energy : double)}
                 \operation[0]{volumeChangeRestoration(dilatation : double)}                
@@ -26,17 +34,17 @@
             }
             
             \begin{class}[text width=\extraLargeTextWidth]{IntraShortInteration}{0, -3}
-                \inherit{AbstractPairInteractions}
+                \inherit{AbstractPairInteraction}
                 \operationsImplementation{}
             \end{class}            
             
             \begin{class}[text width=\extraLargeTextWidth]{InterShortInteration}{0, -6.5}
-                \inherit{AbstractPairInteractions}
+                \inherit{AbstractPairInteraction}
                 \operationsImplementation{}
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(PairInteractions.south) + (-8 cm, -3.5 cm)$)}]
+        \begin{scope}[shift={($(PairInteraction.south) + (-8 cm, -3.5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{AbstractNeighbourCells}{0, 0}
                 \operation{fill()}
                 \operation{index(position : double[3]) : int}
@@ -64,7 +72,7 @@
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(PairInteractions.south) + (8 cm, -3.5 cm)$)}]
+        \begin{scope}[shift={($(PairInteraction.south) + (8 cm, -3.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractPairPotential}{0, 0}
                 \operation[0]{potential(distance : double) : double}
             \end{abstractclass}
@@ -85,7 +93,7 @@
         \end{scope}
         
         \begin{scope}[local bounding box=WallInteraction, 
-            shift={($(ShortInteraction.south) + (8 cm, -2 cm)$)}]
+            shift={($(ShortInteraction.south) + (8 cm, -2.5 cm)$)}]
             \begin{abstractclass}[text width=\extraLargeTextWidth]{AbstractWallInteraction}{0, 0}
                 \inherit{AbstractShortInteraction}
             \end{abstractclass}
@@ -132,9 +140,12 @@
 \end{scope}
 
 \begin{scope}[on background layer]
-    \composition{AbstractPairInteractions}{box}{1}{AbstractBoxGeometry}
-    \composition{AbstractPairInteractions}{neighbourCells}{1}{AbstractNeighbourCells}
-    \composition{AbstractPairInteractions}{pairPotential}{1}{AbstractPairPotential}
+    \composition{ShortInteractionFacade}{pairInteraction}{1}{AbstractPairInteraction}
+    \composition{ShortInteractionFacade}{wallInteraction}{1}{AbstractWallInteraction}
+
+    \composition{AbstractPairInteraction}{box}{1}{AbstractBoxGeometry}
+    \composition{AbstractPairInteraction}{neighbourCells}{1}{AbstractNeighbourCells}
+    \composition{AbstractPairInteraction}{pairPotential}{1}{AbstractPairPotential}
     \composition{IntraShortInteration}{spheres}{1}{AbstractSpheres}
     \composition{InterShortInteration}{spheres}{2}{AbstractSpheres}
     \composition{InterShortInteration}{interSpheres}{1}{AbstractInterSpheres}
