@@ -2,7 +2,7 @@
     \begin{package}{Short range interactions}
     
         \begin{scope}[local bounding box=ShortInteraction]
-            \begin{class}[text width=\extraLargeTextWidth]{ShortInteractionFacade}{0, 4}
+            \begin{class}[text width=\extraLargeTextWidth]{ShortInteractionFacade}{0, 5}
                 \operation{totalEnergy() : double}
                 \operation{soloEnergy(particle : Particle, overlap : bool, energy : double)}
                 \operation{moveUpdate(old : Particle, new : Particle)}
@@ -39,18 +39,18 @@
                 \operation{overlapTest()}
             }
             
-            \begin{class}[text width=\extraLargeTextWidth]{IntraPairInteration}{0, -3}
+            \begin{class}[text width=\extraLargeTextWidth]{IntraPairInteration}{0, -4}
                 \inherit{AbstractPairInteraction}
                 \operationsImplementation{}
             \end{class}            
             
-            \begin{class}[text width=\extraLargeTextWidth]{InterPairInteration}{0, -6.5}
+            \begin{class}[text width=\extraLargeTextWidth]{InterPairInteration}{0, -8.5}
                 \inherit{AbstractPairInteraction}
                 \operationsImplementation{}
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(PairInteraction.south) + (-8 cm, -3.5 cm)$)}]
+        \begin{scope}[shift={($(PairInteraction.south) + (-8 cm, -4 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{AbstractNeighbourCells}{0, 0}
                 \operation{fill()}
                 \operation{index(position : double[3]) : int}
@@ -78,7 +78,7 @@
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(PairInteraction.south) + (8 cm, -3.5 cm)$)}]
+        \begin{scope}[shift={($(PairInteraction.south) + (8 cm, -4 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractPairPotential}{0, 0}
                 \operation[0]{potential(distance : double) : double}
             \end{abstractclass}
@@ -111,18 +111,18 @@
                 \operation{overlapTest()}
             }
             
-            \begin{class}[text width=\extraLargeTextWidth]{NullWallInteraction}{0, -3}
+            \begin{class}[text width=\extraLargeTextWidth]{NullWallInteraction}{0, -4}
                 \inherit{AbstractWallInteraction}
                 \operationsImplementation{}
             \end{class}
             
-            \begin{class}[text width=\extraLargeTextWidth]{WallInteraction}{0, -6.5}
+            \begin{class}[text width=\extraLargeTextWidth]{WallInteraction}{0, -8.5}
                 \inherit{AbstractWallInteraction}
                 \operationsImplementation{}
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(WallInteraction.south) + (8 cm, -3.5 cm)$)}]
+        \begin{scope}[shift={($(WallInteraction.south) + (8 cm, -4.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractWallPotential}{0, 0}
                 \operation[0]{potential(height : double) : double}
             \end{abstractclass}
