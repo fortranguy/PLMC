@@ -27,11 +27,16 @@
         
         \begin{scope}[shift={($(Spheres.north) - (21 cm, 0)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{AbstractThermostat}{0, 0}
-                \operation{getTemperature() : double}
+                \operation[0]{getTemperature() : double}
             \end{abstractclass}
+            
+            \def\operationsImplementation{
+                \operation{getTemperature() : double}
+            }
             
             \begin{class}[text width=\smallTextWidth]{Thermostat}{0, -2.5}
                 \inherit{AbstractThermostat}
+                \operationsImplementation{}
             \end{class}
         \end{scope}
         
@@ -60,12 +65,18 @@
         
         \begin{scope}[shift={($(Spheres.north) + (8 cm, 0)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{AbstractInterSpheres}{0, 0}
+                \operation[0]{getName() : String}
+                \operation[0]{getDiameter() : double}
+            \end{abstractclass}
+            
+            \def\operationsImplementation{
                 \operation{getName() : String}
                 \operation{getDiameter() : double}
-            \end{abstractclass}
+            }
             
             \begin{class}[text width=\smallTextWidth]{InterSpheres}{0, -3}
                 \inherit{AbstractInterSpheres}
+                \operationsImplementation{}
             \end{class}
         \end{scope}
         
