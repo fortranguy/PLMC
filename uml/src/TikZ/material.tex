@@ -85,7 +85,8 @@
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(Spheres.north)!0.5!(BoxGeometry.north) + (0 cm, 16 cm)$)}]
+        \begin{scope}[shift={($(Spheres.north)!0.5!(BoxGeometry.north) + (0 cm, 16 cm)$)},
+            local bounding box=BoxedSpheres]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractBoxedSpheres}{0, 0}
                 \operation[0]{getAccessibleVolume() : double}
                 \operation[0]{isInsideBox(position : double[3]) : bool}
@@ -113,14 +114,13 @@
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(Spheres.north)!0.5!(BoxGeometry.north) + (-9 cm, 16 cm)$)}]
+        \begin{scope}[shift={($(BoxedSpheres.north) + (-9 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractSmallChange}{0, 0}
-                \operation[0]{randomMove(iSphere : int) : double[3]}
+                \operation{randomMove(iSphere : int) : double[3]}
                 \operation[0]{randomRotation(iSphere : int) : double[3]}
             \end{abstractclass}
 
             \def\operationsImplementation{
-                \operation{randomMove(iSphere : int) : double[3]}
                 \operation{randomRotation(iSphere : int) : double[3]}
             }
 
@@ -129,8 +129,28 @@
                 \operationsImplementation{}
             \end{class}
 
-            \begin{class}[text width=\mediumTextWidth]{SmallChange}{0, -5.5}
+            \begin{class}[text width=\mediumTextWidth]{SmallChange}{0, -5}
                 \inherit{AbstractSmallChange}
+                \operationsImplementation{}
+            \end{class}
+        \end{scope}
+
+        \begin{scope}[shift={($(BoxedSpheres.north) + (8 cm, -5 cm)$)}]
+            \begin{abstractclass}[text width=\smallTextWidth]{AbstractRandomOrientation}{0, 0}
+                \operation[0]{orientation() : double[3]}
+            \end{abstractclass}
+
+            \def\operationsImplementation{
+                \operation{orientation() : double[3]}
+            }
+
+            \begin{class}[text width=\smallTextWidth]{NullRandomOrientation}{0, -2.5}
+                \inherit{AbstractRandomOrientation}
+                \operationsImplementation{}
+            \end{class}
+
+            \begin{class}[text width=\smallTextWidth]{RandomOrientation}{0, -4.5}
+                \inherit{AbstractRandomOrientation}
                 \operationsImplementation{}
             \end{class}
         \end{scope}
@@ -142,4 +162,6 @@
     \composition{AbstractBoxedSpheres}{spheres}{1}{AbstractDipolarSpheres}
 
     \composition{AbstractSmallChange}{spheres}{1}{AbstractDipolarSpheres}
+
+    \composition{AbstractBoxedSpheres}{randomOrientation}{1}{AbstractRandomOrientation}
 \end{scope}
