@@ -111,18 +111,18 @@
                 \operation{overlapTest()}
             }
             
-            \begin{class}[text width=\extraLargeTextWidth]{NullWallInteraction}{0, -4}
+            \begin{class}[text width=\extraLargeTextWidth]{NullWallInteraction}{0, -2.5}
                 \inherit{AbstractWallInteraction}
                 \operationsImplementation{}
             \end{class}
             
-            \begin{class}[text width=\extraLargeTextWidth]{WallInteraction}{0, -8.5}
+            \begin{class}[text width=\extraLargeTextWidth]{WallInteraction}{0, -6.5}
                 \inherit{AbstractWallInteraction}
                 \operationsImplementation{}
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(WallInteraction.south) + (8 cm, -4.5 cm)$)}]
+        \begin{scope}[shift={($(WallInteraction.south) + (8 cm, -3.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractWallPotential}{0, 0}
                 \operation[0]{potential(height : double) : double}
             \end{abstractclass}
@@ -152,14 +152,14 @@
     \composition{AbstractPairInteraction}{box}{1}{AbstractBoxGeometry}
     \composition{AbstractPairInteraction}{neighbourCells}{1}{AbstractNeighbourCells}
     \composition{AbstractPairInteraction}{pairPotential}{1}{AbstractPairPotential}
-    \composition{IntraPairInteration}{spheres}{1}{AbstractSpheres}
-    \composition{InterPairInteration}{spheres}{2}{AbstractSpheres}
+    \composition{IntraPairInteration}{spheres}{1}{AbstractDipolarSpheres}
+    \composition{InterPairInteration}{spheres}{2}{AbstractDipolarSpheres}
     \composition{InterPairInteration}{interSpheres}{1}{AbstractInterSpheres}
 
     \composition{AbstractNeighbourCells}{box}{1}{AbstractBoxGeometry}
-    \composition{AbstractNeighbourCells}{spheres}{1}{AbstractSpheres}
+    \composition{AbstractNeighbourCells}{spheres}{1}{AbstractDipolarSpheres}
     
     \composition{AbstractWallInteraction}{wallPotential}{1}{AbstractWallPotential}
     \composition{WallInteraction}{box}{1}{AbstractBoxGeometry}
-    \composition{WallInteraction}{spheres}{1}{AbstractSpheres}
+    \composition{WallInteraction}{spheres}{1}{AbstractDipolarSpheres}
 \end{scope}

@@ -2,7 +2,7 @@
     \begin{package}{Material}
     
         \begin{scope}[local bounding box=Spheres]
-            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractSpheres}{0, 0}
+            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractDipolarSpheres}{0, 0}
                 \operation{getName() : String}
                 \operation{getNum() : int}
                 \operation{getDiameter() : double}
@@ -14,13 +14,13 @@
                 \operation{getMoment(iSphere : int) : double[3]}
             }
             
-            \begin{class}[text width=\mediumTextWidth]{ApolarSpheres}{0, -4}
-                \inherit{AbstractSpheres}
+            \begin{class}[text width=\mediumTextWidth]{ApolarSpheres}{0, -4.5}
+                \inherit{AbstractDipolarSpheres}
                 \operationsImplementation{}
             \end{class}
             
-            \begin{class}[text width=\mediumTextWidth]{DipolarSpheres}{0, -6}
-                \inherit{AbstractSpheres}
+            \begin{class}[text width=\mediumTextWidth]{DipolarSpheres}{0, -7}
+                \inherit{AbstractDipolarSpheres}
                 \operationsImplementation{}
             \end{class}
         \end{scope}
@@ -42,7 +42,7 @@
                 \operationsImplementation{}
             \end{class}
             
-            \begin{class}[text width=\largeTextWidth]{SlabGeometry}{0, -6}
+            \begin{class}[text width=\largeTextWidth]{SlabGeometry}{0, -6.5}
                 \inherit{AbstractBoxGeometry}
                 \operationsImplementation{}
             \end{class}
@@ -59,7 +59,7 @@
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(Spheres.north)!0.5!(BoxGeometry.north) + (0 cm, 11 cm)$)}]
+        \begin{scope}[shift={($(Spheres.north)!0.5!(BoxGeometry.north) + (0 cm, 12 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractBoxedSpheres}{0, 0}
                 \operation[0]{randomPosition() : double[3]}
                 \operation[0]{isInsideBox(position : double[3]) : bool}
@@ -72,12 +72,12 @@
                 \operation{getAccessibleVolume() : double}
             }
             
-            \begin{class}[text width=\mediumTextWidth]{BulkBoxedSpheres}{0, -3}
+            \begin{class}[text width=\mediumTextWidth]{BulkBoxedSpheres}{0, -3.5}
                 \inherit{AbstractBoxedSpheres}
                 \operationsImplementation{}
             \end{class}
             
-            \begin{class}[text width=\mediumTextWidth]{SlabBoxedSpheres}{0, -6}
+            \begin{class}[text width=\mediumTextWidth]{SlabBoxedSpheres}{0, -6.5}
                 \inherit{AbstractBoxedSpheres}
                 \operationsImplementation{}
             \end{class}
@@ -87,6 +87,6 @@
 \end{scope}
 
 \begin{scope}[on background layer]
-    \composition{AbstractBoxedSpheres}{spheres}{1}{AbstractSpheres}
+    \composition{AbstractBoxedSpheres}{spheres}{1}{AbstractDipolarSpheres}
     \composition{AbstractBoxedSpheres}{box}{1}{AbstractBoxGeometry}
 \end{scope}
