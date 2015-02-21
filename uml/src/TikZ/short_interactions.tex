@@ -87,20 +87,20 @@
                 \operation{potential(distance : double) : double}
             }
             
-            \begin{class}[text width=\mediumTextWidth]{LJpairPotential}{0, -2.5}
+            \begin{class}[text width=\mediumTextWidth]{HardPairPotential}{0, -2.5}
                 \inherit{AbstractPairPotential}
                 \operationsImplementation{}
             \end{class}
             
-            \begin{class}[text width=\mediumTextWidth]{HardPairPotential}{0, -4.5}
+            \begin{class}[text width=\mediumTextWidth]{SoftPairPotential}{0, -4.5}
                 \inherit{AbstractPairPotential}
                 \operationsImplementation{}
             \end{class}
         \end{scope}
         
-        \begin{scope}[local bounding box=WallInteraction, 
+        \begin{scope}[local bounding box=WallsInteraction, 
             shift={($(ShortInteraction.south) + (8 cm, -2.5 cm)$)}]
-            \begin{abstractclass}[text width=\extraLargeTextWidth]{AbstractWallInteraction}{0, 0}
+            \begin{abstractclass}[text width=\extraLargeTextWidth]{AbstractWallsInteraction}{0, 0}
                 \inherit{AbstractShortInteraction}
             \end{abstractclass}
             
@@ -111,19 +111,19 @@
                 \operation{overlapTest()}
             }
             
-            \begin{class}[text width=\extraLargeTextWidth]{NullWallInteraction}{0, -2.5}
-                \inherit{AbstractWallInteraction}
+            \begin{class}[text width=\extraLargeTextWidth]{NullWallsInteraction}{0, -2}
+                \inherit{AbstractWallsInteraction}
                 \operationsImplementation{}
             \end{class}
             
-            \begin{class}[text width=\extraLargeTextWidth]{WallInteraction}{0, -6.5}
-                \inherit{AbstractWallInteraction}
+            \begin{class}[text width=\extraLargeTextWidth]{WallsInteraction}{0, -5.5}
+                \inherit{AbstractWallsInteraction}
                 \operationsImplementation{}
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(WallInteraction.south) + (8 cm, -3.5 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractWallPotential}{0, 0}
+        \begin{scope}[shift={($(WallsInteraction.south) + (8 cm, -3.5 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractWallsPotential}{0, 0}
                 \operation[0]{potential(height : double) : double}
             \end{abstractclass}
             
@@ -131,13 +131,13 @@
                 \operation{potential(height : double) : double}
             }
             
-            \begin{class}[text width=\mediumTextWidth]{NullWallPotential}{0, -2.5}
-                \inherit{AbstractWallPotential}
+            \begin{class}[text width=\mediumTextWidth]{HardWallsPotential}{0, -2.5}
+                \inherit{AbstractWallsPotential}
                 \operationsImplementation{}
             \end{class}
             
-            \begin{class}[text width=\mediumTextWidth]{IntegratedLJwallPotential}{0, -4.5}
-                \inherit{AbstractWallPotential}
+            \begin{class}[text width=\mediumTextWidth]{SoftWallsPotential}{0, -4.5}
+                \inherit{AbstractWallsPotential}
                 \operationsImplementation{}
             \end{class}
         \end{scope}
@@ -146,8 +146,8 @@
 \end{scope}
 
 \begin{scope}[on background layer]
-    \composition{ShortInteractionFacade}{pairInteraction}{1}{AbstractPairInteraction}
-    \composition{ShortInteractionFacade}{wallInteraction}{1}{AbstractWallInteraction}
+    \composition{ShortInteractionFacade}{pairInteraction}{2}{AbstractPairInteraction}
+    \composition{ShortInteractionFacade}{wallsInteraction}{1}{AbstractWallsInteraction}
 
     \composition{AbstractPairInteraction}{box}{1}{AbstractBoxGeometry}
     \composition{AbstractPairInteraction}{neighbourCells}{1}{AbstractNeighbourCells}
@@ -159,7 +159,7 @@
     \composition{AbstractNeighbourCells}{box}{1}{AbstractBoxGeometry}
     \composition{AbstractNeighbourCells}{spheres}{1}{AbstractDipolarSpheres}
     
-    \composition{AbstractWallInteraction}{wallPotential}{1}{AbstractWallPotential}
-    \composition{WallInteraction}{box}{1}{AbstractBoxGeometry}
-    \composition{WallInteraction}{spheres}{1}{AbstractDipolarSpheres}
+    \composition{AbstractWallsInteraction}{wallsPotential}{1}{AbstractWallsPotential}
+    \composition{WallsInteraction}{box}{1}{AbstractBoxGeometry}
+    \composition{WallsInteraction}{spheres}{1}{AbstractDipolarSpheres}
 \end{scope}
