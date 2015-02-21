@@ -25,6 +25,16 @@
             \end{class}
         \end{scope}
         
+        \begin{scope}[shift={($(Spheres.north) - (21 cm, 0)$)}]
+            \begin{abstractclass}[text width=\smallTextWidth]{AbstractThermostat}{0, 0}
+                \operation{getTemperature() : double}
+            \end{abstractclass}
+            
+            \begin{class}[text width=\smallTextWidth]{Thermostat}{0, -2.5}
+                \inherit{AbstractThermostat}
+            \end{class}
+        \end{scope}
+        
         \begin{scope}[shift={($(Spheres.north) - (11 cm, 0)$)}, local bounding box=BoxGeometry]
             \begin{abstractclass}[text width=\largeTextWidth]{AbstractBoxGeometry}{0, 0}
                 \operation{getSize() : double[3]}
