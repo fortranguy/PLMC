@@ -15,7 +15,7 @@
 \tikzexternalize[optimize=false, prefix=Figures/, mode=list and make]
 \tikzset{external/system call=
     {pdflatex \tikzexternalcheckshellescape -halt-on-error -interaction=batchmode 
-    -jobname "\image" "\texsource" && pdftops -eps "\image".pdf}
+    -jobname "\image" "\texsource"}
 }
 \tikzset{external/figure name = Figure}
 \else
