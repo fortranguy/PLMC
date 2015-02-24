@@ -143,6 +143,13 @@
                 \operationsImplementation{}
             \end{class}
         \end{scope}
+
+        \begin{scope}[shift={($(InterEwaldReci.south)!0.5!(InterDipolarLayerCorrection.south) +
+            (0 cm, -4 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractStructureFactor}{0, 0}
+                \operation[0]{}
+            \end{abstractclass}
+        \end{scope}
         
         \begin{scope}[shift={($(DipolarInteraction.south) + (19.5 cm, -5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{AbstractEwaldSelf}{0, 0}
@@ -172,8 +179,7 @@
             
         \end{scope}
         
-        \begin{scope}[shift={($(DipolarInteraction.south) + (32.5 cm, -5 cm)$)},
-            local bounding box=EwaldBound]
+        \begin{scope}[shift={($(DipolarInteraction.south) + (32.5 cm, -5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{AbstractEwaldBound}{0, 0}
                 \inherit{AbstractDipolarInteraction}
             \end{abstractclass}
@@ -205,8 +211,7 @@
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(DipolarInteraction.south) + (45.5 cm, -5 cm)$)},
-            local bounding box=FieldInteraction]
+        \begin{scope}[shift={($(DipolarInteraction.south) + (45.5 cm, -5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{AbstractFieldInteraction}{0, 0}
                 \inherit{AbstractDipolarInteraction}
             \end{abstractclass}
@@ -233,7 +238,8 @@
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(EwaldBound.south)!0.5!(FieldInteraction.south) + (0 cm, -8 cm)$)}]
+        \begin{scope}[shift={($(InterEwaldBound.south)!0.5!(FieldInteraction.south) +
+            (0 cm, -6 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractTotalMoment}{0, 0}
                 \operation[0]{getTotalMoment() : double[3]}
                 \operation[0]{rotationUpdate(old : Particle, new : Particle)}
@@ -257,7 +263,7 @@
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(EwaldBound.south)!0.5!(FieldInteraction.south) + (13 cm, -8 cm)$)}]
+        \begin{scope}[shift={($(FieldInteraction.south) + (4 cm, -4 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractExternalField}{0, 0}
                 \operation[0]{field(position : double[3]) : double[3]}
             \end{abstractclass}
