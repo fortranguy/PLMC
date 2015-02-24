@@ -146,9 +146,29 @@
 
         \begin{scope}[shift={($(InterEwaldReci.south)!0.5!(InterDipolarLayerCorrection.south) +
             (0 cm, -4 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractStructureFactor}{0, 0}
-                \operation[0]{}
+            \begin{abstractclass}[text width=\largeTextWidth]{AbstractStructureFactor}{0, 0}
+                \operation[0]{getStructureFactor()}
+                \operation[0]{moveEnergy(old : Particle, new : Particle) : double}
+                \operation[0]{moveUpdate(old : Particle, new : Particle)}
+                \operation[0]{rotationEnergy(old : Particle, new : Particle) : double}
+                \operation[0]{rotationUpdate(old : Particle, new : Particle)}
+                \operation[0]{exchangeEnergy(particle : Particle) : double}
+                \operation[0]{exchangeUpdate(particle : Particle)}
             \end{abstractclass}
+
+            \def\operationsImplementation{
+                \operation{getStructureFactor()}
+                \operation{moveEnergy(old : Particle, new : Particle) : double}
+                \operation{moveUpdate(old : Particle, new : Particle)}
+                \operation{rotationEnergy(old : Particle, new : Particle) : double}
+                \operation{rotationUpdate(old : Particle, new : Particle)}
+                \operation{exchangeEnergy(particle : Particle) : double}
+                \operation{exchangeUpdate(particle : Particle)}
+            }
+            
+            \begin{class}[text width=\largeTextWidth]{EwaldReciStructureFactor}{0, -5.5 cm}
+                \operationsImplementation{}
+            \end{class}
         \end{scope}
         
         \begin{scope}[shift={($(DipolarInteraction.south) + (19.5 cm, -5 cm)$)}]
