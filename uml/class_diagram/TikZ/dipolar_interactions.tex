@@ -31,8 +31,6 @@
             
             \begin{abstractclass}[text width=\largeTextWidth]{AbstractReciInteraction}{0, -6}
                 \inherit{AbstractDipolarInteraction}
-                \operation[0]{reset()}
-                \operation[0]{countWaveVectors()}
                 \operation[0]{moveUpdate(old : Particle, new : Particle)}
                 \operation[0]{rotationUpdate(old : Particle, new : Particle)}
                 \operation[0]{exchangeUpdate(particle : Particle)}
@@ -82,7 +80,6 @@
             \def\operationsImplementation{
                 \operation{totalEnergy() : double}
                 \operation{totalEnergyUsingField() : double}
-                \operation{reset()}
                 \operation{moveEnergy(old : Particle, new : Particle) : double}
                 \operation{moveUpdate(old : Particle, new : Particle)}
                 \operation{rotationEnergy(old : Particle, new : Particle) : double}
@@ -119,7 +116,6 @@
             \def\operationsImplementation{
                 \operation{totalEnergy() : double}
                 \operation{totalEnergyUsingField() : double}
-                \operation{reset()}
                 \operation{moveEnergy(old : Particle, new : Particle) : double}
                 \operation{moveUpdate(old : Particle, new : Particle)}
                 \operation{rotationEnergy(old : Particle, new : Particle) : double}
