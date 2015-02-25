@@ -146,20 +146,20 @@
 \end{scope}
 
 \begin{scope}[on background layer]
-    \composition{ShortInteractionFacade}{pairInteraction}{2}{AbstractPairInteraction}
-    \composition{ShortInteractionFacade}{wallsInteraction}{1}{AbstractWallsInteraction}
+    \aggregation{ShortInteractionFacade}{pairInteraction}{2}{AbstractPairInteraction}
+    \aggregation{ShortInteractionFacade}{wallsInteraction}{1}{AbstractWallsInteraction}
 
-    \composition{AbstractPairInteraction}{box}{1}{AbstractBoxGeometry}
+    \aggregation{AbstractPairInteraction}{box}{1}{AbstractBoxGeometry}
     \composition{AbstractPairInteraction}{neighbourCells}{1}{AbstractNeighbourCells}
     \composition{AbstractPairInteraction}{pairPotential}{1}{AbstractPairPotential}
-    \composition{IntraPairInteration}{spheres}{1}{AbstractDipolarSpheres}
-    \composition{InterPairInteration}{spheres}{2}{AbstractDipolarSpheres}
-    \composition{InterPairInteration}{interSpheres}{1}{AbstractInterSpheres}
+    \aggregation{IntraPairInteration}{spheres}{1}{AbstractDipolarSpheres}
+    \aggregation{InterPairInteration}{spheres}{2}{AbstractDipolarSpheres}
+    \aggregation{InterPairInteration}{interSpheres}{1}{AbstractInterSpheres}
 
-    \composition{AbstractNeighbourCells}{box}{1}{AbstractBoxGeometry}
-    \composition{AbstractNeighbourCells}{spheres}{1}{AbstractDipolarSpheres}
+    \aggregation{AbstractNeighbourCells}{box}{1}{AbstractBoxGeometry}
+    \aggregation{AbstractNeighbourCells}{spheres}{1}{AbstractDipolarSpheres}
     
     \composition{AbstractWallsInteraction}{wallsPotential}{1}{AbstractWallsPotential}
-    \composition{WallsInteraction}{box}{1}{AbstractBoxGeometry}
-    \composition{WallsInteraction}{spheres}{1}{AbstractDipolarSpheres}
+    \aggregation{WallsInteraction}{box}{1}{AbstractBoxGeometry}
+    \aggregation{WallsInteraction}{spheres}{1}{AbstractDipolarSpheres}
 \end{scope}

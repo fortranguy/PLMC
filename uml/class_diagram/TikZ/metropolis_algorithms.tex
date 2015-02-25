@@ -2,6 +2,7 @@
     \begin{package}{Metropolis algorithms}
     
         \begin{scope}[local bounding box=Algorithm]
+            %\begin{abstractclass}[text=\smallTextWidth]{EnsembleAlgorithms}{}
             \begin{abstractclass}[text width=\smallTextWidth]{AbstractMetropolisAlgorithm}{0, 0}
                 \operation[0]{try()}
             \end{abstractclass}
@@ -34,22 +35,22 @@
 \end{scope}
 
 \begin{scope}[on background layer]
-    \composition{MoveOneSphere}{spheres}{2}{AbstractDipolarSpheres}
-    \composition{MoveOneSphere}{boxed}{2}{AbstractBoxedSpheres}
-    \composition{MoveOneSphere}{change}{2}{AbstractSmallChange}
-    \composition{MoveOneSphere}{short}{2}{ShortInteractionFacade}
-    \composition{MoveOneSphere}{dipolar}{2}{DipolarInteractionFacade}
+    \aggregation{MoveOneSphere}{spheres}{2}{AbstractDipolarSpheres}
+    \aggregation{MoveOneSphere}{boxed}{2}{AbstractBoxedSpheres}
+    \aggregation{MoveOneSphere}{change}{2}{AbstractSmallChange}
+    \aggregation{MoveOneSphere}{short}{2}{ShortInteractionFacade}
+    \aggregation{MoveOneSphere}{dipolar}{2}{DipolarInteractionFacade}
     %\compostion{MoveOneSphere}{observables}{3}{AbstractObservables}
     
-    \composition{RotateOneSphere}{spheres}{2}{AbstractDipolarSpheres}
-    \composition{RotateOneSphere}{change}{2}{AbstractSmallChange}
-    \composition{RotateOneSphere}{dipolar}{2}{DipolarInteractionFacade}
+    \aggregation{RotateOneSphere}{spheres}{2}{AbstractDipolarSpheres}
+    \aggregation{RotateOneSphere}{change}{2}{AbstractSmallChange}
+    \aggregation{RotateOneSphere}{dipolar}{2}{DipolarInteractionFacade}
     %\compostion{RotateOneSphere}{observables}{3}{AbstractObservables}
     
-    \composition{SwitchTwoSpheres}{spheres}{2}{AbstractDipolarSpheres}
-    \composition{SwitchTwoSpheres}{boxed}{2}{AbstractBoxedSpheres}
-    \composition{SwitchTwoSpheres}{change}{2}{AbstractSmallChange}
-    \composition{SwitchTwoSpheres}{short}{2}{ShortInteractionFacade}
-    \composition{SwitchTwoSpheres}{dipolar}{2}{DipolarInteractionFacade}
+    \aggregation{SwitchTwoSpheres}{spheres}{2}{AbstractDipolarSpheres}
+    \aggregation{SwitchTwoSpheres}{boxed}{2}{AbstractBoxedSpheres}
+    \aggregation{SwitchTwoSpheres}{change}{2}{AbstractSmallChange}
+    \aggregation{SwitchTwoSpheres}{short}{2}{ShortInteractionFacade}
+    \aggregation{SwitchTwoSpheres}{dipolar}{2}{DipolarInteractionFacade}
     %\compostion{SwitchTwoSpheres}{observables}{3}{AbstractObservables}
 \end{scope}

@@ -158,10 +158,10 @@
 \end{scope}
 
 \begin{scope}[on background layer]
-    \composition{AbstractBoxedSpheres}{box}{1}{AbstractBoxGeometry}
-    \composition{AbstractBoxedSpheres}{spheres}{1}{AbstractDipolarSpheres}
+    \aggregation{AbstractBoxedSpheres}{box}{1}{AbstractBoxGeometry}
+    \aggregation{AbstractBoxedSpheres}{spheres}{1}{AbstractDipolarSpheres}
 
-    \composition{AbstractSmallChange}{spheres}{1}{AbstractDipolarSpheres}
+    \aggregation{AbstractSmallChange}{spheres}{1}{AbstractDipolarSpheres}
 
     \composition{AbstractBoxedSpheres}{randomOrientation}{1}{AbstractRandomOrientation}
 \end{scope}
