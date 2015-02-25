@@ -1,0 +1,39 @@
+\begin{scope}[shift={($(Material.north) + (40 cm, 80 cm)$)}]
+    \begin{package}{Post treatments}
+        
+        \begin{scope}[local bounding box=Widom]
+            \begin{abstractclass}[text width=\smallTextWidth]{AbstractWidomMethod}{0, 0}
+                \operation[0]{measureInverseActivity()}
+            \end{abstractclass}
+            
+            \def\operationsImplementation{
+                \operation{measureInverseActivity()}
+            }
+            
+            \begin{class}[text width=\smallTextWidth]{WidomMethod}{0, -3}
+                \inherit{AbstractWidomMethod}
+                \operationsImplementation{}                
+            \end{class}
+        \end{scope}
+        
+        \begin{scope}[shift={($(Widom.north) + (8 cm, -2 cm)$)}]
+            \begin{abstractclass}[text width=\smallTextWidth]{AbstractTestSpheres}{0, 0}
+                \operation[0]{getWidomNum() : int}
+            \end{abstractclass}
+            
+            \def\operationsImplementation{
+                \operation{getWidomNum() : int}
+            }
+            
+            \begin{class}[text width=\smallTextWidth]{TestSpheres}{0, -3}
+                \inherit{AbstractTestSpheres}
+                \operationsImplementation{}
+            \end{class}
+        \end{scope}
+        
+    \end{package}
+\end{scope}
+
+\begin{scope}[on background layer]
+    \aggregation{AbstractWidomMethod}{testSpheres}{2}{AbstractTestSpheres}
+\end{scope}
