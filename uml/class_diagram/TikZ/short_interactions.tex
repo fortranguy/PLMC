@@ -27,7 +27,7 @@
                 \operation{soloEnergy(particle : Particle, overlap : bool, energy : double)}
                 \operation[0]{moveUpdate(old : Particle, new : Particle)}
                 \operation[0]{exchangeUpdate(particle : particle)}
-                \operation[0]{volumeChangeRestoration(dilatation : double)}                
+                \operation[0]{volumeChangeRestoration(dilatation : double)}
             \end{abstractclass}
 
             \def\operationsImplementation{
@@ -42,7 +42,7 @@
             \begin{class}[text width=\extraLargeTextWidth]{IntraPairInteration}{0, -4}
                 \inherit{AbstractPairInteraction}
                 \operationsImplementation{}
-            \end{class}            
+            \end{class}
             
             \begin{class}[text width=\extraLargeTextWidth]{InterPairInteration}{0, -8.5}
                 \inherit{AbstractPairInteraction}
@@ -98,7 +98,7 @@
             \end{class}
         \end{scope}
         
-        \begin{scope}[local bounding box=WallsInteraction, 
+        \begin{scope}[local bounding box=WallsInteraction,
             shift={($(ShortInteraction.south) + (8 cm, -2.5 cm)$)}]
             \begin{abstractclass}[text width=\extraLargeTextWidth]{AbstractWallsInteraction}{0, 0}
                 \inherit{AbstractShortInteraction}
