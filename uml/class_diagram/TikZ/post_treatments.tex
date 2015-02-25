@@ -35,5 +35,12 @@
 \end{scope}
 
 \begin{scope}[on background layer]
+    \aggregation{AbstractWidomMethod}{thermostat}{1}{AbstractThermostat}
     \aggregation{AbstractWidomMethod}{testSpheres}{2}{AbstractTestSpheres}
+    
+    \aggregation{WidomMethod}{spheres}{2}{AbstractDipolarSpheres}
+    \aggregation{WidomMethod}{boxed}{2}{AbstractBoxedSpheres}
+    \aggregation{WidomMethod}{short}{2}{ShortInteractionFacade}
+    \aggregation{WidomMethod}{dipolar}{2}{DipolarInteractionFacade}
+    %\compostion{ExchangeOneSphere}{observables}{3}{AbstractObservables}
 \end{scope}
