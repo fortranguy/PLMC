@@ -1,36 +1,7 @@
 \begin{scope}[shift={($(Material.north) + (0 cm, 80 cm)$)}]
     \begin{package}{Metropolis algorithms}
-    
-        \begin{scope}[local bounding box=Algorithm]
-            \begin{abstractclass}[text width=\smallTextWidth]{AbstractMetropolisAlgorithm}{0, 0}
-                \operation[0]{try()}
-            \end{abstractclass}
-            
-            \def\operationsImplementation{
-            \operation{try()}
-        }
-            \begin{class}[text width=\smallTextWidth]{MoveOneSphere}{-4, -3}
-                \inherit{AbstractMetropolisAlgorithm}
-                \operationsImplementation{}
-            \end{class}
-            
-            \begin{class}[text width=\smallTextWidth]{RotateOneSphere}{-4, -5.5}
-                \inherit{AbstractMetropolisAlgorithm}
-                \operationsImplementation{}
-            \end{class}
-            
-            \begin{class}[text width=\smallTextWidth]{SwitchTwoSpheres}{4, -3}
-                \inherit{AbstractMetropolisAlgorithm}
-                \operationsImplementation{}
-            \end{class}
-            
-            \begin{class}[text width=\smallTextWidth]{ExchangeOneSphere}{4, -5.5}
-                \inherit{AbstractMetropolisAlgorithm}
-                \operationsImplementation{}
-            \end{class}
-        \end{scope}
         
-        \begin{scope}[shift={($(Algorithm.north) + (-20 cm, 0 cm)$)}]
+        \begin{scope}[local bounding box=EnsembleAlgorithms]
             \begin{abstractclass}[text width=\smallTextWidth]{AbstractEnsembleAlgorithms}{0, 0}
                 \operation[0]{setAlgorithms()} % in constructor?
                 \operation{chooseAlgorithm()}
@@ -52,6 +23,35 @@
             
             \begin{class}[text width=\smallTextWidth]{IsobariclAlgorithms}{0, -5.5}
                 \inherit{AbstractEnsembleAlgorithms}
+                \operationsImplementation{}
+            \end{class}
+        \end{scope}
+        
+        \begin{scope}[shift={($(EnsembleAlgorithms.north) + (15 cm, -2 cm)$)}]
+            \begin{abstractclass}[text width=\smallTextWidth]{AbstractMetropolisAlgorithm}{0, 0}
+                \operation[0]{try()}
+            \end{abstractclass}
+            
+            \def\operationsImplementation{
+                \operation{try()}
+            }
+            \begin{class}[text width=\smallTextWidth]{MoveOneSphere}{-4, -3}
+                \inherit{AbstractMetropolisAlgorithm}
+                \operationsImplementation{}
+            \end{class}
+            
+            \begin{class}[text width=\smallTextWidth]{RotateOneSphere}{-4, -5.5}
+                \inherit{AbstractMetropolisAlgorithm}
+                \operationsImplementation{}
+            \end{class}
+            
+            \begin{class}[text width=\smallTextWidth]{SwitchTwoSpheres}{4, -3}
+                \inherit{AbstractMetropolisAlgorithm}
+                \operationsImplementation{}
+            \end{class}
+            
+            \begin{class}[text width=\smallTextWidth]{ExchangeOneSphere}{4, -5.5}
+                \inherit{AbstractMetropolisAlgorithm}
                 \operationsImplementation{}
             \end{class}
         \end{scope}
