@@ -60,6 +60,8 @@
 
 \begin{scope}[on background layer]
     \composition{AbstractEnsembleAlgorithms}{algo}{1..*}{AbstractMetropolisAlgorithm}
+    
+    \aggregation{AbstractMetropolisAlgorithm}{thermostat}{1}{AbstractThermostat}
 
     \aggregation{MoveOneSphere}{spheres}{2}{AbstractDipolarSpheres}
     \aggregation{MoveOneSphere}{boxed}{2}{AbstractBoxedSpheres}
@@ -84,5 +86,6 @@
     \aggregation{ExchangeOneSphere}{boxed}{2}{AbstractBoxedSpheres}
     \aggregation{ExchangeOneSphere}{short}{2}{ShortInteractionFacade}
     \aggregation{ExchangeOneSphere}{dipolar}{2}{DipolarInteractionFacade}
+    \aggregation{ExchangeOneSphere}{reservoir}{2}{AbstractSpheresReservoir}
     %\compostion{ExchangeOneSphere}{observables}{3}{AbstractObservables}
 \end{scope}

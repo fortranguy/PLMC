@@ -30,6 +30,23 @@
             \end{class}
         \end{scope}
         
+        \begin{scope}[shift={($(Spheres.north) - (29 cm, 0)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractSpheresReservoir}{0, 0}
+                \operation[0]{getDensity() : double}
+                \operation[0]{getExcessChemicalPotential() : double}
+            \end{abstractclass}
+            
+            \def\operationsImplementation{
+                \operation{getDensity() : double}
+                \operation{getExcessChemicalPotential() : double}
+            }
+            
+            \begin{class}[text width=\mediumTextWidth]{SpheresReservoir}{0, -3}
+                \inherit{AbstractSpheresReservoir}
+                \operationsImplementation{}
+            \end{class}            
+        \end{scope}
+        
         \begin{scope}[shift={($(Spheres.north) - (21 cm, 0)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{AbstractThermostat}{0, 0}
                 \operation[0]{getTemperature() : double}
