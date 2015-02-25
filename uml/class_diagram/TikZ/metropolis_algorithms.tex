@@ -32,11 +32,12 @@
         
         \begin{scope}[shift={($(Algorithm.north) + (-20 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{AbstractEnsembleAlgorithms}{0, 0}
-                \operation[0]{chooseAlgorithm()}
+                \operation[0]{setAlgorithms()} % in constructor?
+                \operation{chooseAlgorithm()}
             \end{abstractclass}
             
             \def\operationsImplementation{
-                \operation{chooseAlgorithm()}
+                \operation{setAlgorithms()}
             }
             
             \begin{class}[text width=\smallTextWidth]{CanonicalAlgorithms}{-4, -3}
