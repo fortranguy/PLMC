@@ -11,20 +11,24 @@
                 \operation[0]{getMomentNorm() : double}
                 \operation[0]{getMoment(iSphere : int) : double[3]}
                 \operation[0]{setMoment(iSphere : int, moment : double[3])}
+                \operation[0]{remove(iSphere : int)}
+                \operation[0]{add(particle : Particle)}
             \end{abstractclass}
 
             \def\operationsImplementation{
                 \operation{getMomentNorm() : double}
                 \operation{getMoment(iSphere : int) : double[3]}
                 \operation{setMoment(iSphere : int, moment : double[3])}
+                \operation{remove(iSphere : int)}
+                \operation{add(particle : Particle)}
             }
             
-            \begin{class}[text width=\mediumTextWidth]{ApolarSpheres}{0, -5.5}
+            \begin{class}[text width=\mediumTextWidth]{ApolarSpheres}{0, -6.5}
                 \inherit{AbstractDipolarSpheres}
                 \operationsImplementation{}
             \end{class}
             
-            \begin{class}[text width=\mediumTextWidth]{DipolarSpheres}{0, -8.5}
+            \begin{class}[text width=\mediumTextWidth]{DipolarSpheres}{0, -10.5}
                 \inherit{AbstractDipolarSpheres}
                 \operationsImplementation{}
             \end{class}
