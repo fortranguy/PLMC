@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 
 project(
-    Monte-Carlo_Canonical
+    PLMC
     Fortran CXX
 )
 
@@ -10,7 +10,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CMakeMacroForceAddFlags.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/SetCompilerFlags.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/SetArchiverAndLinkingTool.cmake)
 
-set(executable_prefix mc)
+set(executable_prefix plmc)
 set(EXECUTABLE_OUTPUT_PATH bin/${CMAKE_BUILD_TYPE})
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/mod ${CMAKE_CURRENT_BINARY_DIR}/mod)
@@ -53,9 +53,9 @@ foreach(program_source ${programs_source_files})
     target_link_libraries(
         ${executable_prefix}_${program_name}
         jsonfortran-static
-        mc_meta_module
+        plmc_meta_module
     )
-    INSTALL(TARGETS ${executable_prefix}_${program_name} DESTINATION monte-carlo)
+    INSTALL(TARGETS ${executable_prefix}_${program_name} DESTINATION plmc)
 endforeach(program_source)
 
 # uninstall target
@@ -70,15 +70,15 @@ add_custom_target(
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/CMakeUninstall.cmake
 )
 
-set(CPACK_PACKAGE_NAME "Monte-Carlo")
-set(CPACK_PACKAGE_VENDOR "PLMC")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Monte-Carlo Simulation")
+set(CPACK_PACKAGE_NAME "PLMC")
+set(CPACK_PACKAGE_VENDOR "Laboratoire de physique des liquides et milieux complexes")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Physics of Liquids Monte-Carlo")
 set(CPACK_PACKAGE_VERSION "1.0.0")
 set(CPACK_PACKAGE_VERSION_MAJOR "1")
 set(CPACK_PACKAGE_VERSION_MINOR "0")
 set(CPACK_PACKAGE_VERSION_PATCH "0")
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "/usr/local")
-set(CPACK_DEBIAN_PACKAGE_MAINTAINER "salomon.chung@u-pe.frrm")
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "salomon.chung@u-pe.fr")
 
 include(CPack)
 

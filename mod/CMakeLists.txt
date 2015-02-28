@@ -1,5 +1,5 @@
 project(
-    Monte-CarloMetaModule
+    PLMCmetaModule
     Fortran CXX
 )
 
@@ -31,7 +31,7 @@ file(
 )
 
 add_library(
-    mc_meta_module
+    plmc_meta_module
     STATIC
     ${modules_source_files}
 )
@@ -41,11 +41,11 @@ include_directories(${lapack_INCLUDE_DIRS})
 include_directories(${jsonfortran_INCLUDE_DIRS})
 
 set_property(
-    TARGET mc_meta_module
+    TARGET plmc_meta_module
     PROPERTY LINKER_LANGUAGE Fortran
 )
 target_link_libraries(
-    mc_meta_module
+    plmc_meta_module
     jsonfortran-static
     lapack
 )
