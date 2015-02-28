@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 
 project(
-    PLMClib
+    PLMC_Library
     Fortran CXX
 )
 
@@ -18,15 +18,15 @@ file(
 )
 
 add_library(
-    plmc_libraries
+    plmc_library
     STATIC
     ${lib_source_files}
 )
 
 set_property(
-    TARGET plmc_libraries
+    TARGET plmc_library
     PROPERTY LINKER_LANGUAGE Fortran
 )
 target_link_libraries(
-    plmc_libraries
+    plmc_library
 )

@@ -53,7 +53,7 @@ foreach(program_source ${programs_source_files})
     target_link_libraries(
         ${executable_prefix}_${program_name}
         jsonfortran-static
-        plmc_libraries
+        plmc_library
     )
     INSTALL(TARGETS ${executable_prefix}_${program_name} DESTINATION plmc)
 endforeach(program_source)
