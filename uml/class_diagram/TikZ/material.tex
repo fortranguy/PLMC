@@ -54,21 +54,23 @@
         \begin{scope}[shift={($(Spheres.north) - (11 cm, 0)$)}, local bounding box=BoxGeometry]
             \begin{abstractclass}[text width=\largeTextWidth]{AbstractBoxGeometry}{0, 0}
                 \operation{getSize() : double[3]}
+                \operation[0]{getHeight() : double}
                 \operation{getWave() : int[3]}
                 \operation[0]{vectorPBC(position1 : double[3], position2 : double[3]) : double[3]}
                 \operation{distancePBC(position1 : double[3], position2 : double[3]) : double}
             \end{abstractclass}
 
             \def\operationsImplementation{
+                \operation{getHeight() : double}
                 \operation{vectorPBC(position1 : double[3], position2 : double[3]) : double[3]}
             }
             
-            \begin{class}[text width=\largeTextWidth]{BulkGeometry}{0, -4}
+            \begin{class}[text width=\largeTextWidth]{BulkGeometry}{0, -4.5}
                 \inherit{AbstractBoxGeometry}
                 \operationsImplementation{}
             \end{class}
             
-            \begin{class}[text width=\largeTextWidth]{SlabGeometry}{0, -6.5}
+            \begin{class}[text width=\largeTextWidth]{SlabGeometry}{0, -7.5}
                 \inherit{AbstractBoxGeometry}
                 \operationsImplementation{}
             \end{class}
