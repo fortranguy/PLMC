@@ -3,7 +3,7 @@
 module module_physics_macro
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit, error_unit, iostat_end
-use data_precisions, only: real_zero, io_tiny, consistency_tiny, field_consistency_tiny
+use data_precisions, only: real_zero, input_tiny, consistency_tiny, field_consistency_tiny
 use data_box, only: num_dimensions
 use json_module, only: json_file, json_value, json_value_create, to_object, json_value_add
 use module_data, only: test_data_found
@@ -253,7 +253,7 @@ contains
                         error stop
                 end select
                 
-                if (coordinate_norm > norm_max+io_tiny) then
+                if (coordinate_norm > norm_max+input_tiny) then
                     write(error_unit, *) "Norm error in file: ", file(1:length)
                     write(error_unit, *) "Index ", i_particle
                     write(error_unit, *) "Norm =", coordinate_norm

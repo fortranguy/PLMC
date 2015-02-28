@@ -3,7 +3,7 @@
 module module_physics_micro
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, error_unit
-use data_constants, only: PI, sigma3d
+use data_constants, only: PI
 use data_box, only: num_dimensions
 use module_geometry, only: geometry
 use module_types_micro, only: Box_Parameters
@@ -16,6 +16,8 @@ public set_discrete_length, sphere_volume, PBC_vector, PBC_distance, set_bounds,
        num_wave_vectors, Box_wave1_sym, Box_wave2_sym, fourier_i, set_exp_kz, exchange_sign, &
        index_from_coord, coord_PBC, &
        potential_energy_lennard_jones, potential_energy_yukawa
+
+    real(DP), parameter :: sigma3d = 1._DP/sqrt(3._DP) ! to move
 
 contains
 
