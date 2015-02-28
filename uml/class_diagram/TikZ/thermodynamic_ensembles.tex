@@ -67,8 +67,10 @@
     \aggregation{MoveOneSphere}{spheres}{2}{AbstractDipolarSpheres}
     \aggregation{MoveOneSphere}{boxed}{2}{AbstractBoxedSpheres}
     \aggregation{MoveOneSphere}{change}{2}{AbstractSmallChange}
-    \aggregation{MoveOneSphere}{short}{2}{ShortInteractionFacade}
+    \aggregation{MoveOneSphere}{short}{2}{AbstractShortInteraction}
+    \aggregation{MoveOneSphere}{walls}{1}{AbstractWallsInteraction}
     \aggregation{MoveOneSphere}{dipolar}{2}{DipolarInteractionFacade}
+    \aggregation{MoveOneSphere}{field}{1}{AbstractFieldInteraction}
     %\compostion{MoveOneSphere}{observables}{3}{AbstractObservables}
     
     \aggregation{RotateOneSphere}{spheres}{2}{AbstractDipolarSpheres}
@@ -78,14 +80,18 @@
     
     \aggregation{SwitchTwoSpheres}{spheres}{2}{AbstractDipolarSpheres}
     \aggregation{SwitchTwoSpheres}{boxed}{2}{AbstractBoxedSpheres}
-    \aggregation{SwitchTwoSpheres}{short}{2}{ShortInteractionFacade}
+    \aggregation{SwitchTwoSpheres}{short}{2}{AbstractShortInteraction}
+    \aggregation{SwitchTwoSpheres}{walls}{1}{AbstractWallsInteraction}
     \aggregation{SwitchTwoSpheres}{dipolar}{2}{DipolarInteractionFacade}
+    \aggregation{SwitchTwoSpheres}{field}{1}{AbstractFieldInteraction}
     %\compostion{SwitchTwoSpheres}{observables}{3}{AbstractObservables}
     
     \aggregation{ExchangeOneSphere}{spheres}{2}{AbstractDipolarSpheres}
     \aggregation{ExchangeOneSphere}{boxed}{2}{AbstractBoxedSpheres}
-    \aggregation{ExchangeOneSphere}{short}{2}{ShortInteractionFacade}
+    \aggregation{ExchangeOneSphere}{short}{2}{AbstractShortInteraction}
+    \aggregation{ExchangeOneSphere}{walls}{1}{AbstractWallsInteraction}
     \aggregation{ExchangeOneSphere}{dipolar}{2}{DipolarInteractionFacade}
+    \aggregation{ExchangeOneSphere}{field}{1}{AbstractFieldInteraction}
     \aggregation{ExchangeOneSphere}{reservoir}{2}{AbstractSpheresReservoir}
     %\compostion{ExchangeOneSphere}{observables}{3}{AbstractObservables}
 \end{scope}

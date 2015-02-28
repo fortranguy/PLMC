@@ -1,17 +1,7 @@
 \begin{scope}[shift={($(Material.north) + (-28 cm, 55 cm)$)}]
     \begin{package}{Short range interactions}
     
-        \begin{scope}[local bounding box=ShortInteraction]
-            \begin{class}[text width=\extraLargeTextWidth]{ShortInteractionFacade}{0, 5}
-                \operation{totalEnergy() : double}
-                \operation{soloEnergy(particle : Particle, overlap : bool, energy : double)}
-                \operation{moveUpdate(old : Particle, new : Particle)}
-                \operation{exchangeUpdate(particle : particle)}
-                \operation{volumeChangeEnergy(dilatation : double, overlap : bool, energy : double)}
-                \operation{volumeChangeRestoration(dilatation : double)}
-                \operation{overlapTest()}
-            \end{class}
-        
+        \begin{scope}[local bounding box=ShortInteraction]        
             \begin{abstractclass}[text width=\extraLargeTextWidth]{AbstractShortInteraction}{0, 0}
                 \operation[0]{totalEnergy() : double}
                 \operation[0]{soloEnergy(particle : Particle, overlap : bool, energy : double)}
@@ -146,9 +136,6 @@
 \end{scope}
 
 \begin{scope}[on background layer]
-    \aggregation{ShortInteractionFacade}{pairInteraction}{2}{AbstractPairInteraction}
-    \aggregation{ShortInteractionFacade}{wallsInteraction}{1}{AbstractWallsInteraction}
-
     \aggregation{AbstractPairInteraction}{box}{1}{AbstractBoxGeometry}
     \composition{AbstractPairInteraction}{neighbourCells}{1}{AbstractNeighbourCells}
     \composition{AbstractPairInteraction}{pairPotential}{1}{AbstractPairPotential}
