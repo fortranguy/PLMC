@@ -1,7 +1,7 @@
-module data_box
+module data_geometry
 
 implicit none
     
     integer, parameter :: num_dimensions = 3
     
-end module data_box
+end module data_geometry
