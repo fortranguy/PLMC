@@ -35,22 +35,47 @@
             \def\operationsImplementation{
                 \operation{try()}
             }
-            \begin{class}[text width=\smallTextWidth]{MoveOneSphere}{-4, -3}
+            
+            \begin{abstractclass}[text width=\smallTextWidth]{AbstractOneSphereChange}{-4, -3}
+                \inherit{AbstractMetropolisAlgorithm}
+                \operationsImplementation{}
+                \operation[0]{chooseComponent()}
+                \operation{chooseSphere()}
+                \operation[0]{applySmallChange()}
+                \operation[0]{calculateEnergy()}
+                \operation[0]{testMetroplis()}
+                \operation[0]{update()}
+            \end{abstractclass}
+            
+            \def\operationsImplementation{
+                \operation{chooseComponent()}
+                \operation{applySmallChange()}
+                \operation{calculateEnergy()}
+                \operation{testMetroplis()}
+                \operation{update()}
+            }
+            
+            \begin{class}[text width=\smallTextWidth]{OneSphereMove}{-4, -8.5}
+                \inherit{AbstractOneSphereChange}
+                \operationsImplementation{}
+            \end{class}
+            
+            \begin{class}[text width=\smallTextWidth]{OneSphereRotation}{-4, -13}
+                \inherit{AbstractOneSphereChange}
+                \operationsImplementation{}
+            \end{class}
+            
+            \def\operationsImplementation{
+                \operation{try()}
+                % to fill
+            }
+            
+            \begin{class}[text width=\smallTextWidth]{OneSphereExchange}{4, -3}
                 \inherit{AbstractMetropolisAlgorithm}
                 \operationsImplementation{}
             \end{class}
             
-            \begin{class}[text width=\smallTextWidth]{RotateOneSphere}{-4, -5.5}
-                \inherit{AbstractMetropolisAlgorithm}
-                \operationsImplementation{}
-            \end{class}
-            
-            \begin{class}[text width=\smallTextWidth]{SwitchTwoSpheres}{4, -3}
-                \inherit{AbstractMetropolisAlgorithm}
-                \operationsImplementation{}
-            \end{class}
-            
-            \begin{class}[text width=\smallTextWidth]{ExchangeOneSphere}{4, -5.5}
+            \begin{class}[text width=\smallTextWidth]{TwoSpheresSwitch}{12, -3}
                 \inherit{AbstractMetropolisAlgorithm}
                 \operationsImplementation{}
             \end{class}
@@ -60,38 +85,38 @@
 \end{scope}
 
 \begin{scope}[on background layer]
-    \composition{AbstractEnsembleAlgorithms}{algo}{1..*}{AbstractMetropolisAlgorithm}
+    \aggregation{AbstractEnsembleAlgorithms}{algo}{1..*}{AbstractMetropolisAlgorithm}
     
     \aggregation{AbstractMetropolisAlgorithm}{thermostat}{1}{AbstractThermostat}
 
-    \aggregation{MoveOneSphere}{spheres}{2}{AbstractDipolarSpheres}
-    \aggregation{MoveOneSphere}{boxed}{2}{AbstractBoxedSpheres}
-    \aggregation{MoveOneSphere}{change}{2}{AbstractSmallChange}
-    \aggregation{MoveOneSphere}{short}{2}{AbstractShortInteraction}
-    \aggregation{MoveOneSphere}{walls}{1}{AbstractWallsInteraction}
-    \aggregation{MoveOneSphere}{dipolar}{2}{DipolarInteractionFacade}
-    \aggregation{MoveOneSphere}{field}{1}{AbstractFieldInteraction}
-    %\compostion{MoveOneSphere}{observables}{3}{AbstractObservables}
+    \aggregation{OneSphereMove}{spheres}{2}{AbstractDipolarSpheres}
+    \aggregation{OneSphereMove}{boxed}{2}{AbstractBoxedSpheres}
+    \aggregation{OneSphereMove}{change}{2}{AbstractSmallChange}
+    \aggregation{OneSphereMove}{short}{2}{AbstractShortInteraction}
+    \aggregation{OneSphereMove}{walls}{1}{AbstractWallsInteraction}
+    \aggregation{OneSphereMove}{dipolar}{2}{DipolarInteractionFacade}
+    \aggregation{OneSphereMove}{field}{1}{AbstractFieldInteraction}
+    %\compostion{OneSphereMove}{observables}{3}{AbstractObservables}
     
-    \aggregation{RotateOneSphere}{spheres}{2}{AbstractDipolarSpheres}
-    \aggregation{RotateOneSphere}{change}{2}{AbstractSmallChange}
-    \aggregation{RotateOneSphere}{dipolar}{2}{DipolarInteractionFacade}
-    %\compostion{RotateOneSphere}{observables}{3}{AbstractObservables}
+    \aggregation{OneSphereRotation}{spheres}{2}{AbstractDipolarSpheres}
+    \aggregation{OneSphereRotation}{change}{2}{AbstractSmallChange}
+    \aggregation{OneSphereRotation}{dipolar}{2}{DipolarInteractionFacade}
+    %\compostion{OneSphereRotation}{observables}{3}{AbstractObservables}
     
-    \aggregation{SwitchTwoSpheres}{spheres}{2}{AbstractDipolarSpheres}
-    \aggregation{SwitchTwoSpheres}{boxed}{2}{AbstractBoxedSpheres}
-    \aggregation{SwitchTwoSpheres}{short}{2}{AbstractShortInteraction}
-    \aggregation{SwitchTwoSpheres}{walls}{1}{AbstractWallsInteraction}
-    \aggregation{SwitchTwoSpheres}{dipolar}{2}{DipolarInteractionFacade}
-    \aggregation{SwitchTwoSpheres}{field}{1}{AbstractFieldInteraction}
-    %\compostion{SwitchTwoSpheres}{observables}{3}{AbstractObservables}
+    \aggregation{TwoSpheresSwitch}{spheres}{2}{AbstractDipolarSpheres}
+    \aggregation{TwoSpheresSwitch}{boxed}{2}{AbstractBoxedSpheres}
+    \aggregation{TwoSpheresSwitch}{short}{2}{AbstractShortInteraction}
+    \aggregation{TwoSpheresSwitch}{walls}{1}{AbstractWallsInteraction}
+    \aggregation{TwoSpheresSwitch}{dipolar}{2}{DipolarInteractionFacade}
+    \aggregation{TwoSpheresSwitch}{field}{1}{AbstractFieldInteraction}
+    %\compostion{TwoSpheresSwitch}{observables}{3}{AbstractObservables}
     
-    \aggregation{ExchangeOneSphere}{spheres}{2}{AbstractDipolarSpheres}
-    \aggregation{ExchangeOneSphere}{boxed}{2}{AbstractBoxedSpheres}
-    \aggregation{ExchangeOneSphere}{short}{2}{AbstractShortInteraction}
-    \aggregation{ExchangeOneSphere}{walls}{1}{AbstractWallsInteraction}
-    \aggregation{ExchangeOneSphere}{dipolar}{2}{DipolarInteractionFacade}
-    \aggregation{ExchangeOneSphere}{field}{1}{AbstractFieldInteraction}
-    \aggregation{ExchangeOneSphere}{reservoir}{2}{AbstractSpheresReservoir}
-    %\compostion{ExchangeOneSphere}{observables}{3}{AbstractObservables}
+    \aggregation{OneSphereExchange}{spheres}{2}{AbstractDipolarSpheres}
+    \aggregation{OneSphereExchange}{boxed}{2}{AbstractBoxedSpheres}
+    \aggregation{OneSphereExchange}{short}{2}{AbstractShortInteraction}
+    \aggregation{OneSphereExchange}{walls}{1}{AbstractWallsInteraction}
+    \aggregation{OneSphereExchange}{dipolar}{2}{DipolarInteractionFacade}
+    \aggregation{OneSphereExchange}{field}{1}{AbstractFieldInteraction}
+    \aggregation{OneSphereExchange}{reservoir}{2}{AbstractSpheresReservoir}
+    %\compostion{OneSphereExchange}{observables}{3}{AbstractObservables}
 \end{scope}
