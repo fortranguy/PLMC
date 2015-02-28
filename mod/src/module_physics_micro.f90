@@ -47,13 +47,13 @@ contains
         
     end function sphere_volume
 
-    !> Distance between 2 positions with Periodic Boundary Conditions
+    !> Vector between 2 positions with Periodic Boundary Conditions
     !> from SMAC, algorithm 2.5 & 2.6, p.91
     
     pure function PBC_vector(Box_size, position1, position2)
     
         real(DP), dimension(:), intent(in) :: Box_size
-        real(DP), dimension(:), intent(in) :: position1, position2
+        
         real(DP), dimension(num_dimensions) :: PBC_vector
         
         if (geometry%bulk) then
@@ -77,16 +77,6 @@ contains
         end if
         
     end function PBC_vector
-    
-    pure function PBC_distance(Box_size, position1, position2)
-    
-        real(DP), dimension(:), intent(in) :: Box_size
-        real(DP), dimension(:), intent(in) :: position1, position2
-        real(DP) :: PBC_distance
-        
-        PBC_distance = norm2(PBC_vector(Box_size, position1, position2))
-        
-    end function PBC_distance
     
     pure subroutine set_bounds(Box_size, Box_height, domain_ratio, Box_lower_bounds, Box_upper_bounds)
     
