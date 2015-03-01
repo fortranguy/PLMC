@@ -46,9 +46,6 @@ contains
         sphere_volume = 4._DP/3._DP * PI * radius**3
         
     end function sphere_volume
-
-    !> Vector between 2 positions with Periodic Boundary Conditions
-    !> from SMAC, algorithm 2.5 & 2.6, p.91
     
     pure function PBC_vector(Box_size, position1, position2)
     
@@ -57,12 +54,6 @@ contains
         real(DP), dimension(num_dimensions) :: PBC_vector
         
         if (geometry%bulk) then
-        
-            PBC_vector(:) = modulo(position2(:)-position1(:), Box_size(:))
-            
-            where(PBC_vector(:) > Box_size(:)/2._DP)
-                PBC_vector(:) = PBC_vector(:) - Box_size(:)
-            end where
             
         else if (geometry%slab) then
         

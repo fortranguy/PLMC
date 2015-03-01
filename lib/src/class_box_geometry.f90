@@ -27,6 +27,7 @@ private
             real(DP) :: get_height
         end function Abstract_Box_Geometry_get_height
 
+        !> PBC: Periodic Boundary Conditions
         pure function Abstract_Box_Geometry_vector_PBC(this, position1, position2) result(vector_PBC)
         import :: Abstract_Box_Geometry, DP, num_dimensions
             class(Abstract_Box_Geometry), intent(in) :: this
@@ -35,6 +36,12 @@ private
         end function Abstract_Box_Geometry_vector_PBC
         
     end interface
+
+    type, extends(Abstract_Box_Geometry), public :: Bulk_Geometry
+    contains
+        procedure :: get_height => Bulk_Geometry_get_height
+        procedure :: vector_PBC => Bulk_Geometry_vector_PBC
+    end type Bulk_Geometry
     
 contains
 
@@ -63,5 +70,29 @@ contains
     end function Abstract_Box_Geometry_distance_PBC
     
 !end implementation Abstract_Box_Geometry
+
+!implementation Bulk_Geometry
+
+    pure function Bulk_Geometry_get_height(this) result(get_height)
+        class(Bulk_Geometry), intent(in) :: this
+        real(DP) :: get_height
+
+        get_height = this%size(3)
+    end function Bulk_Geometry_get_height
+
+    !> from SMAC, algorithm 2.5 & 2.6, p.91
+    pure function Bulk_Geometry_vector_PBC(this, position1, position2) result(vector_PBC)
+        class(Bulk_Geometry), intent(in) :: this
+        real(DP), intent(in) :: position1(:), position2(:)
+        real(DP) :: vector_PBC(num_dimensions)
+
+        vector_PBC = modulo(position2 - position1, this%size)
+
+        where(vector_PBC > this%size/2._DP)
+            vector_PBC = vector_PBC - this%size
+        end where
+    end function Bulk_Geometry_vector_PBC
+
+!end implementation Bulk_Geometry
 
 end module class_box_geometry
