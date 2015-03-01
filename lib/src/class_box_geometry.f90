@@ -42,6 +42,14 @@ private
         procedure :: get_height => Bulk_Geometry_get_height
         procedure :: vector_PBC => Bulk_Geometry_vector_PBC
     end type Bulk_Geometry
+
+    type, extends(Abstract_Box_Geometry), public :: Slab_Geometry
+    private
+        real(DP) :: height
+    contains
+        procedure :: get_height => Slab_Geometry_get_height
+        procedure :: vector_PBC => Slab_Geometry_vector_PBC
+    end type Slab_Geometry
     
 contains
 
@@ -94,5 +102,30 @@ contains
     end function Bulk_Geometry_vector_PBC
 
 !end implementation Bulk_Geometry
+
+!implementation Slab_Geometry
+
+    pure function Slab_Geometry_get_height(this) result(get_height)
+        class(Slab_Geometry), intent(in) :: this
+        real(DP) :: get_height
+
+        get_height = this%height
+    end function Slab_Geometry_get_height
+
+    pure function Slab_Geometry_vector_PBC(this, position1, position2) result(vector_PBC)
+        class(Slab_Geometry), intent(in) :: this
+        real(DP), intent(in) :: position1(:), position2(:)
+        real(DP) :: vector_PBC(num_dimensions)
+
+        vector_PBC(1:2) = modulo(position2(1:2) - position1(1:2), this%size(1:2))
+
+        where(vector_PBC(1:2) > this%size(1:2)/2._DP)
+            vector_PBC(1:2) = vector_PBC(1:2) - this%size(1:2)
+        end where
+
+        vector_PBC(num_dimensions) = position2(num_dimensions) - position1(num_dimensions)
+    end function Slab_Geometry_vector_PBC
+
+!end implementation Slab_Geometry
 
 end module class_box_geometry
