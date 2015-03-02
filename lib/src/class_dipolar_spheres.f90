@@ -5,18 +5,20 @@ use data_geometry, only: num_dimensions
 use data_precisions, only: real_zero
 use procedures_coordinates, only: increase_coordinates_size
 use json_module, only: json_file
-use module_data, only: spheres1_object_field, &
-                       test_data_found, test_empty_string
+use module_data, only: test_data_found, test_empty_string
 
 implicit none
 
 private
 
+    integer :: num_abstract_dipolar_spheres_objects = 0
+    integer :: num_dipolar_spheres_objects = 0
+
     type, abstract, public :: Abstract_Dipolar_Spheres
     private
         character(len=:), allocatable :: name
         real(DP) :: diameter
-        integer ::  num
+        integer ::  num_spheres
         real(DP), allocatable :: positions(:, :)
     contains
         !> Template Pattern
@@ -143,7 +145,7 @@ contains
         call this%set_num(input_data, object_field)
         call this%allocate_coordinates()        
     end subroutine Abstract_Dipolar_Spheres_construct
-
+    
     subroutine Abstract_Dipolar_Spheres_set_name(this, input_data, object_field)
         class(Abstract_Dipolar_Spheres), intent(inout) :: this
         type(json_file), intent(inout) :: input_data
@@ -173,7 +175,9 @@ contains
         call input_data%get(data_field, this%diameter, found)
         call test_data_found(data_field, found)
         
-        if (object_field == spheres1_object_field) then
+        !> A hack to count the number of objects
+        num_abstract_dipolar_spheres_objects = num_abstract_dipolar_spheres_objects + 1
+        if (num_abstract_dipolar_spheres_objects == 1) then
             if (abs(this%diameter - 1._DP) > real_zero) then
                 write(error_unit, *) data_field, " must be 1.0 since it is the unit of length."
                 error stop
@@ -189,8 +193,8 @@ contains
         character(len=:), allocatable :: data_field
         logical :: found
 
-        data_field = "Particles."//object_field//".number"
-        call input_data%get(data_field, this%num, found)
+        data_field = "Particles."//object_field//".number of spheres"
+        call input_data%get(data_field, this%num_spheres, found)
         call test_data_found(data_field, found)
     end subroutine Abstract_Dipolar_Spheres_set_num
     
@@ -219,7 +223,7 @@ contains
         class(Abstract_Dipolar_Spheres), intent(in) :: this
         integer :: get_num
         
-        get_num = this%num
+        get_num = this%num_spheres
     end function Abstract_Dipolar_Spheres_get_num
     
     pure function Abstract_Dipolar_Spheres_get_position(this, i_sphere) result(get_position)
@@ -252,7 +256,7 @@ contains
     pure subroutine Apolar_Spheres_allocate_coordinates(this)
         class(Apolar_Spheres), intent(inout) :: this
         
-        allocate(this%positions(num_dimensions, this%num))
+        allocate(this%positions(num_dimensions, this%num_spheres))
     end subroutine Apolar_Spheres_allocate_coordinates
     
     pure subroutine Apolar_Spheres_deallocate_coordinates(this)
@@ -287,11 +291,11 @@ contains
         class(Apolar_Spheres), intent(inout) :: this
         integer, intent(in) :: i_sphere
         
-        if (i_sphere < this%num) then
-            call this%set_position(i_sphere, this%get_position(this%num))
+        if (i_sphere < this%num_spheres) then
+            call this%set_position(i_sphere, this%get_position(this%num_spheres))
         end if
         
-        this%num = this%num - 1        
+        this%num_spheres = this%num_spheres - 1        
     end subroutine Apolar_Spheres_remove
     
     pure subroutine Apolar_Spheres_add(this, position, moment)
@@ -299,12 +303,12 @@ contains
         real(DP), intent(in) :: position(num_dimensions)
         real(DP), intent(in) :: moment(num_dimensions)
         
-        this%num = this%num + 1
+        this%num_spheres = this%num_spheres + 1
         
-        if (size(this%positions) < this%num) then
+        if (size(this%positions) < this%num_spheres) then
             call increase_coordinates_size(this%positions)
         end if
-        call this%set_position(this%num, position)
+        call this%set_position(this%num_spheres, position)
     end subroutine Apolar_Spheres_add
     
 !end implementation Apolar_Spheres
@@ -323,9 +327,10 @@ contains
         call input_data%get(data_field, this%moment_norm, found)
         call test_data_found(data_field, found)
         
-        if (object_field == spheres1_object_field) then ! incorrect: must be more general
+        num_dipolar_spheres_objects = num_dipolar_spheres_objects + 1
+        if (num_dipolar_spheres_objects == 1) then
             if (abs(this%moment_norm - 1._DP) > real_zero) then
-                write(error_unit, *) data_field, " must be 1.0 since it is the unit of length."
+                write(error_unit, *) data_field, " must be 1.0 since it is the unit of moment."
                 error stop
             end if
         end if
@@ -335,8 +340,8 @@ contains
     pure subroutine Dipolar_Spheres_allocate_coordinates(this)
         class(Dipolar_Spheres), intent(inout) :: this
         
-        allocate(this%positions(num_dimensions, this%num))
-        allocate(this%moments(num_dimensions, this%num))
+        allocate(this%positions(num_dimensions, this%num_spheres))
+        allocate(this%moments(num_dimensions, this%num_spheres))
     end subroutine Dipolar_Spheres_allocate_coordinates
     
     pure subroutine Dipolar_Spheres_deallocate_coordinates(this)
@@ -373,12 +378,12 @@ contains
         class(Dipolar_Spheres), intent(inout) :: this
         integer, intent(in) :: i_sphere
         
-        if (i_sphere < this%num) then
-            call this%set_position(i_sphere, this%get_position(this%num))
-            call this%set_moment(i_sphere, this%get_moment(this%num))
+        if (i_sphere < this%num_spheres) then
+            call this%set_position(i_sphere, this%get_position(this%num_spheres))
+            call this%set_moment(i_sphere, this%get_moment(this%num_spheres))
         end if
         
-        this%num = this%num - 1        
+        this%num_spheres = this%num_spheres - 1        
     end subroutine Dipolar_Spheres_remove
     
     pure subroutine Dipolar_Spheres_add(this, position, moment)
@@ -386,17 +391,17 @@ contains
         real(DP), intent(in) :: position(num_dimensions)
         real(DP), intent(in) :: moment(num_dimensions)
         
-        this%num = this%num + 1
+        this%num_spheres = this%num_spheres + 1
         
-        if (size(this%positions) < this%num) then
+        if (size(this%positions) < this%num_spheres) then
             call increase_coordinates_size(this%positions)
         end if
-        call this%set_position(this%num, position)
+        call this%set_position(this%num_spheres, position)
         
-        if (size(this%moments) < this%num) then
+        if (size(this%moments) < this%num_spheres) then
             call increase_coordinates_size(this%moments)
         end if
-        call this%set_moment(this%num, moment)
+        call this%set_moment(this%num_spheres, moment)
     end subroutine Dipolar_Spheres_add
     
 !end implementation Dipolar_Spheres

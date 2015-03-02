@@ -28,8 +28,7 @@ program test_dipolar_spheres
 
 use class_dipolar_spheres, only: Abstract_Dipolar_Spheres, Apolar_Spheres, Dipolar_Spheres
 use procedures_dipolar_spheres, only: print_dipolar_spheres
-use module_data, only: spheres1_object_field, spheres2_object_field, &
-                       test_file_exists
+use module_data, only: test_file_exists
 use json_module, only: json_file, json_initialize
 
 implicit none
@@ -45,9 +44,9 @@ implicit none
     call input_data%load_file(filename = data_filename)
     
     allocate(Apolar_Spheres :: spheres1)
-    call spheres1%construct(input_data, spheres1_object_field)
+    call spheres1%construct(input_data, "Spheres 1")
     allocate(Dipolar_Spheres :: spheres2)
-    call spheres2%construct(input_data, spheres2_object_field)
+    call spheres2%construct(input_data, "Spheres 2")
     
     call print_dipolar_spheres(spheres1)
     call print_dipolar_spheres(spheres2)
