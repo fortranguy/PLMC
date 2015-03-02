@@ -3,6 +3,8 @@ module class_dipolar_spheres
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_geometry, only: num_dimensions
 use procedures_coordinates, only: increase_coordinates_size
+use json_module, only: json_file
+use module_data, only: test_data_found
 
 implicit none
 
@@ -15,6 +17,8 @@ private
         integer ::  num
         real(DP), allocatable :: positions(:, :)
     contains
+        !procedure(Abstract_Dipolar_Spheres_construct), deferred :: construct
+        !procedure(Abstract_Dipolar_Spheres_destroy), deferred :: destroy
         procedure, non_overridable :: get_name => Abstract_Dipolar_Spheres_get_name
         procedure, non_overridable :: get_diameter => Abstract_Dipolar_Spheres_get_diameter
         procedure, non_overridable :: get_num => Abstract_Dipolar_Spheres_get_num
@@ -28,6 +32,8 @@ private
     end type Abstract_Dipolar_Spheres
     
     abstract interface
+    
+        !pure subroutine Abstract_Dipolar_Spheres_construct(this, )
     
         pure function Abstract_Dipolar_Spheres_get_moment_norm(this) result(get_moment_norm)
         import :: Abstract_Dipolar_Spheres, DP
