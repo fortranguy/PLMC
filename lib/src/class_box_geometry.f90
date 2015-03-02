@@ -82,13 +82,13 @@ contains
         logical :: found
         real(DP), allocatable :: Box_size(:) ! workaround: this%size can't be set.
 
-        data_field = "Box.size"
+        data_field = "Box Geometry.size"
         call input_data%get(data_field, Box_size, found)
         call test_data_found(data_field, found)
 
         call this%check_size(data_field, Box_size, size_dimension)
 
-        this%size = Box_size
+        this%size(1:size_dimension) = Box_size
     end subroutine Abstract_Box_Geometry_set_size
 
     subroutine Abstract_Box_Geometry_check_size(size_field, size_value, size_dimension)
@@ -111,13 +111,13 @@ contains
         logical :: found
         integer, allocatable :: Box_wave(:) ! workaround: this%wave can't be set.
 
-        data_field = "Box.wave"
+        data_field = "Box Geometry.wave"
         call input_data%get(data_field, Box_wave, found)
         call test_data_found(data_field, found)
 
         call this%check_wave(data_field, Box_wave, wave_dimension)
 
-        this%wave = Box_wave
+        this%wave(1:wave_dimension) = Box_wave
     end subroutine Abstract_Box_Geometry_set_wave
 
     subroutine Abstract_Box_Geometry_check_wave(wave_field, wave_value, wave_dimension)
@@ -205,7 +205,7 @@ contains
         character(len=:), allocatable :: data_field
         logical :: found
 
-        data_field = "Box.height"
+        data_field = "Box Geometry.height"
         call input_data%get(data_field, this%height, found)
         call test_data_found(data_field, found)        
     end subroutine Slab_Geometry_set_height
