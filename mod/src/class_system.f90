@@ -318,19 +318,6 @@ contains
         if (allocated(Box_wave)) deallocate(Box_wave)        
 
         if (geometry%slab) then
-        
-            data_name = "Box.height"
-            call this%data_json%get(data_name, this%Box%height, found)
-            call test_data_found(data_name, found)
-            
-            data_name = "Box.ratio in z"
-            call this%data_json%get(data_name, z_ratio, found)
-            call test_data_found(data_name, found)
-            
-            this%Box%size(num_dimensions) = z_ratio * this%Box%size(1)
-            if (this%Box%size(num_dimensions) < this%Box%height) &
-                error stop "Box height is too high."
-            this%Box%wave(num_dimensions) = ceiling(z_ratio * real(this%Box%wave(1), DP))
             
         end if
         

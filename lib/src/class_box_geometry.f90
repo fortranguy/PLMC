@@ -23,9 +23,10 @@ private
         procedure, non_overridable :: get_size => Abstract_Box_Geometry_get_size
         procedure(Abstract_Box_Geometry_get_height), deferred :: get_height
         procedure, non_overridable :: get_wave => Abstract_Box_Geometry_get_wave
-        
-        procedure(Abstract_Box_Geometry_vector_PBC), deferred :: vector_PBC
+
+        !> Mini Template Pattern
         procedure, non_overridable :: distance_PBC => Abstract_Box_Geometry_distance_PBC
+        procedure(Abstract_Box_Geometry_vector_PBC), deferred :: vector_PBC
     end type Abstract_Box_Geometry
 
     abstract interface
@@ -195,7 +196,7 @@ contains
 
         call this%set_size(input_data, 2)
         call this%set_wave(input_data, 2)
-        call this%set_height(input_data)        
+        call this%set_height(input_data)
     end subroutine Slab_Geometry_set
 
     subroutine Slab_Geometry_set_height(this, input_data)
@@ -204,10 +205,23 @@ contains
 
         character(len=:), allocatable :: data_field
         logical :: found
+        real(DP) :: z_ratio
+
+        data_field = "Box Geometry.vertical separation ratio"
+        call input_data%get(data_field, z_ratio, found)
+        call test_data_found(data_field, found)
+
+        this%size(3) = z_ratio * this%size(1)
+        this%wave(3) = ceiling(z_ratio * real(this%wave(1), DP))
 
         data_field = "Box Geometry.height"
         call input_data%get(data_field, this%height, found)
-        call test_data_found(data_field, found)        
+        call test_data_found(data_field, found)
+
+        if (this%height > this%size(3)) then
+            write(error_unit, *) data_field, " is too high."
+            error stop
+        end if        
     end subroutine Slab_Geometry_set_height
 
     pure function Slab_Geometry_get_height(this) result(get_height)
