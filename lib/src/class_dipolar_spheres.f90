@@ -22,6 +22,8 @@ private
         procedure(Abstract_Dipolar_Spheres_get_moment_norm), deferred :: get_moment_norm
         procedure(Abstract_Dipolar_Spheres_get_moment), deferred :: get_moment
         procedure(Abstract_Dipolar_Spheres_set_moment), deferred :: set_moment
+        procedure(Abstract_Dipolar_Spheres_remove), deferred :: remove
+        procedure(Abstract_Dipolar_Spheres_add), deferred :: add
     end type Abstract_Dipolar_Spheres
     
     abstract interface
@@ -39,11 +41,25 @@ private
         end function Abstract_Dipolar_Spheres_get_moment
         
         pure subroutine Abstract_Dipolar_Spheres_set_moment(this, i_sphere, moment)
-            import :: DP, num_dimensions, Abstract_Dipolar_Spheres
+        import :: DP, num_dimensions, Abstract_Dipolar_Spheres
             class(Abstract_Dipolar_Spheres), intent(inout) :: this
             integer, intent(in) :: i_sphere
             real(DP), intent(in) :: moment(num_dimensions)
         end subroutine Abstract_Dipolar_Spheres_set_moment
+        
+        pure subroutine Abstract_Dipolar_Spheres_remove(this, i_sphere)
+        import :: Abstract_Dipolar_Spheres
+            class(Abstract_Dipolar_Spheres), intent(inout) :: this
+            integer, intent(in) :: i_sphere            
+        end subroutine Abstract_Dipolar_Spheres_remove
+        
+        pure subroutine Abstract_Dipolar_Spheres_add(this, i_sphere, position, moment)
+        import :: DP, num_dimensions, Abstract_Dipolar_Spheres
+            class(Abstract_Dipolar_Spheres), intent(inout) :: this
+            integer, intent(in) :: i_sphere  
+            real(DP), intent(in) :: position(num_dimensions)
+            real(DP), intent(in) :: moment(num_dimensions)
+        end subroutine Abstract_Dipolar_Spheres_add
     
     end interface
     
