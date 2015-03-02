@@ -44,13 +44,13 @@ private
         !> Accessors & Mutators
         procedure :: get_widom_num_particles => Hard_Spheres_get_widom_num_particles
         procedure :: set_data => Hard_Spheres_set_data
-        procedure :: set_all_positions => Hard_Spheres_set_all_positions
+        procedure :: set_positions => Hard_Spheres_set_positions
         procedure :: set_test_num_particles => Hard_Spheres_set_test_num_particles
         procedure, private :: set_widom_num_particles => Hard_Spheres_set_widom_num_particles
         
         procedure :: write_report => Hard_Spheres_write_report
         procedure :: write_data => Hard_Spheres_write_data
-        procedure :: write_all_positions => Hard_Spheres_write_all_positions
+        procedure :: write_positions => Hard_Spheres_write_positions
         
         procedure :: test_overlap => Hard_Spheres_test_overlap
         
@@ -61,7 +61,7 @@ private
         private
         
         ! Particles
-        real(DP), dimension(:, :), allocatable, public :: all_orientations
+        real(DP), dimension(:, :), allocatable, public :: moments
         
         ! Post-Processing
         integer :: field_num_particles
@@ -70,14 +70,10 @@ private
         
         !> Accessor & Mutator
         procedure :: get_field_num_particles => Dipolar_Hard_Spheres_get_field_num_particles
-        procedure :: get_orientation => Dipolar_Hard_Spheres_get_orientation
-        procedure :: get_orientation_2d => Dipolar_Hard_Spheres_get_orientation_2d
-        procedure :: get_orientation_z => Dipolar_Hard_Spheres_get_orientation_z
-        procedure :: set_orientation => Dipolar_Hard_Spheres_set_orientation
-        procedure :: set_all_orientations => Dipolar_Hard_Spheres_set_all_orientations
+        procedure :: set_moments => Dipolar_Hard_Spheres_set_moments
         procedure, private :: set_field_num_particles => Dipolar_Hard_Spheres_set_field_num_particles
         
-        procedure :: write_all_orientations => Dipolar_Hard_Spheres_write_all_orientations
+        procedure :: write_moments => Dipolar_Hard_Spheres_write_moments
         
     end type Dipolar_Hard_Spheres
     
@@ -100,53 +96,38 @@ private
     
 contains
 
-    subroutine Hard_Spheres_construct(this, Box, data_json, type_name)
+    subroutine Hard_Spheres_construct(this, Box, input_data, object_field)
     
         class(Hard_Spheres), intent(out) :: this
         type(Box_Parameters), intent(in) :: Box
-        type(json_file), intent(inout) :: data_json
-        character(len=*), intent(in) :: type_name
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: object_field
         
-        character(len=4096) :: data_name
-        logical :: found
-        character(len=:), allocatable :: this_name
         
-        data_name = "Particles."//type_name//".name"
-        call data_json%get(data_name, this_name, found)
-        call test_data_found(data_name, found)
-        call test_empty_string(data_name, this_name)
-        this%name = this_name
-        if (allocated(this_name)) deallocate(this_name)
         write(output_unit, *) this%name, " class construction"
         
-        call this%set_particles(data_json, type_name)
+        call this%set_particles(input_data, object_field)
         call this%set_volume(Box)
-        call this%set_snap(data_json)
+        call this%set_snap(input_data)
         
     end subroutine Hard_Spheres_construct
     
-    subroutine Hard_Spheres_set_particles(this, data_json, type_name)
+    subroutine Hard_Spheres_set_particles(this, input_data, object_field)
     
         class(Hard_Spheres), intent(inout) :: this
-        type(json_file), intent(inout) :: data_json
-        character(len=*), intent(in) :: type_name
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: object_field
         
-        character(len=4096) :: data_name
-        logical :: found
-
-        data_name = "Particles."//type_name//".number of particles"
-        call data_json%get(data_name, this%num_particles, found)
-        call test_data_found(data_name, found)
-        allocate(this%all_positions(num_dimensions, this%num_particles))
+        
 
         select type (this)
             type is (Hard_Spheres)
-                data_name = "Particles."//type_name//".diameter"
-                call data_json%get(data_name, this%diameter, found)
-                call test_data_found(data_name, found)
+                data_field = "Particles."//object_field//".diameter"
+                call input_data%get(data_field, this%diameter, found)
+                call test_data_found(data_field, found)
             type is (Dipolar_Hard_Spheres)
                 this%diameter = 1._DP ! = u_length
-                allocate(this%all_orientations(num_dimensions, this%num_particles))
+                allocate(this%moments(num_dimensions, this%num))
         end select
         
     end subroutine Hard_Spheres_set_particles
@@ -164,44 +145,44 @@ contains
 
     end subroutine Hard_Spheres_set_volume
     
-    subroutine Hard_Spheres_set_snap(this, data_json)
+    subroutine Hard_Spheres_set_snap(this, input_data)
     
         class(Hard_Spheres), intent(inout) :: this
-        type(json_file), intent(inout) :: data_json
+        type(json_file), intent(inout) :: input_data
         
-        character(len=4096) :: data_name
+        character(len=4096) :: data_field
         logical :: found
         integer :: snap_ratio
         
-        data_name = "Distribution.number of particles"
-        call data_json%get(data_name, snap_ratio, found)
-        call test_data_found(data_name, found)
-        this%snap_factor = this%num_particles/snap_ratio
+        data_field = "Distribution.number of particles"
+        call input_data%get(data_field, snap_ratio, found)
+        call test_data_found(data_field, found)
+        this%snap_factor = this%num/snap_ratio
         if (this%snap_factor == 0) this%snap_factor = 1
     
     end subroutine Hard_Spheres_set_snap
     
-    subroutine Between_Hard_Spheres_construct(this, data_json, type1_diameter, type2_diameter)
+    subroutine Between_Hard_Spheres_construct(this, input_data, type1_diameter, type2_diameter)
     
         class(Between_Hard_Spheres), intent(out) :: this
-        type(json_file), intent(inout) :: data_json
+        type(json_file), intent(inout) :: input_data
         real(DP), intent(in) :: type1_diameter, type2_diameter
         
-        character(len=4096) :: data_name
+        character(len=4096) :: data_field
         logical :: found
         character(len=:), allocatable :: this_name
         
-        data_name = "Particles.Between Spheres.name"
-        call data_json%get(data_name, this_name, found)
-        call test_data_found(data_name, found)
-        call test_empty_string(data_name, this_name)
+        data_field = "Particles.Between Spheres.name"
+        call input_data%get(data_field, this_name, found)
+        call test_data_found(data_field, found)
+        call test_empty_string(data_field, this_name)
         this%name = this_name
         if (allocated(this_name)) deallocate(this_name)
         write(output_unit, *) this%name, " class construction"
         
-        data_name = "Particles.Between Spheres.non addivity"
-        call data_json%get(data_name, this%non_additivity, found)
-        call test_data_found(data_name, found)
+        data_field = "Particles.Between Spheres.non addivity"
+        call input_data%get(data_field, this%non_additivity, found)
+        call test_data_found(data_field, found)
         this%diameter = (type1_diameter + type2_diameter)/2._DP + this%non_additivity
         
     end subroutine Between_Hard_Spheres_construct
@@ -211,12 +192,12 @@ contains
         class(Hard_Spheres), intent(inout) :: this
         
         write(output_unit, *) this%name, " class destruction"
-        if (allocated(this%all_positions)) deallocate(this%all_positions)
+        if (allocated(this%positions)) deallocate(this%positions)
         if (allocated(this%name)) deallocate(this%name)
 
         select type (this)
             type is (Dipolar_Hard_Spheres)
-                if (allocated(this%all_orientations)) deallocate(this%all_orientations)
+                if (allocated(this%moments)) deallocate(this%moments)
         end select
     
     end subroutine Hard_Spheres_destroy
@@ -249,36 +230,6 @@ contains
         get_widom_num_particles = this%widom_num_particles
         
     end function Hard_Spheres_get_widom_num_particles
-    
-    pure function Dipolar_Hard_Spheres_get_orientation(this, i_particle) result(get_orientation)
-    
-        class(Dipolar_Hard_Spheres), intent(in) :: this
-        integer, intent(in) :: i_particle
-        real(DP), dimension(num_dimensions) :: get_orientation
-        
-        get_orientation(:) = this%all_orientations(:, i_particle)
-        
-    end function Dipolar_Hard_Spheres_get_orientation
-    
-    pure function Dipolar_Hard_Spheres_get_orientation_2d(this, i_particle) result(get_orientation_2d)
-    
-        class(Dipolar_Hard_Spheres), intent(in) :: this
-        integer, intent(in) :: i_particle
-        real(DP), dimension(2) :: get_orientation_2d
-        
-        get_orientation_2d(:) = this%all_orientations(1:2, i_particle)
-        
-    end function Dipolar_Hard_Spheres_get_orientation_2d
-    
-    pure function Dipolar_Hard_Spheres_get_orientation_z(this, i_particle) result(get_orientation_z)
-    
-        class(Dipolar_Hard_Spheres), intent(in) :: this
-        integer, intent(in) :: i_particle
-        real(DP) :: get_orientation_z
-        
-        get_orientation_z = this%all_orientations(num_dimensions, i_particle)
-        
-    end function Dipolar_Hard_Spheres_get_orientation_z
 
     pure function Dipolar_Hard_Spheres_get_field_num_particles(this) result(get_field_num_particles)
 
@@ -288,16 +239,6 @@ contains
         get_field_num_particles = this%field_num_particles
 
     end function Dipolar_Hard_Spheres_get_field_num_particles
-    
-    subroutine Dipolar_Hard_Spheres_set_orientation(this, i_particle, orientation)
-    
-        class(Dipolar_Hard_Spheres), intent(inout) :: this
-        integer, intent(in) :: i_particle
-        real(DP), dimension(:), intent(in) :: orientation
-        
-        this%all_orientations(:, i_particle) = orientation(:)
-        
-    end subroutine Dipolar_Hard_Spheres_set_orientation
     
     pure function Between_Hard_Spheres_get_diameter(this) result(get_diameter)
     
@@ -320,12 +261,12 @@ contains
         read(snap_unit, *) name, num_particles, snap_factor
 
         if (name /= this%name) write(error_unit, *) "Warning: names are different."
-        if (num_particles /= this%num_particles) error stop "Numbers of particles are different."
+        if (num_particles /= this%num) error stop "Numbers of particles are different."
         if (snap_factor /= this%snap_factor) error stop "Snap factors are different."
 
     end subroutine Hard_Spheres_set_data
 
-    subroutine Hard_Spheres_set_all_positions(this, Box_size, i_step, snap_unit, positions_set)
+    subroutine Hard_Spheres_set_positions(this, Box_size, i_step, snap_unit, positions_set)
 
         class(Hard_Spheres), intent(inout) :: this
         real(DP), dimension(:), intent(in) :: Box_size
@@ -338,16 +279,16 @@ contains
         
         positions_set = .false.
         if (modulo(i_step, this%snap_factor) == 0) then
-            do i_particle = 1, this%num_particles
+            do i_particle = 1, this%num
                 read(snap_unit, *) position_i
-                this%all_positions(:, i_particle) = modulo(position_i, Box_size)
+                this%positions(:, i_particle) = modulo(position_i, Box_size)
             end do      
             positions_set = .true.      
         end if
 
-    end subroutine Hard_Spheres_set_all_positions
+    end subroutine Hard_Spheres_set_positions
 
-    subroutine Dipolar_Hard_Spheres_set_all_orientations(this, i_step, snap_unit, orientations_set)
+    subroutine Dipolar_Hard_Spheres_set_moments(this, i_step, snap_unit, orientations_set)
 
         class(Dipolar_Hard_Spheres), intent(inout) :: this
         integer, intent(in) :: i_step
@@ -358,56 +299,56 @@ contains
         
         orientations_set = .false.
         if (modulo(i_step, this%snap_factor) == 0) then
-            do i_particle = 1, this%num_particles
-                read(snap_unit, *) this%all_orientations(:, i_particle)
+            do i_particle = 1, this%num
+                read(snap_unit, *) this%moments(:, i_particle)
             end do
             orientations_set = .true.
         end if
 
-    end subroutine Dipolar_Hard_Spheres_set_all_orientations
+    end subroutine Dipolar_Hard_Spheres_set_moments
 
-    subroutine Hard_Spheres_set_test_num_particles(this, data_post_json, type_name)
+    subroutine Hard_Spheres_set_test_num_particles(this, data_post_json, object_field)
 
         class(Hard_Spheres), intent(inout) :: this
         type(json_file), intent(inout) :: data_post_json
-        character(len=*), intent(in) :: type_name
+        character(len=*), intent(in) :: object_field
 
-        call this%set_widom_num_particles(data_post_json, type_name)
+        call this%set_widom_num_particles(data_post_json, object_field)
 
         select type (this)
             type is (Dipolar_Hard_Spheres)
-                call this%set_field_num_particles(data_post_json, type_name)
+                call this%set_field_num_particles(data_post_json, object_field)
         end select
 
     end subroutine Hard_Spheres_set_test_num_particles
 
-    subroutine Hard_Spheres_set_widom_num_particles(this, data_post_json, type_name)
+    subroutine Hard_Spheres_set_widom_num_particles(this, data_post_json, object_field)
 
         class(Hard_Spheres), intent(inout) :: this
         type(json_file), intent(inout) :: data_post_json
-        character(len=*), intent(in) :: type_name
+        character(len=*), intent(in) :: object_field
 
-        character(len=4096) :: data_name
+        character(len=4096) :: data_field
         logical :: found
 
-        data_name = "Chemical Potential."//type_name//".number of Widom particles"
-        call data_post_json%get(data_name, this%widom_num_particles, found)
-        call test_data_found(data_name, found)
+        data_field = "Chemical Potential."//object_field//".number of Widom particles"
+        call data_post_json%get(data_field, this%widom_num_particles, found)
+        call test_data_found(data_field, found)
 
     end subroutine Hard_Spheres_set_widom_num_particles
     
-    subroutine Dipolar_Hard_Spheres_set_field_num_particles(this, data_post_json, type_name)
+    subroutine Dipolar_Hard_Spheres_set_field_num_particles(this, data_post_json, object_field)
 
         class(Dipolar_Hard_Spheres), intent(inout) :: this
         type(json_file), intent(inout) :: data_post_json
-        character(len=*), intent(in) :: type_name
+        character(len=*), intent(in) :: object_field
 
-        character(len=4096) :: data_name
+        character(len=4096) :: data_field
         logical :: found
 
-        data_name = "Local Field."//type_name//".External.number of test particles"
-        call data_post_json%get(data_name, this%field_num_particles, found)
-        call test_data_found(data_name, found)
+        data_field = "Local Field."//object_field//".External.number of test particles"
+        call data_post_json%get(data_field, this%field_num_particles, found)
+        call test_data_found(data_field, found)
 
     end subroutine Dipolar_Hard_Spheres_set_field_num_particles
     
@@ -426,12 +367,12 @@ contains
         call to_object(properties_json, "Properties")
         call json_value_add(report_json, properties_json)
 
-        if (this%num_particles > 0) then
-            density = real(this%num_particles + 1, DP) / this%volume ! cheating ? cf. Widom
+        if (this%num > 0) then
+            density = real(this%num + 1, DP) / this%volume ! cheating ? cf. Widom
             call json_value_add(properties_json, "density", density)
             compacity = 4._DP/3._DP*PI*(this%diameter/2._DP)**3 * density
             call json_value_add(properties_json, "compacity", compacity)
-            concentration = real(this%num_particles, DP) / real(num_particles, DP)
+            concentration = real(this%num, DP) / real(num_particles, DP)
             call json_value_add(properties_json, "concentration", concentration)
         end if
 
@@ -454,11 +395,11 @@ contains
         class(Hard_Spheres), intent(in) :: this
         integer, intent(in) :: snap_unit
         
-        write(snap_unit, *) this%name, this%num_particles, this%snap_factor
+        write(snap_unit, *) this%name, this%num, this%snap_factor
         
     end subroutine Hard_Spheres_write_data
       
-    subroutine Hard_Spheres_write_all_positions(this, i_step, snap_unit, double_precision)
+    subroutine Hard_Spheres_write_positions(this, i_step, snap_unit, double_precision)
         
         class(Hard_Spheres), intent(in) :: this
         integer, intent(in) :: i_step
@@ -477,14 +418,14 @@ contains
         end if
         
         if (modulo(i_step, this%snap_factor) == 0) then
-            do i_particle = 1, this%num_particles
-                write(snap_unit, output_format) this%all_positions(:, i_particle)
+            do i_particle = 1, this%num
+                write(snap_unit, output_format) this%positions(:, i_particle)
             end do
         end if
 
-    end subroutine Hard_Spheres_write_all_positions
+    end subroutine Hard_Spheres_write_positions
     
-    subroutine Dipolar_Hard_Spheres_write_all_orientations(this, i_step, snap_unit, double_precision)
+    subroutine Dipolar_Hard_Spheres_write_moments(this, i_step, snap_unit, double_precision)
         
         class(Dipolar_Hard_Spheres), intent(in) :: this
         integer, intent(in) :: i_step
@@ -503,12 +444,12 @@ contains
         end if
         
         if (modulo(i_step, this%snap_factor) == 0) then
-            do i_particle = 1, this%num_particles
-                write(snap_unit, output_format) this%all_orientations(:, i_particle)
+            do i_particle = 1, this%num
+                write(snap_unit, output_format) this%moments(:, i_particle)
             end do
         end if
 
-    end subroutine Dipolar_Hard_Spheres_write_all_orientations
+    end subroutine Dipolar_Hard_Spheres_write_moments
     
     !> Do an overlap test
     
@@ -521,11 +462,11 @@ contains
         real(DP), dimension(num_dimensions) :: position_i, position_j
         real(DP) :: distance_ij
     
-        do j_particle = 1, this%num_particles
-            do i_particle = j_particle+1, this%num_particles
+        do j_particle = 1, this%num
+            do i_particle = j_particle+1, this%num
             
-                position_i(:) = this%all_positions(:, i_particle)
-                position_j(:) = this%all_positions(:, j_particle)
+                position_i(:) = this%positions(:, i_particle)
+                position_j(:) = this%positions(:, j_particle)
                 distance_ij = PBC_distance(Box_size, position_i, position_j)
                 
                 if (distance_ij < this%diameter) then
