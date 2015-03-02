@@ -1,12 +1,13 @@
 module procedures_box_geometry
 
-use iso_fortran_env, only: DP => REAL64, output_unit
+use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use data_geometry, only: num_dimensions
 use class_box_geometry, only: Abstract_Box_Geometry
 
 implicit none
 
 private
+
 public print_box_geometry
 
 contains
@@ -35,11 +36,11 @@ end module procedures_box_geometry
 
 program test_box_geometry
 
-use iso_fortran_env, only: output_unit
-use module_data, only: test_file_exists
-use json_module, only: json_file, json_initialize
+use, intrinsic :: iso_fortran_env, only: output_unit
 use class_box_geometry, only: Abstract_Box_Geometry, Bulk_Geometry, Slab_Geometry
 use procedures_box_geometry, only: print_box_geometry
+use module_data, only: test_file_exists
+use json_module, only: json_file, json_initialize
 
 implicit none
 
@@ -48,7 +49,7 @@ implicit none
     character(len=:), allocatable :: data_filename
     
     call json_initialize()
-    
+     
     data_filename = "box_geometry_bulk.json"
     call test_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
@@ -71,6 +72,6 @@ implicit none
     call print_box_geometry(box_geometry)
     deallocate(box_geometry)
     
-    call input_data%destroy()   
+    call input_data%destroy()
 
 end program test_box_geometry
