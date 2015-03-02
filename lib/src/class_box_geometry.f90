@@ -64,6 +64,7 @@ private
         real(DP) :: height
     contains
         procedure :: set => Slab_Geometry_set
+        procedure, private :: set_height => Slab_Geometry_set_height
         procedure :: get_height => Slab_Geometry_get_height
         procedure :: vector_PBC => Slab_Geometry_vector_PBC
     end type Slab_Geometry
@@ -161,8 +162,7 @@ contains
         type(json_file), intent(inout) :: input_data
 
         call this%set_size(input_data, num_dimensions)
-        call this%set_wave(input_data, num_dimensions)
-        
+        call this%set_wave(input_data, num_dimensions)        
     end subroutine Bulk_Geometry_set
 
     pure function Bulk_Geometry_get_height(this) result(get_height)
@@ -195,8 +195,20 @@ contains
 
         call this%set_size(input_data, 2)
         call this%set_wave(input_data, 2)
-        
+        call this%set_height(input_data)        
     end subroutine Slab_Geometry_set
+
+    subroutine Slab_Geometry_set_height(this, input_data)
+        class(Slab_Geometry), intent(inout) :: this
+        type(json_file), intent(inout) :: input_data
+
+        character(len=:), allocatable :: data_field
+        logical :: found
+
+        data_field = "Box.height"
+        call input_data%get(data_field, this%height, found)
+        call test_data_found(data_field, found)        
+    end subroutine Slab_Geometry_set_height
 
     pure function Slab_Geometry_get_height(this) result(get_height)
         class(Slab_Geometry), intent(in) :: this
@@ -216,7 +228,7 @@ contains
             vector_PBC(1:2) = vector_PBC(1:2) - this%size(1:2)
         end where
 
-        vector_PBC(num_dimensions) = position2(num_dimensions) - position1(num_dimensions)
+        vector_PBC(3) = position2(3) - position1(3)
     end function Slab_Geometry_vector_PBC
 
 !end implementation Slab_Geometry
