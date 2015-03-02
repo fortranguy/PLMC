@@ -32,20 +32,20 @@ private
     abstract interface
 
         subroutine Abstract_Box_Geometry_set(this, input_data)
-        import :: Abstract_Box_Geometry, json_file
+        import :: json_file, Abstract_Box_Geometry
             class(Abstract_Box_Geometry), intent(out) :: this
             type(json_file), intent(inout) :: input_data
         end subroutine
 
         pure function Abstract_Box_Geometry_get_height(this) result(get_height)
-        import :: Abstract_Box_Geometry, DP
+        import :: DP, Abstract_Box_Geometry
             class(Abstract_Box_Geometry), intent(in) :: this
             real(DP) :: get_height
         end function Abstract_Box_Geometry_get_height
 
         !> PBC: Periodic Boundary Conditions
         pure function Abstract_Box_Geometry_vector_PBC(this, position1, position2) result(vector_PBC)
-        import :: Abstract_Box_Geometry, DP, num_dimensions
+        import :: DP, num_dimensions, Abstract_Box_Geometry
             class(Abstract_Box_Geometry), intent(in) :: this
             real(DP), intent(in) :: position1(:), position2(:)
             real(DP) :: vector_PBC(num_dimensions)
