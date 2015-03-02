@@ -122,9 +122,7 @@ contains
 
         select type (this)
             type is (Hard_Spheres)
-                data_field = "Particles."//object_field//".diameter"
-                call input_data%get(data_field, this%diameter, found)
-                call test_data_found(data_field, found)
+                
             type is (Dipolar_Hard_Spheres)
                 this%diameter = 1._DP ! = u_length
                 allocate(this%moments(num_dimensions, this%num))

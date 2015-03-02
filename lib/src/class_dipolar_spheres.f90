@@ -1,10 +1,12 @@
 module class_dipolar_spheres
 
-use, intrinsic :: iso_fortran_env, only: DP => REAL64
+use, intrinsic :: iso_fortran_env, only: DP => REAL64, error_unit
 use data_geometry, only: num_dimensions
+use data_precisions, only: real_zero
 use procedures_coordinates, only: increase_coordinates_size
 use json_module, only: json_file
-use module_data, only: test_data_found, test_empty_string
+use module_data, only: spheres1_object_field, &
+                       test_data_found, test_empty_string
 
 implicit none
 
@@ -17,10 +19,16 @@ private
         integer ::  num
         real(DP), allocatable :: positions(:, :)
     contains
-        procedure(Abstract_Dipolar_Spheres_construct), deferred :: construct
+        !> Template Pattern
+        procedure, non_overridable :: construct => Abstract_Dipolar_Spheres_construct
         procedure, private, non_overridable :: set_name => Abstract_Dipolar_Spheres_set_name
-        procedure, private, non_overridable :: set_num => Abstract_Dipolar_Spheres_set_num
-        procedure(Abstract_Dipolar_Spheres_destroy), deferred :: destroy
+        procedure, private, non_overridable :: set_diameter => Abstract_Dipolar_Spheres_set_diameter
+        procedure, private, non_overridable :: set_num => Abstract_Dipolar_Spheres_set_num        
+        procedure(Abstract_Dipolar_Spheres_allocate_coordinates), private, deferred :: &
+            allocate_coordinates
+        procedure, non_overridable :: destroy => Abstract_Dipolar_Spheres_destroy
+        procedure(Abstract_Dipolar_Spheres_deallocate_coordinates), private, deferred :: &
+            deallocate_coordinates
         
         procedure, non_overridable :: get_name => Abstract_Dipolar_Spheres_get_name
         procedure, non_overridable :: get_diameter => Abstract_Dipolar_Spheres_get_diameter
@@ -36,18 +44,16 @@ private
     end type Abstract_Dipolar_Spheres
     
     abstract interface
-    
-        subroutine Abstract_Dipolar_Spheres_construct(this, input_data, object_field)
-        import :: json_file, Abstract_Dipolar_Spheres
-            class(Abstract_Dipolar_Spheres), intent(out) :: this
-            type(json_file), intent(inout) :: input_data
-            character(len=*), intent(in) :: object_field
-        end subroutine Abstract_Dipolar_Spheres_construct
         
-        pure subroutine Abstract_Dipolar_Spheres_destroy(this)
+        pure subroutine Abstract_Dipolar_Spheres_allocate_coordinates(this)
         import :: Abstract_Dipolar_Spheres
             class(Abstract_Dipolar_Spheres), intent(inout) :: this
-        end subroutine Abstract_Dipolar_Spheres_destroy
+        end subroutine Abstract_Dipolar_Spheres_allocate_coordinates
+        
+        pure subroutine Abstract_Dipolar_Spheres_deallocate_coordinates(this)
+        import :: Abstract_Dipolar_Spheres
+            class(Abstract_Dipolar_Spheres), intent(inout) :: this
+        end subroutine Abstract_Dipolar_Spheres_deallocate_coordinates
     
         pure function Abstract_Dipolar_Spheres_get_moment_norm(this) result(get_moment_norm)
         import :: Abstract_Dipolar_Spheres, DP
@@ -86,11 +92,13 @@ private
     
     type, extends(Abstract_Dipolar_Spheres), public :: Apolar_Spheres
     contains
-        procedure :: construct => Apolar_Spheres_construct
-        procedure :: destroy => Apolar_Spheres_destroy
+        procedure :: allocate_coordinates => Apolar_Spheres_allocate_coordinates
+        procedure :: deallocate_coordinates => Apolar_Spheres_deallocate_coordinates
+        
         procedure :: get_moment_norm => Apolar_Spheres_get_moment_norm
         procedure :: get_moment => Apolar_Spheres_get_moment
         procedure :: set_moment => Apolar_Spheres_set_moment
+        
         procedure :: remove => Apolar_Spheres_remove
         procedure :: add => Apolar_Spheres_add
     end type Apolar_Spheres
@@ -99,11 +107,13 @@ private
         real(DP) :: moment_norm
         real(DP), allocatable :: moments(:, :)
     contains
-        procedure :: construct => Dipolar_Spheres_construct
-        procedure :: destroy => Dipolar_Spheres_destroy
+        procedure :: allocate_coordinates => Dipolar_Spheres_allocate_coordinates
+        procedure :: deallocate_coordinates => Dipolar_Spheres_deallocate_coordinates
+        
         procedure :: get_moment_norm => Dipolar_Spheres_get_moment_norm
         procedure :: get_moment => Dipolar_Spheres_get_moment
         procedure :: set_moment => Dipolar_Spheres_set_moment
+        
         procedure :: remove => Dipolar_Spheres_remove
         procedure :: add => Dipolar_Spheres_add
     end type Dipolar_Spheres
@@ -111,6 +121,17 @@ private
 contains
 
 !implementation Abstract_Dipolar_Spheres
+
+    subroutine Abstract_Dipolar_Spheres_construct(this, input_data, object_field)
+        class(Abstract_Dipolar_Spheres), intent(out) :: this
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: object_field
+        
+        call this%set_name(input_data, object_field)
+        call this%set_diameter(input_data, object_field)
+        call this%set_num(input_data, object_field)
+        call this%allocate_coordinates()        
+    end subroutine Abstract_Dipolar_Spheres_construct
 
     subroutine Abstract_Dipolar_Spheres_set_name(this, input_data, object_field)
         class(Abstract_Dipolar_Spheres), intent(inout) :: this
@@ -129,6 +150,26 @@ contains
         deallocate(this_name)
     end subroutine Abstract_Dipolar_Spheres_set_name
     
+    subroutine Abstract_Dipolar_Spheres_set_diameter(this, input_data, object_field)
+        class(Abstract_Dipolar_Spheres), intent(inout) :: this
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: object_field
+        
+        character(len=:), allocatable :: data_field
+        logical :: found
+        
+        data_field = "Particles."//object_field//".diameter"
+        call input_data%get(data_field, this%diameter, found)
+        call test_data_found(data_field, found)
+        
+        if (object_field == spheres1_object_field) then
+            if (abs(this%diameter - 1._DP) > real_zero) then
+                write(error_unit, *) data_field, " must be 1.0 since it is the unit of length."
+                error stop
+            end if
+        end if
+    end subroutine Abstract_Dipolar_Spheres_set_diameter
+    
     subroutine Abstract_Dipolar_Spheres_set_num(this, input_data, object_field)
         class(Abstract_Dipolar_Spheres), intent(inout) :: this
         type(json_file), intent(inout) :: input_data
@@ -141,6 +182,13 @@ contains
         call input_data%get(data_field, this%num, found)
         call test_data_found(data_field, found)
     end subroutine Abstract_Dipolar_Spheres_set_num
+    
+    subroutine Abstract_Dipolar_Spheres_destroy(this)
+        class(Abstract_Dipolar_Spheres), intent(inout) :: this
+        
+        call this%deallocate_coordinates()
+        if (allocated(this%name)) deallocate(this%name)
+    end subroutine Abstract_Dipolar_Spheres_destroy
 
     pure function Abstract_Dipolar_Spheres_get_name(this) result(get_name)
         class(Abstract_Dipolar_Spheres), intent(in) :: this
@@ -183,22 +231,17 @@ contains
 
 !implementation Apolar_Spheres
 
-    subroutine Apolar_Spheres_construct(this, input_data, object_field)
-        class(Apolar_Spheres), intent(out) :: this
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: object_field
+    pure subroutine Apolar_Spheres_allocate_coordinates(this)
+        class(Apolar_Spheres), intent(inout) :: this
         
-        call this%set_name(input_data, object_field)
-        call this%set_num(input_data, object_field)
         allocate(this%positions(num_dimensions, this%num))
-    end subroutine Apolar_Spheres_construct
+    end subroutine Apolar_Spheres_allocate_coordinates
     
-    pure subroutine Apolar_Spheres_destroy(this)
+    pure subroutine Apolar_Spheres_deallocate_coordinates(this)
         class(Apolar_Spheres), intent(inout) :: this
         
         if (allocated(this%positions)) deallocate(this%positions)
-        if (allocated(this%name)) deallocate(this%name)
-    end subroutine Apolar_Spheres_destroy
+    end subroutine Apolar_Spheres_deallocate_coordinates
 
     pure function Apolar_Spheres_get_moment_norm(this) result(get_moment_norm)
         class(Apolar_Spheres), intent(in) :: this
@@ -249,25 +292,20 @@ contains
 !end implementation Apolar_Spheres
 
 !implementation Dipolar_Spheres
-
-    subroutine Dipolar_Spheres_construct(this, input_data, object_field)
-        class(Dipolar_Spheres), intent(out) :: this
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: object_field
+    
+    pure subroutine Dipolar_Spheres_allocate_coordinates(this)
+        class(Dipolar_Spheres), intent(inout) :: this
         
-        call this%set_name(input_data, object_field)
-        call this%set_num(input_data, object_field)
         allocate(this%positions(num_dimensions, this%num))
         allocate(this%moments(num_dimensions, this%num))
-    end subroutine Dipolar_Spheres_construct
-
-    pure subroutine Dipolar_Spheres_destroy(this)
+    end subroutine Dipolar_Spheres_allocate_coordinates
+    
+    pure subroutine Dipolar_Spheres_deallocate_coordinates(this)
         class(Dipolar_Spheres), intent(inout) :: this
         
         if (allocated(this%moments)) deallocate(this%moments)
         if (allocated(this%positions)) deallocate(this%positions)
-        if (allocated(this%name)) deallocate(this%name)
-    end subroutine Dipolar_Spheres_destroy
+    end subroutine Dipolar_Spheres_deallocate_coordinates
 
     pure function Dipolar_Spheres_get_moment_norm(this) result(get_moment_norm)
         class(Dipolar_Spheres), intent(in) :: this
