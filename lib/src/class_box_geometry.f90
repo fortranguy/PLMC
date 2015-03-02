@@ -1,7 +1,9 @@
 module class_box_geometry
 
-use, intrinsic :: iso_fortran_env, only: DP => REAL64
+use, intrinsic :: iso_fortran_env, only: DP => REAL64, error_unit
 use data_geometry, only: num_dimensions
+use json_module, only: json_file
+use module_data, only: test_data_found
 
 implicit none
 
@@ -12,14 +14,27 @@ private
         real(DP) :: size(num_dimensions)
         integer :: wave(num_dimensions)
     contains
+        procedure(Abstract_Box_Geometry_set), deferred :: set
+        procedure, private :: set_size => Abstract_Box_Geometry_set_size
+        procedure, private, nopass :: check_size => Abstract_Box_Geometry_check_size
+        procedure, private :: set_wave => Abstract_Box_Geometry_set_wave
+        procedure, private, nopass :: check_wave => Abstract_Box_Geometry_check_wave
+        
         procedure, non_overridable :: get_size => Abstract_Box_Geometry_get_size
         procedure(Abstract_Box_Geometry_get_height), deferred :: get_height
         procedure, non_overridable :: get_wave => Abstract_Box_Geometry_get_wave
+        
         procedure(Abstract_Box_Geometry_vector_PBC), deferred :: vector_PBC
         procedure, non_overridable :: distance_PBC => Abstract_Box_Geometry_distance_PBC
     end type Abstract_Box_Geometry
 
     abstract interface
+
+        subroutine Abstract_Box_Geometry_set(this, input_data)
+        import :: Abstract_Box_Geometry, json_file
+            class(Abstract_Box_Geometry), intent(out) :: this
+            type(json_file), intent(inout) :: input_data
+        end subroutine
 
         pure function Abstract_Box_Geometry_get_height(this) result(get_height)
         import :: Abstract_Box_Geometry, DP
@@ -39,6 +54,7 @@ private
 
     type, extends(Abstract_Box_Geometry), public :: Bulk_Geometry
     contains
+        procedure :: set => Bulk_Geometry_set
         procedure :: get_height => Bulk_Geometry_get_height
         procedure :: vector_PBC => Bulk_Geometry_vector_PBC
     end type Bulk_Geometry
@@ -47,6 +63,7 @@ private
     private
         real(DP) :: height
     contains
+        procedure :: set => Slab_Geometry_set
         procedure :: get_height => Slab_Geometry_get_height
         procedure :: vector_PBC => Slab_Geometry_vector_PBC
     end type Slab_Geometry
@@ -54,6 +71,64 @@ private
 contains
 
 !implementation Abstract_Box_Geometry
+
+    subroutine Abstract_Box_Geometry_set_size(this, input_data, size_dimension)
+        class(Abstract_Box_Geometry), intent(inout) :: this
+        type(json_file), intent(inout) :: input_data
+        integer, intent(in) :: size_dimension
+
+        character(len=:), allocatable :: data_field
+        logical :: found
+        real(DP), allocatable :: Box_size(:) ! workaround: this%size can't be set.
+
+        data_field = "Box.size"
+        call input_data%get(data_field, Box_size, found)
+        call test_data_found(data_field, found)
+
+        call this%check_size(data_field, Box_size, size_dimension)
+
+        this%size = Box_size
+    end subroutine Abstract_Box_Geometry_set_size
+
+    subroutine Abstract_Box_Geometry_check_size(size_field, size_value, size_dimension)
+        character(len=*), intent(in) :: size_field
+        real(DP), intent(in) :: size_value(:)
+        integer, intent(in) :: size_dimension
+
+        if (size(size_value) /= size_dimension) then
+            write(error_unit, *) size_field, " dimension is not ", size_dimension, "."
+            error stop
+        end if
+    end subroutine Abstract_Box_Geometry_check_size
+
+    subroutine Abstract_Box_Geometry_set_wave(this, input_data, wave_dimension)
+        class(Abstract_Box_Geometry), intent(inout) :: this
+        type(json_file), intent(inout) :: input_data
+        integer, intent(in) :: wave_dimension
+
+        character(len=:), allocatable :: data_field
+        logical :: found
+        integer, allocatable :: Box_wave(:) ! workaround: this%wave can't be set.
+
+        data_field = "Box.wave"
+        call input_data%get(data_field, Box_wave, found)
+        call test_data_found(data_field, found)
+
+        call this%check_wave(data_field, Box_wave, wave_dimension)
+
+        this%wave = Box_wave
+    end subroutine Abstract_Box_Geometry_set_wave
+
+    subroutine Abstract_Box_Geometry_check_wave(wave_field, wave_value, wave_dimension)
+        character(len=*), intent(in) :: wave_field
+        integer, intent(in) :: wave_value(:)
+        integer, intent(in) :: wave_dimension
+
+        if (size(wave_value) /= wave_dimension) then
+            write(error_unit, *) wave_field, " dimension is not ", wave_dimension, "."
+            error stop
+        end if
+    end subroutine Abstract_Box_Geometry_check_wave
 
     pure function Abstract_Box_Geometry_get_size(this) result(get_size)
         class(Abstract_Box_Geometry), intent(in) :: this
@@ -81,6 +156,15 @@ contains
 
 !implementation Bulk_Geometry
 
+    subroutine Bulk_Geometry_set(this, input_data)
+        class(Bulk_Geometry), intent(out) :: this
+        type(json_file), intent(inout) :: input_data
+
+        call this%set_size(input_data, num_dimensions)
+        call this%set_wave(input_data, num_dimensions)
+        
+    end subroutine Bulk_Geometry_set
+
     pure function Bulk_Geometry_get_height(this) result(get_height)
         class(Bulk_Geometry), intent(in) :: this
         real(DP) :: get_height
@@ -104,6 +188,15 @@ contains
 !end implementation Bulk_Geometry
 
 !implementation Slab_Geometry
+
+    subroutine Slab_Geometry_set(this, input_data)
+        class(Slab_Geometry), intent(out) :: this
+        type(json_file), intent(inout) :: input_data
+
+        call this%set_size(input_data, 2)
+        call this%set_wave(input_data, 2)
+        
+    end subroutine Slab_Geometry_set
 
     pure function Slab_Geometry_get_height(this) result(get_height)
         class(Slab_Geometry), intent(in) :: this

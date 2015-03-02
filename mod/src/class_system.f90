@@ -297,19 +297,10 @@ contains
         
         character(len=4096) :: data_name
         logical :: found
-        real(DP), dimension(:), allocatable :: Box_size
-        integer, dimension(:), allocatable :: Box_wave
+        
         real(DP), dimension(:), allocatable :: external_field
 
         real(DP) :: z_ratio
-        
-        data_name = "Box.size"
-        call this%data_json%get(data_name, Box_size, found)
-        call test_data_found(data_name, found)
-        
-        data_name = "Box.wave"
-        call this%data_json%get(data_name, Box_wave, found)
-        call test_data_found(data_name, found)
         
         if (geometry%bulk) then
             if (size(Box_size) /= num_dimensions) error stop "Box size dimension"

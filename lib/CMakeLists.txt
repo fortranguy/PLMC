@@ -10,10 +10,17 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/CMakeMacroForceAddFlags.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/SetCompilerFlags.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/SetArchiverAndLinkingTool.cmake)
 
+find_package(
+    jsonfortran-${CMAKE_Fortran_COMPILER_ID}
+    1.0.0
+    REQUIRED
+)
+
 file(
     GLOB_RECURSE
     lib_source_files
     src/data_*.f90
+    src/module_*.f90
     src/class_*.f90
 )
 
@@ -23,10 +30,13 @@ add_library(
     ${lib_source_files}
 )
 
+include_directories(${jsonfortran_INCLUDE_DIRS})
+
 set_property(
     TARGET plmc_library
     PROPERTY LINKER_LANGUAGE Fortran
 )
 target_link_libraries(
     plmc_library
+    jsonfortran-static
 )

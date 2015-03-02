@@ -16,7 +16,6 @@ public data_filename, data_post_filename, report_filename, report_post_filename,
 contains
 
     subroutine test_file_exists(filename)
-
         character(len=*), intent(in) :: filename
         
         logical :: data_exists
@@ -27,31 +26,26 @@ contains
             write(error_unit, *) filename, " doesn't exist."
             error stop
         end if
-
     end subroutine test_file_exists
 
-    subroutine test_data_found(data_name, found)
-    
-        character(len=*), intent(in) :: data_name
+    subroutine test_data_found(data_field, found)
+        character(len=*), intent(in) :: data_field
         logical, intent(in) :: found
 
         if (.not.found) then
-            write(error_unit, *) trim(data_name), " not found."
+            write(error_unit, *) trim(data_field), " not found."
             error stop
-        end if
-        
+        end if        
     end subroutine test_data_found
     
-    subroutine test_empty_string(data_name, string)
-    
-        character(len=*), intent(in) :: data_name
+    subroutine test_empty_string(data_field, string)
+        character(len=*), intent(in) :: data_field
         character(len=*) :: string
         
         if (len(string) == 0) then
-            write(error_unit, *) trim(data_name), ": string is empty."
+            write(error_unit, *) trim(data_field), ": string is empty."
             error stop
-        end if
-        
+        end if        
     end subroutine test_empty_string
 
 end module module_data
