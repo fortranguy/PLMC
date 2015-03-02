@@ -2,7 +2,7 @@
 
 module class_hard_spheres
 
-use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit, error_unit
+, output_unit, error_unit
 use data_constants, only: PI
 use data_box, only: num_dimensions
 , json_value, json_value_create, to_object, json_value_add
@@ -20,12 +20,10 @@ private
         
         private
     
-        character(len=:), allocatable :: name
+        
 
         ! Particles
-        real(DP) :: diameter
-        integer ::  num_particles
-        real(DP), dimension(:, :), allocatable :: all_positions
+        
         real(DP) :: volume
         
         ! Snashot
@@ -243,15 +241,6 @@ contains
     
     !> Accessors
     
-    pure function Hard_Spheres_get_name(this) result(get_name)
-    
-        class(Hard_Spheres), intent(in) :: this
-        character(len=len(this%name)) :: get_name
-        
-        get_name = this%name
-        
-    end function Hard_Spheres_get_name
-    
     pure function Between_Hard_Spheres_get_name(this) result(get_name)
     
         class(Between_Hard_Spheres), intent(in) :: this
@@ -261,15 +250,6 @@ contains
         
     end function Between_Hard_Spheres_get_name
 
-    pure function Hard_Spheres_get_num_particles(this) result(get_num_particles)
-    
-        class(Hard_Spheres), intent(in) :: this
-        integer :: get_num_particles
-        
-        get_num_particles = this%num_particles
-        
-    end function Hard_Spheres_get_num_particles
-
     pure function Hard_Spheres_get_widom_num_particles(this) result(get_widom_num_particles)
     
         class(Hard_Spheres), intent(in) :: this
@@ -278,25 +258,6 @@ contains
         get_widom_num_particles = this%widom_num_particles
         
     end function Hard_Spheres_get_widom_num_particles
-    
-    pure function Hard_Spheres_get_diameter(this) result(get_diameter)
-    
-        class(Hard_Spheres), intent(in) :: this
-        real(DP) :: get_diameter
-        
-        get_diameter = this%diameter
-        
-    end function Hard_Spheres_get_diameter
-    
-    pure function Hard_Spheres_get_position(this, i_particle) result(get_position)
-    
-        class(Hard_Spheres), intent(in) :: this
-        integer, intent(in) :: i_particle
-        real(DP), dimension(num_dimensions) :: get_position
-        
-        get_position(:) = this%all_positions(:, i_particle)
-        
-    end function Hard_Spheres_get_position
     
     pure function Hard_Spheres_get_position_2d(this, i_particle) result(get_position_2d)
     
