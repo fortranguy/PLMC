@@ -76,7 +76,7 @@
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(BoxGeometry.north) - (11 cm, 0)$)}]
+        \begin{scope}[shift={($(BoxGeometry.north) - (11 cm, 0)$)}, local bounding box=ExternalField]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractExternalField}{0, 0}
                 \operation[0]{field(position : double[3]) : double[3]}
             \end{abstractclass}
@@ -128,77 +128,56 @@
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(Spheres.north)!0.5!(BoxGeometry.north) + (0 cm, 16 cm)$)},
+        \begin{scope}[shift={($(BoxGeometry.north) + (0 cm, 16 cm)$)},
             local bounding box=BoxedSpheres]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractBoxedSpheres}{0, 0}
                 \operation[0]{getAccessibleVolume() : double}
                 \operation[0]{isInsideBox(position : double[3]) : bool}
                 \operation[0]{fold(position : double[3])}
-                \operation[0]{randomPosition() : double[3]}
-                \operation[0]{randomMoment() : double[3]}
             \end{abstractclass}
 
             \def\operationsImplementation{
                 \operation{getAccessibleVolume() : double}
                 \operation{isInsideBox(position : double[3]) : bool}
                 \operation{fold(position : double[3])}
-                \operation{randomPosition() : double[3]}
-                \operation{randomMoment() : double[3]}
             }
             
-            \begin{class}[text width=\mediumTextWidth]{BulkBoxedSpheres}{0, -4.5}
+            \begin{class}[text width=\mediumTextWidth]{BulkBoxedSpheres}{0, -3.5}
                 \inherit{AbstractBoxedSpheres}
                 \operationsImplementation{}
             \end{class}
             
-            \begin{class}[text width=\mediumTextWidth]{SlabBoxedSpheres}{0, -8.5}
+            \begin{class}[text width=\mediumTextWidth]{SlabBoxedSpheres}{0, -6.5}
                 \inherit{AbstractBoxedSpheres}
                 \operationsImplementation{}
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(BoxedSpheres.north) + (-9 cm, 0 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractSmallChange}{0, 0}
-                \operation{randomMove(iSphere : int) : double[3]}
-                \operation[0]{randomRotation(iSphere : int) : double[3]}
+        \begin{scope}[shift={($(Spheres.north) + (0 cm, 16 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractRandomCoordinates}{0, 0}
+                \operation{position(): double[3]}
+                \operation[0]{moment(): double[3]}
+                \operation{move(iSphere : int) : double[3]}
+                \operation[0]{rotation(iSphere : int) : double[3]}
             \end{abstractclass}
 
             \def\operationsImplementation{
-                \operation{randomRotation(iSphere : int) : double[3]}
+                \operation{moment(): double[3]}
+                \operation{rotation(iSphere : int) : double[3]}
             }
 
-            \begin{class}[text width=\mediumTextWidth]{SmallMove}{0, -3}
-                \inherit{AbstractSmallChange}
+            \begin{class}[text width=\mediumTextWidth]{RandomPositions}{0, -4}
+                \inherit{AbstractRandomCoordinates}
                 \operationsImplementation{}
             \end{class}
 
-            \begin{class}[text width=\mediumTextWidth]{SmallChange}{0, -5}
-                \inherit{AbstractSmallChange}
-                \operationsImplementation{}
-            \end{class}
-        \end{scope}
-
-        \begin{scope}[shift={($(BoxedSpheres.north) + (8 cm, -5 cm)$)}]
-            \begin{abstractclass}[text width=\smallTextWidth]{AbstractRandomOrientation}{0, 0}
-                \operation[0]{orientation() : double[3]}
-            \end{abstractclass}
-
-            \def\operationsImplementation{
-                \operation{orientation() : double[3]}
-            }
-
-            \begin{class}[text width=\smallTextWidth]{NullRandomOrientation}{0, -2.5}
-                \inherit{AbstractRandomOrientation}
-                \operationsImplementation{}
-            \end{class}
-
-            \begin{class}[text width=\smallTextWidth]{RandomOrientation}{0, -4.5}
-                \inherit{AbstractRandomOrientation}
+            \begin{class}[text width=\mediumTextWidth]{RandomCoordinates}{0, -7}
+                \inherit{AbstractRandomCoordinates}
                 \operationsImplementation{}
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(BoxedSpheres.north) + (16 cm, 0 cm)$)}]
+        \begin{scope}[shift={($(ExternalField.north) + (0 cm, 16 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractTotalMoment}{0, 0}
                 \operation[0]{getTotalMoment() : double[3]}
                 \operation[0]{rotationUpdate(old : Particle, new : Particle)}
@@ -229,9 +208,8 @@
     \aggregation{AbstractBoxedSpheres}{box}{1}{AbstractBoxGeometry}
     \aggregation{AbstractBoxedSpheres}{spheres}{1}{AbstractDipolarSpheres}
 
-    \aggregation{AbstractSmallChange}{spheres}{1}{AbstractDipolarSpheres}
-
-    \composition{AbstractBoxedSpheres}{randomOrientation}{1}{AbstractRandomOrientation}
+    \aggregation{AbstractRandomCoordinates}{box}{1}{AbstractBoxGeometry}
+    \aggregation{AbstractRandomCoordinates}{spheres}{1}{AbstractDipolarSpheres}
     
     \aggregation{TotalMoment}{spheres}{1}{AbstractDipolarSpheres}
 \end{scope}
