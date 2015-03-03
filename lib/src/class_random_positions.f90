@@ -15,6 +15,8 @@ private
         class(Abstract_Dipolar_Spheres), pointer :: dipolar_spheres => null()
         real(DP) :: delta
     contains
+        procedure :: construct => Abstract_Random_Positions_construct
+        procedure :: destroy => Abstract_Random_Positions_destroy
         procedure(Abstract_Random_Positions_position), deferred :: position
         procedure :: move => Abstract_Random_Positions_move
     end type Abstract_Random_Positions
@@ -42,6 +44,24 @@ private
 contains
 
 !implementation Abstract_Random_Positions
+
+    subroutine Abstract_Random_Positions_construct(this, box_geometry, dipolar_spheres, delta)
+        class(Abstract_Random_Positions), intent(out) :: this
+        class(Abstract_Box_Geometry), target, intent(in) :: box_geometry
+        class(Abstract_Dipolar_Spheres), target, intent(in) :: dipolar_spheres
+        real(DP), intent(in) :: delta
+        
+        this%box_geometry => box_geometry
+        this%dipolar_spheres => dipolar_spheres
+        this%delta = delta
+    end subroutine Abstract_Random_Positions_construct
+    
+    subroutine Abstract_Random_Positions_destroy(this)
+        class(Abstract_Random_Positions), intent(inout) :: this
+        
+        this%dipolar_spheres => null()
+        this%box_geometry => null()
+    end subroutine Abstract_Random_Positions_destroy
 
     function Abstract_Random_Positions_move(this, i_sphere) result(position)
         class(Abstract_Random_Positions), intent(in) :: this
