@@ -26,7 +26,7 @@ private
         procedure, private, non_overridable :: set_name => Abstract_Dipolar_Spheres_set_name
         procedure, private, non_overridable :: set_diameter => Abstract_Dipolar_Spheres_set_diameter
         procedure(Abstract_Dipolar_Spheres_set_moment_norm), private, deferred :: set_moment_norm
-        procedure, private, non_overridable :: set_num => Abstract_Dipolar_Spheres_set_num
+        procedure, private, non_overridable :: set_num_spheres => Abstract_Dipolar_Spheres_set_num_spheres
         procedure(Abstract_Dipolar_Spheres_allocate_coordinates), private, deferred :: &
             allocate_coordinates
         procedure, non_overridable :: destroy => Abstract_Dipolar_Spheres_destroy
@@ -142,7 +142,7 @@ contains
         call this%set_name(input_data, object_field)
         call this%set_diameter(input_data, object_field)
         call this%set_moment_norm(input_data, object_field)
-        call this%set_num(input_data, object_field)
+        call this%set_num_spheres(input_data, object_field)
         call this%allocate_coordinates()        
     end subroutine Abstract_Dipolar_Spheres_construct
     
@@ -185,7 +185,7 @@ contains
         end if
     end subroutine Abstract_Dipolar_Spheres_set_diameter
     
-    subroutine Abstract_Dipolar_Spheres_set_num(this, input_data, object_field)
+    subroutine Abstract_Dipolar_Spheres_set_num_spheres(this, input_data, object_field)
         class(Abstract_Dipolar_Spheres), intent(inout) :: this
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: object_field
@@ -196,7 +196,7 @@ contains
         data_field = "Particles."//object_field//".number of spheres"
         call input_data%get(data_field, this%num_spheres, found)
         call test_data_found(data_field, found)
-    end subroutine Abstract_Dipolar_Spheres_set_num
+    end subroutine Abstract_Dipolar_Spheres_set_num_spheres
     
     subroutine Abstract_Dipolar_Spheres_destroy(this)
         class(Abstract_Dipolar_Spheres), intent(inout) :: this
