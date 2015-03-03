@@ -12,14 +12,28 @@ private
     type, abstract, public :: Abstract_Boxed_Spheres
     private
         class(Abstract_Box_Geometry), pointer :: box => null()
-        class(Abstract_Dipolar_Spheres), pointer :: dip_spheres => null()
     contains
+        procedure(Abstract_Boxed_Spheres_construct), deferred :: construct
+        procedure(Abstract_Boxed_Spheres_destroy), deferred :: destroy
+        
         procedure(Abstract_Boxed_Spheres_accessible_volume), deferred :: accessible_volume
         procedure(Abstract_Boxed_Spheres_is_inside), deferred :: is_inside
         procedure(Abstract_Boxed_Spheres_fold), deferred :: fold
     end type Abstract_Boxed_Spheres
 
     abstract interface
+
+        subroutine Abstract_Boxed_Spheres_construct(this, box, dip_spheres)
+        import :: Abstract_Box_Geometry, Abstract_Dipolar_Spheres, Abstract_Boxed_Spheres
+            class(Abstract_Boxed_Spheres), intent(out) :: this
+            class(Abstract_Box_Geometry), target, intent(in) :: box
+            class(Abstract_Dipolar_Spheres), target, intent(in) :: dip_spheres
+        end subroutine Abstract_Boxed_Spheres_construct
+
+        subroutine Abstract_Boxed_Spheres_destroy(this)
+        import :: Abstract_Boxed_Spheres
+            class(Abstract_Boxed_Spheres), intent(inout) :: this
+        end subroutine Abstract_Boxed_Spheres_destroy
 
         pure function Abstract_Boxed_Spheres_accessible_volume(this) result(accessible_volume)
         import :: DP, Abstract_Boxed_Spheres
@@ -44,13 +58,21 @@ private
 
     type, extends(Abstract_Boxed_Spheres), public :: Bulk_Boxed_Spheres
     contains
+        procedure :: construct => Bulk_Boxed_Spheres_construct
+        procedure :: destroy => Bulk_Boxed_Spheres_destroy
+        
         procedure :: accessible_volume => Bulk_Boxed_Spheres_accessible_volume
         procedure :: is_inside => Bulk_Boxed_Spheres_is_inside
         procedure :: fold => Bulk_Boxed_Spheres_fold
     end type Bulk_Boxed_Spheres
 
     type, extends(Abstract_Boxed_Spheres), public :: Slab_Boxed_Spheres
+    private
+        class(Abstract_Dipolar_Spheres), pointer :: dip_spheres => null()
     contains
+        procedure :: construct => Slab_Boxed_Spheres_construct
+        procedure :: destroy => Slab_Boxed_Spheres_destroy
+        
         procedure :: accessible_volume => Slab_Boxed_Spheres_accessible_volume
         procedure :: is_inside => Slab_Boxed_Spheres_is_inside
         procedure :: fold => Slab_Boxed_Spheres_fold
@@ -59,6 +81,20 @@ private
 contains
 
 !implementation Bulk_Boxed_Spheres
+
+    subroutine Bulk_Boxed_Spheres_construct(this, box, dip_spheres)
+        class(Bulk_Boxed_Spheres), intent(out) :: this
+        class(Abstract_Box_Geometry), target, intent(in) :: box
+        class(Abstract_Dipolar_Spheres), target, intent(in) :: dip_spheres
+
+        this%box => box
+    end subroutine Bulk_Boxed_Spheres_construct
+
+    subroutine Bulk_Boxed_Spheres_destroy(this)
+        class(Bulk_Boxed_Spheres), intent(inout) :: this
+
+        this%box => null()
+    end subroutine Bulk_Boxed_Spheres_destroy
 
     pure function Bulk_Boxed_Spheres_accessible_volume(this) result(accessible_volume)
         class(Bulk_Boxed_Spheres), intent(in) :: this
@@ -85,6 +121,22 @@ contains
 !end implementation Bulk_Boxed_Spheres
 
 !implementation Slab_Boxed_Spheres
+
+    subroutine Slab_Boxed_Spheres_construct(this, box, dip_spheres)
+        class(Slab_Boxed_Spheres), intent(out) :: this
+        class(Abstract_Box_Geometry), target, intent(in) :: box
+        class(Abstract_Dipolar_Spheres), target, intent(in) :: dip_spheres
+
+        this%box => box
+        this%dip_spheres => dip_spheres
+    end subroutine Slab_Boxed_Spheres_construct
+
+    subroutine Slab_Boxed_Spheres_destroy(this)
+        class(Slab_Boxed_Spheres), intent(inout) :: this
+        
+        this%dip_spheres => null()
+        this%box => null()
+    end subroutine Slab_Boxed_Spheres_destroy
 
     pure function Slab_Boxed_Spheres_accessible_volume(this) result(accessible_volume)
         class(Slab_Boxed_Spheres), intent(in) :: this

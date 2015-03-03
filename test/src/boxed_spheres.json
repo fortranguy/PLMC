@@ -1,0 +1,14 @@
+{
+    "Box Geometry": {
+        "size": [10.0, 10.0, 10.0],
+        "wave": [8, 8, 8]
+    },
+    "Particles": {
+        "Spheres 1": {
+            "name": "HS",
+            "diameter": 1.0,
+            "number of spheres": 5  
+        }
+    }
+}
+    

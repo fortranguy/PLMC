@@ -24,7 +24,7 @@ contains
         class(Abstract_Random_Coordinates), allocatable, intent(out) :: rand_coordinates
         class(Abstract_Random_Positions), allocatable, intent(out) :: rand_positions
         class(Abstract_Random_Moments), allocatable, intent(out) :: rand_moments
-        type(json_file) :: input_data
+        type(json_file), intent(inout) :: input_data
         
         allocate(Slab_Geometry :: box)
         call box%set(input_data)
@@ -32,11 +32,9 @@ contains
         call dip_spheres%construct(input_data, "Spheres 1")
         
         allocate(Slab_Random_Positions :: rand_positions)
-        call rand_positions%construct(box, dip_spheres, 0.5_DP)
-        
+        call rand_positions%construct(box, dip_spheres, 0.5_DP)        
         allocate(Random_Moments :: rand_moments)
-        call rand_moments%construct(dip_spheres, 1._DP)
-        
+        call rand_moments%construct(dip_spheres, 1._DP)        
         allocate(Random_Coordinates :: rand_coordinates)
         call rand_coordinates%construct(rand_positions, rand_moments)
     
@@ -86,6 +84,7 @@ implicit none
     class(Abstract_Random_Coordinates), allocatable :: rand_coordinates
     class(Abstract_Random_Positions), allocatable :: rand_positions
     class(Abstract_Random_Moments), allocatable :: rand_moments
+    
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename
     
