@@ -206,12 +206,12 @@
                 \operation{rotation(iSphere : int) : double[3]}
             }
             
-            \begin{class}[text width=\mediumTextWidth]{ApolarRandomMoments}{0, -3}
+            \begin{class}[text width=\mediumTextWidth]{NullRandomMoments}{0, -3}
                 \inherit{AbstractRandomMoments}
                 \operationImplementation{}
             \end{class}
             
-            \begin{class}[text width=\mediumTextWidth]{DipolarRandomMoments}{0, -5.5}
+            \begin{class}[text width=\mediumTextWidth]{RandomMoments}{0, -5.5}
                 \inherit{AbstractRandomMoments}
                 \operationImplementation{}
             \end{class}
@@ -245,16 +245,16 @@
 \end{scope}
 
 \begin{scope}[on background layer]
-    \aggregation{AbstractBoxedSpheres}{box}{1}{AbstractBoxGeometry}
-    \aggregation{AbstractBoxedSpheres}{spheres}{1}{AbstractDipolarSpheres}
+    \aggregation{AbstractBoxedSpheres}{boxGeometry}{1}{AbstractBoxGeometry}
+    \aggregation{AbstractBoxedSpheres}{dipolarSpheres}{1}{AbstractDipolarSpheres}
     
     \aggregation{RandomCoordinates}{randPositions}{1}{AbstractRandomPositions}
     \aggregation{RandomCoordinates}{randMoments}{1}{AbstractRandomMoments}
     
-    \aggregation{AbstractRandomPositions}{box}{1}{AbstractBoxGeometry}
-    \aggregation{AbstractRandomPositions}{spheres}{1}{AbstractDipolarSpheres}
+    \aggregation{AbstractRandomPositions}{boxGeometry}{1}{AbstractBoxGeometry}
+    \aggregation{AbstractRandomPositions}{dipolarSpheres}{1}{AbstractDipolarSpheres}
     
-    \aggregation{AbstractRandomMoments}{spheres}{1}{AbstractDipolarSpheres}
+    \aggregation{RandomMoments}{dipolarSpheres}{1}{AbstractDipolarSpheres}
     
-    \aggregation{TotalMoment}{spheres}{1}{AbstractDipolarSpheres}
+    \aggregation{TotalMoment}{dipolarSpheres}{1}{AbstractDipolarSpheres}
 \end{scope}
