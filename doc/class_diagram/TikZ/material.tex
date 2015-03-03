@@ -131,14 +131,14 @@
         \begin{scope}[shift={($(BoxGeometry.north) + (0 cm, 16 cm)$)},
             local bounding box=BoxedSpheres]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractBoxedSpheres}{0, 0}
-                \operation[0]{getAccessibleVolume() : double}
-                \operation[0]{isInsideBox(position : double[3]) : bool}
+                \operation[0]{accessibleVolume() : double}
+                \operation[0]{isInside(position : double[3]) : bool}
                 \operation[0]{fold(position : double[3])}
             \end{abstractclass}
 
             \def\operationsImplementation{
-                \operation{getAccessibleVolume() : double}
-                \operation{isInsideBox(position : double[3]) : bool}
+                \operation{accessibleVolume() : double}
+                \operation{isInside(position : double[3]) : bool}
                 \operation{fold(position : double[3])}
             }
             
