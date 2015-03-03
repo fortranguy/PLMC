@@ -136,9 +136,9 @@ contains
         type(Box_Parameters), intent(in) :: Box
 
         if (geometry%bulk) then
-            this%volume = product(Box%size)
+            !this%volume = product(Box%size)
         else if (geometry%slab) then
-            this%volume = product(Box%size(1:2)) * (Box%height - this%diameter)
+            !this%volume = product(Box%size(1:2)) * (Box%height - this%diameter)
         end if
 
     end subroutine Hard_Spheres_set_volume

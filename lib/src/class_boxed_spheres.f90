@@ -49,6 +49,13 @@ private
         procedure :: fold => Bulk_Boxed_Spheres_fold
     end type Bulk_Boxed_Spheres
 
+    type, extends(Abstract_Boxed_Spheres), public :: Slab_Boxed_Spheres
+    contains
+        procedure :: accessible_volume => Slab_Boxed_Spheres_accessible_volume
+        procedure :: is_inside => Slab_Boxed_Spheres_is_inside
+        procedure :: fold => Slab_Boxed_Spheres_fold
+    end type Slab_Boxed_Spheres
+
 contains
 
 !implementation Bulk_Boxed_Spheres
@@ -76,5 +83,33 @@ contains
     end subroutine Bulk_Boxed_Spheres_fold
 
 !end implementation Bulk_Boxed_Spheres
+
+!implementation Slab_Boxed_Spheres
+
+    pure function Slab_Boxed_Spheres_accessible_volume(this) result(accessible_volume)
+        class(Slab_Boxed_Spheres), intent(in) :: this
+        real(DP) :: accessible_volume
+
+        accessible_volume = product(reshape(this%box%get_size(), [2])) * &
+                            (this%box%get_height() - this%dip_spheres%get_diameter())
+    end function Slab_Boxed_Spheres_accessible_volume
+
+    pure function Slab_Boxed_Spheres_is_inside(this, position) result(is_inside)
+        class(Slab_Boxed_Spheres), intent(in) :: this
+        real(DP), intent(in) :: position(num_dimensions)
+        logical :: is_inside
+
+        is_inside = this%dip_spheres%get_diameter() / 2._DP < position(3) .and. &
+                    position(3) < this%box%get_height() - this%dip_spheres%get_diameter() / 2._DP
+    end function Slab_Boxed_Spheres_is_inside
+        
+    pure subroutine Slab_Boxed_Spheres_fold(this, position)
+        class(Slab_Boxed_Spheres), intent(in) :: this
+        real(DP), intent(inout) :: position(num_dimensions)
+
+        position(1:2) = modulo(position(1:2), reshape(this%box%get_size(), [2]))
+    end subroutine Slab_Boxed_Spheres_fold
+
+!end implementation Slab_Boxed_Spheres
 
 end module class_boxed_spheres
