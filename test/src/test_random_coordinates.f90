@@ -2,11 +2,11 @@ module procedures_random_coordinates
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use class_box_geometry, only: Abstract_Box_Geometry, Bulk_Geometry, Slab_Geometry
-use class_dipolar_spheres, only: Abstract_Dipolar_Spheres, Apolar_Spheres
+use class_dipolar_spheres, only: Abstract_Dipolar_Spheres, Apolar_Spheres, Dipolar_Spheres
 use class_random_coordinates, only: Abstract_Random_Coordinates, Random_Coordinates
 use class_random_positions, only: Abstract_Random_Positions, Bulk_Random_Positions, &
                                   Slab_Random_Positions
-use class_random_moments, only: Abstract_Random_Moments, Null_Random_Moments
+use class_random_moments, only: Abstract_Random_Moments, Null_Random_Moments, Random_Moments
 use json_module, only: json_file
 
 implicit none
@@ -17,35 +17,35 @@ public construct, destroy
 
 contains
 
-    subroutine construct(box_geometry, dipolar_spheres, rand_positions, rand_moments, &
+    subroutine construct(box_geometry, dip_spheres, rand_positions, rand_moments, &
                          rand_coordinates, input_data)
         class(Abstract_Box_Geometry), allocatable, intent(out) :: box_geometry
-        class(Abstract_Dipolar_Spheres), allocatable, intent(out) :: dipolar_spheres
+        class(Abstract_Dipolar_Spheres), allocatable, intent(out) :: dip_spheres
         class(Abstract_Random_Coordinates), allocatable, intent(out) :: rand_coordinates
         class(Abstract_Random_Positions), allocatable, intent(out) :: rand_positions
         class(Abstract_Random_Moments), allocatable, intent(out) :: rand_moments
         type(json_file) :: input_data
         
-        allocate(Slab_Geometry :: box_geometry)
+        allocate(Bulk_Geometry :: box_geometry)
         call box_geometry%set(input_data)
-        allocate(Apolar_Spheres :: dipolar_spheres)
-        call dipolar_spheres%construct(input_data, "Spheres 1")
+        allocate(Dipolar_Spheres :: dip_spheres)
+        call dip_spheres%construct(input_data, "Spheres 1")
         
-        allocate(Slab_Random_Positions :: rand_positions)
-        call rand_positions%construct(box_geometry, dipolar_spheres, 0.5_DP)
+        allocate(Bulk_Random_Positions :: rand_positions)
+        call rand_positions%construct(box_geometry, dip_spheres, 0.5_DP)
         
-        allocate(Null_Random_Moments :: rand_moments)
-        call rand_moments%construct(dipolar_spheres, 1._DP)
+        allocate(Random_Moments :: rand_moments)
+        call rand_moments%construct(dip_spheres, 1._DP)
         
         allocate(Random_Coordinates :: rand_coordinates)
         call rand_coordinates%construct(rand_positions, rand_moments)
     
     end subroutine construct
     
-    subroutine destroy(box_geometry, dipolar_spheres, rand_positions, rand_moments, &
+    subroutine destroy(box_geometry, dip_spheres, rand_positions, rand_moments, &
                        rand_coordinates)
         class(Abstract_Box_Geometry), allocatable, intent(inout) :: box_geometry
-        class(Abstract_Dipolar_Spheres), allocatable, intent(inout) :: dipolar_spheres
+        class(Abstract_Dipolar_Spheres), allocatable, intent(inout) :: dip_spheres
         class(Abstract_Random_Coordinates), allocatable, intent(inout) :: rand_coordinates
         class(Abstract_Random_Positions), allocatable, intent(inout) :: rand_positions
         class(Abstract_Random_Moments), allocatable, intent(inout) :: rand_moments
@@ -59,8 +59,8 @@ contains
         call rand_positions%destroy()
         if (allocated(rand_positions)) deallocate(rand_positions)
         
-        call dipolar_spheres%destroy()
-        if (allocated(dipolar_spheres)) deallocate(dipolar_spheres)
+        call dip_spheres%destroy()
+        if (allocated(dip_spheres)) deallocate(dip_spheres)
         if (allocated(box_geometry)) deallocate(box_geometry)
     
     end subroutine destroy
@@ -82,7 +82,7 @@ use json_module, only: json_file, json_initialize
 implicit none
 
     class(Abstract_Box_Geometry), allocatable :: box_geometry
-    class(Abstract_Dipolar_Spheres), allocatable :: dipolar_spheres
+    class(Abstract_Dipolar_Spheres), allocatable :: dip_spheres
     class(Abstract_Random_Coordinates), allocatable :: rand_coordinates
     class(Abstract_Random_Positions), allocatable :: rand_positions
     class(Abstract_Random_Moments), allocatable :: rand_moments
@@ -95,19 +95,20 @@ implicit none
     call test_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
     
-    call construct(box_geometry, dipolar_spheres, rand_positions, rand_moments, rand_coordinates, &
+    call construct(box_geometry, dip_spheres, rand_positions, rand_moments, rand_coordinates, &
                    input_data)
                    
     write(output_unit, *) "random postion =", rand_coordinates%position()
-    write(output_unit, *) "initial position =", dipolar_spheres%get_position(1)
+    write(output_unit, *) "initial position =", dip_spheres%get_position(1)
     write(output_unit, *) "moved position =", rand_coordinates%move(1)
     write(output_unit, *)
     
     write(output_unit, *) "random moment =", rand_coordinates%moment()
-    write(output_unit, *) "initial moment =", dipolar_spheres%get_moment(1)
+    call dip_spheres%set_moment(1, [1._DP, 0._DP, 0._DP])
+    write(output_unit, *) "moment =", dip_spheres%get_moment(1)
     write(output_unit, *) "rotated_moment =", rand_coordinates%rotation(1)
     
-    call destroy(box_geometry, dipolar_spheres, rand_positions, rand_moments, rand_coordinates)
+    call destroy(box_geometry, dip_spheres, rand_positions, rand_moments, rand_coordinates)
     
     call input_data%destroy()
 
