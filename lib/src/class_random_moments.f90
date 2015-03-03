@@ -14,6 +14,7 @@ private
     contains
         procedure(Abstract_Random_Moments_construct), deferred :: construct
         procedure(Abstract_Random_Moments_destroy), deferred :: destroy
+                
         procedure(Abstract_Random_Moments_moment), deferred :: moment
         procedure(Abstract_Random_Moments_rotation), deferred :: rotation
     end type Abstract_Random_Moments

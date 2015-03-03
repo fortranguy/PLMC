@@ -17,6 +17,7 @@ private
     contains
         procedure :: construct => Abstract_Random_Positions_construct
         procedure :: destroy => Abstract_Random_Positions_destroy
+        
         procedure(Abstract_Random_Positions_position), deferred :: position
         procedure :: move => Abstract_Random_Positions_move
     end type Abstract_Random_Positions
