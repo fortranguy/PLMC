@@ -26,12 +26,12 @@ contains
         class(Abstract_Random_Moments), allocatable, intent(out) :: rand_moments
         type(json_file) :: input_data
         
-        allocate(Bulk_Geometry :: box)
+        allocate(Slab_Geometry :: box)
         call box%set(input_data)
         allocate(Dipolar_Spheres :: dip_spheres)
         call dip_spheres%construct(input_data, "Spheres 1")
         
-        allocate(Bulk_Random_Positions :: rand_positions)
+        allocate(Slab_Random_Positions :: rand_positions)
         call rand_positions%construct(box, dip_spheres, 0.5_DP)
         
         allocate(Random_Moments :: rand_moments)

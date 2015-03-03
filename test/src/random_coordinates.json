@@ -1,7 +1,9 @@
 {
     "Box Geometry": {
-        "size": [10.0, 10.0, 10.0],
-        "wave": [8, 8, 8]
+        "size": [10.0, 10.0],
+        "wave": [8, 8],
+        "vertical separation ratio": 1.5,
+        "height": 5.0
     },
     "Particles": {
         "Spheres 1": {
