@@ -96,6 +96,15 @@ implicit none
     
     call construct(box_geometry, dipolar_spheres, rand_positions, rand_moments, rand_coordinates, &
                    input_data)
+                   
+    write(output_unit, *) "random postion =", rand_coordinates%position()
+    write(output_unit, *) "initial position =", dipolar_spheres%get_position(1)
+    write(output_unit, *) "moved position =", rand_coordinates%move(1)
+    write(output_unit, *)
+    
+    write(output_unit, *) "random moment =", rand_coordinates%moment()
+    write(output_unit, *) "initial moment =", dipolar_spheres%get_moment(1)
+    write(output_unit, *) "rotated_moment =", rand_coordinates%rotation(1)
     
     call destroy(box_geometry, dipolar_spheres, rand_positions, rand_moments, rand_coordinates)
     

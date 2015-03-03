@@ -258,6 +258,7 @@ contains
         class(Apolar_Spheres), intent(inout) :: this
         
         allocate(this%positions(num_dimensions, this%num_spheres))
+        this%positions = 0._DP
     end subroutine Apolar_Spheres_allocate_coordinates
     
     pure subroutine Apolar_Spheres_deallocate_coordinates(this)
@@ -342,7 +343,9 @@ contains
         class(Dipolar_Spheres), intent(inout) :: this
         
         allocate(this%positions(num_dimensions, this%num_spheres))
+        this%positions = 0._DP
         allocate(this%moments(num_dimensions, this%num_spheres))
+        this%moments = 0._DP
     end subroutine Dipolar_Spheres_allocate_coordinates
     
     pure subroutine Dipolar_Spheres_deallocate_coordinates(this)
