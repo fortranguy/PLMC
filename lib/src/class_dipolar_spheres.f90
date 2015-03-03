@@ -26,7 +26,8 @@ private
         procedure, private, non_overridable :: set_name => Abstract_Dipolar_Spheres_set_name
         procedure, private, non_overridable :: set_diameter => Abstract_Dipolar_Spheres_set_diameter
         procedure(Abstract_Dipolar_Spheres_set_moment_norm), private, deferred :: set_moment_norm
-        procedure, private, non_overridable :: set_num_spheres => Abstract_Dipolar_Spheres_set_num_spheres
+        procedure, private, non_overridable :: set_num_spheres => &
+            Abstract_Dipolar_Spheres_set_num_spheres
         procedure(Abstract_Dipolar_Spheres_allocate_coordinates), private, deferred :: &
             allocate_coordinates
         procedure, non_overridable :: destroy => Abstract_Dipolar_Spheres_destroy
