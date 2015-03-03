@@ -48,7 +48,7 @@ private
            
     end interface
 
-    type, extends(Abstract_Random_Moments) :: Null_Random_Moments
+    type, extends(Abstract_Random_Moments), public :: Null_Random_Moments
     contains
         procedure :: construct => Null_Random_Moments_construct
         procedure :: destroy => Null_Random_Moments_destroy
@@ -56,7 +56,7 @@ private
         procedure :: rotation => Null_Random_Moments_rotation
     end type Null_Random_Moments
 
-    type, extends(Abstract_Random_Moments) :: Random_Moments
+    type, extends(Abstract_Random_Moments), public :: Random_Moments
         class(Abstract_Dipolar_Spheres), pointer :: dipolar_spheres => null()
         real(DP) :: normed_delta
     contains
