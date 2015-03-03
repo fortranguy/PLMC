@@ -11,8 +11,8 @@ implicit none
 
 private
 
-    integer :: num_abstract_dipolar_spheres_objects = 0
-    integer :: num_dipolar_spheres_objects = 0
+    integer :: num_abstract_dip_spheres_objects = 0
+    integer :: num_dip_spheres_objects = 0
 
     type, abstract, public :: Abstract_Dipolar_Spheres
     private
@@ -177,8 +177,8 @@ contains
         call test_data_found(data_field, found)
         
         !> A hack to count the number of objects
-        num_abstract_dipolar_spheres_objects = num_abstract_dipolar_spheres_objects + 1
-        if (num_abstract_dipolar_spheres_objects == 1) then
+        num_abstract_dip_spheres_objects = num_abstract_dip_spheres_objects + 1
+        if (num_abstract_dip_spheres_objects == 1) then
             if (abs(this%diameter - 1._DP) > real_zero) then
                 write(error_unit, *) data_field, " must be 1.0 since it is the unit of length."
                 error stop
@@ -329,8 +329,8 @@ contains
         call input_data%get(data_field, this%moment_norm, found)
         call test_data_found(data_field, found)
         
-        num_dipolar_spheres_objects = num_dipolar_spheres_objects + 1
-        if (num_dipolar_spheres_objects == 1) then
+        num_dip_spheres_objects = num_dip_spheres_objects + 1
+        if (num_dip_spheres_objects == 1) then
             if (abs(this%moment_norm - 1._DP) > real_zero) then
                 write(error_unit, *) data_field, " must be 1.0 since it is the unit of moment."
                 error stop

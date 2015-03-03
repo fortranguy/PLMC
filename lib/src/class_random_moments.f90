@@ -21,10 +21,10 @@ private
 
     abstract interface
     
-        subroutine Abstract_Random_Moments_construct(this, dipolar_spheres, delta)
+        subroutine Abstract_Random_Moments_construct(this, dip_spheres, delta)
         import :: DP, Abstract_Dipolar_Spheres, Abstract_Random_Moments
             class(Abstract_Random_Moments), intent(out) :: this
-            class(Abstract_Dipolar_Spheres), target, intent(in) :: dipolar_spheres
+            class(Abstract_Dipolar_Spheres), target, intent(in) :: dip_spheres
             real(DP), intent(in) :: delta
         end subroutine Abstract_Random_Moments_construct
         
@@ -57,7 +57,7 @@ private
     end type Null_Random_Moments
 
     type, extends(Abstract_Random_Moments), public :: Random_Moments
-        class(Abstract_Dipolar_Spheres), pointer :: dipolar_spheres => null()
+        class(Abstract_Dipolar_Spheres), pointer :: dip_spheres => null()
         real(DP) :: normed_delta
     contains
         procedure :: construct => Random_Moments_construct
@@ -70,9 +70,9 @@ contains
 
 !implementation Null_Random_Moments
 
-    subroutine Null_Random_Moments_construct(this, dipolar_spheres, delta)
+    subroutine Null_Random_Moments_construct(this, dip_spheres, delta)
         class(Null_Random_Moments), intent(out) :: this
-        class(Abstract_Dipolar_Spheres), target, intent(in) :: dipolar_spheres
+        class(Abstract_Dipolar_Spheres), target, intent(in) :: dip_spheres
         real(DP), intent(in) :: delta
         
     end subroutine Null_Random_Moments_construct
@@ -101,26 +101,26 @@ contains
 
 !implementation Random_Moments
 
-    subroutine Random_Moments_construct(this, dipolar_spheres, delta)
+    subroutine Random_Moments_construct(this, dip_spheres, delta)
         class(Random_Moments), intent(out) :: this
-        class(Abstract_Dipolar_Spheres), target, intent(in) :: dipolar_spheres
+        class(Abstract_Dipolar_Spheres), target, intent(in) :: dip_spheres
         real(DP), intent(in) :: delta
         
-        this%dipolar_spheres => dipolar_spheres
-        this%normed_delta = delta / this%dipolar_spheres%get_moment_norm() ! not clear if correct
+        this%dip_spheres => dip_spheres
+        this%normed_delta = delta / this%dip_spheres%get_moment_norm() ! not clear if correct
     end subroutine Random_Moments_construct
     
     subroutine Random_Moments_destroy(this)
         class(Random_Moments), intent(inout) :: this
         
-        this%dipolar_spheres => null()
+        this%dip_spheres => null()
     end subroutine Random_Moments_destroy
     
     function Random_Moments_moment(this) result(moment)
         class(Random_Moments), intent(in) :: this
         real(DP) :: moment(num_dimensions)
 
-        moment = this%dipolar_spheres%get_moment_norm() * random_orientation()
+        moment = this%dip_spheres%get_moment_norm() * random_orientation()
     end function Random_Moments_moment
     
     function Random_Moments_rotation(this, i_sphere) result(rotation)
@@ -130,10 +130,10 @@ contains
         
         real(DP) :: orientation(num_dimensions)
         
-        orientation = this%dipolar_spheres%get_moment(i_sphere)
+        orientation = this%dip_spheres%get_moment(i_sphere)
         orientation = orientation / norm2(orientation)        
         call markov_orientation(orientation, this%normed_delta)        
-        rotation = this%dipolar_spheres%get_moment_norm() * orientation
+        rotation = this%dip_spheres%get_moment_norm() * orientation
     end function Random_Moments_rotation
     
 !end implementation Random_Moments

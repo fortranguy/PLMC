@@ -136,17 +136,17 @@
 \end{scope}
 
 \begin{scope}[on background layer]
-    \aggregation{AbstractPairInteraction}{boxGeometry}{1}{AbstractBoxGeometry}
+    \aggregation{AbstractPairInteraction}{box}{1}{AbstractBoxGeometry}
     \composition{AbstractPairInteraction}{neighbourCells}{1}{AbstractNeighbourCells}
     \composition{AbstractPairInteraction}{pairPotential}{1}{AbstractPairPotential}
-    \aggregation{IntraPairInteration}{spheres}{1}{AbstractDipolarSpheres}
-    \aggregation{InterPairInteration}{spheres}{2}{AbstractDipolarSpheres}
+    \aggregation{IntraPairInteration}{dipSpheres}{1}{AbstractDipolarSpheres}
+    \aggregation{InterPairInteration}{dipSpheres}{2}{AbstractDipolarSpheres}
     \aggregation{InterPairInteration}{interSpheres}{1}{AbstractInterSpheres}
 
-    \aggregation{AbstractNeighbourCells}{boxGeometry}{1}{AbstractBoxGeometry}
-    \aggregation{AbstractNeighbourCells}{spheres}{1}{AbstractDipolarSpheres}
+    \aggregation{AbstractNeighbourCells}{box}{1}{AbstractBoxGeometry}
+    \aggregation{AbstractNeighbourCells}{dipSpheres}{1}{AbstractDipolarSpheres}
     
     \composition{AbstractWallsInteraction}{wallsPotential}{1}{AbstractWallsPotential}
-    \aggregation{WallsInteraction}{boxGeometry}{1}{AbstractBoxGeometry}
-    \aggregation{WallsInteraction}{spheres}{1}{AbstractDipolarSpheres}
+    \aggregation{WallsInteraction}{box}{1}{AbstractBoxGeometry}
+    \aggregation{WallsInteraction}{dipSpheres}{1}{AbstractDipolarSpheres}
 \end{scope}
