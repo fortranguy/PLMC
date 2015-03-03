@@ -305,7 +305,7 @@ contains
         
         this%num_spheres = this%num_spheres + 1
         
-        if (size(this%positions) < this%num_spheres) then
+        if (size(this%positions, 2) < this%num_spheres) then
             call increase_coordinates_size(this%positions)
         end if
         call this%set_position(this%num_spheres, position)
@@ -393,12 +393,12 @@ contains
         
         this%num_spheres = this%num_spheres + 1
         
-        if (size(this%positions) < this%num_spheres) then
+        if (size(this%positions, 2) < this%num_spheres) then
             call increase_coordinates_size(this%positions)
         end if
         call this%set_position(this%num_spheres, position)
         
-        if (size(this%moments) < this%num_spheres) then
+        if (size(this%moments, 2) < this%num_spheres) then
             call increase_coordinates_size(this%moments)
         end if
         call this%set_moment(this%num_spheres, moment)
