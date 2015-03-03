@@ -57,8 +57,8 @@ contains
         old%position(:) = this_spheres%get_position(old%number)
         
         new%number = old%number
-        call random_number(random_vector)
-        new%position(:) = old%position(:) + (random_vector(:)-0.5_DP) * this_macro%move%get_delta()
+        !call random_number(random_vector)
+        !new%position(:) = old%position(:) + (random_vector(:)-0.5_DP) * this_macro%move%get_delta()
 
         if (geometry%bulk) then
             new%position(:) = modulo(new%position(:), Box%size(:))

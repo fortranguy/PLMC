@@ -56,8 +56,8 @@ private
     end type Null_Random_Moments
 
     type, extends(Abstract_Random_Moments) :: Random_Moments
-        real(DP) :: normed_delta
         class(Abstract_Dipolar_Spheres), pointer :: dipolar_spheres => null()
+        real(DP) :: normed_delta
     contains
         procedure :: construct => Random_Moments_construct
         procedure :: destroy => Random_Moments_destroy
@@ -106,7 +106,7 @@ contains
         real(DP), intent(in) :: delta
         
         this%dipolar_spheres => dipolar_spheres
-        this%normed_delta = delta / this%dipolar_spheres%get_moment_norm()
+        this%normed_delta = delta / this%dipolar_spheres%get_moment_norm() ! not clear if correct
     end subroutine Random_Moments_construct
     
     subroutine Random_Moments_destroy(this)

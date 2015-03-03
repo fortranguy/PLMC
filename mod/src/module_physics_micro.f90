@@ -88,15 +88,9 @@ contains
         real(DP), intent(in) :: particle_diameter
         real(DP), dimension(num_dimensions) :: random_position
         
-        real(DP), dimension(num_dimensions) :: random_vector
         
-        call random_number(random_vector)
-        if (geometry%bulk) then
-            random_position(:) = Box%size(:) * random_vector(:)
         else if (geometry%slab) then
-            random_position(1:2) = Box%size(1:2) * random_vector(1:2)
-            random_position(3) = (Box%height - particle_diameter) * random_vector(3) + &
-                                 particle_diameter/2._DP
+            
         end if
         
     end function random_position
