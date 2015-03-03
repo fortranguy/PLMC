@@ -155,25 +155,65 @@
 
         \begin{scope}[shift={($(Spheres.north) + (0 cm, 16 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractRandomCoordinates}{0, 0}
-                \operation{position(): double[3]}
+                \operation[0]{position(): double[3]}
                 \operation[0]{moment(): double[3]}
-                \operation{move(iSphere : int) : double[3]}
+                \operation[0]{move(iSphere : int) : double[3]}
                 \operation[0]{rotation(iSphere : int) : double[3]}
             \end{abstractclass}
 
             \def\operationsImplementation{
+                \operation{position(): double[3]}
                 \operation{moment(): double[3]}
+                \operation{move(iSphere : int) : double[3]}
                 \operation{rotation(iSphere : int) : double[3]}
             }
 
-            \begin{class}[text width=\mediumTextWidth]{RandomPositions}{0, -4}
+            \begin{class}[text width=\mediumTextWidth]{RandomCoordinates}{0, -4}
                 \inherit{AbstractRandomCoordinates}
                 \operationsImplementation{}
             \end{class}
-
-            \begin{class}[text width=\mediumTextWidth]{RandomCoordinates}{0, -7}
-                \inherit{AbstractRandomCoordinates}
+        \end{scope}
+        
+        \begin{scope}[shift={($(RandomCoordinates.south) + (8 cm, -2 cm)$)}]
+            \begin{abstractclass}[text width=\smallTextWidth]{AbstractRandomPositions}{0, 0}
+                \operation[0]{position(): double[3]}
+                \operation{move(iSphere : int) : double[3]}
+            \end{abstractclass}
+            
+            \def\operationsImplementation{
+                \operation{position(): double[3]}
+            }
+            
+            \begin{class}[text width=\smallTextWidth]{BulkRandomPositions}{0, -3}
+                \inherit{AbstractRandomPositions}
                 \operationsImplementation{}
+            \end{class}
+            
+            \begin{class}[text width=\smallTextWidth]{SlabRandomPositions}{0, -5}
+                \inherit{AbstractRandomPositions}
+                \operationsImplementation{}
+            \end{class}            
+        \end{scope}
+        
+        \begin{scope}[shift={($(RandomCoordinates.south) + (16 cm, -2 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractRandomMoments}{0, 0}
+                \operation[0]{moment(): double[3]}
+                \operation[0]{rotation(iSphere : int) : double[3]}
+            \end{abstractclass}
+            
+            \def\operationImplementation{
+                \operation{moment(): double[3]}
+                \operation{rotation(iSphere : int) : double[3]}
+            }
+            
+            \begin{class}[text width=\mediumTextWidth]{ApolarRandomMoments}{0, -3}
+                \inherit{AbstractRandomMoments}
+                \operationImplementation{}
+            \end{class}
+            
+            \begin{class}[text width=\mediumTextWidth]{DipolarRandomMoments}{0, -5.5}
+                \inherit{AbstractRandomMoments}
+                \operationImplementation{}
             \end{class}
         \end{scope}
         
@@ -207,9 +247,14 @@
 \begin{scope}[on background layer]
     \aggregation{AbstractBoxedSpheres}{box}{1}{AbstractBoxGeometry}
     \aggregation{AbstractBoxedSpheres}{spheres}{1}{AbstractDipolarSpheres}
-
-    \aggregation{AbstractRandomCoordinates}{box}{1}{AbstractBoxGeometry}
-    \aggregation{AbstractRandomCoordinates}{spheres}{1}{AbstractDipolarSpheres}
+    
+    \aggregation{RandomCoordinates}{randPositions}{1}{AbstractRandomPositions}
+    \aggregation{RandomCoordinates}{randMoments}{1}{AbstractRandomMoments}
+    
+    \aggregation{AbstractRandomPositions}{box}{1}{AbstractBoxGeometry}
+    \aggregation{AbstractRandomPositions}{spheres}{1}{AbstractDipolarSpheres}
+    
+    \aggregation{AbstractRandomMoments}{spheres}{1}{AbstractDipolarSpheres}
     
     \aggregation{TotalMoment}{spheres}{1}{AbstractDipolarSpheres}
 \end{scope}
