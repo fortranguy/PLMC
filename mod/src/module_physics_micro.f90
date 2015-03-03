@@ -17,8 +17,6 @@ public set_discrete_length, sphere_volume, PBC_vector, PBC_distance, set_bounds,
        index_from_coord, coord_PBC, &
        potential_energy_lennard_jones, potential_energy_yukawa
 
-    real(DP), parameter :: sigma3d = 1._DP/sqrt(3._DP) ! to move
-
 contains
 
     !> Set discretization length
@@ -104,62 +102,15 @@ contains
     end function random_position
     
     !> Rotation
-    !> From SMAC, Algorithm 1.19, p.39
     
-    function gauss()
-        
-        real(DP) :: gauss
-        
-        real(DP) :: x, y
-        real(DP) :: normSqr, factor
-        
-        real(DP), save :: gauss_save
-        integer, save :: switch = 0
-        
-        if (switch == 0) then
-        
-            do
-            
-                call random_number(x)
-                x = 2._DP*x - 1._DP
-                call random_number(y)
-                y = 2._DP*y - 1._DP
-            
-                normSqr = x*x + y*y
-                
-                if (normSqr <= 1._DP .and. normSqr > 0._DP) exit
-                
-            end do
-            
-            factor = sqrt(-2._DP * log(normSqr) / normSqr)
-            
-            gauss_save = sigma3d * factor * x
-            gauss = sigma3d * factor * y
-            
-            switch = 1
-            
-        else
-        
-            gauss = gauss_save
-            switch = 0
-            
-        end if
-        
-    end function gauss
     
-    !> From SMAC, Algorithm 1.23, p. 43
+    
     
     function random_surface()
         
         real(DP), dimension(num_dimensions) :: random_surface
         
-        integer :: i_dim
         
-        do i_dim = 1, num_dimensions
-            random_surface(i_dim) = gauss()
-        end do
-        
-        random_surface(:) = random_surface(:) / norm2(random_surface)
     
     end function random_surface
     

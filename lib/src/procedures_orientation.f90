@@ -1,10 +1,14 @@
-module procedure_orientation
+module procedures_orientation
+
+use, intrinsic :: iso_fortran_env, only: DP => REAL64
 
 implicit none
 
 private
 
 public gauss
+
+    real(DP), parameter :: sigma3d = 1._DP / sqrt(3._DP)
 
 contains
 
@@ -38,4 +42,4 @@ contains
         end if
     end function gauss
 
-end module procedure_orientation
+end module procedures_orientation

@@ -51,7 +51,7 @@ contains
         do i_dimension = 1, num_dimensions
             orientation(i_dimension) = gauss()
         end do
-        orientation(:) = orientation(:) / norm2(orientation)
+        orientation = orientation / norm2(orientation)
     end function Random_Orientation_orientation
 !end implementation Random_Orientation
 
