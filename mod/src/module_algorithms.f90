@@ -61,7 +61,7 @@ contains
         !new%position(:) = old%position(:) + (random_vector(:)-0.5_DP) * this_macro%move%get_delta()
 
         if (geometry%bulk) then
-            new%position(:) = modulo(new%position(:), Box%size(:))
+            !new%position(:) = modulo(new%position(:), Box%size(:))
         else if (geometry%slab) then
             if (new%position(3) < this_spheres%get_diameter()/2._DP .or. &
                 new%position(3) > Box%height-this_spheres%get_diameter()/2._DP) then
