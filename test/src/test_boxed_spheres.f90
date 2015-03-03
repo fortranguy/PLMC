@@ -21,7 +21,7 @@ contains
 
         allocate(Bulk_Geometry :: box)
         call box%set(input_data)
-        allocate(Apolar_Spheres :: dip_spheres)
+        allocate(Dipolar_Spheres :: dip_spheres)
         call dip_spheres%construct(input_data, "Spheres 1")
         allocate(Bulk_Boxed_Spheres :: boxed_spheres)
         call boxed_spheres%construct(box, dip_spheres)
@@ -45,6 +45,8 @@ end module procedures_boxed_spheres
 
 program test_boxed_spheres
 
+use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
+use data_geometry, only: num_dimensions
 use class_box_geometry, only: Abstract_Box_Geometry
 use class_dipolar_spheres, only: Abstract_Dipolar_Spheres
 use class_boxed_spheres, only: Abstract_Boxed_Spheres
@@ -57,6 +59,7 @@ implicit none
     class(Abstract_Box_Geometry), allocatable :: box
     class(Abstract_Dipolar_Spheres), allocatable :: dip_spheres
     class(Abstract_Boxed_Spheres), allocatable :: boxed_spheres
+    real(DP) :: position(num_dimensions)
     
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename
@@ -68,6 +71,12 @@ implicit none
     call input_data%load_file(filename = data_filename)
 
     call construct(box, dip_spheres, boxed_spheres, input_data)
+
+    write(output_unit, *) "accessible volume =", boxed_spheres%accessible_volume()
+    position = 1.5_DP * box%get_size()
+    write(output_unit, *) "position =", position ," is inside =", boxed_spheres%is_inside(position)
+    call boxed_spheres%fold(position)
+    write(output_unit, *) "folded position =", position
 
     call destroy(box, dip_spheres, boxed_spheres)
 
