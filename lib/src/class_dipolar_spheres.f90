@@ -16,7 +16,7 @@ private
 
     type, abstract, public :: Abstract_Dipolar_Spheres
     private
-        character(len=:), allocatable :: name
+        character(len=:), allocatable :: name ! performance issues?
         real(DP) :: diameter
         integer ::  num_spheres
         real(DP), allocatable :: positions(:, :)
