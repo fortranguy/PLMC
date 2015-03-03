@@ -2,8 +2,8 @@ module class_random_moments
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_geometry, only: num_dimensions
-use procedures_orientation, only: gauss
 use class_dipolar_spheres, only: Abstract_Dipolar_Spheres
+use procedures_orientation, only: random_orientation, markov_orientation
 
 implicit none
 
@@ -40,6 +40,7 @@ private
     end type Null_Random_Moments
 
     type, extends(Abstract_Random_Moments) :: Random_Moments
+        real(DP) :: normed_delta
         class(Abstract_Dipolar_Spheres), pointer :: dipolar_spheres => null()
     contains
         procedure :: moment => Random_Moments_moment
@@ -74,20 +75,23 @@ contains
         class(Random_Moments), intent(in) :: this
         real(DP) :: moment(num_dimensions)
 
-        integer :: i_dimension
-
-        do i_dimension = 1, num_dimensions
-            moment(i_dimension) = gauss()
-        end do
-        moment = moment / norm2(moment) ! * moment_norm()
+        moment = this%dipolar_spheres%get_moment_norm() * random_orientation()
     end function Random_Moments_moment
     
     function Random_Moments_rotation(this, i_sphere) result(rotation)
         class(Random_Moments), intent(in) :: this
         integer, intent(in) :: i_sphere
         real(DP) :: rotation(num_dimensions)
+        
+        real(DP) :: orientation(num_dimensions)
+        
+        orientation = this%dipolar_spheres%get_moment(i_sphere)
+        orientation = orientation / norm2(orientation)        
+        call markov_orientation(orientation, this%normed_delta)        
+        rotation = this%dipolar_spheres%get_moment_norm() * orientation
     end function Random_Moments_rotation
     
 !end implementation Random_Moments
 
 end module class_random_moments
+

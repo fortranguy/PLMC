@@ -102,45 +102,6 @@ contains
     end function random_position
     
     !> Rotation
-    
-    
-    
-    
-    function random_surface()
-        
-        real(DP), dimension(num_dimensions) :: random_surface
-        
-        
-    
-    end function random_surface
-    
-    !> From SMAC, Algorithm 1.24, p.44
-    
-    subroutine markov_surface(orientation, orientation_delta)
-    
-        real(DP), dimension(:), intent(inout) :: orientation
-        real(DP), intent(in) :: orientation_delta
-        
-        real(DP), dimension(num_dimensions) :: rotation
-        real(DP) :: rotation_dot_orientation
-        real(DP) :: amplitude, random
-        integer :: i_dim
-        
-        do i_dim = 1, num_dimensions
-            rotation(i_dim) = gauss()
-        end do
-        
-        rotation_dot_orientation = dot_product(rotation, orientation)
-        rotation(:) = rotation(:) - rotation_dot_orientation * orientation(:)
-        rotation(:) = rotation(:) / norm2(rotation)
-        
-        call random_number(random)
-        amplitude = orientation_delta * (random - 0.5_DP)
-        
-        orientation(:) = orientation(:) + amplitude * rotation(:)
-        orientation(:) = orientation(:) / norm2(orientation)
-    
-    end subroutine markov_surface
 
     !> \f[
     !>      \frac{(\vec{\mu}_i\cdot\vec{\mu_j})}{r^3} -
