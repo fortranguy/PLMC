@@ -1,10 +1,11 @@
 module procedures_random_coordinates
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use class_box_geometry, only: Abstract_Box_Geometry, Bulk_Geometry
+use class_box_geometry, only: Abstract_Box_Geometry, Bulk_Geometry, Slab_Geometry
 use class_dipolar_spheres, only: Abstract_Dipolar_Spheres, Apolar_Spheres
 use class_random_coordinates, only: Abstract_Random_Coordinates, Random_Coordinates
-use class_random_positions, only: Abstract_Random_Positions, Bulk_Random_Positions
+use class_random_positions, only: Abstract_Random_Positions, Bulk_Random_Positions, &
+                                  Slab_Random_Positions
 use class_random_moments, only: Abstract_Random_Moments, Null_Random_Moments
 use json_module, only: json_file
 
@@ -25,12 +26,12 @@ contains
         class(Abstract_Random_Moments), allocatable, intent(out) :: rand_moments
         type(json_file) :: input_data
         
-        allocate(Bulk_Geometry :: box_geometry)
+        allocate(Slab_Geometry :: box_geometry)
         call box_geometry%set(input_data)
         allocate(Apolar_Spheres :: dipolar_spheres)
         call dipolar_spheres%construct(input_data, "Spheres 1")
         
-        allocate(Bulk_Random_Positions :: rand_positions)
+        allocate(Slab_Random_Positions :: rand_positions)
         call rand_positions%construct(box_geometry, dipolar_spheres, 0.5_DP)
         
         allocate(Null_Random_Moments :: rand_moments)
