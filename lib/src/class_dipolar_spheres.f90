@@ -36,7 +36,7 @@ private
         procedure, non_overridable :: get_name => Abstract_Dipolar_Spheres_get_name
         procedure, non_overridable :: get_diameter => Abstract_Dipolar_Spheres_get_diameter
         procedure(Abstract_Dipolar_Spheres_get_moment_norm), deferred :: get_moment_norm
-        procedure, non_overridable :: get_num => Abstract_Dipolar_Spheres_get_num
+        procedure, non_overridable :: get_num_spheres => Abstract_Dipolar_Spheres_get_num_spheres
         procedure, non_overridable :: get_position => Abstract_Dipolar_Spheres_get_position
         procedure, non_overridable :: set_position => Abstract_Dipolar_Spheres_set_position
         procedure(Abstract_Dipolar_Spheres_get_moment), deferred :: get_moment
@@ -219,12 +219,12 @@ contains
         get_diameter = this%diameter
     end function Abstract_Dipolar_Spheres_get_diameter
     
-    pure function Abstract_Dipolar_Spheres_get_num(this) result(get_num)
+    pure function Abstract_Dipolar_Spheres_get_num_spheres(this) result(get_num_spheres)
         class(Abstract_Dipolar_Spheres), intent(in) :: this
-        integer :: get_num
+        integer :: get_num_spheres
         
-        get_num = this%num_spheres
-    end function Abstract_Dipolar_Spheres_get_num
+        get_num_spheres = this%num_spheres
+    end function Abstract_Dipolar_Spheres_get_num_spheres
     
     pure function Abstract_Dipolar_Spheres_get_position(this, i_sphere) result(get_position)
         class(Abstract_Dipolar_Spheres), intent(in) :: this
