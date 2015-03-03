@@ -24,7 +24,7 @@ private
         procedure(Abstract_Box_Geometry_get_height), deferred :: get_height
         procedure, non_overridable :: get_wave => Abstract_Box_Geometry_get_wave
 
-        !> Mini Template Pattern
+        !> Mini Template Method
         procedure, non_overridable :: distance_PBC => Abstract_Box_Geometry_distance_PBC
         procedure(Abstract_Box_Geometry_vector_PBC), deferred :: vector_PBC
     end type Abstract_Box_Geometry
