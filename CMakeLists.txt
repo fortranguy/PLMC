@@ -18,7 +18,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}/mod)
 
 find_package(
     jsonfortran-${CMAKE_Fortran_COMPILER_ID}
-    1.0.0
+    3.0.0
     REQUIRED
 )
 include_directories(${jsonfortran_INCLUDE_DIRS})

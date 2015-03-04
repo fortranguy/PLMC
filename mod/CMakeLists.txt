@@ -5,7 +5,7 @@ project(
 
 find_package(
     jsonfortran-${CMAKE_Fortran_COMPILER_ID}
-    1.0.0
+    3.0.0
     REQUIRED
 )
 
