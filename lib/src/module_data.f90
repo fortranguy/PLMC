@@ -18,11 +18,11 @@ contains
     subroutine test_file_exists(filename)
         character(len=*), intent(in) :: filename
         
-        logical :: data_exists
+        logical :: file_exists
         
-        inquire(file=filename, exist=data_exists)
+        inquire(file=filename, exist=file_exists)
         
-        if (.not. data_exists) then
+        if (.not. file_exists) then
             write(error_unit, *) filename, " doesn't exist."
             error stop
         end if

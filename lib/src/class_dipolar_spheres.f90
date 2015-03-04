@@ -161,7 +161,6 @@ contains
         call test_data_found(data_field, found)
         call test_empty_string(data_field, this_name)
         this%name = this_name
-        deallocate(this_name)
     end subroutine Abstract_Dipolar_Spheres_set_name
     
     subroutine Abstract_Dipolar_Spheres_set_diameter(this, input_data, object_field)

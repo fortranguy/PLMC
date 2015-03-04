@@ -86,9 +86,7 @@ contains
         data_field = "Box Geometry.size"
         call input_data%get(data_field, Box_size, found)
         call test_data_found(data_field, found)
-
         call this%check_size(data_field, Box_size, size_dimension)
-
         this%size(1:size_dimension) = Box_size
     end subroutine Abstract_Box_Geometry_set_size
 
@@ -115,9 +113,7 @@ contains
         data_field = "Box Geometry.wave"
         call input_data%get(data_field, Box_wave, found)
         call test_data_found(data_field, found)
-
         call this%check_wave(data_field, Box_wave, wave_dimension)
-
         this%wave(1:wave_dimension) = Box_wave
     end subroutine Abstract_Box_Geometry_set_wave
 
@@ -210,14 +206,12 @@ contains
         data_field = "Box Geometry.vertical separation ratio"
         call input_data%get(data_field, z_ratio, found)
         call test_data_found(data_field, found)
-
         this%size(3) = z_ratio * this%size(1)
         this%wave(3) = ceiling(z_ratio * real(this%wave(1), DP))
 
         data_field = "Box Geometry.height"
         call input_data%get(data_field, this%height, found)
         call test_data_found(data_field, found)
-
         if (this%height > this%size(3)) then
             write(error_unit, *) data_field, " is too high."
             error stop

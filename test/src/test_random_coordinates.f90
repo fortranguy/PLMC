@@ -109,6 +109,7 @@ implicit none
     
     call destroy(box, dip_spheres, rand_positions, rand_moments, rand_coordinates)
     
+    deallocate(data_filename)
     call input_data%destroy()
 
 end program test_random_coordinates
