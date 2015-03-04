@@ -19,13 +19,12 @@ contains
         class(Abstract_Boxed_Spheres), allocatable, intent(out) :: boxed_spheres
         type(json_file), intent(inout) :: input_data
 
-        allocate(Bulk_Geometry :: box)
+        allocate(Slab_Geometry :: box)
         call box%set(input_data)
         allocate(Dipolar_Spheres :: dip_spheres)
         call dip_spheres%construct(input_data, "Spheres 1")
-        allocate(Bulk_Boxed_Spheres :: boxed_spheres)
-        call boxed_spheres%construct(box, dip_spheres)
-        
+        allocate(Slab_Boxed_Spheres :: boxed_spheres)
+        call boxed_spheres%construct(box, dip_spheres)        
     end subroutine construct
 
     subroutine destroy(box, dip_spheres, boxed_spheres)
@@ -34,10 +33,9 @@ contains
         class(Abstract_Boxed_Spheres), allocatable, intent(inout) :: boxed_spheres
 
         call boxed_spheres%destroy()
-
+        if (allocated(boxed_spheres)) deallocate(boxed_spheres)
         call dip_spheres%destroy()
         if (allocated(dip_spheres)) deallocate(dip_spheres)
-
         if (allocated(box)) deallocate(box)
     end subroutine destroy
 
@@ -73,7 +71,7 @@ implicit none
     call construct(box, dip_spheres, boxed_spheres, input_data)
 
     write(output_unit, *) "accessible volume =", boxed_spheres%accessible_volume()
-    position = 1.5_DP * box%get_size()
+    position = [1.5_DP * reshape(box%get_size(), [2]), 0.5_DP * box%get_height()]
     write(output_unit, *) "position =", position ," is inside =", boxed_spheres%is_inside(position)
     call boxed_spheres%fold(position)
     write(output_unit, *) "folded position =", position
