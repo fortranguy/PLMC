@@ -22,24 +22,23 @@ private
         real(DP), allocatable :: positions(:, :)
     contains
         !> Template Pattern
-        procedure, non_overridable :: construct => Abstract_Dipolar_Spheres_construct
-        procedure, private, non_overridable :: set_name => Abstract_Dipolar_Spheres_set_name
-        procedure, private, non_overridable :: set_diameter => Abstract_Dipolar_Spheres_set_diameter
+        procedure :: construct => Abstract_Dipolar_Spheres_construct
+        procedure, private :: set_name => Abstract_Dipolar_Spheres_set_name
+        procedure, private :: set_diameter => Abstract_Dipolar_Spheres_set_diameter
         procedure(Abstract_Dipolar_Spheres_set_moment_norm), private, deferred :: set_moment_norm
-        procedure, private, non_overridable :: set_num_spheres => &
-            Abstract_Dipolar_Spheres_set_num_spheres
+        procedure, private :: set_num_spheres => Abstract_Dipolar_Spheres_set_num_spheres
         procedure(Abstract_Dipolar_Spheres_allocate_coordinates), private, deferred :: &
             allocate_coordinates
-        procedure, non_overridable :: destroy => Abstract_Dipolar_Spheres_destroy
+        procedure :: destroy => Abstract_Dipolar_Spheres_destroy
         procedure(Abstract_Dipolar_Spheres_deallocate_coordinates), private, deferred :: &
             deallocate_coordinates
         
-        procedure, non_overridable :: get_name => Abstract_Dipolar_Spheres_get_name
-        procedure, non_overridable :: get_diameter => Abstract_Dipolar_Spheres_get_diameter
+        procedure :: get_name => Abstract_Dipolar_Spheres_get_name
+        procedure :: get_diameter => Abstract_Dipolar_Spheres_get_diameter
         procedure(Abstract_Dipolar_Spheres_get_moment_norm), deferred :: get_moment_norm
-        procedure, non_overridable :: get_num_spheres => Abstract_Dipolar_Spheres_get_num_spheres
-        procedure, non_overridable :: get_position => Abstract_Dipolar_Spheres_get_position
-        procedure, non_overridable :: set_position => Abstract_Dipolar_Spheres_set_position
+        procedure :: get_num_spheres => Abstract_Dipolar_Spheres_get_num_spheres
+        procedure :: get_position => Abstract_Dipolar_Spheres_get_position
+        procedure :: set_position => Abstract_Dipolar_Spheres_set_position
         procedure(Abstract_Dipolar_Spheres_get_moment), deferred :: get_moment
         procedure(Abstract_Dipolar_Spheres_set_moment), deferred :: set_moment
         

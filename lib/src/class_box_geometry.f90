@@ -20,12 +20,12 @@ private
         procedure, private :: set_wave => Abstract_Box_Geometry_set_wave
         procedure, private, nopass :: check_wave => Abstract_Box_Geometry_check_wave
         
-        procedure, non_overridable :: get_size => Abstract_Box_Geometry_get_size
+        procedure :: get_size => Abstract_Box_Geometry_get_size
         procedure(Abstract_Box_Geometry_get_height), deferred :: get_height
-        procedure, non_overridable :: get_wave => Abstract_Box_Geometry_get_wave
+        procedure :: get_wave => Abstract_Box_Geometry_get_wave
 
         !> Mini Template Method
-        procedure, non_overridable :: distance_PBC => Abstract_Box_Geometry_distance_PBC
+        procedure :: distance_PBC => Abstract_Box_Geometry_distance_PBC
         procedure(Abstract_Box_Geometry_vector_PBC), deferred :: vector_PBC
     end type Abstract_Box_Geometry
 
