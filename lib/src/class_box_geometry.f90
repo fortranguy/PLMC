@@ -159,7 +159,7 @@ contains
         type(json_file), intent(inout) :: input_data
 
         call this%set_size(input_data, num_dimensions)
-        call this%set_wave(input_data, num_dimensions)        
+        call this%set_wave(input_data, num_dimensions)
     end subroutine Bulk_Geometry_set
 
     pure function Bulk_Geometry_get_height(this) result(get_height)
@@ -215,7 +215,7 @@ contains
         if (this%height > this%size(3)) then
             write(error_unit, *) data_field, " is too high."
             error stop
-        end if        
+        end if
     end subroutine Slab_Geometry_set_height
 
     pure function Slab_Geometry_get_height(this) result(get_height)

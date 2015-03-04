@@ -71,7 +71,7 @@ contains
         
         real(DP) :: random_vector(num_dimensions)
         
-        position = this%dip_spheres%get_position(i_sphere)        
+        position = this%dip_spheres%get_position(i_sphere)
         call random_number(random_vector)
         position = position + (random_vector - 0.5_DP) * this%delta
     end function Abstract_Random_Positions_move
@@ -87,7 +87,7 @@ contains
         real(DP) :: random_vector(num_dimensions)
         
         call random_number(random_vector)
-        position = this%box%get_size() * random_vector        
+        position = this%box%get_size() * random_vector
     end function Bulk_Random_Positions_position
 
 !end implementation Bulk_Random_Positions

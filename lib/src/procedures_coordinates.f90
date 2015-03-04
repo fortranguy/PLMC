@@ -22,7 +22,7 @@ contains
         size1 = size(coordinates, 1)
         size2 = size(coordinates, 2)
         allocate(coordinates_tmp(size1, size2))
-        coordinates_tmp = coordinates        
+        coordinates_tmp = coordinates
         deallocate(coordinates)
         
         allocate(coordinates(size1, increase_factor * size2))

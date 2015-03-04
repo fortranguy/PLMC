@@ -88,7 +88,7 @@ private
         pure subroutine Abstract_Dipolar_Spheres_remove(this, i_sphere)
         import :: Abstract_Dipolar_Spheres
             class(Abstract_Dipolar_Spheres), intent(inout) :: this
-            integer, intent(in) :: i_sphere            
+            integer, intent(in) :: i_sphere
         end subroutine Abstract_Dipolar_Spheres_remove
         
         pure subroutine Abstract_Dipolar_Spheres_add(this, position, moment)
@@ -143,7 +143,7 @@ contains
         call this%set_diameter(input_data, object_field)
         call this%set_moment_norm(input_data, object_field)
         call this%set_num_spheres(input_data, object_field)
-        call this%allocate_coordinates()        
+        call this%allocate_coordinates()
     end subroutine Abstract_Dipolar_Spheres_construct
     
     subroutine Abstract_Dipolar_Spheres_set_name(this, input_data, object_field)
@@ -295,7 +295,7 @@ contains
             call this%set_position(i_sphere, this%get_position(this%num_spheres))
         end if
         
-        this%num_spheres = this%num_spheres - 1        
+        this%num_spheres = this%num_spheres - 1
     end subroutine Apolar_Spheres_remove
     
     pure subroutine Apolar_Spheres_add(this, position, moment)
@@ -385,7 +385,7 @@ contains
             call this%set_moment(i_sphere, this%get_moment(this%num_spheres))
         end if
         
-        this%num_spheres = this%num_spheres - 1        
+        this%num_spheres = this%num_spheres - 1
     end subroutine Dipolar_Spheres_remove
     
     pure subroutine Dipolar_Spheres_add(this, position, moment)

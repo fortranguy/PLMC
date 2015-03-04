@@ -13,16 +13,16 @@ public random_orientation, markov_orientation
 
 contains
 
-    !> From SMAC, Algorithm 1.23, p. 43    
-    function random_orientation()        
+    !> From SMAC, Algorithm 1.23, p. 43
+    function random_orientation()
         real(DP), dimension(num_dimensions) :: random_orientation
         
         integer :: i_dimension
         
         do i_dimension = 1, num_dimensions
             random_orientation(i_dimension) = gauss()
-        end do        
-        random_orientation = random_orientation / norm2(random_orientation)    
+        end do
+        random_orientation = random_orientation / norm2(random_orientation)
     end function random_orientation
 
     !> From SMAC, Algorithm 1.19, p.39
@@ -55,8 +55,8 @@ contains
         end if
     end function gauss
     
-    !> From SMAC, Algorithm 1.24, p.44    
-    subroutine markov_orientation(orientation, orientation_delta)    
+    !> From SMAC, Algorithm 1.24, p.44
+    subroutine markov_orientation(orientation, orientation_delta)
         real(DP), intent(inout) :: orientation(num_dimensions)
         real(DP), intent(in) :: orientation_delta
         
@@ -77,7 +77,7 @@ contains
         amplitude = orientation_delta * (random - 0.5_DP)
         
         orientation = orientation + amplitude * rotation
-        orientation = orientation / norm2(orientation)    
+        orientation = orientation / norm2(orientation)
     end subroutine markov_orientation
 
 end module procedures_orientation

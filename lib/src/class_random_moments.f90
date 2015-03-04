@@ -131,8 +131,8 @@ contains
         real(DP) :: orientation(num_dimensions)
         
         orientation = this%dip_spheres%get_moment(i_sphere)
-        orientation = orientation / norm2(orientation)        
-        call markov_orientation(orientation, this%normed_delta)        
+        orientation = orientation / norm2(orientation)
+        call markov_orientation(orientation, this%normed_delta)
         rotation = this%dip_spheres%get_moment_norm() * orientation
     end function Random_Moments_rotation
     

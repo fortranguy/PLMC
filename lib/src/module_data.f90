@@ -35,7 +35,7 @@ contains
         if (.not.found) then
             write(error_unit, *) trim(data_field), " not found."
             error stop
-        end if        
+        end if
     end subroutine test_data_found
     
     subroutine test_empty_string(data_field, string)
@@ -45,7 +45,7 @@ contains
         if (len(string) == 0) then
             write(error_unit, *) trim(data_field), ": string is empty."
             error stop
-        end if        
+        end if
     end subroutine test_empty_string
 
 end module module_data
