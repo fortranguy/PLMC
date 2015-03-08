@@ -16,14 +16,14 @@
                 \inherit{AbstractShortInteraction}
                 \operation{soloEnergy(particle : Particle, overlap : bool, energy : double)}
                 \operation[0]{moveUpdate(old : Particle, new : Particle)}
-                \operation[0]{exchangeUpdate(particle : particle)}
+                \operation[0]{exchangeUpdate(particle : Particle)}
                 \operation[0]{volumeChangeRestoration(dilatation : double)}
             \end{abstractclass}
 
             \def\operationsImplementation{
                 \operation{totalEnergy() : double}
                 \operation{moveUpdate(old : Particle, new : Particle)}
-                \operation{exchangeUpdate(particle : particle)}
+                \operation{exchangeUpdate(particle : Particle)}
                 \operation{volumeChangeEnergy(dilatation : double, overlap : bool, energy : double)}
                 \operation{volumeChangeRestoration(dilatation : double)}
                 \operation{overlapTest()}
