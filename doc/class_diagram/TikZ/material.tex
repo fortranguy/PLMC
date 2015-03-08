@@ -3,7 +3,6 @@
     
         \begin{scope}[local bounding box=Spheres]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractDipolarSpheres}{0, 0}
-                \operation{getName() : String}
                 \operation{getDiameter() : double}
                 \operation[0]{getMomentNorm() : double}
                 \operation{getNumSpheres() : int}
@@ -23,12 +22,12 @@
                 \operation{add(position : double[3], moment : double[3])}
             }
             
-            \begin{class}[text width=\mediumTextWidth]{ApolarSpheres}{0, -6.5}
+            \begin{class}[text width=\mediumTextWidth]{ApolarSpheres}{0, -6}
                 \inherit{AbstractDipolarSpheres}
                 \operationsImplementation{}
             \end{class}
             
-            \begin{class}[text width=\mediumTextWidth]{DipolarSpheres}{0, -10.5}
+            \begin{class}[text width=\mediumTextWidth]{DipolarSpheres}{0, -10}
                 \inherit{AbstractDipolarSpheres}
                 \operationsImplementation{}
             \end{class}
@@ -36,12 +35,10 @@
         
         \begin{scope}[shift={($(Spheres.north) + (8 cm, 0)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{AbstractInterSpheres}{0, 0}
-                \operation[0]{getName() : String}
                 \operation[0]{getDiameter() : double}
             \end{abstractclass}
             
             \def\operationsImplementation{
-                \operation{getName() : String}
                 \operation{getDiameter() : double}
             }
             
@@ -243,6 +240,7 @@
 \begin{scope}[on background layer]
     \aggregation{AbstractBoxedSpheres}{box}{1}{AbstractBoxGeometry}
     \aggregation{AbstractBoxedSpheres}{dipSpheres}{1}{AbstractDipolarSpheres}
+    \aggregation{AbstractInterSpheres}{dipSpheres}{2}{AbstractDipolarSpheres}
     
     \aggregation{AbstractRandomCoordinates}{randPositions}{1}{AbstractRandomPositions}
     \aggregation{AbstractRandomCoordinates}{randMoments}{1}{AbstractRandomMoments}
