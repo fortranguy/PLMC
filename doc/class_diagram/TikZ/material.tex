@@ -2,34 +2,53 @@
     \begin{package}{Material}
     
         \begin{scope}[local bounding box=Spheres]
-            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractDipolarSpheres}{0, 0}
+            \begin{abstractclass}[text width=\smallTextWidth]{AbstractDipolarSpheres}{0, 0}
                 \operation{getDiameter() : double}
                 \operation[0]{getMomentNorm() : double}
                 \operation{getNumSpheres() : int}
-                \operation{getPosition(iSphere : int) : double[3]}
-                \operation{setPosition(iSphere : int, position : double[3])}
-                \operation[0]{getMoment(iSphere : int) : double[3]}
-                \operation[0]{setMoment(iSphere : int, moment : double[3])}
-                \operation[0]{remove(iSphere : int)}
-                \operation[0]{add(position : double[3], moment : double[3])}
+                \operation{remove()}
+                \operation{add()}
             \end{abstractclass}
 
             \def\operationsImplementation{
                 \operation{getMomentNorm() : double}
-                \operation{getMoment(iSphere : int) : double[3]}
-                \operation{setMoment(iSphere : int, moment : double[3])}
-                \operation{remove(iSphere : int)}
-                \operation{add(position : double[3], moment : double[3])}
             }
             
-            \begin{class}[text width=\mediumTextWidth]{ApolarSpheres}{0, -6}
+            \begin{class}[text width=\smallTextWidth]{ApolarSpheres}{0, -4.5}
                 \inherit{AbstractDipolarSpheres}
                 \operationsImplementation{}
             \end{class}
             
-            \begin{class}[text width=\mediumTextWidth]{DipolarSpheres}{0, -10}
+            \begin{class}[text width=\smallTextWidth]{DipolarSpheres}{0, -7}
                 \inherit{AbstractDipolarSpheres}
                 \operationsImplementation{}
+            \end{class}
+        \end{scope}
+
+        \begin{scope}[shift={($(Spheres.north) + (0 cm, 5cm)$)},
+            local bounding box=Positions]
+            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractPositions}{0, 0}
+                \operation{getPosition(iSphere : int) : double[3]}
+                \operation{setPosition(iSphere : int, position : double[3])}
+                \operation{add(position : double[3])}
+                \operation{remove(iSphere : int)}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(Spheres.north) + (12 cm, 5cm)$)},
+            local bounding box=Orientations]
+            \begin{abstractclass}[text width=\largeTextWidth]{AbstractOrientations}{0, 0}
+                \operation{getOrientation(iSphere : int) : double[3]}
+                \operation{setOrientation(iSphere : int, orientation : double[3])}
+                \operation{add(orientation : double[3])}
+                \operation{remove(iSphere : int)}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(Positions.north)!0.5!(Orientations.north) + (0, 4cm)$)}]
+            \begin{class}[text width=\largeTextWidth]{SphereExchangeFacade}{0, 0}
+                \operation{add(iSphere : int, position : double[3], orientation : double[3])}
+                \operation{remove(iSphere : int)}
             \end{class}
         \end{scope}
         
@@ -241,6 +260,11 @@
     \aggregation{AbstractBoxedSpheres}{box}{1}{AbstractBoxGeometry}
     \aggregation{AbstractBoxedSpheres}{dipSpheres}{1}{AbstractDipolarSpheres}
     \aggregation{AbstractInterSpheres}{dipSpheres}{2}{AbstractDipolarSpheres}
+    \aggregation{AbstractPositions}{dipSpheres}{1}{AbstractDipolarSpheres}
+    \aggregation{AbstractOrientations}{dipSpheres}{1}{AbstractDipolarSpheres}
+    \aggregation{SphereExchangeFacade}{dipSpheres}{1}{AbstractDipolarSpheres}
+    \aggregation{SphereExchangeFacade}{positions}{1}{AbstractPositions}
+    \aggregation{SphereExchangeFacade}{orientations}{1}{AbstractOrientations}
     
     \aggregation{AbstractRandomCoordinates}{randPositions}{1}{AbstractRandomPositions}
     \aggregation{AbstractRandomCoordinates}{randMoments}{1}{AbstractRandomMoments}
