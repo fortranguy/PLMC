@@ -168,25 +168,9 @@
                 \operationsImplementation{}
             \end{class}
         \end{scope}
-
-        \begin{scope}[shift={($(Spheres.north) + (0 cm, 16 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractRandomCoordinates}{0, 0}
-                \operation{position(): double[3]}
-                \operation{moment(): double[3]}
-                \operation{move(iSphere : int) : double[3]}
-                \operation{rotation(iSphere : int) : double[3]}
-            \end{abstractclass}
-
-            \def\operationsImplementation{
-            }
-
-            \begin{class}[text width=\mediumTextWidth]{RandomCoordinates}{0, -4}
-                \inherit{AbstractRandomCoordinates}
-                \operationsImplementation{}
-            \end{class}
-        \end{scope}
         
-        \begin{scope}[shift={($(RandomCoordinates.south) + (8 cm, -2 cm)$)}]
+        \begin{scope}[shift={($(Positions.north) + (0, 12 cm)$)},
+                      local bounding box=RandomPositionsBox]
             \begin{abstractclass}[text width=\smallTextWidth]{AbstractRandomPositions}{0, 0}
                 \operation[0]{position(): double[3]}
                 \operation{move(iSphere : int) : double[3]}
@@ -207,25 +191,42 @@
             \end{class}            
         \end{scope}
         
-        \begin{scope}[shift={($(RandomCoordinates.south) + (16 cm, -2 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractRandomMoments}{0, 0}
-                \operation[0]{moment(): double[3]}
+        \begin{scope}[shift={($(Orientations.north) + (0 cm, 12 cm)$)},
+                      local bounding box=RandomOrientationsBox]
+            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractRandomOrientations}{0, 0}
+                \operation[0]{orientation(): double[3]}
                 \operation[0]{rotation(iSphere : int) : double[3]}
             \end{abstractclass}
             
             \def\operationImplementation{
-                \operation{moment(): double[3]}
+                \operation{orientation(): double[3]}
                 \operation{rotation(iSphere : int) : double[3]}
             }
             
-            \begin{class}[text width=\mediumTextWidth]{NullRandomMoments}{0, -3}
-                \inherit{AbstractRandomMoments}
+            \begin{class}[text width=\mediumTextWidth]{NullRandomOrientations}{0, -3}
+                \inherit{AbstractRandomOrientations}
                 \operationImplementation{}
             \end{class}
             
-            \begin{class}[text width=\mediumTextWidth]{RandomMoments}{0, -5.5}
-                \inherit{AbstractRandomMoments}
+            \begin{class}[text width=\mediumTextWidth]{RandomOrientations}{0, -5.5}
+                \inherit{AbstractRandomOrientations}
                 \operationImplementation{}
+            \end{class}
+        \end{scope}
+        
+        \begin{scope}[shift={($(RandomPositionsBox.north)!0.5!(RandomOrientationsBox.north) + 
+                               (0 cm, 5 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractRandomCoordinates}{0, 0}
+                \operation{position(): double[3]}
+                \operation{moment(): double[3]}
+            \end{abstractclass}
+
+            \def\operationsImplementation{
+            }
+
+            \begin{class}[text width=\mediumTextWidth]{RandomCoordinates}{0, -4}
+                \inherit{AbstractRandomCoordinates}
+                \operationsImplementation{}
             \end{class}
         \end{scope}
         
@@ -267,12 +268,12 @@
     \aggregation{SphereExchangeFacade}{orientations}{1}{AbstractOrientations}
     
     \aggregation{AbstractRandomCoordinates}{randPositions}{1}{AbstractRandomPositions}
-    \aggregation{AbstractRandomCoordinates}{randMoments}{1}{AbstractRandomMoments}
+    \aggregation{AbstractRandomCoordinates}{randMoments}{1}{AbstractRandomOrientations}
     
     \aggregation{AbstractRandomPositions}{box}{1}{AbstractBoxGeometry}
     \aggregation{AbstractRandomPositions}{dipSpheres}{1}{AbstractDipolarSpheres}
     
-    \aggregation{RandomMoments}{dipSpheres}{1}{AbstractDipolarSpheres}
+    \aggregation{RandomOrientations}{dipSpheres}{1}{AbstractDipolarSpheres}
     
     \aggregation{TotalMoment}{dipSpheres}{1}{AbstractDipolarSpheres}
 \end{scope}
