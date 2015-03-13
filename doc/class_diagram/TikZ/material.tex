@@ -26,7 +26,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(Spheres.north) + (0 cm, 5cm)$)},
-            local bounding box=Positions]
+            local bounding box=PositionsBox]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractPositions}{0, 0}
                 \operation{getPosition(iSphere : int) : double[3]}
                 \operation{setPosition(iSphere : int, position : double[3])}
@@ -43,13 +43,6 @@
                 \operation{add(orientation : double[3])}
                 \operation{remove(iSphere : int)}
             \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(Positions.north)!0.5!(Orientations.north) + (0, 4cm)$)}]
-            \begin{class}[text width=\largeTextWidth]{SphereExchangeFacade}{0, 0}
-                \operation{add(iSphere : int, position : double[3], orientation : double[3])}
-                \operation{remove(iSphere : int)}
-            \end{class}
         \end{scope}
         
         \begin{scope}[shift={($(Spheres.north) + (8 cm, 0)$)}]
@@ -169,7 +162,7 @@
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(Positions.north) + (0, 12 cm)$)},
+        \begin{scope}[shift={($(PositionsBox.north) + (0, 8 cm)$)},
                       local bounding box=RandomPositionsBox]
             \begin{abstractclass}[text width=\smallTextWidth]{AbstractRandomPositions}{0, 0}
                 \operation[0]{position(): double[3]}
@@ -191,7 +184,7 @@
             \end{class}            
         \end{scope}
         
-        \begin{scope}[shift={($(Orientations.north) + (0 cm, 12 cm)$)},
+        \begin{scope}[shift={($(Orientations.north) + (0 cm, 8 cm)$)},
                       local bounding box=RandomOrientationsBox]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractRandomOrientations}{0, 0}
                 \operation[0]{orientation(): double[3]}
@@ -215,18 +208,17 @@
         \end{scope}
         
         \begin{scope}[shift={($(RandomPositionsBox.north)!0.5!(RandomOrientationsBox.north) + 
-                               (0 cm, 5 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractRandomCoordinates}{0, 0}
+                               (0 cm, 4 cm)$)}, local bounding box=RandomCoordinatesBox]
+            \begin{class}[text width=\mediumTextWidth]{RandomCoordinatesFacade}{0, 0}
                 \operation{position(): double[3]}
                 \operation{moment(): double[3]}
-            \end{abstractclass}
-
-            \def\operationsImplementation{
-            }
-
-            \begin{class}[text width=\mediumTextWidth]{RandomCoordinates}{0, -4}
-                \inherit{AbstractRandomCoordinates}
-                \operationsImplementation{}
+            \end{class}
+        \end{scope}
+        
+        \begin{scope}[shift={($(RandomCoordinatesBox.north) + (14 cm, 0 cm)$)}]
+            \begin{class}[text width=\largeTextWidth]{SphereExchangeFacade}{0, 0}
+                \operation{add(iSphere : int, position : double[3], orientation : double[3])}
+                \operation{remove(iSphere : int)}
             \end{class}
         \end{scope}
         
@@ -267,8 +259,8 @@
     \aggregation{SphereExchangeFacade}{positions}{1}{AbstractPositions}
     \aggregation{SphereExchangeFacade}{orientations}{1}{AbstractOrientations}
     
-    \aggregation{AbstractRandomCoordinates}{randPositions}{1}{AbstractRandomPositions}
-    \aggregation{AbstractRandomCoordinates}{randMoments}{1}{AbstractRandomOrientations}
+    \aggregation{RandomCoordinatesFacade}{randPositions}{1}{AbstractRandomPositions}
+    \aggregation{RandomCoordinatesFacade}{randMoments}{1}{AbstractRandomOrientations}
     
     \aggregation{AbstractRandomPositions}{box}{1}{AbstractBoxGeometry}
     \aggregation{AbstractRandomPositions}{dipSpheres}{1}{AbstractDipolarSpheres}
