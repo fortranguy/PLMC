@@ -3,7 +3,6 @@
     
         \begin{scope}[local bounding box=Spheres]
             \begin{abstractclass}[text width=\smallTextWidth]{AbstractDipolarSpheres}{0, 0}
-                \operation{getDiameter() : double}
                 \operation[0]{getMomentNorm() : double}
                 \operation{getNumSpheres() : int}
                 \operation{remove()}
@@ -24,7 +23,21 @@
                 \operationsImplementation{}
             \end{class}
         \end{scope}
+        
+        \begin{scope}[local bounding box=SphereBox]
+            \begin{abstractclass}[text width=\smallTextWidth]{AbstractSphere}{0, 0}
+                \operation{getDiameter() : double}
+            \end{abstractclass}
+        \end{scope}
+        
+        \begin{scope}[shift={($(SphereBox.north) - (7cm, 0cm)$)}]
+            \begin{abstractclass}[text width=\smallTextWidth]{AbtractNumberOfParticles}{0, 0}
+                \operation{setNum(num: integer)}
+                \operation{getNum(): integer}
+            \end{abstractclass}
+        \end{scope}
 
+        
         \begin{scope}[shift={($(Spheres.north) + (0 cm, 5cm)$)},
             local bounding box=PositionsBox]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractPositions}{0, 0}
@@ -60,7 +73,7 @@
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(Spheres.north) - (11 cm, 0)$)}, local bounding box=BoxGeometry]
+        \begin{scope}[shift={($(Spheres.north) - (20 cm, 0)$)}, local bounding box=BoxGeometry]
             \begin{abstractclass}[text width=\largeTextWidth]{AbstractBoxGeometry}{0, 0}
                 \operation{getSize() : double[3]}
                 \operation[0]{getHeight() : double}
