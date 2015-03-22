@@ -37,6 +37,11 @@
             \end{abstractclass}
         \end{scope}
 
+        \begin{scope}[shift={($(SphereBox.north) + (7cm, 0cm)$)}]
+            \begin{abstractclass}[text width=\smallTextWidth]{AbstractDipolarMoment}{0, 0}
+                \operation{getNorm(): double}
+            \end{abstractclass}
+        \end{scope}
         
         \begin{scope}[shift={($(Spheres.north) + (0 cm, 5cm)$)},
             local bounding box=PositionsBox]
@@ -58,7 +63,7 @@
             \end{abstractclass}
         \end{scope}
         
-        \begin{scope}[shift={($(Spheres.north) + (8 cm, 0)$)}]
+        \begin{scope}[shift={($(SphereBox.north) + (7 cm, 5cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{AbstractInterSpheres}{0, 0}
                 \operation[0]{getDiameter() : double}
             \end{abstractclass}
