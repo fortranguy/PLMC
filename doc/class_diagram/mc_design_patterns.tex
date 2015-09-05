@@ -1,26 +1,10 @@
 \documentclass{article}
 
+\usepackage{standalone}
+
 \usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-
-\usepackage[simplified]{pgf-umlcd}
-\usetikzlibrary{calc, backgrounds}
-
-\newif\ifexternal
-\externaltrue
-
-\ifexternal
-\usetikzlibrary{external}
-\tikzexternalize[optimize=false, prefix=Figures/, mode=list and make]
-\tikzset{external/system call=
-    {pdflatex \tikzexternalcheckshellescape -halt-on-error -interaction=batchmode
-    -jobname "\image" "\texsource"}
-}
-\tikzset{external/figure name = Figure}
-\else
-\newcommand{\tikzsetnextfilename}[1]{}
-\fi
 
 \usepackage[paper=A4,pagesize]{typearea}
 \usepackage{geometry}
@@ -67,10 +51,9 @@
     \thispagestyle{empty}
     \renewcommand{\familydefault}{\sfdefault}
     
-    \tikzsetnextfilename{class_diagram}
     \begin{figure}[htb]
         \centering
-        \input class_diagram.tex
+        \includestandalone[mode=buildnew]{figures/class_diagram}
         \caption{UML class diagram}
     \end{figure}
 
