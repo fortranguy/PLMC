@@ -63,6 +63,7 @@
         
         \begin{scope}[shift={($(AbstractPeriodicBox.north) + (20 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{AbstractSphere}{0, 0}
+                \operation{setDiameter(diameter\type{double})}
                 \operation{getDiameter()\type{double}}
             \end{abstractclass}
         \end{scope}
@@ -76,6 +77,7 @@
 
         \begin{scope}[shift={($(AbstractSphere.north) + (7 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{AbstractDipolarMoment}{0, 0}
+                \operation{setNorm(norm\type{double})}
                 \operation{getNorm()\type{double}}
             \end{abstractclass}
         \end{scope}
