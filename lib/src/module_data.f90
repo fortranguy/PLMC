@@ -1,6 +1,6 @@
 module module_data
 
-use, intrinsic :: iso_fortran_env, only: error_unit
+use module_error, only: error_exit
 
 implicit none
 
@@ -23,8 +23,7 @@ contains
         inquire(file=filename, exist=file_exists)
         
         if (.not. file_exists) then
-            write(error_unit, *) filename, " doesn't exist."
-            error stop
+            call error_exit(filename//" doesn't exist.")
         end if
     end subroutine test_file_exists
 
@@ -32,9 +31,8 @@ contains
         character(len=*), intent(in) :: data_field
         logical, intent(in) :: found
 
-        if (.not.found) then
-            write(error_unit, *) trim(data_field), " not found."
-            error stop
+        if (.not. found) then
+            call error_exit(trim(data_field)//" not found.")
         end if
     end subroutine test_data_found
     
@@ -43,8 +41,7 @@ contains
         character(len=*) :: string
         
         if (len(string) == 0) then
-            write(error_unit, *) trim(data_field), ": string is empty."
-            error stop
+            call error_exit(trim(data_field)//": string is empty.")
         end if
     end subroutine test_empty_string
 
