@@ -93,26 +93,26 @@
         
         \begin{scope}[shift={($(AbstractInterSpheres.north) + (9 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractPositions}{0, 0}
-                \operation{getPosition(iSphere\type{int})\type{double[3]}}
-                \operation{setPosition(iSphere\type{int}, position\type{double[3]})}
+                \operation{getPosition(iParticle\type{int})\type{double[3]}}
+                \operation{setPosition(iParticle\type{int}, position\type{double[3]})}
                 \operation{add(position\type{double[3]})}
-                \operation{remove(iSphere\type{int})}
+                \operation{remove(iParticle\type{int})}
             \end{abstractclass}
         \end{scope}
 
         \begin{scope}[shift={($(AbstractPositions.north) + (9 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractOrientations}{0, 0}
-                \operation[0]{getOrientation(iSphere\type{int})\type{double[3]}}
-                \operation[0]{setOrientation(iSphere\type{int}, orientation\type{double[3]})}
+                \operation[0]{getOrientation(iParticle\type{int})\type{double[3]}}
+                \operation[0]{setOrientation(iParticle\type{int}, orientation\type{double[3]})}
                 \operation[0]{add(orientation\type{double[3]})}
-                \operation[0]{remove(iSphere\type{int})}
+                \operation[0]{remove(iParticle\type{int})}
             \end{abstractclass}
 
             \def\operationsImplementation{
-                \operation{getOrientation(iSphere\type{int})\type{double[3]}}
-                \operation{setOrientation(iSphere\type{int}, orientation\type{double[3]})}
+                \operation{getOrientation(iParticle\type{int})\type{double[3]}}
+                \operation{setOrientation(iParticle\type{int}, orientation\type{double[3]})}
                 \operation{add(orientation\type{double[3]})}
-                \operation{remove(iSphere\type{int})}
+                \operation{remove(iParticle\type{int})}
             }
 
             \begin{class}[text width=\mediumTextWidth]{NullOrientations}{0, -4}
@@ -161,19 +161,19 @@
         \begin{scope}[shift={($(AbstractPositions.north) + (0 cm, 8 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{AbstractRandomPositions}{0, 0}
                 \operation{position()\type{double[3]}}
-                \operation{move(iSphere\type{int})\type{double[3]}}
+                \operation{move(iParticle\type{int})\type{double[3]}}
             \end{abstractclass}
         \end{scope}
         
         \begin{scope}[shift={($(AbstractRandomPositions.north -| AbstractOrientations)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractRandomOrientations}{0, 0}
                 \operation[0]{orientation()\type{double[3]}}
-                \operation[0]{rotation(iSphere\type{int})\type{double[3]}}
+                \operation[0]{rotation(iParticle\type{int})\type{double[3]}}
             \end{abstractclass}
             
             \def\operationImplementation{
                 \operation{orientation()\type{double[3]}}
-                \operation{rotation(iSphere\type{int})\type{double[3]}}
+                \operation{rotation(iParticle\type{int})\type{double[3]}}
             }
             
             \begin{class}[text width=\mediumTextWidth]{NullRandomOrientations}{0, -3}
@@ -198,8 +198,9 @@
         
         \begin{scope}[shift={($(RandomCoordinatesFacade.north) + (11 cm, 0 cm)$)}]
             \begin{class}[text width=\largeTextWidth]{CoordinatesExchangeFacade}{0, 0}
-                \operation{add(iSphere\type{int}, position\type{double[3]}, orientation\type{double[3]})}
-                \operation{remove(iSphere\type{int})}
+                \operation{add(iParticle\type{int}, position\type{double[3]}, 
+                                                      orientation\type{double[3]})}
+                \operation{remove(iParticle\type{int})}
             \end{class}
         \end{scope}
         

@@ -1,0 +1,11 @@
+{
+    "Sphere 1": {
+        "diameter": 1.0
+    },
+    "Sphere 2": {
+        "diameter": 2.0
+    },
+    "Inter Spheres 12": {
+        "non additivity": 0.1
+    }
+}

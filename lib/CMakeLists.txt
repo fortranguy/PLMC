@@ -12,7 +12,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/SetArchiverAndLinkingTool.cmake)
 
 find_package(
     jsonfortran-${CMAKE_Fortran_COMPILER_ID}
-    3.0.0
+    4.2.0
     REQUIRED
 )
 

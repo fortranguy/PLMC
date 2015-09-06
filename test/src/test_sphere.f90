@@ -3,7 +3,7 @@ program test_sphere
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 
 use module_data, only: test_file_exists, test_data_found
-use class_sphere, only : Abstract_Sphere, Concrete_Sphere
+use class_sphere, only: Abstract_Sphere, Concrete_Sphere
 use json_module, only: json_file, json_initialize
 
 implicit none
