@@ -37,58 +37,6 @@
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractPeriodicBox.north) + (20 cm, 0 cm)$)}]
-            \begin{abstractclass}[text width=\smallTextWidth]{AbstractSphere}{0, 0}
-                \operation{getDiameter()\type{double}}
-            \end{abstractclass}
-        \end{scope}
-        
-        \begin{scope}[shift={($(AbstractSphere.north) + (-7 cm, 0 cm)$)}]
-            \begin{abstractclass}[text width=\smallTextWidth]{AbstractParticlesNumber}{0, 0}
-                \operation{setNum(num\type{int})}
-                \operation{getNum()\type{int}}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(AbstractSphere.north) + (7 cm, 0 cm)$)}]
-            \begin{abstractclass}[text width=\smallTextWidth]{AbstractDipolarMoment}{0, 0}
-                \operation{getNorm()\type{double}}
-            \end{abstractclass}
-        \end{scope}
-        
-        \begin{scope}[shift={($(AbstractSphere.north) + (-7 cm, 5 cm)$)}]
-            \begin{abstractclass}[text width=\smallTextWidth]{AbstractInterSpheres}{0, 0}
-                \operation[0]{getDiameter()\type{double}}
-            \end{abstractclass}
-            
-            \def\operationsImplementation{
-                \operation{getDiameter()\type{double}}
-            }
-            
-            \begin{class}[text width=\smallTextWidth]{InterSpheres}{0, -2}
-                \inherit{AbstractInterSpheres}
-                \operationsImplementation{}
-            \end{class}
-        \end{scope}
-        
-        \begin{scope}[shift={($(AbstractSphere.north) + (0 cm, 5 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractPositions}{0, 0}
-                \operation{getPosition(iSphere\type{int})\type{double[3]}}
-                \operation{setPosition(iSphere\type{int}, position\type{double[3]})}
-                \operation{add(position\type{double[3]})}
-                \operation{remove(iSphere\type{int})}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(AbstractSphere.north) + (8 cm, 5 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractOrientations}{0, 0}
-                \operation{getOrientation(iSphere\type{int})\type{double[3]}}
-                \operation{setOrientation(iSphere\type{int}, orientation\type{double[3]})}
-                \operation{add(orientation\type{double[3]})}
-                \operation{remove(iSphere\type{int})}
-            \end{abstractclass}
-        \end{scope}
-        
         \begin{scope}[shift={($(AbstractPeriodicBox.north) - (11 cm, 0)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractExternalField}{0, 0}
                 \operation[0]{field(position\type{double[3]})\type{double[3]}}
@@ -111,34 +59,59 @@
         
         \begin{scope}[shift={($(AbstractPeriodicBox.north) - (20 cm, 0)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractSpheresReservoir}{0, 0}
-                \operation[0]{getDensity()\type{double}}
-                \operation[0]{getExcessChemicalPotential()\type{double}}
-            \end{abstractclass}
-            
-            \def\operationsImplementation{
                 \operation{getDensity()\type{double}}
                 \operation{getExcessChemicalPotential()\type{double}}
-            }
-            
-            \begin{class}[text width=\mediumTextWidth]{SpheresReservoir}{0, -3}
-                \inherit{AbstractSpheresReservoir}
-                \operationsImplementation{}
-            \end{class}
+            \end{abstractclass}
         \end{scope}
         
         \begin{scope}[shift={($(AbstractPeriodicBox.north) - (28 cm, 0)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{AbstractThermostat}{0, 0}
-                \operation[0]{getTemperature()\type{double}}
-            \end{abstractclass}
-            
-            \def\operationsImplementation{
                 \operation{getTemperature()\type{double}}
-            }
-            
-            \begin{class}[text width=\smallTextWidth]{Thermostat}{0, -2.5}
-                \inherit{AbstractThermostat}
-                \operationsImplementation{}
-            \end{class}
+            \end{abstractclass}
+            % Parallel Tempering?
+        \end{scope}
+        
+        \begin{scope}[shift={($(AbstractPeriodicBox.north) + (20 cm, 0 cm)$)}]
+            \begin{abstractclass}[text width=\smallTextWidth]{AbstractSphere}{0, 0}
+                \operation{getDiameter()\type{double}}
+            \end{abstractclass}
+        \end{scope}
+        
+        \begin{scope}[shift={($(AbstractSphere.north) + (-7 cm, 0 cm)$)}]
+            \begin{abstractclass}[text width=\smallTextWidth]{AbstractParticlesNumber}{0, 0}
+                \operation{setNum(num\type{int})}
+                \operation{getNum()\type{int}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(AbstractSphere.north) + (7 cm, 0 cm)$)}]
+            \begin{abstractclass}[text width=\smallTextWidth]{AbstractDipolarMoment}{0, 0}
+                \operation{getNorm()\type{double}}
+            \end{abstractclass}
+        \end{scope}
+        
+        \begin{scope}[shift={($(AbstractSphere.north) + (-8 cm, 5 cm)$)}]
+            \begin{abstractclass}[text width=\smallTextWidth]{AbstractInterSpheres}{0, 0}
+                \operation{getDiameter()\type{double}}
+            \end{abstractclass}
+        \end{scope}
+        
+        \begin{scope}[shift={($(AbstractSphere.north) + (0 cm, 5 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractPositions}{0, 0}
+                \operation{getPosition(iSphere\type{int})\type{double[3]}}
+                \operation{setPosition(iSphere\type{int}, position\type{double[3]})}
+                \operation{add(position\type{double[3]})}
+                \operation{remove(iSphere\type{int})}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(AbstractSphere.north) + (9 cm, 5 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractOrientations}{0, 0}
+                \operation{getOrientation(iSphere\type{int})\type{double[3]}}
+                \operation{setOrientation(iSphere\type{int}, orientation\type{double[3]})}
+                \operation{add(orientation\type{double[3]})}
+                \operation{remove(iSphere\type{int})}
+            \end{abstractclass}
         \end{scope}
         
         \begin{scope}[shift={($(AbstractPeriodicBox.north) + (0 cm, 16 cm)$)}]
