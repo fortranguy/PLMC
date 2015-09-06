@@ -82,13 +82,16 @@
             \end{abstractclass}
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractSphere.north) + (0 cm, 5 cm)$)}]
-            \begin{abstractclass}[text width=\smallTextWidth]{AbstractInterSpheres}{0, 0}
+        \begin{scope}[shift={($(AbstractSphere.north) + (0 cm, 4 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractInterSpheres}{0, 0}
+                \operation{setDiameter(sphere1\type{AbstractSphere},
+                                       sphere2\type{AbstractSphere},
+                                       nonAdditivity\type{double})}
                 \operation{getDiameter()\type{double}}
             \end{abstractclass}
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractInterSpheres.north) + (8 cm, 0 cm)$)}]
+        \begin{scope}[shift={($(AbstractInterSpheres.north) + (9 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractPositions}{0, 0}
                 \operation{getPosition(iSphere\type{int})\type{double[3]}}
                 \operation{setPosition(iSphere\type{int}, position\type{double[3]})}
@@ -97,8 +100,8 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(AbstractPositions.north) + (11 cm, 0 cm)$)}]
-            \begin{abstractclass}[text width=\largeTextWidth]{AbstractOrientations}{0, 0}
+        \begin{scope}[shift={($(AbstractPositions.north) + (9 cm, 0 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractOrientations}{0, 0}
                 \operation[0]{getOrientation(iSphere\type{int})\type{double[3]}}
                 \operation[0]{setOrientation(iSphere\type{int}, orientation\type{double[3]})}
                 \operation[0]{add(orientation\type{double[3]})}
@@ -112,19 +115,19 @@
                 \operation{remove(iSphere\type{int})}
             }
 
-            \begin{class}[text width=\largeTextWidth]{NullOrientations}{0, -4}
+            \begin{class}[text width=\mediumTextWidth]{NullOrientations}{0, -4}
                 \inherit{AbstractOrientations}
                 \operationsImplementation{}
             \end{class}
 
-            \begin{class}[text width=\largeTextWidth]{Orientations}{0, -8}
+            \begin{class}[text width=\mediumTextWidth]{Orientations}{0, -8}
                 \inherit{AbstractOrientations}
                 \operationsImplementation{}
             \end{class}
         \end{scope}
         
         \begin{scope}[shift={($(AbstractPeriodicBox.north) + (0 cm, 10 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractBoxedSpheres}{0, 0}
+            \begin{abstractclass}[text width=\smallTextWidth]{AbstractBoxedSpheres}{0, 0}
                 %\operation[0]{accessibleVolume()\type{double}}
                 %\operation[0]{isInside(position\type{double[3]})\type{bool}}
                 \operation{fold(position\type{double[3]})}
