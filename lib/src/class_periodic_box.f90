@@ -59,7 +59,6 @@ contains
         if (abs(real_size(1)-real_size(2)) > real_zero) then
             call warning_continue("real_size(1) and real_size(2) are not equal.")
         end if
-
     end subroutine Abstract_Periodic_Box_check
 
     pure function Abstract_Periodic_Box_get_real_size(this) result(get_real_size)
