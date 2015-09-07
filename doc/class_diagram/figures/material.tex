@@ -116,7 +116,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(AbstractSpheres.north) + (9 cm, 0 cm)$)}, opacity=1]
-            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractDipolarMomentNorms}{0, 0}
+            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractMomentNorms}{0, 0}
                 \operation{contruct(particleNum\type{AbstractParticlesNumber})}
                 \operation{destroy()}
                 \operation[0]{setNorm(iParticle\type{int}, norm\type{double})}
@@ -262,7 +262,7 @@
 \begin{scope}[on background layer]
     \aggregation{ReciprocalLattice}{periodicBox}{1}{AbstractPeriodicBox}
     \aggregation{AbstractSpheres}{number}{1}{AbstractParticlesNumber}
-    \aggregation{AbstractDipolarMomentNorms}{number}{1}{AbstractParticlesNumber}
+    \aggregation{AbstractMomentNorms}{number}{1}{AbstractParticlesNumber}
     
     \aggregation{AbstractBoxedSpheres}{periodicBox}{1}{AbstractPeriodicBox}
     \aggregation{AbstractBoxedSpheres}{positions}{1}{AbstractPositions}
@@ -280,6 +280,6 @@
     
     \aggregation{AbstractRandomOrientations}{orientations}{1}{AbstractOrientations}
     
-    \aggregation{TotalMoment}{dipMoment}{1}{AbstractDipolarMomentNorms}
+    \aggregation{TotalMoment}{momentNorms}{1}{AbstractMomentNorms}
     \aggregation{TotalMoment}{orientations}{1}{AbstractOrientations}
 \end{scope}
