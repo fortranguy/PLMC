@@ -3,14 +3,14 @@ module class_dipolar_moment_norms
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_precisions, only: real_zero
 use module_error, only: warning_continue, error_exit
-use class_particles_number, only: Abstract_Particles_Number, Abstract_Particles_Number_ptr
+use class_particles_number, only: Abstract_Particles_Number, Abstract_Particles_Number_Pointer
 
 implicit none
 
 private
 
     type, abstract, public :: Abstract_Dipolar_Moment_Norms
-        type(Abstract_Particles_Number_ptr) :: particles_num
+        type(Abstract_Particles_Number_Pointer) :: particles_num
     contains
         procedure :: construct => Abstract_Dipolar_Moment_Norms_construct
         procedure :: destroy => Abstract_Dipolar_Moment_Norms_destroy

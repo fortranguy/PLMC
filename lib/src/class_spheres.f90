@@ -3,14 +3,14 @@ module class_spheres
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_precisions, only: real_zero
 use module_error, only: warning_continue, error_exit
-use class_particles_number, only: Abstract_Particles_Number, Abstract_Particles_Number_ptr
+use class_particles_number, only: Abstract_Particles_Number, Abstract_Particles_Number_Pointer
 
 implicit none
 
 private
 
     type, abstract, public :: Abstract_Spheres
-        type(Abstract_Particles_Number_ptr) :: particles_num
+        type(Abstract_Particles_Number_Pointer) :: particles_num
     contains
         procedure :: construct => Abstract_Spheres_construct
         procedure :: destroy => Abstract_Spheres_destroy
@@ -20,6 +20,10 @@ private
         procedure(Abstract_Spheres_add_diameter), deferred :: add_diameter
         procedure(Abstract_Spheres_remove_diameter), deferred :: remove_diameter
     end type Abstract_Spheres
+    
+    type, public :: Abstract_Spheres_Pointer
+        class(Abstract_Spheres), pointer :: ptr
+    end type Abstract_Spheres_Pointer
     
     abstract interface
     

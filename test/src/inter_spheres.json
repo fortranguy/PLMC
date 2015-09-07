@@ -1,8 +1,10 @@
 {
-    "Sphere 1": {
+    "Spheres 1": {
+        "number": 3,
         "diameter": 1.0
     },
-    "Sphere 2": {
+    "Spheres 2": {
+        "number": 2,
         "diameter": 2.0
     },
     "Inter Spheres 12": {
