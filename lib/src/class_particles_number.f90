@@ -28,7 +28,7 @@ contains
         class(Abstract_Particles_Number), intent(out) :: this
         integer, intent(in) :: num
 
-        if (num < 0) call error_exit("Particles number is negative.")
+        if (num < 0) call error_exit("Abstract_Particles_Number: num is negative.")
         this%num = num
     end subroutine Abstract_Particles_Number_set_num
 
