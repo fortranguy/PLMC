@@ -13,6 +13,10 @@ private
         procedure :: set_num => Abstract_Particles_Number_set_num
         procedure :: get_num => Abstract_Particles_Number_get_num
     end type Abstract_Particles_Number
+    
+    type, public :: Abstract_Particles_Number_ptr
+        class(Abstract_Particles_Number), pointer :: ptr
+    end type Abstract_Particles_Number_ptr
 
     type, extends(Abstract_Particles_Number), public :: Concrete_Particles_Number
         

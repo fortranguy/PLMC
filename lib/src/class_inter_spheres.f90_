@@ -3,7 +3,7 @@ module class_inter_spheres
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_precisions, only: real_zero
 use module_error, only: warning_continue, error_exit
-use class_sphere, only: Abstract_Sphere
+use class_spheres, only: Abstract_Spheres
 
 implicit none
 
@@ -23,14 +23,14 @@ private
 
 contains
 
-    subroutine Abstract_Inter_Spheres_set_diameter(this, sphere1, sphere2, non_additivity)
+    subroutine Abstract_Inter_Spheres_set_diameter(this, spheres_1, spheres_2, non_additivity)
         class(Abstract_Inter_Spheres), intent(out) :: this
-        class(Abstract_Sphere), intent(in) :: sphere1, sphere2
+        class(Abstract_Spheres), intent(in) :: spheres_1, spheres_2
         real(DP), intent(in) :: non_additivity
 
         real(DP) :: diameter
 
-        diameter = (sphere1%get_diameter() + sphere2%get_diameter())/2._DP + non_additivity
+        diameter = (spheres_1%get_diameter() + spheres_2%get_diameter())/2._DP + non_additivity
         if (diameter < 0._DP) call error_exit("Diameter is negative.")
         if (diameter < real_zero) call warning_continue("Diameter may be too small.")
         this%diameter = diameter
