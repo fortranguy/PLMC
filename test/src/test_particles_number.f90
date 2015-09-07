@@ -8,7 +8,7 @@ use json_module, only: json_file, json_initialize
 
 implicit none
 
-    class(Abstract_Particles_Number), allocatable :: particles_num
+    class(Abstract_Particles_Number), allocatable :: particles_number
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename, data_field
     logical :: found
@@ -20,16 +20,16 @@ implicit none
     call test_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
 
-    allocate(Concrete_Particles_Number :: particles_num)
+    allocate(Concrete_Particles_Number :: particles_number)
 
     data_field = "Particles Number.number"
     call input_data%get(data_field, num, found)
     call test_data_found(data_field, found)
 
-    call particles_num%set_num(num)
-    write(output_unit, *) "number =", particles_num%get_num()
+    call particles_number%set_num(num)
+    write(output_unit, *) "number =", particles_number%get_num()
 
-    deallocate(particles_num)
+    deallocate(particles_number)
     deallocate(data_field)
     deallocate(data_filename)
     call input_data%destroy()

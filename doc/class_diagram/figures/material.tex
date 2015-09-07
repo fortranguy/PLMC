@@ -1,14 +1,13 @@
-\begin{scope}[local bounding box=Material]
+\begin{scope}[local bounding box=Material, opacity=0.5]
     \begin{package}{Material}
         
         \begin{scope}
             \begin{abstractclass}[text width=\largeTextWidth]{AbstractPeriodicBox}{0, 0}
                 \operation{getSize()\type{double[3]}}
-                \operation{getWave()\type{int}[3]}
                 \operation[0]{vector(position1\type{double[3]},
-                                     position2\type{double[3]})\type{double[3]}}
+                                      position2\type{double[3]})\type{double[3]}}
                 \operation{distance(position1\type{double[3]},
-                                    position2\type{double[3]})\type{double}}
+                                     position2\type{double[3]})\type{double}}
             \end{abstractclass}
 
             \def\operationsImplementation{
@@ -16,18 +15,38 @@
                                   position2\type{double[3]})\type{double[3]}}
             }
             
-            \begin{class}[text width=\largeTextWidth]{XYZPeriodic}{0, -4}
+            \begin{class}[text width=\largeTextWidth]{XYZPeriodicBox}{0, -4}
                 \inherit{AbstractPeriodicBox}
                 \operationsImplementation{}
             \end{class}
             
-            \begin{class}[text width=\largeTextWidth]{XYPeriodic}{0, -6}
+            \begin{class}[text width=\largeTextWidth]{XYPeriodicBox}{0, -6}
                 \inherit{AbstractPeriodicBox}
                 \operationsImplementation{}
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractPeriodicBox.north) - (11 cm, 0)$)}]
+        \begin{scope}[shift={($(AbstractPeriodicBox.north) + (11 cm, 0 cm)$)}]
+            \begin{abstractclass}[text width=\smallTextWidth]{AbstractReciprocalLattice}{0, 0}
+                \operation[0]{getWave()\type{int[3]}}
+            \end{abstractclass}
+            
+            \def\operationsImplementation{
+                \operation{getWave\type{int[3]}}
+            }
+            
+            \begin{class}[text width=\smallTextWidth]{NullReciprocalLattice}{0, -3}
+                \inherit{AbstractReciprocalLattice}
+                \operationsImplementation{}
+            \end{class}
+            
+            \begin{class}[text width=\smallTextWidth]{ReciprocalLattice}{0, -5}
+                \inherit{AbstractReciprocalLattice}
+                \operationsImplementation{}
+            \end{class}
+        \end{scope}
+        
+        \begin{scope}[shift={($(AbstractPeriodicBox.north) + (-11 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractExternalField}{0, 0}
                 \operation[0]{field(position\type{double[3]})\type{double[3]}}
             \end{abstractclass}
@@ -61,28 +80,28 @@
             % Parallel Tempering?
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractPeriodicBox.north) + (20 cm, 0 cm)$)}]
+        \begin{scope}[shift={($(AbstractPeriodicBox.north) + (28 cm, 0 cm)$)}, opacity=1]
             \begin{abstractclass}[text width=\smallTextWidth]{AbstractSphere}{0, 0}
                 \operation{setDiameter(diameter\type{double})}
                 \operation{getDiameter()\type{double}}
             \end{abstractclass}
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractSphere.north) + (-7 cm, 0 cm)$)}]
+        \begin{scope}[shift={($(AbstractSphere.north) + (-7 cm, 0 cm)$)}, opacity=1]
             \begin{abstractclass}[text width=\smallTextWidth]{AbstractParticlesNumber}{0, 0}
                 \operation{setNum(num\type{int})}
                 \operation{getNum()\type{int}}
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(AbstractSphere.north) + (7 cm, 0 cm)$)}]
+        \begin{scope}[shift={($(AbstractSphere.north) + (7 cm, 0 cm)$)}, opacity=1]
             \begin{abstractclass}[text width=\smallTextWidth]{AbstractDipolarMoment}{0, 0}
                 \operation{setNorm(norm\type{double})}
                 \operation{getNorm()\type{double}}
             \end{abstractclass}
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractSphere.north) + (0 cm, 4 cm)$)}]
+        \begin{scope}[shift={($(AbstractSphere.north) + (0 cm, 4 cm)$)}, opacity=1]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractInterSpheres}{0, 0}
                 \operation{setDiameter(sphere1\type{AbstractSphere},
                                        sphere2\type{AbstractSphere},
@@ -208,6 +227,7 @@
 \end{scope}
 
 \begin{scope}[on background layer]
+    \aggregation{ReciprocalLattice}{box}{1}{AbstractPeriodicBox}
     \aggregation{AbstractBoxedSpheres}{box}{1}{AbstractPeriodicBox}
     \aggregation{AbstractBoxedSpheres}{positions}{1}{AbstractPositions}
     \aggregation{AbstractInterSpheres}{sphere}{2}{AbstractSphere}
