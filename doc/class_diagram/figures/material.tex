@@ -29,12 +29,12 @@
         
         \begin{scope}[shift={($(AbstractPeriodicBox.north) + (11 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{AbstractReciprocalLattice}{0, 0}
-                \operation[0]{setReciNum()\type{int[3]}}
+                \operation[0]{setReciNum(reciNum\type{int[3]})}
                 \operation[0]{getReciNum()\type{int[3]}}
             \end{abstractclass}
             
             \def\operationsImplementation{
-                \operation{setReciNum()\type{int[3]}}
+                \operation{setReciNum(reciNum\type{int[3]})}
                 \operation{getReciNum()\type{int[3]}}
             }
             
