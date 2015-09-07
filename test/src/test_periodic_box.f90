@@ -72,6 +72,7 @@ implicit none
     call print_periodic_box(periodic_box)
     deallocate(periodic_box)
     
+    deallocate(periodic_box_size)
     deallocate(data_field)
     deallocate(data_filename)    
     call input_data%destroy()

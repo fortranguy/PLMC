@@ -19,6 +19,10 @@ private
         procedure :: distance => Abstract_Periodic_Box_distance
         procedure(Abstract_Periodic_Box_vector), deferred :: vector
     end type Abstract_Periodic_Box
+    
+    type, public :: Abstract_Periodic_Box_Pointer
+        class(Abstract_Periodic_Box), pointer :: ptr
+    end type Abstract_Periodic_Box_Pointer
 
     abstract interface
     

@@ -27,23 +27,25 @@
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractPeriodicBox.north) + (11 cm, 0 cm)$)}]
-            \begin{abstractclass}[text width=\smallTextWidth]{AbstractReciprocalLattice}{0, 0}
-                \operation[0]{setReciNum(reciNum\type{int[3]})}
+        \begin{scope}[shift={($(AbstractPeriodicBox.north) + (11 cm, 5 cm)$)}, opacity=1]
+            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractReciprocalLattice}{0, 0}
+                \operation[0]{contruct(periodicBox\type{AbstractPeriodicBox}, reciNum\type{int[3]})}
+                \operation[0]{destroy()}
                 \operation[0]{getReciNum()\type{int[3]}}
             \end{abstractclass}
             
             \def\operationsImplementation{
-                \operation{setReciNum(reciNum\type{int[3]})}
+                \operation{contruct(periodicBox\type{AbstractPeriodicBox}, reciNum\type{int[3]})}
+                \operation{destroy()}
                 \operation{getReciNum()\type{int[3]}}
             }
             
-            \begin{class}[text width=\smallTextWidth]{NullReciprocalLattice}{0, -3}
+            \begin{class}[text width=\mediumTextWidth]{NullReciprocalLattice}{0, -4}
                 \inherit{AbstractReciprocalLattice}
                 \operationsImplementation{}
             \end{class}
             
-            \begin{class}[text width=\smallTextWidth]{ReciprocalLattice}{0, -5.5}
+            \begin{class}[text width=\mediumTextWidth]{ReciprocalLattice}{0, -7.5}
                 \inherit{AbstractReciprocalLattice}
                 \operationsImplementation{}
             \end{class}
@@ -176,7 +178,7 @@
             \end{class}            
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractPeriodicBox.north) + (0 cm, 10 cm)$)}]
+        \begin{scope}[shift={($(AbstractPeriodicBox.north) + (0 cm, 5 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{AbstractBoxedSpheres}{0, 0}
                 %\operation[0]{accessibleVolume()\type{double}}
                 %\operation[0]{isInside(position\type{double[3]})\type{bool}}
@@ -258,11 +260,11 @@
 \end{scope}
 
 \begin{scope}[on background layer]
-    \aggregation{ReciprocalLattice}{box}{1}{AbstractPeriodicBox}
+    \aggregation{ReciprocalLattice}{periodicBox}{1}{AbstractPeriodicBox}
     \aggregation{AbstractSpheres}{number}{1}{AbstractParticlesNumber}
     \aggregation{AbstractDipolarMomentNorms}{number}{1}{AbstractParticlesNumber}
     
-    \aggregation{AbstractBoxedSpheres}{box}{1}{AbstractPeriodicBox}
+    \aggregation{AbstractBoxedSpheres}{periodicBox}{1}{AbstractPeriodicBox}
     \aggregation{AbstractBoxedSpheres}{positions}{1}{AbstractPositions}
     \aggregation{AbstractInterSpheres}{sphere}{2}{AbstractSpheres}
     \aggregation{AbstractPositions}{number}{1}{AbstractParticlesNumber}
@@ -270,7 +272,7 @@
     \aggregation{CoordinatesExchangeFacade}{positions}{1}{AbstractPositions}
     \aggregation{CoordinatesExchangeFacade}{orientations}{1}{AbstractOrientations}
     
-    \aggregation{AbstractRandomPositions}{box}{1}{AbstractPeriodicBox}
+    \aggregation{AbstractRandomPositions}{periodicBox}{1}{AbstractPeriodicBox}
     \aggregation{AbstractRandomPositions}{positions}{1}{AbstractPositions}
 
     \aggregation{RandomCoordinatesFacade}{randPositions}{1}{AbstractRandomPositions}
