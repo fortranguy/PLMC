@@ -1,14 +1,14 @@
 \begin{scope}[local bounding box=Material, opacity=0.5]
     \begin{package}{Material}
         
-        \begin{scope}
+        \begin{scope}[opacity=1]
             \begin{abstractclass}[text width=\largeTextWidth]{AbstractPeriodicBox}{0, 0}
                 \operation{setRealSize(realSize\type{double[3]})}
                 \operation{getRealSize()\type{double[3]}}
-                \operation[0]{vector(position1\type{double[3]},
-                                      position2\type{double[3]})\type{double[3]}}
                 \operation{distance(position1\type{double[3]},
                                      position2\type{double[3]})\type{double}}
+                \operation[0]{vector(position1\type{double[3]},
+                                     position2\type{double[3]})\type{double[3]}}
             \end{abstractclass}
 
             \def\operationsImplementation{

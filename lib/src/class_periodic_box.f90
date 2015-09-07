@@ -3,7 +3,7 @@ module class_periodic_box
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_geometry, only: num_dimensions
 use data_precisions, only: real_zero
-use module_error, only: warning_continue
+use module_error, only: warning_continue, error_exit
 
 implicit none
 
@@ -22,10 +22,10 @@ private
 
     abstract interface
     
-        pure function Abstract_Periodic_Box_vector(this, position1, position2) result(vector)
+        pure function Abstract_Periodic_Box_vector(this, position_1, position_2) result(vector)
         import :: DP, num_dimensions, Abstract_Periodic_Box
             class(Abstract_Periodic_Box), intent(in) :: this
-            real(DP), intent(in) :: position1(:), position2(:)
+            real(DP), intent(in) :: position_1(:), position_2(:)
             real(DP) :: vector(num_dimensions)
         end function Abstract_Periodic_Box_vector
         
@@ -47,17 +47,21 @@ contains
 
     subroutine Abstract_Periodic_Box_set_real_size(this, real_size)
         class(Abstract_Periodic_Box), intent(out) :: this
-        real(DP), intent(in) :: real_size(num_dimensions)
+        real(DP), intent(in) :: real_size(:)
 
         call this%check(real_size)
         this%real_size = real_size
     end subroutine Abstract_Periodic_Box_set_real_size
 
     subroutine Abstract_Periodic_Box_check(real_size)
-        real(DP), intent(in) :: real_size(num_dimensions)
+        real(DP), intent(in) :: real_size(:)
         
+        if (size(real_size) /= num_dimensions) then
+            call error_exit("Abstract_Periodic_Box: wrong number of dimensions (size).")
+        end if     
         if (abs(real_size(1)-real_size(2)) > real_zero) then
-            call warning_continue("real_size(1) and real_size(2) are not equal.")
+            call warning_continue("Abstract_Periodic_Box: "//&
+                "real_size(1) and real_size(2) are not equal.")
         end if
     end subroutine Abstract_Periodic_Box_check
 
@@ -68,12 +72,12 @@ contains
         get_real_size = this%real_size
     end function Abstract_Periodic_Box_get_real_size
 
-    pure function Abstract_Periodic_Box_distance(this, position1, position2) result(distance)
+    pure function Abstract_Periodic_Box_distance(this, position_1, position_2) result(distance)
         class(Abstract_Periodic_Box), intent(in) :: this
-        real(DP), intent(in) :: position1(:), position2(:)
+        real(DP), intent(in) :: position_1(:), position_2(:)
         real(DP) :: distance
 
-        distance = norm2(this%vector(position1, position2))
+        distance = norm2(this%vector(position_1, position_2))
     end function Abstract_Periodic_Box_distance
     
 !end implementation Abstract_Periodic_Box
@@ -81,12 +85,12 @@ contains
 !implementation XYZ_Periodic_Box
 
     !> from SMAC, algorithm 2.5 & 2.6, p.91
-    pure function XYZ_Periodic_Box_vector(this, position1, position2) result(vector)
+    pure function XYZ_Periodic_Box_vector(this, position_1, position_2) result(vector)
         class(XYZ_Periodic_Box), intent(in) :: this
-        real(DP), intent(in) :: position1(:), position2(:)
+        real(DP), intent(in) :: position_1(:), position_2(:)
         real(DP) :: vector(num_dimensions)
 
-        vector = modulo(position2 - position1, this%real_size)
+        vector = modulo(position_2 - position_1, this%real_size)
 
         where(vector > this%real_size/2._DP)
             vector = vector - this%real_size
@@ -97,18 +101,18 @@ contains
 
 !implementation XY_Periodic_Box
 
-    pure function XY_Periodic_Box_vector(this, position1, position2) result(vector)
+    pure function XY_Periodic_Box_vector(this, position_1, position_2) result(vector)
         class(XY_Periodic_Box), intent(in) :: this
-        real(DP), intent(in) :: position1(:), position2(:)
+        real(DP), intent(in) :: position_1(:), position_2(:)
         real(DP) :: vector(num_dimensions)
 
-        vector(1:2) = modulo(position2(1:2) - position1(1:2), this%real_size(1:2))
+        vector(1:2) = modulo(position_2(1:2) - position_1(1:2), this%real_size(1:2))
 
         where(vector(1:2) > this%real_size(1:2)/2._DP)
             vector(1:2) = vector(1:2) - this%real_size(1:2)
         end where
 
-        vector(3) = position2(3) - position1(3)
+        vector(3) = position_2(3) - position_1(3)
     end function XY_Periodic_Box_vector
 
 !end implementation XY_Periodic_Box
