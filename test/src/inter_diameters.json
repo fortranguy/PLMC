@@ -1,13 +1,13 @@
 {
-    "Spheres 1": {
+    "Diameters 1": {
         "number": 3,
         "diameter": 1.0
     },
-    "Spheres 2": {
+    "Diameters 2": {
         "number": 2,
         "diameter": 2.0
     },
-    "Inter Spheres 12": {
+    "Inter Diameters 12": {
         "non additivity": 0.1
     }
 }
