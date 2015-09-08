@@ -135,8 +135,8 @@
         
         \begin{scope}[shift={($(AbstractDiameters.north) + (0 cm, 5 cm)$)}, opacity=1]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractInterDiameters}{0, 0}
-                \operation{construct(sphere1\type{AbstractDiameters},
-                                     sphere2\type{AbstractDiameters},
+                \operation{construct(diameters1\type{AbstractDiameters},
+                                     diameters2\type{AbstractDiameters},
                                      nonAdditivity\type{double})}
                 \operation{destroy()}
                 \operation{get(iParticle\type{int}, jParticle\type{int})\type{double}}
@@ -268,7 +268,7 @@
     
     \aggregation{AbstractBoxedParticles}{periodicBox}{1}{AbstractPeriodicBox}
     \aggregation{AbstractBoxedParticles}{positions}{1}{AbstractPositions}
-    \aggregation{AbstractInterParticles}{sphere}{2}{AbstractSpheres}
+    \aggregation{AbstractInterDiameters}{diameters}{2}{AbstractDiameters}
     \aggregation{AbstractPositions}{number}{1}{AbstractParticlesNumber}
     \aggregation{AbstractOrientations}{number}{1}{AbstractParticlesNumber}
     \aggregation{CoordinatesExchangeFacade}{positions}{1}{AbstractPositions}
