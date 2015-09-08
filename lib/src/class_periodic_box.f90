@@ -71,11 +71,11 @@ contains
         end if
     end subroutine Abstract_Periodic_Box_check
 
-    pure function Abstract_Periodic_Box_get_real_size(this) result(get_real_size)
+    pure function Abstract_Periodic_Box_get_real_size(this) result(real_size)
         class(Abstract_Periodic_Box), intent(in) :: this
-        real(DP) :: get_real_size(num_dimensions)
+        real(DP) :: real_size(num_dimensions)
 
-        get_real_size = this%real_size
+        real_size = this%real_size
     end function Abstract_Periodic_Box_get_real_size
 
     pure function Abstract_Periodic_Box_distance(this, position_1, position_2) result(distance)

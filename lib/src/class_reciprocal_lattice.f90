@@ -30,10 +30,10 @@ private
             class(Abstract_Reciprocal_Lattice), intent(inout) :: this
         end subroutine Abstract_Reciprocal_Lattice_destroy
 
-        pure function Abstract_Reciprocal_Lattice_get_reci_num(this) result(get_reci_num)
+        pure function Abstract_Reciprocal_Lattice_get_reci_num(this) result(reci_num)
         import :: num_dimensions, Abstract_Reciprocal_Lattice
             class(Abstract_Reciprocal_Lattice), intent(in) :: this
-            integer :: get_reci_num(num_dimensions)
+            integer :: reci_num(num_dimensions)
         end function Abstract_Reciprocal_Lattice_get_reci_num
         
     end interface
@@ -72,11 +72,11 @@ contains
         
     end subroutine Null_Reciprocal_Lattice_destroy
 
-    pure function Null_Reciprocal_Lattice_get_reci_num(this) result(get_reci_num)
+    pure function Null_Reciprocal_Lattice_get_reci_num(this) result(reci_num)
         class(Null_Reciprocal_Lattice), intent(in) :: this
-        integer :: get_reci_num(num_dimensions)
+        integer :: reci_num(num_dimensions)
 
-        get_reci_num = 0    
+        reci_num = 0
     end function Null_Reciprocal_Lattice_get_reci_num
 
 !end implementation Null_Reciprocal_Lattice
@@ -123,11 +123,11 @@ contains
         this%periodic_box%ptr => null()
     end subroutine Concrete_Reciprocal_Lattice_destroy
 
-    pure function Concrete_Reciprocal_Lattice_get_reci_num(this) result(get_reci_num)
+    pure function Concrete_Reciprocal_Lattice_get_reci_num(this) result(reci_num)
         class(Concrete_Reciprocal_Lattice), intent(in) :: this
-        integer :: get_reci_num(num_dimensions)
+        integer :: reci_num(num_dimensions)
 
-        get_reci_num = this%reci_num
+        reci_num = this%reci_num
     end function Concrete_Reciprocal_Lattice_get_reci_num
     
 !end implementation Concrete_Reciprocal_Lattice
