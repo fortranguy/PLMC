@@ -7,7 +7,6 @@ use class_periodic_box, only: Abstract_Periodic_Box
 implicit none
 
 private
-
 public print_periodic_box
 
 contains

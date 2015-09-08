@@ -154,8 +154,10 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(AbstractPositions.north) + (9 cm, 0 cm)$)}]
+        \begin{scope}[shift={($(AbstractPositions.north) + (9 cm, 0 cm)$)}, opacity=1]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractOrientations}{0, 0}
+                \operation[0]{construct(particlesNum\type{AbstractParticlesNumber})}
+                \operation[0]{detroy()}
                 \operation[0]{get(iParticle\type{int})\type{double[3]}}
                 \operation[0]{set(iParticle\type{int}, orientation\type{double[3]})}
                 \operation[0]{add(orientation\type{double[3]})}
@@ -163,18 +165,20 @@
             \end{abstractclass}
 
             \def\operationsImplementation{
+                \operation{construct(particlesNum\type{AbstractParticlesNumber})}
+                \operation{detroy()}
                 \operation{get(iParticle\type{int})\type{double[3]}}
                 \operation{set(iParticle\type{int}, orientation\type{double[3]})}
                 \operation{add(orientation\type{double[3]})}
                 \operation{removeOrientation(iParticle\type{int})}
             }
             
-            \begin{class}[text width=\mediumTextWidth]{NullOrientations}{0, -4}
+            \begin{class}[text width=\mediumTextWidth]{NullOrientations}{0, -5}
                 \inherit{AbstractOrientations}
                 \operationsImplementation{}
             \end{class}
 
-            \begin{class}[text width=\mediumTextWidth]{Orientations}{0, -8}
+            \begin{class}[text width=\mediumTextWidth]{Orientations}{0, -10}
                 \inherit{AbstractOrientations}
                 \operationsImplementation{}
             \end{class}            

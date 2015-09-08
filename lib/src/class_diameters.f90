@@ -119,7 +119,7 @@ contains
          class(Uniform_Diameters), intent(inout) :: this
          integer, intent(in) :: i_particle
          
-        if (i_particle < 1 .or. this%particles_num%ptr%get()+1 < i_particle) then
+        if (i_particle < 1 .or. this%particles_num%ptr%get() < i_particle) then
             call error_exit("Uniform_Diameters: i_particle is out of range.")
         end if
     end subroutine Uniform_Diameters_remove

@@ -42,18 +42,18 @@ implicit none
         write(output_unit, *) "position", i_particle, "=", positions%get(i_particle)
     end do
     
-    call particles_num%set(particles_num%get() + 1)
     data_field = "Positions.add"
     call input_data%get(data_field, position, found)
     call test_data_found(data_field, found)
+    call particles_num%set(particles_num%get() + 1)
     call positions%add(position)
     write(output_unit, *) "position", particles_num%get(), "=", positions%get(i_particle)
     
-    call particles_num%set(particles_num%get() - 1)
     data_field = "Positions.remove"
     call input_data%get(data_field, i_particle, found)
     call test_data_found(data_field, found)
     call positions%remove(i_particle)
+    call particles_num%set(particles_num%get() - 1)
     do i_particle = 1, particles_num%get()
         write(output_unit, *) "position", i_particle, "=", positions%get(i_particle)
     end do
