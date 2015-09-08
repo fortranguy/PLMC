@@ -27,7 +27,7 @@ implicit none
     data_field = "Spheres.number"
     call input_data%get(data_field, spheres_num, found)
     call test_data_found(data_field, found)
-    call particles_num%set_num(spheres_num)
+    call particles_num%set(spheres_num)
     
     allocate(Uniform_Spheres :: spheres)
     call spheres%construct(particles_num)
@@ -36,7 +36,7 @@ implicit none
     call test_data_found(data_field, found)
     call spheres%set_diameter(1, spheres_diameter)
     
-    do i_particle = 1, particles_num%get_num()
+    do i_particle = 1, particles_num%get()
         write(output_unit, *) "diameter", i_particle, "=", spheres%get_diameter(i_particle)
     end do
 

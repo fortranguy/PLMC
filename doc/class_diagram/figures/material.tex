@@ -87,8 +87,8 @@
         
         \begin{scope}[shift={($(AbstractPeriodicBox.north) + (28 cm, 0 cm)$)}, opacity=1]
             \begin{abstractclass}[text width=\smallTextWidth]{AbstractParticlesNumber}{0, 0}
-                \operation{setNum(num\type{int})}
-                \operation{getNum()\type{int}}
+                \operation{set(num\type{int})}
+                \operation{get()\type{int}}
             \end{abstractclass}
         \end{scope}
         
@@ -119,21 +119,21 @@
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractMomentNorms}{0, 0}
                 \operation{contruct(particleNum\type{AbstractParticlesNumber})}
                 \operation{destroy()}
-                \operation[0]{setNorm(iParticle\type{int}, norm\type{double})}
-                \operation[0]{getNorm(iParticle\type{int})\type{double}}
-                \operation[0]{addNorm(norm\type{double})}
-                \operation[0]{removeNorm(iParticle\type{int})}
+                \operation[0]{set(iParticle\type{int}, norm\type{double})}
+                \operation[0]{get(iParticle\type{int})\type{double}}
+                \operation[0]{add(norm\type{double})}
+                \operation[0]{remove(iParticle\type{int})}
             \end{abstractclass}
             
             \def\operationsImplementation{
-                \operation{setNorm(iParticle\type{int}, norm\type{double})}
-                \operation{getNorm(iParticle\type{int})\type{double}}
-                \operation{addNorm(norm\type{double})}
-                \operation{removeNorm(iParticle\type{int})}
+                \operation{set(iParticle\type{int}, norm\type{double})}
+                \operation{get(iParticle\type{int})\type{double}}
+                \operation{add(norm\type{double})}
+                \operation{remove(iParticle\type{int})}
             }
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractSpheres.north) + (0 cm, 4 cm)$)}, opacity=1]
+        \begin{scope}[shift={($(AbstractSpheres.north) + (0 cm, 5 cm)$)}, opacity=1]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractInterSpheres}{0, 0}
                 \operation{construct(sphere1\type{AbstractSpheres},
                                      sphere2\type{AbstractSpheres},
@@ -143,27 +143,29 @@
             \end{abstractclass}
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractInterSpheres.north) + (9 cm, 0 cm)$)}]
+        \begin{scope}[shift={($(AbstractInterSpheres.north) + (9 cm, 0 cm)$)}, opacity=1]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractPositions}{0, 0}
-                \operation{setPosition(iParticle\type{int}, position\type{double[3]})}
-                \operation{getPosition(iParticle\type{int})\type{double[3]}}
-                \operation{addPosition(position\type{double[3]})}
-                \operation{removePosition(iParticle\type{int})}
+                \operation{construct(particlesNum\type{AbstractParticlesNumber})}
+                \operation{detroy()}
+                \operation{set(iParticle\type{int}, position\type{double[3]})}
+                \operation{get(iParticle\type{int})\type{double[3]}}
+                \operation{add(position\type{double[3]})}
+                \operation{remove(iParticle\type{int})}
             \end{abstractclass}
         \end{scope}
 
         \begin{scope}[shift={($(AbstractPositions.north) + (9 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractOrientations}{0, 0}
-                \operation[0]{getOrientation(iParticle\type{int})\type{double[3]}}
-                \operation[0]{setOrientation(iParticle\type{int}, orientation\type{double[3]})}
-                \operation[0]{addOrientation(orientation\type{double[3]})}
+                \operation[0]{get(iParticle\type{int})\type{double[3]}}
+                \operation[0]{set(iParticle\type{int}, orientation\type{double[3]})}
+                \operation[0]{add(orientation\type{double[3]})}
                 \operation[0]{removeOrientation(iParticle\type{int})}
             \end{abstractclass}
 
             \def\operationsImplementation{
-                \operation{getOrientation(iParticle\type{int})\type{double[3]}}
-                \operation{setOrientation(iParticle\type{int}, orientation\type{double[3]})}
-                \operation{addOrientation(orientation\type{double[3]})}
+                \operation{get(iParticle\type{int})\type{double[3]}}
+                \operation{set(iParticle\type{int}, orientation\type{double[3]})}
+                \operation{add(orientation\type{double[3]})}
                 \operation{removeOrientation(iParticle\type{int})}
             }
             
@@ -188,13 +190,13 @@
 
         \begin{scope}[shift={($(AbstractPeriodicBox.north) + (-11 cm, 10 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractTotalMoment}{0, 0}
-                \operation[0]{getTotalMoment()\type{double[3]}}
+                \operation[0]{get()\type{double[3]}}
                 \operation[0]{rotationUpdate(old\type{Particle}, new\type{Particle})}
                 \operation[0]{exchangeUpdate(particle\type{Particle})}
             \end{abstractclass}
 
             \def\operationsImplementation{
-                \operation{getTotalMoment()\type{double[3]}}
+                \operation{get()\type{double[3]}}
                 \operation{rotationUpdate(old\type{Particle}, new\type{Particle})}
                 \operation{exchangeUpdate(particle\type{Particle})}
             }

@@ -9,6 +9,15 @@ implicit none
 
 private
 
+    !> A hack to count the number of objects
+    !num_abstract_dip_spheres_objects = num_abstract_dip_spheres_objects + 1
+    !if (num_abstract_dip_spheres_objects == 1) then
+    !    if (abs(this%diameter - 1._DP) > real_zero) then
+    !        write(error_unit, *) data_field, " must be 1.0 since it is the unit of length."
+    !        error stop
+    !    end if
+    !end if
+
     type, abstract, public :: Abstract_Spheres
         type(Abstract_Particles_Number_Pointer) :: particles_num
     contains
@@ -91,7 +100,7 @@ contains
         integer, intent(in) :: i_particle
         real(DP), intent(in) :: diameter
         
-        if (i_particle < 1 .or. this%particles_num%ptr%get_num() < i_particle) then
+        if (i_particle < 1 .or. this%particles_num%ptr%get() < i_particle) then
             call error_exit("Uniform_Spheres: i_particle is out of range.")
         end if
         if (diameter < 0._DP) then
