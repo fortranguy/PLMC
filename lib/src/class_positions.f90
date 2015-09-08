@@ -3,7 +3,7 @@ module class_positions
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, error_unit
 use data_geometry, only: num_dimensions
 use data_precisions, only: real_zero
-use module_error, only: error_exit
+use procedures_errors, only: error_exit
 use class_particles_number, only: Abstract_Particles_Number, Abstract_Particles_Number_Pointer
 use procedures_coordinates, only: increase_coordinates_size
 

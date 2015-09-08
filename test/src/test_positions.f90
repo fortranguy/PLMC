@@ -35,7 +35,7 @@ implicit none
     
     do i_particle = 1, particles_num%get()
         write(string_i, *) i_particle
-        data_field = "Positions."//adjustl(trim(string_i))
+        data_field = "Positions."//trim(adjustl(string_i))
         call input_data%get(data_field, position, found)
         call test_data_found(data_field, found)
         call positions%set(i_particle, position)

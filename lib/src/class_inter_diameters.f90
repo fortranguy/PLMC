@@ -2,7 +2,7 @@ module class_inter_diameters
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_precisions, only: real_zero
-use module_error, only: warning_continue, error_exit
+use procedures_checks, only: check_positive_real
 use class_diameters, only: Abstract_Diameters, Abstract_Diameters_Pointer
 
 implicit none
@@ -32,12 +32,7 @@ contains
         
         this%diameters_1%ptr => diameters_1
         this%diameters_2%ptr => diameters_2
-        if (non_additivity < 0._DP) then
-            call error_exit("Abstract_Inter_Diameters: non_additivity is negative.")
-        end if
-        if (non_additivity < real_zero) then
-            call warning_continue("Abstract_Inter_Diameters: non_additivity may be too small.")
-        end if
+        call check_positive_real("Abstract_Inter_Diameters", "non_additivity", non_additivity)
         this%non_additivity = non_additivity
     end subroutine Abstract_Inter_Diameters_construct
     

@@ -1,6 +1,8 @@
-module module_error
+module procedures_errors
 
 use, intrinsic :: iso_fortran_env, only: error_unit
+
+implicit none
 
 private
 public warning_continue, error_exit
@@ -20,4 +22,5 @@ contains
         error stop
     end subroutine error_exit
 
-end module module_error
+end module procedures_errors
+

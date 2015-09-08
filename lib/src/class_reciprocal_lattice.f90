@@ -2,7 +2,7 @@ module class_reciprocal_lattice
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_geometry, only: num_dimensions
-use module_error, only: warning_continue, error_exit
+use procedures_errors, only: warning_continue, error_exit
 use class_periodic_box, only: Abstract_Periodic_Box, Abstract_Periodic_Box_Pointer
 
 implicit none

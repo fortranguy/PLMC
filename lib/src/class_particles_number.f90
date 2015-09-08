@@ -1,6 +1,6 @@
 module class_particles_number
 
-use module_error, only: error_exit
+use procedures_errors, only: error_exit
 
 implicit none
 

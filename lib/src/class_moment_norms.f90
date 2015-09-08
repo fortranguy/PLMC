@@ -2,7 +2,8 @@ module class_moment_norms
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_precisions, only: real_zero
-use module_error, only: warning_continue, error_exit
+use procedures_errors, only: error_exit
+use procedures_checks, only: check_positive_real
 use class_particles_number, only: Abstract_Particles_Number, Abstract_Particles_Number_Pointer
 
 implicit none
@@ -99,13 +100,7 @@ contains
         if (i_particle < 1 .or. this%particles_num%ptr%get() < i_particle) then
             call error_exit("Uniform_Moment_Norms: i_particle is out of range.")
         end if
-        if (norm < 0._DP) then
-            call error_exit("Uniform_Moment_Norms: norm is negative.")
-        end if
-        if (norm < real_zero) then
-            call warning_continue("Uniform_Moment_Norms: norm may be too small.")
-        end if
-        
+        call check_positive_real("Uniform_Moment_Norms", "norm", norm)        
         this%norm = norm
     end subroutine Uniform_Moment_Norms_set
 

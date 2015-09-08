@@ -3,7 +3,8 @@ module class_periodic_box
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_geometry, only: num_dimensions
 use data_precisions, only: real_zero
-use module_error, only: warning_continue, error_exit
+use procedures_errors, only: warning_continue, error_exit
+use procedures_checks, only: check_positive_real
 
 implicit none
 
@@ -62,7 +63,8 @@ contains
         
         if (size(real_size) /= num_dimensions) then
             call error_exit("Abstract_Periodic_Box: wrong number of dimensions (size).")
-        end if     
+        end if
+        call check_positive_real("Abstract_Periodic_Box", "real_size", real_size)
         if (abs(real_size(1)-real_size(2)) > real_zero) then
             call warning_continue("Abstract_Periodic_Box: "//&
                 "real_size(1) and real_size(2) are not equal.")
