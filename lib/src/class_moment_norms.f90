@@ -9,45 +9,54 @@ implicit none
 
 private
 
+    !> A hack to count the number of objects
+    !num_dip_spheres_objects = num_dip_spheres_objects + 1
+    !if (num_dip_spheres_objects == 1) then
+    !    if (abs(this%moment_norm - 1._DP) > real_zero) then
+    !        write(error_unit, *) data_field, " must be 1.0 since it is the unit of moment."
+    !        error stop
+    !    end if
+    !end if
+
     type, abstract, public :: Abstract_Moment_Norms
         type(Abstract_Particles_Number_Pointer) :: particles_num
     contains
         procedure :: construct => Abstract_Moment_Norms_construct
         procedure :: destroy => Abstract_Moment_Norms_destroy
         
-        procedure(Abstract_Moment_Norms_set_norm), deferred :: set_norm
-        procedure(Abstract_Moment_Norms_get_norm), deferred :: get_norm
-        procedure(Abstract_Moment_Norms_add_norm), deferred :: add_norm
-        procedure(Abstract_Moment_Norms_remove_norm), deferred :: remove_norm
+        procedure(Abstract_Moment_Norms_set), deferred :: set
+        procedure(Abstract_Moment_Norms_get), deferred :: get
+        procedure(Abstract_Moment_Norms_add), deferred :: add
+        procedure(Abstract_Moment_Norms_remove), deferred :: remove
     end type Abstract_Moment_Norms
     
     abstract interface
     
-        subroutine Abstract_Moment_Norms_set_norm(this, i_particle, norm)
+        subroutine Abstract_Moment_Norms_set(this, i_particle, norm)
         import :: DP, Abstract_Moment_Norms
             class(Abstract_Moment_Norms), intent(inout) :: this
             integer, intent(in) :: i_particle
             real(DP), intent(in) :: norm
-        end subroutine Abstract_Moment_Norms_set_norm
+        end subroutine Abstract_Moment_Norms_set
         
-        pure function Abstract_Moment_Norms_get_norm(this, i_particle) result(get_norm)
+        pure function Abstract_Moment_Norms_get(this, i_particle) result(norm)
         import :: DP, Abstract_Moment_Norms
             class(Abstract_Moment_Norms), intent(in) :: this
             integer, intent(in) :: i_particle
-            real(DP) :: get_norm
-        end function Abstract_Moment_Norms_get_norm
+            real(DP) :: norm
+        end function Abstract_Moment_Norms_get
         
-        subroutine Abstract_Moment_Norms_add_norm(this, norm)
+        subroutine Abstract_Moment_Norms_add(this, norm)
         import :: DP, Abstract_Moment_Norms
             class(Abstract_Moment_Norms), intent(inout) :: this
             real(DP), intent(in) :: norm
-        end subroutine Abstract_Moment_Norms_add_norm
+        end subroutine Abstract_Moment_Norms_add
         
-        subroutine Abstract_Moment_Norms_remove_norm(this, i_particle)
+        subroutine Abstract_Moment_Norms_remove(this, i_particle)
         import :: DP, Abstract_Moment_Norms
             class(Abstract_Moment_Norms), intent(inout) :: this
             integer, intent(in) :: i_particle
-        end subroutine Abstract_Moment_Norms_remove_norm
+        end subroutine Abstract_Moment_Norms_remove
         
     end interface
 
@@ -55,10 +64,10 @@ private
     private
         real(DP) :: norm
     contains
-        procedure :: set_norm => Uniform_Moment_Norms_set_norm
-        procedure :: get_norm => Uniform_Moment_Norms_get_norm
-        procedure :: add_norm => Uniform_Moment_Norms_add_norm
-        procedure :: remove_norm => Uniform_Moment_Norms_remove_norm
+        procedure :: set => Uniform_Moment_Norms_set
+        procedure :: get => Uniform_Moment_Norms_get
+        procedure :: add => Uniform_Moment_Norms_add
+        procedure :: remove => Uniform_Moment_Norms_remove
     end type Uniform_Moment_Norms
 
 contains
@@ -82,12 +91,12 @@ contains
 
 !implementation Uniform_Moment_Norms
 
-    subroutine Uniform_Moment_Norms_set_norm(this, i_particle, norm)
+    subroutine Uniform_Moment_Norms_set(this, i_particle, norm)
         class(Uniform_Moment_Norms), intent(inout) :: this
         integer, intent(in) :: i_particle
         real(DP), intent(in) :: norm
         
-        if (i_particle < 1 .or. this%particles_num%ptr%get_num() < i_particle) then
+        if (i_particle < 1 .or. this%particles_num%ptr%get() < i_particle) then
             call error_exit("Uniform_Moment_Norms: i_particle is out of range.")
         end if
         if (norm < 0._DP) then
@@ -98,27 +107,27 @@ contains
         end if
         
         this%norm = norm
-    end subroutine Uniform_Moment_Norms_set_norm
+    end subroutine Uniform_Moment_Norms_set
 
-    pure function Uniform_Moment_Norms_get_norm(this, i_particle) result(get_norm)
+    pure function Uniform_Moment_Norms_get(this, i_particle) result(norm)
         class(Uniform_Moment_Norms), intent(in) :: this
         integer, intent(in) :: i_particle
-        real(DP) :: get_norm
+        real(DP) :: norm
         
-        get_norm = this%norm
-    end function Uniform_Moment_Norms_get_norm
+        norm = this%norm
+    end function Uniform_Moment_Norms_get
     
-    subroutine Uniform_Moment_Norms_add_norm(this, norm)
+    subroutine Uniform_Moment_Norms_add(this, norm)
          class(Uniform_Moment_Norms), intent(inout) :: this
          real(DP), intent(in) :: norm
          
-    end subroutine Uniform_Moment_Norms_add_norm
+    end subroutine Uniform_Moment_Norms_add
     
-    subroutine Uniform_Moment_Norms_remove_norm(this, i_particle)
+    subroutine Uniform_Moment_Norms_remove(this, i_particle)
          class(Uniform_Moment_Norms), intent(inout) :: this
          integer, intent(in) :: i_particle
          
-    end subroutine Uniform_Moment_Norms_remove_norm
+    end subroutine Uniform_Moment_Norms_remove
     
 !end implementation Uniform_Moment_Norms
 

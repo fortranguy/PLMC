@@ -10,8 +10,8 @@ private
     private
         integer :: num
     contains
-        procedure :: set_num => Abstract_Particles_Number_set_num
-        procedure :: get_num => Abstract_Particles_Number_get_num
+        procedure :: set => Abstract_Particles_Number_set
+        procedure :: get => Abstract_Particles_Number_get
     end type Abstract_Particles_Number
     
     type, public :: Abstract_Particles_Number_Pointer
@@ -24,19 +24,19 @@ private
 
 contains
 
-    subroutine Abstract_Particles_Number_set_num(this, num)
+    subroutine Abstract_Particles_Number_set(this, num)
         class(Abstract_Particles_Number), intent(out) :: this
         integer, intent(in) :: num
 
         if (num < 0) call error_exit("Abstract_Particles_Number: num is negative.")
         this%num = num
-    end subroutine Abstract_Particles_Number_set_num
+    end subroutine Abstract_Particles_Number_set
 
-    pure function Abstract_Particles_Number_get_num(this) result(get_num)
+    pure function Abstract_Particles_Number_get(this) result(num)
         class(Abstract_Particles_Number), intent(in) :: this
-        integer :: get_num
+        integer :: num
 
-        get_num = this%num
-    end function Abstract_Particles_Number_get_num
+        num = this%num
+    end function Abstract_Particles_Number_get
 
 end module class_particles_number

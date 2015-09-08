@@ -30,7 +30,7 @@ implicit none
     data_field = "Diameters 1.number"
     call input_data%get(data_field, diameters_1_num, found)
     call test_data_found(data_field, found)
-    call particles_num_1%set_num(diameters_1_num)
+    call particles_num_1%set(diameters_1_num)
     
     allocate(Uniform_Diameters :: diameters_1)
     data_field = "Diameters 1.diameter"
@@ -43,7 +43,7 @@ implicit none
     data_field = "Diameters 2.number"
     call input_data%get(data_field, diameters_2_num, found)
     call test_data_found(data_field, found)
-    call particles_num_2%set_num(diameters_2_num)
+    call particles_num_2%set(diameters_2_num)
     
     allocate(Uniform_Diameters :: diameters_2)
     data_field = "Diameters 2.diameter"
@@ -58,8 +58,8 @@ implicit none
     call test_data_found(data_field, found)
     call inter_diameters_12%construct(diameters_1, diameters_2, non_additivity)
     
-    do i_particle = 1, particles_num_1%get_num()
-        do j_particle = 1, particles_num_2%get_num()
+    do i_particle = 1, particles_num_1%get()
+        do j_particle = 1, particles_num_2%get()
             write(output_unit, *) "diameter", i_particle, j_particle, &
                 inter_diameters_12%get(i_particle, j_particle)
         end do

@@ -27,18 +27,18 @@ implicit none
     data_field = "Diameters.number"
     call input_data%get(data_field, diameters_num, found)
     call test_data_found(data_field, found)
-    call particles_num%set_num(diameters_num)
+    call particles_num%set(diameters_num)
     
     allocate(Uniform_Diameters :: diameters)
     call diameters%construct(particles_num)
     data_field = "Diameters.diameter"
     call input_data%get(data_field, diameters_diameter, found)
     call test_data_found(data_field, found)
-    if (particles_num%get_num() > 0) then
+    if (particles_num%get() > 0) then
         call diameters%set(1, diameters_diameter)
     end if
     
-    do i_particle = 1, particles_num%get_num()
+    do i_particle = 1, particles_num%get()
         write(output_unit, *) "diameter", i_particle, "=", diameters%get(i_particle)
     end do
 

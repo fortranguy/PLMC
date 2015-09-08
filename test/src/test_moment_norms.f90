@@ -27,17 +27,17 @@ implicit none
     data_field = "Moment Norms.number"
     call input_data%get(data_field, moment_norms_num, found)
     call test_data_found(data_field, found)
-    call particles_num%set_num(moment_norms_num)
+    call particles_num%set(moment_norms_num)
     
     allocate(Uniform_Moment_Norms :: moment_norms)
     call moment_norms%construct(particles_num)
     data_field = "Moment Norms.norm"
     call input_data%get(data_field, moment_norms_norm, found)
     call test_data_found(data_field, found)
-    call moment_norms%set_norm(1, moment_norms_norm)
+    call moment_norms%set(1, moment_norms_norm)
     
-    do i_particle = 1, particles_num%get_num()
-        write(output_unit, *) "norm", i_particle, "=", moment_norms%get_norm(i_particle)
+    do i_particle = 1, particles_num%get()
+        write(output_unit, *) "norm", i_particle, "=", moment_norms%get(i_particle)
     end do
 
     call moment_norms%destroy()

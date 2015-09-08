@@ -26,8 +26,8 @@ implicit none
     call input_data%get(data_field, num, found)
     call test_data_found(data_field, found)
 
-    call particles_number%set_num(num)
-    write(output_unit, *) "number =", particles_number%get_num()
+    call particles_number%set(num)
+    write(output_unit, *) "number =", particles_number%get()
 
     deallocate(particles_number)
     deallocate(data_field)

@@ -91,7 +91,7 @@ contains
         integer, intent(in) :: i_particle
         real(DP), intent(in) :: diameter
         
-        if (i_particle < 1 .or. this%particles_num%ptr%get_num() < i_particle) then
+        if (i_particle < 1 .or. this%particles_num%ptr%get() < i_particle) then
             call error_exit("Uniform_Diameters: i_particle is out of range.")
         end if
         if (diameter < 0._DP) then
