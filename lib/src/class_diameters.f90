@@ -4,14 +4,14 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_precisions, only: real_zero
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_positive_real
-use class_particles_number, only: Abstract_Particles_Number, Abstract_Particles_Number_Pointer
+use class_particles_number, only: Abstract_Particles_Number
 
 implicit none
 
 private
 
     type, abstract, public :: Abstract_Diameters
-        type(Abstract_Particles_Number_Pointer) :: particles_num
+        class(Abstract_Particles_Number), pointer :: particles_num
     contains
         procedure :: construct => Abstract_Diameters_construct
         procedure :: destroy => Abstract_Diameters_destroy
@@ -21,10 +21,6 @@ private
         procedure(Abstract_Diameters_add), deferred :: add
         procedure(Abstract_Diameters_remove), deferred :: remove
     end type Abstract_Diameters
-    
-    type, public :: Abstract_Diameters_Pointer
-        class(Abstract_Diameters), pointer :: ptr
-    end type Abstract_Diameters_Pointer
     
     abstract interface
     
@@ -74,13 +70,13 @@ contains
         class(Abstract_Diameters), intent(out) :: this
         class(Abstract_Particles_Number), target, intent(in) :: particles_num
         
-        this%particles_num%ptr => particles_num
+        this%particles_num => particles_num
     end subroutine Abstract_Diameters_construct
     
     subroutine Abstract_Diameters_destroy(this)
         class(Abstract_Diameters), intent(inout) :: this
         
-        this%particles_num%ptr => null()
+        this%particles_num => null()
     end subroutine Abstract_Diameters_destroy
 
 !end implementation Abstract_Diameters
@@ -92,7 +88,7 @@ contains
         integer, intent(in) :: i_particle
         real(DP), intent(in) :: diameter
         
-        if (i_particle < 1 .or. this%particles_num%ptr%get() < i_particle) then
+        if (i_particle < 1 .or. this%particles_num%get() < i_particle) then
             call error_exit("Uniform_Diameters: i_particle is out of range.")
         end if
         call check_positive_real("Uniform_Diameters", "diameter", diameter)
@@ -119,7 +115,7 @@ contains
          class(Uniform_Diameters), intent(inout) :: this
          integer, intent(in) :: i_particle
          
-        if (i_particle < 1 .or. this%particles_num%ptr%get() < i_particle) then
+        if (i_particle < 1 .or. this%particles_num%get() < i_particle) then
             call error_exit("Uniform_Diameters: i_particle is out of range.")
         end if
     end subroutine Uniform_Diameters_remove

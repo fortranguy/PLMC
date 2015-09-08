@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64, error_unit
 use data_geometry, only: num_dimensions
 use data_precisions, only: real_zero
 use procedures_errors, only: error_exit
-use class_particles_number, only: Abstract_Particles_Number, Abstract_Particles_Number_Pointer
+use class_particles_number, only: Abstract_Particles_Number
 use procedures_coordinates, only: increase_coordinates_size
 
 implicit none
@@ -13,7 +13,7 @@ private
 
     type, abstract, public :: Abstract_Positions
     private
-        type(Abstract_Particles_Number_Pointer) :: particles_num
+        class(Abstract_Particles_Number), pointer :: particles_num
         real(DP), allocatable :: positions(:, :)
     contains
         procedure :: construct => Abstract_Positions_construct
@@ -37,11 +37,11 @@ contains
         class(Abstract_Positions), intent(out) :: this
         class(Abstract_Particles_Number), target, intent(in) :: particles_num
         
-        this%particles_num%ptr => particles_num
-        if (this%particles_num%ptr%get() == 0) then
+        this%particles_num => particles_num
+        if (this%particles_num%get() == 0) then
             allocate(this%positions(num_dimensions, 1))
         else
-            allocate(this%positions(num_dimensions, this%particles_num%ptr%get()))
+            allocate(this%positions(num_dimensions, this%particles_num%get()))
         end if
         this%positions = 0._DP
     end subroutine Abstract_Positions_construct
@@ -50,7 +50,7 @@ contains
         class(Abstract_Positions), intent(inout) :: this
         
         if (allocated(this%positions)) deallocate(this%positions)
-        this%particles_num%ptr => null()
+        this%particles_num => null()
     end subroutine Abstract_Positions_destroy
     
     subroutine Abstract_Positions_set(this, i_particle, position)
@@ -76,21 +76,21 @@ contains
         class(Abstract_Positions), intent(inout) :: this
         real(DP), intent(in) :: position(num_dimensions)
         
-        if (size(this%positions, 2) < this%particles_num%ptr%get()) then
+        if (size(this%positions, 2) < this%particles_num%get()) then
             call increase_coordinates_size(this%positions)
         end if
-        call this%set(this%particles_num%ptr%get(), position)
+        call this%set(this%particles_num%get(), position)
     end subroutine Abstract_Positions_add
     
     subroutine Abstract_Positions_remove(this, i_particle)
         class(Abstract_Positions), intent(inout) :: this
         integer, intent(in) :: i_particle
         
-        if (i_particle < 1 .or. this%particles_num%ptr%get() < i_particle) then
+        if (i_particle < 1 .or. this%particles_num%get() < i_particle) then
             call error_exit("Uniform_Spheres: i_particle is out of range.")
         end if        
-        if (i_particle < this%particles_num%ptr%get()) then
-            call this%set(i_particle, this%get(this%particles_num%ptr%get()))
+        if (i_particle < this%particles_num%get()) then
+            call this%set(i_particle, this%get(this%particles_num%get()))
         end if
     end subroutine Abstract_Positions_remove
     

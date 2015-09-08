@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64, error_unit
 use data_geometry, only: num_dimensions
 use data_precisions, only: real_zero
 use procedures_errors, only: error_exit, warning_continue
-use class_particles_number, only: Abstract_Particles_Number, Abstract_Particles_Number_Pointer
+use class_particles_number, only: Abstract_Particles_Number
 use procedures_coordinates, only: increase_coordinates_size
 
 implicit none
@@ -80,7 +80,7 @@ private
     
     type, extends(Abstract_Orientations), public :: Concrete_Orientations
     private
-        type(Abstract_Particles_Number_Pointer) :: particles_num
+        class(Abstract_Particles_Number), pointer :: particles_num
         real(DP), allocatable :: orientations(:, :)
     contains
         procedure :: construct => Concrete_Orientations_construct
@@ -144,14 +144,14 @@ contains
         
         integer :: i_particle
         
-        this%particles_num%ptr => particles_num
-        if (this%particles_num%ptr%get() == 0) then
+        this%particles_num => particles_num
+        if (this%particles_num%get() == 0) then
             allocate(this%orientations(num_dimensions, 1))
         else
-            allocate(this%orientations(num_dimensions, this%particles_num%ptr%get()))
+            allocate(this%orientations(num_dimensions, this%particles_num%get()))
         end if
         
-        do i_particle = 1, this%particles_num%ptr%get()
+        do i_particle = 1, this%particles_num%get()
             this%orientations(:, i_particle) = [1.0_DP, 0._DP, 0._DP]
         end do
     end subroutine Concrete_Orientations_construct
@@ -160,7 +160,7 @@ contains
         class(Concrete_Orientations), intent(inout) :: this
         
         if (allocated(this%orientations)) deallocate(this%orientations)
-        this%particles_num%ptr => null()
+        this%particles_num => null()
     end subroutine Concrete_Orientations_destroy
     
     subroutine Concrete_Orientations_set(this, i_particle, orientation)
@@ -189,24 +189,24 @@ contains
         class(Concrete_Orientations), intent(inout) :: this
         real(DP), intent(in) :: orientation(num_dimensions)
         
-        if (size(this%orientations, 2) < this%particles_num%ptr%get()) then
+        if (size(this%orientations, 2) < this%particles_num%get()) then
             call increase_coordinates_size(this%orientations)
         end if
         if (abs(norm2(orientation)-1.0_DP) > real_zero) then
             call warning_continue("Concrete_Orientations: orientation may not be normed.")
         end if
-        call this%set(this%particles_num%ptr%get(), orientation)
+        call this%set(this%particles_num%get(), orientation)
     end subroutine Concrete_Orientations_add
     
     subroutine Concrete_Orientations_remove(this, i_particle)
         class(Concrete_Orientations), intent(inout) :: this
         integer, intent(in) :: i_particle
         
-        if (i_particle < 1 .or. this%particles_num%ptr%get() < i_particle) then
+        if (i_particle < 1 .or. this%particles_num%get() < i_particle) then
             call error_exit("Uniform_Spheres: i_particle is out of range.")
         end if        
-        if (i_particle < this%particles_num%ptr%get()) then
-            call this%set(i_particle, this%get(this%particles_num%ptr%get()))
+        if (i_particle < this%particles_num%get()) then
+            call this%set(i_particle, this%get(this%particles_num%get()))
         end if
     end subroutine Concrete_Orientations_remove
     

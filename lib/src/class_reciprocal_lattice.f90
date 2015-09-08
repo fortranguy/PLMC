@@ -3,7 +3,7 @@ module class_reciprocal_lattice
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_geometry, only: num_dimensions
 use procedures_errors, only: warning_continue, error_exit
-use class_periodic_box, only: Abstract_Periodic_Box, Abstract_Periodic_Box_Pointer
+use class_periodic_box, only: Abstract_Periodic_Box
 
 implicit none
 
@@ -47,7 +47,7 @@ private
 
     type, extends(Abstract_Reciprocal_Lattice), public :: Concrete_Reciprocal_Lattice
         private
-        type(Abstract_Periodic_Box_Pointer) :: periodic_box
+        class(Abstract_Periodic_Box), pointer :: periodic_box
         integer :: reci_num(num_dimensions)
     contains
         procedure :: construct => Concrete_Reciprocal_Lattice_construct
@@ -88,7 +88,7 @@ contains
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         integer, intent(in) :: reci_num(:)
         
-        this%periodic_box%ptr => periodic_box
+        this%periodic_box => periodic_box
         call this%check(reci_num)
         this%reci_num = reci_num
     end subroutine Concrete_Reciprocal_Lattice_construct
@@ -108,7 +108,7 @@ contains
                 "reci_num(1) and reci_num(2) are not equal.")
         end if
         
-        real_size = this%periodic_box%ptr%get_real_size()
+        real_size = this%periodic_box%get_real_size()
         real_zx_ratio = real_size(3) / real_size(1)
         reci_zx_ratio = real(reci_num(3), DP) / real(reci_num(1), DP)
         if (reci_zx_ratio < real_zx_ratio) then
@@ -120,7 +120,7 @@ contains
     subroutine Concrete_Reciprocal_Lattice_destroy(this)
         class(Concrete_Reciprocal_Lattice), intent(inout) :: this
         
-        this%periodic_box%ptr => null()
+        this%periodic_box => null()
     end subroutine Concrete_Reciprocal_Lattice_destroy
 
     pure function Concrete_Reciprocal_Lattice_get_reci_num(this) result(reci_num)

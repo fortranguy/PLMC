@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_precisions, only: real_zero
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_positive_real
-use class_particles_number, only: Abstract_Particles_Number, Abstract_Particles_Number_Pointer
+use class_particles_number, only: Abstract_Particles_Number
 
 implicit none
 
@@ -20,7 +20,7 @@ private
     !end if
 
     type, abstract, public :: Abstract_Moment_Norms
-        type(Abstract_Particles_Number_Pointer) :: particles_num
+        class(Abstract_Particles_Number), pointer :: particles_num
     contains
         procedure :: construct => Abstract_Moment_Norms_construct
         procedure :: destroy => Abstract_Moment_Norms_destroy
@@ -79,13 +79,13 @@ contains
         class(Abstract_Moment_Norms), intent(out) :: this
         class(Abstract_Particles_Number), target, intent(in) :: particles_num
         
-        this%particles_num%ptr => particles_num
+        this%particles_num => particles_num
     end subroutine Abstract_Moment_Norms_construct
     
     subroutine Abstract_Moment_Norms_destroy(this)
         class(Abstract_Moment_Norms), intent(inout) :: this
         
-        this%particles_num%ptr => null()
+        this%particles_num => null()
     end subroutine Abstract_Moment_Norms_destroy
 
 !end implementation Abstract_Moment_Norms
@@ -97,7 +97,7 @@ contains
         integer, intent(in) :: i_particle
         real(DP), intent(in) :: norm
         
-        if (i_particle < 1 .or. this%particles_num%ptr%get() < i_particle) then
+        if (i_particle < 1 .or. this%particles_num%get() < i_particle) then
             call error_exit("Uniform_Moment_Norms: i_particle is out of range.")
         end if
         call check_positive_real("Uniform_Moment_Norms", "norm", norm)        
