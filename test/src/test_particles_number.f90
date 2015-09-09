@@ -1,10 +1,9 @@
 program test_particles_number
 
 use, intrinsic :: iso_fortran_env, only: output_unit
-
+use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
 use class_particles_number, only: Abstract_Particles_Number, Concrete_Particles_Number
-use json_module, only: json_file, json_initialize
 
 implicit none
 

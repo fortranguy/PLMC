@@ -1,11 +1,11 @@
 program test_reciprocal_lattice
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
+use json_module, only: json_file, json_initialize
+use module_data, only: test_file_exists, test_data_found
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box
 use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice, Null_Reciprocal_Lattice, &
                                     Concrete_Reciprocal_Lattice
-use module_data, only: test_file_exists, test_data_found
-use json_module, only: json_file, json_initialize
 
 implicit none
 
@@ -54,7 +54,7 @@ implicit none
     
     deallocate(periodic_box)
     deallocate(data_field)
-    deallocate(data_filename)    
+    deallocate(data_filename)
     call input_data%destroy()
 
 end program test_reciprocal_lattice

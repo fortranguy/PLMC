@@ -100,7 +100,7 @@ contains
         if (i_particle < 1 .or. this%particles_num%get() < i_particle) then
             call error_exit("Uniform_Moment_Norms: i_particle is out of range.")
         end if
-        call check_positive_real("Uniform_Moment_Norms", "norm", norm)        
+        call check_positive_real("Uniform_Moment_Norms", "norm", norm)
         this%norm = norm
     end subroutine Uniform_Moment_Norms_set
 

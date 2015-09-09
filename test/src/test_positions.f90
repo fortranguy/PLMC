@@ -1,11 +1,10 @@
 program test_positions
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
-
+use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
 use class_particles_number, only: Abstract_Particles_Number, Concrete_Particles_Number
 use class_positions, only: Abstract_Positions, Concrete_Positions
-use json_module, only: json_file, json_initialize
 
 implicit none
     
@@ -24,7 +23,7 @@ implicit none
     call test_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
     
-    allocate(Concrete_Particles_Number :: particles_num)    
+    allocate(Concrete_Particles_Number :: particles_num)
     data_field = "Positions.number"
     call input_data%get(data_field, positions_num, found)
     call test_data_found(data_field, found)

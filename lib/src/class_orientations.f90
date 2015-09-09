@@ -204,7 +204,7 @@ contains
         
         if (i_particle < 1 .or. this%particles_num%get() < i_particle) then
             call error_exit("Uniform_Spheres: i_particle is out of range.")
-        end if        
+        end if
         if (i_particle < this%particles_num%get()) then
             call this%set(i_particle, this%get(this%particles_num%get()))
         end if

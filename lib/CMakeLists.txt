@@ -20,6 +20,7 @@ file(
     GLOB_RECURSE
     lib_source_files
     src/data_*.f90
+    src/types_*.f90
     src/procedures_*.f90
     src/module_*.f90
     src/class_*.f90

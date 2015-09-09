@@ -26,17 +26,17 @@ contains
         write(output_unit, *) "vector =", periodic_box%vector(position_1, position_2)
         write(output_unit, *) "distance =",  periodic_box%distance(position_1, position_2)
         write(output_unit, *)
-    end subroutine print_periodic_box    
+    end subroutine print_periodic_box
 
 end module procedures_periodic_box
 
 program test_periodic_box
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
+use json_module, only: json_file, json_initialize
+use module_data, only: test_file_exists, test_data_found
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box, XY_Periodic_Box
 use procedures_periodic_box, only: print_periodic_box
-use module_data, only: test_file_exists, test_data_found
-use json_module, only: json_file, json_initialize
 
 implicit none
 
@@ -72,7 +72,7 @@ implicit none
     
     deallocate(periodic_box_size)
     deallocate(data_field)
-    deallocate(data_filename)    
+    deallocate(data_filename)
     call input_data%destroy()
 
 end program test_periodic_box
