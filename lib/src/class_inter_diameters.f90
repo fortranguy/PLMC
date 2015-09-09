@@ -11,8 +11,8 @@ private
 
     type, abstract, public :: Abstract_Inter_Diameters
     private
-        class(Abstract_Diameters), pointer :: diameters_1, diameters_2
         real(DP) :: non_additivity
+        class(Abstract_Diameters), pointer :: diameters_1, diameters_2
     contains
         procedure :: construct => Abstract_Inter_Diameters_construct
         procedure :: destroy => Abstract_Inter_Diameters_destroy

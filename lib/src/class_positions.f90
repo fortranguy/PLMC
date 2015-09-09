@@ -14,8 +14,8 @@ private
 
     type, abstract, public :: Abstract_Positions
     private
-        class(Abstract_Particles_Number), pointer :: particles_num
         real(DP), allocatable :: positions(:, :)
+        class(Abstract_Particles_Number), pointer :: particles_num
     contains
         procedure :: construct => Abstract_Positions_construct
         procedure :: destroy => Abstract_Positions_destroy

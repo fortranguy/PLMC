@@ -48,8 +48,8 @@ private
 
     type, extends(Abstract_Reciprocal_Lattice), public :: Concrete_Reciprocal_Lattice
         private
-        class(Abstract_Periodic_Box), pointer :: periodic_box
         integer :: reci_num(num_dimensions)
+        class(Abstract_Periodic_Box), pointer :: periodic_box
     contains
         procedure :: construct => Concrete_Reciprocal_Lattice_construct
         procedure, private :: check => Concrete_Reciprocal_Lattice_check

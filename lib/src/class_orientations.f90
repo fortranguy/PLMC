@@ -80,8 +80,8 @@ private
     
     type, extends(Abstract_Orientations), public :: Concrete_Orientations
     private
-        class(Abstract_Particles_Number), pointer :: particles_num
         real(DP), allocatable :: orientations(:, :)
+        class(Abstract_Particles_Number), pointer :: particles_num
     contains
         procedure :: construct => Concrete_Orientations_construct
         procedure :: destroy => Concrete_Orientations_destroy
