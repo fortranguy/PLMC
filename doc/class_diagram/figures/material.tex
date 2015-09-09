@@ -6,14 +6,14 @@
                 \operation{setRealSize(realSize\type{double[3]})}
                 \operation{getRealSize()\type{double[3]}}
                 \operation{distance(position1\type{double[3]},
-                                     position2\type{double[3]})\type{double}}
-                \operation[0]{vector(position1\type{double[3]},
-                                     position2\type{double[3]})\type{double[3]}}
+                                    position2\type{double[3]})\type{double}}
+                \operation{vector(position1\type{double[3]},
+                                  position2\type{double[3]})\type{double[3]}}
+                \operation[0]{folded(position\type{double[3]})\type{double[3]}}
             \end{abstractclass}
 
             \def\operationsImplementation{
-                \operation{vector(position1\type{double[3]},
-                                  position2\type{double[3]})\type{double[3]}}
+                \operation{folded(position\type{double[3]})\type{double[3]}}
             }
             
             \begin{class}[text width=\largeTextWidth]{XYZPeriodicBox}{0, -4}
@@ -162,13 +162,13 @@
             \end{abstractclass}
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractPeriodicBox.north) + (0 cm, 5 cm)$)}]
-            \begin{abstractclass}[text width=\smallTextWidth]{AbstractBoxedParticles}{0, 0}
+        %\begin{scope}[shift={($(AbstractPeriodicBox.north) + (0 cm, 5 cm)$)}]
+        %    \begin{abstractclass}[text width=\smallTextWidth]{AbstractBoxedParticles}{0, 0}
                 %\operation[0]{accessibleVolume()\type{double}}
                 %\operation[0]{isInside(position\type{double[3]})\type{bool}}
-                \operation{fold(position\type{double[3]})}
-            \end{abstractclass}
-        \end{scope}
+                %\operation{fold(position\type{double[3]})}
+        %    \end{abstractclass}
+        %\end{scope}
         
         \begin{scope}[shift={($(AbstractPositions.north) + (0 cm, 8 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{AbstractRandomPositions}{0, 0}
@@ -282,8 +282,8 @@
     \aggregation{AbstractDiameters}{number}{1}{AbstractParticlesNumber}
     \aggregation{AbstractMomentNorms}{number}{1}{AbstractParticlesNumber}
     
-    \aggregation{AbstractBoxedParticles}{periodicBox}{1}{AbstractPeriodicBox}
-    \aggregation{AbstractBoxedParticles}{positions}{1}{AbstractPositions}
+    %\aggregation{AbstractBoxedParticles}{periodicBox}{1}{AbstractPeriodicBox}
+    %\aggregation{AbstractBoxedParticles}{positions}{1}{AbstractPositions}
     \aggregation{AbstractInterDiameters}{diameters}{2}{AbstractDiameters}
     \aggregation{AbstractPositions}{number}{1}{AbstractParticlesNumber}
     \aggregation{AbstractOrientations}{number}{1}{AbstractParticlesNumber}

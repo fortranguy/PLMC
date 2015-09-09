@@ -18,28 +18,29 @@ private
         procedure, nopass, private :: check => Abstract_Periodic_Box_check
         procedure :: get_real_size => Abstract_Periodic_Box_get_real_size
         procedure :: distance => Abstract_Periodic_Box_distance
-        procedure(Abstract_Periodic_Box_vector), deferred :: vector
+        procedure :: vector => Abstract_Periodic_Box_vector
+        procedure(Abstract_Periodic_Box_folded), deferred :: folded
     end type Abstract_Periodic_Box
-
+    
     abstract interface
     
-        pure function Abstract_Periodic_Box_vector(this, position_1, position_2) result(vector)
+        pure function Abstract_Periodic_Box_folded(this, position) result(folded_position)
         import :: DP, num_dimensions, Abstract_Periodic_Box
             class(Abstract_Periodic_Box), intent(in) :: this
-            real(DP), intent(in) :: position_1(:), position_2(:)
-            real(DP) :: vector(num_dimensions)
-        end function Abstract_Periodic_Box_vector
+            real(DP), intent(in) :: position(:)
+            real(DP) :: folded_position(num_dimensions)
+        end function Abstract_Periodic_Box_folded
         
     end interface
 
     type, extends(Abstract_Periodic_Box), public :: XYZ_Periodic_Box
     contains
-        procedure :: vector => XYZ_Periodic_Box_vector
+        procedure :: folded => XYZ_Periodic_Box_folded
     end type XYZ_Periodic_Box
 
     type, extends(Abstract_Periodic_Box), public :: XY_Periodic_Box
     contains
-        procedure :: vector => XY_Periodic_Box_vector
+        procedure :: folded => XY_Periodic_Box_folded
     end type XY_Periodic_Box
     
 contains
@@ -80,40 +81,45 @@ contains
         distance = norm2(this%vector(position_1, position_2))
     end function Abstract_Periodic_Box_distance
     
+    pure function Abstract_Periodic_Box_vector(this, position_1, position_2) result(vector)
+        class(Abstract_Periodic_Box), intent(in) :: this
+        real(DP), intent(in) :: position_1(:), position_2(:)
+        real(DP) :: vector(num_dimensions)
+
+        vector = this%folded(position_2 - position_1)
+    end function Abstract_Periodic_Box_vector
+    
 !end implementation Abstract_Periodic_Box
 
 !implementation XYZ_Periodic_Box
 
     !> from SMAC, algorithm 2.5 & 2.6, p.91
-    pure function XYZ_Periodic_Box_vector(this, position_1, position_2) result(vector)
+    pure function XYZ_Periodic_Box_folded(this, position) result(folded_position)
         class(XYZ_Periodic_Box), intent(in) :: this
-        real(DP), intent(in) :: position_1(:), position_2(:)
-        real(DP) :: vector(num_dimensions)
-
-        vector = modulo(position_2 - position_1, this%real_size)
-
-        where(vector > this%real_size/2._DP)
-            vector = vector - this%real_size
+        real(DP), intent(in) :: position(:)
+        real(DP) :: folded_position(num_dimensions)
+        
+        folded_position = modulo(position, this%real_size)
+        where(folded_position > this%real_size/2._DP)
+            folded_position = folded_position - this%real_size
         end where
-    end function XYZ_Periodic_Box_vector
+    end function XYZ_Periodic_Box_folded
 
 !end implementation XYZ_Periodic_Box
 
 !implementation XY_Periodic_Box
 
-    pure function XY_Periodic_Box_vector(this, position_1, position_2) result(vector)
+    pure function XY_Periodic_Box_folded(this, position) result(folded_position)
         class(XY_Periodic_Box), intent(in) :: this
-        real(DP), intent(in) :: position_1(:), position_2(:)
-        real(DP) :: vector(num_dimensions)
-
-        vector(1:2) = modulo(position_2(1:2) - position_1(1:2), this%real_size(1:2))
-
-        where(vector(1:2) > this%real_size(1:2)/2._DP)
-            vector(1:2) = vector(1:2) - this%real_size(1:2)
+        real(DP), intent(in) :: position(:)
+        real(DP) :: folded_position(num_dimensions)
+        
+        folded_position(1:2) = modulo(position(1:2), this%real_size(1:2))
+        where(folded_position(1:2) > this%real_size(1:2)/2._DP)
+            folded_position(1:2) = folded_position(1:2) - this%real_size(1:2)
         end where
-
-        vector(3) = position_2(3) - position_1(3)
-    end function XY_Periodic_Box_vector
+        folded_position(3) = position(3)
+    end function XY_Periodic_Box_folded
 
 !end implementation XY_Periodic_Box
 

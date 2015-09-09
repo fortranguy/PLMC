@@ -11,18 +11,13 @@ public print_periodic_box
 
 contains
 
-    subroutine print_periodic_box(periodic_box)
+    subroutine print_periodic_box(periodic_box, position_1, position_2)
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
-
-        real(DP) :: position_1(num_dimensions), position_2(num_dimensions)
+        real(DP), intent(in) :: position_1(:), position_2(:)
 
         write(output_unit, *) "size =", periodic_box%get_real_size()
-        position_2 = 0.9_DP * periodic_box%get_real_size()
-        write(output_unit, *)
-        
-        position_1 = 0._DP
-        position_2 = 0.9_DP * periodic_box%get_real_size()
-        
+        write(output_unit, *) "position_1", periodic_box%folded(position_1)
+        write(output_unit, *) "position_2", periodic_box%folded(position_2)
         write(output_unit, *) "vector =", periodic_box%vector(position_1, position_2)
         write(output_unit, *) "distance =",  periodic_box%distance(position_1, position_2)
         write(output_unit, *)
@@ -44,7 +39,7 @@ implicit none
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename, data_field
     logical :: found
-    real(DP), allocatable :: periodic_box_size(:)
+    real(DP), allocatable :: periodic_box_size(:), position_1(:), position_2(:)
     
     call json_initialize()
      
@@ -52,13 +47,21 @@ implicit none
     call test_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
     
+    data_field ="Periodic Box.position 1"
+    call input_data%get(data_field, position_1, found)
+    call test_data_found(data_field, found)
+    
+    data_field ="Periodic Box.position 2"
+    call input_data%get(data_field, position_2, found)
+    call test_data_found(data_field, found)
+    
     allocate(XYZ_Periodic_Box :: periodic_box)
     write(output_unit, *) "XYZ"
     data_field = "Periodic Box.real size"
     call input_data%get(data_field, periodic_box_size, found)
     call test_data_found(data_field, found)
     call periodic_box%set_real_size(periodic_box_size)
-    call print_periodic_box(periodic_box)
+    call print_periodic_box(periodic_box, position_1, position_2)
     deallocate(periodic_box)
     
     allocate(XY_Periodic_Box :: periodic_box)
@@ -67,9 +70,11 @@ implicit none
     call input_data%get(data_field, periodic_box_size, found)
     call test_data_found(data_field, found)
     call periodic_box%set_real_size(periodic_box_size)
-    call print_periodic_box(periodic_box)
+    call print_periodic_box(periodic_box, position_1, position_2)
     deallocate(periodic_box)
     
+    deallocate(position_2)
+    deallocate(position_1)
     deallocate(periodic_box_size)
     deallocate(data_field)
     deallocate(data_filename)
