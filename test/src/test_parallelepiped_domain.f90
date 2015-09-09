@@ -53,7 +53,7 @@ implicit none
     real(DP) :: position(num_dimensions)
     integer :: num_particles, num_particles_inside, i_particle
     real(DP) :: rand(num_dimensions)
-    integer :: box_unit, domain_unit, positions_unit
+    integer :: box_unit, domain_unit, positions_box_unit, positions_domain_unit
 
     call json_initialize()
 
@@ -85,21 +85,37 @@ implicit none
     data_field = "Particles.number"
     call input_data%get(data_field, num_particles, found)
     call test_data_found(data_field, found)
-    open(newunit=positions_unit, recl=4096, file="positions.out", action="write")
+    write(output_unit, *) "Box :"
+    open(newunit=positions_box_unit, recl=4096, file="positions_box.out", action="write")
     num_particles_inside = 0
     do i_particle = 1, num_particles
         call random_number(rand)
         position = periodic_box%folded(rand * periodic_box%get_size())
         if (parallelepiped_domain%is_inside(position)) then
             num_particles_inside = num_particles_inside + 1
-            write(positions_unit, *) position
+            write(positions_box_unit, *) position
         end if
     end do
-    close(positions_unit)
-    write(output_unit, *) "Inside positions ratio =", &
+    close(positions_box_unit)
+    write(output_unit, *) "    Inside positions ratio =", &
         real(num_particles_inside, DP) /  real(num_particles, DP)
-    write(output_unit, *) "Volumes ratio =", &
+    write(output_unit, *) "    Volumes ratio =", &
         parallelepiped_domain%get_volume() / product(periodic_box%get_size())
+
+    write(output_unit, *) "Domain :"
+    open(newunit=positions_domain_unit, recl=4096, file="positions_domain.out", action="write")
+    num_particles_inside = 0
+    do i_particle = 1, num_particles
+        call random_number(rand)
+        position = parallelepiped_domain%get_inside_position(rand)
+        if (parallelepiped_domain%is_inside(position)) then
+            num_particles_inside = num_particles_inside + 1
+            write(positions_domain_unit, *) position
+        end if
+    end do
+    close(positions_domain_unit)
+    write(output_unit, *) "    Inside positions ratio =", &
+        real(num_particles_inside, DP) /  real(num_particles, DP)
 
     call parallelepiped_domain%destroy()
     deallocate(parallelepiped_domain)
