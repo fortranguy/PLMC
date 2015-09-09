@@ -23,12 +23,12 @@ contains
         logical :: found
         integer, allocatable :: num(:)
         
-        data_field = "Reciprocal Lattice.reci num"
+        data_field = "Reciprocal Lattice.num"
         call input_data%get(data_field, num, found)
         call test_data_found(data_field, found)
         call reciprocal_lattice%construct(periodic_box, num)
         deallocate(num)
-        write(output_unit, *) "reci num =", reciprocal_lattice%get_num()
+        write(output_unit, *) "num =", reciprocal_lattice%get_num()
         call reciprocal_lattice%destroy()
         
         deallocate(data_field)
@@ -62,7 +62,7 @@ implicit none
     call input_data%load_file(filename = data_filename)
     
     allocate(XYZ_Periodic_Box :: periodic_box)
-    data_field = "Periodic Box.real size"
+    data_field = "Periodic Box.size"
     call input_data%get(data_field, periodic_box_size, found)
     call test_data_found(data_field, found)
     call periodic_box%set_size(periodic_box_size)

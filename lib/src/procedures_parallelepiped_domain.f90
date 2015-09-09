@@ -18,7 +18,7 @@ contains
         
         box_corner = box_origin - box_size/2._DP
         point_from_corner = point - box_corner
-        point_is_inside = all(point_from_corner <= box_size)
+        point_is_inside = all(0._DP <= point_from_corner .and. point_from_corner <= box_size)
     end function point_is_inside
 
 end module procedures_parallelepiped_domain
