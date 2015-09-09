@@ -14,7 +14,7 @@ implicit none
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename, data_field, field_name
     logical :: found
-    real(DP), allocatable :: field(:), position(:)
+    real(DP), allocatable :: field_vector(:), position(:)
     
     call json_initialize()
     data_filename = "field_expression.json"
@@ -28,12 +28,13 @@ implicit none
     select case (field_name)
         case ("constant")
             allocate(Constant_Field_Parameters :: field_parameters)
-            data_field = "Field.field"
-            call input_data%get(data_field, field, found)
+            data_field = "Field.vector"
+            call input_data%get(data_field, field_vector, found)
             call test_data_found(data_field, found)
             select type (field_parameters)
                 type is (Constant_Field_Parameters)
-                    field_parameters%field = field
+                    field_parameters%vector = field_vector
+                    deallocate(field_vector)
             end select
             allocate(Constant_Field_Expression :: field_expression)
         case default
@@ -45,6 +46,7 @@ implicit none
     call input_data%get(data_field, position, found)
     call test_data_found(data_field, found)
     write(output_unit, *) field_expression%get(position)
+    deallocate(position)
     
     deallocate(field_expression)
     deallocate(field_parameters)

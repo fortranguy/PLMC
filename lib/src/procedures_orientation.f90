@@ -57,7 +57,7 @@ contains
     
     !> From SMAC, Algorithm 1.24, p.44
     subroutine markov_orientation(orientation, orientation_delta)
-        real(DP), intent(inout) :: orientation(num_dimensions)
+        real(DP), intent(inout) :: orientation(:)
         real(DP), intent(in) :: orientation_delta
         
         real(DP) :: rotation(num_dimensions)

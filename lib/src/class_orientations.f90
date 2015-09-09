@@ -54,7 +54,7 @@ private
         subroutine Abstract_Orientations_add(this, orientation)
         import :: DP, num_dimensions, Abstract_Orientations
             class(Abstract_Orientations), intent(inout) :: this
-            real(DP), intent(in) :: orientation(num_dimensions)
+            real(DP), intent(in) :: orientation(:)
             
         end subroutine Abstract_Orientations_add
         
@@ -124,7 +124,7 @@ contains
     
     subroutine Null_Orientations_add(this, orientation)
         class(Null_Orientations), intent(inout) :: this
-        real(DP), intent(in) :: orientation(num_dimensions)
+        real(DP), intent(in) :: orientation(:)
         
     end subroutine Null_Orientations_add
     
@@ -187,13 +187,10 @@ contains
     
     subroutine Concrete_Orientations_add(this, orientation)
         class(Concrete_Orientations), intent(inout) :: this
-        real(DP), intent(in) :: orientation(num_dimensions)
+        real(DP), intent(in) :: orientation(:)
         
         if (size(this%orientations, 2) < this%particles_num%get()) then
             call increase_coordinates_size(this%orientations)
-        end if
-        if (abs(norm2(orientation)-1.0_DP) > real_zero) then
-            call warning_continue("Concrete_Orientations: orientation may not be normed.")
         end if
         call this%set(this%particles_num%get(), orientation)
     end subroutine Concrete_Orientations_add

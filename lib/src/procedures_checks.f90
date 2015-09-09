@@ -37,8 +37,9 @@ contains
         
         do i_dimension = 1, size(real_array)
             write(string_i, *) i_dimension
-            call check_positive_real_scalar(class_name, real_name//"("//trim(adjustl(string_i))//")", &
-                                         real_array(i_dimension))
+            call check_positive_real_scalar(class_name, &
+                                            real_name//"("//trim(adjustl(string_i))//")", &
+                                            real_array(i_dimension))
         end do
         
     end subroutine check_positive_real_array

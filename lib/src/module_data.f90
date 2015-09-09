@@ -21,7 +21,6 @@ contains
         logical :: file_exists
         
         inquire(file=filename, exist=file_exists)
-        
         if (.not. file_exists) then
             call error_exit(filename//" doesn't exist.")
         end if

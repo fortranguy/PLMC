@@ -34,7 +34,7 @@ private
 
     type, extends(Abstract_Field_Expression), public :: Constant_Field_Expression
     private
-        real(DP) :: field(num_dimensions)
+        real(DP) :: vector(num_dimensions)
     contains
         procedure :: set => Constant_Field_Expression_set
         procedure :: get => Constant_Field_Expression_get
@@ -50,7 +50,7 @@ contains
 
         select type (field_parameters)
             type is (Constant_Field_Parameters)
-                this%field = field_parameters%field
+                this%vector = field_parameters%vector
             class default
                 call error_exit("Constant_Field_Expression: no parameters were given.")
         end select
@@ -61,7 +61,7 @@ contains
         real(DP), intent(in) :: position(:)
         real(DP) :: field_expression(num_dimensions)
 
-        field_expression = this%field
+        field_expression = this%vector
     end function Constant_Field_Expression_get
 
 !end implementation Constant_Field_Expression_get

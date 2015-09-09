@@ -12,7 +12,7 @@ private
     end type Abstract_Field_Parameters
 
     type, extends(Abstract_Field_Parameters), public :: Constant_Field_Parameters
-        real(DP) :: field(num_dimensions)
+        real(DP) :: vector(num_dimensions)
     end type Constant_Field_Parameters
 
 end module types_field_parameters

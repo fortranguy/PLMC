@@ -74,7 +74,7 @@ contains
     
     subroutine Abstract_Positions_add(this, position)
         class(Abstract_Positions), intent(inout) :: this
-        real(DP), intent(in) :: position(num_dimensions)
+        real(DP), intent(in) :: position(:)
         
         if (size(this%positions, 2) < this%particles_num%get()) then
             call increase_coordinates_size(this%positions)

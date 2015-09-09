@@ -42,8 +42,8 @@ implicit none
     end do
 
     call diameters%destroy()
-    deallocate(particles_num)
     deallocate(diameters)
+    deallocate(particles_num)
     deallocate(data_field)
     deallocate(data_filename)
     call input_data%destroy()
