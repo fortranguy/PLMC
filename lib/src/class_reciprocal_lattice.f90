@@ -3,6 +3,7 @@ module class_reciprocal_lattice
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_geometry, only: num_dimensions
 use procedures_errors, only: warning_continue, error_exit
+use procedures_checks, only: check_3d_array, check_positive
 use class_periodic_box, only: Abstract_Periodic_Box
 
 implicit none
@@ -100,9 +101,8 @@ contains
         real(DP) :: real_size(num_dimensions)
         real(DP) :: real_zx_ratio, reci_zx_ratio
         
-        if (size(reci_num) /= num_dimensions) then
-            call error_exit("Concrete_Reciprocal_Lattice: wrong number of dimensions (size).")
-        end if
+        call check_3d_array("Concrete_Reciprocal_Lattice", "reci_num", reci_num)
+        call check_positive("Concrete_Reciprocal_Lattice", "reci_num", reci_num)
         if (reci_num(1) /= reci_num(2)) then
             call warning_continue("Concrete_Reciprocal_Lattice: "//&
                 "reci_num(1) and reci_num(2) are not equal.")

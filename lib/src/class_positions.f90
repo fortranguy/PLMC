@@ -4,6 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64, error_unit
 use data_geometry, only: num_dimensions
 use data_precisions, only: real_zero
 use procedures_errors, only: error_exit
+use procedures_checks, only: check_in_range, check_3d_array
 use class_particles_number, only: Abstract_Particles_Number
 use procedures_coordinates, only: increase_coordinates_size
 
@@ -18,7 +19,6 @@ private
     contains
         procedure :: construct => Abstract_Positions_construct
         procedure :: destroy => Abstract_Positions_destroy
-            
         procedure :: set => Abstract_Positions_set
         procedure :: get => Abstract_Positions_get
         procedure :: add => Abstract_Positions_add
@@ -58,9 +58,7 @@ contains
         integer, intent(in) :: i_particle
         real(DP), intent(in) :: position(:)
         
-        if (size(position) /= num_dimensions) then
-            call error_exit("Abstract_Positions: wrong number of dimensions (size).")
-        end if
+        call check_3d_array("Abstract_Positions", "position", position)
         this%positions(:, i_particle) = position
     end subroutine Abstract_Positions_set
     
@@ -86,9 +84,7 @@ contains
         class(Abstract_Positions), intent(inout) :: this
         integer, intent(in) :: i_particle
         
-        if (i_particle < 1 .or. this%particles_num%get() < i_particle) then
-            call error_exit("Uniform_Spheres: i_particle is out of range.")
-        end if
+        call check_in_range("Abstract_Positions", this%particles_num%get(), "i_particle", i_particle)
         if (i_particle < this%particles_num%get()) then
             call this%set(i_particle, this%get(this%particles_num%get()))
         end if

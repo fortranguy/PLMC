@@ -4,6 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64, error_unit
 use data_geometry, only: num_dimensions
 use data_precisions, only: real_zero
 use procedures_errors, only: error_exit, warning_continue
+use procedures_checks, only: check_in_range, check_3d_array
 use class_particles_number, only: Abstract_Particles_Number
 use procedures_coordinates, only: increase_coordinates_size
 
@@ -15,7 +16,6 @@ private
     contains
         procedure(Abstract_Orientations_construct), deferred :: construct
         procedure(Abstract_Orientations_destroy), deferred :: destroy
-            
         procedure(Abstract_Orientations_set), deferred :: set
         procedure(Abstract_Orientations_get), deferred :: get
         procedure(Abstract_Orientations_add), deferred :: add
@@ -168,9 +168,7 @@ contains
         integer, intent(in) :: i_particle
         real(DP), intent(in) :: orientation(:)
         
-        if (size(orientation) /= num_dimensions) then
-            call error_exit("Concrete_Orientations: wrong number of dimensions (size).")
-        end if
+        call check_3d_array("Concrete_Orientations", "orientation", orientation)
         if (abs(norm2(orientation)-1.0_DP) > real_zero) then
             call warning_continue("Concrete_Orientations: orientation may not be normed.")
         end if
@@ -199,9 +197,8 @@ contains
         class(Concrete_Orientations), intent(inout) :: this
         integer, intent(in) :: i_particle
         
-        if (i_particle < 1 .or. this%particles_num%get() < i_particle) then
-            call error_exit("Uniform_Spheres: i_particle is out of range.")
-        end if
+        call check_in_range("Concrete_Orientations", this%particles_num%get(), &
+                            "i_particle", i_particle)
         if (i_particle < this%particles_num%get()) then
             call this%set(i_particle, this%get(this%particles_num%get()))
         end if

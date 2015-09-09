@@ -3,7 +3,7 @@ module class_moment_norms
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_precisions, only: real_zero
 use procedures_errors, only: error_exit
-use procedures_checks, only: check_positive_real
+use procedures_checks, only: check_in_range, check_positive
 use class_particles_number, only: Abstract_Particles_Number
 
 implicit none
@@ -24,7 +24,6 @@ private
     contains
         procedure :: construct => Abstract_Moment_Norms_construct
         procedure :: destroy => Abstract_Moment_Norms_destroy
-        
         procedure(Abstract_Moment_Norms_set), deferred :: set
         procedure(Abstract_Moment_Norms_get), deferred :: get
         procedure(Abstract_Moment_Norms_add), deferred :: add
@@ -97,10 +96,9 @@ contains
         integer, intent(in) :: i_particle
         real(DP), intent(in) :: norm
         
-        if (i_particle < 1 .or. this%particles_num%get() < i_particle) then
-            call error_exit("Uniform_Moment_Norms: i_particle is out of range.")
-        end if
-        call check_positive_real("Uniform_Moment_Norms", "norm", norm)
+        call check_in_range("Uniform_Moment_Norms", this%particles_num%get(), &
+                            "i_particle", i_particle)
+        call check_positive("Uniform_Moment_Norms", "norm", norm)
         this%norm = norm
     end subroutine Uniform_Moment_Norms_set
 

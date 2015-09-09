@@ -3,7 +3,7 @@ module class_diameters
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_precisions, only: real_zero
 use procedures_errors, only: error_exit
-use procedures_checks, only: check_positive_real
+use procedures_checks, only: check_in_range, check_positive
 use class_particles_number, only: Abstract_Particles_Number
 
 implicit none
@@ -15,7 +15,6 @@ private
     contains
         procedure :: construct => Abstract_Diameters_construct
         procedure :: destroy => Abstract_Diameters_destroy
-        
         procedure(Abstract_Diameters_set), deferred :: set
         procedure(Abstract_Diameters_get), deferred :: get
         procedure(Abstract_Diameters_add), deferred :: add
@@ -88,10 +87,8 @@ contains
         integer, intent(in) :: i_particle
         real(DP), intent(in) :: diameter
         
-        if (i_particle < 1 .or. this%particles_num%get() < i_particle) then
-            call error_exit("Uniform_Diameters: i_particle is out of range.")
-        end if
-        call check_positive_real("Uniform_Diameters", "diameter", diameter)
+        call check_in_range("Uniform_Diameter", this%particles_num%get(), "i_particle", i_particle)
+        call check_positive("Uniform_Diameters", "diameter", diameter)
         this%diameter = diameter
     end subroutine Uniform_Diameters_set
 
@@ -107,17 +104,14 @@ contains
          class(Uniform_Diameters), intent(inout) :: this
          real(DP), intent(in) :: diameter
          
-        call check_positive_real("Uniform_Diameters", "diameter", diameter)
-        this%diameter = diameter
+        call this%set(this%particles_num%get(), diameter)
     end subroutine Uniform_Diameters_add
     
     subroutine Uniform_Diameters_remove(this, i_particle)
-         class(Uniform_Diameters), intent(inout) :: this
-         integer, intent(in) :: i_particle
-         
-        if (i_particle < 1 .or. this%particles_num%get() < i_particle) then
-            call error_exit("Uniform_Diameters: i_particle is out of range.")
-        end if
+        class(Uniform_Diameters), intent(inout) :: this
+        integer, intent(in) :: i_particle
+
+        call check_in_range("Uniform_Diameters", this%particles_num%get(), "i_particle", i_particle)
     end subroutine Uniform_Diameters_remove
     
 !end implementation Uniform_Diameters

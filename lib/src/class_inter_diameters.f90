@@ -2,7 +2,7 @@ module class_inter_diameters
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_precisions, only: real_zero
-use procedures_checks, only: check_positive_real
+use procedures_checks, only: check_positive
 use class_diameters, only: Abstract_Diameters
 
 implicit none
@@ -32,7 +32,7 @@ contains
         
         this%diameters_1 => diameters_1
         this%diameters_2 => diameters_2
-        call check_positive_real("Abstract_Inter_Diameters", "non_additivity", non_additivity)
+        call check_positive("Abstract_Inter_Diameters", "non_additivity", non_additivity)
         this%non_additivity = non_additivity
     end subroutine Abstract_Inter_Diameters_construct
     
