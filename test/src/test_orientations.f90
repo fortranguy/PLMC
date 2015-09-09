@@ -1,4 +1,4 @@
-module procedures_orientations
+module procedures_orientations_manipulate
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file
@@ -64,7 +64,7 @@ contains
         
     end subroutine manipulate_orientations
 
-end module procedures_orientations
+end module procedures_orientations_manipulate
 
 program test_orientations
 
@@ -72,7 +72,7 @@ use, intrinsic :: iso_fortran_env, only: output_unit
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
 use class_orientations, only: Abstract_Orientations, Null_Orientations, Concrete_Orientations
-use procedures_orientations, only: manipulate_orientations
+use procedures_orientations_manipulate, only: manipulate_orientations
 
 implicit none
     

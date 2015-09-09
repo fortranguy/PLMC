@@ -1,4 +1,4 @@
-module procedures_parallelepiped_domain
+module procedures_parallelepiped_domain_write
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 
@@ -29,7 +29,7 @@ contains
         end do
     end subroutine write_corners
 
-end module procedures_parallelepiped_domain
+end module procedures_parallelepiped_domain_write
 
 program test_parallelepiped_domain
 
@@ -40,7 +40,7 @@ use module_data, only: test_file_exists, test_data_found
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box
 use class_parallelepiped_domain, only: Abstract_Parallelepiped_Domain, &
                                        Concrete_Parallelepiped_Domain
-use procedures_parallelepiped_domain, only: write_corners
+use procedures_parallelepiped_domain_write, only: write_corners
 
 implicit none
 

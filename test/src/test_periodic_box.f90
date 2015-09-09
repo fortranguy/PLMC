@@ -1,4 +1,4 @@
-module procedures_periodic_box
+module procedures_periodic_box_print
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use data_geometry, only: num_dimensions
@@ -23,7 +23,7 @@ contains
         write(output_unit, *)
     end subroutine print_periodic_box
 
-end module procedures_periodic_box
+end module procedures_periodic_box_print
 
 program test_periodic_box
 
@@ -31,7 +31,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box, XY_Periodic_Box
-use procedures_periodic_box, only: print_periodic_box
+use procedures_periodic_box_print, only: print_periodic_box
 
 implicit none
 

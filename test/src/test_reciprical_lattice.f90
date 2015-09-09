@@ -1,4 +1,4 @@
-module procedures_reciprocal_lattice
+module procedures_reciprocal_lattice_print
 
 use, intrinsic :: iso_fortran_env, only: output_unit
 use json_module, only: json_file
@@ -34,7 +34,7 @@ contains
         deallocate(data_field)
     end subroutine print_reciprocal_lattice
 
-end module procedures_reciprocal_lattice
+end module procedures_reciprocal_lattice_print
 
 program test_reciprocal_lattice
 
@@ -44,7 +44,7 @@ use module_data, only: test_file_exists, test_data_found
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box
 use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice, Null_Reciprocal_Lattice, &
                                     Concrete_Reciprocal_Lattice
-use procedures_reciprocal_lattice, only: print_reciprocal_lattice
+use procedures_reciprocal_lattice_print, only: print_reciprocal_lattice
 
 implicit none
 

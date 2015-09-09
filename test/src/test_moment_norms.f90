@@ -1,4 +1,4 @@
-module procedures_moment_norms
+module procedures_moment_norms_manipulate
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file
@@ -47,7 +47,7 @@ contains
         
     end subroutine manipulate_moment_norms
 
-end module procedures_moment_norms
+end module procedures_moment_norms_manipulate
 
 program test_moment_norms
 
@@ -55,7 +55,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists
 use class_moment_norms, only: Abstract_Moment_Norms, Null_Moment_Norms, Uniform_Moment_Norms
-use procedures_moment_norms, only: manipulate_moment_norms
+use procedures_moment_norms_manipulate, only: manipulate_moment_norms
 
 implicit none
     
