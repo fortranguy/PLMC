@@ -30,10 +30,10 @@
         \begin{scope}[shift={($(AbstractPeriodicBox.north) + (-11 cm, 5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractParallelepipedDomain}{0, 0}
                 \operation{construct(periodicBox\type{AbstractPeriodicBox}, origin\type{double[3]},
-                                      domainSize\type{double[3]})}
+                                     size\type{double[3]})}
                 \operation{destroy()}
-                \operation{isInside(position\type{double[3]})\type{bool}}
                 \operation{getVolume()}
+                \operation{isInside(position\type{double[3]})\type{bool}}
             \end{abstractclass}
         \end{scope}
         
