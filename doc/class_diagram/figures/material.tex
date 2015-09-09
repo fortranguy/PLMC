@@ -3,8 +3,8 @@
         
         \begin{scope}[opacity=1]
             \begin{abstractclass}[text width=\largeTextWidth]{AbstractPeriodicBox}{0, 0}
-                \operation{setRealSize(realSize\type{double[3]})}
-                \operation{getRealSize()\type{double[3]}}
+                \operation{setSize(size\type{double[3]})}
+                \operation{getSize()\type{double[3]}}
                 \operation{distance(position1\type{double[3]},
                                     position2\type{double[3]})\type{double}}
                 \operation{vector(position1\type{double[3]},
@@ -39,15 +39,15 @@
         
         \begin{scope}[shift={($(AbstractPeriodicBox.north) + (11 cm, 5 cm)$)}, opacity=1]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractReciprocalLattice}{0, 0}
-                \operation[0]{contruct(periodicBox\type{AbstractPeriodicBox}, reciNum\type{int[3]})}
+                \operation[0]{contruct(periodicBox\type{AbstractPeriodicBox}, num\type{int[3]})}
                 \operation[0]{destroy()}
-                \operation[0]{getReciNum()\type{int[3]}}
+                \operation[0]{getNum()\type{int[3]}}
             \end{abstractclass}
             
             \def\operationsImplementation{
-                \operation{contruct(periodicBox\type{AbstractPeriodicBox}, reciNum\type{int[3]})}
+                \operation{contruct(periodicBox\type{AbstractPeriodicBox}, num\type{int[3]})}
                 \operation{destroy()}
-                \operation{getReciNum()\type{int[3]}}
+                \operation{getNum()\type{int[3]}}
             }
             
             \begin{class}[text width=\mediumTextWidth]{NullReciprocalLattice}{0, -4}

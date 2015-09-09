@@ -12,11 +12,11 @@ private
 
     type, abstract, public :: Abstract_Periodic_Box
     private
-        real(DP) :: real_size(num_dimensions)
+        real(DP) :: size(num_dimensions)
     contains
-        procedure :: set_real_size => Abstract_Periodic_Box_set_real_size
+        procedure :: set_size => Abstract_Periodic_Box_set_size
         procedure, nopass, private :: check => Abstract_Periodic_Box_check
-        procedure :: get_real_size => Abstract_Periodic_Box_get_real_size
+        procedure :: get_size => Abstract_Periodic_Box_get_size
         procedure :: distance => Abstract_Periodic_Box_distance
         procedure :: vector => Abstract_Periodic_Box_vector
         procedure(Abstract_Periodic_Box_folded), deferred :: folded
@@ -47,31 +47,31 @@ contains
 
 !implementation Abstract_Periodic_Box
 
-    subroutine Abstract_Periodic_Box_set_real_size(this, real_size)
+    subroutine Abstract_Periodic_Box_set_size(this, size)
         class(Abstract_Periodic_Box), intent(out) :: this
-        real(DP), intent(in) :: real_size(:)
+        real(DP), intent(in) :: size(:)
 
-        call this%check(real_size)
-        this%real_size = real_size
-    end subroutine Abstract_Periodic_Box_set_real_size
+        call this%check(size)
+        this%size = size
+    end subroutine Abstract_Periodic_Box_set_size
 
-    subroutine Abstract_Periodic_Box_check(real_size)
-        real(DP), intent(in) :: real_size(:)
+    subroutine Abstract_Periodic_Box_check(size)
+        real(DP), intent(in) :: size(:)
         
-        call check_3d_array("Abstract_Periodic_Box", "real_size", real_size)
-        call check_positive("Abstract_Periodic_Box", "real_size", real_size)
-        if (abs(real_size(1)-real_size(2)) > real_zero) then
+        call check_3d_array("Abstract_Periodic_Box", "size", size)
+        call check_positive("Abstract_Periodic_Box", "size", size)
+        if (abs(size(1)-size(2)) > real_zero) then
             call warning_continue("Abstract_Periodic_Box: "//&
-                "real_size(1) and real_size(2) are not equal.")
+                "size(1) and size(2) are not equal.")
         end if
     end subroutine Abstract_Periodic_Box_check
 
-    pure function Abstract_Periodic_Box_get_real_size(this) result(real_size)
+    pure function Abstract_Periodic_Box_get_size(this) result(size)
         class(Abstract_Periodic_Box), intent(in) :: this
-        real(DP) :: real_size(num_dimensions)
+        real(DP) :: size(num_dimensions)
 
-        real_size = this%real_size
-    end function Abstract_Periodic_Box_get_real_size
+        size = this%size
+    end function Abstract_Periodic_Box_get_size
 
     pure function Abstract_Periodic_Box_distance(this, position_1, position_2) result(distance)
         class(Abstract_Periodic_Box), intent(in) :: this
@@ -99,9 +99,9 @@ contains
         real(DP), intent(in) :: position(:)
         real(DP) :: folded_position(num_dimensions)
         
-        folded_position = modulo(position, this%real_size)
-        where(folded_position > this%real_size/2._DP)
-            folded_position = folded_position - this%real_size
+        folded_position = modulo(position, this%size)
+        where(folded_position > this%size/2._DP)
+            folded_position = folded_position - this%size
         end where
     end function XYZ_Periodic_Box_folded
 
@@ -114,9 +114,9 @@ contains
         real(DP), intent(in) :: position(:)
         real(DP) :: folded_position(num_dimensions)
         
-        folded_position(1:2) = modulo(position(1:2), this%real_size(1:2))
-        where(folded_position(1:2) > this%real_size(1:2)/2._DP)
-            folded_position(1:2) = folded_position(1:2) - this%real_size(1:2)
+        folded_position(1:2) = modulo(position(1:2), this%size(1:2))
+        where(folded_position(1:2) > this%size(1:2)/2._DP)
+            folded_position(1:2) = folded_position(1:2) - this%size(1:2)
         end where
         folded_position(3) = position(3)
     end function XY_Periodic_Box_folded

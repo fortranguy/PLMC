@@ -56,8 +56,8 @@ contains
         box_origin = 0._DP
         corner_minus = this%origin - this%size/2._DP
         corner_plus = this%origin + this%size/2._DP
-        is_boxed = point_is_inside(box_origin, this%periodic_box%get_real_size(), corner_minus) &
-                   .and. point_is_inside(box_origin, this%periodic_box%get_real_size(), corner_plus)
+        is_boxed = point_is_inside(box_origin, this%periodic_box%get_size(), corner_minus) &
+                   .and. point_is_inside(box_origin, this%periodic_box%get_size(), corner_plus)
     end function Abstract_Parallelepiped_Domain_is_boxed
     
         

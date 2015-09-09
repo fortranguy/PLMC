@@ -15,7 +15,7 @@ contains
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         real(DP), intent(in) :: position_1(:), position_2(:)
 
-        write(output_unit, *) "size =", periodic_box%get_real_size()
+        write(output_unit, *) "size =", periodic_box%get_size()
         write(output_unit, *) "position_1", periodic_box%folded(position_1)
         write(output_unit, *) "position_2", periodic_box%folded(position_2)
         write(output_unit, *) "vector =", periodic_box%vector(position_1, position_2)
@@ -60,7 +60,7 @@ implicit none
     data_field = "Periodic Box.real size"
     call input_data%get(data_field, periodic_box_size, found)
     call test_data_found(data_field, found)
-    call periodic_box%set_real_size(periodic_box_size)
+    call periodic_box%set_size(periodic_box_size)
     call print_periodic_box(periodic_box, position_1, position_2)
     deallocate(periodic_box)
     
@@ -69,7 +69,7 @@ implicit none
     data_field = "Periodic Box.real size"
     call input_data%get(data_field, periodic_box_size, found)
     call test_data_found(data_field, found)
-    call periodic_box%set_real_size(periodic_box_size)
+    call periodic_box%set_size(periodic_box_size)
     call print_periodic_box(periodic_box, position_1, position_2)
     deallocate(periodic_box)
     
