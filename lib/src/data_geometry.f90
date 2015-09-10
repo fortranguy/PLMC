@@ -1,6 +1,9 @@
 module data_geometry
 
 implicit none
+
+private
+public num_dimensions
     
     integer, parameter :: num_dimensions = 3
     
