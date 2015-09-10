@@ -3,7 +3,7 @@ module procedures_external_field_write
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_geometry, only: num_dimensions
 use class_periodic_box, only: Abstract_Periodic_Box
-use class_external_field, only: Abstract_External_Field
+use class_external_field, only: External_Field_Facade
 
 implicit none
 
@@ -15,7 +15,7 @@ contains
     subroutine write_field(field_unit, periodic_box, external_field, delta)
         integer, intent(in) :: field_unit
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        class(Abstract_External_Field), intent(in) :: external_field
+        type(External_Field_Facade), intent(in) :: external_field
         real(DP), intent(in) :: delta(:)
 
         integer :: indices(num_dimensions), i, j, k
@@ -45,12 +45,12 @@ use types_field_parameters, only: Abstract_Field_Parameters, Constant_Field_Para
 use class_field_expression, only: Abstract_Field_Expression, Constant_Field_Expression
 use class_parallelepiped_domain, only: Abstract_Parallelepiped_Domain, &
                                        Concrete_Parallelepiped_Domain
-use class_external_field, only: Abstract_External_Field, Concrete_External_Field
+use class_external_field, only: External_Field_Facade
 use procedures_external_field_write, only: write_field
 
 implicit none
 
-    class(Abstract_External_Field), allocatable :: external_field
+    type(External_Field_Facade) :: external_field
     class(Abstract_Parallelepiped_Domain), allocatable :: parallelepiped_domain
     class(Abstract_Periodic_Box), allocatable :: periodic_box
     class(Abstract_Field_Expression), allocatable :: field_expression
@@ -107,14 +107,12 @@ implicit none
     data_field = "External Field.delta"
     call input_data%get(data_field, delta, found)
     call test_data_found(data_field, found)
-    allocate(Concrete_External_Field :: external_field)
     call external_field%construct(parallelepiped_domain, field_expression)
     open(newunit=field_unit, recl=4096, file="constant_field.out", action="write")
     call write_field(field_unit, periodic_box, external_field, delta)
     close(field_unit)
 
     call external_field%destroy()
-    deallocate(external_field)
     call parallelepiped_domain%destroy()
     deallocate(parallelepiped_domain)
     deallocate(periodic_box)

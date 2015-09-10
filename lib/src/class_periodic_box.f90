@@ -60,7 +60,7 @@ contains
         
         call check_3d_array("Abstract_Periodic_Box", "size", size)
         call check_positive("Abstract_Periodic_Box", "size", size)
-        if (abs(size(1)-size(2)) > real_zero) then
+        if (abs(size(1) - size(2)) > real_zero) then
             call warning_continue("Abstract_Periodic_Box: "//&
                 "size(1) and size(2) are not equal.")
         end if

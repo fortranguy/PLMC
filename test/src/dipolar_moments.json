@@ -1,0 +1,17 @@
+{
+    "Dipoles": {
+        "number": 3,
+        "1": {
+            "moment norm": 0.5,
+            "orientation": [0.0, 0.0, -1.0]
+        },
+        "2": {
+            "moment norm": 0.5,
+            "orientation": [0.0, 1.0, 0.0]
+        },
+        "3": {
+            "moment norm": 0.5,
+            "orientation": [-1.0, 0.0, 0.0]
+        }
+    }
+}

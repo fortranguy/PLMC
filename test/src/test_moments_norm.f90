@@ -14,7 +14,6 @@ public manipulate_moments_norm
 contains
 
     subroutine manipulate_moments_norm(object_name, moments_norm, input_data)
-    
         character(len=*), intent(in) :: object_name
         class(Abstract_Moments_Norm), intent(inout) :: moments_norm
         type(json_file) :: input_data

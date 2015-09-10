@@ -169,7 +169,7 @@ contains
         real(DP), intent(in) :: orientation(:)
         
         call check_3d_array("Concrete_Orientations", "orientation", orientation)
-        if (abs(norm2(orientation)-1.0_DP) > real_zero) then
+        if (abs(norm2(orientation) - 1.0_DP) > real_zero) then
             call warning_continue("Concrete_Orientations: orientation may not be normed.")
         end if
         this%orientations(:, i_particle) = orientation

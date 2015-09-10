@@ -79,12 +79,12 @@
         
         \begin{scope}[shift={($(AbstractParallelepipedDomain.north)!0.5!
                                 (AbstractFieldExpression.north) + (0 cm, 7 cm)$)}, opacity=1]
-            \begin{abstractclass}[text width=\largeTextWidth]{AbstractExternalField}{0, 0}
+            \begin{class}[text width=\largeTextWidth]{ExternalFieldFacade}{0, 0}
                 \operation{construct(parallelepipedDomain\type{AbstractParallelepipedDomain},
                     fieldExpression\type{AbstractFieldExpression})}
                 \operation{destroy()}
                 \operation{get(position\type{double[3]})\type{double[3]}}
-            \end{abstractclass}
+            \end{class}
         \end{scope}
         
         \begin{scope}[shift={($(AbstractFieldExpression.north) + (-9 cm, 0)$)}, opacity=1]
@@ -209,6 +209,15 @@
             \end{class}            
         \end{scope}
         
+        \begin{scope}[shift={($(AbstractOrientations.north) + (10 cm, 10 cm)$)}, opacity=1]
+            \begin{class}[text width=\mediumTextWidth]{DipolarMomentsFacade}{0, 0}
+                \operation{construct(momentsNorm\type{AbstractMomentsNorm}, 
+                                     orientations\type{AbstractOrientations})}
+                \operation{destroy()}
+                \operation{get(iParticle\type{int})}
+            \end{class}
+        \end{scope}
+        
         \begin{scope}[shift={($(AbstractRandomPositions.north -| AbstractOrientations.north)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractRandomOrientations}{0, 0}
                 \operation[0]{orientation()\type{double[3]}}
@@ -231,7 +240,7 @@
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractOrientations.north) + (10 cm, 10 cm)$)}]
+        \begin{scope}[shift={($(DipolarMomentsFacade.north) + (10 cm, 5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractTotalMoment}{0, 0}
                 \operation[0]{get()\type{double[3]}}
                 \operation[0]{rotationUpdate(old\type{Particle}, new\type{Particle})}
@@ -278,8 +287,8 @@
 \begin{scope}[on background layer]
     \aggregation{AbstractParallelepipedDomain}{periodicBox}{1}{AbstractPeriodicBox}
     \aggregation{ReciprocalLattice}{periodicBox}{1}{AbstractPeriodicBox}
-    \aggregation{AbstractExternalField}{parallelepipedDomain}{1}{AbstractParallelepipedDomain}
-    \aggregation{AbstractExternalField}{fieldExpression}{1}{AbstractFieldExpression}
+    \aggregation{ExternalFieldFacade}{parallelepipedDomain}{1}{AbstractParallelepipedDomain}
+    \aggregation{ExternalFieldFacade}{fieldExpression}{1}{AbstractFieldExpression}
     
     \aggregation{AbstractDiameters}{particlesNumber}{1}{AbstractParticlesNumber}
     \aggregation{AbstractMomentsNorm}{particlesNumber}{1}{AbstractParticlesNumber}
@@ -289,6 +298,10 @@
     \aggregation{AbstractInterDiameters}{diameters}{2}{AbstractDiameters}
     \aggregation{AbstractPositions}{particlesNumber}{1}{AbstractParticlesNumber}
     \aggregation{AbstractOrientations}{particlesNumber}{1}{AbstractParticlesNumber}
+    
+    \aggregation{DipolarMomentsFacade}{momentsNorm}{1}{AbstractMomentsNorm}
+    \aggregation{DipolarMomentsFacade}{orientations}{1}{AbstractOrientations}
+    
     \aggregation{CoordinatesExchangeFacade}{positions}{1}{AbstractPositions}
     \aggregation{CoordinatesExchangeFacade}{orientations}{1}{AbstractOrientations}
     

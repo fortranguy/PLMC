@@ -1,6 +1,7 @@
 module class_moments_norm
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
+use data_precisions, only: real_zero
 use procedures_errors, only: warning_continue
 use procedures_checks, only: check_in_range, check_positive
 use class_particles_number, only: Abstract_Particles_Number
@@ -82,6 +83,7 @@ private
     type, extends(Abstract_Moments_Norm), public :: Uniform_Moments_Norm
     private
         real(DP) :: norm
+        logical :: is_set = .false.
         class(Abstract_Particles_Number), pointer :: particles_number
     contains
         procedure :: construct => Uniform_Moments_Norm_construct
@@ -159,6 +161,11 @@ contains
         call check_in_range("Uniform_Moments_Norm", this%particles_number%get(), &
                             "i_particle", i_particle)
         call check_positive("Uniform_Moments_Norm", "norm", norm)
+        if (.not. this%is_set) then
+            this%is_set = .true.
+        else if (abs(norm - this%norm) > real_zero) then
+            call warning_continue("Uniform_Moments_Norm: setting norm is different.")
+        end if
         this%norm = norm
     end subroutine Uniform_Moments_Norm_set
 
@@ -174,7 +181,7 @@ contains
         class(Uniform_Moments_Norm), intent(inout) :: this
         real(DP), intent(in) :: norm
         
-        if (norm /= this%norm) then
+        if (abs(norm - this%norm) > real_zero) then
             call warning_continue("Uniform_Moments_Norm: adding norm is different.")
         end if
         call this%set(this%particles_number%get(), norm)
@@ -184,7 +191,8 @@ contains
          class(Uniform_Moments_Norm), intent(inout) :: this
          integer, intent(in) :: i_particle
          
-        call check_in_range("Uniform_Moments_Norm", this%particles_number%get(), "i_particle", i_particle)
+        call check_in_range("Uniform_Moments_Norm", this%particles_number%get(), &
+                            "i_particle", i_particle)
     end subroutine Uniform_Moments_Norm_remove
     
 !end implementation Uniform_Moments_Norm
