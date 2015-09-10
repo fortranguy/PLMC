@@ -21,7 +21,7 @@ private
 contains
 
     subroutine Abstract_Particles_Number_set(this, num)
-        class(Abstract_Particles_Number), intent(out) :: this
+        class(Abstract_Particles_Number), intent(inout) :: this
         integer, intent(in) :: num
 
         if (num < 0) call error_exit("Abstract_Particles_Number: num is negative.")

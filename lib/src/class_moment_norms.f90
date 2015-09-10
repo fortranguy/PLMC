@@ -1,6 +1,7 @@
 module class_moment_norms
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
+use procedures_errors, only: warning_continue
 use procedures_checks, only: check_in_range, check_positive
 use class_particles_number, only: Abstract_Particles_Number
 
@@ -168,11 +169,14 @@ contains
         
         norm = this%norm
     end function Uniform_Moment_Norms_get
-    
+
     subroutine Uniform_Moment_Norms_add(this, norm)
-         class(Uniform_Moment_Norms), intent(inout) :: this
-         real(DP), intent(in) :: norm
-         
+        class(Uniform_Moment_Norms), intent(inout) :: this
+        real(DP), intent(in) :: norm
+        
+        if (norm /= this%norm) then
+            call warning_continue("Uniform_Moment_Norms: adding norm is different.")
+        end if
         call this%set(this%particles_num%get(), norm)
     end subroutine Uniform_Moment_Norms_add
     

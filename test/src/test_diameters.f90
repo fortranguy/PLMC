@@ -40,6 +40,23 @@ implicit none
     do i_particle = 1, particles_num%get()
         write(output_unit, *) "diameter", i_particle, "=", diameters%get(i_particle)
     end do
+    
+    data_field = "Diameters.add"
+    call input_data%get(data_field, diameters_diameter, found)
+    call test_data_found(data_field, found)
+    call particles_num%set(particles_num%get() + 1)
+    call diameters%add(diameters_diameter)
+    write(output_unit, *) "new diameter", particles_num%get(), "=", &
+        diameters%get(particles_num%get())
+    
+    data_field = "Diameters.remove"
+    call input_data%get(data_field, i_particle, found)
+    call test_data_found(data_field, found)
+    call diameters%remove(i_particle)
+    call particles_num%set(particles_num%get() - 1)
+    do i_particle = 1, particles_num%get()
+        write(output_unit, *) "diameter", i_particle, "=", diameters%get(i_particle)
+    end do
 
     call diameters%destroy()
     deallocate(diameters)

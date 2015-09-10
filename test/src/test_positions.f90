@@ -46,7 +46,7 @@ implicit none
     call test_data_found(data_field, found)
     call particles_num%set(particles_num%get() + 1)
     call positions%add(position)
-    write(output_unit, *) "position", particles_num%get(), "=", positions%get(i_particle)
+    write(output_unit, *) "position", particles_num%get(), "=", positions%get(particles_num%get())
     
     data_field = "Positions.remove"
     call input_data%get(data_field, i_particle, found)

@@ -48,7 +48,8 @@ contains
         call test_data_found(data_field, found)
         call particles_num%set(particles_num%get() + 1)
         call orientations%add(orientation)
-        write(output_unit, *) "orientation", particles_num%get(), "=", orientations%get(i_particle)
+        write(output_unit, *) "orientation", particles_num%get(), "=", &
+            orientations%get(particles_num%get())
         
         data_field = "Orientations.remove"
         call input_data%get(data_field, i_particle, found)

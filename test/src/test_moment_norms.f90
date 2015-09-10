@@ -40,6 +40,22 @@ contains
         do i_particle = 1, particles_num%get()
             write(output_unit, *) "norm", i_particle, "=", moment_norms%get(i_particle)
         end do
+        data_field = "Moment Norms.add"
+        call input_data%get(data_field, moment_norms_norm, found)
+        call test_data_found(data_field, found)
+        call particles_num%set(particles_num%get() + 1)
+        call moment_norms%add(moment_norms_norm)
+        write(output_unit, *) "new norm", particles_num%get(), "=", &
+            moment_norms%get(particles_num%get())
+        
+        data_field = "Moment Norms.remove"
+        call input_data%get(data_field, i_particle, found)
+        call test_data_found(data_field, found)
+        call moment_norms%remove(i_particle)
+        call particles_num%set(particles_num%get() - 1)
+        do i_particle = 1, particles_num%get()
+            write(output_unit, *) "norm", i_particle, "=", moment_norms%get(i_particle)
+        end do
         call moment_norms%destroy()
         
         deallocate(data_field)

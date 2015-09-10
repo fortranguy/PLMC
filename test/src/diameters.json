@@ -1,6 +1,8 @@
 {
     "Diameters": {
         "number": 10,
-        "diameter": 1.0
+        "diameter": 1.0,
+        "add": 1.0,
+        "remove": 3
     }
 }

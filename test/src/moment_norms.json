@@ -1,6 +1,8 @@
 {
     "Moment Norms": {
         "number": 10,
-        "norm": 1.0
+        "norm": 1.0,
+        "add": 1.0,
+        "remove": 3
     }
 }
