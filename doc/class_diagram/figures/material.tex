@@ -78,10 +78,10 @@
         \end{scope}
         
         \begin{scope}[shift={($(AbstractParallelepipedDomain.north)!0.5!
-                                (AbstractFieldExpression.north) + (0 cm, 7 cm)$)}]
+                                (AbstractFieldExpression.north) + (0 cm, 7 cm)$)}, opacity=1]
             \begin{abstractclass}[text width=\largeTextWidth]{AbstractExternalField}{0, 0}
                 \operation{construct(parallelepipedDomain\type{AbstractParallelepipedDomain},
-                    fieldFunction\type{AbstractFieldFunction})}
+                    fieldExpression\type{AbstractFieldExpression})}
                 \operation{destroy()}
                 \operation{get(position\type{double[3]})\type{double[3]}}
             \end{abstractclass}

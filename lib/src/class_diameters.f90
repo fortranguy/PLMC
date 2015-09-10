@@ -1,8 +1,6 @@
 module class_diameters
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use data_precisions, only: real_zero
-use procedures_errors, only: error_exit
 use procedures_checks, only: check_in_range, check_positive
 use class_particles_number, only: Abstract_Particles_Number
 
