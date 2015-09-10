@@ -108,7 +108,7 @@ implicit none
     num_particles_inside = 0
     do i_particle = 1, num_particles
         call random_number(rand)
-        position = parallelepiped_domain%get_inside_position(rand)
+        position = parallelepiped_domain%get_inside(rand)
         if (parallelepiped_domain%is_inside(position)) then
             num_particles_inside = num_particles_inside + 1
             write(positions_domain_unit, *) position

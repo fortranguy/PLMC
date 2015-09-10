@@ -3,18 +3,20 @@ program test_positions
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
+use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box
 use class_particles_number, only: Abstract_Particles_Number, Concrete_Particles_Number
 use class_positions, only: Abstract_Positions, Concrete_Positions
 
 implicit none
-    
+
+    class(Abstract_Periodic_Box), allocatable :: periodic_box
     class(Abstract_Particles_Number), allocatable :: particles_number
     class(Abstract_Positions), allocatable :: positions
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename, data_field
     logical :: found
     integer :: positions_num, i_particle
-    real(DP), allocatable :: position(:)
+    real(DP), allocatable :: periodic_box_size(:), position(:)
     character(len=1024) :: string_i
 
     call json_initialize()
@@ -22,6 +24,13 @@ implicit none
     data_filename = "positions.json"
     call test_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
+
+    allocate(XYZ_Periodic_Box :: periodic_box)
+    write(output_unit, *) "XYZ_Periodic_Box"
+    data_field = "Periodic Box.size"
+    call input_data%get(data_field, periodic_box_size, found)
+    call test_data_found(data_field, found)
+    call periodic_box%set_size(periodic_box_size)
     
     allocate(Concrete_Particles_Number :: particles_number)
     data_field = "Positions.number"
@@ -30,7 +39,7 @@ implicit none
     call particles_number%set(positions_num)
     
     allocate(Concrete_Positions :: positions)
-    call positions%construct(particles_number)
+    call positions%construct(periodic_box, particles_number)
     
     do i_particle = 1, particles_number%get()
         write(string_i, *) i_particle
@@ -61,6 +70,7 @@ implicit none
     call positions%destroy()
     deallocate(positions)
     deallocate(particles_number)
+    deallocate(periodic_box)
     deallocate(data_field)
     deallocate(data_filename)
     call input_data%destroy()

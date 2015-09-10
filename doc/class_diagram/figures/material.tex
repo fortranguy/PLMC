@@ -34,7 +34,7 @@
                 \operation{destroy()}
                 \operation{getVolume()}
                 \operation{isInside(position\type{double[3]})\type{bool}}
-                \operation{getInsidePosition(insideUnitCube\type{double[3]})\type{double[3]}}
+                \operation{getInside(inUnitCube\type{double[3]})\type{double[3]}}
             \end{abstractclass}
         \end{scope}
         
@@ -155,7 +155,8 @@
         
         \begin{scope}[shift={($(AbstractInterDiameters.north) + (9 cm, 0 cm)$)}, opacity=1]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractPositions}{0, 0}
-                \operation{construct(particlesNumber\type{AbstractParticlesNumber})}
+                \operation{construct(periodicBox\type{AbstractPeriodicBox},
+                                      particlesNumber\type{AbstractParticlesNumber})}
                 \operation{detroy()}
                 \operation{set(iParticle\type{int}, position\type{double[3]})}
                 \operation{get(iParticle\type{int})\type{double[3]}}
@@ -172,10 +173,12 @@
         %    \end{abstractclass}
         %\end{scope}
         
-        \begin{scope}[shift={($(AbstractPositions.north) + (0 cm, 8 cm)$)}]
-            \begin{abstractclass}[text width=\smallTextWidth]{AbstractRandomPositions}{0, 0}
-                \operation{position()\type{double[3]}}
-                \operation{move(iParticle\type{int})\type{double[3]}}
+        \begin{scope}[shift={($(AbstractPositions.north) + (0 cm, 8 cm)$)}, opacity=1]
+            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractSmallMove}{0, 0}
+                \operation{construct(positions\type{AbstractPositions})}
+                \operation{destroy()}
+                \operation{set(delta\type{double})}
+                \operation{get(iParticle\type{int})\type{double[3]}}
             \end{abstractclass}
         \end{scope}
 
@@ -218,7 +221,7 @@
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractRandomPositions.north -| AbstractOrientations.north)$)}]
+        \begin{scope}[shift={($(AbstractSmallMove.north -| AbstractOrientations.north)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractRandomOrientations}{0, 0}
                 \operation[0]{orientation()\type{double[3]}}
                 \operation[0]{rotation(iParticle\type{int})\type{double[3]}}
@@ -264,8 +267,7 @@
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={
-            ($(AbstractRandomPositions.north)!0.5!(AbstractRandomOrientations.north) + 
+        \begin{scope}[shift={($(AbstractSmallMove.north)!0.5!(AbstractRandomOrientations.north) +
             (0 cm, 4 cm)$)}]
             \begin{class}[text width=\mediumTextWidth]{RandomCoordinatesFacade}{0, 0}
                 \operation{position()\type{double[3]}}
@@ -296,6 +298,7 @@
     %\aggregation{AbstractBoxedParticles}{periodicBox}{1}{AbstractPeriodicBox}
     %\aggregation{AbstractBoxedParticles}{positions}{1}{AbstractPositions}
     \aggregation{AbstractInterDiameters}{diameters}{2}{AbstractDiameters}
+    \aggregation{AbstractPositions}{periodicBox}{1}{AbstractPeriodicBox}
     \aggregation{AbstractPositions}{particlesNumber}{1}{AbstractParticlesNumber}
     \aggregation{AbstractOrientations}{particlesNumber}{1}{AbstractParticlesNumber}
     
@@ -305,10 +308,9 @@
     \aggregation{CoordinatesExchangeFacade}{positions}{1}{AbstractPositions}
     \aggregation{CoordinatesExchangeFacade}{orientations}{1}{AbstractOrientations}
     
-    \aggregation{AbstractRandomPositions}{periodicBox}{1}{AbstractPeriodicBox}
-    \aggregation{AbstractRandomPositions}{positions}{1}{AbstractPositions}
+    \aggregation{AbstractSmallMove}{positions}{1}{AbstractPositions}
 
-    \aggregation{RandomCoordinatesFacade}{randPositions}{1}{AbstractRandomPositions}
+    \aggregation{RandomCoordinatesFacade}{randPositions}{1}{AbstractSmallMove}
     \aggregation{RandomCoordinatesFacade}{randMoments}{1}{AbstractRandomOrientations}
     
     \aggregation{AbstractRandomOrientations}{orientations}{1}{AbstractOrientations}

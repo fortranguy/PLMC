@@ -1,6 +1,7 @@
 module class_diameters
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
+use data_precisions, only: real_zero
 use procedures_errors, only: warning_continue
 use procedures_checks, only: check_in_range, check_positive
 use class_particles_number, only: Abstract_Particles_Number
@@ -104,7 +105,7 @@ contains
         class(Uniform_Diameters), intent(inout) :: this
         real(DP), intent(in) :: diameter
         
-        if (diameter /= this%diameter) then
+        if (abs(diameter - this%diameter) > real_zero) then
             call warning_continue("Uniform_Diameters: adding diameter is different.")
         end if
         call this%set(this%particles_number%get(), diameter)

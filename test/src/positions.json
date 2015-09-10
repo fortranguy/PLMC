@@ -1,4 +1,7 @@
 {
+    "Periodic Box": {
+        "size": [10.0, 10.0, 10.0]
+    },
     "Positions": {
         "number": 3,
         "1": [0.0, 0.0, 0.0],

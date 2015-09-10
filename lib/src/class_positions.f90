@@ -3,6 +3,7 @@ module class_positions
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, error_unit
 use data_geometry, only: num_dimensions
 use procedures_checks, only: check_in_range, check_3d_array
+use class_periodic_box, only: Abstract_Periodic_Box
 use class_particles_number, only: Abstract_Particles_Number
 use procedures_coordinates, only: increase_coordinates_size
 
@@ -12,8 +13,9 @@ private
 
     type, abstract, public :: Abstract_Positions
     private
-        real(DP), allocatable :: positions(:, :)
+        class(Abstract_Periodic_Box), pointer :: periodic_box
         class(Abstract_Particles_Number), pointer :: particles_number
+        real(DP), allocatable :: positions(:, :)
     contains
         procedure :: construct => Abstract_Positions_construct
         procedure :: destroy => Abstract_Positions_destroy
@@ -31,10 +33,12 @@ contains
 
 !implementation Abstract_Positions
 
-    subroutine Abstract_Positions_construct(this, particles_number)
+    subroutine Abstract_Positions_construct(this, periodic_box, particles_number)
         class(Abstract_Positions), intent(out) :: this
+        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Particles_Number), target, intent(in) :: particles_number
-        
+
+        this%periodic_box => periodic_box
         this%particles_number => particles_number
         if (this%particles_number%get() == 0) then
             allocate(this%positions(num_dimensions, 1))
@@ -49,6 +53,7 @@ contains
         
         if (allocated(this%positions)) deallocate(this%positions)
         this%particles_number => null()
+        this%periodic_box => null()
     end subroutine Abstract_Positions_destroy
     
     subroutine Abstract_Positions_set(this, i_particle, position)
@@ -57,7 +62,7 @@ contains
         real(DP), intent(in) :: position(:)
         
         call check_3d_array("Abstract_Positions", "position", position)
-        this%positions(:, i_particle) = position
+        this%positions(:, i_particle) = this%periodic_box%folded(position)
     end subroutine Abstract_Positions_set
     
     pure function Abstract_Positions_get(this, i_particle) result(position)

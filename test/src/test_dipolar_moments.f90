@@ -49,7 +49,7 @@ contains
             call test_data_found(data_field, data_found)
             call orientations%set(i_particle, orientation)
             deallocate(orientation)
-        end do   
+        end do
     end subroutine construct_objects
     
     subroutine print_dipolar_moments(particles_number, dipolar_moments)
@@ -99,26 +99,26 @@ implicit none
     call particles_number%set(num_particles)
     
     allocate(Null_Moments_Norm :: moments_norm)
-    allocate(Null_Orientations :: orientations)    
+    allocate(Null_Orientations :: orientations)
     call construct_objects(input_data, particles_number, "Null_Moments_Norm", moments_norm, &
                            "Null_Orientations", orientations)
     call dipolar_moments%construct(moments_norm, orientations)
     call print_dipolar_moments(particles_number, dipolar_moments)
     call dipolar_moments%destroy()
     call orientations%destroy()
-    call moments_norm%destroy() 
+    call moments_norm%destroy()
     deallocate(orientations)
     deallocate(moments_norm)
     
     allocate(Uniform_Moments_Norm :: moments_norm)
-    allocate(Concrete_Orientations :: orientations)    
+    allocate(Concrete_Orientations :: orientations)
     call construct_objects(input_data, particles_number, "Uniform_Moments", moments_norm, &
                            "Concrete_Orientations", orientations)
     call dipolar_moments%construct(moments_norm, orientations)
     call print_dipolar_moments(particles_number, dipolar_moments)
     call dipolar_moments%destroy()
     call orientations%destroy()
-    call moments_norm%destroy() 
+    call moments_norm%destroy()
     deallocate(orientations)
     deallocate(moments_norm)
     

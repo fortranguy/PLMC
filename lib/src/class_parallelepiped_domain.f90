@@ -21,7 +21,7 @@ private
         procedure :: destroy => Abstract_Parallelepiped_Domain_destroy
         procedure :: get_volume => Abstract_Parallelepiped_Domain_get_volume
         procedure :: is_inside => Abstract_Parallelepiped_Domain_is_inside
-        procedure :: get_inside_position => Abstract_Parallelepiped_Domain_get_inside_position
+        procedure :: get_inside => Abstract_Parallelepiped_Domain_get_inside
     end type Abstract_Parallelepiped_Domain
     
     type, extends(Abstract_Parallelepiped_Domain), public :: Concrete_Parallelepiped_Domain
@@ -84,14 +84,14 @@ contains
         is_inside = point_is_inside(this%origin, this%size, position)
     end function Abstract_Parallelepiped_Domain_is_inside
 
-    pure function Abstract_Parallelepiped_Domain_get_inside_position(this, inside_unit_cube) &
+    pure function Abstract_Parallelepiped_Domain_get_inside(this, in_unit_cube) &
         result(inside_position)
         class(Abstract_Parallelepiped_Domain), intent(in) :: this
-        real(DP), intent(in) :: inside_unit_cube(:)
+        real(DP), intent(in) :: in_unit_cube(:)
         real(DP), dimension(num_dimensions) :: inside_position
 
-        inside_position = this%origin + (inside_unit_cube - 0.5_DP) * this%size
-    end function Abstract_Parallelepiped_Domain_get_inside_position
+        inside_position = this%origin + (in_unit_cube - 0.5_DP) * this%size
+    end function Abstract_Parallelepiped_Domain_get_inside
     
 !end implementation Abstract_Parallelepiped_Domain
 
