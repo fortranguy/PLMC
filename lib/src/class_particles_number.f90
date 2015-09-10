@@ -8,7 +8,7 @@ private
 
     type, abstract, public :: Abstract_Particles_Number
     private
-        integer :: num
+        integer :: number
     contains
         procedure :: set => Abstract_Particles_Number_set
         procedure :: get => Abstract_Particles_Number_get
@@ -20,19 +20,19 @@ private
 
 contains
 
-    subroutine Abstract_Particles_Number_set(this, num)
+    subroutine Abstract_Particles_Number_set(this, number)
         class(Abstract_Particles_Number), intent(inout) :: this
-        integer, intent(in) :: num
+        integer, intent(in) :: number
 
-        if (num < 0) call error_exit("Abstract_Particles_Number: num is negative.")
-        this%num = num
+        if (number < 0) call error_exit("Abstract_Particles_Number: number is negative.")
+        this%number = number
     end subroutine Abstract_Particles_Number_set
 
-    pure function Abstract_Particles_Number_get(this) result(num)
+    pure function Abstract_Particles_Number_get(this) result(number)
         class(Abstract_Particles_Number), intent(in) :: this
-        integer :: num
+        integer :: number
 
-        num = this%num
+        number = this%number
     end function Abstract_Particles_Number_get
 
 end module class_particles_number

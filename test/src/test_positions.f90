@@ -8,7 +8,7 @@ use class_positions, only: Abstract_Positions, Concrete_Positions
 
 implicit none
     
-    class(Abstract_Particles_Number), allocatable :: particles_num
+    class(Abstract_Particles_Number), allocatable :: particles_number
     class(Abstract_Positions), allocatable :: positions
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename, data_field
@@ -23,16 +23,16 @@ implicit none
     call test_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
     
-    allocate(Concrete_Particles_Number :: particles_num)
+    allocate(Concrete_Particles_Number :: particles_number)
     data_field = "Positions.number"
     call input_data%get(data_field, positions_num, found)
     call test_data_found(data_field, found)
-    call particles_num%set(positions_num)
+    call particles_number%set(positions_num)
     
     allocate(Concrete_Positions :: positions)
-    call positions%construct(particles_num)
+    call positions%construct(particles_number)
     
-    do i_particle = 1, particles_num%get()
+    do i_particle = 1, particles_number%get()
         write(string_i, *) i_particle
         data_field = "Positions."//trim(adjustl(string_i))
         call input_data%get(data_field, position, found)
@@ -44,22 +44,23 @@ implicit none
     data_field = "Positions.add"
     call input_data%get(data_field, position, found)
     call test_data_found(data_field, found)
-    call particles_num%set(particles_num%get() + 1)
+    call particles_number%set(particles_number%get() + 1)
     call positions%add(position)
-    write(output_unit, *) "position", particles_num%get(), "=", positions%get(particles_num%get())
+    write(output_unit, *) "position", particles_number%get(), "=", &
+        positions%get(particles_number%get())
     
     data_field = "Positions.remove"
     call input_data%get(data_field, i_particle, found)
     call test_data_found(data_field, found)
     call positions%remove(i_particle)
-    call particles_num%set(particles_num%get() - 1)
-    do i_particle = 1, particles_num%get()
+    call particles_number%set(particles_number%get() - 1)
+    do i_particle = 1, particles_number%get()
         write(output_unit, *) "position", i_particle, "=", positions%get(i_particle)
     end do
 
     call positions%destroy()
     deallocate(positions)
-    deallocate(particles_num)
+    deallocate(particles_number)
     deallocate(data_field)
     deallocate(data_filename)
     call input_data%destroy()

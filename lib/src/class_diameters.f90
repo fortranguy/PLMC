@@ -10,7 +10,7 @@ implicit none
 private
 
     type, abstract, public :: Abstract_Diameters
-        class(Abstract_Particles_Number), pointer :: particles_num
+        class(Abstract_Particles_Number), pointer :: particles_number
     contains
         procedure :: construct => Abstract_Diameters_construct
         procedure :: destroy => Abstract_Diameters_destroy
@@ -64,17 +64,17 @@ contains
 
 !implementation Abstract_Diameters
 
-    subroutine Abstract_Diameters_construct(this, particles_num)
+    subroutine Abstract_Diameters_construct(this, particles_number)
         class(Abstract_Diameters), intent(out) :: this
-        class(Abstract_Particles_Number), target, intent(in) :: particles_num
+        class(Abstract_Particles_Number), target, intent(in) :: particles_number
         
-        this%particles_num => particles_num
+        this%particles_number => particles_number
     end subroutine Abstract_Diameters_construct
     
     subroutine Abstract_Diameters_destroy(this)
         class(Abstract_Diameters), intent(inout) :: this
         
-        this%particles_num => null()
+        this%particles_number => null()
     end subroutine Abstract_Diameters_destroy
 
 !end implementation Abstract_Diameters
@@ -86,7 +86,8 @@ contains
         integer, intent(in) :: i_particle
         real(DP), intent(in) :: diameter
         
-        call check_in_range("Uniform_Diameter", this%particles_num%get(), "i_particle", i_particle)
+        call check_in_range("Uniform_Diameter", this%particles_number%get(), &
+                            "i_particle", i_particle)
         call check_positive("Uniform_Diameters", "diameter", diameter)
         this%diameter = diameter
     end subroutine Uniform_Diameters_set
@@ -106,14 +107,14 @@ contains
         if (diameter /= this%diameter) then
             call warning_continue("Uniform_Diameters: adding diameter is different.")
         end if
-        call this%set(this%particles_num%get(), diameter)
+        call this%set(this%particles_number%get(), diameter)
     end subroutine Uniform_Diameters_add
     
     subroutine Uniform_Diameters_remove(this, i_particle)
         class(Uniform_Diameters), intent(inout) :: this
         integer, intent(in) :: i_particle
 
-        call check_in_range("Uniform_Diameters", this%particles_num%get(), "i_particle", i_particle)
+        call check_in_range("Uniform_Diameters", this%particles_number%get(), "i_particle", i_particle)
     end subroutine Uniform_Diameters_remove
     
 !end implementation Uniform_Diameters

@@ -21,14 +21,14 @@ contains
     
         character(len=:), allocatable :: data_field
         logical :: found
-        integer, allocatable :: num(:)
+        integer, allocatable :: numbers(:)
         
-        data_field = "Reciprocal Lattice.num"
-        call input_data%get(data_field, num, found)
+        data_field = "Reciprocal Lattice.numbers"
+        call input_data%get(data_field, numbers, found)
         call test_data_found(data_field, found)
-        call reciprocal_lattice%construct(periodic_box, num)
-        deallocate(num)
-        write(output_unit, *) "num =", reciprocal_lattice%get_num()
+        call reciprocal_lattice%construct(periodic_box, numbers)
+        deallocate(numbers)
+        write(output_unit, *) "numbers =", reciprocal_lattice%get_numbers()
         call reciprocal_lattice%destroy()
         
         deallocate(data_field)

@@ -9,7 +9,7 @@ use class_inter_diameters, only: Abstract_Inter_Diameters, Concrete_Inter_Diamet
 
 implicit none
     
-    class(Abstract_Particles_Number), allocatable :: particles_num_1, particles_num_2
+    class(Abstract_Particles_Number), allocatable :: particles_number_1, particles_number_2
     class(Abstract_Diameters), allocatable :: diameters_1, diameters_2
     class(Abstract_Inter_Diameters), allocatable :: inter_diameters_12
     type(json_file) :: input_data
@@ -25,30 +25,30 @@ implicit none
     call test_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
     
-    allocate(Concrete_Particles_Number :: particles_num_1)
+    allocate(Concrete_Particles_Number :: particles_number_1)
     data_field = "Diameters 1.number"
     call input_data%get(data_field, diameters_1_num, found)
     call test_data_found(data_field, found)
-    call particles_num_1%set(diameters_1_num)
+    call particles_number_1%set(diameters_1_num)
     
     allocate(Uniform_Diameters :: diameters_1)
     data_field = "Diameters 1.diameter"
     call input_data%get(data_field, diameters_1_diameter, found)
     call test_data_found(data_field, found)
-    call diameters_1%construct(particles_num_1)
+    call diameters_1%construct(particles_number_1)
     call diameters_1%set(1, diameters_1_diameter)
     
-    allocate(Concrete_Particles_Number :: particles_num_2)
+    allocate(Concrete_Particles_Number :: particles_number_2)
     data_field = "Diameters 2.number"
     call input_data%get(data_field, diameters_2_num, found)
     call test_data_found(data_field, found)
-    call particles_num_2%set(diameters_2_num)
+    call particles_number_2%set(diameters_2_num)
     
     allocate(Uniform_Diameters :: diameters_2)
     data_field = "Diameters 2.diameter"
     call input_data%get(data_field, diameters_2_diameter, found)
     call test_data_found(data_field, found)
-    call diameters_2%construct(particles_num_2)
+    call diameters_2%construct(particles_number_2)
     call diameters_2%set(1, diameters_2_diameter)
     
     allocate(Concrete_Inter_Diameters :: inter_diameters_12)
@@ -57,8 +57,8 @@ implicit none
     call test_data_found(data_field, found)
     call inter_diameters_12%construct(diameters_1, diameters_2, non_additivity)
     
-    do i_particle = 1, particles_num_1%get()
-        do j_particle = 1, particles_num_2%get()
+    do i_particle = 1, particles_number_1%get()
+        do j_particle = 1, particles_number_2%get()
             write(output_unit, *) "diameter", i_particle, j_particle, &
                 inter_diameters_12%get(i_particle, j_particle)
         end do

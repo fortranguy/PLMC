@@ -24,10 +24,10 @@ private
     
     abstract interface
     
-        subroutine Abstract_Orientations_construct(this, particles_num)
+        subroutine Abstract_Orientations_construct(this, particles_number)
         import :: Abstract_Particles_Number, Abstract_Orientations
             class(Abstract_Orientations), intent(out) :: this
-            class(Abstract_Particles_Number), target, intent(in) :: particles_num
+            class(Abstract_Particles_Number), target, intent(in) :: particles_number
         end subroutine Abstract_Orientations_construct
         
         subroutine Abstract_Orientations_destroy(this)
@@ -81,7 +81,7 @@ private
     type, extends(Abstract_Orientations), public :: Concrete_Orientations
     private
         real(DP), allocatable :: orientations(:, :)
-        class(Abstract_Particles_Number), pointer :: particles_num
+        class(Abstract_Particles_Number), pointer :: particles_number
     contains
         procedure :: construct => Concrete_Orientations_construct
         procedure :: destroy => Concrete_Orientations_destroy
@@ -96,9 +96,9 @@ contains
 
 !implementation Null_Orientations
 
-    subroutine Null_Orientations_construct(this, particles_num)
+    subroutine Null_Orientations_construct(this, particles_number)
         class(Null_Orientations), intent(out) :: this
-        class(Abstract_Particles_Number), target, intent(in) :: particles_num
+        class(Abstract_Particles_Number), target, intent(in) :: particles_number
         
     end subroutine Null_Orientations_construct
     
@@ -138,20 +138,20 @@ contains
 
 !implementation Concrete_Orientations
 
-    subroutine Concrete_Orientations_construct(this, particles_num)
+    subroutine Concrete_Orientations_construct(this, particles_number)
         class(Concrete_Orientations), intent(out) :: this
-        class(Abstract_Particles_Number), target, intent(in) :: particles_num
+        class(Abstract_Particles_Number), target, intent(in) :: particles_number
         
         integer :: i_particle
         
-        this%particles_num => particles_num
-        if (this%particles_num%get() == 0) then
+        this%particles_number => particles_number
+        if (this%particles_number%get() == 0) then
             allocate(this%orientations(num_dimensions, 1))
         else
-            allocate(this%orientations(num_dimensions, this%particles_num%get()))
+            allocate(this%orientations(num_dimensions, this%particles_number%get()))
         end if
         
-        do i_particle = 1, this%particles_num%get()
+        do i_particle = 1, this%particles_number%get()
             this%orientations(:, i_particle) = [1.0_DP, 0._DP, 0._DP]
         end do
     end subroutine Concrete_Orientations_construct
@@ -160,7 +160,7 @@ contains
         class(Concrete_Orientations), intent(inout) :: this
         
         if (allocated(this%orientations)) deallocate(this%orientations)
-        this%particles_num => null()
+        this%particles_number => null()
     end subroutine Concrete_Orientations_destroy
     
     subroutine Concrete_Orientations_set(this, i_particle, orientation)
@@ -187,20 +187,20 @@ contains
         class(Concrete_Orientations), intent(inout) :: this
         real(DP), intent(in) :: orientation(:)
         
-        if (size(this%orientations, 2) < this%particles_num%get()) then
+        if (size(this%orientations, 2) < this%particles_number%get()) then
             call increase_coordinates_size(this%orientations)
         end if
-        call this%set(this%particles_num%get(), orientation)
+        call this%set(this%particles_number%get(), orientation)
     end subroutine Concrete_Orientations_add
     
     subroutine Concrete_Orientations_remove(this, i_particle)
         class(Concrete_Orientations), intent(inout) :: this
         integer, intent(in) :: i_particle
         
-        call check_in_range("Concrete_Orientations", this%particles_num%get(), &
+        call check_in_range("Concrete_Orientations", this%particles_number%get(), &
                             "i_particle", i_particle)
-        if (i_particle < this%particles_num%get()) then
-            call this%set(i_particle, this%get(this%particles_num%get()))
+        if (i_particle < this%particles_number%get()) then
+            call this%set(i_particle, this%get(this%particles_number%get()))
         end if
     end subroutine Concrete_Orientations_remove
     

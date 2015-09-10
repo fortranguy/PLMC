@@ -11,7 +11,7 @@ implicit none
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename, data_field
     logical :: found
-    integer :: num
+    integer :: number
 
     call json_initialize()
 
@@ -22,10 +22,10 @@ implicit none
     allocate(Concrete_Particles_Number :: particles_number)
 
     data_field = "Particles Number.number"
-    call input_data%get(data_field, num, found)
+    call input_data%get(data_field, number, found)
     call test_data_found(data_field, found)
 
-    call particles_number%set(num)
+    call particles_number%set(number)
     write(output_unit, *) "number =", particles_number%get()
 
     deallocate(particles_number)
