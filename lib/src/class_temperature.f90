@@ -23,7 +23,7 @@ contains
         class(Abstract_Temperature), intent(inout) :: this
         real(DP), intent(in) :: temperature
         
-        call check_positive("Abstract_Temperature", "temperature", temperature) 
+        call check_positive("Abstract_Temperature", "temperature", temperature)
         this%temperature = temperature
     end subroutine Abstract_Temperature_set
     

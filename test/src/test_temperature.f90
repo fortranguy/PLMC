@@ -28,6 +28,6 @@ implicit none
     deallocate(temperature)
     deallocate(data_field)
     deallocate(data_filename)
-    call input_data%destroy()    
+    call input_data%destroy()
 
 end program test_temperature

@@ -87,10 +87,11 @@
             \end{abstractclass}
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractFieldExpression.north) + (-9 cm, 0)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractParticlesReservoir}{0, 0}
+        \begin{scope}[shift={($(AbstractFieldExpression.north) + (-9 cm, 0)$)}, opacity=1]
+            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractChemicalPotential}{0, 0}
+                \operation{set(density\type{double}, excess\type{double})}
                 \operation{getDensity()\type{double}}
-                \operation{getExcessChemicalPotential()\type{double}}
+                \operation{getExcess()\type{double}}
             \end{abstractclass}
         \end{scope}
         
