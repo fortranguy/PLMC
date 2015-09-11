@@ -8,7 +8,7 @@ use procedures_errors, only: warning_continue, error_exit
 implicit none
 
 private
-public check_in_range, check_3d_array, check_positive
+public check_in_range, check_3d_array, check_positive, check_norm
 
 interface check_3d_array
     module procedure check_integer_3d_array
@@ -27,9 +27,9 @@ contains
     subroutine check_in_range(class_name, integer_max, integer_name, integer_value)
         character(len=*), intent(in) :: class_name, integer_name
         integer, intent(in) :: integer_max, integer_value
-        
+
         character(len=1024) :: string_i
-        
+
         write(string_i, *) integer_value
         if (integer_value < 1 .or. integer_max < integer_value) then
             call error_exit(class_name//": "//integer_name//"="//trim(adjustl(string_i))//&
@@ -42,21 +42,21 @@ contains
     subroutine check_integer_3d_array(class_name, integer_name, integer_array)
         character(len=*), intent(in) :: class_name, integer_name
         integer, intent(in) :: integer_array(:)
-        
+
         if (size(integer_array) /= num_dimensions) then
             call error_exit(class_name//": "//integer_name//" has wrong number of dimensions (size).")
         end if
     end subroutine check_integer_3d_array
-    
+
     subroutine check_real_3d_array(class_name, real_name, real_array)
         character(len=*), intent(in) :: class_name, real_name
         real(DP), intent(in) :: real_array(:)
-        
+
         if (size(real_array) /= num_dimensions) then
             call error_exit(class_name//": "//real_name//" has wrong number of dimensions (size).")
         end if
     end subroutine check_real_3d_array
-    
+
 !end implementation check_3d_array
 
 !implementation check_positive
@@ -64,9 +64,9 @@ contains
     subroutine check_positive_integer_scalar(class_name, integer_name, integer_scalar)
         character(len=*), intent(in) :: class_name, integer_name
         integer, intent(in) :: integer_scalar
-        
+
         character(len=1024) :: string_i
-        
+
         write(string_i, *) integer_scalar
         if (integer_scalar < 0) then
             call error_exit(class_name//": "//integer_name//"="//trim(adjustl(string_i))//&
@@ -76,14 +76,14 @@ contains
             call warning_continue(class_name//": "//integer_name//" is zero.")
         end if
     end subroutine check_positive_integer_scalar
-    
+
     subroutine check_positive_integer_array(class_name, integer_name, integer_array)
         character(len=*), intent(in) :: class_name, integer_name
         integer, intent(in) :: integer_array(:)
-        
+
         integer :: i_dimension
         character(len=1024) :: string_i
-        
+
         do i_dimension = 1, size(integer_array)
             write(string_i, *) i_dimension
             call check_positive_integer_scalar(class_name, &
@@ -95,9 +95,9 @@ contains
     subroutine check_positive_real_scalar(class_name, real_name, real_scalar)
         character(len=*), intent(in) :: class_name, real_name
         real(DP), intent(in) :: real_scalar
-        
+
         character(len=1024) :: string_real
-        
+
         write(string_real, *) real_scalar
 
         if (real_scalar < 0._DP) then
@@ -108,14 +108,14 @@ contains
             call warning_continue(class_name//": "//real_name//" may be too small.")
         end if
     end subroutine check_positive_real_scalar
-    
+
     subroutine check_positive_real_array(class_name, real_name, real_array)
         character(len=*), intent(in) :: class_name, real_name
         real(DP), intent(in) :: real_array(:)
-        
+
         integer :: i_dimension
         character(len=1024) :: string_i
-        
+
         do i_dimension = 1, size(real_array)
             write(string_i, *) i_dimension
             call check_positive_real_scalar(class_name, &
@@ -123,7 +123,20 @@ contains
                                             real_array(i_dimension))
         end do
     end subroutine check_positive_real_array
-    
+
 !end implementation check_positive
-    
+
+    subroutine check_norm(class_name, vector_name, vector)
+        character(len=*), intent(in) :: class_name, vector_name
+        real(DP), intent(in) :: vector(:)
+
+        character(len=1024) :: string_vector
+
+        if (abs(norm2(vector) - 1.0_DP) > real_zero) then
+            write(string_vector, *) norm2(vector)
+            call warning_continue(class_name//": "//vector_name//" may not be normed "//&
+            "("//trim(adjustl(string_vector))//").")
+        end if
+    end subroutine check_norm
+
 end module procedures_checks

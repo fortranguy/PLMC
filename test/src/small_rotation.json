@@ -1,0 +1,17 @@
+{
+    "Particles": {
+        "number": 3,
+        "1": {
+            "orientation": [0.0, 0.0, 1.0]
+        },
+        "2": {
+            "orientation": [0.0, 1.0, 1.0]
+        },
+        "3": {
+            "orientation": [1.0, 0.0, 0.0]
+        }
+    },
+    "Small Rotation": {
+        "delta": 0.1
+    }
+}

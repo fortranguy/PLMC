@@ -21,26 +21,26 @@ implicit none
     type, extends(Abstract_Small_Move), public :: Concrete_Small_Move
 
     end type Concrete_Small_Move
-    
+
 contains
 
     subroutine Abstract_Small_Move_construct(this, positions)
         class(Abstract_Small_Move), intent(out) :: this
         class(Abstract_Positions), target, intent(in) :: positions
-        
+
         this%positions => positions
     end subroutine Abstract_Small_Move_construct
 
     subroutine Abstract_Small_Move_destroy(this)
         class(Abstract_Small_Move), intent(inout) :: this
-        
+
         this%positions => null()
     end subroutine Abstract_Small_Move_destroy
 
     subroutine Abstract_Small_Move_set(this, delta)
         class(Abstract_Small_Move), intent(inout) :: this
-        real(DP) :: delta(:)
-        
+        real(DP), intent(in) :: delta(:)
+
         call check_3d_array("Abstract_Small_Move", "delta", delta)
         call check_positive("Abstract_Small_Move", "delta", delta)
         this%delta = delta
@@ -58,4 +58,3 @@ contains
     end function Abstract_Small_Move_get
 
 end module class_small_move
-

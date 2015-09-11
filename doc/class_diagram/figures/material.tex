@@ -177,7 +177,7 @@
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractSmallMove}{0, 0}
                 \operation{construct(positions\type{AbstractPositions})}
                 \operation{destroy()}
-                \operation{set(delta\type{double})}
+                \operation{set(delta\type{double[3]})}
                 \operation{get(iParticle\type{int})\type{double[3]}}
             \end{abstractclass}
         \end{scope}
@@ -222,9 +222,11 @@
         \end{scope}
         
         \begin{scope}[shift={($(AbstractSmallMove.north -| AbstractOrientations.north)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractRandomOrientations}{0, 0}
-                \operation[0]{orientation()\type{double[3]}}
-                \operation[0]{rotation(iParticle\type{int})\type{double[3]}}
+            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractSmallRotation}{0, 0}
+                \operation[0]{construct(orientations\type{AbstractOrientations})}
+                \operation[0]{destroy()}
+                \operation[0]{set(delta\type{double})}
+                \operation[0]{get(iParticle\type{int})\type{double[3]}}
             \end{abstractclass}
             
             \def\operationImplementation{
@@ -233,12 +235,12 @@
             }
             
             \begin{class}[text width=\mediumTextWidth]{NullRandomOrientations}{0, -3}
-                \inherit{AbstractRandomOrientations}
+                \inherit{AbstractSmallRotation}
                 \operationImplementation{}
             \end{class}
             
             \begin{class}[text width=\mediumTextWidth]{RandomOrientations}{0, -5.5}
-                \inherit{AbstractRandomOrientations}
+                \inherit{AbstractSmallRotation}
                 \operationImplementation{}
             \end{class}
         \end{scope}
@@ -267,7 +269,7 @@
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractSmallMove.north)!0.5!(AbstractRandomOrientations.north) +
+        \begin{scope}[shift={($(AbstractSmallMove.north)!0.5!(AbstractSmallRotation.north) +
             (0 cm, 4 cm)$)}]
             \begin{class}[text width=\mediumTextWidth]{RandomCoordinatesFacade}{0, 0}
                 \operation{position()\type{double[3]}}
@@ -311,9 +313,9 @@
     \aggregation{AbstractSmallMove}{positions}{1}{AbstractPositions}
 
     \aggregation{RandomCoordinatesFacade}{randPositions}{1}{AbstractSmallMove}
-    \aggregation{RandomCoordinatesFacade}{randMoments}{1}{AbstractRandomOrientations}
+    \aggregation{RandomCoordinatesFacade}{randMoments}{1}{AbstractSmallRotation}
     
-    \aggregation{AbstractRandomOrientations}{orientations}{1}{AbstractOrientations}
+    \aggregation{AbstractSmallRotation}{orientations}{1}{AbstractOrientations}
     
     \aggregation{TotalMoment}{momentsNorm}{1}{AbstractMomentsNorm}
     \aggregation{TotalMoment}{orientations}{1}{AbstractOrientations}
