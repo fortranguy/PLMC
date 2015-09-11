@@ -1,4 +1,4 @@
-\begin{scope}[local bounding box=Material, opacity=0.5]
+\begin{scope}[local bounding box=Material, opacity=0.25]
     \begin{package}{Material}
         
         \begin{scope}[opacity=1]
@@ -16,12 +16,12 @@
                 \operation{folded(position\type{double[3]})\type{double[3]}}
             }
             
-            \begin{class}[text width=\largeTextWidth]{XYZPeriodicBox}{0, -4}
+            \begin{class}[text width=\largeTextWidth]{XYZPeriodicBox}{0, -4.5}
                 \inherit{AbstractPeriodicBox}
                 \operationsImplementation{}
             \end{class}
             
-            \begin{class}[text width=\largeTextWidth]{XYPeriodicBox}{0, -6}
+            \begin{class}[text width=\largeTextWidth]{XYPeriodicBox}{0, -6.5}
                 \inherit{AbstractPeriodicBox}
                 \operationsImplementation{}
             \end{class}
@@ -40,25 +40,13 @@
         
         \begin{scope}[shift={($(AbstractPeriodicBox.north) + (11 cm, 5 cm)$)}, opacity=1]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractReciprocalLattice}{0, 0}
-                \operation[0]{contruct(periodicBox\type{AbstractPeriodicBox}, numbers\type{int[3]})}
-                \operation[0]{destroy()}
-                \operation[0]{getNumbers()\type{int[3]}}
-            \end{abstractclass}
-            
-            \def\operationsImplementation{
                 \operation{contruct(periodicBox\type{AbstractPeriodicBox}, numbers\type{int[3]})}
                 \operation{destroy()}
                 \operation{getNumbers()\type{int[3]}}
-            }
+            \end{abstractclass}
             
             \begin{class}[text width=\mediumTextWidth]{NullReciprocalLattice}{0, -4}
                 \inherit{AbstractReciprocalLattice}
-                \operationsImplementation{}
-            \end{class}
-            
-            \begin{class}[text width=\mediumTextWidth]{ReciprocalLattice}{0, -7.5}
-                \inherit{AbstractReciprocalLattice}
-                \operationsImplementation{}
             \end{class}
         \end{scope}
         
@@ -102,11 +90,12 @@
             \end{abstractclass}
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractParticlesNumber.north) + (0 cm, 9 cm)$)}, opacity=1]
+        \begin{scope}[shift={($(AbstractParticlesNumber.north) + (0 cm, 10 cm)$)}, opacity=0.5]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractDiameters}{0, 0}
-                \operation{contruct(particlesNumberber\type{AbstractParticlesNumber})}
+                \operation{contruct(particlesNumber\type{AbstractParticlesNumber})}
                 \operation{destroy()}
                 \operation[0]{set(iParticle\type{int}, diameter\type{double})}
+                \operation[0]{getNum()\type{int}}
                 \operation[0]{get(iParticle\type{int})\type{double}}
                 \operation[0]{add(diameter\type{double})}
                 \operation[0]{remove(iParticle\type{int})}
@@ -114,22 +103,24 @@
             
             \def\operationsImplementation{
                 \operation{set(iParticle\type{int}, diameter\type{double})}
+                \operation{getNum()\type{int}}
                 \operation{get(iParticle\type{int})\type{double}}
                 \operation{add(diameter\type{double})}
                 \operation{remove(iParticle\type{int})}
             }
             
-            \begin{class}[text width=\mediumTextWidth]{UniformDiameters}{0, -5}
+            \begin{class}[text width=\mediumTextWidth]{UniformDiameters}{0, -5.5}
                 \inherit{AbstractDiameters}
                 \operationsImplementation{}
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(AbstractDiameters.north) + (9 cm, 0 cm)$)}, opacity=1]
+        \begin{scope}[shift={($(AbstractDiameters.north) + (9 cm, 0 cm)$)}, opacity=0.5]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractMomentsNorm}{0, 0}
-                \operation{contruct(particlesNumberber\type{AbstractParticlesNumber})}
+                \operation{contruct(particlesNumber\type{AbstractParticlesNumber})}
                 \operation{destroy()}
                 \operation[0]{set(iParticle\type{int}, norm\type{double})}
+                \operation[0]{getNum()\type{int}}
                 \operation[0]{get(iParticle\type{int})\type{double}}
                 \operation[0]{add(norm\type{double})}
                 \operation[0]{remove(iParticle\type{int})}
@@ -137,13 +128,23 @@
             
             \def\operationsImplementation{
                 \operation{set(iParticle\type{int}, norm\type{double})}
+                \operation{getNum()\type{int}}
                 \operation{get(iParticle\type{int})\type{double}}
                 \operation{add(norm\type{double})}
                 \operation{remove(iParticle\type{int})}
             }
+
+            \begin{class}[text width=\mediumTextWidth]{UniformMomentsNorm}{0, -5.5}
+                \inherit{AbstractMomentsNorm}
+                \operationsImplementation{}
+            \end{class}
+
+            \begin{class}[text width=\mediumTextWidth]{NullMomentsNorm}{0, -9.25}
+                \inherit{AbstractMomentsNorm}
+            \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractDiameters.north) + (0 cm, 5 cm)$)}, opacity=1]
+        \begin{scope}[shift={($(AbstractDiameters.north) + (0 cm, 6 cm)$)}, opacity=1]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractInterDiameters}{0, 0}
                 \operation{construct(diameters1\type{AbstractDiameters},
                                      diameters2\type{AbstractDiameters},
@@ -153,28 +154,22 @@
             \end{abstractclass}
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractInterDiameters.north) + (9 cm, 0 cm)$)}, opacity=1]
+        \begin{scope}[shift={($(AbstractMomentsNorm.north) + (9 cm, 0 cm)$)}, opacity=0.5]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractPositions}{0, 0}
                 \operation{construct(periodicBox\type{AbstractPeriodicBox},
                                       particlesNumber\type{AbstractParticlesNumber})}
                 \operation{detroy()}
                 \operation{set(iParticle\type{int}, position\type{double[3]})}
+                \operation{getNum()\type{int}}
                 \operation{get(iParticle\type{int})\type{double[3]}}
                 \operation{add(position\type{double[3]})}
                 \operation{remove(iParticle\type{int})}
             \end{abstractclass}
         \end{scope}
         
-        %\begin{scope}[shift={($(AbstractPeriodicBox.north) + (0 cm, 5 cm)$)}]
-        %    \begin{abstractclass}[text width=\smallTextWidth]{AbstractBoxedParticles}{0, 0}
-                %\operation[0]{accessibleVolume()\type{double}}
-                %\operation[0]{isInside(position\type{double[3]})\type{bool}}
-                %\operation{fold(position\type{double[3]})}
-        %    \end{abstractclass}
-        %\end{scope}
-        
-        \begin{scope}[shift={($(AbstractPositions.north) + (0 cm, 8 cm)$)}, opacity=1]
-            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractSmallMove}{0, 0}
+        \begin{scope}[shift={($(AbstractInterDiameters.north -| AbstractPositions.north)$)},
+                      opacity=0.5]
+            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractMovedPositions}{0, 0}
                 \operation{construct(positions\type{AbstractPositions})}
                 \operation{destroy()}
                 \operation{set(delta\type{double[3]})}
@@ -182,94 +177,64 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(AbstractPositions.north) + (9 cm, 0 cm)$)}, opacity=1]
+        \begin{scope}[shift={($(AbstractPositions.north) + (9 cm, 0 cm)$)}, opacity=0.5]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractOrientations}{0, 0}
-                \operation[0]{construct(particlesNumber\type{AbstractParticlesNumber})}
-                \operation[0]{detroy()}
-                \operation[0]{get(iParticle\type{int})\type{double[3]}}
-                \operation[0]{set(iParticle\type{int}, orientation\type{double[3]})}
-                \operation[0]{add(orientation\type{double[3]})}
-                \operation[0]{removeOrientation(iParticle\type{int})}
-            \end{abstractclass}
-
-            \def\operationsImplementation{
                 \operation{construct(particlesNumber\type{AbstractParticlesNumber})}
                 \operation{detroy()}
-                \operation{get(iParticle\type{int})\type{double[3]}}
                 \operation{set(iParticle\type{int}, orientation\type{double[3]})}
+                \operation{getNum()\type{int}}
+                \operation{get(iParticle\type{int})\type{double[3]}}
                 \operation{add(orientation\type{double[3]})}
-                \operation{removeOrientation(iParticle\type{int})}
-            }
+                \operation{remove(iParticle\type{int})}
+            \end{abstractclass}
             
-            \begin{class}[text width=\mediumTextWidth]{NullOrientations}{0, -5}
+            \begin{class}[text width=\mediumTextWidth]{NullOrientations}{0, -5.5}
                 \inherit{AbstractOrientations}
-                \operationsImplementation{}
             \end{class}
-
-            \begin{class}[text width=\mediumTextWidth]{Orientations}{0, -10}
-                \inherit{AbstractOrientations}
-                \operationsImplementation{}
-            \end{class}            
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractOrientations.north) + (10 cm, 10 cm)$)}, opacity=1]
+        \begin{scope}[shift={($(AbstractMovedPositions.north -| AbstractOrientations.north)$)},
+                      opacity=0.5]
+            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractRotatedOrientations}{0, 0}
+                \operation{construct(orientations\type{AbstractOrientations})}
+                \operation{destroy()}
+                \operation{set(delta\type{double})}
+                \operation{get(iParticle\type{int})\type{double[3]}}
+            \end{abstractclass}
+            
+            \begin{class}[text width=\mediumTextWidth]{NullRotatedOrientations}{0, -3.75}
+                \inherit{AbstractRotatedOrientations}
+            \end{class}
+        \end{scope}
+
+        \begin{scope}[shift={($(AbstractRotatedOrientations.north) + (9 cm, 0 cm)$)}, opacity=0.5]
             \begin{class}[text width=\mediumTextWidth]{DipolarMomentsFacade}{0, 0}
-                \operation{construct(momentsNorm\type{AbstractMomentsNorm}, 
+                \operation{construct(momentsNorm\type{AbstractMomentsNorm},
                                      orientations\type{AbstractOrientations})}
                 \operation{destroy()}
+                \operation{getNum()\type{int}}
                 \operation{get(iParticle\type{int})}
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractSmallMove.north -| AbstractOrientations.north)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractSmallRotation}{0, 0}
-                \operation[0]{construct(orientations\type{AbstractOrientations})}
-                \operation[0]{destroy()}
-                \operation[0]{set(delta\type{double})}
-                \operation[0]{get(iParticle\type{int})\type{double[3]}}
-            \end{abstractclass}
-            
-            \def\operationImplementation{
-                \operation{orientation()\type{double[3]}}
-                \operation{rotation(iParticle\type{int})\type{double[3]}}
-            }
-            
-            \begin{class}[text width=\mediumTextWidth]{NullRandomOrientations}{0, -3}
-                \inherit{AbstractSmallRotation}
-                \operationImplementation{}
-            \end{class}
-            
-            \begin{class}[text width=\mediumTextWidth]{RandomOrientations}{0, -5.5}
-                \inherit{AbstractSmallRotation}
-                \operationImplementation{}
-            \end{class}
-        \end{scope}
-        
-        \begin{scope}[shift={($(DipolarMomentsFacade.north) + (10 cm, 5 cm)$)}]
+        \begin{scope}[shift={($(DipolarMomentsFacade.north) + (9 cm, 5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractTotalMoment}{0, 0}
-                \operation[0]{get()\type{double[3]}}
-                \operation[0]{rotationUpdate(old\type{Particle}, new\type{Particle})}
-                \operation[0]{exchangeUpdate(particle\type{Particle})}
+                \operation{construct(dipolarMoment\type{DipolarMomentsFacade})}
+                \operation{get()\type{double[3]}}
+                %\operation{rotationUpdate(old\type{Particle}, new\type{Particle})}
+                %\operation{exchangeUpdate(particle\type{Particle})}
             \end{abstractclass}
 
-            \def\operationsImplementation{
-                \operation{get()\type{double[3]}}
-                \operation{rotationUpdate(old\type{Particle}, new\type{Particle})}
-                \operation{exchangeUpdate(particle\type{Particle})}
-            }
-
-            \begin{class}[text width=\mediumTextWidth]{NullTotalMoment}{0, -3.5}
+            \begin{class}[text width=\mediumTextWidth]{TotalMoment}{0, -3.5}
                 \inherit{AbstractTotalMoment}
-                \operationsImplementation{}
             \end{class}
 
-            \begin{class}[text width=\mediumTextWidth]{TotalMoment}{0, -6.5}
+            \begin{class}[text width=\mediumTextWidth]{NullTotalMoment}{0, -5}
                 \inherit{AbstractTotalMoment}
-                \operationsImplementation{}
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractSmallMove.north)!0.5!(AbstractSmallRotation.north) +
+        \begin{scope}[shift={($(AbstractMovedPositions.north)!0.5!(AbstractRotatedOrientations.north) +
             (0 cm, 4 cm)$)}]
             \begin{class}[text width=\mediumTextWidth]{RandomCoordinatesFacade}{0, 0}
                 \operation{position()\type{double[3]}}
@@ -279,7 +244,7 @@
         
         \begin{scope}[shift={($(RandomCoordinatesFacade.north) + (11 cm, 0 cm)$)}]
             \begin{class}[text width=\largeTextWidth]{CoordinatesExchangeFacade}{0, 0}
-                \operation{add(iParticle\type{int}, position\type{double[3]}, 
+                \operation{add(iParticle\type{int}, position\type{double[3]},
                                                     orientation\type{double[3]})}
                 \operation{remove(iParticle\type{int})}
             \end{class}
@@ -290,7 +255,7 @@
 
 \begin{scope}[on background layer]
     \aggregation{AbstractParallelepipedDomain}{periodicBox}{1}{AbstractPeriodicBox}
-    \aggregation{ReciprocalLattice}{periodicBox}{1}{AbstractPeriodicBox}
+    \aggregation{AbstractReciprocalLattice}{periodicBox}{1}{AbstractPeriodicBox}
     \aggregation{ExternalFieldFacade}{parallelepipedDomain}{1}{AbstractParallelepipedDomain}
     \aggregation{ExternalFieldFacade}{fieldExpression}{1}{AbstractFieldExpression}
     
@@ -310,13 +275,12 @@
     \aggregation{CoordinatesExchangeFacade}{positions}{1}{AbstractPositions}
     \aggregation{CoordinatesExchangeFacade}{orientations}{1}{AbstractOrientations}
     
-    \aggregation{AbstractSmallMove}{positions}{1}{AbstractPositions}
+    \aggregation{AbstractMovedPositions}{positions}{1}{AbstractPositions}
 
-    \aggregation{RandomCoordinatesFacade}{randPositions}{1}{AbstractSmallMove}
-    \aggregation{RandomCoordinatesFacade}{randMoments}{1}{AbstractSmallRotation}
+    \aggregation{RandomCoordinatesFacade}{randPositions}{1}{AbstractMovedPositions}
+    \aggregation{RandomCoordinatesFacade}{randMoments}{1}{AbstractRotatedOrientations}
     
-    \aggregation{AbstractSmallRotation}{orientations}{1}{AbstractOrientations}
+    \aggregation{AbstractRotatedOrientations}{orientations}{1}{AbstractOrientations}
     
-    \aggregation{TotalMoment}{momentsNorm}{1}{AbstractMomentsNorm}
-    \aggregation{TotalMoment}{orientations}{1}{AbstractOrientations}
+    \aggregation{AbstractTotalMoment}{momentsNorm}{1}{DipolarMomentsFacade}
 \end{scope}
