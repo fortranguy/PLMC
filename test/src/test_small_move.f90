@@ -1,6 +1,7 @@
 program test_small_move
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
+use data_geometry, only: num_dimensions
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box
@@ -18,11 +19,11 @@ implicit none
     character(len=:), allocatable :: data_filename, data_field
     logical :: data_found
 
-    integer :: num_particles, i_particle
+    integer :: num_steps, i_step, num_particles, i_particle
     character(len=1024) :: string_i
     real(DP), allocatable :: periodic_box_size(:), position(:), small_move_delta(:)
-
-    integer :: positions_unit
+    real(DP), dimension(num_dimensions) :: old_position, new_position
+    integer, allocatable :: positions_units(:)
 
     call json_initialize()
     data_filename = "small_move.json"
@@ -45,12 +46,15 @@ implicit none
     allocate(Concrete_Positions :: positions)
     call positions%construct(periodic_box, particles_number)
 
-    do i_particle = 1, particles_number%get()
+    allocate(positions_units(positions%get_num()))
+    do i_particle = 1, positions%get_num()
         write(string_i, *) i_particle
-        data_field = "Particles."//trim(adjustl(string_i))//".position"
+        data_field = "Particles."//trim(adjustl(string_i))//".initial position"
         call input_data%get(data_field, position, data_found)
         call test_data_found(data_field, data_found)
         call positions%set(i_particle, position)
+        open(newunit=positions_units(i_particle), recl=4096, &
+             file="positions_"//trim(adjustl(string_i))//".out", action="write")
     end do
 
     allocate(Concrete_Small_Move :: small_move)
@@ -60,14 +64,23 @@ implicit none
     call test_data_found(data_field, data_found)
     call small_move%set(small_move_delta)
 
-    open(newunit=positions_unit, recl=4096, file="moved_positions.out", action="write")
-    do i_particle = 1, particles_number%get()
-        write(positions_unit, *) positions%get(i_particle), &
-            small_move%get(i_particle) - positions%get(i_particle)
-        write(positions_unit, *)
-        write(positions_unit, *)
+    data_field = "Number of Steps"
+    call input_data%get(data_field, num_steps, data_found)
+    call test_data_found(data_field, data_found)
+
+    do i_step = 1, num_steps
+        do i_particle = 1, positions%get_num()
+            old_position = positions%get(i_particle)
+            call positions%set(i_particle, small_move%get(i_particle))
+            new_position = positions%get(i_particle)
+            write(positions_units(i_particle), *) i_step, old_position, new_position - old_position
+        end do
     end do
-    close(positions_unit)
+
+    do i_particle = positions%get_num(), 1, -1
+        close(positions_units(i_particle))
+    end do
+    deallocate(positions_units)
 
     call small_move%destroy()
     deallocate(small_move)
@@ -78,5 +91,5 @@ implicit none
     deallocate(data_field)
     deallocate(data_filename)
     call input_data%destroy()
-    
+
 end program test_small_move

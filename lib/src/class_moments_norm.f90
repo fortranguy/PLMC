@@ -15,6 +15,7 @@ private
         procedure(Abstract_Moments_Norm_construct), deferred :: construct
         procedure(Abstract_Moments_Norm_destroy), deferred :: destroy
         procedure(Abstract_Moments_Norm_set), deferred :: set
+        procedure(Abstract_Moments_Norm_get_num), deferred :: get_num
         procedure(Abstract_Moments_Norm_get), deferred :: get
         procedure(Abstract_Moments_Norm_add), deferred :: add
         procedure(Abstract_Moments_Norm_remove), deferred :: remove
@@ -39,6 +40,12 @@ private
             integer, intent(in) :: i_particle
             real(DP), intent(in) :: norm
         end subroutine Abstract_Moments_Norm_set
+
+        pure function Abstract_Moments_Norm_get_num(this) result(num_norms)
+        import :: Abstract_Moments_Norm
+            class(Abstract_Moments_Norm), intent(in) :: this
+            integer :: num_norms
+        end function Abstract_Moments_Norm_get_num
 
         pure function Abstract_Moments_Norm_get(this, i_particle) result(norm)
         import :: DP, Abstract_Moments_Norm
@@ -66,6 +73,7 @@ private
         procedure :: construct => Null_Moments_Norm_construct
         procedure :: destroy => Null_Moments_Norm_destroy
         procedure :: set => Null_Moments_Norm_set
+        procedure :: get_num => Null_Moments_Norm_get_num
         procedure :: get => Null_Moments_Norm_get
         procedure :: add => Null_Moments_Norm_add
         procedure :: remove => Null_Moments_Norm_remove
@@ -80,6 +88,7 @@ private
         procedure :: construct => Uniform_Moments_Norm_construct
         procedure :: destroy => Uniform_Moments_Norm_destroy
         procedure :: set => Uniform_Moments_Norm_set
+        procedure :: get_num => Uniform_Moments_Norm_get_num
         procedure :: get => Uniform_Moments_Norm_get
         procedure :: add => Uniform_Moments_Norm_add
         procedure :: remove => Uniform_Moments_Norm_remove
@@ -103,6 +112,12 @@ contains
         integer, intent(in) :: i_particle
         real(DP), intent(in) :: norm
     end subroutine Null_Moments_Norm_set
+
+    pure function Null_Moments_Norm_get_num(this) result(num_norms)
+        class(Null_Moments_Norm), intent(in) :: this
+        integer :: num_norms
+        num_norms = 0
+    end function Null_Moments_Norm_get_num
 
     pure function Null_Moments_Norm_get(this, i_particle) result(norm)
         class(Null_Moments_Norm), intent(in) :: this
@@ -153,6 +168,13 @@ contains
         end if
         this%norm = norm
     end subroutine Uniform_Moments_Norm_set
+
+    pure function Uniform_Moments_Norm_get_num(this) result(num_norms)
+        class(Uniform_Moments_Norm), intent(in) :: this
+        integer  :: num_norms
+
+        num_norms = this%particles_number%get()
+    end function Uniform_Moments_Norm_get_num
 
     pure function Uniform_Moments_Norm_get(this, i_particle) result(norm)
         class(Uniform_Moments_Norm), intent(in) :: this

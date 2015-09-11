@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64, error_unit
 use data_geometry, only: num_dimensions
 use data_precisions, only: real_zero
 use procedures_errors, only: warning_continue
-use procedures_checks, only: check_in_range, check_3d_array, check_norm
+use procedures_checks, only: check_in_range, check_3d_array, check_positive, check_norm
 use class_particles_number, only: Abstract_Particles_Number
 use procedures_coordinates, only: increase_coordinates_size
 
@@ -20,6 +20,7 @@ private
         procedure :: construct => Abstract_Orientations_construct
         procedure :: destroy => Abstract_Orientations_destroy
         procedure :: set => Abstract_Orientations_set
+        procedure :: get_num => Abstract_Orientations_get_num
         procedure :: get => Abstract_Orientations_get
         procedure :: add => Abstract_Orientations_add
         procedure :: remove => Abstract_Orientations_remove
@@ -34,6 +35,7 @@ private
         procedure :: construct => Null_Orientations_construct
         procedure :: destroy => Null_Orientations_destroy
         procedure :: set => Null_Orientations_set
+        procedure :: get_num => Null_Orientations_get_num
         procedure :: get => Null_Orientations_get
         procedure :: add => Null_Orientations_add
         procedure :: remove => Null_Orientations_remove
@@ -73,9 +75,17 @@ contains
         real(DP), intent(in) :: orientation(:)
 
         call check_3d_array("Abstract_Orientations", "orientation", orientation)
+        call check_positive("Abstract_Orientations", "norm2(orientation)", norm2(orientation))
         call check_norm("Abstract_Orientations", "orientation", orientation)
         this%orientations(:, i_particle) = orientation / norm2(orientation)
     end subroutine Abstract_Orientations_set
+
+    pure function Abstract_Orientations_get_num(this) result(num_orientations)
+        class(Abstract_Orientations), intent(in) :: this
+        integer :: num_orientations
+
+        num_orientations = this%particles_number%get()
+    end function Abstract_Orientations_get_num
 
     pure function Abstract_Orientations_get(this, i_particle) result(orientation)
         class(Abstract_Orientations), intent(in) :: this
@@ -124,6 +134,12 @@ contains
         integer, intent(in) :: i_particle
         real(DP), intent(in) :: orientation(:)
     end subroutine Null_Orientations_set
+
+    pure function Null_Orientations_get_num(this) result(num_orientations)
+        class(Null_Orientations), intent(in) :: this
+        integer :: num_orientations
+        num_orientations = 0
+    end function Null_Orientations_get_num
 
     pure function Null_Orientations_get(this, i_particle) result(orientation)
         class(Null_Orientations), intent(in) :: this

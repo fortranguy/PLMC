@@ -31,17 +31,17 @@ implicit none
     call input_data%get(data_field, periodic_box_size, found)
     call test_data_found(data_field, found)
     call periodic_box%set_size(periodic_box_size)
-    
+
     allocate(Concrete_Particles_Number :: particles_number)
     data_field = "Positions.number"
     call input_data%get(data_field, positions_num, found)
     call test_data_found(data_field, found)
     call particles_number%set(positions_num)
-    
+
     allocate(Concrete_Positions :: positions)
     call positions%construct(periodic_box, particles_number)
-    
-    do i_particle = 1, particles_number%get()
+
+    do i_particle = 1, positions%get_num()
         write(string_i, *) i_particle
         data_field = "Positions."//trim(adjustl(string_i))
         call input_data%get(data_field, position, found)
@@ -49,21 +49,21 @@ implicit none
         call positions%set(i_particle, position)
         write(output_unit, *) "position", i_particle, "=", positions%get(i_particle)
     end do
-    
+
     data_field = "Positions.add"
     call input_data%get(data_field, position, found)
     call test_data_found(data_field, found)
     call particles_number%set(particles_number%get() + 1)
     call positions%add(position)
-    write(output_unit, *) "position", particles_number%get(), "=", &
-        positions%get(particles_number%get())
-    
+    write(output_unit, *) "position", positions%get_num(), "=", &
+        positions%get(positions%get_num())
+
     data_field = "Positions.remove"
     call input_data%get(data_field, i_particle, found)
     call test_data_found(data_field, found)
     call positions%remove(i_particle)
     call particles_number%set(particles_number%get() - 1)
-    do i_particle = 1, particles_number%get()
+    do i_particle = 1, positions%get_num()
         write(output_unit, *) "position", i_particle, "=", positions%get(i_particle)
     end do
 
