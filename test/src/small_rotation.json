@@ -5,7 +5,7 @@
             "orientation": [0.0, 0.0, 1.0]
         },
         "2": {
-            "orientation": [0.0, 1.0, 1.0]
+            "orientation": [0.0, 1.0, 0.0]
         },
         "3": {
             "orientation": [1.0, 0.0, 0.0]

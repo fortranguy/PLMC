@@ -52,7 +52,7 @@ implicit none
     call test_data_found(data_field, data_found)
     call small_rotation%set(small_rotation_delta)
 
-    open(newunit=orientations_unit, recl=4096, file="moved_orientations.out", action="write")
+    open(newunit=orientations_unit, recl=4096, file="rotated_orientations.out", action="write")
     do i_particle = 1, particles_number%get()
         write(orientations_unit, *) orientations%get(i_particle), &
             small_rotation%get(i_particle) - orientations%get(i_particle)

@@ -16,7 +16,12 @@
 				<Compiler>
 					<Add option="-Wall" />
 					<Add option="-g" />
+					<Add directory="/home/salomon/usr/local/jsonfortran-gnu-4.2.0/lib" />
 				</Compiler>
+				<Linker>
+					<Add library="/home/salomon/usr/local/jsonfortran-gnu-4.2.0/lib/libjsonfortran.a" />
+					<Add library="/home/salomon/usr/local/jsonfortran-gnu-4.2.0/lib/libjsonfortran.so" />
+				</Linker>
 			</Target>
 			<Target title="Release">
 				<Option output="bin/Release/PLMC" prefix_auto="1" extension_auto="1" />
@@ -34,7 +39,158 @@
 				</Linker>
 			</Target>
 		</Build>
-		<Unit filename="main.f90" />
+		<Unit filename="lib/src/class_chemical_potential.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="lib/src/class_diameters.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="lib/src/class_dipolar_moments.f90">
+			<Option weight="3" />
+		</Unit>
+		<Unit filename="lib/src/class_external_field.f90">
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="lib/src/class_field_expression.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="lib/src/class_inter_diameters.f90">
+			<Option weight="3" />
+		</Unit>
+		<Unit filename="lib/src/class_moments_norm.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="lib/src/class_orientations.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="lib/src/class_parallelepiped_domain.f90">
+			<Option weight="3" />
+		</Unit>
+		<Unit filename="lib/src/class_particles_number.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="lib/src/class_periodic_box.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="lib/src/class_positions.f90">
+			<Option weight="3" />
+		</Unit>
+		<Unit filename="lib/src/class_reciprocal_lattice.f90">
+			<Option weight="3" />
+		</Unit>
+		<Unit filename="lib/src/class_small_move.f90">
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="lib/src/class_small_rotation.f90">
+			<Option weight="3" />
+		</Unit>
+		<Unit filename="lib/src/class_temperature.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="lib/src/data_constants.f90">
+			<Option weight="0" />
+		</Unit>
+		<Unit filename="lib/src/data_geometry.f90">
+			<Option weight="0" />
+		</Unit>
+		<Unit filename="lib/src/data_precisions.f90">
+			<Option weight="0" />
+		</Unit>
+		<Unit filename="lib/src/module_data.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="lib/src/procedures_checks.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="lib/src/procedures_coordinates.f90">
+			<Option weight="0" />
+		</Unit>
+		<Unit filename="lib/src/procedures_errors.f90">
+			<Option weight="0" />
+		</Unit>
+		<Unit filename="lib/src/procedures_orientation.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="lib/src/procedures_parallelepiped_domain.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="lib/src/types_field_parameters.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="test/src/test_dipolar_moments.f90">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="test/src/test_external_field.f90">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option weight="5" />
+		</Unit>
+		<Unit filename="test/src/test_field_expression.f90">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option weight="3" />
+		</Unit>
+		<Unit filename="test/src/test_inter_diameters.f90">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="test/src/test_is_inside.f90">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="test/src/test_moments_norm.f90">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option weight="3" />
+		</Unit>
+		<Unit filename="test/src/test_orientations.f90">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option weight="3" />
+		</Unit>
+		<Unit filename="test/src/test_parallelepiped_domain.f90">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="test/src/test_particles_number.f90">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="test/src/test_periodic_box.f90">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option weight="3" />
+		</Unit>
+		<Unit filename="test/src/test_positions.f90">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="test/src/test_reciprical_lattice.f90">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="test/src/test_small_move.f90">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option weight="5" />
+		</Unit>
+		<Unit filename="test/src/test_small_rotation.f90">
+			<Option link="0" />
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="test/src/test_temperature.f90">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option weight="3" />
+		</Unit>
 		<Extensions>
 			<code_completion />
 			<envvars />
