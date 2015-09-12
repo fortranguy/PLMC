@@ -66,12 +66,16 @@
         \end{scope}
         
         \begin{scope}[shift={($(AbstractParallelepipedDomain.north)!0.5!
-                                (AbstractFieldExpression.north) + (0 cm, 7 cm)$)}, opacity=1]
-            \begin{class}[text width=\largeTextWidth]{ExternalFieldFacade}{0, 0}
+                                (AbstractFieldExpression.north) + (0 cm, 8.5 cm)$)}, opacity=0.5]
+            \begin{abstractclass}[text width=\largeTextWidth]{AbstractExternalField}{0, 0}
                 \operation{construct(parallelepipedDomain\type{AbstractParallelepipedDomain},
                     fieldExpression\type{AbstractFieldExpression})}
                 \operation{destroy()}
                 \operation{get(position\type{double[3]})\type{double[3]}}
+            \end{abstractclass}
+
+            \begin{class}[text width=\largeTextWidth]{NullExternalField}{0, -4}
+                \inherit{AbstractExternalField}
             \end{class}
         \end{scope}
         
@@ -207,26 +211,32 @@
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(AbstractRotatedOrientations.north) + (9 cm, 0 cm)$)}, opacity=1]
-            \begin{class}[text width=\mediumTextWidth]{DipolarMomentsFacade}{0, 0}
+        \begin{scope}[shift={($(AbstractRotatedOrientations.north) + (9 cm, 0 cm)$)}, opacity=0.5]
+            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractDipolarMoments}{0, 0}
                 \operation{construct(momentsNorm\type{AbstractMomentsNorm},
                                      orientations\type{AbstractOrientations})}
                 \operation{destroy()}
                 \operation{getNum()\type{int}}
                 \operation{get(iParticle\type{int})}
+            \end{abstractclass}
+
+            \begin{class}[text width=\mediumTextWidth]{NullDipolarMoments}{0, -5}
+                \inherit{AbstractDipolarMoments}
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(DipolarMomentsFacade.north) + (9 cm, 5 cm)$)}, opacity=1]
+        \begin{scope}[shift={($(AbstractDipolarMoments.north) + (9 cm, 5 cm)$)}, opacity=0.5]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractTotalMoment}{0, 0}
-                \operation{construct(dipolarMoment\type{DipolarMomentsFacade})}
+                \operation{construct(dipolarMoment\type{AbstractDipolarMoments})}
                 \operation{destroy()}
+                \operation{set(totalMoment\type{double[3]})}
+                \operation{reset()}
                 \operation{get()\type{double[3]}}
                 %\operation{rotationUpdate(old\type{Particle}, new\type{Particle})}
                 %\operation{exchangeUpdate(particle\type{Particle})}
             \end{abstractclass}
 
-            \begin{class}[text width=\mediumTextWidth]{NullTotalMoment}{0, -4}
+            \begin{class}[text width=\mediumTextWidth]{NullTotalMoment}{0, -5}
                 \inherit{AbstractTotalMoment}
             \end{class}
         \end{scope}
@@ -247,8 +257,8 @@
 \begin{scope}[on background layer]
     \aggregation{AbstractParallelepipedDomain}{periodicBox}{1}{AbstractPeriodicBox}
     \aggregation{AbstractReciprocalLattice}{periodicBox}{1}{AbstractPeriodicBox}
-    \aggregation{ExternalFieldFacade}{parallelepipedDomain}{1}{AbstractParallelepipedDomain}
-    \aggregation{ExternalFieldFacade}{fieldExpression}{1}{AbstractFieldExpression}
+    \aggregation{AbstractExternalField}{parallelepipedDomain}{1}{AbstractParallelepipedDomain}
+    \aggregation{AbstractExternalField}{fieldExpression}{1}{AbstractFieldExpression}
     
     \aggregation{AbstractDiameters}{number}{1}{AbstractNumber}
     \aggregation{AbstractMomentsNorm}{number}{1}{AbstractNumber}
@@ -258,8 +268,8 @@
     \aggregation{AbstractPositions}{number}{1}{AbstractNumber}
     \aggregation{AbstractOrientations}{number}{1}{AbstractNumber}
     
-    \aggregation{DipolarMomentsFacade}{momentsNorm}{1}{AbstractMomentsNorm}
-    \aggregation{DipolarMomentsFacade}{orientations}{1}{AbstractOrientations}
+    \aggregation{AbstractDipolarMoments}{momentsNorm}{1}{AbstractMomentsNorm}
+    \aggregation{AbstractDipolarMoments}{orientations}{1}{AbstractOrientations}
     
     \aggregation{AbstractMovedPositions}{positions}{1}{AbstractPositions}
     \aggregation{AbstractRotatedOrientations}{orientations}{1}{AbstractOrientations}
@@ -270,5 +280,5 @@
     \aggregation{ParticlesExchangeFacade}{positions}{1}{AbstractPositions}
     \aggregation{ParticlesExchangeFacade}{orientations}{1}{AbstractOrientations}
     
-    \aggregation{AbstractTotalMoment}{momentsNorm}{1}{DipolarMomentsFacade}
+    \aggregation{AbstractTotalMoment}{momentsNorm}{1}{AbstractDipolarMoments}
 \end{scope}
