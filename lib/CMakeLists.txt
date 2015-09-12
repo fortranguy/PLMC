@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 
 project(
     PLMC_Library
-    Fortran CXX
+    Fortran #CXX
 )
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/SelectBuildType.cmake)
