@@ -3,7 +3,7 @@ module procedures_orientations_manipulate
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file
 use module_data, only: test_data_found
-use class_particles_number, only: Abstract_Particles_Number, Concrete_Particles_Number
+use class_number, only: Abstract_Number, Concrete_Number
 use class_orientations, only: Abstract_Orientations
 
 implicit none
@@ -18,7 +18,7 @@ contains
         class(Abstract_Orientations), intent(inout) :: orientations
         type(json_file), intent(inout) :: input_data
 
-        class(Abstract_Particles_Number), allocatable :: particles_number
+        class(Abstract_Number), allocatable :: number
         character(len=:), allocatable :: data_field
         logical :: found
         integer :: orientations_num, i_particle
@@ -29,10 +29,10 @@ contains
         data_field = "Orientations.number"
         call input_data%get(data_field, orientations_num, found)
         call test_data_found(data_field, found)
-        allocate(Concrete_Particles_Number :: particles_number)
-        call particles_number%set(orientations_num)
+        allocate(Concrete_Number :: number)
+        call number%set(orientations_num)
 
-        call orientations%construct(particles_number)
+        call orientations%construct(number)
 
         do i_particle = 1, orientations%get_num()
             write(string_i, *) i_particle
@@ -46,7 +46,7 @@ contains
         data_field = "Orientations.add"
         call input_data%get(data_field, orientation, found)
         call test_data_found(data_field, found)
-        call particles_number%set(particles_number%get() + 1)
+        call number%set(number%get() + 1)
         call orientations%add(orientation)
         write(output_unit, *) "orientation", orientations%get_num(), "=", &
             orientations%get(orientations%get_num())
@@ -55,12 +55,12 @@ contains
         call input_data%get(data_field, i_particle, found)
         call test_data_found(data_field, found)
         call orientations%remove(i_particle)
-        call particles_number%set(particles_number%get() - 1)
+        call number%set(number%get() - 1)
         do i_particle = 1, orientations%get_num()
             write(output_unit, *) "orientation", i_particle, "=", orientations%get(i_particle)
         end do
 
-        deallocate(particles_number)
+        deallocate(number)
         deallocate(data_field)
 
     end subroutine manipulate_orientations

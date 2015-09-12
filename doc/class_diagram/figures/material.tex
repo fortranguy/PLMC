@@ -84,15 +84,15 @@
         \end{scope}
         
         \begin{scope}[shift={($(AbstractPeriodicBox.north) + (28 cm, 0 cm)$)}, opacity=1]
-            \begin{abstractclass}[text width=\smallTextWidth]{AbstractParticlesNumber}{0, 0}
+            \begin{abstractclass}[text width=\smallTextWidth]{AbstractNumber}{0, 0}
                 \operation{set(number\type{int})}
                 \operation{get()\type{int}}
             \end{abstractclass}
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractParticlesNumber.north) + (0 cm, 10 cm)$)}, opacity=1]
+        \begin{scope}[shift={($(AbstractNumber.north) + (0 cm, 10 cm)$)}, opacity=1]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractDiameters}{0, 0}
-                \operation{contruct(particlesNumber\type{AbstractParticlesNumber})}
+                \operation{contruct(number\type{AbstractNumber})}
                 \operation{destroy()}
                 \operation[0]{set(iParticle\type{int}, diameter\type{double})}
                 \operation[0]{getNum()\type{int}}
@@ -117,7 +117,7 @@
 
         \begin{scope}[shift={($(AbstractDiameters.north) + (9 cm, 0 cm)$)}, opacity=1]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractMomentsNorm}{0, 0}
-                \operation{contruct(particlesNumber\type{AbstractParticlesNumber})}
+                \operation{contruct(number\type{AbstractNumber})}
                 \operation{destroy()}
                 \operation[0]{set(iParticle\type{int}, norm\type{double})}
                 \operation[0]{getNum()\type{int}}
@@ -157,7 +157,7 @@
         \begin{scope}[shift={($(AbstractMomentsNorm.north) + (9 cm, 0 cm)$)}, opacity=1]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractPositions}{0, 0}
                 \operation{construct(periodicBox\type{AbstractPeriodicBox},
-                                      particlesNumber\type{AbstractParticlesNumber})}
+                                      number\type{AbstractNumber})}
                 \operation{detroy()}
                 \operation{set(iParticle\type{int}, position\type{double[3]})}
                 \operation{getNum()\type{int}}
@@ -179,7 +179,7 @@
 
         \begin{scope}[shift={($(AbstractPositions.north) + (9 cm, 0 cm)$)}, opacity=1]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractOrientations}{0, 0}
-                \operation{construct(particlesNumber\type{AbstractParticlesNumber})}
+                \operation{construct(number\type{AbstractNumber})}
                 \operation{detroy()}
                 \operation{set(iParticle\type{int}, orientation\type{double[3]})}
                 \operation{getNum()\type{int}}
@@ -250,13 +250,13 @@
     \aggregation{ExternalFieldFacade}{parallelepipedDomain}{1}{AbstractParallelepipedDomain}
     \aggregation{ExternalFieldFacade}{fieldExpression}{1}{AbstractFieldExpression}
     
-    \aggregation{AbstractDiameters}{particlesNumber}{1}{AbstractParticlesNumber}
-    \aggregation{AbstractMomentsNorm}{particlesNumber}{1}{AbstractParticlesNumber}
+    \aggregation{AbstractDiameters}{number}{1}{AbstractNumber}
+    \aggregation{AbstractMomentsNorm}{number}{1}{AbstractNumber}
     
     \aggregation{AbstractInterDiameters}{diameters}{2}{AbstractDiameters}
     \aggregation{AbstractPositions}{periodicBox}{1}{AbstractPeriodicBox}
-    \aggregation{AbstractPositions}{particlesNumber}{1}{AbstractParticlesNumber}
-    \aggregation{AbstractOrientations}{particlesNumber}{1}{AbstractParticlesNumber}
+    \aggregation{AbstractPositions}{number}{1}{AbstractNumber}
+    \aggregation{AbstractOrientations}{number}{1}{AbstractNumber}
     
     \aggregation{DipolarMomentsFacade}{momentsNorm}{1}{AbstractMomentsNorm}
     \aggregation{DipolarMomentsFacade}{orientations}{1}{AbstractOrientations}
@@ -264,7 +264,7 @@
     \aggregation{AbstractMovedPositions}{positions}{1}{AbstractPositions}
     \aggregation{AbstractRotatedOrientations}{orientations}{1}{AbstractOrientations}
 
-    \aggregation{ParticlesExchangeFacade}{particlesNumber}{1}{AbstractParticlesNumber}
+    \aggregation{ParticlesExchangeFacade}{number}{1}{AbstractNumber}
     \aggregation{ParticlesExchangeFacade}{diameters}{1}{AbstractDiameters}
     \aggregation{ParticlesExchangeFacade}{momentNorm}{1}{AbstractMomentsNorm}
     \aggregation{ParticlesExchangeFacade}{positions}{1}{AbstractPositions}

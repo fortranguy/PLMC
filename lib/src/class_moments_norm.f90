@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_precisions, only: real_zero
 use procedures_errors, only: warning_continue
 use procedures_checks, only: check_in_range, check_positive
-use class_particles_number, only: Abstract_Particles_Number
+use class_number, only: Abstract_Number
 
 implicit none
 
@@ -23,10 +23,10 @@ private
 
     abstract interface
 
-        subroutine Abstract_Moments_Norm_construct(this, particles_number)
-        import :: Abstract_Particles_Number, Abstract_Moments_Norm
+        subroutine Abstract_Moments_Norm_construct(this, number)
+        import :: Abstract_Number, Abstract_Moments_Norm
             class(Abstract_Moments_Norm), intent(out) :: this
-            class(Abstract_Particles_Number), target, intent(in) :: particles_number
+            class(Abstract_Number), target, intent(in) :: number
         end subroutine Abstract_Moments_Norm_construct
 
         subroutine Abstract_Moments_Norm_destroy(this)
@@ -83,7 +83,7 @@ private
     private
         real(DP) :: norm
         logical :: is_set = .false.
-        class(Abstract_Particles_Number), pointer :: particles_number
+        class(Abstract_Number), pointer :: number
     contains
         procedure :: construct => Uniform_Moments_Norm_construct
         procedure :: destroy => Uniform_Moments_Norm_destroy
@@ -98,9 +98,9 @@ contains
 
 !implementation Null_Moments_Norm
 
-    subroutine Null_Moments_Norm_construct(this, particles_number)
+    subroutine Null_Moments_Norm_construct(this, number)
         class(Null_Moments_Norm), intent(out) :: this
-        class(Abstract_Particles_Number), target, intent(in) :: particles_number
+        class(Abstract_Number), target, intent(in) :: number
     end subroutine Null_Moments_Norm_construct
 
     subroutine Null_Moments_Norm_destroy(this)
@@ -140,17 +140,17 @@ contains
 
 !implementation Uniform_Moments_Norm
 
-    subroutine Uniform_Moments_Norm_construct(this, particles_number)
+    subroutine Uniform_Moments_Norm_construct(this, number)
         class(Uniform_Moments_Norm), intent(out) :: this
-        class(Abstract_Particles_Number), target, intent(in) :: particles_number
+        class(Abstract_Number), target, intent(in) :: number
 
-        this%particles_number => particles_number
+        this%number => number
     end subroutine Uniform_Moments_Norm_construct
 
     subroutine Uniform_Moments_Norm_destroy(this)
         class(Uniform_Moments_Norm), intent(inout) :: this
 
-        this%particles_number => null()
+        this%number => null()
     end subroutine Uniform_Moments_Norm_destroy
 
     subroutine Uniform_Moments_Norm_set(this, i_particle, norm)
@@ -158,8 +158,7 @@ contains
         integer, intent(in) :: i_particle
         real(DP), intent(in) :: norm
 
-        call check_in_range("Uniform_Moments_Norm", this%particles_number%get(), &
-                            "i_particle", i_particle)
+        call check_in_range("Uniform_Moments_Norm", this%number%get(), "i_particle", i_particle)
         call check_positive("Uniform_Moments_Norm", "norm", norm)
         if (.not. this%is_set) then
             this%is_set = .true.
@@ -173,7 +172,7 @@ contains
         class(Uniform_Moments_Norm), intent(in) :: this
         integer  :: num_norms
 
-        num_norms = this%particles_number%get()
+        num_norms = this%number%get()
     end function Uniform_Moments_Norm_get_num
 
     pure function Uniform_Moments_Norm_get(this, i_particle) result(norm)
@@ -188,15 +187,14 @@ contains
         class(Uniform_Moments_Norm), intent(inout) :: this
         real(DP), intent(in) :: norm
 
-        call this%set(this%particles_number%get(), norm)
+        call this%set(this%number%get(), norm)
     end subroutine Uniform_Moments_Norm_add
 
     subroutine Uniform_Moments_Norm_remove(this, i_particle)
          class(Uniform_Moments_Norm), intent(inout) :: this
          integer, intent(in) :: i_particle
 
-        call check_in_range("Uniform_Moments_Norm", this%particles_number%get(), &
-                            "i_particle", i_particle)
+        call check_in_range("Uniform_Moments_Norm", this%number%get(), "i_particle", i_particle)
     end subroutine Uniform_Moments_Norm_remove
 
 !end implementation Uniform_Moments_Norm

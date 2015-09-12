@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64, error_unit
 use data_geometry, only: num_dimensions
 use procedures_checks, only: check_in_range, check_3d_array
 use class_periodic_box, only: Abstract_Periodic_Box
-use class_particles_number, only: Abstract_Particles_Number
+use class_number, only: Abstract_Number
 use procedures_coordinates, only: increase_coordinates_size
 
 implicit none
@@ -14,7 +14,7 @@ private
     type, abstract, public :: Abstract_Positions
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box
-        class(Abstract_Particles_Number), pointer :: particles_number
+        class(Abstract_Number), pointer :: number
         real(DP), allocatable :: positions(:, :)
     contains
         procedure :: construct => Abstract_Positions_construct
@@ -34,17 +34,17 @@ contains
 
 !implementation Abstract_Positions
 
-    subroutine Abstract_Positions_construct(this, periodic_box, particles_number)
+    subroutine Abstract_Positions_construct(this, periodic_box, number)
         class(Abstract_Positions), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Particles_Number), target, intent(in) :: particles_number
+        class(Abstract_Number), target, intent(in) :: number
 
         this%periodic_box => periodic_box
-        this%particles_number => particles_number
-        if (this%particles_number%get() == 0) then
+        this%number => number
+        if (this%number%get() == 0) then
             allocate(this%positions(num_dimensions, 1))
         else
-            allocate(this%positions(num_dimensions, this%particles_number%get()))
+            allocate(this%positions(num_dimensions, this%number%get()))
         end if
         this%positions = 0._DP
     end subroutine Abstract_Positions_construct
@@ -53,7 +53,7 @@ contains
         class(Abstract_Positions), intent(inout) :: this
 
         if (allocated(this%positions)) deallocate(this%positions)
-        this%particles_number => null()
+        this%number => null()
         this%periodic_box => null()
     end subroutine Abstract_Positions_destroy
 
@@ -70,7 +70,7 @@ contains
         class(Abstract_Positions), intent(in) :: this
         integer :: num_positions
 
-        num_positions = this%particles_number%get()
+        num_positions = this%number%get()
     end function Abstract_Positions_get_num
 
     pure function Abstract_Positions_get(this, i_particle) result(position)
@@ -85,20 +85,20 @@ contains
         class(Abstract_Positions), intent(inout) :: this
         real(DP), intent(in) :: position(:)
 
-        if (size(this%positions, 2) < this%particles_number%get()) then
+        if (size(this%positions, 2) < this%number%get()) then
             call increase_coordinates_size(this%positions)
         end if
-        call this%set(this%particles_number%get(), position)
+        call this%set(this%number%get(), position)
     end subroutine Abstract_Positions_add
 
     subroutine Abstract_Positions_remove(this, i_particle)
         class(Abstract_Positions), intent(inout) :: this
         integer, intent(in) :: i_particle
 
-        call check_in_range("Abstract_Positions", this%particles_number%get(), &
+        call check_in_range("Abstract_Positions", this%number%get(), &
                             "i_particle", i_particle)
-        if (i_particle < this%particles_number%get()) then
-            call this%set(i_particle, this%get(this%particles_number%get()))
+        if (i_particle < this%number%get()) then
+            call this%set(i_particle, this%get(this%number%get()))
         end if
     end subroutine Abstract_Positions_remove
 

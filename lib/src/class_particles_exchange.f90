@@ -35,7 +35,7 @@ contains
         class(Particles_Exchange_Facade), intent(inout) :: this
         type(Generic_Particle), intent(in) :: particle
 
-        call this%particles%particles_number%set(this%particles%particles_number%get() + 1)
+        call this%particles%number%set(this%particles%number%get() + 1)
         call this%particles%diameters%add(particle%diameter)
         call this%particles%moments_norm%add(particle%moment_norm)
         call this%particles%positions%add(particle%position)
@@ -50,7 +50,7 @@ contains
         call this%particles%positions%remove(i_particle)
         call this%particles%moments_norm%remove(i_particle)
         call this%particles%diameters%remove(i_particle)
-        call this%particles%particles_number%set(this%particles%particles_number%get() - 1)
+        call this%particles%number%set(this%particles%number%get() - 1)
     end subroutine Particles_Exchange_Facade_remove
 
 end module class_particles_exchange

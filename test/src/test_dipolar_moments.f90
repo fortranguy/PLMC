@@ -65,7 +65,7 @@ program test_dipolar_moments
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
-use class_particles_number, only: Abstract_Particles_Number, Concrete_Particles_Number
+use class_number, only: Abstract_Number, Concrete_Number
 use class_moments_norm, only: Abstract_Moments_Norm, Null_Moments_Norm, Uniform_Moments_Norm
 use class_orientations, only: Abstract_Orientations, Null_Orientations, Concrete_Orientations
 use class_dipolar_moments, only: Dipolar_Moments_Facade
@@ -76,7 +76,7 @@ implicit none
     type(Dipolar_Moments_Facade) :: dipolar_moments
     class(Abstract_Orientations), allocatable :: orientations
     class(Abstract_Moments_Norm), allocatable :: moments_norm
-    class(Abstract_Particles_Number), allocatable :: particles_number
+    class(Abstract_Number), allocatable :: number
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename, data_field
     logical :: data_found
@@ -87,16 +87,16 @@ implicit none
     call test_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
 
-    allocate(Concrete_Particles_Number :: particles_number)
+    allocate(Concrete_Number :: number)
     data_field = "Dipoles.number"
     call input_data%get(data_field, num_particles, data_found)
     call test_data_found(data_field, data_found)
-    call particles_number%set(num_particles)
+    call number%set(num_particles)
 
     allocate(Null_Moments_Norm :: moments_norm)
     allocate(Null_Orientations :: orientations)
-    call moments_norm%construct(particles_number)
-    call orientations%construct(particles_number)
+    call moments_norm%construct(number)
+    call orientations%construct(number)
     call set_objects(input_data, "Null_Moments_Norm", moments_norm, &
                      "Null_Orientations", orientations)
     call dipolar_moments%construct(moments_norm, orientations)
@@ -109,8 +109,8 @@ implicit none
 
     allocate(Uniform_Moments_Norm :: moments_norm)
     allocate(Concrete_Orientations :: orientations)
-    call moments_norm%construct(particles_number)
-    call orientations%construct(particles_number)
+    call moments_norm%construct(number)
+    call orientations%construct(number)
     call set_objects(input_data, "Uniform_Moments", moments_norm, &
                      "Concrete_Orientations", orientations)
     call dipolar_moments%construct(moments_norm, orientations)
@@ -121,7 +121,7 @@ implicit none
     deallocate(orientations)
     deallocate(moments_norm)
 
-    deallocate(particles_number)
+    deallocate(number)
     deallocate(data_field)
     deallocate(data_filename)
     call input_data%destroy()

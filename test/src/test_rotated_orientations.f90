@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use data_geometry, only: num_dimensions
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
-use class_particles_number, only: Abstract_Particles_Number, Concrete_Particles_Number
+use class_number, only: Abstract_Number, Concrete_Number
 use class_orientations, only: Abstract_Orientations, Concrete_Orientations
 use class_rotated_orientations, only: Abstract_Rotated_Orientations, Concrete_Rotated_Orientations
 
@@ -12,7 +12,7 @@ implicit none
 
     class(Abstract_Rotated_Orientations), allocatable :: rotated_orientations
     class(Abstract_Orientations), allocatable :: orientations
-    class(Abstract_Particles_Number), allocatable :: particles_number
+    class(Abstract_Number), allocatable :: number
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename, data_field
     logical :: data_found
@@ -29,14 +29,14 @@ implicit none
     call test_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
 
-    allocate(Concrete_Particles_Number :: particles_number)
+    allocate(Concrete_Number :: number)
     data_field = "Particles.number"
     call input_data%get(data_field, num_particles, data_found)
     call test_data_found(data_field, data_found)
-    call particles_number%set(num_particles)
+    call number%set(num_particles)
 
     allocate(Concrete_Orientations :: orientations)
-    call orientations%construct(particles_number)
+    call orientations%construct(number)
 
     allocate(orientations_units(orientations%get_num()))
     do i_particle = 1, orientations%get_num()
@@ -79,7 +79,7 @@ implicit none
     deallocate(rotated_orientations)
     call orientations%destroy()
     deallocate(orientations)
-    deallocate(particles_number)
+    deallocate(number)
     deallocate(data_field)
     deallocate(data_filename)
     call input_data%destroy()

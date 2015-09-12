@@ -3,7 +3,7 @@ module procedures_moments_norm_manipulate
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file
 use module_data, only: test_data_found
-use class_particles_number, only: Abstract_Particles_Number, Concrete_Particles_Number
+use class_number, only: Abstract_Number, Concrete_Number
 use class_moments_norm, only: Abstract_Moments_Norm
 
 implicit none
@@ -18,20 +18,20 @@ contains
         class(Abstract_Moments_Norm), intent(inout) :: moments_norm
         type(json_file) :: input_data
 
-        class(Abstract_Particles_Number), allocatable :: particles_number
+        class(Abstract_Number), allocatable :: number
         character(len=:), allocatable :: data_field
         logical :: found
         real(DP) :: moments_norm_value
         integer :: moments_norm_num, i_particle
 
-        allocate(Concrete_Particles_Number :: particles_number)
+        allocate(Concrete_Number :: number)
         data_field = "Moments Norm.number"
         call input_data%get(data_field, moments_norm_num, found)
         call test_data_found(data_field, found)
-        call particles_number%set(moments_norm_num)
+        call number%set(moments_norm_num)
 
         write(output_unit, *) object_name
-        call moments_norm%construct(particles_number)
+        call moments_norm%construct(number)
         data_field = "Moments Norm.value"
         call input_data%get(data_field, moments_norm_value, found)
         call test_data_found(data_field, found)
@@ -42,7 +42,7 @@ contains
         data_field = "Moments Norm.add"
         call input_data%get(data_field, moments_norm_value, found)
         call test_data_found(data_field, found)
-        call particles_number%set(particles_number%get() + 1)
+        call number%set(number%get() + 1)
         call moments_norm%add(moments_norm_value)
         write(output_unit, *) "new norm", moments_norm%get_num(), "=", &
             moments_norm%get(moments_norm%get_num())
@@ -51,14 +51,14 @@ contains
         call input_data%get(data_field, i_particle, found)
         call test_data_found(data_field, found)
         call moments_norm%remove(i_particle)
-        call particles_number%set(particles_number%get() - 1)
+        call number%set(number%get() - 1)
         do i_particle = 1, moments_norm%get_num()
             write(output_unit, *) "norm", i_particle, "=", moments_norm%get(i_particle)
         end do
         call moments_norm%destroy()
 
         deallocate(data_field)
-        deallocate(particles_number)
+        deallocate(number)
 
     end subroutine manipulate_moments_norm
 

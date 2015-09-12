@@ -63,14 +63,17 @@
 		<Unit filename="lib/src/class_moved_positions.f90">
 			<Option weight="4" />
 		</Unit>
+		<Unit filename="lib/src/class_number.f90">
+			<Option weight="1" />
+		</Unit>
 		<Unit filename="lib/src/class_orientations.f90">
 			<Option weight="2" />
 		</Unit>
 		<Unit filename="lib/src/class_parallelepiped_domain.f90">
 			<Option weight="3" />
 		</Unit>
-		<Unit filename="lib/src/class_particles_number.f90">
-			<Option weight="1" />
+		<Unit filename="lib/src/class_particles_exchange.f90">
+			<Option weight="5" />
 		</Unit>
 		<Unit filename="lib/src/class_periodic_box.f90">
 			<Option weight="2" />
@@ -101,6 +104,9 @@
 		</Unit>
 		<Unit filename="lib/src/module_data.f90">
 			<Option weight="1" />
+		</Unit>
+		<Unit filename="lib/src/module_particles.f90">
+			<Option weight="4" />
 		</Unit>
 		<Unit filename="lib/src/procedures_checks.f90">
 			<Option weight="1" />

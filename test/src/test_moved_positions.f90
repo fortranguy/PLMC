@@ -5,7 +5,7 @@ use data_geometry, only: num_dimensions
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box
-use class_particles_number, only: Abstract_Particles_Number, Concrete_Particles_Number
+use class_number, only: Abstract_Number, Concrete_Number
 use class_positions, only: Abstract_Positions, Concrete_Positions
 use class_moved_positions, only: Abstract_Moved_Positions, Concrete_Moved_Positions
 
@@ -13,7 +13,7 @@ implicit none
 
     class(Abstract_Moved_Positions), allocatable :: moved_positions
     class(Abstract_Positions), allocatable :: positions
-    class(Abstract_Particles_Number), allocatable :: particles_number
+    class(Abstract_Number), allocatable :: number
     class(Abstract_Periodic_Box), allocatable :: periodic_box
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename, data_field
@@ -37,14 +37,14 @@ implicit none
     call test_data_found(data_field, data_found)
     call periodic_box%set_size(periodic_box_size)
 
-    allocate(Concrete_Particles_Number :: particles_number)
+    allocate(Concrete_Number :: number)
     data_field = "Particles.number"
     call input_data%get(data_field, num_particles, data_found)
     call test_data_found(data_field, data_found)
-    call particles_number%set(num_particles)
+    call number%set(num_particles)
 
     allocate(Concrete_Positions :: positions)
-    call positions%construct(periodic_box, particles_number)
+    call positions%construct(periodic_box, number)
 
     allocate(positions_units(positions%get_num()))
     do i_particle = 1, positions%get_num()
@@ -86,7 +86,7 @@ implicit none
     deallocate(moved_positions)
     call positions%destroy()
     deallocate(positions)
-    deallocate(particles_number)
+    deallocate(number)
     deallocate(periodic_box)
     deallocate(data_field)
     deallocate(data_filename)

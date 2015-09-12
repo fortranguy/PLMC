@@ -4,14 +4,14 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_precisions, only: real_zero
 use procedures_errors, only: warning_continue
 use procedures_checks, only: check_in_range, check_positive
-use class_particles_number, only: Abstract_Particles_Number
+use class_number, only: Abstract_Number
 
 implicit none
 
 private
 
     type, abstract, public :: Abstract_Diameters
-        class(Abstract_Particles_Number), pointer :: particles_number
+        class(Abstract_Number), pointer :: number
     contains
         procedure :: construct => Abstract_Diameters_construct
         procedure :: destroy => Abstract_Diameters_destroy
@@ -74,17 +74,17 @@ contains
 
 !implementation Abstract_Diameters
 
-    subroutine Abstract_Diameters_construct(this, particles_number)
+    subroutine Abstract_Diameters_construct(this, number)
         class(Abstract_Diameters), intent(out) :: this
-        class(Abstract_Particles_Number), target, intent(in) :: particles_number
+        class(Abstract_Number), target, intent(in) :: number
 
-        this%particles_number => particles_number
+        this%number => number
     end subroutine Abstract_Diameters_construct
 
     subroutine Abstract_Diameters_destroy(this)
         class(Abstract_Diameters), intent(inout) :: this
 
-        this%particles_number => null()
+        this%number => null()
     end subroutine Abstract_Diameters_destroy
 
 !end implementation Abstract_Diameters
@@ -96,7 +96,7 @@ contains
         integer, intent(in) :: i_particle
         real(DP), intent(in) :: diameter
 
-        call check_in_range("Uniform_Diameter", this%particles_number%get(), &
+        call check_in_range("Uniform_Diameter", this%number%get(), &
                             "i_particle", i_particle)
         call check_positive("Uniform_Diameters", "diameter", diameter)
         if (.not. this%is_set) then
@@ -111,7 +111,7 @@ contains
         class(Uniform_Diameters), intent(in) :: this
         integer  :: num_diameters
 
-        num_diameters = this%particles_number%get()
+        num_diameters = this%number%get()
     end function Uniform_Diameters_get_num
 
     pure function Uniform_Diameters_get(this, i_particle) result(diameter)
@@ -126,14 +126,14 @@ contains
         class(Uniform_Diameters), intent(inout) :: this
         real(DP), intent(in) :: diameter
 
-        call this%set(this%particles_number%get(), diameter)
+        call this%set(this%number%get(), diameter)
     end subroutine Uniform_Diameters_add
 
     subroutine Uniform_Diameters_remove(this, i_particle)
         class(Uniform_Diameters), intent(inout) :: this
         integer, intent(in) :: i_particle
 
-        call check_in_range("Uniform_Diameters", this%particles_number%get(), "i_particle", i_particle)
+        call check_in_range("Uniform_Diameters", this%number%get(), "i_particle", i_particle)
     end subroutine Uniform_Diameters_remove
 
 !end implementation Uniform_Diameters

@@ -5,7 +5,7 @@ use data_geometry, only: num_dimensions
 use data_precisions, only: real_zero
 use procedures_errors, only: warning_continue
 use procedures_checks, only: check_in_range, check_3d_array, check_positive, check_norm
-use class_particles_number, only: Abstract_Particles_Number
+use class_number, only: Abstract_Number
 use procedures_coordinates, only: increase_coordinates_size
 
 implicit none
@@ -15,7 +15,7 @@ private
     type, abstract, public :: Abstract_Orientations
     private
         real(DP), allocatable :: orientations(:, :)
-        class(Abstract_Particles_Number), pointer :: particles_number
+        class(Abstract_Number), pointer :: number
     contains
         procedure :: construct => Abstract_Orientations_construct
         procedure :: destroy => Abstract_Orientations_destroy
@@ -45,19 +45,19 @@ contains
 
 !implementation Abstract_Orientations
 
-    subroutine Abstract_Orientations_construct(this, particles_number)
+    subroutine Abstract_Orientations_construct(this, number)
         class(Abstract_Orientations), intent(out) :: this
-        class(Abstract_Particles_Number), target, intent(in) :: particles_number
+        class(Abstract_Number), target, intent(in) :: number
 
         integer :: i_particle
 
-        this%particles_number => particles_number
-        if (this%particles_number%get() == 0) then
+        this%number => number
+        if (this%number%get() == 0) then
             allocate(this%orientations(num_dimensions, 1))
         else
-            allocate(this%orientations(num_dimensions, this%particles_number%get()))
+            allocate(this%orientations(num_dimensions, this%number%get()))
         end if
-        do i_particle = 1, this%particles_number%get()
+        do i_particle = 1, this%number%get()
             this%orientations(:, i_particle) = 0._DP
         end do
     end subroutine Abstract_Orientations_construct
@@ -66,7 +66,7 @@ contains
         class(Abstract_Orientations), intent(inout) :: this
 
         if (allocated(this%orientations)) deallocate(this%orientations)
-        this%particles_number => null()
+        this%number => null()
     end subroutine Abstract_Orientations_destroy
 
     subroutine Abstract_Orientations_set(this, i_particle, orientation)
@@ -84,7 +84,7 @@ contains
         class(Abstract_Orientations), intent(in) :: this
         integer :: num_orientations
 
-        num_orientations = this%particles_number%get()
+        num_orientations = this%number%get()
     end function Abstract_Orientations_get_num
 
     pure function Abstract_Orientations_get(this, i_particle) result(orientation)
@@ -99,20 +99,20 @@ contains
         class(Abstract_Orientations), intent(inout) :: this
         real(DP), intent(in) :: orientation(:)
 
-        if (size(this%orientations, 2) < this%particles_number%get()) then
+        if (size(this%orientations, 2) < this%number%get()) then
             call increase_coordinates_size(this%orientations)
         end if
-        call this%set(this%particles_number%get(), orientation)
+        call this%set(this%number%get(), orientation)
     end subroutine Abstract_Orientations_add
 
     subroutine Abstract_Orientations_remove(this, i_particle)
         class(Abstract_Orientations), intent(inout) :: this
         integer, intent(in) :: i_particle
 
-        call check_in_range("Abstract_Orientations", this%particles_number%get(), &
+        call check_in_range("Abstract_Orientations", this%number%get(), &
                             "i_particle", i_particle)
-        if (i_particle < this%particles_number%get()) then
-            call this%set(i_particle, this%get(this%particles_number%get()))
+        if (i_particle < this%number%get()) then
+            call this%set(i_particle, this%get(this%number%get()))
         end if
     end subroutine Abstract_Orientations_remove
 
@@ -120,9 +120,9 @@ contains
 
 !implementation Null_Orientations
 
-    subroutine Null_Orientations_construct(this, particles_number)
+    subroutine Null_Orientations_construct(this, number)
         class(Null_Orientations), intent(out) :: this
-        class(Abstract_Particles_Number), target, intent(in) :: particles_number
+        class(Abstract_Number), target, intent(in) :: number
     end subroutine Null_Orientations_construct
 
     subroutine Null_Orientations_destroy(this)

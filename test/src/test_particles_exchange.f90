@@ -35,8 +35,8 @@ contains
         character(len=1024) :: string_i
         
         call json_create_object(output_data%ptr, "")
-        allocate(json_particles(particles%particles_number%get()))
-        do i_particle = 1, particles%particles_number%get()
+        allocate(json_particles(particles%number%get()))
+        do i_particle = 1, particles%number%get()
             json_particles(i_particle)%ptr => null()
             write(string_i, *) i_particle
             call json_create_object(json_particles(i_particle)%ptr, &
@@ -44,7 +44,7 @@ contains
             call json_add(output_data%ptr, json_particles(i_particle)%ptr)
         end do
 
-        do i_particle = 1, particles%particles_number%get()
+        do i_particle = 1, particles%number%get()
             call json_add(json_particles(i_particle)%ptr, &
                 "diameter", particles%diameters%get(i_particle))
             call json_add(json_particles(i_particle)%ptr, &
@@ -70,7 +70,7 @@ use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
 use procedures_orientation, only: random_orientation
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box
-use class_particles_number, only: Abstract_Particles_Number, Concrete_Particles_Number
+use class_number, only: Abstract_Number, Concrete_Number
 use class_diameters, only: Abstract_Diameters, Uniform_Diameters
 use class_moments_norm, only: Abstract_Moments_Norm, Uniform_Moments_Norm
 use class_positions, only: Abstract_Positions, Concrete_Positions
@@ -86,7 +86,7 @@ implicit none
     type(Generic_Particles) :: particles
     type(Generic_Particle) :: particle
     class(Abstract_Periodic_Box), allocatable :: periodic_box
-    class(Abstract_Particles_Number), allocatable :: particles_number
+    class(Abstract_Number), allocatable :: number
     class(Abstract_Diameters), allocatable :: diameters
     class(Abstract_Moments_Norm), allocatable :: moments_norm
     class(Abstract_Positions), allocatable :: positions
@@ -116,14 +116,14 @@ implicit none
     data_field = "Particles.number"
     call input_data%get(data_field, num_particles, data_found)
     call test_data_found(data_field, data_found)
-    allocate(Concrete_Particles_Number :: particles_number)
-    call particles_number%set(num_particles)
+    allocate(Concrete_Number :: number)
+    call number%set(num_particles)
 
     data_field = "Particles.diameter"
     call input_data%get(data_field, diameter, data_found)
     call test_data_found(data_field, data_found)
     allocate(Uniform_Diameters :: diameters)
-    call diameters%construct(particles_number)
+    call diameters%construct(number)
     do i_particle = 1, diameters%get_num()
         call diameters%set(i_particle, diameter)
     end do
@@ -132,25 +132,25 @@ implicit none
     call input_data%get(data_field, moment_norm, data_found)
     call test_data_found(data_field, data_found)
     allocate(Uniform_Moments_Norm :: moments_norm)
-    call moments_norm%construct(particles_number)
+    call moments_norm%construct(number)
     do i_particle = 1, moments_norm%get_num()
         call moments_norm%set(i_particle, moment_norm)
     end do
 
     allocate(Concrete_Positions :: positions)
-    call positions%construct(periodic_box, particles_number)
+    call positions%construct(periodic_box, number)
     do i_particle = 1, positions%get_num()
         call random_number(rand_3d)
         call positions%set(i_particle, periodic_box%get_size() * rand_3d)
     end do
 
     allocate(Concrete_Orientations :: orientations)
-    call orientations%construct(particles_number)
+    call orientations%construct(number)
     do i_particle = 1, orientations%get_num()
         call orientations%set(i_particle, random_orientation())
     end do
 
-    call Generic_Particles_construct(particles, particles_number, diameters, moments_norm, &
+    call Generic_Particles_construct(particles, number, diameters, moments_norm, &
                                      positions, orientations)
     call particles_exchange%construct(particles)    
     call json_write_particles(particles, "initial.json")
@@ -164,7 +164,7 @@ implicit none
     call json_write_particles(particles, "added.json")
 
     call random_number(rand)
-    i_particle = int(real(particles_number%get(), DP) * rand) + 1
+    i_particle = int(real(number%get(), DP) * rand) + 1
     write(output_unit, *) "remove index =", i_particle
     call particles_exchange%remove(i_particle)
     call json_write_particles(particles, "removed.json")
@@ -179,7 +179,7 @@ implicit none
     deallocate(moments_norm)
     call diameters%destroy()
     deallocate(diameters)
-    deallocate(particles_number)
+    deallocate(number)
     deallocate(periodic_box)
     deallocate(data_field)
 

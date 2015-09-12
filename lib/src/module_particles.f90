@@ -2,7 +2,7 @@ module module_particles
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_geometry, only: num_dimensions
-use class_particles_number, only: Abstract_Particles_Number
+use class_number, only: Abstract_Number
 use class_diameters, only: Abstract_Diameters
 use class_moments_norm, only: Abstract_Moments_Norm
 use class_positions, only: Abstract_Positions
@@ -20,7 +20,7 @@ public Generic_Particles_construct, Generic_Particles_destroy
     end type Generic_Particle
 
     type, public :: Generic_Particles
-        class(Abstract_Particles_Number), pointer :: particles_number
+        class(Abstract_Number), pointer :: number
         class(Abstract_Diameters), pointer :: diameters
         class(Abstract_Moments_Norm), pointer :: moments_norm
         class(Abstract_Positions), pointer :: positions
@@ -29,17 +29,17 @@ public Generic_Particles_construct, Generic_Particles_destroy
 
 contains
 
-    subroutine Generic_Particles_construct(particles, particles_number, &
+    subroutine Generic_Particles_construct(particles, number, &
                                            diameters, moments_norm, &
                                            positions, orientations)
         type(Generic_Particles), intent(out) :: particles
-        class(Abstract_Particles_Number), target, intent(in) :: particles_number
+        class(Abstract_Number), target, intent(in) :: number
         class(Abstract_Diameters), target, intent(in) :: diameters
         class(Abstract_Moments_Norm), target, intent(in) :: moments_norm
         class(Abstract_Positions), target, intent(in) :: positions
         class(Abstract_Orientations), target, intent(in) :: orientations
 
-        particles%particles_number => particles_number
+        particles%number => number
         particles%diameters => diameters
         particles%moments_norm => moments_norm
         particles%positions => positions
@@ -53,7 +53,7 @@ contains
         particles%positions => null()
         particles%moments_norm => null()
         particles%diameters => null()
-        particles%particles_number => null()
+        particles%number => null()
     end subroutine Generic_Particles_destroy
 
 end module module_particles
