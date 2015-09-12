@@ -152,7 +152,7 @@ implicit none
 
     call Generic_Particles_construct(particles, number, diameters, moments_norm, &
                                      positions, orientations)
-    call particles_exchange%construct(particles)    
+    call particles_exchange%construct(particles)
     call json_write_particles(particles, "initial.json")
 
     particle%diameter = diameters%get(diameters%get_num())

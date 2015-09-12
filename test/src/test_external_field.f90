@@ -74,17 +74,19 @@ implicit none
     select case (field_name)
         case ("constant")
             allocate(Constant_Field_Parameters :: field_parameters)
+        case default
+            call error_exit("Field not yet implemented?")
+    end select
+    select type (field_parameters)
+        type is (Constant_Field_Parameters)
             data_field = "External Field.vector"
             call input_data%get(data_field, field_vector, found)
             call test_data_found(data_field, found)
-            select type (field_parameters)
-                type is (Constant_Field_Parameters)
-                    field_parameters%vector = field_vector
-                    deallocate(field_vector)
-            end select
+            field_parameters%vector = field_vector
+            deallocate(field_vector)
             allocate(Constant_Field_Expression :: field_expression)
-        case default
-            call error_exit("Field not yet implemented?")
+        class default
+            call error_exit("field_parameters unknown.")
     end select
     call field_expression%set(field_parameters)
 

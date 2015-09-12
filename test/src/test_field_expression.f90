@@ -15,42 +15,44 @@ implicit none
     character(len=:), allocatable :: data_filename, data_field, field_name
     logical :: found
     real(DP), allocatable :: field_vector(:), position(:)
-    
+
     call json_initialize()
     data_filename = "field_expression.json"
     call test_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
-    
+
     data_field = "Field.name"
     call input_data%get(data_field, field_name, found)
     call test_data_found(data_field, found)
-    
+
     select case (field_name)
         case ("constant")
             allocate(Constant_Field_Parameters :: field_parameters)
-            data_field = "Field.vector"
-            call input_data%get(data_field, field_vector, found)
-            call test_data_found(data_field, found)
-            select type (field_parameters)
-                type is (Constant_Field_Parameters)
-                    field_parameters%vector = field_vector
-                    deallocate(field_vector)
-            end select
-            allocate(Constant_Field_Expression :: field_expression)
         case default
             call error_exit("Field not yet implemented?")
     end select
-    
+    select type (field_parameters)
+        type is (Constant_Field_Parameters)
+            data_field = "Field.vector"
+            call input_data%get(data_field, field_vector, found)
+            call test_data_found(data_field, found)
+            field_parameters%vector = field_vector
+            deallocate(field_vector)
+            allocate(Constant_Field_Expression :: field_expression)
+        class default
+            call error_exit("field_parameters unknown.")
+    end select
+
     call field_expression%set(field_parameters)
     data_field = "Field.position"
     call input_data%get(data_field, position, found)
     call test_data_found(data_field, found)
     write(output_unit, *) field_expression%get(position)
     deallocate(position)
-    
+
     deallocate(field_expression)
     deallocate(field_parameters)
-    
+
     deallocate(field_name)
     deallocate(data_field)
     deallocate(data_filename)
