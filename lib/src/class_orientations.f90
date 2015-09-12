@@ -58,7 +58,7 @@ contains
             allocate(this%orientations(num_dimensions, this%particles_number%get()))
         end if
         do i_particle = 1, this%particles_number%get()
-            this%orientations(:, i_particle) = [1.0_DP, 0._DP, 0._DP]
+            this%orientations(:, i_particle) = 0._DP
         end do
     end subroutine Abstract_Orientations_construct
 

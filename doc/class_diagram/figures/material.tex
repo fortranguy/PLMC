@@ -168,7 +168,7 @@
         \end{scope}
         
         \begin{scope}[shift={($(AbstractInterDiameters.north -| AbstractPositions.north)$)},
-                      opacity=0.5]
+                      opacity=1]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractMovedPositions}{0, 0}
                 \operation{construct(positions\type{AbstractPositions})}
                 \operation{destroy()}
@@ -194,7 +194,7 @@
         \end{scope}
         
         \begin{scope}[shift={($(AbstractMovedPositions.north -| AbstractOrientations.north)$)},
-                      opacity=0.5]
+                      opacity=1]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractRotatedOrientations}{0, 0}
                 \operation{construct(orientations\type{AbstractOrientations})}
                 \operation{destroy()}

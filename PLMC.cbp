@@ -60,6 +60,9 @@
 		<Unit filename="lib/src/class_moments_norm.f90">
 			<Option weight="2" />
 		</Unit>
+		<Unit filename="lib/src/class_moved_positions.f90">
+			<Option weight="4" />
+		</Unit>
 		<Unit filename="lib/src/class_orientations.f90">
 			<Option weight="2" />
 		</Unit>
@@ -78,10 +81,7 @@
 		<Unit filename="lib/src/class_reciprocal_lattice.f90">
 			<Option weight="3" />
 		</Unit>
-		<Unit filename="lib/src/class_small_move.f90">
-			<Option weight="4" />
-		</Unit>
-		<Unit filename="lib/src/class_small_rotation.f90">
+		<Unit filename="lib/src/class_rotated_orientations.f90">
 			<Option weight="3" />
 		</Unit>
 		<Unit filename="lib/src/class_temperature.f90">
@@ -117,6 +117,16 @@
 		<Unit filename="lib/src/types_field_parameters.f90">
 			<Option weight="1" />
 		</Unit>
+		<Unit filename="test/src/test_chemical_potential.f90">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option weight="3" />
+		</Unit>
+		<Unit filename="test/src/test_diameters.f90">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option weight="3" />
+		</Unit>
 		<Unit filename="test/src/test_dipolar_moments.f90">
 			<Option compile="0" />
 			<Option link="0" />
@@ -146,6 +156,11 @@
 			<Option compile="0" />
 			<Option link="0" />
 			<Option weight="3" />
+		</Unit>
+		<Unit filename="test/src/test_moved_positions.f90">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option weight="5" />
 		</Unit>
 		<Unit filename="test/src/test_orientations.f90">
 			<Option compile="0" />
@@ -177,14 +192,15 @@
 			<Option link="0" />
 			<Option weight="4" />
 		</Unit>
+		<Unit filename="test/src/test_rotated_orientations.f90">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option weight="4" />
+		</Unit>
 		<Unit filename="test/src/test_small_move.f90">
 			<Option compile="0" />
 			<Option link="0" />
 			<Option weight="5" />
-		</Unit>
-		<Unit filename="test/src/test_small_rotation.f90">
-			<Option link="0" />
-			<Option weight="4" />
 		</Unit>
 		<Unit filename="test/src/test_temperature.f90">
 			<Option compile="0" />

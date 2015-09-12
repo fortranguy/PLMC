@@ -1,4 +1,4 @@
-program test_small_rotation
+program test_rotated_orientations
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use data_geometry, only: num_dimensions
@@ -6,11 +6,11 @@ use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
 use class_particles_number, only: Abstract_Particles_Number, Concrete_Particles_Number
 use class_orientations, only: Abstract_Orientations, Concrete_Orientations
-use class_small_rotation, only: Abstract_Small_Rotation, Concrete_Small_Rotation
+use class_rotated_orientations, only: Abstract_Rotated_Orientations, Concrete_Rotated_Orientations
 
 implicit none
 
-    class(Abstract_Small_Rotation), allocatable :: small_rotation
+    class(Abstract_Rotated_Orientations), allocatable :: rotated_orientations
     class(Abstract_Orientations), allocatable :: orientations
     class(Abstract_Particles_Number), allocatable :: particles_number
     type(json_file) :: input_data
@@ -20,12 +20,12 @@ implicit none
     integer :: num_steps, i_step, num_particles, i_particle
     character(len=1024) :: string_i
     real(DP), allocatable :: orientation(:)
-    real(DP) :: small_rotation_delta
+    real(DP) :: rotated_orientations_delta
     real(DP), dimension(num_dimensions) :: old_orientation, new_orientation
     integer, allocatable :: orientations_units(:)
 
     call json_initialize()
-    data_filename = "small_rotation.json"
+    data_filename = "rotated_orientations.json"
     call test_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
 
@@ -49,12 +49,12 @@ implicit none
              file="orientations_"//trim(adjustl(string_i))//".out", action="write")
     end do
 
-    allocate(Concrete_Small_Rotation :: small_rotation)
-    call small_rotation%construct(orientations)
+    allocate(Concrete_Rotated_Orientations :: rotated_orientations)
+    call rotated_orientations%construct(orientations)
     data_field = "Small Rotation.delta"
-    call input_data%get(data_field, small_rotation_delta, data_found)
+    call input_data%get(data_field, rotated_orientations_delta, data_found)
     call test_data_found(data_field, data_found)
-    call small_rotation%set(small_rotation_delta)
+    call rotated_orientations%set(rotated_orientations_delta)
 
     data_field = "Number of Steps"
     call input_data%get(data_field, num_steps, data_found)
@@ -63,7 +63,7 @@ implicit none
     do i_step = 1, num_steps
         do i_particle = 1, orientations%get_num()
             old_orientation = orientations%get(i_particle)
-            call orientations%set(i_particle, small_rotation%get(i_particle))
+            call orientations%set(i_particle, rotated_orientations%get(i_particle))
             new_orientation = orientations%get(i_particle)
             write(orientations_units(i_particle), *) i_step, old_orientation, &
                 new_orientation - old_orientation
@@ -75,8 +75,8 @@ implicit none
     end do
     deallocate(orientations_units)
 
-    call small_rotation%destroy()
-    deallocate(small_rotation)
+    call rotated_orientations%destroy()
+    deallocate(rotated_orientations)
     call orientations%destroy()
     deallocate(orientations)
     deallocate(particles_number)
@@ -84,4 +84,4 @@ implicit none
     deallocate(data_filename)
     call input_data%destroy()
 
-end program test_small_rotation
+end program test_rotated_orientations
