@@ -207,7 +207,7 @@
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(AbstractRotatedOrientations.north) + (9 cm, 0 cm)$)}, opacity=0.5]
+        \begin{scope}[shift={($(AbstractRotatedOrientations.north) + (9 cm, 0 cm)$)}, opacity=1]
             \begin{class}[text width=\mediumTextWidth]{DipolarMomentsFacade}{0, 0}
                 \operation{construct(momentsNorm\type{AbstractMomentsNorm},
                                      orientations\type{AbstractOrientations})}
@@ -220,22 +220,19 @@
         \begin{scope}[shift={($(DipolarMomentsFacade.north) + (9 cm, 5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractTotalMoment}{0, 0}
                 \operation{construct(dipolarMoment\type{DipolarMomentsFacade})}
+                \operation{destroy()}
                 \operation{get()\type{double[3]}}
                 %\operation{rotationUpdate(old\type{Particle}, new\type{Particle})}
                 %\operation{exchangeUpdate(particle\type{Particle})}
             \end{abstractclass}
 
-            \begin{class}[text width=\mediumTextWidth]{TotalMoment}{0, -3.5}
-                \inherit{AbstractTotalMoment}
-            \end{class}
-
-            \begin{class}[text width=\mediumTextWidth]{NullTotalMoment}{0, -5}
+            \begin{class}[text width=\mediumTextWidth]{NullTotalMoment}{0, -4}
                 \inherit{AbstractTotalMoment}
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractMovedPositions.north)!0.5!(AbstractRotatedOrientations.north) +
-            (0 cm, 4 cm)$)}]
+        \begin{scope}[shift={($(AbstractMovedPositions.north)!0.5!
+                             (AbstractRotatedOrientations.north) + (0 cm, 4 cm)$)}]
             \begin{class}[text width=\mediumTextWidth]{RandomCoordinatesFacade}{0, 0}
                 \operation{position()\type{double[3]}}
                 \operation{moment()\type{double[3]}}
