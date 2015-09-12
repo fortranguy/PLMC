@@ -231,18 +231,12 @@
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractMovedPositions.north)!0.5!
-                             (AbstractRotatedOrientations.north) + (0 cm, 4 cm)$)}]
-            \begin{class}[text width=\mediumTextWidth]{RandomCoordinatesFacade}{0, 0}
-                \operation{position()\type{double[3]}}
-                \operation{moment()\type{double[3]}}
-            \end{class}
-        \end{scope}
-        
-        \begin{scope}[shift={($(RandomCoordinatesFacade.north) + (11 cm, 0 cm)$)}]
-            \begin{class}[text width=\largeTextWidth]{CoordinatesExchangeFacade}{0, 0}
-                \operation{add(iParticle\type{int}, position\type{double[3]},
-                                                    orientation\type{double[3]})}
+        \begin{scope}[shift={($(AbstractInterDiameters.north-|AbstractMomentsNorm.north)$)},
+                      opacity=1]
+            \begin{class}[text width=\mediumTextWidth]{ParticlesExchangeFacade}{0, 0}
+                \operation{construct(particles\type{GenericParticles})}
+                \operation{destroy()}
+                \operation{add(particle\type{GenericParticle})}
                 \operation{remove(iParticle\type{int})}
             \end{class}
         \end{scope}
@@ -259,8 +253,6 @@
     \aggregation{AbstractDiameters}{particlesNumber}{1}{AbstractParticlesNumber}
     \aggregation{AbstractMomentsNorm}{particlesNumber}{1}{AbstractParticlesNumber}
     
-    %\aggregation{AbstractBoxedParticles}{periodicBox}{1}{AbstractPeriodicBox}
-    %\aggregation{AbstractBoxedParticles}{positions}{1}{AbstractPositions}
     \aggregation{AbstractInterDiameters}{diameters}{2}{AbstractDiameters}
     \aggregation{AbstractPositions}{periodicBox}{1}{AbstractPeriodicBox}
     \aggregation{AbstractPositions}{particlesNumber}{1}{AbstractParticlesNumber}
@@ -269,15 +261,14 @@
     \aggregation{DipolarMomentsFacade}{momentsNorm}{1}{AbstractMomentsNorm}
     \aggregation{DipolarMomentsFacade}{orientations}{1}{AbstractOrientations}
     
-    \aggregation{CoordinatesExchangeFacade}{positions}{1}{AbstractPositions}
-    \aggregation{CoordinatesExchangeFacade}{orientations}{1}{AbstractOrientations}
-    
     \aggregation{AbstractMovedPositions}{positions}{1}{AbstractPositions}
-
-    \aggregation{RandomCoordinatesFacade}{randPositions}{1}{AbstractMovedPositions}
-    \aggregation{RandomCoordinatesFacade}{randMoments}{1}{AbstractRotatedOrientations}
-    
     \aggregation{AbstractRotatedOrientations}{orientations}{1}{AbstractOrientations}
+
+    \aggregation{ParticlesExchangeFacade}{particlesNumber}{1}{AbstractParticlesNumber}
+    \aggregation{ParticlesExchangeFacade}{diameters}{1}{AbstractDiameters}
+    \aggregation{ParticlesExchangeFacade}{momentNorm}{1}{AbstractMomentsNorm}
+    \aggregation{ParticlesExchangeFacade}{positions}{1}{AbstractPositions}
+    \aggregation{ParticlesExchangeFacade}{orientations}{1}{AbstractOrientations}
     
     \aggregation{AbstractTotalMoment}{momentsNorm}{1}{DipolarMomentsFacade}
 \end{scope}

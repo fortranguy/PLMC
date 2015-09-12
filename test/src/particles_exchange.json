@@ -1,0 +1,10 @@
+{
+    "Periodic Box":{
+        "size": [10.0, 10.0, 10.0]
+    },
+    "Particles":{
+        "number": 3,
+        "diameter": 1.0,
+        "moment norm": 1.0
+    }
+}
