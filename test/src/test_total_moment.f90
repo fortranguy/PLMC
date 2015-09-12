@@ -3,6 +3,7 @@ program test_total_moment
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
+use procedures_orientation, only: random_orientation
 use class_particles_number, only: Abstract_Particles_Number, Concrete_Particles_Number
 use class_moments_norm, only: Abstract_Moments_Norm, Uniform_Moments_Norm
 use class_orientations, only: Abstract_Orientations, Concrete_Orientations
@@ -19,11 +20,10 @@ implicit none
 
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename, data_field
-    logical :: data_found
+    logical :: data_found, write_orientation
     integer ::num_particles, i_particle
-    character(len=1024) :: string_i
-    real(DP), allocatable :: orientation(:)
     real(DP) :: moment_norm
+    integer ::dipolar_moments_unit
 
     call json_initialize()
     data_filename = "total_moment.json"
@@ -38,26 +38,31 @@ implicit none
 
     allocate(Uniform_Moments_Norm :: moments_norm)
     call moments_norm%construct(particles_number)
+    data_field = "Particles.moment norm"
+    call input_data%get(data_field, moment_norm, data_found)
+    call test_data_found(data_field, data_found)
     do i_particle = 1, moments_norm%get_num()
-        write(string_i, *) i_particle
-        data_field = "Particle "//trim(adjustl(string_i))//".moment norm"
-        call input_data%get(data_field, moment_norm, data_found)
-        call test_data_found(data_field, data_found)
         call moments_norm%set(i_particle, moment_norm)
     end do
 
     allocate(Concrete_Orientations :: orientations)
     call orientations%construct(particles_number)
     do i_particle = 1, orientations%get_num()
-        write(string_i, *) i_particle
-        data_field = "Particle "//trim(adjustl(string_i))//".orientation"
-        call input_data%get(data_field, orientation, data_found)
-        call test_data_found(data_field, data_found)
-        call orientations%set(i_particle, orientation)
-        deallocate(orientation)
+        call orientations%set(i_particle, random_orientation())
     end do
 
     call dipolar_moments%construct(moments_norm, orientations)
+    data_field = "Write moments"
+    call input_data%get(data_field, write_orientation, data_found)
+    call test_data_found(data_field, data_found)
+    if (write_orientation) then
+        open(newunit=dipolar_moments_unit, recl=4096, file="dipolar_moments.out", action="write")
+        do i_particle = 1, dipolar_moments%get_num()
+            write(dipolar_moments_unit, *) dipolar_moments%get(i_particle)
+        end do
+        close(dipolar_moments_unit)
+    end if
+
     allocate(Concrete_Total_Moment :: total_moment)
     call total_moment%construct(dipolar_moments)
 

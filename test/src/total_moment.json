@@ -1,14 +1,7 @@
 {
-    "Number of Particles": 3,
-    "Particles 1": {
-        "moment norm": 1.0,
-        "orientation": [0.0, 0.0, 1.0]
+    "Number of Particles": 10000,
+    "Particles": {
+        "moment norm": 1.0
     },
-    "Particles 2": {
-        "moment norm": 1.0,
-        "orientation": [0.0, 1.0, 0.0]
-    },"Particles 1": {
-        "moment norm": 1.0,
-        "orientation": [1.0, 0.0, 0.0]
-    }
+    "Write moments": true
 }
