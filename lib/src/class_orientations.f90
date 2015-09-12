@@ -1,6 +1,6 @@
 module class_orientations
 
-use, intrinsic :: iso_fortran_env, only: DP => REAL64, error_unit
+use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_geometry, only: num_dimensions
 use data_precisions, only: real_zero
 use procedures_errors, only: warning_continue
