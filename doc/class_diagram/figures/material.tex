@@ -94,71 +94,37 @@
             \end{abstractclass}
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractNumber.north) + (0 cm, 10 cm)$)}, opacity=1]
-            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractDiameters}{0, 0}
-                \operation{contruct(number\type{AbstractNumber})}
-                \operation{destroy()}
-                \operation[0]{set(iParticle\type{int}, diameter\type{double})}
-                \operation[0]{getNum()\type{int}}
-                \operation[0]{get(iParticle\type{int})\type{double}}
-                \operation[0]{add(diameter\type{double})}
-                \operation[0]{remove(iParticle\type{int})}
+        \begin{scope}[shift={($(AbstractNumber.north) + (7 cm, 0 cm)$)}, opacity=0.5]
+            \begin{abstractclass}[text width=\smallTextWidth]{AbstractDiameter}{0, 0}
+                \operation{set(diameter\type{double}, minFactor\type{double})}
+                \operation{get()\type{double}}
+                \operation{getMin()\type{double}}
             \end{abstractclass}
-            
-            \def\operationsImplementation{
-                \operation{set(iParticle\type{int}, diameter\type{double})}
-                \operation{getNum()\type{int}}
-                \operation{get(iParticle\type{int})\type{double}}
-                \operation{add(diameter\type{double})}
-                \operation{remove(iParticle\type{int})}
-            }
-            
-            \begin{class}[text width=\mediumTextWidth]{UniformDiameters}{0, -5.5}
-                \inherit{AbstractDiameters}
-                \operationsImplementation{}
-            \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(AbstractDiameters.north) + (9 cm, 0 cm)$)}, opacity=1]
-            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractMomentsNorm}{0, 0}
-                \operation{contruct(number\type{AbstractNumber})}
-                \operation{destroy()}
-                \operation[0]{set(iParticle\type{int}, norm\type{double})}
-                \operation[0]{getNum()\type{int}}
-                \operation[0]{get(iParticle\type{int})\type{double}}
-                \operation[0]{add(norm\type{double})}
-                \operation[0]{remove(iParticle\type{int})}
-            \end{abstractclass}
-            
-            \def\operationsImplementation{
+        \begin{scope}[shift={($(AbstractDiameter.north) + (7 cm, 0 cm)$)}, opacity=0.5]
+            \begin{abstractclass}[text width=\smallTextWidth]{AbstractMomentNorm}{0, 0}
                 \operation{set(iParticle\type{int}, norm\type{double})}
-                \operation{getNum()\type{int}}
                 \operation{get(iParticle\type{int})\type{double}}
-                \operation{add(norm\type{double})}
-                \operation{remove(iParticle\type{int})}
-            }
+            \end{abstractclass}
 
-            \begin{class}[text width=\mediumTextWidth]{UniformMomentsNorm}{0, -5.5}
-                \inherit{AbstractMomentsNorm}
-                \operationsImplementation{}
-            \end{class}
-
-            \begin{class}[text width=\mediumTextWidth]{NullMomentsNorm}{0, -9.25}
-                \inherit{AbstractMomentsNorm}
+            \begin{class}[text width=\smallTextWidth]{NullMomentsNorm}{0, -3}
+                \inherit{AbstractMomentNorm}
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractDiameters.north) + (0 cm, 6 cm)$)}, opacity=1]
+        \begin{scope}[shift={($(AbstractDiameter.north) + (-9 cm, 8 cm)$)}, opacity=0.5]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractInterDiameters}{0, 0}
-                \operation{construct(diameters1\type{AbstractDiameters},
-                                     diameters2\type{AbstractDiameters},
-                                     nonAdditivity\type{double})}
+                \operation{construct(diameter1\type{AbstractDiameter},
+                                     diameter2\type{AbstractDiameter},
+                                     offset\type{double})}
                 \operation{destroy()}
-                \operation{get(iParticle\type{int}, jParticle\type{int})\type{double}}
+                \operation{get()\type{double}}
+                \operation{getMin()\type{double}}
             \end{abstractclass}
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractMomentsNorm.north) + (9 cm, 0 cm)$)}, opacity=1]
+        \begin{scope}[shift={($(AbstractInterDiameters.north) + (9 cm, 0 cm)$)}, opacity=1]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractPositions}{0, 0}
                 \operation{construct(periodicBox\type{AbstractPeriodicBox},
                                       number\type{AbstractNumber})}
@@ -171,8 +137,16 @@
             \end{abstractclass}
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractInterDiameters.north -| AbstractPositions.north)$)},
-                      opacity=1]
+        \begin{scope}[shift={($(AbstractInterDiameters.north) + (0 cm, 6 cm)$)}, opacity=0.5]
+            \begin{class}[text width=\mediumTextWidth]{ParticlesExchangeFacade}{0, 0}
+                \operation{construct(particles\type{GenericParticles})}
+                \operation{destroy()}
+                \operation{add(particle\type{GenericParticle})}
+                \operation{remove(iParticle\type{int})}
+            \end{class}
+        \end{scope}
+        
+        \begin{scope}[shift={($(ParticlesExchangeFacade.north) + (9 cm, 0 cm)$)}, opacity=1]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractMovedPositions}{0, 0}
                 \operation{construct(positions\type{AbstractPositions})}
                 \operation{destroy()}
@@ -213,7 +187,7 @@
 
         \begin{scope}[shift={($(AbstractRotatedOrientations.north) + (9 cm, 0 cm)$)}, opacity=0.5]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractDipolarMoments}{0, 0}
-                \operation{construct(momentsNorm\type{AbstractMomentsNorm},
+                \operation{construct(momentNorm\type{AbstractMomentNorm},
                                      orientations\type{AbstractOrientations})}
                 \operation{destroy()}
                 \operation{getNum()\type{int}}
@@ -241,16 +215,6 @@
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractInterDiameters.north-|AbstractMomentsNorm.north)$)},
-                      opacity=1]
-            \begin{class}[text width=\mediumTextWidth]{ParticlesExchangeFacade}{0, 0}
-                \operation{construct(particles\type{GenericParticles})}
-                \operation{destroy()}
-                \operation{add(particle\type{GenericParticle})}
-                \operation{remove(iParticle\type{int})}
-            \end{class}
-        \end{scope}
-        
     \end{package}
 \end{scope}
 
@@ -260,25 +224,20 @@
     \aggregation{AbstractExternalField}{parallelepipedDomain}{1}{AbstractParallelepipedDomain}
     \aggregation{AbstractExternalField}{fieldExpression}{1}{AbstractFieldExpression}
     
-    \aggregation{AbstractDiameters}{number}{1}{AbstractNumber}
-    \aggregation{AbstractMomentsNorm}{number}{1}{AbstractNumber}
-    
-    \aggregation{AbstractInterDiameters}{diameters}{2}{AbstractDiameters}
+    \aggregation{AbstractInterDiameters}{diameter}{2}{AbstractDiameter}
     \aggregation{AbstractPositions}{periodicBox}{1}{AbstractPeriodicBox}
     \aggregation{AbstractPositions}{number}{1}{AbstractNumber}
     \aggregation{AbstractOrientations}{number}{1}{AbstractNumber}
     
-    \aggregation{AbstractDipolarMoments}{momentsNorm}{1}{AbstractMomentsNorm}
+    \aggregation{AbstractDipolarMoments}{momentNorm}{1}{AbstractMomentNorm}
     \aggregation{AbstractDipolarMoments}{orientations}{1}{AbstractOrientations}
     
     \aggregation{AbstractMovedPositions}{positions}{1}{AbstractPositions}
     \aggregation{AbstractRotatedOrientations}{orientations}{1}{AbstractOrientations}
 
     \aggregation{ParticlesExchangeFacade}{number}{1}{AbstractNumber}
-    \aggregation{ParticlesExchangeFacade}{diameters}{1}{AbstractDiameters}
-    \aggregation{ParticlesExchangeFacade}{momentNorm}{1}{AbstractMomentsNorm}
     \aggregation{ParticlesExchangeFacade}{positions}{1}{AbstractPositions}
     \aggregation{ParticlesExchangeFacade}{orientations}{1}{AbstractOrientations}
     
-    \aggregation{AbstractTotalMoment}{momentsNorm}{1}{AbstractDipolarMoments}
+    \aggregation{AbstractTotalMoment}{momentNorm}{1}{AbstractDipolarMoments}
 \end{scope}
