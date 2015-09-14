@@ -5,6 +5,7 @@
     "Particles":{
         "number": 3,
         "diameter": 1.0,
+        "diameter minimum factor": 0.8,
         "moment norm": 1.0
     }
 }

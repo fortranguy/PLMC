@@ -5,7 +5,7 @@ use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
 use procedures_orientation, only: random_orientation
 use class_number, only: Abstract_Number, Concrete_Number
-use class_moments_norm, only: Abstract_Moments_Norm, Uniform_Moments_Norm
+use class_moment_norm, only: Abstract_Moment_Norm, Concrete_Moment_Norm
 use class_orientations, only: Abstract_Orientations, Concrete_Orientations
 use class_dipolar_moments, only: Dipolar_Moments_Facade
 use class_total_moment, only: Abstract_Total_Moment, Concrete_Total_Moment
@@ -15,20 +15,21 @@ implicit none
     class(Abstract_Total_Moment), allocatable :: total_moment
     type(Dipolar_Moments_Facade) :: dipolar_moments
     class(Abstract_Orientations), allocatable :: orientations
-    class(Abstract_Moments_Norm), allocatable :: moments_norm
+    class(Abstract_Moment_Norm), allocatable :: moment_norm
     class(Abstract_Number), allocatable :: number
 
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename, data_field
     logical :: data_found, write_orientation
     integer ::num_particles, i_particle
-    real(DP) :: moment_norm
+    real(DP) :: moment_norm_value
     integer ::dipolar_moments_unit
 
     call json_initialize()
     data_filename = "total_moment.json"
     call test_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
+    deallocate(data_filename)
 
     allocate(Concrete_Number :: number)
     data_field = "Number of Particles"
@@ -36,14 +37,11 @@ implicit none
     call test_data_found(data_field, data_found)
     call number%set(num_particles)
 
-    allocate(Uniform_Moments_Norm :: moments_norm)
-    call moments_norm%construct(number)
+    allocate(Concrete_Moment_Norm :: moment_norm)
     data_field = "Particles.moment norm"
-    call input_data%get(data_field, moment_norm, data_found)
+    call input_data%get(data_field, moment_norm_value, data_found)
     call test_data_found(data_field, data_found)
-    do i_particle = 1, moments_norm%get_num()
-        call moments_norm%set(i_particle, moment_norm)
-    end do
+    call moment_norm%set(moment_norm_value)
 
     allocate(Concrete_Orientations :: orientations)
     call orientations%construct(number)
@@ -51,7 +49,7 @@ implicit none
         call orientations%set(i_particle, random_orientation())
     end do
 
-    call dipolar_moments%construct(moments_norm, orientations)
+    call dipolar_moments%construct(moment_norm, orientations)
     data_field = "Write moments"
     call input_data%get(data_field, write_orientation, data_found)
     call test_data_found(data_field, data_found)
@@ -62,6 +60,7 @@ implicit none
         end do
         close(dipolar_moments_unit)
     end if
+    deallocate(data_field)
 
     allocate(Concrete_Total_Moment :: total_moment)
     call total_moment%construct(dipolar_moments)
@@ -73,11 +72,8 @@ implicit none
     call dipolar_moments%destroy()
     call orientations%destroy()
     deallocate(orientations)
-    call moments_norm%destroy()
-    deallocate(moments_norm)
+    deallocate(moment_norm)
     deallocate(number)
-    deallocate(data_field)
-    deallocate(data_filename)
     call input_data%destroy()
 
 end program test_total_moment

@@ -3,8 +3,8 @@ module module_particles
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_geometry, only: num_dimensions
 use class_number, only: Abstract_Number
-use class_diameters, only: Abstract_Diameters
-use class_moments_norm, only: Abstract_Moments_Norm
+use class_diameter, only: Abstract_Diameter
+use class_moment_norm, only: Abstract_Moment_Norm
 use class_positions, only: Abstract_Positions
 use class_orientations, only: Abstract_Orientations
 
@@ -21,8 +21,8 @@ public Generic_Particles_construct, Generic_Particles_destroy
 
     type, public :: Generic_Particles
         class(Abstract_Number), pointer :: number
-        class(Abstract_Diameters), pointer :: diameters
-        class(Abstract_Moments_Norm), pointer :: moments_norm
+        class(Abstract_Diameter), pointer :: diameter
+        class(Abstract_Moment_Norm), pointer :: moment_norm
         class(Abstract_Positions), pointer :: positions
         class(Abstract_Orientations), pointer :: orientations
     end type Generic_Particles
@@ -30,18 +30,18 @@ public Generic_Particles_construct, Generic_Particles_destroy
 contains
 
     subroutine Generic_Particles_construct(particles, number, &
-                                           diameters, moments_norm, &
+                                           diameter, moment_norm, &
                                            positions, orientations)
         type(Generic_Particles), intent(out) :: particles
         class(Abstract_Number), target, intent(in) :: number
-        class(Abstract_Diameters), target, intent(in) :: diameters
-        class(Abstract_Moments_Norm), target, intent(in) :: moments_norm
+        class(Abstract_Diameter), target, intent(in) :: diameter
+        class(Abstract_Moment_Norm), target, intent(in) :: moment_norm
         class(Abstract_Positions), target, intent(in) :: positions
         class(Abstract_Orientations), target, intent(in) :: orientations
 
         particles%number => number
-        particles%diameters => diameters
-        particles%moments_norm => moments_norm
+        particles%diameter => diameter
+        particles%moment_norm => moment_norm
         particles%positions => positions
         particles%orientations => orientations
     end subroutine Generic_Particles_construct
@@ -51,8 +51,8 @@ contains
 
         particles%orientations => null()
         particles%positions => null()
-        particles%moments_norm => null()
-        particles%diameters => null()
+        particles%moment_norm => null()
+        particles%diameter => null()
         particles%number => null()
     end subroutine Generic_Particles_destroy
 

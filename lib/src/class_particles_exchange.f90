@@ -36,8 +36,6 @@ contains
         type(Generic_Particle), intent(in) :: particle
 
         call this%particles%number%set(this%particles%number%get() + 1)
-        call this%particles%diameters%add(particle%diameter)
-        call this%particles%moments_norm%add(particle%moment_norm)
         call this%particles%positions%add(particle%position)
         call this%particles%orientations%add(particle%orientation)
     end subroutine Particles_Exchange_Facade_add
@@ -48,8 +46,6 @@ contains
 
         call this%particles%orientations%remove(i_particle)
         call this%particles%positions%remove(i_particle)
-        call this%particles%moments_norm%remove(i_particle)
-        call this%particles%diameters%remove(i_particle)
         call this%particles%number%set(this%particles%number%get() - 1)
     end subroutine Particles_Exchange_Facade_remove
 

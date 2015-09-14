@@ -7,9 +7,11 @@ implicit none
 private
 
     type, abstract, public :: Abstract_Potential_Parameters
+
     end type Abstract_Potential_Parameters
 
     type, extends(Abstract_Potential_Parameters), public :: Null_Potential_Paramters
+
     end type Null_Potential_Paramters
 
     type, extends(Abstract_Potential_Parameters), public :: Lennard_Jones_Parameters
