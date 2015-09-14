@@ -107,7 +107,7 @@ implicit none
     open(newunit=positions_domain_unit, recl=4096, file="positions_domain.out", action="write")
     num_particles_inside = 0
     do i_particle = 1, num_particles
-        position = parallelepiped_domain%get_random_position()
+        position = parallelepiped_domain%random_position()
         if (parallelepiped_domain%is_inside(position)) then
             num_particles_inside = num_particles_inside + 1
             write(positions_domain_unit, *) position

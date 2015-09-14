@@ -21,7 +21,7 @@ private
         procedure :: destroy => Abstract_Parallelepiped_Domain_destroy
         procedure :: get_volume => Abstract_Parallelepiped_Domain_get_volume
         procedure :: is_inside => Abstract_Parallelepiped_Domain_is_inside
-        procedure :: get_random_position => Abstract_Parallelepiped_Domain_get_random_position
+        procedure :: random_position => Abstract_Parallelepiped_Domain_random_position
     end type Abstract_Parallelepiped_Domain
 
     type, extends(Abstract_Parallelepiped_Domain), public :: Concrete_Parallelepiped_Domain
@@ -84,7 +84,7 @@ contains
         is_inside = point_is_inside(this%origin, this%size, position)
     end function Abstract_Parallelepiped_Domain_is_inside
 
-    function Abstract_Parallelepiped_Domain_get_random_position(this) &
+    function Abstract_Parallelepiped_Domain_random_position(this) &
         result(inside_position)
         class(Abstract_Parallelepiped_Domain), intent(in) :: this
         real(DP), dimension(num_dimensions) :: inside_position
@@ -93,7 +93,7 @@ contains
 
         call random_number(rand_3d)
         inside_position = this%origin + (rand_3d - 0.5_DP) * this%size
-    end function Abstract_Parallelepiped_Domain_get_random_position
+    end function Abstract_Parallelepiped_Domain_random_position
 
 !end implementation Abstract_Parallelepiped_Domain
 
