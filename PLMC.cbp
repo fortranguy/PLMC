@@ -162,11 +162,6 @@
 			<Option link="0" />
 			<Option weight="4" />
 		</Unit>
-		<Unit filename="test/src/test_is_inside.f90">
-			<Option compile="0" />
-			<Option link="0" />
-			<Option weight="2" />
-		</Unit>
 		<Unit filename="test/src/test_moment_norm.f90">
 			<Option compile="0" />
 			<Option link="0" />

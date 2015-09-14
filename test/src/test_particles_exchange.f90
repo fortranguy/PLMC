@@ -153,6 +153,7 @@ implicit none
     call json_write_particles(particles, "initial.json")
 
     particle%diameter = diameter%get()
+    particle%min_diameter = diameter%get_min()
     particle%moment_norm = moment_norm%get()
     call random_number(rand_3d)
     particle%position = periodic_box%get_size() * rand_3d

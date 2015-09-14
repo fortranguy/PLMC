@@ -15,7 +15,7 @@ public Generic_Particles_construct, Generic_Particles_destroy
 
     type, public :: Generic_Particle
         integer :: i_particle
-        real(DP) :: diameter, moment_norm
+        real(DP) :: diameter, min_diameter, moment_norm
         real(DP), dimension(num_dimensions) :: position, orientation
     end type Generic_Particle
 
