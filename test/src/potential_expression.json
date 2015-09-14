@@ -1,0 +1,10 @@
+{
+    "Potential": {
+        "name": "LJ",
+        "epsilon": 1.0,
+        "sigma": 1.0,
+        "minimum distance": 0.9,
+        "maximum distance": 2.5,
+        "delta distance": 0.01
+    }
+}

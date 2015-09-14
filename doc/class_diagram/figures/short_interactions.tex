@@ -85,8 +85,9 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(AbstractPairPotential.south) + (0 cm, -1.5 cm)$)}]
+        \begin{scope}[shift={($(AbstractPairPotential.south) + (0 cm, -1.5 cm)$)}, opacity=1]
         \begin{abstractclass}[text width=\mediumTextWidth]{AbstractPotentialExpression}{0, 0}
+                \operation{set(potentialParameters\type{AbstractPotentialParameters})}
                 \operation{get(distance : double) : double}
             \end{abstractclass}
         \end{scope}

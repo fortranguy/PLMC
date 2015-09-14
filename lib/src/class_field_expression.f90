@@ -17,24 +17,24 @@ private
 
     abstract interface
 
-        subroutine Abstract_Field_Expression_set(this, field_parameters)
+        subroutine Abstract_Field_Expression_set(this, parameters)
         import :: Abstract_Field_Parameters, Abstract_Field_Expression
             class(Abstract_Field_Expression), intent(inout) :: this
-            class(Abstract_Field_Parameters), intent(in) :: field_parameters
+            class(Abstract_Field_Parameters), intent(in) :: parameters
         end subroutine Abstract_Field_Expression_set
 
-        pure function Abstract_Field_Expression_get(this, position) result(field_expression)
+        pure function Abstract_Field_Expression_get(this, position) result(expression)
         import :: DP, num_dimensions, Abstract_Field_Expression
             class(Abstract_Field_Expression), intent(in) :: this
             real(DP), intent(in) :: position(:)
-            real(DP) :: field_expression(num_dimensions)
+            real(DP) :: expression(num_dimensions)
         end function Abstract_Field_Expression_get
 
     end interface
 
     type, extends(Abstract_Field_Expression), public :: Constant_Field_Expression
     private
-        real(DP) :: vector(num_dimensions)
+        type(Constant_Field_Parameters) :: parameters
     contains
         procedure :: set => Constant_Field_Expression_set
         procedure :: get => Constant_Field_Expression_get
@@ -44,24 +44,24 @@ contains
 
 !implementation Constant_Field_Expression_get
 
-    subroutine Constant_Field_Expression_set(this, field_parameters)
+    subroutine Constant_Field_Expression_set(this, parameters)
         class(Constant_Field_Expression), intent(inout) :: this
-        class(Abstract_Field_Parameters), intent(in) :: field_parameters
+        class(Abstract_Field_Parameters), intent(in) :: parameters
 
-        select type (field_parameters)
+        select type (parameters)
             type is (Constant_Field_Parameters)
-                this%vector = field_parameters%vector
+                this%parameters%vector = parameters%vector
             class default
                 call error_exit("Constant_Field_Expression: no parameters were given.")
         end select
     end subroutine Constant_Field_Expression_set
 
-    pure function Constant_Field_Expression_get(this, position) result(field_expression)
+    pure function Constant_Field_Expression_get(this, position) result(expression)
         class(Constant_Field_Expression), intent(in) :: this
         real(DP), intent(in) :: position(:)
-        real(DP) :: field_expression(num_dimensions)
+        real(DP) :: expression(num_dimensions)
 
-        field_expression = this%vector
+        expression = this%parameters%vector
     end function Constant_Field_Expression_get
 
 !end implementation Constant_Field_Expression_get

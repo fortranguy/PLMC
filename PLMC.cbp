@@ -81,6 +81,9 @@
 		<Unit filename="lib/src/class_positions.f90">
 			<Option weight="3" />
 		</Unit>
+		<Unit filename="lib/src/class_potential_expression.f90">
+			<Option weight="1" />
+		</Unit>
 		<Unit filename="lib/src/class_reciprocal_lattice.f90">
 			<Option weight="3" />
 		</Unit>
@@ -125,6 +128,9 @@
 		</Unit>
 		<Unit filename="lib/src/types_field_parameters.f90">
 			<Option weight="1" />
+		</Unit>
+		<Unit filename="lib/src/types_potential_parameters.f90">
+			<Option weight="0" />
 		</Unit>
 		<Unit filename="test/src/test_chemical_potential.f90">
 			<Option compile="0" />
@@ -189,7 +195,7 @@
 		<Unit filename="test/src/test_particles_number.f90">
 			<Option compile="0" />
 			<Option link="0" />
-			<Option weight="2" />
+			<Option weight="0" />
 		</Unit>
 		<Unit filename="test/src/test_periodic_box.f90">
 			<Option compile="0" />
@@ -200,6 +206,11 @@
 			<Option compile="0" />
 			<Option link="0" />
 			<Option weight="4" />
+		</Unit>
+		<Unit filename="test/src/test_potential_expression.f90">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option weight="2" />
 		</Unit>
 		<Unit filename="test/src/test_reciprical_lattice.f90">
 			<Option compile="0" />
