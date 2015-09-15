@@ -1,6 +1,6 @@
 module class_particles_exchange
 
-use module_particles, only: Generic_Particle, Generic_Particles
+use module_particles, only: Concrete_Particle, Concrete_Particles
 
 implicit none
 
@@ -8,7 +8,7 @@ private
 
     type, public :: Particles_Exchange_Facade
     private
-        type(Generic_Particles), pointer :: particles
+        type(Concrete_Particles), pointer :: particles
     contains
         procedure :: construct => Particles_Exchange_Facade_construct
         procedure :: destroy => Particles_Exchange_Facade_destroy
@@ -20,7 +20,7 @@ contains
 
     subroutine Particles_Exchange_Facade_construct(this, particles)
         class(Particles_Exchange_Facade), intent(out) :: this
-        type(Generic_Particles), target, intent(in) :: particles
+        type(Concrete_Particles), target, intent(in) :: particles
 
         this%particles => particles
     end subroutine Particles_Exchange_Facade_construct
@@ -33,7 +33,7 @@ contains
 
     subroutine Particles_Exchange_Facade_add(this, particle)
         class(Particles_Exchange_Facade), intent(inout) :: this
-        type(Generic_Particle), intent(in) :: particle
+        type(Concrete_Particle), intent(in) :: particle
 
         call this%particles%number%set(this%particles%number%get() + 1)
         call this%particles%positions%add(particle%position)

@@ -64,7 +64,7 @@
             \begin{abstractclass}[text width=\largeTextWidth]{AbstractVisitableList}{0, 0}
                 \operation{construct(periodicBox\type{AbstractPeriodicBox},
                                      positions\type{AbstractPositions},
-                                     potentialDomain\type{AbstractPotentialDomain})}
+                                     pairPotential\type{AbstractPairPotential})}
                 \operation{destroy()}
                 \operation{set(iTarger\type{int}, iSource\type{int})}
                 \operation{visit(iParticle\type{int}, overlap\type{bool}, energy\type{double})}
@@ -73,14 +73,13 @@
             \end{abstractclass}
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractBoxPotential.south) + (0 cm, -2 cm)$)}]
+        \begin{scope}[shift={($(AbstractBoxPotential.south) + (0 cm, -2 cm)$)}, opacity=1]
             \begin{abstractclass}[text width=\mediumTextWidth]{AbstractPairPotential}{0, 0}
-                \operation{construct(potentialExpression\type{AbstractPotentialExpression},
-                                     maxDistance\type{double}, deltaDistance\type{double})}
-                                     %minDistance? What if varies?
+                \operation{construct(potentialDomain\type{ConcretePotentialDomain},
+                                     potentialExpression\type{AbstractPotentialExpression})}
                 \operation{destroy()}
                 \operation{getMaxDistance()}
-                \operation{meet(minDistance\type{double}, distance\type{double}, overlap\type{bool},
+                \operation{meet(distance\type{double}, overlap\type{bool},
                                 energy\type{double})\type{void}}
             \end{abstractclass}
         \end{scope}

@@ -1,0 +1,13 @@
+{
+    "Particle": {
+        "diameter": 1.0,
+        "minimum diameter factor": 1.0,
+
+    },
+    "Potential": {
+        "name": "HS",
+        "max distance": 1.0,
+        "delta distance": 1.0,
+        "distance": 1.0
+    }
+}

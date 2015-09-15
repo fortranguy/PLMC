@@ -16,7 +16,7 @@ module procedures_particles_exchange_write
 
 use json_module, only: json_create_object, json_add, json_print, json_destroy
 use types_json_wrapper, only: JSON_Value_Pointer
-use module_particles, only: Generic_Particles
+use module_particles, only: Concrete_Particles
 
 implicit none
 
@@ -26,7 +26,7 @@ public json_write_particles
 contains
 
     subroutine json_write_particles(particles, output_filename)
-        type(Generic_Particles), intent(in) :: particles
+        type(Concrete_Particles), intent(in) :: particles
         character(len=*), intent(in) :: output_filename
 
         type(JSON_Value_Pointer) :: output_data
@@ -75,16 +75,16 @@ use class_diameter, only: Abstract_Diameter, Concrete_Diameter
 use class_moment_norm, only: Abstract_Moment_Norm, Concrete_Moment_Norm
 use class_positions, only: Abstract_Positions, Concrete_Positions
 use class_orientations, only: Abstract_Orientations, Concrete_Orientations
-use module_particles, only: Generic_Particle, Generic_Particles, &
-    Generic_Particles_construct, Generic_Particles_destroy
+use module_particles, only: Concrete_Particle, Concrete_Particles, &
+    Concrete_Particles_construct, Concrete_Particles_destroy
 use class_particles_exchange, only: Particles_Exchange_Facade
 use procedures_particles_exchange_write, only: json_write_particles
 
 implicit none
 
     type(Particles_Exchange_Facade) :: particles_exchange
-    type(Generic_Particles) :: particles
-    type(Generic_Particle) :: particle
+    type(Concrete_Particles) :: particles
+    type(Concrete_Particle) :: particle
     class(Abstract_Periodic_Box), allocatable :: periodic_box
     class(Abstract_Number), allocatable :: number
     class(Abstract_Diameter), allocatable :: diameter
@@ -147,7 +147,7 @@ implicit none
         call orientations%set(i_particle, random_orientation())
     end do
 
-    call Generic_Particles_construct(particles, number, diameter, moment_norm, &
+    call Concrete_Particles_construct(particles, number, diameter, moment_norm, &
                                      positions, orientations)
     call particles_exchange%construct(particles)
     call json_write_particles(particles, "initial.json")
@@ -168,7 +168,7 @@ implicit none
     call json_write_particles(particles, "removed.json")
 
     call particles_exchange%destroy()
-    call Generic_Particles_destroy(particles)
+    call Concrete_Particles_destroy(particles)
     call orientations%destroy()
     deallocate(orientations)
     call positions%destroy()

@@ -11,28 +11,28 @@ use class_orientations, only: Abstract_Orientations
 implicit none
 
 private
-public Generic_Particles_construct, Generic_Particles_destroy
+public Concrete_Particles_construct, Concrete_Particles_destroy
 
-    type, public :: Generic_Particle
+    type, public :: Concrete_Particle
         integer :: i_particle
         real(DP) :: diameter, min_diameter, moment_norm
         real(DP), dimension(num_dimensions) :: position, orientation
-    end type Generic_Particle
+    end type Concrete_Particle
 
-    type, public :: Generic_Particles
+    type, public :: Concrete_Particles
         class(Abstract_Number), pointer :: number
         class(Abstract_Diameter), pointer :: diameter
         class(Abstract_Moment_Norm), pointer :: moment_norm
         class(Abstract_Positions), pointer :: positions
         class(Abstract_Orientations), pointer :: orientations
-    end type Generic_Particles
+    end type Concrete_Particles
 
 contains
 
-    subroutine Generic_Particles_construct(particles, number, &
+    subroutine Concrete_Particles_construct(particles, number, &
                                            diameter, moment_norm, &
                                            positions, orientations)
-        type(Generic_Particles), intent(out) :: particles
+        type(Concrete_Particles), intent(out) :: particles
         class(Abstract_Number), target, intent(in) :: number
         class(Abstract_Diameter), target, intent(in) :: diameter
         class(Abstract_Moment_Norm), target, intent(in) :: moment_norm
@@ -44,16 +44,16 @@ contains
         particles%moment_norm => moment_norm
         particles%positions => positions
         particles%orientations => orientations
-    end subroutine Generic_Particles_construct
+    end subroutine Concrete_Particles_construct
 
-    subroutine Generic_Particles_destroy(particles)
-        type(Generic_Particles), intent(inout) :: particles
+    subroutine Concrete_Particles_destroy(particles)
+        type(Concrete_Particles), intent(inout) :: particles
 
         particles%orientations => null()
         particles%positions => null()
         particles%moment_norm => null()
         particles%diameter => null()
         particles%number => null()
-    end subroutine Generic_Particles_destroy
+    end subroutine Concrete_Particles_destroy
 
 end module module_particles
