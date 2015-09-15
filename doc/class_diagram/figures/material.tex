@@ -192,7 +192,7 @@
         \end{scope}
         
         \begin{scope}[shift={($(DipolarMomentsFacade.north) + (9 cm, 5 cm)$)}, opacity=1]
-            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractTotalMoment}{0, 0}
+            \begin{class}[text width=\mediumTextWidth]{TotalMomentFacade}{0, 0}
                 \operation{construct(dipolarMoment\type{DipolarMomentsFacade})}
                 \operation{destroy()}
                 \operation{set(totalMoment\type{double[3]})}
@@ -200,10 +200,6 @@
                 \operation{get()\type{double[3]}}
                 %\operation{rotationUpdate(old\type{Particle}, new\type{Particle})}
                 %\operation{exchangeUpdate(particle\type{Particle})}
-            \end{abstractclass}
-
-            \begin{class}[text width=\mediumTextWidth]{NullTotalMoment}{0, -5}
-                \inherit{AbstractTotalMoment}
             \end{class}
         \end{scope}
         
@@ -231,5 +227,5 @@
     \aggregation{ParticlesExchangeFacade}{positions}{1}{AbstractPositions}
     \aggregation{ParticlesExchangeFacade}{orientations}{1}{AbstractOrientations}
     
-    \aggregation{AbstractTotalMoment}{momentNorm}{1}{DipolarMomentsFacade}
+    \aggregation{TotalMomentFacade}{momentNorm}{1}{DipolarMomentsFacade}
 \end{scope}

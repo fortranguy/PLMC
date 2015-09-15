@@ -6,13 +6,13 @@ use module_data, only: test_file_exists, test_data_found
 use procedures_orientation, only: random_orientation
 use class_number, only: Abstract_Number, Concrete_Number
 use class_moment_norm, only: Abstract_Moment_Norm, Concrete_Moment_Norm
-use class_orientations, only: Abstract_Orientations, Concrete_Orientations
+use class_orientations, only: Abstract_Orientations, Concrete_Orientations, Null_Orientations
 use class_dipolar_moments, only: Dipolar_Moments_Facade
-use class_total_moment, only: Abstract_Total_Moment, Concrete_Total_Moment
+use class_total_moment, only: Total_Moment_Facade
 
 implicit none
 
-    class(Abstract_Total_Moment), allocatable :: total_moment
+    type(Total_Moment_Facade) :: total_moment
     type(Dipolar_Moments_Facade) :: dipolar_moments
     class(Abstract_Orientations), allocatable :: orientations
     class(Abstract_Moment_Norm), allocatable :: moment_norm
@@ -20,7 +20,7 @@ implicit none
 
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename, data_field
-    logical :: data_found, write_orientation
+    logical :: data_found, with_orientation, write_orientation
     integer ::num_particles, i_particle
     real(DP) :: moment_norm_value
     integer ::dipolar_moments_unit
@@ -43,7 +43,14 @@ implicit none
     call test_data_found(data_field, data_found)
     call moment_norm%set(moment_norm_value)
 
-    allocate(Concrete_Orientations :: orientations)
+    data_field = "Particles.with orientation"
+    call input_data%get(data_field, with_orientation, data_found)
+    call test_data_found(data_field, data_found)
+    if (with_orientation) then
+        allocate(Concrete_Orientations :: orientations)
+    else
+        allocate(Null_Orientations :: orientations)
+    end if
     call orientations%construct(number)
     do i_particle = 1, orientations%get_num()
         call orientations%set(i_particle, random_orientation())
@@ -62,13 +69,11 @@ implicit none
     end if
     deallocate(data_field)
 
-    allocate(Concrete_Total_Moment :: total_moment)
     call total_moment%construct(dipolar_moments)
 
     write(output_unit, *) "Total Moment =", total_moment%get()
 
     call total_moment%destroy()
-    deallocate(total_moment)
     call dipolar_moments%destroy()
     call orientations%destroy()
     deallocate(orientations)
