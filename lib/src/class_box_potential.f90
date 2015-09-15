@@ -68,7 +68,7 @@ contains
         overlap = .false.
         energy = 0._DP
         do i_particle = 1, this%positions%get_num()
-            if (same_type .and. particle%i_particle == i_particle) cycle
+            if (same_type .and. particle%i == i_particle) cycle
             distance = this%periodic_box%distance(particle%position, &
                                                   this%positions%get(i_particle))
             call this%pair_potential%meet(distance, overlap, energy_i)

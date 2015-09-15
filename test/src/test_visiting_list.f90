@@ -1,4 +1,4 @@
-program test_box_potential
+program test_visitable_list
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use data_geometry, only: num_dimensions
@@ -17,11 +17,11 @@ use types_potential_domain, only: Concrete_Potential_Domain
 use class_pair_potential, only: Abstract_Pair_Potential, Concrete_Pair_Potential, &
     Hard_Pair_Potential
 use module_particles, only: Concrete_Particle
-use class_box_potential, only: Box_Potential_Facade
+use class_visitable_list, only: Abstract_Visitable_List, Concrete_Visitable_List
 
 implicit none
 
-    type(Box_Potential_Facade) :: box_potential
+    class(Abstract_Visitable_List), allocatable :: visitable_list
     type(Concrete_Particle) :: particle
     class(Abstract_Pair_Potential), allocatable :: pair_potential
     type(Concrete_Potential_Domain) :: potential_domain
@@ -45,7 +45,7 @@ implicit none
     logical :: overlap
 
     call json_initialize()
-    data_filename = "box_potential.json"
+    data_filename = "visitable_list.json"
     call test_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
     deallocate(data_filename)
@@ -129,15 +129,18 @@ implicit none
     if (.not.allocated(pair_potential)) allocate(Concrete_Pair_Potential :: pair_potential)
     call pair_potential%construct(potential_domain, potential_expression)
 
-    call box_potential%construct(periodic_box)
-    call box_potential%set(positions)
-    call box_potential%set(pair_potential)
+    allocate(Concrete_Visitable_List :: visitable_list)
+    call visitable_list%construct(periodic_box, positions)
+    do i_particle = 1, positions%get_num()
+        call visitable_list%add(i_particle) !artificial
+    end do
+    call visitable_list%set(pair_potential)
 
     energy = 0._DP
     do i_particle = 1, positions%get_num()
         particle%i = i_particle
         particle%position = positions%get(particle%i)
-        call box_potential%visit(.true., particle, overlap, energy_i)
+        call visitable_list%visit(.true., particle, overlap, energy_i)
         if (overlap) exit
         energy = energy + energy_i
     end do
@@ -148,7 +151,8 @@ implicit none
         write(output_unit, *) "energy =", energy
     end if
 
-    call box_potential%destroy()
+    call visitable_list%destroy()
+    deallocate(visitable_list)
     call pair_potential%destroy()
     deallocate(pair_potential)
     deallocate(potential_expression)
@@ -160,4 +164,4 @@ implicit none
     deallocate(periodic_box)
     call input_data%destroy()
 
-end program test_box_potential
+end program test_visitable_list

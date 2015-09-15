@@ -63,16 +63,17 @@
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(AbstractCellsPotential.north) + (-13 cm, -3cm)$)}]
-            \begin{abstractclass}[text width=\largeTextWidth]{AbstractVisitableList}{0, 0}
+        \begin{scope}[shift={($(AbstractCellsPotential.north) + (-12 cm, -3cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractVisitableList}{0, 0}
                 \operation{construct(periodicBox\type{AbstractPeriodicBox},
-                                     positions\type{AbstractPositions},
-                                     pairPotential\type{AbstractPairPotential})}
+                                     positions\type{AbstractPositions})}
                 \operation{destroy()}
-                \operation{set(iTarger\type{int}, iSource\type{int})}
-                \operation{visit(iParticle\type{int}, overlap\type{bool}, energy\type{double})}
+                \operation{set(pairPotential\type{AbstractPairPotential})}
+                \operation{visit(sameType\type{bool}, particle\type{Particle},
+                                 overlap\type{bool}, energy\type{double})\type{void}}
                 \operation{add(iParticle\type{int})}
                 \operation{remove(iParticle\type{int})}
+                \operation{overwrite(iTarger\type{int}, iValue\type{int})}
             \end{abstractclass}
         \end{scope}
         

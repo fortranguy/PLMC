@@ -1,8 +1,7 @@
 import JSON
 json = JSON
 
-#cd("/home/salomon/Documents/Simulations/PLMC/test/src")
-input_data = json.parsefile("box_potential.json"; ordered=false, use_mmap=true)
+input_data = json.parsefile(ARGS[1]; ordered=false, use_mmap=true)
 
 box_size = input_data["Box"]["size"]
 num_particles = input_data["Particles"]["number"]
