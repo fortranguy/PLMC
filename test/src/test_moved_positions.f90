@@ -35,7 +35,7 @@ implicit none
     data_field = "Periodic Box.size"
     call input_data%get(data_field, periodic_box_size, data_found)
     call test_data_found(data_field, data_found)
-    call periodic_box%set_size(periodic_box_size)
+    call periodic_box%set(periodic_box_size)
 
     allocate(Concrete_Number :: number)
     data_field = "Particles.number"

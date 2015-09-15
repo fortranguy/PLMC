@@ -111,7 +111,7 @@ implicit none
     call input_data%get(data_field, box_size, data_found)
     call test_data_found(data_field, data_found)
     allocate(XYZ_Periodic_Box :: periodic_box)
-    call periodic_box%set_size(box_size)
+    call periodic_box%set(box_size)
 
     data_field = "Particles.number"
     call input_data%get(data_field, num_particles, data_found)

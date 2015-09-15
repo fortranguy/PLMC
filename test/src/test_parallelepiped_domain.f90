@@ -65,7 +65,7 @@ implicit none
     call input_data%get(data_field, box_size, found)
     call test_data_found(data_field, found)
     allocate(XYZ_Periodic_Box :: periodic_box)
-    call periodic_box%set_size(box_size)
+    call periodic_box%set(box_size)
     deallocate(box_size)
     open(newunit=box_unit, recl=4096, file="box.out", action="write")
     call write_corners([0._DP, 0._DP, 0._DP], periodic_box%get_size(), box_unit)

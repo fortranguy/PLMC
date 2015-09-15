@@ -14,23 +14,23 @@ private
     private
         real(DP) :: size(num_dimensions)
     contains
-        procedure :: set_size => Abstract_Periodic_Box_set_size
+        procedure :: set => Abstract_Periodic_Box_set
         procedure, nopass, private :: check => Abstract_Periodic_Box_check
         procedure :: get_size => Abstract_Periodic_Box_get_size
         procedure :: distance => Abstract_Periodic_Box_distance
         procedure :: vector => Abstract_Periodic_Box_vector
         procedure(Abstract_Periodic_Box_folded), deferred :: folded
     end type Abstract_Periodic_Box
-    
+
     abstract interface
-    
+
         pure function Abstract_Periodic_Box_folded(this, position) result(folded_position)
         import :: DP, num_dimensions, Abstract_Periodic_Box
             class(Abstract_Periodic_Box), intent(in) :: this
             real(DP), intent(in) :: position(:)
             real(DP) :: folded_position(num_dimensions)
         end function Abstract_Periodic_Box_folded
-        
+
     end interface
 
     type, extends(Abstract_Periodic_Box), public :: XYZ_Periodic_Box
@@ -42,22 +42,22 @@ private
     contains
         procedure :: folded => XY_Periodic_Box_folded
     end type XY_Periodic_Box
-    
+
 contains
 
 !implementation Abstract_Periodic_Box
 
-    subroutine Abstract_Periodic_Box_set_size(this, size)
+    subroutine Abstract_Periodic_Box_set(this, size)
         class(Abstract_Periodic_Box), intent(out) :: this
         real(DP), intent(in) :: size(:)
 
         call this%check(size)
         this%size = size
-    end subroutine Abstract_Periodic_Box_set_size
+    end subroutine Abstract_Periodic_Box_set
 
     subroutine Abstract_Periodic_Box_check(size)
         real(DP), intent(in) :: size(:)
-        
+
         call check_3d_array("Abstract_Periodic_Box", "size", size)
         call check_positive("Abstract_Periodic_Box", "size", size)
         if (abs(size(1) - size(2)) > real_zero) then
@@ -80,7 +80,7 @@ contains
 
         distance = norm2(this%vector(position_1, position_2))
     end function Abstract_Periodic_Box_distance
-    
+
     pure function Abstract_Periodic_Box_vector(this, position_1, position_2) result(vector)
         class(Abstract_Periodic_Box), intent(in) :: this
         real(DP), intent(in) :: position_1(:), position_2(:)
@@ -88,7 +88,7 @@ contains
 
         vector = this%folded(position_2 - position_1)
     end function Abstract_Periodic_Box_vector
-    
+
 !end implementation Abstract_Periodic_Box
 
 !implementation XYZ_Periodic_Box
@@ -98,7 +98,7 @@ contains
         class(XYZ_Periodic_Box), intent(in) :: this
         real(DP), intent(in) :: position(:)
         real(DP) :: folded_position(num_dimensions)
-        
+
         folded_position = modulo(position, this%size)
         where(folded_position > this%size/2._DP)
             folded_position = folded_position - this%size
@@ -113,7 +113,7 @@ contains
         class(XY_Periodic_Box), intent(in) :: this
         real(DP), intent(in) :: position(:)
         real(DP) :: folded_position(num_dimensions)
-        
+
         folded_position(1:2) = modulo(position(1:2), this%size(1:2))
         where(folded_position(1:2) > this%size(1:2)/2._DP)
             folded_position(1:2) = folded_position(1:2) - this%size(1:2)

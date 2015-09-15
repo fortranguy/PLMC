@@ -40,39 +40,39 @@ implicit none
     character(len=:), allocatable :: data_filename, data_field
     logical :: found
     real(DP), allocatable :: periodic_box_size(:), position_1(:), position_2(:)
-    
+
     call json_initialize()
-     
+
     data_filename = "periodic_box.json"
     call test_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
-    
+
     data_field ="Periodic Box.position 1"
     call input_data%get(data_field, position_1, found)
     call test_data_found(data_field, found)
-    
+
     data_field ="Periodic Box.position 2"
     call input_data%get(data_field, position_2, found)
     call test_data_found(data_field, found)
-    
+
     allocate(XYZ_Periodic_Box :: periodic_box)
     write(output_unit, *) "XYZ"
-    data_field = "Periodic Box.real size"
+    data_field = "Periodic Box.size"
     call input_data%get(data_field, periodic_box_size, found)
     call test_data_found(data_field, found)
-    call periodic_box%set_size(periodic_box_size)
+    call periodic_box%set(periodic_box_size)
     call print_periodic_box(periodic_box, position_1, position_2)
     deallocate(periodic_box)
-    
+
     allocate(XY_Periodic_Box :: periodic_box)
     write(output_unit, *) "XY"
-    data_field = "Periodic Box.real size"
+    data_field = "Periodic Box.size"
     call input_data%get(data_field, periodic_box_size, found)
     call test_data_found(data_field, found)
-    call periodic_box%set_size(periodic_box_size)
+    call periodic_box%set(periodic_box_size)
     call print_periodic_box(periodic_box, position_1, position_2)
     deallocate(periodic_box)
-    
+
     deallocate(position_2)
     deallocate(position_1)
     deallocate(periodic_box_size)

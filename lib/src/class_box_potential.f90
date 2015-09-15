@@ -10,40 +10,53 @@ implicit none
 
 private
 
-    type, abstract, public :: Abstract_Box_Potential
+    type, public :: Box_Potential_Facade
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box
         class(Abstract_Positions), pointer :: positions
         class(Abstract_Pair_Potential), pointer :: pair_potential
     contains
-        procedure :: construct => Abstract_Box_Potential_construct
-        procedure :: destroy => Abstract_Box_Potential_destroy
-        procedure :: visit => Abstract_Box_Potential_visit
-    end type Abstract_Box_Potential
+        procedure :: construct => Box_Potential_Facade_construct
+        procedure :: destroy => Box_Potential_Facade_destroy
+        procedure, private :: set_positions => Box_Potential_Facade_set_positions
+        procedure, private :: set_pair_potential => Box_Potential_Facade_set_pair_potential
+        generic :: set => set_positions, set_pair_potential
+        procedure :: visit => Box_Potential_Facade_visit
+    end type Box_Potential_Facade
 
 contains
 
-    subroutine Abstract_Box_Potential_construct(this, periodic_box, positions, pair_potential)
-        class(Abstract_Box_Potential), intent(out) :: this
+    subroutine Box_Potential_Facade_construct(this, periodic_box)
+        class(Box_Potential_Facade), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Positions), target, intent(in) :: positions
-        class(Abstract_Pair_Potential), target, intent(in) :: pair_potential
 
         this%periodic_box => periodic_box
-        this%positions => positions
-        this%pair_potential => pair_potential
-    end subroutine Abstract_Box_Potential_construct
+    end subroutine Box_Potential_Facade_construct
 
-    subroutine Abstract_Box_Potential_destroy(this)
-        class(Abstract_Box_Potential), intent(inout) :: this
+    subroutine Box_Potential_Facade_destroy(this)
+        class(Box_Potential_Facade), intent(inout) :: this
 
         this%pair_potential => null()
         this%positions => null()
         this%periodic_box => null()
-    end subroutine Abstract_Box_Potential_destroy
+    end subroutine Box_Potential_Facade_destroy
 
-    pure subroutine Abstract_Box_Potential_visit(this, same_type, particle, overlap, energy)
-        class(Abstract_Box_Potential), intent(inout) :: this
+    subroutine Box_Potential_Facade_set_positions(this, positions)
+        class(Box_Potential_Facade), intent(inout) :: this
+        class(Abstract_Positions), target, intent(in) :: positions
+
+        this%positions => positions
+    end subroutine Box_Potential_Facade_set_positions
+
+    subroutine Box_Potential_Facade_set_pair_potential(this, pair_potential)
+        class(Box_Potential_Facade), intent(inout) :: this
+        class(Abstract_Pair_Potential), target, intent(in) :: pair_potential
+
+        this%pair_potential => pair_potential
+    end subroutine Box_Potential_Facade_set_pair_potential
+
+    pure subroutine Box_Potential_Facade_visit(this, same_type, particle, overlap, energy)
+        class(Box_Potential_Facade), intent(inout) :: this
         logical, intent(in) :: same_type
         type(Concrete_Particle), intent(in) :: particle
         logical, intent(out) :: overlap
@@ -62,6 +75,6 @@ contains
             if (overlap) return
             energy = energy + energy_i
         end do
-    end subroutine Abstract_Box_Potential_visit
+    end subroutine Box_Potential_Facade_visit
 
 end module class_box_potential

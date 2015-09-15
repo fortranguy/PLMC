@@ -39,6 +39,9 @@
 				</Linker>
 			</Target>
 		</Build>
+		<Unit filename="lib/src/class_box_potential.f90">
+			<Option weight="5" />
+		</Unit>
 		<Unit filename="lib/src/class_chemical_potential.f90">
 			<Option weight="2" />
 		</Unit>
@@ -137,6 +140,11 @@
 		</Unit>
 		<Unit filename="lib/src/types_potential_parameters.f90">
 			<Option weight="0" />
+		</Unit>
+		<Unit filename="test/src/test_box_potential.f90">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option weight="6" />
 		</Unit>
 		<Unit filename="test/src/test_chemical_potential.f90">
 			<Option compile="0" />
