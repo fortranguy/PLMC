@@ -70,13 +70,12 @@ implicit none
     end select
     call potential_expression%set(potential_parameters)
 
-    potential_domain%diameter = diameter%get()
-    potential_domain%min_diameter = diameter%get_min()
+    potential_domain%min = diameter%get_min()
     data_field = "Potential.max distance"
-    call input_data%get(data_field, potential_domain%max_distance, data_found)
+    call input_data%get(data_field, potential_domain%max, data_found)
     call test_data_found(data_field, data_found)
     data_field = "Potential.delta distance"
-    call input_data%get(data_field, potential_domain%delta_distance, data_found)
+    call input_data%get(data_field, potential_domain%delta, data_found)
     call test_data_found(data_field, data_found)
 
     if (.not.allocated(pair_potential)) allocate(Concrete_Pair_Potential :: pair_potential)

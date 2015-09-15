@@ -7,10 +7,9 @@ implicit none
 private
 
     type, public :: Concrete_Potential_Domain
-        real(DP) :: diameter
-        real(DP) :: min_diameter
-        real(DP) :: max_distance
-        real(DP) :: delta_distance
+        real(DP) :: min
+        real(DP) :: max
+        real(DP) :: delta
     end type Concrete_Potential_Domain
 
 end module types_potential_domain
