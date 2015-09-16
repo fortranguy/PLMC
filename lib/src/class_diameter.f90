@@ -8,6 +8,7 @@ implicit none
 private
 
     type, abstract, public :: Abstract_Diameter
+    private
         real(DP) :: diameter
         real(DP) :: min_diameter
     contains
