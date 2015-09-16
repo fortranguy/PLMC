@@ -1,3 +1,39 @@
+module procedures_visitable_list_sum
+
+use, intrinsic :: iso_fortran_env, only: DP => REAL64
+use module_particles, only: Concrete_Particle
+use class_positions, only: Abstract_Positions
+use class_visitable_list, only: Abstract_Visitable_List
+
+implicit none
+
+private
+public sum_energy
+
+contains
+
+    subroutine sum_energy(positions, visitable_list, overlap, energy)
+        class(Abstract_Positions), intent(in) :: positions
+        class(Abstract_Visitable_List), intent(in) :: visitable_list
+        logical, intent(out) :: overlap
+        real(DP), intent(out) :: energy
+
+        type(Concrete_Particle) :: particle
+        real(DP) :: energy_i
+        integer :: i_particle
+
+        energy = 0._DP
+        do i_particle = 1, positions%get_num()
+            particle%i = i_particle
+            particle%position = positions%get(particle%i)
+            call visitable_list%visit(.true., particle, overlap, energy_i)
+            if (overlap) exit
+            energy = energy + energy_i
+        end do
+    end subroutine sum_energy
+
+end module procedures_visitable_list_sum
+
 program test_visitable_list
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
@@ -18,11 +54,11 @@ use class_pair_potential, only: Abstract_Pair_Potential, Concrete_Pair_Potential
     Hard_Pair_Potential
 use module_particles, only: Concrete_Particle
 use class_visitable_list, only: Abstract_Visitable_List, Concrete_Visitable_List
+use procedures_visitable_list_sum, only: sum_energy
 
 implicit none
 
     class(Abstract_Visitable_List), allocatable :: visitable_list
-    type(Concrete_Particle) :: particle
     class(Abstract_Pair_Potential), allocatable :: pair_potential
     type(Concrete_Potential_Domain) :: potential_domain
     class(Abstract_Potential_Expression), allocatable :: potential_expression
@@ -40,8 +76,9 @@ implicit none
 
     real(DP), allocatable :: box_size(:)
     real(DP) :: position(num_dimensions)
-    real(DP) :: energy, energy_i, diameter_value, min_diameter_factor
+    real(DP) :: energy, diameter_value, min_diameter_factor, rand
     integer :: num_particles, i_particle
+    integer :: num_exchanges, i_exchange, num_overwrites, i_overwrite, i_target, i_value
     logical :: overlap
 
     call json_initialize()
@@ -135,20 +172,48 @@ implicit none
         call visitable_list%add(i_particle) !artificial
     end do
     call visitable_list%set(pair_potential)
-
-    energy = 0._DP
-    do i_particle = 1, positions%get_num()
-        particle%i = i_particle
-        particle%position = positions%get(particle%i)
-        call visitable_list%visit(.true., particle, overlap, energy_i)
-        if (overlap) exit
-        energy = energy + energy_i
-    end do
+    call sum_energy(positions, visitable_list, overlap, energy)
     if (overlap) then
         write(output_unit,*) "overlap"
     else
         energy = energy / 2._DP
-        write(output_unit, *) "energy =", energy
+        write(output_unit, *) "[initial] energy =", energy
+    end if
+
+    data_field = "Particles.number of exchanges"
+    call input_data%get(data_field, num_exchanges, data_found)
+    call test_data_found(data_field, data_found)
+    do i_exchange = 1, num_exchanges
+        call random_number(rand)
+        i_particle = int(real(number%get(), DP) * rand) + 1
+        call visitable_list%remove(i_particle)
+        call visitable_list%add(i_particle)
+    end do
+    call sum_energy(positions, visitable_list, overlap, energy)
+    if (overlap) then
+        write(output_unit,*) "overlap"
+    else
+        energy = energy / 2._DP
+        write(output_unit, *) "[exchange] energy =", energy
+    end if
+
+    data_field = "Memory.number of overwrites"
+    call input_data%get(data_field, num_overwrites, data_found)
+    call test_data_found(data_field, data_found)
+    do i_overwrite = 1, num_overwrites
+        call random_number(rand)
+        i_target = int(real(number%get(), DP) * rand) + 1
+        call random_number(rand)
+        i_value = int(real(number%get(), DP) * rand) + 1
+        call visitable_list%overwrite(i_target, i_value)
+        call visitable_list%overwrite(i_value, i_target)
+    end do
+    call sum_energy(positions, visitable_list, overlap, energy)
+    if (overlap) then
+        write(output_unit,*) "overlap"
+    else
+        energy = energy / 2._DP
+        write(output_unit, *) "[overwrite] energy =", energy
     end if
 
     call visitable_list%destroy()

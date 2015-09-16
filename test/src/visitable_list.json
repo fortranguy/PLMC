@@ -1,17 +1,21 @@
 {
     "Box": {
         "name": "XYZ",
-        "size": [10.0, 10.0, 10.0]
+        "size": [20, 20, 20]
     },
-    "Particles": {
-        "number": 100,
-        "diameter": 1.0,
-        "minimum diameter factor": 0.8
+        "Particles": {
+        "number": 1000,
+        "diameter": 1,
+        "minimum diameter factor": 0.8,
+        "number of exchanges": 1000
     },
-    "Potential": {
+        "Potential": {
         "name": "LJ",
         "max distance": 2.5,
-        "delta distance": 1.0e-6,
-        "epsilon": 1.0
+        "delta distance": 0.000001,
+        "epsilon": 1
+    },
+    "Memory": {
+        "number of overwrites": 1000
     }
 }

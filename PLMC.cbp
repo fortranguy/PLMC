@@ -66,6 +66,9 @@
 		<Unit filename="lib/src/class_moved_positions.f90">
 			<Option weight="4" />
 		</Unit>
+		<Unit filename="lib/src/class_neighbours_cells.f90">
+			<Option weight="6" />
+		</Unit>
 		<Unit filename="lib/src/class_number.f90">
 			<Option weight="1" />
 		</Unit>
@@ -102,6 +105,9 @@
 		<Unit filename="lib/src/class_total_moment.f90">
 			<Option weight="4" />
 		</Unit>
+		<Unit filename="lib/src/class_visitable_list.f90">
+			<Option weight="5" />
+		</Unit>
 		<Unit filename="lib/src/data_constants.f90">
 			<Option weight="0" />
 		</Unit>
@@ -112,6 +118,9 @@
 			<Option weight="0" />
 		</Unit>
 		<Unit filename="lib/src/module_data.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="lib/src/module_nodes.f90">
 			<Option weight="1" />
 		</Unit>
 		<Unit filename="lib/src/module_particles.f90">
@@ -250,6 +259,11 @@
 			<Option compile="0" />
 			<Option link="0" />
 			<Option weight="5" />
+		</Unit>
+		<Unit filename="test/src/test_visitable_list.f90">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option weight="6" />
 		</Unit>
 		<Extensions>
 			<code_completion />

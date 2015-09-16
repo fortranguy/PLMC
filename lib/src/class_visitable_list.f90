@@ -133,7 +133,6 @@ contains
     end subroutine Abstract_Visitable_List_remove
 
     subroutine Abstract_Visitable_List_overwrite(this, i_target, i_value)
-
         class(Abstract_Visitable_List), intent(inout) :: this
         integer, intent(in) :: i_target, i_value
 
@@ -151,7 +150,6 @@ contains
             end if
             current => next
         end do
-
     end subroutine Abstract_Visitable_List_overwrite
 
 end module class_visitable_list
