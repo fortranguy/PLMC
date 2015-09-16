@@ -1,5 +1,7 @@
 import JSON
 json = JSON
+import ProgressMeter
+pm = ProgressMeter
 
 input_data = json.parsefile(ARGS[1]; ordered=false, use_mmap=true)
 
@@ -19,6 +21,7 @@ end
 
 positions = rand(3) .* box_size
 pos = Float64[]
+prog = pm.Progress(num_particles)
 while size(positions, 2) < num_particles
     overlap = true
     while overlap
@@ -32,6 +35,7 @@ while size(positions, 2) < num_particles
         end
     end
     positions = hcat(positions, pos)
+    pm.next!(prog)
 end
 
 writedlm("positions.in", positions')
