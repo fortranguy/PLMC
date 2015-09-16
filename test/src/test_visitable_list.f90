@@ -169,7 +169,7 @@ implicit none
     allocate(Concrete_Visitable_List :: visitable_list)
     call visitable_list%construct(periodic_box, positions)
     do i_particle = 1, positions%get_num()
-        call visitable_list%add(i_particle) !artificial
+        call visitable_list%allocate(i_particle) !artificial
     end do
     call visitable_list%set(pair_potential)
     call sum_energy(positions, visitable_list, overlap, energy)
@@ -186,8 +186,8 @@ implicit none
     do i_exchange = 1, num_exchanges
         call random_number(rand)
         i_particle = int(real(number%get(), DP) * rand) + 1
-        call visitable_list%remove(i_particle)
-        call visitable_list%add(i_particle)
+        call visitable_list%deallocate(i_particle)
+        call visitable_list%allocate(i_particle)
     end do
     call sum_energy(positions, visitable_list, overlap, energy)
     if (overlap) then

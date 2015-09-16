@@ -14,17 +14,17 @@ private
 
     type, abstract, public :: Abstract_Visitable_List
     private
-        type(Concrete_Node), pointer :: beginning
         class(Abstract_Periodic_Box), pointer :: periodic_box
         class(Abstract_Positions), pointer :: positions
         class(Abstract_Pair_Potential), pointer :: pair_potential
+        type(Concrete_Node), pointer :: beginning
     contains
         procedure :: construct => Abstract_Visitable_List_construct
         procedure :: destroy => Abstract_Visitable_List_destroy
         procedure :: set => Abstract_Visitable_List_set
         procedure :: visit => Abstract_Visitable_List_visit
-        procedure :: add => Abstract_Visitable_List_add
-        procedure :: remove => Abstract_Visitable_List_remove
+        procedure :: allocate => Abstract_Visitable_List_allocate
+        procedure :: deallocate => Abstract_Visitable_List_deallocate
         procedure :: overwrite => Abstract_Visitable_List_overwrite
     end type Abstract_Visitable_List
 
@@ -96,7 +96,7 @@ contains
         end do
     end subroutine Abstract_Visitable_List_visit
 
-    subroutine Abstract_Visitable_List_add(this, i_particle)
+    subroutine Abstract_Visitable_List_allocate(this, i_particle)
         class(Abstract_Visitable_List), intent(inout) :: this
         integer, intent(in) :: i_particle
 
@@ -108,9 +108,9 @@ contains
         new%next => previous%next
         previous%next => new
         new%i = i_particle
-    end subroutine Abstract_Visitable_List_add
+    end subroutine Abstract_Visitable_List_allocate
 
-    subroutine Abstract_Visitable_List_remove(this, i_particle)
+    subroutine Abstract_Visitable_List_deallocate(this, i_particle)
         class(Abstract_Visitable_List), intent(inout) :: this
         integer, intent(in) :: i_particle
 
@@ -130,7 +130,7 @@ contains
             end if
             current => next
         end do
-    end subroutine Abstract_Visitable_List_remove
+    end subroutine Abstract_Visitable_List_deallocate
 
     subroutine Abstract_Visitable_List_overwrite(this, i_target, i_value)
         class(Abstract_Visitable_List), intent(inout) :: this

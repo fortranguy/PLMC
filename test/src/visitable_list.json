@@ -12,7 +12,7 @@
         "Potential": {
         "name": "LJ",
         "max distance": 2.5,
-        "delta distance": 0.000001,
+        "delta distance": 1.0e-6,
         "epsilon": 1
     },
     "Memory": {

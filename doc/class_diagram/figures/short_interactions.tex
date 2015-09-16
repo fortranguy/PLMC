@@ -37,12 +37,11 @@
             \begin{abstractclass}[text width=\largeTextWidth]{AbstractCellsPotential}{0, 0}
                 \operation{construct(periodicBox\type{AbstractPeriodicBox},
                                      positions\type{AbstractPositions},
-                                     pairPotential\type{AbstractPairPotential},
-                                     visitableList\type{AbstractVisitableList})}
+                                     cells\type{ConcreteCells})}
                 \operation{destroy()}
-                \operation{set(particle\type{Particle}, iParticle\type{int})}
                 \operation[0]{visit(particle\type{Particle}, overlap\type{bool},
                                     energy\type{double})}
+                \operation{move(from\type{Particle}, to\type{Particle})}
                 \operation{add(particle\type{Particle})}
                 \operation{remove(particle\type{Particle})}
             \end{abstractclass}
@@ -71,8 +70,8 @@
                 \operation{set(pairPotential\type{AbstractPairPotential})}
                 \operation{visit(sameType\type{bool}, particle\type{Particle},
                                  overlap\type{bool}, energy\type{double})\type{void}}
-                \operation{add(iParticle\type{int})}
-                \operation{remove(iParticle\type{int})}
+                \operation{allocate(iParticle\type{int})}
+                \operation{deallocate(iParticle\type{int})}
                 \operation{overwrite(iTarger\type{int}, iValue\type{int})}
             \end{abstractclass}
         \end{scope}
@@ -153,8 +152,10 @@
     %\aggregation{InterPairInteration}{interDiameters}{1}{AbstractInterDiameters}
     %\aggregation{InterPairInteration}{positions}{2}{AbstractPositions}
 
-    \aggregation{AbstractCellsPotential}{visitableList}{1}{AbstractVisitableList}
+    \aggregation{AbstractCellsPotential}{visitableList}{1..n}{AbstractVisitableList}
+    \aggregation{AbstractVisitableList}{periodicBox}{1}{AbstractPeriodicBox}
     \aggregation{AbstractVisitableList}{pairPotential}{1}{AbstractPairPotential}
+    \aggregation{AbstractVisitableList}{positions}{1}{AbstractPositions}
     
     \aggregation{AbstractPairPotential}{potentialExpression}{1}{AbstractPotentialExpression}
 
