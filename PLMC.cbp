@@ -158,6 +158,10 @@
 			<Option link="0" />
 			<Option weight="6" />
 		</Unit>
+		<Unit filename="test/src/test_cells_potential.f90">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
 		<Unit filename="test/src/test_chemical_potential.f90">
 			<Option compile="0" />
 			<Option link="0" />

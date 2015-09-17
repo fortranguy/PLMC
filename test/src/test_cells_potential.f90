@@ -1,4 +1,41 @@
-program test_box_potential
+module procedures_cells_potential_sum
+
+use, intrinsic :: iso_fortran_env, only: DP => REAL64
+use module_particles, only: Concrete_Particle
+use class_positions, only: Abstract_Positions
+use class_cells_potential, only: Abstract_Cells_Potential
+
+implicit none
+
+private
+public sum_energy
+
+contains
+
+    subroutine sum_energy(positions, cells_potential, overlap, energy)
+        class(Abstract_Positions), intent(in) :: positions
+        class(Abstract_Cells_Potential), intent(in) :: cells_potential
+        logical, intent(out) :: overlap
+        real(DP), intent(out) :: energy
+
+        type(Concrete_Particle) :: particle
+        real(DP) :: energy_i
+        integer :: i_particle
+
+        energy = 0._DP
+        do i_particle = 1, positions%get_num()
+            particle%same_type = .true.
+            particle%i = i_particle
+            particle%position = positions%get(particle%i)
+            call cells_potential%visit(particle, overlap, energy_i)
+            if (overlap) return
+            energy = energy + energy_i
+        end do
+    end subroutine sum_energy
+
+end module procedures_cells_potential_sum
+
+program test_cells_potential
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use data_geometry, only: num_dimensions
@@ -17,12 +54,17 @@ use types_potential_domain, only: Concrete_Potential_Domain
 use class_pair_potential, only: Abstract_Pair_Potential, Concrete_Pair_Potential, &
     Hard_Pair_Potential
 use module_particles, only: Concrete_Particle
-use class_box_potential, only: Box_Potential_Facade
+use class_visitable_list, only: Abstract_Visitable_List, Concrete_Visitable_List
+use module_cells, only: Concrete_Cells, &
+    Concrete_Cells_construct, Concrete_Cells_destroy
+use class_cells_potential, only: Abstract_Cells_Potential, Concrete_Cells_Potential
+use procedures_cells_potential_sum, only: sum_energy
 
 implicit none
 
-    type(Box_Potential_Facade) :: box_potential
-    type(Concrete_Particle) :: particle
+    class(Abstract_Cells_Potential), allocatable :: cells_potential
+    type(Concrete_Cells) :: cells
+    class(Abstract_Visitable_List), allocatable :: visitable_list
     class(Abstract_Pair_Potential), allocatable :: pair_potential
     type(Concrete_Potential_Domain) :: potential_domain
     class(Abstract_Potential_Expression), allocatable :: potential_expression
@@ -40,12 +82,13 @@ implicit none
 
     real(DP), allocatable :: box_size(:)
     real(DP) :: position(num_dimensions)
-    real(DP) :: energy, energy_i, diameter_value, min_diameter_factor
+    real(DP) :: energy, diameter_value, min_diameter_factor
     integer :: num_particles, i_particle
     logical :: overlap
+    character(len=:), allocatable :: periodicity
 
     call json_initialize()
-    data_filename = "box_potential.json"
+    data_filename = "cells_potential.json"
     call test_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
     deallocate(data_filename)
@@ -56,10 +99,13 @@ implicit none
     select case(box_name)
         case("XYZ")
             allocate(XYZ_Periodic_Box :: periodic_box)
+            periodicity = "3D"
         case("XY")
             allocate(XY_Periodic_Box :: periodic_box)
+            periodicity = "2D"
         case default
-            call error_exit(data_field//" unkown.")
+            call error_exit(data_field//" unknown.")
+            periodicity = "unkwown"
     end select
     data_field = "Box.size"
     call input_data%get(data_field, box_size, data_found)
@@ -129,19 +175,14 @@ implicit none
     if (.not.allocated(pair_potential)) allocate(Concrete_Pair_Potential :: pair_potential)
     call pair_potential%construct(potential_domain, potential_expression)
 
-    call box_potential%construct(periodic_box)
-    call box_potential%set(positions)
-    call box_potential%set(pair_potential)
+    allocate(Concrete_Visitable_List :: visitable_list)
+    call Concrete_Cells_construct(cells, visitable_list, periodic_box, periodicity, positions, &
+                                  pair_potential)
+    allocate(Concrete_Cells_Potential :: cells_potential)
+    call cells_potential%construct(periodic_box, positions, cells)
+    call cells_potential%set(pair_potential)
 
-    energy = 0._DP
-    do i_particle = 1, positions%get_num()
-        particle%same_type = .true.
-        particle%i = i_particle
-        particle%position = positions%get(particle%i)
-        call box_potential%visit(particle, overlap, energy_i)
-        if (overlap) exit
-        energy = energy + energy_i
-    end do
+    call sum_energy(positions, cells_potential, overlap, energy)
     if (overlap) then
         write(output_unit,*) "overlap"
     else
@@ -149,7 +190,9 @@ implicit none
         write(output_unit, *) "energy =", energy
     end if
 
-    call box_potential%destroy()
+    deallocate(cells_potential)
+    call Concrete_Cells_destroy(cells)
+    deallocate(visitable_list)
     call pair_potential%destroy()
     deallocate(pair_potential)
     deallocate(potential_expression)
@@ -161,4 +204,4 @@ implicit none
     deallocate(periodic_box)
     call input_data%destroy()
 
-end program test_box_potential
+end program test_cells_potential

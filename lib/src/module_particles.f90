@@ -14,6 +14,7 @@ private
 public Concrete_Particles_construct, Concrete_Particles_destroy
 
     type, public :: Concrete_Particle
+        logical :: same_type
         integer :: i
         real(DP) :: diameter, min_diameter, moment_norm
         real(DP), dimension(num_dimensions) :: position, orientation

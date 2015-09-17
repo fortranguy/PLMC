@@ -28,8 +28,8 @@
                 \operation{destroy()}
                 \operation{set(positions\type{Positions})}
                 \operation{set(pairPotential\type{PairPotential})}
-                \operation{visit(sameType\type{bool}, particle\type{Particle},
-                                 overlap\type{bool}, energy\type{double})\type{void}}
+                \operation{visit(particle\type{Particle}, overlap\type{bool},
+                                 energy\type{double})\type{void}}
             \end{class}
         \end{scope}
         
@@ -39,6 +39,7 @@
                                      positions\type{Positions},
                                      cells\type{Cells})}
                 \operation{destroy()}
+                \operation{set(pairPotential\type{PairPotential})}
                 \operation[0]{visit(particle\type{Particle}, overlap\type{bool},
                                     energy\type{double})}
                 \operation{move(from\type{Particle}, to\type{Particle})}
@@ -67,8 +68,7 @@
                 \operation{construct(periodicBox\type{PeriodicBox},
                                      positions\type{Positions})}
                 \operation{destroy()}
-                \operation{set(pairPotential\type{PairPotential})}
-                \operation{visit(sameType\type{bool}, particle\type{Particle},
+                \operation{visit(particle\type{Particle}, pairPotential\type{PairPotential},
                                  overlap\type{bool}, energy\type{double})\type{void}}
                 \operation{allocate(iParticle\type{int})}
                 \operation{deallocate(iParticle\type{int})}

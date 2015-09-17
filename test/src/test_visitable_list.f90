@@ -4,6 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use module_particles, only: Concrete_Particle
 use class_positions, only: Abstract_Positions
 use class_visitable_list, only: Abstract_Visitable_List
+use class_pair_potential, only: Abstract_Pair_Potential
 
 implicit none
 
@@ -12,9 +13,10 @@ public sum_energy
 
 contains
 
-    subroutine sum_energy(positions, visitable_list, overlap, energy)
+    subroutine sum_energy(positions, visitable_list, pair_potential, overlap, energy)
         class(Abstract_Positions), intent(in) :: positions
         class(Abstract_Visitable_List), intent(in) :: visitable_list
+        class(Abstract_Pair_Potential), intent(in) :: pair_potential
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
 
@@ -24,9 +26,10 @@ contains
 
         energy = 0._DP
         do i_particle = 1, positions%get_num()
+            particle%same_type = .true.
             particle%i = i_particle
             particle%position = positions%get(particle%i)
-            call visitable_list%visit(.true., particle, overlap, energy_i)
+            call visitable_list%visit(particle, pair_potential, overlap, energy_i)
             if (overlap) exit
             energy = energy + energy_i
         end do
@@ -171,8 +174,7 @@ implicit none
     do i_particle = 1, positions%get_num()
         call visitable_list%allocate(i_particle) !artificial
     end do
-    call visitable_list%set(pair_potential)
-    call sum_energy(positions, visitable_list, overlap, energy)
+    call sum_energy(positions, visitable_list, pair_potential, overlap, energy)
     if (overlap) then
         write(output_unit,*) "overlap"
     else
@@ -189,7 +191,7 @@ implicit none
         call visitable_list%deallocate(i_particle)
         call visitable_list%allocate(i_particle)
     end do
-    call sum_energy(positions, visitable_list, overlap, energy)
+    call sum_energy(positions, visitable_list, pair_potential, overlap, energy)
     if (overlap) then
         write(output_unit,*) "overlap"
     else
@@ -208,7 +210,7 @@ implicit none
         call visitable_list%overwrite(i_target, i_value)
         call visitable_list%overwrite(i_value, i_target)
     end do
-    call sum_energy(positions, visitable_list, overlap, energy)
+    call sum_energy(positions, visitable_list, pair_potential, overlap, energy)
     if (overlap) then
         write(output_unit,*) "overlap"
     else

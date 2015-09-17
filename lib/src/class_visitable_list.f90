@@ -16,12 +16,10 @@ private
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box
         class(Abstract_Positions), pointer :: positions
-        class(Abstract_Pair_Potential), pointer :: pair_potential
         type(Concrete_Node), pointer :: beginning
     contains
         procedure :: construct => Abstract_Visitable_List_construct
         procedure :: destroy => Abstract_Visitable_List_destroy
-        procedure :: set => Abstract_Visitable_List_set
         procedure :: visit => Abstract_Visitable_List_visit
         procedure :: allocate => Abstract_Visitable_List_allocate
         procedure :: deallocate => Abstract_Visitable_List_deallocate
@@ -57,22 +55,14 @@ contains
         class(Abstract_Visitable_List), intent(inout) :: this
 
         call deallocate_list(this%beginning)
-        this%pair_potential => null()
         this%positions => null()
         this%periodic_box => null()
     end subroutine Abstract_Visitable_List_destroy
 
-    subroutine Abstract_Visitable_List_set(this, pair_potential)
-        class(Abstract_Visitable_List), intent(inout) :: this
-        class(Abstract_Pair_Potential), target, intent(in) :: pair_potential
-
-        this%pair_potential => pair_potential
-    end subroutine Abstract_Visitable_List_set
-
-    subroutine Abstract_Visitable_List_visit(this, same_type, particle, overlap, energy)
+    subroutine Abstract_Visitable_List_visit(this, particle, pair_potential, overlap, energy)
         class(Abstract_Visitable_List), intent(in) :: this
-        logical, intent(in) :: same_type
         type(Concrete_Particle), intent(in) :: particle
+        class(Abstract_Pair_Potential), intent(in) :: pair_potential
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
 
@@ -82,16 +72,17 @@ contains
         overlap = .false.
         energy = 0._DP
         current => this%beginning%next
+        if (.not. associated(current%next)) return
         do
             next => current%next
-            if (.not. same_type .or. particle%i /= current%i) then
+            if (.not. particle%same_type .or. particle%i /= current%i) then
                 distance = this%periodic_box%distance(particle%position, &
                                                       this%positions%get(current%i))
-                call this%pair_potential%meet(distance, overlap, energy_i)
+                call pair_potential%meet(distance, overlap, energy_i)
                 if (overlap) return
                 energy = energy + energy_i
             end if
-            if (.not. associated(next%next)) exit
+            if (.not. associated(next%next)) return
             current => next
         end do
     end subroutine Abstract_Visitable_List_visit

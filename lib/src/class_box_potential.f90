@@ -55,9 +55,8 @@ contains
         this%pair_potential => pair_potential
     end subroutine Box_Potential_Facade_set_pair_potential
 
-    pure subroutine Box_Potential_Facade_visit(this, same_type, particle, overlap, energy)
+    pure subroutine Box_Potential_Facade_visit(this, particle, overlap, energy)
         class(Box_Potential_Facade), intent(inout) :: this
-        logical, intent(in) :: same_type
         type(Concrete_Particle), intent(in) :: particle
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
@@ -68,7 +67,7 @@ contains
         overlap = .false.
         energy = 0._DP
         do i_particle = 1, this%positions%get_num()
-            if (same_type .and. particle%i == i_particle) cycle
+            if (particle%same_type .and. particle%i == i_particle) cycle
             distance = this%periodic_box%distance(particle%position, &
                                                   this%positions%get(i_particle))
             call this%pair_potential%meet(distance, overlap, energy_i)
