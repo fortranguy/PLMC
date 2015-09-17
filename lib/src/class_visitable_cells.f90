@@ -3,7 +3,7 @@ module class_visitable_cells
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_precisions, only: real_zero
 use data_geometry, only: num_dimensions
-use procedures_errors, only: error_exit
+use procedures_errors, only: error_exit, warning_continue
 use procedures_checks, only: check_positive
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_positions, only: Abstract_Positions
@@ -27,6 +27,7 @@ private
         class(Abstract_Visitable_List), allocatable :: visitable_lists(:, :, :)
         integer, allocatable :: neighbours(:, :, :, :, :, :, :)
         class(Abstract_Positions), pointer :: positions => null()
+        class(Abstract_Periodic_Box), pointer :: periodic_box => null()
     contains
         procedure :: construct => Abstract_Visitable_Cells_construct
         procedure :: destroy => Abstract_Visitable_Cells_destroy
@@ -34,7 +35,8 @@ private
         procedure :: move => Abstract_Visitable_Cells_move
         procedure :: add => Abstract_Visitable_Cells_add
         procedure :: remove => Abstract_Visitable_Cells_remove
-        procedure, private :: check_size => Abstract_Visitable_Cells_check_size
+        procedure, private :: set_division => Abstract_Visitable_Cells_set_division
+        procedure, private :: check_division => Abstract_Visitable_Cells_check_division
         procedure, private :: construct_visitable_lists => &
             Abstract_Visitable_Cells_construct_visitable_lists
         procedure(Abstract_Visitable_Cells_set_neighbours), private, deferred :: set_neighbours
@@ -74,15 +76,13 @@ contains
             min_cell_edge)
         class(Abstract_Visitable_Cells), intent(out) :: this
         class(Abstract_Visitable_List), intent(in) :: mold
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
+        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Positions), target, intent(in) :: positions
         real(DP), intent(in) :: min_cell_edge
 
-        this%nums = floor(periodic_box%get_size()/min_cell_edge)
-        call check_positive("Abstract_Visitable_Cells", "this%nums", this%nums)
-        this%size = periodic_box%get_size() / real(this%nums, DP)
-        call check_positive("Abstract_Visitable_Cells", "this%size", this%size)
-        call this%check_size(periodic_box)
+        this%periodic_box => periodic_box
+        call this%set_division(min_cell_edge)
+        call this%check_division()
 
         this%global_lbounds = -this%nums/2
         this%global_ubounds = this%global_lbounds + this%nums - 1
@@ -106,6 +106,35 @@ contains
         call this%fill()
     end subroutine Abstract_Visitable_Cells_construct
 
+    subroutine Abstract_Visitable_Cells_set_division(this, min_cell_edge)
+        class(Abstract_Visitable_Cells), intent(inout) :: this
+        real(DP), intent(in) :: min_cell_edge
+
+        this%nums = floor(this%periodic_box%get_size()/min_cell_edge)
+        call check_positive("Abstract_Visitable_Cells", "this%nums", this%nums)
+        if (any(this%nums < num_local_cells)) then
+            call warning_continue("Abstract_Visitable_Cells: this%nums is too small. "//&
+                "It will be set to 3 where required.")
+        end if
+        where(this%nums < num_local_cells)
+            this%nums = 3
+        end where
+        this%size = this%periodic_box%get_size() / real(this%nums, DP)
+        call check_positive("Abstract_Visitable_Cells", "this%size", this%size)
+    end subroutine Abstract_Visitable_Cells_set_division
+
+    subroutine Abstract_Visitable_Cells_check_division(this)
+        class(Abstract_Visitable_Cells), intent(in) :: this
+
+        real(DP) :: box_mod_cell(num_dimensions)
+
+        box_mod_cell = modulo(this%periodic_box%get_size(), this%size)
+        if (any(box_mod_cell > real_zero .and. abs(box_mod_cell - this%size) > real_zero)) then
+            call error_exit("Abstract_Visitable_Cells:"//&
+                            "this%size is not a divisor of periodic_box%get_size()")
+        end if
+    end subroutine Abstract_Visitable_Cells_check_division
+
     subroutine Abstract_Visitable_Cells_construct_visitable_lists(this, periodic_box, positions)
         class(Abstract_Visitable_Cells), intent(inout) :: this
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
@@ -122,23 +151,6 @@ contains
         end do
         end do
     end subroutine Abstract_Visitable_Cells_construct_visitable_lists
-
-    subroutine Abstract_Visitable_Cells_check_size(this, periodic_box)
-        class(Abstract_Visitable_Cells), intent(in) :: this
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
-
-        real(DP) :: box_mod_cell(num_dimensions)
-
-        if (any(this%nums < num_local_cells)) then
-            call error_exit("Abstract_Visitable_Cells: this%nums is too small.")
-            !go back to 3 then
-        end if
-        box_mod_cell = modulo(periodic_box%get_size(), this%size)
-        if (any(box_mod_cell > real_zero .and. abs(box_mod_cell - this%size) > real_zero)) then
-            call error_exit("Abstract_Visitable_Cells:"//&
-                            "this%size size is not a divisor of periodic_box%get_size()")
-        end if
-    end subroutine Abstract_Visitable_Cells_check_size
 
     subroutine Abstract_Visitable_Cells_destroy(this)
         class(Abstract_Visitable_Cells), intent(inout) :: this
