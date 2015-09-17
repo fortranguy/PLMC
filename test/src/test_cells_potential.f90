@@ -3,7 +3,7 @@ module procedures_cells_potential_sum
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use module_particles, only: Concrete_Particle
 use class_positions, only: Abstract_Positions
-use class_cells_potential, only: Abstract_Cells_Potential
+use class_cells_potential, only: Cells_Potential_Facade
 
 implicit none
 
@@ -14,7 +14,7 @@ contains
 
     subroutine sum_energy(positions, cells_potential, overlap, energy)
         class(Abstract_Positions), intent(in) :: positions
-        class(Abstract_Cells_Potential), intent(in) :: cells_potential
+        type(Cells_Potential_Facade), intent(in) :: cells_potential
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
 
@@ -55,15 +55,14 @@ use class_pair_potential, only: Abstract_Pair_Potential, Concrete_Pair_Potential
     Hard_Pair_Potential
 use module_particles, only: Concrete_Particle
 use class_visitable_list, only: Abstract_Visitable_List, Concrete_Visitable_List
-use module_cells, only: Concrete_Cells, &
-    Concrete_Cells_construct, Concrete_Cells_destroy
-use class_cells_potential, only: Abstract_Cells_Potential, Concrete_Cells_Potential
+use class_visitable_cells, only: Abstract_Visitable_Cells, PBC_3D_Visitable_Cells
+use class_cells_potential, only: Cells_Potential_Facade
 use procedures_cells_potential_sum, only: sum_energy
 
 implicit none
 
-    class(Abstract_Cells_Potential), allocatable :: cells_potential
-    type(Concrete_Cells) :: cells
+    type(Cells_Potential_Facade) :: cells_potential
+    class(Abstract_Visitable_Cells), allocatable :: visitable_cells
     class(Abstract_Visitable_List), allocatable :: visitable_list
     class(Abstract_Pair_Potential), allocatable :: pair_potential
     type(Concrete_Potential_Domain) :: potential_domain
@@ -85,7 +84,6 @@ implicit none
     real(DP) :: energy, diameter_value, min_diameter_factor
     integer :: num_particles, i_particle
     logical :: overlap
-    character(len=:), allocatable :: periodicity
 
     call json_initialize()
     data_filename = "cells_potential.json"
@@ -99,13 +97,11 @@ implicit none
     select case(box_name)
         case("XYZ")
             allocate(XYZ_Periodic_Box :: periodic_box)
-            periodicity = "3D"
+
         case("XY")
             allocate(XY_Periodic_Box :: periodic_box)
-            periodicity = "2D"
         case default
             call error_exit(data_field//" unknown.")
-            periodicity = "unkwown"
     end select
     data_field = "Box.size"
     call input_data%get(data_field, box_size, data_found)
@@ -176,10 +172,19 @@ implicit none
     call pair_potential%construct(potential_domain, potential_expression)
 
     allocate(Concrete_Visitable_List :: visitable_list)
-    call Concrete_Cells_construct(cells, visitable_list, periodic_box, periodicity, positions, &
-                                  pair_potential)
-    allocate(Concrete_Cells_Potential :: cells_potential)
-    call cells_potential%construct(periodic_box, positions, cells)
+
+    select type(periodic_box)
+        type is (XYZ_Periodic_Box)
+            allocate(PBC_3D_Visitable_Cells :: visitable_cells)
+        type is (XY_Periodic_Box)
+            call error_exit("PBC_2D_Visitable_Cells not yet implemented.")
+        class default
+            call error_exit("Periodic_Box type unknown.")
+    end select
+
+    call visitable_cells%construct(visitable_list, periodic_box, positions, &
+        pair_potential%get_max_distance())
+    call cells_potential%construct(visitable_cells)
     call cells_potential%set(pair_potential)
 
     call sum_energy(positions, cells_potential, overlap, energy)
@@ -190,8 +195,9 @@ implicit none
         write(output_unit, *) "energy =", energy
     end if
 
-    deallocate(cells_potential)
-    call Concrete_Cells_destroy(cells)
+    call cells_potential%destroy()
+    call visitable_cells%destroy()
+    deallocate(visitable_cells)
     deallocate(visitable_list)
     call pair_potential%destroy()
     deallocate(pair_potential)

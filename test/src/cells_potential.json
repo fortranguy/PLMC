@@ -1,16 +1,16 @@
 {
     "Box": {
         "name": "XYZ",
-        "size": [9.0, 9.0, 12.0]
+        "size": [12.0, 12.0, 15.0]
     },
         "Particles": {
-        "number": 200,
+        "number": 1000,
         "diameter": 1,
         "minimum diameter factor": 0.8
     },
         "Potential": {
         "name": "LJ",
-        "max distance": 3.0,
+        "max distance": 2.5,
         "delta distance": 1.0e-6,
         "epsilon": 1
     }
