@@ -6,7 +6,7 @@ use module_particles, only: Concrete_Particle
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_positions, only: Abstract_Positions
 use module_particles, only: Concrete_Particle
-use module_cells, only: Concrete_Cells
+use module_cells, only: Abstract_Cells
 
 implicit none
 
@@ -16,7 +16,8 @@ private
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box
         class(Abstract_Positions), pointer :: positions
-        type(Concrete_Cells), pointer :: cells
+        class(Abstract_Cells), pointer :: cells
+        integer, allocatable :: neighbours(:, :, :, :, :, :)
     contains
         procedure :: construct => Abstract_Cells_Potential_construct
         procedure, private :: fill => Abstract_Cells_Potential_fill
@@ -37,7 +38,7 @@ contains
         class(Abstract_Cells_Potential), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Positions), target, intent(in) :: positions
-        type(Concrete_Cells), target, intent(in) :: cells
+        class(Abstract_Cells), target, intent(in) :: cells
 
         this%periodic_box => periodic_box
         this%positions => positions
@@ -65,11 +66,31 @@ contains
         this%periodic_box => null()
     end subroutine Abstract_Cells_Potential_destroy
 
-    subroutine Abstract_Cells_Potential_visit(this, particle, energy)
+    subroutine Abstract_Cells_Potential_visit(this, same_type, particle, overlap, energy)
         class(Abstract_Cells_Potential), intent(in) :: this
+        logical, intent(in) :: same_type
         type(Concrete_Particle), intent(in) :: particle
+        logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
 
+        real(DP) :: energy_i
+        integer, dimension(num_dimensions) :: i_cell, i_local_cell
+        integer :: local_i1, local_i2, local_i3
+
+        i_cell = nint(particle%position/this%cells%size)
+        energy = 0._DP
+        do local_i3 = this%cells%local_lbounds(3), this%cells%global_ubounds(3)
+        do local_i2 = this%cells%local_lbounds(2), this%cells%global_ubounds(2)
+        do local_i1 = this%cells%local_lbounds(1), this%cells%global_ubounds(1)
+            i_local_cell = this%cells%neighbours(:, local_i1, local_i2, local_i3, &
+                                                 i_cell(1), i_cell(2), i_cell(3))
+            call this%cells%visitables_lists(i_local_cell(1), i_local_cell(2), &
+                i_local_cell(3))%visit(same_type, particle, overlap, energy_i)
+            if (overlap) return
+            energy = energy + energy_i
+        end do
+        end do
+        end do
         !call this%linked_list%visit(particle, energy)
     end subroutine Abstract_Cells_Potential_visit
 
@@ -77,13 +98,15 @@ contains
         class(Abstract_Cells_Potential), intent(inout) :: this
         type(Concrete_Particle), intent(in) :: from, to
 
-        integer, dimension(num_dimensions) :: i_from, i_to
+        integer, dimension(num_dimensions) :: from_i_cell, to_i_cell
 
-        i_from = nint(from%position/this%cells%size)
-        i_to = nint(to%position/this%cells%size)
-        if (any(i_from /= i_to)) then
-            call this%cells%visitables_lists(i_from(1), i_from(2), i_from(3))%deallocate(from%i)
-            call this%cells%visitables_lists(i_to(1), i_to(2), i_to(3))%allocate(to%i)
+        from_i_cell = nint(from%position/this%cells%size)
+        to_i_cell = nint(to%position/this%cells%size)
+        if (any(from_i_cell /= to_i_cell)) then
+            call this%cells%visitables_lists(from_i_cell(1), from_i_cell(2), &
+                                             from_i_cell(3))%deallocate(from%i)
+            call this%cells%visitables_lists(to_i_cell(1), to_i_cell(2), &
+                                             to_i_cell(3))%allocate(to%i)
         end if
     end subroutine Abstract_Cells_Potential_move
 

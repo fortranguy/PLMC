@@ -2,7 +2,7 @@
     \begin{package}{Post treatments}
         
         \begin{scope}[local bounding box=Widom]
-            \begin{abstractclass}[text width=\smallTextWidth]{AbstractWidomMethod}{0, 0}
+            \begin{abstractclass}[text width=\smallTextWidth]{WidomMethod}{0, 0}
                 \operation[0]{measureInverseActivity()}
             \end{abstractclass}
             
@@ -11,13 +11,13 @@
             }
             
             \begin{class}[text width=\smallTextWidth]{WidomMethod}{0, -3}
-                \inherit{AbstractWidomMethod}
+                \inherit{WidomMethod}
                 \operationsImplementation{}
             \end{class}
         \end{scope}
         
         \begin{scope}[shift={($(Widom.north) + (8 cm, -2 cm)$)}]
-            \begin{abstractclass}[text width=\smallTextWidth]{AbstractTestSpheres}{0, 0}
+            \begin{abstractclass}[text width=\smallTextWidth]{TestSpheres}{0, 0}
                 \operation[0]{getWidomNum() : int}
             \end{abstractclass}
             
@@ -26,7 +26,7 @@
             }
             
             \begin{class}[text width=\smallTextWidth]{TestSpheres}{0, -3}
-                \inherit{AbstractTestSpheres}
+                \inherit{TestSpheres}
                 \operationsImplementation{}
             \end{class}
         \end{scope}
@@ -35,15 +35,15 @@
 \end{scope}
 
 \begin{scope}[on background layer]
-    \aggregation{AbstractWidomMethod}{thermostat}{1}{AbstractThermostat}
-    \aggregation{AbstractWidomMethod}{testSpheres}{2}{AbstractTestSpheres}
+    \aggregation{WidomMethod}{thermostat}{1}{Thermostat}
+    \aggregation{WidomMethod}{testSpheres}{2}{TestSpheres}
     
-    \aggregation{WidomMethod}{dipSpheres}{2}{AbstractDipolarSpheres}
-    \aggregation{WidomMethod}{boxedSpheres}{2}{AbstractBoxedSpheres}
+    \aggregation{WidomMethod}{dipSpheres}{2}{DipolarSpheres}
+    \aggregation{WidomMethod}{boxedSpheres}{2}{BoxedSpheres}
     \aggregation{WidomMethod}{random}{2}{RandomCoordinatesFacade}
-    \aggregation{WidomMethod}{short}{2}{AbstractShortInteraction}
-    \aggregation{WidomMethod}{walls}{1}{AbstractWallsInteraction}
+    \aggregation{WidomMethod}{short}{2}{ShortInteraction}
+    \aggregation{WidomMethod}{walls}{1}{WallsInteraction}
     \aggregation{WidomMethod}{dipolar}{2}{DipolarInteractionFacade}
-    \aggregation{WidomMethod}{field}{1}{AbstractFieldInteraction}
-    %\compostion{ExchangeOneSphere}{observables}{3}{AbstractObservables}
+    \aggregation{WidomMethod}{field}{1}{FieldInteraction}
+    %\compostion{ExchangeOneSphere}{observables}{3}{Observables}
 \end{scope}

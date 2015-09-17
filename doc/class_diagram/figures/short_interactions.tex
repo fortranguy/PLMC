@@ -2,7 +2,7 @@
     \begin{package}{Short range interactions}
     
         \begin{scope}
-            \begin{abstractclass}[text width=\extraLargeTextWidth]{AbstractShortInteraction}{0, 0}
+            \begin{abstractclass}[text width=\extraLargeTextWidth]{ShortInteraction}{0, 0}
                 \operation[0]{totalEnergy() : double}
                 \operation[0]{soloEnergy(particle : Particle, overlap : bool, energy : double)}
                 \operation[0]{volumeChangeEnergy(dilatation : double, overlap : bool, energy : double)}
@@ -10,10 +10,10 @@
             \end{abstractclass}
         \end{scope}
     
-        \begin{scope}[shift={($(AbstractShortInteraction.south) + (-8 cm, -2.5 cm)$)}]
+        \begin{scope}[shift={($(ShortInteraction.south) + (-8 cm, -2.5 cm)$)}]
             \begin{class}[text width=\largeTextWidth]{PairPotentialFacade}{0, 0}
                 \operation{construct(boxPotential\type{BoxPotentialFacade},
-                                     cellsPotential\type{AbstractCellsPotential})}
+                                     cellsPotential\type{CellsPotential})}
                 \operation{destroy()}
                 \operation{visitCells(particle\type{Particle}, overlap\type{bool},
                                       energy\type{double})}
@@ -24,20 +24,20 @@
 
         \begin{scope}[shift={($(PairPotentialFacade.south) + (5 cm, -2 cm)$)}, opacity=1]
             \begin{class}[text width=\mediumTextWidth]{BoxPotentialFacade}{0, 0}
-                \operation{construct(periodicBox\type{AbstractPeriodicBox})}
+                \operation{construct(periodicBox\type{PeriodicBox})}
                 \operation{destroy()}
-                \operation{set(positions\type{AbstractPositions})}
-                \operation{set(pairPotential\type{AbstractPairPotential})}
+                \operation{set(positions\type{Positions})}
+                \operation{set(pairPotential\type{PairPotential})}
                 \operation{visit(sameType\type{bool}, particle\type{Particle},
                                  overlap\type{bool}, energy\type{double})\type{void}}
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(PairPotentialFacade.south) + (-7 cm, -2 cm)$)}]
-            \begin{abstractclass}[text width=\largeTextWidth]{AbstractCellsPotential}{0, 0}
-                \operation{construct(periodicBox\type{AbstractPeriodicBox},
-                                     positions\type{AbstractPositions},
-                                     cells\type{ConcreteCells})}
+        \begin{scope}[shift={($(PairPotentialFacade.south) + (-5 cm, -2 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{CellsPotential}{0, 0}
+                \operation{construct(periodicBox\type{PeriodicBox},
+                                     positions\type{Positions},
+                                     cells\type{Cells})}
                 \operation{destroy()}
                 \operation[0]{visit(particle\type{Particle}, overlap\type{bool},
                                     energy\type{double})}
@@ -51,23 +51,23 @@
                                  energy\type{double})}
             }
             
-            \begin{class}[text width=\largeTextWidth]{XYZCellsPotential}{0, -6}
-                \inherit{AbstractCellsPotential}
+            \begin{class}[text width=\mediumTextWidth]{XYZCellsPotential}{0, -6}
+                \inherit{CellsPotential}
                 \operationsImplementation{}
             \end{class}
             
-            \begin{class}[text width=\largeTextWidth]{XYCellsPotential}{0, -8}
-                \inherit{AbstractCellsPotential}
+            \begin{class}[text width=\mediumTextWidth]{XYCellsPotential}{0, -8}
+                \inherit{CellsPotential}
                 \operationsImplementation{}
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(AbstractCellsPotential.north) + (-12 cm, -3cm)$)}, opacity=1]
-            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractVisitableList}{0, 0}
-                \operation{construct(periodicBox\type{AbstractPeriodicBox},
-                                     positions\type{AbstractPositions})}
+        \begin{scope}[shift={($(CellsPotential.north) + (-10 cm, -3cm)$)}, opacity=1]
+            \begin{abstractclass}[text width=\mediumTextWidth]{VisitableList}{0, 0}
+                \operation{construct(periodicBox\type{PeriodicBox},
+                                     positions\type{Positions})}
                 \operation{destroy()}
-                \operation{set(pairPotential\type{AbstractPairPotential})}
+                \operation{set(pairPotential\type{PairPotential})}
                 \operation{visit(sameType\type{bool}, particle\type{Particle},
                                  overlap\type{bool}, energy\type{double})\type{void}}
                 \operation{allocate(iParticle\type{int})}
@@ -77,9 +77,9 @@
         \end{scope}
         
         \begin{scope}[shift={($(BoxPotentialFacade.south) + (0 cm, -2 cm)$)}, opacity=1]
-            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractPairPotential}{0, 0}
-                \operation{construct(potentialDomain\type{ConcretePotentialDomain},
-                                     potentialExpression\type{AbstractPotentialExpression})}
+            \begin{abstractclass}[text width=\mediumTextWidth]{PairPotential}{0, 0}
+                \operation{construct(potentialDomain\type{PotentialDomain},
+                                     potentialExpression\type{PotentialExpression})}
                 \operation{destroy()}
                 \operation{getMaxDistance()}
                 \operation{meet(distance\type{double}, overlap\type{bool},
@@ -87,16 +87,16 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(AbstractPairPotential.south) + (0 cm, -1.5 cm)$)}, opacity=1]
-        \begin{abstractclass}[text width=\mediumTextWidth]{AbstractPotentialExpression}{0, 0}
-                \operation{set(potentialParameters\type{AbstractPotentialParameters})}
+        \begin{scope}[shift={($(PairPotential.south) + (0 cm, -1.5 cm)$)}, opacity=1]
+        \begin{abstractclass}[text width=\mediumTextWidth]{PotentialExpression}{0, 0}
+                \operation{set(potentialParameters\type{PotentialParameters})}
                 \operation{get(distance : double) : double}
             \end{abstractclass}
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractShortInteraction.south) + (8 cm, -2.5 cm)$)}]
-            \begin{abstractclass}[text width=\extraLargeTextWidth]{AbstractWallsInteraction}{0, 0}
-                \inherit{AbstractShortInteraction}
+        \begin{scope}[shift={($(ShortInteraction.south) + (8 cm, -2.5 cm)$)}]
+            \begin{abstractclass}[text width=\extraLargeTextWidth]{WallsInteraction}{0, 0}
+                \inherit{ShortInteraction}
             \end{abstractclass}
             
             \def\operationsImplementation{
@@ -107,18 +107,18 @@
             }
             
             \begin{class}[text width=\extraLargeTextWidth]{NullWallsInteraction}{0, -2}
-                \inherit{AbstractWallsInteraction}
+                \inherit{WallsInteraction}
                 \operationsImplementation{}
             \end{class}
             
             \begin{class}[text width=\extraLargeTextWidth]{tWallsInteraction}{0, -5.5}
-                \inherit{AbstractWallsInteraction}
+                \inherit{WallsInteraction}
                 \operationsImplementation{}
             \end{class}
         \end{scope}
         
-        \begin{scope}[shift={($(AbstractWallsInteraction.south) + (8 cm, -3.5 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractWallsPotential}{0, 0}
+        \begin{scope}[shift={($(WallsInteraction.south) + (8 cm, -3.5 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{WallsPotential}{0, 0}
                 \operation[0]{potential(height : double) : double}
             \end{abstractclass}
             
@@ -127,12 +127,12 @@
             }
             
             \begin{class}[text width=\mediumTextWidth]{HardWallsPotential}{0, -2.5}
-                \inherit{AbstractWallsPotential}
+                \inherit{WallsPotential}
                 \operationsImplementation{}
             \end{class}
             
             \begin{class}[text width=\mediumTextWidth]{SoftWallsPotential}{0, -4.5}
-                \inherit{AbstractWallsPotential}
+                \inherit{WallsPotential}
                 \operationsImplementation{}
             \end{class}
         \end{scope}
@@ -141,29 +141,29 @@
 \end{scope}
 
 \begin{scope}[on background layer]
-    %\aggregation{PairPotentialFacade}{periodicBox}{1}{AbstractPeriodicBox}
-    \aggregation{PairPotentialFacade}{cellsPotential}{1}{AbstractCellsPotential}
+    %\aggregation{PairPotentialFacade}{periodicBox}{1}{PeriodicBox}
+    \aggregation{PairPotentialFacade}{cellsPotential}{1}{CellsPotential}
     \aggregation{PairPotentialFacade}{boxPotential}{1}{BoxPotentialFacade}
-    \aggregation{BoxPotentialFacade}{periodicBox}{1}{AbstractPeriodicBox}
-    \aggregation{BoxPotentialFacade}{positions}{1}{AbstractPositions}
-    \aggregation{BoxPotentialFacade}{pairPotential}{1}{AbstractPairPotential}
-    %\aggregation{IntraPairInteration}{diameters}{1}{AbstractDiameters}
-    %\aggregation{IntraPairInteration}{positions}{1}{AbstractPositions}
-    %\aggregation{InterPairInteration}{interDiameters}{1}{AbstractInterDiameters}
-    %\aggregation{InterPairInteration}{positions}{2}{AbstractPositions}
+    \aggregation{BoxPotentialFacade}{periodicBox}{1}{PeriodicBox}
+    \aggregation{BoxPotentialFacade}{positions}{1}{Positions}
+    \aggregation{BoxPotentialFacade}{pairPotential}{1}{PairPotential}
+    %\aggregation{IntraPairInteration}{diameters}{1}{Diameters}
+    %\aggregation{IntraPairInteration}{positions}{1}{Positions}
+    %\aggregation{InterPairInteration}{interDiameters}{1}{InterDiameters}
+    %\aggregation{InterPairInteration}{positions}{2}{Positions}
 
-    \aggregation{AbstractCellsPotential}{visitableList}{1..n}{AbstractVisitableList}
-    \aggregation{AbstractVisitableList}{periodicBox}{1}{AbstractPeriodicBox}
-    \aggregation{AbstractVisitableList}{pairPotential}{1}{AbstractPairPotential}
-    \aggregation{AbstractVisitableList}{positions}{1}{AbstractPositions}
+    \aggregation{CellsPotential}{visitableList}{1..n}{VisitableList}
+    \aggregation{VisitableList}{periodicBox}{1}{PeriodicBox}
+    \aggregation{VisitableList}{pairPotential}{1}{PairPotential}
+    \aggregation{VisitableList}{positions}{1}{Positions}
     
-    \aggregation{AbstractPairPotential}{potentialExpression}{1}{AbstractPotentialExpression}
+    \aggregation{PairPotential}{potentialExpression}{1}{PotentialExpression}
 
-    \aggregation{AbstractCellsPotential}{periodicBox}{1}{AbstractPeriodicBox}
-    \aggregation{AbstractCellsPotential}{positions}{1}{AbstractPositions}
-    \aggregation{AbstractCellsPotential}{pairPotential}{1}{AbstractPairPotential}
+    \aggregation{CellsPotential}{periodicBox}{1}{PeriodicBox}
+    \aggregation{CellsPotential}{positions}{1}{Positions}
+    \aggregation{CellsPotential}{pairPotential}{1}{PairPotential}
     
-    \composition{AbstractWallsInteraction}{wallsPotential}{1}{AbstractWallsPotential}
-    \aggregation{AbstractWallsInteraction}{periodicBox}{1}{AbstractPeriodicBox}
-    \aggregation{AbstractWallsInteraction}{positions}{1}{AbstractPositions}
+    \composition{WallsInteraction}{wallsPotential}{1}{WallsPotential}
+    \aggregation{WallsInteraction}{periodicBox}{1}{PeriodicBox}
+    \aggregation{WallsInteraction}{positions}{1}{Positions}
 \end{scope}

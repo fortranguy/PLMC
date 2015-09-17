@@ -18,7 +18,7 @@
                 \operation{testField(particle : Particle) : double[3]}
             \end{class}
             
-            \begin{abstractclass}[text width=\largeTextWidth]{AbstractDipolarInteraction}{0, 0}
+            \begin{abstractclass}[text width=\largeTextWidth]{DipolarInteraction}{0, 0}
                 \operation[0]{totalEnergy() : double}
                 \operation[0]{totalEnergyUsingField() : double}
                 \operation[0]{moveEnergy(old : Particle, new : Particle) : double}
@@ -29,8 +29,8 @@
                 \operation[0]{testField(particle : Particle) : double[3]}
             \end{abstractclass}
             
-            \begin{abstractclass}[text width=\largeTextWidth]{AbstractReciInteraction}{0, -6}
-                \inherit{AbstractDipolarInteraction}
+            \begin{abstractclass}[text width=\largeTextWidth]{ReciInteraction}{0, -6}
+                \inherit{DipolarInteraction}
                 \operation[0]{moveUpdate(old : Particle, new : Particle)}
                 \operation[0]{rotationUpdate(old : Particle, new : Particle)}
                 \operation[0]{exchangeUpdate(particle : Particle)}
@@ -39,8 +39,8 @@
         \end{scope}
         
         \begin{scope}[shift={($(DipolarInteraction.south) + (-19.5 cm, -5 cm)$)}]
-            \begin{abstractclass}[text width=\largeTextWidth]{AbstractEwaldReal}{0, 0}
-                \inherit{AbstractDipolarInteraction}
+            \begin{abstractclass}[text width=\largeTextWidth]{EwaldReal}{0, 0}
+                \inherit{DipolarInteraction}
                 \operation[0]{volumeChangeRestoration(dilatation : double)}
             \end{abstractclass}
 
@@ -57,19 +57,19 @@
             }
             
             \begin{class}[text width=\largeTextWidth]{NullEwaldReal}{0, -2.5}
-                \inherit{AbstractEwaldReal}
+                \inherit{EwaldReal}
                 \operationsImplementation{}
             \end{class}
             
             \begin{class}[text width=\largeTextWidth]{EwaldReal}{0, -8}
-                \inherit{AbstractEwaldReal}
+                \inherit{EwaldReal}
                 \operationsImplementation{}
             \end{class}
         \end{scope}
         
         \begin{scope}[shift={($(DipolarInteraction.south) + (-6.5 cm, -5 cm)$)}]
-            \begin{abstractclass}[text width=\largeTextWidth]{AbstractEwaldReci}{0, 0}
-                \inherit{AbstractReciInteraction}
+            \begin{abstractclass}[text width=\largeTextWidth]{EwaldReci}{0, 0}
+                \inherit{ReciInteraction}
             \end{abstractclass}
 
             \def\operationsImplementation{
@@ -88,19 +88,19 @@
             }
             
             \begin{class}[text width=\largeTextWidth]{NullEwaldReci}{0, -2}
-                \inherit{AbstractEwaldReci}
+                \inherit{EwaldReci}
                 \operationsImplementation{}
             \end{class}
             
             \begin{class}[text width=\largeTextWidth]{EwaldReci}{0, -9}
-                \inherit{AbstractEwaldReci}
+                \inherit{EwaldReci}
                 \operationsImplementation{}
             \end{class}
         \end{scope}
         
         \begin{scope}[shift={($(DipolarInteraction.south) + (6.5 cm, -5 cm)$)}]
-            \begin{abstractclass}[text width=\largeTextWidth]{AbstractDipolarLayerCorrection}{0, 0}
-                \inherit{AbstractReciInteraction}
+            \begin{abstractclass}[text width=\largeTextWidth]{DipolarLayerCorrection}{0, 0}
+                \inherit{ReciInteraction}
             \end{abstractclass}
 
             \def\operationsImplementation{
@@ -119,19 +119,19 @@
             }
             
             \begin{class}[text width=\largeTextWidth]{NullDipolarLayerCorrection}{0, -2}
-                \inherit{AbstractDipolarLayerCorrection}
+                \inherit{DipolarLayerCorrection}
                 \operationsImplementation{}
             \end{class}
             
             \begin{class}[text width=\largeTextWidth]{DipolarLayerCorrection}{0, -9}
-                \inherit{AbstractDipolarLayerCorrection}
+                \inherit{DipolarLayerCorrection}
                 \operationsImplementation{}
             \end{class}
         \end{scope}
         
         \begin{scope}[shift={($(DipolarInteraction.south) + (19.5 cm, -5 cm)$)}]
-            \begin{abstractclass}[text width=\largeTextWidth]{AbstractEwaldSelf}{0, 0}
-                \inherit{AbstractDipolarInteraction}
+            \begin{abstractclass}[text width=\largeTextWidth]{EwaldSelf}{0, 0}
+                \inherit{DipolarInteraction}
             \end{abstractclass}
 
             \def\operationsImplementation{
@@ -146,20 +146,20 @@
             }
             
             \begin{class}[text width=\largeTextWidth]{NullEwaldSelf}{0, -2}
-                \inherit{AbstractEwaldSelf}
+                \inherit{EwaldSelf}
                 \operationsImplementation{}
             \end{class}
             
             \begin{class}[text width=\largeTextWidth]{EwaldSelf}{0, -7}
-                \inherit{AbstractEwaldSelf}
+                \inherit{EwaldSelf}
                 \operationsImplementation{}
             \end{class}
             
         \end{scope}
         
         \begin{scope}[shift={($(DipolarInteraction.south) + (32.5 cm, -5 cm)$)}]
-            \begin{abstractclass}[text width=\largeTextWidth]{AbstractEwaldBound}{0, 0}
-                \inherit{AbstractDipolarInteraction}
+            \begin{abstractclass}[text width=\largeTextWidth]{EwaldBound}{0, 0}
+                \inherit{DipolarInteraction}
             \end{abstractclass}
 
             \def\operationsImplementation{
@@ -174,19 +174,19 @@
             }
             
             \begin{class}[text width=\largeTextWidth]{NullEwaldBound}{0, -2}
-                \inherit{AbstractEwaldBound}
+                \inherit{EwaldBound}
                 \operationsImplementation{}
             \end{class}
             
             \begin{class}[text width=\largeTextWidth]{EwaldBound}{0, -7}
-                \inherit{AbstractEwaldBound}
+                \inherit{EwaldBound}
                 \operationsImplementation{}
             \end{class}
         \end{scope}
 
         \begin{scope}[shift={($(DipolarInteraction.south) + (45.5 cm, -5 cm)$)}]
-            \begin{abstractclass}[text width=\largeTextWidth]{AbstractFieldInteraction}{0, 0}
-                \inherit{AbstractDipolarInteraction}
+            \begin{abstractclass}[text width=\largeTextWidth]{FieldInteraction}{0, 0}
+                \inherit{DipolarInteraction}
             \end{abstractclass}
 
             \def\operationsImplementation{
@@ -201,12 +201,12 @@
             }
 
             \begin{class}[text width=\largeTextWidth]{NullFieldInteraction}{0, -2}
-                \inherit{AbstractFieldInteraction}
+                \inherit{FieldInteraction}
                 \operationsImplementation{}
             \end{class}
 
             \begin{class}[text width=\largeTextWidth]{FieldInteraction}{0, -7}
-                \inherit{AbstractFieldInteraction}
+                \inherit{FieldInteraction}
                 \operationsImplementation{}
             \end{class}
         \end{scope}
@@ -215,24 +215,24 @@
 \end{scope}
 
 \begin{scope}[on background layer]
-    \aggregation{DipolarInteractionFacade}{ewaldReal}{2}{AbstractEwaldReal}
-    \aggregation{DipolarInteractionFacade}{ewaldReci}{2}{AbstractEwaldReci}
-    \aggregation{DipolarInteractionFacade}{dlc}{2}{AbstractDipolarLayerCorrection}
-    \aggregation{DipolarInteractionFacade}{ewaldSelf}{1}{AbstractEwaldSelf}
-    \aggregation{DipolarInteractionFacade}{ewaldBound}{2}{AbstractEwaldBound}
+    \aggregation{DipolarInteractionFacade}{ewaldReal}{2}{EwaldReal}
+    \aggregation{DipolarInteractionFacade}{ewaldReci}{2}{EwaldReci}
+    \aggregation{DipolarInteractionFacade}{dlc}{2}{DipolarLayerCorrection}
+    \aggregation{DipolarInteractionFacade}{ewaldSelf}{1}{EwaldSelf}
+    \aggregation{DipolarInteractionFacade}{ewaldBound}{2}{EwaldBound}
 
-    \aggregation{AbstractDipolarInteraction}{box}{1}{AbstractPeriodicBox}
+    \aggregation{DipolarInteraction}{box}{1}{PeriodicBox}
 
-    \aggregation{EwaldReal}{dipSpheres}{1}{AbstractDipolarSpheres}
+    \aggregation{EwaldReal}{dipSpheres}{1}{DipolarSpheres}
 
-    \aggregation{EwaldReci}{dipSpheres}{1}{AbstractDipolarSpheres}
+    \aggregation{EwaldReci}{dipSpheres}{1}{DipolarSpheres}
 
-    \aggregation{DipolarLayerCorrection}{dipSpheres}{1}{AbstractDipolarSpheres}
+    \aggregation{DipolarLayerCorrection}{dipSpheres}{1}{DipolarSpheres}
 
-    \aggregation{EwaldSelf}{dipSpheres}{1}{AbstractDipolarSpheres}
+    \aggregation{EwaldSelf}{dipSpheres}{1}{DipolarSpheres}
 
-    \aggregation{EwaldBound}{totalMoment}{1}{AbstractTotalMoment}
+    \aggregation{EwaldBound}{totalMoment}{1}{TotalMoment}
 
-    \aggregation{FieldInteraction}{totalMoment}{1}{AbstractTotalMoment}
-    \aggregation{FieldInteraction}{extField}{1}{AbstractExternalField}
+    \aggregation{FieldInteraction}{totalMoment}{1}{TotalMoment}
+    \aggregation{FieldInteraction}{extField}{1}{ExternalField}
 \end{scope}[on background layer]
