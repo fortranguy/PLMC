@@ -55,12 +55,14 @@
                 \operation{remove(particle\type{Particle})}
             \end{abstractclass}
             
-            \def\operationsImplementation{
-                \operation{visit(particle\type{Particle}, pairPotential\type{PairPotential},
-                                    overlap\type{bool}, energy\type{double})\type{void}}
-            }
+            \def\operationsImplementation{}
             
-            \begin{class}[text width=\largeTextWidth]{PBC3DVisitableCells}{0, -6}
+            \begin{class}[text width=\largeTextWidth]{XYZPBCVisitableCells}{0, -5.5}
+                \inherit{VisitableCells}
+                \operationsImplementation{}
+            \end{class}
+            
+            \begin{class}[text width=\largeTextWidth]{XYPBCVisitableCells}{0, -7}
                 \inherit{VisitableCells}
                 \operationsImplementation{}
             \end{class}
