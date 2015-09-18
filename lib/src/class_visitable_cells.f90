@@ -40,6 +40,7 @@ private
         procedure, private :: construct_visitable_lists => &
             Abstract_Visitable_Cells_construct_visitable_lists
         procedure, private :: set_neighbours => Abstract_Visitable_Cells_set_neighbours
+        procedure, private :: local_path => Abstract_Visitable_Cells_local_path
         procedure, private :: fill => Abstract_Visitable_Cells_fill
         procedure, private :: index => Abstract_Visitable_Cells_index
         procedure(Abstract_Visitable_Cells_local_lbounds_3), private, deferred :: local_lbounds_3
@@ -168,7 +169,8 @@ contains
             do local_i3 = this%local_lbounds_3(global_i3), this%local_ubounds_3(global_i3)
             do local_i2 = local_lbounds(2), local_ubounds(2)
             do local_i1 = local_lbounds(1), local_ubounds(1)
-                i_cell = [global_i1, global_i2, global_i3] + [local_i1, local_i2, local_i3]
+                i_cell = [global_i1, global_i2, global_i3] + &
+                    this%local_path([local_i1, local_i2, local_i3])
                 i_cell = pbc_3d_index(i_cell, this%nums)
                 this%neighbours(:, local_i1, local_i2, local_i3, &
                     global_i1, global_i2, global_i3) = i_cell
@@ -179,6 +181,14 @@ contains
         end do
         end do
     end subroutine Abstract_Visitable_Cells_set_neighbours
+
+    pure function Abstract_Visitable_Cells_local_path(this, i_cell) result(local_path)
+        class(Abstract_Visitable_Cells), intent(in) :: this
+        integer, intent(in) :: i_cell(:)
+        integer :: local_path(num_dimensions)
+
+        local_path = modulo(i_cell-1, this%nums) - 1
+    end function Abstract_Visitable_Cells_local_path
 
     subroutine Abstract_Visitable_Cells_fill(this)
         class(Abstract_Visitable_Cells), intent(inout) :: this
