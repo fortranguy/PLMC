@@ -13,7 +13,6 @@ private
     private
         class(Abstract_Pair_Potential), pointer :: pair_potential
         class(Abstract_Visitable_Cells), pointer :: visitable_cells
-        integer, allocatable :: neighbours(:, :, :, :, :, :)
     contains
         procedure :: construct => Cells_Potential_Facade_construct
         procedure :: destroy => Cells_Potential_Facade_destroy
