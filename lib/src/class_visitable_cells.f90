@@ -25,8 +25,8 @@ private
         integer, dimension(num_dimensions) :: global_lbounds, global_ubounds
         class(Abstract_Visitable_List), allocatable :: visitable_lists(:, :, :)
         integer, allocatable :: neighbours(:, :, :, :, :, :, :)
-        class(Abstract_Positions), pointer :: positions => null()
-        class(Abstract_Periodic_Box), pointer :: periodic_box => null()
+        class(Abstract_Positions), pointer :: positions
+        class(Abstract_Periodic_Box), pointer :: periodic_box
     contains
         procedure :: construct => Abstract_Visitable_Cells_construct
         procedure :: destroy => Abstract_Visitable_Cells_destroy
@@ -34,18 +34,25 @@ private
         procedure :: move => Abstract_Visitable_Cells_move
         procedure :: add => Abstract_Visitable_Cells_add
         procedure :: remove => Abstract_Visitable_Cells_remove
+        procedure, private :: set_nums => Abstract_Visitable_Cells_set_nums
+        procedure(Abstract_Visitable_Cells_check_nums), private, deferred :: check_nums
         procedure, private :: set_division => Abstract_Visitable_Cells_set_division
         procedure, private :: check_division => Abstract_Visitable_Cells_check_division
         procedure, private :: construct_visitable_lists => &
             Abstract_Visitable_Cells_construct_visitable_lists
         procedure, private :: set_neighbours => Abstract_Visitable_Cells_set_neighbours
-        procedure, private :: local_reindex => Abstract_Visitable_Cells_local_reindex
         procedure, private :: fill => Abstract_Visitable_Cells_fill
+        procedure, private :: local_reindex => Abstract_Visitable_Cells_local_reindex
         procedure, private :: index => Abstract_Visitable_Cells_index
         procedure(Abstract_Visitable_Cells_local_bounds_3), private, deferred :: local_bounds_3
     end type Abstract_Visitable_Cells
 
     abstract interface
+
+        subroutine Abstract_Visitable_Cells_check_nums(this)
+        import :: Abstract_Visitable_Cells
+            class(Abstract_Visitable_Cells), intent(in) :: this
+        end subroutine Abstract_Visitable_Cells_check_nums
 
         pure subroutine Abstract_Visitable_Cells_local_bounds_3(this, i_cell_3, lbound_3, &
             ubound_3, step)
@@ -58,15 +65,17 @@ private
 
     end interface
 
-    type, extends(Abstract_Visitable_Cells), public :: PBC_3D_Visitable_Cells
+    type, extends(Abstract_Visitable_Cells), public :: XYZ_PBC_Visitable_Cells
     contains
-        procedure, private :: local_bounds_3 => PBC_3D_Visitable_Cells_local_bounds_3
-    end type
+        procedure, private :: check_nums => XYZ_PBC_Visitable_Cells_check_nums
+        procedure, private :: local_bounds_3 => XYZ_PBC_Visitable_Cells_local_bounds_3
+    end type XYZ_PBC_Visitable_Cells
 
-    type, extends(Abstract_Visitable_Cells), public :: PBC_2D_Visitable_Cells
+    type, extends(Abstract_Visitable_Cells), public :: XY_PBC_Visitable_Cells
     contains
-        procedure, private :: local_bounds_3 => PBC_2D_Visitable_Cells_local_bounds_3
-    end type
+        procedure, private :: check_nums => XY_PBC_Visitable_Cells_check_nums
+        procedure, private :: local_bounds_3 => XY_PBC_Visitable_Cells_local_bounds_3
+    end type XY_PBC_Visitable_Cells
 
 contains
 
@@ -81,9 +90,8 @@ contains
         real(DP), intent(in) :: min_cell_edge
 
         this%periodic_box => periodic_box
-        call this%set_division(min_cell_edge)
-        call this%check_division()
-
+        call this%set_nums(min_cell_edge)
+        call this%set_division()
         this%global_lbounds = -this%nums/2
         this%global_ubounds = this%global_lbounds + this%nums - 1
         allocate(this%visitable_lists(this%global_lbounds(1):this%global_ubounds(1), &
@@ -102,14 +110,21 @@ contains
         call this%fill()
     end subroutine Abstract_Visitable_Cells_construct
 
-    subroutine Abstract_Visitable_Cells_set_division(this, min_cell_edge)
+    subroutine Abstract_Visitable_Cells_set_nums(this, min_cell_edge)
         class(Abstract_Visitable_Cells), intent(inout) :: this
         real(DP), intent(in) :: min_cell_edge
 
         this%nums = floor(this%periodic_box%get_size()/min_cell_edge)
         call check_positive("Abstract_Visitable_Cells", "this%nums", this%nums)
+        call this%check_nums()
+    end subroutine Abstract_Visitable_Cells_set_nums
+
+    subroutine Abstract_Visitable_Cells_set_division(this)
+        class(Abstract_Visitable_Cells), intent(inout) :: this
+
         this%size = this%periodic_box%get_size() / real(this%nums, DP)
         call check_positive("Abstract_Visitable_Cells", "this%size", this%size)
+        call this%check_division()
     end subroutine Abstract_Visitable_Cells_set_division
 
     subroutine Abstract_Visitable_Cells_check_division(this)
@@ -117,9 +132,6 @@ contains
 
         real(DP) :: box_mod_cell(num_dimensions)
 
-        if (any(this%nums < nums_local_cells)) then
-            call error_exit("Abstract_Visitable_Cells: this%nums is too small.")
-        end if
         box_mod_cell = modulo(this%periodic_box%get_size(), this%size)
         if (any(box_mod_cell > real_zero .and. abs(box_mod_cell - this%size) > real_zero)) then
             call error_exit("Abstract_Visitable_Cells:"//&
@@ -172,15 +184,6 @@ contains
         end do
         end do
     end subroutine Abstract_Visitable_Cells_set_neighbours
-
-    pure function Abstract_Visitable_Cells_local_reindex(this, i_cell) result(local_reindex)
-        class(Abstract_Visitable_Cells), intent(in) :: this
-        integer, intent(in) :: i_cell(:)
-        integer :: local_reindex(num_dimensions)
-
-        local_reindex = mod(i_cell, nums_local_cells) - 1
-    end function Abstract_Visitable_Cells_local_reindex
-    ! To find overlap faster
 
     subroutine Abstract_Visitable_Cells_fill(this)
         class(Abstract_Visitable_Cells), intent(inout) :: this
@@ -283,6 +286,15 @@ contains
         end if
     end subroutine Abstract_Visitable_Cells_remove
 
+    pure function Abstract_Visitable_Cells_local_reindex(this, i_cell) result(local_reindex)
+        class(Abstract_Visitable_Cells), intent(in) :: this
+        integer, intent(in) :: i_cell(:)
+        integer :: local_reindex(num_dimensions)
+
+        local_reindex = mod(i_cell, nums_local_cells) - 1
+    end function Abstract_Visitable_Cells_local_reindex
+    ! To find overlap faster
+
     pure function Abstract_Visitable_Cells_index(this, position) result(index)
         class(Abstract_Visitable_Cells), intent(in) :: this
         real(DP), intent(in) :: position(:)
@@ -297,24 +309,40 @@ contains
 
 !end implementation Abstract_Visitable_Cells
 
-!implementation PBC_3D_Visitable_Cells
+!implementation XYZ_PBC_Visitable_Cells
 
-    pure subroutine PBC_3D_Visitable_Cells_local_bounds_3(this, i_cell_3, lbound_3, ubound_3, step)
-        class(PBC_3D_Visitable_Cells), intent(in) :: this
+    subroutine XYZ_PBC_Visitable_Cells_check_nums(this)
+        class(XYZ_PBC_Visitable_Cells), intent(in) :: this
+
+        if (any(this%nums < nums_local_cells)) then
+            call error_exit("XYZ_PBC_Visitable_Cells: this%nums is too small.")
+        end if
+    end subroutine XYZ_PBC_Visitable_Cells_check_nums
+
+    pure subroutine XYZ_PBC_Visitable_Cells_local_bounds_3(this, i_cell_3, lbound_3, ubound_3, step)
+        class(XYZ_PBC_Visitable_Cells), intent(in) :: this
         integer, intent(in) :: i_cell_3
         integer, intent(out) :: lbound_3, ubound_3, step
 
         lbound_3 = 1
         ubound_3 = nums_local_cells(3)
         step = 1
-    end subroutine PBC_3D_Visitable_Cells_local_bounds_3
+    end subroutine XYZ_PBC_Visitable_Cells_local_bounds_3
 
-!end implementation PBC_3D_Visitable_Cells
+!end implementation XYZ_PBC_Visitable_Cells
 
-!implementation PBC_2D_Visitable_Cells
+!implementation XY_PBC_Visitable_Cells
 
-    pure subroutine PBC_2D_Visitable_Cells_local_bounds_3(this, i_cell_3, lbound_3, ubound_3, step)
-        class(PBC_2D_Visitable_Cells), intent(in) :: this
+    subroutine XY_PBC_Visitable_Cells_check_nums(this)
+        class(XY_PBC_Visitable_Cells), intent(in) :: this
+
+        if (any(this%nums(1:2) < nums_local_cells(1:2))) then
+            call error_exit("XY_PBC_Visitable_Cells: this%nums is too small.")
+        end if
+    end subroutine XY_PBC_Visitable_Cells_check_nums
+
+    pure subroutine XY_PBC_Visitable_Cells_local_bounds_3(this, i_cell_3, lbound_3, ubound_3, step)
+        class(XY_PBC_Visitable_Cells), intent(in) :: this
         integer, intent(in) :: i_cell_3
         integer, intent(out) :: lbound_3, ubound_3, step
 
@@ -329,8 +357,8 @@ contains
             ubound_3 = nums_local_cells(3)
             step = 1
         end if
-    end subroutine PBC_2D_Visitable_Cells_local_bounds_3
+    end subroutine XY_PBC_Visitable_Cells_local_bounds_3
 
-!end implementation PBC_2D_Visitable_Cells
+!end implementation XY_PBC_Visitable_Cells
 
 end module class_visitable_cells
