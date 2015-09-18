@@ -42,4 +42,7 @@ while size(positions, 2) < num_particles
     pm.next!(prog)
 end
 
-writedlm("positions.in", positions')
+outputFile = "positions.in"
+writedlm(outputFile, positions')
+println()
+println("Positions written in ", outputFile)
