@@ -55,7 +55,8 @@ use class_pair_potential, only: Abstract_Pair_Potential, Concrete_Pair_Potential
     Hard_Pair_Potential
 use module_particles, only: Concrete_Particle
 use class_visitable_list, only: Abstract_Visitable_List, Concrete_Visitable_List
-use class_visitable_cells, only: Abstract_Visitable_Cells, PBC_3D_Visitable_Cells
+use class_visitable_cells, only: Abstract_Visitable_Cells, &
+    PBC_3D_Visitable_Cells, PBC_2D_Visitable_Cells
 use class_cells_potential, only: Cells_Potential_Facade
 use procedures_cells_potential_sum, only: sum_energy
 
@@ -177,7 +178,7 @@ implicit none
         type is (XYZ_Periodic_Box)
             allocate(PBC_3D_Visitable_Cells :: visitable_cells)
         type is (XY_Periodic_Box)
-            call error_exit("PBC_2D_Visitable_Cells not yet implemented.")
+            allocate(PBC_2D_Visitable_Cells :: visitable_cells)
         class default
             call error_exit("Periodic_Box type unknown.")
     end select

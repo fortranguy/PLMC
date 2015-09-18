@@ -17,13 +17,13 @@ implicit none
 private
 
     integer, parameter :: num_local_cells(num_dimensions) = 3
+    integer, parameter, dimension(3) :: local_lbounds = -1, local_ubounds = 1
 
     type, abstract, public :: Abstract_Visitable_Cells
     private
         integer :: nums(num_dimensions)
         real(DP) :: size(num_dimensions)
         integer, dimension(num_dimensions) :: global_lbounds, global_ubounds
-        integer, dimension(num_dimensions) :: local_lbounds, local_ubounds
         class(Abstract_Visitable_List), allocatable :: visitable_lists(:, :, :)
         integer, allocatable :: neighbours(:, :, :, :, :, :, :)
         class(Abstract_Positions), pointer :: positions => null()
@@ -31,7 +31,7 @@ private
     contains
         procedure :: construct => Abstract_Visitable_Cells_construct
         procedure :: destroy => Abstract_Visitable_Cells_destroy
-        procedure(Abstract_Visitable_Cells_visit), deferred :: visit
+        procedure :: visit => Abstract_Visitable_Cells_visit
         procedure :: move => Abstract_Visitable_Cells_move
         procedure :: add => Abstract_Visitable_Cells_add
         procedure :: remove => Abstract_Visitable_Cells_remove
@@ -39,33 +39,41 @@ private
         procedure, private :: check_division => Abstract_Visitable_Cells_check_division
         procedure, private :: construct_visitable_lists => &
             Abstract_Visitable_Cells_construct_visitable_lists
-        procedure(Abstract_Visitable_Cells_set_neighbours), private, deferred :: set_neighbours
+        procedure, private :: set_neighbours => Abstract_Visitable_Cells_set_neighbours
         procedure, private :: fill => Abstract_Visitable_Cells_fill
         procedure, private :: index => Abstract_Visitable_Cells_index
+        procedure(Abstract_Visitable_Cells_local_lbounds_3), private, deferred :: local_lbounds_3
+        procedure(Abstract_Visitable_Cells_local_ubounds_3), private, deferred :: local_ubounds_3
     end type Abstract_Visitable_Cells
 
     abstract interface
 
-        subroutine Abstract_Visitable_Cells_set_neighbours(this)
+        pure function Abstract_Visitable_Cells_local_lbounds_3(this, i_cell_3) result(local_lbounds_3)
         import :: Abstract_Visitable_Cells
-            class(Abstract_Visitable_Cells), intent(inout) :: this
-        end subroutine Abstract_Visitable_Cells_set_neighbours
-
-        subroutine Abstract_Visitable_Cells_visit(this, particle, pair_potential, overlap, energy)
-        import :: DP, Abstract_Pair_Potential, Concrete_Particle, Abstract_Visitable_Cells
             class(Abstract_Visitable_Cells), intent(in) :: this
-            type(Concrete_Particle), intent(in) :: particle
-            class(Abstract_Pair_Potential), intent(in) :: pair_potential
-            logical, intent(out) :: overlap
-            real(DP), intent(out) :: energy
-        end subroutine Abstract_Visitable_Cells_visit
+            integer, intent(in) :: i_cell_3
+            integer :: local_lbounds_3
+        end function Abstract_Visitable_Cells_local_lbounds_3
+
+        pure function Abstract_Visitable_Cells_local_ubounds_3(this, i_cell_3) result(local_ubounds_3)
+        import :: Abstract_Visitable_Cells
+            class(Abstract_Visitable_Cells), intent(in) :: this
+            integer, intent(in) :: i_cell_3
+            integer :: local_ubounds_3
+        end function Abstract_Visitable_Cells_local_ubounds_3
 
     end interface
 
     type, extends(Abstract_Visitable_Cells), public :: PBC_3D_Visitable_Cells
     contains
-        procedure :: set_neighbours => PBC_3D_Visitable_Cells_set_neighbours
-        procedure :: visit => PBC_3D_Visitable_Cells_visit
+        procedure, private :: local_lbounds_3 => PBC_3D_Visitable_Cells_local_lbounds_3
+        procedure, private :: local_ubounds_3 => PBC_3D_Visitable_Cells_local_ubounds_3
+    end type
+
+    type, extends(Abstract_Visitable_Cells), public :: PBC_2D_Visitable_Cells
+    contains
+        procedure, private :: local_lbounds_3 => PBC_2D_Visitable_Cells_local_lbounds_3
+        procedure, private :: local_ubounds_3 => PBC_2D_Visitable_Cells_local_ubounds_3
     end type
 
 contains
@@ -92,11 +100,9 @@ contains
                                       mold=mold)
         call this%construct_visitable_lists(periodic_box, positions)
 
-        this%local_lbounds = -num_local_cells/2
-        this%local_ubounds = this%local_lbounds + num_local_cells - 1
-        allocate(this%neighbours(3, this%local_lbounds(1):this%local_ubounds(1), &
-                                    this%local_lbounds(2):this%local_ubounds(2), &
-                                    this%local_lbounds(3):this%local_ubounds(3), &
+        allocate(this%neighbours(3, local_lbounds(1):local_ubounds(1), &
+                                    local_lbounds(2):local_ubounds(2), &
+                                    local_lbounds(3):local_ubounds(3), &
                                     this%global_lbounds(1):this%global_ubounds(1), &
                                     this%global_lbounds(2):this%global_ubounds(2), &
                                     this%global_lbounds(3):this%global_ubounds(3)))
@@ -152,6 +158,45 @@ contains
         end do
     end subroutine Abstract_Visitable_Cells_construct_visitable_lists
 
+    subroutine Abstract_Visitable_Cells_set_neighbours(this)
+        class(Abstract_Visitable_Cells), intent(inout) :: this
+
+        integer :: global_i1, global_i2, global_i3
+        integer :: local_i1, local_i2, local_i3
+        integer :: i_cell(num_dimensions)
+
+        this%neighbours = 0
+        do global_i3 = this%global_lbounds(3), this%global_ubounds(3)
+        do global_i2 = this%global_lbounds(2), this%global_ubounds(2)
+        do global_i1 = this%global_lbounds(1), this%global_ubounds(1)
+            do local_i3 = this%local_lbounds_3(global_i3), this%local_ubounds_3(global_i3)
+            do local_i2 = local_lbounds(2), local_ubounds(2)
+            do local_i1 = local_lbounds(1), local_ubounds(1)
+                i_cell = [global_i1, global_i2, global_i3] + [local_i1, local_i2, local_i3]
+                i_cell = pbc_3d_index(i_cell, this%nums)
+                this%neighbours(:, local_i1, local_i2, local_i3, &
+                    global_i1, global_i2, global_i3) = i_cell
+            end do
+            end do
+            end do
+        end do
+        end do
+        end do
+    end subroutine Abstract_Visitable_Cells_set_neighbours
+
+    subroutine Abstract_Visitable_Cells_fill(this)
+        class(Abstract_Visitable_Cells), intent(inout) :: this
+
+        type(Concrete_Particle) :: particle
+        integer :: i_particle
+
+        do i_particle = 1, this%positions%get_num()
+            particle%i = i_particle
+            particle%position = this%positions%get(particle%i)
+            call this%add(particle)
+        end do
+    end subroutine Abstract_Visitable_Cells_fill
+
     subroutine Abstract_Visitable_Cells_destroy(this)
         class(Abstract_Visitable_Cells), intent(inout) :: this
 
@@ -171,18 +216,32 @@ contains
         if (allocated(this%visitable_lists)) deallocate(this%visitable_lists)
     end subroutine Abstract_Visitable_Cells_destroy
 
-    subroutine Abstract_Visitable_Cells_fill(this)
-        class(Abstract_Visitable_Cells), intent(inout) :: this
+    subroutine Abstract_Visitable_Cells_visit(this, particle, pair_potential, overlap, energy)
+        class(Abstract_Visitable_Cells), intent(in) :: this
+        type(Concrete_Particle), intent(in) :: particle
+        class(Abstract_Pair_Potential), intent(in) :: pair_potential
+        logical, intent(out) :: overlap
+        real(DP), intent(out) :: energy
 
-        type(Concrete_Particle) :: particle
-        integer :: i_particle
+        real(DP) :: energy_i
+        integer, dimension(num_dimensions) :: i_cell, i_local_cell
+        integer :: local_i1, local_i2, local_i3
 
-        do i_particle = 1, this%positions%get_num()
-            particle%i = i_particle
-            particle%position = this%positions%get(particle%i)
-            call this%add(particle)
+        i_cell = this%index(particle%position)
+        energy = 0._DP
+        do local_i3 = this%local_lbounds_3(i_cell(3)), this%local_ubounds_3(i_cell(3))
+        do local_i2 = local_lbounds(2), local_ubounds(2)
+        do local_i1 = local_lbounds(1), local_ubounds(1)
+            i_local_cell = this%neighbours(:, local_i1, local_i2, local_i3, &
+                i_cell(1), i_cell(2), i_cell(3))
+            call this%visitable_lists(i_local_cell(1), i_local_cell(2), &
+                i_local_cell(3))%visit(particle, pair_potential, overlap, energy_i)
+            if (overlap) return
+            energy = energy + energy_i
         end do
-    end subroutine Abstract_Visitable_Cells_fill
+        end do
+        end do
+    end subroutine Abstract_Visitable_Cells_visit
 
     subroutine Abstract_Visitable_Cells_move(this, from, to)
         class(Abstract_Visitable_Cells), intent(inout) :: this
@@ -240,59 +299,50 @@ contains
 
 !implementation PBC_3D_Visitable_Cells
 
-    subroutine PBC_3D_Visitable_Cells_set_neighbours(this)
-        class(PBC_3D_Visitable_Cells), intent(inout) :: this
-
-        integer :: global_i1, global_i2, global_i3
-        integer :: local_i1, local_i2, local_i3
-        integer :: i_cell(num_dimensions)
-
-        this%neighbours = 0
-        do global_i3 = this%global_lbounds(3), this%global_ubounds(3)
-        do global_i2 = this%global_lbounds(2), this%global_ubounds(2)
-        do global_i1 = this%global_lbounds(1), this%global_ubounds(1)
-            do local_i3 = this%local_lbounds(3), this%local_ubounds(3)
-            do local_i2 = this%local_lbounds(2), this%local_ubounds(2)
-            do local_i1 = this%local_lbounds(1), this%local_ubounds(1)
-                i_cell = [global_i1, global_i2, global_i3] + [local_i1, local_i2, local_i3]
-                i_cell = pbc_3d_index(i_cell, this%nums)
-                this%neighbours(:, local_i1, local_i2, local_i3, &
-                    global_i1, global_i2, global_i3) = i_cell
-            end do
-            end do
-            end do
-        end do
-        end do
-        end do
-    end subroutine PBC_3D_Visitable_Cells_set_neighbours
-
-    subroutine PBC_3D_Visitable_Cells_visit(this, particle, pair_potential, overlap, energy)
+    pure function PBC_3D_Visitable_Cells_local_lbounds_3(this, i_cell_3) result(local_lbounds_3)
         class(PBC_3D_Visitable_Cells), intent(in) :: this
-        type(Concrete_Particle), intent(in) :: particle
-        class(Abstract_Pair_Potential), intent(in) :: pair_potential
-        logical, intent(out) :: overlap
-        real(DP), intent(out) :: energy
+        integer, intent(in) :: i_cell_3
+        integer :: local_lbounds_3
 
-        real(DP) :: energy_i
-        integer, dimension(num_dimensions) :: i_cell, i_local_cell
-        integer :: local_i1, local_i2, local_i3
+        local_lbounds_3 = local_lbounds(3)
+    end function PBC_3D_Visitable_Cells_local_lbounds_3
 
-        i_cell = this%index(particle%position)
-        energy = 0._DP
-        do local_i3 = this%local_lbounds(3), this%local_ubounds(3)
-        do local_i2 = this%local_lbounds(2), this%local_ubounds(2)
-        do local_i1 = this%local_lbounds(1), this%local_ubounds(1)
-            i_local_cell = this%neighbours(:, local_i1, local_i2, local_i3, &
-                i_cell(1), i_cell(2), i_cell(3))
-            call this%visitable_lists(i_local_cell(1), i_local_cell(2), &
-                i_local_cell(3))%visit(particle, pair_potential, overlap, energy_i)
-            if (overlap) return
-            energy = energy + energy_i
-        end do
-        end do
-        end do
-    end subroutine PBC_3D_Visitable_Cells_visit
+    pure function PBC_3D_Visitable_Cells_local_ubounds_3(this, i_cell_3) result(local_ubounds_3)
+        class(PBC_3D_Visitable_Cells), intent(in) :: this
+        integer, intent(in) :: i_cell_3
+        integer :: local_ubounds_3
 
-!implementation PBC_3D_Visitable_Cells
+        local_ubounds_3 = local_ubounds(3)
+    end function PBC_3D_Visitable_Cells_local_ubounds_3
+
+!end implementation PBC_3D_Visitable_Cells
+
+!implementation PBC_2D_Visitable_Cells
+
+    pure function PBC_2D_Visitable_Cells_local_lbounds_3(this, i_cell_3) result(local_lbounds_3)
+        class(PBC_2D_Visitable_Cells), intent(in) :: this
+        integer, intent(in) :: i_cell_3
+        integer :: local_lbounds_3
+
+        if (i_cell_3 == this%global_lbounds(3)) then
+            local_lbounds_3 = 0
+        else
+            local_lbounds_3 = local_lbounds(3)
+        end if
+    end function PBC_2D_Visitable_Cells_local_lbounds_3
+
+    pure function PBC_2D_Visitable_Cells_local_ubounds_3(this, i_cell_3) result(local_ubounds_3)
+        class(PBC_2D_Visitable_Cells), intent(in) :: this
+        integer, intent(in) :: i_cell_3
+        integer :: local_ubounds_3
+
+        if (i_cell_3 == this%global_ubounds(3)) then
+            local_ubounds_3 = 0
+        else
+            local_ubounds_3 = local_ubounds(3)
+        end if
+    end function PBC_2D_Visitable_Cells_local_ubounds_3
+
+!end implementation PBC_2D_Visitable_Cells
 
 end module class_visitable_cells
