@@ -9,17 +9,21 @@ box_size = input_data["Box"]["size"]
 num_particles = input_data["Particles"]["number"]
 min_diameter = input_data["Particles"]["diameter"]
 
-function pbc_distance(x, y)
-    v = mod(y-x, box_size)
+function folded(x)
+    v = mod(x, box_size)
     for i=1:3
        if (v[i] > box_size[i]/2)
             v[i] -= box_size[i]
         end
     end
-    return norm(v)
+    return v
 end
 
-positions = rand(3) .* box_size
+function pbc_distance(x, y)
+    return norm(folded(y - x))
+end
+
+positions = folded(rand(3) .* box_size)
 pos = Float64[]
 prog = pm.Progress(num_particles)
 while size(positions, 2) < num_particles
@@ -34,7 +38,7 @@ while size(positions, 2) < num_particles
             overlap = false
         end
     end
-    positions = hcat(positions, pos)
+    positions = hcat(positions, folded(pos))
     pm.next!(prog)
 end
 

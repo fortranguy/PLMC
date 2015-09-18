@@ -3,7 +3,7 @@ module class_visitable_cells
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_precisions, only: real_zero
 use data_geometry, only: num_dimensions
-use procedures_errors, only: error_exit, warning_continue
+use procedures_errors, only: error_exit
 use procedures_checks, only: check_positive
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_positions, only: Abstract_Positions
@@ -118,13 +118,6 @@ contains
 
         this%nums = floor(this%periodic_box%get_size()/min_cell_edge)
         call check_positive("Abstract_Visitable_Cells", "this%nums", this%nums)
-        if (any(this%nums < num_local_cells)) then
-            call warning_continue("Abstract_Visitable_Cells: this%nums is too small. "//&
-                "It will be set to 3 where required.")
-        end if
-        where(this%nums < num_local_cells)
-            this%nums = 3
-        end where
         this%size = this%periodic_box%get_size() / real(this%nums, DP)
         call check_positive("Abstract_Visitable_Cells", "this%size", this%size)
     end subroutine Abstract_Visitable_Cells_set_division
@@ -134,6 +127,9 @@ contains
 
         real(DP) :: box_mod_cell(num_dimensions)
 
+        if (any(this%nums < num_local_cells)) then
+            call error_exit("Abstract_Visitable_Cells: this%nums is too small.")
+        end if
         box_mod_cell = modulo(this%periodic_box%get_size(), this%size)
         if (any(box_mod_cell > real_zero .and. abs(box_mod_cell - this%size) > real_zero)) then
             call error_exit("Abstract_Visitable_Cells:"//&
