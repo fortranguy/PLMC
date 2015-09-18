@@ -1,4 +1,4 @@
-module procedures_cells
+module procedures_visitable_cells
 
 implicit none
 
@@ -14,4 +14,4 @@ contains
         pbc_3d_index = modulo(i_cell + nums_cells/2, nums_cells) - nums_cells/2
     end function pbc_3d_index
 
-end module procedures_cells
+end module procedures_visitable_cells
