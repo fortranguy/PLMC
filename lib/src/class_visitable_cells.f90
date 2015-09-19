@@ -23,6 +23,8 @@ private
         integer :: nums(num_dimensions)
         real(DP) :: size(num_dimensions)
         integer, dimension(num_dimensions) :: global_lbounds, global_ubounds
+        logical :: skip_bottom_layer(nums_local_cells(1), nums_local_cells(2), nums_local_cells(3))
+        logical :: skip_top_layer(nums_local_cells(1), nums_local_cells(2), nums_local_cells(3))
         class(Abstract_Visitable_List), allocatable :: visitable_lists(:, :, :)
         integer, allocatable :: neighbours(:, :, :, :, :, :, :)
         class(Abstract_Positions), pointer :: positions
@@ -43,8 +45,8 @@ private
         procedure, private :: set_neighbours => Abstract_Visitable_Cells_set_neighbours
         procedure, private :: fill => Abstract_Visitable_Cells_fill
         procedure, private :: index => Abstract_Visitable_Cells_index
-        procedure(Abstract_Visitable_Cells_set_local_bounds_3), private, deferred :: &
-            set_local_bounds_3
+        procedure(Abstract_Visitable_Cells_set_skip_layers), private, deferred :: set_skip_layers
+        procedure, private :: skip_local => Abstract_Visitable_Cells_skip_local
     end type Abstract_Visitable_Cells
 
     abstract interface
@@ -54,27 +56,25 @@ private
             class(Abstract_Visitable_Cells), intent(in) :: this
         end subroutine Abstract_Visitable_Cells_check_nums
 
-        pure subroutine Abstract_Visitable_Cells_set_local_bounds_3(this, i_cell_3, lbound_3, &
-            ubound_3, step)
+        pure subroutine Abstract_Visitable_Cells_set_skip_layers(this)
         import :: Abstract_Visitable_Cells
-            class(Abstract_Visitable_Cells), intent(in) :: this
-            integer, intent(in) :: i_cell_3
-            integer, intent(out) :: lbound_3, ubound_3, step
-        end subroutine Abstract_Visitable_Cells_set_local_bounds_3
-        ! Must be coherent with local_reindex.
+            class(Abstract_Visitable_Cells), intent(inout) :: this
+        end subroutine Abstract_Visitable_Cells_set_skip_layers
 
     end interface
 
     type, extends(Abstract_Visitable_Cells), public :: XYZ_PBC_Visitable_Cells
     contains
         procedure, private :: check_nums => XYZ_PBC_Visitable_Cells_check_nums
-        procedure, private :: set_local_bounds_3 => XYZ_PBC_Visitable_Cells_set_local_bounds_3
+        procedure, private :: set_skip_layers => XYZ_PBC_Visitable_Cells_set_skip_layers
     end type XYZ_PBC_Visitable_Cells
 
     type, extends(Abstract_Visitable_Cells), public :: XY_PBC_Visitable_Cells
+    private
+
     contains
         procedure, private :: check_nums => XY_PBC_Visitable_Cells_check_nums
-        procedure, private :: set_local_bounds_3 => XY_PBC_Visitable_Cells_set_local_bounds_3
+        procedure, private :: set_skip_layers => XY_PBC_Visitable_Cells_set_skip_layers
     end type XY_PBC_Visitable_Cells
 
 contains
@@ -100,6 +100,7 @@ contains
                                       mold=mold)
         call this%construct_visitable_lists(periodic_box)
 
+        call this%set_skip_layers()
         allocate(this%neighbours(3, nums_local_cells(1), nums_local_cells(2), nums_local_cells(3), &
                                     this%global_lbounds(1):this%global_ubounds(1), &
                                     this%global_lbounds(2):this%global_ubounds(2), &
@@ -158,18 +159,20 @@ contains
         class(Abstract_Visitable_Cells), intent(inout) :: this
 
         integer :: global_i1, global_i2, global_i3
+        logical :: bottom_layer, top_layer
         integer :: local_i1, local_i2, local_i3
-        integer :: local_lbound_3, local_ubound_3, local_step
         integer :: i_cell(num_dimensions)
 
         this%neighbours = 0
         do global_i3 = this%global_lbounds(3), this%global_ubounds(3)
+            bottom_layer= (global_i3 == this%global_lbounds(3))
+            top_layer = (global_i3 == this%global_ubounds(3))
         do global_i2 = this%global_lbounds(2), this%global_ubounds(2)
         do global_i1 = this%global_lbounds(1), this%global_ubounds(1)
-            call this%set_local_bounds_3(global_i3, local_lbound_3, local_ubound_3, local_step)
-            do local_i3 = local_lbound_3, local_ubound_3, local_step
+            do local_i3 = 1, nums_local_cells(3)
             do local_i2 = 1, nums_local_cells(2)
             do local_i1 = 1, nums_local_cells(1)
+                if (this%skip_local(bottom_layer, top_layer, local_i1, local_i2, local_i3)) cycle
                 i_cell = [global_i1, global_i2, global_i3] + &
                     local_reindex([local_i1, local_i2, local_i3], nums_local_cells)
                 i_cell = pbc_3d_index(i_cell, this%nums)
@@ -182,6 +185,17 @@ contains
         end do
         end do
     end subroutine Abstract_Visitable_Cells_set_neighbours
+
+    pure function Abstract_Visitable_Cells_skip_local(this, bottom_layer, top_layer, &
+        local_i1, local_i2, local_i3) result(skip_local)
+        class(Abstract_Visitable_Cells), intent(in) :: this
+        logical, intent(in) :: bottom_layer, top_layer
+        integer, intent(in) :: local_i1, local_i2, local_i3
+        logical :: skip_local
+
+        skip_local = (bottom_layer .and. this%skip_bottom_layer(local_i1, local_i2, local_i3)) &
+            .or. (top_layer .and. this%skip_top_layer(local_i1, local_i2, local_i3))
+    end function Abstract_Visitable_Cells_skip_local
 
     subroutine Abstract_Visitable_Cells_fill(this)
         class(Abstract_Visitable_Cells), intent(inout) :: this
@@ -224,15 +238,17 @@ contains
 
         real(DP) :: energy_i
         integer, dimension(num_dimensions) :: i_cell, i_local_cell
+        logical :: bottom_layer, top_layer
         integer :: local_i1, local_i2, local_i3
-        integer :: local_lbound_3, local_ubound_3, local_step
 
         i_cell = this%index(particle%position)
+        bottom_layer= (i_cell(3) == this%global_lbounds(3))
+        top_layer = (i_cell(3) == this%global_ubounds(3))
         energy = 0._DP
-        call this%set_local_bounds_3(i_cell(3), local_lbound_3, local_ubound_3, local_step)
-        do local_i3 = local_lbound_3, local_ubound_3, local_step
+        do local_i3 = 1, nums_local_cells(3)
         do local_i2 = 1, nums_local_cells(2)
         do local_i1 = 1, nums_local_cells(1)
+            if (this%skip_local(bottom_layer, top_layer, local_i1, local_i2, local_i3)) cycle
             i_local_cell = this%neighbours(:, local_i1, local_i2, local_i3, &
                 i_cell(1), i_cell(2), i_cell(3))
             call this%visitable_lists(i_local_cell(1), i_local_cell(2), &
@@ -308,15 +324,12 @@ contains
         end if
     end subroutine XYZ_PBC_Visitable_Cells_check_nums
 
-    pure subroutine XYZ_PBC_Visitable_Cells_set_local_bounds_3(this, i_cell_3, lbound_3, ubound_3, step)
-        class(XYZ_PBC_Visitable_Cells), intent(in) :: this
-        integer, intent(in) :: i_cell_3
-        integer, intent(out) :: lbound_3, ubound_3, step
+    pure subroutine XYZ_PBC_Visitable_Cells_set_skip_layers(this)
+        class(XYZ_PBC_Visitable_Cells), intent(inout) :: this
 
-        lbound_3 = 1
-        ubound_3 = nums_local_cells(3)
-        step = 1
-    end subroutine XYZ_PBC_Visitable_Cells_set_local_bounds_3
+        this%skip_top_layer = .false.
+        this%skip_bottom_layer = .false.
+    end subroutine XYZ_PBC_Visitable_Cells_set_skip_layers
 
 !end implementation XYZ_PBC_Visitable_Cells
 
@@ -330,23 +343,30 @@ contains
         end if
     end subroutine XY_PBC_Visitable_Cells_check_nums
 
-    pure subroutine XY_PBC_Visitable_Cells_set_local_bounds_3(this, i_cell_3, lbound_3, ubound_3, step)
-        class(XY_PBC_Visitable_Cells), intent(in) :: this
-        integer, intent(in) :: i_cell_3
-        integer, intent(out) :: lbound_3, ubound_3, step
+    pure subroutine XY_PBC_Visitable_Cells_set_skip_layers(this)
+        class(XY_PBC_Visitable_Cells), intent(inout) :: this
 
-        lbound_3 = 1
-        if (i_cell_3 == this%global_lbounds(3)) then
-            ubound_3 = nums_local_cells(3) - 1
-            step = 1
-        else if (i_cell_3 == this%global_ubounds(3)) then
-            ubound_3 = nums_local_cells(3)
-            step = 2
-        else
-            ubound_3 = nums_local_cells(3)
-            step = 1
-        end if
-    end subroutine XY_PBC_Visitable_Cells_set_local_bounds_3
+        integer :: i_local_cell(num_dimensions)
+        integer :: local_i1, local_i2, local_i3
+
+        do local_i3 = 1, nums_local_cells(3)
+            do local_i2 = 1, nums_local_cells(2)
+                do local_i1 = 1, nums_local_cells(1)
+                    i_local_cell = local_reindex([local_i1, local_i2, local_i3], nums_local_cells)
+                    if (i_local_cell(3) == 1) then
+                        this%skip_top_layer(local_i1, local_i2, local_i3) = .true.
+                    else
+                        this%skip_top_layer(local_i1, local_i2, local_i3) = .false.
+                    end if
+                    if (i_local_cell(3) == -1) then
+                        this%skip_bottom_layer(local_i1, local_i2, local_i3) = .true.
+                    else
+                        this%skip_bottom_layer(local_i1, local_i2, local_i3) = .false.
+                    end if
+                end do
+            end do
+        end do
+    end subroutine XY_PBC_Visitable_Cells_set_skip_layers
 
 !end implementation XY_PBC_Visitable_Cells
 
