@@ -144,9 +144,11 @@
         
         \begin{scope}[shift={($(ParticlesExchangeFacade.north) + (9 cm, 0 cm)$)}, opacity=1]
             \begin{abstractclass}[text width=\mediumTextWidth]{MovedPositions}{0, 0}
-                \operation{construct(positions\type{Positions})}
+                \operation{construct(positions\type{Positions}, delta\type{double[3]},
+                    adaptationFactor\type{double})}
                 \operation{destroy()}
-                \operation{set(delta\type{double[3]})}
+                \operation{increase()}
+                \operation{decrease()}
                 \operation{get(iParticle\type{int})\type{double[3]}}
             \end{abstractclass}
         \end{scope}
@@ -170,13 +172,15 @@
         \begin{scope}[shift={($(MovedPositions.north -| Orientations.north)$)},
                       opacity=1]
             \begin{abstractclass}[text width=\mediumTextWidth]{RotatedOrientations}{0, 0}
-                \operation{construct(orientations\type{Orientations})}
+                \operation{construct(orientations\type{Orientations}, delta\type{double},
+                    adaptationFactor\type{double})}
                 \operation{destroy()}
-                \operation{set(delta\type{double})}
+                \operation{increase()}
+                \operation{decrease()}
                 \operation{get(iParticle\type{int})\type{double[3]}}
             \end{abstractclass}
             
-            \begin{class}[text width=\mediumTextWidth]{NullRotatedOrientations}{0, -3.75}
+            \begin{class}[text width=\mediumTextWidth]{NullRotatedOrientations}{0, -4.5}
                 \inherit{RotatedOrientations}
             \end{class}
         \end{scope}

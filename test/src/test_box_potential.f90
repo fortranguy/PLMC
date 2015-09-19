@@ -61,6 +61,7 @@ implicit none
         case default
             call error_exit(data_field//" unkown.")
     end select
+    deallocate(box_name)
     data_field = "Box.size"
     call input_data%get(data_field, box_size, data_found)
     call test_data_found(data_field, data_found)
@@ -105,6 +106,7 @@ implicit none
         case default
             call error_exit(data_field//" unknown.")
     end select
+    deallocate(potential_name)
 
     select type(potential_parameters)
         type is (Null_Potential_Parameters)

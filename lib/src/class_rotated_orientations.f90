@@ -2,7 +2,7 @@ module class_rotated_orientations
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_geometry, only: num_dimensions
-use procedures_checks, only: check_positive
+use procedures_checks, only: check_positive, check_adaptation_factor
 use class_orientations, only: Abstract_Orientations
 use procedures_orientation, only: markov_orientation
 
@@ -12,10 +12,12 @@ implicit none
     private
         class(Abstract_Orientations), pointer :: orientations
         real(DP) :: delta
+        real(DP) :: adaptation_factor
     contains
         procedure :: construct => Abstract_Rotated_Orientations_construct
         procedure :: destroy => Abstract_Rotated_Orientations_destroy
-        procedure :: set => Abstract_Rotated_Orientations_set
+        procedure :: increase => Abstract_Rotated_Orientations_increase
+        procedure :: decrease => Abstract_Rotated_Orientations_decrease
         procedure :: get => Abstract_Rotated_Orientations_get
     end type Abstract_Rotated_Orientations
 
@@ -23,7 +25,8 @@ implicit none
     contains
         procedure :: construct => Null_Rotated_Orientations_construct
         procedure :: destroy => Null_Rotated_Orientations_destroy
-        procedure :: set => Null_Rotated_Orientations_set
+        procedure :: increase => Null_Rotated_Orientations_increase
+        procedure :: decrease => Null_Rotated_Orientations_decrease
         procedure :: get => Null_Rotated_Orientations_get
     end type Null_Rotated_Orientations
 
@@ -35,11 +38,17 @@ contains
 
 !implementation Abstract_Rotated_Orientations
 
-    subroutine Abstract_Rotated_Orientations_construct(this, orientations)
+    subroutine Abstract_Rotated_Orientations_construct(this, orientations, delta, &
+            adaptation_factor)
         class(Abstract_Rotated_Orientations), intent(out) :: this
         class(Abstract_Orientations), target, intent(in) :: orientations
+        real(DP), intent(in) :: delta, adaptation_factor
 
         this%orientations => orientations
+        call check_positive("Abstract_Rotated_Orientations", "delta", delta)
+        this%delta = delta
+        call check_adaptation_factor("Abstract_Rotated_Orientations", adaptation_factor)
+        this%adaptation_factor = adaptation_factor
     end subroutine Abstract_Rotated_Orientations_construct
 
     subroutine Abstract_Rotated_Orientations_destroy(this)
@@ -48,13 +57,17 @@ contains
         this%orientations => null()
     end subroutine Abstract_Rotated_Orientations_destroy
 
-    subroutine Abstract_Rotated_Orientations_set(this, delta)
+    subroutine Abstract_Rotated_Orientations_increase(this)
         class(Abstract_Rotated_Orientations), intent(inout) :: this
-        real(DP), intent(in) :: delta
 
-        call check_positive("Abstract_Rotated_Orientations", "delta", delta)
-        this%delta = delta
-    end subroutine Abstract_Rotated_Orientations_set
+        this%delta = this%adaptation_factor * this%delta
+    end subroutine Abstract_Rotated_Orientations_increase
+
+    subroutine Abstract_Rotated_Orientations_decrease(this)
+        class(Abstract_Rotated_Orientations), intent(inout) :: this
+
+        this%delta = this%delta / this%adaptation_factor
+    end subroutine Abstract_Rotated_Orientations_decrease
 
     function Abstract_Rotated_Orientations_get(this, i_particle) result(rotated_orientation)
         class(Abstract_Rotated_Orientations), intent(in) :: this
@@ -69,19 +82,23 @@ contains
 
 !implementation Null_Rotated_Orientations
 
-    subroutine Null_Rotated_Orientations_construct(this, orientations)
+    subroutine Null_Rotated_Orientations_construct(this, orientations, delta, adaptation_factor)
         class(Null_Rotated_Orientations), intent(out) :: this
         class(Abstract_Orientations), target, intent(in) :: orientations
+        real(DP), intent(in) :: delta, adaptation_factor
     end subroutine Null_Rotated_Orientations_construct
 
     subroutine Null_Rotated_Orientations_destroy(this)
         class(Null_Rotated_Orientations), intent(inout) :: this
     end subroutine Null_Rotated_Orientations_destroy
 
-    subroutine Null_Rotated_Orientations_set(this, delta)
+    subroutine Null_Rotated_Orientations_increase(this)
         class(Null_Rotated_Orientations), intent(inout) :: this
-        real(DP), intent(in) :: delta
-    end subroutine Null_Rotated_Orientations_set
+    end subroutine Null_Rotated_Orientations_increase
+
+    subroutine Null_Rotated_Orientations_decrease(this)
+        class(Null_Rotated_Orientations), intent(inout) :: this
+    end subroutine Null_Rotated_Orientations_decrease
 
     function Null_Rotated_Orientations_get(this, i_particle) result(rotated_orientation)
         class(Null_Rotated_Orientations), intent(in) :: this

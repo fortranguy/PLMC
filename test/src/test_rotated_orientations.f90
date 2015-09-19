@@ -20,9 +20,9 @@ implicit none
     integer :: num_steps, i_step, num_particles, i_particle
     character(len=1024) :: string_i
     real(DP), allocatable :: orientation(:)
-    real(DP) :: rotated_orientations_delta
+    real(DP) :: rotated_orientations_delta, adaptation_factor
     real(DP), dimension(num_dimensions) :: old_orientation, new_orientation
-    integer, allocatable :: orientations_units(:)
+    integer, allocatable :: orientations_big_units(:), orientations_small_units(:)
 
     call json_initialize()
     data_filename = "rotated_orientations.json"
@@ -38,42 +38,64 @@ implicit none
     allocate(Concrete_Orientations :: orientations)
     call orientations%construct(number)
 
-    allocate(orientations_units(orientations%get_num()))
+    allocate(orientations_big_units(orientations%get_num()))
+    allocate(orientations_small_units(orientations%get_num()))
     do i_particle = 1, orientations%get_num()
         write(string_i, *) i_particle
         data_field = "Particles."//trim(adjustl(string_i))//".initial orientation"
         call input_data%get(data_field, orientation, data_found)
         call test_data_found(data_field, data_found)
         call orientations%set(i_particle, orientation)
-        open(newunit=orientations_units(i_particle), recl=4096, &
-             file="orientations_"//trim(adjustl(string_i))//".out", action="write")
+        open(newunit=orientations_big_units(i_particle), recl=4096, &
+             file="orientations_big_"//trim(adjustl(string_i))//".out", action="write")
+        open(newunit=orientations_small_units(i_particle), recl=4096, &
+             file="orientations_small_"//trim(adjustl(string_i))//".out", action="write")
     end do
 
     allocate(Concrete_Rotated_Orientations :: rotated_orientations)
-    call rotated_orientations%construct(orientations)
     data_field = "Small Rotation.delta"
     call input_data%get(data_field, rotated_orientations_delta, data_found)
     call test_data_found(data_field, data_found)
-    call rotated_orientations%set(rotated_orientations_delta)
+    data_field = "Small Rotation.adaptation factor"
+    call input_data%get(data_field, adaptation_factor, data_found)
+    call test_data_found(data_field, data_found)
+    call rotated_orientations%construct(orientations, rotated_orientations_delta, adaptation_factor)
 
     data_field = "Number of Steps"
     call input_data%get(data_field, num_steps, data_found)
     call test_data_found(data_field, data_found)
 
     do i_step = 1, num_steps
+        call rotated_orientations%increase()
         do i_particle = 1, orientations%get_num()
             old_orientation = orientations%get(i_particle)
             call orientations%set(i_particle, rotated_orientations%get(i_particle))
             new_orientation = orientations%get(i_particle)
-            write(orientations_units(i_particle), *) i_step, old_orientation, &
+            write(orientations_big_units(i_particle), *) i_step, old_orientation, &
                 new_orientation - old_orientation
         end do
     end do
 
     do i_particle = orientations%get_num(), 1, -1
-        close(orientations_units(i_particle))
+        close(orientations_big_units(i_particle))
     end do
-    deallocate(orientations_units)
+    deallocate(orientations_big_units)
+
+    do i_step = 1, num_steps
+        call rotated_orientations%decrease()
+        do i_particle = 1, orientations%get_num()
+            old_orientation = orientations%get(i_particle)
+            call orientations%set(i_particle, rotated_orientations%get(i_particle))
+            new_orientation = orientations%get(i_particle)
+            write(orientations_small_units(i_particle), *) i_step, old_orientation, &
+                new_orientation - old_orientation
+        end do
+    end do
+
+    do i_particle = orientations%get_num(), 1, -1
+        close(orientations_small_units(i_particle))
+    end do
+    deallocate(orientations_small_units)
 
     call rotated_orientations%destroy()
     deallocate(rotated_orientations)

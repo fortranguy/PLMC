@@ -23,7 +23,8 @@ implicit none
     character(len=1024) :: string_i
     real(DP), allocatable :: periodic_box_size(:), position(:), moved_positions_delta(:)
     real(DP), dimension(num_dimensions) :: old_position, new_position
-    integer, allocatable :: positions_units(:)
+    real(DP) :: adaptation_factor
+    integer, allocatable :: positions_long_units(:), positions_short_units(:)
 
     call json_initialize()
     data_filename = "moved_positions.json"
@@ -46,41 +47,64 @@ implicit none
     allocate(Concrete_Positions :: positions)
     call positions%construct(periodic_box, number)
 
-    allocate(positions_units(positions%get_num()))
+    allocate(positions_long_units(positions%get_num()))
+    allocate(positions_short_units(positions%get_num()))
     do i_particle = 1, positions%get_num()
         write(string_i, *) i_particle
         data_field = "Particles."//trim(adjustl(string_i))//".initial position"
         call input_data%get(data_field, position, data_found)
         call test_data_found(data_field, data_found)
         call positions%set(i_particle, position)
-        open(newunit=positions_units(i_particle), recl=4096, &
-             file="positions_"//trim(adjustl(string_i))//".out", action="write")
+        open(newunit=positions_long_units(i_particle), recl=4096, &
+             file="positions_long_"//trim(adjustl(string_i))//".out", action="write")
+        open(newunit=positions_short_units(i_particle), recl=4096, &
+             file="positions_short_"//trim(adjustl(string_i))//".out", action="write")
     end do
 
     allocate(Concrete_Moved_Positions :: moved_positions)
-    call moved_positions%construct(positions)
     data_field = "Small Move.delta"
     call input_data%get(data_field, moved_positions_delta, data_found)
     call test_data_found(data_field, data_found)
-    call moved_positions%set(moved_positions_delta)
+    data_field = "Small Move.adaptation factor"
+    call input_data%get(data_field, adaptation_factor, data_found)
+    call test_data_found(data_field, data_found)
+    call moved_positions%construct(positions, moved_positions_delta, adaptation_factor)
 
     data_field = "Number of Steps"
     call input_data%get(data_field, num_steps, data_found)
     call test_data_found(data_field, data_found)
 
     do i_step = 1, num_steps
+        call moved_positions%increase()
         do i_particle = 1, positions%get_num()
             old_position = positions%get(i_particle)
             call positions%set(i_particle, moved_positions%get(i_particle))
             new_position = positions%get(i_particle)
-            write(positions_units(i_particle), *) i_step, old_position, new_position - old_position
+            write(positions_long_units(i_particle), *) i_step, old_position, &
+                new_position - old_position
         end do
     end do
 
     do i_particle = positions%get_num(), 1, -1
-        close(positions_units(i_particle))
+        close(positions_long_units(i_particle))
     end do
-    deallocate(positions_units)
+    deallocate(positions_long_units)
+
+    do i_step = 1, num_steps
+        call moved_positions%decrease()
+        do i_particle = 1, positions%get_num()
+            old_position = positions%get(i_particle)
+            call positions%set(i_particle, moved_positions%get(i_particle))
+            new_position = positions%get(i_particle)
+            write(positions_short_units(i_particle), *) i_step, old_position, &
+                new_position - old_position
+        end do
+    end do
+
+    do i_particle = positions%get_num(), 1, -1
+        close(positions_short_units(i_particle))
+    end do
+    deallocate(positions_short_units)
 
     call moved_positions%destroy()
     deallocate(moved_positions)

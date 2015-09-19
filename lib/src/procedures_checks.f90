@@ -8,7 +8,7 @@ use procedures_errors, only: warning_continue, error_exit
 implicit none
 
 private
-public check_in_range, check_3d_array, check_positive, check_norm
+public check_in_range, check_3d_array, check_positive, check_norm, check_adaptation_factor
 
 interface check_3d_array
     module procedure check_integer_3d_array
@@ -138,5 +138,17 @@ contains
             "("//trim(adjustl(string_vector))//").")
         end if
     end subroutine check_norm
+
+    subroutine check_adaptation_factor(class_name, value)
+        character(len=*), intent(in) :: class_name
+        real(DP), intent(in) :: value
+
+        if (value < 1.0_DP) then
+            call error_exit(class_name//": adaptation_factor is less than 1.0.")
+        end if
+        if (abs(value - 1.0_DP) < real_zero) then
+            call warning_continue(class_name//": adaptation_factor is 1.0.")
+        end if
+    end subroutine check_adaptation_factor
 
 end module procedures_checks

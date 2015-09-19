@@ -1,6 +1,6 @@
 {
     "Periodic Box": {
-        "size": [10.0, 10.0, 10.0]
+        "size": [1000.0, 1000.0, 1000.0]
     },
     "Particles": {
         "number": 3,
@@ -16,6 +16,7 @@
     },
     "Number of Steps": 100,
     "Small Move": {
-        "delta": [1.0, 1.0, 1.0]
+        "delta": [1.0, 1.0, 1.0],
+        "adaptation factor": 1.05
     }
 }

@@ -13,6 +13,7 @@
     },
     "Number of Steps": 100,
     "Small Rotation": {
-        "delta": 0.5
+        "delta": 0.5,
+        "adaptation factor": 1.05
     }
 }
