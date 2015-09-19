@@ -5,7 +5,7 @@
     },
         "Particles": {
         "number": 1000,
-        "diameter": 1,
+        "diameter": 1.0,
         "minimum diameter factor": 0.8,
         "number of exchanges": 1000
     },
@@ -16,6 +16,7 @@
         "epsilon": 1
     },
     "Memory": {
+        "list name": "list",
         "number of overwrites": 1000
     }
 }

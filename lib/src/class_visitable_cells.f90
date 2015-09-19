@@ -10,7 +10,7 @@ use class_positions, only: Abstract_Positions
 use module_particles, only: Concrete_Particle
 use class_pair_potential, only: Abstract_Pair_Potential
 use class_visitable_list, only: Abstract_Visitable_List
-use procedures_visitable_cells, only: pbc_3d_index
+use procedures_visitable_cells, only: pbc_3d_index, local_reindex
 
 implicit none
 
@@ -42,7 +42,6 @@ private
             Abstract_Visitable_Cells_construct_visitable_lists
         procedure, private :: set_neighbours => Abstract_Visitable_Cells_set_neighbours
         procedure, private :: fill => Abstract_Visitable_Cells_fill
-        procedure, private :: local_reindex => Abstract_Visitable_Cells_local_reindex
         procedure, private :: index => Abstract_Visitable_Cells_index
         procedure(Abstract_Visitable_Cells_local_bounds_3), private, deferred :: local_bounds_3
     end type Abstract_Visitable_Cells
@@ -61,7 +60,7 @@ private
             integer, intent(in) :: i_cell_3
             integer, intent(out) :: lbound_3, ubound_3, step
         end subroutine Abstract_Visitable_Cells_local_bounds_3
-        ! Must be coherent with this%local_reindex(i_cell).
+        ! Must be coherent with local_reindex.
 
     end interface
 
@@ -98,7 +97,7 @@ contains
                                       this%global_lbounds(2):this%global_ubounds(2), &
                                       this%global_lbounds(3):this%global_ubounds(3)), &
                                       mold=mold)
-        call this%construct_visitable_lists(periodic_box, positions)
+        call this%construct_visitable_lists(periodic_box)
 
         allocate(this%neighbours(3, nums_local_cells(1), nums_local_cells(2), nums_local_cells(3), &
                                     this%global_lbounds(1):this%global_ubounds(1), &
@@ -139,10 +138,9 @@ contains
         end if
     end subroutine Abstract_Visitable_Cells_check_division
 
-    subroutine Abstract_Visitable_Cells_construct_visitable_lists(this, periodic_box, positions)
+    subroutine Abstract_Visitable_Cells_construct_visitable_lists(this, periodic_box)
         class(Abstract_Visitable_Cells), intent(inout) :: this
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        class(Abstract_Positions), intent(in) :: positions
 
         integer :: global_i1, global_i2, global_i3
 
@@ -172,7 +170,7 @@ contains
             do local_i2 = 1, nums_local_cells(2)
             do local_i1 = 1, nums_local_cells(1)
                 i_cell = [global_i1, global_i2, global_i3] + &
-                    this%local_reindex([local_i1, local_i2, local_i3])
+                    local_reindex([local_i1, local_i2, local_i3], nums_local_cells)
                 i_cell = pbc_3d_index(i_cell, this%nums)
                 this%neighbours(:, local_i1, local_i2, local_i3, &
                     global_i1, global_i2, global_i3) = i_cell
@@ -284,15 +282,6 @@ contains
                 i_cell(3))%overwrite(this%positions%get_num(), particle)
         end if
     end subroutine Abstract_Visitable_Cells_remove
-
-    pure function Abstract_Visitable_Cells_local_reindex(this, i_cell) result(local_reindex)
-        class(Abstract_Visitable_Cells), intent(in) :: this
-        integer, intent(in) :: i_cell(:)
-        integer :: local_reindex(num_dimensions)
-
-        local_reindex = mod(i_cell, nums_local_cells) - 1
-    end function Abstract_Visitable_Cells_local_reindex
-    ! To find overlap faster
 
     pure function Abstract_Visitable_Cells_index(this, position) result(index)
         class(Abstract_Visitable_Cells), intent(in) :: this

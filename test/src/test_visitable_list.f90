@@ -56,7 +56,8 @@ use types_potential_domain, only: Concrete_Potential_Domain
 use class_pair_potential, only: Abstract_Pair_Potential, Concrete_Pair_Potential, &
     Hard_Pair_Potential
 use module_particles, only: Concrete_Particle
-use class_visitable_list, only: Abstract_Visitable_List, Concrete_Visitable_List
+use class_visitable_list, only: Abstract_Visitable_List, Concrete_Visitable_List, &
+    Concrete_Visitable_Array
 use procedures_visitable_list_sum, only: sum_energy
 
 implicit none
@@ -74,7 +75,7 @@ implicit none
 
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename, data_field, positions_input
-    character(len=:), allocatable :: box_name, potential_name
+    character(len=:), allocatable :: box_name, potential_name, list_name
     logical :: data_found
     integer :: positions_unit
 
@@ -170,7 +171,18 @@ implicit none
     if (.not.allocated(pair_potential)) allocate(Concrete_Pair_Potential :: pair_potential)
     call pair_potential%construct(potential_domain, potential_expression)
 
-    allocate(Concrete_Visitable_List :: visitable_list)
+    data_field = "Memory.list name"
+    call input_data%get(data_field, list_name,data_found)
+    call test_data_found(data_field, data_found)
+    select case(list_name)
+        case ("list")
+            allocate(Concrete_Visitable_List :: visitable_list)
+        case ("array")
+            allocate(Concrete_Visitable_Array :: visitable_list)
+        case default
+            call error_exit(list_name//" unknown.")
+    end select
+
     call visitable_list%construct(periodic_box)
     do i_particle = 1, positions%get_num()
         particle%i = i_particle
@@ -195,12 +207,14 @@ implicit none
         call visitable_list%deallocate(particle%i)
         call visitable_list%allocate(particle)
     end do
-    call sum_energy(positions, visitable_list, pair_potential, overlap, energy)
-    if (overlap) then
-        write(output_unit,*) "overlap"
-    else
-        energy = energy / 2._DP
-        write(output_unit, *) "[exchange] energy =", energy
+    if (num_exchanges > 0) then
+        call sum_energy(positions, visitable_list, pair_potential, overlap, energy)
+        if (overlap) then
+            write(output_unit,*) "overlap"
+        else
+            energy = energy / 2._DP
+            write(output_unit, *) "[exchange] energy =", energy
+        end if
     end if
 
     data_field = "Memory.number of overwrites"
@@ -219,12 +233,14 @@ implicit none
         particle%position = positions%get(particle%i)
         call visitable_list%overwrite(i_value, particle)
     end do
-    call sum_energy(positions, visitable_list, pair_potential, overlap, energy)
-    if (overlap) then
-        write(output_unit,*) "overlap"
-    else
-        energy = energy / 2._DP
-        write(output_unit, *) "[overwrite] energy =", energy
+    if (num_overwrites > 0) then
+        call sum_energy(positions, visitable_list, pair_potential, overlap, energy)
+        if (overlap) then
+            write(output_unit,*) "overlap"
+        else
+            energy = energy / 2._DP
+            write(output_unit, *) "[overwrite] energy =", energy
+        end if
     end if
 
     call visitable_list%destroy()

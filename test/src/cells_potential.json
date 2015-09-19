@@ -3,15 +3,18 @@
         "name": "XYZ",
         "size": [12.0, 12.0, 15.0]
     },
-        "Particles": {
+    "Particles": {
         "number": 1000,
         "diameter": 1,
         "minimum diameter factor": 0.8
     },
-        "Potential": {
+    "Potential": {
         "name": "LJ",
         "max distance": 2.5,
         "delta distance": 1.0e-6,
         "epsilon": 1
+    },
+    "Memory": {
+        "list name": "list"
     }
 }

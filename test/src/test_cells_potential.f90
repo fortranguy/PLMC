@@ -54,7 +54,8 @@ use types_potential_domain, only: Concrete_Potential_Domain
 use class_pair_potential, only: Abstract_Pair_Potential, Concrete_Pair_Potential, &
     Hard_Pair_Potential
 use module_particles, only: Concrete_Particle
-use class_visitable_list, only: Abstract_Visitable_List, Concrete_Visitable_List
+use class_visitable_list, only: Abstract_Visitable_List, Concrete_Visitable_List, &
+    Concrete_Visitable_Array
 use class_visitable_cells, only: Abstract_Visitable_Cells, &
     XYZ_PBC_Visitable_Cells, XY_PBC_Visitable_Cells
 use class_cells_potential, only: Cells_Potential_Facade
@@ -76,7 +77,7 @@ implicit none
 
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename, data_field, positions_input
-    character(len=:), allocatable :: box_name, potential_name
+    character(len=:), allocatable :: box_name, potential_name, list_name
     logical :: data_found
     integer :: positions_unit
 
@@ -172,7 +173,17 @@ implicit none
     if (.not.allocated(pair_potential)) allocate(Concrete_Pair_Potential :: pair_potential)
     call pair_potential%construct(potential_domain, potential_expression)
 
-    allocate(Concrete_Visitable_List :: visitable_list)
+    data_field = "Memory.list name"
+    call input_data%get(data_field, list_name,data_found)
+    call test_data_found(data_field, data_found)
+    select case(list_name)
+        case ("list")
+            allocate(Concrete_Visitable_List :: visitable_list)
+        case ("array")
+            allocate(Concrete_Visitable_Array :: visitable_list)
+        case default
+            call error_exit(list_name//" unknown.")
+    end select
 
     select type(periodic_box)
         type is (XYZ_Periodic_Box)

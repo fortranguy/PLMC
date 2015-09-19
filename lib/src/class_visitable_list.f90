@@ -2,8 +2,8 @@ module class_visitable_list
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use module_particles, only: Concrete_Particle
-use module_nodes, only: Concrete_Node, &
-    deallocate_list
+use module_nodes, only: Concrete_Node, Concrete_Linkable_Node, &
+    deallocate_list, increase_nodes_size
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_pair_potential, only: Abstract_Pair_Potential
 
@@ -14,7 +14,7 @@ private
     type, abstract, public :: Abstract_Visitable_List
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box
-        type(Concrete_Node), pointer :: beginning
+        type(Concrete_Linkable_Node), pointer :: beginning
     contains
         procedure :: construct => Abstract_Visitable_List_construct
         procedure :: destroy => Abstract_Visitable_List_destroy
@@ -28,13 +28,28 @@ private
 
     end type Concrete_Visitable_List
 
+    type, extends(Abstract_Visitable_List), public :: Concrete_Visitable_Array
+    private
+        type(Concrete_Node), allocatable :: nodes(:)
+        integer :: num_nodes
+    contains
+        procedure :: construct =>  Concrete_Visitable_Array_construct
+        procedure :: destroy => Concrete_Visitable_Array_destroy
+        procedure :: visit => Concrete_Visitable_Array_visit
+        procedure :: allocate => Concrete_Visitable_Array_allocate
+        procedure :: deallocate => Concrete_Visitable_Array_deallocate
+        procedure :: overwrite => Concrete_Visitable_Array_overwrite
+    end type Concrete_Visitable_Array
+
 contains
+
+!implementation Abstract_Visitable_List
 
     subroutine Abstract_Visitable_List_construct(this, periodic_box)
         class(Abstract_Visitable_List), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
 
-        type(Concrete_Node), pointer :: current => null(), next => null()
+        type(Concrete_Linkable_Node), pointer :: current => null(), next => null()
 
         this%periodic_box => periodic_box
 
@@ -63,7 +78,7 @@ contains
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
 
-        type(Concrete_Node), pointer :: current => null(), next => null()
+        type(Concrete_Linkable_Node), pointer :: current => null(), next => null()
         real(DP) :: energy_i, distance
 
         overlap = .false.
@@ -87,7 +102,7 @@ contains
         class(Abstract_Visitable_List), intent(inout) :: this
         type(Concrete_Particle), intent(in) :: particle
 
-        type(Concrete_Node), pointer :: previous => null(), new => null(), next => null()
+        type(Concrete_Linkable_Node), pointer :: previous => null(), new => null(), next => null()
 
         previous => this%beginning
         next => previous%next
@@ -102,7 +117,7 @@ contains
         class(Abstract_Visitable_List), intent(inout) :: this
         integer, intent(in) :: i_particle
 
-        type(Concrete_Node), pointer :: previous => null(), current => null(), next => null()
+        type(Concrete_Linkable_Node), pointer :: previous => null(), current => null(), next => null()
 
         previous => this%beginning
         current => previous%next
@@ -125,7 +140,7 @@ contains
         integer, intent(in) :: i_target
         type(Concrete_Particle), intent(in) :: value
 
-        type(Concrete_Node), pointer :: previous => null(), current => null(), next => null()
+        type(Concrete_Linkable_Node), pointer :: previous => null(), current => null(), next => null()
 
         previous => this%beginning
         current => previous%next
@@ -134,12 +149,101 @@ contains
             if (current%i == i_target) then
                 current%i = value%i
                 current%position = value%position
-                exit
+                return
             else
                 previous => current
             end if
             current => next
         end do
     end subroutine Abstract_Visitable_List_overwrite
+
+!end implementation Abstract_Visitable_List
+
+!implementation Concrete_Visitable_Array
+
+    subroutine Concrete_Visitable_Array_construct(this, periodic_box)
+        class(Concrete_Visitable_Array), intent(out) :: this
+        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+
+        integer :: initial_size
+
+        this%periodic_box => periodic_box
+        this%num_nodes = 0
+        initial_size = 10
+        allocate(this%nodes(initial_size))
+    end subroutine Concrete_Visitable_Array_construct
+
+    subroutine Concrete_Visitable_Array_destroy(this)
+        class(Concrete_Visitable_Array), intent(inout) :: this
+
+        if (allocated(this%nodes)) deallocate(this%nodes)
+    end subroutine Concrete_Visitable_Array_destroy
+
+    subroutine Concrete_Visitable_Array_visit(this, particle, pair_potential, overlap, energy)
+        class(Concrete_Visitable_Array), intent(in) :: this
+        type(Concrete_Particle), intent(in) :: particle
+        class(Abstract_Pair_Potential), intent(in) :: pair_potential
+        logical, intent(out) :: overlap
+        real(DP), intent(out) :: energy
+
+        real(DP) :: energy_i, distance
+        integer :: i_node
+
+        overlap = .false.
+        energy = 0._DP
+        do i_node = 1, this%num_nodes
+            if (.not. particle%same_type .or. particle%i /= this%nodes(i_node)%i) then
+                distance = this%periodic_box%distance(particle%position, &
+                    this%nodes(i_node)%position)
+                call pair_potential%meet(distance, overlap, energy_i)
+                if (overlap) return
+                energy = energy + energy_i
+            end if
+        end do
+    end subroutine Concrete_Visitable_Array_visit
+
+    subroutine Concrete_Visitable_Array_allocate(this, particle)
+        class(Concrete_Visitable_Array), intent(inout) :: this
+        type(Concrete_Particle), intent(in) :: particle
+
+        this%num_nodes = this%num_nodes + 1
+        if (size(this%nodes) < this%num_nodes) then
+            call increase_nodes_size(this%nodes)
+        end if
+        this%nodes(this%num_nodes)%i = particle%i
+        this%nodes(this%num_nodes)%position = particle%position
+    end subroutine Concrete_Visitable_Array_allocate
+
+    subroutine Concrete_Visitable_Array_deallocate(this, i_particle)
+        class(Concrete_Visitable_Array), intent(inout) :: this
+        integer, intent(in) :: i_particle
+
+        type(Concrete_Particle) :: last
+
+        if (i_particle /= this%nodes(this%num_nodes)%i) then
+            last%i = this%nodes(this%num_nodes)%i
+            last%position = this%nodes(this%num_nodes)%position
+            call this%overwrite(i_particle, last)
+        end if
+        this%num_nodes = this%num_nodes - 1
+    end subroutine Concrete_Visitable_Array_deallocate
+
+    subroutine Concrete_Visitable_Array_overwrite(this, i_target, value)
+        class(Concrete_Visitable_Array), intent(inout) :: this
+        integer, intent(in) :: i_target
+        type(Concrete_Particle), intent(in) :: value
+
+        integer :: i_node
+
+        do i_node = 1, this%num_nodes
+            if (this%nodes(i_node)%i == i_target) then
+                this%nodes(i_node)%i = value%i
+                this%nodes(i_node)%position = value%position
+                return
+            end if
+        end do
+    end subroutine Concrete_Visitable_Array_overwrite
+
+!end implementation Concrete_Visitable_Array
 
 end module class_visitable_list
