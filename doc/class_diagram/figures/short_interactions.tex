@@ -29,7 +29,7 @@
                 \operation{set(positions\type{Positions})}
                 \operation{set(pairPotential\type{PairPotential})}
                 \operation{visit(particle\type{Particle}, overlap\type{bool},
-                                 energy\type{double})\type{void}}
+                                 energy\type{double})}
             \end{class}
         \end{scope}
         
@@ -39,7 +39,7 @@
                 \operation{destroy()}
                 \operation{set(pairPotential\type{PairPotential})}
                 \operation{visit(particle\type{Particle}, overlap\type{bool},
-                                    energy\type{double})\type{void}}
+                                    energy\type{double})}
             \end{class}
         \end{scope}
                 
@@ -49,7 +49,7 @@
                                      positions\type{Positions}, minCellEdge\type{double})}
                 \operation{destroy()}
                 \operation[0]{visit(particle\type{Particle}, pairPotential\type{PairPotential},
-                                    overlap\type{bool}, energy\type{double})\type{void}}
+                                    overlap\type{bool}, energy\type{double})}
                 \operation{move(from\type{Particle}, to\type{Particle})}
                 \operation{add(particle\type{Particle})}
                 \operation{remove(particle\type{Particle})}
@@ -73,11 +73,11 @@
                 \operation{construct(periodicBox\type{PeriodicBox},
                                      positions\type{Positions})}
                 \operation{destroy()}
+                \operation{set(iTarger\type{int}, particle\type{Particle})}
                 \operation{visit(particle\type{Particle}, pairPotential\type{PairPotential},
-                                 overlap\type{bool}, energy\type{double})\type{void}}
-                \operation{allocate(iParticle\type{int})}
-                \operation{deallocate(iParticle\type{int})}
-                \operation{overwrite(iTarger\type{int}, iValue\type{int})}
+                                 overlap\type{bool}, energy\type{double})}
+                \operation{add(particle\type{Particle})}
+                \operation{remove(iParticle\type{int})}
             \end{abstractclass}
         \end{scope}
         
@@ -88,7 +88,7 @@
                 \operation{destroy()}
                 \operation{getMaxDistance()}
                 \operation{meet(distance\type{double}, overlap\type{bool},
-                                energy\type{double})\type{void}}
+                                energy\type{double})}
             \end{abstractclass}
         \end{scope}
 

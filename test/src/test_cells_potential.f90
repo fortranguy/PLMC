@@ -99,7 +99,6 @@ implicit none
     select case(box_name)
         case("XYZ")
             allocate(XYZ_Periodic_Box :: periodic_box)
-
         case("XY")
             allocate(XY_Periodic_Box :: periodic_box)
         case default

@@ -43,7 +43,8 @@ private
         procedure, private :: set_neighbours => Abstract_Visitable_Cells_set_neighbours
         procedure, private :: fill => Abstract_Visitable_Cells_fill
         procedure, private :: index => Abstract_Visitable_Cells_index
-        procedure(Abstract_Visitable_Cells_local_bounds_3), private, deferred :: local_bounds_3
+        procedure(Abstract_Visitable_Cells_set_local_bounds_3), private, deferred :: &
+            set_local_bounds_3
     end type Abstract_Visitable_Cells
 
     abstract interface
@@ -53,13 +54,13 @@ private
             class(Abstract_Visitable_Cells), intent(in) :: this
         end subroutine Abstract_Visitable_Cells_check_nums
 
-        pure subroutine Abstract_Visitable_Cells_local_bounds_3(this, i_cell_3, lbound_3, &
+        pure subroutine Abstract_Visitable_Cells_set_local_bounds_3(this, i_cell_3, lbound_3, &
             ubound_3, step)
         import :: Abstract_Visitable_Cells
             class(Abstract_Visitable_Cells), intent(in) :: this
             integer, intent(in) :: i_cell_3
             integer, intent(out) :: lbound_3, ubound_3, step
-        end subroutine Abstract_Visitable_Cells_local_bounds_3
+        end subroutine Abstract_Visitable_Cells_set_local_bounds_3
         ! Must be coherent with local_reindex.
 
     end interface
@@ -67,13 +68,13 @@ private
     type, extends(Abstract_Visitable_Cells), public :: XYZ_PBC_Visitable_Cells
     contains
         procedure, private :: check_nums => XYZ_PBC_Visitable_Cells_check_nums
-        procedure, private :: local_bounds_3 => XYZ_PBC_Visitable_Cells_local_bounds_3
+        procedure, private :: set_local_bounds_3 => XYZ_PBC_Visitable_Cells_set_local_bounds_3
     end type XYZ_PBC_Visitable_Cells
 
     type, extends(Abstract_Visitable_Cells), public :: XY_PBC_Visitable_Cells
     contains
         procedure, private :: check_nums => XY_PBC_Visitable_Cells_check_nums
-        procedure, private :: local_bounds_3 => XY_PBC_Visitable_Cells_local_bounds_3
+        procedure, private :: set_local_bounds_3 => XY_PBC_Visitable_Cells_set_local_bounds_3
     end type XY_PBC_Visitable_Cells
 
 contains
@@ -165,7 +166,7 @@ contains
         do global_i3 = this%global_lbounds(3), this%global_ubounds(3)
         do global_i2 = this%global_lbounds(2), this%global_ubounds(2)
         do global_i1 = this%global_lbounds(1), this%global_ubounds(1)
-            call this%local_bounds_3(global_i3, local_lbound_3, local_ubound_3, local_step)
+            call this%set_local_bounds_3(global_i3, local_lbound_3, local_ubound_3, local_step)
             do local_i3 = local_lbound_3, local_ubound_3, local_step
             do local_i2 = 1, nums_local_cells(2)
             do local_i1 = 1, nums_local_cells(1)
@@ -228,7 +229,7 @@ contains
 
         i_cell = this%index(particle%position)
         energy = 0._DP
-        call this%local_bounds_3(i_cell(3), local_lbound_3, local_ubound_3, local_step)
+        call this%set_local_bounds_3(i_cell(3), local_lbound_3, local_ubound_3, local_step)
         do local_i3 = local_lbound_3, local_ubound_3, local_step
         do local_i2 = 1, nums_local_cells(2)
         do local_i1 = 1, nums_local_cells(1)
@@ -253,9 +254,9 @@ contains
         to_i_cell = this%index(to%position)
         if (any(from_i_cell /= to_i_cell)) then
             call this%visitable_lists(from_i_cell(1), from_i_cell(2), &
-                from_i_cell(3))%deallocate(from%i)
+                from_i_cell(3))%remove(from%i)
             call this%visitable_lists(to_i_cell(1), to_i_cell(2), &
-                to_i_cell(3))%allocate(to)
+                to_i_cell(3))%add(to)
         end if
     end subroutine Abstract_Visitable_Cells_move
 
@@ -266,7 +267,7 @@ contains
         integer :: i_cell(num_dimensions)
 
         i_cell = this%index(particle%position)
-        call this%visitable_lists(i_cell(1), i_cell(2), i_cell(3))%allocate(particle)
+        call this%visitable_lists(i_cell(1), i_cell(2), i_cell(3))%add(particle)
     end subroutine Abstract_Visitable_Cells_add
 
     subroutine Abstract_Visitable_Cells_remove(this, particle)
@@ -276,10 +277,10 @@ contains
         integer :: i_cell(num_dimensions)
 
         i_cell = this%index(particle%position)
-        call this%visitable_lists(i_cell(1), i_cell(2), i_cell(3))%deallocate(particle%i)
+        call this%visitable_lists(i_cell(1), i_cell(2), i_cell(3))%remove(particle%i)
         if (particle%i < this%positions%get_num()) then
             call this%visitable_lists(i_cell(1), i_cell(2), &
-                i_cell(3))%overwrite(this%positions%get_num(), particle)
+                i_cell(3))%set(this%positions%get_num(), particle)
         end if
     end subroutine Abstract_Visitable_Cells_remove
 
@@ -307,7 +308,7 @@ contains
         end if
     end subroutine XYZ_PBC_Visitable_Cells_check_nums
 
-    pure subroutine XYZ_PBC_Visitable_Cells_local_bounds_3(this, i_cell_3, lbound_3, ubound_3, step)
+    pure subroutine XYZ_PBC_Visitable_Cells_set_local_bounds_3(this, i_cell_3, lbound_3, ubound_3, step)
         class(XYZ_PBC_Visitable_Cells), intent(in) :: this
         integer, intent(in) :: i_cell_3
         integer, intent(out) :: lbound_3, ubound_3, step
@@ -315,7 +316,7 @@ contains
         lbound_3 = 1
         ubound_3 = nums_local_cells(3)
         step = 1
-    end subroutine XYZ_PBC_Visitable_Cells_local_bounds_3
+    end subroutine XYZ_PBC_Visitable_Cells_set_local_bounds_3
 
 !end implementation XYZ_PBC_Visitable_Cells
 
@@ -329,7 +330,7 @@ contains
         end if
     end subroutine XY_PBC_Visitable_Cells_check_nums
 
-    pure subroutine XY_PBC_Visitable_Cells_local_bounds_3(this, i_cell_3, lbound_3, ubound_3, step)
+    pure subroutine XY_PBC_Visitable_Cells_set_local_bounds_3(this, i_cell_3, lbound_3, ubound_3, step)
         class(XY_PBC_Visitable_Cells), intent(in) :: this
         integer, intent(in) :: i_cell_3
         integer, intent(out) :: lbound_3, ubound_3, step
@@ -345,7 +346,7 @@ contains
             ubound_3 = nums_local_cells(3)
             step = 1
         end if
-    end subroutine XY_PBC_Visitable_Cells_local_bounds_3
+    end subroutine XY_PBC_Visitable_Cells_set_local_bounds_3
 
 !end implementation XY_PBC_Visitable_Cells
 

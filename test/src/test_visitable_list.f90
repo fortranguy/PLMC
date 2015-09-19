@@ -190,7 +190,7 @@ implicit none
     do i_particle = 1, positions%get_num()
         particle%i = i_particle
         particle%position = positions%get(particle%i)
-        call visitable_list%allocate(particle) !artificial
+        call visitable_list%add(particle) !artificial
     end do
     call sum_energy(positions, visitable_list, pair_potential, overlap, energy)
     if (overlap) then
@@ -207,8 +207,8 @@ implicit none
         call random_number(rand)
         particle%i = int(real(number%get(), DP) * rand) + 1
         particle%position = positions%get(particle%i)
-        call visitable_list%deallocate(particle%i)
-        call visitable_list%allocate(particle)
+        call visitable_list%remove(particle%i)
+        call visitable_list%add(particle)
     end do
     if (num_exchanges > 0) then
         call sum_energy(positions, visitable_list, pair_potential, overlap, energy)
@@ -230,11 +230,11 @@ implicit none
         i_value = int(real(number%get(), DP) * rand) + 1
         particle%i = i_value
         particle%position = positions%get(particle%i)
-        call visitable_list%overwrite(i_target, particle)
+        call visitable_list%set(i_target, particle)
         i_value = particle%i
         particle%i = i_target
         particle%position = positions%get(particle%i)
-        call visitable_list%overwrite(i_value, particle)
+        call visitable_list%set(i_value, particle)
     end do
     if (num_overwrites > 0) then
         call sum_energy(positions, visitable_list, pair_potential, overlap, energy)
