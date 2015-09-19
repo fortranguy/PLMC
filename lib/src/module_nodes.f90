@@ -1,6 +1,6 @@
 module module_nodes
 
-use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
+use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_geometry, only: num_dimensions
 
 implicit none
@@ -10,6 +10,7 @@ public deallocate_list
 
     type, public :: Concrete_Node
         integer :: i
+        real(DP) :: position(num_dimensions)
         type(Concrete_Node), pointer :: next => null()
     end type Concrete_Node
 

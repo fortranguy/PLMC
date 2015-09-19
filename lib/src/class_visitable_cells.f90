@@ -149,8 +149,7 @@ contains
         do global_i3 = this%global_lbounds(3), this%global_ubounds(3)
         do global_i2 = this%global_lbounds(2), this%global_ubounds(2)
         do global_i1 = this%global_lbounds(1), this%global_ubounds(1)
-            call this%visitable_lists(global_i1, global_i2, global_i3)%construct(periodic_box, &
-                positions)
+            call this%visitable_lists(global_i1, global_i2, global_i3)%construct(periodic_box)
         end do
         end do
         end do
@@ -258,7 +257,7 @@ contains
             call this%visitable_lists(from_i_cell(1), from_i_cell(2), &
                 from_i_cell(3))%deallocate(from%i)
             call this%visitable_lists(to_i_cell(1), to_i_cell(2), &
-                to_i_cell(3))%allocate(to%i)
+                to_i_cell(3))%allocate(to)
         end if
     end subroutine Abstract_Visitable_Cells_move
 
@@ -269,7 +268,7 @@ contains
         integer :: i_cell(num_dimensions)
 
         i_cell = this%index(particle%position)
-        call this%visitable_lists(i_cell(1), i_cell(2), i_cell(3))%allocate(particle%i)
+        call this%visitable_lists(i_cell(1), i_cell(2), i_cell(3))%allocate(particle)
     end subroutine Abstract_Visitable_Cells_add
 
     subroutine Abstract_Visitable_Cells_remove(this, particle)
@@ -282,7 +281,7 @@ contains
         call this%visitable_lists(i_cell(1), i_cell(2), i_cell(3))%deallocate(particle%i)
         if (particle%i < this%positions%get_num()) then
             call this%visitable_lists(i_cell(1), i_cell(2), &
-                i_cell(3))%overwrite(this%positions%get_num(), particle%i)
+                i_cell(3))%overwrite(this%positions%get_num(), particle)
         end if
     end subroutine Abstract_Visitable_Cells_remove
 

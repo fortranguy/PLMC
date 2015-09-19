@@ -62,6 +62,7 @@ use procedures_visitable_list_sum, only: sum_energy
 implicit none
 
     class(Abstract_Visitable_List), allocatable :: visitable_list
+    type(Concrete_Particle) :: particle
     class(Abstract_Pair_Potential), allocatable :: pair_potential
     type(Concrete_Potential_Domain) :: potential_domain
     class(Abstract_Potential_Expression), allocatable :: potential_expression
@@ -170,9 +171,11 @@ implicit none
     call pair_potential%construct(potential_domain, potential_expression)
 
     allocate(Concrete_Visitable_List :: visitable_list)
-    call visitable_list%construct(periodic_box, positions)
+    call visitable_list%construct(periodic_box)
     do i_particle = 1, positions%get_num()
-        call visitable_list%allocate(i_particle) !artificial
+        particle%i = i_particle
+        particle%position = positions%get(particle%i)
+        call visitable_list%allocate(particle) !artificial
     end do
     call sum_energy(positions, visitable_list, pair_potential, overlap, energy)
     if (overlap) then
@@ -187,9 +190,10 @@ implicit none
     call test_data_found(data_field, data_found)
     do i_exchange = 1, num_exchanges
         call random_number(rand)
-        i_particle = int(real(number%get(), DP) * rand) + 1
-        call visitable_list%deallocate(i_particle)
-        call visitable_list%allocate(i_particle)
+        particle%i = int(real(number%get(), DP) * rand) + 1
+        particle%position = positions%get(particle%i)
+        call visitable_list%deallocate(particle%i)
+        call visitable_list%allocate(particle)
     end do
     call sum_energy(positions, visitable_list, pair_potential, overlap, energy)
     if (overlap) then
@@ -207,8 +211,13 @@ implicit none
         i_target = int(real(number%get(), DP) * rand) + 1
         call random_number(rand)
         i_value = int(real(number%get(), DP) * rand) + 1
-        call visitable_list%overwrite(i_target, i_value)
-        call visitable_list%overwrite(i_value, i_target)
+        particle%i = i_value
+        particle%position = positions%get(particle%i)
+        call visitable_list%overwrite(i_target, particle)
+        i_value = particle%i
+        particle%i = i_target
+        particle%position = positions%get(particle%i)
+        call visitable_list%overwrite(i_value, particle)
     end do
     call sum_energy(positions, visitable_list, pair_potential, overlap, energy)
     if (overlap) then
