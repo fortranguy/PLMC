@@ -15,11 +15,11 @@ private
         real(DP) :: size(num_dimensions)
     contains
         procedure :: set => Abstract_Periodic_Box_set
-        procedure, nopass, private :: check => Abstract_Periodic_Box_check
         procedure :: get_size => Abstract_Periodic_Box_get_size
         procedure :: distance => Abstract_Periodic_Box_distance
         procedure :: vector => Abstract_Periodic_Box_vector
         procedure(Abstract_Periodic_Box_folded), deferred :: folded
+        procedure(Abstract_Periodic_Box_check), private, nopass, deferred :: check
     end type Abstract_Periodic_Box
 
     abstract interface
@@ -31,16 +31,23 @@ private
             real(DP) :: folded_position(num_dimensions)
         end function Abstract_Periodic_Box_folded
 
+        subroutine Abstract_Periodic_Box_check(size)
+        import :: DP
+            real(DP), intent(in) :: size(:)
+        end subroutine Abstract_Periodic_Box_check
+
     end interface
 
     type, extends(Abstract_Periodic_Box), public :: XYZ_Periodic_Box
     contains
         procedure :: folded => XYZ_Periodic_Box_folded
+        procedure, private, nopass :: check => XYZ_Periodic_Box_check
     end type XYZ_Periodic_Box
 
     type, extends(Abstract_Periodic_Box), public :: XY_Periodic_Box
     contains
         procedure :: folded => XY_Periodic_Box_folded
+        procedure, private, nopass :: check => XY_Periodic_Box_check
     end type XY_Periodic_Box
 
 contains
@@ -51,20 +58,11 @@ contains
         class(Abstract_Periodic_Box), intent(out) :: this
         real(DP), intent(in) :: size(:)
 
+        call check_3d_array("Abstract_Periodic_Box", "size", size)
+        call check_positive("Abstract_Periodic_Box", "size", size)
         call this%check(size)
         this%size = size
     end subroutine Abstract_Periodic_Box_set
-
-    subroutine Abstract_Periodic_Box_check(size)
-        real(DP), intent(in) :: size(:)
-
-        call check_3d_array("Abstract_Periodic_Box", "size", size)
-        call check_positive("Abstract_Periodic_Box", "size", size)
-        if (abs(size(1) - size(2)) > real_zero) then
-            call warning_continue("Abstract_Periodic_Box: "//&
-                "size(1) and size(2) are not equal.")
-        end if
-    end subroutine Abstract_Periodic_Box_check
 
     pure function Abstract_Periodic_Box_get_size(this) result(size)
         class(Abstract_Periodic_Box), intent(in) :: this
@@ -93,6 +91,21 @@ contains
 
 !implementation XYZ_Periodic_Box
 
+    subroutine XYZ_Periodic_Box_check(size)
+        real(DP), intent(in) :: size(:)
+
+        integer :: i_dimension, j_dimension
+
+        do i_dimension = 1, num_dimensions
+            do j_dimension = i_dimension + 1, num_dimensions
+                if (abs(size(i_dimension) - size(j_dimension)) > real_zero) then
+                    call warning_continue("XYZ_Periodic_Box: size is not cubic.")
+                    return
+                end if
+            end do
+        end do
+    end subroutine XYZ_Periodic_Box_check
+
     !> from SMAC, algorithm 2.5 & 2.6, p.91
     pure function XYZ_Periodic_Box_folded(this, position) result(folded_position)
         class(XYZ_Periodic_Box), intent(in) :: this
@@ -108,6 +121,14 @@ contains
 !end implementation XYZ_Periodic_Box
 
 !implementation XY_Periodic_Box
+
+    subroutine XY_Periodic_Box_check(size)
+        real(DP), intent(in) :: size(:)
+
+        if (abs(size(1) - size(2)) > real_zero) then
+            call warning_continue("XY_Periodic_Box: size(1) and size(2) are not equal.")
+        end if
+    end subroutine XY_Periodic_Box_check
 
     pure function XY_Periodic_Box_folded(this, position) result(folded_position)
         class(XY_Periodic_Box), intent(in) :: this
