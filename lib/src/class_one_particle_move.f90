@@ -6,7 +6,7 @@ use module_particles, only: Concrete_Particle, Concrete_Particles
 use class_moved_positions, only: Abstract_Moved_Positions
 use class_visitable_cells, only: Abstract_Visitable_Cells
 use module_particle_energy, only: Concrete_Particle_Energy, &
-    Concrete_Particle_Energy_sum, operator(-)
+    particle_energy_sum => Concrete_Particle_Energy_sum, operator(-)
 use procedures_random, only: random_integer
 
 implicit none
@@ -92,7 +92,7 @@ contains
         call this%inter_visitable_cells%visit(old, overlap, old_energy%inter)
 
         energy_difference = new_energy - old_energy
-        energy_difference_sum = Concrete_Particle_Energy_sum(energy_difference)
+        energy_difference_sum = particle_energy_sum(energy_difference)
         call random_number(rand)
         if (rand < exp(-energy_difference_sum/this%temperature%get())) then
             call this%active_particles%positions%set(new%i, new%position)
