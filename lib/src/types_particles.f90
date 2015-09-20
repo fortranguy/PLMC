@@ -30,8 +30,8 @@ private
         class(Abstract_Particles_Moment_Norm), allocatable :: moment_norm
         class(Abstract_Particles_Positions), allocatable :: positions
         class(Abstract_Particles_Orientations), allocatable :: orientations
-        class(Particles_Dipolar_Moments_Facade), allocatable :: dipolar_moments
-        class(Particles_Total_Moment_Facade), allocatable :: total_moment
+        type(Particles_Dipolar_Moments_Facade) :: dipolar_moments
+        type(Particles_Total_Moment_Facade) :: total_moment
     end type Concrete_Particles
 
 end module types_particles

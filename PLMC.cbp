@@ -58,7 +58,7 @@
 			<Option weight="4" />
 		</Unit>
 		<Unit filename="lib/src/class_one_particle_move.f90">
-			<Option weight="5" />
+			<Option weight="8" />
 		</Unit>
 		<Unit filename="lib/src/class_pair_potential.f90">
 			<Option weight="2" />
@@ -73,7 +73,10 @@
 			<Option weight="3" />
 		</Unit>
 		<Unit filename="lib/src/class_particles_exchange.f90">
-			<Option weight="0" />
+			<Option weight="6" />
+		</Unit>
+		<Unit filename="lib/src/class_particles_factory.f90">
+			<Option weight="6" />
 		</Unit>
 		<Unit filename="lib/src/class_particles_moment_norm.f90">
 			<Option weight="2" />
@@ -106,10 +109,10 @@
 			<Option weight="2" />
 		</Unit>
 		<Unit filename="lib/src/class_visitable_cells.f90">
-			<Option weight="4" />
+			<Option weight="7" />
 		</Unit>
 		<Unit filename="lib/src/class_visitable_list.f90">
-			<Option weight="3" />
+			<Option weight="6" />
 		</Unit>
 		<Unit filename="lib/src/data_constants.f90">
 			<Option weight="0" />
@@ -121,7 +124,7 @@
 			<Option weight="0" />
 		</Unit>
 		<Unit filename="lib/src/module_changes.f90">
-			<Option weight="5" />
+			<Option weight="7" />
 		</Unit>
 		<Unit filename="lib/src/module_data.f90">
 			<Option weight="1" />
@@ -146,9 +149,6 @@
 		</Unit>
 		<Unit filename="lib/src/procedures_parallelepiped_domain.f90">
 			<Option weight="1" />
-		</Unit>
-		<Unit filename="lib/src/procedures_particles_factory.f90">
-			<Option weight="6" />
 		</Unit>
 		<Unit filename="lib/src/procedures_random.f90">
 			<Option weight="0" />
@@ -281,12 +281,12 @@
 		<Unit filename="test/src/test_visitable_cells.f90">
 			<Option compile="0" />
 			<Option link="0" />
-			<Option weight="5" />
+			<Option weight="8" />
 		</Unit>
 		<Unit filename="test/src/test_visitable_list.f90">
 			<Option compile="0" />
 			<Option link="0" />
-			<Option weight="4" />
+			<Option weight="7" />
 		</Unit>
 		<Extensions>
 			<code_completion />

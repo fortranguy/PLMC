@@ -68,37 +68,29 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use data_geometry, only: num_dimensions
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
+use procedures_random, only: random_integer
 use procedures_orientation, only: random_orientation
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box
-use class_particles_number, only: Abstract_Particles_Number, Concrete_Particles_Number
-use class_particles_diameter, only: Abstract_Particles_Diameter, Concrete_Particles_Diameter
-use class_particles_moment_norm, only: Abstract_Particles_Moment_Norm, Concrete_Particles_Moment_Norm
-use class_particles_positions, only: Abstract_Particles_Positions, Concrete_Particles_Positions
-use class_particles_orientations, only: Abstract_Particles_Orientations, Concrete_Particles_Orientations
 use types_particles, only: Concrete_Particle, Concrete_Particles
-use procedures_particles_factory, only: particles_construct, particles_destroy
+use class_particles_factory, only: Abstract_Particles_Factory, &
+    Dipolar_Particles_Factory, Apolar_Particles_Factory
 use class_particles_exchange, only: Particles_Exchange_Facade
 use procedures_particles_exchange_write, only: json_write_particles
 
 implicit none
 
     type(Particles_Exchange_Facade) :: particles_exchange
+    class(Abstract_Particles_Factory), allocatable :: particles_factory
     type(Concrete_Particles) :: particles
     type(Concrete_Particle) :: particle
     class(Abstract_Periodic_Box), allocatable :: periodic_box
-    class(Abstract_Particles_Number), allocatable :: number
-    class(Abstract_Particles_Diameter), allocatable :: diameter
-    class(Abstract_Particles_Moment_Norm), allocatable :: moment_norm
-    class(Abstract_Particles_Positions), allocatable :: positions
-    class(Abstract_Particles_Orientations), allocatable :: orientations
-
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename, data_field
     logical :: data_found
 
     real(DP), allocatable :: box_size(:)
+    logical :: dipolar
     real(DP), dimension(num_dimensions) :: rand_3d
-    real(DP) :: diameter_value, diameter_min_factor, moment_norm_value, rand
     integer :: i_particle
 
     call json_initialize()
@@ -113,66 +105,44 @@ implicit none
     allocate(XYZ_Periodic_Box :: periodic_box)
     call periodic_box%set(box_size)
 
-    call particles_construct(particles, input_data, "Particles 1")
-
-    allocate(Concrete_Particles_Diameter :: diameter)
-    data_field = "Particles.diameter"
-    call input_data%get(data_field, diameter_value, data_found)
+    data_field = "Particles.dipolar"
+    call input_data%get(data_field, dipolar, data_found)
     call test_data_found(data_field, data_found)
-    data_field = "Particles.diameter minimum factor"
-    call input_data%get(data_field, diameter_min_factor, data_found)
-    call test_data_found(data_field, data_found)
-    call diameter%set(diameter_value, diameter_min_factor)
+    if (dipolar) then
+        allocate(Dipolar_Particles_Factory :: particles_factory)
+    else
+        allocate(Apolar_Particles_Factory :: particles_factory)
+    end if
+    call particles_factory%create(particles, periodic_box, input_data, "Particles")
 
-    data_field = "Particles.moment norm"
-    call input_data%get(data_field, moment_norm_value, data_found)
-    call test_data_found(data_field, data_found)
-    allocate(Concrete_Particles_Moment_Norm :: moment_norm)
-    call moment_norm%set(moment_norm_value)
-
-    allocate(Concrete_Particles_Positions :: positions)
-    call positions%construct(periodic_box, number)
-    do i_particle = 1, positions%get_num()
+    do i_particle = 1, particles%number%get()
         call random_number(rand_3d)
-        call positions%set(i_particle, periodic_box%get_size() * rand_3d)
+        call particles%positions%set(i_particle, periodic_box%get_size() * rand_3d)
     end do
 
-    allocate(Concrete_Particles_Orientations :: orientations)
-    call orientations%construct(number)
-    do i_particle = 1, orientations%get_num()
-        call orientations%set(i_particle, random_orientation())
+    do i_particle = 1, particles%number%get()
+        call particles%orientations%set(i_particle, random_orientation())
     end do
 
     call particles_exchange%construct(particles)
     call json_write_particles(particles, "initial.json")
 
-    particle%diameter = diameter%get()
-    particle%min_diameter = diameter%get_min()
-    particle%moment_norm = moment_norm%get()
     call random_number(rand_3d)
     particle%position = periodic_box%get_size() * rand_3d
     particle%orientation = random_orientation()
     call particles_exchange%add(particle)
     call json_write_particles(particles, "added.json")
 
-    call random_number(rand)
-    i_particle = int(real(number%get(), DP) * rand) + 1
+    i_particle = random_integer(particles%number%get())
     write(output_unit, *) "remove index =", i_particle
     call particles_exchange%remove(i_particle)
     call json_write_particles(particles, "removed.json")
 
     call particles_exchange%destroy()
-    call particles_destroy(particles)
-    call orientations%destroy()
-    deallocate(orientations)
-    call positions%destroy()
-    deallocate(positions)
-    deallocate(moment_norm)
-    deallocate(diameter)
-    deallocate(number)
+    call particles_factory%destroy(particles)
+    deallocate(particles_factory)
     deallocate(periodic_box)
     deallocate(data_field)
-
     call input_data%destroy()
 
 end program test_particles_exchange
