@@ -88,6 +88,7 @@ contains
             if (overlap) return !Where?
             call this%actor_visitable_cells%visit(new, overlap, new_energy%intra)
         end if
+        if (overlap) return !Where?
         call this%actor_visitable_cells%visit(old, overlap, old_energy%intra)
         call this%inter_visitable_cells%visit(old, overlap, old_energy%inter)
 
