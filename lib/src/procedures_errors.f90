@@ -5,7 +5,7 @@ use, intrinsic :: iso_fortran_env, only: error_unit
 implicit none
 
 private
-public warning_continue, error_exit
+public :: warning_continue, error_exit
 
 contains
 
@@ -17,7 +17,7 @@ contains
 
     subroutine error_exit(message)
         character(len=*), intent(in) :: message
-        
+
         write(error_unit, *) "Fatal Error: ", message
         error stop
     end subroutine error_exit

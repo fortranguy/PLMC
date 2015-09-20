@@ -7,7 +7,7 @@ implicit none
 
 private
 
-public random_orientation, markov_orientation
+public :: random_orientation, markov_orientation
 
     real(DP), parameter :: sigma3d = 1._DP / sqrt(3._DP)
 

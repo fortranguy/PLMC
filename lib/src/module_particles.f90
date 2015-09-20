@@ -11,13 +11,16 @@ use class_orientations, only: Abstract_Orientations
 implicit none
 
 private
-public Concrete_Particles_construct, Concrete_Particles_destroy
+public :: Concrete_Particles_construct, Concrete_Particles_destroy
 
     type, public :: Concrete_Particle
-        logical :: same_type
-        integer :: i
-        real(DP) :: diameter, min_diameter, moment_norm
-        real(DP), dimension(num_dimensions) :: position, orientation
+        logical :: same_type = .false.
+        integer :: i = 0
+        real(DP) :: diameter = 0._DP
+        real(DP) :: min_diameter = 0._DP
+        real(DP) :: moment_norm = 0._DP
+        real(DP) :: position(num_dimensions) = 0._DP
+        real(DP) :: orientation(num_dimensions) = 0._DP
     end type Concrete_Particle
 
     type, public :: Concrete_Particles

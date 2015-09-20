@@ -6,7 +6,7 @@ use data_geometry, only: num_dimensions
 implicit none
 
 private
-public deallocate_list, increase_nodes_size
+public :: deallocate_list, increase_nodes_size
 
     integer, parameter :: increase_factor = 2
 

@@ -7,7 +7,7 @@ use class_particles_exchange, only: Particles_Exchange_Facade
 implicit none
 
 private
-public Concrete_Changes_construct, Concrete_Changes_destroy
+public :: Concrete_Changes_construct, Concrete_Changes_destroy
 
     type, public :: Concrete_Changes
         class(Abstract_Moved_Positions), pointer :: moved_positions

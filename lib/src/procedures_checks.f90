@@ -8,7 +8,7 @@ use procedures_errors, only: warning_continue, error_exit
 implicit none
 
 private
-public check_in_range, check_3d_array, check_positive, check_norm, check_adaptation_factor
+public :: check_in_range, check_3d_array, check_positive, check_norm, check_adaptation_factor
 
 interface check_3d_array
     module procedure check_integer_3d_array

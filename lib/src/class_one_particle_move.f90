@@ -5,7 +5,8 @@ use class_temperature, only: Abstract_Temperature
 use module_particles, only: Concrete_Particle, Concrete_Particles
 use class_moved_positions, only: Abstract_Moved_Positions
 use class_visitable_cells, only: Abstract_Visitable_Cells
-use types_metropolis_algorithms, only: Concrete_Particle_Energy
+use module_particle_energy, only: Concrete_Particle_Energy, &
+    Concrete_Particle_Energy_sum, operator(-)
 use procedures_random, only: random_integer
 
 implicit none
@@ -69,6 +70,7 @@ contains
 
         type(Concrete_Particle) :: old, new
         type(Concrete_Particle_Energy) :: new_energy, old_energy
+        real(DP) :: energy_difference_sum
         logical :: overlap
         real(DP) :: rand
 
@@ -86,16 +88,13 @@ contains
             if (overlap) return !Where?
             call this%active_visitable_cells%visit(new, overlap, new_energy%intra)
         end if
-
         call this%active_visitable_cells%visit(old, overlap, old_energy%intra)
         call this%inter_visitable_cells%visit(old, overlap, old_energy%inter)
 
-        energy_difference%intra = new_energy%intra - old_energy%intra
-        energy_difference%inter = new_energy%inter - old_energy%inter
-        energy_difference%sum = energy_difference%intra + energy_difference%inter
-
+        energy_difference = new_energy - old_energy
+        energy_difference_sum = Concrete_Particle_Energy_sum(energy_difference)
         call random_number(rand)
-        if (rand < exp(-energy_difference%sum/this%temperature%get())) then
+        if (rand < exp(-energy_difference_sum/this%temperature%get())) then
             call this%active_particles%positions%set(new%i, new%position)
             call this%active_visitable_cells%move(old, new)
             call this%inter_visitable_cells%move(old, new)

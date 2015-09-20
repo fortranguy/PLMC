@@ -5,7 +5,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 implicit none
 
 private
-public increase_coordinates_size
+public :: increase_coordinates_size
 
     integer, parameter :: increase_factor = 2
 

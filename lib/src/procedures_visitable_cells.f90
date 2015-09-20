@@ -5,7 +5,7 @@ use data_geometry, only: num_dimensions
 implicit none
 
 private
-public pbc_3d_index, local_reindex
+public :: pbc_3d_index, local_reindex
 
 contains
 
