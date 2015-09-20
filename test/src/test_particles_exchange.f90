@@ -68,8 +68,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use data_geometry, only: num_dimensions
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
-use procedures_random, only: random_integer
-use procedures_orientation, only: random_orientation
+use procedures_random, only: random_integer, random_orientation
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box
 use types_particles, only: Concrete_Particle, Concrete_Particles
 use class_particles_factory, only: Abstract_Particles_Factory, &
@@ -114,15 +113,6 @@ implicit none
         allocate(Apolar_Particles_Factory :: particles_factory)
     end if
     call particles_factory%create(particles, periodic_box, input_data, "Particles")
-
-    do i_particle = 1, particles%number%get()
-        call random_number(rand_3d)
-        call particles%positions%set(i_particle, periodic_box%get_size() * rand_3d)
-    end do
-
-    do i_particle = 1, particles%number%get()
-        call particles%orientations%set(i_particle, random_orientation())
-    end do
 
     call particles_exchange%construct(particles)
     call json_write_particles(particles, "initial.json")

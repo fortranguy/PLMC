@@ -104,7 +104,8 @@ contains
         call this%construct_visitable_lists(periodic_box)
 
         call this%set_skip_layers()
-        allocate(this%neighbours(3, nums_local_cells(1), nums_local_cells(2), nums_local_cells(3), &
+        allocate(this%neighbours(3, nums_local_cells(1), nums_local_cells(2), &
+                                    nums_local_cells(3), &
                                     this%global_lbounds(1):this%global_ubounds(1), &
                                     this%global_lbounds(2):this%global_ubounds(2), &
                                     this%global_lbounds(3):this%global_ubounds(3)))

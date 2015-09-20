@@ -13,38 +13,38 @@ implicit none
 
 private
 
-    type, abstract, public :: Abstract_One_Particle_Move
+    type, public :: Metropolis_One_Particle_Move
     private
         class(Abstract_Temperature), pointer :: temperature
         type(Concrete_Particles), pointer :: actor_particles, spectator_particles
         class(Abstract_Moved_Particles_Positions), pointer :: moved_positions
         class(Abstract_Visitable_Cells), pointer :: actor_visitable_cells, inter_visitable_cells
     contains
-        procedure :: construct => Abstract_One_Particle_Move_construct
-        procedure :: destroy => Abstract_One_Particle_Move_destroy
-        procedure :: set_actor => Abstract_One_Particle_Move_set_actor
-        procedure :: set_spectator => Abstract_One_Particle_Move_set_spectator
-        procedure :: try => Abstract_One_Particle_Move_try
-    end type Abstract_One_Particle_Move
+        procedure :: construct => Metropolis_One_Particle_Move_construct
+        procedure :: destroy => Metropolis_One_Particle_Move_destroy
+        procedure :: set_actor => Metropolis_One_Particle_Move_set_actor
+        procedure :: set_spectator => Metropolis_One_Particle_Move_set_spectator
+        procedure :: try => Metropolis_One_Particle_Move_try
+    end type Metropolis_One_Particle_Move
 
 contains
 
-    subroutine Abstract_One_Particle_Move_construct(this, temperature)
-        class(Abstract_One_Particle_Move), intent(out) :: this
+    subroutine Metropolis_One_Particle_Move_construct(this, temperature)
+        class(Metropolis_One_Particle_Move), intent(out) :: this
         class(Abstract_Temperature), target, intent(in) :: temperature
 
         this%temperature => temperature
-    end subroutine Abstract_One_Particle_Move_construct
+    end subroutine Metropolis_One_Particle_Move_construct
 
-    subroutine Abstract_One_Particle_Move_destroy(this)
-        class(Abstract_One_Particle_Move), intent(inout) :: this
+    subroutine Metropolis_One_Particle_Move_destroy(this)
+        class(Metropolis_One_Particle_Move), intent(inout) :: this
 
         this%temperature => null()
-    end subroutine Abstract_One_Particle_Move_destroy
+    end subroutine Metropolis_One_Particle_Move_destroy
 
-    subroutine Abstract_One_Particle_Move_set_actor(this, particles, moved_positions, &
+    subroutine Metropolis_One_Particle_Move_set_actor(this, particles, moved_positions, &
             visitable_cells)
-        class(Abstract_One_Particle_Move), intent(inout) :: this
+        class(Metropolis_One_Particle_Move), intent(inout) :: this
         type(Concrete_Particles), target, intent(in) :: particles
         class(Abstract_Moved_Particles_Positions), target, intent(in) :: moved_positions
         class(Abstract_Visitable_Cells), target, intent(in) :: visitable_cells
@@ -52,19 +52,19 @@ contains
         this%actor_particles => particles
         this%moved_positions => moved_positions
         this%actor_visitable_cells => visitable_cells
-    end subroutine Abstract_One_Particle_Move_set_actor
+    end subroutine Metropolis_One_Particle_Move_set_actor
 
-    subroutine Abstract_One_Particle_Move_set_spectator(this, particles, inter_visitable_cells)
-        class(Abstract_One_Particle_Move), intent(inout) :: this
+    subroutine Metropolis_One_Particle_Move_set_spectator(this, particles, inter_visitable_cells)
+        class(Metropolis_One_Particle_Move), intent(inout) :: this
         type(Concrete_Particles), target, intent(in) :: particles
         class(Abstract_Visitable_Cells), target, intent(in) :: inter_visitable_cells
 
         this%spectator_particles => particles
         this%inter_visitable_cells => inter_visitable_cells
-    end subroutine Abstract_One_Particle_Move_set_spectator
+    end subroutine Metropolis_One_Particle_Move_set_spectator
 
-    subroutine Abstract_One_Particle_Move_try(this, success, energy_difference)
-        class(Abstract_One_Particle_Move), intent(in) :: this
+    subroutine Metropolis_One_Particle_Move_try(this, success, energy_difference)
+        class(Metropolis_One_Particle_Move), intent(in) :: this
         logical, intent(out) :: success
         type(Concrete_Particle_Energy), intent(out) :: energy_difference
 
@@ -101,6 +101,6 @@ contains
             call this%inter_visitable_cells%move(old, new)
             success = .true.
         end if
-    end subroutine Abstract_One_Particle_Move_try
+    end subroutine Metropolis_One_Particle_Move_try
 
 end module class_one_particle_move

@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_geometry, only: num_dimensions
 use procedures_checks, only: check_positive, check_adaptation_factor
 use class_particles_orientations, only: Abstract_Particles_Orientations
-use procedures_orientation, only: markov_orientation
+use procedures_random, only: markov_orientation
 
 implicit none
 

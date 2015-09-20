@@ -3,6 +3,7 @@ module class_particles_factory
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
 use module_data, only: test_data_found
+use procedures_coordinates, only: read_coordinates
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_particles_number, only: Abstract_Particles_Number, &
     Concrete_Particles_Number
@@ -33,8 +34,11 @@ private
             Abstract_Particles_Factory_allocate_moment_norm
         procedure, nopass, private :: allocate_positions => &
             Abstract_Particles_Factory_allocate_positions
+        procedure, nopass, private :: set_positions => Abstract_Particles_Factory_set_positions
         procedure, nopass, private :: allocate_orientations => &
             Abstract_Particles_Factory_allocate_orientations
+        procedure, nopass, private :: set_orientations => &
+            Abstract_Particles_Factory_set_orientations
         procedure, nopass :: destroy => Abstract_Particles_Factory_destroy
     end type Abstract_Particles_Factory
 
@@ -68,8 +72,10 @@ contains
         call this%allocate_moment_norm(particles, input_data, prefix)
         call this%allocate_positions(particles)
         call particles%positions%construct(periodic_box, particles%number)
+        call this%set_positions(particles, input_data, prefix)
         call this%allocate_orientations(particles)
         call particles%orientations%construct(particles%number)
+        call this%set_orientations(particles, input_data, prefix)
         call particles%dipolar_moments%construct(particles%moment_norm, particles%orientations)
         call particles%total_moment%construct(particles%dipolar_moments)
     end subroutine Abstract_Particles_Factory_create
@@ -135,11 +141,55 @@ contains
         allocate(Concrete_Particles_Positions :: particles%positions)
     end subroutine Abstract_Particles_Factory_allocate_positions
 
+    subroutine Abstract_Particles_Factory_set_positions(particles, input_data, prefix)
+        type(Concrete_Particles), intent(inout) :: particles
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
+
+        character(len=:), allocatable :: data_field, filename
+        logical :: data_found
+        real(DP), allocatable :: positions(:, :)
+        integer :: i_particle
+
+        data_field = prefix//".initial positions"
+        call input_data%get(data_field, filename, data_found)
+        call test_data_found(data_field, data_found)
+        call read_coordinates(positions, particles%positions%get_num(), filename)
+        do i_particle = 1, particles%positions%get_num()
+            call particles%positions%set(i_particle, positions(:, i_particle))
+        end do
+        if (allocated(positions)) deallocate(positions)
+        deallocate(filename)
+        deallocate(data_field)
+    end subroutine Abstract_Particles_Factory_set_positions
+
     subroutine Abstract_Particles_Factory_allocate_orientations(particles)
         type(Concrete_Particles), intent(inout) :: particles
 
         allocate(Concrete_Particles_Orientations :: particles%orientations)
     end subroutine Abstract_Particles_Factory_allocate_orientations
+
+    subroutine Abstract_Particles_Factory_set_orientations(particles, input_data, prefix)
+        type(Concrete_Particles), intent(inout) :: particles
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
+
+        character(len=:), allocatable :: data_field, filename
+        logical :: data_found
+        real(DP), allocatable :: orientations(:, :)
+        integer :: i_particle
+
+        data_field = prefix//".initial orientations"
+        call input_data%get(data_field, filename, data_found)
+        call test_data_found(data_field, data_found)
+        call read_coordinates(orientations, particles%orientations%get_num(), filename)
+        do i_particle = 1, particles%orientations%get_num()
+            call particles%orientations%set(i_particle, orientations(:, i_particle))
+        end do
+        if (allocated(orientations)) deallocate(orientations)
+        deallocate(filename)
+        deallocate(data_field)
+    end subroutine Abstract_Particles_Factory_set_orientations
 
     subroutine Abstract_Particles_Factory_destroy(particles)
         type(Concrete_Particles), intent(inout) :: particles
