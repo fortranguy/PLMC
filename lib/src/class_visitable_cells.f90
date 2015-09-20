@@ -33,6 +33,7 @@ private
     contains
         procedure :: construct => Abstract_Visitable_Cells_construct
         procedure :: destroy => Abstract_Visitable_Cells_destroy
+        procedure :: fill => Abstract_Visitable_Cells_fill
         procedure :: visit => Abstract_Visitable_Cells_visit
         procedure :: move => Abstract_Visitable_Cells_move
         procedure :: add => Abstract_Visitable_Cells_add
@@ -44,7 +45,6 @@ private
         procedure, private :: construct_visitable_lists => &
             Abstract_Visitable_Cells_construct_visitable_lists
         procedure, private :: set_neighbours => Abstract_Visitable_Cells_set_neighbours
-        procedure, private :: fill => Abstract_Visitable_Cells_fill
         procedure, private :: index => Abstract_Visitable_Cells_index
         procedure(Abstract_Visitable_Cells_set_skip_layers), private, deferred :: set_skip_layers
         procedure, private :: skip_local => Abstract_Visitable_Cells_skip_local
@@ -91,6 +91,7 @@ contains
         class(Abstract_Pair_Potential), target, intent(in) :: pair_potential
 
         this%periodic_box => periodic_box
+        this%positions => positions
         this%pair_potential => pair_potential
         call this%set_nums()
         call this%set_division()
@@ -108,9 +109,6 @@ contains
                                     this%global_lbounds(2):this%global_ubounds(2), &
                                     this%global_lbounds(3):this%global_ubounds(3)))
         call this%set_neighbours()
-
-        this%positions => positions
-        call this%fill()
     end subroutine Abstract_Visitable_Cells_construct
 
     subroutine Abstract_Visitable_Cells_set_nums(this)

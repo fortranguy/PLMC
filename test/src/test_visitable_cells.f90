@@ -195,6 +195,7 @@ implicit none
     end select
 
     call visitable_cells%construct(visitable_list, periodic_box, positions, pair_potential)
+    call visitable_cells%fill()
 
     call sum_energy(positions, visitable_cells, overlap, energy)
     if (overlap) then

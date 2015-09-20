@@ -42,9 +42,6 @@
 		<Unit filename="lib/src/class_box_potential.f90">
 			<Option weight="5" />
 		</Unit>
-		<Unit filename="lib/src/class_cells_potential.f90">
-			<Option weight="7" />
-		</Unit>
 		<Unit filename="lib/src/class_chemical_potential.f90">
 			<Option weight="2" />
 		</Unit>
@@ -72,6 +69,7 @@
 		<Unit filename="lib/src/class_number.f90">
 			<Option weight="1" />
 		</Unit>
+		<Unit filename="lib/src/class_one_particle_move.f90" />
 		<Unit filename="lib/src/class_orientations.f90">
 			<Option weight="2" />
 		</Unit>
@@ -120,12 +118,14 @@
 		<Unit filename="lib/src/data_precisions.f90">
 			<Option weight="0" />
 		</Unit>
+		<Unit filename="lib/src/module_changes.f90" />
 		<Unit filename="lib/src/module_data.f90">
 			<Option weight="1" />
 		</Unit>
 		<Unit filename="lib/src/module_nodes.f90">
 			<Option weight="1" />
 		</Unit>
+		<Unit filename="lib/src/module_particle_energy.f90" />
 		<Unit filename="lib/src/module_particles.f90">
 			<Option weight="4" />
 		</Unit>
@@ -144,6 +144,7 @@
 		<Unit filename="lib/src/procedures_parallelepiped_domain.f90">
 			<Option weight="1" />
 		</Unit>
+		<Unit filename="lib/src/procedures_random.f90" />
 		<Unit filename="lib/src/procedures_visitable_cells.f90">
 			<Option weight="0" />
 		</Unit>
@@ -160,11 +161,6 @@
 			<Option compile="0" />
 			<Option link="0" />
 			<Option weight="6" />
-		</Unit>
-		<Unit filename="test/src/test_cells_potential.f90">
-			<Option compile="0" />
-			<Option link="0" />
-			<Option weight="8" />
 		</Unit>
 		<Unit filename="test/src/test_chemical_potential.f90">
 			<Option compile="0" />
