@@ -6,7 +6,7 @@ use data_geometry, only: num_dimensions
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_positive
 use class_periodic_box, only: Abstract_Periodic_Box
-use class_positions, only: Abstract_Positions
+use class_particles_positions, only: Abstract_Particles_Positions
 use module_particles, only: Concrete_Particle
 use class_visitable_list, only: Abstract_Visitable_List
 use procedures_visitable_cells, only: pbc_3d_index, local_reindex
@@ -27,7 +27,7 @@ private
         logical :: skip_top_layer(nums_local_cells(1), nums_local_cells(2), nums_local_cells(3))
         class(Abstract_Visitable_List), allocatable :: visitable_lists(:, :, :)
         integer, allocatable :: neighbours(:, :, :, :, :, :, :)
-        class(Abstract_Positions), pointer :: positions
+        class(Abstract_Particles_Positions), pointer :: positions
         class(Abstract_Periodic_Box), pointer :: periodic_box
         class(Abstract_Pair_Potential), pointer :: pair_potential
     contains
@@ -87,7 +87,7 @@ contains
         class(Abstract_Visitable_Cells), intent(out) :: this
         class(Abstract_Visitable_List), intent(in) :: mold
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Positions), target, intent(in) :: positions
+        class(Abstract_Particles_Positions), target, intent(in) :: positions
         class(Abstract_Pair_Potential), target, intent(in) :: pair_potential
 
         this%periodic_box => periodic_box

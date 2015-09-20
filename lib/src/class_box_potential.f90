@@ -2,7 +2,7 @@ module class_box_potential
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use class_periodic_box, only: Abstract_Periodic_Box
-use class_positions, only: Abstract_Positions
+use class_particles_positions, only: Abstract_Particles_Positions
 use module_particles, only: Concrete_Particle
 use class_pair_potential, only: Abstract_Pair_Potential
 
@@ -13,7 +13,7 @@ private
     type, public :: Box_Potential_Facade
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box
-        class(Abstract_Positions), pointer :: positions
+        class(Abstract_Particles_Positions), pointer :: positions
         class(Abstract_Pair_Potential), pointer :: pair_potential
     contains
         procedure :: construct => Box_Potential_Facade_construct
@@ -43,7 +43,7 @@ contains
 
     subroutine Box_Potential_Facade_set_positions(this, positions)
         class(Box_Potential_Facade), intent(inout) :: this
-        class(Abstract_Positions), target, intent(in) :: positions
+        class(Abstract_Particles_Positions), target, intent(in) :: positions
 
         this%positions => positions
     end subroutine Box_Potential_Facade_set_positions

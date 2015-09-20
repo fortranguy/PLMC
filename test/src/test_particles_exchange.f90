@@ -99,7 +99,7 @@ implicit none
     real(DP), allocatable :: box_size(:)
     real(DP), dimension(num_dimensions) :: rand_3d
     real(DP) :: diameter_value, diameter_min_factor, moment_norm_value, rand
-    integer :: num_particles, i_particle
+    , i_particle
 
     call json_initialize()
     data_filename = "particles_exchange.json"
@@ -112,12 +112,6 @@ implicit none
     call test_data_found(data_field, data_found)
     allocate(XYZ_Periodic_Box :: periodic_box)
     call periodic_box%set(box_size)
-
-    data_field = "Particles.number"
-    call input_data%get(data_field, num_particles, data_found)
-    call test_data_found(data_field, data_found)
-    allocate(Concrete_Number :: number)
-    call number%set(num_particles)
 
     allocate(Concrete_Diameter :: diameter)
     data_field = "Particles.diameter"

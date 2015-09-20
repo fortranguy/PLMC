@@ -3,7 +3,7 @@ module class_one_particle_move
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use class_temperature, only: Abstract_Temperature
 use module_particles, only: Concrete_Particle, Concrete_Particles
-use class_moved_positions, only: Abstract_Moved_Positions
+use class_moved_particles_positions, only: Abstract_Moved_Particles_Positions
 use class_visitable_cells, only: Abstract_Visitable_Cells
 use module_particle_energy, only: Concrete_Particle_Energy, &
     particle_energy_sum => Concrete_Particle_Energy_sum, operator(-)
@@ -17,7 +17,7 @@ private
     private
         class(Abstract_Temperature), pointer :: temperature
         type(Concrete_Particles), pointer :: actor_particles, spectator_particles
-        class(Abstract_Moved_Positions), pointer :: moved_positions
+        class(Abstract_Moved_Particles_Positions), pointer :: moved_positions
         class(Abstract_Visitable_Cells), pointer :: actor_visitable_cells, inter_visitable_cells
     contains
         procedure :: construct => Abstract_One_Particle_Move_construct
@@ -46,7 +46,7 @@ contains
             visitable_cells)
         class(Abstract_One_Particle_Move), intent(inout) :: this
         type(Concrete_Particles), target, intent(in) :: particles
-        class(Abstract_Moved_Positions), target, intent(in) :: moved_positions
+        class(Abstract_Moved_Particles_Positions), target, intent(in) :: moved_positions
         class(Abstract_Visitable_Cells), target, intent(in) :: visitable_cells
 
         this%actor_particles => particles

@@ -2,11 +2,15 @@ module module_particles
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_geometry, only: num_dimensions
-use class_number, only: Abstract_Number
-use class_diameter, only: Abstract_Diameter
-use class_moment_norm, only: Abstract_Moment_Norm
-use class_positions, only: Abstract_Positions
-use class_orientations, only: Abstract_Orientations
+use json_module, only: json_file
+use module_data, only: test_data_found
+use class_particles_number, only: Abstract_Particles_Number, Concrete_Particles_Number
+use class_particles_diameter, only: Abstract_Particles_Diameter
+use class_particles_moment_norm, only: Abstract_Particles_Moment_Norm
+use class_particles_positions, only: Abstract_Particles_Positions
+use class_particles_orientations, only: Abstract_Particles_Orientations
+use class_particles_dipolar_moments, only: Particles_Dipolar_Moments_Facade
+use class_particles_total_moment, only: Particles_Total_Moment_Facade
 
 implicit none
 
@@ -24,40 +28,55 @@ public :: Concrete_Particles_construct, Concrete_Particles_destroy
     end type Concrete_Particle
 
     type, public :: Concrete_Particles
-        class(Abstract_Number), pointer :: number
-        class(Abstract_Diameter), pointer :: diameter
-        class(Abstract_Moment_Norm), pointer :: moment_norm
-        class(Abstract_Positions), pointer :: positions
-        class(Abstract_Orientations), pointer :: orientations
+        class(Abstract_Particles_Number), allocatable :: number
+        class(Abstract_Particles_Diameter), allocatable :: diameter
+        class(Abstract_Particles_Moment_Norm), allocatable :: moment_norm
+        class(Abstract_Particles_Positions), allocatable :: positions
+        class(Abstract_Particles_Orientations), allocatable :: orientations
+        class(Particles_Dipolar_Moments_Facade), allocatable :: dipolar_moments
+        class(Particles_Total_Moment_Facade), allocatable :: total_moment
     end type Concrete_Particles
 
 contains
 
-    subroutine Concrete_Particles_construct(particles, number, &
-                                           diameter, moment_norm, &
-                                           positions, orientations)
+    subroutine Concrete_Particles_construct(particles, input_data, prefix)
         type(Concrete_Particles), intent(out) :: particles
-        class(Abstract_Number), target, intent(in) :: number
-        class(Abstract_Diameter), target, intent(in) :: diameter
-        class(Abstract_Moment_Norm), target, intent(in) :: moment_norm
-        class(Abstract_Positions), target, intent(in) :: positions
-        class(Abstract_Orientations), target, intent(in) :: orientations
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
 
-        particles%number => number
-        particles%diameter => diameter
-        particles%moment_norm => moment_norm
-        particles%positions => positions
-        particles%orientations => orientations
+        !particles%number => number
+        call set_number(particles, input_data, prefix)
+        !particles%diameter => diameter
+        !particles%moment_norm => moment_norm
+        !particles%positions => positions
+        !particles%orientations => orientations
     end subroutine Concrete_Particles_construct
 
     subroutine Concrete_Particles_destroy(particles)
         type(Concrete_Particles), intent(inout) :: particles
 
-        particles%orientations => null()
-        particles%positions => null()
-        particles%moment_norm => null()
-        particles%diameter => null()
-        particles%number => null()
+        !particles%orientations
+        !particles%positions
+        !particles%moment_norm
+        !particles%diameter
+        !particles%number
     end subroutine Concrete_Particles_destroy
+
+    subroutine set_number(particles, input_data, prefix)
+        type(Concrete_Particles), intent(inout) :: particles
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
+
+        character(len=:), allocatable :: data_field
+        logical :: data_found
+        integer :: num_particles
+
+        data_field = prefix//".number"
+        call input_data%get(data_field, num_particles, data_found)
+        call test_data_found(data_field, data_found)
+        allocate(Concrete_Particles_Number :: particles%number)
+        call particles%number%set(num_particles)
+        deallocate(data_field)
+    end subroutine set_number
 
 end module module_particles
