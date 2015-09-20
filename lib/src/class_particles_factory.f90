@@ -17,7 +17,7 @@ use class_particles_orientations, only: Abstract_Particles_Orientations, &
     Concrete_Particles_Orientations, Null_Particles_Orientations
 use class_particles_dipolar_moments, only: Particles_Dipolar_Moments_Facade
 use class_particles_total_moment, only: Particles_Total_Moment_Facade
-use types_particles, only: Concrete_Particles
+use types_particles, only: Particles_Wrapper
 
 implicit none
 
@@ -62,7 +62,7 @@ contains
     subroutine Abstract_Particles_Factory_create(this, particles, periodic_box, input_data, &
         prefix)
         class(Abstract_Particles_Factory), intent(in) :: this
-        type(Concrete_Particles), intent(out) :: particles
+        type(Particles_Wrapper), intent(out) :: particles
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
@@ -81,7 +81,7 @@ contains
     end subroutine Abstract_Particles_Factory_create
 
     subroutine Abstract_Particles_Factory_allocate_number(particles, input_data, prefix)
-        type(Concrete_Particles), intent(inout) :: particles
+        type(Particles_Wrapper), intent(inout) :: particles
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -98,7 +98,7 @@ contains
     end subroutine Abstract_Particles_Factory_allocate_number
 
     subroutine Abstract_Particles_Factory_allocate_diameter(particles, input_data, prefix)
-        type(Concrete_Particles), intent(inout) :: particles
+        type(Particles_Wrapper), intent(inout) :: particles
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -119,7 +119,7 @@ contains
 
     subroutine Abstract_Particles_Factory_allocate_moment_norm(particles, input_data, &
         prefix)
-        type(Concrete_Particles), intent(inout) :: particles
+        type(Particles_Wrapper), intent(inout) :: particles
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -136,13 +136,13 @@ contains
     end subroutine Abstract_Particles_Factory_allocate_moment_norm
 
     subroutine Abstract_Particles_Factory_allocate_positions(particles)
-        type(Concrete_Particles), intent(inout) :: particles
+        type(Particles_Wrapper), intent(inout) :: particles
 
         allocate(Concrete_Particles_Positions :: particles%positions)
     end subroutine Abstract_Particles_Factory_allocate_positions
 
     subroutine Abstract_Particles_Factory_set_positions(particles, input_data, prefix)
-        type(Concrete_Particles), intent(inout) :: particles
+        type(Particles_Wrapper), intent(inout) :: particles
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -164,13 +164,13 @@ contains
     end subroutine Abstract_Particles_Factory_set_positions
 
     subroutine Abstract_Particles_Factory_allocate_orientations(particles)
-        type(Concrete_Particles), intent(inout) :: particles
+        type(Particles_Wrapper), intent(inout) :: particles
 
         allocate(Concrete_Particles_Orientations :: particles%orientations)
     end subroutine Abstract_Particles_Factory_allocate_orientations
 
     subroutine Abstract_Particles_Factory_set_orientations(particles, input_data, prefix)
-        type(Concrete_Particles), intent(inout) :: particles
+        type(Particles_Wrapper), intent(inout) :: particles
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -192,7 +192,7 @@ contains
     end subroutine Abstract_Particles_Factory_set_orientations
 
     subroutine Abstract_Particles_Factory_destroy(particles)
-        type(Concrete_Particles), intent(inout) :: particles
+        type(Particles_Wrapper), intent(inout) :: particles
 
         if (allocated(particles%orientations)) deallocate(particles%orientations)
         if (allocated(particles%positions)) deallocate(particles%positions)
@@ -207,7 +207,7 @@ contains
 
     subroutine Apolar_Particles_Factory_allocate_moment_norm(particles, input_data, &
         prefix)
-        type(Concrete_Particles), intent(inout) :: particles
+        type(Particles_Wrapper), intent(inout) :: particles
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -215,7 +215,7 @@ contains
     end subroutine Apolar_Particles_Factory_allocate_moment_norm
 
     subroutine Apolar_Particles_Factory_allocate_orientations(particles)
-        type(Concrete_Particles), intent(inout) :: particles
+        type(Particles_Wrapper), intent(inout) :: particles
 
         allocate(Null_Particles_Orientations :: particles%orientations)
     end subroutine Apolar_Particles_Factory_allocate_orientations

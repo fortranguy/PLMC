@@ -2,7 +2,8 @@ module class_one_particle_move
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use class_temperature, only: Abstract_Temperature
-use types_particles, only: Concrete_Particle, Concrete_Particles
+use types_particle, only: Concrete_Particle
+use types_particles, only: Particles_Wrapper
 use class_moved_particles_positions, only: Abstract_Moved_Particles_Positions
 use class_visitable_cells, only: Abstract_Visitable_Cells
 use module_particle_energy, only: Concrete_Particle_Energy, &
@@ -16,7 +17,7 @@ private
     type, public :: Metropolis_One_Particle_Move
     private
         class(Abstract_Temperature), pointer :: temperature
-        type(Concrete_Particles), pointer :: actor_particles, spectator_particles
+        type(Particles_Wrapper), pointer :: actor_particles, spectator_particles
         class(Abstract_Moved_Particles_Positions), pointer :: moved_positions
         class(Abstract_Visitable_Cells), pointer :: actor_visitable_cells, inter_visitable_cells
     contains
@@ -45,7 +46,7 @@ contains
     subroutine Metropolis_One_Particle_Move_set_actor(this, particles, moved_positions, &
             visitable_cells)
         class(Metropolis_One_Particle_Move), intent(inout) :: this
-        type(Concrete_Particles), target, intent(in) :: particles
+        type(Particles_Wrapper), target, intent(in) :: particles
         class(Abstract_Moved_Particles_Positions), target, intent(in) :: moved_positions
         class(Abstract_Visitable_Cells), target, intent(in) :: visitable_cells
 
@@ -56,7 +57,7 @@ contains
 
     subroutine Metropolis_One_Particle_Move_set_spectator(this, particles, inter_visitable_cells)
         class(Metropolis_One_Particle_Move), intent(inout) :: this
-        type(Concrete_Particles), target, intent(in) :: particles
+        type(Particles_Wrapper), target, intent(in) :: particles
         class(Abstract_Visitable_Cells), target, intent(in) :: inter_visitable_cells
 
         this%spectator_particles => particles

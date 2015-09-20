@@ -16,7 +16,7 @@ module procedures_particles_exchange_write
 
 use json_module, only: json_create_object, json_add, json_print, json_destroy
 use types_json_wrapper, only: JSON_Value_Pointer
-use types_particles, only: Concrete_Particles
+use types_particles, only: Particles_Wrapper
 
 implicit none
 
@@ -26,7 +26,7 @@ public json_write_particles
 contains
 
     subroutine json_write_particles(particles, output_filename)
-        type(Concrete_Particles), intent(in) :: particles
+        type(Particles_Wrapper), intent(in) :: particles
         character(len=*), intent(in) :: output_filename
 
         type(JSON_Value_Pointer) :: output_data
@@ -70,7 +70,8 @@ use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
 use procedures_random, only: random_integer, random_orientation
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box
-use types_particles, only: Concrete_Particle, Concrete_Particles
+use types_particle, only: Concrete_Particle
+use types_particles, only: Particles_Wrapper
 use class_particles_factory, only: Abstract_Particles_Factory, &
     Dipolar_Particles_Factory, Apolar_Particles_Factory
 use class_particles_exchange, only: Particles_Exchange_Facade
@@ -80,7 +81,7 @@ implicit none
 
     type(Particles_Exchange_Facade) :: particles_exchange
     class(Abstract_Particles_Factory), allocatable :: particles_factory
-    type(Concrete_Particles) :: particles
+    type(Particles_Wrapper) :: particles
     type(Concrete_Particle) :: particle
     class(Abstract_Periodic_Box), allocatable :: periodic_box
     type(json_file) :: input_data

@@ -3,7 +3,7 @@ module class_box_potential
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_particles_positions, only: Abstract_Particles_Positions
-use types_particles, only: Concrete_Particle
+use types_particle, only: Concrete_Particle
 use class_pair_potential, only: Abstract_Pair_Potential
 
 implicit none

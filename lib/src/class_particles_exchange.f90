@@ -1,6 +1,7 @@
 module class_particles_exchange
 
-use types_particles, only: Concrete_Particle, Concrete_Particles
+use types_particle, only: Concrete_Particle
+use types_particles, only: Particles_Wrapper
 
 implicit none
 
@@ -8,7 +9,7 @@ private
 
     type, public :: Particles_Exchange_Facade
     private
-        type(Concrete_Particles), pointer :: particles
+        type(Particles_Wrapper), pointer :: particles
     contains
         procedure :: construct => Particles_Exchange_Facade_construct
         procedure :: destroy => Particles_Exchange_Facade_destroy
@@ -20,7 +21,7 @@ contains
 
     subroutine Particles_Exchange_Facade_construct(this, particles)
         class(Particles_Exchange_Facade), intent(out) :: this
-        type(Concrete_Particles), target, intent(in) :: particles
+        type(Particles_Wrapper), target, intent(in) :: particles
 
         this%particles => particles
     end subroutine Particles_Exchange_Facade_construct

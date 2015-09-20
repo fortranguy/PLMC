@@ -14,17 +14,7 @@ implicit none
 
 private
 
-    type, public :: Concrete_Particle
-        logical :: same_type = .false.
-        integer :: i = 0
-        real(DP) :: diameter = 0._DP
-        real(DP) :: min_diameter = 0._DP
-        real(DP) :: moment_norm = 0._DP
-        real(DP) :: position(num_dimensions) = 0._DP
-        real(DP) :: orientation(num_dimensions) = 0._DP
-    end type Concrete_Particle
-
-    type, public :: Concrete_Particles
+    type, public :: Particles_Wrapper
         class(Abstract_Particles_Number), allocatable :: number
         class(Abstract_Particles_Diameter), allocatable :: diameter
         class(Abstract_Particles_Moment_Norm), allocatable :: moment_norm
@@ -32,6 +22,6 @@ private
         class(Abstract_Particles_Orientations), allocatable :: orientations
         type(Particles_Dipolar_Moments_Facade) :: dipolar_moments
         type(Particles_Total_Moment_Facade) :: total_moment
-    end type Concrete_Particles
+    end type Particles_Wrapper
 
 end module types_particles

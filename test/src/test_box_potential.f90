@@ -16,7 +16,7 @@ use class_potential_expression, only: Abstract_Potential_Expression, Null_Potent
 use types_potential_domain, only: Concrete_Potential_Domain
 use class_pair_potential, only: Abstract_Pair_Potential, Concrete_Pair_Potential, &
     Hard_Pair_Potential
-use types_particles, only: Concrete_Particle
+use types_particle, only: Concrete_Particle
 use class_box_potential, only: Box_Potential_Facade
 
 implicit none
