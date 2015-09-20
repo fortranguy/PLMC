@@ -1,7 +1,7 @@
 module procedures_visitable_list_sum
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use module_particles, only: Concrete_Particle
+use types_particles, only: Concrete_Particle
 use class_particles_positions, only: Abstract_Particles_Positions
 use class_visitable_list, only: Abstract_Visitable_List
 use class_pair_potential, only: Abstract_Pair_Potential
@@ -55,7 +55,7 @@ use class_potential_expression, only: Abstract_Potential_Expression, Null_Potent
 use types_potential_domain, only: Concrete_Potential_Domain
 use class_pair_potential, only: Abstract_Pair_Potential, Concrete_Pair_Potential, &
     Hard_Pair_Potential
-use module_particles, only: Concrete_Particle
+use types_particles, only: Concrete_Particle
 use class_visitable_list, only: Abstract_Visitable_List, Concrete_Visitable_List, &
     Concrete_Visitable_Array
 use procedures_visitable_list_sum, only: sum_energy

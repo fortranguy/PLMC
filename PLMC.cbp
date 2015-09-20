@@ -58,7 +58,7 @@
 			<Option weight="4" />
 		</Unit>
 		<Unit filename="lib/src/class_one_particle_move.f90">
-			<Option weight="8" />
+			<Option weight="5" />
 		</Unit>
 		<Unit filename="lib/src/class_pair_potential.f90">
 			<Option weight="2" />
@@ -73,7 +73,7 @@
 			<Option weight="3" />
 		</Unit>
 		<Unit filename="lib/src/class_particles_exchange.f90">
-			<Option weight="6" />
+			<Option weight="0" />
 		</Unit>
 		<Unit filename="lib/src/class_particles_moment_norm.f90">
 			<Option weight="2" />
@@ -106,10 +106,10 @@
 			<Option weight="2" />
 		</Unit>
 		<Unit filename="lib/src/class_visitable_cells.f90">
-			<Option weight="7" />
+			<Option weight="4" />
 		</Unit>
 		<Unit filename="lib/src/class_visitable_list.f90">
-			<Option weight="6" />
+			<Option weight="3" />
 		</Unit>
 		<Unit filename="lib/src/data_constants.f90">
 			<Option weight="0" />
@@ -121,7 +121,7 @@
 			<Option weight="0" />
 		</Unit>
 		<Unit filename="lib/src/module_changes.f90">
-			<Option weight="7" />
+			<Option weight="5" />
 		</Unit>
 		<Unit filename="lib/src/module_data.f90">
 			<Option weight="1" />
@@ -131,9 +131,6 @@
 		</Unit>
 		<Unit filename="lib/src/module_particle_energy.f90">
 			<Option weight="0" />
-		</Unit>
-		<Unit filename="lib/src/module_particles.f90">
-			<Option weight="5" />
 		</Unit>
 		<Unit filename="lib/src/procedures_checks.f90">
 			<Option weight="1" />
@@ -150,6 +147,9 @@
 		<Unit filename="lib/src/procedures_parallelepiped_domain.f90">
 			<Option weight="1" />
 		</Unit>
+		<Unit filename="lib/src/procedures_particles_factory.f90">
+			<Option weight="6" />
+		</Unit>
 		<Unit filename="lib/src/procedures_random.f90">
 			<Option weight="0" />
 		</Unit>
@@ -158,6 +158,9 @@
 		</Unit>
 		<Unit filename="lib/src/types_field_parameters.f90">
 			<Option weight="1" />
+		</Unit>
+		<Unit filename="lib/src/types_particles.f90">
+			<Option weight="5" />
 		</Unit>
 		<Unit filename="lib/src/types_potential_domain.f90">
 			<Option weight="0" />
@@ -178,12 +181,12 @@
 		<Unit filename="test/src/test_diameter.f90">
 			<Option compile="0" />
 			<Option link="0" />
-			<Option weight="2" />
+			<Option weight="3" />
 		</Unit>
 		<Unit filename="test/src/test_dipolar_moments.f90">
 			<Option compile="0" />
 			<Option link="0" />
-			<Option weight="2" />
+			<Option weight="4" />
 		</Unit>
 		<Unit filename="test/src/test_external_field.f90">
 			<Option compile="0" />
@@ -198,17 +201,17 @@
 		<Unit filename="test/src/test_inter_diameter.f90">
 			<Option compile="0" />
 			<Option link="0" />
-			<Option weight="2" />
+			<Option weight="4" />
 		</Unit>
 		<Unit filename="test/src/test_moment_norm.f90">
 			<Option compile="0" />
 			<Option link="0" />
-			<Option weight="2" />
+			<Option weight="3" />
 		</Unit>
 		<Unit filename="test/src/test_moved_positions.f90">
 			<Option compile="0" />
 			<Option link="0" />
-			<Option weight="3" />
+			<Option weight="5" />
 		</Unit>
 		<Unit filename="test/src/test_number.f90">
 			<Option compile="0" />
@@ -218,7 +221,7 @@
 		<Unit filename="test/src/test_orientations.f90">
 			<Option compile="0" />
 			<Option link="0" />
-			<Option weight="2" />
+			<Option weight="3" />
 		</Unit>
 		<Unit filename="test/src/test_pair_potential.f90">
 			<Option compile="0" />
@@ -235,11 +238,6 @@
 			<Option link="0" />
 			<Option weight="7" />
 		</Unit>
-		<Unit filename="test/src/test_particles_number.f90">
-			<Option compile="0" />
-			<Option link="0" />
-			<Option weight="0" />
-		</Unit>
 		<Unit filename="test/src/test_periodic_box.f90">
 			<Option compile="0" />
 			<Option link="0" />
@@ -248,7 +246,7 @@
 		<Unit filename="test/src/test_positions.f90">
 			<Option compile="0" />
 			<Option link="0" />
-			<Option weight="3" />
+			<Option weight="4" />
 		</Unit>
 		<Unit filename="test/src/test_potential_expression.f90">
 			<Option compile="0" />
@@ -263,7 +261,7 @@
 		<Unit filename="test/src/test_rotated_orientations.f90">
 			<Option compile="0" />
 			<Option link="0" />
-			<Option weight="2" />
+			<Option weight="4" />
 		</Unit>
 		<Unit filename="test/src/test_small_move.f90">
 			<Option compile="0" />
@@ -278,17 +276,17 @@
 		<Unit filename="test/src/test_total_moment.f90">
 			<Option compile="0" />
 			<Option link="0" />
-			<Option weight="2" />
+			<Option weight="5" />
 		</Unit>
 		<Unit filename="test/src/test_visitable_cells.f90">
 			<Option compile="0" />
 			<Option link="0" />
-			<Option weight="8" />
+			<Option weight="5" />
 		</Unit>
 		<Unit filename="test/src/test_visitable_list.f90">
 			<Option compile="0" />
 			<Option link="0" />
-			<Option weight="7" />
+			<Option weight="4" />
 		</Unit>
 		<Extensions>
 			<code_completion />

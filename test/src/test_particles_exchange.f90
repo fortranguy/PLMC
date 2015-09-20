@@ -16,7 +16,7 @@ module procedures_particles_exchange_write
 
 use json_module, only: json_create_object, json_add, json_print, json_destroy
 use types_json_wrapper, only: JSON_Value_Pointer
-use module_particles, only: Concrete_Particles
+use types_particles, only: Concrete_Particles
 
 implicit none
 
@@ -75,8 +75,8 @@ use class_particles_diameter, only: Abstract_Particles_Diameter, Concrete_Partic
 use class_particles_moment_norm, only: Abstract_Particles_Moment_Norm, Concrete_Particles_Moment_Norm
 use class_particles_positions, only: Abstract_Particles_Positions, Concrete_Particles_Positions
 use class_particles_orientations, only: Abstract_Particles_Orientations, Concrete_Particles_Orientations
-use module_particles, only: Concrete_Particle, Concrete_Particles, &
-    Concrete_Particles_construct, Concrete_Particles_destroy
+use types_particles, only: Concrete_Particle, Concrete_Particles
+use procedures_particles_factory, only: particles_construct, particles_destroy
 use class_particles_exchange, only: Particles_Exchange_Facade
 use procedures_particles_exchange_write, only: json_write_particles
 
@@ -113,6 +113,8 @@ implicit none
     allocate(XYZ_Periodic_Box :: periodic_box)
     call periodic_box%set(box_size)
 
+    call particles_construct(particles, input_data, "Particles 1")
+
     allocate(Concrete_Particles_Diameter :: diameter)
     data_field = "Particles.diameter"
     call input_data%get(data_field, diameter_value, data_found)
@@ -141,8 +143,6 @@ implicit none
         call orientations%set(i_particle, random_orientation())
     end do
 
-    call Concrete_Particles_construct(particles, number, diameter, moment_norm, &
-                                     positions, orientations)
     call particles_exchange%construct(particles)
     call json_write_particles(particles, "initial.json")
 
@@ -162,7 +162,7 @@ implicit none
     call json_write_particles(particles, "removed.json")
 
     call particles_exchange%destroy()
-    call Concrete_Particles_destroy(particles)
+    call particles_destroy(particles)
     call orientations%destroy()
     deallocate(orientations)
     call positions%destroy()

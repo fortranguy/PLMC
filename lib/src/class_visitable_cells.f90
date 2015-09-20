@@ -7,7 +7,7 @@ use procedures_errors, only: error_exit
 use procedures_checks, only: check_positive
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_particles_positions, only: Abstract_Particles_Positions
-use module_particles, only: Concrete_Particle
+use types_particles, only: Concrete_Particle
 use class_visitable_list, only: Abstract_Visitable_List
 use procedures_visitable_cells, only: pbc_3d_index, local_reindex
 use class_pair_potential, only: Abstract_Pair_Potential

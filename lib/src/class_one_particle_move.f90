@@ -2,7 +2,7 @@ module class_one_particle_move
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use class_temperature, only: Abstract_Temperature
-use module_particles, only: Concrete_Particle, Concrete_Particles
+use types_particles, only: Concrete_Particle, Concrete_Particles
 use class_moved_particles_positions, only: Abstract_Moved_Particles_Positions
 use class_visitable_cells, only: Abstract_Visitable_Cells
 use module_particle_energy, only: Concrete_Particle_Energy, &

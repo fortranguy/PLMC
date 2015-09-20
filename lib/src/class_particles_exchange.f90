@@ -1,6 +1,6 @@
 module class_particles_exchange
 
-use module_particles, only: Concrete_Particle, Concrete_Particles
+use types_particles, only: Concrete_Particle, Concrete_Particles
 
 implicit none
 
