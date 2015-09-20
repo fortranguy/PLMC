@@ -8,9 +8,9 @@ use procedures_checks, only: check_positive
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_positions, only: Abstract_Positions
 use module_particles, only: Concrete_Particle
-use class_pair_potential, only: Abstract_Pair_Potential
 use class_visitable_list, only: Abstract_Visitable_List
 use procedures_visitable_cells, only: pbc_3d_index, local_reindex
+use class_pair_potential, only: Abstract_Pair_Potential
 
 implicit none
 
@@ -29,6 +29,7 @@ private
         integer, allocatable :: neighbours(:, :, :, :, :, :, :)
         class(Abstract_Positions), pointer :: positions
         class(Abstract_Periodic_Box), pointer :: periodic_box
+        class(Abstract_Pair_Potential), pointer :: pair_potential
     contains
         procedure :: construct => Abstract_Visitable_Cells_construct
         procedure :: destroy => Abstract_Visitable_Cells_destroy
@@ -82,15 +83,16 @@ contains
 !implementation Abstract_Visitable_Cells
 
     subroutine Abstract_Visitable_Cells_construct(this, mold, periodic_box, positions, &
-            min_cell_edge)
+            pair_potential)
         class(Abstract_Visitable_Cells), intent(out) :: this
         class(Abstract_Visitable_List), intent(in) :: mold
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Positions), target, intent(in) :: positions
-        real(DP), intent(in) :: min_cell_edge
+        class(Abstract_Pair_Potential), target, intent(in) :: pair_potential
 
         this%periodic_box => periodic_box
-        call this%set_nums(min_cell_edge)
+        this%pair_potential => pair_potential
+        call this%set_nums()
         call this%set_division()
         this%global_lbounds = -this%nums/2
         this%global_ubounds = this%global_lbounds + this%nums - 1
@@ -111,11 +113,10 @@ contains
         call this%fill()
     end subroutine Abstract_Visitable_Cells_construct
 
-    subroutine Abstract_Visitable_Cells_set_nums(this, min_cell_edge)
+    subroutine Abstract_Visitable_Cells_set_nums(this)
         class(Abstract_Visitable_Cells), intent(inout) :: this
-        real(DP), intent(in) :: min_cell_edge
 
-        this%nums = floor(this%periodic_box%get_size()/min_cell_edge)
+        this%nums = floor(this%periodic_box%get_size()/this%pair_potential%get_max_distance())
         call check_positive("Abstract_Visitable_Cells", "this%nums", this%nums)
         call this%check_nums()
     end subroutine Abstract_Visitable_Cells_set_nums
@@ -215,6 +216,7 @@ contains
 
         integer :: global_i1, global_i2, global_i3
 
+        this%pair_potential => null()
         this%positions => null()
 
         do global_i3 = this%global_ubounds(3), this%global_lbounds(3), -1
@@ -229,10 +231,9 @@ contains
         if (allocated(this%visitable_lists)) deallocate(this%visitable_lists)
     end subroutine Abstract_Visitable_Cells_destroy
 
-    subroutine Abstract_Visitable_Cells_visit(this, particle, pair_potential, overlap, energy)
+    subroutine Abstract_Visitable_Cells_visit(this, particle, overlap, energy)
         class(Abstract_Visitable_Cells), intent(in) :: this
         type(Concrete_Particle), intent(in) :: particle
-        class(Abstract_Pair_Potential), intent(in) :: pair_potential
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
 
@@ -252,7 +253,7 @@ contains
             i_local_cell = this%neighbours(:, local_i1, local_i2, local_i3, &
                 i_cell(1), i_cell(2), i_cell(3))
             call this%visitable_lists(i_local_cell(1), i_local_cell(2), &
-                i_local_cell(3))%visit(particle, pair_potential, overlap, energy_i)
+                i_local_cell(3))%visit(particle, this%pair_potential, overlap, energy_i)
             if (overlap) return
             energy = energy + energy_i
         end do

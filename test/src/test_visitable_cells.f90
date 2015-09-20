@@ -1,9 +1,9 @@
-module procedures_cells_potential_sum
+module procedures_visitable_cells_sum
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use module_particles, only: Concrete_Particle
 use class_positions, only: Abstract_Positions
-use class_cells_potential, only: Cells_Potential_Facade
+use class_visitable_cells, only: Abstract_Visitable_Cells
 
 implicit none
 
@@ -12,9 +12,9 @@ public sum_energy
 
 contains
 
-    subroutine sum_energy(positions, cells_potential, overlap, energy)
+    subroutine sum_energy(positions, visitable_cells, overlap, energy)
         class(Abstract_Positions), intent(in) :: positions
-        type(Cells_Potential_Facade), intent(in) :: cells_potential
+        class(Abstract_Visitable_Cells), intent(in) :: visitable_cells
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
 
@@ -27,15 +27,15 @@ contains
             particle%same_type = .true.
             particle%i = i_particle
             particle%position = positions%get(particle%i)
-            call cells_potential%visit(particle, overlap, energy_i)
+            call visitable_cells%visit(particle, overlap, energy_i)
             if (overlap) return
             energy = energy + energy_i
         end do
     end subroutine sum_energy
 
-end module procedures_cells_potential_sum
+end module procedures_visitable_cells_sum
 
-program test_cells_potential
+program test_visitable_cells
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use data_geometry, only: num_dimensions
@@ -58,12 +58,10 @@ use class_visitable_list, only: Abstract_Visitable_List, Concrete_Visitable_List
     Concrete_Visitable_Array
 use class_visitable_cells, only: Abstract_Visitable_Cells, &
     XYZ_PBC_Visitable_Cells, XY_PBC_Visitable_Cells
-use class_cells_potential, only: Cells_Potential_Facade
-use procedures_cells_potential_sum, only: sum_energy
+use procedures_visitable_cells_sum, only: sum_energy
 
 implicit none
 
-    type(Cells_Potential_Facade) :: cells_potential
     class(Abstract_Visitable_Cells), allocatable :: visitable_cells
     class(Abstract_Visitable_List), allocatable :: visitable_list
     class(Abstract_Pair_Potential), allocatable :: pair_potential
@@ -88,7 +86,7 @@ implicit none
     logical :: overlap
 
     call json_initialize()
-    data_filename = "cells_potential.json"
+    data_filename = "visitable_cells.json"
     call test_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
     deallocate(data_filename)
@@ -196,12 +194,9 @@ implicit none
             call error_exit("Periodic_Box type unknown.")
     end select
 
-    call visitable_cells%construct(visitable_list, periodic_box, positions, &
-        pair_potential%get_max_distance())
-    call cells_potential%construct(visitable_cells)
-    call cells_potential%set(pair_potential)
+    call visitable_cells%construct(visitable_list, periodic_box, positions, pair_potential)
 
-    call sum_energy(positions, cells_potential, overlap, energy)
+    call sum_energy(positions, visitable_cells, overlap, energy)
     if (overlap) then
         write(output_unit,*) "overlap"
     else
@@ -209,7 +204,6 @@ implicit none
         write(output_unit, *) "energy =", energy
     end if
 
-    call cells_potential%destroy()
     call visitable_cells%destroy()
     deallocate(visitable_cells)
     deallocate(visitable_list)
@@ -224,4 +218,4 @@ implicit none
     deallocate(periodic_box)
     call input_data%destroy()
 
-end program test_cells_potential
+end program test_visitable_cells

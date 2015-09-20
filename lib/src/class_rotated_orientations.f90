@@ -8,6 +8,8 @@ use procedures_orientation, only: markov_orientation
 
 implicit none
 
+private
+
     type, abstract, public :: Abstract_Rotated_Orientations
     private
         class(Abstract_Orientations), pointer :: orientations

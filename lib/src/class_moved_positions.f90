@@ -7,6 +7,8 @@ use class_positions, only: Abstract_Positions
 
 implicit none
 
+private
+
     type, abstract, public :: Abstract_Moved_Positions
     private
         class(Abstract_Positions), pointer :: positions

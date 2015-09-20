@@ -32,24 +32,14 @@
                                  energy\type{double})}
             \end{class}
         \end{scope}
-        
-        \begin{scope}[shift={($(PairPotentialFacade.south) + (-5 cm, -2 cm)$)}, opacity=1]
-            \begin{class}[text width=\mediumTextWidth]{CellsPotential}{0, 0}
-                \operation{construct(visitableCells\type{VisitableCells})}
-                \operation{destroy()}
-                \operation{set(pairPotential\type{PairPotential})}
-                \operation{visit(particle\type{Particle}, overlap\type{bool},
-                                    energy\type{double})}
-            \end{class}
-        \end{scope}
                 
-        \begin{scope}[shift={($(CellsPotential.north) + (-2 cm, -5 cm)$)}, opacity=1]
+        \begin{scope}[shift={($(PairPotentialFacade.south) + (-7 cm, -2 cm)$)}, opacity=1]
             \begin{abstractclass}[text width=\largeTextWidth]{VisitableCells}{0, 0}
                 \operation{construct(mold\type{VisitableList}, periodicBox\type{PeriodicBox},
-                                     positions\type{Positions}, minCellEdge\type{double})}
+                                     positions\type{Positions}, pairPotential\type{PairPotential})}
                 \operation{destroy()}
-                \operation[0]{visit(particle\type{Particle}, pairPotential\type{PairPotential},
-                                    overlap\type{bool}, energy\type{double})}
+                \operation{visit(particle\type{Particle}, overlap\type{bool},
+                    energy\type{double})}
                 \operation{move(from\type{Particle}, to\type{Particle})}
                 \operation{add(particle\type{Particle})}
                 \operation{remove(particle\type{Particle})}
@@ -147,7 +137,7 @@
 
 \begin{scope}[on background layer]
     %\aggregation{PairPotentialFacade}{periodicBox}{1}{PeriodicBox}
-    \aggregation{PairPotentialFacade}{cellsPotential}{1}{CellsPotential}
+    \aggregation{PairPotentialFacade}{cellsPotential}{1}{VisitableCells}
     \aggregation{PairPotentialFacade}{boxPotential}{1}{BoxPotentialFacade}
     \aggregation{BoxPotentialFacade}{periodicBox}{1}{PeriodicBox}
     \aggregation{BoxPotentialFacade}{positions}{1}{Positions}
@@ -156,9 +146,8 @@
     %\aggregation{IntraPairInteration}{positions}{1}{Positions}
     %\aggregation{InterPairInteration}{interDiameters}{1}{InterDiameters}
     %\aggregation{InterPairInteration}{positions}{2}{Positions}
-
-    \aggregation{CellsPotential}{visitableCells}{1}{VisitableCells}
-    \aggregation{CellsPotential}{pairPotential}{1}{PairPotential}
+    
+    \aggregation{VisitableCells}{pairPotential}{1}{PairPotential}
     \composition{VisitableCells}{visitableList}{1..n}{VisitableList}
     \aggregation{VisitableCells}{periodicBox}{1}{PeriodicBox}
     \aggregation{VisitableList}{periodicBox}{1}{PeriodicBox}
