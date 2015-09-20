@@ -4,19 +4,21 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
 use procedures_orientation, only: random_orientation
-use class_number, only: Abstract_Number, Concrete_Number
-use class_moment_norm, only: Abstract_Moment_Norm, Concrete_Moment_Norm
-use class_orientations, only: Abstract_Orientations, Concrete_Orientations, Null_Orientations
-use class_dipolar_moments, only: Dipolar_Moments_Facade
-use class_total_moment, only: Total_Moment_Facade
+use class_particles_number, only: Abstract_Particles_Number, Concrete_Particles_Number
+use class_particles_moment_norm, only: Abstract_Particles_Moment_Norm, &
+    Concrete_Particles_Moment_Norm
+use class_particles_orientations, only: Abstract_Particles_Orientations, &
+    Concrete_Particles_Orientations, Null_Particles_Orientations
+use class_particles_dipolar_moments, only: Particles_Dipolar_Moments_Facade
+use class_particles_total_moment, only: Particles_Total_Moment_Facade
 
 implicit none
 
-    type(Total_Moment_Facade) :: total_moment
-    type(Dipolar_Moments_Facade) :: dipolar_moments
-    class(Abstract_Orientations), allocatable :: orientations
-    class(Abstract_Moment_Norm), allocatable :: moment_norm
-    class(Abstract_Number), allocatable :: number
+    type(Particles_Total_Moment_Facade) :: total_moment
+    type(Particles_Dipolar_Moments_Facade) :: dipolar_moments
+    class(Abstract_Particles_Orientations), allocatable :: orientations
+    class(Abstract_Particles_Moment_Norm), allocatable :: moment_norm
+    class(Abstract_Particles_Number), allocatable :: number
 
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename, data_field
@@ -31,13 +33,13 @@ implicit none
     call input_data%load_file(filename = data_filename)
     deallocate(data_filename)
 
-    allocate(Concrete_Number :: number)
-    data_field = "Number of Particles"
+    allocate(Concrete_Particles_Number :: number)
+    data_field = "Number of _Particles"
     call input_data%get(data_field, num_particles, data_found)
     call test_data_found(data_field, data_found)
     call number%set(num_particles)
 
-    allocate(Concrete_Moment_Norm :: moment_norm)
+    allocate(Concrete_Particles_Moment_Norm :: moment_norm)
     data_field = "Particles.moment norm"
     call input_data%get(data_field, moment_norm_value, data_found)
     call test_data_found(data_field, data_found)
@@ -47,9 +49,9 @@ implicit none
     call input_data%get(data_field, with_orientation, data_found)
     call test_data_found(data_field, data_found)
     if (with_orientation) then
-        allocate(Concrete_Orientations :: orientations)
+        allocate(Concrete_Particles_Orientations :: orientations)
     else
-        allocate(Null_Orientations :: orientations)
+        allocate(Null_Particles_Orientations :: orientations)
     end if
     call orientations%construct(number)
     do i_particle = 1, orientations%get_num()

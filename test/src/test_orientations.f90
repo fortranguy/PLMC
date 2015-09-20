@@ -3,8 +3,8 @@ module procedures_orientations_manipulate
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file
 use module_data, only: test_data_found
-use class_number, only: Abstract_Number, Concrete_Number
-use class_orientations, only: Abstract_Orientations
+use class_particles_number, only: Abstract_Particles_Number, Concrete_Particles_Number
+use class_particles_orientations, only: Abstract_Particles_Orientations
 
 implicit none
 
@@ -15,10 +15,10 @@ contains
 
     subroutine manipulate_orientations(orientations, input_data)
 
-        class(Abstract_Orientations), intent(inout) :: orientations
+        class(Abstract_Particles_Orientations), intent(inout) :: orientations
         type(json_file), intent(inout) :: input_data
 
-        class(Abstract_Number), allocatable :: number
+        class(Abstract_Particles_Number), allocatable :: number
         character(len=:), allocatable :: data_field
         logical :: found
         integer :: orientations_num, i_particle
@@ -29,7 +29,7 @@ contains
         data_field = "Orientations.number"
         call input_data%get(data_field, orientations_num, found)
         call test_data_found(data_field, found)
-        allocate(Concrete_Number :: number)
+        allocate(Concrete_Particles_Number :: number)
         call number%set(orientations_num)
 
         call orientations%construct(number)
@@ -72,12 +72,13 @@ program test_orientations
 use, intrinsic :: iso_fortran_env, only: output_unit
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
-use class_orientations, only: Abstract_Orientations, Null_Orientations, Concrete_Orientations
+use class_particles_orientations, only: Abstract_Particles_Orientations, &
+    Concrete_Particles_Orientations, Null_Particles_Orientations
 use procedures_orientations_manipulate, only: manipulate_orientations
 
 implicit none
 
-    class(Abstract_Orientations), allocatable :: orientations
+    class(Abstract_Particles_Orientations), allocatable :: orientations
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename
 
@@ -88,12 +89,12 @@ implicit none
     call input_data%load_file(filename = data_filename)
 
     write(output_unit, *) "Null"
-    allocate(Null_Orientations :: orientations)
+    allocate(Null_Particles_Orientations :: orientations)
     call manipulate_orientations(orientations, input_data)
     deallocate(orientations)
 
     write(output_unit, *) "Concrete"
-    allocate(Concrete_Orientations :: orientations)
+    allocate(Concrete_Particles_Orientations :: orientations)
     call manipulate_orientations(orientations, input_data)
     deallocate(orientations)
 

@@ -4,14 +4,14 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box
-use class_number, only: Abstract_Number, Concrete_Number
-use class_positions, only: Abstract_Positions, Concrete_Positions
+use class_particles_number, only: Abstract_Particles_Number, Concrete_Particles_Number
+use class_particles_positions, only: Abstract_Particles_Positions, Concrete_Particles_Positions
 
 implicit none
 
     class(Abstract_Periodic_Box), allocatable :: periodic_box
-    class(Abstract_Number), allocatable :: number
-    class(Abstract_Positions), allocatable :: positions
+    class(Abstract_Particles_Number), allocatable :: number
+    class(Abstract_Particles_Positions), allocatable :: positions
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename, data_field
     logical :: found
@@ -32,13 +32,13 @@ implicit none
     call test_data_found(data_field, found)
     call periodic_box%set(periodic_box_size)
 
-    allocate(Concrete_Number :: number)
+    allocate(Concrete_Particles_Number :: number)
     data_field = "Positions.number"
     call input_data%get(data_field, positions_num, found)
     call test_data_found(data_field, found)
     call number%set(positions_num)
 
-    allocate(Concrete_Positions :: positions)
+    allocate(Concrete_Particles_Positions :: positions)
     call positions%construct(periodic_box, number)
 
     do i_particle = 1, positions%get_num()

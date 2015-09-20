@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
 use procedures_errors, only: error_exit
-use class_diameter, only: Abstract_Diameter, Concrete_Diameter
+use class_particles_diameter, only: Abstract_Particles_Diameter, Concrete_Particles_Diameter
 use types_potential_parameters, only: Abstract_Potential_Parameters, Null_Potential_Parameters, &
     Lennard_Jones_Parameters
 use class_potential_expression, only: Abstract_Potential_Expression, Null_Potential_Expression, &
@@ -19,7 +19,7 @@ implicit none
     type(Concrete_Potential_Domain) :: potential_domain
     class(Abstract_Potential_Expression), allocatable :: potential_expression
     class(Abstract_Potential_Parameters), allocatable :: potential_parameters
-    class(Abstract_Diameter), allocatable :: diameter
+    class(Abstract_Particles_Diameter), allocatable :: diameter
 
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename, data_field, potential_name
@@ -41,7 +41,7 @@ implicit none
     data_field = "Particle.minimum diameter factor"
     call input_data%get(data_field, min_diameter_factor, data_found)
     call test_data_found(data_field, data_found)
-    allocate(Concrete_Diameter :: diameter)
+    allocate(Concrete_Particles_Diameter :: diameter)
     call diameter%set(diameter_value, min_diameter_factor)
 
     data_field = "Potential.name"

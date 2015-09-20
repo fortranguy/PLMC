@@ -3,7 +3,7 @@ module procedures_moment_norm_manipulate
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file
 use module_data, only: test_data_found
-use class_moment_norm, only: Abstract_Moment_Norm
+use class_particles_moment_norm, only: Abstract_Particles_Moment_Norm
 
 implicit none
 
@@ -14,7 +14,7 @@ contains
 
     subroutine manipulate_moment_norm(object_name, moment_norm, input_data)
         character(len=*), intent(in) :: object_name
-        class(Abstract_Moment_Norm), intent(inout) :: moment_norm
+        class(Abstract_Particles_Moment_Norm), intent(inout) :: moment_norm
         type(json_file) :: input_data
 
         character(len=:), allocatable :: data_field
@@ -38,12 +38,12 @@ program test_moment_norm
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists
-use class_moment_norm, only: Abstract_Moment_Norm, Null_Moment_Norm, Concrete_Moment_Norm
+use class_particles_moment_norm, only: Abstract_Particles_Moment_Norm, Null_Particles_Moment_Norm, Concrete_Particles_Moment_Norm
 use procedures_moment_norm_manipulate, only: manipulate_moment_norm
 
 implicit none
 
-    class(Abstract_Moment_Norm), allocatable :: moment_norm
+    class(Abstract_Particles_Moment_Norm), allocatable :: moment_norm
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename
 
@@ -53,11 +53,11 @@ implicit none
     call test_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
 
-    allocate(Null_Moment_Norm :: moment_norm)
+    allocate(Null_Particles_Moment_Norm :: moment_norm)
     call manipulate_moment_norm("Null", moment_norm, input_data)
     deallocate(moment_norm)
 
-    allocate(Concrete_Moment_Norm :: moment_norm)
+    allocate(Concrete_Particles_Moment_Norm :: moment_norm)
     call manipulate_moment_norm("Uniform", moment_norm, input_data)
     deallocate(moment_norm)
 

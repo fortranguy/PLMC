@@ -2,7 +2,7 @@ module procedures_visitable_cells_sum
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use module_particles, only: Concrete_Particle
-use class_positions, only: Abstract_Positions
+use class_particles_positions, only: Abstract_Particles_Positions
 use class_visitable_cells, only: Abstract_Visitable_Cells
 
 implicit none
@@ -13,7 +13,7 @@ public sum_energy
 contains
 
     subroutine sum_energy(positions, visitable_cells, overlap, energy)
-        class(Abstract_Positions), intent(in) :: positions
+        class(Abstract_Particles_Positions), intent(in) :: positions
         class(Abstract_Visitable_Cells), intent(in) :: visitable_cells
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
@@ -43,9 +43,9 @@ use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
 use procedures_errors, only: error_exit
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box, XY_Periodic_Box
-use class_number, only: Abstract_Number, Concrete_Number
-use class_diameter, only: Abstract_Diameter, Concrete_Diameter
-use class_positions, only: Abstract_Positions, Concrete_Positions
+use class_particles_number, only: Abstract_Particles_Number, Concrete_Particles_Number
+use class_particles_diameter, only: Abstract_Particles_Diameter, Concrete_Particles_Diameter
+use class_particles_positions, only: Abstract_Particles_Positions, Concrete_Particles_Positions
 use types_potential_parameters, only: Abstract_Potential_Parameters, Null_Potential_Parameters, &
     Lennard_Jones_Parameters
 use class_potential_expression, only: Abstract_Potential_Expression, Null_Potential_Expression, &
@@ -68,9 +68,9 @@ implicit none
     type(Concrete_Potential_Domain) :: potential_domain
     class(Abstract_Potential_Expression), allocatable :: potential_expression
     class(Abstract_Potential_Parameters), allocatable :: potential_parameters
-    class(Abstract_Positions), allocatable :: positions
-    class(Abstract_Diameter), allocatable :: diameter
-    class(Abstract_Number), allocatable :: number
+    class(Abstract_Particles_Positions), allocatable :: positions
+    class(Abstract_Particles_Diameter), allocatable :: diameter
+    class(Abstract_Particles_Number), allocatable :: number
     class(Abstract_Periodic_Box), allocatable :: periodic_box
 
     type(json_file) :: input_data
@@ -111,10 +111,10 @@ implicit none
     data_field = "Particles.number"
     call input_data%get(data_field, num_particles, data_found)
     call test_data_found(data_field, data_found)
-    allocate(Concrete_Number :: number)
+    allocate(Concrete_Particles_Number :: number)
     call number%set(num_particles)
 
-    allocate(Concrete_Positions :: positions)
+    allocate(Concrete_Particles_Positions :: positions)
     call positions%construct(periodic_box, number)
     positions_input = "positions.in"
     call test_file_exists(positions_input)
@@ -131,7 +131,7 @@ implicit none
     data_field = "Particles.minimum diameter factor"
     call input_data%get(data_field, min_diameter_factor, data_found)
     call test_data_found(data_field, data_found)
-    allocate(Concrete_Diameter :: diameter)
+    allocate(Concrete_Particles_Diameter :: diameter)
     call diameter%set(diameter_value, min_diameter_factor)
 
     data_field = "Potential.name"

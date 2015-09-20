@@ -3,11 +3,11 @@ program test_number
 use, intrinsic :: iso_fortran_env, only: output_unit
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
-use class_number, only: Abstract_Number, Concrete_Number
+use class_particles_number, only: Abstract_Particles_Number, Concrete_Particles_Number
 
 implicit none
 
-    class(Abstract_Number), allocatable :: number
+    class(Abstract_Particles_Number), allocatable :: number
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename, data_field
     logical :: found
@@ -19,7 +19,7 @@ implicit none
     call test_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
 
-    allocate(Concrete_Number :: number)
+    allocate(Concrete_Particles_Number :: number)
 
     data_field = "Particles.number"
     call input_data%get(data_field, num_particles, found)

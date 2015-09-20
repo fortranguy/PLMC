@@ -3,9 +3,9 @@ module procedures_dipolar_moments_print
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file
 use module_data, only: test_data_found
-use class_moment_norm, only: Abstract_Moment_Norm
-use class_orientations, only: Abstract_Orientations
-use class_dipolar_moments, only: Dipolar_Moments_Facade
+use class_particles_moment_norm, only: Abstract_Particles_Moment_Norm
+use class_particles_orientations, only: Abstract_Particles_Orientations
+use class_particles_dipolar_moments, only: Particles_Dipolar_Moments_Facade
 
 implicit none
 
@@ -17,8 +17,8 @@ contains
     subroutine set_objects(input_data, moment_norm_name, moment_norm, &
                            orientations_name, orientations)
         type(json_file), intent(inout) :: input_data
-        class(Abstract_Moment_Norm), intent(inout) :: moment_norm
-        class(Abstract_Orientations), intent(inout) :: orientations
+        class(Abstract_Particles_Moment_Norm), intent(inout) :: moment_norm
+        class(Abstract_Particles_Orientations), intent(inout) :: orientations
         character(len=*), intent(in) :: moment_norm_name, orientations_name
 
         character(len=:), allocatable :: data_field
@@ -46,7 +46,7 @@ contains
     end subroutine set_objects
 
     subroutine print_dipolar_moments(dipolar_moments)
-        type(Dipolar_Moments_Facade), intent(in) :: dipolar_moments
+        type(Particles_Dipolar_Moments_Facade), intent(in) :: dipolar_moments
 
         integer :: i_particle
 
@@ -62,18 +62,20 @@ program test_dipolar_moments
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
-use class_number, only: Abstract_Number, Concrete_Number
-use class_moment_norm, only: Abstract_Moment_Norm, Null_Moment_Norm, Concrete_Moment_Norm
-use class_orientations, only: Abstract_Orientations, Null_Orientations, Concrete_Orientations
-use class_dipolar_moments, only: Dipolar_Moments_Facade
+use class_particles_number, only: Abstract_Particles_Number, Concrete_Particles_Number
+use class_particles_moment_norm, only: Abstract_Particles_Moment_Norm, &
+    Null_Particles_Moment_Norm, Concrete_Particles_Moment_Norm
+use class_particles_orientations, only: Abstract_Particles_Orientations, &
+    Null_Particles_Orientations, Concrete_Particles_Orientations
+use class_particles_dipolar_moments, only: Particles_Dipolar_Moments_Facade
 use procedures_dipolar_moments_print, only: set_objects, print_dipolar_moments
 
 implicit none
 
-    type(Dipolar_Moments_Facade) :: dipolar_moments
-    class(Abstract_Orientations), allocatable :: orientations
-    class(Abstract_Moment_Norm), allocatable :: moment_norm
-    class(Abstract_Number), allocatable :: number
+    type(Particles_Dipolar_Moments_Facade) :: dipolar_moments
+    class(Abstract_Particles_Orientations), allocatable :: orientations
+    class(Abstract_Particles_Moment_Norm), allocatable :: moment_norm
+    class(Abstract_Particles_Number), allocatable :: number
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename, data_field
     logical :: data_found
@@ -84,17 +86,17 @@ implicit none
     call test_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
 
-    allocate(Concrete_Number :: number)
+    allocate(Concrete_Particles_Number :: number)
     data_field = "Dipoles.number"
     call input_data%get(data_field, num_particles, data_found)
     call test_data_found(data_field, data_found)
     call number%set(num_particles)
 
-    allocate(Null_Moment_Norm :: moment_norm)
-    allocate(Null_Orientations :: orientations)
+    allocate(Null_Particles_Moment_Norm :: moment_norm)
+    allocate(Null_Particles_Orientations :: orientations)
     call orientations%construct(number)
-    call set_objects(input_data, "Null_Moment_Norm", moment_norm, &
-                     "Null_Orientations", orientations)
+    call set_objects(input_data, "Null_Particles_Moment_Norm", moment_norm, &
+                     "Null_Particles_Orientations", orientations)
     call dipolar_moments%construct(moment_norm, orientations)
     call print_dipolar_moments(dipolar_moments)
     call dipolar_moments%destroy()
@@ -102,11 +104,11 @@ implicit none
     deallocate(orientations)
     deallocate(moment_norm)
 
-    allocate(Concrete_Moment_Norm :: moment_norm)
-    allocate(Concrete_Orientations :: orientations)
+    allocate(Concrete_Particles_Moment_Norm :: moment_norm)
+    allocate(Concrete_Particles_Orientations :: orientations)
     call orientations%construct(number)
     call set_objects(input_data, "Uniform_Moments", moment_norm, &
-                     "Concrete_Orientations", orientations)
+                     "Concrete_Particles_Orientations", orientations)
     call dipolar_moments%construct(moment_norm, orientations)
     call print_dipolar_moments(dipolar_moments)
     call dipolar_moments%destroy()
