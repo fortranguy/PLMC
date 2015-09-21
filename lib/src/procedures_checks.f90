@@ -8,7 +8,7 @@ use procedures_errors, only: warning_continue, error_exit
 implicit none
 
 private
-public :: check_in_range, check_3d_array, check_positive, check_norm, check_adaptation_factor
+public :: check_in_range, check_3d_array, check_positive, check_norm, check_increase_factor
 
 interface check_3d_array
     module procedure check_integer_3d_array
@@ -139,16 +139,17 @@ contains
         end if
     end subroutine check_norm
 
-    subroutine check_adaptation_factor(class_name, value)
-        character(len=*), intent(in) :: class_name
-        real(DP), intent(in) :: value
+    subroutine check_increase_factor(class_name, increase_factor_name, increase_factor)
+        character(len=*), intent(in) :: class_name, increase_factor_name
+        real(DP), intent(in) :: increase_factor
 
-        if (value < 1.0_DP) then
-            call error_exit(class_name//": adaptation_factor is less than 1.0.")
+        call check_positive(class_name, increase_factor_name, increase_factor)
+        if (increase_factor < 1.0_DP) then
+            call error_exit(class_name//": "//increase_factor_name//" is less than 1.0.")
         end if
-        if (abs(value - 1.0_DP) < real_zero) then
-            call warning_continue(class_name//": adaptation_factor is 1.0.")
+        if (abs(increase_factor - 1.0_DP) < real_zero) then
+            call warning_continue(class_name//": "//increase_factor_name//" is 1.0.")
         end if
-    end subroutine check_adaptation_factor
+    end subroutine check_increase_factor
 
 end module procedures_checks

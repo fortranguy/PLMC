@@ -16,7 +16,8 @@
     },
     "Number of Steps": 100,
     "Small Move": {
-        "delta": [1.0, 1.0, 1.0],
-        "adaptation factor": 1.05
+        "delta": [0.5, 0.5, 0.5],
+        "increase factor": 1.001,
+        "maximum increase factor": 1.5
     }
 }

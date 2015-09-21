@@ -7,12 +7,14 @@ use module_data, only: test_file_exists, test_data_found
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box
 use class_particles_number, only: Abstract_Particles_Number, Concrete_Particles_Number
 use class_particles_positions, only: Abstract_Particles_Positions, Concrete_Particles_Positions
-use class_moved_particles_positions, only: Abstract_Moved_Particles_Positions, &
-    Concrete_Moved_Particles_Positions
+use module_adaptation, only: Concrete_Adaptation_Parameters
+use class_moved_positions, only: Abstract_Moved_Positions, &
+    Concrete_Moved_Positions
 
 implicit none
 
-    class(Abstract_Moved_Particles_Positions), allocatable :: moved_positions
+    class(Abstract_Moved_Positions), allocatable :: moved_positions
+    type(Concrete_Adaptation_Parameters) :: adaptation_parameters
     class(Abstract_Particles_Positions), allocatable :: positions
     class(Abstract_Particles_Number), allocatable :: number
     class(Abstract_Periodic_Box), allocatable :: periodic_box
@@ -24,7 +26,6 @@ implicit none
     character(len=1024) :: string_i
     real(DP), allocatable :: periodic_box_size(:), position(:), moved_positions_delta(:)
     real(DP), dimension(num_dimensions) :: old_position, new_position
-    real(DP) :: adaptation_factor
     integer, allocatable :: positions_long_units(:), positions_short_units(:)
 
     call json_initialize()
@@ -62,14 +63,17 @@ implicit none
              file="positions_short_"//trim(adjustl(string_i))//".out", action="write")
     end do
 
-    allocate(Concrete_Moved_Particles_Positions :: moved_positions)
+    allocate(Concrete_Moved_Positions :: moved_positions)
     data_field = "Small Move.delta"
     call input_data%get(data_field, moved_positions_delta, data_found)
     call test_data_found(data_field, data_found)
-    data_field = "Small Move.adaptation factor"
-    call input_data%get(data_field, adaptation_factor, data_found)
+    data_field = "Small Move.increase factor"
+    call input_data%get(data_field, adaptation_parameters%increase_factor, data_found)
     call test_data_found(data_field, data_found)
-    call moved_positions%construct(positions, moved_positions_delta, adaptation_factor)
+    data_field = "Small Move.maximum increase factor"
+    call input_data%get(data_field, adaptation_parameters%increase_factor_max, data_found)
+    call test_data_found(data_field, data_found)
+    call moved_positions%construct(positions, moved_positions_delta, adaptation_parameters)
 
     data_field = "Number of Steps"
     call input_data%get(data_field, num_steps, data_found)

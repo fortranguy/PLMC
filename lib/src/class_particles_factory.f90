@@ -26,18 +26,18 @@ private
     type, abstract, public :: Abstract_Particles_Factory
     contains
         procedure :: create => Abstract_Particles_Factory_create
-        procedure, nopass, private :: allocate_number => &
+        procedure, private, nopass :: allocate_number => &
             Abstract_Particles_Factory_allocate_number
-        procedure, nopass, private :: allocate_diameter => &
+        procedure, private, nopass :: allocate_diameter => &
             Abstract_Particles_Factory_allocate_diameter
-        procedure, nopass, private :: allocate_moment_norm => &
+        procedure, private, nopass :: allocate_moment_norm => &
             Abstract_Particles_Factory_allocate_moment_norm
-        procedure, nopass, private :: allocate_positions => &
+        procedure, private, nopass :: allocate_positions => &
             Abstract_Particles_Factory_allocate_positions
-        procedure, nopass, private :: set_positions => Abstract_Particles_Factory_set_positions
-        procedure, nopass, private :: allocate_orientations => &
+        procedure, private, nopass :: set_positions => Abstract_Particles_Factory_set_positions
+        procedure, private, nopass :: allocate_orientations => &
             Abstract_Particles_Factory_allocate_orientations
-        procedure, nopass, private :: set_orientations => &
+        procedure, private, nopass :: set_orientations => &
             Abstract_Particles_Factory_set_orientations
         procedure, nopass :: destroy => Abstract_Particles_Factory_destroy
     end type Abstract_Particles_Factory
@@ -49,9 +49,9 @@ private
 
     type, extends(Abstract_Particles_Factory), public :: Apolar_Particles_Factory
     contains
-        procedure, nopass, private :: allocate_moment_norm => &
+        procedure, private, nopass :: allocate_moment_norm => &
             Apolar_Particles_Factory_allocate_moment_norm
-        procedure, nopass, private :: allocate_orientations => &
+        procedure, private, nopass :: allocate_orientations => &
             Apolar_Particles_Factory_allocate_orientations
     end type Apolar_Particles_Factory
 
