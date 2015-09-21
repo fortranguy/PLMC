@@ -113,7 +113,8 @@ implicit none
     else
         allocate(Apolar_Particles_Factory :: particles_factory)
     end if
-    call particles_factory%create(particles, periodic_box, input_data, "Particles")
+    call particles_factory%allocate(particles, input_data, "Particles")
+    call particles_factory%construct(particles, periodic_box)
 
     call particles_exchange%construct(particles)
     call json_write_particles(particles, "initial.json")

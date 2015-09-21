@@ -1,5 +1,5 @@
 {
-    "Box": {
+    "Periodic Box": {
         "name": "XYZ",
         "size": [12.0, 12.0, 15.0]
     },

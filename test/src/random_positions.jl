@@ -32,7 +32,7 @@ input_data = json.parsefile(ARGS[1]; ordered=false, use_mmap=true)
 box_size = input_data["Periodic Box"]["size"]
 num_particles = input_data["Particles"]["number"]
 min_diameter = input_data["Particles"]["diameter"] *
-    input_data["Particles"]["diameter minimum factor"]
+    input_data["Particles"]["minimum diameter factor"]
 
 positions = pbc.folded(rand(3) .* box_size, box_size)
 pos = Float64[]

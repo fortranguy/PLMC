@@ -50,7 +50,7 @@ implicit none
     call input_data%load_file(filename = data_filename)
     deallocate(data_filename)
 
-    data_field = "Box.name"
+    data_field = "Periodic Box.name"
     call input_data%get(data_field, box_name, data_found)
     call test_data_found(data_field, data_found)
     select case(box_name)
@@ -62,7 +62,7 @@ implicit none
             call error_exit(data_field//" unkown.")
     end select
     deallocate(box_name)
-    data_field = "Box.size"
+    data_field = "Periodic Box.size"
     call input_data%get(data_field, box_size, data_found)
     call test_data_found(data_field, data_found)
     call periodic_box%set(box_size)

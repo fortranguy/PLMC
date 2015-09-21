@@ -6,6 +6,8 @@ use class_particles_exchange, only: Particles_Exchange_Facade
 
 implicit none
 
+private
+
     type, public :: Changes_Wrapper
         class(Abstract_Moved_Positions), allocatable :: moved_positions
         class(Abstract_Rotated_Orientations), allocatable :: rotated_orientations

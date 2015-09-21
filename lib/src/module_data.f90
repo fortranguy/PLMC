@@ -1,6 +1,7 @@
 module module_data
 
 use procedures_errors, only: error_exit
+use json_module, only: json_file
 
 implicit none
 
@@ -12,6 +13,11 @@ public :: data_filename, data_post_filename, report_filename, report_post_filena
     character(len=*), parameter :: data_post_filename = "data_post.json"
     character(len=*), parameter :: report_filename = "report.json"
     character(len=*), parameter :: report_post_filename = "report_post.json"
+
+    type, public :: Concrete_Input_Data
+        type(json_file) :: json
+        character(len=:), allocatable :: prefix
+    end type Concrete_Input_Data
 
 contains
 

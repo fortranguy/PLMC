@@ -10,9 +10,6 @@ private
     type, public :: Concrete_Particle
         logical :: same_type = .false.
         integer :: i = 0
-        real(DP) :: diameter = 0._DP
-        real(DP) :: min_diameter = 0._DP
-        real(DP) :: moment_norm = 0._DP
         real(DP) :: position(num_dimensions) = 0._DP
         real(DP) :: orientation(num_dimensions) = 0._DP
     end type Concrete_Particle
