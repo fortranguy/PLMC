@@ -9,37 +9,48 @@ implicit none
 
 private
 
-    type, public :: External_Field_Facade
+    type, abstract, public :: Abstract_External_Field
         class(Abstract_Parallelepiped_Domain), pointer :: parallelepiped_domain
         class(Abstract_Field_Expression), pointer :: field_expression
     contains
-        procedure :: construct => External_Field_Facade_construct
-        procedure :: destroy => External_Field_Facade_destroy
-        procedure :: get => External_Field_Facade_get
-    end type External_Field_Facade
-    
+        procedure :: construct => Abstract_External_Field_construct
+        procedure :: destroy => Abstract_External_Field_destroy
+        procedure :: get => Abstract_External_Field_get
+    end type Abstract_External_Field
+
+    type, extends(Abstract_External_Field), public :: Concrete_External_Field
+
+    end type Concrete_External_Field
+
+    type, extends(Abstract_External_Field), public :: Null_External_Field
+    contains
+        procedure :: construct => Null_External_Field_construct
+        procedure :: destroy => Null_External_Field_destroy
+        procedure :: get => Null_External_Field_get
+    end type Null_External_Field
+
 contains
 
-!implementation External_Field_Facade
+!implementation Abstract_External_Field
 
-    subroutine External_Field_Facade_construct(this, parallelepiped_domain, field_expression)
-        class(External_Field_Facade), intent(out) :: this
+    subroutine Abstract_External_Field_construct(this, parallelepiped_domain, field_expression)
+        class(Abstract_External_Field), intent(out) :: this
         class(Abstract_Parallelepiped_Domain), target, intent(in) :: parallelepiped_domain
         class(Abstract_Field_Expression), target, intent(in) :: field_expression
-        
+
         this%parallelepiped_domain => parallelepiped_domain
         this%field_expression => field_expression
-    end subroutine External_Field_Facade_construct
+    end subroutine Abstract_External_Field_construct
 
-    subroutine External_Field_Facade_destroy(this)
-        class(External_Field_Facade), intent(inout) :: this
+    subroutine Abstract_External_Field_destroy(this)
+        class(Abstract_External_Field), intent(inout) :: this
 
         this%field_expression => null()
         this%parallelepiped_domain => null()
-    end subroutine External_Field_Facade_destroy
+    end subroutine Abstract_External_Field_destroy
 
-    pure function External_Field_Facade_get(this, position) result(external_field)
-        class(External_Field_Facade), intent(in) :: this
+    pure function Abstract_External_Field_get(this, position) result(external_field)
+        class(Abstract_External_Field), intent(in) :: this
         real(DP), intent(in) :: position(:)
         real(DP) :: external_field(num_dimensions)
 
@@ -48,8 +59,29 @@ contains
         else
             external_field = 0._DP
         end if
-    end function External_Field_Facade_get
+    end function Abstract_External_Field_get
 
-!end implementation External_Field_Facade
-    
+!end implementation Abstract_External_Field
+
+!implementation Null_External_Field
+
+    subroutine Null_External_Field_construct(this, parallelepiped_domain, field_expression)
+        class(Null_External_Field), intent(out) :: this
+        class(Abstract_Parallelepiped_Domain), target, intent(in) :: parallelepiped_domain
+        class(Abstract_Field_Expression), target, intent(in) :: field_expression
+    end subroutine Null_External_Field_construct
+
+    subroutine Null_External_Field_destroy(this)
+        class(Null_External_Field), intent(inout) :: this
+    end subroutine Null_External_Field_destroy
+
+    pure function Null_External_Field_get(this, position) result(external_field)
+        class(Null_External_Field), intent(in) :: this
+        real(DP), intent(in) :: position(:)
+        real(DP) :: external_field(num_dimensions)
+        external_field = 0._DP
+    end function Null_External_Field_get
+
+!end implementation Null_External_Field
+
 end module class_external_field
