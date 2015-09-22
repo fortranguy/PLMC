@@ -1,0 +1,114 @@
+\begin{scope}[shift={($(Box.north) + (28 cm, 0 cm)$)}]
+\begin{package}{Particles}
+    
+    \begin{scope}[opacity=1]
+        \begin{abstractclass}[text width=\smallTextWidth]{ParticlesNumber}{0, 0}
+            \operation{set(number\type{int})}
+            \operation{get()\type{int}}
+        \end{abstractclass}
+    \end{scope}
+    
+    \begin{scope}[shift={($(ParticlesNumber.north) + (7 cm, 0 cm)$)}, opacity=1]
+        \begin{abstractclass}[text width=\smallTextWidth]{ParticlesDiameter}{0, 0}
+            \operation{set(diameter\type{double}, minFactor\type{double})}
+            \operation{get()\type{double}}
+            \operation{getMin()\type{double}}
+        \end{abstractclass}
+    \end{scope}
+
+    \begin{scope}[shift={($(ParticlesDiameter.north) + (7 cm, 0 cm)$)}, opacity=1]
+        \begin{abstractclass}[text width=\smallTextWidth]{ParticlesMomentNorm}{0, 0}
+            \operation{set(norm\type{double})}
+            \operation{get()\type{double}}
+        \end{abstractclass}
+        \begin{comment}
+            \begin{class}[text width=\smallTextWidth]{NullMomentsNorm}{0, -3}
+                \inherit{ParticlesMomentNorm}
+            \end{class}
+        \end{comment}
+    \end{scope}
+    
+    \begin{scope}[shift={($(ParticlesMomentNorm.north) + (7 cm, 0)$)}, opacity=1]
+        \begin{abstractclass}[text width=\smallTextWidth]{ParticlesChemicalPotential}{0, 0}
+            \operation{set(density\type{double}, excess\type{double})}
+            \operation{getDensity()\type{double}}
+            \operation{getExcess()\type{double}}
+        \end{abstractclass}
+    \end{scope}
+    
+    \begin{scope}[shift={($(ParticlesDiameter.north) + (-9 cm, 6 cm)$)}, opacity=1]
+        \begin{abstractclass}[text width=\mediumTextWidth]{InterParticlesDiameter}{0, 0}
+            \operation{construct(diameter1\type{ParticlesDiameter},
+                                diameter2\type{ParticlesDiameter},
+                                offset\type{double})}
+            \operation{destroy()}
+            \operation{get()\type{double}}
+            \operation{getMin()\type{double}}
+        \end{abstractclass}
+    \end{scope}
+    
+    \begin{scope}[shift={($(InterParticlesDiameter.north) + (9 cm, 0 cm)$)}, opacity=1]
+        \begin{abstractclass}[text width=\mediumTextWidth]{ParticlesPositions}{0, 0}
+            \operation{construct(periodicBox\type{PeriodicBox},
+                                number\type{ParticlesNumber})}
+            \operation{detroy()}
+            \operation{set(iParticle\type{int}, position\type{double[3]})}
+            \operation{getNum()\type{int}}
+            \operation{get(iParticle\type{int})\type{double[3]}}
+            \operation{add(position\type{double[3]})}
+            \operation{remove(iParticle\type{int})}
+        \end{abstractclass}
+    \end{scope}
+    
+    \begin{scope}[shift={($(ParticlesPositions.north) + (9 cm, 0 cm)$)}, opacity=1]
+        \begin{abstractclass}[text width=\mediumTextWidth]{ParticlesOrientations}{0, 0}
+            \operation{construct(number\type{ParticlesNumber})}
+            \operation{detroy()}
+            \operation{set(iParticle\type{int}, orientation\type{double[3]})}
+            \operation{getNum()\type{int}}
+            \operation{get(iParticle\type{int})\type{double[3]}}
+            \operation{add(orientation\type{double[3]})}
+            \operation{remove(iParticle\type{int})}
+        \end{abstractclass}
+        \begin{comment}
+            \begin{class}[text width=\mediumTextWidth]{NullOrientations}{0, -5.5}
+                \inherit{ParticlesOrientations}
+            \end{class}
+        \end{comment}
+    \end{scope}
+    
+    \begin{scope}[shift={($(ParticlesOrientations.north) + (5 cm, 5 cm)$)}, opacity=1]
+        \begin{abstractclass}[text width=\mediumTextWidth]{ParticlesDipolarMoments}{0, 0}
+            \operation{construct(momentNorm\type{ParticlesMomentNorm},
+                                orientations\type{ParticlesOrientations})}
+            \operation{destroy()}
+            \operation{getNum()\type{int}}
+            \operation{get(iParticle\type{int})}
+        \end{abstractclass}
+    \end{scope}
+    
+    \begin{scope}[shift={($(ParticlesDipolarMoments.north) + (9 cm, 0 cm)$)}, opacity=1]
+        \begin{abstractclass}[text width=\mediumTextWidth]{ParticlesTotalMoment}{0, 0}
+            \operation{construct(dipolarMoment\type{ParticlesDipolarMoments})}
+            \operation{destroy()}
+            \operation{reset()}
+            \operation{get()\type{double[3]}}
+            \operation{add(moment\type{double[3]})}
+            \operation{remove(moment\type{double[3]})}
+            %\operation{rotationUpdate(old\type{Particle}, new\type{Particle})}
+            %\operation{exchangeUpdate(particle\type{Particle})}
+        \end{abstractclass}
+    \end{scope}
+    
+\end{package}
+\end{scope}
+
+\begin{scope}[on background layer]
+    \aggregation{InterParticlesDiameter}{diameter}{2}{ParticlesDiameter}
+    \aggregation{ParticlesPositions}{periodicBox}{1}{PeriodicBox}
+    \aggregation{ParticlesPositions}{number}{1}{ParticlesNumber}
+    \aggregation{ParticlesOrientations}{number}{1}{ParticlesNumber}    
+    \aggregation{ParticlesDipolarMoments}{momentNorm}{1}{ParticlesMomentNorm}
+    \aggregation{ParticlesDipolarMoments}{orientations}{1}{ParticlesOrientations}
+    \aggregation{ParticlesTotalMoment}{momentNorm}{1}{ParticlesDipolarMoments}
+\end{scope}

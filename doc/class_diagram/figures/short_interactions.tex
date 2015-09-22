@@ -1,53 +1,32 @@
-\begin{scope}[shift={($(Material.north) + (-28 cm, 55 cm)$)}, opacity=0.5]
-    \begin{package}{Short range interactions}
+\begin{scope}[shift={($(Box.north) + (-28 cm, 55 cm)$)}, opacity=0.5]
+\begin{package}{Short range interactions}
     
-        \begin{scope}
-            \begin{abstractclass}[text width=\extraLargeTextWidth]{ShortInteraction}{0, 0}
-                \operation[0]{totalEnergy() : double}
-                \operation[0]{soloEnergy(particle : Particle, overlap : bool, energy : double)}
-                \operation[0]{volumeChangeEnergy(dilatation : double, overlap : bool, energy : double)}
-                \operation[0]{overlapTest()}
-            \end{abstractclass}
-        \end{scope}
-    
-        \begin{scope}[shift={($(ShortInteraction.south) + (-8 cm, -2.5 cm)$)}]
-            \begin{class}[text width=\largeTextWidth]{PairPotentialFacade}{0, 0}
-                \operation{construct(boxPotential\type{BoxPotentialFacade},
-                                     cellsPotential\type{CellsPotential})}
-                \operation{destroy()}
-                \operation{visitCells(particle\type{Particle}, overlap\type{bool},
-                                      energy\type{double})}
-                \operation{visitBox(particle\type{Particle}, overlap\type{bool},
-                                    energy\type{double})}
-            \end{class}
-        \end{scope}
-
-        \begin{scope}[shift={($(PairPotentialFacade.south) + (5 cm, -2 cm)$)}, opacity=1]
-            \begin{class}[text width=\mediumTextWidth]{BoxPotentialFacade}{0, 0}
-                \operation{construct(periodicBox\type{PeriodicBox})}
-                \operation{destroy()}
-                \operation{set(positions\type{ParticlesPositions})}
-                \operation{set(pairPotential\type{PairPotential})}
-                \operation{visit(particle\type{Particle}, overlap\type{bool},
-                                 energy\type{double})}
-            \end{class}
-        \end{scope}
-                
-        \begin{scope}[shift={($(PairPotentialFacade.south) + (-7 cm, -2 cm)$)}, opacity=1]
-            \begin{abstractclass}[text width=\largeTextWidth]{VisitableCells}{0, 0}
-                \operation{construct(mold\type{VisitableList}, periodicBox\type{PeriodicBox},
-                                     positions\type{ParticlesPositions}, pairPotential\type{PairPotential})}
-                \operation{destroy()}
-                \operation{fill()}
-                \operation{visit(particle\type{Particle}, overlap\type{bool},
-                    energy\type{double})}
-                \operation{move(from\type{Particle}, to\type{Particle})}
-                \operation{add(particle\type{Particle})}
-                \operation{remove(particle\type{Particle})}
-            \end{abstractclass}
+    \begin{scope}[opacity=1]
+        \begin{abstractclass}[text width=\mediumTextWidth]{ParticlesPotential}{0, 0}
+            \operation{construct(periodicBox\type{PeriodicBox})}
+            \operation{destroy()}
+            \operation{set(positions\type{ParticlesPositions})}
+            \operation{set(pairPotential\type{PairPotential})}
+            \operation{visit(particle\type{Particle}, overlap\type{bool},
+                                energy\type{double})}
+        \end{abstractclass}
+    \end{scope}
             
-            \def\operationsImplementation{}
-            
+    \begin{scope}[shift={($(ParticlesPotential.north) + (-12 cm, 0 cm)$)}, opacity=1]
+        \begin{abstractclass}[text width=\largeTextWidth]{VisitableCells}{0, 0}
+            \operation{construct(mold\type{VisitableList}, periodicBox\type{PeriodicBox},
+                                    positions\type{ParticlesPositions}, pairPotential\type{PairPotential})}
+            \operation{destroy()}
+            \operation{fill()}
+            \operation{visit(particle\type{Particle}, overlap\type{bool},
+                energy\type{double})}
+            \operation{move(from\type{Particle}, to\type{Particle})}
+            \operation{add(particle\type{Particle})}
+            \operation{remove(particle\type{Particle})}
+        \end{abstractclass}
+        
+        \def\operationsImplementation{}
+        \begin{comment}
             \begin{class}[text width=\largeTextWidth]{XYZPBCVisitableCells}{0, -5.5}
                 \inherit{VisitableCells}
                 \operationsImplementation{}
@@ -57,92 +36,55 @@
                 \inherit{VisitableCells}
                 \operationsImplementation{}
             \end{class}
-        \end{scope}
+        \end{comment}
+    \end{scope}
 
-        \begin{scope}[shift={($(VisitableCells.north) + (-11 cm, -6 cm)$)}, opacity=1]
-            \begin{abstractclass}[text width=\mediumTextWidth]{VisitableList}{0, 0}
-                \operation{construct(periodicBox\type{PeriodicBox},
-                                     positions\type{ParticlesPositions})}
-                \operation{destroy()}
-                \operation{set(iTarger\type{int}, particle\type{Particle})}
-                \operation{visit(particle\type{Particle}, pairPotential\type{PairPotential},
-                                 overlap\type{bool}, energy\type{double})}
-                \operation{add(particle\type{Particle})}
-                \operation{remove(iParticle\type{int})}
-            \end{abstractclass}
-        \end{scope}
-        
-        \begin{scope}[shift={($(BoxPotentialFacade.south) + (0 cm, -2 cm)$)}, opacity=1]
-            \begin{abstractclass}[text width=\mediumTextWidth]{PairPotential}{0, 0}
-                \operation{construct(potentialDomain\type{PotentialDomain},
-                                     potentialExpression\type{PotentialExpression})}
-                \operation{destroy()}
-                \operation{getMaxDistance()}
-                \operation{meet(distance\type{double}, overlap\type{bool},
-                                energy\type{double})}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(PairPotential.south) + (0 cm, -1.5 cm)$)}, opacity=1]
-        \begin{abstractclass}[text width=\mediumTextWidth]{PotentialExpression}{0, 0}
-                \operation{set(potentialParameters\type{PotentialParameters})}
-                \operation{get(distance : double) : double}
-            \end{abstractclass}
-        \end{scope}
-        
-        \begin{scope}[shift={($(ShortInteraction.south) + (8 cm, -2.5 cm)$)}]
-            \begin{abstractclass}[text width=\extraLargeTextWidth]{WallsInteraction}{0, 0}
-                \inherit{ShortInteraction}
-            \end{abstractclass}
-            
-            \def\operationsImplementation{
-                \operation{totalEnergy() : double}
-                \operation{soloEnergy(particle : Particle, overlap : bool, energy : double)}
-                \operation{volumeChangeEnergy(dilatation : double, overlap : bool, energy : double)}
-                \operation{overlapTest()}
-            }
-            
-            \begin{class}[text width=\extraLargeTextWidth]{NullWallsInteraction}{0, -2}
-                \inherit{WallsInteraction}
-                \operationsImplementation{}
-            \end{class}
-            
-            \begin{class}[text width=\extraLargeTextWidth]{tWallsInteraction}{0, -5.5}
-                \inherit{WallsInteraction}
-                \operationsImplementation{}
-            \end{class}
-        \end{scope}
-        
-        \begin{scope}[shift={($(WallsInteraction.south) + (8 cm, -3.5 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{WallsPotential}{0, 0}
-                \operation[0]{potential(height : double) : double}
-            \end{abstractclass}
-            
-            \def\operationsImplementation{
-                \operation{potential(height : double) : double}
-            }
-            
-            \begin{class}[text width=\mediumTextWidth]{HardWallsPotential}{0, -2.5}
-                \inherit{WallsPotential}
-                \operationsImplementation{}
-            \end{class}
-            
-            \begin{class}[text width=\mediumTextWidth]{SoftWallsPotential}{0, -4.5}
-                \inherit{WallsPotential}
-                \operationsImplementation{}
-            \end{class}
-        \end{scope}
+    \begin{scope}[shift={($(VisitableCells.south) + (-7 cm, -3 cm)$)}, opacity=1]
+        \begin{abstractclass}[text width=\mediumTextWidth]{VisitableList}{0, 0}
+            \operation{construct(periodicBox\type{PeriodicBox},
+                                    positions\type{ParticlesPositions})}
+            \operation{destroy()}
+            \operation{set(iTarger\type{int}, particle\type{Particle})}
+            \operation{visit(particle\type{Particle}, pairPotential\type{PairPotential},
+                                overlap\type{bool}, energy\type{double})}
+            \operation{add(particle\type{Particle})}
+            \operation{remove(iParticle\type{int})}
+        \end{abstractclass}
+    \end{scope}
     
-    \end{package}
+    \begin{scope}[shift={($(ParticlesPotential.south) + (0 cm, -2 cm)$)}, opacity=1]
+        \begin{abstractclass}[text width=\mediumTextWidth]{PairPotential}{0, 0}
+            \operation{construct(potentialDomain\type{PotentialDomain}, 
+                potentialExpression\type{PotentialExpression})}
+            \operation{destroy()}
+            \operation{getMaxDistance()}
+            \operation{meet(distance\type{double}, overlap\type{bool}, energy\type{double})}
+        \end{abstractclass}
+    \end{scope}
+
+    \begin{scope}[shift={($(PairPotential.south) + (0 cm, -1.5 cm)$)}, opacity=1]
+    \begin{abstractclass}[text width=\mediumTextWidth]{PotentialExpression}{0, 0}
+            \operation{set(potentialParameters\type{PotentialParameters})}
+            \operation{get(distance : double) : double}
+        \end{abstractclass}
+    \end{scope}
+    
+    \begin{scope}[shift={($(PairPotential.north) + (10 cm, 0 cm)$)}, opacity=1]
+        \begin{abstractclass}[text width=\mediumTextWidth]{WallPotential}{0, 0}
+            \operation{construct(potentialDomain\type{PotentialDomain},
+                potentialExpression\type{PotentialExpression})}
+            \operation{destroy()}
+            \operation{meet(distance\type{double}, overlap\type{bool}, energy\type{double})}
+        \end{abstractclass}
+    \end{scope}
+
+\end{package}
 \end{scope}
 
 \begin{scope}[on background layer]
-    %\aggregation{PairPotentialFacade}{periodicBox}{1}{PeriodicBox}
-    \aggregation{PairPotentialFacade}{cellsPotential}{1}{VisitableCells}
-    \aggregation{PairPotentialFacade}{boxPotential}{1}{BoxPotentialFacade}
-    \aggregation{BoxPotentialFacade}{periodicBox}{1}{PeriodicBox}
-    \aggregation{BoxPotentialFacade}{positions}{1}{ParticlesPositions}
-    \aggregation{BoxPotentialFacade}{pairPotential}{1}{PairPotential}
+    \aggregation{ParticlesPotential}{periodicBox}{1}{PeriodicBox}
+    \aggregation{ParticlesPotential}{positions}{1}{ParticlesPositions}
+    \aggregation{ParticlesPotential}{pairPotential}{1}{PairPotential}
     %\aggregation{IntraPairInteration}{diameters}{1}{Diameters}
     %\aggregation{IntraPairInteration}{positions}{1}{ParticlesPositions}
     %\aggregation{InterPairInteration}{interDiameters}{1}{InterDiameters}
@@ -155,7 +97,5 @@
     
     \aggregation{PairPotential}{potentialExpression}{1}{PotentialExpression}
     
-    \composition{WallsInteraction}{wallsPotential}{1}{WallsPotential}
-    \aggregation{WallsInteraction}{periodicBox}{1}{PeriodicBox}
-    \aggregation{WallsInteraction}{positions}{1}{ParticlesPositions}
+    \aggregation{WallPotential}{potentialExpression}{1}{PotentialExpression}
 \end{scope}

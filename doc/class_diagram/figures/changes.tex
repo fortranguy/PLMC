@@ -1,0 +1,51 @@
+\begin{scope}[shift={($(Particles.north) + (0 cm, 10 cm)$)}]
+\begin{package}{Changes}
+        
+    \begin{scope}
+        \begin{abstractclass}[text width=\mediumTextWidth]{AbstractParticlesExchange}{0, 0}
+            \operation{construct(particles\type{GenericParticles})}
+            \operation{destroy()}
+            \operation{add(particle\type{GenericParticle})}
+            \operation{remove(iParticle\type{int})}
+        \end{abstractclass}
+    \end{scope}
+    
+    \begin{scope}[shift={($(AbstractParticlesExchange.north) + (9 cm, 0 cm)$)}, opacity=1]
+        \begin{abstractclass}[text width=\mediumTextWidth]{MovedPositions}{0, 0}
+            \operation{construct(positions\type{ParticlesPositions}, delta\type{double[3]},
+                adaptationFactor\type{double})}
+            \operation{destroy()}
+            \operation{increase()}
+            \operation{decrease()}
+            \operation{get(iParticle\type{int})\type{double[3]}}
+        \end{abstractclass}
+    \end{scope}
+    
+    \begin{scope}[shift={($(MovedPositions.north) + (9 cm, 0 cm)$)}, opacity=1]
+        \begin{abstractclass}[text width=\mediumTextWidth]{RotatedOrientations}{0, 0}
+            \operation{construct(orientations\type{ParticlesOrientations}, delta\type{double},
+                adaptationFactor\type{double})}
+            \operation{destroy()}
+            \operation{increase()}
+            \operation{decrease()}
+            \operation{get(iParticle\type{int})\type{double[3]}}
+        \end{abstractclass}
+        \begin{comment}
+            \begin{class}[text width=\mediumTextWidth]{NullRotatedOrientations}{0, -4.5}
+                \inherit{RotatedOrientations}
+            \end{class}
+        \end{comment}
+    \end{scope}
+
+\end{package}
+\end{scope}
+
+\begin{scope}[on background layer]
+    \aggregation{MovedPositions}{positions}{1}{ParticlesPositions}
+    \aggregation{RotatedOrientations}{orientations}{1}{ParticlesOrientations}
+
+    \aggregation{AbstractParticlesExchange}{number}{1}{ParticlesNumber}
+    \aggregation{AbstractParticlesExchange}{positions}{1}{ParticlesPositions}
+    \aggregation{AbstractParticlesExchange}{orientations}{1}{ParticlesOrientations}
+    \aggregation{AbstractParticlesExchange}{totalMoment}{1}{ParticlesTotalMoment}
+\end{scope}
