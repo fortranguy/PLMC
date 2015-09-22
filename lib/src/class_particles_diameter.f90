@@ -21,6 +21,13 @@ private
 
     end type Concrete_Particles_Diameter
 
+    type, extends(Abstract_Particles_Diameter), public :: Null_Particles_Diameter
+    contains
+        procedure :: set => Null_Particles_Diameter_set
+        procedure :: get => Null_Particles_Diameter_get
+        procedure :: get_min => Null_Particles_Diameter_get_min
+    end type Null_Particles_Diameter
+
 contains
 
 !implementation Abstract_Particles_Diameter
@@ -49,5 +56,26 @@ contains
     end function Abstract_Particles_Diameter_get_min
 
 !end implementation Abstract_Particles_Diameter
+
+!implementation Null_Particles_Diameter
+
+    subroutine Null_Particles_Diameter_set(this, diameter, min_factor)
+        class(Null_Particles_Diameter), intent(inout) :: this
+        real(DP), intent(in) :: diameter, min_factor
+    end subroutine Null_Particles_Diameter_set
+
+    pure function Null_Particles_Diameter_get(this) result(diameter)
+        class(Null_Particles_Diameter), intent(in) :: this
+        real(DP) :: diameter
+        diameter = 0._DP
+    end function Null_Particles_Diameter_get
+
+    pure function Null_Particles_Diameter_get_min(this) result(min_diameter)
+        class(Null_Particles_Diameter), intent(in) :: this
+        real(DP) :: min_diameter
+        min_diameter = 0._DP
+    end function Null_Particles_Diameter_get_min
+
+!end implementation Null_Particles_Diameter
 
 end module class_particles_diameter

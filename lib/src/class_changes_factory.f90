@@ -9,7 +9,7 @@ use class_moved_positions, only: Abstract_Moved_Positions, &
 use class_particles_orientations, only:  Abstract_Particles_Orientations
 use class_rotated_orientations, only: Abstract_Rotated_Orientations, &
     Concrete_Rotated_Orientations
-use class_particles_exchange, only: Particles_Exchange_Facade
+use class_particles_exchange, only: Abstract_Particles_Exchange
 use module_adaptation, only: Concrete_Adaptation_Parameters
 use types_particles, only: Particles_Wrapper
 use types_changes, only: Changes_Wrapper

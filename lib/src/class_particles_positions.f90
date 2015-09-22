@@ -30,6 +30,17 @@ private
 
     end type Concrete_Particles_Positions
 
+    type, extends(Abstract_Particles_Positions), public :: Null_Particles_Positions
+    contains
+        procedure :: construct => Null_Particles_Positions_construct
+        procedure :: destroy => Null_Particles_Positions_destroy
+        procedure :: set => Null_Particles_Positions_set
+        procedure :: get_num => Null_Particles_Positions_get_num
+        procedure :: get => Null_Particles_Positions_get
+        procedure :: add => Null_Particles_Positions_add
+        procedure :: remove => Null_Particles_Positions_remove
+    end type Null_Particles_Positions
+
 contains
 
 !implementation Abstract_Particles_Positions
@@ -103,5 +114,48 @@ contains
     end subroutine Abstract_Particles_Positions_remove
 
 !end implementation Abstract_Particles_Positions
+
+!implementation Null_Particles_Positions
+
+    subroutine Null_Particles_Positions_construct(this, periodic_box, number)
+        class(Null_Particles_Positions), intent(out) :: this
+        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+        class(Abstract_Particles_Number), target, intent(in) :: number
+    end subroutine Null_Particles_Positions_construct
+
+    subroutine Null_Particles_Positions_destroy(this)
+        class(Null_Particles_Positions), intent(inout) :: this
+    end subroutine Null_Particles_Positions_destroy
+
+    subroutine Null_Particles_Positions_set(this, i_particle, position)
+        class(Null_Particles_Positions), intent(inout) :: this
+        integer, intent(in) :: i_particle
+        real(DP), intent(in) :: position(:)
+    end subroutine Null_Particles_Positions_set
+
+    pure function Null_Particles_Positions_get_num(this) result(num_positions)
+        class(Null_Particles_Positions), intent(in) :: this
+        integer :: num_positions
+        num_positions = 0
+    end function Null_Particles_Positions_get_num
+
+    pure function Null_Particles_Positions_get(this, i_particle) result(position)
+        class(Null_Particles_Positions), intent(in) :: this
+        integer, intent(in) :: i_particle
+        real(DP) :: position(num_dimensions)
+        position = 0._DP
+    end function Null_Particles_Positions_get
+
+    subroutine Null_Particles_Positions_add(this, position)
+        class(Null_Particles_Positions), intent(inout) :: this
+        real(DP), intent(in) :: position(:)
+    end subroutine Null_Particles_Positions_add
+
+    subroutine Null_Particles_Positions_remove(this, i_particle)
+        class(Null_Particles_Positions), intent(inout) :: this
+        integer, intent(in) :: i_particle
+    end subroutine Null_Particles_Positions_remove
+
+!end implementation Null_Particles_Positions
 
 end module class_particles_positions
