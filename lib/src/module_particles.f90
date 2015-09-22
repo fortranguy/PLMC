@@ -1,7 +1,5 @@
 module module_particles
 
-use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use data_geometry, only: num_dimensions
 use class_particles_number, only: Abstract_Particles_Number
 use class_particles_diameter, only: Abstract_Particles_Diameter
 use class_particles_moment_norm, only: Abstract_Particles_Moment_Norm

@@ -38,7 +38,7 @@
         \end{abstractclass}
     \end{scope}
     
-    \begin{scope}[shift={($(PeriodicBox.north) + (11 cm, 5 cm)$)}, opacity=1]
+    \begin{scope}[shift={($(ParallelepipedDomain.north) + (11 cm, 0 cm)$)}, opacity=1]
         \begin{abstractclass}[text width=\mediumTextWidth]{ReciprocalLattice}{0, 0}
             \operation{contruct(periodicBox\type{PeriodicBox}, numbers\type{int[3]})}
             \operation{destroy()}
@@ -73,6 +73,16 @@
                 fieldExpression\type{FieldExpression})}
             \operation{destroy()}
             \operation{get(position\type{double[3]})\type{double[3]}}
+        \end{abstractclass}
+    \end{scope}
+    
+    \begin{scope}[shift={($(AbstractExternalField.north) + (10 cm, 0 cm)$)}, opacity=1]
+        \begin{abstractclass}[text width=\mediumTextWidth]{WallsPotential}{0, 0}
+            \operation{construct(gap\type{double}, potentialDomain\type{PotentialDomain},
+                potentialExpression\type{PotentialExpression})}
+            \operation{destroy()}
+            \operation{getGap()}
+            \operation{meet(position\type{double[3]}, overlap\type{bool}, energy\type{double})}
         \end{abstractclass}
     \end{scope}
     

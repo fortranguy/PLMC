@@ -68,15 +68,6 @@
             \operation{get(distance : double) : double}
         \end{abstractclass}
     \end{scope}
-    
-    \begin{scope}[shift={($(PairPotential.north) + (10 cm, 0 cm)$)}, opacity=1]
-        \begin{abstractclass}[text width=\mediumTextWidth]{WallPotential}{0, 0}
-            \operation{construct(potentialDomain\type{PotentialDomain},
-                potentialExpression\type{PotentialExpression})}
-            \operation{destroy()}
-            \operation{meet(distance\type{double}, overlap\type{bool}, energy\type{double})}
-        \end{abstractclass}
-    \end{scope}
 
 \end{package}
 \end{scope}
@@ -97,5 +88,5 @@
     
     \aggregation{PairPotential}{potentialExpression}{1}{PotentialExpression}
     
-    \aggregation{WallPotential}{potentialExpression}{1}{PotentialExpression}
+    \aggregation{WallsPotential}{pairPotential}{1}{PairPotential}
 \end{scope}
