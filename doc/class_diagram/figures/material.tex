@@ -201,12 +201,13 @@
         \end{scope}
         
         \begin{scope}[shift={($(ParticlesDipolarMoments.north) + (9 cm, 0 cm)$)}, opacity=1]
-            \begin{abstractclass}[text width=\mediumTextWidth]{AbstractTotalMoment}{0, 0}
+            \begin{abstractclass}[text width=\mediumTextWidth]{ParticlesTotalMoment}{0, 0}
                 \operation{construct(dipolarMoment\type{ParticlesDipolarMoments})}
                 \operation{destroy()}
-                \operation{set(totalMoment\type{double[3]})}
                 \operation{reset()}
                 \operation{get()\type{double[3]}}
+                \operation{add(moment\type{double[3]})}
+                \operation{remove(moment\type{double[3]})}
                 %\operation{rotationUpdate(old\type{Particle}, new\type{Particle})}
                 %\operation{exchangeUpdate(particle\type{Particle})}
             \end{abstractclass}
@@ -235,6 +236,7 @@
     \aggregation{AbstractParticlesExchange}{number}{1}{ParticlesNumber}
     \aggregation{AbstractParticlesExchange}{positions}{1}{ParticlesPositions}
     \aggregation{AbstractParticlesExchange}{orientations}{1}{ParticlesOrientations}
+    \aggregation{AbstractParticlesExchange}{totalMoment}{1}{ParticlesTotalMoment}
     
-    \aggregation{AbstractTotalMoment}{momentNorm}{1}{ParticlesDipolarMoments}
+    \aggregation{ParticlesTotalMoment}{momentNorm}{1}{ParticlesDipolarMoments}
 \end{scope}

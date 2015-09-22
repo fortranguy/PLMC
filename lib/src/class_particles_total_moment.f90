@@ -16,9 +16,10 @@ private
     contains
         procedure :: construct => Abstract_Particles_Total_Moment_construct
         procedure :: destroy => Abstract_Particles_Total_Moment_destroy
-        procedure :: set => Abstract_Particles_Total_Moment_set
         procedure :: reset => Abstract_Particles_Total_Moment_reset
         procedure :: get => Abstract_Particles_Total_Moment_get
+        procedure :: add => Abstract_Particles_Total_Moment_add
+        procedure :: remove => Abstract_Particles_Total_Moment_remove
     end type Abstract_Particles_Total_Moment
 
     type, extends(Abstract_Particles_Total_Moment), public :: Concrete_Particles_Total_Moment
@@ -29,9 +30,9 @@ private
     contains
         procedure :: construct => Null_Particles_Total_Moment_construct
         procedure :: destroy => Null_Particles_Total_Moment_destroy
-        procedure :: set => Null_Particles_Total_Moment_set
         procedure :: reset => Null_Particles_Total_Moment_reset
         procedure :: get => Null_Particles_Total_Moment_get
+        procedure :: remove => Null_Particles_Total_Moment_remove
     end type Null_Particles_Total_Moment
 
 contains
@@ -52,14 +53,6 @@ contains
         this%dipolar_moments => null()
     end subroutine Abstract_Particles_Total_Moment_destroy
 
-    subroutine Abstract_Particles_Total_Moment_set(this, total_moment)
-        class(Abstract_Particles_Total_Moment), intent(inout) :: this
-        real(DP), intent(in) :: total_moment(:)
-
-        call check_3d_array("Abstract_Particles_Total_Moment", "total_moment", total_moment)
-        this%total_moment = total_moment
-    end subroutine Abstract_Particles_Total_Moment_set
-
     pure subroutine Abstract_Particles_Total_Moment_reset(this)
         class(Abstract_Particles_Total_Moment), intent(inout) :: this
 
@@ -78,6 +71,22 @@ contains
         total_moment = this%total_moment
     end function Abstract_Particles_Total_Moment_get
 
+    subroutine Abstract_Particles_Total_Moment_add(this, total_moment)
+        class(Abstract_Particles_Total_Moment), intent(inout) :: this
+        real(DP), intent(in) :: total_moment(:)
+
+        call check_3d_array("Abstract_Particles_Total_Moment", "total_moment", total_moment)
+        this%total_moment = this%total_moment + total_moment
+    end subroutine Abstract_Particles_Total_Moment_add
+
+    subroutine Abstract_Particles_Total_Moment_remove(this, total_moment)
+        class(Abstract_Particles_Total_Moment), intent(inout) :: this
+        real(DP), intent(in) :: total_moment(:)
+
+        call check_3d_array("Abstract_Particles_Total_Moment", "total_moment", total_moment)
+        this%total_moment = this%total_moment - total_moment
+    end subroutine Abstract_Particles_Total_Moment_remove
+
 !end implementation Abstract_Particles_Total_Moment
 
 !implementation Null_Particles_Total_Moment
@@ -91,11 +100,6 @@ contains
         class(Null_Particles_Total_Moment), intent(inout) :: this
     end subroutine Null_Particles_Total_Moment_destroy
 
-    subroutine Null_Particles_Total_Moment_set(this, total_moment)
-        class(Null_Particles_Total_Moment), intent(inout) :: this
-        real(DP), intent(in) :: total_moment(:)
-    end subroutine Null_Particles_Total_Moment_set
-
     pure subroutine Null_Particles_Total_Moment_reset(this)
         class(Null_Particles_Total_Moment), intent(inout) :: this
     end subroutine Null_Particles_Total_Moment_reset
@@ -105,6 +109,16 @@ contains
         real(DP) :: total_moment(num_dimensions)
         total_moment = 0._DP
     end function Null_Particles_Total_Moment_get
+
+    subroutine Null_Particles_Total_Moment_add(this, total_moment)
+        class(Null_Particles_Total_Moment), intent(inout) :: this
+        real(DP), intent(in) :: total_moment(:)
+    end subroutine Null_Particles_Total_Moment_add
+
+    subroutine Null_Particles_Total_Moment_remove(this, total_moment)
+        class(Null_Particles_Total_Moment), intent(inout) :: this
+        real(DP), intent(in) :: total_moment(:)
+    end subroutine Null_Particles_Total_Moment_remove
 
 !end implementation Null_Particles_Total_Moment
 

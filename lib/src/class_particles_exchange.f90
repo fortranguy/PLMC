@@ -53,12 +53,15 @@ contains
         call this%particles%number%set(this%particles%number%get() + 1)
         call this%particles%positions%add(particle%position)
         call this%particles%orientations%add(particle%orientation)
+        call this%particles%total_moment%add(this%particles%dipolar_moments%get(&
+            this%particles%number%get()))
     end subroutine Abstract_Particles_Exchange_add
 
     subroutine Abstract_Particles_Exchange_remove(this, i_particle)
         class(Abstract_Particles_Exchange), intent(inout) :: this
         integer, intent(in) :: i_particle
 
+        call this%particles%total_moment%remove(this%particles%dipolar_moments%get(i_particle))
         call this%particles%orientations%remove(i_particle)
         call this%particles%positions%remove(i_particle)
         call this%particles%number%set(this%particles%number%get() - 1)
