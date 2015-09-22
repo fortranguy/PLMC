@@ -2,7 +2,8 @@ module class_field_expression
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_geometry, only: num_dimensions
-use types_field_parameters, only: Abstract_Field_Parameters, Constant_Field_Parameters
+use types_field_parameters, only: Abstract_Field_Parameters, Constant_Field_Parameters, &
+    Null_Field_Parameters
 use procedures_errors, only: error_exit
 
 implicit none
@@ -31,6 +32,14 @@ private
         end function Abstract_Field_Expression_get
 
     end interface
+
+    type, extends(Abstract_Field_Expression), public :: Null_Field_Expression
+    private
+        type(Constant_Field_Parameters) :: parameters
+    contains
+        procedure :: set => Null_Field_Expression_set
+        procedure :: get => Null_Field_Expression_get
+    end type Null_Field_Expression
 
     type, extends(Abstract_Field_Expression), public :: Constant_Field_Expression
     private
@@ -65,5 +74,21 @@ contains
     end function Constant_Field_Expression_get
 
 !end implementation Constant_Field_Expression_get
+
+!implementation Null_Field_Expression_get
+
+    subroutine Null_Field_Expression_set(this, parameters)
+        class(Null_Field_Expression), intent(inout) :: this
+        class(Abstract_Field_Parameters), intent(in) :: parameters
+    end subroutine Null_Field_Expression_set
+
+    pure function Null_Field_Expression_get(this, position) result(expression)
+        class(Null_Field_Expression), intent(in) :: this
+        real(DP), intent(in) :: position(:)
+        real(DP) :: expression(num_dimensions)
+        expression = 0._DP
+    end function Null_Field_Expression_get
+
+!end implementation Null_Field_Expression_get
 
 end module class_field_expression

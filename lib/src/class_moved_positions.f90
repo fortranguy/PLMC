@@ -103,7 +103,7 @@ contains
         class(Null_Moved_Positions), intent(out) :: this
         class(Abstract_Particles_Positions), target, intent(in) :: positions
         real(DP), intent(in) :: delta(:)
-        type(Concrete_Adaptation_Parameters) :: adaptation_parameters
+        type(Concrete_Adaptation_Parameters), intent(in) :: adaptation_parameters
     end subroutine Null_Moved_Positions_construct
 
     subroutine Null_Moved_Positions_destroy(this)

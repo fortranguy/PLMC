@@ -11,6 +11,10 @@ private
 
     end type Abstract_Field_Parameters
 
+    type, extends(Abstract_Field_Parameters), public :: Null_Field_Parameters
+
+    end type Null_Field_Parameters
+
     type, extends(Abstract_Field_Parameters), public :: Constant_Field_Parameters
         real(DP) :: vector(num_dimensions)
     end type Constant_Field_Parameters
