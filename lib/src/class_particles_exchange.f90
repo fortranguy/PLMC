@@ -1,7 +1,7 @@
 module class_particles_exchange
 
 use types_particle, only: Concrete_Particle
-use types_particles, only: Particles_Wrapper
+use module_particles, only: Particles_Wrapper
 
 implicit none
 
@@ -16,6 +16,10 @@ private
         procedure :: add => Abstract_Particles_Exchange_add
         procedure :: remove => Abstract_Particles_Exchange_remove
     end type Abstract_Particles_Exchange
+
+    type, extends(Abstract_Particles_Exchange), public :: Concrete_Particles_Exchange
+
+    end type Concrete_Particles_Exchange
 
     type, extends(Abstract_Particles_Exchange), public :: Null_Particles_Exchange
     contains

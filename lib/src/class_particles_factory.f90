@@ -21,7 +21,7 @@ use class_particles_dipolar_moments, only: Abstract_Particles_Dipolar_Moments, &
     Concrete_Particles_Dipolar_Moments, Null_Particles_Dipolar_Moments
 use class_particles_total_moment, only: Abstract_Particles_Total_Moment, &
     Concrete_Particles_Total_Moment, Null_Particles_Total_Moment
-use types_particles, only: Particles_Wrapper_Parameters, Particles_Wrapper
+use module_particles, only: Particles_Wrapper_Parameters, Particles_Wrapper
 
 implicit none
 
@@ -59,16 +59,14 @@ contains
 
 !implementation Concrete_Particles_Factory
 
-    subroutine Concrete_Particles_Factory_allocate(this, parameters, particles, input_data, prefix)
+    subroutine Concrete_Particles_Factory_allocate(this, particles, parameters, input_data, prefix)
         class(Concrete_Particles_Factory), intent(out) :: this
-        type(Particles_Wrapper_Parameters), intent(in) :: parameters
         type(Particles_Wrapper), intent(out) :: particles
+        type(Particles_Wrapper_Parameters), intent(in) :: parameters
         type(json_file), target, intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        this%parameters%exist = parameters%exist
-        this%parameters%are_dipolar = parameters%are_dipolar
-        this%parameters%can_exchange = parameters%can_exchange
+        this%parameters = parameters
         this%input_data => input_data
         this%prefix = prefix
         call this%allocate_number(particles%number)

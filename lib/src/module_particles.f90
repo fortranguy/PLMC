@@ -1,4 +1,4 @@
-module types_particles
+module module_particles
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_geometry, only: num_dimensions
@@ -21,6 +21,10 @@ private
         logical :: can_exchange
     end type Particles_Wrapper_Parameters
 
+    interface assignment(=)
+        module procedure :: Particles_Wrapper_Parameters_assignment
+    end interface
+
     type, public :: Particles_Wrapper
         class(Abstract_Particles_Number), allocatable :: number
         class(Abstract_Particles_Diameter), allocatable :: diameter
@@ -32,4 +36,16 @@ private
         class(Abstract_Particles_Total_Moment), allocatable :: total_moment
     end type Particles_Wrapper
 
-end module types_particles
+contains
+
+    pure subroutine Particles_Wrapper_Parameters_assignment(particles_parameters_target, &
+        particles_parameters_value)
+        type(Particles_Wrapper_Parameters), intent(out) :: particles_parameters_target
+        type(Particles_Wrapper_Parameters), intent(in) :: particles_parameters_value
+
+        particles_parameters_target%exist = particles_parameters_value%exist
+        particles_parameters_target%are_dipolar = particles_parameters_value%are_dipolar
+        particles_parameters_target%can_exchange = particles_parameters_value%can_exchange
+    end subroutine Particles_Wrapper_Parameters_assignment
+
+end module module_particles

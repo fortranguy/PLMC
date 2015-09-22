@@ -31,13 +31,24 @@ private
 
     end type Concrete_Moved_Positions
 
+    type, extends(Abstract_Moved_Positions), public :: Null_Moved_Positions
+    contains
+        procedure :: construct => Null_Moved_Positions_construct
+        procedure :: destroy => Null_Moved_Positions_destroy
+        procedure :: increase => Null_Moved_Positions_increase
+        procedure :: decrease => Null_Moved_Positions_decrease
+        procedure :: get => Null_Moved_Positions_get
+    end type Null_Moved_Positions
+
 contains
+
+!implementation Abstract_Moved_Positions
 
     subroutine Abstract_Moved_Positions_construct(this, positions, delta, adaptation_parameters)
         class(Abstract_Moved_Positions), intent(out) :: this
         class(Abstract_Particles_Positions), target, intent(in) :: positions
         real(DP), intent(in) :: delta(:)
-        type(Concrete_Adaptation_Parameters) :: adaptation_parameters
+        type(Concrete_Adaptation_Parameters), intent(in) :: adaptation_parameters
 
         this%positions => positions
         call check_3d_array("Abstract_Moved_Positions", "delta", delta)
@@ -83,5 +94,37 @@ contains
         call random_number(rand)
         moved_position = this%positions%get(i_particle) + (rand - 0.5_DP) * this%delta
     end function Abstract_Moved_Positions_get
+
+!end implementation Abstract_Moved_Positions
+
+!implementation Null_Moved_Positions
+
+    subroutine Null_Moved_Positions_construct(this, positions, delta, adaptation_parameters)
+        class(Null_Moved_Positions), intent(out) :: this
+        class(Abstract_Particles_Positions), target, intent(in) :: positions
+        real(DP), intent(in) :: delta(:)
+        type(Concrete_Adaptation_Parameters) :: adaptation_parameters
+    end subroutine Null_Moved_Positions_construct
+
+    subroutine Null_Moved_Positions_destroy(this)
+        class(Null_Moved_Positions), intent(inout) :: this
+    end subroutine Null_Moved_Positions_destroy
+
+    subroutine Null_Moved_Positions_increase(this)
+        class(Null_Moved_Positions), intent(inout) :: this
+    end subroutine Null_Moved_Positions_increase
+
+    subroutine Null_Moved_Positions_decrease(this)
+        class(Null_Moved_Positions), intent(inout) :: this
+    end subroutine Null_Moved_Positions_decrease
+
+    function Null_Moved_Positions_get(this, i_particle) result(moved_position)
+        class(Null_Moved_Positions), intent(in) :: this
+        integer, intent(in) :: i_particle
+        real(DP) :: moved_position(num_dimensions)
+        moved_position = 0._DP
+    end function Null_Moved_Positions_get
+
+!end implementation Null_Moved_Positions
 
 end module class_moved_positions
