@@ -9,13 +9,15 @@ use class_particles_moment_norm, only: Abstract_Particles_Moment_Norm, &
     Concrete_Particles_Moment_Norm
 use class_particles_orientations, only: Abstract_Particles_Orientations, &
     Concrete_Particles_Orientations, Null_Particles_Orientations
-use class_particles_dipolar_moments, only: Particles_Dipolar_Moments_Facade
-use class_particles_total_moment, only: Particles_Total_Moment_Facade
+use class_particles_dipolar_moments, only: Abstract_Particles_Dipolar_Moments, &
+    Concrete_Particles_Dipolar_Moments
+use class_particles_total_moment, only: Abstract_Particles_Total_Moment, &
+    Concrete_Particles_Total_Moment
 
 implicit none
 
-    type(Particles_Total_Moment_Facade) :: total_moment
-    type(Particles_Dipolar_Moments_Facade) :: dipolar_moments
+    class(Abstract_Particles_Total_Moment), allocatable :: total_moment
+    class(Abstract_Particles_Dipolar_Moments), allocatable :: dipolar_moments
     class(Abstract_Particles_Orientations), allocatable :: orientations
     class(Abstract_Particles_Moment_Norm), allocatable :: moment_norm
     class(Abstract_Particles_Number), allocatable :: number
@@ -58,6 +60,7 @@ implicit none
         call orientations%set(i_particle, random_orientation())
     end do
 
+    allocate(Concrete_Particles_Dipolar_Moments :: dipolar_moments)
     call dipolar_moments%construct(moment_norm, orientations)
     data_field = "Write moments"
     call input_data%get(data_field, write_orientation, data_found)
@@ -71,12 +74,15 @@ implicit none
     end if
     deallocate(data_field)
 
+    allocate(Concrete_Particles_Total_Moment :: total_moment)
     call total_moment%construct(dipolar_moments)
 
     write(output_unit, *) "Total Moment =", total_moment%get()
 
+    deallocate(total_moment)
     call total_moment%destroy()
     call dipolar_moments%destroy()
+    deallocate(dipolar_moments)
     call orientations%destroy()
     deallocate(orientations)
     deallocate(moment_norm)

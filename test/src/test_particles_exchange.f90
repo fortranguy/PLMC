@@ -16,7 +16,7 @@ module procedures_particles_exchange_write
 
 use json_module, only: json_create_object, json_add, json_print, json_destroy
 use types_json_wrapper, only: JSON_Value_Pointer
-use types_particles, only: Particles_Wrapper
+use module_particles, only: Particles_Wrapper
 
 implicit none
 
@@ -71,16 +71,16 @@ use module_data, only: test_file_exists, test_data_found
 use procedures_random, only: random_integer, random_orientation
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box
 use types_particle, only: Concrete_Particle
-use types_particles, only: Particles_Wrapper
-use class_particles_factory, only: Abstract_Particles_Factory, &
-    Dipolar_Particles_Factory, Apolar_Particles_Factory
-use class_particles_exchange, only: Particles_Exchange_Facade
+use module_particles, only: Particles_Wrapper_Parameters, Particles_Wrapper
+use class_particles_factory, only: Concrete_Particles_Factory
+use class_particles_exchange, only: Abstract_Particles_Exchange, Concrete_Particles_Exchange
 use procedures_particles_exchange_write, only: json_write_particles
 
 implicit none
 
-    type(Particles_Exchange_Facade) :: particles_exchange
-    class(Abstract_Particles_Factory), allocatable :: particles_factory
+    class(Abstract_Particles_Exchange), allocatable :: particles_exchange
+    type(Concrete_Particles_Factory) :: particles_factory
+    type(Particles_Wrapper_Parameters) :: particles_parameters
     type(Particles_Wrapper) :: particles
     type(Concrete_Particle) :: particle
     class(Abstract_Periodic_Box), allocatable :: periodic_box
@@ -89,7 +89,6 @@ implicit none
     logical :: data_found
 
     real(DP), allocatable :: box_size(:)
-    logical :: dipolar
     real(DP), dimension(num_dimensions) :: rand_3d
     integer :: i_particle
 
@@ -105,17 +104,18 @@ implicit none
     allocate(XYZ_Periodic_Box :: periodic_box)
     call periodic_box%set(box_size)
 
-    data_field = "Particles.dipolar"
-    call input_data%get(data_field, dipolar, data_found)
+    data_field = "Particles.exist"
+    call input_data%get(data_field, particles_parameters%exist, data_found)
     call test_data_found(data_field, data_found)
-    if (dipolar) then
-        allocate(Dipolar_Particles_Factory :: particles_factory)
-    else
-        allocate(Apolar_Particles_Factory :: particles_factory)
-    end if
-    call particles_factory%allocate(particles, input_data, "Particles")
+    data_field = "Particles.are dipolar"
+    call input_data%get(data_field, particles_parameters%are_dipolar, data_found)
+    call test_data_found(data_field, data_found)
+    data_field = "Particles.can exchange"
+    call input_data%get(data_field, particles_parameters%can_exchange, data_found)
+    call test_data_found(data_field, data_found)
+    call particles_factory%allocate(particles, particles_parameters, input_data, "Particles")
     call particles_factory%construct(particles, periodic_box)
-
+    allocate(Concrete_Particles_Exchange :: particles_exchange)
     call particles_exchange%construct(particles)
     call json_write_particles(particles, "initial.json")
 
@@ -131,8 +131,8 @@ implicit none
     call json_write_particles(particles, "removed.json")
 
     call particles_exchange%destroy()
+    deallocate(particles_exchange)
     call particles_factory%destroy(particles)
-    deallocate(particles_factory)
     deallocate(periodic_box)
     deallocate(data_field)
     call input_data%destroy()

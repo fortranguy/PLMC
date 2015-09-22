@@ -19,31 +19,31 @@ implicit none
 
 private
 
-    type, abstract, public :: Abstract_Changes_Factory
+    type, public :: Concrete_Changes_Factory
     private
         type(Particles_Wrapper_Parameters) :: parameters
         type(json_file), pointer :: input_data
         character(len=:), allocatable :: prefix
     contains
-        procedure :: create => Abstract_Changes_Factory_create
+        procedure :: create => Concrete_Changes_Factory_create
         procedure, private ::  allocate_moved_positions => &
-            Abstract_Changes_Factory_allocate_moved_positions
-        procedure, private :: construct_moved_positions => &
-            Abstract_Changes_Factory_construct_moved_positions
+            Concrete_Changes_Factory_allocate_moved_positions
         procedure, private :: allocate_rotated_orientations => &
-            Abstract_Changes_Factory_allocate_rotated_orientations
+            Concrete_Changes_Factory_allocate_rotated_orientations
         procedure, private :: allocate_particles_exchange => &
-            Abstract_Changes_Factory_allocate_particles_exchange
+            Concrete_Changes_Factory_allocate_particles_exchange
+        procedure :: construct => Concrete_Changes_Factory_construct
+        procedure, private :: construct_moved_positions => &
+            Concrete_Changes_Factory_construct_moved_positions
         procedure, private :: construct_rotated_orientations => &
-            Abstract_Changes_Factory_construct_rotated_orientations
-        procedure :: construct => Abstract_Changes_Factory_construct
-        procedure, nopass :: destroy => Abstract_Changes_Factory_destroy
-    end type Abstract_Changes_Factory
+            Concrete_Changes_Factory_construct_rotated_orientations
+        procedure, nopass :: destroy => Concrete_Changes_Factory_destroy
+    end type Concrete_Changes_Factory
 
 contains
 
-    subroutine Abstract_Changes_Factory_create(this, changes, parameters, input_data, prefix)
-        class(Abstract_Changes_Factory), intent(out) :: this
+    subroutine Concrete_Changes_Factory_create(this, changes, parameters, input_data, prefix)
+        class(Concrete_Changes_Factory), intent(out) :: this
         type(Changes_Wrapper), intent(out) :: changes
         type(Particles_Wrapper_Parameters) :: parameters
         type(json_file), target, intent(in) :: input_data
@@ -55,10 +55,10 @@ contains
         call this%allocate_moved_positions(changes%moved_positions)
         call this%allocate_rotated_orientations(changes%rotated_orientations)
         call this%allocate_particles_exchange(changes%particles_exchange)
-    end subroutine Abstract_Changes_Factory_create
+    end subroutine Concrete_Changes_Factory_create
 
-    subroutine Abstract_Changes_Factory_allocate_moved_positions(this, moved_positions)
-        class(Abstract_Changes_Factory), intent(in) :: this
+    subroutine Concrete_Changes_Factory_allocate_moved_positions(this, moved_positions)
+        class(Concrete_Changes_Factory), intent(in) :: this
         class(Abstract_Moved_Positions), allocatable, intent(out) :: moved_positions
 
         if (this%parameters%exist) then
@@ -66,10 +66,10 @@ contains
         else
             allocate(Null_Moved_Positions :: moved_positions)
         end if
-    end subroutine Abstract_Changes_Factory_allocate_moved_positions
+    end subroutine Concrete_Changes_Factory_allocate_moved_positions
 
-    subroutine Abstract_Changes_Factory_allocate_rotated_orientations(this, rotated_orientations)
-        class(Abstract_Changes_Factory), intent(in) :: this
+    subroutine Concrete_Changes_Factory_allocate_rotated_orientations(this, rotated_orientations)
+        class(Concrete_Changes_Factory), intent(in) :: this
         class(Abstract_Rotated_Orientations), allocatable, intent(out) :: rotated_orientations
 
         if (this%parameters%exist .and. this%parameters%are_dipolar) then
@@ -77,10 +77,10 @@ contains
         else
             allocate(Null_Rotated_Orientations :: rotated_orientations)
         end if
-    end subroutine Abstract_Changes_Factory_allocate_rotated_orientations
+    end subroutine Concrete_Changes_Factory_allocate_rotated_orientations
 
-    subroutine Abstract_Changes_Factory_allocate_particles_exchange(this, particles_exchange)
-        class(Abstract_Changes_Factory), intent(in) :: this
+    subroutine Concrete_Changes_Factory_allocate_particles_exchange(this, particles_exchange)
+        class(Concrete_Changes_Factory), intent(in) :: this
         class(Abstract_Particles_Exchange), allocatable, intent(out) :: particles_exchange
 
         if (this%parameters%exist .and. this%parameters%can_exchange) then
@@ -88,20 +88,20 @@ contains
         else
             allocate(Null_Particles_Exchange :: particles_exchange)
         end if
-    end subroutine Abstract_Changes_Factory_allocate_particles_exchange
+    end subroutine Concrete_Changes_Factory_allocate_particles_exchange
 
-    subroutine Abstract_Changes_Factory_construct(this, changes, particles)
+    subroutine Concrete_Changes_Factory_construct(this, changes, particles)
         type(Changes_Wrapper), intent(inout) :: changes
-        class(Abstract_Changes_Factory), intent(in) :: this
+        class(Concrete_Changes_Factory), intent(in) :: this
         type(Particles_Wrapper), intent(in) :: particles
 
         call this%construct_moved_positions(changes, particles%positions)
         call this%construct_rotated_orientations(changes, particles%orientations)
         call changes%particles_exchange%construct(particles)
-    end subroutine Abstract_Changes_Factory_construct
+    end subroutine Concrete_Changes_Factory_construct
 
-    subroutine Abstract_Changes_Factory_construct_moved_positions(this, changes, positions)
-        class(Abstract_Changes_Factory), intent(in) :: this
+    subroutine Concrete_Changes_Factory_construct_moved_positions(this, changes, positions)
+        class(Concrete_Changes_Factory), intent(in) :: this
         type(Changes_Wrapper), intent(inout) :: changes
         class(Abstract_Particles_Positions), intent(in) :: positions
 
@@ -110,6 +110,7 @@ contains
         real(DP), allocatable :: moved_delta(:)
         type(Concrete_Adaptation_Parameters) :: adaptation_parameters
 
+        if (.not. this%parameters%exist) return
         data_field = this%prefix//".Small Move.delta"
         call this%input_data%get(data_field, moved_delta, data_found)
         call test_data_found(data_field, data_found)
@@ -121,10 +122,10 @@ contains
         call test_data_found(data_field, data_found)
         call changes%moved_positions%construct(positions, moved_delta, adaptation_parameters)
         deallocate(data_field)
-    end subroutine Abstract_Changes_Factory_construct_moved_positions
+    end subroutine Concrete_Changes_Factory_construct_moved_positions
 
-    subroutine Abstract_Changes_Factory_construct_rotated_orientations(this, changes, orientations)
-        class(Abstract_Changes_Factory), intent(in) :: this
+    subroutine Concrete_Changes_Factory_construct_rotated_orientations(this, changes, orientations)
+        class(Concrete_Changes_Factory), intent(in) :: this
         type(Changes_Wrapper), intent(inout) :: changes
         class(Abstract_Particles_Orientations), intent(in) :: orientations
 
@@ -133,6 +134,7 @@ contains
         real(DP), allocatable :: moved_delta
         type(Concrete_Adaptation_Parameters) :: adaptation_parameters
 
+        if (.not. (this%parameters%exist .and. this%parameters%are_dipolar)) return
         data_field = this%prefix//".Small Rotation.delta"
         call this%input_data%get(data_field, moved_delta, data_found)
         call test_data_found(data_field, data_found)
@@ -142,12 +144,13 @@ contains
         data_field = this%prefix//".Small Rotation.maximum increase factor"
         call this%input_data%get(data_field, adaptation_parameters%increase_factor_max, data_found)
         call test_data_found(data_field, data_found)
-        call changes%rotated_orientations%construct(orientations, moved_delta, adaptation_parameters)
+        call changes%rotated_orientations%construct(orientations, moved_delta, &
+            adaptation_parameters)
         deallocate(data_field)
-    end subroutine Abstract_Changes_Factory_construct_rotated_orientations
+    end subroutine Concrete_Changes_Factory_construct_rotated_orientations
 
-    subroutine Abstract_Changes_Factory_destroy(this, changes)
-        class(Abstract_Changes_Factory), intent(inout) :: this
+    subroutine Concrete_Changes_Factory_destroy(this, changes)
+        class(Concrete_Changes_Factory), intent(inout) :: this
         type(Changes_Wrapper), intent(inout) :: changes
 
         call changes%particles_exchange%destroy()
@@ -157,6 +160,6 @@ contains
         if (allocated(changes%moved_positions)) deallocate(changes%moved_positions)
         if (allocated(this%prefix)) deallocate(this%prefix)
         this%input_data => null()
-    end subroutine Abstract_Changes_Factory_destroy
+    end subroutine Concrete_Changes_Factory_destroy
 
 end module class_changes_factory

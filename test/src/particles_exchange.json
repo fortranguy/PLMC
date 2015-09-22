@@ -3,12 +3,18 @@
         "size": [10.0, 10.0, 10.0]
     },
     "Particles":{
-        "dipolar": true,
+        "exist": true,
+        "are dipolar": true,
+        "can exchange": true,
         "number": 10,
         "diameter": 1.0,
         "minimum diameter factor": 0.8,
         "moment norm": 1.0,
         "initial positions": "positions.in",
-        "initial orientations": "orientations.in"
+        "initial orientations": "orientations.in",
+        "Chemical Potential": {
+            "density": 0.0,
+            "excess": 0.0
+        }
     }
 }

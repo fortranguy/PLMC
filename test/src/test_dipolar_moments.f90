@@ -5,7 +5,7 @@ use json_module, only: json_file
 use module_data, only: test_data_found
 use class_particles_moment_norm, only: Abstract_Particles_Moment_Norm
 use class_particles_orientations, only: Abstract_Particles_Orientations
-use class_particles_dipolar_moments, only: Particles_Dipolar_Moments_Facade
+use class_particles_dipolar_moments, only: Abstract_Particles_Dipolar_Moments
 
 implicit none
 
@@ -46,7 +46,7 @@ contains
     end subroutine set_objects
 
     subroutine print_dipolar_moments(dipolar_moments)
-        type(Particles_Dipolar_Moments_Facade), intent(in) :: dipolar_moments
+        type(Abstract_Particles_Dipolar_Moments), intent(in) :: dipolar_moments
 
         integer :: i_particle
 
@@ -67,12 +67,13 @@ use class_particles_moment_norm, only: Abstract_Particles_Moment_Norm, &
     Null_Particles_Moment_Norm, Concrete_Particles_Moment_Norm
 use class_particles_orientations, only: Abstract_Particles_Orientations, &
     Null_Particles_Orientations, Concrete_Particles_Orientations
-use class_particles_dipolar_moments, only: Particles_Dipolar_Moments_Facade
+use class_particles_dipolar_moments, only: Abstract_Particles_Dipolar_Moments, &
+    Concrete_Particles_Dipolar_Moments
 use procedures_dipolar_moments_print, only: set_objects, print_dipolar_moments
 
 implicit none
 
-    type(Particles_Dipolar_Moments_Facade) :: dipolar_moments
+    class(Abstract_Particles_Dipolar_Moments), allocatable :: dipolar_moments
     class(Abstract_Particles_Orientations), allocatable :: orientations
     class(Abstract_Particles_Moment_Norm), allocatable :: moment_norm
     class(Abstract_Particles_Number), allocatable :: number
@@ -97,9 +98,11 @@ implicit none
     call orientations%construct(number)
     call set_objects(input_data, "Null_Particles_Moment_Norm", moment_norm, &
                      "Null_Particles_Orientations", orientations)
+    allocate(Concrete_Particles_Dipolar_Moments :: dipolar_moments)
     call dipolar_moments%construct(moment_norm, orientations)
     call print_dipolar_moments(dipolar_moments)
     call dipolar_moments%destroy()
+    deallocate(dipolar_moments)
     call orientations%destroy()
     deallocate(orientations)
     deallocate(moment_norm)

@@ -27,7 +27,7 @@ implicit none
 
 private
 
-    type, abstract, public :: Concrete_Particles_Factory
+    type, public :: Concrete_Particles_Factory
     private
         type(Particles_Wrapper_Parameters) :: parameters
         type(json_file), pointer :: input_data
@@ -197,10 +197,10 @@ contains
         real(DP) :: density, excess
 
         if (this%parameters%exist .and. this%parameters%can_exchange) then
-            data_field = this%prefix//"Chemical Potential.density"
+            data_field = this%prefix//".Chemical Potential.density"
             call this%input_data%get(data_field, density, data_found)
             call test_data_found(data_field, data_found)
-            data_field = this%prefix//"Chemical Potential.excess"
+            data_field = this%prefix//".Chemical Potential.excess"
             call this%input_data%get(data_field, excess, data_found)
             call test_data_found(data_field, data_found)
             allocate(Concrete_Particles_Chemical_Potential :: particles_chemical_potential)

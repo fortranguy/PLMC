@@ -4,14 +4,13 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box
-use types_particles, only: Particles_Wrapper
-use class_particles_factory, only: Abstract_Particles_Factory, &
-    Dipolar_Particles_Factory, Apolar_Particles_Factory
+use module_particles, only: Particles_Wrapper
+use class_particles_factory, only: Concrete_Particles_Factory
 use class_one_particle_move, only: Metropolis_One_Particle_Move
 
 implicit none
 
-    class(Abstract_Particles_Factory), allocatable :: particles_factory
+    type(Concrete_Particles_Factory) :: particles_factory
     type(Particles_Wrapper) :: particles
     class(Abstract_Periodic_Box), allocatable :: periodic_box
     type(Metropolis_One_Particle_Move) :: one_particle_move
