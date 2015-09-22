@@ -71,9 +71,7 @@
 		<Unit filename="lib/src/class_particles_diameter.f90">
 			<Option weight="2" />
 		</Unit>
-		<Unit filename="lib/src/class_particles_dipolar_moments.f90">
-			<Option weight="4" />
-		</Unit>
+		<Unit filename="lib/src/class_particles_dipolar_moments.f90" />
 		<Unit filename="lib/src/class_particles_exchange.f90">
 			<Option weight="7" />
 		</Unit>
@@ -92,9 +90,7 @@
 		<Unit filename="lib/src/class_particles_positions.f90">
 			<Option weight="3" />
 		</Unit>
-		<Unit filename="lib/src/class_particles_total_moment.f90">
-			<Option weight="5" />
-		</Unit>
+		<Unit filename="lib/src/class_particles_total_moment.f90" />
 		<Unit filename="lib/src/class_periodic_box.f90">
 			<Option weight="2" />
 		</Unit>
