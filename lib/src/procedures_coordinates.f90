@@ -54,6 +54,7 @@ contains
                 read(file_unit, *) coordinates(:, i_particle)
             end do
         end if
+        close(file_unit)
     end subroutine read_coordinates
 
 end module procedures_coordinates

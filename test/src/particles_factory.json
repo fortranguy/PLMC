@@ -3,7 +3,7 @@
         "Periodic Box": {
         "periodicity": "XYZ",
         "size": [10.0, 10.0, 10.0]
-        },
+        }
     },
     "Particles": {
         "Particles 1": {
