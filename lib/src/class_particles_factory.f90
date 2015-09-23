@@ -48,10 +48,10 @@ private
         procedure, private :: allocate_chemical_potential => &
             Concrete_Particles_Factory_allocate_chemical_potential
         procedure :: construct => Concrete_Particles_Factory_construct
-        procedure, private :: construct_positions => &
-            Concrete_Particles_Factory_construct_positions
-        procedure, private :: construct_orientations => &
-            Concrete_Particles_Factory_construct_orientations
+        procedure, private :: set_positions => &
+            Concrete_Particles_Factory_set_positions
+        procedure, private :: set_orientations => &
+            Concrete_Particles_Factory_set_orientations
         procedure :: destroy => Concrete_Particles_Factory_destroy
     end type Concrete_Particles_Factory
 
@@ -216,18 +216,17 @@ contains
         type(Particles_Wrapper), intent(inout) :: particles
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
 
-        call this%construct_positions(particles%positions, particles%number, periodic_box)
-        call this%construct_orientations(particles%orientations, particles%number)
+        call particles%positions%construct(periodic_box, particles%number)
+        call this%set_positions(particles%positions)
+        call particles%orientations%construct(particles%number)
+        call this%set_orientations(particles%orientations)
         call particles%dipolar_moments%construct(particles%moment_norm, particles%orientations)
         call particles%total_moment%construct(particles%dipolar_moments)
     end subroutine Concrete_Particles_Factory_construct
 
-    subroutine Concrete_Particles_Factory_construct_positions(this, particles_positions, &
-        particles_number, periodic_box)
+    subroutine Concrete_Particles_Factory_set_positions(this, particles_positions)
         class(Concrete_Particles_Factory), intent(in) :: this
         class(Abstract_Particles_Positions), intent(inout) :: particles_positions
-        class(Abstract_Particles_Number), intent(in) :: particles_number
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
 
         character(len=:), allocatable :: data_field, filename
         logical :: data_found
@@ -235,7 +234,6 @@ contains
         integer :: i_particle
 
         if (.not. this%parameters%exist) return
-        call particles_positions%construct(periodic_box, particles_number)
         data_field = this%prefix//".initial positions"
         call this%input_data%get(data_field, filename, data_found)
         call test_data_found(data_field, data_found)
@@ -246,13 +244,11 @@ contains
         if (allocated(file_positions)) deallocate(file_positions)
         deallocate(filename)
         deallocate(data_field)
-    end subroutine Concrete_Particles_Factory_construct_positions
+    end subroutine Concrete_Particles_Factory_set_positions
 
-    subroutine Concrete_Particles_Factory_construct_orientations(this, particles_orientations, &
-        particles_number)
+    subroutine Concrete_Particles_Factory_set_orientations(this, particles_orientations)
         class(Concrete_Particles_Factory), intent(in) :: this
         class(Abstract_Particles_Orientations), intent(inout) :: particles_orientations
-        class(Abstract_Particles_Number), intent(in) :: particles_number
 
         character(len=:), allocatable :: data_field, filename
         logical :: data_found
@@ -260,7 +256,6 @@ contains
         integer :: i_particle
 
         if (.not. (this%parameters%exist .and. this%parameters%are_dipolar)) return
-        call particles_orientations%construct(particles_number)
         data_field = this%prefix//".initial orientations"
         call this%input_data%get(data_field, filename, data_found)
         call test_data_found(data_field, data_found)
@@ -271,7 +266,7 @@ contains
         if (allocated(file_orientations)) deallocate(file_orientations)
         deallocate(filename)
         deallocate(data_field)
-    end subroutine Concrete_Particles_Factory_construct_orientations
+    end subroutine Concrete_Particles_Factory_set_orientations
 
     subroutine Concrete_Particles_Factory_destroy(this, particles)
         class(Concrete_Particles_Factory), intent(inout) :: this

@@ -19,7 +19,7 @@ implicit none
     call input_data%load_file(filename = data_filename)
     deallocate(data_filename)
 
-    call box_factory%allocate(box, input_data, "PLMC")
+    call box_factory%allocate(box, input_data, "System")
     call box_factory%construct(box)
     call box_factory%destroy(box)
 
