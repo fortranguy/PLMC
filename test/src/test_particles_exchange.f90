@@ -16,7 +16,7 @@ module procedures_particles_exchange_write
 
 use json_module, only: json_create_object, json_add, json_print, json_destroy
 use types_json_wrapper, only: JSON_Value_Pointer
-use module_particles, only: Particles_Wrapper
+use types_particles, only: Particles_Wrapper
 
 implicit none
 
@@ -71,7 +71,7 @@ use module_data, only: test_file_exists, test_data_found
 use procedures_random, only: random_integer, random_orientation
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box
 use types_particle, only: Concrete_Particle
-use module_particles, only: Particles_Wrapper
+use types_particles, only: Particles_Wrapper
 use procedures_particles_factory, only: particles_factory_construct, particles_factory_destroy
 use class_particles_exchange, only: Abstract_Particles_Exchange, Concrete_Particles_Exchange
 use procedures_particles_exchange_write, only: json_write_particles

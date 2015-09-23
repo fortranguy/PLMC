@@ -1,4 +1,4 @@
-module module_particles
+module types_particles
 
 use class_particles_number, only: Abstract_Particles_Number
 use class_particles_diameter, only: Abstract_Particles_Diameter
@@ -13,16 +13,6 @@ implicit none
 
 private
 
-    type, public :: Particles_Wrapper_Parameters
-        logical :: exist
-        logical :: are_dipolar
-        logical :: can_exchange
-    end type Particles_Wrapper_Parameters
-
-    interface assignment(=)
-        module procedure :: Particles_Wrapper_Parameters_assignment
-    end interface
-
     type, public :: Particles_Wrapper
         class(Abstract_Particles_Number), allocatable :: number
         class(Abstract_Particles_Diameter), allocatable :: diameter
@@ -34,16 +24,4 @@ private
         class(Abstract_Particles_Total_Moment), allocatable :: total_moment
     end type Particles_Wrapper
 
-contains
-
-    pure subroutine Particles_Wrapper_Parameters_assignment(particles_parameters_target, &
-        particles_parameters_value)
-        type(Particles_Wrapper_Parameters), intent(out) :: particles_parameters_target
-        type(Particles_Wrapper_Parameters), intent(in) :: particles_parameters_value
-
-        particles_parameters_target%exist = particles_parameters_value%exist
-        particles_parameters_target%are_dipolar = particles_parameters_value%are_dipolar
-        particles_parameters_target%can_exchange = particles_parameters_value%can_exchange
-    end subroutine Particles_Wrapper_Parameters_assignment
-
-end module module_particles
+end module types_particles

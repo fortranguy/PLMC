@@ -1,7 +1,7 @@
 module class_particles_exchange
 
 use types_particle, only: Concrete_Particle
-use module_particles, only: Particles_Wrapper
+use types_particles, only: Particles_Wrapper
 
 implicit none
 

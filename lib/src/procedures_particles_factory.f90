@@ -22,12 +22,13 @@ use class_particles_dipolar_moments, only: Abstract_Particles_Dipolar_Moments, &
     Concrete_Particles_Dipolar_Moments, Null_Particles_Dipolar_Moments
 use class_particles_total_moment, only: Abstract_Particles_Total_Moment, &
     Concrete_Particles_Total_Moment, Null_Particles_Total_Moment
-use module_particles, only: Particles_Wrapper
+use types_particles, only: Particles_Wrapper
 
 implicit none
 
 private
-public :: particles_factory_construct, particles_factory_destroy
+public :: particles_factory_construct, particles_factory_destroy, particles_exist, &
+    particles_are_dipolar, particles_can_exchange
 
 contains
 
@@ -283,7 +284,7 @@ contains
         logical :: data_found
 
         if (particles_exist(input_data, prefix)) then
-            data_field = prefix//".dipolar"
+            data_field = prefix//".are dipolar"
             call input_data%get(data_field, particles_are_dipolar, data_found)
             call test_data_found(data_field, data_found)
         else
