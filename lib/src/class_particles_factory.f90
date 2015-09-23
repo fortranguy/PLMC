@@ -63,7 +63,7 @@ contains
         class(Concrete_Particles_Factory), intent(out) :: this
         type(Particles_Wrapper), intent(out) :: particles
         type(Particles_Wrapper_Parameters), intent(in) :: parameters
-        type(json_file), target, intent(inout) :: input_data
+        type(json_file), target, intent(in) :: input_data
         character(len=*), intent(in) :: prefix
 
         this%parameters = parameters
@@ -216,55 +216,59 @@ contains
         type(Particles_Wrapper), intent(inout) :: particles
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
 
-        call this%construct_positions(particles, periodic_box)
-        call this%construct_orientations(particles)
+        call this%construct_positions(particles%positions, particles%number, periodic_box)
+        call this%construct_orientations(particles%orientations, particles%number)
         call particles%dipolar_moments%construct(particles%moment_norm, particles%orientations)
         call particles%total_moment%construct(particles%dipolar_moments)
     end subroutine Concrete_Particles_Factory_construct
 
-    subroutine Concrete_Particles_Factory_construct_positions(this, particles, periodic_box)
+    subroutine Concrete_Particles_Factory_construct_positions(this, particles_positions, &
+        particles_number, periodic_box)
         class(Concrete_Particles_Factory), intent(in) :: this
-        type(Particles_Wrapper), intent(inout) :: particles
+        class(Abstract_Particles_Positions), intent(inout) :: particles_positions
+        class(Abstract_Particles_Number), intent(in) :: particles_number
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
 
         character(len=:), allocatable :: data_field, filename
         logical :: data_found
-        real(DP), allocatable :: positions(:, :)
+        real(DP), allocatable :: file_positions(:, :)
         integer :: i_particle
 
         if (.not. this%parameters%exist) return
-        call particles%positions%construct(periodic_box, particles%number)
+        call particles_positions%construct(periodic_box, particles_number)
         data_field = this%prefix//".initial positions"
         call this%input_data%get(data_field, filename, data_found)
         call test_data_found(data_field, data_found)
-        call read_coordinates(positions, particles%positions%get_num(), filename)
-        do i_particle = 1, particles%positions%get_num()
-            call particles%positions%set(i_particle, positions(:, i_particle))
+        call read_coordinates(file_positions, particles_positions%get_num(), filename)
+        do i_particle = 1, particles_positions%get_num()
+            call particles_positions%set(i_particle, file_positions(:, i_particle))
         end do
-        if (allocated(positions)) deallocate(positions)
+        if (allocated(file_positions)) deallocate(file_positions)
         deallocate(filename)
         deallocate(data_field)
     end subroutine Concrete_Particles_Factory_construct_positions
 
-    subroutine Concrete_Particles_Factory_construct_orientations(this, particles)
+    subroutine Concrete_Particles_Factory_construct_orientations(this, particles_orientations, &
+        particles_number)
         class(Concrete_Particles_Factory), intent(in) :: this
-        type(Particles_Wrapper), intent(inout) :: particles
+        class(Abstract_Particles_Orientations), intent(inout) :: particles_orientations
+        class(Abstract_Particles_Number), intent(in) :: particles_number
 
         character(len=:), allocatable :: data_field, filename
         logical :: data_found
-        real(DP), allocatable :: orientations(:, :)
+        real(DP), allocatable :: file_orientations(:, :)
         integer :: i_particle
 
         if (.not. (this%parameters%exist .and. this%parameters%are_dipolar)) return
-        call particles%orientations%construct(particles%number)
+        call particles_orientations%construct(particles_number)
         data_field = this%prefix//".initial orientations"
         call this%input_data%get(data_field, filename, data_found)
         call test_data_found(data_field, data_found)
-        call read_coordinates(orientations, particles%orientations%get_num(), filename)
-        do i_particle = 1, particles%orientations%get_num()
-            call particles%orientations%set(i_particle, orientations(:, i_particle))
+        call read_coordinates(file_orientations, particles_orientations%get_num(), filename)
+        do i_particle = 1, particles_orientations%get_num()
+            call particles_orientations%set(i_particle, file_orientations(:, i_particle))
         end do
-        if (allocated(orientations)) deallocate(orientations)
+        if (allocated(file_orientations)) deallocate(file_orientations)
         deallocate(filename)
         deallocate(data_field)
     end subroutine Concrete_Particles_Factory_construct_orientations

@@ -28,6 +28,15 @@ private
 
     end type Concrete_Parallelepiped_Domain
 
+    type, extends(Abstract_Parallelepiped_Domain), public :: Null_Parallelepiped_Domain
+    contains
+        procedure :: construct => Null_Parallelepiped_Domain_construct
+        procedure :: destroy => Null_Parallelepiped_Domain_destroy
+        procedure :: get_volume => Null_Parallelepiped_Domain_get_volume
+        procedure :: is_inside => Null_Parallelepiped_Domain_is_inside
+        procedure :: random_position => Null_Parallelepiped_Domain_random_position
+    end type Null_Parallelepiped_Domain
+
     type, extends(Abstract_Parallelepiped_Domain), public :: Box_Parallelepiped_Domain
     contains
         procedure :: construct => Box_Parallelepiped_Domain_construct
@@ -90,17 +99,51 @@ contains
     end function Abstract_Parallelepiped_Domain_is_inside
 
     function Abstract_Parallelepiped_Domain_random_position(this) &
-        result(inside_position)
+        result(random_position)
         class(Abstract_Parallelepiped_Domain), intent(in) :: this
-        real(DP), dimension(num_dimensions) :: inside_position
+        real(DP), dimension(num_dimensions) :: random_position
 
         real(DP) :: rand_3d(num_dimensions)
 
         call random_number(rand_3d)
-        inside_position = this%origin + (rand_3d - 0.5_DP) * this%size
+        random_position = this%origin + (rand_3d - 0.5_DP) * this%size
     end function Abstract_Parallelepiped_Domain_random_position
 
 !end implementation Abstract_Parallelepiped_Domain
+
+!implementation Null_Parallelepiped_Domain
+
+    subroutine Null_Parallelepiped_Domain_construct(this, periodic_box, origin, size)
+        class(Null_Parallelepiped_Domain), intent(out) :: this
+        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+        real(DP), intent(in) :: origin(:), size(:)
+    end subroutine Null_Parallelepiped_Domain_construct
+
+    subroutine Null_Parallelepiped_Domain_destroy(this)
+        class(Null_Parallelepiped_Domain), intent(inout) :: this
+    end subroutine Null_Parallelepiped_Domain_destroy
+
+    pure function Null_Parallelepiped_Domain_get_volume(this) result(volume)
+        class(Null_Parallelepiped_Domain), intent(in) :: this
+        real(DP) :: volume
+        volume = 0._DP
+    end function Null_Parallelepiped_Domain_get_volume
+
+    pure function Null_Parallelepiped_Domain_is_inside(this, position) result(is_inside)
+        class(Null_Parallelepiped_Domain), intent(in) :: this
+        real(DP), intent(in) :: position(:)
+        logical :: is_inside
+        is_inside = .false.
+    end function Null_Parallelepiped_Domain_is_inside
+
+    function Null_Parallelepiped_Domain_random_position(this) &
+        result(random_position)
+        class(Null_Parallelepiped_Domain), intent(in) :: this
+        real(DP), dimension(num_dimensions) :: random_position
+        random_position = 0._DP
+    end function Null_Parallelepiped_Domain_random_position
+
+!end implementation Null_Parallelepiped_Domain
 
 !implementation Box_Parallelepiped_Domain
 
