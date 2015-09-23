@@ -71,16 +71,14 @@ use module_data, only: test_file_exists, test_data_found
 use procedures_random, only: random_integer, random_orientation
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box
 use types_particle, only: Concrete_Particle
-use module_particles, only: Particles_Wrapper_Parameters, Particles_Wrapper
-use class_particles_factory, only: Concrete_Particles_Factory
+use module_particles, only: Particles_Wrapper
+use procedures_particles_factory, only: particles_factory_construct, particles_factory_destroy
 use class_particles_exchange, only: Abstract_Particles_Exchange, Concrete_Particles_Exchange
 use procedures_particles_exchange_write, only: json_write_particles
 
 implicit none
 
     class(Abstract_Particles_Exchange), allocatable :: particles_exchange
-    type(Concrete_Particles_Factory) :: particles_factory
-    type(Particles_Wrapper_Parameters) :: particles_parameters
     type(Particles_Wrapper) :: particles
     type(Concrete_Particle) :: particle
     class(Abstract_Periodic_Box), allocatable :: periodic_box
@@ -104,17 +102,7 @@ implicit none
     allocate(XYZ_Periodic_Box :: periodic_box)
     call periodic_box%set(box_size)
 
-    data_field = "Particles.exist"
-    call input_data%get(data_field, particles_parameters%exist, data_found)
-    call test_data_found(data_field, data_found)
-    data_field = "Particles.are dipolar"
-    call input_data%get(data_field, particles_parameters%are_dipolar, data_found)
-    call test_data_found(data_field, data_found)
-    data_field = "Particles.can exchange"
-    call input_data%get(data_field, particles_parameters%can_exchange, data_found)
-    call test_data_found(data_field, data_found)
-    call particles_factory%allocate(particles, particles_parameters, input_data, "Particles")
-    call particles_factory%construct(particles, periodic_box)
+    call particles_factory_construct(particles, input_data, "Particles", periodic_box)
     allocate(Concrete_Particles_Exchange :: particles_exchange)
     call particles_exchange%construct(particles)
     call json_write_particles(particles, "initial.json")
@@ -132,7 +120,7 @@ implicit none
 
     call particles_exchange%destroy()
     deallocate(particles_exchange)
-    call particles_factory%destroy(particles)
+    call particles_factory_destroy(particles)
     deallocate(periodic_box)
     deallocate(data_field)
     call input_data%destroy()

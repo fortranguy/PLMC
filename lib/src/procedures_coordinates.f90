@@ -31,26 +31,22 @@ contains
         deallocate(coordinates_tmp)
     end subroutine increase_coordinates_size
 
-    subroutine read_coordinates(coordinates, num_particles, filename)
+    subroutine read_coordinates(coordinates, filename)
         real(DP), allocatable, intent(out) :: coordinates(:, :)
-        integer, intent(in) :: num_particles
         character(len=*), intent(in) :: filename
 
         real(DP) :: coordinate(num_dimensions)
-        integer :: i_particle
+        integer :: num_particles, i_particle
         integer :: file_unit, read_stat
 
         call test_file_exists(filename)
         open(newunit=file_unit, recl=4096, file=filename, status="old", action="read")
-        i_particle = 0
+        num_particles = 0
         do
             read(file_unit, fmt=*, iostat=read_stat) coordinate
             if (read_stat == iostat_end) exit
-            i_particle = i_particle + 1
+            num_particles = num_particles + 1
         end do
-        if (i_particle /= num_particles) then
-            call error_exit("read_coordinates from "//filename//": wrong number of lines.")
-        end if
         if (num_particles > 0) then
             allocate(coordinates(num_dimensions, num_particles))
             rewind(file_unit)
