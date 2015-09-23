@@ -38,14 +38,8 @@
 				</Linker>
 			</Target>
 		</Build>
-		<Unit filename="lib/src/class_box_factory.f90">
-			<Option weight="6" />
-		</Unit>
 		<Unit filename="lib/src/class_box_potential.f90">
 			<Option weight="4" />
-		</Unit>
-		<Unit filename="lib/src/class_changes_factory.f90">
-			<Option weight="9" />
 		</Unit>
 		<Unit filename="lib/src/class_external_field.f90">
 			<Option weight="4" />
@@ -78,9 +72,6 @@
 			<Option weight="4" />
 		</Unit>
 		<Unit filename="lib/src/class_particles_exchange.f90">
-			<Option weight="7" />
-		</Unit>
-		<Unit filename="lib/src/class_particles_factory.f90">
 			<Option weight="7" />
 		</Unit>
 		<Unit filename="lib/src/class_particles_moment_norm.f90">
@@ -140,8 +131,11 @@
 		<Unit filename="lib/src/module_particle_energy.f90">
 			<Option weight="0" />
 		</Unit>
-		<Unit filename="lib/src/module_particles.f90">
+		<Unit filename="lib/src/procedures_box_factory.f90">
 			<Option weight="6" />
+		</Unit>
+		<Unit filename="lib/src/procedures_changes_factory.f90">
+			<Option weight="9" />
 		</Unit>
 		<Unit filename="lib/src/procedures_checks.f90">
 			<Option weight="1" />
@@ -156,7 +150,7 @@
 			<Option weight="1" />
 		</Unit>
 		<Unit filename="lib/src/procedures_particles_factory.f90">
-			<Option weight="6" />
+			<Option weight="7" />
 		</Unit>
 		<Unit filename="lib/src/procedures_random.f90">
 			<Option weight="1" />
@@ -176,6 +170,9 @@
 		<Unit filename="lib/src/types_particle.f90">
 			<Option weight="1" />
 		</Unit>
+		<Unit filename="lib/src/types_particles.f90">
+			<Option weight="6" />
+		</Unit>
 		<Unit filename="lib/src/types_potential_domain.f90">
 			<Option weight="0" />
 		</Unit>
@@ -185,7 +182,7 @@
 		<Unit filename="test/src/test_box_factory.f90">
 			<Option compile="0" />
 			<Option link="0" />
-			<Option weight="7" />
+			<Option weight="6" />
 		</Unit>
 		<Unit filename="test/src/test_box_potential.f90">
 			<Option compile="0" />

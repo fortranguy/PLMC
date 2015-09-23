@@ -10,6 +10,7 @@ implicit none
 private
 
     type, abstract, public :: Abstract_External_Field
+    private
         class(Abstract_Parallelepiped_Domain), pointer :: parallelepiped_domain
         class(Abstract_Field_Expression), pointer :: field_expression
     contains

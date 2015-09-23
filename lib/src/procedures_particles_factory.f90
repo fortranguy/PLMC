@@ -273,6 +273,7 @@ contains
         data_field = prefix//".exist"
         call input_data%get(data_field, particles_exist, data_found)
         call test_data_found(data_field, data_found)
+        deallocate(data_field)
     end function particles_exist
 
     function particles_are_dipolar(input_data, prefix)
@@ -287,6 +288,7 @@ contains
             data_field = prefix//".are dipolar"
             call input_data%get(data_field, particles_are_dipolar, data_found)
             call test_data_found(data_field, data_found)
+            deallocate(data_field)
         else
             particles_are_dipolar = .false.
         end if
@@ -304,6 +306,7 @@ contains
             data_field = prefix//".can exchange"
             call input_data%get(data_field, particles_can_exchange, data_found)
             call test_data_found(data_field, data_found)
+            deallocate(data_field)
         else
             particles_can_exchange = .false.
         end if

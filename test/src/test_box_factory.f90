@@ -1,13 +1,13 @@
 program test_box_factory
 
+use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists
 use types_box, only: Box_Wrapper
-use class_box_factory, only: Concrete_Box_Factory
+use procedures_box_factory, only: box_factory_construct, box_factory_destroy
 
 implicit none
 
-    type(Concrete_Box_Factory) :: box_factory
     type(Box_Wrapper) :: box
 
     type(json_file) :: input_data
@@ -19,10 +19,13 @@ implicit none
     call input_data%load_file(filename = data_filename)
     deallocate(data_filename)
 
-    call box_factory%allocate(box, input_data, "System")
-    call box_factory%construct(box)
-    call box_factory%destroy(box)
+    call box_factory_construct(box, input_data, "System")
+    write(output_unit, *) "box size", box%periodic_box%get_size()
+    write(output_unit, *) "temperature", box%temperature%get()
+    write(output_unit, *) "external field at origin", box%external_field%get([0._DP, 0._DP, 0._DP])
+    write(output_unit, *) "reciprocal lattice numbers", box%reciprocal_lattice%get_numbers()
 
+    call box_factory_destroy(box)
     call input_data%destroy()
 
 end program test_box_factory
