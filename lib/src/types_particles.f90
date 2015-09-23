@@ -2,6 +2,7 @@ module types_particles
 
 use class_particles_number, only: Abstract_Particles_Number
 use class_particles_diameter, only: Abstract_Particles_Diameter
+use class_inter_particles_diameter, only: Abstract_Inter_Particles_Diameter
 use class_particles_moment_norm, only: Abstract_Particles_Moment_Norm
 use class_particles_positions, only: Abstract_Particles_Positions
 use class_particles_orientations, only: Abstract_Particles_Orientations
@@ -23,5 +24,10 @@ private
         class(Abstract_Particles_Dipolar_Moments), allocatable :: dipolar_moments
         class(Abstract_Particles_Total_Moment), allocatable :: total_moment
     end type Particles_Wrapper
+
+    type, public :: Mixture_Wrapper
+        type(Particles_Wrapper) :: components(2)
+        class(Abstract_Inter_Particles_Diameter), allocatable :: inter_diameters
+    end type Mixture_Wrapper
 
 end module types_particles

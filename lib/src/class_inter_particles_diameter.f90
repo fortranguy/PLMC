@@ -22,7 +22,17 @@ private
 
     end type Concrete_Inter_Particles_Diameter
 
+    type, extends(Abstract_Inter_Particles_Diameter), public :: Null_Inter_Particles_Diameter
+    contains
+        procedure :: construct => Null_Inter_Particles_Diameter_construct
+        procedure :: destroy => Null_Inter_Particles_Diameter_destroy
+        procedure :: get => Null_Inter_Particles_Diameter_get
+        procedure :: get_min => Null_Inter_Particles_Diameter_get_min
+    end type Null_Inter_Particles_Diameter
+
 contains
+
+!implementation Abstract_Inter_Particles_Diameter
 
     subroutine Abstract_Inter_Particles_Diameter_construct(this, diameter_1, diameter_2, offset)
         class(Abstract_Inter_Particles_Diameter), intent(out) :: this
@@ -54,5 +64,33 @@ contains
 
         min_diameter = (this%diameter_1%get_min() + this%diameter_2%get_min()) / 2._DP + this%offset
     end function Abstract_Inter_Particles_Diameter_get_min
+
+!implementation Abstract_Inter_Particles_Diameter
+
+!implementation Null_Inter_Particles_Diameter
+
+    subroutine Null_Inter_Particles_Diameter_construct(this, diameter_1, diameter_2, offset)
+        class(Null_Inter_Particles_Diameter), intent(out) :: this
+        class(Abstract_Particles_Diameter), target, intent(in) :: diameter_1, diameter_2
+        real(DP), intent(in) :: offset
+    end subroutine Null_Inter_Particles_Diameter_construct
+
+    subroutine Null_Inter_Particles_Diameter_destroy(this)
+        class(Null_Inter_Particles_Diameter), intent(inout) :: this
+    end subroutine Null_Inter_Particles_Diameter_destroy
+
+    pure function Null_Inter_Particles_Diameter_get(this) result(diameter)
+        class(Null_Inter_Particles_Diameter), intent(in) :: this
+        real(DP) :: diameter
+        diameter = 0._DP
+    end function Null_Inter_Particles_Diameter_get
+
+    pure function Null_Inter_Particles_Diameter_get_min(this) result(min_diameter)
+        class(Null_Inter_Particles_Diameter), intent(in) :: this
+        real(DP) :: min_diameter
+        min_diameter = 0._DP
+    end function Null_Inter_Particles_Diameter_get_min
+
+!implementation Null_Inter_Particles_Diameter
 
 end module class_inter_particles_diameter

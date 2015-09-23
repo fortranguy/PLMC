@@ -22,7 +22,7 @@ use types_box, only: Box_Wrapper
 implicit none
 
 private
-public :: box_factory_construct, box_factory_destroy
+public :: box_factory_construct, box_factory_destroy, allocate_and_set_periodic_box
 
 contains
 

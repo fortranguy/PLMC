@@ -10,6 +10,8 @@ use class_particles_number, only: Abstract_Particles_Number, &
     Concrete_Particles_Number, Null_Particles_Number
 use class_particles_diameter, only: Abstract_Particles_Diameter, &
     Concrete_Particles_Diameter, Null_Particles_Diameter
+use class_inter_particles_diameter, only: Abstract_Inter_Particles_Diameter, &
+    Concrete_Inter_Particles_Diameter, Null_Inter_Particles_Diameter
 use class_particles_moment_norm, only: Abstract_Particles_Moment_Norm, &
     Concrete_Particles_Moment_Norm, Null_Particles_Moment_Norm
 use class_particles_positions, only: Abstract_Particles_Positions, &
@@ -28,7 +30,7 @@ implicit none
 
 private
 public :: particles_factory_construct, particles_factory_destroy, particles_exist, &
-    particles_are_dipolar, particles_can_exchange
+    particles_are_dipolar, particles_can_exchange, allocate_and_construct_inter_diameter
 
 contains
 
@@ -47,9 +49,9 @@ contains
         type(json_file), target, intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        call allocate_and_set_particles_number(particles%number, input_data, prefix)
-        call allocate_and_set_particles_diameter(particles%diameter, input_data, prefix)
-        call allocate_and_set_particles_moment_norm(particles%moment_norm, input_data, prefix)
+        call allocate_and_set_number(particles%number, input_data, prefix)
+        call allocate_and_set_diameter(particles%diameter, input_data, prefix)
+        call allocate_and_set_moment_norm(particles%moment_norm, input_data, prefix)
         call allocate_positions(particles%positions, input_data, prefix)
         call allocate_orientations(particles%orientations, input_data, prefix)
         call allocate_dipolar_moments(particles%dipolar_moments, input_data, prefix)
@@ -71,7 +73,7 @@ contains
         call particles%total_moment%construct(particles%dipolar_moments)
     end subroutine particles_factory_construct_and_set
 
-    subroutine allocate_and_set_particles_number(particles_number, input_data, prefix)
+    subroutine allocate_and_set_number(particles_number, input_data, prefix)
         class(Abstract_Particles_Number), allocatable, intent(out) :: particles_number
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
@@ -90,9 +92,9 @@ contains
             allocate(Null_Particles_Number :: particles_number)
         end if
         call particles_number%set(num_particles)
-    end subroutine allocate_and_set_particles_number
+    end subroutine allocate_and_set_number
 
-    subroutine allocate_and_set_particles_diameter(particles_diameter, input_data, prefix)
+    subroutine allocate_and_set_diameter(particles_diameter, input_data, prefix)
         class(Abstract_Particles_Diameter), allocatable, intent(out) :: particles_diameter
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
@@ -114,9 +116,46 @@ contains
             allocate(Null_Particles_Diameter :: particles_diameter)
         end if
         call particles_diameter%set(diameter, diameter_min_factor)
-    end subroutine allocate_and_set_particles_diameter
+    end subroutine allocate_and_set_diameter
 
-    subroutine allocate_and_set_particles_moment_norm(particles_moment_norm, input_data, prefix)
+    subroutine allocate_and_construct_inter_diameter(inter_particles_diameter, &
+        particles_diameter_1, particles_diameter_2, input_data, prefix)
+        class(Abstract_Inter_Particles_Diameter), allocatable, intent(out) :: &
+            inter_particles_diameter
+        class(Abstract_Particles_Diameter), intent(in) :: particles_diameter_1, particles_diameter_2
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
+
+        character(len=:), allocatable :: data_field
+        logical :: data_found, diameter_1_exists, diameter_2_exists
+        real(DP) :: inter_diameter_offset
+
+        select type(particles_diameter_1)
+            type is (Null_Particles_Diameter)
+                diameter_1_exists = .false.
+            class default
+                diameter_1_exists = .true.
+        end select
+        select type(particles_diameter_2)
+            type is (Null_Particles_Diameter)
+                diameter_2_exists = .false.
+            class default
+                diameter_2_exists = .true.
+        end select
+
+        if (diameter_1_exists .and. diameter_2_exists) then
+            data_field = prefix//".offset"
+            call input_data%get(data_field, inter_diameter_offset, data_found)
+            call test_data_found(data_field, data_found)
+            allocate(Concrete_Inter_Particles_Diameter :: inter_particles_diameter)
+        else
+            allocate(Null_Inter_Particles_Diameter :: inter_particles_diameter)
+        end if
+        call inter_particles_diameter%construct(particles_diameter_1, particles_diameter_2, &
+            inter_diameter_offset)
+    end subroutine allocate_and_construct_inter_diameter
+
+    subroutine allocate_and_set_moment_norm(particles_moment_norm, input_data, prefix)
         class(Abstract_Particles_Moment_Norm), allocatable, intent(out) :: particles_moment_norm
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
@@ -135,7 +174,7 @@ contains
             allocate(Null_Particles_Moment_Norm :: particles_moment_norm)
         end if
         call particles_moment_norm%set(moment_norm)
-    end subroutine allocate_and_set_particles_moment_norm
+    end subroutine allocate_and_set_moment_norm
 
     subroutine allocate_positions(particles_positions, input_data, prefix)
         class(Abstract_Particles_Positions), allocatable, intent(out) :: particles_positions

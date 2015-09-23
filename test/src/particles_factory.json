@@ -1,0 +1,31 @@
+{
+    "Box": {
+        "Periodic Box": {
+        "periodicity": "XYZ",
+        "size": [10.0, 10.0, 10.0]
+        },
+    },
+    "Particles": {
+        "Particles 1": {
+            "exist": true,
+            "are dipolar": false,
+            "can exchange": false,
+            "number": 10,
+            "diameter": 1.0,
+            "minimum diameter factor": 0.8,
+            "initial positions": "positions.in"
+        },
+        "Particles 2": {
+            "exist": true,
+            "are dipolar": false,
+            "can exchange": false,
+            "number": 10,
+            "diameter": 1.0,
+            "minimum diameter factor": 0.8,
+            "initial positions": "positions.in"
+        },
+        "Between 12": {
+            "offset": 0.2   
+        }
+    }
+}

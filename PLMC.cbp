@@ -182,7 +182,7 @@
 		<Unit filename="test/src/test_box_factory.f90">
 			<Option compile="0" />
 			<Option link="0" />
-			<Option weight="6" />
+			<Option weight="7" />
 		</Unit>
 		<Unit filename="test/src/test_box_potential.f90">
 			<Option compile="0" />
@@ -258,6 +258,11 @@
 			<Option compile="0" />
 			<Option link="0" />
 			<Option weight="8" />
+		</Unit>
+		<Unit filename="test/src/test_particles_factory.f90">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option weight="7" />
 		</Unit>
 		<Unit filename="test/src/test_periodic_box.f90">
 			<Option compile="0" />
