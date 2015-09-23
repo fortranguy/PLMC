@@ -12,7 +12,7 @@ use types_field_parameters, only: Abstract_Field_Parameters, Constant_Field_Para
 use class_field_expression, only: Abstract_Field_Expression, Constant_Field_Expression, &
     Null_Field_Expression
 use class_parallelepiped_domain, only: Abstract_Parallelepiped_Domain, &
-    Concrete_Parallelepiped_Domain, Null_Parallelepiped_Domain
+    Concrete_Parallelepiped_Domain, Null_Parallelepiped_Domain, Box_Parallelepiped_Domain
 use class_external_field, only: Abstract_External_Field, Concrete_External_Field, &
     Null_External_Field
 use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice, Concrete_Reciprocal_Lattice, &
@@ -82,13 +82,13 @@ contains
         data_field = this%prefix//".Periodic Box.name"
         call this%input_data%get(data_field, box_name, data_found)
         call test_data_found(data_field, data_found)
-        select case(box_name)
-            case("XYZ")
+        select case (box_name)
+            case ("XYZ")
                 allocate(XYZ_Periodic_Box :: periodic_box)
-            case("XY")
+            case ("XY")
                 allocate(XY_Periodic_Box :: periodic_box)
             case default
-                call error_exit(data_field//" unkown. Choose between: 'XYZ' and 'XY'")
+                call error_exit(data_field//" box_name unknown. Choose between: 'XYZ' and 'XY'")
         end select
         deallocate(box_name)
         data_field = this%prefix//".Periodic Box.size"
@@ -126,13 +126,14 @@ contains
         call test_data_found(data_field, data_found)
         this%use_external_field = .true.
         select case (field_name)
-            case("constant")
+            case ("constant")
                 allocate(Constant_Field_Parameters :: field_parameters)
-            case("null")
+            case ("null")
                 this%use_external_field = .false.
                 allocate(Null_Field_Parameters :: field_parameters)
             case default
-                call error_exit(field_name//"unknown. Choose between: 'constant' and 'null'.")
+                call error_exit(field_name//" field_name unknown."//&
+                    "Choose between: 'constant' and 'null'.")
         end select
         deallocate(field_name)
         deallocate(data_field)
@@ -170,8 +171,25 @@ contains
         class(Concrete_Box_Factory), intent(in) :: this
         class(Abstract_Parallelepiped_Domain), allocatable, intent(out) :: parallelepiped_domain
 
+        character(len=:), allocatable :: data_field
+        logical :: data_found
+        character(len=:), allocatable :: domain_name
+
         if (this%use_external_field) then
-            allocate(Concrete_Parallelepiped_Domain :: parallelepiped_domain)
+            data_field = this%prefix//".Field.Parallelepiped Domain.name"
+            call this%input_data%get(data_field, domain_name, data_found)
+            call test_data_found(data_field, data_found)
+            select case(domain_name)
+                case ("domain")
+                    allocate(Concrete_Parallelepiped_Domain :: parallelepiped_domain)
+                case ("box")
+                    allocate(Box_Parallelepiped_Domain :: parallelepiped_domain)
+                case default
+                    call error_exit(domain_name//" domain_name unknown."//&
+                        "Choose between: 'domain' and 'box'.")
+            end select
+            deallocate(data_field)
+            deallocate(domain_name)
         else
             allocate(Null_Parallelepiped_Domain :: parallelepiped_domain)
         end if
