@@ -120,8 +120,8 @@ contains
         end if
     end subroutine allocate_field_parameters_and_expression
 
-    subroutine set_field_parameters_and_expression(field_expression, field_parameters, input_data, &
-        prefix)
+    subroutine set_field_parameters_and_expression(field_expression, field_parameters, &
+        input_data, prefix)
         class(Abstract_Field_Expression), allocatable, intent(inout) :: field_expression
         class(Abstract_Field_Parameters), intent(inout) :: field_parameters
         type(json_file), intent(inout) :: input_data

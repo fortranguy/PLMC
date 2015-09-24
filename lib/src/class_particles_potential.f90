@@ -1,4 +1,4 @@
-module class_box_potential
+module class_particles_potential
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use class_periodic_box, only: Abstract_Periodic_Box
@@ -76,4 +76,4 @@ contains
         end do
     end subroutine Box_Potential_Facade_visit
 
-end module class_box_potential
+end module class_particles_potential

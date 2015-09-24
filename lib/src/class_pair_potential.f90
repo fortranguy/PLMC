@@ -14,7 +14,7 @@ private
     type, abstract, public :: Abstract_Pair_Potential
     private
         type(Concrete_Potential_Domain) :: domain
-        class(Abstract_Potential_Expression), pointer :: potential_expression
+        class(Abstract_Potential_Expression), pointer :: expression
         real(DP), allocatable :: tabulation(:)
     contains
         procedure :: construct => Abstract_Pair_Potential_construct
@@ -41,12 +41,12 @@ contains
 
 !implementation Abstract_Pair_Potential
 
-    subroutine Abstract_Pair_Potential_construct(this, domain, potential_expression)
+    subroutine Abstract_Pair_Potential_construct(this, domain, expression)
         class(Abstract_Pair_Potential), intent(out) :: this
         type(Concrete_Potential_Domain), intent(in) :: domain
-        class(Abstract_Potential_Expression), target, intent(in) :: potential_expression
+        class(Abstract_Potential_Expression), target, intent(in) :: expression
 
-        this%potential_expression => potential_expression
+        this%expression => expression
         call this%set_domain(domain)
         call this%set_tabulation()
     end subroutine Abstract_Pair_Potential_construct
@@ -86,7 +86,7 @@ contains
         allocate(this%tabulation(i_min:i_max))
         do i_distance = i_min, i_max
             distance_i = real(i_distance, DP) * this%domain%delta
-            this%tabulation(i_distance) = this%potential_expression%get(distance_i)
+            this%tabulation(i_distance) = this%expression%get(distance_i)
         end do
         this%tabulation = this%tabulation - this%tabulation(i_max)
     end subroutine Abstract_Pair_Potential_set_tabulation
@@ -95,7 +95,7 @@ contains
         class(Abstract_Pair_Potential), intent(inout) :: this
 
         if (allocated(this%tabulation)) deallocate(this%tabulation)
-        this%potential_expression => null()
+        this%expression => null()
     end subroutine Abstract_Pair_Potential_destroy
 
     pure function Abstract_Pair_Potential_get_max_distance(this) result(max)
@@ -132,10 +132,10 @@ contains
 
 !implementation Hard_Pair_Potential
 
-    subroutine Hard_Pair_Potential_construct(this, domain, potential_expression)
+    subroutine Hard_Pair_Potential_construct(this, domain, expression)
         class(Hard_Pair_Potential), intent(out) :: this
         type(Concrete_Potential_Domain), intent(in) :: domain
-        class(Abstract_Potential_Expression), target, intent(in) :: potential_expression
+        class(Abstract_Potential_Expression), target, intent(in) :: expression
 
         call this%set_domain(domain)
     end subroutine Hard_Pair_Potential_construct

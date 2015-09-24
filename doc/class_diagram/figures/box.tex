@@ -68,7 +68,7 @@
     
     \begin{scope}[shift={($(ParallelepipedDomain.north)!0.5!
                             (FieldExpression.north) + (0 cm, 8.5 cm)$)}, opacity=1]
-        \begin{abstractclass}[text width=\mediumTextWidth]{AbstractExternalField}{0, 0}
+        \begin{abstractclass}[text width=\mediumTextWidth]{ExternalField}{0, 0}
             \operation{construct(parallelepipedDomain\type{ParallelepipedDomain},
                 fieldExpression\type{FieldExpression})}
             \operation{destroy()}
@@ -76,13 +76,20 @@
         \end{abstractclass}
     \end{scope}
     
-    \begin{scope}[shift={($(AbstractExternalField.north) + (10 cm, 0 cm)$)}, opacity=1]
+    \begin{scope}[shift={($(ExternalField.north) + (10 cm, 0 cm)$)}, opacity=1]
         \begin{abstractclass}[text width=\mediumTextWidth]{WallsPotential}{0, 0}
-            \operation{construct(gap\type{double}, potentialDomain\type{PotentialDomain},
-                potentialExpression\type{PotentialExpression})}
+            \operation{construct(gap\type{double}, floorPenetration\type{FloorPenetration},
+                pairPotential\type{PairPotential})}
             \operation{destroy()}
             \operation{getGap()}
-            \operation{meet(position\type{double[3]}, overlap\type{bool}, energy\type{double})}
+            \operation{meet(overlap\type{bool}, energy\type{double}, position\type{double[3]})}
+        \end{abstractclass}
+    \end{scope}
+    
+    \begin{scope}[shift={($(WallsPotential.south) + (10 cm, 2 cm)$)}, opacity=1]
+        \begin{abstractclass}[text width=\mediumTextWidth]{FloorPenetration}{0, 0}
+            \operation{meet(overlap\type{bool}, shortestVectorFromFloor\type{double[3]}, 
+                positionFromFloor\type{double[3]})}
         \end{abstractclass}
     \end{scope}
     
@@ -91,6 +98,7 @@
 \begin{scope}[on background layer]
     \aggregation{ParallelepipedDomain}{periodicBox}{1}{PeriodicBox}
     \aggregation{ReciprocalLattice}{periodicBox}{1}{PeriodicBox}
-    \aggregation{AbstractExternalField}{parallelepipedDomain}{1}{ParallelepipedDomain}
-    \aggregation{AbstractExternalField}{fieldExpression}{1}{FieldExpression}
+    \aggregation{ExternalField}{parallelepipedDomain}{1}{ParallelepipedDomain}
+    \aggregation{ExternalField}{fieldExpression}{1}{FieldExpression}
+    \aggregation{WallsPotential}{floorPenetration}{1}{FloorPenetration}
 \end{scope}
