@@ -7,8 +7,6 @@ use procedures_errors, only: error_exit
 use procedures_checks, only: check_3d_array
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box, XY_Periodic_Box
 use class_temperature, only: Abstract_Temperature, Concrete_Temperature
-use types_field_parameters, only: Abstract_Field_Parameters, Constant_Field_Parameters, &
-    Null_Field_Parameters
 use class_field_expression, only: Abstract_Field_Expression, Constant_Field_Expression, &
     Null_Field_Expression
 use class_parallelepiped_domain, only: Abstract_Parallelepiped_Domain, &
@@ -22,7 +20,8 @@ use types_box, only: Box_Wrapper
 implicit none
 
 private
-public :: box_factory_construct, box_factory_destroy, allocate_and_set_periodic_box
+public :: box_factory_construct, box_factory_destroy, allocate_and_set_periodic_box, &
+    allocate_and_set_field_expression, allocate_and_construct_parallelepiped_domain
 
 contains
 
@@ -33,12 +32,9 @@ contains
 
         call allocate_and_set_periodic_box(box%periodic_box, input_data, prefix)
         call allocate_temperature(box%temperature, input_data, prefix)
-        call allocate_field_parameters_and_expression(box%field_parameters, box%field_expression, &
-            input_data, prefix)
-        call set_field_parameters_and_expression(box%field_expression, box%field_parameters, &
-            input_data, prefix)
-        call allocate_and_construct_parallelepiped_domain(box%parallelepiped_domain, &
-            input_data, prefix//".External Field", box%periodic_box)
+        call allocate_and_set_field_expression(box%field_expression, input_data, prefix)
+        call allocate_and_construct_parallelepiped_domain(box%parallelepiped_domain, input_data, &
+            prefix//".External Field", box%periodic_box)
         call allocate_external_field(box%external_field, input_data, prefix)
         call box%external_field%construct(box%parallelepiped_domain, box%field_expression)
         call allocate_and_construct_reciprocal_lattice(box%reciprocal_lattice, input_data, prefix, &
@@ -91,9 +87,16 @@ contains
         deallocate(data_field)
     end subroutine allocate_temperature
 
-    subroutine allocate_field_parameters_and_expression(field_parameters, field_expression, &
-        input_data, prefix)
-        class(Abstract_Field_Parameters), allocatable, intent(out) :: field_parameters
+    subroutine allocate_and_set_field_expression(field_expression, input_data, prefix)
+        class(Abstract_Field_Expression), allocatable, intent(out) :: field_expression
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
+
+        call allocate_field_expression(field_expression, input_data, prefix)
+        call set_field_expression(field_expression, input_data, prefix)
+    end subroutine allocate_and_set_field_expression
+
+    subroutine allocate_field_expression(field_expression, input_data, prefix)
         class(Abstract_Field_Expression), allocatable, intent(out) :: field_expression
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
@@ -107,7 +110,6 @@ contains
             call test_data_found(data_field, data_found)
             select case (field_name)
                 case ("constant")
-                    allocate(Constant_Field_Parameters :: field_parameters)
                     allocate(Constant_Field_Expression :: field_expression)
                 case default
                     call error_exit(field_name//" field_name unknown. Choose: 'constant'.")
@@ -115,15 +117,12 @@ contains
             deallocate(field_name)
             deallocate(data_field)
         else
-            allocate(Null_Field_Parameters :: field_parameters)
             allocate(Null_Field_Expression :: field_expression)
         end if
-    end subroutine allocate_field_parameters_and_expression
+    end subroutine allocate_field_expression
 
-    subroutine set_field_parameters_and_expression(field_expression, field_parameters, &
-        input_data, prefix)
+    subroutine set_field_expression(field_expression, input_data, prefix)
         class(Abstract_Field_Expression), allocatable, intent(inout) :: field_expression
-        class(Abstract_Field_Parameters), intent(inout) :: field_parameters
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -131,20 +130,18 @@ contains
         logical :: data_found
         real(DP), allocatable :: field_vector(:)
 
-        if (apply_external_field(input_data, prefix)) then
-            select type (field_parameters)
-                type is (Constant_Field_Parameters)
-                    data_field = prefix//".External Field.vector"
-                    call input_data%get(data_field, field_vector, data_found)
-                    call test_data_found(data_field, data_found)
-                    call check_3d_array("Concrete_Box_Factory", "field_vector", field_vector)
-                    field_parameters%vector = field_vector
-                    deallocate(field_vector)
-                    deallocate(data_field)
-            end select
-        end if
-        call field_expression%set(field_parameters)
-    end subroutine set_field_parameters_and_expression
+        select type (field_expression)
+            type is (Constant_Field_Expression)
+                data_field = prefix//".External Field.vector"
+                call input_data%get(data_field, field_vector, data_found)
+                call test_data_found(data_field, data_found)
+                call field_expression%set(field_vector)
+                deallocate(field_vector)
+            type is (Null_Field_Expression)
+                call field_expression%set()
+        end select
+        if (allocated(data_field)) deallocate(data_field)
+    end subroutine set_field_expression
 
     subroutine allocate_and_construct_parallelepiped_domain(parallelepiped_domain, input_data, &
         prefix, periodic_box)
@@ -259,7 +256,6 @@ contains
         call box%parallelepiped_domain%destroy()
         if (allocated(box%parallelepiped_domain)) deallocate(box%parallelepiped_domain)
         if (allocated(box%field_expression)) deallocate(box%field_expression)
-        if (allocated(box%field_parameters)) deallocate(box%field_parameters)
         if (allocated(box%temperature)) deallocate(box%temperature)
         if (allocated(box%periodic_box)) deallocate(box%periodic_box)
     end subroutine box_factory_destroy
