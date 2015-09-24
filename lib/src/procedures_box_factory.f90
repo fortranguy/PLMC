@@ -131,14 +131,14 @@ contains
         real(DP), allocatable :: field_vector(:)
 
         select type (field_expression)
+            type is (Null_Field_Expression)
+                call field_expression%set()
             type is (Constant_Field_Expression)
                 data_field = prefix//".External Field.vector"
                 call input_data%get(data_field, field_vector, data_found)
                 call test_data_found(data_field, data_found)
                 call field_expression%set(field_vector)
                 deallocate(field_vector)
-            type is (Null_Field_Expression)
-                call field_expression%set()
         end select
         if (allocated(data_field)) deallocate(data_field)
     end subroutine set_field_expression

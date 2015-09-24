@@ -25,6 +25,12 @@ private
 
     end interface
 
+    type, extends(Abstract_Field_Expression), public :: Null_Field_Expression
+    contains
+        procedure :: set => Null_Field_Expression_set
+        procedure :: get => Null_Field_Expression_get
+    end type Null_Field_Expression
+
     type, extends(Abstract_Field_Expression), public :: Constant_Field_Expression
     private
         real(DP) :: vector(num_dimensions)
@@ -33,13 +39,22 @@ private
         procedure :: get => Constant_Field_Expression_get
     end type Constant_Field_Expression
 
-    type, extends(Abstract_Field_Expression), public :: Null_Field_Expression
-    contains
-        procedure :: set => Null_Field_Expression_set
-        procedure :: get => Null_Field_Expression_get
-    end type Null_Field_Expression
-
 contains
+
+!implementation Null_Field_Expression
+
+    subroutine Null_Field_Expression_set(this)
+        class(Null_Field_Expression), intent(inout) :: this
+    end subroutine Null_Field_Expression_set
+
+    pure function Null_Field_Expression_get(this, position) result(expression)
+        class(Null_Field_Expression), intent(in) :: this
+        real(DP), intent(in) :: position(:)
+        real(DP) :: expression(num_dimensions)
+        expression = 0._DP
+    end function Null_Field_Expression_get
+
+!end implementation Null_Field_Expression
 
 !implementation Constant_Field_Expression
 
@@ -60,20 +75,5 @@ contains
     end function Constant_Field_Expression_get
 
 !end implementation Constant_Field_Expression
-
-!implementation Null_Field_Expression
-
-    subroutine Null_Field_Expression_set(this)
-        class(Null_Field_Expression), intent(inout) :: this
-    end subroutine Null_Field_Expression_set
-
-    pure function Null_Field_Expression_get(this, position) result(expression)
-        class(Null_Field_Expression), intent(in) :: this
-        real(DP), intent(in) :: position(:)
-        real(DP) :: expression(num_dimensions)
-        expression = 0._DP
-    end function Null_Field_Expression_get
-
-!end implementation Null_Field_Expression
 
 end module class_field_expression

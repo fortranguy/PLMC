@@ -29,6 +29,14 @@ private
 
     end type Concrete_Pair_Potential
 
+    type, extends(Abstract_Pair_Potential), public :: Null_Pair_Potential
+    contains
+        procedure :: construct => Null_Pair_Potential_construct
+        procedure :: destroy => Null_Pair_Potential_destroy
+        procedure :: get_max_distance => Null_Pair_Potential_get_max_distance
+        procedure :: meet => Null_Pair_Potential_meet
+    end type Null_Pair_Potential
+
     type, extends(Abstract_Pair_Potential), public :: Hard_Pair_Potential
     contains
         procedure :: construct => Hard_Pair_Potential_construct
@@ -105,11 +113,11 @@ contains
         max = this%domain%max
     end function Abstract_Pair_Potential_get_max_distance
 
-    pure subroutine Abstract_Pair_Potential_meet(this, distance, overlap, energy)
+    pure subroutine Abstract_Pair_Potential_meet(this, overlap, energy, distance)
         class(Abstract_Pair_Potential), intent(in) :: this
-        real(DP), intent(in) :: distance
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
+        real(DP), intent(in) :: distance
 
         real(DP) :: distance_i
         integer :: i_distance
@@ -129,6 +137,33 @@ contains
     end subroutine Abstract_Pair_Potential_meet
 
 !end implementation Abstract_Pair_Potential
+
+!implementation Null_Pair_Potential
+
+    subroutine Null_Pair_Potential_construct(this, domain, expression)
+        class(Null_Pair_Potential), intent(out) :: this
+        type(Concrete_Potential_Domain), intent(in) :: domain
+        class(Abstract_Potential_Expression), target, intent(in) :: expression
+    end subroutine Null_Pair_Potential_construct
+
+    subroutine Null_Pair_Potential_destroy(this)
+        class(Null_Pair_Potential), intent(inout) :: this
+    end subroutine Null_Pair_Potential_destroy
+
+    pure function Null_Pair_Potential_get_max_distance(this) result(max)
+        class(Null_Pair_Potential), intent(in) :: this
+        real(DP) :: max
+        max = 0._DP
+    end function Null_Pair_Potential_get_max_distance
+
+    pure subroutine Null_Pair_Potential_meet(this, overlap, energy, distance)
+        class(Null_Pair_Potential), intent(in) :: this
+        logical, intent(out) :: overlap
+        real(DP), intent(out) :: energy
+        real(DP), intent(in) :: distance
+    end subroutine Null_Pair_Potential_meet
+
+!end implementation Null_Pair_Potential
 
 !implementation Hard_Pair_Potential
 
@@ -155,11 +190,11 @@ contains
 
     end subroutine Hard_Pair_Potential_destroy
 
-    pure subroutine Hard_Pair_Potential_meet(this, distance, overlap, energy)
+    pure subroutine Hard_Pair_Potential_meet(this, overlap, energy, distance)
         class(Hard_Pair_Potential), intent(in) :: this
-        real(DP), intent(in) :: distance
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
+        real(DP), intent(in) :: distance
 
         overlap = .false.
         energy = 0._DP

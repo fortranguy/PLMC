@@ -62,9 +62,9 @@ contains
         call this%floor_penetration%meet(overlap, shortest_vector_from_ceiling, &
             -this%position_from_ceiling(position))
         if (overlap) return
-        call this%pair_potential%meet(norm2(shortest_vector_from_floor), overlap, energy_floor)
+        call this%pair_potential%meet(overlap, energy_floor, norm2(shortest_vector_from_floor))
         if (overlap) return
-        call this%pair_potential%meet(norm2(shortest_vector_from_ceiling), overlap, energy_ceiling)
+        call this%pair_potential%meet(overlap, energy_ceiling, norm2(shortest_vector_from_ceiling))
         if (overlap) return
         energy = energy_floor + energy_ceiling
     end subroutine Abstract_Walls_Potential_visit

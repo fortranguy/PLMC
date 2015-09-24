@@ -111,7 +111,7 @@ contains
             next => current%next
             if (.not. particle%same_type .or. particle%i /= current%i) then
                 distance = this%periodic_box%distance(particle%position, current%position)
-                call pair_potential%meet(distance, overlap, energy_i)
+                call pair_potential%meet(overlap, energy_i, distance)
                 if (overlap) return
                 energy = energy + energy_i
             end if
@@ -211,7 +211,7 @@ contains
             if (.not. particle%same_type .or. particle%i /= this%nodes(i_node)%i) then
                 distance = this%periodic_box%distance(particle%position, &
                     this%nodes(i_node)%position)
-                call pair_potential%meet(distance, overlap, energy_i)
+                call pair_potential%meet(overlap, energy_i, distance)
                 if (overlap) return
                 energy = energy + energy_i
             end if

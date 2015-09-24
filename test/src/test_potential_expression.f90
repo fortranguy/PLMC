@@ -33,16 +33,12 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
 use procedures_errors, only: error_exit
-use types_potential_parameters, only: Abstract_Potential_Parameters, Null_Potential_Parameters, &
-    Lennard_Jones_Parameters
-use class_potential_expression, only: Abstract_Potential_Expression, Null_Potential_Expression, &
-    Lennard_Jones_Expression
+use procedures_short_potential_factory, only: allocate_and_set_potential_expression
 use procedures_potential_expression_write, only: write_potential_expression
 
 implicit none
 
     class(Abstract_Potential_Expression), allocatable :: potential_expression
-    class(Abstract_Potential_Parameters), allocatable :: potential_parameters
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename, data_field, potential_name
     logical :: data_found
@@ -56,32 +52,8 @@ implicit none
     call input_data%load_file(filename = data_filename)
     deallocate(data_filename)
 
-    data_field = "Potential.name"
-    call input_data%get(data_field, potential_name, data_found)
-    call test_data_found(data_field, data_found)
-
-    select case(potential_name)
-        case ("null")
-            allocate(Null_Potential_Parameters :: potential_parameters)
-        case ("LJ")
-            allocate(Lennard_Jones_Parameters :: potential_parameters)
-        case default
-            call error_exit(data_field//" unkown.")
-    end select
-
-    select type(potential_parameters)
-        type is (Null_Potential_Parameters)
-            allocate(Null_Potential_Expression :: potential_expression)
-        type is (Lennard_Jones_Parameters)
-            data_field = "Potential.epsilon"
-            call input_data%get(data_field, potential_parameters%epsilon, data_found)
-            call test_data_found(data_field, data_found)
-            data_field = "Potential.sigma"
-            call input_data%get(data_field, potential_parameters%sigma, data_found)
-            call test_data_found(data_field, data_found)
-            allocate(Lennard_Jones_Expression :: potential_expression)
-    end select
-    call potential_expression%set(potential_parameters)
+    call allocate_and_set_potential_expression(potential_expression, input_data, &
+        "Test Potential Expression")
 
     data_field = "Potential.minimum distance"
     call input_data%get(data_field, min_distance, data_found)
@@ -100,7 +72,6 @@ implicit none
 
     deallocate(potential_name)
     deallocate(potential_expression)
-    deallocate(potential_parameters)
     deallocate(data_field)
     call input_data%destroy()
 
