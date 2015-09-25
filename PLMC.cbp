@@ -182,6 +182,7 @@
 		<Unit filename="lib/src/types_potential_domain.f90">
 			<Option weight="0" />
 		</Unit>
+		<Unit filename="lib/src/types_short_potential.f90" />
 		<Unit filename="test/src/test_box_factory.f90">
 			<Option compile="0" />
 			<Option link="0" />
@@ -316,9 +317,6 @@
 			<Option compile="0" />
 			<Option link="0" />
 			<Option weight="5" />
-		</Unit>
-		<Unit filename="types_short_potential.f90">
-			<Option weight="6" />
 		</Unit>
 		<Extensions>
 			<code_completion />

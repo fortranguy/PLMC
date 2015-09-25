@@ -33,14 +33,17 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
 use procedures_errors, only: error_exit
-use procedures_short_potential_factory, only: allocate_and_set_potential_expression
+use class_particles_diameter, only: Abstract_Particles_Diameter, Concrete_Particles_Diameter
+use class_potential_expression, only: Abstract_Potential_Expression
+use procedures_short_potential_factory, only: allocate_and_set_expression
 use procedures_potential_expression_write, only: write_potential_expression
 
 implicit none
 
+    class(Abstract_Particles_Diameter), allocatable :: diameter
     class(Abstract_Potential_Expression), allocatable :: potential_expression
     type(json_file) :: input_data
-    character(len=:), allocatable :: data_filename, data_field, potential_name
+    character(len=:), allocatable :: data_filename, data_field
     logical :: data_found
 
     real(DP) :: min_distance, max_distance, delta_distance
@@ -52,16 +55,18 @@ implicit none
     call input_data%load_file(filename = data_filename)
     deallocate(data_filename)
 
-    call allocate_and_set_potential_expression(potential_expression, input_data, &
-        "Test Potential Expression")
+    allocate(Concrete_Particles_Diameter :: diameter)
+    call diameter%set(1.0_DP, 0.8_DP)
+    call allocate_and_set_expression(potential_expression, input_data, &
+        "Test Potential Expression", diameter)
 
-    data_field = "Potential.minimum distance"
+    data_field = "Test Potential Expression.Potential.minimum distance"
     call input_data%get(data_field, min_distance, data_found)
     call test_data_found(data_field, data_found)
-    data_field = "Potential.maximum distance"
+    data_field = "Test Potential Expression.Potential.maximum distance"
     call input_data%get(data_field, max_distance, data_found)
     call test_data_found(data_field, data_found)
-    data_field = "Potential.delta distance"
+    data_field = "Test Potential Expression.Potential.delta distance"
     call input_data%get(data_field, delta_distance, data_found)
     call test_data_found(data_field, data_found)
 
@@ -70,7 +75,7 @@ implicit none
                                     delta_distance, potential_unit)
     close(potential_unit)
 
-    deallocate(potential_name)
+    deallocate(diameter)
     deallocate(potential_expression)
     deallocate(data_field)
     call input_data%destroy()

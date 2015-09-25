@@ -11,11 +11,11 @@ implicit none
 private
 
     type, public :: Short_Potential_Wrapper
-        class(Abstract_Potential_Expression), allocatable :: potential_expression
-        class(Abstract_Pair_Potential), allocatable :: pair_potential
-        class(Abstract_Particles_Potential), allocatable :: particle_potential
-        class(Abstract_Visitable_List), allocatable :: visitable_list
-        class(Abstract_Visitable_Cells), allocatable :: visitable_cells
+        class(Abstract_Potential_Expression), allocatable :: expression
+        class(Abstract_Pair_Potential), allocatable :: pair
+        class(Abstract_Particles_Potential), allocatable :: particles
+        class(Abstract_Visitable_List), allocatable :: list
+        class(Abstract_Visitable_Cells), allocatable :: cells
     end type Short_Potential_Wrapper
 
 end module types_short_potential

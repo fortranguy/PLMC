@@ -37,13 +37,13 @@ private
         procedure :: meet => Null_Pair_Potential_meet
     end type Null_Pair_Potential
 
-    type, extends(Abstract_Pair_Potential), public :: Hard_Pair_Potential
+    type, extends(Abstract_Pair_Potential), public :: Raw_Pair_Potential
     contains
-        procedure :: construct => Hard_Pair_Potential_construct
-        procedure, private :: set_domain => Hard_Pair_Potential_set_domain
-        procedure :: destroy => Hard_Pair_Potential_destroy
-        procedure :: meet => Hard_Pair_Potential_meet
-    end type Hard_Pair_Potential
+        procedure :: construct => Raw_Pair_Potential_construct
+        procedure, private :: set_domain => Raw_Pair_Potential_set_domain
+        procedure :: destroy => Raw_Pair_Potential_destroy
+        procedure :: meet => Raw_Pair_Potential_meet
+    end type Raw_Pair_Potential
 
 contains
 
@@ -66,12 +66,12 @@ contains
         real(DP) :: distance_range
 
         call check_positive("Abstract_Pair_Potential", "domain%min", domain%min)
-        this%domain%min = domain%min
         call check_positive("Abstract_Pair_Potential", "domain%max", domain%max)
-        this%domain%max = domain%max
         if (domain%min > domain%max) then
-            call error_exit("Abstract_Pair_Potential: "//"domain%min > domain%max.")
+            call error_exit("Abstract_Pair_Potential: domain%min > domain%max.")
         end if
+        this%domain%min = domain%min
+        this%domain%max = domain%max
         call check_positive("Abstract_Pair_Potential", "domain%delta", domain%delta)
         distance_range = domain%max - domain%min
         if (distance_range < real_zero) then
@@ -161,37 +161,45 @@ contains
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
         real(DP), intent(in) :: distance
+        overlap = .false.
+        energy = 0._DP
     end subroutine Null_Pair_Potential_meet
 
 !end implementation Null_Pair_Potential
 
-!implementation Hard_Pair_Potential
+!implementation Raw_Pair_Potential
 
-    subroutine Hard_Pair_Potential_construct(this, domain, expression)
-        class(Hard_Pair_Potential), intent(out) :: this
+    subroutine Raw_Pair_Potential_construct(this, domain, expression)
+        class(Raw_Pair_Potential), intent(out) :: this
         type(Concrete_Potential_Domain), intent(in) :: domain
         class(Abstract_Potential_Expression), target, intent(in) :: expression
 
+        this%expression => expression
         call this%set_domain(domain)
-    end subroutine Hard_Pair_Potential_construct
+    end subroutine Raw_Pair_Potential_construct
 
-    subroutine Hard_Pair_Potential_set_domain(this, domain)
-        class(Hard_Pair_Potential), intent(inout) :: this
+    subroutine Raw_Pair_Potential_set_domain(this, domain)
+        class(Raw_Pair_Potential), intent(inout) :: this
         type(Concrete_Potential_Domain), intent(in) :: domain
 
-        call check_positive("Hard_Pair_Potential", "domain%min", domain%min)
+        call check_positive("Raw_Pair_Potential", "domain%min", domain%min)
+        call check_positive("Raw_Pair_Potential", "domain%max", domain%max)
+        if (domain%min > domain%max) then
+            call error_exit("Raw_Pair_Potential: domain%min > domain%max.")
+        end if
         this%domain%min = domain%min
-        this%domain%max = this%domain%min
+        this%domain%max = domain%max
         this%domain%delta = 0._DP
-    end subroutine Hard_Pair_Potential_set_domain
+    end subroutine Raw_Pair_Potential_set_domain
 
-    subroutine Hard_Pair_Potential_destroy(this)
-        class(Hard_Pair_Potential), intent(inout) :: this
+    subroutine Raw_Pair_Potential_destroy(this)
+        class(Raw_Pair_Potential), intent(inout) :: this
 
-    end subroutine Hard_Pair_Potential_destroy
+        this%expression => null()
+    end subroutine Raw_Pair_Potential_destroy
 
-    pure subroutine Hard_Pair_Potential_meet(this, overlap, energy, distance)
-        class(Hard_Pair_Potential), intent(in) :: this
+    pure subroutine Raw_Pair_Potential_meet(this, overlap, energy, distance)
+        class(Raw_Pair_Potential), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
         real(DP), intent(in) :: distance
@@ -200,9 +208,11 @@ contains
         energy = 0._DP
         if (distance < this%domain%min) then
             overlap = .true.
+        else if (distance < this%domain%max) then
+            energy = this%expression%get(distance)
         end if
-    end subroutine Hard_Pair_Potential_meet
+    end subroutine Raw_Pair_Potential_meet
 
-!end implementation Hard_Pair_Potential
+!end implementation Raw_Pair_Potential
 
 end module class_pair_potential

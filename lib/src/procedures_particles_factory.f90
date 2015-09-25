@@ -30,7 +30,8 @@ implicit none
 
 private
 public :: particles_factory_construct, particles_factory_destroy, particles_exist, &
-    particles_are_dipolar, particles_can_exchange, allocate_and_construct_inter_diameter
+    particles_are_dipolar, particles_can_exchange, allocate_and_construct_inter_diameter, &
+    allocate_and_set_diameter
 
 contains
 
