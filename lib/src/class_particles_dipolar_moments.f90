@@ -9,7 +9,7 @@ implicit none
 
 private
 
-    type, public :: Abstract_Particles_Dipolar_Moments
+    type, abstract, public :: Abstract_Particles_Dipolar_Moments
     private
         class(Abstract_Particles_Moment_Norm), pointer :: moment_norm
         class(Abstract_Particles_Orientations), pointer :: orientations
