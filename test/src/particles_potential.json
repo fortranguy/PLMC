@@ -1,17 +1,23 @@
 {
-    "Box": {
-        "name": "XYZ",
-        "size": [10.0, 10.0, 10.0]
-    },
-    "Particles": {
-        "number": 100,
-        "diameter": 1.0,
-        "minimum diameter factor": 0.8
-    },
-    "Potential": {
-        "name": "LJ",
-        "max distance": 2.5,
-        "delta distance": 1.0e-6,
-        "epsilon": 1.0
+    "Test Particles Potential": {
+        "Periodic Box": {
+            "periodicity": "XYZ",
+            "size": [12.0, 12.0, 12.0]
+        },
+        "Particles": {
+            "exist": true,
+            "number": 1000,
+            "diameter": 1.0,
+            "minimum diameter factor": 0.8,
+            "initial positions": "positions.in",
+            "Potential": {
+                "tabulated": true,
+                "name": "LJ",
+                "sigma": 1.0,
+                "epsilon": 1.0,
+                "max distance": 2.5,
+                "delta distance": 1.0e-6
+            }
+        }
     }
 }

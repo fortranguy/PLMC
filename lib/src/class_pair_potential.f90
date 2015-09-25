@@ -38,6 +38,8 @@ private
     end type Null_Pair_Potential
 
     type, extends(Abstract_Pair_Potential), public :: Raw_Pair_Potential
+    private
+        real(DP) :: energy_domain_max
     contains
         procedure :: construct => Raw_Pair_Potential_construct
         procedure, private :: set_domain => Raw_Pair_Potential_set_domain
@@ -176,6 +178,7 @@ contains
 
         this%expression => expression
         call this%set_domain(domain)
+        this%energy_domain_max = this%expression%get(this%domain%max)
     end subroutine Raw_Pair_Potential_construct
 
     subroutine Raw_Pair_Potential_set_domain(this, domain)
@@ -209,7 +212,7 @@ contains
         if (distance < this%domain%min) then
             overlap = .true.
         else if (distance < this%domain%max) then
-            energy = this%expression%get(distance)
+            energy = this%expression%get(distance) - this%energy_domain_max
         end if
     end subroutine Raw_Pair_Potential_meet
 

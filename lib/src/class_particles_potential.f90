@@ -24,7 +24,7 @@ private
         procedure :: visit => Abstract_Particles_Potential_visit
     end type Abstract_Particles_Potential
 
-    type, extends(Abstract_Particles_Positions), public :: Concrete_Particles_Potential
+    type, extends(Abstract_Particles_Potential), public :: Concrete_Particles_Potential
 
     end type Concrete_Particles_Potential
 

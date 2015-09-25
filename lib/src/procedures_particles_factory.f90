@@ -29,9 +29,11 @@ use types_particles, only: Particles_Wrapper
 implicit none
 
 private
-public :: particles_factory_construct, particles_factory_destroy, particles_exist, &
-    particles_are_dipolar, particles_can_exchange, allocate_and_construct_inter_diameter, &
-    allocate_and_set_diameter
+public :: particles_factory_construct, particles_factory_destroy, &
+    allocate_and_set_number, allocate_and_set_diameter, allocate_and_construct_inter_diameter, &
+    allocate_and_construct_positions, set_positions, &
+    particles_exist, particles_are_dipolar, particles_can_exchange
+
 
 interface particles_exist
     module procedure :: particles_exist_from_json
@@ -178,6 +180,17 @@ contains
         end if
         call particles_moment_norm%set(moment_norm)
     end subroutine allocate_and_set_moment_norm
+
+    subroutine allocate_and_construct_positions(particles_positions, periodic_box, &
+        particles_number, particles_diameter)
+        class(Abstract_Particles_Positions), allocatable, intent(out) :: particles_positions
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
+        class(Abstract_Particles_Number), intent(in) :: particles_number
+        class(Abstract_Particles_Diameter), intent(in) :: particles_diameter
+
+        call allocate_positions(particles_positions, particles_diameter)
+        call particles_positions%construct(periodic_box, particles_number)
+    end subroutine allocate_and_construct_positions
 
     subroutine allocate_positions(particles_positions, particles_diameter)
         class(Abstract_Particles_Positions), allocatable, intent(out) :: particles_positions
