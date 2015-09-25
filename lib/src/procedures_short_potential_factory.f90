@@ -7,7 +7,7 @@ use procedures_errors, only: error_exit
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_particles_diameter, only: Abstract_Particles_Diameter, &
     Null_Particles_Diameter
-use procedures_particles_factory, only: particles_exist
+use procedures_types_selectors, only: particles_exist
 use class_potential_expression, only: Abstract_Potential_Expression, &
     Null_Potential_Expression, Lennard_Jones_Expression
 use types_potential_domain, only: Concrete_Potential_Domain
@@ -20,12 +20,13 @@ use types_short_potential, only: Short_Potential_Wrapper
 implicit none
 
 private
-public :: allocate_and_set_expression, allocate_and_construct_pair, &
+public :: potential_factory_create, potential_factory_destroy, &
+    allocate_and_set_expression, allocate_and_construct_pair, &
     allocate_and_construct_particles_potential
 
 contains
 
-    subroutine potential_factory_construct(short_potential, input_data, prefix, periodic_box, &
+    subroutine potential_factory_create(short_potential, input_data, prefix, periodic_box, &
         particles_diameter)
         type(Short_Potential_Wrapper), intent(out) :: short_potential
         type(json_file), target, intent(inout) :: input_data
@@ -37,9 +38,9 @@ contains
             particles_diameter)
         call allocate_and_construct_pair(short_potential%pair, input_data, prefix, &
             particles_diameter, short_potential%expression)
-        call allocate_and_construct_particles_potential(short_potential%particles, &
-            periodic_box, particles_diameter)
-    end subroutine potential_factory_construct
+        call allocate_and_construct_particles_potential(short_potential%particles, periodic_box, &
+            particles_diameter)
+    end subroutine potential_factory_create
 
     subroutine allocate_and_set_expression(potential_expression, input_data, prefix, &
         particles_diameter)

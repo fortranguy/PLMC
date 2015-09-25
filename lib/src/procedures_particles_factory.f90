@@ -25,14 +25,15 @@ use class_particles_dipolar_moments, only: Abstract_Particles_Dipolar_Moments, &
 use class_particles_total_moment, only: Abstract_Particles_Total_Moment, &
     Concrete_Particles_Total_Moment, Null_Particles_Total_Moment
 use types_particles, only: Particles_Wrapper
-use procedures_types_selectors, only: particles_exist, particles_are_dipolar
+use procedures_types_selectors, only: particles_exist, particles_have_positions, &
+    particles_have_orientations, particles_are_dipolar
 
 implicit none
 
 private
 public :: particles_factory_create, particles_factory_destroy, &
-    allocate_and_set_number, allocate_and_set_diameter, create_inter_diameter, &
-    create_positions, set_positions
+    allocate_and_set_number, allocate_and_set_diameter, allocate_and_construct_inter_diameter, &
+    allocate_and_construct_positions, set_positions
 
 contains
 
@@ -45,14 +46,14 @@ contains
         call allocate_and_set_number(particles%number, input_data, prefix)
         call allocate_and_set_diameter(particles%diameter, particles%number, input_data, prefix)
         call allocate_and_set_moment_norm(particles%moment_norm, input_data, prefix)
-        call create_positions(particles%positions, periodic_box, particles%number)
-        call set_positions(particles%positions, input_data, prefix, particles%diameter)
-        call create_orientations(particles%orientations, input_data, prefix, &
+        call allocate_and_construct_positions(particles%positions, periodic_box, particles%number)
+        call set_positions(particles%positions, input_data, prefix)
+        call allocate_and_construct_orientations(particles%orientations, input_data, prefix, &
             particles%number)
-        call set_orientations(particles%orientations, input_data, prefix, particles%moment_norm)
-        call create_dipolar_moments(particles%dipolar_moments, particles%moment_norm, &
-            particles%orientations)
-        call create_total_moment(particles%total_moment, particles%dipolar_moments)
+        call set_orientations(particles%orientations, input_data, prefix)
+        call allocate_and_construct_dipolar_moments(particles%dipolar_moments, &
+            particles%moment_norm, particles%orientations)
+        call allocate_and_construct_total_moment(particles%total_moment, particles%dipolar_moments)
         call allocate_and_set_chemical_potential(particles%chemical_potential, input_data, prefix)
     end subroutine particles_factory_create
 
@@ -115,7 +116,7 @@ contains
         call particles_diameter%set(diameter, diameter_min_factor)
     end subroutine allocate_and_set_diameter
 
-    subroutine create_inter_diameter(inter_particles_diameter, &
+    subroutine allocate_and_construct_inter_diameter(inter_particles_diameter, &
         particles_diameter_1, particles_diameter_2, input_data, prefix)
         class(Abstract_Inter_Particles_Diameter), allocatable, intent(out) :: &
             inter_particles_diameter
@@ -137,7 +138,7 @@ contains
         end if
         call inter_particles_diameter%construct(particles_diameter_1, particles_diameter_2, &
             inter_diameter_offset)
-    end subroutine create_inter_diameter
+    end subroutine allocate_and_construct_inter_diameter
 
     subroutine allocate_and_set_moment_norm(particles_moment_norm, input_data, prefix)
         class(Abstract_Particles_Moment_Norm), allocatable, intent(out) :: particles_moment_norm
@@ -178,7 +179,7 @@ contains
         end if
     end function particles_are_dipolar_from_json
 
-    subroutine create_positions(particles_positions, periodic_box, particles_number)
+    subroutine allocate_and_construct_positions(particles_positions, periodic_box, particles_number)
         class(Abstract_Particles_Positions), allocatable, intent(out) :: particles_positions
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Particles_Number), intent(in) :: particles_number
@@ -189,9 +190,9 @@ contains
             allocate(Null_Particles_Positions :: particles_positions)
         end if
         call particles_positions%construct(periodic_box, particles_number)
-    end subroutine create_positions
+    end subroutine allocate_and_construct_positions
 
-    subroutine create_orientations(particles_orientations, input_data, prefix, &
+    subroutine allocate_and_construct_orientations(particles_orientations, input_data, prefix, &
         particles_number)
         class(Abstract_Particles_Orientations), allocatable, intent(out) :: particles_orientations
         type(json_file), intent(inout) :: input_data
@@ -204,20 +205,19 @@ contains
             allocate(Null_Particles_Orientations :: particles_orientations)
         end if
         call particles_orientations%construct(particles_number)
-    end subroutine create_orientations
+    end subroutine allocate_and_construct_orientations
 
-    subroutine set_positions(particles_positions, input_data, prefix, particles_diameter)
+    subroutine set_positions(particles_positions, input_data, prefix)
         class(Abstract_Particles_Positions), intent(inout) :: particles_positions
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
-        class(Abstract_Particles_Diameter), intent(in) :: particles_diameter
 
         character(len=:), allocatable :: data_field, filename
         logical :: data_found
         real(DP), allocatable :: file_positions(:, :)
         integer :: i_particle
 
-        if (.not. particles_exist(particles_diameter)) return
+        if (.not. particles_have_positions(particles_positions)) return
         data_field = prefix//".initial positions"
         call input_data%get(data_field, filename, data_found)
         call test_data_found(data_field, data_found)
@@ -233,18 +233,17 @@ contains
         deallocate(data_field)
     end subroutine set_positions
 
-    subroutine set_orientations(particles_orientations, input_data, prefix, particles_moment_norm)
+    subroutine set_orientations(particles_orientations, input_data, prefix)
         class(Abstract_Particles_Orientations), intent(inout) :: particles_orientations
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
-        class(Abstract_Particles_Moment_Norm), intent(in) :: particles_moment_norm
 
         character(len=:), allocatable :: data_field, filename
         logical :: data_found
         real(DP), allocatable :: file_orientations(:, :)
         integer :: i_particle
 
-        if (.not. particles_are_dipolar(particles_moment_norm, particles_orientations)) return
+        if (.not. particles_have_orientations(particles_orientations)) return
         data_field = prefix//".initial orientations"
         call input_data%get(data_field, filename, data_found)
         call test_data_found(data_field, data_found)
@@ -260,8 +259,8 @@ contains
         deallocate(data_field)
     end subroutine set_orientations
 
-    subroutine create_dipolar_moments(particles_dipolar_moments, particles_moment_norm, &
-        particles_orientations)
+    subroutine allocate_and_construct_dipolar_moments(particles_dipolar_moments, &
+        particles_moment_norm, particles_orientations)
         class(Abstract_Particles_Dipolar_Moments), allocatable, intent(out) :: &
             particles_dipolar_moments
         class(Abstract_Particles_Moment_Norm), intent(in) :: particles_moment_norm
@@ -273,9 +272,10 @@ contains
             allocate(Null_Particles_Dipolar_Moments :: particles_dipolar_moments)
         end if
         call particles_dipolar_moments%construct(particles_moment_norm, particles_orientations)
-    end subroutine allocate_dipolar_moments
+    end subroutine allocate_and_construct_dipolar_moments
 
-    subroutine create_total_moment(particles_total_moment, particles_dipolar_moments)
+    subroutine allocate_and_construct_total_moment(particles_total_moment, &
+        particles_dipolar_moments)
         class(Abstract_Particles_Total_Moment), allocatable, intent(out) :: particles_total_moment
         class(Abstract_Particles_Dipolar_Moments), intent(in) :: particles_dipolar_moments
 
@@ -285,7 +285,7 @@ contains
             allocate(Null_Particles_Total_Moment :: particles_total_moment)
         end if
         call particles_total_moment%construct(particles_dipolar_moments)
-    end subroutine create_total_moment
+    end subroutine allocate_and_construct_total_moment
 
     subroutine allocate_and_set_chemical_potential(particles_chemical_potential, input_data, prefix)
         class(Abstract_Particles_Chemical_Potential), allocatable, intent(out) :: &
@@ -297,7 +297,7 @@ contains
         logical :: data_found
         real(DP) :: density, excess
 
-        if (particles_exchange_with_reservoir_from_json(input_data, prefix)) then
+        if (particles_can_exchange_from_json(input_data, prefix)) then
             data_field = prefix//".Chemical Potential.density"
             call input_data%get(data_field, density, data_found)
             call test_data_found(data_field, data_found)
@@ -312,7 +312,7 @@ contains
         call particles_chemical_potential%set(density, excess)
     end subroutine allocate_and_set_chemical_potential
 
-    logical function particles_exchange_with_reservoir_from_json(input_data, prefix) &
+    logical function particles_can_exchange_from_json(input_data, prefix) &
         result(particles_exchange_with_reservoir)
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
@@ -320,7 +320,7 @@ contains
         character(len=:), allocatable :: data_field
         logical :: data_found
 
-        if (particles_exist(input_data, prefix)) then
+        if (particles_exist_from_json(input_data, prefix)) then
             data_field = prefix//".exchange with reservoir"
             call input_data%get(data_field, particles_exchange_with_reservoir, data_found)
             call test_data_found(data_field, data_found)
@@ -328,7 +328,7 @@ contains
         else
             particles_exchange_with_reservoir = .false.
         end if
-    end function particles_exchange_with_reservoir_from_json
+    end function particles_can_exchange_from_json
 
     subroutine particles_factory_destroy(particles)
         type(Particles_Wrapper), intent(inout) :: particles

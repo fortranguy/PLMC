@@ -16,72 +16,58 @@ use class_particles_exchange, only: Abstract_Particles_Exchange, &
     Concrete_Particles_Exchange, Null_Particles_Exchange
 use module_adaptation, only: Concrete_Adaptation_Parameters
 use types_particles, only: Particles_Wrapper
-use procedures_particles_factory, only: particles_exist, particles_are_dipolar, &
-    particles_can_exchange
+use procedures_types_selectors, only: particles_have_positions, particles_have_orientations, &
+    particles_have_chemical_potential
 use types_changes, only: Changes_Wrapper
 
 implicit none
 
 private
-public :: changes_factory_construct, changes_factory_destroy
+public :: changes_factory_create, changes_factory_destroy
 
 contains
 
-    subroutine changes_factory_construct(changes, input_data, prefix, particles)
+    subroutine changes_factory_create(changes, input_data, prefix, particles)
         type(Changes_Wrapper), intent(out) :: changes
         type(json_file), target, intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
         type(Particles_Wrapper), intent(in) :: particles
 
-        call allocate_moved_positions(changes%moved_positions, particles%diameter)
-        call allocate_rotated_orientations(changes%rotated_orientations, particles%moment_norm)
-        call allocate_particles_exchange(changes%particles_exchange, particles%chemical_potential)
+        call allocate_and_construct_moved_positions(changes%moved_positions, particles%positions, &
+            input_data, prefix)
+        call allocate_and_construct_rotated_orientations(changes%rotated_orientations, &
+            particles%orientations, input_data, prefix)
+        call allocate_and_construct_particles_exchange(changes%particles_exchange, &
+            particles%chemical_potential, particles)
+    end subroutine changes_factory_create
 
-        call construct_moved_positions(changes%moved_positions, input_data, prefix, &
-            particles%positions)
-        call construct_rotated_orientations(changes%rotated_orientations, input_data, prefix, &
-            particles%orientations)
-        call changes%particles_exchange%construct(particles)
-    end subroutine changes_factory_construct
-
-    subroutine allocate_moved_positions(moved_positions, particles_diameter)
+    subroutine allocate_and_construct_moved_positions(moved_positions, particles_positions, &
+        input_data, prefix)
         class(Abstract_Moved_Positions), allocatable, intent(out) :: moved_positions
-        class(Abstract_Particles_Diameter), intent(in) :: particles_diameter
+        class(Abstract_Particles_Positions), intent(in) :: particles_positions
+        type(json_file), target, intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
 
-        if (particles_exist(particles_diameter)) then
+        call allocate_moved_positions(moved_positions, particles_positions)
+        call construct_moved_positions(moved_positions, input_data, prefix, particles_positions)
+    end subroutine allocate_and_construct_moved_positions
+
+    subroutine allocate_moved_positions(moved_positions, particles_positions)
+        class(Abstract_Moved_Positions), allocatable, intent(out) :: moved_positions
+        class(Abstract_Particles_Positions), intent(in) :: particles_positions
+
+        if (particles_have_positions(particles_positions)) then
             allocate(Concrete_Moved_Positions :: moved_positions)
         else
             allocate(Null_Moved_Positions :: moved_positions)
         end if
     end subroutine allocate_moved_positions
 
-    subroutine allocate_rotated_orientations(rotated_orientations, particles_moment_norm)
-        class(Abstract_Rotated_Orientations), allocatable, intent(out) :: rotated_orientations
-        class(Abstract_Particles_Moment_Norm), intent(in) :: particles_moment_norm
-
-        if (particles_are_dipolar(particles_moment_norm)) then
-            allocate(Concrete_Rotated_Orientations :: rotated_orientations)
-        else
-            allocate(Null_Rotated_Orientations :: rotated_orientations)
-        end if
-    end subroutine allocate_rotated_orientations
-
-    subroutine allocate_particles_exchange(particles_exchange, particles_chemical_potential)
-        class(Abstract_Particles_Exchange), allocatable, intent(out) :: particles_exchange
-        class(Abstract_Particles_Chemical_Potential), intent(in) :: particles_chemical_potential
-
-        if (particles_can_exchange(particles_chemical_potential)) then
-            allocate(Concrete_Particles_Exchange :: particles_exchange)
-        else
-            allocate(Null_Particles_Exchange :: particles_exchange)
-        end if
-    end subroutine allocate_particles_exchange
-
-    subroutine construct_moved_positions(moved_positions, input_data, prefix, positions)
+    subroutine construct_moved_positions(moved_positions, input_data, prefix, particles_positions)
         class(Abstract_Moved_Positions), intent(inout) :: moved_positions
         type(json_file), target, intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
-        class(Abstract_Particles_Positions), intent(in) :: positions
+        class(Abstract_Particles_Positions), intent(in) :: particles_positions
 
         character(len=:), allocatable :: data_field
         logical :: data_found
@@ -97,20 +83,44 @@ contains
                 call input_data%get(data_field, adaptation_parameters%increase_factor, data_found)
                 call test_data_found(data_field, data_found)
                 data_field = prefix//".Small Move.maximum increase factor"
-                call input_data%get(data_field, adaptation_parameters%increase_factor_max, data_found)
+                call input_data%get(data_field, adaptation_parameters%increase_factor_max, &
+                    data_found)
                 call test_data_found(data_field, data_found)
                 deallocate(data_field)
         end select
-        call moved_positions%construct(positions, moved_delta, adaptation_parameters)
+        call moved_positions%construct(particles_positions, moved_delta, adaptation_parameters)
         if (allocated(moved_delta)) deallocate(moved_delta)
     end subroutine construct_moved_positions
 
+    subroutine allocate_and_construct_rotated_orientations(rotated_orientations, &
+        particles_orientations, input_data, prefix)
+        class(Abstract_Rotated_Orientations), allocatable, intent(out) :: rotated_orientations
+        class(Abstract_Particles_Orientations), intent(in) :: particles_orientations
+        type(json_file), target, intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
+
+        call allocate_rotated_orientations(rotated_orientations, particles_orientations)
+        call construct_rotated_orientations(rotated_orientations, input_data, prefix, &
+            particles_orientations)
+    end subroutine allocate_and_construct_rotated_orientations
+
+    subroutine allocate_rotated_orientations(rotated_orientations, particles_orientations)
+        class(Abstract_Rotated_Orientations), allocatable, intent(out) :: rotated_orientations
+        class(Abstract_Particles_Orientations), intent(in) :: particles_orientations
+
+        if (particles_have_orientations(particles_orientations)) then
+            allocate(Concrete_Rotated_Orientations :: rotated_orientations)
+        else
+            allocate(Null_Rotated_Orientations :: rotated_orientations)
+        end if
+    end subroutine allocate_rotated_orientations
+
     subroutine construct_rotated_orientations(rotated_orientations, input_data, prefix, &
-        orientations)
+        particles_orientations)
         class(Abstract_Rotated_Orientations), intent(inout) :: rotated_orientations
         type(json_file), target, intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
-        class(Abstract_Particles_Orientations), intent(in) :: orientations
+        class(Abstract_Particles_Orientations), intent(in) :: particles_orientations
 
         character(len=:), allocatable :: data_field
         logical :: data_found
@@ -126,12 +136,28 @@ contains
                 call input_data%get(data_field, adaptation_parameters%increase_factor, data_found)
                 call test_data_found(data_field, data_found)
                 data_field = prefix//".Small Rotation.maximum increase factor"
-                call input_data%get(data_field, adaptation_parameters%increase_factor_max, data_found)
+                call input_data%get(data_field, adaptation_parameters%increase_factor_max, &
+                    data_found)
                 call test_data_found(data_field, data_found)
                 deallocate(data_field)
         end select
-        call rotated_orientations%construct(orientations, moved_delta, adaptation_parameters)
+        call rotated_orientations%construct(particles_orientations, moved_delta, &
+            adaptation_parameters)
     end subroutine construct_rotated_orientations
+
+    subroutine allocate_and_construct_particles_exchange(particles_exchange, &
+        particles_chemical_potential, particles)
+        class(Abstract_Particles_Exchange), allocatable, intent(out) :: particles_exchange
+        class(Abstract_Particles_Chemical_Potential), intent(in) :: particles_chemical_potential
+        type(Particles_Wrapper), intent(in) :: particles
+
+        if (particles_have_chemical_potential(particles_chemical_potential)) then
+            allocate(Concrete_Particles_Exchange :: particles_exchange)
+        else
+            allocate(Null_Particles_Exchange :: particles_exchange)
+        end if
+        call particles_exchange%construct(particles)
+    end subroutine allocate_and_construct_particles_exchange
 
     subroutine changes_factory_destroy(changes)
         type(Changes_Wrapper), intent(inout) :: changes
