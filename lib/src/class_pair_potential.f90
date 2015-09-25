@@ -15,19 +15,47 @@ private
     private
         type(Concrete_Potential_Domain) :: domain
         class(Abstract_Potential_Expression), pointer :: expression
-        real(DP), allocatable :: tabulation(:)
     contains
-        procedure :: construct => Abstract_Pair_Potential_construct
-        procedure, private :: set_domain => Abstract_Pair_Potential_set_domain
-        procedure, private :: set_tabulation => Abstract_Pair_Potential_set_tabulation
-        procedure :: destroy => Abstract_Pair_Potential_destroy
+        procedure(Abstract_Pair_Potential_construct), deferred :: construct
+        procedure(Abstract_Pair_Potential_destroy), deferred :: destroy
         procedure :: get_max_distance => Abstract_Pair_Potential_get_max_distance
-        procedure :: meet => Abstract_Pair_Potential_meet
+        procedure(Abstract_Pair_Potential_meet), deferred :: meet
     end type Abstract_Pair_Potential
 
-    type, extends(Abstract_Pair_Potential), public :: Concrete_Pair_Potential
+    abstract interface
 
-    end type Concrete_Pair_Potential
+        subroutine Abstract_Pair_Potential_construct(this, domain, expression)
+        import :: Concrete_Potential_Domain, Abstract_Potential_Expression, Abstract_Pair_Potential
+            class(Abstract_Pair_Potential), intent(out) :: this
+            type(Concrete_Potential_Domain), intent(in) :: domain
+            class(Abstract_Potential_Expression), target, intent(in) :: expression
+        end subroutine Abstract_Pair_Potential_construct
+
+        subroutine Abstract_Pair_Potential_destroy(this)
+        import :: Abstract_Pair_Potential
+            class(Abstract_Pair_Potential), intent(inout) :: this
+        end subroutine Abstract_Pair_Potential_destroy
+
+        pure subroutine Abstract_Pair_Potential_meet(this, overlap, energy, distance)
+        import :: DP, Abstract_Pair_Potential
+            class(Abstract_Pair_Potential), intent(in) :: this
+            logical, intent(out) :: overlap
+            real(DP), intent(out) :: energy
+            real(DP), intent(in) :: distance
+        end subroutine Abstract_Pair_Potential_meet
+
+    end interface
+
+    type, extends(Abstract_Pair_Potential), public :: Tabulated_Pair_Potential
+    private
+        real(DP), allocatable :: tabulation(:)
+    contains
+        procedure :: construct => Tabulated_Pair_Potential_construct
+        procedure, private :: set_domain => Tabulated_Pair_Potential_set_domain
+        procedure, private :: set_tabulation => Tabulated_Pair_Potential_set_tabulation
+        procedure :: destroy => Tabulated_Pair_Potential_destroy
+        procedure :: meet => Tabulated_Pair_Potential_meet
+    end type Tabulated_Pair_Potential
 
     type, extends(Abstract_Pair_Potential), public :: Null_Pair_Potential
     contains
@@ -51,42 +79,53 @@ contains
 
 !implementation Abstract_Pair_Potential
 
-    subroutine Abstract_Pair_Potential_construct(this, domain, expression)
-        class(Abstract_Pair_Potential), intent(out) :: this
+    pure function Abstract_Pair_Potential_get_max_distance(this) result(max_distance)
+        class(Abstract_Pair_Potential), intent(in) :: this
+        real(DP) :: max_distance
+
+        max_distance = this%domain%max
+    end function Abstract_Pair_Potential_get_max_distance
+
+!end implementation Abstract_Pair_Potential
+
+!implementation Tabulated_Pair_Potential
+
+    subroutine Tabulated_Pair_Potential_construct(this, domain, expression)
+        class(Tabulated_Pair_Potential), intent(out) :: this
         type(Concrete_Potential_Domain), intent(in) :: domain
         class(Abstract_Potential_Expression), target, intent(in) :: expression
 
         this%expression => expression
         call this%set_domain(domain)
         call this%set_tabulation()
-    end subroutine Abstract_Pair_Potential_construct
+    end subroutine Tabulated_Pair_Potential_construct
 
-    subroutine Abstract_Pair_Potential_set_domain(this, domain)
-        class(Abstract_Pair_Potential), intent(inout) :: this
+    subroutine Tabulated_Pair_Potential_set_domain(this, domain)
+        class(Tabulated_Pair_Potential), intent(inout) :: this
         type(Concrete_Potential_Domain), intent(in) :: domain
 
         real(DP) :: distance_range
 
-        call check_positive("Abstract_Pair_Potential", "domain%min", domain%min)
-        call check_positive("Abstract_Pair_Potential", "domain%max", domain%max)
+        call check_positive("Tabulated_Pair_Potential", "domain%min", domain%min)
+        call check_positive("Tabulated_Pair_Potential", "domain%max", domain%max)
         if (domain%min > domain%max) then
-            call error_exit("Abstract_Pair_Potential: domain%min > domain%max.")
+            call error_exit("Tabulated_Pair_Potential: domain%min > domain%max.")
         end if
         this%domain%min = domain%min
         this%domain%max = domain%max
-        call check_positive("Abstract_Pair_Potential", "domain%delta", domain%delta)
+        call check_positive("Tabulated_Pair_Potential", "domain%delta", domain%delta)
         distance_range = domain%max - domain%min
         if (distance_range < real_zero) then
-            call warning_continue("Abstract_Pair_Potential: "//"distance_range may be too small.")
+            call warning_continue("Tabulated_Pair_Potential: "//"distance_range may be too small.")
         end if
         if (distance_range / domain%delta < 1._DP) then
-            call warning_continue("Abstract_Pair_Potential: "//"domain%delta may be too big.")
+            call warning_continue("Tabulated_Pair_Potential: "//"domain%delta may be too big.")
         end if
         this%domain%delta = domain%delta
-    end subroutine Abstract_Pair_Potential_set_domain
+    end subroutine Tabulated_Pair_Potential_set_domain
 
-    subroutine Abstract_Pair_Potential_set_tabulation(this)
-        class(Abstract_Pair_Potential), intent(inout) :: this
+    subroutine Tabulated_Pair_Potential_set_tabulation(this)
+        class(Tabulated_Pair_Potential), intent(inout) :: this
 
         real(DP) :: distance_i
         integer :: i_min, i_max, i_distance
@@ -99,24 +138,17 @@ contains
             this%tabulation(i_distance) = this%expression%get(distance_i)
         end do
         this%tabulation = this%tabulation - this%tabulation(i_max)
-    end subroutine Abstract_Pair_Potential_set_tabulation
+    end subroutine Tabulated_Pair_Potential_set_tabulation
 
-    subroutine Abstract_Pair_Potential_destroy(this)
-        class(Abstract_Pair_Potential), intent(inout) :: this
+    subroutine Tabulated_Pair_Potential_destroy(this)
+        class(Tabulated_Pair_Potential), intent(inout) :: this
 
         if (allocated(this%tabulation)) deallocate(this%tabulation)
         this%expression => null()
-    end subroutine Abstract_Pair_Potential_destroy
+    end subroutine Tabulated_Pair_Potential_destroy
 
-    pure function Abstract_Pair_Potential_get_max_distance(this) result(max)
-        class(Abstract_Pair_Potential), intent(in) :: this
-        real(DP) :: max
-
-        max = this%domain%max
-    end function Abstract_Pair_Potential_get_max_distance
-
-    pure subroutine Abstract_Pair_Potential_meet(this, overlap, energy, distance)
-        class(Abstract_Pair_Potential), intent(in) :: this
+    pure subroutine Tabulated_Pair_Potential_meet(this, overlap, energy, distance)
+        class(Tabulated_Pair_Potential), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
         real(DP), intent(in) :: distance
@@ -136,9 +168,9 @@ contains
                 (this%tabulation(i_distance + 1) - this%tabulation(i_distance)) / &
                 this%domain%delta
         end if
-    end subroutine Abstract_Pair_Potential_meet
+    end subroutine Tabulated_Pair_Potential_meet
 
-!end implementation Abstract_Pair_Potential
+!end implementation Tabulated_Pair_Potential
 
 !implementation Null_Pair_Potential
 
@@ -152,10 +184,10 @@ contains
         class(Null_Pair_Potential), intent(inout) :: this
     end subroutine Null_Pair_Potential_destroy
 
-    pure function Null_Pair_Potential_get_max_distance(this) result(max)
+    pure function Null_Pair_Potential_get_max_distance(this) result(max_distance)
         class(Null_Pair_Potential), intent(in) :: this
-        real(DP) :: max
-        max = 0._DP
+        real(DP) :: max_distance
+        max_distance = 0._DP
     end function Null_Pair_Potential_get_max_distance
 
     pure subroutine Null_Pair_Potential_meet(this, overlap, energy, distance)

@@ -12,7 +12,7 @@ use class_potential_expression, only: Abstract_Potential_Expression, &
     Null_Potential_Expression, Lennard_Jones_Expression
 use types_potential_domain, only: Concrete_Potential_Domain
 use class_pair_potential, only: Abstract_Pair_Potential, &
-    Concrete_Pair_Potential, Null_Pair_Potential, Raw_Pair_Potential
+    Null_Pair_Potential, Tabulated_Pair_Potential, Raw_Pair_Potential
 use class_particles_potential, only: Abstract_Particles_Potential, &
     Concrete_Particles_Potential, Null_Particles_Potential
 use types_short_potential, only: Short_Potential_Wrapper
@@ -132,7 +132,7 @@ contains
             call input_data%get(data_field, tabulated_potential, data_found)
             call test_data_found(data_field, data_found)
             if(tabulated_potential) then
-                allocate(Concrete_Pair_Potential :: pair_potential)
+                allocate(Tabulated_Pair_Potential :: pair_potential)
             else
                 allocate(Raw_Pair_Potential :: pair_potential)
             end if
@@ -160,7 +160,7 @@ contains
             call input_data%get(data_field, domain%max, data_found)
             call test_data_found(data_field, data_found)
             select type (pair_potential)
-                type is (Concrete_Pair_Potential)
+                type is (Tabulated_Pair_Potential)
                     data_field = prefix//".Potential.delta distance"
                     call input_data%get(data_field, domain%delta, data_found)
                     call test_data_found(data_field, data_found)
