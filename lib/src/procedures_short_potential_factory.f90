@@ -6,6 +6,7 @@ use module_data, only: test_data_found
 use procedures_errors, only: error_exit
 use class_particles_diameter, only: Abstract_Particles_Diameter, &
     Null_Particles_Diameter
+use procedures_particles_factory, only: particles_exist
 use class_potential_expression, only: Abstract_Potential_Expression, &
     Null_Potential_Expression, Lennard_Jones_Expression
 use types_potential_domain, only: Concrete_Potential_Domain
@@ -69,17 +70,6 @@ contains
             allocate(Null_Potential_Expression :: potential_expression)
         end if
     end subroutine allocate_expression
-
-    pure logical function particles_exist(diameter)
-        class(Abstract_Particles_Diameter), intent(in) :: diameter
-
-        select type (diameter)
-            type is (Null_Particles_Diameter)
-                particles_exist = .false.
-            class default
-                particles_exist = .true.
-        end select
-    end function particles_exist
 
     subroutine set_expression(potential_expression, input_data, prefix)
         class(Abstract_Potential_Expression), intent(inout) :: potential_expression

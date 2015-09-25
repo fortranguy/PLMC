@@ -11,15 +11,15 @@ private
 public :: check_in_range, check_3d_array, check_positive, check_norm, check_increase_factor
 
 interface check_3d_array
-    module procedure check_integer_3d_array
-    module procedure check_real_3d_array
+    module procedure :: check_integer_3d_array
+    module procedure :: check_real_3d_array
 end interface check_3d_array
 
 interface check_positive
-    module procedure check_positive_integer_scalar
-    module procedure check_positive_integer_array
-    module procedure check_positive_real_scalar
-    module procedure check_positive_real_array
+    module procedure :: check_positive_integer_scalar
+    module procedure :: check_positive_integer_array
+    module procedure :: check_positive_real_scalar
+    module procedure :: check_positive_real_array
 end interface check_positive
 
 contains
