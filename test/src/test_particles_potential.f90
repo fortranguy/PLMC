@@ -48,10 +48,8 @@ implicit none
         "Test Particles Potential.Particles")
     call allocate_and_set_diameter(particles_diameter, input_data, &
         "Test Particles Potential.Particles")
-    call allocate_and_construct_positions(particles_positions, periodic_box, particles_number, &
-        particles_diameter)
-    call set_positions(particles_positions, input_data, &
-        "Test Particles Potential.Particles", particles_diameter)
+    call allocate_and_construct_positions(particles_positions, periodic_box, particles_number)
+    call set_positions(particles_positions, input_data, "Test Particles Potential.Particles")
     call allocate_and_set_expression(potential_expression, input_data, &
         "Test Particles Potential.Particles", particles_diameter)
     call allocate_and_construct_pair(pair_potential, input_data, &

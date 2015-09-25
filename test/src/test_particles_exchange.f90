@@ -72,7 +72,7 @@ use procedures_random, only: random_integer, random_orientation
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box
 use types_particle, only: Concrete_Particle
 use types_particles, only: Particles_Wrapper
-use procedures_particles_factory, only: particles_factory_construct, particles_factory_destroy
+use procedures_particles_factory, only: particles_factory_create, particles_factory_destroy
 use class_particles_exchange, only: Abstract_Particles_Exchange, Concrete_Particles_Exchange
 use procedures_particles_exchange_write, only: json_write_particles
 
@@ -102,7 +102,7 @@ implicit none
     allocate(XYZ_Periodic_Box :: periodic_box)
     call periodic_box%set(box_size)
 
-    call particles_factory_construct(particles, input_data, "Particles", periodic_box)
+    call particles_factory_create(particles, input_data, "Particles", periodic_box)
     allocate(Concrete_Particles_Exchange :: particles_exchange)
     call particles_exchange%construct(particles)
     call json_write_particles(particles, "initial.json")

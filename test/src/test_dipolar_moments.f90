@@ -46,7 +46,7 @@ contains
     end subroutine set_objects
 
     subroutine print_dipolar_moments(dipolar_moments)
-        type(Abstract_Particles_Dipolar_Moments), intent(in) :: dipolar_moments
+        class(Abstract_Particles_Dipolar_Moments), intent(in) :: dipolar_moments
 
         integer :: i_particle
 

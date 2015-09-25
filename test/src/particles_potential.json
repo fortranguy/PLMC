@@ -18,6 +18,9 @@
                 "max distance": 2.5,
                 "delta distance": 1.0e-6
             }
+        },
+        "Memory": {
+            "data structure": "list"
         }
     }
 }

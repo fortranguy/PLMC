@@ -198,6 +198,10 @@
 			<Option link="0" />
 			<Option weight="10" />
 		</Unit>
+		<Unit filename="test/src/test_changes_factory.f90">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
 		<Unit filename="test/src/test_chemical_potential.f90">
 			<Option compile="0" />
 			<Option link="0" />

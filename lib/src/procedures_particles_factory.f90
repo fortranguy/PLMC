@@ -44,7 +44,7 @@ contains
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
 
         call allocate_and_set_number(particles%number, input_data, prefix)
-        call allocate_and_set_diameter(particles%diameter, particles%number, input_data, prefix)
+        call allocate_and_set_diameter(particles%diameter, input_data, prefix)
         call allocate_and_set_moment_norm(particles%moment_norm, input_data, prefix)
         call allocate_and_construct_positions(particles%positions, periodic_box, particles%number)
         call set_positions(particles%positions, input_data, prefix)
@@ -91,9 +91,8 @@ contains
         deallocate(data_field)
     end function particles_exist_from_json
 
-    subroutine allocate_and_set_diameter(particles_diameter, particles_number, input_data, prefix)
+    subroutine allocate_and_set_diameter(particles_diameter, input_data, prefix)
         class(Abstract_Particles_Diameter), allocatable, intent(out) :: particles_diameter
-        class(Abstract_Particles_Number), intent(in) :: particles_number
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -101,7 +100,7 @@ contains
         logical :: data_found
         real(DP) :: diameter, diameter_min_factor
 
-        if (particles_exist(particles_number)) then
+        if (particles_exist_from_json(input_data, prefix)) then
             data_field = prefix//".diameter"
             call input_data%get(data_field, diameter, data_found)
             call test_data_found(data_field, data_found)

@@ -6,9 +6,9 @@ use module_data, only: test_file_exists, test_data_found
 use procedures_errors, only: error_exit
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box, XY_Periodic_Box
 use types_particles, only: Particles_Wrapper
-use procedures_particles_factory, only: particles_factory_construct, particles_factory_destroy
+use procedures_particles_factory, only: particles_factory_create, particles_factory_destroy
 use types_changes, only: Changes_Wrapper
-use procedures_changes_factory, only: changes_factory_construct, changes_factory_destroy
+use procedures_changes_factory, only: changes_factory_create, changes_factory_destroy
 
 implicit none
 
@@ -44,8 +44,8 @@ implicit none
     call test_data_found(data_field, data_found)
     call periodic_box%set(box_size)
 
-    call particles_factory_construct(particles, input_data, "Particles", periodic_box)
-    call changes_factory_construct(changes, input_data, "Particles", particles)
+    call particles_factory_create(particles, input_data, "Particles", periodic_box)
+    call changes_factory_create(changes, input_data, "Particles", particles)
     write(output_unit, *) "moved_positions(1)", changes%moved_positions%get(1)
     write(output_unit, *) "rotated_orientations(1)", changes%rotated_orientations%get(1)
     call changes%particles_exchange%remove(particles%number%get())

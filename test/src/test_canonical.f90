@@ -5,7 +5,7 @@ use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box
 use types_particles, only: Particles_Wrapper
-use procedures_particles_factory, only: particles_factory_construct, particles_factory_destroy
+use procedures_particles_factory, only: particles_factory_create, particles_factory_destroy
 use class_one_particle_move, only: Metropolis_One_Particle_Move
 
 implicit none
