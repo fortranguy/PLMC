@@ -1,0 +1,27 @@
+{
+    "Test Parallelepiped Domains": {
+        "Periodic Box": {
+            "periodicity": "XYZ",
+            "size": [20.0, 20.0, 10.0]
+        },
+        "Domain 0": {
+            "Parallelepiped Domain": {
+                "name": "box"
+            }
+        },
+        "Domain 1": {
+            "Parallelepiped Domain": {
+                "name": "domain",
+                "origin": [7.5, 0.0, 0.0],
+                "size": [5.0, 10.0, 5.0]
+            }
+        },
+        "Domain 2": {
+            "Parallelepiped Domain": {
+                "name": "domain",
+                "origin": [-7.5, 0.0, 0.0],
+                "size": [5.0, 10.0, 5.0]
+            }
+        }
+    }
+}

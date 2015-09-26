@@ -20,6 +20,7 @@ private
         procedure, private :: is_boxed => Abstract_Parallelepiped_Domain_is_boxed
         procedure :: destroy => Abstract_Parallelepiped_Domain_destroy
         procedure :: get_volume => Abstract_Parallelepiped_Domain_get_volume
+        procedure :: get_vertices => Abstract_Parallelepiped_Domain_get_vertices
         procedure :: is_inside => Abstract_Parallelepiped_Domain_is_inside
         procedure :: random_position => Abstract_Parallelepiped_Domain_random_position
     end type Abstract_Parallelepiped_Domain
@@ -33,6 +34,7 @@ private
         procedure :: construct => Null_Parallelepiped_Domain_construct
         procedure :: destroy => Null_Parallelepiped_Domain_destroy
         procedure :: get_volume => Null_Parallelepiped_Domain_get_volume
+        procedure :: get_vertices => Null_Parallelepiped_Domain_get_vertices
         procedure :: is_inside => Null_Parallelepiped_Domain_is_inside
         procedure :: random_position => Null_Parallelepiped_Domain_random_position
     end type Null_Parallelepiped_Domain
@@ -90,6 +92,15 @@ contains
         volume = product(this%size)
     end function Abstract_Parallelepiped_Domain_get_volume
 
+    pure function Abstract_Parallelepiped_Domain_get_vertices(this, i_vertex, j_vertex, k_vertex) &
+        result(vertices)
+        real(DP) :: vertices(num_dimensions)
+        class(Abstract_Parallelepiped_Domain), intent(in) :: this
+        integer, intent(in) :: i_vertex, j_vertex, k_vertex
+
+        vertices = this%origin + this%size * (real([i_vertex, j_vertex, k_vertex], DP) - 1.5_DP)
+    end function Abstract_Parallelepiped_Domain_get_vertices
+
     pure function Abstract_Parallelepiped_Domain_is_inside(this, position) result(is_inside)
         class(Abstract_Parallelepiped_Domain), intent(in) :: this
         real(DP), intent(in) :: position(:)
@@ -128,6 +139,14 @@ contains
         real(DP) :: volume
         volume = 0._DP
     end function Null_Parallelepiped_Domain_get_volume
+
+    pure function Null_Parallelepiped_Domain_get_vertices(this, i_vertex, j_vertex, k_vertex) &
+        result(vertices)
+        real(DP) :: vertices(num_dimensions)
+        class(Null_Parallelepiped_Domain), intent(in) :: this
+        integer, intent(in) :: i_vertex, j_vertex, k_vertex
+        vertices = 0._DP
+    end function Null_Parallelepiped_Domain_get_vertices
 
     pure function Null_Parallelepiped_Domain_is_inside(this, position) result(is_inside)
         class(Null_Parallelepiped_Domain), intent(in) :: this
