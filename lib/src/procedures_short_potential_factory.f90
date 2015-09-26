@@ -27,13 +27,13 @@ use types_short_potential, only: Short_Potential_Wrapper
 implicit none
 
 private
-public :: potential_factory_create, potential_factory_destroy, &
+public :: short_potential_factory_create, short_potential_factory_destroy, &
     allocate_and_set_expression, allocate_and_construct_pair, &
     allocate_and_construct_particles, allocate_list, allocate_and_construct_cells
 
 contains
 
-    subroutine potential_factory_create(short_potential, input_data, prefix, periodic_box, &
+    subroutine short_potential_factory_create(short_potential, input_data, prefix, periodic_box, &
         particles)
         type(Short_Potential_Wrapper), intent(out) :: short_potential
         type(json_file), target, intent(inout) :: input_data
@@ -50,7 +50,7 @@ contains
         call allocate_list(short_potential%list, input_data, prefix, particles%positions)
         call allocate_and_construct_cells(short_potential%cells, short_potential%list, &
             periodic_box, particles%positions, short_potential%pair)
-    end subroutine potential_factory_create
+    end subroutine short_potential_factory_create
 
     subroutine allocate_and_set_expression(potential_expression, input_data, prefix, &
         particles_diameter)
@@ -249,7 +249,7 @@ contains
             pair_potential)
     end subroutine allocate_and_construct_cells
 
-    subroutine potential_factory_destroy(short_potential)
+    subroutine short_potential_factory_destroy(short_potential)
         type(Short_Potential_Wrapper), intent(inout) :: short_potential
 
         call short_potential%cells%destroy()
@@ -260,6 +260,6 @@ contains
         call short_potential%pair%destroy()
         if (allocated(short_potential%pair)) deallocate(short_potential%pair)
         if (allocated(short_potential%expression)) deallocate(short_potential%expression)
-    end subroutine potential_factory_destroy
+    end subroutine short_potential_factory_destroy
 
 end module procedures_short_potential_factory

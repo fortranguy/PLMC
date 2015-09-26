@@ -22,18 +22,34 @@ use class_particles_dipolar_moments, only: Abstract_Particles_Dipolar_Moments, &
     Concrete_Particles_Dipolar_Moments, Null_Particles_Dipolar_Moments
 use class_particles_total_moment, only: Abstract_Particles_Total_Moment, &
     Concrete_Particles_Total_Moment, Null_Particles_Total_Moment
-use types_particles, only: Particles_Wrapper
+use types_particles, only: Particles_Wrapper, Mixture_Wrapper
 use procedures_types_selectors, only: particles_exist, particles_have_positions, &
     particles_have_orientations, particles_are_dipolar
 
 implicit none
 
 private
-public :: particles_factory_create, particles_factory_destroy, &
+public :: mixture_factory_create, mixture_factory_destroy, &
+    particles_factory_create, particles_factory_destroy, &
     allocate_and_set_number, allocate_and_set_diameter, allocate_and_set_inter_diameter, &
     allocate_and_construct_positions, set_positions
 
 contains
+
+    subroutine mixture_factory_create(mixture, input_data, prefix, periodic_box)
+        type(Mixture_Wrapper), intent(out) :: mixture
+        type(json_file), target, intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
+
+        call particles_factory_create(mixture%components(1), input_data, prefix//".Component 1", &
+            periodic_box)
+        call particles_factory_create(mixture%components(2), input_data, prefix//".Component 2", &
+            periodic_box)
+        call allocate_and_set_inter_diameter(mixture%inter_diameters, &
+            mixture%components(1)%diameter, mixture%components(2)%diameter, input_data, &
+            prefix//".Inter 12")
+    end subroutine mixture_factory_create
 
     subroutine particles_factory_create(particles, input_data, prefix, periodic_box)
         type(Particles_Wrapper), intent(out) :: particles
@@ -331,6 +347,14 @@ contains
             particles_exchange_with_reservoir = .false.
         end if
     end function particles_can_exchange_from_json
+
+    subroutine mixture_factory_destroy(mixture)
+        type(Mixture_Wrapper), intent(inout) :: mixture
+
+        if (allocated(mixture%inter_diameters)) deallocate(mixture%inter_diameters)
+        call particles_factory_destroy(mixture%components(2))
+        call particles_factory_destroy(mixture%components(1))
+    end subroutine mixture_factory_destroy
 
     subroutine particles_factory_destroy(particles)
         type(Particles_Wrapper), intent(inout) :: particles

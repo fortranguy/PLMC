@@ -32,12 +32,13 @@ use types_box, only: Box_Wrapper
 implicit none
 
 private
-public :: box_factory_construct, box_factory_destroy, allocate_and_set_periodic_box, &
-    allocate_and_set_field_expression, allocate_and_construct_parallelepiped_domain
+public :: box_factory_create, box_factory_destroy, &
+    allocate_and_set_periodic_box, allocate_and_set_field_expression, &
+    allocate_and_construct_parallelepiped_domain
 
 contains
 
-    subroutine box_factory_construct(box, input_data, prefix)
+    subroutine box_factory_create(box, input_data, prefix)
         type(Box_Wrapper), intent(out) :: box
         type(json_file), target, intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
@@ -59,7 +60,7 @@ contains
             box%wall_diameter, box%wall_expression)
         call allocate_and_construct_walls_potential(box%walls_potential, input_data, prefix, &
             box%periodic_box, box%floor_penetration, box%wall_pair)
-    end subroutine box_factory_construct
+    end subroutine box_factory_create
 
     subroutine allocate_and_set_periodic_box(periodic_box, input_data, prefix)
         class(Abstract_Periodic_Box), allocatable, intent(out) :: periodic_box

@@ -6,9 +6,7 @@ use module_data, only: test_file_exists
 use class_periodic_box, only: Abstract_Periodic_Box
 use procedures_box_factory, only: allocate_and_set_periodic_box
 use types_particles, only: Mixture_Wrapper
-use procedures_particles_factory, only: particles_factory_create, particles_factory_destroy, &
-    allocate_and_set_inter_diameter
-
+use procedures_particles_factory, only: mixture_factory_create, mixture_factory_destroy
 implicit none
 
     class(Abstract_Periodic_Box), allocatable :: periodic_box
@@ -24,19 +22,11 @@ implicit none
     deallocate(data_filename)
 
     call allocate_and_set_periodic_box(periodic_box, input_data, "Box")
-    call particles_factory_create(mixture%components(1), input_data, "Particles.Particles 1", &
-        periodic_box)
-    call particles_factory_create(mixture%components(2), input_data, "Particles.Particles 2", &
-        periodic_box)
-    call allocate_and_set_inter_diameter(mixture%inter_diameters, &
-        mixture%components(1)%diameter, mixture%components(2)%diameter, input_data, &
-        "Particles.Between 12")
+    call mixture_factory_create(mixture, input_data, "Mixture", periodic_box)
     write(*, *) "inter diameter", mixture%inter_diameters%get()
     write(*, *) "minimum inter diameter", mixture%inter_diameters%get_min()
 
-    deallocate(mixture%inter_diameters)
-    call particles_factory_destroy(mixture%components(2))
-    call particles_factory_destroy(mixture%components(1))
+    call mixture_factory_destroy(mixture)
     deallocate(periodic_box)
     call input_data%destroy()
 
