@@ -15,6 +15,7 @@ use class_pair_potential, only: Abstract_Pair_Potential, &
     Null_Pair_Potential, Tabulated_Pair_Potential, Raw_Pair_Potential
 use class_particles_potential, only: Abstract_Particles_Potential, &
     Concrete_Particles_Potential, Null_Particles_Potential
+use class_visitable_list, only: Abstract_Visitable_List,
 use types_short_potential, only: Short_Potential_Wrapper
 
 implicit none
@@ -22,7 +23,7 @@ implicit none
 private
 public :: potential_factory_create, potential_factory_destroy, &
     allocate_and_set_expression, allocate_and_construct_pair, &
-    allocate_and_construct_particles_potential
+    allocate_and_construct_particles
 
 contains
 
@@ -38,7 +39,7 @@ contains
             particles_diameter)
         call allocate_and_construct_pair(short_potential%pair, input_data, prefix, &
             particles_diameter, short_potential%expression)
-        call allocate_and_construct_particles_potential(short_potential%particles, periodic_box, &
+        call allocate_and_construct_particles(short_potential%particles, periodic_box, &
             particles_diameter)
     end subroutine potential_factory_create
 
@@ -170,8 +171,8 @@ contains
         call pair_potential%construct(domain, potential_expression)
     end subroutine construct_pair
 
-    subroutine allocate_and_construct_particles_potential(particles_potential, &
-        periodic_box, particles_diameter)
+    subroutine allocate_and_construct_particles(particles_potential, periodic_box, &
+        particles_diameter)
         class(Abstract_Particles_Potential), allocatable, intent(out) :: particles_potential
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Particles_Diameter), intent(in) :: particles_diameter
@@ -182,7 +183,11 @@ contains
             allocate(Null_Particles_Potential :: particles_potential)
         end if
         call particles_potential%construct(periodic_box)
-    end subroutine allocate_and_construct_particles_potential
+    end subroutine allocate_and_construct_particles
+
+    subroutine allocate_list(visitable_list)
+        class(Abstract_Visitable_List), allocatable, intent(out) :: visitable_list
+    end subroutine allocate_list
 
     subroutine potential_factory_destroy(short_potential)
         type(Short_Potential_Wrapper), intent(inout) :: short_potential
