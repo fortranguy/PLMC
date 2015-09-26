@@ -98,7 +98,8 @@ implicit none
         "Test Particles Potential.Particles", particles_diameter)
     call allocate_and_construct_pair(pair_potential, input_data, &
         "Test Particles Potential.Particles", particles_diameter, potential_expression)
-    call allocate_list(visitable_list, input_data, "Test Particles Potential.Particles")
+    call allocate_list(visitable_list, input_data, "Test Particles Potential.Particles", &
+        particles_positions)
 
     call visitable_list%construct(periodic_box)
     do i_particle = 1, particles_positions%get_num()

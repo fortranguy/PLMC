@@ -47,7 +47,7 @@ contains
             particles%diameter, short_potential%expression)
         call allocate_and_construct_particles(short_potential%particles, periodic_box, &
             particles%positions, short_potential%pair)
-        call allocate_list(short_potential%list, input_data, prefix)
+        call allocate_list(short_potential%list, input_data, prefix, particles%positions)
         call allocate_and_construct_cells(short_potential%cells, short_potential%list, &
             periodic_box, particles%positions, short_potential%pair)
     end subroutine potential_factory_create
@@ -197,27 +197,32 @@ contains
         call particles_potential%construct(periodic_box, particles_positions, pair_potential)
     end subroutine allocate_and_construct_particles
 
-    subroutine allocate_list(visitable_list, input_data, prefix)
+    subroutine allocate_list(visitable_list, input_data, prefix, particles_positions)
         class(Abstract_Visitable_List), allocatable, intent(out) :: visitable_list
         type(json_file), target, intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
+        class(Abstract_Particles_Positions), intent(in) :: particles_positions
 
         character(len=:), allocatable :: data_field, cells_data_structure
         logical :: data_found
 
-        data_field = prefix//".Potential.Cells.data structure"
-        call input_data%get(data_field, cells_data_structure, data_found)
-        call test_data_found(data_field, data_found)
-        select case(cells_data_structure)
-            case ("list")
-                allocate(Concrete_Visitable_List :: visitable_list)
-            case ("array")
-                allocate(Concrete_Visitable_Array :: visitable_list)
-            case default
-                call error_exit(cells_data_structure//" unknown."&
-                    //"Choose between 'list' and 'array'.")
-        end select
-        deallocate(cells_data_structure)
+        if (particles_have_positions(particles_positions)) then
+            data_field = prefix//".Potential.Cells.data structure"
+            call input_data%get(data_field, cells_data_structure, data_found)
+            call test_data_found(data_field, data_found)
+            select case(cells_data_structure)
+                case ("list")
+                    allocate(Concrete_Visitable_List :: visitable_list)
+                case ("array")
+                    allocate(Concrete_Visitable_Array :: visitable_list)
+                case default
+                    call error_exit(cells_data_structure//" unknown."&
+                        //"Choose between 'list' and 'array'.")
+            end select
+            deallocate(cells_data_structure)
+        else
+            allocate(Null_Visitable_List :: visitable_list)
+        end if
     end subroutine allocate_list
 
     subroutine allocate_and_construct_cells(visitable_cells, visitable_list, periodic_box, &
@@ -228,14 +233,18 @@ contains
         class(Abstract_Particles_Positions), intent(in) :: particles_positions
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
 
-        select type(periodic_box)
-            type is (XYZ_Periodic_Box)
-                allocate(XYZ_PBC_Visitable_Cells :: visitable_cells)
-            type is (XY_Periodic_Box)
-                allocate(XY_PBC_Visitable_Cells :: visitable_cells)
-            class default
-                call error_exit("periodic_box type unknown.")
-        end select
+        if (particles_have_positions(particles_positions)) then
+            select type(periodic_box)
+                type is (XYZ_Periodic_Box)
+                    allocate(XYZ_PBC_Visitable_Cells :: visitable_cells)
+                type is (XY_Periodic_Box)
+                    allocate(XY_PBC_Visitable_Cells :: visitable_cells)
+                class default
+                    call error_exit("periodic_box type unknown.")
+            end select
+        else
+            allocate(Null_Visitable_Cells :: visitable_cells)
+        end if
         call visitable_cells%construct(visitable_list, periodic_box, particles_positions, &
             pair_potential)
     end subroutine allocate_and_construct_cells
