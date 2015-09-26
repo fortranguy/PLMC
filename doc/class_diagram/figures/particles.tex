@@ -36,18 +36,7 @@
         \end{abstractclass}
     \end{scope}
     
-    \begin{scope}[shift={($(ParticlesDiameter.north) + (-9 cm, 6 cm)$)}, opacity=1]
-        \begin{abstractclass}[text width=\mediumTextWidth]{InterParticlesDiameter}{0, 0}
-            \operation{construct(diameter1\type{ParticlesDiameter},
-                                diameter2\type{ParticlesDiameter},
-                                offset\type{double})}
-            \operation{destroy()}
-            \operation{get()\type{double}}
-            \operation{getMin()\type{double}}
-        \end{abstractclass}
-    \end{scope}
-    
-    \begin{scope}[shift={($(InterParticlesDiameter.north) + (9 cm, 0 cm)$)}, opacity=1]
+    \begin{scope}[shift={($(ParticlesNumber.north) + (0 cm, 6 cm)$)}, opacity=1]
         \begin{abstractclass}[text width=\mediumTextWidth]{ParticlesPositions}{0, 0}
             \operation{construct(periodicBox\type{PeriodicBox},
                                 number\type{ParticlesNumber})}
@@ -104,7 +93,6 @@
 \end{scope}
 
 \begin{scope}[on background layer]
-    \aggregation{InterParticlesDiameter}{diameter}{2}{ParticlesDiameter}
     \aggregation{ParticlesPositions}{periodicBox}{1}{PeriodicBox}
     \aggregation{ParticlesPositions}{number}{1}{ParticlesNumber}
     \aggregation{ParticlesOrientations}{number}{1}{ParticlesNumber}    

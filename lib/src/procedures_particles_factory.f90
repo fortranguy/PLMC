@@ -10,8 +10,6 @@ use class_particles_number, only: Abstract_Particles_Number, &
     Concrete_Particles_Number, Null_Particles_Number
 use class_particles_diameter, only: Abstract_Particles_Diameter, &
     Concrete_Particles_Diameter, Null_Particles_Diameter
-use class_inter_particles_diameter, only: Abstract_Inter_Particles_Diameter, &
-    Concrete_Inter_Particles_Diameter, Null_Inter_Particles_Diameter
 use class_particles_moment_norm, only: Abstract_Particles_Moment_Norm, &
     Concrete_Particles_Moment_Norm, Null_Particles_Moment_Norm
 use class_particles_positions, only: Abstract_Particles_Positions, &
@@ -32,7 +30,7 @@ implicit none
 
 private
 public :: particles_factory_create, particles_factory_destroy, &
-    allocate_and_set_number, allocate_and_set_diameter, allocate_and_construct_inter_diameter, &
+    allocate_and_set_number, allocate_and_set_diameter, allocate_and_set_inter_diameter, &
     allocate_and_construct_positions, set_positions
 
 contains
@@ -115,29 +113,34 @@ contains
         call particles_diameter%set(diameter, diameter_min_factor)
     end subroutine allocate_and_set_diameter
 
-    subroutine allocate_and_construct_inter_diameter(inter_particles_diameter, &
+    subroutine allocate_and_set_inter_diameter(inter_particles_diameter, &
         particles_diameter_1, particles_diameter_2, input_data, prefix)
-        class(Abstract_Inter_Particles_Diameter), allocatable, intent(out) :: &
-            inter_particles_diameter
+        class(Abstract_Particles_Diameter), allocatable, intent(out) :: inter_particles_diameter
         class(Abstract_Particles_Diameter), intent(in) :: particles_diameter_1, particles_diameter_2
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field
         logical :: data_found
+        real(DP) :: inter_diameter, inter_diameter_min_factor
         real(DP) :: inter_diameter_offset
 
         if (particles_exist(particles_diameter_1) .and. particles_exist(particles_diameter_2)) then
             data_field = prefix//".offset"
             call input_data%get(data_field, inter_diameter_offset, data_found)
             call test_data_found(data_field, data_found)
-            allocate(Concrete_Inter_Particles_Diameter :: inter_particles_diameter)
+            data_field = prefix//".minimum diameter factor"
+            call input_data%get(data_field, inter_diameter_min_factor, data_found)
+            call test_data_found(data_field, data_found)
+            allocate(Concrete_Particles_Diameter :: inter_particles_diameter)
+            deallocate(data_field)
         else
-            allocate(Null_Inter_Particles_Diameter :: inter_particles_diameter)
+            allocate(Null_Particles_Diameter :: inter_particles_diameter)
         end if
-        call inter_particles_diameter%construct(particles_diameter_1, particles_diameter_2, &
-            inter_diameter_offset)
-    end subroutine allocate_and_construct_inter_diameter
+        inter_diameter = (particles_diameter_1%get() + particles_diameter_2%get()) / 2._DP + &
+            inter_diameter_offset
+        call inter_particles_diameter%set(inter_diameter, inter_diameter_min_factor)
+    end subroutine allocate_and_set_inter_diameter
 
     subroutine allocate_and_set_moment_norm(particles_moment_norm, input_data, prefix)
         class(Abstract_Particles_Moment_Norm), allocatable, intent(out) :: particles_moment_norm
@@ -320,7 +323,7 @@ contains
         logical :: data_found
 
         if (particles_exist_from_json(input_data, prefix)) then
-            data_field = prefix//".exchange with reservoir"
+            data_field = prefix//".can exchange"
             call input_data%get(data_field, particles_exchange_with_reservoir, data_found)
             call test_data_found(data_field, data_found)
             deallocate(data_field)
@@ -333,11 +336,11 @@ contains
         type(Particles_Wrapper), intent(inout) :: particles
 
         if (allocated(particles%chemical_potential)) deallocate(particles%chemical_potential)
-        call particles%orientations%destroy()
         call particles%total_moment%destroy()
         if (allocated(particles%total_moment)) deallocate(particles%total_moment)
         call particles%dipolar_moments%destroy()
         if (allocated(particles%dipolar_moments)) deallocate(particles%dipolar_moments)
+        call particles%orientations%destroy()
         if (allocated(particles%orientations)) deallocate(particles%orientations)
         call particles%positions%destroy()
         if (allocated(particles%positions)) deallocate(particles%positions)

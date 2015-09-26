@@ -5,6 +5,18 @@
             "size": [10.0, 10.0, 10.0]
         },
         "Temperature": 1.0,
+        "Walls": {
+            "use": true,
+            "name": "flat",
+            "gap": 10.0,
+            "diameter": 1.0,
+            "minimum diameter factor": 1.0,
+            "Potential": {
+                "name": "null",
+                "tabulated": false,
+                "maximum distance": 1.0
+            }
+        },
         "External Field": {
             "apply": true,
             "name": "constant",

@@ -169,7 +169,7 @@ contains
 
         if (particles_exist(particles_diameter)) then
             domain%min = particles_diameter%get_min()
-            data_field = prefix//".Potential.max distance"
+            data_field = prefix//".Potential.maximum distance"
             call input_data%get(data_field, domain%max, data_found)
             call test_data_found(data_field, data_found)
             select type (pair_potential)

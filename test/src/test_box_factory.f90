@@ -24,6 +24,7 @@ implicit none
     write(output_unit, *) "temperature", box%temperature%get()
     write(output_unit, *) "external field at origin", box%external_field%get([0._DP, 0._DP, 0._DP])
     write(output_unit, *) "reciprocal lattice numbers", box%reciprocal_lattice%get_numbers()
+    write(output_unit, *) "walls gap", box%walls_potential%get_gap()
 
     call box_factory_destroy(box)
     call input_data%destroy()
