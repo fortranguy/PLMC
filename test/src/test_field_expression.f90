@@ -5,7 +5,7 @@ use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
 use procedures_errors, only: error_exit
 use class_field_expression, only: Abstract_Field_Expression
-use procedures_box_factory, only: allocate_and_set_field_expression
+use procedures_box_factory, only: box_factory_create, box_factory_destroy
 
 implicit none
 
@@ -21,7 +21,7 @@ implicit none
     call input_data%load_file(filename = data_filename)
     deallocate(data_filename)
 
-    call allocate_and_set_field_expression(field_expression, input_data, "Test Field Expression")
+    call box_factory_create(field_expression, input_data, "Test Field Expression")
 
     data_field = "Test Field Expression.Particle.position"
     call input_data%get(data_field, position, found)
@@ -30,6 +30,6 @@ implicit none
     write(output_unit, *) field_expression%get(position)
     deallocate(position)
 
-    deallocate(field_expression)
+    call box_factory_destroy(field_expression)
 
 end program test_field_expression

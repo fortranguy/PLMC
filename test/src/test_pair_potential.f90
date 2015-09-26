@@ -8,8 +8,8 @@ use class_particles_diameter, only: Abstract_Particles_Diameter, Concrete_Partic
 use procedures_particles_factory, only: particles_factory_create, particles_factory_destroy
 use class_potential_expression, only: Abstract_Potential_Expression
 use class_pair_potential, only: Abstract_Pair_Potential
-use procedures_short_potential_factory, only: allocate_and_set_expression, &
-    allocate_and_construct_pair
+use procedures_short_potential_factory, only: short_potential_factory_create, &
+    short_potential_factory_destroy
 
 implicit none
 
@@ -31,10 +31,10 @@ implicit none
     deallocate(data_filename)
 
     call particles_factory_create(particles_diameter, input_data, "Test Pair Potential.Particles")
-    call allocate_and_set_expression(potential_expression, input_data, &
+    call short_potential_factory_create(potential_expression, input_data, &
         "Test Pair Potential.Particles", particles_diameter)
-    call allocate_and_construct_pair(pair_potential, input_data, "Test Pair Potential.Particles", &
-        particles_diameter, potential_expression)
+    call short_potential_factory_create(pair_potential, input_data, &
+        "Test Pair Potential.Particles", particles_diameter, potential_expression)
 
     data_field = "Test Pair Potential.Particles.Potential.distance"
     call input_data%get(data_field, distance, data_found)
@@ -49,7 +49,7 @@ implicit none
 
     call pair_potential%destroy()
     deallocate(pair_potential)
-    deallocate(potential_expression)
+    call short_potential_factory_destroy(potential_expression)
     call particles_factory_destroy(particles_diameter)
     call input_data%destroy()
 

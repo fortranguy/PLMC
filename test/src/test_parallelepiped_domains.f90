@@ -58,8 +58,7 @@ use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
-use procedures_box_factory, only: allocate_and_set_periodic_box, &
-    allocate_and_construct_parallelepiped_domain
+use procedures_box_factory, only: box_factory_create, box_factory_destroy
 use procedures_parallelepiped_domains_print, only: print_vertices, parallelepiped_domains_overlap
 
 implicit none
@@ -77,12 +76,12 @@ implicit none
     call input_data%load_file(filename=data_filename)
     deallocate(data_filename)
 
-    call allocate_and_set_periodic_box(periodic_box, input_data, "Test Parallelepiped Domains")
-    call allocate_and_construct_parallelepiped_domain(parallelepiped_domain_0, input_data, &
+    call box_factory_create(periodic_box, input_data, "Test Parallelepiped Domains")
+    call box_factory_create(parallelepiped_domain_0, input_data, &
         "Test Parallelepiped Domains.Domain 0", periodic_box)
-    call allocate_and_construct_parallelepiped_domain(parallelepiped_domain_1, input_data, &
+    call box_factory_create(parallelepiped_domain_1, input_data, &
         "Test Parallelepiped Domains.Domain 1", periodic_box)
-    call allocate_and_construct_parallelepiped_domain(parallelepiped_domain_2, input_data, &
+    call box_factory_create(parallelepiped_domain_2, input_data, &
         "Test Parallelepiped Domains.Domain 2", periodic_box)
 
     call print_vertices(parallelepiped_domain_0, "domain_0")
@@ -93,11 +92,10 @@ implicit none
     write(output_unit, *) "Domains 2-1 overlap:", &
         parallelepiped_domains_overlap(parallelepiped_domain_2, parallelepiped_domain_1)
 
-    call parallelepiped_domain_2%destroy()
-    deallocate(parallelepiped_domain_2)
-    call parallelepiped_domain_1%destroy()
-    deallocate(parallelepiped_domain_1)
-    deallocate(periodic_box)
+    call box_factory_destroy(parallelepiped_domain_2)
+    call box_factory_destroy(parallelepiped_domain_1)
+    call box_factory_destroy(parallelepiped_domain_0)
+    call box_factory_destroy(periodic_box)
     call input_data%destroy()
 
 end program test_parallelepiped_domains

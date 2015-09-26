@@ -42,8 +42,7 @@ use module_data, only: test_file_exists, test_data_found
 use procedures_errors, only: error_exit
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box
 use class_field_expression, only: Abstract_Field_Expression
-use procedures_box_factory, only: allocate_and_set_field_expression, &
-    allocate_and_construct_parallelepiped_domain
+use procedures_box_factory, only: box_factory_create, box_factory_destroy
 use class_parallelepiped_domain, only: Abstract_Parallelepiped_Domain, &
                                        Concrete_Parallelepiped_Domain
 use class_external_field, only: Abstract_External_Field, Concrete_External_Field
@@ -66,16 +65,9 @@ implicit none
     call test_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
 
-    call allocate_and_set_field_expression(field_expression, input_data, "Test External Field")
-
-    data_field = "Test External Field.Periodic Box.size"
-    call input_data%get(data_field, box_size, found)
-    call test_data_found(data_field, found)
-    allocate(XYZ_Periodic_Box :: periodic_box)
-    call periodic_box%set(box_size)
-    deallocate(box_size)
-
-    call allocate_and_construct_parallelepiped_domain(parallelepiped_domain, input_data, &
+    call box_factory_create(periodic_box, input_data, "Test External Field")
+    call box_factory_create(field_expression, input_data, "Test External Field")
+    call box_factory_create(parallelepiped_domain, input_data, &
         "Test External Field.External Field", periodic_box)
 
     data_field = "Test External Field.External Field.delta"
@@ -89,10 +81,9 @@ implicit none
 
     call external_field%destroy()
     deallocate(external_field)
-    call parallelepiped_domain%destroy()
-    deallocate(parallelepiped_domain)
-    deallocate(periodic_box)
-    deallocate(field_expression)
+    call box_factory_destroy(parallelepiped_domain)
+    call box_factory_destroy(periodic_box)
+    call box_factory_destroy(field_expression)
     deallocate(data_field)
     deallocate(data_filename)
     call input_data%destroy()

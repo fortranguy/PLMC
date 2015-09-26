@@ -1,6 +1,7 @@
 {
     "Test External Field": {
         "Periodic Box": {
+            "periodicity": "XYZ",
             "size": [10.0, 10.0, 10.0]
         },
         "External Field": {

@@ -33,9 +33,11 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
 use procedures_errors, only: error_exit
-use class_particles_diameter, only: Abstract_Particles_Diameter, Concrete_Particles_Diameter
+use class_particles_diameter, only: Abstract_Particles_Diameter
+use procedures_particles_factory, only: particles_factory_create, particles_factory_destroy
 use class_potential_expression, only: Abstract_Potential_Expression
-use procedures_short_potential_factory, only: allocate_and_set_expression
+use procedures_short_potential_factory, only: short_potential_factory_create, &
+    short_potential_factory_destroy
 use procedures_potential_expression_write, only: write_potential_expression
 
 implicit none
@@ -55,9 +57,8 @@ implicit none
     call input_data%load_file(filename = data_filename)
     deallocate(data_filename)
 
-    allocate(Concrete_Particles_Diameter :: diameter)
-    call diameter%set(1.0_DP, 0.8_DP)
-    call allocate_and_set_expression(potential_expression, input_data, &
+    call particles_factory_create(diameter, input_data, "Test Potential Expression")
+    call short_potential_factory_create(potential_expression, input_data, &
         "Test Potential Expression", diameter)
 
     data_field = "Test Potential Expression.Potential.minimum distance"
@@ -75,8 +76,8 @@ implicit none
                                     delta_distance, potential_unit)
     close(potential_unit)
 
-    deallocate(diameter)
-    deallocate(potential_expression)
+    call particles_factory_destroy(diameter)
+    call short_potential_factory_destroy(potential_expression)
     deallocate(data_field)
     call input_data%destroy()
 

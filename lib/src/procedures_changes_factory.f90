@@ -25,21 +25,35 @@ implicit none
 private
 public :: changes_factory_create, changes_factory_destroy
 
+interface changes_factory_create
+    module procedure :: changes_factory_create_all
+    module procedure :: allocate_and_construct_moved_positions
+    module procedure :: allocate_and_construct_rotated_orientations
+    module procedure :: allocate_and_construct_particles_exchange
+end interface changes_factory_create
+
+interface changes_factory_destroy
+    module procedure :: destroy_and_deallocate_particles_exchange
+    module procedure :: destroy_and_deallocate_rotated_orientations
+    module procedure :: destroy_and_deallocate_moved_positions
+    module procedure :: changes_factory_destroy_all
+end interface changes_factory_destroy
+
 contains
 
-    subroutine changes_factory_create(changes, input_data, prefix, particles)
+    subroutine changes_factory_create_all(changes, input_data, prefix, particles)
         type(Changes_Wrapper), intent(out) :: changes
         type(json_file), target, intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
         type(Particles_Wrapper), intent(in) :: particles
 
-        call allocate_and_construct_moved_positions(changes%moved_positions, particles%positions, &
+        call changes_factory_create(changes%moved_positions, particles%positions, input_data, &
+            prefix)
+        call changes_factory_create(changes%rotated_orientations, particles%orientations, &
             input_data, prefix)
-        call allocate_and_construct_rotated_orientations(changes%rotated_orientations, &
-            particles%orientations, input_data, prefix)
-        call allocate_and_construct_particles_exchange(changes%particles_exchange, &
-            particles%chemical_potential, particles)
-    end subroutine changes_factory_create
+        call changes_factory_create(changes%particles_exchange, particles%chemical_potential, &
+            particles)
+    end subroutine changes_factory_create_all
 
     subroutine allocate_and_construct_moved_positions(moved_positions, particles_positions, &
         input_data, prefix)
@@ -159,15 +173,33 @@ contains
         call particles_exchange%construct(particles)
     end subroutine allocate_and_construct_particles_exchange
 
-    subroutine changes_factory_destroy(changes)
+    subroutine changes_factory_destroy_all(changes)
         type(Changes_Wrapper), intent(inout) :: changes
 
-        call changes%particles_exchange%destroy()
-        if (allocated(changes%particles_exchange)) deallocate(changes%particles_exchange)
-        call changes%rotated_orientations%destroy()
-        if (allocated(changes%rotated_orientations)) deallocate(changes%rotated_orientations)
-        call changes%moved_positions%destroy()
-        if (allocated(changes%moved_positions)) deallocate(changes%moved_positions)
-    end subroutine changes_factory_destroy
+        call changes_factory_destroy(changes%particles_exchange)
+        call changes_factory_destroy(changes%rotated_orientations)
+        call changes_factory_destroy(changes%moved_positions)
+    end subroutine changes_factory_destroy_all
+
+    subroutine destroy_and_deallocate_particles_exchange(particles_exchange)
+        class(Abstract_Particles_Exchange), allocatable, intent(inout) :: particles_exchange
+
+        call particles_exchange%destroy()
+        if (allocated(particles_exchange)) deallocate(particles_exchange)
+    end subroutine destroy_and_deallocate_particles_exchange
+
+    subroutine destroy_and_deallocate_rotated_orientations(rotated_orientations)
+        class(Abstract_Rotated_Orientations), allocatable, intent(inout) :: rotated_orientations
+
+        call rotated_orientations%destroy()
+        if (allocated(rotated_orientations)) deallocate(rotated_orientations)
+    end subroutine destroy_and_deallocate_rotated_orientations
+
+    subroutine destroy_and_deallocate_moved_positions(moved_positions)
+        class(Abstract_Moved_Positions), allocatable, intent(inout) :: moved_positions
+
+        call moved_positions%destroy()
+        if (allocated(moved_positions)) deallocate(moved_positions)
+    end subroutine destroy_and_deallocate_moved_positions
 
 end module procedures_changes_factory

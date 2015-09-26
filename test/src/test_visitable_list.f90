@@ -44,7 +44,7 @@ use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
 use procedures_errors, only: error_exit
 use class_periodic_box, only: Abstract_Periodic_Box
-use procedures_box_factory, only: allocate_and_set_periodic_box
+use procedures_box_factory, only: box_factory_create, box_factory_destroy
 use class_particles_number, only: Abstract_Particles_Number
 use class_particles_diameter, only: Abstract_Particles_Diameter
 use class_particles_positions, only: Abstract_Particles_Positions
@@ -53,8 +53,8 @@ use procedures_particles_factory, only: particles_factory_create, particles_fact
 use class_potential_expression, only: Abstract_Potential_Expression
 use class_pair_potential, only: Abstract_Pair_Potential
 use class_particles_potential, only: Abstract_Particles_Potential
-use procedures_short_potential_factory, only: allocate_and_set_expression, &
-    allocate_and_construct_pair, allocate_and_construct_particles, allocate_list
+use procedures_short_potential_factory, only: short_potential_factory_create, &
+    short_potential_factory_destroy
 use types_particle, only: Concrete_Particle
 use class_visitable_list, only: Abstract_Visitable_List, Concrete_Visitable_List, &
     Concrete_Visitable_Array
@@ -87,19 +87,19 @@ implicit none
     call input_data%load_file(filename = data_filename)
     deallocate(data_filename)
 
-    call allocate_and_set_periodic_box(periodic_box, input_data, "Test Particles Potential")
+    call box_factory_create(periodic_box, input_data, "Test Particles Potential")
     call particles_factory_create(particles_number, input_data, &
         "Test Particles Potential.Particles")
     call particles_factory_create(particles_diameter, input_data, &
         "Test Particles Potential.Particles")
     call particles_factory_create(particles_positions, periodic_box, particles_number)
     call particles_factory_set(particles_positions, input_data, "Test Particles Potential.Particles")
-    call allocate_and_set_expression(potential_expression, input_data, &
+    call short_potential_factory_create(potential_expression, input_data, &
         "Test Particles Potential.Particles", particles_diameter)
-    call allocate_and_construct_pair(pair_potential, input_data, &
+    call short_potential_factory_create(pair_potential, input_data, &
         "Test Particles Potential.Particles", particles_diameter, potential_expression)
-    call allocate_list(visitable_list, input_data, "Test Particles Potential.Particles", &
-        particles_positions)
+    call short_potential_factory_create(visitable_list, input_data, &
+        "Test Particles Potential.Particles", particles_positions)
 
     call visitable_list%construct(periodic_box)
     do i_particle = 1, particles_positions%get_num()
@@ -160,13 +160,12 @@ implicit none
 
     call visitable_list%destroy()
     deallocate(visitable_list)
-    call pair_potential%destroy()
-    deallocate(pair_potential)
-    deallocate(potential_expression)
+    call short_potential_factory_destroy(pair_potential)
+    call short_potential_factory_destroy(potential_expression)
     call particles_factory_destroy(particles_positions)
     call particles_factory_destroy(particles_diameter)
     call particles_factory_destroy(particles_number)
-    deallocate(periodic_box)
+    call box_factory_destroy(periodic_box)
     call input_data%destroy()
 
 end program test_visitable_list
