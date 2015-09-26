@@ -17,7 +17,7 @@ use class_particles_exchange, only: Abstract_Particles_Exchange, &
 use module_adaptation, only: Concrete_Adaptation_Parameters
 use types_particles, only: Particles_Wrapper
 use procedures_types_selectors, only: particles_have_positions, particles_have_orientations, &
-    particles_have_chemical_potential
+    particles_can_exchange
 use types_changes, only: Changes_Wrapper
 
 implicit none
@@ -151,7 +151,7 @@ contains
         class(Abstract_Particles_Chemical_Potential), intent(in) :: particles_chemical_potential
         type(Particles_Wrapper), intent(in) :: particles
 
-        if (particles_have_chemical_potential(particles_chemical_potential)) then
+        if (particles_can_exchange(particles_chemical_potential)) then
             allocate(Concrete_Particles_Exchange :: particles_exchange)
         else
             allocate(Null_Particles_Exchange :: particles_exchange)

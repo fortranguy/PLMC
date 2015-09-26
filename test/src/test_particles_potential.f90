@@ -9,8 +9,8 @@ use procedures_box_factory, only: allocate_and_set_periodic_box
 use class_particles_number, only: Abstract_Particles_Number
 use class_particles_diameter, only: Abstract_Particles_Diameter
 use class_particles_positions, only: Abstract_Particles_Positions
-use procedures_particles_factory, only: allocate_and_set_number, allocate_and_set_diameter, &
-    allocate_and_construct_positions, set_positions
+use procedures_particles_factory, only: particles_factory_create, particles_factory_set, &
+    particles_factory_destroy
 use class_potential_expression, only: Abstract_Potential_Expression
 use class_pair_potential, only: Abstract_Pair_Potential
 use class_particles_potential, only: Abstract_Particles_Potential
@@ -44,12 +44,12 @@ implicit none
     deallocate(data_filename)
 
     call allocate_and_set_periodic_box(periodic_box, input_data, "Test Particles Potential")
-    call allocate_and_set_number(particles_number, input_data, &
+    call particles_factory_create(particles_number, input_data, &
         "Test Particles Potential.Particles")
-    call allocate_and_set_diameter(particles_diameter, input_data, &
+    call particles_factory_create(particles_diameter, input_data, &
         "Test Particles Potential.Particles")
-    call allocate_and_construct_positions(particles_positions, periodic_box, particles_number)
-    call set_positions(particles_positions, input_data, "Test Particles Potential.Particles")
+    call particles_factory_create(particles_positions, periodic_box, particles_number)
+    call particles_factory_set(particles_positions, input_data, "Test Particles Potential.Particles")
     call allocate_and_set_expression(potential_expression, input_data, &
         "Test Particles Potential.Particles", particles_diameter)
     call allocate_and_construct_pair(pair_potential, input_data, &
@@ -78,10 +78,9 @@ implicit none
     call pair_potential%destroy()
     deallocate(pair_potential)
     deallocate(potential_expression)
-    call particles_positions%destroy()
-    deallocate(particles_positions)
-    deallocate(particles_diameter)
-    deallocate(particles_number)
+    call particles_factory_destroy(particles_positions)
+    call particles_factory_destroy(particles_diameter)
+    call particles_factory_destroy(particles_number)
     deallocate(periodic_box)
     call input_data%destroy()
 

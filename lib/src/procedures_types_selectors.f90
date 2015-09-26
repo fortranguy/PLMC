@@ -1,5 +1,7 @@
 module procedures_types_selectors
 
+use json_module, only: json_file
+use module_data, only: test_data_found
 use class_particles_number, only: Abstract_Particles_Number, Null_Particles_Number
 use class_particles_diameter, only: Abstract_Particles_Diameter, Null_Particles_Diameter
 use class_particles_moment_norm, only: Abstract_Particles_Moment_Norm, Null_Particles_Moment_Norm
@@ -14,20 +16,40 @@ use class_particles_exchange, only: Abstract_Particles_Exchange, Null_Particles_
 implicit none
 
 private
-public :: particles_exist, particles_have_positions, particles_have_orientations, &
-    particles_are_dipolar, particles_have_chemical_potential
+public :: particles_exist, particles_have_positions, particles_are_dipolar, &
+    particles_have_orientations, particles_can_exchange
 
 interface particles_exist
+    module procedure :: particles_exist_from_json
     module procedure :: particles_exist_from_number
     module procedure :: particles_exist_from_diameter
 end interface particles_exist
 
 interface particles_are_dipolar
+    module procedure :: particles_are_dipolar_from_json
     module procedure :: particles_are_dipolar_from_norm_and_orientations
-    module procedure :: particle_are_dipolar_from_dipolar_moments
+    module procedure :: particles_are_dipolar_from_dipolar_moments
 end interface particles_are_dipolar
 
+interface particles_can_exchange
+    module procedure :: particles_can_exchange_from_json
+    module procedure :: particles_can_exchange_from_chemical_potential
+end interface particles_can_exchange
+
 contains
+
+    logical function particles_exist_from_json(input_data, prefix) result(particles_exist)
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
+
+        character(len=:), allocatable :: data_field
+        logical :: data_found
+
+        data_field = prefix//".exist"
+        call input_data%get(data_field, particles_exist, data_found)
+        call test_data_found(data_field, data_found)
+        deallocate(data_field)
+    end function particles_exist_from_json
 
     pure logical function particles_exist_from_number(particles_number) result(particles_exist)
         class(Abstract_Particles_Number), intent(in) :: particles_number
@@ -73,6 +95,24 @@ contains
         end select
     end function particles_have_positions
 
+    logical function particles_are_dipolar_from_json(input_data, prefix) &
+        result(particles_are_dipolar)
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
+
+        character(len=:), allocatable :: data_field
+        logical :: data_found
+
+        if (particles_exist_from_json(input_data, prefix)) then
+            data_field = prefix//".are dipolar"
+            call input_data%get(data_field, particles_are_dipolar, data_found)
+            call test_data_found(data_field, data_found)
+            deallocate(data_field)
+        else
+            particles_are_dipolar = .false.
+        end if
+    end function particles_are_dipolar_from_json
+
     pure logical function particles_have_orientations(particles_orientations)
         class(Abstract_Particles_Orientations), intent(in) :: particles_orientations
 
@@ -93,7 +133,7 @@ contains
             particles_have_orientations(particles_orientations)
     end function particles_are_dipolar_from_norm_and_orientations
 
-    pure logical function particle_are_dipolar_from_dipolar_moments(particles_dipolar_moments) &
+    pure logical function particles_are_dipolar_from_dipolar_moments(particles_dipolar_moments) &
         result(particles_are_dipolar)
         class(Abstract_Particles_Dipolar_Moments), intent(in) :: particles_dipolar_moments
 
@@ -103,17 +143,36 @@ contains
             class default
                 particles_are_dipolar = .true.
         end select
-    end function particle_are_dipolar_from_dipolar_moments
+    end function particles_are_dipolar_from_dipolar_moments
 
-    pure logical function particles_have_chemical_potential(particles_chemical_potential)
+    logical function particles_can_exchange_from_json(input_data, prefix) &
+        result(particles_can_exchange)
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
+
+        character(len=:), allocatable :: data_field
+        logical :: data_found
+
+        if (particles_exist_from_json(input_data, prefix)) then
+            data_field = prefix//".can exchange"
+            call input_data%get(data_field, particles_can_exchange, data_found)
+            call test_data_found(data_field, data_found)
+            deallocate(data_field)
+        else
+            particles_can_exchange = .false.
+        end if
+    end function particles_can_exchange_from_json
+
+    pure logical function particles_can_exchange_from_chemical_potential(&
+        particles_chemical_potential) result(particles_can_exchange)
         class(Abstract_Particles_Chemical_Potential), intent(in) :: particles_chemical_potential
 
         select type (particles_chemical_potential)
             type is (Null_Particles_Chemical_Potential)
-                particles_have_chemical_potential = .false.
+                particles_can_exchange = .false.
             class default
-                particles_have_chemical_potential = .true.
+                particles_can_exchange = .true.
         end select
-    end function particles_have_chemical_potential
+    end function particles_can_exchange_from_chemical_potential
 
 end module procedures_types_selectors
