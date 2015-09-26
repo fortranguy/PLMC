@@ -15,7 +15,7 @@ use class_potential_expression, only: Abstract_Potential_Expression
 use class_pair_potential, only: Abstract_Pair_Potential
 use class_particles_potential, only: Abstract_Particles_Potential
 use procedures_short_potential_factory, only: allocate_and_set_expression, &
-    allocate_and_construct_pair, allocate_and_construct_particles_potential
+    allocate_and_construct_pair, allocate_and_construct_particles
 use types_particle, only: Concrete_Particle
 use class_particles_potential, only: Abstract_Particles_Potential
 
@@ -54,11 +54,8 @@ implicit none
         "Test Particles Potential.Particles", particles_diameter)
     call allocate_and_construct_pair(pair_potential, input_data, &
         "Test Particles Potential.Particles", particles_diameter, potential_expression)
-    call allocate_and_construct_particles_potential(particles_potential, periodic_box, &
-        particles_diameter)
-
-    call particles_potential%set(particles_positions)
-    call particles_potential%set(pair_potential)
+    call allocate_and_construct_particles(particles_potential, periodic_box, &
+        particles_positions, pair_potential)
 
     energy = 0._DP
     do i_particle = 1, particles_positions%get_num()

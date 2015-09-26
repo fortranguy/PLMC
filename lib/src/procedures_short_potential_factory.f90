@@ -4,10 +4,13 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
 use module_data, only: test_data_found
 use procedures_errors, only: error_exit
-use class_periodic_box, only: Abstract_Periodic_Box
+use class_periodic_box, only: Abstract_Periodic_Box, &
+    XYZ_Periodic_Box, XY_Periodic_Box
 use class_particles_diameter, only: Abstract_Particles_Diameter, &
     Null_Particles_Diameter
-use procedures_types_selectors, only: particles_exist
+use class_particles_positions, only: Abstract_Particles_Positions
+use types_particles, only: Particles_Wrapper
+use procedures_types_selectors, only: particles_exist, particles_have_positions
 use class_potential_expression, only: Abstract_Potential_Expression, &
     Null_Potential_Expression, Lennard_Jones_Expression
 use types_potential_domain, only: Concrete_Potential_Domain
@@ -15,7 +18,10 @@ use class_pair_potential, only: Abstract_Pair_Potential, &
     Null_Pair_Potential, Tabulated_Pair_Potential, Raw_Pair_Potential
 use class_particles_potential, only: Abstract_Particles_Potential, &
     Concrete_Particles_Potential, Null_Particles_Potential
-use class_visitable_list, only: Abstract_Visitable_List,
+use class_visitable_list, only: Abstract_Visitable_List, &
+    Null_Visitable_List, Concrete_Visitable_List, Concrete_Visitable_Array
+use class_visitable_cells, only: Abstract_Visitable_Cells, &
+    Null_Visitable_Cells, XYZ_PBC_Visitable_Cells, XY_PBC_Visitable_Cells
 use types_short_potential, only: Short_Potential_Wrapper
 
 implicit none
@@ -23,24 +29,27 @@ implicit none
 private
 public :: potential_factory_create, potential_factory_destroy, &
     allocate_and_set_expression, allocate_and_construct_pair, &
-    allocate_and_construct_particles
+    allocate_and_construct_particles, allocate_list, allocate_and_construct_cells
 
 contains
 
     subroutine potential_factory_create(short_potential, input_data, prefix, periodic_box, &
-        particles_diameter)
+        particles)
         type(Short_Potential_Wrapper), intent(out) :: short_potential
         type(json_file), target, intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        class(Abstract_Particles_Diameter), intent(in) :: particles_diameter
+        type(Particles_Wrapper), intent(in) :: particles
 
         call allocate_and_set_expression(short_potential%expression, input_data, prefix, &
-            particles_diameter)
+            particles%diameter)
         call allocate_and_construct_pair(short_potential%pair, input_data, prefix, &
-            particles_diameter, short_potential%expression)
+            particles%diameter, short_potential%expression)
         call allocate_and_construct_particles(short_potential%particles, periodic_box, &
-            particles_diameter)
+            particles%positions, short_potential%pair)
+        call allocate_list(short_potential%list, input_data, prefix)
+        call allocate_and_construct_cells(short_potential%cells, short_potential%list, &
+            periodic_box, particles%positions, short_potential%pair)
     end subroutine potential_factory_create
 
     subroutine allocate_and_set_expression(potential_expression, input_data, prefix, &
@@ -103,6 +112,8 @@ contains
                 call input_data%get(data_field, LJ_sigma, data_found)
                 call test_data_found(data_field, data_found)
                 call potential_expression%set(LJ_epsilon, LJ_sigma)
+            class default
+                call error_exit("potential_expression type unknown.")
         end select
         if (allocated(data_field)) deallocate(data_field)
     end subroutine set_expression
@@ -172,26 +183,69 @@ contains
     end subroutine construct_pair
 
     subroutine allocate_and_construct_particles(particles_potential, periodic_box, &
-        particles_diameter)
+        particles_positions, pair_potential)
         class(Abstract_Particles_Potential), allocatable, intent(out) :: particles_potential
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        class(Abstract_Particles_Diameter), intent(in) :: particles_diameter
+        class(Abstract_Particles_Positions), target, intent(in) :: particles_positions
+        class(Abstract_Pair_Potential), target, intent(in) :: pair_potential
 
-        if (particles_exist(particles_diameter)) then
+        if (particles_have_positions(particles_positions)) then
             allocate(Concrete_Particles_Potential :: particles_potential)
         else
             allocate(Null_Particles_Potential :: particles_potential)
         end if
-        call particles_potential%construct(periodic_box)
+        call particles_potential%construct(periodic_box, particles_positions, pair_potential)
     end subroutine allocate_and_construct_particles
 
-    subroutine allocate_list(visitable_list)
+    subroutine allocate_list(visitable_list, input_data, prefix)
         class(Abstract_Visitable_List), allocatable, intent(out) :: visitable_list
+        type(json_file), target, intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
+
+        character(len=:), allocatable :: data_field, cells_data_structure
+        logical :: data_found
+
+        data_field = prefix//".Potential.Cells.data structure"
+        call input_data%get(data_field, cells_data_structure, data_found)
+        call test_data_found(data_field, data_found)
+        select case(cells_data_structure)
+            case ("list")
+                allocate(Concrete_Visitable_List :: visitable_list)
+            case ("array")
+                allocate(Concrete_Visitable_Array :: visitable_list)
+            case default
+                call error_exit(cells_data_structure//" unknown."&
+                    //"Choose between 'list' and 'array'.")
+        end select
+        deallocate(cells_data_structure)
     end subroutine allocate_list
+
+    subroutine allocate_and_construct_cells(visitable_cells, visitable_list, periodic_box, &
+        particles_positions, pair_potential)
+        class(Abstract_Visitable_Cells), allocatable, intent(out) :: visitable_cells
+        class(Abstract_Visitable_List), intent(in) :: visitable_list
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
+        class(Abstract_Particles_Positions), intent(in) :: particles_positions
+        class(Abstract_Pair_Potential), intent(in) :: pair_potential
+
+        select type(periodic_box)
+            type is (XYZ_Periodic_Box)
+                allocate(XYZ_PBC_Visitable_Cells :: visitable_cells)
+            type is (XY_Periodic_Box)
+                allocate(XY_PBC_Visitable_Cells :: visitable_cells)
+            class default
+                call error_exit("periodic_box type unknown.")
+        end select
+        call visitable_cells%construct(visitable_list, periodic_box, particles_positions, &
+            pair_potential)
+    end subroutine allocate_and_construct_cells
 
     subroutine potential_factory_destroy(short_potential)
         type(Short_Potential_Wrapper), intent(inout) :: short_potential
 
+        call short_potential%cells%destroy()
+        if (allocated(short_potential%cells)) deallocate(short_potential%cells)
+        if (allocated(short_potential%list)) deallocate(short_potential%list)
         call short_potential%particles%destroy()
         if (allocated(short_potential%particles)) deallocate(short_potential%particles)
         call short_potential%pair%destroy()

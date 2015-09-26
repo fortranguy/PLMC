@@ -29,7 +29,7 @@ contains
             particle%same_type = .true.
             particle%i = i_particle
             particle%position = particles_positions%get(particle%i)
-            call visitable_list%visit(particle, pair_potential, overlap, energy_i)
+            call visitable_list%visit(overlap, energy_i, particle, pair_potential)
             if (overlap) exit
             energy = energy + energy_i
         end do
@@ -40,7 +40,6 @@ end module procedures_visitable_list_sum
 program test_visitable_list
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
-use data_geometry, only: num_dimensions
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
 use procedures_errors, only: error_exit
@@ -55,7 +54,7 @@ use class_potential_expression, only: Abstract_Potential_Expression
 use class_pair_potential, only: Abstract_Pair_Potential
 use class_particles_potential, only: Abstract_Particles_Potential
 use procedures_short_potential_factory, only: allocate_and_set_expression, &
-    allocate_and_construct_pair, allocate_and_construct_particles_potential
+    allocate_and_construct_pair, allocate_and_construct_particles, allocate_list
 use types_particle, only: Concrete_Particle
 use class_visitable_list, only: Abstract_Visitable_List, Concrete_Visitable_List, &
     Concrete_Visitable_Array
@@ -73,7 +72,7 @@ implicit none
     class(Abstract_Periodic_Box), allocatable :: periodic_box
 
     type(json_file) :: input_data
-    character(len=:), allocatable :: data_filename, data_field, list_data_structure
+    character(len=:), allocatable :: data_filename, data_field
     logical :: data_found
 
     type(Concrete_Particle) :: particle
@@ -99,20 +98,7 @@ implicit none
         "Test Particles Potential.Particles", particles_diameter)
     call allocate_and_construct_pair(pair_potential, input_data, &
         "Test Particles Potential.Particles", particles_diameter, potential_expression)
-
-    data_field = "Test Particles Potential.Memory.data structure"
-    call input_data%get(data_field, list_data_structure, data_found)
-    call test_data_found(data_field, data_found)
-    call test_data_found(data_field, data_found)
-    select case(list_data_structure)
-        case ("list")
-            allocate(Concrete_Visitable_List :: visitable_list)
-        case ("array")
-            allocate(Concrete_Visitable_Array :: visitable_list)
-        case default
-            call error_exit(list_data_structure//" unknown.")
-    end select
-    deallocate(list_data_structure)
+    call allocate_list(visitable_list, input_data, "Test Particles Potential.Particles")
 
     call visitable_list%construct(periodic_box)
     do i_particle = 1, particles_positions%get_num()

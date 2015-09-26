@@ -15,7 +15,8 @@ use class_potential_expression, only: Abstract_Potential_Expression
 use class_pair_potential, only: Abstract_Pair_Potential
 use class_particles_potential, only: Abstract_Particles_Potential
 use procedures_short_potential_factory, only: allocate_and_set_expression, &
-    allocate_and_construct_pair, allocate_and_construct_particles_potential
+    allocate_and_construct_pair, allocate_and_construct_particles, allocate_list, &
+    allocate_and_construct_cells
 use types_particle, only: Concrete_Particle
 use class_visitable_list, only: Abstract_Visitable_List, Concrete_Visitable_List, &
     Concrete_Visitable_Array
@@ -34,8 +35,7 @@ implicit none
     class(Abstract_Periodic_Box), allocatable :: periodic_box
 
     type(json_file) :: input_data
-    character(len=:), allocatable :: data_filename, data_field, list_data_structure
-    logical :: data_found
+    character(len=:), allocatable :: data_filename
 
     type(Concrete_Particle) :: particle
     real(DP) :: energy, energy_i
@@ -59,39 +59,16 @@ implicit none
         "Test Particles Potential.Particles", particles_diameter)
     call allocate_and_construct_pair(pair_potential, input_data, &
         "Test Particles Potential.Particles", particles_diameter, potential_expression)
-
-    data_field = "Test Particles Potential.Memory.data structure"
-    call input_data%get(data_field, list_data_structure, data_found)
-    call test_data_found(data_field, data_found)
-    select case(list_data_structure)
-        case ("list")
-            allocate(Concrete_Visitable_List :: visitable_list)
-        case ("array")
-            allocate(Concrete_Visitable_Array :: visitable_list)
-        case default
-            call error_exit(list_data_structure//" unknown.")
-    end select
-    deallocate(list_data_structure)
-
-    select type(periodic_box)
-        type is (XYZ_Periodic_Box)
-            allocate(XYZ_PBC_Visitable_Cells :: visitable_cells)
-        type is (XY_Periodic_Box)
-            allocate(XY_PBC_Visitable_Cells :: visitable_cells)
-        class default
-            call error_exit("Periodic_Box type unknown.")
-    end select
-
-    call visitable_cells%construct(visitable_list, periodic_box, particles_positions, &
-        pair_potential)
-    call visitable_cells%fill()
+    call allocate_list(visitable_list, input_data, "Test Particles Potential.Particles")
+    call allocate_and_construct_cells(visitable_cells, visitable_list, periodic_box, &
+        particles_positions, pair_potential)
 
     energy = 0._DP
     do i_particle = 1, particles_positions%get_num()
         particle%same_type = .true.
         particle%i = i_particle
         particle%position = particles_positions%get(particle%i)
-        call visitable_cells%visit(particle, overlap, energy_i)
+        call visitable_cells%visit(overlap, energy_i, particle)
         if (overlap) exit
         energy = energy + energy_i
     end do

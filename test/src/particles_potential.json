@@ -16,11 +16,11 @@
                 "sigma": 1.0,
                 "epsilon": 1.0,
                 "max distance": 2.5,
-                "delta distance": 1.0e-6
+                "delta distance": 1.0e-6,
+                "Cells": {
+                    "data structure": "list"
+                }
             }
-        },
-        "Memory": {
-            "data structure": "list"
         }
     }
 }

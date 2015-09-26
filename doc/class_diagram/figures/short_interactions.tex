@@ -3,12 +3,10 @@
     
     \begin{scope}[opacity=1]
         \begin{abstractclass}[text width=\mediumTextWidth]{ParticlesPotential}{0, 0}
-            \operation{construct(periodicBox\type{PeriodicBox})}
+            \operation{construct(periodicBox\type{PeriodicBox}, positions\type{ParticlesPositions},
+                pairPotential\type{PairPotential})}
             \operation{destroy()}
-            \operation{set(positions\type{ParticlesPositions})}
-            \operation{set(pairPotential\type{PairPotential})}
-            \operation{visit(particle\type{Particle}, overlap\type{bool},
-                                energy\type{double})}
+            \operation{visit(overlap\type{bool}, energy\type{double}, particle\type{Particle})}
         \end{abstractclass}
     \end{scope}
             
@@ -17,9 +15,7 @@
             \operation{construct(mold\type{VisitableList}, periodicBox\type{PeriodicBox},
                                     positions\type{ParticlesPositions}, pairPotential\type{PairPotential})}
             \operation{destroy()}
-            \operation{fill()}
-            \operation{visit(particle\type{Particle}, overlap\type{bool},
-                energy\type{double})}
+            \operation{visit(overlap\type{bool}, energy\type{double}, particle\type{Particle})}
             \operation{move(from\type{Particle}, to\type{Particle})}
             \operation{add(particle\type{Particle})}
             \operation{remove(particle\type{Particle})}
@@ -41,12 +37,11 @@
 
     \begin{scope}[shift={($(VisitableCells.south) + (-7 cm, -3 cm)$)}, opacity=1]
         \begin{abstractclass}[text width=\mediumTextWidth]{VisitableList}{0, 0}
-            \operation{construct(periodicBox\type{PeriodicBox},
-                                    positions\type{ParticlesPositions})}
+            \operation{construct(periodicBox\type{PeriodicBox})}
             \operation{destroy()}
             \operation{set(iTarger\type{int}, particle\type{Particle})}
-            \operation{visit(particle\type{Particle}, pairPotential\type{PairPotential},
-                             overlap\type{bool}, energy\type{double})}
+            \operation{visit(overlap\type{bool}, energy\type{double}, particle\type{Particle},
+                pairPotential\type{PairPotential})}
             \operation{add(particle\type{Particle})}
             \operation{remove(iParticle\type{int})}
         \end{abstractclass}
@@ -58,7 +53,7 @@
                 potentialExpression\type{PotentialExpression})}
             \operation{destroy()}
             \operation{getMaxDistance()}
-            \operation{meet(distance\type{double}, overlap\type{bool}, energy\type{double})}
+            \operation{meet(overlap\type{bool}, energy\type{double}, distance\type{double})}
         \end{abstractclass}
     \end{scope}
 

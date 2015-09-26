@@ -24,6 +24,16 @@ private
         procedure :: remove => Abstract_Visitable_List_remove
     end type Abstract_Visitable_List
 
+    type, extends(Abstract_Visitable_List), public :: Null_Visitable_List
+    contains
+        procedure :: construct => Null_Visitable_List_construct
+        procedure :: destroy => Null_Visitable_List_destroy
+        procedure :: set => Null_Visitable_List_set
+        procedure :: visit => Null_Visitable_List_visit
+        procedure :: add => Null_Visitable_List_add
+        procedure :: remove => Null_Visitable_List_remove
+    end type Null_Visitable_List
+
     type, extends(Abstract_Visitable_List), public :: Concrete_Visitable_List
 
     end type Concrete_Visitable_List
@@ -93,12 +103,12 @@ contains
         end do
     end subroutine Abstract_Visitable_List_set
 
-    subroutine Abstract_Visitable_List_visit(this, particle, pair_potential, overlap, energy)
+    subroutine Abstract_Visitable_List_visit(this, overlap, energy, particle, pair_potential)
         class(Abstract_Visitable_List), intent(in) :: this
-        type(Concrete_Particle), intent(in) :: particle
-        class(Abstract_Pair_Potential), intent(in) :: pair_potential
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
+        type(Concrete_Particle), intent(in) :: particle
+        class(Abstract_Pair_Potential), intent(in) :: pair_potential
 
         type(Concrete_Linkable_Node), pointer :: current => null(), next => null()
         real(DP) :: energy_i, distance
@@ -159,6 +169,45 @@ contains
 
 !end implementation Abstract_Visitable_List
 
+!implementation Null_Visitable_List
+
+    subroutine Null_Visitable_List_construct(this, periodic_box)
+        class(Null_Visitable_List), intent(out) :: this
+        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+    end subroutine Null_Visitable_List_construct
+
+    subroutine Null_Visitable_List_destroy(this)
+        class(Null_Visitable_List), intent(inout) :: this
+    end subroutine Null_Visitable_List_destroy
+
+    subroutine Null_Visitable_List_set(this, i_target, particle)
+        class(Null_Visitable_List), intent(inout) :: this
+        integer, intent(in) :: i_target
+        type(Concrete_Particle), intent(in) :: particle
+    end subroutine Null_Visitable_List_set
+
+    subroutine Null_Visitable_List_visit(this, overlap, energy, particle, pair_potential)
+        class(Null_Visitable_List), intent(in) :: this
+        logical, intent(out) :: overlap
+        real(DP), intent(out) :: energy
+        type(Concrete_Particle), intent(in) :: particle
+        class(Abstract_Pair_Potential), intent(in) :: pair_potential
+        overlap = .false.
+        energy = 0._DP
+    end subroutine Null_Visitable_List_visit
+
+    subroutine Null_Visitable_List_add(this, particle)
+        class(Null_Visitable_List), intent(inout) :: this
+        type(Concrete_Particle), intent(in) :: particle
+    end subroutine Null_Visitable_List_add
+
+    subroutine Null_Visitable_List_remove(this, i_particle)
+        class(Null_Visitable_List), intent(inout) :: this
+        integer, intent(in) :: i_particle
+    end subroutine Null_Visitable_List_remove
+
+!end implementation Null_Visitable_List
+
 !implementation Concrete_Visitable_Array
 
     subroutine Concrete_Visitable_Array_construct(this, periodic_box)
@@ -195,12 +244,12 @@ contains
         end do
     end subroutine Concrete_Visitable_Array_set
 
-    subroutine Concrete_Visitable_Array_visit(this, particle, pair_potential, overlap, energy)
+    subroutine Concrete_Visitable_Array_visit(this, overlap, energy, particle, pair_potential)
         class(Concrete_Visitable_Array), intent(in) :: this
-        type(Concrete_Particle), intent(in) :: particle
-        class(Abstract_Pair_Potential), intent(in) :: pair_potential
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
+        type(Concrete_Particle), intent(in) :: particle
+        class(Abstract_Pair_Potential), intent(in) :: pair_potential
 
         real(DP) :: energy_i, distance
         integer :: i_node

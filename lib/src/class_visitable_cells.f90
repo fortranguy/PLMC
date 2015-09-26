@@ -33,7 +33,6 @@ private
     contains
         procedure :: construct => Abstract_Visitable_Cells_construct
         procedure :: destroy => Abstract_Visitable_Cells_destroy
-        procedure :: fill => Abstract_Visitable_Cells_fill
         procedure :: visit => Abstract_Visitable_Cells_visit
         procedure :: move => Abstract_Visitable_Cells_move
         procedure :: add => Abstract_Visitable_Cells_add
@@ -48,6 +47,7 @@ private
         procedure, private :: index => Abstract_Visitable_Cells_index
         procedure(Abstract_Visitable_Cells_set_skip_layers), private, deferred :: set_skip_layers
         procedure, private :: skip_local => Abstract_Visitable_Cells_skip_local
+        procedure, private :: fill => Abstract_Visitable_Cells_fill
     end type Abstract_Visitable_Cells
 
     abstract interface
@@ -63,6 +63,19 @@ private
         end subroutine Abstract_Visitable_Cells_set_skip_layers
 
     end interface
+
+    type, extends(Abstract_Visitable_Cells), public :: Null_Visitable_Cells
+    contains
+        procedure :: construct => Null_Visitable_Cells_construct
+        procedure :: destroy => Null_Visitable_Cells_destroy
+        procedure :: visit => Null_Visitable_Cells_visit
+        procedure :: move => Null_Visitable_Cells_move
+        procedure :: add => Null_Visitable_Cells_add
+        procedure :: remove => Null_Visitable_Cells_remove
+        procedure, private :: check_nums => Null_Visitable_Cells_check_nums
+        procedure, private :: set_skip_layers => Null_Visitable_Cells_set_skip_layers
+        procedure, private :: fill => Null_Visitable_Cells_fill
+    end type Null_Visitable_Cells
 
     type, extends(Abstract_Visitable_Cells), public :: XYZ_PBC_Visitable_Cells
     contains
@@ -110,6 +123,7 @@ contains
                                     this%global_lbounds(2):this%global_ubounds(2), &
                                     this%global_lbounds(3):this%global_ubounds(3)))
         call this%set_neighbours()
+        call this%fill()
     end subroutine Abstract_Visitable_Cells_construct
 
     subroutine Abstract_Visitable_Cells_set_nums(this)
@@ -230,11 +244,11 @@ contains
         if (allocated(this%visitable_lists)) deallocate(this%visitable_lists)
     end subroutine Abstract_Visitable_Cells_destroy
 
-    subroutine Abstract_Visitable_Cells_visit(this, particle, overlap, energy)
+    subroutine Abstract_Visitable_Cells_visit(this, overlap, energy, particle)
         class(Abstract_Visitable_Cells), intent(in) :: this
-        type(Concrete_Particle), intent(in) :: particle
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
+        type(Concrete_Particle), intent(in) :: particle
 
         real(DP) :: energy_i
         integer, dimension(num_dimensions) :: i_cell, i_local_cell
@@ -252,7 +266,7 @@ contains
             i_local_cell = this%neighbours(:, local_i1, local_i2, local_i3, &
                 i_cell(1), i_cell(2), i_cell(3))
             call this%visitable_lists(i_local_cell(1), i_local_cell(2), &
-                i_local_cell(3))%visit(particle, this%pair_potential, overlap, energy_i)
+                i_local_cell(3))%visit(overlap, energy_i, particle, this%pair_potential)
             if (overlap) return
             energy = energy + energy_i
         end do
@@ -313,6 +327,59 @@ contains
     end function Abstract_Visitable_Cells_index
 
 !end implementation Abstract_Visitable_Cells
+
+!implementation Null_Visitable_Cells
+
+    subroutine Null_Visitable_Cells_construct(this, mold, periodic_box, positions, &
+            pair_potential)
+        class(Null_Visitable_Cells), intent(out) :: this
+        class(Abstract_Visitable_List), intent(in) :: mold
+        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+        class(Abstract_Particles_Positions), target, intent(in) :: positions
+        class(Abstract_Pair_Potential), target, intent(in) :: pair_potential
+    end subroutine Null_Visitable_Cells_construct
+
+    subroutine Null_Visitable_Cells_fill(this)
+        class(Null_Visitable_Cells), intent(inout) :: this
+    end subroutine Null_Visitable_Cells_fill
+
+    subroutine Null_Visitable_Cells_destroy(this)
+        class(Null_Visitable_Cells), intent(inout) :: this
+    end subroutine Null_Visitable_Cells_destroy
+
+    subroutine Null_Visitable_Cells_visit(this, overlap, energy, particle)
+        class(Null_Visitable_Cells), intent(in) :: this
+        logical, intent(out) :: overlap
+        real(DP), intent(out) :: energy
+        type(Concrete_Particle), intent(in) :: particle
+        overlap = .false.
+        energy = 0._DP
+    end subroutine Null_Visitable_Cells_visit
+
+    subroutine Null_Visitable_Cells_move(this, from, to)
+        class(Null_Visitable_Cells), intent(inout) :: this
+        type(Concrete_Particle), intent(in) :: from, to
+    end subroutine Null_Visitable_Cells_move
+
+    subroutine Null_Visitable_Cells_add(this, particle)
+        class(Null_Visitable_Cells), intent(inout) :: this
+        type(Concrete_Particle), intent(in) :: particle
+    end subroutine Null_Visitable_Cells_add
+
+    subroutine Null_Visitable_Cells_remove(this, particle)
+        class(Null_Visitable_Cells), intent(inout) :: this
+        type(Concrete_Particle), intent(in) :: particle
+    end subroutine Null_Visitable_Cells_remove
+
+    subroutine Null_Visitable_Cells_check_nums(this)
+        class(Null_Visitable_Cells), intent(in) :: this
+    end subroutine Null_Visitable_Cells_check_nums
+
+    pure subroutine Null_Visitable_Cells_set_skip_layers(this)
+        class(Null_Visitable_Cells), intent(inout) :: this
+    end subroutine Null_Visitable_Cells_set_skip_layers
+
+!end implementation Null_Visitable_Cells
 
 !implementation XYZ_PBC_Visitable_Cells
 

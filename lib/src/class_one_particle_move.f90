@@ -81,17 +81,17 @@ contains
         new%position = this%moved_positions%get(new%i)
         success = .false.
         if (this%actor_particles%number%get() > this%spectator_particles%number%get()) then
-            call this%actor_visitable_cells%visit(new, overlap, new_energy%intra)
+            call this%actor_visitable_cells%visit(overlap, new_energy%intra, new)
             if (overlap) return !Where?
-            call this%inter_visitable_cells%visit(new, overlap, new_energy%inter)
+            call this%inter_visitable_cells%visit(overlap, new_energy%inter, new)
         else
-            call this%inter_visitable_cells%visit(new, overlap, new_energy%inter)
+            call this%inter_visitable_cells%visit(overlap, new_energy%inter, new)
             if (overlap) return !Where?
-            call this%actor_visitable_cells%visit(new, overlap, new_energy%intra)
+            call this%actor_visitable_cells%visit(overlap, new_energy%intra, new)
         end if
         if (overlap) return !Where?
-        call this%actor_visitable_cells%visit(old, overlap, old_energy%intra)
-        call this%inter_visitable_cells%visit(old, overlap, old_energy%inter)
+        call this%actor_visitable_cells%visit(overlap, old_energy%intra, old)
+        call this%inter_visitable_cells%visit(overlap, old_energy%inter, old)
 
         energy_difference = new_energy - old_energy
         energy_difference_sum = particle_energy_sum(energy_difference)
