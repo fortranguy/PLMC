@@ -92,13 +92,12 @@ contains
         volume = product(this%size)
     end function Abstract_Parallelepiped_Domain_get_volume
 
-    pure function Abstract_Parallelepiped_Domain_get_vertices(this, i_vertex, j_vertex, k_vertex) &
-        result(vertices)
+    pure function Abstract_Parallelepiped_Domain_get_vertices(this, i_vertex) result(vertices)
         real(DP) :: vertices(num_dimensions)
         class(Abstract_Parallelepiped_Domain), intent(in) :: this
-        integer, intent(in) :: i_vertex, j_vertex, k_vertex
+        integer, intent(in) :: i_vertex(num_dimensions)
 
-        vertices = this%origin + this%size * (real([i_vertex, j_vertex, k_vertex], DP) - 1.5_DP)
+        vertices = this%origin + this%size * (real(i_vertex, DP) - 1.5_DP)
     end function Abstract_Parallelepiped_Domain_get_vertices
 
     pure function Abstract_Parallelepiped_Domain_is_inside(this, position) result(is_inside)
@@ -140,11 +139,10 @@ contains
         volume = 0._DP
     end function Null_Parallelepiped_Domain_get_volume
 
-    pure function Null_Parallelepiped_Domain_get_vertices(this, i_vertex, j_vertex, k_vertex) &
-        result(vertices)
+    pure function Null_Parallelepiped_Domain_get_vertices(this, i_vertex) result(vertices)
         real(DP) :: vertices(num_dimensions)
         class(Null_Parallelepiped_Domain), intent(in) :: this
-        integer, intent(in) :: i_vertex, j_vertex, k_vertex
+        integer, intent(in) :: i_vertex(num_dimensions)
         vertices = 0._DP
     end function Null_Parallelepiped_Domain_get_vertices
 

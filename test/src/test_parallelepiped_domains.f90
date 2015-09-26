@@ -21,7 +21,7 @@ contains
             do j_vertex = 1, 2
                 do i_vertex = 1, 2
                     parallelepiped_domains_overlap = &
-                        domain_2%is_inside(domain_1%get_vertices(i_vertex, j_vertex, k_vertex))
+                        domain_2%is_inside(domain_1%get_vertices([i_vertex, j_vertex, k_vertex]))
                     if (parallelepiped_domains_overlap) return
                 end do
             end do
@@ -40,7 +40,7 @@ contains
             do j_vertex = 1, 2
                 do i_vertex = 1, 2
                     write(vertices_unit, *) &
-                        parallelepiped_domain%get_vertices(i_vertex, j_vertex, k_vertex)
+                        parallelepiped_domain%get_vertices([i_vertex, j_vertex, k_vertex])
                 end do
                 write(vertices_unit, *)
             end do
