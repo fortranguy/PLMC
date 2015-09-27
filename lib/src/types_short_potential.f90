@@ -18,4 +18,21 @@ private
         class(Abstract_Visitable_Cells), allocatable :: cells
     end type Short_Potential_Wrapper
 
+    type, public :: Short_Potential_Macro_Wrapper
+        class(Abstract_Particles_Potential), allocatable :: particles
+        class(Abstract_Visitable_List), allocatable :: list
+        class(Abstract_Visitable_Cells), allocatable :: cells
+    end type Short_Potential_Macro_Wrapper
+
+    type, public :: Short_Potential_Micro_Wrapper
+        class(Abstract_Potential_Expression), allocatable :: expression
+        class(Abstract_Pair_Potential), allocatable :: pair
+    end type Short_Potential_Micro_Wrapper
+
+    type, public :: Mixture_Short_Potentials_Wrapper
+        type(Short_Potential_Wrapper) :: intras(2)
+        type(Short_Potential_Macro_Wrapper) :: inter_macros(2)
+        type(Short_Potential_Micro_Wrapper) :: inter_micro
+    end type Mixture_Short_Potentials_Wrapper
+
 end module types_short_potential

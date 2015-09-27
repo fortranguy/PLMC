@@ -26,12 +26,12 @@ implicit none
         periodic_box)
     call particles_factory_create(mixture%components(2), input_data, "Mixture.Component 2.", &
         periodic_box)
-    call particles_factory_create(mixture%inter_diameters, mixture%components(1)%diameter, &
+    call particles_factory_create(mixture%inter_diameter, mixture%components(1)%diameter, &
         mixture%components(2)%diameter, input_data, "Mixture.Inter 12.")
-    write(*, *) "inter diameter", mixture%inter_diameters%get()
-    write(*, *) "minimum inter diameter", mixture%inter_diameters%get_min()
+    write(*, *) "inter diameter", mixture%inter_diameter%get()
+    write(*, *) "minimum inter diameter", mixture%inter_diameter%get_min()
 
-    call particles_factory_destroy(mixture%inter_diameters)
+    call particles_factory_destroy(mixture%inter_diameter)
     call particles_factory_destroy(mixture%components(2))
     call particles_factory_destroy(mixture%components(1))
     call box_factory_destroy(periodic_box)

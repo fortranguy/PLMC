@@ -26,7 +26,7 @@ private
 
     type, public :: Mixture_Wrapper
         type(Particles_Wrapper) :: components(2)
-        class(Abstract_Particles_Diameter), allocatable :: inter_diameters
+        class(Abstract_Particles_Diameter), allocatable :: inter_diameter
     end type Mixture_Wrapper
 
 end module types_particles
