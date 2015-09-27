@@ -29,10 +29,10 @@ use procedures_types_selectors, only: particles_exist, particles_have_positions,
 implicit none
 
 private
-public :: particles_factory_create, particles_factory_set, particles_factory_destroy
+public :: particles_factory_create_mixture, particles_factory_destroy_mixture, &
+    particles_factory_create, particles_factory_set, particles_factory_destroy
 
 interface particles_factory_create
-    module procedure :: particles_factory_create_mixture
     module procedure :: particles_factory_create_all
     module procedure :: allocate_and_set_number
     module procedure :: allocate_and_set_diameter
@@ -60,7 +60,6 @@ interface particles_factory_destroy
     module procedure :: deallocate_diameter
     module procedure :: deallocate_number
     module procedure :: particles_factory_destroy_all
-    module procedure :: particles_factory_destroy_mixture
 end interface particles_factory_destroy
 
 contains
@@ -72,11 +71,11 @@ contains
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
 
         call particles_factory_create_all(mixture%components(1), input_data, &
-            prefix//".Component 1", periodic_box)
+            prefix//"Component 1", periodic_box)
         call particles_factory_create_all(mixture%components(2), input_data, &
-            prefix//".Component 2", periodic_box)
+            prefix//"Component 2", periodic_box)
         call particles_factory_create(mixture%inter_diameters, mixture%components(1)%diameter, &
-            mixture%components(2)%diameter, input_data, prefix//".Inter 12")
+            mixture%components(2)%diameter, input_data, prefix//"Inter 12")
     end subroutine particles_factory_create_mixture
 
     subroutine particles_factory_create_all(particles, input_data, prefix, periodic_box)
@@ -108,7 +107,7 @@ contains
         integer :: num_particles
 
         if (particles_exist(input_data, prefix)) then
-            data_field = prefix//".number"
+            data_field = prefix//"number"
             call input_data%get(data_field, num_particles, data_found)
             call test_data_found(data_field, data_found)
             allocate(Concrete_Particles_Number :: particles_number)
@@ -129,10 +128,10 @@ contains
         real(DP) :: diameter, diameter_min_factor
 
         if (particles_exist(input_data, prefix)) then
-            data_field = prefix//".diameter"
+            data_field = prefix//"diameter"
             call input_data%get(data_field, diameter, data_found)
             call test_data_found(data_field, data_found)
-            data_field = prefix//".minimum diameter factor"
+            data_field = prefix//"minimum diameter factor"
             call input_data%get(data_field, diameter_min_factor, data_found)
             call test_data_found(data_field, data_found)
             allocate(Concrete_Particles_Diameter :: particles_diameter)
@@ -156,10 +155,10 @@ contains
         real(DP) :: inter_diameter_offset
 
         if (particles_exist(particles_diameter_1) .and. particles_exist(particles_diameter_2)) then
-            data_field = prefix//".offset"
+            data_field = prefix//"offset"
             call input_data%get(data_field, inter_diameter_offset, data_found)
             call test_data_found(data_field, data_found)
-            data_field = prefix//".minimum diameter factor"
+            data_field = prefix//"minimum diameter factor"
             call input_data%get(data_field, inter_diameter_min_factor, data_found)
             call test_data_found(data_field, data_found)
             allocate(Concrete_Particles_Diameter :: inter_particles_diameter)
@@ -182,7 +181,7 @@ contains
         real(DP) :: moment_norm
 
         if (particles_are_dipolar(input_data, prefix)) then
-            data_field = prefix//".moment norm"
+            data_field = prefix//"moment norm"
             call input_data%get(data_field, moment_norm, data_found)
             call test_data_found(data_field, data_found)
             allocate(Concrete_Particles_Moment_Norm :: particles_moment_norm)
@@ -232,7 +231,7 @@ contains
         integer :: i_particle
 
         if (.not. particles_have_positions(particles_positions)) return
-        data_field = prefix//".initial positions"
+        data_field = prefix//"initial positions"
         call input_data%get(data_field, filename, data_found)
         call test_data_found(data_field, data_found)
         call read_coordinates(file_positions, filename)
@@ -258,7 +257,7 @@ contains
         integer :: i_particle
 
         if (.not. particles_have_orientations(particles_orientations)) return
-        data_field = prefix//".initial orientations"
+        data_field = prefix//"initial orientations"
         call input_data%get(data_field, filename, data_found)
         call test_data_found(data_field, data_found)
         call read_coordinates(file_orientations, filename)
@@ -312,10 +311,10 @@ contains
         real(DP) :: density, excess
 
         if (particles_can_exchange(input_data, prefix)) then
-            data_field = prefix//".Chemical Potential.density"
+            data_field = prefix//"Chemical Potential.density"
             call input_data%get(data_field, density, data_found)
             call test_data_found(data_field, data_found)
-            data_field = prefix//".Chemical Potential.excess"
+            data_field = prefix//"Chemical Potential.excess"
             call input_data%get(data_field, excess, data_found)
             call test_data_found(data_field, data_found)
             allocate(Concrete_Particles_Chemical_Potential :: particles_chemical_potential)

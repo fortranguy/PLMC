@@ -70,7 +70,7 @@ contains
         call box_factory_create(box%periodic_box, input_data, prefix)
         call box_factory_create(box%temperature, input_data, prefix)
         call box_factory_create(box%field_expression, input_data, prefix)
-        call box_factory_create(box%parallelepiped_domain, input_data, prefix//".External Field", &
+        call box_factory_create(box%parallelepiped_domain, input_data, prefix//"External Field.", &
             box%periodic_box)
         call box_factory_create(box%external_field, input_data, prefix, &
             box%parallelepiped_domain, box%field_expression)
@@ -78,9 +78,9 @@ contains
             box%periodic_box)
         call box_factory_create(box%floor_penetration, input_data, prefix)
         call box_factory_create(box%wall_diameter, input_data, prefix)
-        call short_potential_factory_create(box%wall_expression, input_data, prefix//".Walls", &
+        call short_potential_factory_create(box%wall_expression, input_data, prefix//"Walls.", &
             box%wall_diameter)
-        call short_potential_factory_create(box%wall_pair, input_data, prefix//".Walls", &
+        call short_potential_factory_create(box%wall_pair, input_data, prefix//"Walls.", &
             box%wall_diameter, box%wall_expression)
         call box_factory_create(box%walls_potential, input_data, prefix, box%periodic_box, &
             box%floor_penetration, box%wall_pair)
@@ -96,7 +96,7 @@ contains
         character(len=:), allocatable :: box_periodicity
         real(DP), allocatable :: box_size(:)
 
-        data_field = prefix//".Periodic Box.periodicity"
+        data_field = prefix//"periodicity"
         call input_data%get(data_field, box_periodicity, data_found)
         call test_data_found(data_field, data_found)
         select case (box_periodicity)
@@ -108,7 +108,7 @@ contains
                 call error_exit(data_field//" unknown. Choose between: 'XYZ' and 'XY'")
         end select
         deallocate(box_periodicity)
-        data_field = prefix//".Periodic Box.size"
+        data_field = prefix//"size"
         call input_data%get(data_field, box_size, data_found)
         call test_data_found(data_field, data_found)
         deallocate(data_field)
@@ -124,7 +124,7 @@ contains
         logical :: data_found
         real(DP) :: temperature_value
 
-        data_field = prefix//".Temperature"
+        data_field = prefix//"temperature"
         call input_data%get(data_field, temperature_value, data_found)
         call test_data_found(data_field, data_found)
         allocate(Concrete_Temperature :: temperature)
@@ -150,7 +150,7 @@ contains
         logical :: data_found
 
         if (apply_external_field(input_data, prefix)) then
-            data_field = prefix//".External Field.name"
+            data_field = prefix//"External Field.name"
             call input_data%get(data_field, field_name, data_found)
             call test_data_found(data_field, data_found)
             select case (field_name)
@@ -179,7 +179,7 @@ contains
             type is (Null_Field_Expression)
                 call field_expression%set()
             type is (Constant_Field_Expression)
-                data_field = prefix//".External Field.vector"
+                data_field = prefix//"External Field.vector"
                 call input_data%get(data_field, field_vector, data_found)
                 call test_data_found(data_field, data_found)
                 call field_expression%set(field_vector)
@@ -200,15 +200,15 @@ contains
         character(len=:), allocatable :: domain_name
         real(DP), allocatable :: domain_origin(:), domain_size(:)
 
-        data_field = prefix//".Parallelepiped Domain.name"
+        data_field = prefix//"Parallelepiped Domain.name"
         call input_data%get(data_field, domain_name, data_found)
         call test_data_found(data_field, data_found)
         select case(domain_name)
             case ("domain")
-                data_field = prefix//".Parallelepiped Domain.origin"
+                data_field = prefix//"Parallelepiped Domain.origin"
                 call input_data%get(data_field, domain_origin, data_found)
                 call test_data_found(data_field, data_found)
-                data_field = prefix//".Parallelepiped Domain.size"
+                data_field = prefix//"Parallelepiped Domain.size"
                 call input_data%get(data_field, domain_size, data_found)
                 call test_data_found(data_field, data_found)
                 allocate(Concrete_Parallelepiped_Domain :: parallelepiped_domain)
@@ -251,7 +251,7 @@ contains
         character(len=:), allocatable :: data_field
         logical :: data_found
 
-        data_field = prefix//".External Field.apply"
+        data_field = prefix//"External Field.apply"
         call input_data%get(data_field, apply_external_field, data_found)
         call test_data_found(data_field, data_found)
         deallocate(data_field)
@@ -269,7 +269,7 @@ contains
         integer, allocatable :: numbers(:)
 
         if (use_reciprocal_lattice(input_data, prefix)) then
-            data_field = prefix//".Reciprocal Lattice.numbers"
+            data_field = prefix//"Reciprocal Lattice.numbers"
             call input_data%get(data_field, numbers, data_found)
             call test_data_found(data_field, data_found)
             deallocate(data_field)
@@ -289,7 +289,7 @@ contains
         character(len=:), allocatable :: data_field
         logical :: data_found
 
-        data_field = prefix//".Reciprocal Lattice.use"
+        data_field = prefix//"Reciprocal Lattice.use"
         call input_data%get(data_field, use_reciprocal_lattice, data_found)
         call test_data_found(data_field, data_found)
         deallocate(data_field)
@@ -305,7 +305,7 @@ contains
         character(len=:), allocatable :: walls_name
 
         if (use_walls(input_data, prefix)) then
-            data_field = prefix//".Walls.name"
+            data_field = prefix//"Walls.name"
             call input_data%get(data_field, walls_name, data_found)
             call test_data_found(data_field, data_found)
             select case(walls_name)
@@ -329,10 +329,10 @@ contains
         real(DP) :: diameter, diameter_min_factor
 
         if (use_walls(input_data, prefix)) then
-            data_field = prefix//".Walls.diameter"
+            data_field = prefix//"Walls.diameter"
             call input_data%get(data_field, diameter, data_found)
             call test_data_found(data_field, data_found)
-            data_field = prefix//".Walls.minimum diameter factor"
+            data_field = prefix//"Walls.minimum diameter factor"
             call input_data%get(data_field, diameter_min_factor, data_found)
             call test_data_found(data_field, data_found)
             allocate(Concrete_Particles_Diameter :: wall_diameter)
@@ -357,7 +357,7 @@ contains
 
         if (use_walls(input_data, prefix)) then
             allocate(Concrete_Walls_Potential :: walls_potential)
-            data_field = prefix//".Walls.gap"
+            data_field = prefix//"Walls.gap"
             call input_data%get(data_field, gap, data_found)
             call test_data_found(data_field, data_found)
         else
@@ -374,7 +374,7 @@ contains
         character(len=:), allocatable :: data_field
         logical :: data_found
 
-        data_field = prefix//".Walls.use"
+        data_field = prefix//"Walls.use"
         call input_data%get(data_field, use_walls, data_found)
         call test_data_found(data_field, data_found)
         deallocate(data_field)

@@ -90,7 +90,7 @@ contains
         logical :: data_found
 
         if (particles_exist(particles_diameter)) then
-            data_field = prefix//".Potential.name"
+            data_field = prefix//"name"
             call input_data%get(data_field, potential_name, data_found)
             call test_data_found(data_field, data_found)
             select case(potential_name)
@@ -122,10 +122,10 @@ contains
             type is (Null_Potential_Expression)
                 call potential_expression%set()
             type is (Lennard_Jones_Expression)
-                data_field = prefix//".Potential.epsilon"
+                data_field = prefix//"epsilon"
                 call input_data%get(data_field, LJ_epsilon, data_found)
                 call test_data_found(data_field, data_found)
-                data_field = prefix//".Potential.sigma"
+                data_field = prefix//"sigma"
                 call input_data%get(data_field, LJ_sigma, data_found)
                 call test_data_found(data_field, data_found)
                 call potential_expression%set(LJ_epsilon, LJ_sigma)
@@ -158,7 +158,7 @@ contains
         logical :: data_found, tabulated_potential
 
         if (particles_exist(particles_diameter)) then
-            data_field = prefix//".Potential.tabulated"
+            data_field = prefix//"tabulated"
             call input_data%get(data_field, tabulated_potential, data_found)
             call test_data_found(data_field, data_found)
             if(tabulated_potential) then
@@ -186,12 +186,12 @@ contains
 
         if (particles_exist(particles_diameter)) then
             domain%min = particles_diameter%get_min()
-            data_field = prefix//".Potential.maximum distance"
+            data_field = prefix//"maximum distance"
             call input_data%get(data_field, domain%max, data_found)
             call test_data_found(data_field, data_found)
             select type (pair_potential)
                 type is (Tabulated_Pair_Potential)
-                    data_field = prefix//".Potential.delta distance"
+                    data_field = prefix//"delta distance"
                     call input_data%get(data_field, domain%delta, data_found)
                     call test_data_found(data_field, data_found)
             end select
@@ -224,7 +224,7 @@ contains
         logical :: data_found
 
         if (particles_have_positions(particles_positions)) then
-            data_field = prefix//".Potential.Cells.data structure"
+            data_field = prefix//"Cells.data structure"
             call input_data%get(data_field, cells_data_structure, data_found)
             call test_data_found(data_field, data_found)
             select case(cells_data_structure)

@@ -57,7 +57,7 @@ implicit none
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename, data_field
     logical :: found
-    real(DP), allocatable :: box_size(:), delta(:)
+    real(DP), allocatable :: delta(:)
     integer :: field_unit
 
     call json_initialize()
@@ -77,6 +77,7 @@ implicit none
     call external_field%construct(parallelepiped_domain, field_expression)
     open(newunit=field_unit, recl=4096, file="external_field.out", action="write")
     call write_field(field_unit, periodic_box, external_field, delta)
+    deallocate(delta)
     close(field_unit)
 
     call external_field%destroy()

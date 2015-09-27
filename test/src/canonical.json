@@ -1,0 +1,80 @@
+{
+    "Box": {
+        "periodicity": "XYZ",
+        "size": [10.0, 10.0, 10.0],
+        "temperature": 1.0,
+        "External Field": {
+            "apply": false,
+            "Parallelepiped Domain": {
+                "name": "null"
+            }
+        },
+        "Reciprocal Lattice": {
+            "use": false
+        },
+        "Walls": {
+            "use": false
+        }
+    },
+    "Mixture": {
+        "Component 1": {
+            "exist": true,
+            "dipolar": false,
+            "exchange": false,
+            "number": 100,
+            "diameter": 1.0,
+            "minimum diameter factor": 1.0,
+            "initial positions": "positions.in"
+        },
+        "Component 2": {
+            "exist": true,
+            "dipolar": false,
+            "exchange": false,
+            "number": 100,
+            "diameter": 1.0,
+            "minimum diameter factor": 0.8,
+            "initial positions": "positions.in"
+        },
+        "Inter 12": {
+            "offset": 0.2,
+            "minimum diameter factor": 1.0
+        }
+    },
+    "Changes": {
+        "Component 1": {
+            "Small Move": {
+                "delta": [0.3, 0.3, 0.3],
+                "increase factor": 1.01,
+                "maximum increase factor": 1.05
+            }
+        },
+        "Component 2": {
+            "Small Move": {
+                "delta": [0.3, 0.3, 0.3],
+                "increase factor": 1.01,
+                "maximum increase factor": 1.05
+            }
+        }
+    },
+    "Short Potential": {
+        "Component 1": {
+            "name": "null",
+            "tabulated": false,
+            "maximum distance": 1.0,
+            "Cells": {
+                "data structure": "list"
+            }
+        },
+        "Component 2": {
+            "name": "LJ",
+            "tabulated": true,
+            "delta distance": 1.0e-5,
+            "epsilon": 1.0,
+            "sigma": 1.0,
+            "maximum distance": 2.5,
+            "Cells": {
+                "data structure": "array"
+            }
+        }
+    }
+}

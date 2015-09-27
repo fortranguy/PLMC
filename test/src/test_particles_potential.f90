@@ -43,17 +43,15 @@ implicit none
     call input_data%load_file(filename = data_filename)
     deallocate(data_filename)
 
-    call box_factory_create(periodic_box, input_data, "Test Particles Potential")
-    call particles_factory_create(particles_number, input_data, &
-        "Test Particles Potential.Particles")
-    call particles_factory_create(particles_diameter, input_data, &
-        "Test Particles Potential.Particles")
+    call box_factory_create(periodic_box, input_data, "Box.")
+    call particles_factory_create(particles_number, input_data, "Particles.")
+    call particles_factory_create(particles_diameter, input_data, "Particles.")
     call particles_factory_create(particles_positions, periodic_box, particles_number)
-    call particles_factory_set(particles_positions, input_data, "Test Particles Potential.Particles")
+    call particles_factory_set(particles_positions, input_data, "Particles.")
     call short_potential_factory_create(potential_expression, input_data, &
-        "Test Particles Potential.Particles", particles_diameter)
+        "Particles.Potential.", particles_diameter)
     call short_potential_factory_create(pair_potential, input_data, &
-        "Test Particles Potential.Particles", particles_diameter, potential_expression)
+        "Particles.Potential.", particles_diameter, potential_expression)
     call short_potential_factory_create(particles_potential, periodic_box, particles_positions, &
         pair_potential)
 

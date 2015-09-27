@@ -90,13 +90,13 @@ contains
 
         select type (moved_positions)
             type is (Concrete_Moved_Positions)
-                data_field = prefix//".Small Move.delta"
+                data_field = prefix//"Small Move.delta"
                 call input_data%get(data_field, moved_delta, data_found)
                 call test_data_found(data_field, data_found)
-                data_field = prefix//".Small Move.increase factor"
+                data_field = prefix//"Small Move.increase factor"
                 call input_data%get(data_field, adaptation_parameters%increase_factor, data_found)
                 call test_data_found(data_field, data_found)
-                data_field = prefix//".Small Move.maximum increase factor"
+                data_field = prefix//"Small Move.maximum increase factor"
                 call input_data%get(data_field, adaptation_parameters%increase_factor_max, &
                     data_found)
                 call test_data_found(data_field, data_found)
@@ -143,13 +143,13 @@ contains
 
         select type (rotated_orientations)
             type is (Concrete_Rotated_Orientations)
-                data_field = prefix//".Small Rotation.delta"
+                data_field = prefix//"Small Rotation.delta"
                 call input_data%get(data_field, moved_delta, data_found)
                 call test_data_found(data_field, data_found)
-                data_field = prefix//".Small Rotation.increase factor"
+                data_field = prefix//"Small Rotation.increase factor"
                 call input_data%get(data_field, adaptation_parameters%increase_factor, data_found)
                 call test_data_found(data_field, data_found)
-                data_field = prefix//".Small Rotation.maximum increase factor"
+                data_field = prefix//"Small Rotation.maximum increase factor"
                 call input_data%get(data_field, adaptation_parameters%increase_factor_max, &
                     data_found)
                 call test_data_found(data_field, data_found)
