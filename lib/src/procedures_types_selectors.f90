@@ -104,7 +104,7 @@ contains
         logical :: data_found
 
         if (particles_exist_from_json(input_data, prefix)) then
-            data_field = prefix//"dipolar"
+            data_field = prefix//"are dipolar"
             call input_data%get(data_field, particles_are_dipolar, data_found)
             call test_data_found(data_field, data_found)
             deallocate(data_field)
@@ -154,7 +154,7 @@ contains
         logical :: data_found
 
         if (particles_exist_from_json(input_data, prefix)) then
-            data_field = prefix//"exchange"
+            data_field = prefix//"can exchange"
             call input_data%get(data_field, particles_can_exchange, data_found)
             call test_data_found(data_field, data_found)
             deallocate(data_field)

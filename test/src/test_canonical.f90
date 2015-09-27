@@ -32,10 +32,10 @@ implicit none
     deallocate(data_filename)
 
     call box_factory_create(box, input_data, "Box.")
-    call particles_factory_create(mixture%components(1), input_data, &
-        "Mixture.Component 1.", box%periodic_box)
-    call particles_factory_create(mixture%components(2), input_data, &
-        "Mixture.Component 2.", box%periodic_box)
+    call particles_factory_create(mixture%components(1), input_data, "Mixture.Component 1.", &
+        box%periodic_box)
+    call particles_factory_create(mixture%components(2), input_data, "Mixture.Component 2.", &
+        box%periodic_box)
     call particles_factory_create(mixture%inter_diameters, mixture%components(1)%diameter, &
         mixture%components(2)%diameter, input_data, "Mixture.Inter 12.")
     call changes_factory_create(changes_1, input_data, "Changes.Component 1.", &
@@ -52,6 +52,7 @@ implicit none
     call short_potential_factory_destroy(short_potential_2)
     call changes_factory_destroy(changes_1)
     call changes_factory_destroy(changes_2)
+    call particles_factory_destroy(mixture%inter_diameters)
     call particles_factory_destroy(mixture%components(2))
     call particles_factory_destroy(mixture%components(1))
     call box_factory_destroy(box)

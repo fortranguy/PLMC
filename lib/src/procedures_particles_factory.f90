@@ -29,8 +29,7 @@ use procedures_types_selectors, only: particles_exist, particles_have_positions,
 implicit none
 
 private
-public :: particles_factory_create_mixture, particles_factory_destroy_mixture, &
-    particles_factory_create, particles_factory_set, particles_factory_destroy
+public :: particles_factory_create, particles_factory_set, particles_factory_destroy
 
 interface particles_factory_create
     module procedure :: particles_factory_create_all
@@ -63,20 +62,6 @@ interface particles_factory_destroy
 end interface particles_factory_destroy
 
 contains
-
-    subroutine particles_factory_create_mixture(mixture, input_data, prefix, periodic_box)
-        type(Mixture_Wrapper), intent(out) :: mixture
-        type(json_file), target, intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
-
-        call particles_factory_create_all(mixture%components(1), input_data, &
-            prefix//"Component 1", periodic_box)
-        call particles_factory_create_all(mixture%components(2), input_data, &
-            prefix//"Component 2", periodic_box)
-        call particles_factory_create(mixture%inter_diameters, mixture%components(1)%diameter, &
-            mixture%components(2)%diameter, input_data, prefix//"Inter 12")
-    end subroutine particles_factory_create_mixture
 
     subroutine particles_factory_create_all(particles, input_data, prefix, periodic_box)
         type(Particles_Wrapper), intent(out) :: particles
@@ -324,14 +309,6 @@ contains
         end if
         call particles_chemical_potential%set(density, excess)
     end subroutine allocate_and_set_chemical_potential
-
-    subroutine particles_factory_destroy_mixture(mixture)
-        type(Mixture_Wrapper), intent(inout) :: mixture
-
-        if (allocated(mixture%inter_diameters)) deallocate(mixture%inter_diameters)
-        call particles_factory_destroy_all(mixture%components(2))
-        call particles_factory_destroy_all(mixture%components(1))
-    end subroutine particles_factory_destroy_mixture
 
     subroutine particles_factory_destroy_all(particles)
         type(Particles_Wrapper), intent(inout) :: particles

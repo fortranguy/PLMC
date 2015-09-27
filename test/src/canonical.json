@@ -19,8 +19,8 @@
     "Mixture": {
         "Component 1": {
             "exist": true,
-            "dipolar": false,
-            "exchange": false,
+            "are dipolar": false,
+            "can exchange": false,
             "number": 100,
             "diameter": 1.0,
             "minimum diameter factor": 1.0,
@@ -28,8 +28,8 @@
         },
         "Component 2": {
             "exist": true,
-            "dipolar": false,
-            "exchange": false,
+            "are dipolar": false,
+            "can exchange": false,
             "number": 100,
             "diameter": 1.0,
             "minimum diameter factor": 0.8,

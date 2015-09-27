@@ -1,16 +1,14 @@
 {
     "Box": {
-        "Periodic Box": {
         "periodicity": "XYZ",
         "size": [10.0, 10.0, 10.0]
-        }
     },
     "Mixture": {
         "Component 1": {
             "exist": true,
             "are dipolar": false,
             "can exchange": false,
-            "number": 10,
+            "number": 100,
             "diameter": 1.0,
             "minimum diameter factor": 0.8,
             "initial positions": "positions.in"
@@ -19,7 +17,7 @@
             "exist": true,
             "are dipolar": false,
             "can exchange": false,
-            "number": 10,
+            "number": 100,
             "diameter": 1.0,
             "minimum diameter factor": 0.8,
             "initial positions": "positions.in"
