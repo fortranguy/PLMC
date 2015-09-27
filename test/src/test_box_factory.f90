@@ -19,7 +19,7 @@ implicit none
     call input_data%load_file(filename = data_filename)
     deallocate(data_filename)
 
-    call box_factory_create(box, input_data, "System")
+    call box_factory_create(box, input_data, "Box.")
     write(output_unit, *) "box size", box%periodic_box%get_size()
     write(output_unit, *) "temperature", box%temperature%get()
     write(output_unit, *) "external field at origin", box%external_field%get([0._DP, 0._DP, 0._DP])

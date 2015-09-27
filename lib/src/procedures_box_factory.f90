@@ -29,6 +29,7 @@ use procedures_short_potential_factory, only: short_potential_factory_create, &
 use class_walls_potential, only: Abstract_Walls_Potential, &
     Concrete_Walls_Potential, Null_Walls_Potential
 use types_box, only: Box_Wrapper
+use procedures_types_selectors, only: apply_external_field, use_reciprocal_lattice, use_walls
 
 implicit none
 
@@ -78,9 +79,9 @@ contains
             box%periodic_box)
         call box_factory_create(box%floor_penetration, input_data, prefix)
         call box_factory_create(box%wall_diameter, input_data, prefix)
-        call short_potential_factory_create(box%wall_expression, input_data, prefix//"Walls.", &
-            box%wall_diameter)
-        call short_potential_factory_create(box%wall_pair, input_data, prefix//"Walls.", &
+        call short_potential_factory_create(box%wall_expression, input_data, &
+            prefix//"Walls.Potential.", box%wall_diameter)
+        call short_potential_factory_create(box%wall_pair, input_data, prefix//"Walls.Potential.", &
             box%wall_diameter, box%wall_expression)
         call box_factory_create(box%walls_potential, input_data, prefix, box%periodic_box, &
             box%floor_penetration, box%wall_pair)
@@ -243,20 +244,6 @@ contains
         call external_field%construct(parallelepiped_domain, field_expression)
     end subroutine allocate_and_construct_external_field
 
-    function apply_external_field(input_data, prefix)
-        logical :: apply_external_field
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
-
-        character(len=:), allocatable :: data_field
-        logical :: data_found
-
-        data_field = prefix//"External Field.apply"
-        call input_data%get(data_field, apply_external_field, data_found)
-        call test_data_found(data_field, data_found)
-        deallocate(data_field)
-    end function apply_external_field
-
     subroutine allocate_and_construct_reciprocal_lattice(reciprocal_lattice, input_data, prefix, &
         periodic_box)
         class(Abstract_Reciprocal_Lattice), allocatable, intent(out) :: reciprocal_lattice
@@ -280,20 +267,6 @@ contains
         call reciprocal_lattice%construct(periodic_box, numbers)
         if (allocated(numbers)) deallocate(numbers)
     end subroutine allocate_and_construct_reciprocal_lattice
-
-    function use_reciprocal_lattice(input_data, prefix)
-        logical :: use_reciprocal_lattice
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
-
-        character(len=:), allocatable :: data_field
-        logical :: data_found
-
-        data_field = prefix//"Reciprocal Lattice.use"
-        call input_data%get(data_field, use_reciprocal_lattice, data_found)
-        call test_data_found(data_field, data_found)
-        deallocate(data_field)
-    end function use_reciprocal_lattice
 
     subroutine allocate_and_set_floor_penetration(floor_penetration, input_data, prefix)
         class(Abstract_Floor_Penetration), allocatable, intent(out) :: floor_penetration
@@ -365,20 +338,6 @@ contains
         end if
         call walls_potential%construct(periodic_box, gap, floor_penetration, wall_pair)
     end subroutine allocate_and_construct_walls_potential
-
-    function use_walls(input_data, prefix)
-        logical :: use_walls
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
-
-        character(len=:), allocatable :: data_field
-        logical :: data_found
-
-        data_field = prefix//"Walls.use"
-        call input_data%get(data_field, use_walls, data_found)
-        call test_data_found(data_field, data_found)
-        deallocate(data_field)
-    end function use_walls
 
     subroutine box_factory_destroy_all(box)
         type(Box_Wrapper), intent(inout) :: box

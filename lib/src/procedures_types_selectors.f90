@@ -16,8 +16,21 @@ use class_particles_exchange, only: Abstract_Particles_Exchange, Null_Particles_
 implicit none
 
 private
-public :: particles_exist, particles_have_positions, particles_are_dipolar, &
+public :: apply_external_field, use_reciprocal_lattice, use_walls, &
+    particles_exist, particles_have_positions, particles_are_dipolar, &
     particles_have_orientations, particles_can_exchange
+
+interface apply_external_field
+    module procedure :: apply_external_field_from_json
+end interface apply_external_field
+
+interface use_reciprocal_lattice
+    module procedure :: use_reciprocal_lattice_from_json
+end interface use_reciprocal_lattice
+
+interface use_walls
+    module procedure :: use_walls_from_json
+end interface use_walls
 
 interface particles_exist
     module procedure :: particles_exist_from_json
@@ -37,6 +50,45 @@ interface particles_can_exchange
 end interface particles_can_exchange
 
 contains
+
+    logical function apply_external_field_from_json(input_data, prefix) result(apply_external_field)
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
+
+        character(len=:), allocatable :: data_field
+        logical :: data_found
+
+        data_field = prefix//"External Field.apply"
+        call input_data%get(data_field, apply_external_field, data_found)
+        call test_data_found(data_field, data_found)
+        deallocate(data_field)
+    end function apply_external_field_from_json
+
+    logical function use_reciprocal_lattice_from_json(input_data, prefix) result(use_reciprocal_lattice)
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
+
+        character(len=:), allocatable :: data_field
+        logical :: data_found
+
+        data_field = prefix//"Reciprocal Lattice.use"
+        call input_data%get(data_field, use_reciprocal_lattice, data_found)
+        call test_data_found(data_field, data_found)
+        deallocate(data_field)
+    end function use_reciprocal_lattice_from_json
+
+    logical function use_walls_from_json(input_data, prefix) result(use_walls)
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
+
+        character(len=:), allocatable :: data_field
+        logical :: data_found
+
+        data_field = prefix//"Walls.use"
+        call input_data%get(data_field, use_walls, data_found)
+        call test_data_found(data_field, data_found)
+        deallocate(data_field)
+    end function use_walls_from_json
 
     logical function particles_exist_from_json(input_data, prefix) result(particles_exist)
         type(json_file), intent(inout) :: input_data

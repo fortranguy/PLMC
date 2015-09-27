@@ -1,10 +1,8 @@
 {
-    "System": {
-        "Periodic Box": {
-            "periodicity": "XYZ",
-            "size": [10.0, 10.0, 10.0]
-        },
-        "Temperature": 1.0,
+    "Box": {
+        "periodicity": "XYZ",
+        "size": [10.0, 10.0, 10.0],
+        "temperature": 1.0,
         "Walls": {
             "use": true,
             "name": "flat",
