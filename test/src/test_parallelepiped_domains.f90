@@ -7,26 +7,9 @@ use class_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
 implicit none
 
 private
-public :: print_vertices, parallelepiped_domains_overlap
+public :: print_vertices
 
 contains
-
-    pure logical function parallelepiped_domains_overlap(domain_1, domain_2)
-        class(Abstract_Parallelepiped_Domain), intent(in) :: domain_1, domain_2
-
-        integer :: i_vertex, j_vertex, k_vertex
-
-        parallelepiped_domains_overlap = .false.
-        do k_vertex = 1, 2
-            do j_vertex = 1, 2
-                do i_vertex = 1, 2
-                    parallelepiped_domains_overlap = &
-                        domain_2%is_inside(domain_1%get_vertices([i_vertex, j_vertex, k_vertex]))
-                    if (parallelepiped_domains_overlap) return
-                end do
-            end do
-        end do
-    end function parallelepiped_domains_overlap
 
     subroutine print_vertices(parallelepiped_domain, domain_name)
         class(Abstract_Parallelepiped_Domain), intent(in) :: parallelepiped_domain
@@ -59,7 +42,7 @@ use module_data, only: test_file_exists
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
 use procedures_box_factory, only: box_factory_create, box_factory_destroy
-use procedures_parallelepiped_domains_print, only: print_vertices, parallelepiped_domains_overlap
+use procedures_parallelepiped_domains_print, only: print_vertices
 
 implicit none
 
@@ -88,9 +71,9 @@ implicit none
     call print_vertices(parallelepiped_domain_1, "domain_1")
     call print_vertices(parallelepiped_domain_2, "domain_2")
     write(output_unit, *) "Domains 1-2 overlap:", &
-        parallelepiped_domains_overlap(parallelepiped_domain_1, parallelepiped_domain_2)
+        parallelepiped_domain_1%overlap(parallelepiped_domain_2)
     write(output_unit, *) "Domains 2-1 overlap:", &
-        parallelepiped_domains_overlap(parallelepiped_domain_2, parallelepiped_domain_1)
+        parallelepiped_domain_2%overlap(parallelepiped_domain_1)
 
     call box_factory_destroy(parallelepiped_domain_2)
     call box_factory_destroy(parallelepiped_domain_1)

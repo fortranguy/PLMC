@@ -6,7 +6,7 @@ use module_data, only: test_file_exists
 use class_periodic_box, only: Abstract_Periodic_Box
 use procedures_box_factory, only: box_factory_create, box_factory_destroy
 use types_particles, only: Mixture_Wrapper
-use procedures_particles_factory, only: mixture_factory_create, mixture_factory_destroy
+use procedures_particles_factory, only: particles_factory_create, particles_factory_destroy
 implicit none
 
     class(Abstract_Periodic_Box), allocatable :: periodic_box
@@ -22,11 +22,11 @@ implicit none
     deallocate(data_filename)
 
     call box_factory_create(periodic_box, input_data, "Box")
-    call mixture_factory_create(mixture, input_data, "Mixture", periodic_box)
+    call particles_factory_create(mixture, input_data, "Mixture", periodic_box)
     write(*, *) "inter diameter", mixture%inter_diameters%get()
     write(*, *) "minimum inter diameter", mixture%inter_diameters%get_min()
 
-    call mixture_factory_destroy(mixture)
+    call particles_factory_destroy(mixture)
     call box_factory_destroy(periodic_box)
     call input_data%destroy()
 

@@ -22,6 +22,7 @@ private
         procedure :: get_volume => Abstract_Parallelepiped_Domain_get_volume
         procedure :: get_vertices => Abstract_Parallelepiped_Domain_get_vertices
         procedure :: is_inside => Abstract_Parallelepiped_Domain_is_inside
+        procedure :: overlap => Abstract_Parallelepiped_Domain_overlap
         procedure :: random_position => Abstract_Parallelepiped_Domain_random_position
     end type Abstract_Parallelepiped_Domain
 
@@ -36,6 +37,7 @@ private
         procedure :: get_volume => Null_Parallelepiped_Domain_get_volume
         procedure :: get_vertices => Null_Parallelepiped_Domain_get_vertices
         procedure :: is_inside => Null_Parallelepiped_Domain_is_inside
+        procedure :: overlap => Null_Parallelepiped_Domain_overlap
         procedure :: random_position => Null_Parallelepiped_Domain_random_position
     end type Null_Parallelepiped_Domain
 
@@ -65,9 +67,8 @@ contains
         end if
     end subroutine Abstract_Parallelepiped_Domain_construct
 
-    pure function Abstract_Parallelepiped_Domain_is_boxed(this) result(is_boxed)
+    pure logical function Abstract_Parallelepiped_Domain_is_boxed(this) result(is_boxed)
         class(Abstract_Parallelepiped_Domain), intent(in) :: this
-        logical :: is_boxed
 
         real(DP), dimension(num_dimensions) :: box_origin, corner_minus, corner_plus
 
@@ -85,9 +86,8 @@ contains
         this%periodic_box => null()
     end subroutine Abstract_Parallelepiped_Domain_destroy
 
-    pure function Abstract_Parallelepiped_Domain_get_volume(this) result(volume)
+    pure real(DP) function Abstract_Parallelepiped_Domain_get_volume(this) result(volume)
         class(Abstract_Parallelepiped_Domain), intent(in) :: this
-        real(DP) :: volume
 
         volume = product(this%size)
     end function Abstract_Parallelepiped_Domain_get_volume
@@ -100,13 +100,33 @@ contains
         vertices = this%origin + this%size * (real(i_vertex, DP) - 1.5_DP)
     end function Abstract_Parallelepiped_Domain_get_vertices
 
-    pure function Abstract_Parallelepiped_Domain_is_inside(this, position) result(is_inside)
+    pure logical function Abstract_Parallelepiped_Domain_is_inside(this, position) result(is_inside)
         class(Abstract_Parallelepiped_Domain), intent(in) :: this
         real(DP), intent(in) :: position(:)
-        logical :: is_inside
 
         is_inside = point_is_inside(this%origin, this%size, position)
     end function Abstract_Parallelepiped_Domain_is_inside
+
+    pure logical function Abstract_Parallelepiped_Domain_overlap(this, other) result(overlap)
+        class(Abstract_Parallelepiped_Domain), intent(in) :: this, other
+
+        logical :: this_vertex_in_other, other_vertex_in_this
+        integer :: i_vertex, j_vertex, k_vertex
+
+        overlap = .false.
+        do k_vertex = 1, 2
+            do j_vertex = 1, 2
+                do i_vertex = 1, 2
+                    this_vertex_in_other = &
+                        other%is_inside(this%get_vertices([i_vertex, j_vertex, k_vertex]))
+                    other_vertex_in_this = &
+                        this%is_inside(other%get_vertices([i_vertex, j_vertex, k_vertex]))
+                    overlap = this_vertex_in_other .or. other_vertex_in_this
+                    if (overlap) return
+                end do
+            end do
+        end do
+    end function Abstract_Parallelepiped_Domain_overlap
 
     function Abstract_Parallelepiped_Domain_random_position(this) &
         result(random_position)
@@ -152,6 +172,12 @@ contains
         logical :: is_inside
         is_inside = .false.
     end function Null_Parallelepiped_Domain_is_inside
+
+    pure logical function Null_Parallelepiped_Domain_overlap(this, other) result(overlap)
+        class(Null_Parallelepiped_Domain), intent(in) :: this
+        class(Abstract_Parallelepiped_Domain), intent(in) :: other
+        overlap = .false.
+    end function Null_Parallelepiped_Domain_overlap
 
     function Null_Parallelepiped_Domain_random_position(this) &
         result(random_position)

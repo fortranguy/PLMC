@@ -27,7 +27,7 @@
         \end{comment}
     \end{scope}
     
-    \begin{scope}[shift={($(PeriodicBox.north) + (-11 cm, 5 cm)$)}, opacity=1]
+    \begin{scope}[shift={($(PeriodicBox.north) + (-11 cm, 6.5 cm)$)}, opacity=1]
         \begin{abstractclass}[text width=\mediumTextWidth]{ParallelepipedDomain}{0, 0}
             \operation{construct(periodicBox\type{PeriodicBox}, origin\type{double[3]},
                                     size\type{double[3]})}
@@ -35,6 +35,7 @@
             \operation{getVolume()}
             \operation{getVertices(iVertex\type{int[3]})\type{double[3]}}
             \operation{isInside(position\type{double[3]})\type{bool}}
+            \operation{overlap(parallelepipedDomain\type{ParallelepipedDomain})}
             \operation{randomPosition()\type{double[3]}}
         \end{abstractclass}
     \end{scope}

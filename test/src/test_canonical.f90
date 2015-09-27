@@ -6,7 +6,8 @@ use module_data, only: test_file_exists, test_data_found
 use types_box, only: Box_Wrapper
 use procedures_box_factory, only: box_factory_create, box_factory_destroy
 use types_particles, only: Mixture_Wrapper
-use procedures_particles_factory, only: mixture_factory_create, mixture_factory_destroy
+use procedures_particles_factory, only: particles_factory_create, &
+    particles_factory_set, particles_factory_destroy
 use types_changes, only: Changes_Wrapper
 use procedures_changes_factory, only: changes_factory_create, changes_factory_destroy
 use types_short_potential, only: Short_Potential_Wrapper
@@ -24,9 +25,6 @@ implicit none
 
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename, prefix
-    logical :: data_found
-    real(DP), allocatable :: box_size(:)
-    logical :: dipolar
 
     call json_initialize()
     data_filename = "canonical.json"
@@ -36,8 +34,11 @@ implicit none
     prefix = "Test Canonical"
 
     call box_factory_create(box, input_data, prefix)
+    call particles_factory_create(mixture, input_data, prefix, box%periodic_box)
 
+    call particles_factory_destroy(mixture)
     call box_factory_destroy(box)
+
     deallocate(prefix)
     deallocate(data_filename)
     call input_data%destroy()

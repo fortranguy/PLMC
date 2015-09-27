@@ -1,4 +1,4 @@
-\begin{scope}[shift={($(Material.north) + (42 cm, 55 cm)$)}]
+\begin{scope}[shift={($(Particles.north) + (42 cm, 55 cm)$)}]
     \begin{package}{Dipolar interactions}
     
         \begin{scope}[local bounding box=DipolarInteraction]
@@ -223,16 +223,16 @@
 
     \aggregation{DipolarInteraction}{box}{1}{PeriodicBox}
 
-    \aggregation{EwaldReal}{dipSpheres}{1}{DipolarSpheres}
+    %\aggregation{EwaldReal}{dipSpheres}{1}{DipolarSpheres}
 
-    \aggregation{EwaldReci}{dipSpheres}{1}{DipolarSpheres}
+    %\aggregation{EwaldReci}{dipSpheres}{1}{DipolarSpheres}
 
-    \aggregation{DipolarLayerCorrection}{dipSpheres}{1}{DipolarSpheres}
+    %\aggregation{DipolarLayerCorrection}{dipSpheres}{1}{DipolarSpheres}
 
-    \aggregation{EwaldSelf}{dipSpheres}{1}{DipolarSpheres}
+    %\aggregation{EwaldSelf}{dipSpheres}{1}{DipolarSpheres}
 
-    \aggregation{EwaldBound}{totalMoment}{1}{TotalMoment}
+    \aggregation{EwaldBound}{totalMoment}{1}{ParticlesTotalMoment}
 
-    \aggregation{FieldInteraction}{totalMoment}{1}{TotalMoment}
+    \aggregation{FieldInteraction}{totalMoment}{1}{ParticlesTotalMoment}
     \aggregation{FieldInteraction}{extField}{1}{ExternalField}
 \end{scope}[on background layer]

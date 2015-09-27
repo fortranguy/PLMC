@@ -129,6 +129,8 @@ contains
     subroutine Abstract_Visitable_Cells_set_nums(this)
         class(Abstract_Visitable_Cells), intent(inout) :: this
 
+        call check_positive("Abstract_Visitable_Cells", "this%pair_potential%get_max_distance()", &
+            this%pair_potential%get_max_distance())
         this%nums = floor(this%periodic_box%get_size()/this%pair_potential%get_max_distance())
         call check_positive("Abstract_Visitable_Cells", "this%nums", this%nums)
         call this%check_nums()
