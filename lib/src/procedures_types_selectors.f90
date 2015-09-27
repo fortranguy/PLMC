@@ -55,52 +55,29 @@ contains
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        character(len=:), allocatable :: data_field
-        logical :: data_found
-
-        data_field = prefix//"External Field.apply"
-        call input_data%get(data_field, apply_external_field, data_found)
-        call test_data_found(data_field, data_found)
-        deallocate(data_field)
+        apply_external_field = logical_from_json(input_data, prefix//"External Field.apply")
     end function apply_external_field_from_json
 
-    logical function use_reciprocal_lattice_from_json(input_data, prefix) result(use_reciprocal_lattice)
+    logical function use_reciprocal_lattice_from_json(input_data, prefix) &
+        result(use_reciprocal_lattice)
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        character(len=:), allocatable :: data_field
-        logical :: data_found
-
-        data_field = prefix//"Reciprocal Lattice.use"
-        call input_data%get(data_field, use_reciprocal_lattice, data_found)
-        call test_data_found(data_field, data_found)
-        deallocate(data_field)
+        use_reciprocal_lattice = logical_from_json(input_data, prefix//"Reciprocal Lattice.use")
     end function use_reciprocal_lattice_from_json
 
     logical function use_walls_from_json(input_data, prefix) result(use_walls)
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        character(len=:), allocatable :: data_field
-        logical :: data_found
-
-        data_field = prefix//"Walls.use"
-        call input_data%get(data_field, use_walls, data_found)
-        call test_data_found(data_field, data_found)
-        deallocate(data_field)
+        use_walls = logical_from_json(input_data, prefix//"Walls.use")
     end function use_walls_from_json
 
     logical function particles_exist_from_json(input_data, prefix) result(particles_exist)
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        character(len=:), allocatable :: data_field
-        logical :: data_found
-
-        data_field = prefix//"exist"
-        call input_data%get(data_field, particles_exist, data_found)
-        call test_data_found(data_field, data_found)
-        deallocate(data_field)
+        particles_exist = logical_from_json(input_data, prefix//"exist")
     end function particles_exist_from_json
 
     pure logical function particles_exist_from_number(particles_number) result(particles_exist)
@@ -152,17 +129,8 @@ contains
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        character(len=:), allocatable :: data_field
-        logical :: data_found
-
-        if (particles_exist_from_json(input_data, prefix)) then
-            data_field = prefix//"are dipolar"
-            call input_data%get(data_field, particles_are_dipolar, data_found)
-            call test_data_found(data_field, data_found)
-            deallocate(data_field)
-        else
-            particles_are_dipolar = .false.
-        end if
+        particles_are_dipolar = particles_exist(input_data, prefix) .and. &
+            logical_from_json(input_data, prefix//"are dipolar")
     end function particles_are_dipolar_from_json
 
     pure logical function particles_have_orientations(particles_orientations)
@@ -202,17 +170,8 @@ contains
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        character(len=:), allocatable :: data_field
-        logical :: data_found
-
-        if (particles_exist_from_json(input_data, prefix)) then
-            data_field = prefix//"can exchange"
-            call input_data%get(data_field, particles_can_exchange, data_found)
-            call test_data_found(data_field, data_found)
-            deallocate(data_field)
-        else
-            particles_can_exchange = .false.
-        end if
+        particles_can_exchange = particles_exist(input_data, prefix) .and. &
+            logical_from_json(input_data, prefix//"can exchange")
     end function particles_can_exchange_from_json
 
     pure logical function particles_can_exchange_from_chemical_potential(&
@@ -226,5 +185,15 @@ contains
                 particles_can_exchange = .true.
         end select
     end function particles_can_exchange_from_chemical_potential
+
+    logical function logical_from_json(input_data, switch_name)
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: switch_name
+
+        logical :: data_found
+
+        call input_data%get(switch_name, logical_from_json, data_found)
+        call test_data_found(switch_name, data_found)
+    end function logical_from_json
 
 end module procedures_types_selectors
