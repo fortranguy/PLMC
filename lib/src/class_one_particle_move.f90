@@ -3,7 +3,7 @@ module class_one_particle_move
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use class_temperature, only: Abstract_Temperature
 use types_particle, only: Concrete_Particle
-use types_particles, only: Particles_Wrapper
+use class_particles_positions, only: Abstract_Particles_Positions
 use class_moved_positions, only: Abstract_Moved_Positions
 use class_visitable_cells, only: Abstract_Visitable_Cells
 use module_particle_energy, only: Concrete_Particle_Energy, &
@@ -17,8 +17,8 @@ private
     type, abstract, public :: Abstract_One_Particle_Move
     private
         class(Abstract_Temperature), pointer :: temperature
-        type(Particles_Wrapper), pointer :: actor_particles, spectator_particles
-        class(Abstract_Moved_Positions), pointer :: moved_positions
+        class(Abstract_Particles_Positions), pointer :: actor_positions, spectator_positions
+        class(Abstract_Moved_Positions), pointer :: actor_moved_positions
         class(Abstract_Visitable_Cells), pointer :: actor_visitable_cells, inter_visitable_cells
     contains
         procedure :: construct => Abstract_One_Particle_Move_construct
@@ -43,24 +43,25 @@ contains
         this%temperature => null()
     end subroutine Abstract_One_Particle_Move_destroy
 
-    subroutine Abstract_One_Particle_Move_set_actor(this, particles, moved_positions, &
-            visitable_cells)
+    subroutine Abstract_One_Particle_Move_set_actor(this, actor_positions, actor_moved_positions, &
+            actor_visitable_cells)
         class(Abstract_One_Particle_Move), intent(inout) :: this
-        type(Particles_Wrapper), target, intent(in) :: particles
-        class(Abstract_Moved_Positions), target, intent(in) :: moved_positions
-        class(Abstract_Visitable_Cells), target, intent(in) :: visitable_cells
+        class(Abstract_Particles_Positions), target, intent(in) :: actor_positions
+        class(Abstract_Moved_Positions), target, intent(in) :: actor_moved_positions
+        class(Abstract_Visitable_Cells), target, intent(in) :: actor_visitable_cells
 
-        this%actor_particles => particles
-        this%moved_positions => moved_positions
-        this%actor_visitable_cells => visitable_cells
+        this%actor_positions => actor_positions
+        this%actor_moved_positions => actor_moved_positions
+        this%actor_visitable_cells => actor_visitable_cells
     end subroutine Abstract_One_Particle_Move_set_actor
 
-    subroutine Abstract_One_Particle_Move_set_spectator(this, particles, inter_visitable_cells)
+    subroutine Abstract_One_Particle_Move_set_spectator(this, spectator_positions, &
+        inter_visitable_cells)
         class(Abstract_One_Particle_Move), intent(inout) :: this
-        type(Particles_Wrapper), target, intent(in) :: particles
+        class(Abstract_Particles_Positions), target, intent(in) :: spectator_positions
         class(Abstract_Visitable_Cells), target, intent(in) :: inter_visitable_cells
 
-        this%spectator_particles => particles
+        this%spectator_positions => spectator_positions
         this%inter_visitable_cells => inter_visitable_cells
     end subroutine Abstract_One_Particle_Move_set_spectator
 
@@ -75,12 +76,12 @@ contains
         logical :: overlap
         real(DP) :: rand
 
-        old%i = random_integer(this%actor_particles%number%get())
-        old%position = this%actor_particles%positions%get(old%i)
+        old%i = random_integer(this%actor_positions%get_num())
+        old%position = this%actor_positions%get(old%i)
         new%i = old%i
-        new%position = this%moved_positions%get(new%i)
+        new%position = this%actor_moved_positions%get(new%i)
         success = .false.
-        if (this%actor_particles%number%get() > this%spectator_particles%number%get()) then
+        if (this%actor_positions%get_num() > this%spectator_positions%get_num()) then
             call this%actor_visitable_cells%visit(overlap, new_energy%intra, new)
             if (overlap) return !Where?
             call this%inter_visitable_cells%visit(overlap, new_energy%inter, new)
@@ -97,7 +98,7 @@ contains
         energy_difference_sum = particle_energy_sum(energy_difference)
         call random_number(rand)
         if (rand < exp(-energy_difference_sum/this%temperature%get())) then
-            call this%actor_particles%positions%set(new%i, new%position)
+            call this%actor_positions%set(new%i, new%position)
             call this%actor_visitable_cells%move(old, new)
             call this%inter_visitable_cells%move(old, new)
             success = .true.
