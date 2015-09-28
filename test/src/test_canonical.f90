@@ -1,3 +1,17 @@
+module types_canonical
+
+use, intrinsic :: iso_fortran_env, only: DP => REAL64
+
+implicit none
+
+    type, public :: Concrete_Particles_Observables
+        integer :: num_move_hits = 0
+        integer :: num_move_rejection = 0
+        real(DP) :: energy_step = 0._DP
+    end type Concrete_Particles_Observables
+
+end module types_canonical
+
 program test_canonical
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
@@ -12,7 +26,9 @@ use procedures_changes_factory, only: changes_factory_create, changes_factory_de
 use types_short_potential, only: Mixture_Short_Potentials_Wrapper
 use procedures_short_potential_factory, only: short_potential_factory_create, &
     short_potential_factory_destroy
-use class_one_particle_move, only: Abstract_One_Particle_Move
+use class_one_particle_move, only: Abstract_One_Particle_Move, &
+    Two_Candidates_One_Particle_Move
+use types_canonical, only: Concrete_Particles_Observables
 
 implicit none
 
@@ -21,6 +37,8 @@ implicit none
     type(Changes_Wrapper) :: changes_1, changes_2
     type(Mixture_Short_Potentials_Wrapper) :: mixture_short_potentials
     class(Abstract_One_Particle_Move), allocatable :: one_particle_move
+    type(Concrete_Particles_Observables) :: observable_1, observable_2
+    logical :: move_success
 
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename
@@ -55,7 +73,18 @@ implicit none
         mixture_short_potentials%inter_micro, input_data, "Short Potentials.Inter 12.", &
         box%periodic_box, mixture%components(2)%positions)
     call input_data%destroy()
+    allocate(Two_Candidates_One_Particle_Move :: one_particle_move)
+    call one_particle_move%construct(box%temperature)
+    call one_particle_move%set_first_candidate(mixture%components(1)%positions, &
+        changes_1%moved_positions, mixture_short_potentials%intras(1)%cells, &
+        mixture_short_potentials%inter_macros(1)%cells)
+    call one_particle_move%set_second_candidate(mixture%components(2)%positions, &
+        changes_2%moved_positions, mixture_short_potentials%intras(2)%cells, &
+        mixture_short_potentials%inter_macros(2)%cells)
 
+    !call one_particle_move%try(move_success, )
+
+    deallocate(one_particle_move)
     call short_potential_factory_destroy(mixture_short_potentials%inter_macros(2))
     call short_potential_factory_destroy(mixture_short_potentials%inter_macros(1))
     call short_potential_factory_destroy(mixture_short_potentials%inter_micro)

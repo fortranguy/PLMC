@@ -14,11 +14,6 @@ public :: data_filename, data_post_filename, report_filename, report_post_filena
     character(len=*), parameter :: report_filename = "report.json"
     character(len=*), parameter :: report_post_filename = "report_post.json"
 
-    type, public :: Concrete_Input_Data
-        type(json_file) :: json
-        character(len=:), allocatable :: prefix
-    end type Concrete_Input_Data
-
 contains
 
     subroutine test_file_exists(filename)

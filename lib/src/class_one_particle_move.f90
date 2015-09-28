@@ -2,6 +2,7 @@ module class_one_particle_move
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use class_temperature, only: Abstract_Temperature
+use procedures_errors, only: error_exit
 use types_particle, only: Concrete_Particle
 use class_particles_positions, only: Abstract_Particles_Positions
 use class_moved_positions, only: Abstract_Moved_Positions
@@ -14,21 +15,52 @@ implicit none
 
 private
 
+    type :: Move_Candidate
+        class(Abstract_Particles_Positions), pointer :: positions
+        class(Abstract_Moved_Positions), pointer :: moved
+        class(Abstract_Visitable_Cells), pointer :: intra_cells, inter_cells
+    end type Move_Candidate
+
     type, abstract, public :: Abstract_One_Particle_Move
     private
         class(Abstract_Temperature), pointer :: temperature
-        class(Abstract_Particles_Positions), pointer :: actor_positions, spectator_positions
-        class(Abstract_Moved_Positions), pointer :: actor_moved_positions
-        class(Abstract_Visitable_Cells), pointer :: actor_visitable_cells, inter_visitable_cells
+        type(Move_Candidate) :: candidates(2)
     contains
         procedure :: construct => Abstract_One_Particle_Move_construct
+        procedure :: set_first_candidate => Abstract_One_Particle_Move_set_first_candidate
+        procedure :: set_second_candidate => Abstract_One_Particle_Move_set_second_candidate
         procedure :: destroy => Abstract_One_Particle_Move_destroy
-        procedure :: set_actor => Abstract_One_Particle_Move_set_actor
-        procedure :: set_spectator => Abstract_One_Particle_Move_set_spectator
         procedure :: try => Abstract_One_Particle_Move_try
+        procedure, private :: test_metropolis => Abstract_One_Particle_Move_test_metropolis
+        procedure, private :: nullify_candidate => Abstract_One_Particle_Move_nullify_candidate
+        procedure, private :: select_actor_and_spectator => &
+            Abstract_One_Particle_Move_select_actor_and_spectator
+        procedure, private :: set_actor => Abstract_One_Particle_Move_set_actor
+        procedure, private :: set_spectator => Abstract_One_Particle_Move_set_spectator
     end type Abstract_One_Particle_Move
 
+    type, extends(Abstract_One_Particle_Move), public :: Null_One_Particle_Move
+    contains
+        procedure :: construct => Null_One_Particle_Move_construct
+        procedure :: set_first_candidate => Null_One_Particle_Move_set_first_candidate
+        procedure :: set_second_candidate => Null_One_Particle_Move_set_second_candidate
+        procedure :: destroy => Null_One_Particle_Move_destroy
+        procedure :: try => Null_One_Particle_Move_try
+    end type Null_One_Particle_Move
+
+    type, extends(Abstract_One_Particle_Move), public :: Two_Candidates_One_Particle_Move
+
+    end type Two_Candidates_One_Particle_Move
+
+    type, extends(Abstract_One_Particle_Move), public :: First_Candidate_One_Particle_Move
+    contains
+        procedure, private :: select_actor_and_spectator => &
+            First_Candidate_One_Particle_Move_select_actor_and_spectator
+    end type First_Candidate_One_Particle_Move
+
 contains
+
+!implementation Abstract_One_Particle_Move
 
     subroutine Abstract_One_Particle_Move_construct(this, temperature)
         class(Abstract_One_Particle_Move), intent(out) :: this
@@ -40,69 +72,190 @@ contains
     subroutine Abstract_One_Particle_Move_destroy(this)
         class(Abstract_One_Particle_Move), intent(inout) :: this
 
+        call this%nullify_candidate(2)
+        call this%nullify_candidate(1)
         this%temperature => null()
     end subroutine Abstract_One_Particle_Move_destroy
 
-    subroutine Abstract_One_Particle_Move_set_actor(this, actor_positions, actor_moved_positions, &
-            actor_visitable_cells)
+    subroutine Abstract_One_Particle_Move_nullify_candidate(this, i_canditate)
         class(Abstract_One_Particle_Move), intent(inout) :: this
-        class(Abstract_Particles_Positions), target, intent(in) :: actor_positions
-        class(Abstract_Moved_Positions), target, intent(in) :: actor_moved_positions
-        class(Abstract_Visitable_Cells), target, intent(in) :: actor_visitable_cells
+        integer, intent(in) :: i_canditate
 
-        this%actor_positions => actor_positions
-        this%actor_moved_positions => actor_moved_positions
-        this%actor_visitable_cells => actor_visitable_cells
-    end subroutine Abstract_One_Particle_Move_set_actor
+        this%candidates(i_canditate)%inter_cells => null()
+        this%candidates(i_canditate)%intra_cells => null()
+        this%candidates(i_canditate)%moved => null()
+        this%candidates(i_canditate)%positions => null()
+    end subroutine Abstract_One_Particle_Move_nullify_candidate
 
-    subroutine Abstract_One_Particle_Move_set_spectator(this, spectator_positions, &
-        inter_visitable_cells)
+    subroutine Abstract_One_Particle_Move_set_first_candidate(this, positions, moved, intra_cells, &
+        inter_cells)
         class(Abstract_One_Particle_Move), intent(inout) :: this
-        class(Abstract_Particles_Positions), target, intent(in) :: spectator_positions
-        class(Abstract_Visitable_Cells), target, intent(in) :: inter_visitable_cells
+        class(Abstract_Particles_Positions), target, intent(in) :: positions
+        class(Abstract_Moved_Positions), target, intent(in) :: moved
+        class(Abstract_Visitable_Cells), target, intent(in) :: intra_cells, inter_cells
 
-        this%spectator_positions => spectator_positions
-        this%inter_visitable_cells => inter_visitable_cells
-    end subroutine Abstract_One_Particle_Move_set_spectator
+        this%candidates(1)%positions => positions
+        this%candidates(1)%moved => moved
+        this%candidates(1)%intra_cells => intra_cells
+        this%candidates(1)%inter_cells => inter_cells
+    end subroutine Abstract_One_Particle_Move_set_first_candidate
 
-    subroutine Abstract_One_Particle_Move_try(this, success, energy_difference)
+    subroutine Abstract_One_Particle_Move_set_second_candidate(this, positions, moved, &
+        intra_cells, inter_cells)
+        class(Abstract_One_Particle_Move), intent(inout) :: this
+        class(Abstract_Particles_Positions), target, intent(in) :: positions
+        class(Abstract_Moved_Positions), target, intent(in) :: moved
+        class(Abstract_Visitable_Cells), target, intent(in) :: intra_cells, inter_cells
+
+        this%candidates(2)%positions => positions
+        this%candidates(2)%moved => moved
+        this%candidates(2)%intra_cells => intra_cells
+        this%candidates(2)%inter_cells => inter_cells
+    end subroutine Abstract_One_Particle_Move_set_second_candidate
+
+    subroutine Abstract_One_Particle_Move_try(this)
+        class(Abstract_One_Particle_Move), intent(in) :: this
+
+        integer :: i_actor, i_spectator
+        logical :: success
+        type(Concrete_Particle_Energy) :: energy_difference
+
+        call this%select_actor_and_spectator(i_actor, i_spectator)
+        call this%test_metropolis(success, energy_difference, i_actor, i_spectator)
+        if (success) then
+
+        else
+
+        end if
+    end subroutine Abstract_One_Particle_Move_try
+
+    subroutine Abstract_One_Particle_Move_test_metropolis(this, success, energy_difference, &
+        i_actor, i_spectator)
         class(Abstract_One_Particle_Move), intent(in) :: this
         logical, intent(out) :: success
         type(Concrete_Particle_Energy), intent(out) :: energy_difference
+        integer, intent(in) :: i_actor, i_spectator
 
+        class(Abstract_Particles_Positions), pointer :: actor_positions, spectator_positions
+        class(Abstract_Moved_Positions), pointer :: actor_moved
+        class(Abstract_Visitable_Cells), pointer :: actor_cells, spectator_cells
         type(Concrete_Particle) :: old, new
         type(Concrete_Particle_Energy) :: new_energy, old_energy
         real(DP) :: energy_difference_sum
         logical :: overlap
         real(DP) :: rand
 
-        old%i = random_integer(this%actor_positions%get_num())
-        old%position = this%actor_positions%get(old%i)
+        call this%set_actor(actor_positions, actor_moved, actor_cells, i_actor)
+        call this%set_spectator(spectator_positions, spectator_cells, i_spectator)
+
+        old%i = random_integer(actor_positions%get_num())
         new%i = old%i
-        new%position = this%actor_moved_positions%get(new%i)
+        old%position = actor_positions%get(old%i)
+        new%position = actor_moved%get(new%i)
+
         success = .false.
-        if (this%actor_positions%get_num() > this%spectator_positions%get_num()) then
-            call this%actor_visitable_cells%visit(overlap, new_energy%intra, new)
+        if (actor_positions%get_num() > spectator_positions%get_num()) then
+            call actor_cells%visit(overlap, new_energy%intra, new)
             if (overlap) return !Where?
-            call this%inter_visitable_cells%visit(overlap, new_energy%inter, new)
+            call spectator_cells%visit(overlap, new_energy%inter, new)
         else
-            call this%inter_visitable_cells%visit(overlap, new_energy%inter, new)
+            call spectator_cells%visit(overlap, new_energy%inter, new)
             if (overlap) return !Where?
-            call this%actor_visitable_cells%visit(overlap, new_energy%intra, new)
+            call actor_cells%visit(overlap, new_energy%intra, new)
         end if
         if (overlap) return !Where?
-        call this%actor_visitable_cells%visit(overlap, old_energy%intra, old)
-        call this%inter_visitable_cells%visit(overlap, old_energy%inter, old)
+        call actor_cells%visit(overlap, old_energy%intra, old)
+        call spectator_cells%visit(overlap, old_energy%inter, old)
 
         energy_difference = new_energy - old_energy
         energy_difference_sum = particle_energy_sum(energy_difference)
         call random_number(rand)
         if (rand < exp(-energy_difference_sum/this%temperature%get())) then
-            call this%actor_positions%set(new%i, new%position)
-            call this%actor_visitable_cells%move(old, new)
-            call this%inter_visitable_cells%move(old, new)
+            call actor_positions%set(new%i, new%position)
+            call actor_cells%move(old, new)
+            call spectator_cells%move(old, new)
             success = .true.
         end if
-    end subroutine Abstract_One_Particle_Move_try
+    end subroutine Abstract_One_Particle_Move_test_metropolis
+
+    subroutine Abstract_One_Particle_Move_select_actor_and_spectator(this, i_actor, i_spectator)
+        class(Abstract_One_Particle_Move), intent(in) :: this
+        integer, intent(out) :: i_actor, i_spectator
+
+        i_actor = random_integer(size(this%candidates))
+        i_spectator = mod(i_actor, size(this%candidates)) + 1
+    end subroutine Abstract_One_Particle_Move_select_actor_and_spectator
+
+    subroutine Abstract_One_Particle_Move_set_actor(this, actor_positions, actor_moved, &
+        actor_cells, i_actor)
+        class(Abstract_One_Particle_Move), intent(in) :: this
+        class(Abstract_Particles_Positions), pointer, intent(out) :: actor_positions
+        class(Abstract_Moved_Positions), pointer, intent(out) :: actor_moved
+        class(Abstract_Visitable_Cells), pointer, intent(out) :: actor_cells
+        integer, intent(in) :: i_actor
+
+        actor_positions => this%candidates(i_actor)%positions
+        actor_moved => this%candidates(i_actor)%moved
+        actor_cells => this%candidates(i_actor)%intra_cells
+    end subroutine Abstract_One_Particle_Move_set_actor
+
+    subroutine Abstract_One_Particle_Move_set_spectator(this, spectator_positions, &
+        spectator_cells, i_spectator)
+        class(Abstract_One_Particle_Move), intent(in) :: this
+        class(Abstract_Particles_Positions), pointer, intent(out) :: spectator_positions
+        class(Abstract_Visitable_Cells), pointer, intent(out) :: spectator_cells
+        integer, intent(in) :: i_spectator
+
+        spectator_positions => this%candidates(i_spectator)%positions
+        spectator_cells => this%candidates(i_spectator)%inter_cells
+    end subroutine Abstract_One_Particle_Move_set_spectator
+
+!end implementation Abstract_One_Particle_Move
+
+!implementation Null_One_Particle_Move
+
+    subroutine Null_One_Particle_Move_construct(this, temperature)
+        class(Null_One_Particle_Move), intent(out) :: this
+        class(Abstract_Temperature), target, intent(in) :: temperature
+    end subroutine Null_One_Particle_Move_construct
+
+    subroutine Null_One_Particle_Move_destroy(this)
+        class(Null_One_Particle_Move), intent(inout) :: this
+    end subroutine Null_One_Particle_Move_destroy
+
+    subroutine Null_One_Particle_Move_set_first_candidate(this, positions, moved, intra_cells, &
+        inter_cells)
+        class(Null_One_Particle_Move), intent(inout) :: this
+        class(Abstract_Particles_Positions), target, intent(in) :: positions
+        class(Abstract_Moved_Positions), target, intent(in) :: moved
+        class(Abstract_Visitable_Cells), target, intent(in) :: intra_cells, inter_cells
+    end subroutine Null_One_Particle_Move_set_first_candidate
+
+    subroutine Null_One_Particle_Move_set_second_candidate(this, positions, moved, &
+        intra_cells, inter_cells)
+        class(Null_One_Particle_Move), intent(inout) :: this
+        class(Abstract_Particles_Positions), target, intent(in) :: positions
+        class(Abstract_Moved_Positions), target, intent(in) :: moved
+        class(Abstract_Visitable_Cells), target, intent(in) :: intra_cells, inter_cells
+    end subroutine Null_One_Particle_Move_set_second_candidate
+
+    subroutine Null_One_Particle_Move_try(this)
+        class(Null_One_Particle_Move), intent(in) :: this
+    end subroutine Null_One_Particle_Move_try
+
+!end implementation Null_One_Particle_Move
+
+!implementation First_Candidate_One_Particle_Move
+
+    subroutine First_Candidate_One_Particle_Move_select_actor_and_spectator(this, i_actor, &
+        i_spectator)
+        class(First_Candidate_One_Particle_Move), intent(in) :: this
+        integer, intent(out) :: i_actor, i_spectator
+
+        i_actor = 1
+        i_spectator = 2
+    end subroutine First_Candidate_One_Particle_Move_select_actor_and_spectator
+
+!end implementation First_Candidate_One_Particle_Move
 
 end module class_one_particle_move
