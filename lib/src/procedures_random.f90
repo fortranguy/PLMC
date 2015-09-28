@@ -2,6 +2,7 @@ module procedures_random
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_geometry, only: num_dimensions
+use procedures_checks, only: check_positive
 
 implicit none
 
@@ -17,8 +18,14 @@ contains
         integer :: random_integer
 
         real(DP) :: rand
-        call random_number(rand)
-        random_integer = int(rand * real(maximum, DP)) + 1
+
+        call check_positive("procedures_random: random_integer", "maximum", maximum)
+        if (maximum == 1) then
+            random_integer = maximum
+        else
+            call random_number(rand)
+            random_integer = int(rand * real(maximum, DP)) + 1
+        end if
     end function random_integer
 
         !> From SMAC, Algorithm 1.23, p. 43

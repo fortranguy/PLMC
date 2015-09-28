@@ -12,7 +12,7 @@ use procedures_changes_factory, only: changes_factory_create, changes_factory_de
 use types_short_potential, only: Mixture_Short_Potentials_Wrapper
 use procedures_short_potential_factory, only: short_potential_factory_create, &
     short_potential_factory_destroy
-use class_one_particle_move, only: Metropolis_One_Particle_Move
+use class_one_particle_move, only: Abstract_One_Particle_Move
 
 implicit none
 
@@ -20,7 +20,7 @@ implicit none
     type(Mixture_Wrapper) :: mixture
     type(Changes_Wrapper) :: changes_1, changes_2
     type(Mixture_Short_Potentials_Wrapper) :: mixture_short_potentials
-    type(Metropolis_One_Particle_Move) :: one_particle_move
+    class(Abstract_One_Particle_Move), allocatable :: one_particle_move
 
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename

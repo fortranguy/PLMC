@@ -116,16 +116,16 @@ contains
         overlap = .false.
         energy = 0._DP
         current => this%beginning%next
-        if (.not. associated(current%next)) return
+        if (.not.associated(current%next)) return
         do
             next => current%next
-            if (.not. particle%same_type .or. particle%i /= current%i) then
+            if (.not.particle%same_type .or. particle%i /= current%i) then
                 distance = this%periodic_box%distance(particle%position, current%position)
                 call pair_potential%meet(overlap, energy_i, distance)
                 if (overlap) return
                 energy = energy + energy_i
             end if
-            if (.not. associated(next%next)) return
+            if (.not.associated(next%next)) return
             current => next
         end do
     end subroutine Abstract_Visitable_List_visit
@@ -257,7 +257,7 @@ contains
         overlap = .false.
         energy = 0._DP
         do i_node = 1, this%num_nodes
-            if (.not. particle%same_type .or. particle%i /= this%nodes(i_node)%i) then
+            if (.not.particle%same_type .or. particle%i /= this%nodes(i_node)%i) then
                 distance = this%periodic_box%distance(particle%position, &
                     this%nodes(i_node)%position)
                 call pair_potential%meet(overlap, energy_i, distance)

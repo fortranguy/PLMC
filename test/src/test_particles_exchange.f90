@@ -74,6 +74,7 @@ use types_particle, only: Concrete_Particle
 use types_particles, only: Particles_Wrapper
 use procedures_particles_factory, only: particles_factory_create, particles_factory_destroy
 use class_particles_exchange, only: Abstract_Particles_Exchange, Concrete_Particles_Exchange
+use procedures_changes_factory, only: changes_factory_create, changes_factory_destroy
 use procedures_particles_exchange_write, only: json_write_particles
 
 implicit none
@@ -102,9 +103,8 @@ implicit none
     allocate(XYZ_Periodic_Box :: periodic_box)
     call periodic_box%set(box_size)
 
-    call particles_factory_create(particles, input_data, "Particles", periodic_box)
-    allocate(Concrete_Particles_Exchange :: particles_exchange)
-    call particles_exchange%construct(particles)
+    call particles_factory_create(particles, input_data, "Particles.", periodic_box)
+    call changes_factory_create(particles_exchange, particles)
     call json_write_particles(particles, "initial.json")
 
     call random_number(rand_3d)
@@ -118,8 +118,7 @@ implicit none
     call particles_exchange%remove(i_particle)
     call json_write_particles(particles, "removed.json")
 
-    call particles_exchange%destroy()
-    deallocate(particles_exchange)
+    call changes_factory_destroy(particles_exchange)
     call particles_factory_destroy(particles)
     deallocate(periodic_box)
     deallocate(data_field)

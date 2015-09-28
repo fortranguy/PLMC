@@ -27,7 +27,7 @@ contains
         logical :: file_exists
 
         inquire(file=filename, exist=file_exists)
-        if (.not. file_exists) then
+        if (.not.file_exists) then
             call error_exit(filename//" doesn't exist.")
         end if
     end subroutine test_file_exists
@@ -36,7 +36,7 @@ contains
         character(len=*), intent(in) :: field
         logical, intent(in) :: found
 
-        if (.not. found) then
+        if (.not.found) then
             call error_exit(trim(field)//" not found.")
         end if
     end subroutine test_data_found

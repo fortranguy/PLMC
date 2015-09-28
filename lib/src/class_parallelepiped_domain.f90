@@ -62,7 +62,7 @@ contains
         call check_positive("Abstract_Parallelepiped_Domain", "size", size)
         this%size = size
 
-        if (.not. this%is_boxed()) then
+        if (.not.this%is_boxed()) then
             call error_exit("Abstract_Parallelepiped_Domain: domain is not boxed.")
         end if
     end subroutine Abstract_Parallelepiped_Domain_construct
@@ -199,7 +199,7 @@ contains
         this%origin = this%periodic_box%folded([0._DP, 0._DP, 0._DP])
         this%size = this%periodic_box%get_size()
 
-        if (.not. this%is_boxed()) then
+        if (.not.this%is_boxed()) then
             call error_exit("Box_Parallelepiped_Domain: domain is not boxed.")
         end if
     end subroutine Box_Parallelepiped_Domain_construct

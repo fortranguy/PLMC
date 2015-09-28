@@ -215,7 +215,8 @@ contains
         real(DP), allocatable :: file_positions(:, :)
         integer :: i_particle
 
-        if (.not. particles_have_positions(particles_positions)) return
+        if (.not.particles_have_positions(particles_positions)) return
+        if (particles_positions%get_num() == 0) return
         data_field = prefix//"initial positions"
         call input_data%get(data_field, filename, data_found)
         call test_data_found(data_field, data_found)
@@ -241,7 +242,8 @@ contains
         real(DP), allocatable :: file_orientations(:, :)
         integer :: i_particle
 
-        if (.not. particles_have_orientations(particles_orientations)) return
+        if (.not.particles_have_orientations(particles_orientations)) return
+        if (particles_orientations%get_num() == 0) return
         data_field = prefix//"initial orientations"
         call input_data%get(data_field, filename, data_found)
         call test_data_found(data_field, data_found)

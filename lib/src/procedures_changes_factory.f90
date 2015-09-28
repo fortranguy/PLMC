@@ -51,8 +51,7 @@ contains
             prefix)
         call changes_factory_create(changes%rotated_orientations, particles%orientations, &
             input_data, prefix)
-        call changes_factory_create(changes%particles_exchange, particles%chemical_potential, &
-            particles)
+        call changes_factory_create(changes%particles_exchange, particles)
     end subroutine changes_factory_create_all
 
     subroutine allocate_and_construct_moved_positions(moved_positions, particles_positions, &
@@ -159,13 +158,11 @@ contains
             adaptation_parameters)
     end subroutine construct_rotated_orientations
 
-    subroutine allocate_and_construct_particles_exchange(particles_exchange, &
-        particles_chemical_potential, particles)
+    subroutine allocate_and_construct_particles_exchange(particles_exchange, particles)
         class(Abstract_Particles_Exchange), allocatable, intent(out) :: particles_exchange
-        class(Abstract_Particles_Chemical_Potential), intent(in) :: particles_chemical_potential
         type(Particles_Wrapper), intent(in) :: particles
 
-        if (particles_can_exchange(particles_chemical_potential)) then
+        if (particles_can_exchange(particles%chemical_potential)) then
             allocate(Concrete_Particles_Exchange :: particles_exchange)
         else
             allocate(Null_Particles_Exchange :: particles_exchange)
