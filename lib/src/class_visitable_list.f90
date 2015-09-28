@@ -218,7 +218,7 @@ contains
 
         this%periodic_box => periodic_box
         this%num_nodes = 0
-        initial_size = 10
+        initial_size = 1
         allocate(this%nodes(initial_size))
     end subroutine Concrete_Visitable_Array_construct
 
