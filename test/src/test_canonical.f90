@@ -63,7 +63,7 @@ implicit none
         mixture_short_potentials%inter_micro, input_data, "Short Potentials.Inter 12.", &
         box%periodic_box, mixture%components(2)%positions)
     call input_data%destroy()
-    call metropolis_factory_create(one_particle_move, box%temperature, changes_1%moved_positions, &
+    call metropolis_factory_create(one_particle_move, box, changes_1%moved_positions, &
         changes_2%moved_positions)
     call one_particle_move%set_candidate(1, mixture%components(1)%positions)
     call one_particle_move%set_candidate(1, mixture_short_potentials%intras(1)%cells, &

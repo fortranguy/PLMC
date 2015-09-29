@@ -4,7 +4,10 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_in_range
 use procedures_random, only: random_integer
+use types_box, only: Box_Wrapper
 use class_temperature, only: Abstract_Temperature
+use class_external_field, only: Abstract_External_Field
+use class_walls_potential, only: Abstract_Walls_Potential
 use types_particle, only: Concrete_Particle
 use class_particles_positions, only: Abstract_Particles_Positions
 use class_moved_positions, only: Abstract_Moved_Positions
@@ -27,7 +30,9 @@ private
 
     type, abstract, public :: Abstract_One_Particle_Move
     private
-        class(Abstract_Temperature), pointer :: temperature
+        class(Abstract_Temperature), pointer :: temperature => null()
+        class(Abstract_External_Field), pointer :: field => null()
+        class(Abstract_Walls_Potential), pointer :: walls => null()
         type(Move_Candidate) :: candidates(num_candidates)
         type(Concrete_Change_Counter), pointer :: move_counters(:) => null()
         type(Concrete_Particle_Energy), pointer :: particles_energies(:) => null()
@@ -83,12 +88,14 @@ contains
 
 !implementation Abstract_One_Particle_Move
 
-    subroutine Abstract_One_Particle_Move_construct(this, temperature, moved_1, moved_2)
+    subroutine Abstract_One_Particle_Move_construct(this, box, moved_1, moved_2)
         class(Abstract_One_Particle_Move), intent(out) :: this
-        class(Abstract_Temperature), target, intent(in) :: temperature
+        type(Box_Wrapper), target, intent(in) :: box
         class(Abstract_Moved_Positions), target, intent(in) :: moved_1, moved_2
 
-        this%temperature => temperature
+        this%temperature => box%temperature
+        this%field => box%external_field
+        this%walls => box%walls_potential
         this%candidates(1)%moved => moved_1
         this%candidates(2)%moved => moved_2
     end subroutine Abstract_One_Particle_Move_construct
@@ -100,6 +107,8 @@ contains
         this%particles_energies => null()
         call this%nullify_candidate(2)
         call this%nullify_candidate(1)
+        this%walls => null()
+        this%field => null()
         this%temperature => null()
     end subroutine Abstract_One_Particle_Move_destroy
 
@@ -263,9 +272,9 @@ contains
 
 !implementation Null_One_Particle_Move
 
-    subroutine Null_One_Particle_Move_construct(this, temperature, moved_1, moved_2)
+    subroutine Null_One_Particle_Move_construct(this, box, moved_1, moved_2)
         class(Null_One_Particle_Move), intent(out) :: this
-        class(Abstract_Temperature), target, intent(in) :: temperature
+        type(Box_Wrapper), target, intent(in) :: box
         class(Abstract_Moved_Positions), target, intent(in) :: moved_1, moved_2
     end subroutine Null_One_Particle_Move_construct
 

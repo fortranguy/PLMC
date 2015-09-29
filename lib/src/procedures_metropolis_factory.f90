@@ -2,7 +2,7 @@ module procedures_metropolis_factory
 
 use json_module, only: json_file
 use module_data, only: test_data_found
-use class_temperature, only: Abstract_Temperature
+use types_box, only: Box_Wrapper
 use class_moved_positions, only: Abstract_Moved_Positions
 use class_one_particle_move, only: Abstract_One_Particle_Move, &
     Null_One_Particle_Move, Two_Candidates_One_Particle_Move, &
@@ -24,10 +24,10 @@ end interface metropolis_factory_destroy
 
 contains
 
-    subroutine allocate_and_construct_one_particle_move(one_particle_move, temperature, &
+    subroutine allocate_and_construct_one_particle_move(one_particle_move, box, &
         moved_positions_1, moved_positions_2)
         class(Abstract_One_Particle_Move), allocatable, intent(out) :: one_particle_move
-        class(Abstract_Temperature), intent(in) :: temperature
+        type(Box_Wrapper), intent(in) :: box
         class(Abstract_Moved_Positions), intent(in) :: moved_positions_1, moved_positions_2
 
         if (particles_can_move(moved_positions_1) .and. particles_can_move(moved_positions_2)) then
@@ -41,7 +41,7 @@ contains
         else
             allocate(Null_One_Particle_Move :: one_particle_move)
         end if
-        call one_particle_move%construct(temperature, moved_positions_1, moved_positions_2)
+        call one_particle_move%construct(box, moved_positions_1, moved_positions_2)
     end subroutine allocate_and_construct_one_particle_move
 
     subroutine destroy_and_deallocate_one_particle_move(one_particle_move)
