@@ -56,21 +56,19 @@ implicit none
     call short_potentials%intras(2)%particles%set(short_potentials%intras(2)%pair)
     call short_potential_factory_create(short_potentials%inter_micro, input_data, &
         "Short Potentials.Inter 12.", mixture%inter_diameter)
-    call short_potential_factory_create(short_potentials%inter_macros(1), &
-        short_potentials%inter_micro, input_data, "Short Potentials.Inter 12.", box%periodic_box, &
-        mixture%components(1)%positions)
-    call short_potential_factory_create(short_potentials%inter_macros(2), &
-        short_potentials%inter_micro, input_data, "Short Potentials.Inter 12.", box%periodic_box, &
-        mixture%components(2)%positions)
+    call short_potential_factory_create(short_potentials%inters(1), short_potentials%inter_micro, &
+        input_data, "Short Potentials.Inter 12.", box%periodic_box, mixture%components(1)%positions)
+    call short_potential_factory_create(short_potentials%inters(2), short_potentials%inter_micro, &
+        input_data, "Short Potentials.Inter 12.", box%periodic_box, mixture%components(2)%positions)
     call input_data%destroy()
     call metropolis_factory_create(one_particle_move, box, changes_1%moved_positions, &
         changes_2%moved_positions)
     call one_particle_move%set_candidate(1, mixture%components(1)%positions)
     call one_particle_move%set_candidate(1, short_potentials%intras(1)%cells, &
-        short_potentials%inter_macros(1)%cells)
+        short_potentials%inters(1)%cells)
     call one_particle_move%set_candidate(2, mixture%components(2)%positions)
     call one_particle_move%set_candidate(2, short_potentials%intras(2)%cells, &
-        short_potentials%inter_macros(2)%cells)
+        short_potentials%inters(2)%cells)
     inter_energy = 0._DP
     call one_particle_move%set_candidates_observables(move_counters, particles_energies, &
         inter_energy)
@@ -78,8 +76,8 @@ implicit none
     call one_particle_move%try()
 
     call metropolis_factory_destroy(one_particle_move)
-    call short_potential_factory_destroy(short_potentials%inter_macros(2))
-    call short_potential_factory_destroy(short_potentials%inter_macros(1))
+    call short_potential_factory_destroy(short_potentials%inters(2))
+    call short_potential_factory_destroy(short_potentials%inters(1))
     call short_potential_factory_destroy(short_potentials%inter_micro)
     call short_potential_factory_destroy(short_potentials%intras(2))
     call short_potential_factory_destroy(short_potentials%intras(1))

@@ -87,8 +87,9 @@ contains
             particles_positions)
         call short_potential_factory_create(short_potential_macro%list, input_data, prefix, &
             particles_positions)
-        call short_potential_factory_create(short_potential_macro%cells, short_potential_macro%list, &
-            periodic_box, particles_positions, short_potential_micro%pair)
+        call short_potential_factory_create(short_potential_macro%cells, &
+            short_potential_macro%list, periodic_box, particles_positions, &
+            short_potential_micro%pair)
     end subroutine short_potential_factory_create_macro
 
     subroutine short_potential_factory_create_micro(short_potential_micro, input_data, prefix, &

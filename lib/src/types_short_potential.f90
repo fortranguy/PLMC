@@ -31,7 +31,7 @@ private
 
     type, public :: Mixture_Short_Potentials_Wrapper
         type(Short_Potential_Wrapper) :: intras(2)
-        type(Short_Potential_Macro_Wrapper) :: inter_macros(2)
+        type(Short_Potential_Macro_Wrapper) :: inters(2)
         type(Short_Potential_Micro_Wrapper) :: inter_micro
     end type Mixture_Short_Potentials_Wrapper
 
