@@ -73,7 +73,8 @@ implicit none
     data_field = "Small Move.maximum increase factor"
     call input_data%get(data_field, adaptation_parameters%increase_factor_max, data_found)
     call test_data_found(data_field, data_found)
-    call moved_positions%construct(positions, moved_positions_delta, adaptation_parameters)
+    call moved_positions%construct(periodic_box, positions, moved_positions_delta, &
+        adaptation_parameters)
 
     data_field = "Number of Steps"
     call input_data%get(data_field, num_steps, data_found)

@@ -45,7 +45,7 @@ implicit none
     call periodic_box%set(box_size)
 
     call particles_factory_create(particles, input_data, "Particles", periodic_box)
-    call changes_factory_create(changes, input_data, "Particles", particles)
+    call changes_factory_create(changes, input_data, "Particles", periodic_box, particles)
     write(output_unit, *) "moved_positions(1)", changes%moved_positions%get(1)
     write(output_unit, *) "rotated_orientations(1)", changes%rotated_orientations%get(1)
     call changes%particles_exchange%remove(particles%number%get())

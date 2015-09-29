@@ -4,6 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_geometry, only: num_dimensions
 use procedures_errors, only: warning_continue
 use procedures_checks, only: check_3d_array, check_positive, check_increase_factor
+use class_periodic_box, only: Abstract_Periodic_Box
 use class_particles_positions, only: Abstract_Particles_Positions
 use module_change_adaptation, only: Concrete_Adaptation_Parameters, &
     set_increase_factor
@@ -14,7 +15,8 @@ private
 
     type, abstract, public :: Abstract_Moved_Positions
     private
-        class(Abstract_Particles_Positions), pointer :: positions
+        class(Abstract_Periodic_Box), pointer :: periodic_box => null()
+        class(Abstract_Particles_Positions), pointer :: positions => null()
         real(DP) :: delta(num_dimensions)
         type(Concrete_Adaptation_Parameters) :: adaptation_parameters
         real(DP) :: current_increase_factor
@@ -44,12 +46,15 @@ contains
 
 !implementation Abstract_Moved_Positions
 
-    subroutine Abstract_Moved_Positions_construct(this, positions, delta, adaptation_parameters)
+    subroutine Abstract_Moved_Positions_construct(this, periodic_box, positions, delta, &
+        adaptation_parameters)
         class(Abstract_Moved_Positions), intent(out) :: this
+        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Particles_Positions), target, intent(in) :: positions
         real(DP), intent(in) :: delta(:)
         type(Concrete_Adaptation_Parameters), intent(in) :: adaptation_parameters
 
+        this%periodic_box => periodic_box
         this%positions => positions
         call check_3d_array("Abstract_Moved_Positions", "delta", delta)
         call check_positive("Abstract_Moved_Positions", "delta", delta)
@@ -67,6 +72,7 @@ contains
         class(Abstract_Moved_Positions), intent(inout) :: this
 
         this%positions => null()
+        this%periodic_box => null()
     end subroutine Abstract_Moved_Positions_destroy
 
     subroutine Abstract_Moved_Positions_increase(this)
@@ -93,14 +99,17 @@ contains
 
         call random_number(rand)
         moved_position = this%positions%get(i_particle) + (rand - 0.5_DP) * this%delta
+        moved_position = this%periodic_box%folded(moved_position)
     end function Abstract_Moved_Positions_get
 
 !end implementation Abstract_Moved_Positions
 
 !implementation Null_Moved_Positions
 
-    subroutine Null_Moved_Positions_construct(this, positions, delta, adaptation_parameters)
+    subroutine Null_Moved_Positions_construct(this, periodic_box, positions, delta, &
+        adaptation_parameters)
         class(Null_Moved_Positions), intent(out) :: this
+        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Particles_Positions), target, intent(in) :: positions
         real(DP), intent(in) :: delta(:)
         type(Concrete_Adaptation_Parameters), intent(in) :: adaptation_parameters

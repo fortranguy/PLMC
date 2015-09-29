@@ -117,7 +117,6 @@ if input_data["Mixture"]["Component 2"]["exist"]
     end
     output_file = "positions_2.in"
     writedlm(output_file, particles_2.positions')
-    println()
     println("Positions written in ", output_file)
 
 end

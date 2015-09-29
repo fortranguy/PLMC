@@ -3,6 +3,7 @@ module procedures_changes_factory
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
 use module_data, only: test_data_found
+use class_periodic_box, only: Abstract_Periodic_Box
 use class_particles_diameter, only: Abstract_Particles_Diameter
 use class_particles_moment_norm, only: Abstract_Particles_Moment_Norm
 use class_particles_positions, only: Abstract_Particles_Positions
@@ -41,28 +42,31 @@ end interface changes_factory_destroy
 
 contains
 
-    subroutine changes_factory_create_all(changes, input_data, prefix, particles)
+    subroutine changes_factory_create_all(changes, input_data, prefix, periodic_box, particles)
         type(Changes_Wrapper), intent(out) :: changes
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(Particles_Wrapper), intent(in) :: particles
 
-        call changes_factory_create(changes%moved_positions, particles%positions, input_data, &
-            prefix)
+        call changes_factory_create(changes%moved_positions, particles%positions, &
+            input_data, prefix, periodic_box)
         call changes_factory_create(changes%rotated_orientations, particles%orientations, &
             input_data, prefix)
         call changes_factory_create(changes%particles_exchange, particles)
     end subroutine changes_factory_create_all
 
     subroutine allocate_and_construct_moved_positions(moved_positions, particles_positions, &
-        input_data, prefix)
+        input_data, prefix, periodic_box)
         class(Abstract_Moved_Positions), allocatable, intent(out) :: moved_positions
         class(Abstract_Particles_Positions), intent(in) :: particles_positions
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
 
         call allocate_moved_positions(moved_positions, particles_positions)
-        call construct_moved_positions(moved_positions, input_data, prefix, particles_positions)
+        call construct_moved_positions(moved_positions, input_data, prefix, periodic_box, &
+            particles_positions)
     end subroutine allocate_and_construct_moved_positions
 
     subroutine allocate_moved_positions(moved_positions, particles_positions)
@@ -76,21 +80,23 @@ contains
         end if
     end subroutine allocate_moved_positions
 
-    subroutine construct_moved_positions(moved_positions, input_data, prefix, particles_positions)
+    subroutine construct_moved_positions(moved_positions, input_data, prefix, periodic_box, &
+        particles_positions)
         class(Abstract_Moved_Positions), intent(inout) :: moved_positions
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Particles_Positions), intent(in) :: particles_positions
 
         character(len=:), allocatable :: data_field
         logical :: data_found
-        real(DP), allocatable :: moved_delta(:)
+        real(DP), allocatable :: move_delta(:)
         type(Concrete_Adaptation_Parameters) :: adaptation_parameters
 
         select type (moved_positions)
             type is (Concrete_Moved_Positions)
                 data_field = prefix//"Small Move.delta"
-                call input_data%get(data_field, moved_delta, data_found)
+                call input_data%get(data_field, move_delta, data_found)
                 call test_data_found(data_field, data_found)
                 data_field = prefix//"Small Move.increase factor"
                 call input_data%get(data_field, adaptation_parameters%increase_factor, data_found)
@@ -101,8 +107,9 @@ contains
                 call test_data_found(data_field, data_found)
                 deallocate(data_field)
         end select
-        call moved_positions%construct(particles_positions, moved_delta, adaptation_parameters)
-        if (allocated(moved_delta)) deallocate(moved_delta)
+        call moved_positions%construct(periodic_box, particles_positions, move_delta, &
+            adaptation_parameters)
+        if (allocated(move_delta)) deallocate(move_delta)
     end subroutine construct_moved_positions
 
     subroutine allocate_and_construct_rotated_orientations(rotated_orientations, &
@@ -137,13 +144,13 @@ contains
 
         character(len=:), allocatable :: data_field
         logical :: data_found
-        real(DP) :: moved_delta
+        real(DP) :: rotation_delta
         type(Concrete_Adaptation_Parameters) :: adaptation_parameters
 
         select type (rotated_orientations)
             type is (Concrete_Rotated_Orientations)
                 data_field = prefix//"Small Rotation.delta"
-                call input_data%get(data_field, moved_delta, data_found)
+                call input_data%get(data_field, rotation_delta, data_found)
                 call test_data_found(data_field, data_found)
                 data_field = prefix//"Small Rotation.increase factor"
                 call input_data%get(data_field, adaptation_parameters%increase_factor, data_found)
@@ -154,7 +161,7 @@ contains
                 call test_data_found(data_field, data_found)
                 deallocate(data_field)
         end select
-        call rotated_orientations%construct(particles_orientations, moved_delta, &
+        call rotated_orientations%construct(particles_orientations, rotation_delta, &
             adaptation_parameters)
     end subroutine construct_rotated_orientations
 
