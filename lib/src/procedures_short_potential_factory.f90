@@ -221,9 +221,14 @@ contains
 
         if (particles_exist(particles_diameter)) then
             domain%min = particles_diameter%get_min()
-            data_field = prefix//"maximum distance"
-            call input_data%get(data_field, domain%max, data_found)
-            call test_data_found(data_field, data_found)
+            select type (potential_expression)
+                type is (Null_Potential_Expression)
+                    domain%max = domain%min
+                class default
+                    data_field = prefix//"maximum distance"
+                    call input_data%get(data_field, domain%max, data_found)
+                    call test_data_found(data_field, data_found)
+            end select
             select type (pair_potential)
                 type is (Tabulated_Pair_Potential)
                     data_field = prefix//"delta distance"

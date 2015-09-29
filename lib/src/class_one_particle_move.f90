@@ -1,39 +1,46 @@
 module class_one_particle_move
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use class_temperature, only: Abstract_Temperature
 use procedures_errors, only: error_exit
+use procedures_random, only: random_integer
+use class_temperature, only: Abstract_Temperature
 use types_particle, only: Concrete_Particle
 use class_particles_positions, only: Abstract_Particles_Positions
 use class_moved_positions, only: Abstract_Moved_Positions
 use class_visitable_cells, only: Abstract_Visitable_Cells
 use module_particle_energy, only: Concrete_Particle_Energy, &
-    particle_energy_sum => Concrete_Particle_Energy_sum, operator(-)
-use procedures_random, only: random_integer
+    particle_energy_sum => Concrete_Particle_Energy_sum, operator(+), operator(-)
+use types_change_counter, only: Concrete_Change_Counter
 
 implicit none
 
 private
 
+    integer, parameter :: num_candidates = 2
+
     type :: Move_Candidate
-        class(Abstract_Particles_Positions), pointer :: positions
-        class(Abstract_Moved_Positions), pointer :: moved
-        class(Abstract_Visitable_Cells), pointer :: intra_cells, inter_cells
+        class(Abstract_Particles_Positions), pointer :: positions => null()
+        class(Abstract_Moved_Positions), pointer :: moved => null()
+        class(Abstract_Visitable_Cells), pointer :: intra_cells => null(), inter_cells => null()
     end type Move_Candidate
 
     type, abstract, public :: Abstract_One_Particle_Move
     private
         class(Abstract_Temperature), pointer :: temperature
-        type(Move_Candidate) :: candidates(2)
+        type(Move_Candidate) :: candidates(num_candidates)
+        type(Concrete_Change_Counter), pointer :: move_counters(:) => null()
+        type(Concrete_Particle_Energy), pointer :: particles_energies(:) => null()
     contains
         procedure :: construct => Abstract_One_Particle_Move_construct
         procedure :: set_first_candidate => Abstract_One_Particle_Move_set_first_candidate
         procedure :: set_second_candidate => Abstract_One_Particle_Move_set_second_candidate
+        procedure :: set_candidates_observables => &
+            Abstract_One_Particle_Move_set_candidates_observables
         procedure :: destroy => Abstract_One_Particle_Move_destroy
         procedure :: try => Abstract_One_Particle_Move_try
         procedure, private :: test_metropolis => Abstract_One_Particle_Move_test_metropolis
         procedure, private :: nullify_candidate => Abstract_One_Particle_Move_nullify_candidate
-        procedure, private :: select_actor_and_spectator => &
+        procedure, private, nopass :: select_actor_and_spectator => &
             Abstract_One_Particle_Move_select_actor_and_spectator
         procedure, private :: set_actor => Abstract_One_Particle_Move_set_actor
         procedure, private :: set_spectator => Abstract_One_Particle_Move_set_spectator
@@ -54,9 +61,15 @@ private
 
     type, extends(Abstract_One_Particle_Move), public :: First_Candidate_One_Particle_Move
     contains
-        procedure, private :: select_actor_and_spectator => &
+        procedure, private, nopass :: select_actor_and_spectator => &
             First_Candidate_One_Particle_Move_select_actor_and_spectator
     end type First_Candidate_One_Particle_Move
+
+    type, extends(Abstract_One_Particle_Move), public :: Second_Candidate_One_Particle_Move
+    contains
+        procedure, private, nopass :: select_actor_and_spectator => &
+            Second_Candidate_One_Particle_Move_select_actor_and_spectator
+    end type Second_Candidate_One_Particle_Move
 
 contains
 
@@ -72,6 +85,8 @@ contains
     subroutine Abstract_One_Particle_Move_destroy(this)
         class(Abstract_One_Particle_Move), intent(inout) :: this
 
+        this%move_counters => null()
+        this%particles_energies => null()
         call this%nullify_candidate(2)
         call this%nullify_candidate(1)
         this%temperature => null()
@@ -113,6 +128,24 @@ contains
         this%candidates(2)%inter_cells => inter_cells
     end subroutine Abstract_One_Particle_Move_set_second_candidate
 
+    subroutine Abstract_One_Particle_Move_set_candidates_observables(this, move_counters, &
+        particles_energies)
+        class(Abstract_One_Particle_Move), intent(inout) :: this
+        type(Concrete_Change_Counter), target, intent(in) :: move_counters(:)
+        type(Concrete_Particle_Energy), target, intent(in) :: particles_energies(:)
+
+        if (size(move_counters) /= num_candidates) then
+            call error_exit("Abstract_One_Particle_Move: "//&
+                "move_counters doesn't have the right size.")
+        end if
+        this%move_counters => move_counters
+        if (size(particles_energies) /= num_candidates) then
+            call error_exit("Abstract_One_Particle_Move: "//&
+                "particles_energies doesn't have the right size.")
+        end if
+        this%particles_energies => particles_energies
+    end subroutine Abstract_One_Particle_Move_set_candidates_observables
+
     subroutine Abstract_One_Particle_Move_try(this)
         class(Abstract_One_Particle_Move), intent(in) :: this
 
@@ -121,11 +154,11 @@ contains
         type(Concrete_Particle_Energy) :: energy_difference
 
         call this%select_actor_and_spectator(i_actor, i_spectator)
+        this%move_counters(i_actor)%num_hits = this%move_counters(i_actor)%num_hits + 1
         call this%test_metropolis(success, energy_difference, i_actor, i_spectator)
         if (success) then
-
-        else
-
+            this%particles_energies(i_actor) = this%particles_energies(i_actor) + energy_difference
+            this%move_counters(i_actor)%num_success = this%move_counters(i_actor)%num_success + 1
         end if
     end subroutine Abstract_One_Particle_Move_try
 
@@ -149,21 +182,21 @@ contains
         call this%set_spectator(spectator_positions, spectator_cells, i_spectator)
 
         old%i = random_integer(actor_positions%get_num())
-        new%i = old%i
         old%position = actor_positions%get(old%i)
+        new%i = old%i
         new%position = actor_moved%get(new%i)
 
         success = .false.
         if (actor_positions%get_num() > spectator_positions%get_num()) then
             call actor_cells%visit(overlap, new_energy%intra, new)
-            if (overlap) return !Where?
+            if (overlap) return
             call spectator_cells%visit(overlap, new_energy%inter, new)
         else
             call spectator_cells%visit(overlap, new_energy%inter, new)
-            if (overlap) return !Where?
+            if (overlap) return
             call actor_cells%visit(overlap, new_energy%intra, new)
         end if
-        if (overlap) return !Where?
+        if (overlap) return
         call actor_cells%visit(overlap, old_energy%intra, old)
         call spectator_cells%visit(overlap, old_energy%inter, old)
 
@@ -178,12 +211,11 @@ contains
         end if
     end subroutine Abstract_One_Particle_Move_test_metropolis
 
-    subroutine Abstract_One_Particle_Move_select_actor_and_spectator(this, i_actor, i_spectator)
-        class(Abstract_One_Particle_Move), intent(in) :: this
+    subroutine Abstract_One_Particle_Move_select_actor_and_spectator(i_actor, i_spectator)
         integer, intent(out) :: i_actor, i_spectator
 
-        i_actor = random_integer(size(this%candidates))
-        i_spectator = mod(i_actor, size(this%candidates)) + 1
+        i_actor = random_integer(num_candidates)
+        i_spectator = mod(i_actor, num_candidates) + 1
     end subroutine Abstract_One_Particle_Move_select_actor_and_spectator
 
     subroutine Abstract_One_Particle_Move_set_actor(this, actor_positions, actor_moved, &
@@ -247,9 +279,7 @@ contains
 
 !implementation First_Candidate_One_Particle_Move
 
-    subroutine First_Candidate_One_Particle_Move_select_actor_and_spectator(this, i_actor, &
-        i_spectator)
-        class(First_Candidate_One_Particle_Move), intent(in) :: this
+    subroutine First_Candidate_One_Particle_Move_select_actor_and_spectator(i_actor, i_spectator)
         integer, intent(out) :: i_actor, i_spectator
 
         i_actor = 1
@@ -257,5 +287,16 @@ contains
     end subroutine First_Candidate_One_Particle_Move_select_actor_and_spectator
 
 !end implementation First_Candidate_One_Particle_Move
+
+!implementation Second_Candidate_One_Particle_Move
+
+    subroutine Second_Candidate_One_Particle_Move_select_actor_and_spectator(i_actor, i_spectator)
+        integer, intent(out) :: i_actor, i_spectator
+
+        i_actor = 2
+        i_spectator = 1
+    end subroutine Second_Candidate_One_Particle_Move_select_actor_and_spectator
+
+!end implementation Second_Candidate_One_Particle_Move
 
 end module class_one_particle_move

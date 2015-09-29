@@ -1,17 +1,3 @@
-module types_canonical
-
-use, intrinsic :: iso_fortran_env, only: DP => REAL64
-
-implicit none
-
-    type, public :: Concrete_Particles_Observables
-        integer :: num_move_hits = 0
-        integer :: num_move_rejection = 0
-        real(DP) :: energy_step = 0._DP
-    end type Concrete_Particles_Observables
-
-end module types_canonical
-
 program test_canonical
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
@@ -28,7 +14,8 @@ use procedures_short_potential_factory, only: short_potential_factory_create, &
     short_potential_factory_destroy
 use class_one_particle_move, only: Abstract_One_Particle_Move, &
     Two_Candidates_One_Particle_Move
-use types_canonical, only: Concrete_Particles_Observables
+use types_change_counter, only: Concrete_Change_Counter
+use module_particle_energy, only: Concrete_Particle_Energy
 
 implicit none
 
@@ -37,8 +24,8 @@ implicit none
     type(Changes_Wrapper) :: changes_1, changes_2
     type(Mixture_Short_Potentials_Wrapper) :: mixture_short_potentials
     class(Abstract_One_Particle_Move), allocatable :: one_particle_move
-    type(Concrete_Particles_Observables) :: observable_1, observable_2
-    logical :: move_success
+    type(Concrete_Change_Counter) :: move_counters(2)
+    type(Concrete_Particle_Energy) :: particles_energies(2)
 
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename
@@ -81,8 +68,9 @@ implicit none
     call one_particle_move%set_second_candidate(mixture%components(2)%positions, &
         changes_2%moved_positions, mixture_short_potentials%intras(2)%cells, &
         mixture_short_potentials%inter_macros(2)%cells)
+    call one_particle_move%set_candidates_observables(move_counters, particles_energies)
 
-    !call one_particle_move%try(move_success, )
+    call one_particle_move%try()
 
     deallocate(one_particle_move)
     call short_potential_factory_destroy(mixture_short_potentials%inter_macros(2))

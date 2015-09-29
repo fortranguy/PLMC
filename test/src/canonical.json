@@ -56,7 +56,7 @@
             }
         }
     },
-    "Short Potential": {
+    "Short Potentials": {
         "Component 1": {
             "name": "null",
             "tabulated": false,
@@ -74,6 +74,13 @@
             "maximum distance": 2.5,
             "Cells": {
                 "data structure": "array"
+            }
+        },
+        "Inter 12": {
+            "name": "null",
+            "tabulated": false,
+            "Cells": {
+                "data structure": "list"
             }
         }
     }

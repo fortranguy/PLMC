@@ -51,7 +51,7 @@
 			<Option weight="4" />
 		</Unit>
 		<Unit filename="lib/src/class_one_particle_move.f90">
-			<Option weight="7" />
+			<Option weight="6" />
 		</Unit>
 		<Unit filename="lib/src/class_pair_potential.f90">
 			<Option weight="3" />
@@ -135,7 +135,7 @@
 			<Option weight="0" />
 		</Unit>
 		<Unit filename="lib/src/procedures_box_factory.f90">
-			<Option weight="6" />
+			<Option weight="10" />
 		</Unit>
 		<Unit filename="lib/src/procedures_changes_factory.f90">
 			<Option weight="9" />
@@ -156,7 +156,7 @@
 			<Option weight="9" />
 		</Unit>
 		<Unit filename="lib/src/procedures_random.f90">
-			<Option weight="1" />
+			<Option weight="2" />
 		</Unit>
 		<Unit filename="lib/src/procedures_short_potential_factory.f90">
 			<Option weight="9" />
@@ -169,6 +169,9 @@
 		</Unit>
 		<Unit filename="lib/src/types_box.f90">
 			<Option weight="5" />
+		</Unit>
+		<Unit filename="lib/src/types_change_counter.f90">
+			<Option weight="0" />
 		</Unit>
 		<Unit filename="lib/src/types_changes.f90">
 			<Option weight="8" />
@@ -186,10 +189,10 @@
 			<Option weight="6" />
 		</Unit>
 		<Unit filename="test/src/test_box_factory.f90">
-			<Option weight="7" />
+			<Option weight="11" />
 		</Unit>
 		<Unit filename="test/src/test_canonical.f90">
-			<Option weight="10" />
+			<Option weight="11" />
 		</Unit>
 		<Unit filename="test/src/test_changes_factory.f90">
 			<Option weight="10" />
@@ -204,10 +207,10 @@
 			<Option weight="5" />
 		</Unit>
 		<Unit filename="test/src/test_external_field.f90">
-			<Option weight="7" />
+			<Option weight="11" />
 		</Unit>
 		<Unit filename="test/src/test_field_expression.f90">
-			<Option weight="7" />
+			<Option weight="11" />
 		</Unit>
 		<Unit filename="test/src/test_moment_norm.f90">
 			<Option weight="3" />
@@ -228,16 +231,16 @@
 			<Option weight="4" />
 		</Unit>
 		<Unit filename="test/src/test_parallelepiped_domains.f90">
-			<Option weight="7" />
+			<Option weight="11" />
 		</Unit>
 		<Unit filename="test/src/test_particles_exchange.f90">
 			<Option weight="10" />
 		</Unit>
 		<Unit filename="test/src/test_particles_factory.f90">
-			<Option weight="10" />
+			<Option weight="11" />
 		</Unit>
 		<Unit filename="test/src/test_particles_potential.f90">
-			<Option weight="10" />
+			<Option weight="11" />
 		</Unit>
 		<Unit filename="test/src/test_periodic_box.f90">
 			<Option weight="3" />
@@ -261,10 +264,10 @@
 			<Option weight="6" />
 		</Unit>
 		<Unit filename="test/src/test_visitable_cells.f90">
-			<Option weight="10" />
+			<Option weight="11" />
 		</Unit>
 		<Unit filename="test/src/test_visitable_list.f90">
-			<Option weight="10" />
+			<Option weight="11" />
 		</Unit>
 		<Extensions>
 			<code_completion />
