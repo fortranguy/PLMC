@@ -26,6 +26,7 @@ implicit none
     class(Abstract_One_Particle_Move), allocatable :: one_particle_move
     type(Concrete_Change_Counter) :: move_counters(2)
     type(Concrete_Particle_Energy) :: particles_energies(2)
+    real(DP) :: inter_energy
 
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename
@@ -68,7 +69,9 @@ implicit none
     call one_particle_move%set_candidate(2, mixture%components(2)%positions)
     call one_particle_move%set_candidate(2, mixture_short_potentials%intras(2)%cells, &
         mixture_short_potentials%inter_macros(2)%cells)
-    call one_particle_move%set_candidates_observables(move_counters, particles_energies)
+    inter_energy = 0._DP
+    call one_particle_move%set_candidates_observables(move_counters, particles_energies, &
+        inter_energy)
 
     call one_particle_move%try()
 

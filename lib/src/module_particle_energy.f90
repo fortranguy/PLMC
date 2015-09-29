@@ -9,7 +9,6 @@ public :: Concrete_Particle_Energy_sum, operator(+), operator(-)
 
     type, public :: Concrete_Particle_Energy
         real(DP) :: intra = 0._DP
-        real(DP) :: inter = 0._DP
         real(DP) :: walls = 0._DP
     end type Concrete_Particle_Energy
 
@@ -31,7 +30,7 @@ contains
         type(Concrete_Particle_Energy), intent(in) :: particle_energy
         real(DP) :: particle_energy_sum
 
-        particle_energy_sum = particle_energy%intra + particle_energy%inter + particle_energy%walls
+        particle_energy_sum = particle_energy%intra + particle_energy%walls
     end function Concrete_Particle_Energy_sum
 
     pure subroutine Concrete_Particle_Energy_assignment(particle_energy_target, &
@@ -40,7 +39,6 @@ contains
         type(Concrete_Particle_Energy), intent(in) :: particle_energy_value
 
         particle_energy_target%intra = particle_energy_value%intra
-        particle_energy_target%inter = particle_energy_value%inter
         particle_energy_target%walls = particle_energy_value%walls
     end subroutine Concrete_Particle_Energy_assignment
 
@@ -50,7 +48,6 @@ contains
         type(Concrete_Particle_Energy), intent(in) :: particle_energy_1, particle_energy_2
 
         particle_energy_addition%intra = particle_energy_1%intra + particle_energy_2%intra
-        particle_energy_addition%inter = particle_energy_1%inter + particle_energy_2%inter
         particle_energy_addition%walls = particle_energy_1%walls + particle_energy_2%walls
     end function Concrete_Particle_Energy_addition
 
@@ -60,7 +57,6 @@ contains
         type(Concrete_Particle_Energy), intent(in) :: particle_energy_1, particle_energy_2
 
         particle_energy_difference%intra = particle_energy_1%intra - particle_energy_2%intra
-        particle_energy_difference%inter = particle_energy_1%inter - particle_energy_2%inter
         particle_energy_difference%walls = particle_energy_1%walls - particle_energy_2%walls
     end function Concrete_Particle_Energy_difference
 
