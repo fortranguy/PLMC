@@ -12,13 +12,13 @@ public :: calculate_particles_energy
 
 contains
 
-    subroutine calculate_particles_energy(overlap, energy, same_type, particles_positions, &
-        particles_potential)
+    subroutine calculate_particles_energy(overlap, energy, same_type, particles_potential, &
+        particles_positions)
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
         logical, intent(in) :: same_type
-        class(Abstract_Particles_Positions), intent(in) :: particles_positions
         class(Abstract_Particles_Potential), intent(in) :: particles_potential
+        class(Abstract_Particles_Positions), intent(in) :: particles_positions
 
         type(Concrete_Particle) :: particle
         real(DP) :: energy_i
@@ -99,14 +99,14 @@ implicit none
         "Short Potentials.Component 1.", box%periodic_box, mixture%components(1))
     call short_potentials%intras(1)%particles%set(short_potentials%intras(1)%pair)
     call calculate_particles_energy(overlap, particles_energies(1)%intra, .true., &
-        mixture%components(1)%positions, short_potentials%intras(1)%particles)
+        short_potentials%intras(1)%particles, mixture%components(1)%positions)
     if (overlap) call error_exit("short_potentials%intras(1) overlap")
 
     call short_potential_factory_create(short_potentials%intras(2), input_data, &
         "Short Potentials.Component 2.", box%periodic_box, mixture%components(2))
     call short_potentials%intras(2)%particles%set(short_potentials%intras(2)%pair)
     call calculate_particles_energy(overlap, particles_energies(2)%intra, .true., &
-        mixture%components(2)%positions, short_potentials%intras(2)%particles)
+        short_potentials%intras(2)%particles, mixture%components(2)%positions)
     if (overlap) call error_exit("short_potentials%intras(2) overlap")
 
     call short_potential_factory_create(short_potentials%inter_micro, input_data, &
@@ -115,13 +115,13 @@ implicit none
         input_data, "Short Potentials.Inter 12.", box%periodic_box, mixture%components(1)%positions)
     call short_potentials%intras(1)%particles%set(short_potentials%inter_micro%pair)
     call calculate_particles_energy(overlap, inter_energy_1, .false., &
-        mixture%components(2)%positions, short_potentials%intras(1)%particles)
+        short_potentials%intras(1)%particles, mixture%components(2)%positions)
     if (overlap) call error_exit("inter short_potentials%intras(1) overlap")
     call short_potential_factory_create(short_potentials%inters(2), short_potentials%inter_micro, &
         input_data, "Short Potentials.Inter 12.", box%periodic_box, mixture%components(2)%positions)
     call short_potentials%intras(2)%particles%set(short_potentials%inter_micro%pair)
     call calculate_particles_energy(overlap, inter_energy_2, .false., &
-        mixture%components(1)%positions, short_potentials%intras(2)%particles)
+        short_potentials%intras(2)%particles, mixture%components(1)%positions)
     if (overlap) call error_exit("inter short_potentials%intras(2) overlap")
 
     call input_data%destroy()
