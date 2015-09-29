@@ -10,7 +10,7 @@ use class_particles_diameter, only: Abstract_Particles_Diameter, &
     Null_Particles_Diameter
 use class_particles_positions, only: Abstract_Particles_Positions
 use types_particles, only: Particles_Wrapper
-use procedures_types_selectors, only: particles_exist, particles_have_positions
+use procedures_types_selectors, only: particles_exist, particles_have_positions, particles_interact
 use class_potential_expression, only: Abstract_Potential_Expression, &
     Null_Potential_Expression, Lennard_Jones_Expression
 use types_potential_domain, only: Concrete_Potential_Domain
@@ -291,7 +291,7 @@ contains
         class(Abstract_Particles_Positions), intent(in) :: particles_positions
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
 
-        if (particles_have_positions(particles_positions)) then
+        if (particles_interact(pair_potential)) then
             select type(periodic_box)
                 type is (XYZ_Periodic_Box)
                     allocate(XYZ_PBC_Visitable_Cells :: visitable_cells)

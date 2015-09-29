@@ -13,13 +13,14 @@ use class_particles_chemical_potential, only: Abstract_Particles_Chemical_Potent
     Null_Particles_Chemical_Potential
 use class_moved_positions, only: Abstract_Moved_Positions, Null_Moved_Positions
 use class_particles_exchange, only: Abstract_Particles_Exchange, Null_Particles_Exchange
+use class_pair_potential, only: Abstract_Pair_Potential, Null_Pair_Potential
 
 implicit none
 
 private
 public :: apply_external_field, use_reciprocal_lattice, use_walls, &
     particles_exist, particles_have_positions, particles_can_move, particles_are_dipolar, &
-    particles_have_orientations, particles_can_exchange
+    particles_have_orientations, particles_can_exchange, particles_interact
 
 interface apply_external_field
     module procedure :: apply_external_field_from_json
@@ -102,6 +103,17 @@ contains
                 particles_exist = .true.
         end select
     end function particles_exist_from_diameter
+
+    pure logical function particles_interact(pair_potential)
+        class(Abstract_Pair_Potential), intent(in) :: pair_potential
+
+        select type (pair_potential)
+            type is (Null_Pair_Potential)
+                particles_interact = .false.
+            class default
+                particles_interact = .true.
+        end select
+    end function particles_interact
 
     pure logical function particles_have_moment_norm(particles_moment_norm)
         class(Abstract_Particles_Moment_Norm), intent(in) :: particles_moment_norm
