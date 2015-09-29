@@ -84,6 +84,7 @@ if input_data["Mixture"]["Component 2"]["exist"]
     inter_diameter = (particles_1.diameter + particles_2.diameter) / 2 + input_data["Mixture"]["Inter 12"]["offset"]
     inter_min_diameter = inter_diameter * input_data["Mixture"]["Inter 12"]["minimum diameter factor"]
 
+    first_position = true
     prog = pm.Progress(particles_2.num_particles)
     while size(particles_2.positions, 2) < particles_2.num_particles
         overlap = true
@@ -106,7 +107,12 @@ if input_data["Mixture"]["Component 2"]["exist"]
                 end
             end
         end
-        particles_2.positions = hcat(particles_2.positions, pbc.folded(test_position, box_size))
+        if first_position then
+            particles_2.positions[:, 1] = pbc.folded(test_position, box_size)
+            first_position = false
+        else
+            particles_2.positions = hcat(particles_2.positions, pbc.folded(test_position, box_size))
+        end
         pm.next!(prog)
     end
     output_file = "positions_2.in"
