@@ -45,8 +45,8 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
 use procedures_errors, only: error_exit
-use types_box, only: Box_Wrapper
-use procedures_box_factory, only: box_factory_create, box_factory_destroy
+use types_environment_wrapper, only: Environment_Wrapper
+use procedures_environment_factory, only: environment_factory_create, environment_factory_destroy
 use types_particles, only: Mixture_Wrapper
 use procedures_particles_factory, only: particles_factory_create, particles_factory_destroy
 use types_changes, only: Changes_Wrapper
@@ -62,7 +62,7 @@ use procedures_canonical, only: calculate_particles_energy
 
 implicit none
 
-    type(Box_Wrapper) :: box
+    type(Environment_Wrapper) :: environment
     type(Mixture_Wrapper) :: mixture
     type(Changes_Wrapper) :: changes_1, changes_2
     type(Mixture_Short_Potentials_Wrapper) :: short_potentials
@@ -82,12 +82,12 @@ implicit none
     call input_data%load_file(filename = data_filename)
     deallocate(data_filename)
 
-    call box_factory_create(box, input_data, "Box.")
+    call environment_factory_create(environment, input_data, "Box.")
 
     call particles_factory_create(mixture%components(1), input_data, "Mixture.Component 1.", &
-        box%periodic_box)
+        environment%periodic_box)
     call particles_factory_create(mixture%components(2), input_data, "Mixture.Component 2.", &
-        box%periodic_box)
+        environment%periodic_box)
     call particles_factory_create(mixture%inter_diameter, mixture%components(1)%diameter, &
         mixture%components(2)%diameter, input_data, "Mixture.Inter 12.")
 
@@ -97,14 +97,14 @@ implicit none
         mixture%components(2))
 
     call short_potential_factory_create(short_potentials%intras(1), input_data, &
-        "Short Potentials.Component 1.", box%periodic_box, mixture%components(1))
+        "Short Potentials.Component 1.", environment%periodic_box, mixture%components(1))
     call short_potentials%intras(1)%particles%set(short_potentials%intras(1)%pair)
     call calculate_particles_energy(overlap, particles_energies(1)%intra, &
         short_potentials%intras(1)%particles, mixture%components(1)%positions, same_type=.true.)
     if (overlap) call error_exit("short_potentials%intras(1) overlap")
 
     call short_potential_factory_create(short_potentials%intras(2), input_data, &
-        "Short Potentials.Component 2.", box%periodic_box, mixture%components(2))
+        "Short Potentials.Component 2.", environment%periodic_box, mixture%components(2))
     call short_potentials%intras(2)%particles%set(short_potentials%intras(2)%pair)
     call calculate_particles_energy(overlap, particles_energies(2)%intra, &
         short_potentials%intras(2)%particles, mixture%components(2)%positions, same_type=.true.)
@@ -113,13 +113,15 @@ implicit none
     call short_potential_factory_create(short_potentials%inter_micro, input_data, &
         "Short Potentials.Inter 12.", mixture%inter_diameter)
     call short_potential_factory_create(short_potentials%inters(1), short_potentials%inter_micro, &
-        input_data, "Short Potentials.Inter 12.", box%periodic_box, mixture%components(1)%positions)
+        input_data, "Short Potentials.Inter 12.", environment%periodic_box, &
+        mixture%components(1)%positions)
     call short_potentials%intras(1)%particles%set(short_potentials%inter_micro%pair)
     call calculate_particles_energy(overlap, inter_energy_1, short_potentials%intras(1)%particles, &
         mixture%components(2)%positions, same_type=.false.)
     if (overlap) call error_exit("inter short_potentials%intras(1) overlap")
     call short_potential_factory_create(short_potentials%inters(2), short_potentials%inter_micro, &
-        input_data, "Short Potentials.Inter 12.", box%periodic_box, mixture%components(2)%positions)
+        input_data, "Short Potentials.Inter 12.", environment%periodic_box, &
+        mixture%components(2)%positions)
     call short_potentials%intras(2)%particles%set(short_potentials%inter_micro%pair)
     call calculate_particles_energy(overlap, inter_energy_2, short_potentials%intras(2)%particles, &
         mixture%components(1)%positions, same_type=.false.)
@@ -128,7 +130,7 @@ implicit none
 
     call input_data%destroy()
 
-    call metropolis_factory_create(one_particle_move, box, changes_1%moved_positions, &
+    call metropolis_factory_create(one_particle_move, environment, changes_1%moved_positions, &
         changes_2%moved_positions)
     call one_particle_move%set_candidate(1, mixture%components(1)%positions)
     call one_particle_move%set_candidate(1, short_potentials%intras(1)%cells, &
@@ -153,6 +155,6 @@ implicit none
     call particles_factory_destroy(mixture%inter_diameter)
     call particles_factory_destroy(mixture%components(2))
     call particles_factory_destroy(mixture%components(1))
-    call box_factory_destroy(box)
+    call environment_factory_destroy(environment)
 
 end program test_canonical

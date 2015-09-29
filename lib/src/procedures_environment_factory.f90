@@ -1,4 +1,4 @@
-module procedures_box_factory
+module procedures_environment_factory
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
@@ -28,16 +28,16 @@ use procedures_short_potential_factory, only: short_potential_factory_create, &
     short_potential_factory_destroy
 use class_walls_potential, only: Abstract_Walls_Potential, &
     Concrete_Walls_Potential, Null_Walls_Potential
-use types_box, only: Box_Wrapper
+use types_environment_wrapper, only: Environment_Wrapper
 use procedures_types_selectors, only: apply_external_field, use_reciprocal_lattice, use_walls
 
 implicit none
 
 private
-public :: box_factory_create, box_factory_destroy
+public :: environment_factory_create, environment_factory_destroy
 
-interface box_factory_create
-    module procedure :: box_factory_create_all
+interface environment_factory_create
+    module procedure :: environment_factory_create_all
     module procedure :: allocate_and_set_periodic_box
     module procedure :: allocate_and_set_temperature
     module procedure :: allocate_and_set_field_expression
@@ -47,9 +47,9 @@ interface box_factory_create
     module procedure :: allocate_and_set_floor_penetration
     module procedure :: allocate_and_set_wall_diameter
     module procedure :: allocate_and_construct_walls_potential
-end interface box_factory_create
+end interface environment_factory_create
 
-interface box_factory_destroy
+interface environment_factory_destroy
     module procedure :: destroy_and_deallocate_walls_potential
     module procedure :: deallocate_floor_penetration
     module procedure :: destroy_and_deallocate_reciprocal_lattice
@@ -58,34 +58,34 @@ interface box_factory_destroy
     module procedure :: deallocate_field_expression
     module procedure :: deallocate_temperature
     module procedure :: deallocate_periodic_box
-    module procedure :: box_factory_destroy_all
-end interface box_factory_destroy
+    module procedure :: environment_factory_destroy_all
+end interface environment_factory_destroy
 
 contains
 
-    subroutine box_factory_create_all(box, input_data, prefix)
-        type(Box_Wrapper), intent(out) :: box
+    subroutine environment_factory_create_all(environment, input_data, prefix)
+        type(Environment_Wrapper), intent(out) :: environment
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        call box_factory_create(box%periodic_box, input_data, prefix)
-        call box_factory_create(box%temperature, input_data, prefix)
-        call box_factory_create(box%field_expression, input_data, prefix)
-        call box_factory_create(box%parallelepiped_domain, input_data, prefix//"External Field.", &
-            box%periodic_box)
-        call box_factory_create(box%external_field, input_data, prefix, &
-            box%parallelepiped_domain, box%field_expression)
-        call box_factory_create(box%reciprocal_lattice, input_data, prefix, &
-            box%periodic_box)
-        call box_factory_create(box%floor_penetration, input_data, prefix)
-        call box_factory_create(box%wall_diameter, input_data, prefix)
-        call short_potential_factory_create(box%wall_expression, input_data, &
-            prefix//"Walls.Potential.", box%wall_diameter)
-        call short_potential_factory_create(box%wall_pair, input_data, prefix//"Walls.Potential.", &
-            box%wall_diameter, box%wall_expression)
-        call box_factory_create(box%walls_potential, input_data, prefix, box%periodic_box, &
-            box%floor_penetration, box%wall_pair)
-    end subroutine box_factory_create_all
+        call environment_factory_create(environment%periodic_box, input_data, prefix)
+        call environment_factory_create(environment%temperature, input_data, prefix)
+        call environment_factory_create(environment%field_expression, input_data, prefix)
+        call environment_factory_create(environment%parallelepiped_domain, input_data, &
+            prefix//"External Field.", environment%periodic_box)
+        call environment_factory_create(environment%external_field, input_data, prefix, &
+            environment%parallelepiped_domain, environment%field_expression)
+        call environment_factory_create(environment%reciprocal_lattice, input_data, prefix, &
+            environment%periodic_box)
+        call environment_factory_create(environment%floor_penetration, input_data, prefix)
+        call environment_factory_create(environment%wall_diameter, input_data, prefix)
+        call short_potential_factory_create(environment%wall_expression, input_data, &
+            prefix//"Walls.Potential.", environment%wall_diameter)
+        call short_potential_factory_create(environment%wall_pair, input_data, &
+            prefix//"Walls.Potential.", environment%wall_diameter, environment%wall_expression)
+        call environment_factory_create(environment%walls_potential, input_data, prefix, &
+            environment%periodic_box, environment%floor_penetration, environment%wall_pair)
+    end subroutine environment_factory_create_all
 
     subroutine allocate_and_set_periodic_box(periodic_box, input_data, prefix)
         class(Abstract_Periodic_Box), allocatable, intent(out) :: periodic_box
@@ -339,22 +339,22 @@ contains
         call walls_potential%construct(periodic_box, gap, floor_penetration, wall_pair)
     end subroutine allocate_and_construct_walls_potential
 
-    subroutine box_factory_destroy_all(box)
-        type(Box_Wrapper), intent(inout) :: box
+    subroutine environment_factory_destroy_all(environment)
+        type(Environment_Wrapper), intent(inout) :: environment
 
-        call box_factory_destroy(box%walls_potential)
-        call box%wall_pair%destroy()
-        if (allocated(box%wall_pair)) deallocate(box%wall_pair)
-        call short_potential_factory_destroy(box%wall_expression)
-        call particles_factory_destroy(box%wall_diameter)
-        call box_factory_destroy(box%floor_penetration)
-        call box_factory_destroy(box%reciprocal_lattice)
-        call box_factory_destroy(box%external_field)
-        call box_factory_destroy(box%parallelepiped_domain)
-        call box_factory_destroy(box%field_expression)
-        call box_factory_destroy(box%temperature)
-        call box_factory_destroy(box%periodic_box)
-    end subroutine box_factory_destroy_all
+        call environment_factory_destroy(environment%walls_potential)
+        call environment%wall_pair%destroy()
+        if (allocated(environment%wall_pair)) deallocate(environment%wall_pair)
+        call short_potential_factory_destroy(environment%wall_expression)
+        call particles_factory_destroy(environment%wall_diameter)
+        call environment_factory_destroy(environment%floor_penetration)
+        call environment_factory_destroy(environment%reciprocal_lattice)
+        call environment_factory_destroy(environment%external_field)
+        call environment_factory_destroy(environment%parallelepiped_domain)
+        call environment_factory_destroy(environment%field_expression)
+        call environment_factory_destroy(environment%temperature)
+        call environment_factory_destroy(environment%periodic_box)
+    end subroutine environment_factory_destroy_all
 
     subroutine deallocate_periodic_box(periodic_box)
         class(Abstract_Periodic_Box), allocatable, intent(inout) :: periodic_box
@@ -408,4 +408,4 @@ contains
         if (allocated(walls_potential)) deallocate(walls_potential)
     end subroutine destroy_and_deallocate_walls_potential
 
-end module procedures_box_factory
+end module procedures_environment_factory

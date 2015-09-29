@@ -1,4 +1,4 @@
-module types_box
+module types_environment_wrapper
 
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_temperature, only: Abstract_Temperature
@@ -16,7 +16,7 @@ implicit none
 
 private
 
-    type, public :: Box_Wrapper
+    type, public :: Environment_Wrapper
         class(Abstract_Periodic_Box), allocatable :: periodic_box
         class(Abstract_Temperature), allocatable :: temperature
         class(Abstract_Field_Expression), allocatable :: field_expression
@@ -28,6 +28,6 @@ private
         class(Abstract_Potential_Expression), allocatable :: wall_expression
         class(Abstract_Pair_Potential), allocatable :: wall_pair
         class(Abstract_Walls_Potential), allocatable :: walls_potential
-    end type Box_Wrapper
+    end type Environment_Wrapper
 
-end module types_box
+end module types_environment_wrapper

@@ -42,7 +42,7 @@ use module_data, only: test_file_exists, test_data_found
 use procedures_errors, only: error_exit
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box
 use class_field_expression, only: Abstract_Field_Expression
-use procedures_box_factory, only: box_factory_create, box_factory_destroy
+use procedures_environment_factory, only: environment_factory_create, environment_factory_destroy
 use class_parallelepiped_domain, only: Abstract_Parallelepiped_Domain, &
                                        Concrete_Parallelepiped_Domain
 use class_external_field, only: Abstract_External_Field, Concrete_External_Field
@@ -65,9 +65,9 @@ implicit none
     call test_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
 
-    call box_factory_create(periodic_box, input_data, "Test External Field")
-    call box_factory_create(field_expression, input_data, "Test External Field")
-    call box_factory_create(parallelepiped_domain, input_data, &
+    call environment_factory_create(periodic_box, input_data, "Test External Field")
+    call environment_factory_create(field_expression, input_data, "Test External Field")
+    call environment_factory_create(parallelepiped_domain, input_data, &
         "Test External Field.External Field", periodic_box)
 
     data_field = "Test External Field.External Field.delta"
@@ -82,9 +82,9 @@ implicit none
 
     call external_field%destroy()
     deallocate(external_field)
-    call box_factory_destroy(parallelepiped_domain)
-    call box_factory_destroy(periodic_box)
-    call box_factory_destroy(field_expression)
+    call environment_factory_destroy(parallelepiped_domain)
+    call environment_factory_destroy(periodic_box)
+    call environment_factory_destroy(field_expression)
     deallocate(data_field)
     deallocate(data_filename)
     call input_data%destroy()

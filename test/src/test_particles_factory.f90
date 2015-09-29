@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: output_unit
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists
 use class_periodic_box, only: Abstract_Periodic_Box
-use procedures_box_factory, only: box_factory_create, box_factory_destroy
+use procedures_environment_factory, only: environment_factory_create, environment_factory_destroy
 use types_particles, only: Mixture_Wrapper
 use procedures_particles_factory, only: particles_factory_create, particles_factory_destroy
 implicit none
@@ -21,7 +21,7 @@ implicit none
     call input_data%load_file(filename = data_filename)
     deallocate(data_filename)
 
-    call box_factory_create(periodic_box, input_data, "Box.")
+    call environment_factory_create(periodic_box, input_data, "Box.")
     call particles_factory_create(mixture%components(1), input_data, "Mixture.Component 1.", &
         periodic_box)
     call particles_factory_create(mixture%components(2), input_data, "Mixture.Component 2.", &
@@ -34,7 +34,7 @@ implicit none
     call particles_factory_destroy(mixture%inter_diameter)
     call particles_factory_destroy(mixture%components(2))
     call particles_factory_destroy(mixture%components(1))
-    call box_factory_destroy(periodic_box)
+    call environment_factory_destroy(periodic_box)
     call input_data%destroy()
 
 end program test_particles_factory

@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_in_range
 use procedures_random, only: random_integer
-use types_box, only: Box_Wrapper
+use types_environment_wrapper, only: Environment_Wrapper
 use class_temperature, only: Abstract_Temperature
 use class_external_field, only: Abstract_External_Field
 use class_walls_potential, only: Abstract_Walls_Potential
@@ -88,14 +88,14 @@ contains
 
 !implementation Abstract_One_Particle_Move
 
-    subroutine Abstract_One_Particle_Move_construct(this, box, moved_1, moved_2)
+    subroutine Abstract_One_Particle_Move_construct(this, environment, moved_1, moved_2)
         class(Abstract_One_Particle_Move), intent(out) :: this
-        type(Box_Wrapper), target, intent(in) :: box
+        type(Environment_Wrapper), target, intent(in) :: environment
         class(Abstract_Moved_Positions), target, intent(in) :: moved_1, moved_2
 
-        this%temperature => box%temperature
-        this%field => box%external_field
-        this%walls => box%walls_potential
+        this%temperature => environment%temperature
+        this%field => environment%external_field
+        this%walls => environment%walls_potential
         this%candidates(1)%moved => moved_1
         this%candidates(2)%moved => moved_2
     end subroutine Abstract_One_Particle_Move_construct
@@ -272,9 +272,9 @@ contains
 
 !implementation Null_One_Particle_Move
 
-    subroutine Null_One_Particle_Move_construct(this, box, moved_1, moved_2)
+    subroutine Null_One_Particle_Move_construct(this, environment, moved_1, moved_2)
         class(Null_One_Particle_Move), intent(out) :: this
-        type(Box_Wrapper), target, intent(in) :: box
+        type(Environment_Wrapper), target, intent(in) :: environment
         class(Abstract_Moved_Positions), target, intent(in) :: moved_1, moved_2
     end subroutine Null_One_Particle_Move_construct
 

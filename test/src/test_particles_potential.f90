@@ -5,7 +5,7 @@ use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
 use procedures_errors, only: error_exit
 use class_periodic_box, only: Abstract_Periodic_Box
-use procedures_box_factory, only: box_factory_create, box_factory_destroy
+use procedures_environment_factory, only: environment_factory_create, environment_factory_destroy
 use class_particles_number, only: Abstract_Particles_Number
 use class_particles_diameter, only: Abstract_Particles_Diameter
 use class_particles_positions, only: Abstract_Particles_Positions
@@ -43,7 +43,7 @@ implicit none
     call input_data%load_file(filename = data_filename)
     deallocate(data_filename)
 
-    call box_factory_create(periodic_box, input_data, "Box.")
+    call environment_factory_create(periodic_box, input_data, "Box.")
     call particles_factory_create(particles_number, input_data, "Particles.")
     call particles_factory_create(particles_diameter, input_data, "Particles.")
     call particles_factory_create(particles_positions, periodic_box, particles_number)
@@ -79,7 +79,7 @@ implicit none
     call particles_factory_destroy(particles_positions)
     call particles_factory_destroy(particles_diameter)
     call particles_factory_destroy(particles_number)
-    call box_factory_destroy(periodic_box)
+    call environment_factory_destroy(periodic_box)
     call input_data%destroy()
 
 end program test_particles_potential
