@@ -65,7 +65,7 @@ contains
 
     subroutine particles_factory_create_all(particles, input_data, prefix, periodic_box)
         type(Particles_Wrapper), intent(out) :: particles
-        type(json_file), target, intent(inout) :: input_data
+        type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
 

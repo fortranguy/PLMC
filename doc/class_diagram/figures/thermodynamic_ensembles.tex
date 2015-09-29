@@ -1,92 +1,25 @@
-\begin{scope}[shift={($(Material.north) + (-5 cm, 85 cm)$)}]
+\begin{scope}[shift={($(Box.north) + (-5 cm, 85 cm)$)}, opacity=0.25]
     \begin{package}{Thermodynamic ensembles}
         
-        \begin{scope}[local bounding box=EnsembleAlgorithms]
-            \begin{abstractclass}[text width=\smallTextWidth]{EnsembleAlgorithms}{0, 0}
-                \operation[0]{setAlgorithms()} % in constructor?
-                \operation{chooseAlgorithm()}
-            \end{abstractclass}
-            
-            \def\operationsImplementation{
-                \operation{setAlgorithms()}
-            }
-            
-            \begin{class}[text width=\smallTextWidth]{CanonicalAlgorithms}{-4, -3}
-                \inherit{EnsembleAlgorithms}
-                \operationsImplementation{}
-            \end{class}
-            
-            \begin{class}[text width=\smallTextWidth]{GrandCanonicalAlgorithms}{4, -3}
-                \inherit{EnsembleAlgorithms}
-                \operationsImplementation{}
-            \end{class}
-            
-            \begin{class}[text width=\smallTextWidth]{IsobariclAlgorithms}{0, -5.5}
-                \inherit{EnsembleAlgorithms}
-                \operationsImplementation{}
-            \end{class}
-        \end{scope}
-        
-        \begin{scope}[shift={($(EnsembleAlgorithms.north) + (15 cm, -2 cm)$)}]
-            \begin{abstractclass}[text width=\smallTextWidth]{MetropolisAlgorithm}{0, 0}
-                \operation[0]{try()}
-            \end{abstractclass}
-            
-            \def\operationsImplementation{
+        \begin{scope}[opacity=1]
+            \begin{abstractclass}[text width=\largeTextWidth]{OneParticleMove}{0, 0}
+                \operation{construct(temperature\type{Temperature}, moved1\type{MovedPositions},
+                    moved2\type{MovedPositions})}
+                \operation{destroy()}
+                \operation{setCandidate(iCandidate\type{int}, positions\type{Positions})}
+                \operation{setCandidate(iCandidate\type{int}, intraCells\type{VisitableCells},
+                    interCells\type{VisitableCells}}
+                \operation{setCandidateObservables(moveCounters\type{ChangeCounter[2]},
+                    particlesEnergies\type{ParticleEnergy[2]}, interEnergy\type{double})}
+                \operation{destroy()}
                 \operation{try()}
-            }
-            
-            \begin{abstractclass}[text width=\smallTextWidth]{OneSphereChange}{-4, -3}
-                \inherit{MetropolisAlgorithm}
-                \operationsImplementation{}
-                \operation[0]{chooseComponent()}
-                \operation{chooseSphere()}
-                \operation[0]{applySmallChange()}
-                \operation[0]{calculateEnergy()}
-                \operation[0]{testMetroplis()}
-                \operation[0]{update()}
             \end{abstractclass}
-            
-            \def\operationsImplementation{
-                \operation{chooseComponent()}
-                \operation{applySmallChange()}
-                \operation{calculateEnergy()}
-                \operation{testMetroplis()}
-                \operation{update()}
-            }
-            
-            \begin{class}[text width=\smallTextWidth]{OneSphereMove}{-4, -8.5}
-                \inherit{OneSphereChange}
-                \operationsImplementation{}
-            \end{class}
-            
-            \begin{class}[text width=\smallTextWidth]{OneSphereRotation}{-4, -13}
-                \inherit{OneSphereChange}
-                \operationsImplementation{}
-            \end{class}
-            
-            \def\operationsImplementation{
-                \operation{try()}
-                % to fill
-            }
-            
-            \begin{class}[text width=\smallTextWidth]{OneSphereExchange}{4, -3}
-                \inherit{MetropolisAlgorithm}
-                \operationsImplementation{}
-            \end{class}
-            
-            \begin{class}[text width=\smallTextWidth]{TwoSpheresSwitch}{12, -3}
-                \inherit{MetropolisAlgorithm}
-                \operationsImplementation{}
-            \end{class}
         \end{scope}
 
     \end{package}
 \end{scope}
 
 \begin{scope}[on background layer]
-    \aggregation{EnsembleAlgorithms}{algo}{1..*}{MetropolisAlgorithm}
-    
     %\aggregation{MetropolisAlgorithm}{thermostat}{1}{Thermostat}
 
     %\aggregation{OneSphereMove}{dipSpheres}{2}{DipolarSpheres}

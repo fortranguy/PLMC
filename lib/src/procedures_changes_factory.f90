@@ -43,7 +43,7 @@ contains
 
     subroutine changes_factory_create_all(changes, input_data, prefix, particles)
         type(Changes_Wrapper), intent(out) :: changes
-        type(json_file), target, intent(inout) :: input_data
+        type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
         type(Particles_Wrapper), intent(in) :: particles
 
@@ -58,7 +58,7 @@ contains
         input_data, prefix)
         class(Abstract_Moved_Positions), allocatable, intent(out) :: moved_positions
         class(Abstract_Particles_Positions), intent(in) :: particles_positions
-        type(json_file), target, intent(inout) :: input_data
+        type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
         call allocate_moved_positions(moved_positions, particles_positions)
@@ -78,7 +78,7 @@ contains
 
     subroutine construct_moved_positions(moved_positions, input_data, prefix, particles_positions)
         class(Abstract_Moved_Positions), intent(inout) :: moved_positions
-        type(json_file), target, intent(inout) :: input_data
+        type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
         class(Abstract_Particles_Positions), intent(in) :: particles_positions
 
@@ -109,7 +109,7 @@ contains
         particles_orientations, input_data, prefix)
         class(Abstract_Rotated_Orientations), allocatable, intent(out) :: rotated_orientations
         class(Abstract_Particles_Orientations), intent(in) :: particles_orientations
-        type(json_file), target, intent(inout) :: input_data
+        type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
         call allocate_rotated_orientations(rotated_orientations, particles_orientations)
@@ -131,7 +131,7 @@ contains
     subroutine construct_rotated_orientations(rotated_orientations, input_data, prefix, &
         particles_orientations)
         class(Abstract_Rotated_Orientations), intent(inout) :: rotated_orientations
-        type(json_file), target, intent(inout) :: input_data
+        type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
         class(Abstract_Particles_Orientations), intent(in) :: particles_orientations
 

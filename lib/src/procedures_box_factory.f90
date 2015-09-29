@@ -65,7 +65,7 @@ contains
 
     subroutine box_factory_create_all(box, input_data, prefix)
         type(Box_Wrapper), intent(out) :: box
-        type(json_file), target, intent(inout) :: input_data
+        type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
         call box_factory_create(box%periodic_box, input_data, prefix)
@@ -89,7 +89,7 @@ contains
 
     subroutine allocate_and_set_periodic_box(periodic_box, input_data, prefix)
         class(Abstract_Periodic_Box), allocatable, intent(out) :: periodic_box
-        type(json_file), target, intent(inout) :: input_data
+        type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field
@@ -118,7 +118,7 @@ contains
 
     subroutine allocate_and_set_temperature(temperature, input_data, prefix)
         class(Abstract_Temperature), allocatable, intent(out) :: temperature
-        type(json_file), target, intent(inout) :: input_data
+        type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field

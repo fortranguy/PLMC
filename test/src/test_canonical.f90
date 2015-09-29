@@ -50,8 +50,10 @@ implicit none
         mixture%components(2))
     call short_potential_factory_create(mixture_short_potentials%intras(1), input_data, &
         "Short Potentials.Component 1.", box%periodic_box, mixture%components(1))
+    call mixture_short_potentials%intras(1)%particles%set(mixture_short_potentials%intras(1)%pair)
     call short_potential_factory_create(mixture_short_potentials%intras(2), input_data, &
         "Short Potentials.Component 2.", box%periodic_box, mixture%components(2))
+    call mixture_short_potentials%intras(2)%particles%set(mixture_short_potentials%intras(2)%pair)
     call short_potential_factory_create(mixture_short_potentials%inter_micro, input_data, &
         "Short Potentials.Inter 12.", mixture%inter_diameter)
     call short_potential_factory_create(mixture_short_potentials%inter_macros(1), &

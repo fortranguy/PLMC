@@ -52,8 +52,8 @@ implicit none
         "Particles.Potential.", particles_diameter)
     call short_potential_factory_create(pair_potential, input_data, &
         "Particles.Potential.", particles_diameter, potential_expression)
-    call short_potential_factory_create(particles_potential, periodic_box, particles_positions, &
-        pair_potential)
+    call short_potential_factory_create(particles_potential, periodic_box, particles_positions)
+    call particles_potential%set(pair_potential)
 
     energy = 0._DP
     do i_particle = 1, particles_positions%get_num()

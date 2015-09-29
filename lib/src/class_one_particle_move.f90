@@ -2,6 +2,7 @@ module class_one_particle_move
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use procedures_errors, only: error_exit
+use procedures_checks, only: check_in_range
 use procedures_random, only: random_integer
 use class_temperature, only: Abstract_Temperature
 use types_particle, only: Concrete_Particle
@@ -102,14 +103,16 @@ contains
         this%temperature => null()
     end subroutine Abstract_One_Particle_Move_destroy
 
-    subroutine Abstract_One_Particle_Move_nullify_candidate(this, i_canditate)
+    subroutine Abstract_One_Particle_Move_nullify_candidate(this, i_candidate)
         class(Abstract_One_Particle_Move), intent(inout) :: this
-        integer, intent(in) :: i_canditate
+        integer, intent(in) :: i_candidate
 
-        this%candidates(i_canditate)%inter_cells => null()
-        this%candidates(i_canditate)%intra_cells => null()
-        this%candidates(i_canditate)%moved => null()
-        this%candidates(i_canditate)%positions => null()
+        call check_in_range("Abstract_One_Particle_Move_nullify_candidate", num_candidates, &
+            "i_candidate", i_candidate)
+        this%candidates(i_candidate)%inter_cells => null()
+        this%candidates(i_candidate)%intra_cells => null()
+        this%candidates(i_candidate)%moved => null()
+        this%candidates(i_candidate)%positions => null()
     end subroutine Abstract_One_Particle_Move_nullify_candidate
 
     subroutine Abstract_One_Particle_Move_set_candidate_positions(this, i_candidate, positions)
@@ -117,6 +120,8 @@ contains
         integer, intent(in) :: i_candidate
         class(Abstract_Particles_Positions), target, intent(in) :: positions
 
+        call check_in_range("Abstract_One_Particle_Move_set_candidate_positions", num_candidates, &
+            "i_candidate", i_candidate)
         this%candidates(i_candidate)%positions => positions
     end subroutine Abstract_One_Particle_Move_set_candidate_positions
 
@@ -126,6 +131,8 @@ contains
         integer, intent(in) :: i_candidate
         class(Abstract_Visitable_Cells), target, intent(in) :: intra_cells, inter_cells
 
+        call check_in_range("Abstract_One_Particle_Move_set_candidate_short_potentials", &
+            num_candidates, "i_candidate", i_candidate)
         this%candidates(i_candidate)%intra_cells => intra_cells
         this%candidates(i_candidate)%inter_cells => inter_cells
     end subroutine Abstract_One_Particle_Move_set_candidate_short_potentials
