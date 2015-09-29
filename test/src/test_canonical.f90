@@ -12,8 +12,8 @@ use procedures_changes_factory, only: changes_factory_create, changes_factory_de
 use types_short_potential, only: Mixture_Short_Potentials_Wrapper
 use procedures_short_potential_factory, only: short_potential_factory_create, &
     short_potential_factory_destroy
-use class_one_particle_move, only: Abstract_One_Particle_Move, &
-    Two_Candidates_One_Particle_Move
+use class_one_particle_move, only: Abstract_One_Particle_Move
+use procedures_metropolis_factory, only: metropolis_factory_create, metropolis_factory_destroy
 use types_change_counter, only: Concrete_Change_Counter
 use module_particle_energy, only: Concrete_Particle_Energy
 
@@ -60,19 +60,19 @@ implicit none
         mixture_short_potentials%inter_micro, input_data, "Short Potentials.Inter 12.", &
         box%periodic_box, mixture%components(2)%positions)
     call input_data%destroy()
-    allocate(Two_Candidates_One_Particle_Move :: one_particle_move)
-    call one_particle_move%construct(box%temperature)
-    call one_particle_move%set_first_candidate(mixture%components(1)%positions, &
-        changes_1%moved_positions, mixture_short_potentials%intras(1)%cells, &
+    call metropolis_factory_create(one_particle_move, box%temperature, changes_1%moved_positions, &
+        changes_2%moved_positions)
+    call one_particle_move%set_candidate(1, mixture%components(1)%positions)
+    call one_particle_move%set_candidate(1, mixture_short_potentials%intras(1)%cells, &
         mixture_short_potentials%inter_macros(1)%cells)
-    call one_particle_move%set_second_candidate(mixture%components(2)%positions, &
-        changes_2%moved_positions, mixture_short_potentials%intras(2)%cells, &
+    call one_particle_move%set_candidate(2, mixture%components(2)%positions)
+    call one_particle_move%set_candidate(2, mixture_short_potentials%intras(2)%cells, &
         mixture_short_potentials%inter_macros(2)%cells)
     call one_particle_move%set_candidates_observables(move_counters, particles_energies)
 
     call one_particle_move%try()
 
-    deallocate(one_particle_move)
+    call metropolis_factory_destroy(one_particle_move)
     call short_potential_factory_destroy(mixture_short_potentials%inter_macros(2))
     call short_potential_factory_destroy(mixture_short_potentials%inter_macros(1))
     call short_potential_factory_destroy(mixture_short_potentials%inter_micro)

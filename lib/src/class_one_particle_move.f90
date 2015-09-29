@@ -32,12 +32,15 @@ private
         type(Concrete_Particle_Energy), pointer :: particles_energies(:) => null()
     contains
         procedure :: construct => Abstract_One_Particle_Move_construct
-        procedure :: set_first_candidate => Abstract_One_Particle_Move_set_first_candidate
-        procedure :: set_second_candidate => Abstract_One_Particle_Move_set_second_candidate
+        generic :: set_candidate => set_candidate_positions, set_candidate_short_potentials
         procedure :: set_candidates_observables => &
             Abstract_One_Particle_Move_set_candidates_observables
         procedure :: destroy => Abstract_One_Particle_Move_destroy
         procedure :: try => Abstract_One_Particle_Move_try
+        procedure, private :: set_candidate_positions => &
+            Abstract_One_Particle_Move_set_candidate_positions
+        procedure, private :: set_candidate_short_potentials => &
+            Abstract_One_Particle_Move_set_candidate_short_potentials
         procedure, private :: test_metropolis => Abstract_One_Particle_Move_test_metropolis
         procedure, private :: nullify_candidate => Abstract_One_Particle_Move_nullify_candidate
         procedure, private, nopass :: select_actor_and_spectator => &
@@ -49,9 +52,12 @@ private
     type, extends(Abstract_One_Particle_Move), public :: Null_One_Particle_Move
     contains
         procedure :: construct => Null_One_Particle_Move_construct
-        procedure :: set_first_candidate => Null_One_Particle_Move_set_first_candidate
-        procedure :: set_second_candidate => Null_One_Particle_Move_set_second_candidate
+        procedure :: set_candidates_observables => Null_One_Particle_Move_set_candidates_observables
         procedure :: destroy => Null_One_Particle_Move_destroy
+        procedure, private :: set_candidate_positions => &
+            Null_One_Particle_Move_set_candidate_positions
+        procedure, private :: set_candidate_short_potentials => &
+            Null_One_Particle_Move_set_candidate_short_potentials
         procedure :: try => Null_One_Particle_Move_try
     end type Null_One_Particle_Move
 
@@ -75,11 +81,14 @@ contains
 
 !implementation Abstract_One_Particle_Move
 
-    subroutine Abstract_One_Particle_Move_construct(this, temperature)
+    subroutine Abstract_One_Particle_Move_construct(this, temperature, moved_1, moved_2)
         class(Abstract_One_Particle_Move), intent(out) :: this
         class(Abstract_Temperature), target, intent(in) :: temperature
+        class(Abstract_Moved_Positions), target, intent(in) :: moved_1, moved_2
 
         this%temperature => temperature
+        this%candidates(1)%moved => moved_1
+        this%candidates(2)%moved => moved_2
     end subroutine Abstract_One_Particle_Move_construct
 
     subroutine Abstract_One_Particle_Move_destroy(this)
@@ -102,31 +111,23 @@ contains
         this%candidates(i_canditate)%positions => null()
     end subroutine Abstract_One_Particle_Move_nullify_candidate
 
-    subroutine Abstract_One_Particle_Move_set_first_candidate(this, positions, moved, intra_cells, &
-        inter_cells)
+    subroutine Abstract_One_Particle_Move_set_candidate_positions(this, i_candidate, positions)
         class(Abstract_One_Particle_Move), intent(inout) :: this
+        integer, intent(in) :: i_candidate
         class(Abstract_Particles_Positions), target, intent(in) :: positions
-        class(Abstract_Moved_Positions), target, intent(in) :: moved
-        class(Abstract_Visitable_Cells), target, intent(in) :: intra_cells, inter_cells
 
-        this%candidates(1)%positions => positions
-        this%candidates(1)%moved => moved
-        this%candidates(1)%intra_cells => intra_cells
-        this%candidates(1)%inter_cells => inter_cells
-    end subroutine Abstract_One_Particle_Move_set_first_candidate
+        this%candidates(i_candidate)%positions => positions
+    end subroutine Abstract_One_Particle_Move_set_candidate_positions
 
-    subroutine Abstract_One_Particle_Move_set_second_candidate(this, positions, moved, &
+    subroutine Abstract_One_Particle_Move_set_candidate_short_potentials(this, i_candidate, &
         intra_cells, inter_cells)
         class(Abstract_One_Particle_Move), intent(inout) :: this
-        class(Abstract_Particles_Positions), target, intent(in) :: positions
-        class(Abstract_Moved_Positions), target, intent(in) :: moved
+        integer, intent(in) :: i_candidate
         class(Abstract_Visitable_Cells), target, intent(in) :: intra_cells, inter_cells
 
-        this%candidates(2)%positions => positions
-        this%candidates(2)%moved => moved
-        this%candidates(2)%intra_cells => intra_cells
-        this%candidates(2)%inter_cells => inter_cells
-    end subroutine Abstract_One_Particle_Move_set_second_candidate
+        this%candidates(i_candidate)%intra_cells => intra_cells
+        this%candidates(i_candidate)%inter_cells => inter_cells
+    end subroutine Abstract_One_Particle_Move_set_candidate_short_potentials
 
     subroutine Abstract_One_Particle_Move_set_candidates_observables(this, move_counters, &
         particles_energies)
@@ -246,30 +247,35 @@ contains
 
 !implementation Null_One_Particle_Move
 
-    subroutine Null_One_Particle_Move_construct(this, temperature)
+    subroutine Null_One_Particle_Move_construct(this, temperature, moved_1, moved_2)
         class(Null_One_Particle_Move), intent(out) :: this
         class(Abstract_Temperature), target, intent(in) :: temperature
+        class(Abstract_Moved_Positions), target, intent(in) :: moved_1, moved_2
     end subroutine Null_One_Particle_Move_construct
 
     subroutine Null_One_Particle_Move_destroy(this)
         class(Null_One_Particle_Move), intent(inout) :: this
     end subroutine Null_One_Particle_Move_destroy
 
-    subroutine Null_One_Particle_Move_set_first_candidate(this, positions, moved, intra_cells, &
-        inter_cells)
+    subroutine Null_One_Particle_Move_set_candidate_positions(this, i_candidate, positions)
         class(Null_One_Particle_Move), intent(inout) :: this
+        integer, intent(in) :: i_candidate
         class(Abstract_Particles_Positions), target, intent(in) :: positions
-        class(Abstract_Moved_Positions), target, intent(in) :: moved
-        class(Abstract_Visitable_Cells), target, intent(in) :: intra_cells, inter_cells
-    end subroutine Null_One_Particle_Move_set_first_candidate
+    end subroutine Null_One_Particle_Move_set_candidate_positions
 
-    subroutine Null_One_Particle_Move_set_second_candidate(this, positions, moved, &
+    subroutine Null_One_Particle_Move_set_candidate_short_potentials(this, i_candidate, &
         intra_cells, inter_cells)
         class(Null_One_Particle_Move), intent(inout) :: this
-        class(Abstract_Particles_Positions), target, intent(in) :: positions
-        class(Abstract_Moved_Positions), target, intent(in) :: moved
+        integer, intent(in) :: i_candidate
         class(Abstract_Visitable_Cells), target, intent(in) :: intra_cells, inter_cells
-    end subroutine Null_One_Particle_Move_set_second_candidate
+    end subroutine Null_One_Particle_Move_set_candidate_short_potentials
+
+    subroutine Null_One_Particle_Move_set_candidates_observables(this, move_counters, &
+        particles_energies)
+        class(Null_One_Particle_Move), intent(inout) :: this
+        type(Concrete_Change_Counter), target, intent(in) :: move_counters(:)
+        type(Concrete_Particle_Energy), target, intent(in) :: particles_energies(:)
+    end subroutine Null_One_Particle_Move_set_candidates_observables
 
     subroutine Null_One_Particle_Move_try(this)
         class(Null_One_Particle_Move), intent(in) :: this

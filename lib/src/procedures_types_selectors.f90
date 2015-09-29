@@ -11,13 +11,14 @@ use class_particles_dipolar_moments, only: Abstract_Particles_Dipolar_Moments, &
     Null_Particles_Dipolar_Moments
 use class_particles_chemical_potential, only: Abstract_Particles_Chemical_Potential, &
     Null_Particles_Chemical_Potential
+use class_moved_positions, only: Abstract_Moved_Positions, Null_Moved_Positions
 use class_particles_exchange, only: Abstract_Particles_Exchange, Null_Particles_Exchange
 
 implicit none
 
 private
 public :: apply_external_field, use_reciprocal_lattice, use_walls, &
-    particles_exist, particles_have_positions, particles_are_dipolar, &
+    particles_exist, particles_have_positions, particles_can_move, particles_are_dipolar, &
     particles_have_orientations, particles_can_exchange
 
 interface apply_external_field
@@ -123,6 +124,17 @@ contains
                 particles_have_positions = .true.
         end select
     end function particles_have_positions
+
+    pure logical function particles_can_move(moved_positions)
+        class(Abstract_Moved_Positions), intent(in) :: moved_positions
+
+        select type (moved_positions)
+            type is (Null_Moved_Positions)
+                particles_can_move = .false.
+            class default
+                particles_can_move = .true.
+        end select
+    end function particles_can_move
 
     logical function particles_are_dipolar_from_json(input_data, prefix) &
         result(particles_are_dipolar)
