@@ -7,7 +7,7 @@ use class_moved_positions, only: Abstract_Moved_Positions
 use class_one_particle_move, only: Abstract_One_Particle_Move, &
     Null_One_Particle_Move, Two_Candidates_One_Particle_Move, &
     First_Candidate_One_Particle_Move, Second_Candidate_One_Particle_Move
-use procedures_types_selectors, only: particles_can_move
+use procedures_property_inquirers, only: particles_can_move
 
 implicit none
 

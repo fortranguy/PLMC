@@ -5,7 +5,7 @@ use data_geometry, only: num_dimensions
 use procedures_checks, only: check_positive, check_increase_factor
 use class_particles_orientations, only: Abstract_Particles_Orientations
 use procedures_random, only: markov_orientation
-use module_adaptation, only: Concrete_Adaptation_Parameters, &
+use module_change_adaptation, only: Concrete_Adaptation_Parameters, &
     set_increase_factor
 
 implicit none

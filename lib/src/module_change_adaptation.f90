@@ -1,4 +1,4 @@
-module module_adaptation
+module module_change_adaptation
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use procedures_errors, only: warning_continue
@@ -32,4 +32,4 @@ contains
         end if
     end subroutine set_increase_factor
 
-end module module_adaptation
+end module module_change_adaptation

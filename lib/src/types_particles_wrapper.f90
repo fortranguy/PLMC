@@ -1,4 +1,4 @@
-module types_particles
+module types_particles_wrapper
 
 use class_particles_number, only: Abstract_Particles_Number
 use class_particles_diameter, only: Abstract_Particles_Diameter
@@ -29,4 +29,4 @@ private
         class(Abstract_Particles_Diameter), allocatable :: inter_diameter
     end type Mixture_Wrapper
 
-end module types_particles
+end module types_particles_wrapper

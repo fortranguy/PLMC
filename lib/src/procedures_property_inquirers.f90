@@ -1,4 +1,4 @@
-module procedures_types_selectors
+module procedures_property_inquirers
 
 use json_module, only: json_file
 use module_data, only: test_data_found
@@ -220,4 +220,4 @@ contains
         call test_data_found(switch_name, data_found)
     end function logical_from_json
 
-end module procedures_types_selectors
+end module procedures_property_inquirers

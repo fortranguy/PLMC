@@ -22,8 +22,8 @@ use class_particles_dipolar_moments, only: Abstract_Particles_Dipolar_Moments, &
     Concrete_Particles_Dipolar_Moments, Null_Particles_Dipolar_Moments
 use class_particles_total_moment, only: Abstract_Particles_Total_Moment, &
     Concrete_Particles_Total_Moment, Null_Particles_Total_Moment
-use types_particles, only: Particles_Wrapper, Mixture_Wrapper
-use procedures_types_selectors, only: particles_exist, particles_have_positions, &
+use types_particles_wrapper, only: Particles_Wrapper, Mixture_Wrapper
+use procedures_property_inquirers, only: particles_exist, particles_have_positions, &
     particles_are_dipolar, particles_have_orientations, particles_can_exchange
 
 implicit none

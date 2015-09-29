@@ -7,7 +7,7 @@ use module_data, only: test_file_exists, test_data_found
 use class_particles_number, only: Abstract_Particles_Number, Concrete_Particles_Number
 use class_particles_orientations, only: Abstract_Particles_Orientations, &
     Concrete_Particles_Orientations
-use module_adaptation, only: Concrete_Adaptation_Parameters
+use module_change_adaptation, only: Concrete_Adaptation_Parameters
 use class_rotated_orientations, only: Abstract_Rotated_Orientations, &
     Concrete_Rotated_Orientations
 

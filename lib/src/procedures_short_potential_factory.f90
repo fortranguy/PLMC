@@ -9,8 +9,9 @@ use class_periodic_box, only: Abstract_Periodic_Box, &
 use class_particles_diameter, only: Abstract_Particles_Diameter, &
     Null_Particles_Diameter
 use class_particles_positions, only: Abstract_Particles_Positions
-use types_particles, only: Particles_Wrapper
-use procedures_types_selectors, only: particles_exist, particles_have_positions, particles_interact
+use types_particles_wrapper, only: Particles_Wrapper
+use procedures_property_inquirers, only: particles_exist, particles_have_positions, &
+    particles_interact
 use class_potential_expression, only: Abstract_Potential_Expression, &
     Null_Potential_Expression, Lennard_Jones_Expression
 use types_potential_domain, only: Concrete_Potential_Domain

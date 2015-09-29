@@ -5,7 +5,7 @@ use data_geometry, only: num_dimensions
 use procedures_errors, only: warning_continue
 use procedures_checks, only: check_3d_array, check_positive, check_increase_factor
 use class_particles_positions, only: Abstract_Particles_Positions
-use module_adaptation, only: Concrete_Adaptation_Parameters, &
+use module_change_adaptation, only: Concrete_Adaptation_Parameters, &
     set_increase_factor
 
 implicit none

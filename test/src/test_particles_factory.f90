@@ -5,7 +5,7 @@ use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists
 use class_periodic_box, only: Abstract_Periodic_Box
 use procedures_environment_factory, only: environment_factory_create, environment_factory_destroy
-use types_particles, only: Mixture_Wrapper
+use types_particles_wrapper, only: Mixture_Wrapper
 use procedures_particles_factory, only: particles_factory_create, particles_factory_destroy
 implicit none
 

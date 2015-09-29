@@ -7,7 +7,7 @@ use module_data, only: test_file_exists, test_data_found
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box
 use class_particles_number, only: Abstract_Particles_Number, Concrete_Particles_Number
 use class_particles_positions, only: Abstract_Particles_Positions, Concrete_Particles_Positions
-use module_adaptation, only: Concrete_Adaptation_Parameters
+use module_change_adaptation, only: Concrete_Adaptation_Parameters
 use class_moved_positions, only: Abstract_Moved_Positions, &
     Concrete_Moved_Positions
 

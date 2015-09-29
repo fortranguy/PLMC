@@ -47,9 +47,9 @@ use module_data, only: test_file_exists, test_data_found
 use procedures_errors, only: error_exit
 use types_environment_wrapper, only: Environment_Wrapper
 use procedures_environment_factory, only: environment_factory_create, environment_factory_destroy
-use types_particles, only: Mixture_Wrapper
+use types_particles_wrapper, only: Mixture_Wrapper
 use procedures_particles_factory, only: particles_factory_create, particles_factory_destroy
-use types_changes, only: Changes_Wrapper
+use types_changes_wrapper, only: Changes_Wrapper
 use procedures_changes_factory, only: changes_factory_create, changes_factory_destroy
 use types_short_potential, only: Mixture_Short_Potentials_Wrapper
 use procedures_short_potential_factory, only: short_potential_factory_create, &

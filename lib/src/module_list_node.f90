@@ -1,4 +1,4 @@
-module module_nodes
+module module_list_node
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_geometry, only: num_dimensions
@@ -48,4 +48,4 @@ contains
         deallocate(nodes_tmp)
     end subroutine increase_nodes_size
 
-end module module_nodes
+end module module_list_node

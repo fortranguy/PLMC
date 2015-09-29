@@ -29,7 +29,7 @@ use procedures_short_potential_factory, only: short_potential_factory_create, &
 use class_walls_potential, only: Abstract_Walls_Potential, &
     Concrete_Walls_Potential, Null_Walls_Potential
 use types_environment_wrapper, only: Environment_Wrapper
-use procedures_types_selectors, only: apply_external_field, use_reciprocal_lattice, use_walls
+use procedures_property_inquirers, only: apply_external_field, use_reciprocal_lattice, use_walls
 
 implicit none
 

@@ -1,4 +1,4 @@
-module types_changes
+module types_changes_wrapper
 
 use class_moved_positions, only: Abstract_Moved_Positions
 use class_rotated_orientations, only: Abstract_Rotated_Orientations
@@ -14,4 +14,4 @@ private
         class(Abstract_Particles_Exchange), allocatable :: particles_exchange
     end type Changes_Wrapper
 
-end module types_changes
+end module types_changes_wrapper

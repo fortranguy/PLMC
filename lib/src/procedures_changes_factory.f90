@@ -14,11 +14,11 @@ use class_rotated_orientations, only: Abstract_Rotated_Orientations, &
     Concrete_Rotated_Orientations, Null_Rotated_Orientations
 use class_particles_exchange, only: Abstract_Particles_Exchange, &
     Concrete_Particles_Exchange, Null_Particles_Exchange
-use module_adaptation, only: Concrete_Adaptation_Parameters
-use types_particles, only: Particles_Wrapper
-use procedures_types_selectors, only: particles_have_positions, particles_have_orientations, &
+use module_change_adaptation, only: Concrete_Adaptation_Parameters
+use types_particles_wrapper, only: Particles_Wrapper
+use procedures_property_inquirers, only: particles_have_positions, particles_have_orientations, &
     particles_can_exchange
-use types_changes, only: Changes_Wrapper
+use types_changes_wrapper, only: Changes_Wrapper
 
 implicit none
 
