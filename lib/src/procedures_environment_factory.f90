@@ -97,7 +97,7 @@ contains
         character(len=:), allocatable :: box_periodicity
         real(DP), allocatable :: box_size(:)
 
-        data_field = prefix//"periodicity"
+        data_field = prefix//"Box.periodicity"
         call input_data%get(data_field, box_periodicity, data_found)
         call test_data_found(data_field, data_found)
         select case (box_periodicity)
@@ -109,7 +109,7 @@ contains
                 call error_exit(data_field//" unknown. Choose between: 'XYZ' and 'XY'")
         end select
         deallocate(box_periodicity)
-        data_field = prefix//"size"
+        data_field = prefix//"Box.size"
         call input_data%get(data_field, box_size, data_found)
         call test_data_found(data_field, data_found)
         deallocate(data_field)
@@ -125,7 +125,7 @@ contains
         logical :: data_found
         real(DP) :: temperature_value
 
-        data_field = prefix//"temperature"
+        data_field = prefix//"Thermostat.temperature"
         call input_data%get(data_field, temperature_value, data_found)
         call test_data_found(data_field, data_found)
         allocate(Concrete_Temperature :: temperature)

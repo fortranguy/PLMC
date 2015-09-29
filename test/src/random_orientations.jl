@@ -1,19 +1,47 @@
+module RandomOrientations
+    function randomOrientations(num_particles::Int64)
+        orientations = randn(num_particles, 3)
+        for i=1:size(orientations, 1)
+            orientations[i, :] = orientations[i, :] / norm(orientations[i, :])
+        end
+        return orientations
+    end
+end
+
+module ParticlesType
+    type Particles
+        num_particles :: Int64
+        orientations :: Array{Float64, 2}
+    end
+end
+
 import JSON
 json = JSON
+import RandomOrientations
+ro = RandomOrientations
+import ParticlesType
+pt = ParticlesType
 
 if size(ARGS, 1) == 0
     error("Please provide a .json file.")
 end
-input_data = json.parsefile(ARGS[1]; ordered=false, use_mmap=true)
-if !input_data["Particles"]["are dipolar"]
-    error("Particles aren't dipolar: orientations are useless (yet).")
-end
-num_particles = input_data["Particles"]["number"]
-orientations = randn(num_particles, 3)
-for i=1:size(orientations, 1)
-    orientations[i, :] = orientations[i, :] / norm(orientations[i, :])
+#input_data = json.parsefile(ARGS[1]; ordered=false, use_mmap=true)
+input_data = json.parsefile("/home/salomon/Documents/Simulations/PLMC/test/src/canonical.json"; ordered=false, use_mmap=true)
+
+if input_data["Mixture"]["Component 1"]["exist"] && input_data["Mixture"]["Component 1"]["are dipolar"]
+    particles_1 = pt.Particles(0, zeros(3, 1))
+    particles_1.num_particles = input_data["Mixture"]["Component 1"]["number"]
+    particles_1.orientations = ro.randomOrientations(particles_1.num_particles)
+    output_file = "orientations_1.in"
+    writedlm(output_file, particles_1.orientations)
+    println("Positions written in ", output_file)
 end
 
-outputFile = "orientations.in"
-writedlm(outputFile, orientations)
-println("Positions written in ", outputFile)
+if input_data["Mixture"]["Component 2"]["exist"] && input_data["Mixture"]["Component 2"]["are dipolar"]
+    particles_2 = pt.Particles(0, zeros(3, 1))
+    particles_2.num_particles = input_data["Mixture"]["Component 2"]["number"]
+    particles_2.orientations = ro.randomOrientations(particles_2.num_particles)
+    output_file = "orientations_2.in"
+    writedlm(output_file, particles_2.orientations)
+    println("Positions written in ", output_file)
+end

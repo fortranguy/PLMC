@@ -149,6 +149,7 @@ contains
             allocate(Concrete_Particles_Diameter :: inter_particles_diameter)
             deallocate(data_field)
         else
+            inter_diameter_offset = 0._DP
             allocate(Null_Particles_Diameter :: inter_particles_diameter)
         end if
         inter_diameter = (particles_diameter_1%get() + particles_diameter_2%get()) / 2._DP + &

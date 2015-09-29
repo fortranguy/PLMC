@@ -82,7 +82,7 @@ implicit none
     call input_data%load_file(filename = data_filename)
     deallocate(data_filename)
 
-    call environment_factory_create(environment, input_data, "Box.")
+    call environment_factory_create(environment, input_data, "Environment.")
 
     call particles_factory_create(mixture%components(1), input_data, "Mixture.Component 1.", &
         environment%periodic_box)
