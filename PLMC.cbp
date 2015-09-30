@@ -170,6 +170,9 @@
 		<Unit filename="lib/src/procedures_visitable_cells.f90">
 			<Option weight="1" />
 		</Unit>
+		<Unit filename="lib/src/procedures_visits.f90">
+			<Option weight="5" />
+		</Unit>
 		<Unit filename="lib/src/types_change_counter.f90">
 			<Option weight="0" />
 		</Unit>

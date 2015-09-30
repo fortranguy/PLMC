@@ -1,14 +1,74 @@
+module procedures_factorising
+
+use json_module, only: json_file, json_initialize
+use module_data, only: test_file_exists
+use class_periodic_box, only: Abstract_Periodic_Box
+use types_environment_wrapper, only: Environment_Wrapper
+use procedures_environment_factory, only: environment_factory_create
+use types_particles_wrapper, only: Mixture_Wrapper
+use procedures_particles_factory, only: particles_factory_create
+
+implicit none
+
+private
+public :: load, create
+
+interface load
+    module procedure :: load_input_data
+end interface
+
+interface create
+    module procedure :: create_environment
+    module procedure :: create_mixture
+end interface create
+
+contains
+
+    subroutine load_input_data(input_data)
+        type(json_file), intent(out) :: input_data
+
+        character(len=:), allocatable :: data_filename
+
+        call json_initialize()
+        data_filename = "canonical.json"
+        call test_file_exists(data_filename)
+        call input_data%load_file(filename = data_filename)
+        deallocate(data_filename)
+    end subroutine load_input_data
+
+    subroutine create_environment(environment, input_data)
+        type(Environment_Wrapper), intent(out) :: environment
+        type(json_file), intent(inout) :: input_data
+
+        call environment_factory_create(environment, input_data, "Environment.")
+    end subroutine create_environment
+
+    subroutine create_mixture(mixture, input_data, periodic_box)
+        type(Mixture_Wrapper), intent(out) :: mixture
+        type(json_file), intent(inout) :: input_data
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
+
+        call particles_factory_create(mixture%components(1), input_data, "Mixture.Component 1.", &
+            periodic_box)
+        call particles_factory_create(mixture%components(2), input_data, "Mixture.Component 2.", &
+            periodic_box)
+        call particles_factory_create(mixture%inter_diameter, mixture%components(1)%diameter, &
+            mixture%components(2)%diameter, input_data, "Mixture.Inter 12.")
+    end subroutine create_mixture
+
+end module procedures_factorising
+
 program test_canonical
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
-use json_module, only: json_file, json_initialize
-use module_data, only: test_file_exists, test_data_found
+use json_module, only: json_file
+use module_data, only: test_data_found
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_positive
 use types_environment_wrapper, only: Environment_Wrapper
-use procedures_environment_factory, only: environment_factory_create, environment_factory_destroy
+use procedures_environment_factory, only: environment_factory_destroy
 use types_particles_wrapper, only: Mixture_Wrapper
-use procedures_particles_factory, only: particles_factory_create, particles_factory_destroy
+use procedures_particles_factory, only: particles_factory_destroy
 use types_changes_wrapper, only: Changes_Wrapper
 use procedures_changes_factory, only: changes_factory_create, changes_factory_destroy
 use types_short_potential, only: Mixture_Short_Potentials_Wrapper
@@ -21,6 +81,7 @@ use module_particle_energy, only: Concrete_Particle_Energy, &
     particle_energy_write_legend => Concrete_Particle_Energy_write_legend, &
     particle_energy_write => Concrete_Particle_Energy_write
 use procedures_visits, only: visit
+use procedures_factorising, only: load, create
 
 implicit none
 
@@ -35,26 +96,15 @@ implicit none
     logical :: overlap
 
     type(json_file) :: input_data
-    character(len=:), allocatable :: data_filename, data_field
+    character(len=:), allocatable :: data_field
     logical :: data_found
     integer :: energy_units(2), inter_energy_unit
     integer :: num_steps, i_step, num_moves, i_move
     integer :: move_units(2)
 
-    call json_initialize()
-    data_filename = "canonical.json"
-    call test_file_exists(data_filename)
-    call input_data%load_file(filename = data_filename)
-    deallocate(data_filename)
-
-    call environment_factory_create(environment, input_data, "Environment.")
-
-    call particles_factory_create(mixture%components(1), input_data, "Mixture.Component 1.", &
-        environment%periodic_box)
-    call particles_factory_create(mixture%components(2), input_data, "Mixture.Component 2.", &
-        environment%periodic_box)
-    call particles_factory_create(mixture%inter_diameter, mixture%components(1)%diameter, &
-        mixture%components(2)%diameter, input_data, "Mixture.Inter 12.")
+    call load(input_data)
+    call create(environment, input_data)
+    call create(mixture, input_data, environment%periodic_box)
 
     call changes_factory_create(changes_1, input_data, "Changes.Component 1.", &
         environment%periodic_box, mixture%components(1))
