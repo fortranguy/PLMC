@@ -195,7 +195,7 @@ contains
 
         class(Abstract_Particles_Positions), pointer :: actor_positions, spectator_positions
         class(Abstract_Moved_Positions), pointer :: actor_moved
-        class(Abstract_Visitable_Cells), pointer :: actor_cells, spectator_cells
+        class(Abstract_Visitable_Cells), pointer :: actor_cells, actor_inter_cells, spectator_cells
         type(Concrete_Particle) :: old, new
         type(Concrete_Particle_Energy) :: new_energy, old_energy
         real(DP) :: inter_new_energy, inter_old_energy
@@ -203,7 +203,7 @@ contains
         logical :: overlap
         real(DP) :: rand
 
-        call this%set_actor(actor_positions, actor_moved, actor_cells, i_actor)
+        call this%set_actor(actor_positions, actor_moved, actor_cells, actor_inter_cells, i_actor)
         call this%set_spectator(spectator_positions, spectator_cells, i_spectator)
 
         old%i = random_integer(actor_positions%get_num())
@@ -213,16 +213,22 @@ contains
 
         success = .false.
         if (actor_positions%get_num() > spectator_positions%get_num()) then
+            new%same_type = .true.
             call actor_cells%visit(overlap, new_energy%intra, new)
             if (overlap) return
+            new%same_type = .false.
             call spectator_cells%visit(overlap, inter_new_energy, new)
         else
+            new%same_type = .false.
             call spectator_cells%visit(overlap, inter_new_energy, new)
             if (overlap) return
+            new%same_type = .true.
             call actor_cells%visit(overlap, new_energy%intra, new)
         end if
         if (overlap) return
+        old%same_type = .true.
         call actor_cells%visit(overlap, old_energy%intra, old)
+        old%same_type = .false.
         call spectator_cells%visit(overlap, inter_old_energy, old)
 
         energy_difference = new_energy - old_energy
@@ -232,7 +238,7 @@ contains
         if (rand < exp(-energy_difference_sum/this%temperature%get())) then
             call actor_positions%set(new%i, new%position)
             call actor_cells%move(old, new)
-            call spectator_cells%move(old, new)
+            call actor_inter_cells%move(old, new)
             success = .true.
         end if
     end subroutine Abstract_One_Particle_Move_test_metropolis
@@ -245,16 +251,17 @@ contains
     end subroutine Abstract_One_Particle_Move_select_actor_and_spectator
 
     subroutine Abstract_One_Particle_Move_set_actor(this, actor_positions, actor_moved, &
-        actor_cells, i_actor)
+        actor_cells, actor_inter_cells, i_actor)
         class(Abstract_One_Particle_Move), intent(in) :: this
         class(Abstract_Particles_Positions), pointer, intent(out) :: actor_positions
         class(Abstract_Moved_Positions), pointer, intent(out) :: actor_moved
-        class(Abstract_Visitable_Cells), pointer, intent(out) :: actor_cells
+        class(Abstract_Visitable_Cells), pointer, intent(out) :: actor_cells, actor_inter_cells
         integer, intent(in) :: i_actor
 
         actor_positions => this%candidates(i_actor)%positions
         actor_moved => this%candidates(i_actor)%moved
         actor_cells => this%candidates(i_actor)%intra_cells
+        actor_inter_cells => this%candidates(i_actor)%inter_cells
     end subroutine Abstract_One_Particle_Move_set_actor
 
     subroutine Abstract_One_Particle_Move_set_spectator(this, spectator_positions, &

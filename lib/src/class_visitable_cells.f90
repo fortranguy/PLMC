@@ -289,6 +289,9 @@ contains
                 from_i_cell(3))%remove(from%i)
             call this%visitable_lists(to_i_cell(1), to_i_cell(2), &
                 to_i_cell(3))%add(to)
+        else
+            call this%visitable_lists(from_i_cell(1), from_i_cell(2), &
+                from_i_cell(3))%set(from%i, to)
         end if
     end subroutine Abstract_Visitable_Cells_move
 

@@ -149,7 +149,8 @@ contains
         class(Abstract_Visitable_List), intent(inout) :: this
         integer, intent(in) :: i_particle
 
-        type(Concrete_Linkable_Node), pointer :: previous => null(), current => null(), next => null()
+        type(Concrete_Linkable_Node), pointer :: previous => null(), current => null(), &
+            next => null()
 
         previous => this%beginning
         current => previous%next
@@ -159,7 +160,7 @@ contains
                 previous%next => current%next
                 deallocate(current)
                 current => next
-                exit
+                return
             else
                 previous => current
             end if

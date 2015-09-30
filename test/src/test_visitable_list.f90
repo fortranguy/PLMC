@@ -87,19 +87,17 @@ implicit none
     call input_data%load_file(filename = data_filename)
     deallocate(data_filename)
 
-    call environment_factory_create(periodic_box, input_data, "Test Particles Potential")
-    call particles_factory_create(particles_number, input_data, &
-        "Test Particles Potential.Particles")
-    call particles_factory_create(particles_diameter, input_data, &
-        "Test Particles Potential.Particles")
+    call environment_factory_create(periodic_box, input_data, "Environment.")
+    call particles_factory_create(particles_number, input_data, "Particles.")
+    call particles_factory_create(particles_diameter, input_data, "Particles.")
     call particles_factory_create(particles_positions, periodic_box, particles_number)
-    call particles_factory_set(particles_positions, input_data, "Test Particles Potential.Particles")
-    call short_potential_factory_create(potential_expression, input_data, &
-        "Test Particles Potential.Particles", particles_diameter)
-    call short_potential_factory_create(pair_potential, input_data, &
-        "Test Particles Potential.Particles", particles_diameter, potential_expression)
-    call short_potential_factory_create(visitable_list, input_data, &
-        "Test Particles Potential.Particles", particles_positions)
+    call particles_factory_set(particles_positions, input_data, "Particles.")
+    call short_potential_factory_create(potential_expression, input_data, "Short Potential.", &
+        particles_diameter)
+    call short_potential_factory_create(pair_potential, input_data, "Short Potential.", &
+        particles_diameter, potential_expression)
+    call short_potential_factory_create(visitable_list, input_data, "Short Potential.", &
+        particles_positions)
 
     call visitable_list%construct(periodic_box)
     do i_particle = 1, particles_positions%get_num()
@@ -115,7 +113,7 @@ implicit none
         write(output_unit, *) "[initial] energy =", energy
     end if
 
-    data_field = "Test Particles Potential.Particles.number of exchanges"
+    data_field = "Particles.number of exchanges"
     call input_data%get(data_field, num_exchanges, data_found)
     call test_data_found(data_field, data_found)
     do i_exchange = 1, num_exchanges
@@ -134,7 +132,7 @@ implicit none
         end if
     end if
 
-    data_field = "Test Particles Potential.Memory.number of overwrites"
+    data_field = "Memory.number of overwrites"
     call input_data%get(data_field, num_overwrites, data_found)
     call test_data_found(data_field, data_found)
     do i_overwrite = 1, num_overwrites

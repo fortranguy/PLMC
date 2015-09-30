@@ -30,7 +30,7 @@ contains
             particle%i = i_particle
             particle%position = particles_positions%get(particle%i)
             call particles_potential%visit(overlap, energy_i, particle)
-            if (overlap) exit
+            if (overlap) return
             energy = energy + energy_i
         end do
         energy = energy / 2._DP
@@ -71,7 +71,7 @@ implicit none
     class(Abstract_One_Particle_Move), allocatable :: one_particle_move
     type(Concrete_Change_Counter) :: move_counters(2)
     type(Concrete_Particle_Energy) :: particles_energies(2)
-    real(DP) :: inter_energy, inter_energy_1, inter_energy_2
+    real(DP) :: inter_energy, inter_energy_1, inter_energy_2, particles_energy_1_intra
     logical :: overlap
 
     type(json_file) :: input_data
@@ -159,7 +159,6 @@ implicit none
     call one_particle_move%set_candidate(2, mixture%components(2)%positions)
     call one_particle_move%set_candidate(2, short_potentials%intras(2)%cells, &
         short_potentials%inters(2)%cells)
-    inter_energy = 0._DP
     call one_particle_move%set_candidates_observables(move_counters, particles_energies, &
         inter_energy)
 
@@ -168,6 +167,7 @@ implicit none
     open(newunit=move_units(2), recl=4096, file="component_2_move.out", action="write")
     write(move_units(2), *) "# num_hits    num_success"
 
+    call short_potentials%intras(1)%particles%set(short_potentials%intras(1)%pair)
     num_moves = mixture%components(1)%positions%get_num() + &
         mixture%components(2)%positions%get_num()
     do i_step = 1, num_steps
@@ -177,9 +177,30 @@ implicit none
         call particle_energy_write(energy_units(1), i_step, particles_energies(1))
         call particle_energy_write(energy_units(2), i_step, particles_energies(2))
         write(inter_energy_unit, *) i_step, inter_energy
-        write(move_units(1), *) move_counters(1)%num_hits, move_counters%num_success
-        write(move_units(1), *) move_counters(2)%num_hits, move_counters%num_success
+        write(move_units(1), *) i_step, move_counters(1)%num_hits, move_counters(1)%num_success
+        write(move_units(1), *) i_step, move_counters(2)%num_hits, move_counters(2)%num_success
     end do
+
+    call short_potentials%intras(1)%particles%set(short_potentials%intras(1)%pair)
+    call visit(overlap, particles_energies(1)%intra, short_potentials%intras(1)%particles, &
+        mixture%components(1)%positions, same_type=.true.)
+    if (overlap) call error_exit("short_potentials%intras(1) overlap")
+    call short_potentials%intras(2)%particles%set(short_potentials%intras(2)%pair)
+    call visit(overlap, particles_energies(2)%intra, short_potentials%intras(2)%particles, &
+        mixture%components(2)%positions, same_type=.true.)
+    if (overlap) call error_exit("short_potentials%intras(2) overlap")
+    call short_potentials%intras(1)%particles%set(short_potentials%inter_micro%pair)
+    call visit(overlap, inter_energy_1, short_potentials%intras(1)%particles, &
+        mixture%components(2)%positions, same_type=.false.)
+    if (overlap) call error_exit("inter short_potentials%intras(1) overlap")
+    call short_potentials%intras(2)%particles%set(short_potentials%inter_micro%pair)
+    call visit(overlap, inter_energy_2, short_potentials%intras(2)%particles, &
+        mixture%components(1)%positions, same_type=.false.)
+    if (overlap) call error_exit("inter short_potentials%intras(2) overlap")
+    inter_energy = inter_energy_1 + inter_energy_2
+    call particle_energy_write(energy_units(1), i_step, particles_energies(1))
+    call particle_energy_write(energy_units(2), i_step, particles_energies(2))
+    write(inter_energy_unit, *) i_step, inter_energy
 
     close(move_units(1))
     close(move_units(2))
