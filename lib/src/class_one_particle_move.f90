@@ -193,9 +193,10 @@ contains
         real(DP), intent(out) :: inter_energy_difference
         integer, intent(in) :: i_actor, i_spectator
 
-        class(Abstract_Particles_Positions), pointer :: actor_positions, spectator_positions
+        class(Abstract_Particles_Positions), pointer :: actor_positions
         class(Abstract_Moved_Positions), pointer :: actor_moved
         class(Abstract_Visitable_Cells), pointer :: actor_cells, actor_inter_cells, spectator_cells
+        integer :: spectator_num_positions
         type(Concrete_Particle) :: old, new
         type(Concrete_Particle_Energy) :: new_energy, old_energy
         real(DP) :: inter_new_energy, inter_old_energy
@@ -204,7 +205,7 @@ contains
         real(DP) :: rand
 
         call this%set_actor(actor_positions, actor_moved, actor_cells, actor_inter_cells, i_actor)
-        call this%set_spectator(spectator_positions, spectator_cells, i_spectator)
+        call this%set_spectator(spectator_num_positions, spectator_cells, i_spectator)
 
         old%i = random_integer(actor_positions%get_num())
         old%position = actor_positions%get(old%i)
@@ -212,7 +213,7 @@ contains
         new%position = actor_moved%get(new%i)
 
         success = .false.
-        if (actor_positions%get_num() > spectator_positions%get_num()) then
+        if (actor_positions%get_num() > spectator_num_positions) then
             new%same_type = .true.
             call actor_cells%visit(overlap, new_energy%intra, new)
             if (overlap) return
@@ -264,14 +265,14 @@ contains
         actor_inter_cells => this%candidates(i_actor)%inter_cells
     end subroutine Abstract_One_Particle_Move_set_actor
 
-    subroutine Abstract_One_Particle_Move_set_spectator(this, spectator_positions, &
+    subroutine Abstract_One_Particle_Move_set_spectator(this, spectator_num_positions, &
         spectator_cells, i_spectator)
         class(Abstract_One_Particle_Move), intent(in) :: this
-        class(Abstract_Particles_Positions), pointer, intent(out) :: spectator_positions
+        integer, intent(out) :: spectator_num_positions
         class(Abstract_Visitable_Cells), pointer, intent(out) :: spectator_cells
         integer, intent(in) :: i_spectator
 
-        spectator_positions => this%candidates(i_spectator)%positions
+        spectator_num_positions = this%candidates(i_spectator)%positions%get_num()
         spectator_cells => this%candidates(i_spectator)%inter_cells
     end subroutine Abstract_One_Particle_Move_set_spectator
 

@@ -1,43 +1,3 @@
-module procedures_canonical
-
-use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use types_particle, only: Concrete_Particle
-use class_particles_positions, only: Abstract_Particles_Positions
-use class_particles_potential, only: Abstract_Particles_Potential
-
-implicit none
-
-private
-public :: visit
-
-contains
-
-    subroutine visit(overlap, energy, particles_potential, particles_positions, same_type)
-        logical, intent(out) :: overlap
-        real(DP), intent(out) :: energy
-        class(Abstract_Particles_Potential), intent(in) :: particles_potential
-        class(Abstract_Particles_Positions), intent(in) :: particles_positions
-        logical, intent(in) :: same_type
-
-        type(Concrete_Particle) :: particle
-        real(DP) :: energy_i
-        integer :: i_particle
-
-        particle%same_type = same_type
-        overlap = .false.
-        energy = 0._DP
-        do i_particle = 1, particles_positions%get_num()
-            particle%i = i_particle
-            particle%position = particles_positions%get(particle%i)
-            call particles_potential%visit(overlap, energy_i, particle)
-            if (overlap) return
-            energy = energy + energy_i
-        end do
-        energy = energy / 2._DP
-    end subroutine visit
-
-end module procedures_canonical
-
 program test_canonical
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
@@ -60,7 +20,7 @@ use types_change_counter, only: Concrete_Change_Counter
 use module_particle_energy, only: Concrete_Particle_Energy, &
     particle_energy_write_legend => Concrete_Particle_Energy_write_legend, &
     particle_energy_write => Concrete_Particle_Energy_write
-use procedures_canonical, only: visit
+use procedures_visits, only: visit
 
 implicit none
 
@@ -171,6 +131,8 @@ implicit none
     num_moves = mixture%components(1)%positions%get_num() + &
         mixture%components(2)%positions%get_num()
     do i_step = 1, num_steps
+        move_counters(1)%num_hits = 0; move_counters(1)%num_success = 0
+        move_counters(2)%num_hits = 0; move_counters(2)%num_success = 0
         do i_move = 1, num_moves
             call one_particle_move%try()
         end do
