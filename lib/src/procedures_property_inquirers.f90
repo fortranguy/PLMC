@@ -153,8 +153,11 @@ contains
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        particles_are_dipolar = particles_exist(input_data, prefix) .and. &
-            logical_from_json(input_data, prefix//"are dipolar")
+        if (particles_exist(input_data, prefix)) then
+            particles_are_dipolar = logical_from_json(input_data, prefix//"are dipolar")
+        else
+            particles_are_dipolar = .false.
+        end if
     end function particles_are_dipolar_from_json
 
     pure logical function particles_have_orientations(particles_orientations)
@@ -194,8 +197,11 @@ contains
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        particles_can_exchange = particles_exist(input_data, prefix) .and. &
-            logical_from_json(input_data, prefix//"can exchange")
+        if (particles_exist(input_data, prefix)) then
+            particles_can_exchange = logical_from_json(input_data, prefix//"can exchange")
+        else
+            particles_can_exchange = .false.
+        end if
     end function particles_can_exchange_from_json
 
     pure logical function particles_can_exchange_from_chemical_potential(&

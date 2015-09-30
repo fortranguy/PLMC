@@ -71,7 +71,7 @@ implicit none
     class(Abstract_One_Particle_Move), allocatable :: one_particle_move
     type(Concrete_Change_Counter) :: move_counters(2)
     type(Concrete_Particle_Energy) :: particles_energies(2)
-    real(DP) :: inter_energy, inter_energy_1, inter_energy_2, particles_energy_1_intra
+    real(DP) :: inter_energy, inter_energy_1, inter_energy_2
     logical :: overlap
 
     type(json_file) :: input_data
@@ -178,7 +178,7 @@ implicit none
         call particle_energy_write(energy_units(2), i_step, particles_energies(2))
         write(inter_energy_unit, *) i_step, inter_energy
         write(move_units(1), *) i_step, move_counters(1)%num_hits, move_counters(1)%num_success
-        write(move_units(1), *) i_step, move_counters(2)%num_hits, move_counters(2)%num_success
+        write(move_units(2), *) i_step, move_counters(2)%num_hits, move_counters(2)%num_success
     end do
 
     call short_potentials%intras(1)%particles%set(short_potentials%intras(1)%pair)

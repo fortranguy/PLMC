@@ -57,7 +57,7 @@ implicit none
     call short_potential_factory_create(pair_potential, input_data, "Particles.Potential.", &
         particles_diameter, potential_expression)
     call short_potential_factory_create(visitable_list, input_data, "Particles.Potential.", &
-        particles_positions)
+        pair_potential)
     call short_potential_factory_create(visitable_cells, visitable_list, periodic_box, &
         particles_positions, pair_potential)
 

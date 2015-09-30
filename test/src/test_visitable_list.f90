@@ -97,7 +97,7 @@ implicit none
     call short_potential_factory_create(pair_potential, input_data, "Short Potential.", &
         particles_diameter, potential_expression)
     call short_potential_factory_create(visitable_list, input_data, "Short Potential.", &
-        particles_positions)
+        pair_potential)
 
     call visitable_list%construct(periodic_box)
     do i_particle = 1, particles_positions%get_num()

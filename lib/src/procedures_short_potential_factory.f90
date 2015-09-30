@@ -70,7 +70,7 @@ contains
         call short_potential_factory_create(short_potential%particles, periodic_box, &
             particles%positions)
         call short_potential_factory_create(short_potential%list, input_data, prefix, &
-            particles%positions)
+            short_potential%pair)
         call short_potential_factory_create(short_potential%cells, short_potential%list, &
             periodic_box, particles%positions, short_potential%pair)
     end subroutine short_potential_factory_create_all
@@ -87,7 +87,7 @@ contains
         call short_potential_factory_create(short_potential_macro%particles, periodic_box, &
             particles_positions)
         call short_potential_factory_create(short_potential_macro%list, input_data, prefix, &
-            particles_positions)
+            short_potential_micro%pair)
         call short_potential_factory_create(short_potential_macro%cells, &
             short_potential_macro%list, periodic_box, particles_positions, &
             short_potential_micro%pair)
@@ -256,16 +256,16 @@ contains
         call particles_potential%construct(periodic_box, particles_positions)
     end subroutine allocate_and_construct_particles
 
-    subroutine allocate_list(visitable_list, input_data, prefix, particles_positions)
+    subroutine allocate_list(visitable_list, input_data, prefix, pair_potential)
         class(Abstract_Visitable_List), allocatable, intent(out) :: visitable_list
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
-        class(Abstract_Particles_Positions), intent(in) :: particles_positions
+        class(Abstract_Pair_Potential), intent(in) :: pair_potential
 
         character(len=:), allocatable :: data_field, cells_data_structure
         logical :: data_found
 
-        if (particles_have_positions(particles_positions)) then
+        if (particles_interact(pair_potential)) then
             data_field = prefix//"Cells.data structure"
             call input_data%get(data_field, cells_data_structure, data_found)
             call test_data_found(data_field, data_found)

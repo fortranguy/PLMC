@@ -258,7 +258,7 @@ contains
         integer :: local_i1, local_i2, local_i3
 
         i_cell = this%index(particle%position)
-        bottom_layer= (i_cell(3) == this%global_lbounds(3))
+        bottom_layer = (i_cell(3) == this%global_lbounds(3))
         top_layer = (i_cell(3) == this%global_ubounds(3))
         energy = 0._DP
         do local_i3 = 1, nums_local_cells(3)
