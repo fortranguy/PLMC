@@ -171,25 +171,26 @@ contains
 
         integer :: i_actor, i_spectator
         logical :: success
-        type(Concrete_Particle_Energy) :: energy_difference
+        type(Concrete_Particle_Energy) :: actor_energy_difference
         real(DP) :: inter_energy_difference
 
         call this%select_actor_and_spectator(i_actor, i_spectator)
         this%move_counters(i_actor)%num_hits = this%move_counters(i_actor)%num_hits + 1
-        call this%test_metropolis(success, energy_difference, inter_energy_difference, i_actor, &
-            i_spectator)
+        call this%test_metropolis(success, actor_energy_difference, inter_energy_difference, &
+            i_actor, i_spectator)
         if (success) then
-            this%particles_energies(i_actor) = this%particles_energies(i_actor) + energy_difference
+            this%particles_energies(i_actor) = this%particles_energies(i_actor) + &
+                actor_energy_difference
             this%inter_energy = this%inter_energy + inter_energy_difference
             this%move_counters(i_actor)%num_success = this%move_counters(i_actor)%num_success + 1
         end if
     end subroutine Abstract_One_Particle_Move_try
 
-    subroutine Abstract_One_Particle_Move_test_metropolis(this, success, energy_difference, &
+    subroutine Abstract_One_Particle_Move_test_metropolis(this, success, actor_energy_difference, &
         inter_energy_difference, i_actor, i_spectator)
         class(Abstract_One_Particle_Move), intent(in) :: this
         logical, intent(out) :: success
-        type(Concrete_Particle_Energy), intent(out) :: energy_difference
+        type(Concrete_Particle_Energy), intent(out) :: actor_energy_difference
         real(DP), intent(out) :: inter_energy_difference
         integer, intent(in) :: i_actor, i_spectator
 
@@ -200,7 +201,7 @@ contains
         type(Concrete_Particle) :: old, new
         type(Concrete_Particle_Energy) :: new_energy, old_energy
         real(DP) :: inter_new_energy, inter_old_energy
-        real(DP) :: energy_difference_sum
+        real(DP) :: energy_difference
         logical :: overlap
         real(DP) :: rand
 
@@ -232,11 +233,11 @@ contains
         old%same_type = .false.
         call spectator_cells%visit(overlap, inter_old_energy, old)
 
-        energy_difference = new_energy - old_energy
+        actor_energy_difference = new_energy - old_energy
         inter_energy_difference = inter_new_energy - inter_old_energy
-        energy_difference_sum = particle_energy_sum(energy_difference) + inter_energy_difference
+        energy_difference = particle_energy_sum(actor_energy_difference) + inter_energy_difference
         call random_number(rand)
-        if (rand < exp(-energy_difference_sum/this%temperature%get())) then
+        if (rand < exp(-energy_difference/this%temperature%get())) then
             call actor_positions%set(new%i, new%position)
             call actor_cells%move(old, new)
             call actor_inter_cells%move(old, new)
