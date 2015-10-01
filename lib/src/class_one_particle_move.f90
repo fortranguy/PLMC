@@ -12,8 +12,8 @@ use types_particle, only: Concrete_Particle
 use class_particles_positions, only: Abstract_Particles_Positions
 use class_moved_positions, only: Abstract_Moved_Positions
 use class_visitable_cells, only: Abstract_Visitable_Cells
-use module_particle_energy, only: Concrete_Particle_Energy, &
-    particle_energy_sum => Concrete_Particle_Energy_sum, operator(+), operator(-)
+use module_particles_energy, only: Concrete_Particles_Energy, &
+    particle_energy_sum => Concrete_Particles_Energy_sum, operator(+), operator(-)
 use types_change_counter, only: Concrete_Change_Counter
 
 implicit none
@@ -35,7 +35,7 @@ private
         class(Abstract_Walls_Potential), pointer :: walls => null()
         type(Move_Candidate) :: candidates(num_candidates)
         type(Concrete_Change_Counter), pointer :: move_counters(:) => null()
-        type(Concrete_Particle_Energy), pointer :: particles_energies(:) => null()
+        type(Concrete_Particles_Energy), pointer :: particles_energies(:) => null()
         real(DP), pointer :: inter_energy => null()
     contains
         procedure :: construct => Abstract_One_Particle_Move_construct
@@ -150,7 +150,7 @@ contains
         particles_energies, inter_energy)
         class(Abstract_One_Particle_Move), intent(inout) :: this
         type(Concrete_Change_Counter), target, intent(in) :: move_counters(:)
-        type(Concrete_Particle_Energy), target, intent(in) :: particles_energies(:)
+        type(Concrete_Particles_Energy), target, intent(in) :: particles_energies(:)
         real(DP), target, intent(in) :: inter_energy
 
         if (size(move_counters) /= num_candidates) then
@@ -171,7 +171,7 @@ contains
 
         integer :: i_actor, i_spectator
         logical :: success
-        type(Concrete_Particle_Energy) :: actor_energy_difference
+        type(Concrete_Particles_Energy) :: actor_energy_difference
         real(DP) :: inter_energy_difference
 
         call this%select_actor_and_spectator(i_actor, i_spectator)
@@ -190,7 +190,7 @@ contains
         inter_energy_difference, i_actor, i_spectator)
         class(Abstract_One_Particle_Move), intent(in) :: this
         logical, intent(out) :: success
-        type(Concrete_Particle_Energy), intent(out) :: actor_energy_difference
+        type(Concrete_Particles_Energy), intent(out) :: actor_energy_difference
         real(DP), intent(out) :: inter_energy_difference
         integer, intent(in) :: i_actor, i_spectator
 
@@ -199,7 +199,7 @@ contains
         class(Abstract_Visitable_Cells), pointer :: actor_cells, actor_inter_cells, spectator_cells
         integer :: spectator_num_positions
         type(Concrete_Particle) :: old, new
-        type(Concrete_Particle_Energy) :: new_energy, old_energy
+        type(Concrete_Particles_Energy) :: new_energy, old_energy
         real(DP) :: inter_new_energy, inter_old_energy
         real(DP) :: energy_difference
         logical :: overlap
@@ -308,7 +308,7 @@ contains
         particles_energies, inter_energy)
         class(Null_One_Particle_Move), intent(inout) :: this
         type(Concrete_Change_Counter), target, intent(in) :: move_counters(:)
-        type(Concrete_Particle_Energy), target, intent(in) :: particles_energies(:)
+        type(Concrete_Particles_Energy), target, intent(in) :: particles_energies(:)
         real(DP), target, intent(in) :: inter_energy
     end subroutine Null_One_Particle_Move_set_candidates_observables
 

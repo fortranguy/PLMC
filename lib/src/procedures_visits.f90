@@ -8,7 +8,7 @@ use types_particles_wrapper, only: Particles_Wrapper
 use class_pair_potential, only: Abstract_Pair_Potential
 use class_particles_potential, only: Abstract_Particles_Potential
 use types_short_potential_wrapper, only: Short_Potential_Wrapper
-use module_particle_energy, only: Concrete_Particle_Energy
+use module_particles_energy, only: Concrete_Particles_Energy
 
 implicit none
 
@@ -24,7 +24,7 @@ contains
 
     subroutine visit_mixture_potentials(particles_energies, inter_energy, intras, inter_pair, &
         components)
-        type(Concrete_Particle_Energy), intent(out) :: particles_energies(2)
+        type(Concrete_Particles_Energy), intent(out) :: particles_energies(2)
         real(DP), intent(out) :: inter_energy
         type(Short_Potential_Wrapper), intent(inout) :: intras(2)
         class(Abstract_Pair_Potential), intent(in) :: inter_pair
