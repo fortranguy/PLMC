@@ -26,8 +26,6 @@ implicit none
     type(Mixture_Short_Potentials_Wrapper) :: short_potentials
     class(Abstract_One_Particle_Move), allocatable :: one_particle_move
     type(Concrete_Mixture_Observables) :: observables
-    type(Concrete_Particles_Energy) :: particles_energies_final(2)
-    real(DP) :: inter_energy_final
 
     type(json_file) :: input_data
     character(len=:), allocatable :: data_field
@@ -90,11 +88,11 @@ implicit none
         observables%move_counters(2)%num_hits = 0; observables%move_counters(2)%num_success = 0
     end do
 
-    call visit(particles_energies_final, inter_energy_final, short_potentials%intras, &
+    call visit(observables%particles_energies, observables%inter_energy, short_potentials%intras, &
         short_potentials%inter_micro%pair, mixture%components)
-    call particles_energy_write(energy_units(1), i_step-1, particles_energies_final(1))
-    call particles_energy_write(energy_units(2), i_step-1, particles_energies_final(2))
-    write(inter_energy_unit, *) i_step-1, inter_energy_final
+    call particles_energy_write(energy_units(1), i_step-1, observables%particles_energies(1))
+    call particles_energy_write(energy_units(2), i_step-1, observables%particles_energies(2))
+    write(inter_energy_unit, *) i_step-1, observables%inter_energy
 
     close(move_units(1))
     close(move_units(2))
