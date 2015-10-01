@@ -69,7 +69,8 @@ use data_geometry, only: num_dimensions
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
 use procedures_random, only: random_integer, random_orientation
-use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box
+use types_environment_wrapper, only: Environment_Wrapper
+use procedures_environment_factory, only: environment_factory_create, environment_factory_destroy
 use types_particle, only: Concrete_Particle
 use types_particles_wrapper, only: Particles_Wrapper
 use procedures_particles_factory, only: particles_factory_create, particles_factory_destroy
@@ -82,12 +83,10 @@ implicit none
     class(Abstract_Particles_Exchange), allocatable :: particles_exchange
     type(Particles_Wrapper) :: particles
     type(Concrete_Particle) :: particle
-    class(Abstract_Periodic_Box), allocatable :: periodic_box
+    type(Environment_Wrapper) :: environment
     type(json_file) :: input_data
-    character(len=:), allocatable :: data_filename, data_field
-    logical :: data_found
+    character(len=:), allocatable :: data_filename
 
-    real(DP), allocatable :: box_size(:)
     real(DP), dimension(num_dimensions) :: rand_3d
     integer :: i_particle
 
@@ -97,18 +96,15 @@ implicit none
     call input_data%load_file(filename = data_filename)
     deallocate(data_filename)
 
-    data_field = "Periodic Box.size"
-    call input_data%get(data_field, box_size, data_found)
-    call test_data_found(data_field, data_found)
-    allocate(XYZ_Periodic_Box :: periodic_box)
-    call periodic_box%set(box_size)
+    call environment_factory_create(environment%periodic_box, input_data, "Environment.")
+    call environment_factory_create(environment%floor_penetration, input_data, "Environment.")
 
-    call particles_factory_create(particles, input_data, "Particles.", periodic_box)
+    call particles_factory_create(particles, input_data, "Particles.", environment)
     call changes_factory_create(particles_exchange, particles)
     call json_write_particles(particles, "initial.json")
 
     call random_number(rand_3d)
-    particle%position = periodic_box%get_size() * rand_3d
+    particle%position = environment%periodic_box%get_size() * rand_3d
     particle%orientation = random_orientation()
     call particles_exchange%add(particle)
     call json_write_particles(particles, "added.json")
@@ -120,8 +116,8 @@ implicit none
 
     call changes_factory_destroy(particles_exchange)
     call particles_factory_destroy(particles)
-    deallocate(periodic_box)
-    deallocate(data_field)
+    call environment_factory_destroy(environment%floor_penetration)
+    call environment_factory_destroy(environment%periodic_box)
     call input_data%destroy()
 
 end program test_particles_exchange

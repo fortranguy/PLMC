@@ -3,13 +3,13 @@ program test_particles_factory
 use, intrinsic :: iso_fortran_env, only: output_unit
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists
-use class_periodic_box, only: Abstract_Periodic_Box
+use types_environment_wrapper, only: Environment_Wrapper
 use procedures_environment_factory, only: environment_factory_create, environment_factory_destroy
 use types_particles_wrapper, only: Mixture_Wrapper
 use procedures_particles_factory, only: particles_factory_create, particles_factory_destroy
 implicit none
 
-    class(Abstract_Periodic_Box), allocatable :: periodic_box
+    type(Environment_Wrapper) :: environment
     type(Mixture_Wrapper) :: mixture
 
     type(json_file) :: input_data
@@ -21,11 +21,12 @@ implicit none
     call input_data%load_file(filename = data_filename)
     deallocate(data_filename)
 
-    call environment_factory_create(periodic_box, input_data, "Box.")
+    call environment_factory_create(environment%periodic_box, input_data, "Environment.")
+    call environment_factory_create(environment%floor_penetration, input_data, "Environment.")
     call particles_factory_create(mixture%components(1), input_data, "Mixture.Component 1.", &
-        periodic_box)
+        environment)
     call particles_factory_create(mixture%components(2), input_data, "Mixture.Component 2.", &
-        periodic_box)
+        environment)
     call particles_factory_create(mixture%inter_diameter, mixture%components(1)%diameter, &
         mixture%components(2)%diameter, input_data, "Mixture.Inter 12.")
     write(*, *) "inter diameter", mixture%inter_diameter%get()
@@ -34,7 +35,8 @@ implicit none
     call particles_factory_destroy(mixture%inter_diameter)
     call particles_factory_destroy(mixture%components(2))
     call particles_factory_destroy(mixture%components(1))
-    call environment_factory_destroy(periodic_box)
+    call environment_factory_destroy(environment%floor_penetration)
+    call environment_factory_destroy(environment%periodic_box)
     call input_data%destroy()
 
 end program test_particles_factory

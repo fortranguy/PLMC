@@ -19,8 +19,6 @@ use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice, &
     Concrete_Reciprocal_Lattice, Null_Reciprocal_Lattice
 use class_floor_penetration, only: Abstract_Floor_Penetration, &
     Flat_Floor_Penetration, Null_Floor_Penetration
-use class_particles_diameter, only: Abstract_Particles_Diameter, &
-    Concrete_Particles_Diameter, Null_Particles_Diameter
 use procedures_particles_factory, only: particles_factory_destroy
 use class_potential_expression, only: Abstract_Potential_Expression
 use class_pair_potential, only: Abstract_Pair_Potential
@@ -45,7 +43,6 @@ interface environment_factory_create
     module procedure :: allocate_and_construct_external_field
     module procedure :: allocate_and_construct_reciprocal_lattice
     module procedure :: allocate_and_set_floor_penetration
-    module procedure :: allocate_and_set_wall_diameter
     module procedure :: allocate_and_construct_walls_potential
 end interface environment_factory_create
 
@@ -78,13 +75,8 @@ contains
         call environment_factory_create(environment%reciprocal_lattice, input_data, prefix, &
             environment%periodic_box)
         call environment_factory_create(environment%floor_penetration, input_data, prefix)
-        call environment_factory_create(environment%wall_diameter, input_data, prefix)
-        call short_potential_factory_create(environment%wall_expression, input_data, &
-            prefix//"Walls.Potential.", environment%wall_diameter)
-        call short_potential_factory_create(environment%wall_pair, input_data, &
-            prefix//"Walls.Potential.", environment%wall_diameter, environment%wall_expression)
-        call environment_factory_create(environment%walls_potential, input_data, prefix, &
-            environment%periodic_box, environment%floor_penetration, environment%wall_pair)
+        !call environment_factory_create(environment%walls_potential, input_data, prefix, &
+        !    environment%periodic_box, environment%floor_penetration, environment%wall_pair)
     end subroutine environment_factory_create_all
 
     subroutine allocate_and_set_periodic_box(periodic_box, input_data, prefix)
@@ -292,29 +284,6 @@ contains
         end if
     end subroutine allocate_and_set_floor_penetration
 
-    subroutine allocate_and_set_wall_diameter(wall_diameter, input_data, prefix)
-        class(Abstract_Particles_Diameter), allocatable, intent(out) :: wall_diameter
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
-
-        character(len=:), allocatable :: data_field
-        logical :: data_found
-        real(DP) :: diameter, diameter_min_factor
-
-        if (use_walls(input_data, prefix)) then
-            data_field = prefix//"Walls.diameter"
-            call input_data%get(data_field, diameter, data_found)
-            call test_data_found(data_field, data_found)
-            data_field = prefix//"Walls.minimum diameter factor"
-            call input_data%get(data_field, diameter_min_factor, data_found)
-            call test_data_found(data_field, data_found)
-            allocate(Concrete_Particles_Diameter :: wall_diameter)
-        else
-            allocate(Null_Particles_Diameter :: wall_diameter)
-        end if
-        call wall_diameter%set(diameter, diameter_min_factor)
-    end subroutine allocate_and_set_wall_diameter
-
     subroutine allocate_and_construct_walls_potential(walls_potential, input_data, prefix, &
         periodic_box, floor_penetration, wall_pair)
         class(Abstract_Walls_Potential), allocatable, intent(out) :: walls_potential
@@ -342,11 +311,7 @@ contains
     subroutine environment_factory_destroy_all(environment)
         type(Environment_Wrapper), intent(inout) :: environment
 
-        call environment_factory_destroy(environment%walls_potential)
-        call environment%wall_pair%destroy()
-        if (allocated(environment%wall_pair)) deallocate(environment%wall_pair)
-        call short_potential_factory_destroy(environment%wall_expression)
-        call particles_factory_destroy(environment%wall_diameter)
+        !call environment_factory_destroy(environment%walls_potential)
         call environment_factory_destroy(environment%floor_penetration)
         call environment_factory_destroy(environment%reciprocal_lattice)
         call environment_factory_destroy(environment%external_field)

@@ -2,6 +2,7 @@ module procedures_property_inquirers
 
 use json_module, only: json_file
 use module_data, only: test_data_found
+use class_floor_penetration, only: Abstract_Floor_Penetration, Null_Floor_Penetration
 use class_particles_number, only: Abstract_Particles_Number, Null_Particles_Number
 use class_particles_diameter, only: Abstract_Particles_Diameter, Null_Particles_Diameter
 use class_particles_moment_norm, only: Abstract_Particles_Moment_Norm, Null_Particles_Moment_Norm
@@ -32,6 +33,7 @@ end interface use_reciprocal_lattice
 
 interface use_walls
     module procedure :: use_walls_from_json
+    module procedure :: use_walls_from_floor_penetration
 end interface use_walls
 
 interface particles_exist
@@ -74,6 +76,17 @@ contains
 
         use_walls = logical_from_json(input_data, prefix//"Walls.use")
     end function use_walls_from_json
+
+    logical function use_walls_from_floor_penetration(floor_penetration) result(use_walls)
+        class(Abstract_Floor_Penetration), intent(in) :: floor_penetration
+
+        select type (floor_penetration)
+            type is (Null_Floor_Penetration)
+                use_walls = .false.
+            class default
+                use_walls = .true.
+        end select
+    end function use_walls_from_floor_penetration
 
     logical function particles_exist_from_json(input_data, prefix) result(particles_exist)
         type(json_file), intent(inout) :: input_data

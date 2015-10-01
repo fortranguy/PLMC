@@ -38,9 +38,9 @@ implicit none
 
     call plmc_load(input_data)
     call plmc_create(environment, input_data)
-    call plmc_create(mixture, input_data, environment%periodic_box)
+    call plmc_create(mixture, input_data, environment)
     call plmc_create(changes, input_data, environment%periodic_box, mixture%components)
-    call plmc_create(short_potentials, input_data, environment%periodic_box, mixture)
+    call plmc_create(short_potentials, input_data, environment, mixture)
 
     data_field = "Monte Carlo.number of steps"
     call input_data%get(data_field, num_steps, data_found)

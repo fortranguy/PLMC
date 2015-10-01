@@ -63,15 +63,15 @@ contains
         call environment_factory_destroy(environment)
     end subroutine destroy_environment
 
-    subroutine create_mixture(mixture, input_data, periodic_box)
+    subroutine create_mixture(mixture, input_data, environment)
         type(Mixture_Wrapper), intent(out) :: mixture
         type(json_file), intent(inout) :: input_data
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
+        type(Environment_Wrapper), intent(in) :: environment
 
         call particles_factory_create(mixture%components(1), input_data, "Mixture.Component 1.", &
-            periodic_box)
+            environment)
         call particles_factory_create(mixture%components(2), input_data, "Mixture.Component 2.", &
-            periodic_box)
+            environment)
         call particles_factory_create(mixture%inter_diameter, mixture%components(1)%diameter, &
             mixture%components(2)%diameter, input_data, "Mixture.Inter 12.")
     end subroutine create_mixture
@@ -103,24 +103,24 @@ contains
         call changes_factory_destroy(changes(2))
     end subroutine destroy_changes
 
-    subroutine create_short_potentials(short_potentials, input_data, periodic_box, mixture)
+    subroutine create_short_potentials(short_potentials, input_data, environment, mixture)
         type(Mixture_Short_Potentials_Wrapper), intent(out) :: short_potentials
         type(json_file), intent(inout) :: input_data
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
+        type(Environment_Wrapper), intent(in) :: environment
         type(Mixture_Wrapper), intent(in) :: mixture
 
         call short_potential_factory_create(short_potentials%intras(1), input_data, &
-            "Short Potentials.Component 1.", periodic_box, mixture%components(1))
+            "Short Potentials.Component 1.", environment, mixture%components(1))
         call short_potential_factory_create(short_potentials%intras(2), input_data, &
-            "Short Potentials.Component 2.", periodic_box, mixture%components(2))
+            "Short Potentials.Component 2.", environment, mixture%components(2))
         call short_potential_factory_create(short_potentials%inter_micro, input_data, &
             "Short Potentials.Inter 12.", mixture%inter_diameter)
         call short_potential_factory_create(short_potentials%inters(1), &
-            short_potentials%inter_micro, input_data, "Short Potentials.Inter 12.", periodic_box, &
-            mixture%components(1)%positions)
+            short_potentials%inter_micro, input_data, "Short Potentials.Inter 12.", &
+            environment%periodic_box, mixture%components(1)%positions)
         call short_potential_factory_create(short_potentials%inters(2), &
-            short_potentials%inter_micro, input_data, "Short Potentials.Inter 12.", periodic_box, &
-            mixture%components(2)%positions)
+            short_potentials%inter_micro, input_data, "Short Potentials.Inter 12.", &
+            environment%periodic_box, mixture%components(2)%positions)
     end subroutine create_short_potentials
 
     subroutine destroy_short_potentials(short_potentials)

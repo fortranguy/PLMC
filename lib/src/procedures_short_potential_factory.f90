@@ -6,11 +6,13 @@ use module_data, only: test_data_found
 use procedures_errors, only: error_exit
 use class_periodic_box, only: Abstract_Periodic_Box, &
     XYZ_Periodic_Box, XY_Periodic_Box
+use class_floor_penetration, only: Abstract_Floor_Penetration
+use types_environment_wrapper, only: Environment_Wrapper
 use class_particles_diameter, only: Abstract_Particles_Diameter, &
     Null_Particles_Diameter
 use class_particles_positions, only: Abstract_Particles_Positions
 use types_particles_wrapper, only: Particles_Wrapper
-use procedures_property_inquirers, only: particles_exist, particles_have_positions, &
+use procedures_property_inquirers, only: use_walls, particles_exist, particles_have_positions, &
     particles_interact
 use class_potential_expression, only: Abstract_Potential_Expression, &
     Null_Potential_Expression, Lennard_Jones_Expression
@@ -55,24 +57,28 @@ end interface short_potential_factory_destroy
 
 contains
 
-    subroutine short_potential_factory_create_all(short_potential, input_data, prefix, periodic_box, &
-        particles)
+    subroutine short_potential_factory_create_all(short_potential, input_data, prefix, &
+        environment, particles)
         type(Short_Potential_Wrapper), intent(out) :: short_potential
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
+        type(Environment_Wrapper), intent(in) :: environment
         type(Particles_Wrapper), intent(in) :: particles
 
         call short_potential_factory_create(short_potential%expression, input_data, prefix, &
             particles%diameter)
+        call short_potential_factory_create(short_potential%wall_expression, input_data, prefix, &
+            particles%wall_diameter, environment%floor_penetration)
         call short_potential_factory_create(short_potential%pair, input_data, prefix, &
             particles%diameter, short_potential%expression)
-        call short_potential_factory_create(short_potential%particles, periodic_box, &
+        call short_potential_factory_create(short_potential%wall_pair, input_data, prefix, &
+            particles%diameter, short_potential%wall_expression, environment%floor_penetration)
+        call short_potential_factory_create(short_potential%particles, environment%periodic_box, &
             particles%positions)
         call short_potential_factory_create(short_potential%list, input_data, prefix, &
             short_potential%pair)
         call short_potential_factory_create(short_potential%cells, short_potential%list, &
-            periodic_box, particles%positions, short_potential%pair)
+            environment%periodic_box, particles%positions, short_potential%pair)
     end subroutine short_potential_factory_create_all
 
     subroutine short_potential_factory_create_macro(short_potential_macro, short_potential_micro, &
@@ -105,14 +111,25 @@ contains
     end subroutine short_potential_factory_create_micro
 
     subroutine allocate_and_set_expression(potential_expression, input_data, prefix, &
-        particles_diameter)
+        particles_diameter, floor_penetration)
         class(Abstract_Potential_Expression), allocatable, intent(out) :: potential_expression
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
         class(Abstract_Particles_Diameter), intent(in) :: particles_diameter
+        class(Abstract_Floor_Penetration), optional, intent(in) :: floor_penetration
 
-        call allocate_expression(potential_expression, input_data, prefix, particles_diameter)
-        call set_expression(potential_expression, input_data, prefix)
+        character(len=:), allocatable :: precise_prefix
+
+        precise_prefix = prefix
+        if (present(floor_penetration)) then
+            if (use_walls(floor_penetration)) then
+                precise_prefix = prefix//"With Walls."
+            end if
+        end if
+        call allocate_expression(potential_expression, input_data, precise_prefix, &
+            particles_diameter)
+        call set_expression(potential_expression, input_data, precise_prefix)
+        deallocate(precise_prefix)
     end subroutine allocate_and_set_expression
 
     subroutine allocate_expression(potential_expression, input_data, prefix, particles_diameter)
@@ -171,16 +188,26 @@ contains
     end subroutine set_expression
 
     subroutine allocate_and_construct_pair(pair_potential, input_data, prefix, &
-        particles_diameter, potential_expression)
+        particles_diameter, potential_expression, floor_penetration)
         class(Abstract_Pair_Potential), allocatable, intent(out) :: pair_potential
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
         class(Abstract_Particles_Diameter), intent(in) :: particles_diameter
         class(Abstract_Potential_Expression), intent(in) :: potential_expression
+        class(Abstract_Floor_Penetration), optional, intent(in) :: floor_penetration
 
+        character(len=:), allocatable :: precise_prefix
+
+        precise_prefix = prefix
+        if (present(floor_penetration)) then
+            if (use_walls(floor_penetration)) then
+                precise_prefix = prefix//"With Walls."
+            end if
+        end if
         call allocate_pair(pair_potential, input_data, prefix, particles_diameter)
         call construct_pair(pair_potential, input_data, prefix, particles_diameter, &
             potential_expression)
+        deallocate(precise_prefix)
     end subroutine allocate_and_construct_pair
 
     subroutine allocate_pair(pair_potential, input_data, prefix, particles_diameter)
@@ -327,6 +354,7 @@ contains
         call short_potential_factory_destroy(short_potential%list)
         call short_potential_factory_destroy(short_potential%particles)
         call short_potential_factory_destroy(short_potential%pair)
+        call short_potential_factory_destroy(short_potential%wall_expression)
         call short_potential_factory_destroy(short_potential%expression)
     end subroutine short_potential_factory_destroy_all
 

@@ -16,6 +16,7 @@ private
     type, public :: Particles_Wrapper
         class(Abstract_Particles_Number), allocatable :: number
         class(Abstract_Particles_Diameter), allocatable :: diameter
+        class(Abstract_Particles_Diameter), allocatable :: wall_diameter
         class(Abstract_Particles_Moment_Norm), allocatable :: moment_norm
         class(Abstract_Particles_Positions), allocatable :: positions
         class(Abstract_Particles_Orientations), allocatable :: orientations

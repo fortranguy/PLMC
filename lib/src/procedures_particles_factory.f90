@@ -6,6 +6,8 @@ use module_data, only: test_data_found
 use procedures_errors, only: error_exit
 use procedures_coordinates, only: read_coordinates
 use class_periodic_box, only: Abstract_Periodic_Box
+use class_floor_penetration, only: Abstract_Floor_Penetration
+use types_environment_wrapper, only: Environment_Wrapper
 use class_particles_number, only: Abstract_Particles_Number, &
     Concrete_Particles_Number, Null_Particles_Number
 use class_particles_diameter, only: Abstract_Particles_Diameter, &
@@ -23,7 +25,7 @@ use class_particles_dipolar_moments, only: Abstract_Particles_Dipolar_Moments, &
 use class_particles_total_moment, only: Abstract_Particles_Total_Moment, &
     Concrete_Particles_Total_Moment, Null_Particles_Total_Moment
 use types_particles_wrapper, only: Particles_Wrapper, Mixture_Wrapper
-use procedures_property_inquirers, only: particles_exist, particles_have_positions, &
+use procedures_property_inquirers, only: use_walls, particles_exist, particles_have_positions, &
     particles_are_dipolar, particles_have_orientations, particles_can_exchange
 
 implicit none
@@ -63,16 +65,19 @@ end interface particles_factory_destroy
 
 contains
 
-    subroutine particles_factory_create_all(particles, input_data, prefix, periodic_box)
+    subroutine particles_factory_create_all(particles, input_data, prefix, environment)
         type(Particles_Wrapper), intent(out) :: particles
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
+        type(Environment_Wrapper), intent(in) :: environment
 
         call particles_factory_create(particles%number, input_data, prefix)
         call particles_factory_create(particles%diameter, input_data, prefix)
+        call particles_factory_create(particles%wall_diameter, input_data, prefix, &
+            environment%floor_penetration)
         call particles_factory_create(particles%moment_norm, input_data, prefix)
-        call particles_factory_create(particles%positions, periodic_box, particles%number)
+        call particles_factory_create(particles%positions, environment%periodic_box, &
+            particles%number)
         call particles_factory_set(particles%positions, input_data, prefix)
         call particles_factory_create(particles%orientations, input_data, prefix, particles%number)
         call particles_factory_set(particles%orientations, input_data, prefix)
@@ -103,24 +108,32 @@ contains
         call particles_number%set(num_particles)
     end subroutine allocate_and_set_number
 
-    subroutine allocate_and_set_diameter(particles_diameter, input_data, prefix)
+    subroutine allocate_and_set_diameter(particles_diameter, input_data, prefix, floor_penetration)
         class(Abstract_Particles_Diameter), allocatable, intent(out) :: particles_diameter
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
+        class(Abstract_Floor_Penetration), optional, intent(in) :: floor_penetration
 
-        character(len=:), allocatable :: data_field
+        character(len=:), allocatable :: data_field, precise_prefix
         logical :: data_found
         real(DP) :: diameter, diameter_min_factor
 
         if (particles_exist(input_data, prefix)) then
-            data_field = prefix//"diameter"
+            precise_prefix = prefix
+            if (present(floor_penetration)) then
+                if (use_walls(floor_penetration)) then
+                    precise_prefix = prefix//"With Walls."
+                end if
+            end if
+            data_field = precise_prefix//"diameter"
             call input_data%get(data_field, diameter, data_found)
             call test_data_found(data_field, data_found)
-            data_field = prefix//"minimum diameter factor"
+            data_field = precise_prefix//"minimum diameter factor"
             call input_data%get(data_field, diameter_min_factor, data_found)
             call test_data_found(data_field, data_found)
             allocate(Concrete_Particles_Diameter :: particles_diameter)
             deallocate(data_field)
+            deallocate(precise_prefix)
         else
             allocate(Null_Particles_Diameter :: particles_diameter)
         end if
@@ -322,6 +335,7 @@ contains
         call particles_factory_destroy(particles%orientations)
         call particles_factory_destroy(particles%positions)
         call particles_factory_destroy(particles%moment_norm)
+        call particles_factory_destroy(particles%wall_diameter)
         call particles_factory_destroy(particles%diameter)
         call particles_factory_destroy(particles%number)
     end subroutine particles_factory_destroy_all
