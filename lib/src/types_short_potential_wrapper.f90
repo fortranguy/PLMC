@@ -1,4 +1,4 @@
-module types_short_potential
+module types_short_potential_wrapper
 
 use class_potential_expression, only: Abstract_Potential_Expression
 use class_pair_potential, only: Abstract_Pair_Potential
@@ -35,4 +35,4 @@ private
         type(Short_Potential_Micro_Wrapper) :: inter_micro
     end type Mixture_Short_Potentials_Wrapper
 
-end module types_short_potential
+end module types_short_potential_wrapper

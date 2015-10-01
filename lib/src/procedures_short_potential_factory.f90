@@ -23,7 +23,7 @@ use class_visitable_list, only: Abstract_Visitable_List, &
     Null_Visitable_List, Concrete_Visitable_List, Concrete_Visitable_Array
 use class_visitable_cells, only: Abstract_Visitable_Cells, &
     Null_Visitable_Cells, XYZ_PBC_Visitable_Cells, XY_PBC_Visitable_Cells
-use types_short_potential, only: Short_Potential_Wrapper, &
+use types_short_potential_wrapper, only: Short_Potential_Wrapper, &
     Short_Potential_Macro_Wrapper, Short_Potential_Micro_Wrapper
 
 implicit none

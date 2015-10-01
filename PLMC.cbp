@@ -149,6 +149,9 @@
 		<Unit filename="lib/src/procedures_errors.f90">
 			<Option weight="0" />
 		</Unit>
+		<Unit filename="lib/src/procedures_meta_factory.f90">
+			<Option weight="11" />
+		</Unit>
 		<Unit filename="lib/src/procedures_metropolis_factory.f90">
 			<Option weight="9" />
 		</Unit>
@@ -191,11 +194,9 @@
 		<Unit filename="lib/src/types_potential_domain.f90">
 			<Option weight="0" />
 		</Unit>
-		<Unit filename="lib/src/types_short_potential.f90">
-			<Option weight="6" />
-		</Unit>
+		<Unit filename="lib/src/types_short_potential_wrapper.f90" />
 		<Unit filename="test/src/test_canonical.f90">
-			<Option weight="11" />
+			<Option weight="12" />
 		</Unit>
 		<Unit filename="test/src/test_changes_factory.f90">
 			<Option weight="10" />

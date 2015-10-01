@@ -1,79 +1,13 @@
-module procedures_factorising
-
-use json_module, only: json_file, json_initialize
-use module_data, only: test_file_exists
-use class_periodic_box, only: Abstract_Periodic_Box
-use types_environment_wrapper, only: Environment_Wrapper
-use procedures_environment_factory, only: environment_factory_create
-use types_particles_wrapper, only: Mixture_Wrapper
-use procedures_particles_factory, only: particles_factory_create
-
-implicit none
-
-private
-public :: load, create
-
-interface load
-    module procedure :: load_input_data
-end interface
-
-interface create
-    module procedure :: create_environment
-    module procedure :: create_mixture
-end interface create
-
-contains
-
-    subroutine load_input_data(input_data)
-        type(json_file), intent(out) :: input_data
-
-        character(len=:), allocatable :: data_filename
-
-        call json_initialize()
-        data_filename = "canonical.json"
-        call test_file_exists(data_filename)
-        call input_data%load_file(filename = data_filename)
-        deallocate(data_filename)
-    end subroutine load_input_data
-
-    subroutine create_environment(environment, input_data)
-        type(Environment_Wrapper), intent(out) :: environment
-        type(json_file), intent(inout) :: input_data
-
-        call environment_factory_create(environment, input_data, "Environment.")
-    end subroutine create_environment
-
-    subroutine create_mixture(mixture, input_data, periodic_box)
-        type(Mixture_Wrapper), intent(out) :: mixture
-        type(json_file), intent(inout) :: input_data
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
-
-        call particles_factory_create(mixture%components(1), input_data, "Mixture.Component 1.", &
-            periodic_box)
-        call particles_factory_create(mixture%components(2), input_data, "Mixture.Component 2.", &
-            periodic_box)
-        call particles_factory_create(mixture%inter_diameter, mixture%components(1)%diameter, &
-            mixture%components(2)%diameter, input_data, "Mixture.Inter 12.")
-    end subroutine create_mixture
-
-end module procedures_factorising
-
 program test_canonical
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file
 use module_data, only: test_data_found
-use procedures_errors, only: error_exit
 use procedures_checks, only: check_positive
 use types_environment_wrapper, only: Environment_Wrapper
-use procedures_environment_factory, only: environment_factory_destroy
 use types_particles_wrapper, only: Mixture_Wrapper
-use procedures_particles_factory, only: particles_factory_destroy
 use types_changes_wrapper, only: Changes_Wrapper
-use procedures_changes_factory, only: changes_factory_create, changes_factory_destroy
-use types_short_potential, only: Mixture_Short_Potentials_Wrapper
-use procedures_short_potential_factory, only: short_potential_factory_create, &
-    short_potential_factory_destroy
+use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper
 use class_one_particle_move, only: Abstract_One_Particle_Move
 use procedures_metropolis_factory, only: metropolis_factory_create, metropolis_factory_destroy
 use types_change_counter, only: Concrete_Change_Counter
@@ -81,19 +15,18 @@ use module_particle_energy, only: Concrete_Particle_Energy, &
     particle_energy_write_legend => Concrete_Particle_Energy_write_legend, &
     particle_energy_write => Concrete_Particle_Energy_write
 use procedures_visits, only: visit
-use procedures_factorising, only: load, create
+use procedures_meta_factory, only: load, create, destroy
 
 implicit none
 
     type(Environment_Wrapper) :: environment
     type(Mixture_Wrapper) :: mixture
-    type(Changes_Wrapper) :: changes_1, changes_2
+    type(Changes_Wrapper) :: changes(2)
     type(Mixture_Short_Potentials_Wrapper) :: short_potentials
     class(Abstract_One_Particle_Move), allocatable :: one_particle_move
     type(Concrete_Change_Counter) :: move_counters(2)
-    type(Concrete_Particle_Energy) :: particles_energies(2)
-    real(DP) :: inter_energy, inter_energy_1, inter_energy_2
-    logical :: overlap
+    type(Concrete_Particle_Energy) :: particles_energies(2), particles_energies_final(2)
+    real(DP) :: inter_energy, inter_energy_final
 
     type(json_file) :: input_data
     character(len=:), allocatable :: data_field
@@ -105,24 +38,8 @@ implicit none
     call load(input_data)
     call create(environment, input_data)
     call create(mixture, input_data, environment%periodic_box)
-
-    call changes_factory_create(changes_1, input_data, "Changes.Component 1.", &
-        environment%periodic_box, mixture%components(1))
-    call changes_factory_create(changes_2, input_data, "Changes.Component 2.", &
-        environment%periodic_box, mixture%components(2))
-
-    call short_potential_factory_create(short_potentials%intras(1), input_data, &
-        "Short Potentials.Component 1.", environment%periodic_box, mixture%components(1))
-    call short_potential_factory_create(short_potentials%intras(2), input_data, &
-        "Short Potentials.Component 2.", environment%periodic_box, mixture%components(2))
-    call short_potential_factory_create(short_potentials%inter_micro, input_data, &
-        "Short Potentials.Inter 12.", mixture%inter_diameter)
-    call short_potential_factory_create(short_potentials%inters(1), short_potentials%inter_micro, &
-        input_data, "Short Potentials.Inter 12.", environment%periodic_box, &
-        mixture%components(1)%positions)
-    call short_potential_factory_create(short_potentials%inters(2), short_potentials%inter_micro, &
-        input_data, "Short Potentials.Inter 12.", environment%periodic_box, &
-        mixture%components(2)%positions)
+    call create(changes, input_data, environment%periodic_box, mixture%components)
+    call create(short_potentials, input_data, environment%periodic_box, mixture)
 
     data_field = "Monte Carlo.number of steps"
     call input_data%get(data_field, num_steps, data_found)
@@ -132,23 +49,8 @@ implicit none
 
     call input_data%destroy()
 
-    call short_potentials%intras(1)%particles%set(short_potentials%intras(1)%pair)
-    call visit(overlap, particles_energies(1)%intra, short_potentials%intras(1)%particles, &
-        mixture%components(1)%positions, same_type=.true.)
-    if (overlap) call error_exit("short_potentials%intras(1) overlap")
-    call short_potentials%intras(2)%particles%set(short_potentials%intras(2)%pair)
-    call visit(overlap, particles_energies(2)%intra, short_potentials%intras(2)%particles, &
-        mixture%components(2)%positions, same_type=.true.)
-    if (overlap) call error_exit("short_potentials%intras(2) overlap")
-    call short_potentials%intras(1)%particles%set(short_potentials%inter_micro%pair)
-    call visit(overlap, inter_energy_1, short_potentials%intras(1)%particles, &
-        mixture%components(2)%positions, same_type=.false.)
-    if (overlap) call error_exit("inter short_potentials%intras(1) overlap")
-    call short_potentials%intras(2)%particles%set(short_potentials%inter_micro%pair)
-    call visit(overlap, inter_energy_2, short_potentials%intras(2)%particles, &
-        mixture%components(1)%positions, same_type=.false.)
-    if (overlap) call error_exit("inter short_potentials%intras(2) overlap")
-    inter_energy = inter_energy_1 + inter_energy_2
+    call visit(particles_energies, inter_energy, short_potentials%intras,  &
+        short_potentials%inter_micro%pair, mixture%components)
 
     i_step = 0
     open(newunit=energy_units(1), recl=4096, file="component_1_energy.out", action="write")
@@ -161,8 +63,8 @@ implicit none
     write(inter_energy_unit, *) "# i_step    inter"
     write(inter_energy_unit, *) i_step, inter_energy
 
-    call metropolis_factory_create(one_particle_move, environment, changes_1%moved_positions, &
-        changes_2%moved_positions)
+    call metropolis_factory_create(one_particle_move, environment, changes(1)%moved_positions, &
+        changes(2)%moved_positions)
     call one_particle_move%set_candidate(1, mixture%components(1)%positions)
     call one_particle_move%set_candidate(1, short_potentials%intras(1)%cells, &
         short_potentials%inters(1)%cells)
@@ -193,26 +95,11 @@ implicit none
         write(move_units(2), *) i_step, move_counters(2)%num_hits, move_counters(2)%num_success
     end do
 
-    call short_potentials%intras(1)%particles%set(short_potentials%intras(1)%pair)
-    call visit(overlap, particles_energies(1)%intra, short_potentials%intras(1)%particles, &
-        mixture%components(1)%positions, same_type=.true.)
-    if (overlap) call error_exit("short_potentials%intras(1) overlap")
-    call short_potentials%intras(2)%particles%set(short_potentials%intras(2)%pair)
-    call visit(overlap, particles_energies(2)%intra, short_potentials%intras(2)%particles, &
-        mixture%components(2)%positions, same_type=.true.)
-    if (overlap) call error_exit("short_potentials%intras(2) overlap")
-    call short_potentials%intras(1)%particles%set(short_potentials%inter_micro%pair)
-    call visit(overlap, inter_energy_1, short_potentials%intras(1)%particles, &
-        mixture%components(2)%positions, same_type=.false.)
-    if (overlap) call error_exit("inter short_potentials%intras(1) overlap")
-    call short_potentials%intras(2)%particles%set(short_potentials%inter_micro%pair)
-    call visit(overlap, inter_energy_2, short_potentials%intras(2)%particles, &
-        mixture%components(1)%positions, same_type=.false.)
-    if (overlap) call error_exit("inter short_potentials%intras(2) overlap")
-    inter_energy = inter_energy_1 + inter_energy_2
-    call particle_energy_write(energy_units(1), i_step, particles_energies(1))
-    call particle_energy_write(energy_units(2), i_step, particles_energies(2))
-    write(inter_energy_unit, *) i_step, inter_energy
+    call visit(particles_energies_final, inter_energy_final, short_potentials%intras,  &
+        short_potentials%inter_micro%pair, mixture%components)
+    call particle_energy_write(energy_units(1), i_step-1, particles_energies_final(1))
+    call particle_energy_write(energy_units(2), i_step-1, particles_energies_final(2))
+    write(inter_energy_unit, *) i_step-1, inter_energy_final
 
     close(move_units(1))
     close(move_units(2))
@@ -220,16 +107,9 @@ implicit none
     close(inter_energy_unit)
     close(energy_units(2))
     close(energy_units(1))
-    call short_potential_factory_destroy(short_potentials%inters(2))
-    call short_potential_factory_destroy(short_potentials%inters(1))
-    call short_potential_factory_destroy(short_potentials%inter_micro)
-    call short_potential_factory_destroy(short_potentials%intras(2))
-    call short_potential_factory_destroy(short_potentials%intras(1))
-    call changes_factory_destroy(changes_1)
-    call changes_factory_destroy(changes_2)
-    call particles_factory_destroy(mixture%inter_diameter)
-    call particles_factory_destroy(mixture%components(2))
-    call particles_factory_destroy(mixture%components(1))
-    call environment_factory_destroy(environment)
+    call destroy(short_potentials)
+    call destroy(changes)
+    call destroy(mixture)
+    call destroy(environment)
 
 end program test_canonical
