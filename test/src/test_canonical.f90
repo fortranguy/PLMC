@@ -15,7 +15,7 @@ use module_particle_energy, only: Concrete_Particle_Energy, &
     particle_energy_write_legend => Concrete_Particle_Energy_write_legend, &
     particle_energy_write => Concrete_Particle_Energy_write
 use procedures_visits, only: visit
-use procedures_meta_factory, only: load, create, destroy
+use procedures_plmc_factory, only: plmc_load, plmc_create, plmc_destroy
 use types_mixture_observables, only: Concrete_Mixture_Observables
 
 implicit none
@@ -36,11 +36,11 @@ implicit none
     integer :: num_steps, i_step, num_moves, i_move
     integer :: move_units(2)
 
-    call load(input_data)
-    call create(environment, input_data)
-    call create(mixture, input_data, environment%periodic_box)
-    call create(changes, input_data, environment%periodic_box, mixture%components)
-    call create(short_potentials, input_data, environment%periodic_box, mixture)
+    call plmc_load(input_data)
+    call plmc_create(environment, input_data)
+    call plmc_create(mixture, input_data, environment%periodic_box)
+    call plmc_create(changes, input_data, environment%periodic_box, mixture%components)
+    call plmc_create(short_potentials, input_data, environment%periodic_box, mixture)
 
     data_field = "Monte Carlo.number of steps"
     call input_data%get(data_field, num_steps, data_found)
@@ -102,9 +102,9 @@ implicit none
     close(inter_energy_unit)
     close(energy_units(2))
     close(energy_units(1))
-    call destroy(short_potentials)
-    call destroy(changes)
-    call destroy(mixture)
-    call destroy(environment)
+    call plmc_destroy(short_potentials)
+    call plmc_destroy(changes)
+    call plmc_destroy(mixture)
+    call plmc_destroy(environment)
 
 end program test_canonical

@@ -1,4 +1,4 @@
-module procedures_meta_factory
+module procedures_plmc_factory
 
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists
@@ -16,25 +16,25 @@ use procedures_short_potential_factory, only: short_potential_factory_create, &
 implicit none
 
 private
-public :: load, create, destroy
+public :: plmc_load, plmc_create, plmc_destroy
 
-interface load
+interface plmc_load
     module procedure :: load_input_data
-end interface
+end interface plmc_load
 
-interface create
+interface plmc_create
     module procedure :: create_environment
     module procedure :: create_mixture
     module procedure :: create_changes
     module procedure :: create_short_potentials
-end interface create
+end interface plmc_create
 
-interface destroy
+interface plmc_destroy
     module procedure :: destroy_short_potentials
     module procedure :: destroy_changes
     module procedure :: destroy_mixture
     module procedure :: destroy_environment
-end interface destroy
+end interface plmc_destroy
 
 contains
 
@@ -133,4 +133,4 @@ contains
         call short_potential_factory_destroy(short_potentials%intras(1))
     end subroutine destroy_short_potentials
 
-end module procedures_meta_factory
+end module procedures_plmc_factory
