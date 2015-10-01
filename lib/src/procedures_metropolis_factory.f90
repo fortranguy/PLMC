@@ -1,18 +1,16 @@
 module procedures_metropolis_factory
 
-use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
 use module_data, only: test_data_found
 use procedures_property_inquirers, only: particles_can_move
 use types_environment_wrapper, only: Environment_Wrapper
 use types_particles_wrapper, only: Particles_Wrapper
-use class_moved_positions, only: Abstract_Moved_Positions
+use types_changes_wrapper, only: Changes_Wrapper
 use types_short_potential_wrapper, only: Short_Potential_Wrapper, Short_Potential_Macro_Wrapper
 use class_one_particle_move, only: Abstract_One_Particle_Move, &
     Null_One_Particle_Move, Two_Candidates_One_Particle_Move, &
     First_Candidate_One_Particle_Move, Second_Candidate_One_Particle_Move
-use types_change_counter, only: Concrete_Change_Counter
-use module_particle_energy, only: Concrete_Particle_Energy
+use types_mixture_observables, only: Concrete_Mixture_Observables
 
 implicit none
 
@@ -34,24 +32,25 @@ end interface metropolis_factory_destroy
 
 contains
 
-    subroutine allocate_and_construct_one_particle_move(one_particle_move, environment, &
-        moved_positions_1, moved_positions_2)
+    subroutine allocate_and_construct_one_particle_move(one_particle_move, environment, changes)
         class(Abstract_One_Particle_Move), allocatable, intent(out) :: one_particle_move
         type(Environment_Wrapper), intent(in) :: environment
-        class(Abstract_Moved_Positions), intent(in) :: moved_positions_1, moved_positions_2
+        type(Changes_Wrapper), intent(in) :: changes(2)
 
-        if (particles_can_move(moved_positions_1) .and. particles_can_move(moved_positions_2)) then
+        if (particles_can_move(changes(1)%moved_positions) .and. &
+            particles_can_move(changes(2)%moved_positions)) then
             allocate(Two_Candidates_One_Particle_Move :: one_particle_move)
-        else if (particles_can_move(moved_positions_1) .and. &
-            .not.particles_can_move(moved_positions_2)) then
+        else if (particles_can_move(changes(1)%moved_positions) .and. &
+            .not.particles_can_move(changes(2)%moved_positions)) then
             allocate(First_Candidate_One_Particle_Move :: one_particle_move)
-        else if (.not.particles_can_move(moved_positions_1) .and. &
-            particles_can_move(moved_positions_2)) then
+        else if (.not.particles_can_move(changes(1)%moved_positions) .and. &
+            particles_can_move(changes(2)%moved_positions)) then
             allocate(Second_Candidate_One_Particle_Move :: one_particle_move)
         else
             allocate(Null_One_Particle_Move :: one_particle_move)
         end if
-        call one_particle_move%construct(environment, moved_positions_1, moved_positions_2)
+        call one_particle_move%construct(environment, changes(1)%moved_positions, &
+            changes(2)%moved_positions)
     end subroutine allocate_and_construct_one_particle_move
 
     subroutine set_one_particle_move_components_and_potential(one_particle_move, components, &
@@ -67,15 +66,12 @@ contains
         call one_particle_move%set_candidate(2, intras(2)%cells, inters(2)%cells)
     end subroutine set_one_particle_move_components_and_potential
 
-    subroutine set_one_particle_move_observables(one_particle_move, move_counters, &
-        particles_energies, inter_energy)
+    subroutine set_one_particle_move_observables(one_particle_move, observables)
         class(Abstract_One_Particle_Move), intent(inout) :: one_particle_move
-        type(Concrete_Change_Counter), intent(in) :: move_counters(2)
-        type(Concrete_Particle_Energy), intent(in) :: particles_energies(2)
-        real(DP), intent(in) :: inter_energy
+        type(Concrete_Mixture_Observables), intent(in) :: observables
 
-        call one_particle_move%set_candidates_observables(move_counters, particles_energies, &
-            inter_energy)
+        call one_particle_move%set_candidates_observables(observables%move_counters, &
+            observables%particles_energies, observables%inter_energy)
     end subroutine set_one_particle_move_observables
 
     subroutine destroy_and_deallocate_one_particle_move(one_particle_move)
