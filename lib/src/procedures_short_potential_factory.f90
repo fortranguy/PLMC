@@ -84,8 +84,6 @@ contains
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Particles_Positions), intent(in) :: particles_positions
 
-        call short_potential_factory_create(short_potential_macro%particles, periodic_box, &
-            particles_positions)
         call short_potential_factory_create(short_potential_macro%list, input_data, prefix, &
             short_potential_micro%pair)
         call short_potential_factory_create(short_potential_macro%cells, &
@@ -320,7 +318,6 @@ contains
 
         call short_potential_factory_destroy(short_potential_macro%cells)
         call short_potential_factory_destroy(short_potential_macro%list)
-        call short_potential_factory_destroy(short_potential_macro%particles)
     end subroutine short_potential_factory_destroy_macro
 
     subroutine short_potential_factory_destroy_all(short_potential)
