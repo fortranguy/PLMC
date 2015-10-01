@@ -9,7 +9,8 @@ use types_particles_wrapper, only: Mixture_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
 use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper
 use class_one_particle_move, only: Abstract_One_Particle_Move
-use procedures_metropolis_factory, only: metropolis_factory_create, metropolis_factory_destroy
+use procedures_metropolis_factory, only: metropolis_factory_create, metropolis_factory_set, &
+    metropolis_factory_destroy
 use types_change_counter, only: Concrete_Change_Counter
 use module_particle_energy, only: Concrete_Particle_Energy, &
     particle_energy_write_legend => Concrete_Particle_Energy_write_legend, &
@@ -65,14 +66,9 @@ implicit none
 
     call metropolis_factory_create(one_particle_move, environment, changes(1)%moved_positions, &
         changes(2)%moved_positions)
-    call one_particle_move%set_candidate(1, mixture%components(1)%positions)
-    call one_particle_move%set_candidate(1, short_potentials%intras(1)%cells, &
-        short_potentials%inters(1)%cells)
-    call one_particle_move%set_candidate(2, mixture%components(2)%positions)
-    call one_particle_move%set_candidate(2, short_potentials%intras(2)%cells, &
-        short_potentials%inters(2)%cells)
-    call one_particle_move%set_candidates_observables(move_counters, particles_energies, &
-        inter_energy)
+    call metropolis_factory_set(one_particle_move, mixture%components, short_potentials%intras, &
+        short_potentials%inters)
+    call metropolis_factory_set(one_particle_move, move_counters, particles_energies, inter_energy)
 
     open(newunit=move_units(1), recl=4096, file="component_1_move.out", action="write")
     write(move_units(1), *) "# num_hits    num_success"
