@@ -79,17 +79,18 @@
     
     \begin{scope}[shift={($(ExternalField.north) + (10 cm, 0 cm)$)}, opacity=1]
         \begin{abstractclass}[text width=\mediumTextWidth]{WallsPotential}{0, 0}
-            \operation{construct(gap\type{double}, floorPenetration\type{FloorPenetration},
-                pairPotential\type{PairPotential})}
+            \operation{construct(periodicBox\type{PeriodicBox}, gap\type{double},
+                floorPenetration\type{FloorPenetration})}
             \operation{destroy()}
             \operation{getGap()}
-            \operation{meet(overlap\type{bool}, energy\type{double}, position\type{double[3]})}
+            \operation{set(pairPotential\type{PairPotential})}
+            \operation{visit(overlap\type{bool}, energy\type{double}, position\type{double[3]})}
         \end{abstractclass}
     \end{scope}
     
     \begin{scope}[shift={($(WallsPotential.south) + (10 cm, 2 cm)$)}, opacity=1]
         \begin{abstractclass}[text width=\mediumTextWidth]{FloorPenetration}{0, 0}
-            \operation{meet(overlap\type{bool}, shortestVectorFromFloor\type{double[3]}, 
+            \operation{meet(overlap\type{bool}, shortestVectorFromFloor\type{double[3]},
                 positionFromFloor\type{double[3]})}
         \end{abstractclass}
     \end{scope}

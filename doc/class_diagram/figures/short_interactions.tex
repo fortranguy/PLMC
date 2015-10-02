@@ -13,7 +13,7 @@
     \begin{scope}[shift={($(ParticlesPotential.north) + (-12 cm, 0 cm)$)}, opacity=1]
         \begin{abstractclass}[text width=\largeTextWidth]{VisitableCells}{0, 0}
             \operation{construct(mold\type{VisitableList}, periodicBox\type{PeriodicBox},
-                                    positions\type{ParticlesPositions}, 
+                                    positions\type{ParticlesPositions},
                                     pairPotential\type{PairPotential})}
             \operation{destroy()}
             \operation{visit(overlap\type{bool}, energy\type{double}, particle\type{Particle})}
@@ -50,7 +50,7 @@
     
     \begin{scope}[shift={($(ParticlesPotential.south) + (0 cm, -2 cm)$)}, opacity=1]
         \begin{abstractclass}[text width=\mediumTextWidth]{PairPotential}{0, 0}
-            \operation{construct(potentialDomain\type{PotentialDomain}, 
+            \operation{construct(potentialDomain\type{PotentialDomain},
                 potentialExpression\type{PotentialExpression})}
             \operation{destroy()}
             \operation{getMaxDistance()}

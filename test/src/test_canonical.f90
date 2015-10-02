@@ -50,8 +50,8 @@ implicit none
 
     call visit(observables%particles_energies, observables%inter_energy, short_potentials%intras, &
         short_potentials%inter_micro%pair, mixture%components)
-    !call visit(observables%particles_energies, environment%walls_potential, mixture%components, &
-    !    short_potentials%)
+    call visit(observables%particles_energies, environment%walls_potential, mixture%components, &
+        short_potentials%walls)
 
     i_step = 0
     open(newunit=energy_units(1), recl=4096, file="component_1_energy.out", action="write")
@@ -65,8 +65,9 @@ implicit none
     write(inter_energy_unit, *) i_step, observables%inter_energy
 
     call metropolis_factory_create(one_particle_move, environment, changes)
-    call metropolis_factory_set(one_particle_move, mixture%components, short_potentials%intras, &
-        short_potentials%inters)
+    call metropolis_factory_set(one_particle_move, mixture%components)
+    call metropolis_factory_set(one_particle_move, short_potentials%intras, &
+        short_potentials%inters, short_potentials%walls)
     call metropolis_factory_set(one_particle_move, observables)
 
     open(newunit=move_units(1), recl=4096, file="component_1_move.out", action="write")
@@ -91,6 +92,8 @@ implicit none
 
     call visit(observables%particles_energies, observables%inter_energy, short_potentials%intras, &
         short_potentials%inter_micro%pair, mixture%components)
+    call visit(observables%particles_energies, environment%walls_potential, mixture%components, &
+        short_potentials%walls)
     call particles_energy_write(energy_units(1), i_step-1, observables%particles_energies(1))
     call particles_energy_write(energy_units(2), i_step-1, observables%particles_energies(2))
     write(inter_energy_unit, *) i_step-1, observables%inter_energy

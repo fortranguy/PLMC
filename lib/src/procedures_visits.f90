@@ -8,7 +8,7 @@ use class_particles_positions, only: Abstract_Particles_Positions
 use types_particles_wrapper, only: Particles_Wrapper
 use class_pair_potential, only: Abstract_Pair_Potential
 use class_particles_potential, only: Abstract_Particles_Potential
-use types_short_potential_wrapper, only: Short_Potential_Wrapper
+use types_short_potential_wrapper, only: Short_Potential_Wrapper, Wall_Short_Potential_Wrapper
 use module_particles_energy, only: Concrete_Particles_Energy
 
 implicit none
@@ -20,22 +20,23 @@ interface visit
     module procedure :: visit_mixture
     module procedure :: visit_particles
     module procedure :: visit_particles_walls
+    module procedure :: visit_mixture_walls
 end interface visit
 
 contains
 
-    subroutine visit_mixture_walls(particles_energies, walls_potential, components, wall_pairs)
+    subroutine visit_mixture_walls(particles_energies, walls_potential, components, walls)
         type(Concrete_Particles_Energy), intent(inout) :: particles_energies(2)
         class(Abstract_Walls_Potential), intent(inout) :: walls_potential
         type(Particles_Wrapper), intent(in) :: components(2)
-        class(Abstract_Pair_Potential), intent(in) :: wall_pairs(2)
+        class(Wall_Short_Potential_Wrapper), intent(in) :: walls(2)
 
         logical :: overlap
 
-        call walls_potential%set(wall_pairs(1))
+        call walls_potential%set(walls(1)%pair)
         call visit(overlap, particles_energies(1)%walls, walls_potential, components(1)%positions)
         if (overlap) call error_exit("walls - components(1) overlap")
-        call walls_potential%set(wall_pairs(2))
+        call walls_potential%set(walls(2)%pair)
         call visit(overlap, particles_energies(2)%walls, walls_potential, components(2)%positions)
         if (overlap) call error_exit("walls - components(1) overlap")
     end subroutine visit_mixture_walls
