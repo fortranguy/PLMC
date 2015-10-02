@@ -17,8 +17,8 @@ private
         class(Abstract_Pair_Potential), pointer :: pair_potential => null()
     contains
         procedure :: construct => Abstract_Particles_Potential_construct
-        procedure :: set => Abstract_Particles_Potential_set
         procedure :: destroy => Abstract_Particles_Potential_destroy
+        procedure :: set => Abstract_Particles_Potential_set
         procedure :: visit => Abstract_Particles_Potential_visit
     end type Abstract_Particles_Potential
 
@@ -29,8 +29,8 @@ private
     type, extends(Abstract_Particles_Potential), public :: Null_Particles_Potential
     contains
         procedure :: construct => Null_Particles_Potential_construct
-        procedure :: set => Null_Particles_Potential_set
         procedure :: destroy => Null_Particles_Potential_destroy
+        procedure :: set => Null_Particles_Potential_set
         procedure :: visit => Null_Particles_Potential_visit
     end type Null_Particles_Potential
 
@@ -48,13 +48,6 @@ contains
         this%particles_positions => particles_positions
     end subroutine Abstract_Particles_Potential_construct
 
-    subroutine Abstract_Particles_Potential_set(this, pair_potential)
-        class(Abstract_Particles_Potential), intent(inout) :: this
-        class(Abstract_Pair_Potential), target, intent(in) :: pair_potential
-
-        this%pair_potential => pair_potential
-    end subroutine Abstract_Particles_Potential_set
-
     subroutine Abstract_Particles_Potential_destroy(this)
         class(Abstract_Particles_Potential), intent(inout) :: this
 
@@ -62,6 +55,13 @@ contains
         this%particles_positions => null()
         this%periodic_box => null()
     end subroutine Abstract_Particles_Potential_destroy
+
+    subroutine Abstract_Particles_Potential_set(this, pair_potential)
+        class(Abstract_Particles_Potential), intent(inout) :: this
+        class(Abstract_Pair_Potential), target, intent(in) :: pair_potential
+
+        this%pair_potential => pair_potential
+    end subroutine Abstract_Particles_Potential_set
 
     pure subroutine Abstract_Particles_Potential_visit(this, overlap, energy, particle)
         class(Abstract_Particles_Potential), intent(in) :: this
@@ -94,14 +94,14 @@ contains
         class(Abstract_Particles_Positions), target, intent(in) :: particles_positions
     end subroutine Null_Particles_Potential_construct
 
+    subroutine Null_Particles_Potential_destroy(this)
+        class(Null_Particles_Potential), intent(inout) :: this
+    end subroutine Null_Particles_Potential_destroy
+
     subroutine Null_Particles_Potential_set(this, pair_potential)
         class(Null_Particles_Potential), intent(inout) :: this
         class(Abstract_Pair_Potential), target, intent(in) :: pair_potential
     end subroutine Null_Particles_Potential_set
-
-    subroutine Null_Particles_Potential_destroy(this)
-        class(Null_Particles_Potential), intent(inout) :: this
-    end subroutine Null_Particles_Potential_destroy
 
     pure subroutine Null_Particles_Potential_visit(this, overlap, energy, particle)
         class(Null_Particles_Potential), intent(in) :: this

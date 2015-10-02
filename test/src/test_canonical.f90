@@ -50,6 +50,8 @@ implicit none
 
     call visit(observables%particles_energies, observables%inter_energy, short_potentials%intras, &
         short_potentials%inter_micro%pair, mixture%components)
+    !call visit(observables%particles_energies, environment%walls_potential, mixture%components, &
+    !    short_potentials%)
 
     i_step = 0
     open(newunit=energy_units(1), recl=4096, file="component_1_energy.out", action="write")
@@ -72,7 +74,6 @@ implicit none
     open(newunit=move_units(2), recl=4096, file="component_2_move.out", action="write")
     write(move_units(2), *) "# num_hits    num_success"
 
-    call short_potentials%intras(1)%particles%set(short_potentials%intras(1)%pair)
     num_moves = mixture%components(1)%positions%get_num() + &
         mixture%components(2)%positions%get_num()
     do i_step = 1, num_steps

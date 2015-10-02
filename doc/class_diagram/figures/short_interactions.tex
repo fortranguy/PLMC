@@ -3,9 +3,9 @@
     
     \begin{scope}[opacity=1]
         \begin{abstractclass}[text width=\mediumTextWidth]{ParticlesPotential}{0, 0}
-            \operation{construct(periodicBox\type{PeriodicBox}, positions\type{ParticlesPositions},
-                pairPotential\type{PairPotential})}
+            \operation{construct(periodicBox\type{PeriodicBox}, positions\type{ParticlesPositions})}
             \operation{destroy()}
+            \operation{set(pairPotential\type{PairPotential})}
             \operation{visit(overlap\type{bool}, energy\type{double}, particle\type{Particle})}
         \end{abstractclass}
     \end{scope}
@@ -13,7 +13,8 @@
     \begin{scope}[shift={($(ParticlesPotential.north) + (-12 cm, 0 cm)$)}, opacity=1]
         \begin{abstractclass}[text width=\largeTextWidth]{VisitableCells}{0, 0}
             \operation{construct(mold\type{VisitableList}, periodicBox\type{PeriodicBox},
-                                    positions\type{ParticlesPositions}, pairPotential\type{PairPotential})}
+                                    positions\type{ParticlesPositions}, 
+                                    pairPotential\type{PairPotential})}
             \operation{destroy()}
             \operation{visit(overlap\type{bool}, energy\type{double}, particle\type{Particle})}
             \operation{move(from\type{Particle}, to\type{Particle})}

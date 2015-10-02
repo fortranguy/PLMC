@@ -114,31 +114,56 @@ contains
         character(len=*), intent(in) :: prefix
         class(Abstract_Floor_Penetration), optional, intent(in) :: floor_penetration
 
-        character(len=:), allocatable :: data_field, precise_prefix
-        logical :: data_found
-        real(DP) :: diameter, diameter_min_factor
+        character(len=:), allocatable :: precise_prefix
+        call allocate_diameter(particles_diameter, precise_prefix, input_data, prefix, &
+            floor_penetration)
+        call set_diameter(particles_diameter, input_data, precise_prefix)
+        if (allocated(precise_prefix)) deallocate(precise_prefix)
+    end subroutine allocate_and_set_diameter
 
+    subroutine allocate_diameter(particles_diameter, precise_prefix, input_data, prefix, &
+        floor_penetration)
+        class(Abstract_Particles_Diameter), allocatable, intent(out) :: particles_diameter
+        character(len=:), allocatable, intent(out) :: precise_prefix
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
+        class(Abstract_Floor_Penetration), optional, intent(in) :: floor_penetration
+
+        precise_prefix = prefix
         if (particles_exist(input_data, prefix)) then
-            precise_prefix = prefix
             if (present(floor_penetration)) then
                 if (use_walls(floor_penetration)) then
                     precise_prefix = prefix//"With Walls."
+                    allocate(Concrete_Particles_Diameter :: particles_diameter)
+                else
+                    allocate(Null_Particles_Diameter :: particles_diameter)
                 end if
+            else
+                allocate(Concrete_Particles_Diameter :: particles_diameter)
             end if
-            data_field = precise_prefix//"diameter"
-            call input_data%get(data_field, diameter, data_found)
-            call test_data_found(data_field, data_found)
-            data_field = precise_prefix//"minimum diameter factor"
-            call input_data%get(data_field, diameter_min_factor, data_found)
-            call test_data_found(data_field, data_found)
-            allocate(Concrete_Particles_Diameter :: particles_diameter)
-            deallocate(data_field)
-            deallocate(precise_prefix)
         else
             allocate(Null_Particles_Diameter :: particles_diameter)
         end if
+    end subroutine allocate_diameter
+
+    subroutine set_diameter(particles_diameter, input_data, prefix)
+        class(Abstract_Particles_Diameter), intent(inout) :: particles_diameter
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
+
+        character(len=:), allocatable :: data_field
+        logical :: data_found
+        real(DP) :: diameter, diameter_min_factor
+
+        data_field = prefix//"diameter"
+        call input_data%get(data_field, diameter, data_found)
+        call test_data_found(data_field, data_found)
+        data_field = prefix//"minimum diameter factor"
+        call input_data%get(data_field, diameter_min_factor, data_found)
+        call test_data_found(data_field, data_found)
         call particles_diameter%set(diameter, diameter_min_factor)
-    end subroutine allocate_and_set_diameter
+        deallocate(data_field)
+    end subroutine set_diameter
 
     subroutine allocate_and_set_inter_diameter(inter_particles_diameter, &
         particles_diameter_1, particles_diameter_2, input_data, prefix)

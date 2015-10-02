@@ -121,6 +121,10 @@ contains
         call short_potential_factory_create(short_potentials%inters(2), &
             short_potentials%inter_micro, input_data, "Short Potentials.Inter 12.", &
             environment%periodic_box, mixture%components(2)%positions)
+        call short_potential_factory_create(short_potentials%walls(1), input_data, &
+            "Short Potentials.Component 1.With Walls.", mixture%components(1))
+        call short_potential_factory_create(short_potentials%walls(2), input_data, &
+            "Short Potentials.Component 2.With Walls.", mixture%components(2))
     end subroutine create_short_potentials
 
     subroutine destroy_short_potentials(short_potentials)
