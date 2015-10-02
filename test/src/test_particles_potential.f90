@@ -53,14 +53,13 @@ implicit none
     call short_potential_factory_create(pair_potential, input_data, &
         "Particles.Potential.", particles_diameter, potential_expression)
     call short_potential_factory_create(particles_potential, periodic_box, particles_positions)
-    call particles_potential%set(pair_potential)
 
     energy = 0._DP
     do i_particle = 1, particles_positions%get_num()
         particle%same_type = .true.
         particle%i = i_particle
         particle%position = particles_positions%get(particle%i)
-        call particles_potential%visit(overlap, energy_i, particle)
+        call particles_potential%visit(overlap, energy_i, particle, pair_potential)
         if (overlap) exit
         energy = energy + energy_i
     end do

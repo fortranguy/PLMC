@@ -27,33 +27,36 @@ contains
 
     subroutine visit_mixture_walls(particles_energies, walls_potential, components, walls)
         type(Concrete_Particles_Energy), intent(inout) :: particles_energies(2)
-        class(Abstract_Walls_Potential), intent(inout) :: walls_potential
+        class(Abstract_Walls_Potential), intent(in) :: walls_potential
         type(Particles_Wrapper), intent(in) :: components(2)
         class(Wall_Short_Potential_Wrapper), intent(in) :: walls(2)
 
         logical :: overlap
 
-        call walls_potential%set(walls(1)%pair)
-        call visit(overlap, particles_energies(1)%walls, walls_potential, components(1)%positions)
+        call visit(overlap, particles_energies(1)%walls, walls_potential, components(1)%positions, &
+            walls(1)%pair)
         if (overlap) call error_exit("walls - components(1) overlap")
-        call walls_potential%set(walls(2)%pair)
-        call visit(overlap, particles_energies(2)%walls, walls_potential, components(2)%positions)
-        if (overlap) call error_exit("walls - components(1) overlap")
+        call visit(overlap, particles_energies(2)%walls, walls_potential, components(2)%positions, &
+            walls(2)%pair)
+        if (overlap) call error_exit("walls - components(2) overlap")
     end subroutine visit_mixture_walls
 
-    pure subroutine visit_particles_walls(overlap, energy, walls_potential, particles_positions)
+    pure subroutine visit_particles_walls(overlap, energy, walls_potential, particles_positions, &
+        wall_pair)
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
         class(Abstract_Walls_Potential), intent(in) :: walls_potential
         class(Abstract_Particles_Positions), intent(in) :: particles_positions
+        class(Abstract_Pair_Potential), intent(in) :: wall_pair
 
         real(DP) :: energy_i
         integer :: i_particle
 
         overlap = .false.
-        energy_i = 0._DP
+        energy = 0._DP
         do i_particle = 1, particles_positions%get_num()
-            call walls_potential%visit(overlap, energy_i, particles_positions%get(i_particle))
+            call walls_potential%visit(overlap, energy_i, particles_positions%get(i_particle), &
+                wall_pair)
             if (overlap) return
             energy = energy + energy_i
         end do
@@ -63,38 +66,35 @@ contains
         components)
         type(Concrete_Particles_Energy), intent(inout) :: particles_energies(2)
         real(DP), intent(out) :: inter_energy
-        type(Short_Potential_Wrapper), intent(inout) :: intras(2)
+        type(Short_Potential_Wrapper), intent(in) :: intras(2)
         class(Abstract_Pair_Potential), intent(in) :: inter_pair
         type(Particles_Wrapper), intent(in) :: components(2)
 
         logical :: overlap
         real(DP) :: inter_energy_1, inter_energy_2
 
-        call intras(1)%particles%set(intras(1)%pair)
         call visit(overlap, particles_energies(1)%intra, intras(1)%particles, &
-            components(1)%positions, same_type=.true.)
+            components(1)%positions, intras(1)%pair, same_type=.true.)
         if (overlap) call error_exit("intra 1 overlap")
-        call intras(2)%particles%set(intras(2)%pair)
         call visit(overlap, particles_energies(2)%intra, intras(2)%particles, &
-            components(2)%positions, same_type=.true.)
+            components(2)%positions, intras(2)%pair, same_type=.true.)
         if (overlap) call error_exit("intra 2 overlap")
-        call intras(1)%particles%set(inter_pair)
         call visit(overlap, inter_energy_1, intras(1)%particles, components(2)%positions, &
-            same_type=.false.)
+            inter_pair, same_type=.false.)
         if (overlap) call error_exit("inter intras(1) overlap")
-        call intras(2)%particles%set(inter_pair)
         call visit(overlap, inter_energy_2, intras(2)%particles, components(1)%positions, &
-        same_type=.false.)
+            inter_pair, same_type=.false.)
         if (overlap) call error_exit("inter intras(2) overlap")
         inter_energy = inter_energy_1 + inter_energy_2
     end subroutine visit_mixture
 
     pure subroutine visit_particles(overlap, energy, particles_potential, &
-        particles_positions, same_type)
+        particles_positions, pair_potential, same_type)
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
         class(Abstract_Particles_Potential), intent(in) :: particles_potential
         class(Abstract_Particles_Positions), intent(in) :: particles_positions
+        class(Abstract_Pair_Potential), intent(in) :: pair_potential
         logical, intent(in) :: same_type
 
         type(Concrete_Particle) :: particle
@@ -107,7 +107,7 @@ contains
         do i_particle = 1, particles_positions%get_num()
             particle%i = i_particle
             particle%position = particles_positions%get(particle%i)
-            call particles_potential%visit(overlap, energy_i, particle)
+            call particles_potential%visit(overlap, energy_i, particle, pair_potential)
             if (overlap) return
             energy = energy + energy_i
         end do

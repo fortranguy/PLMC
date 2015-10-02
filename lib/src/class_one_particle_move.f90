@@ -57,10 +57,12 @@ private
         procedure, private :: nullify_candidate => Abstract_One_Particle_Move_nullify_candidate
         procedure, private, nopass :: select_actor_and_spectator => &
             Abstract_One_Particle_Move_select_actor_and_spectator
-        generic, private :: set_actor => set_actor_positions_and_moved, set_actor_cells
+        generic, private :: set_actor => set_actor_positions_and_moved, set_actor_cells, &
+            set_actor_wall_pair
         procedure, private :: set_actor_positions_and_moved => &
             Abstract_One_Particle_Move_set_actor_positions_and_moved
         procedure, private :: set_actor_cells => Abstract_One_Particle_Move_set_actor_cells
+        procedure, private :: set_actor_wall_pair => Abstract_One_Particle_Move_set_actor_wall_pair
         procedure, private :: set_spectator => Abstract_One_Particle_Move_set_spectator
     end type Abstract_One_Particle_Move
 
@@ -217,6 +219,7 @@ contains
         class(Abstract_Particles_Positions), pointer :: actor_positions
         class(Abstract_Moved_Positions), pointer :: actor_moved
         class(Abstract_Visitable_Cells), pointer :: actor_cells, actor_inter_cells, spectator_cells
+        class(Abstract_Pair_Potential), pointer :: actor_wall_pair
         integer :: spectator_num_positions
         type(Concrete_Particle) :: old, new
         type(Concrete_Particles_Energy) :: new_energy, old_energy
@@ -227,6 +230,7 @@ contains
 
         call this%set_actor(actor_positions, actor_moved, i_actor)
         call this%set_actor(actor_cells, actor_inter_cells, i_actor)
+        call this%set_actor(actor_wall_pair, i_actor)
         call this%set_spectator(spectator_num_positions, spectator_cells, i_spectator)
 
         old%i = random_integer(actor_positions%get_num())
@@ -235,7 +239,7 @@ contains
         new%position = actor_moved%get(new%i)
 
         success = .false.
-        call this%walls%visit(overlap, new_energy%walls, new%position)
+        call this%walls%visit(overlap, new_energy%walls, new%position, actor_wall_pair)
         if (overlap) return
         if (actor_positions%get_num() > spectator_num_positions) then
             new%same_type = .true.
@@ -251,7 +255,7 @@ contains
             call actor_cells%visit(overlap, new_energy%intra, new)
         end if
         if (overlap) return
-        call this%walls%visit(overlap, old_energy%walls, old%position)
+        call this%walls%visit(overlap, old_energy%walls, old%position, actor_wall_pair)
         old%same_type = .true.
         call actor_cells%visit(overlap, old_energy%intra, old)
         old%same_type = .false.
@@ -296,6 +300,14 @@ contains
         actor_cells => this%candidates(i_actor)%intra_cells
         actor_inter_cells => this%candidates(i_actor)%inter_cells
     end subroutine Abstract_One_Particle_Move_set_actor_cells
+
+    subroutine Abstract_One_Particle_Move_set_actor_wall_pair(this, actor_wall_pair, i_actor)
+        class(Abstract_One_Particle_Move), intent(in) :: this
+        class(Abstract_Pair_Potential), pointer, intent(out) :: actor_wall_pair
+        integer, intent(in) :: i_actor
+
+        actor_wall_pair => this%candidates(i_actor)%wall_pair
+    end subroutine Abstract_One_Particle_Move_set_actor_wall_pair
 
     subroutine Abstract_One_Particle_Move_set_spectator(this, spectator_num_positions, &
         spectator_cells, i_spectator)

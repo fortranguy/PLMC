@@ -14,11 +14,9 @@ private
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
         class(Abstract_Particles_Positions), pointer :: particles_positions => null()
-        class(Abstract_Pair_Potential), pointer :: pair_potential => null()
     contains
         procedure :: construct => Abstract_Particles_Potential_construct
         procedure :: destroy => Abstract_Particles_Potential_destroy
-        procedure :: set => Abstract_Particles_Potential_set
         procedure :: visit => Abstract_Particles_Potential_visit
     end type Abstract_Particles_Potential
 
@@ -30,7 +28,6 @@ private
     contains
         procedure :: construct => Null_Particles_Potential_construct
         procedure :: destroy => Null_Particles_Potential_destroy
-        procedure :: set => Null_Particles_Potential_set
         procedure :: visit => Null_Particles_Potential_visit
     end type Null_Particles_Potential
 
@@ -51,23 +48,17 @@ contains
     subroutine Abstract_Particles_Potential_destroy(this)
         class(Abstract_Particles_Potential), intent(inout) :: this
 
-        this%pair_potential => null()
         this%particles_positions => null()
         this%periodic_box => null()
     end subroutine Abstract_Particles_Potential_destroy
 
-    subroutine Abstract_Particles_Potential_set(this, pair_potential)
-        class(Abstract_Particles_Potential), intent(inout) :: this
-        class(Abstract_Pair_Potential), target, intent(in) :: pair_potential
-
-        this%pair_potential => pair_potential
-    end subroutine Abstract_Particles_Potential_set
-
-    pure subroutine Abstract_Particles_Potential_visit(this, overlap, energy, particle)
+    pure subroutine Abstract_Particles_Potential_visit(this, overlap, energy, particle, &
+        pair_potential)
         class(Abstract_Particles_Potential), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
         type(Concrete_Particle), intent(in) :: particle
+        class(Abstract_Pair_Potential), intent(in) :: pair_potential
 
         real(DP) :: energy_i, distance
         integer :: i_particle
@@ -78,7 +69,7 @@ contains
             if (particle%same_type .and. particle%i == i_particle) cycle
             distance = this%periodic_box%distance(particle%position, &
                                                   this%particles_positions%get(i_particle))
-            call this%pair_potential%meet(overlap, energy_i, distance)
+            call pair_potential%meet(overlap, energy_i, distance)
             if (overlap) return
             energy = energy + energy_i
         end do
@@ -98,16 +89,12 @@ contains
         class(Null_Particles_Potential), intent(inout) :: this
     end subroutine Null_Particles_Potential_destroy
 
-    subroutine Null_Particles_Potential_set(this, pair_potential)
-        class(Null_Particles_Potential), intent(inout) :: this
-        class(Abstract_Pair_Potential), target, intent(in) :: pair_potential
-    end subroutine Null_Particles_Potential_set
-
-    pure subroutine Null_Particles_Potential_visit(this, overlap, energy, particle)
+    pure subroutine Null_Particles_Potential_visit(this, overlap, energy, particle, pair_potential)
         class(Null_Particles_Potential), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
         type(Concrete_Particle), intent(in) :: particle
+        class(Abstract_Pair_Potential), intent(in) :: pair_potential
         overlap = .false.
         energy = 0._DP
     end subroutine Null_Particles_Potential_visit

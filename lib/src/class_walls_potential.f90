@@ -17,12 +17,10 @@ private
         real(DP) :: gap
         class(Abstract_Periodic_Box), pointer :: periodic_box
         class(Abstract_Floor_Penetration), pointer :: floor_penetration
-        class(Abstract_Pair_Potential), pointer :: pair_potential
     contains
         procedure :: construct => Abstract_Walls_Potential_construct
         procedure :: destroy => Abstract_Walls_Potential_destroy
         procedure :: get_gap => Abstract_Walls_Potential_get_gap
-        procedure :: set => Abstract_Walls_Potential_set
         procedure :: visit => Abstract_Walls_Potential_visit
         procedure, private :: position_from_floor => Abstract_Walls_Potential_position_from_floor
         procedure, private :: position_from_ceiling => &
@@ -34,7 +32,6 @@ private
         procedure :: construct => Null_Walls_Potential_construct
         procedure :: destroy => Null_Walls_Potential_destroy
         procedure :: get_gap => Null_Walls_Potential_get_gap
-        procedure :: set => Null_Walls_Potential_set
         procedure :: visit => Null_Walls_Potential_visit
     end type Null_Walls_Potential
 
@@ -72,18 +69,12 @@ contains
         gap = this%gap
     end function Abstract_Walls_Potential_get_gap
 
-    subroutine Abstract_Walls_Potential_set(this, pair_potential)
-        class(Abstract_Walls_Potential), intent(inout) :: this
-        class(Abstract_Pair_Potential), target, intent(in) :: pair_potential
-
-        this%pair_potential => pair_potential
-    end subroutine Abstract_Walls_Potential_set
-
-    pure subroutine Abstract_Walls_Potential_visit(this, overlap, energy, position)
+    pure subroutine Abstract_Walls_Potential_visit(this, overlap, energy, position, pair_potential)
         class(Abstract_Walls_Potential), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
         real(DP), intent(in) :: position(:)
+        class(Abstract_Pair_Potential), intent(in) :: pair_potential
 
         real(DP) :: energy_floor, energy_ceiling
         real(DP), dimension(num_dimensions) :: shortest_vector_from_floor, &
@@ -95,9 +86,9 @@ contains
         call this%floor_penetration%meet(overlap, shortest_vector_from_ceiling, &
             -this%position_from_ceiling(position))
         if (overlap) return
-        call this%pair_potential%meet(overlap, energy_floor, norm2(shortest_vector_from_floor))
+        call pair_potential%meet(overlap, energy_floor, norm2(shortest_vector_from_floor))
         if (overlap) return
-        call this%pair_potential%meet(overlap, energy_ceiling, norm2(shortest_vector_from_ceiling))
+        call pair_potential%meet(overlap, energy_ceiling, norm2(shortest_vector_from_ceiling))
         if (overlap) return
         energy = energy_floor + energy_ceiling
     end subroutine Abstract_Walls_Potential_visit
@@ -123,7 +114,6 @@ contains
     subroutine Abstract_Walls_Potential_destroy(this)
         class(Abstract_Walls_Potential), intent(inout) :: this
 
-        this%pair_potential => null()
         this%floor_penetration => null()
         this%periodic_box => null()
     end subroutine Abstract_Walls_Potential_destroy
@@ -145,16 +135,12 @@ contains
         gap = 0._DP
     end function Null_Walls_Potential_get_gap
 
-    subroutine Null_Walls_Potential_set(this, pair_potential)
-        class(Null_Walls_Potential), intent(inout) :: this
-        class(Abstract_Pair_Potential), target, intent(in) :: pair_potential
-    end subroutine Null_Walls_Potential_set
-
-    pure subroutine Null_Walls_Potential_visit(this, overlap, energy, position)
+    pure subroutine Null_Walls_Potential_visit(this, overlap, energy, position, pair_potential)
         class(Null_Walls_Potential), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
         real(DP), intent(in) :: position(:)
+        class(Abstract_Pair_Potential), intent(in) :: pair_potential
         overlap = .false.
         energy = 0._DP
     end subroutine Null_Walls_Potential_visit
