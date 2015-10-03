@@ -37,6 +37,7 @@ interface particles_factory_create
     module procedure :: particles_factory_create_all
     module procedure :: allocate_and_set_number
     module procedure :: allocate_and_set_diameter
+    module procedure :: allocate_and_set_wall_diameter
     module procedure :: allocate_and_set_inter_diameter
     module procedure :: allocate_and_set_moment_norm
     module procedure :: allocate_and_construct_positions
@@ -73,8 +74,8 @@ contains
 
         call particles_factory_create(particles%number, input_data, prefix)
         call particles_factory_create(particles%diameter, input_data, prefix)
-        call particles_factory_create(particles%wall_diameter, input_data, prefix, &
-            environment%floor_penetration)
+        call particles_factory_create(particles%wall_diameter, particles%diameter,&
+            environment%floor_penetration, input_data, prefix)
         call particles_factory_create(particles%moment_norm, input_data, prefix)
         call particles_factory_create(particles%positions, environment%periodic_box, &
             particles%number)
@@ -108,43 +109,51 @@ contains
         call particles_number%set(num_particles)
     end subroutine allocate_and_set_number
 
-    subroutine allocate_and_set_diameter(particles_diameter, input_data, prefix, floor_penetration)
+    subroutine allocate_and_set_diameter(particles_diameter, input_data, prefix)
         class(Abstract_Particles_Diameter), allocatable, intent(out) :: particles_diameter
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
-        class(Abstract_Floor_Penetration), optional, intent(in) :: floor_penetration
 
-        character(len=:), allocatable :: precise_prefix
-        call allocate_diameter(particles_diameter, precise_prefix, input_data, prefix, &
-            floor_penetration)
-        call set_diameter(particles_diameter, input_data, precise_prefix)
-        if (allocated(precise_prefix)) deallocate(precise_prefix)
+        call allocate_diameter(particles_diameter, input_data, prefix)
+        call set_diameter(particles_diameter, input_data, prefix)
     end subroutine allocate_and_set_diameter
 
-    subroutine allocate_diameter(particles_diameter, precise_prefix, input_data, prefix, &
-        floor_penetration)
+    subroutine allocate_diameter(particles_diameter, input_data, prefix)
         class(Abstract_Particles_Diameter), allocatable, intent(out) :: particles_diameter
-        character(len=:), allocatable, intent(out) :: precise_prefix
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
-        class(Abstract_Floor_Penetration), optional, intent(in) :: floor_penetration
 
-        precise_prefix = prefix
         if (particles_exist(input_data, prefix)) then
-            if (present(floor_penetration)) then
-                if (use_walls(floor_penetration)) then
-                    precise_prefix = prefix//"With Walls."
-                    allocate(Concrete_Particles_Diameter :: particles_diameter)
-                else
-                    allocate(Null_Particles_Diameter :: particles_diameter)
-                end if
-            else
-                allocate(Concrete_Particles_Diameter :: particles_diameter)
-            end if
+            allocate(Concrete_Particles_Diameter :: particles_diameter)
         else
             allocate(Null_Particles_Diameter :: particles_diameter)
         end if
     end subroutine allocate_diameter
+
+    subroutine allocate_and_set_wall_diameter(particles_wall_diameter, particles_diameter, &
+        floor_penetration, input_data, prefix)
+        class(Abstract_Particles_Diameter), allocatable, intent(out) :: particles_wall_diameter
+        class(Abstract_Particles_Diameter), intent(in) :: particles_diameter
+        class(Abstract_Floor_Penetration), intent(in) :: floor_penetration
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
+
+        call allocate_wall_diameter(particles_wall_diameter, particles_diameter, floor_penetration)
+        call set_diameter(particles_wall_diameter, input_data, prefix//"With Walls.")
+    end subroutine allocate_and_set_wall_diameter
+
+    subroutine allocate_wall_diameter(particles_wall_diameter, particles_diameter, &
+        floor_penetration)
+        class(Abstract_Particles_Diameter), allocatable, intent(out) :: particles_wall_diameter
+        class(Abstract_Particles_Diameter), intent(in) :: particles_diameter
+        class(Abstract_Floor_Penetration), intent(in) :: floor_penetration
+
+        if (particles_exist(particles_diameter) .and. use_walls(floor_penetration)) then
+            allocate(Concrete_Particles_Diameter :: particles_wall_diameter)
+        else
+            allocate(Null_Particles_Diameter :: particles_wall_diameter)
+        end if
+    end subroutine allocate_wall_diameter
 
     subroutine set_diameter(particles_diameter, input_data, prefix)
         class(Abstract_Particles_Diameter), intent(inout) :: particles_diameter
@@ -155,14 +164,19 @@ contains
         logical :: data_found
         real(DP) :: diameter, diameter_min_factor
 
-        data_field = prefix//"diameter"
-        call input_data%get(data_field, diameter, data_found)
-        call test_data_found(data_field, data_found)
-        data_field = prefix//"minimum diameter factor"
-        call input_data%get(data_field, diameter_min_factor, data_found)
-        call test_data_found(data_field, data_found)
+        if (particles_exist(particles_diameter)) then
+            data_field = prefix//"diameter"
+            call input_data%get(data_field, diameter, data_found)
+            call test_data_found(data_field, data_found)
+            data_field = prefix//"minimum diameter factor"
+            call input_data%get(data_field, diameter_min_factor, data_found)
+            call test_data_found(data_field, data_found)
+            deallocate(data_field)
+        else
+            diameter = 0._DP
+            diameter_min_factor = 0._DP
+        end if
         call particles_diameter%set(diameter, diameter_min_factor)
-        deallocate(data_field)
     end subroutine set_diameter
 
     subroutine allocate_and_set_inter_diameter(inter_particles_diameter, &

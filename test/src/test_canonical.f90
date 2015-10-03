@@ -14,7 +14,7 @@ use procedures_metropolis_factory, only: metropolis_factory_create, metropolis_f
 use module_particles_energy, only: Concrete_Particles_Energy, &
     particle_energys_write_legend => Concrete_Particles_Energy_write_legend, &
     particles_energy_write => Concrete_Particles_Energy_write
-use procedures_visits, only: visit
+use procedures_plmc_visit, only: plmc_visit
 use procedures_plmc_factory, only: plmc_load, plmc_create, plmc_destroy
 use types_mixture_observables, only: Concrete_Mixture_Observables
 
@@ -48,10 +48,7 @@ implicit none
 
     call input_data%destroy()
 
-    call visit(observables%particles_energies, observables%inter_energy, short_potentials%intras, &
-        short_potentials%inter_micro%pair, mixture%components)
-    call visit(observables%particles_energies, environment%walls_potential, mixture%components, &
-        short_potentials%walls)
+    call plmc_visit(observables, environment%walls_potential, short_potentials, mixture)
 
     i_step = 0
     open(newunit=energy_units(1), recl=4096, file="component_1_energy.out", action="write")
@@ -66,8 +63,7 @@ implicit none
 
     call metropolis_factory_create(one_particle_move, environment, changes)
     call metropolis_factory_set(one_particle_move, mixture%components)
-    call metropolis_factory_set(one_particle_move, short_potentials%intras, &
-        short_potentials%inters, short_potentials%walls)
+    call metropolis_factory_set(one_particle_move, short_potentials%intras, short_potentials%inters)
     call metropolis_factory_set(one_particle_move, observables)
 
     open(newunit=move_units(1), recl=4096, file="component_1_move.out", action="write")
@@ -90,10 +86,7 @@ implicit none
         observables%move_counters(2)%num_hits = 0; observables%move_counters(2)%num_success = 0
     end do
 
-    call visit(observables%particles_energies, observables%inter_energy, short_potentials%intras, &
-        short_potentials%inter_micro%pair, mixture%components)
-    call visit(observables%particles_energies, environment%walls_potential, mixture%components, &
-        short_potentials%walls)
+    call plmc_visit(observables, environment%walls_potential, short_potentials, mixture)
     call particles_energy_write(energy_units(1), i_step-1, observables%particles_energies(1))
     call particles_energy_write(energy_units(2), i_step-1, observables%particles_energies(2))
     write(inter_energy_unit, *) i_step-1, observables%inter_energy
