@@ -13,6 +13,7 @@ use class_particles_dipolar_moments, only: Abstract_Particles_Dipolar_Moments, &
 use class_particles_chemical_potential, only: Abstract_Particles_Chemical_Potential, &
     Null_Particles_Chemical_Potential
 use class_moved_positions, only: Abstract_Moved_Positions, Null_Moved_Positions
+use class_rotated_orientations, only: Abstract_Rotated_Orientations, Null_Rotated_Orientations
 use class_particles_exchange, only: Abstract_Particles_Exchange, Null_Particles_Exchange
 use class_pair_potential, only: Abstract_Pair_Potential, Null_Pair_Potential
 
@@ -20,8 +21,9 @@ implicit none
 
 private
 public :: apply_external_field, use_reciprocal_lattice, use_walls, &
-    particles_exist, particles_have_positions, particles_can_move, particles_are_dipolar, &
-    particles_have_orientations, particles_can_exchange, particles_interact
+    particles_exist, mixture_exists, particles_have_positions, particles_can_move, &
+    particles_are_dipolar, particles_have_orientations, particles_can_exchange, &
+    particles_can_rotate, particles_interact
 
 interface apply_external_field
     module procedure :: apply_external_field_from_json
@@ -34,6 +36,7 @@ end interface use_reciprocal_lattice
 interface use_walls
     module procedure :: use_walls_from_json
     module procedure :: use_walls_from_floor_penetration
+    module procedure :: use_walls_from_particles_wall_diameter
 end interface use_walls
 
 interface particles_exist
@@ -41,6 +44,10 @@ interface particles_exist
     module procedure :: particles_exist_from_number
     module procedure :: particles_exist_from_diameter
 end interface particles_exist
+
+interface mixture_exists
+    module procedure :: mixture_exists_from_inter_diameter
+end interface mixture_exists
 
 interface particles_are_dipolar
     module procedure :: particles_are_dipolar_from_json
@@ -51,6 +58,7 @@ end interface particles_are_dipolar
 interface particles_can_exchange
     module procedure :: particles_can_exchange_from_json
     module procedure :: particles_can_exchange_from_chemical_potential
+    module procedure :: particles_can_exchange_from_particles_exchange
 end interface particles_can_exchange
 
 contains
@@ -88,6 +96,18 @@ contains
         end select
     end function use_walls_from_floor_penetration
 
+    logical function use_walls_from_particles_wall_diameter(particles_wall_diameter) &
+        result(use_walls)
+        class(Abstract_Particles_Diameter), intent(in) :: particles_wall_diameter
+
+        select type (particles_wall_diameter)
+            type is (Null_Particles_Diameter)
+                use_walls = .false.
+            class default
+                use_walls = .true.
+        end select
+    end function use_walls_from_particles_wall_diameter
+
     logical function particles_exist_from_json(input_data, prefix) result(particles_exist)
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
@@ -116,6 +136,12 @@ contains
                 particles_exist = .true.
         end select
     end function particles_exist_from_diameter
+
+    pure logical function mixture_exists_from_inter_diameter(inter_diameter) result(mixture_exists)
+        class(Abstract_Particles_Diameter), intent(in) :: inter_diameter
+
+        mixture_exists = particles_exist(inter_diameter)
+    end function mixture_exists_from_inter_diameter
 
     pure logical function particles_interact(pair_potential)
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
@@ -160,6 +186,17 @@ contains
                 particles_can_move = .true.
         end select
     end function particles_can_move
+
+    pure logical function particles_can_rotate(rotated_orientations)
+        class(Abstract_Rotated_Orientations), intent(in) :: rotated_orientations
+
+        select type (rotated_orientations)
+            type is (Null_Rotated_Orientations)
+                particles_can_rotate = .false.
+            class default
+                particles_can_rotate = .true.
+        end select
+    end function particles_can_rotate
 
     logical function particles_are_dipolar_from_json(input_data, prefix) &
         result(particles_are_dipolar)
@@ -228,6 +265,18 @@ contains
                 particles_can_exchange = .true.
         end select
     end function particles_can_exchange_from_chemical_potential
+
+    pure logical function particles_can_exchange_from_particles_exchange(particles_exchange) &
+        result(particles_can_exchange)
+        class(Abstract_Particles_Exchange), intent(in) :: particles_exchange
+
+        select type (particles_exchange)
+            type is (Null_Particles_Exchange)
+                particles_can_exchange = .false.
+            class default
+                particles_can_exchange = .true.
+        end select
+    end function particles_can_exchange_from_particles_exchange
 
     logical function logical_from_json(input_data, switch_name)
         type(json_file), intent(inout) :: input_data

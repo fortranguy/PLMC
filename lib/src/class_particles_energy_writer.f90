@@ -7,6 +7,8 @@ use module_particles_energy, only: Concrete_Particles_Energy
 
 implicit none
 
+private
+
     type, public :: Concrete_Energy_Writer_Selector
         logical :: write_walls
     end type Concrete_Energy_Writer_Selector

@@ -5,6 +5,8 @@ use module_data, only: test_empty_string
 
 implicit none
 
+private
+
     type, abstract, public :: Abstract_Inter_Energy_Writer
     private
         integer :: unit
@@ -35,13 +37,13 @@ contains
 
         call test_empty_string("Abstract_Inter_Energy_Writer_construct: filename", filename)
         open(newunit=this%unit, recl=4096, file=filename, action="write")
+        write(this%unit, *) "#i_step    energy"
     end subroutine Abstract_Inter_Energy_Writer_construct
 
     subroutine Abstract_Inter_Energy_Writer_destroy(this)
         class(Abstract_Inter_Energy_Writer), intent(inout) :: this
 
         close(this%unit)
-
     end subroutine Abstract_Inter_Energy_Writer_destroy
 
     subroutine Abstract_Inter_Energy_Writer_write(this, i_step, energy)

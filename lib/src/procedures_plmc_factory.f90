@@ -12,6 +12,9 @@ use procedures_changes_factory, only: changes_factory_create, changes_factory_de
 use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper
 use procedures_short_potential_factory, only: short_potential_factory_create, &
     short_potential_factory_destroy
+use types_observable_writers_wrapper, only: Mixture_Observable_Writers_Wrapper
+use procedures_observable_writers_factory, only: observable_writers_factory_create, &
+    observable_writers_factory_destroy
 
 implicit none
 
@@ -27,9 +30,11 @@ interface plmc_create
     module procedure :: create_mixture
     module procedure :: create_changes
     module procedure :: create_short_potentials
+    module procedure :: create_observable_writers
 end interface plmc_create
 
 interface plmc_destroy
+    module procedure :: destroy_observable_writers
     module procedure :: destroy_short_potentials
     module procedure :: destroy_changes
     module procedure :: destroy_mixture
@@ -132,5 +137,35 @@ contains
         call short_potential_factory_destroy(short_potentials%intras(2))
         call short_potential_factory_destroy(short_potentials%intras(1))
     end subroutine destroy_short_potentials
+
+    subroutine create_observable_writers(observable_writers, mixture, changes)
+        type(Mixture_Observable_Writers_Wrapper), intent(out) :: observable_writers
+        type(Mixture_Wrapper), intent(in) :: mixture
+        type(Changes_Wrapper), intent(in) :: changes(2)
+
+        call observable_writers_factory_create(observable_writers%intras(1)%energy_writer, &
+            mixture%components(1)%number, mixture%components(1)%wall_diameter, &
+            "component_1_energy.out")
+        call observable_writers_factory_create(observable_writers%intras(2)%energy_writer, &
+            mixture%components(2)%number, mixture%components(2)%wall_diameter, &
+            "component_2_energy.out")
+        call observable_writers_factory_create(observable_writers%inter_energy_writer, &
+            mixture%inter_diameter, "inter_12_energy.out")
+        call observable_writers_factory_create(observable_writers%intras(1)%changes_writer, &
+            changes(1)%moved_positions, changes(1)%rotated_orientations, &
+            changes(1)%particles_exchange, "component_1_success.out")
+        call observable_writers_factory_create(observable_writers%intras(2)%changes_writer, &
+            changes(2)%moved_positions, changes(2)%rotated_orientations, &
+            changes(2)%particles_exchange, "component_2_success.out")
+    end subroutine create_observable_writers
+
+    subroutine destroy_observable_writers(observable_writers)
+        type(Mixture_Observable_Writers_Wrapper), intent(inout) :: observable_writers
+        call observable_writers_factory_destroy(observable_writers%intras(2)%changes_writer)
+        call observable_writers_factory_destroy(observable_writers%intras(1)%changes_writer)
+        call observable_writers_factory_destroy(observable_writers%inter_energy_writer)
+        call observable_writers_factory_destroy(observable_writers%intras(2)%energy_writer)
+        call observable_writers_factory_destroy(observable_writers%intras(1)%energy_writer)
+    end subroutine destroy_observable_writers
 
 end module procedures_plmc_factory

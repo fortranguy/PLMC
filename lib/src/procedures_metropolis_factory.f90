@@ -77,7 +77,7 @@ contains
         class(Abstract_One_Particle_Move), intent(inout) :: one_particle_move
         type(Concrete_Mixture_Observables), intent(in) :: observables
 
-        call one_particle_move%set_candidates_observables(observables%move_counters, &
+        call one_particle_move%set_candidates_observables(observables%changes_counters%moves, &
             observables%particles_energies, observables%inter_energy)
     end subroutine set_one_particle_move_observables
 

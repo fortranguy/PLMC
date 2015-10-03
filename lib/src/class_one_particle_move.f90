@@ -15,7 +15,7 @@ use class_pair_potential, only: Abstract_Pair_Potential
 use class_visitable_cells, only: Abstract_Visitable_Cells
 use module_particles_energy, only: Concrete_Particles_Energy, &
     particle_energy_sum => Concrete_Particles_Energy_sum, operator(+), operator(-)
-use types_change_counter, only: Concrete_Change_Counter
+use module_changes_success, only: Concrete_Change_Counters
 
 implicit none
 
@@ -36,7 +36,7 @@ private
         class(Abstract_External_Field), pointer :: field => null()
         class(Abstract_Walls_Potential), pointer :: walls => null()
         type(Move_Candidate) :: candidates(num_candidates)
-        type(Concrete_Change_Counter), pointer :: move_counters(:) => null()
+        type(Concrete_Change_Counters), pointer :: move_counters(:) => null()
         type(Concrete_Particles_Energy), pointer :: particles_energies(:) => null()
         real(DP), pointer :: inter_energy => null()
     contains
@@ -171,7 +171,7 @@ contains
     subroutine Abstract_One_Particle_Move_set_candidates_observables(this, move_counters, &
         particles_energies, inter_energy)
         class(Abstract_One_Particle_Move), intent(inout) :: this
-        type(Concrete_Change_Counter), target, intent(in) :: move_counters(:)
+        type(Concrete_Change_Counters), target, intent(in) :: move_counters(:)
         type(Concrete_Particles_Energy), target, intent(in) :: particles_energies(:)
         real(DP), target, intent(in) :: inter_energy
 
@@ -356,7 +356,7 @@ contains
     subroutine Null_One_Particle_Move_set_candidates_observables(this, move_counters, &
         particles_energies, inter_energy)
         class(Null_One_Particle_Move), intent(inout) :: this
-        type(Concrete_Change_Counter), target, intent(in) :: move_counters(:)
+        type(Concrete_Change_Counters), target, intent(in) :: move_counters(:)
         type(Concrete_Particles_Energy), target, intent(in) :: particles_energies(:)
         real(DP), target, intent(in) :: inter_energy
     end subroutine Null_One_Particle_Move_set_candidates_observables

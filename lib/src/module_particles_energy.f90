@@ -5,8 +5,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 implicit none
 
 private
-public :: Concrete_Particles_Energy_sum, operator(+), operator(-), &
-    Concrete_Particles_Energy_write_legend, Concrete_Particles_Energy_write
+public :: Concrete_Particles_Energy_sum, operator(+), operator(-)
 
     type, public :: Concrete_Particles_Energy
         real(DP) :: intra = 0._DP
@@ -60,18 +59,5 @@ contains
         particle_energy_difference%intra = particle_energy_1%intra - particle_energy_2%intra
         particle_energy_difference%walls = particle_energy_1%walls - particle_energy_2%walls
     end function Concrete_Particles_Energy_difference
-
-    subroutine Concrete_Particles_Energy_write_legend(unit)
-        integer, intent(in) :: unit
-
-        write(unit, *) "# i_step    intra    walls"
-    end subroutine Concrete_Particles_Energy_write_legend
-
-    subroutine Concrete_Particles_Energy_write(unit, i_step, particle_energy)
-        integer, intent(in) :: unit, i_step
-        type(Concrete_Particles_Energy), intent(in) :: particle_energy
-
-        write(unit, *) i_step, particle_energy%intra, particle_energy%walls
-    end subroutine Concrete_Particles_Energy_write
 
 end module module_particles_energy
