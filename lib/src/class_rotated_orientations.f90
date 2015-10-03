@@ -1,7 +1,7 @@
 module class_rotated_orientations
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use data_geometry, only: num_dimensions
+use data_constants, only: num_dimensions
 use procedures_checks, only: check_positive, check_increase_factor
 use class_particles_orientations, only: Abstract_Particles_Orientations
 use procedures_random, only: markov_orientation

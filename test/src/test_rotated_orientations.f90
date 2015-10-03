@@ -1,7 +1,7 @@
 program test_rotated_orientations
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
-use data_geometry, only: num_dimensions
+use data_constants, only: num_dimensions
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
 use class_particles_number, only: Abstract_Particles_Number, Concrete_Particles_Number

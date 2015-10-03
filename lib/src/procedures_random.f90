@@ -1,7 +1,7 @@
 module procedures_random
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use data_geometry, only: num_dimensions
+use data_constants, only: num_dimensions
 use procedures_checks, only: check_positive
 
 implicit none

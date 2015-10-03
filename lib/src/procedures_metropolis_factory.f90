@@ -1,5 +1,6 @@
 module procedures_metropolis_factory
 
+use data_constants, only: num_components
 use json_module, only: json_file
 use module_data, only: test_data_found
 use procedures_property_inquirers, only: particles_can_move
@@ -36,7 +37,7 @@ contains
     subroutine allocate_and_construct_one_particle_move(one_particle_move, environment, changes)
         class(Abstract_One_Particle_Move), allocatable, intent(out) :: one_particle_move
         type(Environment_Wrapper), intent(in) :: environment
-        type(Changes_Wrapper), intent(in) :: changes(2)
+        type(Changes_Wrapper), intent(in) :: changes(num_components)
 
         if (particles_can_move(changes(1)%moved_positions) .and. &
             particles_can_move(changes(2)%moved_positions)) then
@@ -56,7 +57,7 @@ contains
 
     subroutine set_one_particle_move_components(one_particle_move, components)
         class(Abstract_One_Particle_Move), intent(inout) :: one_particle_move
-        type(Particles_Wrapper), intent(in) :: components(2)
+        type(Particles_Wrapper), intent(in) :: components(num_components)
 
         call one_particle_move%set_candidate(1, components(1)%positions)
         call one_particle_move%set_candidate(2, components(2)%positions)

@@ -1,8 +1,7 @@
 module class_visitable_cells
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use data_precisions, only: real_zero
-use data_geometry, only: num_dimensions
+use data_constants, only: num_dimensions, real_zero
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_positive
 use class_periodic_box, only: Abstract_Periodic_Box

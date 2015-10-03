@@ -1,8 +1,7 @@
 module procedures_checks
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use data_precisions, only: real_zero
-use data_geometry, only: num_dimensions
+use data_constants, only: num_dimensions, real_zero
 use procedures_errors, only: warning_continue, error_exit
 
 implicit none

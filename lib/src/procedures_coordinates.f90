@@ -1,7 +1,7 @@
 module procedures_coordinates
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, iostat_end
-use data_geometry, only: num_dimensions
+use data_constants, only: num_dimensions
 use module_data, only: test_file_exists
 use procedures_errors, only: error_exit
 

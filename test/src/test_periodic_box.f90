@@ -1,7 +1,7 @@
 module procedures_periodic_box_print
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
-use data_geometry, only: num_dimensions
+use data_constants, only: num_dimensions
 use class_periodic_box, only: Abstract_Periodic_Box
 
 implicit none

@@ -1,7 +1,7 @@
 module class_particles_total_moment
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use data_geometry, only: num_dimensions
+use data_constants, only: num_dimensions
 use procedures_checks, only: check_3d_array
 use class_particles_dipolar_moments, only: Abstract_Particles_Dipolar_Moments
 

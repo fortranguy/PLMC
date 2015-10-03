@@ -34,7 +34,7 @@ end module procedures_parallelepiped_domain_write
 program test_parallelepiped_domain
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
-use data_geometry, only: num_dimensions
+use data_constants, only: num_dimensions
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box

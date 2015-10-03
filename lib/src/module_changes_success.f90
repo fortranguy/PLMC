@@ -1,13 +1,12 @@
 module module_changes_success
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
+use data_constants, only: num_components
 
 implicit none
 
 private
 public :: Concrete_Mixture_Changes_Counters_reset, Concrete_Mixture_Changes_Success_set
-
-    integer, parameter :: num_components = 2
 
     type, public :: Concrete_Change_Counters
         integer :: num_hits
@@ -27,7 +26,7 @@ public :: Concrete_Mixture_Changes_Counters_reset, Concrete_Mixture_Changes_Succ
     end type Concrete_Changes_Success_Ratio
 
     type, public :: Concrete_Mixture_Changes_Success
-        type(Concrete_Changes_Success_Ratio) :: ratios(2)
+        type(Concrete_Changes_Success_Ratio) :: ratios(num_components)
     end type Concrete_Mixture_Changes_Success
 
 contains

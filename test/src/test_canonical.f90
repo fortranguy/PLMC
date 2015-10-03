@@ -1,6 +1,6 @@
 program test_canonical
 
-use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
+use data_constants, only: num_components
 use json_module, only: json_file
 use module_data, only: test_data_found
 use procedures_checks, only: check_positive
@@ -19,21 +19,20 @@ use module_changes_success, only: counters_reset => Concrete_Mixture_Changes_Cou
 use types_mixture_observables, only: Concrete_Mixture_Observables
 use types_observable_writers_wrapper, only: Mixture_Observable_Writers_Wrapper
 use procedures_plmc_write, only: plmc_write
+use module_plmc_iterations, only: num_steps, plmc_set_num_steps
 
 implicit none
 
     type(Environment_Wrapper) :: environment
     type(Mixture_Wrapper) :: mixture
-    type(Changes_Wrapper) :: changes(2)
+    type(Changes_Wrapper) :: changes(num_components)
     type(Mixture_Short_Potentials_Wrapper) :: short_potentials
     class(Abstract_One_Particle_Move), allocatable :: one_particle_move
     type(Concrete_Mixture_Observables) :: observables
     type(Mixture_Observable_Writers_Wrapper) :: observables_writers
 
     type(json_file) :: input_data
-    character(len=:), allocatable :: data_field
-    logical :: data_found
-    integer :: num_steps, i_step, num_moves, i_move
+    integer :: i_step, num_moves, i_move
 
     call plmc_load(input_data)
     call plmc_create(environment, input_data)
@@ -41,12 +40,7 @@ implicit none
     call plmc_create(changes, input_data, environment%periodic_box, mixture%components)
     call plmc_create(short_potentials, input_data, environment, mixture)
     call plmc_create(observables_writers, mixture, changes)
-
-    data_field = "Monte Carlo.number of steps"
-    call input_data%get(data_field, num_steps, data_found)
-    call test_data_found(data_field, data_found)
-    call check_positive("test_canonical", "num_steps", num_steps)
-    deallocate(data_field)
+    call plmc_set_num_steps(input_data)
 
     call input_data%destroy()
 

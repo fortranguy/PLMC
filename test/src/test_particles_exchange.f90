@@ -65,7 +65,7 @@ end module procedures_particles_exchange_write
 program test_particles_exchange
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
-use data_geometry, only: num_dimensions
+use data_constants, only: num_dimensions
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists, test_data_found
 use procedures_random, only: random_integer, random_orientation

@@ -1,6 +1,7 @@
 module class_one_particle_move
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
+use data_constants, only: num_components
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_in_range
 use procedures_random, only: random_integer
@@ -21,8 +22,6 @@ implicit none
 
 private
 
-    integer, parameter :: num_candidates = 2
-
     type :: Move_Candidate
         class(Abstract_Particles_Positions), pointer :: positions => null()
         class(Abstract_Moved_Positions), pointer :: moved => null()
@@ -35,7 +34,7 @@ private
         class(Abstract_Temperature), pointer :: temperature => null()
         class(Abstract_External_Field), pointer :: field => null()
         class(Abstract_Walls_Potential), pointer :: walls => null()
-        type(Move_Candidate) :: candidates(num_candidates)
+        type(Move_Candidate) :: candidates(num_components)
         type(Concrete_Change_Counters), pointer :: move_counters(:) => null()
         type(Concrete_Particles_Energy), pointer :: particles_energies(:) => null()
         real(DP), pointer :: inter_energy => null()
@@ -128,7 +127,7 @@ contains
         class(Abstract_One_Particle_Move), intent(inout) :: this
         integer, intent(in) :: i_candidate
 
-        call check_in_range("Abstract_One_Particle_Move_nullify_candidate", num_candidates, &
+        call check_in_range("Abstract_One_Particle_Move_nullify_candidate", num_components, &
             "i_candidate", i_candidate)
         this%candidates(i_candidate)%inter_cells => null()
         this%candidates(i_candidate)%intra_cells => null()
@@ -141,7 +140,7 @@ contains
         integer, intent(in) :: i_candidate
         class(Abstract_Particles_Positions), target, intent(in) :: positions
 
-        call check_in_range("Abstract_One_Particle_Move_set_candidate_positions", num_candidates, &
+        call check_in_range("Abstract_One_Particle_Move_set_candidate_positions", num_components, &
             "i_candidate", i_candidate)
         this%candidates(i_candidate)%positions => positions
     end subroutine Abstract_One_Particle_Move_set_candidate_positions
@@ -153,7 +152,7 @@ contains
         class(Abstract_Visitable_Cells), target, intent(in) :: intra_cells, inter_cells
 
         call check_in_range("Abstract_One_Particle_Move_set_candidate_short_potentials", &
-            num_candidates, "i_candidate", i_candidate)
+            num_components, "i_candidate", i_candidate)
         this%candidates(i_candidate)%intra_cells => intra_cells
         this%candidates(i_candidate)%inter_cells => inter_cells
     end subroutine Abstract_One_Particle_Move_set_candidate_short_potentials
@@ -164,7 +163,7 @@ contains
         class(Abstract_Pair_Potential), target, intent(in) :: wall_pair
 
         call check_in_range("Abstract_One_Particle_Move_set_candidate_short_potentials", &
-            num_candidates, "i_candidate", i_candidate)
+            num_components, "i_candidate", i_candidate)
         this%candidates(i_candidate)%wall_pair => wall_pair
     end subroutine Abstract_One_Particle_Move_set_candidate_wall_pair
 
@@ -175,12 +174,12 @@ contains
         type(Concrete_Particles_Energy), target, intent(in) :: particles_energies(:)
         real(DP), target, intent(in) :: inter_energy
 
-        if (size(move_counters) /= num_candidates) then
+        if (size(move_counters) /= num_components) then
             call error_exit("Abstract_One_Particle_Move: "//&
                 "move_counters doesn't have the right size.")
         end if
         this%move_counters => move_counters
-        if (size(particles_energies) /= num_candidates) then
+        if (size(particles_energies) /= num_components) then
             call error_exit("Abstract_One_Particle_Move: "//&
                 "particles_energies doesn't have the right size.")
         end if
@@ -276,8 +275,8 @@ contains
     subroutine Abstract_One_Particle_Move_select_actor_and_spectator(i_actor, i_spectator)
         integer, intent(out) :: i_actor, i_spectator
 
-        i_actor = random_integer(num_candidates)
-        i_spectator = mod(i_actor, num_candidates) + 1
+        i_actor = random_integer(num_components)
+        i_spectator = mod(i_actor, num_components) + 1
     end subroutine Abstract_One_Particle_Move_select_actor_and_spectator
 
     subroutine Abstract_One_Particle_Move_set_actor_positions_and_moved(this, actor_positions, &

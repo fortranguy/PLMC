@@ -1,5 +1,6 @@
 module types_particles_wrapper
 
+use data_constants, only: num_components
 use class_particles_number, only: Abstract_Particles_Number
 use class_particles_diameter, only: Abstract_Particles_Diameter
 use class_particles_moment_norm, only: Abstract_Particles_Moment_Norm
@@ -26,7 +27,7 @@ private
     end type Particles_Wrapper
 
     type, public :: Mixture_Wrapper
-        type(Particles_Wrapper) :: components(2)
+        type(Particles_Wrapper) :: components(num_components)
         class(Abstract_Particles_Diameter), allocatable :: inter_diameter
     end type Mixture_Wrapper
 

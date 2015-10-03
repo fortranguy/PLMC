@@ -1,7 +1,7 @@
 module class_parallelepiped_domain
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use data_geometry, only: num_dimensions
+use data_constants, only: num_dimensions
 use class_periodic_box, only: Abstract_Periodic_Box
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_3d_array, check_positive

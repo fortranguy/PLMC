@@ -1,7 +1,7 @@
 module class_external_field
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use data_geometry, only: num_dimensions
+use data_constants, only: num_dimensions
 use class_field_expression, only: Abstract_Field_Expression
 use class_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
 

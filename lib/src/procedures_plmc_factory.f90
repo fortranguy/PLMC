@@ -1,5 +1,6 @@
 module procedures_plmc_factory
 
+use data_constants, only: num_components
 use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists
 use class_periodic_box, only: Abstract_Periodic_Box
@@ -90,10 +91,10 @@ contains
     end subroutine destroy_mixture
 
     subroutine create_changes(changes, input_data, periodic_box, components)
-        type(Changes_Wrapper), intent(out) :: changes(2)
+        type(Changes_Wrapper), intent(out) :: changes(num_components)
         type(json_file), intent(inout) :: input_data
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        type(Particles_Wrapper), intent(in) :: components(2)
+        type(Particles_Wrapper), intent(in) :: components(num_components)
 
         call changes_factory_create(changes(1), input_data, "Changes.Component 1.", periodic_box, &
             components(1))
@@ -141,7 +142,7 @@ contains
     subroutine create_observable_writers(observable_writers, mixture, changes)
         type(Mixture_Observable_Writers_Wrapper), intent(out) :: observable_writers
         type(Mixture_Wrapper), intent(in) :: mixture
-        type(Changes_Wrapper), intent(in) :: changes(2)
+        type(Changes_Wrapper), intent(in) :: changes(num_components)
 
         call observable_writers_factory_create(observable_writers%intras(1)%energy_writer, &
             mixture%components(1)%number, mixture%components(1)%wall_diameter, &
