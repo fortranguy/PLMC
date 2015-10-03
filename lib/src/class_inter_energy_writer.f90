@@ -8,7 +8,6 @@ implicit none
     type, abstract, public :: Abstract_Inter_Energy_Writer
     private
         integer :: unit
-        real(DP), pointer :: energy => null()
     contains
         procedure :: construct => Abstract_Inter_Energy_Writer_construct
         procedure :: destroy => Abstract_Inter_Energy_Writer_destroy
@@ -30,12 +29,10 @@ contains
 
 !implementation Abstract_Inter_Energy_Writer
 
-    subroutine Abstract_Inter_Energy_Writer_construct(this, energy, filename)
+    subroutine Abstract_Inter_Energy_Writer_construct(this, filename)
         class(Abstract_Inter_Energy_Writer), intent(out) :: this
-        real(DP), target, intent(in) :: energy
         character(len=*), intent(in) :: filename
 
-        this%energy => energy
         call test_empty_string("Abstract_Inter_Energy_Writer_construct: filename", filename)
         open(newunit=this%unit, recl=4096, file=filename, action="write")
     end subroutine Abstract_Inter_Energy_Writer_construct
@@ -44,23 +41,23 @@ contains
         class(Abstract_Inter_Energy_Writer), intent(inout) :: this
 
         close(this%unit)
-        this%energy => null()
+
     end subroutine Abstract_Inter_Energy_Writer_destroy
 
-    subroutine Abstract_Inter_Energy_Writer_write(this, i_step)
+    subroutine Abstract_Inter_Energy_Writer_write(this, i_step, energy)
         class(Abstract_Inter_Energy_Writer), intent(in) :: this
         integer, intent(in) :: i_step
+        real(DP), intent(in) :: energy
 
-        write(this%unit, *) i_step, this%energy
+        write(this%unit, *) i_step, energy
     end subroutine Abstract_Inter_Energy_Writer_write
 
 !end implementation Abstract_Inter_Energy_Writer
 
 !implementation Null_Inter_Energy_Writer
 
-    subroutine Null_Inter_Energy_Writer_construct(this, energy, filename)
+    subroutine Null_Inter_Energy_Writer_construct(this, filename)
         class(Null_Inter_Energy_Writer), intent(out) :: this
-        real(DP), target, intent(in) :: energy
         character(len=*), intent(in) :: filename
     end subroutine Null_Inter_Energy_Writer_construct
 
@@ -68,9 +65,10 @@ contains
         class(Null_Inter_Energy_Writer), intent(inout) :: this
     end subroutine Null_Inter_Energy_Writer_destroy
 
-    subroutine Null_Inter_Energy_Writer_write(this, i_step)
+    subroutine Null_Inter_Energy_Writer_write(this, i_step, energy)
         class(Null_Inter_Energy_Writer), intent(in) :: this
         integer, intent(in) :: i_step
+        real(DP), intent(in) :: energy
     end subroutine Null_Inter_Energy_Writer_write
 
 !end implementation Null_Inter_Energy_Writer

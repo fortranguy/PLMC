@@ -5,7 +5,6 @@ use data_geometry, only: num_dimensions
 use class_periodic_box, only: Abstract_Periodic_Box
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_3d_array, check_positive
-use procedures_parallelepiped_domain, only: point_is_inside
 
 implicit none
 
@@ -22,7 +21,6 @@ private
         procedure :: get_volume => Abstract_Parallelepiped_Domain_get_volume
         procedure :: get_vertices => Abstract_Parallelepiped_Domain_get_vertices
         procedure :: is_inside => Abstract_Parallelepiped_Domain_is_inside
-        procedure :: overlap => Abstract_Parallelepiped_Domain_overlap
         procedure :: random_position => Abstract_Parallelepiped_Domain_random_position
     end type Abstract_Parallelepiped_Domain
 
@@ -37,7 +35,6 @@ private
         procedure :: get_volume => Null_Parallelepiped_Domain_get_volume
         procedure :: get_vertices => Null_Parallelepiped_Domain_get_vertices
         procedure :: is_inside => Null_Parallelepiped_Domain_is_inside
-        procedure :: overlap => Null_Parallelepiped_Domain_overlap
         procedure :: random_position => Null_Parallelepiped_Domain_random_position
     end type Null_Parallelepiped_Domain
 
@@ -107,26 +104,16 @@ contains
         is_inside = point_is_inside(this%origin, this%size, position)
     end function Abstract_Parallelepiped_Domain_is_inside
 
-    pure logical function Abstract_Parallelepiped_Domain_overlap(this, other) result(overlap)
-        class(Abstract_Parallelepiped_Domain), intent(in) :: this, other
+    pure function point_is_inside(box_origin, box_size, point)
+        logical :: point_is_inside
+        real(DP), intent(in) :: box_origin(:), box_size(:), point(:)
 
-        logical :: this_vertex_in_other, other_vertex_in_this
-        integer :: i_vertex, j_vertex, k_vertex
+        real(DP), dimension(num_dimensions) :: box_corner, point_from_corner
 
-        overlap = .false.
-        do k_vertex = 1, 2
-            do j_vertex = 1, 2
-                do i_vertex = 1, 2
-                    this_vertex_in_other = &
-                        other%is_inside(this%get_vertices([i_vertex, j_vertex, k_vertex]))
-                    other_vertex_in_this = &
-                        this%is_inside(other%get_vertices([i_vertex, j_vertex, k_vertex]))
-                    overlap = this_vertex_in_other .or. other_vertex_in_this
-                    if (overlap) return
-                end do
-            end do
-        end do
-    end function Abstract_Parallelepiped_Domain_overlap
+        box_corner = box_origin - box_size/2._DP
+        point_from_corner = point - box_corner
+        point_is_inside = all(0._DP <= point_from_corner .and. point_from_corner <= box_size)
+    end function point_is_inside
 
     function Abstract_Parallelepiped_Domain_random_position(this) &
         result(random_position)
@@ -172,12 +159,6 @@ contains
         logical :: is_inside
         is_inside = .false.
     end function Null_Parallelepiped_Domain_is_inside
-
-    pure logical function Null_Parallelepiped_Domain_overlap(this, other) result(overlap)
-        class(Null_Parallelepiped_Domain), intent(in) :: this
-        class(Abstract_Parallelepiped_Domain), intent(in) :: other
-        overlap = .false.
-    end function Null_Parallelepiped_Domain_overlap
 
     function Null_Parallelepiped_Domain_random_position(this) &
         result(random_position)

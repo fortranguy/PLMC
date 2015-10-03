@@ -14,7 +14,6 @@ implicit none
     type, abstract, public :: Abstract_Particles_Energy_Writer
     private
         integer :: unit
-        type(Concrete_Particles_Energy), pointer :: energy => null()
         type(Concrete_Number_to_String) :: string_intra
         class(Abstract_Number_to_String), allocatable :: string_walls
     contains
@@ -35,15 +34,13 @@ contains
 
 !implementation Abstract_Particles_Energy_Writer
 
-    subroutine Abstract_Particles_Energy_Writer_construct(this, energy, filename, energy_selector)
+    subroutine Abstract_Particles_Energy_Writer_construct(this, filename, energy_selector)
         class(Abstract_Particles_Energy_Writer), intent(out) :: this
-        type(Concrete_Particles_Energy), target, intent(in) :: energy
         character(len=*), intent(in) :: filename
         type(Concrete_Energy_Writer_Selector), intent(in) :: energy_selector
 
         character(len=:), allocatable :: legend
 
-        this%energy => energy
         call test_empty_string("Abstract_Particles_Energy_Writer_construct: filename", filename)
         open(newunit=this%unit, recl=4096, file=filename, action="write")
         legend = "#i_step    intra"
@@ -61,25 +58,24 @@ contains
         class(Abstract_Particles_Energy_Writer), intent(inout) :: this
 
         if (allocated(this%string_walls)) deallocate(this%string_walls)
-        this%energy => null()
         close(this%unit)
     end subroutine Abstract_Particles_Energy_Writer_destroy
 
-    subroutine Abstract_Particles_Energy_Writer_write(this, i_step)
+    subroutine Abstract_Particles_Energy_Writer_write(this, i_step, energy)
         class(Abstract_Particles_Energy_Writer), intent(in) :: this
         integer, intent(in) :: i_step
+        type(Concrete_Particles_Energy), intent(in) :: energy
 
-        write(this%unit, *) i_step, this%string_intra%get(this%energy%intra)//&
-            this%string_walls%get(this%energy%walls)
+        write(this%unit, *) i_step, this%string_intra%get(energy%intra)//&
+            this%string_walls%get(energy%walls)
     end subroutine Abstract_Particles_Energy_Writer_write
 
 !end implementation Abstract_Particles_Energy_Writer
 
 !implementation Null_Particles_Energy_Writer
 
-    subroutine Null_Particles_Energy_Writer_construct(this, energy, filename, energy_selector)
+    subroutine Null_Particles_Energy_Writer_construct(this, filename, energy_selector)
         class(Null_Particles_Energy_Writer), intent(out) :: this
-        type(Concrete_Particles_Energy), target, intent(in) :: energy
         character(len=*), intent(in) :: filename
         type(Concrete_Energy_Writer_Selector), intent(in) :: energy_selector
     end subroutine Null_Particles_Energy_Writer_construct
@@ -88,9 +84,10 @@ contains
         class(Null_Particles_Energy_Writer), intent(inout) :: this
     end subroutine Null_Particles_Energy_Writer_destory
 
-    subroutine Null_Particles_Energy_Writer_write(this, i_step)
+    subroutine Null_Particles_Energy_Writer_write(this, i_step, energy)
         class(Null_Particles_Energy_Writer), intent(in) :: this
         integer, intent(in) :: i_step
+        type(Concrete_Particles_Energy), intent(in) :: energy
     end subroutine Null_Particles_Energy_Writer_write
 
 !end implementation Null_Particles_Energy_Writer

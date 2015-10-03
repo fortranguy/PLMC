@@ -9,7 +9,6 @@ use class_periodic_box, only: Abstract_Periodic_Box
 use class_particles_positions, only: Abstract_Particles_Positions
 use types_particle, only: Concrete_Particle
 use class_visitable_list, only: Abstract_Visitable_List
-use procedures_visitable_cells, only: pbc_3d_index, local_reindex
 use class_pair_potential, only: Abstract_Pair_Potential
 
 implicit none
@@ -201,6 +200,21 @@ contains
         end do
         end do
     end subroutine Abstract_Visitable_Cells_set_neighbours
+
+    pure function local_reindex(i_cell, nums_cells)
+        integer, intent(in) :: i_cell(:), nums_cells(:)
+        integer :: local_reindex(num_dimensions)
+
+        local_reindex = mod(i_cell, nums_cells) - 1
+    end function local_reindex
+    ! To find overlap faster
+
+    pure function pbc_3d_index(i_cell, nums_cells)
+        integer, intent(in) :: i_cell(:), nums_cells(:)
+        integer :: pbc_3d_index(3)
+
+        pbc_3d_index = modulo(i_cell + nums_cells/2, nums_cells) - nums_cells/2
+    end function pbc_3d_index
 
     pure function Abstract_Visitable_Cells_skip_local(this, bottom_layer, top_layer, &
         local_i1, local_i2, local_i3) result(skip_local)

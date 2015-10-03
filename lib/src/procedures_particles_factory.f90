@@ -130,6 +130,30 @@ contains
         end if
     end subroutine allocate_diameter
 
+    subroutine set_diameter(particles_diameter, input_data, prefix)
+        class(Abstract_Particles_Diameter), intent(inout) :: particles_diameter
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
+
+        character(len=:), allocatable :: data_field
+        logical :: data_found
+        real(DP) :: diameter, diameter_min_factor
+
+        if (particles_exist(particles_diameter)) then
+            data_field = prefix//"diameter"
+            call input_data%get(data_field, diameter, data_found)
+            call test_data_found(data_field, data_found)
+            data_field = prefix//"minimum diameter factor"
+            call input_data%get(data_field, diameter_min_factor, data_found)
+            call test_data_found(data_field, data_found)
+            deallocate(data_field)
+        else
+            diameter = 0._DP
+            diameter_min_factor = 0._DP
+        end if
+        call particles_diameter%set(diameter, diameter_min_factor)
+    end subroutine set_diameter
+
     subroutine allocate_and_set_wall_diameter(particles_wall_diameter, particles_diameter, &
         floor_penetration, input_data, prefix)
         class(Abstract_Particles_Diameter), allocatable, intent(out) :: particles_wall_diameter
@@ -154,30 +178,6 @@ contains
             allocate(Null_Particles_Diameter :: particles_wall_diameter)
         end if
     end subroutine allocate_wall_diameter
-
-    subroutine set_diameter(particles_diameter, input_data, prefix)
-        class(Abstract_Particles_Diameter), intent(inout) :: particles_diameter
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
-
-        character(len=:), allocatable :: data_field
-        logical :: data_found
-        real(DP) :: diameter, diameter_min_factor
-
-        if (particles_exist(particles_diameter)) then
-            data_field = prefix//"diameter"
-            call input_data%get(data_field, diameter, data_found)
-            call test_data_found(data_field, data_found)
-            data_field = prefix//"minimum diameter factor"
-            call input_data%get(data_field, diameter_min_factor, data_found)
-            call test_data_found(data_field, data_found)
-            deallocate(data_field)
-        else
-            diameter = 0._DP
-            diameter_min_factor = 0._DP
-        end if
-        call particles_diameter%set(diameter, diameter_min_factor)
-    end subroutine set_diameter
 
     subroutine allocate_and_set_inter_diameter(inter_particles_diameter, &
         particles_diameter_1, particles_diameter_2, input_data, prefix)

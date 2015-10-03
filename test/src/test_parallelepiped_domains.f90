@@ -41,6 +41,7 @@ use json_module, only: json_file, json_initialize
 use module_data, only: test_file_exists
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
+use procedures_parallelepiped_domain, only: parallelepiped_domains_overlap
 use procedures_environment_factory, only: environment_factory_create, environment_factory_destroy
 use procedures_parallelepiped_domains_print, only: print_vertices
 
@@ -59,21 +60,21 @@ implicit none
     call input_data%load_file(filename=data_filename)
     deallocate(data_filename)
 
-    call environment_factory_create(periodic_box, input_data, "Test Parallelepiped Domains")
+    call environment_factory_create(periodic_box, input_data, "Test Parallelepiped Domains.")
     call environment_factory_create(parallelepiped_domain_0, input_data, &
-        "Test Parallelepiped Domains.Domain 0", periodic_box)
+        "Test Parallelepiped Domains.Domain 0.", periodic_box)
     call environment_factory_create(parallelepiped_domain_1, input_data, &
-        "Test Parallelepiped Domains.Domain 1", periodic_box)
+        "Test Parallelepiped Domains.Domain 1.", periodic_box)
     call environment_factory_create(parallelepiped_domain_2, input_data, &
-        "Test Parallelepiped Domains.Domain 2", periodic_box)
+        "Test Parallelepiped Domains.Domain 2.", periodic_box)
 
     call print_vertices(parallelepiped_domain_0, "domain_0")
     call print_vertices(parallelepiped_domain_1, "domain_1")
     call print_vertices(parallelepiped_domain_2, "domain_2")
     write(output_unit, *) "Domains 1-2 overlap:", &
-        parallelepiped_domain_1%overlap(parallelepiped_domain_2)
+        parallelepiped_domains_overlap(parallelepiped_domain_1, parallelepiped_domain_2)
     write(output_unit, *) "Domains 2-1 overlap:", &
-        parallelepiped_domain_2%overlap(parallelepiped_domain_1)
+        parallelepiped_domains_overlap(parallelepiped_domain_2, parallelepiped_domain_1)
 
     call environment_factory_destroy(parallelepiped_domain_2)
     call environment_factory_destroy(parallelepiped_domain_1)

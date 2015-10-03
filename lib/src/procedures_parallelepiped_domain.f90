@@ -1,24 +1,33 @@
 module procedures_parallelepiped_domain
 
-use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use data_geometry, only: num_dimensions
+use class_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
 
 implicit none
 
 private
-public :: point_is_inside
+public :: parallelepiped_domains_overlap
 
 contains
 
-    pure function point_is_inside(box_origin, box_size, point)
-        logical :: point_is_inside
-        real(DP), intent(in) :: box_origin(:), box_size(:), point(:)
+    pure logical function parallelepiped_domains_overlap(domain_1, domain_2) result(overlap)
+        class(Abstract_Parallelepiped_Domain), intent(in) :: domain_1, domain_2
 
-        real(DP), dimension(num_dimensions) :: box_corner, point_from_corner
+        logical :: domain_2_contains_vertex_1, domain_1_contains_vertex_2
+        integer :: i_vertex, j_vertex, k_vertex
 
-        box_corner = box_origin - box_size/2._DP
-        point_from_corner = point - box_corner
-        point_is_inside = all(0._DP <= point_from_corner .and. point_from_corner <= box_size)
-    end function point_is_inside
+        overlap = .false.
+        do k_vertex = 1, 2
+            do j_vertex = 1, 2
+                do i_vertex = 1, 2
+                    domain_2_contains_vertex_1 = &
+                        domain_2%is_inside(domain_1%get_vertices([i_vertex, j_vertex, k_vertex]))
+                    domain_1_contains_vertex_2 = &
+                        domain_1%is_inside(domain_2%get_vertices([i_vertex, j_vertex, k_vertex]))
+                    overlap = domain_2_contains_vertex_1 .or. domain_1_contains_vertex_2
+                    if (overlap) return
+                end do
+            end do
+        end do
+    end function parallelepiped_domains_overlap
 
 end module procedures_parallelepiped_domain

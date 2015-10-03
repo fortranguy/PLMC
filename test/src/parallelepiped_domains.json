@@ -1,6 +1,6 @@
 {
     "Test Parallelepiped Domains": {
-        "Periodic Box": {
+        "Box": {
             "periodicity": "XYZ",
             "size": [20.0, 20.0, 10.0]
         },
