@@ -1,13 +1,14 @@
 module procedures_checks
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use data_constants, only: num_dimensions, real_zero
+use data_constants, only: num_dimensions, max_word_length, real_zero
 use procedures_errors, only: warning_continue, error_exit
 
 implicit none
 
 private
-public :: check_in_range, check_3d_array, check_positive, check_norm, check_increase_factor
+public :: check_file_exists, check_data_found, check_string_not_empty, &
+    check_in_range, check_3d_array, check_positive, check_norm, check_increase_factor
 
 interface check_3d_array
     module procedure :: check_integer_3d_array
@@ -23,11 +24,40 @@ end interface check_positive
 
 contains
 
+    subroutine check_file_exists(filename)
+        character(len=*), intent(in) :: filename
+
+        logical :: file_exists
+
+        inquire(file=filename, exist=file_exists)
+        if (.not.file_exists) then
+            call error_exit(filename//" doesn't exist.")
+        end if
+    end subroutine check_file_exists
+
+    subroutine check_data_found(field, found)
+        character(len=*), intent(in) :: field
+        logical, intent(in) :: found
+
+        if (.not.found) then
+            call error_exit(trim(field)//" not found.")
+        end if
+    end subroutine check_data_found
+
+    subroutine check_string_not_empty(field, string)
+        character(len=*), intent(in) :: field
+        character(len=*) :: string
+
+        if (len(string) == 0) then
+            call error_exit(trim(field)//": string is empty.")
+        end if
+    end subroutine check_string_not_empty
+
     subroutine check_in_range(context, integer_max, integer_name, integer_value)
         character(len=*), intent(in) :: context, integer_name
         integer, intent(in) :: integer_max, integer_value
 
-        character(len=1024) :: string_i
+        character(len=max_word_length) :: string_i
 
         write(string_i, *) integer_value
         if (integer_value < 1 .or. integer_max < integer_value) then
@@ -64,7 +94,7 @@ contains
         character(len=*), intent(in) :: context, integer_name
         integer, intent(in) :: integer_scalar
 
-        character(len=1024) :: string_i
+        character(len=max_word_length) :: string_i
 
         write(string_i, *) integer_scalar
         if (integer_scalar < 0) then
@@ -81,7 +111,7 @@ contains
         integer, intent(in) :: integer_array(:)
 
         integer :: i_dimension
-        character(len=1024) :: string_i
+        character(len=max_word_length) :: string_i
 
         do i_dimension = 1, size(integer_array)
             write(string_i, *) i_dimension
@@ -95,7 +125,7 @@ contains
         character(len=*), intent(in) :: context, real_name
         real(DP), intent(in) :: real_scalar
 
-        character(len=1024) :: string_real
+        character(len=max_word_length) :: string_real
 
         write(string_real, *) real_scalar
 
@@ -113,7 +143,7 @@ contains
         real(DP), intent(in) :: real_array(:)
 
         integer :: i_dimension
-        character(len=1024) :: string_i
+        character(len=max_word_length) :: string_i
 
         do i_dimension = 1, size(real_array)
             write(string_i, *) i_dimension
@@ -129,7 +159,7 @@ contains
         character(len=*), intent(in) :: context, vector_name
         real(DP), intent(in) :: vector(:)
 
-        character(len=1024) :: string_vector
+        character(len=max_word_length) :: string_vector
 
         if (abs(norm2(vector) - 1.0_DP) > real_zero) then
             write(string_vector, *) norm2(vector)

@@ -2,7 +2,7 @@ module procedures_dipolar_moments_print
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file
-use module_data, only: test_data_found
+use procedures_checks, only: check_data_found
 use class_particles_moment_norm, only: Abstract_Particles_Moment_Norm
 use class_particles_orientations, only: Abstract_Particles_Orientations
 use class_particles_dipolar_moments, only: Abstract_Particles_Dipolar_Moments
@@ -32,14 +32,14 @@ contains
 
         data_field = "Dipoles.moment norm"
         call input_data%get(data_field, moment_norm_value, data_found)
-        call test_data_found(data_field, data_found)
+        call check_data_found(data_field, data_found)
         call moment_norm%set(moment_norm_value)
 
         do i_particle = 1, orientations%get_num()
             write(string_i, *) i_particle
             data_field = "Dipoles.orientation "//trim(adjustl(string_i))
             call input_data%get(data_field, orientation, data_found)
-            call test_data_found(data_field, data_found)
+            call check_data_found(data_field, data_found)
             call orientations%set(i_particle, orientation)
             deallocate(orientation)
         end do
@@ -61,7 +61,7 @@ program test_dipolar_moments
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file, json_initialize
-use module_data, only: test_file_exists, test_data_found
+use procedures_checks, only: check_file_exists, check_data_found
 use class_particles_number, only: Abstract_Particles_Number, Concrete_Particles_Number
 use class_particles_moment_norm, only: Abstract_Particles_Moment_Norm, &
     Null_Particles_Moment_Norm, Concrete_Particles_Moment_Norm
@@ -84,13 +84,13 @@ implicit none
 
     call json_initialize()
     data_filename = "dipolar_moments.json"
-    call test_file_exists(data_filename)
+    call check_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
 
     allocate(Concrete_Particles_Number :: number)
     data_field = "Dipoles.number"
     call input_data%get(data_field, num_particles, data_found)
-    call test_data_found(data_field, data_found)
+    call check_data_found(data_field, data_found)
     call number%set(num_particles)
 
     allocate(Null_Particles_Moment_Norm :: moment_norm)

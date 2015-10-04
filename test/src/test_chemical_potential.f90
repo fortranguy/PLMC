@@ -2,7 +2,7 @@ program test_chemical_potential
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file, json_initialize
-use module_data, only: test_file_exists, test_data_found
+use procedures_checks, only: check_file_exists, check_data_found
 use class_particles_chemical_potential, only: Abstract_Particles_Chemical_Potential, &
     Concrete_Particles_Chemical_Potential
 
@@ -16,16 +16,16 @@ implicit none
 
     call json_initialize()
     data_filename = "chemical_potential.json"
-    call test_file_exists(data_filename)
+    call check_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
 
     allocate(Concrete_Particles_Chemical_Potential :: chemical_potential)
     data_field = "Chemical Potential.density"
     call input_data%get(data_field, density, found)
-    call test_data_found(data_field, found)
+    call check_data_found(data_field, found)
     data_field = "Chemical Potential.excess"
     call input_data%get(data_field, excess, found)
-    call test_data_found(data_field, found)
+    call check_data_found(data_field, found)
     call chemical_potential%set(density, excess)
 
     write(output_unit, *) "density =", chemical_potential%get_density()

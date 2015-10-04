@@ -2,7 +2,7 @@ program test_particles_factory
 
 use, intrinsic :: iso_fortran_env, only: output_unit
 use json_module, only: json_file, json_initialize
-use module_data, only: test_file_exists
+use procedures_checks, only: check_file_exists
 use types_environment_wrapper, only: Environment_Wrapper
 use procedures_environment_factory, only: environment_factory_create, environment_factory_destroy
 use types_particles_wrapper, only: Mixture_Wrapper
@@ -17,7 +17,7 @@ implicit none
 
     call json_initialize()
     data_filename = "particles_factory.json"
-    call test_file_exists(data_filename)
+    call check_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
     deallocate(data_filename)
 

@@ -1,7 +1,8 @@
 module class_inter_energy_writer
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use module_data, only: test_empty_string
+use data_constants, only: max_line_length
+use procedures_checks, only: check_string_not_empty
 
 implicit none
 
@@ -35,8 +36,8 @@ contains
         class(Abstract_Inter_Energy_Writer), intent(out) :: this
         character(len=*), intent(in) :: filename
 
-        call test_empty_string("Abstract_Inter_Energy_Writer_construct: filename", filename)
-        open(newunit=this%unit, recl=4096, file=filename, action="write")
+        call check_string_not_empty("Abstract_Inter_Energy_Writer_construct: filename", filename)
+        open(newunit=this%unit, recl=max_line_length, file=filename, action="write")
         write(this%unit, *) "#i_step    energy"
     end subroutine Abstract_Inter_Energy_Writer_construct
 

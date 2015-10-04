@@ -17,7 +17,9 @@
             "use": false
         },
         "Walls": {
-            "use": false
+            "use": true,
+            "name": "flat",
+            "gap": 10.0
         }
     },
     "Mixture": {
@@ -28,7 +30,11 @@
             "number": 500,
             "diameter": 1.0,
             "minimum diameter factor": 0.8,
-            "initial positions": "positions_1.in"
+            "initial positions": "positions_1.in",
+            "With Walls": {
+                "diameter": 1.0,
+                "minimum diameter factor": 0.8
+            }
         },
         "Component 2": {
             "exist": true,
@@ -37,7 +43,11 @@
             "number": 500,
             "diameter": 1.0,
             "minimum diameter factor": 0.8,
-            "initial positions": "positions_2.in"
+            "initial positions": "positions_2.in",
+            "With Walls": {
+                "diameter": 1.0,
+                "minimum diameter factor": 0.8
+            }
         },
         "Inter 12": {
             "offset": 0.0,
@@ -70,6 +80,14 @@
             "maximum distance": 2.5,
             "Cells": {
                 "data structure": "list"
+            },
+            "With Walls": {
+                "name": "LJ",
+                "tabulated": false,
+                "delta distance": 1.0e-6,
+                "epsilon": 1.0,
+                "sigma": 1.0,
+                "maximum distance": 2.5
             }
         },
         "Component 2": {
@@ -81,6 +99,14 @@
             "maximum distance": 2.5,
             "Cells": {
                 "data structure": "list"
+            },
+            "With Walls": {
+                "name": "LJ",
+                "tabulated": false,
+                "delta distance": 1.0e-6,
+                "epsilon": 1.0,
+                "sigma": 1.0,
+                "maximum distance": 2.5
             }
         },
         "Inter 12": {
@@ -96,6 +122,6 @@
         }
     },
     "Monte Carlo": {
-        "number of steps": 1000
+        "number of steps": 100
     }
 }

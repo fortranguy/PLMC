@@ -57,7 +57,7 @@
 			<Option weight="4" />
 		</Unit>
 		<Unit filename="lib/src/class_number_to_string.f90">
-			<Option weight="0" />
+			<Option weight="1" />
 		</Unit>
 		<Unit filename="lib/src/class_one_particle_move.f90">
 			<Option weight="6" />
@@ -134,9 +134,6 @@
 		<Unit filename="lib/src/module_changes_success.f90">
 			<Option weight="0" />
 		</Unit>
-		<Unit filename="lib/src/module_data.f90">
-			<Option weight="1" />
-		</Unit>
 		<Unit filename="lib/src/module_list_node.f90">
 			<Option weight="0" />
 		</Unit>
@@ -153,7 +150,7 @@
 			<Option weight="1" />
 		</Unit>
 		<Unit filename="lib/src/procedures_command_arguments.f90">
-			<Option weight="2" />
+			<Option weight="1" />
 		</Unit>
 		<Unit filename="lib/src/procedures_coordinates.f90">
 			<Option weight="2" />

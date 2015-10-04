@@ -2,7 +2,7 @@ module procedures_moment_norm_manipulate
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file
-use module_data, only: test_data_found
+use procedures_checks, only: check_data_found
 use class_particles_moment_norm, only: Abstract_Particles_Moment_Norm
 
 implicit none
@@ -24,7 +24,7 @@ contains
         write(output_unit, *) object_name
         data_field = "Moment Norm.value"
         call input_data%get(data_field, moment_norm_value, data_found)
-        call test_data_found(data_field, data_found)
+        call check_data_found(data_field, data_found)
         call moment_norm%set(moment_norm_value)
         write(output_unit, *) "norm =", moment_norm%get()
 
@@ -37,7 +37,7 @@ program test_moment_norm
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file, json_initialize
-use module_data, only: test_file_exists
+use procedures_checks, only: check_file_exists
 use class_particles_moment_norm, only: Abstract_Particles_Moment_Norm, Null_Particles_Moment_Norm, Concrete_Particles_Moment_Norm
 use procedures_moment_norm_manipulate, only: manipulate_moment_norm
 
@@ -50,7 +50,7 @@ implicit none
     call json_initialize()
 
     data_filename = "moment_norm.json"
-    call test_file_exists(data_filename)
+    call check_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
 
     allocate(Null_Particles_Moment_Norm :: moment_norm)

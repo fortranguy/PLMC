@@ -3,7 +3,7 @@ program test_rotated_orientations
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use data_constants, only: num_dimensions
 use json_module, only: json_file, json_initialize
-use module_data, only: test_file_exists, test_data_found
+use procedures_checks, only: check_file_exists, check_data_found
 use class_particles_number, only: Abstract_Particles_Number, Concrete_Particles_Number
 use class_particles_orientations, only: Abstract_Particles_Orientations, &
     Concrete_Particles_Orientations
@@ -30,13 +30,13 @@ implicit none
 
     call json_initialize()
     data_filename = "rotated_orientations.json"
-    call test_file_exists(data_filename)
+    call check_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
 
     allocate(Concrete_Particles_Number :: number)
     data_field = "Particles.number"
     call input_data%get(data_field, num_particles, data_found)
-    call test_data_found(data_field, data_found)
+    call check_data_found(data_field, data_found)
     call number%set(num_particles)
 
     allocate(Concrete_Particles_Orientations :: orientations)
@@ -48,7 +48,7 @@ implicit none
         write(string_i, *) i_particle
         data_field = "Particles."//trim(adjustl(string_i))//".initial orientation"
         call input_data%get(data_field, orientation, data_found)
-        call test_data_found(data_field, data_found)
+        call check_data_found(data_field, data_found)
         call orientations%set(i_particle, orientation)
         open(newunit=orientations_big_units(i_particle), recl=4096, &
              file="orientations_big_"//trim(adjustl(string_i))//".out", action="write")
@@ -59,19 +59,19 @@ implicit none
     allocate(Concrete_Rotated_Orientations :: rotated_orientations)
     data_field = "Small Rotation.delta"
     call input_data%get(data_field, rotated_orientations_delta, data_found)
-    call test_data_found(data_field, data_found)
+    call check_data_found(data_field, data_found)
     data_field = "Small Rotation.increase factor"
     call input_data%get(data_field, adaptation_parameters%increase_factor, data_found)
-    call test_data_found(data_field, data_found)
+    call check_data_found(data_field, data_found)
     data_field = "Small Rotation.maximum increase factor"
     call input_data%get(data_field, adaptation_parameters%increase_factor_max, data_found)
-    call test_data_found(data_field, data_found)
+    call check_data_found(data_field, data_found)
     call rotated_orientations%construct(orientations, rotated_orientations_delta, &
         adaptation_parameters)
 
     data_field = "Number of Steps"
     call input_data%get(data_field, num_steps, data_found)
-    call test_data_found(data_field, data_found)
+    call check_data_found(data_field, data_found)
 
     do i_step = 1, num_steps
         call rotated_orientations%increase()

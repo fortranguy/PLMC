@@ -38,7 +38,7 @@ program test_external_field
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file, json_initialize
-use module_data, only: test_file_exists, test_data_found
+use procedures_checks, only: check_file_exists, check_data_found
 use procedures_errors, only: error_exit
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box
 use class_field_expression, only: Abstract_Field_Expression
@@ -62,7 +62,7 @@ implicit none
 
     call json_initialize()
     data_filename = "external_field.json"
-    call test_file_exists(data_filename)
+    call check_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
 
     call environment_factory_create(periodic_box, input_data, "Test External Field")
@@ -72,7 +72,7 @@ implicit none
 
     data_field = "Test External Field.External Field.delta"
     call input_data%get(data_field, delta, found)
-    call test_data_found(data_field, found)
+    call check_data_found(data_field, found)
     allocate(Concrete_External_Field :: external_field)
     call external_field%construct(parallelepiped_domain, field_expression)
     open(newunit=field_unit, recl=4096, file="external_field.out", action="write")

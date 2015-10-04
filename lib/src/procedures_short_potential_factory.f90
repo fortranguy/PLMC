@@ -2,8 +2,8 @@ module procedures_short_potential_factory
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
-use module_data, only: test_data_found
 use procedures_errors, only: error_exit
+use procedures_checks, only: check_data_found
 use class_periodic_box, only: Abstract_Periodic_Box, &
     XYZ_Periodic_Box, XY_Periodic_Box
 use class_floor_penetration, only: Abstract_Floor_Penetration
@@ -133,7 +133,7 @@ contains
         if (particles_exist(particles_diameter)) then
             data_field = prefix//"name"
             call input_data%get(data_field, potential_name, data_found)
-            call test_data_found(data_field, data_found)
+            call check_data_found(data_field, data_found)
             select case(potential_name)
                 case ("null")
                     allocate(Null_Potential_Expression :: potential_expression)
@@ -165,10 +165,10 @@ contains
             type is (Lennard_Jones_Expression)
                 data_field = prefix//"epsilon"
                 call input_data%get(data_field, LJ_epsilon, data_found)
-                call test_data_found(data_field, data_found)
+                call check_data_found(data_field, data_found)
                 data_field = prefix//"sigma"
                 call input_data%get(data_field, LJ_sigma, data_found)
-                call test_data_found(data_field, data_found)
+                call check_data_found(data_field, data_found)
                 call potential_expression%set(LJ_epsilon, LJ_sigma)
             class default
                 call error_exit("potential_expression type unknown.")
@@ -201,7 +201,7 @@ contains
         if (particles_exist(particles_diameter)) then
             data_field = prefix//"tabulated"
             call input_data%get(data_field, tabulated_potential, data_found)
-            call test_data_found(data_field, data_found)
+            call check_data_found(data_field, data_found)
             if(tabulated_potential) then
                 allocate(Tabulated_Pair_Potential :: pair_potential)
             else
@@ -233,13 +233,13 @@ contains
                 class default
                     data_field = prefix//"maximum distance"
                     call input_data%get(data_field, domain%max, data_found)
-                    call test_data_found(data_field, data_found)
+                    call check_data_found(data_field, data_found)
             end select
             select type (pair_potential)
                 type is (Tabulated_Pair_Potential)
                     data_field = prefix//"delta distance"
                     call input_data%get(data_field, domain%delta, data_found)
-                    call test_data_found(data_field, data_found)
+                    call check_data_found(data_field, data_found)
             end select
         end if
         call pair_potential%construct(domain, potential_expression)
@@ -272,7 +272,7 @@ contains
         if (particles_interact(pair_potential)) then
             data_field = prefix//"Cells.data structure"
             call input_data%get(data_field, cells_data_structure, data_found)
-            call test_data_found(data_field, data_found)
+            call check_data_found(data_field, data_found)
             select case(cells_data_structure)
                 case ("list")
                     allocate(Concrete_Visitable_List :: visitable_list)

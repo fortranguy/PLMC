@@ -2,9 +2,8 @@ module procedures_environment_factory
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
-use module_data, only: test_data_found
 use procedures_errors, only: error_exit
-use procedures_checks, only: check_3d_array
+use procedures_checks, only: check_data_found, check_3d_array
 use class_periodic_box, only: Abstract_Periodic_Box, &
     XYZ_Periodic_Box, XY_Periodic_Box
 use class_temperature, only: Abstract_Temperature, &
@@ -91,7 +90,7 @@ contains
 
         data_field = prefix//"Box.periodicity"
         call input_data%get(data_field, box_periodicity, data_found)
-        call test_data_found(data_field, data_found)
+        call check_data_found(data_field, data_found)
         select case (box_periodicity)
             case ("XYZ")
                 allocate(XYZ_Periodic_Box :: periodic_box)
@@ -103,7 +102,7 @@ contains
         deallocate(box_periodicity)
         data_field = prefix//"Box.size"
         call input_data%get(data_field, box_size, data_found)
-        call test_data_found(data_field, data_found)
+        call check_data_found(data_field, data_found)
         deallocate(data_field)
         call periodic_box%set(box_size)
     end subroutine allocate_and_set_periodic_box
@@ -119,7 +118,7 @@ contains
 
         data_field = prefix//"Thermostat.temperature"
         call input_data%get(data_field, temperature_value, data_found)
-        call test_data_found(data_field, data_found)
+        call check_data_found(data_field, data_found)
         allocate(Concrete_Temperature :: temperature)
         call temperature%set(temperature_value)
         deallocate(data_field)
@@ -145,7 +144,7 @@ contains
         if (apply_external_field(input_data, prefix)) then
             data_field = prefix//"External Field.name"
             call input_data%get(data_field, field_name, data_found)
-            call test_data_found(data_field, data_found)
+            call check_data_found(data_field, data_found)
             select case (field_name)
                 case ("constant")
                     allocate(Constant_Field_Expression :: field_expression)
@@ -174,7 +173,7 @@ contains
             type is (Constant_Field_Expression)
                 data_field = prefix//"External Field.vector"
                 call input_data%get(data_field, field_vector, data_found)
-                call test_data_found(data_field, data_found)
+                call check_data_found(data_field, data_found)
                 call field_expression%set(field_vector)
                 deallocate(field_vector)
         end select
@@ -195,15 +194,15 @@ contains
 
         data_field = prefix//"Parallelepiped Domain.name"
         call input_data%get(data_field, domain_name, data_found)
-        call test_data_found(data_field, data_found)
+        call check_data_found(data_field, data_found)
         select case(domain_name)
             case ("domain")
                 data_field = prefix//"Parallelepiped Domain.origin"
                 call input_data%get(data_field, domain_origin, data_found)
-                call test_data_found(data_field, data_found)
+                call check_data_found(data_field, data_found)
                 data_field = prefix//"Parallelepiped Domain.size"
                 call input_data%get(data_field, domain_size, data_found)
-                call test_data_found(data_field, data_found)
+                call check_data_found(data_field, data_found)
                 allocate(Concrete_Parallelepiped_Domain :: parallelepiped_domain)
             case ("box")
                 allocate(Box_Parallelepiped_Domain :: parallelepiped_domain)
@@ -250,7 +249,7 @@ contains
         if (use_reciprocal_lattice(input_data, prefix)) then
             data_field = prefix//"Reciprocal Lattice.numbers"
             call input_data%get(data_field, numbers, data_found)
-            call test_data_found(data_field, data_found)
+            call check_data_found(data_field, data_found)
             deallocate(data_field)
             allocate(Concrete_Reciprocal_Lattice :: reciprocal_lattice)
         else
@@ -272,7 +271,7 @@ contains
         if (use_walls(input_data, prefix)) then
             data_field = prefix//"Walls.name"
             call input_data%get(data_field, walls_name, data_found)
-            call test_data_found(data_field, data_found)
+            call check_data_found(data_field, data_found)
             select case(walls_name)
                 case ("flat")
                     allocate(Flat_Floor_Penetration :: floor_penetration)
@@ -300,7 +299,7 @@ contains
             allocate(Concrete_Walls_Potential :: walls_potential)
             data_field = prefix//"Walls.gap"
             call input_data%get(data_field, gap, data_found)
-            call test_data_found(data_field, data_found)
+            call check_data_found(data_field, data_found)
         else
             allocate(Null_Walls_Potential :: walls_potential)
         end if

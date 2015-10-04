@@ -41,7 +41,7 @@ program test_visitable_list
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file, json_initialize
-use module_data, only: test_file_exists, test_data_found
+use procedures_checks, only: check_file_exists, check_data_found
 use procedures_errors, only: error_exit
 use class_periodic_box, only: Abstract_Periodic_Box
 use procedures_environment_factory, only: environment_factory_create, environment_factory_destroy
@@ -83,7 +83,7 @@ implicit none
 
     call json_initialize()
     data_filename = "particles_potential.json"
-    call test_file_exists(data_filename)
+    call check_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
     deallocate(data_filename)
 
@@ -115,7 +115,7 @@ implicit none
 
     data_field = "Particles.number of exchanges"
     call input_data%get(data_field, num_exchanges, data_found)
-    call test_data_found(data_field, data_found)
+    call check_data_found(data_field, data_found)
     do i_exchange = 1, num_exchanges
         particle%i = random_integer(particles_number%get())
         particle%position = particles_positions%get(particle%i)
@@ -134,7 +134,7 @@ implicit none
 
     data_field = "Memory.number of overwrites"
     call input_data%get(data_field, num_overwrites, data_found)
-    call test_data_found(data_field, data_found)
+    call check_data_found(data_field, data_found)
     do i_overwrite = 1, num_overwrites
         i_target = random_integer(particles_number%get())
         i_value = random_integer(particles_number%get())

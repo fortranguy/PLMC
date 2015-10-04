@@ -36,7 +36,7 @@ program test_parallelepiped_domain
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use data_constants, only: num_dimensions
 use json_module, only: json_file, json_initialize
-use module_data, only: test_file_exists, test_data_found
+use procedures_checks, only: check_file_exists, check_data_found
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box
 use class_parallelepiped_domain, only: Abstract_Parallelepiped_Domain, &
                                        Concrete_Parallelepiped_Domain
@@ -58,12 +58,12 @@ implicit none
     call json_initialize()
 
     data_filename = "parallelepiped_domain.json"
-    call test_file_exists(data_filename)
+    call check_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
 
     data_field = "Periodic Box.size"
     call input_data%get(data_field, box_size, found)
-    call test_data_found(data_field, found)
+    call check_data_found(data_field, found)
     allocate(XYZ_Periodic_Box :: periodic_box)
     call periodic_box%set(box_size)
     deallocate(box_size)
@@ -73,10 +73,10 @@ implicit none
 
     data_field = "Parallelepiped Domain.origin"
     call input_data%get(data_field, domain_origin, found)
-    call test_data_found(data_field, found)
+    call check_data_found(data_field, found)
     data_field = "Parallelepiped Domain.size"
     call input_data%get(data_field, domain_size, found)
-    call test_data_found(data_field, found)
+    call check_data_found(data_field, found)
     allocate(Concrete_Parallelepiped_Domain :: parallelepiped_domain)
     call parallelepiped_domain%construct(periodic_box, domain_origin, domain_size)
     open(newunit=domain_unit, recl=4096, file="domain.out", action="write")
@@ -85,7 +85,7 @@ implicit none
 
     data_field = "Particles.number"
     call input_data%get(data_field, num_particles, found)
-    call test_data_found(data_field, found)
+    call check_data_found(data_field, found)
     write(output_unit, *) "Box :"
     open(newunit=positions_box_unit, recl=4096, file="positions_box.out", action="write")
     num_particles_inside = 0

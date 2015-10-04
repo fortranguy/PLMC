@@ -2,8 +2,8 @@ module procedures_particles_factory
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
-use module_data, only: test_data_found
 use procedures_errors, only: error_exit
+use procedures_checks, only: check_data_found
 use procedures_coordinates, only: read_coordinates
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_floor_penetration, only: Abstract_Floor_Penetration
@@ -100,7 +100,7 @@ contains
         if (particles_exist(input_data, prefix)) then
             data_field = prefix//"number"
             call input_data%get(data_field, num_particles, data_found)
-            call test_data_found(data_field, data_found)
+            call check_data_found(data_field, data_found)
             allocate(Concrete_Particles_Number :: particles_number)
             deallocate(data_field)
         else
@@ -142,10 +142,10 @@ contains
         if (particles_exist(particles_diameter)) then
             data_field = prefix//"diameter"
             call input_data%get(data_field, diameter, data_found)
-            call test_data_found(data_field, data_found)
+            call check_data_found(data_field, data_found)
             data_field = prefix//"minimum diameter factor"
             call input_data%get(data_field, diameter_min_factor, data_found)
-            call test_data_found(data_field, data_found)
+            call check_data_found(data_field, data_found)
             deallocate(data_field)
         else
             diameter = 0._DP
@@ -194,10 +194,10 @@ contains
         if (particles_exist(particles_diameter_1) .and. particles_exist(particles_diameter_2)) then
             data_field = prefix//"offset"
             call input_data%get(data_field, inter_diameter_offset, data_found)
-            call test_data_found(data_field, data_found)
+            call check_data_found(data_field, data_found)
             data_field = prefix//"minimum diameter factor"
             call input_data%get(data_field, inter_diameter_min_factor, data_found)
-            call test_data_found(data_field, data_found)
+            call check_data_found(data_field, data_found)
             allocate(Concrete_Particles_Diameter :: inter_particles_diameter)
             deallocate(data_field)
         else
@@ -221,7 +221,7 @@ contains
         if (particles_are_dipolar(input_data, prefix)) then
             data_field = prefix//"moment norm"
             call input_data%get(data_field, moment_norm, data_found)
-            call test_data_found(data_field, data_found)
+            call check_data_found(data_field, data_found)
             allocate(Concrete_Particles_Moment_Norm :: particles_moment_norm)
             deallocate(data_field)
         else
@@ -272,7 +272,7 @@ contains
         if (particles_positions%get_num() == 0) return
         data_field = prefix//"initial positions"
         call input_data%get(data_field, filename, data_found)
-        call test_data_found(data_field, data_found)
+        call check_data_found(data_field, data_found)
         call read_coordinates(file_positions, filename)
         if (size(file_positions, 2) /= particles_positions%get_num()) then
             call error_exit("set_positions from "//filename//": wrong number of lines.")
@@ -299,7 +299,7 @@ contains
         if (particles_orientations%get_num() == 0) return
         data_field = prefix//"initial orientations"
         call input_data%get(data_field, filename, data_found)
-        call test_data_found(data_field, data_found)
+        call check_data_found(data_field, data_found)
         call read_coordinates(file_orientations, filename)
         if (size(file_orientations, 2) /= particles_orientations%get_num()) then
             call error_exit("set_orientations from "//filename//": wrong number of lines.")
@@ -353,10 +353,10 @@ contains
         if (particles_can_exchange(input_data, prefix)) then
             data_field = prefix//"Chemical Potential.density"
             call input_data%get(data_field, density, data_found)
-            call test_data_found(data_field, data_found)
+            call check_data_found(data_field, data_found)
             data_field = prefix//"Chemical Potential.excess"
             call input_data%get(data_field, excess, data_found)
-            call test_data_found(data_field, data_found)
+            call check_data_found(data_field, data_found)
             allocate(Concrete_Particles_Chemical_Potential :: particles_chemical_potential)
             deallocate(data_field)
         else

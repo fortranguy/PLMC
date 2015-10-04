@@ -2,7 +2,7 @@ program test_field_expression
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file, json_initialize
-use module_data, only: test_file_exists, test_data_found
+use procedures_checks, only: check_file_exists, check_data_found
 use procedures_errors, only: error_exit
 use class_field_expression, only: Abstract_Field_Expression
 use procedures_environment_factory, only: environment_factory_create, environment_factory_destroy
@@ -17,7 +17,7 @@ implicit none
 
     call json_initialize()
     data_filename = "field_expression.json"
-    call test_file_exists(data_filename)
+    call check_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
     deallocate(data_filename)
 
@@ -25,7 +25,7 @@ implicit none
 
     data_field = "Test Field Expression.Particle.position"
     call input_data%get(data_field, position, found)
-    call test_data_found(data_field, found)
+    call check_data_found(data_field, found)
     deallocate(data_field)
     write(output_unit, *) field_expression%get(position)
     deallocate(position)

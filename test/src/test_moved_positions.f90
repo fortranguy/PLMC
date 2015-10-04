@@ -3,7 +3,7 @@ program test_moved_positions
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use data_constants, only: num_dimensions
 use json_module, only: json_file, json_initialize
-use module_data, only: test_file_exists, test_data_found
+use procedures_checks, only: check_file_exists, check_data_found
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box
 use class_particles_number, only: Abstract_Particles_Number, Concrete_Particles_Number
 use class_particles_positions, only: Abstract_Particles_Positions, Concrete_Particles_Positions
@@ -30,20 +30,20 @@ implicit none
 
     call json_initialize()
     data_filename = "moved_positions.json"
-    call test_file_exists(data_filename)
+    call check_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
 
     allocate(XYZ_Periodic_Box :: periodic_box)
     write(output_unit, *) "XYZ_Periodic_Box"
     data_field = "Periodic Box.size"
     call input_data%get(data_field, periodic_box_size, data_found)
-    call test_data_found(data_field, data_found)
+    call check_data_found(data_field, data_found)
     call periodic_box%set(periodic_box_size)
 
     allocate(Concrete_Particles_Number :: number)
     data_field = "Particles.number"
     call input_data%get(data_field, num_particles, data_found)
-    call test_data_found(data_field, data_found)
+    call check_data_found(data_field, data_found)
     call number%set(num_particles)
 
     allocate(Concrete_Particles_Positions :: positions)
@@ -55,7 +55,7 @@ implicit none
         write(string_i, *) i_particle
         data_field = "Particles."//trim(adjustl(string_i))//".initial position"
         call input_data%get(data_field, position, data_found)
-        call test_data_found(data_field, data_found)
+        call check_data_found(data_field, data_found)
         call positions%set(i_particle, position)
         open(newunit=positions_long_units(i_particle), recl=4096, &
              file="positions_long_"//trim(adjustl(string_i))//".out", action="write")
@@ -66,19 +66,19 @@ implicit none
     allocate(Concrete_Moved_Positions :: moved_positions)
     data_field = "Small Move.delta"
     call input_data%get(data_field, moved_positions_delta, data_found)
-    call test_data_found(data_field, data_found)
+    call check_data_found(data_field, data_found)
     data_field = "Small Move.increase factor"
     call input_data%get(data_field, adaptation_parameters%increase_factor, data_found)
-    call test_data_found(data_field, data_found)
+    call check_data_found(data_field, data_found)
     data_field = "Small Move.maximum increase factor"
     call input_data%get(data_field, adaptation_parameters%increase_factor_max, data_found)
-    call test_data_found(data_field, data_found)
+    call check_data_found(data_field, data_found)
     call moved_positions%construct(periodic_box, positions, moved_positions_delta, &
         adaptation_parameters)
 
     data_field = "Number of Steps"
     call input_data%get(data_field, num_steps, data_found)
-    call test_data_found(data_field, data_found)
+    call check_data_found(data_field, data_found)
 
     do i_step = 1, num_steps
         call moved_positions%increase()

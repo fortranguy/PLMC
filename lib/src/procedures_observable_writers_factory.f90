@@ -1,7 +1,6 @@
 module procedures_observable_writers_factory
 
 use json_module, only: json_file
-use module_data, only: test_data_found
 use class_particles_number, only: Abstract_Particles_Number
 use class_particles_diameter, only: Abstract_Particles_Diameter
 use class_particles_exchange, only: Abstract_Particles_Exchange

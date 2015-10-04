@@ -1,6 +1,7 @@
 module class_number_to_string
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
+use data_constants, only: max_word_length
 
 implicit none
 
@@ -31,7 +32,7 @@ contains
         character(len=:), allocatable :: string
         real(DP), intent(in) :: number
 
-        character(len=1024) :: big_string
+        character(len=max_word_length) :: big_string
 
         write(big_string, *) number
         string = trim(big_string)
@@ -41,7 +42,7 @@ contains
         character(len=:), allocatable :: string
         integer, intent(in) :: number
 
-        character(len=1024) :: big_string
+        character(len=max_word_length) :: big_string
 
         write(big_string, *) number
         string = trim(big_string)

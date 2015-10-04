@@ -1,9 +1,9 @@
 module procedures_coordinates
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, iostat_end
-use data_constants, only: num_dimensions
-use module_data, only: test_file_exists
+use data_constants, only: num_dimensions, max_line_length
 use procedures_errors, only: error_exit
+use procedures_checks, only: check_file_exists
 
 implicit none
 
@@ -39,8 +39,8 @@ contains
         integer :: num_particles, i_particle
         integer :: file_unit, read_stat
 
-        call test_file_exists(filename)
-        open(newunit=file_unit, recl=4096, file=filename, status="old", action="read")
+        call check_file_exists(filename)
+        open(newunit=file_unit, recl=max_line_length, file=filename, status="old", action="read")
         num_particles = 0
         do
             read(file_unit, fmt=*, iostat=read_stat) coordinate

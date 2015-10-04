@@ -38,7 +38,7 @@ program test_parallelepiped_domains
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file, json_initialize
-use module_data, only: test_file_exists
+use procedures_checks, only: check_file_exists
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
 use procedures_parallelepiped_domain, only: parallelepiped_domains_overlap
@@ -56,7 +56,7 @@ implicit none
 
     call json_initialize()
     data_filename = "parallelepiped_domains.json"
-    call test_file_exists(data_filename)
+    call check_file_exists(data_filename)
     call input_data%load_file(filename=data_filename)
     deallocate(data_filename)
 

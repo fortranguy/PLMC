@@ -1,7 +1,7 @@
 module procedures_property_inquirers
 
 use json_module, only: json_file
-use module_data, only: test_data_found
+use procedures_checks, only: check_data_found
 use class_floor_penetration, only: Abstract_Floor_Penetration, Null_Floor_Penetration
 use class_particles_number, only: Abstract_Particles_Number, Null_Particles_Number
 use class_particles_diameter, only: Abstract_Particles_Diameter, Null_Particles_Diameter
@@ -285,7 +285,7 @@ contains
         logical :: data_found
 
         call input_data%get(switch_name, logical_from_json, data_found)
-        call test_data_found(switch_name, data_found)
+        call check_data_found(switch_name, data_found)
     end function logical_from_json
 
 end module procedures_property_inquirers

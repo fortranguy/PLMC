@@ -2,7 +2,7 @@ module procedures_changes_factory
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
-use module_data, only: test_data_found
+use procedures_checks, only: check_data_found
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_particles_diameter, only: Abstract_Particles_Diameter
 use class_particles_moment_norm, only: Abstract_Particles_Moment_Norm
@@ -97,14 +97,14 @@ contains
             type is (Concrete_Moved_Positions)
                 data_field = prefix//"Small Move.delta"
                 call input_data%get(data_field, move_delta, data_found)
-                call test_data_found(data_field, data_found)
+                call check_data_found(data_field, data_found)
                 data_field = prefix//"Small Move.increase factor"
                 call input_data%get(data_field, adaptation_parameters%increase_factor, data_found)
-                call test_data_found(data_field, data_found)
+                call check_data_found(data_field, data_found)
                 data_field = prefix//"Small Move.maximum increase factor"
                 call input_data%get(data_field, adaptation_parameters%increase_factor_max, &
                     data_found)
-                call test_data_found(data_field, data_found)
+                call check_data_found(data_field, data_found)
                 deallocate(data_field)
         end select
         call moved_positions%construct(periodic_box, particles_positions, move_delta, &
@@ -151,14 +151,14 @@ contains
             type is (Concrete_Rotated_Orientations)
                 data_field = prefix//"Small Rotation.delta"
                 call input_data%get(data_field, rotation_delta, data_found)
-                call test_data_found(data_field, data_found)
+                call check_data_found(data_field, data_found)
                 data_field = prefix//"Small Rotation.increase factor"
                 call input_data%get(data_field, adaptation_parameters%increase_factor, data_found)
-                call test_data_found(data_field, data_found)
+                call check_data_found(data_field, data_found)
                 data_field = prefix//"Small Rotation.maximum increase factor"
                 call input_data%get(data_field, adaptation_parameters%increase_factor_max, &
                     data_found)
-                call test_data_found(data_field, data_found)
+                call check_data_found(data_field, data_found)
                 deallocate(data_field)
         end select
         call rotated_orientations%construct(particles_orientations, rotation_delta, &

@@ -2,7 +2,6 @@ module procedures_metropolis_factory
 
 use data_constants, only: num_components
 use json_module, only: json_file
-use module_data, only: test_data_found
 use procedures_property_inquirers, only: particles_can_move
 use types_environment_wrapper, only: Environment_Wrapper
 use types_particles_wrapper, only: Particles_Wrapper

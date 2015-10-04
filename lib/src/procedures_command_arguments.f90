@@ -1,7 +1,8 @@
 module procedures_command_arguments
 
+use data_constants, only: max_word_length
 use procedures_errors, only: error_exit
-use module_data, only: test_file_exists
+use procedures_checks, only: check_file_exists
 
 implicit none
 private
@@ -22,14 +23,14 @@ contains
         integer, intent(in) :: i_argument
         character(len=:), allocatable, intent(out) :: filename_i
 
-        character(len=1024) :: filename
+        character(len=max_word_length) :: filename
         integer :: length, argument_stat
 
         call get_command_argument(i_argument, filename, length, argument_stat)
         if (argument_stat /= 0) then
             call error_exit("argument_to_file: error")
         end if
-        call test_file_exists(filename(1:length))
+        call check_file_exists(filename(1:length))
         filename_i = filename(1:length)
     end subroutine argument_to_file
 

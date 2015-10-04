@@ -2,7 +2,7 @@ module procedures_reciprocal_lattice_print
 
 use, intrinsic :: iso_fortran_env, only: output_unit
 use json_module, only: json_file
-use module_data, only: test_data_found
+use procedures_checks, only: check_data_found
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 
@@ -25,7 +25,7 @@ contains
         
         data_field = "Reciprocal Lattice.numbers"
         call input_data%get(data_field, numbers, found)
-        call test_data_found(data_field, found)
+        call check_data_found(data_field, found)
         call reciprocal_lattice%construct(periodic_box, numbers)
         deallocate(numbers)
         write(output_unit, *) "numbers =", reciprocal_lattice%get_numbers()
@@ -40,7 +40,7 @@ program test_reciprocal_lattice
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file, json_initialize
-use module_data, only: test_file_exists, test_data_found
+use procedures_checks, only: check_file_exists, check_data_found
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box
 use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice, Null_Reciprocal_Lattice, &
                                     Concrete_Reciprocal_Lattice
@@ -58,13 +58,13 @@ implicit none
     call json_initialize()
      
     data_filename = "reciprocal_lattice.json"
-    call test_file_exists(data_filename)
+    call check_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
     
     allocate(XYZ_Periodic_Box :: periodic_box)
     data_field = "Periodic Box.size"
     call input_data%get(data_field, periodic_box_size, found)
-    call test_data_found(data_field, found)
+    call check_data_found(data_field, found)
     call periodic_box%set(periodic_box_size)
     deallocate(periodic_box_size)
     

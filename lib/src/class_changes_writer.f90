@@ -1,6 +1,7 @@
 module class_changes_writer
 
-use module_data, only: test_empty_string
+use data_constants, only: max_line_length
+use procedures_checks, only: check_string_not_empty
 use class_number_to_string, only: Abstract_Number_to_String, &
     Concrete_Number_to_String, Null_Number_to_String
 use module_changes_success, only: Concrete_Changes_Success_Ratio
@@ -45,8 +46,8 @@ contains
 
         character(len=:), allocatable :: legend
 
-        call test_empty_string("Abstract_Changes_Success_Writer_construct: filename", filename)
-        open(newunit=this%unit, recl=4096, file=filename, action="write")
+        call check_string_not_empty("Abstract_Changes_Success_Writer_construct: filename", filename)
+        open(newunit=this%unit, recl=max_line_length, file=filename, action="write")
         legend = "#i_step    moves"
         if (changes_selector%write_rotations) then
             allocate(Concrete_Number_to_String :: this%string_rotation)

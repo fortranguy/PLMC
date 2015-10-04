@@ -31,7 +31,7 @@ program test_potential_expression
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file, json_initialize
-use module_data, only: test_file_exists, test_data_found
+use procedures_checks, only: check_file_exists, check_data_found
 use procedures_errors, only: error_exit
 use class_particles_diameter, only: Abstract_Particles_Diameter
 use procedures_particles_factory, only: particles_factory_create, particles_factory_destroy
@@ -53,7 +53,7 @@ implicit none
 
     call json_initialize()
     data_filename = "potential_expression.json"
-    call test_file_exists(data_filename)
+    call check_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
     deallocate(data_filename)
 
@@ -63,13 +63,13 @@ implicit none
 
     data_field = "Test Potential Expression.Potential.minimum distance"
     call input_data%get(data_field, min_distance, data_found)
-    call test_data_found(data_field, data_found)
+    call check_data_found(data_field, data_found)
     data_field = "Test Potential Expression.Potential.maximum distance"
     call input_data%get(data_field, max_distance, data_found)
-    call test_data_found(data_field, data_found)
+    call check_data_found(data_field, data_found)
     data_field = "Test Potential Expression.Potential.delta distance"
     call input_data%get(data_field, delta_distance, data_found)
-    call test_data_found(data_field, data_found)
+    call check_data_found(data_field, data_found)
 
     open(newunit=potential_unit, recl=4096, file="potential_expression.out", action="write")
     call write_potential_expression(potential_expression, min_distance, max_distance, &

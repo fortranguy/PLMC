@@ -2,8 +2,6 @@ program test_canonical
 
 use data_constants, only: num_components
 use json_module, only: json_file
-use module_data, only: test_data_found
-use procedures_checks, only: check_positive
 use types_environment_wrapper, only: Environment_Wrapper
 use types_particles_wrapper, only: Mixture_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
@@ -11,7 +9,6 @@ use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper
 use class_one_particle_move, only: Abstract_One_Particle_Move
 use procedures_metropolis_factory, only: metropolis_factory_create, metropolis_factory_set, &
     metropolis_factory_destroy
-use module_particles_energy, only: Concrete_Particles_Energy
 use procedures_plmc_factory, only: plmc_load, plmc_create, plmc_destroy
 use procedures_plmc_visit, only: plmc_visit
 use module_changes_success, only: counters_reset => Concrete_Mixture_Changes_Counters_reset, &
