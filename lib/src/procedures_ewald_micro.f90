@@ -1,4 +1,4 @@
-module procedures_ewald_summation
+module procedures_ewald_micro
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions, PI
@@ -110,4 +110,4 @@ contains
         end do
     end subroutine set_exp_kz
 
-end module procedures_ewald_summation
+end module procedures_ewald_micro

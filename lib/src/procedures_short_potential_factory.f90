@@ -251,7 +251,6 @@ contains
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Particles_Positions), intent(in) :: particles_positions
 
-
         if (particles_have_positions(particles_positions)) then
             allocate(Concrete_Particles_Potential :: particles_potential)
         else

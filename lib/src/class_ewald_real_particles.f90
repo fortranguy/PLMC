@@ -25,7 +25,7 @@ private
         procedure, private :: visit_field => Abstract_Ewald_Real_Particles_visit_field
     end type Abstract_Ewald_Real_Particles
 
-    type, extends(Abstract_Ewald_Real_Particles) :: Concrete_Ewald_Real_Particles
+    type, extends(Abstract_Ewald_Real_Particles), public :: Concrete_Ewald_Real_Particles
 
     end type Concrete_Ewald_Real_Particles
 

@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_positive, check_potential_domain
-use procedures_ewald_summation, only: ewald_real_B, ewald_real_C
+use procedures_ewald_micro, only: ewald_real_B, ewald_real_C
 use types_potential_domain, only: Concrete_Potential_Domain
 
 implicit none
@@ -47,7 +47,7 @@ private
 
     end interface
 
-    type, extends(Abstract_Ewald_Real_Pair) :: Tabulated_Ewald_Real_Pair
+    type, extends(Abstract_Ewald_Real_Pair), public :: Tabulated_Ewald_Real_Pair
     private
         real(DP), dimension(:, :), allocatable :: tabulation
     contains
@@ -58,7 +58,7 @@ private
         procedure, private :: expression => Tabulated_Ewald_Real_Pair_expression
     end type Tabulated_Ewald_Real_Pair
 
-    type, extends(Abstract_Ewald_Real_Pair) :: Raw_Ewald_Real_Pair
+    type, extends(Abstract_Ewald_Real_Pair), public :: Raw_Ewald_Real_Pair
     private
         real(DP) :: expression_domain_max(2)
     contains
@@ -68,7 +68,7 @@ private
         procedure, private :: expression => Raw_Ewald_Real_Pair_expression
     end type Raw_Ewald_Real_Pair
 
-    type, extends(Abstract_Ewald_Real_Pair) :: Null_Ewald_Real_Pair
+    type, extends(Abstract_Ewald_Real_Pair), public :: Null_Ewald_Real_Pair
     contains
         procedure :: construct => Null_Ewald_Real_Pair_construct
         procedure :: destroy => Null_Ewald_Real_Pair_destroy
@@ -220,6 +220,7 @@ contains
 
         if (distance < this%domain%max) then
             expression = [ewald_real_B(this%alpha, distance), ewald_real_C(this%alpha, distance)]
+            expression = expression - this%expression_domain_max
         else
             expression = 0._DP
         end if

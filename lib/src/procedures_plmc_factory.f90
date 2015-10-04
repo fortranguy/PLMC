@@ -13,6 +13,8 @@ use procedures_changes_factory, only: changes_factory_create, changes_factory_de
 use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper
 use procedures_short_potential_factory, only: short_potential_factory_create, &
     short_potential_factory_destroy
+use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
+use procedures_ewald_factory, only: ewald_factory_create, ewald_factory_destroy
 use types_observable_writers_wrapper, only: Mixture_Observable_Writers_Wrapper
 use procedures_observable_writers_factory, only: observable_writers_factory_create, &
     observable_writers_factory_destroy
@@ -137,6 +139,28 @@ contains
         call short_potential_factory_destroy(short_potentials%intras(2))
         call short_potential_factory_destroy(short_potentials%intras(1))
     end subroutine destroy_short_potentials
+
+    subroutine create_ewalds(ewalds, input_data, environment, mixture)
+        type(Mixture_Ewald_Wrapper), intent(out) :: ewalds
+        type(json_file), intent(inout) :: input_data
+        type(Environment_Wrapper), intent(in) :: environment
+        type(Mixture_Wrapper), intent(in) :: mixture
+
+        call ewald_factory_create(ewalds%intras(1), input_data, "Ewald.Component 1.", environment, &
+            mixture%components(1))
+        call ewald_factory_create(ewalds%intras(2), input_data, "Ewald.Component 2.", environment, &
+            mixture%components(2))
+
+        !call ewald_factory_create(ewalds%inter%real_pair, input_data, "Ewald.Inter 12.", &
+        !    environment, mixture%inter_diameter)
+    end subroutine create_ewalds
+
+    subroutine destroy_ewalds(ewalds)
+        type(Mixture_Ewald_Wrapper), intent(inout) :: ewalds
+
+        call ewald_factory_destroy(ewalds%intras(2))
+        call ewald_factory_destroy(ewalds%intras(1))
+    end subroutine destroy_ewalds
 
     subroutine create_observable_writers(observable_writers, input_data, mixture, changes)
         type(Mixture_Observable_Writers_Wrapper), intent(out) :: observable_writers
