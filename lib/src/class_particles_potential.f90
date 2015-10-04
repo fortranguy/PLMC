@@ -40,7 +40,6 @@ contains
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Particles_Positions), target, intent(in) :: particles_positions
 
-
         this%periodic_box => periodic_box
         this%particles_positions => particles_positions
     end subroutine Abstract_Particles_Potential_construct
@@ -68,7 +67,7 @@ contains
         do i_particle = 1, this%particles_positions%get_num()
             if (particle%same_type .and. particle%i == i_particle) cycle
             distance = this%periodic_box%distance(particle%position, &
-                                                  this%particles_positions%get(i_particle))
+                this%particles_positions%get(i_particle))
             call pair_potential%meet(overlap, energy_i, distance)
             if (overlap) return
             energy = energy + energy_i

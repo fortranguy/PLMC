@@ -38,10 +38,13 @@
 				</Linker>
 			</Target>
 		</Build>
+		<Unit filename="class_ewald_real_particles.f90">
+			<Option weight="5" />
+		</Unit>
 		<Unit filename="lib/src/class_changes_writer.f90">
 			<Option weight="2" />
 		</Unit>
-		<Unit filename="lib/src/class_ewald_summation_real.f90">
+		<Unit filename="lib/src/class_ewald_real_pair.f90">
 			<Option weight="2" />
 		</Unit>
 		<Unit filename="lib/src/class_external_field.f90">

@@ -15,7 +15,6 @@ private
     private
         type(Concrete_Potential_Domain) :: domain
         real(DP) :: alpha
-        real(DP), dimension(:, :), allocatable :: tabulation
     contains
         procedure(Abstract_Ewald_Real_Pair_construct), deferred :: construct
         procedure(Abstract_Ewald_Real_Pair_destroy), deferred :: destroy
@@ -49,6 +48,8 @@ private
     end interface
 
     type, extends(Abstract_Ewald_Real_Pair) :: Tabulated_Ewald_Real_Pair
+    private
+        real(DP), dimension(:, :), allocatable :: tabulation
     contains
         procedure :: construct => Tabulated_Ewald_Real_Pair_construct
         procedure :: destroy => Tabulated_Ewald_Real_Pair_destroy
@@ -83,17 +84,16 @@ contains
     !> Between 2 particles
     !> \f[ (\vec{\mu}_i\cdot\vec{\mu}_j) B_\alpha(r_{ij}) -
     !>     (\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij}) C_\alpha(r_{ij}) \f]
-    pure real(DP) function Abstract_Ewald_Real_Pair_meet_energy(this, vector_ij, orientation_i, &
-        orientation_j) result(energy)
+    pure real(DP) function Abstract_Ewald_Real_Pair_meet_energy(this, vector_ij, moment_i, &
+        moment_j) result(energy)
         class(Abstract_Ewald_Real_Pair), intent(in) :: this
         real(DP), dimension(:), intent(in) :: vector_ij
-        real(DP), dimension(:), intent(in) :: orientation_i, orientation_j
+        real(DP), dimension(:), intent(in) :: moment_i, moment_j
 
         real(DP), dimension(2) :: coefficient
 
-        coefficient(1) = dot_product(orientation_i, orientation_j)
-        coefficient(2) =-dot_product(orientation_i, vector_ij) * &
-                         dot_product(orientation_j, vector_ij)
+        coefficient(1) = dot_product(moment_i, moment_j)
+        coefficient(2) =-dot_product(moment_i, vector_ij) * dot_product(moment_j, vector_ij)
         energy = dot_product(coefficient, this%expression(norm2(vector_ij)))
     end function Abstract_Ewald_Real_Pair_meet_energy
 
@@ -250,11 +250,11 @@ contains
         expression = 0._DP
     end function Null_Ewald_Real_Pair_expression
 
-    pure real(DP) function Null_Ewald_Real_Pair_meet_energy(this, vector_ij, orientation_i, &
-        orientation_j) result(energy)
+    pure real(DP) function Null_Ewald_Real_Pair_meet_energy(this, vector_ij, moment_i, &
+        moment_j) result(energy)
         class(Null_Ewald_Real_Pair), intent(in) :: this
         real(DP), dimension(:), intent(in) :: vector_ij
-        real(DP), dimension(:), intent(in) :: orientation_i, orientation_j
+        real(DP), dimension(:), intent(in) :: moment_i, moment_j
         energy = 0._DP
     end function Null_Ewald_Real_Pair_meet_energy
 

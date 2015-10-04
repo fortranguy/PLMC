@@ -70,7 +70,7 @@ contains
         integer, intent(in) :: i_step
         type(Concrete_Particles_Energy), intent(in) :: energy
 
-        write(this%unit, *) i_step, this%string_intra%get(energy%intra)//&
+        write(this%unit, *) i_step, this%string_intra%get(energy%intra), &
             this%string_walls%get(energy%walls)
     end subroutine Abstract_Particles_Energy_Writer_write
 
