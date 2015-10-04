@@ -5,7 +5,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 implicit none
 
 private
-public :: num_components, num_dimensions, max_word_length, max_line_length, real_zero
+public :: num_components, num_dimensions, max_word_length, max_line_length, PI, real_zero
 
     integer, parameter :: num_components = 2
     integer, parameter :: num_dimensions = 3

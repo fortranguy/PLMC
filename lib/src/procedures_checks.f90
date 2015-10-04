@@ -3,12 +3,14 @@ module procedures_checks
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions, max_word_length, real_zero
 use procedures_errors, only: warning_continue, error_exit
+use types_potential_domain, only: Concrete_Potential_Domain
 
 implicit none
 
 private
 public :: check_file_exists, check_data_found, check_string_not_empty, &
-    check_in_range, check_3d_array, check_positive, check_norm, check_increase_factor
+    check_in_range, check_3d_array, check_positive, check_norm, check_increase_factor, &
+    check_potential_domain
 
 interface check_3d_array
     module procedure :: check_integer_3d_array
@@ -180,5 +182,25 @@ contains
             call warning_continue(context//": "//increase_factor_name//" is 1.0.")
         end if
     end subroutine check_increase_factor
+
+    subroutine check_potential_domain(context, domain_name, domain)
+        character(len=*), intent(in) :: context, domain_name
+        type(Concrete_Potential_Domain), intent(in) :: domain
+
+        real(DP) :: distance_range
+        call check_positive(context, domain_name//"%min", domain%min)
+        call check_positive(context, domain_name//"%max", domain%max)
+        if (domain%min > domain%max) then
+            call error_exit(context//": "//domain_name//"%min > domain%max.")
+        end if
+        call check_positive(context, "domain%delta", domain%delta)
+        distance_range = domain%max - domain%min
+        if (distance_range < real_zero) then
+            call warning_continue(context//"distance_range may be too small.")
+        end if
+        if (distance_range / domain%delta < 1._DP) then
+            call warning_continue(context//domain_name//"%delta may be too big.")
+        end if
+    end subroutine check_potential_domain
 
 end module procedures_checks

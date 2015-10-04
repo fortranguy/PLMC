@@ -3,7 +3,7 @@ module class_pair_potential
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: real_zero
 use procedures_errors, only: error_exit, warning_continue
-use procedures_checks, only: check_positive
+use procedures_checks, only: check_positive, check_potential_domain
 use class_potential_expression, only: Abstract_Potential_Expression
 use types_potential_domain, only: Concrete_Potential_Domain
 
@@ -104,23 +104,9 @@ contains
         class(Tabulated_Pair_Potential), intent(inout) :: this
         type(Concrete_Potential_Domain), intent(in) :: domain
 
-        real(DP) :: distance_range
-
-        call check_positive("Tabulated_Pair_Potential", "domain%min", domain%min)
-        call check_positive("Tabulated_Pair_Potential", "domain%max", domain%max)
-        if (domain%min > domain%max) then
-            call error_exit("Tabulated_Pair_Potential: domain%min > domain%max.")
-        end if
+        call check_potential_domain("Tabulated_Pair_Potential_set_domain", "domain", domain)
         this%domain%min = domain%min
         this%domain%max = domain%max
-        call check_positive("Tabulated_Pair_Potential", "domain%delta", domain%delta)
-        distance_range = domain%max - domain%min
-        if (distance_range < real_zero) then
-            call warning_continue("Tabulated_Pair_Potential: "//"distance_range may be too small.")
-        end if
-        if (distance_range / domain%delta < 1._DP) then
-            call warning_continue("Tabulated_Pair_Potential: "//"domain%delta may be too big.")
-        end if
         this%domain%delta = domain%delta
     end subroutine Tabulated_Pair_Potential_set_domain
 
