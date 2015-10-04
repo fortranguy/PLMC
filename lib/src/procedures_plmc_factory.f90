@@ -2,7 +2,7 @@ module procedures_plmc_factory
 
 use data_constants, only: num_components
 use json_module, only: json_file, json_initialize
-use module_data, only: test_file_exists
+use procedures_command_arguments, only: set_filename_from_argument
 use class_periodic_box, only: Abstract_Periodic_Box
 use types_environment_wrapper, only: Environment_Wrapper
 use procedures_environment_factory, only: environment_factory_create, environment_factory_destroy
@@ -50,10 +50,9 @@ contains
         character(len=:), allocatable :: data_filename
 
         call json_initialize()
-        data_filename = "canonical.json"
-        call test_file_exists(data_filename)
+        call set_filename_from_argument(data_filename)
         call input_data%load_file(filename = data_filename)
-        deallocate(data_filename)
+        if (allocated(data_filename)) deallocate(data_filename)
     end subroutine load_input_data
 
     subroutine create_environment(environment, input_data)

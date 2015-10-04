@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 
 project(
     PLMC
-    Fortran CXX
+    Fortran
 )
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/SelectBuildType.cmake)
@@ -10,11 +10,10 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CMakeMacroForceAddFlags.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/SetCompilerFlags.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/SetArchiverAndLinkingTool.cmake)
 
-set(executable_prefix plmc)
 set(EXECUTABLE_OUTPUT_PATH bin/${CMAKE_BUILD_TYPE})
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/mod ${CMAKE_CURRENT_BINARY_DIR}/mod)
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/mod)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib ${CMAKE_CURRENT_BINARY_DIR}/lib)
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/lib)
 
 find_package(
     jsonfortran-${CMAKE_Fortran_COMPILER_ID}
@@ -33,30 +32,19 @@ if(DOXYGEN_FOUND)
     )
 endif(DOXYGEN_FOUND)
 
-file(
-    GLOB_RECURSE
-    programs_source_files
-    src/program_*.f90
+set(plmc_source src/plmc.f90)
+get_filename_component(plmc_name ${plmc_source} NAME_WE)
+add_executable(${plmc_name} ${plmc_source})
+set_property(
+    TARGET ${plmc_name}
+    PROPERTY LINKER_LANGUAGE Fortran
 )
-
-foreach(program_source ${programs_source_files})
-    get_filename_component(program_name ${program_source} NAME_WE)
-    string(REGEX REPLACE ^program_ ""  program_name ${program_name})
-    add_executable(
-        ${executable_prefix}_${program_name}
-        ${program_source}
-    )
-    set_property(
-        TARGET ${executable_prefix}_${program_name}
-        PROPERTY LINKER_LANGUAGE Fortran
-    )
-    target_link_libraries(
-        ${executable_prefix}_${program_name}
-        jsonfortran-static
-        plmc_library
-    )
-    INSTALL(TARGETS ${executable_prefix}_${program_name} DESTINATION plmc)
-endforeach(program_source)
+target_link_libraries(
+    ${plmc_name}
+    jsonfortran-static
+    plmc_library
+)
+INSTALL(TARGETS ${plmc_name} DESTINATION plmc)
 
 # uninstall target
 configure_file(
@@ -71,10 +59,10 @@ add_custom_target(
 )
 
 set(CPACK_PACKAGE_NAME "PLMC")
-set(CPACK_PACKAGE_VENDOR "Laboratoire de physique des liquides et milieux complexes")
+set(CPACK_PACKAGE_VENDOR "Laboratoire de Physique des Liquides et Milieux Complexes")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Physics of Liquids Monte-Carlo")
-set(CPACK_PACKAGE_VERSION "1.0.0")
-set(CPACK_PACKAGE_VERSION_MAJOR "1")
+set(CPACK_PACKAGE_VERSION "2.0.0")
+set(CPACK_PACKAGE_VERSION_MAJOR "2")
 set(CPACK_PACKAGE_VERSION_MINOR "0")
 set(CPACK_PACKAGE_VERSION_PATCH "0")
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "/usr/local")
