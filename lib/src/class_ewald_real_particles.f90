@@ -61,7 +61,8 @@ contains
         this%periodic_box => null()
     end subroutine Abstract_Ewald_Real_Particles_destroy
 
-    subroutine Abstract_Ewald_Real_Particles_visit_energy(this, energy, particle, ewald_real_pair)
+    pure subroutine Abstract_Ewald_Real_Particles_visit_energy(this, energy, particle, &
+        ewald_real_pair)
         class(Abstract_Ewald_Real_Particles), intent(in) :: this
         real(DP), intent(out) :: energy
         type(Concrete_Particle), intent(in) :: particle
@@ -80,7 +81,8 @@ contains
         end do
     end subroutine Abstract_Ewald_Real_Particles_visit_energy
 
-    subroutine Abstract_Ewald_Real_Particles_visit_field(this, field, particle, ewald_real_pair)
+    pure subroutine Abstract_Ewald_Real_Particles_visit_field(this, field, particle, &
+        ewald_real_pair)
         class(Abstract_Ewald_Real_Particles), intent(in) :: this
         real(DP), intent(out) :: field(num_dimensions)
         type(Concrete_Particle), intent(in) :: particle
@@ -115,7 +117,7 @@ contains
         class(Null_Ewald_Real_Particles), intent(inout) :: this
     end subroutine Null_Ewald_Real_Particles_destroy
 
-    subroutine Null_Ewald_Real_Particles_visit_energy(this, energy, particle, ewald_real_pair)
+    pure subroutine Null_Ewald_Real_Particles_visit_energy(this, energy, particle, ewald_real_pair)
         class(Null_Ewald_Real_Particles), intent(in) :: this
         real(DP), intent(out) :: energy
         type(Concrete_Particle), intent(in) :: particle
@@ -123,7 +125,7 @@ contains
         energy = 0._DP
     end subroutine Null_Ewald_Real_Particles_visit_energy
 
-    subroutine Null_Ewald_Real_Particles_visit_field(this, field, particle, ewald_real_pair)
+    pure subroutine Null_Ewald_Real_Particles_visit_field(this, field, particle, ewald_real_pair)
         class(Null_Ewald_Real_Particles), intent(in) :: this
         real(DP), intent(out) :: field(num_dimensions)
         type(Concrete_Particle), intent(in) :: particle
