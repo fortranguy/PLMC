@@ -6,12 +6,13 @@ use procedures_checks, only: check_in_range, check_3d_array
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_particles_number, only: Abstract_Particles_Number
 use procedures_coordinates, only: increase_coordinates_size
+use class_particles_coordinates, only: Abstract_Particles_Coordinates
 
 implicit none
 
 private
 
-    type, abstract, public :: Abstract_Particles_Positions
+    type, extends(Abstract_Particles_Coordinates), abstract, public :: Abstract_Particles_Positions
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box
         class(Abstract_Particles_Number), pointer :: number
@@ -68,13 +69,13 @@ contains
         this%periodic_box => null()
     end subroutine Abstract_Particles_Positions_destroy
 
-    subroutine Abstract_Particles_Positions_set(this, i_particle, position)
+    subroutine Abstract_Particles_Positions_set(this, i_particle, vector)
         class(Abstract_Particles_Positions), intent(inout) :: this
         integer, intent(in) :: i_particle
-        real(DP), intent(in) :: position(:)
+        real(DP), intent(in) :: vector(:)
 
-        call check_3d_array("Abstract_Particles_Positions", "position", position)
-        this%positions(:, i_particle) = this%periodic_box%folded(position)
+        call check_3d_array("Abstract_Particles_Positions", "vector", vector)
+        this%positions(:, i_particle) = this%periodic_box%folded(vector)
     end subroutine Abstract_Particles_Positions_set
 
     pure function Abstract_Particles_Positions_get_num(this) result(num_positions)
@@ -92,14 +93,14 @@ contains
         position = this%positions(:, i_particle)
     end function Abstract_Particles_Positions_get
 
-    subroutine Abstract_Particles_Positions_add(this, position)
+    subroutine Abstract_Particles_Positions_add(this, vector)
         class(Abstract_Particles_Positions), intent(inout) :: this
-        real(DP), intent(in) :: position(:)
+        real(DP), intent(in) :: vector(:)
 
         if (size(this%positions, 2) < this%number%get()) then
             call increase_coordinates_size(this%positions)
         end if
-        call this%set(this%number%get(), position)
+        call this%set(this%number%get(), vector)
     end subroutine Abstract_Particles_Positions_add
 
     subroutine Abstract_Particles_Positions_remove(this, i_particle)
@@ -127,10 +128,10 @@ contains
         class(Null_Particles_Positions), intent(inout) :: this
     end subroutine Null_Particles_Positions_destroy
 
-    subroutine Null_Particles_Positions_set(this, i_particle, position)
+    subroutine Null_Particles_Positions_set(this, i_particle, vector)
         class(Null_Particles_Positions), intent(inout) :: this
         integer, intent(in) :: i_particle
-        real(DP), intent(in) :: position(:)
+        real(DP), intent(in) :: vector(:)
     end subroutine Null_Particles_Positions_set
 
     pure function Null_Particles_Positions_get_num(this) result(num_positions)
@@ -146,9 +147,9 @@ contains
         position = 0._DP
     end function Null_Particles_Positions_get
 
-    subroutine Null_Particles_Positions_add(this, position)
+    subroutine Null_Particles_Positions_add(this, vector)
         class(Null_Particles_Positions), intent(inout) :: this
-        real(DP), intent(in) :: position(:)
+        real(DP), intent(in) :: vector(:)
     end subroutine Null_Particles_Positions_add
 
     subroutine Null_Particles_Positions_remove(this, i_particle)

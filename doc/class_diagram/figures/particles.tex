@@ -35,28 +35,40 @@
             \operation{getExcess()\type{double}}
         \end{abstractclass}
     \end{scope}
+
+    \begin{scope}[shift={($(ParticlesNumber.north) + (0 cm, 11 cm)$)}, opacity=1]
+        \begin{abstractclass}[text width=\mediumTextWidth]{ParticlesCoordinates}{0, 0}
+            \operation[0]{set(iParticle\type{int}, vector\type{double[3]})}
+            \operation[0]{getNum()\type{int}}
+            \operation[0]{get(iParticle\type{int})\type{double[3]}}
+            \operation[0]{add(vector\type{double[3]})}
+            \operation[0]{remove(iParticle\type{int})}
+        \end{abstractclass}
+    \end{scope}
     
-    \begin{scope}[shift={($(ParticlesNumber.north) + (0 cm, 6 cm)$)}, opacity=1]
+    \begin{scope}[shift={($(ParticlesCoordinates.south) + (-4.5 cm, -1.5 cm)$)}, opacity=1]
         \begin{abstractclass}[text width=\mediumTextWidth]{ParticlesPositions}{0, 0}
+            \inherit{ParticlesCoordinates}
             \operation{construct(periodicBox\type{PeriodicBox},
                                 number\type{ParticlesNumber})}
             \operation{detroy()}
-            \operation{set(iParticle\type{int}, position\type{double[3]})}
+            \operation{set(iParticle\type{int}, vector\type{double[3]})}
             \operation{getNum()\type{int}}
             \operation{get(iParticle\type{int})\type{double[3]}}
-            \operation{add(position\type{double[3]})}
+            \operation{add(vector\type{double[3]})}
             \operation{remove(iParticle\type{int})}
         \end{abstractclass}
     \end{scope}
     
-    \begin{scope}[shift={($(ParticlesPositions.north) + (9 cm, 0 cm)$)}, opacity=1]
+    \begin{scope}[shift={($(ParticlesCoordinates.south) + (4.5 cm, -1.5 cm)$)}, opacity=1]
         \begin{abstractclass}[text width=\mediumTextWidth]{ParticlesOrientations}{0, 0}
+            \inherit{ParticlesCoordinates}
             \operation{construct(number\type{ParticlesNumber})}
             \operation{detroy()}
-            \operation{set(iParticle\type{int}, orientation\type{double[3]})}
+            \operation{set(iParticle\type{int}, vector\type{double[3]})}
             \operation{getNum()\type{int}}
             \operation{get(iParticle\type{int})\type{double[3]}}
-            \operation{add(orientation\type{double[3]})}
+            \operation{add(vector\type{double[3]})}
             \operation{remove(iParticle\type{int})}
         \end{abstractclass}
         \begin{comment}
@@ -66,7 +78,7 @@
         \end{comment}
     \end{scope}
     
-    \begin{scope}[shift={($(ParticlesOrientations.north) + (5 cm, 5 cm)$)}, opacity=1]
+    \begin{scope}[shift={($(ParticlesCoordinates.north) + (9 cm, 0 cm)$)}, opacity=1]
         \begin{abstractclass}[text width=\mediumTextWidth]{ParticlesDipolarMoments}{0, 0}
             \operation{construct(momentNorm\type{ParticlesMomentNorm},
                                 orientations\type{ParticlesOrientations})}

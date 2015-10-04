@@ -28,7 +28,7 @@ contains
 
 !implementation Abstract_Number_to_String
 
-    function Abstract_Number_to_String_get_real(number) result(string)
+    elemental function Abstract_Number_to_String_get_real(number) result(string)
         character(len=:), allocatable :: string
         real(DP), intent(in) :: number
 
@@ -45,14 +45,14 @@ contains
         character(len=max_word_length) :: big_string
 
         write(big_string, *) number
-        string = trim(big_string)
+        string = trim(adjustl(big_string))
     end function Abstract_Number_to_String_get_integer
 
 !end implementation Abstract_Number_to_String
 
 !implementation Null_Number_to_String
 
-    function Null_Number_to_String_get_real(number) result(string)
+    elemental function Null_Number_to_String_get_real(number) result(string)
         character(len=:), allocatable :: string
         real(DP), intent(in) :: number
         string = ""

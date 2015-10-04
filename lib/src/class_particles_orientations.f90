@@ -6,12 +6,14 @@ use procedures_errors, only: warning_continue
 use procedures_checks, only: check_in_range, check_3d_array, check_positive, check_norm
 use class_particles_number, only: Abstract_Particles_Number
 use procedures_coordinates, only: increase_coordinates_size
+use class_particles_coordinates, only: Abstract_Particles_Coordinates
 
 implicit none
 
 private
 
-    type, abstract, public :: Abstract_Particles_Orientations
+    type, extends(Abstract_Particles_Coordinates), abstract, public :: &
+        Abstract_Particles_Orientations
     private
         real(DP), allocatable :: orientations(:, :)
         class(Abstract_Particles_Number), pointer :: number
@@ -68,15 +70,15 @@ contains
         this%number => null()
     end subroutine Abstract_Particles_Orientations_destroy
 
-    subroutine Abstract_Particles_Orientations_set(this, i_particle, orientation)
+    subroutine Abstract_Particles_Orientations_set(this, i_particle, vector)
         class(Abstract_Particles_Orientations), intent(inout) :: this
         integer, intent(in) :: i_particle
-        real(DP), intent(in) :: orientation(:)
+        real(DP), intent(in) :: vector(:)
 
-        call check_3d_array("Abstract_Particles_Orientations", "orientation", orientation)
-        call check_positive("Abstract_Particles_Orientations", "norm2(orientation)", norm2(orientation))
-        call check_norm("Abstract_Particles_Orientations", "orientation", orientation)
-        this%orientations(:, i_particle) = orientation / norm2(orientation)
+        call check_3d_array("Abstract_Particles_Orientations", "vector", vector)
+        call check_positive("Abstract_Particles_Orientations", "norm2(vector)", norm2(vector))
+        call check_norm("Abstract_Particles_Orientations", "vector", vector)
+        this%orientations(:, i_particle) = vector / norm2(vector)
     end subroutine Abstract_Particles_Orientations_set
 
     pure function Abstract_Particles_Orientations_get_num(this) result(num_orientations)
@@ -94,14 +96,14 @@ contains
         orientation = this%orientations(:, i_particle)
     end function Abstract_Particles_Orientations_get
 
-    subroutine Abstract_Particles_Orientations_add(this, orientation)
+    subroutine Abstract_Particles_Orientations_add(this, vector)
         class(Abstract_Particles_Orientations), intent(inout) :: this
-        real(DP), intent(in) :: orientation(:)
+        real(DP), intent(in) :: vector(:)
 
         if (size(this%orientations, 2) < this%number%get()) then
             call increase_coordinates_size(this%orientations)
         end if
-        call this%set(this%number%get(), orientation)
+        call this%set(this%number%get(), vector)
     end subroutine Abstract_Particles_Orientations_add
 
     subroutine Abstract_Particles_Orientations_remove(this, i_particle)
@@ -128,10 +130,10 @@ contains
         class(Null_Particles_Orientations), intent(inout) :: this
     end subroutine Null_Particles_Orientations_destroy
 
-    subroutine Null_Particles_Orientations_set(this, i_particle, orientation)
+    subroutine Null_Particles_Orientations_set(this, i_particle, vector)
         class(Null_Particles_Orientations), intent(inout) :: this
         integer, intent(in) :: i_particle
-        real(DP), intent(in) :: orientation(:)
+        real(DP), intent(in) :: vector(:)
     end subroutine Null_Particles_Orientations_set
 
     pure function Null_Particles_Orientations_get_num(this) result(num_orientations)
@@ -147,9 +149,9 @@ contains
         orientation = 0._DP
     end function Null_Particles_Orientations_get
 
-    subroutine Null_Particles_Orientations_add(this, orientation)
+    subroutine Null_Particles_Orientations_add(this, vector)
         class(Null_Particles_Orientations), intent(inout) :: this
-        real(DP), intent(in) :: orientation(:)
+        real(DP), intent(in) :: vector(:)
     end subroutine Null_Particles_Orientations_add
 
     subroutine Null_Particles_Orientations_remove(this, i_particle)

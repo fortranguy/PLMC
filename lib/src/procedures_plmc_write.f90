@@ -20,15 +20,15 @@ contains
         type(Concrete_Mixture_Observables), intent(in) :: observables
         logical, intent(in) :: in_loop
 
-        call observables_writers%intras(1)%energy_writer%write(i_step, &
-            observables%particles_energies(1))
-        call observables_writers%intras(2)%energy_writer%write(i_step, &
-            observables%particles_energies(2))
-        call observables_writers%inter_energy_writer%write(i_step, observables%inter_energy)
+        call observables_writers%intras(1)%coordinates%write(i_step)
+        call observables_writers%intras(2)%coordinates%write(i_step)
+        call observables_writers%intras(1)%energy%write(i_step, observables%particles_energies(1))
+        call observables_writers%intras(2)%energy%write(i_step, observables%particles_energies(2))
+        call observables_writers%inter_energy%write(i_step, observables%inter_energy)
         if (in_loop) then
-            call observables_writers%intras(1)%changes_writer%write(i_step, &
+            call observables_writers%intras(1)%changes%write(i_step, &
                 observables%changes_success%ratios(1))
-            call observables_writers%intras(2)%changes_writer%write(i_step, &
+            call observables_writers%intras(2)%changes%write(i_step, &
                 observables%changes_success%ratios(2))
         end if
     end subroutine write_observables

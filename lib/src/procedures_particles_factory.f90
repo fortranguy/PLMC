@@ -14,6 +14,7 @@ use class_particles_diameter, only: Abstract_Particles_Diameter, &
     Concrete_Particles_Diameter, Null_Particles_Diameter
 use class_particles_moment_norm, only: Abstract_Particles_Moment_Norm, &
     Concrete_Particles_Moment_Norm, Null_Particles_Moment_Norm
+use class_particles_coordinates, only: Abstract_Particles_Coordinates
 use class_particles_positions, only: Abstract_Particles_Positions, &
     Concrete_Particles_Positions, Null_Particles_Positions
 use class_particles_orientations, only: Abstract_Particles_Orientations, &
@@ -263,53 +264,41 @@ contains
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        character(len=:), allocatable :: data_field, filename
+        if (.not.particles_have_positions(particles_positions)) return
+        call set_coordinates(particles_positions, input_data, prefix//"initial positions")
+    end subroutine set_positions
+
+    subroutine set_coordinates(particles_coordinates, input_data, data_field)
+        class(Abstract_Particles_Coordinates), intent(inout) :: particles_coordinates
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: data_field
+
+        character(len=:), allocatable :: filename
         logical :: data_found
-        real(DP), allocatable :: file_positions(:, :)
+        real(DP), allocatable :: file_coordinates(:, :)
         integer :: i_particle
 
-        if (.not.particles_have_positions(particles_positions)) return
-        if (particles_positions%get_num() == 0) return
-        data_field = prefix//"initial positions"
+        if (particles_coordinates%get_num() == 0) return
         call input_data%get(data_field, filename, data_found)
         call check_data_found(data_field, data_found)
-        call read_coordinates(file_positions, filename)
-        if (size(file_positions, 2) /= particles_positions%get_num()) then
-            call error_exit("set_positions from "//filename//": wrong number of lines.")
+        call read_coordinates(file_coordinates, filename)
+        if (size(file_coordinates, 2) /= particles_coordinates%get_num()) then
+            call error_exit("set_coordinates from "//filename//": wrong number of lines.")
         end if
-        do i_particle = 1, particles_positions%get_num()
-            call particles_positions%set(i_particle, file_positions(:, i_particle))
+        do i_particle = 1, particles_coordinates%get_num()
+            call particles_coordinates%set(i_particle, file_coordinates(:, i_particle))
         end do
-        if (allocated(file_positions)) deallocate(file_positions)
+        if (allocated(file_coordinates)) deallocate(file_coordinates)
         deallocate(filename)
-        deallocate(data_field)
-    end subroutine set_positions
+    end subroutine set_coordinates
 
     subroutine set_orientations(particles_orientations, input_data, prefix)
         class(Abstract_Particles_Orientations), intent(inout) :: particles_orientations
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        character(len=:), allocatable :: data_field, filename
-        logical :: data_found
-        real(DP), allocatable :: file_orientations(:, :)
-        integer :: i_particle
-
         if (.not.particles_have_orientations(particles_orientations)) return
-        if (particles_orientations%get_num() == 0) return
-        data_field = prefix//"initial orientations"
-        call input_data%get(data_field, filename, data_found)
-        call check_data_found(data_field, data_found)
-        call read_coordinates(file_orientations, filename)
-        if (size(file_orientations, 2) /= particles_orientations%get_num()) then
-            call error_exit("set_orientations from "//filename//": wrong number of lines.")
-        end if
-        do i_particle = 1, particles_orientations%get_num()
-            call particles_orientations%set(i_particle, file_orientations(:, i_particle))
-        end do
-        if (allocated(file_orientations)) deallocate(file_orientations)
-        deallocate(filename)
-        deallocate(data_field)
+        call set_coordinates(particles_orientations, input_data, prefix//"initial orientations")
     end subroutine set_orientations
 
     subroutine allocate_and_construct_dipolar_moments(particles_dipolar_moments, &

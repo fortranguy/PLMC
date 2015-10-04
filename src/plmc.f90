@@ -36,7 +36,7 @@ implicit none
     call plmc_create(mixture, input_data, environment)
     call plmc_create(changes, input_data, environment%periodic_box, mixture%components)
     call plmc_create(short_potentials, input_data, environment, mixture)
-    call plmc_create(observables_writers, mixture, changes)
+    call plmc_create(observables_writers, input_data, mixture, changes)
     call plmc_set_num_steps(input_data)
 
     call input_data%destroy()

@@ -138,34 +138,43 @@ contains
         call short_potential_factory_destroy(short_potentials%intras(1))
     end subroutine destroy_short_potentials
 
-    subroutine create_observable_writers(observable_writers, mixture, changes)
+    subroutine create_observable_writers(observable_writers, input_data, mixture, changes)
         type(Mixture_Observable_Writers_Wrapper), intent(out) :: observable_writers
+        type(json_file), intent(inout) :: input_data
         type(Mixture_Wrapper), intent(in) :: mixture
         type(Changes_Wrapper), intent(in) :: changes(num_components)
 
-        call observable_writers_factory_create(observable_writers%intras(1)%energy_writer, &
+        call observable_writers_factory_create(observable_writers%intras(1)%energy, &
             mixture%components(1)%number, mixture%components(1)%wall_diameter, &
             "component_1_energy.out")
-        call observable_writers_factory_create(observable_writers%intras(2)%energy_writer, &
+        call observable_writers_factory_create(observable_writers%intras(2)%energy, &
             mixture%components(2)%number, mixture%components(2)%wall_diameter, &
             "component_2_energy.out")
-        call observable_writers_factory_create(observable_writers%inter_energy_writer, &
+        call observable_writers_factory_create(observable_writers%inter_energy, &
             mixture%inter_diameter, "inter_12_energy.out")
-        call observable_writers_factory_create(observable_writers%intras(1)%changes_writer, &
+        call observable_writers_factory_create(observable_writers%intras(1)%changes, &
             changes(1)%moved_positions, changes(1)%rotated_orientations, &
             changes(1)%particles_exchange, "component_1_success.out")
-        call observable_writers_factory_create(observable_writers%intras(2)%changes_writer, &
+        call observable_writers_factory_create(observable_writers%intras(2)%changes, &
             changes(2)%moved_positions, changes(2)%rotated_orientations, &
             changes(2)%particles_exchange, "component_2_success.out")
+        call observable_writers_factory_create(observable_writers%intras(1)%coordinates, &
+            "component_1_coordinates", mixture%components(1)%positions, &
+            mixture%components(1)%orientations, input_data, "Monte Carlo.")
+        call observable_writers_factory_create(observable_writers%intras(2)%coordinates, &
+            "component_2_coordinates", mixture%components(2)%positions, &
+            mixture%components(2)%orientations, input_data, "Monte Carlo.")
     end subroutine create_observable_writers
 
     subroutine destroy_observable_writers(observable_writers)
         type(Mixture_Observable_Writers_Wrapper), intent(inout) :: observable_writers
-        call observable_writers_factory_destroy(observable_writers%intras(2)%changes_writer)
-        call observable_writers_factory_destroy(observable_writers%intras(1)%changes_writer)
-        call observable_writers_factory_destroy(observable_writers%inter_energy_writer)
-        call observable_writers_factory_destroy(observable_writers%intras(2)%energy_writer)
-        call observable_writers_factory_destroy(observable_writers%intras(1)%energy_writer)
+        call observable_writers_factory_destroy(observable_writers%intras(2)%coordinates)
+        call observable_writers_factory_destroy(observable_writers%intras(1)%coordinates)
+        call observable_writers_factory_destroy(observable_writers%intras(2)%changes)
+        call observable_writers_factory_destroy(observable_writers%intras(1)%changes)
+        call observable_writers_factory_destroy(observable_writers%inter_energy)
+        call observable_writers_factory_destroy(observable_writers%intras(2)%energy)
+        call observable_writers_factory_destroy(observable_writers%intras(1)%energy)
     end subroutine destroy_observable_writers
 
 end module procedures_plmc_factory
