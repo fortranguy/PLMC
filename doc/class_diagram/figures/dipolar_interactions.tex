@@ -39,32 +39,25 @@
         \end{scope}
         
         \begin{scope}[shift={($(DipolarInteraction.south) + (-19.5 cm, -5 cm)$)}]
-            \begin{abstractclass}[text width=\largeTextWidth]{EwaldReal}{0, 0}
-                \inherit{DipolarInteraction}
-                \operation[0]{volumeChangeRestoration(dilatation : double)}
+            \begin{abstractclass}[text width=\largeTextWidth]{EwaldRealParticles}{0, 0}
+                \operation{construct(periodicBox\type{PeriodicBox},
+                    particlesPositions\type{ParticlesPositions},
+                    particlesDipolarMoments\type{ParticlesDipolarMoments})}
+                \operation{destroy()}
+                \operation{visit(energy\type{double}, particle\type{Particle},
+                    ewaldRealPair\type{EwaldRealPair})}
+                \operation{visit(field\type{double[3]}, particle\type{Particle},
+                    ewaldRealPair\type{EwaldRealPair})}
             \end{abstractclass}
+        \end{scope}
 
-            \def\operationsImplementation{
-                \operation{totalEnergy() : double}
-                \operation{totalEnergyUsingField() : double}
-                \operation{moveEnergy(old : Particle, new : Particle) : double}
-                \operation{rotationEnergy(old : Particle, new : Particle) : double}
-                \operation{exchangeEnergy(particle : Particle) : double}
-                \operation{volumeChangeEnergy(dilatation : double, oldEnergy : double) : double}
-                \operation{volumeChangeRestoration(dilatation : double)}
-                \operation{soloField(particle : Particle) : double[3]}
-                \operation{testField(particle : Particle) : double[3]}
-            }
-            
-            \begin{class}[text width=\largeTextWidth]{NullEwaldReal}{0, -2.5}
-                \inherit{EwaldReal}
-                \operationsImplementation{}
-            \end{class}
-            
-            \begin{class}[text width=\largeTextWidth]{EwaldReal}{0, -8}
-                \inherit{EwaldReal}
-                \operationsImplementation{}
-            \end{class}
+        \begin{scope}[shift={($(EwaldRealParticles.south) + (0 cm, -1.5 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{EwaldRealPair}{0, 0}
+                \operation{construct(domain\type{PotentialDomain}, alpha\type{double})}
+                \operation{destroy()}
+                \operation{meet(vectorIJ\type{double[3]}, momentI\type{double[3]},
+                    momentJ\type{double[3]})\type{double}}
+            \end{abstractclass}
         \end{scope}
         
         \begin{scope}[shift={($(DipolarInteraction.south) + (-6.5 cm, -5 cm)$)}]
@@ -215,7 +208,7 @@
 \end{scope}
 
 \begin{scope}[on background layer]
-    \aggregation{DipolarInteractionFacade}{ewaldReal}{2}{EwaldReal}
+    \aggregation{DipolarInteractionFacade}{ewaldReal}{2}{EwaldRealParticles}
     \aggregation{DipolarInteractionFacade}{ewaldReci}{2}{EwaldReci}
     \aggregation{DipolarInteractionFacade}{dlc}{2}{DipolarLayerCorrection}
     \aggregation{DipolarInteractionFacade}{ewaldSelf}{1}{EwaldSelf}
@@ -223,7 +216,7 @@
 
     \aggregation{DipolarInteraction}{box}{1}{PeriodicBox}
 
-    %\aggregation{EwaldReal}{dipSpheres}{1}{DipolarSpheres}
+    %\aggregation{EwaldRealParticles}{dipSpheres}{1}{DipolarSpheres}
 
     %\aggregation{EwaldReci}{dipSpheres}{1}{DipolarSpheres}
 
