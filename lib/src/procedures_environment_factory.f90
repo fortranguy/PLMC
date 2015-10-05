@@ -64,18 +64,27 @@ contains
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
+        class(Abstract_Field_Expression), allocatable :: field_expression
+        class(Abstract_Parallelepiped_Domain), allocatable :: parallelepiped_domain
+        class(Abstract_Floor_Penetration), allocatable :: floor_penetration
+        logical :: apply_field
+
         call environment_factory_create(environment%periodic_box, input_data, prefix)
         call environment_factory_create(environment%temperature, input_data, prefix)
-        call environment_factory_create(environment%field_expression, input_data, prefix)
-        call environment_factory_create(environment%parallelepiped_domain, input_data, &
-            prefix//"External Field.", environment%periodic_box)
-        call environment_factory_create(environment%external_field, input_data, prefix, &
-            environment%parallelepiped_domain, environment%field_expression)
+        apply_field = apply_external_field(input_data, prefix)
+        call environment_factory_create(field_expression, apply_field, input_data, prefix)
+        call environment_factory_create(parallelepiped_domain, apply_field, &
+            environment%periodic_box, input_data, prefix//"External Field.")
+        call environment_factory_create(environment%external_field, apply_field, &
+            parallelepiped_domain, field_expression)
+        call environment_factory_destroy(field_expression)
+        call environment_factory_destroy(parallelepiped_domain)
         call environment_factory_create(environment%reciprocal_lattice, input_data, prefix, &
             environment%periodic_box)
-        call environment_factory_create(environment%floor_penetration, input_data, prefix)
+        call environment_factory_create(floor_penetration, input_data, prefix)
         call environment_factory_create(environment%walls_potential, input_data, prefix, &
-            environment%periodic_box, environment%floor_penetration)
+            environment%periodic_box, floor_penetration)
+        call environment_factory_destroy(floor_penetration)
     end subroutine environment_factory_create_all
 
     subroutine allocate_and_set_periodic_box(periodic_box, input_data, prefix)
@@ -124,24 +133,25 @@ contains
         deallocate(data_field)
     end subroutine allocate_and_set_temperature
 
-    subroutine allocate_and_set_field_expression(field_expression, input_data, prefix)
+    subroutine allocate_and_set_field_expression(field_expression, apply_field, input_data, prefix)
         class(Abstract_Field_Expression), allocatable, intent(out) :: field_expression
+        logical, intent(in) :: apply_field
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        call allocate_field_expression(field_expression, input_data, prefix)
+        call allocate_field_expression(field_expression, apply_field, input_data, prefix)
         call set_field_expression(field_expression, input_data, prefix)
     end subroutine allocate_and_set_field_expression
 
-    subroutine allocate_field_expression(field_expression, input_data, prefix)
+    subroutine allocate_field_expression(field_expression, apply_field, input_data, prefix)
         class(Abstract_Field_Expression), allocatable, intent(out) :: field_expression
+        logical, intent(in) :: apply_field
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field, field_name
         logical :: data_found
-
-        if (apply_external_field(input_data, prefix)) then
+        if (apply_field) then
             data_field = prefix//"External Field.name"
             call input_data%get(data_field, field_name, data_found)
             call check_data_found(data_field, data_found)
@@ -180,54 +190,58 @@ contains
         if (allocated(data_field)) deallocate(data_field)
     end subroutine set_field_expression
 
-    subroutine allocate_and_construct_parallelepiped_domain(parallelepiped_domain, input_data, &
-        prefix, periodic_box)
+    subroutine allocate_and_construct_parallelepiped_domain(parallelepiped_domain, needed, &
+        periodic_box, input_data, prefix)
         class(Abstract_Parallelepiped_Domain), allocatable, intent(out) :: parallelepiped_domain
+        logical, intent(in) :: needed
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
 
         character(len=:), allocatable :: data_field
         logical :: data_found
         character(len=:), allocatable :: domain_name
         real(DP), allocatable :: domain_origin(:), domain_size(:)
 
-        data_field = prefix//"Parallelepiped Domain.name"
-        call input_data%get(data_field, domain_name, data_found)
-        call check_data_found(data_field, data_found)
-        select case(domain_name)
-            case ("domain")
-                data_field = prefix//"Parallelepiped Domain.origin"
-                call input_data%get(data_field, domain_origin, data_found)
-                call check_data_found(data_field, data_found)
-                data_field = prefix//"Parallelepiped Domain.size"
-                call input_data%get(data_field, domain_size, data_found)
-                call check_data_found(data_field, data_found)
-                allocate(Concrete_Parallelepiped_Domain :: parallelepiped_domain)
-            case ("box")
-                allocate(Box_Parallelepiped_Domain :: parallelepiped_domain)
-            case ("null")
-                allocate(Null_Parallelepiped_Domain :: parallelepiped_domain)
-            case default
-                call error_exit(domain_name//" domain_name unknown."//&
-                    "Choose among: 'domain', 'box', 'null'.")
-        end select
+        if (needed) then
+            data_field = prefix//"Parallelepiped Domain.name"
+            call input_data%get(data_field, domain_name, data_found)
+            call check_data_found(data_field, data_found)
+            select case(domain_name)
+                case ("domain")
+                    data_field = prefix//"Parallelepiped Domain.origin"
+                    call input_data%get(data_field, domain_origin, data_found)
+                    call check_data_found(data_field, data_found)
+                    data_field = prefix//"Parallelepiped Domain.size"
+                    call input_data%get(data_field, domain_size, data_found)
+                    call check_data_found(data_field, data_found)
+                    allocate(Concrete_Parallelepiped_Domain :: parallelepiped_domain)
+                case ("box")
+                    allocate(Box_Parallelepiped_Domain :: parallelepiped_domain)
+                case default
+                    call error_exit(domain_name//" domain_name unknown."//&
+                        "Choose among: 'domain', 'box', 'null'.")
+            end select
+            deallocate(domain_name)
+            deallocate(data_field)
+        else
+            domain_size = [0._DP, 0._DP, 0._DP]
+            domain_origin = [0._DP, 0._DP, 0._DP]
+            allocate(Null_Parallelepiped_Domain :: parallelepiped_domain)
+        end if
         call parallelepiped_domain%construct(periodic_box, domain_origin, domain_size)
         if (allocated(domain_size)) deallocate(domain_size)
         if (allocated(domain_origin)) deallocate(domain_origin)
-        deallocate(domain_name)
-        deallocate(data_field)
     end subroutine allocate_and_construct_parallelepiped_domain
 
-    subroutine allocate_and_construct_external_field(external_field, input_data, prefix, &
+    subroutine allocate_and_construct_external_field(external_field, apply_field, &
         parallelepiped_domain, field_expression)
         class(Abstract_External_Field), allocatable, intent(out) :: external_field
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
+        logical, intent(in) :: apply_field
         class(Abstract_Parallelepiped_Domain), intent(in) :: parallelepiped_domain
         class(Abstract_Field_Expression), intent(in) :: field_expression
 
-        if (apply_external_field(input_data, prefix)) then
+        if (apply_field) then
             allocate(Concrete_External_Field :: external_field)
         else
             allocate(Null_External_Field :: external_field)
@@ -310,11 +324,8 @@ contains
         type(Environment_Wrapper), intent(inout) :: environment
 
         call environment_factory_destroy(environment%walls_potential)
-        call environment_factory_destroy(environment%floor_penetration)
         call environment_factory_destroy(environment%reciprocal_lattice)
         call environment_factory_destroy(environment%external_field)
-        call environment_factory_destroy(environment%parallelepiped_domain)
-        call environment_factory_destroy(environment%field_expression)
         call environment_factory_destroy(environment%temperature)
         call environment_factory_destroy(environment%periodic_box)
     end subroutine environment_factory_destroy_all

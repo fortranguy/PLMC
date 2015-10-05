@@ -16,11 +16,8 @@ private
     type, public :: Environment_Wrapper
         class(Abstract_Periodic_Box), allocatable :: periodic_box
         class(Abstract_Temperature), allocatable :: temperature
-        class(Abstract_Field_Expression), allocatable :: field_expression
-        class(Abstract_Parallelepiped_Domain), allocatable :: parallelepiped_domain
         class(Abstract_External_Field), allocatable :: external_field
         class(Abstract_Reciprocal_Lattice), allocatable :: reciprocal_lattice
-        class(Abstract_Floor_Penetration), allocatable :: floor_penetration
         class(Abstract_Walls_Potential), allocatable :: walls_potential
     end type Environment_Wrapper
 

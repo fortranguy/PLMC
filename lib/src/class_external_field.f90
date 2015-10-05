@@ -11,8 +11,8 @@ private
 
     type, abstract, public :: Abstract_External_Field
     private
-        class(Abstract_Parallelepiped_Domain), pointer :: parallelepiped_domain
-        class(Abstract_Field_Expression), pointer :: field_expression
+        class(Abstract_Parallelepiped_Domain), allocatable :: parallelepiped_domain
+        class(Abstract_Field_Expression), allocatable :: field_expression
     contains
         procedure :: construct => Abstract_External_Field_construct
         procedure :: destroy => Abstract_External_Field_destroy
@@ -36,18 +36,18 @@ contains
 
     subroutine Abstract_External_Field_construct(this, parallelepiped_domain, field_expression)
         class(Abstract_External_Field), intent(out) :: this
-        class(Abstract_Parallelepiped_Domain), target, intent(in) :: parallelepiped_domain
-        class(Abstract_Field_Expression), target, intent(in) :: field_expression
+        class(Abstract_Parallelepiped_Domain), intent(in) :: parallelepiped_domain
+        class(Abstract_Field_Expression), intent(in) :: field_expression
 
-        this%parallelepiped_domain => parallelepiped_domain
-        this%field_expression => field_expression
+        allocate(this%parallelepiped_domain, source = parallelepiped_domain)
+        allocate(this%field_expression, source = field_expression)
     end subroutine Abstract_External_Field_construct
 
     subroutine Abstract_External_Field_destroy(this)
         class(Abstract_External_Field), intent(inout) :: this
 
-        this%field_expression => null()
-        this%parallelepiped_domain => null()
+        if (allocated(this%field_expression)) deallocate(this%field_expression)
+        if (allocated(this%parallelepiped_domain)) deallocate(this%parallelepiped_domain)
     end subroutine Abstract_External_Field_destroy
 
     pure function Abstract_External_Field_get(this, position) result(external_field)
@@ -68,8 +68,8 @@ contains
 
     subroutine Null_External_Field_construct(this, parallelepiped_domain, field_expression)
         class(Null_External_Field), intent(out) :: this
-        class(Abstract_Parallelepiped_Domain), target, intent(in) :: parallelepiped_domain
-        class(Abstract_Field_Expression), target, intent(in) :: field_expression
+        class(Abstract_Parallelepiped_Domain), intent(in) :: parallelepiped_domain
+        class(Abstract_Field_Expression), intent(in) :: field_expression
     end subroutine Null_External_Field_construct
 
     subroutine Null_External_Field_destroy(this)

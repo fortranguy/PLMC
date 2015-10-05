@@ -1,6 +1,8 @@
 module procedures_plmc_factory
 
 use data_constants, only: num_components
+use data_wrappers_prefix, only:environment_prefix, mixtures_prefix, changes_prefix, &
+    short_potentials_prefix, ewalds_prefix
 use json_module, only: json_file, json_initialize
 use procedures_command_arguments, only: set_filename_from_argument
 use class_periodic_box, only: Abstract_Periodic_Box
@@ -61,7 +63,7 @@ contains
         type(Environment_Wrapper), intent(out) :: environment
         type(json_file), intent(inout) :: input_data
 
-        call environment_factory_create(environment, input_data, "Environment.")
+        call environment_factory_create(environment, input_data, environment_prefix)
     end subroutine create_environment
 
     subroutine destroy_environment(environment)
@@ -75,12 +77,12 @@ contains
         type(json_file), intent(inout) :: input_data
         type(Environment_Wrapper), intent(in) :: environment
 
-        call particles_factory_create(mixture%components(1), input_data, "Mixture.Component 1.", &
-            environment)
-        call particles_factory_create(mixture%components(2), input_data, "Mixture.Component 2.", &
-            environment)
+        call particles_factory_create(mixture%components(1), input_data, &
+            mixtures_prefix//"Component 1.", environment)
+        call particles_factory_create(mixture%components(2), input_data, &
+            mixtures_prefix//"Component 2.", environment)
         call particles_factory_create(mixture%inter_diameter, mixture%components(1)%diameter, &
-            mixture%components(2)%diameter, input_data, "Mixture.Inter 12.")
+            mixture%components(2)%diameter, input_data, mixtures_prefix//"Inter 12.")
     end subroutine create_mixture
 
     subroutine destroy_mixture(mixture)
@@ -97,10 +99,10 @@ contains
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(Particles_Wrapper), intent(in) :: components(num_components)
 
-        call changes_factory_create(changes(1), input_data, "Changes.Component 1.", periodic_box, &
-            components(1))
-        call changes_factory_create(changes(2), input_data, "Changes.Component 2.", periodic_box, &
-            components(2))
+        call changes_factory_create(changes(1), input_data, changes_prefix//"Component 1.", &
+            periodic_box, components(1))
+        call changes_factory_create(changes(2), input_data, changes_prefix//"Component 2.", &
+            periodic_box, components(2))
     end subroutine create_changes
 
     subroutine destroy_changes(changes)
@@ -117,16 +119,16 @@ contains
         type(Mixture_Wrapper), intent(in) :: mixture
 
         call short_potential_factory_create(short_potentials%intras(1), input_data, &
-            "Short Potentials.Component 1.", environment, mixture%components(1))
+            short_potentials_prefix//"Component 1.", environment, mixture%components(1))
         call short_potential_factory_create(short_potentials%intras(2), input_data, &
-            "Short Potentials.Component 2.", environment, mixture%components(2))
+            short_potentials_prefix//"Component 2.", environment, mixture%components(2))
         call short_potential_factory_create(short_potentials%inter_micro, input_data, &
-            "Short Potentials.Inter 12.", mixture%inter_diameter)
+            short_potentials_prefix//"Inter 12.", mixture%inter_diameter)
         call short_potential_factory_create(short_potentials%inters(1), &
-            short_potentials%inter_micro, input_data, "Short Potentials.Inter 12.", &
+            short_potentials%inter_micro, input_data, short_potentials_prefix//"Inter 12.", &
             environment%periodic_box, mixture%components(1)%positions)
         call short_potential_factory_create(short_potentials%inters(2), &
-            short_potentials%inter_micro, input_data, "Short Potentials.Inter 12.", &
+            short_potentials%inter_micro, input_data, short_potentials_prefix//"Inter 12.", &
             environment%periodic_box, mixture%components(2)%positions)
     end subroutine create_short_potentials
 
@@ -146,10 +148,10 @@ contains
         type(Environment_Wrapper), intent(in) :: environment
         type(Mixture_Wrapper), intent(in) :: mixture
 
-        call ewald_factory_create(ewalds%intras(1), input_data, "Ewald.Component 1.", environment, &
-            mixture%components(1))
-        call ewald_factory_create(ewalds%intras(2), input_data, "Ewald.Component 2.", environment, &
-            mixture%components(2))
+        call ewald_factory_create(ewalds%intras(1), input_data, ewalds_prefix//"Component 1.", &
+            environment, mixture%components(1))
+        call ewald_factory_create(ewalds%intras(2), input_data, ewalds_prefix//"Component 2.", &
+            environment, mixture%components(2))
 
         !call ewald_factory_create(ewalds%inter%real_pair, input_data, "Ewald.Inter 12.", &
         !    environment, mixture%inter_diameter)

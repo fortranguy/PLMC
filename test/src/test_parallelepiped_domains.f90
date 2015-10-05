@@ -41,7 +41,7 @@ use json_module, only: json_file, json_initialize
 use procedures_checks, only: check_file_exists
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
-use procedures_parallelepiped_domain, only: parallelepiped_domains_overlap
+use procedures_parallelepiped_domain_macro, only: parallelepiped_domains_overlap
 use procedures_environment_factory, only: environment_factory_create, environment_factory_destroy
 use procedures_parallelepiped_domains_print, only: print_vertices
 

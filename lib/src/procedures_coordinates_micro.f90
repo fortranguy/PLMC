@@ -1,4 +1,4 @@
-module procedures_coordinates
+module procedures_coordinates_micro
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, iostat_end
 use data_constants, only: num_dimensions, max_line_length
@@ -57,4 +57,4 @@ contains
         close(file_unit)
     end subroutine read_coordinates
 
-end module procedures_coordinates
+end module procedures_coordinates_micro

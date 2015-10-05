@@ -35,7 +35,6 @@ end interface use_reciprocal_lattice
 
 interface use_walls
     module procedure :: use_walls_from_json
-    module procedure :: use_walls_from_floor_penetration
     module procedure :: use_walls_from_particles_wall_diameter
 end interface use_walls
 
@@ -51,7 +50,7 @@ end interface mixture_exists
 
 interface particles_are_dipolar
     module procedure :: particles_are_dipolar_from_json
-    module procedure :: particles_are_dipolar_from_norm_and_orientations
+    module procedure :: particles_are_dipolar_from_moment_norm
     module procedure :: particles_are_dipolar_from_dipolar_moments
 end interface particles_are_dipolar
 
@@ -84,17 +83,6 @@ contains
 
         use_walls = logical_from_json(input_data, prefix//"Walls.use")
     end function use_walls_from_json
-
-    logical function use_walls_from_floor_penetration(floor_penetration) result(use_walls)
-        class(Abstract_Floor_Penetration), intent(in) :: floor_penetration
-
-        select type (floor_penetration)
-            type is (Null_Floor_Penetration)
-                use_walls = .false.
-            class default
-                use_walls = .true.
-        end select
-    end function use_walls_from_floor_penetration
 
     logical function use_walls_from_particles_wall_diameter(particles_wall_diameter) &
         result(use_walls)
@@ -154,17 +142,6 @@ contains
         end select
     end function particles_interact
 
-    pure logical function particles_have_moment_norm(particles_moment_norm)
-        class(Abstract_Particles_Moment_Norm), intent(in) :: particles_moment_norm
-
-        select type (particles_moment_norm)
-            type is (Null_Particles_Moment_Norm)
-                particles_have_moment_norm = .false.
-            class default
-                particles_have_moment_norm = .true.
-        end select
-    end function particles_have_moment_norm
-
     pure logical function particles_have_positions(partcles_positions)
         class(Abstract_Particles_Positions), intent(in) :: partcles_positions
 
@@ -210,6 +187,18 @@ contains
         end if
     end function particles_are_dipolar_from_json
 
+    pure logical function particles_are_dipolar_from_moment_norm(particles_moment_norm) &
+        result(particles_are_dipolar)
+        class(Abstract_Particles_Moment_Norm), intent(in) :: particles_moment_norm
+
+        select type (particles_moment_norm)
+            type is (Null_Particles_Moment_Norm)
+                particles_are_dipolar = .false.
+            class default
+                particles_are_dipolar = .true.
+        end select
+    end function particles_are_dipolar_from_moment_norm
+
     pure logical function particles_have_orientations(particles_orientations)
         class(Abstract_Particles_Orientations), intent(in) :: particles_orientations
 
@@ -220,15 +209,6 @@ contains
                 particles_have_orientations = .true.
         end select
     end function particles_have_orientations
-
-    pure logical function particles_are_dipolar_from_norm_and_orientations(particles_moment_norm, &
-        particles_orientations) result(particles_are_dipolar)
-        class(Abstract_Particles_Moment_Norm), intent(in) :: particles_moment_norm
-        class(Abstract_Particles_Orientations), intent(in) :: particles_orientations
-
-        particles_are_dipolar = particles_have_moment_norm(particles_moment_norm) .and. &
-            particles_have_orientations(particles_orientations)
-    end function particles_are_dipolar_from_norm_and_orientations
 
     pure logical function particles_are_dipolar_from_dipolar_moments(particles_dipolar_moments) &
         result(particles_are_dipolar)

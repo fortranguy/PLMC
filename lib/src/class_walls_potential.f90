@@ -16,7 +16,7 @@ private
     private
         real(DP) :: gap
         class(Abstract_Periodic_Box), pointer :: periodic_box
-        class(Abstract_Floor_Penetration), pointer :: floor_penetration
+        class(Abstract_Floor_Penetration), allocatable :: floor_penetration
     contains
         procedure :: construct => Abstract_Walls_Potential_construct
         procedure :: destroy => Abstract_Walls_Potential_destroy
@@ -47,7 +47,7 @@ contains
         class(Abstract_Walls_Potential), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         real(DP), intent(in) :: gap
-        class(Abstract_Floor_Penetration), target, intent(in) :: floor_penetration
+        class(Abstract_Floor_Penetration), intent(in) :: floor_penetration
 
 
         real(DP) :: box_size(num_dimensions)
@@ -59,8 +59,15 @@ contains
             call error_exit("Abstract_Walls_Potential: gap is too big.")
         end if
         this%gap = gap
-        this%floor_penetration => floor_penetration
+        allocate(this%floor_penetration, source = floor_penetration)
     end subroutine Abstract_Walls_Potential_construct
+
+    subroutine Abstract_Walls_Potential_destroy(this)
+        class(Abstract_Walls_Potential), intent(inout) :: this
+
+        if (allocated(this%floor_penetration)) deallocate(this%floor_penetration)
+        this%periodic_box => null()
+    end subroutine Abstract_Walls_Potential_destroy
 
     pure function Abstract_Walls_Potential_get_gap(this) result(gap)
         class(Abstract_Walls_Potential), intent(in) :: this
@@ -111,13 +118,6 @@ contains
         position_from_ceiling = position - [0._DP, 0._DP, this%gap/2._DP]
     end function Abstract_Walls_Potential_position_from_ceiling
 
-    subroutine Abstract_Walls_Potential_destroy(this)
-        class(Abstract_Walls_Potential), intent(inout) :: this
-
-        this%floor_penetration => null()
-        this%periodic_box => null()
-    end subroutine Abstract_Walls_Potential_destroy
-
 !end implementation Abstract_Walls_Potential
 
 !implementation Null_Walls_Potential
@@ -126,7 +126,7 @@ contains
         class(Null_Walls_Potential), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         real(DP), intent(in) :: gap
-        class(Abstract_Floor_Penetration), target, intent(in) :: floor_penetration
+        class(Abstract_Floor_Penetration), intent(in) :: floor_penetration
     end subroutine Null_Walls_Potential_construct
 
     pure function Null_Walls_Potential_get_gap(this) result(gap)

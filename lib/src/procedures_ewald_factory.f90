@@ -45,57 +45,64 @@ contains
         type(Particles_Wrapper), intent(in) :: particles
 
         real(DP) :: alpha
+        logical :: dipolar
 
-        call set_alpha(alpha, input_data, prefix, environment%periodic_box)
-        call ewald_factory_create(ewald%real_pair, input_data, prefix//"Real.", alpha, &
-            environment%periodic_box, particles%diameter, particles%dipolar_moments)
-        call ewald_factory_create(ewald%real_particles, environment%periodic_box, &
+        dipolar = particles_are_dipolar(particles%dipolar_moments)
+        call set_alpha(alpha, dipolar, environment%periodic_box, input_data, prefix)
+        call ewald_factory_create(ewald%real_pair, dipolar, alpha, environment%periodic_box, &
+            particles%diameter, input_data, prefix//"Real.")
+        call ewald_factory_create(ewald%real_particles, dipolar, environment%periodic_box, &
             particles%positions, particles%dipolar_moments)
     end subroutine ewald_factory_create_all
 
-    subroutine set_alpha(alpha, input_data, prefix, periodic_box)
+    subroutine set_alpha(alpha, dipolar, periodic_box, input_data, prefix)
         real(DP), intent(out) :: alpha
+        logical, intent(in) :: dipolar
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
 
         character(len=:), allocatable :: data_field
         logical :: data_found
         real(DP) :: box_size(num_dimensions), alpha_times_box
 
-        data_field = prefix//"alpha * box size(1)"
-        call input_data%get(data_field, alpha_times_box, data_found)
-        call check_data_found(data_field, data_found)
-        box_size = periodic_box%get_size()
-        alpha = alpha_times_box / box_size(1)
-        deallocate(data_field)
+        if (dipolar) then
+            data_field = prefix//"alpha * box size(1)"
+            call input_data%get(data_field, alpha_times_box, data_found)
+            call check_data_found(data_field, data_found)
+            box_size = periodic_box%get_size()
+            alpha = alpha_times_box / box_size(1)
+            deallocate(data_field)
+        else
+            alpha = 0._DP
+        end if
     end subroutine set_alpha
 
-    subroutine allocate_and_construct_real_pair(real_pair, input_data, prefix, alpha, &
-        periodic_box, particles_diameter, particles_dipolar_moments)
+    subroutine allocate_and_construct_real_pair(real_pair, dipolar, alpha, periodic_box, &
+        particles_diameter, input_data, prefix)
         class(Abstract_Ewald_Real_Pair), allocatable, intent(out) :: real_pair
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
+        logical, intent(in) :: dipolar
         real(DP), intent(in) :: alpha
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Particles_Diameter), intent(in) :: particles_diameter
-        class(Abstract_Particles_Dipolar_Moments), intent(in) :: particles_dipolar_moments
-
-        call allocate_real_pair(real_pair, input_data, prefix, particles_dipolar_moments)
-        call construct_real_pair(real_pair, input_data, prefix, alpha, periodic_box, &
-            particles_diameter, particles_dipolar_moments)
-    end subroutine allocate_and_construct_real_pair
-
-    subroutine allocate_real_pair(real_pair, input_data, prefix, particles_dipolar_moments)
-        class(Abstract_Ewald_Real_Pair), allocatable, intent(out) :: real_pair
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
-        class(Abstract_Particles_Dipolar_Moments), intent(in) :: particles_dipolar_moments
+
+        call allocate_real_pair(real_pair, dipolar, input_data, prefix)
+        call construct_real_pair(real_pair, dipolar, alpha, periodic_box, particles_diameter, &
+            input_data, prefix)
+    end subroutine allocate_and_construct_real_pair
+
+    subroutine allocate_real_pair(real_pair, dipolar, input_data, prefix)
+        class(Abstract_Ewald_Real_Pair), allocatable, intent(out) :: real_pair
+        logical, intent(in) :: dipolar
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field
         logical :: data_found, tabulated_potential
 
-        if (particles_are_dipolar(particles_dipolar_moments)) then
+        if (dipolar) then
             data_field = prefix//"tabulated"
             call input_data%get(data_field, tabulated_potential, data_found)
             call check_data_found(data_field, data_found)
@@ -110,22 +117,22 @@ contains
         end if
     end subroutine allocate_real_pair
 
-    subroutine construct_real_pair(real_pair, input_data, prefix, alpha, periodic_box, &
-        particles_diameter, particles_dipolar_moments)
+    subroutine construct_real_pair(real_pair, dipolar, alpha, periodic_box, particles_diameter, &
+        input_data, prefix)
         class(Abstract_Ewald_Real_Pair), intent(inout) :: real_pair
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
+        logical, intent(in) :: dipolar
         real(DP), intent(in) :: alpha
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Particles_Diameter), intent(in) :: particles_diameter
-        class(Abstract_Particles_Dipolar_Moments), intent(in) :: particles_dipolar_moments
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field
         logical :: data_found
         type(Concrete_Potential_Domain) :: domain
         real(DP) :: box_size(num_dimensions), max_over_box
 
-        if (particles_are_dipolar(particles_dipolar_moments)) then
+        if (dipolar) then
             domain%min = particles_diameter%get_min()
             data_field = prefix//"max distance / box size(1)"
             call input_data%get(data_field, max_over_box, data_found)
@@ -142,14 +149,15 @@ contains
         call real_pair%construct(domain, alpha)
     end subroutine construct_real_pair
 
-    subroutine allocate_and_construct_real_particles(real_particles, periodic_box, &
+    subroutine allocate_and_construct_real_particles(real_particles, dipolar, periodic_box, &
         particles_positions, particles_dipolar_moments)
         class(Abstract_Ewald_Real_Particles), allocatable, intent(out) :: real_particles
+        logical, intent(in) :: dipolar
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Particles_Positions), intent(in) :: particles_positions
         class(Abstract_Particles_Dipolar_Moments), intent(in) :: particles_dipolar_moments
 
-        if (particles_are_dipolar(particles_dipolar_moments)) then
+        if (dipolar) then
             allocate(Concrete_Ewald_Real_Particles :: real_particles)
         else
             allocate(Null_Ewald_Real_Particles :: real_particles)

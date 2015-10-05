@@ -56,7 +56,7 @@ implicit none
     class(Abstract_Field_Expression), allocatable :: field_expression
     type(json_file) :: input_data
     character(len=:), allocatable :: data_filename, data_field
-    logical :: found
+    logical :: data_found
     real(DP), allocatable :: delta(:)
     integer :: field_unit
 
@@ -65,26 +65,25 @@ implicit none
     call check_file_exists(data_filename)
     call input_data%load_file(filename = data_filename)
 
-    call environment_factory_create(periodic_box, input_data, "Test External Field")
-    call environment_factory_create(field_expression, input_data, "Test External Field")
+    call environment_factory_create(periodic_box, input_data, "Environment.")
+    call environment_factory_create(field_expression, input_data, "Environment.")
     call environment_factory_create(parallelepiped_domain, input_data, &
-        "Test External Field.External Field", periodic_box)
+        "Environment.External Field.", periodic_box)
 
-    data_field = "Test External Field.External Field.delta"
-    call input_data%get(data_field, delta, found)
-    call check_data_found(data_field, found)
-    allocate(Concrete_External_Field :: external_field)
-    call external_field%construct(parallelepiped_domain, field_expression)
+    call environment_factory_create(external_field, input_data, "Environment.", &
+        parallelepiped_domain, field_expression)
+    call environment_factory_destroy(field_expression)
     open(newunit=field_unit, recl=4096, file="external_field.out", action="write")
+    data_field = "Environment.External Field.delta"
+    call input_data%get(data_field, delta, data_found)
+    call check_data_found(data_field, data_found)
     call write_field(field_unit, periodic_box, external_field, delta)
     deallocate(delta)
     close(field_unit)
 
-    call external_field%destroy()
-    deallocate(external_field)
+    call environment_factory_destroy(external_field)
     call environment_factory_destroy(parallelepiped_domain)
     call environment_factory_destroy(periodic_box)
-    call environment_factory_destroy(field_expression)
     deallocate(data_field)
     deallocate(data_filename)
     call input_data%destroy()

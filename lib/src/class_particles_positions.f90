@@ -5,7 +5,7 @@ use data_constants, only: num_dimensions
 use procedures_checks, only: check_in_range, check_3d_array
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_particles_number, only: Abstract_Particles_Number
-use procedures_coordinates, only: increase_coordinates_size
+use procedures_coordinates_micro, only: increase_coordinates_size
 use class_particles_coordinates, only: Abstract_Particles_Coordinates
 
 implicit none

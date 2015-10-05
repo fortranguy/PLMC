@@ -1,4 +1,4 @@
-module procedures_parallelepiped_domain
+module procedures_parallelepiped_domain_macro
 
 use class_parallelepiped_domain, only: Abstract_Parallelepiped_Domain
 
@@ -30,4 +30,4 @@ contains
         end do
     end function parallelepiped_domains_overlap
 
-end module procedures_parallelepiped_domain
+end module procedures_parallelepiped_domain_macro
