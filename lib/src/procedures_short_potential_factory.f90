@@ -1,6 +1,7 @@
 module procedures_short_potential_factory
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
+use data_wrappers_prefix, only: environment_prefix
 use json_module, only: json_file
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_data_found
@@ -12,8 +13,6 @@ use class_particles_diameter, only: Abstract_Particles_Diameter, &
     Null_Particles_Diameter
 use class_particles_positions, only: Abstract_Particles_Positions
 use types_particles_wrapper, only: Particles_Wrapper
-use procedures_property_inquirers, only: use_walls, particles_exist, particles_have_positions, &
-    particles_interact
 use class_potential_expression, only: Abstract_Potential_Expression, &
     Null_Potential_Expression, Lennard_Jones_Expression
 use types_potential_domain, only: Concrete_Potential_Domain
@@ -27,6 +26,8 @@ use class_visitable_cells, only: Abstract_Visitable_Cells, &
     Null_Visitable_Cells, XYZ_PBC_Visitable_Cells, XY_PBC_Visitable_Cells
 use types_short_potential_wrapper, only: Short_Potential_Wrapper, &
     Short_Potential_Macro_Wrapper, Short_Potential_Micro_Wrapper
+use procedures_property_inquirers, only: use_walls, particles_exist, particles_have_positions, &
+    particles_interact
 
 implicit none
 
@@ -57,80 +58,93 @@ end interface short_potential_factory_destroy
 
 contains
 
-    subroutine short_potential_factory_create_all(short_potential, input_data, prefix, &
-        environment, particles)
+    subroutine short_potential_factory_create_all(short_potential, environment, particles, &
+        input_data, prefix)
         type(Short_Potential_Wrapper), intent(out) :: short_potential
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
         type(Environment_Wrapper), intent(in) :: environment
         type(Particles_Wrapper), intent(in) :: particles
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
 
-        call short_potential_factory_create(short_potential%expression, input_data, prefix, &
-            particles%diameter)
-        call short_potential_factory_create(short_potential%wall_expression, input_data, &
-            prefix//"With Walls.", particles%wall_diameter)
-        call short_potential_factory_create(short_potential%pair, input_data, prefix, &
-            particles%diameter, short_potential%expression)
-        call short_potential_factory_create(short_potential%wall_pair, input_data, &
-            prefix//"With Walls.", particles%wall_diameter, short_potential%wall_expression)
+        class(Abstract_Potential_Expression), allocatable :: expression, wall_expression
+        class(Abstract_Visitable_List), allocatable :: list
+        logical :: exist, exist_and_walls_used, interact
+
+        exist = particles_exist(particles%number)
+        call short_potential_factory_create(expression, exist, input_data, prefix)
+        call short_potential_factory_create(short_potential%pair, exist, particles%diameter, &
+            expression, input_data, prefix)
+        call short_potential_factory_destroy(expression)
+        exist_and_walls_used = exist .and. use_walls(input_data, environment_prefix)
+        call short_potential_factory_create(wall_expression, exist_and_walls_used, &
+            input_data, prefix//"With Walls.")
+        call short_potential_factory_create(short_potential%wall_pair, exist_and_walls_used, &
+            particles%wall_diameter, wall_expression, input_data, prefix//"With Walls.")
+        call short_potential_factory_destroy(wall_expression)
         call short_potential_factory_create(short_potential%particles, environment%periodic_box, &
             particles%positions)
-        call short_potential_factory_create(short_potential%list, input_data, prefix, &
-            short_potential%pair)
-        call short_potential_factory_create(short_potential%cells, short_potential%list, &
+        interact = particles_interact(short_potential%pair)
+        call short_potential_factory_create(list, interact, input_data, prefix)
+        call short_potential_factory_create(short_potential%cells, interact, list, &
             environment%periodic_box, particles%positions, short_potential%pair)
+        call short_potential_factory_destroy(list)
     end subroutine short_potential_factory_create_all
 
     subroutine short_potential_factory_create_macro(short_potential_macro, short_potential_micro, &
-        input_data, prefix, periodic_box, particles_positions)
+        periodic_box, particles_positions, input_data, prefix)
         type(Short_Potential_Macro_Wrapper), intent(out) :: short_potential_macro
         type(Short_Potential_Micro_Wrapper), intent(in) :: short_potential_micro
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Particles_Positions), intent(in) :: particles_positions
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
 
-        call short_potential_factory_create(short_potential_macro%list, input_data, prefix, &
-            short_potential_micro%pair)
-        call short_potential_factory_create(short_potential_macro%cells, &
-            short_potential_macro%list, periodic_box, particles_positions, &
-            short_potential_micro%pair)
+        class(Abstract_Visitable_List), allocatable :: list
+        logical :: interact
+
+        interact = particles_interact(short_potential_micro%pair)
+        call short_potential_factory_create(list, interact, input_data, prefix)
+        call short_potential_factory_create(short_potential_macro%cells, interact, list, &
+            periodic_box, particles_positions, short_potential_micro%pair)
+        call short_potential_factory_destroy(list)
     end subroutine short_potential_factory_create_macro
 
-    subroutine short_potential_factory_create_micro(short_potential_micro, input_data, prefix, &
-        particles_diameter)
+    subroutine short_potential_factory_create_micro(short_potential_micro, exist, &
+        particles_diameter, input_data, prefix)
         type(Short_Potential_Micro_Wrapper), intent(out) :: short_potential_micro
+        logical, intent(in) :: exist
+        class(Abstract_Particles_Diameter), intent(in) :: particles_diameter
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
-        class(Abstract_Particles_Diameter), intent(in) :: particles_diameter
 
-        call short_potential_factory_create(short_potential_micro%expression, input_data, prefix, &
-            particles_diameter)
-        call short_potential_factory_create(short_potential_micro%pair, input_data, prefix, &
-            particles_diameter, short_potential_micro%expression)
+        class(Abstract_Potential_Expression), allocatable :: expression
+
+        call short_potential_factory_create(expression, exist, input_data, prefix)
+        call short_potential_factory_create(short_potential_micro%pair, exist, particles_diameter, &
+            expression, input_data, prefix)
+        call short_potential_factory_destroy(expression)
     end subroutine short_potential_factory_create_micro
 
-    subroutine allocate_and_set_expression(potential_expression, input_data, prefix, &
-        particles_diameter)
+    subroutine allocate_and_set_expression(potential_expression, exist, input_data, prefix)
         class(Abstract_Potential_Expression), allocatable, intent(out) :: potential_expression
+        logical, intent(in) :: exist
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
-        class(Abstract_Particles_Diameter), intent(in) :: particles_diameter
 
-        call allocate_expression(potential_expression, input_data, prefix, particles_diameter)
+        call allocate_expression(potential_expression, exist, input_data, prefix)
         call set_expression(potential_expression, input_data, prefix)
     end subroutine allocate_and_set_expression
 
-    subroutine allocate_expression(potential_expression, input_data, prefix, particles_diameter)
+    subroutine allocate_expression(potential_expression, exist, input_data, prefix)
         class(Abstract_Potential_Expression), allocatable, intent(out) :: potential_expression
+        logical, intent(in) :: exist
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
-        class(Abstract_Particles_Diameter), intent(in) :: particles_diameter
 
         character(len=:), allocatable :: data_field, potential_name
         logical :: data_found
 
-        if (particles_exist(particles_diameter)) then
+        if (exist) then
             data_field = prefix//"name"
             call input_data%get(data_field, potential_name, data_found)
             call check_data_found(data_field, data_found)
@@ -176,29 +190,30 @@ contains
         if (allocated(data_field)) deallocate(data_field)
     end subroutine set_expression
 
-    subroutine allocate_and_construct_pair(pair_potential, input_data, prefix, &
-        particles_diameter, potential_expression)
+    subroutine allocate_and_construct_pair(pair_potential, exist, particles_diameter, &
+        potential_expression, input_data, prefix)
         class(Abstract_Pair_Potential), allocatable, intent(out) :: pair_potential
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
+        logical, intent(in) :: exist
         class(Abstract_Particles_Diameter), intent(in) :: particles_diameter
         class(Abstract_Potential_Expression), intent(in) :: potential_expression
-
-        call allocate_pair(pair_potential, input_data, prefix, particles_diameter)
-        call construct_pair(pair_potential, input_data, prefix, particles_diameter, &
-            potential_expression)
-    end subroutine allocate_and_construct_pair
-
-    subroutine allocate_pair(pair_potential, input_data, prefix, particles_diameter)
-        class(Abstract_Pair_Potential), allocatable, intent(out) :: pair_potential
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
-        class(Abstract_Particles_Diameter), intent(in) :: particles_diameter
+
+        call allocate_pair(pair_potential, exist, input_data, prefix)
+        call construct_pair(pair_potential, exist, particles_diameter, potential_expression, &
+            input_data, prefix)
+    end subroutine allocate_and_construct_pair
+
+    subroutine allocate_pair(pair_potential, exist, input_data, prefix)
+        class(Abstract_Pair_Potential), allocatable, intent(out) :: pair_potential
+        logical, intent(in) :: exist
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field
         logical :: data_found, tabulated_potential
 
-        if (particles_exist(particles_diameter)) then
+        if (exist) then
             data_field = prefix//"tabulated"
             call input_data%get(data_field, tabulated_potential, data_found)
             call check_data_found(data_field, data_found)
@@ -213,19 +228,20 @@ contains
         end if
     end subroutine allocate_pair
 
-    subroutine construct_pair(pair_potential, input_data, prefix, particles_diameter, &
-        potential_expression)
+    subroutine construct_pair(pair_potential, exist, particles_diameter, potential_expression, &
+        input_data, prefix)
         class(Abstract_Pair_Potential), intent(inout) :: pair_potential
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
+        logical, intent(in) :: exist
         class(Abstract_Particles_Diameter), intent(in) :: particles_diameter
         class(Abstract_Potential_Expression), intent(in) :: potential_expression
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field
         logical :: data_found
         type(Concrete_Potential_Domain) :: domain
 
-        if (particles_exist(particles_diameter)) then
+        if (exist) then
             domain%min = particles_diameter%get_min()
             select type (potential_expression)
                 type is (Null_Potential_Expression)
@@ -259,16 +275,16 @@ contains
         call particles_potential%construct(periodic_box, particles_positions)
     end subroutine allocate_and_construct_particles
 
-    subroutine allocate_list(visitable_list, input_data, prefix, pair_potential)
+    subroutine allocate_list(visitable_list, interact, input_data, prefix)
         class(Abstract_Visitable_List), allocatable, intent(out) :: visitable_list
+        logical, intent(in) :: interact
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
-        class(Abstract_Pair_Potential), intent(in) :: pair_potential
 
         character(len=:), allocatable :: data_field, cells_data_structure
         logical :: data_found
 
-        if (particles_interact(pair_potential)) then
+        if (interact) then
             data_field = prefix//"Cells.data structure"
             call input_data%get(data_field, cells_data_structure, data_found)
             call check_data_found(data_field, data_found)
@@ -287,15 +303,16 @@ contains
         end if
     end subroutine allocate_list
 
-    subroutine allocate_and_construct_cells(visitable_cells, visitable_list, periodic_box, &
-        particles_positions, pair_potential)
+    subroutine allocate_and_construct_cells(visitable_cells, interact, visitable_list, &
+        periodic_box, particles_positions, pair_potential)
         class(Abstract_Visitable_Cells), allocatable, intent(out) :: visitable_cells
+        logical, intent(in) :: interact
         class(Abstract_Visitable_List), intent(in) :: visitable_list
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Particles_Positions), intent(in) :: particles_positions
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
 
-        if (particles_interact(pair_potential)) then
+        if (interact) then
             select type(periodic_box)
                 type is (XYZ_Periodic_Box)
                     allocate(XYZ_PBC_Visitable_Cells :: visitable_cells)
@@ -315,26 +332,21 @@ contains
         type(Short_Potential_Micro_Wrapper), intent(inout) :: short_potential_micro
 
         call short_potential_factory_destroy(short_potential_micro%pair)
-        call short_potential_factory_destroy(short_potential_micro%expression)
     end subroutine short_potential_factory_destroy_micro
 
     subroutine short_potential_factory_destroy_macro(short_potential_macro)
         type(Short_Potential_Macro_Wrapper), intent(inout) :: short_potential_macro
 
         call short_potential_factory_destroy(short_potential_macro%cells)
-        call short_potential_factory_destroy(short_potential_macro%list)
     end subroutine short_potential_factory_destroy_macro
 
     subroutine short_potential_factory_destroy_all(short_potential)
         type(Short_Potential_Wrapper), intent(inout) :: short_potential
 
         call short_potential_factory_destroy(short_potential%cells)
-        call short_potential_factory_destroy(short_potential%list)
         call short_potential_factory_destroy(short_potential%particles)
         call short_potential_factory_destroy(short_potential%wall_pair)
         call short_potential_factory_destroy(short_potential%pair)
-        call short_potential_factory_destroy(short_potential%wall_expression)
-        call short_potential_factory_destroy(short_potential%expression)
     end subroutine short_potential_factory_destroy_all
 
     subroutine deallocate_expression(potential_expression)

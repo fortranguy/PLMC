@@ -1,7 +1,9 @@
 module procedures_observable_writers_factory
 
 use json_module, only: json_file
+use data_wrappers_prefix, only: environment_prefix
 use procedures_checks, only: check_data_found
+use class_walls_potential, only: Abstract_Walls_Potential
 use class_particles_number, only: Abstract_Particles_Number
 use class_particles_diameter, only: Abstract_Particles_Diameter
 use class_particles_positions, only: Abstract_Particles_Positions
@@ -18,9 +20,8 @@ use class_changes_writer, only: Concrete_Changes_Selector, &
 use class_particles_coordinates_writer, only: Concrete_Coordinates_Writer_Selector, &
     Abstract_Particles_Coordinates_Writer, Concrete_Particles_Coordinates_Writer, &
     Null_Particles_Coordinates_Writer
-use procedures_property_inquirers, only: use_walls, particles_exist, mixture_exists, &
-    particles_have_positions, particles_have_orientations, &
-    particles_can_move, particles_can_rotate, particles_can_exchange
+use procedures_property_inquirers, only: use_walls, particles_exist, particles_have_positions, &
+    particles_have_orientations, particles_can_move, particles_can_rotate, particles_can_exchange
 
 implicit none
 
@@ -43,31 +44,33 @@ end interface observable_writers_factory_destroy
 
 contains
 
-    subroutine allocate_and_construct_energy_writer(particles_energy_writer, particles_number, &
-        wall_diameter, filename)
+    subroutine allocate_and_construct_energy_writer(particles_energy_writer, walls_potential, &
+        particles_number, filename)
         class(Abstract_Particles_Energy_Writer), allocatable, intent(out) :: particles_energy_writer
+        class(Abstract_Walls_Potential), intent(in) :: walls_potential
         class(Abstract_Particles_Number), intent(in) :: particles_number
-        class(Abstract_Particles_Diameter), intent(in) :: wall_diameter
         character(len=*), intent(in) :: filename
 
         type(Concrete_Energy_Writer_Selector) :: energy_selector
+        logical :: exist
 
-        if (particles_exist(particles_number)) then
+        exist = particles_exist(particles_number)
+        if (exist) then
             allocate(Concrete_Particles_Energy_Writer :: particles_energy_writer)
         else
             allocate(Null_Particles_Energy_Writer :: particles_energy_writer)
         end if
-        energy_selector%write_walls = use_walls(wall_diameter)
+        energy_selector%write_walls = exist .and. use_walls(walls_potential)
         call particles_energy_writer%construct(filename, energy_selector)
     end subroutine allocate_and_construct_energy_writer
 
-    subroutine allocate_and_construct_inter_energy_writer(inter_energy_writer, &
-        inter_diameter, filename)
+    subroutine allocate_and_construct_inter_energy_writer(inter_energy_writer, mixture_exists, &
+        filename)
         class(Abstract_Inter_Energy_Writer), allocatable, intent(out) :: inter_energy_writer
-        class(Abstract_Particles_Diameter), intent(in) :: inter_diameter
+        logical, intent(in) :: mixture_exists
         character(len=*), intent(in) :: filename
 
-        if (mixture_exists(inter_diameter)) then
+        if (mixture_exists) then
             allocate(Concrete_Inter_Energy_Writer :: inter_energy_writer)
         else
             allocate(Null_Inter_Energy_Writer :: inter_energy_writer)
@@ -121,7 +124,8 @@ contains
         else
             allocate(Null_Particles_Coordinates_Writer :: particles_coordinates_writer)
         end if
-        coordinates_selector%write_orientations = particles_have_orientations(particles_orientations)
+        coordinates_selector%write_orientations = &
+            particles_have_orientations(particles_orientations)
         call particles_coordinates_writer%construct(basename, particles_positions, &
             particles_orientations, coordinates_selector)
         deallocate(data_field)

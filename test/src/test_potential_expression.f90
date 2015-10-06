@@ -57,9 +57,9 @@ implicit none
     call input_data%load_file(filename = data_filename)
     deallocate(data_filename)
 
-    call particles_factory_create(diameter, input_data, "Test Potential Expression")
-    call short_potential_factory_create(potential_expression, input_data, &
-        "Test Potential Expression", diameter)
+    call particles_factory_create(diameter, .true., input_data, "Test Potential Expression")
+    call short_potential_factory_create(potential_expression, .true., input_data, &
+        "Test Potential Expression")
 
     data_field = "Test Potential Expression.Potential.minimum distance"
     call input_data%get(data_field, min_distance, data_found)

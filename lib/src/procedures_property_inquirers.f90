@@ -2,7 +2,7 @@ module procedures_property_inquirers
 
 use json_module, only: json_file
 use procedures_checks, only: check_data_found
-use class_floor_penetration, only: Abstract_Floor_Penetration, Null_Floor_Penetration
+use class_walls_potential, only: Abstract_Walls_Potential, Null_Walls_Potential
 use class_particles_number, only: Abstract_Particles_Number, Null_Particles_Number
 use class_particles_diameter, only: Abstract_Particles_Diameter, Null_Particles_Diameter
 use class_particles_moment_norm, only: Abstract_Particles_Moment_Norm, Null_Particles_Moment_Norm
@@ -21,9 +21,8 @@ implicit none
 
 private
 public :: apply_external_field, use_reciprocal_lattice, use_walls, &
-    particles_exist, mixture_exists, particles_have_positions, particles_can_move, &
-    particles_are_dipolar, particles_have_orientations, particles_can_exchange, &
-    particles_can_rotate, particles_interact
+    particles_exist, particles_have_positions, particles_can_move, particles_are_dipolar, &
+    particles_have_orientations, particles_can_exchange, particles_can_rotate, particles_interact
 
 interface apply_external_field
     module procedure :: apply_external_field_from_json
@@ -35,22 +34,16 @@ end interface use_reciprocal_lattice
 
 interface use_walls
     module procedure :: use_walls_from_json
-    module procedure :: use_walls_from_particles_wall_diameter
+    module procedure :: use_walls_from_walls_potential
 end interface use_walls
 
 interface particles_exist
     module procedure :: particles_exist_from_json
     module procedure :: particles_exist_from_number
-    module procedure :: particles_exist_from_diameter
 end interface particles_exist
-
-interface mixture_exists
-    module procedure :: mixture_exists_from_inter_diameter
-end interface mixture_exists
 
 interface particles_are_dipolar
     module procedure :: particles_are_dipolar_from_json
-    module procedure :: particles_are_dipolar_from_moment_norm
     module procedure :: particles_are_dipolar_from_dipolar_moments
 end interface particles_are_dipolar
 
@@ -84,17 +77,16 @@ contains
         use_walls = logical_from_json(input_data, prefix//"Walls.use")
     end function use_walls_from_json
 
-    logical function use_walls_from_particles_wall_diameter(particles_wall_diameter) &
-        result(use_walls)
-        class(Abstract_Particles_Diameter), intent(in) :: particles_wall_diameter
+    logical function use_walls_from_walls_potential(walls_potential) result(use_walls)
+        class(Abstract_Walls_Potential), intent(in) :: walls_potential
 
-        select type (particles_wall_diameter)
-            type is (Null_Particles_Diameter)
+        select type (walls_potential)
+            type is (Null_Walls_Potential)
                 use_walls = .false.
             class default
                 use_walls = .true.
         end select
-    end function use_walls_from_particles_wall_diameter
+    end function use_walls_from_walls_potential
 
     logical function particles_exist_from_json(input_data, prefix) result(particles_exist)
         type(json_file), intent(inout) :: input_data
@@ -124,12 +116,6 @@ contains
                 particles_exist = .true.
         end select
     end function particles_exist_from_diameter
-
-    pure logical function mixture_exists_from_inter_diameter(inter_diameter) result(mixture_exists)
-        class(Abstract_Particles_Diameter), intent(in) :: inter_diameter
-
-        mixture_exists = particles_exist(inter_diameter)
-    end function mixture_exists_from_inter_diameter
 
     pure logical function particles_interact(pair_potential)
         class(Abstract_Pair_Potential), intent(in) :: pair_potential

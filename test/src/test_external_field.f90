@@ -40,6 +40,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64, output_unit
 use json_module, only: json_file, json_initialize
 use procedures_checks, only: check_file_exists, check_data_found
 use procedures_errors, only: error_exit
+use procedures_property_inquirers, only: apply_external_field
 use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box
 use class_field_expression, only: Abstract_Field_Expression
 use procedures_environment_factory, only: environment_factory_create, environment_factory_destroy
@@ -59,6 +60,7 @@ implicit none
     logical :: data_found
     real(DP), allocatable :: delta(:)
     integer :: field_unit
+    logical :: field_applied
 
     call json_initialize()
     data_filename = "external_field.json"
@@ -66,12 +68,12 @@ implicit none
     call input_data%load_file(filename = data_filename)
 
     call environment_factory_create(periodic_box, input_data, "Environment.")
-    call environment_factory_create(field_expression, input_data, "Environment.")
-    call environment_factory_create(parallelepiped_domain, input_data, &
-        "Environment.External Field.", periodic_box)
-
-    call environment_factory_create(external_field, input_data, "Environment.", &
-        parallelepiped_domain, field_expression)
+    field_applied = apply_external_field(input_data, "Environment.")
+    call environment_factory_create(field_expression, field_applied, input_data, "Environment.")
+    call environment_factory_create(parallelepiped_domain, field_applied, periodic_box, &
+        input_data, "Environment.External Field.")
+    call environment_factory_create(external_field, field_applied, parallelepiped_domain, &
+        field_expression)
     call environment_factory_destroy(field_expression)
     open(newunit=field_unit, recl=4096, file="external_field.out", action="write")
     data_field = "Environment.External Field.delta"

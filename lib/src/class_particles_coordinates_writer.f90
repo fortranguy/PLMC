@@ -39,7 +39,10 @@ private
 
     type, extends(Abstract_Particles_Coordinates_Writer), public :: &
         Null_Particles_Coordinates_Writer
-
+    contains
+        procedure :: construct => Null_Particles_Coordinates_Writer_construct
+        procedure :: destroy => Null_Particles_Coordinates_Writer_destroy
+        procedure :: write => Null_Particles_Coordinates_Writer_write
     end type Null_Particles_Coordinates_Writer
 
 contains
@@ -103,18 +106,18 @@ contains
 
 !implementation Null_Particles_Coordinates_Writer
 
-    subroutine Null_Particles_Coordinates_Writer_construct(this, filename, positions, &
+    subroutine Null_Particles_Coordinates_Writer_construct(this, basename, positions, &
         orientations, coordinates_selector)
         class(Null_Particles_Coordinates_Writer), intent(out) :: this
-        character(len=*), intent(in) :: filename
+        character(len=*), intent(in) :: basename
         class(Abstract_Particles_Positions), target, intent(in) :: positions
         class(Abstract_Particles_Orientations), target, intent(in) :: orientations
         type(Concrete_Coordinates_Writer_Selector), intent(in) :: coordinates_selector
     end subroutine Null_Particles_Coordinates_Writer_construct
 
-    subroutine Null_Particles_Coordinates_Writer_destory(this)
+    subroutine Null_Particles_Coordinates_Writer_destroy(this)
         class(Null_Particles_Coordinates_Writer), intent(inout) :: this
-    end subroutine Null_Particles_Coordinates_Writer_destory
+    end subroutine Null_Particles_Coordinates_Writer_destroy
 
     subroutine Null_Particles_Coordinates_Writer_write(this, i_step)
         class(Null_Particles_Coordinates_Writer), intent(in) :: this

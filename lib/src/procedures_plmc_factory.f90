@@ -6,6 +6,7 @@ use data_wrappers_prefix, only:environment_prefix, mixtures_prefix, changes_pref
 use json_module, only: json_file, json_initialize
 use procedures_command_arguments, only: set_filename_from_argument
 use class_periodic_box, only: Abstract_Periodic_Box
+use class_walls_potential, only: Abstract_Walls_Potential
 use types_environment_wrapper, only: Environment_Wrapper
 use procedures_environment_factory, only: environment_factory_create, environment_factory_destroy
 use types_particles_wrapper, only: Mixture_Wrapper, Particles_Wrapper
@@ -20,6 +21,7 @@ use procedures_ewald_factory, only: ewald_factory_create, ewald_factory_destroy
 use types_observable_writers_wrapper, only: Mixture_Observable_Writers_Wrapper
 use procedures_observable_writers_factory, only: observable_writers_factory_create, &
     observable_writers_factory_destroy
+use procedures_property_inquirers, only: particles_exist
 
 implicit none
 
@@ -72,17 +74,22 @@ contains
         call environment_factory_destroy(environment)
     end subroutine destroy_environment
 
-    subroutine create_mixture(mixture, input_data, environment)
+    subroutine create_mixture(mixture, environment, input_data)
         type(Mixture_Wrapper), intent(out) :: mixture
-        type(json_file), intent(inout) :: input_data
         type(Environment_Wrapper), intent(in) :: environment
+        type(json_file), intent(inout) :: input_data
 
-        call particles_factory_create(mixture%components(1), input_data, &
-            mixtures_prefix//"Component 1.", environment)
-        call particles_factory_create(mixture%components(2), input_data, &
-            mixtures_prefix//"Component 2.", environment)
-        call particles_factory_create(mixture%inter_diameter, mixture%components(1)%diameter, &
-            mixture%components(2)%diameter, input_data, mixtures_prefix//"Inter 12.")
+        logical :: mixture_exists
+
+        call particles_factory_create(mixture%components(1), environment, input_data, &
+            mixtures_prefix//"Component 1.")
+        call particles_factory_create(mixture%components(2), environment, input_data, &
+            mixtures_prefix//"Component 2.")
+        mixture_exists = particles_exist(mixture%components(1)%number) .and. &
+            particles_exist(mixture%components(2)%number)
+        call particles_factory_create(mixture%inter_diameter, mixture_exists, &
+            mixture%components(1)%diameter, mixture%components(2)%diameter, input_data, &
+            mixtures_prefix//"Inter 12.")
     end subroutine create_mixture
 
     subroutine destroy_mixture(mixture)
@@ -93,16 +100,16 @@ contains
         call particles_factory_destroy(mixture%components(1))
     end subroutine destroy_mixture
 
-    subroutine create_changes(changes, input_data, periodic_box, components)
+    subroutine create_changes(changes, periodic_box, components, input_data)
         type(Changes_Wrapper), intent(out) :: changes(num_components)
-        type(json_file), intent(inout) :: input_data
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(Particles_Wrapper), intent(in) :: components(num_components)
+        type(json_file), intent(inout) :: input_data
 
-        call changes_factory_create(changes(1), input_data, changes_prefix//"Component 1.", &
-            periodic_box, components(1))
-        call changes_factory_create(changes(2), input_data, changes_prefix//"Component 2.", &
-            periodic_box, components(2))
+        call changes_factory_create(changes(1), periodic_box, components(1), input_data, &
+            changes_prefix//"Component 1.")
+        call changes_factory_create(changes(2), periodic_box, components(2), input_data, &
+            changes_prefix//"Component 2.")
     end subroutine create_changes
 
     subroutine destroy_changes(changes)
@@ -112,24 +119,28 @@ contains
         call changes_factory_destroy(changes(2))
     end subroutine destroy_changes
 
-    subroutine create_short_potentials(short_potentials, input_data, environment, mixture)
+    subroutine create_short_potentials(short_potentials, environment, mixture, input_data)
         type(Mixture_Short_Potentials_Wrapper), intent(out) :: short_potentials
-        type(json_file), intent(inout) :: input_data
         type(Environment_Wrapper), intent(in) :: environment
         type(Mixture_Wrapper), intent(in) :: mixture
+        type(json_file), intent(inout) :: input_data
 
-        call short_potential_factory_create(short_potentials%intras(1), input_data, &
-            short_potentials_prefix//"Component 1.", environment, mixture%components(1))
-        call short_potential_factory_create(short_potentials%intras(2), input_data, &
-            short_potentials_prefix//"Component 2.", environment, mixture%components(2))
-        call short_potential_factory_create(short_potentials%inter_micro, input_data, &
-            short_potentials_prefix//"Inter 12.", mixture%inter_diameter)
+        logical :: mixture_exists
+
+        call short_potential_factory_create(short_potentials%intras(1), environment, &
+            mixture%components(1), input_data, short_potentials_prefix//"Component 1.")
+        call short_potential_factory_create(short_potentials%intras(2), environment, &
+            mixture%components(2), input_data, short_potentials_prefix//"Component 2.")
+        mixture_exists = particles_exist(mixture%components(1)%number) .and. &
+            particles_exist(mixture%components(2)%number)
+        call short_potential_factory_create(short_potentials%inter_micro, mixture_exists, &
+            mixture%inter_diameter, input_data, short_potentials_prefix//"Inter 12.")
         call short_potential_factory_create(short_potentials%inters(1), &
-            short_potentials%inter_micro, input_data, short_potentials_prefix//"Inter 12.", &
-            environment%periodic_box, mixture%components(1)%positions)
+            short_potentials%inter_micro, environment%periodic_box, &
+            mixture%components(1)%positions, input_data, short_potentials_prefix//"Inter 12.")
         call short_potential_factory_create(short_potentials%inters(2), &
-            short_potentials%inter_micro, input_data, short_potentials_prefix//"Inter 12.", &
-            environment%periodic_box, mixture%components(2)%positions)
+            short_potentials%inter_micro, environment%periodic_box, &
+            mixture%components(2)%positions, input_data, short_potentials_prefix//"Inter 12.")
     end subroutine create_short_potentials
 
     subroutine destroy_short_potentials(short_potentials)
@@ -142,11 +153,11 @@ contains
         call short_potential_factory_destroy(short_potentials%intras(1))
     end subroutine destroy_short_potentials
 
-    subroutine create_ewalds(ewalds, input_data, environment, mixture)
+    subroutine create_ewalds(ewalds, environment, mixture, input_data)
         type(Mixture_Ewald_Wrapper), intent(out) :: ewalds
-        type(json_file), intent(inout) :: input_data
         type(Environment_Wrapper), intent(in) :: environment
         type(Mixture_Wrapper), intent(in) :: mixture
+        type(json_file), intent(inout) :: input_data
 
         call ewald_factory_create(ewalds%intras(1), input_data, ewalds_prefix//"Component 1.", &
             environment, mixture%components(1))
@@ -164,20 +175,24 @@ contains
         call ewald_factory_destroy(ewalds%intras(1))
     end subroutine destroy_ewalds
 
-    subroutine create_observable_writers(observable_writers, input_data, mixture, changes)
+    subroutine create_observable_writers(observable_writers, walls_potential, mixture, changes, &
+        input_data)
         type(Mixture_Observable_Writers_Wrapper), intent(out) :: observable_writers
-        type(json_file), intent(inout) :: input_data
+        class(Abstract_Walls_Potential), intent(in) :: walls_potential
         type(Mixture_Wrapper), intent(in) :: mixture
         type(Changes_Wrapper), intent(in) :: changes(num_components)
+        type(json_file), intent(inout) :: input_data
+
+        logical :: mixture_exists
 
         call observable_writers_factory_create(observable_writers%intras(1)%energy, &
-            mixture%components(1)%number, mixture%components(1)%wall_diameter, &
-            "component_1_energy.out")
+            walls_potential, mixture%components(1)%number, "component_1_energy.out")
         call observable_writers_factory_create(observable_writers%intras(2)%energy, &
-            mixture%components(2)%number, mixture%components(2)%wall_diameter, &
-            "component_2_energy.out")
-        call observable_writers_factory_create(observable_writers%inter_energy, &
-            mixture%inter_diameter, "inter_12_energy.out")
+            walls_potential, mixture%components(2)%number, "component_2_energy.out")
+        mixture_exists = particles_exist(mixture%components(1)%number) .and. &
+            particles_exist(mixture%components(2)%number)
+        call observable_writers_factory_create(observable_writers%inter_energy, mixture_exists, &
+            "inter_12_energy.out")
         call observable_writers_factory_create(observable_writers%intras(1)%changes, &
             changes(1)%moved_positions, changes(1)%rotated_orientations, &
             changes(1)%particles_exchange, "component_1_success.out")
@@ -194,6 +209,7 @@ contains
 
     subroutine destroy_observable_writers(observable_writers)
         type(Mixture_Observable_Writers_Wrapper), intent(inout) :: observable_writers
+
         call observable_writers_factory_destroy(observable_writers%intras(2)%coordinates)
         call observable_writers_factory_destroy(observable_writers%intras(1)%coordinates)
         call observable_writers_factory_destroy(observable_writers%intras(2)%changes)

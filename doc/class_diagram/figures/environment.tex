@@ -99,7 +99,7 @@
 \begin{scope}[on background layer]
     \aggregation{ParallelepipedDomain}{periodicBox}{1}{PeriodicBox}
     \aggregation{ReciprocalLattice}{periodicBox}{1}{PeriodicBox}
-    \aggregation{ExternalField}{parallelepipedDomain}{1}{ParallelepipedDomain}
-    \aggregation{ExternalField}{fieldExpression}{1}{FieldExpression}
-    \aggregation{WallsPotential}{floorPenetration}{1}{FloorPenetration}
+    \composition{ExternalField}{parallelepipedDomain}{1}{ParallelepipedDomain}
+    \composition{ExternalField}{fieldExpression}{1}{FieldExpression}
+    \composition{WallsPotential}{floorPenetration}{1}{FloorPenetration}
 \end{scope}

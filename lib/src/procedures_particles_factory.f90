@@ -1,13 +1,11 @@
 module procedures_particles_factory
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use data_wrappers_prefix, only: environment_prefix
 use json_module, only: json_file
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_data_found
 use procedures_coordinates_micro, only: read_coordinates
 use class_periodic_box, only: Abstract_Periodic_Box
-use class_floor_penetration, only: Abstract_Floor_Penetration
 use types_environment_wrapper, only: Environment_Wrapper
 use class_particles_number, only: Abstract_Particles_Number, &
     Concrete_Particles_Number, Null_Particles_Number
@@ -39,7 +37,6 @@ interface particles_factory_create
     module procedure :: particles_factory_create_all
     module procedure :: allocate_and_set_number
     module procedure :: allocate_and_set_diameter
-    module procedure :: allocate_and_set_wall_diameter
     module procedure :: allocate_and_set_inter_diameter
     module procedure :: allocate_and_set_moment_norm
     module procedure :: allocate_and_construct_positions
@@ -68,31 +65,36 @@ end interface particles_factory_destroy
 
 contains
 
-    subroutine particles_factory_create_all(particles, input_data, prefix, environment)
+    subroutine particles_factory_create_all(particles, environment, input_data, prefix)
         type(Particles_Wrapper), intent(out) :: particles
+        type(Environment_Wrapper), intent(in) :: environment
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
-        type(Environment_Wrapper), intent(in) :: environment
 
-        call particles_factory_create(particles%number, input_data, prefix)
-        call particles_factory_create(particles%diameter, input_data, prefix)
-        call particles_factory_create(particles%wall_diameter, particles%diameter, input_data, &
-            prefix)
-        call particles_factory_create(particles%moment_norm, input_data, prefix)
-        call particles_factory_create(particles%positions, environment%periodic_box, &
+        logical :: exist, exist_and_walls_used, dipolar
+
+        exist = particles_exist(input_data, prefix)
+        call particles_factory_create(particles%number, exist, input_data, prefix)
+        call particles_factory_create(particles%diameter, exist, input_data, prefix)
+        exist_and_walls_used = exist .and. use_walls(environment%walls_potential)
+        call particles_factory_create(particles%wall_diameter, exist_and_walls_used, input_data, &
+            prefix//"With Walls.")
+        dipolar = particles_are_dipolar(input_data, prefix)
+        call particles_factory_create(particles%moment_norm, dipolar, input_data, prefix)
+        call particles_factory_create(particles%positions, exist, environment%periodic_box, &
             particles%number)
         call particles_factory_set(particles%positions, input_data, prefix)
-        call particles_factory_create(particles%orientations, &
-            particles_are_dipolar(particles%moment_norm), particles%number)
+        call particles_factory_create(particles%orientations, dipolar, particles%number)
         call particles_factory_set(particles%orientations, input_data, prefix)
-        call particles_factory_create(particles%dipolar_moments, particles%moment_norm, &
+        call particles_factory_create(particles%dipolar_moments, dipolar, particles%moment_norm, &
             particles%orientations)
         call particles_factory_create(particles%total_moment, particles%dipolar_moments)
         call particles_factory_create(particles%chemical_potential, input_data, prefix)
     end subroutine particles_factory_create_all
 
-    subroutine allocate_and_set_number(particles_number, input_data, prefix)
+    subroutine allocate_and_set_number(particles_number, exist, input_data, prefix)
         class(Abstract_Particles_Number), allocatable, intent(out) :: particles_number
+        logical, intent(in) :: exist
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -100,7 +102,7 @@ contains
         logical :: data_found
         integer :: num_particles
 
-        if (particles_exist(input_data, prefix)) then
+        if (exist) then
             data_field = prefix//"number"
             call input_data%get(data_field, num_particles, data_found)
             call check_data_found(data_field, data_found)
@@ -112,29 +114,30 @@ contains
         call particles_number%set(num_particles)
     end subroutine allocate_and_set_number
 
-    subroutine allocate_and_set_diameter(particles_diameter, input_data, prefix)
+    subroutine allocate_and_set_diameter(particles_diameter, exist, input_data, prefix)
         class(Abstract_Particles_Diameter), allocatable, intent(out) :: particles_diameter
+        logical, intent(in) :: exist
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        call allocate_diameter(particles_diameter, input_data, prefix)
-        call set_diameter(particles_diameter, input_data, prefix)
+        call allocate_diameter(particles_diameter, exist)
+        call set_diameter(particles_diameter, exist, input_data, prefix)
     end subroutine allocate_and_set_diameter
 
-    subroutine allocate_diameter(particles_diameter, input_data, prefix)
+    subroutine allocate_diameter(particles_diameter, exist)
         class(Abstract_Particles_Diameter), allocatable, intent(out) :: particles_diameter
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
+        logical, intent(in) :: exist
 
-        if (particles_exist(input_data, prefix)) then
+        if (exist) then
             allocate(Concrete_Particles_Diameter :: particles_diameter)
         else
             allocate(Null_Particles_Diameter :: particles_diameter)
         end if
     end subroutine allocate_diameter
 
-    subroutine set_diameter(particles_diameter, input_data, prefix)
+    subroutine set_diameter(particles_diameter, exist, input_data, prefix)
         class(Abstract_Particles_Diameter), intent(inout) :: particles_diameter
+        logical, intent(in) :: exist
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -142,7 +145,7 @@ contains
         logical :: data_found
         real(DP) :: diameter, diameter_min_factor
 
-        if (particles_exist(particles_diameter)) then
+        if (exist) then
             data_field = prefix//"diameter"
             call input_data%get(data_field, diameter, data_found)
             call check_data_found(data_field, data_found)
@@ -157,32 +160,10 @@ contains
         call particles_diameter%set(diameter, diameter_min_factor)
     end subroutine set_diameter
 
-    subroutine allocate_and_set_wall_diameter(particles_wall_diameter, particles_diameter, &
-        input_data, prefix)
-        class(Abstract_Particles_Diameter), allocatable, intent(out) :: particles_wall_diameter
-        class(Abstract_Particles_Diameter), intent(in) :: particles_diameter
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
-
-        call allocate_wall_diameter(particles_wall_diameter, particles_exist(particles_diameter), &
-            use_walls(input_data, environment_prefix))
-        call set_diameter(particles_wall_diameter, input_data, prefix//"With Walls.")
-    end subroutine allocate_and_set_wall_diameter
-
-    subroutine allocate_wall_diameter(particles_wall_diameter, particles_exist, use_walls)
-        class(Abstract_Particles_Diameter), allocatable, intent(out) :: particles_wall_diameter
-        logical, intent(in) :: particles_exist, use_walls
-
-        if (particles_exist .and. use_walls) then
-            allocate(Concrete_Particles_Diameter :: particles_wall_diameter)
-        else
-            allocate(Null_Particles_Diameter :: particles_wall_diameter)
-        end if
-    end subroutine allocate_wall_diameter
-
-    subroutine allocate_and_set_inter_diameter(inter_particles_diameter, &
+    subroutine allocate_and_set_inter_diameter(inter_particles_diameter, exists, &
         particles_diameter_1, particles_diameter_2, input_data, prefix)
         class(Abstract_Particles_Diameter), allocatable, intent(out) :: inter_particles_diameter
+        logical, intent(in) :: exists
         class(Abstract_Particles_Diameter), intent(in) :: particles_diameter_1, particles_diameter_2
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
@@ -192,7 +173,7 @@ contains
         real(DP) :: inter_diameter, inter_diameter_min_factor
         real(DP) :: inter_diameter_offset
 
-        if (particles_exist(particles_diameter_1) .and. particles_exist(particles_diameter_2)) then
+        if (exists) then
             data_field = prefix//"offset"
             call input_data%get(data_field, inter_diameter_offset, data_found)
             call check_data_found(data_field, data_found)
@@ -210,8 +191,9 @@ contains
         call inter_particles_diameter%set(inter_diameter, inter_diameter_min_factor)
     end subroutine allocate_and_set_inter_diameter
 
-    subroutine allocate_and_set_moment_norm(particles_moment_norm, input_data, prefix)
+    subroutine allocate_and_set_moment_norm(particles_moment_norm, dipolar, input_data, prefix)
         class(Abstract_Particles_Moment_Norm), allocatable, intent(out) :: particles_moment_norm
+        logical, intent(in) :: dipolar
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -219,24 +201,27 @@ contains
         logical :: data_found
         real(DP) :: moment_norm
 
-        if (particles_are_dipolar(input_data, prefix)) then
+        if (dipolar) then
             data_field = prefix//"moment norm"
             call input_data%get(data_field, moment_norm, data_found)
             call check_data_found(data_field, data_found)
             allocate(Concrete_Particles_Moment_Norm :: particles_moment_norm)
             deallocate(data_field)
         else
+            moment_norm = 0._DP
             allocate(Null_Particles_Moment_Norm :: particles_moment_norm)
         end if
         call particles_moment_norm%set(moment_norm)
     end subroutine allocate_and_set_moment_norm
 
-    subroutine allocate_and_construct_positions(particles_positions, periodic_box, particles_number)
+    subroutine allocate_and_construct_positions(particles_positions, exist, periodic_box, &
+        particles_number)
         class(Abstract_Particles_Positions), allocatable, intent(out) :: particles_positions
+        logical, intent(in) :: exist
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Particles_Number), intent(in) :: particles_number
 
-        if (particles_exist(particles_number)) then
+        if (exist) then
             allocate(Concrete_Particles_Positions :: particles_positions)
         else
             allocate(Null_Particles_Positions :: particles_positions)
@@ -244,13 +229,13 @@ contains
         call particles_positions%construct(periodic_box, particles_number)
     end subroutine allocate_and_construct_positions
 
-    subroutine allocate_and_construct_orientations(particles_orientations, particles_are_dipolar, &
+    subroutine allocate_and_construct_orientations(particles_orientations, dipolar, &
         particles_number)
         class(Abstract_Particles_Orientations), allocatable, intent(out) :: particles_orientations
-        logical, intent(in) :: particles_are_dipolar
+        logical, intent(in) :: dipolar
         class(Abstract_Particles_Number), intent(in) :: particles_number
 
-        if (particles_are_dipolar) then
+        if (dipolar) then
             allocate(Concrete_Particles_Orientations :: particles_orientations)
         else
             allocate(Null_Particles_Orientations :: particles_orientations)
@@ -300,14 +285,15 @@ contains
         call set_coordinates(particles_orientations, input_data, prefix//"initial orientations")
     end subroutine set_orientations
 
-    subroutine allocate_and_construct_dipolar_moments(particles_dipolar_moments, &
+    subroutine allocate_and_construct_dipolar_moments(particles_dipolar_moments, dipolar, &
         particles_moment_norm, particles_orientations)
         class(Abstract_Particles_Dipolar_Moments), allocatable, intent(out) :: &
             particles_dipolar_moments
+        logical, intent(in) :: dipolar
         class(Abstract_Particles_Moment_Norm), intent(in) :: particles_moment_norm
         class(Abstract_Particles_Orientations), intent(in) :: particles_orientations
 
-        if (particles_are_dipolar(particles_moment_norm)) then
+        if (dipolar) then
             allocate(Concrete_Particles_Dipolar_Moments :: particles_dipolar_moments)
         else
             allocate(Null_Particles_Dipolar_Moments :: particles_dipolar_moments)

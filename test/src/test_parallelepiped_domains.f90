@@ -61,12 +61,12 @@ implicit none
     deallocate(data_filename)
 
     call environment_factory_create(periodic_box, input_data, "Test Parallelepiped Domains.")
-    call environment_factory_create(parallelepiped_domain_0, input_data, &
-        "Test Parallelepiped Domains.Domain 0.", periodic_box)
-    call environment_factory_create(parallelepiped_domain_1, input_data, &
-        "Test Parallelepiped Domains.Domain 1.", periodic_box)
-    call environment_factory_create(parallelepiped_domain_2, input_data, &
-        "Test Parallelepiped Domains.Domain 2.", periodic_box)
+    call environment_factory_create(parallelepiped_domain_0, .true., periodic_box, input_data, &
+        "Test Parallelepiped Domains.Domain 0.")
+    call environment_factory_create(parallelepiped_domain_1, .true., periodic_box, input_data, &
+        "Test Parallelepiped Domains.Domain 1.")
+    call environment_factory_create(parallelepiped_domain_2, .true., periodic_box, input_data, &
+        "Test Parallelepiped Domains.Domain 2.")
 
     call print_vertices(parallelepiped_domain_0, "domain_0")
     call print_vertices(parallelepiped_domain_1, "domain_1")

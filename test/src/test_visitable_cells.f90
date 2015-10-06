@@ -48,18 +48,19 @@ implicit none
     deallocate(data_filename)
 
     call environment_factory_create(periodic_box, input_data, "Box.")
-    call particles_factory_create(particles_number, input_data, "Particles.")
-    call particles_factory_create(particles_diameter, input_data, "Particles.")
-    call particles_factory_create(particles_positions, periodic_box, particles_number)
+    call particles_factory_create(particles_number, .true., input_data, "Particles.")
+    call particles_factory_create(particles_diameter, .true., input_data, "Particles.")
+    call particles_factory_create(particles_positions, .true., periodic_box, particles_number)
     call particles_factory_set(particles_positions, input_data, "Particles.")
-    call short_potential_factory_create(potential_expression, input_data, "Particles.Potential.", &
-        particles_diameter)
-    call short_potential_factory_create(pair_potential, input_data, "Particles.Potential.", &
-        particles_diameter, potential_expression)
-    call short_potential_factory_create(visitable_list, input_data, "Particles.Potential.", &
-        pair_potential)
-    call short_potential_factory_create(visitable_cells, visitable_list, periodic_box, &
+    call short_potential_factory_create(potential_expression, .true., input_data, &
+        "Particles.Potential.")
+    call short_potential_factory_create(pair_potential, .true., particles_diameter, &
+        potential_expression, input_data, "Particles.Potential.")
+    call short_potential_factory_destroy(potential_expression)
+    call short_potential_factory_create(visitable_list, .true., input_data, "Particles.Potential.")
+    call short_potential_factory_create(visitable_cells, .true., visitable_list, periodic_box, &
         particles_positions, pair_potential)
+    call short_potential_factory_destroy(visitable_list)
 
     energy = 0._DP
     do i_particle = 1, particles_positions%get_num()
@@ -78,9 +79,7 @@ implicit none
     end if
 
     call short_potential_factory_destroy(visitable_cells)
-    call short_potential_factory_destroy(visitable_list)
     call short_potential_factory_destroy(pair_potential)
-    call short_potential_factory_destroy(potential_expression)
     call particles_factory_destroy(particles_positions)
     call particles_factory_destroy(particles_diameter)
     call particles_factory_destroy(particles_number)

@@ -12,22 +12,17 @@ implicit none
 private
 
     type, public :: Short_Potential_Wrapper
-        class(Abstract_Potential_Expression), allocatable :: expression
-        class(Abstract_Potential_Expression), allocatable :: wall_expression
         class(Abstract_Pair_Potential), allocatable :: pair
         class(Abstract_Pair_Potential), allocatable :: wall_pair
         class(Abstract_Particles_Potential), allocatable :: particles
-        class(Abstract_Visitable_List), allocatable :: list
         class(Abstract_Visitable_Cells), allocatable :: cells
     end type Short_Potential_Wrapper
 
     type, public :: Short_Potential_Macro_Wrapper
-        class(Abstract_Visitable_List), allocatable :: list
         class(Abstract_Visitable_Cells), allocatable :: cells
     end type Short_Potential_Macro_Wrapper
 
     type, public :: Short_Potential_Micro_Wrapper
-        class(Abstract_Potential_Expression), allocatable :: expression
         class(Abstract_Pair_Potential), allocatable :: pair
     end type Short_Potential_Micro_Wrapper
 

@@ -17,9 +17,9 @@ use class_particles_exchange, only: Abstract_Particles_Exchange, &
     Concrete_Particles_Exchange, Null_Particles_Exchange
 use module_change_adaptation, only: Concrete_Adaptation_Parameters
 use types_particles_wrapper, only: Particles_Wrapper
+use types_changes_wrapper, only: Changes_Wrapper
 use procedures_property_inquirers, only: particles_have_positions, particles_have_orientations, &
     particles_can_exchange
-use types_changes_wrapper, only: Changes_Wrapper
 
 implicit none
 
@@ -42,31 +42,31 @@ end interface changes_factory_destroy
 
 contains
 
-    subroutine changes_factory_create_all(changes, input_data, prefix, periodic_box, particles)
+    subroutine changes_factory_create_all(changes, periodic_box, particles, input_data, prefix)
         type(Changes_Wrapper), intent(out) :: changes
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(Particles_Wrapper), intent(in) :: particles
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
 
-        call changes_factory_create(changes%moved_positions, particles%positions, &
-            input_data, prefix, periodic_box)
+        call changes_factory_create(changes%moved_positions, particles%positions, periodic_box, &
+            input_data, prefix)
         call changes_factory_create(changes%rotated_orientations, particles%orientations, &
             input_data, prefix)
         call changes_factory_create(changes%particles_exchange, particles)
     end subroutine changes_factory_create_all
 
     subroutine allocate_and_construct_moved_positions(moved_positions, particles_positions, &
-        input_data, prefix, periodic_box)
+        periodic_box, input_data, prefix)
         class(Abstract_Moved_Positions), allocatable, intent(out) :: moved_positions
         class(Abstract_Particles_Positions), intent(in) :: particles_positions
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
 
         call allocate_moved_positions(moved_positions, particles_positions)
-        call construct_moved_positions(moved_positions, input_data, prefix, periodic_box, &
-            particles_positions)
+        call construct_moved_positions(moved_positions, periodic_box, particles_positions, &
+            input_data, prefix)
     end subroutine allocate_and_construct_moved_positions
 
     subroutine allocate_moved_positions(moved_positions, particles_positions)
@@ -80,13 +80,13 @@ contains
         end if
     end subroutine allocate_moved_positions
 
-    subroutine construct_moved_positions(moved_positions, input_data, prefix, periodic_box, &
-        particles_positions)
+    subroutine construct_moved_positions(moved_positions, periodic_box, particles_positions, &
+        input_data, prefix)
         class(Abstract_Moved_Positions), intent(inout) :: moved_positions
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Particles_Positions), intent(in) :: particles_positions
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field
         logical :: data_found
@@ -120,8 +120,8 @@ contains
         character(len=*), intent(in) :: prefix
 
         call allocate_rotated_orientations(rotated_orientations, particles_orientations)
-        call construct_rotated_orientations(rotated_orientations, input_data, prefix, &
-            particles_orientations)
+        call construct_rotated_orientations(rotated_orientations, particles_orientations, &
+            input_data, prefix)
     end subroutine allocate_and_construct_rotated_orientations
 
     subroutine allocate_rotated_orientations(rotated_orientations, particles_orientations)
@@ -135,12 +135,12 @@ contains
         end if
     end subroutine allocate_rotated_orientations
 
-    subroutine construct_rotated_orientations(rotated_orientations, input_data, prefix, &
-        particles_orientations)
+    subroutine construct_rotated_orientations(rotated_orientations, particles_orientations, &
+        input_data, prefix)
         class(Abstract_Rotated_Orientations), intent(inout) :: rotated_orientations
+        class(Abstract_Particles_Orientations), intent(in) :: particles_orientations
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
-        class(Abstract_Particles_Orientations), intent(in) :: particles_orientations
 
         character(len=:), allocatable :: data_field
         logical :: data_found

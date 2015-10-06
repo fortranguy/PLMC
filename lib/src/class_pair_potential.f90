@@ -14,7 +14,7 @@ private
     type, abstract, public :: Abstract_Pair_Potential
     private
         type(Concrete_Potential_Domain) :: domain
-        class(Abstract_Potential_Expression), pointer :: expression
+        class(Abstract_Potential_Expression), allocatable :: expression
     contains
         procedure(Abstract_Pair_Potential_construct), deferred :: construct
         procedure(Abstract_Pair_Potential_destroy), deferred :: destroy
@@ -28,7 +28,7 @@ private
         import :: Concrete_Potential_Domain, Abstract_Potential_Expression, Abstract_Pair_Potential
             class(Abstract_Pair_Potential), intent(out) :: this
             type(Concrete_Potential_Domain), intent(in) :: domain
-            class(Abstract_Potential_Expression), target, intent(in) :: expression
+            class(Abstract_Potential_Expression), intent(in) :: expression
         end subroutine Abstract_Pair_Potential_construct
 
         subroutine Abstract_Pair_Potential_destroy(this)
@@ -93,9 +93,9 @@ contains
     subroutine Tabulated_Pair_Potential_construct(this, domain, expression)
         class(Tabulated_Pair_Potential), intent(out) :: this
         type(Concrete_Potential_Domain), intent(in) :: domain
-        class(Abstract_Potential_Expression), target, intent(in) :: expression
+        class(Abstract_Potential_Expression), intent(in) :: expression
 
-        this%expression => expression
+        allocate(this%expression, source = expression)
         call this%set_domain(domain)
         call this%set_tabulation()
     end subroutine Tabulated_Pair_Potential_construct
@@ -130,7 +130,7 @@ contains
         class(Tabulated_Pair_Potential), intent(inout) :: this
 
         if (allocated(this%tabulation)) deallocate(this%tabulation)
-        this%expression => null()
+        if (allocated(this%expression)) deallocate(this%expression)
     end subroutine Tabulated_Pair_Potential_destroy
 
     pure subroutine Tabulated_Pair_Potential_meet(this, overlap, energy, distance)
@@ -163,9 +163,9 @@ contains
     subroutine Raw_Pair_Potential_construct(this, domain, expression)
         class(Raw_Pair_Potential), intent(out) :: this
         type(Concrete_Potential_Domain), intent(in) :: domain
-        class(Abstract_Potential_Expression), target, intent(in) :: expression
+        class(Abstract_Potential_Expression), intent(in) :: expression
 
-        this%expression => expression
+        allocate(this%expression, source = expression)
         call this%set_domain(domain)
         this%energy_domain_max = this%expression%get(this%domain%max)
     end subroutine Raw_Pair_Potential_construct
@@ -187,7 +187,7 @@ contains
     subroutine Raw_Pair_Potential_destroy(this)
         class(Raw_Pair_Potential), intent(inout) :: this
 
-        this%expression => null()
+        if (allocated(this%expression)) deallocate(this%expression)
     end subroutine Raw_Pair_Potential_destroy
 
     pure subroutine Raw_Pair_Potential_meet(this, overlap, energy, distance)
@@ -212,7 +212,7 @@ contains
     subroutine Null_Pair_Potential_construct(this, domain, expression)
         class(Null_Pair_Potential), intent(out) :: this
         type(Concrete_Potential_Domain), intent(in) :: domain
-        class(Abstract_Potential_Expression), target, intent(in) :: expression
+        class(Abstract_Potential_Expression), intent(in) :: expression
     end subroutine Null_Pair_Potential_construct
 
     subroutine Null_Pair_Potential_destroy(this)

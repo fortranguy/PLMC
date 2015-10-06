@@ -30,13 +30,15 @@ implicit none
     call input_data%load_file(filename = data_filename)
     deallocate(data_filename)
 
-    call particles_factory_create(particles_diameter, input_data, "Test Pair Potential.Particles")
-    call short_potential_factory_create(potential_expression, input_data, &
-        "Test Pair Potential.Particles", particles_diameter)
-    call short_potential_factory_create(pair_potential, input_data, &
-        "Test Pair Potential.Particles", particles_diameter, potential_expression)
+    call particles_factory_create(particles_diameter, .true., input_data, &
+        "Test Pair Potential.Particles")
+    call short_potential_factory_create(potential_expression, .true., input_data, &
+        "Test Pair Potential.Particles")
+    call short_potential_factory_create(pair_potential, .true., particles_diameter, &
+        potential_expression, input_data, "Test Pair Potential.Potential")
+    call short_potential_factory_destroy(potential_expression)
 
-    data_field = "Test Pair Potential.Particles.Potential.distance"
+    data_field = "Test Pair Potential.Potential.distance"
     call input_data%get(data_field, distance, data_found)
     call check_data_found(data_field, data_found)
     call pair_potential%meet(overlap, energy, distance)
@@ -47,9 +49,7 @@ implicit none
     end if
     write(output_unit, *) "maximum distance", pair_potential%get_max_distance()
 
-    call pair_potential%destroy()
-    deallocate(pair_potential)
-    call short_potential_factory_destroy(potential_expression)
+    call short_potential_factory_destroy(pair_potential)
     call particles_factory_destroy(particles_diameter)
     call input_data%destroy()
 

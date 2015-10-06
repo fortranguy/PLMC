@@ -25,7 +25,7 @@ private
         logical :: skip_top_layer(nums_local_cells(1), nums_local_cells(2), nums_local_cells(3))
         class(Abstract_Visitable_List), allocatable :: visitable_lists(:, :, :)
         integer, allocatable :: neighbours(:, :, :, :, :, :, :)
-        class(Abstract_Particles_Positions), pointer :: positions
+        class(Abstract_Particles_Positions), pointer :: particles_positions
         class(Abstract_Periodic_Box), pointer :: periodic_box
         class(Abstract_Pair_Potential), pointer :: pair_potential
     contains
@@ -93,16 +93,16 @@ contains
 
 !implementation Abstract_Visitable_Cells
 
-    subroutine Abstract_Visitable_Cells_construct(this, mold, periodic_box, positions, &
-            pair_potential)
+    subroutine Abstract_Visitable_Cells_construct(this, list_mold, periodic_box, &
+            particles_positions, pair_potential)
         class(Abstract_Visitable_Cells), intent(out) :: this
-        class(Abstract_Visitable_List), intent(in) :: mold
+        class(Abstract_Visitable_List), intent(in) :: list_mold
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Particles_Positions), target, intent(in) :: positions
+        class(Abstract_Particles_Positions), target, intent(in) :: particles_positions
         class(Abstract_Pair_Potential), target, intent(in) :: pair_potential
 
         this%periodic_box => periodic_box
-        this%positions => positions
+        this%particles_positions => particles_positions
         this%pair_potential => pair_potential
         call this%set_nums()
         call this%set_division()
@@ -111,7 +111,7 @@ contains
         allocate(this%visitable_lists(this%global_lbounds(1):this%global_ubounds(1), &
                                       this%global_lbounds(2):this%global_ubounds(2), &
                                       this%global_lbounds(3):this%global_ubounds(3)), &
-                                      mold=mold)
+                                      mold=list_mold)
         call this%construct_visitable_lists(periodic_box)
 
         call this%set_skip_layers()
@@ -232,9 +232,9 @@ contains
         type(Concrete_Particle) :: particle
         integer :: i_particle
 
-        do i_particle = 1, this%positions%get_num()
+        do i_particle = 1, this%particles_positions%get_num()
             particle%i = i_particle
-            particle%position = this%positions%get(particle%i)
+            particle%position = this%particles_positions%get(particle%i)
             call this%add(particle)
         end do
     end subroutine Abstract_Visitable_Cells_fill
@@ -245,7 +245,7 @@ contains
         integer :: global_i1, global_i2, global_i3
 
         this%pair_potential => null()
-        this%positions => null()
+        this%particles_positions => null()
 
         do global_i3 = this%global_ubounds(3), this%global_lbounds(3), -1
         do global_i2 = this%global_ubounds(2), this%global_lbounds(2), -1
@@ -326,9 +326,9 @@ contains
 
         i_cell = this%index(particle%position)
         call this%visitable_lists(i_cell(1), i_cell(2), i_cell(3))%remove(particle%i)
-        if (particle%i < this%positions%get_num()) then
+        if (particle%i < this%particles_positions%get_num()) then
             call this%visitable_lists(i_cell(1), i_cell(2), &
-                i_cell(3))%set(this%positions%get_num(), particle)
+                i_cell(3))%set(this%particles_positions%get_num(), particle)
         end if
     end subroutine Abstract_Visitable_Cells_remove
 
@@ -348,12 +348,12 @@ contains
 
 !implementation Null_Visitable_Cells
 
-    subroutine Null_Visitable_Cells_construct(this, mold, periodic_box, positions, &
+    subroutine Null_Visitable_Cells_construct(this, list_mold, periodic_box, particles_positions, &
             pair_potential)
         class(Null_Visitable_Cells), intent(out) :: this
-        class(Abstract_Visitable_List), intent(in) :: mold
+        class(Abstract_Visitable_List), intent(in) :: list_mold
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Particles_Positions), target, intent(in) :: positions
+        class(Abstract_Particles_Positions), target, intent(in) :: particles_positions
         class(Abstract_Pair_Potential), target, intent(in) :: pair_potential
     end subroutine Null_Visitable_Cells_construct
 

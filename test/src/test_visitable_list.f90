@@ -88,16 +88,16 @@ implicit none
     deallocate(data_filename)
 
     call environment_factory_create(periodic_box, input_data, "Environment.")
-    call particles_factory_create(particles_number, input_data, "Particles.")
-    call particles_factory_create(particles_diameter, input_data, "Particles.")
-    call particles_factory_create(particles_positions, periodic_box, particles_number)
+    call particles_factory_create(particles_number, .true., input_data, "Particles.")
+    call particles_factory_create(particles_diameter, .true., input_data, "Particles.")
+    call particles_factory_create(particles_positions, .true., periodic_box, particles_number)
     call particles_factory_set(particles_positions, input_data, "Particles.")
-    call short_potential_factory_create(potential_expression, input_data, "Short Potential.", &
-        particles_diameter)
-    call short_potential_factory_create(pair_potential, input_data, "Short Potential.", &
-        particles_diameter, potential_expression)
-    call short_potential_factory_create(visitable_list, input_data, "Short Potential.", &
-        pair_potential)
+    call short_potential_factory_create(potential_expression, .true., input_data, &
+        "Short Potential.")
+    call short_potential_factory_create(pair_potential, .true., particles_diameter, &
+        potential_expression, input_data, "Short Potential.")
+    call short_potential_factory_destroy(potential_expression)
+    call short_potential_factory_create(visitable_list, .true., input_data, "Short Potential.")
 
     call visitable_list%construct(periodic_box)
     do i_particle = 1, particles_positions%get_num()
@@ -159,7 +159,6 @@ implicit none
     call visitable_list%destroy()
     deallocate(visitable_list)
     call short_potential_factory_destroy(pair_potential)
-    call short_potential_factory_destroy(potential_expression)
     call particles_factory_destroy(particles_positions)
     call particles_factory_destroy(particles_diameter)
     call particles_factory_destroy(particles_number)

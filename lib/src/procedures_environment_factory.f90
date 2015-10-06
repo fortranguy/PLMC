@@ -67,23 +67,24 @@ contains
         class(Abstract_Field_Expression), allocatable :: field_expression
         class(Abstract_Parallelepiped_Domain), allocatable :: parallelepiped_domain
         class(Abstract_Floor_Penetration), allocatable :: floor_penetration
-        logical :: apply_field
+        logical :: field_applied, walls_used
 
         call environment_factory_create(environment%periodic_box, input_data, prefix)
         call environment_factory_create(environment%temperature, input_data, prefix)
-        apply_field = apply_external_field(input_data, prefix)
-        call environment_factory_create(field_expression, apply_field, input_data, prefix)
-        call environment_factory_create(parallelepiped_domain, apply_field, &
+        field_applied = apply_external_field(input_data, prefix)
+        call environment_factory_create(field_expression, field_applied, input_data, prefix)
+        call environment_factory_create(parallelepiped_domain, field_applied, &
             environment%periodic_box, input_data, prefix//"External Field.")
-        call environment_factory_create(environment%external_field, apply_field, &
+        call environment_factory_create(environment%external_field, field_applied, &
             parallelepiped_domain, field_expression)
         call environment_factory_destroy(field_expression)
         call environment_factory_destroy(parallelepiped_domain)
-        call environment_factory_create(environment%reciprocal_lattice, input_data, prefix, &
-            environment%periodic_box)
-        call environment_factory_create(floor_penetration, input_data, prefix)
-        call environment_factory_create(environment%walls_potential, input_data, prefix, &
-            environment%periodic_box, floor_penetration)
+        call environment_factory_create(environment%reciprocal_lattice, environment%periodic_box, &
+            input_data, prefix)
+        walls_used = use_walls(input_data, prefix)
+        call environment_factory_create(floor_penetration, walls_used, input_data, prefix)
+        call environment_factory_create(environment%walls_potential, walls_used, &
+            environment%periodic_box, floor_penetration, input_data, prefix)
         call environment_factory_destroy(floor_penetration)
     end subroutine environment_factory_create_all
 
@@ -133,25 +134,26 @@ contains
         deallocate(data_field)
     end subroutine allocate_and_set_temperature
 
-    subroutine allocate_and_set_field_expression(field_expression, apply_field, input_data, prefix)
+    subroutine allocate_and_set_field_expression(field_expression, field_applied, input_data, &
+        prefix)
         class(Abstract_Field_Expression), allocatable, intent(out) :: field_expression
-        logical, intent(in) :: apply_field
+        logical, intent(in) :: field_applied
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        call allocate_field_expression(field_expression, apply_field, input_data, prefix)
+        call allocate_field_expression(field_expression, field_applied, input_data, prefix)
         call set_field_expression(field_expression, input_data, prefix)
     end subroutine allocate_and_set_field_expression
 
-    subroutine allocate_field_expression(field_expression, apply_field, input_data, prefix)
+    subroutine allocate_field_expression(field_expression, field_applied, input_data, prefix)
         class(Abstract_Field_Expression), allocatable, intent(out) :: field_expression
-        logical, intent(in) :: apply_field
+        logical, intent(in) :: field_applied
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field, field_name
         logical :: data_found
-        if (apply_field) then
+        if (field_applied) then
             data_field = prefix//"External Field.name"
             call input_data%get(data_field, field_name, data_found)
             call check_data_found(data_field, data_found)
@@ -225,8 +227,6 @@ contains
             deallocate(domain_name)
             deallocate(data_field)
         else
-            domain_size = [0._DP, 0._DP, 0._DP]
-            domain_origin = [0._DP, 0._DP, 0._DP]
             allocate(Null_Parallelepiped_Domain :: parallelepiped_domain)
         end if
         call parallelepiped_domain%construct(periodic_box, domain_origin, domain_size)
@@ -234,14 +234,14 @@ contains
         if (allocated(domain_origin)) deallocate(domain_origin)
     end subroutine allocate_and_construct_parallelepiped_domain
 
-    subroutine allocate_and_construct_external_field(external_field, apply_field, &
+    subroutine allocate_and_construct_external_field(external_field, field_applied, &
         parallelepiped_domain, field_expression)
         class(Abstract_External_Field), allocatable, intent(out) :: external_field
-        logical, intent(in) :: apply_field
+        logical, intent(in) :: field_applied
         class(Abstract_Parallelepiped_Domain), intent(in) :: parallelepiped_domain
         class(Abstract_Field_Expression), intent(in) :: field_expression
 
-        if (apply_field) then
+        if (field_applied) then
             allocate(Concrete_External_Field :: external_field)
         else
             allocate(Null_External_Field :: external_field)
@@ -249,8 +249,8 @@ contains
         call external_field%construct(parallelepiped_domain, field_expression)
     end subroutine allocate_and_construct_external_field
 
-    subroutine allocate_and_construct_reciprocal_lattice(reciprocal_lattice, input_data, prefix, &
-        periodic_box)
+    subroutine allocate_and_construct_reciprocal_lattice(reciprocal_lattice, periodic_box, &
+        input_data, prefix)
         class(Abstract_Reciprocal_Lattice), allocatable, intent(out) :: reciprocal_lattice
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
@@ -273,8 +273,9 @@ contains
         if (allocated(numbers)) deallocate(numbers)
     end subroutine allocate_and_construct_reciprocal_lattice
 
-    subroutine allocate_and_set_floor_penetration(floor_penetration, input_data, prefix)
+    subroutine allocate_and_set_floor_penetration(floor_penetration, walls_used, input_data, prefix)
         class(Abstract_Floor_Penetration), allocatable, intent(out) :: floor_penetration
+        logical, intent(in) :: walls_used
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -282,7 +283,7 @@ contains
         logical :: data_found
         character(len=:), allocatable :: walls_name
 
-        if (use_walls(input_data, prefix)) then
+        if (walls_used) then
             data_field = prefix//"Walls.name"
             call input_data%get(data_field, walls_name, data_found)
             call check_data_found(data_field, data_found)
@@ -292,28 +293,33 @@ contains
                 case default
                     call error_exit(walls_name//" walls_name unknown. Choose: 'flat'.")
             end select
+            deallocate(walls_name)
+            deallocate(data_field)
         else
             allocate(Null_Floor_Penetration :: floor_penetration)
         end if
+        !call floor_penetration%...
     end subroutine allocate_and_set_floor_penetration
 
-    subroutine allocate_and_construct_walls_potential(walls_potential, input_data, prefix, &
-        periodic_box, floor_penetration)
+    subroutine allocate_and_construct_walls_potential(walls_potential, walls_used, periodic_box, &
+        floor_penetration, input_data, prefix)
         class(Abstract_Walls_Potential), allocatable, intent(out) :: walls_potential
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
+        logical, intent(in) :: walls_used
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Floor_Penetration), intent(in) :: floor_penetration
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field
         logical :: data_found
         real(DP) :: gap
 
-        if (use_walls(input_data, prefix)) then
+        if (walls_used) then
             allocate(Concrete_Walls_Potential :: walls_potential)
             data_field = prefix//"Walls.gap"
             call input_data%get(data_field, gap, data_found)
             call check_data_found(data_field, data_found)
+            deallocate(data_field)
         else
             allocate(Null_Walls_Potential :: walls_potential)
         end if
