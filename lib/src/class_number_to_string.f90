@@ -39,7 +39,7 @@ contains
         write(big_string, *) number
         string = trim(big_string)
     end function Abstract_Number_to_String_get_real_scalar
-    !elemental: works with gfrotran 4.9 / doesn't work with ifort 13
+    !elemental: works with gfortran 4.9 / doesn't work with ifort 13
 
     function Abstract_Number_to_String_get_real_array(number) result(string)
         character(len=:), allocatable :: string

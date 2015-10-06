@@ -6,7 +6,7 @@ use procedures_errors, only: error_exit
 use procedures_checks, only: check_positive
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_particles_positions, only: Abstract_Particles_Positions
-use types_particle, only: Concrete_Particle
+use types_temporary_particle, only: Concrete_Temporary_Particle
 use class_visitable_list, only: Abstract_Visitable_List
 use class_pair_potential, only: Abstract_Pair_Potential
 
@@ -229,7 +229,7 @@ contains
     subroutine Abstract_Visitable_Cells_fill(this)
         class(Abstract_Visitable_Cells), intent(inout) :: this
 
-        type(Concrete_Particle) :: particle
+        type(Concrete_Temporary_Particle) :: particle
         integer :: i_particle
 
         do i_particle = 1, this%particles_positions%get_num()
@@ -263,7 +263,7 @@ contains
         class(Abstract_Visitable_Cells), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
-        type(Concrete_Particle), intent(in) :: particle
+        type(Concrete_Temporary_Particle), intent(in) :: particle
         logical, intent(in) :: same_type
 
         real(DP) :: energy_i
@@ -292,7 +292,7 @@ contains
 
     subroutine Abstract_Visitable_Cells_move(this, from, to)
         class(Abstract_Visitable_Cells), intent(inout) :: this
-        type(Concrete_Particle), intent(in) :: from, to
+        type(Concrete_Temporary_Particle), intent(in) :: from, to
 
         integer, dimension(num_dimensions) :: from_i_cell, to_i_cell
 
@@ -311,7 +311,7 @@ contains
 
     subroutine Abstract_Visitable_Cells_add(this, particle)
         class(Abstract_Visitable_Cells), intent(inout) :: this
-        type(Concrete_Particle), intent(in) :: particle
+        type(Concrete_Temporary_Particle), intent(in) :: particle
 
         integer :: i_cell(num_dimensions)
 
@@ -321,7 +321,7 @@ contains
 
     subroutine Abstract_Visitable_Cells_remove(this, particle)
         class(Abstract_Visitable_Cells), intent(inout) :: this
-        type(Concrete_Particle), intent(in) :: particle
+        type(Concrete_Temporary_Particle), intent(in) :: particle
 
         integer :: i_cell(num_dimensions)
 
@@ -370,7 +370,7 @@ contains
         class(Null_Visitable_Cells), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
-        type(Concrete_Particle), intent(in) :: particle
+        type(Concrete_Temporary_Particle), intent(in) :: particle
         logical, intent(in) :: same_type
         overlap = .false.
         energy = 0._DP
@@ -378,17 +378,17 @@ contains
 
     subroutine Null_Visitable_Cells_move(this, from, to)
         class(Null_Visitable_Cells), intent(inout) :: this
-        type(Concrete_Particle), intent(in) :: from, to
+        type(Concrete_Temporary_Particle), intent(in) :: from, to
     end subroutine Null_Visitable_Cells_move
 
     subroutine Null_Visitable_Cells_add(this, particle)
         class(Null_Visitable_Cells), intent(inout) :: this
-        type(Concrete_Particle), intent(in) :: particle
+        type(Concrete_Temporary_Particle), intent(in) :: particle
     end subroutine Null_Visitable_Cells_add
 
     subroutine Null_Visitable_Cells_remove(this, particle)
         class(Null_Visitable_Cells), intent(inout) :: this
-        type(Concrete_Particle), intent(in) :: particle
+        type(Concrete_Temporary_Particle), intent(in) :: particle
     end subroutine Null_Visitable_Cells_remove
 
     subroutine Null_Visitable_Cells_check_nums(this)

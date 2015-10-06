@@ -1,7 +1,7 @@
 module class_visitable_list
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use types_particle, only: Concrete_Particle
+use types_temporary_particle, only: Concrete_Temporary_Particle
 use module_list_node, only: Concrete_Node, Concrete_Linkable_Node, &
     deallocate_list, increase_nodes_size
 use class_periodic_box, only: Abstract_Periodic_Box
@@ -84,7 +84,7 @@ contains
     subroutine Abstract_Visitable_List_set(this, i_target, particle)
         class(Abstract_Visitable_List), intent(inout) :: this
         integer, intent(in) :: i_target
-        type(Concrete_Particle), intent(in) :: particle
+        type(Concrete_Temporary_Particle), intent(in) :: particle
 
         type(Concrete_Linkable_Node), pointer :: previous => null(), current => null(), next => null()
 
@@ -108,7 +108,7 @@ contains
         class(Abstract_Visitable_List), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
-        type(Concrete_Particle), intent(in) :: particle
+        type(Concrete_Temporary_Particle), intent(in) :: particle
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
         logical, intent(in) :: same_type
 
@@ -134,7 +134,7 @@ contains
 
     subroutine Abstract_Visitable_List_add(this, particle)
         class(Abstract_Visitable_List), intent(inout) :: this
-        type(Concrete_Particle), intent(in) :: particle
+        type(Concrete_Temporary_Particle), intent(in) :: particle
 
         type(Concrete_Linkable_Node), pointer :: previous => null(), new => null(), next => null()
 
@@ -195,7 +195,7 @@ contains
     subroutine Concrete_Visitable_Array_set(this, i_target, particle)
         class(Concrete_Visitable_Array), intent(inout) :: this
         integer, intent(in) :: i_target
-        type(Concrete_Particle), intent(in) :: particle
+        type(Concrete_Temporary_Particle), intent(in) :: particle
 
         integer :: i_node
 
@@ -213,7 +213,7 @@ contains
         class(Concrete_Visitable_Array), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
-        type(Concrete_Particle), intent(in) :: particle
+        type(Concrete_Temporary_Particle), intent(in) :: particle
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
         logical, intent(in) :: same_type
 
@@ -235,7 +235,7 @@ contains
 
     subroutine Concrete_Visitable_Array_add(this, particle)
         class(Concrete_Visitable_Array), intent(inout) :: this
-        type(Concrete_Particle), intent(in) :: particle
+        type(Concrete_Temporary_Particle), intent(in) :: particle
 
         this%num_nodes = this%num_nodes + 1
         if (size(this%nodes) < this%num_nodes) then
@@ -249,7 +249,7 @@ contains
         class(Concrete_Visitable_Array), intent(inout) :: this
         integer, intent(in) :: i_particle
 
-        type(Concrete_Particle) :: last
+        type(Concrete_Temporary_Particle) :: last
 
         if (i_particle /= this%nodes(this%num_nodes)%i) then
             last%i = this%nodes(this%num_nodes)%i
@@ -275,14 +275,14 @@ contains
     subroutine Null_Visitable_List_set(this, i_target, particle)
         class(Null_Visitable_List), intent(inout) :: this
         integer, intent(in) :: i_target
-        type(Concrete_Particle), intent(in) :: particle
+        type(Concrete_Temporary_Particle), intent(in) :: particle
     end subroutine Null_Visitable_List_set
 
     subroutine Null_Visitable_List_visit(this, overlap, energy, particle, pair_potential, same_type)
         class(Null_Visitable_List), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
-        type(Concrete_Particle), intent(in) :: particle
+        type(Concrete_Temporary_Particle), intent(in) :: particle
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
         logical, intent(in) :: same_type
         overlap = .false.
@@ -291,7 +291,7 @@ contains
 
     subroutine Null_Visitable_List_add(this, particle)
         class(Null_Visitable_List), intent(inout) :: this
-        type(Concrete_Particle), intent(in) :: particle
+        type(Concrete_Temporary_Particle), intent(in) :: particle
     end subroutine Null_Visitable_List_add
 
     subroutine Null_Visitable_List_remove(this, i_particle)

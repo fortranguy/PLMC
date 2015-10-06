@@ -3,7 +3,7 @@ module class_particles_potential
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_particles_positions, only: Abstract_Particles_Positions
-use types_particle, only: Concrete_Particle
+use types_temporary_particle, only: Concrete_Temporary_Particle
 use class_pair_potential, only: Abstract_Pair_Potential
 
 implicit none
@@ -56,7 +56,7 @@ contains
         class(Abstract_Particles_Potential), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
-        type(Concrete_Particle), intent(in) :: particle
+        type(Concrete_Temporary_Particle), intent(in) :: particle
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
         logical, intent(in) :: same_type
 
@@ -94,7 +94,7 @@ contains
         class(Null_Particles_Potential), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
-        type(Concrete_Particle), intent(in) :: particle
+        type(Concrete_Temporary_Particle), intent(in) :: particle
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
         logical, intent(in) :: same_type
         overlap = .false.

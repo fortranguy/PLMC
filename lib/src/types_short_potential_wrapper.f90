@@ -27,7 +27,7 @@ private
     end type Short_Potential_Micro_Wrapper
 
     type, public :: Mixture_Short_Potentials_Wrapper
-        type(Short_Potential_Wrapper) :: intras(num_components)
+        type(Short_Potential_Wrapper) :: intras(num_components) !+ interaction with walls
         type(Short_Potential_Macro_Wrapper) :: inters(num_components)
         type(Short_Potential_Micro_Wrapper) :: inter_micro
     end type Mixture_Short_Potentials_Wrapper

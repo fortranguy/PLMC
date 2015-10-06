@@ -3,7 +3,7 @@ module procedures_plmc_visit
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use procedures_errors, only: error_exit
 use class_walls_potential, only: Abstract_Walls_Potential
-use types_particle, only: Concrete_Particle
+use types_temporary_particle, only: Concrete_Temporary_Particle
 use class_particles_positions, only: Abstract_Particles_Positions
 use class_particles_dipolar_moments, only: Abstract_Particles_Dipolar_Moments
 use types_particles_wrapper, only: Mixture_Wrapper
@@ -103,7 +103,7 @@ contains
         class(Abstract_Pair_Potential), intent(in) :: pair
         logical, intent(in) :: same_type
 
-        type(Concrete_Particle) :: particle
+        type(Concrete_Temporary_Particle) :: particle
         real(DP) :: energy_i
         integer :: i_particle
 
@@ -155,7 +155,7 @@ contains
         class(Abstract_Ewald_Real_Pair), intent(in) :: pair
         logical, intent(in) :: same_type
 
-        type(Concrete_Particle) :: particle
+        type(Concrete_Temporary_Particle) :: particle
         real(DP) :: energy_i
         integer :: i_particle
 

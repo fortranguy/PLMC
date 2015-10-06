@@ -8,16 +8,29 @@ private
 public :: Concrete_Particles_Energy_sum, Concrete_Inter_Energy_sum, &
     operator(+), operator(-)
 
+    type, public :: Concrete_Long_Energy
+        real(DP) :: real = 0._DP
+        !real(DP) :: reci = 0._DP
+        !real(DP) :: self = 0._DP
+        !real(DP) :: dlc = 0._DP
+    end type Concrete_Long_Energy
+
     type, public :: Concrete_Particles_Energy
         real(DP) :: short = 0._DP
         real(DP) :: walls = 0._DP
         real(DP) :: long = 0._DP
+        !real(DP) :: field = 0._DP
     end type Concrete_Particles_Energy
 
     type, public :: Concrete_Inter_Energy
         real(DP) :: short = 0._DP
         real(DP) :: long = 0._DP
     end type Concrete_Inter_Energy
+
+    type, public :: Concrete_Mixture_Energy
+        type(Concrete_Particles_Energy) :: intras(2)
+        type(Concrete_Inter_Energy) :: inter
+    end type Concrete_Mixture_Energy
 
     interface assignment(=)
         module procedure :: Concrete_Particles_Energy_assignment

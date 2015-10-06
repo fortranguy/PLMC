@@ -6,7 +6,7 @@ use class_ewald_real_pair, only: Abstract_Ewald_Real_Pair
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_particles_positions, only: Abstract_Particles_Positions
 use class_particles_dipolar_moments, only: Abstract_Particles_Dipolar_Moments
-use types_particle, only: Concrete_Particle
+use types_temporary_particle, only: Concrete_Temporary_Particle
 
 implicit none
 
@@ -65,7 +65,7 @@ contains
         ewald_real_pair, same_type)
         class(Abstract_Ewald_Real_Particles), intent(in) :: this
         real(DP), intent(out) :: energy
-        type(Concrete_Particle), intent(in) :: particle
+        type(Concrete_Temporary_Particle), intent(in) :: particle
         class(Abstract_Ewald_Real_Pair), intent(in) :: ewald_real_pair
         logical, intent(in) :: same_type
 
@@ -86,7 +86,7 @@ contains
         ewald_real_pair, same_type)
         class(Abstract_Ewald_Real_Particles), intent(in) :: this
         real(DP), intent(out) :: field(num_dimensions)
-        type(Concrete_Particle), intent(in) :: particle
+        type(Concrete_Temporary_Particle), intent(in) :: particle
         class(Abstract_Ewald_Real_Pair), intent(in) :: ewald_real_pair
         logical, intent(in) :: same_type
 
@@ -123,7 +123,7 @@ contains
         ewald_real_pair, same_type)
         class(Null_Ewald_Real_Particles), intent(in) :: this
         real(DP), intent(out) :: energy
-        type(Concrete_Particle), intent(in) :: particle
+        type(Concrete_Temporary_Particle), intent(in) :: particle
         class(Abstract_Ewald_Real_Pair), intent(in) :: ewald_real_pair
         logical, intent(in) :: same_type
         energy = 0._DP
@@ -133,7 +133,7 @@ contains
         same_type)
         class(Null_Ewald_Real_Particles), intent(in) :: this
         real(DP), intent(out) :: field(num_dimensions)
-        type(Concrete_Particle), intent(in) :: particle
+        type(Concrete_Temporary_Particle), intent(in) :: particle
         class(Abstract_Ewald_Real_Pair), intent(in) :: ewald_real_pair
         logical, intent(in) :: same_type
         field = 0._DP

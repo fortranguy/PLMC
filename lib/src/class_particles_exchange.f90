@@ -1,6 +1,6 @@
 module class_particles_exchange
 
-use types_particle, only: Concrete_Particle
+use types_temporary_particle, only: Concrete_Temporary_Particle
 use types_particles_wrapper, only: Particles_Wrapper
 
 implicit none
@@ -48,7 +48,7 @@ contains
 
     subroutine Abstract_Particles_Exchange_add(this, particle)
         class(Abstract_Particles_Exchange), intent(inout) :: this
-        type(Concrete_Particle), intent(in) :: particle
+        type(Concrete_Temporary_Particle), intent(in) :: particle
 
         call this%particles%number%set(this%particles%number%get() + 1)
         call this%particles%positions%add(particle%position)
@@ -82,7 +82,7 @@ contains
 
     subroutine Null_Particles_Exchange_add(this, particle)
         class(Null_Particles_Exchange), intent(inout) :: this
-        type(Concrete_Particle), intent(in) :: particle
+        type(Concrete_Temporary_Particle), intent(in) :: particle
     end subroutine Null_Particles_Exchange_add
 
     subroutine Null_Particles_Exchange_remove(this, i_particle)
