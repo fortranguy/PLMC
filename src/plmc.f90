@@ -47,10 +47,8 @@ implicit none
     call plmc_write(0, observables_writers, observables, in_loop = .false.)
 
     call metropolis_factory_create(one_particle_move, environment, changes)
-    call metropolis_factory_set(one_particle_move, mixture%components)
-    call metropolis_factory_set(one_particle_move, short_potentials%intras, short_potentials%inters)
-    call metropolis_factory_set(one_particle_move, ewalds)
-    call metropolis_factory_set(one_particle_move, observables)
+    call metropolis_factory_set(one_particle_move, mixture%components, short_potentials, ewalds, &
+        observables)
 
     num_moves = mixture%components(1)%positions%get_num() + &
         mixture%components(2)%positions%get_num()

@@ -12,11 +12,14 @@ use class_walls_potential, only: Abstract_Walls_Potential
 use types_particle, only: Concrete_Particle
 use class_particles_positions, only: Abstract_Particles_Positions
 use class_particles_dipolar_moments, only: Abstract_Particles_Dipolar_Moments
+use types_particles_wrapper, only: Particles_Wrapper
 use class_moved_positions, only: Abstract_Moved_Positions
 use class_pair_potential, only: Abstract_Pair_Potential
 use class_visitable_cells, only: Abstract_Visitable_Cells
+use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper
 use class_ewald_real_pair, only: Abstract_Ewald_Real_Pair
 use class_ewald_real_particles, only: Abstract_Ewald_Real_Particles
+use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
 use module_particles_energy, only: Concrete_Particles_Energy, Concrete_Inter_Energy, &
     particle_energy_sum => Concrete_Particles_Energy_sum, &
     inter_energy_sum => Concrete_Inter_Energy_sum, operator(+), operator(-)
@@ -28,7 +31,7 @@ private
 
     type :: Move_Candidate
         class(Abstract_Particles_Positions), pointer :: positions => null()
-        class(Abstract_Particles_Dipolar_Moments), pointer :: moments => null()
+        class(Abstract_Particles_Dipolar_Moments), pointer :: dipolar_moments => null()
         class(Abstract_Moved_Positions), pointer :: moved => null()
         class(Abstract_Visitable_Cells), pointer :: intra_cells => null(), inter_cells => null()
         class(Abstract_Pair_Potential), pointer :: wall_pair
@@ -48,25 +51,14 @@ private
         type(Concrete_Inter_Energy), pointer :: inter_energy => null()
     contains
         procedure :: construct => Abstract_One_Particle_Move_construct
-        generic :: set_candidate => set_candidate_wall_pair, set_candidate_positions, &
-            set_candidate_dipolar_moments, set_candidate_short_potentials, set_candidate_ewald_real
-        generic :: set_inter_candidates => set_inter_candidates_ewald_real
-        procedure :: set_candidates_observables => &
-            Abstract_One_Particle_Move_set_candidates_observables
+        generic :: set => set_components, set_short_potentials, set_ewalds, set_observables
         procedure :: destroy => Abstract_One_Particle_Move_destroy
         procedure :: try => Abstract_One_Particle_Move_try
-        procedure, private :: set_candidate_wall_pair => &
-            Abstract_One_Particle_Move_set_candidate_wall_pair
-        procedure, private :: set_candidate_positions => &
-            Abstract_One_Particle_Move_set_candidate_positions
-        procedure, private :: set_candidate_dipolar_moments => &
-            Abstract_One_Particle_Move_set_candidate_dipolar_moments
-        procedure, private :: set_candidate_short_potentials => &
-            Abstract_One_Particle_Move_set_candidate_short_potentials
-        procedure, private :: set_candidate_ewald_real => &
-            Abstract_One_Particle_Move_set_candidate_ewald_real
-        procedure, private :: set_inter_candidates_ewald_real => &
-            Abstract_One_Particle_Move_set_inter_candidates_ewald_real
+        procedure, private :: set_components => Abstract_One_Particle_Move_set_components
+        procedure, private :: set_short_potentials => &
+            Abstract_One_Particle_Move_set_short_potentials
+        procedure, private :: set_ewalds => Abstract_One_Particle_Move_set_ewalds
+        procedure, private :: set_observables => Abstract_One_Particle_Move_set_observables
         procedure, private :: test_metropolis => Abstract_One_Particle_Move_test_metropolis
         procedure, private :: nullify_candidate => Abstract_One_Particle_Move_nullify_candidate
         procedure, private, nopass :: select_actor_and_spectator => &
@@ -102,20 +94,11 @@ private
     type, extends(Abstract_One_Particle_Move), public :: Null_One_Particle_Move
     contains
         procedure :: construct => Null_One_Particle_Move_construct
-        procedure :: set_candidates_observables => Null_One_Particle_Move_set_candidates_observables
         procedure :: destroy => Null_One_Particle_Move_destroy
-        procedure, private :: set_candidate_wall_pair => &
-            Null_One_Particle_Move_set_candidate_wall_pair
-        procedure, private :: set_candidate_positions => &
-            Null_One_Particle_Move_set_candidate_positions
-        procedure, private :: set_candidate_dipolar_moments => &
-            Null_One_Particle_Move_set_candidate_dipolar_moments
-        procedure, private :: set_candidate_short_potentials => &
-            Null_One_Particle_Move_set_candidate_short_potentials
-        procedure, private :: set_candidate_ewald_real => &
-            Null_One_Particle_Move_set_candidate_ewald_real
-        procedure, private :: set_inter_candidates_ewald_real => &
-            Null_One_Particle_Move_set_inter_candidates_ewald_real
+        procedure, private :: set_components => Null_One_Particle_Move_set_components
+        procedure, private :: set_short_potentials => Null_One_Particle_Move_set_short_potentials
+        procedure, private :: set_ewalds => Null_One_Particle_Move_set_ewalds
+        procedure, private :: set_observables => Null_One_Particle_Move_set_observables
         procedure :: try => Null_One_Particle_Move_try
     end type Null_One_Particle_Move
 
@@ -159,75 +142,45 @@ contains
         this%candidates(i_candidate)%inter_cells => null()
         this%candidates(i_candidate)%intra_cells => null()
         this%candidates(i_candidate)%moved => null()
-        this%candidates(i_candidate)%moments => null()
+        this%candidates(i_candidate)%dipolar_moments => null()
         this%candidates(i_candidate)%positions => null()
     end subroutine Abstract_One_Particle_Move_nullify_candidate
 
-    subroutine Abstract_One_Particle_Move_set_candidate_wall_pair(this, i_candidate, wall_pair)
+    subroutine Abstract_One_Particle_Move_set_components(this, components)
         class(Abstract_One_Particle_Move), intent(inout) :: this
-        integer, intent(in) :: i_candidate
-        class(Abstract_Pair_Potential), target, intent(in) :: wall_pair
+        type(Particles_Wrapper), target, intent(in) :: components(num_components)
 
-        call check_in_range("Abstract_One_Particle_Move_set_candidate_short_potentials", &
-            num_components, "i_candidate", i_candidate)
-        this%candidates(i_candidate)%wall_pair => wall_pair
-    end subroutine Abstract_One_Particle_Move_set_candidate_wall_pair
+        this%candidates(1)%positions => components(1)%positions
+        this%candidates(1)%dipolar_moments => components(1)%dipolar_moments
+        this%candidates(2)%positions => components(2)%positions
+        this%candidates(2)%dipolar_moments => components(2)%dipolar_moments
+    end subroutine Abstract_One_Particle_Move_set_components
 
-    subroutine Abstract_One_Particle_Move_set_candidate_positions(this, i_candidate, positions)
+    subroutine Abstract_One_Particle_Move_set_short_potentials(this, short_potentials)
         class(Abstract_One_Particle_Move), intent(inout) :: this
-        integer, intent(in) :: i_candidate
-        class(Abstract_Particles_Positions), target, intent(in) :: positions
+        type(Mixture_Short_Potentials_Wrapper), target, intent(in) :: short_potentials
 
-        call check_in_range("Abstract_One_Particle_Move_set_candidate_positions", num_components, &
-            "i_candidate", i_candidate)
-        this%candidates(i_candidate)%positions => positions
-    end subroutine Abstract_One_Particle_Move_set_candidate_positions
+        this%candidates(1)%intra_cells => short_potentials%intras(1)%cells
+        this%candidates(1)%inter_cells => short_potentials%inters(1)%cells
+        this%candidates(1)%wall_pair => short_potentials%intras(1)%wall_pair
+        this%candidates(2)%intra_cells => short_potentials%intras(2)%cells
+        this%candidates(2)%inter_cells => short_potentials%inters(2)%cells
+        this%candidates(2)%wall_pair => short_potentials%intras(2)%wall_pair
+    end subroutine Abstract_One_Particle_Move_set_short_potentials
 
-    subroutine Abstract_One_Particle_Move_set_candidate_dipolar_moments(this, i_candidate, moments)
+    subroutine Abstract_One_Particle_Move_set_ewalds(this, ewalds)
         class(Abstract_One_Particle_Move), intent(inout) :: this
-        integer, intent(in) :: i_candidate
-        class(Abstract_Particles_Dipolar_Moments), target, intent(in) :: moments
+        type(Mixture_Ewald_Wrapper), target, intent(in) :: ewalds
 
-        call check_in_range("Abstract_One_Particle_Move_set_candidate_positions", num_components, &
-            "i_candidate", i_candidate)
-        this%candidates(i_candidate)%moments => moments
-    end subroutine Abstract_One_Particle_Move_set_candidate_dipolar_moments
+        this%candidates(1)%ewald_real_pair => ewalds%intras(1)%real_pair
+        this%candidates(1)%ewald_real => ewalds%intras(1)%real_particles
+        this%candidates(2)%ewald_real_pair => ewalds%intras(2)%real_pair
+        this%candidates(2)%ewald_real => ewalds%intras(2)%real_particles
+        this%ewald_inter_real_pair => ewalds%inter%real_pair
+    end subroutine Abstract_One_Particle_Move_set_ewalds
 
-    subroutine Abstract_One_Particle_Move_set_candidate_short_potentials(this, i_candidate, &
-        intra_cells, inter_cells)
-        class(Abstract_One_Particle_Move), intent(inout) :: this
-        integer, intent(in) :: i_candidate
-        class(Abstract_Visitable_Cells), target, intent(in) :: intra_cells, inter_cells
-
-        call check_in_range("Abstract_One_Particle_Move_set_candidate_short_potentials", &
-            num_components, "i_candidate", i_candidate)
-        this%candidates(i_candidate)%intra_cells => intra_cells
-        this%candidates(i_candidate)%inter_cells => inter_cells
-    end subroutine Abstract_One_Particle_Move_set_candidate_short_potentials
-
-    subroutine Abstract_One_Particle_Move_set_candidate_ewald_real(this, i_candidate, ewald_real, &
-        ewald_real_pair)
-        class(Abstract_One_Particle_Move), intent(inout) :: this
-        integer, intent(in) :: i_candidate
-        class(Abstract_Ewald_Real_Particles), target, intent(in) :: ewald_real
-        class(Abstract_Ewald_Real_Pair), target, intent(in) :: ewald_real_pair
-
-        call check_in_range("Abstract_One_Particle_Move_set_candidate_short_potentials", &
-            num_components, "i_candidate", i_candidate)
-        this%candidates(i_candidate)%ewald_real_pair => ewald_real_pair
-        this%candidates(i_candidate)%ewald_real => ewald_real
-    end subroutine Abstract_One_Particle_Move_set_candidate_ewald_real
-
-    subroutine Abstract_One_Particle_Move_set_inter_candidates_ewald_real(this, &
-        ewald_inter_real_pair)
-        class(Abstract_One_Particle_Move), intent(inout) :: this
-        class(Abstract_Ewald_Real_Pair), target, intent(in) :: ewald_inter_real_pair
-
-        this%ewald_inter_real_pair => ewald_inter_real_pair
-    end subroutine Abstract_One_Particle_Move_set_inter_candidates_ewald_real
-
-    subroutine Abstract_One_Particle_Move_set_candidates_observables(this, move_counters, &
-        particles_energies, inter_energy)
+    subroutine Abstract_One_Particle_Move_set_observables(this, move_counters, particles_energies, &
+        inter_energy)
         class(Abstract_One_Particle_Move), intent(inout) :: this
         type(Concrete_Change_Counters), target, intent(in) :: move_counters(:)
         type(Concrete_Particles_Energy), target, intent(in) :: particles_energies(:)
@@ -244,7 +197,7 @@ contains
         end if
         this%particles_energies => particles_energies
         this%inter_energy => inter_energy
-    end subroutine Abstract_One_Particle_Move_set_candidates_observables
+    end subroutine Abstract_One_Particle_Move_set_observables
 
     subroutine Abstract_One_Particle_Move_try(this)
         class(Abstract_One_Particle_Move), intent(in) :: this
@@ -381,7 +334,7 @@ contains
         class(Abstract_Particles_Dipolar_Moments), pointer, intent(out) :: actor_dipolar_moments
         integer, intent(in) :: i_actor
 
-        actor_dipolar_moments => this%candidates(i_actor)%moments
+        actor_dipolar_moments => this%candidates(i_actor)%dipolar_moments
     end subroutine Abstract_One_Particle_Move_set_actor_dipolar_moments
 
     subroutine Abstract_One_Particle_Move_set_actor_cells(this, actor_cells, actor_inter_cells, &
@@ -454,51 +407,28 @@ contains
         class(Null_One_Particle_Move), intent(inout) :: this
     end subroutine Null_One_Particle_Move_destroy
 
-    subroutine Null_One_Particle_Move_set_candidate_wall_pair(this, i_candidate, wall_pair)
+    subroutine Null_One_Particle_Move_set_components(this, components)
         class(Null_One_Particle_Move), intent(inout) :: this
-        integer, intent(in) :: i_candidate
-        class(Abstract_Pair_Potential), target, intent(in) :: wall_pair
-    end subroutine Null_One_Particle_Move_set_candidate_wall_pair
+        type(Particles_Wrapper), target, intent(in) :: components(num_components)
+    end subroutine Null_One_Particle_Move_set_components
 
-    subroutine Null_One_Particle_Move_set_candidate_positions(this, i_candidate, positions)
+    subroutine Null_One_Particle_Move_set_short_potentials(this, short_potentials)
         class(Null_One_Particle_Move), intent(inout) :: this
-        integer, intent(in) :: i_candidate
-        class(Abstract_Particles_Positions), target, intent(in) :: positions
-    end subroutine Null_One_Particle_Move_set_candidate_positions
+        type(Mixture_Short_Potentials_Wrapper), target, intent(in) :: short_potentials
+    end subroutine Null_One_Particle_Move_set_short_potentials
 
-    subroutine Null_One_Particle_Move_set_candidate_dipolar_moments(this, i_candidate, moments)
+    subroutine Null_One_Particle_Move_set_ewalds(this, ewalds)
         class(Null_One_Particle_Move), intent(inout) :: this
-        integer, intent(in) :: i_candidate
-        class(Abstract_Particles_Dipolar_Moments), target, intent(in) :: moments
-    end subroutine Null_One_Particle_Move_set_candidate_dipolar_moments
+        type(Mixture_Ewald_Wrapper), target, intent(in) :: ewalds
+    end subroutine Null_One_Particle_Move_set_ewalds
 
-    subroutine Null_One_Particle_Move_set_candidate_short_potentials(this, i_candidate, &
-        intra_cells, inter_cells)
-        class(Null_One_Particle_Move), intent(inout) :: this
-        integer, intent(in) :: i_candidate
-        class(Abstract_Visitable_Cells), target, intent(in) :: intra_cells, inter_cells
-    end subroutine Null_One_Particle_Move_set_candidate_short_potentials
-
-    subroutine Null_One_Particle_Move_set_candidate_ewald_real(this, i_candidate, ewald_real, &
-        ewald_real_pair)
-        class(Null_One_Particle_Move), intent(inout) :: this
-        integer, intent(in) :: i_candidate
-        class(Abstract_Ewald_Real_Particles), target, intent(in) :: ewald_real
-        class(Abstract_Ewald_Real_Pair), target, intent(in) :: ewald_real_pair
-    end subroutine Null_One_Particle_Move_set_candidate_ewald_real
-
-    subroutine Null_One_Particle_Move_set_inter_candidates_ewald_real(this, ewald_inter_real_pair)
-        class(Null_One_Particle_Move), intent(inout) :: this
-        class(Abstract_Ewald_Real_Pair), target, intent(in) :: ewald_inter_real_pair
-    end subroutine Null_One_Particle_Move_set_inter_candidates_ewald_real
-
-    subroutine Null_One_Particle_Move_set_candidates_observables(this, move_counters, &
-        particles_energies, inter_energy)
+    subroutine Null_One_Particle_Move_set_observables(this, move_counters, particles_energies, &
+        inter_energy)
         class(Null_One_Particle_Move), intent(inout) :: this
         type(Concrete_Change_Counters), target, intent(in) :: move_counters(:)
         type(Concrete_Particles_Energy), target, intent(in) :: particles_energies(:)
         type(Concrete_Inter_Energy), target, intent(in) :: inter_energy
-    end subroutine Null_One_Particle_Move_set_candidates_observables
+    end subroutine Null_One_Particle_Move_set_observables
 
     subroutine Null_One_Particle_Move_try(this)
         class(Null_One_Particle_Move), intent(in) :: this
