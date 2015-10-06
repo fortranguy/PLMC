@@ -25,12 +25,14 @@
     "Mixture": {
         "Component 1": {
             "exist": true,
-            "are dipolar": false,
+            "are dipolar": true,
             "can exchange": false,
             "number": 500,
             "diameter": 1.0,
+            "moment norm": 1.0,
             "minimum diameter factor": 0.8,
             "initial positions": "positions_1.in",
+            "initial orientations": "orientations_1.in",
             "With Walls": {
                 "diameter": 1.0,
                 "minimum diameter factor": 0.8
@@ -58,6 +60,11 @@
         "Component 1": {
             "Small Move": {
                 "delta": [0.1, 0.1, 0.1],
+                "increase factor": 1.01,
+                "maximum increase factor": 1.05
+            },
+            "Small Rotation": {
+                "delta": 0.1,
                 "increase factor": 1.01,
                 "maximum increase factor": 1.05
             }
@@ -121,7 +128,20 @@
             }
         }
     },
+    "Ewalds": {
+        "Component 1": {
+            "alpha times box edge": 7.0,
+            "Real": {
+                "tabulated": true,
+                "delta distance": 1.0e-6,
+                "max distance over box edge": 0.5
+            }
+        }
+    },
     "Monte Carlo": {
-        "number of steps": 100
+        "number of steps": 100,
+        "Coordinates": {
+            "write": false
+        }
     }
 }

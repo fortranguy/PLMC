@@ -151,7 +151,7 @@ contains
         do i_distance = i_min, i_max
             distance_i = real(i_distance, DP) * this%domain%delta
             this%tabulation(i_distance, 1) = ewald_real_B(this%alpha, distance_i)
-            this%tabulation(i_distance, 1) = ewald_real_C(this%alpha, distance_i)
+            this%tabulation(i_distance, 2) = ewald_real_C(this%alpha, distance_i)
         end do
         this%tabulation(:, 1) = this%tabulation(:, 1) - this%tabulation(i_max, 1)
         this%tabulation(:, 2) = this%tabulation(:, 2) - this%tabulation(i_max, 2)
@@ -196,7 +196,8 @@ contains
         call this%set_domain(domain)
         call check_positive("Tabulated_Ewald_Real_Pair_construct", "alpha", alpha)
         this%alpha = alpha
-        this%expression_domain_max = this%expression(this%domain%max)
+        this%expression_domain_max =  [ewald_real_B(this%alpha, this%domain%max), &
+            ewald_real_C(this%alpha, this%domain%max)]
     end subroutine Raw_Ewald_Real_Pair_construct
 
     subroutine Raw_Ewald_Real_Pair_set_domain(this, domain)
