@@ -62,18 +62,19 @@ contains
     end subroutine Abstract_Ewald_Real_Particles_destroy
 
     pure subroutine Abstract_Ewald_Real_Particles_visit_energy(this, energy, particle, &
-        ewald_real_pair)
+        ewald_real_pair, same_type)
         class(Abstract_Ewald_Real_Particles), intent(in) :: this
         real(DP), intent(out) :: energy
         type(Concrete_Particle), intent(in) :: particle
         class(Abstract_Ewald_Real_Pair), intent(in) :: ewald_real_pair
+        logical, intent(in) :: same_type
 
         real(DP) :: vector_ij(num_dimensions)
         integer :: j_particle
 
         energy = 0._DP
         do j_particle = 1, this%particles_positions%get_num()
-            if (particle%same_type .and. particle%i == j_particle) cycle
+            if (same_type .and. particle%i == j_particle) cycle
             vector_ij = this%periodic_box%vector(particle%position, &
                 this%particles_positions%get(j_particle))
             energy = energy + ewald_real_pair%meet(vector_ij, particle%dipolar_moment, &
@@ -82,18 +83,19 @@ contains
     end subroutine Abstract_Ewald_Real_Particles_visit_energy
 
     pure subroutine Abstract_Ewald_Real_Particles_visit_field(this, field, particle, &
-        ewald_real_pair)
+        ewald_real_pair, same_type)
         class(Abstract_Ewald_Real_Particles), intent(in) :: this
         real(DP), intent(out) :: field(num_dimensions)
         type(Concrete_Particle), intent(in) :: particle
         class(Abstract_Ewald_Real_Pair), intent(in) :: ewald_real_pair
+        logical, intent(in) :: same_type
 
         real(DP) :: vector_ij(num_dimensions)
         integer :: j_particle
 
         field = 0._DP
         do j_particle = 1, this%particles_positions%get_num()
-            if (particle%same_type .and. particle%i == j_particle) cycle
+            if (same_type .and. particle%i == j_particle) cycle
             vector_ij = this%periodic_box%vector(particle%position, &
                 this%particles_positions%get(j_particle))
             field = field + ewald_real_pair%meet(vector_ij, &
@@ -117,19 +119,23 @@ contains
         class(Null_Ewald_Real_Particles), intent(inout) :: this
     end subroutine Null_Ewald_Real_Particles_destroy
 
-    pure subroutine Null_Ewald_Real_Particles_visit_energy(this, energy, particle, ewald_real_pair)
+    pure subroutine Null_Ewald_Real_Particles_visit_energy(this, energy, particle, &
+        ewald_real_pair, same_type)
         class(Null_Ewald_Real_Particles), intent(in) :: this
         real(DP), intent(out) :: energy
         type(Concrete_Particle), intent(in) :: particle
         class(Abstract_Ewald_Real_Pair), intent(in) :: ewald_real_pair
+        logical, intent(in) :: same_type
         energy = 0._DP
     end subroutine Null_Ewald_Real_Particles_visit_energy
 
-    pure subroutine Null_Ewald_Real_Particles_visit_field(this, field, particle, ewald_real_pair)
+    pure subroutine Null_Ewald_Real_Particles_visit_field(this, field, particle, ewald_real_pair, &
+        same_type)
         class(Null_Ewald_Real_Particles), intent(in) :: this
         real(DP), intent(out) :: field(num_dimensions)
         type(Concrete_Particle), intent(in) :: particle
         class(Abstract_Ewald_Real_Pair), intent(in) :: ewald_real_pair
+        logical, intent(in) :: same_type
         field = 0._DP
     end subroutine Null_Ewald_Real_Particles_visit_field
 

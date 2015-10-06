@@ -107,13 +107,12 @@ contains
         real(DP) :: energy_i
         integer :: i_particle
 
-        particle%same_type = same_type
         overlap = .false.
         energy = 0._DP
         do i_particle = 1, positions%get_num()
             particle%i = i_particle
             particle%position = positions%get(particle%i)
-            call potential%visit(overlap, energy_i, particle, pair)
+            call potential%visit(overlap, energy_i, particle, pair, same_type)
             if (overlap) return
             energy = energy + energy_i
         end do
@@ -160,13 +159,12 @@ contains
         real(DP) :: energy_i
         integer :: i_particle
 
-        particle%same_type = same_type
         energy = 0._DP
         do i_particle = 1, positions%get_num()
             particle%i = i_particle
             particle%position = positions%get(particle%i)
             particle%dipolar_moment = dipolar_moments%get(particle%i)
-            call potential%visit(energy_i, particle, pair)
+            call potential%visit(energy_i, particle, pair, same_type)
             energy = energy + energy_i
         end do
         energy = energy / 2._DP

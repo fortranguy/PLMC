@@ -259,11 +259,12 @@ contains
         if (allocated(this%visitable_lists)) deallocate(this%visitable_lists)
     end subroutine Abstract_Visitable_Cells_destroy
 
-    subroutine Abstract_Visitable_Cells_visit(this, overlap, energy, particle)
+    subroutine Abstract_Visitable_Cells_visit(this, overlap, energy, particle, same_type)
         class(Abstract_Visitable_Cells), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
         type(Concrete_Particle), intent(in) :: particle
+        logical, intent(in) :: same_type
 
         real(DP) :: energy_i
         integer, dimension(num_dimensions) :: i_cell, i_local_cell
@@ -281,7 +282,7 @@ contains
             i_local_cell = this%neighbours(:, local_i1, local_i2, local_i3, &
                 i_cell(1), i_cell(2), i_cell(3))
             call this%visitable_lists(i_local_cell(1), i_local_cell(2), &
-                i_local_cell(3))%visit(overlap, energy_i, particle, this%pair_potential)
+                i_local_cell(3))%visit(overlap, energy_i, particle, this%pair_potential, same_type)
             if (overlap) return
             energy = energy + energy_i
         end do
@@ -365,11 +366,12 @@ contains
         class(Null_Visitable_Cells), intent(inout) :: this
     end subroutine Null_Visitable_Cells_destroy
 
-    subroutine Null_Visitable_Cells_visit(this, overlap, energy, particle)
+    subroutine Null_Visitable_Cells_visit(this, overlap, energy, particle, same_type)
         class(Null_Visitable_Cells), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
         type(Concrete_Particle), intent(in) :: particle
+        logical, intent(in) :: same_type
         overlap = .false.
         energy = 0._DP
     end subroutine Null_Visitable_Cells_visit

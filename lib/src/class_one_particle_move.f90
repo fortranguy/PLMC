@@ -63,16 +63,8 @@ private
         procedure, private :: nullify_candidate => Abstract_One_Particle_Move_nullify_candidate
         procedure, private, nopass :: select_actor_and_spectator => &
             Abstract_One_Particle_Move_select_actor_and_spectator
-        generic, private :: set_actor => set_actor_wall_pair, set_actor_positions_and_moved, &
-            set_actor_dipolar_moments, set_actor_cells, set_actor_ewald
-        procedure, private :: set_actor_wall_pair => Abstract_One_Particle_Move_set_actor_wall_pair
-        procedure, private :: set_actor_positions_and_moved => &
-            Abstract_One_Particle_Move_set_actor_positions_and_moved
-        procedure, private :: set_actor_dipolar_moments => &
-            Abstract_One_Particle_Move_set_actor_dipolar_moments
-        procedure, private :: set_actor_cells => Abstract_One_Particle_Move_set_actor_cells
-        procedure, private :: set_actor_ewald => Abstract_One_Particle_Move_set_actor_ewald
-        procedure, private :: set_spectator => Abstract_One_Particle_Move_set_spectator
+        procedure, private :: visit_short => Abstract_One_Particle_Move_visit_short
+        procedure, private :: visit_long => Abstract_One_Particle_Move_visit_long
     end type Abstract_One_Particle_Move
 
     type, extends(Abstract_One_Particle_Move), public :: Two_Candidates_One_Particle_Move
@@ -227,67 +219,26 @@ contains
         type(Concrete_Inter_Energy), intent(out) :: inter_energy_difference
         integer, intent(in) :: i_actor, i_spectator
 
-        class(Abstract_Pair_Potential), pointer :: actor_wall_pair
-        class(Abstract_Particles_Positions), pointer :: actor_positions
-        class(Abstract_Particles_Dipolar_Moments), pointer :: actor_dipolar_moments
-        class(Abstract_Moved_Positions), pointer :: actor_moved
-        class(Abstract_Visitable_Cells), pointer :: actor_cells, actor_inter_cells, spectator_cells
-        class(Abstract_Ewald_Real_Pair), pointer :: actor_ewald_real_pair
-        class(Abstract_Ewald_Real_Particles), pointer :: actor_ewald_real, spectator_ewald_real
-        integer :: spectator_num_positions
-        type(Concrete_Particle) :: old, new
+        type(Concrete_Particle) :: new, old
         type(Concrete_Particles_Energy) :: new_energy, old_energy
         type(Concrete_Inter_Energy) :: inter_new_energy, inter_old_energy
         real(DP) :: energy_difference
         logical :: overlap
         real(DP) :: rand
 
-        call this%set_actor(actor_wall_pair, i_actor)
-        call this%set_actor(actor_positions, actor_moved, i_actor)
-        call this%set_actor(actor_dipolar_moments, i_actor)
-        call this%set_actor(actor_cells, actor_inter_cells, i_actor)
-        call this%set_actor(actor_ewald_real_pair, actor_ewald_real, i_actor)
-        call this%set_spectator(spectator_num_positions, spectator_cells, spectator_ewald_real, &
-            i_spectator)
-
-        old%i = random_integer(actor_positions%get_num())
-        old%position = actor_positions%get(old%i)
+        old%i = random_integer(this%candidates(i_actor)%positions%get_num())
+        old%position = this%candidates(i_actor)%positions%get(old%i)
+        old%dipolar_moment = this%candidates(i_actor)%dipolar_moments%get(old%i)
         new%i = old%i
-        new%position = actor_moved%get(new%i)
+        new%position = this%candidates(i_actor)%moved%get(new%i)
+        new%dipolar_moment = old%dipolar_moment
 
         success = .false.
-        call this%walls%visit(overlap, new_energy%walls, new%position, actor_wall_pair)
+        call this%visit_short(overlap, new_energy, old_energy, inter_new_energy, inter_old_energy, &
+            new, old, i_actor, i_spectator)
         if (overlap) return
-        if (actor_positions%get_num() > spectator_num_positions) then
-            new%same_type = .true.
-            call actor_cells%visit(overlap, new_energy%short, new)
-            if (overlap) return
-            new%same_type = .false.
-            call spectator_cells%visit(overlap, inter_new_energy%short, new)
-        else
-            new%same_type = .false.
-            call spectator_cells%visit(overlap, inter_new_energy%short, new)
-            if (overlap) return
-            new%same_type = .true.
-            call actor_cells%visit(overlap, new_energy%short, new)
-        end if
-        if (overlap) return
-        call this%walls%visit(overlap, old_energy%walls, old%position, actor_wall_pair)
-        old%same_type = .true.
-        call actor_cells%visit(overlap, old_energy%short, old)
-        old%same_type = .false.
-        call spectator_cells%visit(overlap, inter_old_energy%short, old)
-
-        new%dipolar_moment = actor_dipolar_moments%get(new%i)
-        new%same_type = .true.
-        call actor_ewald_real%visit(new_energy%long, new, actor_ewald_real_pair)
-        new%same_type = .false.
-        call spectator_ewald_real%visit(inter_new_energy%long, new, this%ewald_inter_real_pair)
-        old%dipolar_moment = actor_dipolar_moments%get(old%i)
-        old%same_type = .true.
-        call actor_ewald_real%visit(old_energy%long, old, actor_ewald_real_pair)
-        old%same_type = .false.
-        call spectator_ewald_real%visit(inter_old_energy%long, old, this%ewald_inter_real_pair)
+        call this%visit_long(new_energy, old_energy, inter_new_energy, inter_old_energy, new, old, &
+            i_actor, i_spectator)
 
         actor_energy_difference = new_energy - old_energy
         inter_energy_difference = inter_new_energy - inter_old_energy
@@ -295,9 +246,9 @@ contains
             inter_energy_sum(inter_energy_difference)
         call random_number(rand)
         if (rand < exp(-energy_difference/this%temperature%get())) then
-            call actor_positions%set(new%i, new%position)
-            call actor_cells%move(old, new)
-            call actor_inter_cells%move(old, new)
+            call this%candidates(i_actor)%positions%set(new%i, new%position)
+            call this%candidates(i_actor)%intra_cells%move(old, new)
+            call this%candidates(i_actor)%inter_cells%move(old, new)
             success = .true.
         end if
     end subroutine Abstract_One_Particle_Move_test_metropolis
@@ -309,67 +260,65 @@ contains
         i_spectator = mod(i_actor, num_components) + 1
     end subroutine Abstract_One_Particle_Move_select_actor_and_spectator
 
-    subroutine Abstract_One_Particle_Move_set_actor_wall_pair(this, actor_wall_pair, i_actor)
+    subroutine Abstract_One_Particle_Move_visit_short(this, overlap, new_energy, old_energy, &
+        inter_new_energy, inter_old_energy, new, old, i_actor, i_spectator)
         class(Abstract_One_Particle_Move), intent(in) :: this
-        class(Abstract_Pair_Potential), pointer, intent(out) :: actor_wall_pair
-        integer, intent(in) :: i_actor
+        logical, intent(out) :: overlap
+        type(Concrete_Particles_Energy), intent(out) :: new_energy, old_energy
+        type(Concrete_Inter_Energy), intent(out) :: inter_new_energy, inter_old_energy
+        type(Concrete_Particle), intent(in) :: new, old
+        integer, intent(in) :: i_actor, i_spectator
 
-        actor_wall_pair => this%candidates(i_actor)%wall_pair
-    end subroutine Abstract_One_Particle_Move_set_actor_wall_pair
+        associate(actor_wall_pair => this%candidates(i_actor)%wall_pair, &
+            actor_num_positions => this%candidates(i_actor)%positions%get_num(), &
+            spectator_num_positions => this%candidates(i_spectator)%positions%get_num(), &
+            actor_cells => this%candidates(i_actor)%intra_cells, &
+            spectator_cells => this%candidates(i_spectator)%inter_cells)
+            call this%walls%visit(overlap, new_energy%walls, new%position, actor_wall_pair)
+            if (overlap) return
+            if (actor_num_positions > spectator_num_positions) then
+                call actor_cells%visit(overlap, new_energy%short, new, same_type=.true.)
+                if (overlap) return
+                call spectator_cells%visit(overlap, inter_new_energy%short, new, same_type=.false.)
+            else
+                call spectator_cells%visit(overlap, inter_new_energy%short, new, same_type=.false.)
+                if (overlap) return
+                call actor_cells%visit(overlap, new_energy%short, new, same_type=.true.)
+            end if
+            if (overlap) return
+            call this%walls%visit(overlap, old_energy%walls, old%position, actor_wall_pair)
+            call actor_cells%visit(overlap, old_energy%short, old, same_type=.true.)
+            call spectator_cells%visit(overlap, inter_old_energy%short, old, same_type=.false.)
+        end associate
+    end subroutine Abstract_One_Particle_Move_visit_short
 
-    subroutine Abstract_One_Particle_Move_set_actor_positions_and_moved(this, actor_positions, &
-        actor_moved, i_actor)
+    subroutine Abstract_One_Particle_Move_visit_long(this, new_energy, old_energy, &
+        inter_new_energy, inter_old_energy, new, old, i_actor, i_spectator)
         class(Abstract_One_Particle_Move), intent(in) :: this
-        class(Abstract_Particles_Positions), pointer, intent(out) :: actor_positions
-        class(Abstract_Moved_Positions), pointer, intent(out) :: actor_moved
-        integer, intent(in) :: i_actor
+        type(Concrete_Particles_Energy), intent(inout) :: new_energy, old_energy
+        type(Concrete_Inter_Energy), intent(inout) :: inter_new_energy, inter_old_energy
+        type(Concrete_Particle), intent(in) :: new, old
+        integer, intent(in) :: i_actor, i_spectator
 
-        actor_positions => this%candidates(i_actor)%positions
-        actor_moved => this%candidates(i_actor)%moved
-    end subroutine Abstract_One_Particle_Move_set_actor_positions_and_moved
+        real(DP) :: new_energy_real, old_energy_real, inter_energy_real_new, inter_energy_real_old
 
-    subroutine Abstract_One_Particle_Move_set_actor_dipolar_moments(this, actor_dipolar_moments, &
-        i_actor)
-        class(Abstract_One_Particle_Move), intent(in) :: this
-        class(Abstract_Particles_Dipolar_Moments), pointer, intent(out) :: actor_dipolar_moments
-        integer, intent(in) :: i_actor
-
-        actor_dipolar_moments => this%candidates(i_actor)%dipolar_moments
-    end subroutine Abstract_One_Particle_Move_set_actor_dipolar_moments
-
-    subroutine Abstract_One_Particle_Move_set_actor_cells(this, actor_cells, actor_inter_cells, &
-        i_actor)
-        class(Abstract_One_Particle_Move), intent(in) :: this
-        class(Abstract_Visitable_Cells), pointer, intent(out) :: actor_cells, actor_inter_cells
-        integer, intent(in) :: i_actor
-
-        actor_cells => this%candidates(i_actor)%intra_cells
-        actor_inter_cells => this%candidates(i_actor)%inter_cells
-    end subroutine Abstract_One_Particle_Move_set_actor_cells
-
-    subroutine Abstract_One_Particle_Move_set_actor_ewald(this, actor_ewald_real_pair, &
-        actor_ewald_real, i_actor)
-        class(Abstract_One_Particle_Move), intent(in) :: this
-        class(Abstract_Ewald_Real_Pair), pointer, intent(out) :: actor_ewald_real_pair
-        class(Abstract_Ewald_Real_Particles), pointer, intent(out) :: actor_ewald_real
-        integer, intent(in) :: i_actor
-
-        actor_ewald_real_pair => this%candidates(i_actor)%ewald_real_pair
-        actor_ewald_real => this%candidates(i_actor)%ewald_real
-    end subroutine Abstract_One_Particle_Move_set_actor_ewald
-
-    subroutine Abstract_One_Particle_Move_set_spectator(this, spectator_num_positions, &
-        spectator_cells, spectator_ewald_real, i_spectator)
-        class(Abstract_One_Particle_Move), intent(in) :: this
-        integer, intent(out) :: spectator_num_positions
-        class(Abstract_Visitable_Cells), pointer, intent(out) :: spectator_cells
-        class(Abstract_Ewald_Real_Particles), pointer, intent(out) :: spectator_ewald_real
-        integer, intent(in) :: i_spectator
-
-        spectator_num_positions = this%candidates(i_spectator)%positions%get_num()
-        spectator_cells => this%candidates(i_spectator)%inter_cells
-        spectator_ewald_real => this%candidates(i_spectator)%ewald_real
-    end subroutine Abstract_One_Particle_Move_set_spectator
+        associate(actor_ewald_real_pair => this%candidates(i_actor)%ewald_real_pair, &
+            actor_ewald_real => this%candidates(i_actor)%ewald_real, &
+            spectator_ewald_real => this%candidates(i_spectator)%ewald_real)
+            call actor_ewald_real%visit(new_energy_real, new, actor_ewald_real_pair, &
+                same_type=.true.)
+            call spectator_ewald_real%visit(inter_energy_real_new, new, &
+                this%ewald_inter_real_pair, same_type=.false.)
+            call actor_ewald_real%visit(old_energy_real, old, actor_ewald_real_pair, &
+                same_type=.true.)
+            call spectator_ewald_real%visit(inter_energy_real_old, old, &
+                this%ewald_inter_real_pair, same_type=.false.)
+        end associate
+        new_energy%long = new_energy_real
+        old_energy%long = old_energy_real
+        inter_new_energy%long = inter_energy_real_new
+        inter_old_energy%long = inter_energy_real_old
+    end subroutine Abstract_One_Particle_Move_visit_long
 
 !end implementation Abstract_One_Particle_Move
 
