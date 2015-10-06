@@ -9,8 +9,9 @@ private
 
     type, abstract, public :: Abstract_Number_to_String
     contains
-        generic :: get => get_real, get_integer
-        procedure, nopass, private :: get_real => Abstract_Number_to_String_get_real
+        generic :: get => get_real_scalar, get_real_array, get_integer
+        procedure, nopass, private :: get_real_scalar => Abstract_Number_to_String_get_real_scalar
+        procedure, nopass, private :: get_real_array => Abstract_Number_to_String_get_real_array
         procedure, nopass, private :: get_integer => Abstract_Number_to_String_get_integer
     end type Abstract_Number_to_String
 
@@ -20,7 +21,8 @@ private
 
     type, extends(Abstract_Number_to_String), public :: Null_Number_to_String
     contains
-        procedure, nopass, private :: get_real => Null_Number_to_String_get_real
+        procedure, nopass, private :: get_real_scalar => Null_Number_to_String_get_real_scalar
+        procedure, nopass, private :: get_real_array => Null_Number_to_String_get_real_array
         procedure, nopass, private :: get_integer => Null_Number_to_String_get_integer
     end type Null_Number_to_String
 
@@ -28,7 +30,7 @@ contains
 
 !implementation Abstract_Number_to_String
 
-    elemental function Abstract_Number_to_String_get_real(number) result(string)
+    function Abstract_Number_to_String_get_real_scalar(number) result(string)
         character(len=:), allocatable :: string
         real(DP), intent(in) :: number
 
@@ -36,7 +38,18 @@ contains
 
         write(big_string, *) number
         string = trim(big_string)
-    end function Abstract_Number_to_String_get_real
+    end function Abstract_Number_to_String_get_real_scalar
+    !elemental: works with gfrotran 4.9 / doesn't work with ifort 13
+
+    function Abstract_Number_to_String_get_real_array(number) result(string)
+        character(len=:), allocatable :: string
+        real(DP), intent(in) :: number(:)
+
+        character(len=max_word_length) :: big_string
+
+        write(big_string, *) number
+        string = trim(big_string)
+    end function Abstract_Number_to_String_get_real_array
 
     function Abstract_Number_to_String_get_integer(number) result(string)
         character(len=:), allocatable :: string
@@ -52,11 +65,17 @@ contains
 
 !implementation Null_Number_to_String
 
-    elemental function Null_Number_to_String_get_real(number) result(string)
+    function Null_Number_to_String_get_real_scalar(number) result(string)
         character(len=:), allocatable :: string
         real(DP), intent(in) :: number
         string = ""
-    end function Null_Number_to_String_get_real
+    end function Null_Number_to_String_get_real_scalar
+
+    function Null_Number_to_String_get_real_array(number) result(string)
+        character(len=:), allocatable :: string
+        real(DP), intent(in) :: number(:)
+        string = ""
+    end function Null_Number_to_String_get_real_array
 
     function Null_Number_to_String_get_integer(number) result(string)
         character(len=:), allocatable :: string

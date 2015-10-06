@@ -21,7 +21,7 @@ use procedures_ewald_factory, only: ewald_factory_create, ewald_factory_destroy
 use types_observable_writers_wrapper, only: Mixture_Observable_Writers_Wrapper
 use procedures_observable_writers_factory, only: observable_writers_factory_create, &
     observable_writers_factory_destroy
-use procedures_property_inquirers, only: particles_exist
+use procedures_property_inquirers, only: use_walls, particles_exist, particles_are_dipolar
 
 implicit none
 
@@ -37,11 +37,13 @@ interface plmc_create
     module procedure :: create_mixture
     module procedure :: create_changes
     module procedure :: create_short_potentials
+    module procedure :: create_ewalds
     module procedure :: create_observable_writers
 end interface plmc_create
 
 interface plmc_destroy
     module procedure :: destroy_observable_writers
+    module procedure :: destroy_ewalds
     module procedure :: destroy_short_potentials
     module procedure :: destroy_changes
     module procedure :: destroy_mixture
@@ -159,18 +161,19 @@ contains
         type(Mixture_Wrapper), intent(in) :: mixture
         type(json_file), intent(inout) :: input_data
 
-        call ewald_factory_create(ewalds%intras(1), input_data, ewalds_prefix//"Component 1.", &
-            environment, mixture%components(1))
-        call ewald_factory_create(ewalds%intras(2), input_data, ewalds_prefix//"Component 2.", &
-            environment, mixture%components(2))
+        call ewald_factory_create(ewalds%intras(1), environment, mixture%components(1), &
+            input_data, ewalds_prefix//"Component 1.")
+        call ewald_factory_create(ewalds%intras(2), environment, mixture%components(2), &
+            input_data, ewalds_prefix//"Component 2.")
 
-        !call ewald_factory_create(ewalds%inter%real_pair, input_data, "Ewald.Inter 12.", &
-        !    environment, mixture%inter_diameter)
+        call ewald_factory_create(ewalds%inter, environment, mixture, input_data, &
+            ewalds_prefix//"Inter 12.")
     end subroutine create_ewalds
 
     subroutine destroy_ewalds(ewalds)
         type(Mixture_Ewald_Wrapper), intent(inout) :: ewalds
 
+        call ewald_factory_destroy(ewalds%inter)
         call ewald_factory_destroy(ewalds%intras(2))
         call ewald_factory_destroy(ewalds%intras(1))
     end subroutine destroy_ewalds
@@ -183,22 +186,32 @@ contains
         type(Changes_Wrapper), intent(in) :: changes(num_components)
         type(json_file), intent(inout) :: input_data
 
-        logical :: mixture_exists
+        logical :: wall_used
+        logical :: mixture_exists, mixture_is_dipolar
+        logical :: component_1_exist, component_1_is_dipolar
+        logical :: component_2_exist, component_2_is_dipolar
 
-        call observable_writers_factory_create(observable_writers%intras(1)%energy, &
-            walls_potential, mixture%components(1)%number, "component_1_energy.out")
-        call observable_writers_factory_create(observable_writers%intras(2)%energy, &
-            walls_potential, mixture%components(2)%number, "component_2_energy.out")
-        mixture_exists = particles_exist(mixture%components(1)%number) .and. &
-            particles_exist(mixture%components(2)%number)
+        wall_used = use_walls(walls_potential)
+        component_1_exist = particles_exist(mixture%components(1)%number)
+        component_1_is_dipolar = particles_are_dipolar(mixture%components(1)%dipolar_moments)
+        call observable_writers_factory_create(observable_writers%intras(1)%energy, wall_used, &
+            component_1_exist, component_1_is_dipolar, "component_1_energy.out")
+        component_2_exist = particles_exist(mixture%components(2)%number)
+        component_2_is_dipolar = particles_are_dipolar(mixture%components(2)%dipolar_moments)
+        call observable_writers_factory_create(observable_writers%intras(2)%energy, wall_used, &
+            component_2_exist, component_2_is_dipolar, "component_2_energy.out")
+        mixture_exists = component_1_exist .and. component_2_exist
+        mixture_is_dipolar = component_1_is_dipolar .and. component_2_is_dipolar
         call observable_writers_factory_create(observable_writers%inter_energy, mixture_exists, &
-            "inter_12_energy.out")
+            mixture_is_dipolar, "inter_12_energy.out")
+
         call observable_writers_factory_create(observable_writers%intras(1)%changes, &
             changes(1)%moved_positions, changes(1)%rotated_orientations, &
             changes(1)%particles_exchange, "component_1_success.out")
         call observable_writers_factory_create(observable_writers%intras(2)%changes, &
             changes(2)%moved_positions, changes(2)%rotated_orientations, &
             changes(2)%particles_exchange, "component_2_success.out")
+
         call observable_writers_factory_create(observable_writers%intras(1)%coordinates, &
             "component_1_coordinates", mixture%components(1)%positions, &
             mixture%components(1)%orientations, input_data, "Monte Carlo.")

@@ -32,7 +32,10 @@ private
     end type Concrete_Changes_Success_Writer
 
     type, extends(Abstract_Changes_Success_Writer), public :: Null_Changes_Success_Writer
-
+    contains
+        procedure :: construct => Null_Changes_Success_Writer_construct
+        procedure :: destroy => Null_Changes_Success_Writer_destroy
+        procedure :: write => Null_Changes_Success_Writer_write
     end type Null_Changes_Success_Writer
 
 contains
@@ -92,9 +95,9 @@ contains
         type(Concrete_Changes_Selector), intent(in) :: changes_selector
     end subroutine Null_Changes_Success_Writer_construct
 
-    subroutine Null_Changes_Success_Writer_destory(this)
+    subroutine Null_Changes_Success_Writer_destroy(this)
         class(Null_Changes_Success_Writer), intent(inout) :: this
-    end subroutine Null_Changes_Success_Writer_destory
+    end subroutine Null_Changes_Success_Writer_destroy
 
     subroutine Null_Changes_Success_Writer_write(this, i_step, changes_success_ratio)
         class(Null_Changes_Success_Writer), intent(in) :: this

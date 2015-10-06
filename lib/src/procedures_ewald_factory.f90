@@ -9,14 +9,14 @@ use types_environment_wrapper, only: Environment_Wrapper
 use class_particles_diameter, only: Abstract_Particles_Diameter
 use class_particles_positions, only: Abstract_Particles_Positions
 use class_particles_dipolar_moments, only: Abstract_Particles_Dipolar_Moments
-use types_particles_wrapper, only: Particles_Wrapper
+use types_particles_wrapper, only: Particles_Wrapper, Mixture_Wrapper
 use procedures_property_inquirers, only: particles_are_dipolar
 use types_potential_domain, only: Concrete_Potential_Domain
 use class_ewald_real_pair, only: Abstract_Ewald_Real_Pair, &
     Tabulated_Ewald_Real_Pair, Raw_Ewald_Real_Pair, Null_Ewald_Real_Pair
 use class_ewald_real_particles, only: Abstract_Ewald_Real_Particles, &
     Concrete_Ewald_Real_Particles, Null_Ewald_Real_Particles
-use types_ewald_wrapper, only: Ewald_Wrapper
+use types_ewald_wrapper, only: Ewald_Wrapper, Inter_Ewald_Wrapper
 
 implicit none
 
@@ -25,6 +25,7 @@ public :: ewald_factory_create, ewald_factory_destroy
 
 interface ewald_factory_create
     module procedure :: ewald_factory_create_all
+    module procedure :: ewald_factory_create_inter
     module procedure :: allocate_and_construct_real_pair
     module procedure :: allocate_and_construct_real_particles
 end interface ewald_factory_create
@@ -32,17 +33,18 @@ end interface ewald_factory_create
 interface ewald_factory_destroy
     module procedure :: destroy_and_deallocate_real_particles
     module procedure :: destroy_and_deallocate_real_pair
+    module procedure :: ewald_factory_destroy_inter
     module procedure :: ewald_factory_destroy_all
 end interface ewald_factory_destroy
 
 contains
 
-    subroutine ewald_factory_create_all(ewald, input_data, prefix, environment, particles)
+    subroutine ewald_factory_create_all(ewald, environment, particles, input_data, prefix)
         type(Ewald_Wrapper), intent(out) :: ewald
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
         type(Environment_Wrapper), intent(in) :: environment
         type(Particles_Wrapper), intent(in) :: particles
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
 
         real(DP) :: alpha
         logical :: dipolar
@@ -54,6 +56,23 @@ contains
         call ewald_factory_create(ewald%real_particles, dipolar, environment%periodic_box, &
             particles%positions, particles%dipolar_moments)
     end subroutine ewald_factory_create_all
+
+    subroutine ewald_factory_create_inter(inter_ewald, environment, mixture, input_data, prefix)
+        type(Inter_Ewald_Wrapper), intent(out) :: inter_ewald
+        type(Environment_Wrapper), intent(in) :: environment
+        type(Mixture_Wrapper), intent(in) :: mixture
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
+
+        logical :: mixture_is_dipolar
+        real(DP) :: alpha
+
+        mixture_is_dipolar = particles_are_dipolar(mixture%components(1)%dipolar_moments) .and. &
+            particles_are_dipolar(mixture%components(2)%dipolar_moments)
+        call set_alpha(alpha, mixture_is_dipolar, environment%periodic_box, input_data, prefix)
+        call ewald_factory_create(inter_ewald%real_pair, mixture_is_dipolar, alpha, &
+            environment%periodic_box, mixture%inter_diameter, input_data, prefix//"Real.")
+    end subroutine ewald_factory_create_inter
 
     subroutine set_alpha(alpha, dipolar, periodic_box, input_data, prefix)
         real(DP), intent(out) :: alpha
@@ -67,7 +86,7 @@ contains
         real(DP) :: box_size(num_dimensions), alpha_times_box
 
         if (dipolar) then
-            data_field = prefix//"alpha * box size(1)"
+            data_field = prefix//"alpha times box edge"
             call input_data%get(data_field, alpha_times_box, data_found)
             call check_data_found(data_field, data_found)
             box_size = periodic_box%get_size()
@@ -134,7 +153,7 @@ contains
 
         if (dipolar) then
             domain%min = particles_diameter%get_min()
-            data_field = prefix//"max distance / box size(1)"
+            data_field = prefix//"max distance over box edge"
             call input_data%get(data_field, max_over_box, data_found)
             call check_data_found(data_field, data_found)
             box_size = periodic_box%get_size()
@@ -171,6 +190,12 @@ contains
         call ewald_factory_destroy(ewald%real_particles)
         call ewald_factory_destroy(ewald%real_pair)
     end subroutine ewald_factory_destroy_all
+
+    subroutine ewald_factory_destroy_inter(inter_ewald)
+        type(Inter_Ewald_Wrapper), intent(inout) :: inter_ewald
+
+        call ewald_factory_destroy(inter_ewald%real_pair)
+    end subroutine ewald_factory_destroy_inter
 
     subroutine destroy_and_deallocate_real_particles(real_particles)
         class(Abstract_Ewald_Real_Particles), allocatable, intent(inout) :: real_particles

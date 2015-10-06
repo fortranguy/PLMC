@@ -6,6 +6,7 @@ use types_environment_wrapper, only: Environment_Wrapper
 use types_particles_wrapper, only: Mixture_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
 use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper
+use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
 use class_one_particle_move, only: Abstract_One_Particle_Move
 use procedures_metropolis_factory, only: metropolis_factory_create, metropolis_factory_set, &
     metropolis_factory_destroy
@@ -24,6 +25,7 @@ implicit none
     type(Mixture_Wrapper) :: mixture
     type(Changes_Wrapper) :: changes(num_components)
     type(Mixture_Short_Potentials_Wrapper) :: short_potentials
+    type(Mixture_Ewald_Wrapper) :: ewalds
     class(Abstract_One_Particle_Move), allocatable :: one_particle_move
     type(Concrete_Mixture_Observables) :: observables
     type(Mixture_Observable_Writers_Wrapper) :: observables_writers
@@ -36,11 +38,12 @@ implicit none
     call plmc_create(mixture, environment, input_data)
     call plmc_create(changes, environment%periodic_box, mixture%components, input_data)
     call plmc_create(short_potentials, environment, mixture, input_data)
+    call plmc_create(ewalds, environment, mixture, input_data)
     call plmc_create(observables_writers, environment%walls_potential, mixture, changes, input_data)
     call plmc_set_num_steps(input_data)
     call input_data%destroy()
 
-    call plmc_visit(observables, environment%walls_potential, short_potentials, mixture)
+    call plmc_visit(observables, environment%walls_potential, short_potentials, ewalds, mixture)
     call plmc_write(0, observables_writers, observables, in_loop = .false.)
 
     call metropolis_factory_create(one_particle_move, environment, changes)
@@ -59,11 +62,12 @@ implicit none
         call plmc_write(i_step, observables_writers, observables, in_loop = .true.)
     end do
 
-    call plmc_visit(observables, environment%walls_potential, short_potentials, mixture)
+    call plmc_visit(observables, environment%walls_potential, short_potentials, ewalds, mixture)
     call plmc_write(i_step-1, observables_writers, observables, in_loop = .false.)
 
     call metropolis_factory_destroy(one_particle_move)
     call plmc_destroy(observables_writers)
+    call plmc_destroy(ewalds)
     call plmc_destroy(short_potentials)
     call plmc_destroy(changes)
     call plmc_destroy(mixture)

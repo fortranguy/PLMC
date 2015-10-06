@@ -14,8 +14,9 @@ use class_particles_positions, only: Abstract_Particles_Positions
 use class_moved_positions, only: Abstract_Moved_Positions
 use class_pair_potential, only: Abstract_Pair_Potential
 use class_visitable_cells, only: Abstract_Visitable_Cells
-use module_particles_energy, only: Concrete_Particles_Energy, &
-    particle_energy_sum => Concrete_Particles_Energy_sum, operator(+), operator(-)
+use module_particles_energy, only: Concrete_Particles_Energy, Concrete_Inter_Energy, &
+    particle_energy_sum => Concrete_Particles_Energy_sum, &
+    inter_energy_sum => Concrete_Inter_Energy_sum, operator(+), operator(-)
 use module_changes_success, only: Concrete_Change_Counters
 
 implicit none
@@ -37,7 +38,7 @@ private
         type(Move_Candidate) :: candidates(num_components)
         type(Concrete_Change_Counters), pointer :: move_counters(:) => null()
         type(Concrete_Particles_Energy), pointer :: particles_energies(:) => null()
-        real(DP), pointer :: inter_energy => null()
+        type(Concrete_Inter_Energy), pointer :: inter_energy => null()
     contains
         procedure :: construct => Abstract_One_Particle_Move_construct
         generic :: set_candidate => set_candidate_positions, set_candidate_short_potentials, &
@@ -172,7 +173,7 @@ contains
         class(Abstract_One_Particle_Move), intent(inout) :: this
         type(Concrete_Change_Counters), target, intent(in) :: move_counters(:)
         type(Concrete_Particles_Energy), target, intent(in) :: particles_energies(:)
-        real(DP), target, intent(in) :: inter_energy
+        type(Concrete_Inter_Energy), target, intent(in) :: inter_energy
 
         if (size(move_counters) /= num_components) then
             call error_exit("Abstract_One_Particle_Move: "//&
@@ -193,7 +194,7 @@ contains
         integer :: i_actor, i_spectator
         logical :: success
         type(Concrete_Particles_Energy) :: actor_energy_difference
-        real(DP) :: inter_energy_difference
+        type(Concrete_Inter_Energy) :: inter_energy_difference
 
         call this%select_actor_and_spectator(i_actor, i_spectator)
         this%move_counters(i_actor)%num_hits = this%move_counters(i_actor)%num_hits + 1
@@ -212,7 +213,7 @@ contains
         class(Abstract_One_Particle_Move), intent(in) :: this
         logical, intent(out) :: success
         type(Concrete_Particles_Energy), intent(out) :: actor_energy_difference
-        real(DP), intent(out) :: inter_energy_difference
+        type(Concrete_Inter_Energy), intent(out) :: inter_energy_difference
         integer, intent(in) :: i_actor, i_spectator
 
         class(Abstract_Particles_Positions), pointer :: actor_positions
@@ -222,7 +223,7 @@ contains
         integer :: spectator_num_positions
         type(Concrete_Particle) :: old, new
         type(Concrete_Particles_Energy) :: new_energy, old_energy
-        real(DP) :: inter_new_energy, inter_old_energy
+        type(Concrete_Inter_Energy) :: inter_new_energy, inter_old_energy
         real(DP) :: energy_difference
         logical :: overlap
         real(DP) :: rand
@@ -242,27 +243,28 @@ contains
         if (overlap) return
         if (actor_positions%get_num() > spectator_num_positions) then
             new%same_type = .true.
-            call actor_cells%visit(overlap, new_energy%intra, new)
+            call actor_cells%visit(overlap, new_energy%short, new)
             if (overlap) return
             new%same_type = .false.
-            call spectator_cells%visit(overlap, inter_new_energy, new)
+            call spectator_cells%visit(overlap, inter_new_energy%short, new)
         else
             new%same_type = .false.
-            call spectator_cells%visit(overlap, inter_new_energy, new)
+            call spectator_cells%visit(overlap, inter_new_energy%short, new)
             if (overlap) return
             new%same_type = .true.
-            call actor_cells%visit(overlap, new_energy%intra, new)
+            call actor_cells%visit(overlap, new_energy%short, new)
         end if
         if (overlap) return
         call this%walls%visit(overlap, old_energy%walls, old%position, actor_wall_pair)
         old%same_type = .true.
-        call actor_cells%visit(overlap, old_energy%intra, old)
+        call actor_cells%visit(overlap, old_energy%short, old)
         old%same_type = .false.
-        call spectator_cells%visit(overlap, inter_old_energy, old)
+        call spectator_cells%visit(overlap, inter_old_energy%short, old)
 
         actor_energy_difference = new_energy - old_energy
         inter_energy_difference = inter_new_energy - inter_old_energy
-        energy_difference = particle_energy_sum(actor_energy_difference) + inter_energy_difference
+        energy_difference = particle_energy_sum(actor_energy_difference) + &
+            inter_energy_sum(inter_energy_difference)
         call random_number(rand)
         if (rand < exp(-energy_difference/this%temperature%get())) then
             call actor_positions%set(new%i, new%position)
@@ -357,7 +359,7 @@ contains
         class(Null_One_Particle_Move), intent(inout) :: this
         type(Concrete_Change_Counters), target, intent(in) :: move_counters(:)
         type(Concrete_Particles_Energy), target, intent(in) :: particles_energies(:)
-        real(DP), target, intent(in) :: inter_energy
+        type(Concrete_Inter_Energy), target, intent(in) :: inter_energy
     end subroutine Null_One_Particle_Move_set_candidates_observables
 
     subroutine Null_One_Particle_Move_try(this)
