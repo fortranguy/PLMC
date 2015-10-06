@@ -7,6 +7,7 @@ use types_environment_wrapper, only: Environment_Wrapper
 use types_particles_wrapper, only: Particles_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
 use types_short_potential_wrapper, only: Short_Potential_Wrapper, Short_Potential_Macro_Wrapper
+use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
 use class_one_particle_move, only: Abstract_One_Particle_Move, &
     Null_One_Particle_Move, Two_Candidates_One_Particle_Move, &
     First_Candidate_One_Particle_Move, Second_Candidate_One_Particle_Move
@@ -25,6 +26,7 @@ interface metropolis_factory_set
     module procedure :: set_one_particle_move_components
     module procedure :: set_one_particle_move_observables
     module procedure :: set_one_particle_move_short_potentials
+    module procedure :: set_one_particle_move_ewald_real
 end interface metropolis_factory_set
 
 interface metropolis_factory_destroy
@@ -59,7 +61,9 @@ contains
         type(Particles_Wrapper), intent(in) :: components(num_components)
 
         call one_particle_move%set_candidate(1, components(1)%positions)
+        call one_particle_move%set_candidate(1, components(1)%dipolar_moments)
         call one_particle_move%set_candidate(2, components(2)%positions)
+        call one_particle_move%set_candidate(2, components(2)%dipolar_moments)
     end subroutine set_one_particle_move_components
 
     subroutine set_one_particle_move_short_potentials(one_particle_move, intras, inters)
@@ -72,6 +76,17 @@ contains
         call one_particle_move%set_candidate(2, intras(2)%cells, inters(2)%cells)
         call one_particle_move%set_candidate(2, intras(2)%wall_pair)
     end subroutine set_one_particle_move_short_potentials
+
+    subroutine set_one_particle_move_ewald_real(one_particle_move, ewalds)
+        class(Abstract_One_Particle_Move), intent(inout) :: one_particle_move
+        class(Mixture_Ewald_Wrapper), intent(in) :: ewalds
+
+        call one_particle_move%set_candidate(1, ewalds%intras(1)%real_particles, &
+            ewalds%intras(1)%real_pair)
+        call one_particle_move%set_candidate(2, ewalds%intras(2)%real_particles, &
+            ewalds%intras(2)%real_pair)
+        call one_particle_move%set_inter_candidates(ewalds%inter%real_pair)
+    end subroutine set_one_particle_move_ewald_real
 
     subroutine set_one_particle_move_observables(one_particle_move, observables)
         class(Abstract_One_Particle_Move), intent(inout) :: one_particle_move
