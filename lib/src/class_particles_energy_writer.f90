@@ -51,7 +51,7 @@ contains
         call check_string_not_empty("Abstract_Particles_Energy_Writer_construct: filename", &
             filename)
         open(newunit=this%unit, recl=max_line_length, file=filename, action="write")
-        legend = "#i_step    short"
+        legend = "# i_step    short"
         if (energy_selector%write_walls) then
             allocate(Concrete_Number_to_String :: this%string_walls)
             legend = legend//"    walls"

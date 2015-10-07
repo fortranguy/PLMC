@@ -143,32 +143,34 @@ contains
         class(Abstract_One_Particle_Move), intent(inout) :: this
         type(Particles_Wrapper), target, intent(in) :: components(num_components)
 
-        this%candidates(1)%positions => components(1)%positions
-        this%candidates(1)%dipolar_moments => components(1)%dipolar_moments
-        this%candidates(2)%positions => components(2)%positions
-        this%candidates(2)%dipolar_moments => components(2)%dipolar_moments
+        integer :: i_candidate
+        do i_candidate = 1, num_components
+            this%candidates(i_candidate)%positions => components(i_candidate)%positions
+            this%candidates(i_candidate)%dipolar_moments => components(i_candidate)%dipolar_moments
+        end do
     end subroutine Abstract_One_Particle_Move_set_components
 
     subroutine Abstract_One_Particle_Move_set_short_potentials(this, short_potentials)
         class(Abstract_One_Particle_Move), intent(inout) :: this
         type(Mixture_Short_Potentials_Wrapper), target, intent(in) :: short_potentials
 
-        this%candidates(1)%intra_cells => short_potentials%intras(1)%cells
-        this%candidates(1)%inter_cells => short_potentials%inters(1)%cells
-        this%candidates(1)%wall_pair => short_potentials%intras(1)%wall_pair
-        this%candidates(2)%intra_cells => short_potentials%intras(2)%cells
-        this%candidates(2)%inter_cells => short_potentials%inters(2)%cells
-        this%candidates(2)%wall_pair => short_potentials%intras(2)%wall_pair
+        integer :: i_candidate
+        do i_candidate = 1, num_components
+            this%candidates(i_candidate)%intra_cells => short_potentials%intras(i_candidate)%cells
+            this%candidates(i_candidate)%inter_cells => short_potentials%inters(i_candidate)%cells
+            this%candidates(i_candidate)%wall_pair => short_potentials%intras(i_candidate)%wall_pair
+        end do
     end subroutine Abstract_One_Particle_Move_set_short_potentials
 
     subroutine Abstract_One_Particle_Move_set_ewalds(this, ewalds)
         class(Abstract_One_Particle_Move), intent(inout) :: this
         type(Mixture_Ewald_Wrapper), target, intent(in) :: ewalds
 
-        this%candidates(1)%ewald_real_pair => ewalds%intras(1)%real_pair
-        this%candidates(1)%ewald_real => ewalds%intras(1)%real_particles
-        this%candidates(2)%ewald_real_pair => ewalds%intras(2)%real_pair
-        this%candidates(2)%ewald_real => ewalds%intras(2)%real_particles
+        integer :: i_candidate
+        do i_candidate = 1, num_components
+            this%candidates(i_candidate)%ewald_real_pair => ewalds%intras(i_candidate)%real_pair
+            this%candidates(i_candidate)%ewald_real => ewalds%intras(i_candidate)%real_particles
+        end do
         this%ewald_inter_real_pair => ewalds%inter%real_pair
     end subroutine Abstract_One_Particle_Move_set_ewalds
 

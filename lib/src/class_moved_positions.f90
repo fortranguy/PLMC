@@ -24,8 +24,8 @@ private
     contains
         procedure :: construct => Abstract_Moved_Positions_construct
         procedure :: destroy => Abstract_Moved_Positions_destroy
-        procedure :: increase => Abstract_Moved_Positions_increase
-        procedure :: decrease => Abstract_Moved_Positions_decrease
+        procedure :: increase_delta => Abstract_Moved_Positions_increase_delta
+        procedure :: decrease_delta => Abstract_Moved_Positions_decrease_delta
         procedure :: get => Abstract_Moved_Positions_get
     end type Abstract_Moved_Positions
 
@@ -37,8 +37,8 @@ private
     contains
         procedure :: construct => Null_Moved_Positions_construct
         procedure :: destroy => Null_Moved_Positions_destroy
-        procedure :: increase => Null_Moved_Positions_increase
-        procedure :: decrease => Null_Moved_Positions_decrease
+        procedure :: increase_delta => Null_Moved_Positions_increase_delta
+        procedure :: decrease_delta => Null_Moved_Positions_decrease_delta
         procedure :: get => Null_Moved_Positions_get
     end type Null_Moved_Positions
 
@@ -75,20 +75,20 @@ contains
         this%periodic_box => null()
     end subroutine Abstract_Moved_Positions_destroy
 
-    subroutine Abstract_Moved_Positions_increase(this)
+    subroutine Abstract_Moved_Positions_increase_delta(this)
         class(Abstract_Moved_Positions), intent(inout) :: this
 
         if (this%max_factor_reached) return
         call set_increase_factor("Abstract_Moved_Positions", this%current_increase_factor, &
             this%adaptation_parameters, this%max_factor_reached)
         this%delta = this%current_increase_factor * this%delta
-    end subroutine Abstract_Moved_Positions_increase
+    end subroutine Abstract_Moved_Positions_increase_delta
 
-    subroutine Abstract_Moved_Positions_decrease(this)
+    subroutine Abstract_Moved_Positions_decrease_delta(this)
         class(Abstract_Moved_Positions), intent(inout) :: this
 
         this%delta = this%delta / this%current_increase_factor
-    end subroutine Abstract_Moved_Positions_decrease
+    end subroutine Abstract_Moved_Positions_decrease_delta
 
     function Abstract_Moved_Positions_get(this, i_particle) result(moved_position)
         class(Abstract_Moved_Positions), intent(in) :: this
@@ -119,13 +119,13 @@ contains
         class(Null_Moved_Positions), intent(inout) :: this
     end subroutine Null_Moved_Positions_destroy
 
-    subroutine Null_Moved_Positions_increase(this)
+    subroutine Null_Moved_Positions_increase_delta(this)
         class(Null_Moved_Positions), intent(inout) :: this
-    end subroutine Null_Moved_Positions_increase
+    end subroutine Null_Moved_Positions_increase_delta
 
-    subroutine Null_Moved_Positions_decrease(this)
+    subroutine Null_Moved_Positions_decrease_delta(this)
         class(Null_Moved_Positions), intent(inout) :: this
-    end subroutine Null_Moved_Positions_decrease
+    end subroutine Null_Moved_Positions_decrease_delta
 
     function Null_Moved_Positions_get(this, i_particle) result(moved_position)
         class(Null_Moved_Positions), intent(in) :: this

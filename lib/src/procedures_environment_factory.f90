@@ -11,7 +11,7 @@ use class_temperature, only: Abstract_Temperature, &
 use class_field_expression, only: Abstract_Field_Expression, &
     Constant_Field_Expression, Null_Field_Expression
 use class_parallelepiped_domain, only: Abstract_Parallelepiped_Domain, &
-    Concrete_Parallelepiped_Domain, Null_Parallelepiped_Domain, Box_Parallelepiped_Domain
+    Concrete_Parallelepiped_Domain, Null_Parallelepiped_Domain
 use class_external_field, only: Abstract_External_Field, &
     Concrete_External_Field, Null_External_Field
 use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice, &
@@ -218,11 +218,9 @@ contains
                     call input_data%get(data_field, domain_size, data_found)
                     call check_data_found(data_field, data_found)
                     allocate(Concrete_Parallelepiped_Domain :: parallelepiped_domain)
-                case ("box")
-                    allocate(Box_Parallelepiped_Domain :: parallelepiped_domain)
                 case default
                     call error_exit(domain_name//" domain_name unknown."//&
-                        "Choose among: 'domain', 'box', 'null'.")
+                        "Choose: 'domain'.")
             end select
             deallocate(domain_name)
             deallocate(data_field)

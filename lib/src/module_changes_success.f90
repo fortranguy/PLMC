@@ -34,37 +34,36 @@ contains
     subroutine Concrete_Mixture_Changes_Counters_reset(changes_counters)
         type(Concrete_Mixture_Changes_Counters), intent(out) :: changes_counters
 
-        integer :: i_component
-        do i_component = 1, num_components
-            call Concrete_Change_Counters_reset(changes_counters%moves(i_component))
-            call Concrete_Change_Counters_reset(changes_counters%rotations(i_component))
-            call Concrete_Change_Counters_reset(changes_counters%exchanges(i_component))
-        end do
+        call reset(changes_counters%moves)
+        call reset(changes_counters%rotations)
+        call reset(changes_counters%exchanges)
     end subroutine Concrete_Mixture_Changes_Counters_reset
 
-    subroutine Concrete_Change_Counters_reset(change_counters)
+    elemental subroutine reset(change_counters)
         type(Concrete_Change_Counters), intent(out) :: change_counters
 
         change_counters%num_hits = 0
         change_counters%num_success = 0
-    end subroutine Concrete_Change_Counters_reset
+    end subroutine reset
 
     subroutine Concrete_Mixture_Changes_Success_set(changes_success, changes_counters)
         type(Concrete_Mixture_Changes_Success), intent(out) :: changes_success
         type(Concrete_Mixture_Changes_Counters), intent(in) :: changes_counters
 
-        integer :: i_component
-        do i_component = 1, num_components
-            changes_success%ratios(i_component)%move = &
-                real(changes_counters%moves(i_component)%num_success, DP) / &
-                real(changes_counters%moves(i_component)%num_hits, DP)
-            changes_success%ratios(i_component)%rotation = &
-                real(changes_counters%rotations(i_component)%num_success, DP) / &
-                real(changes_counters%rotations(i_component)%num_hits, DP)
-            changes_success%ratios(i_component)%exchange = &
-                real(changes_counters%exchanges(i_component)%num_success, DP) / &
-                real(changes_counters%exchanges(i_component)%num_hits, DP)
-        end do
+        changes_success%ratios(:)%move = get_ratio(changes_counters%moves)
+        changes_success%ratios(:)%rotation = get_ratio(changes_counters%rotations)
+        changes_success%ratios(:)%exchange = get_ratio(changes_counters%exchanges)
     end subroutine Concrete_Mixture_Changes_Success_set
+
+    elemental real(DP) function get_ratio(change_counters)
+        type(Concrete_Change_Counters), intent(in) :: change_counters
+
+        if (change_counters%num_hits > 0) then
+            get_ratio = real(change_counters%num_success, DP) / &
+                real(change_counters%num_hits, DP)
+        else
+            get_ratio = 0._DP
+        end if
+    end function get_ratio
 
 end module module_changes_success

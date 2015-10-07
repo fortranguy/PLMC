@@ -38,11 +38,6 @@ private
         procedure :: random_position => Null_Parallelepiped_Domain_random_position
     end type Null_Parallelepiped_Domain
 
-    type, extends(Abstract_Parallelepiped_Domain), public :: Box_Parallelepiped_Domain
-    contains
-        procedure :: construct => Box_Parallelepiped_Domain_construct
-    end type Box_Parallelepiped_Domain
-
 contains
 
 !implementation Abstract_Parallelepiped_Domain
@@ -168,23 +163,5 @@ contains
     end function Null_Parallelepiped_Domain_random_position
 
 !end implementation Null_Parallelepiped_Domain
-
-!implementation Box_Parallelepiped_Domain
-
-    subroutine Box_Parallelepiped_Domain_construct(this, periodic_box, origin, size)
-        class(Box_Parallelepiped_Domain), intent(out) :: this
-        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        real(DP), intent(in) :: origin(:), size(:)
-
-        this%periodic_box => periodic_box
-        this%origin = this%periodic_box%folded([0._DP, 0._DP, 0._DP])
-        this%size = this%periodic_box%get_size()
-
-        if (.not.this%is_boxed()) then
-            call error_exit("Box_Parallelepiped_Domain: domain is not boxed.")
-        end if
-    end subroutine Box_Parallelepiped_Domain_construct
-
-!end implementation Box_Parallelepiped_Domain
 
 end module class_parallelepiped_domain

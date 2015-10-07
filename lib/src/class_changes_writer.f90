@@ -51,7 +51,7 @@ contains
 
         call check_string_not_empty("Abstract_Changes_Success_Writer_construct: filename", filename)
         open(newunit=this%unit, recl=max_line_length, file=filename, action="write")
-        legend = "#i_step    moves"
+        legend = "# i_step    moves"
         if (changes_selector%write_rotations) then
             allocate(Concrete_Number_to_String :: this%string_rotation)
             legend = legend//"    rotations"
