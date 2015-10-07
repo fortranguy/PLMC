@@ -38,6 +38,12 @@
 				</Linker>
 			</Target>
 		</Build>
+		<Unit filename="lib/src/class_change_tuner.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="lib/src/class_changed_coordinates.f90">
+			<Option weight="0" />
+		</Unit>
 		<Unit filename="lib/src/class_changes_writer.f90">
 			<Option weight="2" />
 		</Unit>
@@ -143,7 +149,7 @@
 		<Unit filename="lib/src/data_wrappers_prefix.f90">
 			<Option weight="0" />
 		</Unit>
-		<Unit filename="lib/src/module_change_adaptation.f90">
+		<Unit filename="lib/src/module_change_tuning.f90">
 			<Option weight="1" />
 		</Unit>
 		<Unit filename="lib/src/module_changes_success.f90">

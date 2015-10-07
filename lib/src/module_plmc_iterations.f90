@@ -6,9 +6,9 @@ use procedures_checks, only: check_data_found, check_positive
 implicit none
 
 private
-public :: num_steps, plmc_set_num_steps
+public :: num_tuning_steps, num_steps, plmc_set_num_steps
 
-    integer, protected :: num_steps
+    integer, protected :: num_tuning_steps, num_steps
 
 contains
 
@@ -18,10 +18,14 @@ contains
         character(len=:), allocatable :: data_field
         logical :: data_found
 
+        data_field = "Monte Carlo.number of tuning steps"
+        call input_data%get(data_field, num_tuning_steps, data_found)
+        call check_data_found(data_field, data_found)
+        call check_positive("plmc_set_num_steps", "num_tuning_steps", num_tuning_steps)
         data_field = "Monte Carlo.number of steps"
         call input_data%get(data_field, num_steps, data_found)
         call check_data_found(data_field, data_found)
-        call check_positive("test_canonical", "num_steps", num_steps)
+        call check_positive("plmc_set_num_steps", "num_steps", num_steps)
         deallocate(data_field)
     end subroutine plmc_set_num_steps
 

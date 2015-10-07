@@ -5,18 +5,19 @@ use data_constants, only: num_dimensions
 use procedures_checks, only: check_positive, check_increase_factor
 use class_particles_orientations, only: Abstract_Particles_Orientations
 use procedures_random, only: markov_orientation
-use module_change_adaptation, only: Concrete_Adaptation_Parameters, &
+use module_change_tuning, only: Concrete_Tuning_Parameters, &
     set_increase_factor
+use class_changed_coordinates, only: Abstract_Changed_Coordinates
 
 implicit none
 
 private
 
-    type, abstract, public :: Abstract_Rotated_Orientations
+    type, extends(Abstract_Changed_Coordinates), abstract, public :: Abstract_Rotated_Orientations
     private
         class(Abstract_Particles_Orientations), pointer :: orientations
         real(DP) :: delta
-        type(Concrete_Adaptation_Parameters) :: adaptation_parameters
+        type(Concrete_Tuning_Parameters) :: tuning_parameters
         real(DP) :: current_increase_factor
         logical :: max_factor_reached
     contains
@@ -47,22 +48,22 @@ contains
 !implementation Abstract_Rotated_Orientations
 
     subroutine Abstract_Rotated_Orientations_construct(this, orientations, delta, &
-        adaptation_parameters)
+        tuning_parameters)
         class(Abstract_Rotated_Orientations), intent(out) :: this
         class(Abstract_Particles_Orientations), target, intent(in) :: orientations
         real(DP), intent(in) :: delta
-        type(Concrete_Adaptation_Parameters), intent(in) :: adaptation_parameters
+        type(Concrete_Tuning_Parameters), intent(in) :: tuning_parameters
 
         this%orientations => orientations
         call check_positive("Abstract_Rotated_Orientations", "delta", delta)
         this%delta = delta
         call check_increase_factor("Abstract_Rotated_Orientations", "increase_factor", &
-            adaptation_parameters%increase_factor)
-        this%adaptation_parameters%increase_factor = adaptation_parameters%increase_factor
-        this%current_increase_factor = this%adaptation_parameters%increase_factor
+            tuning_parameters%increase_factor)
+        this%tuning_parameters%increase_factor = tuning_parameters%increase_factor
+        this%current_increase_factor = this%tuning_parameters%increase_factor
         call check_increase_factor("Abstract_Rotated_Orientations", "increase_factor_max", &
-            adaptation_parameters%increase_factor_max)
-        this%adaptation_parameters%increase_factor_max = adaptation_parameters%increase_factor_max
+            tuning_parameters%increase_factor_max)
+        this%tuning_parameters%increase_factor_max = tuning_parameters%increase_factor_max
     end subroutine Abstract_Rotated_Orientations_construct
 
     subroutine Abstract_Rotated_Orientations_destroy(this)
@@ -76,7 +77,7 @@ contains
 
         if (this%max_factor_reached) return
         call set_increase_factor("Abstract_Rotated_Orientations", this%current_increase_factor, &
-            this%adaptation_parameters, this%max_factor_reached)
+            this%tuning_parameters, this%max_factor_reached)
         this%delta = this%current_increase_factor * this%delta
     end subroutine Abstract_Rotated_Orientations_increase_delta
 
@@ -99,11 +100,11 @@ contains
 
 !implementation Null_Rotated_Orientations
 
-    subroutine Null_Rotated_Orientations_construct(this, orientations, delta, adaptation_parameters)
+    subroutine Null_Rotated_Orientations_construct(this, orientations, delta, tuning_parameters)
         class(Null_Rotated_Orientations), intent(out) :: this
         class(Abstract_Particles_Orientations), target, intent(in) :: orientations
         real(DP), intent(in) :: delta
-        type(Concrete_Adaptation_Parameters), intent(in) :: adaptation_parameters
+        type(Concrete_Tuning_Parameters), intent(in) :: tuning_parameters
     end subroutine Null_Rotated_Orientations_construct
 
     subroutine Null_Rotated_Orientations_destroy(this)

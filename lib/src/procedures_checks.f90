@@ -10,7 +10,7 @@ implicit none
 private
 public :: check_file_exists, check_data_found, check_string_not_empty, &
     check_in_range, check_3d_array, check_positive, check_norm, check_increase_factor, &
-    check_potential_domain
+    check_potential_domain, check_ratio
 
 interface check_3d_array
     module procedure :: check_integer_3d_array
@@ -202,5 +202,14 @@ contains
             call warning_continue(context//domain_name//"%delta may be too big.")
         end if
     end subroutine check_potential_domain
+
+    subroutine check_ratio(context, ratio_name, ratio)
+        character(len=*), intent(in) :: context, ratio_name
+        real(DP), intent(in) :: ratio
+
+        if (ratio < 0._DP .or. 1._DP < ratio) then
+            call error_exit(context//": "//ratio_name//" must be between 0.0 and 1.0.")
+        end if
+    end subroutine check_ratio
 
 end module procedures_checks

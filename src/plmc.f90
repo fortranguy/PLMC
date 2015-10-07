@@ -17,7 +17,7 @@ use module_changes_success, only: counters_reset => Concrete_Mixture_Changes_Cou
 use types_mixture_observables, only: Concrete_Mixture_Observables
 use types_observable_writers_wrapper, only: Mixture_Observable_Writers_Wrapper
 use procedures_plmc_write, only: plmc_write
-use module_plmc_iterations, only: num_steps, plmc_set_num_steps
+use module_plmc_iterations, only: num_tuning_steps, num_steps, plmc_set_num_steps
 
 implicit none
 
@@ -34,13 +34,13 @@ implicit none
     integer :: i_step, num_moves, i_move
 
     call plmc_load(input_data)
+    call plmc_set_num_steps(input_data)
     call plmc_create(environment, input_data)
     call plmc_create(mixture, environment, input_data)
     call plmc_create(changes, environment%periodic_box, mixture%components, input_data)
     call plmc_create(short_potentials, environment, mixture, input_data)
     call plmc_create(ewalds, environment, mixture, input_data)
     call plmc_create(observables_writers, environment%walls_potential, mixture, changes, input_data)
-    call plmc_set_num_steps(input_data)
     call input_data%destroy()
 
     call plmc_visit(observables, environment%walls_potential, short_potentials, ewalds, mixture)
@@ -52,13 +52,14 @@ implicit none
 
     num_moves = mixture%components(1)%positions%get_num() + &
         mixture%components(2)%positions%get_num()
-    do i_step = 1, num_steps
+    do while (i_step < num_steps)
         call counters_reset(observables%changes_counters)
         do i_move = 1, num_moves
             call one_particle_move%try()
         end do
         call sucess_set(observables%changes_success, observables%changes_counters)
         call plmc_write(i_step, observables_writers, observables, in_loop = .true.)
+        i_step = i_step + 1
     end do
 
     call plmc_visit(observables, environment%walls_potential, short_potentials, ewalds, mixture)

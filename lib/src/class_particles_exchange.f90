@@ -9,7 +9,7 @@ private
 
     type, abstract, public :: Abstract_Particles_Exchange
     private
-        type(Particles_Wrapper), pointer :: particles
+        type(Particles_Wrapper), pointer :: particles => null()
     contains
         procedure :: construct => Abstract_Particles_Exchange_construct
         procedure :: destroy => Abstract_Particles_Exchange_destroy

@@ -6,19 +6,20 @@ use procedures_errors, only: warning_continue
 use procedures_checks, only: check_3d_array, check_positive, check_increase_factor
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_particles_positions, only: Abstract_Particles_Positions
-use module_change_adaptation, only: Concrete_Adaptation_Parameters, &
+use module_change_tuning, only: Concrete_Tuning_Parameters, &
     set_increase_factor
+use class_changed_coordinates, only: Abstract_Changed_Coordinates
 
 implicit none
 
 private
 
-    type, abstract, public :: Abstract_Moved_Positions
+    type, extends(Abstract_Changed_Coordinates), abstract, public :: Abstract_Moved_Positions
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
         class(Abstract_Particles_Positions), pointer :: positions => null()
         real(DP) :: delta(num_dimensions)
-        type(Concrete_Adaptation_Parameters) :: adaptation_parameters
+        type(Concrete_Tuning_Parameters) :: tuning_parameters
         real(DP) :: current_increase_factor
         logical :: max_factor_reached
     contains
@@ -47,12 +48,12 @@ contains
 !implementation Abstract_Moved_Positions
 
     subroutine Abstract_Moved_Positions_construct(this, periodic_box, positions, delta, &
-        adaptation_parameters)
+        tuning_parameters)
         class(Abstract_Moved_Positions), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Particles_Positions), target, intent(in) :: positions
         real(DP), intent(in) :: delta(:)
-        type(Concrete_Adaptation_Parameters), intent(in) :: adaptation_parameters
+        type(Concrete_Tuning_Parameters), intent(in) :: tuning_parameters
 
         this%periodic_box => periodic_box
         this%positions => positions
@@ -60,12 +61,12 @@ contains
         call check_positive("Abstract_Moved_Positions", "delta", delta)
         this%delta = delta
         call check_increase_factor("Abstract_Moved_Positions", "increase_factor", &
-            adaptation_parameters%increase_factor)
-        this%adaptation_parameters%increase_factor = adaptation_parameters%increase_factor
-        this%current_increase_factor = this%adaptation_parameters%increase_factor
+            tuning_parameters%increase_factor)
+        this%tuning_parameters%increase_factor = tuning_parameters%increase_factor
+        this%current_increase_factor = this%tuning_parameters%increase_factor
         call check_increase_factor("Abstract_Moved_Positions", "increase_factor_max", &
-            adaptation_parameters%increase_factor_max)
-        this%adaptation_parameters%increase_factor_max = adaptation_parameters%increase_factor_max
+            tuning_parameters%increase_factor_max)
+        this%tuning_parameters%increase_factor_max = tuning_parameters%increase_factor_max
     end subroutine Abstract_Moved_Positions_construct
 
     subroutine Abstract_Moved_Positions_destroy(this)
@@ -80,7 +81,7 @@ contains
 
         if (this%max_factor_reached) return
         call set_increase_factor("Abstract_Moved_Positions", this%current_increase_factor, &
-            this%adaptation_parameters, this%max_factor_reached)
+            this%tuning_parameters, this%max_factor_reached)
         this%delta = this%current_increase_factor * this%delta
     end subroutine Abstract_Moved_Positions_increase_delta
 
@@ -107,12 +108,12 @@ contains
 !implementation Null_Moved_Positions
 
     subroutine Null_Moved_Positions_construct(this, periodic_box, positions, delta, &
-        adaptation_parameters)
+        tuning_parameters)
         class(Null_Moved_Positions), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Particles_Positions), target, intent(in) :: positions
         real(DP), intent(in) :: delta(:)
-        type(Concrete_Adaptation_Parameters), intent(in) :: adaptation_parameters
+        type(Concrete_Tuning_Parameters), intent(in) :: tuning_parameters
     end subroutine Null_Moved_Positions_construct
 
     subroutine Null_Moved_Positions_destroy(this)
