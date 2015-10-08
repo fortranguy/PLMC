@@ -1,5 +1,6 @@
 program test_canonical
 
+use, intrinsic :: iso_fortran_env, only: output_unit
 use data_constants, only: num_components
 use json_module, only: json_file
 use types_environment_wrapper, only: Environment_Wrapper
@@ -18,6 +19,7 @@ use types_mixture_observables, only: Concrete_Mixture_Observables
 use types_observable_writers_wrapper, only: Mixture_Observable_Writers_Wrapper
 use procedures_plmc_write, only: plmc_write
 use module_plmc_iterations, only: num_tuning_steps, num_steps, plmc_set_num_steps
+use procedures_plmc_tuning, only: plmc_tune
 
 implicit none
 
@@ -32,6 +34,7 @@ implicit none
 
     type(json_file) :: input_data
     integer :: i_step, num_moves, i_move
+    logical :: tuning_is_over
 
     call plmc_load(input_data)
     call plmc_set_num_steps(input_data)
@@ -52,15 +55,28 @@ implicit none
 
     num_moves = mixture%components(1)%positions%get_num() + &
         mixture%components(2)%positions%get_num()
-    do while (i_step < num_steps)
+    write(output_unit, *)  "Tuning changes..."
+    i_step = 1; tuning_is_over = .false.
+    do while (.not. tuning_is_over)
+        call counters_reset(observables%changes_counters)
+        do i_move = 1, num_moves
+            call one_particle_move%try()
+        end do
+        call sucess_set(observables%changes_success, observables%changes_counters)
+        call plmc_tune(tuning_is_over, i_step, changes, observables%changes_success)
+        call plmc_write(i_step, observables_writers, observables, in_loop = .true.)
+        i_step = i_step + 1
+    end do
+    write(output_unit, *) "Iterations start."
+    do i_step = 1, num_steps
         call counters_reset(observables%changes_counters)
         do i_move = 1, num_moves
             call one_particle_move%try()
         end do
         call sucess_set(observables%changes_success, observables%changes_counters)
         call plmc_write(i_step, observables_writers, observables, in_loop = .true.)
-        i_step = i_step + 1
     end do
+    write(output_unit, *) "Iterations end."
 
     call plmc_visit(observables, environment%walls_potential, short_potentials, ewalds, mixture)
     call plmc_write(i_step-1, observables_writers, observables, in_loop = .false.)

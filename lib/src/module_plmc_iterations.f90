@@ -1,6 +1,7 @@
 module module_plmc_iterations
 
 use json_module, only: json_file
+use data_wrappers_prefix, only: changes_prefix
 use procedures_checks, only: check_data_found, check_positive
 
 implicit none
@@ -18,7 +19,7 @@ contains
         character(len=:), allocatable :: data_field
         logical :: data_found
 
-        data_field = "Monte Carlo.number of tuning steps"
+        data_field = changes_prefix//"number of tuning steps"
         call input_data%get(data_field, num_tuning_steps, data_found)
         call check_data_found(data_field, data_found)
         call check_positive("plmc_set_num_steps", "num_tuning_steps", num_tuning_steps)

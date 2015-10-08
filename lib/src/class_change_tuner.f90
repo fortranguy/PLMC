@@ -80,15 +80,14 @@ contains
         real(DP) :: averaged_success_ratio
 
         tuned = .false.
-        if (mod(i_step, this%accumulation_period) /= 0) then
-            this%accumulated_success_ratio = this%accumulated_success_ratio + success_ratio
-        else
+        this%accumulated_success_ratio = this%accumulated_success_ratio + success_ratio
+        if (mod(i_step, this%accumulation_period) == 0) then
             averaged_success_ratio = this%accumulated_success_ratio / &
-                real(this%accumulation_period - 1, DP) ! assuming i_step++;
+                real(this%accumulation_period, DP) ! assuming i_step++;
             if (averaged_success_ratio < this%success_ratio_min) then
-                call this%changed_coordinates%increase_delta()
-            else if (this%success_ratio_max < averaged_success_ratio) then
                 call this%changed_coordinates%decrease_delta()
+            else if (this%success_ratio_max < averaged_success_ratio) then
+                call this%changed_coordinates%increase_delta()
             else
                 tuned = .true. ! sufficient condition?
                 return
@@ -116,6 +115,7 @@ contains
         logical, intent(out) :: tuned
         integer, intent(in) :: i_step
         real(DP), intent(in) :: success_ratio
+        tuned = .true.
     end subroutine Null_Change_Tuner_tune
 
 !end implementation Null_Change_Tuner

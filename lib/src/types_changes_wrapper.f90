@@ -17,8 +17,4 @@ private
         class(Abstract_Particles_Exchange), allocatable :: particles_exchange
     end type Changes_Wrapper
 
-    type, public :: Mixture_Changes_Wrapper
-        type(Changes_Wrapper) :: changes(num_components)
-    end type Mixture_Changes_Wrapper
-
 end module types_changes_wrapper
