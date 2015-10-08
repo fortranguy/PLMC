@@ -1,0 +1,252 @@
+module class_one_particle_change
+
+use, intrinsic :: iso_fortran_env, only: DP => REAL64
+use data_constants, only: num_components
+use procedures_errors, only: error_exit
+use procedures_checks, only: check_in_range
+use procedures_random, only: random_integer
+use types_environment_wrapper, only: Environment_Wrapper
+use types_particles_wrapper, only: Particles_Wrapper
+use types_temporary_particle, only: Concrete_Temporary_Particle
+use class_changed_coordinates, only: Abstract_Changed_Coordinates
+use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper
+use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
+use class_candidates_selector, only: Abstract_Candidates_Selector
+use module_changes_success, only: Concrete_Change_Counters
+use module_particles_energy, only: Concrete_Particles_Energy, Concrete_Inter_Energy, &
+    Concrete_Long_Energy, Concrete_Mixture_Energy, &
+    particle_energy_sum => Concrete_Particles_Energy_sum, &
+    inter_energy_sum => Concrete_Inter_Energy_sum, operator(+), operator(-)
+
+implicit none
+
+private
+
+    type, abstract, public :: Abstract_One_Particle_Change
+    private
+        type(Environment_Wrapper), pointer :: environment => null()
+        type(Particles_Wrapper), pointer :: components(:) => null()
+        class(Abstract_Changed_Coordinates), pointer :: changed_coordinates(:) => null()
+        type(Mixture_Short_Potentials_Wrapper), pointer :: short_potentials => null()
+        type(Mixture_Ewald_Wrapper), pointer :: ewalds => null()
+        class(Abstract_Candidates_Selector), allocatable :: selector
+        type(Concrete_Change_Counters), pointer :: change_counters(:) => null()
+        type(Concrete_Particles_Energy), pointer :: particles_energies(:) => null()
+        type(Concrete_Inter_Energy), pointer :: inter_energy => null()
+    contains
+        procedure :: construct => Abstract_One_Particle_Change_construct
+        procedure :: destroy => Abstract_One_Particle_Change_destroy
+        procedure :: set_candidates => Abstract_One_Particle_Change_set_candidates
+        procedure :: set_observables => Abstract_One_Particle_Change_set_observables
+        procedure :: try => Abstract_One_Particle_Change_try
+        procedure, private :: test_metropolis => Abstract_One_Particle_Change_test_metropolis
+        procedure(Abstract_One_Particle_Change_define_change), deferred :: define_change
+        procedure, private :: visit_short => Abstract_One_Particle_Change_visit_short
+        procedure, private :: visit_long => Abstract_One_Particle_Change_visit_long
+        procedure(Abstract_One_Particle_Change_update_actor), private, deferred :: update_actor
+    end type Abstract_One_Particle_Change
+
+    abstract interface
+
+        subroutine Abstract_One_Particle_Change_define_change(this, new, old)
+        import :: Concrete_Temporary_Particle, Abstract_One_Particle_Change
+            class(Abstract_One_Particle_Change), intent(in) :: this
+            type(Concrete_Temporary_Particle), intent(out) :: new, old
+        end subroutine Abstract_One_Particle_Change_define_change
+
+        subroutine Abstract_One_Particle_Change_update_actor(this, i_actor)
+        import :: Abstract_One_Particle_Change
+            class(Abstract_One_Particle_Change), intent(in) :: this
+            integer, intent(in) :: i_actor
+        end subroutine Abstract_One_Particle_Change_update_actor
+
+    end interface
+
+contains
+
+!implementation Abstract_One_Particle_Change
+
+    subroutine Abstract_One_Particle_Change_construct(this, environment, selector, &
+        changed_coordinates)
+        class(Abstract_One_Particle_Change), intent(out) :: this
+        class(Abstract_Candidates_Selector), intent(in) :: selector
+        type(Environment_Wrapper), target, intent(in) :: environment
+        class(Abstract_Changed_Coordinates), target, intent(in) :: &
+            changed_coordinates(num_components)
+
+        this%environment => environment
+        allocate(this%selector, source=selector)
+        this%changed_coordinates => changed_coordinates
+    end subroutine Abstract_One_Particle_Change_construct
+
+    subroutine Abstract_One_Particle_Change_destroy(this)
+        class(Abstract_One_Particle_Change), intent(inout) :: this
+
+        this%inter_energy => null()
+        this%particles_energies => null()
+        this%change_counters => null()
+        this%ewalds => null()
+        this%short_potentials => null()
+        this%changed_coordinates => null()
+        this%components => null()
+        if (allocated(this%selector)) deallocate(this%selector)
+        this%environment => null()
+    end subroutine Abstract_One_Particle_Change_destroy
+
+    subroutine Abstract_One_Particle_Change_set_candidates(this, components, short_potentials, &
+        ewalds)
+        class(Abstract_One_Particle_Change), intent(inout) :: this
+        type(Particles_Wrapper), target, intent(in) :: components(:)
+        type(Mixture_Short_Potentials_Wrapper), target, intent(in) :: short_potentials
+        type(Mixture_Ewald_Wrapper), target, intent(in) :: ewalds
+
+        if (size(components) /= num_components) then
+            call error_exit("Abstract_One_Particle_Change: "//&
+                "components doesn't have the right size.")
+        end if
+        this%components => components
+        this%short_potentials => short_potentials
+        this%ewalds => ewalds
+    end subroutine Abstract_One_Particle_Change_set_candidates
+
+    subroutine Abstract_One_Particle_Change_set_observables(this, change_counters, &
+        particles_energies, inter_energy)
+        class(Abstract_One_Particle_Change), intent(inout) :: this
+        type(Concrete_Change_Counters), target, intent(in) :: change_counters(:)
+        type(Concrete_Particles_Energy), target, intent(in) :: particles_energies(:)
+        type(Concrete_Inter_Energy), target, intent(in) :: inter_energy
+
+        if (size(change_counters) /= num_components) then
+            call error_exit("Abstract_One_Particle_Change: "//&
+                "change_counters doesn't have the right size.")
+        end if
+        this%change_counters => change_counters
+        if (size(particles_energies) /= num_components) then
+            call error_exit("Abstract_One_Particle_Change: "//&
+                "particles_energies doesn't have the right size.")
+        end if
+        this%particles_energies => particles_energies
+        this%inter_energy => inter_energy
+    end subroutine Abstract_One_Particle_Change_set_observables
+
+    subroutine Abstract_One_Particle_Change_try(this)
+        class(Abstract_One_Particle_Change), intent(in) :: this
+
+        integer :: i_actor, i_spectator
+        logical :: success
+        type(Concrete_Particles_Energy) :: actor_energy_difference
+        type(Concrete_Inter_Energy) :: inter_energy_difference
+
+        call this%selector%set(i_actor, i_spectator)
+        this%change_counters(i_actor)%num_hits = this%change_counters(i_actor)%num_hits + 1
+        call this%test_metropolis(success, actor_energy_difference, inter_energy_difference, &
+            i_actor, i_spectator)
+        if (success) then
+            this%particles_energies(i_actor) = this%particles_energies(i_actor) + &
+                actor_energy_difference
+            this%inter_energy = this%inter_energy + inter_energy_difference
+            this%change_counters(i_actor)%num_success = this%change_counters(i_actor)%num_success + 1
+        end if
+    end subroutine Abstract_One_Particle_Change_try
+
+    subroutine Abstract_One_Particle_Change_test_metropolis(this, success, &
+        actor_energy_difference, inter_energy_difference, i_actor, i_spectator)
+        class(Abstract_One_Particle_Change), intent(in) :: this
+        logical, intent(out) :: success
+        type(Concrete_Particles_Energy), intent(out) :: actor_energy_difference
+        type(Concrete_Inter_Energy), intent(out) :: inter_energy_difference
+        integer, intent(in) :: i_actor, i_spectator
+
+        type(Concrete_Temporary_Particle) :: new, old
+        type(Concrete_Mixture_Energy) :: new_energy, old_energy
+        real(DP) :: energy_difference
+        logical :: overlap
+        real(DP) :: rand
+
+        call this%define_change(new, old)
+
+        success = .false.
+        call this%visit_short(overlap, new_energy, old_energy, new, old, i_actor, i_spectator)
+        if (overlap) return
+        call this%visit_long(new_energy, old_energy, new, old, i_actor, i_spectator)
+
+        actor_energy_difference = new_energy%intras(i_actor) - old_energy%intras(i_actor)
+        inter_energy_difference = new_energy%inter - old_energy%inter
+        energy_difference = particle_energy_sum(actor_energy_difference) + &
+            inter_energy_sum(inter_energy_difference)
+        call random_number(rand)
+        if (rand < exp(-energy_difference/this%environment%temperature%get())) then
+            call this%update_actor(i_actor)
+            success = .true.
+        end if
+    end subroutine Abstract_One_Particle_Change_test_metropolis
+
+    subroutine Abstract_One_Particle_Change_visit_short(this, overlap, new_energy, old_energy, &
+        new, old, i_actor, i_spectator)
+        class(Abstract_One_Particle_Change), intent(in) :: this
+        logical, intent(out) :: overlap
+        type(Concrete_Mixture_Energy), intent(out) :: new_energy, old_energy
+        type(Concrete_Temporary_Particle), intent(in) :: new, old
+        integer, intent(in) :: i_actor, i_spectator
+
+        associate(actor_new_energy => new_energy%intras(i_actor), &
+            actor_old_energy => old_energy%intras(i_actor), &
+            wall_potential => this%environment%walls_potential, &
+            actor_wall_pair => this%short_potentials%intras(i_actor)%wall_pair, &
+            actor_num_particles => this%components(i_actor)%number%get(), &
+            spectator_num_particles => this%components(i_spectator)%number%get(), &
+            actor_cells => this%short_potentials%intras(i_actor)%cells, &
+            spectator_cells => this%short_potentials%inters(i_spectator)%cells)
+
+            call wall_potential%visit(overlap, actor_new_energy%walls, new%position, &
+                actor_wall_pair)
+            if (overlap) return
+            if (actor_num_particles > spectator_num_particles) then
+                call actor_cells%visit(overlap, actor_new_energy%short, new, same_type=.true.)
+                if (overlap) return
+                call spectator_cells%visit(overlap, new_energy%inter%short, new, same_type=.false.)
+            else
+                call spectator_cells%visit(overlap, new_energy%inter%short, new, same_type=.false.)
+                if (overlap) return
+                call actor_cells%visit(overlap, actor_new_energy%short, new, same_type=.true.)
+            end if
+            if (overlap) return
+            call wall_potential%visit(overlap, actor_old_energy%walls, old%position, &
+                actor_wall_pair)
+            call actor_cells%visit(overlap, actor_old_energy%short, old, same_type=.true.)
+            call spectator_cells%visit(overlap, old_energy%inter%short, old, same_type=.false.)
+        end associate
+    end subroutine Abstract_One_Particle_Change_visit_short
+
+    subroutine Abstract_One_Particle_Change_visit_long(this, new_energy, old_energy, new, old, &
+        i_actor, i_spectator)
+        class(Abstract_One_Particle_Change), intent(in) :: this
+        type(Concrete_Mixture_Energy), intent(inout) :: new_energy, old_energy
+        type(Concrete_Temporary_Particle), intent(in) :: new, old
+        integer, intent(in) :: i_actor, i_spectator
+
+        type(Concrete_Long_Energy) :: new_long, old_long, inter_new_long, inter_old_long
+
+        associate(actor_ewald_real_pair => this%ewalds%intras(i_actor)%real_pair, &
+            actor_ewald_real => this%ewalds%intras(i_actor)%real_particles, &
+            spectator_ewald_real => this%ewalds%intras(i_spectator)%real_particles)
+
+            call actor_ewald_real%visit(new_long%real, new, actor_ewald_real_pair, &
+                same_type=.true.)
+            call spectator_ewald_real%visit(inter_new_long%real, new, &
+                this%ewalds%inter%real_pair, same_type=.false.)
+            call actor_ewald_real%visit(old_long%real, old, actor_ewald_real_pair, &
+                same_type=.true.)
+            call spectator_ewald_real%visit(inter_old_long%real, old, &
+                this%ewalds%inter%real_pair, same_type=.false.)
+        end associate
+        new_energy%intras(i_actor)%long = new_long%real
+        old_energy%intras(i_actor)%long = old_long%real
+        new_energy%inter%long = inter_new_long%real
+        old_energy%inter%long = inter_old_long%real
+        ! add effect of field
+    end subroutine Abstract_One_Particle_Change_visit_long
+
+!end implementation Abstract_One_Particle_Change
+
+end module class_one_particle_change

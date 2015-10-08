@@ -38,6 +38,9 @@
 				</Linker>
 			</Target>
 		</Build>
+		<Unit filename="lib/src/class_candidates_selector.f90">
+			<Option weight="3" />
+		</Unit>
 		<Unit filename="lib/src/class_change_tuner.f90">
 			<Option weight="3" />
 		</Unit>
@@ -70,6 +73,9 @@
 		</Unit>
 		<Unit filename="lib/src/class_number_to_string.f90">
 			<Option weight="1" />
+		</Unit>
+		<Unit filename="lib/src/class_one_particle_change.f90">
+			<Option weight="7" />
 		</Unit>
 		<Unit filename="lib/src/class_one_particle_move.f90">
 			<Option weight="7" />
