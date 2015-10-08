@@ -68,21 +68,21 @@ private
         procedure, private :: visit_long => Abstract_One_Particle_Move_visit_long
     end type Abstract_One_Particle_Move
 
-    type, extends(Abstract_One_Particle_Move), public :: Two_Candidates_One_Particle_Move
+    type, extends(Abstract_One_Particle_Move), public :: Two_Candidates_Move
 
-    end type Two_Candidates_One_Particle_Move
+    end type Two_Candidates_Move
 
-    type, extends(Abstract_One_Particle_Move), public :: First_Candidate_One_Particle_Move
+    type, extends(Abstract_One_Particle_Move), public :: First_Candidate_Move
     contains
         procedure, private, nopass :: select_actor_and_spectator => &
-            First_Candidate_One_Particle_Move_select_actor_and_spectator
-    end type First_Candidate_One_Particle_Move
+            First_Candidate_Move_select_actor_and_spectator
+    end type First_Candidate_Move
 
-    type, extends(Abstract_One_Particle_Move), public :: Second_Candidate_One_Particle_Move
+    type, extends(Abstract_One_Particle_Move), public :: Second_Candidate_Move
     contains
         procedure, private, nopass :: select_actor_and_spectator => &
-            Second_Candidate_One_Particle_Move_select_actor_and_spectator
-    end type Second_Candidate_One_Particle_Move
+            Second_Candidate_Move_select_actor_and_spectator
+    end type Second_Candidate_Move
 
     type, extends(Abstract_One_Particle_Move), public :: Null_One_Particle_Move
     contains
@@ -324,27 +324,27 @@ contains
 
 !end implementation Abstract_One_Particle_Move
 
-!implementation First_Candidate_One_Particle_Move
+!implementation First_Candidate_Move
 
-    subroutine First_Candidate_One_Particle_Move_select_actor_and_spectator(i_actor, i_spectator)
+    subroutine First_Candidate_Move_select_actor_and_spectator(i_actor, i_spectator)
         integer, intent(out) :: i_actor, i_spectator
 
         i_actor = 1
         i_spectator = 2
-    end subroutine First_Candidate_One_Particle_Move_select_actor_and_spectator
+    end subroutine First_Candidate_Move_select_actor_and_spectator
 
-!end implementation First_Candidate_One_Particle_Move
+!end implementation First_Candidate_Move
 
-!implementation Second_Candidate_One_Particle_Move
+!implementation Second_Candidate_Move
 
-    subroutine Second_Candidate_One_Particle_Move_select_actor_and_spectator(i_actor, i_spectator)
+    subroutine Second_Candidate_Move_select_actor_and_spectator(i_actor, i_spectator)
         integer, intent(out) :: i_actor, i_spectator
 
         i_actor = 2
         i_spectator = 1
-    end subroutine Second_Candidate_One_Particle_Move_select_actor_and_spectator
+    end subroutine Second_Candidate_Move_select_actor_and_spectator
 
-!end implementation Second_Candidate_One_Particle_Move
+!end implementation Second_Candidate_Move
 
 !implementation Null_One_Particle_Move
 
