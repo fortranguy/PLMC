@@ -88,9 +88,9 @@ contains
     end subroutine Abstract_Rotated_Orientations_decrease_delta
 
     function Abstract_Rotated_Orientations_get(this, i_particle) result(rotated_orientation)
+        real(DP) :: rotated_orientation(num_dimensions)
         class(Abstract_Rotated_Orientations), intent(in) :: this
         integer, intent(in) :: i_particle
-        real(DP) :: rotated_orientation(num_dimensions)
 
         rotated_orientation = this%orientations%get(i_particle)
         call markov_orientation(rotated_orientation, this%delta)

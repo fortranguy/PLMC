@@ -45,7 +45,7 @@
 			<Option weight="3" />
 		</Unit>
 		<Unit filename="lib/src/class_changed_coordinates.f90">
-			<Option weight="0" />
+			<Option weight="1" />
 		</Unit>
 		<Unit filename="lib/src/class_changes_writer.f90">
 			<Option weight="2" />

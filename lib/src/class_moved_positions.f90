@@ -92,9 +92,9 @@ contains
     end subroutine Abstract_Moved_Positions_decrease_delta
 
     function Abstract_Moved_Positions_get(this, i_particle) result(moved_position)
+        real(DP) :: moved_position(num_dimensions)
         class(Abstract_Moved_Positions), intent(in) :: this
         integer, intent(in) :: i_particle
-        real(DP) :: moved_position(num_dimensions)
 
         real(DP) :: rand(num_dimensions)
 

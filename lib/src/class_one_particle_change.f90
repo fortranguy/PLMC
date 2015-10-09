@@ -48,19 +48,45 @@ private
 
     abstract interface
 
-        subroutine Abstract_One_Particle_Change_define_change(this, new, old)
+        subroutine Abstract_One_Particle_Change_define_change(this, new, old, i_actor)
         import :: Concrete_Temporary_Particle, Abstract_One_Particle_Change
             class(Abstract_One_Particle_Change), intent(in) :: this
             type(Concrete_Temporary_Particle), intent(out) :: new, old
+            integer, intent(in) :: i_actor
         end subroutine Abstract_One_Particle_Change_define_change
 
-        subroutine Abstract_One_Particle_Change_update_actor(this, i_actor)
-        import :: Abstract_One_Particle_Change
+        subroutine Abstract_One_Particle_Change_update_actor(this, i_actor, new, old)
+        import :: Concrete_Temporary_Particle, Abstract_One_Particle_Change
             class(Abstract_One_Particle_Change), intent(in) :: this
             integer, intent(in) :: i_actor
+            type(Concrete_Temporary_Particle), intent(out) :: new, old
         end subroutine Abstract_One_Particle_Change_update_actor
 
     end interface
+
+    type, extends(Abstract_One_Particle_Change), abstract, public :: Abstract_One_Particle_Move
+    contains
+        procedure, private :: define_change => Abstract_One_Particle_Move_define_change
+        procedure, private :: update_actor => Abstract_One_Particle_Move_update_actor
+    end type Abstract_One_Particle_Move
+
+    type, extends(Abstract_One_Particle_Change), abstract, public :: Abstract_One_Particle_Rotation
+    contains
+        procedure, private :: visit_short => Abstract_One_Particle_Rotation_visit_short
+        procedure, private :: define_change => Abstract_One_Particle_Rotation_define_change
+        procedure, private :: update_actor => Abstract_One_Particle_Rotation_update_actor
+    end type Abstract_One_Particle_Rotation
+
+    type, extends(Abstract_One_Particle_Change), public :: Null_One_Particle_Change
+    contains
+        procedure :: construct => Null_One_Particle_Change_construct
+        procedure :: destroy => Null_One_Particle_Change_destroy
+        procedure :: set_candidates => Null_One_Particle_Change_set_candidates
+        procedure :: set_observables => Null_One_Particle_Change_set_observables
+        procedure :: try => Null_One_Particle_Change_try
+        procedure, private :: define_change => Null_One_Particle_Change_define_change
+        procedure, private :: update_actor => Null_One_Particle_Change_update_actor
+    end type Null_One_Particle_Change
 
 contains
 
@@ -163,7 +189,7 @@ contains
         logical :: overlap
         real(DP) :: rand
 
-        call this%define_change(new, old)
+        call this%define_change(new, old, i_actor)
 
         success = .false.
         call this%visit_short(overlap, new_energy, old_energy, new, old, i_actor, i_spectator)
@@ -176,7 +202,7 @@ contains
             inter_energy_sum(inter_energy_difference)
         call random_number(rand)
         if (rand < exp(-energy_difference/this%environment%temperature%get())) then
-            call this%update_actor(i_actor)
+            call this%update_actor(i_actor, new, old)
             success = .true.
         end if
     end subroutine Abstract_One_Particle_Change_test_metropolis
@@ -248,5 +274,125 @@ contains
     end subroutine Abstract_One_Particle_Change_visit_long
 
 !end implementation Abstract_One_Particle_Change
+
+!implementation Abstract_One_Particle_Move
+
+    subroutine Abstract_One_Particle_Move_define_change(this, new, old, i_actor)
+        class(Abstract_One_Particle_Move), intent(in) :: this
+        type(Concrete_Temporary_Particle), intent(out) :: new, old
+        integer, intent(in) :: i_actor
+
+        old%i = random_integer(this%components(i_actor)%positions%get_num())
+        old%position = this%components(i_actor)%positions%get(old%i)
+        old%dipolar_moment = this%components(i_actor)%dipolar_moments%get(old%i)
+        new%i = old%i
+        new%position = this%changed_coordinates(i_actor)%get(new%i)
+        new%dipolar_moment = old%dipolar_moment
+    end subroutine Abstract_One_Particle_Move_define_change
+
+    subroutine Abstract_One_Particle_Move_update_actor(this, i_actor, new, old)
+        class(Abstract_One_Particle_Move), intent(in) :: this
+        integer, intent(in) :: i_actor
+        type(Concrete_Temporary_Particle), intent(out) :: new, old
+
+        call this%components(i_actor)%positions%set(new%i, new%position)
+        call this%short_potentials%intras(i_actor)%cells%move(old, new)
+        call this%short_potentials%inters(i_actor)%cells%move(old, new)
+    end subroutine Abstract_One_Particle_Move_update_actor
+
+!end implementation Abstract_One_Particle_Move
+
+!implementation Abstract_One_Particle_Rotation
+
+    subroutine Abstract_One_Particle_Rotation_visit_short(this, overlap, new_energy, old_energy, &
+        new, old, i_actor, i_spectator)
+        class(Abstract_One_Particle_Rotation), intent(in) :: this
+        logical, intent(out) :: overlap
+        type(Concrete_Mixture_Energy), intent(out) :: new_energy, old_energy
+        type(Concrete_Temporary_Particle), intent(in) :: new, old
+        integer, intent(in) :: i_actor, i_spectator
+        overlap = .false.
+        new_energy%intras(:)%short = 0._DP
+        new_energy%inter%short = 0._DP
+        old_energy%intras(:)%short = 0._DP
+        old_energy%inter%short = 0._DP
+    end subroutine Abstract_One_Particle_Rotation_visit_short
+
+    subroutine Abstract_One_Particle_Rotation_define_change(this, new, old, i_actor)
+        class(Abstract_One_Particle_Rotation), intent(in) :: this
+        type(Concrete_Temporary_Particle), intent(out) :: new, old
+        integer, intent(in) :: i_actor
+
+        old%i = random_integer(this%components(i_actor)%orientations%get_num())
+        old%position = this%components(i_actor)%positions%get(old%i)
+        old%dipolar_moment = this%components(i_actor)%dipolar_moments%get(old%i)
+        new%i = old%i
+        new%position = old%position
+        new%orientation = this%changed_coordinates(i_actor)%get(new%i)
+        new%dipolar_moment = this%components(i_actor)%moment_norm%get() * new%orientation
+    end subroutine Abstract_One_Particle_Rotation_define_change
+
+    subroutine Abstract_One_Particle_Rotation_update_actor(this, i_actor, new, old)
+        class(Abstract_One_Particle_Rotation), intent(in) :: this
+        integer, intent(in) :: i_actor
+        type(Concrete_Temporary_Particle), intent(out) :: new, old
+
+        call this%components(i_actor)%orientations%set(new%i, new%orientation)
+    end subroutine Abstract_One_Particle_Rotation_update_actor
+
+!end implementation Abstract_One_Particle_Rotation
+
+!implementation Null_One_Particle_Change
+
+    subroutine Null_One_Particle_Change_construct(this, environment, selector, &
+        changed_coordinates)
+        class(Null_One_Particle_Change), intent(out) :: this
+        class(Abstract_Candidates_Selector), intent(in) :: selector
+        type(Environment_Wrapper), target, intent(in) :: environment
+        class(Abstract_Changed_Coordinates), target, intent(in) :: &
+            changed_coordinates(num_components)
+    end subroutine Null_One_Particle_Change_construct
+
+    subroutine Null_One_Particle_Change_destroy(this)
+        class(Null_One_Particle_Change), intent(inout) :: this
+    end subroutine Null_One_Particle_Change_destroy
+
+    subroutine Null_One_Particle_Change_set_candidates(this, components, short_potentials, &
+        ewalds)
+        class(Null_One_Particle_Change), intent(inout) :: this
+        type(Particles_Wrapper), target, intent(in) :: components(:)
+        type(Mixture_Short_Potentials_Wrapper), target, intent(in) :: short_potentials
+        type(Mixture_Ewald_Wrapper), target, intent(in) :: ewalds
+    end subroutine Null_One_Particle_Change_set_candidates
+
+    subroutine Null_One_Particle_Change_set_observables(this, change_counters, &
+        particles_energies, inter_energy)
+        class(Null_One_Particle_Change), intent(inout) :: this
+        type(Concrete_Change_Counters), target, intent(in) :: change_counters(:)
+        type(Concrete_Particles_Energy), target, intent(in) :: particles_energies(:)
+        type(Concrete_Inter_Energy), target, intent(in) :: inter_energy
+    end subroutine Null_One_Particle_Change_set_observables
+
+    subroutine Null_One_Particle_Change_try(this)
+        class(Null_One_Particle_Change), intent(in) :: this
+    end subroutine Null_One_Particle_Change_try
+
+    subroutine Null_One_Particle_Change_define_change(this, new, old, i_actor)
+        class(Null_One_Particle_Change), intent(in) :: this
+        type(Concrete_Temporary_Particle), intent(out) :: new, old
+        integer, intent(in) :: i_actor
+        new%i = 0
+        old%i = 0
+    end subroutine Null_One_Particle_Change_define_change
+
+    subroutine Null_One_Particle_Change_update_actor(this, i_actor, new, old)
+        class(Null_One_Particle_Change), intent(in) :: this
+        integer, intent(in) :: i_actor
+        type(Concrete_Temporary_Particle), intent(out) :: new, old
+        new%i = 0
+        old%i = 0
+    end subroutine Null_One_Particle_Change_update_actor
+
+!end implementation Null_One_Particle_Change
 
 end module class_one_particle_change
