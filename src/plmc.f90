@@ -8,6 +8,7 @@ use types_particles_wrapper, only: Mixture_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
 use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper
 use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
+use class_one_particle_change, only: Abstract_One_Particle_Change
 use class_one_particle_move, only: Abstract_One_Particle_Move
 use class_one_particle_rotation, only: Abstract_One_Particle_Rotation
 use procedures_metropolis_factory, only: metropolis_factory_create, metropolis_factory_set, &
@@ -29,7 +30,7 @@ implicit none
     type(Changes_Wrapper) :: changes(num_components)
     type(Mixture_Short_Potentials_Wrapper) :: short_potentials
     type(Mixture_Ewald_Wrapper) :: ewalds
-    class(Abstract_One_Particle_Move), allocatable :: one_particle_move
+    class(Abstract_One_Particle_Change), allocatable :: one_particle_move
     class(Abstract_One_Particle_Rotation), allocatable :: one_particle_rotation
     type(Concrete_Mixture_Observables) :: observables
     type(Mixture_Observable_Writers_Wrapper) :: observables_writers
@@ -52,8 +53,8 @@ implicit none
     call plmc_write(0, observables_writers, observables, in_loop = .false.)
 
     call metropolis_factory_create(one_particle_move, environment, changes)
-    call metropolis_factory_set(one_particle_move, mixture%components, short_potentials, ewalds, &
-        observables)
+    !call metropolis_factory_set(one_particle_move, mixture%components, short_potentials, ewalds, &
+    !    observables)
     call metropolis_factory_create(one_particle_rotation, environment, changes)
     call metropolis_factory_set(one_particle_rotation, mixture%components, ewalds, observables)
 
@@ -94,7 +95,7 @@ implicit none
     call plmc_write(i_step-1, observables_writers, observables, in_loop = .false.)
 
     call metropolis_factory_destroy(one_particle_rotation)
-    call metropolis_factory_destroy(one_particle_move)
+    !call metropolis_factory_destroy(one_particle_move)
     call plmc_destroy(observables_writers)
     call plmc_destroy(ewalds)
     call plmc_destroy(short_potentials)

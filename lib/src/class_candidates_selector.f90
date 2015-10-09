@@ -11,6 +11,10 @@ private
         procedure, nopass :: set => Abstract_Candidates_Selector_set
     end type Abstract_Candidates_Selector
 
+    type, extends(Abstract_Candidates_Selector), public :: Concrete_Candidates_Selector
+
+    end type Concrete_Candidates_Selector
+
     type, extends(Abstract_Candidates_Selector), public :: First_Candidate_Selector
     contains
         procedure, nopass :: set => First_Candidate_Selector_set
@@ -20,7 +24,6 @@ private
     contains
         procedure, nopass :: set => Second_Candidate_Selector_set
     end type Second_Candidate_Selector
-
 
     type, extends(Abstract_Candidates_Selector), public :: Null_Candidates_Selector
     contains

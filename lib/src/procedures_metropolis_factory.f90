@@ -7,6 +7,10 @@ use types_particles_wrapper, only: Particles_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
 use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper
 use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
+use class_candidates_selector, only: Abstract_Candidates_Selector, Concrete_Candidates_Selector, &
+    First_Candidate_Selector, Second_Candidate_Selector, Null_Candidates_Selector
+use class_one_particle_change, only: Abstract_One_Particle_Change, &
+    Concrete_One_Particle_Move, Concrete_One_Particle_Rotation, Null_One_Particle_Change
 use class_one_particle_move, only: Abstract_One_Particle_Move, Null_One_Particle_Move, &
     Two_Candidates_Move, First_Candidate_Move, Second_Candidate_Move
 use class_one_particle_rotation, only: Abstract_One_Particle_Rotation, Null_One_Particle_Rotation, &
@@ -25,8 +29,7 @@ interface metropolis_factory_create
 end interface metropolis_factory_create
 
 interface metropolis_factory_set
-    module procedure :: set_one_particle_move
-    module procedure :: set_one_particle_rotation
+    module procedure :: set_one_particle_change
 end interface metropolis_factory_set
 
 interface metropolis_factory_destroy
@@ -37,40 +40,55 @@ end interface metropolis_factory_destroy
 contains
 
     subroutine allocate_and_construct_one_particle_move(one_particle_move, environment, changes)
-        class(Abstract_One_Particle_Move), allocatable, intent(out) :: one_particle_move
+        class(Abstract_One_Particle_Change), allocatable, intent(out) :: one_particle_move
         type(Environment_Wrapper), intent(in) :: environment
         type(Changes_Wrapper), intent(in) :: changes(num_components)
 
+        class(Abstract_Candidates_Selector), allocatable :: selector
+
         if (particles_can_move(changes(1)%moved_positions) .and. &
             particles_can_move(changes(2)%moved_positions)) then
-            allocate(Two_Candidates_Move :: one_particle_move)
+            allocate(Concrete_Candidates_Selector :: selector)
         else if (particles_can_move(changes(1)%moved_positions) .and. &
             .not.particles_can_move(changes(2)%moved_positions)) then
-            allocate(First_Candidate_Move :: one_particle_move)
+            allocate(First_Candidate_Selector :: selector)
         else if (.not.particles_can_move(changes(1)%moved_positions) .and. &
             particles_can_move(changes(2)%moved_positions)) then
-            allocate(Second_Candidate_Move :: one_particle_move)
+            allocate(Second_Candidate_Selector :: selector)
         else
-            allocate(Null_One_Particle_Move :: one_particle_move)
+            allocate(Null_Candidates_Selector :: selector)
         end if
-        call one_particle_move%construct(environment, changes(1)%moved_positions, &
-            changes(2)%moved_positions)
+        select type (selector)
+            type is (Null_Candidates_Selector)
+                allocate(Null_One_Particle_Change :: one_particle_move)
+            class default
+                allocate(Concrete_One_Particle_Move :: one_particle_move)
+        end select
+        call one_particle_move%construct(environment, selector, [changes(1)%moved_positions, &
+            changes(2)%moved_positions])
+        if (allocated(selector)) deallocate(selector)
     end subroutine allocate_and_construct_one_particle_move
 
-    subroutine set_one_particle_move(one_particle_move, components, short_potentials, ewalds, &
+    subroutine set_one_particle_move(one_particle_change, components, short_potentials, ewalds, &
         observables)
-        class(Abstract_One_Particle_Move), intent(inout) :: one_particle_move
+        class(Concrete_One_Particle_Move), intent(inout) :: one_particle_change
+
+    end subroutine set_one_particle_move
+
+    subroutine set_one_particle_change(one_particle_change, components, short_potentials, ewalds, &
+        observables)
+        class(Abstract_One_Particle_Change), intent(inout) :: one_particle_change
         type(Particles_Wrapper), intent(in) :: components(num_components)
         type(Mixture_Short_Potentials_Wrapper), intent(in) :: short_potentials
         type(Mixture_Ewald_Wrapper), intent(in) :: ewalds
         type(Concrete_Mixture_Observables), intent(in) :: observables
 
-        call one_particle_move%set(components)
-        call one_particle_move%set(short_potentials)
-        call one_particle_move%set(ewalds)
-        call one_particle_move%set(observables%changes_counters%moves, &
+        call one_particle_change%set(components)
+        call one_particle_change%set(short_potentials)
+        call one_particle_change%set(ewalds)
+        call one_particle_change%set(observables%changes_counters, &
             observables%particles_energies, observables%inter_energy)
-    end subroutine set_one_particle_move
+    end subroutine set_one_particle_change
 
     subroutine allocate_and_construct_one_particle_rotation(one_particle_rotation, environment, &
         changes)
