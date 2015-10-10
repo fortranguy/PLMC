@@ -294,7 +294,7 @@ contains
         class(Concrete_One_Particle_Move), intent(inout) :: this
 
         call this%selector%construct([this%components(1)%positions%get_num(), &
-            this%components(2)%positions%get_num])
+            this%components(2)%positions%get_num()])
     end subroutine Concrete_One_Particle_Move_set_selector
 
     subroutine Concrete_One_Particle_Move_define_change(this, new, old, i_actor)
@@ -328,7 +328,7 @@ contains
         class(Concrete_One_Particle_Rotation), intent(inout) :: this
 
         call this%selector%construct([this%components(1)%orientations%get_num(), &
-            this%components(2)%orientations%get_num])
+            this%components(2)%orientations%get_num()])
     end subroutine Concrete_One_Particle_Rotation_set_selector
 
     subroutine Concrete_One_Particle_Rotation_visit_short(this, overlap, new_energy, old_energy, &

@@ -45,7 +45,7 @@ contains
             allocate(Concrete_Tower_Sampler :: selector)
             allocate(Concrete_One_Particle_Move :: one_particle_move)
         else
-            allocate(Null_Candidates_Selector :: selector)
+            allocate(Null_Tower_Sampler :: selector)
             allocate(Null_One_Particle_Change :: one_particle_move)
         end if
         call one_particle_move%construct(environment, selector, [changes(1)%moved_positions, &
@@ -79,7 +79,7 @@ contains
             allocate(Concrete_Tower_Sampler :: selector)
             allocate(Concrete_One_Particle_Move :: one_particle_rotation)
         else
-            allocate(Null_Candidates_Selector :: selector)
+            allocate(Null_Tower_Sampler :: selector)
             allocate(Null_One_Particle_Change :: one_particle_rotation)
         end if
         call one_particle_rotation%construct(environment, selector, &
