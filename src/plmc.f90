@@ -9,8 +9,6 @@ use types_changes_wrapper, only: Changes_Wrapper
 use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper
 use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
 use class_one_particle_change, only: Abstract_One_Particle_Change
-use class_one_particle_move, only: Abstract_One_Particle_Move
-use class_one_particle_rotation, only: Abstract_One_Particle_Rotation
 use procedures_metropolis_factory, only: metropolis_factory_create, metropolis_factory_set, &
     metropolis_factory_destroy
 use procedures_plmc_factory, only: plmc_load, plmc_create, plmc_destroy
@@ -30,8 +28,8 @@ implicit none
     type(Changes_Wrapper) :: changes(num_components)
     type(Mixture_Short_Potentials_Wrapper) :: short_potentials
     type(Mixture_Ewald_Wrapper) :: ewalds
-    class(Abstract_One_Particle_Change), allocatable :: one_particle_move
-    class(Abstract_One_Particle_Rotation), allocatable :: one_particle_rotation
+    !class(Abstract_One_Particle_Change), allocatable :: one_particle_move
+    !class(Abstract_One_Particle_Rotation), allocatable :: one_particle_rotation
     type(Concrete_Mixture_Observables) :: observables
     type(Mixture_Observable_Writers_Wrapper) :: observables_writers
 
@@ -52,11 +50,11 @@ implicit none
     call plmc_visit(observables, environment%walls_potential, short_potentials, ewalds, mixture)
     call plmc_write(0, observables_writers, observables, in_loop = .false.)
 
-    call metropolis_factory_create(one_particle_move, environment, changes)
+    !call metropolis_factory_create(one_particle_move, environment, changes)
     !call metropolis_factory_set(one_particle_move, mixture%components, short_potentials, ewalds, &
     !    observables)
-    call metropolis_factory_create(one_particle_rotation, environment, changes)
-    call metropolis_factory_set(one_particle_rotation, mixture%components, ewalds, observables)
+    !call metropolis_factory_create(one_particle_rotation, environment, changes)
+    !call metropolis_factory_set(one_particle_rotation, mixture%components, ewalds, observables)
 
     num_moves = mixture%components(1)%positions%get_num() + &
         mixture%components(2)%positions%get_num()
@@ -66,10 +64,10 @@ implicit none
     do i_step = 1, num_tuning_steps
         call counters_reset(observables%changes_counters)
         do i_move = 1, num_moves
-            call one_particle_move%try()
+            !call one_particle_move%try()
         end do
         do i_rotation = 1, num_rotations
-            call one_particle_rotation%try()
+            !call one_particle_rotation%try()
         end do
         call sucess_set(observables%changes_success, observables%changes_counters)
         call plmc_write(i_step, observables_writers, observables, in_loop = .true.)
@@ -81,10 +79,10 @@ implicit none
     do i_step = 1, num_steps
         call counters_reset(observables%changes_counters)
         do i_move = 1, num_moves
-            call one_particle_move%try()
+            !call one_particle_move%try()
         end do
         do i_rotation = 1, num_rotations
-            call one_particle_rotation%try()
+            !call one_particle_rotation%try()
         end do
         call sucess_set(observables%changes_success, observables%changes_counters)
         call plmc_write(i_step, observables_writers, observables, in_loop = .true.)
@@ -94,7 +92,7 @@ implicit none
     call plmc_visit(observables, environment%walls_potential, short_potentials, ewalds, mixture)
     call plmc_write(i_step-1, observables_writers, observables, in_loop = .false.)
 
-    call metropolis_factory_destroy(one_particle_rotation)
+    !call metropolis_factory_destroy(one_particle_rotation)
     !call metropolis_factory_destroy(one_particle_move)
     call plmc_destroy(observables_writers)
     call plmc_destroy(ewalds)

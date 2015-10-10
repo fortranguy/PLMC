@@ -11,7 +11,7 @@ use types_temporary_particle, only: Concrete_Temporary_Particle
 use class_changed_coordinates, only: Abstract_Changed_Coordinates
 use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper
 use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
-use class_candidates_selector, only: Abstract_Candidates_Selector
+use class_tower_sampler, only: Abstract_Tower_Sampler
 use module_changes_success, only: Concrete_Change_Counters
 use module_particles_energy, only: Concrete_Particles_Energy, Concrete_Inter_Energy, &
     Concrete_Long_Energy, Concrete_Mixture_Energy, &
@@ -29,7 +29,7 @@ private
         class(Abstract_Changed_Coordinates), pointer :: changed_coordinates(:) => null()
         type(Mixture_Short_Potentials_Wrapper), pointer :: short_potentials => null()
         type(Mixture_Ewald_Wrapper), pointer :: ewalds => null()
-        class(Abstract_Candidates_Selector), allocatable :: selector
+        class(Abstract_Tower_Sampler), allocatable :: selector
         type(Concrete_Change_Counters), pointer :: change_counters(:) => null()
         type(Concrete_Particles_Energy), pointer :: particles_energies(:) => null()
         type(Concrete_Inter_Energy), pointer :: inter_energy => null()
@@ -39,14 +39,20 @@ private
         procedure :: set_candidates => Abstract_One_Particle_Change_set_candidates
         procedure :: set_observables => Abstract_One_Particle_Change_set_observables
         procedure :: try => Abstract_One_Particle_Change_try
+        procedure(Abstract_One_Particle_Change_set_selector), private, deferred :: set_selector
         procedure, private :: test_metropolis => Abstract_One_Particle_Change_test_metropolis
-        procedure(Abstract_One_Particle_Change_define_change), deferred :: define_change
+        procedure(Abstract_One_Particle_Change_define_change), private, deferred :: define_change
         procedure, private :: visit_short => Abstract_One_Particle_Change_visit_short
         procedure, private :: visit_long => Abstract_One_Particle_Change_visit_long
         procedure(Abstract_One_Particle_Change_update_actor), private, deferred :: update_actor
     end type Abstract_One_Particle_Change
 
     abstract interface
+
+        subroutine Abstract_One_Particle_Change_set_selector(this)
+        import :: Abstract_One_Particle_Change
+            class(Abstract_One_Particle_Change), intent(inout) :: this
+        end subroutine Abstract_One_Particle_Change_set_selector
 
         subroutine Abstract_One_Particle_Change_define_change(this, new, old, i_actor)
         import :: Concrete_Temporary_Particle, Abstract_One_Particle_Change
@@ -66,12 +72,14 @@ private
 
     type, extends(Abstract_One_Particle_Change), public :: Concrete_One_Particle_Move
     contains
+        procedure, private :: set_selector => Concrete_One_Particle_Move_set_selector
         procedure, private :: define_change => Concrete_One_Particle_Move_define_change
         procedure, private :: update_actor => Concrete_One_Particle_Move_update_actor
     end type Concrete_One_Particle_Move
 
     type, extends(Abstract_One_Particle_Change), public :: Concrete_One_Particle_Rotation
     contains
+        procedure, private :: set_selector => Concrete_One_Particle_Rotation_set_selector
         procedure, private :: visit_short => Concrete_One_Particle_Rotation_visit_short
         procedure, private :: define_change => Concrete_One_Particle_Rotation_define_change
         procedure, private :: update_actor => Concrete_One_Particle_Rotation_update_actor
@@ -84,6 +92,7 @@ private
         procedure :: set_candidates => Null_One_Particle_Change_set_candidates
         procedure :: set_observables => Null_One_Particle_Change_set_observables
         procedure :: try => Null_One_Particle_Change_try
+        procedure, private :: set_selector => Null_One_Particle_Change_set_selector
         procedure, private :: define_change => Null_One_Particle_Change_define_change
         procedure, private :: update_actor => Null_One_Particle_Change_update_actor
     end type Null_One_Particle_Change
@@ -95,7 +104,7 @@ contains
     subroutine Abstract_One_Particle_Change_construct(this, environment, selector, &
         changed_coordinates)
         class(Abstract_One_Particle_Change), intent(out) :: this
-        class(Abstract_Candidates_Selector), intent(in) :: selector
+        class(Abstract_Tower_Sampler), intent(in) :: selector
         type(Environment_Wrapper), target, intent(in) :: environment
         class(Abstract_Changed_Coordinates), target, intent(in) :: &
             changed_coordinates(num_components)
@@ -115,6 +124,7 @@ contains
         this%short_potentials => null()
         this%changed_coordinates => null()
         this%components => null()
+        call this%selector%destroy()
         if (allocated(this%selector)) deallocate(this%selector)
         this%environment => null()
     end subroutine Abstract_One_Particle_Change_destroy
@@ -131,6 +141,7 @@ contains
                 "components doesn't have the right size.")
         end if
         this%components => components
+        call this%set_selector()
         this%short_potentials => short_potentials
         this%ewalds => ewalds
     end subroutine Abstract_One_Particle_Change_set_candidates
@@ -163,7 +174,8 @@ contains
         type(Concrete_Particles_Energy) :: actor_energy_difference
         type(Concrete_Inter_Energy) :: inter_energy_difference
 
-        call this%selector%set(i_actor, i_spectator)
+        i_actor = this%selector%get()
+        i_spectator = mod(i_actor, num_components) + 1
         this%change_counters(i_actor)%num_hits = this%change_counters(i_actor)%num_hits + 1
         call this%test_metropolis(success, actor_energy_difference, inter_energy_difference, &
             i_actor, i_spectator)
@@ -171,7 +183,8 @@ contains
             this%particles_energies(i_actor) = this%particles_energies(i_actor) + &
                 actor_energy_difference
             this%inter_energy = this%inter_energy + inter_energy_difference
-            this%change_counters(i_actor)%num_success = this%change_counters(i_actor)%num_success + 1
+            this%change_counters(i_actor)%num_success = &
+                this%change_counters(i_actor)%num_success + 1
         end if
     end subroutine Abstract_One_Particle_Change_try
 
@@ -277,6 +290,13 @@ contains
 
 !implementation Concrete_One_Particle_Move
 
+    subroutine Concrete_One_Particle_Move_set_selector(this)
+        class(Concrete_One_Particle_Move), intent(inout) :: this
+
+        call this%selector%construct([this%components(1)%positions%get_num(), &
+            this%components(2)%positions%get_num])
+    end subroutine Concrete_One_Particle_Move_set_selector
+
     subroutine Concrete_One_Particle_Move_define_change(this, new, old, i_actor)
         class(Concrete_One_Particle_Move), intent(in) :: this
         type(Concrete_Temporary_Particle), intent(out) :: new, old
@@ -303,6 +323,13 @@ contains
 !end implementation Concrete_One_Particle_Move
 
 !implementation Concrete_One_Particle_Rotation
+
+    subroutine Concrete_One_Particle_Rotation_set_selector(this)
+        class(Concrete_One_Particle_Rotation), intent(inout) :: this
+
+        call this%selector%construct([this%components(1)%orientations%get_num(), &
+            this%components(2)%orientations%get_num])
+    end subroutine Concrete_One_Particle_Rotation_set_selector
 
     subroutine Concrete_One_Particle_Rotation_visit_short(this, overlap, new_energy, old_energy, &
         new, old, i_actor, i_spectator)
@@ -347,7 +374,7 @@ contains
     subroutine Null_One_Particle_Change_construct(this, environment, selector, &
         changed_coordinates)
         class(Null_One_Particle_Change), intent(out) :: this
-        class(Abstract_Candidates_Selector), intent(in) :: selector
+        class(Abstract_Tower_Sampler), intent(in) :: selector
         type(Environment_Wrapper), target, intent(in) :: environment
         class(Abstract_Changed_Coordinates), target, intent(in) :: &
             changed_coordinates(num_components)
@@ -364,6 +391,10 @@ contains
         type(Mixture_Short_Potentials_Wrapper), target, intent(in) :: short_potentials
         type(Mixture_Ewald_Wrapper), target, intent(in) :: ewalds
     end subroutine Null_One_Particle_Change_set_candidates
+
+    subroutine Null_One_Particle_Change_set_selector(this)
+        class(Null_One_Particle_Change), intent(inout) :: this
+    end subroutine Null_One_Particle_Change_set_selector
 
     subroutine Null_One_Particle_Change_set_observables(this, change_counters, &
         particles_energies, inter_energy)
