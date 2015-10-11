@@ -29,8 +29,6 @@ use types_metropolis_wrapper, only: Metropolis_Wrapper
 use procedures_metropolis_factory, only: metropolis_factory_create, metropolis_factory_set, &
     metropolis_factory_destroy
 use class_tower_sampler, only: Abstract_Tower_Sampler, Concrete_Tower_Sampler, Null_Tower_Sampler
-use class_monte_carlo_propagator, only: Abstract_Monte_Carlo_Propagator, &
-    Concrete_Monte_Carlo_Propagator, Null_Monte_Carlo_Propagator
 use procedures_property_inquirers, only: use_walls, particles_exist, particles_are_dipolar, &
     particles_can_change
 
@@ -51,7 +49,6 @@ interface plmc_create
     module procedure :: create_ewalds
     module procedure :: create_observable_writers
     module procedure :: create_metropolis
-    module procedure :: create_propagator
 end interface plmc_create
 
 interface plmc_set
@@ -61,7 +58,6 @@ interface plmc_set
 end interface plmc_set
 
 interface plmc_destroy
-    module procedure :: destroy_propagator
     module procedure :: destroy_metropolis
     module procedure :: destroy_observable_writers
     module procedure :: destroy_ewalds
@@ -266,37 +262,6 @@ contains
 
         call metropolis_factory_destroy(metropolis)
     end subroutine destroy_metropolis
-
-    subroutine create_propagator(propagator, metropolis, changes)
-        class(Abstract_Monte_Carlo_Propagator), allocatable, intent(out) :: propagator
-        type(Metropolis_Wrapper), intent(in) :: metropolis
-        type(Changes_Wrapper), intent(in) :: changes(num_components)
-
-        class(Abstract_Tower_Sampler), allocatable :: selector
-        logical :: propagate
-
-        propagate = particles_can_change(changes(1)%moved_positions, &
-            changes(1)%rotated_orientations, changes(1)%particles_exchange) .or. &
-            particles_can_change(changes(2)%moved_positions, &
-            changes(2)%rotated_orientations, changes(2)%particles_exchange)
-
-        if (propagate) then
-            allocate(Concrete_Tower_Sampler :: selector)
-            allocate(Concrete_Monte_Carlo_Propagator :: propagator)
-        else
-            allocate(Null_Tower_Sampler :: selector)
-            allocate(Null_Monte_Carlo_Propagator :: propagator)
-        end if
-        call propagator%construct(metropolis, selector)
-        deallocate(selector)
-    end subroutine create_propagator
-
-    subroutine destroy_propagator(propagator)
-        class(Abstract_Monte_Carlo_Propagator), allocatable, intent(inout) :: propagator
-
-        call propagator%destroy()
-        if (allocated(propagator)) deallocate(propagator)
-    end subroutine destroy_propagator
 
     subroutine set_metropolis(metropolis, components, short_potentials, ewalds, observables)
         type(Metropolis_Wrapper), intent(inout) :: metropolis

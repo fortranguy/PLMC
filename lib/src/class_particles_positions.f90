@@ -74,6 +74,8 @@ contains
         integer, intent(in) :: i_particle
         real(DP), intent(in) :: vector(:)
 
+        call check_in_range("Abstract_Particles_Positions_set", this%number%get(), &
+            "i_particle", i_particle)
         call check_3d_array("Abstract_Particles_Positions", "vector", vector)
         this%positions(:, i_particle) = this%periodic_box%folded(vector)
     end subroutine Abstract_Particles_Positions_set
@@ -107,8 +109,8 @@ contains
         class(Abstract_Particles_Positions), intent(inout) :: this
         integer, intent(in) :: i_particle
 
-        call check_in_range("Abstract_Particles_Positions", this%number%get(), &
-                            "i_particle", i_particle)
+        call check_in_range("Abstract_Particles_Positions_remove", this%number%get(), &
+            "i_particle", i_particle)
         if (i_particle < this%number%get()) then
             call this%set(i_particle, this%get(this%number%get()))
         end if

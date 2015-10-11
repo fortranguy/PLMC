@@ -8,7 +8,7 @@ use procedures_random, only: random_integer
 use types_environment_wrapper, only: Environment_Wrapper
 use types_particles_wrapper, only: Particles_Wrapper
 use types_temporary_particle, only: Concrete_Temporary_Particle
-use class_changed_coordinates, only: Abstract_Changed_Coordinates
+use types_changes_wrapper, only: Changes_Wrapper
 use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper
 use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
 use class_tower_sampler, only: Abstract_Tower_Sampler
@@ -28,7 +28,7 @@ private
     private
         type(Environment_Wrapper), pointer :: environment => null()
         type(Particles_Wrapper), pointer :: components(:) => null()
-        class(Abstract_Changed_Coordinates), pointer :: changed_coordinates(:) => null()
+        type(Changes_Wrapper), pointer :: changes(:) => null()
         type(Mixture_Short_Potentials_Wrapper), pointer :: short_potentials => null()
         type(Mixture_Ewald_Wrapper), pointer :: ewalds => null()
         class(Abstract_Tower_Sampler), allocatable :: selector
@@ -69,7 +69,7 @@ private
         import :: Concrete_Temporary_Particle, Abstract_One_Particle_Change
             class(Abstract_One_Particle_Change), intent(in) :: this
             integer, intent(in) :: i_actor
-            type(Concrete_Temporary_Particle), intent(out) :: new, old
+            type(Concrete_Temporary_Particle), intent(in) :: new, old
         end subroutine Abstract_One_Particle_Change_update_actor
 
         subroutine Abstract_One_Particle_Change_increment_hits(this, i_actor)
@@ -126,17 +126,15 @@ contains
 
 !implementation Abstract_One_Particle_Change
 
-    subroutine Abstract_One_Particle_Change_construct(this, environment, changed_coordinates, &
-        selector)
+    subroutine Abstract_One_Particle_Change_construct(this, environment, changes, selector)
         class(Abstract_One_Particle_Change), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
-        class(Abstract_Changed_Coordinates), target, intent(in) :: &
-            changed_coordinates(num_components)
+        type(Changes_Wrapper), target, intent(in) :: changes(:)
         class(Abstract_Tower_Sampler), intent(in) :: selector
 
         this%environment => environment
-        this%changed_coordinates => changed_coordinates
-        allocate(this%selector, source=selector)
+        this%changes => changes
+        allocate(this%selector, mold=selector)
     end subroutine Abstract_One_Particle_Change_construct
 
     subroutine Abstract_One_Particle_Change_destroy(this)
@@ -148,7 +146,7 @@ contains
         this%components => null()
         call this%selector%destroy()
         if (allocated(this%selector)) deallocate(this%selector)
-        this%changed_coordinates => null()
+        this%changes => null()
         this%environment => null()
     end subroutine Abstract_One_Particle_Change_destroy
 
@@ -322,14 +320,14 @@ contains
         old%position = this%components(i_actor)%positions%get(old%i)
         old%dipolar_moment = this%components(i_actor)%dipolar_moments%get(old%i)
         new%i = old%i
-        new%position = this%changed_coordinates(i_actor)%get(new%i)
+        new%position = this%changes(i_actor)%moved_positions%get(new%i)
         new%dipolar_moment = old%dipolar_moment
     end subroutine Concrete_One_Particle_Move_define_change
 
     subroutine Concrete_One_Particle_Move_update_actor(this, i_actor, new, old)
         class(Concrete_One_Particle_Move), intent(in) :: this
         integer, intent(in) :: i_actor
-        type(Concrete_Temporary_Particle), intent(out) :: new, old
+        type(Concrete_Temporary_Particle), intent(in) :: new, old
 
         call this%components(i_actor)%positions%set(new%i, new%position)
         call this%short_potentials%intras(i_actor)%cells%move(old, new)
@@ -396,14 +394,14 @@ contains
         old%dipolar_moment = this%components(i_actor)%dipolar_moments%get(old%i)
         new%i = old%i
         new%position = old%position
-        new%orientation = this%changed_coordinates(i_actor)%get(new%i)
+        new%orientation = this%changes(i_actor)%rotated_orientations%get(new%i)
         new%dipolar_moment = this%components(i_actor)%moment_norm%get() * new%orientation
     end subroutine Concrete_One_Particle_Rotation_define_change
 
     subroutine Concrete_One_Particle_Rotation_update_actor(this, i_actor, new, old)
         class(Concrete_One_Particle_Rotation), intent(in) :: this
         integer, intent(in) :: i_actor
-        type(Concrete_Temporary_Particle), intent(out) :: new, old
+        type(Concrete_Temporary_Particle), intent(in) :: new, old
 
         call this%components(i_actor)%orientations%set(new%i, new%orientation)
     end subroutine Concrete_One_Particle_Rotation_update_actor
@@ -430,12 +428,10 @@ contains
 
 !implementation Null_One_Particle_Change
 
-    subroutine Null_One_Particle_Change_construct(this, environment, changed_coordinates, &
-        selector)
+    subroutine Null_One_Particle_Change_construct(this, environment, changes, selector)
         class(Null_One_Particle_Change), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
-        class(Abstract_Changed_Coordinates), target, intent(in) :: &
-            changed_coordinates(num_components)
+        type(Changes_Wrapper), target, intent(in) :: changes(:)
         class(Abstract_Tower_Sampler), intent(in) :: selector
     end subroutine Null_One_Particle_Change_construct
 
@@ -480,9 +476,7 @@ contains
     subroutine Null_One_Particle_Change_update_actor(this, i_actor, new, old)
         class(Null_One_Particle_Change), intent(in) :: this
         integer, intent(in) :: i_actor
-        type(Concrete_Temporary_Particle), intent(out) :: new, old
-        new%i = 0
-        old%i = 0
+        type(Concrete_Temporary_Particle), intent(in) :: new, old
     end subroutine Null_One_Particle_Change_update_actor
 
     subroutine Null_One_Particle_Change_increment_hits(this, i_actor)

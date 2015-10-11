@@ -75,9 +75,11 @@ contains
         integer, intent(in) :: i_particle
         real(DP), intent(in) :: vector(:)
 
-        call check_3d_array("Abstract_Particles_Orientations", "vector", vector)
-        call check_positive("Abstract_Particles_Orientations", "norm2(vector)", norm2(vector))
-        call check_norm("Abstract_Particles_Orientations", "vector", vector)
+        call check_in_range("Abstract_Particles_Orientations_set", this%number%get(), &
+            "i_particle", i_particle)
+        call check_3d_array("Abstract_Particles_Orientations_set", "vector", vector)
+        call check_positive("Abstract_Particles_Orientations_set", "norm2(vector)", norm2(vector))
+        call check_norm("Abstract_Particles_Orientations_set", "vector", vector)
         this%orientations(:, i_particle) = vector / norm2(vector)
     end subroutine Abstract_Particles_Orientations_set
 
@@ -111,7 +113,7 @@ contains
         integer, intent(in) :: i_particle
 
         call check_in_range("Abstract_Particles_Orientations", this%number%get(), &
-                            "i_particle", i_particle)
+            "i_particle", i_particle)
         if (i_particle < this%number%get()) then
             call this%set(i_particle, this%get(this%number%get()))
         end if

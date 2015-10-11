@@ -57,23 +57,33 @@
         }
     },
     "Changes": {
+        "number of tuning steps": 100,
         "Component 1": {
             "Small Move": {
                 "delta": [0.1, 0.1, 0.1],
                 "increase factor": 1.01,
-                "maximum increase factor": 1.05
+                "maximum increase factor": 1.1,
+                "accumulation period": 25,
+                "wanted success ratio": 0.8,
+                "tolerance": 0.01
             },
             "Small Rotation": {
                 "delta": 0.1,
                 "increase factor": 1.01,
-                "maximum increase factor": 1.05
+                "maximum increase factor": 1.1,
+                "accumulation period": 25,
+                "wanted success ratio": 0.8,
+                "tolerance": 0.01
             }
         },
         "Component 2": {
             "Small Move": {
                 "delta": [0.1, 0.1, 0.1],
                 "increase factor": 1.01,
-                "maximum increase factor": 1.05
+                "maximum increase factor": 1.1,
+                "accumulation period": 25,
+                "wanted success ratio": 0.8,
+                "tolerance": 0.01
             }
         }
     },

@@ -59,8 +59,7 @@ contains
             allocate(Null_Tower_Sampler :: selector)
             allocate(Null_One_Particle_Change :: one_particle_move)
         end if
-        call one_particle_move%construct(environment, [changes(1)%moved_positions, &
-            changes(2)%moved_positions], selector)
+        call one_particle_move%construct(environment, changes, selector)
         deallocate(selector)
     end subroutine allocate_and_construct_one_particle_move
 
@@ -106,8 +105,7 @@ contains
             allocate(Null_Tower_Sampler :: selector)
             allocate(Null_One_Particle_Change :: one_particle_rotation)
         end if
-        call one_particle_rotation%construct(environment, [changes(1)%rotated_orientations, &
-            changes(2)%rotated_orientations], selector)
+        call one_particle_rotation%construct(environment, changes, selector)
         deallocate(selector)
     end subroutine allocate_and_construct_one_particle_rotation
 
