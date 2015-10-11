@@ -12,11 +12,12 @@ use class_changed_coordinates, only: Abstract_Changed_Coordinates
 use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper
 use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
 use class_tower_sampler, only: Abstract_Tower_Sampler
-use module_changes_success, only: Concrete_Change_Counters
+use module_changes_success, only: Concrete_Change_Counter
 use module_particles_energy, only: Concrete_Particles_Energy, Concrete_Inter_Energy, &
     Concrete_Long_Energy, Concrete_Mixture_Energy, &
     particle_energy_sum => Concrete_Particles_Energy_sum, &
     inter_energy_sum => Concrete_Inter_Energy_sum, operator(+), operator(-)
+use types_observables_wrapper, only: Mixture_Observables_Wrapper
 
 implicit none
 
@@ -30,7 +31,7 @@ private
         type(Mixture_Short_Potentials_Wrapper), pointer :: short_potentials => null()
         type(Mixture_Ewald_Wrapper), pointer :: ewalds => null()
         class(Abstract_Tower_Sampler), allocatable :: selector
-        type(Concrete_Change_Counters), pointer :: change_counters(:) => null()
+        type(Concrete_Change_Counter), pointer :: change_counters(:) => null()
         type(Concrete_Particles_Energy), pointer :: particles_energies(:) => null()
         type(Concrete_Inter_Energy), pointer :: inter_energy => null()
     contains
@@ -149,7 +150,7 @@ contains
     subroutine Abstract_One_Particle_Change_set_observables(this, change_counters, &
         particles_energies, inter_energy)
         class(Abstract_One_Particle_Change), intent(inout) :: this
-        type(Concrete_Change_Counters), target, intent(in) :: change_counters(:)
+        type(Concrete_Change_Counter), target, intent(in) :: change_counters(:)
         type(Concrete_Particles_Energy), target, intent(in) :: particles_energies(:)
         type(Concrete_Inter_Energy), target, intent(in) :: inter_energy
 
@@ -399,7 +400,7 @@ contains
     subroutine Null_One_Particle_Change_set_observables(this, change_counters, &
         particles_energies, inter_energy)
         class(Null_One_Particle_Change), intent(inout) :: this
-        type(Concrete_Change_Counters), target, intent(in) :: change_counters(:)
+        type(Concrete_Change_Counter), target, intent(in) :: change_counters(:)
         type(Concrete_Particles_Energy), target, intent(in) :: particles_energies(:)
         type(Concrete_Inter_Energy), target, intent(in) :: inter_energy
     end subroutine Null_One_Particle_Change_set_observables

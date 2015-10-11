@@ -1,7 +1,7 @@
 module procedures_plmc_write
 
 use types_observable_writers_wrapper, only: Mixture_Observable_Writers_Wrapper
-use types_mixture_observables, only: Concrete_Mixture_Observables
+use types_observables_wrapper, only: Mixture_Observables_Wrapper
 
 implicit none
 
@@ -17,19 +17,21 @@ contains
     subroutine write_observables(i_step, observables_writers, observables, in_loop)
         integer, intent(in) :: i_step
         type(Mixture_Observable_Writers_Wrapper), intent(in) :: observables_writers
-        type(Concrete_Mixture_Observables), intent(in) :: observables
+        type(Mixture_Observables_Wrapper), intent(in) :: observables
         logical, intent(in) :: in_loop
 
         call observables_writers%intras(1)%coordinates%write(i_step)
         call observables_writers%intras(2)%coordinates%write(i_step)
-        call observables_writers%intras(1)%energy%write(i_step, observables%particles_energies(1))
-        call observables_writers%intras(2)%energy%write(i_step, observables%particles_energies(2))
+        call observables_writers%intras(1)%energy%write(i_step, &
+            observables%intras(1)%particles_energy)
+        call observables_writers%intras(2)%energy%write(i_step, &
+            observables%intras(2)%particles_energy)
         call observables_writers%inter_energy%write(i_step, observables%inter_energy)
         if (in_loop) then
             call observables_writers%intras(1)%changes%write(i_step, &
-                observables%changes_success%ratios(1))
+                observables%intras(1)%changes_success)
             call observables_writers%intras(2)%changes%write(i_step, &
-                observables%changes_success%ratios(2))
+                observables%intras(2)%changes_success)
         end if
     end subroutine write_observables
 

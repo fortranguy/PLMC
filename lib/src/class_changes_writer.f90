@@ -4,7 +4,7 @@ use data_constants, only: max_line_length
 use procedures_checks, only: check_string_not_empty
 use class_number_to_string, only: Abstract_Number_to_String, &
     Concrete_Number_to_String, Null_Number_to_String
-use module_changes_success, only: Concrete_Changes_Success_Ratio
+use module_changes_success, only: Concrete_Changes_Success
 
 implicit none
 
@@ -76,13 +76,13 @@ contains
         close(this%unit)
     end subroutine Abstract_Changes_Success_Writer_destroy
 
-    subroutine Abstract_Changes_Success_Writer_write(this, i_step, changes_success_ratio)
+    subroutine Abstract_Changes_Success_Writer_write(this, i_step, changes_success)
         class(Abstract_Changes_Success_Writer), intent(in) :: this
         integer, intent(in) :: i_step
-        type(Concrete_Changes_Success_Ratio), intent(in) :: changes_success_ratio
+        type(Concrete_Changes_Success), intent(in) :: changes_success
 
-        write(this%unit, *) i_step, this%string_move%get(changes_success_ratio%move)//&
-            this%string_rotation%get(changes_success_ratio%rotation)
+        write(this%unit, *) i_step, this%string_move%get(changes_success%move)//&
+            this%string_rotation%get(changes_success%rotation)
     end subroutine Abstract_Changes_Success_Writer_write
 
 !end implementation Abstract_Changes_Success_Writer
@@ -99,10 +99,10 @@ contains
         class(Null_Changes_Success_Writer), intent(inout) :: this
     end subroutine Null_Changes_Success_Writer_destroy
 
-    subroutine Null_Changes_Success_Writer_write(this, i_step, changes_success_ratio)
+    subroutine Null_Changes_Success_Writer_write(this, i_step, changes_success)
         class(Null_Changes_Success_Writer), intent(in) :: this
         integer, intent(in) :: i_step
-        type(Concrete_Changes_Success_Ratio), intent(in) :: changes_success_ratio
+        type(Concrete_Changes_Success), intent(in) :: changes_success
     end subroutine Null_Changes_Success_Writer_write
 
 !end implementation Null_Changes_Success_Writer

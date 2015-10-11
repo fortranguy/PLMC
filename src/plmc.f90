@@ -13,13 +13,13 @@ use procedures_metropolis_factory, only: metropolis_factory_create, metropolis_f
     metropolis_factory_destroy
 use procedures_plmc_factory, only: plmc_load, plmc_create, plmc_destroy
 use procedures_plmc_visit, only: plmc_visit
-use module_changes_success, only: counters_reset => Concrete_Mixture_Changes_Counters_reset, &
-    sucess_set => Concrete_Mixture_Changes_Success_set
-use types_mixture_observables, only: Concrete_Mixture_Observables
+use module_changes_success, only: counters_reset => Concrete_Changes_Counter_reset, &
+    sucess_set => Concrete_Changes_Counter_set
+use types_observables_wrapper, only: Mixture_Observables_Wrapper
 use types_observable_writers_wrapper, only: Mixture_Observable_Writers_Wrapper
 use procedures_plmc_write, only: plmc_write
 use module_plmc_iterations, only: num_tuning_steps, num_steps, plmc_set_num_steps
-use procedures_plmc_tuning, only: plmc_tune, plmc_print_tuning_status
+use procedures_plmc_tuning, only: plmc_tune
 
 implicit none
 
@@ -30,7 +30,7 @@ implicit none
     type(Mixture_Ewald_Wrapper) :: ewalds
     !class(Abstract_One_Particle_Change), allocatable :: one_particle_move
     !class(Abstract_One_Particle_Rotation), allocatable :: one_particle_rotation
-    type(Concrete_Mixture_Observables) :: observables
+    type(Mixture_Observables_Wrapper) :: observables
     type(Mixture_Observable_Writers_Wrapper) :: observables_writers
 
     type(json_file) :: input_data
@@ -48,7 +48,7 @@ implicit none
     call input_data%destroy()
 
     call plmc_visit(observables, environment%walls_potential, short_potentials, ewalds, mixture)
-    call plmc_write(0, observables_writers, observables, in_loop = .false.)
+    call plmc_write(-num_tuning_steps, observables_writers, observables, in_loop = .false.)
 
     !call metropolis_factory_create(one_particle_move, environment, changes)
     !call metropolis_factory_set(one_particle_move, mixture%components, short_potentials, ewalds, &
@@ -60,31 +60,34 @@ implicit none
         mixture%components(2)%positions%get_num()
     num_rotations = mixture%components(1)%orientations%get_num() + &
         mixture%components(2)%orientations%get_num()
-    write(output_unit, *)  "Tuning changes..."
-    do i_step = 1, num_tuning_steps
-        call counters_reset(observables%changes_counters)
+    write(output_unit, *)  "Trying to tune changes..."
+    do i_step = -num_tuning_steps + 1, 0
+        call counters_reset(observables%intras(1)%changes_counter)
+        call counters_reset(observables%intras(2)%changes_counter)
         do i_move = 1, num_moves
             !call one_particle_move%try()
         end do
         do i_rotation = 1, num_rotations
             !call one_particle_rotation%try()
         end do
-        call sucess_set(observables%changes_success, observables%changes_counters)
+        call sucess_set(observables%intras(1)%changes_success, observables%intras(1)%changes_counter)
+        call sucess_set(observables%intras(2)%changes_success, observables%intras(2)%changes_counter)
         call plmc_write(i_step, observables_writers, observables, in_loop = .true.)
-        call plmc_tune(changes_tuned, i_step, changes, observables%changes_success)
+        call plmc_tune(changes_tuned, i_step, changes, observables%intras)
         if (changes_tuned) exit
     end do
-    call plmc_print_tuning_status(changes_tuned)
     write(output_unit, *) "Iterations start."
     do i_step = 1, num_steps
-        call counters_reset(observables%changes_counters)
+        call counters_reset(observables%intras(1)%changes_counter)
+        call counters_reset(observables%intras(2)%changes_counter)
         do i_move = 1, num_moves
             !call one_particle_move%try()
         end do
         do i_rotation = 1, num_rotations
             !call one_particle_rotation%try()
         end do
-        call sucess_set(observables%changes_success, observables%changes_counters)
+        call sucess_set(observables%intras(1)%changes_success, observables%intras(1)%changes_counter)
+        call sucess_set(observables%intras(2)%changes_success, observables%intras(2)%changes_counter)
         call plmc_write(i_step, observables_writers, observables, in_loop = .true.)
     end do
     write(output_unit, *) "Iterations end."

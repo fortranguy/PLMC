@@ -10,7 +10,7 @@ use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
 use class_tower_sampler, only: Abstract_Tower_Sampler, Concrete_Tower_Sampler, Null_Tower_Sampler
 use class_one_particle_change, only: Abstract_One_Particle_Change, &
     Concrete_One_Particle_Move, Concrete_One_Particle_Rotation, Null_One_Particle_Change
-use types_mixture_observables, only: Concrete_Mixture_Observables
+use types_observables_wrapper, only: Mixture_Observables_Wrapper
 use procedures_property_inquirers, only: particles_can_move, particles_can_rotate
 
 implicit none
@@ -59,7 +59,7 @@ contains
         type(Particles_Wrapper), intent(in) :: components(num_components)
         type(Mixture_Short_Potentials_Wrapper), intent(in) :: short_potentials
         type(Mixture_Ewald_Wrapper), intent(in) :: ewalds
-        type(Concrete_Mixture_Observables), intent(in) :: observables
+        type(Mixture_Observables_Wrapper), intent(in) :: observables
 
         call one_particle_change%set_candidates(components, short_potentials, ewalds)
         !call one_particle_change%set_observables(observables%changes_counters, &
@@ -91,7 +91,7 @@ contains
         type(Particles_Wrapper), intent(in) :: components(num_components)
         type(Mixture_Short_Potentials_Wrapper), intent(in) :: short_potentials
         type(Mixture_Ewald_Wrapper), intent(in) :: ewalds
-        type(Concrete_Mixture_Observables), intent(in) :: observables
+        type(Mixture_Observables_Wrapper), intent(in) :: observables
 
         call one_particle_rotation%set_candidates(components, short_potentials, ewalds)
         !call one_particle_rotation%set_observables(observables%changes_counters%rotations, &
