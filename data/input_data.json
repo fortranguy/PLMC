@@ -172,7 +172,7 @@
                 "delta distance": 1.0e-6,
                 "max distance over box edge": 0.5
             }
-        },
+        }
     },
     "Monte Carlo": {
         "number of steps": 200,
