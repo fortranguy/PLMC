@@ -54,7 +54,9 @@ contains
                 cumulative_weight(i_candidate) = real(sum(nums_candidates(1:i_candidate)), DP) / &
                     real(sum(nums_candidates), DP)
             end do
-            this%limits = [0._DP, cumulative_weight]
+            allocate(this%limits(this%num_candidates + 1))
+            this%limits(1) = 0._DP
+            this%limits(2:this%num_candidates + 1) = cumulative_weight
             deallocate(cumulative_weight)
         end if
     end subroutine Abstract_Tower_Sampler_construct
