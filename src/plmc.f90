@@ -43,10 +43,10 @@ implicit none
     call plmc_create(ewalds, environment, mixture, input_data)
     call plmc_create(observables_writers, environment%walls_potential, mixture, changes, input_data)
     call plmc_create(metropolis, environment, changes)
-    call plmc_create(propagator, metropolis, changes)
     call input_data%destroy()
 
     call plmc_set(metropolis, mixture%components, short_potentials, ewalds, observables)
+    call plmc_create(propagator, metropolis, changes)
     call plmc_visit(observables, environment%walls_potential, short_potentials, ewalds, mixture)
     call plmc_write(-num_tuning_steps, observables_writers, observables, in_loop = .false.)
 

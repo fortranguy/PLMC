@@ -3,6 +3,7 @@ if (${CMAKE_Fortran_COMPILER_ID} MATCHES "GNU")
     force_add_flags(CMAKE_Fortran_FLAGS_DEBUG "-W -Wall -fbounds-check")
     set(CMAKE_Fortran_FLAGS_FAST "-Ofast")
 elseif (${CMAKE_Fortran_COMPILER_ID} MATCHES "Intel")
+    force_add_flags(CMAKE_Fortran_FLAGS -assume realloc_lhs)
     force_add_flags(CMAKE_Fortran_FLAGS_DEBUG
         "-warn all -check all -check noarg_temp_created -fltconsistency -traceback"
     )

@@ -287,8 +287,10 @@ contains
             allocate(Null_Tower_Sampler :: selector)
             allocate(Null_Monte_Carlo_Propagator :: propagator)
         end if
-        call propagator%construct([metropolis%one_particle_move, &
-            metropolis%one_particle_rotation], selector)
+        call propagator%construct(selector)
+        call propagator%add(metropolis%one_particle_move)
+        call propagator%add(metropolis%one_particle_rotation)
+        call propagator%set()
         deallocate(selector)
     end subroutine create_propagator
 
