@@ -14,6 +14,7 @@ use procedures_plmc_visit, only: plmc_visit
 use types_observables_wrapper, only: Mixture_Observables_Wrapper
 use types_observable_writers_wrapper, only: Mixture_Observable_Writers_Wrapper
 use types_metropolis_wrapper, only: Metropolis_Wrapper
+use class_monte_carlo_propagator, only: Abstract_Monte_Carlo_Propagator
 use procedures_plmc_write, only: plmc_write
 use module_plmc_iterations, only: num_tuning_steps, num_steps, plmc_set_num_steps
 
@@ -27,9 +28,10 @@ implicit none
     type(Mixture_Observables_Wrapper) :: observables
     type(Mixture_Observable_Writers_Wrapper) :: observables_writers
     type(Metropolis_Wrapper) :: metropolis
+    class(Abstract_Monte_Carlo_Propagator), allocatable :: propagator
 
     type(json_file) :: input_data
-    integer :: i_step, num_moves, i_move, num_rotations, i_rotation
+    integer :: i_step
     logical :: changes_tuned
 
     call plmc_load(input_data)
@@ -41,24 +43,16 @@ implicit none
     call plmc_create(ewalds, environment, mixture, input_data)
     call plmc_create(observables_writers, environment%walls_potential, mixture, changes, input_data)
     call plmc_create(metropolis, environment, changes)
+    call plmc_create(propagator, metropolis, changes)
     call input_data%destroy()
 
     call plmc_set(metropolis, mixture%components, short_potentials, ewalds, observables)
     call plmc_visit(observables, environment%walls_potential, short_potentials, ewalds, mixture)
     call plmc_write(-num_tuning_steps, observables_writers, observables, in_loop = .false.)
 
-    num_moves = mixture%components(1)%positions%get_num() + &
-        mixture%components(2)%positions%get_num()
-    num_rotations = mixture%components(1)%orientations%get_num() + &
-        mixture%components(2)%orientations%get_num()
     write(output_unit, *)  "Trying to tune changes..."
     do i_step = -num_tuning_steps + 1, 0
-        do i_move = 1, num_moves
-            !call one_particle_move%try()
-        end do
-        do i_rotation = 1, num_rotations
-            !call one_particle_rotation%try()
-        end do
+        call propagator%try()
         call plmc_set(observables%intras)
         call plmc_set(changes_tuned, i_step, changes, observables%intras)
         call plmc_write(i_step, observables_writers, observables, in_loop = .true.)
@@ -66,12 +60,7 @@ implicit none
     end do
     write(output_unit, *) "Iterations start."
     do i_step = 1, num_steps
-        do i_move = 1, num_moves
-            !call one_particle_move%try()
-        end do
-        do i_rotation = 1, num_rotations
-            !call one_particle_rotation%try()
-        end do
+        call propagator%try()
         call plmc_set(observables%intras)
         call plmc_write(i_step, observables_writers, observables, in_loop = .true.)
     end do
@@ -80,6 +69,7 @@ implicit none
     call plmc_visit(observables, environment%walls_potential, short_potentials, ewalds, mixture)
     call plmc_write(i_step-1, observables_writers, observables, in_loop = .false.)
 
+    call plmc_destroy(propagator)
     call plmc_destroy(metropolis)
     call plmc_destroy(observables_writers)
     call plmc_destroy(ewalds)

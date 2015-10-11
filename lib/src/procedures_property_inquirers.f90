@@ -22,7 +22,8 @@ implicit none
 private
 public :: apply_external_field, use_reciprocal_lattice, use_walls, &
     particles_exist, particles_have_positions, particles_can_move, particles_are_dipolar, &
-    particles_have_orientations, particles_can_exchange, particles_can_rotate, particles_interact
+    particles_have_orientations, particles_can_exchange, particles_can_rotate, particles_interact, &
+    particles_can_change
 
 interface apply_external_field
     module procedure :: apply_external_field_from_json
@@ -105,17 +106,6 @@ contains
                 particles_exist = .true.
         end select
     end function particles_exist_from_number
-
-    pure logical function particles_exist_from_diameter(particles_diameter) result(particles_exist)
-        class(Abstract_Particles_Diameter), intent(in) :: particles_diameter
-
-        select type (particles_diameter)
-            type is (Null_Particles_Diameter)
-                particles_exist = .false.
-            class default
-                particles_exist = .true.
-        end select
-    end function particles_exist_from_diameter
 
     pure logical function particles_interact(pair_potential)
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
@@ -243,6 +233,17 @@ contains
                 particles_can_exchange = .true.
         end select
     end function particles_can_exchange_from_particles_exchange
+
+    pure logical function particles_can_change(moved_positions, rotated_orientations, &
+        particles_exchange)
+        class(Abstract_Moved_Positions), intent(in) :: moved_positions
+        class(Abstract_Rotated_Orientations), intent(in) :: rotated_orientations
+        class(Abstract_Particles_Exchange), intent(in) :: particles_exchange
+
+        particles_can_change = particles_can_move(moved_positions) .or. &
+            particles_can_rotate(rotated_orientations) .or. &
+            particles_can_exchange(particles_exchange)
+    end function particles_can_change
 
     logical function logical_from_json(input_data, switch_name)
         type(json_file), intent(inout) :: input_data

@@ -126,17 +126,17 @@ contains
 
 !implementation Abstract_One_Particle_Change
 
-    subroutine Abstract_One_Particle_Change_construct(this, environment, selector, &
-        changed_coordinates)
+    subroutine Abstract_One_Particle_Change_construct(this, environment, changed_coordinates, &
+        selector)
         class(Abstract_One_Particle_Change), intent(out) :: this
-        class(Abstract_Tower_Sampler), intent(in) :: selector
         type(Environment_Wrapper), target, intent(in) :: environment
         class(Abstract_Changed_Coordinates), target, intent(in) :: &
             changed_coordinates(num_components)
+        class(Abstract_Tower_Sampler), intent(in) :: selector
 
         this%environment => environment
-        allocate(this%selector, source=selector)
         this%changed_coordinates => changed_coordinates
+        allocate(this%selector, mold=selector)
     end subroutine Abstract_One_Particle_Change_construct
 
     subroutine Abstract_One_Particle_Change_destroy(this)
@@ -145,10 +145,10 @@ contains
         this%observables => null()
         this%ewalds => null()
         this%short_potentials => null()
-        this%changed_coordinates => null()
         this%components => null()
         call this%selector%destroy()
         if (allocated(this%selector)) deallocate(this%selector)
+        this%changed_coordinates => null()
         this%environment => null()
     end subroutine Abstract_One_Particle_Change_destroy
 
@@ -430,13 +430,13 @@ contains
 
 !implementation Null_One_Particle_Change
 
-    subroutine Null_One_Particle_Change_construct(this, environment, selector, &
-        changed_coordinates)
+    subroutine Null_One_Particle_Change_construct(this, environment, changed_coordinates, &
+        selector)
         class(Null_One_Particle_Change), intent(out) :: this
-        class(Abstract_Tower_Sampler), intent(in) :: selector
         type(Environment_Wrapper), target, intent(in) :: environment
         class(Abstract_Changed_Coordinates), target, intent(in) :: &
             changed_coordinates(num_components)
+        class(Abstract_Tower_Sampler), intent(in) :: selector
     end subroutine Null_One_Particle_Change_construct
 
     subroutine Null_One_Particle_Change_destroy(this)
