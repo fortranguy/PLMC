@@ -97,10 +97,10 @@ contains
 
         class(Abstract_Tower_Sampler), allocatable :: selector
 
-        if (particles_can_rotate(changes(1)%rotated_orientations) .and. &
+        if (particles_can_rotate(changes(1)%rotated_orientations) .or. &
             particles_can_rotate(changes(2)%rotated_orientations)) then
             allocate(Concrete_Tower_Sampler :: selector)
-            allocate(Concrete_One_Particle_Move :: one_particle_rotation)
+            allocate(Concrete_One_Particle_Rotation :: one_particle_rotation)
         else
             allocate(Null_Tower_Sampler :: selector)
             allocate(Null_One_Particle_Change :: one_particle_rotation)

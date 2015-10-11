@@ -38,8 +38,8 @@ private
         generic :: set => set_candidates, set_observables
         procedure :: destroy => Abstract_One_Particle_Change_destroy
         procedure :: try => Abstract_One_Particle_Change_try
-        procedure(Abstract_One_Particle_Change_set_selector), private, deferred :: set_selector
         procedure, private :: set_candidates => Abstract_One_Particle_Change_set_candidates
+        procedure(Abstract_One_Particle_Change_set_selector), private, deferred :: set_selector
         procedure, private :: set_observables => Abstract_One_Particle_Change_set_observables
         procedure, private :: test_metropolis => Abstract_One_Particle_Change_test_metropolis
         procedure(Abstract_One_Particle_Change_define_change), private, deferred :: define_change

@@ -41,6 +41,7 @@ contains
 
         do i_choice = 1, num_choices
             select case (selector%get())
+                case (0)
                 case (1)
                     call metropolis%one_particle_move%try()
                 case (2)
