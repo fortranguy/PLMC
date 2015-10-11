@@ -1,6 +1,5 @@
 module types_observables_wrapper
 
-use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_components
 use module_changes_success, only: Concrete_Changes_Counter, Concrete_Changes_Success
 use module_particles_energy, only: Concrete_Particles_Energy, Concrete_Inter_Energy

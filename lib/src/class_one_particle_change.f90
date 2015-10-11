@@ -18,12 +18,13 @@ use module_particles_energy, only: Concrete_Particles_Energy, Concrete_Inter_Ene
     particle_energy_sum => Concrete_Particles_Energy_sum, &
     inter_energy_sum => Concrete_Inter_Energy_sum, operator(+), operator(-)
 use types_observables_wrapper, only: Mixture_Observables_Wrapper
+use class_metropolis_algorithm, only: Abstract_Metropolis_Algorithm
 
 implicit none
 
 private
 
-    type, abstract, public :: Abstract_One_Particle_Change
+    type, extends(Abstract_Metropolis_Algorithm), abstract, public :: Abstract_One_Particle_Change
     private
         type(Environment_Wrapper), pointer :: environment => null()
         type(Particles_Wrapper), pointer :: components(:) => null()
@@ -31,21 +32,23 @@ private
         type(Mixture_Short_Potentials_Wrapper), pointer :: short_potentials => null()
         type(Mixture_Ewald_Wrapper), pointer :: ewalds => null()
         class(Abstract_Tower_Sampler), allocatable :: selector
-        type(Concrete_Change_Counter), pointer :: change_counters(:) => null()
-        type(Concrete_Particles_Energy), pointer :: particles_energies(:) => null()
-        type(Concrete_Inter_Energy), pointer :: inter_energy => null()
+        type(Mixture_Observables_Wrapper), pointer :: observables
     contains
         procedure :: construct => Abstract_One_Particle_Change_construct
+        generic :: set => set_candidates, set_observables
         procedure :: destroy => Abstract_One_Particle_Change_destroy
-        procedure :: set_candidates => Abstract_One_Particle_Change_set_candidates
-        procedure :: set_observables => Abstract_One_Particle_Change_set_observables
         procedure :: try => Abstract_One_Particle_Change_try
         procedure(Abstract_One_Particle_Change_set_selector), private, deferred :: set_selector
+        procedure, private :: set_candidates => Abstract_One_Particle_Change_set_candidates
+        procedure, private :: set_observables => Abstract_One_Particle_Change_set_observables
         procedure, private :: test_metropolis => Abstract_One_Particle_Change_test_metropolis
         procedure(Abstract_One_Particle_Change_define_change), private, deferred :: define_change
         procedure, private :: visit_short => Abstract_One_Particle_Change_visit_short
         procedure, private :: visit_long => Abstract_One_Particle_Change_visit_long
         procedure(Abstract_One_Particle_Change_update_actor), private, deferred :: update_actor
+        procedure(Abstract_One_Particle_Change_increment_hits), private, deferred :: increment_hits
+        procedure(Abstract_One_Particle_Change_increment_success), private, deferred :: &
+            increment_success
     end type Abstract_One_Particle_Change
 
     abstract interface
@@ -69,33 +72,54 @@ private
             type(Concrete_Temporary_Particle), intent(out) :: new, old
         end subroutine Abstract_One_Particle_Change_update_actor
 
+        subroutine Abstract_One_Particle_Change_increment_hits(this, i_actor)
+        import :: Concrete_Temporary_Particle, Abstract_One_Particle_Change
+            class(Abstract_One_Particle_Change), intent(inout) :: this
+            integer, intent(in) :: i_actor
+        end subroutine Abstract_One_Particle_Change_increment_hits
+
+        subroutine Abstract_One_Particle_Change_increment_success(this, i_actor)
+        import :: Concrete_Temporary_Particle, Abstract_One_Particle_Change
+            class(Abstract_One_Particle_Change), intent(inout) :: this
+            integer, intent(in) :: i_actor
+        end subroutine Abstract_One_Particle_Change_increment_success
+
     end interface
 
     type, extends(Abstract_One_Particle_Change), public :: Concrete_One_Particle_Move
     contains
+        procedure :: get_num_choices => Concrete_One_Particle_Move_get_num_choices
         procedure, private :: set_selector => Concrete_One_Particle_Move_set_selector
         procedure, private :: define_change => Concrete_One_Particle_Move_define_change
         procedure, private :: update_actor => Concrete_One_Particle_Move_update_actor
+        procedure, private :: increment_hits => Concrete_One_Particle_Move_increment_hits
+        procedure, private :: increment_success => Concrete_One_Particle_Move_increment_success
     end type Concrete_One_Particle_Move
 
     type, extends(Abstract_One_Particle_Change), public :: Concrete_One_Particle_Rotation
     contains
+        procedure :: get_num_choices => Concrete_One_Particle_Rotation_get_num_choices
         procedure, private :: set_selector => Concrete_One_Particle_Rotation_set_selector
         procedure, private :: visit_short => Concrete_One_Particle_Rotation_visit_short
         procedure, private :: define_change => Concrete_One_Particle_Rotation_define_change
         procedure, private :: update_actor => Concrete_One_Particle_Rotation_update_actor
+        procedure, private :: increment_hits => Concrete_One_Particle_Rotation_increment_hits
+        procedure, private :: increment_success => Concrete_One_Particle_Rotation_increment_success
     end type Concrete_One_Particle_Rotation
 
     type, extends(Abstract_One_Particle_Change), public :: Null_One_Particle_Change
     contains
         procedure :: construct => Null_One_Particle_Change_construct
         procedure :: destroy => Null_One_Particle_Change_destroy
-        procedure :: set_candidates => Null_One_Particle_Change_set_candidates
-        procedure :: set_observables => Null_One_Particle_Change_set_observables
+        procedure, private :: set_candidates => Null_One_Particle_Change_set_candidates
+        procedure, private :: set_observables => Null_One_Particle_Change_set_observables
+        procedure :: get_num_choices => Null_One_Particle_Change_get_num_choices
         procedure :: try => Null_One_Particle_Change_try
         procedure, private :: set_selector => Null_One_Particle_Change_set_selector
         procedure, private :: define_change => Null_One_Particle_Change_define_change
         procedure, private :: update_actor => Null_One_Particle_Change_update_actor
+        procedure, private :: increment_hits => Null_One_Particle_Change_increment_hits
+        procedure, private :: increment_success => Null_One_Particle_Change_increment_success
     end type Null_One_Particle_Change
 
 contains
@@ -118,9 +142,7 @@ contains
     subroutine Abstract_One_Particle_Change_destroy(this)
         class(Abstract_One_Particle_Change), intent(inout) :: this
 
-        this%inter_energy => null()
-        this%particles_energies => null()
-        this%change_counters => null()
+        this%observables => null()
         this%ewalds => null()
         this%short_potentials => null()
         this%changed_coordinates => null()
@@ -147,28 +169,15 @@ contains
         this%ewalds => ewalds
     end subroutine Abstract_One_Particle_Change_set_candidates
 
-    subroutine Abstract_One_Particle_Change_set_observables(this, change_counters, &
-        particles_energies, inter_energy)
+    subroutine Abstract_One_Particle_Change_set_observables(this, observables)
         class(Abstract_One_Particle_Change), intent(inout) :: this
-        type(Concrete_Change_Counter), target, intent(in) :: change_counters(:)
-        type(Concrete_Particles_Energy), target, intent(in) :: particles_energies(:)
-        type(Concrete_Inter_Energy), target, intent(in) :: inter_energy
+        type(Mixture_Observables_Wrapper), target, intent(in) :: observables
 
-        if (size(change_counters) /= num_components) then
-            call error_exit("Abstract_One_Particle_Change: "//&
-                "change_counters doesn't have the right size.")
-        end if
-        this%change_counters => change_counters
-        if (size(particles_energies) /= num_components) then
-            call error_exit("Abstract_One_Particle_Change: "//&
-                "particles_energies doesn't have the right size.")
-        end if
-        this%particles_energies => particles_energies
-        this%inter_energy => inter_energy
+        this%observables => observables
     end subroutine Abstract_One_Particle_Change_set_observables
 
     subroutine Abstract_One_Particle_Change_try(this)
-        class(Abstract_One_Particle_Change), intent(in) :: this
+        class(Abstract_One_Particle_Change), intent(inout) :: this
 
         integer :: i_actor, i_spectator
         logical :: success
@@ -177,15 +186,14 @@ contains
 
         i_actor = this%selector%get()
         i_spectator = mod(i_actor, num_components) + 1
-        this%change_counters(i_actor)%num_hits = this%change_counters(i_actor)%num_hits + 1
+        call this%increment_hits(i_actor)
         call this%test_metropolis(success, actor_energy_difference, inter_energy_difference, &
             i_actor, i_spectator)
         if (success) then
-            this%particles_energies(i_actor) = this%particles_energies(i_actor) + &
-                actor_energy_difference
-            this%inter_energy = this%inter_energy + inter_energy_difference
-            this%change_counters(i_actor)%num_success = &
-                this%change_counters(i_actor)%num_success + 1
+            this%observables%intras(i_actor)%particles_energy = &
+                this%observables%intras(i_actor)%particles_energy + actor_energy_difference
+            this%observables%inter_energy = this%observables%inter_energy + inter_energy_difference
+            call this%increment_success(i_actor)
         end if
     end subroutine Abstract_One_Particle_Change_try
 
@@ -298,6 +306,13 @@ contains
             this%components(2)%positions%get_num()])
     end subroutine Concrete_One_Particle_Move_set_selector
 
+    pure integer function Concrete_One_Particle_Move_get_num_choices(this) result(num_choices)
+        class(Concrete_One_Particle_Move), intent(in) :: this
+
+        num_choices = this%components(1)%positions%get_num() + &
+            this%components(2)%positions%get_num()
+    end function Concrete_One_Particle_Move_get_num_choices
+
     subroutine Concrete_One_Particle_Move_define_change(this, new, old, i_actor)
         class(Concrete_One_Particle_Move), intent(in) :: this
         type(Concrete_Temporary_Particle), intent(out) :: new, old
@@ -321,6 +336,24 @@ contains
         call this%short_potentials%inters(i_actor)%cells%move(old, new)
     end subroutine Concrete_One_Particle_Move_update_actor
 
+    subroutine Concrete_One_Particle_Move_increment_hits(this, i_actor)
+        class(Concrete_One_Particle_Move), intent(inout) :: this
+        integer, intent(in) :: i_actor
+
+        associate (actor_move => this%observables%intras(i_actor)%changes_counter%move)
+            actor_move%num_hits = actor_move%num_hits + 1
+        end associate
+    end subroutine Concrete_One_Particle_Move_increment_hits
+
+    subroutine Concrete_One_Particle_Move_increment_success(this, i_actor)
+        class(Concrete_One_Particle_Move), intent(inout) :: this
+        integer, intent(in) :: i_actor
+
+        associate (actor_move => this%observables%intras(i_actor)%changes_counter%move)
+            actor_move%num_success = actor_move%num_success + 1
+        end associate
+    end subroutine Concrete_One_Particle_Move_increment_success
+
 !end implementation Concrete_One_Particle_Move
 
 !implementation Concrete_One_Particle_Rotation
@@ -331,6 +364,13 @@ contains
         call this%selector%construct([this%components(1)%orientations%get_num(), &
             this%components(2)%orientations%get_num()])
     end subroutine Concrete_One_Particle_Rotation_set_selector
+
+    pure integer function Concrete_One_Particle_Rotation_get_num_choices(this) result(num_choices)
+        class(Concrete_One_Particle_Rotation), intent(in) :: this
+
+        num_choices = this%components(1)%orientations%get_num() + &
+            this%components(2)%orientations%get_num()
+    end function Concrete_One_Particle_Rotation_get_num_choices
 
     subroutine Concrete_One_Particle_Rotation_visit_short(this, overlap, new_energy, old_energy, &
         new, old, i_actor, i_spectator)
@@ -368,6 +408,24 @@ contains
         call this%components(i_actor)%orientations%set(new%i, new%orientation)
     end subroutine Concrete_One_Particle_Rotation_update_actor
 
+    subroutine Concrete_One_Particle_Rotation_increment_hits(this, i_actor)
+        class(Concrete_One_Particle_Rotation), intent(inout) :: this
+        integer, intent(in) :: i_actor
+
+        associate (actor_rotation => this%observables%intras(i_actor)%changes_counter%rotation)
+            actor_rotation%num_hits = actor_rotation%num_hits + 1
+        end associate
+    end subroutine Concrete_One_Particle_Rotation_increment_hits
+
+    subroutine Concrete_One_Particle_Rotation_increment_success(this, i_actor)
+        class(Concrete_One_Particle_Rotation), intent(inout) :: this
+        integer, intent(in) :: i_actor
+
+        associate (actor_rotation => this%observables%intras(i_actor)%changes_counter%rotation)
+            actor_rotation%num_success = actor_rotation%num_success + 1
+        end associate
+    end subroutine Concrete_One_Particle_Rotation_increment_success
+
 !end implementation Concrete_One_Particle_Rotation
 
 !implementation Null_One_Particle_Change
@@ -397,16 +455,18 @@ contains
         class(Null_One_Particle_Change), intent(inout) :: this
     end subroutine Null_One_Particle_Change_set_selector
 
-    subroutine Null_One_Particle_Change_set_observables(this, change_counters, &
-        particles_energies, inter_energy)
+    subroutine Null_One_Particle_Change_set_observables(this, observables)
         class(Null_One_Particle_Change), intent(inout) :: this
-        type(Concrete_Change_Counter), target, intent(in) :: change_counters(:)
-        type(Concrete_Particles_Energy), target, intent(in) :: particles_energies(:)
-        type(Concrete_Inter_Energy), target, intent(in) :: inter_energy
+        type(Mixture_Observables_Wrapper), target, intent(in) :: observables
     end subroutine Null_One_Particle_Change_set_observables
 
-    subroutine Null_One_Particle_Change_try(this)
+    pure integer function Null_One_Particle_Change_get_num_choices(this) result(num_choices)
         class(Null_One_Particle_Change), intent(in) :: this
+        num_choices = 0
+    end function Null_One_Particle_Change_get_num_choices
+
+    subroutine Null_One_Particle_Change_try(this)
+        class(Null_One_Particle_Change), intent(inout) :: this
     end subroutine Null_One_Particle_Change_try
 
     subroutine Null_One_Particle_Change_define_change(this, new, old, i_actor)
@@ -424,6 +484,16 @@ contains
         new%i = 0
         old%i = 0
     end subroutine Null_One_Particle_Change_update_actor
+
+    subroutine Null_One_Particle_Change_increment_hits(this, i_actor)
+        class(Null_One_Particle_Change), intent(inout) :: this
+        integer, intent(in) :: i_actor
+    end subroutine Null_One_Particle_Change_increment_hits
+
+    subroutine Null_One_Particle_Change_increment_success(this, i_actor)
+        class(Null_One_Particle_Change), intent(inout) :: this
+        integer, intent(in) :: i_actor
+    end subroutine Null_One_Particle_Change_increment_success
 
 !end implementation Null_One_Particle_Change
 

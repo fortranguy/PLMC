@@ -5,6 +5,7 @@ use data_wrappers_prefix, only:environment_prefix, mixtures_prefix, changes_pref
     short_potentials_prefix, ewalds_prefix
 use json_module, only: json_file, json_initialize
 use procedures_command_arguments, only: set_filename_from_argument
+use module_plmc_iterations, only: num_tuning_steps
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_walls_potential, only: Abstract_Walls_Potential
 use types_environment_wrapper, only: Environment_Wrapper
@@ -18,15 +19,21 @@ use procedures_short_potential_factory, only: short_potential_factory_create, &
     short_potential_factory_destroy
 use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
 use procedures_ewald_factory, only: ewald_factory_create, ewald_factory_destroy
+use module_changes_success, only: reset_counter => Concrete_Changes_Counter_reset, &
+    set_success => Concrete_Changes_Counter_set
+use types_observables_wrapper, only: Observables_Wrapper, Mixture_Observables_Wrapper
 use types_observable_writers_wrapper, only: Mixture_Observable_Writers_Wrapper
 use procedures_observable_writers_factory, only: observable_writers_factory_create, &
     observable_writers_factory_destroy
+use types_metropolis_wrapper, only: Metropolis_Wrapper
+use procedures_metropolis_factory, only: metropolis_factory_create, metropolis_factory_set, &
+    metropolis_factory_destroy
 use procedures_property_inquirers, only: use_walls, particles_exist, particles_are_dipolar
 
 implicit none
 
 private
-public :: plmc_load, plmc_create, plmc_destroy
+public :: plmc_load, plmc_create, plmc_set, plmc_destroy
 
 interface plmc_load
     module procedure :: load_input_data
@@ -39,9 +46,17 @@ interface plmc_create
     module procedure :: create_short_potentials
     module procedure :: create_ewalds
     module procedure :: create_observable_writers
+    module procedure :: create_metropolis
 end interface plmc_create
 
+interface plmc_set
+    module procedure :: set_metropolis
+    module procedure :: tune_changes
+    module procedure :: set_success_and_reset_counter
+end interface plmc_set
+
 interface plmc_destroy
+    module procedure :: destroy_metropolis
     module procedure :: destroy_observable_writers
     module procedure :: destroy_ewalds
     module procedure :: destroy_short_potentials
@@ -231,5 +246,59 @@ contains
         call observable_writers_factory_destroy(observable_writers%intras(2)%energy)
         call observable_writers_factory_destroy(observable_writers%intras(1)%energy)
     end subroutine destroy_observable_writers
+
+    subroutine create_metropolis(metropolis, environment, changes)
+        type(Metropolis_Wrapper), intent(out) :: metropolis
+        type(Environment_Wrapper), intent(in) :: environment
+        type(Changes_Wrapper), intent(in) :: changes(num_components)
+
+        call metropolis_factory_create(metropolis, environment, changes)
+    end subroutine create_metropolis
+
+    subroutine destroy_metropolis(metropolis)
+        type(Metropolis_Wrapper), intent(inout) :: metropolis
+
+        call metropolis_factory_destroy(metropolis)
+    end subroutine destroy_metropolis
+
+    subroutine set_metropolis(metropolis, components, short_potentials, ewalds, observables)
+        type(Metropolis_Wrapper), intent(inout) :: metropolis
+        type(Particles_Wrapper), intent(in) :: components(num_components)
+        type(Mixture_Short_Potentials_Wrapper), intent(in) :: short_potentials
+        type(Mixture_Ewald_Wrapper), intent(in) :: ewalds
+        type(Mixture_Observables_Wrapper), intent(in) :: observables
+
+        call metropolis_factory_set(metropolis, components, short_potentials, ewalds, observables)
+    end subroutine set_metropolis
+
+    subroutine tune_changes(tuned, i_step, changes, observables_intras)
+        logical, intent(out) :: tuned
+        integer, intent(in) :: i_step
+        type(Changes_Wrapper), intent(inout) :: changes(:)
+        type(Observables_Wrapper), intent(in) :: observables_intras(num_components)
+
+        logical :: move_tuned(num_components), rotation_tuned(num_components)
+        integer :: i_component
+
+        do i_component = 1, num_components
+            call changes(i_component)%move_tuner%tune(move_tuned(i_component), i_step, &
+                observables_intras(i_component)%changes_success%move)
+            call changes(i_component)%rotation_tuner%tune(rotation_tuned(i_component), i_step, &
+                observables_intras(i_component)%changes_success%rotation)
+        end do
+        tuned = all(move_tuned) .and. all(rotation_tuned)
+    end subroutine tune_changes
+
+    subroutine set_success_and_reset_counter(observables_intras)
+        type(Observables_Wrapper), intent(inout) :: observables_intras(num_components)
+
+        integer :: i_component
+
+        do i_component = 1, num_components
+            call set_success(observables_intras(i_component)%changes_success, &
+                observables_intras(i_component)%changes_counter)
+            call reset_counter(observables_intras(i_component)%changes_counter)
+        end do
+    end subroutine set_success_and_reset_counter
 
 end module procedures_plmc_factory
