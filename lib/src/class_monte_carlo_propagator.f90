@@ -60,7 +60,7 @@ contains
     end subroutine Abstract_Monte_Carlo_Propagator_destroy
 
     subroutine Abstract_Monte_Carlo_Propagator_try(this)
-        class(Abstract_Monte_Carlo_Propagator), intent(in) :: this
+        class(Abstract_Monte_Carlo_Propagator), intent(inout) :: this
 
         integer :: i_choice
 
@@ -84,7 +84,7 @@ contains
     end subroutine Null_Monte_Carlo_Propagator_destroy
 
     subroutine Null_Monte_Carlo_Propagator_try(this)
-        class(Null_Monte_Carlo_Propagator), intent(in) :: this
+        class(Null_Monte_Carlo_Propagator), intent(inout) :: this
     end subroutine Null_Monte_Carlo_Propagator_try
 
 !implementation Null_Monte_Carlo_Propagator
