@@ -136,7 +136,7 @@ contains
 
         this%environment => environment
         this%changed_coordinates => changed_coordinates
-        allocate(this%selector, mold=selector)
+        allocate(this%selector, source=selector)
     end subroutine Abstract_One_Particle_Change_construct
 
     subroutine Abstract_One_Particle_Change_destroy(this)

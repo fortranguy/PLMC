@@ -58,7 +58,7 @@ contains
     subroutine Abstract_Monte_Carlo_Propagator_try(this)
         class(Abstract_Monte_Carlo_Propagator), intent(inout) :: this
 
-        integer :: i_choice, i_algorithm
+        integer :: i_choice
 
         do i_choice = 1, this%num_choices
             select case (this%selector%get())

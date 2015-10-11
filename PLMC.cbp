@@ -65,6 +65,12 @@
 		<Unit filename="lib/src/class_inter_energy_writer.f90">
 			<Option weight="2" />
 		</Unit>
+		<Unit filename="lib/src/class_metropolis_algorithm.f90">
+			<Option weight="0" />
+		</Unit>
+		<Unit filename="lib/src/class_monte_carlo_propagator.f90">
+			<Option weight="9" />
+		</Unit>
 		<Unit filename="lib/src/class_moved_positions.f90">
 			<Option weight="4" />
 		</Unit>
@@ -206,9 +212,6 @@
 		<Unit filename="lib/src/procedures_plmc_factory.f90">
 			<Option weight="11" />
 		</Unit>
-		<Unit filename="lib/src/procedures_plmc_tuning.f90">
-			<Option weight="9" />
-		</Unit>
 		<Unit filename="lib/src/procedures_plmc_visit.f90">
 			<Option weight="7" />
 		</Unit>
@@ -232,6 +235,9 @@
 		</Unit>
 		<Unit filename="lib/src/types_ewald_wrapper.f90">
 			<Option weight="6" />
+		</Unit>
+		<Unit filename="lib/src/types_metropolis_wrapper.f90">
+			<Option weight="8" />
 		</Unit>
 		<Unit filename="lib/src/types_observable_writers_wrapper.f90">
 			<Option weight="5" />
