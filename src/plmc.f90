@@ -44,14 +44,14 @@ implicit none
     call plmc_create(metropolis, environment, changes)
     call input_data%destroy()
 
-    call plmc_set(metropolis, mixture%components, short_potentials, ewalds, observables)
+    call plmc_set(metropolis, mixture%components, short_potentials, ewalds)
     call plmc_propagator_construct(metropolis)
     call plmc_visit(observables, environment%walls_potential, short_potentials, ewalds, mixture)
     call plmc_write(-num_tuning_steps, observables_writers, observables)
 
     write(output_unit, *)  "Trying to tune changes..."
     do i_step = -num_tuning_steps + 1, 0
-        call plmc_propagator_try(metropolis)
+        call plmc_propagator_try(metropolis, observables)
         call plmc_set(observables%intras)
         call plmc_set(changes_tuned, i_step, changes, observables%intras)
         call plmc_write(i_step, observables_writers, observables)
@@ -59,7 +59,7 @@ implicit none
     end do
     write(output_unit, *) "Iterations start."
     do i_step = 1, num_steps
-        call plmc_propagator_try(metropolis)
+        call plmc_propagator_try(metropolis, observables)
         call plmc_set(observables%intras)
         call plmc_write(i_step, observables_writers, observables)
     end do

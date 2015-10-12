@@ -11,7 +11,6 @@ use class_tower_sampler, only: Abstract_Tower_Sampler, Concrete_Tower_Sampler, N
 use class_one_particle_change, only: Abstract_One_Particle_Change, &
     Concrete_One_Particle_Move, Concrete_One_Particle_Rotation, Null_One_Particle_Change
 use types_metropolis_wrapper, only: Metropolis_Wrapper
-use types_observables_wrapper, only: Mixture_Observables_Wrapper
 use procedures_property_inquirers, only: particles_can_move, particles_can_rotate
 
 implicit none
@@ -63,31 +62,15 @@ contains
         deallocate(selector)
     end subroutine allocate_and_construct_one_particle_move
 
-    subroutine metropolis_factory_set_all(metropolis, components, short_potentials, ewalds, &
-        observables)
+    subroutine metropolis_factory_set_all(metropolis, components, short_potentials, ewalds)
         type(Metropolis_Wrapper), intent(inout) :: metropolis
         type(Particles_Wrapper), intent(in) :: components(num_components)
         type(Mixture_Short_Potentials_Wrapper), intent(in) :: short_potentials
         type(Mixture_Ewald_Wrapper), intent(in) :: ewalds
-        type(Mixture_Observables_Wrapper), intent(in) :: observables
 
-        call set_one_particle_change(metropolis%one_particle_move, components, short_potentials, &
-            ewalds, observables)
-        call set_one_particle_change(metropolis%one_particle_rotation, components, &
-            short_potentials, ewalds, observables)
+        call metropolis%one_particle_move%set_candidates(components, short_potentials, ewalds)
+        call metropolis%one_particle_rotation%set_candidates(components, short_potentials, ewalds)
     end subroutine metropolis_factory_set_all
-
-    subroutine set_one_particle_change(one_particle_change, components, short_potentials, ewalds, &
-        observables)
-        class(Abstract_One_Particle_Change), intent(inout) :: one_particle_change
-        type(Particles_Wrapper), intent(in) :: components(num_components)
-        type(Mixture_Short_Potentials_Wrapper), intent(in) :: short_potentials
-        type(Mixture_Ewald_Wrapper), intent(in) :: ewalds
-        type(Mixture_Observables_Wrapper), intent(in) :: observables
-
-        call one_particle_change%set(components, short_potentials, ewalds)
-        call one_particle_change%set(observables)
-    end subroutine set_one_particle_change
 
     subroutine allocate_and_construct_one_particle_rotation(one_particle_rotation, environment, &
         changes)

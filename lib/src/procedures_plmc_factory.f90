@@ -21,7 +21,7 @@ use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
 use procedures_ewald_factory, only: ewald_factory_create, ewald_factory_destroy
 use module_changes_success, only: reset_counter => Concrete_Changes_Counter_reset, &
     set_success => Concrete_Changes_Counter_set
-use types_observables_wrapper, only: Observables_Wrapper, Mixture_Observables_Wrapper
+use types_observables_wrapper, only: Observables_Wrapper
 use types_observable_writers_wrapper, only: Mixture_Observable_Writers_Wrapper
 use procedures_observable_writers_factory, only: observable_writers_factory_create, &
     observable_writers_factory_destroy
@@ -273,14 +273,13 @@ contains
         call metropolis_factory_destroy(metropolis)
     end subroutine destroy_metropolis
 
-    subroutine set_metropolis(metropolis, components, short_potentials, ewalds, observables)
+    subroutine set_metropolis(metropolis, components, short_potentials, ewalds)
         type(Metropolis_Wrapper), intent(inout) :: metropolis
         type(Particles_Wrapper), intent(in) :: components(num_components)
         type(Mixture_Short_Potentials_Wrapper), intent(in) :: short_potentials
         type(Mixture_Ewald_Wrapper), intent(in) :: ewalds
-        type(Mixture_Observables_Wrapper), intent(in) :: observables
 
-        call metropolis_factory_set(metropolis, components, short_potentials, ewalds, observables)
+        call metropolis_factory_set(metropolis, components, short_potentials, ewalds)
     end subroutine set_metropolis
 
     subroutine tune_changes(tuned, i_step, changes, observables_intras)

@@ -88,7 +88,8 @@ contains
         class(Abstract_Visitable_List), intent(inout) :: this
         integer, intent(in) :: i_target, i_particle
 
-        type(Concrete_Linkable_Node), pointer :: previous => null(), current => null(), next => null()
+        type(Concrete_Linkable_Node), pointer :: previous => null(), current => null(), &
+            next => null()
 
         previous => this%beginning
         current => previous%next
