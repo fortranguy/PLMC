@@ -6,6 +6,8 @@ implicit none
 
 private
 
+    integer, public, parameter :: num_algorithms = 2
+
     type, public :: Metropolis_Wrapper
         class(Abstract_One_Particle_Change), allocatable :: one_particle_move, one_particle_rotation
     end type Metropolis_Wrapper

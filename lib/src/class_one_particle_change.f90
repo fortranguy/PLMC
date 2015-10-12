@@ -235,33 +235,29 @@ contains
         type(Concrete_Temporary_Particle), intent(in) :: new, old
         integer, intent(in) :: i_actor, i_spectator
 
-        associate(actor_new_energy => new_energy%intras(i_actor), &
-            actor_old_energy => old_energy%intras(i_actor), &
-            wall_potential => this%environment%walls_potential, &
-            actor_wall_pair => this%short_potentials%intras(i_actor)%wall_pair, &
-            actor_num_particles => this%components(i_actor)%number%get(), &
-            spectator_num_particles => this%components(i_spectator)%number%get(), &
-            actor_cells => this%short_potentials%intras(i_actor)%cells, &
-            spectator_cells => this%short_potentials%inters(i_spectator)%cells)
-
-            call wall_potential%visit(overlap, actor_new_energy%walls, new%position, &
-                actor_wall_pair)
+        call this%environment%walls_potential%visit(overlap, new_energy%intras(i_actor)%walls, &
+            new%position, this%short_potentials%intras(i_actor)%wall_pair)
+        if (overlap) return
+        if (this%components(i_actor)%number%get() > this%components(i_spectator)%number%get()) then
+            call this%short_potentials%intras(i_actor)%cells%visit(overlap, &
+                new_energy%intras(i_actor)%short, new, same_type=.true.)
             if (overlap) return
-            if (actor_num_particles > spectator_num_particles) then
-                call actor_cells%visit(overlap, actor_new_energy%short, new, same_type=.true.)
-                if (overlap) return
-                call spectator_cells%visit(overlap, new_energy%inter%short, new, same_type=.false.)
-            else
-                call spectator_cells%visit(overlap, new_energy%inter%short, new, same_type=.false.)
-                if (overlap) return
-                call actor_cells%visit(overlap, actor_new_energy%short, new, same_type=.true.)
-            end if
+            call this%short_potentials%inters(i_spectator)%cells%visit(overlap, &
+                new_energy%inter%short, new, same_type=.false.)
+        else
+            call this%short_potentials%inters(i_spectator)%cells%visit(overlap, &
+                new_energy%inter%short, new, same_type=.false.)
             if (overlap) return
-            call wall_potential%visit(overlap, actor_old_energy%walls, old%position, &
-                actor_wall_pair)
-            call actor_cells%visit(overlap, actor_old_energy%short, old, same_type=.true.)
-            call spectator_cells%visit(overlap, old_energy%inter%short, old, same_type=.false.)
-        end associate
+            call this%short_potentials%intras(i_actor)%cells%visit(overlap, &
+                new_energy%intras(i_actor)%short, new, same_type=.true.)
+        end if
+        if (overlap) return
+        call this%environment%walls_potential%visit(overlap, old_energy%intras(i_actor)%walls, &
+            old%position, this%short_potentials%intras(i_actor)%wall_pair)
+        call this%short_potentials%intras(i_actor)%cells%visit(overlap, &
+            old_energy%intras(i_actor)%short, old, same_type=.true.)
+        call this%short_potentials%inters(i_spectator)%cells%visit(overlap, &
+            old_energy%inter%short, old, same_type=.false.)
     end subroutine Abstract_One_Particle_Change_visit_short
 
     subroutine Abstract_One_Particle_Change_visit_long(this, new_energy, old_energy, new, old, &
@@ -273,19 +269,14 @@ contains
 
         type(Concrete_Long_Energy) :: new_long, old_long, inter_new_long, inter_old_long
 
-        associate(actor_ewald_real_pair => this%ewalds%intras(i_actor)%real_pair, &
-            actor_ewald_real => this%ewalds%intras(i_actor)%real_particles, &
-            spectator_ewald_real => this%ewalds%inters(i_spectator)%real_particles)
-
-            call actor_ewald_real%visit(new_long%real, new, actor_ewald_real_pair, &
-                same_type=.true.)
-            call spectator_ewald_real%visit(inter_new_long%real, new, &
-                this%ewalds%inter_micro%real_pair, same_type=.false.)
-            call actor_ewald_real%visit(old_long%real, old, actor_ewald_real_pair, &
-                same_type=.true.)
-            call spectator_ewald_real%visit(inter_old_long%real, old, &
-                this%ewalds%inter_micro%real_pair, same_type=.false.)
-        end associate
+        call this%ewalds%intras(i_actor)%real_particles%visit(new_long%real, new, &
+            this%ewalds%intras(i_actor)%real_pair, same_type=.true.)
+        call this%ewalds%inters(i_spectator)%real_particles%visit(inter_new_long%real, new, &
+            this%ewalds%inter_micro%real_pair, same_type=.false.)
+        call this%ewalds%intras(i_actor)%real_particles%visit(old_long%real, old, &
+            this%ewalds%intras(i_actor)%real_pair, same_type=.true.)
+        call this%ewalds%inters(i_spectator)%real_particles%visit(inter_old_long%real, old, &
+            this%ewalds%inter_micro%real_pair, same_type=.false.)
         new_energy%intras(i_actor)%long = new_long%real
         old_energy%intras(i_actor)%long = old_long%real
         new_energy%inter%long = inter_new_long%real
@@ -338,18 +329,16 @@ contains
         class(Concrete_One_Particle_Move), intent(inout) :: this
         integer, intent(in) :: i_actor
 
-        associate (actor_move => this%observables%intras(i_actor)%changes_counter%move)
-            actor_move%num_hits = actor_move%num_hits + 1
-        end associate
+        this%observables%intras(i_actor)%changes_counter%move%num_hits = &
+            this%observables%intras(i_actor)%changes_counter%move%num_hits + 1
     end subroutine Concrete_One_Particle_Move_increment_hits
 
     subroutine Concrete_One_Particle_Move_increment_success(this, i_actor)
         class(Concrete_One_Particle_Move), intent(inout) :: this
         integer, intent(in) :: i_actor
 
-        associate (actor_move => this%observables%intras(i_actor)%changes_counter%move)
-            actor_move%num_success = actor_move%num_success + 1
-        end associate
+        this%observables%intras(i_actor)%changes_counter%move%num_success = &
+            this%observables%intras(i_actor)%changes_counter%move%num_success + 1
     end subroutine Concrete_One_Particle_Move_increment_success
 
 !end implementation Concrete_One_Particle_Move
@@ -410,18 +399,16 @@ contains
         class(Concrete_One_Particle_Rotation), intent(inout) :: this
         integer, intent(in) :: i_actor
 
-        associate (actor_rotation => this%observables%intras(i_actor)%changes_counter%rotation)
-            actor_rotation%num_hits = actor_rotation%num_hits + 1
-        end associate
+        this%observables%intras(i_actor)%changes_counter%rotation%num_hits = &
+            this%observables%intras(i_actor)%changes_counter%rotation%num_hits + 1
     end subroutine Concrete_One_Particle_Rotation_increment_hits
 
     subroutine Concrete_One_Particle_Rotation_increment_success(this, i_actor)
         class(Concrete_One_Particle_Rotation), intent(inout) :: this
         integer, intent(in) :: i_actor
 
-        associate (actor_rotation => this%observables%intras(i_actor)%changes_counter%rotation)
-            actor_rotation%num_success = actor_rotation%num_success + 1
-        end associate
+        this%observables%intras(i_actor)%changes_counter%rotation%num_success = &
+            this%observables%intras(i_actor)%changes_counter%rotation%num_success + 1
     end subroutine Concrete_One_Particle_Rotation_increment_success
 
 !end implementation Concrete_One_Particle_Rotation

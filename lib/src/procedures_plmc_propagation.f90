@@ -1,8 +1,7 @@
 module procedures_plmc_propagation
 
-use data_constants, only: num_algorithms
 use class_tower_sampler, only: Abstract_Tower_Sampler, Concrete_Tower_Sampler, Null_Tower_Sampler
-use types_metropolis_wrapper, only: Metropolis_Wrapper
+use types_metropolis_wrapper, only: num_algorithms, Metropolis_Wrapper
 implicit none
 
 private
