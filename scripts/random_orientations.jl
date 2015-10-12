@@ -25,7 +25,7 @@ pt = ParticlesType
 if size(ARGS, 1) == 0
     error("Please provide a .json file.")
 end
-input_data = json.parsefile(ARGS[1]; ordered=false, use_mmap=true)
+input_data = json.parsefile(ARGS[1]; dicttype=Dict, use_mmap=true)
 
 if input_data["Mixture"]["Component 1"]["exist"] && input_data["Mixture"]["Component 1"]["are dipolar"]
     particles_1 = pt.Particles(0, zeros(3, 1))

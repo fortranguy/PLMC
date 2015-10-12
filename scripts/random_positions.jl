@@ -38,13 +38,13 @@ pt = ParticlesType
 if size(ARGS, 1) == 0
     error("Please provide a .json file.")
 end
-input_data = json.parsefile(ARGS[1]; ordered=false, use_mmap=true)
+input_data = json.parsefile(ARGS[1]; dicttype=Dict, use_mmap=true)
 
-box_size = float64(input_data["Environment"]["Box"]["size"])
+box_size = map(Float64, input_data["Environment"]["Box"]["size"])
 
+particles_1 = pt.Particles(0, 0.0, 0.0, zeros(3, 1))
 if input_data["Mixture"]["Component 1"]["exist"]
-
-    particles_1 = pt.Particles(0, 0.0, 0.0, zeros(3, 1))
+    
     particles_1.num_particles = input_data["Mixture"]["Component 1"]["number"]
     particles_1.diameter = input_data["Mixture"]["Component 1"]["diameter"]
     particles_1.min_diameter = particles_1.diameter * input_data["Mixture"]["Component 1"]["minimum diameter factor"]
@@ -74,9 +74,9 @@ if input_data["Mixture"]["Component 1"]["exist"]
     println("Positions written in ", output_file)
 end
 
+particles_2 = pt.Particles(0, 0.0, 0.0, zeros(3, 1))
 if input_data["Mixture"]["Component 2"]["exist"]
 
-    particles_2 = pt.Particles(0, 0.0, 0.0, zeros(3, 1))
     particles_2.num_particles = input_data["Mixture"]["Component 2"]["number"]
     particles_2.diameter = input_data["Mixture"]["Component 2"]["diameter"]
     particles_2.min_diameter = particles_2.diameter * input_data["Mixture"]["Component 2"]["minimum diameter factor"]
