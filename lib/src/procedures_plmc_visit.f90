@@ -136,10 +136,10 @@ contains
 
         call plmc_visit(inter_energy_1, ewalds%intras(1)%real_particles, &
             mixture%components(2)%positions, mixture%components(2)%dipolar_moments, &
-            ewalds%inter%real_pair, same_type=.false.)
+            ewalds%inter_micro%real_pair, same_type=.false.)
         call plmc_visit(inter_energy_2, ewalds%intras(2)%real_particles, &
             mixture%components(1)%positions, mixture%components(1)%dipolar_moments, &
-            ewalds%inter%real_pair, same_type=.false.)
+            ewalds%inter_micro%real_pair, same_type=.false.)
 
         observables%intras(1)%particles_energy%long = real_energy_1
         observables%intras(2)%particles_energy%long = real_energy_2

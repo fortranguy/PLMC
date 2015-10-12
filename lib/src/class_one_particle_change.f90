@@ -275,16 +275,16 @@ contains
 
         associate(actor_ewald_real_pair => this%ewalds%intras(i_actor)%real_pair, &
             actor_ewald_real => this%ewalds%intras(i_actor)%real_particles, &
-            spectator_ewald_real => this%ewalds%intras(i_spectator)%real_particles)
+            spectator_ewald_real => this%ewalds%inters(i_spectator)%real_particles)
 
             call actor_ewald_real%visit(new_long%real, new, actor_ewald_real_pair, &
                 same_type=.true.)
             call spectator_ewald_real%visit(inter_new_long%real, new, &
-                this%ewalds%inter%real_pair, same_type=.false.)
+                this%ewalds%inter_micro%real_pair, same_type=.false.)
             call actor_ewald_real%visit(old_long%real, old, actor_ewald_real_pair, &
                 same_type=.true.)
             call spectator_ewald_real%visit(inter_old_long%real, old, &
-                this%ewalds%inter%real_pair, same_type=.false.)
+                this%ewalds%inter_micro%real_pair, same_type=.false.)
         end associate
         new_energy%intras(i_actor)%long = new_long%real
         old_energy%intras(i_actor)%long = old_long%real

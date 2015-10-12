@@ -178,19 +178,29 @@ contains
         type(Mixture_Wrapper), intent(in) :: mixture
         type(json_file), intent(inout) :: input_data
 
+        logical :: mixture_is_dipolar
+
         call ewald_factory_create(ewalds%intras(1), environment, mixture%components(1), &
             input_data, ewalds_prefix//"Component 1.")
         call ewald_factory_create(ewalds%intras(2), environment, mixture%components(2), &
             input_data, ewalds_prefix//"Component 2.")
 
-        call ewald_factory_create(ewalds%inter, environment, mixture, input_data, &
-            ewalds_prefix//"Inter 12.")
+        mixture_is_dipolar = particles_are_dipolar(mixture%components(1)%dipolar_moments) .and. &
+            particles_are_dipolar(mixture%components(2)%dipolar_moments)
+        call ewald_factory_create(ewalds%inter_micro, mixture_is_dipolar, environment, &
+            mixture%inter_diameter, input_data, ewalds_prefix//"Inter 12.")
+        call ewald_factory_create(ewalds%inters(1), ewalds%inter_micro, environment, &
+            mixture%components(1))
+        call ewald_factory_create(ewalds%inters(2), ewalds%inter_micro, environment, &
+            mixture%components(2))
     end subroutine create_ewalds
 
     subroutine destroy_ewalds(ewalds)
         type(Mixture_Ewald_Wrapper), intent(inout) :: ewalds
 
-        call ewald_factory_destroy(ewalds%inter)
+        call ewald_factory_destroy(ewalds%inters(2))
+        call ewald_factory_destroy(ewalds%inters(1))
+        call ewald_factory_destroy(ewalds%inter_micro)
         call ewald_factory_destroy(ewalds%intras(2))
         call ewald_factory_destroy(ewalds%intras(1))
     end subroutine destroy_ewalds

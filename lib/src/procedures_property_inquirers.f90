@@ -16,6 +16,7 @@ use class_moved_positions, only: Abstract_Moved_Positions, Null_Moved_Positions
 use class_rotated_orientations, only: Abstract_Rotated_Orientations, Null_Rotated_Orientations
 use class_particles_exchange, only: Abstract_Particles_Exchange, Null_Particles_Exchange
 use class_pair_potential, only: Abstract_Pair_Potential, Null_Pair_Potential
+use class_ewald_real_pair, only: Abstract_Ewald_Real_Pair, Null_Ewald_Real_Pair
 
 implicit none
 
@@ -53,6 +54,11 @@ interface particles_can_exchange
     module procedure :: particles_can_exchange_from_chemical_potential
     module procedure :: particles_can_exchange_from_particles_exchange
 end interface particles_can_exchange
+
+interface particles_interact
+    module procedure :: particles_interact_short
+    module procedure :: particles_interact_long
+end interface particles_interact
 
 contains
 
@@ -107,7 +113,7 @@ contains
         end select
     end function particles_exist_from_number
 
-    pure logical function particles_interact(pair_potential)
+    pure logical function particles_interact_short(pair_potential) result(particles_interact)
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
 
         select type (pair_potential)
@@ -116,7 +122,18 @@ contains
             class default
                 particles_interact = .true.
         end select
-    end function particles_interact
+    end function particles_interact_short
+
+    pure logical function particles_interact_long(ewald_pair) result(particles_interact)
+        class(Abstract_Ewald_Real_Pair), intent(in) :: ewald_pair
+
+        select type (ewald_pair)
+            type is (Null_Ewald_Real_Pair)
+                particles_interact = .false.
+            class default
+                particles_interact = .true.
+        end select
+    end function particles_interact_long
 
     pure logical function particles_have_positions(partcles_positions)
         class(Abstract_Particles_Positions), intent(in) :: partcles_positions

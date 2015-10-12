@@ -13,13 +13,18 @@ private
         class(Abstract_Ewald_Real_Particles), allocatable :: real_particles
     end type Ewald_Wrapper
 
-    type, public :: Inter_Ewald_Wrapper
+    type, public :: Ewald_Wrapper_Macro
+        class(Abstract_Ewald_Real_Particles), allocatable :: real_particles
+    end type Ewald_Wrapper_Macro
+
+    type, public :: Ewald_Wrapper_Micro
         class(Abstract_Ewald_Real_Pair), allocatable :: real_pair
-    end type Inter_Ewald_Wrapper
+    end type Ewald_Wrapper_Micro
 
     type, public :: Mixture_Ewald_Wrapper
         type(Ewald_Wrapper) :: intras(num_components)
-        type(Inter_Ewald_Wrapper) :: inter
+        type(Ewald_Wrapper_Macro) :: inters(num_components)
+        type(Ewald_Wrapper_Micro) :: inter_micro
     end type Mixture_Ewald_Wrapper
 
 end module types_ewald_wrapper

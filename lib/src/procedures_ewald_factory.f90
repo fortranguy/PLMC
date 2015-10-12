@@ -10,13 +10,13 @@ use class_particles_diameter, only: Abstract_Particles_Diameter
 use class_particles_positions, only: Abstract_Particles_Positions
 use class_particles_dipolar_moments, only: Abstract_Particles_Dipolar_Moments
 use types_particles_wrapper, only: Particles_Wrapper, Mixture_Wrapper
-use procedures_property_inquirers, only: particles_are_dipolar
 use types_potential_domain, only: Concrete_Potential_Domain
 use class_ewald_real_pair, only: Abstract_Ewald_Real_Pair, &
     Tabulated_Ewald_Real_Pair, Raw_Ewald_Real_Pair, Null_Ewald_Real_Pair
 use class_ewald_real_particles, only: Abstract_Ewald_Real_Particles, &
     Concrete_Ewald_Real_Particles, Null_Ewald_Real_Particles
-use types_ewald_wrapper, only: Ewald_Wrapper, Inter_Ewald_Wrapper
+use types_ewald_wrapper, only: Ewald_Wrapper, Ewald_Wrapper_Macro, Ewald_Wrapper_Micro
+use procedures_property_inquirers, only: particles_are_dipolar, particles_interact
 
 implicit none
 
@@ -25,7 +25,8 @@ public :: ewald_factory_create, ewald_factory_destroy
 
 interface ewald_factory_create
     module procedure :: ewald_factory_create_all
-    module procedure :: ewald_factory_create_inter
+    module procedure :: ewald_factory_create_macro
+    module procedure :: ewald_factory_create_micro
     module procedure :: allocate_and_construct_real_pair
     module procedure :: allocate_and_construct_real_particles
 end interface ewald_factory_create
@@ -33,7 +34,8 @@ end interface ewald_factory_create
 interface ewald_factory_destroy
     module procedure :: destroy_and_deallocate_real_particles
     module procedure :: destroy_and_deallocate_real_pair
-    module procedure :: ewald_factory_destroy_inter
+    module procedure :: ewald_factory_destroy_micro
+    module procedure :: ewald_factory_destroy_macro
     module procedure :: ewald_factory_destroy_all
 end interface ewald_factory_destroy
 
@@ -57,22 +59,34 @@ contains
             particles%positions, particles%dipolar_moments)
     end subroutine ewald_factory_create_all
 
-    subroutine ewald_factory_create_inter(inter_ewald, environment, mixture, input_data, prefix)
-        type(Inter_Ewald_Wrapper), intent(out) :: inter_ewald
+    subroutine ewald_factory_create_macro(ewald_macro, ewald_micro, environment, particles)
+        type(Ewald_Wrapper_Macro), intent(out) :: ewald_macro
+        type(Ewald_Wrapper_Micro), intent(in) :: ewald_micro
         type(Environment_Wrapper), intent(in) :: environment
-        type(Mixture_Wrapper), intent(in) :: mixture
+        type(Particles_Wrapper), intent(in) :: particles
+
+        logical :: interact
+
+        interact = particles_interact(ewald_micro%real_pair)
+        call ewald_factory_create(ewald_macro%real_particles, interact, environment%periodic_box, &
+            particles%positions, particles%dipolar_moments)
+    end subroutine ewald_factory_create_macro
+
+    subroutine ewald_factory_create_micro(ewald_micro, dipolar, environment, particles_diameter, &
+        input_data, prefix)
+        type(Ewald_Wrapper_Micro), intent(out) :: ewald_micro
+        logical, intent(in) :: dipolar
+        type(Environment_Wrapper), intent(in) :: environment
+        class(Abstract_Particles_Diameter), intent(in) :: particles_diameter
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        logical :: mixture_is_dipolar
         real(DP) :: alpha
 
-        mixture_is_dipolar = particles_are_dipolar(mixture%components(1)%dipolar_moments) .and. &
-            particles_are_dipolar(mixture%components(2)%dipolar_moments)
-        call set_alpha(alpha, mixture_is_dipolar, environment%periodic_box, input_data, prefix)
-        call ewald_factory_create(inter_ewald%real_pair, mixture_is_dipolar, alpha, &
-            environment%periodic_box, mixture%inter_diameter, input_data, prefix//"Real.")
-    end subroutine ewald_factory_create_inter
+        call set_alpha(alpha, dipolar, environment%periodic_box, input_data, prefix)
+        call ewald_factory_create(ewald_micro%real_pair, dipolar, alpha, &
+            environment%periodic_box, particles_diameter, input_data, prefix//"Real.")
+    end subroutine ewald_factory_create_micro
 
     subroutine set_alpha(alpha, dipolar, periodic_box, input_data, prefix)
         real(DP), intent(out) :: alpha
@@ -191,11 +205,17 @@ contains
         call ewald_factory_destroy(ewald%real_pair)
     end subroutine ewald_factory_destroy_all
 
-    subroutine ewald_factory_destroy_inter(inter_ewald)
-        type(Inter_Ewald_Wrapper), intent(inout) :: inter_ewald
+    subroutine ewald_factory_destroy_micro(ewald_micro)
+        type(Ewald_Wrapper_Micro), intent(inout) :: ewald_micro
 
-        call ewald_factory_destroy(inter_ewald%real_pair)
-    end subroutine ewald_factory_destroy_inter
+        call ewald_factory_destroy(ewald_micro%real_pair)
+    end subroutine ewald_factory_destroy_micro
+
+    subroutine ewald_factory_destroy_macro(ewald_macro)
+        type(Ewald_Wrapper_Macro), intent(inout) :: ewald_macro
+
+        call ewald_factory_destroy(ewald_macro%real_particles)
+    end subroutine ewald_factory_destroy_macro
 
     subroutine destroy_and_deallocate_real_particles(real_particles)
         class(Abstract_Ewald_Real_Particles), allocatable, intent(inout) :: real_particles
