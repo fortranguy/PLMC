@@ -10,14 +10,12 @@ public :: deallocate_list, increase_nodes_size
 
     integer, parameter :: increase_factor = 2
 
-    type, public :: Concrete_Node
+    type :: Concrete_Node
         integer :: i
-        real(DP) :: position(num_dimensions)
     end type Concrete_Node
 
     type, public :: Concrete_Linkable_Node
         integer :: i
-        real(DP) :: position(num_dimensions)
         type(Concrete_Linkable_Node), pointer :: next => null()
     end type Concrete_Linkable_Node
 
@@ -33,9 +31,9 @@ contains
     end subroutine deallocate_list
 
     subroutine increase_nodes_size(nodes)
-        type(Concrete_Node), allocatable, intent(inout) :: nodes(:)
+        integer, allocatable, intent(inout) :: nodes(:)
 
-        type(Concrete_Node), allocatable :: nodes_tmp(:)
+        integer, allocatable :: nodes_tmp(:)
         integer :: num_nodes
 
         num_nodes = size(nodes)

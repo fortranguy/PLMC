@@ -112,7 +112,7 @@ contains
                                       this%global_lbounds(2):this%global_ubounds(2), &
                                       this%global_lbounds(3):this%global_ubounds(3)), &
                                       mold=list_mold)
-        call this%construct_visitable_lists(periodic_box)
+        call this%construct_visitable_lists(periodic_box, particles_positions)
 
         call this%set_skip_layers()
         allocate(this%neighbours(3, nums_local_cells(1), nums_local_cells(2), &
@@ -154,16 +154,19 @@ contains
         end if
     end subroutine Abstract_Visitable_Cells_check_division
 
-    subroutine Abstract_Visitable_Cells_construct_visitable_lists(this, periodic_box)
+    subroutine Abstract_Visitable_Cells_construct_visitable_lists(this, periodic_box, &
+        particles_positions)
         class(Abstract_Visitable_Cells), intent(inout) :: this
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
+        class(Abstract_Particles_Positions), intent(in) :: particles_positions
 
         integer :: global_i1, global_i2, global_i3
 
         do global_i3 = this%global_lbounds(3), this%global_ubounds(3)
         do global_i2 = this%global_lbounds(2), this%global_ubounds(2)
         do global_i1 = this%global_lbounds(1), this%global_ubounds(1)
-            call this%visitable_lists(global_i1, global_i2, global_i3)%construct(periodic_box)
+            call this%visitable_lists(global_i1, global_i2, global_i3)%construct(periodic_box, &
+                particles_positions)
         end do
         end do
         end do
@@ -302,10 +305,7 @@ contains
             call this%visitable_lists(from_i_cell(1), from_i_cell(2), &
                 from_i_cell(3))%remove(from%i)
             call this%visitable_lists(to_i_cell(1), to_i_cell(2), &
-                to_i_cell(3))%add(to)
-        else
-            call this%visitable_lists(from_i_cell(1), from_i_cell(2), &
-                from_i_cell(3))%set(from%i, to)
+                to_i_cell(3))%add(to%i)
         end if
     end subroutine Abstract_Visitable_Cells_move
 
@@ -316,7 +316,7 @@ contains
         integer :: i_cell(num_dimensions)
 
         i_cell = this%index(particle%position)
-        call this%visitable_lists(i_cell(1), i_cell(2), i_cell(3))%add(particle)
+        call this%visitable_lists(i_cell(1), i_cell(2), i_cell(3))%add(particle%i)
     end subroutine Abstract_Visitable_Cells_add
 
     subroutine Abstract_Visitable_Cells_remove(this, particle)
@@ -329,7 +329,7 @@ contains
         call this%visitable_lists(i_cell(1), i_cell(2), i_cell(3))%remove(particle%i)
         if (particle%i < this%particles_positions%get_num()) then
             call this%visitable_lists(i_cell(1), i_cell(2), &
-                i_cell(3))%set(this%particles_positions%get_num(), particle)
+                i_cell(3))%set(this%particles_positions%get_num(), particle%i)
         end if
     end subroutine Abstract_Visitable_Cells_remove
 
