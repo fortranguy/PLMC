@@ -68,10 +68,10 @@ contains
         if (overlap) call error_exit("intra 2 overlap")
 
         call plmc_visit(overlap, inter_energy_1, short_potentials%intras(1)%particles, &
-            mixture%components(2)%positions, short_potentials%inter_micro%pair, same_type=.false.)
+            mixture%components(2)%positions, short_potentials%inter_pair, same_type=.false.)
         if (overlap) call error_exit("inter intras(1) overlap")
         call plmc_visit(overlap, inter_energy_2, short_potentials%intras(2)%particles, &
-            mixture%components(1)%positions, short_potentials%inter_micro%pair, same_type=.false.)
+            mixture%components(1)%positions, short_potentials%inter_pair, same_type=.false.)
         if (overlap) call error_exit("inter intras(2) overlap")
         observables%inter_energy%short = inter_energy_1 + inter_energy_2
     end subroutine visit_mixture_short

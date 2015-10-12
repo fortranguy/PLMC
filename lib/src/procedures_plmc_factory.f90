@@ -152,13 +152,13 @@ contains
             mixture%components(2), input_data, short_potentials_prefix//"Component 2.")
         mixture_exists = particles_exist(mixture%components(1)%number) .and. &
             particles_exist(mixture%components(2)%number)
-        call short_potential_factory_create(short_potentials%inter_micro, mixture_exists, &
+        call short_potential_factory_create(short_potentials%inter_pair, mixture_exists, &
             mixture%inter_diameter, input_data, short_potentials_prefix//"Inter 12.")
         call short_potential_factory_create(short_potentials%inters(1), &
-            short_potentials%inter_micro, environment%periodic_box, &
+            short_potentials%inter_pair, environment%periodic_box, &
             mixture%components(1)%positions, input_data, short_potentials_prefix//"Inter 12.")
         call short_potential_factory_create(short_potentials%inters(2), &
-            short_potentials%inter_micro, environment%periodic_box, &
+            short_potentials%inter_pair, environment%periodic_box, &
             mixture%components(2)%positions, input_data, short_potentials_prefix//"Inter 12.")
     end subroutine create_short_potentials
 
@@ -167,7 +167,7 @@ contains
 
         call short_potential_factory_destroy(short_potentials%inters(2))
         call short_potential_factory_destroy(short_potentials%inters(1))
-        call short_potential_factory_destroy(short_potentials%inter_micro)
+        call short_potential_factory_destroy(short_potentials%inter_pair)
         call short_potential_factory_destroy(short_potentials%intras(2))
         call short_potential_factory_destroy(short_potentials%intras(1))
     end subroutine destroy_short_potentials

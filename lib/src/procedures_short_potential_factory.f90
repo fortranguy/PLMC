@@ -24,8 +24,7 @@ use class_visitable_list, only: Abstract_Visitable_List, &
     Null_Visitable_List, Concrete_Visitable_List, Concrete_Visitable_Array
 use class_visitable_cells, only: Abstract_Visitable_Cells, &
     Null_Visitable_Cells, XYZ_PBC_Visitable_Cells, XY_PBC_Visitable_Cells
-use types_short_potential_wrapper, only: Short_Potential_Wrapper, &
-    Short_Potential_Macro_Wrapper, Short_Potential_Micro_Wrapper
+use types_short_potential_wrapper, only: Short_Potential_Wrapper, Short_Potential_Macro_Wrapper
 use procedures_property_inquirers, only: use_walls, particles_exist, particles_have_positions, &
     particles_interact
 
@@ -37,7 +36,7 @@ public :: short_potential_factory_create, short_potential_factory_destroy
 interface short_potential_factory_create
     module procedure :: short_potential_factory_create_all
     module procedure :: short_potential_factory_create_macro
-    module procedure :: short_potential_factory_create_micro
+    module procedure :: short_potential_factory_create_inter_pair
     module procedure :: allocate_and_set_expression
     module procedure :: allocate_and_construct_pair
     module procedure :: allocate_and_construct_particles
@@ -51,7 +50,6 @@ interface short_potential_factory_destroy
     module procedure :: destroy_and_deallocate_particles
     module procedure :: destroy_and_deallocate_pair
     module procedure :: deallocate_expression
-    module procedure :: short_potential_factory_destroy_micro
     module procedure :: short_potential_factory_destroy_macro
     module procedure :: short_potential_factory_destroy_all
 end interface short_potential_factory_destroy
@@ -90,10 +88,10 @@ contains
         call short_potential_factory_destroy(list)
     end subroutine short_potential_factory_create_all
 
-    subroutine short_potential_factory_create_macro(short_potential_macro, short_potential_micro, &
+    subroutine short_potential_factory_create_macro(short_potential_macro, inter_pair, &
         periodic_box, particles_positions, input_data, prefix)
         type(Short_Potential_Macro_Wrapper), intent(out) :: short_potential_macro
-        type(Short_Potential_Micro_Wrapper), intent(in) :: short_potential_micro
+        class(Abstract_Pair_Potential), intent(in) :: inter_pair
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Particles_Positions), intent(in) :: particles_positions
         type(json_file), intent(inout) :: input_data
@@ -102,16 +100,16 @@ contains
         class(Abstract_Visitable_List), allocatable :: list
         logical :: interact
 
-        interact = particles_interact(short_potential_micro%pair)
+        interact = particles_interact(inter_pair)
         call short_potential_factory_create(list, interact, input_data, prefix)
         call short_potential_factory_create(short_potential_macro%cells, interact, list, &
-            periodic_box, particles_positions, short_potential_micro%pair)
+            periodic_box, particles_positions, inter_pair)
         call short_potential_factory_destroy(list)
     end subroutine short_potential_factory_create_macro
 
-    subroutine short_potential_factory_create_micro(short_potential_micro, exist, &
+    subroutine short_potential_factory_create_inter_pair(inter_pair, exist, &
         particles_diameter, input_data, prefix)
-        type(Short_Potential_Micro_Wrapper), intent(out) :: short_potential_micro
+        class(Abstract_Pair_Potential), allocatable, intent(out) :: inter_pair
         logical, intent(in) :: exist
         class(Abstract_Particles_Diameter), intent(in) :: particles_diameter
         type(json_file), intent(inout) :: input_data
@@ -120,10 +118,10 @@ contains
         class(Abstract_Potential_Expression), allocatable :: expression
 
         call short_potential_factory_create(expression, exist, input_data, prefix)
-        call short_potential_factory_create(short_potential_micro%pair, exist, particles_diameter, &
+        call short_potential_factory_create(inter_pair, exist, particles_diameter, &
             expression, input_data, prefix)
         call short_potential_factory_destroy(expression)
-    end subroutine short_potential_factory_create_micro
+    end subroutine short_potential_factory_create_inter_pair
 
     subroutine allocate_and_set_expression(potential_expression, exist, input_data, prefix)
         class(Abstract_Potential_Expression), allocatable, intent(out) :: potential_expression
@@ -327,12 +325,6 @@ contains
         call visitable_cells%construct(visitable_list, periodic_box, particles_positions, &
             pair_potential)
     end subroutine allocate_and_construct_cells
-
-    subroutine short_potential_factory_destroy_micro(short_potential_micro)
-        type(Short_Potential_Micro_Wrapper), intent(inout) :: short_potential_micro
-
-        call short_potential_factory_destroy(short_potential_micro%pair)
-    end subroutine short_potential_factory_destroy_micro
 
     subroutine short_potential_factory_destroy_macro(short_potential_macro)
         type(Short_Potential_Macro_Wrapper), intent(inout) :: short_potential_macro

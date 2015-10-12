@@ -22,14 +22,10 @@ private
         class(Abstract_Visitable_Cells), allocatable :: cells
     end type Short_Potential_Macro_Wrapper
 
-    type, public :: Short_Potential_Micro_Wrapper
-        class(Abstract_Pair_Potential), allocatable :: pair
-    end type Short_Potential_Micro_Wrapper
-
     type, public :: Mixture_Short_Potentials_Wrapper
         type(Short_Potential_Wrapper) :: intras(num_components) !+ interaction with walls
         type(Short_Potential_Macro_Wrapper) :: inters(num_components)
-        type(Short_Potential_Micro_Wrapper) :: inter_micro
+        class(Abstract_Pair_Potential), allocatable :: inter_pair
     end type Mixture_Short_Potentials_Wrapper
 
 end module types_short_potential_wrapper
