@@ -99,7 +99,8 @@ private
     type, extends(Abstract_One_Particle_Change), public :: Concrete_One_Particle_Rotation
     contains
         procedure :: get_num_choices => Concrete_One_Particle_Rotation_get_num_choices
-        procedure, private :: construct_selector => Concrete_One_Particle_Rotation_construct_selector
+        procedure, private :: construct_selector => &
+            Concrete_One_Particle_Rotation_construct_selector
         procedure, private :: visit_short => Concrete_One_Particle_Rotation_visit_short
         procedure, private :: define_change => Concrete_One_Particle_Rotation_define_change
         procedure, private :: update_actor => Concrete_One_Particle_Rotation_update_actor
@@ -264,14 +265,12 @@ contains
 
         type(Concrete_Long_Energy) :: new_long, old_long, inter_new_long, inter_old_long
 
-        call this%ewalds%intras(i_actor)%real_particles%visit(new_long%real, new, &
-            this%ewalds%intras(i_actor)%real_pair, same_type=.true.)
+        call this%ewalds%intras(i_actor)%real_particles%visit(new_long%real, new, same_type=.true.)
         call this%ewalds%inters(i_spectator)%real_particles%visit(inter_new_long%real, new, &
-            this%ewalds%inter_micro%real_pair, same_type=.false.)
-        call this%ewalds%intras(i_actor)%real_particles%visit(old_long%real, old, &
-            this%ewalds%intras(i_actor)%real_pair, same_type=.true.)
+            same_type=.false.)
+        call this%ewalds%intras(i_actor)%real_particles%visit(old_long%real, old, same_type=.true.)
         call this%ewalds%inters(i_spectator)%real_particles%visit(inter_old_long%real, old, &
-            this%ewalds%inter_micro%real_pair, same_type=.false.)
+            same_type=.false.)
         new_energy%intras(i_actor)%long = new_long%real
         old_energy%intras(i_actor)%long = old_long%real
         new_energy%inter%long = inter_new_long%real

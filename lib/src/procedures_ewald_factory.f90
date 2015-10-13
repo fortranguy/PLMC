@@ -56,7 +56,7 @@ contains
         call ewald_factory_create(ewald%real_pair, dipolar, alpha, environment%periodic_box, &
             particles%diameter, input_data, prefix//"Real.")
         call ewald_factory_create(ewald%real_particles, dipolar, environment%periodic_box, &
-            particles%positions, particles%dipolar_moments)
+            particles%positions, particles%dipolar_moments, ewald%real_pair)
     end subroutine ewald_factory_create_all
 
     subroutine ewald_factory_create_macro(ewald_macro, ewald_micro, environment, particles)
@@ -69,7 +69,7 @@ contains
 
         interact = particles_interact(ewald_micro%real_pair)
         call ewald_factory_create(ewald_macro%real_particles, interact, environment%periodic_box, &
-            particles%positions, particles%dipolar_moments)
+            particles%positions, particles%dipolar_moments, ewald_micro%real_pair)
     end subroutine ewald_factory_create_macro
 
     subroutine ewald_factory_create_micro(ewald_micro, dipolar, environment, particles_diameter, &
@@ -183,19 +183,21 @@ contains
     end subroutine construct_real_pair
 
     subroutine allocate_and_construct_real_particles(real_particles, dipolar, periodic_box, &
-        particles_positions, particles_dipolar_moments)
+        particles_positions, particles_dipolar_moments, real_pair)
         class(Abstract_Ewald_Real_Particles), allocatable, intent(out) :: real_particles
         logical, intent(in) :: dipolar
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Particles_Positions), intent(in) :: particles_positions
         class(Abstract_Particles_Dipolar_Moments), intent(in) :: particles_dipolar_moments
+        class(Abstract_Ewald_Real_Pair), intent(in) :: real_pair
 
         if (dipolar) then
             allocate(Concrete_Ewald_Real_Particles :: real_particles)
         else
             allocate(Null_Ewald_Real_Particles :: real_particles)
         end if
-        call real_particles%construct(periodic_box, particles_positions, particles_dipolar_moments)
+        call real_particles%construct(periodic_box, particles_positions, &
+            particles_dipolar_moments, real_pair)
     end subroutine allocate_and_construct_real_particles
 
     subroutine ewald_factory_destroy_all(ewald)

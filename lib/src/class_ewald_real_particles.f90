@@ -17,6 +17,7 @@ private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
         class(Abstract_Particles_Positions), pointer :: particles_positions => null()
         class(Abstract_Particles_Dipolar_Moments), pointer :: particles_dipolar_moments => null()
+        class(Abstract_Ewald_Real_Pair), pointer :: ewald_real_pair => null()
     contains
         procedure :: construct => Abstract_Ewald_Real_Particles_construct
         procedure :: destroy => Abstract_Ewald_Real_Particles_destroy
@@ -42,31 +43,33 @@ contains
 !implementation Abstract_Ewald_Real_Particles
 
     subroutine Abstract_Ewald_Real_Particles_construct(this, periodic_box, particles_positions, &
-        particles_dipolar_moments)
+        particles_dipolar_moments, ewald_real_pair)
         class(Abstract_Ewald_Real_Particles), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Particles_Positions), target, intent(in) :: particles_positions
         class(Abstract_Particles_Dipolar_Moments), target, intent(in) :: particles_dipolar_moments
+        class(Abstract_Ewald_Real_Pair), target, intent(in) :: ewald_real_pair
 
         this%periodic_box => periodic_box
         this%particles_positions => particles_positions
         this%particles_dipolar_moments => particles_dipolar_moments
+        this%ewald_real_pair => ewald_real_pair
     end subroutine Abstract_Ewald_Real_Particles_construct
 
     subroutine Abstract_Ewald_Real_Particles_destroy(this)
         class(Abstract_Ewald_Real_Particles), intent(inout) :: this
 
+        this%ewald_real_pair => null()
         this%particles_dipolar_moments => null()
         this%particles_positions => null()
         this%periodic_box => null()
     end subroutine Abstract_Ewald_Real_Particles_destroy
 
-    pure subroutine Abstract_Ewald_Real_Particles_visit_energy(this, energy, particle, &
-        ewald_real_pair, same_type)
+    pure subroutine Abstract_Ewald_Real_Particles_visit_energy(this, energy, particle, same_type)
         class(Abstract_Ewald_Real_Particles), intent(in) :: this
         real(DP), intent(out) :: energy
         type(Concrete_Temporary_Particle), intent(in) :: particle
-        class(Abstract_Ewald_Real_Pair), intent(in) :: ewald_real_pair
+
         logical, intent(in) :: same_type
 
         real(DP) :: vector_ij(num_dimensions)
@@ -77,17 +80,15 @@ contains
             if (same_type .and. particle%i == j_particle) cycle
             vector_ij = this%periodic_box%vector(particle%position, &
                 this%particles_positions%get(j_particle))
-            energy = energy + ewald_real_pair%meet(vector_ij, particle%dipolar_moment, &
+            energy = energy + this%ewald_real_pair%meet(vector_ij, particle%dipolar_moment, &
                 this%particles_dipolar_moments%get(j_particle))
         end do
     end subroutine Abstract_Ewald_Real_Particles_visit_energy
 
-    pure subroutine Abstract_Ewald_Real_Particles_visit_field(this, field, particle, &
-        ewald_real_pair, same_type)
+    pure subroutine Abstract_Ewald_Real_Particles_visit_field(this, field, particle, same_type)
         class(Abstract_Ewald_Real_Particles), intent(in) :: this
         real(DP), intent(out) :: field(num_dimensions)
         type(Concrete_Temporary_Particle), intent(in) :: particle
-        class(Abstract_Ewald_Real_Pair), intent(in) :: ewald_real_pair
         logical, intent(in) :: same_type
 
         real(DP) :: vector_ij(num_dimensions)
@@ -98,7 +99,7 @@ contains
             if (same_type .and. particle%i == j_particle) cycle
             vector_ij = this%periodic_box%vector(particle%position, &
                 this%particles_positions%get(j_particle))
-            field = field + ewald_real_pair%meet(vector_ij, &
+            field = field + this%ewald_real_pair%meet(vector_ij, &
                 this%particles_dipolar_moments%get(j_particle))
         end do
     end subroutine Abstract_Ewald_Real_Particles_visit_field
@@ -108,33 +109,30 @@ contains
 !implementation Null_Ewald_Real_Particles
 
     subroutine Null_Ewald_Real_Particles_construct(this, periodic_box, particles_positions, &
-        particles_dipolar_moments)
+        particles_dipolar_moments, ewald_real_pair)
         class(Null_Ewald_Real_Particles), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Particles_Positions), target, intent(in) :: particles_positions
         class(Abstract_Particles_Dipolar_Moments), target, intent(in) :: particles_dipolar_moments
+        class(Abstract_Ewald_Real_Pair), target, intent(in) :: ewald_real_pair
     end subroutine Null_Ewald_Real_Particles_construct
 
     subroutine Null_Ewald_Real_Particles_destroy(this)
         class(Null_Ewald_Real_Particles), intent(inout) :: this
     end subroutine Null_Ewald_Real_Particles_destroy
 
-    pure subroutine Null_Ewald_Real_Particles_visit_energy(this, energy, particle, &
-        ewald_real_pair, same_type)
+    pure subroutine Null_Ewald_Real_Particles_visit_energy(this, energy, particle, same_type)
         class(Null_Ewald_Real_Particles), intent(in) :: this
         real(DP), intent(out) :: energy
         type(Concrete_Temporary_Particle), intent(in) :: particle
-        class(Abstract_Ewald_Real_Pair), intent(in) :: ewald_real_pair
         logical, intent(in) :: same_type
         energy = 0._DP
     end subroutine Null_Ewald_Real_Particles_visit_energy
 
-    pure subroutine Null_Ewald_Real_Particles_visit_field(this, field, particle, ewald_real_pair, &
-        same_type)
+    pure subroutine Null_Ewald_Real_Particles_visit_field(this, field, particle, same_type)
         class(Null_Ewald_Real_Particles), intent(in) :: this
         real(DP), intent(out) :: field(num_dimensions)
         type(Concrete_Temporary_Particle), intent(in) :: particle
-        class(Abstract_Ewald_Real_Pair), intent(in) :: ewald_real_pair
         logical, intent(in) :: same_type
         field = 0._DP
     end subroutine Null_Ewald_Real_Particles_visit_field

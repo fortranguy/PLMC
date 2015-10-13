@@ -10,7 +10,6 @@ use types_particles_wrapper, only: Mixture_Wrapper
 use class_pair_potential, only: Abstract_Pair_Potential
 use class_particles_potential, only: Abstract_Particles_Potential
 use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper
-use class_ewald_real_pair, only: Abstract_Ewald_Real_Pair
 use class_ewald_real_particles, only: Abstract_Ewald_Real_Particles
 use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
 use types_observables_wrapper, only: Mixture_Observables_Wrapper
@@ -129,17 +128,17 @@ contains
 
         call plmc_visit(real_energy_1, ewalds%intras(1)%real_particles, &
             mixture%components(1)%positions, mixture%components(1)%dipolar_moments, &
-            ewalds%intras(1)%real_pair, same_type=.true.)
+            same_type=.true.)
         call plmc_visit(real_energy_2, ewalds%intras(2)%real_particles, &
             mixture%components(2)%positions, mixture%components(2)%dipolar_moments, &
-            ewalds%intras(2)%real_pair, same_type=.true.)
+            same_type=.true.)
 
-        call plmc_visit(inter_energy_1, ewalds%intras(1)%real_particles, &
+        call plmc_visit(inter_energy_1, ewalds%inters(1)%real_particles, &
             mixture%components(2)%positions, mixture%components(2)%dipolar_moments, &
-            ewalds%inter_micro%real_pair, same_type=.false.)
-        call plmc_visit(inter_energy_2, ewalds%intras(2)%real_particles, &
+            same_type=.false.)
+        call plmc_visit(inter_energy_2, ewalds%inters(2)%real_particles, &
             mixture%components(1)%positions, mixture%components(1)%dipolar_moments, &
-            ewalds%inter_micro%real_pair, same_type=.false.)
+            same_type=.false.)
 
         observables%intras(1)%particles_energy%long = real_energy_1
         observables%intras(2)%particles_energy%long = real_energy_2
@@ -147,12 +146,11 @@ contains
     end subroutine visit_mixture_ewald
 
     pure subroutine visit_particles_ewald_real(energy, potential, positions, dipolar_moments, &
-        pair, same_type)
+        same_type)
         real(DP), intent(out) :: energy
         class(Abstract_Ewald_Real_Particles), intent(in) :: potential
         class(Abstract_Particles_Positions), intent(in) :: positions
         class(Abstract_Particles_Dipolar_Moments), intent(in) :: dipolar_moments
-        class(Abstract_Ewald_Real_Pair), intent(in) :: pair
         logical, intent(in) :: same_type
 
         type(Concrete_Temporary_Particle) :: particle
@@ -164,7 +162,7 @@ contains
             particle%i = i_particle
             particle%position = positions%get(particle%i)
             particle%dipolar_moment = dipolar_moments%get(particle%i)
-            call potential%visit(energy_i, particle, pair, same_type)
+            call potential%visit(energy_i, particle, same_type)
             energy = energy + energy_i
         end do
         energy = energy / 2._DP
