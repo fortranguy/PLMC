@@ -25,8 +25,8 @@ private
         logical :: skip_top_layer(nums_local_cells(1), nums_local_cells(2), nums_local_cells(3))
         class(Abstract_Visitable_List), allocatable :: visitable_lists(:, :, :)
         integer, allocatable :: neighbours(:, :, :, :, :, :, :)
-        class(Abstract_Particles_Positions), pointer :: particles_positions
         class(Abstract_Periodic_Box), pointer :: periodic_box
+        class(Abstract_Particles_Positions), pointer :: particles_positions
         class(Abstract_Pair_Potential), pointer :: pair_potential
     contains
         procedure :: construct => Abstract_Visitable_Cells_construct
@@ -247,9 +247,6 @@ contains
 
         integer :: global_i1, global_i2, global_i3
 
-        this%pair_potential => null()
-        this%particles_positions => null()
-
         do global_i3 = this%global_ubounds(3), this%global_lbounds(3), -1
         do global_i2 = this%global_ubounds(2), this%global_lbounds(2), -1
         do global_i1 = this%global_ubounds(1), this%global_lbounds(1), -1
@@ -257,9 +254,11 @@ contains
         end do
         end do
         end do
-
         if (allocated(this%neighbours)) deallocate(this%neighbours)
         if (allocated(this%visitable_lists)) deallocate(this%visitable_lists)
+        this%pair_potential => null()
+        this%particles_positions => null()
+        this%periodic_box => null()
     end subroutine Abstract_Visitable_Cells_destroy
 
     subroutine Abstract_Visitable_Cells_visit(this, overlap, energy, particle, same_type)
