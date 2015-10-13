@@ -21,8 +21,8 @@ private
         integer :: nums(num_dimensions)
         real(DP) :: size(num_dimensions)
         integer, dimension(num_dimensions) :: global_lbounds, global_ubounds
-        logical :: skip_bottom_layer(nums_local_cells(1), nums_local_cells(2), nums_local_cells(3))
-        logical :: skip_top_layer(nums_local_cells(1), nums_local_cells(2), nums_local_cells(3))
+        logical :: skip_bottom_layer(-nums_local_cells(3)/2:nums_local_cells(3)/2)
+        logical :: skip_top_layer(-nums_local_cells(3)/2:nums_local_cells(3)/2)
         class(Abstract_Visitable_List), allocatable :: visitable_lists(:, :, :)
         integer, allocatable :: neighbours(:, :, :, :, :, :, :)
         class(Abstract_Periodic_Box), pointer :: periodic_box
@@ -115,8 +115,9 @@ contains
         call this%construct_visitable_lists(periodic_box, particles_positions)
 
         call this%set_skip_layers()
-        allocate(this%neighbours(3, nums_local_cells(1), nums_local_cells(2), &
-                                    nums_local_cells(3), &
+        allocate(this%neighbours(3, -nums_local_cells(1)/2:nums_local_cells(1)/2, &
+                                    -nums_local_cells(2)/2:nums_local_cells(2)/2, &
+                                    -nums_local_cells(3)/2:nums_local_cells(3)/2, &
                                     this%global_lbounds(1):this%global_ubounds(1), &
                                     this%global_lbounds(2):this%global_ubounds(2), &
                                     this%global_lbounds(3):this%global_ubounds(3)))
@@ -186,12 +187,11 @@ contains
             top_layer = (global_i3 == this%global_ubounds(3))
         do global_i2 = this%global_lbounds(2), this%global_ubounds(2)
         do global_i1 = this%global_lbounds(1), this%global_ubounds(1)
-            do local_i3 = 1, nums_local_cells(3)
-            do local_i2 = 1, nums_local_cells(2)
-            do local_i1 = 1, nums_local_cells(1)
-                if (this%skip_local(bottom_layer, top_layer, local_i1, local_i2, local_i3)) cycle
-                i_cell = [global_i1, global_i2, global_i3] + &
-                    local_reindex([local_i1, local_i2, local_i3], nums_local_cells)
+            do local_i3 = -nums_local_cells(3)/2, nums_local_cells(3)/2
+                if (this%skip_local(bottom_layer, top_layer, local_i3)) cycle
+            do local_i2 = -nums_local_cells(2)/2, nums_local_cells(2)/2
+            do local_i1 = -nums_local_cells(1)/2, nums_local_cells(1)/2
+                i_cell = [global_i1, global_i2, global_i3] + [local_i1, local_i2, local_i3]
                 i_cell = pbc_3d_index(i_cell, this%nums)
                 this%neighbours(:, local_i1, local_i2, local_i3, &
                     global_i1, global_i2, global_i3) = i_cell
@@ -203,14 +203,6 @@ contains
         end do
     end subroutine Abstract_Visitable_Cells_set_neighbours
 
-    pure function local_reindex(i_cell, nums_cells)
-        integer, intent(in) :: i_cell(:), nums_cells(:)
-        integer :: local_reindex(num_dimensions)
-
-        local_reindex = mod(i_cell, nums_cells) - 1
-    end function local_reindex
-    ! To find overlap faster
-
     pure function pbc_3d_index(i_cell, nums_cells)
         integer, intent(in) :: i_cell(:), nums_cells(:)
         integer :: pbc_3d_index(3)
@@ -218,15 +210,15 @@ contains
         pbc_3d_index = modulo(i_cell + nums_cells/2, nums_cells) - nums_cells/2
     end function pbc_3d_index
 
-    pure function Abstract_Visitable_Cells_skip_local(this, bottom_layer, top_layer, &
-        local_i1, local_i2, local_i3) result(skip_local)
+    pure function Abstract_Visitable_Cells_skip_local(this, bottom_layer, top_layer, local_i3) &
+        result(skip_local)
         class(Abstract_Visitable_Cells), intent(in) :: this
         logical, intent(in) :: bottom_layer, top_layer
-        integer, intent(in) :: local_i1, local_i2, local_i3
+        integer, intent(in) :: local_i3
         logical :: skip_local
 
-        skip_local = (bottom_layer .and. this%skip_bottom_layer(local_i1, local_i2, local_i3)) &
-            .or. (top_layer .and. this%skip_top_layer(local_i1, local_i2, local_i3))
+        skip_local = (bottom_layer .and. this%skip_bottom_layer(local_i3)) &
+            .or. (top_layer .and. this%skip_top_layer(local_i3))
     end function Abstract_Visitable_Cells_skip_local
 
     subroutine Abstract_Visitable_Cells_fill(this)
@@ -277,10 +269,10 @@ contains
         bottom_layer = (i_cell(3) == this%global_lbounds(3))
         top_layer = (i_cell(3) == this%global_ubounds(3))
         energy = 0._DP
-        do local_i3 = 1, nums_local_cells(3)
-        do local_i2 = 1, nums_local_cells(2)
-        do local_i1 = 1, nums_local_cells(1)
-            if (this%skip_local(bottom_layer, top_layer, local_i1, local_i2, local_i3)) cycle
+        do local_i3 = -nums_local_cells(3)/2, nums_local_cells(3)/2
+            if (this%skip_local(bottom_layer, top_layer, local_i3)) cycle
+        do local_i2 = -nums_local_cells(2)/2, nums_local_cells(2)/2
+        do local_i1 = -nums_local_cells(1)/2, nums_local_cells(1)/2
             i_local_cell = this%neighbours(:, local_i1, local_i2, local_i3, &
                 i_cell(1), i_cell(2), i_cell(3))
             call this%visitable_lists(i_local_cell(1), i_local_cell(2), &
@@ -432,25 +424,19 @@ contains
     pure subroutine XY_PBC_Visitable_Cells_set_skip_layers(this)
         class(XY_PBC_Visitable_Cells), intent(inout) :: this
 
-        integer :: i_local_cell(num_dimensions)
-        integer :: local_i1, local_i2, local_i3
+        integer :: local_i3
 
-        do local_i3 = 1, nums_local_cells(3)
-            do local_i2 = 1, nums_local_cells(2)
-                do local_i1 = 1, nums_local_cells(1)
-                    i_local_cell = local_reindex([local_i1, local_i2, local_i3], nums_local_cells)
-                    if (i_local_cell(3) == 1) then
-                        this%skip_top_layer(local_i1, local_i2, local_i3) = .true.
-                    else
-                        this%skip_top_layer(local_i1, local_i2, local_i3) = .false.
-                    end if
-                    if (i_local_cell(3) == -1) then
-                        this%skip_bottom_layer(local_i1, local_i2, local_i3) = .true.
-                    else
-                        this%skip_bottom_layer(local_i1, local_i2, local_i3) = .false.
-                    end if
-                end do
-            end do
+        do local_i3 = -nums_local_cells(3)/2, nums_local_cells(3)/2
+            if (local_i3 == 1) then
+                this%skip_top_layer(local_i3) = .true.
+            else
+                this%skip_top_layer(local_i3) = .false.
+            end if
+            if (local_i3 == -1) then
+                this%skip_bottom_layer(local_i3) = .true.
+            else
+                this%skip_bottom_layer(local_i3) = .false.
+            end if
         end do
     end subroutine XY_PBC_Visitable_Cells_set_skip_layers
 
