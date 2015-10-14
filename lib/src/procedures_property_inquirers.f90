@@ -6,12 +6,12 @@ use class_walls_potential, only: Abstract_Walls_Potential, Null_Walls_Potential
 use class_particles_number, only: Abstract_Particles_Number, Null_Particles_Number
 use class_particles_diameter, only: Abstract_Particles_Diameter, Null_Particles_Diameter
 use class_particles_moment_norm, only: Abstract_Particles_Moment_Norm, Null_Particles_Moment_Norm
-use class_particles_positions, only: Abstract_Particles_Positions, Null_Particles_Positions
-use class_particles_orientations, only: Abstract_Particles_Orientations, Null_Particles_Orientations
+use class_component_positions, only: Abstract_Component_Positions, Null_Component_Positions
+use class_component_orientations, only: Abstract_Component_Orientations, Null_Component_Orientations
 use class_particles_dipolar_moments, only: Abstract_Particles_Dipolar_Moments, &
     Null_Particles_Dipolar_Moments
-use class_particles_chemical_potential, only: Abstract_Particles_Chemical_Potential, &
-    Null_Particles_Chemical_Potential
+use class_component_chemical_potential, only: Abstract_Component_Chemical_Potential, &
+    Null_Component_Chemical_Potential
 use class_moved_positions, only: Abstract_Moved_Positions, Null_Moved_Positions
 use class_rotated_orientations, only: Abstract_Rotated_Orientations, Null_Rotated_Orientations
 use class_particles_exchange, only: Abstract_Particles_Exchange, Null_Particles_Exchange
@@ -136,10 +136,10 @@ contains
     end function particles_interact_long
 
     pure logical function particles_have_positions(partcles_positions)
-        class(Abstract_Particles_Positions), intent(in) :: partcles_positions
+        class(Abstract_Component_Positions), intent(in) :: partcles_positions
 
         select type (partcles_positions)
-            type is (Null_Particles_Positions)
+            type is (Null_Component_Positions)
                 particles_have_positions = .false.
             class default
                 particles_have_positions = .true.
@@ -193,10 +193,10 @@ contains
     end function particles_are_dipolar_from_moment_norm
 
     pure logical function particles_have_orientations(particles_orientations)
-        class(Abstract_Particles_Orientations), intent(in) :: particles_orientations
+        class(Abstract_Component_Orientations), intent(in) :: particles_orientations
 
         select type (particles_orientations)
-            type is (Null_Particles_Orientations)
+            type is (Null_Component_Orientations)
                 particles_have_orientations = .false.
             class default
                 particles_have_orientations = .true.
@@ -229,10 +229,10 @@ contains
 
     pure logical function particles_can_exchange_from_chemical_potential(&
         particles_chemical_potential) result(particles_can_exchange)
-        class(Abstract_Particles_Chemical_Potential), intent(in) :: particles_chemical_potential
+        class(Abstract_Component_Chemical_Potential), intent(in) :: particles_chemical_potential
 
         select type (particles_chemical_potential)
-            type is (Null_Particles_Chemical_Potential)
+            type is (Null_Component_Chemical_Potential)
                 particles_can_exchange = .false.
             class default
                 particles_can_exchange = .true.

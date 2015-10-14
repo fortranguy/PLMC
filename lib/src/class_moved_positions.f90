@@ -5,7 +5,7 @@ use data_constants, only: num_dimensions
 use procedures_errors, only: warning_continue
 use procedures_checks, only: check_3d_array, check_positive, check_increase_factor
 use class_periodic_box, only: Abstract_Periodic_Box
-use class_particles_positions, only: Abstract_Particles_Positions
+use class_component_positions, only: Abstract_Component_Positions
 use module_change_tuning, only: Concrete_Tuning_Parameters, &
     set_increase_factor
 use class_changed_coordinates, only: Abstract_Changed_Coordinates
@@ -17,7 +17,7 @@ private
     type, extends(Abstract_Changed_Coordinates), abstract, public :: Abstract_Moved_Positions
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
-        class(Abstract_Particles_Positions), pointer :: positions => null()
+        class(Abstract_Component_Positions), pointer :: positions => null()
         real(DP) :: delta(num_dimensions)
         type(Concrete_Tuning_Parameters) :: tuning_parameters
         real(DP) :: current_increase_factor
@@ -51,7 +51,7 @@ contains
         tuning_parameters)
         class(Abstract_Moved_Positions), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Particles_Positions), target, intent(in) :: positions
+        class(Abstract_Component_Positions), target, intent(in) :: positions
         real(DP), intent(in) :: delta(:)
         type(Concrete_Tuning_Parameters), intent(in) :: tuning_parameters
 
@@ -111,7 +111,7 @@ contains
         tuning_parameters)
         class(Null_Moved_Positions), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Particles_Positions), target, intent(in) :: positions
+        class(Abstract_Component_Positions), target, intent(in) :: positions
         real(DP), intent(in) :: delta(:)
         type(Concrete_Tuning_Parameters), intent(in) :: tuning_parameters
     end subroutine Null_Moved_Positions_construct

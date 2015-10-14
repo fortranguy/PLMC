@@ -11,7 +11,7 @@ use class_floor_penetration, only: Abstract_Floor_Penetration
 use types_environment_wrapper, only: Environment_Wrapper
 use class_particles_diameter, only: Abstract_Particles_Diameter, &
     Null_Particles_Diameter
-use class_particles_positions, only: Abstract_Particles_Positions
+use class_component_positions, only: Abstract_Component_Positions
 use types_particles_wrapper, only: Particles_Wrapper
 use class_potential_expression, only: Abstract_Potential_Expression, &
     Null_Potential_Expression, Lennard_Jones_Expression
@@ -93,7 +93,7 @@ contains
         type(Short_Potential_Macro_Wrapper), intent(out) :: short_potential_macro
         class(Abstract_Pair_Potential), intent(in) :: inter_pair
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        class(Abstract_Particles_Positions), intent(in) :: particles_positions
+        class(Abstract_Component_Positions), intent(in) :: particles_positions
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -263,7 +263,7 @@ contains
         particles_positions)
         class(Abstract_Particles_Potential), allocatable, intent(out) :: particles_potential
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        class(Abstract_Particles_Positions), intent(in) :: particles_positions
+        class(Abstract_Component_Positions), intent(in) :: particles_positions
 
         if (particles_have_positions(particles_positions)) then
             allocate(Concrete_Particles_Potential :: particles_potential)
@@ -307,7 +307,7 @@ contains
         logical, intent(in) :: interact
         class(Abstract_Visitable_List), intent(in) :: visitable_list
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        class(Abstract_Particles_Positions), intent(in) :: particles_positions
+        class(Abstract_Component_Positions), intent(in) :: particles_positions
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
 
         if (interact) then

@@ -3,7 +3,7 @@ module class_rotated_orientations
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
 use procedures_checks, only: check_positive, check_increase_factor
-use class_particles_orientations, only: Abstract_Particles_Orientations
+use class_component_orientations, only: Abstract_Component_Orientations
 use procedures_random, only: markov_orientation
 use module_change_tuning, only: Concrete_Tuning_Parameters, &
     set_increase_factor
@@ -15,7 +15,7 @@ private
 
     type, extends(Abstract_Changed_Coordinates), abstract, public :: Abstract_Rotated_Orientations
     private
-        class(Abstract_Particles_Orientations), pointer :: orientations
+        class(Abstract_Component_Orientations), pointer :: orientations
         real(DP) :: delta
         type(Concrete_Tuning_Parameters) :: tuning_parameters
         real(DP) :: current_increase_factor
@@ -50,7 +50,7 @@ contains
     subroutine Abstract_Rotated_Orientations_construct(this, orientations, delta, &
         tuning_parameters)
         class(Abstract_Rotated_Orientations), intent(out) :: this
-        class(Abstract_Particles_Orientations), target, intent(in) :: orientations
+        class(Abstract_Component_Orientations), target, intent(in) :: orientations
         real(DP), intent(in) :: delta
         type(Concrete_Tuning_Parameters), intent(in) :: tuning_parameters
 
@@ -102,7 +102,7 @@ contains
 
     subroutine Null_Rotated_Orientations_construct(this, orientations, delta, tuning_parameters)
         class(Null_Rotated_Orientations), intent(out) :: this
-        class(Abstract_Particles_Orientations), target, intent(in) :: orientations
+        class(Abstract_Component_Orientations), target, intent(in) :: orientations
         real(DP), intent(in) :: delta
         type(Concrete_Tuning_Parameters), intent(in) :: tuning_parameters
     end subroutine Null_Rotated_Orientations_construct

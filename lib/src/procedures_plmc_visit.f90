@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use procedures_errors, only: error_exit
 use class_walls_potential, only: Abstract_Walls_Potential
 use types_temporary_particle, only: Concrete_Temporary_Particle
-use class_particles_positions, only: Abstract_Particles_Positions
+use class_component_positions, only: Abstract_Component_Positions
 use class_particles_dipolar_moments, only: Abstract_Particles_Dipolar_Moments
 use types_particles_wrapper, only: Mixture_Wrapper
 use class_pair_potential, only: Abstract_Pair_Potential
@@ -79,7 +79,7 @@ contains
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
         class(Abstract_Walls_Potential), intent(in) :: potential
-        class(Abstract_Particles_Positions), intent(in) :: positions
+        class(Abstract_Component_Positions), intent(in) :: positions
         class(Abstract_Pair_Potential), intent(in) :: pair
 
         real(DP) :: energy_i
@@ -98,7 +98,7 @@ contains
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
         class(Abstract_Particles_Potential), intent(in) :: potential
-        class(Abstract_Particles_Positions), intent(in) :: positions
+        class(Abstract_Component_Positions), intent(in) :: positions
         class(Abstract_Pair_Potential), intent(in) :: pair
         logical, intent(in) :: same_type
 
@@ -149,7 +149,7 @@ contains
         same_type)
         real(DP), intent(out) :: energy
         class(Abstract_Ewald_Real_Particles), intent(in) :: potential
-        class(Abstract_Particles_Positions), intent(in) :: positions
+        class(Abstract_Component_Positions), intent(in) :: positions
         class(Abstract_Particles_Dipolar_Moments), intent(in) :: dipolar_moments
         logical, intent(in) :: same_type
 

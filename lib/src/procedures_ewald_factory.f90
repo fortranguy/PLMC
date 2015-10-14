@@ -7,7 +7,7 @@ use procedures_checks, only: check_data_found
 use class_periodic_box, only: Abstract_Periodic_Box
 use types_environment_wrapper, only: Environment_Wrapper
 use class_particles_diameter, only: Abstract_Particles_Diameter
-use class_particles_positions, only: Abstract_Particles_Positions
+use class_component_positions, only: Abstract_Component_Positions
 use class_particles_dipolar_moments, only: Abstract_Particles_Dipolar_Moments
 use types_particles_wrapper, only: Particles_Wrapper, Mixture_Wrapper
 use types_potential_domain, only: Concrete_Potential_Domain
@@ -188,7 +188,7 @@ contains
         class(Abstract_Ewald_Real_Particles), allocatable, intent(out) :: real_particles
         logical, intent(in) :: dipolar
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        class(Abstract_Particles_Positions), intent(in) :: particles_positions
+        class(Abstract_Component_Positions), intent(in) :: particles_positions
         class(Abstract_Particles_Dipolar_Moments), intent(in) :: particles_dipolar_moments
         class(Abstract_Ewald_Real_Pair), intent(in) :: real_pair
 

@@ -2,7 +2,7 @@ module class_particles_potential
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use class_periodic_box, only: Abstract_Periodic_Box
-use class_particles_positions, only: Abstract_Particles_Positions
+use class_component_positions, only: Abstract_Component_Positions
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use class_pair_potential, only: Abstract_Pair_Potential
 
@@ -13,7 +13,7 @@ private
     type, abstract, public :: Abstract_Particles_Potential
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
-        class(Abstract_Particles_Positions), pointer :: particles_positions => null()
+        class(Abstract_Component_Positions), pointer :: particles_positions => null()
     contains
         procedure :: construct => Abstract_Particles_Potential_construct
         procedure :: destroy => Abstract_Particles_Potential_destroy
@@ -38,7 +38,7 @@ contains
     subroutine Abstract_Particles_Potential_construct(this, periodic_box, particles_positions)
         class(Abstract_Particles_Potential), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Particles_Positions), target, intent(in) :: particles_positions
+        class(Abstract_Component_Positions), target, intent(in) :: particles_positions
 
         this%periodic_box => periodic_box
         this%particles_positions => particles_positions
@@ -82,7 +82,7 @@ contains
     subroutine Null_Particles_Potential_construct(this, periodic_box, particles_positions)
         class(Null_Particles_Potential), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Particles_Positions), target, intent(in) :: particles_positions
+        class(Abstract_Component_Positions), target, intent(in) :: particles_positions
     end subroutine Null_Particles_Potential_construct
 
     subroutine Null_Particles_Potential_destroy(this)

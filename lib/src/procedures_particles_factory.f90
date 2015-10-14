@@ -13,13 +13,13 @@ use class_particles_diameter, only: Abstract_Particles_Diameter, &
     Concrete_Particles_Diameter, Null_Particles_Diameter
 use class_particles_moment_norm, only: Abstract_Particles_Moment_Norm, &
     Concrete_Particles_Moment_Norm, Null_Particles_Moment_Norm
-use class_particles_coordinates, only: Abstract_Particles_Coordinates
-use class_particles_positions, only: Abstract_Particles_Positions, &
-    Concrete_Particles_Positions, Null_Particles_Positions
-use class_particles_orientations, only: Abstract_Particles_Orientations, &
-    Concrete_Particles_Orientations, Null_Particles_Orientations
-use class_particles_chemical_potential, only : Abstract_Particles_Chemical_Potential, &
-    Concrete_Particles_Chemical_Potential, Null_Particles_Chemical_Potential
+use class_component_coordinates, only: Abstract_Component_Coordinates
+use class_component_positions, only: Abstract_Component_Positions, &
+    Concrete_Component_Positions, Null_Component_Positions
+use class_component_orientations, only: Abstract_Component_Orientations, &
+    Concrete_Component_Orientations, Null_Component_Orientations
+use class_component_chemical_potential, only : Abstract_Component_Chemical_Potential, &
+    Concrete_Component_Chemical_Potential, Null_Component_Chemical_Potential
 use class_particles_dipolar_moments, only: Abstract_Particles_Dipolar_Moments, &
     Concrete_Particles_Dipolar_Moments, Null_Particles_Dipolar_Moments
 use class_particles_total_moment, only: Abstract_Particles_Total_Moment, &
@@ -216,35 +216,35 @@ contains
 
     subroutine allocate_and_construct_positions(particles_positions, exist, periodic_box, &
         particles_number)
-        class(Abstract_Particles_Positions), allocatable, intent(out) :: particles_positions
+        class(Abstract_Component_Positions), allocatable, intent(out) :: particles_positions
         logical, intent(in) :: exist
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Particles_Number), intent(in) :: particles_number
 
         if (exist) then
-            allocate(Concrete_Particles_Positions :: particles_positions)
+            allocate(Concrete_Component_Positions :: particles_positions)
         else
-            allocate(Null_Particles_Positions :: particles_positions)
+            allocate(Null_Component_Positions :: particles_positions)
         end if
         call particles_positions%construct(periodic_box, particles_number)
     end subroutine allocate_and_construct_positions
 
     subroutine allocate_and_construct_orientations(particles_orientations, dipolar, &
         particles_number)
-        class(Abstract_Particles_Orientations), allocatable, intent(out) :: particles_orientations
+        class(Abstract_Component_Orientations), allocatable, intent(out) :: particles_orientations
         logical, intent(in) :: dipolar
         class(Abstract_Particles_Number), intent(in) :: particles_number
 
         if (dipolar) then
-            allocate(Concrete_Particles_Orientations :: particles_orientations)
+            allocate(Concrete_Component_Orientations :: particles_orientations)
         else
-            allocate(Null_Particles_Orientations :: particles_orientations)
+            allocate(Null_Component_Orientations :: particles_orientations)
         end if
         call particles_orientations%construct(particles_number)
     end subroutine allocate_and_construct_orientations
 
     subroutine set_positions(particles_positions, input_data, prefix)
-        class(Abstract_Particles_Positions), intent(inout) :: particles_positions
+        class(Abstract_Component_Positions), intent(inout) :: particles_positions
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -253,7 +253,7 @@ contains
     end subroutine set_positions
 
     subroutine set_coordinates(particles_coordinates, input_data, data_field)
-        class(Abstract_Particles_Coordinates), intent(inout) :: particles_coordinates
+        class(Abstract_Component_Coordinates), intent(inout) :: particles_coordinates
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: data_field
 
@@ -277,7 +277,7 @@ contains
     end subroutine set_coordinates
 
     subroutine set_orientations(particles_orientations, input_data, prefix)
-        class(Abstract_Particles_Orientations), intent(inout) :: particles_orientations
+        class(Abstract_Component_Orientations), intent(inout) :: particles_orientations
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -291,7 +291,7 @@ contains
             particles_dipolar_moments
         logical, intent(in) :: dipolar
         class(Abstract_Particles_Moment_Norm), intent(in) :: particles_moment_norm
-        class(Abstract_Particles_Orientations), intent(in) :: particles_orientations
+        class(Abstract_Component_Orientations), intent(in) :: particles_orientations
 
         if (dipolar) then
             allocate(Concrete_Particles_Dipolar_Moments :: particles_dipolar_moments)
@@ -315,7 +315,7 @@ contains
     end subroutine allocate_and_construct_total_moment
 
     subroutine allocate_and_set_chemical_potential(particles_chemical_potential, input_data, prefix)
-        class(Abstract_Particles_Chemical_Potential), allocatable, intent(out) :: &
+        class(Abstract_Component_Chemical_Potential), allocatable, intent(out) :: &
             particles_chemical_potential
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
@@ -331,10 +331,10 @@ contains
             data_field = prefix//"Chemical Potential.excess"
             call input_data%get(data_field, excess, data_found)
             call check_data_found(data_field, data_found)
-            allocate(Concrete_Particles_Chemical_Potential :: particles_chemical_potential)
+            allocate(Concrete_Component_Chemical_Potential :: particles_chemical_potential)
             deallocate(data_field)
         else
-            allocate(Null_Particles_Chemical_Potential :: particles_chemical_potential)
+            allocate(Null_Component_Chemical_Potential :: particles_chemical_potential)
         end if
         call particles_chemical_potential%set(density, excess)
     end subroutine allocate_and_set_chemical_potential
@@ -372,14 +372,14 @@ contains
     end subroutine deallocate_moment_norm
 
     subroutine destroy_and_deallocate_positions(particles_positions)
-        class(Abstract_Particles_Positions), allocatable, intent(inout) :: particles_positions
+        class(Abstract_Component_Positions), allocatable, intent(inout) :: particles_positions
 
         call particles_positions%destroy()
         if (allocated(particles_positions)) deallocate(particles_positions)
     end subroutine destroy_and_deallocate_positions
 
     subroutine destroy_and_deallocate_orientations(particles_orientations)
-        class(Abstract_Particles_Orientations), allocatable, intent(inout) :: particles_orientations
+        class(Abstract_Component_Orientations), allocatable, intent(inout) :: particles_orientations
 
         call particles_orientations%destroy()
         if (allocated(particles_orientations)) deallocate(particles_orientations)
@@ -401,7 +401,7 @@ contains
     end subroutine destroy_and_deallocate_total_moment
 
     subroutine deallocate_chemical_potential(particles_chemical_potential)
-        class(Abstract_Particles_Chemical_Potential), allocatable, intent(inout) :: &
+        class(Abstract_Component_Chemical_Potential), allocatable, intent(inout) :: &
             particles_chemical_potential
 
         if (allocated(particles_chemical_potential)) deallocate(particles_chemical_potential)

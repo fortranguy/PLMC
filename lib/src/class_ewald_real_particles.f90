@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
 use class_ewald_real_pair, only: Abstract_Ewald_Real_Pair
 use class_periodic_box, only: Abstract_Periodic_Box
-use class_particles_positions, only: Abstract_Particles_Positions
+use class_component_positions, only: Abstract_Component_Positions
 use class_particles_dipolar_moments, only: Abstract_Particles_Dipolar_Moments
 use types_temporary_particle, only: Concrete_Temporary_Particle
 
@@ -15,7 +15,7 @@ private
     type, abstract, public :: Abstract_Ewald_Real_Particles
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
-        class(Abstract_Particles_Positions), pointer :: particles_positions => null()
+        class(Abstract_Component_Positions), pointer :: particles_positions => null()
         class(Abstract_Particles_Dipolar_Moments), pointer :: particles_dipolar_moments => null()
         class(Abstract_Ewald_Real_Pair), pointer :: ewald_real_pair => null()
     contains
@@ -46,7 +46,7 @@ contains
         particles_dipolar_moments, ewald_real_pair)
         class(Abstract_Ewald_Real_Particles), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Particles_Positions), target, intent(in) :: particles_positions
+        class(Abstract_Component_Positions), target, intent(in) :: particles_positions
         class(Abstract_Particles_Dipolar_Moments), target, intent(in) :: particles_dipolar_moments
         class(Abstract_Ewald_Real_Pair), target, intent(in) :: ewald_real_pair
 
@@ -112,7 +112,7 @@ contains
         particles_dipolar_moments, ewald_real_pair)
         class(Null_Ewald_Real_Particles), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Particles_Positions), target, intent(in) :: particles_positions
+        class(Abstract_Component_Positions), target, intent(in) :: particles_positions
         class(Abstract_Particles_Dipolar_Moments), target, intent(in) :: particles_dipolar_moments
         class(Abstract_Ewald_Real_Pair), target, intent(in) :: ewald_real_pair
     end subroutine Null_Ewald_Real_Particles_construct

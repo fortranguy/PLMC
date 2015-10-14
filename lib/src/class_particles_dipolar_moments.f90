@@ -3,7 +3,7 @@ module class_particles_dipolar_moments
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
 use class_particles_moment_norm, only: Abstract_Particles_Moment_Norm
-use class_particles_orientations, only: Abstract_Particles_Orientations
+use class_component_orientations, only: Abstract_Component_Orientations
 
 implicit none
 
@@ -12,7 +12,7 @@ private
     type, abstract, public :: Abstract_Particles_Dipolar_Moments
     private
         class(Abstract_Particles_Moment_Norm), pointer :: moment_norm
-        class(Abstract_Particles_Orientations), pointer :: orientations
+        class(Abstract_Component_Orientations), pointer :: orientations
     contains
         procedure :: construct => Abstract_Particles_Dipolar_Moments_construct
         procedure :: destroy => Abstract_Particles_Dipolar_Moments_destroy
@@ -39,7 +39,7 @@ contains
     subroutine Abstract_Particles_Dipolar_Moments_construct(this, moment_norm, orientations)
         class(Abstract_Particles_Dipolar_Moments), intent(out) :: this
         class(Abstract_Particles_Moment_Norm), target, intent(in) :: moment_norm
-        class(Abstract_Particles_Orientations), target, intent(in) :: orientations
+        class(Abstract_Component_Orientations), target, intent(in) :: orientations
 
         this%moment_norm => moment_norm
         this%orientations => orientations
@@ -74,7 +74,7 @@ contains
     subroutine Null_Particles_Dipolar_Moments_construct(this, moment_norm, orientations)
         class(Null_Particles_Dipolar_Moments), intent(out) :: this
         class(Abstract_Particles_Moment_Norm), target, intent(in) :: moment_norm
-        class(Abstract_Particles_Orientations), target, intent(in) :: orientations
+        class(Abstract_Component_Orientations), target, intent(in) :: orientations
     end subroutine Null_Particles_Dipolar_Moments_construct
 
     subroutine Null_Particles_Dipolar_Moments_destroy(this)

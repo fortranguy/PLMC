@@ -5,8 +5,8 @@ use data_wrappers_prefix, only: environment_prefix
 use procedures_checks, only: check_data_found
 use class_particles_number, only: Abstract_Particles_Number
 use class_particles_diameter, only: Abstract_Particles_Diameter
-use class_particles_positions, only: Abstract_Particles_Positions
-use class_particles_orientations, only: Abstract_Particles_Orientations
+use class_component_positions, only: Abstract_Component_Positions
+use class_component_orientations, only: Abstract_Component_Orientations
 use class_particles_dipolar_moments, only: Abstract_Particles_Dipolar_Moments
 use class_particles_exchange, only: Abstract_Particles_Exchange
 use class_moved_positions, only: Abstract_Moved_Positions
@@ -17,9 +17,9 @@ use class_inter_energy_writer, only: Concrete_Inter_Energy_Writer_Selector, &
     Abstract_Inter_Energy_Writer, Concrete_Inter_Energy_Writer, Null_Inter_Energy_Writer
 use class_changes_writer, only: Concrete_Changes_Selector, &
     Abstract_Changes_Success_Writer, Concrete_Changes_Success_Writer, Null_Changes_Success_Writer
-use class_particles_coordinates_writer, only: Concrete_Coordinates_Writer_Selector, &
-    Abstract_Particles_Coordinates_Writer, Concrete_Particles_Coordinates_Writer, &
-    Null_Particles_Coordinates_Writer
+use class_component_coordinates_writer, only: Concrete_Coordinates_Writer_Selector, &
+    Abstract_Component_Coordinates_Writer, Concrete_Component_Coordinates_Writer, &
+    Null_Component_Coordinates_Writer
 use procedures_property_inquirers, only: use_walls, particles_have_positions, &
     particles_have_orientations, particles_can_move, particles_can_rotate, particles_can_exchange, &
     particles_are_dipolar
@@ -102,11 +102,11 @@ contains
 
     subroutine allocate_and_construct_coordinates(particles_coordinates_writer, basename, &
         particles_positions, particles_orientations, input_data, prefix)
-        class(Abstract_Particles_Coordinates_Writer), allocatable, intent(out) :: &
+        class(Abstract_Component_Coordinates_Writer), allocatable, intent(out) :: &
             particles_coordinates_writer
         character(len=*), intent(in) :: basename
-        class(Abstract_Particles_Positions), intent(in) :: particles_positions
-        class(Abstract_Particles_Orientations), intent(in) :: particles_orientations
+        class(Abstract_Component_Positions), intent(in) :: particles_positions
+        class(Abstract_Component_Orientations), intent(in) :: particles_orientations
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -122,9 +122,9 @@ contains
             data_field = prefix//"Coordinates.period"
             call input_data%get(data_field, coordinates_selector%period, data_found)
             call check_data_found(data_field, data_found)
-            allocate(Concrete_Particles_Coordinates_Writer :: particles_coordinates_writer)
+            allocate(Concrete_Component_Coordinates_Writer :: particles_coordinates_writer)
         else
-            allocate(Null_Particles_Coordinates_Writer :: particles_coordinates_writer)
+            allocate(Null_Component_Coordinates_Writer :: particles_coordinates_writer)
         end if
         coordinates_selector%write_orientations = &
             particles_have_orientations(particles_orientations)
@@ -156,7 +156,7 @@ contains
     end subroutine destroy_and_deallocate_changes
 
     subroutine destroy_and_deallocate_coordinates(particles_coordinates_writer)
-        class(Abstract_Particles_Coordinates_Writer), allocatable, intent(inout) :: &
+        class(Abstract_Component_Coordinates_Writer), allocatable, intent(inout) :: &
             particles_coordinates_writer
 
         call particles_coordinates_writer%destroy()
