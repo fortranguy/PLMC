@@ -8,8 +8,7 @@ use class_component_diameter, only: Abstract_Component_Diameter
 use class_component_coordinates, only: Abstract_Component_Coordinates
 use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
 use class_component_exchange, only: Abstract_Component_Exchange
-use class_moved_positions, only: Abstract_Moved_Positions
-use class_rotated_orientations, only: Abstract_Rotated_Orientations
+use class_changed_coordinates, only: Abstract_Changed_Coordinates
 use class_component_energy_writer, only: Concrete_Energy_Writer_Selector, &
     Abstract_Component_Energy_Writer, Concrete_Component_Energy_Writer, Null_Component_Energy_Writer
 use class_inter_energy_writer, only: Concrete_Inter_Energy_Writer_Selector, &
@@ -82,8 +81,7 @@ contains
     subroutine allocate_and_construct_changes(changes_success_writer, moved_positions, &
         rotated_orientations, component_exchange, filename)
         class(Abstract_Changes_Success_Writer), allocatable, intent(out) :: changes_success_writer
-        class(Abstract_Moved_Positions), intent(in) :: moved_positions
-        class(Abstract_Rotated_Orientations), intent(in) :: rotated_orientations
+        class(Abstract_Changed_Coordinates), intent(in) :: moved_positions, rotated_orientations
         class(Abstract_Component_Exchange), intent(in) :: component_exchange
         character(len=*), intent(in) :: filename
 

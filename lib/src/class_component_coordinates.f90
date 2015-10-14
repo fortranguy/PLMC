@@ -17,14 +17,14 @@ private
         class(Abstract_Component_Number), pointer :: number
         real(DP), allocatable :: coordinates(:, :)
     contains
-        procedure, private :: allocate_coordinates => &
-            Abstract_Component_Coordinates_allocate_coordinates
         procedure(Abstract_Component_Coordinates_destroy), deferred :: destroy
         procedure(Abstract_Component_Coordinates_set), deferred :: set
         procedure :: get_num => Abstract_Component_Coordinates_get_num
         procedure :: get => Abstract_Component_Coordinates_get
         procedure :: add => Abstract_Component_Coordinates_add
         procedure :: remove => Abstract_Component_Coordinates_remove
+        procedure, private :: allocate_coordinates => &
+            Abstract_Component_Coordinates_allocate_coordinates
     end type Abstract_Component_Coordinates
 
     abstract interface

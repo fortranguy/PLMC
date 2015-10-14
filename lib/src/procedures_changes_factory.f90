@@ -3,17 +3,16 @@ module procedures_changes_factory
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
 use module_plmc_iterations, only: num_tuning_steps
+use procedures_errors, only: error_exit
 use procedures_checks, only: check_data_found
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_component_diameter, only: Abstract_Component_Diameter
 use class_component_moment_norm, only: Abstract_Component_Moment_Norm
 use class_component_coordinates, only: Abstract_Component_Coordinates
 use class_component_chemical_potential, only: Abstract_Component_Chemical_Potential
-use class_changed_coordinates, only: Abstract_Changed_Coordinates
-use class_moved_positions, only: Abstract_Moved_Positions, &
-    Concrete_Moved_Positions, Null_Moved_Positions
-use class_rotated_orientations, only: Abstract_Rotated_Orientations, &
-    Concrete_Rotated_Orientations, Null_Rotated_Orientations
+use class_changed_coordinates, only: Abstract_Changed_Coordinates, Null_Changed_Coordinates
+use class_moved_positions, only: Concrete_Moved_Positions
+use class_rotated_orientations, only: Concrete_Rotated_Orientations
 use class_change_tuner, only: Concrete_Change_Tuner_Parameters, &
     Abstract_Change_Tuner, Concrete_Change_Tuner, Null_Change_Tuner
 use class_component_exchange, only: Abstract_Component_Exchange, &
@@ -27,22 +26,20 @@ use procedures_property_inquirers, only: component_has_positions, component_has_
 implicit none
 
 private
-public :: changes_factory_create, changes_factory_destroy
+public :: changes_factory_create, changes_factory_destroy, &
+    allocate_and_construct_move_tuner, allocate_and_construct_rotation_tuner
 
 interface changes_factory_create
     module procedure :: changes_factory_create_all
     module procedure :: allocate_and_construct_moved_positions
-    module procedure :: allocate_and_construct_move_tuner
     module procedure :: allocate_and_construct_rotated_orientations
-    module procedure :: allocate_and_construct_rotation_tuner
     module procedure :: allocate_and_construct_component_exchange
 end interface changes_factory_create
 
 interface changes_factory_destroy
     module procedure :: destroy_and_deallocate_component_exchange
     module procedure :: destroy_and_deallocate_change_tuner
-    module procedure :: destroy_and_deallocate_rotated_orientations
-    module procedure :: destroy_and_deallocate_moved_positions
+    module procedure :: destroy_and_deallocate_changed_coordinates
     module procedure :: changes_factory_destroy_all
 end interface changes_factory_destroy
 
@@ -57,17 +54,18 @@ contains
 
         call changes_factory_create(changes%moved_positions, component%positions, periodic_box, &
             input_data, prefix)
-        call changes_factory_create(changes%move_tuner, changes%moved_positions, input_data, prefix)
+        call allocate_and_construct_move_tuner(changes%move_tuner, changes%moved_positions, &
+            input_data, prefix)
         call changes_factory_create(changes%rotated_orientations, component%orientations, &
             input_data, prefix)
-        call changes_factory_create(changes%rotation_tuner, changes%rotated_orientations, &
-            input_data, prefix)
+        call allocate_and_construct_rotation_tuner(changes%rotation_tuner, &
+            changes%rotated_orientations, input_data, prefix)
         call changes_factory_create(changes%component_exchange, component)
     end subroutine changes_factory_create_all
 
     subroutine allocate_and_construct_moved_positions(moved_positions, component_positions, &
         periodic_box, input_data, prefix)
-        class(Abstract_Moved_Positions), allocatable, intent(out) :: moved_positions
+        class(Abstract_Changed_Coordinates), allocatable, intent(out) :: moved_positions
         class(Abstract_Component_Coordinates), intent(in) :: component_positions
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(json_file), intent(inout) :: input_data
@@ -79,19 +77,19 @@ contains
     end subroutine allocate_and_construct_moved_positions
 
     subroutine allocate_moved_positions(moved_positions, component_positions)
-        class(Abstract_Moved_Positions), allocatable, intent(out) :: moved_positions
+        class(Abstract_Changed_Coordinates), allocatable, intent(out) :: moved_positions
         class(Abstract_Component_Coordinates), intent(in) :: component_positions
 
         if (component_has_positions(component_positions)) then
             allocate(Concrete_Moved_Positions :: moved_positions)
         else
-            allocate(Null_Moved_Positions :: moved_positions)
+            allocate(Null_Changed_Coordinates :: moved_positions)
         end if
     end subroutine allocate_moved_positions
 
     subroutine construct_moved_positions(moved_positions, periodic_box, component_positions, &
         input_data, prefix)
-        class(Abstract_Moved_Positions), intent(inout) :: moved_positions
+        class(Abstract_Changed_Coordinates), intent(inout) :: moved_positions
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Component_Coordinates), intent(in) :: component_positions
         type(json_file), intent(inout) :: input_data
@@ -115,15 +113,19 @@ contains
                     data_found)
                 call check_data_found(data_field, data_found)
                 deallocate(data_field)
+                call moved_positions%construct(periodic_box, component_positions, move_delta, &
+                    tuning_parameters)
+                deallocate(move_delta)
+            type is (Null_Changed_Coordinates)
+                call moved_positions%construct()
+            class default
+                call error_exit("construct_moved_positions: type unknown")
         end select
-        call moved_positions%construct(periodic_box, component_positions, move_delta, &
-            tuning_parameters)
-        if (allocated(move_delta)) deallocate(move_delta)
     end subroutine construct_moved_positions
 
     subroutine allocate_and_construct_move_tuner(move_tuner, moved_positions, input_data, prefix)
         class(Abstract_Change_Tuner), allocatable, intent(out) :: move_tuner
-        class(Abstract_Moved_Positions), intent(in) :: moved_positions
+        class(Abstract_Changed_Coordinates), intent(in) :: moved_positions
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -133,7 +135,7 @@ contains
 
     subroutine allocate_move_tuner(move_tuner, moved_positions)
         class(Abstract_Change_Tuner), allocatable, intent(out) :: move_tuner
-        class(Abstract_Moved_Positions), intent(in) :: moved_positions
+        class(Abstract_Changed_Coordinates), intent(in) :: moved_positions
 
         if (component_can_move(moved_positions) .and. num_tuning_steps > 0) then
             allocate(Concrete_Change_Tuner :: move_tuner)
@@ -169,7 +171,7 @@ contains
 
     subroutine allocate_and_construct_rotated_orientations(rotated_orientations, &
         component_orientations, input_data, prefix)
-        class(Abstract_Rotated_Orientations), allocatable, intent(out) :: rotated_orientations
+        class(Abstract_Changed_Coordinates), allocatable, intent(out) :: rotated_orientations
         class(Abstract_Component_Coordinates), intent(in) :: component_orientations
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
@@ -180,19 +182,19 @@ contains
     end subroutine allocate_and_construct_rotated_orientations
 
     subroutine allocate_rotated_orientations(rotated_orientations, component_orientations)
-        class(Abstract_Rotated_Orientations), allocatable, intent(out) :: rotated_orientations
+        class(Abstract_Changed_Coordinates), allocatable, intent(out) :: rotated_orientations
         class(Abstract_Component_Coordinates), intent(in) :: component_orientations
 
         if (component_has_orientations(component_orientations)) then
             allocate(Concrete_Rotated_Orientations :: rotated_orientations)
         else
-            allocate(Null_Rotated_Orientations :: rotated_orientations)
+            allocate(Null_Changed_Coordinates :: rotated_orientations)
         end if
     end subroutine allocate_rotated_orientations
 
     subroutine construct_rotated_orientations(rotated_orientations, component_orientations, &
         input_data, prefix)
-        class(Abstract_Rotated_Orientations), intent(inout) :: rotated_orientations
+        class(Abstract_Changed_Coordinates), intent(inout) :: rotated_orientations
         class(Abstract_Component_Coordinates), intent(in) :: component_orientations
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
@@ -215,15 +217,19 @@ contains
                     data_found)
                 call check_data_found(data_field, data_found)
                 deallocate(data_field)
+                call rotated_orientations%construct(component_orientations, rotation_delta, &
+                    tuning_parameters)
+            type is (Null_Changed_Coordinates)
+                call rotated_orientations%construct()
+            class default
+                call error_exit("construct_rotated_orientations: type unknown")
         end select
-        call rotated_orientations%construct(component_orientations, rotation_delta, &
-            tuning_parameters)
     end subroutine construct_rotated_orientations
 
     subroutine allocate_and_construct_rotation_tuner(rotation_tuner, rotated_orientations, &
         input_data, prefix)
         class(Abstract_Change_Tuner), allocatable, intent(out) :: rotation_tuner
-        class(Abstract_Rotated_Orientations), intent(in) :: rotated_orientations
+        class(Abstract_Changed_Coordinates), intent(in) :: rotated_orientations
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -234,7 +240,7 @@ contains
 
     subroutine allocate_rotation_tuner(rotation_tuner, rotated_orientations)
         class(Abstract_Change_Tuner), allocatable, intent(out) :: rotation_tuner
-        class(Abstract_Rotated_Orientations), intent(in) :: rotated_orientations
+        class(Abstract_Changed_Coordinates), intent(in) :: rotated_orientations
 
         if (component_can_rotate(rotated_orientations) .and. num_tuning_steps > 0) then
             allocate(Concrete_Change_Tuner :: rotation_tuner)
@@ -279,18 +285,11 @@ contains
         if (allocated(change_tuner)) deallocate(change_tuner)
     end subroutine destroy_and_deallocate_change_tuner
 
-    subroutine destroy_and_deallocate_rotated_orientations(rotated_orientations)
-        class(Abstract_Rotated_Orientations), allocatable, intent(inout) :: rotated_orientations
+    subroutine destroy_and_deallocate_changed_coordinates(changed_coordinates)
+        class(Abstract_Changed_Coordinates), allocatable, intent(inout) :: changed_coordinates
 
-        call rotated_orientations%destroy()
-        if (allocated(rotated_orientations)) deallocate(rotated_orientations)
-    end subroutine destroy_and_deallocate_rotated_orientations
-
-    subroutine destroy_and_deallocate_moved_positions(moved_positions)
-        class(Abstract_Moved_Positions), allocatable, intent(inout) :: moved_positions
-
-        call moved_positions%destroy()
-        if (allocated(moved_positions)) deallocate(moved_positions)
-    end subroutine destroy_and_deallocate_moved_positions
+        call changed_coordinates%destroy()
+        if (allocated(changed_coordinates)) deallocate(changed_coordinates)
+    end subroutine destroy_and_deallocate_changed_coordinates
 
 end module procedures_changes_factory

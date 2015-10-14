@@ -227,7 +227,7 @@ contains
         new, old, i_actor, i_spectator)
         class(Abstract_One_Particle_Change), intent(in) :: this
         logical, intent(out) :: overlap
-        type(Concrete_Mixture_Energy), intent(out) :: new_energy, old_energy
+        type(Concrete_Mixture_Energy), intent(inout) :: new_energy, old_energy
         type(Concrete_Temporary_Particle), intent(in) :: new, old
         integer, intent(in) :: i_actor, i_spectator
 
@@ -357,7 +357,7 @@ contains
         new, old, i_actor, i_spectator)
         class(Concrete_One_Particle_Rotation), intent(in) :: this
         logical, intent(out) :: overlap
-        type(Concrete_Mixture_Energy), intent(out) :: new_energy, old_energy
+        type(Concrete_Mixture_Energy), intent(inout) :: new_energy, old_energy
         type(Concrete_Temporary_Particle), intent(in) :: new, old
         integer, intent(in) :: i_actor, i_spectator
         overlap = .false.

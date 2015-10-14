@@ -3,18 +3,19 @@ module procedures_property_inquirers
 use json_module, only: json_file
 use procedures_checks, only: check_data_found
 use class_walls_potential, only: Abstract_Walls_Potential, Null_Walls_Potential
-use class_component_number, only: Abstract_Component_Number, Null_Component_Number
-use class_component_diameter, only: Abstract_Component_Diameter, Null_Component_Diameter
-use class_component_moment_norm, only: Abstract_Component_Moment_Norm, Null_Component_Moment_Norm
+use class_component_number, only: Abstract_Component_Number, Concrete_Component_Number
+use class_component_diameter, only: Abstract_Component_Diameter, Concrete_Component_Diameter
+use class_component_moment_norm, only: Abstract_Component_Moment_Norm, Concrete_Component_Moment_Norm
 use class_component_coordinates, only: Abstract_Component_Coordinates, &
     Concrete_Component_Positions, Concrete_Component_Orientations
 use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments, &
-    Null_Component_Dipolar_Moments
+    Concrete_Component_Dipolar_Moments
 use class_component_chemical_potential, only: Abstract_Component_Chemical_Potential, &
-    Null_Component_Chemical_Potential
-use class_moved_positions, only: Abstract_Moved_Positions, Null_Moved_Positions
-use class_rotated_orientations, only: Abstract_Rotated_Orientations, Null_Rotated_Orientations
-use class_component_exchange, only: Abstract_Component_Exchange, Null_Component_Exchange
+    Concrete_Component_Chemical_Potential
+use class_changed_coordinates, only: Abstract_Changed_Coordinates
+use class_moved_positions, only: Concrete_Moved_Positions
+use class_rotated_orientations, only: Concrete_Rotated_Orientations
+use class_component_exchange, only: Abstract_Component_Exchange, Concrete_Component_Exchange
 use class_pair_potential, only: Abstract_Pair_Potential, Null_Pair_Potential
 use class_ewald_real_pair, only: Abstract_Ewald_Real_Pair, Null_Ewald_Real_Pair
 
@@ -106,10 +107,10 @@ contains
         class(Abstract_Component_Number), intent(in) :: component_number
 
         select type (component_number)
-            type is (Null_Component_Number)
-                component_exists = .false.
-            class default
+            type is (Concrete_Component_Number)
                 component_exists = .true.
+            class default
+                component_exists = .false.
         end select
     end function component_exists_from_number
 
@@ -147,24 +148,24 @@ contains
     end function component_has_positions
 
     pure logical function component_can_move(moved_positions)
-        class(Abstract_Moved_Positions), intent(in) :: moved_positions
+        class(Abstract_Changed_Coordinates), intent(in) :: moved_positions
 
         select type (moved_positions)
-            type is (Null_Moved_Positions)
-                component_can_move = .false.
-            class default
+            type is (Concrete_Moved_Positions)
                 component_can_move = .true.
+            class default
+                component_can_move = .false.
         end select
     end function component_can_move
 
     pure logical function component_can_rotate(rotated_orientations)
-        class(Abstract_Rotated_Orientations), intent(in) :: rotated_orientations
+        class(Abstract_Changed_Coordinates), intent(in) :: rotated_orientations
 
         select type (rotated_orientations)
-            type is (Null_Rotated_Orientations)
-                component_can_rotate = .false.
-            class default
+            type is (Concrete_Rotated_Orientations)
                 component_can_rotate = .true.
+            class default
+                component_can_rotate = .false.
         end select
     end function component_can_rotate
 
@@ -185,10 +186,10 @@ contains
         class(Abstract_Component_Moment_Norm), intent(in) :: component_moment_norm
 
         select type (component_moment_norm)
-            type is (Null_Component_Moment_Norm)
-                component_is_dipolar = .false.
-            class default
+            type is (Concrete_Component_Moment_Norm)
                 component_is_dipolar = .true.
+            class default
+                component_is_dipolar = .false.
         end select
     end function component_is_dipolar_from_moment_norm
 
@@ -208,10 +209,10 @@ contains
         class(Abstract_Component_Dipolar_Moments), intent(in) :: component_dipolar_moments
 
         select type (component_dipolar_moments)
-            type is (Null_Component_Dipolar_Moments)
-                component_is_dipolar = .false.
-            class default
+            type is (Concrete_Component_Dipolar_Moments)
                 component_is_dipolar = .true.
+            class default
+                component_is_dipolar = .false.
         end select
     end function component_is_dipolar_from_dipolar_moments
 
@@ -232,10 +233,10 @@ contains
         class(Abstract_Component_Chemical_Potential), intent(in) :: component_chemical_potential
 
         select type (component_chemical_potential)
-            type is (Null_Component_Chemical_Potential)
-                component_can_exchange = .false.
-            class default
+            type is (Concrete_Component_Chemical_Potential)
                 component_can_exchange = .true.
+            class default
+                component_can_exchange = .false.
         end select
     end function component_can_exchange_from_chemical_potential
 
@@ -244,17 +245,16 @@ contains
         class(Abstract_Component_Exchange), intent(in) :: component_exchange
 
         select type (component_exchange)
-            type is (Null_Component_Exchange)
-                component_can_exchange = .false.
-            class default
+            type is (Concrete_Component_Exchange)
                 component_can_exchange = .true.
+            class default
+                component_can_exchange = .false.
         end select
     end function component_can_exchange_from_component_exchange
 
     pure logical function component_can_change(moved_positions, rotated_orientations, &
         component_exchange)
-        class(Abstract_Moved_Positions), intent(in) :: moved_positions
-        class(Abstract_Rotated_Orientations), intent(in) :: rotated_orientations
+        class(Abstract_Changed_Coordinates), intent(in) :: moved_positions, rotated_orientations
         class(Abstract_Component_Exchange), intent(in) :: component_exchange
 
         component_can_change = component_can_move(moved_positions) .or. &

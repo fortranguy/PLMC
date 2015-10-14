@@ -3,7 +3,7 @@
     
     \begin{scope}[opacity=1]
         \begin{abstractclass}[text width=\mediumTextWidth]{ComponentPotential}{0, 0}
-            \operation{construct(periodicBox\type{PeriodicBox}, positions\type{ComponentPositions})}
+            \operation{construct(periodicBox\type{PeriodicBox}, positions\type{ComponentCoordinates})}
             \operation{destroy()}
             \operation{visit(overlap\type{bool}, energy\type{double}, particle\type{Particle},
                 pairPotential\type{PairPotential})}
@@ -13,7 +13,7 @@
     \begin{scope}[shift={($(ComponentPotential.north) + (-12 cm, 0 cm)$)}, opacity=1]
         \begin{abstractclass}[text width=\largeTextWidth]{VisitableCells}{0, 0}
             \operation{construct(mold\type{VisitableList}, periodicBox\type{PeriodicBox},
-                                    positions\type{ComponentPositions},
+                                    positions\type{ComponentCoordinates},
                                     pairPotential\type{PairPotential})}
             \operation{destroy()}
             \operation{visit(overlap\type{bool}, energy\type{double}, particle\type{Particle})}
@@ -69,12 +69,12 @@
 
 \begin{scope}[on background layer]
     \aggregation{ComponentPotential}{periodicBox}{1}{PeriodicBox}
-    \aggregation{ComponentPotential}{positions}{1}{ComponentPositions}
+    \aggregation{ComponentPotential}{positions}{1}{ComponentCoordinates}
     \aggregation{ComponentPotential}{pairPotential}{1}{PairPotential}
     %\aggregation{IntraPairInteration}{diameters}{1}{Diameters}
-    %\aggregation{IntraPairInteration}{positions}{1}{ComponentPositions}
+    %\aggregation{IntraPairInteration}{positions}{1}{ComponentCoordinates}
     %\aggregation{InterPairInteration}{interDiameters}{1}{InterDiameters}
-    %\aggregation{InterPairInteration}{positions}{2}{ComponentPositions}
+    %\aggregation{InterPairInteration}{positions}{2}{ComponentCoordinates}
     
     \aggregation{VisitableCells}{pairPotential}{1}{PairPotential}
     \composition{VisitableCells}{visitableList}{1..n}{VisitableList}

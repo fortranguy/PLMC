@@ -36,61 +36,51 @@
         \end{abstractclass}
     \end{scope}
 
-    \begin{scope}[shift={($(ComponentNumber.north) + (0 cm, 11 cm)$)}, opacity=1]
-        \begin{abstractclass}[text width=\mediumTextWidth]{ComponentCoordinates}{0, 0}
-            \operation[0]{set(iParticle\type{int}, vector\type{double[3]})}
+    \begin{scope}[shift={($(ComponentNumber.north) + (0 cm, 9 cm)$)}, opacity=1]
+        \begin{abstractclass}[text width=\mediumTextWidth]{Coordinates}{0, 0}
             \operation[0]{getNum()\type{int}}
             \operation[0]{get(iParticle\type{int})\type{double[3]}}
-            \operation[0]{add(vector\type{double[3]})}
-            \operation[0]{remove(iParticle\type{int})}
         \end{abstractclass}
     \end{scope}
-    
-    \begin{scope}[shift={($(ComponentCoordinates.south) + (-4.5 cm, -1.5 cm)$)}, opacity=1]
-        \begin{abstractclass}[text width=\mediumTextWidth]{ComponentPositions}{0, 0}
-            \inherit{ComponentCoordinates}
-            \operation{construct(periodicBox\type{PeriodicBox},
-                                number\type{ComponentNumber})}
-            \operation{detroy()}
-            \operation{set(iParticle\type{int}, vector\type{double[3]})}
+
+    \begin{scope}[shift={($(Coordinates.south) + (-4.5 cm, -1.5 cm)$)}, opacity=1]
+        \begin{abstractclass}[text width=\mediumTextWidth]{ComponentCoordinates}{0, 0}
+            \inherit{Coordinates}
+            \operation[0]{detroy()}
+            \operation[0]{set(iParticle\type{int}, vector\type{double[3]})}
             \operation{getNum()\type{int}}
             \operation{get(iParticle\type{int})\type{double[3]}}
             \operation{add(vector\type{double[3]})}
             \operation{remove(iParticle\type{int})}
         \end{abstractclass}
     \end{scope}
-    
-    \begin{scope}[shift={($(ComponentCoordinates.south) + (4.5 cm, -1.5 cm)$)}, opacity=1]
-        \begin{abstractclass}[text width=\mediumTextWidth]{ComponentOrientations}{0, 0}
-            \inherit{ComponentCoordinates}
-            \operation{construct(number\type{ComponentNumber})}
-            \operation{detroy()}
-            \operation{set(iParticle\type{int}, vector\type{double[3]})}
-            \operation{getNum()\type{int}}
-            \operation{get(iParticle\type{int})\type{double[3]}}
-            \operation{add(vector\type{double[3]})}
-            \operation{remove(iParticle\type{int})}
-        \end{abstractclass}
-        \begin{comment}
-            \begin{class}[text width=\mediumTextWidth]{NullOrientations}{0, -5.5}
-                \inherit{ComponentOrientations}
+
+    \begin{comment}
+        \begin{scope}[shift={($(Coordinates.south) + (-4.5 cm, -1.5 cm)$)}]
+            \begin{class}[text width=\mediumTextWidth]{ComponentPositions}{0, 0}
+                \inherit{ComponentCoordinates}
+                \operation{construct(periodicBox\type{PeriodicBox},
+                                    number\type{ComponentNumber})}
+                \operation{detroy()}
+                \operation{set(iParticle\type{int}, vector\type{double[3]})}
             \end{class}
-        \end{comment}
-    \end{scope}
+        \end{scope}
+    \end{comment}
+
+    \begin{comment}
+        \begin{scope}[shift={($(ComponentCoordinates.south) + (4.5 cm, -1.5 cm)$)}]
+            \begin{class}[text width=\mediumTextWidth]{ComponentOrientations}{0, 0}
+                \inherit{ComponentCoordinates}
+                \operation{construct(number\type{ComponentNumber})}
+                \operation{detroy()}
+                \operation{set(iParticle\type{int}, vector\type{double[3]})}
+            \end{class}
+        \end{scope}
+    \end{comment}
     
-    \begin{scope}[shift={($(ComponentCoordinates.north) + (9 cm, 0 cm)$)}, opacity=1]
-        \begin{abstractclass}[text width=\mediumTextWidth]{ComponentDipolarMoments}{0, 0}
-            \operation{construct(momentNorm\type{ComponentMomentNorm},
-                                orientations\type{ComponentOrientations})}
-            \operation{destroy()}
-            \operation{getNum()\type{int}}
-            \operation{get(iParticle\type{int})}
-        \end{abstractclass}
-    \end{scope}
-    
-    \begin{scope}[shift={($(ComponentDipolarMoments.north) + (9 cm, 0 cm)$)}, opacity=1]
+    \begin{scope}[shift={($(Coordinates.north) + (9 cm, 0 cm)$)}, opacity=1]
         \begin{abstractclass}[text width=\mediumTextWidth]{ComponentTotalMoment}{0, 0}
-            \operation{construct(dipolarMoment\type{ComponentDipolarMoments})}
+            \operation{construct(dipolarMoment\type{Coordinates})}
             \operation{destroy()}
             \operation{reset()}
             \operation{get()\type{double[3]}}
@@ -105,10 +95,8 @@
 \end{scope}
 
 \begin{scope}[on background layer]
-    \aggregation{ComponentPositions}{periodicBox}{1}{PeriodicBox}
-    \aggregation{ComponentPositions}{number}{1}{ComponentNumber}
-    \aggregation{ComponentOrientations}{number}{1}{ComponentNumber}
-    \aggregation{ComponentDipolarMoments}{momentNorm}{1}{ComponentMomentNorm}
-    \aggregation{ComponentDipolarMoments}{orientations}{1}{ComponentOrientations}
-    \aggregation{ComponentTotalMoment}{momentNorm}{1}{ComponentDipolarMoments}
+    \aggregation{ComponentCoordinates}{number}{1}{ComponentNumber}
+    \aggregation{Coordinates}{momentNorm}{1}{ComponentMomentNorm}
+    \aggregation{Coordinates}{orientations}{1}{ComponentCoordinates}
+    \aggregation{ComponentTotalMoment}{momentNorm}{1}{Coordinates}
 \end{scope}
