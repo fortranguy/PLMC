@@ -15,6 +15,7 @@ use class_ewald_real_pair, only: Abstract_Ewald_Real_Pair, &
     Tabulated_Ewald_Real_Pair, Raw_Ewald_Real_Pair, Null_Ewald_Real_Pair
 use class_ewald_real_particles, only: Abstract_Ewald_Real_Particles, &
     Concrete_Ewald_Real_Particles, Null_Ewald_Real_Particles
+use class_weighted_structure, only: Abstract_Weighted_Structure
 use types_ewald_wrapper, only: Ewald_Wrapper, Ewald_Wrapper_Macro, Ewald_Wrapper_Micro
 use procedures_property_inquirers, only: particles_are_dipolar, particles_interact
 
@@ -199,6 +200,10 @@ contains
         call real_particles%construct(periodic_box, particles_positions, &
             particles_dipolar_moments, real_pair)
     end subroutine allocate_and_construct_real_particles
+
+    subroutine allocate_and_construct_weighted_structure(weighted_structure)
+        class(Abstract_Weighted_Structure), allocatable, intent(out) :: weighted_structure
+    end subroutine allocate_and_construct_weighted_structure
 
     subroutine ewald_factory_destroy_all(ewald)
         type(Ewald_Wrapper), intent(inout) :: ewald

@@ -6,7 +6,7 @@ use data_constants, only: num_dimensions, PI
 implicit none
 private
 public :: ewald_real_B, ewald_real_C, &
-       reciprocal_size_1_sym, reciprocal_size_2_sym, fourier_i, set_exp_kz
+       reciprocal_size_1_sym, reciprocal_size_2_sym, set_fourier, set_exp_kz
 
 contains
 
@@ -76,20 +76,20 @@ contains
     end function reciprocal_size_2_sym
 
     !> Fourier coefficients (bases)
-    pure subroutine fourier_i(exp_Ikx_i, reciprocal_size_i, position_over_box_i)
-        integer, intent(in) :: reciprocal_size_i
-        complex(DP), dimension(-reciprocal_size_i:reciprocal_size_i), intent(out) :: exp_Ikx_i
-        real(DP), intent(in) :: position_over_box_i
+    pure subroutine set_fourier(fourier_position_i, reci_number_i, relative_position_i)
+        integer, intent(in) :: reci_number_i
+        complex(DP), dimension(-reci_number_i:reci_number_i), intent(out) :: fourier_position_i
+        real(DP), intent(in) :: relative_position_i
 
-        integer :: kx_i
-        exp_Ikx_i(0) = (1._DP, 0._DP)
-        exp_Ikx_i(1) = cmplx(cos(position_over_box_i), sin(position_over_box_i), DP)
-        exp_Ikx_i(-1) = conjg(exp_Ikx_i(1))
-        do kx_i = 2, reciprocal_size_i
-            exp_Ikx_i(kx_i) = exp_Ikx_i(kx_i-1) * exp_Ikx_i(1)
-            exp_Ikx_i(-kx_i) = conjg(exp_Ikx_i(kx_i))
+        integer :: n_i
+        fourier_position_i(0) = (1._DP, 0._DP)
+        fourier_position_i(1) = cmplx(cos(relative_position_i), sin(relative_position_i), DP)
+        fourier_position_i(-1) = conjg(fourier_position_i(1))
+        do n_i = 2, reci_number_i
+            fourier_position_i(n_i) = fourier_position_i(n_i-1) * fourier_position_i(1)
+            fourier_position_i(-n_i) = conjg(fourier_position_i(n_i))
         end do
-    end subroutine fourier_i
+    end subroutine set_fourier
 
     ! Tabulation for DLC
     pure subroutine set_exp_kz(exp_kz_tab, reciprocal_size, wave_norm, z)
