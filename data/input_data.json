@@ -24,8 +24,8 @@
     },
     "Mixture": {
         "Component 1": {
-            "exist": true,
-            "are dipolar": true,
+            "exists": true,
+            "is dipolar": true,
             "can exchange": false,
             "number": 500,
             "diameter": 1.0,
@@ -39,8 +39,8 @@
             }
         },
         "Component 2": {
-            "exist": true,
-            "are dipolar": true,
+            "exists": true,
+            "is dipolar": true,
             "can exchange": false,
             "number": 500,
             "diameter": 1.0,
@@ -59,13 +59,13 @@
         }
     },
     "Changes": {
-        "number of tuning steps": 200,
+        "number of tuning steps": 10,
         "Component 1": {
             "Small Move": {
                 "delta": [0.1, 0.1, 0.1],
                 "increase factor": 1.01,
                 "maximum increase factor": 1.1,
-                "accumulation period": 25,
+                "accumulation period": 10,
                 "wanted success ratio": 0.7,
                 "tolerance": 0.01
             },
@@ -73,7 +73,7 @@
                 "delta": 0.1,
                 "increase factor": 1.1,
                 "maximum increase factor": 1.5,
-                "accumulation period": 25,
+                "accumulation period": 10,
                 "wanted success ratio": 0.8,
                 "tolerance": 0.01
             }
@@ -83,7 +83,7 @@
                 "delta": [0.1, 0.1, 0.1],
                 "increase factor": 1.01,
                 "maximum increase factor": 1.1,
-                "accumulation period": 25,
+                "accumulation period": 10,
                 "wanted success ratio": 0.7,
                 "tolerance": 0.01
             },
@@ -91,7 +91,7 @@
                 "delta": 0.1,
                 "increase factor": 1.1,
                 "maximum increase factor": 1.5,
-                "accumulation period": 25,
+                "accumulation period": 10,
                 "wanted success ratio": 0.8,
                 "tolerance": 0.01
             }
@@ -175,7 +175,7 @@
         }
     },
     "Monte Carlo": {
-        "number of steps": 200,
+        "number of steps": 20,
         "Coordinates": {
             "write": true,
             "period": 10
