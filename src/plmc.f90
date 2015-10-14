@@ -49,7 +49,6 @@ implicit none
     call plmc_visit(observables, environment%walls_potential, short_potentials, ewalds, mixture)
     call plmc_write(-num_tuning_steps, observables_writers, observables)
 
-    write(output_unit, *)  "Trying to tune changes..."
     do i_step = -num_tuning_steps + 1, 0
         call plmc_propagator_try(metropolis, observables)
         call plmc_set(observables%intras)

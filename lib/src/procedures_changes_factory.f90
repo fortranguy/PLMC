@@ -2,6 +2,7 @@ module procedures_changes_factory
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
+use module_plmc_iterations, only: num_tuning_steps
 use procedures_checks, only: check_data_found
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_particles_diameter, only: Abstract_Particles_Diameter
@@ -135,7 +136,7 @@ contains
         class(Abstract_Change_Tuner), allocatable, intent(out) :: move_tuner
         class(Abstract_Moved_Positions), intent(in) :: moved_positions
 
-        if (particles_can_move(moved_positions)) then
+        if (particles_can_move(moved_positions) .and. num_tuning_steps > 0) then
             allocate(Concrete_Change_Tuner :: move_tuner)
         else
             allocate(Null_Change_Tuner :: move_tuner)
@@ -236,7 +237,7 @@ contains
         class(Abstract_Change_Tuner), allocatable, intent(out) :: rotation_tuner
         class(Abstract_Rotated_Orientations), intent(in) :: rotated_orientations
 
-        if (particles_can_rotate(rotated_orientations)) then
+        if (particles_can_rotate(rotated_orientations) .and. num_tuning_steps > 0) then
             allocate(Concrete_Change_Tuner :: rotation_tuner)
         else
             allocate(Null_Change_Tuner :: rotation_tuner)
