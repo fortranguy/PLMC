@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
 use class_coordinates, only: Abstract_Coordinates
 use class_component_moment_norm, only: Abstract_Component_Moment_Norm
-use class_component_orientations, only: Abstract_Component_Orientations
+use class_component_coordinates, only: Abstract_Component_Coordinates
 
 implicit none
 
@@ -13,7 +13,7 @@ private
     type, extends(Abstract_Coordinates), abstract, public :: Abstract_Component_Dipolar_Moments
     private
         class(Abstract_Component_Moment_Norm), pointer :: moment_norm
-        class(Abstract_Component_Orientations), pointer :: orientations
+        class(Abstract_Component_Coordinates), pointer :: orientations
     contains
         procedure :: construct => Abstract_Component_Dipolar_Moments_construct
         procedure :: destroy => Abstract_Component_Dipolar_Moments_destroy
@@ -40,7 +40,7 @@ contains
     subroutine Abstract_Component_Dipolar_Moments_construct(this, moment_norm, orientations)
         class(Abstract_Component_Dipolar_Moments), intent(out) :: this
         class(Abstract_Component_Moment_Norm), target, intent(in) :: moment_norm
-        class(Abstract_Component_Orientations), target, intent(in) :: orientations
+        class(Abstract_Component_Coordinates), target, intent(in) :: orientations
 
         this%moment_norm => moment_norm
         this%orientations => orientations
@@ -75,7 +75,7 @@ contains
     subroutine Null_Component_Dipolar_Moments_construct(this, moment_norm, orientations)
         class(Null_Component_Dipolar_Moments), intent(out) :: this
         class(Abstract_Component_Moment_Norm), target, intent(in) :: moment_norm
-        class(Abstract_Component_Orientations), target, intent(in) :: orientations
+        class(Abstract_Component_Coordinates), target, intent(in) :: orientations
     end subroutine Null_Component_Dipolar_Moments_construct
 
     subroutine Null_Component_Dipolar_Moments_destroy(this)

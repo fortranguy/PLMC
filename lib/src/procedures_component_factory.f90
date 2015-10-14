@@ -13,11 +13,8 @@ use class_component_diameter, only: Abstract_Component_Diameter, &
     Concrete_Component_Diameter, Null_Component_Diameter
 use class_component_moment_norm, only: Abstract_Component_Moment_Norm, &
     Concrete_Component_Moment_Norm, Null_Component_Moment_Norm
-use class_component_coordinates, only: Abstract_Component_Coordinates
-use class_component_positions, only: Abstract_Component_Positions, &
-    Concrete_Component_Positions, Null_Component_Positions
-use class_component_orientations, only: Abstract_Component_Orientations, &
-    Concrete_Component_Orientations, Null_Component_Orientations
+use class_component_coordinates, only: Abstract_Component_Coordinates, &
+    Concrete_Component_Positions, Concrete_Component_Orientations, Null_Component_Coordinates
 use class_component_chemical_potential, only : Abstract_Component_Chemical_Potential, &
     Concrete_Component_Chemical_Potential, Null_Component_Chemical_Potential
 use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments, &
@@ -25,8 +22,8 @@ use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments, &
 use class_component_total_moment, only: Abstract_Component_Total_Moment, &
     Concrete_Component_Total_Moment, Null_Component_Total_Moment
 use types_component_wrapper, only: Component_Wrapper, Mixture_Wrapper
-use procedures_property_inquirers, only: use_walls, component_exists, component_has_positions, &
-    component_is_dipolar, component_has_orientations, component_can_exchange
+use procedures_property_inquirers, only: use_walls, component_exists, component_is_dipolar, &
+    component_can_exchange
 
 implicit none
 
@@ -47,16 +44,14 @@ interface component_factory_create
 end interface component_factory_create
 
 interface component_factory_set
-    module procedure :: set_positions
-    module procedure :: set_orientations
+    module procedure :: set_coordinates
 end interface component_factory_set
 
 interface component_factory_destroy
     module procedure :: deallocate_chemical_potential
     module procedure :: destroy_and_deallocate_total_moment
     module procedure :: destroy_and_deallocate_dipolar_moments
-    module procedure :: destroy_and_deallocate_orientations
-    module procedure :: destroy_and_deallocate_positions
+    module procedure :: destroy_and_deallocate_coordinates
     module procedure :: deallocate_moment_norm
     module procedure :: deallocate_diameter
     module procedure :: deallocate_number
@@ -83,9 +78,9 @@ contains
         call component_factory_create(component%moment_norm, dipolar, input_data, prefix)
         call component_factory_create(component%positions, exist, environment%periodic_box, &
             component%number)
-        call component_factory_set(component%positions, input_data, prefix)
+        call component_factory_set(component%positions, input_data, prefix//"initial positions")
         call component_factory_create(component%orientations, dipolar, component%number)
-        call component_factory_set(component%orientations, input_data, prefix)
+        call component_factory_set(component%orientations, input_data, prefix//"initial orientations")
         call component_factory_create(component%dipolar_moments, dipolar, component%moment_norm, &
             component%orientations)
         call component_factory_create(component%total_moment, component%dipolar_moments)
@@ -216,7 +211,7 @@ contains
 
     subroutine allocate_and_construct_positions(component_positions, exist, periodic_box, &
         component_number)
-        class(Abstract_Component_Positions), allocatable, intent(out) :: component_positions
+        class(Abstract_Component_Coordinates), allocatable, intent(out) :: component_positions
         logical, intent(in) :: exist
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Component_Number), intent(in) :: component_number
@@ -224,33 +219,34 @@ contains
         if (exist) then
             allocate(Concrete_Component_Positions :: component_positions)
         else
-            allocate(Null_Component_Positions :: component_positions)
+            allocate(Null_Component_Coordinates :: component_positions)
         end if
-        call component_positions%construct(periodic_box, component_number)
+        select type (component_positions)
+            type is (Concrete_Component_Positions)
+                call component_positions%construct(periodic_box, component_number)
+            type is (Null_Component_Coordinates)
+                call component_positions%construct()
+        end select
     end subroutine allocate_and_construct_positions
 
     subroutine allocate_and_construct_orientations(component_orientations, dipolar, &
         component_number)
-        class(Abstract_Component_Orientations), allocatable, intent(out) :: component_orientations
+        class(Abstract_Component_Coordinates), allocatable, intent(out) :: component_orientations
         logical, intent(in) :: dipolar
         class(Abstract_Component_Number), intent(in) :: component_number
 
         if (dipolar) then
             allocate(Concrete_Component_Orientations :: component_orientations)
         else
-            allocate(Null_Component_Orientations :: component_orientations)
+            allocate(Null_Component_Coordinates :: component_orientations)
         end if
-        call component_orientations%construct(component_number)
+        select type (component_orientations)
+            type is (Concrete_Component_Orientations)
+                call component_orientations%construct(component_number)
+            type is (Null_Component_Coordinates)
+                call component_orientations%destroy()
+        end select
     end subroutine allocate_and_construct_orientations
-
-    subroutine set_positions(component_positions, input_data, prefix)
-        class(Abstract_Component_Positions), intent(inout) :: component_positions
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
-
-        if (.not.component_has_positions(component_positions)) return
-        call set_coordinates(component_positions, input_data, prefix//"initial positions")
-    end subroutine set_positions
 
     subroutine set_coordinates(component_coordinates, input_data, data_field)
         class(Abstract_Component_Coordinates), intent(inout) :: component_coordinates
@@ -276,22 +272,13 @@ contains
         deallocate(filename)
     end subroutine set_coordinates
 
-    subroutine set_orientations(component_orientations, input_data, prefix)
-        class(Abstract_Component_Orientations), intent(inout) :: component_orientations
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
-
-        if (.not.component_has_orientations(component_orientations)) return
-        call set_coordinates(component_orientations, input_data, prefix//"initial orientations")
-    end subroutine set_orientations
-
     subroutine allocate_and_construct_dipolar_moments(component_dipolar_moments, dipolar, &
         component_moment_norm, component_orientations)
         class(Abstract_Component_Dipolar_Moments), allocatable, intent(out) :: &
             component_dipolar_moments
         logical, intent(in) :: dipolar
         class(Abstract_Component_Moment_Norm), intent(in) :: component_moment_norm
-        class(Abstract_Component_Orientations), intent(in) :: component_orientations
+        class(Abstract_Component_Coordinates), intent(in) :: component_orientations
 
         if (dipolar) then
             allocate(Concrete_Component_Dipolar_Moments :: component_dipolar_moments)
@@ -371,19 +358,12 @@ contains
         if (allocated(component_moment_norm)) deallocate(component_moment_norm)
     end subroutine deallocate_moment_norm
 
-    subroutine destroy_and_deallocate_positions(component_positions)
-        class(Abstract_Component_Positions), allocatable, intent(inout) :: component_positions
+    subroutine destroy_and_deallocate_coordinates(component_coordinates)
+        class(Abstract_Component_Coordinates), allocatable, intent(inout) :: component_coordinates
 
-        call component_positions%destroy()
-        if (allocated(component_positions)) deallocate(component_positions)
-    end subroutine destroy_and_deallocate_positions
-
-    subroutine destroy_and_deallocate_orientations(component_orientations)
-        class(Abstract_Component_Orientations), allocatable, intent(inout) :: component_orientations
-
-        call component_orientations%destroy()
-        if (allocated(component_orientations)) deallocate(component_orientations)
-    end subroutine destroy_and_deallocate_orientations
+        call component_coordinates%destroy()
+        if (allocated(component_coordinates)) deallocate(component_coordinates)
+    end subroutine destroy_and_deallocate_coordinates
 
     subroutine destroy_and_deallocate_dipolar_moments(component_dipolar_moments)
         class(Abstract_Component_Dipolar_Moments), allocatable, intent(inout) :: &

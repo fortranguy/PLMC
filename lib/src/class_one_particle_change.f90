@@ -114,7 +114,7 @@ private
     contains
         procedure :: construct => Null_One_Particle_Change_construct
         procedure :: destroy => Null_One_Particle_Change_destroy
-        procedure, private :: set_candidates => Null_One_Particle_Change_set_candidates
+        procedure :: set_candidates => Null_One_Particle_Change_set_candidates
         procedure :: get_num_choices => Null_One_Particle_Change_get_num_choices
         procedure :: try => Null_One_Particle_Change_try
         procedure, private :: construct_selector => Null_One_Particle_Change_construct_selector

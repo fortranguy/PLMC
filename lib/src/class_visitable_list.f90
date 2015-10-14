@@ -5,7 +5,7 @@ use types_temporary_particle, only: Concrete_Temporary_Particle
 use module_list_node, only: Concrete_Linkable_Node, &
     deallocate_list, increase_nodes_size
 use class_periodic_box, only: Abstract_Periodic_Box
-use class_component_positions, only: Abstract_Component_Positions
+use class_component_coordinates, only: Abstract_Component_Coordinates
 use class_pair_potential, only: Abstract_Pair_Potential
 
 implicit none
@@ -15,7 +15,7 @@ private
     type, abstract, public :: Abstract_Visitable_List
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box
-        class(Abstract_Component_Positions), pointer :: component_positions
+        class(Abstract_Component_Coordinates), pointer :: component_positions
         type(Concrete_Linkable_Node), pointer :: beginning
     contains
         procedure :: construct => Abstract_Visitable_List_construct
@@ -60,7 +60,7 @@ contains
     subroutine Abstract_Visitable_List_construct(this, periodic_box, component_positions)
         class(Abstract_Visitable_List), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Component_Positions), target, intent(in) :: component_positions
+        class(Abstract_Component_Coordinates), target, intent(in) :: component_positions
 
         type(Concrete_Linkable_Node), pointer :: current => null(), next => null()
 
@@ -179,7 +179,7 @@ contains
     subroutine Concrete_Visitable_Array_construct(this, periodic_box, component_positions)
         class(Concrete_Visitable_Array), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Component_Positions), target, intent(in) :: component_positions
+        class(Abstract_Component_Coordinates), target, intent(in) :: component_positions
 
         integer :: initial_size
 
@@ -268,7 +268,7 @@ contains
     subroutine Null_Visitable_List_construct(this, periodic_box, component_positions)
         class(Null_Visitable_List), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Component_Positions), target, intent(in) :: component_positions
+        class(Abstract_Component_Coordinates), target, intent(in) :: component_positions
     end subroutine Null_Visitable_List_construct
 
     subroutine Null_Visitable_List_destroy(this)

@@ -11,7 +11,7 @@ use class_floor_penetration, only: Abstract_Floor_Penetration
 use types_environment_wrapper, only: Environment_Wrapper
 use class_component_diameter, only: Abstract_Component_Diameter, &
     Null_Component_Diameter
-use class_component_positions, only: Abstract_Component_Positions
+use class_component_coordinates, only: Abstract_Component_Coordinates
 use types_component_wrapper, only: Component_Wrapper
 use class_potential_expression, only: Abstract_Potential_Expression, &
     Null_Potential_Expression, Lennard_Jones_Expression
@@ -93,7 +93,7 @@ contains
         type(Short_Potential_Macro_Wrapper), intent(out) :: short_potential_macro
         class(Abstract_Pair_Potential), intent(in) :: inter_pair
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        class(Abstract_Component_Positions), intent(in) :: component_positions
+        class(Abstract_Component_Coordinates), intent(in) :: component_positions
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -263,7 +263,7 @@ contains
         component_positions)
         class(Abstract_Component_Potential), allocatable, intent(out) :: component_potential
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        class(Abstract_Component_Positions), intent(in) :: component_positions
+        class(Abstract_Component_Coordinates), intent(in) :: component_positions
 
         if (component_has_positions(component_positions)) then
             allocate(Concrete_Component_Potential :: component_potential)
@@ -307,7 +307,7 @@ contains
         logical, intent(in) :: interacts
         class(Abstract_Visitable_List), intent(in) :: visitable_list
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        class(Abstract_Component_Positions), intent(in) :: component_positions
+        class(Abstract_Component_Coordinates), intent(in) :: component_positions
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
 
         if (interacts) then

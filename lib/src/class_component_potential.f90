@@ -2,7 +2,7 @@ module class_component_potential
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use class_periodic_box, only: Abstract_Periodic_Box
-use class_component_positions, only: Abstract_Component_Positions
+use class_component_coordinates, only: Abstract_Component_Coordinates
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use class_pair_potential, only: Abstract_Pair_Potential
 
@@ -13,7 +13,7 @@ private
     type, abstract, public :: Abstract_Component_Potential
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
-        class(Abstract_Component_Positions), pointer :: component_positions => null()
+        class(Abstract_Component_Coordinates), pointer :: component_positions => null()
     contains
         procedure :: construct => Abstract_Component_Potential_construct
         procedure :: destroy => Abstract_Component_Potential_destroy
@@ -38,7 +38,7 @@ contains
     subroutine Abstract_Component_Potential_construct(this, periodic_box, component_positions)
         class(Abstract_Component_Potential), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Component_Positions), target, intent(in) :: component_positions
+        class(Abstract_Component_Coordinates), target, intent(in) :: component_positions
 
         this%periodic_box => periodic_box
         this%component_positions => component_positions
@@ -82,7 +82,7 @@ contains
     subroutine Null_Component_Potential_construct(this, periodic_box, component_positions)
         class(Null_Component_Potential), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Component_Positions), target, intent(in) :: component_positions
+        class(Abstract_Component_Coordinates), target, intent(in) :: component_positions
     end subroutine Null_Component_Potential_construct
 
     subroutine Null_Component_Potential_destroy(this)

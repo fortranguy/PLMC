@@ -4,9 +4,7 @@ use data_constants, only: max_line_length
 use procedures_checks, only: check_string_not_empty, check_positive
 use class_number_to_string, only: Abstract_Number_to_String, &
     Concrete_Number_to_String, Null_Number_to_String
-use class_component_positions, only: Abstract_Component_Positions
-use class_component_orientations, only: Abstract_Component_Orientations
-
+use class_component_coordinates, only: Abstract_Component_Coordinates
 implicit none
 
 private
@@ -22,10 +20,10 @@ private
         character(len=:), allocatable :: legend
         integer :: period
         type(Concrete_Number_to_String) :: string_step
-        class(Abstract_Component_Positions), pointer :: positions => null()
+        class(Abstract_Component_Coordinates), pointer :: positions => null()
         type(Concrete_Number_to_String) :: string_positions
         class(Abstract_Number_to_String), allocatable :: string_orientations
-        class(Abstract_Component_Orientations), pointer :: orientations => null()
+        class(Abstract_Component_Coordinates), pointer :: orientations => null()
     contains
         procedure :: construct => Abstract_Component_Coordinates_Writer_construct
         procedure :: destroy => Abstract_Component_Coordinates_Writer_destroy
@@ -53,8 +51,7 @@ contains
         orientations, coordinates_selector)
         class(Abstract_Component_Coordinates_Writer), intent(out) :: this
         character(len=*), intent(in) :: basename
-        class(Abstract_Component_Positions), target, intent(in) :: positions
-        class(Abstract_Component_Orientations), target, intent(in) :: orientations
+        class(Abstract_Component_Coordinates), target, intent(in) :: positions, orientations
         type(Concrete_Coordinates_Writer_Selector), intent(in) :: coordinates_selector
 
         this%positions => positions
@@ -110,8 +107,7 @@ contains
         orientations, coordinates_selector)
         class(Null_Component_Coordinates_Writer), intent(out) :: this
         character(len=*), intent(in) :: basename
-        class(Abstract_Component_Positions), target, intent(in) :: positions
-        class(Abstract_Component_Orientations), target, intent(in) :: orientations
+        class(Abstract_Component_Coordinates), target, intent(in) :: positions, orientations
         type(Concrete_Coordinates_Writer_Selector), intent(in) :: coordinates_selector
     end subroutine Null_Component_Coordinates_Writer_construct
 

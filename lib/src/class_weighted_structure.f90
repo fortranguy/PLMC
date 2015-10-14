@@ -5,7 +5,7 @@ use data_constants, only: num_dimensions, PI
 use procedures_checks, only: check_positive
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
-use class_component_positions, only: Abstract_Component_Positions
+use class_component_coordinates, only: Abstract_Component_Coordinates
 use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
 use procedures_ewald_micro, only: set_fourier, reciprocal_size_1_sym, reciprocal_size_2_sym
 
@@ -20,7 +20,7 @@ private
         complex(DP), dimension(:, :, :), allocatable :: structure
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
         class(Abstract_Reciprocal_Lattice), pointer :: reciprocal_lattice => null()
-        class(Abstract_Component_Positions), pointer :: component_positions => null()
+        class(Abstract_Component_Coordinates), pointer :: component_positions => null()
         class(Abstract_Component_Dipolar_Moments), pointer :: component_dipolar_moments => null()
     contains
         procedure :: construct => Abstract_Weighted_Structure_construct
@@ -48,7 +48,7 @@ contains
         class(Abstract_Weighted_Structure), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Reciprocal_Lattice), target, intent(in) :: reciprocal_lattice
-        class(Abstract_Component_Positions), target, intent(in) :: component_positions
+        class(Abstract_Component_Coordinates), target, intent(in) :: component_positions
         class(Abstract_Component_Dipolar_Moments), target, intent(in) :: component_dipolar_moments
         real(DP), intent(in) :: alpha
 

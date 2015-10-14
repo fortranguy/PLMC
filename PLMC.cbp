@@ -51,7 +51,7 @@
 			<Option weight="2" />
 		</Unit>
 		<Unit filename="lib/src/class_component_coordinates.f90">
-			<Option weight="2" />
+			<Option weight="3" />
 		</Unit>
 		<Unit filename="lib/src/class_component_coordinates_writer.f90">
 			<Option weight="4" />
@@ -73,12 +73,6 @@
 		</Unit>
 		<Unit filename="lib/src/class_component_number.f90">
 			<Option weight="1" />
-		</Unit>
-		<Unit filename="lib/src/class_component_orientations.f90">
-			<Option weight="3" />
-		</Unit>
-		<Unit filename="lib/src/class_component_positions.f90">
-			<Option weight="3" />
 		</Unit>
 		<Unit filename="lib/src/class_component_potential.f90">
 			<Option weight="4" />
@@ -110,10 +104,7 @@
 		<Unit filename="lib/src/class_metropolis_algorithm.f90">
 			<Option weight="2" />
 		</Unit>
-		<Unit filename="lib/src/class_mixture_dipolar_moments.f90">
-			<Option weight="5" />
-		</Unit>
-		<Unit filename="lib/src/class_mixture_positions.f90">
+		<Unit filename="lib/src/class_mixture_coordinates.f90">
 			<Option weight="4" />
 		</Unit>
 		<Unit filename="lib/src/class_moved_positions.f90">

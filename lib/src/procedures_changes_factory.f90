@@ -7,12 +7,11 @@ use procedures_checks, only: check_data_found
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_component_diameter, only: Abstract_Component_Diameter
 use class_component_moment_norm, only: Abstract_Component_Moment_Norm
-use class_component_positions, only: Abstract_Component_Positions
+use class_component_coordinates, only: Abstract_Component_Coordinates
 use class_component_chemical_potential, only: Abstract_Component_Chemical_Potential
 use class_changed_coordinates, only: Abstract_Changed_Coordinates
 use class_moved_positions, only: Abstract_Moved_Positions, &
     Concrete_Moved_Positions, Null_Moved_Positions
-use class_component_orientations, only:  Abstract_Component_Orientations
 use class_rotated_orientations, only: Abstract_Rotated_Orientations, &
     Concrete_Rotated_Orientations, Null_Rotated_Orientations
 use class_change_tuner, only: Concrete_Change_Tuner_Parameters, &
@@ -69,7 +68,7 @@ contains
     subroutine allocate_and_construct_moved_positions(moved_positions, component_positions, &
         periodic_box, input_data, prefix)
         class(Abstract_Moved_Positions), allocatable, intent(out) :: moved_positions
-        class(Abstract_Component_Positions), intent(in) :: component_positions
+        class(Abstract_Component_Coordinates), intent(in) :: component_positions
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
@@ -81,7 +80,7 @@ contains
 
     subroutine allocate_moved_positions(moved_positions, component_positions)
         class(Abstract_Moved_Positions), allocatable, intent(out) :: moved_positions
-        class(Abstract_Component_Positions), intent(in) :: component_positions
+        class(Abstract_Component_Coordinates), intent(in) :: component_positions
 
         if (component_has_positions(component_positions)) then
             allocate(Concrete_Moved_Positions :: moved_positions)
@@ -94,7 +93,7 @@ contains
         input_data, prefix)
         class(Abstract_Moved_Positions), intent(inout) :: moved_positions
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        class(Abstract_Component_Positions), intent(in) :: component_positions
+        class(Abstract_Component_Coordinates), intent(in) :: component_positions
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -171,7 +170,7 @@ contains
     subroutine allocate_and_construct_rotated_orientations(rotated_orientations, &
         component_orientations, input_data, prefix)
         class(Abstract_Rotated_Orientations), allocatable, intent(out) :: rotated_orientations
-        class(Abstract_Component_Orientations), intent(in) :: component_orientations
+        class(Abstract_Component_Coordinates), intent(in) :: component_orientations
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -182,7 +181,7 @@ contains
 
     subroutine allocate_rotated_orientations(rotated_orientations, component_orientations)
         class(Abstract_Rotated_Orientations), allocatable, intent(out) :: rotated_orientations
-        class(Abstract_Component_Orientations), intent(in) :: component_orientations
+        class(Abstract_Component_Coordinates), intent(in) :: component_orientations
 
         if (component_has_orientations(component_orientations)) then
             allocate(Concrete_Rotated_Orientations :: rotated_orientations)
@@ -194,7 +193,7 @@ contains
     subroutine construct_rotated_orientations(rotated_orientations, component_orientations, &
         input_data, prefix)
         class(Abstract_Rotated_Orientations), intent(inout) :: rotated_orientations
-        class(Abstract_Component_Orientations), intent(in) :: component_orientations
+        class(Abstract_Component_Coordinates), intent(in) :: component_orientations
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 

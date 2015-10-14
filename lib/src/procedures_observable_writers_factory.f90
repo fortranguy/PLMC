@@ -5,8 +5,7 @@ use data_wrappers_prefix, only: environment_prefix
 use procedures_checks, only: check_data_found
 use class_component_number, only: Abstract_Component_Number
 use class_component_diameter, only: Abstract_Component_Diameter
-use class_component_positions, only: Abstract_Component_Positions
-use class_component_orientations, only: Abstract_Component_Orientations
+use class_component_coordinates, only: Abstract_Component_Coordinates
 use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
 use class_component_exchange, only: Abstract_Component_Exchange
 use class_moved_positions, only: Abstract_Moved_Positions
@@ -105,8 +104,8 @@ contains
         class(Abstract_Component_Coordinates_Writer), allocatable, intent(out) :: &
             component_coordinates_writer
         character(len=*), intent(in) :: basename
-        class(Abstract_Component_Positions), intent(in) :: component_positions
-        class(Abstract_Component_Orientations), intent(in) :: component_orientations
+        class(Abstract_Component_Coordinates), intent(in) :: component_positions
+        class(Abstract_Component_Coordinates), intent(in) :: component_orientations
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 

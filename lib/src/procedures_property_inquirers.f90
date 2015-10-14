@@ -6,8 +6,8 @@ use class_walls_potential, only: Abstract_Walls_Potential, Null_Walls_Potential
 use class_component_number, only: Abstract_Component_Number, Null_Component_Number
 use class_component_diameter, only: Abstract_Component_Diameter, Null_Component_Diameter
 use class_component_moment_norm, only: Abstract_Component_Moment_Norm, Null_Component_Moment_Norm
-use class_component_positions, only: Abstract_Component_Positions, Null_Component_Positions
-use class_component_orientations, only: Abstract_Component_Orientations, Null_Component_Orientations
+use class_component_coordinates, only: Abstract_Component_Coordinates, &
+    Concrete_Component_Positions, Concrete_Component_Orientations
 use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments, &
     Null_Component_Dipolar_Moments
 use class_component_chemical_potential, only: Abstract_Component_Chemical_Potential, &
@@ -136,13 +136,13 @@ contains
     end function component_interacts_long
 
     pure logical function component_has_positions(partcles_positions)
-        class(Abstract_Component_Positions), intent(in) :: partcles_positions
+        class(Abstract_Component_Coordinates), intent(in) :: partcles_positions
 
         select type (partcles_positions)
-            type is (Null_Component_Positions)
-                component_has_positions = .false.
-            class default
+            type is (Concrete_Component_Positions)
                 component_has_positions = .true.
+            class default
+                component_has_positions = .false.
         end select
     end function component_has_positions
 
@@ -193,13 +193,13 @@ contains
     end function component_is_dipolar_from_moment_norm
 
     pure logical function component_has_orientations(component_orientations)
-        class(Abstract_Component_Orientations), intent(in) :: component_orientations
+        class(Abstract_Component_Coordinates), intent(in) :: component_orientations
 
         select type (component_orientations)
-            type is (Null_Component_Orientations)
-                component_has_orientations = .false.
-            class default
+            type is (Concrete_Component_Orientations)
                 component_has_orientations = .true.
+            class default
+                component_has_orientations = .false.
         end select
     end function component_has_orientations
 
