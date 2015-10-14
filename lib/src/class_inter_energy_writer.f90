@@ -4,7 +4,7 @@ use data_constants, only: max_line_length
 use procedures_checks, only: check_string_not_empty
 use class_number_to_string, only: Abstract_Number_to_String, &
     Concrete_Number_to_String, Null_Number_to_String
-use module_particles_energy, only: Concrete_Inter_Energy
+use module_component_energy, only: Concrete_Inter_Energy
 
 implicit none
 

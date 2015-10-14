@@ -81,7 +81,7 @@ contains
 
 !implementation Abstract_Ewald_Real_Pair
 
-    !> Between 2 particles
+    !> Between 2 component
     !> \f[ (\vec{\mu}_i\cdot\vec{\mu}_j) B_\alpha(r_{ij}) -
     !>     (\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij}) C_\alpha(r_{ij}) \f]
     pure real(DP) function Abstract_Ewald_Real_Pair_meet_energy(this, vector_ij, moment_i, &

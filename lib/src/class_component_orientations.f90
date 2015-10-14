@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions, real_zero
 use procedures_errors, only: warning_continue
 use procedures_checks, only: check_in_range, check_3d_array, check_positive, check_norm
-use class_particles_number, only: Abstract_Particles_Number
+use class_component_number, only: Abstract_Component_Number
 use procedures_coordinates_micro, only: increase_coordinates_size
 use class_component_coordinates, only: Abstract_Component_Coordinates
 
@@ -16,7 +16,7 @@ private
         Abstract_Component_Orientations
     private
         real(DP), allocatable :: orientations(:, :)
-        class(Abstract_Particles_Number), pointer :: number
+        class(Abstract_Component_Number), pointer :: number
     contains
         procedure :: construct => Abstract_Component_Orientations_construct
         procedure :: destroy => Abstract_Component_Orientations_destroy
@@ -48,7 +48,7 @@ contains
 
     subroutine Abstract_Component_Orientations_construct(this, number)
         class(Abstract_Component_Orientations), intent(out) :: this
-        class(Abstract_Particles_Number), target, intent(in) :: number
+        class(Abstract_Component_Number), target, intent(in) :: number
 
         integer :: i_particle
 
@@ -125,7 +125,7 @@ contains
 
     subroutine Null_Component_Orientations_construct(this, number)
         class(Null_Component_Orientations), intent(out) :: this
-        class(Abstract_Particles_Number), target, intent(in) :: number
+        class(Abstract_Component_Number), target, intent(in) :: number
     end subroutine Null_Component_Orientations_construct
 
     subroutine Null_Component_Orientations_destroy(this)

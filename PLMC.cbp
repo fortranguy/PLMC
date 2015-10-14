@@ -47,6 +47,45 @@
 		<Unit filename="lib/src/class_changes_writer.f90">
 			<Option weight="2" />
 		</Unit>
+		<Unit filename="lib/src/class_component_chemical_potential.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="lib/src/class_component_coordinates.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="lib/src/class_component_coordinates_writer.f90">
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="lib/src/class_component_diameter.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="lib/src/class_component_dipolar_moments.f90">
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="lib/src/class_component_energy_writer.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="lib/src/class_component_exchange.f90">
+			<Option weight="7" />
+		</Unit>
+		<Unit filename="lib/src/class_component_moment_norm.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="lib/src/class_component_number.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="lib/src/class_component_orientations.f90">
+			<Option weight="3" />
+		</Unit>
+		<Unit filename="lib/src/class_component_positions.f90">
+			<Option weight="3" />
+		</Unit>
+		<Unit filename="lib/src/class_component_potential.f90">
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="lib/src/class_component_total_moment.f90">
+			<Option weight="5" />
+		</Unit>
 		<Unit filename="lib/src/class_ewald_real_pair.f90">
 			<Option weight="2" />
 		</Unit>
@@ -66,7 +105,7 @@
 			<Option weight="2" />
 		</Unit>
 		<Unit filename="lib/src/class_metropolis_algorithm.f90">
-			<Option weight="0" />
+			<Option weight="2" />
 		</Unit>
 		<Unit filename="lib/src/class_moved_positions.f90">
 			<Option weight="4" />
@@ -82,45 +121,6 @@
 		</Unit>
 		<Unit filename="lib/src/class_parallelepiped_domain.f90">
 			<Option weight="3" />
-		</Unit>
-		<Unit filename="lib/src/class_particles_chemical_potential.f90">
-			<Option weight="2" />
-		</Unit>
-		<Unit filename="lib/src/class_particles_coordinates.f90">
-			<Option weight="1" />
-		</Unit>
-		<Unit filename="lib/src/class_particles_coordinates_writer.f90">
-			<Option weight="4" />
-		</Unit>
-		<Unit filename="lib/src/class_particles_diameter.f90">
-			<Option weight="2" />
-		</Unit>
-		<Unit filename="lib/src/class_particles_dipolar_moments.f90">
-			<Option weight="4" />
-		</Unit>
-		<Unit filename="lib/src/class_particles_energy_writer.f90">
-			<Option weight="2" />
-		</Unit>
-		<Unit filename="lib/src/class_particles_exchange.f90">
-			<Option weight="7" />
-		</Unit>
-		<Unit filename="lib/src/class_particles_moment_norm.f90">
-			<Option weight="2" />
-		</Unit>
-		<Unit filename="lib/src/class_particles_number.f90">
-			<Option weight="1" />
-		</Unit>
-		<Unit filename="lib/src/class_particles_orientations.f90">
-			<Option weight="3" />
-		</Unit>
-		<Unit filename="lib/src/class_particles_positions.f90">
-			<Option weight="3" />
-		</Unit>
-		<Unit filename="lib/src/class_particles_potential.f90">
-			<Option weight="4" />
-		</Unit>
-		<Unit filename="lib/src/class_particles_total_moment.f90">
-			<Option weight="5" />
 		</Unit>
 		<Unit filename="lib/src/class_periodic_box.f90">
 			<Option weight="2" />
@@ -148,6 +148,9 @@
 		</Unit>
 		<Unit filename="lib/src/class_walls_potential.f90">
 			<Option weight="4" />
+		</Unit>
+		<Unit filename="lib/src/class_weighted_structure.f90">
+			<Option weight="5" />
 		</Unit>
 		<Unit filename="lib/src/data_constants.f90">
 			<Option weight="0" />
@@ -179,6 +182,9 @@
 		<Unit filename="lib/src/procedures_command_arguments.f90">
 			<Option weight="2" />
 		</Unit>
+		<Unit filename="lib/src/procedures_component_factory.f90">
+			<Option weight="9" />
+		</Unit>
 		<Unit filename="lib/src/procedures_coordinates_micro.f90">
 			<Option weight="2" />
 		</Unit>
@@ -202,9 +208,6 @@
 		</Unit>
 		<Unit filename="lib/src/procedures_parallelepiped_domain_macro.f90">
 			<Option weight="4" />
-		</Unit>
-		<Unit filename="lib/src/procedures_particles_factory.f90">
-			<Option weight="9" />
 		</Unit>
 		<Unit filename="lib/src/procedures_plmc_factory.f90">
 			<Option weight="12" />
@@ -268,17 +271,17 @@
 		<Unit filename="test/src/test_chemical_potential.f90">
 			<Option compile="0" />
 			<Option link="0" />
-			<Option weight="3" />
+			<Option weight="2" />
 		</Unit>
 		<Unit filename="test/src/test_diameter.f90">
 			<Option compile="0" />
 			<Option link="0" />
-			<Option weight="3" />
+			<Option weight="2" />
 		</Unit>
 		<Unit filename="test/src/test_dipolar_moments.f90">
 			<Option compile="0" />
 			<Option link="0" />
-			<Option weight="5" />
+			<Option weight="2" />
 		</Unit>
 		<Unit filename="test/src/test_environment_factory.f90">
 			<Option compile="0" />
@@ -298,7 +301,7 @@
 		<Unit filename="test/src/test_moment_norm.f90">
 			<Option compile="0" />
 			<Option link="0" />
-			<Option weight="3" />
+			<Option weight="2" />
 		</Unit>
 		<Unit filename="test/src/test_moved_positions.f90">
 			<Option compile="0" />
@@ -313,7 +316,7 @@
 		<Unit filename="test/src/test_orientations.f90">
 			<Option compile="0" />
 			<Option link="0" />
-			<Option weight="4" />
+			<Option weight="2" />
 		</Unit>
 		<Unit filename="test/src/test_pair_potential.f90">
 			<Option compile="0" />
@@ -353,7 +356,7 @@
 		<Unit filename="test/src/test_positions.f90">
 			<Option compile="0" />
 			<Option link="0" />
-			<Option weight="4" />
+			<Option weight="3" />
 		</Unit>
 		<Unit filename="test/src/test_potential_expression.f90">
 			<Option compile="0" />
@@ -378,7 +381,7 @@
 		<Unit filename="test/src/test_total_moment.f90">
 			<Option compile="0" />
 			<Option link="0" />
-			<Option weight="6" />
+			<Option weight="3" />
 		</Unit>
 		<Unit filename="test/src/test_visitable_cells.f90">
 			<Option compile="0" />

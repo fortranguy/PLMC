@@ -27,7 +27,7 @@ if size(ARGS, 1) == 0
 end
 input_data = json.parsefile(ARGS[1]; dicttype=Dict, use_mmap=true)
 
-if input_data["Mixture"]["Component 1"]["exist"] && input_data["Mixture"]["Component 1"]["are dipolar"]
+if input_data["Mixture"]["Component 1"]["exists"] && input_data["Mixture"]["Component 1"]["is dipolar"]
     particles_1 = pt.Particles(0, zeros(3, 1))
     particles_1.num_particles = input_data["Mixture"]["Component 1"]["number"]
     particles_1.orientations = ro.randomOrientations(particles_1.num_particles)
@@ -36,7 +36,7 @@ if input_data["Mixture"]["Component 1"]["exist"] && input_data["Mixture"]["Compo
     println("Positions written in ", output_file)
 end
 
-if input_data["Mixture"]["Component 2"]["exist"] && input_data["Mixture"]["Component 2"]["are dipolar"]
+if input_data["Mixture"]["Component 2"]["exists"] && input_data["Mixture"]["Component 2"]["is dipolar"]
     particles_2 = pt.Particles(0, zeros(3, 1))
     particles_2.num_particles = input_data["Mixture"]["Component 2"]["number"]
     particles_2.orientations = ro.randomOrientations(particles_2.num_particles)

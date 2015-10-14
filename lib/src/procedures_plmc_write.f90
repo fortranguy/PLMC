@@ -25,9 +25,9 @@ contains
             call observables_writers%intras(2)%coordinates%write(i_step)
         end if
         call observables_writers%intras(1)%energy%write(i_step, &
-            observables%intras(1)%particles_energy)
+            observables%intras(1)%component_energy)
         call observables_writers%intras(2)%energy%write(i_step, &
-            observables%intras(2)%particles_energy)
+            observables%intras(2)%component_energy)
         call observables_writers%inter_energy%write(i_step, observables%inter_energy)
         if (-num_tuning_steps < i_step .and. i_step < num_steps) then
             call observables_writers%intras(1)%changes%write(i_step, &

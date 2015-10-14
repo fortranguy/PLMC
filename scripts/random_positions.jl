@@ -43,7 +43,7 @@ input_data = json.parsefile(ARGS[1]; dicttype=Dict, use_mmap=true)
 box_size = map(Float64, input_data["Environment"]["Box"]["size"])
 
 particles_1 = pt.Particles(0, 0.0, 0.0, zeros(3, 1))
-if input_data["Mixture"]["Component 1"]["exist"]
+if input_data["Mixture"]["Component 1"]["exists"]
     
     particles_1.num_particles = input_data["Mixture"]["Component 1"]["number"]
     particles_1.diameter = input_data["Mixture"]["Component 1"]["diameter"]
@@ -75,7 +75,7 @@ if input_data["Mixture"]["Component 1"]["exist"]
 end
 
 particles_2 = pt.Particles(0, 0.0, 0.0, zeros(3, 1))
-if input_data["Mixture"]["Component 2"]["exist"]
+if input_data["Mixture"]["Component 2"]["exists"]
 
     particles_2.num_particles = input_data["Mixture"]["Component 2"]["number"]
     particles_2.diameter = input_data["Mixture"]["Component 2"]["diameter"]

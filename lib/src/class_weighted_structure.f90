@@ -6,7 +6,7 @@ use procedures_checks, only: check_positive
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use class_component_positions, only: Abstract_Component_Positions
-use class_particles_dipolar_moments, only: Abstract_Particles_Dipolar_Moments
+use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
 use procedures_ewald_micro, only: set_fourier, reciprocal_size_1_sym, reciprocal_size_2_sym
 
 implicit none
@@ -20,8 +20,8 @@ private
         complex(DP), dimension(:, :, :), allocatable :: structure
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
         class(Abstract_Reciprocal_Lattice), pointer :: reciprocal_lattice => null()
-        class(Abstract_Component_Positions), pointer :: particles_positions => null()
-        class(Abstract_Particles_Dipolar_Moments), pointer :: particles_dipolar_moments => null()
+        class(Abstract_Component_Positions), pointer :: component_positions => null()
+        class(Abstract_Component_Dipolar_Moments), pointer :: component_dipolar_moments => null()
     contains
         procedure :: construct => Abstract_Weighted_Structure_construct
         procedure :: destroy => Abstract_Weighted_Structure_destroy
@@ -44,19 +44,19 @@ contains
 !implementation Abstract_Weighted_Structure
 
     subroutine Abstract_Weighted_Structure_construct(this, periodic_box, reciprocal_lattice, &
-        particles_positions, particles_dipolar_moments, alpha)
+        component_positions, component_dipolar_moments, alpha)
         class(Abstract_Weighted_Structure), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Reciprocal_Lattice), target, intent(in) :: reciprocal_lattice
-        class(Abstract_Component_Positions), target, intent(in) :: particles_positions
-        class(Abstract_Particles_Dipolar_Moments), target, intent(in) :: particles_dipolar_moments
+        class(Abstract_Component_Positions), target, intent(in) :: component_positions
+        class(Abstract_Component_Dipolar_Moments), target, intent(in) :: component_dipolar_moments
         real(DP), intent(in) :: alpha
 
         this%periodic_box => periodic_box
         this%reciprocal_lattice => reciprocal_lattice
         this%reci_numbers = this%reciprocal_lattice%get_numbers()
-        this%particles_positions => particles_positions
-        this%particles_dipolar_moments => particles_dipolar_moments
+        this%component_positions => component_positions
+        this%component_dipolar_moments => component_dipolar_moments
         call check_positive("Abstract_Weighted_Structure_construct", "alpha", alpha)
         this%alpha = alpha
         allocate(this%weight(-this%reci_numbers(1):this%reci_numbers(1), &
@@ -127,8 +127,8 @@ contains
         integer :: i_particle
 
         this%structure(:, :, :) = cmplx(0._DP, 0._DP, DP)
-        do i_particle = 1, this%particles_positions%get_num()
-            relative_position(:) = 2._DP*PI * this%particles_positions%get(i_particle) / &
+        do i_particle = 1, this%component_positions%get_num()
+            relative_position(:) = 2._DP*PI * this%component_positions%get(i_particle) / &
                 this%periodic_box%get_size()
             call set_fourier(fourier_position_1, this%reci_numbers(1), relative_position(1))
             call set_fourier(fourier_position_2, this%reci_numbers(2), relative_position(2))
@@ -140,7 +140,7 @@ contains
                 fourier_position = fourier_position_1(n_1) * fourier_position_2(n_2) * &
                     fourier_position_3(n_3)
                 wave_dot_moment = dot_product(wave_vector, &
-                    this%particles_dipolar_moments%get(i_particle))
+                    this%component_dipolar_moments%get(i_particle))
                 this%structure(n_1, n_2, n_3) = this%structure(n_1, n_2, n_3) + &
                     cmplx(wave_dot_moment, 0._DP, DP) * fourier_position
             end do
@@ -162,8 +162,8 @@ contains
 
         if (allocated(this%structure)) deallocate(this%structure)
         if (allocated(this%weight)) deallocate(this%weight)
-        this%particles_dipolar_moments => null()
-        this%particles_positions => null()
+        this%component_dipolar_moments => null()
+        this%component_positions => null()
         this%reciprocal_lattice => null()
         this%periodic_box => null()
     end subroutine Abstract_Weighted_Structure_destroy

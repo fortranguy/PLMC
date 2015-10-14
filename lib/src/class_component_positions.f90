@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64, error_unit
 use data_constants, only: num_dimensions
 use procedures_checks, only: check_in_range, check_3d_array
 use class_periodic_box, only: Abstract_Periodic_Box
-use class_particles_number, only: Abstract_Particles_Number
+use class_component_number, only: Abstract_Component_Number
 use procedures_coordinates_micro, only: increase_coordinates_size
 use class_component_coordinates, only: Abstract_Component_Coordinates
 
@@ -15,7 +15,7 @@ private
     type, extends(Abstract_Component_Coordinates), abstract, public :: Abstract_Component_Positions
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box
-        class(Abstract_Particles_Number), pointer :: number
+        class(Abstract_Component_Number), pointer :: number
         real(DP), allocatable :: positions(:, :)
     contains
         procedure :: construct => Abstract_Component_Positions_construct
@@ -49,7 +49,7 @@ contains
     subroutine Abstract_Component_Positions_construct(this, periodic_box, number)
         class(Abstract_Component_Positions), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Particles_Number), target, intent(in) :: number
+        class(Abstract_Component_Number), target, intent(in) :: number
 
         this%periodic_box => periodic_box
         this%number => number
@@ -123,7 +123,7 @@ contains
     subroutine Null_Component_Positions_construct(this, periodic_box, number)
         class(Null_Component_Positions), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Particles_Number), target, intent(in) :: number
+        class(Abstract_Component_Number), target, intent(in) :: number
     end subroutine Null_Component_Positions_construct
 
     subroutine Null_Component_Positions_destroy(this)

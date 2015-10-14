@@ -36,21 +36,21 @@ contains
         character(len=*), intent(in) :: filename
 
         real(DP) :: coordinate(num_dimensions)
-        integer :: num_particles, i_particle
+        integer :: num_component, i_particle
         integer :: file_unit, read_stat
 
         call check_file_exists(filename)
         open(newunit=file_unit, recl=max_line_length, file=filename, status="old", action="read")
-        num_particles = 0
+        num_component = 0
         do
             read(file_unit, fmt=*, iostat=read_stat) coordinate
             if (read_stat == iostat_end) exit
-            num_particles = num_particles + 1
+            num_component = num_component + 1
         end do
-        if (num_particles > 0) then
-            allocate(coordinates(num_dimensions, num_particles))
+        if (num_component > 0) then
+            allocate(coordinates(num_dimensions, num_component))
             rewind(file_unit)
-            do i_particle = 1, num_particles
+            do i_particle = 1, num_component
                 read(file_unit, *) coordinates(:, i_particle)
             end do
         end if

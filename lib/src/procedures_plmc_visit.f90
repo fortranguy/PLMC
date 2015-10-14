@@ -5,12 +5,12 @@ use procedures_errors, only: error_exit
 use class_walls_potential, only: Abstract_Walls_Potential
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use class_component_positions, only: Abstract_Component_Positions
-use class_particles_dipolar_moments, only: Abstract_Particles_Dipolar_Moments
-use types_particles_wrapper, only: Mixture_Wrapper
+use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
+use types_component_wrapper, only: Mixture_Wrapper
 use class_pair_potential, only: Abstract_Pair_Potential
-use class_particles_potential, only: Abstract_Particles_Potential
+use class_component_potential, only: Abstract_Component_Potential
 use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper
-use class_ewald_real_particles, only: Abstract_Ewald_Real_Particles
+use class_ewald_real_component, only: Abstract_Ewald_Real_Component
 use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
 use types_observables_wrapper, only: Mixture_Observables_Wrapper
 
@@ -22,10 +22,10 @@ public :: plmc_visit
 interface plmc_visit
     module procedure :: visit_mixture
     module procedure :: visit_mixture_short
-    module procedure :: visit_particles_walls
-    module procedure :: visit_particles_short
+    module procedure :: visit_component_walls
+    module procedure :: visit_component_short
     module procedure :: visit_mixture_ewald
-    module procedure :: visit_particles_ewald_real
+    module procedure :: visit_component_ewald_real
 end interface plmc_visit
 
 contains
@@ -50,32 +50,32 @@ contains
         logical :: overlap
         real(DP) :: inter_energy_1, inter_energy_2
 
-        call plmc_visit(overlap, observables%intras(1)%particles_energy%walls, walls_potential, &
+        call plmc_visit(overlap, observables%intras(1)%component_energy%walls, walls_potential, &
             mixture%components(1)%positions, short_potentials%intras(1)%wall_pair)
         if (overlap) call error_exit("walls - components(1) overlap")
-        call plmc_visit(overlap, observables%intras(2)%particles_energy%walls, walls_potential, &
+        call plmc_visit(overlap, observables%intras(2)%component_energy%walls, walls_potential, &
             mixture%components(2)%positions, short_potentials%intras(2)%wall_pair)
         if (overlap) call error_exit("walls - components(2) overlap")
 
-        call plmc_visit(overlap, observables%intras(1)%particles_energy%short, &
-            short_potentials%intras(1)%particles, mixture%components(1)%positions, &
+        call plmc_visit(overlap, observables%intras(1)%component_energy%short, &
+            short_potentials%intras(1)%component, mixture%components(1)%positions, &
             short_potentials%intras(1)%pair, same_type=.true.)
         if (overlap) call error_exit("intra 1 overlap")
-        call plmc_visit(overlap, observables%intras(2)%particles_energy%short, &
-            short_potentials%intras(2)%particles, mixture%components(2)%positions, &
+        call plmc_visit(overlap, observables%intras(2)%component_energy%short, &
+            short_potentials%intras(2)%component, mixture%components(2)%positions, &
             short_potentials%intras(2)%pair, same_type=.true.)
         if (overlap) call error_exit("intra 2 overlap")
 
-        call plmc_visit(overlap, inter_energy_1, short_potentials%intras(1)%particles, &
+        call plmc_visit(overlap, inter_energy_1, short_potentials%intras(1)%component, &
             mixture%components(2)%positions, short_potentials%inter_pair, same_type=.false.)
         if (overlap) call error_exit("inter intras(1) overlap")
-        call plmc_visit(overlap, inter_energy_2, short_potentials%intras(2)%particles, &
+        call plmc_visit(overlap, inter_energy_2, short_potentials%intras(2)%component, &
             mixture%components(1)%positions, short_potentials%inter_pair, same_type=.false.)
         if (overlap) call error_exit("inter intras(2) overlap")
         observables%inter_energy%short = inter_energy_1 + inter_energy_2
     end subroutine visit_mixture_short
 
-    pure subroutine visit_particles_walls(overlap, energy, potential, positions, pair)
+    pure subroutine visit_component_walls(overlap, energy, potential, positions, pair)
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
         class(Abstract_Walls_Potential), intent(in) :: potential
@@ -92,12 +92,12 @@ contains
             if (overlap) return
             energy = energy + energy_i
         end do
-    end subroutine visit_particles_walls
+    end subroutine visit_component_walls
 
-    pure subroutine visit_particles_short(overlap, energy, potential, positions, pair, same_type)
+    pure subroutine visit_component_short(overlap, energy, potential, positions, pair, same_type)
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
-        class(Abstract_Particles_Potential), intent(in) :: potential
+        class(Abstract_Component_Potential), intent(in) :: potential
         class(Abstract_Component_Positions), intent(in) :: positions
         class(Abstract_Pair_Potential), intent(in) :: pair
         logical, intent(in) :: same_type
@@ -116,7 +116,7 @@ contains
             energy = energy + energy_i
         end do
         energy = energy / 2._DP
-    end subroutine visit_particles_short
+    end subroutine visit_component_short
 
     pure subroutine visit_mixture_ewald(observables, ewalds, mixture)
         type(Mixture_Observables_Wrapper), intent(inout) :: observables
@@ -126,31 +126,31 @@ contains
         real(DP) :: real_energy_1, real_energy_2
         real(DP) :: inter_energy_1, inter_energy_2
 
-        call plmc_visit(real_energy_1, ewalds%intras(1)%real_particles, &
+        call plmc_visit(real_energy_1, ewalds%intras(1)%real_component, &
             mixture%components(1)%positions, mixture%components(1)%dipolar_moments, &
             same_type=.true.)
-        call plmc_visit(real_energy_2, ewalds%intras(2)%real_particles, &
+        call plmc_visit(real_energy_2, ewalds%intras(2)%real_component, &
             mixture%components(2)%positions, mixture%components(2)%dipolar_moments, &
             same_type=.true.)
 
-        call plmc_visit(inter_energy_1, ewalds%inters(1)%real_particles, &
+        call plmc_visit(inter_energy_1, ewalds%inters(1)%real_component, &
             mixture%components(2)%positions, mixture%components(2)%dipolar_moments, &
             same_type=.false.)
-        call plmc_visit(inter_energy_2, ewalds%inters(2)%real_particles, &
+        call plmc_visit(inter_energy_2, ewalds%inters(2)%real_component, &
             mixture%components(1)%positions, mixture%components(1)%dipolar_moments, &
             same_type=.false.)
 
-        observables%intras(1)%particles_energy%long = real_energy_1
-        observables%intras(2)%particles_energy%long = real_energy_2
+        observables%intras(1)%component_energy%long = real_energy_1
+        observables%intras(2)%component_energy%long = real_energy_2
         observables%inter_energy%long = inter_energy_1 + inter_energy_2
     end subroutine visit_mixture_ewald
 
-    pure subroutine visit_particles_ewald_real(energy, potential, positions, dipolar_moments, &
+    pure subroutine visit_component_ewald_real(energy, potential, positions, dipolar_moments, &
         same_type)
         real(DP), intent(out) :: energy
-        class(Abstract_Ewald_Real_Particles), intent(in) :: potential
+        class(Abstract_Ewald_Real_Component), intent(in) :: potential
         class(Abstract_Component_Positions), intent(in) :: positions
-        class(Abstract_Particles_Dipolar_Moments), intent(in) :: dipolar_moments
+        class(Abstract_Component_Dipolar_Moments), intent(in) :: dipolar_moments
         logical, intent(in) :: same_type
 
         type(Concrete_Temporary_Particle) :: particle
@@ -166,6 +166,6 @@ contains
             energy = energy + energy_i
         end do
         energy = energy / 2._DP
-    end subroutine visit_particles_ewald_real
+    end subroutine visit_component_ewald_real
 
 end module procedures_plmc_visit

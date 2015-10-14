@@ -15,7 +15,7 @@ private
     type, abstract, public :: Abstract_Visitable_List
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box
-        class(Abstract_Component_Positions), pointer :: particles_positions
+        class(Abstract_Component_Positions), pointer :: component_positions
         type(Concrete_Linkable_Node), pointer :: beginning
     contains
         procedure :: construct => Abstract_Visitable_List_construct
@@ -57,15 +57,15 @@ contains
 
 !implementation Abstract_Visitable_List
 
-    subroutine Abstract_Visitable_List_construct(this, periodic_box, particles_positions)
+    subroutine Abstract_Visitable_List_construct(this, periodic_box, component_positions)
         class(Abstract_Visitable_List), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Component_Positions), target, intent(in) :: particles_positions
+        class(Abstract_Component_Positions), target, intent(in) :: component_positions
 
         type(Concrete_Linkable_Node), pointer :: current => null(), next => null()
 
         this%periodic_box => periodic_box
-        this%particles_positions => particles_positions
+        this%component_positions => component_positions
 
         allocate(this%beginning)
         current => this%beginning
@@ -80,7 +80,7 @@ contains
         class(Abstract_Visitable_List), intent(inout) :: this
 
         call deallocate_list(this%beginning)
-        this%particles_positions => null()
+        this%component_positions => null()
         this%periodic_box => null()
     end subroutine Abstract_Visitable_List_destroy
 
@@ -125,7 +125,7 @@ contains
             next => current%next
             if (.not.same_type .or. particle%i /= current%i) then
                 distance = this%periodic_box%distance(particle%position, &
-                    this%particles_positions%get(current%i))
+                    this%component_positions%get(current%i))
                 call pair_potential%meet(overlap, energy_i, distance)
                 if (overlap) return
                 energy = energy + energy_i
@@ -176,15 +176,15 @@ contains
 
 !implementation Concrete_Visitable_Array
 
-    subroutine Concrete_Visitable_Array_construct(this, periodic_box, particles_positions)
+    subroutine Concrete_Visitable_Array_construct(this, periodic_box, component_positions)
         class(Concrete_Visitable_Array), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Component_Positions), target, intent(in) :: particles_positions
+        class(Abstract_Component_Positions), target, intent(in) :: component_positions
 
         integer :: initial_size
 
         this%periodic_box => periodic_box
-        this%particles_positions => particles_positions
+        this%component_positions => component_positions
         this%num_nodes = 0
         initial_size = 1
         allocate(this%nodes(initial_size))
@@ -194,7 +194,7 @@ contains
         class(Concrete_Visitable_Array), intent(inout) :: this
 
         if (allocated(this%nodes)) deallocate(this%nodes)
-        this%particles_positions => null()
+        this%component_positions => null()
         this%periodic_box => null()
     end subroutine Concrete_Visitable_Array_destroy
 
@@ -229,7 +229,7 @@ contains
         do i_node = 1, this%num_nodes
             if (.not.same_type .or. particle%i /= this%nodes(i_node)) then
                 distance = this%periodic_box%distance(particle%position, &
-                    this%particles_positions%get(this%nodes(i_node)))
+                    this%component_positions%get(this%nodes(i_node)))
                 call pair_potential%meet(overlap, energy_i, distance)
                 if (overlap) return
                 energy = energy + energy_i
@@ -265,10 +265,10 @@ contains
 
 !implementation Null_Visitable_List
 
-    subroutine Null_Visitable_List_construct(this, periodic_box, particles_positions)
+    subroutine Null_Visitable_List_construct(this, periodic_box, component_positions)
         class(Null_Visitable_List), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Component_Positions), target, intent(in) :: particles_positions
+        class(Abstract_Component_Positions), target, intent(in) :: component_positions
     end subroutine Null_Visitable_List_construct
 
     subroutine Null_Visitable_List_destroy(this)

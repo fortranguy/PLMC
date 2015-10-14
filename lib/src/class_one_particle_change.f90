@@ -6,16 +6,16 @@ use procedures_errors, only: error_exit
 use procedures_checks, only: check_in_range
 use procedures_random, only: random_integer
 use types_environment_wrapper, only: Environment_Wrapper
-use types_particles_wrapper, only: Particles_Wrapper
+use types_component_wrapper, only: Component_Wrapper
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use types_changes_wrapper, only: Changes_Wrapper
 use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper
 use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
 use class_tower_sampler, only: Abstract_Tower_Sampler
 use module_changes_success, only: Concrete_Change_Counter
-use module_particles_energy, only: Concrete_Particles_Energy, Concrete_Inter_Energy, &
+use module_component_energy, only: Concrete_Component_Energy, Concrete_Inter_Energy, &
     Concrete_Long_Energy, Concrete_Mixture_Energy, &
-    particle_energy_sum => Concrete_Particles_Energy_sum, &
+    particle_energy_sum => Concrete_Component_Energy_sum, &
     inter_energy_sum => Concrete_Inter_Energy_sum, operator(+), operator(-)
 use types_observables_wrapper, only: Mixture_Observables_Wrapper
 use class_metropolis_algorithm, only: Abstract_Metropolis_Algorithm
@@ -27,7 +27,7 @@ private
     type, extends(Abstract_Metropolis_Algorithm), abstract, public :: Abstract_One_Particle_Change
     private
         type(Environment_Wrapper), pointer :: environment => null()
-        type(Particles_Wrapper), pointer :: components(:) => null()
+        type(Component_Wrapper), pointer :: components(:) => null()
         type(Changes_Wrapper), pointer :: changes(:) => null()
         type(Mixture_Short_Potentials_Wrapper), pointer :: short_potentials => null()
         type(Mixture_Ewald_Wrapper), pointer :: ewalds => null()
@@ -155,7 +155,7 @@ contains
     subroutine Abstract_One_Particle_Change_set_candidates(this, components, short_potentials, &
         ewalds)
         class(Abstract_One_Particle_Change), intent(inout) :: this
-        type(Particles_Wrapper), target, intent(in) :: components(:)
+        type(Component_Wrapper), target, intent(in) :: components(:)
         type(Mixture_Short_Potentials_Wrapper), target, intent(in) :: short_potentials
         type(Mixture_Ewald_Wrapper), target, intent(in) :: ewalds
 
@@ -175,7 +175,7 @@ contains
 
         integer :: i_actor, i_spectator
         logical :: success
-        type(Concrete_Particles_Energy) :: actor_energy_difference
+        type(Concrete_Component_Energy) :: actor_energy_difference
         type(Concrete_Inter_Energy) :: inter_energy_difference
 
         i_actor = this%selector%get()
@@ -184,8 +184,8 @@ contains
         call this%test_metropolis(success, actor_energy_difference, inter_energy_difference, &
             i_actor, i_spectator)
         if (success) then
-            observables%intras(i_actor)%particles_energy = &
-                observables%intras(i_actor)%particles_energy + actor_energy_difference
+            observables%intras(i_actor)%component_energy = &
+                observables%intras(i_actor)%component_energy + actor_energy_difference
             observables%inter_energy = observables%inter_energy + inter_energy_difference
             call this%increment_success(observables, i_actor)
         end if
@@ -195,7 +195,7 @@ contains
         actor_energy_difference, inter_energy_difference, i_actor, i_spectator)
         class(Abstract_One_Particle_Change), intent(in) :: this
         logical, intent(out) :: success
-        type(Concrete_Particles_Energy), intent(out) :: actor_energy_difference
+        type(Concrete_Component_Energy), intent(out) :: actor_energy_difference
         type(Concrete_Inter_Energy), intent(out) :: inter_energy_difference
         integer, intent(in) :: i_actor, i_spectator
 
@@ -265,11 +265,11 @@ contains
 
         type(Concrete_Long_Energy) :: new_long, old_long, inter_new_long, inter_old_long
 
-        call this%ewalds%intras(i_actor)%real_particles%visit(new_long%real, new, same_type=.true.)
-        call this%ewalds%inters(i_spectator)%real_particles%visit(inter_new_long%real, new, &
+        call this%ewalds%intras(i_actor)%real_component%visit(new_long%real, new, same_type=.true.)
+        call this%ewalds%inters(i_spectator)%real_component%visit(inter_new_long%real, new, &
             same_type=.false.)
-        call this%ewalds%intras(i_actor)%real_particles%visit(old_long%real, old, same_type=.true.)
-        call this%ewalds%inters(i_spectator)%real_particles%visit(inter_old_long%real, old, &
+        call this%ewalds%intras(i_actor)%real_component%visit(old_long%real, old, same_type=.true.)
+        call this%ewalds%inters(i_spectator)%real_component%visit(inter_old_long%real, old, &
             same_type=.false.)
         new_energy%intras(i_actor)%long = new_long%real
         old_energy%intras(i_actor)%long = old_long%real
@@ -423,7 +423,7 @@ contains
     subroutine Null_One_Particle_Change_set_candidates(this, components, short_potentials, &
         ewalds)
         class(Null_One_Particle_Change), intent(inout) :: this
-        type(Particles_Wrapper), target, intent(in) :: components(:)
+        type(Component_Wrapper), target, intent(in) :: components(:)
         type(Mixture_Short_Potentials_Wrapper), target, intent(in) :: short_potentials
         type(Mixture_Ewald_Wrapper), target, intent(in) :: ewalds
     end subroutine Null_One_Particle_Change_set_candidates

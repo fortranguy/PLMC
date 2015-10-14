@@ -18,7 +18,7 @@ use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice, &
     Concrete_Reciprocal_Lattice, Null_Reciprocal_Lattice
 use class_floor_penetration, only: Abstract_Floor_Penetration, &
     Flat_Floor_Penetration, Null_Floor_Penetration
-use procedures_particles_factory, only: particles_factory_destroy
+use procedures_component_factory, only: component_factory_destroy
 use class_potential_expression, only: Abstract_Potential_Expression
 use class_pair_potential, only: Abstract_Pair_Potential
 use procedures_short_potential_factory, only: short_potential_factory_create, &

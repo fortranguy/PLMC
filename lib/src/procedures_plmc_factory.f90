@@ -10,8 +10,8 @@ use class_periodic_box, only: Abstract_Periodic_Box
 use class_walls_potential, only: Abstract_Walls_Potential
 use types_environment_wrapper, only: Environment_Wrapper
 use procedures_environment_factory, only: environment_factory_create, environment_factory_destroy
-use types_particles_wrapper, only: Mixture_Wrapper, Particles_Wrapper
-use procedures_particles_factory, only: particles_factory_create, particles_factory_destroy
+use types_component_wrapper, only: Mixture_Wrapper, Component_Wrapper
+use procedures_component_factory, only: component_factory_create, component_factory_destroy
 use types_changes_wrapper, only: Changes_Wrapper
 use procedures_changes_factory, only: changes_factory_create, changes_factory_destroy
 use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper
@@ -29,8 +29,8 @@ use types_metropolis_wrapper, only: Metropolis_Wrapper
 use procedures_metropolis_factory, only: metropolis_factory_create, metropolis_factory_set, &
     metropolis_factory_destroy
 use class_tower_sampler, only: Abstract_Tower_Sampler, Concrete_Tower_Sampler, Null_Tower_Sampler
-use procedures_property_inquirers, only: use_walls, particles_exist, particles_are_dipolar, &
-    particles_can_change
+use procedures_property_inquirers, only: use_walls, component_exists, component_is_dipolar, &
+    component_can_change
 
 implicit none
 
@@ -100,13 +100,13 @@ contains
 
         logical :: mixture_exists
 
-        call particles_factory_create(mixture%components(1), environment, input_data, &
+        call component_factory_create(mixture%components(1), environment, input_data, &
             mixtures_prefix//"Component 1.")
-        call particles_factory_create(mixture%components(2), environment, input_data, &
+        call component_factory_create(mixture%components(2), environment, input_data, &
             mixtures_prefix//"Component 2.")
-        mixture_exists = particles_exist(mixture%components(1)%number) .and. &
-            particles_exist(mixture%components(2)%number)
-        call particles_factory_create(mixture%inter_diameter, mixture_exists, &
+        mixture_exists = component_exists(mixture%components(1)%number) .and. &
+            component_exists(mixture%components(2)%number)
+        call component_factory_create(mixture%inter_diameter, mixture_exists, &
             mixture%components(1)%diameter, mixture%components(2)%diameter, input_data, &
             mixtures_prefix//"Inter 12.")
     end subroutine create_mixture
@@ -114,15 +114,15 @@ contains
     subroutine destroy_mixture(mixture)
         type(Mixture_Wrapper), intent(inout) :: mixture
 
-        call particles_factory_destroy(mixture%inter_diameter)
-        call particles_factory_destroy(mixture%components(2))
-        call particles_factory_destroy(mixture%components(1))
+        call component_factory_destroy(mixture%inter_diameter)
+        call component_factory_destroy(mixture%components(2))
+        call component_factory_destroy(mixture%components(1))
     end subroutine destroy_mixture
 
     subroutine create_changes(changes, periodic_box, components, input_data)
         type(Changes_Wrapper), intent(out) :: changes(num_components)
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        type(Particles_Wrapper), intent(in) :: components(num_components)
+        type(Component_Wrapper), intent(in) :: components(num_components)
         type(json_file), intent(inout) :: input_data
 
         call changes_factory_create(changes(1), periodic_box, components(1), input_data, &
@@ -150,8 +150,8 @@ contains
             mixture%components(1), input_data, short_potentials_prefix//"Component 1.")
         call short_potential_factory_create(short_potentials%intras(2), environment, &
             mixture%components(2), input_data, short_potentials_prefix//"Component 2.")
-        mixture_exists = particles_exist(mixture%components(1)%number) .and. &
-            particles_exist(mixture%components(2)%number)
+        mixture_exists = component_exists(mixture%components(1)%number) .and. &
+            component_exists(mixture%components(2)%number)
         call short_potential_factory_create(short_potentials%inter_pair, mixture_exists, &
             mixture%inter_diameter, input_data, short_potentials_prefix//"Inter 12.")
         call short_potential_factory_create(short_potentials%inters(1), &
@@ -185,8 +185,8 @@ contains
         call ewald_factory_create(ewalds%intras(2), environment, mixture%components(2), &
             input_data, ewalds_prefix//"Component 2.")
 
-        mixture_is_dipolar = particles_are_dipolar(mixture%components(1)%dipolar_moments) .and. &
-            particles_are_dipolar(mixture%components(2)%dipolar_moments)
+        mixture_is_dipolar = component_is_dipolar(mixture%components(1)%dipolar_moments) .and. &
+            component_is_dipolar(mixture%components(2)%dipolar_moments)
         call ewald_factory_create(ewalds%inter_micro, mixture_is_dipolar, environment, &
             mixture%inter_diameter, input_data, ewalds_prefix//"Inter 12.")
         call ewald_factory_create(ewalds%inters(1), ewalds%inter_micro, environment, &
@@ -215,29 +215,29 @@ contains
 
         logical :: wall_used
         logical :: mixture_exists, mixture_is_dipolar
-        logical :: component_1_exist, component_1_is_dipolar
-        logical :: component_2_exist, component_2_is_dipolar
+        logical :: component_1_exists, component_1_is_dipolar
+        logical :: component_2_exists, component_2_is_dipolar
 
         wall_used = use_walls(walls_potential)
-        component_1_exist = particles_exist(mixture%components(1)%number)
-        component_1_is_dipolar = particles_are_dipolar(mixture%components(1)%dipolar_moments)
+        component_1_exists = component_exists(mixture%components(1)%number)
+        component_1_is_dipolar = component_is_dipolar(mixture%components(1)%dipolar_moments)
         call observable_writers_factory_create(observable_writers%intras(1)%energy, wall_used, &
-            component_1_exist, component_1_is_dipolar, "component_1_energy.out")
-        component_2_exist = particles_exist(mixture%components(2)%number)
-        component_2_is_dipolar = particles_are_dipolar(mixture%components(2)%dipolar_moments)
+            component_1_exists, component_1_is_dipolar, "component_1_energy.out")
+        component_2_exists = component_exists(mixture%components(2)%number)
+        component_2_is_dipolar = component_is_dipolar(mixture%components(2)%dipolar_moments)
         call observable_writers_factory_create(observable_writers%intras(2)%energy, wall_used, &
-            component_2_exist, component_2_is_dipolar, "component_2_energy.out")
-        mixture_exists = component_1_exist .and. component_2_exist
+            component_2_exists, component_2_is_dipolar, "component_2_energy.out")
+        mixture_exists = component_1_exists .and. component_2_exists
         mixture_is_dipolar = component_1_is_dipolar .and. component_2_is_dipolar
         call observable_writers_factory_create(observable_writers%inter_energy, mixture_exists, &
             mixture_is_dipolar, "inter_12_energy.out")
 
         call observable_writers_factory_create(observable_writers%intras(1)%changes, &
             changes(1)%moved_positions, changes(1)%rotated_orientations, &
-            changes(1)%particles_exchange, "component_1_success.out")
+            changes(1)%component_exchange, "component_1_success.out")
         call observable_writers_factory_create(observable_writers%intras(2)%changes, &
             changes(2)%moved_positions, changes(2)%rotated_orientations, &
-            changes(2)%particles_exchange, "component_2_success.out")
+            changes(2)%component_exchange, "component_2_success.out")
 
         call observable_writers_factory_create(observable_writers%intras(1)%coordinates, &
             "component_1_coordinates", mixture%components(1)%positions, &
@@ -275,7 +275,7 @@ contains
 
     subroutine set_metropolis(metropolis, components, short_potentials, ewalds)
         type(Metropolis_Wrapper), intent(inout) :: metropolis
-        type(Particles_Wrapper), intent(in) :: components(num_components)
+        type(Component_Wrapper), intent(in) :: components(num_components)
         type(Mixture_Short_Potentials_Wrapper), intent(in) :: short_potentials
         type(Mixture_Ewald_Wrapper), intent(in) :: ewalds
 
