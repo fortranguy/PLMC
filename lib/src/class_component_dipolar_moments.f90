@@ -2,6 +2,7 @@ module class_component_dipolar_moments
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
+use class_coordinates, only: Abstract_Coordinates
 use class_component_moment_norm, only: Abstract_Component_Moment_Norm
 use class_component_orientations, only: Abstract_Component_Orientations
 
@@ -9,7 +10,7 @@ implicit none
 
 private
 
-    type, abstract, public :: Abstract_Component_Dipolar_Moments
+    type, extends(Abstract_Coordinates), abstract, public :: Abstract_Component_Dipolar_Moments
     private
         class(Abstract_Component_Moment_Norm), pointer :: moment_norm
         class(Abstract_Component_Orientations), pointer :: orientations
