@@ -1,4 +1,4 @@
-\begin{scope}[shift={($(Particles.north) + (42 cm, 55 cm)$)}]
+\begin{scope}[shift={($(Component.north) + (42 cm, 55 cm)$)}]
     \begin{package}{Dipolar interactions}
     
         \begin{scope}[local bounding box=DipolarInteraction]
@@ -39,10 +39,10 @@
         \end{scope}
         
         \begin{scope}[shift={($(DipolarInteraction.south) + (-19.5 cm, -5 cm)$)}]
-            \begin{abstractclass}[text width=\largeTextWidth]{EwaldRealParticles}{0, 0}
+            \begin{abstractclass}[text width=\largeTextWidth]{EwaldRealComponent}{0, 0}
                 \operation{construct(periodicBox\type{PeriodicBox},
-                    particlesPositions\type{ParticlesPositions},
-                    particlesDipolarMoments\type{ParticlesDipolarMoments},
+                    componentPositions\type{ComponentPositions},
+                    componentDipolarMoments\type{ComponentDipolarMoments},
                     ewaldRealPair\type{EwaldRealPair})}
                 \operation{destroy()}
                 \operation{visit(energy\type{double}, particle\type{Particle},
@@ -52,7 +52,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(EwaldRealParticles.south) + (0 cm, -1.5 cm)$)}]
+        \begin{scope}[shift={($(EwaldRealComponent.south) + (0 cm, -1.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{EwaldRealPair}{0, 0}
                 \operation{construct(domain\type{PotentialDomain}, alpha\type{double})}
                 \operation{destroy()}
@@ -209,7 +209,7 @@
 \end{scope}
 
 \begin{scope}[on background layer]
-    \aggregation{DipolarInteractionFacade}{ewaldReal}{2}{EwaldRealParticles}
+    \aggregation{DipolarInteractionFacade}{ewaldReal}{2}{EwaldRealComponent}
     \aggregation{DipolarInteractionFacade}{ewaldReci}{2}{EwaldReci}
     \aggregation{DipolarInteractionFacade}{dlc}{2}{DipolarLayerCorrection}
     \aggregation{DipolarInteractionFacade}{ewaldSelf}{1}{EwaldSelf}
@@ -217,7 +217,7 @@
 
     \aggregation{DipolarInteraction}{box}{1}{PeriodicBox}
 
-    %\aggregation{EwaldRealParticles}{dipSpheres}{1}{DipolarSpheres}
+    %\aggregation{EwaldRealComponent}{dipSpheres}{1}{DipolarSpheres}
 
     %\aggregation{EwaldReci}{dipSpheres}{1}{DipolarSpheres}
 
@@ -225,8 +225,8 @@
 
     %\aggregation{EwaldSelf}{dipSpheres}{1}{DipolarSpheres}
 
-    \aggregation{EwaldBound}{totalMoment}{1}{ParticlesTotalMoment}
+    \aggregation{EwaldBound}{totalMoment}{1}{ComponentTotalMoment}
 
-    \aggregation{FieldInteraction}{totalMoment}{1}{ParticlesTotalMoment}
+    \aggregation{FieldInteraction}{totalMoment}{1}{ComponentTotalMoment}
     \aggregation{FieldInteraction}{extField}{1}{ExternalField}
 \end{scope}[on background layer]
