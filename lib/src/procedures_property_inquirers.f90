@@ -181,18 +181,6 @@ contains
         end if
     end function component_is_dipolar_from_json
 
-    pure logical function component_is_dipolar_from_moment_norm(component_moment_norm) &
-        result(component_is_dipolar)
-        class(Abstract_Component_Moment_Norm), intent(in) :: component_moment_norm
-
-        select type (component_moment_norm)
-            type is (Concrete_Component_Moment_Norm)
-                component_is_dipolar = .true.
-            class default
-                component_is_dipolar = .false.
-        end select
-    end function component_is_dipolar_from_moment_norm
-
     pure logical function component_has_orientations(component_orientations)
         class(Abstract_Component_Coordinates), intent(in) :: component_orientations
 

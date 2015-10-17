@@ -76,14 +76,18 @@ contains
     pure subroutine Abstract_Weighted_Structure_set_weight(this)
         class(Abstract_Weighted_Structure), intent(inout) :: this
 
+        real(DP) :: box_size(num_dimensions)
         integer :: n_1, n_2, n_3
         real(DP), dimension(num_dimensions) :: wave_vector
         real(DP) :: wave_squared
 
+        box_size = this%periodic_box%get_size()
         do n_3 = -this%reci_numbers(3), this%reci_numbers(3)
+            wave_vector(3) = 2._DP*PI * real(n_3, DP) / box_size(3)
         do n_2 = -this%reci_numbers(2), this%reci_numbers(2)
+            wave_vector(2) = 2._DP*PI * real(n_2, DP) / box_size(2)
         do n_1 = -this%reci_numbers(1), this%reci_numbers(1)
-            wave_vector = 2._DP*PI * real([n_1, n_2, n_3], DP) / this%periodic_box%get_size()
+            wave_vector(1) = 2._DP*PI * real(n_1, DP) / box_size(1)
             if (n_1 /= 0 .or. n_2 /= 0 .or. n_3 /= 0) then
                 wave_squared = dot_product(wave_vector, wave_vector)
                 this%weight(n_1, n_2, n_3) = exp(-wave_squared/this%alpha**2/4._DP) / wave_squared
@@ -120,12 +124,14 @@ contains
         complex(DP), dimension(-this%reci_numbers(2):this%reci_numbers(2)) :: fourier_position_2
         complex(DP), dimension(-this%reci_numbers(3):this%reci_numbers(3)) :: fourier_position_3
 
+        real(DP) :: box_size(num_dimensions)
         real(DP), dimension(num_dimensions) :: relative_position
         real(DP), dimension(num_dimensions) :: wave_vector
         real(DP) :: wave_dot_moment
         integer :: n_1, n_2, n_3
         integer :: i_particle
 
+        box_size = this%periodic_box%get_size()
         this%structure(:, :, :) = cmplx(0._DP, 0._DP, DP)
         do i_particle = 1, this%component_positions%get_num()
             relative_position(:) = 2._DP*PI * this%component_positions%get(i_particle) / &
@@ -134,9 +140,11 @@ contains
             call set_fourier(fourier_position_2, this%reci_numbers(2), relative_position(2))
             call set_fourier(fourier_position_3, this%reci_numbers(3), relative_position(3))
             do n_3 = -this%reci_numbers(3), this%reci_numbers(3)
+                wave_vector(3) = 2._DP*PI * real(n_3, DP) / box_size(3)
             do n_2 = -this%reci_numbers(2), this%reci_numbers(2)
+                wave_vector(2) = 2._DP*PI * real(n_2, DP) / box_size(2)
             do n_1 = -this%reci_numbers(1), this%reci_numbers(1)
-                wave_vector = 2._DP*PI * real([n_1, n_2, n_3], DP) / this%periodic_box%get_size()
+                wave_vector(1) = 2._DP*PI * real(n_1, DP) / box_size(1)
                 fourier_position = fourier_position_1(n_1) * fourier_position_2(n_2) * &
                     fourier_position_3(n_3)
                 wave_dot_moment = dot_product(wave_vector, &

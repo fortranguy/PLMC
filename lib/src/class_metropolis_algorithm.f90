@@ -28,8 +28,4 @@ private
 
     end interface
 
-    type, public :: Metropolis_Algorithm_Pointer
-        class(Abstract_Metropolis_Algorithm), pointer :: ptr => null()
-    end type Metropolis_Algorithm_Pointer
-
 end module class_metropolis_algorithm
