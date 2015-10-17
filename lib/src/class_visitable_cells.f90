@@ -275,8 +275,8 @@ contains
         do local_i1 = -nums_local_cells(1)/2, nums_local_cells(1)/2
             i_local_cell = this%neighbours(:, local_i1, local_i2, local_i3, &
                 i_cell(1), i_cell(2), i_cell(3))
-            call this%visitable_lists(i_local_cell(1), i_local_cell(2), &
-                i_local_cell(3))%visit(overlap, energy_i, particle, this%pair_potential, same_type)
+            call this%visitable_lists(i_local_cell(1), i_local_cell(2), i_local_cell(3))%&
+                visit(overlap, energy_i, particle, this%pair_potential, same_type)
             if (overlap) return
             energy = energy + energy_i
         end do
@@ -293,10 +293,10 @@ contains
         from_i_cell = this%index(from%position)
         to_i_cell = this%index(to%position)
         if (any(from_i_cell /= to_i_cell)) then
-            call this%visitable_lists(from_i_cell(1), from_i_cell(2), &
-                from_i_cell(3))%remove(from%i)
-            call this%visitable_lists(to_i_cell(1), to_i_cell(2), &
-                to_i_cell(3))%add(to%i)
+            call this%visitable_lists(from_i_cell(1), from_i_cell(2), from_i_cell(3))%&
+                remove(from%i)
+            call this%visitable_lists(to_i_cell(1), to_i_cell(2), to_i_cell(3))%&
+                add(to%i)
         end if
     end subroutine Abstract_Visitable_Cells_move
 

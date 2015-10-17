@@ -6,7 +6,7 @@ use class_walls_potential, only: Abstract_Walls_Potential
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use class_component_coordinates, only: Abstract_Component_Coordinates
 use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
-use types_component_wrapper, only: Mixture_Wrapper
+use types_component_wrapper, only: Mixture_Wrapper_Old
 use class_pair_potential, only: Abstract_Pair_Potential
 use class_component_potential, only: Abstract_Component_Potential
 use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper
@@ -35,7 +35,7 @@ contains
         class(Abstract_Walls_Potential), intent(in) :: walls_potential
         type(Mixture_Short_Potentials_Wrapper), intent(in) :: short_potentials
         type(Mixture_Ewald_Wrapper), intent(in) :: ewalds
-        type(Mixture_Wrapper), intent(in) :: mixture
+        type(Mixture_Wrapper_Old), intent(in) :: mixture
 
         call plmc_visit(observables, walls_potential, short_potentials, mixture)
         call plmc_visit(observables, ewalds, mixture)
@@ -45,7 +45,7 @@ contains
         type(Mixture_Observables_Wrapper), intent(inout) :: observables
         class(Abstract_Walls_Potential), intent(in) :: walls_potential
         type(Mixture_Short_Potentials_Wrapper), intent(in) :: short_potentials
-        type(Mixture_Wrapper), intent(in) :: mixture
+        type(Mixture_Wrapper_Old), intent(in) :: mixture
 
         logical :: overlap
         real(DP) :: inter_energy_1, inter_energy_2
@@ -121,7 +121,7 @@ contains
     pure subroutine visit_mixture_ewald(observables, ewalds, mixture)
         type(Mixture_Observables_Wrapper), intent(inout) :: observables
         type(Mixture_Ewald_Wrapper), intent(in) :: ewalds
-        type(Mixture_Wrapper), intent(in) :: mixture
+        type(Mixture_Wrapper_Old), intent(in) :: mixture
 
         real(DP) :: real_energy_1, real_energy_2
         real(DP) :: inter_energy_1, inter_energy_2

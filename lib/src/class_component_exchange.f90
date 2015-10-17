@@ -31,7 +31,7 @@ private
 
 contains
 
-!implemetation Abstract_Component_Exchange
+!implementation Abstract_Component_Exchange
 
     subroutine Abstract_Component_Exchange_construct(this, component)
         class(Abstract_Component_Exchange), intent(out) :: this
@@ -67,9 +67,9 @@ contains
         call this%component%number%set(this%component%number%get() - 1)
     end subroutine Abstract_Component_Exchange_remove
 
-!end implemetation Abstract_Component_Exchange
+!end implementation Abstract_Component_Exchange
 
-!implemetation Null_Component_Exchange
+!implementation Null_Component_Exchange
 
     subroutine Null_Component_Exchange_construct(this, component)
         class(Null_Component_Exchange), intent(out) :: this
@@ -90,6 +90,6 @@ contains
         integer, intent(in) :: i_particle
     end subroutine Null_Component_Exchange_remove
 
-!end implemetation Null_Component_Exchange
+!end implementation Null_Component_Exchange
 
 end module class_component_exchange

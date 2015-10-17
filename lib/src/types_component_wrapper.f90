@@ -15,18 +15,18 @@ private
 
     type, public :: Component_Wrapper
         class(Abstract_Component_Number), allocatable :: number
-        class(Abstract_Component_Diameter), allocatable :: diameter
-        class(Abstract_Component_Diameter), allocatable :: wall_diameter
-        class(Abstract_Component_Moment_Norm), allocatable :: moment_norm
+        class(Abstract_Component_Diameter), allocatable :: diameter ! to remove
+        class(Abstract_Component_Diameter), allocatable :: wall_diameter ! to remove
+        class(Abstract_Component_Moment_Norm), allocatable :: moment_norm ! to remove
         class(Abstract_Component_Coordinates), allocatable :: positions, orientations
         class(Abstract_Component_Chemical_Potential), allocatable :: chemical_potential
         class(Abstract_Component_Dipolar_Moments), allocatable :: dipolar_moments
         class(Abstract_Component_Total_Moment), allocatable :: total_moment
     end type Component_Wrapper
 
-    type, public :: Mixture_Wrapper
+    type, public :: Mixture_Wrapper_Old
         type(Component_Wrapper) :: components(num_components)
         class(Abstract_Component_Diameter), allocatable :: inter_diameter
-    end type Mixture_Wrapper
+    end type Mixture_Wrapper_Old
 
 end module types_component_wrapper

@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: output_unit
 use data_constants, only: num_components
 use json_module, only: json_file
 use types_environment_wrapper, only: Environment_Wrapper
-use types_component_wrapper, only: Mixture_Wrapper
+use types_component_wrapper, only: Mixture_Wrapper_Old
 use types_changes_wrapper, only: Changes_Wrapper
 use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper
 use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
@@ -21,7 +21,7 @@ use module_plmc_iterations, only: num_tuning_steps, num_steps, plmc_set_num_step
 implicit none
 
     type(Environment_Wrapper) :: environment
-    type(Mixture_Wrapper) :: mixture
+    type(Mixture_Wrapper_Old) :: mixture
     type(Changes_Wrapper) :: changes(num_components)
     type(Mixture_Short_Potentials_Wrapper) :: short_potentials
     type(Mixture_Ewald_Wrapper) :: ewalds

@@ -1,0 +1,43 @@
+module class_minimum_distance
+
+use, intrinsic :: iso_fortran_env, only: DP => REAL64
+use procedures_checks, only: check_positive
+
+implicit none
+
+private
+
+    type, abstract, public :: Abstract_Minimum_Distance
+    private
+        real(DP) :: min_distance
+    contains
+        procedure :: set => Abstract_Minimum_Distance_set
+        procedure :: get => Abstract_Minimum_Distance_get
+    end type Abstract_Minimum_Distance
+
+    type, extends(Abstract_Minimum_Distance), public :: Concrete_Minimum_Distance
+
+    end type Concrete_Minimum_Distance
+
+contains
+
+!implementation Abstract_Minimum_Distance
+
+    subroutine Abstract_Minimum_Distance_set(this, min_distance)
+        class(Abstract_Minimum_Distance), intent(inout) :: this
+        real(DP), intent(in) :: min_distance
+
+        call check_positive("Abstract_Minimum_Distance", "min_distance", min_distance)
+        this%min_distance = min_distance
+    end subroutine Abstract_Minimum_Distance_set
+
+    pure function Abstract_Minimum_Distance_get(this) result(min_distance)
+        class(Abstract_Minimum_Distance), intent(in) :: this
+        real(DP) :: min_distance
+
+        min_distance = this%min_distance
+    end function Abstract_Minimum_Distance_get
+
+!end implementation Abstract_Minimum_Distance
+
+end module class_minimum_distance

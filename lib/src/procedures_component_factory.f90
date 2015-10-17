@@ -21,7 +21,7 @@ use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments, &
     Concrete_Component_Dipolar_Moments, Null_Component_Dipolar_Moments
 use class_component_total_moment, only: Abstract_Component_Total_Moment, &
     Concrete_Component_Total_Moment, Null_Component_Total_Moment
-use types_component_wrapper, only: Component_Wrapper, Mixture_Wrapper
+use types_component_wrapper, only: Component_Wrapper, Mixture_Wrapper_Old
 use procedures_property_inquirers, only: use_walls, component_exists, component_is_dipolar, &
     component_can_exchange
 
@@ -95,7 +95,7 @@ contains
 
         character(len=:), allocatable :: data_field
         logical :: data_found
-        integer :: num_component
+        integer :: num_component ! ambiguous
 
         if (exist) then
             data_field = prefix//"number"

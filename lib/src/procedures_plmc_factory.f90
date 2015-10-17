@@ -1,7 +1,7 @@
 module procedures_plmc_factory
 
 use data_constants, only: num_components
-use data_wrappers_prefix, only:environment_prefix, mixtures_prefix, changes_prefix, &
+use data_wrappers_prefix, only:environment_prefix, mixture_prefix, changes_prefix, &
     short_potentials_prefix, ewalds_prefix
 use json_module, only: json_file, json_initialize
 use procedures_command_arguments, only: set_filename_from_argument
@@ -10,7 +10,7 @@ use class_periodic_box, only: Abstract_Periodic_Box
 use class_walls_potential, only: Abstract_Walls_Potential
 use types_environment_wrapper, only: Environment_Wrapper
 use procedures_environment_factory, only: environment_factory_create, environment_factory_destroy
-use types_component_wrapper, only: Mixture_Wrapper, Component_Wrapper
+use types_component_wrapper, only: Mixture_Wrapper_Old, Component_Wrapper
 use procedures_component_factory, only: component_factory_create, component_factory_destroy
 use types_changes_wrapper, only: Changes_Wrapper
 use procedures_changes_factory, only: changes_factory_create, changes_factory_destroy
@@ -94,25 +94,25 @@ contains
     end subroutine destroy_environment
 
     subroutine create_mixture(mixture, environment, input_data)
-        type(Mixture_Wrapper), intent(out) :: mixture
+        type(Mixture_Wrapper_Old), intent(out) :: mixture
         type(Environment_Wrapper), intent(in) :: environment
         type(json_file), intent(inout) :: input_data
 
         logical :: mixture_exists
 
         call component_factory_create(mixture%components(1), environment, input_data, &
-            mixtures_prefix//"Component 1.")
+            mixture_prefix//"Component 1.")
         call component_factory_create(mixture%components(2), environment, input_data, &
-            mixtures_prefix//"Component 2.")
+            mixture_prefix//"Component 2.")
         mixture_exists = component_exists(mixture%components(1)%number) .and. &
             component_exists(mixture%components(2)%number)
         call component_factory_create(mixture%inter_diameter, mixture_exists, &
             mixture%components(1)%diameter, mixture%components(2)%diameter, input_data, &
-            mixtures_prefix//"Inter 12.")
+            mixture_prefix//"Inter 12.")
     end subroutine create_mixture
 
     subroutine destroy_mixture(mixture)
-        type(Mixture_Wrapper), intent(inout) :: mixture
+        type(Mixture_Wrapper_Old), intent(inout) :: mixture
 
         call component_factory_destroy(mixture%inter_diameter)
         call component_factory_destroy(mixture%components(2))
@@ -141,7 +141,7 @@ contains
     subroutine create_short_potentials(short_potentials, environment, mixture, input_data)
         type(Mixture_Short_Potentials_Wrapper), intent(out) :: short_potentials
         type(Environment_Wrapper), intent(in) :: environment
-        type(Mixture_Wrapper), intent(in) :: mixture
+        type(Mixture_Wrapper_Old), intent(in) :: mixture
         type(json_file), intent(inout) :: input_data
 
         logical :: mixture_exists
@@ -175,7 +175,7 @@ contains
     subroutine create_ewalds(ewalds, environment, mixture, input_data)
         type(Mixture_Ewald_Wrapper), intent(out) :: ewalds
         type(Environment_Wrapper), intent(in) :: environment
-        type(Mixture_Wrapper), intent(in) :: mixture
+        type(Mixture_Wrapper_Old), intent(in) :: mixture
         type(json_file), intent(inout) :: input_data
 
         logical :: mixture_is_dipolar
@@ -209,7 +209,7 @@ contains
         input_data)
         type(Mixture_Observable_Writers_Wrapper), intent(out) :: observable_writers
         class(Abstract_Walls_Potential), intent(in) :: walls_potential
-        type(Mixture_Wrapper), intent(in) :: mixture
+        type(Mixture_Wrapper_Old), intent(in) :: mixture
         type(Changes_Wrapper), intent(in) :: changes(num_components)
         type(json_file), intent(inout) :: input_data
 
