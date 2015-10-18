@@ -48,6 +48,8 @@ interface short_potential_factory_create
 end interface short_potential_factory_create
 
 interface short_potential_factory_destroy
+    module procedure :: deallocate_and_destroy_inter_pair_potentials
+    module procedure :: deallocate_and_destroy_pair_potentials
     module procedure :: destroy_and_deallocate_cells
     module procedure :: deallocate_list
     module procedure :: destroy_and_deallocate_component
@@ -96,7 +98,7 @@ contains
 
     end subroutine short_potential_factory_create_all
 
-    subroutine allocate_and_set_pair_inter_pair_potentials(pair_potentials, interact, &
+    subroutine allocate_and_construct_inter_pair_potentials(pair_potentials, interact, &
         min_distances, input_data, prefix)
         type(Pair_Potentials_Wrapper), allocatable, intent(out) :: pair_potentials(:)
         logical, intent(in) :: interact
@@ -129,10 +131,10 @@ contains
                 call short_potential_factory_destroy(expression)
             end do
         end do
-    end subroutine allocate_and_set_pair_inter_pair_potentials
+    end subroutine allocate_and_construct_inter_pair_potentials
 
-    subroutine allocate_and_set_wall_pair_potentials(pair_potentials, interact, min_distances, &
-        input_data, prefix)
+    subroutine allocate_and_construct_wall_pair_potentials(pair_potentials, interact, &
+        min_distances, input_data, prefix)
         type(Pair_Potential_Wrapper), allocatable, intent(out) :: pair_potentials(:)
         logical, intent(in) :: interact
         type(Minimum_Distance_Wrapper), intent(in) :: min_distances(:)
@@ -155,7 +157,7 @@ contains
             deallocate(pair_prefix)
             call short_potential_factory_destroy(expression)
         end do
-    end subroutine allocate_and_set_wall_pair_potentials
+    end subroutine allocate_and_construct_wall_pair_potentials
 
     subroutine short_potential_factory_create_macro(short_potential_macro, inter_pair, &
         periodic_box, component_positions, input_data, prefix)
@@ -409,6 +411,32 @@ contains
         call short_potential_factory_destroy(short_potential%wall_pair)
         call short_potential_factory_destroy(short_potential%pair)
     end subroutine short_potential_factory_destroy_all_old
+
+    subroutine deallocate_and_destroy_inter_pair_potentials(pair_potentials)
+        type(Pair_Potentials_Wrapper), allocatable, intent(inout) :: pair_potentials(:)
+
+        integer :: i_component
+
+        if (allocated(pair_potentials)) then
+            do i_component = size(pair_potentials), 1, -1
+                call short_potential_factory_destroy(pair_potentials(i_component)%with_components)
+            end do
+            deallocate(pair_potentials)
+        end if
+    end subroutine deallocate_and_destroy_inter_pair_potentials
+
+    subroutine deallocate_and_destroy_pair_potentials(pair_potentials)
+        type(Pair_Potential_Wrapper), allocatable, intent(inout) :: pair_potentials(:)
+
+        integer :: i_component
+
+        if (allocated(pair_potentials)) then
+            do i_component = size(pair_potentials), 1, -1
+                call short_potential_factory_destroy(pair_potentials(i_component)%pair_potential)
+            end do
+            deallocate(pair_potentials)
+        end if
+    end subroutine deallocate_and_destroy_pair_potentials
 
     subroutine deallocate_expression(potential_expression)
         class(Abstract_Potential_Expression), allocatable, intent(inout) :: potential_expression

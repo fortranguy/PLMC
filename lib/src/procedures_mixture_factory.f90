@@ -144,7 +144,7 @@ contains
     end subroutine allocate_and_set_min_distance
 
     subroutine deallocate_inter_min_distances(min_distances)
-        type(Minimum_Distances_Wrapper), allocatable, intent(out) :: min_distances(:)
+        type(Minimum_Distances_Wrapper), allocatable, intent(inout) :: min_distances(:)
 
         integer :: i_component
 
