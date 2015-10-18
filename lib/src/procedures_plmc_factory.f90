@@ -15,8 +15,8 @@ use procedures_component_factory, only: component_factory_create, component_fact
 use types_changes_wrapper, only: Changes_Wrapper
 use procedures_changes_factory, only: changes_factory_create, changes_factory_destroy
 use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper
-use procedures_short_potentials_factory, only: short_potential_factory_create, &
-    short_potential_factory_destroy
+use procedures_short_potentials_factory, only: short_potentials_factory_create, &
+    short_potentials_factory_destroy
 use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
 use procedures_ewald_factory, only: ewald_factory_create, ewald_factory_destroy
 use module_changes_success, only: reset_counter => Concrete_Changes_Counter_reset, &
@@ -145,31 +145,11 @@ contains
         type(json_file), intent(inout) :: input_data
 
         logical :: mixture_exists
-
-        call short_potential_factory_create(short_potentials%intras(1), environment, &
-            mixture%components(1), input_data, short_potentials_prefix//"Component 1.")
-        call short_potential_factory_create(short_potentials%intras(2), environment, &
-            mixture%components(2), input_data, short_potentials_prefix//"Component 2.")
-        mixture_exists = component_exists(mixture%components(1)%number) .and. &
-            component_exists(mixture%components(2)%number)
-        call short_potential_factory_create(short_potentials%inter_pair, mixture_exists, &
-            mixture%inter_diameter, input_data, short_potentials_prefix//"Inter 12.")
-        call short_potential_factory_create(short_potentials%inters(1), &
-            short_potentials%inter_pair, environment%periodic_box, &
-            mixture%components(1)%positions, input_data, short_potentials_prefix//"Inter 12.")
-        call short_potential_factory_create(short_potentials%inters(2), &
-            short_potentials%inter_pair, environment%periodic_box, &
-            mixture%components(2)%positions, input_data, short_potentials_prefix//"Inter 12.")
     end subroutine create_short_potentials
 
     subroutine destroy_short_potentials(short_potentials)
         type(Mixture_Short_Potentials_Wrapper), intent(inout) :: short_potentials
 
-        call short_potential_factory_destroy(short_potentials%inters(2))
-        call short_potential_factory_destroy(short_potentials%inters(1))
-        call short_potential_factory_destroy(short_potentials%inter_pair)
-        call short_potential_factory_destroy(short_potentials%intras(2))
-        call short_potential_factory_destroy(short_potentials%intras(1))
     end subroutine destroy_short_potentials
 
     subroutine create_ewalds(ewalds, environment, mixture, input_data)

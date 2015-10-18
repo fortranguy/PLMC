@@ -38,9 +38,9 @@ private
 
     type, public :: Short_Potentials_Wrapper
         !macro visitor
-        type(Pair_Potentials_Wrapper), allocatable :: inter_pair_potentials(:)
-        class(Abstract_Visitable_Cells), allocatable :: inter_visitable_cells(:, :)
-        type(Pair_Potential_Wrapper), allocatable :: wall_pair_potentials(:)
+        type(Pair_Potentials_Wrapper), allocatable :: inter_pairs(:)
+        class(Abstract_Visitable_Cells), allocatable :: inter_cells(:, :)
+        type(Pair_Potential_Wrapper), allocatable :: wall_pairs(:)
     end type Short_Potentials_Wrapper
 
 end module types_short_potential_wrapper

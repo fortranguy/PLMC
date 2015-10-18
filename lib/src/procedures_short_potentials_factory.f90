@@ -1,18 +1,14 @@
 module procedures_short_potentials_factory
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use data_wrappers_prefix, only: environment_prefix
 use json_module, only: json_file
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_data_found
 use class_number_to_string, only: Concrete_Number_to_String
 use class_periodic_box, only: Abstract_Periodic_Box, &
     XYZ_Periodic_Box, XY_Periodic_Box
-use class_floor_penetration, only: Abstract_Floor_Penetration
 use types_environment_wrapper, only: Environment_Wrapper
-use class_component_diameter, only: Abstract_Component_Diameter ! to remove
 use class_minimum_distance, only: Abstract_Minimum_Distance
-use class_component_coordinates, only: Abstract_Component_Coordinates
 use types_component_wrapper, only: Component_Wrapper
 use types_mixture_wrapper, only: Minimum_Distance_Wrapper, Minimum_Distances_Wrapper, &
     Mixture_Wrapper
@@ -21,330 +17,120 @@ use class_potential_expression, only: Abstract_Potential_Expression, &
 use types_potential_domain, only: Concrete_Potential_Domain
 use class_pair_potential, only: Abstract_Pair_Potential, &
     Null_Pair_Potential, Tabulated_Pair_Potential, Raw_Pair_Potential
-use class_component_potential, only: Abstract_Component_Potential, &
-    Concrete_Component_Potential, Null_Component_Potential
 use class_visitable_list, only: Abstract_Visitable_List, &
     Null_Visitable_List, Concrete_Visitable_List, Concrete_Visitable_Array
 use class_visitable_cells, only: Abstract_Visitable_Cells, &
     Null_Visitable_Cells, XYZ_PBC_Visitable_Cells, XY_PBC_Visitable_Cells
-use types_short_potential_wrapper, only: Short_Potential_Wrapper, Short_Potential_Macro_Wrapper, &
-    Pair_Potential_Wrapper, Pair_Potentials_Wrapper, Short_Potentials_Wrapper
-use procedures_property_inquirers, only: use_walls, component_exists, component_has_positions, &
-    component_interacts
+use types_short_potential_wrapper, only: Pair_Potential_Wrapper, Pair_Potentials_Wrapper, &
+    Short_Potentials_Wrapper
+use procedures_property_inquirers, only: use_walls
 
 implicit none
 
 private
-public :: short_potential_factory_create, short_potential_factory_destroy
+public :: short_potentials_factory_create, short_potentials_factory_destroy
 
-interface short_potential_factory_create
-    module procedure :: short_potential_factory_create_all_old
-    module procedure :: short_potential_factory_create_macro
-    module procedure :: short_potential_factory_create_inter_pair
-    module procedure :: allocate_and_set_expression
-    module procedure :: allocate_and_construct_pair
-    module procedure :: allocate_and_construct_component
-    module procedure :: allocate_and_construct_cells
-end interface short_potential_factory_create
+interface short_potentials_factory_create
+    module procedure :: short_potentials_factory_create_all
+    module procedure :: create_inter_cells
+    module procedure :: create_inter_pairs
+    module procedure :: create_wall_pairs
+    module procedure :: create_pair
+    module procedure :: create_expression
+end interface short_potentials_factory_create
 
-interface short_potential_factory_destroy
-    module procedure :: destroy_inter_pair_potentials
-    module procedure :: destroy_pair_potentials
-    module procedure :: destroy_and_deallocate_cells
-    module procedure :: destroy_and_deallocate_component
-    module procedure :: destroy_and_deallocate_pair
-    module procedure :: deallocate_expression
-    module procedure :: short_potential_factory_destroy_macro
-    module procedure :: short_potential_factory_destroy_all_old
-end interface short_potential_factory_destroy
+interface short_potentials_factory_destroy
+    module procedure :: destroy_expression
+    module procedure :: destroy_pair
+    module procedure :: destroy_pairs
+    module procedure :: destroy_inter_pairs
+    module procedure :: destroy_inter_cells
+    module procedure :: short_potentials_factory_destroy_all
+end interface short_potentials_factory_destroy
 
 contains
 
-    subroutine short_potential_factory_create_all_old(short_potential, environment, component, &
+    subroutine short_potentials_factory_create_all(short_potentials, environment, mixture, &
         input_data, prefix)
-        type(Short_Potential_Wrapper), intent(out) :: short_potential
+        type(Short_Potentials_Wrapper), intent(out) :: short_potentials
         type(Environment_Wrapper), intent(in) :: environment
-        type(Component_Wrapper), intent(in) :: component
+        type(Mixture_Wrapper), intent(in) :: mixture
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        class(Abstract_Potential_Expression), allocatable :: expression, wall_expression
-        class(Abstract_Visitable_List), allocatable :: list
         logical :: interact, interact_with_walls
+        class(Abstract_Visitable_List), allocatable :: list
 
         interact = .true.
-        call short_potential_factory_create(expression, interact, input_data, prefix)
-        !call short_potential_factory_create(short_potential%pair, interact, component%diameter, &
-        !    expression, input_data, prefix)
-        !call short_potential_factory_destroy(expression)
-        interact_with_walls = interact .and. use_walls(input_data, environment_prefix)
-        call short_potential_factory_create(wall_expression, interact_with_walls, &
-            input_data, prefix//"With Walls.")
-        !call short_potential_factory_create(short_potential%wall_pair, interact_with_walls, &
-        !    component%wall_diameter, wall_expression, input_data, prefix//"With Walls.")
-        !call short_potential_factory_destroy(wall_expression)
-        call short_potential_factory_create(short_potential%component, environment%periodic_box, &
-            component%positions)
-        interact = component_interacts(short_potential%pair)
-        !call short_potential_factory_create(list, interact, input_data, prefix)
-        call short_potential_factory_create(short_potential%cells, interact, list, &
-            environment%periodic_box, component%positions, short_potential%pair)
-        !call short_potential_factory_destroy(list)
-    end subroutine short_potential_factory_create_all_old
+        call short_potentials_factory_create(short_potentials%inter_pairs, interact, mixture%&
+            inter_min_distances, input_data, prefix)
+        interact_with_walls = interact .and. use_walls(environment%walls_potential)
+        call short_potentials_factory_create(short_potentials%wall_pairs, interact_with_walls, &
+            mixture%wall_min_distances, input_data, prefix)
+        call allocate_list(list, interact, input_data, prefix)
+        call short_potentials_factory_create(short_potentials%inter_cells, interact, &
+            environment%periodic_box, mixture%components, short_potentials%inter_pairs, list)
+        call deallocate_list(list)
+    end subroutine short_potentials_factory_create_all
 
-    subroutine short_potential_factory_create_all(short_potentials)
-        type(Short_Potentials_Wrapper), intent(out) :: short_potentials
+    subroutine short_potentials_factory_destroy_all(short_potentials)
+        type(Short_Potentials_Wrapper), intent(inout) :: short_potentials
 
-    end subroutine short_potential_factory_create_all
+        call short_potentials_factory_destroy(short_potentials%inter_cells)
+        call short_potentials_factory_destroy(short_potentials%wall_pairs)
+        call short_potentials_factory_destroy(short_potentials%inter_pairs)
+    end subroutine short_potentials_factory_destroy_all
 
-    subroutine create_inter_pair_potentials(pair_potentials, interact, &
-        min_distances, input_data, prefix)
-        type(Pair_Potentials_Wrapper), allocatable, intent(out) :: pair_potentials(:)
+    subroutine create_inter_cells(cells, interact, periodic_box, components, pairs, list)
+        class(Abstract_Visitable_Cells), allocatable, intent(out) :: cells(:, :)
         logical, intent(in) :: interact
-        type(Minimum_Distances_Wrapper), intent(in) :: min_distances(:)
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
+        type(Component_Wrapper), intent(in) :: components(:)
+        type(Pair_Potentials_Wrapper), intent(in) :: pairs(:)
+        class(Abstract_Visitable_List), intent(in) :: list
 
         integer :: i_component, j_component
-        class(Abstract_Potential_Expression), allocatable :: expression
-        character(len=:), allocatable :: pair_prefix
-        type(Concrete_Number_to_String) :: string
 
-        allocate(pair_potentials(size(min_distances)))
-        do i_component = 1, size(pair_potentials)
-            allocate(pair_potentials(i_component)%with_components(i_component))
-            do j_component = 1, size(pair_potentials(i_component)%with_components)
-                if (j_component == i_component) then
-                    pair_prefix = prefix//"Component "//string%get(i_component)
-                else
-                    pair_prefix = prefix//"Inter "//string%get(i_component)//string%get(j_component)
-                end if
-                call short_potential_factory_create(expression, interact, input_data, pair_prefix)
-                associate (min_distance => min_distances(i_component)%with_components(j_component)%&
-                        min_distance)
-                    call short_potential_factory_create(pair_potentials(i_component)%&
-                        with_components(j_component)%pair_potential, interact, min_distance, &
-                        expression, input_data, pair_prefix)
+        if (interact) then
+            select type(periodic_box)
+                type is (XYZ_Periodic_Box)
+                    allocate(XYZ_PBC_Visitable_Cells :: cells(size(pairs), size(pairs)))
+                type is (XY_Periodic_Box)
+                    allocate(XY_PBC_Visitable_Cells :: cells(size(pairs), size(pairs)))
+                class default
+                    call error_exit("periodic_box type unknown.")
+            end select
+        else
+            allocate(Null_Visitable_Cells :: cells(size(pairs), &
+                size(pairs)))
+        end if
+
+        do i_component = 1, size(cells, 2)
+            do j_component = 1, size(cells, 1)
+                associate (pair_potential => pairs(i_component)%with_components(j_component)%&
+                        pair_potential)
+                    call cells(j_component, i_component)%construct(list, periodic_box, &
+                        components(i_component)%positions, pair_potential)
                 end associate
-                deallocate(pair_prefix)
-                call short_potential_factory_destroy(expression)
             end do
         end do
-    end subroutine create_inter_pair_potentials
+    end subroutine create_inter_cells
 
-    subroutine create_wall_pair_potentials(pair_potentials, interact, &
-        min_distances, input_data, prefix)
-        type(Pair_Potential_Wrapper), allocatable, intent(out) :: pair_potentials(:)
-        logical, intent(in) :: interact
-        type(Minimum_Distance_Wrapper), intent(in) :: min_distances(:)
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
+    subroutine destroy_inter_cells(cells)
+        class(Abstract_Visitable_Cells), allocatable, intent(inout) :: cells(:, :)
 
-        integer :: i_component
-        class(Abstract_Potential_Expression), allocatable :: expression
-        character(len=:), allocatable :: pair_prefix
-        type(Concrete_Number_to_String) :: string
+        integer :: i_component, j_component
 
-        allocate(pair_potentials(size(min_distances)))
-        do i_component = 1, size(pair_potentials)
-            pair_prefix = prefix//"Component "//string%get(i_component)//".With Walls."
-            call short_potential_factory_create(expression, interact, input_data, pair_prefix)
-            associate (min_distance => min_distances(i_component)%min_distance)
-                call short_potential_factory_create(pair_potentials(i_component)%pair_potential, &
-                    interact, min_distance, expression, input_data, pair_prefix)
-            end associate
-            deallocate(pair_prefix)
-            call short_potential_factory_destroy(expression)
+        do i_component = size(cells, 2), 1, -1
+            do j_component = size(cells, 1), 1, -1
+                call cells(j_component, i_component)%destroy()
+            end do
         end do
-    end subroutine create_wall_pair_potentials
+        deallocate(cells)
+    end subroutine destroy_inter_cells
 
-    subroutine short_potential_factory_create_macro(short_potential_macro, inter_pair, &
-        periodic_box, component_positions, input_data, prefix)
-        type(Short_Potential_Macro_Wrapper), intent(out) :: short_potential_macro
-        class(Abstract_Pair_Potential), intent(in) :: inter_pair
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        class(Abstract_Component_Coordinates), intent(in) :: component_positions
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
-
-        class(Abstract_Visitable_List), allocatable :: list
-        logical :: interact
-
-        interact = component_interacts(inter_pair)
-        !call short_potential_factory_create(list, interact, input_data, prefix)
-        call short_potential_factory_create(short_potential_macro%cells, interact, list, &
-            periodic_box, component_positions, inter_pair)
-        !call short_potential_factory_destroy(list)
-    end subroutine short_potential_factory_create_macro
-
-    subroutine short_potential_factory_create_inter_pair(inter_pair, interact, &
-        component_diameter, input_data, prefix)
-        class(Abstract_Pair_Potential), allocatable, intent(out) :: inter_pair
-        logical, intent(in) :: interact
-        class(Abstract_Component_Diameter), intent(in) :: component_diameter
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
-
-        class(Abstract_Potential_Expression), allocatable :: expression
-
-        !call short_potential_factory_create(expression, interact, input_data, prefix)
-        !call short_potential_factory_create(inter_pair, interact, component_diameter, &
-        !    expression, input_data, prefix)
-        !call short_potential_factory_destroy(expression)
-    end subroutine short_potential_factory_create_inter_pair
-
-    subroutine allocate_and_set_expression(potential_expression, interact, input_data, prefix)
-        class(Abstract_Potential_Expression), allocatable, intent(out) :: potential_expression
-        logical, intent(in) :: interact
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
-
-        call allocate_expression(potential_expression, interact, input_data, prefix)
-        call set_expression(potential_expression, input_data, prefix)
-    end subroutine allocate_and_set_expression
-
-    subroutine allocate_expression(potential_expression, interact, input_data, prefix)
-        class(Abstract_Potential_Expression), allocatable, intent(out) :: potential_expression
-        logical, intent(in) :: interact
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
-
-        character(len=:), allocatable :: data_field, potential_name
-        logical :: data_found
-
-        if (interact) then
-            data_field = prefix//"name"
-            call input_data%get(data_field, potential_name, data_found)
-            call check_data_found(data_field, data_found)
-            select case(potential_name)
-                case ("null")
-                    allocate(Null_Potential_Expression :: potential_expression)
-                case ("LJ")
-                    allocate(Lennard_Jones_Expression :: potential_expression)
-                case default
-                    call error_exit(potential_name//" unknown potential_name."//&
-                        "Choose between: 'null' and LJ.")
-            end select
-            deallocate(potential_name)
-            deallocate(data_field)
-        else
-            allocate(Null_Potential_Expression :: potential_expression)
-        end if
-    end subroutine allocate_expression
-
-    subroutine set_expression(potential_expression, input_data, prefix)
-        class(Abstract_Potential_Expression), intent(inout) :: potential_expression
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
-
-        character(len=:), allocatable :: data_field
-        logical :: data_found
-        real(DP) :: LJ_epsilon, LJ_sigma
-
-        select type(potential_expression)
-            type is (Null_Potential_Expression)
-                call potential_expression%set()
-            type is (Lennard_Jones_Expression)
-                data_field = prefix//"epsilon"
-                call input_data%get(data_field, LJ_epsilon, data_found)
-                call check_data_found(data_field, data_found)
-                data_field = prefix//"sigma"
-                call input_data%get(data_field, LJ_sigma, data_found)
-                call check_data_found(data_field, data_found)
-                call potential_expression%set(LJ_epsilon, LJ_sigma)
-            class default
-                call error_exit("potential_expression type unknown.")
-        end select
-        if (allocated(data_field)) deallocate(data_field)
-    end subroutine set_expression
-
-    subroutine allocate_and_construct_pair(pair_potential, interact, min_distance, &
-        potential_expression, input_data, prefix)
-        class(Abstract_Pair_Potential), allocatable, intent(out) :: pair_potential
-        logical, intent(in) :: interact
-        class(Abstract_Minimum_Distance), intent(in) :: min_distance
-        class(Abstract_Potential_Expression), intent(in) :: potential_expression
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
-
-        call allocate_pair(pair_potential, interact, input_data, prefix)
-        call construct_pair(pair_potential, interact, min_distance, potential_expression, &
-            input_data, prefix)
-    end subroutine allocate_and_construct_pair
-
-    subroutine allocate_pair(pair_potential, interact, input_data, prefix)
-        class(Abstract_Pair_Potential), allocatable, intent(out) :: pair_potential
-        logical, intent(in) :: interact
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
-
-        character(len=:), allocatable :: data_field
-        logical :: data_found, tabulated_potential
-
-        if (interact) then
-            data_field = prefix//"tabulated"
-            call input_data%get(data_field, tabulated_potential, data_found)
-            call check_data_found(data_field, data_found)
-            if(tabulated_potential) then
-                allocate(Tabulated_Pair_Potential :: pair_potential)
-            else
-                allocate(Raw_Pair_Potential :: pair_potential)
-            end if
-            deallocate(data_field)
-        else
-            allocate(Null_Pair_Potential :: pair_potential)
-        end if
-    end subroutine allocate_pair
-
-    subroutine construct_pair(pair_potential, interact, min_distance, potential_expression, &
-        input_data, prefix)
-        class(Abstract_Pair_Potential), intent(inout) :: pair_potential
-        logical, intent(in) :: interact
-        class(Abstract_Minimum_Distance), intent(in) :: min_distance
-        class(Abstract_Potential_Expression), intent(in) :: potential_expression
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
-
-        character(len=:), allocatable :: data_field
-        logical :: data_found
-        type(Concrete_Potential_Domain) :: domain
-
-        if (interact) then
-            domain%min = min_distance%get()
-            select type (potential_expression)
-                type is (Null_Potential_Expression)
-                    domain%max = domain%min
-                class default
-                    data_field = prefix//"maximum distance"
-                    call input_data%get(data_field, domain%max, data_found)
-                    call check_data_found(data_field, data_found)
-            end select
-            select type (pair_potential)
-                type is (Tabulated_Pair_Potential)
-                    data_field = prefix//"delta distance"
-                    call input_data%get(data_field, domain%delta, data_found)
-                    call check_data_found(data_field, data_found)
-            end select
-        end if
-        call pair_potential%construct(domain, potential_expression)
-    end subroutine construct_pair
-
-    subroutine allocate_and_construct_component(component_potential, periodic_box, &
-        component_positions)
-        class(Abstract_Component_Potential), allocatable, intent(out) :: component_potential
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        class(Abstract_Component_Coordinates), intent(in) :: component_positions
-
-        if (component_has_positions(component_positions)) then
-            allocate(Concrete_Component_Potential :: component_potential)
-        else
-            allocate(Null_Component_Potential :: component_potential)
-        end if
-        call component_potential%construct(periodic_box, component_positions)
-    end subroutine allocate_and_construct_component
-
-    subroutine allocate_list(visitable_list, interact, input_data, prefix)
-        class(Abstract_Visitable_List), allocatable, intent(out) :: visitable_list
+    subroutine allocate_list(list, interact, input_data, prefix)
+        class(Abstract_Visitable_List), allocatable, intent(out) :: list
         logical, intent(in) :: interact
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
@@ -358,166 +144,256 @@ contains
             call check_data_found(data_field, data_found)
             select case(cells_data_structure)
                 case ("list")
-                    allocate(Concrete_Visitable_List :: visitable_list)
+                    allocate(Concrete_Visitable_List :: list)
                 case ("array")
-                    allocate(Concrete_Visitable_Array :: visitable_list)
+                    allocate(Concrete_Visitable_Array :: list)
                 case default
                     call error_exit(cells_data_structure//" unknown."&
                         //"Choose between 'list' and 'array'.")
             end select
             deallocate(cells_data_structure)
         else
-            allocate(Null_Visitable_List :: visitable_list)
+            allocate(Null_Visitable_List :: list)
         end if
     end subroutine allocate_list
 
-    subroutine allocate_and_construct_cells(visitable_cells, interact, visitable_list, &
-        periodic_box, component_positions, pair_potential)
-        class(Abstract_Visitable_Cells), allocatable, intent(out) :: visitable_cells
-        logical, intent(in) :: interact
-        class(Abstract_Visitable_List), intent(in) :: visitable_list
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        class(Abstract_Component_Coordinates), intent(in) :: component_positions
-        class(Abstract_Pair_Potential), intent(in) :: pair_potential
+    subroutine deallocate_list(list)
+        class(Abstract_Visitable_List), allocatable, intent(inout) :: list
 
-        if (interact) then
-            select type(periodic_box)
-                type is (XYZ_Periodic_Box)
-                    allocate(XYZ_PBC_Visitable_Cells :: visitable_cells)
-                type is (XY_Periodic_Box)
-                    allocate(XY_PBC_Visitable_Cells :: visitable_cells)
-                class default
-                    call error_exit("periodic_box type unknown.")
-            end select
-        else
-            allocate(Null_Visitable_Cells :: visitable_cells)
-        end if
-        call visitable_cells%construct(visitable_list, periodic_box, component_positions, &
-            pair_potential)
-    end subroutine allocate_and_construct_cells
-
-    subroutine create_inter_visitable_cells(visitable_cells, interact, periodic_box, components, &
-        pair_potentials, visitable_list)
-        class(Abstract_Visitable_Cells), allocatable, intent(out) :: visitable_cells(:, :)
-        logical, intent(in) :: interact
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        type(Component_Wrapper), intent(in) :: components(:)
-        type(Pair_Potentials_Wrapper), intent(in) :: pair_potentials(:)
-        class(Abstract_Visitable_List), intent(in) :: visitable_list
-
-        integer :: i_component, j_component
-
-        if (interact) then
-            select type(periodic_box)
-                type is (XYZ_Periodic_Box)
-                    allocate(XYZ_PBC_Visitable_Cells :: visitable_cells(size(pair_potentials), &
-                        size(pair_potentials)))
-                type is (XY_Periodic_Box)
-                    allocate(XY_PBC_Visitable_Cells :: visitable_cells(size(pair_potentials), &
-                        size(pair_potentials)))
-                class default
-                    call error_exit("periodic_box type unknown.")
-            end select
-        else
-            allocate(Null_Visitable_Cells :: visitable_cells(size(pair_potentials), &
-                size(pair_potentials)))
-        end if
-
-        do i_component = 1, size(visitable_cells, 2)
-            do j_component = 1, size(visitable_cells, 1)
-                associate (pair_potential => pair_potentials(i_component)%&
-                        with_components(j_component)%pair_potential)
-                    call visitable_cells(j_component, i_component)%construct(visitable_list, &
-                        periodic_box, components(i_component)%positions, pair_potential)
-                end associate
-            end do
-        end do
-    end subroutine create_inter_visitable_cells
-
-    subroutine short_potential_factory_destroy_macro(short_potential_macro)
-        type(Short_Potential_Macro_Wrapper), intent(inout) :: short_potential_macro
-
-        call short_potential_factory_destroy(short_potential_macro%cells)
-    end subroutine short_potential_factory_destroy_macro
-
-    subroutine short_potential_factory_destroy_all_old(short_potential)
-        type(Short_Potential_Wrapper), intent(inout) :: short_potential
-
-        call short_potential_factory_destroy(short_potential%cells)
-        call short_potential_factory_destroy(short_potential%component)
-        call short_potential_factory_destroy(short_potential%wall_pair)
-        call short_potential_factory_destroy(short_potential%pair)
-    end subroutine short_potential_factory_destroy_all_old
-
-    subroutine destroy_inter_pair_potentials(pair_potentials)
-        type(Pair_Potentials_Wrapper), allocatable, intent(inout) :: pair_potentials(:)
-
-        integer :: i_component
-
-        if (allocated(pair_potentials)) then
-            do i_component = size(pair_potentials), 1, -1
-                call short_potential_factory_destroy(pair_potentials(i_component)%with_components)
-            end do
-            deallocate(pair_potentials)
-        end if
-    end subroutine destroy_inter_pair_potentials
-
-    subroutine destroy_pair_potentials(pair_potentials)
-        type(Pair_Potential_Wrapper), allocatable, intent(inout) :: pair_potentials(:)
-
-        integer :: i_component
-
-        if (allocated(pair_potentials)) then
-            do i_component = size(pair_potentials), 1, -1
-                call short_potential_factory_destroy(pair_potentials(i_component)%pair_potential)
-            end do
-            deallocate(pair_potentials)
-        end if
-    end subroutine destroy_pair_potentials
-
-    subroutine deallocate_expression(potential_expression)
-        class(Abstract_Potential_Expression), allocatable, intent(inout) :: potential_expression
-
-        if (allocated(potential_expression)) deallocate(potential_expression)
-    end subroutine deallocate_expression
-
-    subroutine destroy_and_deallocate_pair(pair_potential)
-        class(Abstract_Pair_Potential), allocatable, intent(inout) :: pair_potential
-
-        call pair_potential%destroy()
-        if (allocated(pair_potential)) deallocate(pair_potential)
-    end subroutine destroy_and_deallocate_pair
-
-    subroutine destroy_and_deallocate_component(component_potential)
-        class(Abstract_Component_Potential), allocatable, intent(inout) :: component_potential
-
-        call component_potential%destroy()
-        if (allocated(component_potential)) deallocate(component_potential)
-    end subroutine destroy_and_deallocate_component
-
-    subroutine deallocate_list(visitable_list)
-        class(Abstract_Visitable_List), allocatable, intent(inout) :: visitable_list
-
-        if (allocated(visitable_list)) deallocate(visitable_list)
+        if (allocated(list)) deallocate(list)
     end subroutine deallocate_list
 
-    subroutine destroy_and_deallocate_cells(visitable_cells)
-        class(Abstract_Visitable_Cells), allocatable, intent(inout) :: visitable_cells
-
-        call visitable_cells%destroy()
-        if (allocated(visitable_cells)) deallocate(visitable_cells)
-    end subroutine destroy_and_deallocate_cells
-
-    subroutine destroy_inter_visitable_cells(visitable_cells)
-        class(Abstract_Visitable_Cells), allocatable, intent(inout) :: visitable_cells(:, :)
+    subroutine create_inter_pairs(pairs, interact, min_distances, input_data, prefix)
+        type(Pair_Potentials_Wrapper), allocatable, intent(out) :: pairs(:)
+        logical, intent(in) :: interact
+        type(Minimum_Distances_Wrapper), intent(in) :: min_distances(:)
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
 
         integer :: i_component, j_component
+        class(Abstract_Potential_Expression), allocatable :: expression
+        character(len=:), allocatable :: pair_prefix
+        type(Concrete_Number_to_String) :: string
 
-        do i_component = size(visitable_cells, 2), 1, -1
-            do j_component = size(visitable_cells, 1), 1, -1
-                call visitable_cells(j_component, i_component)%destroy()
+        allocate(pairs(size(min_distances)))
+        do i_component = 1, size(pairs)
+            allocate(pairs(i_component)%with_components(i_component))
+            do j_component = 1, size(pairs(i_component)%with_components)
+                if (j_component == i_component) then
+                    pair_prefix = prefix//"Component "//string%get(i_component)
+                else
+                    pair_prefix = prefix//"Inter "//string%get(i_component)//string%get(j_component)
+                end if
+                call short_potentials_factory_create(expression, interact, input_data, pair_prefix)
+                associate (min_distance => min_distances(i_component)%with_components(j_component)%&
+                        min_distance)
+                    call short_potentials_factory_create(pairs(i_component)%&
+                        with_components(j_component)%pair_potential, interact, min_distance, &
+                        expression, input_data, pair_prefix)
+                end associate
+                deallocate(pair_prefix)
+                call short_potentials_factory_destroy(expression)
             end do
         end do
-    end subroutine destroy_inter_visitable_cells
+    end subroutine create_inter_pairs
+
+    subroutine destroy_inter_pairs(pairs)
+        type(Pair_Potentials_Wrapper), allocatable, intent(inout) :: pairs(:)
+
+        integer :: i_component
+
+        if (allocated(pairs)) then
+            do i_component = size(pairs), 1, -1
+                call short_potentials_factory_destroy(pairs(i_component)%with_components)
+            end do
+            deallocate(pairs)
+        end if
+    end subroutine destroy_inter_pairs
+
+    subroutine create_wall_pairs(pairs, interact, min_distances, input_data, &
+        prefix)
+        type(Pair_Potential_Wrapper), allocatable, intent(out) :: pairs(:)
+        logical, intent(in) :: interact
+        type(Minimum_Distance_Wrapper), intent(in) :: min_distances(:)
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
+
+        integer :: i_component
+        class(Abstract_Potential_Expression), allocatable :: expression
+        character(len=:), allocatable :: pair_prefix
+        type(Concrete_Number_to_String) :: string
+
+        allocate(pairs(size(min_distances)))
+        do i_component = 1, size(pairs)
+            pair_prefix = prefix//"Component "//string%get(i_component)//".With Walls."
+            call short_potentials_factory_create(expression, interact, input_data, pair_prefix)
+            associate (min_distance => min_distances(i_component)%min_distance)
+                call short_potentials_factory_create(pairs(i_component)%pair_potential, &
+                    interact, min_distance, expression, input_data, pair_prefix)
+            end associate
+            deallocate(pair_prefix)
+            call short_potentials_factory_destroy(expression)
+        end do
+    end subroutine create_wall_pairs
+
+    subroutine destroy_pairs(pairs)
+        type(Pair_Potential_Wrapper), allocatable, intent(inout) :: pairs(:)
+
+        integer :: i_component
+
+        if (allocated(pairs)) then
+            do i_component = size(pairs), 1, -1
+                call short_potentials_factory_destroy(pairs(i_component)%pair_potential)
+            end do
+            deallocate(pairs)
+        end if
+    end subroutine destroy_pairs
+
+    subroutine create_pair(pair, interact, min_distance, expression, &
+        input_data, prefix)
+        class(Abstract_Pair_Potential), allocatable, intent(out) :: pair
+        logical, intent(in) :: interact
+        class(Abstract_Minimum_Distance), intent(in) :: min_distance
+        class(Abstract_Potential_Expression), intent(in) :: expression
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
+
+        call allocate_pair(pair, interact, input_data, prefix)
+        call construct_pair(pair, interact, min_distance, expression, input_data, prefix)
+    end subroutine create_pair
+
+    subroutine allocate_pair(pair, interact, input_data, prefix)
+        class(Abstract_Pair_Potential), allocatable, intent(out) :: pair
+        logical, intent(in) :: interact
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
+
+        character(len=:), allocatable :: data_field
+        logical :: data_found, tabulated_potential
+
+        if (interact) then
+            data_field = prefix//"tabulated"
+            call input_data%get(data_field, tabulated_potential, data_found)
+            call check_data_found(data_field, data_found)
+            if(tabulated_potential) then
+                allocate(Tabulated_Pair_Potential :: pair)
+            else
+                allocate(Raw_Pair_Potential :: pair)
+            end if
+            deallocate(data_field)
+        else
+            allocate(Null_Pair_Potential :: pair)
+        end if
+    end subroutine allocate_pair
+
+    subroutine construct_pair(pair, interact, min_distance, expression, input_data, prefix)
+        class(Abstract_Pair_Potential), intent(inout) :: pair
+        logical, intent(in) :: interact
+        class(Abstract_Minimum_Distance), intent(in) :: min_distance
+        class(Abstract_Potential_Expression), intent(in) :: expression
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
+
+        character(len=:), allocatable :: data_field
+        logical :: data_found
+        type(Concrete_Potential_Domain) :: domain
+
+        if (interact) then
+            domain%min = min_distance%get()
+            select type (expression)
+                type is (Null_Potential_Expression)
+                    domain%max = domain%min
+                class default
+                    data_field = prefix//"maximum distance"
+                    call input_data%get(data_field, domain%max, data_found)
+                    call check_data_found(data_field, data_found)
+            end select
+            select type (pair)
+                type is (Tabulated_Pair_Potential)
+                    data_field = prefix//"delta distance"
+                    call input_data%get(data_field, domain%delta, data_found)
+                    call check_data_found(data_field, data_found)
+            end select
+        end if
+        call pair%construct(domain, expression)
+    end subroutine construct_pair
+
+    subroutine destroy_pair(pair)
+        class(Abstract_Pair_Potential), allocatable, intent(inout) :: pair
+
+        call pair%destroy()
+        if (allocated(pair)) deallocate(pair)
+    end subroutine destroy_pair
+
+    subroutine create_expression(expression, interact, input_data, prefix)
+        class(Abstract_Potential_Expression), allocatable, intent(out) :: expression
+        logical, intent(in) :: interact
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
+
+        call allocate_expression(expression, interact, input_data, prefix)
+        call set_expression(expression, input_data, prefix)
+    end subroutine create_expression
+
+    subroutine allocate_expression(expression, interact, input_data, prefix)
+        class(Abstract_Potential_Expression), allocatable, intent(out) :: expression
+        logical, intent(in) :: interact
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
+
+        character(len=:), allocatable :: data_field, potential_name
+        logical :: data_found
+
+        if (interact) then
+            data_field = prefix//"name"
+            call input_data%get(data_field, potential_name, data_found)
+            call check_data_found(data_field, data_found)
+            select case(potential_name)
+                case ("null")
+                    allocate(Null_Potential_Expression :: expression)
+                case ("LJ")
+                    allocate(Lennard_Jones_Expression :: expression)
+                case default
+                    call error_exit(potential_name//" unknown potential_name."//&
+                        "Choose between: 'null' and LJ.")
+            end select
+            deallocate(potential_name)
+            deallocate(data_field)
+        else
+            allocate(Null_Potential_Expression :: expression)
+        end if
+    end subroutine allocate_expression
+
+    subroutine set_expression(expression, input_data, prefix)
+        class(Abstract_Potential_Expression), intent(inout) :: expression
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
+
+        character(len=:), allocatable :: data_field
+        logical :: data_found
+        real(DP) :: LJ_epsilon, LJ_sigma
+
+        select type(expression)
+            type is (Null_Potential_Expression)
+                call expression%set()
+            type is (Lennard_Jones_Expression)
+                data_field = prefix//"epsilon"
+                call input_data%get(data_field, LJ_epsilon, data_found)
+                call check_data_found(data_field, data_found)
+                data_field = prefix//"sigma"
+                call input_data%get(data_field, LJ_sigma, data_found)
+                call check_data_found(data_field, data_found)
+                call expression%set(LJ_epsilon, LJ_sigma)
+            class default
+                call error_exit("expression type unknown.")
+        end select
+        if (allocated(data_field)) deallocate(data_field)
+    end subroutine set_expression
+
+    subroutine destroy_expression(expression)
+        class(Abstract_Potential_Expression), allocatable, intent(inout) :: expression
+
+        if (allocated(expression)) deallocate(expression)
+    end subroutine destroy_expression
 
 end module procedures_short_potentials_factory
