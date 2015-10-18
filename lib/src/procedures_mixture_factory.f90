@@ -108,25 +108,25 @@ contains
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        integer :: i_component, j_component
+        integer :: j_component, i_component
         logical :: exists
         character(len=:), allocatable :: min_distance_prefix
         type(Concrete_Number_to_String) :: string
 
         allocate(min_distances(size(components)))
-        do i_component = 1, size(min_distances)
-            allocate(min_distances(i_component)%with_components(i_component))
-            do j_component = 1, size(min_distances(i_component)%with_components)
-                exists = component_exists(components(i_component)%number) .and. &
-                    component_exists(components(j_component)%number)
-                if (j_component == i_component) then
+        do j_component = 1, size(min_distances)
+            allocate(min_distances(j_component)%with_components(j_component))
+            do i_component = 1, size(min_distances(j_component)%with_components)
+                exists = component_exists(components(j_component)%number) .and. &
+                    component_exists(components(i_component)%number)
+                if (i_component == j_component) then
                     min_distance_prefix = prefix//"Component "//string%get(i_component)//"."
                 else
                     min_distance_prefix = prefix//"Inter "//string%get(i_component)//&
                         string%get(j_component)//"."
                 end if
-                call mixture_factory_create(min_distances(i_component)%&
-                    with_components(j_component)%min_distance, exists, input_data, &
+                call mixture_factory_create(min_distances(j_component)%&
+                    with_components(i_component)%min_distance, exists, input_data, &
                     min_distance_prefix)
                 deallocate(min_distance_prefix)
             end do

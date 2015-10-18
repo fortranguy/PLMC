@@ -86,7 +86,8 @@ contains
         type(Pair_Potentials_Wrapper), intent(in) :: pairs(:)
         class(Abstract_Visitable_List), intent(in) :: list
 
-        integer :: i_component, j_component
+        integer :: j_component, i_component
+        integer :: j_pair, i_pair
 
         if (interact) then
             select type(periodic_box)
@@ -101,12 +102,13 @@ contains
             allocate(Null_Visitable_Cells :: cells(size(pairs), size(pairs)))
         end if
 
-        do i_component = 1, size(cells, 2)
-            do j_component = 1, size(cells, 1)
-                associate (pair_potential => pairs(i_component)%with_components(j_component)%&
-                        pair_potential)
-                    call cells(j_component, i_component)%construct(list, periodic_box, &
-                        components(i_component)%positions, pair_potential)
+        do j_component = 1, size(cells, 2)
+            do i_component = 1, size(cells, 1)
+                j_pair = maxval([j_component, i_component])
+                i_pair = minval([j_component, i_component])
+                associate (pair_potential => pairs(j_pair)%with_components(i_pair)%pair_potential)
+                    call cells(i_component, j_component)%construct(list, periodic_box, &
+                        components(j_component)%positions, pair_potential)
                 end associate
             end do
         end do
@@ -115,11 +117,11 @@ contains
     subroutine destroy_inter_cells(cells)
         class(Abstract_Visitable_Cells), allocatable, intent(inout) :: cells(:, :)
 
-        integer :: i_component, j_component
+        integer :: j_component, i_component
 
-        do i_component = size(cells, 2), 1, -1
-            do j_component = size(cells, 1), 1, -1
-                call cells(j_component, i_component)%destroy()
+        do j_component = size(cells, 2), 1, -1
+            do i_component = size(cells, 1), 1, -1
+                call cells(i_component, j_component)%destroy()
             end do
         end do
         deallocate(cells)
@@ -166,7 +168,7 @@ contains
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        integer :: i_component, j_component
+        integer :: j_component, i_component
         logical :: interact_ij
         class(Abstract_Potential_Expression), allocatable :: expression
         character(len=:), allocatable :: pair_prefix
@@ -174,23 +176,23 @@ contains
 
         interact = .true.
         allocate(pairs(size(min_distances)))
-        do i_component = 1, size(pairs)
-            allocate(pairs(i_component)%with_components(i_component))
-            do j_component = 1, size(pairs(i_component)%with_components)
-                if (j_component == i_component) then
+        do j_component = 1, size(pairs)
+            allocate(pairs(j_component)%with_components(j_component))
+            do i_component = 1, size(pairs(j_component)%with_components)
+                if (i_component == j_component) then
                     pair_prefix = prefix//"Component "//string%get(i_component)//"."
                 else
                     pair_prefix = prefix//"Inter "//string%get(i_component)//&
                         string%get(j_component)//"."
                 end if
-                associate (min_distance => min_distances(i_component)%with_components(j_component)%&
+                associate (min_distance => min_distances(j_component)%with_components(i_component)%&
                         min_distance)
                     interact_ij = components_interact(min_distance)
                     interact = interact .and. interact_ij
                     call short_potentials_factory_create(expression, interact_ij, input_data, &
                         pair_prefix)
-                    call short_potentials_factory_create(pairs(i_component)%&
-                        with_components(j_component)%pair_potential, interact_ij, min_distance, &
+                    call short_potentials_factory_create(pairs(j_component)%&
+                        with_components(i_component)%pair_potential, interact_ij, min_distance, &
                         expression, input_data, pair_prefix)
                 end associate
                 deallocate(pair_prefix)
