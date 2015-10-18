@@ -5,6 +5,7 @@ use data_constants, only: num_components
 use json_module, only: json_file
 use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Mixture_Wrapper_Old
+use types_mixture_wrapper, only: Mixture_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
 use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper
 use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
@@ -21,7 +22,8 @@ use module_plmc_iterations, only: num_tuning_steps, num_steps, plmc_set_num_step
 implicit none
 
     type(Environment_Wrapper) :: environment
-    type(Mixture_Wrapper_Old) :: mixture
+    type(Mixture_Wrapper_Old) :: mixture_old ! to delete
+    type(Mixture_Wrapper) :: mixture
     type(Changes_Wrapper) :: changes(num_components)
     type(Mixture_Short_Potentials_Wrapper) :: short_potentials
     type(Mixture_Ewald_Wrapper) :: ewalds
@@ -37,16 +39,16 @@ implicit none
     call plmc_set_num_steps(input_data)
     call plmc_create(environment, input_data)
     call plmc_create(mixture, environment, input_data)
-    call plmc_create(changes, environment%periodic_box, mixture%components, input_data)
-    call plmc_create(short_potentials, environment, mixture, input_data)
-    call plmc_create(ewalds, environment, mixture, input_data)
-    call plmc_create(observables_writers, environment%walls_potential, mixture, changes, input_data)
+    call plmc_create(changes, environment%periodic_box, mixture_old%components, input_data)
+    call plmc_create(short_potentials, environment, mixture_old, input_data)
+    call plmc_create(ewalds, environment, mixture_old, input_data)
+    call plmc_create(observables_writers, environment%walls_potential, mixture_old, changes, input_data)
     call plmc_create(metropolis, environment, changes)
     call input_data%destroy()
 
-    call plmc_set(metropolis, mixture%components, short_potentials, ewalds)
+    call plmc_set(metropolis, mixture_old%components, short_potentials, ewalds)
     call plmc_propagator_construct(metropolis)
-    call plmc_visit(observables, environment%walls_potential, short_potentials, ewalds, mixture)
+    call plmc_visit(observables, environment%walls_potential, short_potentials, ewalds, mixture_old)
     call plmc_write(-num_tuning_steps, observables_writers, observables)
 
     if (num_tuning_steps > 0) write(output_unit, *) "Trying to tune changes..."
@@ -65,7 +67,7 @@ implicit none
     end do
     write(output_unit, *) "Iterations end."
 
-    call plmc_visit(observables, environment%walls_potential, short_potentials, ewalds, mixture)
+    call plmc_visit(observables, environment%walls_potential, short_potentials, ewalds, mixture_old)
     call plmc_write(i_step-1, observables_writers, observables)
 
     call plmc_propagator_destroy()

@@ -14,6 +14,7 @@ use types_mixture_wrapper, only: Minimum_Distance_Wrapper, Minimum_Distances_Wra
 implicit none
 
 private
+public :: mixture_factory_create, mixture_factory_destroy
 
 interface mixture_factory_create
     module procedure :: mixture_factory_create_all
@@ -24,11 +25,11 @@ interface mixture_factory_create
 end interface mixture_factory_create
 
 interface mixture_factory_destroy
-    module procedure :: mixture_factory_destroy_all
-    module procedure :: destroy_and_deallocate_components
-    module procedure :: deallocate_inter_min_distances
-    module procedure :: deallocate_min_distances
     module procedure :: deallocate_min_distance
+    module procedure :: deallocate_min_distances
+    module procedure :: deallocate_inter_min_distances
+    module procedure :: destroy_and_deallocate_components
+    module procedure :: mixture_factory_destroy_all
 end interface mixture_factory_destroy
 
 contains
@@ -45,6 +46,14 @@ contains
         call mixture_factory_create(mixture%wall_min_distances, size(mixture%components), &
             input_data, prefix)
     end subroutine mixture_factory_create_all
+
+    subroutine mixture_factory_destroy_all(mixture)
+        type(Mixture_Wrapper), intent(inout) :: mixture
+
+        call mixture_factory_destroy(mixture%wall_min_distances)
+        call mixture_factory_destroy(mixture%inter_min_distances)
+        call mixture_factory_destroy(mixture%components)
+    end subroutine mixture_factory_destroy_all
 
     subroutine allocate_and_create_components(components, environment, input_data, prefix)
         type(Component_Wrapper), allocatable, intent(out) :: components(:)
@@ -104,10 +113,23 @@ contains
                 end if
                 call mixture_factory_create(min_distances(i_component)%&
                     with_components(j_component)%min_distance, input_data, min_distance_prefix)
+                deallocate(min_distance_prefix)
             end do
         end do
-        if (allocated(min_distance_prefix)) deallocate(min_distance_prefix)
     end subroutine allocate_and_set_inter_min_distances
+
+    subroutine deallocate_inter_min_distances(min_distances)
+        type(Minimum_Distances_Wrapper), allocatable, intent(inout) :: min_distances(:)
+
+        integer :: i_component
+
+        if (allocated(min_distances)) then
+            do i_component = size(min_distances), 1, -1
+                call mixture_factory_destroy(min_distances(i_component)%with_components)
+            end do
+            deallocate(min_distances)
+        end if
+    end subroutine deallocate_inter_min_distances
 
     subroutine allocate_and_set_wall_min_distances(min_distances, num_components, input_data, &
         prefix)
@@ -126,6 +148,19 @@ contains
         end do
     end subroutine allocate_and_set_wall_min_distances
 
+    subroutine deallocate_min_distances(min_distances)
+        type(Minimum_Distance_Wrapper), allocatable, intent(inout) :: min_distances(:)
+
+        integer :: i_component
+
+        if (allocated(min_distances)) then
+            do i_component = size(min_distances), 1, -1
+                call mixture_factory_destroy(min_distances(i_component)%min_distance)
+            end do
+            deallocate(min_distances)
+        end if
+    end subroutine deallocate_min_distances
+
     subroutine allocate_and_set_min_distance(min_distance, input_data, prefix)
         class(Abstract_Minimum_Distance), allocatable, intent(out) :: min_distance
         type(json_file), intent(inout) :: input_data
@@ -143,44 +178,10 @@ contains
         call min_distance%set(min_distance_value)
     end subroutine allocate_and_set_min_distance
 
-    subroutine deallocate_inter_min_distances(min_distances)
-        type(Minimum_Distances_Wrapper), allocatable, intent(inout) :: min_distances(:)
-
-        integer :: i_component
-
-        if (allocated(min_distances)) then
-            do i_component = size(min_distances), 1, -1
-                call mixture_factory_destroy(min_distances(i_component)%with_components)
-            end do
-            deallocate(min_distances)
-        end if
-    end subroutine deallocate_inter_min_distances
-
-    subroutine deallocate_min_distances(min_distances)
-        type(Minimum_Distance_Wrapper), allocatable, intent(inout) :: min_distances(:)
-
-        integer :: i_component
-
-        if (allocated(min_distances)) then
-            do i_component = size(min_distances), 1, -1
-                call mixture_factory_destroy(min_distances(i_component)%min_distance)
-            end do
-            deallocate(min_distances)
-        end if
-    end subroutine deallocate_min_distances
-
     subroutine deallocate_min_distance(min_distance)
         class(Abstract_Minimum_Distance), allocatable, intent(inout) :: min_distance
 
         if (allocated(min_distance)) deallocate(min_distance)
     end subroutine deallocate_min_distance
-
-    subroutine mixture_factory_destroy_all(mixture)
-        type(Mixture_Wrapper), intent(inout) :: mixture
-
-        call mixture_factory_destroy(mixture%wall_min_distances)
-        call mixture_factory_destroy(mixture%inter_min_distances)
-        call mixture_factory_destroy(mixture%components)
-    end subroutine mixture_factory_destroy_all
 
 end module procedures_mixture_factory

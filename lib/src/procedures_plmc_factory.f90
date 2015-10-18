@@ -5,13 +5,14 @@ use data_wrappers_prefix, only:environment_prefix, mixture_prefix, changes_prefi
     short_potentials_prefix, ewalds_prefix
 use json_module, only: json_file, json_initialize
 use procedures_command_arguments, only: set_filename_from_argument
-use module_plmc_iterations, only: num_tuning_steps
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_walls_potential, only: Abstract_Walls_Potential
 use types_environment_wrapper, only: Environment_Wrapper
 use procedures_environment_factory, only: environment_factory_create, environment_factory_destroy
-use types_component_wrapper, only: Mixture_Wrapper_Old, Component_Wrapper
-use procedures_component_factory, only: component_factory_create, component_factory_destroy
+use types_component_wrapper, only: Mixture_Wrapper_Old, Component_Wrapper !to delete
+use types_mixture_wrapper, only: Mixture_Wrapper
+use procedures_component_factory, only: component_factory_create, component_factory_destroy !to delete
+use procedures_mixture_factory, only: mixture_factory_create, mixture_factory_destroy
 use types_changes_wrapper, only: Changes_Wrapper
 use procedures_changes_factory, only: changes_factory_create, changes_factory_destroy
 use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper
@@ -94,29 +95,17 @@ contains
     end subroutine destroy_environment
 
     subroutine create_mixture(mixture, environment, input_data)
-        type(Mixture_Wrapper_Old), intent(out) :: mixture
+        type(Mixture_Wrapper), intent(out) :: mixture
         type(Environment_Wrapper), intent(in) :: environment
         type(json_file), intent(inout) :: input_data
 
-        logical :: mixture_exists
-
-        call component_factory_create(mixture%components(1), environment, input_data, &
-            mixture_prefix//"Component 1.")
-        call component_factory_create(mixture%components(2), environment, input_data, &
-            mixture_prefix//"Component 2.")
-        mixture_exists = component_exists(mixture%components(1)%number) .and. &
-            component_exists(mixture%components(2)%number)
-        call component_factory_create(mixture%inter_diameter, mixture_exists, &
-            mixture%components(1)%diameter, mixture%components(2)%diameter, input_data, &
-            mixture_prefix//"Inter 12.")
+        call mixture_factory_create(mixture, environment, input_data, mixture_prefix)
     end subroutine create_mixture
 
     subroutine destroy_mixture(mixture)
-        type(Mixture_Wrapper_Old), intent(inout) :: mixture
+        type(Mixture_Wrapper), intent(inout) :: mixture
 
-        call component_factory_destroy(mixture%inter_diameter)
-        call component_factory_destroy(mixture%components(2))
-        call component_factory_destroy(mixture%components(1))
+        call mixture_factory_destroy(mixture)
     end subroutine destroy_mixture
 
     subroutine create_changes(changes, periodic_box, components, input_data)

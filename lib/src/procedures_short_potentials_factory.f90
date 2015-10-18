@@ -61,7 +61,7 @@ contains
         logical :: interact, interact_with_walls
         class(Abstract_Visitable_List), allocatable :: list
 
-        interact = .true.
+        interact = size(mixture%components) > 0
         call short_potentials_factory_create(short_potentials%inter_pairs, interact, mixture%&
             inter_min_distances, input_data, prefix)
         interact_with_walls = interact .and. use_walls(environment%walls_potential)
