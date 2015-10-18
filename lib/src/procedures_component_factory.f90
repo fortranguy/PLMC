@@ -6,7 +6,6 @@ use procedures_errors, only: error_exit
 use procedures_checks, only: check_data_found
 use procedures_coordinates_micro, only: read_coordinates
 use class_periodic_box, only: Abstract_Periodic_Box
-use types_environment_wrapper, only: Environment_Wrapper
 use class_component_number, only: Abstract_Component_Number, Concrete_Component_Number
 use class_component_coordinates, only: Abstract_Component_Coordinates, &
     Concrete_Component_Positions, Concrete_Component_Orientations, Null_Component_Coordinates
@@ -17,7 +16,7 @@ use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments, &
 use class_component_total_moment, only: Abstract_Component_Total_Moment, &
     Concrete_Component_Total_Moment, Null_Component_Total_Moment
 use types_component_wrapper, only: Component_Wrapper, Mixture_Wrapper_Old
-use procedures_property_inquirers, only: use_walls, component_exists, component_is_dipolar, &
+use procedures_property_inquirers, only: use_walls, component_is_dipolar, &
     component_can_exchange
 
 implicit none
@@ -50,17 +49,16 @@ end interface component_factory_destroy
 
 contains
 
-    subroutine create_all(component, environment, input_data, prefix)
+    subroutine create_all(component, periodic_box, input_data, prefix)
         type(Component_Wrapper), intent(out) :: component
-        type(Environment_Wrapper), intent(in) :: environment
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
         logical :: dipolar
 
         call component_factory_create(component%number, input_data, prefix)
-        call component_factory_create(component%positions, environment%periodic_box, &
-            component%number)
+        call component_factory_create(component%positions, periodic_box, component%number)
         call component_factory_set(component%positions, input_data, prefix//"initial positions")
         dipolar = component_is_dipolar(input_data, prefix)
         call component_factory_create(component%orientations, dipolar, component%number)

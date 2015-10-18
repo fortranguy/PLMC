@@ -31,7 +31,7 @@ use types_metropolis_wrapper, only: Metropolis_Wrapper
 use procedures_metropolis_factory, only: metropolis_factory_create, metropolis_factory_set, &
     metropolis_factory_destroy
 use class_tower_sampler, only: Abstract_Tower_Sampler, Concrete_Tower_Sampler, Null_Tower_Sampler
-use procedures_property_inquirers, only: use_walls, component_exists, component_is_dipolar, &
+use procedures_property_inquirers, only: use_walls, component_is_dipolar, &
     component_can_change
 
 implicit none
@@ -191,11 +191,11 @@ contains
         logical :: component_2_exists, component_2_is_dipolar
 
         wall_used = use_walls(walls_potential)
-        component_1_exists = component_exists(mixture%components(1)%number)
+        component_1_exists = .false.
         component_1_is_dipolar = component_is_dipolar(mixture%components(1)%dipolar_moments)
         call observable_writers_factory_create(observable_writers%intras(1)%energy, wall_used, &
             component_1_exists, component_1_is_dipolar, "component_1_energy.out")
-        component_2_exists = component_exists(mixture%components(2)%number)
+        component_2_exists = .false.
         component_2_is_dipolar = component_is_dipolar(mixture%components(2)%dipolar_moments)
         call observable_writers_factory_create(observable_writers%intras(2)%energy, wall_used, &
             component_2_exists, component_2_is_dipolar, "component_2_energy.out")

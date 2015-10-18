@@ -179,9 +179,10 @@ contains
             allocate(pairs(i_component)%with_components(i_component))
             do j_component = 1, size(pairs(i_component)%with_components)
                 if (j_component == i_component) then
-                    pair_prefix = prefix//"Component "//string%get(i_component)
+                    pair_prefix = prefix//"Component "//string%get(i_component)//"."
                 else
-                    pair_prefix = prefix//"Inter "//string%get(i_component)//string%get(j_component)
+                    pair_prefix = prefix//"Inter "//string%get(i_component)//&
+                        string%get(j_component)//"."
                 end if
                 call short_potentials_factory_create(expression, interact, input_data, pair_prefix)
                 associate (min_distance => min_distances(i_component)%with_components(j_component)%&

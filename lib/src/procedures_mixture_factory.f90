@@ -4,12 +4,15 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
 use procedures_checks, only: check_data_found, check_positive
 use class_number_to_string, only: Concrete_Number_to_String
+use class_periodic_box, only: Abstract_Periodic_Box
+use class_walls_potential, only: Abstract_Walls_Potential
 use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
 use class_minimum_distance, only: Abstract_Minimum_Distance, Concrete_Minimum_Distance
 use procedures_component_factory, only: component_factory_create, component_factory_destroy
 use types_mixture_wrapper, only: Minimum_Distance_Wrapper, Minimum_Distances_Wrapper, &
     Mixture_Wrapper
+use procedures_property_inquirers, only: use_walls
 
 implicit none
 
@@ -40,11 +43,12 @@ contains
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        call mixture_factory_create(mixture%components, environment, input_data, prefix)
+        call mixture_factory_create(mixture%components, environment%periodic_box, input_data, &
+            prefix)
         call mixture_factory_create(mixture%inter_min_distances, size(mixture%components), &
             input_data, prefix)
         call mixture_factory_create(mixture%wall_min_distances, size(mixture%components), &
-            input_data, prefix)
+            environment%walls_potential, input_data, prefix)
     end subroutine create_all
 
     subroutine destroy_all(mixture)
@@ -55,9 +59,9 @@ contains
         call mixture_factory_destroy(mixture%components)
     end subroutine destroy_all
 
-    subroutine create_components(components, environment, input_data, prefix)
+    subroutine create_components(components, periodic_box, input_data, prefix)
         type(Component_Wrapper), allocatable, intent(out) :: components(:)
-        type(Environment_Wrapper), intent(in) :: environment
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -72,8 +76,8 @@ contains
         call check_positive("create_components", "num_components", num_components)
         allocate(components(num_components))
         do i_component = 1, size(components)
-            call component_factory_create(components(i_component), environment, input_data, &
-                prefix//"Component "//string%get(i_component))
+            call component_factory_create(components(i_component), periodic_box, input_data, &
+                prefix//"Component "//string%get(i_component)//".")
         end do
     end subroutine create_components
 
@@ -106,10 +110,10 @@ contains
             allocate(min_distances(i_component)%with_components(i_component))
             do j_component = 1, size(min_distances(i_component)%with_components)
                 if (j_component == i_component) then
-                    min_distance_prefix = prefix//"Component "//string%get(i_component)
+                    min_distance_prefix = prefix//"Component "//string%get(i_component)//"."
                 else
                     min_distance_prefix = prefix//"Inter "//string%get(i_component)//&
-                        string%get(j_component)
+                        string%get(j_component)//"."
                 end if
                 call mixture_factory_create(min_distances(i_component)%&
                     with_components(j_component)%min_distance, input_data, min_distance_prefix)
@@ -131,16 +135,18 @@ contains
         end if
     end subroutine destroy_inter_min_distances
 
-    subroutine create_wall_min_distances(min_distances, num_components, input_data, &
+    subroutine create_wall_min_distances(min_distances, num_components, potential, input_data, &
         prefix)
         type(Minimum_Distance_Wrapper), allocatable, intent(out) :: min_distances(:)
         integer, intent(in) :: num_components
+        class(Abstract_Walls_Potential), intent(in) :: potential
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
         integer :: i_component
         type(Concrete_Number_to_String) :: string
 
+        if (.not.use_walls(potential)) return
         allocate(min_distances(num_components))
         do i_component = 1, size(min_distances)
             call mixture_factory_create(min_distances(i_component)%min_distance, input_data, &

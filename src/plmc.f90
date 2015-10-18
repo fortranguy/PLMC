@@ -6,10 +6,10 @@ use json_module, only: json_file
 use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Mixture_Wrapper_Old
 use types_mixture_wrapper, only: Mixture_Wrapper
-use types_changes_wrapper, only: Changes_Wrapper
 use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper, &
     Short_Potentials_Wrapper
 use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
+use types_changes_wrapper, only: Changes_Wrapper
 use types_metropolis_wrapper, only: Metropolis_Wrapper
 use procedures_plmc_factory, only: plmc_load, plmc_create, plmc_set, plmc_destroy
 use procedures_plmc_visit, only: plmc_visit
@@ -38,12 +38,13 @@ implicit none
     logical :: changes_tuned
 
     call plmc_load(input_data)
-    call plmc_set_num_steps(input_data)
     call plmc_create(environment, input_data)
     call plmc_create(mixture, environment, input_data)
-    call plmc_create(changes, environment%periodic_box, mixture_old%components, input_data)
     call plmc_create(short_potentials, environment, mixture, input_data)
+    stop
     call plmc_create(ewalds, environment, mixture_old, input_data)
+    call plmc_set_num_steps(input_data)
+    call plmc_create(changes, environment%periodic_box, mixture_old%components, input_data)
     call plmc_create(observables_writers, environment%walls_potential, mixture_old, changes, input_data)
     call plmc_create(metropolis, environment, changes)
     call input_data%destroy()

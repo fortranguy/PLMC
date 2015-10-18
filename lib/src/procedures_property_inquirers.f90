@@ -21,7 +21,7 @@ implicit none
 
 private
 public :: apply_external_field, use_reciprocal_lattice, use_walls, &
-    component_exists, component_is_dipolar, component_has_positions, component_can_move, &
+    component_is_dipolar, component_has_positions, component_can_move, &
     component_has_orientations, component_can_exchange, component_can_rotate, component_interacts, &
     component_can_change
 
@@ -37,11 +37,6 @@ interface use_walls
     module procedure :: use_walls_from_json
     module procedure :: use_walls_from_walls_potential
 end interface use_walls
-
-interface component_exists
-    module procedure :: component_exists_from_json
-    module procedure :: component_exists_from_number
-end interface component_exists
 
 interface component_is_dipolar
     module procedure :: component_is_dipolar_from_json
@@ -172,11 +167,7 @@ contains
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        if (component_exists(input_data, prefix)) then
-            component_is_dipolar = logical_from_json(input_data, prefix//"is dipolar")
-        else
-            component_is_dipolar = .false.
-        end if
+        component_is_dipolar = logical_from_json(input_data, prefix//"is dipolar")
     end function component_is_dipolar_from_json
 
     pure logical function component_has_orientations(component_orientations)
@@ -207,11 +198,7 @@ contains
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        if (component_exists(input_data, prefix)) then
-            component_can_exchange = logical_from_json(input_data, prefix//"can exchange")
-        else
-            component_can_exchange = .false.
-        end if
+        component_can_exchange = logical_from_json(input_data, prefix//"can exchange")
     end function component_can_exchange_from_json
 
     pure logical function component_can_exchange_from_chemical_potential(&
