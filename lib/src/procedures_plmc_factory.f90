@@ -15,7 +15,8 @@ use procedures_component_factory, only: component_factory_create, component_fact
 use procedures_mixture_factory, only: mixture_factory_create, mixture_factory_destroy
 use types_changes_wrapper, only: Changes_Wrapper
 use procedures_changes_factory, only: changes_factory_create, changes_factory_destroy
-use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper
+use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper ! to delete
+use types_short_potential_wrapper, only: Short_Potentials_Wrapper
 use procedures_short_potentials_factory, only: short_potentials_factory_create, &
     short_potentials_factory_destroy
 use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
@@ -128,17 +129,19 @@ contains
     end subroutine destroy_changes
 
     subroutine create_short_potentials(short_potentials, environment, mixture, input_data)
-        type(Mixture_Short_Potentials_Wrapper), intent(out) :: short_potentials
+        type(Short_Potentials_Wrapper), intent(out) :: short_potentials
         type(Environment_Wrapper), intent(in) :: environment
-        type(Mixture_Wrapper_Old), intent(in) :: mixture
+        type(Mixture_Wrapper), intent(in) :: mixture
         type(json_file), intent(inout) :: input_data
 
-        logical :: mixture_exists
+        call short_potentials_factory_create(short_potentials, environment, mixture, input_data, &
+            short_potentials_prefix)
     end subroutine create_short_potentials
 
     subroutine destroy_short_potentials(short_potentials)
-        type(Mixture_Short_Potentials_Wrapper), intent(inout) :: short_potentials
+        type(Short_Potentials_Wrapper), intent(inout) :: short_potentials
 
+        call short_potentials_factory_destroy(short_potentials)
     end subroutine destroy_short_potentials
 
     subroutine create_ewalds(ewalds, environment, mixture, input_data)

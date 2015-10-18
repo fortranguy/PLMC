@@ -31,7 +31,7 @@ private
 public :: short_potentials_factory_create, short_potentials_factory_destroy
 
 interface short_potentials_factory_create
-    module procedure :: short_potentials_factory_create_all
+    module procedure :: create_all
     module procedure :: create_inter_cells
     module procedure :: create_inter_pairs
     module procedure :: create_wall_pairs
@@ -45,13 +45,12 @@ interface short_potentials_factory_destroy
     module procedure :: destroy_pairs
     module procedure :: destroy_inter_pairs
     module procedure :: destroy_inter_cells
-    module procedure :: short_potentials_factory_destroy_all
+    module procedure :: destroy_all
 end interface short_potentials_factory_destroy
 
 contains
 
-    subroutine short_potentials_factory_create_all(short_potentials, environment, mixture, &
-        input_data, prefix)
+    subroutine create_all(short_potentials, environment, mixture, input_data, prefix)
         type(Short_Potentials_Wrapper), intent(out) :: short_potentials
         type(Environment_Wrapper), intent(in) :: environment
         type(Mixture_Wrapper), intent(in) :: mixture
@@ -71,15 +70,15 @@ contains
         call short_potentials_factory_create(short_potentials%inter_cells, interact, &
             environment%periodic_box, mixture%components, short_potentials%inter_pairs, list)
         call deallocate_list(list)
-    end subroutine short_potentials_factory_create_all
+    end subroutine create_all
 
-    subroutine short_potentials_factory_destroy_all(short_potentials)
+    subroutine destroy_all(short_potentials)
         type(Short_Potentials_Wrapper), intent(inout) :: short_potentials
 
         call short_potentials_factory_destroy(short_potentials%inter_cells)
         call short_potentials_factory_destroy(short_potentials%wall_pairs)
         call short_potentials_factory_destroy(short_potentials%inter_pairs)
-    end subroutine short_potentials_factory_destroy_all
+    end subroutine destroy_all
 
     subroutine create_inter_cells(cells, interact, periodic_box, components, pairs, list)
         class(Abstract_Visitable_Cells), allocatable, intent(out) :: cells(:, :)
