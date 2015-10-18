@@ -17,7 +17,7 @@ use class_ewald_real_component, only: Abstract_Ewald_Real_Component, &
     Concrete_Ewald_Real_Component, Null_Ewald_Real_Component
 use class_weighted_structure, only: Abstract_Weighted_Structure
 use types_ewald_wrapper, only: Ewald_Wrapper, Ewald_Wrapper_Macro, Ewald_Wrapper_Micro
-use procedures_property_inquirers, only: component_is_dipolar, component_interacts
+use procedures_property_inquirers, only: component_is_dipolar, components_interact
 
 implicit none
 
@@ -68,7 +68,7 @@ contains
 
         logical :: interact
 
-        interact = component_interacts(ewald_micro%real_pair)
+        interact = components_interact(ewald_micro%real_pair)
         call ewald_factory_create(ewald_macro%real_component, interact, environment%periodic_box, &
             component%positions, component%dipolar_moments, ewald_micro%real_pair)
     end subroutine ewald_factory_create_macro

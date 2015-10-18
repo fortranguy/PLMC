@@ -6,7 +6,8 @@ use procedures_errors, only: error_exit
 use procedures_checks, only: check_data_found
 use procedures_coordinates_micro, only: read_coordinates
 use class_periodic_box, only: Abstract_Periodic_Box
-use class_component_number, only: Abstract_Component_Number, Concrete_Component_Number
+use class_component_number, only: Abstract_Component_Number, Concrete_Component_Number, &
+    Null_Component_Number
 use class_component_coordinates, only: Abstract_Component_Coordinates, &
     Concrete_Component_Positions, Concrete_Component_Orientations, Null_Component_Coordinates
 use class_component_chemical_potential, only : Abstract_Component_Chemical_Potential, &
@@ -49,25 +50,28 @@ end interface component_factory_destroy
 
 contains
 
-    subroutine create_all(component, periodic_box, input_data, prefix)
+    subroutine create_all(component, exists, periodic_box, input_data, prefix)
         type(Component_Wrapper), intent(out) :: component
+        logical, intent(in) :: exists
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        logical :: dipolar
+        logical :: is_dipolar, can_exchange
 
-        call component_factory_create(component%number, input_data, prefix)
-        call component_factory_create(component%positions, periodic_box, component%number)
+        call component_factory_create(component%number, exists, input_data, prefix)
+        call component_factory_create(component%positions, exists, periodic_box, component%number)
         call component_factory_set(component%positions, input_data, prefix//"initial positions")
-        dipolar = component_is_dipolar(input_data, prefix)
-        call component_factory_create(component%orientations, dipolar, component%number)
+        is_dipolar = exists .and. component_is_dipolar(input_data, prefix)
+        call component_factory_create(component%orientations, is_dipolar, component%number)
         call component_factory_set(component%orientations, input_data, &
             prefix//"initial orientations")
-        call component_factory_create(component%dipolar_moments, dipolar, component%orientations, &
+        call component_factory_create(component%dipolar_moments, is_dipolar, component%orientations, &
             input_data, prefix)
         call component_factory_create(component%total_moment, component%dipolar_moments)
-        call component_factory_create(component%chemical_potential, input_data, prefix)
+        can_exchange = exists .and. component_can_exchange(input_data, prefix)
+        call component_factory_create(component%chemical_potential, can_exchange, input_data, &
+            prefix)
     end subroutine create_all
 
     subroutine destroy_all(component)
@@ -81,8 +85,9 @@ contains
         call component_factory_destroy(component%number)
     end subroutine destroy_all
 
-    subroutine create_number(component_number, input_data, prefix)
+    subroutine create_number(component_number, exists, input_data, prefix)
         class(Abstract_Component_Number), allocatable, intent(out) :: component_number
+        logical, intent(in) :: exists
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -90,11 +95,16 @@ contains
         logical :: data_found
         integer :: num_particles
 
-        data_field = prefix//"number"
-        call input_data%get(data_field, num_particles, data_found)
-        call check_data_found(data_field, data_found)
-        allocate(Concrete_Component_Number :: component_number)
-        deallocate(data_field)
+        if (exists) then
+            allocate(Concrete_Component_Number :: component_number)
+            data_field = prefix//"number"
+            call input_data%get(data_field, num_particles, data_found)
+            call check_data_found(data_field, data_found)
+            deallocate(data_field)
+        else
+            num_particles = 0
+            allocate(Null_Component_Number :: component_number)
+        end if
         call component_number%set(num_particles)
     end subroutine create_number
 
@@ -104,12 +114,17 @@ contains
         if (allocated(component_number)) deallocate(component_number)
     end subroutine destroy_number
 
-    subroutine create_positions(component_positions, periodic_box, component_number)
+    subroutine create_positions(component_positions, exists, periodic_box, component_number)
         class(Abstract_Component_Coordinates), allocatable, intent(out) :: component_positions
+        logical, intent(in) :: exists
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Component_Number), intent(in) :: component_number
 
-        allocate(Concrete_Component_Positions :: component_positions)
+        if (exists) then
+            allocate(Concrete_Component_Positions :: component_positions)
+        else
+            allocate(Null_Component_Coordinates :: component_positions)
+        end if
         select type (component_positions)
             type is (Concrete_Component_Positions)
                 call component_positions%construct(periodic_box, component_number)
@@ -118,12 +133,12 @@ contains
         end select
     end subroutine create_positions
 
-    subroutine create_orientations(component_orientations, dipolar, component_number)
+    subroutine create_orientations(component_orientations, is_dipolar, component_number)
         class(Abstract_Component_Coordinates), allocatable, intent(out) :: component_orientations
-        logical, intent(in) :: dipolar
+        logical, intent(in) :: is_dipolar
         class(Abstract_Component_Number), intent(in) :: component_number
 
-        if (dipolar) then
+        if (is_dipolar) then
             allocate(Concrete_Component_Orientations :: component_orientations)
         else
             allocate(Null_Component_Coordinates :: component_orientations)
@@ -167,11 +182,11 @@ contains
         deallocate(filename)
     end subroutine set_coordinates
 
-    subroutine create_dipolar_moments(component_dipolar_moments, dipolar, &
+    subroutine create_dipolar_moments(component_dipolar_moments, is_dipolar, &
         component_orientations, input_data, prefix)
         class(Abstract_Component_Dipolar_Moments), allocatable, intent(out) :: &
             component_dipolar_moments
-        logical, intent(in) :: dipolar
+        logical, intent(in) :: is_dipolar
         class(Abstract_Component_Coordinates), intent(in) :: component_orientations
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
@@ -180,7 +195,7 @@ contains
         logical :: data_found
         real(DP) :: moment_norm
 
-        if (dipolar) then
+        if (is_dipolar) then
             data_field = prefix//"moment norm"
             call input_data%get(data_field, moment_norm, data_found)
             call check_data_found(data_field, data_found)
@@ -220,9 +235,11 @@ contains
         if (allocated(component_total_moment)) deallocate(component_total_moment)
     end subroutine destroy_total_moment
 
-    subroutine create_chemical_potential(component_chemical_potential, input_data, prefix)
+    subroutine create_chemical_potential(component_chemical_potential, can_exchange, input_data, &
+            prefix)
         class(Abstract_Component_Chemical_Potential), allocatable, intent(out) :: &
             component_chemical_potential
+        logical, intent(in) :: can_exchange
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -230,7 +247,7 @@ contains
         logical :: data_found
         real(DP) :: density, excess
 
-        if (component_can_exchange(input_data, prefix)) then
+        if (can_exchange) then
             data_field = prefix//"Chemical Potential.density"
             call input_data%get(data_field, density, data_found)
             call check_data_found(data_field, data_found)

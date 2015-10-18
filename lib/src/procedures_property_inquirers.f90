@@ -2,10 +2,11 @@ module procedures_property_inquirers
 
 use json_module, only: json_file
 use procedures_checks, only: check_data_found
-use class_walls_potential, only: Abstract_Walls_Potential, Null_Walls_Potential
+use class_walls_potential, only: Abstract_Walls_Potential, Concrete_Walls_Potential
 use class_component_number, only: Abstract_Component_Number, Concrete_Component_Number
 use class_component_coordinates, only: Abstract_Component_Coordinates, &
     Concrete_Component_Positions, Concrete_Component_Orientations
+use class_minimum_distance, only: Abstract_Minimum_Distance, Concrete_Minimum_Distance
 use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments, &
     Concrete_Component_Dipolar_Moments
 use class_component_chemical_potential, only: Abstract_Component_Chemical_Potential, &
@@ -21,8 +22,8 @@ implicit none
 
 private
 public :: apply_external_field, use_reciprocal_lattice, use_walls, &
-    component_is_dipolar, component_has_positions, component_can_move, &
-    component_has_orientations, component_can_exchange, component_can_rotate, component_interacts, &
+    component_exists, component_is_dipolar, component_has_positions, component_can_move, &
+    component_has_orientations, component_can_exchange, component_can_rotate, components_interact, &
     component_can_change
 
 interface apply_external_field
@@ -38,6 +39,10 @@ interface use_walls
     module procedure :: use_walls_from_walls_potential
 end interface use_walls
 
+interface component_exists
+    module procedure :: component_exists_from_number
+end interface component_exists
+
 interface component_is_dipolar
     module procedure :: component_is_dipolar_from_json
     module procedure :: component_is_dipolar_from_dipolar_moments
@@ -49,10 +54,11 @@ interface component_can_exchange
     module procedure :: component_can_exchange_from_component_exchange
 end interface component_can_exchange
 
-interface component_interacts
-    module procedure :: component_interacts_short
-    module procedure :: component_interacts_long
-end interface component_interacts
+interface components_interact
+    module procedure :: components_interact_from_min_distance
+    module procedure :: components_interact_from_pair_potential
+    module procedure :: components_interact_from_ewald_real_pair
+end interface components_interact
 
 contains
 
@@ -82,19 +88,12 @@ contains
         class(Abstract_Walls_Potential), intent(in) :: walls_potential
 
         select type (walls_potential)
-            type is (Null_Walls_Potential)
-                use_walls = .false.
-            class default
+            type is (Concrete_Walls_Potential)
                 use_walls = .true.
+            class default
+                use_walls = .false.
         end select
     end function use_walls_from_walls_potential
-
-    logical function component_exists_from_json(input_data, prefix) result(component_exists)
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
-
-        component_exists = logical_from_json(input_data, prefix//"exists")
-    end function component_exists_from_json
 
     pure logical function component_exists_from_number(component_number) result(component_exists)
         class(Abstract_Component_Number), intent(in) :: component_number
@@ -107,27 +106,41 @@ contains
         end select
     end function component_exists_from_number
 
-    pure logical function component_interacts_short(pair_potential) result(component_interacts)
+    pure logical function components_interact_from_min_distance(min_distance) &
+        result(components_interact)
+        class(Abstract_Minimum_Distance), intent(in) :: min_distance
+
+        select type (min_distance)
+            type is (Concrete_Minimum_Distance)
+                components_interact = .true.
+            class default
+                components_interact = .false.
+        end select
+    end function components_interact_from_min_distance
+
+    pure logical function components_interact_from_pair_potential(pair_potential) &
+        result(components_interact)
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
 
         select type (pair_potential)
             type is (Null_Pair_Potential)
-                component_interacts = .false.
+                components_interact = .false.
             class default
-                component_interacts = .true.
+                components_interact = .true.
         end select
-    end function component_interacts_short
+    end function components_interact_from_pair_potential
 
-    pure logical function component_interacts_long(ewald_pair) result(component_interacts)
-        class(Abstract_Ewald_Real_Pair), intent(in) :: ewald_pair
+    pure logical function components_interact_from_ewald_real_pair(ewald_real_pair) &
+        result(components_interact)
+        class(Abstract_Ewald_Real_Pair), intent(in) :: ewald_real_pair
 
-        select type (ewald_pair)
+        select type (ewald_real_pair)
             type is (Null_Ewald_Real_Pair)
-                component_interacts = .false.
+                components_interact = .false.
             class default
-                component_interacts = .true.
+                components_interact = .true.
         end select
-    end function component_interacts_long
+    end function components_interact_from_ewald_real_pair
 
     pure logical function component_has_positions(partcles_positions)
         class(Abstract_Component_Coordinates), intent(in) :: partcles_positions

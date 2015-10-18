@@ -23,7 +23,7 @@ use class_visitable_cells, only: Abstract_Visitable_Cells, &
     Null_Visitable_Cells, XYZ_PBC_Visitable_Cells, XY_PBC_Visitable_Cells
 use types_short_potential_wrapper, only: Pair_Potential_Wrapper, Pair_Potentials_Wrapper, &
     Short_Potentials_Wrapper
-use procedures_property_inquirers, only: use_walls
+use procedures_property_inquirers, only: use_walls, components_interact
 
 implicit none
 
@@ -57,14 +57,12 @@ contains
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        logical :: interact, interact_with_walls
+        logical :: interact
         class(Abstract_Visitable_List), allocatable :: list
 
-        interact = size(mixture%components) > 0
         call short_potentials_factory_create(short_potentials%inter_pairs, interact, mixture%&
             inter_min_distances, input_data, prefix)
-        interact_with_walls = interact .and. use_walls(environment%walls_potential)
-        call short_potentials_factory_create(short_potentials%wall_pairs, interact_with_walls, &
+        call short_potentials_factory_create(short_potentials%wall_pairs, &
             mixture%wall_min_distances, input_data, prefix)
         call allocate_list(list, interact, input_data, prefix)
         call short_potentials_factory_create(short_potentials%inter_cells, interact, &
@@ -100,8 +98,7 @@ contains
                     call error_exit("periodic_box type unknown.")
             end select
         else
-            allocate(Null_Visitable_Cells :: cells(size(pairs), &
-                size(pairs)))
+            allocate(Null_Visitable_Cells :: cells(size(pairs), size(pairs)))
         end if
 
         do i_component = 1, size(cells, 2)
@@ -164,16 +161,18 @@ contains
 
     subroutine create_inter_pairs(pairs, interact, min_distances, input_data, prefix)
         type(Pair_Potentials_Wrapper), allocatable, intent(out) :: pairs(:)
-        logical, intent(in) :: interact
+        logical, intent(out) :: interact
         type(Minimum_Distances_Wrapper), intent(in) :: min_distances(:)
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
         integer :: i_component, j_component
+        logical :: interact_ij
         class(Abstract_Potential_Expression), allocatable :: expression
         character(len=:), allocatable :: pair_prefix
         type(Concrete_Number_to_String) :: string
 
+        interact = .true.
         allocate(pairs(size(min_distances)))
         do i_component = 1, size(pairs)
             allocate(pairs(i_component)%with_components(i_component))
@@ -184,11 +183,14 @@ contains
                     pair_prefix = prefix//"Inter "//string%get(i_component)//&
                         string%get(j_component)//"."
                 end if
-                call short_potentials_factory_create(expression, interact, input_data, pair_prefix)
                 associate (min_distance => min_distances(i_component)%with_components(j_component)%&
                         min_distance)
+                    interact_ij = components_interact(min_distance)
+                    interact = interact .and. interact_ij
+                    call short_potentials_factory_create(expression, interact_ij, input_data, &
+                        pair_prefix)
                     call short_potentials_factory_create(pairs(i_component)%&
-                        with_components(j_component)%pair_potential, interact, min_distance, &
+                        with_components(j_component)%pair_potential, interact_ij, min_distance, &
                         expression, input_data, pair_prefix)
                 end associate
                 deallocate(pair_prefix)
@@ -210,15 +212,14 @@ contains
         end if
     end subroutine destroy_inter_pairs
 
-    subroutine create_wall_pairs(pairs, interact, min_distances, input_data, &
-        prefix)
+    subroutine create_wall_pairs(pairs, min_distances, input_data, prefix)
         type(Pair_Potential_Wrapper), allocatable, intent(out) :: pairs(:)
-        logical, intent(in) :: interact
         type(Minimum_Distance_Wrapper), intent(in) :: min_distances(:)
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
         integer :: i_component
+        logical :: interact
         class(Abstract_Potential_Expression), allocatable :: expression
         character(len=:), allocatable :: pair_prefix
         type(Concrete_Number_to_String) :: string
@@ -226,8 +227,9 @@ contains
         allocate(pairs(size(min_distances)))
         do i_component = 1, size(pairs)
             pair_prefix = prefix//"Component "//string%get(i_component)//".With Walls."
-            call short_potentials_factory_create(expression, interact, input_data, pair_prefix)
             associate (min_distance => min_distances(i_component)%min_distance)
+                interact = components_interact(min_distance)
+                call short_potentials_factory_create(expression, interact, input_data, pair_prefix)
                 call short_potentials_factory_create(pairs(i_component)%pair_potential, &
                     interact, min_distance, expression, input_data, pair_prefix)
             end associate
