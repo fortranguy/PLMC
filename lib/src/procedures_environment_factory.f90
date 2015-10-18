@@ -21,7 +21,7 @@ use class_floor_penetration, only: Abstract_Floor_Penetration, &
 use procedures_component_factory, only: component_factory_destroy
 use class_potential_expression, only: Abstract_Potential_Expression
 use class_pair_potential, only: Abstract_Pair_Potential
-use procedures_short_potential_factory, only: short_potential_factory_create, &
+use procedures_short_potentials_factory, only: short_potential_factory_create, &
     short_potential_factory_destroy
 use class_walls_potential, only: Abstract_Walls_Potential, &
     Concrete_Walls_Potential, Null_Walls_Potential

@@ -28,15 +28,16 @@ private
         class(Abstract_Pair_Potential), allocatable :: inter_pair
     end type Mixture_Short_Potentials_Wrapper
 
-    type :: Pair_Potential_Wrapper
+    type, public :: Pair_Potential_Wrapper
         class(Abstract_Pair_Potential), allocatable :: pair_potential
     end type Pair_Potential_Wrapper
 
-    type :: Pair_Potentials_Wrapper
+    type, public :: Pair_Potentials_Wrapper
         type(Pair_Potential_Wrapper), allocatable :: with_components(:)
     end type Pair_Potentials_Wrapper
 
     type, public :: Short_Potentials_Wrapper
+        !macro visitor
         type(Pair_Potentials_Wrapper), allocatable :: inter_pair_potentials(:)
         class(Abstract_Visitable_Cells), allocatable :: inter_visitable_cells(:, :)
         type(Pair_Potential_Wrapper), allocatable :: wall_pair_potentials(:)

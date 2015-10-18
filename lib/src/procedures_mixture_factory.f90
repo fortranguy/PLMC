@@ -81,9 +81,9 @@ contains
         end if
     end subroutine destroy_and_deallocate_components
 
-    subroutine allocate_and_set_inter_min_distances(inter_min_distances, num_components, &
-        input_data, prefix)
-        type(Minimum_Distances_Wrapper), allocatable, intent(out) :: inter_min_distances(:)
+    subroutine allocate_and_set_inter_min_distances(min_distances, num_components, input_data, &
+        prefix)
+        type(Minimum_Distances_Wrapper), allocatable, intent(out) :: min_distances(:)
         integer, intent(in) :: num_components
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
@@ -92,26 +92,26 @@ contains
         character(len=:), allocatable :: min_distance_prefix
         type(Concrete_Number_to_String) :: string
 
-        do i_component = 1, num_components
-            allocate(inter_min_distances(num_components))
-            do j_component = 1, i_component
-                allocate(inter_min_distances(i_component)%with_components(i_component))
+        allocate(min_distances(num_components))
+        do i_component = 1, size(min_distances)
+            allocate(min_distances(i_component)%with_components(i_component))
+            do j_component = 1, size(min_distances(i_component)%with_components)
                 if (j_component == i_component) then
                     min_distance_prefix = prefix//"Component "//string%get(i_component)
                 else
                     min_distance_prefix = prefix//"Inter "//string%get(i_component)//&
                         string%get(j_component)
                 end if
-                call mixture_factory_create(inter_min_distances(i_component)%&
+                call mixture_factory_create(min_distances(i_component)%&
                     with_components(j_component)%min_distance, input_data, min_distance_prefix)
             end do
         end do
         if (allocated(min_distance_prefix)) deallocate(min_distance_prefix)
     end subroutine allocate_and_set_inter_min_distances
 
-    subroutine allocate_and_set_wall_min_distances(wall_min_distances, num_components, input_data, &
+    subroutine allocate_and_set_wall_min_distances(min_distances, num_components, input_data, &
         prefix)
-        type(Minimum_Distance_Wrapper), allocatable, intent(out) :: wall_min_distances(:)
+        type(Minimum_Distance_Wrapper), allocatable, intent(out) :: min_distances(:)
         integer, intent(in) :: num_components
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
@@ -119,10 +119,10 @@ contains
         integer :: i_component
         type(Concrete_Number_to_String) :: string
 
-        allocate(wall_min_distances(num_components))
-        do i_component = 1, num_components
-            call mixture_factory_create(wall_min_distances(i_component)%min_distance, input_data, &
-                prefix//"Component "//string%get(i_component))
+        allocate(min_distances(num_components))
+        do i_component = 1, size(min_distances)
+            call mixture_factory_create(min_distances(i_component)%min_distance, input_data, &
+                prefix//"Component "//string%get(i_component)//".With Walls.")
         end do
     end subroutine allocate_and_set_wall_min_distances
 
@@ -143,16 +143,16 @@ contains
         call min_distance%set(min_distance_value)
     end subroutine allocate_and_set_min_distance
 
-    subroutine deallocate_inter_min_distances(inter_min_distances)
-        type(Minimum_Distances_Wrapper), allocatable, intent(out) :: inter_min_distances(:)
+    subroutine deallocate_inter_min_distances(min_distances)
+        type(Minimum_Distances_Wrapper), allocatable, intent(out) :: min_distances(:)
 
         integer :: i_component
 
-        if (allocated(inter_min_distances)) then
-            do i_component = size(inter_min_distances), 1, -1
-                call mixture_factory_destroy(inter_min_distances(i_component)%with_components)
+        if (allocated(min_distances)) then
+            do i_component = size(min_distances), 1, -1
+                call mixture_factory_destroy(min_distances(i_component)%with_components)
             end do
-            deallocate(inter_min_distances)
+            deallocate(min_distances)
         end if
     end subroutine deallocate_inter_min_distances
 

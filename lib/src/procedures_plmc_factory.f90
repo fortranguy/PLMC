@@ -15,7 +15,7 @@ use procedures_component_factory, only: component_factory_create, component_fact
 use types_changes_wrapper, only: Changes_Wrapper
 use procedures_changes_factory, only: changes_factory_create, changes_factory_destroy
 use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper
-use procedures_short_potential_factory, only: short_potential_factory_create, &
+use procedures_short_potentials_factory, only: short_potential_factory_create, &
     short_potential_factory_destroy
 use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
 use procedures_ewald_factory, only: ewald_factory_create, ewald_factory_destroy
