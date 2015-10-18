@@ -156,8 +156,8 @@ contains
 
         mixture_is_dipolar = component_is_dipolar(mixture%components(1)%dipolar_moments) .and. &
             component_is_dipolar(mixture%components(2)%dipolar_moments)
-        call ewald_factory_create(ewalds%inter_micro, mixture_is_dipolar, environment, &
-            mixture%inter_diameter, input_data, ewalds_prefix//"Inter 12.")
+        !call ewald_factory_create(ewalds%inter_micro, mixture_is_dipolar, environment, &
+        !    mixture%inter_diameter, input_data, ewalds_prefix//"Inter 12.")
         call ewald_factory_create(ewalds%inters(1), ewalds%inter_micro, environment, &
             mixture%components(1))
         call ewald_factory_create(ewalds%inters(2), ewalds%inter_micro, environment, &

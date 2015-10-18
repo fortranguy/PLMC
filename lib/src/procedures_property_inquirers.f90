@@ -4,8 +4,6 @@ use json_module, only: json_file
 use procedures_checks, only: check_data_found
 use class_walls_potential, only: Abstract_Walls_Potential, Null_Walls_Potential
 use class_component_number, only: Abstract_Component_Number, Concrete_Component_Number
-use class_component_diameter, only: Abstract_Component_Diameter, Concrete_Component_Diameter
-use class_component_moment_norm, only: Abstract_Component_Moment_Norm, Concrete_Component_Moment_Norm
 use class_component_coordinates, only: Abstract_Component_Coordinates, &
     Concrete_Component_Positions, Concrete_Component_Orientations
 use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments, &

@@ -6,7 +6,7 @@ use json_module, only: json_file
 use procedures_checks, only: check_data_found
 use class_periodic_box, only: Abstract_Periodic_Box
 use types_environment_wrapper, only: Environment_Wrapper
-use class_component_diameter, only: Abstract_Component_Diameter
+use class_minimum_distance, only: Abstract_Minimum_Distance
 use class_component_coordinates, only: Abstract_Component_Coordinates
 use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
 use types_component_wrapper, only: Component_Wrapper, Mixture_Wrapper_Old
@@ -54,8 +54,8 @@ contains
 
         is_dipolar = component_is_dipolar(component%dipolar_moments)
         call set_alpha(alpha, is_dipolar, environment%periodic_box, input_data, prefix)
-        call ewald_factory_create(ewald%real_pair, is_dipolar, alpha, environment%periodic_box, &
-            component%diameter, input_data, prefix//"Real.")
+        !call ewald_factory_create(ewald%real_pair, is_dipolar, alpha, environment%periodic_box, &
+        !    component%diameter, input_data, prefix//"Real.")
         call ewald_factory_create(ewald%real_component, is_dipolar, environment%periodic_box, &
             component%positions, component%dipolar_moments, ewald%real_pair)
     end subroutine ewald_factory_create_all
@@ -73,12 +73,12 @@ contains
             component%positions, component%dipolar_moments, ewald_micro%real_pair)
     end subroutine ewald_factory_create_macro
 
-    subroutine ewald_factory_create_micro(ewald_micro, is_dipolar, environment, &
-        component_diameter, input_data, prefix)
+    subroutine ewald_factory_create_micro(ewald_micro, is_dipolar, environment, min_distance, &
+        input_data, prefix)
         type(Ewald_Wrapper_Micro), intent(out) :: ewald_micro
         logical, intent(in) :: is_dipolar
         type(Environment_Wrapper), intent(in) :: environment
-        class(Abstract_Component_Diameter), intent(in) :: component_diameter
+        class(Abstract_Minimum_Distance), intent(in) :: min_distance
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -86,7 +86,7 @@ contains
 
         call set_alpha(alpha, is_dipolar, environment%periodic_box, input_data, prefix)
         call ewald_factory_create(ewald_micro%real_pair, is_dipolar, alpha, &
-            environment%periodic_box, component_diameter, input_data, prefix//"Real.")
+            environment%periodic_box, min_distance, input_data, prefix//"Real.")
     end subroutine ewald_factory_create_micro
 
     subroutine set_alpha(alpha, is_dipolar, periodic_box, input_data, prefix)
@@ -113,17 +113,17 @@ contains
     end subroutine set_alpha
 
     subroutine allocate_and_construct_real_pair(real_pair, is_dipolar, alpha, periodic_box, &
-        component_diameter, input_data, prefix)
+        min_distance, input_data, prefix)
         class(Abstract_Ewald_Real_Pair), allocatable, intent(out) :: real_pair
         logical, intent(in) :: is_dipolar
         real(DP), intent(in) :: alpha
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        class(Abstract_Component_Diameter), intent(in) :: component_diameter
+        class(Abstract_Minimum_Distance), intent(in) :: min_distance
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
         call allocate_real_pair(real_pair, is_dipolar, input_data, prefix)
-        call construct_real_pair(real_pair, is_dipolar, alpha, periodic_box, component_diameter, &
+        call construct_real_pair(real_pair, is_dipolar, alpha, periodic_box, min_distance, &
             input_data, prefix)
     end subroutine allocate_and_construct_real_pair
 
@@ -151,13 +151,13 @@ contains
         end if
     end subroutine allocate_real_pair
 
-    subroutine construct_real_pair(real_pair, is_dipolar, alpha, periodic_box, component_diameter, &
+    subroutine construct_real_pair(real_pair, is_dipolar, alpha, periodic_box, min_distance, &
         input_data, prefix)
         class(Abstract_Ewald_Real_Pair), intent(inout) :: real_pair
         logical, intent(in) :: is_dipolar
         real(DP), intent(in) :: alpha
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        class(Abstract_Component_Diameter), intent(in) :: component_diameter
+        class(Abstract_Minimum_Distance), intent(in) :: min_distance
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -167,7 +167,7 @@ contains
         real(DP) :: box_size(num_dimensions), max_over_box
 
         if (is_dipolar) then
-            domain%min = component_diameter%get_min()
+            domain%min = min_distance%get()
             data_field = prefix//"max distance over box edge"
             call input_data%get(data_field, max_over_box, data_found)
             call check_data_found(data_field, data_found)

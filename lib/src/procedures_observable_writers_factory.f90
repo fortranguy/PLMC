@@ -4,7 +4,6 @@ use json_module, only: json_file
 use data_wrappers_prefix, only: environment_prefix
 use procedures_checks, only: check_data_found
 use class_component_number, only: Abstract_Component_Number
-use class_component_diameter, only: Abstract_Component_Diameter
 use class_component_coordinates, only: Abstract_Component_Coordinates
 use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
 use class_component_exchange, only: Abstract_Component_Exchange

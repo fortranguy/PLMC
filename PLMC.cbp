@@ -56,9 +56,6 @@
 		<Unit filename="lib/src/class_component_coordinates_writer.f90">
 			<Option weight="4" />
 		</Unit>
-		<Unit filename="lib/src/class_component_diameter.f90">
-			<Option weight="2" />
-		</Unit>
 		<Unit filename="lib/src/class_component_dipolar_moments.f90">
 			<Option weight="4" />
 		</Unit>
@@ -67,9 +64,6 @@
 		</Unit>
 		<Unit filename="lib/src/class_component_exchange.f90">
 			<Option weight="7" />
-		</Unit>
-		<Unit filename="lib/src/class_component_moment_norm.f90">
-			<Option weight="2" />
 		</Unit>
 		<Unit filename="lib/src/class_component_number.f90">
 			<Option weight="1" />
@@ -233,7 +227,7 @@
 		<Unit filename="lib/src/procedures_random.f90">
 			<Option weight="2" />
 		</Unit>
-		<Unit filename="lib/src/procedures_short_potential_factory.f90">
+		<Unit filename="lib/src/procedures_short_potentials_factory.f90">
 			<Option weight="9" />
 		</Unit>
 		<Unit filename="lib/src/types_changes_wrapper.f90">
@@ -330,7 +324,7 @@
 		<Unit filename="test/src/test_pair_potential.f90">
 			<Option compile="0" />
 			<Option link="0" />
-			<Option weight="10" />
+			<Option weight="4" />
 		</Unit>
 		<Unit filename="test/src/test_parallelepiped_domain.f90">
 			<Option compile="0" />
@@ -370,7 +364,7 @@
 		<Unit filename="test/src/test_potential_expression.f90">
 			<Option compile="0" />
 			<Option link="0" />
-			<Option weight="10" />
+			<Option weight="3" />
 		</Unit>
 		<Unit filename="test/src/test_reciprical_lattice.f90">
 			<Option compile="0" />

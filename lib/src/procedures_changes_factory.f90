@@ -6,8 +6,6 @@ use module_plmc_iterations, only: num_tuning_steps
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_data_found
 use class_periodic_box, only: Abstract_Periodic_Box
-use class_component_diameter, only: Abstract_Component_Diameter
-use class_component_moment_norm, only: Abstract_Component_Moment_Norm
 use class_component_coordinates, only: Abstract_Component_Coordinates
 use class_component_chemical_potential, only: Abstract_Component_Chemical_Potential
 use class_changed_coordinates, only: Abstract_Changed_Coordinates, Null_Changed_Coordinates

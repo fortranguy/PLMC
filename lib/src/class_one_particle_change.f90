@@ -378,7 +378,7 @@ contains
         new%i = old%i
         new%position = old%position
         new%orientation = this%changes(i_actor)%rotated_orientations%get(new%i)
-        new%dipolar_moment = this%components(i_actor)%moment_norm%get() * new%orientation
+        new%dipolar_moment = this%components(i_actor)%dipolar_moments%get_norm() * new%orientation
     end subroutine Concrete_One_Particle_Rotation_define_change
 
     subroutine Concrete_One_Particle_Rotation_update_actor(this, i_actor, new, old)
