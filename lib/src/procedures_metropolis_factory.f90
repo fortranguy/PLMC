@@ -6,7 +6,7 @@ use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
 use types_short_potentials_wrapper, only: Short_Potentials_Wrapper
-use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
+use types_ewalds_wrapper, only: Mixture_Ewald_Wrapper
 use class_tower_sampler, only: Abstract_Tower_Sampler, Concrete_Tower_Sampler, Null_Tower_Sampler
 use class_one_particle_change, only: Abstract_One_Particle_Change, &
     Concrete_One_Particle_Move, Concrete_One_Particle_Rotation, Null_One_Particle_Change

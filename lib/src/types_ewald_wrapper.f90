@@ -1,4 +1,4 @@
-module types_ewald_wrapper
+module types_ewalds_wrapper
 
 use data_constants, only: num_components
 use class_ewald_real_pair, only: Abstract_Ewald_Real_Pair
@@ -30,4 +30,16 @@ private
         type(Ewald_Wrapper_Micro) :: inter_micro
     end type Mixture_Ewald_Wrapper
 
-end module types_ewald_wrapper
+    type, public :: Ewald_Real_Pair_Wrapper
+        class(Abstract_Ewald_Real_Pair), allocatable :: real_pair
+    end type Ewald_Real_Pair_Wrapper
+
+    type, public :: Ewald_Real_Pairs_Wrapper
+        type(Ewald_Real_Pair_Wrapper), allocatable :: with_components(:)
+    end type Ewald_Real_Pairs_Wrapper
+
+    type, public :: Ewalds_Wrapper
+        type(Ewald_Real_Pairs_Wrapper), allocatable :: real_pairs(:)
+    end type Ewalds_Wrapper
+
+end module types_ewalds_wrapper

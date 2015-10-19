@@ -8,7 +8,7 @@ use types_component_wrapper, only: Mixture_Wrapper_Old
 use types_mixture_wrapper, only: Mixture_Wrapper
 use types_short_potentials_wrapper, only: Mixture_Short_Potentials_Wrapper, &
     Short_Potentials_Wrapper
-use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
+use types_ewalds_wrapper, only: Mixture_Ewald_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
 use types_metropolis_wrapper, only: Metropolis_Wrapper
 use procedures_plmc_factory, only: plmc_load, plmc_create, plmc_set, plmc_destroy

@@ -18,8 +18,8 @@ use procedures_changes_factory, only: changes_create, changes_destroy
 use types_short_potentials_wrapper, only: Short_Potentials_Wrapper
 use procedures_short_potentials_factory, only: short_potentials_create, &
     short_potentials_destroy
-use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
-use procedures_ewald_factory, only: ewald_create, ewald_destroy
+use types_ewalds_wrapper, only: Mixture_Ewald_Wrapper
+use procedures_ewalds_factory, only: ewald_create, ewald_destroy
 use module_changes_success, only: reset_counter => Concrete_Changes_Counter_reset, &
     set_success => Concrete_Changes_Counter_set
 use types_observables_wrapper, only: Observables_Wrapper_old

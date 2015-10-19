@@ -10,7 +10,7 @@ use types_component_wrapper, only: Component_Wrapper
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use types_changes_wrapper, only: Changes_Wrapper
 use types_short_potentials_wrapper, only: Short_Potentials_Wrapper
-use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
+use types_ewalds_wrapper, only: Mixture_Ewald_Wrapper
 use class_tower_sampler, only: Abstract_Tower_Sampler
 use module_changes_success, only: Concrete_Change_Counter
 use module_component_energy, only: Concrete_Component_Energy, Concrete_Inter_Energy, &
