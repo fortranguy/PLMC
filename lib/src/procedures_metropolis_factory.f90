@@ -16,23 +16,23 @@ use procedures_property_inquirers, only: component_can_move, component_can_rotat
 implicit none
 
 private
-public :: metropolis_factory_create, metropolis_factory_set, metropolis_factory_destroy
+public :: metropolis_create, metropolis_set, metropolis_destroy
 
-interface metropolis_factory_create
-    module procedure :: metropolis_factory_create_all
-end interface metropolis_factory_create
+interface metropolis_create
+    module procedure :: metropolis_create_all
+end interface metropolis_create
 
-interface metropolis_factory_set
-    module procedure :: metropolis_factory_set_all
-end interface metropolis_factory_set
+interface metropolis_set
+    module procedure :: metropolis_set_all
+end interface metropolis_set
 
-interface metropolis_factory_destroy
-    module procedure :: metropolis_factory_destroy_all
-end interface metropolis_factory_destroy
+interface metropolis_destroy
+    module procedure :: metropolis_destroy_all
+end interface metropolis_destroy
 
 contains
 
-    subroutine metropolis_factory_create_all(metropolis, environment, changes)
+    subroutine metropolis_create_all(metropolis, environment, changes)
         type(Metropolis_Wrapper), intent(out) :: metropolis
         type(Environment_Wrapper), intent(in) :: environment
         type(Changes_Wrapper), intent(in) :: changes(num_components)
@@ -41,7 +41,7 @@ contains
             changes)
         call allocate_and_construct_one_particle_rotation(metropolis%one_particle_rotation, &
             environment, changes)
-    end subroutine metropolis_factory_create_all
+    end subroutine metropolis_create_all
 
     subroutine allocate_and_construct_one_particle_move(one_particle_move, environment, changes)
         class(Abstract_One_Particle_Change), allocatable, intent(out) :: one_particle_move
@@ -62,7 +62,7 @@ contains
         deallocate(selector)
     end subroutine allocate_and_construct_one_particle_move
 
-    subroutine metropolis_factory_set_all(metropolis, components, short_potentials, ewalds)
+    subroutine metropolis_set_all(metropolis, components, short_potentials, ewalds)
         type(Metropolis_Wrapper), intent(inout) :: metropolis
         type(Component_Wrapper), intent(in) :: components(num_components)
         type(Short_Potentials_Wrapper), intent(in) :: short_potentials
@@ -70,7 +70,7 @@ contains
 
         call metropolis%one_particle_move%set_candidates(components, short_potentials, ewalds)
         call metropolis%one_particle_rotation%set_candidates(components, short_potentials, ewalds)
-    end subroutine metropolis_factory_set_all
+    end subroutine metropolis_set_all
 
     subroutine allocate_and_construct_one_particle_rotation(one_particle_rotation, environment, &
         changes)
@@ -92,12 +92,12 @@ contains
         deallocate(selector)
     end subroutine allocate_and_construct_one_particle_rotation
 
-    subroutine metropolis_factory_destroy_all(metropolis)
+    subroutine metropolis_destroy_all(metropolis)
         type(Metropolis_Wrapper), intent(inout) :: metropolis
 
         call destroy_and_deallocate_one_particle_change(metropolis%one_particle_rotation)
         call destroy_and_deallocate_one_particle_change(metropolis%one_particle_move)
-    end subroutine metropolis_factory_destroy_all
+    end subroutine metropolis_destroy_all
 
     subroutine destroy_and_deallocate_one_particle_change(one_particle_change)
         class(Abstract_One_Particle_Change), allocatable, intent(inout) :: one_particle_change

@@ -17,7 +17,7 @@ use module_component_energy, only: Concrete_Component_Energy, Concrete_Inter_Ene
     Concrete_Long_Energy, Concrete_Mixture_Energy, &
     particle_energy_sum => Concrete_Component_Energy_sum, &
     inter_energy_sum => Concrete_Inter_Energy_sum, operator(+), operator(-)
-use types_observables_wrapper, only: Mixture_Observables_Wrapper
+use types_observables_wrapper, only: Observables_Wrapper
 use class_metropolis_algorithm, only: Abstract_Metropolis_Algorithm
 
 implicit none
@@ -41,6 +41,7 @@ private
             construct_selector
         procedure, private :: test_metropolis => Abstract_One_Particle_Change_test_metropolis
         procedure(Abstract_One_Particle_Change_define_change), private, deferred :: define_change
+        procedure, private :: visit_walls => Abstract_One_Particle_Change_visit_walls
         procedure, private :: visit_short => Abstract_One_Particle_Change_visit_short
         procedure, private :: visit_long => Abstract_One_Particle_Change_visit_long
         procedure(Abstract_One_Particle_Change_update_actor), private, deferred :: update_actor
@@ -72,14 +73,14 @@ private
         end subroutine Abstract_One_Particle_Change_update_actor
 
         subroutine Abstract_One_Particle_Change_increment_hits(observables, i_actor)
-        import :: Mixture_Observables_Wrapper
-            type(Mixture_Observables_Wrapper), intent(inout) :: observables
+        import :: Observables_Wrapper
+            type(Observables_Wrapper), intent(inout) :: observables
             integer, intent(in) :: i_actor
         end subroutine Abstract_One_Particle_Change_increment_hits
 
         subroutine Abstract_One_Particle_Change_increment_success(observables, i_actor)
-        import :: Mixture_Observables_Wrapper
-            type(Mixture_Observables_Wrapper), intent(inout) :: observables
+        import :: Observables_Wrapper
+            type(Observables_Wrapper), intent(inout) :: observables
             integer, intent(in) :: i_actor
         end subroutine Abstract_One_Particle_Change_increment_success
 
@@ -101,7 +102,8 @@ private
         procedure :: get_num_choices => Concrete_One_Particle_Rotation_get_num_choices
         procedure, private :: construct_selector => &
             Concrete_One_Particle_Rotation_construct_selector
-        procedure, private :: visit_short => Concrete_One_Particle_Rotation_visit_short
+        !procedure, private :: visit_walls => Concrete_One_Particle_Rotation_visit_walls
+        !procedure, private :: visit_short => Concrete_One_Particle_Rotation_visit_short
         procedure, private :: define_change => Concrete_One_Particle_Rotation_define_change
         procedure, private :: update_actor => Concrete_One_Particle_Rotation_update_actor
         procedure, private, nopass :: increment_hits => &
@@ -171,19 +173,26 @@ contains
 
     subroutine Abstract_One_Particle_Change_try(this, observables)
         class(Abstract_One_Particle_Change), intent(in) :: this
-        type(Mixture_Observables_Wrapper), intent(inout) :: observables
+        type(Observables_Wrapper), intent(inout) :: observables
 
-        integer :: i_actor, i_spectator
+        integer :: i_actor, i_spectator, i_component
         logical :: success
         type(Concrete_Component_Energy) :: actor_energy_difference
         type(Concrete_Inter_Energy) :: inter_energy_difference
+        real(DP) :: walls_energy, field_energy
+        real(DP) :: short_differences(size(observables%short_energies)), &
+            long_energies(size(observables%long_energies))
 
         i_actor = this%selector%get()
         i_spectator = mod(i_actor, num_components) + 1
         call this%increment_hits(observables, i_actor)
         call this%test_metropolis(success, actor_energy_difference, inter_energy_difference, &
-            i_actor, i_spectator)
+            walls_energy, short_differences, long_energies, i_actor, i_spectator)
         if (success) then
+            do i_component = 1, size(observables%short_energies)
+                !observables%short_energies(i_actor)%with_components =
+                !observables%short_energies(i_actor)%with_components +
+            end do
             observables%intras(i_actor)%component_energy = &
                 observables%intras(i_actor)%component_energy + actor_energy_difference
             observables%inter_energy = observables%inter_energy + inter_energy_difference
@@ -192,11 +201,14 @@ contains
     end subroutine Abstract_One_Particle_Change_try
 
     subroutine Abstract_One_Particle_Change_test_metropolis(this, success, &
-        actor_energy_difference, inter_energy_difference, i_actor, i_spectator)
+        actor_energy_difference, inter_energy_difference, walls_difference, short_differences, &
+        long_difference, i_actor, i_spectator)
         class(Abstract_One_Particle_Change), intent(in) :: this
         logical, intent(out) :: success
         type(Concrete_Component_Energy), intent(out) :: actor_energy_difference
         type(Concrete_Inter_Energy), intent(out) :: inter_energy_difference
+        real(DP), intent(out) :: walls_difference
+        real(DP), intent(out) :: short_differences(:), long_difference(:)
         integer, intent(in) :: i_actor, i_spectator
 
         type(Concrete_Temporary_Particle) :: new, old
@@ -208,9 +220,11 @@ contains
         call this%define_change(new, old, i_actor)
 
         success = .false.
-        call this%visit_short(overlap, new_energy, old_energy, new, old, i_actor, i_spectator)
+        call this%visit_walls(overlap, walls_difference, new, old, i_actor)
         if (overlap) return
-        call this%visit_long(new_energy, old_energy, new, old, i_actor, i_spectator)
+        call this%visit_short(overlap, short_differences, new, old, i_actor)
+        if (overlap) return
+        call this%visit_long(long_difference, new, old, i_actor)
 
         actor_energy_difference = new_energy%intras(i_actor) - old_energy%intras(i_actor)
         inter_energy_difference = new_energy%inter - old_energy%inter
@@ -223,52 +237,65 @@ contains
         end if
     end subroutine Abstract_One_Particle_Change_test_metropolis
 
-    subroutine Abstract_One_Particle_Change_visit_short(this, overlap, new_energy, old_energy, &
-        new, old, i_actor, i_spectator)
+    subroutine Abstract_One_Particle_Change_visit_walls(this, overlap, walls_difference, new, old, &
+        i_actor)
         class(Abstract_One_Particle_Change), intent(in) :: this
         logical, intent(out) :: overlap
-        type(Concrete_Mixture_Energy), intent(inout) :: new_energy, old_energy
+        real(DP), intent(out) :: walls_difference
         type(Concrete_Temporary_Particle), intent(in) :: new, old
-        integer, intent(in) :: i_actor, i_spectator
+        integer, intent(in) :: i_actor
 
+        real(DP) :: walls_new, walls_old
         integer :: i_component
 
-        call this%environment%walls_potential%visit(overlap, new_energy%intras(i_actor)%walls, &
-            new%position, this%short_potentials%wall_pairs(i_actor)%pair_potential)
+        call this%environment%walls_potential%visit(overlap, walls_new, new%position, &
+            this%short_potentials%wall_pairs(i_actor)%pair_potential)
         if (overlap) return
-        do i_component = 1, size(this%short_potentials%inter_cells)
+        call this%environment%walls_potential%visit(overlap, walls_old, old%position, &
+            this%short_potentials%wall_pairs(i_actor)%pair_potential)
+        walls_difference = walls_new - walls_old
+    end subroutine Abstract_One_Particle_Change_visit_walls
+
+    subroutine Abstract_One_Particle_Change_visit_short(this, overlap, short_differences, new, &
+        old, i_actor)
+        class(Abstract_One_Particle_Change), intent(in) :: this
+        logical, intent(out) :: overlap
+        real(DP), intent(out) :: short_differences(:)
+        type(Concrete_Temporary_Particle), intent(in) :: new, old
+        integer, intent(in) :: i_actor
+
+        integer :: i_component
+        real(DP), dimension(size(short_differences)) :: short_new, short_old
+
+        do i_component = 1, size(this%short_potentials%inter_cells, 1)
             call this%short_potentials%inter_cells(i_component, i_actor)%visit(overlap, &
-                new_energy%intras(i_actor)%short, new, same_type=.true.) ! energy holder to change
+                short_new(i_component), new, same_type=.true.)
             if (overlap) return
         end do
-        call this%environment%walls_potential%visit(overlap, old_energy%intras(i_actor)%walls, &
-            old%position, this%short_potentials%wall_pairs(i_actor)%pair_potential)
-        do i_component = 1, size(this%short_potentials%inter_cells)
+        do i_component = 1, size(this%short_potentials%inter_cells, 1)
             call this%short_potentials%inter_cells(i_component, i_actor)%visit(overlap, &
-                old_energy%intras(i_actor)%short, old, same_type=.true.)
+                short_old(i_component), old, same_type=.true.)
         end do
+        short_differences = short_new - short_old
     end subroutine Abstract_One_Particle_Change_visit_short
 
-    subroutine Abstract_One_Particle_Change_visit_long(this, new_energy, old_energy, new, old, &
-        i_actor, i_spectator)
+    subroutine Abstract_One_Particle_Change_visit_long(this, long_difference, new, old, i_actor)
         class(Abstract_One_Particle_Change), intent(in) :: this
-        type(Concrete_Mixture_Energy), intent(inout) :: new_energy, old_energy
+        real(DP), intent(out) :: long_difference(:)
         type(Concrete_Temporary_Particle), intent(in) :: new, old
-        integer, intent(in) :: i_actor, i_spectator
+        integer, intent(in) :: i_actor
 
         type(Concrete_Long_Energy) :: new_long, old_long, inter_new_long, inter_old_long
+        real(DP), dimension(size(long_difference)) :: long_new_real, long_old_real
 
-        call this%ewalds%intras(i_actor)%real_component%visit(new_long%real, new, same_type=.true.)
-        call this%ewalds%inters(i_spectator)%real_component%visit(inter_new_long%real, new, &
-            same_type=.false.)
-        call this%ewalds%intras(i_actor)%real_component%visit(old_long%real, old, same_type=.true.)
-        call this%ewalds%inters(i_spectator)%real_component%visit(inter_old_long%real, old, &
-            same_type=.false.)
-        new_energy%intras(i_actor)%long = new_long%real
-        old_energy%intras(i_actor)%long = old_long%real
-        new_energy%inter%long = inter_new_long%real
-        old_energy%inter%long = inter_old_long%real
-        ! add effect of field
+        !do i_component = 1, size(this%ewalds%pairs) ...
+
+        !call this%ewalds%intras(i_actor)%real_component%visit(new_long%real, new, same_type=.true.)
+        !call this%ewalds%inters(i_spectator)%real_component%visit(inter_new_long%real, new, &
+        !    same_type=.false.)
+        !call this%ewalds%intras(i_actor)%real_component%visit(old_long%real, old, same_type=.true.)
+        !call this%ewalds%inters(i_spectator)%real_component%visit(inter_old_long%real, old, &
+        !    same_type=.false.)
     end subroutine Abstract_One_Particle_Change_visit_long
 
 !end implementation Abstract_One_Particle_Change
@@ -316,7 +343,7 @@ contains
     end subroutine Concrete_One_Particle_Move_update_actor
 
     subroutine Concrete_One_Particle_Move_increment_hits(observables, i_actor)
-        type(Mixture_Observables_Wrapper), intent(inout) :: observables
+        type(Observables_Wrapper), intent(inout) :: observables
         integer, intent(in) :: i_actor
 
         observables%intras(i_actor)%changes_counter%move%num_hits = &
@@ -324,7 +351,7 @@ contains
     end subroutine Concrete_One_Particle_Move_increment_hits
 
     subroutine Concrete_One_Particle_Move_increment_success(observables, i_actor)
-        type(Mixture_Observables_Wrapper), intent(inout) :: observables
+        type(Observables_Wrapper), intent(inout) :: observables
         integer, intent(in) :: i_actor
 
         observables%intras(i_actor)%changes_counter%move%num_success = &
@@ -349,19 +376,7 @@ contains
             this%components(2)%orientations%get_num()
     end function Concrete_One_Particle_Rotation_get_num_choices
 
-    subroutine Concrete_One_Particle_Rotation_visit_short(this, overlap, new_energy, old_energy, &
-        new, old, i_actor, i_spectator)
-        class(Concrete_One_Particle_Rotation), intent(in) :: this
-        logical, intent(out) :: overlap
-        type(Concrete_Mixture_Energy), intent(inout) :: new_energy, old_energy
-        type(Concrete_Temporary_Particle), intent(in) :: new, old
-        integer, intent(in) :: i_actor, i_spectator
-        overlap = .false.
-        new_energy%intras(:)%short = 0._DP
-        new_energy%inter%short = 0._DP
-        old_energy%intras(:)%short = 0._DP
-        old_energy%inter%short = 0._DP
-    end subroutine Concrete_One_Particle_Rotation_visit_short
+    ! override visit walls ans short
 
     subroutine Concrete_One_Particle_Rotation_define_change(this, new, old, i_actor)
         class(Concrete_One_Particle_Rotation), intent(in) :: this
@@ -386,7 +401,7 @@ contains
     end subroutine Concrete_One_Particle_Rotation_update_actor
 
     subroutine Concrete_One_Particle_Rotation_increment_hits(observables, i_actor)
-        type(Mixture_Observables_Wrapper), intent(inout) :: observables
+        type(Observables_Wrapper), intent(inout) :: observables
         integer, intent(in) :: i_actor
 
         observables%intras(i_actor)%changes_counter%rotation%num_hits = &
@@ -394,7 +409,7 @@ contains
     end subroutine Concrete_One_Particle_Rotation_increment_hits
 
     subroutine Concrete_One_Particle_Rotation_increment_success(observables, i_actor)
-        type(Mixture_Observables_Wrapper), intent(inout) :: observables
+        type(Observables_Wrapper), intent(inout) :: observables
         integer, intent(in) :: i_actor
 
         observables%intras(i_actor)%changes_counter%rotation%num_success = &
@@ -435,7 +450,7 @@ contains
 
     subroutine Null_One_Particle_Change_try(this, observables)
         class(Null_One_Particle_Change), intent(in) :: this
-        type(Mixture_Observables_Wrapper), intent(inout) :: observables
+        type(Observables_Wrapper), intent(inout) :: observables
     end subroutine Null_One_Particle_Change_try
 
     subroutine Null_One_Particle_Change_define_change(this, new, old, i_actor)
@@ -453,12 +468,12 @@ contains
     end subroutine Null_One_Particle_Change_update_actor
 
     subroutine Null_One_Particle_Change_increment_hits(observables, i_actor)
-        type(Mixture_Observables_Wrapper), intent(inout) :: observables
+        type(Observables_Wrapper), intent(inout) :: observables
         integer, intent(in) :: i_actor
     end subroutine Null_One_Particle_Change_increment_hits
 
     subroutine Null_One_Particle_Change_increment_success(observables, i_actor)
-        type(Mixture_Observables_Wrapper), intent(inout) :: observables
+        type(Observables_Wrapper), intent(inout) :: observables
         integer, intent(in) :: i_actor
     end subroutine Null_One_Particle_Change_increment_success
 

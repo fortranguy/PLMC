@@ -2,7 +2,7 @@ module procedures_plmc_write
 
 use module_plmc_iterations, only: num_tuning_steps, num_steps
 use types_observable_writers_wrapper, only: Mixture_Observable_Writers_Wrapper
-use types_observables_wrapper, only: Mixture_Observables_Wrapper
+use types_observables_wrapper, only: Observables_Wrapper
 
 implicit none
 
@@ -18,7 +18,7 @@ contains
     subroutine write_observables(i_step, observables_writers, observables)
         integer, intent(in) :: i_step
         type(Mixture_Observable_Writers_Wrapper), intent(in) :: observables_writers
-        type(Mixture_Observables_Wrapper), intent(in) :: observables
+        type(Observables_Wrapper), intent(in) :: observables
 
         if (i_step > 0) then
             call observables_writers%intras(1)%coordinates%write(i_step)

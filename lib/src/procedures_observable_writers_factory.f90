@@ -24,21 +24,21 @@ use procedures_property_inquirers, only: use_walls, component_has_positions, &
 implicit none
 
 private
-public :: observable_writers_factory_create, observable_writers_factory_destroy
+public :: observable_writers_create, observable_writers_destroy
 
-interface observable_writers_factory_create
+interface observable_writers_create
     module procedure :: allocate_and_construct_energy
     module procedure :: allocate_and_construct_inter_energy
     module procedure :: allocate_and_construct_changes
     module procedure :: allocate_and_construct_coordinates
-end interface observable_writers_factory_create
+end interface observable_writers_create
 
-interface observable_writers_factory_destroy
+interface observable_writers_destroy
     module procedure :: destroy_and_deallocate_coordinates
     module procedure :: destroy_and_deallocate_changes
     module procedure :: destroy_and_deallocate_inter_energy
     module procedure :: destroy_and_deallocate_component_energy
-end interface observable_writers_factory_destroy
+end interface observable_writers_destroy
 
 contains
 

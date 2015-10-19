@@ -8,27 +8,27 @@ use procedures_command_arguments, only: set_filename_from_argument
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_walls_potential, only: Abstract_Walls_Potential
 use types_environment_wrapper, only: Environment_Wrapper
-use procedures_environment_factory, only: environment_factory_create, environment_factory_destroy
+use procedures_environment_factory, only: environment_create, environment_destroy
 use types_component_wrapper, only: Mixture_Wrapper_Old, Component_Wrapper !to delete
 use types_mixture_wrapper, only: Mixture_Wrapper
-use procedures_component_factory, only: component_factory_create, component_factory_destroy !to delete
-use procedures_mixture_factory, only: mixture_factory_create, mixture_factory_destroy
+use procedures_component_factory, only: component_create, component_destroy !to delete
+use procedures_mixture_factory, only: mixture_create, mixture_destroy
 use types_changes_wrapper, only: Changes_Wrapper
-use procedures_changes_factory, only: changes_factory_create, changes_factory_destroy
+use procedures_changes_factory, only: changes_create, changes_destroy
 use types_short_potentials_wrapper, only: Short_Potentials_Wrapper
-use procedures_short_potentials_factory, only: short_potentials_factory_create, &
-    short_potentials_factory_destroy
+use procedures_short_potentials_factory, only: short_potentials_create, &
+    short_potentials_destroy
 use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
-use procedures_ewald_factory, only: ewald_factory_create, ewald_factory_destroy
+use procedures_ewald_factory, only: ewald_create, ewald_destroy
 use module_changes_success, only: reset_counter => Concrete_Changes_Counter_reset, &
     set_success => Concrete_Changes_Counter_set
-use types_observables_wrapper, only: Observables_Wrapper
+use types_observables_wrapper, only: Observables_Wrapper_old
 use types_observable_writers_wrapper, only: Mixture_Observable_Writers_Wrapper
-use procedures_observable_writers_factory, only: observable_writers_factory_create, &
-    observable_writers_factory_destroy
+use procedures_observable_writers_factory, only: observable_writers_create, &
+    observable_writers_destroy
 use types_metropolis_wrapper, only: Metropolis_Wrapper
-use procedures_metropolis_factory, only: metropolis_factory_create, metropolis_factory_set, &
-    metropolis_factory_destroy
+use procedures_metropolis_factory, only: metropolis_create, metropolis_set, &
+    metropolis_destroy
 use class_tower_sampler, only: Abstract_Tower_Sampler, Concrete_Tower_Sampler, Null_Tower_Sampler
 use procedures_property_inquirers, only: use_walls, component_is_dipolar, &
     component_can_change
@@ -85,13 +85,13 @@ contains
         type(Environment_Wrapper), intent(out) :: environment
         type(json_file), intent(inout) :: input_data
 
-        call environment_factory_create(environment, input_data, environment_prefix)
+        call environment_create(environment, input_data, environment_prefix)
     end subroutine create_environment
 
     subroutine destroy_environment(environment)
         type(Environment_Wrapper), intent(inout) :: environment
 
-        call environment_factory_destroy(environment)
+        call environment_destroy(environment)
     end subroutine destroy_environment
 
     subroutine create_mixture(mixture, environment, input_data)
@@ -99,13 +99,13 @@ contains
         type(Environment_Wrapper), intent(in) :: environment
         type(json_file), intent(inout) :: input_data
 
-        call mixture_factory_create(mixture, environment, input_data, mixture_prefix)
+        call mixture_create(mixture, environment, input_data, mixture_prefix)
     end subroutine create_mixture
 
     subroutine destroy_mixture(mixture)
         type(Mixture_Wrapper), intent(inout) :: mixture
 
-        call mixture_factory_destroy(mixture)
+        call mixture_destroy(mixture)
     end subroutine destroy_mixture
 
     subroutine create_changes(changes, periodic_box, components, input_data)
@@ -114,17 +114,17 @@ contains
         type(Component_Wrapper), intent(in) :: components(num_components)
         type(json_file), intent(inout) :: input_data
 
-        call changes_factory_create(changes(1), periodic_box, components(1), input_data, &
+        call changes_create(changes(1), periodic_box, components(1), input_data, &
             changes_prefix//"Component 1.")
-        call changes_factory_create(changes(2), periodic_box, components(2), input_data, &
+        call changes_create(changes(2), periodic_box, components(2), input_data, &
             changes_prefix//"Component 2.")
     end subroutine create_changes
 
     subroutine destroy_changes(changes)
         type(Changes_Wrapper), intent(inout) :: changes(2)
 
-        call changes_factory_destroy(changes(1))
-        call changes_factory_destroy(changes(2))
+        call changes_destroy(changes(1))
+        call changes_destroy(changes(2))
     end subroutine destroy_changes
 
     subroutine create_short_potentials(short_potentials, environment, mixture, input_data)
@@ -133,14 +133,14 @@ contains
         type(Mixture_Wrapper), intent(in) :: mixture
         type(json_file), intent(inout) :: input_data
 
-        call short_potentials_factory_create(short_potentials, environment, mixture, input_data, &
+        call short_potentials_create(short_potentials, environment, mixture, input_data, &
             short_potentials_prefix)
     end subroutine create_short_potentials
 
     subroutine destroy_short_potentials(short_potentials)
         type(Short_Potentials_Wrapper), intent(inout) :: short_potentials
 
-        call short_potentials_factory_destroy(short_potentials)
+        call short_potentials_destroy(short_potentials)
     end subroutine destroy_short_potentials
 
     subroutine create_ewalds(ewalds, environment, mixture, input_data)
@@ -151,29 +151,29 @@ contains
 
         logical :: mixture_is_dipolar
 
-        call ewald_factory_create(ewalds%intras(1), environment, mixture%components(1), &
+        call ewald_create(ewalds%intras(1), environment, mixture%components(1), &
             input_data, ewalds_prefix//"Component 1.")
-        call ewald_factory_create(ewalds%intras(2), environment, mixture%components(2), &
+        call ewald_create(ewalds%intras(2), environment, mixture%components(2), &
             input_data, ewalds_prefix//"Component 2.")
 
         mixture_is_dipolar = component_is_dipolar(mixture%components(1)%dipolar_moments) .and. &
             component_is_dipolar(mixture%components(2)%dipolar_moments)
-        !call ewald_factory_create(ewalds%inter_micro, mixture_is_dipolar, environment, &
+        !call ewald_create(ewalds%inter_micro, mixture_is_dipolar, environment, &
         !    mixture%inter_diameter, input_data, ewalds_prefix//"Inter 12.")
-        call ewald_factory_create(ewalds%inters(1), ewalds%inter_micro, environment, &
+        call ewald_create(ewalds%inters(1), ewalds%inter_micro, environment, &
             mixture%components(1))
-        call ewald_factory_create(ewalds%inters(2), ewalds%inter_micro, environment, &
+        call ewald_create(ewalds%inters(2), ewalds%inter_micro, environment, &
             mixture%components(2))
     end subroutine create_ewalds
 
     subroutine destroy_ewalds(ewalds)
         type(Mixture_Ewald_Wrapper), intent(inout) :: ewalds
 
-        call ewald_factory_destroy(ewalds%inters(2))
-        call ewald_factory_destroy(ewalds%inters(1))
-        call ewald_factory_destroy(ewalds%inter_micro)
-        call ewald_factory_destroy(ewalds%intras(2))
-        call ewald_factory_destroy(ewalds%intras(1))
+        call ewald_destroy(ewalds%inters(2))
+        call ewald_destroy(ewalds%inters(1))
+        call ewald_destroy(ewalds%inter_micro)
+        call ewald_destroy(ewalds%intras(2))
+        call ewald_destroy(ewalds%intras(1))
     end subroutine destroy_ewalds
 
     subroutine create_observable_writers(observable_writers, walls_potential, mixture, changes, &
@@ -192,28 +192,28 @@ contains
         wall_used = use_walls(walls_potential)
         component_1_exists = .false.
         component_1_is_dipolar = component_is_dipolar(mixture%components(1)%dipolar_moments)
-        call observable_writers_factory_create(observable_writers%intras(1)%energy, wall_used, &
+        call observable_writers_create(observable_writers%intras(1)%energy, wall_used, &
             component_1_exists, component_1_is_dipolar, "component_1_energy.out")
         component_2_exists = .false.
         component_2_is_dipolar = component_is_dipolar(mixture%components(2)%dipolar_moments)
-        call observable_writers_factory_create(observable_writers%intras(2)%energy, wall_used, &
+        call observable_writers_create(observable_writers%intras(2)%energy, wall_used, &
             component_2_exists, component_2_is_dipolar, "component_2_energy.out")
         mixture_exists = component_1_exists .and. component_2_exists
         mixture_is_dipolar = component_1_is_dipolar .and. component_2_is_dipolar
-        call observable_writers_factory_create(observable_writers%inter_energy, mixture_exists, &
+        call observable_writers_create(observable_writers%inter_energy, mixture_exists, &
             mixture_is_dipolar, "inter_12_energy.out")
 
-        call observable_writers_factory_create(observable_writers%intras(1)%changes, &
+        call observable_writers_create(observable_writers%intras(1)%changes, &
             changes(1)%moved_positions, changes(1)%rotated_orientations, &
             changes(1)%component_exchange, "component_1_success.out")
-        call observable_writers_factory_create(observable_writers%intras(2)%changes, &
+        call observable_writers_create(observable_writers%intras(2)%changes, &
             changes(2)%moved_positions, changes(2)%rotated_orientations, &
             changes(2)%component_exchange, "component_2_success.out")
 
-        call observable_writers_factory_create(observable_writers%intras(1)%coordinates, &
+        call observable_writers_create(observable_writers%intras(1)%coordinates, &
             "component_1_coordinates", mixture%components(1)%positions, &
             mixture%components(1)%orientations, input_data, "Monte Carlo.")
-        call observable_writers_factory_create(observable_writers%intras(2)%coordinates, &
+        call observable_writers_create(observable_writers%intras(2)%coordinates, &
             "component_2_coordinates", mixture%components(2)%positions, &
             mixture%components(2)%orientations, input_data, "Monte Carlo.")
     end subroutine create_observable_writers
@@ -221,13 +221,13 @@ contains
     subroutine destroy_observable_writers(observable_writers)
         type(Mixture_Observable_Writers_Wrapper), intent(inout) :: observable_writers
 
-        call observable_writers_factory_destroy(observable_writers%intras(2)%coordinates)
-        call observable_writers_factory_destroy(observable_writers%intras(1)%coordinates)
-        call observable_writers_factory_destroy(observable_writers%intras(2)%changes)
-        call observable_writers_factory_destroy(observable_writers%intras(1)%changes)
-        call observable_writers_factory_destroy(observable_writers%inter_energy)
-        call observable_writers_factory_destroy(observable_writers%intras(2)%energy)
-        call observable_writers_factory_destroy(observable_writers%intras(1)%energy)
+        call observable_writers_destroy(observable_writers%intras(2)%coordinates)
+        call observable_writers_destroy(observable_writers%intras(1)%coordinates)
+        call observable_writers_destroy(observable_writers%intras(2)%changes)
+        call observable_writers_destroy(observable_writers%intras(1)%changes)
+        call observable_writers_destroy(observable_writers%inter_energy)
+        call observable_writers_destroy(observable_writers%intras(2)%energy)
+        call observable_writers_destroy(observable_writers%intras(1)%energy)
     end subroutine destroy_observable_writers
 
     subroutine create_metropolis(metropolis, environment, changes)
@@ -235,13 +235,13 @@ contains
         type(Environment_Wrapper), intent(in) :: environment
         type(Changes_Wrapper), intent(in) :: changes(num_components)
 
-        call metropolis_factory_create(metropolis, environment, changes)
+        call metropolis_create(metropolis, environment, changes)
     end subroutine create_metropolis
 
     subroutine destroy_metropolis(metropolis)
         type(Metropolis_Wrapper), intent(inout) :: metropolis
 
-        call metropolis_factory_destroy(metropolis)
+        call metropolis_destroy(metropolis)
     end subroutine destroy_metropolis
 
     subroutine set_metropolis(metropolis, components, short_potentials, ewalds)
@@ -250,14 +250,14 @@ contains
         type(Short_Potentials_Wrapper), intent(in) :: short_potentials
         type(Mixture_Ewald_Wrapper), intent(in) :: ewalds
 
-        call metropolis_factory_set(metropolis, components, short_potentials, ewalds)
+        call metropolis_set(metropolis, components, short_potentials, ewalds)
     end subroutine set_metropolis
 
     subroutine tune_changes(tuned, i_step, changes, observables_intras)
         logical, intent(out) :: tuned
         integer, intent(in) :: i_step
         type(Changes_Wrapper), intent(inout) :: changes(:)
-        type(Observables_Wrapper), intent(in) :: observables_intras(num_components)
+        type(Observables_Wrapper_old), intent(in) :: observables_intras(num_components)
 
         logical :: move_tuned(num_components), rotation_tuned(num_components)
         integer :: i_component
@@ -272,7 +272,7 @@ contains
     end subroutine tune_changes
 
     subroutine set_success_and_reset_counter(observables_intras)
-        type(Observables_Wrapper), intent(inout) :: observables_intras(num_components)
+        type(Observables_Wrapper_old), intent(inout) :: observables_intras(num_components)
 
         integer :: i_component
 

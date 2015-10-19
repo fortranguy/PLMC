@@ -18,11 +18,11 @@ use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice, &
     Concrete_Reciprocal_Lattice, Null_Reciprocal_Lattice
 use class_floor_penetration, only: Abstract_Floor_Penetration, &
     Flat_Floor_Penetration, Null_Floor_Penetration
-use procedures_component_factory, only: component_factory_destroy
+use procedures_component_factory, only: component_destroy
 use class_potential_expression, only: Abstract_Potential_Expression
 use class_pair_potential, only: Abstract_Pair_Potential
-use procedures_short_potentials_factory, only: short_potentials_factory_create, &
-    short_potentials_factory_destroy
+use procedures_short_potentials_factory, only: short_potentials_create, &
+    short_potentials_destroy
 use class_walls_potential, only: Abstract_Walls_Potential, &
     Concrete_Walls_Potential, Null_Walls_Potential
 use types_environment_wrapper, only: Environment_Wrapper
@@ -31,10 +31,10 @@ use procedures_property_inquirers, only: apply_external_field, use_reciprocal_la
 implicit none
 
 private
-public :: environment_factory_create, environment_factory_destroy
+public :: environment_create, environment_destroy
 
-interface environment_factory_create
-    module procedure :: environment_factory_create_all
+interface environment_create
+    module procedure :: environment_create_all
     module procedure :: allocate_and_set_periodic_box
     module procedure :: allocate_and_set_temperature
     module procedure :: allocate_and_set_field_expression
@@ -43,9 +43,9 @@ interface environment_factory_create
     module procedure :: allocate_and_construct_reciprocal_lattice
     module procedure :: allocate_and_set_floor_penetration
     module procedure :: allocate_and_construct_walls_potential
-end interface environment_factory_create
+end interface environment_create
 
-interface environment_factory_destroy
+interface environment_destroy
     module procedure :: destroy_and_deallocate_walls_potential
     module procedure :: deallocate_floor_penetration
     module procedure :: destroy_and_deallocate_reciprocal_lattice
@@ -54,12 +54,12 @@ interface environment_factory_destroy
     module procedure :: deallocate_field_expression
     module procedure :: deallocate_temperature
     module procedure :: deallocate_periodic_box
-    module procedure :: environment_factory_destroy_all
-end interface environment_factory_destroy
+    module procedure :: environment_destroy_all
+end interface environment_destroy
 
 contains
 
-    subroutine environment_factory_create_all(environment, input_data, prefix)
+    subroutine environment_create_all(environment, input_data, prefix)
         type(Environment_Wrapper), intent(out) :: environment
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
@@ -69,24 +69,24 @@ contains
         class(Abstract_Floor_Penetration), allocatable :: floor_penetration
         logical :: field_applied, walls_used
 
-        call environment_factory_create(environment%periodic_box, input_data, prefix)
-        call environment_factory_create(environment%temperature, input_data, prefix)
+        call environment_create(environment%periodic_box, input_data, prefix)
+        call environment_create(environment%temperature, input_data, prefix)
         field_applied = apply_external_field(input_data, prefix)
-        call environment_factory_create(field_expression, field_applied, input_data, prefix)
-        call environment_factory_create(parallelepiped_domain, field_applied, &
+        call environment_create(field_expression, field_applied, input_data, prefix)
+        call environment_create(parallelepiped_domain, field_applied, &
             environment%periodic_box, input_data, prefix//"External Field.")
-        call environment_factory_create(environment%external_field, field_applied, &
+        call environment_create(environment%external_field, field_applied, &
             parallelepiped_domain, field_expression)
-        call environment_factory_destroy(field_expression)
-        call environment_factory_destroy(parallelepiped_domain)
-        call environment_factory_create(environment%reciprocal_lattice, environment%periodic_box, &
+        call environment_destroy(field_expression)
+        call environment_destroy(parallelepiped_domain)
+        call environment_create(environment%reciprocal_lattice, environment%periodic_box, &
             input_data, prefix)
         walls_used = use_walls(input_data, prefix)
-        call environment_factory_create(floor_penetration, walls_used, input_data, prefix)
-        call environment_factory_create(environment%walls_potential, walls_used, &
+        call environment_create(floor_penetration, walls_used, input_data, prefix)
+        call environment_create(environment%walls_potential, walls_used, &
             environment%periodic_box, floor_penetration, input_data, prefix)
-        call environment_factory_destroy(floor_penetration)
-    end subroutine environment_factory_create_all
+        call environment_destroy(floor_penetration)
+    end subroutine environment_create_all
 
     subroutine allocate_and_set_periodic_box(periodic_box, input_data, prefix)
         class(Abstract_Periodic_Box), allocatable, intent(out) :: periodic_box
@@ -324,15 +324,15 @@ contains
         call walls_potential%construct(periodic_box, gap, floor_penetration)
     end subroutine allocate_and_construct_walls_potential
 
-    subroutine environment_factory_destroy_all(environment)
+    subroutine environment_destroy_all(environment)
         type(Environment_Wrapper), intent(inout) :: environment
 
-        call environment_factory_destroy(environment%walls_potential)
-        call environment_factory_destroy(environment%reciprocal_lattice)
-        call environment_factory_destroy(environment%external_field)
-        call environment_factory_destroy(environment%temperature)
-        call environment_factory_destroy(environment%periodic_box)
-    end subroutine environment_factory_destroy_all
+        call environment_destroy(environment%walls_potential)
+        call environment_destroy(environment%reciprocal_lattice)
+        call environment_destroy(environment%external_field)
+        call environment_destroy(environment%temperature)
+        call environment_destroy(environment%periodic_box)
+    end subroutine environment_destroy_all
 
     subroutine deallocate_periodic_box(periodic_box)
         class(Abstract_Periodic_Box), allocatable, intent(inout) :: periodic_box

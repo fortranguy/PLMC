@@ -13,7 +13,7 @@ use types_changes_wrapper, only: Changes_Wrapper
 use types_metropolis_wrapper, only: Metropolis_Wrapper
 use procedures_plmc_factory, only: plmc_load, plmc_create, plmc_set, plmc_destroy
 use procedures_plmc_visit, only: plmc_visit
-use types_observables_wrapper, only: Mixture_Observables_Wrapper
+use types_observables_wrapper, only: Observables_Wrapper
 use types_observable_writers_wrapper, only: Mixture_Observable_Writers_Wrapper
 use procedures_plmc_propagation, only: plmc_propagator_construct, plmc_propagator_destroy, &
     plmc_propagator_try
@@ -29,7 +29,7 @@ implicit none
     type(Mixture_Short_Potentials_Wrapper) :: short_potentials_old
     type(Short_Potentials_Wrapper) :: short_potentials
     type(Mixture_Ewald_Wrapper) :: ewalds
-    type(Mixture_Observables_Wrapper) :: observables
+    type(Observables_Wrapper) :: observables
     type(Mixture_Observable_Writers_Wrapper) :: observables_writers
     type(Metropolis_Wrapper) :: metropolis
 

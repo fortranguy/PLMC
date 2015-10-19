@@ -23,9 +23,9 @@ use procedures_property_inquirers, only: use_walls, component_is_dipolar, &
 implicit none
 
 private
-public :: component_factory_create, component_factory_set, component_factory_destroy
+public :: component_create, component_set, component_destroy
 
-interface component_factory_create
+interface component_create
     module procedure :: create_all
     module procedure :: create_number
     module procedure :: create_positions
@@ -33,20 +33,20 @@ interface component_factory_create
     module procedure :: create_dipolar_moments
     module procedure :: create_total_moment
     module procedure :: create_chemical_potential
-end interface component_factory_create
+end interface component_create
 
-interface component_factory_set
+interface component_set
     module procedure :: set_coordinates
-end interface component_factory_set
+end interface component_set
 
-interface component_factory_destroy
+interface component_destroy
     module procedure :: destroy_chemical_potential
     module procedure :: destroy_total_moment
     module procedure :: destroy_dipolar_moments
     module procedure :: destroy_coordinates
     module procedure :: destroy_number
     module procedure :: destroy_all
-end interface component_factory_destroy
+end interface component_destroy
 
 contains
 
@@ -59,30 +59,30 @@ contains
 
         logical :: is_dipolar, can_exchange
 
-        call component_factory_create(component%number, exists, input_data, prefix)
-        call component_factory_create(component%positions, exists, periodic_box, component%number)
-        call component_factory_set(component%positions, input_data, prefix//"initial positions")
+        call component_create(component%number, exists, input_data, prefix)
+        call component_create(component%positions, exists, periodic_box, component%number)
+        call component_set(component%positions, input_data, prefix//"initial positions")
         is_dipolar = exists .and. component_is_dipolar(input_data, prefix)
-        call component_factory_create(component%orientations, is_dipolar, component%number)
-        call component_factory_set(component%orientations, input_data, &
+        call component_create(component%orientations, is_dipolar, component%number)
+        call component_set(component%orientations, input_data, &
             prefix//"initial orientations")
-        call component_factory_create(component%dipolar_moments, is_dipolar, component%orientations, &
+        call component_create(component%dipolar_moments, is_dipolar, component%orientations, &
             input_data, prefix)
-        call component_factory_create(component%total_moment, component%dipolar_moments)
+        call component_create(component%total_moment, component%dipolar_moments)
         can_exchange = exists .and. component_can_exchange(input_data, prefix)
-        call component_factory_create(component%chemical_potential, can_exchange, input_data, &
+        call component_create(component%chemical_potential, can_exchange, input_data, &
             prefix)
     end subroutine create_all
 
     subroutine destroy_all(component)
         type(Component_Wrapper), intent(inout) :: component
 
-        call component_factory_destroy(component%chemical_potential)
-        call component_factory_destroy(component%total_moment)
-        call component_factory_destroy(component%dipolar_moments)
-        call component_factory_destroy(component%orientations)
-        call component_factory_destroy(component%positions)
-        call component_factory_destroy(component%number)
+        call component_destroy(component%chemical_potential)
+        call component_destroy(component%total_moment)
+        call component_destroy(component%dipolar_moments)
+        call component_destroy(component%orientations)
+        call component_destroy(component%positions)
+        call component_destroy(component%number)
     end subroutine destroy_all
 
     subroutine create_number(component_number, exists, input_data, prefix)

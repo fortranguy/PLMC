@@ -12,7 +12,7 @@ use class_component_potential, only: Abstract_Component_Potential
 use types_short_potentials_wrapper, only: Mixture_Short_Potentials_Wrapper
 use class_ewald_real_component, only: Abstract_Ewald_Real_Component
 use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
-use types_observables_wrapper, only: Mixture_Observables_Wrapper
+use types_observables_wrapper, only: Observables_Wrapper
 
 implicit none
 
@@ -31,7 +31,7 @@ end interface plmc_visit
 contains
 
     subroutine visit_mixture(observables, walls_potential, short_potentials, ewalds, mixture)
-        type(Mixture_Observables_Wrapper), intent(inout) :: observables
+        type(Observables_Wrapper), intent(inout) :: observables
         class(Abstract_Walls_Potential), intent(in) :: walls_potential
         type(Mixture_Short_Potentials_Wrapper), intent(in) :: short_potentials
         type(Mixture_Ewald_Wrapper), intent(in) :: ewalds
@@ -42,7 +42,7 @@ contains
     end subroutine visit_mixture
 
     subroutine visit_mixture_short(observables, walls_potential, short_potentials, mixture)
-        type(Mixture_Observables_Wrapper), intent(inout) :: observables
+        type(Observables_Wrapper), intent(inout) :: observables
         class(Abstract_Walls_Potential), intent(in) :: walls_potential
         type(Mixture_Short_Potentials_Wrapper), intent(in) :: short_potentials
         type(Mixture_Wrapper_Old), intent(in) :: mixture
@@ -119,7 +119,7 @@ contains
     end subroutine visit_component_short
 
     pure subroutine visit_mixture_ewald(observables, ewalds, mixture)
-        type(Mixture_Observables_Wrapper), intent(inout) :: observables
+        type(Observables_Wrapper), intent(inout) :: observables
         type(Mixture_Ewald_Wrapper), intent(in) :: ewalds
         type(Mixture_Wrapper_Old), intent(in) :: mixture
 

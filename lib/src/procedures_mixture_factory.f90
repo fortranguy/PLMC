@@ -10,7 +10,7 @@ use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
 use class_minimum_distance, only: Abstract_Minimum_Distance, Concrete_Minimum_Distance, &
     Null_Minimum_Distance
-use procedures_component_factory, only: component_factory_create, component_factory_destroy
+use procedures_component_factory, only: component_create, component_destroy
 use types_mixture_wrapper, only: Minimum_Distance_Wrapper, Minimum_Distances_Wrapper, &
     Mixture_Wrapper
 use procedures_property_inquirers, only: use_walls, component_exists
@@ -18,23 +18,23 @@ use procedures_property_inquirers, only: use_walls, component_exists
 implicit none
 
 private
-public :: mixture_factory_create, mixture_factory_destroy
+public :: mixture_create, mixture_destroy
 
-interface mixture_factory_create
+interface mixture_create
     module procedure :: create_all
     module procedure :: create_components
     module procedure :: create_inter_min_distances
     module procedure :: create_min_distance
     module procedure :: create_wall_min_distances
-end interface mixture_factory_create
+end interface mixture_create
 
-interface mixture_factory_destroy
+interface mixture_destroy
     module procedure :: destroy_min_distance
     module procedure :: destroy_min_distances
     module procedure :: destroy_inter_min_distances
     module procedure :: destroy_components
     module procedure :: destroy_all
-end interface mixture_factory_destroy
+end interface mixture_destroy
 
 contains
 
@@ -44,20 +44,20 @@ contains
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        call mixture_factory_create(mixture%components, environment%periodic_box, input_data, &
+        call mixture_create(mixture%components, environment%periodic_box, input_data, &
             prefix)
-        call mixture_factory_create(mixture%inter_min_distances, mixture%components, input_data, &
+        call mixture_create(mixture%inter_min_distances, mixture%components, input_data, &
             prefix)
-        call mixture_factory_create(mixture%wall_min_distances, mixture%components, &
+        call mixture_create(mixture%wall_min_distances, mixture%components, &
             environment%walls_potential, input_data, prefix)
     end subroutine create_all
 
     subroutine destroy_all(mixture)
         type(Mixture_Wrapper), intent(inout) :: mixture
 
-        call mixture_factory_destroy(mixture%wall_min_distances)
-        call mixture_factory_destroy(mixture%inter_min_distances)
-        call mixture_factory_destroy(mixture%components)
+        call mixture_destroy(mixture%wall_min_distances)
+        call mixture_destroy(mixture%inter_min_distances)
+        call mixture_destroy(mixture%components)
     end subroutine destroy_all
 
     subroutine create_components(components, periodic_box, input_data, prefix)
@@ -83,7 +83,7 @@ contains
         end if
         allocate(components(num_components))
         do i_component = 1, size(components)
-            call component_factory_create(components(i_component), exists, periodic_box, &
+            call component_create(components(i_component), exists, periodic_box, &
                 input_data, prefix//"Component "//string%get(i_component)//".")
         end do
     end subroutine create_components
@@ -95,7 +95,7 @@ contains
 
         if (allocated(components)) then
             do i_component = size(components), 1, -1
-                call component_factory_destroy(components(i_component))
+                call component_destroy(components(i_component))
             end do
             deallocate(components)
         end if
@@ -125,7 +125,7 @@ contains
                     min_distance_prefix = prefix//"Inter "//string%get(i_component)//&
                         string%get(j_component)//"."
                 end if
-                call mixture_factory_create(min_distances(j_component)%&
+                call mixture_create(min_distances(j_component)%&
                     with_components(i_component)%min_distance, exists, input_data, &
                     min_distance_prefix)
                 deallocate(min_distance_prefix)
@@ -140,7 +140,7 @@ contains
 
         if (allocated(min_distances)) then
             do i_component = size(min_distances), 1, -1
-                call mixture_factory_destroy(min_distances(i_component)%with_components)
+                call mixture_destroy(min_distances(i_component)%with_components)
             end do
             deallocate(min_distances)
         end if
@@ -161,7 +161,7 @@ contains
         allocate(min_distances(size(components)))
         do i_component = 1, size(min_distances)
             exists = use_walls(potential) .and. component_exists(components(i_component)%number)
-            call mixture_factory_create(min_distances(i_component)%min_distance, exists, &
+            call mixture_create(min_distances(i_component)%min_distance, exists, &
                 input_data, prefix//"Component "//string%get(i_component)//".With Walls.")
         end do
     end subroutine create_wall_min_distances
@@ -173,7 +173,7 @@ contains
 
         if (allocated(min_distances)) then
             do i_component = size(min_distances), 1, -1
-                call mixture_factory_destroy(min_distances(i_component)%min_distance)
+                call mixture_destroy(min_distances(i_component)%min_distance)
             end do
             deallocate(min_distances)
         end if

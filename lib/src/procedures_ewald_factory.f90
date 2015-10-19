@@ -22,27 +22,27 @@ use procedures_property_inquirers, only: component_is_dipolar, components_intera
 implicit none
 
 private
-public :: ewald_factory_create, ewald_factory_destroy
+public :: ewald_create, ewald_destroy
 
-interface ewald_factory_create
-    module procedure :: ewald_factory_create_all
-    module procedure :: ewald_factory_create_macro
-    module procedure :: ewald_factory_create_micro
+interface ewald_create
+    module procedure :: ewald_create_all
+    module procedure :: ewald_create_macro
+    module procedure :: ewald_create_micro
     module procedure :: allocate_and_construct_real_pair
     module procedure :: allocate_and_construct_real_component
-end interface ewald_factory_create
+end interface ewald_create
 
-interface ewald_factory_destroy
+interface ewald_destroy
     module procedure :: destroy_and_deallocate_real_component
     module procedure :: destroy_and_deallocate_real_pair
-    module procedure :: ewald_factory_destroy_micro
-    module procedure :: ewald_factory_destroy_macro
-    module procedure :: ewald_factory_destroy_all
-end interface ewald_factory_destroy
+    module procedure :: ewald_destroy_micro
+    module procedure :: ewald_destroy_macro
+    module procedure :: ewald_destroy_all
+end interface ewald_destroy
 
 contains
 
-    subroutine ewald_factory_create_all(ewald, environment, component, input_data, prefix)
+    subroutine ewald_create_all(ewald, environment, component, input_data, prefix)
         type(Ewald_Wrapper), intent(out) :: ewald
         type(Environment_Wrapper), intent(in) :: environment
         type(Component_Wrapper), intent(in) :: component
@@ -54,13 +54,13 @@ contains
 
         is_dipolar = component_is_dipolar(component%dipolar_moments)
         call set_alpha(alpha, is_dipolar, environment%periodic_box, input_data, prefix)
-        !call ewald_factory_create(ewald%real_pair, is_dipolar, alpha, environment%periodic_box, &
+        !call ewald_create(ewald%real_pair, is_dipolar, alpha, environment%periodic_box, &
         !    component%diameter, input_data, prefix//"Real.")
-        call ewald_factory_create(ewald%real_component, is_dipolar, environment%periodic_box, &
+        call ewald_create(ewald%real_component, is_dipolar, environment%periodic_box, &
             component%positions, component%dipolar_moments, ewald%real_pair)
-    end subroutine ewald_factory_create_all
+    end subroutine ewald_create_all
 
-    subroutine ewald_factory_create_macro(ewald_macro, ewald_micro, environment, component)
+    subroutine ewald_create_macro(ewald_macro, ewald_micro, environment, component)
         type(Ewald_Wrapper_Macro), intent(out) :: ewald_macro
         type(Ewald_Wrapper_Micro), intent(in) :: ewald_micro
         type(Environment_Wrapper), intent(in) :: environment
@@ -69,11 +69,11 @@ contains
         logical :: interact
 
         interact = components_interact(ewald_micro%real_pair)
-        call ewald_factory_create(ewald_macro%real_component, interact, environment%periodic_box, &
+        call ewald_create(ewald_macro%real_component, interact, environment%periodic_box, &
             component%positions, component%dipolar_moments, ewald_micro%real_pair)
-    end subroutine ewald_factory_create_macro
+    end subroutine ewald_create_macro
 
-    subroutine ewald_factory_create_micro(ewald_micro, is_dipolar, environment, min_distance, &
+    subroutine ewald_create_micro(ewald_micro, is_dipolar, environment, min_distance, &
         input_data, prefix)
         type(Ewald_Wrapper_Micro), intent(out) :: ewald_micro
         logical, intent(in) :: is_dipolar
@@ -85,9 +85,9 @@ contains
         real(DP) :: alpha
 
         call set_alpha(alpha, is_dipolar, environment%periodic_box, input_data, prefix)
-        call ewald_factory_create(ewald_micro%real_pair, is_dipolar, alpha, &
+        call ewald_create(ewald_micro%real_pair, is_dipolar, alpha, &
             environment%periodic_box, min_distance, input_data, prefix//"Real.")
-    end subroutine ewald_factory_create_micro
+    end subroutine ewald_create_micro
 
     subroutine set_alpha(alpha, is_dipolar, periodic_box, input_data, prefix)
         real(DP), intent(out) :: alpha
@@ -205,24 +205,24 @@ contains
         class(Abstract_Weighted_Structure), allocatable, intent(out) :: weighted_structure
     end subroutine allocate_and_construct_weighted_structure
 
-    subroutine ewald_factory_destroy_all(ewald)
+    subroutine ewald_destroy_all(ewald)
         type(Ewald_Wrapper), intent(inout) :: ewald
 
-        call ewald_factory_destroy(ewald%real_component)
-        call ewald_factory_destroy(ewald%real_pair)
-    end subroutine ewald_factory_destroy_all
+        call ewald_destroy(ewald%real_component)
+        call ewald_destroy(ewald%real_pair)
+    end subroutine ewald_destroy_all
 
-    subroutine ewald_factory_destroy_micro(ewald_micro)
+    subroutine ewald_destroy_micro(ewald_micro)
         type(Ewald_Wrapper_Micro), intent(inout) :: ewald_micro
 
-        call ewald_factory_destroy(ewald_micro%real_pair)
-    end subroutine ewald_factory_destroy_micro
+        call ewald_destroy(ewald_micro%real_pair)
+    end subroutine ewald_destroy_micro
 
-    subroutine ewald_factory_destroy_macro(ewald_macro)
+    subroutine ewald_destroy_macro(ewald_macro)
         type(Ewald_Wrapper_Macro), intent(inout) :: ewald_macro
 
-        call ewald_factory_destroy(ewald_macro%real_component)
-    end subroutine ewald_factory_destroy_macro
+        call ewald_destroy(ewald_macro%real_component)
+    end subroutine ewald_destroy_macro
 
     subroutine destroy_and_deallocate_real_component(real_component)
         class(Abstract_Ewald_Real_Component), allocatable, intent(inout) :: real_component

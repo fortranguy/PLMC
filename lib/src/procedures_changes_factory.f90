@@ -24,42 +24,42 @@ use procedures_property_inquirers, only: component_has_positions, component_has_
 implicit none
 
 private
-public :: changes_factory_create, changes_factory_destroy, &
+public :: changes_create, changes_destroy, &
     allocate_and_construct_move_tuner, allocate_and_construct_rotation_tuner
 
-interface changes_factory_create
-    module procedure :: changes_factory_create_all
+interface changes_create
+    module procedure :: changes_create_all
     module procedure :: allocate_and_construct_moved_positions
     module procedure :: allocate_and_construct_rotated_orientations
     module procedure :: allocate_and_construct_component_exchange
-end interface changes_factory_create
+end interface changes_create
 
-interface changes_factory_destroy
+interface changes_destroy
     module procedure :: destroy_and_deallocate_component_exchange
     module procedure :: destroy_and_deallocate_change_tuner
     module procedure :: destroy_and_deallocate_changed_coordinates
-    module procedure :: changes_factory_destroy_all
-end interface changes_factory_destroy
+    module procedure :: changes_destroy_all
+end interface changes_destroy
 
 contains
 
-    subroutine changes_factory_create_all(changes, periodic_box, component, input_data, prefix)
+    subroutine changes_create_all(changes, periodic_box, component, input_data, prefix)
         type(Changes_Wrapper), intent(out) :: changes
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(Component_Wrapper), intent(in) :: component
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        call changes_factory_create(changes%moved_positions, component%positions, periodic_box, &
+        call changes_create(changes%moved_positions, component%positions, periodic_box, &
             input_data, prefix)
         call allocate_and_construct_move_tuner(changes%move_tuner, changes%moved_positions, &
             input_data, prefix)
-        call changes_factory_create(changes%rotated_orientations, component%orientations, &
+        call changes_create(changes%rotated_orientations, component%orientations, &
             input_data, prefix)
         call allocate_and_construct_rotation_tuner(changes%rotation_tuner, &
             changes%rotated_orientations, input_data, prefix)
-        call changes_factory_create(changes%component_exchange, component)
-    end subroutine changes_factory_create_all
+        call changes_create(changes%component_exchange, component)
+    end subroutine changes_create_all
 
     subroutine allocate_and_construct_moved_positions(moved_positions, component_positions, &
         periodic_box, input_data, prefix)
@@ -259,15 +259,15 @@ contains
         call component_exchange%construct(component)
     end subroutine allocate_and_construct_component_exchange
 
-    subroutine changes_factory_destroy_all(changes)
+    subroutine changes_destroy_all(changes)
         type(Changes_Wrapper), intent(inout) :: changes
 
-        call changes_factory_destroy(changes%component_exchange)
-        call changes_factory_destroy(changes%rotation_tuner)
-        call changes_factory_destroy(changes%rotated_orientations)
-        call changes_factory_destroy(changes%move_tuner)
-        call changes_factory_destroy(changes%moved_positions)
-    end subroutine changes_factory_destroy_all
+        call changes_destroy(changes%component_exchange)
+        call changes_destroy(changes%rotation_tuner)
+        call changes_destroy(changes%rotated_orientations)
+        call changes_destroy(changes%move_tuner)
+        call changes_destroy(changes%moved_positions)
+    end subroutine changes_destroy_all
 
     subroutine destroy_and_deallocate_component_exchange(component_exchange)
         class(Abstract_Component_Exchange), allocatable, intent(inout) :: component_exchange
