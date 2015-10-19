@@ -15,8 +15,7 @@ use procedures_component_factory, only: component_factory_create, component_fact
 use procedures_mixture_factory, only: mixture_factory_create, mixture_factory_destroy
 use types_changes_wrapper, only: Changes_Wrapper
 use procedures_changes_factory, only: changes_factory_create, changes_factory_destroy
-use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper ! to delete
-use types_short_potential_wrapper, only: Short_Potentials_Wrapper
+use types_short_potentials_wrapper, only: Short_Potentials_Wrapper
 use procedures_short_potentials_factory, only: short_potentials_factory_create, &
     short_potentials_factory_destroy
 use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
@@ -248,7 +247,7 @@ contains
     subroutine set_metropolis(metropolis, components, short_potentials, ewalds)
         type(Metropolis_Wrapper), intent(inout) :: metropolis
         type(Component_Wrapper), intent(in) :: components(num_components)
-        type(Mixture_Short_Potentials_Wrapper), intent(in) :: short_potentials
+        type(Short_Potentials_Wrapper), intent(in) :: short_potentials
         type(Mixture_Ewald_Wrapper), intent(in) :: ewalds
 
         call metropolis_factory_set(metropolis, components, short_potentials, ewalds)

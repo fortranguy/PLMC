@@ -21,7 +21,7 @@ use class_visitable_list, only: Abstract_Visitable_List, &
     Null_Visitable_List, Concrete_Visitable_List, Concrete_Visitable_Array
 use class_visitable_cells, only: Abstract_Visitable_Cells, &
     Null_Visitable_Cells, XYZ_PBC_Visitable_Cells, XY_PBC_Visitable_Cells
-use types_short_potential_wrapper, only: Pair_Potential_Wrapper, Pair_Potentials_Wrapper, &
+use types_short_potentials_wrapper, only: Pair_Potential_Wrapper, Pair_Potentials_Wrapper, &
     Short_Potentials_Wrapper
 use procedures_property_inquirers, only: use_walls, components_interact
 

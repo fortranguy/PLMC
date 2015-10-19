@@ -9,7 +9,7 @@ use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
 use types_component_wrapper, only: Mixture_Wrapper_Old
 use class_pair_potential, only: Abstract_Pair_Potential
 use class_component_potential, only: Abstract_Component_Potential
-use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper
+use types_short_potentials_wrapper, only: Mixture_Short_Potentials_Wrapper
 use class_ewald_real_component, only: Abstract_Ewald_Real_Component
 use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
 use types_observables_wrapper, only: Mixture_Observables_Wrapper

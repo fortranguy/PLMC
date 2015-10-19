@@ -5,7 +5,7 @@ use json_module, only: json_file
 use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
-use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper
+use types_short_potentials_wrapper, only: Short_Potentials_Wrapper
 use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
 use class_tower_sampler, only: Abstract_Tower_Sampler, Concrete_Tower_Sampler, Null_Tower_Sampler
 use class_one_particle_change, only: Abstract_One_Particle_Change, &
@@ -65,7 +65,7 @@ contains
     subroutine metropolis_factory_set_all(metropolis, components, short_potentials, ewalds)
         type(Metropolis_Wrapper), intent(inout) :: metropolis
         type(Component_Wrapper), intent(in) :: components(num_components)
-        type(Mixture_Short_Potentials_Wrapper), intent(in) :: short_potentials
+        type(Short_Potentials_Wrapper), intent(in) :: short_potentials
         type(Mixture_Ewald_Wrapper), intent(in) :: ewalds
 
         call metropolis%one_particle_move%set_candidates(components, short_potentials, ewalds)

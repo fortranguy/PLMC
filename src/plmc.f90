@@ -6,7 +6,7 @@ use json_module, only: json_file
 use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Mixture_Wrapper_Old
 use types_mixture_wrapper, only: Mixture_Wrapper
-use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper, &
+use types_short_potentials_wrapper, only: Mixture_Short_Potentials_Wrapper, &
     Short_Potentials_Wrapper
 use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
@@ -49,7 +49,7 @@ implicit none
     call plmc_create(metropolis, environment, changes)
     call input_data%destroy()
 
-    call plmc_set(metropolis, mixture_old%components, short_potentials_old, ewalds)
+    call plmc_set(metropolis, mixture_old%components, short_potentials, ewalds)
     call plmc_propagator_construct(metropolis)
     call plmc_visit(observables, environment%walls_potential, short_potentials_old, ewalds, mixture_old)
     call plmc_write(-num_tuning_steps, observables_writers, observables)

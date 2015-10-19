@@ -1,4 +1,4 @@
-module types_short_potential_wrapper
+module types_short_potentials_wrapper
 
 use data_constants, only: num_components
 use class_potential_expression, only: Abstract_Potential_Expression
@@ -37,10 +37,9 @@ private
     end type Pair_Potentials_Wrapper
 
     type, public :: Short_Potentials_Wrapper
-        !macro visitor
         type(Pair_Potentials_Wrapper), allocatable :: inter_pairs(:)
         class(Abstract_Visitable_Cells), allocatable :: inter_cells(:, :)
         type(Pair_Potential_Wrapper), allocatable :: wall_pairs(:)
     end type Short_Potentials_Wrapper
 
-end module types_short_potential_wrapper
+end module types_short_potentials_wrapper

@@ -9,7 +9,7 @@ use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use types_changes_wrapper, only: Changes_Wrapper
-use types_short_potential_wrapper, only: Mixture_Short_Potentials_Wrapper
+use types_short_potentials_wrapper, only: Short_Potentials_Wrapper
 use types_ewald_wrapper, only: Mixture_Ewald_Wrapper
 use class_tower_sampler, only: Abstract_Tower_Sampler
 use module_changes_success, only: Concrete_Change_Counter
@@ -29,7 +29,7 @@ private
         type(Environment_Wrapper), pointer :: environment => null()
         type(Component_Wrapper), pointer :: components(:) => null()
         type(Changes_Wrapper), pointer :: changes(:) => null()
-        type(Mixture_Short_Potentials_Wrapper), pointer :: short_potentials => null()
+        type(Short_Potentials_Wrapper), pointer :: short_potentials => null()
         type(Mixture_Ewald_Wrapper), pointer :: ewalds => null()
         class(Abstract_Tower_Sampler), allocatable :: selector
     contains
@@ -156,7 +156,7 @@ contains
         ewalds)
         class(Abstract_One_Particle_Change), intent(inout) :: this
         type(Component_Wrapper), target, intent(in) :: components(:)
-        type(Mixture_Short_Potentials_Wrapper), target, intent(in) :: short_potentials
+        type(Short_Potentials_Wrapper), target, intent(in) :: short_potentials
         type(Mixture_Ewald_Wrapper), target, intent(in) :: ewalds
 
         if (size(components) /= num_components) then
@@ -231,29 +231,22 @@ contains
         type(Concrete_Temporary_Particle), intent(in) :: new, old
         integer, intent(in) :: i_actor, i_spectator
 
+        integer :: i_component
+
         call this%environment%walls_potential%visit(overlap, new_energy%intras(i_actor)%walls, &
-            new%position, this%short_potentials%intras(i_actor)%wall_pair)
+            new%position, this%short_potentials%wall_pairs(i_actor)%pair_potential)
         if (overlap) return
-        if (this%components(i_actor)%number%get() > this%components(i_spectator)%number%get()) then
-            call this%short_potentials%intras(i_actor)%cells%visit(overlap, &
-                new_energy%intras(i_actor)%short, new, same_type=.true.)
+        do i_component = 1, size(this%short_potentials%inter_cells)
+            call this%short_potentials%inter_cells(i_component, i_actor)%visit(overlap, &
+                new_energy%intras(i_actor)%short, new, same_type=.true.) ! energy holder to change
             if (overlap) return
-            call this%short_potentials%inters(i_spectator)%cells%visit(overlap, &
-                new_energy%inter%short, new, same_type=.false.)
-        else
-            call this%short_potentials%inters(i_spectator)%cells%visit(overlap, &
-                new_energy%inter%short, new, same_type=.false.)
-            if (overlap) return
-            call this%short_potentials%intras(i_actor)%cells%visit(overlap, &
-                new_energy%intras(i_actor)%short, new, same_type=.true.)
-        end if
-        if (overlap) return
+        end do
         call this%environment%walls_potential%visit(overlap, old_energy%intras(i_actor)%walls, &
-            old%position, this%short_potentials%intras(i_actor)%wall_pair)
-        call this%short_potentials%intras(i_actor)%cells%visit(overlap, &
-            old_energy%intras(i_actor)%short, old, same_type=.true.)
-        call this%short_potentials%inters(i_spectator)%cells%visit(overlap, &
-            old_energy%inter%short, old, same_type=.false.)
+            old%position, this%short_potentials%wall_pairs(i_actor)%pair_potential)
+        do i_component = 1, size(this%short_potentials%inter_cells)
+            call this%short_potentials%inter_cells(i_component, i_actor)%visit(overlap, &
+                old_energy%intras(i_actor)%short, old, same_type=.true.)
+        end do
     end subroutine Abstract_One_Particle_Change_visit_short
 
     subroutine Abstract_One_Particle_Change_visit_long(this, new_energy, old_energy, new, old, &
@@ -314,9 +307,12 @@ contains
         integer, intent(in) :: i_actor
         type(Concrete_Temporary_Particle), intent(in) :: new, old
 
+        integer :: i_component
+
         call this%components(i_actor)%positions%set(new%i, new%position)
-        call this%short_potentials%intras(i_actor)%cells%move(old, new)
-        call this%short_potentials%inters(i_actor)%cells%move(old, new)
+        do i_component = 1, size(this%short_potentials%inter_cells)
+            call this%short_potentials%inter_cells(i_component, i_actor)%move(old, new)
+        end do
     end subroutine Concrete_One_Particle_Move_update_actor
 
     subroutine Concrete_One_Particle_Move_increment_hits(observables, i_actor)
@@ -424,7 +420,7 @@ contains
         ewalds)
         class(Null_One_Particle_Change), intent(inout) :: this
         type(Component_Wrapper), target, intent(in) :: components(:)
-        type(Mixture_Short_Potentials_Wrapper), target, intent(in) :: short_potentials
+        type(Short_Potentials_Wrapper), target, intent(in) :: short_potentials
         type(Mixture_Ewald_Wrapper), target, intent(in) :: ewalds
     end subroutine Null_One_Particle_Change_set_candidates
 
