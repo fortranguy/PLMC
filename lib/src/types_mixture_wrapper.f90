@@ -19,7 +19,6 @@ private
         type(Component_Wrapper), allocatable :: components(:)
         type(Minimum_Distances_Wrapper), allocatable :: inter_min_distances(:)
         type(Minimum_Distance_Wrapper), allocatable :: wall_min_distances(:)
-        logical, allocatable :: components_are_dipolar(:)
     end type Mixture_Wrapper
 
 end module types_mixture_wrapper

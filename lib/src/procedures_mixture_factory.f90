@@ -13,7 +13,7 @@ use class_minimum_distance, only: Abstract_Minimum_Distance, Concrete_Minimum_Di
 use procedures_component_factory, only: component_create, component_destroy
 use types_mixture_wrapper, only: Minimum_Distance_Wrapper, Minimum_Distances_Wrapper, &
     Mixture_Wrapper
-use procedures_property_inquirers, only: use_walls, component_exists, component_is_dipolar
+use procedures_property_inquirers, only: use_walls, component_exists
 
 implicit none
 
@@ -26,11 +26,9 @@ interface mixture_create
     module procedure :: create_inter_min_distances
     module procedure :: create_min_distance
     module procedure :: create_wall_min_distances
-    module procedure :: create_components_are_dipolar
 end interface mixture_create
 
 interface mixture_destroy
-    module procedure :: destroy_components_are_dipolar
     module procedure :: destroy_min_distance
     module procedure :: destroy_min_distances
     module procedure :: destroy_inter_min_distances
@@ -52,7 +50,6 @@ contains
             prefix)
         call mixture_create(mixture%wall_min_distances, mixture%components, &
             environment%walls_potential, input_data, prefix)
-        call mixture_create(mixture%components_are_dipolar, mixture%components)
     end subroutine create_all
 
     subroutine destroy_all(mixture)
@@ -210,24 +207,5 @@ contains
 
         if (allocated(min_distance)) deallocate(min_distance)
     end subroutine destroy_min_distance
-
-    subroutine create_components_are_dipolar(components_are_dipolar, components)
-        logical, allocatable, intent(out) :: components_are_dipolar(:)
-        type(Component_Wrapper), intent(in) :: components(:)
-
-        integer :: i_component
-
-        allocate(components_are_dipolar(size(components)))
-        do i_component = 1, size(components_are_dipolar)
-            components_are_dipolar(i_component) = component_is_dipolar(components(i_component)%&
-                dipolar_moments)
-        end do
-    end subroutine create_components_are_dipolar
-
-    subroutine destroy_components_are_dipolar(components_are_dipolar)
-        logical, allocatable, intent(inout) :: components_are_dipolar(:)
-
-        if (allocated(components_are_dipolar)) deallocate(components_are_dipolar)
-    end subroutine destroy_components_are_dipolar
 
 end module procedures_mixture_factory

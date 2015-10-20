@@ -264,8 +264,8 @@ contains
         type(Concrete_Temporary_Particle), intent(in) :: new, old
         integer, intent(in) :: i_actor
 
-        integer :: i_component, i_exclude
         real(DP), dimension(size(short_differences)) :: short_new, short_old
+        integer :: i_component, i_exclude
 
         do i_component = 1, size(this%short_potentials%inter_cells, 1)
             i_exclude = merge(new%i, 0, i_component == i_actor)
@@ -287,17 +287,19 @@ contains
         type(Concrete_Temporary_Particle), intent(in) :: new, old
         integer, intent(in) :: i_actor
 
-        integer :: i_component, i_exclude
         real(DP), dimension(size(long_difference)) :: long_new_real, long_old_real
+        integer :: i_component, i_exclude, j_pair, i_pair
 
         do i_component = 1, size(this%ewalds%real_components)
             i_exclude = merge(new%i, 0, i_component == i_actor)
+            j_pair = maxval([i_actor, i_component])
+            i_pair = minval([i_actor, i_component])
             call this%ewalds%real_components(i_component)%real_component%&
-                visit(long_new_real(i_component), this%ewalds%real_pairs(i_actor)%&
-                with_components(i_component)%real_pair, new, i_exclude)
+                visit(long_new_real(i_component), this%ewalds%real_pairs(j_pair)%&
+                with_components(i_pair)%real_pair, new, i_exclude)
             call this%ewalds%real_components(i_component)%real_component%&
-                visit(long_old_real(i_component), this%ewalds%real_pairs(i_actor)%&
-                with_components(i_component)%real_pair, old, i_exclude)
+                visit(long_old_real(i_component), this%ewalds%real_pairs(j_pair)%&
+                with_components(i_pair)%real_pair, old, i_exclude)
         end do
         long_difference = long_new_real - long_old_real
     end subroutine Abstract_One_Particle_Change_visit_long

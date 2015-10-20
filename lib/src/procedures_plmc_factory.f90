@@ -19,7 +19,7 @@ use types_short_potentials_wrapper, only: Short_Potentials_Wrapper
 use procedures_short_potentials_factory, only: short_potentials_create, &
     short_potentials_destroy
 use types_ewalds_wrapper, only: Ewalds_Wrapper
-use procedures_ewalds_factory, only: ewald_create, ewald_destroy
+use procedures_ewalds_factory, only: ewalds_create, ewalds_destroy
 use module_changes_success, only: reset_counter => Concrete_Changes_Counter_reset, &
     set_success => Concrete_Changes_Counter_set
 use types_observables_wrapper, only: Observables_Wrapper_old
@@ -149,13 +149,13 @@ contains
         type(Mixture_Wrapper), intent(in) :: mixture
         type(json_file), intent(inout) :: input_data
 
-        call ewald_create(ewalds, environment, mixture, input_data, ewalds_prefix)
+        call ewalds_create(ewalds, environment, mixture, input_data, ewalds_prefix)
     end subroutine create_ewalds
 
     subroutine destroy_ewalds(ewalds)
         type(Ewalds_Wrapper), intent(inout) :: ewalds
 
-        call ewald_destroy(ewalds)
+        call ewalds_destroy(ewalds)
     end subroutine destroy_ewalds
 
     subroutine create_observable_writers(observable_writers, walls_potential, mixture, changes, &

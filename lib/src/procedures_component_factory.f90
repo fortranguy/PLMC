@@ -154,8 +154,10 @@ contains
     subroutine destroy_coordinates(component_coordinates)
         class(Abstract_Component_Coordinates), allocatable, intent(inout) :: component_coordinates
 
-        call component_coordinates%destroy()
-        if (allocated(component_coordinates)) deallocate(component_coordinates)
+        if (allocated(component_coordinates)) then
+            call component_coordinates%destroy()
+            deallocate(component_coordinates)
+        end if
     end subroutine destroy_coordinates
 
     subroutine set_coordinates(component_coordinates, input_data, data_field)
@@ -212,8 +214,10 @@ contains
         class(Abstract_Component_Dipolar_Moments), allocatable, intent(inout) :: &
             component_dipolar_moments
 
-        call component_dipolar_moments%destroy()
-        if (allocated(component_dipolar_moments)) deallocate(component_dipolar_moments)
+        if (allocated(component_dipolar_moments)) then
+            call component_dipolar_moments%destroy()
+            deallocate(component_dipolar_moments)
+        end if
     end subroutine destroy_dipolar_moments
 
     subroutine create_total_moment(component_total_moment, component_dipolar_moments)
@@ -231,8 +235,10 @@ contains
     subroutine destroy_total_moment(component_total_moment)
         class(Abstract_Component_Total_Moment), allocatable, intent(inout) :: component_total_moment
 
-        call component_total_moment%destroy()
-        if (allocated(component_total_moment)) deallocate(component_total_moment)
+        if (allocated(component_total_moment)) then
+            call component_total_moment%destroy()
+            deallocate(component_total_moment)
+        end if
     end subroutine destroy_total_moment
 
     subroutine create_chemical_potential(component_chemical_potential, can_exchange, input_data, &
