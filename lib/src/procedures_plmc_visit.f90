@@ -159,10 +159,9 @@ contains
 
         energy = 0._DP
         do i_particle = 1, positions%get_num()
-            particle%i = i_particle
             particle%position = positions%get(particle%i)
             particle%dipolar_moment = dipolar_moments%get(particle%i)
-            call potential%visit(energy_i, particle, same_type)
+            !call potential%visit(energy_i, particle, i_particle) pair needed
             energy = energy + energy_i
         end do
         energy = energy / 2._DP

@@ -10,7 +10,7 @@ use types_component_wrapper, only: Component_Wrapper
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use types_changes_wrapper, only: Changes_Wrapper
 use types_short_potentials_wrapper, only: Short_Potentials_Wrapper
-use types_ewalds_wrapper, only: Mixture_Ewald_Wrapper
+use types_ewalds_wrapper, only: Ewalds_Wrapper
 use class_tower_sampler, only: Abstract_Tower_Sampler
 use module_changes_success, only: Concrete_Change_Counter
 use module_component_energy, only: Concrete_Component_Energy, Concrete_Inter_Energy, &
@@ -30,7 +30,7 @@ private
         type(Component_Wrapper), pointer :: components(:) => null()
         type(Changes_Wrapper), pointer :: changes(:) => null()
         type(Short_Potentials_Wrapper), pointer :: short_potentials => null()
-        type(Mixture_Ewald_Wrapper), pointer :: ewalds => null()
+        type(Ewalds_Wrapper), pointer :: ewalds => null()
         class(Abstract_Tower_Sampler), allocatable :: selector
     contains
         procedure :: construct => Abstract_One_Particle_Change_construct
@@ -102,8 +102,8 @@ private
         procedure :: get_num_choices => Concrete_One_Particle_Rotation_get_num_choices
         procedure, private :: construct_selector => &
             Concrete_One_Particle_Rotation_construct_selector
-        !procedure, private :: visit_walls => Concrete_One_Particle_Rotation_visit_walls
-        !procedure, private :: visit_short => Concrete_One_Particle_Rotation_visit_short
+        procedure, private :: visit_walls => Concrete_One_Particle_Rotation_visit_walls
+        procedure, private :: visit_short => Concrete_One_Particle_Rotation_visit_short
         procedure, private :: define_change => Concrete_One_Particle_Rotation_define_change
         procedure, private :: update_actor => Concrete_One_Particle_Rotation_update_actor
         procedure, private, nopass :: increment_hits => &
@@ -159,7 +159,7 @@ contains
         class(Abstract_One_Particle_Change), intent(inout) :: this
         type(Component_Wrapper), target, intent(in) :: components(:)
         type(Short_Potentials_Wrapper), target, intent(in) :: short_potentials
-        type(Mixture_Ewald_Wrapper), target, intent(in) :: ewalds
+        type(Ewalds_Wrapper), target, intent(in) :: ewalds
 
         if (size(components) /= num_components) then
             call error_exit("Abstract_One_Particle_Change: "//&
@@ -264,17 +264,19 @@ contains
         type(Concrete_Temporary_Particle), intent(in) :: new, old
         integer, intent(in) :: i_actor
 
-        integer :: i_component
+        integer :: i_component, i_exclude
         real(DP), dimension(size(short_differences)) :: short_new, short_old
 
         do i_component = 1, size(this%short_potentials%inter_cells, 1)
+            i_exclude = merge(new%i, 0, i_component == i_actor)
             call this%short_potentials%inter_cells(i_component, i_actor)%visit(overlap, &
-                short_new(i_component), new, same_type=.true.)
+                short_new(i_component), new, i_exclude)
             if (overlap) return
         end do
         do i_component = 1, size(this%short_potentials%inter_cells, 1)
+            i_exclude = merge(old%i, 0, i_component == i_actor)
             call this%short_potentials%inter_cells(i_component, i_actor)%visit(overlap, &
-                short_old(i_component), old, same_type=.true.)
+                short_old(i_component), old, i_exclude)
         end do
         short_differences = short_new - short_old
     end subroutine Abstract_One_Particle_Change_visit_short
@@ -285,17 +287,19 @@ contains
         type(Concrete_Temporary_Particle), intent(in) :: new, old
         integer, intent(in) :: i_actor
 
-        type(Concrete_Long_Energy) :: new_long, old_long, inter_new_long, inter_old_long
+        integer :: i_component, i_exclude
         real(DP), dimension(size(long_difference)) :: long_new_real, long_old_real
 
-        !do i_component = 1, size(this%ewalds%pairs) ...
-
-        !call this%ewalds%intras(i_actor)%real_component%visit(new_long%real, new, same_type=.true.)
-        !call this%ewalds%inters(i_spectator)%real_component%visit(inter_new_long%real, new, &
-        !    same_type=.false.)
-        !call this%ewalds%intras(i_actor)%real_component%visit(old_long%real, old, same_type=.true.)
-        !call this%ewalds%inters(i_spectator)%real_component%visit(inter_old_long%real, old, &
-        !    same_type=.false.)
+        do i_component = 1, size(this%ewalds%real_components)
+            i_exclude = merge(new%i, 0, i_component == i_actor)
+            call this%ewalds%real_components(i_component)%real_component%&
+                visit(long_new_real(i_component), this%ewalds%real_pairs(i_actor)%&
+                with_components(i_component)%real_pair, new, i_exclude)
+            call this%ewalds%real_components(i_component)%real_component%&
+                visit(long_old_real(i_component), this%ewalds%real_pairs(i_actor)%&
+                with_components(i_component)%real_pair, old, i_exclude)
+        end do
+        long_difference = long_new_real - long_old_real
     end subroutine Abstract_One_Particle_Change_visit_long
 
 !end implementation Abstract_One_Particle_Change
@@ -376,7 +380,27 @@ contains
             this%components(2)%orientations%get_num()
     end function Concrete_One_Particle_Rotation_get_num_choices
 
-    ! override visit walls ans short
+    subroutine Concrete_One_Particle_Rotation_visit_walls(this, overlap, walls_difference, new, &
+        old, i_actor)
+        class(Concrete_One_Particle_Rotation), intent(in) :: this
+        logical, intent(out) :: overlap
+        real(DP), intent(out) :: walls_difference
+        type(Concrete_Temporary_Particle), intent(in) :: new, old
+        integer, intent(in) :: i_actor
+        overlap = .false.
+        walls_difference = 0._DP
+    end subroutine Concrete_One_Particle_Rotation_visit_walls
+
+    subroutine Concrete_One_Particle_Rotation_visit_short(this, overlap, short_differences, new, &
+        old, i_actor)
+        class(Concrete_One_Particle_Rotation), intent(in) :: this
+        logical, intent(out) :: overlap
+        real(DP), intent(out) :: short_differences(:)
+        type(Concrete_Temporary_Particle), intent(in) :: new, old
+        integer, intent(in) :: i_actor
+        overlap = .false.
+        short_differences = 0._DP
+    end subroutine Concrete_One_Particle_Rotation_visit_short
 
     subroutine Concrete_One_Particle_Rotation_define_change(this, new, old, i_actor)
         class(Concrete_One_Particle_Rotation), intent(in) :: this
@@ -436,7 +460,7 @@ contains
         class(Null_One_Particle_Change), intent(inout) :: this
         type(Component_Wrapper), target, intent(in) :: components(:)
         type(Short_Potentials_Wrapper), target, intent(in) :: short_potentials
-        type(Mixture_Ewald_Wrapper), target, intent(in) :: ewalds
+        type(Ewalds_Wrapper), target, intent(in) :: ewalds
     end subroutine Null_One_Particle_Change_set_candidates
 
     subroutine Null_One_Particle_Change_construct_selector(this)

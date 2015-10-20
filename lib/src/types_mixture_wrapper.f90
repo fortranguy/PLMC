@@ -15,15 +15,11 @@ private
         type(Minimum_Distance_Wrapper), allocatable :: with_components(:)
     end type Minimum_Distances_Wrapper
 
-    type, public :: Are_Dipolar_Wrapper
-        logical, allocatable :: with_components(:) !strange grammar
-    end type Are_Dipolar_Wrapper
-
     type, public :: Mixture_Wrapper
         type(Component_Wrapper), allocatable :: components(:)
         type(Minimum_Distances_Wrapper), allocatable :: inter_min_distances(:)
         type(Minimum_Distance_Wrapper), allocatable :: wall_min_distances(:)
-        type(Are_Dipolar_Wrapper), allocatable :: are_dipolar(:)
+        logical, allocatable :: components_are_dipolar(:)
     end type Mixture_Wrapper
 
 end module types_mixture_wrapper

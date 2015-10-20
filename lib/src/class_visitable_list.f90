@@ -106,13 +106,13 @@ contains
     end subroutine Abstract_Visitable_List_set
 
     subroutine Abstract_Visitable_List_visit(this, overlap, energy, particle, pair_potential, &
-        same_type)
+        i_exclude)
         class(Abstract_Visitable_List), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
         type(Concrete_Temporary_Particle), intent(in) :: particle
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
-        logical, intent(in) :: same_type
+        integer, intent(in) :: i_exclude
 
         type(Concrete_Linkable_Node), pointer :: current => null(), next => null()
         real(DP) :: energy_i, distance
@@ -123,7 +123,7 @@ contains
         if (.not.associated(current%next)) return
         do
             next => current%next
-            if (.not.same_type .or. particle%i /= current%i) then
+            if (current%i /= i_exclude) then
                 distance = this%periodic_box%distance(particle%position, &
                     this%component_positions%get(current%i))
                 call pair_potential%meet(overlap, energy_i, distance)
@@ -213,13 +213,13 @@ contains
     end subroutine Concrete_Visitable_Array_set
 
     subroutine Concrete_Visitable_Array_visit(this, overlap, energy, particle, pair_potential, &
-        same_type)
+        i_exclude)
         class(Concrete_Visitable_Array), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
         type(Concrete_Temporary_Particle), intent(in) :: particle
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
-        logical, intent(in) :: same_type
+        integer, intent(in) :: i_exclude
 
         real(DP) :: energy_i, distance
         integer :: i_node
@@ -227,13 +227,12 @@ contains
         overlap = .false.
         energy = 0._DP
         do i_node = 1, this%num_nodes
-            if (.not.same_type .or. particle%i /= this%nodes(i_node)) then
-                distance = this%periodic_box%distance(particle%position, &
-                    this%component_positions%get(this%nodes(i_node)))
-                call pair_potential%meet(overlap, energy_i, distance)
-                if (overlap) return
-                energy = energy + energy_i
-            end if
+            if (this%nodes(i_node) == i_exclude) cycle
+            distance = this%periodic_box%distance(particle%position, this%component_positions%&
+                get(this%nodes(i_node)))
+            call pair_potential%meet(overlap, energy_i, distance)
+            if (overlap) return
+            energy = energy + energy_i
         end do
     end subroutine Concrete_Visitable_Array_visit
 
@@ -280,13 +279,13 @@ contains
         integer, intent(in) :: i_target, i_particle
     end subroutine Null_Visitable_List_set
 
-    subroutine Null_Visitable_List_visit(this, overlap, energy, particle, pair_potential, same_type)
+    subroutine Null_Visitable_List_visit(this, overlap, energy, particle, pair_potential, i_exclude)
         class(Null_Visitable_List), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
         type(Concrete_Temporary_Particle), intent(in) :: particle
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
-        logical, intent(in) :: same_type
+        integer, intent(in) :: i_exclude
         overlap = .false.
         energy = 0._DP
     end subroutine Null_Visitable_List_visit

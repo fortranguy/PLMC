@@ -18,7 +18,7 @@ use procedures_changes_factory, only: changes_create, changes_destroy
 use types_short_potentials_wrapper, only: Short_Potentials_Wrapper
 use procedures_short_potentials_factory, only: short_potentials_create, &
     short_potentials_destroy
-use types_ewalds_wrapper, only: Mixture_Ewald_Wrapper
+use types_ewalds_wrapper, only: Ewalds_Wrapper
 use procedures_ewalds_factory, only: ewald_create, ewald_destroy
 use module_changes_success, only: reset_counter => Concrete_Changes_Counter_reset, &
     set_success => Concrete_Changes_Counter_set
@@ -144,36 +144,18 @@ contains
     end subroutine destroy_short_potentials
 
     subroutine create_ewalds(ewalds, environment, mixture, input_data)
-        type(Mixture_Ewald_Wrapper), intent(out) :: ewalds
+        type(Ewalds_Wrapper), intent(out) :: ewalds
         type(Environment_Wrapper), intent(in) :: environment
-        type(Mixture_Wrapper_Old), intent(in) :: mixture
+        type(Mixture_Wrapper), intent(in) :: mixture
         type(json_file), intent(inout) :: input_data
 
-        logical :: mixture_is_dipolar
-
-        call ewald_create(ewalds%intras(1), environment, mixture%components(1), &
-            input_data, ewalds_prefix//"Component 1.")
-        call ewald_create(ewalds%intras(2), environment, mixture%components(2), &
-            input_data, ewalds_prefix//"Component 2.")
-
-        mixture_is_dipolar = component_is_dipolar(mixture%components(1)%dipolar_moments) .and. &
-            component_is_dipolar(mixture%components(2)%dipolar_moments)
-        !call ewald_create(ewalds%inter_micro, mixture_is_dipolar, environment, &
-        !    mixture%inter_diameter, input_data, ewalds_prefix//"Inter 12.")
-        call ewald_create(ewalds%inters(1), ewalds%inter_micro, environment, &
-            mixture%components(1))
-        call ewald_create(ewalds%inters(2), ewalds%inter_micro, environment, &
-            mixture%components(2))
+        call ewald_create(ewalds, environment, mixture, input_data, ewalds_prefix)
     end subroutine create_ewalds
 
     subroutine destroy_ewalds(ewalds)
-        type(Mixture_Ewald_Wrapper), intent(inout) :: ewalds
+        type(Ewalds_Wrapper), intent(inout) :: ewalds
 
-        call ewald_destroy(ewalds%inters(2))
-        call ewald_destroy(ewalds%inters(1))
-        call ewald_destroy(ewalds%inter_micro)
-        call ewald_destroy(ewalds%intras(2))
-        call ewald_destroy(ewalds%intras(1))
+        call ewald_destroy(ewalds)
     end subroutine destroy_ewalds
 
     subroutine create_observable_writers(observable_writers, walls_potential, mixture, changes, &
@@ -248,7 +230,7 @@ contains
         type(Metropolis_Wrapper), intent(inout) :: metropolis
         type(Component_Wrapper), intent(in) :: components(num_components)
         type(Short_Potentials_Wrapper), intent(in) :: short_potentials
-        type(Mixture_Ewald_Wrapper), intent(in) :: ewalds
+        type(Ewalds_Wrapper), intent(in) :: ewalds
 
         call metropolis_set(metropolis, components, short_potentials, ewalds)
     end subroutine set_metropolis

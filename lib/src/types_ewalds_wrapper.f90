@@ -38,7 +38,12 @@ private
         type(Ewald_Real_Pair_Wrapper), allocatable :: with_components(:)
     end type Ewald_Real_Pairs_Wrapper
 
+    type, public :: Ewald_Real_Component_Wrapper
+        class(Abstract_Ewald_Real_Component), allocatable :: real_component
+    end type Ewald_Real_Component_Wrapper
+
     type, public :: Ewalds_Wrapper
+        type(Ewald_Real_Component_Wrapper), allocatable :: real_components(:)
         type(Ewald_Real_Pairs_Wrapper), allocatable :: real_pairs(:)
     end type Ewalds_Wrapper
 

@@ -62,8 +62,8 @@ contains
 
         call short_potentials_create(short_potentials%inter_pairs, interact, mixture%&
             inter_min_distances, input_data, prefix)
-        call short_potentials_create(short_potentials%wall_pairs, &
-            mixture%wall_min_distances, input_data, prefix)
+        call short_potentials_create(short_potentials%wall_pairs, mixture%wall_min_distances, &
+            input_data, prefix)
         call allocate_list(list, interact, input_data, prefix)
         call short_potentials_create(short_potentials%inter_cells, interact, &
             environment%periodic_box, mixture%components, short_potentials%inter_pairs, list)
