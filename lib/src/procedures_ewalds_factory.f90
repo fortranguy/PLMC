@@ -9,7 +9,7 @@ use types_environment_wrapper, only: Environment_Wrapper
 use class_minimum_distance, only: Abstract_Minimum_Distance
 use class_component_coordinates, only: Abstract_Component_Coordinates
 use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
-use types_component_wrapper, only: Component_Wrapper, Mixture_Wrapper_Old
+use types_component_wrapper, only: Component_Wrapper
 use types_mixture_wrapper, only: Minimum_Distances_Wrapper, Mixture_Wrapper
 use types_potential_domain, only: Concrete_Potential_Domain
 use class_ewald_real_pair, only: Abstract_Ewald_Real_Pair, &

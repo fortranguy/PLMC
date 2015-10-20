@@ -9,7 +9,7 @@ use class_periodic_box, only: Abstract_Periodic_Box
 use class_walls_potential, only: Abstract_Walls_Potential
 use types_environment_wrapper, only: Environment_Wrapper
 use procedures_environment_factory, only: environment_create, environment_destroy
-use types_component_wrapper, only: Mixture_Wrapper_Old, Component_Wrapper !to delete
+use types_component_wrapper, only: Component_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
 use procedures_component_factory, only: component_create, component_destroy !to delete
 use procedures_mixture_factory, only: mixture_create, mixture_destroy
@@ -162,7 +162,7 @@ contains
         input_data)
         type(Mixture_Observable_Writers_Wrapper), intent(out) :: observable_writers
         class(Abstract_Walls_Potential), intent(in) :: walls_potential
-        type(Mixture_Wrapper_Old), intent(in) :: mixture
+        type(Mixture_Wrapper), intent(in) :: mixture
         type(Changes_Wrapper), intent(in) :: changes(num_components)
         type(json_file), intent(inout) :: input_data
 
@@ -173,11 +173,11 @@ contains
 
         wall_used = use_walls(walls_potential)
         component_1_exists = .false.
-        component_1_is_dipolar = component_is_dipolar(mixture%components(1)%dipolar_moments)
+        !component_1_is_dipolar = component_is_dipolar(mixture%components(1)%dipolar_moments)
         call observable_writers_create(observable_writers%intras(1)%energy, wall_used, &
             component_1_exists, component_1_is_dipolar, "component_1_energy.out")
         component_2_exists = .false.
-        component_2_is_dipolar = component_is_dipolar(mixture%components(2)%dipolar_moments)
+        !component_2_is_dipolar = component_is_dipolar(mixture%components(2)%dipolar_moments)
         call observable_writers_create(observable_writers%intras(2)%energy, wall_used, &
             component_2_exists, component_2_is_dipolar, "component_2_energy.out")
         mixture_exists = component_1_exists .and. component_2_exists
@@ -192,12 +192,12 @@ contains
             changes(2)%moved_positions, changes(2)%rotated_orientations, &
             changes(2)%component_exchange, "component_2_success.out")
 
-        call observable_writers_create(observable_writers%intras(1)%coordinates, &
-            "component_1_coordinates", mixture%components(1)%positions, &
-            mixture%components(1)%orientations, input_data, "Monte Carlo.")
-        call observable_writers_create(observable_writers%intras(2)%coordinates, &
-            "component_2_coordinates", mixture%components(2)%positions, &
-            mixture%components(2)%orientations, input_data, "Monte Carlo.")
+        !call observable_writers_create(observable_writers%intras(1)%coordinates, &
+        !    "component_1_coordinates", mixture%components(1)%positions, &
+        !    mixture%components(1)%orientations, input_data, "Monte Carlo.")
+        !call observable_writers_create(observable_writers%intras(2)%coordinates, &
+        !    "component_2_coordinates", mixture%components(2)%positions, &
+        !    mixture%components(2)%orientations, input_data, "Monte Carlo.")
     end subroutine create_observable_writers
 
     subroutine destroy_observable_writers(observable_writers)

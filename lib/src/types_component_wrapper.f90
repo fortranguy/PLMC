@@ -19,8 +19,4 @@ private
         class(Abstract_Component_Total_Moment), allocatable :: total_moment
     end type Component_Wrapper
 
-    type, public :: Mixture_Wrapper_Old
-        type(Component_Wrapper) :: components(num_components)
-    end type Mixture_Wrapper_Old
-
 end module types_component_wrapper
