@@ -127,13 +127,13 @@ contains
         call changes_destroy(changes(2))
     end subroutine destroy_changes
 
-    subroutine create_short_potentials(short_potentials, environment, mixture, input_data)
+    subroutine create_short_potentials(short_potentials, periodic_box, mixture, input_data)
         type(Short_Potentials_Wrapper), intent(out) :: short_potentials
-        type(Environment_Wrapper), intent(in) :: environment
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(Mixture_Wrapper), intent(in) :: mixture
         type(json_file), intent(inout) :: input_data
 
-        call short_potentials_create(short_potentials, environment, mixture, input_data, &
+        call short_potentials_create(short_potentials, periodic_box, mixture, input_data, &
             short_potentials_prefix)
     end subroutine create_short_potentials
 

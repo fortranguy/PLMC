@@ -37,7 +37,7 @@ implicit none
     call plmc_load(input_data)
     call plmc_create(environment, input_data)
     call plmc_create(mixture, environment, input_data)
-    call plmc_create(short_potentials, environment, mixture, input_data)
+    call plmc_create(short_potentials, environment%periodic_box, mixture, input_data)
     stop
     call plmc_create(ewalds, environment, mixture, input_data)
     call plmc_set_num_steps(input_data)

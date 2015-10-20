@@ -182,6 +182,7 @@ contains
         real(DP) :: walls_energy, field_energy
         real(DP) :: short_differences(size(observables%short_energies)), &
             long_energies(size(observables%long_energies))
+        integer :: j_observable, i_observable
 
         i_actor = this%selector%get()
         i_spectator = mod(i_actor, num_components) + 1
@@ -190,8 +191,11 @@ contains
             walls_energy, short_differences, long_energies, i_actor, i_spectator)
         if (success) then
             do i_component = 1, size(observables%short_energies)
-                !observables%short_energies(i_actor)%with_components =
-                !observables%short_energies(i_actor)%with_components +
+                j_observable = maxval([i_actor, i_component])
+                i_observable = minval([i_actor, i_component])
+                observables%short_energies(j_observable)%with_components(i_observable) = &
+                    observables%short_energies(j_observable)%with_components(i_observable) + &
+                    short_differences(i_component)
             end do
             observables%intras(i_actor)%component_energy = &
                 observables%intras(i_actor)%component_energy + actor_energy_difference
