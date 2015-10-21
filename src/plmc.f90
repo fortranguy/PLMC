@@ -48,7 +48,7 @@ implicit none
 
     call plmc_set(metropolis, mixture%components, short_potentials, ewalds)
     call plmc_propagator_construct(metropolis)
-    !call plmc_visit(observables, environment%walls_potential, short_potentials_old, ewalds, mixture_old)
+    call plmc_visit(observables, short_potentials, ewalds, mixture)
     call plmc_write(-num_tuning_steps, observables_writers, observables)
 
     if (num_tuning_steps > 0) write(output_unit, *) "Trying to tune changes..."
@@ -67,7 +67,7 @@ implicit none
     end do
     write(output_unit, *) "Iterations end."
 
-    !call plmc_visit(observables, environment%walls_potential, short_potentials_old, ewalds, mixture_old)
+    call plmc_visit(observables, short_potentials, ewalds, mixture)
     call plmc_write(i_step-1, observables_writers, observables)
 
     call plmc_propagator_destroy()

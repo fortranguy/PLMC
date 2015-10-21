@@ -1,4 +1,4 @@
-module procedures_temporary_energies
+module procedures_inter_energies
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use types_observables_wrapper, only: Concrete_Inter_Energies
@@ -40,4 +40,4 @@ contains
         end do
     end function Concrete_Inter_Energies_addition
 
-end module procedures_temporary_energies
+end module procedures_inter_energies
