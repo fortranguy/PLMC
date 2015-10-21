@@ -12,11 +12,13 @@ use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
 use types_component_wrapper, only: Component_Wrapper
 use types_mixture_wrapper, only: Minimum_Distances_Wrapper, Mixture_Wrapper
 use types_potential_domain, only: Concrete_Potential_Domain
-use class_ewald_real_pair, only: Abstract_Ewald_Real_Pair, &
-    Tabulated_Ewald_Real_Pair, Raw_Ewald_Real_Pair, Null_Ewald_Real_Pair
+use class_ewald_real_pair, only: Abstract_Ewald_Real_Pair, Tabulated_Ewald_Real_Pair, &
+    Raw_Ewald_Real_Pair, Null_Ewald_Real_Pair
 use class_ewald_real_component, only: Abstract_Ewald_Real_Component, &
     Concrete_Ewald_Real_Component, Null_Ewald_Real_Component
 use class_weighted_structure, only: Abstract_Weighted_Structure
+use class_ewald_real_visitor, only: Abstract_Ewald_Real_Visitor, Concrete_Ewald_Real_Visitor, &
+    Null_Ewald_Real_Visitor
 use types_ewalds_wrapper, only: Ewald_Wrapper, Ewald_Wrapper_Macro, Ewald_Wrapper_Micro, &
     Ewald_Real_Pair_Wrapper, Ewald_Real_Pairs_Wrapper, Ewald_Real_Component_Wrapper, Ewalds_Wrapper
 use procedures_property_inquirers, only: component_is_dipolar
@@ -28,6 +30,7 @@ public :: ewalds_create, ewalds_set, ewalds_destroy
 
 interface ewalds_create
     module procedure :: create_all
+    module procedure :: create_real_visitor
     module procedure :: create_real_components
     module procedure :: create_real_component
     module procedure :: create_real_pairs
@@ -36,7 +39,7 @@ end interface ewalds_create
 
 interface ewalds_set
     module procedure :: set_alpha
-    module procedure :: set_components_are_dipolar
+    module procedure :: set_are_dipolar
 end interface ewalds_set
 
 interface ewalds_destroy
@@ -44,6 +47,7 @@ interface ewalds_destroy
     module procedure :: destroy_real_pairs
     module procedure :: destroy_real_component
     module procedure :: destroy_real_components
+    module procedure :: desrtroy_real_visitor
     module procedure :: destroy_all
 end interface ewalds_destroy
 
@@ -56,16 +60,16 @@ contains
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        logical :: components_are_dipolar(size(mixture%components))
+        logical :: are_dipolar(size(mixture%components))
         real(DP) :: alpha
 
-        call ewalds_set(components_are_dipolar, mixture%components)
-        call ewalds_create(ewalds%real_components, components_are_dipolar, &
-            environment%periodic_box, mixture%components)
-        call ewalds_set(alpha, any(components_are_dipolar), environment%periodic_box, input_data, &
-            prefix)
-        call ewalds_create(ewalds%real_pairs, components_are_dipolar, environment%periodic_box, &
-            mixture%inter_min_distances, alpha, input_data, prefix//"Real.")
+        call ewalds_set(are_dipolar, mixture%components)
+        call ewalds_create(ewalds%real_visitor, environment%periodic_box, any(are_dipolar))
+        call ewalds_create(ewalds%real_components, environment%periodic_box, mixture%components, &
+            are_dipolar)
+        call ewalds_set(alpha, environment%periodic_box,  any(are_dipolar), input_data, prefix)
+        call ewalds_create(ewalds%real_pairs, environment%periodic_box, mixture%&
+            inter_min_distances, are_dipolar, alpha, input_data, prefix//"Real.")
     end subroutine create_all
 
     subroutine destroy_all(ewalds)
@@ -73,23 +77,44 @@ contains
 
         call ewalds_destroy(ewalds%real_pairs)
         call ewalds_destroy(ewalds%real_components)
+        call ewalds_destroy(ewalds%real_visitor)
     end subroutine destroy_all
 
-    subroutine create_real_components(real_components, components_are_dipolar, periodic_box, &
-        components)
+    subroutine create_real_visitor(visitor, periodic_box, dipoles_exist)
+        class(Abstract_Ewald_Real_Visitor), allocatable, intent(out) :: visitor
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
+        logical, intent(in) :: dipoles_exist
+
+        if (dipoles_exist) then
+            allocate(Concrete_Ewald_Real_Visitor :: visitor)
+        else
+            allocate(Null_Ewald_Real_Visitor :: visitor)
+        end if
+        call visitor%construct(periodic_box)
+    end subroutine create_real_visitor
+
+    subroutine desrtroy_real_visitor(visitor)
+        class(Abstract_Ewald_Real_Visitor), allocatable, intent(inout) :: visitor
+
+        if (allocated(visitor)) then
+            call visitor%destroy()
+            deallocate(visitor)
+        end if
+    end subroutine desrtroy_real_visitor
+
+    subroutine create_real_components(real_components, periodic_box, components, are_dipolar)
         type(Ewald_Real_Component_Wrapper), allocatable, intent(out) :: real_components(:)
-        logical, intent(in) :: components_are_dipolar(:)
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(Component_Wrapper), intent(in) :: components(:)
+        logical, intent(in) :: are_dipolar(:)
 
         integer :: i_component
 
-        allocate(real_components(size(components_are_dipolar)))
+        allocate(real_components(size(are_dipolar)))
         do i_component = 1, size(real_components)
-            call ewalds_create(real_components(i_component)%real_component, &
-                components_are_dipolar(i_component), periodic_box, &
-                components(i_component)%positions, &
-                components(i_component)%dipolar_moments)
+            call ewalds_create(real_components(i_component)%real_component, periodic_box, &
+                components(i_component)%positions, components(i_component)%dipolar_moments, &
+                are_dipolar(i_component))
         end do
     end subroutine create_real_components
 
@@ -99,20 +124,20 @@ contains
         if (allocated(real_components)) deallocate(real_components)
     end subroutine destroy_real_components
 
-    subroutine create_real_component(real_component, is_dipolar, periodic_box, &
-        component_positions, component_dipolar_moments)
+    subroutine create_real_component(real_component, periodic_box, positions, dipolar_moments, &
+        is_dipolar)
         class(Abstract_Ewald_Real_Component), allocatable, intent(out) :: real_component
-        logical, intent(in) :: is_dipolar
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        class(Abstract_Component_Coordinates), intent(in) :: component_positions
-        class(Abstract_Component_Dipolar_Moments), intent(in) :: component_dipolar_moments
+        class(Abstract_Component_Coordinates), intent(in) :: positions
+        class(Abstract_Component_Dipolar_Moments), intent(in) :: dipolar_moments
+        logical, intent(in) :: is_dipolar
 
         if (is_dipolar) then
             allocate(Concrete_Ewald_Real_Component :: real_component)
         else
             allocate(Null_Ewald_Real_Component :: real_component)
         end if
-        call real_component%construct(periodic_box, component_positions, component_dipolar_moments)
+        call real_component%construct(periodic_box, positions, dipolar_moments)
     end subroutine create_real_component
 
     subroutine destroy_real_component(real_component)
@@ -124,28 +149,28 @@ contains
         end if
     end subroutine destroy_real_component
 
-    subroutine create_real_pairs(real_pairs, components_are_dipolar, periodic_box, min_distances, &
+    subroutine create_real_pairs(real_pairs, periodic_box, min_distances, are_dipolar, &
         alpha, input_data, prefix)
         type(Ewald_Real_Pairs_Wrapper), allocatable, intent(out) :: real_pairs(:)
-        logical, intent(in) :: components_are_dipolar(:)
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(Minimum_Distances_Wrapper), intent(in) :: min_distances(:)
+        logical, intent(in) :: are_dipolar(:)
         real(DP), intent(in) :: alpha
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
         integer :: j_component, i_component
 
-        allocate(real_pairs(size(components_are_dipolar)))
-        do j_component = 1, size(components_are_dipolar)
+        allocate(real_pairs(size(are_dipolar)))
+        do j_component = 1, size(are_dipolar)
             allocate(real_pairs(j_component)%with_components(j_component))
             do i_component = 1, size(real_pairs(j_component)%with_components)
-                associate (interact_ij => components_are_dipolar(i_component) .and. &
-                    components_are_dipolar(j_component), &
+                associate (interact_ij => are_dipolar(i_component) .and. &
+                    are_dipolar(j_component), &
                     min_distance => min_distances(j_component)%with_components(i_component)%&
                     min_distance)
                     call ewalds_create(real_pairs(j_component)%with_components(i_component)%&
-                        real_pair, interact_ij, alpha, periodic_box, min_distance, input_data, &
+                        real_pair, periodic_box, min_distance, interact_ij, alpha, input_data, &
                         prefix)
                 end associate
             end do
@@ -171,18 +196,18 @@ contains
         end if
     end subroutine destroy_real_pairs
 
-    subroutine create_real_pair(real_pair, interact, alpha, periodic_box, &
-        min_distance, input_data, prefix)
+    subroutine create_real_pair(real_pair, periodic_box, min_distance, interact, alpha, &
+        input_data, prefix)
         class(Abstract_Ewald_Real_Pair), allocatable, intent(out) :: real_pair
-        logical, intent(in) :: interact
-        real(DP), intent(in) :: alpha
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Minimum_Distance), intent(in) :: min_distance
+        logical, intent(in) :: interact
+        real(DP), intent(in) :: alpha
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
         call allocate_real_pair(real_pair, interact, input_data, prefix)
-        call construct_real_pair(real_pair, interact, alpha, periodic_box, min_distance, &
+        call construct_real_pair(real_pair, periodic_box, min_distance, interact, alpha, &
             input_data, prefix)
     end subroutine create_real_pair
 
@@ -210,13 +235,13 @@ contains
         end if
     end subroutine allocate_real_pair
 
-    subroutine construct_real_pair(real_pair, interact, alpha, periodic_box, min_distance, &
+    subroutine construct_real_pair(real_pair, periodic_box, min_distance, interact, alpha, &
         input_data, prefix)
         class(Abstract_Ewald_Real_Pair), intent(inout) :: real_pair
-        logical, intent(in) :: interact
-        real(DP), intent(in) :: alpha
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Minimum_Distance), intent(in) :: min_distance
+        logical, intent(in) :: interact
+        real(DP), intent(in) :: alpha
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -255,10 +280,10 @@ contains
         class(Abstract_Weighted_Structure), allocatable, intent(out) :: weighted_structure
     end subroutine allocate_and_construct_weighted_structure
 
-    subroutine set_alpha(alpha, dipoles_exist, periodic_box, input_data, prefix)
+    subroutine set_alpha(alpha, periodic_box, dipoles_exist, input_data, prefix)
         real(DP), intent(out) :: alpha
-        logical, intent(in) :: dipoles_exist
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
+        logical, intent(in) :: dipoles_exist
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -278,16 +303,16 @@ contains
         end if
     end subroutine set_alpha
 
-    subroutine set_components_are_dipolar(components_are_dipolar, components)
-        logical, intent(out) :: components_are_dipolar(:)
+    subroutine set_are_dipolar(are_dipolar, components)
+        logical, intent(out) :: are_dipolar(:)
         type(Component_Wrapper), intent(in) :: components(:)
 
         integer :: i_component
 
-        do i_component = 1, size(components_are_dipolar)
-            components_are_dipolar(i_component) = component_is_dipolar(components(i_component)%&
+        do i_component = 1, size(are_dipolar)
+            are_dipolar(i_component) = component_is_dipolar(components(i_component)%&
                 dipolar_moments)
         end do
-    end subroutine set_components_are_dipolar
+    end subroutine set_are_dipolar
 
 end module procedures_ewalds_factory

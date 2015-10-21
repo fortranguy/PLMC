@@ -50,12 +50,11 @@ contains
     end subroutine Abstract_Short_Potential_Visitor_destroy
 
     pure subroutine Abstract_Short_Potential_Visitor_visit_inter(this, overlap, energy, &
-        component_1_positions, component_2_positions, pair_potential)
+        positions_1, positions_2, pair_potential)
         class(Abstract_Short_Potential_Visitor), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
-        class(Abstract_Component_Coordinates), intent(in) :: component_1_positions, &
-            component_2_positions
+        class(Abstract_Component_Coordinates), intent(in) :: positions_1, positions_2
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
 
         real(DP) :: energy_ij, distance_ij
@@ -63,10 +62,10 @@ contains
 
         overlap = .false.
         energy = 0._DP
-        do j_particle = 1, component_2_positions%get_num()
-            do i_particle = 1, component_1_positions%get_num()
-                distance_ij = this%periodic_box%distance(component_1_positions%get(i_particle), &
-                    component_2_positions%get(j_particle))
+        do j_particle = 1, positions_2%get_num()
+            do i_particle = 1, positions_1%get_num()
+                distance_ij = this%periodic_box%distance(positions_1%get(i_particle), positions_2%&
+                    get(j_particle))
                 call pair_potential%meet(overlap, energy_ij, distance_ij)
                 if (overlap) return
                 energy = energy + energy_ij
@@ -74,12 +73,12 @@ contains
         end do
     end subroutine Abstract_Short_Potential_Visitor_visit_inter
 
-    pure subroutine Abstract_Short_Potential_Visitor_visit_intra(this, overlap, energy, &
-        component_positions, pair_potential)
+    pure subroutine Abstract_Short_Potential_Visitor_visit_intra(this, overlap, energy, positions, &
+        pair_potential)
         class(Abstract_Short_Potential_Visitor), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
-        class(Abstract_Component_Coordinates), intent(in) :: component_positions
+        class(Abstract_Component_Coordinates), intent(in) :: positions
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
 
         real(DP) :: energy_ij, distance_ij
@@ -87,10 +86,10 @@ contains
 
         overlap = .false.
         energy = 0._DP
-        do j_particle = 1, component_positions%get_num()
-            do i_particle = j_particle + 1, component_positions%get_num()
-                distance_ij = this%periodic_box%distance(component_positions%get(i_particle), &
-                    component_positions%get(j_particle))
+        do j_particle = 1, positions%get_num()
+            do i_particle = j_particle + 1, positions%get_num()
+                distance_ij = this%periodic_box%distance(positions%get(i_particle), positions%&
+                    get(j_particle))
                 call pair_potential%meet(overlap, energy_ij, distance_ij)
                 if (overlap) return
                 energy = energy + energy_ij
@@ -111,24 +110,24 @@ contains
         class(Null_Short_Potential_Visitor), intent(inout) :: this
     end subroutine Null_Short_Potential_Visitor_destroy
 
-    pure subroutine Null_Short_Potential_Visitor_visit_inter(this, overlap, energy, &
-        component_1_positions, component_2_positions, pair_potential)
+    pure subroutine Null_Short_Potential_Visitor_visit_inter(this, overlap, energy, positions_1, &
+        positions_2, pair_potential)
         class(Null_Short_Potential_Visitor), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
-        class(Abstract_Component_Coordinates), intent(in) :: component_1_positions, &
-            component_2_positions
+        class(Abstract_Component_Coordinates), intent(in) :: positions_1, &
+            positions_2
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
         overlap = .false.
         energy = 0._DP
     end subroutine Null_Short_Potential_Visitor_visit_inter
 
-    pure subroutine Null_Short_Potential_Visitor_visit_intra(this, overlap, energy, &
-        component_positions, pair_potential)
+    pure subroutine Null_Short_Potential_Visitor_visit_intra(this, overlap, energy, positions, &
+        pair_potential)
         class(Null_Short_Potential_Visitor), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
-        class(Abstract_Component_Coordinates), intent(in) :: component_positions
+        class(Abstract_Component_Coordinates), intent(in) :: positions
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
         overlap = .false.
         energy = 0._DP

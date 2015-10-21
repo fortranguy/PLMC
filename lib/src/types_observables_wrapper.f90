@@ -15,18 +15,18 @@ private
         type(Concrete_Component_Energy) :: component_energy ! to remove
     end type Observables_Wrapper_old
 
-    type, public :: Concrete_Energies
+    type, public :: Concrete_Inter_Energies
         real(DP), allocatable :: with_components(:)
-    end type Concrete_Energies
+    end type Concrete_Inter_Energies
 
     type, public :: Observables_Wrapper
         type(Observables_Wrapper_old) :: intras(num_components) ! to remove
         type(Concrete_Inter_Energy) :: inter_energy ! to remove
         type(Concrete_Changes_Counter), allocatable :: changes_counters(:)
         type(Concrete_Changes_Success), allocatable :: changes_sucesses(:)
-        type(Concrete_Energies), allocatable :: short_energies(:)
+        type(Concrete_Inter_Energies), allocatable :: short_energies(:)
         real(DP), allocatable :: walls_energies(:)
-        type(Concrete_Energies), allocatable :: long_energies(:)
+        type(Concrete_Inter_Energies), allocatable :: long_energies(:)
         real(DP), allocatable :: field_energies(:)
     end type Observables_Wrapper
 
