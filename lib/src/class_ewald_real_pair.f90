@@ -82,8 +82,9 @@ contains
 !implementation Abstract_Ewald_Real_Pair
 
     !> Between 2 component
-    !> \f[ (\vec{\mu}_i\cdot\vec{\mu}_j) B_\alpha(r_{ij}) -
-    !>     (\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij}) C_\alpha(r_{ij}) \f]
+    !> \[ (\vec{\mu}_i\cdot\vec{\mu}_j) B_\alpha(r_{ij}) -
+    !>     (\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij}) C_\alpha(r_{ij})
+    !> \]
     pure real(DP) function Abstract_Ewald_Real_Pair_meet_energy(this, vector_ij, moment_i, &
         moment_j) result(energy)
         class(Abstract_Ewald_Real_Pair), intent(in) :: this
@@ -98,10 +99,10 @@ contains
     end function Abstract_Ewald_Real_Pair_meet_energy
 
     !> Field: to check
-    !> \f[
+    !> \[
     !>      \vec{E}(\vec{r}_i) = -B_\alpha(r_{ij}) |\vec{\mu}_j) +
     !>                           (\vec{r}_{ij}\cdot\vec{\mu}_j) C_\alpha(r_{ij}) |\vec{r}_{ij})
-    !> \f]
+    !> \]
     pure function Abstract_Ewald_Real_Pair_meet_field(this, vector_ij, moment_j) result(field)
         real(DP) :: field(num_dimensions)
         class(Abstract_Ewald_Real_Pair), intent(in) :: this

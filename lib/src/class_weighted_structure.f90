@@ -1,3 +1,4 @@
+!> display: private
 module class_weighted_structure
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
@@ -69,10 +70,10 @@ contains
         call this%set_structure()
     end subroutine Abstract_Weighted_Structure_construct
 
-    !> \f[
+    !> \[
     !>      w(\alpha, \vec{k}) = \frac{e^{-\frac{\pi^2}{\alpha^2} \sum_{d=1}^3 \frac{k_d^2}{L_d^2}}}
     !>                                {\sum_{d=1}^3 k_d^2}
-    !> \f] ! different definition of wave?
+    !> \] different definition of wave?
     pure subroutine Abstract_Weighted_Structure_set_weight(this)
         class(Abstract_Weighted_Structure), intent(inout) :: this
 
@@ -108,14 +109,14 @@ contains
     end function Abstract_Weighted_Structure_get_weight
 
     !> Structure factor init :
-    !> \f[
+    !> \[
     !>      S(\vec{k}) = \sum_{i} (\vec{k}\cdot\vec{\mu}_i) e^{+i\vec{k}\cdot\vec{x}_i}
-    !> \f]
+    !> \]
     !> We will also use a restricted definition later :
-    !> \f[
+    !> \[
     !>      S_\underline{l}(\vec{k}) = \sum_{i \neq l} (\vec{k}\cdot\vec{\mu}_i)
     !>                                 e^{+i\vec{k}\cdot\vec{x}_i}
-    !> \f].
+    !> \].
     pure subroutine Abstract_Weighted_Structure_set_structure(this)
         class(Abstract_Weighted_Structure), intent(inout) :: this
 

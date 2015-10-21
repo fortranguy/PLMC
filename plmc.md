@@ -5,8 +5,10 @@ project_dir: ./src
     ./lib/src
 extra_mods: json_module: http://jacobwilliams.github.io/json-fortran/
 output_dir: ./doc
+predocmark: >
+search: false
 graph: true
-sort: alpha
+sort: permission
 version: Green Mile
 year: 2015
 author: Salomon CHUNG

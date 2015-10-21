@@ -16,7 +16,7 @@ use class_ewald_real_component, only: Abstract_Ewald_Real_Component
 use types_ewalds_wrapper, only: Ewalds_Wrapper
 use types_observables_wrapper, only: Concrete_Inter_Energies, Observables_Wrapper
 use procedures_observables_factory, only: create_inter_energies_nodes, destroy_inter_energies_nodes
-use procedures_temporary_energies, only: operator(+)
+use procedures_inter_energies, only: operator(+)
 
 implicit none
 

@@ -10,10 +10,10 @@ public :: ewald_real_B, ewald_real_C, &
 
 contains
 
-    !> \f[
+    !> \[
     !>      \frac{(\vec{\mu}_i\cdot\vec{\mu_j})}{r^3} -
     !>     3\frac{(\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij})}{r^5}
-    !> \f]
+    !> \]
     pure function dipolar_pair_energy(orientation_i, orientation_j, vector_ij)
         real(DP) :: dipolar_pair_energy
         real(DP), dimension(:), intent(in) :: orientation_i, orientation_j
@@ -26,8 +26,10 @@ contains
                                       dot_product(orientation_j, vector_ij) / distance_ij**5
     end function dipolar_pair_energy
 
-    !> \f[ B(r) = \frac{\mathrm{erfc}(\alpha r)}{r^3} +
-    !>           2\frac{\alpha}{\sqrt{\pi}}\frac{e^{-\alpha^2 r^2}}{r^2} \f]
+    !> \[
+    !>      B(r) = \frac{\mathrm{erfc}(\alpha r)}{r^3} +
+    !>           2\frac{\alpha}{\sqrt{\pi}}\frac{e^{-\alpha^2 r^2}}{r^2}
+    !> \]
     pure function ewald_real_B(alpha, r)
         real(DP) :: ewald_real_B
         real(DP), intent(in) :: alpha
@@ -36,9 +38,11 @@ contains
         ewald_real_B = erfc(alpha*r)/r**3 + 2._DP*alpha/sqrt(PI) * exp(-alpha**2*r**2) / r**2
     end function ewald_real_B
 
-    !> \f[ C(r) = 3\frac{\mathrm{erfc}(\alpha r)}{r^5} +
+    !> \[
+    !>      C(r) = 3\frac{\mathrm{erfc}(\alpha r)}{r^5} +
     !>            2\frac{\alpha}{\sqrt{\pi}}\left(2\alpha^2 + \frac{3}{r^2}\right)
-    !>                                     \frac{e^{-\alpha^2 r^2}}{r^2} \f]
+    !>                                     \frac{e^{-\alpha^2 r^2}}{r^2}
+    !> \]
     pure function ewald_real_C(alpha, r)
         real(DP) :: ewald_real_C
         real(DP), intent(in) :: alpha
