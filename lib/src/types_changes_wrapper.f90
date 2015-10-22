@@ -1,6 +1,5 @@
 module types_changes_wrapper
 
-use data_constants, only: num_components
 use class_changed_coordinates, only: Abstract_Changed_Coordinates
 use class_change_tuner, only: Abstract_Change_Tuner
 use class_component_exchange, only: Abstract_Component_Exchange

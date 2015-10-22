@@ -1,12 +1,11 @@
 module procedures_metropolis_factory
 
-use data_constants, only: num_components
 use json_module, only: json_file
 use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
-use types_short_potentials_wrapper, only: Short_Potentials_Wrapper
-use types_ewalds_wrapper, only: Ewalds_Wrapper
+use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
+use types_long_interactions_wrapper, only: Long_Interactions_Wrapper
 use class_tower_sampler, only: Abstract_Tower_Sampler, Concrete_Tower_Sampler, Null_Tower_Sampler
 use class_one_particle_change, only: Abstract_One_Particle_Change, &
     Concrete_One_Particle_Move, Concrete_One_Particle_Rotation, Null_One_Particle_Change
@@ -35,7 +34,7 @@ contains
     subroutine metropolis_create_all(metropolis, environment, changes)
         type(Metropolis_Wrapper), intent(out) :: metropolis
         type(Environment_Wrapper), intent(in) :: environment
-        type(Changes_Wrapper), intent(in) :: changes(num_components)
+        type(Changes_Wrapper), intent(in) :: changes(:)
 
         call allocate_and_construct_one_particle_move(metropolis%one_particle_move, environment, &
             changes)
@@ -46,10 +45,10 @@ contains
     subroutine allocate_and_construct_one_particle_move(one_particle_move, environment, changes)
         class(Abstract_One_Particle_Change), allocatable, intent(out) :: one_particle_move
         type(Environment_Wrapper), intent(in) :: environment
-        type(Changes_Wrapper), intent(in) :: changes(num_components)
+        type(Changes_Wrapper), intent(in) :: changes(:)
 
         class(Abstract_Tower_Sampler), allocatable :: selector
-
+        ! to update: multi components
         if (component_can_move(changes(1)%moved_positions) .or. &
             component_can_move(changes(2)%moved_positions)) then
             allocate(Concrete_Tower_Sampler :: selector)
@@ -62,21 +61,21 @@ contains
         deallocate(selector)
     end subroutine allocate_and_construct_one_particle_move
 
-    subroutine metropolis_set_all(metropolis, components, short_potentials, ewalds)
+    subroutine metropolis_set_all(metropolis, components, short_interactions, long_interactions)
         type(Metropolis_Wrapper), intent(inout) :: metropolis
-        type(Component_Wrapper), intent(in) :: components(num_components)
-        type(Short_Potentials_Wrapper), intent(in) :: short_potentials
-        type(Ewalds_Wrapper), intent(in) :: ewalds
+        type(Component_Wrapper), intent(in) :: components(:)
+        type(Short_Interactions_Wrapper), intent(in) :: short_interactions
+        type(Long_Interactions_Wrapper), intent(in) :: long_interactions
 
-        call metropolis%one_particle_move%set_candidates(components, short_potentials, ewalds)
-        call metropolis%one_particle_rotation%set_candidates(components, short_potentials, ewalds)
+        call metropolis%one_particle_move%set_candidates(components, short_interactions, long_interactions)
+        call metropolis%one_particle_rotation%set_candidates(components, short_interactions, long_interactions)
     end subroutine metropolis_set_all
 
     subroutine allocate_and_construct_one_particle_rotation(one_particle_rotation, environment, &
         changes)
         class(Abstract_One_Particle_Change), allocatable, intent(out) :: one_particle_rotation
         type(Environment_Wrapper), intent(in) :: environment
-        type(Changes_Wrapper), intent(in) :: changes(num_components)
+        type(Changes_Wrapper), intent(in) :: changes(:)
 
         class(Abstract_Tower_Sampler), allocatable :: selector
 

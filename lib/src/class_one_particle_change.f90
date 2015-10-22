@@ -1,22 +1,15 @@
 module class_one_particle_change
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use data_constants, only: num_components
-use procedures_errors, only: error_exit
-use procedures_checks, only: check_in_range
 use procedures_random, only: random_integer
 use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use types_changes_wrapper, only: Changes_Wrapper
-use types_short_potentials_wrapper, only: Short_Potentials_Wrapper
-use types_ewalds_wrapper, only: Ewalds_Wrapper
+use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
+use types_long_interactions_wrapper, only: Long_Interactions_Wrapper
 use class_tower_sampler, only: Abstract_Tower_Sampler
 use module_changes_success, only: Concrete_Changes_Counter
-use module_component_energy, only: Concrete_Component_Energy, Concrete_Inter_Energy, &
-    Concrete_Long_Energy, Concrete_Mixture_Energy, &
-    particle_energy_sum => Concrete_Component_Energy_sum, &
-    inter_energy_sum => Concrete_Inter_Energy_sum, operator(+), operator(-)
 use types_observables_wrapper, only: Observables_Wrapper
 use class_metropolis_algorithm, only: Abstract_Metropolis_Algorithm
 
@@ -29,8 +22,8 @@ private
         type(Environment_Wrapper), pointer :: environment => null()
         type(Component_Wrapper), pointer :: components(:) => null()
         type(Changes_Wrapper), pointer :: changes(:) => null()
-        type(Short_Potentials_Wrapper), pointer :: short_potentials => null()
-        type(Ewalds_Wrapper), pointer :: ewalds => null()
+        type(Short_Interactions_Wrapper), pointer :: short_interactions => null()
+        type(Long_Interactions_Wrapper), pointer :: long_interactions => null()
         class(Abstract_Tower_Sampler), allocatable :: selector
     contains
         procedure :: construct => Abstract_One_Particle_Change_construct
@@ -144,8 +137,8 @@ contains
     subroutine Abstract_One_Particle_Change_destroy(this)
         class(Abstract_One_Particle_Change), intent(inout) :: this
 
-        this%ewalds => null()
-        this%short_potentials => null()
+        this%long_interactions => null()
+        this%short_interactions => null()
         this%components => null()
         call this%selector%destroy()
         if (allocated(this%selector)) deallocate(this%selector)
@@ -153,21 +146,17 @@ contains
         this%environment => null()
     end subroutine Abstract_One_Particle_Change_destroy
 
-    subroutine Abstract_One_Particle_Change_set_candidates(this, components, short_potentials, &
-        ewalds)
+    subroutine Abstract_One_Particle_Change_set_candidates(this, components, short_interactions, &
+        long_interactions)
         class(Abstract_One_Particle_Change), intent(inout) :: this
         type(Component_Wrapper), target, intent(in) :: components(:)
-        type(Short_Potentials_Wrapper), target, intent(in) :: short_potentials
-        type(Ewalds_Wrapper), target, intent(in) :: ewalds
+        type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
+        type(Long_Interactions_Wrapper), target, intent(in) :: long_interactions
 
-        if (size(components) /= num_components) then
-            call error_exit("Abstract_One_Particle_Change: "//&
-                "components doesn't have the right size.")
-        end if
         this%components => components
         call this%construct_selector()
-        this%short_potentials => short_potentials
-        this%ewalds => ewalds
+        this%short_interactions => short_interactions
+        this%long_interactions => long_interactions
     end subroutine Abstract_One_Particle_Change_set_candidates
 
     subroutine Abstract_One_Particle_Change_try(this, observables)
@@ -176,8 +165,6 @@ contains
 
         integer :: i_actor, i_spectator, i_component
         logical :: success
-        type(Concrete_Component_Energy) :: actor_energy_difference
-        type(Concrete_Inter_Energy) :: inter_energy_difference
         real(DP) :: walls_difference, field_energy
         real(DP) :: short_differences(size(observables%short_energies)), &
             long_differences(size(observables%long_energies))
@@ -215,7 +202,6 @@ contains
         integer, intent(in) :: i_actor
 
         type(Concrete_Temporary_Particle) :: new, old
-        type(Concrete_Mixture_Energy) :: new_energy, old_energy
         real(DP) :: energy_difference
         logical :: overlap
         real(DP) :: rand
@@ -249,10 +235,10 @@ contains
         integer :: i_component
 
         call this%environment%walls_potential%visit(overlap, walls_new, new%position, &
-            this%short_potentials%wall_pairs(i_actor)%pair_potential)
+            this%short_interactions%wall_pairs(i_actor)%pair_potential)
         if (overlap) return
         call this%environment%walls_potential%visit(overlap, walls_old, old%position, &
-            this%short_potentials%wall_pairs(i_actor)%pair_potential)
+            this%short_interactions%wall_pairs(i_actor)%pair_potential)
         walls_difference = walls_new - walls_old
     end subroutine Abstract_One_Particle_Change_visit_walls
 
@@ -267,15 +253,15 @@ contains
         real(DP), dimension(size(short_differences)) :: short_new, short_old
         integer :: i_component, i_exclude
 
-        do i_component = 1, size(this%short_potentials%inter_cells, 1)
+        do i_component = 1, size(this%short_interactions%components_cells, 1)
             i_exclude = merge(new%i, 0, i_component == i_actor)
-            call this%short_potentials%inter_cells(i_component, i_actor)%visit(overlap, &
+            call this%short_interactions%components_cells(i_component, i_actor)%visit(overlap, &
                 short_new(i_component), new, i_exclude)
             if (overlap) return
         end do
-        do i_component = 1, size(this%short_potentials%inter_cells, 1)
+        do i_component = 1, size(this%short_interactions%components_cells, 1)
             i_exclude = merge(old%i, 0, i_component == i_actor)
-            call this%short_potentials%inter_cells(i_component, i_actor)%visit(overlap, &
+            call this%short_interactions%components_cells(i_component, i_actor)%visit(overlap, &
                 short_old(i_component), old, i_exclude)
         end do
         short_differences = short_new - short_old
@@ -290,15 +276,15 @@ contains
         real(DP), dimension(size(long_differences)) :: long_new_real, long_old_real
         integer :: i_component, i_exclude, j_pair, i_pair
 
-        do i_component = 1, size(this%ewalds%real_components)
+        do i_component = 1, size(this%long_interactions%real_components)
             i_exclude = merge(new%i, 0, i_component == i_actor)
             j_pair = maxval([i_actor, i_component])
             i_pair = minval([i_actor, i_component])
-            call this%ewalds%real_components(i_component)%real_component%&
-                visit(long_new_real(i_component), this%ewalds%real_pairs(j_pair)%&
+            call this%long_interactions%real_components(i_component)%real_component%&
+                visit(long_new_real(i_component), this%long_interactions%real_pairs(j_pair)%&
                 with_components(i_pair)%real_pair, new, i_exclude)
-            call this%ewalds%real_components(i_component)%real_component%&
-                visit(long_old_real(i_component), this%ewalds%real_pairs(j_pair)%&
+            call this%long_interactions%real_components(i_component)%real_component%&
+                visit(long_old_real(i_component), this%long_interactions%real_pairs(j_pair)%&
                 with_components(i_pair)%real_pair, old, i_exclude)
         end do
         long_differences = long_new_real - long_old_real
@@ -345,8 +331,8 @@ contains
         integer :: i_component
 
         call this%components(i_actor)%positions%set(new%i, new%position)
-        do i_component = 1, size(this%short_potentials%inter_cells)
-            call this%short_potentials%inter_cells(i_component, i_actor)%move(old, new)
+        do i_component = 1, size(this%short_interactions%components_cells)
+            call this%short_interactions%components_cells(i_component, i_actor)%move(old, new)
         end do
     end subroutine Concrete_One_Particle_Move_update_actor
 
@@ -452,12 +438,12 @@ contains
         class(Null_One_Particle_Change), intent(inout) :: this
     end subroutine Null_One_Particle_Change_destroy
 
-    subroutine Null_One_Particle_Change_set_candidates(this, components, short_potentials, &
-        ewalds)
+    subroutine Null_One_Particle_Change_set_candidates(this, components, short_interactions, &
+        long_interactions)
         class(Null_One_Particle_Change), intent(inout) :: this
         type(Component_Wrapper), target, intent(in) :: components(:)
-        type(Short_Potentials_Wrapper), target, intent(in) :: short_potentials
-        type(Ewalds_Wrapper), target, intent(in) :: ewalds
+        type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
+        type(Long_Interactions_Wrapper), target, intent(in) :: long_interactions
     end subroutine Null_One_Particle_Change_set_candidates
 
     subroutine Null_One_Particle_Change_construct_selector(this)

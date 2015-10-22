@@ -1,8 +1,7 @@
 module procedures_plmc_factory
 
-use data_constants, only: num_components
 use data_wrappers_prefix, only:environment_prefix, mixture_prefix, changes_prefix, &
-    short_potentials_prefix, ewalds_prefix
+    short_interactions_prefix, long_interactions_prefix
 use json_module, only: json_file, json_initialize
 use procedures_command_arguments, only: set_filename_from_argument
 use class_periodic_box, only: Abstract_Periodic_Box
@@ -16,11 +15,11 @@ use procedures_mixture_factory, only: mixture_create, mixture_destroy
 use module_changes_success, only: Concrete_Changes_Success, Concrete_Changes_Counter
 use types_changes_wrapper, only: Changes_Wrapper
 use procedures_changes_factory, only: changes_create, changes_destroy
-use types_short_potentials_wrapper, only: Short_Potentials_Wrapper
-use procedures_short_potentials_factory, only: short_potentials_create, &
-    short_potentials_destroy
-use types_ewalds_wrapper, only: Ewalds_Wrapper
-use procedures_ewalds_factory, only: ewalds_create, ewalds_destroy
+use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
+use procedures_short_interactions_factory, only: short_interactions_create, &
+    short_interactions_destroy
+use types_long_interactions_wrapper, only: Long_Interactions_Wrapper
+use procedures_long_interactions_factory, only: long_interactions_create, long_interactions_destroy
 use module_changes_success, only: reset_counter => Concrete_Changes_Counter_reset, &
     set_success => Concrete_Changes_Counter_set
 use types_observables_wrapper, only: Observables_Wrapper
@@ -47,8 +46,8 @@ interface plmc_create
     module procedure :: create_environment
     module procedure :: create_mixture
     module procedure :: create_changes
-    module procedure :: create_short_potentials
-    module procedure :: create_ewalds
+    module procedure :: create_short_interactions
+    module procedure :: create_long_interactions
     module procedure :: create_writers
     module procedure :: create_metropolis
 end interface plmc_create
@@ -62,8 +61,8 @@ end interface plmc_set
 interface plmc_destroy
     module procedure :: destroy_metropolis
     module procedure :: destroy_writers
-    module procedure :: destroy_ewalds
-    module procedure :: destroy_short_potentials
+    module procedure :: destroy_long_interactions
+    module procedure :: destroy_short_interactions
     module procedure :: destroy_changes
     module procedure :: destroy_mixture
     module procedure :: destroy_environment
@@ -110,9 +109,9 @@ contains
     end subroutine destroy_mixture
 
     subroutine create_changes(changes, periodic_box, components, input_data)
-        type(Changes_Wrapper), intent(out) :: changes(num_components)
+        type(Changes_Wrapper), intent(out) :: changes(:)
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        type(Component_Wrapper), intent(in) :: components(num_components)
+        type(Component_Wrapper), intent(in) :: components(:)
         type(json_file), intent(inout) :: input_data
 
         call changes_create(changes(1), periodic_box, components(1), input_data, &
@@ -128,43 +127,43 @@ contains
         call changes_destroy(changes(2))
     end subroutine destroy_changes
 
-    subroutine create_short_potentials(short_potentials, environment, mixture, input_data)
-        type(Short_Potentials_Wrapper), intent(out) :: short_potentials
+    subroutine create_short_interactions(short_interactions, environment, mixture, input_data)
+        type(Short_Interactions_Wrapper), intent(out) :: short_interactions
         type(Environment_Wrapper), intent(in) :: environment
         type(Mixture_Wrapper), intent(in) :: mixture
         type(json_file), intent(inout) :: input_data
 
-        call short_potentials_create(short_potentials, environment, mixture, input_data, &
-            short_potentials_prefix)
-    end subroutine create_short_potentials
+        call short_interactions_create(short_interactions, environment, mixture, input_data, &
+            short_interactions_prefix)
+    end subroutine create_short_interactions
 
-    subroutine destroy_short_potentials(short_potentials)
-        type(Short_Potentials_Wrapper), intent(inout) :: short_potentials
+    subroutine destroy_short_interactions(short_interactions)
+        type(Short_Interactions_Wrapper), intent(inout) :: short_interactions
 
-        call short_potentials_destroy(short_potentials)
-    end subroutine destroy_short_potentials
+        call short_interactions_destroy(short_interactions)
+    end subroutine destroy_short_interactions
 
-    subroutine create_ewalds(ewalds, environment, mixture, input_data)
-        type(Ewalds_Wrapper), intent(out) :: ewalds
+    subroutine create_long_interactions(long_interactions, environment, mixture, input_data)
+        type(Long_Interactions_Wrapper), intent(out) :: long_interactions
         type(Environment_Wrapper), intent(in) :: environment
         type(Mixture_Wrapper), intent(in) :: mixture
         type(json_file), intent(inout) :: input_data
 
-        call ewalds_create(ewalds, environment, mixture, input_data, ewalds_prefix)
-    end subroutine create_ewalds
+        call long_interactions_create(long_interactions, environment, mixture, input_data, long_interactions_prefix)
+    end subroutine create_long_interactions
 
-    subroutine destroy_ewalds(ewalds)
-        type(Ewalds_Wrapper), intent(inout) :: ewalds
+    subroutine destroy_long_interactions(long_interactions)
+        type(Long_Interactions_Wrapper), intent(inout) :: long_interactions
 
-        call ewalds_destroy(ewalds)
-    end subroutine destroy_ewalds
+        call long_interactions_destroy(long_interactions)
+    end subroutine destroy_long_interactions
 
     subroutine create_writers(writers, walls_potential, mixture, changes, &
         input_data)
         type(Writers_Wrapper), intent(out) :: writers
         class(Abstract_Walls_Potential), intent(in) :: walls_potential
         type(Mixture_Wrapper), intent(in) :: mixture
-        type(Changes_Wrapper), intent(in) :: changes(num_components)
+        type(Changes_Wrapper), intent(in) :: changes(:)
         type(json_file), intent(inout) :: input_data
 
         logical :: wall_used
@@ -183,8 +182,8 @@ contains
         !    component_2_exists, component_2_is_dipolar, "component_2_energy.out")
         mixture_exists = component_1_exists .and. component_2_exists
         mixture_is_dipolar = component_1_is_dipolar .and. component_2_is_dipolar
-        !call writers_create(writers%inter_energy, mixture_exists, &
-        !    mixture_is_dipolar, "inter_12_energy.out")
+        !call writers_create(writers%components_energy, mixture_exists, &
+        !    mixture_is_dipolar, "components_12_energy.out")
 
         !call writers_create(writers%intras(1)%changes, &
         !    changes(1)%moved_positions, changes(1)%rotated_orientations, &
@@ -209,7 +208,7 @@ contains
     subroutine create_metropolis(metropolis, environment, changes)
         type(Metropolis_Wrapper), intent(out) :: metropolis
         type(Environment_Wrapper), intent(in) :: environment
-        type(Changes_Wrapper), intent(in) :: changes(num_components)
+        type(Changes_Wrapper), intent(in) :: changes(:)
 
         call metropolis_create(metropolis, environment, changes)
     end subroutine create_metropolis
@@ -220,13 +219,13 @@ contains
         call metropolis_destroy(metropolis)
     end subroutine destroy_metropolis
 
-    subroutine set_metropolis(metropolis, components, short_potentials, ewalds)
+    subroutine set_metropolis(metropolis, components, short_interactions, long_interactions)
         type(Metropolis_Wrapper), intent(inout) :: metropolis
-        type(Component_Wrapper), intent(in) :: components(num_components)
-        type(Short_Potentials_Wrapper), intent(in) :: short_potentials
-        type(Ewalds_Wrapper), intent(in) :: ewalds
+        type(Component_Wrapper), intent(in) :: components(:)
+        type(Short_Interactions_Wrapper), intent(in) :: short_interactions
+        type(Long_Interactions_Wrapper), intent(in) :: long_interactions
 
-        call metropolis_set(metropolis, components, short_potentials, ewalds)
+        call metropolis_set(metropolis, components, short_interactions, long_interactions)
     end subroutine set_metropolis
 
     subroutine tune_changes(tuned, i_step, changes, changes_sucesses)

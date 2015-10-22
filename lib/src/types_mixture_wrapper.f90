@@ -17,7 +17,7 @@ private
 
     type, public :: Mixture_Wrapper
         type(Component_Wrapper), allocatable :: components(:)
-        type(Minimum_Distances_Wrapper), allocatable :: inter_min_distances(:)
+        type(Minimum_Distances_Wrapper), allocatable :: components_min_distances(:)
         type(Minimum_Distance_Wrapper), allocatable :: wall_min_distances(:)
     end type Mixture_Wrapper
 

@@ -1,6 +1,5 @@
 module types_component_wrapper
 
-use data_constants, only: num_components
 use class_component_number, only: Abstract_Component_Number
 use class_component_coordinates, only: Abstract_Component_Coordinates
 use class_component_chemical_potential, only: Abstract_Component_Chemical_Potential

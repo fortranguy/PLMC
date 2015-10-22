@@ -1,4 +1,4 @@
-module procedures_short_potentials_factory
+module procedures_short_interactions_factory
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
@@ -26,41 +26,41 @@ use class_walls_potential_visitor, only: Abstract_Walls_Potential_Visitor, &
     Concrete_Walls_Potential_Visitor, Null_Walls_Potential_Visitor
 use class_short_pairs_visitor, only: Abstract_Short_Pairs_Visitor, &
     Concrete_Short_Pairs_Visitor, Null_Short_Pairs_Visitor
-use types_short_potentials_wrapper, only: Pair_Potential_Wrapper, Pair_Potentials_Wrapper, &
-    Short_Potentials_Wrapper
+use types_short_interactions_wrapper, only: Pair_Potential_Wrapper, Pair_Potentials_Wrapper, &
+    Short_Interactions_Wrapper
 use procedures_property_inquirers, only: use_walls, components_interact
 
 implicit none
 
 private
-public :: short_potentials_create, short_potentials_destroy
+public :: short_interactions_create, short_interactions_destroy
 
-interface short_potentials_create
+interface short_interactions_create
     module procedure :: create_all
     module procedure :: create_walls_visitor
-    module procedure :: create_inter_visitor
-    module procedure :: create_inter_cells
-    module procedure :: create_inter_pairs
+    module procedure :: create_components_visitor
+    module procedure :: create_components_cells
+    module procedure :: create_components_pairs
     module procedure :: create_wall_pairs
     module procedure :: create_pair
     module procedure :: create_expression
-end interface short_potentials_create
+end interface short_interactions_create
 
-interface short_potentials_destroy
+interface short_interactions_destroy
     module procedure :: destroy_expression
     module procedure :: destroy_pair
     module procedure :: destroy_pairs
-    module procedure :: destroy_inter_pairs
-    module procedure :: destroy_inter_cells
-    module procedure :: destroy_inter_visitor
+    module procedure :: destroy_components_pairs
+    module procedure :: destroy_components_cells
+    module procedure :: destroy_components_visitor
     module procedure :: destroy_walls_visitor
     module procedure :: destroy_all
-end interface short_potentials_destroy
+end interface short_interactions_destroy
 
 contains
 
-    subroutine create_all(short_potentials, environment, mixture, input_data, prefix)
-        type(Short_Potentials_Wrapper), intent(out) :: short_potentials
+    subroutine create_all(short_interactions, environment, mixture, input_data, prefix)
+        type(Short_Interactions_Wrapper), intent(out) :: short_interactions
         type(Environment_Wrapper), intent(in) :: environment
         type(Mixture_Wrapper), intent(in) :: mixture
         type(json_file), intent(inout) :: input_data
@@ -69,28 +69,28 @@ contains
         logical :: interact, interact_with_walls
         class(Abstract_Visitable_List), allocatable :: list
 
-        call short_potentials_create(short_potentials%wall_pairs, interact_with_walls, &
+        call short_interactions_create(short_interactions%wall_pairs, interact_with_walls, &
             mixture%wall_min_distances, input_data, prefix)
-        call short_potentials_create(short_potentials%walls_visitor, environment%walls_potential, &
-            interact_with_walls)
-        call short_potentials_create(short_potentials%inter_pairs, interact, mixture%&
-            inter_min_distances, input_data, prefix)
-        call short_potentials_create(short_potentials%inter_visitor, environment%periodic_box, &
-            interact)
+        call short_interactions_create(short_interactions%walls_visitor, environment%&
+            walls_potential, interact_with_walls)
+        call short_interactions_create(short_interactions%components_pairs, interact, mixture%&
+            components_min_distances, input_data, prefix)
+        call short_interactions_create(short_interactions%components_visitor, environment%&
+            periodic_box, interact)
         call allocate_list(list, interact, input_data, prefix)
-        call short_potentials_create(short_potentials%inter_cells, environment%periodic_box, &
-            mixture%components, short_potentials%inter_pairs, interact, list)
+        call short_interactions_create(short_interactions%components_cells, environment%&
+            periodic_box, mixture%components, short_interactions%components_pairs, interact, list)
         call deallocate_list(list)
     end subroutine create_all
 
-    subroutine destroy_all(short_potentials)
-        type(Short_Potentials_Wrapper), intent(inout) :: short_potentials
+    subroutine destroy_all(short_interactions)
+        type(Short_Interactions_Wrapper), intent(inout) :: short_interactions
 
-        call short_potentials_destroy(short_potentials%walls_visitor)
-        call short_potentials_destroy(short_potentials%inter_visitor)
-        call short_potentials_destroy(short_potentials%inter_cells)
-        call short_potentials_destroy(short_potentials%wall_pairs)
-        call short_potentials_destroy(short_potentials%inter_pairs)
+        call short_interactions_destroy(short_interactions%walls_visitor)
+        call short_interactions_destroy(short_interactions%components_visitor)
+        call short_interactions_destroy(short_interactions%components_cells)
+        call short_interactions_destroy(short_interactions%wall_pairs)
+        call short_interactions_destroy(short_interactions%components_pairs)
     end subroutine destroy_all
 
     subroutine create_walls_visitor(visitor, walls_potential, interact)
@@ -134,16 +134,16 @@ contains
             associate (min_distance => min_distances(i_component)%min_distance, &
                 interact_i => components_interact(min_distances(i_component)%min_distance))
                 interact = interact .and. interact_i
-                call short_potentials_create(expression, interact_i, input_data, pair_prefix)
-                call short_potentials_create(pairs(i_component)%pair_potential, min_distance, &
+                call short_interactions_create(expression, interact_i, input_data, pair_prefix)
+                call short_interactions_create(pairs(i_component)%pair_potential, min_distance, &
                     interact_i, expression, input_data, pair_prefix)
             end associate
             deallocate(pair_prefix)
-            call short_potentials_destroy(expression)
+            call short_interactions_destroy(expression)
         end do
     end subroutine create_wall_pairs
 
-    subroutine create_inter_visitor(visitor, periodic_box, interact)
+    subroutine create_components_visitor(visitor, periodic_box, interact)
         class(Abstract_Short_Pairs_Visitor), allocatable, intent(out) :: visitor
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         logical, intent(in) :: interact
@@ -154,18 +154,18 @@ contains
             allocate(Null_Short_Pairs_Visitor :: visitor)
         end if
         call visitor%construct(periodic_box)
-    end subroutine create_inter_visitor
+    end subroutine create_components_visitor
 
-    subroutine destroy_inter_visitor(visitor)
+    subroutine destroy_components_visitor(visitor)
         class(Abstract_Short_Pairs_Visitor), allocatable, intent(inout) :: visitor
 
         if (allocated(visitor)) then
             call visitor%destroy()
             deallocate(visitor)
         end if
-    end subroutine destroy_inter_visitor
+    end subroutine destroy_components_visitor
 
-    subroutine create_inter_cells(cells, periodic_box, components, pairs, interact, list)
+    subroutine create_components_cells(cells, periodic_box, components, pairs, interact, list)
         class(Abstract_Visitable_Cells), allocatable, intent(out) :: cells(:, :)
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(Component_Wrapper), intent(in) :: components(:)
@@ -199,9 +199,9 @@ contains
                 end associate
             end do
         end do
-    end subroutine create_inter_cells
+    end subroutine create_components_cells
 
-    subroutine destroy_inter_cells(cells)
+    subroutine destroy_components_cells(cells)
         class(Abstract_Visitable_Cells), allocatable, intent(inout) :: cells(:, :)
 
         integer :: j_component, i_component
@@ -212,7 +212,7 @@ contains
             end do
         end do
         deallocate(cells)
-    end subroutine destroy_inter_cells
+    end subroutine destroy_components_cells
 
     subroutine allocate_list(list, interact, input_data, prefix)
         class(Abstract_Visitable_List), allocatable, intent(out) :: list
@@ -248,7 +248,7 @@ contains
         if (allocated(list)) deallocate(list)
     end subroutine deallocate_list
 
-    subroutine create_inter_pairs(pairs, interact, min_distances, input_data, prefix)
+    subroutine create_components_pairs(pairs, interact, min_distances, input_data, prefix)
         type(Pair_Potentials_Wrapper), allocatable, intent(out) :: pairs(:)
         logical, intent(out) :: interact
         type(Minimum_Distances_Wrapper), intent(in) :: min_distances(:)
@@ -276,30 +276,30 @@ contains
                         min_distance)
                     interact_ij = components_interact(min_distance)
                     interact = interact .and. interact_ij
-                    call short_potentials_create(expression, interact_ij, input_data, &
+                    call short_interactions_create(expression, interact_ij, input_data, &
                         pair_prefix)
-                    call short_potentials_create(pairs(j_component)%&
+                    call short_interactions_create(pairs(j_component)%&
                         with_components(i_component)%pair_potential, min_distance, interact_ij, &
                         expression, input_data, pair_prefix)
                 end associate
                 deallocate(pair_prefix)
-                call short_potentials_destroy(expression)
+                call short_interactions_destroy(expression)
             end do
         end do
-    end subroutine create_inter_pairs
+    end subroutine create_components_pairs
 
-    subroutine destroy_inter_pairs(pairs)
+    subroutine destroy_components_pairs(pairs)
         type(Pair_Potentials_Wrapper), allocatable, intent(inout) :: pairs(:)
 
         integer :: i_component
 
         if (allocated(pairs)) then
             do i_component = size(pairs), 1, -1
-                call short_potentials_destroy(pairs(i_component)%with_components)
+                call short_interactions_destroy(pairs(i_component)%with_components)
             end do
             deallocate(pairs)
         end if
-    end subroutine destroy_inter_pairs
+    end subroutine destroy_components_pairs
 
     subroutine destroy_pairs(pairs)
         type(Pair_Potential_Wrapper), allocatable, intent(inout) :: pairs(:)
@@ -308,7 +308,7 @@ contains
 
         if (allocated(pairs)) then
             do i_component = size(pairs), 1, -1
-                call short_potentials_destroy(pairs(i_component)%pair_potential)
+                call short_interactions_destroy(pairs(i_component)%pair_potential)
             end do
             deallocate(pairs)
         end if
@@ -460,4 +460,4 @@ contains
         if (allocated(expression)) deallocate(expression)
     end subroutine destroy_expression
 
-end module procedures_short_potentials_factory
+end module procedures_short_interactions_factory

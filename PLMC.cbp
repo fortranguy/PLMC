@@ -68,6 +68,9 @@
 		<Unit filename="lib/src/class_component_total_moment.f90">
 			<Option weight="5" />
 		</Unit>
+		<Unit filename="lib/src/class_components_energies_writer.f90">
+			<Option weight="2" />
+		</Unit>
 		<Unit filename="lib/src/class_coordinates.f90">
 			<Option weight="1" />
 		</Unit>
@@ -88,9 +91,6 @@
 		</Unit>
 		<Unit filename="lib/src/class_floor_penetration.f90">
 			<Option weight="1" />
-		</Unit>
-		<Unit filename="lib/src/class_inter_energies_writer.f90">
-			<Option weight="2" />
 		</Unit>
 		<Unit filename="lib/src/class_metropolis_algorithm.f90">
 			<Option weight="2" />
@@ -182,6 +182,9 @@
 		<Unit filename="lib/src/procedures_component_factory.f90">
 			<Option weight="9" />
 		</Unit>
+		<Unit filename="lib/src/procedures_components_energies.f90">
+			<Option weight="2" />
+		</Unit>
 		<Unit filename="lib/src/procedures_coordinates_micro.f90">
 			<Option weight="2" />
 		</Unit>
@@ -194,11 +197,8 @@
 		<Unit filename="lib/src/procedures_ewald_micro.f90">
 			<Option weight="1" />
 		</Unit>
-		<Unit filename="lib/src/procedures_ewalds_factory.f90">
+		<Unit filename="lib/src/procedures_long_interactions_factory.f90">
 			<Option weight="9" />
-		</Unit>
-		<Unit filename="lib/src/procedures_inter_energies.f90">
-			<Option weight="2" />
 		</Unit>
 		<Unit filename="lib/src/procedures_metropolis_factory.f90">
 			<Option weight="11" />
@@ -222,7 +222,7 @@
 			<Option weight="9" />
 		</Unit>
 		<Unit filename="lib/src/procedures_plmc_write.f90">
-			<Option weight="3" />
+			<Option weight="6" />
 		</Unit>
 		<Unit filename="lib/src/procedures_property_inquirers.f90">
 			<Option weight="8" />
@@ -230,7 +230,7 @@
 		<Unit filename="lib/src/procedures_random.f90">
 			<Option weight="2" />
 		</Unit>
-		<Unit filename="lib/src/procedures_short_potentials_factory.f90">
+		<Unit filename="lib/src/procedures_short_interactions_factory.f90">
 			<Option weight="9" />
 		</Unit>
 		<Unit filename="lib/src/procedures_writers_factory.f90">
@@ -245,7 +245,7 @@
 		<Unit filename="lib/src/types_environment_wrapper.f90">
 			<Option weight="5" />
 		</Unit>
-		<Unit filename="lib/src/types_ewalds_wrapper.f90">
+		<Unit filename="lib/src/types_long_interactions_wrapper.f90">
 			<Option weight="6" />
 		</Unit>
 		<Unit filename="lib/src/types_metropolis_wrapper.f90">
@@ -260,13 +260,15 @@
 		<Unit filename="lib/src/types_potential_domain.f90">
 			<Option weight="0" />
 		</Unit>
-		<Unit filename="lib/src/types_short_potentials_wrapper.f90">
+		<Unit filename="lib/src/types_short_interactions_wrapper.f90">
 			<Option weight="6" />
 		</Unit>
 		<Unit filename="lib/src/types_temporary_particle.f90">
 			<Option weight="1" />
 		</Unit>
-		<Unit filename="lib/src/types_writers_wrapper.f90" />
+		<Unit filename="lib/src/types_writers_wrapper.f90">
+			<Option weight="5" />
+		</Unit>
 		<Unit filename="src/plmc.f90">
 			<Option weight="13" />
 		</Unit>

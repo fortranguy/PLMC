@@ -23,7 +23,7 @@ public :: mixture_create, mixture_destroy
 interface mixture_create
     module procedure :: create_all
     module procedure :: create_components
-    module procedure :: create_inter_min_distances
+    module procedure :: create_components_min_distances
     module procedure :: create_min_distance
     module procedure :: create_wall_min_distances
 end interface mixture_create
@@ -31,7 +31,7 @@ end interface mixture_create
 interface mixture_destroy
     module procedure :: destroy_min_distance
     module procedure :: destroy_min_distances
-    module procedure :: destroy_inter_min_distances
+    module procedure :: destroy_components_min_distances
     module procedure :: destroy_components
     module procedure :: destroy_all
 end interface mixture_destroy
@@ -46,7 +46,7 @@ contains
 
         call mixture_create(mixture%components, environment%periodic_box, input_data, &
             prefix)
-        call mixture_create(mixture%inter_min_distances, mixture%components, input_data, &
+        call mixture_create(mixture%components_min_distances, mixture%components, input_data, &
             prefix)
         call mixture_create(mixture%wall_min_distances, mixture%components, &
             environment%walls_potential, input_data, prefix)
@@ -56,7 +56,7 @@ contains
         type(Mixture_Wrapper), intent(inout) :: mixture
 
         call mixture_destroy(mixture%wall_min_distances)
-        call mixture_destroy(mixture%inter_min_distances)
+        call mixture_destroy(mixture%components_min_distances)
         call mixture_destroy(mixture%components)
     end subroutine destroy_all
 
@@ -101,7 +101,7 @@ contains
         end if
     end subroutine destroy_components
 
-    subroutine create_inter_min_distances(min_distances, components, input_data, &
+    subroutine create_components_min_distances(min_distances, components, input_data, &
         prefix)
         type(Minimum_Distances_Wrapper), allocatable, intent(out) :: min_distances(:)
         type(Component_Wrapper), intent(in) :: components(:)
@@ -131,9 +131,9 @@ contains
                 deallocate(min_distance_prefix)
             end do
         end do
-    end subroutine create_inter_min_distances
+    end subroutine create_components_min_distances
 
-    subroutine destroy_inter_min_distances(min_distances)
+    subroutine destroy_components_min_distances(min_distances)
         type(Minimum_Distances_Wrapper), allocatable, intent(inout) :: min_distances(:)
 
         integer :: i_component
@@ -144,7 +144,7 @@ contains
             end do
             deallocate(min_distances)
         end if
-    end subroutine destroy_inter_min_distances
+    end subroutine destroy_components_min_distances
 
     subroutine create_wall_min_distances(min_distances, components, potential, input_data, &
         prefix)

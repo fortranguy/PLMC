@@ -97,7 +97,7 @@
             }
         }
     },
-    "Short Potentials": {
+    "Short Interactions": {
         "Component 1": {
             "name": "LJ",
             "tabulated": false,
@@ -148,9 +148,9 @@
             }
         }
     },
-    "Ewalds": {
+    "Long Interactions": {
+        "alpha times box edge": 7.0,
         "Component 1": {
-            "alpha times box edge": 7.0,
             "Real": {
                 "tabulated": false,
                 "delta distance": 1.0e-6,
@@ -158,7 +158,6 @@
             }
         },
         "Component 2": {
-            "alpha times box edge": 7.0,
             "Real": {
                 "tabulated": false,
                 "delta distance": 1.0e-6,
@@ -166,7 +165,6 @@
             }
         },
         "Inter 12": {
-            "alpha times box edge": 7.0,
             "Real": {
                 "tabulated": false,
                 "delta distance": 1.0e-6,

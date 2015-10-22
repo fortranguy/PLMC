@@ -4,25 +4,25 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use types_mixture_wrapper, only: Mixture_Wrapper
 use module_changes_success, only: Concrete_Changes_Counter, Concrete_Changes_Success, &
     counter_reset => Concrete_Changes_Counter_reset
-use types_observables_wrapper, only: Concrete_Inter_Energies, Observables_Wrapper
+use types_observables_wrapper, only: Concrete_Components_Energies, Observables_Wrapper
 
 implicit none
 
 private
-public :: observables_create, observables_destroy, create_inter_energies_nodes, &
-    destroy_inter_energies_nodes
+public :: observables_create, observables_destroy, create_components_energies_nodes, &
+    destroy_components_energies_nodes
 
 interface observables_create
     module procedure :: create_all
     module procedure :: create_counters
     module procedure :: create_successes
-    module procedure :: create_inter_energies
+    module procedure :: create_components_energies
     module procedure :: create_energies
 end interface observables_create
 
 interface observables_destroy
     module procedure :: destroy_energies
-    module procedure :: destroy_inter_energies
+    module procedure :: destroy_components_energies
     module procedure :: destroy_successes
     module procedure :: destroy_counters
     module procedure :: destroy_all
@@ -84,42 +84,42 @@ contains
         if (allocated(successes)) deallocate(successes)
     end subroutine destroy_successes
 
-    pure subroutine create_inter_energies(energies, num_components)
-        type(Concrete_Inter_Energies), allocatable, intent(out) :: energies(:)
+    pure subroutine create_components_energies(energies, num_components)
+        type(Concrete_Components_Energies), allocatable, intent(out) :: energies(:)
         integer, intent(in) :: num_components
 
         allocate(energies(num_components))
-        call create_inter_energies_nodes(energies)
-    end subroutine create_inter_energies
+        call create_components_energies_nodes(energies)
+    end subroutine create_components_energies
 
-    pure subroutine destroy_inter_energies(energies)
-        type(Concrete_Inter_Energies), allocatable, intent(inout) :: energies(:)
+    pure subroutine destroy_components_energies(energies)
+        type(Concrete_Components_Energies), allocatable, intent(inout) :: energies(:)
 
         if (allocated(energies)) then
-            call destroy_inter_energies_nodes(energies)
+            call destroy_components_energies_nodes(energies)
             deallocate(energies)
         end if
-    end subroutine destroy_inter_energies
+    end subroutine destroy_components_energies
 
-    pure subroutine create_inter_energies_nodes(energies)
-        type(Concrete_Inter_Energies), intent(out) :: energies(:)
+    pure subroutine create_components_energies_nodes(energies)
+        type(Concrete_Components_Energies), intent(out) :: energies(:)
 
         integer :: i_component
         do i_component = 1, size(energies)
             allocate(energies(i_component)%with_components(i_component))
             energies(i_component)%with_components = 0._DP
         end do
-    end subroutine create_inter_energies_nodes
+    end subroutine create_components_energies_nodes
 
-    pure subroutine destroy_inter_energies_nodes(energies)
-        type(Concrete_Inter_Energies), intent(inout) :: energies(:)
+    pure subroutine destroy_components_energies_nodes(energies)
+        type(Concrete_Components_Energies), intent(inout) :: energies(:)
 
         integer :: i_component
 
         do i_component = size(energies), 1, -1
             deallocate(energies(i_component)%with_components)
         end do
-    end subroutine destroy_inter_energies_nodes
+    end subroutine destroy_components_energies_nodes
 
     pure subroutine create_energies(energies, num_components)
         real(DP), allocatable, intent(out) :: energies(:)

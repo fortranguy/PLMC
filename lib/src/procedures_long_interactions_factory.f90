@@ -1,4 +1,4 @@
-module procedures_ewalds_factory
+module procedures_long_interactions_factory
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
@@ -19,42 +19,42 @@ use class_ewald_real_component, only: Abstract_Ewald_Real_Component, &
 use class_weighted_structure, only: Abstract_Weighted_Structure
 use class_ewald_real_visitor, only: Abstract_Ewald_Real_Visitor, Concrete_Ewald_Real_Visitor, &
     Null_Ewald_Real_Visitor
-use types_ewalds_wrapper, only: Ewald_Real_Pair_Wrapper, Ewald_Real_Pairs_Wrapper, &
-    Ewald_Real_Component_Wrapper, Ewalds_Wrapper
+use types_long_interactions_wrapper, only: Ewald_Real_Pair_Wrapper, Ewald_Real_Pairs_Wrapper, &
+    Ewald_Real_Component_Wrapper, Long_Interactions_Wrapper
 use procedures_property_inquirers, only: component_is_dipolar
 
 implicit none
 
 private
-public :: ewalds_create, ewalds_set, ewalds_destroy
+public :: long_interactions_create, long_interactions_set, long_interactions_destroy
 
-interface ewalds_create
+interface long_interactions_create
     module procedure :: create_all
     module procedure :: create_real_visitor
     module procedure :: create_real_components
     module procedure :: create_real_component
     module procedure :: create_real_pairs
     module procedure :: create_real_pair
-end interface ewalds_create
+end interface long_interactions_create
 
-interface ewalds_set
+interface long_interactions_set
     module procedure :: set_alpha
     module procedure :: set_are_dipolar
-end interface ewalds_set
+end interface long_interactions_set
 
-interface ewalds_destroy
+interface long_interactions_destroy
     module procedure :: destroy_real_pair
     module procedure :: destroy_real_pairs
     module procedure :: destroy_real_component
     module procedure :: destroy_real_components
     module procedure :: desrtroy_real_visitor
     module procedure :: destroy_all
-end interface ewalds_destroy
+end interface long_interactions_destroy
 
 contains
 
-    subroutine create_all(ewalds, environment, mixture, input_data, prefix)
-        type(Ewalds_Wrapper), intent(out) :: ewalds
+    subroutine create_all(long_interactions, environment, mixture, input_data, prefix)
+        type(Long_Interactions_Wrapper), intent(out) :: long_interactions
         type(Environment_Wrapper), intent(in) :: environment
         type(Mixture_Wrapper), intent(in) :: mixture
         type(json_file), intent(inout) :: input_data
@@ -63,21 +63,23 @@ contains
         logical :: are_dipolar(size(mixture%components))
         real(DP) :: alpha
 
-        call ewalds_set(are_dipolar, mixture%components)
-        call ewalds_create(ewalds%real_visitor, environment%periodic_box, any(are_dipolar))
-        call ewalds_create(ewalds%real_components, environment%periodic_box, mixture%components, &
-            are_dipolar)
-        call ewalds_set(alpha, environment%periodic_box,  any(are_dipolar), input_data, prefix)
-        call ewalds_create(ewalds%real_pairs, environment%periodic_box, mixture%&
-            inter_min_distances, are_dipolar, alpha, input_data, prefix//"Real.")
+        call long_interactions_set(are_dipolar, mixture%components)
+        call long_interactions_create(long_interactions%real_visitor, environment%periodic_box, &
+            any(are_dipolar))
+        call long_interactions_create(long_interactions%real_components, environment%periodic_box, &
+            mixture%components, are_dipolar)
+        call long_interactions_set(alpha, environment%periodic_box,  any(are_dipolar), input_data, &
+            prefix)
+        call long_interactions_create(long_interactions%real_pairs, environment%periodic_box, &
+            mixture%components_min_distances, are_dipolar, alpha, input_data, prefix//"Real.")
     end subroutine create_all
 
-    subroutine destroy_all(ewalds)
-        type(Ewalds_Wrapper), intent(inout) :: ewalds
+    subroutine destroy_all(long_interactions)
+        type(Long_Interactions_Wrapper), intent(inout) :: long_interactions
 
-        call ewalds_destroy(ewalds%real_pairs)
-        call ewalds_destroy(ewalds%real_components)
-        call ewalds_destroy(ewalds%real_visitor)
+        call long_interactions_destroy(long_interactions%real_pairs)
+        call long_interactions_destroy(long_interactions%real_components)
+        call long_interactions_destroy(long_interactions%real_visitor)
     end subroutine destroy_all
 
     subroutine create_real_visitor(visitor, periodic_box, dipoles_exist)
@@ -112,9 +114,9 @@ contains
 
         allocate(real_components(size(are_dipolar)))
         do i_component = 1, size(real_components)
-            call ewalds_create(real_components(i_component)%real_component, periodic_box, &
-                components(i_component)%positions, components(i_component)%dipolar_moments, &
-                are_dipolar(i_component))
+            call long_interactions_create(real_components(i_component)%real_component, &
+                periodic_box, components(i_component)%positions, components(i_component)%&
+                dipolar_moments, are_dipolar(i_component))
         end do
     end subroutine create_real_components
 
@@ -169,9 +171,9 @@ contains
                     are_dipolar(j_component), &
                     min_distance => min_distances(j_component)%with_components(i_component)%&
                     min_distance)
-                    call ewalds_create(real_pairs(j_component)%with_components(i_component)%&
-                        real_pair, periodic_box, min_distance, interact_ij, alpha, input_data, &
-                        prefix)
+                    call long_interactions_create(real_pairs(j_component)%&
+                        with_components(i_component)%real_pair, periodic_box, min_distance, &
+                        interact_ij, alpha, input_data, prefix)
                 end associate
             end do
         end do
@@ -186,8 +188,8 @@ contains
             do j_component = size(real_pairs), 1, -1
                 if (allocated(real_pairs(j_component)%with_components)) then
                     do i_component = size(real_pairs(j_component)%with_components), 1, -1
-                        call ewalds_destroy(real_pairs(j_component)%with_components(i_component)%&
-                            real_pair)
+                        call long_interactions_destroy(real_pairs(j_component)%&
+                            with_components(i_component)%real_pair)
                     end do
                     deallocate(real_pairs(j_component)%with_components)
                 end if
@@ -310,9 +312,8 @@ contains
         integer :: i_component
 
         do i_component = 1, size(are_dipolar)
-            are_dipolar(i_component) = component_is_dipolar(components(i_component)%&
-                dipolar_moments)
+            are_dipolar(i_component) = component_is_dipolar(components(i_component)%dipolar_moments)
         end do
     end subroutine set_are_dipolar
 
-end module procedures_ewalds_factory
+end module procedures_long_interactions_factory

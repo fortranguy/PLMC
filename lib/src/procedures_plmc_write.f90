@@ -28,7 +28,7 @@ contains
         !    observables%intras(1)%component_energy)
         !call writers%intras(2)%energy%write(i_step, &
         !    observables%intras(2)%component_energy)
-        !call writers%inter_energy%write(i_step, observables%inter_energy)
+        !call writers%components_energy%write(i_step, observables%components_energy)
         if (-num_tuning_steps < i_step .and. i_step < num_steps) then
             !call writers%intras(1)%changes%write(i_step, &
             !    observables%intras(1)%changes_success)

@@ -8,12 +8,13 @@ use class_component_number, only: Abstract_Component_Number
 use class_component_coordinates, only: Abstract_Component_Coordinates
 use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
 use types_component_wrapper, only: Component_Wrapper
-use types_short_potentials_wrapper, only: Pair_Potentials_Wrapper
-use types_ewalds_wrapper, only: Ewald_Real_Pairs_Wrapper
+use types_short_interactions_wrapper, only: Pair_Potentials_Wrapper
+use types_long_interactions_wrapper, only: Ewald_Real_Pairs_Wrapper
 use class_component_exchange, only: Abstract_Component_Exchange
 use class_changed_coordinates, only: Abstract_Changed_Coordinates
 use types_observables_wrapper, only: Observables_Wrapper
-use class_inter_energes_writer, only: Concrete_Inter_Energy_Selector, Abstract_Inter_Energy_Writer
+use class_components_energes_writer, only: Concrete_Components_Energies_Selector, &
+    Abstract_Components_Energies_Writer
 use class_changes_writer, only: Concrete_Changes_Selector, &
     Abstract_Changes_Success_Writer, Concrete_Changes_Success_Writer, Null_Changes_Success_Writer
 use class_component_coordinates_writer, only: Concrete_Coordinates_Writer_Selector, &
@@ -31,7 +32,7 @@ public :: writers_create, writers_destroy
 
 interface writers_create
     module procedure :: create_all
-    module procedure :: create_inter
+    module procedure :: create_components_energies
     module procedure :: create_changes
     module procedure :: create_component_coordinates
 end interface writers_create
@@ -39,7 +40,7 @@ end interface writers_create
 interface writers_destroy
     module procedure :: destroy_component_coordinates
     module procedure :: destroy_changes
-    module procedure :: destroy_inter
+    module procedure :: destroy_components_energies
     module procedure :: destroy_all
 end interface writers_destroy
 
@@ -55,7 +56,7 @@ contains
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        call writers_create(writers%short_inter, short_pairs, "short_potentials.out")
+        call writers_create(writers%short_inter, short_pairs, "short_interactions.out")
         call writers_create(writers%long_inter, ewald_pairs, "long_potentials.out")
     end subroutine create_all
 
@@ -65,12 +66,12 @@ contains
         call writers_destroy(writers%short_inter)
     end subroutine destroy_all
 
-    subroutine create_inter(inter, pairs, filename)
-        class(Abstract_Inter_Energy_Writer), allocatable, intent(out) :: inter
+    subroutine create_components_energies(energies, pairs, filename)
+        class(Abstract_Components_Energies_Writer), allocatable, intent(out) :: energies
         class(*), intent(in) :: pairs(:)
         character(len=*), intent(in) :: filename
 
-        type(Concrete_Inter_Energy_Selector) :: selector(size(pairs))
+        type(Concrete_Components_Energies_Selector) :: selector(size(pairs))
         logical :: interact_ij
         integer :: j_component, i_component
 
@@ -85,17 +86,18 @@ contains
                         interact_ij = components_interact(pairs(j_component)%&
                             with_components(i_component)%real_pair)
                     class default
-                        call error_exit("writers_create: create_inter: pairs type unknown.")
+                        call error_exit("writers_create: create_components_energies: "//&
+                            "pairs type unknown.")
                 end select
                 selector(j_component)%with_components(i_component) = interact_ij
             end do
         end do
-        call inter%construct(filename, selector)
+        call energies%construct(filename, selector)
         call deallocate_selector(selector)
-    end subroutine create_inter
+    end subroutine create_components_energies
 
     subroutine deallocate_selector(selector)
-        type(Concrete_Inter_Energy_Selector), intent(inout) :: selector(:)
+        type(Concrete_Components_Energies_Selector), intent(inout) :: selector(:)
 
         integer :: i_component
         do i_component = size(selector), 1, -1
@@ -103,14 +105,14 @@ contains
         end do
     end subroutine deallocate_selector
 
-    subroutine destroy_inter(inter)
-        class(Abstract_Inter_Energy_Writer), allocatable, intent(inout) :: inter
+    subroutine destroy_components_energies(energies)
+        class(Abstract_Components_Energies_Writer), allocatable, intent(inout) :: energies
 
-        if (allocated(inter)) then
-            call inter%destroy()
-            deallocate(inter)
+        if (allocated(energies)) then
+            call energies%destroy()
+            deallocate(energies)
         end if
-    end subroutine destroy_inter
+    end subroutine destroy_components_energies
 
     subroutine create_changes(changes_success_writer, changes_selector, filename)
         class(Abstract_Changes_Success_Writer), allocatable, intent(out) :: changes_success_writer
