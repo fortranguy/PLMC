@@ -2,6 +2,7 @@ module procedures_writers_factory
 
 use json_module, only: json_file
 use data_wrappers_prefix, only: environment_prefix
+use procedures_errors, only: error_exit
 use procedures_checks, only: check_data_found
 use class_component_number, only: Abstract_Component_Number
 use class_component_coordinates, only: Abstract_Component_Coordinates
@@ -30,8 +31,7 @@ public :: writers_create, writers_destroy
 
 interface writers_create
     module procedure :: create_all
-    module procedure :: create_short_inter
-    module procedure :: create_long_inter
+    module procedure :: create_inter
     module procedure :: create_changes
     module procedure :: create_component_coordinates
 end interface writers_create
@@ -65,49 +65,34 @@ contains
         call writers_destroy(writers%short_inter)
     end subroutine destroy_all
 
-    subroutine create_short_inter(inter, pairs, filename)
+    subroutine create_inter(inter, pairs, filename)
         class(Abstract_Inter_Energy_Writer), allocatable, intent(out) :: inter
-        type(Pair_Potentials_Wrapper), intent(in) :: pairs(:)
+        class(*), intent(in) :: pairs(:)
         character(len=*), intent(in) :: filename
 
         type(Concrete_Inter_Energy_Selector) :: selector(size(pairs))
+        logical :: interact_ij
         integer :: j_component, i_component
 
         do j_component = 1, size(selector)
             allocate(selector(j_component)%with_components(j_component))
             do i_component = 1, size(selector(j_component)%with_components)
-                associate(interact_ij => pairs(j_component)%with_components(i_component)%&
-                    pair_potential)
-                    selector(j_component)%with_components(i_component) = &
-                        components_interact(interact_ij)
-                end associate
+                select type (pairs) ! several checks: not optimal
+                    type is (Pair_Potentials_Wrapper)
+                        interact_ij = components_interact(pairs(j_component)%&
+                            with_components(i_component)%pair_potential)
+                    type is (Ewald_Real_Pairs_Wrapper)
+                        interact_ij = components_interact(pairs(j_component)%&
+                            with_components(i_component)%real_pair)
+                    class default
+                        call error_exit("writers_create: create_inter: pairs type unknown.")
+                end select
+                selector(j_component)%with_components(i_component) = interact_ij
             end do
         end do
         call inter%construct(filename, selector)
         call deallocate_selector(selector)
-    end subroutine create_short_inter
-
-    subroutine create_long_inter(inter, pairs, filename)
-        class(Abstract_Inter_Energy_Writer), allocatable, intent(out) :: inter
-        type(Ewald_Real_Pairs_Wrapper), intent(in) :: pairs(:)
-        character(len=*), intent(in) :: filename
-
-        type(Concrete_Inter_Energy_Selector) :: selector(size(pairs))
-        integer :: j_component, i_component
-
-        do j_component = 1, size(selector)
-            allocate(selector(j_component)%with_components(j_component))
-            do i_component = 1, size(selector(j_component)%with_components)
-                associate(interact_ij => pairs(j_component)%with_components(i_component)%&
-                    real_pair)
-                    selector(j_component)%with_components(i_component) = &
-                        components_interact(interact_ij)
-                end associate
-            end do
-        end do
-        call inter%construct(filename, selector)
-        call deallocate_selector(selector)
-    end subroutine create_long_inter
+    end subroutine create_inter
 
     subroutine deallocate_selector(selector)
         type(Concrete_Inter_Energy_Selector), intent(inout) :: selector(:)
