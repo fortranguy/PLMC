@@ -11,6 +11,7 @@ private
 
     type, public :: Concrete_Coordinates_Writer_Selector
         integer :: period
+        logical :: write_positions
         logical :: write_orientations
     end type Concrete_Coordinates_Writer_Selector
 

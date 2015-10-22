@@ -11,6 +11,7 @@ implicit none
 private
 
     type, public :: Concrete_Changes_Selector
+        logical :: write_positions
         logical :: write_rotations
         logical :: write_exchanges
     end type Concrete_Changes_Selector

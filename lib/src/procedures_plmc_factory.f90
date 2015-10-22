@@ -24,9 +24,9 @@ use procedures_ewalds_factory, only: ewalds_create, ewalds_destroy
 use module_changes_success, only: reset_counter => Concrete_Changes_Counter_reset, &
     set_success => Concrete_Changes_Counter_set
 use types_observables_wrapper, only: Observables_Wrapper
-use types_observable_writers_wrapper, only: Mixture_Observable_Writers_Wrapper
-use procedures_observable_writers_factory, only: observable_writers_create, &
-    observable_writers_destroy
+use types_writers_wrapper, only: Writers_Wrapper
+use procedures_writers_factory, only: writers_create, &
+    writers_destroy
 use types_metropolis_wrapper, only: Metropolis_Wrapper
 use procedures_metropolis_factory, only: metropolis_create, metropolis_set, &
     metropolis_destroy
@@ -49,7 +49,7 @@ interface plmc_create
     module procedure :: create_changes
     module procedure :: create_short_potentials
     module procedure :: create_ewalds
-    module procedure :: create_observable_writers
+    module procedure :: create_writers
     module procedure :: create_metropolis
 end interface plmc_create
 
@@ -61,7 +61,7 @@ end interface plmc_set
 
 interface plmc_destroy
     module procedure :: destroy_metropolis
-    module procedure :: destroy_observable_writers
+    module procedure :: destroy_writers
     module procedure :: destroy_ewalds
     module procedure :: destroy_short_potentials
     module procedure :: destroy_changes
@@ -159,9 +159,9 @@ contains
         call ewalds_destroy(ewalds)
     end subroutine destroy_ewalds
 
-    subroutine create_observable_writers(observable_writers, walls_potential, mixture, changes, &
+    subroutine create_writers(writers, walls_potential, mixture, changes, &
         input_data)
-        type(Mixture_Observable_Writers_Wrapper), intent(out) :: observable_writers
+        type(Writers_Wrapper), intent(out) :: writers
         class(Abstract_Walls_Potential), intent(in) :: walls_potential
         type(Mixture_Wrapper), intent(in) :: mixture
         type(Changes_Wrapper), intent(in) :: changes(num_components)
@@ -175,43 +175,36 @@ contains
         wall_used = use_walls(walls_potential)
         component_1_exists = .false.
         !component_1_is_dipolar = component_is_dipolar(mixture%components(1)%dipolar_moments)
-        call observable_writers_create(observable_writers%intras(1)%energy, wall_used, &
-            component_1_exists, component_1_is_dipolar, "component_1_energy.out")
-        component_2_exists = .false.
+        !call writers_create(writers%intras(1)%energy, wall_used, &
+        !    component_1_exists, component_1_is_dipolar, "component_1_energy.out")
+        !component_2_exists = .false.
         !component_2_is_dipolar = component_is_dipolar(mixture%components(2)%dipolar_moments)
-        call observable_writers_create(observable_writers%intras(2)%energy, wall_used, &
-            component_2_exists, component_2_is_dipolar, "component_2_energy.out")
+        !call writers_create(writers%intras(2)%energy, wall_used, &
+        !    component_2_exists, component_2_is_dipolar, "component_2_energy.out")
         mixture_exists = component_1_exists .and. component_2_exists
         mixture_is_dipolar = component_1_is_dipolar .and. component_2_is_dipolar
-        call observable_writers_create(observable_writers%inter_energy, mixture_exists, &
-            mixture_is_dipolar, "inter_12_energy.out")
+        !call writers_create(writers%inter_energy, mixture_exists, &
+        !    mixture_is_dipolar, "inter_12_energy.out")
 
-        call observable_writers_create(observable_writers%intras(1)%changes, &
-            changes(1)%moved_positions, changes(1)%rotated_orientations, &
-            changes(1)%component_exchange, "component_1_success.out")
-        call observable_writers_create(observable_writers%intras(2)%changes, &
-            changes(2)%moved_positions, changes(2)%rotated_orientations, &
-            changes(2)%component_exchange, "component_2_success.out")
+        !call writers_create(writers%intras(1)%changes, &
+        !    changes(1)%moved_positions, changes(1)%rotated_orientations, &
+        !    changes(1)%component_exchange, "component_1_success.out")
+        !call writers_create(writers%intras(2)%changes, &
+        !    changes(2)%moved_positions, changes(2)%rotated_orientations, &
+        !    changes(2)%component_exchange, "component_2_success.out")
 
-        !call observable_writers_create(observable_writers%intras(1)%coordinates, &
+        !call writers_create(writers%intras(1)%coordinates, &
         !    "component_1_coordinates", mixture%components(1)%positions, &
         !    mixture%components(1)%orientations, input_data, "Monte Carlo.")
-        !call observable_writers_create(observable_writers%intras(2)%coordinates, &
+        !call writers_create(writers%intras(2)%coordinates, &
         !    "component_2_coordinates", mixture%components(2)%positions, &
         !    mixture%components(2)%orientations, input_data, "Monte Carlo.")
-    end subroutine create_observable_writers
+    end subroutine create_writers
 
-    subroutine destroy_observable_writers(observable_writers)
-        type(Mixture_Observable_Writers_Wrapper), intent(inout) :: observable_writers
+    subroutine destroy_writers(writers)
+        type(Writers_Wrapper), intent(inout) :: writers
 
-        call observable_writers_destroy(observable_writers%intras(2)%coordinates)
-        call observable_writers_destroy(observable_writers%intras(1)%coordinates)
-        call observable_writers_destroy(observable_writers%intras(2)%changes)
-        call observable_writers_destroy(observable_writers%intras(1)%changes)
-        call observable_writers_destroy(observable_writers%inter_energy)
-        call observable_writers_destroy(observable_writers%intras(2)%energy)
-        call observable_writers_destroy(observable_writers%intras(1)%energy)
-    end subroutine destroy_observable_writers
+    end subroutine destroy_writers
 
     subroutine create_metropolis(metropolis, environment, changes)
         type(Metropolis_Wrapper), intent(out) :: metropolis

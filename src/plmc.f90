@@ -12,7 +12,7 @@ use types_metropolis_wrapper, only: Metropolis_Wrapper
 use procedures_plmc_factory, only: plmc_load, plmc_create, plmc_set, plmc_destroy
 use procedures_plmc_visit, only: plmc_visit
 use types_observables_wrapper, only: Observables_Wrapper
-use types_observable_writers_wrapper, only: Mixture_Observable_Writers_Wrapper
+use types_writers_wrapper, only: Writers_Wrapper
 use procedures_plmc_propagation, only: plmc_propagator_construct, plmc_propagator_destroy, &
     plmc_propagator_try
 use procedures_plmc_write, only: plmc_write
@@ -26,7 +26,7 @@ implicit none
     type(Short_Potentials_Wrapper) :: short_potentials
     type(Ewalds_Wrapper) :: ewalds
     type(Observables_Wrapper) :: observables
-    type(Mixture_Observable_Writers_Wrapper) :: observables_writers
+    type(Writers_Wrapper) :: writers
     type(Metropolis_Wrapper) :: metropolis
 
     type(json_file) :: input_data
@@ -41,37 +41,37 @@ implicit none
     call plmc_create(ewalds, environment, mixture, input_data)
     call plmc_set_num_steps(input_data)
     !call plmc_create(changes, environment%periodic_box, mixture_old%components, input_data)
-    !call plmc_create(observables_writers, environment%walls_potential, mixture_old, changes, input_data)
+    !call plmc_create(writers, environment%walls_potential, mixture_old, changes, input_data)
     call plmc_create(metropolis, environment, changes)
     call input_data%destroy()
 
     call plmc_set(metropolis, mixture%components, short_potentials, ewalds)
     call plmc_propagator_construct(metropolis)
     call plmc_visit(observables, short_potentials, ewalds, mixture)
-    call plmc_write(-num_tuning_steps, observables_writers, observables)
+    call plmc_write(-num_tuning_steps, writers, observables)
 
     if (num_tuning_steps > 0) write(output_unit, *) "Trying to tune changes..."
     do i_step = -num_tuning_steps + 1, 0
         call plmc_propagator_try(metropolis, observables)
         call plmc_set(observables%changes_sucesses, observables%changes_counters)
         call plmc_set(changes_tuned, i_step, changes, observables%changes_sucesses)
-        call plmc_write(i_step, observables_writers, observables)
+        call plmc_write(i_step, writers, observables)
         if (changes_tuned) exit
     end do
     write(output_unit, *) "Iterations start."
     do i_step = 1, num_steps
         call plmc_propagator_try(metropolis, observables)
         call plmc_set(observables%changes_sucesses, observables%changes_counters)
-        call plmc_write(i_step, observables_writers, observables)
+        call plmc_write(i_step, writers, observables)
     end do
     write(output_unit, *) "Iterations end."
 
     call plmc_visit(observables, short_potentials, ewalds, mixture)
-    call plmc_write(i_step-1, observables_writers, observables)
+    call plmc_write(i_step-1, writers, observables)
 
     call plmc_propagator_destroy()
     call plmc_destroy(metropolis)
-    call plmc_destroy(observables_writers)
+    call plmc_destroy(writers)
     call plmc_destroy(ewalds)
     call plmc_destroy(short_potentials)
     call plmc_destroy(changes)
