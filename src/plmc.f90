@@ -5,8 +5,7 @@ use data_constants, only: num_components
 use json_module, only: json_file
 use types_environment_wrapper, only: Environment_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
-use types_short_potentials_wrapper, only: Mixture_Short_Potentials_Wrapper, &
-    Short_Potentials_Wrapper
+use types_short_potentials_wrapper, only: Short_Potentials_Wrapper
 use types_ewalds_wrapper, only: Ewalds_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
 use types_metropolis_wrapper, only: Metropolis_Wrapper

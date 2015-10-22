@@ -11,10 +11,10 @@ use class_component_chemical_potential, only: Abstract_Component_Chemical_Potent
 use class_changed_coordinates, only: Abstract_Changed_Coordinates, Null_Changed_Coordinates
 use class_moved_positions, only: Concrete_Moved_Positions
 use class_rotated_orientations, only: Concrete_Rotated_Orientations
-use class_change_tuner, only: Concrete_Change_Tuner_Parameters, &
-    Abstract_Change_Tuner, Concrete_Change_Tuner, Null_Change_Tuner
-use class_component_exchange, only: Abstract_Component_Exchange, &
-    Concrete_Component_Exchange, Null_Component_Exchange
+use class_change_tuner, only: Concrete_Change_Tuner_Parameters, Abstract_Change_Tuner, &
+    Concrete_Change_Tuner, Null_Change_Tuner
+use class_component_exchange, only: Abstract_Component_Exchange, Concrete_Component_Exchange, &
+    Null_Component_Exchange
 use module_change_tuning, only: Concrete_Tuning_Parameters
 use types_component_wrapper, only: Component_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
@@ -24,26 +24,25 @@ use procedures_property_inquirers, only: component_has_positions, component_has_
 implicit none
 
 private
-public :: changes_create, changes_destroy, &
-    allocate_and_construct_move_tuner, allocate_and_construct_rotation_tuner
+public :: changes_create, changes_destroy, changes_create_move_tuner, changes_create_rotation_tuner
 
 interface changes_create
-    module procedure :: changes_create_all
-    module procedure :: allocate_and_construct_moved_positions
-    module procedure :: allocate_and_construct_rotated_orientations
-    module procedure :: allocate_and_construct_component_exchange
+    module procedure :: create_all
+    module procedure :: create_moved_positions
+    module procedure :: create_rotated_orientations
+    module procedure :: create_component_exchange
 end interface changes_create
 
 interface changes_destroy
-    module procedure :: destroy_and_deallocate_component_exchange
-    module procedure :: destroy_and_deallocate_change_tuner
-    module procedure :: destroy_and_deallocate_changed_coordinates
-    module procedure :: changes_destroy_all
+    module procedure :: destroy_component_exchange
+    module procedure :: destroy_change_tuner
+    module procedure :: destroy_changed_coordinates
+    module procedure :: destroy_all
 end interface changes_destroy
 
 contains
 
-    subroutine changes_create_all(changes, periodic_box, component, input_data, prefix)
+    subroutine create_all(changes, periodic_box, component, input_data, prefix)
         type(Changes_Wrapper), intent(out) :: changes
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(Component_Wrapper), intent(in) :: component
@@ -52,16 +51,26 @@ contains
 
         call changes_create(changes%moved_positions, component%positions, periodic_box, &
             input_data, prefix)
-        call allocate_and_construct_move_tuner(changes%move_tuner, changes%moved_positions, &
+        call changes_create_move_tuner(changes%move_tuner, changes%moved_positions, &
             input_data, prefix)
         call changes_create(changes%rotated_orientations, component%orientations, &
             input_data, prefix)
-        call allocate_and_construct_rotation_tuner(changes%rotation_tuner, &
+        call changes_create_rotation_tuner(changes%rotation_tuner, &
             changes%rotated_orientations, input_data, prefix)
         call changes_create(changes%component_exchange, component)
-    end subroutine changes_create_all
+    end subroutine create_all
 
-    subroutine allocate_and_construct_moved_positions(moved_positions, component_positions, &
+    subroutine destroy_all(changes)
+        type(Changes_Wrapper), intent(inout) :: changes
+
+        call changes_destroy(changes%component_exchange)
+        call changes_destroy(changes%rotation_tuner)
+        call changes_destroy(changes%rotated_orientations)
+        call changes_destroy(changes%move_tuner)
+        call changes_destroy(changes%moved_positions)
+    end subroutine destroy_all
+
+    subroutine create_moved_positions(moved_positions, component_positions, &
         periodic_box, input_data, prefix)
         class(Abstract_Changed_Coordinates), allocatable, intent(out) :: moved_positions
         class(Abstract_Component_Coordinates), intent(in) :: component_positions
@@ -72,7 +81,7 @@ contains
         call allocate_moved_positions(moved_positions, component_positions)
         call construct_moved_positions(moved_positions, periodic_box, component_positions, &
             input_data, prefix)
-    end subroutine allocate_and_construct_moved_positions
+    end subroutine create_moved_positions
 
     subroutine allocate_moved_positions(moved_positions, component_positions)
         class(Abstract_Changed_Coordinates), allocatable, intent(out) :: moved_positions
@@ -121,7 +130,16 @@ contains
         end select
     end subroutine construct_moved_positions
 
-    subroutine allocate_and_construct_move_tuner(move_tuner, moved_positions, input_data, prefix)
+    subroutine destroy_changed_coordinates(changed_coordinates)
+        class(Abstract_Changed_Coordinates), allocatable, intent(inout) :: changed_coordinates
+
+        if (allocated(changed_coordinates)) then
+            call changed_coordinates%destroy()
+            deallocate(changed_coordinates)
+        end if
+    end subroutine destroy_changed_coordinates
+
+    subroutine changes_create_move_tuner(move_tuner, moved_positions, input_data, prefix)
         class(Abstract_Change_Tuner), allocatable, intent(out) :: move_tuner
         class(Abstract_Changed_Coordinates), intent(in) :: moved_positions
         type(json_file), intent(inout) :: input_data
@@ -129,7 +147,7 @@ contains
 
         call allocate_move_tuner(move_tuner, moved_positions)
         call construct_change_tuner(move_tuner, moved_positions, input_data, prefix//"Small Move.")
-    end subroutine allocate_and_construct_move_tuner
+    end subroutine changes_create_move_tuner
 
     subroutine allocate_move_tuner(move_tuner, moved_positions)
         class(Abstract_Change_Tuner), allocatable, intent(out) :: move_tuner
@@ -167,7 +185,16 @@ contains
         call change_tuner%construct(changed_coordinates, tuner_parameters)
     end subroutine construct_change_tuner
 
-    subroutine allocate_and_construct_rotated_orientations(rotated_orientations, &
+    subroutine destroy_change_tuner(change_tuner)
+        class(Abstract_Change_Tuner), allocatable, intent(inout) :: change_tuner
+
+        if (allocated(change_tuner)) then
+            call change_tuner%destroy()
+            deallocate(change_tuner)
+        end if
+    end subroutine destroy_change_tuner
+
+    subroutine create_rotated_orientations(rotated_orientations, &
         component_orientations, input_data, prefix)
         class(Abstract_Changed_Coordinates), allocatable, intent(out) :: rotated_orientations
         class(Abstract_Component_Coordinates), intent(in) :: component_orientations
@@ -177,7 +204,7 @@ contains
         call allocate_rotated_orientations(rotated_orientations, component_orientations)
         call construct_rotated_orientations(rotated_orientations, component_orientations, &
             input_data, prefix)
-    end subroutine allocate_and_construct_rotated_orientations
+    end subroutine create_rotated_orientations
 
     subroutine allocate_rotated_orientations(rotated_orientations, component_orientations)
         class(Abstract_Changed_Coordinates), allocatable, intent(out) :: rotated_orientations
@@ -224,7 +251,7 @@ contains
         end select
     end subroutine construct_rotated_orientations
 
-    subroutine allocate_and_construct_rotation_tuner(rotation_tuner, rotated_orientations, &
+    subroutine changes_create_rotation_tuner(rotation_tuner, rotated_orientations, &
         input_data, prefix)
         class(Abstract_Change_Tuner), allocatable, intent(out) :: rotation_tuner
         class(Abstract_Changed_Coordinates), intent(in) :: rotated_orientations
@@ -234,7 +261,7 @@ contains
         call allocate_rotation_tuner(rotation_tuner, rotated_orientations)
         call construct_change_tuner(rotation_tuner, rotated_orientations, input_data, &
             prefix//"Small Rotation.")
-    end subroutine allocate_and_construct_rotation_tuner
+    end subroutine changes_create_rotation_tuner
 
     subroutine allocate_rotation_tuner(rotation_tuner, rotated_orientations)
         class(Abstract_Change_Tuner), allocatable, intent(out) :: rotation_tuner
@@ -247,7 +274,7 @@ contains
         end if
     end subroutine allocate_rotation_tuner
 
-    subroutine allocate_and_construct_component_exchange(component_exchange, component)
+    subroutine create_component_exchange(component_exchange, component)
         class(Abstract_Component_Exchange), allocatable, intent(out) :: component_exchange
         type(Component_Wrapper), intent(in) :: component
 
@@ -257,37 +284,15 @@ contains
             allocate(Null_Component_Exchange :: component_exchange)
         end if
         call component_exchange%construct(component)
-    end subroutine allocate_and_construct_component_exchange
+    end subroutine create_component_exchange
 
-    subroutine changes_destroy_all(changes)
-        type(Changes_Wrapper), intent(inout) :: changes
-
-        call changes_destroy(changes%component_exchange)
-        call changes_destroy(changes%rotation_tuner)
-        call changes_destroy(changes%rotated_orientations)
-        call changes_destroy(changes%move_tuner)
-        call changes_destroy(changes%moved_positions)
-    end subroutine changes_destroy_all
-
-    subroutine destroy_and_deallocate_component_exchange(component_exchange)
+    subroutine destroy_component_exchange(component_exchange)
         class(Abstract_Component_Exchange), allocatable, intent(inout) :: component_exchange
 
-        call component_exchange%destroy()
-        if (allocated(component_exchange)) deallocate(component_exchange)
-    end subroutine destroy_and_deallocate_component_exchange
-
-    subroutine destroy_and_deallocate_change_tuner(change_tuner)
-        class(Abstract_Change_Tuner), allocatable, intent(inout) :: change_tuner
-
-        call change_tuner%destroy()
-        if (allocated(change_tuner)) deallocate(change_tuner)
-    end subroutine destroy_and_deallocate_change_tuner
-
-    subroutine destroy_and_deallocate_changed_coordinates(changed_coordinates)
-        class(Abstract_Changed_Coordinates), allocatable, intent(inout) :: changed_coordinates
-
-        call changed_coordinates%destroy()
-        if (allocated(changed_coordinates)) deallocate(changed_coordinates)
-    end subroutine destroy_and_deallocate_changed_coordinates
+        if (allocated(component_exchange)) then
+            call component_exchange%destroy()
+            deallocate(component_exchange)
+        end if
+    end subroutine destroy_component_exchange
 
 end module procedures_changes_factory
