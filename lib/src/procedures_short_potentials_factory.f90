@@ -24,8 +24,8 @@ use class_visitable_cells, only: Abstract_Visitable_Cells, &
     Null_Visitable_Cells, XYZ_PBC_Visitable_Cells, XY_PBC_Visitable_Cells
 use class_walls_potential_visitor, only: Abstract_Walls_Potential_Visitor, &
     Concrete_Walls_Potential_Visitor, Null_Walls_Potential_Visitor
-use class_short_potential_visitor, only: Abstract_Short_Potential_Visitor, &
-    Concrete_Short_Potential_Visitor, Null_Short_Potential_Visitor
+use class_short_pairs_visitor, only: Abstract_Short_Pairs_Visitor, &
+    Concrete_Short_Pairs_Visitor, Null_Short_Pairs_Visitor
 use types_short_potentials_wrapper, only: Pair_Potential_Wrapper, Pair_Potentials_Wrapper, &
     Short_Potentials_Wrapper
 use procedures_property_inquirers, only: use_walls, components_interact
@@ -144,20 +144,20 @@ contains
     end subroutine create_wall_pairs
 
     subroutine create_inter_visitor(visitor, periodic_box, interact)
-        class(Abstract_Short_Potential_Visitor), allocatable, intent(out) :: visitor
+        class(Abstract_Short_Pairs_Visitor), allocatable, intent(out) :: visitor
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         logical, intent(in) :: interact
 
         if (interact) then
-            allocate(Concrete_Short_Potential_Visitor :: visitor)
+            allocate(Concrete_Short_Pairs_Visitor :: visitor)
         else
-            allocate(Null_Short_Potential_Visitor :: visitor)
+            allocate(Null_Short_Pairs_Visitor :: visitor)
         end if
         call visitor%construct(periodic_box)
     end subroutine create_inter_visitor
 
     subroutine destroy_inter_visitor(visitor)
-        class(Abstract_Short_Potential_Visitor), allocatable, intent(inout) :: visitor
+        class(Abstract_Short_Pairs_Visitor), allocatable, intent(inout) :: visitor
 
         if (allocated(visitor)) then
             call visitor%destroy()

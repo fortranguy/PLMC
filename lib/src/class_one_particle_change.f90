@@ -12,7 +12,7 @@ use types_changes_wrapper, only: Changes_Wrapper
 use types_short_potentials_wrapper, only: Short_Potentials_Wrapper
 use types_ewalds_wrapper, only: Ewalds_Wrapper
 use class_tower_sampler, only: Abstract_Tower_Sampler
-use module_changes_success, only: Concrete_Change_Counter
+use module_changes_success, only: Concrete_Changes_Counter
 use module_component_energy, only: Concrete_Component_Energy, Concrete_Inter_Energy, &
     Concrete_Long_Energy, Concrete_Mixture_Energy, &
     particle_energy_sum => Concrete_Component_Energy_sum, &
@@ -72,16 +72,14 @@ private
             type(Concrete_Temporary_Particle), intent(in) :: new, old
         end subroutine Abstract_One_Particle_Change_update_actor
 
-        subroutine Abstract_One_Particle_Change_increment_hits(observables, i_actor)
-        import :: Observables_Wrapper
-            type(Observables_Wrapper), intent(inout) :: observables
-            integer, intent(in) :: i_actor
+        subroutine Abstract_One_Particle_Change_increment_hits(changes_counters)
+        import :: Concrete_Changes_Counter
+            type(Concrete_Changes_Counter), intent(inout) :: changes_counters
         end subroutine Abstract_One_Particle_Change_increment_hits
 
-        subroutine Abstract_One_Particle_Change_increment_success(observables, i_actor)
-        import :: Observables_Wrapper
-            type(Observables_Wrapper), intent(inout) :: observables
-            integer, intent(in) :: i_actor
+        subroutine Abstract_One_Particle_Change_increment_success(changes_counters)
+        import :: Concrete_Changes_Counter
+            type(Concrete_Changes_Counter), intent(inout) :: changes_counters
         end subroutine Abstract_One_Particle_Change_increment_success
 
     end interface
@@ -120,6 +118,7 @@ private
         procedure :: get_num_choices => Null_One_Particle_Change_get_num_choices
         procedure :: try => Null_One_Particle_Change_try
         procedure, private :: construct_selector => Null_One_Particle_Change_construct_selector
+        procedure, private :: test_metropolis => Null_One_Particle_Change_test_metropolis
         procedure, private :: define_change => Null_One_Particle_Change_define_change
         procedure, private :: update_actor => Null_One_Particle_Change_update_actor
         procedure, private, nopass :: increment_hits => Null_One_Particle_Change_increment_hits
@@ -179,16 +178,15 @@ contains
         logical :: success
         type(Concrete_Component_Energy) :: actor_energy_difference
         type(Concrete_Inter_Energy) :: inter_energy_difference
-        real(DP) :: walls_energy, field_energy
+        real(DP) :: walls_difference, field_energy
         real(DP) :: short_differences(size(observables%short_energies)), &
-            long_energies(size(observables%long_energies))
+            long_differences(size(observables%long_energies))
         integer :: j_observable, i_observable
 
         i_actor = this%selector%get()
-        i_spectator = mod(i_actor, num_components) + 1
-        call this%increment_hits(observables, i_actor)
-        call this%test_metropolis(success, actor_energy_difference, inter_energy_difference, &
-            walls_energy, short_differences, long_energies, i_actor, i_spectator)
+        call this%increment_hits(observables%changes_counters(i_actor))
+        call this%test_metropolis(success, walls_difference, short_differences, long_differences, &
+            i_actor)
         if (success) then
             do i_component = 1, size(observables%short_energies)
                 j_observable = maxval([i_actor, i_component])
@@ -197,23 +195,24 @@ contains
                     observables%short_energies(j_observable)%with_components(i_observable) + &
                     short_differences(i_component)
             end do
-            observables%intras(i_actor)%component_energy = &
-                observables%intras(i_actor)%component_energy + actor_energy_difference
-            observables%inter_energy = observables%inter_energy + inter_energy_difference
-            call this%increment_success(observables, i_actor)
+            do i_component = 1, size(observables%long_energies)
+                j_observable = maxval([i_actor, i_component])
+                i_observable = minval([i_actor, i_component])
+                observables%long_energies(j_observable)%with_components(i_observable) = &
+                    observables%long_energies(j_observable)%with_components(i_observable) + &
+                    long_differences(i_component)
+            end do
+            call this%increment_success(observables%changes_counters(i_actor))
         end if
     end subroutine Abstract_One_Particle_Change_try
 
-    subroutine Abstract_One_Particle_Change_test_metropolis(this, success, &
-        actor_energy_difference, inter_energy_difference, walls_difference, short_differences, &
-        long_difference, i_actor, i_spectator)
+    subroutine Abstract_One_Particle_Change_test_metropolis(this, success, walls_difference, &
+        short_differences, long_differences, i_actor)
         class(Abstract_One_Particle_Change), intent(in) :: this
         logical, intent(out) :: success
-        type(Concrete_Component_Energy), intent(out) :: actor_energy_difference
-        type(Concrete_Inter_Energy), intent(out) :: inter_energy_difference
         real(DP), intent(out) :: walls_difference
-        real(DP), intent(out) :: short_differences(:), long_difference(:)
-        integer, intent(in) :: i_actor, i_spectator
+        real(DP), intent(out) :: short_differences(:), long_differences(:)
+        integer, intent(in) :: i_actor
 
         type(Concrete_Temporary_Particle) :: new, old
         type(Concrete_Mixture_Energy) :: new_energy, old_energy
@@ -228,12 +227,9 @@ contains
         if (overlap) return
         call this%visit_short(overlap, short_differences, new, old, i_actor)
         if (overlap) return
-        call this%visit_long(long_difference, new, old, i_actor)
+        call this%visit_long(long_differences, new, old, i_actor)
 
-        actor_energy_difference = new_energy%intras(i_actor) - old_energy%intras(i_actor)
-        inter_energy_difference = new_energy%inter - old_energy%inter
-        energy_difference = particle_energy_sum(actor_energy_difference) + &
-            inter_energy_sum(inter_energy_difference)
+        energy_difference = walls_difference + sum(short_differences + long_differences)
         call random_number(rand)
         if (rand < exp(-energy_difference/this%environment%temperature%get())) then
             call this%update_actor(i_actor, new, old)
@@ -285,13 +281,13 @@ contains
         short_differences = short_new - short_old
     end subroutine Abstract_One_Particle_Change_visit_short
 
-    subroutine Abstract_One_Particle_Change_visit_long(this, long_difference, new, old, i_actor)
+    subroutine Abstract_One_Particle_Change_visit_long(this, long_differences, new, old, i_actor)
         class(Abstract_One_Particle_Change), intent(in) :: this
-        real(DP), intent(out) :: long_difference(:)
+        real(DP), intent(out) :: long_differences(:)
         type(Concrete_Temporary_Particle), intent(in) :: new, old
         integer, intent(in) :: i_actor
 
-        real(DP), dimension(size(long_difference)) :: long_new_real, long_old_real
+        real(DP), dimension(size(long_differences)) :: long_new_real, long_old_real
         integer :: i_component, i_exclude, j_pair, i_pair
 
         do i_component = 1, size(this%ewalds%real_components)
@@ -305,7 +301,7 @@ contains
                 visit(long_old_real(i_component), this%ewalds%real_pairs(j_pair)%&
                 with_components(i_pair)%real_pair, old, i_exclude)
         end do
-        long_difference = long_new_real - long_old_real
+        long_differences = long_new_real - long_old_real
     end subroutine Abstract_One_Particle_Change_visit_long
 
 !end implementation Abstract_One_Particle_Change
@@ -333,9 +329,11 @@ contains
 
         old%i = random_integer(this%components(i_actor)%positions%get_num())
         old%position = this%components(i_actor)%positions%get(old%i)
+        old%orientation = this%components(i_actor)%orientations%get(old%i)
         old%dipolar_moment = this%components(i_actor)%dipolar_moments%get(old%i)
         new%i = old%i
         new%position = this%changes(i_actor)%moved_positions%get(new%i)
+        new%orientation = old%orientation
         new%dipolar_moment = old%dipolar_moment
     end subroutine Concrete_One_Particle_Move_define_change
 
@@ -352,20 +350,16 @@ contains
         end do
     end subroutine Concrete_One_Particle_Move_update_actor
 
-    subroutine Concrete_One_Particle_Move_increment_hits(observables, i_actor)
-        type(Observables_Wrapper), intent(inout) :: observables
-        integer, intent(in) :: i_actor
+    subroutine Concrete_One_Particle_Move_increment_hits(changes_counters)
+        type(Concrete_Changes_Counter), intent(inout) :: changes_counters
 
-        observables%intras(i_actor)%changes_counter%move%num_hits = &
-            observables%intras(i_actor)%changes_counter%move%num_hits + 1
+        changes_counters%move%num_hits = changes_counters%move%num_hits + 1
     end subroutine Concrete_One_Particle_Move_increment_hits
 
-    subroutine Concrete_One_Particle_Move_increment_success(observables, i_actor)
-        type(Observables_Wrapper), intent(inout) :: observables
-        integer, intent(in) :: i_actor
+    subroutine Concrete_One_Particle_Move_increment_success(changes_counters)
+        type(Concrete_Changes_Counter), intent(inout) :: changes_counters
 
-        observables%intras(i_actor)%changes_counter%move%num_success = &
-            observables%intras(i_actor)%changes_counter%move%num_success + 1
+        changes_counters%move%num_success = changes_counters%move%num_success + 1
     end subroutine Concrete_One_Particle_Move_increment_success
 
 !end implementation Concrete_One_Particle_Move
@@ -415,6 +409,7 @@ contains
 
         old%i = random_integer(this%components(i_actor)%orientations%get_num())
         old%position = this%components(i_actor)%positions%get(old%i)
+        old%orientation = this%components(i_actor)%orientations%get(old%i)
         old%dipolar_moment = this%components(i_actor)%dipolar_moments%get(old%i)
         new%i = old%i
         new%position = old%position
@@ -430,20 +425,16 @@ contains
         call this%components(i_actor)%orientations%set(new%i, new%orientation)
     end subroutine Concrete_One_Particle_Rotation_update_actor
 
-    subroutine Concrete_One_Particle_Rotation_increment_hits(observables, i_actor)
-        type(Observables_Wrapper), intent(inout) :: observables
-        integer, intent(in) :: i_actor
+    subroutine Concrete_One_Particle_Rotation_increment_hits(changes_counters)
+        type(Concrete_Changes_Counter), intent(inout) :: changes_counters
 
-        observables%intras(i_actor)%changes_counter%rotation%num_hits = &
-            observables%intras(i_actor)%changes_counter%rotation%num_hits + 1
+        changes_counters%rotation%num_hits = changes_counters%rotation%num_hits + 1
     end subroutine Concrete_One_Particle_Rotation_increment_hits
 
-    subroutine Concrete_One_Particle_Rotation_increment_success(observables, i_actor)
-        type(Observables_Wrapper), intent(inout) :: observables
-        integer, intent(in) :: i_actor
+    subroutine Concrete_One_Particle_Rotation_increment_success(changes_counters)
+        type(Concrete_Changes_Counter), intent(inout) :: changes_counters
 
-        observables%intras(i_actor)%changes_counter%rotation%num_success = &
-            observables%intras(i_actor)%changes_counter%rotation%num_success + 1
+        changes_counters%rotation%num_success = changes_counters%rotation%num_success + 1
     end subroutine Concrete_One_Particle_Rotation_increment_success
 
 !end implementation Concrete_One_Particle_Rotation
@@ -483,28 +474,37 @@ contains
         type(Observables_Wrapper), intent(inout) :: observables
     end subroutine Null_One_Particle_Change_try
 
+    subroutine Null_One_Particle_Change_test_metropolis(this, success, walls_difference, &
+        short_differences, long_differences, i_actor)
+        class(Null_One_Particle_Change), intent(in) :: this
+        logical, intent(out) :: success
+        real(DP), intent(out) :: walls_difference
+        real(DP), intent(out) :: short_differences(:), long_differences(:)
+        integer, intent(in) :: i_actor
+        success = .false.
+        walls_difference = 0._DP; short_differences = 0._DP; long_differences = 0._DP
+    end subroutine Null_One_Particle_Change_test_metropolis
+
     subroutine Null_One_Particle_Change_define_change(this, new, old, i_actor)
-        class(Null_One_Particle_Change), intent(in) :: this
-        type(Concrete_Temporary_Particle), intent(out) :: new, old
-        integer, intent(in) :: i_actor
-        new%i = 0
-        old%i = 0
-    end subroutine Null_One_Particle_Change_define_change
+         class(Null_One_Particle_Change), intent(in) :: this
+         type(Concrete_Temporary_Particle), intent(out) :: new, old
+         integer, intent(in) :: i_actor
+         new%i = 0; new%position = 0._DP; new%orientation = 0._DP; new%dipolar_moment = 0._DP
+         old%i = 0; old%position = 0._DP; old%orientation = 0._DP; old%dipolar_moment = 0._DP
+     end subroutine Null_One_Particle_Change_define_change
 
-    subroutine Null_One_Particle_Change_update_actor(this, i_actor, new, old)
-        class(Null_One_Particle_Change), intent(in) :: this
-        integer, intent(in) :: i_actor
-        type(Concrete_Temporary_Particle), intent(in) :: new, old
-    end subroutine Null_One_Particle_Change_update_actor
+     subroutine Null_One_Particle_Change_update_actor(this, i_actor, new, old)
+         class(Null_One_Particle_Change), intent(in) :: this
+         integer, intent(in) :: i_actor
+         type(Concrete_Temporary_Particle), intent(in) :: new, old
+     end subroutine Null_One_Particle_Change_update_actor
 
-    subroutine Null_One_Particle_Change_increment_hits(observables, i_actor)
-        type(Observables_Wrapper), intent(inout) :: observables
-        integer, intent(in) :: i_actor
+    subroutine Null_One_Particle_Change_increment_hits(changes_counters)
+        type(Concrete_Changes_Counter), intent(inout) :: changes_counters
     end subroutine Null_One_Particle_Change_increment_hits
 
-    subroutine Null_One_Particle_Change_increment_success(observables, i_actor)
-        type(Observables_Wrapper), intent(inout) :: observables
-        integer, intent(in) :: i_actor
+    subroutine Null_One_Particle_Change_increment_success(changes_counters)
+        type(Concrete_Changes_Counter), intent(inout) :: changes_counters
     end subroutine Null_One_Particle_Change_increment_success
 
 !end implementation Null_One_Particle_Change

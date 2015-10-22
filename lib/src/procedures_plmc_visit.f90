@@ -10,7 +10,7 @@ use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
 use types_component_wrapper, only: Component_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
 use class_pair_potential, only: Abstract_Pair_Potential
-use class_short_potential_visitor, only: Abstract_Short_Potential_Visitor
+use class_short_pairs_visitor, only: Abstract_Short_Pairs_Visitor
 use types_short_potentials_wrapper, only: Short_Potentials_Wrapper
 use class_ewald_real_component, only: Abstract_Ewald_Real_Component
 use types_ewalds_wrapper, only: Ewalds_Wrapper

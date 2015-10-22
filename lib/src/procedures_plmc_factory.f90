@@ -13,6 +13,7 @@ use types_component_wrapper, only: Component_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
 use procedures_component_factory, only: component_create, component_destroy !to delete
 use procedures_mixture_factory, only: mixture_create, mixture_destroy
+use module_changes_success, only: Concrete_Changes_Success, Concrete_Changes_Counter
 use types_changes_wrapper, only: Changes_Wrapper
 use procedures_changes_factory, only: changes_create, changes_destroy
 use types_short_potentials_wrapper, only: Short_Potentials_Wrapper
@@ -22,7 +23,7 @@ use types_ewalds_wrapper, only: Ewalds_Wrapper
 use procedures_ewalds_factory, only: ewalds_create, ewalds_destroy
 use module_changes_success, only: reset_counter => Concrete_Changes_Counter_reset, &
     set_success => Concrete_Changes_Counter_set
-use types_observables_wrapper, only: Observables_Wrapper_old
+use types_observables_wrapper, only: Observables_Wrapper
 use types_observable_writers_wrapper, only: Mixture_Observable_Writers_Wrapper
 use procedures_observable_writers_factory, only: observable_writers_create, &
     observable_writers_destroy
@@ -235,34 +236,30 @@ contains
         call metropolis_set(metropolis, components, short_potentials, ewalds)
     end subroutine set_metropolis
 
-    subroutine tune_changes(tuned, i_step, changes, observables_intras)
+    subroutine tune_changes(tuned, i_step, changes, changes_sucesses)
         logical, intent(out) :: tuned
         integer, intent(in) :: i_step
         type(Changes_Wrapper), intent(inout) :: changes(:)
-        type(Observables_Wrapper_old), intent(in) :: observables_intras(num_components)
+        type(Concrete_Changes_Success), intent(in) :: changes_sucesses(:)
 
-        logical :: move_tuned(num_components), rotation_tuned(num_components)
+        logical :: move_tuned(size(changes)), rotation_tuned(size(changes))
         integer :: i_component
 
-        do i_component = 1, num_components
+        do i_component = 1, size(changes)
             call changes(i_component)%move_tuner%tune(move_tuned(i_component), i_step, &
-                observables_intras(i_component)%changes_success%move)
+                changes_sucesses(i_component)%move)
             call changes(i_component)%rotation_tuner%tune(rotation_tuned(i_component), i_step, &
-                observables_intras(i_component)%changes_success%rotation)
+                changes_sucesses(i_component)%rotation)
         end do
         tuned = all(move_tuned) .and. all(rotation_tuned)
     end subroutine tune_changes
 
-    subroutine set_success_and_reset_counter(observables_intras)
-        type(Observables_Wrapper_old), intent(inout) :: observables_intras(num_components)
+    subroutine set_success_and_reset_counter(changes_sucesses, changes_counters)
+        type(Concrete_Changes_Success), intent(out) :: changes_sucesses(:)
+        type(Concrete_Changes_Counter), intent(inout) :: changes_counters(:)
 
-        integer :: i_component
-
-        do i_component = 1, num_components
-            call set_success(observables_intras(i_component)%changes_success, &
-                observables_intras(i_component)%changes_counter)
-            call reset_counter(observables_intras(i_component)%changes_counter)
-        end do
+        call set_success(changes_sucesses, changes_counters)
+        call reset_counter(changes_counters)
     end subroutine set_success_and_reset_counter
 
 end module procedures_plmc_factory

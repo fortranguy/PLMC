@@ -131,7 +131,7 @@
 		<Unit filename="lib/src/class_rotated_orientations.f90">
 			<Option weight="4" />
 		</Unit>
-		<Unit filename="lib/src/class_short_potential_visitor.f90">
+		<Unit filename="lib/src/class_short_pairs_visitor.f90">
 			<Option weight="4" />
 		</Unit>
 		<Unit filename="lib/src/class_temperature.f90">
@@ -170,9 +170,6 @@
 		<Unit filename="lib/src/module_list_node.f90">
 			<Option weight="1" />
 		</Unit>
-		<Unit filename="lib/src/module_particles_energy.f90">
-			<Option weight="0" />
-		</Unit>
 		<Unit filename="lib/src/module_plmc_iterations.f90">
 			<Option weight="2" />
 		</Unit>
@@ -202,6 +199,9 @@
 		</Unit>
 		<Unit filename="lib/src/procedures_ewalds_factory.f90">
 			<Option weight="9" />
+		</Unit>
+		<Unit filename="lib/src/procedures_inter_energies.f90">
+			<Option weight="2" />
 		</Unit>
 		<Unit filename="lib/src/procedures_metropolis_factory.f90">
 			<Option weight="11" />
@@ -238,9 +238,6 @@
 		</Unit>
 		<Unit filename="lib/src/procedures_short_potentials_factory.f90">
 			<Option weight="9" />
-		</Unit>
-		<Unit filename="lib/src/procedures_temporary_energies.f90">
-			<Option weight="2" />
 		</Unit>
 		<Unit filename="lib/src/types_changes_wrapper.f90">
 			<Option weight="8" />

@@ -54,15 +54,15 @@ implicit none
     if (num_tuning_steps > 0) write(output_unit, *) "Trying to tune changes..."
     do i_step = -num_tuning_steps + 1, 0
         call plmc_propagator_try(metropolis, observables)
-        call plmc_set(observables%intras)
-        call plmc_set(changes_tuned, i_step, changes, observables%intras)
+        call plmc_set(observables%changes_sucesses, observables%changes_counters)
+        call plmc_set(changes_tuned, i_step, changes, observables%changes_sucesses)
         call plmc_write(i_step, observables_writers, observables)
         if (changes_tuned) exit
     end do
     write(output_unit, *) "Iterations start."
     do i_step = 1, num_steps
         call plmc_propagator_try(metropolis, observables)
-        call plmc_set(observables%intras)
+        call plmc_set(observables%changes_sucesses, observables%changes_counters)
         call plmc_write(i_step, observables_writers, observables)
     end do
     write(output_unit, *) "Iterations end."

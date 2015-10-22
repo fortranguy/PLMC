@@ -10,27 +10,6 @@ implicit none
 
 private
 
-    type, public :: Ewald_Wrapper
-        class(Abstract_Ewald_Real_Pair), allocatable :: real_pair
-        class(Abstract_Ewald_Real_Component), allocatable :: real_component
-        class(Abstract_Weighted_Structure), allocatable :: weighted_structure
-    end type Ewald_Wrapper
-
-    type, public :: Ewald_Wrapper_Macro
-        class(Abstract_Ewald_Real_Component), allocatable :: real_component
-        class(Abstract_Weighted_Structure), allocatable :: weighted_structure
-    end type Ewald_Wrapper_Macro
-
-    type, public :: Ewald_Wrapper_Micro
-        class(Abstract_Ewald_Real_Pair), allocatable :: real_pair
-    end type Ewald_Wrapper_Micro
-
-    type, public :: Mixture_Ewald_Wrapper
-        type(Ewald_Wrapper) :: intras(num_components)
-        type(Ewald_Wrapper_Macro) :: inters(num_components)
-        type(Ewald_Wrapper_Micro) :: inter_micro
-    end type Mixture_Ewald_Wrapper
-
     type, public :: Ewald_Real_Pair_Wrapper
         class(Abstract_Ewald_Real_Pair), allocatable :: real_pair
     end type Ewald_Real_Pair_Wrapper

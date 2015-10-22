@@ -19,8 +19,8 @@ use class_ewald_real_component, only: Abstract_Ewald_Real_Component, &
 use class_weighted_structure, only: Abstract_Weighted_Structure
 use class_ewald_real_visitor, only: Abstract_Ewald_Real_Visitor, Concrete_Ewald_Real_Visitor, &
     Null_Ewald_Real_Visitor
-use types_ewalds_wrapper, only: Ewald_Wrapper, Ewald_Wrapper_Macro, Ewald_Wrapper_Micro, &
-    Ewald_Real_Pair_Wrapper, Ewald_Real_Pairs_Wrapper, Ewald_Real_Component_Wrapper, Ewalds_Wrapper
+use types_ewalds_wrapper, only: Ewald_Real_Pair_Wrapper, Ewald_Real_Pairs_Wrapper, &
+    Ewald_Real_Component_Wrapper, Ewalds_Wrapper
 use procedures_property_inquirers, only: component_is_dipolar
 
 implicit none
