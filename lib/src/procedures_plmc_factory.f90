@@ -149,7 +149,8 @@ contains
         type(Mixture_Wrapper), intent(in) :: mixture
         type(json_file), intent(inout) :: input_data
 
-        call long_interactions_create(long_interactions, environment, mixture, input_data, long_interactions_prefix)
+        call long_interactions_create(long_interactions, environment, mixture, input_data, &
+            long_interactions_prefix)
     end subroutine create_long_interactions
 
     subroutine destroy_long_interactions(long_interactions)

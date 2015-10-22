@@ -29,7 +29,8 @@ contains
         end do
     end subroutine Concrete_Components_Energies_assignment
 
-    pure function Concrete_Components_Energies_addition(energies_1, energies_2) result(additive_energies)
+    pure function Concrete_Components_Energies_addition(energies_1, energies_2) &
+        result(additive_energies)
         type(Concrete_Components_Energies), intent(in) :: energies_1(:), energies_2(:)
         type(Concrete_Components_Energies) :: additive_energies(size(energies_1))
 

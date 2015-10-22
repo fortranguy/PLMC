@@ -67,8 +67,10 @@ contains
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
         type(Long_Interactions_Wrapper), intent(in) :: long_interactions
 
-        call metropolis%one_particle_move%set_candidates(components, short_interactions, long_interactions)
-        call metropolis%one_particle_rotation%set_candidates(components, short_interactions, long_interactions)
+        call metropolis%one_particle_move%set_candidates(components, short_interactions, &
+            long_interactions)
+        call metropolis%one_particle_rotation%set_candidates(components, short_interactions, &
+            long_interactions)
     end subroutine metropolis_set_all
 
     subroutine allocate_and_construct_one_particle_rotation(one_particle_rotation, environment, &
