@@ -10,7 +10,6 @@ use types_environment_wrapper, only: Environment_Wrapper
 use procedures_environment_factory, only: environment_create, environment_destroy
 use types_component_wrapper, only: Component_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
-use procedures_component_factory, only: component_create, component_destroy !to delete
 use procedures_mixture_factory, only: mixture_create, mixture_destroy
 use module_changes_success, only: Concrete_Changes_Success, Concrete_Changes_Counter
 use types_changes_wrapper, only: Changes_Wrapper
