@@ -9,11 +9,10 @@ use class_component_coordinates, only: Abstract_Component_Coordinates
 use types_component_wrapper, only: Component_Wrapper
 use types_short_interactions_wrapper, only: Pair_Potentials_Wrapper
 use types_long_interactions_wrapper, only: Ewald_Real_Pairs_Wrapper
-use class_component_exchange, only: Abstract_Component_Exchange
-use class_changed_coordinates, only: Abstract_Changed_Coordinates
-use types_observables_wrapper, only: Observables_Wrapper
+use types_changes_wrapper, only: Changes_Wrapper
 use class_components_energes_writer, only: Concrete_Components_Energies_Selector, &
-    Abstract_Components_Energies_Writer
+    Abstract_Components_Energies_Writer, Concrete_Components_Energies_Writer, &
+    Null_Components_Energies_Writer
 use class_changes_writer, only: Concrete_Changes_Selector, &
     Abstract_Changes_Success_Writer, Concrete_Changes_Success_Writer, Null_Changes_Success_Writer
 use class_component_coordinates_writer, only: Concrete_Coordinates_Writer_Selector, &
@@ -31,34 +30,37 @@ public :: writers_create, writers_destroy
 interface writers_create
     module procedure :: create_all
     module procedure :: create_components_energies
+    module procedure :: create_components
+    module procedure :: create_components_changes
     module procedure :: create_changes
+    module procedure :: create_components_coordinates
     module procedure :: create_coordinates
-    module procedure :: create_component_coordinates
 end interface writers_create
 
 interface writers_destroy
-    module procedure :: destroy_component_coordinates
     module procedure :: destroy_coordinates
     module procedure :: destroy_changes
+    module procedure :: destroy_components
     module procedure :: destroy_components_energies
     module procedure :: destroy_all
 end interface writers_destroy
 
 contains
 
-    subroutine create_all(writers, components, short_pairs, ewald_pairs, observables, input_data, &
+    subroutine create_all(writers, components, short_pairs, long_pairs, changes, input_data, &
         prefix)
         type(Writers_Wrapper), intent(out) :: writers
         type(Component_Wrapper), intent(in) :: components(:)
         type(Pair_Potentials_Wrapper), intent(in) :: short_pairs(:)
-        type(Ewald_Real_Pairs_Wrapper), intent(in) :: ewald_pairs(:)
-        type(Observables_Wrapper), intent(in) :: observables
+        type(Ewald_Real_Pairs_Wrapper), intent(in) :: long_pairs(:)
+        type(Changes_Wrapper), intent(in) :: changes(:)
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
+        !todo: walls and field to add
         call writers_create(writers%short_inter, short_pairs, "short_interactions.out")
-        call writers_create(writers%long_inter, ewald_pairs, "long_potentials.out")
-        call writers_create(writers%components, components, input_data, prefix)
+        call writers_create(writers%long_inter, long_pairs, "long_potentials.out")
+        call writers_create(writers%components, components, changes, input_data, prefix)
     end subroutine create_all
 
     subroutine destroy_all(writers)
@@ -74,13 +76,14 @@ contains
         class(*), intent(in) :: pairs(:)
         character(len=*), intent(in) :: filename
 
-        type(Concrete_Components_Energies_Selector) :: selector(size(pairs))
-        logical :: interact_ij
+        type(Concrete_Components_Energies_Selector) :: selectors(size(pairs))
+        logical :: interact, interact_ij
         integer :: j_component, i_component
 
-        do j_component = 1, size(selector)
-            allocate(selector(j_component)%with_components(j_component))
-            do i_component = 1, size(selector(j_component)%with_components)
+        interact = .false.
+        do j_component = 1, size(selectors)
+            allocate(selectors(j_component)%with_components(j_component))
+            do i_component = 1, size(selectors(j_component)%with_components)
                 select type (pairs) ! several checks: not optimal
                     type is (Pair_Potentials_Wrapper)
                         interact_ij = components_interact(pairs(j_component)%&
@@ -92,21 +95,27 @@ contains
                         call error_exit("writers_create: create_components_energies: "//&
                             "pairs type unknown.")
                 end select
-                selector(j_component)%with_components(i_component) = interact_ij
+                interact = interact .or. interact_ij
+                selectors(j_component)%with_components(i_component) = interact_ij
             end do
         end do
-        call energies%construct(filename, selector)
-        call deallocate_selector(selector)
+        if (interact) then
+            allocate(Concrete_Components_Energies_Writer :: energies)
+        else
+            allocate(Null_Components_Energies_Writer :: energies)
+        end if
+        call energies%construct(filename, selectors)
+        call deallocate_selectors(selectors)
     end subroutine create_components_energies
 
-    subroutine deallocate_selector(selector)
-        type(Concrete_Components_Energies_Selector), intent(inout) :: selector(:)
+    subroutine deallocate_selectors(selectors)
+        type(Concrete_Components_Energies_Selector), intent(inout) :: selectors(:)
 
         integer :: i_component
-        do i_component = size(selector), 1, -1
-            deallocate(selector(i_component)%with_components)
+        do i_component = size(selectors), 1, -1
+            deallocate(selectors(i_component)%with_components)
         end do
-    end subroutine deallocate_selector
+    end subroutine deallocate_selectors
 
     subroutine destroy_components_energies(energies)
         class(Abstract_Components_Energies_Writer), allocatable, intent(inout) :: energies
@@ -117,37 +126,41 @@ contains
         end if
     end subroutine destroy_components_energies
 
-    subroutine create_changes(changes, changes_selector, filename)
-        class(Abstract_Changes_Success_Writer), allocatable, intent(out) :: changes
-        type(Concrete_Changes_Selector), intent(in) :: changes_selector
-        character(len=*), intent(in) :: filename
+    subroutine create_components(components, mixture_components, changes, input_data, prefix)
+        type(Component_Writers_Wrapper), allocatable, intent(out) :: components(:)
+        type(Component_Wrapper), intent(in) :: mixture_components(:)
+        type(Changes_Wrapper), intent(in) :: changes(:)
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
 
-        if (changes_selector%write_positions) then
-            allocate(Concrete_Changes_Success_Writer :: changes)
-        else
-            allocate(Null_Changes_Success_Writer :: changes)
-        end if
-        call changes%construct(filename, changes_selector)
-    end subroutine create_changes
+        allocate(components(size(mixture_components)))
+        call writers_create(components, mixture_components, input_data, prefix)
+        call writers_create(components, changes)
+    end subroutine create_components
 
-    subroutine destroy_changes(changes)
-        class(Abstract_Changes_Success_Writer), allocatable, intent(inout) :: changes
-
-        if (allocated(changes)) then
-            call changes%destroy()
-            deallocate(changes)
-        end if
-    end subroutine destroy_changes
-
-    subroutine create_coordinates(components, mixture_components, input_data, prefix)
+    subroutine destroy_components(components)
         type(Component_Writers_Wrapper), allocatable, intent(inout) :: components(:)
+
+        integer :: i_component
+
+        if (allocated(components)) then
+            do i_component = size(components), 1, -1
+                call writers_destroy(components(i_component)%changes)
+                call writers_destroy(components(i_component)%coordinates)
+            end do
+            deallocate(components)
+        end if
+    end subroutine destroy_components
+
+    subroutine create_components_coordinates(components, mixture_components, input_data, prefix)
+        type(Component_Writers_Wrapper), intent(inout) :: components(:)
         type(Component_Wrapper), intent(in) :: mixture_components(:)
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field
         logical :: data_found, write_coordinates
-        type(Concrete_Coordinates_Writer_Selector) :: selectors(size(mixture_components))
+        type(Concrete_Coordinates_Writer_Selector) :: selector_i
         integer :: period, i_component
         type(Concrete_Number_to_String) :: string
 
@@ -159,23 +172,21 @@ contains
             data_field = prefix//"Coordinates.period"
             call input_data%get(data_field, period, data_found)
             call check_data_found(data_field, data_found)
+            selector_i%period = period
             do i_component = 1, size(components)
                 associate(positions_i => mixture_components(i_component)%positions, &
-                    orientations_i => mixture_components(i_component)%orientations, &
-                    basename_i => "coordinates_"//string%get(i_component)//".out")
-                    selectors(i_component)%period = period
-                    selectors(i_component)%write_positions = component_has_positions(positions_i)
-                    selectors(i_component)%write_orientations = &
-                        component_has_orientations(orientations_i)
-                    call writers_create(components(i_component)%coordinates, basename_i, &
-                        positions_i, orientations_i, selectors(i_component))
+                    orientations_i => mixture_components(i_component)%orientations)
+                    selector_i%write_positions = component_has_positions(positions_i)
+                    selector_i%write_orientations = component_has_orientations(orientations_i)
+                    call writers_create(components(i_component)%coordinates, "coordinates_"//&
+                        string%get(i_component), positions_i, orientations_i, selector_i)
                 end associate
             end do
         end if
         deallocate(data_field)
-    end subroutine create_coordinates
+    end subroutine create_components_coordinates
 
-    subroutine create_component_coordinates(coordinates, basename, positions, orientations, &
+    subroutine create_coordinates(coordinates, basename, positions, orientations, &
         selector)
         class(Abstract_Coordinates_Writer), allocatable, intent(out) :: coordinates
         character(len=*), intent(in) :: basename
@@ -188,27 +199,57 @@ contains
             allocate(Null_Coordinates_Writer :: coordinates)
         end if
         call coordinates%construct(basename, positions, orientations, selector)
-    end subroutine create_component_coordinates
+    end subroutine create_coordinates
 
-    subroutine destroy_component_coordinates(coordinates)
+    subroutine destroy_coordinates(coordinates)
         class(Abstract_Coordinates_Writer), allocatable, intent(inout) :: coordinates
 
         if (allocated(coordinates)) then
             call coordinates%destroy()
             deallocate(coordinates)
         end if
-    end subroutine destroy_component_coordinates
+    end subroutine destroy_coordinates
 
-    subroutine destroy_coordinates(components)
-        type(Component_Writers_Wrapper), allocatable, intent(inout) :: components(:)
+    subroutine create_components_changes(components, changes)
+        type(Component_Writers_Wrapper), intent(inout) :: components(:)
+        type(Changes_Wrapper), intent(in) :: changes(:)
+
+        type(Concrete_Changes_Selector) :: selector_i
+        type(Concrete_Number_to_String) :: string
 
         integer :: i_component
-
-        do i_component = size(components), 1, -1
-            call writers_destroy(components(i_component)%changes)
-            call writers_destroy(components(i_component)%coordinates)
+        do i_component = 1, size(components)
+            selector_i%write_positions = component_can_move(changes(i_component)%moved_positions)
+            selector_i%write_rotations = component_can_rotate(changes(i_component)%&
+                rotated_orientations)
+            selector_i%write_exchanges = component_can_exchange(changes(i_component)%&
+                component_exchange)
+            call writers_create(components(i_component)%changes, selector_i, "changes_"//&
+                string%get(i_component))
         end do
-    end subroutine destroy_coordinates
+    end subroutine create_components_changes
+
+    subroutine create_changes(changes, selector, filename)
+        class(Abstract_Changes_Success_Writer), allocatable, intent(out) :: changes
+        type(Concrete_Changes_Selector), intent(in) :: selector
+        character(len=*), intent(in) :: filename
+
+        if (selector%write_positions) then
+            allocate(Concrete_Changes_Success_Writer :: changes)
+        else
+            allocate(Null_Changes_Success_Writer :: changes)
+        end if
+        call changes%construct(filename, selector)
+    end subroutine create_changes
+
+    subroutine destroy_changes(changes)
+        class(Abstract_Changes_Success_Writer), allocatable, intent(inout) :: changes
+
+        if (allocated(changes)) then
+            call changes%destroy()
+            deallocate(changes)
+        end if
+    end subroutine destroy_changes
 
 end module procedures_writers_factory
 

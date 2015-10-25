@@ -23,8 +23,7 @@ use module_changes_success, only: reset_counter => Concrete_Changes_Counter_rese
     set_success => Concrete_Changes_Counter_set
 use types_observables_wrapper, only: Observables_Wrapper
 use types_writers_wrapper, only: Writers_Wrapper
-use procedures_writers_factory, only: writers_create, &
-    writers_destroy
+use procedures_writers_factory, only: writers_create, writers_destroy
 use types_metropolis_wrapper, only: Metropolis_Wrapper
 use procedures_metropolis_factory, only: metropolis_create, metropolis_set, &
     metropolis_destroy
@@ -158,51 +157,24 @@ contains
         call long_interactions_destroy(long_interactions)
     end subroutine destroy_long_interactions
 
-    subroutine create_writers(writers, walls_potential, mixture, changes, &
-        input_data)
+    subroutine create_writers(writers, walls_potential, mixture, short_interactions, &
+        long_interactions, changes, input_data)
         type(Writers_Wrapper), intent(out) :: writers
         class(Abstract_Walls_Potential), intent(in) :: walls_potential
         type(Mixture_Wrapper), intent(in) :: mixture
+        type(Short_Interactions_Wrapper), intent(in) :: short_interactions
+        type(Long_Interactions_Wrapper), intent(in) :: long_interactions
         type(Changes_Wrapper), intent(in) :: changes(:)
         type(json_file), intent(inout) :: input_data
 
-        logical :: wall_used
-        logical :: mixture_exists, mixture_is_dipolar
-        logical :: component_1_exists, component_1_is_dipolar
-        logical :: component_2_exists, component_2_is_dipolar
-
-        wall_used = use_walls(walls_potential)
-        component_1_exists = .false.
-        !component_1_is_dipolar = component_is_dipolar(mixture%components(1)%dipolar_moments)
-        !call writers_create(writers%intras(1)%energy, wall_used, &
-        !    component_1_exists, component_1_is_dipolar, "component_1_energy.out")
-        !component_2_exists = .false.
-        !component_2_is_dipolar = component_is_dipolar(mixture%components(2)%dipolar_moments)
-        !call writers_create(writers%intras(2)%energy, wall_used, &
-        !    component_2_exists, component_2_is_dipolar, "component_2_energy.out")
-        mixture_exists = component_1_exists .and. component_2_exists
-        mixture_is_dipolar = component_1_is_dipolar .and. component_2_is_dipolar
-        !call writers_create(writers%components_energy, mixture_exists, &
-        !    mixture_is_dipolar, "components_12_energy.out")
-
-        !call writers_create(writers%intras(1)%changes, &
-        !    changes(1)%moved_positions, changes(1)%rotated_orientations, &
-        !    changes(1)%component_exchange, "component_1_success.out")
-        !call writers_create(writers%intras(2)%changes, &
-        !    changes(2)%moved_positions, changes(2)%rotated_orientations, &
-        !    changes(2)%component_exchange, "component_2_success.out")
-
-        !call writers_create(writers%intras(1)%coordinates, &
-        !    "component_1_coordinates", mixture%components(1)%positions, &
-        !    mixture%components(1)%orientations, input_data, "Monte Carlo.")
-        !call writers_create(writers%intras(2)%coordinates, &
-        !    "component_2_coordinates", mixture%components(2)%positions, &
-        !    mixture%components(2)%orientations, input_data, "Monte Carlo.")
+        call writers_create(writers, mixture%components, short_interactions%components_pairs, &
+            long_interactions%real_pairs, changes, input_data, changes_prefix)
     end subroutine create_writers
 
     subroutine destroy_writers(writers)
         type(Writers_Wrapper), intent(inout) :: writers
 
+        call writers_destroy(writers)
     end subroutine destroy_writers
 
     subroutine create_metropolis(metropolis, environment, changes)
