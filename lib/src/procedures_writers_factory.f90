@@ -9,7 +9,7 @@ use class_component_coordinates, only: Abstract_Component_Coordinates
 use types_component_wrapper, only: Component_Wrapper
 use types_short_interactions_wrapper, only: Pair_Potentials_Wrapper
 use types_long_interactions_wrapper, only: Ewald_Real_Pairs_Wrapper
-use types_changes_wrapper, only: Changes_Wrapper
+use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use class_components_energes_writer, only: Concrete_Components_Energies_Selector, &
     Abstract_Components_Energies_Writer, Concrete_Components_Energies_Writer, &
     Null_Components_Energies_Writer
@@ -53,13 +53,13 @@ contains
         type(Component_Wrapper), intent(in) :: components(:)
         type(Pair_Potentials_Wrapper), intent(in) :: short_pairs(:)
         type(Ewald_Real_Pairs_Wrapper), intent(in) :: long_pairs(:)
-        type(Changes_Wrapper), intent(in) :: changes(:)
+        type(Changes_Component_Wrapper), intent(in) :: changes(:)
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
         !todo: walls and field to add
-        call writers_create(writers%short_inter, short_pairs, "short_interactions.out")
-        call writers_create(writers%long_inter, long_pairs, "long_potentials.out")
+        call writers_create(writers%short_energies, short_pairs, "short_energies.out")
+        call writers_create(writers%long_energies, long_pairs, "long_energies.out")
         call writers_create(writers%components, components, changes, input_data, prefix)
     end subroutine create_all
 
@@ -67,8 +67,8 @@ contains
         type(Writers_Wrapper), intent(inout) :: writers
 
         call writers_destroy(writers%components)
-        call writers_destroy(writers%long_inter)
-        call writers_destroy(writers%short_inter)
+        call writers_destroy(writers%long_energies)
+        call writers_destroy(writers%short_energies)
     end subroutine destroy_all
 
     subroutine create_components_energies(energies, pairs, filename)
@@ -129,7 +129,7 @@ contains
     subroutine create_components(components, mixture_components, changes, input_data, prefix)
         type(Component_Writers_Wrapper), allocatable, intent(out) :: components(:)
         type(Component_Wrapper), intent(in) :: mixture_components(:)
-        type(Changes_Wrapper), intent(in) :: changes(:)
+        type(Changes_Component_Wrapper), intent(in) :: changes(:)
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -212,7 +212,7 @@ contains
 
     subroutine create_components_changes(components, changes)
         type(Component_Writers_Wrapper), intent(inout) :: components(:)
-        type(Changes_Wrapper), intent(in) :: changes(:)
+        type(Changes_Component_Wrapper), intent(in) :: changes(:)
 
         type(Concrete_Changes_Selector) :: selector_i
         type(Concrete_Number_to_String) :: string
@@ -222,8 +222,7 @@ contains
             selector_i%write_positions = component_can_move(changes(i_component)%moved_positions)
             selector_i%write_rotations = component_can_rotate(changes(i_component)%&
                 rotated_orientations)
-            selector_i%write_exchanges = component_can_exchange(changes(i_component)%&
-                component_exchange)
+            selector_i%write_exchanges = component_can_exchange(changes(i_component)%exchange)
             call writers_create(components(i_component)%changes, selector_i, "changes_"//&
                 string%get(i_component))
         end do

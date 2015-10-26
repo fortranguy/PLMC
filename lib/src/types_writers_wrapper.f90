@@ -15,7 +15,7 @@ private
 
     type, public :: Writers_Wrapper
         type(Component_Writers_Wrapper), allocatable :: components(:)
-        class(Abstract_Components_Energies_Writer), allocatable :: short_inter, long_inter
+        class(Abstract_Components_Energies_Writer), allocatable :: short_energies, long_energies
     end type Writers_Wrapper
 
 end module types_writers_wrapper

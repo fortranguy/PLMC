@@ -5,22 +5,21 @@ use data_wrappers_prefix, only:environment_prefix, mixture_prefix, changes_prefi
 use json_module, only: json_file, json_initialize
 use procedures_command_arguments, only: set_filename_from_argument
 use class_periodic_box, only: Abstract_Periodic_Box
-use class_walls_potential, only: Abstract_Walls_Potential
 use types_environment_wrapper, only: Environment_Wrapper
 use procedures_environment_factory, only: environment_create, environment_destroy
 use types_component_wrapper, only: Component_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
 use procedures_mixture_factory, only: mixture_create, mixture_destroy
-use module_changes_success, only: Concrete_Changes_Success, Concrete_Changes_Counter
-use types_changes_wrapper, only: Changes_Wrapper
-use procedures_changes_factory, only: changes_create, changes_destroy
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use procedures_short_interactions_factory, only: short_interactions_create, &
     short_interactions_destroy
 use types_long_interactions_wrapper, only: Long_Interactions_Wrapper
 use procedures_long_interactions_factory, only: long_interactions_create, long_interactions_destroy
-use module_changes_success, only: reset_counter => Concrete_Changes_Counter_reset, &
-    set_success => Concrete_Changes_Counter_set
+use module_changes_success, only: Concrete_Changes_Success, Concrete_Changes_Counter, &
+    reset_counter => Concrete_Changes_Counter_reset, set_success => Concrete_Changes_Counter_set
+use types_changes_component_wrapper, only: Changes_Component_Wrapper
+use types_changes_wrapper, only: Changes_Wrapper
+use procedures_changes_factory, only: changes_create, changes_destroy
 use types_observables_wrapper, only: Observables_Wrapper
 use types_writers_wrapper, only: Writers_Wrapper
 use procedures_writers_factory, only: writers_create, writers_destroy
@@ -106,25 +105,6 @@ contains
         call mixture_destroy(mixture)
     end subroutine destroy_mixture
 
-    subroutine create_changes(changes, periodic_box, components, input_data)
-        type(Changes_Wrapper), intent(out) :: changes(:)
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
-        type(Component_Wrapper), intent(in) :: components(:)
-        type(json_file), intent(inout) :: input_data
-
-        call changes_create(changes(1), periodic_box, components(1), input_data, &
-            changes_prefix//"Component 1.")
-        call changes_create(changes(2), periodic_box, components(2), input_data, &
-            changes_prefix//"Component 2.")
-    end subroutine create_changes
-
-    subroutine destroy_changes(changes)
-        type(Changes_Wrapper), intent(inout) :: changes(2)
-
-        call changes_destroy(changes(1))
-        call changes_destroy(changes(2))
-    end subroutine destroy_changes
-
     subroutine create_short_interactions(short_interactions, environment, mixture, input_data)
         type(Short_Interactions_Wrapper), intent(out) :: short_interactions
         type(Environment_Wrapper), intent(in) :: environment
@@ -157,18 +137,32 @@ contains
         call long_interactions_destroy(long_interactions)
     end subroutine destroy_long_interactions
 
-    subroutine create_writers(writers, walls_potential, mixture, short_interactions, &
-        long_interactions, changes, input_data)
+    subroutine create_changes(changes, periodic_box, components, input_data)
+        type(Changes_Wrapper), intent(out) :: changes
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
+        type(Component_Wrapper), intent(in) :: components(:)
+        type(json_file), intent(inout) :: input_data
+
+        call changes_create(changes, periodic_box, components, input_data, changes_prefix)
+    end subroutine create_changes
+
+    subroutine destroy_changes(changes)
+        type(Changes_Wrapper), intent(inout) :: changes
+
+        call changes_destroy(changes)
+    end subroutine destroy_changes
+
+    subroutine create_writers(writers, mixture, short_interactions, long_interactions, changes, &
+        input_data)
         type(Writers_Wrapper), intent(out) :: writers
-        class(Abstract_Walls_Potential), intent(in) :: walls_potential
         type(Mixture_Wrapper), intent(in) :: mixture
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
         type(Long_Interactions_Wrapper), intent(in) :: long_interactions
-        type(Changes_Wrapper), intent(in) :: changes(:)
+        type(Changes_Wrapper), intent(in) :: changes
         type(json_file), intent(inout) :: input_data
 
         call writers_create(writers, mixture%components, short_interactions%components_pairs, &
-            long_interactions%real_pairs, changes, input_data, changes_prefix)
+            long_interactions%real_pairs, changes%components, input_data, changes_prefix)
     end subroutine create_writers
 
     subroutine destroy_writers(writers)
@@ -180,9 +174,9 @@ contains
     subroutine create_metropolis(metropolis, environment, changes)
         type(Metropolis_Wrapper), intent(out) :: metropolis
         type(Environment_Wrapper), intent(in) :: environment
-        type(Changes_Wrapper), intent(in) :: changes(:)
+        type(Changes_Wrapper), intent(in) :: changes
 
-        call metropolis_create(metropolis, environment, changes)
+        call metropolis_create(metropolis, environment, changes%components)
     end subroutine create_metropolis
 
     subroutine destroy_metropolis(metropolis)
@@ -200,20 +194,20 @@ contains
         call metropolis_set(metropolis, components, short_interactions, long_interactions)
     end subroutine set_metropolis
 
-    subroutine tune_changes(tuned, i_step, changes, changes_sucesses)
+    subroutine tune_changes(tuned, i_step, components_changes, changes_sucesses)
         logical, intent(out) :: tuned
         integer, intent(in) :: i_step
-        type(Changes_Wrapper), intent(inout) :: changes(:)
+        type(Changes_Component_Wrapper), intent(inout) :: components_changes(:)
         type(Concrete_Changes_Success), intent(in) :: changes_sucesses(:)
 
-        logical :: move_tuned(size(changes)), rotation_tuned(size(changes))
+        logical :: move_tuned(size(components_changes)), rotation_tuned(size(components_changes))
         integer :: i_component
 
-        do i_component = 1, size(changes)
-            call changes(i_component)%move_tuner%tune(move_tuned(i_component), i_step, &
+        do i_component = 1, size(components_changes)
+            call components_changes(i_component)%move_tuner%tune(move_tuned(i_component), i_step, &
                 changes_sucesses(i_component)%move)
-            call changes(i_component)%rotation_tuner%tune(rotation_tuned(i_component), i_step, &
-                changes_sucesses(i_component)%rotation)
+            call components_changes(i_component)%rotation_tuner%tune(rotation_tuned(i_component), &
+                i_step, changes_sucesses(i_component)%rotation)
         end do
         tuned = all(move_tuned) .and. all(rotation_tuned)
     end subroutine tune_changes

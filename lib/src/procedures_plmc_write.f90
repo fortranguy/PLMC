@@ -20,21 +20,21 @@ contains
         type(Writers_Wrapper), intent(in) :: writers
         type(Observables_Wrapper), intent(in) :: observables
 
+        integer :: i_component
+
         if (i_step > 0) then
-            !call writers%intras(1)%coordinates%write(i_step)
-            !call writers%intras(2)%coordinates%write(i_step)
+            do i_component = 1, size(writers%components)
+                call writers%components(i_component)%coordinates%write(i_step)
+            end do
         end if
-        !call writers%intras(1)%energy%write(i_step, &
-        !    observables%intras(1)%component_energy)
-        !call writers%intras(2)%energy%write(i_step, &
-        !    observables%intras(2)%component_energy)
-        !call writers%components_energy%write(i_step, observables%components_energy)
         if (-num_tuning_steps < i_step .and. i_step < num_steps) then
-            !call writers%intras(1)%changes%write(i_step, &
-            !    observables%intras(1)%changes_success)
-            !call writers%intras(2)%changes%write(i_step, &
-            !    observables%intras(2)%changes_success)
+            do i_component = 1, size(writers%components)
+                call writers%components(i_component)%changes%write(i_step, observables%&
+                    changes_sucesses(i_component))
+            end do
         end if
+        call writers%short_energies%write(i_step, observables%short_energies)
+        call writers%long_energies%write(i_step, observables%long_energies)
     end subroutine write_observables
 
 end module procedures_plmc_write

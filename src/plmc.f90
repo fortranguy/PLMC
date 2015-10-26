@@ -21,7 +21,7 @@ implicit none
 
     type(Environment_Wrapper) :: environment
     type(Mixture_Wrapper) :: mixture
-    type(Changes_Wrapper), allocatable :: changes(:)
+    type(Changes_Wrapper) :: changes
     type(Short_Interactions_Wrapper) :: short_interactions
     type(Long_Interactions_Wrapper) :: long_interactions
     type(Observables_Wrapper) :: observables
@@ -39,8 +39,8 @@ implicit none
     stop
     call plmc_create(long_interactions, environment, mixture, input_data)
     call plmc_set_num_steps(input_data)
-    !call plmc_create(changes, environment%periodic_box, mixture_old%components, input_data)
-    !call plmc_create(writers, environment%walls_potential, mixture_old, changes, input_data)
+    call plmc_create(changes, environment%periodic_box, mixture%components, input_data)
+    call plmc_create(writers, mixture, short_interactions, long_interactions, changes, input_data)
     call plmc_create(metropolis, environment, changes)
     call input_data%destroy()
 
@@ -53,7 +53,7 @@ implicit none
     do i_step = -num_tuning_steps + 1, 0
         call plmc_propagator_try(metropolis, observables)
         call plmc_set(observables%changes_sucesses, observables%changes_counters)
-        call plmc_set(changes_tuned, i_step, changes, observables%changes_sucesses)
+        call plmc_set(changes_tuned, i_step, changes%components, observables%changes_sucesses)
         call plmc_write(i_step, writers, observables)
         if (changes_tuned) exit
     end do
@@ -71,9 +71,9 @@ implicit none
     call plmc_propagator_destroy()
     call plmc_destroy(metropolis)
     call plmc_destroy(writers)
+    call plmc_destroy(changes)
     call plmc_destroy(long_interactions)
     call plmc_destroy(short_interactions)
-    call plmc_destroy(changes)
     call plmc_destroy(mixture)
     call plmc_destroy(environment)
 

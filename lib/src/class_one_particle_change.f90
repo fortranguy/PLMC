@@ -5,7 +5,7 @@ use procedures_random, only: random_integer
 use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
 use types_temporary_particle, only: Concrete_Temporary_Particle
-use types_changes_wrapper, only: Changes_Wrapper
+use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use types_long_interactions_wrapper, only: Long_Interactions_Wrapper
 use class_tower_sampler, only: Abstract_Tower_Sampler
@@ -21,7 +21,7 @@ private
     private
         type(Environment_Wrapper), pointer :: environment => null()
         type(Component_Wrapper), pointer :: components(:) => null()
-        type(Changes_Wrapper), pointer :: changes(:) => null()
+        type(Changes_Component_Wrapper), pointer :: changes(:) => null()
         type(Short_Interactions_Wrapper), pointer :: short_interactions => null()
         type(Long_Interactions_Wrapper), pointer :: long_interactions => null()
         class(Abstract_Tower_Sampler), allocatable :: selector
@@ -126,7 +126,7 @@ contains
     subroutine Abstract_One_Particle_Change_construct(this, environment, changes, selector)
         class(Abstract_One_Particle_Change), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
-        type(Changes_Wrapper), target, intent(in) :: changes(:)
+        type(Changes_Component_Wrapper), target, intent(in) :: changes(:)
         class(Abstract_Tower_Sampler), intent(in) :: selector
 
         this%environment => environment
@@ -430,7 +430,7 @@ contains
     subroutine Null_One_Particle_Change_construct(this, environment, changes, selector)
         class(Null_One_Particle_Change), intent(out) :: this
         type(Environment_Wrapper), target, intent(in) :: environment
-        type(Changes_Wrapper), target, intent(in) :: changes(:)
+        type(Changes_Component_Wrapper), target, intent(in) :: changes(:)
         class(Abstract_Tower_Sampler), intent(in) :: selector
     end subroutine Null_One_Particle_Change_construct
 

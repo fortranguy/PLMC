@@ -3,7 +3,7 @@ module procedures_metropolis_factory
 use json_module, only: json_file
 use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
-use types_changes_wrapper, only: Changes_Wrapper
+use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use types_long_interactions_wrapper, only: Long_Interactions_Wrapper
 use class_tower_sampler, only: Abstract_Tower_Sampler, Concrete_Tower_Sampler, Null_Tower_Sampler
@@ -34,7 +34,7 @@ contains
     subroutine metropolis_create_all(metropolis, environment, changes)
         type(Metropolis_Wrapper), intent(out) :: metropolis
         type(Environment_Wrapper), intent(in) :: environment
-        type(Changes_Wrapper), intent(in) :: changes(:)
+        type(Changes_Component_Wrapper), intent(in) :: changes(:)
 
         call allocate_and_construct_one_particle_move(metropolis%one_particle_move, environment, &
             changes)
@@ -45,7 +45,7 @@ contains
     subroutine allocate_and_construct_one_particle_move(one_particle_move, environment, changes)
         class(Abstract_One_Particle_Change), allocatable, intent(out) :: one_particle_move
         type(Environment_Wrapper), intent(in) :: environment
-        type(Changes_Wrapper), intent(in) :: changes(:)
+        type(Changes_Component_Wrapper), intent(in) :: changes(:)
 
         class(Abstract_Tower_Sampler), allocatable :: selector
         ! to update: multi components
@@ -77,7 +77,7 @@ contains
         changes)
         class(Abstract_One_Particle_Change), allocatable, intent(out) :: one_particle_rotation
         type(Environment_Wrapper), intent(in) :: environment
-        type(Changes_Wrapper), intent(in) :: changes(:)
+        type(Changes_Component_Wrapper), intent(in) :: changes(:)
 
         class(Abstract_Tower_Sampler), allocatable :: selector
 
