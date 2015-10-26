@@ -8,13 +8,6 @@ module RandomOrientations
     end
 end
 
-module ParticlesType
-    type Particles
-        num_particles :: Int64
-        orientations :: Array{Float64, 2}
-    end
-end
-
 import JSON
 json = JSON
 import RandomOrientations

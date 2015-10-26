@@ -1,50 +1,37 @@
-module PeriodicBoundaryCondition
-
-    export folded, distance
-
-    function folded(x::Array{Float64, 1}, box_size::Array{Float64, 1})
-        v = mod(x, box_size)
-        for i=1:3
-           if (v[i] > box_size[i]/2)
-                v[i] -= box_size[i]
-            end
-        end
-        return v
-    end
-
-    function distance(x::Array{Float64, 1}, y::Array{Float64, 1}, box_size::Array{Float64, 1})
-        return norm(folded(y - x, box_size))
-    end
-end
-
-module ParticlesType
-    type Particles
-        num_particles :: Int64
-        diameter :: Float64
-        min_diameter :: Float64
-        positions :: Array{Float64, 2}
-    end
-end
-
 import JSON
 json = JSON
 import ProgressMeter
 pm = ProgressMeter
-import PeriodicBoundaryCondition
-pbc = PeriodicBoundaryCondition
-import ParticlesType
-pt = ParticlesType
+import PLMC
+pbc = PLMC.PBC
 
+#=
 if size(ARGS, 1) == 0
     error("Please provide a .json file.")
 end
 input_data = json.parsefile(ARGS[1]; dicttype=Dict, use_mmap=true)
+=#
+input_data = json.parsefile("/home/salomon/Documents/Sciences/Physique/Doctorat/Simulations/PLMC/data/input_data.json")
 
 box_size = map(Float64, input_data["Environment"]["Box"]["size"])
+components = Array{PLMC.Component}(input_data["Mixture"]["number of components"])
+if (size(components, 1) == 0)
+    exit(0)
+end
 
-particles_1 = pt.Particles(0, 0.0, 0.0, zeros(3, 1))
+interMinDistance = zeros(size(components, 1), size(components, 1)) # triangle?
+for i_component = 1:size(components, 1)
+    components[i_component] = PLMC.Component(input_data["Mixture"]["Component $(i_component)"]["number"],
+                                             zeros(3, 1), zeros(3, 1))
+    for j_component = 1:i_component
+        interMinDistance[i_component, j_component] = input_data["Mixture"]["Inter $(j_component)$(i_component)"]["minimum distance"]
+    end
+end
+exit()
+
+particles_1 = PLMC.Particles(0, 0.0, 0.0, zeros(3, 1))
 if input_data["Mixture"]["Component 1"]["exists"]
-    
+
     particles_1.num_particles = input_data["Mixture"]["Component 1"]["number"]
     particles_1.diameter = input_data["Mixture"]["Component 1"]["diameter"]
     particles_1.min_diameter = particles_1.diameter * input_data["Mixture"]["Component 1"]["minimum diameter factor"]
