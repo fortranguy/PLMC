@@ -20,21 +20,21 @@
     "Mixture": {
         "number of components": 2,
         "Component 1": {
-            "number": 500,
-            "minimum distance": 1.0,
+            "number": 100,
+            "minimum distance": 0.8,
             "is dipolar": false,
             "can exchange": false,
             "initial positions": "positions_1.in"
         },
         "Component 2": {
-            "number": 500,
-            "minimum distance": 1.0,
+            "number": 100,
+            "minimum distance": 0.8,
             "is dipolar": false,
             "can exchange": false,
             "initial positions": "positions_2.in"
         },
         "Inter 12": {
-            "minimum distance": 1.0
+            "minimum distance": 0.8
         }
     },
     "Short Interactions": {

@@ -48,9 +48,15 @@ contains
         type(Changes_Component_Wrapper), intent(in) :: changes(:)
 
         class(Abstract_Tower_Sampler), allocatable :: selector
-        ! to update: multi components
-        if (component_can_move(changes(1)%moved_positions) .or. &
-            component_can_move(changes(2)%moved_positions)) then
+        logical :: some_components_can_move
+        integer :: i_component
+
+        some_components_can_move = .false.
+        do i_component = 1, size(changes)
+            some_components_can_move = some_components_can_move .or. &
+                component_can_move(changes(i_component)%moved_positions)
+        end do
+        if (some_components_can_move) then
             allocate(Concrete_Tower_Sampler :: selector)
             allocate(Concrete_One_Particle_Move :: one_particle_move)
         else
@@ -80,9 +86,15 @@ contains
         type(Changes_Component_Wrapper), intent(in) :: changes(:)
 
         class(Abstract_Tower_Sampler), allocatable :: selector
+        logical :: some_components_can_rotate
+        integer :: i_component
 
-        if (component_can_rotate(changes(1)%rotated_orientations) .or. &
-            component_can_rotate(changes(2)%rotated_orientations)) then
+        some_components_can_rotate = .false.
+        do i_component = 1, size(changes)
+            some_components_can_rotate = some_components_can_rotate .or. &
+                component_can_rotate(changes(i_component)%rotated_orientations)
+        end do
+        if (some_components_can_rotate) then
             allocate(Concrete_Tower_Sampler :: selector)
             allocate(Concrete_One_Particle_Rotation :: one_particle_rotation)
         else

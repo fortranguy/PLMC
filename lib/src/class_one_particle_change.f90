@@ -25,11 +25,13 @@ private
         type(Short_Interactions_Wrapper), pointer :: short_interactions => null()
         type(Long_Interactions_Wrapper), pointer :: long_interactions => null()
         class(Abstract_Tower_Sampler), allocatable :: selector
+        integer, allocatable :: nums_candidates(:)
     contains
         procedure :: construct => Abstract_One_Particle_Change_construct
         procedure :: destroy => Abstract_One_Particle_Change_destroy
         procedure :: try => Abstract_One_Particle_Change_try
         procedure :: set_candidates => Abstract_One_Particle_Change_set_candidates
+        procedure :: get_num_choices => Abstract_One_Particle_Change_get_num_choices
         procedure(Abstract_One_Particle_Change_construct_selector), private, deferred :: &
             construct_selector
         procedure, private :: test_metropolis => Abstract_One_Particle_Change_test_metropolis
@@ -79,7 +81,6 @@ private
 
     type, extends(Abstract_One_Particle_Change), public :: Concrete_One_Particle_Move
     contains
-        procedure :: get_num_choices => Concrete_One_Particle_Move_get_num_choices
         procedure, private :: construct_selector => Concrete_One_Particle_Move_construct_selector
         procedure, private :: define_change => Concrete_One_Particle_Move_define_change
         procedure, private :: update_actor => Concrete_One_Particle_Move_update_actor
@@ -90,7 +91,6 @@ private
 
     type, extends(Abstract_One_Particle_Change), public :: Concrete_One_Particle_Rotation
     contains
-        procedure :: get_num_choices => Concrete_One_Particle_Rotation_get_num_choices
         procedure, private :: construct_selector => &
             Concrete_One_Particle_Rotation_construct_selector
         procedure, private :: visit_walls => Concrete_One_Particle_Rotation_visit_walls
@@ -142,6 +142,7 @@ contains
         this%components => null()
         call this%selector%destroy()
         if (allocated(this%selector)) deallocate(this%selector)
+        if (allocated(this%nums_candidates)) deallocate(this%nums_candidates)
         this%changes => null()
         this%environment => null()
     end subroutine Abstract_One_Particle_Change_destroy
@@ -154,10 +155,17 @@ contains
         type(Long_Interactions_Wrapper), target, intent(in) :: long_interactions
 
         this%components => components
+        allocate(this%nums_candidates(size(this%components)))
         call this%construct_selector()
         this%short_interactions => short_interactions
         this%long_interactions => long_interactions
     end subroutine Abstract_One_Particle_Change_set_candidates
+
+    pure integer function Abstract_One_Particle_Change_get_num_choices(this) result(num_choices)
+        class(Abstract_One_Particle_Change), intent(in) :: this
+
+        num_choices = sum(this%nums_candidates)
+    end function Abstract_One_Particle_Change_get_num_choices
 
     subroutine Abstract_One_Particle_Change_try(this, observables)
         class(Abstract_One_Particle_Change), intent(in) :: this
@@ -297,16 +305,12 @@ contains
     subroutine Concrete_One_Particle_Move_construct_selector(this)
         class(Concrete_One_Particle_Move), intent(inout) :: this
 
-        call this%selector%construct([this%components(1)%positions%get_num(), &
-            this%components(2)%positions%get_num()])
+        integer :: i_component
+        do i_component = 1, size(this%nums_candidates)
+            this%nums_candidates(i_component) = this%components(i_component)%positions%get_num()
+        end do
+        call this%selector%construct(this%nums_candidates)
     end subroutine Concrete_One_Particle_Move_construct_selector
-
-    pure integer function Concrete_One_Particle_Move_get_num_choices(this) result(num_choices)
-        class(Concrete_One_Particle_Move), intent(in) :: this
-
-        num_choices = this%components(1)%positions%get_num() + &
-            this%components(2)%positions%get_num()
-    end function Concrete_One_Particle_Move_get_num_choices
 
     subroutine Concrete_One_Particle_Move_define_change(this, new, old, i_actor)
         class(Concrete_One_Particle_Move), intent(in) :: this
@@ -355,16 +359,12 @@ contains
     subroutine Concrete_One_Particle_Rotation_construct_selector(this)
         class(Concrete_One_Particle_Rotation), intent(inout) :: this
 
-        call this%selector%construct([this%components(1)%orientations%get_num(), &
-            this%components(2)%orientations%get_num()])
+        integer :: i_component
+        do i_component = 1, size(this%nums_candidates)
+            this%nums_candidates(i_component) = this%components(i_component)%orientations%get_num()
+        end do
+        call this%selector%construct(this%nums_candidates)
     end subroutine Concrete_One_Particle_Rotation_construct_selector
-
-    pure integer function Concrete_One_Particle_Rotation_get_num_choices(this) result(num_choices)
-        class(Concrete_One_Particle_Rotation), intent(in) :: this
-
-        num_choices = this%components(1)%orientations%get_num() + &
-            this%components(2)%orientations%get_num()
-    end function Concrete_One_Particle_Rotation_get_num_choices
 
     subroutine Concrete_One_Particle_Rotation_visit_walls(this, overlap, walls_difference, new, &
         old, i_actor)
