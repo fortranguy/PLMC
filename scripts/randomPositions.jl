@@ -32,7 +32,10 @@ for i_component=1:size(components, 1)
     num_particles += components[i_component].num
 end
 
-components[1].positions[:, 1] = pbc.folded(rand(3) .* box_size, box_size)
+for i_component = 1:size(components, 1)
+    components[i_component].positions = zeros(3, 1) #excluded
+end
+first_positions = trues(size(components))
 test_position = Array{Float64}
 for i_component = 1:size(components, 1)
     prog = pm.Progress(components[i_component].num)
@@ -55,12 +58,16 @@ for i_component = 1:size(components, 1)
                 end
             end
         end
-        components[i_component].positions = hcat(components[i_component].positions,
-                                                 pbc.folded(test_position, box_size))
+        if (first_positions[i_component])
+            components[i_component].positions[:, 1] = pbc.folded(test_position, box_size)
+            first_positions[i_component] = false
+        else
+            components[i_component].positions = hcat(components[i_component].positions,
+                                                     pbc.folded(test_position, box_size))
+        end
         pm.next!(prog)
     end
     output_file = input_data["Mixture"]["Component $(i_component)"]["initial positions"]
     writedlm(output_file, components[i_component].positions')
-    println()
     println("Positions written in ", output_file)
 end

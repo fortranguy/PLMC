@@ -18,22 +18,35 @@
         }
     },
     "Mixture": {
-        "number of components": 2,
+        "number of components": 3,
         "Component 1": {
-            "number": 100,
+            "number": 250,
             "minimum distance": 0.8,
             "is dipolar": false,
             "can exchange": false,
             "initial positions": "positions_1.in"
         },
         "Component 2": {
-            "number": 100,
+            "number": 250,
             "minimum distance": 0.8,
             "is dipolar": false,
             "can exchange": false,
             "initial positions": "positions_2.in"
         },
+        "Component 3": {
+            "number": 250,
+            "minimum distance": 0.8,
+            "is dipolar": false,
+            "can exchange": false,
+            "initial positions": "positions_3.in"
+        },
         "Inter 12": {
+            "minimum distance": 0.8
+        },
+        "Inter 13": {
+            "minimum distance": 0.8
+        },
+        "Inter 23": {
             "minimum distance": 0.8
         }
     },
@@ -52,7 +65,28 @@
             "sigma": 1.0,
             "maximum distance": 2.5
         },
+        "Component 3": {
+            "name": "LJ",
+            "tabulated": false,
+            "epsilon": 1.0,
+            "sigma": 1.0,
+            "maximum distance": 2.5
+        },
         "Inter 12": {
+            "name": "LJ",
+            "tabulated": false,
+            "epsilon": 1.0,
+            "sigma": 1.0,
+            "maximum distance": 2.5
+        },
+        "Inter 13": {
+            "name": "LJ",
+            "tabulated": false,
+            "epsilon": 1.0,
+            "sigma": 1.0,
+            "maximum distance": 2.5
+        },
+        "Inter 23": {
             "name": "LJ",
             "tabulated": false,
             "epsilon": 1.0,
@@ -71,6 +105,11 @@
             }
         },
         "Component 2": {
+            "Small Move": {
+                "delta": [0.3, 0.3, 0.3]
+            }
+        },
+        "Component 3": {
             "Small Move": {
                 "delta": [0.3, 0.3, 0.3]
             }
