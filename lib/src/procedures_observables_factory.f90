@@ -1,7 +1,7 @@
 module procedures_observables_factory
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use types_mixture_wrapper, only: Mixture_Wrapper
+use types_component_wrapper, only: Component_Wrapper
 use module_changes_success, only: Concrete_Changes_Counter, Concrete_Changes_Success, &
     counter_reset => Concrete_Changes_Counter_reset
 use types_observables_wrapper, only: Concrete_Components_Energies, Observables_Wrapper
@@ -30,16 +30,16 @@ end interface observables_destroy
 
 contains
 
-    pure subroutine create_all(observables, mixture)
+    pure subroutine create_all(observables, components)
         type(Observables_Wrapper), intent(out) :: observables
-        type(Mixture_Wrapper), intent(in) :: mixture
+        type(Component_Wrapper), intent(in) :: components(:)
 
-        call observables_create(observables%changes_counters, size(mixture%components))
-        call observables_create(observables%changes_sucesses, size(mixture%components))
-        call observables_create(observables%short_energies, size(mixture%components))
-        call observables_create(observables%walls_energies, size(mixture%components))
-        call observables_create(observables%long_energies, size(mixture%components))
-        call observables_create(observables%field_energies, size(mixture%components))
+        call observables_create(observables%changes_counters, size(components))
+        call observables_create(observables%changes_sucesses, size(components))
+        call observables_create(observables%short_energies, size(components))
+        call observables_create(observables%walls_energies, size(components))
+        call observables_create(observables%long_energies, size(components))
+        call observables_create(observables%field_energies, size(components))
     end subroutine create_all
 
     pure subroutine destroy_all(observables)

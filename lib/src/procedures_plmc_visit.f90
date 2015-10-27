@@ -67,7 +67,7 @@ contains
     end subroutine visit_walls
 
     subroutine visit_short(energies, short_interactions, components)
-        type(Concrete_Components_Energies), intent(out) :: energies(:)
+        type(Concrete_Components_Energies), intent(inout) :: energies(:)
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
         type(Component_Wrapper), intent(in) :: components(:)
 
@@ -126,7 +126,7 @@ contains
     end subroutine visit_short_inter
 
     pure subroutine visit_long(energies, long_interactions, components)
-        type(Concrete_Components_Energies), intent(out) :: energies(:)
+        type(Concrete_Components_Energies), intent(inout) :: energies(:)
         type(Long_Interactions_Wrapper), intent(in) :: long_interactions
         type(Component_Wrapper), intent(in) :: components(:)
 
@@ -140,7 +140,7 @@ contains
     end subroutine visit_long
 
     pure subroutine visit_long_real(energies, long_interactions, components)
-        type(Concrete_Components_Energies), intent(out) :: energies(:)
+        type(Concrete_Components_Energies), intent(inout) :: energies(:)
         type(Long_Interactions_Wrapper), intent(in) :: long_interactions
         type(Component_Wrapper), intent(in) :: components(:)
 

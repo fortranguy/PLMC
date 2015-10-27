@@ -36,11 +36,12 @@ implicit none
     call plmc_create(environment, input_data)
     call plmc_create(mixture, environment, input_data)
     call plmc_create(short_interactions, environment, mixture, input_data)
-    stop
     call plmc_create(long_interactions, environment, mixture, input_data)
     call plmc_set_num_steps(input_data)
     call plmc_create(changes, environment%periodic_box, mixture%components, input_data)
-    call plmc_create(writers, mixture, short_interactions, long_interactions, changes, input_data)
+    call plmc_create(observables, mixture%components)
+    call plmc_create(writers, mixture%components, short_interactions, long_interactions, changes, &
+        input_data)
     call plmc_create(metropolis, environment, changes)
     call input_data%destroy()
 
@@ -71,6 +72,7 @@ implicit none
     call plmc_propagator_destroy()
     call plmc_destroy(metropolis)
     call plmc_destroy(writers)
+    call plmc_destroy(observables)
     call plmc_destroy(changes)
     call plmc_destroy(long_interactions)
     call plmc_destroy(short_interactions)

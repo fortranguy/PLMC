@@ -1,7 +1,7 @@
 module procedures_plmc_factory
 
 use data_wrappers_prefix, only:environment_prefix, mixture_prefix, changes_prefix, &
-    short_interactions_prefix, long_interactions_prefix
+    short_interactions_prefix, long_interactions_prefix, writers_prefix
 use json_module, only: json_file, json_initialize
 use procedures_command_arguments, only: set_filename_from_argument
 use class_periodic_box, only: Abstract_Periodic_Box
@@ -21,6 +21,7 @@ use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
 use procedures_changes_factory, only: changes_create, changes_destroy
 use types_observables_wrapper, only: Observables_Wrapper
+use procedures_observables_factory, only: observables_create, observables_destroy
 use types_writers_wrapper, only: Writers_Wrapper
 use procedures_writers_factory, only: writers_create, writers_destroy
 use types_metropolis_wrapper, only: Metropolis_Wrapper
@@ -42,9 +43,10 @@ end interface plmc_load
 interface plmc_create
     module procedure :: create_environment
     module procedure :: create_mixture
-    module procedure :: create_changes
     module procedure :: create_short_interactions
     module procedure :: create_long_interactions
+    module procedure :: create_changes
+    module procedure :: create_observables
     module procedure :: create_writers
     module procedure :: create_metropolis
 end interface plmc_create
@@ -58,9 +60,10 @@ end interface plmc_set
 interface plmc_destroy
     module procedure :: destroy_metropolis
     module procedure :: destroy_writers
+    module procedure :: destroy_observables
+    module procedure :: destroy_changes
     module procedure :: destroy_long_interactions
     module procedure :: destroy_short_interactions
-    module procedure :: destroy_changes
     module procedure :: destroy_mixture
     module procedure :: destroy_environment
 end interface plmc_destroy
@@ -152,17 +155,30 @@ contains
         call changes_destroy(changes)
     end subroutine destroy_changes
 
-    subroutine create_writers(writers, mixture, short_interactions, long_interactions, changes, &
+    subroutine create_observables(observables, components)
+        type(Observables_Wrapper), intent(out) :: observables
+        type(Component_Wrapper), intent(in) :: components(:)
+
+        call observables_create(observables, components)
+    end subroutine create_observables
+
+    subroutine destroy_observables(observables)
+        type(Observables_Wrapper), intent(out) :: observables
+
+        call observables_destroy(observables)
+    end subroutine destroy_observables
+
+    subroutine create_writers(writers, components, short_interactions, long_interactions, changes, &
         input_data)
         type(Writers_Wrapper), intent(out) :: writers
-        type(Mixture_Wrapper), intent(in) :: mixture
+        type(Component_Wrapper), intent(in) :: components(:)
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
         type(Long_Interactions_Wrapper), intent(in) :: long_interactions
         type(Changes_Wrapper), intent(in) :: changes
         type(json_file), intent(inout) :: input_data
 
-        call writers_create(writers, mixture%components, short_interactions%components_pairs, &
-            long_interactions%real_pairs, changes%components, input_data, changes_prefix)
+        call writers_create(writers, components, short_interactions%components_pairs, &
+            long_interactions%real_pairs, changes%components, input_data, writers_prefix)
     end subroutine create_writers
 
     subroutine destroy_writers(writers)

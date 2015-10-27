@@ -21,20 +21,59 @@
         "number of components": 2,
         "Component 1": {
             "number": 10,
-            "initial positions": "positions_1.in" 
+            "minimum distance": 1.1,
+            "is dipolar": false,
+            "can exchange": false,
+            "initial positions": "positions_1.in"
         },
         "Component 2": {
             "number": 10,
+            "minimum distance": 2.2,
+            "is dipolar": false,
+            "can exchange": false,
             "initial positions": "positions_2.in"
-        },
-        "Inter 11": {
-            "minimum distance": 1.1
         },
         "Inter 12": {
             "minimum distance": 1.2
+        }
+    },
+    "Short Interactions": {
+        "Component 1": {
+            "name": "null",
+            "tabulated": false
         },
-        "Inter 22": {
-            "minimum distance": 2.2
+        "Component 2": {
+            "name": "null",
+            "tabulated": false
+        },
+        "Inter 12": {
+            "name": "null",
+            "tabulated": false
+        },
+        "Cells": {
+            "data structure": "list"
+        }
+    },
+    "Changes": {
+        "number of tuning steps": 0,
+        "Component 1": {
+            "Small Move": {
+                "delta": [0.3, 0.3, 0.3]
+            }
+        },
+        "Component 2": {
+            "Small Move": {
+                "delta": [0.3, 0.3, 0.3]
+            }
+        }
+    },
+    "Monte Carlo": {
+        "number of steps": 100
+    },
+    "Output": {
+        "Coordinates": {
+            "write": true,
+            "period": 10
         }
     }
 }
