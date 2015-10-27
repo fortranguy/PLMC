@@ -161,7 +161,7 @@ contains
         character(len=:), allocatable :: data_field
         logical :: data_found, write_coordinates
         type(Concrete_Coordinates_Writer_Selector) :: selector_i
-        integer :: period, i_component
+        integer :: i_component
         type(Concrete_Number_to_String) :: string
 
         data_field = prefix//"Coordinates.write"
@@ -170,30 +170,31 @@ contains
 
         if (write_coordinates) then
             data_field = prefix//"Coordinates.period"
-            call input_data%get(data_field, period, data_found)
+            call input_data%get(data_field, selector_i%period, data_found)
             call check_data_found(data_field, data_found)
-            selector_i%period = period
-            do i_component = 1, size(components)
-                associate(positions_i => mixture_components(i_component)%positions, &
-                    orientations_i => mixture_components(i_component)%orientations)
-                    selector_i%write_positions = component_has_positions(positions_i)
-                    selector_i%write_orientations = component_has_orientations(orientations_i)
-                    call writers_create(components(i_component)%coordinates, "coordinates_"//&
-                        string%get(i_component), positions_i, orientations_i, selector_i)
-                end associate
-            end do
+            deallocate(data_field)
         end if
-        deallocate(data_field)
+        do i_component = 1, size(components)
+            associate(positions_i => mixture_components(i_component)%positions, &
+                orientations_i => mixture_components(i_component)%orientations)
+                selector_i%write_positions = component_has_positions(positions_i)
+                selector_i%write_orientations = component_has_orientations(orientations_i)
+                call writers_create(components(i_component)%coordinates, "coordinates_"//&
+                    string%get(i_component), positions_i, orientations_i, selector_i, &
+                    write_coordinates)
+            end associate
+        end do
     end subroutine create_components_coordinates
 
     subroutine create_coordinates(coordinates, basename, positions, orientations, &
-        selector)
+        selector, write_coordinates)
         class(Abstract_Coordinates_Writer), allocatable, intent(out) :: coordinates
         character(len=*), intent(in) :: basename
         class(Abstract_Component_Coordinates), intent(in) :: positions, orientations
         type(Concrete_Coordinates_Writer_Selector), intent(in) :: selector
+        logical, intent(in) :: write_coordinates
 
-        if (selector%write_positions) then
+        if (write_coordinates) then
             allocate(Concrete_Coordinates_Writer :: coordinates)
         else
             allocate(Null_Coordinates_Writer :: coordinates)
