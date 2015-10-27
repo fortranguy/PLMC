@@ -171,7 +171,7 @@ contains
         class(Abstract_One_Particle_Change), intent(in) :: this
         type(Observables_Wrapper), intent(inout) :: observables
 
-        integer :: i_actor, i_spectator, i_component
+        integer :: i_actor, i_component
         logical :: success
         real(DP) :: walls_difference, field_energy
         real(DP) :: short_differences(size(observables%short_energies)), &
@@ -240,7 +240,6 @@ contains
         integer, intent(in) :: i_actor
 
         real(DP) :: walls_new, walls_old
-        integer :: i_component
 
         call this%environment%walls_potential%visit(overlap, walls_new, new%position, &
             this%short_interactions%wall_pairs(i_actor)%pair_potential)
@@ -282,18 +281,14 @@ contains
         integer, intent(in) :: i_actor
 
         real(DP), dimension(size(long_differences)) :: long_new_real, long_old_real
-        integer :: i_component, i_exclude, j_pair, i_pair
+        integer :: i_component, i_exclude
 
-        do i_component = 1, size(this%long_interactions%real_components)
+        do i_component = 1, size(this%long_interactions%real_components, 1)
             i_exclude = merge(new%i, 0, i_component == i_actor)
-            j_pair = maxval([i_actor, i_component])
-            i_pair = minval([i_actor, i_component])
-            call this%long_interactions%real_components(i_component)%real_component%&
-                visit(long_new_real(i_component), this%long_interactions%real_pairs(j_pair)%&
-                with_components(i_pair)%real_pair, new, i_exclude)
-            call this%long_interactions%real_components(i_component)%real_component%&
-                visit(long_old_real(i_component), this%long_interactions%real_pairs(j_pair)%&
-                with_components(i_pair)%real_pair, old, i_exclude)
+            call this%long_interactions%real_components(i_component, i_actor)%real_component%&
+                visit(long_new_real(i_component), new, i_exclude)
+            call this%long_interactions%real_components(i_component, i_actor)%real_component%&
+                visit(long_old_real(i_component), old, i_exclude)
         end do
         long_differences = long_new_real - long_old_real
     end subroutine Abstract_One_Particle_Change_visit_long

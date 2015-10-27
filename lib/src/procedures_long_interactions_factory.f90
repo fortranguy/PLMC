@@ -21,7 +21,7 @@ use class_ewald_real_visitor, only: Abstract_Ewald_Real_Visitor, Concrete_Ewald_
     Null_Ewald_Real_Visitor
 use types_long_interactions_wrapper, only: Ewald_Real_Pair_Wrapper, Ewald_Real_Pairs_Wrapper, &
     Ewald_Real_Component_Wrapper, Long_Interactions_Wrapper
-use procedures_property_inquirers, only: component_is_dipolar
+use procedures_property_inquirers, only: component_is_dipolar, components_interact
 
 implicit none
 
@@ -66,12 +66,12 @@ contains
         call long_interactions_set(are_dipolar, mixture%components)
         call long_interactions_create(long_interactions%real_visitor, environment%periodic_box, &
             any(are_dipolar))
-        call long_interactions_create(long_interactions%real_components, environment%periodic_box, &
-            mixture%components, are_dipolar)
         call long_interactions_set(alpha, environment%periodic_box, any(are_dipolar), input_data, &
             prefix)
         call long_interactions_create(long_interactions%real_pairs, environment%periodic_box, &
             mixture%components_min_distances, are_dipolar, alpha, input_data, prefix//"Real.")
+        call long_interactions_create(long_interactions%real_components, environment%periodic_box, &
+            mixture%components, long_interactions%real_pairs)
     end subroutine create_all
 
     subroutine destroy_all(long_interactions)
@@ -104,42 +104,60 @@ contains
         end if
     end subroutine desrtroy_real_visitor
 
-    subroutine create_real_components(real_components, periodic_box, components, are_dipolar)
-        type(Ewald_Real_Component_Wrapper), allocatable, intent(out) :: real_components(:)
+    subroutine create_real_components(real_components, periodic_box, components, real_pairs)
+        type(Ewald_Real_Component_Wrapper), allocatable, intent(out) :: real_components(:, :)
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(Component_Wrapper), intent(in) :: components(:)
-        logical, intent(in) :: are_dipolar(:)
+        type(Ewald_Real_Pairs_Wrapper), intent(in) :: real_pairs(:)
 
-        integer :: i_component
+        integer :: j_component, i_component
+        integer :: j_pair, i_pair
 
-        allocate(real_components(size(are_dipolar)))
-        do i_component = 1, size(real_components)
-            call long_interactions_create(real_components(i_component)%real_component, &
-                periodic_box, components(i_component)%positions, components(i_component)%&
-                dipolar_moments, are_dipolar(i_component))
+        allocate(real_components(size(real_pairs), size(real_pairs)))
+
+        do j_component = 1, size(real_components, 2)
+            do i_component = 1, size(real_components, 1)
+                j_pair = maxval([j_component, i_component])
+                i_pair = minval([j_component, i_component])
+                associate (pair_ij => real_pairs(j_pair)%with_components(i_pair)%real_pair)
+                    call long_interactions_create(real_components(i_component, j_component)%&
+                        real_component, periodic_box, components(i_component)%positions, &
+                        components(i_component)%dipolar_moments, pair_ij)
+                end associate
+            end do
         end do
     end subroutine create_real_components
 
     subroutine destroy_real_components(real_components)
-        type(Ewald_Real_Component_Wrapper), allocatable, intent(inout) :: real_components(:)
+        type(Ewald_Real_Component_Wrapper), allocatable, intent(inout) :: real_components(:, :)
 
-        if (allocated(real_components)) deallocate(real_components)
+        integer :: j_component, i_component
+
+        if (allocated(real_components)) then
+            do j_component = size(real_components, 2), 1, -1
+                do i_component = size(real_components, 1), 1, -1
+                    call long_interactions_destroy(real_components(i_component, j_component)%&
+                        real_component)
+                end do
+            end do
+            deallocate(real_components)
+        end if
     end subroutine destroy_real_components
 
     subroutine create_real_component(real_component, periodic_box, positions, dipolar_moments, &
-        is_dipolar)
+        real_pair)
         class(Abstract_Ewald_Real_Component), allocatable, intent(out) :: real_component
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Component_Coordinates), intent(in) :: positions
         class(Abstract_Component_Dipolar_Moments), intent(in) :: dipolar_moments
-        logical, intent(in) :: is_dipolar
+        class(Abstract_Ewald_Real_Pair), intent(in) :: real_pair
 
-        if (is_dipolar) then
+        if (components_interact(real_pair)) then
             allocate(Concrete_Ewald_Real_Component :: real_component)
         else
             allocate(Null_Ewald_Real_Component :: real_component)
         end if
-        call real_component%construct(periodic_box, positions, dipolar_moments)
+        call real_component%construct(periodic_box, positions, dipolar_moments, real_pair)
     end subroutine create_real_component
 
     subroutine destroy_real_component(real_component)
@@ -167,8 +185,7 @@ contains
         do j_component = 1, size(are_dipolar)
             allocate(real_pairs(j_component)%with_components(j_component))
             do i_component = 1, size(real_pairs(j_component)%with_components)
-                associate (interact_ij => are_dipolar(i_component) .and. &
-                    are_dipolar(j_component), &
+                associate (interact_ij => are_dipolar(i_component) .and. are_dipolar(j_component), &
                     min_distance => min_distances(j_component)%with_components(i_component)%&
                     min_distance)
                     call long_interactions_create(real_pairs(j_component)%&

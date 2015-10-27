@@ -193,9 +193,9 @@ contains
             do i_component = 1, size(cells, 1)
                 j_pair = maxval([j_component, i_component])
                 i_pair = minval([j_component, i_component])
-                associate (pair_potential => pairs(j_pair)%with_components(i_pair)%pair_potential)
+                associate (pair_ij => pairs(j_pair)%with_components(i_pair)%pair_potential)
                     call cells(i_component, j_component)%construct(list, periodic_box, &
-                        components(i_component)%positions, pair_potential)
+                        components(i_component)%positions, pair_ij)
                 end associate
             end do
         end do
@@ -206,12 +206,14 @@ contains
 
         integer :: j_component, i_component
 
-        do j_component = size(cells, 2), 1, -1
-            do i_component = size(cells, 1), 1, -1
-                call cells(i_component, j_component)%destroy()
+        if (allocated(cells)) then
+            do j_component = size(cells, 2), 1, -1
+                do i_component = size(cells, 1), 1, -1
+                    call cells(i_component, j_component)%destroy()
+                end do
             end do
-        end do
-        deallocate(cells)
+            deallocate(cells)
+        end if
     end subroutine destroy_components_cells
 
     subroutine allocate_list(list, interact, input_data, prefix)

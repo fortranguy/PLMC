@@ -23,7 +23,7 @@ private
 
     type, public :: Long_Interactions_Wrapper
         class(Abstract_Ewald_Real_Visitor), allocatable :: real_visitor
-        type(Ewald_Real_Component_Wrapper), allocatable :: real_components(:)
+        type(Ewald_Real_Component_Wrapper), allocatable :: real_components(:, :)
         type(Ewald_Real_Pairs_Wrapper), allocatable :: real_pairs(:)
     end type Long_Interactions_Wrapper
 

@@ -18,7 +18,7 @@ private
 
     type, abstract, public :: Abstract_Changes_Success_Writer
     private
-        integer :: unit
+        integer :: file_unit
         type(Concrete_Number_to_String) :: string_move
         class(Abstract_Number_to_String), allocatable :: string_rotation
         class(Abstract_Number_to_String), allocatable :: string_exchange
@@ -51,7 +51,7 @@ contains
         character(len=:), allocatable :: legend
 
         call check_string_not_empty("Abstract_Changes_Success_Writer_construct: filename", filename)
-        open(newunit=this%unit, recl=max_line_length, file=filename, action="write")
+        open(newunit=this%file_unit, recl=max_line_length, file=filename, action="write")
         legend = "# i_step    moves"
         if (changes_selector%write_rotations) then
             allocate(Concrete_Number_to_String :: this%string_rotation)
@@ -65,7 +65,7 @@ contains
         else
             allocate(Null_Number_to_String :: this%string_exchange)
         end if
-        write(this%unit, *) legend
+        write(this%file_unit, *) legend
         deallocate(legend)
     end subroutine Abstract_Changes_Success_Writer_construct
 
@@ -74,7 +74,7 @@ contains
 
         if (allocated(this%string_exchange)) deallocate(this%string_exchange)
         if (allocated(this%string_rotation)) deallocate(this%string_rotation)
-        close(this%unit)
+        close(this%file_unit)
     end subroutine Abstract_Changes_Success_Writer_destroy
 
     subroutine Abstract_Changes_Success_Writer_write(this, i_step, changes_success)
@@ -82,7 +82,7 @@ contains
         integer, intent(in) :: i_step
         type(Concrete_Changes_Success), intent(in) :: changes_success
 
-        write(this%unit, *) i_step, this%string_move%get(changes_success%move)//&
+        write(this%file_unit, *) i_step, this%string_move%get(changes_success%move)//&
             this%string_rotation%get(changes_success%rotation)
     end subroutine Abstract_Changes_Success_Writer_write
 

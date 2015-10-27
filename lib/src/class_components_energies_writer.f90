@@ -25,7 +25,7 @@ private
 
     type, abstract, public :: Abstract_Components_Energies_Writer
     private
-        integer :: unit
+        integer :: file_unit
         type(Strings_Wrapper), allocatable :: strings(:)
     contains
         procedure :: construct => Abstract_Components_Energies_Writer_construct
@@ -57,13 +57,15 @@ contains
         type(Concrete_Components_Energies_Selector), intent(in) :: selector(:)
 
         character(len=:), allocatable :: legend
+        integer :: file_unit !strange gfortran behaviour: otherwise writes to output_unit.
 
         call check_string_not_empty("Abstract_Components_Energies_Writer_construct: filename", &
             filename)
-        open(newunit=this%unit, recl=max_line_length, file=filename, action="write")
+        open(newunit=file_unit, recl=max_line_length, file=filename, action="write")
         legend = "# i_step"
         call this%allocate_string(legend, selector)
-        write(this%unit, *) legend
+        this%file_unit = file_unit
+        write(this%file_unit, *) legend
         deallocate(legend)
     end subroutine Abstract_Components_Energies_Writer_construct
 
@@ -104,7 +106,7 @@ contains
             end do
             deallocate(this%strings)
         end if
-        close(this%unit)
+        close(this%file_unit)
     end subroutine Abstract_Components_Energies_Writer_destroy
 
     subroutine Abstract_Components_Energies_Writer_write(this, i_step, components_energies)
@@ -125,7 +127,7 @@ contains
                 end associate
             end do
         end do
-        write(this%unit, *) i_step, energies
+        write(this%file_unit, *) i_step, energies
         deallocate(energies)
     end subroutine Abstract_Components_Energies_Writer_write
 
