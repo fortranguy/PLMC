@@ -331,8 +331,8 @@ contains
         integer :: i_component
 
         call this%components(i_actor)%positions%set(new%i, new%position)
-        do i_component = 1, size(this%short_interactions%components_cells)
-            call this%short_interactions%components_cells(i_component, i_actor)%move(old, new)
+        do i_component = 1, size(this%short_interactions%components_cells, 1)
+            call this%short_interactions%components_cells(i_actor, i_component)%move(old, new)
         end do
     end subroutine Concrete_One_Particle_Move_update_actor
 

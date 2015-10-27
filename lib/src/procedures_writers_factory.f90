@@ -224,7 +224,7 @@ contains
                 rotated_orientations)
             selector_i%write_exchanges = component_can_exchange(changes(i_component)%exchange)
             call writers_create(components(i_component)%changes, selector_i, "changes_"//&
-                string%get(i_component))
+                string%get(i_component)//".out")
         end do
     end subroutine create_components_changes
 

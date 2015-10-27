@@ -134,9 +134,8 @@ contains
 
         call create_components_energies_nodes(real_energies)
         call visit_long_real(real_energies, long_interactions, components)
-        call destroy_components_energies_nodes(real_energies)
-
         energies = real_energies
+        call destroy_components_energies_nodes(real_energies)
     end subroutine visit_long
 
     pure subroutine visit_long_real(energies, long_interactions, components)

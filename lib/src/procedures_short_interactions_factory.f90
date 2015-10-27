@@ -195,7 +195,7 @@ contains
                 i_pair = minval([j_component, i_component])
                 associate (pair_potential => pairs(j_pair)%with_components(i_pair)%pair_potential)
                     call cells(i_component, j_component)%construct(list, periodic_box, &
-                        components(j_component)%positions, pair_potential)
+                        components(i_component)%positions, pair_potential)
                 end associate
             end do
         end do
