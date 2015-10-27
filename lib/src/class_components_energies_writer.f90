@@ -102,6 +102,7 @@ contains
                     deallocate(this%strings(i_component)%with_component)
                 end if
             end do
+            deallocate(this%strings)
         end if
         close(this%unit)
     end subroutine Abstract_Components_Energies_Writer_destroy
