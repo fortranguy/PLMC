@@ -32,8 +32,6 @@ private
 
 contains
 
-!implementation Concrete_Moved_Positions
-
     subroutine Concrete_Moved_Positions_construct(this, periodic_box, positions, delta, &
         tuning_parameters)
         class(Concrete_Moved_Positions), intent(out) :: this
@@ -89,7 +87,5 @@ contains
         moved_position = this%positions%get(i_particle) + (rand - 0.5_DP) * this%delta
         moved_position = this%periodic_box%folded(moved_position)
     end function Concrete_Moved_Positions_get
-
-!end implementation Concrete_Moved_Positions
 
 end module class_moved_positions

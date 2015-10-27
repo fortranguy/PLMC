@@ -68,7 +68,7 @@ contains
             any(are_dipolar))
         call long_interactions_create(long_interactions%real_components, environment%periodic_box, &
             mixture%components, are_dipolar)
-        call long_interactions_set(alpha, environment%periodic_box,  any(are_dipolar), input_data, &
+        call long_interactions_set(alpha, environment%periodic_box, any(are_dipolar), input_data, &
             prefix)
         call long_interactions_create(long_interactions%real_pairs, environment%periodic_box, &
             mixture%components_min_distances, are_dipolar, alpha, input_data, prefix//"Real.")
