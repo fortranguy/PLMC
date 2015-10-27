@@ -12,28 +12,23 @@ import JSON
 json = JSON
 import RandomOrientations
 ro = RandomOrientations
-import ParticlesType
-pt = ParticlesType
+import PLMC
 
 if size(ARGS, 1) == 0
     error("Please provide a .json file.")
 end
 input_data = json.parsefile(ARGS[1]; dicttype=Dict, use_mmap=true)
-
-if input_data["Mixture"]["Component 1"]["exists"] && input_data["Mixture"]["Component 1"]["is dipolar"]
-    particles_1 = pt.Particles(0, zeros(3, 1))
-    particles_1.num_particles = input_data["Mixture"]["Component 1"]["number"]
-    particles_1.orientations = ro.randomOrientations(particles_1.num_particles)
-    output_file = "orientations_1.in"
-    writedlm(output_file, particles_1.orientations)
-    println("Positions written in ", output_file)
+num_components = input_data["Mixture"]["number of components"]
+if num_components == 0
+    exit(0)
 end
-
-if input_data["Mixture"]["Component 2"]["exists"] && input_data["Mixture"]["Component 2"]["is dipolar"]
-    particles_2 = pt.Particles(0, zeros(3, 1))
-    particles_2.num_particles = input_data["Mixture"]["Component 2"]["number"]
-    particles_2.orientations = ro.randomOrientations(particles_2.num_particles)
-    output_file = "orientations_2.in"
-    writedlm(output_file, particles_2.orientations)
-    println("Positions written in ", output_file)
+for i_component = 1:num_components
+    if (input_data["Mixture"]["Component $(i_component)"]["is dipolar"])
+        component_i = PLMC.Component(input_data["Mixture"]["Component $(i_component)"]["number"],
+                                     zeros(3, 1), zeros(3, 1))
+        component_i.orientations = ro.randomOrientations(component_i.num)
+        output_file = input_data["Mixture"]["Component $(i_component)"]["initial orientations"]
+        writedlm(output_file, component_i.orientations)
+        println("Orientations written in ", output_file)
+    end
 end

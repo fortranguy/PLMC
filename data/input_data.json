@@ -22,23 +22,29 @@
         "Component 1": {
             "number": 250,
             "minimum distance": 0.8,
-            "is dipolar": false,
+            "is dipolar": true,
+            "moment norm": 1.0,
             "can exchange": false,
-            "initial positions": "positions_1.in"
+            "initial positions": "positions_1.in",
+            "initial orientations": "orientations_1.in"
         },
         "Component 2": {
             "number": 250,
             "minimum distance": 0.8,
-            "is dipolar": false,
+            "is dipolar": true,
+            "moment norm": 1.0,
             "can exchange": false,
-            "initial positions": "positions_2.in"
+            "initial positions": "positions_2.in",
+            "initial orientations": "orientations_2.in"
         },
         "Component 3": {
             "number": 250,
             "minimum distance": 0.8,
-            "is dipolar": false,
+            "is dipolar": true,
+            "moment norm": 1.0,
             "can exchange": false,
-            "initial positions": "positions_3.in"
+            "initial positions": "positions_3.in",
+            "initial orientations": "orientations_3.in"
         },
         "Inter 12": {
             "minimum distance": 0.8
@@ -97,21 +103,37 @@
             "data structure": "list"
         }
     },
+    "Long Interactions": {
+        "alpha times box edge": 7.0,
+        "Real": {
+            "tabulated": false,
+            "max distance over box edge": 0.5
+        }
+    },
     "Changes": {
         "number of tuning steps": 0,
         "Component 1": {
             "Small Move": {
                 "delta": [0.3, 0.3, 0.3]
+            },
+            "Small Rotation": {
+                "delta": 1.0
             }
         },
         "Component 2": {
             "Small Move": {
                 "delta": [0.3, 0.3, 0.3]
+            },
+            "Small Rotation": {
+                "delta": 1.0
             }
         },
         "Component 3": {
             "Small Move": {
                 "delta": [0.3, 0.3, 0.3]
+            },
+            "Small Rotation": {
+                "delta": 1.0
             }
         }
     },
