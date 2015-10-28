@@ -1,4 +1,4 @@
-program test_canonical
+program plmc
 
 use, intrinsic :: iso_fortran_env, only: output_unit
 use json_module, only: json_file
@@ -12,8 +12,7 @@ use procedures_plmc_factory, only: plmc_load, plmc_create, plmc_set, plmc_destro
 use procedures_plmc_visit, only: plmc_visit
 use types_observables_wrapper, only: Observables_Wrapper
 use types_writers_wrapper, only: Writers_Wrapper
-use procedures_plmc_propagation, only: plmc_propagator_construct, plmc_propagator_destroy, &
-    plmc_propagator_try
+use class_plmc_propagator, only: Abstract_PLMC_Propagator
 use procedures_plmc_write, only: plmc_write
 use module_plmc_iterations, only: num_tuning_steps, num_steps, plmc_set_num_steps
 
@@ -27,6 +26,7 @@ implicit none
     type(Observables_Wrapper) :: observables
     type(Writers_Wrapper) :: writers
     type(Metropolis_Wrapper) :: metropolis
+    class(Abstract_PLMC_Propagator), allocatable :: plmc_propagator
 
     type(json_file) :: input_data
     integer :: i_step
@@ -39,20 +39,20 @@ implicit none
     call plmc_create(long_interactions, environment, mixture, input_data)
     call plmc_set_num_steps(input_data)
     call plmc_create(changes, environment%periodic_box, mixture%components, input_data)
+    call plmc_create(metropolis, environment, changes)
     call plmc_create(observables, mixture%components)
     call plmc_create(writers, mixture%components, short_interactions, long_interactions, changes, &
         input_data)
-    call plmc_create(metropolis, environment, changes)
     call input_data%destroy()
 
     call plmc_set(metropolis, mixture%components, short_interactions, long_interactions)
-    call plmc_propagator_construct(metropolis)
+    call plmc_create(plmc_propagator, metropolis)
     call plmc_visit(observables, short_interactions, long_interactions, mixture)
     call plmc_write(-num_tuning_steps, writers, observables)
 
     if (num_tuning_steps > 0) write(output_unit, *) "Trying to tune changes..."
     do i_step = -num_tuning_steps + 1, 0
-        call plmc_propagator_try(metropolis, observables)
+        call plmc_propagator%try(observables)
         call plmc_set(observables%changes_sucesses, observables%changes_counters)
         call plmc_set(changes_tuned, i_step, changes%components, observables%changes_sucesses)
         call plmc_write(i_step, writers, observables)
@@ -60,7 +60,7 @@ implicit none
     end do
     write(output_unit, *) "Iterations start."
     do i_step = 1, num_steps
-        call plmc_propagator_try(metropolis, observables)
+        call plmc_propagator%try(observables)
         call plmc_set(observables%changes_sucesses, observables%changes_counters)
         call plmc_write(i_step, writers, observables)
     end do
@@ -69,14 +69,14 @@ implicit none
     call plmc_visit(observables, short_interactions, long_interactions, mixture)
     call plmc_write(i_step-1, writers, observables)
 
-    call plmc_propagator_destroy()
-    call plmc_destroy(metropolis)
     call plmc_destroy(writers)
     call plmc_destroy(observables)
+    call plmc_destroy(plmc_propagator)
+    call plmc_destroy(metropolis)
     call plmc_destroy(changes)
     call plmc_destroy(long_interactions)
     call plmc_destroy(short_interactions)
     call plmc_destroy(mixture)
     call plmc_destroy(environment)
 
-end program test_canonical
+end program plmc

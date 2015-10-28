@@ -119,6 +119,9 @@
 		<Unit filename="lib/src/class_periodic_box.f90">
 			<Option weight="2" />
 		</Unit>
+		<Unit filename="lib/src/class_plmc_propagator.f90">
+			<Option weight="11" />
+		</Unit>
 		<Unit filename="lib/src/class_potential_expression.f90">
 			<Option weight="2" />
 		</Unit>
@@ -170,7 +173,9 @@
 		<Unit filename="lib/src/module_plmc_iterations.f90">
 			<Option weight="2" />
 		</Unit>
-		<Unit filename="lib/src/procedures_changes_component_factory.f90" />
+		<Unit filename="lib/src/procedures_changes_component_factory.f90">
+			<Option weight="9" />
+		</Unit>
 		<Unit filename="lib/src/procedures_changes_factory.f90">
 			<Option weight="10" />
 		</Unit>
@@ -208,7 +213,7 @@
 			<Option weight="10" />
 		</Unit>
 		<Unit filename="lib/src/procedures_observables_factory.f90">
-			<Option weight="8" />
+			<Option weight="7" />
 		</Unit>
 		<Unit filename="lib/src/procedures_parallelepiped_domain_macro.f90">
 			<Option weight="4" />
@@ -216,11 +221,8 @@
 		<Unit filename="lib/src/procedures_plmc_factory.f90">
 			<Option weight="12" />
 		</Unit>
-		<Unit filename="lib/src/procedures_plmc_propagation.f90">
-			<Option weight="11" />
-		</Unit>
 		<Unit filename="lib/src/procedures_plmc_visit.f90">
-			<Option weight="9" />
+			<Option weight="8" />
 		</Unit>
 		<Unit filename="lib/src/procedures_plmc_write.f90">
 			<Option weight="6" />
@@ -237,7 +239,9 @@
 		<Unit filename="lib/src/procedures_writers_factory.f90">
 			<Option weight="9" />
 		</Unit>
-		<Unit filename="lib/src/types_changes_component_wrapper.f90" />
+		<Unit filename="lib/src/types_changes_component_wrapper.f90">
+			<Option weight="8" />
+		</Unit>
 		<Unit filename="lib/src/types_changes_wrapper.f90">
 			<Option weight="9" />
 		</Unit>

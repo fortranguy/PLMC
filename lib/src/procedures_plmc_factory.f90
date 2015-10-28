@@ -25,6 +25,7 @@ use procedures_observables_factory, only: observables_create, observables_destro
 use types_writers_wrapper, only: Writers_Wrapper
 use procedures_writers_factory, only: writers_create, writers_destroy
 use types_metropolis_wrapper, only: Metropolis_Wrapper
+use class_plmc_propagator, only: Abstract_PLMC_Propagator, Concrete_PLMC_Propagator
 use procedures_metropolis_factory, only: metropolis_create, metropolis_set, &
     metropolis_destroy
 use class_tower_sampler, only: Abstract_Tower_Sampler, Concrete_Tower_Sampler, Null_Tower_Sampler
@@ -49,6 +50,7 @@ interface plmc_create
     module procedure :: create_observables
     module procedure :: create_writers
     module procedure :: create_metropolis
+    module procedure :: create_propagator
 end interface plmc_create
 
 interface plmc_set
@@ -58,6 +60,7 @@ interface plmc_set
 end interface plmc_set
 
 interface plmc_destroy
+    module procedure :: destroy_propagator
     module procedure :: destroy_metropolis
     module procedure :: destroy_writers
     module procedure :: destroy_observables
@@ -200,6 +203,25 @@ contains
 
         call metropolis_destroy(metropolis)
     end subroutine destroy_metropolis
+
+    subroutine create_propagator(propagator, metropolis)
+        class(Abstract_PLMC_Propagator), allocatable, intent(out) :: propagator
+        type(Metropolis_Wrapper), intent(in) :: metropolis
+
+        allocate(Concrete_PLMC_Propagator :: propagator)
+        call propagator%add(metropolis%one_particle_move)
+        call propagator%add(metropolis%one_particle_rotation)
+        call propagator%construct()
+    end subroutine create_propagator
+
+    subroutine destroy_propagator(propagator)
+        class(Abstract_PLMC_Propagator), allocatable, intent(inout) :: propagator
+
+        if (allocated(propagator)) then
+            call propagator%destroy()
+            deallocate(propagator)
+        end if
+    end subroutine destroy_propagator
 
     subroutine set_metropolis(metropolis, components, short_interactions, long_interactions)
         type(Metropolis_Wrapper), intent(inout) :: metropolis
