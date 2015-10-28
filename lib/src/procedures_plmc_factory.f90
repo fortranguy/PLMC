@@ -24,10 +24,12 @@ use types_observables_wrapper, only: Observables_Wrapper
 use procedures_observables_factory, only: observables_create, observables_destroy
 use types_writers_wrapper, only: Writers_Wrapper
 use procedures_writers_factory, only: writers_create, writers_destroy
-use types_metropolis_algorithms_wrapper, only: Metropolis_Algorithms_Wrapper, Metropolis_Algorithm_Pointer
-use class_plmc_propagator, only: Abstract_PLMC_Propagator, Concrete_PLMC_Propagator
-use procedures_metropolis_algorithms_factory, only: metropolis_algorithms_create, metropolis_algorithms_set, &
-    metropolis_algorithms_destroy
+use types_metropolis_algorithms_wrapper, only: Metropolis_Algorithms_Wrapper, &
+    Metropolis_Algorithm_Pointer
+use class_plmc_propagator, only: Abstract_PLMC_Propagator, Concrete_PLMC_Propagator, &
+    Null_PLMC_Propagator
+use procedures_metropolis_algorithms_factory, only: metropolis_algorithms_create, &
+    metropolis_algorithms_set, metropolis_algorithms_destroy
 use class_tower_sampler, only: Abstract_Tower_Sampler, Concrete_Tower_Sampler, Null_Tower_Sampler
 use procedures_property_inquirers, only: use_walls, component_is_dipolar, &
     component_can_change
@@ -47,23 +49,23 @@ interface plmc_create
     module procedure :: create_short_interactions
     module procedure :: create_long_interactions
     module procedure :: create_changes
-    module procedure :: create_observables
-    module procedure :: create_writers
     module procedure :: create_metropolis
     module procedure :: create_propagator
+    module procedure :: create_observables
+    module procedure :: create_writers
 end interface plmc_create
 
 interface plmc_set
     module procedure :: set_metropolis
-    module procedure :: tune_changes
+    module procedure :: tune_changes_components
     module procedure :: set_success_and_reset_counter
 end interface plmc_set
 
 interface plmc_destroy
-    module procedure :: destroy_propagator
-    module procedure :: destroy_metropolis
     module procedure :: destroy_writers
     module procedure :: destroy_observables
+    module procedure :: destroy_propagator
+    module procedure :: destroy_metropolis
     module procedure :: destroy_changes
     module procedure :: destroy_long_interactions
     module procedure :: destroy_short_interactions
@@ -152,11 +154,89 @@ contains
         call changes_create(changes, periodic_box, components, input_data, changes_prefix)
     end subroutine create_changes
 
+    subroutine tune_changes_components(tuned, i_step, components, changes_sucesses)
+        logical, intent(out) :: tuned
+        integer, intent(in) :: i_step
+        type(Changes_Component_Wrapper), intent(inout) :: components(:)
+        type(Concrete_Changes_Success), intent(in) :: changes_sucesses(:)
+
+        logical :: move_tuned(size(components)), rotation_tuned(size(components))
+        integer :: i_component
+
+        do i_component = 1, size(components)
+            call components(i_component)%move_tuner%tune(move_tuned(i_component), i_step, &
+                changes_sucesses(i_component)%move)
+            call components(i_component)%rotation_tuner%tune(rotation_tuned(i_component), i_step, &
+                changes_sucesses(i_component)%rotation)
+        end do
+        tuned = all(move_tuned) .and. all(rotation_tuned)
+    end subroutine tune_changes_components
+
     subroutine destroy_changes(changes)
         type(Changes_Wrapper), intent(inout) :: changes
 
         call changes_destroy(changes)
     end subroutine destroy_changes
+
+    subroutine create_metropolis(metropolis, environment, changes)
+        type(Metropolis_Algorithms_Wrapper), intent(out) :: metropolis
+        type(Environment_Wrapper), intent(in) :: environment
+        type(Changes_Wrapper), intent(in) :: changes
+
+        call metropolis_algorithms_create(metropolis, environment, changes%components)
+    end subroutine create_metropolis
+
+    subroutine set_metropolis(metropolis, components, short_interactions, long_interactions)
+        type(Metropolis_Algorithms_Wrapper), intent(inout) :: metropolis
+        type(Component_Wrapper), intent(in) :: components(:)
+        type(Short_Interactions_Wrapper), intent(in) :: short_interactions
+        type(Long_Interactions_Wrapper), intent(in) :: long_interactions
+
+        call metropolis_algorithms_set(metropolis, components, short_interactions, &
+            long_interactions)
+    end subroutine set_metropolis
+
+    subroutine destroy_metropolis(metropolis)
+        type(Metropolis_Algorithms_Wrapper), intent(inout) :: metropolis
+
+        call metropolis_algorithms_destroy(metropolis)
+    end subroutine destroy_metropolis
+
+    subroutine create_propagator(propagator, metropolis)
+        class(Abstract_PLMC_Propagator), allocatable, intent(out) :: propagator
+        type(Metropolis_Algorithms_Wrapper), target, intent(in) :: metropolis
+
+        class(Abstract_Tower_Sampler), allocatable :: selector
+        type(Metropolis_Algorithm_Pointer) :: metropolis_algorithms(2)
+        integer :: nums_choices(size(metropolis_algorithms))
+        integer :: i_choice
+
+        metropolis_algorithms(1)%algorithm => metropolis%one_particle_move
+        metropolis_algorithms(2)%algorithm => metropolis%one_particle_rotation
+        do i_choice = 1, size(nums_choices)
+            nums_choices(i_choice) = metropolis_algorithms(i_choice)%algorithm%get_num_choices()
+        end do
+        if (sum(nums_choices) == 0) then
+            allocate(Null_Tower_Sampler :: selector)
+            allocate(Null_PLMC_Propagator :: propagator)
+        else
+            allocate(Concrete_Tower_Sampler :: selector)
+            allocate(Concrete_PLMC_Propagator :: propagator)
+        end if
+        call selector%construct(nums_choices)
+        call propagator%construct(metropolis_algorithms, selector)
+        call selector%destroy()
+        deallocate(selector)
+    end subroutine create_propagator
+
+    subroutine destroy_propagator(propagator)
+        class(Abstract_PLMC_Propagator), allocatable, intent(inout) :: propagator
+
+        if (allocated(propagator)) then
+            call propagator%destroy()
+            deallocate(propagator)
+        end if
+    end subroutine destroy_propagator
 
     subroutine create_observables(observables, components)
         type(Observables_Wrapper), intent(out) :: observables
@@ -164,6 +244,14 @@ contains
 
         call observables_create(observables, components)
     end subroutine create_observables
+
+    subroutine set_success_and_reset_counter(changes_sucesses, changes_counters)
+        type(Concrete_Changes_Success), intent(out) :: changes_sucesses(:)
+        type(Concrete_Changes_Counter), intent(inout) :: changes_counters(:)
+
+        call set_success(changes_sucesses, changes_counters)
+        call reset_counter(changes_counters)
+    end subroutine set_success_and_reset_counter
 
     subroutine destroy_observables(observables)
         type(Observables_Wrapper), intent(out) :: observables
@@ -189,75 +277,5 @@ contains
 
         call writers_destroy(writers)
     end subroutine destroy_writers
-
-    subroutine create_metropolis(metropolis, environment, changes)
-        type(Metropolis_Algorithms_Wrapper), intent(out) :: metropolis
-        type(Environment_Wrapper), intent(in) :: environment
-        type(Changes_Wrapper), intent(in) :: changes
-
-        call metropolis_algorithms_create(metropolis, environment, changes%components)
-    end subroutine create_metropolis
-
-    subroutine destroy_metropolis(metropolis)
-        type(Metropolis_Algorithms_Wrapper), intent(inout) :: metropolis
-
-        call metropolis_algorithms_destroy(metropolis)
-    end subroutine destroy_metropolis
-
-    subroutine create_propagator(propagator, metropolis)
-        class(Abstract_PLMC_Propagator), allocatable, intent(out) :: propagator
-        type(Metropolis_Algorithms_Wrapper), target, intent(in) :: metropolis
-
-        type(Metropolis_Algorithm_Pointer) :: metropolis_algorithms(2)
-
-        metropolis_algorithms(1)%algorithm => metropolis%one_particle_move
-        metropolis_algorithms(2)%algorithm => metropolis%one_particle_rotation
-        allocate(Concrete_PLMC_Propagator :: propagator)
-        call propagator%construct(metropolis_algorithms)
-    end subroutine create_propagator
-
-    subroutine destroy_propagator(propagator)
-        class(Abstract_PLMC_Propagator), allocatable, intent(inout) :: propagator
-
-        if (allocated(propagator)) then
-            call propagator%destroy()
-            deallocate(propagator)
-        end if
-    end subroutine destroy_propagator
-
-    subroutine set_metropolis(metropolis, components, short_interactions, long_interactions)
-        type(Metropolis_Algorithms_Wrapper), intent(inout) :: metropolis
-        type(Component_Wrapper), intent(in) :: components(:)
-        type(Short_Interactions_Wrapper), intent(in) :: short_interactions
-        type(Long_Interactions_Wrapper), intent(in) :: long_interactions
-
-        call metropolis_algorithms_set(metropolis, components, short_interactions, long_interactions)
-    end subroutine set_metropolis
-
-    subroutine tune_changes(tuned, i_step, components_changes, changes_sucesses)
-        logical, intent(out) :: tuned
-        integer, intent(in) :: i_step
-        type(Changes_Component_Wrapper), intent(inout) :: components_changes(:)
-        type(Concrete_Changes_Success), intent(in) :: changes_sucesses(:)
-
-        logical :: move_tuned(size(components_changes)), rotation_tuned(size(components_changes))
-        integer :: i_component
-
-        do i_component = 1, size(components_changes)
-            call components_changes(i_component)%move_tuner%tune(move_tuned(i_component), i_step, &
-                changes_sucesses(i_component)%move)
-            call components_changes(i_component)%rotation_tuner%tune(rotation_tuned(i_component), &
-                i_step, changes_sucesses(i_component)%rotation)
-        end do
-        tuned = all(move_tuned) .and. all(rotation_tuned)
-    end subroutine tune_changes
-
-    subroutine set_success_and_reset_counter(changes_sucesses, changes_counters)
-        type(Concrete_Changes_Success), intent(out) :: changes_sucesses(:)
-        type(Concrete_Changes_Counter), intent(inout) :: changes_counters(:)
-
-        call set_success(changes_sucesses, changes_counters)
-        call reset_counter(changes_counters)
-    end subroutine set_success_and_reset_counter
 
 end module procedures_plmc_factory

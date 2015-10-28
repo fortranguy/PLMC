@@ -25,15 +25,12 @@ private
         type(Short_Interactions_Wrapper), pointer :: short_interactions => null()
         type(Long_Interactions_Wrapper), pointer :: long_interactions => null()
         class(Abstract_Tower_Sampler), allocatable :: selector
-        integer :: num_choices
     contains
         procedure :: construct => Abstract_One_Particle_Change_construct
         procedure :: destroy => Abstract_One_Particle_Change_destroy
         procedure :: try => Abstract_One_Particle_Change_try
         procedure :: set_candidates => Abstract_One_Particle_Change_set_candidates
         procedure :: get_num_choices => Abstract_One_Particle_Change_get_num_choices
-        procedure(Abstract_One_Particle_Change_construct_selector), private, deferred :: &
-            construct_selector
         procedure, private :: test_metropolis => Abstract_One_Particle_Change_test_metropolis
         procedure(Abstract_One_Particle_Change_define_change), private, deferred :: define_change
         procedure, private :: visit_walls => Abstract_One_Particle_Change_visit_walls
@@ -47,11 +44,6 @@ private
     end type Abstract_One_Particle_Change
 
     abstract interface
-
-        subroutine Abstract_One_Particle_Change_construct_selector(this)
-        import :: Abstract_One_Particle_Change
-            class(Abstract_One_Particle_Change), intent(inout) :: this
-        end subroutine Abstract_One_Particle_Change_construct_selector
 
         subroutine Abstract_One_Particle_Change_define_change(this, new, old, i_actor)
         import :: Concrete_Temporary_Particle, Abstract_One_Particle_Change
@@ -81,7 +73,6 @@ private
 
     type, extends(Abstract_One_Particle_Change), public :: Concrete_One_Particle_Move
     contains
-        procedure, private :: construct_selector => Concrete_One_Particle_Move_construct_selector
         procedure, private :: define_change => Concrete_One_Particle_Move_define_change
         procedure, private :: update_actor => Concrete_One_Particle_Move_update_actor
         procedure, private, nopass :: increment_hits => Concrete_One_Particle_Move_increment_hits
@@ -91,8 +82,6 @@ private
 
     type, extends(Abstract_One_Particle_Change), public :: Concrete_One_Particle_Rotation
     contains
-        procedure, private :: construct_selector => &
-            Concrete_One_Particle_Rotation_construct_selector
         procedure, private :: visit_walls => Concrete_One_Particle_Rotation_visit_walls
         procedure, private :: visit_short => Concrete_One_Particle_Rotation_visit_short
         procedure, private :: define_change => Concrete_One_Particle_Rotation_define_change
@@ -110,7 +99,6 @@ private
         procedure :: set_candidates => Null_One_Particle_Change_set_candidates
         procedure :: get_num_choices => Null_One_Particle_Change_get_num_choices
         procedure :: try => Null_One_Particle_Change_try
-        procedure, private :: construct_selector => Null_One_Particle_Change_construct_selector
         procedure, private :: test_metropolis => Null_One_Particle_Change_test_metropolis
         procedure, private :: define_change => Null_One_Particle_Change_define_change
         procedure, private :: update_actor => Null_One_Particle_Change_update_actor
@@ -131,7 +119,7 @@ contains
 
         this%environment => environment
         this%changes => changes
-        allocate(this%selector, mold=selector)
+        allocate(this%selector, source=selector)
     end subroutine Abstract_One_Particle_Change_construct
 
     subroutine Abstract_One_Particle_Change_destroy(this)
@@ -156,7 +144,6 @@ contains
         type(Long_Interactions_Wrapper), target, intent(in) :: long_interactions
 
         this%components => components
-        call this%construct_selector()
         this%short_interactions => short_interactions
         this%long_interactions => long_interactions
     end subroutine Abstract_One_Particle_Change_set_candidates
@@ -164,7 +151,7 @@ contains
     pure integer function Abstract_One_Particle_Change_get_num_choices(this) result(num_choices)
         class(Abstract_One_Particle_Change), intent(in) :: this
 
-        num_choices = this%num_choices
+        num_choices = this%selector%get_num_choices()
     end function Abstract_One_Particle_Change_get_num_choices
 
     subroutine Abstract_One_Particle_Change_try(this, observables)
@@ -297,19 +284,6 @@ contains
 
 !implementation Concrete_One_Particle_Move
 
-    subroutine Concrete_One_Particle_Move_construct_selector(this)
-        class(Concrete_One_Particle_Move), intent(inout) :: this
-
-        integer :: nums_candidates(size(this%components))
-
-        integer :: i_component
-        do i_component = 1, size(nums_candidates)
-            nums_candidates(i_component) = this%components(i_component)%positions%get_num()
-        end do
-        this%num_choices = sum(nums_candidates)
-        call this%selector%construct(nums_candidates)
-    end subroutine Concrete_One_Particle_Move_construct_selector
-
     subroutine Concrete_One_Particle_Move_define_change(this, new, old, i_actor)
         class(Concrete_One_Particle_Move), intent(in) :: this
         type(Concrete_Temporary_Particle), intent(out) :: new, old
@@ -363,7 +337,6 @@ contains
         do i_component = 1, size(nums_candidates)
             nums_candidates(i_component) = this%components(i_component)%orientations%get_num()
         end do
-        this%num_choices = sum(nums_candidates)
         call this%selector%construct(nums_candidates)
     end subroutine Concrete_One_Particle_Rotation_construct_selector
 
@@ -446,10 +419,6 @@ contains
         type(Short_Interactions_Wrapper), target, intent(in) :: short_interactions
         type(Long_Interactions_Wrapper), target, intent(in) :: long_interactions
     end subroutine Null_One_Particle_Change_set_candidates
-
-    subroutine Null_One_Particle_Change_construct_selector(this)
-        class(Null_One_Particle_Change), intent(inout) :: this
-    end subroutine Null_One_Particle_Change_construct_selector
 
     pure integer function Null_One_Particle_Change_get_num_choices(this) result(num_choices)
         class(Null_One_Particle_Change), intent(in) :: this

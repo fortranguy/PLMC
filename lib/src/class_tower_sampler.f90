@@ -12,10 +12,12 @@ private
         logical :: unique_candidate
         integer :: i_unique_candidate
         integer :: num_candidates
+        integer :: num_choices
         real(DP), allocatable :: limits(:)
     contains
         procedure :: construct => Abstract_Tower_Sampler_construct
         procedure :: destroy => Abstract_Tower_Sampler_destroy
+        procedure :: get_num_choices => Abstract_Tower_Sampler_get_num_choices
         procedure :: get => Abstract_Tower_Sampler_get
     end type Abstract_Tower_Sampler
 
@@ -27,6 +29,7 @@ private
     contains
         procedure :: construct => Null_Tower_Sampler_construct
         procedure :: destroy => Null_Tower_Sampler_destroy
+        procedure :: get_num_choices => Null_Tower_Sampler_get_num_choices
         procedure :: get => Null_Tower_Sampler_get
     end type Null_Tower_Sampler
 
@@ -44,6 +47,7 @@ contains
         call check_positive("Abstract_Tower_Sampler_construct", "sum(nums_candidates)", &
             sum(nums_candidates))
         this%num_candidates = size(nums_candidates)
+        this%num_choices = sum(nums_candidates)
         if (count(nums_candidates > 0) == 1) then
             this%unique_candidate = .true.
             this%i_unique_candidate = maxloc(nums_candidates, 1)
@@ -52,7 +56,7 @@ contains
             allocate(cumulative_weight(this%num_candidates))
             do i_candidate = 1, this%num_candidates
                 cumulative_weight(i_candidate) = real(sum(nums_candidates(1:i_candidate)), DP) / &
-                    real(sum(nums_candidates), DP)
+                    real(this%num_choices, DP)
             end do
             allocate(this%limits(this%num_candidates + 1))
             this%limits(1) = 0._DP
@@ -66,6 +70,12 @@ contains
 
         if (allocated(this%limits)) deallocate(this%limits)
     end subroutine Abstract_Tower_Sampler_destroy
+
+    integer pure function Abstract_Tower_Sampler_get_num_choices(this) result(num_choices)
+        class(Abstract_Tower_Sampler), intent(in) :: this
+
+        num_choices = this%num_choices
+    end function Abstract_Tower_Sampler_get_num_choices
 
     integer function Abstract_Tower_Sampler_get(this) result(i_random_candidate)
         class(Abstract_Tower_Sampler), intent(in) :: this
@@ -98,6 +108,11 @@ contains
     subroutine Null_Tower_Sampler_destroy(this)
         class(Null_Tower_Sampler), intent(inout) :: this
     end subroutine Null_Tower_Sampler_destroy
+
+    integer pure function Null_Tower_Sampler_get_num_choices(this) result(num_choices)
+        class(Null_Tower_Sampler), intent(in) :: this
+        num_choices = 0
+    end function Null_Tower_Sampler_get_num_choices
 
     integer function Null_Tower_Sampler_get(this) result(i_random_candidate)
         class(Null_Tower_Sampler), intent(in) :: this

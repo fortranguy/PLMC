@@ -27,6 +27,7 @@ private
         procedure :: destroy => Concrete_Moved_Positions_destroy
         procedure :: increase_delta => Concrete_Moved_Positions_increase_delta
         procedure :: decrease_delta => Concrete_Moved_Positions_decrease_delta
+        procedure :: get_num => Concrete_Moved_Positions_get_num
         procedure :: get => Concrete_Moved_Positions_get
     end type Concrete_Moved_Positions
 
@@ -75,6 +76,12 @@ contains
 
         this%delta = this%delta / this%current_increase_factor
     end subroutine Concrete_Moved_Positions_decrease_delta
+
+    pure integer function Concrete_Moved_Positions_get_num(this) result(num_positions)
+        class(Concrete_Moved_Positions), intent(in) :: this
+
+        num_positions = this%positions%get_num()
+    end function Concrete_Moved_Positions_get_num
 
     function Concrete_Moved_Positions_get(this, i_particle) result(moved_position)
         real(DP) :: moved_position(num_dimensions)

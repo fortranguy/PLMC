@@ -42,19 +42,28 @@ contains
             environment, changes)
     end subroutine metropolis_algorithms_create_all
 
+    subroutine metropolis_algorithms_destroy_all(metropolis_algoritms)
+        type(Metropolis_Algorithms_Wrapper), intent(inout) :: metropolis_algoritms
+
+        call destroy_change(metropolis_algoritms%one_particle_rotation)
+        call destroy_change(metropolis_algoritms%one_particle_move)
+    end subroutine metropolis_algorithms_destroy_all
+
     subroutine metropolis_algorithms_create_move(one_particle_move, environment, changes)
         class(Abstract_One_Particle_Change), allocatable, intent(out) :: one_particle_move
         type(Environment_Wrapper), intent(in) :: environment
         type(Changes_Component_Wrapper), intent(in) :: changes(:)
 
         class(Abstract_Tower_Sampler), allocatable :: selector
+        integer :: nums_candidates(size(changes))
         logical :: some_components_can_move
         integer :: i_component
 
         some_components_can_move = .false.
-        do i_component = 1, size(changes)
+        do i_component = 1, size(nums_candidates)
             some_components_can_move = some_components_can_move .or. &
                 component_can_move(changes(i_component)%moved_positions)
+            nums_candidates(i_component) = changes(i_component)%moved_positions%get_num()
         end do
         if (some_components_can_move) then
             allocate(Concrete_Tower_Sampler :: selector)
@@ -63,9 +72,50 @@ contains
             allocate(Null_Tower_Sampler :: selector)
             allocate(Null_One_Particle_Change :: one_particle_move)
         end if
+        call selector%construct(nums_candidates)
         call one_particle_move%construct(environment, changes, selector)
+        call selector%destroy()
         deallocate(selector)
     end subroutine metropolis_algorithms_create_move
+
+    subroutine metropolis_algorithms_create_rotation(one_particle_rotation, environment, &
+        changes)
+        class(Abstract_One_Particle_Change), allocatable, intent(out) :: one_particle_rotation
+        type(Environment_Wrapper), intent(in) :: environment
+        type(Changes_Component_Wrapper), intent(in) :: changes(:)
+
+        class(Abstract_Tower_Sampler), allocatable :: selector
+        integer :: nums_candidates(size(changes))
+        logical :: some_components_can_rotate
+        integer :: i_component
+
+        some_components_can_rotate = .false.
+        do i_component = 1, size(changes)
+            some_components_can_rotate = some_components_can_rotate .or. &
+                component_can_rotate(changes(i_component)%rotated_orientations)
+            nums_candidates(i_component) = changes(i_component)%rotated_orientations%get_num()
+        end do
+        if (some_components_can_rotate) then
+            allocate(Concrete_Tower_Sampler :: selector)
+            allocate(Concrete_One_Particle_Rotation :: one_particle_rotation)
+        else
+            allocate(Null_Tower_Sampler :: selector)
+            allocate(Null_One_Particle_Change :: one_particle_rotation)
+        end if
+        call selector%construct(nums_candidates)
+        call one_particle_rotation%construct(environment, changes, selector)
+        call selector%destroy()
+        deallocate(selector)
+    end subroutine metropolis_algorithms_create_rotation
+
+    subroutine destroy_change(one_particle_change)
+        class(Abstract_One_Particle_Change), allocatable, intent(inout) :: one_particle_change
+
+        if (allocated(one_particle_change)) then
+            call one_particle_change%destroy()
+            deallocate(one_particle_change)
+        end if
+    end subroutine destroy_change
 
     subroutine metropolis_algorithms_set_all(metropolis_algoritms, components, short_interactions, &
         long_interactions)
@@ -79,47 +129,5 @@ contains
         call metropolis_algoritms%one_particle_rotation%set_candidates(components, &
             short_interactions, long_interactions)
     end subroutine metropolis_algorithms_set_all
-
-    subroutine metropolis_algorithms_create_rotation(one_particle_rotation, environment, &
-        changes)
-        class(Abstract_One_Particle_Change), allocatable, intent(out) :: one_particle_rotation
-        type(Environment_Wrapper), intent(in) :: environment
-        type(Changes_Component_Wrapper), intent(in) :: changes(:)
-
-        class(Abstract_Tower_Sampler), allocatable :: selector
-        logical :: some_components_can_rotate
-        integer :: i_component
-
-        some_components_can_rotate = .false.
-        do i_component = 1, size(changes)
-            some_components_can_rotate = some_components_can_rotate .or. &
-                component_can_rotate(changes(i_component)%rotated_orientations)
-        end do
-        if (some_components_can_rotate) then
-            allocate(Concrete_Tower_Sampler :: selector)
-            allocate(Concrete_One_Particle_Rotation :: one_particle_rotation)
-        else
-            allocate(Null_Tower_Sampler :: selector)
-            allocate(Null_One_Particle_Change :: one_particle_rotation)
-        end if
-        call one_particle_rotation%construct(environment, changes, selector)
-        deallocate(selector)
-    end subroutine metropolis_algorithms_create_rotation
-
-    subroutine metropolis_algorithms_destroy_all(metropolis_algoritms)
-        type(Metropolis_Algorithms_Wrapper), intent(inout) :: metropolis_algoritms
-
-        call destroy_and_deallocate_one_particle_change(metropolis_algoritms%one_particle_rotation)
-        call destroy_and_deallocate_one_particle_change(metropolis_algoritms%one_particle_move)
-    end subroutine metropolis_algorithms_destroy_all
-
-    subroutine destroy_and_deallocate_one_particle_change(one_particle_change)
-        class(Abstract_One_Particle_Change), allocatable, intent(inout) :: one_particle_change
-
-        if (allocated(one_particle_change)) then
-            call one_particle_change%destroy()
-            deallocate(one_particle_change)
-        end if
-    end subroutine destroy_and_deallocate_one_particle_change
 
 end module procedures_metropolis_algorithms_factory
