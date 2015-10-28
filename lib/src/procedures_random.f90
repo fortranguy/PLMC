@@ -2,7 +2,7 @@ module procedures_random
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
-use procedures_checks, only: check_positive
+use procedures_checks, only: check_positive, check_3d_array
 use class_normal_random_number, only: Normal_Random_Number
 
 implicit none
@@ -49,6 +49,8 @@ contains
         type(Normal_Random_Number) :: gauss
         real(DP) :: amplitude, rand
         integer :: i_dimension
+
+        call check_3d_array("markov_orientation", "orientation", orientation)
 
         do i_dimension = 1, num_dimensions
             rotation(i_dimension) = gauss%get()
