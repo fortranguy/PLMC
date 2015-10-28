@@ -18,24 +18,30 @@ private
         procedure :: construct => Abstract_Parallelepiped_Domain_construct
         procedure, private :: is_boxed => Abstract_Parallelepiped_Domain_is_boxed
         procedure :: destroy => Abstract_Parallelepiped_Domain_destroy
-        procedure :: get_volume => Abstract_Parallelepiped_Domain_get_volume
-        procedure :: get_vertices => Abstract_Parallelepiped_Domain_get_vertices
+        procedure :: get_origin => Abstract_Parallelepiped_Domain_get_origin
+        procedure :: get_size => Abstract_Parallelepiped_Domain_get_size
         procedure :: is_inside => Abstract_Parallelepiped_Domain_is_inside
-        procedure :: random_position => Abstract_Parallelepiped_Domain_random_position
     end type Abstract_Parallelepiped_Domain
 
     type, extends(Abstract_Parallelepiped_Domain), public :: Concrete_Parallelepiped_Domain
 
     end type Concrete_Parallelepiped_Domain
 
+    type, extends(Abstract_Parallelepiped_Domain), public :: Concrete_Box_Domain
+    contains
+        procedure :: construct => Concrete_Box_Domain_construct
+        procedure :: get_origin => Concrete_Box_Domain_get_origin
+        procedure :: get_size => Concrete_Box_Domain_get_size
+        procedure :: is_inside => Concrete_Box_Domain_is_inside
+    end type Concrete_Box_Domain
+
     type, extends(Abstract_Parallelepiped_Domain), public :: Null_Parallelepiped_Domain
     contains
         procedure :: construct => Null_Parallelepiped_Domain_construct
         procedure :: destroy => Null_Parallelepiped_Domain_destroy
-        procedure :: get_volume => Null_Parallelepiped_Domain_get_volume
-        procedure :: get_vertices => Null_Parallelepiped_Domain_get_vertices
+        procedure :: get_origin => Null_Parallelepiped_Domain_get_origin
+        procedure :: get_size => Null_Parallelepiped_Domain_get_size
         procedure :: is_inside => Null_Parallelepiped_Domain_is_inside
-        procedure :: random_position => Null_Parallelepiped_Domain_random_position
     end type Null_Parallelepiped_Domain
 
 contains
@@ -71,26 +77,25 @@ contains
                    .and. point_is_inside(box_origin, this%periodic_box%get_size(), corner_plus)
     end function Abstract_Parallelepiped_Domain_is_boxed
 
-
     subroutine Abstract_Parallelepiped_Domain_destroy(this)
         class(Abstract_Parallelepiped_Domain), intent(inout) :: this
 
         this%periodic_box => null()
     end subroutine Abstract_Parallelepiped_Domain_destroy
 
-    pure real(DP) function Abstract_Parallelepiped_Domain_get_volume(this) result(volume)
+    pure function Abstract_Parallelepiped_Domain_get_origin(this) result(origin)
         class(Abstract_Parallelepiped_Domain), intent(in) :: this
+        real(DP) :: origin(num_dimensions)
 
-        volume = product(this%size)
-    end function Abstract_Parallelepiped_Domain_get_volume
+        origin = this%origin
+    end function Abstract_Parallelepiped_Domain_get_origin
 
-    pure function Abstract_Parallelepiped_Domain_get_vertices(this, i_vertex) result(vertices)
-        real(DP) :: vertices(num_dimensions)
+    pure function Abstract_Parallelepiped_Domain_get_size(this) result(size)
         class(Abstract_Parallelepiped_Domain), intent(in) :: this
-        integer, intent(in) :: i_vertex(num_dimensions)
+        real(DP) :: size(num_dimensions)
 
-        vertices = this%origin + this%size * (real(i_vertex, DP) - 1.5_DP)
-    end function Abstract_Parallelepiped_Domain_get_vertices
+        size = this%size
+    end function Abstract_Parallelepiped_Domain_get_size
 
     pure logical function Abstract_Parallelepiped_Domain_is_inside(this, position) result(is_inside)
         class(Abstract_Parallelepiped_Domain), intent(in) :: this
@@ -110,18 +115,40 @@ contains
         point_is_inside = all(0._DP <= point_from_corner .and. point_from_corner <= box_size)
     end function point_is_inside
 
-    function Abstract_Parallelepiped_Domain_random_position(this) &
-        result(random_position)
-        class(Abstract_Parallelepiped_Domain), intent(in) :: this
-        real(DP), dimension(num_dimensions) :: random_position
-
-        real(DP) :: rand_3d(num_dimensions)
-
-        call random_number(rand_3d)
-        random_position = this%origin + (rand_3d - 0.5_DP) * this%size
-    end function Abstract_Parallelepiped_Domain_random_position
-
 !end implementation Abstract_Parallelepiped_Domain
+
+!implementation Concrete_Box_Domain
+
+    subroutine Concrete_Box_Domain_construct(this, periodic_box, origin, size)
+        class(Concrete_Box_Domain), intent(out) :: this
+        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+        real(DP), intent(in) :: origin(:), size(:)
+
+        this%periodic_box => periodic_box
+    end subroutine Concrete_Box_Domain_construct
+
+    pure function Concrete_Box_Domain_get_origin(this) result(origin)
+        class(Concrete_Box_Domain), intent(in) :: this
+        real(DP) :: origin(num_dimensions)
+
+        origin = 0._DP
+    end function Concrete_Box_Domain_get_origin
+
+    pure function Concrete_Box_Domain_get_size(this) result(size)
+        class(Concrete_Box_Domain), intent(in) :: this
+        real(DP) :: size(num_dimensions)
+
+        size = this%periodic_box%get_size()
+    end function Concrete_Box_Domain_get_size
+
+    pure logical function Concrete_Box_Domain_is_inside(this, position) result(is_inside)
+        class(Concrete_Box_Domain), intent(in) :: this
+        real(DP), intent(in) :: position(:)
+
+        is_inside = .true.
+    end function Concrete_Box_Domain_is_inside
+
+!end implementation Concrete_Box_Domain
 
 !implementation Null_Parallelepiped_Domain
 
@@ -135,18 +162,19 @@ contains
         class(Null_Parallelepiped_Domain), intent(inout) :: this
     end subroutine Null_Parallelepiped_Domain_destroy
 
-    pure function Null_Parallelepiped_Domain_get_volume(this) result(volume)
+    pure function Null_Parallelepiped_Domain_get_origin(this) result(origin)
         class(Null_Parallelepiped_Domain), intent(in) :: this
-        real(DP) :: volume
-        volume = 0._DP
-    end function Null_Parallelepiped_Domain_get_volume
+        real(DP) :: origin(num_dimensions)
 
-    pure function Null_Parallelepiped_Domain_get_vertices(this, i_vertex) result(vertices)
-        real(DP) :: vertices(num_dimensions)
+        origin = this%origin
+    end function Null_Parallelepiped_Domain_get_origin
+
+    pure function Null_Parallelepiped_Domain_get_size(this) result(size)
         class(Null_Parallelepiped_Domain), intent(in) :: this
-        integer, intent(in) :: i_vertex(num_dimensions)
-        vertices = 0._DP
-    end function Null_Parallelepiped_Domain_get_vertices
+        real(DP) :: size(num_dimensions)
+
+        size = this%size
+    end function Null_Parallelepiped_Domain_get_size
 
     pure function Null_Parallelepiped_Domain_is_inside(this, position) result(is_inside)
         class(Null_Parallelepiped_Domain), intent(in) :: this
@@ -154,13 +182,6 @@ contains
         logical :: is_inside
         is_inside = .false.
     end function Null_Parallelepiped_Domain_is_inside
-
-    function Null_Parallelepiped_Domain_random_position(this) &
-        result(random_position)
-        class(Null_Parallelepiped_Domain), intent(in) :: this
-        real(DP), dimension(num_dimensions) :: random_position
-        random_position = 0._DP
-    end function Null_Parallelepiped_Domain_random_position
 
 !end implementation Null_Parallelepiped_Domain
 

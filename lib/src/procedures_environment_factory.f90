@@ -11,7 +11,7 @@ use class_temperature, only: Abstract_Temperature, &
 use class_field_expression, only: Abstract_Field_Expression, &
     Constant_Field_Expression, Null_Field_Expression
 use class_parallelepiped_domain, only: Abstract_Parallelepiped_Domain, &
-    Concrete_Parallelepiped_Domain, Null_Parallelepiped_Domain
+    Concrete_Parallelepiped_Domain, Concrete_Box_Domain, Null_Parallelepiped_Domain
 use class_external_field, only: Abstract_External_Field, &
     Concrete_External_Field, Null_External_Field
 use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice, &
@@ -34,32 +34,32 @@ private
 public :: environment_create, environment_destroy
 
 interface environment_create
-    module procedure :: environment_create_all
-    module procedure :: allocate_and_set_periodic_box
-    module procedure :: allocate_and_set_temperature
-    module procedure :: allocate_and_set_field_expression
-    module procedure :: allocate_and_construct_parallelepiped_domain
-    module procedure :: allocate_and_construct_external_field
-    module procedure :: allocate_and_construct_reciprocal_lattice
-    module procedure :: allocate_and_set_floor_penetration
-    module procedure :: allocate_and_construct_walls_potential
+    module procedure :: create_all
+    module procedure :: create_periodic_box
+    module procedure :: create_temperature
+    module procedure :: create_field_expression
+    module procedure :: create_parallelepiped_domain
+    module procedure :: create_external_field
+    module procedure :: create_reciprocal_lattice
+    module procedure :: create_floor_penetration
+    module procedure :: create_walls_potential
 end interface environment_create
 
 interface environment_destroy
-    module procedure :: destroy_and_deallocate_walls_potential
-    module procedure :: deallocate_floor_penetration
-    module procedure :: destroy_and_deallocate_reciprocal_lattice
-    module procedure :: destroy_and_deallocate_external_field
-    module procedure :: destroy_and_deallocate_parallelepiped_domain
-    module procedure :: deallocate_field_expression
-    module procedure :: deallocate_temperature
-    module procedure :: deallocate_periodic_box
-    module procedure :: environment_destroy_all
+    module procedure :: destroy_walls_potential
+    module procedure :: destroy_floor_penetration
+    module procedure :: destroy_reciprocal_lattice
+    module procedure :: destroy_external_field
+    module procedure :: destroy_parallelepiped_domain
+    module procedure :: destroy_field_expression
+    module procedure :: destroy_temperature
+    module procedure :: destroy_periodic_box
+    module procedure :: destroy_all
 end interface environment_destroy
 
 contains
 
-    subroutine environment_create_all(environment, input_data, prefix)
+    subroutine create_all(environment, input_data, prefix)
         type(Environment_Wrapper), intent(out) :: environment
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
@@ -86,9 +86,19 @@ contains
         call environment_create(environment%walls_potential, walls_used, &
             environment%periodic_box, floor_penetration, input_data, prefix)
         call environment_destroy(floor_penetration)
-    end subroutine environment_create_all
+    end subroutine create_all
 
-    subroutine allocate_and_set_periodic_box(periodic_box, input_data, prefix)
+    subroutine destroy_all(environment)
+        type(Environment_Wrapper), intent(inout) :: environment
+
+        call environment_destroy(environment%walls_potential)
+        call environment_destroy(environment%reciprocal_lattice)
+        call environment_destroy(environment%external_field)
+        call environment_destroy(environment%temperature)
+        call environment_destroy(environment%periodic_box)
+    end subroutine destroy_all
+
+    subroutine create_periodic_box(periodic_box, input_data, prefix)
         class(Abstract_Periodic_Box), allocatable, intent(out) :: periodic_box
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
@@ -115,9 +125,15 @@ contains
         call check_data_found(data_field, data_found)
         deallocate(data_field)
         call periodic_box%set(box_size)
-    end subroutine allocate_and_set_periodic_box
+    end subroutine create_periodic_box
 
-    subroutine allocate_and_set_temperature(temperature, input_data, prefix)
+    subroutine destroy_periodic_box(periodic_box)
+        class(Abstract_Periodic_Box), allocatable, intent(inout) :: periodic_box
+
+        if (allocated(periodic_box)) deallocate(periodic_box)
+    end subroutine destroy_periodic_box
+
+    subroutine create_temperature(temperature, input_data, prefix)
         class(Abstract_Temperature), allocatable, intent(out) :: temperature
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
@@ -132,9 +148,15 @@ contains
         allocate(Concrete_Temperature :: temperature)
         call temperature%set(temperature_value)
         deallocate(data_field)
-    end subroutine allocate_and_set_temperature
+    end subroutine create_temperature
 
-    subroutine allocate_and_set_field_expression(field_expression, field_applied, input_data, &
+    subroutine destroy_temperature(temperature)
+        class(Abstract_Temperature), allocatable, intent(inout) :: temperature
+
+        if (allocated(temperature)) deallocate(temperature)
+    end subroutine destroy_temperature
+
+    subroutine create_field_expression(field_expression, field_applied, input_data, &
         prefix)
         class(Abstract_Field_Expression), allocatable, intent(out) :: field_expression
         logical, intent(in) :: field_applied
@@ -143,7 +165,7 @@ contains
 
         call allocate_field_expression(field_expression, field_applied, input_data, prefix)
         call set_field_expression(field_expression, input_data, prefix)
-    end subroutine allocate_and_set_field_expression
+    end subroutine create_field_expression
 
     subroutine allocate_field_expression(field_expression, field_applied, input_data, prefix)
         class(Abstract_Field_Expression), allocatable, intent(out) :: field_expression
@@ -192,7 +214,13 @@ contains
         if (allocated(data_field)) deallocate(data_field)
     end subroutine set_field_expression
 
-    subroutine allocate_and_construct_parallelepiped_domain(parallelepiped_domain, needed, &
+    subroutine destroy_field_expression(field_expression)
+        class(Abstract_Field_Expression), allocatable, intent(inout) :: field_expression
+
+        if (allocated(field_expression)) deallocate(field_expression)
+    end subroutine destroy_field_expression
+
+    subroutine create_parallelepiped_domain(parallelepiped_domain, needed, &
         periodic_box, input_data, prefix)
         class(Abstract_Parallelepiped_Domain), allocatable, intent(out) :: parallelepiped_domain
         logical, intent(in) :: needed
@@ -218,9 +246,11 @@ contains
                     call input_data%get(data_field, domain_size, data_found)
                     call check_data_found(data_field, data_found)
                     allocate(Concrete_Parallelepiped_Domain :: parallelepiped_domain)
+                case ("box")
+                    allocate(Concrete_Box_Domain :: parallelepiped_domain)
                 case default
                     call error_exit(domain_name//" domain_name unknown."//&
-                        "Choose: 'domain'.")
+                        "Choose between 'domain' and 'box'.")
             end select
             deallocate(domain_name)
             deallocate(data_field)
@@ -230,9 +260,16 @@ contains
         call parallelepiped_domain%construct(periodic_box, domain_origin, domain_size)
         if (allocated(domain_size)) deallocate(domain_size)
         if (allocated(domain_origin)) deallocate(domain_origin)
-    end subroutine allocate_and_construct_parallelepiped_domain
+    end subroutine create_parallelepiped_domain
 
-    subroutine allocate_and_construct_external_field(external_field, field_applied, &
+    subroutine destroy_parallelepiped_domain(parallelepiped_domain)
+        class(Abstract_Parallelepiped_Domain), allocatable, intent(inout) :: parallelepiped_domain
+
+        call parallelepiped_domain%destroy()
+        if (allocated(parallelepiped_domain)) deallocate(parallelepiped_domain)
+    end subroutine destroy_parallelepiped_domain
+
+    subroutine create_external_field(external_field, field_applied, &
         parallelepiped_domain, field_expression)
         class(Abstract_External_Field), allocatable, intent(out) :: external_field
         logical, intent(in) :: field_applied
@@ -245,9 +282,16 @@ contains
             allocate(Null_External_Field :: external_field)
         end if
         call external_field%construct(parallelepiped_domain, field_expression)
-    end subroutine allocate_and_construct_external_field
+    end subroutine create_external_field
 
-    subroutine allocate_and_construct_reciprocal_lattice(reciprocal_lattice, periodic_box, &
+    subroutine destroy_external_field(external_field)
+        class(Abstract_External_Field), allocatable, intent(inout) :: external_field
+
+        call external_field%destroy()
+        if (allocated(external_field)) deallocate(external_field)
+    end subroutine destroy_external_field
+
+    subroutine create_reciprocal_lattice(reciprocal_lattice, periodic_box, &
         input_data, prefix)
         class(Abstract_Reciprocal_Lattice), allocatable, intent(out) :: reciprocal_lattice
         type(json_file), intent(inout) :: input_data
@@ -269,9 +313,16 @@ contains
         end if
         call reciprocal_lattice%construct(periodic_box, numbers)
         if (allocated(numbers)) deallocate(numbers)
-    end subroutine allocate_and_construct_reciprocal_lattice
+    end subroutine create_reciprocal_lattice
 
-    subroutine allocate_and_set_floor_penetration(floor_penetration, walls_used, input_data, prefix)
+    subroutine destroy_reciprocal_lattice(reciprocal_lattice)
+        class(Abstract_Reciprocal_Lattice), allocatable, intent(inout) :: reciprocal_lattice
+
+        call reciprocal_lattice%destroy()
+        if (allocated(reciprocal_lattice)) deallocate(reciprocal_lattice)
+    end subroutine destroy_reciprocal_lattice
+
+    subroutine create_floor_penetration(floor_penetration, walls_used, input_data, prefix)
         class(Abstract_Floor_Penetration), allocatable, intent(out) :: floor_penetration
         logical, intent(in) :: walls_used
         type(json_file), intent(inout) :: input_data
@@ -296,10 +347,16 @@ contains
         else
             allocate(Null_Floor_Penetration :: floor_penetration)
         end if
-        !call floor_penetration%...
-    end subroutine allocate_and_set_floor_penetration
+        !call floor_penetration%construct... if needed
+    end subroutine create_floor_penetration
 
-    subroutine allocate_and_construct_walls_potential(walls_potential, walls_used, periodic_box, &
+    subroutine destroy_floor_penetration(floor_penetration)
+        class(Abstract_Floor_Penetration), allocatable, intent(inout) :: floor_penetration
+
+        if (allocated(floor_penetration)) deallocate(floor_penetration)
+    end subroutine destroy_floor_penetration
+
+    subroutine create_walls_potential(walls_potential, walls_used, periodic_box, &
         floor_penetration, input_data, prefix)
         class(Abstract_Walls_Potential), allocatable, intent(out) :: walls_potential
         logical, intent(in) :: walls_used
@@ -322,68 +379,13 @@ contains
             allocate(Null_Walls_Potential :: walls_potential)
         end if
         call walls_potential%construct(periodic_box, gap, floor_penetration)
-    end subroutine allocate_and_construct_walls_potential
+    end subroutine create_walls_potential
 
-    subroutine environment_destroy_all(environment)
-        type(Environment_Wrapper), intent(inout) :: environment
-
-        call environment_destroy(environment%walls_potential)
-        call environment_destroy(environment%reciprocal_lattice)
-        call environment_destroy(environment%external_field)
-        call environment_destroy(environment%temperature)
-        call environment_destroy(environment%periodic_box)
-    end subroutine environment_destroy_all
-
-    subroutine deallocate_periodic_box(periodic_box)
-        class(Abstract_Periodic_Box), allocatable, intent(inout) :: periodic_box
-
-        if (allocated(periodic_box)) deallocate(periodic_box)
-    end subroutine deallocate_periodic_box
-
-    subroutine deallocate_temperature(temperature)
-        class(Abstract_Temperature), allocatable, intent(inout) :: temperature
-
-        if (allocated(temperature)) deallocate(temperature)
-    end subroutine deallocate_temperature
-
-    subroutine deallocate_field_expression(field_expression)
-        class(Abstract_Field_Expression), allocatable, intent(inout) :: field_expression
-
-        if (allocated(field_expression)) deallocate(field_expression)
-    end subroutine deallocate_field_expression
-
-    subroutine destroy_and_deallocate_parallelepiped_domain(parallelepiped_domain)
-        class(Abstract_Parallelepiped_Domain), allocatable, intent(inout) :: parallelepiped_domain
-
-        call parallelepiped_domain%destroy()
-        if (allocated(parallelepiped_domain)) deallocate(parallelepiped_domain)
-    end subroutine destroy_and_deallocate_parallelepiped_domain
-
-    subroutine destroy_and_deallocate_external_field(external_field)
-        class(Abstract_External_Field), allocatable, intent(inout) :: external_field
-
-        call external_field%destroy()
-        if (allocated(external_field)) deallocate(external_field)
-    end subroutine destroy_and_deallocate_external_field
-
-    subroutine destroy_and_deallocate_reciprocal_lattice(reciprocal_lattice)
-        class(Abstract_Reciprocal_Lattice), allocatable, intent(inout) :: reciprocal_lattice
-
-        call reciprocal_lattice%destroy()
-        if (allocated(reciprocal_lattice)) deallocate(reciprocal_lattice)
-    end subroutine destroy_and_deallocate_reciprocal_lattice
-
-    subroutine deallocate_floor_penetration(floor_penetration)
-        class(Abstract_Floor_Penetration), allocatable, intent(inout) :: floor_penetration
-
-        if (allocated(floor_penetration)) deallocate(floor_penetration)
-    end subroutine deallocate_floor_penetration
-
-    subroutine destroy_and_deallocate_walls_potential(walls_potential)
+    subroutine destroy_walls_potential(walls_potential)
         class(Abstract_Walls_Potential), allocatable, intent(inout) :: walls_potential
 
         call walls_potential%destroy()
         if (allocated(walls_potential)) deallocate(walls_potential)
-    end subroutine destroy_and_deallocate_walls_potential
+    end subroutine destroy_walls_potential
 
 end module procedures_environment_factory
