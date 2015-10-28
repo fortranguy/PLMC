@@ -1,4 +1,4 @@
-module procedures_metropolis_factory
+module procedures_metropolis_algorithms_factory
 
 use json_module, only: json_file
 use types_environment_wrapper, only: Environment_Wrapper
@@ -9,40 +9,40 @@ use types_long_interactions_wrapper, only: Long_Interactions_Wrapper
 use class_tower_sampler, only: Abstract_Tower_Sampler, Concrete_Tower_Sampler, Null_Tower_Sampler
 use class_one_particle_change, only: Abstract_One_Particle_Change, &
     Concrete_One_Particle_Move, Concrete_One_Particle_Rotation, Null_One_Particle_Change
-use types_metropolis_wrapper, only: Metropolis_Wrapper
+use types_metropolis_algorithms_wrapper, only: Metropolis_Algorithms_Wrapper
 use procedures_property_inquirers, only: component_can_move, component_can_rotate
 
 implicit none
 
 private
-public :: metropolis_create, metropolis_set, metropolis_destroy
+public :: metropolis_algorithms_create, metropolis_algorithms_set, metropolis_algorithms_destroy
 
-interface metropolis_create
-    module procedure :: metropolis_create_all
-end interface metropolis_create
+interface metropolis_algorithms_create
+    module procedure :: metropolis_algorithms_create_all
+end interface metropolis_algorithms_create
 
-interface metropolis_set
-    module procedure :: metropolis_set_all
-end interface metropolis_set
+interface metropolis_algorithms_set
+    module procedure :: metropolis_algorithms_set_all
+end interface metropolis_algorithms_set
 
-interface metropolis_destroy
-    module procedure :: metropolis_destroy_all
-end interface metropolis_destroy
+interface metropolis_algorithms_destroy
+    module procedure :: metropolis_algorithms_destroy_all
+end interface metropolis_algorithms_destroy
 
 contains
 
-    subroutine metropolis_create_all(metropolis, environment, changes)
-        type(Metropolis_Wrapper), intent(out) :: metropolis
+    subroutine metropolis_algorithms_create_all(metropolis_algoritms, environment, changes)
+        type(Metropolis_Algorithms_Wrapper), intent(out) :: metropolis_algoritms
         type(Environment_Wrapper), intent(in) :: environment
         type(Changes_Component_Wrapper), intent(in) :: changes(:)
 
-        call allocate_and_construct_one_particle_move(metropolis%one_particle_move, environment, &
-            changes)
-        call allocate_and_construct_one_particle_rotation(metropolis%one_particle_rotation, &
+        call metropolis_algorithms_create_move(metropolis_algoritms%one_particle_move, &
             environment, changes)
-    end subroutine metropolis_create_all
+        call metropolis_algorithms_create_rotation(metropolis_algoritms%one_particle_rotation, &
+            environment, changes)
+    end subroutine metropolis_algorithms_create_all
 
-    subroutine allocate_and_construct_one_particle_move(one_particle_move, environment, changes)
+    subroutine metropolis_algorithms_create_move(one_particle_move, environment, changes)
         class(Abstract_One_Particle_Change), allocatable, intent(out) :: one_particle_move
         type(Environment_Wrapper), intent(in) :: environment
         type(Changes_Component_Wrapper), intent(in) :: changes(:)
@@ -65,21 +65,22 @@ contains
         end if
         call one_particle_move%construct(environment, changes, selector)
         deallocate(selector)
-    end subroutine allocate_and_construct_one_particle_move
+    end subroutine metropolis_algorithms_create_move
 
-    subroutine metropolis_set_all(metropolis, components, short_interactions, long_interactions)
-        type(Metropolis_Wrapper), intent(inout) :: metropolis
+    subroutine metropolis_algorithms_set_all(metropolis_algoritms, components, short_interactions, &
+        long_interactions)
+        type(Metropolis_Algorithms_Wrapper), intent(inout) :: metropolis_algoritms
         type(Component_Wrapper), intent(in) :: components(:)
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
         type(Long_Interactions_Wrapper), intent(in) :: long_interactions
 
-        call metropolis%one_particle_move%set_candidates(components, short_interactions, &
+        call metropolis_algoritms%one_particle_move%set_candidates(components, short_interactions, &
             long_interactions)
-        call metropolis%one_particle_rotation%set_candidates(components, short_interactions, &
-            long_interactions)
-    end subroutine metropolis_set_all
+        call metropolis_algoritms%one_particle_rotation%set_candidates(components, &
+            short_interactions, long_interactions)
+    end subroutine metropolis_algorithms_set_all
 
-    subroutine allocate_and_construct_one_particle_rotation(one_particle_rotation, environment, &
+    subroutine metropolis_algorithms_create_rotation(one_particle_rotation, environment, &
         changes)
         class(Abstract_One_Particle_Change), allocatable, intent(out) :: one_particle_rotation
         type(Environment_Wrapper), intent(in) :: environment
@@ -103,20 +104,22 @@ contains
         end if
         call one_particle_rotation%construct(environment, changes, selector)
         deallocate(selector)
-    end subroutine allocate_and_construct_one_particle_rotation
+    end subroutine metropolis_algorithms_create_rotation
 
-    subroutine metropolis_destroy_all(metropolis)
-        type(Metropolis_Wrapper), intent(inout) :: metropolis
+    subroutine metropolis_algorithms_destroy_all(metropolis_algoritms)
+        type(Metropolis_Algorithms_Wrapper), intent(inout) :: metropolis_algoritms
 
-        call destroy_and_deallocate_one_particle_change(metropolis%one_particle_rotation)
-        call destroy_and_deallocate_one_particle_change(metropolis%one_particle_move)
-    end subroutine metropolis_destroy_all
+        call destroy_and_deallocate_one_particle_change(metropolis_algoritms%one_particle_rotation)
+        call destroy_and_deallocate_one_particle_change(metropolis_algoritms%one_particle_move)
+    end subroutine metropolis_algorithms_destroy_all
 
     subroutine destroy_and_deallocate_one_particle_change(one_particle_change)
         class(Abstract_One_Particle_Change), allocatable, intent(inout) :: one_particle_change
 
-        call one_particle_change%destroy()
-        if (allocated(one_particle_change)) deallocate(one_particle_change)
+        if (allocated(one_particle_change)) then
+            call one_particle_change%destroy()
+            deallocate(one_particle_change)
+        end if
     end subroutine destroy_and_deallocate_one_particle_change
 
-end module procedures_metropolis_factory
+end module procedures_metropolis_algorithms_factory

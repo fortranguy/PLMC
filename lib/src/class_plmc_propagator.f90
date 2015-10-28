@@ -1,9 +1,9 @@
 module class_plmc_propagator
 
-use procedures_errors, only: error_exit
+use procedures_checks, only: check_positive
 use class_tower_sampler, only: Abstract_Tower_Sampler, Concrete_Tower_Sampler, Null_Tower_Sampler
 use class_metropolis_algorithm, only: Abstract_Metropolis_Algorithm
-use types_metropolis_wrapper, only: Metropolis_Algorithm_Pointer
+use types_metropolis_algorithms_wrapper, only: Metropolis_Algorithm_Pointer
 use types_observables_wrapper, only: Observables_Wrapper
 implicit none
 
@@ -11,11 +11,10 @@ private
 
     type, abstract, public :: Abstract_PLMC_Propagator
     private
-        type(Metropolis_Algorithm_Pointer), allocatable :: metropolis(:)
+        type(Metropolis_Algorithm_Pointer), allocatable :: metropolis_algorithms(:)
         class(Abstract_Tower_Sampler), allocatable :: selector
         integer :: num_choices
     contains
-        procedure :: add => Abstract_PLMC_Propagator_add
         procedure :: construct => Abstract_PLMC_Propagator_construct
         procedure :: destroy => Abstract_PLMC_Propagator_destroy
         procedure :: try => Abstract_PLMC_Propagator_try
@@ -29,28 +28,22 @@ contains
 
 !implementation Abstract_PLMC_Propagator
 
-    subroutine Abstract_PLMC_Propagator_add(this, algorithm)
+    subroutine Abstract_PLMC_Propagator_construct(this, metropolis_algorithms)
         class(Abstract_PLMC_Propagator), intent(inout) :: this
-        class(Abstract_Metropolis_Algorithm), target, intent(in) :: algorithm
+        type(Metropolis_Algorithm_Pointer), intent(in) :: metropolis_algorithms(:)
 
-        type(Metropolis_Algorithm_Pointer) :: new
+        integer, allocatable :: nums_choices(:)
+        integer :: i_choice
 
-        if (.not.allocated(this%metropolis)) then
-            allocate(this%metropolis(1))
-            this%metropolis(1)%algorithm => algorithm
-        else
-            new%algorithm => algorithm
-            this%metropolis = [this%metropolis, new]
-        end if
-    end subroutine Abstract_PLMC_Propagator_add
+        call check_positive("Abstract_PLMC_Propagator_construct", "size(metropolis_algorithms)", &
+            size(metropolis_algorithms))
+        allocate(this%metropolis_algorithms(size(metropolis_algorithms)))
+        this%metropolis_algorithms = metropolis_algorithms
 
-    subroutine Abstract_PLMC_Propagator_construct(this)
-        class(Abstract_PLMC_Propagator), intent(inout) :: this
-
-        integer :: nums_choices(size(this%metropolis)), i_choice
-
-        do i_choice = 1, size(this%metropolis)
-            nums_choices(i_choice) = this%metropolis(i_choice)%algorithm%get_num_choices()
+        allocate(nums_choices(size(this%metropolis_algorithms)))
+        do i_choice = 1, size(nums_choices)
+            nums_choices(i_choice) = this%metropolis_algorithms(i_choice)%algorithm%&
+                get_num_choices()
         end do
         this%num_choices = sum(nums_choices)
         if (this%num_choices == 0) then
@@ -59,6 +52,7 @@ contains
             allocate(Concrete_Tower_Sampler :: this%selector)
         end if
         call this%selector%construct(nums_choices)
+        deallocate(nums_choices)
     end subroutine Abstract_PLMC_Propagator_construct
 
     subroutine Abstract_PLMC_Propagator_destroy(this)
@@ -68,6 +62,7 @@ contains
             call this%selector%destroy()
             deallocate(this%selector)
         end if
+        if (allocated(this%metropolis_algorithms)) deallocate(this%metropolis_algorithms)
     end subroutine Abstract_PLMC_Propagator_destroy
 
     subroutine Abstract_PLMC_Propagator_try(this, observables)
@@ -77,7 +72,7 @@ contains
         integer :: i_choice
 
         do i_choice = 1, this%num_choices
-            call this%metropolis(this%selector%get())%algorithm%try(observables)
+            call this%metropolis_algorithms(this%selector%get())%algorithm%try(observables)
         end do
     end subroutine Abstract_PLMC_Propagator_try
 

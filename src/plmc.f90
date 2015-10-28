@@ -7,7 +7,7 @@ use types_mixture_wrapper, only: Mixture_Wrapper
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use types_long_interactions_wrapper, only: Long_Interactions_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
-use types_metropolis_wrapper, only: Metropolis_Wrapper
+use types_metropolis_algorithms_wrapper, only: Metropolis_Algorithms_Wrapper
 use procedures_plmc_factory, only: plmc_load, plmc_create, plmc_set, plmc_destroy
 use procedures_plmc_visit, only: plmc_visit
 use types_observables_wrapper, only: Observables_Wrapper
@@ -25,7 +25,7 @@ implicit none
     type(Long_Interactions_Wrapper) :: long_interactions
     type(Observables_Wrapper) :: observables
     type(Writers_Wrapper) :: writers
-    type(Metropolis_Wrapper) :: metropolis
+    type(Metropolis_Algorithms_Wrapper) :: metropolis_algoritms
     class(Abstract_PLMC_Propagator), allocatable :: plmc_propagator
 
     type(json_file) :: input_data
@@ -39,17 +39,16 @@ implicit none
     call plmc_create(long_interactions, environment, mixture, input_data)
     call plmc_set_num_steps(input_data)
     call plmc_create(changes, environment%periodic_box, mixture%components, input_data)
-    call plmc_create(metropolis, environment, changes)
+    call plmc_create(metropolis_algoritms, environment, changes)
+    call plmc_set(metropolis_algoritms, mixture%components, short_interactions, long_interactions)
+    call plmc_create(plmc_propagator, metropolis_algoritms)
     call plmc_create(observables, mixture%components)
     call plmc_create(writers, mixture%components, short_interactions, long_interactions, changes, &
         input_data)
     call input_data%destroy()
 
-    call plmc_set(metropolis, mixture%components, short_interactions, long_interactions)
-    call plmc_create(plmc_propagator, metropolis)
     call plmc_visit(observables, short_interactions, long_interactions, mixture)
     call plmc_write(-num_tuning_steps, writers, observables)
-
     if (num_tuning_steps > 0) write(output_unit, *) "Trying to tune changes..."
     do i_step = -num_tuning_steps + 1, 0
         call plmc_propagator%try(observables)
@@ -65,14 +64,13 @@ implicit none
         call plmc_write(i_step, writers, observables)
     end do
     write(output_unit, *) "Iterations end."
-
     call plmc_visit(observables, short_interactions, long_interactions, mixture)
     call plmc_write(i_step-1, writers, observables)
 
     call plmc_destroy(writers)
     call plmc_destroy(observables)
     call plmc_destroy(plmc_propagator)
-    call plmc_destroy(metropolis)
+    call plmc_destroy(metropolis_algoritms)
     call plmc_destroy(changes)
     call plmc_destroy(long_interactions)
     call plmc_destroy(short_interactions)

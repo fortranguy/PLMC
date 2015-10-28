@@ -24,10 +24,10 @@ use types_observables_wrapper, only: Observables_Wrapper
 use procedures_observables_factory, only: observables_create, observables_destroy
 use types_writers_wrapper, only: Writers_Wrapper
 use procedures_writers_factory, only: writers_create, writers_destroy
-use types_metropolis_wrapper, only: Metropolis_Wrapper
+use types_metropolis_algorithms_wrapper, only: Metropolis_Algorithms_Wrapper, Metropolis_Algorithm_Pointer
 use class_plmc_propagator, only: Abstract_PLMC_Propagator, Concrete_PLMC_Propagator
-use procedures_metropolis_factory, only: metropolis_create, metropolis_set, &
-    metropolis_destroy
+use procedures_metropolis_algorithms_factory, only: metropolis_algorithms_create, metropolis_algorithms_set, &
+    metropolis_algorithms_destroy
 use class_tower_sampler, only: Abstract_Tower_Sampler, Concrete_Tower_Sampler, Null_Tower_Sampler
 use procedures_property_inquirers, only: use_walls, component_is_dipolar, &
     component_can_change
@@ -191,27 +191,29 @@ contains
     end subroutine destroy_writers
 
     subroutine create_metropolis(metropolis, environment, changes)
-        type(Metropolis_Wrapper), intent(out) :: metropolis
+        type(Metropolis_Algorithms_Wrapper), intent(out) :: metropolis
         type(Environment_Wrapper), intent(in) :: environment
         type(Changes_Wrapper), intent(in) :: changes
 
-        call metropolis_create(metropolis, environment, changes%components)
+        call metropolis_algorithms_create(metropolis, environment, changes%components)
     end subroutine create_metropolis
 
     subroutine destroy_metropolis(metropolis)
-        type(Metropolis_Wrapper), intent(inout) :: metropolis
+        type(Metropolis_Algorithms_Wrapper), intent(inout) :: metropolis
 
-        call metropolis_destroy(metropolis)
+        call metropolis_algorithms_destroy(metropolis)
     end subroutine destroy_metropolis
 
     subroutine create_propagator(propagator, metropolis)
         class(Abstract_PLMC_Propagator), allocatable, intent(out) :: propagator
-        type(Metropolis_Wrapper), intent(in) :: metropolis
+        type(Metropolis_Algorithms_Wrapper), target, intent(in) :: metropolis
 
+        type(Metropolis_Algorithm_Pointer) :: metropolis_algorithms(2)
+
+        metropolis_algorithms(1)%algorithm => metropolis%one_particle_move
+        metropolis_algorithms(2)%algorithm => metropolis%one_particle_rotation
         allocate(Concrete_PLMC_Propagator :: propagator)
-        call propagator%add(metropolis%one_particle_move)
-        call propagator%add(metropolis%one_particle_rotation)
-        call propagator%construct()
+        call propagator%construct(metropolis_algorithms)
     end subroutine create_propagator
 
     subroutine destroy_propagator(propagator)
@@ -224,12 +226,12 @@ contains
     end subroutine destroy_propagator
 
     subroutine set_metropolis(metropolis, components, short_interactions, long_interactions)
-        type(Metropolis_Wrapper), intent(inout) :: metropolis
+        type(Metropolis_Algorithms_Wrapper), intent(inout) :: metropolis
         type(Component_Wrapper), intent(in) :: components(:)
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
         type(Long_Interactions_Wrapper), intent(in) :: long_interactions
 
-        call metropolis_set(metropolis, components, short_interactions, long_interactions)
+        call metropolis_algorithms_set(metropolis, components, short_interactions, long_interactions)
     end subroutine set_metropolis
 
     subroutine tune_changes(tuned, i_step, components_changes, changes_sucesses)
