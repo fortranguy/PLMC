@@ -22,7 +22,7 @@ find_package(
 )
 include_directories(${jsonfortran_INCLUDE_DIRS})
 
-set(plmc_source src/plmc.f90)
+set(plmc_source programs/plmc.f90)
 get_filename_component(plmc_name ${plmc_source} NAME_WE)
 add_executable(${plmc_name} ${plmc_source})
 set_property(

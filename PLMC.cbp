@@ -38,86 +38,244 @@
 				</Linker>
 			</Target>
 		</Build>
-		<Unit filename="modules/changes/class_change_tuner.f90" />
-		<Unit filename="modules/changes/class_changed_coordinates.f90" />
-		<Unit filename="modules/changes/class_component_exchange.f90" />
-		<Unit filename="modules/changes/class_moved_positions.f90" />
-		<Unit filename="modules/changes/class_rotated_orientations.f90" />
-		<Unit filename="modules/changes/module_change_tuning.f90" />
-		<Unit filename="modules/changes/procedures_changes_component_factory.f90" />
-		<Unit filename="modules/changes/procedures_changes_factory.f90" />
-		<Unit filename="modules/changes/types_changes_component_wrapper.f90" />
-		<Unit filename="modules/changes/types_changes_wrapper.f90" />
-		<Unit filename="modules/environment/class_external_field.f90" />
-		<Unit filename="modules/environment/class_field_expression.f90" />
-		<Unit filename="modules/environment/class_floor_penetration.f90" />
-		<Unit filename="modules/environment/class_parallelepiped_domain.f90" />
-		<Unit filename="modules/environment/class_periodic_box.f90" />
-		<Unit filename="modules/environment/class_reciprocal_lattice.f90" />
-		<Unit filename="modules/environment/class_temperature.f90" />
-		<Unit filename="modules/environment/class_walls_potential.f90" />
-		<Unit filename="modules/environment/class_walls_potential_visitor.f90" />
-		<Unit filename="modules/environment/procedures_environment_factory.f90" />
-		<Unit filename="modules/environment/procedures_parallelepiped_domain_macro.f90" />
-		<Unit filename="modules/environment/types_environment_wrapper.f90" />
-		<Unit filename="modules/long_interactions/class_ewald_real_component.f90" />
-		<Unit filename="modules/long_interactions/class_ewald_real_pair.f90" />
-		<Unit filename="modules/long_interactions/class_ewald_real_visitor.f90" />
-		<Unit filename="modules/long_interactions/class_weighted_structure.f90" />
-		<Unit filename="modules/long_interactions/procedures_ewald_micro.f90" />
-		<Unit filename="modules/long_interactions/procedures_long_interactions_factory.f90" />
-		<Unit filename="modules/long_interactions/types_long_interactions_wrapper.f90" />
-		<Unit filename="modules/macro/module_plmc_iterations.f90" />
-		<Unit filename="modules/macro/procedures_plmc_factory.f90" />
-		<Unit filename="modules/macro/procedures_plmc_propagator.f90" />
-		<Unit filename="modules/macro/procedures_plmc_visit.f90" />
-		<Unit filename="modules/macro/procedures_plmc_write.f90" />
-		<Unit filename="modules/metropolis_algorithms/class_metropolis_algorithm.f90" />
-		<Unit filename="modules/metropolis_algorithms/class_one_particle_change.f90" />
-		<Unit filename="modules/metropolis_algorithms/procedures_metropolis_algorithms_factory.f90" />
-		<Unit filename="modules/metropolis_algorithms/types_metropolis_algorithms_wrapper.f90" />
-		<Unit filename="modules/micro/class_number_to_string.f90" />
-		<Unit filename="modules/micro/data_constants.f90" />
-		<Unit filename="modules/micro/data_wrappers_prefix.f90" />
-		<Unit filename="modules/micro/procedures_checks.f90" />
-		<Unit filename="modules/micro/procedures_command_arguments.f90" />
-		<Unit filename="modules/micro/procedures_errors.f90" />
-		<Unit filename="modules/micro/procedures_property_inquirers.f90" />
-		<Unit filename="modules/mixture/class_component_chemical_potential.f90" />
-		<Unit filename="modules/mixture/class_component_coordinates.f90" />
-		<Unit filename="modules/mixture/class_component_dipolar_moments.f90" />
-		<Unit filename="modules/mixture/class_component_number.f90" />
-		<Unit filename="modules/mixture/class_component_total_moment.f90" />
-		<Unit filename="modules/mixture/class_coordinates.f90" />
-		<Unit filename="modules/mixture/class_minimum_distance.f90" />
-		<Unit filename="modules/mixture/procedures_component_factory.f90" />
-		<Unit filename="modules/mixture/procedures_coordinates_micro.f90" />
-		<Unit filename="modules/mixture/procedures_mixture_factory.f90" />
-		<Unit filename="modules/mixture/types_component_wrapper.f90" />
-		<Unit filename="modules/mixture/types_mixture_wrapper.f90" />
-		<Unit filename="modules/mixture/types_temporary_particle.f90" />
-		<Unit filename="modules/observables/module_changes_success.f90" />
-		<Unit filename="modules/observables/procedures_components_energies.f90" />
-		<Unit filename="modules/observables/procedures_observables_factory.f90" />
-		<Unit filename="modules/observables/types_observables_wrapper.f90" />
-		<Unit filename="modules/random/class_normal_random_number.f90" />
-		<Unit filename="modules/random/class_tower_sampler.f90" />
-		<Unit filename="modules/random/procedures_random.f90" />
-		<Unit filename="modules/short_interactions/class_pair_potential.f90" />
-		<Unit filename="modules/short_interactions/class_potential_expression.f90" />
-		<Unit filename="modules/short_interactions/class_short_pairs_visitor.f90" />
-		<Unit filename="modules/short_interactions/class_visitable_cells.f90" />
-		<Unit filename="modules/short_interactions/class_visitable_list.f90" />
-		<Unit filename="modules/short_interactions/module_list_node.f90" />
-		<Unit filename="modules/short_interactions/procedures_short_interactions_factory.f90" />
-		<Unit filename="modules/short_interactions/types_potential_domain.f90" />
-		<Unit filename="modules/short_interactions/types_short_interactions_wrapper.f90" />
-		<Unit filename="modules/writers/class_changes_writer.f90" />
-		<Unit filename="modules/writers/class_component_coordinates_writer.f90" />
-		<Unit filename="modules/writers/class_components_energies_writer.f90" />
-		<Unit filename="modules/writers/procedures_writers_factory.f90" />
-		<Unit filename="modules/writers/types_writers_wrapper.f90" />
-		<Unit filename="src/plmc.f90">
+		<Unit filename="modules/changes/class_change_tuner.f90">
+			<Option weight="3" />
+		</Unit>
+		<Unit filename="modules/changes/class_changed_coordinates.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="modules/changes/class_component_exchange.f90">
+			<Option weight="7" />
+		</Unit>
+		<Unit filename="modules/changes/class_moved_positions.f90">
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="modules/changes/class_rotated_orientations.f90">
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="modules/changes/module_change_tuning.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="modules/changes/procedures_changes_component_factory.f90">
+			<Option weight="9" />
+		</Unit>
+		<Unit filename="modules/changes/procedures_changes_factory.f90">
+			<Option weight="10" />
+		</Unit>
+		<Unit filename="modules/changes/types_changes_component_wrapper.f90">
+			<Option weight="8" />
+		</Unit>
+		<Unit filename="modules/changes/types_changes_wrapper.f90">
+			<Option weight="9" />
+		</Unit>
+		<Unit filename="modules/environment/class_external_field.f90">
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="modules/environment/class_field_expression.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="modules/environment/class_floor_penetration.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="modules/environment/class_parallelepiped_domain.f90">
+			<Option weight="3" />
+		</Unit>
+		<Unit filename="modules/environment/class_periodic_box.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="modules/environment/class_reciprocal_lattice.f90">
+			<Option weight="3" />
+		</Unit>
+		<Unit filename="modules/environment/class_temperature.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="modules/environment/class_walls_potential.f90">
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="modules/environment/class_walls_potential_visitor.f90">
+			<Option weight="5" />
+		</Unit>
+		<Unit filename="modules/environment/procedures_environment_factory.f90">
+			<Option weight="10" />
+		</Unit>
+		<Unit filename="modules/environment/procedures_parallelepiped_domain_macro.f90">
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="modules/environment/types_environment_wrapper.f90">
+			<Option weight="5" />
+		</Unit>
+		<Unit filename="modules/long_interactions/class_ewald_real_component.f90">
+			<Option weight="5" />
+		</Unit>
+		<Unit filename="modules/long_interactions/class_ewald_real_pair.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="modules/long_interactions/class_ewald_real_visitor.f90">
+			<Option weight="5" />
+		</Unit>
+		<Unit filename="modules/long_interactions/class_weighted_structure.f90">
+			<Option weight="5" />
+		</Unit>
+		<Unit filename="modules/long_interactions/procedures_ewald_micro.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="modules/long_interactions/procedures_long_interactions_factory.f90">
+			<Option weight="9" />
+		</Unit>
+		<Unit filename="modules/long_interactions/types_long_interactions_wrapper.f90">
+			<Option weight="6" />
+		</Unit>
+		<Unit filename="modules/macro/module_plmc_iterations.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="modules/macro/procedures_plmc_factory.f90">
+			<Option weight="12" />
+		</Unit>
+		<Unit filename="modules/macro/procedures_plmc_propagator.f90">
+			<Option weight="11" />
+		</Unit>
+		<Unit filename="modules/macro/procedures_plmc_visit.f90">
+			<Option weight="8" />
+		</Unit>
+		<Unit filename="modules/macro/procedures_plmc_write.f90">
+			<Option weight="6" />
+		</Unit>
+		<Unit filename="modules/metropolis_algorithms/class_metropolis_algorithm.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="modules/metropolis_algorithms/class_one_particle_change.f90">
+			<Option weight="9" />
+		</Unit>
+		<Unit filename="modules/metropolis_algorithms/procedures_metropolis_algorithms_factory.f90">
+			<Option weight="11" />
+		</Unit>
+		<Unit filename="modules/metropolis_algorithms/types_metropolis_algorithms_wrapper.f90">
+			<Option weight="10" />
+		</Unit>
+		<Unit filename="modules/micro/class_number_to_string.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="modules/micro/data_constants.f90">
+			<Option weight="0" />
+		</Unit>
+		<Unit filename="modules/micro/data_wrappers_prefix.f90">
+			<Option weight="0" />
+		</Unit>
+		<Unit filename="modules/micro/procedures_checks.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="modules/micro/procedures_command_arguments.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="modules/micro/procedures_errors.f90">
+			<Option weight="0" />
+		</Unit>
+		<Unit filename="modules/micro/procedures_property_inquirers.f90">
+			<Option weight="8" />
+		</Unit>
+		<Unit filename="modules/mixture/class_component_chemical_potential.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="modules/mixture/class_component_coordinates.f90">
+			<Option weight="3" />
+		</Unit>
+		<Unit filename="modules/mixture/class_component_dipolar_moments.f90">
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="modules/mixture/class_component_number.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="modules/mixture/class_component_total_moment.f90">
+			<Option weight="5" />
+		</Unit>
+		<Unit filename="modules/mixture/class_coordinates.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="modules/mixture/class_minimum_distance.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="modules/mixture/procedures_component_factory.f90">
+			<Option weight="9" />
+		</Unit>
+		<Unit filename="modules/mixture/procedures_coordinates_micro.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="modules/mixture/procedures_mixture_factory.f90">
+			<Option weight="10" />
+		</Unit>
+		<Unit filename="modules/mixture/types_component_wrapper.f90">
+			<Option weight="6" />
+		</Unit>
+		<Unit filename="modules/mixture/types_mixture_wrapper.f90">
+			<Option weight="7" />
+		</Unit>
+		<Unit filename="modules/mixture/types_temporary_particle.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="modules/observables/module_changes_success.f90">
+			<Option weight="0" />
+		</Unit>
+		<Unit filename="modules/observables/procedures_components_energies.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="modules/observables/procedures_observables_factory.f90">
+			<Option weight="7" />
+		</Unit>
+		<Unit filename="modules/observables/types_observables_wrapper.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="modules/random/class_normal_random_number.f90">
+			<Option weight="0" />
+		</Unit>
+		<Unit filename="modules/random/class_tower_sampler.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="modules/random/procedures_random.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="modules/short_interactions/class_pair_potential.f90">
+			<Option weight="3" />
+		</Unit>
+		<Unit filename="modules/short_interactions/class_potential_expression.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="modules/short_interactions/class_short_pairs_visitor.f90">
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="modules/short_interactions/class_visitable_cells.f90">
+			<Option weight="5" />
+		</Unit>
+		<Unit filename="modules/short_interactions/class_visitable_list.f90">
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="modules/short_interactions/module_list_node.f90">
+			<Option weight="1" />
+		</Unit>
+		<Unit filename="modules/short_interactions/procedures_short_interactions_factory.f90">
+			<Option weight="9" />
+		</Unit>
+		<Unit filename="modules/short_interactions/types_potential_domain.f90">
+			<Option weight="0" />
+		</Unit>
+		<Unit filename="modules/short_interactions/types_short_interactions_wrapper.f90">
+			<Option weight="6" />
+		</Unit>
+		<Unit filename="modules/writers/class_changes_writer.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="modules/writers/class_component_coordinates_writer.f90">
+			<Option weight="4" />
+		</Unit>
+		<Unit filename="modules/writers/class_components_energies_writer.f90">
+			<Option weight="2" />
+		</Unit>
+		<Unit filename="modules/writers/procedures_writers_factory.f90">
+			<Option weight="9" />
+		</Unit>
+		<Unit filename="modules/writers/types_writers_wrapper.f90">
+			<Option weight="5" />
+		</Unit>
+		<Unit filename="programs/plmc.f90">
 			<Option weight="13" />
 		</Unit>
 		<Extensions>

@@ -1,8 +1,8 @@
 project: Physics of Liquids Monte-Carlo
 summary: A simple Monte-Carlo program for colloids
     written in Modern Fortran
-project_dir: ./src
-    ./lib/src
+project_dir: ./programs
+    ./modules
 extra_mods: json_module: http://jacobwilliams.github.io/json-fortran/
 output_dir: ./doc
 predocmark: >
@@ -14,3 +14,4 @@ year: 2015
 author: Salomon CHUNG
 email: salomon.chung@u-pe.fr
 website: http://www.plmc.u-pec.fr/
+
