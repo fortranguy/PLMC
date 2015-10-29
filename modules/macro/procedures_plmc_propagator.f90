@@ -50,10 +50,11 @@ contains
     subroutine plmc_propagator_try(observables)
         type(Observables_Wrapper), intent(inout) :: observables
 
-        integer :: i_choice
+        integer :: i_choice, i_random
 
         do i_choice = 1, selector%get_num_choices()
-            call algorithms(selector%get())%algorithm%try(observables)
+            i_random = selector%get()
+            call algorithms(i_random)%algorithm%try(observables)
         end do
     end subroutine plmc_propagator_try
 
