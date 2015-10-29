@@ -20,17 +20,16 @@ use module_changes_success, only: Concrete_Changes_Success, Concrete_Changes_Cou
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
 use procedures_changes_factory, only: changes_create, changes_destroy
+use procedures_metropolis_algorithms_factory, only: metropolis_algorithms_create, &
+    metropolis_algorithms_set, metropolis_algorithms_destroy
+use class_plmc_propagator, only: Abstract_PLMC_Propagator
+use procedures_plmc_propagator_factory, only: plmc_propagator_create, plmc_propagator_destroy
 use types_observables_wrapper, only: Observables_Wrapper
 use procedures_observables_factory, only: observables_create, observables_destroy
 use types_writers_wrapper, only: Writers_Wrapper
 use procedures_writers_factory, only: writers_create, writers_destroy
 use types_metropolis_algorithms_wrapper, only: Metropolis_Algorithms_Wrapper, &
     Metropolis_Algorithm_Pointer
-use class_plmc_propagator, only: Abstract_PLMC_Propagator, Concrete_PLMC_Propagator, &
-    Null_PLMC_Propagator
-use procedures_metropolis_algorithms_factory, only: metropolis_algorithms_create, &
-    metropolis_algorithms_set, metropolis_algorithms_destroy
-use class_tower_sampler, only: Abstract_Tower_Sampler, Concrete_Tower_Sampler, Null_Tower_Sampler
 use procedures_property_inquirers, only: use_walls, component_is_dipolar, &
     component_can_change
 
@@ -206,36 +205,13 @@ contains
         class(Abstract_PLMC_Propagator), allocatable, intent(out) :: propagator
         type(Metropolis_Algorithms_Wrapper), target, intent(in) :: metropolis
 
-        class(Abstract_Tower_Sampler), allocatable :: selector
-        type(Metropolis_Algorithm_Pointer) :: metropolis_algorithms(2)
-        integer :: nums_choices(size(metropolis_algorithms))
-        integer :: i_choice
-
-        metropolis_algorithms(1)%algorithm => metropolis%one_particle_move
-        metropolis_algorithms(2)%algorithm => metropolis%one_particle_rotation
-        do i_choice = 1, size(nums_choices)
-            nums_choices(i_choice) = metropolis_algorithms(i_choice)%algorithm%get_num_choices()
-        end do
-        if (sum(nums_choices) == 0) then
-            allocate(Null_Tower_Sampler :: selector)
-            allocate(Null_PLMC_Propagator :: propagator)
-        else
-            allocate(Concrete_Tower_Sampler :: selector)
-            allocate(Concrete_PLMC_Propagator :: propagator)
-        end if
-        call selector%construct(nums_choices)
-        call propagator%construct(metropolis_algorithms, selector)
-        call selector%destroy()
-        deallocate(selector)
+        call plmc_propagator_create(propagator, metropolis)
     end subroutine create_propagator
 
     subroutine destroy_propagator(propagator)
         class(Abstract_PLMC_Propagator), allocatable, intent(inout) :: propagator
 
-        if (allocated(propagator)) then
-            call propagator%destroy()
-            deallocate(propagator)
-        end if
+        call plmc_propagator_destroy(propagator)
     end subroutine destroy_propagator
 
     subroutine create_observables(observables, components)

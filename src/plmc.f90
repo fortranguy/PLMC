@@ -8,11 +8,11 @@ use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use types_long_interactions_wrapper, only: Long_Interactions_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
 use types_metropolis_algorithms_wrapper, only: Metropolis_Algorithms_Wrapper
-use procedures_plmc_factory, only: plmc_load, plmc_create, plmc_set, plmc_destroy
-use procedures_plmc_visit, only: plmc_visit
+use class_plmc_propagator, only: Abstract_PLMC_Propagator
 use types_observables_wrapper, only: Observables_Wrapper
 use types_writers_wrapper, only: Writers_Wrapper
-use class_plmc_propagator, only: Abstract_PLMC_Propagator
+use procedures_plmc_factory, only: plmc_load, plmc_create, plmc_set, plmc_destroy
+use procedures_plmc_visit, only: plmc_visit
 use procedures_plmc_write, only: plmc_write
 use module_plmc_iterations, only: num_tuning_steps, num_steps, plmc_set_num_steps
 
@@ -23,10 +23,10 @@ implicit none
     type(Changes_Wrapper) :: changes
     type(Short_Interactions_Wrapper) :: short_interactions
     type(Long_Interactions_Wrapper) :: long_interactions
-    type(Observables_Wrapper) :: observables
-    type(Writers_Wrapper) :: writers
     type(Metropolis_Algorithms_Wrapper) :: metropolis_algoritms
     class(Abstract_PLMC_Propagator), allocatable :: plmc_propagator
+    type(Observables_Wrapper) :: observables
+    type(Writers_Wrapper) :: writers
 
     type(json_file) :: input_data
     integer :: i_step
