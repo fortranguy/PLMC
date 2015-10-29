@@ -47,7 +47,7 @@ interface long_interactions_destroy
     module procedure :: destroy_real_pairs
     module procedure :: destroy_real_component
     module procedure :: destroy_real_components
-    module procedure :: desrtroy_real_visitor
+    module procedure :: destroy_real_visitor
     module procedure :: destroy_all
 end interface long_interactions_destroy
 
@@ -95,14 +95,14 @@ contains
         call visitor%construct(periodic_box)
     end subroutine create_real_visitor
 
-    subroutine desrtroy_real_visitor(visitor)
+    subroutine destroy_real_visitor(visitor)
         class(Abstract_Ewald_Real_Visitor), allocatable, intent(inout) :: visitor
 
         if (allocated(visitor)) then
             call visitor%destroy()
             deallocate(visitor)
         end if
-    end subroutine desrtroy_real_visitor
+    end subroutine destroy_real_visitor
 
     subroutine create_real_components(real_components, periodic_box, components, real_pairs)
         type(Ewald_Real_Component_Wrapper), allocatable, intent(out) :: real_components(:, :)

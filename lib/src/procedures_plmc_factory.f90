@@ -22,8 +22,6 @@ use types_changes_wrapper, only: Changes_Wrapper
 use procedures_changes_factory, only: changes_create, changes_destroy
 use procedures_metropolis_algorithms_factory, only: metropolis_algorithms_create, &
     metropolis_algorithms_set, metropolis_algorithms_destroy
-use class_plmc_propagator, only: Abstract_PLMC_Propagator
-use procedures_plmc_propagator_factory, only: plmc_propagator_create, plmc_propagator_destroy
 use types_observables_wrapper, only: Observables_Wrapper
 use procedures_observables_factory, only: observables_create, observables_destroy
 use types_writers_wrapper, only: Writers_Wrapper
@@ -49,7 +47,6 @@ interface plmc_create
     module procedure :: create_long_interactions
     module procedure :: create_changes
     module procedure :: create_metropolis
-    module procedure :: create_propagator
     module procedure :: create_observables
     module procedure :: create_writers
 end interface plmc_create
@@ -63,7 +60,6 @@ end interface plmc_set
 interface plmc_destroy
     module procedure :: destroy_writers
     module procedure :: destroy_observables
-    module procedure :: destroy_propagator
     module procedure :: destroy_metropolis
     module procedure :: destroy_changes
     module procedure :: destroy_long_interactions
@@ -200,19 +196,6 @@ contains
 
         call metropolis_algorithms_destroy(metropolis)
     end subroutine destroy_metropolis
-
-    subroutine create_propagator(propagator, metropolis)
-        class(Abstract_PLMC_Propagator), allocatable, intent(out) :: propagator
-        type(Metropolis_Algorithms_Wrapper), target, intent(in) :: metropolis
-
-        call plmc_propagator_create(propagator, metropolis)
-    end subroutine create_propagator
-
-    subroutine destroy_propagator(propagator)
-        class(Abstract_PLMC_Propagator), allocatable, intent(inout) :: propagator
-
-        call plmc_propagator_destroy(propagator)
-    end subroutine destroy_propagator
 
     subroutine create_observables(observables, components)
         type(Observables_Wrapper), intent(out) :: observables

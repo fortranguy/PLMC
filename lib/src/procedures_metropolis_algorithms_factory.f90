@@ -15,39 +15,42 @@ use procedures_property_inquirers, only: component_can_move, component_can_rotat
 implicit none
 
 private
-public :: metropolis_algorithms_create, metropolis_algorithms_set, metropolis_algorithms_destroy
+public :: metropolis_algorithms_create, metropolis_algorithms_set, metropolis_algorithms_destroy, &
+    metropolis_algorithms_create_move, metropolis_algorithms_create_rotation
+
 
 interface metropolis_algorithms_create
-    module procedure :: metropolis_algorithms_create_all
+    module procedure :: create_all
 end interface metropolis_algorithms_create
 
 interface metropolis_algorithms_set
-    module procedure :: metropolis_algorithms_set_all
+    module procedure :: set_all
 end interface metropolis_algorithms_set
 
 interface metropolis_algorithms_destroy
-    module procedure :: metropolis_algorithms_destroy_all
+    module procedure :: destroy_change
+    module procedure :: destroy_all
 end interface metropolis_algorithms_destroy
 
 contains
 
-    subroutine metropolis_algorithms_create_all(metropolis_algoritms, environment, changes)
-        type(Metropolis_Algorithms_Wrapper), intent(out) :: metropolis_algoritms
+    subroutine create_all(metropolis_algorithms, environment, changes)
+        type(Metropolis_Algorithms_Wrapper), intent(out) :: metropolis_algorithms
         type(Environment_Wrapper), intent(in) :: environment
         type(Changes_Component_Wrapper), intent(in) :: changes(:)
 
-        call metropolis_algorithms_create_move(metropolis_algoritms%one_particle_move, &
+        call metropolis_algorithms_create_move(metropolis_algorithms%one_particle_move, &
             environment, changes)
-        call metropolis_algorithms_create_rotation(metropolis_algoritms%one_particle_rotation, &
+        call metropolis_algorithms_create_rotation(metropolis_algorithms%one_particle_rotation, &
             environment, changes)
-    end subroutine metropolis_algorithms_create_all
+    end subroutine create_all
 
-    subroutine metropolis_algorithms_destroy_all(metropolis_algoritms)
-        type(Metropolis_Algorithms_Wrapper), intent(inout) :: metropolis_algoritms
+    subroutine destroy_all(metropolis_algorithms)
+        type(Metropolis_Algorithms_Wrapper), intent(inout) :: metropolis_algorithms
 
-        call destroy_change(metropolis_algoritms%one_particle_rotation)
-        call destroy_change(metropolis_algoritms%one_particle_move)
-    end subroutine metropolis_algorithms_destroy_all
+        call metropolis_algorithms_destroy(metropolis_algorithms%one_particle_rotation)
+        call metropolis_algorithms_destroy(metropolis_algorithms%one_particle_move)
+    end subroutine destroy_all
 
     subroutine metropolis_algorithms_create_move(one_particle_move, environment, changes)
         class(Abstract_One_Particle_Change), allocatable, intent(out) :: one_particle_move
@@ -117,17 +120,16 @@ contains
         end if
     end subroutine destroy_change
 
-    subroutine metropolis_algorithms_set_all(metropolis_algoritms, components, short_interactions, &
-        long_interactions)
-        type(Metropolis_Algorithms_Wrapper), intent(inout) :: metropolis_algoritms
+    subroutine set_all(metropolis_algorithms, components, short_interactions, long_interactions)
+        type(Metropolis_Algorithms_Wrapper), intent(inout) :: metropolis_algorithms
         type(Component_Wrapper), intent(in) :: components(:)
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
         type(Long_Interactions_Wrapper), intent(in) :: long_interactions
 
-        call metropolis_algoritms%one_particle_move%set_candidates(components, short_interactions, &
-            long_interactions)
-        call metropolis_algoritms%one_particle_rotation%set_candidates(components, &
+        call metropolis_algorithms%one_particle_move%set_candidates(components, &
             short_interactions, long_interactions)
-    end subroutine metropolis_algorithms_set_all
+        call metropolis_algorithms%one_particle_rotation%set_candidates(components, &
+            short_interactions, long_interactions)
+    end subroutine set_all
 
 end module procedures_metropolis_algorithms_factory
