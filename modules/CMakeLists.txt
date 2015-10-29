@@ -19,11 +19,17 @@ find_package(
 file(
     GLOB_RECURSE
     lib_source_files
-    src/data_*.f90
-    src/types_*.f90
-    src/procedures_*.f90
-    src/module_*.f90
-    src/class_*.f90
+    micro/*.f90
+    random/*.f90
+    environment/*.f90
+    mixture/*.f90
+    short_interactions/*.f90
+    long_interactions/*.f90
+    changes/*.f90
+    metropolis_algorithms/*.f90
+    observables/*.f90
+    writers/*.f90
+    macro/*.f90
 )
 
 add_library(
