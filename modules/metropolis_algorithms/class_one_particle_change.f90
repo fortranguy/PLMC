@@ -1,7 +1,7 @@
 module class_one_particle_change
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use procedures_random, only: random_integer
+use procedures_random_number, only: random_integer
 use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
 use types_temporary_particle, only: Concrete_Temporary_Particle

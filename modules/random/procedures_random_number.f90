@@ -1,9 +1,9 @@
-module procedures_random
+module procedures_random_number
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
 use procedures_checks, only: check_positive, check_3d_array
-use class_normal_random_number, only: Normal_Random_Number
+use procedures_normal_random_number, only: normal_random_number
 
 implicit none
 
@@ -18,7 +18,7 @@ contains
 
         real(DP) :: rand
 
-        call check_positive("procedures_random: random_integer", "maximum", maximum)
+        call check_positive("procedures_random_number: random_integer", "maximum", maximum)
         if (maximum == 1) then
             random_integer = maximum
         else
@@ -31,12 +31,7 @@ contains
     function random_orientation()
         real(DP), dimension(num_dimensions) :: random_orientation
 
-        integer :: i_dimension
-        type(Normal_Random_Number) :: gauss
-
-        do i_dimension = 1, num_dimensions
-            random_orientation(i_dimension) = gauss%get()
-        end do
+        call normal_random_number(random_orientation)
         random_orientation = random_orientation / norm2(random_orientation)
     end function random_orientation
 
@@ -46,24 +41,17 @@ contains
         real(DP), intent(in) :: orientation_delta
 
         real(DP) :: rotation(num_dimensions)
-        type(Normal_Random_Number) :: gauss
         real(DP) :: amplitude, rand
-        integer :: i_dimension
 
         call check_3d_array("markov_orientation", "orientation", orientation)
 
-        do i_dimension = 1, num_dimensions
-            rotation(i_dimension) = gauss%get()
-        end do
-
+        call normal_random_number(rotation)
         rotation = rotation - dot_product(rotation, orientation) * orientation
         rotation = rotation / norm2(rotation)
-
         call random_number(rand)
         amplitude = orientation_delta * (rand - 0.5_DP)
-
         orientation = orientation + amplitude * rotation
         orientation = orientation / norm2(orientation)
     end subroutine markov_orientation
 
-end module procedures_random
+end module procedures_random_number

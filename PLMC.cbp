@@ -224,13 +224,13 @@
 		<Unit filename="modules/observables/types_observables_wrapper.f90">
 			<Option weight="1" />
 		</Unit>
-		<Unit filename="modules/random/class_normal_random_number.f90">
-			<Option weight="0" />
-		</Unit>
 		<Unit filename="modules/random/class_tower_sampler.f90">
 			<Option weight="2" />
 		</Unit>
-		<Unit filename="modules/random/procedures_random.f90">
+		<Unit filename="modules/random/procedures_normal_random_number.f90">
+			<Option weight="0" />
+		</Unit>
+		<Unit filename="modules/random/procedures_random_number.f90">
 			<Option weight="2" />
 		</Unit>
 		<Unit filename="modules/short_interactions/class_pair_potential.f90">

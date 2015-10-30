@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
 use procedures_checks, only: check_positive, check_increase_factor
 use class_component_coordinates, only: Abstract_Component_Coordinates
-use procedures_random, only: markov_orientation
+use procedures_random_number, only: markov_orientation
 use module_change_tuning, only: Concrete_Tuning_Parameters, &
     set_increase_factor
 use class_changed_coordinates, only: Abstract_Changed_Coordinates
