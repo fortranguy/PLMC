@@ -2,6 +2,7 @@ module procedures_property_inquirers
 
 use json_module, only: json_file
 use procedures_checks, only: check_data_found
+use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice, Concrete_Reciprocal_Lattice
 use class_walls_potential, only: Abstract_Walls_Potential, Concrete_Walls_Potential
 use class_component_number, only: Abstract_Component_Number, Concrete_Component_Number
 use class_component_coordinates, only: Abstract_Component_Coordinates, &
@@ -32,6 +33,7 @@ end interface apply_external_field
 
 interface use_reciprocal_lattice
     module procedure :: use_reciprocal_lattice_from_json
+    module procedure :: use_reciprocal_lattice_from_reciprocal_lattice
 end interface use_reciprocal_lattice
 
 interface use_walls
@@ -76,6 +78,18 @@ contains
 
         use_reciprocal_lattice = logical_from_json(input_data, prefix//"Reciprocal Lattice.use")
     end function use_reciprocal_lattice_from_json
+
+    pure logical function use_reciprocal_lattice_from_reciprocal_lattice(reciprocal_lattice) &
+        result(use_reciprocal_lattice)
+        class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
+
+        select type (reciprocal_lattice)
+            type is (Concrete_Reciprocal_Lattice)
+                use_reciprocal_lattice = .true.
+            class default
+                use_reciprocal_lattice = .false.
+        end select
+    end function use_reciprocal_lattice_from_reciprocal_lattice
 
     logical function use_walls_from_json(input_data, prefix) result(use_walls)
         type(json_file), intent(inout) :: input_data

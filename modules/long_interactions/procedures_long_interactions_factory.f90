@@ -3,8 +3,10 @@ module procedures_long_interactions_factory
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
 use json_module, only: json_file
+use procedures_errors, only: warning_continue
 use procedures_checks, only: check_data_found
 use class_periodic_box, only: Abstract_Periodic_Box
+use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use types_environment_wrapper, only: Environment_Wrapper
 use class_minimum_distance, only: Abstract_Minimum_Distance
 use class_component_coordinates, only: Abstract_Component_Coordinates
@@ -21,7 +23,8 @@ use class_ewald_real_visitor, only: Abstract_Ewald_Real_Visitor, Concrete_Ewald_
     Null_Ewald_Real_Visitor
 use types_long_interactions_wrapper, only: Ewald_Real_Pair_Wrapper, Ewald_Real_Pairs_Wrapper, &
     Ewald_Real_Component_Wrapper, Long_Interactions_Wrapper
-use procedures_property_inquirers, only: component_is_dipolar, components_interact
+use procedures_property_inquirers, only: use_reciprocal_lattice, component_is_dipolar, &
+    components_interact
 
 implicit none
 
@@ -63,7 +66,7 @@ contains
         logical :: are_dipolar(size(mixture%components))
         real(DP) :: alpha
 
-        call long_interactions_set(are_dipolar, mixture%components)
+        call long_interactions_set(are_dipolar, environment%reciprocal_lattice, mixture%components)
         call long_interactions_create(long_interactions%real_visitor, environment%periodic_box, &
             any(are_dipolar))
         call long_interactions_set(alpha, environment%periodic_box, any(are_dipolar), input_data, &
@@ -322,8 +325,9 @@ contains
         end if
     end subroutine set_alpha
 
-    subroutine set_are_dipolar(are_dipolar, components)
+    subroutine set_are_dipolar(are_dipolar, reciprocal_lattice, components)
         logical, intent(out) :: are_dipolar(:)
+        class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
         type(Component_Wrapper), intent(in) :: components(:)
 
         integer :: i_component
@@ -331,6 +335,9 @@ contains
         do i_component = 1, size(are_dipolar)
             are_dipolar(i_component) = component_is_dipolar(components(i_component)%dipolar_moments)
         end do
+        if (any(are_dipolar) .and. .not.use_reciprocal_lattice(reciprocal_lattice)) then
+            call warning_continue("set_are_dipolar: dipoles exist but reciprocal_lattice unused.")
+        end if
     end subroutine set_are_dipolar
 
 end module procedures_long_interactions_factory
