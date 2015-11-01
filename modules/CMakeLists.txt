@@ -19,7 +19,7 @@ find_package(
 file(
     GLOB_RECURSE
     lib_source_files
-    micro/*.f90
+    common/*.f90
     random/*.f90
     environment/*.f90
     mixture/*.f90
@@ -29,7 +29,6 @@ file(
     metropolis_algorithms/*.f90
     observables/*.f90
     writers/*.f90
-    macro/*.f90
 )
 
 add_library(

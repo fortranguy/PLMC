@@ -3,9 +3,10 @@ summary: A simple Monte-Carlo program for colloids
     written in Modern Fortran
 project_dir: ./programs
     ./modules
-extra_mods: json_module: http://jacobwilliams.github.io/json-fortran/
+extra_mods: iso_fortran_env:https://gcc.gnu.org/onlinedocs/gfortran/ISO_005fFORTRAN_005fENV.html
+    json_module: http://jacobwilliams.github.io/json-fortran/
 output_dir: ./doc
-page_dir: ./pages
+page_dir: ./modules
 predocmark: >
 search: false
 graph: true

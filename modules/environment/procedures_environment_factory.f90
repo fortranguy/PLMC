@@ -14,6 +14,7 @@ use class_parallelepiped_domain, only: Abstract_Parallelepiped_Domain, &
     Concrete_Parallelepiped_Domain, Concrete_Box_Domain, Null_Parallelepiped_Domain
 use class_external_field, only: Abstract_External_Field, &
     Concrete_External_Field, Null_External_Field
+use class_permittivity, only: Abstract_Permittivity, Concrete_Permittivity, Null_Permittivity
 use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice, &
     Concrete_Reciprocal_Lattice, Null_Reciprocal_Lattice
 use class_floor_penetration, only: Abstract_Floor_Penetration, &
@@ -26,7 +27,8 @@ use procedures_short_interactions_factory, only: short_interactions_create, &
 use class_walls_potential, only: Abstract_Walls_Potential, &
     Concrete_Walls_Potential, Null_Walls_Potential
 use types_environment_wrapper, only: Environment_Wrapper
-use procedures_property_inquirers, only: apply_external_field, use_reciprocal_lattice, use_walls
+use procedures_property_inquirers, only: apply_external_field, use_permittivity, &
+    use_reciprocal_lattice, use_walls
 
 implicit none
 
@@ -40,6 +42,7 @@ interface environment_create
     module procedure :: create_field_expression
     module procedure :: create_parallelepiped_domain
     module procedure :: create_external_field
+    module procedure :: create_permittivity
     module procedure :: create_reciprocal_lattice
     module procedure :: create_floor_penetration
     module procedure :: create_walls_potential
@@ -49,6 +52,7 @@ interface environment_destroy
     module procedure :: destroy_walls_potential
     module procedure :: destroy_floor_penetration
     module procedure :: destroy_reciprocal_lattice
+    module procedure :: destroy_permittivity
     module procedure :: destroy_external_field
     module procedure :: destroy_parallelepiped_domain
     module procedure :: destroy_field_expression
@@ -79,6 +83,7 @@ contains
             parallelepiped_domain, field_expression)
         call environment_destroy(field_expression)
         call environment_destroy(parallelepiped_domain)
+        call environment_create(environment%permittivity, input_data, prefix)
         call environment_create(environment%reciprocal_lattice, environment%periodic_box, &
             input_data, prefix)
         walls_used = use_walls(input_data, prefix)
@@ -93,6 +98,7 @@ contains
 
         call environment_destroy(environment%walls_potential)
         call environment_destroy(environment%reciprocal_lattice)
+        call environment_destroy(environment%permittivity)
         call environment_destroy(environment%external_field)
         call environment_destroy(environment%temperature)
         call environment_destroy(environment%periodic_box)
@@ -156,8 +162,7 @@ contains
         if (allocated(temperature)) deallocate(temperature)
     end subroutine destroy_temperature
 
-    subroutine create_field_expression(field_expression, field_applied, input_data, &
-        prefix)
+    subroutine create_field_expression(field_expression, field_applied, input_data, prefix)
         class(Abstract_Field_Expression), allocatable, intent(out) :: field_expression
         logical, intent(in) :: field_applied
         type(json_file), intent(inout) :: input_data
@@ -263,7 +268,8 @@ contains
     end subroutine create_parallelepiped_domain
 
     subroutine destroy_parallelepiped_domain(parallelepiped_domain)
-        class(Abstract_Parallelepiped_Domain), allocatable, intent(inout) :: parallelepiped_domain
+        class(Abstract_Parallelepiped_Domain), allocatable, intent(inout) :: &
+            parallelepiped_domain
 
         call parallelepiped_domain%destroy()
         if (allocated(parallelepiped_domain)) deallocate(parallelepiped_domain)
@@ -291,12 +297,41 @@ contains
         if (allocated(external_field)) deallocate(external_field)
     end subroutine destroy_external_field
 
+    subroutine create_permittivity(permittivity, input_data, prefix)
+        class(Abstract_Permittivity), allocatable, intent(out) :: permittivity
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
+
+        character(len=:), allocatable :: data_field
+        logical :: data_found
+        real(DP) :: permittivity_value
+
+        if (use_permittivity(input_data, prefix)) then
+            data_field = prefix//"Permittivity.value"
+            call input_data%get(data_field, permittivity_value, data_found)
+            call check_data_found(data_field, data_found)
+            deallocate(data_field)
+            allocate(Concrete_Permittivity :: permittivity)
+        else
+            allocate(Null_Permittivity :: permittivity)
+        end if
+        call permittivity%set(permittivity_value)
+    end subroutine
+
+    subroutine destroy_permittivity(permittivity)
+        class(Abstract_Permittivity), allocatable, intent(inout) :: permittivity
+
+        if (allocated(permittivity)) then
+            deallocate(permittivity)
+        end if
+    end subroutine
+
     subroutine create_reciprocal_lattice(reciprocal_lattice, periodic_box, &
         input_data, prefix)
         class(Abstract_Reciprocal_Lattice), allocatable, intent(out) :: reciprocal_lattice
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
 
         character(len=:), allocatable :: data_field
         logical :: data_found

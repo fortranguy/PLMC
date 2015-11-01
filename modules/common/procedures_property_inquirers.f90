@@ -2,6 +2,7 @@ module procedures_property_inquirers
 
 use json_module, only: json_file
 use procedures_checks, only: check_data_found
+use class_permittivity, only: Abstract_Permittivity, Concrete_Permittivity
 use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice, Concrete_Reciprocal_Lattice
 use class_walls_potential, only: Abstract_Walls_Potential, Concrete_Walls_Potential
 use class_component_number, only: Abstract_Component_Number, Concrete_Component_Number
@@ -22,7 +23,7 @@ use class_ewald_real_pair, only: Abstract_Ewald_Real_Pair, Null_Ewald_Real_Pair
 implicit none
 
 private
-public :: apply_external_field, use_reciprocal_lattice, use_walls, &
+public :: apply_external_field, use_permittivity, use_reciprocal_lattice, use_walls, &
     component_exists, component_is_dipolar, component_has_positions, component_can_move, &
     component_has_orientations, component_can_exchange, component_can_rotate, components_interact, &
     component_can_change
@@ -31,9 +32,14 @@ interface apply_external_field
     module procedure :: apply_external_field_from_json
 end interface apply_external_field
 
+interface use_permittivity
+    module procedure :: use_permittivity_from_json
+    module procedure :: use_permittivity_from
+end interface
+
 interface use_reciprocal_lattice
     module procedure :: use_reciprocal_lattice_from_json
-    module procedure :: use_reciprocal_lattice_from_reciprocal_lattice
+    module procedure :: use_reciprocal_lattice_from
 end interface use_reciprocal_lattice
 
 interface use_walls
@@ -71,6 +77,24 @@ contains
         apply_external_field = logical_from_json(input_data, prefix//"External Field.apply")
     end function apply_external_field_from_json
 
+    logical function use_permittivity_from_json(input_data, prefix) result(use_permittivity)
+        type(json_file), intent(inout) :: input_data
+        character(len=*), intent(in) :: prefix
+
+        use_permittivity = logical_from_json(input_data, prefix//"Permittivity.use")
+    end function
+
+    pure logical function use_permittivity_from(permittivity) result(use_permittivity)
+        class(Abstract_Permittivity), intent(in) :: permittivity
+
+        select type (permittivity)
+            type is (Concrete_Permittivity)
+                use_permittivity = .true.
+            class default
+                use_permittivity = .false.
+        end select
+    end function
+
     logical function use_reciprocal_lattice_from_json(input_data, prefix) &
         result(use_reciprocal_lattice)
         type(json_file), intent(inout) :: input_data
@@ -79,7 +103,7 @@ contains
         use_reciprocal_lattice = logical_from_json(input_data, prefix//"Reciprocal Lattice.use")
     end function use_reciprocal_lattice_from_json
 
-    pure logical function use_reciprocal_lattice_from_reciprocal_lattice(reciprocal_lattice) &
+    pure logical function use_reciprocal_lattice_from(reciprocal_lattice) &
         result(use_reciprocal_lattice)
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
 
@@ -89,7 +113,7 @@ contains
             class default
                 use_reciprocal_lattice = .false.
         end select
-    end function use_reciprocal_lattice_from_reciprocal_lattice
+    end function use_reciprocal_lattice_from
 
     logical function use_walls_from_json(input_data, prefix) result(use_walls)
         type(json_file), intent(inout) :: input_data

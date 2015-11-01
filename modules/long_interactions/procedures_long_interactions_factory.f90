@@ -6,6 +6,7 @@ use json_module, only: json_file
 use procedures_errors, only: warning_continue
 use procedures_checks, only: check_data_found
 use class_periodic_box, only: Abstract_Periodic_Box
+use class_permittivity, only: Abstract_Permittivity
 use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use types_environment_wrapper, only: Environment_Wrapper
 use class_minimum_distance, only: Abstract_Minimum_Distance
@@ -23,8 +24,8 @@ use class_ewald_real_visitor, only: Abstract_Ewald_Real_Visitor, Concrete_Ewald_
     Null_Ewald_Real_Visitor
 use types_long_interactions_wrapper, only: Ewald_Real_Pair_Wrapper, Ewald_Real_Pairs_Wrapper, &
     Ewald_Real_Component_Wrapper, Long_Interactions_Wrapper
-use procedures_property_inquirers, only: use_reciprocal_lattice, component_is_dipolar, &
-    components_interact
+use procedures_property_inquirers, only: use_permittivity, use_reciprocal_lattice, &
+    component_is_dipolar, components_interact
 
 implicit none
 
@@ -44,6 +45,10 @@ interface long_interactions_set
     module procedure :: set_alpha
     module procedure :: set_are_dipolar
 end interface long_interactions_set
+
+interface long_interactions_check
+    module procedure :: check_consistency
+end interface
 
 interface long_interactions_destroy
     module procedure :: destroy_real_pair
@@ -66,13 +71,15 @@ contains
         logical :: are_dipolar(size(mixture%components))
         real(DP) :: alpha
 
-        call long_interactions_set(are_dipolar, environment%reciprocal_lattice, mixture%components)
+        call long_interactions_set(are_dipolar, mixture%components)
+        call long_interactions_check(any(are_dipolar), environment%reciprocal_lattice, &
+            environment%permittivity)
         call long_interactions_create(long_interactions%real_visitor, environment%periodic_box, &
             any(are_dipolar))
         call long_interactions_set(alpha, environment%periodic_box, any(are_dipolar), input_data, &
             prefix)
-        call long_interactions_create(long_interactions%real_pairs, environment%periodic_box, &
-            mixture%components_min_distances, are_dipolar, alpha, input_data, prefix//"Real.")
+        call long_interactions_create(long_interactions%real_pairs, environment, mixture%&
+            components_min_distances, are_dipolar, alpha, input_data, prefix//"Real.")
         call long_interactions_create(long_interactions%real_components, environment%periodic_box, &
             mixture%components, long_interactions%real_pairs)
     end subroutine create_all
@@ -172,27 +179,28 @@ contains
         end if
     end subroutine destroy_real_component
 
-    subroutine create_real_pairs(real_pairs, periodic_box, min_distances, are_dipolar, &
+    subroutine create_real_pairs(real_pairs, environment, min_distances, are_dipolar, &
         alpha, input_data, prefix)
         type(Ewald_Real_Pairs_Wrapper), allocatable, intent(out) :: real_pairs(:)
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
+        type(Environment_Wrapper), intent(in) :: environment
         type(Minimum_Distances_Wrapper), intent(in) :: min_distances(:)
         logical, intent(in) :: are_dipolar(:)
         real(DP), intent(in) :: alpha
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
+        logical :: interact_ij
         integer :: j_component, i_component
 
         allocate(real_pairs(size(are_dipolar)))
         do j_component = 1, size(are_dipolar)
             allocate(real_pairs(j_component)%with_components(j_component))
             do i_component = 1, size(real_pairs(j_component)%with_components)
-                associate (interact_ij => are_dipolar(i_component) .and. are_dipolar(j_component), &
-                    min_distance => min_distances(j_component)%with_components(i_component)%&
-                    min_distance)
+                interact_ij = are_dipolar(i_component) .and. are_dipolar(j_component)
+                associate (min_distance_ij => min_distances(j_component)%&
+                    with_components(i_component)%min_distance)
                     call long_interactions_create(real_pairs(j_component)%&
-                        with_components(i_component)%real_pair, periodic_box, min_distance, &
+                        with_components(i_component)%real_pair, environment, min_distance_ij, &
                         interact_ij, alpha, input_data, prefix)
                 end associate
             end do
@@ -218,10 +226,10 @@ contains
         end if
     end subroutine destroy_real_pairs
 
-    subroutine create_real_pair(real_pair, periodic_box, min_distance, interact, alpha, &
+    subroutine create_real_pair(real_pair, environment, min_distance, interact, alpha, &
         input_data, prefix)
         class(Abstract_Ewald_Real_Pair), allocatable, intent(out) :: real_pair
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
+        type(Environment_Wrapper), intent(in) :: environment
         class(Abstract_Minimum_Distance), intent(in) :: min_distance
         logical, intent(in) :: interact
         real(DP), intent(in) :: alpha
@@ -229,7 +237,7 @@ contains
         character(len=*), intent(in) :: prefix
 
         call allocate_real_pair(real_pair, interact, input_data, prefix)
-        call construct_real_pair(real_pair, periodic_box, min_distance, interact, alpha, &
+        call construct_real_pair(real_pair, environment, min_distance, interact, alpha, &
             input_data, prefix)
     end subroutine create_real_pair
 
@@ -257,10 +265,10 @@ contains
         end if
     end subroutine allocate_real_pair
 
-    subroutine construct_real_pair(real_pair, periodic_box, min_distance, interact, alpha, &
+    subroutine construct_real_pair(real_pair, environment, min_distance, interact, alpha, &
         input_data, prefix)
         class(Abstract_Ewald_Real_Pair), intent(inout) :: real_pair
-        class(Abstract_Periodic_Box), intent(in) :: periodic_box
+        type(Environment_Wrapper), intent(in) :: environment
         class(Abstract_Minimum_Distance), intent(in) :: min_distance
         logical, intent(in) :: interact
         real(DP), intent(in) :: alpha
@@ -271,14 +279,16 @@ contains
         logical :: data_found
         type(Concrete_Potential_Domain) :: domain
         real(DP) :: box_size(num_dimensions), max_over_box
+        real(DP) :: permittivity
 
         if (interact) then
             domain%min = min_distance%get()
             data_field = prefix//"max distance over box edge"
             call input_data%get(data_field, max_over_box, data_found)
             call check_data_found(data_field, data_found)
-            box_size = periodic_box%get_size()
+            box_size = environment%periodic_box%get_size()
             domain%max = max_over_box * box_size(1)
+            permittivity = environment%permittivity%get()
             select type (real_pair)
                 type is (Tabulated_Ewald_Real_Pair)
                     data_field = prefix//"delta distance"
@@ -286,7 +296,7 @@ contains
                     call check_data_found(data_field, data_found)
             end select
         end if
-        call real_pair%construct(domain, alpha)
+        call real_pair%construct(domain, permittivity, alpha)
     end subroutine construct_real_pair
 
     subroutine destroy_real_pair(real_pair)
@@ -325,9 +335,8 @@ contains
         end if
     end subroutine set_alpha
 
-    subroutine set_are_dipolar(are_dipolar, reciprocal_lattice, components)
+    subroutine set_are_dipolar(are_dipolar, components)
         logical, intent(out) :: are_dipolar(:)
-        class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
         type(Component_Wrapper), intent(in) :: components(:)
 
         integer :: i_component
@@ -335,9 +344,22 @@ contains
         do i_component = 1, size(are_dipolar)
             are_dipolar(i_component) = component_is_dipolar(components(i_component)%dipolar_moments)
         end do
-        if (any(are_dipolar) .and. .not.use_reciprocal_lattice(reciprocal_lattice)) then
-            call warning_continue("set_are_dipolar: dipoles exist but reciprocal_lattice unused.")
-        end if
     end subroutine set_are_dipolar
+
+    subroutine check_consistency(dipoles_exist, reciprocal_lattice, permittivity)
+        logical, intent(in) :: dipoles_exist
+        class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
+        class(Abstract_Permittivity), intent(in) :: permittivity
+
+        if (dipoles_exist) then
+            if (.not.use_reciprocal_lattice(reciprocal_lattice)) then
+                call warning_continue("check_consistency: dipoles exist but reciprocal_lattice "//&
+                    "unused.")
+            end if
+            if (.not.use_permittivity(permittivity)) then
+                call warning_continue("check_consistency: dipoles exist but permittivity unused.")
+            end if
+        end if
+    end subroutine
 
 end module procedures_long_interactions_factory
