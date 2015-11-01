@@ -5,6 +5,7 @@ project_dir: ./programs
     ./modules
 extra_mods: json_module: http://jacobwilliams.github.io/json-fortran/
 output_dir: ./doc
+page_dir: ./pages
 predocmark: >
 search: false
 graph: true

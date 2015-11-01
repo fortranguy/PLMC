@@ -1,7 +1,9 @@
+!> display: public
+!>          private
 module class_ewald_real_pair
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
-use data_constants, only: num_dimensions
+use data_constants, only: num_dimensions, PI
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_positive, check_potential_domain
 use procedures_ewald_micro, only: ewald_real_B, ewald_real_C
@@ -81,10 +83,8 @@ contains
 
 !implementation Abstract_Ewald_Real_Pair
 
-    !> Between 2 component
-    !> \[ (\vec{\mu}_i\cdot\vec{\mu}_j) B_\alpha(r_{ij}) -
-    !>     (\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij}) C_\alpha(r_{ij})
-    !> \]
+    !> \[ u_{ij} = \frac{1}{4\pi\epsilon} (\vec{\mu}_i\cdot\vec{\mu}_j) B_\alpha(r_{ij}) -
+    !>      (\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij}) C_\alpha(r_{ij}) \]
     pure real(DP) function Abstract_Ewald_Real_Pair_meet_energy(this, vector_ij, moment_i, &
         moment_j) result(energy)
         class(Abstract_Ewald_Real_Pair), intent(in) :: this
@@ -95,7 +95,8 @@ contains
 
         coefficient(1) = dot_product(moment_i, moment_j)
         coefficient(2) =-dot_product(moment_i, vector_ij) * dot_product(moment_j, vector_ij)
-        energy = dot_product(coefficient, this%expression(norm2(vector_ij)))
+        energy = dot_product(coefficient, this%expression(norm2(vector_ij))) / (4._DP*PI)
+        !> dimension problem
     end function Abstract_Ewald_Real_Pair_meet_energy
 
     !> Field: to check

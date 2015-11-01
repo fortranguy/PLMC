@@ -1,4 +1,5 @@
-!> display: private
+!> display: public
+!>          private
 module class_weighted_structure
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
@@ -71,9 +72,8 @@ contains
     end subroutine Abstract_Weighted_Structure_construct
 
     !> \[
-    !>      w(\alpha, \vec{k}) = \frac{e^{-\frac{\pi^2}{\alpha^2} \sum_{d=1}^3 \frac{k_d^2}{L_d^2}}}
-    !>                                {\sum_{d=1}^3 k_d^2}
-    !> \] different definition of wave?
+    !>      w(\alpha, \vec{k}) = \frac{e^{-k^2/4\alpha^2}}{k^2}
+    !> \]
     pure subroutine Abstract_Weighted_Structure_set_weight(this)
         class(Abstract_Weighted_Structure), intent(inout) :: this
 
@@ -108,15 +108,10 @@ contains
         weight = this%weight(n_1, n_2, n_3)
     end function Abstract_Weighted_Structure_get_weight
 
-    !> Structure factor init :
+    !> Structure factor:
     !> \[
-    !>      S(\vec{k}) = \sum_{i} (\vec{k}\cdot\vec{\mu}_i) e^{+i\vec{k}\cdot\vec{x}_i}
+    !>      S(\vec{k}) = \sum_{i=1}^N (\vec{k}\cdot\vec{\mu}_i) e^{i\vec{k}\cdot\vec{x}_i}
     !> \]
-    !> We will also use a restricted definition later :
-    !> \[
-    !>      S_\underline{l}(\vec{k}) = \sum_{i \neq l} (\vec{k}\cdot\vec{\mu}_i)
-    !>                                 e^{+i\vec{k}\cdot\vec{x}_i}
-    !> \].
     pure subroutine Abstract_Weighted_Structure_set_structure(this)
         class(Abstract_Weighted_Structure), intent(inout) :: this
 
@@ -126,7 +121,7 @@ contains
         complex(DP), dimension(-this%reci_numbers(3):this%reci_numbers(3)) :: fourier_position_3
 
         real(DP) :: box_size(num_dimensions)
-        real(DP), dimension(num_dimensions) :: relative_position
+        real(DP), dimension(num_dimensions) :: wave_dot_positions
         real(DP), dimension(num_dimensions) :: wave_vector
         real(DP) :: wave_dot_moment
         integer :: n_1, n_2, n_3
@@ -135,11 +130,11 @@ contains
         box_size = this%periodic_box%get_size()
         this%structure(:, :, :) = cmplx(0._DP, 0._DP, DP)
         do i_particle = 1, this%component_positions%get_num()
-            relative_position(:) = 2._DP*PI * this%component_positions%get(i_particle) / &
+            wave_dot_positions(:) = 2._DP*PI * this%component_positions%get(i_particle) / &
                 this%periodic_box%get_size()
-            call set_fourier(fourier_position_1, this%reci_numbers(1), relative_position(1))
-            call set_fourier(fourier_position_2, this%reci_numbers(2), relative_position(2))
-            call set_fourier(fourier_position_3, this%reci_numbers(3), relative_position(3))
+            call set_fourier(fourier_position_1, this%reci_numbers(1), wave_dot_positions(1))
+            call set_fourier(fourier_position_2, this%reci_numbers(2), wave_dot_positions(2))
+            call set_fourier(fourier_position_3, this%reci_numbers(3), wave_dot_positions(3))
             do n_3 = -this%reci_numbers(3), this%reci_numbers(3)
                 wave_vector(3) = 2._DP*PI * real(n_3, DP) / box_size(3)
             do n_2 = -this%reci_numbers(2), this%reci_numbers(2)
@@ -148,8 +143,8 @@ contains
                 wave_vector(1) = 2._DP*PI * real(n_1, DP) / box_size(1)
                 fourier_position = fourier_position_1(n_1) * fourier_position_2(n_2) * &
                     fourier_position_3(n_3)
-                wave_dot_moment = dot_product(wave_vector, &
-                    this%component_dipolar_moments%get(i_particle))
+                wave_dot_moment = dot_product(wave_vector, this%component_dipolar_moments%&
+                    get(i_particle))
                 this%structure(n_1, n_2, n_3) = this%structure(n_1, n_2, n_3) + &
                     cmplx(wave_dot_moment, 0._DP, DP) * fourier_position
             end do

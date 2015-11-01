@@ -14,6 +14,7 @@ private
 
     abstract interface
 
+        !> \[u : r \mapsto u(r) \]
         pure function Abstract_Potential_Expression_get(this, distance) result(field_expression)
         import :: DP, Abstract_Potential_Expression
             class(Abstract_Potential_Expression), intent(in) :: this
@@ -45,6 +46,7 @@ contains
         class(Null_Potential_Expression), intent(inout) :: this
     end subroutine Null_Potential_Expression_set
 
+    !> \[ u(r) = 0 \]
     pure function Null_Potential_Expression_get(this, distance) result(expression)
         class(Null_Potential_Expression), intent(in) :: this
         real(DP), intent(in) :: distance
@@ -66,6 +68,8 @@ contains
         this%sigma =  sigma
     end subroutine Lennard_Jones_Expression_set
 
+    !> \[ u(r) = 4 \epsilon \left[\left(\frac{\sigma}{r}\right)^{12} -
+    !>      \left(\frac{\sigma}{r}\right)^6 \right] \]
     pure function Lennard_Jones_Expression_get(this, distance) result(expression)
         class(Lennard_Jones_Expression), intent(in) :: this
         real(DP), intent(in) :: distance
