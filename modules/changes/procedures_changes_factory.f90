@@ -34,15 +34,13 @@ contains
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
+        type(Concrete_Change_Tuning_Parameters) :: tuning_parameters
+        type(Concrete_Change_Tuner_Parameters) :: tuner_parameters
         type(Concrete_Number_to_String) :: string
         integer :: i_component
 
-        type(Concrete_Change_Tuning_Parameters) :: tuning_parameters
-        type(Concrete_Change_Tuner_Parameters) :: tuner_parameters
-
         call set_tuning_parameters(tuning_parameters, input_data, prefix//"Components.")
         call set_tuner_parameters(tuner_parameters, input_data, prefix//"Components.")
-
         allocate(changes%components(size(components)))
         do i_component = 1, size(changes%components)
             call changes_component_create(changes%components(i_component), periodic_box, &

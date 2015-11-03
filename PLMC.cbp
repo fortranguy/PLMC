@@ -152,8 +152,8 @@
 		<Unit filename="modules/long_interactions/class_ewald_real_visitor.f90">
 			<Option weight="5" />
 		</Unit>
-		<Unit filename="modules/long_interactions/class_weighted_structure.f90">
-			<Option weight="5" />
+		<Unit filename="modules/long_interactions/class_ewald_reci_structures.f90">
+			<Option weight="7" />
 		</Unit>
 		<Unit filename="modules/long_interactions/procedures_ewald_micro.f90">
 			<Option weight="1" />
