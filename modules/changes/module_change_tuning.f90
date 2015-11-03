@@ -8,10 +8,10 @@ implicit none
 private
 public :: set_increase_factor
 
-    type, public :: Concrete_Tuning_Parameters
+    type, public :: Concrete_Change_Tuning_Parameters
         real(DP) :: increase_factor
         real(DP) :: increase_factor_max
-    end type Concrete_Tuning_Parameters
+    end type Concrete_Change_Tuning_Parameters
 
 contains
 
@@ -19,7 +19,7 @@ contains
         max_factor_reached)
         character(len=*), intent(in) :: context
         real(DP), intent(inout) :: current_increase_factor
-        type(Concrete_Tuning_Parameters), intent(in) :: tuning_parameters
+        type(Concrete_Change_Tuning_Parameters), intent(in) :: tuning_parameters
         logical, intent(out) :: max_factor_reached
 
         current_increase_factor = tuning_parameters%increase_factor * current_increase_factor

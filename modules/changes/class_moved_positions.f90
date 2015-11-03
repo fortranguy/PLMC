@@ -6,7 +6,7 @@ use procedures_errors, only: warning_continue
 use procedures_checks, only: check_3d_array, check_positive, check_increase_factor
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_component_coordinates, only: Abstract_Component_Coordinates
-use module_change_tuning, only: Concrete_Tuning_Parameters, &
+use module_change_tuning, only: Concrete_Change_Tuning_Parameters, &
     set_increase_factor
 use class_changed_coordinates, only: Abstract_Changed_Coordinates
 
@@ -19,7 +19,7 @@ private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
         class(Abstract_Component_Coordinates), pointer :: positions => null()
         real(DP) :: delta(num_dimensions)
-        type(Concrete_Tuning_Parameters) :: tuning_parameters
+        type(Concrete_Change_Tuning_Parameters) :: tuning_parameters
         real(DP) :: current_increase_factor
         logical :: max_factor_reached
     contains
@@ -39,7 +39,7 @@ contains
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Component_Coordinates), target, intent(in) :: positions
         real(DP), intent(in) :: delta(:)
-        type(Concrete_Tuning_Parameters), intent(in) :: tuning_parameters
+        type(Concrete_Change_Tuning_Parameters), intent(in) :: tuning_parameters
 
         this%periodic_box => periodic_box
         this%positions => positions

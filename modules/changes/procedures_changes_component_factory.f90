@@ -2,7 +2,6 @@ module procedures_changes_component_factory
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
-use module_plmc_iterations, only: num_tuning_steps
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_data_found
 use class_periodic_box, only: Abstract_Periodic_Box
@@ -11,15 +10,16 @@ use class_component_chemical_potential, only: Abstract_Component_Chemical_Potent
 use class_changed_coordinates, only: Abstract_Changed_Coordinates, Null_Changed_Coordinates
 use class_moved_positions, only: Concrete_Moved_Positions
 use class_rotated_orientations, only: Concrete_Rotated_Orientations
+use module_change_tuning, only: Concrete_Change_Tuning_Parameters
 use class_change_tuner, only: Concrete_Change_Tuner_Parameters, Abstract_Change_Tuner, &
     Concrete_Change_Tuner, Null_Change_Tuner
 use class_component_exchange, only: Abstract_Component_Exchange, Concrete_Component_Exchange, &
     Null_Component_Exchange
-use module_change_tuning, only: Concrete_Tuning_Parameters
 use types_component_wrapper, only: Component_Wrapper
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use procedures_property_inquirers, only: component_has_positions, component_has_orientations, &
     component_can_move, component_can_rotate, component_can_exchange
+use module_plmc_iterations, only: num_tuning_steps
 
 implicit none
 
@@ -43,21 +43,24 @@ end interface changes_component_destroy
 
 contains
 
-    subroutine create_all(component, periodic_box, mixture_component, input_data, prefix)
+    subroutine create_all(component, periodic_box, mixture_component, tuning_parameters, &
+        tuner_parameters, input_data, prefix)
         type(Changes_Component_Wrapper), intent(out) :: component
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(Component_Wrapper), intent(in) :: mixture_component
+        type(Concrete_Change_Tuning_Parameters), intent(in) :: tuning_parameters
+        type(Concrete_Change_Tuner_Parameters), intent(in) :: tuner_parameters
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
         call changes_component_create(component%moved_positions, periodic_box, mixture_component%&
-            positions, input_data, prefix)
+            positions, tuning_parameters, input_data, prefix)
         call changes_component_create_move_tuner(component%move_tuner, component%moved_positions, &
-            input_data, prefix)
+            tuner_parameters)
         call changes_component_create(component%rotated_orientations, mixture_component%&
-            orientations, input_data, prefix)
+            orientations, tuning_parameters, input_data, prefix)
         call changes_component_create_rotation_tuner(component%rotation_tuner, component%&
-            rotated_orientations, input_data, prefix)
+            rotated_orientations, tuner_parameters)
         call changes_component_create(component%exchange, mixture_component)
     end subroutine create_all
 
@@ -71,15 +74,18 @@ contains
         call changes_component_destroy(component%moved_positions)
     end subroutine destroy_all
 
-    subroutine create_moved_positions(moved_positions, periodic_box, positions, input_data, prefix)
+    subroutine create_moved_positions(moved_positions, periodic_box, positions, tuning_parameters, &
+        input_data, prefix)
         class(Abstract_Changed_Coordinates), allocatable, intent(out) :: moved_positions
+        type(Concrete_Change_Tuning_Parameters), intent(in) :: tuning_parameters
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Component_Coordinates), intent(in) :: positions
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
         call allocate_moved_positions(moved_positions, positions)
-        call construct_moved_positions(moved_positions, periodic_box, positions, input_data, prefix)
+        call construct_moved_positions(moved_positions, periodic_box, positions, &
+            tuning_parameters, input_data, prefix)
     end subroutine create_moved_positions
 
     subroutine allocate_moved_positions(moved_positions, positions)
@@ -93,18 +99,18 @@ contains
         end if
     end subroutine allocate_moved_positions
 
-    subroutine construct_moved_positions(moved_positions, periodic_box, positions, input_data, &
-        prefix)
+    subroutine construct_moved_positions(moved_positions, periodic_box, positions, &
+        tuning_parameters, input_data, prefix)
         class(Abstract_Changed_Coordinates), intent(inout) :: moved_positions
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Component_Coordinates), intent(in) :: positions
+        type(Concrete_Change_Tuning_Parameters), intent(in) :: tuning_parameters
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field
         logical :: data_found
         real(DP), allocatable :: move_delta(:)
-        type(Concrete_Tuning_Parameters) :: tuning_parameters
 
         select type (moved_positions)
             type is (Concrete_Moved_Positions)
@@ -112,7 +118,6 @@ contains
                 call input_data%get(data_field, move_delta, data_found)
                 call check_data_found(data_field, data_found)
                 deallocate(data_field)
-                call set_tuning_parameters(tuning_parameters, input_data, prefix//"Small Move.")
                 call moved_positions%construct(periodic_box, positions, move_delta, &
                     tuning_parameters)
                 deallocate(move_delta)
@@ -132,51 +137,18 @@ contains
         end if
     end subroutine destroy_changed_coordinates
 
-    subroutine changes_component_create_move_tuner(move_tuner, moved_positions, input_data, prefix)
+    subroutine changes_component_create_move_tuner(move_tuner, moved_positions, tuner_parameters)
         class(Abstract_Change_Tuner), allocatable, intent(out) :: move_tuner
         class(Abstract_Changed_Coordinates), intent(in) :: moved_positions
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
-
-        call allocate_move_tuner(move_tuner, moved_positions)
-        call construct_change_tuner(move_tuner, moved_positions, input_data, prefix//"Small Move.")
-    end subroutine changes_component_create_move_tuner
-
-    subroutine allocate_move_tuner(move_tuner, moved_positions)
-        class(Abstract_Change_Tuner), allocatable, intent(out) :: move_tuner
-        class(Abstract_Changed_Coordinates), intent(in) :: moved_positions
+        type(Concrete_Change_Tuner_Parameters), intent(in) :: tuner_parameters
 
         if (component_can_move(moved_positions) .and. num_tuning_steps > 0) then
             allocate(Concrete_Change_Tuner :: move_tuner)
         else
             allocate(Null_Change_Tuner :: move_tuner)
         end if
-    end subroutine allocate_move_tuner
-
-    subroutine construct_change_tuner(change_tuner, changed_coordinates, input_data, prefix)
-        class(Abstract_Change_Tuner), intent(inout) :: change_tuner
-        class(Abstract_Changed_Coordinates), intent(in) :: changed_coordinates
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
-
-        character(len=:), allocatable :: data_field
-        logical :: data_found
-        type(Concrete_Change_Tuner_Parameters) :: tuner_parameters
-
-        select type (change_tuner)
-            type is (Concrete_Change_Tuner)
-                data_field = prefix//"accumulation period"
-                call input_data%get(data_field, tuner_parameters%accumulation_period, data_found)
-                call check_data_found(data_field, data_found)
-                data_field = prefix//"wanted success ratio"
-                call input_data%get(data_field, tuner_parameters%wanted_success_ratio, data_found)
-                call check_data_found(data_field, data_found)
-                data_field = prefix//"tolerance"
-                call input_data%get(data_field, tuner_parameters%tolerance, data_found)
-                call check_data_found(data_field, data_found)
-        end select
-        call change_tuner%construct(changed_coordinates, tuner_parameters)
-    end subroutine construct_change_tuner
+        call move_tuner%construct(moved_positions, tuner_parameters)
+    end subroutine changes_component_create_move_tuner
 
     subroutine destroy_change_tuner(change_tuner)
         class(Abstract_Change_Tuner), allocatable, intent(inout) :: change_tuner
@@ -187,14 +159,17 @@ contains
         end if
     end subroutine destroy_change_tuner
 
-    subroutine create_rotated_orientations(rotated_orientations, orientations, input_data, prefix)
+    subroutine create_rotated_orientations(rotated_orientations, orientations, tuning_parameters, &
+        input_data, prefix)
         class(Abstract_Changed_Coordinates), allocatable, intent(out) :: rotated_orientations
+        type(Concrete_Change_Tuning_Parameters), intent(in) :: tuning_parameters
         class(Abstract_Component_Coordinates), intent(in) :: orientations
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
         call allocate_rotated_orientations(rotated_orientations, orientations)
-        call construct_rotated_orientations(rotated_orientations, orientations, input_data, prefix)
+        call construct_rotated_orientations(rotated_orientations, orientations, tuning_parameters, &
+            input_data, prefix)
     end subroutine create_rotated_orientations
 
     subroutine allocate_rotated_orientations(rotated_orientations, orientations)
@@ -208,17 +183,17 @@ contains
         end if
     end subroutine allocate_rotated_orientations
 
-    subroutine construct_rotated_orientations(rotated_orientations, orientations, input_data, &
-        prefix)
+    subroutine construct_rotated_orientations(rotated_orientations, orientations, &
+        tuning_parameters, input_data, prefix)
         class(Abstract_Changed_Coordinates), intent(inout) :: rotated_orientations
         class(Abstract_Component_Coordinates), intent(in) :: orientations
+        type(Concrete_Change_Tuning_Parameters), intent(in) :: tuning_parameters
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: data_field
         logical :: data_found
         real(DP) :: rotation_delta
-        type(Concrete_Tuning_Parameters) :: tuning_parameters
 
         select type (rotated_orientations)
             type is (Concrete_Rotated_Orientations)
@@ -226,7 +201,6 @@ contains
                 call input_data%get(data_field, rotation_delta, data_found)
                 call check_data_found(data_field, data_found)
                 deallocate(data_field)
-                call set_tuning_parameters(tuning_parameters, input_data, prefix//"Small Rotation.")
                 call rotated_orientations%construct(orientations, rotation_delta, tuning_parameters)
             type is (Null_Changed_Coordinates)
                 call rotated_orientations%construct()
@@ -235,50 +209,19 @@ contains
         end select
     end subroutine construct_rotated_orientations
 
-    subroutine set_tuning_parameters(parameters, input_data, prefix)
-        type(Concrete_Tuning_Parameters), intent(out) :: parameters
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
-
-        character(len=:), allocatable :: data_field
-        logical :: data_found
-
-        if (num_tuning_steps > 0) then
-            data_field = prefix//"increase factor"
-            call input_data%get(data_field, parameters%increase_factor, data_found)
-            call check_data_found(data_field, data_found)
-            data_field = prefix//"maximum increase factor"
-            call input_data%get(data_field, parameters%increase_factor_max, data_found)
-            call check_data_found(data_field, data_found)
-            deallocate(data_field)
-        else
-            parameters%increase_factor = 1._DP
-            parameters%increase_factor_max = parameters%increase_factor
-        end if
-    end subroutine set_tuning_parameters
-
     subroutine changes_component_create_rotation_tuner(rotation_tuner, rotated_orientations, &
-        input_data, prefix)
+        tuner_parameters)
         class(Abstract_Change_Tuner), allocatable, intent(out) :: rotation_tuner
         class(Abstract_Changed_Coordinates), intent(in) :: rotated_orientations
-        type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: prefix
-
-        call allocate_rotation_tuner(rotation_tuner, rotated_orientations)
-        call construct_change_tuner(rotation_tuner, rotated_orientations, input_data, &
-            prefix//"Small Rotation.")
-    end subroutine changes_component_create_rotation_tuner
-
-    subroutine allocate_rotation_tuner(rotation_tuner, rotated_orientations)
-        class(Abstract_Change_Tuner), allocatable, intent(out) :: rotation_tuner
-        class(Abstract_Changed_Coordinates), intent(in) :: rotated_orientations
+        type(Concrete_Change_Tuner_Parameters), intent(in) :: tuner_parameters
 
         if (component_can_rotate(rotated_orientations) .and. num_tuning_steps > 0) then
             allocate(Concrete_Change_Tuner :: rotation_tuner)
         else
             allocate(Null_Change_Tuner :: rotation_tuner)
         end if
-    end subroutine allocate_rotation_tuner
+        call rotation_tuner%construct(rotated_orientations, tuner_parameters)
+    end subroutine changes_component_create_rotation_tuner
 
     subroutine create_component_exchange(component_exchange, component)
         class(Abstract_Component_Exchange), allocatable, intent(out) :: component_exchange

@@ -10,6 +10,10 @@
         "External Field": {
             "apply": false
         },
+        "Permittivity": {
+            "use": true,
+            "value": 1.0
+        },
         "Reciprocal Lattice": {
             "use": false
         },
@@ -111,7 +115,14 @@
         }
     },
     "Changes": {
-        "number of tuning steps": 0,
+        "number of tuning steps": 50,
+        "Components": {
+            "increase factor": 1.05,
+            "maximum increase factor": 1.5,
+            "accumulation period": 10,
+            "wanted success ratio": 0.75,
+            "tolerance": 0.01
+        },
         "Component 1": {
             "Small Move": {
                 "delta": [0.3, 0.3, 0.3]
