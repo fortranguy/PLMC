@@ -8,6 +8,7 @@ use procedures_errors, only: error_exit
 use procedures_checks, only: check_positive, check_potential_domain
 use procedures_ewald_micro, only: ewald_real_B, ewald_real_C
 use types_potential_domain, only: Concrete_Potential_Domain
+use class_ewald_convergence_parameter, only: Abstract_Ewald_Convergence_Parameter
 
 implicit none
 
@@ -17,7 +18,7 @@ private
     private
         type(Concrete_Potential_Domain) :: domain
         real(DP) :: coulomb
-        real(DP) :: alpha
+        class(Abstract_Ewald_Convergence_Parameter), pointer :: alpha => null()
     contains
         procedure(Abstract_Ewald_Real_Pair_construct), deferred :: construct
         procedure(Abstract_Ewald_Real_Pair_destroy), deferred :: destroy
@@ -30,11 +31,12 @@ private
     abstract interface
 
         subroutine Abstract_Ewald_Real_Pair_construct(this, domain, permittivity, alpha)
-        import :: DP, Concrete_Potential_Domain, Abstract_Ewald_Real_Pair
+        import :: DP, Concrete_Potential_Domain, Abstract_Ewald_Convergence_Parameter, &
+            Abstract_Ewald_Real_Pair
             class(Abstract_Ewald_Real_Pair), intent(out) :: this
             type(Concrete_Potential_Domain), intent(in) :: domain
             real(DP), intent(in) :: permittivity
-            real(DP), intent(in) :: alpha
+            class(Abstract_Ewald_Convergence_Parameter), target, intent(in) :: alpha
         end subroutine Abstract_Ewald_Real_Pair_construct
 
         subroutine Abstract_Ewald_Real_Pair_destroy(this)
@@ -64,8 +66,6 @@ private
     end type Tabulated_Ewald_Real_Pair
 
     type, extends(Abstract_Ewald_Real_Pair), public :: Raw_Ewald_Real_Pair
-    private
-        real(DP) :: expression_domain_max(2)
     contains
         procedure :: construct => Raw_Ewald_Real_Pair_construct
         procedure :: destroy => Raw_Ewald_Real_Pair_destroy
@@ -126,13 +126,12 @@ contains
         class(Tabulated_Ewald_Real_Pair), intent(out) :: this
         type(Concrete_Potential_Domain), intent(in) :: domain
         real(DP), intent(in) :: permittivity
-        real(DP), intent(in) :: alpha
+        class(Abstract_Ewald_Convergence_Parameter), target, intent(in) :: alpha
 
         call this%set_domain(domain)
         call check_positive("Tabulated_Ewald_Real_Pair_construct", "permittivity", permittivity)
         this%coulomb = 1._DP / (4._DP * PI * permittivity)
-        call check_positive("Tabulated_Ewald_Real_Pair_construct", "alpha", alpha)
-        this%alpha = alpha
+        this%alpha => alpha
         call this%set_tabulation()
     end subroutine Tabulated_Ewald_Real_Pair_construct
 
@@ -149,16 +148,17 @@ contains
     pure subroutine Tabulated_Ewald_Real_Pair_set_tabulation(this)
         class(Tabulated_Ewald_Real_Pair), intent(inout) :: this
 
-        real(DP) :: distance_i
+        real(DP) :: alpha, distance_i
         integer :: i_min, i_max, i_distance
 
+        alpha = this%alpha%get()
         i_min = int(this%domain%min/this%domain%delta)
         i_max = int(this%domain%max/this%domain%delta) + 1
         allocate(this%tabulation(i_min:i_max, 2))
         do i_distance = i_min, i_max
             distance_i = real(i_distance, DP) * this%domain%delta
-            this%tabulation(i_distance, 1) = ewald_real_B(this%alpha, distance_i)
-            this%tabulation(i_distance, 2) = ewald_real_C(this%alpha, distance_i)
+            this%tabulation(i_distance, 1) = ewald_real_B(alpha, distance_i)
+            this%tabulation(i_distance, 2) = ewald_real_C(alpha, distance_i)
         end do
         this%tabulation(:, 1) = this%coulomb * (this%tabulation(:, 1) - this%tabulation(i_max, 1))
         this%tabulation(:, 2) = this%coulomb * (this%tabulation(:, 2) - this%tabulation(i_max, 2))
@@ -168,6 +168,7 @@ contains
         class(Tabulated_Ewald_Real_Pair), intent(inout) :: this
 
         if (allocated(this%tabulation)) deallocate(this%tabulation)
+        this%alpha => null()
     end subroutine Tabulated_Ewald_Real_Pair_destroy
 
     !> Linear interpolation
@@ -199,15 +200,12 @@ contains
         class(Raw_Ewald_Real_Pair), intent(out) :: this
         type(Concrete_Potential_Domain), intent(in) :: domain
         real(DP), intent(in) :: permittivity
-        real(DP), intent(in) :: alpha
+        class(Abstract_Ewald_Convergence_Parameter), target, intent(in) :: alpha
 
         call this%set_domain(domain)
+        this%alpha => alpha
         call check_positive("Raw_Ewald_Real_Pair_construct", "permittivity", permittivity)
         this%coulomb = 1._DP / (4._DP * PI * permittivity)
-        call check_positive("Raw_Ewald_Real_Pair_construct", "alpha", alpha)
-        this%alpha = alpha
-        this%expression_domain_max =  [ewald_real_B(this%alpha, this%domain%max), &
-            ewald_real_C(this%alpha, this%domain%max)]
     end subroutine Raw_Ewald_Real_Pair_construct
 
     subroutine Raw_Ewald_Real_Pair_set_domain(this, domain)
@@ -229,9 +227,15 @@ contains
         class(Raw_Ewald_Real_Pair), intent(in) :: this
         real(DP), intent(in) :: distance
 
+        real(DP) :: expression_domain_max(2)
+        real(DP) :: alpha
+
         if (distance < this%domain%max) then
-            expression = [ewald_real_B(this%alpha, distance), ewald_real_C(this%alpha, distance)]
-            expression = this%coulomb * (expression - this%expression_domain_max)
+            alpha = this%alpha%get()
+            expression = [ewald_real_B(alpha, distance), ewald_real_C(alpha, distance)]
+            expression_domain_max =  [ewald_real_B(alpha, this%domain%max), &
+                ewald_real_C(alpha, this%domain%max)]
+            expression = this%coulomb * (expression - expression_domain_max)
         else
             expression = 0._DP
         end if
@@ -239,6 +243,8 @@ contains
 
     subroutine Raw_Ewald_Real_Pair_destroy(this)
         class(Raw_Ewald_Real_Pair), intent(inout) :: this
+
+        this%alpha => null()
     end subroutine Raw_Ewald_Real_Pair_destroy
 
 !end implementation Raw_Ewald_Real_Pair
@@ -249,7 +255,7 @@ contains
         class(Null_Ewald_Real_Pair), intent(out) :: this
         type(Concrete_Potential_Domain), intent(in) :: domain
         real(DP), intent(in) :: permittivity
-        real(DP), intent(in) :: alpha
+        class(Abstract_Ewald_Convergence_Parameter), target, intent(in) :: alpha
     end subroutine Null_Ewald_Real_Pair_construct
 
     subroutine Null_Ewald_Real_Pair_destroy(this)

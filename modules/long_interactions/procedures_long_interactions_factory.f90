@@ -15,6 +15,8 @@ use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
 use types_component_wrapper, only: Component_Wrapper
 use types_mixture_wrapper, only: Minimum_Distances_Wrapper, Mixture_Wrapper
 use types_potential_domain, only: Concrete_Potential_Domain
+use class_ewald_convergence_parameter, only: Abstract_Ewald_Convergence_Parameter, &
+    Concrete_Ewald_Convergence_Parameter, Null_Ewald_Convergence_Parameter
 use class_ewald_real_pair, only: Abstract_Ewald_Real_Pair, Tabulated_Ewald_Real_Pair, &
     Raw_Ewald_Real_Pair, Null_Ewald_Real_Pair
 use class_ewald_real_component, only: Abstract_Ewald_Real_Component, &
@@ -39,18 +41,19 @@ interface long_interactions_create
     module procedure :: create_real_component
     module procedure :: create_real_pairs
     module procedure :: create_real_pair
+    module procedure :: create_alpha
 end interface long_interactions_create
 
 interface long_interactions_set
-    module procedure :: set_alpha
     module procedure :: set_are_dipolar
 end interface long_interactions_set
 
 interface long_interactions_check
     module procedure :: check_consistency
-end interface
+end interface long_interactions_check
 
 interface long_interactions_destroy
+    module procedure :: destroy_alpha
     module procedure :: destroy_real_pair
     module procedure :: destroy_real_pairs
     module procedure :: destroy_real_component
@@ -69,17 +72,17 @@ contains
         character(len=*), intent(in) :: prefix
 
         logical :: are_dipolar(size(mixture%components))
-        real(DP) :: alpha
 
         call long_interactions_set(are_dipolar, mixture%components)
         call long_interactions_check(any(are_dipolar), environment%reciprocal_lattice, &
             environment%permittivity)
         call long_interactions_create(long_interactions%real_visitor, environment%periodic_box, &
             any(are_dipolar))
-        call long_interactions_set(alpha, environment%periodic_box, any(are_dipolar), input_data, &
-            prefix)
+        call long_interactions_create(long_interactions%alpha, environment%periodic_box, &
+            any(are_dipolar), input_data, prefix)
         call long_interactions_create(long_interactions%real_pairs, environment, mixture%&
-            components_min_distances, are_dipolar, alpha, input_data, prefix//"Real.")
+            components_min_distances, are_dipolar, long_interactions%alpha, input_data, &
+            prefix//"Real.")
         call long_interactions_create(long_interactions%real_components, environment%periodic_box, &
             mixture%components, long_interactions%real_pairs)
     end subroutine create_all
@@ -88,6 +91,7 @@ contains
         type(Long_Interactions_Wrapper), intent(inout) :: long_interactions
 
         call long_interactions_destroy(long_interactions%real_pairs)
+        call long_interactions_destroy(long_interactions%alpha)
         call long_interactions_destroy(long_interactions%real_components)
         call long_interactions_destroy(long_interactions%real_visitor)
     end subroutine destroy_all
@@ -185,7 +189,7 @@ contains
         type(Environment_Wrapper), intent(in) :: environment
         type(Minimum_Distances_Wrapper), intent(in) :: min_distances(:)
         logical, intent(in) :: are_dipolar(:)
-        real(DP), intent(in) :: alpha
+        class(Abstract_Ewald_Convergence_Parameter), intent(in) :: alpha
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -232,7 +236,7 @@ contains
         type(Environment_Wrapper), intent(in) :: environment
         class(Abstract_Minimum_Distance), intent(in) :: min_distance
         logical, intent(in) :: interact
-        real(DP), intent(in) :: alpha
+        class(Abstract_Ewald_Convergence_Parameter), intent(in) :: alpha
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -271,7 +275,7 @@ contains
         type(Environment_Wrapper), intent(in) :: environment
         class(Abstract_Minimum_Distance), intent(in) :: min_distance
         logical, intent(in) :: interact
-        real(DP), intent(in) :: alpha
+        class(Abstract_Ewald_Convergence_Parameter), intent(in) :: alpha
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
@@ -308,12 +312,8 @@ contains
         end if
     end subroutine destroy_real_pair
 
-    subroutine allocate_and_construct_weighted_structure(weighted_structure)
-        class(Abstract_Ewald_Reci_Structures), allocatable, intent(out) :: weighted_structure
-    end subroutine allocate_and_construct_weighted_structure
-
-    subroutine set_alpha(alpha, periodic_box, dipoles_exist, input_data, prefix)
-        real(DP), intent(out) :: alpha
+    subroutine create_alpha(alpha, periodic_box, dipoles_exist, input_data, prefix)
+        class(Abstract_Ewald_Convergence_Parameter), allocatable, intent(out) :: alpha
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         logical, intent(in) :: dipoles_exist
         type(json_file), intent(inout) :: input_data
@@ -321,19 +321,28 @@ contains
 
         character(len=:), allocatable :: data_field
         logical :: data_found
-        real(DP) :: box_size(num_dimensions), alpha_times_box
+        real(DP) :: alpha_x_box
 
         if (dipoles_exist) then
             data_field = prefix//"alpha times box edge"
-            call input_data%get(data_field, alpha_times_box, data_found)
+            call input_data%get(data_field, alpha_x_box, data_found)
             call check_data_found(data_field, data_found)
-            box_size = periodic_box%get_size()
-            alpha = alpha_times_box / box_size(1)
             deallocate(data_field)
+            allocate(Concrete_Ewald_Convergence_Parameter :: alpha)
         else
-            alpha = 0._DP
+            allocate(Null_Ewald_Convergence_Parameter :: alpha)
         end if
-    end subroutine set_alpha
+        call alpha%construct(periodic_box, alpha_x_box)
+    end subroutine create_alpha
+
+    subroutine destroy_alpha(alpha)
+        class(Abstract_Ewald_Convergence_Parameter), allocatable, intent(inout) :: alpha
+
+        if (allocated(alpha)) then
+            call alpha%destroy()
+            deallocate(alpha)
+        end if
+    end subroutine destroy_alpha
 
     subroutine set_are_dipolar(are_dipolar, components)
         logical, intent(out) :: are_dipolar(:)
@@ -360,6 +369,6 @@ contains
                 call warning_continue("check_consistency: dipoles exist but permittivity unused.")
             end if
         end if
-    end subroutine
+    end subroutine check_consistency
 
 end module procedures_long_interactions_factory
