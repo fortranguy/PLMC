@@ -3,7 +3,7 @@ module types_long_interactions_wrapper
 use class_ewald_convergence_parameter, only: Abstract_Ewald_Convergence_Parameter
 use class_ewald_real_pair, only: Abstract_Ewald_Real_Pair
 use class_ewald_real_component, only: Abstract_Ewald_Real_Component
-use class_ewald_reci_structures, only: Abstract_Ewald_Reci_Structures
+use class_ewald_reci_structure, only: Abstract_Ewald_Reci_Structure
 use class_ewald_real_visitor, only: Abstract_Ewald_Real_Visitor
 
 implicit none

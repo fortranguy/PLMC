@@ -21,7 +21,7 @@ use class_ewald_real_pair, only: Abstract_Ewald_Real_Pair, Tabulated_Ewald_Real_
     Raw_Ewald_Real_Pair, Null_Ewald_Real_Pair
 use class_ewald_real_component, only: Abstract_Ewald_Real_Component, &
     Concrete_Ewald_Real_Component, Null_Ewald_Real_Component
-use class_ewald_reci_structures, only: Abstract_Ewald_Reci_Structures
+use class_ewald_reci_structure, only: Abstract_Ewald_Reci_Structure
 use class_ewald_real_visitor, only: Abstract_Ewald_Real_Visitor, Concrete_Ewald_Real_Visitor, &
     Null_Ewald_Real_Visitor
 use types_long_interactions_wrapper, only: Ewald_Real_Pair_Wrapper, Ewald_Real_Pairs_Wrapper, &
