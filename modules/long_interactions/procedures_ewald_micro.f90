@@ -79,15 +79,15 @@ contains
         end if
     end function reciprocal_size_2_sym
 
-    !> Fourier coefficients (bases)
-    pure subroutine set_fourier(fourier_position_i, reci_number_i, wave_dot_position_i)
+    !> Fourier coefficients (bases) tabulation
+    pure subroutine set_fourier(fourier_position_i, reci_number_i, wave_1_dot_position_i)
         integer, intent(in) :: reci_number_i
         complex(DP), dimension(-reci_number_i:reci_number_i), intent(out) :: fourier_position_i
-        real(DP), intent(in) :: wave_dot_position_i
+        real(DP), intent(in) :: wave_1_dot_position_i
 
         integer :: n_i
         fourier_position_i(0) = (1._DP, 0._DP)
-        fourier_position_i(1) = cmplx(cos(wave_dot_position_i), sin(wave_dot_position_i), DP)
+        fourier_position_i(1) = cmplx(cos(wave_1_dot_position_i), sin(wave_1_dot_position_i), DP)
         fourier_position_i(-1) = conjg(fourier_position_i(1))
         do n_i = 2, reci_number_i
             fourier_position_i(n_i) = fourier_position_i(n_i-1) * fourier_position_i(1)
@@ -95,7 +95,7 @@ contains
         end do
     end subroutine set_fourier
 
-    ! Tabulation for DLC
+    !> DLC tabulation
     pure subroutine set_exp_kz(exp_kz_tab, reciprocal_size, wave_norm, z)
         integer, dimension(:), intent(in) :: reciprocal_size
         real(DP), dimension(0:reciprocal_size(1), 0:reciprocal_size(2)), intent(out) :: exp_kz_tab
