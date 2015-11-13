@@ -328,18 +328,6 @@ contains
 
 !implementation Concrete_One_Particle_Rotation
 
-    subroutine Concrete_One_Particle_Rotation_construct_selector(this)
-        class(Concrete_One_Particle_Rotation), intent(inout) :: this
-
-        integer :: nums_candidates(size(this%components))
-
-        integer :: i_component
-        do i_component = 1, size(nums_candidates)
-            nums_candidates(i_component) = this%components(i_component)%orientations%get_num()
-        end do
-        call this%selector%construct(nums_candidates)
-    end subroutine Concrete_One_Particle_Rotation_construct_selector
-
     subroutine Concrete_One_Particle_Rotation_visit_walls(this, overlap, walls_difference, new, &
         old, i_actor)
         class(Concrete_One_Particle_Rotation), intent(in) :: this

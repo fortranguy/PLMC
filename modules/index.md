@@ -2,8 +2,8 @@ title: Bridging Physics and Computer Science
 
 #Design
 
-This program aims at being fast and versatile using Modern
-Fortran features.
+This program aims at being readable, fast and versatile using
+Modern Fortran features.
 
 #Base units
 
