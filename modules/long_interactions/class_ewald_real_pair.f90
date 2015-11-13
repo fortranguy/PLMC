@@ -1,5 +1,5 @@
-!> display: public
-!>          private
+!! display: public
+!!          private
 module class_ewald_real_pair
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
@@ -86,8 +86,11 @@ contains
 
 !implementation Abstract_Ewald_Real_Pair
 
-    !> \[ u_{ij} = \frac{1}{4\pi\epsilon} (\vec{\mu}_i\cdot\vec{\mu}_j) B_\alpha(r_{ij}) -
-    !>      (\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij}) C_\alpha(r_{ij}) \]
+    !> \[
+    !>      u_{ij} = \frac{1}{4\pi\epsilon} \left[ (\vec{\mu}_i\cdot\vec{\mu}_j) B_\alpha(r_{ij}) -
+    !>               (\vec{\mu}_i\cdot\vec{r}_{ij}) (\vec{\mu}_j\cdot\vec{r}_{ij}) C_\alpha(r_{ij})
+    !>               \right]
+    !> \]
     pure real(DP) function Abstract_Ewald_Real_Pair_meet_energy(this, vector_ij, moment_i, &
         moment_j) result(energy)
         class(Abstract_Ewald_Real_Pair), intent(in) :: this
@@ -101,10 +104,10 @@ contains
         energy = dot_product(coefficient, this%expression(norm2(vector_ij)))
     end function Abstract_Ewald_Real_Pair_meet_energy
 
-    !> Field: to check
     !> \[
-    !>      \vec{E}(\vec{r}_i) = -B_\alpha(r_{ij}) |\vec{\mu}_j) +
+    !>      \vec{E}(\vec{r}_i) = \frac{1}{4\pi\epsilon} \left[ -B_\alpha(r_{ij}) |\vec{\mu}_j) +
     !>                           (\vec{r}_{ij}\cdot\vec{\mu}_j) C_\alpha(r_{ij}) |\vec{r}_{ij})
+    !>                           \right]
     !> \]
     pure function Abstract_Ewald_Real_Pair_meet_field(this, vector_ij, moment_j) result(field)
         real(DP) :: field(num_dimensions)
@@ -114,8 +117,7 @@ contains
         real(DP), dimension(2) :: expression
 
         expression = this%expression(norm2(vector_ij))
-        field = -expression(1) * moment_j + &
-            dot_product(vector_ij, moment_j) * expression(2) * vector_ij
+        field = -expression(1)*moment_j + dot_product(vector_ij, moment_j)*expression(2) * vector_ij
     end function Abstract_Ewald_Real_Pair_meet_field
 
 !end implementation Abstract_Ewald_Real_Pair

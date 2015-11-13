@@ -1,5 +1,3 @@
-!> display: public
-!>          private
 module class_ewald_reci_structure
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
@@ -8,6 +6,7 @@ use class_periodic_box, only: Abstract_Periodic_Box
 use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use class_component_coordinates, only: Abstract_Component_Coordinates
 use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
+use class_ewald_reci_weight, only: Abstract_Ewald_Reci_Weight
 use procedures_ewald_micro, only: set_fourier, reciprocal_size_1_sym, reciprocal_size_2_sym
 
 implicit none
@@ -19,11 +18,13 @@ private
         integer :: reci_numbers(num_dimensions)
         class(Abstract_Component_Coordinates), pointer :: component_positions => null()
         class(Abstract_Component_Dipolar_Moments), pointer :: component_dipolar_moments => null()
+        class(Abstract_Ewald_Reci_Weight), pointer :: reci_weight => null()
         complex(DP), dimension(:, :, :), allocatable :: structure
     contains
         procedure :: construct => Abstract_Ewald_Reci_Structure_construct
-        procedure :: reset => Abstract_Ewald_Reci_Structure_set
         procedure :: destroy => Abstract_Ewald_Reci_Structure_destroy
+        procedure :: reset => Abstract_Ewald_Reci_Structure_set
+        procedure :: get => Abstract_Ewald_Reci_Structure_get
         procedure, private :: set => Abstract_Ewald_Reci_Structure_set
     end type Abstract_Ewald_Reci_Structure
 
@@ -32,27 +33,35 @@ contains
 !implementation Abstract_Ewald_Reci_Structure
 
     subroutine Abstract_Ewald_Reci_Structure_construct(this, periodic_box, reciprocal_lattice, &
-        component_positions, component_dipolar_moments)
+        component_positions, component_dipolar_moments, reci_weight)
         class(Abstract_Ewald_Reci_Structure), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
         class(Abstract_Component_Coordinates), target, intent(in) :: component_positions
         class(Abstract_Component_Dipolar_Moments), target, intent(in) :: component_dipolar_moments
+        class(Abstract_Ewald_Reci_Weight), target, intent(in) :: reci_weight
 
         this%periodic_box => periodic_box
         this%reci_numbers = reciprocal_lattice%get_numbers()
         this%component_positions => component_positions
         this%component_dipolar_moments => component_dipolar_moments
+        this%reci_weight => reci_weight
         allocate(this%structure(-this%reci_numbers(1):this%reci_numbers(1), &
                                 -this%reci_numbers(2):this%reci_numbers(2), &
                                 -this%reci_numbers(3):this%reci_numbers(3)))
         call this%set()
     end subroutine Abstract_Ewald_Reci_Structure_construct
 
-    !> Structure factor:
-    !> \[
-    !>      S(\vec{k}) = \sum_{i=1}^N (\vec{k}\cdot\vec{\mu}_i) e^{i\vec{k}\cdot\vec{x}_i}
-    !> \]
+    subroutine Abstract_Ewald_Reci_Structure_destroy(this)
+        class(Abstract_Ewald_Reci_Structure), intent(inout) :: this
+
+        if (allocated(this%structure)) deallocate(this%structure)
+        this%reci_weight => null()
+        this%component_dipolar_moments => null()
+        this%component_positions => null()
+        this%periodic_box => null()
+    end subroutine Abstract_Ewald_Reci_Structure_destroy
+
     pure subroutine Abstract_Ewald_Reci_Structure_set(this)
         class(Abstract_Ewald_Reci_Structure), intent(inout) :: this
 
@@ -94,14 +103,17 @@ contains
         end do
     end subroutine Abstract_Ewald_Reci_Structure_set
 
-    subroutine Abstract_Ewald_Reci_Structure_destroy(this)
-        class(Abstract_Ewald_Reci_Structure), intent(inout) :: this
+    !> Structure factor:
+    !> \[
+    !>      S(\vec{k}) = \sum_{i=1}^N (\vec{k}\cdot\vec{\mu}_i) e^{i\vec{k}\cdot\vec{x}_i}
+    !> \]
+    pure complex(DP) function Abstract_Ewald_Reci_Structure_get(this, n_1, n_2, n_3) &
+        result(structure)
+        class(Abstract_Ewald_Reci_Structure), intent(in) :: this
+        integer, intent(in) :: n_1, n_2, n_3
 
-        if (allocated(this%structure)) deallocate(this%structure)
-        this%component_dipolar_moments => null()
-        this%component_positions => null()
-        this%periodic_box => null()
-    end subroutine Abstract_Ewald_Reci_Structure_destroy
+        structure = this%structure(n_1, n_2, n_3)
+    end function Abstract_Ewald_Reci_Structure_get
 
 !end implementation Abstract_Ewald_Reci_Structure
 

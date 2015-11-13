@@ -16,8 +16,9 @@ private
         real(DP), dimension(:, :, :), allocatable :: weight
     contains
         procedure :: construct => Abstract_Ewald_Reci_Weight_construct
-        procedure :: reset => Abstract_Ewald_Reci_Weight_set
         procedure :: destroy => Abstract_Ewald_Reci_Weight_destroy
+        procedure :: reset => Abstract_Ewald_Reci_Weight_set
+        procedure :: get => Abstract_Ewald_Reci_Weight_get
         procedure, private :: set => Abstract_Ewald_Reci_Weight_set
     end type Abstract_Ewald_Reci_Weight
 
@@ -40,9 +41,14 @@ contains
         call this%set()
     end subroutine Abstract_Ewald_Reci_Weight_construct
 
-    !> \[
-    !>      w(\alpha, \vec{k}) = \frac{e^{-k^2/4\alpha^2}}{k^2}
-    !> \]
+    subroutine Abstract_Ewald_Reci_Weight_destroy(this)
+        class(Abstract_Ewald_Reci_Weight), intent(inout) :: this
+
+        if (allocated(this%weight)) deallocate(this%weight)
+        this%alpha => null()
+        this%periodic_box => null()
+    end subroutine Abstract_Ewald_Reci_Weight_destroy
+
     pure subroutine Abstract_Ewald_Reci_Weight_set(this)
         class(Abstract_Ewald_Reci_Weight), intent(inout) :: this
 
@@ -69,13 +75,15 @@ contains
         end do
     end subroutine Abstract_Ewald_Reci_Weight_set
 
-    subroutine Abstract_Ewald_Reci_Weight_destroy(this)
-        class(Abstract_Ewald_Reci_Weight), intent(inout) :: this
+    !> \[
+    !>      w(\alpha, \vec{k}) = \frac{e^{-k^2/4\alpha^2}}{k^2}
+    !> \]
+    pure real(DP) function Abstract_Ewald_Reci_Weight_get(this, n_1, n_2, n_3) result(weight)
+        class(Abstract_Ewald_Reci_Weight), intent(in) :: this
+        integer, intent(in) :: n_1, n_2, n_3
 
-        if (allocated(this%weight)) deallocate(this%weight)
-        this%alpha => null()
-        this%periodic_box => null()
-    end subroutine Abstract_Ewald_Reci_Weight_destroy
+        weight = this%weight(n_1, n_2, n_3)
+    end function Abstract_Ewald_Reci_Weight_get
 
 !end implementation Abstract_Ewald_Reci_Weight
 
