@@ -14,11 +14,12 @@ implicit none
 private
 
     type, abstract, public :: Abstract_Ewald_Reci_Structure
+    private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
         integer :: reci_numbers(num_dimensions)
         class(Abstract_Component_Coordinates), pointer :: component_positions => null()
         class(Abstract_Component_Dipolar_Moments), pointer :: component_dipolar_moments => null()
-        class(Abstract_Ewald_Reci_Weight), pointer :: reci_weight => null()
+        class(Abstract_Ewald_Reci_Weight), pointer :: weight => null()
         complex(DP), dimension(:, :, :), allocatable :: structure
     contains
         procedure :: construct => Abstract_Ewald_Reci_Structure_construct
@@ -33,19 +34,19 @@ contains
 !implementation Abstract_Ewald_Reci_Structure
 
     subroutine Abstract_Ewald_Reci_Structure_construct(this, periodic_box, reciprocal_lattice, &
-        component_positions, component_dipolar_moments, reci_weight)
+        component_positions, component_dipolar_moments, weight)
         class(Abstract_Ewald_Reci_Structure), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
         class(Abstract_Component_Coordinates), target, intent(in) :: component_positions
         class(Abstract_Component_Dipolar_Moments), target, intent(in) :: component_dipolar_moments
-        class(Abstract_Ewald_Reci_Weight), target, intent(in) :: reci_weight
+        class(Abstract_Ewald_Reci_Weight), target, intent(in) :: weight
 
         this%periodic_box => periodic_box
         this%reci_numbers = reciprocal_lattice%get_numbers()
         this%component_positions => component_positions
         this%component_dipolar_moments => component_dipolar_moments
-        this%reci_weight => reci_weight
+        this%weight => weight
         allocate(this%structure(-this%reci_numbers(1):this%reci_numbers(1), &
                                 -this%reci_numbers(2):this%reci_numbers(2), &
                                 -this%reci_numbers(3):this%reci_numbers(3)))
@@ -56,7 +57,7 @@ contains
         class(Abstract_Ewald_Reci_Structure), intent(inout) :: this
 
         if (allocated(this%structure)) deallocate(this%structure)
-        this%reci_weight => null()
+        this%weight => null()
         this%component_dipolar_moments => null()
         this%component_positions => null()
         this%periodic_box => null()

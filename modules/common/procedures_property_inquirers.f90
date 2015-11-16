@@ -82,7 +82,7 @@ contains
         character(len=*), intent(in) :: prefix
 
         use_permittivity = logical_from_json(input_data, prefix//"Permittivity.use")
-    end function
+    end function use_permittivity_from_json
 
     pure logical function use_permittivity_from(permittivity) result(use_permittivity)
         class(Abstract_Permittivity), intent(in) :: permittivity
@@ -93,7 +93,7 @@ contains
             class default
                 use_permittivity = .false.
         end select
-    end function
+    end function use_permittivity_from
 
     logical function use_reciprocal_lattice_from_json(input_data, prefix) &
         result(use_reciprocal_lattice)

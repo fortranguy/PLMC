@@ -12,6 +12,7 @@ private
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
         integer :: reci_numbers(num_dimensions)
+        real(DP) :: permittivity
         class(Abstract_Ewald_Convergence_Parameter), pointer :: alpha => null()
         real(DP), dimension(:, :, :), allocatable :: weight
     contains
@@ -26,14 +27,17 @@ contains
 
 !implementation Abstract_Ewald_Reci_Weight
 
-    subroutine Abstract_Ewald_Reci_Weight_construct(this, periodic_box, reciprocal_lattice, alpha)
+    subroutine Abstract_Ewald_Reci_Weight_construct(this, periodic_box, reciprocal_lattice, &
+        permittivity, alpha)
         class(Abstract_Ewald_Reci_Weight), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
+        real(DP), intent(in) :: permittivity
         class(Abstract_Ewald_Convergence_Parameter), target, intent(in) :: alpha
 
         this%periodic_box => periodic_box
         this%reci_numbers = reciprocal_lattice%get_numbers()
+        this%permittivity = permittivity
         this%alpha => alpha
         allocate(this%weight(-this%reci_numbers(1):this%reci_numbers(1), &
                              -this%reci_numbers(2):this%reci_numbers(2), &
@@ -66,7 +70,8 @@ contains
             wave_vector(1) = 2._DP*PI * real(n_1, DP) / box_size(1)
             if (n_1 /= 0 .or. n_2 /= 0 .or. n_3 /= 0) then
                 wave_squared = dot_product(wave_vector, wave_vector)
-                this%weight(n_1, n_2, n_3) = exp(-wave_squared/alpha**2/4._DP) / wave_squared
+                this%weight(n_1, n_2, n_3) = exp(-wave_squared/alpha**2/4._DP) / &
+                    this%permittivity / product(box_size) / wave_squared
             else
                 this%weight(n_1, n_2, n_3) = 0._DP
             end if
@@ -76,7 +81,7 @@ contains
     end subroutine Abstract_Ewald_Reci_Weight_set
 
     !> \[
-    !>      w(\alpha, \vec{k}) = \frac{e^{-k^2/4\alpha^2}}{k^2}
+    !>      w(\alpha, \vec{k}) = \frac{e^{-k^2/4\alpha^2}}{\epsilon V k^2}
     !> \]
     pure real(DP) function Abstract_Ewald_Reci_Weight_get(this, n_1, n_2, n_3) result(weight)
         class(Abstract_Ewald_Reci_Weight), intent(in) :: this

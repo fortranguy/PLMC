@@ -47,7 +47,8 @@ implicit none
         input_data)
     call input_data%destroy()
 
-    call plmc_visit(observables, short_interactions, long_interactions, mixture)
+    call plmc_visit(observables, environment%reciprocal_lattice, short_interactions, &
+        long_interactions, mixture)
     call plmc_write(-num_tuning_steps, writers, observables)
     if (num_tuning_steps > 0) write(output_unit, *) "Trying to tune changes..."
     do i_step = -num_tuning_steps + 1, 0
@@ -64,7 +65,8 @@ implicit none
         call plmc_write(i_step, writers, observables)
     end do
     write(output_unit, *) "Iterations end."
-    call plmc_visit(observables, short_interactions, long_interactions, mixture)
+    call plmc_visit(observables, environment%reciprocal_lattice, short_interactions, &
+        long_interactions, mixture)
     call plmc_write(i_step-1, writers, observables)
 
     call plmc_destroy(writers)

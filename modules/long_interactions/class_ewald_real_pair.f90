@@ -117,7 +117,7 @@ contains
         real(DP), dimension(2) :: expression
 
         expression = this%expression(norm2(vector_ij))
-        field = -expression(1)*moment_j + dot_product(vector_ij, moment_j)*expression(2) * vector_ij
+        field =-expression(1)*moment_j + dot_product(vector_ij, moment_j)*expression(2) * vector_ij
     end function Abstract_Ewald_Real_Pair_meet_field
 
 !end implementation Abstract_Ewald_Real_Pair
@@ -132,7 +132,7 @@ contains
 
         call this%set_domain(domain)
         call check_positive("Tabulated_Ewald_Real_Pair_construct", "permittivity", permittivity)
-        this%coulomb = 1._DP / (4._DP * PI * permittivity)
+        this%coulomb = 1._DP / (4._DP*PI * permittivity)
         this%alpha => alpha
         call this%set_tabulation()
     end subroutine Tabulated_Ewald_Real_Pair_construct

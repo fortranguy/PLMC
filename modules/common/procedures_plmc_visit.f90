@@ -3,6 +3,7 @@ module procedures_plmc_visit
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use procedures_errors, only: error_exit
 use class_number_to_string, only: Concrete_Number_to_String
+use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use class_walls_potential, only: Abstract_Walls_Potential
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use class_component_coordinates, only: Abstract_Component_Coordinates
@@ -13,6 +14,7 @@ use class_pair_potential, only: Abstract_Pair_Potential
 use class_short_pairs_visitor, only: Abstract_Short_Pairs_Visitor
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use class_ewald_real_component, only: Abstract_Ewald_Real_Component
+use procedures_ewald_reci, only: ewald_reci_visit
 use types_long_interactions_wrapper, only: Long_Interactions_Wrapper
 use types_observables_wrapper, only: Concrete_Components_Energies, Observables_Wrapper
 use procedures_observables_factory, only: create_components_energies_nodes, &
@@ -33,15 +35,18 @@ end interface plmc_visit
 
 contains
 
-    subroutine visit_all(observables, short_interactions, long_interactions, mixture)
+    subroutine visit_all(observables, reciprocal_lattice, short_interactions, long_interactions, &
+        mixture)
         type(Observables_Wrapper), intent(inout) :: observables
+        class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
         type(Long_Interactions_Wrapper), intent(in) :: long_interactions
         type(Mixture_Wrapper), intent(in) :: mixture
 
         call plmc_visit(observables%walls_energies, short_interactions, mixture%components)
         call plmc_visit(observables%short_energies, short_interactions, mixture%components)
-        call plmc_visit(observables%long_energies, long_interactions, mixture%components)
+        call plmc_visit(observables%long_energies, reciprocal_lattice, long_interactions, mixture%&
+            components)
     end subroutine visit_all
 
     subroutine visit_walls(walls_energies, short_interactions, components)
@@ -125,16 +130,21 @@ contains
         end do
     end subroutine visit_short_inter
 
-    pure subroutine visit_long(energies, long_interactions, components)
+    pure subroutine visit_long(energies, reciprocal_lattice, long_interactions, components)
         type(Concrete_Components_Energies), intent(inout) :: energies(:)
+        class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
         type(Long_Interactions_Wrapper), intent(in) :: long_interactions
         type(Component_Wrapper), intent(in) :: components(:)
 
         type(Concrete_Components_Energies) :: real_energies(size(components))
+        type(Concrete_Components_Energies) :: reci_energies(size(components))
 
         call create_components_energies_nodes(real_energies)
         call visit_long_real(real_energies, long_interactions, components)
-        energies = real_energies
+        call create_components_energies_nodes(reci_energies)
+        call visit_long_reci(reci_energies, reciprocal_lattice%get_numbers(), long_interactions)
+        energies = real_energies + reci_energies
+        call destroy_components_energies_nodes(reci_energies)
         call destroy_components_energies_nodes(real_energies)
     end subroutine visit_long
 
@@ -188,5 +198,29 @@ contains
             end do
         end do
     end subroutine visit_long_real_inter
+
+    pure subroutine visit_long_reci(energies, reci_numbers, long_interactions)
+        type(Concrete_Components_Energies), intent(inout) :: energies(:)
+        integer, intent(in) :: reci_numbers(:)
+        type(Long_Interactions_Wrapper), intent(in) :: long_interactions
+
+        integer :: j_component, i_component
+
+        do j_component = 1, size(energies)
+            associate(energy_j => energies(j_component)%with_components(j_component), &
+                structure_j => long_interactions%reci_structures(j_component)%reci_structure)
+                energy_j = ewald_reci_visit(reci_numbers, long_interactions%reci_weight, &
+                    structure_j)
+            end associate
+            do i_component = 1, j_component - 1
+                associate(energy_ij => energies(j_component)%with_components(i_component), &
+                    structure_i => long_interactions%reci_structures(i_component)%reci_structure, &
+                    structure_j => long_interactions%reci_structures(j_component)%reci_structure)
+                    energy_ij = ewald_reci_visit(reci_numbers, long_interactions%reci_weight, &
+                        structure_i, structure_j)
+                end associate
+            end do
+        end do
+    end subroutine visit_long_reci
 
 end module procedures_plmc_visit
