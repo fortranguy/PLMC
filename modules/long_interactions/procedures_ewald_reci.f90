@@ -16,6 +16,9 @@ end interface ewald_reci_visit
 
 contains
 
+    !> \[
+    !>      U_I = \sum_{\vec{k}} w_\alpha(\vec{k}) |S_I(\vec{k})|^2
+    !> \]
     pure real(DP) function visit_intra(reci_numbers, weight, structure) result(energy)
         integer, intent(in) :: reci_numbers(:)
         class(Abstract_Ewald_Reci_Weight), intent(in) :: weight
@@ -35,6 +38,9 @@ contains
         energy = energy / 2._DP
     end function visit_intra
 
+    !> \[
+    !>      U_{IJ} = \sum_{\vec{k}} w_\alpha(\vec{k}) S_I(\vec{k}) S_J(\vec{k})^\ast
+    !> \]
     pure real(DP) function visit_inter(reci_numbers, weight, structure_i, structure_j) &
         result(energy)
         integer, intent(in) :: reci_numbers(:)

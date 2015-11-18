@@ -9,7 +9,7 @@ use class_periodic_box, only: Abstract_Periodic_Box
 use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use class_component_coordinates, only: Abstract_Component_Coordinates
 use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
-use procedures_ewald_micro, only: set_fourier, reciprocal_size_1_sym, reciprocal_size_2_sym
+use procedures_ewald_micro, only: set_fourier, reci_number_1_sym, reci_number_2_sym
 
 implicit none
 

@@ -81,7 +81,7 @@ contains
     end subroutine Abstract_Ewald_Reci_Weight_set
 
     !> \[
-    !>      w(\alpha, \vec{k}) = \frac{e^{-k^2/4\alpha^2}}{\epsilon V k^2}
+    !>      w_\alpha(\vec{k}) = \frac{e^{-k^2/4\alpha^2}}{\epsilon V k^2}
     !> \]
     pure real(DP) function Abstract_Ewald_Reci_Weight_get(this, n_1, n_2, n_3) result(weight)
         class(Abstract_Ewald_Reci_Weight), intent(in) :: this

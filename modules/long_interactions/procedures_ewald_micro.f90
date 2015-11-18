@@ -6,7 +6,7 @@ use data_constants, only: num_dimensions, PI
 implicit none
 private
 public :: ewald_real_B, ewald_real_C, &
-       reciprocal_size_1_sym, reciprocal_size_2_sym, set_fourier, set_exp_kz
+       reci_number_1_sym, reci_number_2_sym, set_fourier, set_exp_n_3
 
 contains
 
@@ -53,41 +53,39 @@ contains
                                               exp(-alpha**2*r**2) / r**2
     end function ewald_real_C
 
-    !> Symmetry: half wave vectors in do loop: reciprocal_size_1
-    pure function reciprocal_size_1_sym(reciprocal_size, ky, kz)
-        integer :: reciprocal_size_1_sym
-        integer, dimension(:), intent(in) :: reciprocal_size
-        integer, intent(in) :: ky, kz
+    !> Symmetry: half wave vectors in do loop: reci_number_1
+    pure integer function reci_number_1_sym(reci_numbers, n_3, n_2)
+        integer, dimension(:), intent(in) :: reci_numbers
+        integer, intent(in) :: n_3, n_2
 
-        if (ky == 0 .and. kz == 0) then
-            reciprocal_size_1_sym = 0
+        if (n_2 == 0 .and. n_3 == 0) then
+            reci_number_1_sym = 0
         else
-            reciprocal_size_1_sym = reciprocal_size(1)
+            reci_number_1_sym = reci_numbers(1)
         end if
-    end function reciprocal_size_1_sym
+    end function reci_number_1_sym
 
-    !> Symmetry: half wave vectors in do loop: reciprocal_size_2
-    pure function reciprocal_size_2_sym(reciprocal_size, kz)
-        integer :: reciprocal_size_2_sym
-        integer, dimension(:), intent(in) :: reciprocal_size
-        integer, intent(in) :: kz
+    !> Symmetry: half wave vectors in do loop: reci_number_2
+    pure integer function reci_number_2_sym(reci_numbers, n_3)
+        integer, dimension(:), intent(in) :: reci_numbers
+        integer, intent(in) :: n_3
 
-        if (kz == 0) then
-            reciprocal_size_2_sym = 0
+        if (n_3 == 0) then
+            reci_number_2_sym = 0
         else
-            reciprocal_size_2_sym = reciprocal_size(2)
+            reci_number_2_sym = reci_numbers(2)
         end if
-    end function reciprocal_size_2_sym
+    end function reci_number_2_sym
 
     !> Fourier coefficients (bases) tabulation
-    pure subroutine set_fourier(fourier_position_i, reci_number_i, wave_1_dot_position_i)
+    pure subroutine set_fourier(fourier_position_i, reci_number_i, wave_1_x_position_i)
         integer, intent(in) :: reci_number_i
         complex(DP), dimension(-reci_number_i:reci_number_i), intent(out) :: fourier_position_i
-        real(DP), intent(in) :: wave_1_dot_position_i
+        real(DP), intent(in) :: wave_1_x_position_i
 
         integer :: n_i
         fourier_position_i(0) = (1._DP, 0._DP)
-        fourier_position_i(1) = cmplx(cos(wave_1_dot_position_i), sin(wave_1_dot_position_i), DP)
+        fourier_position_i(1) = cmplx(cos(wave_1_x_position_i), sin(wave_1_x_position_i), DP)
         fourier_position_i(-1) = conjg(fourier_position_i(1))
         do n_i = 2, reci_number_i
             fourier_position_i(n_i) = fourier_position_i(n_i-1) * fourier_position_i(1)
@@ -96,22 +94,22 @@ contains
     end subroutine set_fourier
 
     !> DLC tabulation
-    pure subroutine set_exp_kz(exp_kz_tab, reciprocal_size, wave_norm, z)
-        integer, dimension(:), intent(in) :: reciprocal_size
-        real(DP), dimension(0:reciprocal_size(1), 0:reciprocal_size(2)), intent(out) :: exp_kz_tab
-        real(DP), dimension(-reciprocal_size(1):reciprocal_size(1), &
-                            -reciprocal_size(2):reciprocal_size(2)), intent(in) :: wave_norm
+    pure subroutine set_exp_n_3(exp_n_3_tab, reci_number, wave_norm, z)
+        integer, dimension(:), intent(in) :: reci_number
+        real(DP), dimension(0:reci_number(1), 0:reci_number(2)), intent(out) :: exp_n_3_tab
+        real(DP), dimension(-reci_number(1):reci_number(1), &
+                            -reci_number(2):reci_number(2)), intent(in) :: wave_norm
         real(DP), intent(in) :: z
 
-        integer :: kx, ky
-        do ky = 0, reciprocal_size(2)
-            do kx = ky, reciprocal_size(1)
-                exp_kz_tab(kx, ky) = exp(wave_norm(kx, ky) * z)
+        integer :: n_1, n_2
+        do n_2 = 0, reci_number(2)
+            do n_1 = n_2, reci_number(1)
+                exp_n_3_tab(n_1, n_2) = exp(wave_norm(n_1, n_2) * z)
             end do
-            do kx = 0, ky-1
-                exp_kz_tab(kx, ky) = exp_kz_tab(ky, kx)
+            do n_1 = 0, n_2-1
+                exp_n_3_tab(n_1, n_2) = exp_n_3_tab(n_2, n_1)
             end do
         end do
-    end subroutine set_exp_kz
+    end subroutine set_exp_n_3
 
 end module procedures_ewald_micro
