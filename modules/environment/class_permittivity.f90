@@ -13,17 +13,17 @@ private
     contains
         procedure :: set => Abstract_Permittivity_set
         procedure :: get => Abstract_Permittivity_get
-    end type
+    end type Abstract_Permittivity
 
     type, extends(Abstract_Permittivity), public :: Concrete_Permittivity
 
-    end type
+    end type Concrete_Permittivity
 
     type, extends(Abstract_Permittivity), public :: Null_Permittivity
     contains
         procedure :: set => Null_Permittivity_set
         procedure :: get => Null_Permittivity_get
-    end type
+    end type Null_Permittivity
 
 contains
 
@@ -41,7 +41,7 @@ contains
         class(Abstract_Permittivity), intent(in) :: this
 
         permittivity = this%permittivity
-    end function
+    end function Abstract_Permittivity_get
 
 !end implementation Abstract_Permittivity
 
@@ -55,8 +55,8 @@ contains
     pure real(DP) function Null_Permittivity_get(this) result(permittivity)
         class(Null_Permittivity), intent(in) :: this
         permittivity = 0._DP
-    end function
+    end function Null_Permittivity_get
 
 !end implementation Null_Permittivity
 
-end module
+end module class_permittivity

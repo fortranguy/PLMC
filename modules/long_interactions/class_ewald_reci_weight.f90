@@ -3,6 +3,7 @@ module class_ewald_reci_weight
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions, PI
 use class_periodic_box, only: Abstract_Periodic_Box
+use class_permittivity, only: Abstract_Permittivity
 use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use class_ewald_convergence_parameter, only: Abstract_Ewald_Convergence_Parameter
 
@@ -23,21 +24,33 @@ private
         procedure, private :: set => Abstract_Ewald_Reci_Weight_set
     end type Abstract_Ewald_Reci_Weight
 
+    type, extends(Abstract_Ewald_Reci_Weight), public :: Concrete_Ewald_Reci_Weight
+
+    end type Concrete_Ewald_Reci_Weight
+
+    type, extends(Abstract_Ewald_Reci_Weight), public :: Null_Ewald_Reci_Weight
+    contains
+        procedure :: construct => Null_Ewald_Reci_Weight_construct
+        procedure :: destroy => Null_Ewald_Reci_Weight_destroy
+        procedure :: get => Null_Ewald_Reci_Weight_get
+        procedure, private :: set => Null_Ewald_Reci_Weight_set
+    end type Null_Ewald_Reci_Weight
+
 contains
 
 !implementation Abstract_Ewald_Reci_Weight
 
-    subroutine Abstract_Ewald_Reci_Weight_construct(this, periodic_box, reciprocal_lattice, &
-        permittivity, alpha)
+    subroutine Abstract_Ewald_Reci_Weight_construct(this, periodic_box, permittivity, &
+        reciprocal_lattice, alpha)
         class(Abstract_Ewald_Reci_Weight), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+        class(Abstract_Permittivity), intent(in) :: permittivity
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
-        real(DP), intent(in) :: permittivity
         class(Abstract_Ewald_Convergence_Parameter), target, intent(in) :: alpha
 
         this%periodic_box => periodic_box
         this%reci_numbers = reciprocal_lattice%get_numbers()
-        this%permittivity = permittivity
+        this%permittivity = permittivity%get()
         this%alpha => alpha
         allocate(this%weight(-this%reci_numbers(1):this%reci_numbers(1), &
                              -this%reci_numbers(2):this%reci_numbers(2), &
@@ -62,6 +75,7 @@ contains
 
         box_size = this%periodic_box%get_size()
         alpha = this%alpha%get()
+        ! How about using symmetry to reduce memory?
         do n_3 = -this%reci_numbers(3), this%reci_numbers(3)
             wave_vector(3) = 2._DP*PI * real(n_3, DP) / box_size(3)
         do n_2 = -this%reci_numbers(2), this%reci_numbers(2)
@@ -91,5 +105,32 @@ contains
     end function Abstract_Ewald_Reci_Weight_get
 
 !end implementation Abstract_Ewald_Reci_Weight
+
+!implementation Null_Ewald_Reci_Weight
+
+    subroutine Null_Ewald_Reci_Weight_construct(this, periodic_box, permittivity, &
+        reciprocal_lattice, alpha)
+        class(Null_Ewald_Reci_Weight), intent(out) :: this
+        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+        class(Abstract_Permittivity), intent(in) :: permittivity
+        class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
+        class(Abstract_Ewald_Convergence_Parameter), target, intent(in) :: alpha
+    end subroutine Null_Ewald_Reci_Weight_construct
+
+    subroutine Null_Ewald_Reci_Weight_destroy(this)
+        class(Null_Ewald_Reci_Weight), intent(inout) :: this
+    end subroutine Null_Ewald_Reci_Weight_destroy
+
+    pure subroutine Null_Ewald_Reci_Weight_set(this)
+        class(Null_Ewald_Reci_Weight), intent(inout) :: this
+    end subroutine Null_Ewald_Reci_Weight_set
+
+    pure real(DP) function Null_Ewald_Reci_Weight_get(this, n_1, n_2, n_3) result(weight)
+        class(Null_Ewald_Reci_Weight), intent(in) :: this
+        integer, intent(in) :: n_1, n_2, n_3
+        weight = 0._DP
+    end function Null_Ewald_Reci_Weight_get
+
+!end implementation Null_Ewald_Reci_Weight
 
 end module class_ewald_reci_weight
