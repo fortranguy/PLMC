@@ -32,6 +32,20 @@ private
         procedure :: set_coordinates_delta => Abstract_Ewald_Reci_Structure_set_coordinates_delta
     end type Abstract_Ewald_Reci_Structure
 
+    type, extends(Abstract_Ewald_Reci_Structure), public :: Concrete_Ewald_Reci_Structure
+
+    end type Concrete_Ewald_Reci_Structure
+
+    type, extends(Abstract_Ewald_Reci_Structure), public :: Null_Ewald_Reci_Structure
+    contains
+        procedure :: construct => Null_Ewald_Reci_Structure_construct
+        procedure :: destroy => Null_Ewald_Reci_Structure_destroy
+        procedure :: get => Null_Ewald_Reci_Structure_get
+        procedure, private :: set => Null_Ewald_Reci_Structure_set
+        procedure :: get_coordinates_delta => Null_Ewald_Reci_Structure_get_coordinates_delta
+        procedure :: set_coordinates_delta => Null_Ewald_Reci_Structure_set_coordinates_delta
+    end type Null_Ewald_Reci_Structure
+
 contains
 
 !implementation Abstract_Ewald_Reci_Structure
@@ -251,5 +265,47 @@ contains
     end subroutine Abstract_Ewald_Reci_Structure_set_coordinates_delta
 
 !end implementation Abstract_Ewald_Reci_Structure
+
+!implementation Null_Ewald_Reci_Structure
+
+    subroutine Null_Ewald_Reci_Structure_construct(this, periodic_box, reciprocal_lattice, &
+        component_positions, component_dipolar_moments, weight)
+        class(Null_Ewald_Reci_Structure), intent(out) :: this
+        class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
+        class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
+        class(Abstract_Component_Coordinates), target, intent(in) :: component_positions
+        class(Abstract_Component_Dipolar_Moments), target, intent(in) :: component_dipolar_moments
+        class(Abstract_Ewald_Reci_Weight), target, intent(in) :: weight
+    end subroutine Null_Ewald_Reci_Structure_construct
+
+    subroutine Null_Ewald_Reci_Structure_destroy(this)
+        class(Null_Ewald_Reci_Structure), intent(inout) :: this
+    end subroutine Null_Ewald_Reci_Structure_destroy
+
+    pure subroutine Null_Ewald_Reci_Structure_set(this)
+        class(Null_Ewald_Reci_Structure), intent(inout) :: this
+    end subroutine Null_Ewald_Reci_Structure_set
+
+    pure complex(DP) function Null_Ewald_Reci_Structure_get(this, n_1, n_2, n_3) &
+        result(structure)
+        class(Null_Ewald_Reci_Structure), intent(in) :: this
+        integer, intent(in) :: n_1, n_2, n_3
+        structure = cmplx(0._DP, 0._DP, DP)
+    end function Null_Ewald_Reci_Structure_get
+
+    pure real(DP) function Null_Ewald_Reci_Structure_get_coordinates_delta(this, new, old, &
+        same_component) result(delta_energy)
+        class(Null_Ewald_Reci_Structure), intent(in) :: this
+        type(Concrete_Temporary_Particle), intent(in) :: new, old
+        logical, intent(in) :: same_component
+        delta_energy = 0._DP
+    end function Null_Ewald_Reci_Structure_get_coordinates_delta
+
+    pure subroutine Null_Ewald_Reci_Structure_set_coordinates_delta(this, new, old)
+        class(Null_Ewald_Reci_Structure), intent(inout) :: this
+        type(Concrete_Temporary_Particle), intent(in) :: new, old
+    end subroutine Null_Ewald_Reci_Structure_set_coordinates_delta
+
+!end implementation Null_Ewald_Reci_Structure
 
 end module class_ewald_reci_structure
