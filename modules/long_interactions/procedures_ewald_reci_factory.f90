@@ -1,4 +1,4 @@
-module procedures_long_interactions_reci_factory
+module procedures_ewald_reci_factory
 
 use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
@@ -60,8 +60,8 @@ contains
         else
             allocate(Null_Ewald_Reci_Weight :: weight)
         end if
-        call weight%construct(environment%periodic_box, environment%reciprocal_lattice, &
-            environment%permittivity, alpha)
+        call weight%construct(environment%periodic_box, environment%permittivity, environment%&
+            reciprocal_lattice, alpha)
     end subroutine create_weight
 
     subroutine destroy_weight(weight)
@@ -72,4 +72,4 @@ contains
         end if
     end subroutine destroy_weight
 
-end module procedures_long_interactions_reci_factory
+end module procedures_ewald_reci_factory

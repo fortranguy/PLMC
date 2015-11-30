@@ -3,8 +3,8 @@ module class_ewald_reci_weight
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions, PI
 use class_periodic_box, only: Abstract_Periodic_Box
-use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use class_permittivity, only: Abstract_Permittivity
+use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use class_ewald_convergence_parameter, only: Abstract_Ewald_Convergence_Parameter
 
 private
@@ -40,12 +40,12 @@ contains
 
 !implementation Abstract_Ewald_Reci_Weight
 
-    subroutine Abstract_Ewald_Reci_Weight_construct(this, periodic_box, reciprocal_lattice, &
-        permittivity, alpha)
+    subroutine Abstract_Ewald_Reci_Weight_construct(this, periodic_box, permittivity, &
+        reciprocal_lattice, alpha)
         class(Abstract_Ewald_Reci_Weight), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
         class(Abstract_Permittivity), intent(in) :: permittivity
+        class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
         class(Abstract_Ewald_Convergence_Parameter), target, intent(in) :: alpha
 
         this%periodic_box => periodic_box
@@ -108,12 +108,12 @@ contains
 
 !implementation Null_Ewald_Reci_Weight
 
-    subroutine Null_Ewald_Reci_Weight_construct(this, periodic_box, reciprocal_lattice, &
-        permittivity, alpha)
+    subroutine Null_Ewald_Reci_Weight_construct(this, periodic_box, permittivity, &
+        reciprocal_lattice, alpha)
         class(Null_Ewald_Reci_Weight), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
         class(Abstract_Permittivity), intent(in) :: permittivity
+        class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
         class(Abstract_Ewald_Convergence_Parameter), target, intent(in) :: alpha
     end subroutine Null_Ewald_Reci_Weight_construct
 
