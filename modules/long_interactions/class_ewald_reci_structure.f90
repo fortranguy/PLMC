@@ -124,7 +124,9 @@ contains
     !>          \Re[(s^{\prime{}I}_i(\vec{k}) - s^I_i(\vec{k})) S_J(\vec{k})^\ast] +
     !>          [I=J] \frac{1}{2}|s^{\prime{}I}_i(\vec{k}) - s^I_i(\vec{k})|^2
     !> \]
-    !> with \( s_i(\vec{k}) = (\vec{k}\cdot\vec{\mu}_i) e^{i\vec{k}\cdot\vec{x}_i}\).
+    !> with \( s_i(\vec{k}) = (\vec{k}\cdot\vec{\mu}_i) e^{i\vec{k}\cdot\vec{x}_i} \).
+    !> Though \( \vec{x} \) and \( \vec{\mu} \) don't change simultaneously,
+    !> only one procedure is provided for simplicity.
     pure real(DP) function Abstract_Ewald_Reci_Structure_get_coordinates_delta(this, new, old, &
         same_component) result(delta_energy)
         class(Abstract_Ewald_Reci_Structure), intent(in) :: this
