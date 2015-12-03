@@ -198,7 +198,7 @@ contains
                             conjg(this%structure(n_1, n_2, n_3)), DP)
 
                     if (same_component) then
-                        delta_energy = delta_energy + &
+                        delta_energy = delta_energy + this%weight%get(n_1, n_2, n_3) * &
                             0.5_DP * abs(structure_wave_new - structure_wave_old)**2
                     end if
                 end do
