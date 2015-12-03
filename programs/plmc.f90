@@ -13,6 +13,7 @@ use procedures_plmc_propagator, only: plmc_propagator_create, plmc_propagator_de
 use types_observables_wrapper, only: Observables_Wrapper
 use types_writers_wrapper, only: Writers_Wrapper
 use procedures_plmc_factory, only: plmc_load, plmc_create, plmc_set, plmc_destroy
+use procedures_plmc_reset, only: plmc_reset
 use procedures_plmc_visit, only: plmc_visit
 use procedures_plmc_write, only: plmc_write
 use module_plmc_iterations, only: num_tuning_steps, num_steps, plmc_set_num_steps
@@ -64,6 +65,7 @@ implicit none
         call plmc_write(i_step, writers, observables)
     end do
     write(output_unit, *) "Iterations end."
+    call plmc_reset(long_interactions)
     call plmc_visit(observables, short_interactions, long_interactions, mixture)
     call plmc_write(i_step-1, writers, observables)
 

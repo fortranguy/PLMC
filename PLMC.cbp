@@ -95,6 +95,7 @@
 		<Unit filename="modules/common/procedures_plmc_propagator.f90">
 			<Option weight="11" />
 		</Unit>
+		<Unit filename="modules/common/procedures_plmc_reset.f90" />
 		<Unit filename="modules/common/procedures_plmc_visit.f90">
 			<Option weight="8" />
 		</Unit>
