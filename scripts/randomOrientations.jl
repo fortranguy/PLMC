@@ -12,7 +12,9 @@ import JSON
 json = JSON
 import RandomOrientations
 ro = RandomOrientations
+include("PLMC.jl")
 import PLMC
+plmc = PLMC
 
 if size(ARGS, 1) == 0
     error("Please provide a .json file.")
@@ -24,7 +26,7 @@ if num_components == 0
 end
 for i_component = 1:num_components
     if (input_data["Mixture"]["Component $(i_component)"]["is dipolar"])
-        component_i = PLMC.Component(input_data["Mixture"]["Component $(i_component)"]["number"],
+        component_i = plmc.Component(input_data["Mixture"]["Component $(i_component)"]["number"],
                                      zeros(3, 1), zeros(3, 1))
         component_i.orientations = ro.randomOrientations(component_i.num)
         output_file = input_data["Mixture"]["Component $(i_component)"]["initial orientations"]

@@ -2,8 +2,9 @@ import JSON
 json = JSON
 import ProgressMeter
 pm = ProgressMeter
+include("PLMC.jl")
 import PLMC
-pbc = PLMC.PBC
+plmc = PLMC
 
 if size(ARGS, 1) == 0
     error("Please provide a .json file.")
@@ -11,14 +12,14 @@ end
 input_data = json.parsefile(ARGS[1]; dicttype=Dict, use_mmap=true)
 
 box_size = map(Float64, input_data["Environment"]["Box"]["size"])
-components = Array{PLMC.Component}(input_data["Mixture"]["number of components"])
+components = Array{plmc.Component}(input_data["Mixture"]["number of components"])
 if (size(components, 1) == 0)
     exit(0)
 end
 
 interMinDistance = zeros(size(components, 1), size(components, 1)) # triangle?
 for i_component = 1:size(components, 1)
-    components[i_component] = PLMC.Component(
+    components[i_component] = plmc.Component(
         input_data["Mixture"]["Component $(i_component)"]["number"], zeros(3, 1), zeros(3, 1))
     for j_component = 1:i_component-1
         interMinDistance[i_component, j_component] =
@@ -46,7 +47,7 @@ for i_component = 1:size(components, 1)
             overlap = false
             for j_component = i_component:-1:1
                 for i_particle = 1:size(components[j_component].positions, 2)
-                    if (pbc.distance(test_position, components[j_component].positions[:,
+                    if (plmc.distance(test_position, components[j_component].positions[:,
                                                                                       i_particle],
                                      box_size) < interMinDistance[i_component, j_component])
                         overlap = true
@@ -59,11 +60,11 @@ for i_component = 1:size(components, 1)
             end
         end
         if (first_positions[i_component])
-            components[i_component].positions[:, 1] = pbc.folded(test_position, box_size)
+            components[i_component].positions[:, 1] = plmc.folded(test_position, box_size)
             first_positions[i_component] = false
         else
             components[i_component].positions = hcat(components[i_component].positions,
-                                                     pbc.folded(test_position, box_size))
+                                                     plmc.folded(test_position, box_size))
         end
         pm.next!(prog)
     end
