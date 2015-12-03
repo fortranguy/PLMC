@@ -29,9 +29,9 @@ contains
 
         reci_numbers = weight%get_reci_numbers()
         energy = 0._DP
-        do n_3 = 1, reci_numbers(3)
-        do n_2 = 1, reci_numbers(2)
-        do n_1 = 1, reci_numbers(1)
+        do n_3 = -reci_numbers(3), reci_numbers(3)
+        do n_2 = -reci_numbers(2), reci_numbers(2)
+        do n_1 = -reci_numbers(1), reci_numbers(1)
             energy = energy + weight%get(n_1, n_2, n_3) * real(structure%get(n_1, n_2, n_3) * &
                 conjg(structure%get(n_1, n_2, n_3)), DP)
         end do
@@ -52,9 +52,9 @@ contains
 
         reci_numbers = weight%get_reci_numbers()
         energy = 0._DP
-        do n_3 = 1, reci_numbers(3)
-        do n_2 = 1, reci_numbers(2)
-        do n_1 = 1, reci_numbers(1)
+        do n_3 = -reci_numbers(3), reci_numbers(3)
+        do n_2 = -reci_numbers(2), reci_numbers(2)
+        do n_1 = -reci_numbers(1), reci_numbers(1)
             energy = energy + weight%get(n_1, n_2, n_3) * real(structure_i%get(n_1, n_2, n_3) * &
                 conjg(structure_j%get(n_1, n_2, n_3)), DP)
         end do
