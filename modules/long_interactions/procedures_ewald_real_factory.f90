@@ -5,13 +5,14 @@ use data_constants, only: num_dimensions
 use json_module, only: json_file
 use procedures_checks, only: check_data_found
 use class_periodic_box, only: Abstract_Periodic_Box
+use class_permittivity, only: Abstract_Permittivity
 use types_environment_wrapper, only: Environment_Wrapper
 use class_minimum_distance, only: Abstract_Minimum_Distance
 use class_component_coordinates, only: Abstract_Component_Coordinates
 use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
 use types_component_wrapper, only: Component_Wrapper
 use types_mixture_wrapper, only: Minimum_Distances_Wrapper
-use types_potential_domain, only: Concrete_Potential_Domain
+use types_potential_domain, only: Long_Potential_Domain
 use class_ewald_convergence_parameter, only: Abstract_Ewald_Convergence_Parameter
 use class_ewald_real_pair, only: Abstract_Ewald_Real_Pair, Tabulated_Ewald_Real_Pair, &
     Raw_Ewald_Real_Pair, Null_Ewald_Real_Pair
@@ -132,10 +133,10 @@ contains
         end if
     end subroutine destroy_component
 
-    subroutine create_pairs(real_pairs, environment, min_distances, are_dipolar, &
+    subroutine create_pairs(real_pairs, permittivity, min_distances, are_dipolar, &
         alpha, input_data, prefix)
         type(Ewald_Real_Pairs_Wrapper), allocatable, intent(out) :: real_pairs(:)
-        type(Environment_Wrapper), intent(in) :: environment
+        class(Abstract_Permittivity), intent(in) :: permittivity
         type(Minimum_Distances_Wrapper), intent(in) :: min_distances(:)
         logical, intent(in) :: are_dipolar(:)
         class(Abstract_Ewald_Convergence_Parameter), intent(in) :: alpha
@@ -153,7 +154,7 @@ contains
                 associate (min_distance_ij => min_distances(j_component)%&
                     with_components(i_component)%min_distance)
                     call ewald_real_create(real_pairs(j_component)%&
-                        with_components(i_component)%real_pair, environment, min_distance_ij, &
+                        with_components(i_component)%real_pair, permittivity, min_distance_ij, &
                         interact_ij, alpha, input_data, prefix)
                 end associate
             end do
@@ -179,10 +180,10 @@ contains
         end if
     end subroutine destroy_pairs
 
-    subroutine create_pair(real_pair, environment, min_distance, interact, alpha, &
+    subroutine create_pair(real_pair, permittivity, min_distance, interact, alpha, &
         input_data, prefix)
         class(Abstract_Ewald_Real_Pair), allocatable, intent(out) :: real_pair
-        type(Environment_Wrapper), intent(in) :: environment
+        class(Abstract_Permittivity), intent(in) :: permittivity
         class(Abstract_Minimum_Distance), intent(in) :: min_distance
         logical, intent(in) :: interact
         class(Abstract_Ewald_Convergence_Parameter), intent(in) :: alpha
@@ -190,7 +191,7 @@ contains
         character(len=*), intent(in) :: prefix
 
         call allocate_real_pair(real_pair, interact, input_data, prefix)
-        call construct_real_pair(real_pair, environment, min_distance, interact, alpha, &
+        call construct_real_pair(real_pair, permittivity, min_distance, interact, alpha, &
             input_data, prefix)
     end subroutine create_pair
 
@@ -218,10 +219,10 @@ contains
         end if
     end subroutine allocate_real_pair
 
-    subroutine construct_real_pair(real_pair, environment, min_distance, interact, alpha, &
+    subroutine construct_real_pair(real_pair, permittivity, min_distance, interact, alpha, &
         input_data, prefix)
         class(Abstract_Ewald_Real_Pair), intent(inout) :: real_pair
-        type(Environment_Wrapper), intent(in) :: environment
+        class(Abstract_Permittivity), intent(in) :: permittivity
         class(Abstract_Minimum_Distance), intent(in) :: min_distance
         logical, intent(in) :: interact
         class(Abstract_Ewald_Convergence_Parameter), intent(in) :: alpha
@@ -230,18 +231,13 @@ contains
 
         character(len=:), allocatable :: data_field
         logical :: data_found
-        type(Concrete_Potential_Domain) :: domain
-        real(DP) :: box_size(num_dimensions), max_over_box
-        real(DP) :: permittivity
+        type(Long_Potential_Domain) :: domain
 
         if (interact) then
             domain%min = min_distance%get()
             data_field = prefix//"max distance over box edge"
-            call input_data%get(data_field, max_over_box, data_found)
+            call input_data%get(data_field, domain%max_over_box, data_found)
             call check_data_found(data_field, data_found)
-            box_size = environment%periodic_box%get_size()
-            domain%max = max_over_box * box_size(1)
-            permittivity = environment%permittivity%get()
             select type (real_pair)
                 type is (Tabulated_Ewald_Real_Pair)
                     data_field = prefix//"delta distance"
@@ -249,7 +245,7 @@ contains
                     call check_data_found(data_field, data_found)
             end select
         end if
-        call real_pair%construct(domain, permittivity, alpha)
+        call real_pair%construct(permittivity, alpha, domain)
     end subroutine construct_real_pair
 
     subroutine destroy_pair(real_pair)

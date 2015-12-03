@@ -15,7 +15,7 @@ use types_mixture_wrapper, only: Minimum_Distance_Wrapper, Minimum_Distances_Wra
     Mixture_Wrapper
 use class_potential_expression, only: Abstract_Potential_Expression, &
     Null_Potential_Expression, Lennard_Jones_Expression
-use types_potential_domain, only: Concrete_Potential_Domain
+use types_potential_domain, only: Short_Potential_Domain
 use class_pair_potential, only: Abstract_Pair_Potential, &
     Null_Pair_Potential, Tabulated_Pair_Potential, Raw_Pair_Potential
 use class_visitable_list, only: Abstract_Visitable_List, &
@@ -362,7 +362,7 @@ contains
 
         character(len=:), allocatable :: data_field
         logical :: data_found
-        type(Concrete_Potential_Domain) :: domain
+        type(Short_Potential_Domain) :: domain
 
         if (interact) then
             domain%min = min_distance%get()

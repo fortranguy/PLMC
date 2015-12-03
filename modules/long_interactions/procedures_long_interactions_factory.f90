@@ -60,7 +60,7 @@ contains
 
         call ewald_real_create(long_interactions%real_visitor, environment%periodic_box, &
             any(are_dipolar))
-        call ewald_real_create(long_interactions%real_pairs, environment, mixture%&
+        call ewald_real_create(long_interactions%real_pairs, environment%permittivity, mixture%&
             components_min_distances, are_dipolar, long_interactions%alpha, input_data, &
             prefix//"Real.")
         call ewald_real_create(long_interactions%real_components, environment%periodic_box, &

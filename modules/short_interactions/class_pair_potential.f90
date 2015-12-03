@@ -5,7 +5,7 @@ use data_constants, only: real_zero
 use procedures_errors, only: error_exit, warning_continue
 use procedures_checks, only: check_positive, check_potential_domain
 use class_potential_expression, only: Abstract_Potential_Expression
-use types_potential_domain, only: Concrete_Potential_Domain
+use types_potential_domain, only: Short_Potential_Domain
 
 implicit none
 
@@ -13,7 +13,7 @@ private
 
     type, abstract, public :: Abstract_Pair_Potential
     private
-        type(Concrete_Potential_Domain) :: domain
+        type(Short_Potential_Domain) :: domain
         class(Abstract_Potential_Expression), allocatable :: expression
     contains
         procedure(Abstract_Pair_Potential_construct), deferred :: construct
@@ -25,9 +25,9 @@ private
     abstract interface
 
         subroutine Abstract_Pair_Potential_construct(this, domain, expression)
-        import :: Concrete_Potential_Domain, Abstract_Potential_Expression, Abstract_Pair_Potential
+        import :: Short_Potential_Domain, Abstract_Potential_Expression, Abstract_Pair_Potential
             class(Abstract_Pair_Potential), intent(out) :: this
-            type(Concrete_Potential_Domain), intent(in) :: domain
+            type(Short_Potential_Domain), intent(in) :: domain
             class(Abstract_Potential_Expression), intent(in) :: expression
         end subroutine Abstract_Pair_Potential_construct
 
@@ -92,7 +92,7 @@ contains
 
     subroutine Tabulated_Pair_Potential_construct(this, domain, expression)
         class(Tabulated_Pair_Potential), intent(out) :: this
-        type(Concrete_Potential_Domain), intent(in) :: domain
+        type(Short_Potential_Domain), intent(in) :: domain
         class(Abstract_Potential_Expression), intent(in) :: expression
 
         allocate(this%expression, source = expression)
@@ -102,9 +102,9 @@ contains
 
     subroutine Tabulated_Pair_Potential_set_domain(this, domain)
         class(Tabulated_Pair_Potential), intent(inout) :: this
-        type(Concrete_Potential_Domain), intent(in) :: domain
+        type(Short_Potential_Domain), intent(in) :: domain
 
-        call check_potential_domain("Tabulated_Pair_Potential_set_domain", "domain", domain)
+        call check_potential_domain("Tabulated_Pair_Potential_set_domain", domain)
         this%domain%min = domain%min
         this%domain%max = domain%max
         this%domain%delta = domain%delta
@@ -162,7 +162,7 @@ contains
 
     subroutine Raw_Pair_Potential_construct(this, domain, expression)
         class(Raw_Pair_Potential), intent(out) :: this
-        type(Concrete_Potential_Domain), intent(in) :: domain
+        type(Short_Potential_Domain), intent(in) :: domain
         class(Abstract_Potential_Expression), intent(in) :: expression
 
         allocate(this%expression, source = expression)
@@ -172,12 +172,12 @@ contains
 
     subroutine Raw_Pair_Potential_set_domain(this, domain)
         class(Raw_Pair_Potential), intent(inout) :: this
-        type(Concrete_Potential_Domain), intent(in) :: domain
+        type(Short_Potential_Domain), intent(in) :: domain
 
         call check_positive("Raw_Pair_Potential", "domain%min", domain%min)
         call check_positive("Raw_Pair_Potential", "domain%max", domain%max)
         if (domain%min > domain%max) then
-            call error_exit("Raw_Pair_Potential: domain%min > domain%max.")
+            call error_exit("Raw_Pair_Potential_set_domain: min > max.")
         end if
         this%domain%min = domain%min
         this%domain%max = domain%max
@@ -211,7 +211,7 @@ contains
 
     subroutine Null_Pair_Potential_construct(this, domain, expression)
         class(Null_Pair_Potential), intent(out) :: this
-        type(Concrete_Potential_Domain), intent(in) :: domain
+        type(Short_Potential_Domain), intent(in) :: domain
         class(Abstract_Potential_Expression), intent(in) :: expression
     end subroutine Null_Pair_Potential_construct
 

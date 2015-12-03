@@ -16,6 +16,7 @@ private
     contains
         procedure :: construct => Abstract_Ewald_Convergence_Parameter_construct
         procedure :: destroy => Abstract_Ewald_Convergence_Parameter_destroy
+        procedure :: get_box_edge => Abstract_Ewald_Convergence_Parameter_get_box_edge
         procedure :: get => Abstract_Ewald_Convergence_Parameter_get
     end type Abstract_Ewald_Convergence_Parameter
 
@@ -24,6 +25,11 @@ private
     end type Concrete_Ewald_Convergence_Parameter
 
     type, extends(Abstract_Ewald_Convergence_Parameter), public :: Null_Ewald_Convergence_Parameter
+    contains
+        procedure :: construct => Null_Ewald_Convergence_Parameter_construct
+        procedure :: destroy => Null_Ewald_Convergence_Parameter_destroy
+        procedure :: get_box_edge => Null_Ewald_Convergence_Parameter_get_box_edge
+        procedure :: get => Null_Ewald_Convergence_Parameter_get
     end type Null_Ewald_Convergence_Parameter
 
 contains
@@ -47,13 +53,19 @@ contains
         this%periodic_box => null()
     end subroutine Abstract_Ewald_Convergence_Parameter_destroy
 
-    pure real(DP) function Abstract_Ewald_Convergence_Parameter_get(this) result(alpha)
+    pure real(DP) function Abstract_Ewald_Convergence_Parameter_get_box_edge(this) result(box_edge)
         class(Abstract_Ewald_Convergence_Parameter), intent(in) :: this
 
         real(DP) :: box_size(num_dimensions)
 
         box_size = this%periodic_box%get_size()
-        alpha = this%alpha_x_box / box_size(1)
+        box_edge = box_size(1)
+    end function Abstract_Ewald_Convergence_Parameter_get_box_edge
+
+    pure real(DP) function Abstract_Ewald_Convergence_Parameter_get(this) result(alpha)
+        class(Abstract_Ewald_Convergence_Parameter), intent(in) :: this
+
+        alpha = this%alpha_x_box / this%get_box_edge()
     end function Abstract_Ewald_Convergence_Parameter_get
 
 !end implementation Abstract_Ewald_Convergence_Parameter
@@ -69,6 +81,11 @@ contains
     subroutine Null_Ewald_Convergence_Parameter_destroy(this)
         class(Null_Ewald_Convergence_Parameter), intent(inout) :: this
     end subroutine Null_Ewald_Convergence_Parameter_destroy
+
+    pure real(DP) function Null_Ewald_Convergence_Parameter_get_box_edge(this) result(box_edge)
+        class(Null_Ewald_Convergence_Parameter), intent(in) :: this
+        box_edge = 0._DP
+    end function Null_Ewald_Convergence_Parameter_get_box_edge
 
     pure real(DP) function Null_Ewald_Convergence_Parameter_get(this) result(alpha)
         class(Null_Ewald_Convergence_Parameter), intent(in) :: this
