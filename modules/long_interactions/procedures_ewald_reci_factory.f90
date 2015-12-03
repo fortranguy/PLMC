@@ -7,6 +7,7 @@ use class_ewald_reci_weight, only: Abstract_Ewald_Reci_Weight, Concrete_Ewald_Re
     Null_Ewald_Reci_Weight
 use class_ewald_reci_structure, only: Abstract_Ewald_Reci_Structure, &
     Concrete_Ewald_Reci_Structure, Null_Ewald_Reci_Structure
+use types_long_interactions_wrapper, only: Ewald_Reci_Structure_Wrapper
 
 implicit none
 
@@ -14,6 +15,7 @@ private
 public :: ewald_reci_create, ewald_reci_destroy
 
 interface ewald_reci_create
+    module procedure :: create_structures
     module procedure :: create_structure
     module procedure :: create_weight
 end interface ewald_reci_create
@@ -21,9 +23,38 @@ end interface ewald_reci_create
 interface ewald_reci_destroy
     module procedure :: destroy_weight
     module procedure :: destroy_structure
+    module procedure :: destroy_structures
 end interface ewald_reci_destroy
 
 contains
+
+    subroutine create_structures(structures, environment, components, are_dipolar, weight)
+        type(Ewald_Reci_Structure_Wrapper), allocatable, intent(out) :: structures(:)
+        type(Environment_Wrapper), intent(in) :: environment
+        type(Component_Wrapper), intent(in) :: components(:)
+        logical, intent(in) :: are_dipolar(:)
+        class(Abstract_Ewald_Reci_Weight), intent(in) :: weight
+
+        integer :: i_component
+
+        allocate(structures(size(components)))
+        do i_component = 1, size(structures)
+            call ewald_reci_create(structures(i_component)%reci_structure, environment, &
+                components(i_component), weight, are_dipolar(i_component))
+        end do
+    end subroutine create_structures
+
+    subroutine destroy_structures(structures)
+        type(Ewald_Reci_Structure_Wrapper), allocatable, intent(inout) :: structures(:)
+
+        integer :: i_component
+
+        if (allocated(structures)) then
+            do i_component = size(structures), 1, -1
+                call ewald_reci_destroy(structures(i_component)%reci_structure)
+            end do
+        end if
+    end subroutine destroy_structures
 
     subroutine create_structure(structure, environment, component, weight, is_dipolar)
         class(Abstract_Ewald_Reci_Structure), allocatable, intent(out) :: structure

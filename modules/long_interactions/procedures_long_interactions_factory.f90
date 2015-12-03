@@ -16,6 +16,7 @@ use types_long_interactions_wrapper, only: Long_Interactions_Wrapper
 use procedures_property_inquirers, only: use_permittivity, use_reciprocal_lattice, &
     component_is_dipolar
 use procedures_ewald_real_factory, only: ewald_real_create, ewald_real_destroy
+use procedures_ewald_reci_factory, only: ewald_reci_create, ewald_reci_destroy
 
 implicit none
 
@@ -54,24 +55,34 @@ contains
         call long_interactions_set(are_dipolar, mixture%components)
         call long_interactions_check(any(are_dipolar), environment%reciprocal_lattice, &
             environment%permittivity)
-        call ewald_real_create(long_interactions%real_visitor, environment%periodic_box, &
-            any(are_dipolar))
         call long_interactions_create(long_interactions%alpha, environment%periodic_box, &
             any(are_dipolar), input_data, prefix)
+
+        call ewald_real_create(long_interactions%real_visitor, environment%periodic_box, &
+            any(are_dipolar))
         call ewald_real_create(long_interactions%real_pairs, environment, mixture%&
             components_min_distances, are_dipolar, long_interactions%alpha, input_data, &
             prefix//"Real.")
         call ewald_real_create(long_interactions%real_components, environment%periodic_box, &
             mixture%components, long_interactions%real_pairs)
+
+        call ewald_reci_create(long_interactions%reci_weight, environment, long_interactions%&
+            alpha, any(are_dipolar))
+        call ewald_reci_create(long_interactions%reci_structures, environment, mixture%components, &
+            are_dipolar, long_interactions%reci_weight)
     end subroutine create_all
 
     subroutine destroy_all(long_interactions)
         type(Long_Interactions_Wrapper), intent(inout) :: long_interactions
 
-        call ewald_real_destroy(long_interactions%real_pairs)
-        call long_interactions_destroy(long_interactions%alpha)
+        call ewald_reci_destroy(long_interactions%reci_structures)
+        call ewald_reci_destroy(long_interactions%reci_weight)
+
         call ewald_real_destroy(long_interactions%real_components)
+        call ewald_real_destroy(long_interactions%real_pairs)
         call ewald_real_destroy(long_interactions%real_visitor)
+
+        call long_interactions_destroy(long_interactions%alpha)
     end subroutine destroy_all
 
     subroutine create_alpha(alpha, periodic_box, dipoles_exist, input_data, prefix)

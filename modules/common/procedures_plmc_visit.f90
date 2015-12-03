@@ -14,7 +14,7 @@ use class_pair_potential, only: Abstract_Pair_Potential
 use class_short_pairs_visitor, only: Abstract_Short_Pairs_Visitor
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use class_ewald_real_component, only: Abstract_Ewald_Real_Component
-use procedures_ewald_reci, only: ewald_reci_visit
+use procedures_ewald_reci_macro, only: ewald_reci_visit
 use types_long_interactions_wrapper, only: Long_Interactions_Wrapper
 use types_observables_wrapper, only: Concrete_Components_Energies, Observables_Wrapper
 use procedures_observables_factory, only: create_components_energies_nodes, &

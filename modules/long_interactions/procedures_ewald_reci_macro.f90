@@ -1,4 +1,4 @@
-module procedures_ewald_reci
+module procedures_ewald_reci_macro
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use class_ewald_reci_weight, only: Abstract_Ewald_Reci_Weight
@@ -60,4 +60,4 @@ contains
         end do
     end function visit_inter
 
-end module procedures_ewald_reci
+end module procedures_ewald_reci_macro
