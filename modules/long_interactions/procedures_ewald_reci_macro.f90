@@ -1,6 +1,7 @@
 module procedures_ewald_reci_macro
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
+use data_constants, only: num_dimensions
 use class_ewald_reci_weight, only: Abstract_Ewald_Reci_Weight
 use class_ewald_reci_structure, only: Abstract_Ewald_Reci_Structure
 
@@ -19,13 +20,14 @@ contains
     !> \[
     !>      U_I = \sum_{\vec{k}} w_\alpha(\vec{k}) |S_I(\vec{k})|^2
     !> \]
-    pure real(DP) function visit_intra(reci_numbers, weight, structure) result(energy)
-        integer, intent(in) :: reci_numbers(:)
+    pure real(DP) function visit_intra(weight, structure) result(energy)
         class(Abstract_Ewald_Reci_Weight), intent(in) :: weight
         class(Abstract_Ewald_Reci_Structure), intent(in) :: structure
 
+        integer :: reci_numbers(num_dimensions)
         integer :: n_1, n_2, n_3
 
+        reci_numbers = weight%get_reci_numbers()
         energy = 0._DP
         do n_3 = 1, reci_numbers(3)
         do n_2 = 1, reci_numbers(2)
@@ -41,14 +43,14 @@ contains
     !> \[
     !>      U_{IJ} = \sum_{\vec{k}} w_\alpha(\vec{k}) S_I(\vec{k}) S_J(\vec{k})^\ast
     !> \]
-    pure real(DP) function visit_inter(reci_numbers, weight, structure_i, structure_j) &
-        result(energy)
-        integer, intent(in) :: reci_numbers(:)
+    pure real(DP) function visit_inter(weight, structure_i, structure_j) result(energy)
         class(Abstract_Ewald_Reci_Weight), intent(in) :: weight
         class(Abstract_Ewald_Reci_Structure), intent(in) :: structure_i, structure_j
 
+        integer :: reci_numbers(num_dimensions)
         integer :: n_1, n_2, n_3
 
+        reci_numbers = weight%get_reci_numbers()
         energy = 0._DP
         do n_3 = 1, reci_numbers(3)
         do n_2 = 1, reci_numbers(2)

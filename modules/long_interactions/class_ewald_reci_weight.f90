@@ -20,6 +20,7 @@ private
         procedure :: construct => Abstract_Ewald_Reci_Weight_construct
         procedure :: destroy => Abstract_Ewald_Reci_Weight_destroy
         procedure :: reset => Abstract_Ewald_Reci_Weight_set
+        procedure :: get_reci_numbers => Abstract_Ewald_Reci_Weight_get_reci_numbers
         procedure :: get => Abstract_Ewald_Reci_Weight_get
         procedure, private :: set => Abstract_Ewald_Reci_Weight_set
     end type Abstract_Ewald_Reci_Weight
@@ -32,6 +33,7 @@ private
     contains
         procedure :: construct => Null_Ewald_Reci_Weight_construct
         procedure :: destroy => Null_Ewald_Reci_Weight_destroy
+        procedure :: get_reci_numbers => Null_Ewald_Reci_Weight_get_reci_numbers
         procedure :: get => Null_Ewald_Reci_Weight_get
         procedure, private :: set => Null_Ewald_Reci_Weight_set
     end type Null_Ewald_Reci_Weight
@@ -94,6 +96,13 @@ contains
         end do
     end subroutine Abstract_Ewald_Reci_Weight_set
 
+    pure function Abstract_Ewald_Reci_Weight_get_reci_numbers(this) result(reci_numbers)
+        class(Abstract_Ewald_Reci_Weight), intent(in) :: this
+        integer :: reci_numbers(num_dimensions)
+
+        reci_numbers = this%reci_numbers
+    end function Abstract_Ewald_Reci_Weight_get_reci_numbers
+
     !> \[
     !>      w_\alpha(\vec{k}) = \frac{e^{-k^2/4\alpha^2}}{\epsilon V k^2}
     !> \]
@@ -124,6 +133,12 @@ contains
     pure subroutine Null_Ewald_Reci_Weight_set(this)
         class(Null_Ewald_Reci_Weight), intent(inout) :: this
     end subroutine Null_Ewald_Reci_Weight_set
+
+    pure function Null_Ewald_Reci_Weight_get_reci_numbers(this) result(reci_numbers)
+        class(Null_Ewald_Reci_Weight), intent(in) :: this
+        integer :: reci_numbers(num_dimensions)
+        reci_numbers = 0
+    end function Null_Ewald_Reci_Weight_get_reci_numbers
 
     pure real(DP) function Null_Ewald_Reci_Weight_get(this, n_1, n_2, n_3) result(weight)
         class(Null_Ewald_Reci_Weight), intent(in) :: this

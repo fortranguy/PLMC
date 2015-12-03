@@ -35,18 +35,15 @@ end interface plmc_visit
 
 contains
 
-    subroutine visit_all(observables, reciprocal_lattice, short_interactions, long_interactions, &
-        mixture)
+    subroutine visit_all(observables, short_interactions, long_interactions, mixture)
         type(Observables_Wrapper), intent(inout) :: observables
-        class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
         type(Long_Interactions_Wrapper), intent(in) :: long_interactions
         type(Mixture_Wrapper), intent(in) :: mixture
 
         call plmc_visit(observables%walls_energies, short_interactions, mixture%components)
         call plmc_visit(observables%short_energies, short_interactions, mixture%components)
-        call plmc_visit(observables%long_energies, reciprocal_lattice, long_interactions, mixture%&
-            components)
+        call plmc_visit(observables%long_energies, long_interactions, mixture%components)
     end subroutine visit_all
 
     subroutine visit_walls(walls_energies, short_interactions, components)
@@ -130,9 +127,8 @@ contains
         end do
     end subroutine visit_short_inter
 
-    pure subroutine visit_long(energies, reciprocal_lattice, long_interactions, components)
+    pure subroutine visit_long(energies, long_interactions, components)
         type(Concrete_Components_Energies), intent(inout) :: energies(:)
-        class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
         type(Long_Interactions_Wrapper), intent(in) :: long_interactions
         type(Component_Wrapper), intent(in) :: components(:)
 
@@ -142,7 +138,7 @@ contains
         call create_components_energies_nodes(real_energies)
         call visit_long_real(real_energies, long_interactions, components)
         call create_components_energies_nodes(reci_energies)
-        call visit_long_reci(reci_energies, reciprocal_lattice%get_numbers(), long_interactions)
+        call visit_long_reci(reci_energies, long_interactions)
         energies = real_energies + reci_energies
         call destroy_components_energies_nodes(reci_energies)
         call destroy_components_energies_nodes(real_energies)
@@ -199,9 +195,8 @@ contains
         end do
     end subroutine visit_long_real_inter
 
-    pure subroutine visit_long_reci(energies, reci_numbers, long_interactions)
+    pure subroutine visit_long_reci(energies, long_interactions)
         type(Concrete_Components_Energies), intent(inout) :: energies(:)
-        integer, intent(in) :: reci_numbers(:)
         type(Long_Interactions_Wrapper), intent(in) :: long_interactions
 
         integer :: j_component, i_component
@@ -209,15 +204,14 @@ contains
         do j_component = 1, size(energies)
             associate(energy_j => energies(j_component)%with_components(j_component), &
                 structure_j => long_interactions%reci_structures(j_component)%reci_structure)
-                energy_j = ewald_reci_visit(reci_numbers, long_interactions%reci_weight, &
-                    structure_j)
+                energy_j = ewald_reci_visit(long_interactions%reci_weight, structure_j)
             end associate
             do i_component = 1, j_component - 1
                 associate(energy_ij => energies(j_component)%with_components(i_component), &
                     structure_i => long_interactions%reci_structures(i_component)%reci_structure, &
                     structure_j => long_interactions%reci_structures(j_component)%reci_structure)
-                    energy_ij = ewald_reci_visit(reci_numbers, long_interactions%reci_weight, &
-                        structure_i, structure_j)
+                    energy_ij = ewald_reci_visit(long_interactions%reci_weight, structure_i, &
+                        structure_j)
                 end associate
             end do
         end do
