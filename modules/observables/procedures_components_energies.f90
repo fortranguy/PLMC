@@ -36,6 +36,8 @@ contains
 
         integer :: i_component
         do i_component = 1, size(energies_1)
+            allocate(additive_energies(i_component)%with_components(size(energies_1(i_component)%&
+                with_components)))
             additive_energies(i_component)%with_components = energies_1(i_component)%&
                 with_components + energies_2(i_component)%with_components
         end do
