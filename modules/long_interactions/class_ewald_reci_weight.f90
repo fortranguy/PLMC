@@ -54,9 +54,8 @@ contains
         this%reci_numbers = reciprocal_lattice%get_numbers()
         this%permittivity = permittivity%get()
         this%alpha => alpha
-        allocate(this%weight(-this%reci_numbers(1):this%reci_numbers(1), &
-                             -this%reci_numbers(2):this%reci_numbers(2), &
-                             -this%reci_numbers(3):this%reci_numbers(3)))
+        allocate(this%weight(0:this%reci_numbers(1), 0:this%reci_numbers(2), &
+                             0:this%reci_numbers(3)))
         call this%set()
     end subroutine Abstract_Ewald_Reci_Weight_construct
 
@@ -77,12 +76,11 @@ contains
 
         box_size = this%periodic_box%get_size()
         alpha = this%alpha%get()
-        ! How about using symmetry to reduce memory?
-        do n_3 = -this%reci_numbers(3), this%reci_numbers(3)
+        do n_3 = 0, this%reci_numbers(3)
             wave_vector(3) = 2._DP*PI * real(n_3, DP) / box_size(3)
-        do n_2 = -this%reci_numbers(2), this%reci_numbers(2)
+        do n_2 = 0, this%reci_numbers(2)
             wave_vector(2) = 2._DP*PI * real(n_2, DP) / box_size(2)
-        do n_1 = -this%reci_numbers(1), this%reci_numbers(1)
+        do n_1 = 0, this%reci_numbers(1)
             wave_vector(1) = 2._DP*PI * real(n_1, DP) / box_size(1)
             if (n_1 /= 0 .or. n_2 /= 0 .or. n_3 /= 0) then
                 wave_squared = dot_product(wave_vector, wave_vector)
@@ -110,7 +108,7 @@ contains
         class(Abstract_Ewald_Reci_Weight), intent(in) :: this
         integer, intent(in) :: n_1, n_2, n_3
 
-        weight = this%weight(n_1, n_2, n_3)
+        weight = this%weight(abs(n_1), abs(n_2), abs(n_3))
     end function Abstract_Ewald_Reci_Weight_get
 
 !end implementation Abstract_Ewald_Reci_Weight
