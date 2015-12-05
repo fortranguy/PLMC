@@ -53,6 +53,7 @@ contains
             do i_component = size(structures), 1, -1
                 call ewald_reci_destroy(structures(i_component)%reci_structure)
             end do
+            deallocate(structures)
         end if
     end subroutine destroy_structures
 
@@ -77,6 +78,7 @@ contains
 
         if (allocated(structure)) then
             call structure%destroy()
+            deallocate(structure)
         end if
     end subroutine destroy_structure
 
@@ -100,6 +102,7 @@ contains
 
         if (allocated(weight)) then
             call weight%destroy()
+            deallocate(weight)
         end if
     end subroutine destroy_weight
 
