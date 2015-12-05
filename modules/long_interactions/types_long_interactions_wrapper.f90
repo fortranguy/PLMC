@@ -29,10 +29,6 @@ private
         class(Abstract_Ewald_Reci_Structure), allocatable :: reci_structure
     end type Ewald_Reci_Structure_Wrapper
 
-    type, public :: Ewald_Self_Wrapper
-        class(Abstract_Ewald_Self), allocatable :: self
-    end type Ewald_Self_Wrapper
-
     !Dipolar interactions only
     type, public :: Long_Interactions_Wrapper
         class(Abstract_Ewald_Convergence_Parameter), allocatable :: alpha
@@ -41,7 +37,7 @@ private
         type(Ewald_Real_Pairs_Wrapper), allocatable :: real_pairs(:)
         class(Abstract_Ewald_Reci_Weight), allocatable :: reci_weight
         type(Ewald_Reci_Structure_Wrapper), allocatable :: reci_structures(:)
-        type(Ewald_Self_Wrapper), allocatable :: self(:)
+        class(Abstract_Ewald_Self), allocatable :: self
     end type Long_Interactions_Wrapper
 
 end module types_long_interactions_wrapper

@@ -267,6 +267,7 @@ contains
         integer, intent(in) :: i_actor
 
         real(DP), dimension(size(long_deltas)) :: long_new_real, long_old_real, lond_delta_reci
+        real(DP) :: long_delta_self
         integer :: i_component, i_exclude
 
         do i_component = 1, size(this%long_interactions%real_components, 1)
@@ -276,12 +277,13 @@ contains
             call this%long_interactions%real_components(i_component, i_actor)%real_component%&
                 visit(long_old_real(i_component), old, i_exclude)
         end do
-
         do i_component = 1, size(this%long_interactions%reci_structures, 1)
             lond_delta_reci(i_component) = this%long_interactions%reci_structures(i_component)%&
                 reci_structure%get_coordinates_delta(new, old, i_component==i_actor)
         end do
-        long_deltas = long_new_real-long_old_real + lond_delta_reci
+        long_delta_self = this%long_interactions%self%get(new%dipolar_moment) - &
+                          this%long_interactions%self%get(old%dipolar_moment)
+        long_deltas = long_new_real-long_old_real + lond_delta_reci - long_delta_self
     end subroutine Abstract_One_Particle_Change_visit_long
 
 !end implementation Abstract_One_Particle_Change

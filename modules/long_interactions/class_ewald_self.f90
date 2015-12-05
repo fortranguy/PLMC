@@ -19,9 +19,21 @@ private
         procedure :: construct => Abstract_Ewald_Self_construct
         procedure :: destroy => Abstract_Ewald_Self_destroy
         procedure :: reset => Abstract_Ewald_Self_set
-        procedure, private :: set => Abstract_Ewald_Self_set
         procedure :: get => Abstract_Ewald_Self_get
+        procedure, private :: set => Abstract_Ewald_Self_set
     end type Abstract_Ewald_Self
+
+    type, extends(Abstract_Ewald_Self), public :: Concrete_Ewald_Self
+
+    end type Concrete_Ewald_Self
+
+    type, extends(Abstract_Ewald_Self), public :: Null_Ewald_Self
+    contains
+        procedure :: construct => Null_Ewald_Self_construct
+        procedure :: destroy => Null_Ewald_Self_destroy
+        procedure :: reset => Null_Ewald_Self_set
+        procedure :: get => Null_Ewald_Self_get
+    end type Null_Ewald_Self
 
 contains
 
@@ -60,5 +72,29 @@ contains
     end function Abstract_Ewald_Self_get
 
 !end implementation Abstract_Ewald_Self
+
+!implementation Null_Ewald_Self
+
+    subroutine Null_Ewald_Self_construct(this, permittivity, alpha)
+        class(Null_Ewald_Self), intent(out) :: this
+        class(Abstract_Permittivity), target, intent(in) :: permittivity
+        class(Abstract_Ewald_Convergence_Parameter), target, intent(in) :: alpha
+    end subroutine Null_Ewald_Self_construct
+
+    subroutine Null_Ewald_Self_set(this)
+        class(Null_Ewald_Self), intent(inout) :: this
+    end subroutine Null_Ewald_Self_set
+
+    subroutine Null_Ewald_Self_destroy(this)
+        class(Null_Ewald_Self), intent(inout) :: this
+    end subroutine Null_Ewald_Self_destroy
+
+    pure real(DP) function Null_Ewald_Self_get(this, moment) result(self)
+        class(Null_Ewald_Self), intent(in) :: this
+        real(DP), intent(in) :: moment(:)
+        self = 0._DP
+    end function Null_Ewald_Self_get
+
+!end implementation Null_Ewald_Self
 
 end module class_ewald_self

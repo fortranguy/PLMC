@@ -17,6 +17,7 @@ use procedures_property_inquirers, only: use_permittivity, use_reciprocal_lattic
     component_is_dipolar
 use procedures_ewald_real_factory, only: ewald_real_create, ewald_real_destroy
 use procedures_ewald_reci_factory, only: ewald_reci_create, ewald_reci_destroy
+use procedures_ewald_self_factory, only: ewald_self_create, ewald_self_destroy
 
 implicit none
 
@@ -70,10 +71,15 @@ contains
             alpha, any(are_dipolar))
         call ewald_reci_create(long_interactions%reci_structures, environment, mixture%components, &
             are_dipolar, long_interactions%reci_weight)
+
+        call ewald_self_create(long_interactions%self, environment%permittivity, long_interactions%&
+            alpha, any(are_dipolar))
     end subroutine create_all
 
     subroutine destroy_all(long_interactions)
         type(Long_Interactions_Wrapper), intent(inout) :: long_interactions
+
+        call ewald_self_destroy(long_interactions%self)
 
         call ewald_reci_destroy(long_interactions%reci_structures)
         call ewald_reci_destroy(long_interactions%reci_weight)

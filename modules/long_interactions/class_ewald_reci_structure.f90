@@ -40,8 +40,8 @@ private
     contains
         procedure :: construct => Null_Ewald_Reci_Structure_construct
         procedure :: destroy => Null_Ewald_Reci_Structure_destroy
+        procedure :: reset =>  Null_Ewald_Reci_Structure_set
         procedure :: get => Null_Ewald_Reci_Structure_get
-        procedure, private :: set => Null_Ewald_Reci_Structure_set
         procedure :: get_coordinates_delta => Null_Ewald_Reci_Structure_get_coordinates_delta
         procedure :: set_coordinates_delta => Null_Ewald_Reci_Structure_set_coordinates_delta
     end type Null_Ewald_Reci_Structure

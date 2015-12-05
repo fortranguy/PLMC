@@ -33,9 +33,9 @@ private
     contains
         procedure :: construct => Null_Ewald_Reci_Weight_construct
         procedure :: destroy => Null_Ewald_Reci_Weight_destroy
+        procedure :: reset => Null_Ewald_Reci_Weight_set
         procedure :: get_reci_numbers => Null_Ewald_Reci_Weight_get_reci_numbers
         procedure :: get => Null_Ewald_Reci_Weight_get
-        procedure, private :: set => Null_Ewald_Reci_Weight_set
     end type Null_Ewald_Reci_Weight
 
 contains
