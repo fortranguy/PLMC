@@ -15,7 +15,8 @@
             "value": 1.0
         },
         "Reciprocal Lattice": {
-            "use": false
+            "use": true,
+            "numbers": [8, 8, 8]
         },
         "Walls": {
             "use": false
@@ -110,7 +111,8 @@
     "Long Interactions": {
         "alpha times box edge": 7.0,
         "Real": {
-            "tabulated": false,
+            "tabulated": true,
+            "delta distance": 1.0e-4,
             "max distance over box edge": 0.5
         }
     },
