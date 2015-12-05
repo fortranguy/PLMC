@@ -1,4 +1,4 @@
-module procedures_ewald_reci_macro
+module procedures_ewald_reci_visit
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
@@ -62,4 +62,4 @@ contains
         end do
     end function visit_inter
 
-end module procedures_ewald_reci_macro
+end module procedures_ewald_reci_visit

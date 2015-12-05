@@ -14,8 +14,9 @@ use class_pair_potential, only: Abstract_Pair_Potential
 use class_short_pairs_visitor, only: Abstract_Short_Pairs_Visitor
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use class_ewald_real_component, only: Abstract_Ewald_Real_Component
-use procedures_ewald_reci_macro, only: ewald_reci_visit
-use types_long_interactions_wrapper, only: Long_Interactions_Wrapper
+use procedures_ewald_reci_visit, only: ewald_reci_visit
+use procedures_ewald_self_visit, only: ewald_self_visit
+use types_long_interactions_wrapper, only: Ewald_Self_Wrapper, Long_Interactions_Wrapper
 use types_observables_wrapper, only: Concrete_Components_Energies, Observables_Wrapper
 use procedures_observables_factory, only: create_components_energies_nodes, &
     destroy_components_energies_nodes
@@ -36,21 +37,21 @@ end interface plmc_visit
 
 contains
 
-    subroutine visit_all(observables, short_interactions, long_interactions, mixture)
+    subroutine visit_all(observables, mixture, short_interactions, long_interactions)
         type(Observables_Wrapper), intent(inout) :: observables
+        type(Mixture_Wrapper), intent(in) :: mixture
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
         type(Long_Interactions_Wrapper), intent(in) :: long_interactions
-        type(Mixture_Wrapper), intent(in) :: mixture
 
-        call plmc_visit(observables%walls_energies, short_interactions, mixture%components)
-        call plmc_visit(observables%short_energies, short_interactions, mixture%components)
-        call plmc_visit(observables%long_energies, long_interactions, mixture%components)
+        call plmc_visit(observables%walls_energies, mixture%components, short_interactions)
+        call plmc_visit(observables%short_energies, mixture%components, short_interactions)
+        call plmc_visit(observables%long_energies, mixture%components, long_interactions)
     end subroutine visit_all
 
-    subroutine visit_walls(walls_energies, short_interactions, components)
+    subroutine visit_walls(walls_energies, components, short_interactions)
         real(DP), intent(out) :: walls_energies(:)
-        type(Short_Interactions_Wrapper), intent(in) :: short_interactions
         type(Component_Wrapper), intent(in) :: components(:)
+        type(Short_Interactions_Wrapper), intent(in) :: short_interactions
 
         logical :: overlap
         integer :: i_component
@@ -69,19 +70,19 @@ contains
         end do
     end subroutine visit_walls
 
-    subroutine visit_short(energies, short_interactions, components)
+    subroutine visit_short(energies, components, short_interactions)
         type(Concrete_Components_Energies), intent(inout) :: energies(:)
-        type(Short_Interactions_Wrapper), intent(in) :: short_interactions
         type(Component_Wrapper), intent(in) :: components(:)
+        type(Short_Interactions_Wrapper), intent(in) :: short_interactions
 
-        call visit_short_intra(energies, short_interactions, components)
-        call visit_short_inter(energies, short_interactions, components)
+        call visit_short_intra(energies, components, short_interactions)
+        call visit_short_inter(energies, components, short_interactions)
     end subroutine visit_short
 
-    subroutine visit_short_intra(energies, short_interactions, components)
+    subroutine visit_short_intra(energies, components, short_interactions)
         type(Concrete_Components_Energies), intent(inout) :: energies(:)
-        type(Short_Interactions_Wrapper), intent(in) :: short_interactions
         type(Component_Wrapper), intent(in) :: components(:)
+        type(Short_Interactions_Wrapper), intent(in) :: short_interactions
 
         logical :: overlap
         integer :: i_component
@@ -101,10 +102,10 @@ contains
         end do
     end subroutine visit_short_intra
 
-    subroutine visit_short_inter(energies, short_interactions, components)
+    subroutine visit_short_inter(energies, components, short_interactions)
         type(Concrete_Components_Energies), intent(inout) :: energies(:)
-        type(Short_Interactions_Wrapper), intent(in) :: short_interactions
         type(Component_Wrapper), intent(in) :: components(:)
+        type(Short_Interactions_Wrapper), intent(in) :: short_interactions
 
         logical :: overlap
         integer :: j_component, i_component
@@ -128,18 +129,19 @@ contains
         end do
     end subroutine visit_short_inter
 
-    pure subroutine visit_long(energies, long_interactions, components)
+    pure subroutine visit_long(energies, components, long_interactions)
         type(Concrete_Components_Energies), intent(inout) :: energies(:)
-        type(Long_Interactions_Wrapper), intent(in) :: long_interactions
         type(Component_Wrapper), intent(in) :: components(:)
+        type(Long_Interactions_Wrapper), intent(in) :: long_interactions
 
         type(Concrete_Components_Energies) :: real_energies(size(components))
         type(Concrete_Components_Energies) :: reci_energies(size(components))
+        real(DP) :: self_energies(size(components))
 
         call Concrete_Components_Energies_init(energies)
 
         call create_components_energies_nodes(real_energies)
-        call visit_long_real(real_energies, long_interactions, components)
+        call visit_long_real(real_energies, components, long_interactions)
         call Concrete_Components_Energies_add(energies, real_energies)
         call destroy_components_energies_nodes(real_energies)
 
@@ -147,21 +149,24 @@ contains
         call visit_long_reci(reci_energies, long_interactions)
         call Concrete_Components_Energies_add(energies, reci_energies)
         call destroy_components_energies_nodes(reci_energies)
+
+        call visit_long_self(self_energies, components, long_interactions%self)
+        call Concrete_Components_Energies_add(energies, self_energies)
     end subroutine visit_long
 
-    pure subroutine visit_long_real(energies, long_interactions, components)
+    pure subroutine visit_long_real(energies, components, long_interactions)
         type(Concrete_Components_Energies), intent(inout) :: energies(:)
-        type(Long_Interactions_Wrapper), intent(in) :: long_interactions
         type(Component_Wrapper), intent(in) :: components(:)
+        type(Long_Interactions_Wrapper), intent(in) :: long_interactions
 
-        call visit_long_real_intra(energies, long_interactions, components)
-        call visit_long_real_inter(energies, long_interactions, components)
+        call visit_long_real_intra(energies, components, long_interactions)
+        call visit_long_real_inter(energies, components, long_interactions)
     end subroutine visit_long_real
 
-    pure subroutine visit_long_real_intra(energies, long_interactions, components)
+    pure subroutine visit_long_real_intra(energies, components, long_interactions)
         type(Concrete_Components_Energies), intent(inout) :: energies(:)
-        type(Long_Interactions_Wrapper), intent(in) :: long_interactions
         type(Component_Wrapper), intent(in) :: components(:)
+        type(Long_Interactions_Wrapper), intent(in) :: long_interactions
 
         integer :: i_component
 
@@ -177,10 +182,10 @@ contains
         end do
     end subroutine visit_long_real_intra
 
-    pure subroutine visit_long_real_inter(energies, long_interactions, components)
+    pure subroutine visit_long_real_inter(energies, components, long_interactions)
         type(Concrete_Components_Energies), intent(inout) :: energies(:)
-        type(Long_Interactions_Wrapper), intent(in) :: long_interactions
         type(Component_Wrapper), intent(in) :: components(:)
+        type(Long_Interactions_Wrapper), intent(in) :: long_interactions
 
         integer :: j_component, i_component
 
@@ -221,5 +226,18 @@ contains
             end do
         end do
     end subroutine visit_long_reci
+
+    pure subroutine visit_long_self(energies, components, ewald_self)
+        real(DP), intent(out) :: energies(:)
+        type(Component_Wrapper), intent(in) :: components(:)
+        type(Ewald_Self_Wrapper), intent(in) :: ewald_self(:)
+
+        integer :: i_component
+
+        do i_component = 1, size(energies)
+            energies(i_component) = ewald_self_visit(components(i_component)%&
+                dipolar_moments, ewald_self(i_component)%self)
+        end do
+    end subroutine visit_long_self
 
 end module procedures_plmc_visit
