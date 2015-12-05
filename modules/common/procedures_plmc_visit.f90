@@ -19,7 +19,8 @@ use types_long_interactions_wrapper, only: Long_Interactions_Wrapper
 use types_observables_wrapper, only: Concrete_Components_Energies, Observables_Wrapper
 use procedures_observables_factory, only: create_components_energies_nodes, &
     destroy_components_energies_nodes
-use procedures_components_energies, only: operator(+)
+use procedures_components_energies, only: Concrete_Components_Energies_init, &
+    Concrete_Components_Energies_add
 
 implicit none
 
@@ -135,13 +136,17 @@ contains
         type(Concrete_Components_Energies) :: real_energies(size(components))
         type(Concrete_Components_Energies) :: reci_energies(size(components))
 
+        call Concrete_Components_Energies_init(energies)
+
         call create_components_energies_nodes(real_energies)
         call visit_long_real(real_energies, long_interactions, components)
+        call Concrete_Components_Energies_add(energies, real_energies)
+        call destroy_components_energies_nodes(real_energies)
+
         call create_components_energies_nodes(reci_energies)
         call visit_long_reci(reci_energies, long_interactions)
-        energies = real_energies + reci_energies
+        call Concrete_Components_Energies_add(energies, reci_energies)
         call destroy_components_energies_nodes(reci_energies)
-        call destroy_components_energies_nodes(real_energies)
     end subroutine visit_long
 
     pure subroutine visit_long_real(energies, long_interactions, components)
