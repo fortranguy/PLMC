@@ -100,7 +100,6 @@ contains
             data_field = prefix//"alpha times box edge"
             call input_data%get(data_field, alpha_x_box, data_found)
             call check_data_found(data_field, data_found)
-            deallocate(data_field)
             allocate(Concrete_Ewald_Convergence_Parameter :: alpha)
         else
             allocate(Null_Ewald_Convergence_Parameter :: alpha)

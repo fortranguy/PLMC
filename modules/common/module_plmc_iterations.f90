@@ -27,7 +27,6 @@ contains
         call input_data%get(data_field, num_steps, data_found)
         call check_data_found(data_field, data_found)
         call check_positive("plmc_set_num_steps", "num_steps", num_steps)
-        deallocate(data_field)
     end subroutine plmc_set_num_steps
 
 end module module_plmc_iterations

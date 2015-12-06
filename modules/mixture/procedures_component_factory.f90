@@ -99,7 +99,6 @@ contains
             data_field = prefix//"number"
             call input_data%get(data_field, num_particles, data_found)
             call check_data_found(data_field, data_found)
-            deallocate(data_field)
         else
             num_particles = 0
             allocate(Null_Component_Number :: component_number)
@@ -200,7 +199,6 @@ contains
             data_field = prefix//"moment norm"
             call input_data%get(data_field, moment_norm, data_found)
             call check_data_found(data_field, data_found)
-            deallocate(data_field)
             allocate(Concrete_Component_Dipolar_Moments :: component_dipolar_moments)
         else
             moment_norm = 0._DP
@@ -260,7 +258,6 @@ contains
             call input_data%get(data_field, excess, data_found)
             call check_data_found(data_field, data_found)
             allocate(Concrete_Component_Chemical_Potential :: component_chemical_potential)
-            deallocate(data_field)
         else
             allocate(Null_Component_Chemical_Potential :: component_chemical_potential)
         end if

@@ -172,7 +172,6 @@ contains
             data_field = prefix//"Coordinates.period"
             call input_data%get(data_field, selector_i%period, data_found)
             call check_data_found(data_field, data_found)
-            deallocate(data_field)
         end if
         do i_component = 1, size(components)
             associate(positions_i => mixture_components(i_component)%positions, &
@@ -252,4 +251,3 @@ contains
     end subroutine destroy_changes
 
 end module procedures_writers_factory
-

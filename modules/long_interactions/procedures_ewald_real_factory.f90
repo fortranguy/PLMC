@@ -213,7 +213,6 @@ contains
             else
                 allocate(Raw_Ewald_Real_Pair :: real_pair)
             end if
-            deallocate(data_field)
         else
             allocate(Null_Ewald_Real_Pair :: real_pair)
         end if

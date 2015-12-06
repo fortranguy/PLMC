@@ -194,7 +194,6 @@ contains
             data_field = prefix//"minimum distance"
             call input_data%get(data_field, min_distance_value, data_found)
             call check_data_found(data_field, data_found)
-            deallocate(data_field)
         else
             allocate(Null_Minimum_Distance :: min_distance)
             min_distance_value = 0._DP
