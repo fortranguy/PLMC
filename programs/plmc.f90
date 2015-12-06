@@ -1,7 +1,7 @@
 program plmc
 
 use, intrinsic :: iso_fortran_env, only: output_unit
-use json_module, only: json_file
+use json_module, only: json_file, json_initialize
 use types_environment_wrapper, only: Environment_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
@@ -12,7 +12,7 @@ use procedures_plmc_propagator, only: plmc_propagator_create, plmc_propagator_de
     plmc_propagator_try
 use types_observables_wrapper, only: Observables_Wrapper
 use types_writers_wrapper, only: Writers_Wrapper
-use procedures_plmc_factory, only: plmc_load, plmc_create, plmc_set, plmc_destroy
+use procedures_plmc_factory, only: plmc_create, plmc_set, plmc_destroy
 use procedures_plmc_reset, only: plmc_reset
 use procedures_plmc_visit, only: plmc_visit
 use procedures_plmc_write, only: plmc_write
@@ -33,7 +33,8 @@ implicit none
     integer :: i_step
     logical :: changes_tuned
 
-    call plmc_load(input_data)
+    call json_initialize()
+    call plmc_create(input_data)
     call plmc_create(environment, input_data)
     call plmc_create(mixture, environment, input_data)
     call plmc_create(short_interactions, environment, mixture, input_data)
@@ -46,7 +47,7 @@ implicit none
     call plmc_create(observables, mixture%components)
     call plmc_create(writers, mixture%components, short_interactions, long_interactions, changes, &
         input_data)
-    call input_data%destroy()
+    call plmc_destroy(input_data)
 
     call plmc_visit(observables, short_interactions, long_interactions, mixture)
     call plmc_write(-num_tuning_steps, writers, observables)

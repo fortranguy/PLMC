@@ -2,7 +2,7 @@ module procedures_plmc_factory
 
 use data_wrappers_prefix, only:environment_prefix, mixture_prefix, changes_prefix, &
     short_interactions_prefix, long_interactions_prefix, writers_prefix
-use json_module, only: json_file, json_initialize
+use json_module, only: json_file
 use procedures_command_arguments, only: set_filename_from_argument
 use class_periodic_box, only: Abstract_Periodic_Box
 use types_environment_wrapper, only: Environment_Wrapper
@@ -34,13 +34,10 @@ use procedures_property_inquirers, only: use_walls, component_is_dipolar, &
 implicit none
 
 private
-public :: plmc_load, plmc_create, plmc_set, plmc_destroy
-
-interface plmc_load
-    module procedure :: load_input_data
-end interface plmc_load
+public :: plmc_create, plmc_set, plmc_destroy
 
 interface plmc_create
+    module procedure :: create_input_data
     module procedure :: create_environment
     module procedure :: create_mixture
     module procedure :: create_short_interactions
@@ -66,20 +63,25 @@ interface plmc_destroy
     module procedure :: destroy_short_interactions
     module procedure :: destroy_mixture
     module procedure :: destroy_environment
+    module procedure :: destroy_input_data
 end interface plmc_destroy
 
 contains
 
-    subroutine load_input_data(input_data)
+    subroutine create_input_data(input_data)
         type(json_file), intent(out) :: input_data
 
         character(len=:), allocatable :: data_filename
-
-        call json_initialize()
         call set_filename_from_argument(data_filename)
         call input_data%load_file(filename = data_filename)
         if (allocated(data_filename)) deallocate(data_filename)
-    end subroutine load_input_data
+    end subroutine create_input_data
+
+    subroutine destroy_input_data(input_data)
+        type(json_file), intent(inout) :: input_data
+
+        call input_data%destroy()
+    end subroutine destroy_input_data
 
     subroutine create_environment(environment, input_data)
         type(Environment_Wrapper), intent(out) :: environment
