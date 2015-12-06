@@ -65,7 +65,6 @@ contains
             data_field = prefix//"maximum increase factor"
             call input_data%get(data_field, parameters%increase_factor_max, data_found)
             call check_data_found(data_field, data_found)
-            deallocate(data_field)
         else
             parameters%increase_factor = 1._DP
             parameters%increase_factor_max = parameters%increase_factor

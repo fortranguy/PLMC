@@ -129,7 +129,6 @@ contains
         data_field = prefix//"Box.size"
         call input_data%get(data_field, box_size, data_found)
         call check_data_found(data_field, data_found)
-        deallocate(data_field)
         call periodic_box%set(box_size)
     end subroutine create_periodic_box
 
@@ -153,7 +152,6 @@ contains
         call check_data_found(data_field, data_found)
         allocate(Concrete_Temperature :: temperature)
         call temperature%set(temperature_value)
-        deallocate(data_field)
     end subroutine create_temperature
 
     subroutine destroy_temperature(temperature)
@@ -190,8 +188,6 @@ contains
                 case default
                     call error_exit(field_name//" field_name unknown. Choose: 'constant'.")
             end select
-            deallocate(field_name)
-            deallocate(data_field)
         else
             allocate(Null_Field_Expression :: field_expression)
         end if
@@ -216,7 +212,6 @@ contains
                 call field_expression%set(field_vector)
                 deallocate(field_vector)
         end select
-        if (allocated(data_field)) deallocate(data_field)
     end subroutine set_field_expression
 
     subroutine destroy_field_expression(field_expression)
@@ -257,8 +252,6 @@ contains
                     call error_exit(domain_name//" domain_name unknown."//&
                         "Choose between 'domain' and 'box'.")
             end select
-            deallocate(domain_name)
-            deallocate(data_field)
         else
             allocate(Null_Parallelepiped_Domain :: parallelepiped_domain)
         end if
@@ -310,7 +303,6 @@ contains
             data_field = prefix//"Permittivity.value"
             call input_data%get(data_field, permittivity_value, data_found)
             call check_data_found(data_field, data_found)
-            deallocate(data_field)
             allocate(Concrete_Permittivity :: permittivity)
         else
             allocate(Null_Permittivity :: permittivity)
@@ -341,7 +333,6 @@ contains
             data_field = prefix//"Reciprocal Lattice.numbers"
             call input_data%get(data_field, numbers, data_found)
             call check_data_found(data_field, data_found)
-            deallocate(data_field)
             allocate(Concrete_Reciprocal_Lattice :: reciprocal_lattice)
         else
             allocate(Null_Reciprocal_Lattice :: reciprocal_lattice)
@@ -377,8 +368,6 @@ contains
                 case default
                     call error_exit(walls_name//" walls_name unknown. Choose: 'flat'.")
             end select
-            deallocate(walls_name)
-            deallocate(data_field)
         else
             allocate(Null_Floor_Penetration :: floor_penetration)
         end if
@@ -409,7 +398,6 @@ contains
             data_field = prefix//"Walls.gap"
             call input_data%get(data_field, gap, data_found)
             call check_data_found(data_field, data_found)
-            deallocate(data_field)
         else
             allocate(Null_Walls_Potential :: walls_potential)
         end if

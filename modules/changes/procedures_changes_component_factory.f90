@@ -117,7 +117,6 @@ contains
                 data_field = prefix//"Small Move.delta"
                 call input_data%get(data_field, move_delta, data_found)
                 call check_data_found(data_field, data_found)
-                deallocate(data_field)
                 call moved_positions%construct(periodic_box, positions, move_delta, &
                     tuning_parameters)
                 deallocate(move_delta)
@@ -200,7 +199,6 @@ contains
                 data_field = prefix//"Small Rotation.delta"
                 call input_data%get(data_field, rotation_delta, data_found)
                 call check_data_found(data_field, data_found)
-                deallocate(data_field)
                 call rotated_orientations%construct(orientations, rotation_delta, tuning_parameters)
             type is (Null_Changed_Coordinates)
                 call rotated_orientations%construct()

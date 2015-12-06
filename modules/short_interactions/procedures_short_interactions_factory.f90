@@ -346,7 +346,6 @@ contains
             else
                 allocate(Raw_Pair_Potential :: pair)
             end if
-            deallocate(data_field)
         else
             allocate(Null_Pair_Potential :: pair)
         end if
@@ -423,8 +422,6 @@ contains
                     call error_exit(potential_name//" unknown potential_name."//&
                         "Choose between: 'null' and LJ.")
             end select
-            deallocate(potential_name)
-            deallocate(data_field)
         else
             allocate(Null_Potential_Expression :: expression)
         end if
@@ -453,7 +450,6 @@ contains
             class default
                 call error_exit("expression type unknown.")
         end select
-        if (allocated(data_field)) deallocate(data_field)
     end subroutine set_expression
 
     subroutine destroy_expression(expression)
