@@ -1,6 +1,6 @@
 module procedures_plmc_reset
 
-use types_long_interactions_wrapper, only: Ewald_Real_Pairs_Wrapper, Ewald_Reci_Structure_Wrapper, &
+use types_long_interactions_wrapper, only: Ewald_Real_Pairs_Wrapper, Ewald_Reci_Component_Wrapper, &
     Long_Interactions_Wrapper
 
 implicit none
@@ -22,7 +22,7 @@ contains
 
         call plmc_reset(long_interactions%real_pairs)
         call long_interactions%reci_weight%reset()
-        call plmc_reset(long_interactions%reci_structures)
+        call plmc_reset(long_interactions%reci_components)
     end subroutine reset_long
 
     !> To ensure volume changes were taken into account
@@ -39,13 +39,13 @@ contains
     end subroutine reset_long_real
 
     !> To ensure components changes were taken into account
-    subroutine reset_long_reci(reci_structures)
-        type(Ewald_Reci_Structure_Wrapper), intent(inout) :: reci_structures(:)
+    subroutine reset_long_reci(reci_components)
+        type(Ewald_Reci_Component_Wrapper), intent(inout) :: reci_components(:)
 
         integer :: i_component
 
-        do i_component = 1, size(reci_structures)
-            call reci_structures(i_component)%reci_structure%reset()
+        do i_component = 1, size(reci_components)
+            call reci_components(i_component)%reci_component%reset()
         end do
     end subroutine reset_long_reci
 

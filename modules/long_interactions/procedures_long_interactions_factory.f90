@@ -69,7 +69,7 @@ contains
 
         call ewald_reci_create(long_interactions%reci_weight, environment, long_interactions%&
             alpha, any(are_dipolar))
-        call ewald_reci_create(long_interactions%reci_structures, environment, mixture%components, &
+        call ewald_reci_create(long_interactions%reci_components, environment, mixture%components, &
             are_dipolar, long_interactions%reci_weight)
 
         call ewald_self_create(long_interactions%selves, environment%permittivity, &
@@ -81,7 +81,7 @@ contains
 
         call ewald_self_destroy(long_interactions%selves)
 
-        call ewald_reci_destroy(long_interactions%reci_structures)
+        call ewald_reci_destroy(long_interactions%reci_components)
         call ewald_reci_destroy(long_interactions%reci_weight)
 
         call ewald_real_destroy(long_interactions%real_components)

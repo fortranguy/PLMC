@@ -277,9 +277,9 @@ contains
             call this%long_interactions%real_components(i_component, i_actor)%real_component%&
                 visit(long_old_real(i_component), old, i_exclude)
         end do
-        do i_component = 1, size(this%long_interactions%reci_structures, 1)
-            lond_delta_reci(i_component) = this%long_interactions%reci_structures(i_component)%&
-                reci_structure%get_coordinates_delta(new, old, i_component==i_actor)
+        do i_component = 1, size(this%long_interactions%reci_components, 1)
+            lond_delta_reci(i_component) = this%long_interactions%reci_components(i_component)%&
+                reci_component%visit_coordinates_delta(new, old, i_component==i_actor)
         end do
         long_delta_self = this%long_interactions%selves(i_actor)%self%get(new%dipolar_moment) - &
                           this%long_interactions%selves(i_actor)%self%get(old%dipolar_moment)
@@ -316,7 +316,7 @@ contains
         do i_component = 1, size(this%short_interactions%components_cells, 1)
             call this%short_interactions%components_cells(i_actor, i_component)%move(old, new)
         end do
-        call this%long_interactions%reci_structures(i_actor)%reci_structure%&
+        call this%long_interactions%reci_components(i_actor)%reci_component%&
             set_coordinates_delta(new, old)
     end subroutine Concrete_One_Particle_Move_update_actor
 
@@ -379,7 +379,7 @@ contains
         type(Concrete_Temporary_Particle), intent(in) :: new, old
 
         call this%components(i_actor)%orientations%set(new%i, new%orientation)
-        call this%long_interactions%reci_structures(i_actor)%reci_structure%&
+        call this%long_interactions%reci_components(i_actor)%reci_component%&
             set_coordinates_delta(new, old)
     end subroutine Concrete_One_Particle_Rotation_update_actor
 

@@ -15,11 +15,11 @@
 				<Option use_console_runner="0" />
 				<Compiler>
 					<Add option="-warn all" />
-					<Add directory="/home/salomon/usr/local/jsonfortran-intel-4.2.0/lib" />
+					<Add directory="/home/salomon/usr/local/jsonfortran-intel-4.3.0/lib" />
 				</Compiler>
 				<Linker>
-					<Add library="/home/salomon/usr/local/jsonfortran-intel-4.2.0/lib/libjsonfortran.a" />
-					<Add library="/home/salomon/usr/local/jsonfortran-intel-4.2.0/lib/libjsonfortran.so" />
+					<Add library="/home/salomon/usr/local/jsonfortran-intel-4.3.0/lib/libjsonfortran.a" />
+					<Add library="/home/salomon/usr/local/jsonfortran-intel-4.3.0/lib/libjsonfortran.so" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -161,9 +161,6 @@
 		<Unit filename="modules/long_interactions/class_ewald_real_visitor.f90">
 			<Option weight="5" />
 		</Unit>
-		<Unit filename="modules/long_interactions/class_ewald_reci_structure.f90">
-			<Option weight="5" />
-		</Unit>
 		<Unit filename="modules/long_interactions/class_ewald_reci_weight.f90">
 			<Option weight="4" />
 		</Unit>
@@ -180,13 +177,13 @@
 			<Option weight="7" />
 		</Unit>
 		<Unit filename="modules/long_interactions/procedures_ewald_reci_visit.f90">
-			<Option weight="0" />
+			<Option weight="6" />
 		</Unit>
 		<Unit filename="modules/long_interactions/procedures_ewald_self_factory.f90">
-			<Option weight="5" />
+			<Option weight="7" />
 		</Unit>
 		<Unit filename="modules/long_interactions/procedures_ewald_self_visit.f90">
-			<Option weight="0" />
+			<Option weight="5" />
 		</Unit>
 		<Unit filename="modules/long_interactions/procedures_long_interactions_factory.f90">
 			<Option weight="10" />
