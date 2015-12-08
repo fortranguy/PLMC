@@ -151,7 +151,7 @@ contains
         real(DP) :: box_size(num_dimensions)
         real(DP), dimension(num_dimensions) :: wave_vector
         integer :: n_1, n_2, n_3
-        complex(DP) :: structure_wave_new, structure_wave_old, delta_strucutre_wave
+        complex(DP) :: delta_strucutre_wave
         real(DP), dimension(num_dimensions) :: wave_1_x_position_new, wave_1_x_position_old
         real(DP) :: wave_dot_moment_new, wave_dot_moment_old
 
@@ -192,14 +192,12 @@ contains
                     wave_dot_moment_old = dot_product(wave_vector, old%dipolar_moment)
                     wave_dot_moment_new = dot_product(wave_vector, new%dipolar_moment)
 
-                    structure_wave_new = wave_dot_moment_new * fourier_position_new
-                    structure_wave_old = wave_dot_moment_old * fourier_position_old
+                    delta_strucutre_wave = wave_dot_moment_new * fourier_position_new - &
+                        wave_dot_moment_old * fourier_position_old
                     delta_energy = delta_energy + this%weight%get(n_1, n_2, n_3) * &
-                        real((structure_wave_new - structure_wave_old) * &
-                            conjg(this%structure(n_1, n_2, n_3)), DP)
+                        real(delta_strucutre_wave * conjg(this%structure(n_1, n_2, n_3)), DP)
 
                     if (same_component) then
-                        delta_strucutre_wave = structure_wave_new - structure_wave_old
                         delta_energy = delta_energy + this%weight%get(n_1, n_2, n_3) * &
                             0.5_DP * (real(delta_strucutre_wave, DP)**2 + &
                             aimag(delta_strucutre_wave)**2)
@@ -219,7 +217,6 @@ contains
         real(DP) :: box_size(num_dimensions)
         real(DP), dimension(num_dimensions) :: wave_vector
         integer :: n_1, n_2, n_3
-        complex(DP) :: structure_wave_new, structure_wave_old
         real(DP), dimension(num_dimensions) :: wave_1_x_position_new, wave_1_x_position_old
         real(DP) :: wave_dot_moment_new, wave_dot_moment_old
 
@@ -260,10 +257,9 @@ contains
                     wave_dot_moment_old = dot_product(wave_vector, old%dipolar_moment)
                     wave_dot_moment_new = dot_product(wave_vector, new%dipolar_moment)
 
-                    structure_wave_new = wave_dot_moment_new * fourier_position_new
-                    structure_wave_old = wave_dot_moment_old * fourier_position_old
                     this%structure(n_1, n_2, n_3) = this%structure(n_1, n_2, n_3) + &
-                        structure_wave_new - structure_wave_old
+                        wave_dot_moment_new * fourier_position_new - &
+                        wave_dot_moment_old * fourier_position_old
                 end do
             end do
         end do
