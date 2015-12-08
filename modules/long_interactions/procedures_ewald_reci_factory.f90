@@ -15,21 +15,21 @@ private
 public :: ewald_reci_create, ewald_reci_destroy
 
 interface ewald_reci_create
-    module procedure :: create_structures
-    module procedure :: create_structure
+    module procedure :: create_components
+    module procedure :: create_component
     module procedure :: create_weight
 end interface ewald_reci_create
 
 interface ewald_reci_destroy
     module procedure :: destroy_weight
-    module procedure :: destroy_structure
-    module procedure :: destroy_structures
+    module procedure :: destroy_component
+    module procedure :: destroy_components
 end interface ewald_reci_destroy
 
 contains
 
-    subroutine create_structures(structures, environment, components, are_dipolar, weight)
-        type(Ewald_Reci_Component_Wrapper), allocatable, intent(out) :: structures(:)
+    subroutine create_components(reci_components, environment, components, are_dipolar, weight)
+        type(Ewald_Reci_Component_Wrapper), allocatable, intent(out) :: reci_components(:)
         type(Environment_Wrapper), intent(in) :: environment
         type(Component_Wrapper), intent(in) :: components(:)
         logical, intent(in) :: are_dipolar(:)
@@ -37,50 +37,50 @@ contains
 
         integer :: i_component
 
-        allocate(structures(size(components)))
-        do i_component = 1, size(structures)
-            call ewald_reci_create(structures(i_component)%reci_component, environment, &
+        allocate(reci_components(size(components)))
+        do i_component = 1, size(reci_components)
+            call ewald_reci_create(reci_components(i_component)%reci_component, environment, &
                 components(i_component), weight, are_dipolar(i_component))
         end do
-    end subroutine create_structures
+    end subroutine create_components
 
-    subroutine destroy_structures(structures)
-        type(Ewald_Reci_Component_Wrapper), allocatable, intent(inout) :: structures(:)
+    subroutine destroy_components(reci_components)
+        type(Ewald_Reci_Component_Wrapper), allocatable, intent(inout) :: reci_components(:)
 
         integer :: i_component
 
-        if (allocated(structures)) then
-            do i_component = size(structures), 1, -1
-                call ewald_reci_destroy(structures(i_component)%reci_component)
+        if (allocated(reci_components)) then
+            do i_component = size(reci_components), 1, -1
+                call ewald_reci_destroy(reci_components(i_component)%reci_component)
             end do
-            deallocate(structures)
+            deallocate(reci_components)
         end if
-    end subroutine destroy_structures
+    end subroutine destroy_components
 
-    subroutine create_structure(structure, environment, component, weight, is_dipolar)
-        class(Abstract_Ewald_Reci_Component), allocatable, intent(out) :: structure
+    subroutine create_component(reci_component, environment, component, weight, is_dipolar)
+        class(Abstract_Ewald_Reci_Component), allocatable, intent(out) :: reci_component
         type(Environment_Wrapper), intent(in) :: environment
         type(Component_Wrapper), intent(in) :: component
         class(Abstract_Ewald_Reci_Weight), intent(in) :: weight
         logical, intent(in) :: is_dipolar
 
         if (is_dipolar) then
-            allocate(Concrete_Ewald_Reci_Component :: structure)
+            allocate(Concrete_Ewald_Reci_Component :: reci_component)
         else
-            allocate(Null_Ewald_Reci_Component :: structure)
+            allocate(Null_Ewald_Reci_Component :: reci_component)
         end if
-        call structure%construct(environment%periodic_box, environment%reciprocal_lattice, &
+        call reci_component%construct(environment%periodic_box, environment%reciprocal_lattice, &
             component%positions, component%dipolar_moments, weight)
-    end subroutine create_structure
+    end subroutine create_component
 
-    subroutine destroy_structure(structure)
-        class(Abstract_Ewald_Reci_Component), allocatable, intent(inout) :: structure
+    subroutine destroy_component(reci_component)
+        class(Abstract_Ewald_Reci_Component), allocatable, intent(inout) :: reci_component
 
-        if (allocated(structure)) then
-            call structure%destroy()
-            deallocate(structure)
+        if (allocated(reci_component)) then
+            call reci_component%destroy()
+            deallocate(reci_component)
         end if
-    end subroutine destroy_structure
+    end subroutine destroy_component
 
     subroutine create_weight(weight, environment, alpha, dipoles_exist)
         class(Abstract_Ewald_Reci_Weight), allocatable, intent(out) :: weight

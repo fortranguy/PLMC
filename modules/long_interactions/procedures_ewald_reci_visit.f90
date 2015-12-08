@@ -20,9 +20,9 @@ contains
     !> \[
     !>      U_I = \sum_{\vec{k}} w_\alpha(\vec{k}) |S_I(\vec{k})|^2
     !> \]
-    pure real(DP) function visit_intra(weight, structure) result(energy)
+    pure real(DP) function visit_intra(weight, reci_component) result(energy)
         class(Abstract_Ewald_Reci_Weight), intent(in) :: weight
-        class(Abstract_Ewald_Reci_Component), intent(in) :: structure
+        class(Abstract_Ewald_Reci_Component), intent(in) :: reci_component
 
         integer :: reci_numbers(num_dimensions)
         integer :: n_1, n_2, n_3
@@ -32,8 +32,9 @@ contains
         do n_3 = -reci_numbers(3), reci_numbers(3)
         do n_2 = -reci_numbers(2), reci_numbers(2)
         do n_1 = -reci_numbers(1), reci_numbers(1)
-            energy = energy + weight%get(n_1, n_2, n_3) * real(structure%get(n_1, n_2, n_3) * &
-                conjg(structure%get(n_1, n_2, n_3)), DP)
+            energy = energy + weight%get(n_1, n_2, n_3) * &
+                real(reci_component%get_structure(n_1, n_2, n_3) * conjg(reci_component%&
+                get_structure(n_1, n_2, n_3)), DP)
         end do
         end do
         end do
@@ -43,9 +44,9 @@ contains
     !> \[
     !>      U_{IJ} = \sum_{\vec{k}} w_\alpha(\vec{k}) S_I(\vec{k}) S_J(\vec{k})^\ast
     !> \]
-    pure real(DP) function visit_inter(weight, structure_i, structure_j) result(energy)
+    pure real(DP) function visit_inter(weight, reci_component_i, reci_component_j) result(energy)
         class(Abstract_Ewald_Reci_Weight), intent(in) :: weight
-        class(Abstract_Ewald_Reci_Component), intent(in) :: structure_i, structure_j
+        class(Abstract_Ewald_Reci_Component), intent(in) :: reci_component_i, reci_component_j
 
         integer :: reci_numbers(num_dimensions)
         integer :: n_1, n_2, n_3
@@ -55,8 +56,9 @@ contains
         do n_3 = -reci_numbers(3), reci_numbers(3)
         do n_2 = -reci_numbers(2), reci_numbers(2)
         do n_1 = -reci_numbers(1), reci_numbers(1)
-            energy = energy + weight%get(n_1, n_2, n_3) * real(structure_i%get(n_1, n_2, n_3) * &
-                conjg(structure_j%get(n_1, n_2, n_3)), DP)
+            energy = energy + weight%get(n_1, n_2, n_3) * real(reci_component_i%&
+                get_structure(n_1, n_2, n_3) * conjg(reci_component_j%&
+                get_structure(n_1, n_2, n_3)), DP)
         end do
         end do
         end do

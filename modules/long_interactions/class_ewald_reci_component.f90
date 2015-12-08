@@ -25,9 +25,9 @@ private
     contains
         procedure :: construct => Abstract_Ewald_Reci_Component_construct
         procedure :: destroy => Abstract_Ewald_Reci_Component_destroy
-        procedure :: reset => Abstract_Ewald_Reci_Component_set
-        procedure :: get => Abstract_Ewald_Reci_Component_get
-        procedure, private :: set => Abstract_Ewald_Reci_Component_set
+        procedure :: reset => Abstract_Ewald_Reci_Component_set_structure
+        procedure :: get_structure => Abstract_Ewald_Reci_Component_get_structure
+        procedure, private :: set_structure => Abstract_Ewald_Reci_Component_set_structure
         procedure :: visit_coordinates_delta => &
             Abstract_Ewald_Reci_Component_visit_coordinates_delta
         procedure :: set_coordinates_delta => Abstract_Ewald_Reci_Component_set_coordinates_delta
@@ -42,7 +42,7 @@ private
         procedure :: construct => Null_Ewald_Reci_Component_construct
         procedure :: destroy => Null_Ewald_Reci_Component_destroy
         procedure :: reset =>  Null_Ewald_Reci_Component_set
-        procedure :: get => Null_Ewald_Reci_Component_get
+        procedure :: get_structure => Null_Ewald_Reci_Component_get_structure
         procedure :: visit_coordinates_delta => Null_Ewald_Reci_Component_visit_coordinates_delta
         procedure :: set_coordinates_delta => Null_Ewald_Reci_Component_set_coordinates_delta
     end type Null_Ewald_Reci_Component
@@ -68,7 +68,7 @@ contains
         allocate(this%structure(-this%reci_numbers(1):this%reci_numbers(1), &
                                 -this%reci_numbers(2):this%reci_numbers(2), &
                                 -this%reci_numbers(3):this%reci_numbers(3)))
-        call this%set()
+        call this%set_structure()
     end subroutine Abstract_Ewald_Reci_Component_construct
 
     subroutine Abstract_Ewald_Reci_Component_destroy(this)
@@ -81,7 +81,7 @@ contains
         this%periodic_box => null()
     end subroutine Abstract_Ewald_Reci_Component_destroy
 
-    pure subroutine Abstract_Ewald_Reci_Component_set(this)
+    pure subroutine Abstract_Ewald_Reci_Component_set_structure(this)
         class(Abstract_Ewald_Reci_Component), intent(inout) :: this
 
         complex(DP) :: fourier_position
@@ -119,19 +119,19 @@ contains
             end do
             end do
         end do
-    end subroutine Abstract_Ewald_Reci_Component_set
+    end subroutine Abstract_Ewald_Reci_Component_set_structure
 
     !> Structure factor:
     !> \[
     !>      S(\vec{k}) = \sum_{i=1}^N (\vec{k}\cdot\vec{\mu}_i) e^{i\vec{k}\cdot\vec{x}_i}
     !> \]
-    pure complex(DP) function Abstract_Ewald_Reci_Component_get(this, n_1, n_2, n_3) &
+    pure complex(DP) function Abstract_Ewald_Reci_Component_get_structure(this, n_1, n_2, n_3) &
         result(structure)
         class(Abstract_Ewald_Reci_Component), intent(in) :: this
         integer, intent(in) :: n_1, n_2, n_3
 
         structure = this%structure(n_1, n_2, n_3)
-    end function Abstract_Ewald_Reci_Component_get
+    end function Abstract_Ewald_Reci_Component_get_structure
 
     !> Energy delta when a particle \( i \) of component \( I \) changes its coordinates.
     !> \[
@@ -289,12 +289,12 @@ contains
         class(Null_Ewald_Reci_Component), intent(inout) :: this
     end subroutine Null_Ewald_Reci_Component_set
 
-    pure complex(DP) function Null_Ewald_Reci_Component_get(this, n_1, n_2, n_3) &
+    pure complex(DP) function Null_Ewald_Reci_Component_get_structure(this, n_1, n_2, n_3) &
         result(structure)
         class(Null_Ewald_Reci_Component), intent(in) :: this
         integer, intent(in) :: n_1, n_2, n_3
         structure = cmplx(0._DP, 0._DP, DP)
-    end function Null_Ewald_Reci_Component_get
+    end function Null_Ewald_Reci_Component_get_structure
 
     pure real(DP) function Null_Ewald_Reci_Component_visit_coordinates_delta(this, new, old, &
         same_component) result(delta_energy)

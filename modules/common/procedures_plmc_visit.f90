@@ -213,15 +213,17 @@ contains
 
         do j_component = 1, size(energies)
             associate(energy_j => energies(j_component)%with_components(j_component), &
-                structure_j => long_interactions%reci_components(j_component)%reci_component)
-                energy_j = ewald_reci_visit(long_interactions%reci_weight, structure_j)
+                reci_component_j => long_interactions%reci_components(j_component)%reci_component)
+                energy_j = ewald_reci_visit(long_interactions%reci_weight, reci_component_j)
             end associate
             do i_component = 1, j_component - 1
                 associate(energy_ij => energies(j_component)%with_components(i_component), &
-                    structure_i => long_interactions%reci_components(i_component)%reci_component, &
-                    structure_j => long_interactions%reci_components(j_component)%reci_component)
-                    energy_ij = ewald_reci_visit(long_interactions%reci_weight, structure_i, &
-                        structure_j)
+                    reci_component_i => long_interactions%reci_components(i_component)%&
+                        reci_component, &
+                    reci_component_j => long_interactions%reci_components(j_component)%&
+                        reci_component)
+                    energy_ij = ewald_reci_visit(long_interactions%reci_weight, reci_component_i, &
+                        reci_component_j)
                 end associate
             end do
         end do
