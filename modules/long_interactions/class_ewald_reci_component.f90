@@ -151,7 +151,7 @@ contains
         real(DP) :: box_size(num_dimensions)
         real(DP), dimension(num_dimensions) :: wave_vector
         integer :: n_1, n_2, n_3
-        complex(DP) :: structure_wave_new, structure_wave_old
+        complex(DP) :: structure_wave_new, structure_wave_old, delta_strucutre_wave
         real(DP), dimension(num_dimensions) :: wave_1_x_position_new, wave_1_x_position_old
         real(DP) :: wave_dot_moment_new, wave_dot_moment_old
 
@@ -199,8 +199,10 @@ contains
                             conjg(this%structure(n_1, n_2, n_3)), DP)
 
                     if (same_component) then
+                        delta_strucutre_wave = structure_wave_new - structure_wave_old
                         delta_energy = delta_energy + this%weight%get(n_1, n_2, n_3) * &
-                            0.5_DP * abs(structure_wave_new - structure_wave_old)**2
+                            0.5_DP * (real(delta_strucutre_wave, DP)**2 + &
+                            aimag(delta_strucutre_wave)**2)
                     end if
                 end do
             end do
