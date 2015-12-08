@@ -15,8 +15,7 @@ use class_short_pairs_visitor, only: Abstract_Short_Pairs_Visitor
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use class_ewald_real_component, only: Abstract_Ewald_Real_Component
 use procedures_ewald_reci_visit, only: ewald_reci_visit
-use procedures_ewald_self_visit, only: ewald_self_visit
-use types_long_interactions_wrapper, only: Ewald_Self_Wrapper, Long_Interactions_Wrapper
+use types_long_interactions_wrapper, only: Ewald_Self_Component_Wrapper, Long_Interactions_Wrapper
 use types_observables_wrapper, only: Concrete_Components_Energies, Observables_Wrapper
 use procedures_observables_factory, only: create_components_energies_nodes, &
     destroy_components_energies_nodes
@@ -150,7 +149,7 @@ contains
         call Concrete_Components_Energies_add(energies, reci_energies)
         call destroy_components_energies_nodes(reci_energies)
 
-        call visit_long_self(self_energies, components, long_interactions%selves)
+        call visit_long_self(self_energies, long_interactions%self_components)
         call Concrete_Components_Energies_add(energies, -self_energies)
     end subroutine visit_long
 
@@ -229,16 +228,14 @@ contains
         end do
     end subroutine visit_long_reci
 
-    pure subroutine visit_long_self(energies, components, ewald_selves)
+    pure subroutine visit_long_self(energies, ewald_self_components)
         real(DP), intent(out) :: energies(:)
-        type(Component_Wrapper), intent(in) :: components(:)
-        type(Ewald_Self_Wrapper), intent(in) :: ewald_selves(:)
+        type(Ewald_Self_Component_Wrapper), intent(in) :: ewald_self_components(:)
 
         integer :: i_component
 
         do i_component = 1, size(energies)
-            energies(i_component) = ewald_self_visit(components(i_component)%dipolar_moments, &
-                ewald_selves(i_component)%self)
+            energies(i_component) = ewald_self_components(i_component)%self%visit()
         end do
     end subroutine visit_long_self
 

@@ -54,8 +54,8 @@ contains
         logical :: are_dipolar(size(mixture%components))
 
         call long_interactions_set(are_dipolar, mixture%components)
-        call long_interactions_check(any(are_dipolar), environment%reciprocal_lattice, &
-            environment%permittivity)
+        call long_interactions_check(environment%reciprocal_lattice, environment%permittivity, &
+            any(are_dipolar))
         call long_interactions_create(long_interactions%alpha, environment%periodic_box, &
             any(are_dipolar), input_data, prefix)
 
@@ -67,19 +67,19 @@ contains
         call ewald_real_create(long_interactions%real_components, environment%periodic_box, &
             mixture%components, long_interactions%real_pairs)
 
-        call ewald_reci_create(long_interactions%reci_weight, environment, long_interactions%&
-            alpha, any(are_dipolar))
+        call ewald_reci_create(long_interactions%reci_weight, environment, any(are_dipolar), &
+            long_interactions%alpha)
         call ewald_reci_create(long_interactions%reci_components, environment, mixture%components, &
             are_dipolar, long_interactions%reci_weight)
 
-        call ewald_self_create(long_interactions%selves, environment%permittivity, &
-            long_interactions%alpha, are_dipolar)
+        call ewald_self_create(long_interactions%self_components, environment%permittivity, &
+            mixture%components, are_dipolar, long_interactions%alpha)
     end subroutine create_all
 
     subroutine destroy_all(long_interactions)
         type(Long_Interactions_Wrapper), intent(inout) :: long_interactions
 
-        call ewald_self_destroy(long_interactions%selves)
+        call ewald_self_destroy(long_interactions%self_components)
 
         call ewald_reci_destroy(long_interactions%reci_components)
         call ewald_reci_destroy(long_interactions%reci_weight)
@@ -133,10 +133,10 @@ contains
         end do
     end subroutine set_are_dipolar
 
-    subroutine check_consistency(dipoles_exist, reciprocal_lattice, permittivity)
-        logical, intent(in) :: dipoles_exist
+    subroutine check_consistency(reciprocal_lattice, permittivity, dipoles_exist)
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
         class(Abstract_Permittivity), intent(in) :: permittivity
+        logical, intent(in) :: dipoles_exist
 
         if (dipoles_exist) then
             if (.not.use_reciprocal_lattice(reciprocal_lattice)) then

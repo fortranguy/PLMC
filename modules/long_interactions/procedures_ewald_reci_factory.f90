@@ -40,7 +40,7 @@ contains
         allocate(reci_components(size(components)))
         do i_component = 1, size(reci_components)
             call ewald_reci_create(reci_components(i_component)%reci_component, environment, &
-                components(i_component), weight, are_dipolar(i_component))
+                components(i_component), are_dipolar(i_component), weight)
         end do
     end subroutine create_components
 
@@ -57,12 +57,12 @@ contains
         end if
     end subroutine destroy_components
 
-    subroutine create_component(reci_component, environment, component, weight, is_dipolar)
+    subroutine create_component(reci_component, environment, component, is_dipolar, weight)
         class(Abstract_Ewald_Reci_Component), allocatable, intent(out) :: reci_component
         type(Environment_Wrapper), intent(in) :: environment
         type(Component_Wrapper), intent(in) :: component
-        class(Abstract_Ewald_Reci_Weight), intent(in) :: weight
         logical, intent(in) :: is_dipolar
+        class(Abstract_Ewald_Reci_Weight), intent(in) :: weight
 
         if (is_dipolar) then
             allocate(Concrete_Ewald_Reci_Component :: reci_component)
@@ -82,11 +82,11 @@ contains
         end if
     end subroutine destroy_component
 
-    subroutine create_weight(weight, environment, alpha, dipoles_exist)
+    subroutine create_weight(weight, environment, dipoles_exist, alpha)
         class(Abstract_Ewald_Reci_Weight), allocatable, intent(out) :: weight
         type(Environment_Wrapper), intent(in) :: environment
-        class(Abstract_Ewald_Convergence_Parameter), intent(in) :: alpha
         logical, intent(in) :: dipoles_exist
+        class(Abstract_Ewald_Convergence_Parameter), intent(in) :: alpha
 
         if (dipoles_exist) then
             allocate(Concrete_Ewald_Reci_Weight :: weight)

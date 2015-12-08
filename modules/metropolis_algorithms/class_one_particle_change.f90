@@ -281,8 +281,9 @@ contains
             lond_delta_reci(i_component) = this%long_interactions%reci_components(i_component)%&
                 reci_component%visit_coordinates_delta(new, old, i_component==i_actor)
         end do
-        long_delta_self = this%long_interactions%selves(i_actor)%self%get(new%dipolar_moment) - &
-                          this%long_interactions%selves(i_actor)%self%get(old%dipolar_moment)
+        long_delta_self = this%long_interactions%self_components(i_actor)%self%&
+            meet(new%dipolar_moment) - this%long_interactions%self_components(i_actor)%self%&
+            meet(old%dipolar_moment)
         long_deltas = long_new_real-long_old_real + lond_delta_reci - long_delta_self
     end subroutine Abstract_One_Particle_Change_visit_long
 
