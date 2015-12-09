@@ -126,7 +126,8 @@ contains
 
     !> Structure factor:
     !> \[
-    !>      S(\vec{k}) = \sum_{i=1}^N (\vec{k}\cdot\vec{\mu}_i) e^{i\vec{k}\cdot\vec{x}_i}
+    !>      S(\vec{k}) = \sum_{\mathsf{i}=1}^N (\vec{k}\cdot\vec{\mu}_\mathsf{i})
+    !>          e^{i\vec{k}\cdot\vec{x}_\mathsf{i}}
     !> \]
     pure complex(DP) function Abstract_Ewald_Reci_Component_get_structure(this, n_1, n_2, n_3) &
         result(structure)
@@ -136,16 +137,19 @@ contains
         structure = this%structure(n_1, n_2, n_3)
     end function Abstract_Ewald_Reci_Component_get_structure
 
-    !> Energy delta when a particle \( l \) of component \( I \) moves.
+    !> Energy delta when a particle \( \mathsf{i} \) of component \( \mathsf{I} \) moves.
     !> \[
-    !>      \Delta U_{I, J} = \sum_{\vec{k}} w_\alpha(k) (\vec{k}\cdot\vec{\mu}_l) \{
-    !>          \Re[(e^{i\vec{k}\cdot\vec{x}^\prime_l} - e^{i\vec{k}\cdot\vec{x}_l})
-    !>              S_J^\ast(\vec{k})] +
-    !>          [I=J] (\vec{k}\cdot\vec{\mu}_l)
-    !>              [1 - \Re(e^{i\vec{k}\cdot\vec{x}^\prime_l}e^{-i\vec{k}\cdot\vec{x}_l})]
+    !>      \Delta U_{\mathsf{I}, \mathsf{J}} = \sum_{\vec{k}} w_\alpha(k)
+    !>          (\vec{k}\cdot\vec{\mu}_\mathsf{i}) \{
+    !>          \Re[(e^{i\vec{k}\cdot\vec{x}^\prime_\mathsf{i}} -
+    !>              e^{i\vec{k}\cdot\vec{x}_\mathsf{i}}) S_\mathsf{J}^\ast(\vec{k})] +
+    !>          [\mathsf{I}=\mathsf{J}] (\vec{k}\cdot\vec{\mu}_\mathsf{i})
+    !>              [1 - \Re(e^{i\vec{k}\cdot\vec{x}^\prime_\mathsf{i}}
+    !>                  e^{-i\vec{k}\cdot\vec{x}_\mathsf{i}})]
     !>          \}
     !> \]
-    !> with \( s_i(\vec{k}) = (\vec{k}\cdot\vec{\mu}_i) e^{i\vec{k}\cdot\vec{x}_i} \).
+    !> with \( s_\mathsf{i}(\vec{k}) = (\vec{k}\cdot\vec{\mu}_\mathsf{i})
+    !>      e^{i\vec{k}\cdot\vec{x}_\mathsf{i}} \).
     pure real(DP) function Abstract_Ewald_Reci_Component_visit_move_delta(this, new, old, &
         same_component) result(delta_energy)
         class(Abstract_Ewald_Reci_Component), intent(in) :: this
@@ -213,9 +217,9 @@ contains
         delta_energy = 2._DP * delta_energy ! half wave vector (symmetry) -> double energy
     end function Abstract_Ewald_Reci_Component_visit_move_delta
 
-    !> Structure factor update when a particle \( l \) moves.
-    !>  \[ \Delta S(\vec{k}) = (\vec{k}\cdot\vec{\mu}_l)
-    !>                         (e^{i\vec{k}\cdot\vec{x}^\prime_l} - e^{i\vec{k}\cdot\vec{x}_l}) \]
+    !> Structure factor update when a particle \( \mathsf{i} \) moves.
+    !>  \[ \Delta S(\vec{k}) = (\vec{k}\cdot\vec{\mu}_\mathsf{i})
+    !>      (e^{i\vec{k}\cdot\vec{x}^\prime_\mathsf{i}} - e^{i\vec{k}\cdot\vec{x}_\mathsf{i}}) \]
     pure subroutine Abstract_Ewald_Reci_Component_set_move_delta(this, new, old)
         class(Abstract_Ewald_Reci_Component), intent(inout) :: this
         type(Concrete_Temporary_Particle), intent(in) :: new, old
@@ -268,15 +272,17 @@ contains
         end do
     end subroutine Abstract_Ewald_Reci_Component_set_move_delta
 
-    !> Energy delta when a particle \( l \) of component \( I \) rotates.
+    !> Energy delta when a particle \( \mathsf{i} \) of component \( \mathsf{\mathsf{I}} \) rotates.
     !> \[
-    !>      \Delta U_{I, J} = \sum_{\vec{k}} w_\alpha(k)
-    !>          \vec{k}\cdot(\vec{\mu}^\prime_l - \vec{\mu}_l) [
-    !>              \Re(e^{i\vec{k}\cdot\vec{x}_l} S_J^\ast(\vec{k})) +
-    !>              [I=J] \vec{k}\cdot(\vec{\mu}^\prime_l - \vec{\mu}_l)
+    !>      \Delta U_{\mathsf{\mathsf{I}}, \mathsf{J}} = \sum_{\vec{k}} w_\alpha(k)
+    !>          \vec{k}\cdot(\vec{\mu}^\prime_\mathsf{i} - \vec{\mu}_\mathsf{i}) [
+    !>              \Re(e^{i\vec{k}\cdot\vec{x}_\mathsf{i}} S_\mathsf{J}^\ast(\vec{k})) +
+    !>              [\mathsf{\mathsf{I}}=\mathsf{J}] \vec{k}\cdot(\vec{\mu}^\prime_\mathsf{i} -
+    !>                  \vec{\mu}_\mathsf{i})
     !>      ]
     !> \]
-    !> with \( s_i(\vec{k}) = (\vec{k}\cdot\vec{\mu}_i) e^{i\vec{k}\cdot\vec{x}_i} \).
+    !> with \( s_\mathsf{i}(\vec{k}) = (\vec{k}\cdot\vec{\mu}_\mathsf{i})
+    !>      e^{i\vec{k}\cdot\vec{x}_\mathsf{i}} \).
     pure real(DP) function Abstract_Ewald_Reci_Component_visit_rotation_delta(this, new, old, &
         same_component) result(delta_energy)
         class(Abstract_Ewald_Reci_Component), intent(in) :: this
@@ -331,9 +337,9 @@ contains
         delta_energy = 2._DP * delta_energy ! half wave vector (symmetry) -> double energy
     end function Abstract_Ewald_Reci_Component_visit_rotation_delta
 
-    !> Structure factor update when a particle \( l \) rotates.
-    !>  \[ \Delta S(\vec{k}) = \vec{k}\cdot(\vec{\mu}^\prime_l - \vec{\mu}_l)
-    !>      e^{i\vec{k}\cdot\vec{x}_l} \]
+    !> Structure factor update when a particle \( \mathsf{i} \) rotates.
+    !>  \[ \Delta S(\vec{k}) = \vec{k}\cdot(\vec{\mu}^\prime_\mathsf{i} - \vec{\mu}_\mathsf{i})
+    !>      e^{i\vec{k}\cdot\vec{x}_\mathsf{i}} \]
     pure subroutine Abstract_Ewald_Reci_Component_set_rotation_delta(this, new, old)
         class(Abstract_Ewald_Reci_Component), intent(inout) :: this
         type(Concrete_Temporary_Particle), intent(in) :: new, old

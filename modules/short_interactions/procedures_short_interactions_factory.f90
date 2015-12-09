@@ -386,8 +386,10 @@ contains
     subroutine destroy_pair(pair)
         class(Abstract_Pair_Potential), allocatable, intent(inout) :: pair
 
-        call pair%destroy()
-        if (allocated(pair)) deallocate(pair)
+        if (allocated(pair)) then
+            call pair%destroy()
+            deallocate(pair)
+        end if
     end subroutine destroy_pair
 
     subroutine create_expression(expression, interact, input_data, prefix)
