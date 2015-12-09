@@ -139,7 +139,7 @@ contains
 
     !> Energy delta when a particle \( \mathsf{i} \) of component \( \mathsf{I} \) moves.
     !> \[
-    !>      \Delta U_{\mathsf{I}, \mathsf{J}} = \sum_{\vec{k}} w_\alpha(k)
+    !>      \Delta U_{\mathsf{I}, \mathsf{J}} = \sum_{\vec{k}} w_\alpha(\vec{k})
     !>          (\vec{k}\cdot\vec{\mu}_\mathsf{i}) \{
     !>          \Re[(e^{i\vec{k}\cdot\vec{x}^\prime_\mathsf{i}} -
     !>              e^{i\vec{k}\cdot\vec{x}_\mathsf{i}}) S_\mathsf{J}^\ast(\vec{k})] +
@@ -274,7 +274,7 @@ contains
 
     !> Energy delta when a particle \( \mathsf{i} \) of component \( \mathsf{\mathsf{I}} \) rotates.
     !> \[
-    !>      \Delta U_{\mathsf{\mathsf{I}}, \mathsf{J}} = \sum_{\vec{k}} w_\alpha(k)
+    !>      \Delta U_{\mathsf{\mathsf{I}}, \mathsf{J}} = \sum_{\vec{k}} w_\alpha(\vec{k})
     !>          \vec{k}\cdot(\vec{\mu}^\prime_\mathsf{i} - \vec{\mu}_\mathsf{i}) [
     !>              \Re(e^{i\vec{k}\cdot\vec{x}_\mathsf{i}} S_\mathsf{J}^\ast(\vec{k})) +
     !>              [\mathsf{\mathsf{I}}=\mathsf{J}] \vec{k}\cdot(\vec{\mu}^\prime_\mathsf{i} -

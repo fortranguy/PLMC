@@ -82,12 +82,12 @@ contains
             wave_vector(2) = 2._DP*PI * real(n_2, DP) / box_size(2)
         do n_1 = 0, this%reci_numbers(1)
             wave_vector(1) = 2._DP*PI * real(n_1, DP) / box_size(1)
-            if (n_1 /= 0 .or. n_2 /= 0 .or. n_3 /= 0) then
+            if (n_1 == 0 .and. n_2 == 0 .and. n_3 == 0) then
+                this%weight(n_1, n_2, n_3) = 0._DP
+            else
                 wave_squared = dot_product(wave_vector, wave_vector)
                 this%weight(n_1, n_2, n_3) = exp(-wave_squared/alpha**2/4._DP) / &
                     this%permittivity / product(box_size) / wave_squared
-            else
-                this%weight(n_1, n_2, n_3) = 0._DP
             end if
         end do
         end do
@@ -102,7 +102,11 @@ contains
     end function Abstract_Ewald_Reci_Weight_get_reci_numbers
 
     !> \[
-    !>      w_\alpha(\vec{k}) = \frac{e^{-k^2/4\alpha^2}}{\epsilon V k^2}
+    !>      w_\alpha(\vec{k}) =
+    !>          \begin{cases}
+    !>              0                                           & \text{if } \vec{k} = \vec{0} \\
+    !>              \frac{e^{-k^2/4\alpha^2}}{\epsilon V k^2}   & \text{else}
+    !>          \end{cases}
     !> \]
     pure real(DP) function Abstract_Ewald_Reci_Weight_get(this, n_1, n_2, n_3) result(weight)
         class(Abstract_Ewald_Reci_Weight), intent(in) :: this

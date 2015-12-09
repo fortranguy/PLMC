@@ -1,5 +1,3 @@
-!! display: public
-!!          private
 module class_ewald_real_pair
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
