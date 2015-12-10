@@ -52,23 +52,24 @@ contains
     end subroutine Abstract_Ewald_Real_Visitor_destroy
 
     pure subroutine Abstract_Ewald_Real_Visitor_visit_inter(this, energy, positions_1, &
-        dipolar_moment_1, positions_2, dipolar_moment_2, ewald_real_pair)
+        dipolar_moments_1, positions_2, dipolar_moments_2, ewald_real_pair)
         class(Abstract_Ewald_Real_Visitor), intent(in) :: this
         real(DP), intent(out) :: energy
         class(Abstract_Component_Coordinates), intent(in) :: positions_1, positions_2
-        class(Abstract_Component_Dipolar_Moments), intent(in) :: dipolar_moment_1, dipolar_moment_2
+        class(Abstract_Component_Dipolar_Moments), intent(in) :: dipolar_moments_1, &
+            dipolar_moments_2
         class(Abstract_Ewald_Real_Pair), intent(in) :: ewald_real_pair
 
         real(DP) :: vector_ij(num_dimensions)
         integer :: i_particle, j_particle
 
         energy = 0._DP
-        do j_particle = 1, dipolar_moment_2%get_num()
-            do i_particle = 1, dipolar_moment_1%get_num()
+        do j_particle = 1, dipolar_moments_2%get_num()
+            do i_particle = 1, dipolar_moments_1%get_num()
                 vector_ij = this%periodic_box%vector(positions_1%get(i_particle), positions_2%&
                     get(j_particle))
-                energy = energy + ewald_real_pair%meet(vector_ij, dipolar_moment_1%&
-                    get(i_particle), dipolar_moment_2%get(j_particle))
+                energy = energy + ewald_real_pair%meet(vector_ij, dipolar_moments_1%&
+                    get(i_particle), dipolar_moments_2%get(j_particle))
             end do
         end do
     end subroutine Abstract_Ewald_Real_Visitor_visit_inter
@@ -109,11 +110,12 @@ contains
     end subroutine Null_Ewald_Real_Visitor_destroy
 
     pure subroutine Null_Ewald_Real_Visitor_visit_inter(this, energy, positions_1, &
-        dipolar_moment_1, positions_2, dipolar_moment_2, ewald_real_pair)
+        dipolar_moments_1, positions_2, dipolar_moments_2, ewald_real_pair)
         class(Null_Ewald_Real_Visitor), intent(in) :: this
         real(DP), intent(out) :: energy
         class(Abstract_Component_Coordinates), intent(in) :: positions_1, positions_2
-        class(Abstract_Component_Dipolar_Moments), intent(in) :: dipolar_moment_1, dipolar_moment_2
+        class(Abstract_Component_Dipolar_Moments), intent(in) :: dipolar_moments_1, &
+            dipolar_moments_2
         class(Abstract_Ewald_Real_Pair), intent(in) :: ewald_real_pair
         energy = 0._DP
     end subroutine Null_Ewald_Real_Visitor_visit_inter

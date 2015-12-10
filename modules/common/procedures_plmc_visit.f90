@@ -172,11 +172,11 @@ contains
         do i_component = 1, size(components)
             associate(energy_i => energies(i_component)%with_components(i_component), &
                     positions_i => components(i_component)%positions, &
-                    dipolar_moment_i => components(i_component)%dipolar_moments, &
+                    dipolar_moments_i => components(i_component)%dipolar_moments, &
                     pair_i => long_interactions%real_pairs(i_component)%&
                         with_components(i_component)%real_pair)
-                call long_interactions%real_visitor%visit(energy_i, positions_i, dipolar_moment_i, &
-                    pair_i)
+                call long_interactions%real_visitor%visit(energy_i, positions_i, &
+                    dipolar_moments_i, pair_i)
             end associate
         end do
     end subroutine visit_long_real_intra
