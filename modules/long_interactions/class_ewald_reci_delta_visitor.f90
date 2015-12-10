@@ -119,6 +119,8 @@ contains
                 do n_1 = -reci_number_1_sym(this%reci_numbers, n_3, n_2), this%reci_numbers(1)
                     wave_vector(1) = 2._DP*PI * real(n_1, DP) / box_size(1)
 
+                    if (n_1**2 + n_2**2 + n_3**2 > this%reci_numbers(1)**2) cycle
+
                     fourier_position_old = fourier_position_old_1(n_1) * &
                         fourier_position_old_2(n_2) * fourier_position_old_3(n_3)
                     fourier_position_new = fourier_position_new_1(n_1) * &
@@ -186,6 +188,8 @@ contains
                 wave_vector(2) = 2._DP*PI * real(n_2, DP) / box_size(2)
                 do n_1 = -reci_number_1_sym(this%reci_numbers, n_3, n_2), this%reci_numbers(1)
                     wave_vector(1) = 2._DP*PI * real(n_1, DP) / box_size(1)
+
+                    if (n_1**2 + n_2**2 + n_3**2 > this%reci_numbers(1)**2) cycle
 
                     fourier_position = fourier_position_1(n_1) * fourier_position_2(n_2) * &
                         fourier_position_3(n_3)

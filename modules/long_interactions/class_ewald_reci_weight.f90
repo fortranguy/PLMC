@@ -56,6 +56,7 @@ contains
         this%alpha => alpha
         allocate(this%weight(0:this%reci_numbers(1), 0:this%reci_numbers(2), &
                              0:this%reci_numbers(3)))
+        this%weight = 0._DP
         call this%set()
     end subroutine Abstract_Ewald_Reci_Weight_construct
 
@@ -82,6 +83,9 @@ contains
             wave_vector(2) = 2._DP*PI * real(n_2, DP) / box_size(2)
         do n_1 = 0, this%reci_numbers(1)
             wave_vector(1) = 2._DP*PI * real(n_1, DP) / box_size(1)
+
+            if (n_1**2 + n_2**2 + n_3**2 > this%reci_numbers(1)**2) cycle
+
             if (n_1 == 0 .and. n_2 == 0 .and. n_3 == 0) then
                 this%weight(n_1, n_2, n_3) = 0._DP
             else

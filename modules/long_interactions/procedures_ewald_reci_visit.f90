@@ -32,6 +32,7 @@ contains
         do n_3 = -reci_numbers(3), reci_numbers(3)
         do n_2 = -reci_numbers(2), reci_numbers(2)
         do n_1 = -reci_numbers(1), reci_numbers(1)
+            if (n_1**2 + n_2**2 + n_3**2 > reci_numbers(1)**2) cycle
             energy = energy + weight%get(n_1, n_2, n_3) * &
                 real(structure%get(n_1, n_2, n_3) * conjg(structure%get(n_1, n_2, n_3)), DP)
         end do
@@ -56,6 +57,7 @@ contains
         do n_3 = -reci_numbers(3), reci_numbers(3)
         do n_2 = -reci_numbers(2), reci_numbers(2)
         do n_1 = -reci_numbers(1), reci_numbers(1)
+            if (n_1**2 + n_2**2 + n_3**2 > reci_numbers(1)**2) cycle
             energy = energy + weight%get(n_1, n_2, n_3) * real(structure_i%get(n_1, n_2, n_3) * &
                 conjg(structure_j%get(n_1, n_2, n_3)), DP)
         end do
