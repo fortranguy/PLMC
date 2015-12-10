@@ -45,7 +45,7 @@ contains
         integer :: i_component
 
         do i_component = 1, size(reci_components)
-            call reci_components(i_component)%reci_component%reset()
+            call reci_components(i_component)%reci_structure%reset()
         end do
     end subroutine reset_long_reci
 

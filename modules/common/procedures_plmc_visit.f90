@@ -13,7 +13,6 @@ use types_mixture_wrapper, only: Mixture_Wrapper
 use class_pair_potential, only: Abstract_Pair_Potential
 use class_short_pairs_visitor, only: Abstract_Short_Pairs_Visitor
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
-use class_ewald_real_component, only: Abstract_Ewald_Real_Component
 use procedures_ewald_reci_visit, only: ewald_reci_visit
 use types_long_interactions_wrapper, only: Ewald_Self_Component_Wrapper, Long_Interactions_Wrapper
 use types_observables_wrapper, only: Concrete_Components_Energies, Observables_Wrapper
@@ -212,17 +211,17 @@ contains
 
         do j_component = 1, size(energies)
             associate(energy_j => energies(j_component)%with_components(j_component), &
-                reci_component_j => long_interactions%reci_components(j_component)%reci_component)
-                energy_j = ewald_reci_visit(long_interactions%reci_weight, reci_component_j)
+                reci_structure_j => long_interactions%reci_components(j_component)%reci_structure)
+                energy_j = ewald_reci_visit(long_interactions%reci_weight, reci_structure_j)
             end associate
             do i_component = 1, j_component - 1
                 associate(energy_ij => energies(j_component)%with_components(i_component), &
-                    reci_component_i => long_interactions%reci_components(i_component)%&
-                        reci_component, &
-                    reci_component_j => long_interactions%reci_components(j_component)%&
-                        reci_component)
-                    energy_ij = ewald_reci_visit(long_interactions%reci_weight, reci_component_i, &
-                        reci_component_j)
+                    reci_structure_i => long_interactions%reci_components(i_component)%&
+                        reci_structure, &
+                    reci_structure_j => long_interactions%reci_components(j_component)%&
+                        reci_structure)
+                    energy_ij = ewald_reci_visit(long_interactions%reci_weight, reci_structure_i, &
+                        reci_structure_j)
                 end associate
             end do
         end do

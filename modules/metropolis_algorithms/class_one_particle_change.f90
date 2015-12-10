@@ -331,7 +331,7 @@ contains
         end do
         do i_component = 1, size(this%long_interactions%reci_components, 1)
             lond_delta_reci(i_component) = this%long_interactions%reci_components(i_component)%&
-                reci_component%visit_move_delta(new, old, i_component==i_actor)
+                reci_delta_visitor%visit_move(new, old, i_component==i_actor)
         end do
         long_deltas = long_new_real-long_old_real + lond_delta_reci
     end subroutine Concrete_One_Particle_Move_visit_long
@@ -347,7 +347,7 @@ contains
         do i_component = 1, size(this%short_interactions%components_cells, 1)
             call this%short_interactions%components_cells(i_actor, i_component)%move(old, new)
         end do
-        call this%long_interactions%reci_components(i_actor)%reci_component%set_move_delta(new, old)
+        call this%long_interactions%reci_components(i_actor)%reci_structure%set_move_delta(new, old)
     end subroutine Concrete_One_Particle_Move_update_actor
 
     subroutine Concrete_One_Particle_Move_increment_hits(changes_counters)
@@ -422,7 +422,7 @@ contains
         end do
         do i_component = 1, size(this%long_interactions%reci_components, 1)
             lond_delta_reci(i_component) = this%long_interactions%reci_components(i_component)%&
-                reci_component%visit_rotation_delta(new, old, i_component==i_actor)
+                reci_delta_visitor%visit_rotation(new, old, i_component==i_actor)
         end do
         long_delta_self = this%long_interactions%self_components(i_actor)%self%&
             meet(new%dipolar_moment) - this%long_interactions%self_components(i_actor)%self%&
@@ -436,7 +436,7 @@ contains
         type(Concrete_Temporary_Particle), intent(in) :: new, old
 
         call this%components(i_actor)%orientations%set(new%i, new%orientation)
-        call this%long_interactions%reci_components(i_actor)%reci_component%&
+        call this%long_interactions%reci_components(i_actor)%reci_structure%&
             set_rotation_delta(new, old)
     end subroutine Concrete_One_Particle_Rotation_update_actor
 

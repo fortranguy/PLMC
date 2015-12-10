@@ -3,10 +3,10 @@ module types_long_interactions_wrapper
 use class_ewald_convergence_parameter, only: Abstract_Ewald_Convergence_Parameter
 use class_ewald_real_pair, only: Abstract_Ewald_Real_Pair
 use class_ewald_real_component, only: Abstract_Ewald_Real_Component
-use class_ewald_reci_component, only: Abstract_Ewald_Reci_Component
 use class_ewald_real_visitor, only: Abstract_Ewald_Real_Visitor
 use class_ewald_reci_weight, only: Abstract_Ewald_Reci_Weight
-use class_ewald_reci_component, only: Abstract_Ewald_Reci_Component
+use class_ewald_reci_structure, only: Abstract_Ewald_Reci_Structure
+use class_ewald_reci_delta_visitor, only: Abstract_Ewald_Reci_Delta_Visitor
 use class_ewald_self_component, only: Abstract_Ewald_Self_Component
 
 implicit none
@@ -26,7 +26,8 @@ private
     end type Ewald_Real_Component_Wrapper
 
     type, public :: Ewald_Reci_Component_Wrapper
-        class(Abstract_Ewald_Reci_Component), allocatable :: reci_component
+        class(Abstract_Ewald_Reci_Structure), allocatable :: reci_structure
+        class(Abstract_Ewald_Reci_Delta_Visitor), allocatable :: reci_delta_visitor
     end type Ewald_Reci_Component_Wrapper
 
     type, public :: Ewald_Self_Component_Wrapper

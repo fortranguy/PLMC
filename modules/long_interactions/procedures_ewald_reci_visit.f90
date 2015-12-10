@@ -3,7 +3,7 @@ module procedures_ewald_reci_visit
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
 use class_ewald_reci_weight, only: Abstract_Ewald_Reci_Weight
-use class_ewald_reci_component, only: Abstract_Ewald_Reci_Component
+use class_ewald_reci_structure, only: Abstract_Ewald_Reci_Structure
 
 implicit none
 
@@ -20,9 +20,9 @@ contains
     !> \[
     !>      U_\mathsf{I} = \sum_{\vec{k}} w_\alpha(\vec{k}) |S_\mathsf{I}(\vec{k})|^2
     !> \]
-    pure real(DP) function visit_intra(weight, reci_component) result(energy)
+    pure real(DP) function visit_intra(weight, structure) result(energy)
         class(Abstract_Ewald_Reci_Weight), intent(in) :: weight
-        class(Abstract_Ewald_Reci_Component), intent(in) :: reci_component
+        class(Abstract_Ewald_Reci_Structure), intent(in) :: structure
 
         integer :: reci_numbers(num_dimensions)
         integer :: n_1, n_2, n_3
@@ -33,8 +33,7 @@ contains
         do n_2 = -reci_numbers(2), reci_numbers(2)
         do n_1 = -reci_numbers(1), reci_numbers(1)
             energy = energy + weight%get(n_1, n_2, n_3) * &
-                real(reci_component%get_structure(n_1, n_2, n_3) * conjg(reci_component%&
-                get_structure(n_1, n_2, n_3)), DP)
+                real(structure%get(n_1, n_2, n_3) * conjg(structure%get(n_1, n_2, n_3)), DP)
         end do
         end do
         end do
@@ -45,9 +44,9 @@ contains
     !>      U_\mathsf{IJ} = \sum_{\vec{k}} w_\alpha(\vec{k}) S_\mathsf{I}(\vec{k})
     !>          S_\mathsf{J}^\ast(\vec{k})
     !> \]
-    pure real(DP) function visit_inter(weight, reci_component_i, reci_component_j) result(energy)
+    pure real(DP) function visit_inter(weight, structure_i, structure_j) result(energy)
         class(Abstract_Ewald_Reci_Weight), intent(in) :: weight
-        class(Abstract_Ewald_Reci_Component), intent(in) :: reci_component_i, reci_component_j
+        class(Abstract_Ewald_Reci_Structure), intent(in) :: structure_i, structure_j
 
         integer :: reci_numbers(num_dimensions)
         integer :: n_1, n_2, n_3
@@ -57,9 +56,8 @@ contains
         do n_3 = -reci_numbers(3), reci_numbers(3)
         do n_2 = -reci_numbers(2), reci_numbers(2)
         do n_1 = -reci_numbers(1), reci_numbers(1)
-            energy = energy + weight%get(n_1, n_2, n_3) * real(reci_component_i%&
-                get_structure(n_1, n_2, n_3) * conjg(reci_component_j%&
-                get_structure(n_1, n_2, n_3)), DP)
+            energy = energy + weight%get(n_1, n_2, n_3) * real(structure_i%get(n_1, n_2, n_3) * &
+                conjg(structure_j%get(n_1, n_2, n_3)), DP)
         end do
         end do
         end do
