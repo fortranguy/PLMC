@@ -16,7 +16,8 @@ private
         type(Concrete_Changes_Success), allocatable :: changes_sucesses(:)
         type(Concrete_Components_Energies), allocatable :: short_energies(:)
         real(DP), allocatable :: walls_energies(:)
-        type(Concrete_Components_Energies), allocatable :: long_energies(:)
+        type(Concrete_Components_Energies), allocatable :: long_energies_wo_reci(:)
+        real(DP) :: reci_energy
         real(DP), allocatable :: field_energies(:)
     end type Observables_Wrapper
 

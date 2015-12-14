@@ -9,10 +9,12 @@ use class_component_coordinates, only: Abstract_Component_Coordinates
 use types_component_wrapper, only: Component_Wrapper
 use types_short_interactions_wrapper, only: Pair_Potentials_Wrapper
 use types_long_interactions_wrapper, only: Ewald_Real_Pairs_Wrapper
+use procedures_long_interactions_factory, only: long_interactions_set
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use class_components_energes_writer, only: Concrete_Components_Energies_Selector, &
     Abstract_Components_Energies_Writer, Concrete_Components_Energies_Writer, &
     Null_Components_Energies_Writer
+use class_energy_writer, only: Abstract_Energy_Writer, Concrete_Energy_Writer, Null_Energy_Writer
 use class_changes_writer, only: Concrete_Changes_Selector, &
     Abstract_Changes_Success_Writer, Concrete_Changes_Success_Writer, Null_Changes_Success_Writer
 use class_component_coordinates_writer, only: Concrete_Coordinates_Writer_Selector, &
@@ -30,6 +32,7 @@ public :: writers_create, writers_destroy
 interface writers_create
     module procedure :: create_all
     module procedure :: create_components_energies
+    module procedure :: create_reci_energy
     module procedure :: create_components
     module procedure :: create_components_changes
     module procedure :: create_changes
@@ -41,14 +44,14 @@ interface writers_destroy
     module procedure :: destroy_coordinates
     module procedure :: destroy_changes
     module procedure :: destroy_components
+    module procedure :: destroy_reci_energy
     module procedure :: destroy_components_energies
     module procedure :: destroy_all
 end interface writers_destroy
 
 contains
 
-    subroutine create_all(writers, components, short_pairs, long_pairs, changes, input_data, &
-        prefix)
+    subroutine create_all(writers, components, short_pairs, long_pairs, changes, input_data, prefix)
         type(Writers_Wrapper), intent(out) :: writers
         type(Component_Wrapper), intent(in) :: components(:)
         type(Pair_Potentials_Wrapper), intent(in) :: short_pairs(:)
@@ -57,9 +60,13 @@ contains
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
+        logical :: are_dipolar(size(components))
+
         !todo: walls and field to add
         call writers_create(writers%short_energies, short_pairs, "short_energies.out")
-        call writers_create(writers%long_energies, long_pairs, "long_energies.out")
+        call writers_create(writers%long_energies_wo_reci, long_pairs, "long_energies_wo_reci.out")
+        call long_interactions_set(are_dipolar, components)
+        call writers_create(writers%reci_energy, any(are_dipolar), "reci_energy.out")
         call writers_create(writers%components, components, changes, input_data, prefix)
     end subroutine create_all
 
@@ -67,9 +74,32 @@ contains
         type(Writers_Wrapper), intent(inout) :: writers
 
         call writers_destroy(writers%components)
-        call writers_destroy(writers%long_energies)
+        call writers_destroy(writers%reci_energy)
+        call writers_destroy(writers%long_energies_wo_reci)
         call writers_destroy(writers%short_energies)
     end subroutine destroy_all
+
+    subroutine create_reci_energy(reci_energy, dipoles_exist, filename)
+        class(Abstract_Energy_Writer), allocatable, intent(out) :: reci_energy
+        logical, intent(in) :: dipoles_exist
+        character(len=*), intent(in) :: filename
+
+        if (dipoles_exist) then
+            allocate(Concrete_Energy_Writer :: reci_energy)
+        else
+            allocate(Null_Energy_Writer :: reci_energy)
+        end if
+        call reci_energy%construct(filename)
+    end subroutine create_reci_energy
+
+    subroutine destroy_reci_energy(reci_energy)
+        class(Abstract_Energy_Writer), allocatable, intent(inout) :: reci_energy
+
+        if (allocated(reci_energy)) then
+            call reci_energy%destroy()
+            deallocate(reci_energy)
+        end if
+    end subroutine destroy_reci_energy
 
     subroutine create_components_energies(energies, pairs, filename)
         class(Abstract_Components_Energies_Writer), allocatable, intent(out) :: energies

@@ -66,7 +66,6 @@ contains
         call this%allocate_string(legend, selector)
         this%file_unit = file_unit
         write(this%file_unit, *) legend
-        deallocate(legend)
     end subroutine Abstract_Components_Energies_Writer_construct
 
     subroutine Abstract_Components_Energies_Writer_allocate_strings(this, legend, selector)
@@ -128,7 +127,6 @@ contains
             end do
         end do
         write(this%file_unit, *) i_step, energies
-        deallocate(energies)
     end subroutine Abstract_Components_Energies_Writer_write
 
 !end implementation Abstract_Components_Energies_Writer

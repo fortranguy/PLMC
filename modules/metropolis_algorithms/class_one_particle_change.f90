@@ -72,10 +72,12 @@ private
             integer, intent(in) :: i_actor
         end subroutine Abstract_One_Particle_Change_visit_short
 
-        subroutine Abstract_One_Particle_Change_visit_long(this, long_deltas, new, old, i_actor)
+        subroutine Abstract_One_Particle_Change_visit_long(this, long_deltas, reci_delta, new, &
+            old, i_actor)
         import :: DP, Concrete_Temporary_Particle, Abstract_One_Particle_Change
             class(Abstract_One_Particle_Change), intent(in) :: this
             real(DP), intent(out) :: long_deltas(:)
+            real(DP), intent(out) :: reci_delta
             type(Concrete_Temporary_Particle), intent(in) :: new, old
             integer, intent(in) :: i_actor
         end subroutine Abstract_One_Particle_Change_visit_long
@@ -197,12 +199,14 @@ contains
         logical :: success
         real(DP) :: walls_delta, field_energy
         real(DP) :: short_deltas(size(observables%short_energies)), long_deltas(size(observables%&
-            long_energies))
+            long_energies_wo_reci))
+        real(DP) :: reci_delta
         integer :: j_observable, i_observable
 
         i_actor = this%selector%get()
         call this%increment_hits(observables%changes_counters(i_actor))
-        call this%test_metropolis(success, walls_delta, short_deltas, long_deltas, i_actor)
+        call this%test_metropolis(success, walls_delta, short_deltas, long_deltas, reci_delta, &
+            i_actor)
         if (success) then
             do i_component = 1, size(observables%short_energies)
                 j_observable = maxval([i_actor, i_component])
@@ -211,23 +215,25 @@ contains
                     observables%short_energies(j_observable)%with_components(i_observable) + &
                     short_deltas(i_component)
             end do
-            do i_component = 1, size(observables%long_energies)
+            do i_component = 1, size(observables%long_energies_wo_reci)
                 j_observable = maxval([i_actor, i_component])
                 i_observable = minval([i_actor, i_component])
-                observables%long_energies(j_observable)%with_components(i_observable) = &
-                    observables%long_energies(j_observable)%with_components(i_observable) + &
+                observables%long_energies_wo_reci(j_observable)%with_components(i_observable) = &
+                    observables%long_energies_wo_reci(j_observable)%with_components(i_observable) + &
                     long_deltas(i_component)
             end do
+            observables%reci_energy = observables%reci_energy + reci_delta
             call this%increment_success(observables%changes_counters(i_actor))
         end if
     end subroutine Abstract_One_Particle_Change_try
 
     subroutine Abstract_One_Particle_Change_test_metropolis(this, success, walls_delta, &
-        short_deltas, long_deltas, i_actor)
+        short_deltas, long_deltas, reci_delta, i_actor)
         class(Abstract_One_Particle_Change), intent(in) :: this
         logical, intent(out) :: success
         real(DP), intent(out) :: walls_delta
         real(DP), intent(out) :: short_deltas(:), long_deltas(:)
+        real(DP), intent(out) :: reci_delta
         integer, intent(in) :: i_actor
 
         type(Concrete_Temporary_Particle) :: new, old
@@ -242,9 +248,9 @@ contains
         if (overlap) return
         call this%visit_short(overlap, short_deltas, new, old, i_actor)
         if (overlap) return
-        call this%visit_long(long_deltas, new, old, i_actor)
+        call this%visit_long(long_deltas, reci_delta, new, old, i_actor)
 
-        energy_delta = walls_delta + sum(short_deltas + long_deltas)
+        energy_delta = walls_delta + sum(short_deltas + long_deltas) + reci_delta
         call random_number(rand)
         if (rand < exp(-energy_delta/this%environment%temperature%get())) then
             call this%update_actor(i_actor, new, old)
@@ -313,13 +319,15 @@ contains
         short_deltas = short_new - short_old
     end subroutine Concrete_One_Particle_Move_visit_short
 
-    subroutine Concrete_One_Particle_Move_visit_long(this, long_deltas, new, old, i_actor)
+    subroutine Concrete_One_Particle_Move_visit_long(this, long_deltas, reci_delta, new, old, &
+        i_actor)
         class(Concrete_One_Particle_Move), intent(in) :: this
         real(DP), intent(out) :: long_deltas(:)
+        real(DP), intent(out) :: reci_delta
         type(Concrete_Temporary_Particle), intent(in) :: new, old
         integer, intent(in) :: i_actor
 
-        real(DP), dimension(size(long_deltas)) :: long_new_real, long_old_real, lond_delta_reci
+        real(DP), dimension(size(long_deltas)) :: long_new_real, long_old_real
         integer :: i_component, i_exclude
 
         do i_component = 1, size(this%long_interactions%real_components, 1)
@@ -329,11 +337,8 @@ contains
             call this%long_interactions%real_components(i_component, i_actor)%real_component%&
                 visit(long_old_real(i_component), old, i_exclude)
         end do
-        do i_component = 1, size(this%long_interactions%reci_components, 1)
-            lond_delta_reci(i_component) = this%long_interactions%reci_components(i_component)%&
-                reci_delta_visitor%visit_move(new, old, i_component==i_actor)
-        end do
-        long_deltas = long_new_real-long_old_real + lond_delta_reci
+        reci_delta = this%long_interactions%reci_visitor%visit_move(i_actor, new, old)
+        long_deltas = long_new_real-long_old_real
     end subroutine Concrete_One_Particle_Move_visit_long
 
     subroutine Concrete_One_Particle_Move_update_actor(this, i_actor, new, old)
@@ -347,7 +352,7 @@ contains
         do i_component = 1, size(this%short_interactions%components_cells, 1)
             call this%short_interactions%components_cells(i_actor, i_component)%move(old, new)
         end do
-        call this%long_interactions%reci_components(i_actor)%reci_structure%set_move_delta(new, old)
+        call this%long_interactions%reci_structure%update_move(i_actor, new, old)
     end subroutine Concrete_One_Particle_Move_update_actor
 
     subroutine Concrete_One_Particle_Move_increment_hits(changes_counters)
@@ -403,13 +408,15 @@ contains
         short_deltas = 0._DP
     end subroutine Concrete_One_Particle_Rotation_visit_short
 
-    subroutine Concrete_One_Particle_Rotation_visit_long(this, long_deltas, new, old, i_actor)
+    subroutine Concrete_One_Particle_Rotation_visit_long(this, long_deltas, reci_delta, new, old, &
+        i_actor)
         class(Concrete_One_Particle_Rotation), intent(in) :: this
         real(DP), intent(out) :: long_deltas(:)
+        real(DP), intent(out) :: reci_delta
         type(Concrete_Temporary_Particle), intent(in) :: new, old
         integer, intent(in) :: i_actor
 
-        real(DP), dimension(size(long_deltas)) :: long_new_real, long_old_real, lond_delta_reci
+        real(DP), dimension(size(long_deltas)) :: long_new_real, long_old_real
         real(DP) :: long_delta_self
         integer :: i_component, i_exclude
 
@@ -420,14 +427,11 @@ contains
             call this%long_interactions%real_components(i_component, i_actor)%real_component%&
                 visit(long_old_real(i_component), old, i_exclude)
         end do
-        do i_component = 1, size(this%long_interactions%reci_components, 1)
-            lond_delta_reci(i_component) = this%long_interactions%reci_components(i_component)%&
-                reci_delta_visitor%visit_rotation(new, old, i_component==i_actor)
-        end do
+        reci_delta = this%long_interactions%reci_visitor%visit_rotation(i_actor, new, old)
         long_delta_self = this%long_interactions%self_components(i_actor)%self%&
             meet(new%dipolar_moment) - this%long_interactions%self_components(i_actor)%self%&
             meet(old%dipolar_moment)
-        long_deltas = long_new_real-long_old_real + lond_delta_reci - long_delta_self
+        long_deltas = long_new_real-long_old_real - long_delta_self
     end subroutine Concrete_One_Particle_Rotation_visit_long
 
     subroutine Concrete_One_Particle_Rotation_update_actor(this, i_actor, new, old)
@@ -436,8 +440,7 @@ contains
         type(Concrete_Temporary_Particle), intent(in) :: new, old
 
         call this%components(i_actor)%orientations%set(new%i, new%orientation)
-        call this%long_interactions%reci_components(i_actor)%reci_structure%&
-            set_rotation_delta(new, old)
+        call this%long_interactions%reci_structure%update_rotation(i_actor, new, old)
     end subroutine Concrete_One_Particle_Rotation_update_actor
 
     subroutine Concrete_One_Particle_Rotation_increment_hits(changes_counters)
@@ -486,14 +489,15 @@ contains
     end subroutine Null_One_Particle_Change_try
 
     subroutine Null_One_Particle_Change_test_metropolis(this, success, walls_delta, &
-        short_deltas, long_deltas, i_actor)
+        short_deltas, long_deltas, reci_delta, i_actor)
         class(Null_One_Particle_Change), intent(in) :: this
         logical, intent(out) :: success
         real(DP), intent(out) :: walls_delta
         real(DP), intent(out) :: short_deltas(:), long_deltas(:)
+        real(DP), intent(out) :: reci_delta
         integer, intent(in) :: i_actor
         success = .false.
-        walls_delta = 0._DP; short_deltas = 0._DP; long_deltas = 0._DP
+        walls_delta = 0._DP; short_deltas = 0._DP; long_deltas = 0._DP; reci_delta = 0._DP
     end subroutine Null_One_Particle_Change_test_metropolis
 
     subroutine Null_One_Particle_Change_define_change(this, new, old, i_actor)
@@ -524,12 +528,15 @@ contains
          short_deltas = 0._DP
      end subroutine Null_One_Particle_Change_visit_short
 
-     subroutine Null_One_Particle_Change_visit_long(this, long_deltas, new, old, i_actor)
+     subroutine Null_One_Particle_Change_visit_long(this, long_deltas, reci_delta, new, old, &
+        i_actor)
          class(Null_One_Particle_Change), intent(in) :: this
          real(DP), intent(out) :: long_deltas(:)
+         real(DP), intent(out) :: reci_delta
          type(Concrete_Temporary_Particle), intent(in) :: new, old
          integer, intent(in) :: i_actor
          long_deltas = 0._DP
+         reci_delta = 0._DP
      end subroutine Null_One_Particle_Change_visit_long
 
      subroutine Null_One_Particle_Change_update_actor(this, i_actor, new, old)

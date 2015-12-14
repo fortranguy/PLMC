@@ -66,7 +66,6 @@ contains
             allocate(Null_Number_to_String :: this%string_exchange)
         end if
         write(this%file_unit, *) legend
-        deallocate(legend)
     end subroutine Abstract_Changes_Success_Writer_construct
 
     subroutine Abstract_Changes_Success_Writer_destroy(this)
