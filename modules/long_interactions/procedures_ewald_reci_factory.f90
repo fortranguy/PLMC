@@ -5,8 +5,8 @@ use types_component_wrapper, only: Component_Wrapper
 use class_ewald_convergence_parameter, only: Abstract_Ewald_Convergence_Parameter
 use class_ewald_reci_weight, only: Abstract_Ewald_Reci_Weight, Concrete_Ewald_Reci_Weight, &
     Null_Ewald_Reci_Weight
-use class_ewald_reci_structure, only: Abstract_Ewald_Reci_Structure, &
-    Concrete_Ewald_Reci_Structure, Null_Ewald_Reci_Structure
+use class_ewald_reci_structure_, only: Abstract_Ewald_Reci_Structure_, &
+    Concrete_Ewald_Reci_Structure_, Null_Ewald_Reci_Structure_
 use class_ewald_reci_delta_visitor, only: Abstract_Ewald_Reci_Delta_Visitor, &
     Concrete_Ewald_Reci_Delta_Visitor, Null_Ewald_Reci_Delta_Visitor
 use types_long_interactions_wrapper, only: Ewald_Reci_Component_Wrapper
@@ -69,7 +69,7 @@ contains
         type(Environment_Wrapper), intent(in) :: environment
         logical, intent(in) :: is_dipolar
         class(Abstract_Ewald_Reci_Weight), intent(in) :: weight
-        class(Abstract_Ewald_Reci_Structure), intent(in) :: structure
+        class(Abstract_Ewald_Reci_Structure_), intent(in) :: structure
 
         if (is_dipolar) then
             allocate(Concrete_Ewald_Reci_Delta_Visitor :: reci_delta_visitor)
@@ -90,22 +90,22 @@ contains
     end subroutine destroy_delta_visitor
 
     subroutine create_structure(reci_structure, environment, component, is_dipolar)
-        class(Abstract_Ewald_Reci_Structure), allocatable, intent(out) :: reci_structure
+        class(Abstract_Ewald_Reci_Structure_), allocatable, intent(out) :: reci_structure
         type(Environment_Wrapper), intent(in) :: environment
         type(Component_Wrapper), intent(in) :: component
         logical, intent(in) :: is_dipolar
 
         if (is_dipolar) then
-            allocate(Concrete_Ewald_Reci_Structure :: reci_structure)
+            allocate(Concrete_Ewald_Reci_Structure_ :: reci_structure)
         else
-            allocate(Null_Ewald_Reci_Structure :: reci_structure)
+            allocate(Null_Ewald_Reci_Structure_ :: reci_structure)
         end if
         call reci_structure%construct(environment%periodic_box, environment%reciprocal_lattice, &
             component%positions, component%dipolar_moments)
     end subroutine create_structure
 
     subroutine destroy_structure(reci_structure)
-        class(Abstract_Ewald_Reci_Structure), allocatable, intent(inout) :: reci_structure
+        class(Abstract_Ewald_Reci_Structure_), allocatable, intent(inout) :: reci_structure
 
         if (allocated(reci_structure)) then
             call reci_structure%destroy()

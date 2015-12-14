@@ -6,7 +6,7 @@ use class_periodic_box, only: Abstract_Periodic_Box
 use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use class_ewald_reci_weight, only: Abstract_Ewald_Reci_Weight
-use class_ewald_reci_structure, only: Abstract_Ewald_Reci_Structure
+use class_ewald_reci_structure_, only: Abstract_Ewald_Reci_Structure_
 use procedures_ewald_micro, only: set_fourier, reci_number_1_sym, reci_number_2_sym
 
 implicit none
@@ -18,7 +18,7 @@ private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
         integer :: reci_numbers(num_dimensions)
         class(Abstract_Ewald_Reci_Weight), pointer :: weight => null()
-        class(Abstract_Ewald_Reci_Structure), pointer :: structure => null()
+        class(Abstract_Ewald_Reci_Structure_), pointer :: structure => null()
     contains
         procedure :: construct => Abstract_Ewald_Reci_Delta_Visitor_construct
         procedure :: destroy => Abstract_Ewald_Reci_Delta_Visitor_destroy
@@ -48,7 +48,7 @@ contains
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
         class(Abstract_Ewald_Reci_Weight), target, intent(in) :: weight
-        class(Abstract_Ewald_Reci_Structure), target, intent(in) :: structure
+        class(Abstract_Ewald_Reci_Structure_), target, intent(in) :: structure
 
         this%periodic_box => periodic_box
         this%reci_numbers = reciprocal_lattice%get_numbers()
@@ -223,7 +223,7 @@ contains
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
         class(Abstract_Ewald_Reci_Weight), target, intent(in) :: weight
-        class(Abstract_Ewald_Reci_Structure), target, intent(in) :: structure
+        class(Abstract_Ewald_Reci_Structure_), target, intent(in) :: structure
     end subroutine Null_Ewald_Reci_Delta_Visitor_construct
 
     subroutine Null_Ewald_Reci_Delta_Visitor_destroy(this)
