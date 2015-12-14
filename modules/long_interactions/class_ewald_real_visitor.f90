@@ -64,6 +64,7 @@ contains
         integer :: i_particle, j_particle
 
         energy = 0._DP
+        if (dipolar_moments_1%get_num() == 0 .or. dipolar_moments_2%get_num() == 0) return
         do j_particle = 1, dipolar_moments_2%get_num()
             do i_particle = 1, dipolar_moments_1%get_num()
                 vector_ij = this%periodic_box%vector(positions_1%get(i_particle), positions_2%&

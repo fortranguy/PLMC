@@ -13,7 +13,6 @@ use types_mixture_wrapper, only: Mixture_Wrapper
 use class_pair_potential, only: Abstract_Pair_Potential
 use class_short_pairs_visitor, only: Abstract_Short_Pairs_Visitor
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
-use procedures_ewald_reci_visit, only: ewald_reci_visit
 use types_long_interactions_wrapper, only: Ewald_Self_Component_Wrapper, Long_Interactions_Wrapper
 use types_observables_wrapper, only: Concrete_Components_Energies, Observables_Wrapper
 use procedures_observables_factory, only: create_components_energies_nodes, &
@@ -43,7 +42,8 @@ contains
 
         call plmc_visit(observables%walls_energies, mixture%components, short_interactions)
         call plmc_visit(observables%short_energies, mixture%components, short_interactions)
-        call plmc_visit(observables%long_energies, mixture%components, long_interactions)
+        call plmc_visit(observables%long_energies_wo_reci, observables%reci_energy, mixture%&
+            components, long_interactions)
     end subroutine visit_all
 
     subroutine visit_walls(walls_energies, components, short_interactions)
@@ -127,13 +127,13 @@ contains
         end do
     end subroutine visit_short_inter
 
-    pure subroutine visit_long(energies, components, long_interactions)
+    pure subroutine visit_long(energies, reci_energy, components, long_interactions)
         type(Concrete_Components_Energies), intent(inout) :: energies(:)
+        real(DP), intent(out) :: reci_energy
         type(Component_Wrapper), intent(in) :: components(:)
         type(Long_Interactions_Wrapper), intent(in) :: long_interactions
 
         type(Concrete_Components_Energies) :: real_energies(size(components))
-        type(Concrete_Components_Energies) :: reci_energies(size(components))
         real(DP) :: self_energies(size(components))
 
         call Concrete_Components_Energies_init(energies)
@@ -143,10 +143,7 @@ contains
         call Concrete_Components_Energies_add(energies, real_energies)
         call destroy_components_energies_nodes(real_energies)
 
-        call create_components_energies_nodes(reci_energies)
-        call visit_long_reci(reci_energies, long_interactions)
-        call Concrete_Components_Energies_add(energies, reci_energies)
-        call destroy_components_energies_nodes(reci_energies)
+        reci_energy = long_interactions%reci_visitor%visit()
 
         call visit_long_self(self_energies, long_interactions%self_components)
         call Concrete_Components_Energies_add(energies, -self_energies)
@@ -202,30 +199,6 @@ contains
             end do
         end do
     end subroutine visit_long_real_inter
-
-    pure subroutine visit_long_reci(energies, long_interactions)
-        type(Concrete_Components_Energies), intent(inout) :: energies(:)
-        type(Long_Interactions_Wrapper), intent(in) :: long_interactions
-
-        integer :: j_component, i_component
-
-        do j_component = 1, size(energies)
-            associate(energy_j => energies(j_component)%with_components(j_component), &
-                reci_structure_j => long_interactions%reci_components(j_component)%reci_structure)
-                energy_j = ewald_reci_visit(long_interactions%reci_weight, reci_structure_j)
-            end associate
-            do i_component = 1, j_component - 1
-                associate(energy_ij => energies(j_component)%with_components(i_component), &
-                    reci_structure_i => long_interactions%reci_components(i_component)%&
-                        reci_structure, &
-                    reci_structure_j => long_interactions%reci_components(j_component)%&
-                        reci_structure)
-                    energy_ij = ewald_reci_visit(long_interactions%reci_weight, reci_structure_i, &
-                        reci_structure_j)
-                end associate
-            end do
-        end do
-    end subroutine visit_long_reci
 
     pure subroutine visit_long_self(energies, ewald_self_components)
         real(DP), intent(out) :: energies(:)

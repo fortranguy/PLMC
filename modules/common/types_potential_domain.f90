@@ -16,7 +16,7 @@ private
     end type Short_Potential_Domain
 
     type, extends(Abstract_Potential_Domain), public :: Long_Potential_Domain
-        real(DP) :: max_over_box = 0._DP !> volume dependency
+        real(DP) :: max_over_box = 0._DP ! volume dependency
     end type Long_Potential_Domain
 
 end module types_potential_domain
