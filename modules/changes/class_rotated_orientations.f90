@@ -21,18 +21,17 @@ private
         real(DP) :: current_increase_factor
         logical :: max_factor_reached
     contains
-        procedure :: construct => Concrete_Rotated_Orientations_construct
-        procedure :: destroy => Concrete_Rotated_Orientations_destroy
-        procedure :: increase_delta => Concrete_Rotated_Orientations_increase_delta
-        procedure :: decrease_delta => Concrete_Rotated_Orientations_decrease_delta
-        procedure :: get_num => Concrete_Rotated_Orientations_get_num
-        procedure :: get => Concrete_Rotated_Orientations_get
+        procedure :: construct => Concrete_construct
+        procedure :: destroy => Concrete_destroy
+        procedure :: increase_delta => Concrete_increase_delta
+        procedure :: decrease_delta => Concrete_decrease_delta
+        procedure :: get_num => Concrete_get_num
+        procedure :: get => Concrete_get
     end type Concrete_Rotated_Orientations
 
 contains
 
-    subroutine Concrete_Rotated_Orientations_construct(this, orientations, delta, &
-        tuning_parameters)
+    subroutine Concrete_construct(this, orientations, delta, tuning_parameters)
         class(Concrete_Rotated_Orientations), intent(out) :: this
         class(Abstract_Component_Coordinates), target, intent(in) :: orientations
         real(DP), intent(in) :: delta
@@ -48,42 +47,42 @@ contains
         call check_increase_factor("Concrete_Rotated_Orientations", "increase_factor_max", &
             tuning_parameters%increase_factor_max)
         this%tuning_parameters%increase_factor_max = tuning_parameters%increase_factor_max
-    end subroutine Concrete_Rotated_Orientations_construct
+    end subroutine Concrete_construct
 
-    subroutine Concrete_Rotated_Orientations_destroy(this)
+    subroutine Concrete_destroy(this)
         class(Concrete_Rotated_Orientations), intent(inout) :: this
 
         this%orientations => null()
-    end subroutine Concrete_Rotated_Orientations_destroy
+    end subroutine Concrete_destroy
 
-    subroutine Concrete_Rotated_Orientations_increase_delta(this)
+    subroutine Concrete_increase_delta(this)
         class(Concrete_Rotated_Orientations), intent(inout) :: this
 
         if (this%max_factor_reached) return
         call set_increase_factor("Concrete_Rotated_Orientations", this%current_increase_factor, &
             this%tuning_parameters, this%max_factor_reached)
         this%delta = this%current_increase_factor * this%delta
-    end subroutine Concrete_Rotated_Orientations_increase_delta
+    end subroutine Concrete_increase_delta
 
-    subroutine Concrete_Rotated_Orientations_decrease_delta(this)
+    subroutine Concrete_decrease_delta(this)
         class(Concrete_Rotated_Orientations), intent(inout) :: this
 
         this%delta = this%delta / this%current_increase_factor
-    end subroutine Concrete_Rotated_Orientations_decrease_delta
+    end subroutine Concrete_decrease_delta
 
-    pure integer function Concrete_Rotated_Orientations_get_num(this) result(num_orientations)
+    pure integer function Concrete_get_num(this) result(num_orientations)
         class(Concrete_Rotated_Orientations), intent(in) :: this
 
         num_orientations = this%orientations%get_num()
-    end function Concrete_Rotated_Orientations_get_num
+    end function Concrete_get_num
 
-    function Concrete_Rotated_Orientations_get(this, i_particle) result(rotated_orientation)
+    function Concrete_get(this, i_particle) result(rotated_orientation)
         real(DP) :: rotated_orientation(num_dimensions)
         class(Concrete_Rotated_Orientations), intent(in) :: this
         integer, intent(in) :: i_particle
 
         rotated_orientation = this%orientations%get(i_particle)
         call markov_orientation(rotated_orientation, this%delta)
-    end function Concrete_Rotated_Orientations_get
+    end function Concrete_get
 
 end module class_rotated_orientations

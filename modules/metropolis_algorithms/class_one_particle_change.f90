@@ -219,7 +219,7 @@ contains
                 j_observable = maxval([i_actor, i_component])
                 i_observable = minval([i_actor, i_component])
                 observables%long_energies_wo_reci(j_observable)%with_components(i_observable) = &
-                    observables%long_energies_wo_reci(j_observable)%with_components(i_observable) + &
+                    observables%long_energies_wo_reci(j_observable)%with_components(i_observable) +&
                     long_deltas(i_component)
             end do
             observables%reci_energy = observables%reci_energy + reci_delta

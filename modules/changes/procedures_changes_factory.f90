@@ -45,8 +45,7 @@ contains
         do i_component = 1, size(changes%components)
             call changes_component_create(changes%components(i_component), periodic_box, &
                 components(i_component), tuning_parameters, tuner_parameters, input_data, &
-                prefix//"Component "//string%get(i_component)&
-                //".")
+                prefix//"Component "//string%get(i_component)//".")
         end do
     end subroutine create_all
 
