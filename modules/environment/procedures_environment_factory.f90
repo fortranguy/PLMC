@@ -220,8 +220,8 @@ contains
         if (allocated(field_expression)) deallocate(field_expression)
     end subroutine destroy_field_expression
 
-    subroutine create_parallelepiped_domain(parallelepiped_domain, needed, &
-        periodic_box, input_data, prefix)
+    subroutine create_parallelepiped_domain(parallelepiped_domain, needed,periodic_box, &
+        input_data, prefix)
         class(Abstract_Parallelepiped_Domain), allocatable, intent(out) :: parallelepiped_domain
         logical, intent(in) :: needed
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
@@ -261,8 +261,7 @@ contains
     end subroutine create_parallelepiped_domain
 
     subroutine destroy_parallelepiped_domain(parallelepiped_domain)
-        class(Abstract_Parallelepiped_Domain), allocatable, intent(inout) :: &
-            parallelepiped_domain
+        class(Abstract_Parallelepiped_Domain), allocatable, intent(inout) :: parallelepiped_domain
 
         call parallelepiped_domain%destroy()
         if (allocated(parallelepiped_domain)) deallocate(parallelepiped_domain)
@@ -318,8 +317,7 @@ contains
         end if
     end subroutine
 
-    subroutine create_reciprocal_lattice(reciprocal_lattice, periodic_box, &
-        input_data, prefix)
+    subroutine create_reciprocal_lattice(reciprocal_lattice, periodic_box, input_data, prefix)
         class(Abstract_Reciprocal_Lattice), allocatable, intent(out) :: reciprocal_lattice
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         type(json_file), intent(inout) :: input_data

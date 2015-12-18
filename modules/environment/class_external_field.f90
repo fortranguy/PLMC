@@ -14,9 +14,9 @@ private
         class(Abstract_Parallelepiped_Domain), allocatable :: parallelepiped_domain
         class(Abstract_Field_Expression), allocatable :: field_expression
     contains
-        procedure :: construct => Abstract_External_Field_construct
-        procedure :: destroy => Abstract_External_Field_destroy
-        procedure :: get => Abstract_External_Field_get
+        procedure :: construct => Abstract_construct
+        procedure :: destroy => Abstract_destroy
+        procedure :: get => Abstract_get
     end type Abstract_External_Field
 
     type, extends(Abstract_External_Field), public :: Concrete_External_Field
@@ -25,32 +25,32 @@ private
 
     type, extends(Abstract_External_Field), public :: Null_External_Field
     contains
-        procedure :: construct => Null_External_Field_construct
-        procedure :: destroy => Null_External_Field_destroy
-        procedure :: get => Null_External_Field_get
+        procedure :: construct => Null_construct
+        procedure :: destroy => Null_destroy
+        procedure :: get => Null_get
     end type Null_External_Field
 
 contains
 
 !implementation Abstract_External_Field
 
-    subroutine Abstract_External_Field_construct(this, parallelepiped_domain, field_expression)
+    subroutine Abstract_construct(this, parallelepiped_domain, field_expression)
         class(Abstract_External_Field), intent(out) :: this
         class(Abstract_Parallelepiped_Domain), intent(in) :: parallelepiped_domain
         class(Abstract_Field_Expression), intent(in) :: field_expression
 
         allocate(this%parallelepiped_domain, source = parallelepiped_domain)
         allocate(this%field_expression, source = field_expression)
-    end subroutine Abstract_External_Field_construct
+    end subroutine Abstract_construct
 
-    subroutine Abstract_External_Field_destroy(this)
+    subroutine Abstract_destroy(this)
         class(Abstract_External_Field), intent(inout) :: this
 
         if (allocated(this%field_expression)) deallocate(this%field_expression)
         if (allocated(this%parallelepiped_domain)) deallocate(this%parallelepiped_domain)
-    end subroutine Abstract_External_Field_destroy
+    end subroutine Abstract_destroy
 
-    pure function Abstract_External_Field_get(this, position) result(external_field)
+    pure function Abstract_get(this, position) result(external_field)
         class(Abstract_External_Field), intent(in) :: this
         real(DP), intent(in) :: position(:)
         real(DP) :: external_field(num_dimensions)
@@ -60,28 +60,28 @@ contains
         else
             external_field = 0._DP
         end if
-    end function Abstract_External_Field_get
+    end function Abstract_get
 
 !end implementation Abstract_External_Field
 
 !implementation Null_External_Field
 
-    subroutine Null_External_Field_construct(this, parallelepiped_domain, field_expression)
+    subroutine Null_construct(this, parallelepiped_domain, field_expression)
         class(Null_External_Field), intent(out) :: this
         class(Abstract_Parallelepiped_Domain), intent(in) :: parallelepiped_domain
         class(Abstract_Field_Expression), intent(in) :: field_expression
-    end subroutine Null_External_Field_construct
+    end subroutine Null_construct
 
-    subroutine Null_External_Field_destroy(this)
+    subroutine Null_destroy(this)
         class(Null_External_Field), intent(inout) :: this
-    end subroutine Null_External_Field_destroy
+    end subroutine Null_destroy
 
-    pure function Null_External_Field_get(this, position) result(external_field)
+    pure function Null_get(this, position) result(external_field)
         class(Null_External_Field), intent(in) :: this
         real(DP), intent(in) :: position(:)
         real(DP) :: external_field(num_dimensions)
         external_field = 0._DP
-    end function Null_External_Field_get
+    end function Null_get
 
 !end implementation Null_External_Field
 

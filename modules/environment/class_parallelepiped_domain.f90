@@ -15,12 +15,12 @@ private
         real(DP), dimension(num_dimensions) :: origin, size
         class(Abstract_Periodic_Box), pointer :: periodic_box
     contains
-        procedure :: construct => Abstract_Parallelepiped_Domain_construct
-        procedure, private :: is_boxed => Abstract_Parallelepiped_Domain_is_boxed
-        procedure :: destroy => Abstract_Parallelepiped_Domain_destroy
-        procedure :: get_origin => Abstract_Parallelepiped_Domain_get_origin
-        procedure :: get_size => Abstract_Parallelepiped_Domain_get_size
-        procedure :: is_inside => Abstract_Parallelepiped_Domain_is_inside
+        procedure :: construct => Abstract_construct
+        procedure, private :: is_boxed => Abstract_is_boxed
+        procedure :: destroy => Abstract_destroy
+        procedure :: get_origin => Abstract_get_origin
+        procedure :: get_size => Abstract_get_size
+        procedure :: is_inside => Abstract_is_inside
     end type Abstract_Parallelepiped_Domain
 
     type, extends(Abstract_Parallelepiped_Domain), public :: Concrete_Parallelepiped_Domain
@@ -29,26 +29,26 @@ private
 
     type, extends(Abstract_Parallelepiped_Domain), public :: Concrete_Box_Domain
     contains
-        procedure :: construct => Concrete_Box_Domain_construct
-        procedure :: get_origin => Concrete_Box_Domain_get_origin
-        procedure :: get_size => Concrete_Box_Domain_get_size
-        procedure :: is_inside => Concrete_Box_Domain_is_inside
+        procedure :: construct => Box_construct
+        procedure :: get_origin => Box_get_origin
+        procedure :: get_size => Box_get_size
+        procedure :: is_inside => Box_is_inside
     end type Concrete_Box_Domain
 
     type, extends(Abstract_Parallelepiped_Domain), public :: Null_Parallelepiped_Domain
     contains
-        procedure :: construct => Null_Parallelepiped_Domain_construct
-        procedure :: destroy => Null_Parallelepiped_Domain_destroy
-        procedure :: get_origin => Null_Parallelepiped_Domain_get_origin
-        procedure :: get_size => Null_Parallelepiped_Domain_get_size
-        procedure :: is_inside => Null_Parallelepiped_Domain_is_inside
+        procedure :: construct => Null_construct
+        procedure :: destroy => Null_destroy
+        procedure :: get_origin => Null_get_origin
+        procedure :: get_size => Null_get_size
+        procedure :: is_inside => Null_is_inside
     end type Null_Parallelepiped_Domain
 
 contains
 
 !implementation Abstract_Parallelepiped_Domain
 
-    subroutine Abstract_Parallelepiped_Domain_construct(this, periodic_box, origin, size)
+    subroutine Abstract_construct(this, periodic_box, origin, size)
         class(Abstract_Parallelepiped_Domain), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         real(DP), intent(in) :: origin(:), size(:)
@@ -63,9 +63,9 @@ contains
         if (.not.this%is_boxed()) then
             call error_exit("Abstract_Parallelepiped_Domain: domain is not boxed.")
         end if
-    end subroutine Abstract_Parallelepiped_Domain_construct
+    end subroutine Abstract_construct
 
-    pure logical function Abstract_Parallelepiped_Domain_is_boxed(this) result(is_boxed)
+    pure logical function Abstract_is_boxed(this) result(is_boxed)
         class(Abstract_Parallelepiped_Domain), intent(in) :: this
 
         real(DP), dimension(num_dimensions) :: box_origin, corner_minus, corner_plus
@@ -75,37 +75,36 @@ contains
         corner_plus = this%origin + this%size/2._DP
         is_boxed = point_is_inside(box_origin, this%periodic_box%get_size(), corner_minus) &
                    .and. point_is_inside(box_origin, this%periodic_box%get_size(), corner_plus)
-    end function Abstract_Parallelepiped_Domain_is_boxed
+    end function Abstract_is_boxed
 
-    subroutine Abstract_Parallelepiped_Domain_destroy(this)
+    subroutine Abstract_destroy(this)
         class(Abstract_Parallelepiped_Domain), intent(inout) :: this
 
         this%periodic_box => null()
-    end subroutine Abstract_Parallelepiped_Domain_destroy
+    end subroutine Abstract_destroy
 
-    pure function Abstract_Parallelepiped_Domain_get_origin(this) result(origin)
+    pure function Abstract_get_origin(this) result(origin)
         class(Abstract_Parallelepiped_Domain), intent(in) :: this
         real(DP) :: origin(num_dimensions)
 
         origin = this%origin
-    end function Abstract_Parallelepiped_Domain_get_origin
+    end function Abstract_get_origin
 
-    pure function Abstract_Parallelepiped_Domain_get_size(this) result(size)
+    pure function Abstract_get_size(this) result(size)
         class(Abstract_Parallelepiped_Domain), intent(in) :: this
         real(DP) :: size(num_dimensions)
 
         size = this%size
-    end function Abstract_Parallelepiped_Domain_get_size
+    end function Abstract_get_size
 
-    pure logical function Abstract_Parallelepiped_Domain_is_inside(this, position) result(is_inside)
+    pure logical function Abstract_is_inside(this, position) result(is_inside)
         class(Abstract_Parallelepiped_Domain), intent(in) :: this
         real(DP), intent(in) :: position(:)
 
         is_inside = point_is_inside(this%origin, this%size, position)
-    end function Abstract_Parallelepiped_Domain_is_inside
+    end function Abstract_is_inside
 
-    pure function point_is_inside(box_origin, box_size, point)
-        logical :: point_is_inside
+    pure logical function point_is_inside(box_origin, box_size, point)
         real(DP), intent(in) :: box_origin(:), box_size(:), point(:)
 
         real(DP), dimension(num_dimensions) :: box_corner, point_from_corner
@@ -119,69 +118,67 @@ contains
 
 !implementation Concrete_Box_Domain
 
-    subroutine Concrete_Box_Domain_construct(this, periodic_box, origin, size)
+    subroutine Box_construct(this, periodic_box, origin, size)
         class(Concrete_Box_Domain), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         real(DP), intent(in) :: origin(:), size(:)
 
         this%periodic_box => periodic_box
-    end subroutine Concrete_Box_Domain_construct
+    end subroutine Box_construct
 
-    pure function Concrete_Box_Domain_get_origin(this) result(origin)
+    pure function Box_get_origin(this) result(origin)
         class(Concrete_Box_Domain), intent(in) :: this
         real(DP) :: origin(num_dimensions)
 
         origin = 0._DP
-    end function Concrete_Box_Domain_get_origin
+    end function Box_get_origin
 
-    pure function Concrete_Box_Domain_get_size(this) result(size)
+    pure function Box_get_size(this) result(size)
         class(Concrete_Box_Domain), intent(in) :: this
         real(DP) :: size(num_dimensions)
 
         size = this%periodic_box%get_size()
-    end function Concrete_Box_Domain_get_size
+    end function Box_get_size
 
-    pure logical function Concrete_Box_Domain_is_inside(this, position) result(is_inside)
+    pure logical function Box_is_inside(this, position) result(is_inside)
         class(Concrete_Box_Domain), intent(in) :: this
         real(DP), intent(in) :: position(:)
 
         is_inside = .true.
-    end function Concrete_Box_Domain_is_inside
+    end function Box_is_inside
 
 !end implementation Concrete_Box_Domain
 
 !implementation Null_Parallelepiped_Domain
 
-    subroutine Null_Parallelepiped_Domain_construct(this, periodic_box, origin, size)
+    subroutine Null_construct(this, periodic_box, origin, size)
         class(Null_Parallelepiped_Domain), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         real(DP), intent(in) :: origin(:), size(:)
-    end subroutine Null_Parallelepiped_Domain_construct
+    end subroutine Null_construct
 
-    subroutine Null_Parallelepiped_Domain_destroy(this)
+    subroutine Null_destroy(this)
         class(Null_Parallelepiped_Domain), intent(inout) :: this
-    end subroutine Null_Parallelepiped_Domain_destroy
+    end subroutine Null_destroy
 
-    pure function Null_Parallelepiped_Domain_get_origin(this) result(origin)
+    pure function Null_get_origin(this) result(origin)
         class(Null_Parallelepiped_Domain), intent(in) :: this
         real(DP) :: origin(num_dimensions)
+        origin = 0._DP
+    end function Null_get_origin
 
-        origin = this%origin
-    end function Null_Parallelepiped_Domain_get_origin
-
-    pure function Null_Parallelepiped_Domain_get_size(this) result(size)
+    pure function Null_get_size(this) result(size)
         class(Null_Parallelepiped_Domain), intent(in) :: this
         real(DP) :: size(num_dimensions)
+        size = 0._DP
+    end function Null_get_size
 
-        size = this%size
-    end function Null_Parallelepiped_Domain_get_size
-
-    pure function Null_Parallelepiped_Domain_is_inside(this, position) result(is_inside)
+    pure function Null_is_inside(this, position) result(is_inside)
         class(Null_Parallelepiped_Domain), intent(in) :: this
         real(DP), intent(in) :: position(:)
         logical :: is_inside
         is_inside = .false.
-    end function Null_Parallelepiped_Domain_is_inside
+    end function Null_is_inside
 
 !end implementation Null_Parallelepiped_Domain
 

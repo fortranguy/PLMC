@@ -11,8 +11,8 @@ private
     private
         real(DP) :: permittivity
     contains
-        procedure :: set => Abstract_Permittivity_set
-        procedure :: get => Abstract_Permittivity_get
+        procedure :: set => Abstract_set
+        procedure :: get => Abstract_get
     end type Abstract_Permittivity
 
     type, extends(Abstract_Permittivity), public :: Concrete_Permittivity
@@ -21,41 +21,41 @@ private
 
     type, extends(Abstract_Permittivity), public :: Null_Permittivity
     contains
-        procedure :: set => Null_Permittivity_set
-        procedure :: get => Null_Permittivity_get
+        procedure :: set => Null_set
+        procedure :: get => Null_get
     end type Null_Permittivity
 
 contains
 
 !implementation Abstract_Permittivity
 
-    subroutine Abstract_Permittivity_set(this, permittivity)
+    subroutine Abstract_set(this, permittivity)
         class(Abstract_Permittivity), intent(inout) :: this
         real(DP), intent(in) :: permittivity
 
-        call check_positive("Abstract_Permittivity_set", "permittivity", permittivity)
+        call check_positive("Abstract_set", "permittivity", permittivity)
         this%permittivity = permittivity
-    end subroutine
+    end subroutine Abstract_set
 
-    pure real(DP) function Abstract_Permittivity_get(this) result(permittivity)
+    pure real(DP) function Abstract_get(this) result(permittivity)
         class(Abstract_Permittivity), intent(in) :: this
 
         permittivity = this%permittivity
-    end function Abstract_Permittivity_get
+    end function Abstract_get
 
 !end implementation Abstract_Permittivity
 
 !implementation Null_Permittivity
 
-    subroutine Null_Permittivity_set(this, permittivity)
+    subroutine Null_set(this, permittivity)
         class(Null_Permittivity), intent(inout) :: this
         real(DP), intent(in) :: permittivity
-    end subroutine
+    end subroutine Null_set
 
-    pure real(DP) function Null_Permittivity_get(this) result(permittivity)
+    pure real(DP) function Null_get(this) result(permittivity)
         class(Null_Permittivity), intent(in) :: this
         permittivity = 0._DP
-    end function Null_Permittivity_get
+    end function Null_get
 
 !end implementation Null_Permittivity
 

@@ -11,8 +11,8 @@ private
     private
         real(DP) :: temperature
     contains
-        procedure :: set => Abstract_Temperature_set
-        procedure :: get => Abstract_Temperature_get
+        procedure :: set => Abstract_set
+        procedure :: get => Abstract_get
     end type Abstract_Temperature
 
     type, extends(Abstract_Temperature), public :: Concrete_Temperature
@@ -21,19 +21,19 @@ private
 
 contains
 
-    subroutine Abstract_Temperature_set(this, temperature)
+    subroutine Abstract_set(this, temperature)
         class(Abstract_Temperature), intent(inout) :: this
         real(DP), intent(in) :: temperature
 
         call check_positive("Abstract_Temperature", "temperature", temperature)
         this%temperature = temperature
-    end subroutine Abstract_Temperature_set
+    end subroutine Abstract_set
 
-    pure function Abstract_Temperature_get(this) result(temperature)
+    pure function Abstract_get(this) result(temperature)
         class(Abstract_Temperature), intent(in) :: this
         real(DP) :: temperature
 
         temperature = this%temperature
-    end function Abstract_Temperature_get
+    end function Abstract_get
 
 end module class_temperature

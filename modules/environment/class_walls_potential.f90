@@ -18,21 +18,20 @@ private
         class(Abstract_Periodic_Box), pointer :: periodic_box
         class(Abstract_Floor_Penetration), allocatable :: floor_penetration
     contains
-        procedure :: construct => Abstract_Walls_Potential_construct
-        procedure :: destroy => Abstract_Walls_Potential_destroy
-        procedure :: get_gap => Abstract_Walls_Potential_get_gap
-        procedure :: visit => Abstract_Walls_Potential_visit
-        procedure, private :: position_from_floor => Abstract_Walls_Potential_position_from_floor
-        procedure, private :: position_from_ceiling => &
-            Abstract_Walls_Potential_position_from_ceiling
+        procedure :: construct => Abstract_construct
+        procedure :: destroy => Abstract_destroy
+        procedure :: get_gap => Abstract_get_gap
+        procedure :: visit => Abstract_visit
+        procedure, private :: position_from_floor => Abstract_position_from_floor
+        procedure, private :: position_from_ceiling => Abstract_position_from_ceiling
     end type Abstract_Walls_Potential
 
     type, extends(Abstract_Walls_Potential), public :: Null_Walls_Potential
         contains
-        procedure :: construct => Null_Walls_Potential_construct
-        procedure :: destroy => Null_Walls_Potential_destroy
-        procedure :: get_gap => Null_Walls_Potential_get_gap
-        procedure :: visit => Null_Walls_Potential_visit
+        procedure :: construct => Null_construct
+        procedure :: destroy => Null_destroy
+        procedure :: get_gap => Null_get_gap
+        procedure :: visit => Null_visit
     end type Null_Walls_Potential
 
     type, extends(Abstract_Walls_Potential), public :: Concrete_Walls_Potential
@@ -43,12 +42,11 @@ contains
 
 !implementation Abstract_Walls_Potential
 
-    subroutine Abstract_Walls_Potential_construct(this, periodic_box, gap, floor_penetration)
+    subroutine Abstract_construct(this, periodic_box, gap, floor_penetration)
         class(Abstract_Walls_Potential), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         real(DP), intent(in) :: gap
         class(Abstract_Floor_Penetration), intent(in) :: floor_penetration
-
 
         real(DP) :: box_size(num_dimensions)
 
@@ -60,23 +58,22 @@ contains
         end if
         this%gap = gap
         allocate(this%floor_penetration, source = floor_penetration)
-    end subroutine Abstract_Walls_Potential_construct
+    end subroutine Abstract_construct
 
-    subroutine Abstract_Walls_Potential_destroy(this)
+    subroutine Abstract_destroy(this)
         class(Abstract_Walls_Potential), intent(inout) :: this
 
         if (allocated(this%floor_penetration)) deallocate(this%floor_penetration)
         this%periodic_box => null()
-    end subroutine Abstract_Walls_Potential_destroy
+    end subroutine Abstract_destroy
 
-    pure function Abstract_Walls_Potential_get_gap(this) result(gap)
+    pure real(DP) function Abstract_get_gap(this) result(gap)
         class(Abstract_Walls_Potential), intent(in) :: this
-        real(DP) :: gap
 
         gap = this%gap
-    end function Abstract_Walls_Potential_get_gap
+    end function Abstract_get_gap
 
-    pure subroutine Abstract_Walls_Potential_visit(this, overlap, energy, position, pair_potential)
+    pure subroutine Abstract_visit(this, overlap, energy, position, pair_potential)
         class(Abstract_Walls_Potential), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
@@ -98,44 +95,41 @@ contains
         call pair_potential%meet(overlap, energy_ceiling, norm2(shortest_vector_from_ceiling))
         if (overlap) return
         energy = energy_floor + energy_ceiling
-    end subroutine Abstract_Walls_Potential_visit
+    end subroutine Abstract_visit
 
-    pure function Abstract_Walls_Potential_position_from_floor(this, position) &
-        result(position_from_floor)
+    pure function Abstract_position_from_floor(this, position) result(position_from_floor)
         class(Abstract_Walls_Potential), intent(in) :: this
         real(DP), intent(in) :: position(:)
         real(DP) :: position_from_floor(num_dimensions)
 
         position_from_floor = position + [0._DP, 0._DP, this%gap/2._DP]
-    end function Abstract_Walls_Potential_position_from_floor
+    end function Abstract_position_from_floor
 
-    pure function Abstract_Walls_Potential_position_from_ceiling(this, position) &
-        result(position_from_ceiling)
+    pure function Abstract_position_from_ceiling(this, position) result(position_from_ceiling)
         class(Abstract_Walls_Potential), intent(in) :: this
         real(DP), intent(in) :: position(:)
         real(DP) :: position_from_ceiling(num_dimensions)
 
         position_from_ceiling = position - [0._DP, 0._DP, this%gap/2._DP]
-    end function Abstract_Walls_Potential_position_from_ceiling
+    end function Abstract_position_from_ceiling
 
 !end implementation Abstract_Walls_Potential
 
 !implementation Null_Walls_Potential
 
-    subroutine Null_Walls_Potential_construct(this, periodic_box, gap, floor_penetration)
+    subroutine Null_construct(this, periodic_box, gap, floor_penetration)
         class(Null_Walls_Potential), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         real(DP), intent(in) :: gap
         class(Abstract_Floor_Penetration), intent(in) :: floor_penetration
-    end subroutine Null_Walls_Potential_construct
+    end subroutine Null_construct
 
-    pure function Null_Walls_Potential_get_gap(this) result(gap)
+    pure real(DP) function Null_get_gap(this) result(gap)
         class(Null_Walls_Potential), intent(in) :: this
-        real(DP) :: gap
         gap = 0._DP
-    end function Null_Walls_Potential_get_gap
+    end function Null_get_gap
 
-    pure subroutine Null_Walls_Potential_visit(this, overlap, energy, position, pair_potential)
+    pure subroutine Null_visit(this, overlap, energy, position, pair_potential)
         class(Null_Walls_Potential), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
@@ -143,11 +137,11 @@ contains
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
         overlap = .false.
         energy = 0._DP
-    end subroutine Null_Walls_Potential_visit
+    end subroutine Null_visit
 
-    subroutine Null_Walls_Potential_destroy(this)
+    subroutine Null_destroy(this)
         class(Null_Walls_Potential), intent(inout) :: this
-    end subroutine Null_Walls_Potential_destroy
+    end subroutine Null_destroy
 
 !end implementation Null_Walls_Potential
 
