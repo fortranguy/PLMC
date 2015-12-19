@@ -20,14 +20,14 @@ private
         logical, allocatable :: are_dipolar(:)
         complex(DP), dimension(:, :, :), allocatable :: structure
     contains
-        procedure :: construct => Abstract_Ewald_Reci_Structure_construct
-        procedure :: destroy => Abstract_Ewald_Reci_Structure_destroy
-        procedure :: reset => Abstract_Ewald_Reci_Structure_set
-        procedure :: is_dipolar => Abstract_Ewald_Reci_Structure_is_dipolar
-        procedure :: get => Abstract_Ewald_Reci_Structure_get
-        procedure, private :: set => Abstract_Ewald_Reci_Structure_set
-        procedure :: update_move => Abstract_Ewald_Reci_Structure_update_move
-        procedure :: update_rotation => Abstract_Ewald_Reci_Structure_update_rotation
+        procedure :: construct => Abstract_construct
+        procedure :: destroy => Abstract_destroy
+        procedure :: reset => Abstract_set
+        procedure :: is_dipolar => Abstract_is_dipolar
+        procedure :: get => Abstract_get
+        procedure, private :: set => Abstract_set
+        procedure :: update_move => Abstract_update_move
+        procedure :: update_rotation => Abstract_update_rotation
     end type Abstract_Ewald_Reci_Structure
 
     type, extends(Abstract_Ewald_Reci_Structure), public :: Concrete_Ewald_Reci_Structure
@@ -36,21 +36,20 @@ private
 
     type, extends(Abstract_Ewald_Reci_Structure), public :: Null_Ewald_Reci_Structure
     contains
-        procedure :: construct => Null_Ewald_Reci_Structure_construct
-        procedure :: destroy => Null_Ewald_Reci_Structure_destroy
-        procedure :: reset => Null_Ewald_Reci_Structure_set
-        procedure :: is_dipolar => Null_Ewald_Reci_Structure_is_dipolar
-        procedure :: get => Null_Ewald_Reci_Structure_get
-        procedure :: update_move => Null_Ewald_Reci_Structure_update_move
-        procedure :: update_rotation => Null_Ewald_Reci_Structure_update_rotation
+        procedure :: construct => Null_construct
+        procedure :: destroy => Null_destroy
+        procedure :: reset => Null_set
+        procedure :: is_dipolar => Null_is_dipolar
+        procedure :: get => Null_get
+        procedure :: update_move => Null_update_move
+        procedure :: update_rotation => Null_update_rotation
     end type Null_Ewald_Reci_Structure
 
 contains
 
 !implementation Abstract_Ewald_Reci_Structure
 
-    subroutine Abstract_Ewald_Reci_Structure_construct(this, periodic_box, reciprocal_lattice, &
-        components, are_dipolar)
+    subroutine Abstract_construct(this, periodic_box, reciprocal_lattice, components, are_dipolar)
         class(Abstract_Ewald_Reci_Structure), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
@@ -66,26 +65,25 @@ contains
                                 -this%reci_numbers(2):this%reci_numbers(2), &
                                 -this%reci_numbers(3):this%reci_numbers(3)))
         call this%set()
-    end subroutine Abstract_Ewald_Reci_Structure_construct
+    end subroutine Abstract_construct
 
-    subroutine Abstract_Ewald_Reci_Structure_destroy(this)
+    subroutine Abstract_destroy(this)
         class(Abstract_Ewald_Reci_Structure), intent(inout) :: this
 
         if (allocated(this%structure)) deallocate(this%structure)
         if (allocated(this%are_dipolar)) deallocate(this%are_dipolar)
         this%components => null()
         this%periodic_box => null()
-    end subroutine Abstract_Ewald_Reci_Structure_destroy
+    end subroutine Abstract_destroy
 
-    pure logical function Abstract_Ewald_Reci_Structure_is_dipolar(this, i_component) &
-        result(is_dipolar)
+    pure logical function Abstract_is_dipolar(this, i_component) result(is_dipolar)
         class(Abstract_Ewald_Reci_Structure), intent(in) :: this
         integer, intent(in) :: i_component
 
         is_dipolar = this%are_dipolar(i_component)
-    end function Abstract_Ewald_Reci_Structure_is_dipolar
+    end function Abstract_is_dipolar
 
-    pure subroutine Abstract_Ewald_Reci_Structure_set(this)
+    pure subroutine Abstract_set(this)
         class(Abstract_Ewald_Reci_Structure), intent(inout) :: this
 
         complex(DP) :: fourier_position
@@ -130,7 +128,7 @@ contains
                 end do
             end do
         end do
-    end subroutine Abstract_Ewald_Reci_Structure_set
+    end subroutine Abstract_set
 
     !> Structure factor:
     !> \[
@@ -138,20 +136,19 @@ contains
     !>          e^{i\vec{k}\cdot\vec{x}^\mathsf{I}_\mathsf{i}}
     !> \]
     !> where \(\mathsf{I}\) indexes a component and \(\mathsf{i}\), a particle of \(\mathsf{I}\).
-    pure complex(DP) function Abstract_Ewald_Reci_Structure_get(this, n_1, n_2, n_3) &
-        result(structure)
+    pure complex(DP) function Abstract_get(this, n_1, n_2, n_3) result(structure)
         class(Abstract_Ewald_Reci_Structure), intent(in) :: this
         integer, intent(in) :: n_1, n_2, n_3
 
         structure = this%structure(n_1, n_2, n_3)
-    end function Abstract_Ewald_Reci_Structure_get
+    end function Abstract_get
 
     !> Structure factor update when a particle \(\mathsf{i}\) of component \(\mathsf{I}\) moves.
     !>  \[ \Delta S(\vec{k}) = (\vec{k}\cdot\vec{\mu}^\mathsf{I}_\mathsf{i})
     !>      (e^{i\vec{k}\cdot\vec{x}^{\mathsf{I}\prime}_\mathsf{i}} -
     !>       e^{i\vec{k}\cdot\vec{x}^\mathsf{I}_\mathsf{i}}) \]
     !> Warning: only half wave vectors are updated.
-    pure subroutine Abstract_Ewald_Reci_Structure_update_move(this, i_component, new, old)
+    pure subroutine Abstract_update_move(this, i_component, new, old)
         class(Abstract_Ewald_Reci_Structure), intent(inout) :: this
         integer, intent(in) :: i_component
         type(Concrete_Temporary_Particle), intent(in) :: new, old
@@ -205,13 +202,13 @@ contains
                 end do
             end do
         end do
-    end subroutine Abstract_Ewald_Reci_Structure_update_move
+    end subroutine Abstract_update_move
 
     !> Structure factor update when a particle \(\mathsf{i}\) of component \(\mathsf{I}\) rotates.
     !>  \[ \Delta S(\vec{k}) = \vec{k}\cdot(\vec{\mu}^{\mathsf{I}\prime}_\mathsf{i} -
     !>      \vec{\mu}^\mathsf{I}_\mathsf{i}) e^{i\vec{k}\cdot\vec{x}^\mathsf{I}_\mathsf{i}} \]
     !> Warning: only half wave vectors are updated.
-    pure subroutine Abstract_Ewald_Reci_Structure_update_rotation(this, i_component, new, old)
+    pure subroutine Abstract_update_rotation(this, i_component, new, old)
         class(Abstract_Ewald_Reci_Structure), intent(inout) :: this
         integer, intent(in) :: i_component
         type(Concrete_Temporary_Particle), intent(in) :: new, old
@@ -253,53 +250,51 @@ contains
                 end do
             end do
         end do
-    end subroutine Abstract_Ewald_Reci_Structure_update_rotation
+    end subroutine Abstract_update_rotation
 
 !end implementation Abstract_Ewald_Reci_Structure
 
 !implementation Null_Ewald_Reci_Structure
 
-    subroutine Null_Ewald_Reci_Structure_construct(this, periodic_box, reciprocal_lattice, &
-        components, are_dipolar)
+    subroutine Null_construct(this, periodic_box, reciprocal_lattice, components, are_dipolar)
         class(Null_Ewald_Reci_Structure), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
         type(Component_Wrapper), target, intent(in) :: components(:)
         logical, intent(in) :: are_dipolar(:)
-    end subroutine Null_Ewald_Reci_Structure_construct
+    end subroutine Null_construct
 
-    subroutine Null_Ewald_Reci_Structure_destroy(this)
+    subroutine Null_destroy(this)
         class(Null_Ewald_Reci_Structure), intent(inout) :: this
-    end subroutine Null_Ewald_Reci_Structure_destroy
+    end subroutine Null_destroy
 
-    pure logical function Null_Ewald_Reci_Structure_is_dipolar(this, i_component) result(is_dipolar)
+    pure logical function Null_is_dipolar(this, i_component) result(is_dipolar)
         class(Null_Ewald_Reci_Structure), intent(in) :: this
         integer, intent(in) :: i_component
         is_dipolar = .false.
-    end function Null_Ewald_Reci_Structure_is_dipolar
+    end function Null_is_dipolar
 
-    pure subroutine Null_Ewald_Reci_Structure_set(this)
+    pure subroutine Null_set(this)
         class(Null_Ewald_Reci_Structure), intent(inout) :: this
-    end subroutine Null_Ewald_Reci_Structure_set
+    end subroutine Null_set
 
-    pure complex(DP) function Null_Ewald_Reci_Structure_get(this, n_1, n_2, n_3) &
-        result(structure)
+    pure complex(DP) function Null_get(this, n_1, n_2, n_3) result(structure)
         class(Null_Ewald_Reci_Structure), intent(in) :: this
         integer, intent(in) :: n_1, n_2, n_3
         structure = cmplx(0._DP, 0._DP, DP)
-    end function Null_Ewald_Reci_Structure_get
+    end function Null_get
 
-    pure subroutine Null_Ewald_Reci_Structure_update_move(this, i_component, new, old)
+    pure subroutine Null_update_move(this, i_component, new, old)
         class(Null_Ewald_Reci_Structure), intent(inout) :: this
         integer, intent(in) :: i_component
         type(Concrete_Temporary_Particle), intent(in) :: new, old
-    end subroutine Null_Ewald_Reci_Structure_update_move
+    end subroutine Null_update_move
 
-    pure subroutine Null_Ewald_Reci_Structure_update_rotation(this, i_component, new, old)
+    pure subroutine Null_update_rotation(this, i_component, new, old)
         class(Null_Ewald_Reci_Structure), intent(inout) :: this
         integer, intent(in) :: i_component
         type(Concrete_Temporary_Particle), intent(in) :: new, old
-    end subroutine Null_Ewald_Reci_Structure_update_rotation
+    end subroutine Null_update_rotation
 
 !end implementation Null_Ewald_Reci_Structure
 

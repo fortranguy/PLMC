@@ -17,12 +17,12 @@ private
         class(Abstract_Ewald_Convergence_Parameter), pointer :: alpha => null()
         real(DP), dimension(:, :, :), allocatable :: weight
     contains
-        procedure :: construct => Abstract_Ewald_Reci_Weight_construct
-        procedure :: destroy => Abstract_Ewald_Reci_Weight_destroy
-        procedure :: reset => Abstract_Ewald_Reci_Weight_set
-        procedure :: get_reci_numbers => Abstract_Ewald_Reci_Weight_get_reci_numbers
-        procedure :: get => Abstract_Ewald_Reci_Weight_get
-        procedure, private :: set => Abstract_Ewald_Reci_Weight_set
+        procedure :: construct => Abstract_construct
+        procedure :: destroy => Abstract_destroy
+        procedure :: reset => Abstract_set
+        procedure :: get_reci_numbers => Abstract_get_reci_numbers
+        procedure :: get => Abstract_get
+        procedure, private :: set => Abstract_set
     end type Abstract_Ewald_Reci_Weight
 
     type, extends(Abstract_Ewald_Reci_Weight), public :: Concrete_Ewald_Reci_Weight
@@ -31,19 +31,18 @@ private
 
     type, extends(Abstract_Ewald_Reci_Weight), public :: Null_Ewald_Reci_Weight
     contains
-        procedure :: construct => Null_Ewald_Reci_Weight_construct
-        procedure :: destroy => Null_Ewald_Reci_Weight_destroy
-        procedure :: reset => Null_Ewald_Reci_Weight_set
-        procedure :: get_reci_numbers => Null_Ewald_Reci_Weight_get_reci_numbers
-        procedure :: get => Null_Ewald_Reci_Weight_get
+        procedure :: construct => Null_construct
+        procedure :: destroy => Null_destroy
+        procedure :: reset => Null_set
+        procedure :: get_reci_numbers => Null_get_reci_numbers
+        procedure :: get => Null_get
     end type Null_Ewald_Reci_Weight
 
 contains
 
 !implementation Abstract_Ewald_Reci_Weight
 
-    subroutine Abstract_Ewald_Reci_Weight_construct(this, periodic_box, permittivity, &
-        reciprocal_lattice, alpha)
+    subroutine Abstract_construct(this, periodic_box, permittivity, reciprocal_lattice, alpha)
         class(Abstract_Ewald_Reci_Weight), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Permittivity), intent(in) :: permittivity
@@ -58,17 +57,17 @@ contains
                              0:this%reci_numbers(3)))
         this%weight = 0._DP
         call this%set()
-    end subroutine Abstract_Ewald_Reci_Weight_construct
+    end subroutine Abstract_construct
 
-    subroutine Abstract_Ewald_Reci_Weight_destroy(this)
+    subroutine Abstract_destroy(this)
         class(Abstract_Ewald_Reci_Weight), intent(inout) :: this
 
         if (allocated(this%weight)) deallocate(this%weight)
         this%alpha => null()
         this%periodic_box => null()
-    end subroutine Abstract_Ewald_Reci_Weight_destroy
+    end subroutine Abstract_destroy
 
-    pure subroutine Abstract_Ewald_Reci_Weight_set(this)
+    pure subroutine Abstract_set(this)
         class(Abstract_Ewald_Reci_Weight), intent(inout) :: this
 
         integer :: n_1, n_2, n_3
@@ -96,14 +95,14 @@ contains
         end do
         end do
         end do
-    end subroutine Abstract_Ewald_Reci_Weight_set
+    end subroutine Abstract_set
 
-    pure function Abstract_Ewald_Reci_Weight_get_reci_numbers(this) result(reci_numbers)
+    pure function Abstract_get_reci_numbers(this) result(reci_numbers)
         class(Abstract_Ewald_Reci_Weight), intent(in) :: this
         integer :: reci_numbers(num_dimensions)
 
         reci_numbers = this%reci_numbers
-    end function Abstract_Ewald_Reci_Weight_get_reci_numbers
+    end function Abstract_get_reci_numbers
 
     !> \[
     !>      w_\alpha(\vec{k}) =
@@ -112,45 +111,44 @@ contains
     !>              \frac{e^{-k^2/4\alpha^2}}{\epsilon V k^2}   & \text{else}
     !>          \end{cases}
     !> \]
-    pure real(DP) function Abstract_Ewald_Reci_Weight_get(this, n_1, n_2, n_3) result(weight)
+    pure real(DP) function Abstract_get(this, n_1, n_2, n_3) result(weight)
         class(Abstract_Ewald_Reci_Weight), intent(in) :: this
         integer, intent(in) :: n_1, n_2, n_3
 
         weight = this%weight(abs(n_1), abs(n_2), abs(n_3))
-    end function Abstract_Ewald_Reci_Weight_get
+    end function Abstract_get
 
 !end implementation Abstract_Ewald_Reci_Weight
 
 !implementation Null_Ewald_Reci_Weight
 
-    subroutine Null_Ewald_Reci_Weight_construct(this, periodic_box, permittivity, &
-        reciprocal_lattice, alpha)
+    subroutine Null_construct(this, periodic_box, permittivity, reciprocal_lattice, alpha)
         class(Null_Ewald_Reci_Weight), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Permittivity), intent(in) :: permittivity
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
         class(Abstract_Ewald_Convergence_Parameter), target, intent(in) :: alpha
-    end subroutine Null_Ewald_Reci_Weight_construct
+    end subroutine Null_construct
 
-    subroutine Null_Ewald_Reci_Weight_destroy(this)
+    subroutine Null_destroy(this)
         class(Null_Ewald_Reci_Weight), intent(inout) :: this
-    end subroutine Null_Ewald_Reci_Weight_destroy
+    end subroutine Null_destroy
 
-    pure subroutine Null_Ewald_Reci_Weight_set(this)
+    pure subroutine Null_set(this)
         class(Null_Ewald_Reci_Weight), intent(inout) :: this
-    end subroutine Null_Ewald_Reci_Weight_set
+    end subroutine Null_set
 
-    pure function Null_Ewald_Reci_Weight_get_reci_numbers(this) result(reci_numbers)
+    pure function Null_get_reci_numbers(this) result(reci_numbers)
         class(Null_Ewald_Reci_Weight), intent(in) :: this
         integer :: reci_numbers(num_dimensions)
         reci_numbers = 0
-    end function Null_Ewald_Reci_Weight_get_reci_numbers
+    end function Null_get_reci_numbers
 
-    pure real(DP) function Null_Ewald_Reci_Weight_get(this, n_1, n_2, n_3) result(weight)
+    pure real(DP) function Null_get(this, n_1, n_2, n_3) result(weight)
         class(Null_Ewald_Reci_Weight), intent(in) :: this
         integer, intent(in) :: n_1, n_2, n_3
         weight = 0._DP
-    end function Null_Ewald_Reci_Weight_get
+    end function Null_get
 
 !end implementation Null_Ewald_Reci_Weight
 

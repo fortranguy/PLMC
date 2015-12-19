@@ -18,12 +18,12 @@ private
         real(DP) :: factor_denominator
         class(Abstract_Component_Dipolar_Moments), pointer :: component_dipolar_moment => null()
     contains
-        procedure :: construct => Abstract_Ewald_Self_Component_construct
-        procedure :: destroy => Abstract_Ewald_Self_Component_destroy
-        procedure :: reset => Abstract_Ewald_Self_Component_set
-        procedure :: meet => Abstract_Ewald_Self_Component_meet
-        procedure :: visit => Abstract_Ewald_Self_Component_visit
-        procedure, private :: set => Abstract_Ewald_Self_Component_set
+        procedure :: construct => Abstract_construct
+        procedure :: destroy => Abstract_destroy
+        procedure :: reset => Abstract_set
+        procedure :: meet => Abstract_meet
+        procedure :: visit => Abstract_visit
+        procedure, private :: set => Abstract_set
     end type Abstract_Ewald_Self_Component
 
     type, extends(Abstract_Ewald_Self_Component), public :: Concrete_Ewald_Self_Component
@@ -32,19 +32,18 @@ private
 
     type, extends(Abstract_Ewald_Self_Component), public :: Null_Ewald_Self_Component
     contains
-        procedure :: construct => Null_Ewald_Self_Component_construct
-        procedure :: destroy => Null_Ewald_Self_Component_destroy
-        procedure :: reset => Null_Ewald_Self_Component_set
-        procedure :: visit => Null_Ewald_Self_Component_visit
-        procedure :: meet => Null_Ewald_Self_Component_meet
+        procedure :: construct => Null_construct
+        procedure :: destroy => Null_destroy
+        procedure :: reset => Null_set
+        procedure :: visit => Null_visit
+        procedure :: meet => Null_meet
     end type Null_Ewald_Self_Component
 
 contains
 
 !implementation Abstract_Ewald_Self_Component
 
-    subroutine Abstract_Ewald_Self_Component_construct(this, permittivity, &
-        component_dipolar_moment, alpha)
+    subroutine Abstract_construct(this, permittivity, component_dipolar_moment, alpha)
         class(Abstract_Ewald_Self_Component), intent(out) :: this
         class(Abstract_Permittivity), target, intent(in) :: permittivity
         class(Abstract_Component_Dipolar_Moments), target, intent(in) :: component_dipolar_moment
@@ -54,24 +53,24 @@ contains
         this%component_dipolar_moment => component_dipolar_moment
         this%alpha => alpha
         call this%set()
-    end subroutine Abstract_Ewald_Self_Component_construct
+    end subroutine Abstract_construct
 
-    subroutine Abstract_Ewald_Self_Component_set(this)
+    subroutine Abstract_set(this)
         class(Abstract_Ewald_Self_Component), intent(inout) :: this
 
         this%apha_cube = this%alpha%get()**3
         this%factor_denominator = 6._DP * this%permittivity%get() * PI**(3._DP/2._DP)
-    end subroutine Abstract_Ewald_Self_Component_set
+    end subroutine Abstract_set
 
-    subroutine Abstract_Ewald_Self_Component_destroy(this)
+    subroutine Abstract_destroy(this)
         class(Abstract_Ewald_Self_Component), intent(inout) :: this
 
         this%alpha => null()
         this%component_dipolar_moment => null()
         this%permittivity => null()
-    end subroutine Abstract_Ewald_Self_Component_destroy
+    end subroutine Abstract_destroy
 
-    pure real(DP) function Abstract_Ewald_Self_Component_visit(this) result(energy)
+    pure real(DP) function Abstract_visit(this) result(energy)
         class(Abstract_Ewald_Self_Component), intent(in) :: this
 
         integer :: i_particle
@@ -80,46 +79,45 @@ contains
         do i_particle = 1, this%component_dipolar_moment%get_num()
             energy = energy + this%meet(this%component_dipolar_moment%get(i_particle))
         end do
-    end function Abstract_Ewald_Self_Component_visit
+    end function Abstract_visit
 
     !> \[ u(\mu) = \frac{\alpha^3}{6\epsilon\pi^{3/2}} \vec{\mu}\cdot\vec{\mu} \]
-    pure real(DP) function Abstract_Ewald_Self_Component_meet(this, moment) result(energy)
+    pure real(DP) function Abstract_meet(this, moment) result(energy)
         class(Abstract_Ewald_Self_Component), intent(in) :: this
         real(DP), intent(in) :: moment(:)
 
         energy = this%apha_cube/this%factor_denominator * dot_product(moment, moment)
-    end function Abstract_Ewald_Self_Component_meet
+    end function Abstract_meet
 
 !end implementation Abstract_Ewald_Self_Component
 
 !implementation Null_Ewald_Self_Component
 
-    subroutine Null_Ewald_Self_Component_construct(this, permittivity, component_dipolar_moment, &
-        alpha)
+    subroutine Null_construct(this, permittivity, component_dipolar_moment, alpha)
         class(Null_Ewald_Self_Component), intent(out) :: this
         class(Abstract_Permittivity), target, intent(in) :: permittivity
         class(Abstract_Component_Dipolar_Moments), target, intent(in) :: component_dipolar_moment
         class(Abstract_Ewald_Convergence_Parameter), target, intent(in) :: alpha
-    end subroutine Null_Ewald_Self_Component_construct
+    end subroutine Null_construct
 
-    subroutine Null_Ewald_Self_Component_set(this)
+    subroutine Null_set(this)
         class(Null_Ewald_Self_Component), intent(inout) :: this
-    end subroutine Null_Ewald_Self_Component_set
+    end subroutine Null_set
 
-    subroutine Null_Ewald_Self_Component_destroy(this)
+    subroutine Null_destroy(this)
         class(Null_Ewald_Self_Component), intent(inout) :: this
-    end subroutine Null_Ewald_Self_Component_destroy
+    end subroutine Null_destroy
 
-    pure real(DP) function Null_Ewald_Self_Component_visit(this) result(energy)
+    pure real(DP) function Null_visit(this) result(energy)
         class(Null_Ewald_Self_Component), intent(in) :: this
         energy = 0._DP
-    end function Null_Ewald_Self_Component_visit
+    end function Null_visit
 
-    pure real(DP) function Null_Ewald_Self_Component_meet(this, moment) result(self)
+    pure real(DP) function Null_meet(this, moment) result(self)
         class(Null_Ewald_Self_Component), intent(in) :: this
         real(DP), intent(in) :: moment(:)
         self = 0._DP
-    end function Null_Ewald_Self_Component_meet
+    end function Null_meet
 
 !end implementation Null_Ewald_Self_Component
 

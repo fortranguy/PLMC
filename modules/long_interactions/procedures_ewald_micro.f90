@@ -5,8 +5,7 @@ use data_constants, only: num_dimensions, PI
 
 implicit none
 private
-public :: ewald_real_B, ewald_real_C, &
-       reci_number_1_sym, reci_number_2_sym, set_fourier, set_exp_n_3
+public :: ewald_real_B, ewald_real_C, reci_number_1_sym, reci_number_2_sym, set_fourier, set_exp_n_3
 
 contains
 

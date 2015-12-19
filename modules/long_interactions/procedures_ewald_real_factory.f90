@@ -108,8 +108,7 @@ contains
         end if
     end subroutine destroy_components
 
-    subroutine create_component(real_component, periodic_box, positions, dipolar_moments, &
-        real_pair)
+    subroutine create_component(real_component, periodic_box, positions, dipolar_moments, real_pair)
         class(Abstract_Ewald_Real_Component), allocatable, intent(out) :: real_component
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Component_Coordinates), intent(in) :: positions
@@ -133,8 +132,8 @@ contains
         end if
     end subroutine destroy_component
 
-    subroutine create_pairs(real_pairs, permittivity, min_distances, are_dipolar, &
-        alpha, input_data, prefix)
+    subroutine create_pairs(real_pairs, permittivity, min_distances, are_dipolar, alpha, &
+        input_data, prefix)
         type(Ewald_Real_Pairs_Wrapper), allocatable, intent(out) :: real_pairs(:)
         class(Abstract_Permittivity), intent(in) :: permittivity
         type(Minimum_Distances_Wrapper), intent(in) :: min_distances(:)
