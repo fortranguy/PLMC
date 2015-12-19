@@ -78,7 +78,6 @@ contains
         call selector%construct(nums_candidates)
         call one_particle_move%construct(environment, changes, selector)
         call selector%destroy()
-        deallocate(selector)
     end subroutine metropolis_algorithms_create_move
 
     subroutine metropolis_algorithms_create_rotation(one_particle_rotation, environment, &
@@ -108,7 +107,6 @@ contains
         call selector%construct(nums_candidates)
         call one_particle_rotation%construct(environment, changes, selector)
         call selector%destroy()
-        deallocate(selector)
     end subroutine metropolis_algorithms_create_rotation
 
     subroutine destroy_change(one_particle_change)
