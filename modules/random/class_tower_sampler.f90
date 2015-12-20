@@ -15,10 +15,10 @@ private
         integer :: num_choices
         real(DP), allocatable :: limits(:)
     contains
-        procedure :: construct => Abstract_Tower_Sampler_construct
-        procedure :: destroy => Abstract_Tower_Sampler_destroy
-        procedure :: get_num_choices => Abstract_Tower_Sampler_get_num_choices
-        procedure :: get => Abstract_Tower_Sampler_get
+        procedure :: construct => Abstract_construct
+        procedure :: destroy => Abstract_destroy
+        procedure :: get_num_choices => Abstract_get_num_choices
+        procedure :: get => Abstract_get
     end type Abstract_Tower_Sampler
 
     type, extends(Abstract_Tower_Sampler), public :: Concrete_Tower_Sampler
@@ -27,24 +27,24 @@ private
 
     type, extends(Abstract_Tower_Sampler), public :: Null_Tower_Sampler
     contains
-        procedure :: construct => Null_Tower_Sampler_construct
-        procedure :: destroy => Null_Tower_Sampler_destroy
-        procedure :: get_num_choices => Null_Tower_Sampler_get_num_choices
-        procedure :: get => Null_Tower_Sampler_get
+        procedure :: construct => Null_construct
+        procedure :: destroy => Null_destroy
+        procedure :: get_num_choices => Null_get_num_choices
+        procedure :: get => Null_get
     end type Null_Tower_Sampler
 
 contains
 
 !implementation Abstract_Tower_Sampler
 
-    subroutine Abstract_Tower_Sampler_construct(this, nums_candidates)
+    subroutine Abstract_construct(this, nums_candidates)
         class(Abstract_Tower_Sampler), intent(out) :: this
         integer, intent(in) :: nums_candidates(:)
 
         real(DP), allocatable :: cumulative_weight(:)
         integer :: i_candidate
 
-        call check_positive("Abstract_Tower_Sampler_construct", "sum(nums_candidates)", &
+        call check_positive("Abstract_Tower_Sampler: construct", "sum(nums_candidates)", &
             sum(nums_candidates))
         this%num_candidates = size(nums_candidates)
         this%num_choices = sum(nums_candidates)
@@ -63,21 +63,21 @@ contains
             this%limits(2:this%num_candidates + 1) = cumulative_weight
             deallocate(cumulative_weight)
         end if
-    end subroutine Abstract_Tower_Sampler_construct
+    end subroutine Abstract_construct
 
-    subroutine Abstract_Tower_Sampler_destroy(this)
+    subroutine Abstract_destroy(this)
         class(Abstract_Tower_Sampler), intent(inout) :: this
 
         if (allocated(this%limits)) deallocate(this%limits)
-    end subroutine Abstract_Tower_Sampler_destroy
+    end subroutine Abstract_destroy
 
-    integer pure function Abstract_Tower_Sampler_get_num_choices(this) result(num_choices)
+    pure integer function Abstract_get_num_choices(this) result(num_choices)
         class(Abstract_Tower_Sampler), intent(in) :: this
 
         num_choices = this%num_choices
-    end function Abstract_Tower_Sampler_get_num_choices
+    end function Abstract_get_num_choices
 
-    integer function Abstract_Tower_Sampler_get(this) result(i_random_candidate)
+    integer function Abstract_get(this) result(i_random_candidate)
         class(Abstract_Tower_Sampler), intent(in) :: this
 
         integer :: i_candidate
@@ -94,30 +94,30 @@ contains
                 return
             end if
         end do
-    end function Abstract_Tower_Sampler_get
+    end function Abstract_get
 
 !end implementation Abstract_Tower_Sampler
 
 !implementation Null_Tower_Sampler
 
-    subroutine Null_Tower_Sampler_construct(this, nums_candidates)
+    subroutine Null_construct(this, nums_candidates)
         class(Null_Tower_Sampler), intent(out) :: this
         integer, intent(in) :: nums_candidates(:)
-    end subroutine Null_Tower_Sampler_construct
+    end subroutine Null_construct
 
-    subroutine Null_Tower_Sampler_destroy(this)
+    subroutine Null_destroy(this)
         class(Null_Tower_Sampler), intent(inout) :: this
-    end subroutine Null_Tower_Sampler_destroy
+    end subroutine Null_destroy
 
-    integer pure function Null_Tower_Sampler_get_num_choices(this) result(num_choices)
+    pure integer function Null_get_num_choices(this) result(num_choices)
         class(Null_Tower_Sampler), intent(in) :: this
         num_choices = 0
-    end function Null_Tower_Sampler_get_num_choices
+    end function Null_get_num_choices
 
-    integer function Null_Tower_Sampler_get(this) result(i_random_candidate)
+    integer function Null_get(this) result(i_random_candidate)
         class(Null_Tower_Sampler), intent(in) :: this
         i_random_candidate = 0
-    end function Null_Tower_Sampler_get
+    end function Null_get
 
 !end implementation Null_Tower_Sampler
 
