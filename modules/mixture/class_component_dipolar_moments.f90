@@ -15,11 +15,11 @@ private
         real(DP) :: norm
         class(Abstract_Component_Coordinates), pointer :: orientations
     contains
-        procedure :: construct => Abstract_Component_Dipolar_Moments_construct
-        procedure :: destroy => Abstract_Component_Dipolar_Moments_destroy
-        procedure :: get_num => Abstract_Component_Dipolar_Moments_get_num
-        procedure :: get => Abstract_Component_Dipolar_Moments_get
-        procedure :: get_norm => Abstract_Component_Dipolar_Moments_get_norm
+        procedure :: construct => Abstract_construct
+        procedure :: destroy => Abstract_destroy
+        procedure :: get_num => Abstract_get_num
+        procedure :: get => Abstract_get
+        procedure :: get_norm => Abstract_get_norm
     end type Abstract_Component_Dipolar_Moments
 
     type, extends(Abstract_Component_Dipolar_Moments), public :: Concrete_Component_Dipolar_Moments
@@ -28,83 +28,83 @@ private
 
     type, extends(Abstract_Component_Dipolar_Moments), public :: Null_Component_Dipolar_Moments
     contains
-        procedure :: construct => Null_Component_Dipolar_Moments_construct
-        procedure :: destroy => Null_Component_Dipolar_Moments_destroy
-        procedure :: get_num => Null_Component_Dipolar_Moments_get_num
-        procedure :: get => Null_Component_Dipolar_Moments_get
-        procedure :: get_norm => Null_Component_Dipolar_Moments_get_norm
+        procedure :: construct => Null_construct
+        procedure :: destroy => Null_destroy
+        procedure :: get_num => Null_get_num
+        procedure :: get => Null_get
+        procedure :: get_norm => Null_get_norm
     end type Null_Component_Dipolar_Moments
 
 contains
 
 !implementation Abstract_Component_Dipolar_Moments
 
-    subroutine Abstract_Component_Dipolar_Moments_construct(this, norm, orientations)
+    subroutine Abstract_construct(this, norm, orientations)
         class(Abstract_Component_Dipolar_Moments), intent(out) :: this
         real(DP), intent(in) :: norm
         class(Abstract_Component_Coordinates), target, intent(in) :: orientations
 
-        call check_positive("Abstract_Component_Dipolar_Moments_construct", "norm", norm)
+        call check_positive("Abstract_construct", "norm", norm)
         this%norm = norm
         this%orientations => orientations
-    end subroutine Abstract_Component_Dipolar_Moments_construct
+    end subroutine Abstract_construct
 
-    subroutine Abstract_Component_Dipolar_Moments_destroy(this)
+    subroutine Abstract_destroy(this)
         class(Abstract_Component_Dipolar_Moments), intent(inout) :: this
 
         this%orientations => null()
-    end subroutine Abstract_Component_Dipolar_Moments_destroy
+    end subroutine Abstract_destroy
 
-    pure integer function Abstract_Component_Dipolar_Moments_get_num(this) result(num_moments)
+    pure integer function Abstract_get_num(this) result(num_moments)
         class(Abstract_Component_Dipolar_Moments), intent(in) :: this
 
         num_moments = this%orientations%get_num()
-    end function Abstract_Component_Dipolar_Moments_get_num
+    end function Abstract_get_num
 
-    pure function Abstract_Component_Dipolar_Moments_get(this, i_particle) result(moment)
+    pure function Abstract_get(this, i_particle) result(moment)
         class(Abstract_Component_Dipolar_Moments), intent(in) :: this
         integer, intent(in) :: i_particle
         real(DP) :: moment(num_dimensions)
 
         moment = this%norm * this%orientations%get(i_particle)
-    end function Abstract_Component_Dipolar_Moments_get
+    end function Abstract_get
 
-    pure real(DP) function Abstract_Component_Dipolar_Moments_get_norm(this) result(norm)
+    pure real(DP) function Abstract_get_norm(this) result(norm)
         class(Abstract_Component_Dipolar_Moments), intent(in) :: this
 
         norm = this%norm
-    end function Abstract_Component_Dipolar_Moments_get_norm
+    end function Abstract_get_norm
 
 !end implementation Abstract_Component_Dipolar_Moments
 
 !implementation Null_Component_Dipolar_Moments
 
-    subroutine Null_Component_Dipolar_Moments_construct(this, norm, orientations)
+    subroutine Null_construct(this, norm, orientations)
         class(Null_Component_Dipolar_Moments), intent(out) :: this
         real(DP), intent(in) :: norm
         class(Abstract_Component_Coordinates), target, intent(in) :: orientations
-    end subroutine Null_Component_Dipolar_Moments_construct
+    end subroutine Null_construct
 
-    subroutine Null_Component_Dipolar_Moments_destroy(this)
+    subroutine Null_destroy(this)
         class(Null_Component_Dipolar_Moments), intent(inout) :: this
-    end subroutine Null_Component_Dipolar_Moments_destroy
+    end subroutine Null_destroy
 
-    pure integer function Null_Component_Dipolar_Moments_get_num(this) result(num_moments)
+    pure integer function Null_get_num(this) result(num_moments)
         class(Null_Component_Dipolar_Moments), intent(in) :: this
         num_moments = 0
-    end function Null_Component_Dipolar_Moments_get_num
+    end function Null_get_num
 
-    pure function Null_Component_Dipolar_Moments_get(this, i_particle) result(moment)
+    pure function Null_get(this, i_particle) result(moment)
         class(Null_Component_Dipolar_Moments), intent(in) :: this
         integer, intent(in) :: i_particle
         real(DP) :: moment(num_dimensions)
         moment = 0._DP
-    end function Null_Component_Dipolar_Moments_get
+    end function Null_get
 
-    pure real(DP) function Null_Component_Dipolar_Moments_get_norm(this) result(norm)
+    pure real(DP) function Null_get_norm(this) result(norm)
         class(Null_Component_Dipolar_Moments), intent(in) :: this
         norm = 0._DP
-    end function Null_Component_Dipolar_Moments_get_norm
+    end function Null_get_norm
 
 !end implementation Null_Component_Dipolar_Moments
 

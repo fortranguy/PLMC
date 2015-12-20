@@ -44,12 +44,11 @@ contains
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        call mixture_create(mixture%components, environment%periodic_box, input_data, &
-            prefix)
+        call mixture_create(mixture%components, environment%periodic_box, input_data, prefix)
         call mixture_create(mixture%components_min_distances, mixture%components, input_data, &
             prefix)
-        call mixture_create(mixture%wall_min_distances, mixture%components, &
-            environment%walls_potential, input_data, prefix)
+        call mixture_create(mixture%wall_min_distances, mixture%components, environment%&
+            walls_potential, input_data, prefix)
     end subroutine create_all
 
     subroutine destroy_all(mixture)
@@ -101,8 +100,7 @@ contains
         end if
     end subroutine destroy_components
 
-    subroutine create_components_min_distances(min_distances, components, input_data, &
-        prefix)
+    subroutine create_components_min_distances(min_distances, components, input_data, prefix)
         type(Minimum_Distances_Wrapper), allocatable, intent(out) :: min_distances(:)
         type(Component_Wrapper), intent(in) :: components(:)
         type(json_file), intent(inout) :: input_data
@@ -146,8 +144,7 @@ contains
         end if
     end subroutine destroy_components_min_distances
 
-    subroutine create_wall_min_distances(min_distances, components, potential, input_data, &
-        prefix)
+    subroutine create_wall_min_distances(min_distances, components, potential, input_data, prefix)
         type(Minimum_Distance_Wrapper), allocatable, intent(out) :: min_distances(:)
         type(Component_Wrapper), intent(in) :: components(:)
         class(Abstract_Walls_Potential), intent(in) :: potential
