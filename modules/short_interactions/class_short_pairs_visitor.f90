@@ -13,11 +13,11 @@ private
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
     contains
-        procedure :: construct => Abstract_Short_Pairs_Visitor_construct
-        procedure :: destroy => Abstract_Short_Pairs_Visitor_destroy
+        procedure :: construct => Abstract_construct
+        procedure :: destroy => Abstract_destroy
         generic :: visit => visit_intra, visit_inter
-        procedure, private :: visit_intra => Abstract_Short_Pairs_Visitor_visit_intra
-        procedure, private :: visit_inter => Abstract_Short_Pairs_Visitor_visit_inter
+        procedure, private :: visit_intra => Abstract_visit_intra
+        procedure, private :: visit_inter => Abstract_visit_inter
     end type Abstract_Short_Pairs_Visitor
 
     type, extends(Abstract_Short_Pairs_Visitor), public :: Concrete_Short_Pairs_Visitor
@@ -26,31 +26,31 @@ private
 
     type, extends(Abstract_Short_Pairs_Visitor), public :: Null_Short_Pairs_Visitor
     contains
-        procedure :: construct => Null_Short_Pairs_Visitor_construct
-        procedure :: destroy => Null_Short_Pairs_Visitor_destroy
-        procedure, private :: visit_intra => Null_Short_Pairs_Visitor_visit_intra
-        procedure, private :: visit_inter => Null_Short_Pairs_Visitor_visit_inter
+        procedure :: construct => Null_construct
+        procedure :: destroy => Null_destroy
+        procedure, private :: visit_intra => Null_visit_intra
+        procedure, private :: visit_inter => Null_visit_inter
     end type Null_Short_Pairs_Visitor
 
 contains
 
 !implementation Abstract_Short_Pairs_Visitor
 
-    subroutine Abstract_Short_Pairs_Visitor_construct(this, periodic_box)
+    subroutine Abstract_construct(this, periodic_box)
         class(Abstract_Short_Pairs_Visitor), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
 
         this%periodic_box => periodic_box
-    end subroutine Abstract_Short_Pairs_Visitor_construct
+    end subroutine Abstract_construct
 
-    subroutine Abstract_Short_Pairs_Visitor_destroy(this)
+    subroutine Abstract_destroy(this)
         class(Abstract_Short_Pairs_Visitor), intent(inout) :: this
 
         this%periodic_box => null()
-    end subroutine Abstract_Short_Pairs_Visitor_destroy
+    end subroutine Abstract_destroy
 
-    pure subroutine Abstract_Short_Pairs_Visitor_visit_inter(this, overlap, energy, positions_1, &
-        positions_2, pair_potential)
+    pure subroutine Abstract_visit_inter(this, overlap, energy, positions_1, positions_2, &
+        pair_potential)
         class(Abstract_Short_Pairs_Visitor), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
@@ -71,10 +71,9 @@ contains
                 energy = energy + energy_ij
             end do
         end do
-    end subroutine Abstract_Short_Pairs_Visitor_visit_inter
+    end subroutine Abstract_visit_inter
 
-    pure subroutine Abstract_Short_Pairs_Visitor_visit_intra(this, overlap, energy, positions, &
-        pair_potential)
+    pure subroutine Abstract_visit_intra(this, overlap, energy, positions, pair_potential)
         class(Abstract_Short_Pairs_Visitor), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
@@ -95,35 +94,33 @@ contains
                 energy = energy + energy_ij
             end do
         end do
-    end subroutine Abstract_Short_Pairs_Visitor_visit_intra
+    end subroutine Abstract_visit_intra
 
 !end implementation Abstract_Short_Pairs_Visitor
 
 !implementation Null_Short_Pairs_Visitor
 
-    subroutine Null_Short_Pairs_Visitor_construct(this, periodic_box)
+    subroutine Null_construct(this, periodic_box)
         class(Null_Short_Pairs_Visitor), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-    end subroutine Null_Short_Pairs_Visitor_construct
+    end subroutine Null_construct
 
-    subroutine Null_Short_Pairs_Visitor_destroy(this)
+    subroutine Null_destroy(this)
         class(Null_Short_Pairs_Visitor), intent(inout) :: this
-    end subroutine Null_Short_Pairs_Visitor_destroy
+    end subroutine Null_destroy
 
-    pure subroutine Null_Short_Pairs_Visitor_visit_inter(this, overlap, energy, positions_1, &
-        positions_2, pair_potential)
+    pure subroutine Null_visit_inter(this, overlap, energy, positions_1, positions_2, &
+        pair_potential)
         class(Null_Short_Pairs_Visitor), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
-        class(Abstract_Component_Coordinates), intent(in) :: positions_1, &
-            positions_2
+        class(Abstract_Component_Coordinates), intent(in) :: positions_1, positions_2
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
         overlap = .false.
         energy = 0._DP
-    end subroutine Null_Short_Pairs_Visitor_visit_inter
+    end subroutine Null_visit_inter
 
-    pure subroutine Null_Short_Pairs_Visitor_visit_intra(this, overlap, energy, positions, &
-        pair_potential)
+    pure subroutine Null_visit_intra(this, overlap, energy, positions, pair_potential)
         class(Null_Short_Pairs_Visitor), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
@@ -131,7 +128,7 @@ contains
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
         overlap = .false.
         energy = 0._DP
-    end subroutine Null_Short_Pairs_Visitor_visit_intra
+    end subroutine Null_visit_intra
 
 !end implementation Null_Short_Pairs_Visitor
 

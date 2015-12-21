@@ -18,12 +18,12 @@ private
         class(Abstract_Component_Coordinates), pointer :: component_positions
         type(Concrete_Linkable_Node), pointer :: beginning
     contains
-        procedure :: construct => Abstract_Visitable_List_construct
-        procedure :: destroy => Abstract_Visitable_List_destroy
-        procedure :: set => Abstract_Visitable_List_set
-        procedure :: visit => Abstract_Visitable_List_visit
-        procedure :: add => Abstract_Visitable_List_add
-        procedure :: remove => Abstract_Visitable_List_remove
+        procedure :: construct => Abstract_construct
+        procedure :: destroy => Abstract_destroy
+        procedure :: set => Abstract_set
+        procedure :: visit => Abstract_visit
+        procedure :: add => Abstract_add
+        procedure :: remove => Abstract_remove
     end type Abstract_Visitable_List
 
     type, extends(Abstract_Visitable_List), public :: Concrete_Visitable_List
@@ -35,29 +35,29 @@ private
         integer, allocatable :: nodes(:)
         integer :: num_nodes
     contains
-        procedure :: construct =>  Concrete_Visitable_Array_construct
-        procedure :: destroy => Concrete_Visitable_Array_destroy
-        procedure :: set => Concrete_Visitable_Array_set
-        procedure :: visit => Concrete_Visitable_Array_visit
-        procedure :: add => Concrete_Visitable_Array_add
-        procedure :: remove => Concrete_Visitable_Array_remove
+        procedure :: construct =>  Array_construct
+        procedure :: destroy => Array_destroy
+        procedure :: set => Array_set
+        procedure :: visit => Array_visit
+        procedure :: add => Array_add
+        procedure :: remove => Array_remove
     end type Concrete_Visitable_Array
 
     type, extends(Abstract_Visitable_List), public :: Null_Visitable_List
     contains
-        procedure :: construct => Null_Visitable_List_construct
-        procedure :: destroy => Null_Visitable_List_destroy
-        procedure :: set => Null_Visitable_List_set
-        procedure :: visit => Null_Visitable_List_visit
-        procedure :: add => Null_Visitable_List_add
-        procedure :: remove => Null_Visitable_List_remove
+        procedure :: construct => Null_construct
+        procedure :: destroy => Null_destroy
+        procedure :: set => Null_set
+        procedure :: visit => Null_visit
+        procedure :: add => Null_add
+        procedure :: remove => Null_remove
     end type Null_Visitable_List
 
 contains
 
 !implementation Abstract_Visitable_List
 
-    subroutine Abstract_Visitable_List_construct(this, periodic_box, component_positions)
+    subroutine Abstract_construct(this, periodic_box, component_positions)
         class(Abstract_Visitable_List), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Component_Coordinates), target, intent(in) :: component_positions
@@ -74,17 +74,17 @@ contains
         next%i = 0
         current%next => next
         current => next
-    end subroutine Abstract_Visitable_List_construct
+    end subroutine Abstract_construct
 
-    subroutine Abstract_Visitable_List_destroy(this)
+    subroutine Abstract_destroy(this)
         class(Abstract_Visitable_List), intent(inout) :: this
 
         call deallocate_list(this%beginning)
         this%component_positions => null()
         this%periodic_box => null()
-    end subroutine Abstract_Visitable_List_destroy
+    end subroutine Abstract_destroy
 
-    subroutine Abstract_Visitable_List_set(this, i_target, i_particle)
+    subroutine Abstract_set(this, i_target, i_particle)
         class(Abstract_Visitable_List), intent(inout) :: this
         integer, intent(in) :: i_target, i_particle
 
@@ -103,10 +103,9 @@ contains
             end if
             current => next
         end do
-    end subroutine Abstract_Visitable_List_set
+    end subroutine Abstract_set
 
-    subroutine Abstract_Visitable_List_visit(this, overlap, energy, particle, pair_potential, &
-        i_exclude)
+    subroutine Abstract_visit(this, overlap, energy, particle, pair_potential, i_exclude)
         class(Abstract_Visitable_List), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
@@ -133,9 +132,9 @@ contains
             if (.not.associated(next%next)) return
             current => next
         end do
-    end subroutine Abstract_Visitable_List_visit
+    end subroutine Abstract_visit
 
-    subroutine Abstract_Visitable_List_add(this, i_particle)
+    subroutine Abstract_add(this, i_particle)
         class(Abstract_Visitable_List), intent(inout) :: this
         integer, intent(in) :: i_particle
 
@@ -147,9 +146,9 @@ contains
         new%next => previous%next
         previous%next => new
         new%i = i_particle
-    end subroutine Abstract_Visitable_List_add
+    end subroutine Abstract_add
 
-    subroutine Abstract_Visitable_List_remove(this, i_particle)
+    subroutine Abstract_remove(this, i_particle)
         class(Abstract_Visitable_List), intent(inout) :: this
         integer, intent(in) :: i_particle
 
@@ -170,13 +169,13 @@ contains
             end if
             current => next
         end do
-    end subroutine Abstract_Visitable_List_remove
+    end subroutine Abstract_remove
 
 !end implementation Abstract_Visitable_List
 
 !implementation Concrete_Visitable_Array
 
-    subroutine Concrete_Visitable_Array_construct(this, periodic_box, component_positions)
+    subroutine Array_construct(this, periodic_box, component_positions)
         class(Concrete_Visitable_Array), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Component_Coordinates), target, intent(in) :: component_positions
@@ -188,17 +187,17 @@ contains
         this%num_nodes = 0
         initial_size = 1
         allocate(this%nodes(initial_size))
-    end subroutine Concrete_Visitable_Array_construct
+    end subroutine Array_construct
 
-    subroutine Concrete_Visitable_Array_destroy(this)
+    subroutine Array_destroy(this)
         class(Concrete_Visitable_Array), intent(inout) :: this
 
         if (allocated(this%nodes)) deallocate(this%nodes)
         this%component_positions => null()
         this%periodic_box => null()
-    end subroutine Concrete_Visitable_Array_destroy
+    end subroutine Array_destroy
 
-    subroutine Concrete_Visitable_Array_set(this, i_target, i_particle)
+    subroutine Array_set(this, i_target, i_particle)
         class(Concrete_Visitable_Array), intent(inout) :: this
         integer, intent(in) :: i_target, i_particle
 
@@ -210,10 +209,9 @@ contains
                 return
             end if
         end do
-    end subroutine Concrete_Visitable_Array_set
+    end subroutine Array_set
 
-    subroutine Concrete_Visitable_Array_visit(this, overlap, energy, particle, pair_potential, &
-        i_exclude)
+    subroutine Array_visit(this, overlap, energy, particle, pair_potential, i_exclude)
         class(Concrete_Visitable_Array), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
@@ -234,9 +232,9 @@ contains
             if (overlap) return
             energy = energy + energy_i
         end do
-    end subroutine Concrete_Visitable_Array_visit
+    end subroutine Array_visit
 
-    subroutine Concrete_Visitable_Array_add(this, i_particle)
+    subroutine Array_add(this, i_particle)
         class(Concrete_Visitable_Array), intent(inout) :: this
         integer, intent(in) :: i_particle
 
@@ -245,9 +243,9 @@ contains
             call increase_nodes_size(this%nodes)
         end if
         this%nodes(this%num_nodes) = i_particle
-    end subroutine Concrete_Visitable_Array_add
+    end subroutine Array_add
 
-    subroutine Concrete_Visitable_Array_remove(this, i_particle)
+    subroutine Array_remove(this, i_particle)
         class(Concrete_Visitable_Array), intent(inout) :: this
         integer, intent(in) :: i_particle
 
@@ -258,28 +256,28 @@ contains
             call this%set(i_particle, i_last)
         end if
         this%num_nodes = this%num_nodes - 1
-    end subroutine Concrete_Visitable_Array_remove
+    end subroutine Array_remove
 
 !end implementation Concrete_Visitable_Array
 
 !implementation Null_Visitable_List
 
-    subroutine Null_Visitable_List_construct(this, periodic_box, component_positions)
+    subroutine Null_construct(this, periodic_box, component_positions)
         class(Null_Visitable_List), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Component_Coordinates), target, intent(in) :: component_positions
-    end subroutine Null_Visitable_List_construct
+    end subroutine Null_construct
 
-    subroutine Null_Visitable_List_destroy(this)
+    subroutine Null_destroy(this)
         class(Null_Visitable_List), intent(inout) :: this
-    end subroutine Null_Visitable_List_destroy
+    end subroutine Null_destroy
 
-    subroutine Null_Visitable_List_set(this, i_target, i_particle)
+    subroutine Null_set(this, i_target, i_particle)
         class(Null_Visitable_List), intent(inout) :: this
         integer, intent(in) :: i_target, i_particle
-    end subroutine Null_Visitable_List_set
+    end subroutine Null_set
 
-    subroutine Null_Visitable_List_visit(this, overlap, energy, particle, pair_potential, i_exclude)
+    subroutine Null_visit(this, overlap, energy, particle, pair_potential, i_exclude)
         class(Null_Visitable_List), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
@@ -288,17 +286,17 @@ contains
         integer, intent(in) :: i_exclude
         overlap = .false.
         energy = 0._DP
-    end subroutine Null_Visitable_List_visit
+    end subroutine Null_visit
 
-    subroutine Null_Visitable_List_add(this, i_particle)
+    subroutine Null_add(this, i_particle)
         class(Null_Visitable_List), intent(inout) :: this
         integer, intent(in) :: i_particle
-    end subroutine Null_Visitable_List_add
+    end subroutine Null_add
 
-    subroutine Null_Visitable_List_remove(this, i_particle)
+    subroutine Null_remove(this, i_particle)
         class(Null_Visitable_List), intent(inout) :: this
         integer, intent(in) :: i_particle
-    end subroutine Null_Visitable_List_remove
+    end subroutine Null_remove
 
 !end implementation Null_Visitable_List
 

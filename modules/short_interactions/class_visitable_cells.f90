@@ -29,72 +29,72 @@ private
         class(Abstract_Component_Coordinates), pointer :: component_positions
         class(Abstract_Pair_Potential), pointer :: pair_potential
     contains
-        procedure :: construct => Abstract_Visitable_Cells_construct
-        procedure :: destroy => Abstract_Visitable_Cells_destroy
-        procedure :: visit => Abstract_Visitable_Cells_visit
-        procedure :: move => Abstract_Visitable_Cells_move
-        procedure :: add => Abstract_Visitable_Cells_add
-        procedure :: remove => Abstract_Visitable_Cells_remove
-        procedure, private :: set_nums => Abstract_Visitable_Cells_set_nums
-        procedure(Abstract_Visitable_Cells_check_nums), private, deferred :: check_nums
-        procedure, private :: set_division => Abstract_Visitable_Cells_set_division
-        procedure, private :: check_division => Abstract_Visitable_Cells_check_division
+        procedure :: construct => Abstract_construct
+        procedure :: destroy => Abstract_destroy
+        procedure :: visit => Abstract_visit
+        procedure :: move => Abstract_move
+        procedure :: add => Abstract_add
+        procedure :: remove => Abstract_remove
+        procedure, private :: set_nums => Abstract_set_nums
+        procedure(Abstract_check_nums), private, deferred :: check_nums
+        procedure, private :: set_division => Abstract_set_division
+        procedure, private :: check_division => Abstract_check_division
         procedure, private :: construct_visitable_lists => &
-            Abstract_Visitable_Cells_construct_visitable_lists
-        procedure, private :: set_neighbours => Abstract_Visitable_Cells_set_neighbours
-        procedure, private :: index => Abstract_Visitable_Cells_index
-        procedure(Abstract_Visitable_Cells_set_skip_layers), private, deferred :: set_skip_layers
-        procedure, private :: skip_local => Abstract_Visitable_Cells_skip_local
-        procedure, private :: fill => Abstract_Visitable_Cells_fill
+            Abstract_construct_visitable_lists
+        procedure, private :: set_neighbours => Abstract_set_neighbours
+        procedure, private :: index => Abstract_index
+        procedure(Abstract_set_skip_layers), private, deferred :: set_skip_layers
+        procedure, private :: skip_local => Abstract_skip_local
+        procedure, private :: fill => Abstract_fill
     end type Abstract_Visitable_Cells
 
     abstract interface
 
-        subroutine Abstract_Visitable_Cells_check_nums(this)
+        subroutine Abstract_check_nums(this)
         import :: Abstract_Visitable_Cells
             class(Abstract_Visitable_Cells), intent(in) :: this
-        end subroutine Abstract_Visitable_Cells_check_nums
+        end subroutine Abstract_check_nums
 
-        pure subroutine Abstract_Visitable_Cells_set_skip_layers(this)
+        pure subroutine Abstract_set_skip_layers(this)
         import :: Abstract_Visitable_Cells
             class(Abstract_Visitable_Cells), intent(inout) :: this
-        end subroutine Abstract_Visitable_Cells_set_skip_layers
+        end subroutine Abstract_set_skip_layers
 
     end interface
 
     type, extends(Abstract_Visitable_Cells), public :: Null_Visitable_Cells
     contains
-        procedure :: construct => Null_Visitable_Cells_construct
-        procedure :: destroy => Null_Visitable_Cells_destroy
-        procedure :: visit => Null_Visitable_Cells_visit
-        procedure :: move => Null_Visitable_Cells_move
-        procedure :: add => Null_Visitable_Cells_add
-        procedure :: remove => Null_Visitable_Cells_remove
-        procedure, private :: check_nums => Null_Visitable_Cells_check_nums
-        procedure, private :: set_skip_layers => Null_Visitable_Cells_set_skip_layers
-        procedure, private :: fill => Null_Visitable_Cells_fill
+        procedure :: construct => Null_construct
+        procedure :: destroy => Null_destroy
+        procedure :: visit => Null_visit
+        procedure :: move => Null_move
+        procedure :: add => Null_add
+        procedure :: remove => Null_remove
+        procedure, private :: check_nums => Null_check_nums
+        procedure, private :: set_skip_layers => Null_set_skip_layers
+        procedure, private :: fill => Null_fill
     end type Null_Visitable_Cells
 
     type, extends(Abstract_Visitable_Cells), public :: XYZ_PBC_Visitable_Cells
     contains
-        procedure, private :: check_nums => XYZ_PBC_Visitable_Cells_check_nums
-        procedure, private :: set_skip_layers => XYZ_PBC_Visitable_Cells_set_skip_layers
+        procedure, private :: check_nums => XYZ_check_nums
+        procedure, private :: set_skip_layers => XYZ_set_skip_layers
     end type XYZ_PBC_Visitable_Cells
 
     type, extends(Abstract_Visitable_Cells), public :: XY_PBC_Visitable_Cells
     private
 
     contains
-        procedure, private :: check_nums => XY_PBC_Visitable_Cells_check_nums
-        procedure, private :: set_skip_layers => XY_PBC_Visitable_Cells_set_skip_layers
+        procedure, private :: check_nums => XY_check_nums
+        procedure, private :: set_skip_layers => XY_set_skip_layers
     end type XY_PBC_Visitable_Cells
 
 contains
 
 !implementation Abstract_Visitable_Cells
 
-    subroutine Abstract_Visitable_Cells_construct(this, list_mold, periodic_box, &
-            component_positions, pair_potential)
+    subroutine Abstract_construct(this, list_mold, periodic_box, component_positions, &
+        pair_potential)
         class(Abstract_Visitable_Cells), intent(out) :: this
         class(Abstract_Visitable_List), intent(in) :: list_mold
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
@@ -113,7 +113,6 @@ contains
                                       this%global_lbounds(3):this%global_ubounds(3)), &
                                       mold=list_mold)
         call this%construct_visitable_lists(periodic_box, component_positions)
-
         call this%set_skip_layers()
         allocate(this%neighbours(3, -nums_local_cells(1)/2:nums_local_cells(1)/2, &
                                     -nums_local_cells(2)/2:nums_local_cells(2)/2, &
@@ -123,40 +122,39 @@ contains
                                     this%global_lbounds(3):this%global_ubounds(3)))
         call this%set_neighbours()
         call this%fill()
-    end subroutine Abstract_Visitable_Cells_construct
+    end subroutine Abstract_construct
 
-    subroutine Abstract_Visitable_Cells_set_nums(this)
+    subroutine Abstract_set_nums(this)
         class(Abstract_Visitable_Cells), intent(inout) :: this
 
-        call check_positive("Abstract_Visitable_Cells", "this%pair_potential%get_max_distance()", &
-            this%pair_potential%get_max_distance())
+        call check_positive("Abstract_Visitable_Cells: set_nums", &
+            "this%pair_potential%get_max_distance()", this%pair_potential%get_max_distance())
         this%nums = floor(this%periodic_box%get_size()/this%pair_potential%get_max_distance())
-        call check_positive("Abstract_Visitable_Cells", "this%nums", this%nums)
+        call check_positive("Abstract_Visitable_Cells: set_nums", "this%nums", this%nums)
         call this%check_nums()
-    end subroutine Abstract_Visitable_Cells_set_nums
+    end subroutine Abstract_set_nums
 
-    subroutine Abstract_Visitable_Cells_set_division(this)
+    subroutine Abstract_set_division(this)
         class(Abstract_Visitable_Cells), intent(inout) :: this
 
         this%size = this%periodic_box%get_size() / real(this%nums, DP)
-        call check_positive("Abstract_Visitable_Cells", "this%size", this%size)
+        call check_positive("Abstract_Visitable_Cells: set_division", "this%size", this%size)
         call this%check_division()
-    end subroutine Abstract_Visitable_Cells_set_division
+    end subroutine Abstract_set_division
 
-    subroutine Abstract_Visitable_Cells_check_division(this)
+    subroutine Abstract_check_division(this)
         class(Abstract_Visitable_Cells), intent(in) :: this
 
         real(DP) :: box_mod_cell(num_dimensions)
 
         box_mod_cell = modulo(this%periodic_box%get_size(), this%size)
         if (any(box_mod_cell > real_zero .and. abs(box_mod_cell - this%size) > real_zero)) then
-            call error_exit("Abstract_Visitable_Cells:"//&
+            call error_exit("Abstract_Visitable_Cells: check_division: "//&
                             "this%size is not a divisor of periodic_box%get_size()")
         end if
-    end subroutine Abstract_Visitable_Cells_check_division
+    end subroutine Abstract_check_division
 
-    subroutine Abstract_Visitable_Cells_construct_visitable_lists(this, periodic_box, &
-        component_positions)
+    subroutine Abstract_construct_visitable_lists(this, periodic_box, component_positions)
         class(Abstract_Visitable_Cells), intent(inout) :: this
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Component_Coordinates), intent(in) :: component_positions
@@ -171,9 +169,9 @@ contains
         end do
         end do
         end do
-    end subroutine Abstract_Visitable_Cells_construct_visitable_lists
+    end subroutine Abstract_construct_visitable_lists
 
-    subroutine Abstract_Visitable_Cells_set_neighbours(this)
+    subroutine Abstract_set_neighbours(this)
         class(Abstract_Visitable_Cells), intent(inout) :: this
 
         integer :: global_i1, global_i2, global_i3
@@ -201,7 +199,7 @@ contains
         end do
         end do
         end do
-    end subroutine Abstract_Visitable_Cells_set_neighbours
+    end subroutine Abstract_set_neighbours
 
     pure function pbc_3d_index(i_cell, nums_cells)
         integer, intent(in) :: i_cell(:), nums_cells(:)
@@ -210,7 +208,7 @@ contains
         pbc_3d_index = modulo(i_cell + nums_cells/2, nums_cells) - nums_cells/2
     end function pbc_3d_index
 
-    pure function Abstract_Visitable_Cells_skip_local(this, bottom_layer, top_layer, local_i3) &
+    pure function Abstract_skip_local(this, bottom_layer, top_layer, local_i3) &
         result(skip_local)
         class(Abstract_Visitable_Cells), intent(in) :: this
         logical, intent(in) :: bottom_layer, top_layer
@@ -219,9 +217,9 @@ contains
 
         skip_local = (bottom_layer .and. this%skip_bottom_layer(local_i3)) &
             .or. (top_layer .and. this%skip_top_layer(local_i3))
-    end function Abstract_Visitable_Cells_skip_local
+    end function Abstract_skip_local
 
-    subroutine Abstract_Visitable_Cells_fill(this)
+    subroutine Abstract_fill(this)
         class(Abstract_Visitable_Cells), intent(inout) :: this
 
         type(Concrete_Temporary_Particle) :: particle
@@ -232,9 +230,9 @@ contains
             particle%position = this%component_positions%get(particle%i)
             call this%add(particle)
         end do
-    end subroutine Abstract_Visitable_Cells_fill
+    end subroutine Abstract_fill
 
-    subroutine Abstract_Visitable_Cells_destroy(this)
+    subroutine Abstract_destroy(this)
         class(Abstract_Visitable_Cells), intent(inout) :: this
 
         integer :: global_i1, global_i2, global_i3
@@ -251,9 +249,9 @@ contains
         this%pair_potential => null()
         this%component_positions => null()
         this%periodic_box => null()
-    end subroutine Abstract_Visitable_Cells_destroy
+    end subroutine Abstract_destroy
 
-    subroutine Abstract_Visitable_Cells_visit(this, overlap, energy, particle, i_exclude)
+    subroutine Abstract_visit(this, overlap, energy, particle, i_exclude)
         class(Abstract_Visitable_Cells), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
@@ -282,9 +280,9 @@ contains
         end do
         end do
         end do
-    end subroutine Abstract_Visitable_Cells_visit
+    end subroutine Abstract_visit
 
-    subroutine Abstract_Visitable_Cells_move(this, from, to)
+    subroutine Abstract_move(this, from, to)
         class(Abstract_Visitable_Cells), intent(inout) :: this
         type(Concrete_Temporary_Particle), intent(in) :: from, to
 
@@ -298,9 +296,9 @@ contains
             call this%visitable_lists(to_i_cell(1), to_i_cell(2), to_i_cell(3))%&
                 add(to%i)
         end if
-    end subroutine Abstract_Visitable_Cells_move
+    end subroutine Abstract_move
 
-    subroutine Abstract_Visitable_Cells_add(this, particle)
+    subroutine Abstract_add(this, particle)
         class(Abstract_Visitable_Cells), intent(inout) :: this
         type(Concrete_Temporary_Particle), intent(in) :: particle
 
@@ -308,9 +306,9 @@ contains
 
         i_cell = this%index(particle%position)
         call this%visitable_lists(i_cell(1), i_cell(2), i_cell(3))%add(particle%i)
-    end subroutine Abstract_Visitable_Cells_add
+    end subroutine Abstract_add
 
-    subroutine Abstract_Visitable_Cells_remove(this, particle)
+    subroutine Abstract_remove(this, particle)
         class(Abstract_Visitable_Cells), intent(inout) :: this
         type(Concrete_Temporary_Particle), intent(in) :: particle
 
@@ -322,9 +320,9 @@ contains
             call this%visitable_lists(i_cell(1), i_cell(2), &
                 i_cell(3))%set(this%component_positions%get_num(), particle%i)
         end if
-    end subroutine Abstract_Visitable_Cells_remove
+    end subroutine Abstract_remove
 
-    pure function Abstract_Visitable_Cells_index(this, position) result(index)
+    pure function Abstract_index(this, position) result(index)
         class(Abstract_Visitable_Cells), intent(in) :: this
         real(DP), intent(in) :: position(:)
         integer :: index(num_dimensions)
@@ -334,30 +332,29 @@ contains
         elsewhere
             index = nint(position/this%size)
         end where
-    end function Abstract_Visitable_Cells_index
+    end function Abstract_index
 
 !end implementation Abstract_Visitable_Cells
 
 !implementation Null_Visitable_Cells
 
-    subroutine Null_Visitable_Cells_construct(this, list_mold, periodic_box, component_positions, &
-            pair_potential)
+    subroutine Null_construct(this, list_mold, periodic_box, component_positions, pair_potential)
         class(Null_Visitable_Cells), intent(out) :: this
         class(Abstract_Visitable_List), intent(in) :: list_mold
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Component_Coordinates), target, intent(in) :: component_positions
         class(Abstract_Pair_Potential), target, intent(in) :: pair_potential
-    end subroutine Null_Visitable_Cells_construct
+    end subroutine Null_construct
 
-    subroutine Null_Visitable_Cells_fill(this)
+    subroutine Null_fill(this)
         class(Null_Visitable_Cells), intent(inout) :: this
-    end subroutine Null_Visitable_Cells_fill
+    end subroutine Null_fill
 
-    subroutine Null_Visitable_Cells_destroy(this)
+    subroutine Null_destroy(this)
         class(Null_Visitable_Cells), intent(inout) :: this
-    end subroutine Null_Visitable_Cells_destroy
+    end subroutine Null_destroy
 
-    subroutine Null_Visitable_Cells_visit(this, overlap, energy, particle, i_exclude)
+    subroutine Null_visit(this, overlap, energy, particle, i_exclude)
         class(Null_Visitable_Cells), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
@@ -365,63 +362,63 @@ contains
         integer, intent(in) :: i_exclude
         overlap = .false.
         energy = 0._DP
-    end subroutine Null_Visitable_Cells_visit
+    end subroutine Null_visit
 
-    subroutine Null_Visitable_Cells_move(this, from, to)
+    subroutine Null_move(this, from, to)
         class(Null_Visitable_Cells), intent(inout) :: this
         type(Concrete_Temporary_Particle), intent(in) :: from, to
-    end subroutine Null_Visitable_Cells_move
+    end subroutine Null_move
 
-    subroutine Null_Visitable_Cells_add(this, particle)
+    subroutine Null_add(this, particle)
         class(Null_Visitable_Cells), intent(inout) :: this
         type(Concrete_Temporary_Particle), intent(in) :: particle
-    end subroutine Null_Visitable_Cells_add
+    end subroutine Null_add
 
-    subroutine Null_Visitable_Cells_remove(this, particle)
+    subroutine Null_remove(this, particle)
         class(Null_Visitable_Cells), intent(inout) :: this
         type(Concrete_Temporary_Particle), intent(in) :: particle
-    end subroutine Null_Visitable_Cells_remove
+    end subroutine Null_remove
 
-    subroutine Null_Visitable_Cells_check_nums(this)
+    subroutine Null_check_nums(this)
         class(Null_Visitable_Cells), intent(in) :: this
-    end subroutine Null_Visitable_Cells_check_nums
+    end subroutine Null_check_nums
 
-    pure subroutine Null_Visitable_Cells_set_skip_layers(this)
+    pure subroutine Null_set_skip_layers(this)
         class(Null_Visitable_Cells), intent(inout) :: this
-    end subroutine Null_Visitable_Cells_set_skip_layers
+    end subroutine Null_set_skip_layers
 
 !end implementation Null_Visitable_Cells
 
 !implementation XYZ_PBC_Visitable_Cells
 
-    subroutine XYZ_PBC_Visitable_Cells_check_nums(this)
+    subroutine XYZ_check_nums(this)
         class(XYZ_PBC_Visitable_Cells), intent(in) :: this
 
         if (any(this%nums < nums_local_cells)) then
             call error_exit("XYZ_PBC_Visitable_Cells: this%nums is too small.")
         end if
-    end subroutine XYZ_PBC_Visitable_Cells_check_nums
+    end subroutine XYZ_check_nums
 
-    pure subroutine XYZ_PBC_Visitable_Cells_set_skip_layers(this)
+    pure subroutine XYZ_set_skip_layers(this)
         class(XYZ_PBC_Visitable_Cells), intent(inout) :: this
 
         this%skip_top_layer = .false.
         this%skip_bottom_layer = .false.
-    end subroutine XYZ_PBC_Visitable_Cells_set_skip_layers
+    end subroutine XYZ_set_skip_layers
 
 !end implementation XYZ_PBC_Visitable_Cells
 
 !implementation XY_PBC_Visitable_Cells
 
-    subroutine XY_PBC_Visitable_Cells_check_nums(this)
+    subroutine XY_check_nums(this)
         class(XY_PBC_Visitable_Cells), intent(in) :: this
 
         if (any(this%nums(1:2) < nums_local_cells(1:2))) then
             call error_exit("XY_PBC_Visitable_Cells: this%nums is too small.")
         end if
-    end subroutine XY_PBC_Visitable_Cells_check_nums
+    end subroutine XY_check_nums
 
-    pure subroutine XY_PBC_Visitable_Cells_set_skip_layers(this)
+    pure subroutine XY_set_skip_layers(this)
         class(XY_PBC_Visitable_Cells), intent(inout) :: this
 
         integer :: local_i3
@@ -438,7 +435,7 @@ contains
                 this%skip_bottom_layer(local_i3) = .false.
             end if
         end do
-    end subroutine XY_PBC_Visitable_Cells_set_skip_layers
+    end subroutine XY_set_skip_layers
 
 !end implementation XY_PBC_Visitable_Cells
 
