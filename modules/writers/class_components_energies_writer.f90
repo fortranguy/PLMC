@@ -28,11 +28,10 @@ private
         integer :: file_unit
         type(Strings_Wrapper), allocatable :: strings(:)
     contains
-        procedure :: construct => Abstract_Components_Energies_Writer_construct
-        procedure :: destroy => Abstract_Components_Energies_Writer_destroy
-        procedure :: write => Abstract_Components_Energies_Writer_write
-        procedure, private :: allocate_string => &
-            Abstract_Components_Energies_Writer_allocate_strings
+        procedure :: construct => Abstract_construct
+        procedure :: destroy => Abstract_destroy
+        procedure :: write => Abstract_write
+        procedure, private :: allocate_string => Abstract_allocate_strings
     end type Abstract_Components_Energies_Writer
 
     type, extends(Abstract_Components_Energies_Writer), public :: &
@@ -42,16 +41,16 @@ private
 
     type, extends(Abstract_Components_Energies_Writer), public :: Null_Components_Energies_Writer
     contains
-        procedure :: construct => Null_Components_Energies_Writer_construct
-        procedure :: destroy => Null_Components_Energies_Writer_destroy
-        procedure :: write => Null_Components_Energies_Writer_write
+        procedure :: construct => Null_construct
+        procedure :: destroy => Null_destroy
+        procedure :: write => Null_write
     end type Null_Components_Energies_Writer
 
 contains
 
 !implementation Abstract_Components_Energies_Writer
 
-    subroutine Abstract_Components_Energies_Writer_construct(this, filename, selector)
+    subroutine Abstract_construct(this, filename, selector)
         class(Abstract_Components_Energies_Writer), intent(out) :: this
         character(len=*), intent(in) :: filename
         type(Concrete_Components_Energies_Selector), intent(in) :: selector(:)
@@ -59,16 +58,16 @@ contains
         character(len=:), allocatable :: legend
         integer :: file_unit !strange gfortran behaviour: otherwise writes to output_unit.
 
-        call check_string_not_empty("Abstract_Components_Energies_Writer_construct: filename", &
+        call check_string_not_empty("Abstract_Components_Energies_Writer: construct: filename", &
             filename)
         open(newunit=file_unit, recl=max_line_length, file=filename, action="write")
         legend = "# i_step"
         call this%allocate_string(legend, selector)
         this%file_unit = file_unit
         write(this%file_unit, *) legend
-    end subroutine Abstract_Components_Energies_Writer_construct
+    end subroutine Abstract_construct
 
-    subroutine Abstract_Components_Energies_Writer_allocate_strings(this, legend, selector)
+    subroutine Abstract_allocate_strings(this, legend, selector)
         class(Abstract_Components_Energies_Writer), intent(out) :: this
         character(len=:), allocatable, intent(inout) :: legend
         type(Concrete_Components_Energies_Selector), intent(in) :: selector(:)
@@ -90,9 +89,9 @@ contains
                 end if
             end do
         end do
-    end subroutine Abstract_Components_Energies_Writer_allocate_strings
+    end subroutine Abstract_allocate_strings
 
-    subroutine Abstract_Components_Energies_Writer_destroy(this)
+    subroutine Abstract_destroy(this)
         class(Abstract_Components_Energies_Writer), intent(inout) :: this
 
         integer :: i_component
@@ -106,9 +105,9 @@ contains
             deallocate(this%strings)
         end if
         close(this%file_unit)
-    end subroutine Abstract_Components_Energies_Writer_destroy
+    end subroutine Abstract_destroy
 
-    subroutine Abstract_Components_Energies_Writer_write(this, i_step, components_energies)
+    subroutine Abstract_write(this, i_step, components_energies)
         class(Abstract_Components_Energies_Writer), intent(in) :: this
         integer, intent(in) :: i_step
         type(Concrete_Components_Energies), intent(in) :: components_energies(:)
@@ -127,27 +126,27 @@ contains
             end do
         end do
         write(this%file_unit, *) i_step, energies
-    end subroutine Abstract_Components_Energies_Writer_write
+    end subroutine Abstract_write
 
 !end implementation Abstract_Components_Energies_Writer
 
 !implementation Null_Components_Energies_Writer
 
-    subroutine Null_Components_Energies_Writer_construct(this, filename, selector)
+    subroutine Null_construct(this, filename, selector)
         class(Null_Components_Energies_Writer), intent(out) :: this
         character(len=*), intent(in) :: filename
         type(Concrete_Components_Energies_Selector), intent(in) :: selector(:)
-    end subroutine Null_Components_Energies_Writer_construct
+    end subroutine Null_construct
 
-    subroutine Null_Components_Energies_Writer_destroy(this)
+    subroutine Null_destroy(this)
         class(Null_Components_Energies_Writer), intent(inout) :: this
-    end subroutine Null_Components_Energies_Writer_destroy
+    end subroutine Null_destroy
 
-    subroutine Null_Components_Energies_Writer_write(this, i_step, components_energies)
+    subroutine Null_write(this, i_step, components_energies)
         class(Null_Components_Energies_Writer), intent(in) :: this
         integer, intent(in) :: i_step
         type(Concrete_Components_Energies), intent(in) :: components_energies(:)
-    end subroutine Null_Components_Energies_Writer_write
+    end subroutine Null_write
 
 !end implementation Null_Components_Energies_Writer
 
