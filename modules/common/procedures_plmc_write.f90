@@ -34,8 +34,8 @@ contains
             end do
         end if
         call writers%short_energies%write(i_step, observables%short_energies)
-        call writers%long_energies_wo_reci%write(i_step, observables%long_energies_wo_reci)
-        call writers%reci_energy%write(i_step, observables%reci_energy)
+        call writers%long_energies%write(i_step, observables%long_energies)
+        call writers%long_mixture_energy%write(i_step, observables%long_mixture_energy)
     end subroutine write_observables
 
 end module procedures_plmc_write

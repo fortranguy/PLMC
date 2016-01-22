@@ -25,9 +25,9 @@ private
         procedure :: reset => Abstract_set
         procedure :: is_dipolar => Abstract_is_dipolar
         procedure :: get => Abstract_get
-        procedure, private :: set => Abstract_set
         procedure :: update_move => Abstract_update_move
         procedure :: update_rotation => Abstract_update_rotation
+        procedure, private :: set => Abstract_set
     end type Abstract_Ewald_Reci_Structure
 
     type, extends(Abstract_Ewald_Reci_Structure), public :: Concrete_Ewald_Reci_Structure

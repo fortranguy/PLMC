@@ -42,7 +42,7 @@ implicit none
     call plmc_set_num_steps(input_data)
     call plmc_create(changes, environment%periodic_box, mixture%components, input_data)
     call plmc_create(metropolis_algorithms, environment, changes)
-    call plmc_set(metropolis_algorithms, mixture%components, short_interactions, long_interactions)
+    call plmc_set(metropolis_algorithms, mixture, short_interactions, long_interactions)
     call plmc_propagator_create(metropolis_algorithms)
     call plmc_create(observables, mixture%components)
     call plmc_create(writers, mixture%components, short_interactions, long_interactions, changes, &
@@ -66,6 +66,7 @@ implicit none
         call plmc_write(i_step, writers, observables)
     end do
     write(output_unit, *) "Iterations end."
+    call plmc_reset(mixture%total_moment)
     call plmc_reset(long_interactions)
     call plmc_visit(observables, mixture, short_interactions, long_interactions)
     call plmc_write(i_step-1, writers, observables)

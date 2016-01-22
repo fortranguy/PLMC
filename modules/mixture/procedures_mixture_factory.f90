@@ -7,18 +7,20 @@ use class_number_to_string, only: Concrete_Number_to_String
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_walls_potential, only: Abstract_Walls_Potential
 use types_environment_wrapper, only: Environment_Wrapper
+use class_mixture_total_moment, only: Abstract_Mixture_Total_Moment, &
+    Concrete_Mixture_Total_Moment, Null_Mixture_Total_Moment
 use types_component_wrapper, only: Component_Wrapper
 use class_minimum_distance, only: Abstract_Minimum_Distance, Concrete_Minimum_Distance, &
     Null_Minimum_Distance
 use procedures_component_factory, only: component_create, component_destroy
 use types_mixture_wrapper, only: Minimum_Distance_Wrapper, Minimum_Distances_Wrapper, &
     Mixture_Wrapper
-use procedures_property_inquirers, only: use_walls, component_exists
+use procedures_property_inquirers, only: use_walls, component_exists, component_is_dipolar
 
 implicit none
 
 private
-public :: mixture_create, mixture_destroy
+public :: mixture_create, mixture_destroy, mixture_set
 
 interface mixture_create
     module procedure :: create_all
@@ -26,15 +28,21 @@ interface mixture_create
     module procedure :: create_components_min_distances
     module procedure :: create_min_distance
     module procedure :: create_wall_min_distances
+    module procedure :: create_total_moment
 end interface mixture_create
 
 interface mixture_destroy
+    module procedure :: destroy_total_moment
     module procedure :: destroy_min_distance
     module procedure :: destroy_min_distances
     module procedure :: destroy_components_min_distances
     module procedure :: destroy_components
     module procedure :: destroy_all
 end interface mixture_destroy
+
+interface mixture_set
+    module procedure :: set_are_dipolar
+end interface mixture_set
 
 contains
 
@@ -49,11 +57,13 @@ contains
             prefix)
         call mixture_create(mixture%wall_min_distances, mixture%components, environment%&
             walls_potential, input_data, prefix)
+        call mixture_create(mixture%total_moment, mixture%components)
     end subroutine create_all
 
     subroutine destroy_all(mixture)
         type(Mixture_Wrapper), intent(inout) :: mixture
 
+        call mixture_destroy(mixture%total_moment)
         call mixture_destroy(mixture%wall_min_distances)
         call mixture_destroy(mixture%components_min_distances)
         call mixture_destroy(mixture%components)
@@ -203,5 +213,40 @@ contains
 
         if (allocated(min_distance)) deallocate(min_distance)
     end subroutine destroy_min_distance
+
+    subroutine create_total_moment(total_moment, components)
+        class(Abstract_Mixture_Total_Moment), allocatable, intent(out) :: total_moment
+        type(Component_Wrapper), intent(in) :: components(:)
+
+        logical :: are_dipolar(size(components))
+
+        call mixture_set(are_dipolar, components)
+        if (any(are_dipolar)) then
+            allocate(Concrete_Mixture_Total_Moment :: total_moment)
+        else
+            allocate(Null_Mixture_Total_Moment :: total_moment)
+        end if
+        call total_moment%construct(components, are_dipolar)
+    end subroutine create_total_moment
+
+    subroutine destroy_total_moment(total_moment)
+        class(Abstract_Mixture_Total_Moment), allocatable, intent(inout) :: total_moment
+
+        if (allocated(total_moment)) then
+            call total_moment%destroy()
+            deallocate(total_moment)
+        end if
+    end subroutine destroy_total_moment
+
+    subroutine set_are_dipolar(are_dipolar, components)
+        logical, intent(out) :: are_dipolar(:)
+        type(Component_Wrapper), intent(in) :: components(:)
+
+        integer :: i_component
+
+        do i_component = 1, size(are_dipolar)
+            are_dipolar(i_component) = component_is_dipolar(components(i_component)%dipolar_moments)
+        end do
+    end subroutine set_are_dipolar
 
 end module procedures_mixture_factory

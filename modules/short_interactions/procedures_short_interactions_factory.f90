@@ -183,7 +183,7 @@ contains
                 type is (XY_Periodic_Box)
                     allocate(XY_PBC_Visitable_Cells :: cells(size(pairs), size(pairs)))
                 class default
-                    call error_exit("periodic_box type unknown.")
+                    call error_exit("create_components_cells: periodic_box type unknown.")
             end select
         else
             allocate(Null_Visitable_Cells :: cells(size(pairs), size(pairs)))

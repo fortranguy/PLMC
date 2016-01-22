@@ -53,15 +53,12 @@ contains
         call this%component%number%set(this%component%number%get() + 1)
         call this%component%positions%add(particle%position)
         call this%component%orientations%add(particle%orientation)
-        call this%component%total_moment%add(this%component%dipolar_moments%get(&
-            this%component%number%get()))
     end subroutine Abstract_add
 
     subroutine Abstract_remove(this, i_particle)
         class(Abstract_Component_Exchange), intent(inout) :: this
         integer, intent(in) :: i_particle
 
-        call this%component%total_moment%remove(this%component%dipolar_moments%get(i_particle))
         call this%component%orientations%remove(i_particle)
         call this%component%positions%remove(i_particle)
         call this%component%number%set(this%component%number%get() - 1)

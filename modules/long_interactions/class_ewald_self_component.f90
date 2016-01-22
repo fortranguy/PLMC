@@ -21,9 +21,9 @@ private
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
         procedure :: reset => Abstract_set
-        procedure :: meet => Abstract_meet
         procedure :: visit => Abstract_visit
         procedure, private :: set => Abstract_set
+        procedure, private :: meet => Abstract_meet
     end type Abstract_Ewald_Self_Component
 
     type, extends(Abstract_Ewald_Self_Component), public :: Concrete_Ewald_Self_Component
@@ -36,7 +36,7 @@ private
         procedure :: destroy => Null_destroy
         procedure :: reset => Null_set
         procedure :: visit => Null_visit
-        procedure :: meet => Null_meet
+        procedure, private :: meet => Null_meet
     end type Null_Ewald_Self_Component
 
 contains

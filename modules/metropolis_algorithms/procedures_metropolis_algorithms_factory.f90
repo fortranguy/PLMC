@@ -2,7 +2,7 @@ module procedures_metropolis_algorithms_factory
 
 use json_module, only: json_file
 use types_environment_wrapper, only: Environment_Wrapper
-use types_component_wrapper, only: Component_Wrapper
+use types_mixture_wrapper, only: Mixture_Wrapper
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use types_long_interactions_wrapper, only: Long_Interactions_Wrapper
@@ -118,15 +118,15 @@ contains
         end if
     end subroutine destroy_change
 
-    subroutine set_all(metropolis_algorithms, components, short_interactions, long_interactions)
+    subroutine set_all(metropolis_algorithms, mixture, short_interactions, long_interactions)
         type(Metropolis_Algorithms_Wrapper), intent(inout) :: metropolis_algorithms
-        type(Component_Wrapper), intent(in) :: components(:)
+        type(Mixture_Wrapper), intent(in) :: mixture
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
         type(Long_Interactions_Wrapper), intent(in) :: long_interactions
 
-        call metropolis_algorithms%one_particle_move%set_candidates(components, &
-            short_interactions, long_interactions)
-        call metropolis_algorithms%one_particle_rotation%set_candidates(components, &
+        call metropolis_algorithms%one_particle_move%set_candidates(mixture, short_interactions, &
+            long_interactions)
+        call metropolis_algorithms%one_particle_rotation%set_candidates(mixture, &
             short_interactions, long_interactions)
     end subroutine set_all
 

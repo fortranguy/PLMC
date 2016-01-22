@@ -42,7 +42,7 @@ contains
 
         call plmc_visit(observables%walls_energies, mixture%components, short_interactions)
         call plmc_visit(observables%short_energies, mixture%components, short_interactions)
-        call plmc_visit(observables%long_energies_wo_reci, observables%reci_energy, mixture%&
+        call plmc_visit(observables%long_energies, observables%long_mixture_energy, mixture%&
             components, long_interactions)
     end subroutine visit_all
 
@@ -127,9 +127,9 @@ contains
         end do
     end subroutine visit_short_inter
 
-    pure subroutine visit_long(energies, reci_energy, components, long_interactions)
+    pure subroutine visit_long(energies, long_mixture_energy, components, long_interactions)
         type(Concrete_Components_Energies), intent(inout) :: energies(:)
-        real(DP), intent(out) :: reci_energy
+        real(DP), intent(out) :: long_mixture_energy
         type(Component_Wrapper), intent(in) :: components(:)
         type(Long_Interactions_Wrapper), intent(in) :: long_interactions
 
@@ -143,7 +143,8 @@ contains
         call Concrete_Components_Energies_add(energies, real_energies)
         call destroy_components_energies_nodes(real_energies)
 
-        reci_energy = long_interactions%reci_visitor%visit()
+        long_mixture_energy = long_interactions%reci_visitor%visit() + &
+                              long_interactions%surf_mixture%visit()
 
         call visit_long_self(self_energies, long_interactions%self_components)
         call Concrete_Components_Energies_add(energies, -self_energies)

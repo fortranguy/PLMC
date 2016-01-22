@@ -1,5 +1,6 @@
 module procedures_plmc_reset
 
+use class_mixture_total_moment, only: Abstract_Mixture_Total_Moment
 use types_long_interactions_wrapper, only: Ewald_Real_Pairs_Wrapper, Long_Interactions_Wrapper
 
 implicit none
@@ -8,11 +9,18 @@ private
 public :: plmc_reset
 
 interface plmc_reset
+    module procedure :: reset_total_moments
     module procedure :: reset_long
     module procedure :: reset_long_real
 end interface plmc_reset
 
 contains
+
+    subroutine reset_total_moments(total_moment)
+        class(Abstract_Mixture_Total_Moment), intent(inout) :: total_moment
+
+        call total_moment%reset()
+    end subroutine reset_total_moments
 
     !> When using Ewald, some quantities may need to be reset to reflect the actual configuration.
     subroutine reset_long(long_interactions)

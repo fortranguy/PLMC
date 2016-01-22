@@ -14,8 +14,6 @@ use class_component_chemical_potential, only : Abstract_Component_Chemical_Poten
     Concrete_Component_Chemical_Potential, Null_Component_Chemical_Potential
 use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments, &
     Concrete_Component_Dipolar_Moments, Null_Component_Dipolar_Moments
-use class_component_total_moment, only: Abstract_Component_Total_Moment, &
-    Concrete_Component_Total_Moment, Null_Component_Total_Moment
 use types_component_wrapper, only: Component_Wrapper
 use procedures_property_inquirers, only: use_walls, component_is_dipolar, component_can_exchange
 
@@ -30,7 +28,6 @@ interface component_create
     module procedure :: create_positions
     module procedure :: create_orientations
     module procedure :: create_dipolar_moments
-    module procedure :: create_total_moment
     module procedure :: create_chemical_potential
 end interface component_create
 
@@ -40,7 +37,6 @@ end interface component_set
 
 interface component_destroy
     module procedure :: destroy_chemical_potential
-    module procedure :: destroy_total_moment
     module procedure :: destroy_dipolar_moments
     module procedure :: destroy_coordinates
     module procedure :: destroy_number
@@ -67,7 +63,6 @@ contains
             prefix//"initial orientations")
         call component_create(component%dipolar_moments, is_dipolar, component%orientations, &
             input_data, prefix)
-        call component_create(component%total_moment, component%dipolar_moments)
         can_exchange = exists .and. component_can_exchange(input_data, prefix)
         call component_create(component%chemical_potential, can_exchange, input_data, &
             prefix)
@@ -77,7 +72,6 @@ contains
         type(Component_Wrapper), intent(inout) :: component
 
         call component_destroy(component%chemical_potential)
-        call component_destroy(component%total_moment)
         call component_destroy(component%dipolar_moments)
         call component_destroy(component%orientations)
         call component_destroy(component%positions)
@@ -216,27 +210,6 @@ contains
             deallocate(component_dipolar_moments)
         end if
     end subroutine destroy_dipolar_moments
-
-    subroutine create_total_moment(component_total_moment, component_dipolar_moments)
-        class(Abstract_Component_Total_Moment), allocatable, intent(out) :: component_total_moment
-        class(Abstract_Component_Dipolar_Moments), intent(in) :: component_dipolar_moments
-
-        if (component_is_dipolar(component_dipolar_moments)) then
-            allocate(Concrete_Component_Total_Moment :: component_total_moment)
-        else
-            allocate(Null_Component_Total_Moment :: component_total_moment)
-        end if
-        call component_total_moment%construct(component_dipolar_moments)
-    end subroutine create_total_moment
-
-    subroutine destroy_total_moment(component_total_moment)
-        class(Abstract_Component_Total_Moment), allocatable, intent(inout) :: component_total_moment
-
-        if (allocated(component_total_moment)) then
-            call component_total_moment%destroy()
-            deallocate(component_total_moment)
-        end if
-    end subroutine destroy_total_moment
 
     subroutine create_chemical_potential(component_chemical_potential, can_exchange, input_data, &
             prefix)

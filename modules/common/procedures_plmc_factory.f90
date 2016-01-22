@@ -183,14 +183,13 @@ contains
         call metropolis_algorithms_create(metropolis, environment, changes%components)
     end subroutine create_metropolis
 
-    subroutine set_metropolis(metropolis, components, short_interactions, long_interactions)
+    subroutine set_metropolis(metropolis, mixture, short_interactions, long_interactions)
         type(Metropolis_Algorithms_Wrapper), intent(inout) :: metropolis
-        type(Component_Wrapper), intent(in) :: components(:)
+        type(Mixture_Wrapper), intent(in) :: mixture
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
         type(Long_Interactions_Wrapper), intent(in) :: long_interactions
 
-        call metropolis_algorithms_set(metropolis, components, short_interactions, &
-            long_interactions)
+        call metropolis_algorithms_set(metropolis, mixture, short_interactions, long_interactions)
     end subroutine set_metropolis
 
     subroutine destroy_metropolis(metropolis)

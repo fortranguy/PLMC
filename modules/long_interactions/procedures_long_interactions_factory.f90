@@ -10,37 +10,34 @@ use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use types_environment_wrapper, only: Environment_Wrapper
 use types_component_wrapper, only: Component_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
+use procedures_mixture_factory, only: mixture_set
 use class_ewald_convergence_parameter, only: Abstract_Ewald_Convergence_Parameter, &
     Concrete_Ewald_Convergence_Parameter, Null_Ewald_Convergence_Parameter
 use types_long_interactions_wrapper, only: Long_Interactions_Wrapper
-use procedures_property_inquirers, only: use_permittivity, use_reciprocal_lattice, &
-    component_is_dipolar
+use procedures_property_inquirers, only: use_permittivity, use_reciprocal_lattice
 use procedures_ewald_real_factory, only: ewald_real_create, ewald_real_destroy
 use procedures_ewald_reci_factory, only: ewald_reci_create, ewald_reci_destroy
 use procedures_ewald_self_factory, only: ewald_self_create, ewald_self_destroy
+use procedures_ewald_surf_factory, only: ewald_surf_create, ewald_surf_destroy
 
 implicit none
 
 private
-public :: long_interactions_create, long_interactions_set, long_interactions_destroy
+public :: long_interactions_create, long_interactions_destroy
 
 interface long_interactions_create
     module procedure :: create_all
     module procedure :: create_alpha
 end interface long_interactions_create
 
-interface long_interactions_set
-    module procedure :: set_are_dipolar
-end interface long_interactions_set
-
-interface long_interactions_check
-    module procedure :: check_consistency
-end interface long_interactions_check
-
 interface long_interactions_destroy
     module procedure :: destroy_alpha
     module procedure :: destroy_all
 end interface long_interactions_destroy
+
+interface long_interactions_check
+    module procedure :: check_consistency
+end interface long_interactions_check
 
 contains
 
@@ -53,7 +50,7 @@ contains
 
         logical :: are_dipolar(size(mixture%components))
 
-        call long_interactions_set(are_dipolar, mixture%components)
+        call mixture_set(are_dipolar, mixture%components)
         call long_interactions_check(environment%reciprocal_lattice, environment%permittivity, &
             any(are_dipolar))
         call long_interactions_create(long_interactions%alpha, environment%periodic_box, &
@@ -76,10 +73,15 @@ contains
 
         call ewald_self_create(long_interactions%self_components, environment%permittivity, &
             mixture%components, are_dipolar, long_interactions%alpha)
+
+        call ewald_surf_create(long_interactions%surf_mixture, environment%periodic_box, &
+            environment%permittivity, mixture%total_moment)
     end subroutine create_all
 
     subroutine destroy_all(long_interactions)
         type(Long_Interactions_Wrapper), intent(inout) :: long_interactions
+
+        call ewald_surf_destroy(long_interactions%surf_mixture)
 
         call ewald_self_destroy(long_interactions%self_components)
 
@@ -124,17 +126,6 @@ contains
             deallocate(alpha)
         end if
     end subroutine destroy_alpha
-
-    subroutine set_are_dipolar(are_dipolar, components)
-        logical, intent(out) :: are_dipolar(:)
-        type(Component_Wrapper), intent(in) :: components(:)
-
-        integer :: i_component
-
-        do i_component = 1, size(are_dipolar)
-            are_dipolar(i_component) = component_is_dipolar(components(i_component)%dipolar_moments)
-        end do
-    end subroutine set_are_dipolar
 
     subroutine check_consistency(reciprocal_lattice, permittivity, dipoles_exist)
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice

@@ -86,7 +86,7 @@ contains
         energy = energy / 2._DP
     end function Abstract_visit
 
-    !> Energy delta when a particle \( \mathsf{i} \) of component \( \mathsf{I} \) moves.
+    !> Energy delta when a particle \( \mathsf{i} \) moves.
     !> \[
     !>      \Delta U_{\mathsf{I}, \mathsf{J}} = \sum_{\vec{k}} w_\alpha(\vec{k})
     !>          (\vec{k}\cdot\vec{\mu}_\mathsf{i}) \{
@@ -160,7 +160,7 @@ contains
         delta_energy = 2._DP * delta_energy ! half wave vector (symmetry) -> double energy
     end function Abstract_visit_move
 
-    !> Energy delta when a particle \( \mathsf{i} \) of component \( \mathsf{\mathsf{I}} \) rotates.
+    !> Energy delta when a particle \( \mathsf{i} \) rotates.
     !> \[
     !>      \Delta U_{\mathsf{\mathsf{I}}, \mathsf{J}} = \sum_{\vec{k}} w_\alpha(\vec{k})
     !>          \vec{k}\cdot(\vec{\mu}^\prime_\mathsf{i} - \vec{\mu}_\mathsf{i}) [

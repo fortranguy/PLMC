@@ -17,8 +17,8 @@ private
     type, public :: Writers_Wrapper
         type(Component_Writers_Wrapper), allocatable :: components(:)
         class(Abstract_Components_Energies_Writer), allocatable :: short_energies, &
-            long_energies_wo_reci
-        class(Abstract_Energy_Writer), allocatable :: reci_energy
+            long_energies
+        class(Abstract_Energy_Writer), allocatable :: long_mixture_energy
     end type Writers_Wrapper
 
 end module types_writers_wrapper

@@ -38,7 +38,7 @@ contains
         call observables_create(observables%changes_sucesses, size(components))
         call observables_create(observables%short_energies, size(components))
         call observables_create(observables%walls_energies, size(components))
-        call observables_create(observables%long_energies_wo_reci, size(components))
+        call observables_create(observables%long_energies, size(components))
         call observables_create(observables%field_energies, size(components))
     end subroutine create_all
 
@@ -46,7 +46,7 @@ contains
         type(Observables_Wrapper), intent(inout) :: observables
 
         call observables_destroy(observables%field_energies)
-        call observables_destroy(observables%long_energies_wo_reci)
+        call observables_destroy(observables%long_energies)
         call observables_destroy(observables%walls_energies)
         call observables_destroy(observables%short_energies)
         call observables_destroy(observables%changes_sucesses)

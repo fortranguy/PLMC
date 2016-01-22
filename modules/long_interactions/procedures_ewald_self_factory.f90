@@ -31,6 +31,7 @@ contains
         type(Component_Wrapper), intent(in) :: components(:)
         logical, intent(in) :: are_dipolar(:)
         class(Abstract_Ewald_Convergence_Parameter), intent(in) :: alpha
+
         integer :: i_component
 
         allocate(self_components(size(components)))
@@ -53,14 +54,14 @@ contains
         end if
     end subroutine destroy_self_components
 
-    subroutine create_self(self, permittivity, dipolar_moments, dipoles_exist, alpha)
+    subroutine create_self(self, permittivity, dipolar_moments, is_dipolar, alpha)
         class(Abstract_Ewald_Self_Component), allocatable, intent(out) :: self
         class(Abstract_Permittivity), intent(in) :: permittivity
         class(Abstract_Component_Dipolar_Moments), intent(in) :: dipolar_moments
-        logical, intent(in) :: dipoles_exist
+        logical, intent(in) :: is_dipolar
         class(Abstract_Ewald_Convergence_Parameter), intent(in) :: alpha
 
-        if (dipoles_exist) then
+        if (is_dipolar) then
             allocate(Concrete_Ewald_Self_Component :: self)
         else
             allocate(Null_Ewald_Self_Component :: self)

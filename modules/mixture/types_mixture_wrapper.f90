@@ -2,6 +2,7 @@ module types_mixture_wrapper
 
 use class_minimum_distance, only: Abstract_Minimum_Distance
 use types_component_wrapper, only: Component_Wrapper
+use class_mixture_total_moment, only: Abstract_Mixture_Total_Moment
 
 implicit none
 
@@ -19,6 +20,7 @@ private
         type(Component_Wrapper), allocatable :: components(:)
         type(Minimum_Distances_Wrapper), allocatable :: components_min_distances(:)
         type(Minimum_Distance_Wrapper), allocatable :: wall_min_distances(:)
+        class(Abstract_Mixture_Total_Moment), allocatable :: total_moment
     end type Mixture_Wrapper
 
 end module types_mixture_wrapper

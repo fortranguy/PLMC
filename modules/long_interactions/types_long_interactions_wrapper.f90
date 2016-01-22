@@ -8,6 +8,7 @@ use class_ewald_reci_weight, only: Abstract_Ewald_Reci_Weight
 use class_ewald_reci_structure, only: Abstract_Ewald_Reci_Structure
 use class_ewald_reci_visitor, only: Abstract_Ewald_Reci_Visitor
 use class_ewald_self_component, only: Abstract_Ewald_Self_Component
+use class_ewald_surf_mixture, only: Abstract_Ewald_Surf_Mixture
 
 implicit none
 
@@ -39,6 +40,7 @@ private
         class(Abstract_Ewald_Reci_Structure), allocatable :: reci_structure
         class(Abstract_Ewald_Reci_Visitor), allocatable :: reci_visitor
         type(Ewald_Self_Component_Wrapper), allocatable :: self_components(:)
+        class(Abstract_Ewald_Surf_Mixture), allocatable :: surf_mixture
     end type Long_Interactions_Wrapper
 
 end module types_long_interactions_wrapper
