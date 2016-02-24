@@ -45,9 +45,8 @@ for i_component = 1:size(components, 1)
             overlap = false
             for j_component = i_component:-1:1
                 for i_particle = 1:size(components[j_component].positions, 2)
-                    if (PLMC.distance(test_position, components[j_component].positions[:,
-                                                                                      i_particle],
-                                     box_size) < interMinDistance[i_component, j_component])
+                    if (PLMC.distance(box_size, test_position, components[j_component].
+                        positions[:, i_particle]) < interMinDistance[i_component, j_component])
                         overlap = true
                         break
                     end
@@ -58,11 +57,11 @@ for i_component = 1:size(components, 1)
             end
         end
         if (first_positions[i_component])
-            components[i_component].positions[:, 1] = PLMC.folded(test_position, box_size)
+            components[i_component].positions[:, 1] = PLMC.folded(box_size, test_position)
             first_positions[i_component] = false
         else
             components[i_component].positions = hcat(components[i_component].positions,
-                                                     PLMC.folded(test_position, box_size))
+                                                     PLMC.folded(box_size, test_position))
         end
         PM.next!(prog)
     end
