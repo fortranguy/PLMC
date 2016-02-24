@@ -1,4 +1,6 @@
 import JSON
+import ProgressMeter
+PM = ProgressMeter
 include("PLMC.jl")
 import PLMC
 
@@ -20,6 +22,7 @@ distribution_average = zeros(distribution)
 num_particles_average = 0
 sphere_surface(radius) = 4pi*radius.^2
 
+progression = PM.Progress(size(files, 1))
 for file in files
     positions = readdlm(file)[:, 1:3]
     distribution = zeros(distribution)
@@ -38,6 +41,7 @@ for file in files
         distribution_average = distribution_average + distribution / num_particles
         num_particles_average = num_particles_average + num_particles
     end
+    PM.next!(progression)
 end
 
 distribution_average = 2 * distribution_average / size(files, 1)
