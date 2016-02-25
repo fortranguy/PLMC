@@ -313,7 +313,7 @@
 			<Option link="0" />
 			<Option weight="14" />
 		</Unit>
-		<Unit filename="programs/radial_distribution.f90">
+		<Unit filename="programs/plmc_radial_distribution.f90">
 			<Option weight="14" />
 		</Unit>
 		<Extensions>
