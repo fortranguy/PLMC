@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_data_found
-use procedures_coordinates_micro, only: read_coordinates
+use procedures_coordinates_micro, only: create_coordinates_from_file
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_component_number, only: Abstract_Component_Number, Concrete_Component_Number, &
     Null_Component_Number
@@ -171,7 +171,7 @@ contains
         if (component_coordinates%get_num() == 0) return
         call input_data%get(data_field, filename, data_found)
         call check_data_found(data_field, data_found)
-        call read_coordinates(file_coordinates, filename)
+        call create_coordinates_from_file(file_coordinates, filename)
         if (size(file_coordinates, 2) /= component_coordinates%get_num()) then
             call error_exit("set_coordinates from "//filename//": wrong number of lines.")
         end if

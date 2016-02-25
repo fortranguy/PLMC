@@ -16,7 +16,7 @@ post_data = JSON.parsefile(ARGS[end]; dicttype=Dict, use_mmap=true)
 box_size = map(Float64, input_data["Environment"]["Box"]["size"])
 max_distance = min(box_size...)/2
 delta = post_data["Distribution"]["delta"]
-distance_range = delta/2:delta:max_distance+delta/2
+distance_range = 0:delta:max_distance
 distribution = zeros(Float64, size(distance_range, 1))
 distribution_average = zeros(distribution)
 num_particles_average = 0
@@ -32,7 +32,7 @@ for file in files
             distance_ij = PLMC.distance(box_size, vec(positions[i_particle, :]),
                 vec(positions[j_particle, :]))
             if distance_ij <= max_distance
-                i_dist = round(Int, distance_ij/delta) + 1
+                i_dist = round(Int, distance_ij/delta)
                 distribution[i_dist] = distribution[i_dist] + 1
             end
         end

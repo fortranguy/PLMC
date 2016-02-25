@@ -3,7 +3,7 @@ module procedures_plmc_factory
 use data_wrappers_prefix, only:environment_prefix, mixture_prefix, changes_prefix, &
     short_interactions_prefix, long_interactions_prefix, writers_prefix
 use json_module, only: json_file
-use procedures_command_arguments, only: set_filename_from_argument
+use procedures_command_arguments, only: create_filename_from_argument
 use class_periodic_box, only: Abstract_Periodic_Box
 use types_environment_wrapper, only: Environment_Wrapper
 use procedures_environment_factory, only: environment_create, environment_destroy
@@ -68,11 +68,13 @@ end interface plmc_destroy
 
 contains
 
-    subroutine create_input_data(input_data)
+    subroutine create_input_data(input_data, i_argument)
         type(json_file), intent(out) :: input_data
+        integer, intent(in) :: i_argument
 
         character(len=:), allocatable :: data_filename
-        call set_filename_from_argument(data_filename)
+
+        call create_filename_from_argument(data_filename, i_argument)
         call input_data%load_file(filename = data_filename)
         if (allocated(data_filename)) deallocate(data_filename)
     end subroutine create_input_data

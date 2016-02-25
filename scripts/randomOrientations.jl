@@ -27,8 +27,11 @@ for i_component = 1:num_components
         component_i = PLMC.Component(input_data["Mixture"]["Component $(i_component)"]["number"],
                                      zeros(3, 1), zeros(3, 1))
         component_i.orientations = RO.randomOrientations(component_i.num)
-        output_file = input_data["Mixture"]["Component $(i_component)"]["initial orientations"]
+        output_file =
+            open(input_data["Mixture"]["Component $(i_component)"]["initial orientations"], "w")
+        write(output_file, "#orientation_x   orientation_y   orientation_z\n")
         writedlm(output_file, component_i.orientations)
-        println("Orientations written in ", output_file)
+        close(output_file)
+        println("Orientations written in ", output_file.name)
     end
 end

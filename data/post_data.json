@@ -1,5 +1,6 @@
 {
     "Distribution": {
-        "delta": 0.05
+        "delta": 0.05,
+        "file name": "distribution.out"
     }
 }
