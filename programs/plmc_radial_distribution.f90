@@ -30,7 +30,7 @@ implicit none
     real(DP) :: max_distance, delta_distance, distance_ij, distance_i
     integer :: num_snaps, i_snap
     character(len=:), allocatable :: snap_filename
-    integer :: num_bins, i_bin
+    integer :: i_bin
     real(DP), allocatable :: bins_snap(:), bins_function(:)
     integer :: bins_unit
     character(len=:), allocatable :: bins_filename
@@ -65,9 +65,8 @@ implicit none
     call plmc_destroy(post_data)
     deallocate(data_field)
 
-    num_bins = int(max_distance/delta_distance) + 1
-    allocate(bins_snap(num_bins))
-    allocate(bins_function(num_bins))
+    allocate(bins_snap(nint(max_distance/delta_distance)))
+    allocate(bins_function(size(bins_snap)))
 
     num_particles_sum = 0
     bins_function = 0._DP
@@ -81,7 +80,7 @@ implicit none
                 distance_ij = periodic_box%distance(positions(:, i_particle), &
                     positions(:, j_particle))
                 if (distance_ij < max_distance) then
-                    i_bin = int(distance_ij/delta_distance) + 1
+                    i_bin = nint(distance_ij/delta_distance)
                     bins_snap(i_bin) = bins_snap(i_bin) + 1._DP
                 end if
             end do
@@ -101,8 +100,8 @@ implicit none
     call environment_destroy(periodic_box)
 
     open(newunit=bins_unit, recl=max_line_length, file=bins_filename, action="write")
-    do i_bin = 1, num_bins
-        distance_i = (real(i_bin, DP) - 0.5) * delta_distance
+    do i_bin = 1, size(bins_function)
+        distance_i = real(i_bin, DP) * delta_distance
         bins_function(i_bin) = bins_function(i_bin) / delta_distance / density_average / &
             sphere_surface(distance_i)
         write(bins_unit, *) distance_i, bins_function(i_bin)
