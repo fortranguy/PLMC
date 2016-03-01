@@ -74,15 +74,15 @@ contains
         type(Component_Wrapper), intent(in) :: components(:)
         type(Ewald_Real_Pairs_Wrapper), intent(in) :: real_pairs(:)
 
-        integer :: j_component, i_component
-        integer :: j_pair, i_pair
+        integer :: i_component, j_component
+        integer :: i_pair, j_pair
 
         allocate(real_components(size(real_pairs), size(real_pairs)))
 
         do j_component = 1, size(real_components, 2)
             do i_component = 1, size(real_components, 1)
-                j_pair = maxval([j_component, i_component])
-                i_pair = minval([j_component, i_component])
+                j_pair = maxval([i_component, j_component])
+                i_pair = minval([i_component, j_component])
                 associate (pair_ij => real_pairs(j_pair)%with_components(i_pair)%real_pair)
                     call ewald_real_create(real_components(i_component, j_component)%&
                         real_component, periodic_box, components(i_component)%positions, &
@@ -95,7 +95,7 @@ contains
     subroutine destroy_components(real_components)
         type(Ewald_Real_Component_Wrapper), allocatable, intent(inout) :: real_components(:, :)
 
-        integer :: j_component, i_component
+        integer :: i_component, j_component
 
         if (allocated(real_components)) then
             do j_component = size(real_components, 2), 1, -1
@@ -143,7 +143,7 @@ contains
         character(len=*), intent(in) :: prefix
 
         logical :: interact_ij
-        integer :: j_component, i_component
+        integer :: i_component, j_component
 
         allocate(real_pairs(size(are_dipolar)))
         do j_component = 1, size(are_dipolar)
@@ -163,7 +163,7 @@ contains
     subroutine destroy_pairs(real_pairs)
         type(Ewald_Real_Pairs_Wrapper), allocatable, intent(inout) :: real_pairs(:)
 
-        integer :: j_component, i_component
+        integer :: i_component, j_component
 
         if (allocated(real_pairs)) then
             do j_component = size(real_pairs), 1, -1

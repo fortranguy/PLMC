@@ -282,19 +282,20 @@ contains
         end do
     end subroutine Abstract_visit
 
-    subroutine Abstract_move(this, from, to)
+    subroutine Abstract_move(this, to_position, from)
         class(Abstract_Visitable_Cells), intent(inout) :: this
-        type(Concrete_Temporary_Particle), intent(in) :: from, to
+        real(DP), intent(in) :: to_position(:)
+        type(Concrete_Temporary_Particle), intent(in) :: from
 
         integer, dimension(num_dimensions) :: from_i_cell, to_i_cell
 
         from_i_cell = this%index(from%position)
-        to_i_cell = this%index(to%position)
+        to_i_cell = this%index(to_position)
         if (any(from_i_cell /= to_i_cell)) then
             call this%visitable_lists(from_i_cell(1), from_i_cell(2), from_i_cell(3))%&
                 remove(from%i)
             call this%visitable_lists(to_i_cell(1), to_i_cell(2), to_i_cell(3))%&
-                add(to%i)
+                add(from%i)
         end if
     end subroutine Abstract_move
 
@@ -364,9 +365,10 @@ contains
         energy = 0._DP
     end subroutine Null_visit
 
-    subroutine Null_move(this, from, to)
+    subroutine Null_move(this, to_position, from)
         class(Null_Visitable_Cells), intent(inout) :: this
-        type(Concrete_Temporary_Particle), intent(in) :: from, to
+        real(DP), intent(in) :: to_position(:)
+        type(Concrete_Temporary_Particle), intent(in) :: from
     end subroutine Null_move
 
     subroutine Null_add(this, particle)

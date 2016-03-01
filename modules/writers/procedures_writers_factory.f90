@@ -11,16 +11,15 @@ use procedures_mixture_factory, only: mixture_set
 use types_short_interactions_wrapper, only: Pair_Potentials_Wrapper
 use types_long_interactions_wrapper, only: Ewald_Real_Pairs_Wrapper
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
-use class_components_energes_writer, only: Concrete_Components_Energies_Selector, &
-    Abstract_Components_Energies_Writer, Concrete_Components_Energies_Writer, &
-    Null_Components_Energies_Writer
+use class_triangle_writer, only: Concrete_Line_Selector, &
+    Abstract_Triangle_Writer, Concrete_Triangle_Writer, Null_Triangle_Writer
 use class_energy_writer, only: Abstract_Energy_Writer, Concrete_Energy_Writer, Null_Energy_Writer
 use class_changes_writer, only: Concrete_Changes_Selector, &
     Abstract_Changes_Success_Writer, Concrete_Changes_Success_Writer, Null_Changes_Success_Writer
 use class_component_coordinates_writer, only: Concrete_Coordinates_Writer_Selector, &
     Abstract_Coordinates_Writer, Concrete_Coordinates_Writer, Null_Coordinates_Writer
 use types_writers_wrapper, only: Component_Writers_Wrapper, Writers_Wrapper
-use procedures_property_inquirers, only: use_walls, component_has_positions, &
+use procedures_property_inquirers, only: use_walls, component_exists, component_has_positions, &
     component_has_orientations, component_can_move, component_can_rotate, component_can_exchange, &
     component_is_dipolar, components_interact
 
@@ -31,21 +30,23 @@ public :: writers_create, writers_destroy
 
 interface writers_create
     module procedure :: create_all
-    module procedure :: create_components_energies
-    module procedure :: create_long_mixture_energy
     module procedure :: create_components
-    module procedure :: create_components_changes
-    module procedure :: create_changes
     module procedure :: create_components_coordinates
     module procedure :: create_coordinates
+    module procedure :: create_components_changes
+    module procedure :: create_changes
+    module procedure :: create_switches
+    module procedure :: create_short_energies
+    module procedure :: create_long_energies
+    module procedure :: create_long_mixture_energy
 end interface writers_create
 
 interface writers_destroy
-    module procedure :: destroy_coordinates
-    module procedure :: destroy_changes
-    module procedure :: destroy_components
     module procedure :: destroy_long_mixture_energy
-    module procedure :: destroy_components_energies
+    module procedure :: destroy_triangle
+    module procedure :: destroy_changes
+    module procedure :: destroy_coordinates
+    module procedure :: destroy_components
     module procedure :: destroy_all
 end interface writers_destroy
 
@@ -63,99 +64,24 @@ contains
         logical :: are_dipolar(size(components))
 
         !todo: walls and field to add
+        call writers_create(writers%components, components, changes, input_data, prefix)
+        call writers_create(writers%switches, components, "switches.out")
         call writers_create(writers%short_energies, short_pairs, "short_energies.out")
         call writers_create(writers%long_energies, long_pairs, "long_energies.out")
         call mixture_set(are_dipolar, components)
         call writers_create(writers%long_mixture_energy, any(are_dipolar), &
             "long_mixture_energy.out")
-        call writers_create(writers%components, components, changes, input_data, prefix)
     end subroutine create_all
 
     subroutine destroy_all(writers)
         type(Writers_Wrapper), intent(inout) :: writers
 
-        call writers_destroy(writers%components)
         call writers_destroy(writers%long_mixture_energy)
         call writers_destroy(writers%long_energies)
         call writers_destroy(writers%short_energies)
+        call writers_destroy(writers%switches)
+        call writers_destroy(writers%components)
     end subroutine destroy_all
-
-    subroutine create_long_mixture_energy(long_mixture_energy, dipoles_exist, filename)
-        class(Abstract_Energy_Writer), allocatable, intent(out) :: long_mixture_energy
-        logical, intent(in) :: dipoles_exist
-        character(len=*), intent(in) :: filename
-
-        if (dipoles_exist) then
-            allocate(Concrete_Energy_Writer :: long_mixture_energy)
-        else
-            allocate(Null_Energy_Writer :: long_mixture_energy)
-        end if
-        call long_mixture_energy%construct(filename)
-    end subroutine create_long_mixture_energy
-
-    subroutine destroy_long_mixture_energy(long_mixture_energy)
-        class(Abstract_Energy_Writer), allocatable, intent(inout) :: long_mixture_energy
-
-        if (allocated(long_mixture_energy)) then
-            call long_mixture_energy%destroy()
-            deallocate(long_mixture_energy)
-        end if
-    end subroutine destroy_long_mixture_energy
-
-    subroutine create_components_energies(energies, pairs, filename)
-        class(Abstract_Components_Energies_Writer), allocatable, intent(out) :: energies
-        class(*), intent(in) :: pairs(:)
-        character(len=*), intent(in) :: filename
-
-        type(Concrete_Components_Energies_Selector) :: selectors(size(pairs))
-        logical :: interact, interact_ij
-        integer :: j_component, i_component
-
-        interact = .false.
-        do j_component = 1, size(selectors)
-            allocate(selectors(j_component)%with_components(j_component))
-            do i_component = 1, size(selectors(j_component)%with_components)
-                select type (pairs) ! several checks: not optimal
-                    type is (Pair_Potentials_Wrapper)
-                        interact_ij = components_interact(pairs(j_component)%&
-                            with_components(i_component)%pair_potential)
-                    type is (Ewald_Real_Pairs_Wrapper)
-                        interact_ij = components_interact(pairs(j_component)%&
-                            with_components(i_component)%real_pair)
-                    class default
-                        call error_exit("writers_create: create_components_energies: "//&
-                            "pairs type unknown.")
-                end select
-                interact = interact .or. interact_ij
-                selectors(j_component)%with_components(i_component) = interact_ij
-            end do
-        end do
-        if (interact) then
-            allocate(Concrete_Components_Energies_Writer :: energies)
-        else
-            allocate(Null_Components_Energies_Writer :: energies)
-        end if
-        call energies%construct(filename, selectors)
-        call deallocate_selectors(selectors)
-    end subroutine create_components_energies
-
-    subroutine deallocate_selectors(selectors)
-        type(Concrete_Components_Energies_Selector), intent(inout) :: selectors(:)
-
-        integer :: i_component
-        do i_component = size(selectors), 1, -1
-            deallocate(selectors(i_component)%with_components)
-        end do
-    end subroutine deallocate_selectors
-
-    subroutine destroy_components_energies(energies)
-        class(Abstract_Components_Energies_Writer), allocatable, intent(inout) :: energies
-
-        if (allocated(energies)) then
-            call energies%destroy()
-            deallocate(energies)
-        end if
-    end subroutine destroy_components_energies
 
     subroutine create_components(components, mixture_components, changes, input_data, prefix)
         type(Component_Writers_Wrapper), allocatable, intent(out) :: components(:)
@@ -280,5 +206,134 @@ contains
             deallocate(changes)
         end if
     end subroutine destroy_changes
+
+    subroutine create_switches(switches, components, filename)
+        class(Abstract_Triangle_Writer), allocatable, intent(out) :: switches
+        type(Component_Wrapper), intent(in) :: components(:)
+        character(len=*), intent(in) :: filename
+
+        type(Concrete_Line_Selector) :: selectors(size(components))
+        logical :: some_components_exist, exist_ij
+        integer :: i_component, j_component
+
+        some_components_exist = .false.
+        do j_component = 1, size(selectors)
+            allocate(selectors(j_component)%with_components(j_component))
+            do i_component = 1, size(selectors(j_component)%with_components)
+                exist_ij = component_exists(components(i_component)%number) .and. &
+                    component_exists(components(j_component)%number)
+                some_components_exist = some_components_exist .or. exist_ij
+                selectors(j_component)%with_components(i_component) = exist_ij .and. &
+                    i_component /= j_component
+            end do
+        end do
+        if (some_components_exist) then
+            allocate(Concrete_Triangle_Writer :: switches)
+        else
+            allocate(Null_Triangle_Writer :: switches)
+        end if
+        call switches%construct(filename, selectors)
+        call deallocate_selectors(selectors)
+    end subroutine create_switches
+
+    subroutine create_short_energies(energies, pairs, filename)
+        class(Abstract_Triangle_Writer), allocatable, intent(out) :: energies
+        type(Pair_Potentials_Wrapper), intent(in) :: pairs(:)
+        character(len=*), intent(in) :: filename
+
+        type(Concrete_Line_Selector) :: selectors(size(pairs))
+        logical :: some_components_interact, interact_ij
+        integer :: i_component, j_component
+
+        some_components_interact = .false.
+        do j_component = 1, size(selectors)
+            allocate(selectors(j_component)%with_components(j_component))
+            do i_component = 1, size(selectors(j_component)%with_components)
+                interact_ij = components_interact(pairs(j_component)%with_components(i_component)%&
+                    pair_potential)
+                some_components_interact = some_components_interact .or. interact_ij
+                selectors(j_component)%with_components(i_component) = interact_ij
+            end do
+        end do
+
+        if (some_components_interact) then
+            allocate(Concrete_Triangle_Writer :: energies)
+        else
+            allocate(Null_Triangle_Writer :: energies)
+        end if
+        call energies%construct(filename, selectors)
+        call deallocate_selectors(selectors)
+    end subroutine create_short_energies
+
+    subroutine create_long_energies(energies, pairs, filename)
+        class(Abstract_Triangle_Writer), allocatable, intent(out) :: energies
+        type(Ewald_Real_Pairs_Wrapper), intent(in) :: pairs(:)
+        character(len=*), intent(in) :: filename
+
+        type(Concrete_Line_Selector) :: selectors(size(pairs))
+        logical :: some_components_interact, interact_ij
+        integer :: i_component, j_component
+
+        some_components_interact = .false.
+        do j_component = 1, size(selectors)
+            allocate(selectors(j_component)%with_components(j_component))
+            do i_component = 1, size(selectors(j_component)%with_components)
+                interact_ij = components_interact(pairs(j_component)%with_components(i_component)%&
+                    real_pair)
+                some_components_interact = some_components_interact .or. interact_ij
+                selectors(j_component)%with_components(i_component) = interact_ij
+            end do
+        end do
+
+        if (some_components_interact) then
+            allocate(Concrete_Triangle_Writer :: energies)
+        else
+            allocate(Null_Triangle_Writer :: energies)
+        end if
+        call energies%construct(filename, selectors)
+        call deallocate_selectors(selectors)
+    end subroutine create_long_energies
+
+    subroutine deallocate_selectors(selectors)
+        type(Concrete_Line_Selector), intent(inout) :: selectors(:)
+
+        integer :: i_component
+        do i_component = size(selectors), 1, -1
+            if (allocated(selectors(i_component)%with_components)) then
+                deallocate(selectors(i_component)%with_components)
+            end if
+        end do
+    end subroutine deallocate_selectors
+
+    subroutine destroy_triangle(triangle)
+        class(Abstract_Triangle_Writer), allocatable, intent(inout) :: triangle
+
+        if (allocated(triangle)) then
+            call triangle%destroy()
+            deallocate(triangle)
+        end if
+    end subroutine destroy_triangle
+
+    subroutine create_long_mixture_energy(long_mixture_energy, dipoles_exist, filename)
+        class(Abstract_Energy_Writer), allocatable, intent(out) :: long_mixture_energy
+        logical, intent(in) :: dipoles_exist
+        character(len=*), intent(in) :: filename
+
+        if (dipoles_exist) then
+            allocate(Concrete_Energy_Writer :: long_mixture_energy)
+        else
+            allocate(Null_Energy_Writer :: long_mixture_energy)
+        end if
+        call long_mixture_energy%construct(filename)
+    end subroutine create_long_mixture_energy
+
+    subroutine destroy_long_mixture_energy(long_mixture_energy)
+        class(Abstract_Energy_Writer), allocatable, intent(inout) :: long_mixture_energy
+
+        if (allocated(long_mixture_energy)) then
+            call long_mixture_energy%destroy()
+            deallocate(long_mixture_energy)
+        end if
+    end subroutine destroy_long_mixture_energy
 
 end module procedures_writers_factory

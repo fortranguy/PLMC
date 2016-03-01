@@ -27,6 +27,7 @@ private
         procedure :: get => Abstract_get
         procedure :: update_move => Abstract_update_move
         procedure :: update_rotation => Abstract_update_rotation
+        procedure :: update_switch => Abstract_update_switch
         procedure, private :: set => Abstract_set
     end type Abstract_Ewald_Reci_Structure
 
@@ -43,6 +44,7 @@ private
         procedure :: get => Null_get
         procedure :: update_move => Null_update_move
         procedure :: update_rotation => Null_update_rotation
+        procedure :: update_switch => Null_update_switch
     end type Null_Ewald_Reci_Structure
 
 contains
@@ -132,10 +134,8 @@ contains
 
     !> Structure factor:
     !> \[
-    !>      S(\vec{k}) = \sum_{\mathsf{I}, \mathsf{i}} (\vec{k}\cdot\vec{\mu}^\mathsf{I}_\mathsf{i})
-    !>          e^{i\vec{k}\cdot\vec{x}^\mathsf{I}_\mathsf{i}}
+    !>      S(\vec{k}) = \sum_{\vec{x}, \vec{\mu}} (\vec{k}\cdot\vec{\mu}) e^{i\vec{k}\cdot\vec{x}}
     !> \]
-    !> where \(\mathsf{I}\) indexes a component and \(\mathsf{i}\), a particle of \(\mathsf{I}\).
     pure complex(DP) function Abstract_get(this, n_1, n_2, n_3) result(structure)
         class(Abstract_Ewald_Reci_Structure), intent(in) :: this
         integer, intent(in) :: n_1, n_2, n_3
@@ -143,15 +143,17 @@ contains
         structure = this%structure(n_1, n_2, n_3)
     end function Abstract_get
 
-    !> Structure factor update when a particle \(\mathsf{i}\) of component \(\mathsf{I}\) moves.
-    !>  \[ \Delta S(\vec{k}) = (\vec{k}\cdot\vec{\mu}^\mathsf{I}_\mathsf{i})
-    !>      (e^{i\vec{k}\cdot\vec{x}^{\mathsf{I}\prime}_\mathsf{i}} -
-    !>       e^{i\vec{k}\cdot\vec{x}^\mathsf{I}_\mathsf{i}}) \]
+    !> Structure factor update when a particle of coordinates \( (\vec{x}, \vec{\mu}) \) moves.
+    !>  \[
+    !>      \Delta S(\vec{k}) = \vec{k}\cdot\vec{\mu}
+    !>          \left( e^{i\vec{k}\cdot\vec{x}^\prime} - e^{i\vec{k}\cdot\vec{x}} \right)
+    !>  \]
     !> Warning: only half wave vectors are updated.
-    pure subroutine Abstract_update_move(this, i_component, new, old)
+    pure subroutine Abstract_update_move(this, i_component, new_position, old)
         class(Abstract_Ewald_Reci_Structure), intent(inout) :: this
         integer, intent(in) :: i_component
-        type(Concrete_Temporary_Particle), intent(in) :: new, old
+        real(DP), intent(in) :: new_position(:)
+        type(Concrete_Temporary_Particle), intent(in) :: old
 
         real(DP) :: box_size(num_dimensions)
         real(DP), dimension(num_dimensions) :: wave_vector
@@ -177,7 +179,7 @@ contains
         call set_fourier(fourier_position_old_2, this%reci_numbers(2), wave_1_x_position_old(2))
         call set_fourier(fourier_position_old_3, this%reci_numbers(3), wave_1_x_position_old(3))
 
-        wave_1_x_position_new = 2._DP*PI * new%position / box_size
+        wave_1_x_position_new = 2._DP*PI * new_position / box_size
         call set_fourier(fourier_position_new_1, this%reci_numbers(1), wave_1_x_position_new(1))
         call set_fourier(fourier_position_new_2, this%reci_numbers(2), wave_1_x_position_new(2))
         call set_fourier(fourier_position_new_3, this%reci_numbers(3), wave_1_x_position_new(3))
@@ -204,14 +206,16 @@ contains
         end do
     end subroutine Abstract_update_move
 
-    !> Structure factor update when a particle \(\mathsf{i}\) of component \(\mathsf{I}\) rotates.
-    !>  \[ \Delta S(\vec{k}) = \vec{k}\cdot(\vec{\mu}^{\mathsf{I}\prime}_\mathsf{i} -
-    !>      \vec{\mu}^\mathsf{I}_\mathsf{i}) e^{i\vec{k}\cdot\vec{x}^\mathsf{I}_\mathsf{i}} \]
+    !> Structure factor update when a particle of coordinates \( (\vec{x}, \vec{\mu}) \) rotates.
+    !>  \[
+    !>      \Delta S(\vec{k}) = \vec{k}\cdot(\vec{\mu}^\prime - \vec{\mu}) e^{i\vec{k}\cdot\vec{x}}
+    !>  \]
     !> Warning: only half wave vectors are updated.
-    pure subroutine Abstract_update_rotation(this, i_component, new, old)
+    pure subroutine Abstract_update_rotation(this, i_component, new_dipolar_moment, old)
         class(Abstract_Ewald_Reci_Structure), intent(inout) :: this
         integer, intent(in) :: i_component
-        type(Concrete_Temporary_Particle), intent(in) :: new, old
+        real(DP), intent(in) :: new_dipolar_moment(:)
+        type(Concrete_Temporary_Particle), intent(in) :: old
 
         real(DP) :: box_size(num_dimensions)
         real(DP), dimension(num_dimensions) :: wave_vector
@@ -245,12 +249,122 @@ contains
                         fourier_position_3(n_3)
 
                     this%structure(n_1, n_2, n_3) = this%structure(n_1, n_2, n_3) + &
-                        dot_product(wave_vector, new%dipolar_moment - old%dipolar_moment) * &
+                        dot_product(wave_vector, new_dipolar_moment - old%dipolar_moment) * &
                         fourier_position
                 end do
             end do
         end do
     end subroutine Abstract_update_rotation
+
+    !> Structure factor update when a particle of coordinates \( (\vec{x}, \vec{\mu}) \) is added
+    !> (\( + )\) or removed (\( - \)):
+    !> Delta S(\vec{k}) = \pm (\vec{k}\cdot\vec{\mu}) e^{i\vec{k}\cdot\vec{x}}
+    pure subroutine Abstract_update_exchange(this, i_component, particle, signed)
+        class(Abstract_Ewald_Reci_Structure), intent(inout) :: this
+        integer, intent(in) :: i_component
+        type(Concrete_Temporary_Particle), intent(in) :: particle
+        real(DP), intent(in) :: signed
+
+        real(DP) :: box_size(num_dimensions)
+        real(DP), dimension(num_dimensions) :: wave_vector
+        integer :: n_1, n_2, n_3
+        real(DP), dimension(num_dimensions) :: wave_1_x_position
+
+        complex(DP) :: fourier_position
+        complex(DP), dimension(-this%reci_numbers(1):this%reci_numbers(1)) :: fourier_position_1
+        complex(DP), dimension(-this%reci_numbers(2):this%reci_numbers(2)) :: fourier_position_2
+        complex(DP), dimension(-this%reci_numbers(3):this%reci_numbers(3)) :: fourier_position_3
+
+        if (.not.this%are_dipolar(i_component)) return
+
+        box_size = this%periodic_box%get_size()
+        wave_1_x_position = 2._DP*PI * particle%position / box_size
+        call set_fourier(fourier_position_1, this%reci_numbers(1), wave_1_x_position(1))
+        call set_fourier(fourier_position_2, this%reci_numbers(2), wave_1_x_position(2))
+        call set_fourier(fourier_position_3, this%reci_numbers(3), wave_1_x_position(3))
+
+        do n_3 = 0, this%reci_numbers(3)
+            wave_vector(3) = 2._DP*PI * real(n_3, DP) / box_size(3)
+            do n_2 = -reci_number_2_sym(this%reci_numbers, n_3), this%reci_numbers(2)
+                wave_vector(2) = 2._DP*PI * real(n_2, DP) / box_size(2)
+                do n_1 = -reci_number_1_sym(this%reci_numbers, n_3, n_2), this%reci_numbers(1)
+                    wave_vector(1) = 2._DP*PI * real(n_1, DP) / box_size(1)
+
+                    if (n_1**2 + n_2**2 + n_3**2 > this%reci_numbers(1)**2) cycle
+
+                    fourier_position = fourier_position_1(n_1) * fourier_position_2(n_2) * &
+                        fourier_position_3(n_3)
+
+                    this%structure(n_1, n_2, n_3) = this%structure(n_1, n_2, n_3) + &
+                        signed*dot_product(wave_vector, particle%dipolar_moment) * &
+                        fourier_position
+                end do
+            end do
+        end do
+    end subroutine Abstract_update_exchange
+
+    !> Structure factor update when 2 particles of coordinates \( (\vec{x}_1, \vec{\mu}_1) \) and
+    !> \( (\vec{x}_2, \vec{\mu}_2) \) are switched.
+    !> \[
+    !>      \Delta S(\vec{k}) = \vec{k}\cdot(\vec{\mu}_1 - \vec{\mu}_2)
+    !>          \left( e^{i\vec{k}\cdot\vec{x}_2} - e^{i\vec{k}\cdot\vec{x}_1} \right)
+    !> \]
+    pure subroutine Abstract_update_switch(this, ij_components, particles)
+        class(Abstract_Ewald_Reci_Structure), intent(inout) :: this
+        integer, intent(in) :: ij_components(:)
+        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+
+        real(DP) :: box_size(num_dimensions)
+        real(DP), dimension(num_dimensions) :: wave_vector
+        integer :: n_1, n_2, n_3
+        real(DP), dimension(num_dimensions) :: wave_1_x_position_1, wave_1_x_position_2
+
+        complex(DP) :: fourier_position_1
+        complex(DP), dimension(-this%reci_numbers(1):this%reci_numbers(1)) :: fourier_position_1_1
+        complex(DP), dimension(-this%reci_numbers(2):this%reci_numbers(2)) :: fourier_position_1_2
+        complex(DP), dimension(-this%reci_numbers(3):this%reci_numbers(3)) :: fourier_position_1_3
+
+        complex(DP) :: fourier_position_2
+        complex(DP), dimension(-this%reci_numbers(1):this%reci_numbers(1)) :: fourier_position_2_1
+        complex(DP), dimension(-this%reci_numbers(2):this%reci_numbers(2)) :: fourier_position_2_2
+        complex(DP), dimension(-this%reci_numbers(3):this%reci_numbers(3)) :: fourier_position_2_3
+
+        if (.not.(this%are_dipolar(ij_components(1)) .or. this%are_dipolar(ij_components(2)))) &
+            return
+
+        box_size = this%periodic_box%get_size()
+
+        wave_1_x_position_1 = 2._DP*PI * particles(1)%position / box_size
+        call set_fourier(fourier_position_1_1, this%reci_numbers(1), wave_1_x_position_1(1))
+        call set_fourier(fourier_position_1_2, this%reci_numbers(2), wave_1_x_position_1(2))
+        call set_fourier(fourier_position_1_3, this%reci_numbers(3), wave_1_x_position_1(3))
+
+        wave_1_x_position_2 = 2._DP*PI * particles(2)%position / box_size
+        call set_fourier(fourier_position_2_1, this%reci_numbers(1), wave_1_x_position_2(1))
+        call set_fourier(fourier_position_2_2, this%reci_numbers(2), wave_1_x_position_2(2))
+        call set_fourier(fourier_position_2_3, this%reci_numbers(3), wave_1_x_position_2(3))
+
+        do n_3 = 0, this%reci_numbers(3)
+            wave_vector(3) = 2._DP*PI * real(n_3, DP) / box_size(3)
+            do n_2 = -reci_number_2_sym(this%reci_numbers, n_3), this%reci_numbers(2)
+                wave_vector(2) = 2._DP*PI * real(n_2, DP) / box_size(2)
+                do n_1 = -reci_number_1_sym(this%reci_numbers, n_3, n_2), this%reci_numbers(1)
+                    wave_vector(1) = 2._DP*PI * real(n_1, DP) / box_size(1)
+
+                    if (n_1**2 + n_2**2 + n_3**2 > this%reci_numbers(1)**2) cycle
+
+                    fourier_position_1 = fourier_position_1_1(n_1) * fourier_position_1_2(n_2) * &
+                        fourier_position_1_3(n_3)
+                    fourier_position_2 = fourier_position_2_1(n_1) * fourier_position_2_2(n_2) * &
+                        fourier_position_2_3(n_3)
+
+                    this%structure(n_1, n_2, n_3) = this%structure(n_1, n_2, n_3) + &
+                        dot_product(wave_vector, particles(1)%dipolar_moment - particles(2)%&
+                            dipolar_moment) * (fourier_position_2 - fourier_position_1)
+                end do
+            end do
+        end do
+    end subroutine Abstract_update_switch
 
 !end implementation Abstract_Ewald_Reci_Structure
 
@@ -284,17 +398,25 @@ contains
         structure = cmplx(0._DP, 0._DP, DP)
     end function Null_get
 
-    pure subroutine Null_update_move(this, i_component, new, old)
+    pure subroutine Null_update_move(this, i_component, new_position, old)
         class(Null_Ewald_Reci_Structure), intent(inout) :: this
         integer, intent(in) :: i_component
-        type(Concrete_Temporary_Particle), intent(in) :: new, old
+        real(DP), intent(in) :: new_position(:)
+        type(Concrete_Temporary_Particle), intent(in) :: old
     end subroutine Null_update_move
 
-    pure subroutine Null_update_rotation(this, i_component, new, old)
+    pure subroutine Null_update_rotation(this, i_component, new_dipolar_moment, old)
         class(Null_Ewald_Reci_Structure), intent(inout) :: this
         integer, intent(in) :: i_component
-        type(Concrete_Temporary_Particle), intent(in) :: new, old
+        real(DP), intent(in) :: new_dipolar_moment(:)
+        type(Concrete_Temporary_Particle), intent(in) :: old
     end subroutine Null_update_rotation
+
+    pure subroutine Null_update_switch(this, ij_components, particles)
+        class(Null_Ewald_Reci_Structure), intent(inout) :: this
+        integer, intent(in) :: ij_components(:)
+        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+    end subroutine Null_update_switch
 
 !end implementation Null_Ewald_Reci_Structure
 

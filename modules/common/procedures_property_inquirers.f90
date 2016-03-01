@@ -286,14 +286,14 @@ contains
             component_can_exchange(component_exchange)
     end function component_can_change
 
-    logical function logical_from_json(input_data, switch_name)
+    logical function logical_from_json(input_data, statement)
         type(json_file), intent(inout) :: input_data
-        character(len=*), intent(in) :: switch_name
+        character(len=*), intent(in) :: statement
 
         logical :: data_found
 
-        call input_data%get(switch_name, logical_from_json, data_found)
-        call check_data_found(switch_name, data_found)
+        call input_data%get(statement, logical_from_json, data_found)
+        call check_data_found(statement, data_found)
     end function logical_from_json
 
 end module procedures_property_inquirers

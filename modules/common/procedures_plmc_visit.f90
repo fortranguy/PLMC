@@ -14,11 +14,11 @@ use class_pair_potential, only: Abstract_Pair_Potential
 use class_short_pairs_visitor, only: Abstract_Short_Pairs_Visitor
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use types_long_interactions_wrapper, only: Ewald_Self_Component_Wrapper, Long_Interactions_Wrapper
-use types_observables_wrapper, only: Concrete_Components_Energies, Observables_Wrapper
-use procedures_observables_factory, only: create_components_energies_nodes, &
-    destroy_components_energies_nodes
-use procedures_components_energies, only: Concrete_Components_Energies_init, &
-    Concrete_Components_Energies_add
+use types_line_observables, only: Concrete_Line_Observables
+use types_observables_wrapper, only: Observables_Wrapper
+use procedures_observables_factory, only: create_triangle_nodes, destroy_triangle_nodes
+use procedures_triangle_observables, only: triangle_observables_init, &
+    triangle_observables_add
 
 implicit none
 
@@ -69,7 +69,7 @@ contains
     end subroutine visit_walls
 
     subroutine visit_short(energies, components, short_interactions)
-        type(Concrete_Components_Energies), intent(inout) :: energies(:)
+        type(Concrete_Line_Observables), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
 
@@ -78,7 +78,7 @@ contains
     end subroutine visit_short
 
     subroutine visit_short_intra(energies, components, short_interactions)
-        type(Concrete_Components_Energies), intent(inout) :: energies(:)
+        type(Concrete_Line_Observables), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
 
@@ -101,12 +101,12 @@ contains
     end subroutine visit_short_intra
 
     subroutine visit_short_inter(energies, components, short_interactions)
-        type(Concrete_Components_Energies), intent(inout) :: energies(:)
+        type(Concrete_Line_Observables), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
 
         logical :: overlap
-        integer :: j_component, i_component
+        integer :: i_component, j_component
         type(Concrete_Number_to_String) :: string
 
         do j_component = 1, size(components)
@@ -128,30 +128,30 @@ contains
     end subroutine visit_short_inter
 
     pure subroutine visit_long(energies, long_mixture_energy, components, long_interactions)
-        type(Concrete_Components_Energies), intent(inout) :: energies(:)
+        type(Concrete_Line_Observables), intent(inout) :: energies(:)
         real(DP), intent(out) :: long_mixture_energy
         type(Component_Wrapper), intent(in) :: components(:)
         type(Long_Interactions_Wrapper), intent(in) :: long_interactions
 
-        type(Concrete_Components_Energies) :: real_energies(size(components))
+        type(Concrete_Line_Observables) :: real_energies(size(components))
         real(DP) :: self_energies(size(components))
 
-        call Concrete_Components_Energies_init(energies)
+        call triangle_observables_init(energies)
 
-        call create_components_energies_nodes(real_energies)
+        call create_triangle_nodes(real_energies)
         call visit_long_real(real_energies, components, long_interactions)
-        call Concrete_Components_Energies_add(energies, real_energies)
-        call destroy_components_energies_nodes(real_energies)
+        call triangle_observables_add(energies, real_energies)
+        call destroy_triangle_nodes(real_energies)
 
         long_mixture_energy = long_interactions%reci_visitor%visit() + &
                               long_interactions%surf_mixture%visit()
 
         call visit_long_self(self_energies, long_interactions%self_components)
-        call Concrete_Components_Energies_add(energies, -self_energies)
+        call triangle_observables_add(energies, -self_energies)
     end subroutine visit_long
 
     pure subroutine visit_long_real(energies, components, long_interactions)
-        type(Concrete_Components_Energies), intent(inout) :: energies(:)
+        type(Concrete_Line_Observables), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
         type(Long_Interactions_Wrapper), intent(in) :: long_interactions
 
@@ -160,7 +160,7 @@ contains
     end subroutine visit_long_real
 
     pure subroutine visit_long_real_intra(energies, components, long_interactions)
-        type(Concrete_Components_Energies), intent(inout) :: energies(:)
+        type(Concrete_Line_Observables), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
         type(Long_Interactions_Wrapper), intent(in) :: long_interactions
 
@@ -179,11 +179,11 @@ contains
     end subroutine visit_long_real_intra
 
     pure subroutine visit_long_real_inter(energies, components, long_interactions)
-        type(Concrete_Components_Energies), intent(inout) :: energies(:)
+        type(Concrete_Line_Observables), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
         type(Long_Interactions_Wrapper), intent(in) :: long_interactions
 
-        integer :: j_component, i_component
+        integer :: i_component, j_component
 
         do j_component = 1, size(components)
             do i_component = 1, j_component - 1

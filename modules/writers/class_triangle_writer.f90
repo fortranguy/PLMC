@@ -1,19 +1,19 @@
-module class_components_energes_writer
+module class_triangle_writer
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: max_line_length
 use procedures_checks, only: check_string_not_empty
 use class_number_to_string, only: Abstract_Number_to_String, &
     Concrete_Number_to_String, Null_Number_to_String
-use types_observables_wrapper, only: Concrete_Components_Energies
+use types_line_observables, only: Concrete_Line_Observables
 
 implicit none
 
 private
 
-    type, public :: Concrete_Components_Energies_Selector
+    type, public :: Concrete_Line_Selector
         logical, allocatable :: with_components(:)
-    end type Concrete_Components_Energies_Selector
+    end type Concrete_Line_Selector
 
     type :: String_Wrapper
         class(Abstract_Number_to_String), allocatable :: string
@@ -23,7 +23,7 @@ private
         type(String_Wrapper), allocatable :: with_component(:)
     end type Strings_Wrapper
 
-    type, abstract, public :: Abstract_Components_Energies_Writer
+    type, abstract, public :: Abstract_Triangle_Writer
     private
         integer :: file_unit
         type(Strings_Wrapper), allocatable :: strings(:)
@@ -32,33 +32,32 @@ private
         procedure :: destroy => Abstract_destroy
         procedure :: write => Abstract_write
         procedure, private :: allocate_string => Abstract_allocate_strings
-    end type Abstract_Components_Energies_Writer
+    end type Abstract_Triangle_Writer
 
-    type, extends(Abstract_Components_Energies_Writer), public :: &
-        Concrete_Components_Energies_Writer
+    type, extends(Abstract_Triangle_Writer), public :: Concrete_Triangle_Writer
 
-    end type Concrete_Components_Energies_Writer
+    end type Concrete_Triangle_Writer
 
-    type, extends(Abstract_Components_Energies_Writer), public :: Null_Components_Energies_Writer
+    type, extends(Abstract_Triangle_Writer), public :: Null_Triangle_Writer
     contains
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
         procedure :: write => Null_write
-    end type Null_Components_Energies_Writer
+    end type Null_Triangle_Writer
 
 contains
 
-!implementation Abstract_Components_Energies_Writer
+!implementation Abstract_Triangle_Writer
 
     subroutine Abstract_construct(this, filename, selector)
-        class(Abstract_Components_Energies_Writer), intent(out) :: this
+        class(Abstract_Triangle_Writer), intent(out) :: this
         character(len=*), intent(in) :: filename
-        type(Concrete_Components_Energies_Selector), intent(in) :: selector(:)
+        type(Concrete_Line_Selector), intent(in) :: selector(:)
 
         character(len=:), allocatable :: legend
         integer :: file_unit !strange gfortran behaviour: otherwise writes to output_unit.
 
-        call check_string_not_empty("Abstract_Components_Energies_Writer: construct: filename", &
+        call check_string_not_empty("Abstract_Triangle_Writer: construct: filename", &
             filename)
         open(newunit=file_unit, recl=max_line_length, file=filename, action="write")
         legend = "# i_step"
@@ -68,12 +67,12 @@ contains
     end subroutine Abstract_construct
 
     subroutine Abstract_allocate_strings(this, legend, selector)
-        class(Abstract_Components_Energies_Writer), intent(out) :: this
+        class(Abstract_Triangle_Writer), intent(out) :: this
         character(len=:), allocatable, intent(inout) :: legend
-        type(Concrete_Components_Energies_Selector), intent(in) :: selector(:)
+        type(Concrete_Line_Selector), intent(in) :: selector(:)
 
         type(Concrete_Number_to_String) :: string
-        integer :: j_component, i_component
+        integer :: i_component, j_component
 
         allocate(this%strings(size(selector)))
         do j_component = 1, size(this%strings)
@@ -92,7 +91,7 @@ contains
     end subroutine Abstract_allocate_strings
 
     subroutine Abstract_destroy(this)
-        class(Abstract_Components_Energies_Writer), intent(inout) :: this
+        class(Abstract_Triangle_Writer), intent(inout) :: this
 
         integer :: i_component
 
@@ -107,47 +106,47 @@ contains
         close(this%file_unit)
     end subroutine Abstract_destroy
 
-    subroutine Abstract_write(this, i_step, components_energies)
-        class(Abstract_Components_Energies_Writer), intent(in) :: this
+    subroutine Abstract_write(this, i_step, triangle)
+        class(Abstract_Triangle_Writer), intent(in) :: this
         integer, intent(in) :: i_step
-        type(Concrete_Components_Energies), intent(in) :: components_energies(:)
+        type(Concrete_Line_Observables), intent(in) :: triangle(:)
 
-        character(len=:), allocatable :: energies
-        integer :: j_component, i_component
+        character(len=:), allocatable :: string
+        integer :: i_component, j_component
 
-        energies = ""
+        string = ""
         do j_component = 1, size(this%strings)
             do i_component = 1, size(this%strings(j_component)%with_component)
                 associate(string_ij => this%strings(j_component)%with_component(i_component)%&
-                    string, energy_ij => components_energies(j_component)%&
+                    string, energy_ij => triangle(j_component)%&
                     with_components(i_component))
-                    energies = energies//string_ij%get(energy_ij)
+                    string = string//string_ij%get(energy_ij)
                 end associate
             end do
         end do
-        write(this%file_unit, *) i_step, energies
+        write(this%file_unit, *) i_step, string
     end subroutine Abstract_write
 
-!end implementation Abstract_Components_Energies_Writer
+!end implementation Abstract_Triangle_Writer
 
-!implementation Null_Components_Energies_Writer
+!implementation Null_Triangle_Writer
 
     subroutine Null_construct(this, filename, selector)
-        class(Null_Components_Energies_Writer), intent(out) :: this
+        class(Null_Triangle_Writer), intent(out) :: this
         character(len=*), intent(in) :: filename
-        type(Concrete_Components_Energies_Selector), intent(in) :: selector(:)
+        type(Concrete_Line_Selector), intent(in) :: selector(:)
     end subroutine Null_construct
 
     subroutine Null_destroy(this)
-        class(Null_Components_Energies_Writer), intent(inout) :: this
+        class(Null_Triangle_Writer), intent(inout) :: this
     end subroutine Null_destroy
 
-    subroutine Null_write(this, i_step, components_energies)
-        class(Null_Components_Energies_Writer), intent(in) :: this
+    subroutine Null_write(this, i_step, triangle)
+        class(Null_Triangle_Writer), intent(in) :: this
         integer, intent(in) :: i_step
-        type(Concrete_Components_Energies), intent(in) :: components_energies(:)
+        type(Concrete_Line_Observables), intent(in) :: triangle(:)
     end subroutine Null_write
 
-!end implementation Null_Components_Energies_Writer
+!end implementation Null_Triangle_Writer
 
-end module class_components_energes_writer
+end module class_triangle_writer

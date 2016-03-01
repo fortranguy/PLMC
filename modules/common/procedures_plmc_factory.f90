@@ -16,7 +16,8 @@ use procedures_short_interactions_factory, only: short_interactions_create, &
 use types_long_interactions_wrapper, only: Long_Interactions_Wrapper
 use procedures_long_interactions_factory, only: long_interactions_create, long_interactions_destroy
 use module_changes_success, only: Concrete_Changes_Success, Concrete_Changes_Counter, &
-    reset_counter => Concrete_Changes_Counter_reset, set_success => Concrete_Changes_Counter_set
+    Concrete_Switch_Counters, &
+    changes_counter_reset, changes_counter_set, switches_counters_reset, switches_counters_set
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use types_changes_wrapper, only: Changes_Wrapper
 use procedures_changes_factory, only: changes_create, changes_destroy
@@ -175,12 +176,13 @@ contains
         call changes_destroy(changes)
     end subroutine destroy_changes
 
-    subroutine create_metropolis(metropolis, environment, changes)
+    subroutine create_metropolis(metropolis, environment, components, changes)
         type(Metropolis_Algorithms_Wrapper), intent(out) :: metropolis
         type(Environment_Wrapper), intent(in) :: environment
+        type(Component_Wrapper), intent(in) :: components(:)
         type(Changes_Wrapper), intent(in) :: changes
 
-        call metropolis_algorithms_create(metropolis, environment, changes%components)
+        call metropolis_algorithms_create(metropolis, environment, components, changes%components)
     end subroutine create_metropolis
 
     subroutine set_metropolis(metropolis, mixture, short_interactions, long_interactions)
@@ -205,12 +207,14 @@ contains
         call observables_create(observables, components)
     end subroutine create_observables
 
-    subroutine set_success_and_reset_counter(changes_sucesses, changes_counters)
-        type(Concrete_Changes_Success), intent(out) :: changes_sucesses(:)
-        type(Concrete_Changes_Counter), intent(inout) :: changes_counters(:)
+    subroutine set_success_and_reset_counter(observables)
+        type(Observables_Wrapper), intent(inout) :: observables
 
-        call set_success(changes_sucesses, changes_counters)
-        call reset_counter(changes_counters)
+        call changes_counter_set(observables%changes_sucesses, observables%changes_counters)
+        call changes_counter_reset(observables%changes_counters)
+
+        call switches_counters_set(observables%switches_successes, observables%switches_counters)
+        call switches_counters_reset(observables%switches_counters)
     end subroutine set_success_and_reset_counter
 
     subroutine destroy_observables(observables)

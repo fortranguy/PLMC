@@ -1,7 +1,7 @@
 module types_writers_wrapper
 
 use class_component_coordinates_writer, only: Abstract_Coordinates_Writer
-use class_components_energes_writer, only: Abstract_Components_Energies_Writer
+use class_triangle_writer, only: Abstract_Triangle_Writer
 use class_energy_writer, only: Abstract_Energy_Writer
 use class_changes_writer, only: Abstract_Changes_Success_Writer
 
@@ -16,8 +16,7 @@ private
 
     type, public :: Writers_Wrapper
         type(Component_Writers_Wrapper), allocatable :: components(:)
-        class(Abstract_Components_Energies_Writer), allocatable :: short_energies, &
-            long_energies
+        class(Abstract_Triangle_Writer), allocatable :: switches, short_energies, long_energies
         class(Abstract_Energy_Writer), allocatable :: long_mixture_energy
     end type Writers_Wrapper
 

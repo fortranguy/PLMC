@@ -34,7 +34,7 @@ contains
     subroutine reset_long_real(real_pairs)
         type(Ewald_Real_Pairs_Wrapper), intent(inout) :: real_pairs(:)
 
-        integer :: j_component, i_component
+        integer :: i_component, j_component
 
         do j_component = 1, size(real_pairs)
             do i_component = 1, size(real_pairs(j_component)%with_components)

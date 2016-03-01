@@ -116,7 +116,7 @@ contains
         type(json_file), intent(inout) :: input_data
         character(len=*), intent(in) :: prefix
 
-        integer :: j_component, i_component
+        integer :: i_component, j_component
         logical :: exists
         character(len=:), allocatable :: min_distance_prefix
         type(Concrete_Number_to_String) :: string

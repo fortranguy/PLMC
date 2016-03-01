@@ -10,7 +10,7 @@ implicit none
 private
 public :: plmc_propagator_create, plmc_propagator_destroy, plmc_propagator_try
 
-    type(Metropolis_Algorithm_Pointer) :: algorithms(2)
+    type(Metropolis_Algorithm_Pointer) :: algorithms(3)
     class(Abstract_Tower_Sampler), allocatable :: selector
 
 contains
@@ -23,6 +23,7 @@ contains
 
         algorithms(1)%algorithm => metropolis_algorithms%one_particle_move
         algorithms(2)%algorithm => metropolis_algorithms%one_particle_rotation
+        algorithms(3)%algorithm => metropolis_algorithms%two_particles_switch
         do i_choice = 1, size(nums_choices)
             nums_choices(i_choice) = algorithms(i_choice)%algorithm%get_num_choices()
         end do

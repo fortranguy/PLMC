@@ -2,6 +2,7 @@ module types_metropolis_algorithms_wrapper
 
 use class_metropolis_algorithm, only: Abstract_Metropolis_Algorithm
 use class_one_particle_change, only: Abstract_One_Particle_Change
+use class_two_particles_switch, only: Abstract_Two_Particles_Switch
 
 implicit none
 
@@ -13,6 +14,7 @@ private
 
     type, public :: Metropolis_Algorithms_Wrapper
         class(Abstract_One_Particle_Change), allocatable :: one_particle_move, one_particle_rotation
+        class(Abstract_Two_Particles_Switch), allocatable :: two_particles_switch
     end type Metropolis_Algorithms_Wrapper
 
 end module types_metropolis_algorithms_wrapper

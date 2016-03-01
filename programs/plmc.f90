@@ -41,7 +41,7 @@ implicit none
     call plmc_create(long_interactions, environment, mixture, input_data)
     call plmc_set_num_steps(input_data)
     call plmc_create(changes, environment%periodic_box, mixture%components, input_data)
-    call plmc_create(metropolis_algorithms, environment, changes)
+    call plmc_create(metropolis_algorithms, environment, mixture%components, changes)
     call plmc_set(metropolis_algorithms, mixture, short_interactions, long_interactions)
     call plmc_propagator_create(metropolis_algorithms)
     call plmc_create(observables, mixture%components)
@@ -54,7 +54,7 @@ implicit none
     if (num_tuning_steps > 0) write(output_unit, *) "Trying to tune changes..."
     do i_step = -num_tuning_steps + 1, 0
         call plmc_propagator_try(observables)
-        call plmc_set(observables%changes_sucesses, observables%changes_counters)
+        call plmc_set(observables)
         call plmc_set(changes_tuned, i_step, changes%components, observables%changes_sucesses)
         call plmc_write(i_step, writers, observables)
         if (changes_tuned) exit
@@ -62,7 +62,7 @@ implicit none
     write(output_unit, *) "Iterations start."
     do i_step = 1, num_steps
         call plmc_propagator_try(observables)
-        call plmc_set(observables%changes_sucesses, observables%changes_counters)
+        call plmc_set(observables)
         call plmc_write(i_step, writers, observables)
     end do
     write(output_unit, *) "Iterations end."

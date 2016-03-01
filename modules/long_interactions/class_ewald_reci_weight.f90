@@ -7,6 +7,8 @@ use class_permittivity, only: Abstract_Permittivity
 use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use class_ewald_convergence_parameter, only: Abstract_Ewald_Convergence_Parameter
 
+implicit none
+
 private
 
     type, abstract, public :: Abstract_Ewald_Reci_Weight
@@ -15,7 +17,7 @@ private
         integer :: reci_numbers(num_dimensions)
         real(DP) :: permittivity
         class(Abstract_Ewald_Convergence_Parameter), pointer :: alpha => null()
-        real(DP), dimension(:, :, :), allocatable :: weight
+        real(DP), allocatable :: weight(:, :, :)
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
@@ -90,7 +92,7 @@ contains
             else
                 wave_squared = dot_product(wave_vector, wave_vector)
                 this%weight(n_1, n_2, n_3) = exp(-wave_squared/alpha**2/4._DP) / &
-                    this%permittivity / product(box_size) / wave_squared
+                    2._DP / this%permittivity / product(box_size) / wave_squared
             end if
         end do
         end do
@@ -108,7 +110,7 @@ contains
     !>      w_\alpha(\vec{k}) =
     !>          \begin{cases}
     !>              0                                           & \text{if } \vec{k} = \vec{0} \\
-    !>              \frac{e^{-k^2/4\alpha^2}}{\epsilon V k^2}   & \text{else}
+    !>              \frac{e^{-k^2/4\alpha^2}}{2\epsilon V k^2}   & \text{else}
     !>          \end{cases}
     !> \]
     pure real(DP) function Abstract_get(this, n_1, n_2, n_3) result(weight)
