@@ -1,4 +1,4 @@
-!Calculate the radial distribution function from snap shots
+!Calculate the radial distribution function from snap shots of 1 component
 !> \[
 !>      g(r) = \frac{\mathrm{d}N}{\mathrm{d}r} \frac{1}{\rho S(r)}
 !> \]
@@ -19,14 +19,14 @@ use class_periodic_box, only: Abstract_Periodic_Box
 use procedures_environment_factory, only: environment_create, environment_destroy
 use procedures_coordinates_micro, only: create_coordinates_from_file
 use procedures_plmc_factory, only: plmc_create, plmc_destroy
+use types_radial_distribution, only: Concrete_Radial_Distribution_Component
 
 implicit none
 
     class(Abstract_Periodic_Box), allocatable :: periodic_box
-    integer :: num_particles_sum, num_particles_snap, i_particle, j_particle
-    real(DP) :: density_average
+    type(Concrete_Radial_Distribution_Component) :: component
+    integer :: i_particle, j_particle
     logical :: coordinates_written
-    real(DP), allocatable :: positions(:, :)
     real(DP) :: max_distance, delta_distance, distance_ij, distance_i
     integer :: num_snaps, i_snap
     character(len=:), allocatable :: snap_filename
@@ -68,41 +68,42 @@ implicit none
     allocate(bins_snap(nint(max_distance/delta_distance)))
     allocate(bins_function(size(bins_snap)))
 
-    num_particles_sum = 0
+    component%num_particles_sum = 0
     bins_function = 0._DP
     do i_snap = 1, num_snaps
         call create_filename_from_argument(snap_filename, i_snap)
-        call create_coordinates_from_file(positions, snap_filename)
-        num_particles_snap = size(positions, 2)
+        call create_coordinates_from_file(component%positions, snap_filename)
+        component%num_particles = size(component%positions, 2)
         bins_snap = 0._DP
-        do i_particle = 1, num_particles_snap
-            do j_particle = i_particle + 1, num_particles_snap
-                distance_ij = periodic_box%distance(positions(:, i_particle), &
-                    positions(:, j_particle))
+        do i_particle = 1, component%num_particles
+            do j_particle = i_particle + 1, component%num_particles
+                distance_ij = periodic_box%distance(component%positions(:, i_particle), &
+                    component%positions(:, j_particle))
                 if (distance_ij < max_distance) then
                     i_bin = nint(distance_ij/delta_distance)
                     bins_snap(i_bin) = bins_snap(i_bin) + 1._DP
                 end if
             end do
         end do
-        deallocate(positions)
+        deallocate(component%positions)
         deallocate(snap_filename)
-        if (num_particles_snap > 0) then
-            bins_function = bins_function + bins_snap/real(num_particles_snap, DP)
-            num_particles_sum = num_particles_sum + num_particles_snap
+        if (component%num_particles > 0) then
+            bins_function = bins_function + bins_snap/real(component%num_particles, DP)
+            component%num_particles_sum = component%num_particles_sum + component%num_particles
         end if
     end do
     deallocate(bins_snap)
 
     bins_function = 2._DP * bins_function / real(num_snaps, DP)
-    density_average = real(num_particles_sum, DP) / real(num_snaps) / &
+    component%density = real(component%num_particles_sum, DP) / real(num_snaps) / &
         product(periodic_box%get_size())
     call environment_destroy(periodic_box)
 
     open(newunit=bins_unit, recl=max_line_length, file=bins_filename, action="write")
+    deallocate(bins_filename)
     do i_bin = 1, size(bins_function)
         distance_i = real(i_bin, DP) * delta_distance
-        bins_function(i_bin) = bins_function(i_bin) / delta_distance / density_average / &
+        bins_function(i_bin) = bins_function(i_bin) / delta_distance / component%density / &
             sphere_surface(distance_i)
         write(bins_unit, *) distance_i, bins_function(i_bin)
     end do
