@@ -232,8 +232,9 @@ contains
         type(Changes_Wrapper), intent(in) :: changes
         type(json_file), intent(inout) :: input_data
 
-        call writers_create(writers, components, short_interactions%components_pairs, &
-            long_interactions%real_pairs, changes%components, input_data, writers_prefix)
+        call writers_create(writers, components, short_interactions%wall_pairs, &
+            short_interactions%components_pairs, long_interactions%real_pairs, changes%components, &
+            input_data, writers_prefix)
     end subroutine create_writers
 
     subroutine destroy_writers(writers)

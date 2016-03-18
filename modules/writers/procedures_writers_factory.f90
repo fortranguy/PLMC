@@ -5,12 +5,14 @@ use data_wrappers_prefix, only: environment_prefix
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_data_found
 use class_number_to_string, only: Concrete_Number_to_String
+use class_walls_potential, only: Abstract_Walls_Potential
 use class_component_coordinates, only: Abstract_Component_Coordinates
 use types_component_wrapper, only: Component_Wrapper
 use procedures_mixture_factory, only: mixture_set
-use types_short_interactions_wrapper, only: Pair_Potentials_Wrapper
+use types_short_interactions_wrapper, only: Pair_Potential_Wrapper, Pair_Potentials_Wrapper
 use types_long_interactions_wrapper, only: Ewald_Real_Pairs_Wrapper
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
+use class_line_writer, only: Abstract_Line_Writer, Concrete_Line_Writer, Null_Line_Writer
 use class_triangle_writer, only: Concrete_Line_Selector, &
     Abstract_Triangle_Writer, Concrete_Triangle_Writer, Null_Triangle_Writer
 use class_energy_writer, only: Abstract_Energy_Writer, Concrete_Energy_Writer, Null_Energy_Writer
@@ -21,7 +23,7 @@ use class_component_coordinates_writer, only: Concrete_Coordinates_Writer_Select
 use types_writers_wrapper, only: Component_Writers_Wrapper, Writers_Wrapper
 use procedures_property_inquirers, only: use_walls, component_exists, component_has_positions, &
     component_has_orientations, component_can_move, component_can_rotate, component_can_exchange, &
-    component_is_dipolar, components_interact
+    component_is_dipolar, components_interact, component_interacts_with_wall
 
 implicit none
 
@@ -35,6 +37,7 @@ interface writers_create
     module procedure :: create_coordinates
     module procedure :: create_components_changes
     module procedure :: create_changes
+    module procedure :: create_walls
     module procedure :: create_switches
     module procedure :: create_short_energies
     module procedure :: create_long_energies
@@ -44,6 +47,7 @@ end interface writers_create
 interface writers_destroy
     module procedure :: destroy_long_mixture_energy
     module procedure :: destroy_triangle
+    module procedure :: destroy_line
     module procedure :: destroy_changes
     module procedure :: destroy_coordinates
     module procedure :: destroy_components
@@ -52,9 +56,11 @@ end interface writers_destroy
 
 contains
 
-    subroutine create_all(writers, components, short_pairs, long_pairs, changes, input_data, prefix)
+    subroutine create_all(writers, components, wall_pairs, short_pairs, long_pairs, changes, &
+        input_data, prefix)
         type(Writers_Wrapper), intent(out) :: writers
         type(Component_Wrapper), intent(in) :: components(:)
+        type(Pair_Potential_Wrapper), intent(in) :: wall_pairs(:)
         type(Pair_Potentials_Wrapper), intent(in) :: short_pairs(:)
         type(Ewald_Real_Pairs_Wrapper), intent(in) :: long_pairs(:)
         type(Changes_Component_Wrapper), intent(in) :: changes(:)
@@ -63,8 +69,9 @@ contains
 
         logical :: are_dipolar(size(components))
 
-        !todo: walls and field to add
+        !todo: field to add
         call writers_create(writers%components, components, changes, input_data, prefix)
+        call writers_create(writers%walls, wall_pairs, "walls_energies.out")
         call writers_create(writers%switches, components, "switches.out")
         call writers_create(writers%short_energies, short_pairs, "short_energies.out")
         call writers_create(writers%long_energies, long_pairs, "long_energies.out")
@@ -80,6 +87,7 @@ contains
         call writers_destroy(writers%long_energies)
         call writers_destroy(writers%short_energies)
         call writers_destroy(writers%switches)
+        call writers_destroy(writers%walls)
         call writers_destroy(writers%components)
     end subroutine destroy_all
 
@@ -206,6 +214,38 @@ contains
             deallocate(changes)
         end if
     end subroutine destroy_changes
+
+    subroutine create_walls(walls, wall_pairs, filename)
+        class(Abstract_Line_Writer), allocatable, intent(out) :: walls
+        type(Pair_Potential_Wrapper), intent(in) :: wall_pairs(:)
+        character(len=*), intent(in) :: filename
+
+        logical :: selector(size(wall_pairs)), some_components_interact
+        integer :: i_component
+
+        some_components_interact = .false.
+        do i_component = 1, size(wall_pairs)
+            selector(i_component) = component_interacts_with_wall(wall_pairs(i_component)%&
+                pair_potential)
+            some_components_interact = some_components_interact .or. selector(i_component)
+        end do
+
+        if (some_components_interact) then
+            allocate(Concrete_Line_Writer :: walls)
+        else
+            allocate(Null_Line_Writer :: walls)
+        end if
+        call walls%construct(filename, selector)
+    end subroutine create_walls
+
+    subroutine destroy_line(line)
+        class(Abstract_Line_Writer), allocatable, intent(inout) :: line
+
+        if (allocated(line)) then
+            call line%destroy()
+            deallocate(line)
+        end if
+    end subroutine destroy_line
 
     subroutine create_switches(switches, components, filename)
         class(Abstract_Triangle_Writer), allocatable, intent(out) :: switches

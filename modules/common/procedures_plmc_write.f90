@@ -33,6 +33,7 @@ contains
                     changes_sucesses(i_component))
             end do
         end if
+        call writers%walls%write(i_step, observables%walls_energies)
         call writers%switches%write(i_step, observables%switches_successes)
         call writers%short_energies%write(i_step, observables%short_energies)
         call writers%long_energies%write(i_step, observables%long_energies)

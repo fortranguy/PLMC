@@ -125,6 +125,8 @@ contains
             long_mixture_delta, ij_actors)
         if (success) then
             do i = 1, size(ij_actors)
+                observables%walls_energies(ij_actors(i)) = &
+                    observables%walls_energies(ij_actors(i)) + walls_delta(i)
                 call update_energies(observables%short_energies, short_deltas(:, i), ij_actors(i))
                 call update_energies(observables%long_energies, long_deltas(:, i), ij_actors(i))
             end do
@@ -259,7 +261,8 @@ contains
             end do
         end do
         long_deltas = long_new_real - long_old_real
-        long_mixture_delta = this%long_interactions%reci_visitor%visit_switch(ij_actors, old)
+        long_mixture_delta = this%long_interactions%reci_visitor%visit_switch(ij_actors, old) - &
+            this%long_interactions%dlc_visitor%visit_switch(ij_actors, old)
     end subroutine Abstract_visit_long
 
     !> Warning: the i_actor <-> j_actor term is ignored.
@@ -291,6 +294,7 @@ contains
             end do
         end do
         call this%long_interactions%reci_structure%update_switch(ij_actors, old)
+        call this%long_interactions%dlc_structures%update_switch(ij_actors, old)
     end subroutine Abstract_update_actors
 
 !end implementation Abstract_Two_Particles_Switch

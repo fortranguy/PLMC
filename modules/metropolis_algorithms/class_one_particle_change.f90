@@ -198,6 +198,7 @@ contains
         call this%test_metropolis(success, walls_delta, short_deltas, long_deltas, &
             long_mixture_delta, i_actor)
         if (success) then
+            observables%walls_energies(i_actor) = observables%walls_energies(i_actor) + walls_delta
             call update_energies(observables%short_energies, short_deltas, i_actor)
             call update_energies(observables%long_energies, long_deltas, i_actor)
             observables%long_mixture_energy = observables%long_mixture_energy + long_mixture_delta
@@ -314,7 +315,7 @@ contains
                 visit(long_old_real(i_component), old, i_exclude)
         end do
         long_mixture_delta = this%long_interactions%reci_visitor%visit_move(i_actor, new%position, &
-            old)
+            old) - this%long_interactions%dlc_visitor%visit_move(i_actor, new%position, old)
         long_deltas = long_new_real - long_old_real
     end subroutine Move_visit_long
 
@@ -331,6 +332,7 @@ contains
                 old)
         end do
         call this%long_interactions%reci_structure%update_move(i_actor, new%position, old)
+        call this%long_interactions%dlc_structures%update_move(i_actor, new%position, old)
     end subroutine Move_update_actor
 
     subroutine Move_increment_hit(changes_counters)
@@ -406,7 +408,8 @@ contains
         long_mixture_delta = &
             this%long_interactions%reci_visitor%visit_rotation(i_actor, new%dipolar_moment, old) + &
             this%long_interactions%surf_mixture%visit_rotation(i_actor, new%dipolar_moment, old%&
-                dipolar_moment)
+                dipolar_moment) - this%long_interactions%dlc_visitor%visit_rotation(i_actor, new%&
+                dipolar_moment, old)
     end subroutine Rotation_visit_long
 
     subroutine Rotation_update_actor(this, i_actor, new, old)
@@ -418,6 +421,7 @@ contains
         call this%mixture%total_moment%remove(i_actor, old%dipolar_moment)
         call this%mixture%total_moment%add(i_actor, new%dipolar_moment)
         call this%long_interactions%reci_structure%update_rotation(i_actor, new%dipolar_moment, old)
+        call this%long_interactions%dlc_structures%update_rotation(i_actor, new%dipolar_moment, old)
     end subroutine Rotation_update_actor
 
     subroutine Rotation_increment_hit(changes_counters)

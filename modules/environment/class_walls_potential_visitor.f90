@@ -61,6 +61,7 @@ contains
         do i_particle = 1, component_positions%get_num()
             call this%walls_potential%visit(overlap, energy_i, component_positions%&
                 get(i_particle), pair_potential)
+            if (overlap) return
             energy = energy + energy_i
         end do
     end subroutine Abstract_visit

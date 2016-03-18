@@ -2,6 +2,7 @@ module procedures_property_inquirers
 
 use json_module, only: json_file
 use procedures_checks, only: check_data_found
+use class_periodic_box, only: Abstract_Periodic_Box, XYZ_Periodic_Box, XY_Periodic_Box
 use class_permittivity, only: Abstract_Permittivity, Concrete_Permittivity
 use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice, Concrete_Reciprocal_Lattice
 use class_walls_potential, only: Abstract_Walls_Potential, Concrete_Walls_Potential
@@ -23,10 +24,11 @@ use class_ewald_real_pair, only: Abstract_Ewald_Real_Pair, Null_Ewald_Real_Pair
 implicit none
 
 private
-public :: apply_external_field, use_permittivity, use_reciprocal_lattice, use_walls, &
+public :: periodicity_is_xyz, periodicity_is_xy, apply_external_field, use_permittivity, &
+    use_reciprocal_lattice, use_walls, &
     component_exists, component_is_dipolar, component_has_positions, component_can_move, &
     component_has_orientations, component_can_exchange, component_can_rotate, components_interact, &
-    component_can_change
+    component_interacts_with_wall, component_can_change
 
 interface apply_external_field
     module procedure :: apply_external_field_from_json
@@ -69,6 +71,28 @@ interface components_interact
 end interface components_interact
 
 contains
+
+    pure logical function periodicity_is_xyz(periodic_box)
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
+
+        select type (periodic_box)
+            type is (XYZ_Periodic_Box)
+                periodicity_is_xyz = .true.
+            class default
+                periodicity_is_xyz = .false.
+        end select
+    end function periodicity_is_xyz
+
+    pure logical function periodicity_is_xy(periodic_box)
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
+
+        select type (periodic_box)
+            type is (XY_Periodic_Box)
+                periodicity_is_xy = .true.
+            class default
+                periodicity_is_xy = .false.
+        end select
+    end function periodicity_is_xy
 
     logical function apply_external_field_from_json(input_data, prefix) result(apply_external_field)
         type(json_file), intent(inout) :: input_data
@@ -167,6 +191,17 @@ contains
                 components_interact = .true.
         end select
     end function components_interact_from_pair_potential
+
+    pure logical function component_interacts_with_wall(wall_pair) result(component_interacts)
+        class(Abstract_Pair_Potential), intent(in) :: wall_pair
+
+        select type (wall_pair)
+            type is (Null_Pair_Potential)
+                component_interacts = .false.
+            class default
+                component_interacts = .true.
+        end select
+    end function component_interacts_with_wall
 
     pure logical function components_interact_from_ewald_real_pair(ewald_real_pair) &
         result(components_interact)

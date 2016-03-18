@@ -19,6 +19,7 @@ use procedures_ewald_real_factory, only: ewald_real_create, ewald_real_destroy
 use procedures_ewald_reci_factory, only: ewald_reci_create, ewald_reci_destroy
 use procedures_ewald_self_factory, only: ewald_self_create, ewald_self_destroy
 use procedures_ewald_surf_factory, only: ewald_surf_create, ewald_surf_destroy
+use procedures_dlc_factory, only: dlc_create, dlc_destroy
 
 implicit none
 
@@ -76,10 +77,20 @@ contains
 
         call ewald_surf_create(long_interactions%surf_mixture, environment%periodic_box, &
             environment%permittivity, mixture%total_moment)
+
+        call dlc_create(long_interactions%dlc_weight, environment, any(are_dipolar))
+        call dlc_create(long_interactions%dlc_structures, environment, mixture%components, &
+            are_dipolar)
+        call dlc_create(long_interactions%dlc_visitor, environment, long_interactions%dlc_weight, &
+            long_interactions%dlc_structures)
     end subroutine create_all
 
     subroutine destroy_all(long_interactions)
         type(Long_Interactions_Wrapper), intent(inout) :: long_interactions
+
+        call dlc_destroy(long_interactions%dlc_visitor)
+        call dlc_destroy(long_interactions%dlc_structures)
+        call dlc_destroy(long_interactions%dlc_weight)
 
         call ewald_surf_destroy(long_interactions%surf_mixture)
 
@@ -134,11 +145,12 @@ contains
 
         if (dipoles_exist) then
             if (.not.use_reciprocal_lattice(reciprocal_lattice)) then
-                call warning_continue("check_consistency: dipoles exist but reciprocal_lattice "//&
-                    "unused.")
+                call warning_continue("long_interactions_check: "//&
+                    "dipoles exist but reciprocal_lattice unused.")
             end if
             if (.not.use_permittivity(permittivity)) then
-                call warning_continue("check_consistency: dipoles exist but permittivity unused.")
+                call warning_continue("long_interactions_check: "//&
+                    "dipoles exist but permittivity unused.")
             end if
         end if
     end subroutine check_consistency

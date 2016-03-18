@@ -3,9 +3,9 @@ module class_triangle_writer
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: max_line_length
 use procedures_checks, only: check_string_not_empty
-use class_number_to_string, only: Abstract_Number_to_String, &
-    Concrete_Number_to_String, Null_Number_to_String
+use class_number_to_string, only: Concrete_Number_to_String, Null_Number_to_String
 use types_line_observables, only: Concrete_Line_Observables
+use module_string_wrapper, only: String_Wrapper, strings_wrapper_destroy
 
 implicit none
 
@@ -14,10 +14,6 @@ private
     type, public :: Concrete_Line_Selector
         logical, allocatable :: with_components(:)
     end type Concrete_Line_Selector
-
-    type :: String_Wrapper
-        class(Abstract_Number_to_String), allocatable :: string
-    end type String_Wrapper
 
     type :: Strings_Wrapper
         type(String_Wrapper), allocatable :: with_component(:)
@@ -60,14 +56,14 @@ contains
         call check_string_not_empty("Abstract_Triangle_Writer: construct: filename", &
             filename)
         open(newunit=file_unit, recl=max_line_length, file=filename, action="write")
+        this%file_unit = file_unit
         legend = "# i_step"
         call this%allocate_string(legend, selector)
-        this%file_unit = file_unit
         write(this%file_unit, *) legend
     end subroutine Abstract_construct
 
     subroutine Abstract_allocate_strings(this, legend, selector)
-        class(Abstract_Triangle_Writer), intent(out) :: this
+        class(Abstract_Triangle_Writer), intent(inout) :: this
         character(len=:), allocatable, intent(inout) :: legend
         type(Concrete_Line_Selector), intent(in) :: selector(:)
 
@@ -97,9 +93,7 @@ contains
 
         if (allocated(this%strings)) then
             do i_component = size(this%strings), 1, -1
-                if (allocated(this%strings(i_component)%with_component)) then
-                    deallocate(this%strings(i_component)%with_component)
-                end if
+                call strings_wrapper_destroy(this%strings(i_component)%with_component)
             end do
             deallocate(this%strings)
         end if

@@ -6,7 +6,7 @@ use class_periodic_box, only: Abstract_Periodic_Box
 use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use types_component_wrapper, only: Component_Wrapper
 use types_temporary_particle, only: Concrete_Temporary_Particle
-use procedures_ewald_micro, only: set_fourier, reci_number_1_sym, reci_number_2_sym
+use procedures_long_interactions_micro, only: set_fourier, reci_number_1_sym, reci_number_2_sym
 
 implicit none
 
@@ -29,6 +29,7 @@ private
         procedure :: update_rotation => Abstract_update_rotation
         procedure :: update_switch => Abstract_update_switch
         procedure, private :: set => Abstract_set
+        procedure, private :: update_exchange => Abstract_update_exchange
     end type Abstract_Ewald_Reci_Structure
 
     type, extends(Abstract_Ewald_Reci_Structure), public :: Concrete_Ewald_Reci_Structure
@@ -88,17 +89,16 @@ contains
     pure subroutine Abstract_set(this)
         class(Abstract_Ewald_Reci_Structure), intent(inout) :: this
 
+        real(DP) :: box_size(num_dimensions)
+        real(DP), dimension(num_dimensions) :: wave_1_x_position, wave_vector
+        real(DP) :: wave_dot_moment
+        integer :: n_1, n_2, n_3
+        integer :: i_component, i_particle
+
         complex(DP) :: fourier_position
         complex(DP), dimension(-this%reci_numbers(1):this%reci_numbers(1)) :: fourier_position_1
         complex(DP), dimension(-this%reci_numbers(2):this%reci_numbers(2)) :: fourier_position_2
         complex(DP), dimension(-this%reci_numbers(3):this%reci_numbers(3)) :: fourier_position_3
-
-        real(DP) :: box_size(num_dimensions)
-        real(DP), dimension(num_dimensions) :: wave_1_x_position
-        real(DP), dimension(num_dimensions) :: wave_vector
-        real(DP) :: wave_dot_moment
-        integer :: n_1, n_2, n_3
-        integer :: i_component, i_particle
 
         box_size = this%periodic_box%get_size()
         this%structure  = cmplx(0._DP, 0._DP, DP)
@@ -124,7 +124,7 @@ contains
                         dipolar_moments%get(i_particle))
 
                     this%structure(n_1, n_2, n_3) = this%structure(n_1, n_2, n_3) + &
-                        cmplx(wave_dot_moment, 0._DP, DP) * fourier_position
+                        wave_dot_moment * fourier_position
                 end do
                 end do
                 end do
@@ -145,7 +145,7 @@ contains
 
     !> Structure factor update when a particle of coordinates \( (\vec{x}, \vec{\mu}) \) moves.
     !>  \[
-    !>      \Delta S(\vec{k}) = \vec{k}\cdot\vec{\mu}
+    !>      \Delta S(\vec{k}) = (\vec{k}\cdot\vec{\mu})
     !>          \left( e^{i\vec{k}\cdot\vec{x}^\prime} - e^{i\vec{k}\cdot\vec{x}} \right)
     !>  \]
     !> Warning: only half wave vectors are updated.
@@ -156,15 +156,14 @@ contains
         type(Concrete_Temporary_Particle), intent(in) :: old
 
         real(DP) :: box_size(num_dimensions)
-        real(DP), dimension(num_dimensions) :: wave_vector
+        real(DP), dimension(num_dimensions) :: wave_1_x_position_new, wave_1_x_position_old, &
+            wave_vector
         integer :: n_1, n_2, n_3
-        real(DP), dimension(num_dimensions) :: wave_1_x_position_new, wave_1_x_position_old
 
         complex(DP) :: fourier_position_new
         complex(DP), dimension(-this%reci_numbers(1):this%reci_numbers(1)) :: fourier_position_new_1
         complex(DP), dimension(-this%reci_numbers(2):this%reci_numbers(2)) :: fourier_position_new_2
         complex(DP), dimension(-this%reci_numbers(3):this%reci_numbers(3)) :: fourier_position_new_3
-
         complex(DP) :: fourier_position_old
         complex(DP), dimension(-this%reci_numbers(1):this%reci_numbers(1)) :: fourier_position_old_1
         complex(DP), dimension(-this%reci_numbers(2):this%reci_numbers(2)) :: fourier_position_old_2
@@ -173,12 +172,10 @@ contains
         if (.not.this%are_dipolar(i_component)) return
 
         box_size = this%periodic_box%get_size()
-
         wave_1_x_position_old = 2._DP*PI * old%position / box_size
         call set_fourier(fourier_position_old_1, this%reci_numbers(1), wave_1_x_position_old(1))
         call set_fourier(fourier_position_old_2, this%reci_numbers(2), wave_1_x_position_old(2))
         call set_fourier(fourier_position_old_3, this%reci_numbers(3), wave_1_x_position_old(3))
-
         wave_1_x_position_new = 2._DP*PI * new_position / box_size
         call set_fourier(fourier_position_new_1, this%reci_numbers(1), wave_1_x_position_new(1))
         call set_fourier(fourier_position_new_2, this%reci_numbers(2), wave_1_x_position_new(2))
@@ -218,9 +215,8 @@ contains
         type(Concrete_Temporary_Particle), intent(in) :: old
 
         real(DP) :: box_size(num_dimensions)
-        real(DP), dimension(num_dimensions) :: wave_vector
+        real(DP), dimension(num_dimensions) :: wave_1_x_position, wave_vector
         integer :: n_1, n_2, n_3
-        real(DP), dimension(num_dimensions) :: wave_1_x_position
 
         complex(DP) :: fourier_position
         complex(DP), dimension(-this%reci_numbers(1):this%reci_numbers(1)) :: fourier_position_1
@@ -230,7 +226,6 @@ contains
         if (.not.this%are_dipolar(i_component)) return
 
         box_size = this%periodic_box%get_size()
-
         wave_1_x_position = 2._DP*PI * old%position / box_size
         call set_fourier(fourier_position_1, this%reci_numbers(1), wave_1_x_position(1))
         call set_fourier(fourier_position_2, this%reci_numbers(2), wave_1_x_position(2))
@@ -258,7 +253,9 @@ contains
 
     !> Structure factor update when a particle of coordinates \( (\vec{x}, \vec{\mu}) \) is added
     !> (\( + )\) or removed (\( - \)):
-    !> Delta S(\vec{k}) = \pm (\vec{k}\cdot\vec{\mu}) e^{i\vec{k}\cdot\vec{x}}
+    !> \[
+    !>      \Delta S(\vec{k}) = \pm (\vec{k}\cdot\vec{\mu}) e^{i\vec{k}\cdot\vec{x}}
+    !> \]
     pure subroutine Abstract_update_exchange(this, i_component, particle, signed)
         class(Abstract_Ewald_Reci_Structure), intent(inout) :: this
         integer, intent(in) :: i_component
@@ -266,9 +263,8 @@ contains
         real(DP), intent(in) :: signed
 
         real(DP) :: box_size(num_dimensions)
-        real(DP), dimension(num_dimensions) :: wave_vector
+        real(DP), dimension(num_dimensions) :: wave_1_x_position, wave_vector
         integer :: n_1, n_2, n_3
-        real(DP), dimension(num_dimensions) :: wave_1_x_position
 
         complex(DP) :: fourier_position
         complex(DP), dimension(-this%reci_numbers(1):this%reci_numbers(1)) :: fourier_position_1
@@ -315,15 +311,14 @@ contains
         type(Concrete_Temporary_Particle), intent(in) :: particles(:)
 
         real(DP) :: box_size(num_dimensions)
-        real(DP), dimension(num_dimensions) :: wave_vector
+        real(DP), dimension(num_dimensions) :: wave_1_x_position_1, wave_1_x_position_2, &
+            wave_vector
         integer :: n_1, n_2, n_3
-        real(DP), dimension(num_dimensions) :: wave_1_x_position_1, wave_1_x_position_2
 
         complex(DP) :: fourier_position_1
         complex(DP), dimension(-this%reci_numbers(1):this%reci_numbers(1)) :: fourier_position_1_1
         complex(DP), dimension(-this%reci_numbers(2):this%reci_numbers(2)) :: fourier_position_1_2
         complex(DP), dimension(-this%reci_numbers(3):this%reci_numbers(3)) :: fourier_position_1_3
-
         complex(DP) :: fourier_position_2
         complex(DP), dimension(-this%reci_numbers(1):this%reci_numbers(1)) :: fourier_position_2_1
         complex(DP), dimension(-this%reci_numbers(2):this%reci_numbers(2)) :: fourier_position_2_2
@@ -333,12 +328,10 @@ contains
             return
 
         box_size = this%periodic_box%get_size()
-
         wave_1_x_position_1 = 2._DP*PI * particles(1)%position / box_size
         call set_fourier(fourier_position_1_1, this%reci_numbers(1), wave_1_x_position_1(1))
         call set_fourier(fourier_position_1_2, this%reci_numbers(2), wave_1_x_position_1(2))
         call set_fourier(fourier_position_1_3, this%reci_numbers(3), wave_1_x_position_1(3))
-
         wave_1_x_position_2 = 2._DP*PI * particles(2)%position / box_size
         call set_fourier(fourier_position_2_1, this%reci_numbers(1), wave_1_x_position_2(1))
         call set_fourier(fourier_position_2_2, this%reci_numbers(2), wave_1_x_position_2(2))

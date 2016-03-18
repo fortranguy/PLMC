@@ -30,54 +30,54 @@ end interface ewald_reci_destroy
 
 contains
 
-    subroutine create_visitor(reci_visitor, environment, weight, structure)
-        class(Abstract_Ewald_Reci_Visitor), allocatable, intent(out) :: reci_visitor
+    subroutine create_visitor(visitor, environment, weight, structure)
+        class(Abstract_Ewald_Reci_Visitor), allocatable, intent(out) :: visitor
         type(Environment_Wrapper), intent(in) :: environment
         class(Abstract_Ewald_Reci_Weight), intent(in) :: weight
         class(Abstract_Ewald_Reci_Structure), intent(in) :: structure
 
         select type (structure)
             type is (Concrete_Ewald_Reci_Structure)
-                allocate(Concrete_Ewald_Reci_Visitor :: reci_visitor)
+                allocate(Concrete_Ewald_Reci_Visitor :: visitor)
             type is (Null_Ewald_Reci_Structure)
-                allocate(Null_Ewald_Reci_Visitor :: reci_visitor)
+                allocate(Null_Ewald_Reci_Visitor :: visitor)
             class default
-                call error_exit("create_visitor: structure type unknown.")
+                call error_exit("ewald_reci_create: create_visitor: structure type unknown.")
         end select
-        call reci_visitor%construct(environment%periodic_box, environment%reciprocal_lattice, &
+        call visitor%construct(environment%periodic_box, environment%reciprocal_lattice, &
             weight, structure)
     end subroutine create_visitor
 
-    subroutine destroy_visitor(reci_visitor)
-        class(Abstract_Ewald_Reci_Visitor), allocatable, intent(inout) :: reci_visitor
+    subroutine destroy_visitor(visitor)
+        class(Abstract_Ewald_Reci_Visitor), allocatable, intent(inout) :: visitor
 
-        if (allocated(reci_visitor)) then
-            call reci_visitor%destroy()
-            deallocate(reci_visitor)
+        if (allocated(visitor)) then
+            call visitor%destroy()
+            deallocate(visitor)
         end if
     end subroutine destroy_visitor
 
-    subroutine create_structure(reci_structure, environment, components, are_dipolar)
-        class(Abstract_Ewald_Reci_Structure), allocatable, intent(out) :: reci_structure
+    subroutine create_structure(structure, environment, components, are_dipolar)
+        class(Abstract_Ewald_Reci_Structure), allocatable, intent(out) :: structure
         type(Environment_Wrapper), intent(in) :: environment
         type(Component_Wrapper), intent(in) :: components(:)
         logical, intent(in) :: are_dipolar(:)
 
         if (any(are_dipolar)) then
-            allocate(Concrete_Ewald_Reci_Structure :: reci_structure)
+            allocate(Concrete_Ewald_Reci_Structure :: structure)
         else
-            allocate(Null_Ewald_Reci_Structure :: reci_structure)
+            allocate(Null_Ewald_Reci_Structure :: structure)
         end if
-        call reci_structure%construct(environment%periodic_box, environment%reciprocal_lattice, &
+        call structure%construct(environment%periodic_box, environment%reciprocal_lattice, &
             components, are_dipolar)
     end subroutine create_structure
 
-    subroutine destroy_structure(reci_structure)
-        class(Abstract_Ewald_Reci_Structure), allocatable, intent(inout) :: reci_structure
+    subroutine destroy_structure(structure)
+        class(Abstract_Ewald_Reci_Structure), allocatable, intent(inout) :: structure
 
-        if (allocated(reci_structure)) then
-            call reci_structure%destroy()
-            deallocate(reci_structure)
+        if (allocated(structure)) then
+            call structure%destroy()
+            deallocate(structure)
         end if
     end subroutine destroy_structure
 

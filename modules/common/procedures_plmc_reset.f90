@@ -22,13 +22,15 @@ contains
         call total_moment%reset()
     end subroutine reset_total_moments
 
-    !> When using Ewald, some quantities may need to be reset to reflect the actual configuration.
+    !> Some quantities may need to be reset to reflect the current configuration.
     subroutine reset_long(long_interactions)
         type(Long_Interactions_Wrapper), intent(inout) :: long_interactions
 
         call plmc_reset(long_interactions%real_pairs)
         call long_interactions%reci_weight%reset()
         call long_interactions%reci_structure%reset()
+        call long_interactions%dlc_weight%reset()
+        call long_interactions%dlc_structures%reset()
     end subroutine reset_long
 
     subroutine reset_long_real(real_pairs)

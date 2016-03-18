@@ -1,6 +1,5 @@
 project: Physics of Liquids Monte-Carlo
-summary: A simple Monte-Carlo program for colloids
-    written in Modern Fortran
+summary: A simple Monte-Carlo program for colloids written in Modern Fortran
 project_dir: ./programs
     ./modules
 extra_mods: iso_fortran_env:https://gcc.gnu.org/onlinedocs/gfortran/ISO_005fFORTRAN_005fENV.html
@@ -15,7 +14,7 @@ display: public
     private
 sort: permission
 version: Green Mile
-year: 2015
+year: 2016
 author: Salomon CHUNG
 email: salomon.chung@u-pe.fr
 website: http://www.plmc.u-pec.fr/

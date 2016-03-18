@@ -1,11 +1,11 @@
-module procedures_ewald_micro
+module procedures_long_interactions_micro
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions, PI
 
 implicit none
 private
-public :: ewald_real_B, ewald_real_C, reci_number_1_sym, reci_number_2_sym, set_fourier, set_exp_n_3
+public :: ewald_real_B, ewald_real_C, reci_number_1_sym, reci_number_2_sym, set_fourier, set_exp_kz
 
 contains
 
@@ -76,7 +76,7 @@ contains
         end if
     end function reci_number_2_sym
 
-    !> Fourier coefficients (bases) tabulation
+    !> Set fourier coefficients \( e^{i k_\mathsf{i} x_\mathsf{i}} \) tabulation
     pure subroutine set_fourier(fourier_position_i, reci_number_i, wave_1_x_position_i)
         integer, intent(in) :: reci_number_i
         complex(DP), dimension(-reci_number_i:reci_number_i), intent(out) :: fourier_position_i
@@ -92,23 +92,24 @@ contains
         end do
     end subroutine set_fourier
 
-    !> DLC tabulation
-    pure subroutine set_exp_n_3(exp_n_3_tab, reci_number, wave_norm, z)
-        integer, dimension(:), intent(in) :: reci_number
-        real(DP), dimension(0:reci_number(1), 0:reci_number(2)), intent(out) :: exp_n_3_tab
-        real(DP), dimension(-reci_number(1):reci_number(1), &
-                            -reci_number(2):reci_number(2)), intent(in) :: wave_norm
-        real(DP), intent(in) :: z
+    !> Set \( e^{k_{1:2} z} \) tabulation
+    pure subroutine set_exp_kz(exp_kz_tab, surface_size, position_3)
+        real(DP), dimension(0:, 0:), intent(out) :: exp_kz_tab
+        real(DP), intent(in) :: surface_size(:), position_3
 
+        real(DP) :: wave_vector(2)
         integer :: n_1, n_2
-        do n_2 = 0, reci_number(2)
-            do n_1 = n_2, reci_number(1)
-                exp_n_3_tab(n_1, n_2) = exp(wave_norm(n_1, n_2) * z)
+
+        do n_2 = 0, ubound(exp_kz_tab, 2)
+            wave_vector(2) = 2._DP*PI * real(n_2, DP) / surface_size(2)
+            do n_1 = n_2, ubound(exp_kz_tab, 1)
+                wave_vector(1) = 2._DP*PI * real(n_1, DP) / surface_size(1)
+                exp_kz_tab(n_1, n_2) = exp(norm2(wave_vector) * position_3)
             end do
             do n_1 = 0, n_2-1
-                exp_n_3_tab(n_1, n_2) = exp_n_3_tab(n_2, n_1)
+                exp_kz_tab(n_1, n_2) = exp_kz_tab(n_2, n_1)
             end do
         end do
-    end subroutine set_exp_n_3
+    end subroutine set_exp_kz
 
-end module procedures_ewald_micro
+end module procedures_long_interactions_micro

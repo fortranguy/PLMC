@@ -2,7 +2,7 @@ module procedures_environment_factory
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use json_module, only: json_file
-use procedures_errors, only: error_exit
+use procedures_errors, only: error_exit, warning_continue
 use procedures_checks, only: check_data_found, check_3d_array
 use class_periodic_box, only: Abstract_Periodic_Box, &
     XYZ_Periodic_Box, XY_Periodic_Box
@@ -27,8 +27,8 @@ use procedures_short_interactions_factory, only: short_interactions_create, &
 use class_walls_potential, only: Abstract_Walls_Potential, &
     Concrete_Walls_Potential, Null_Walls_Potential
 use types_environment_wrapper, only: Environment_Wrapper
-use procedures_property_inquirers, only: apply_external_field, use_permittivity, &
-    use_reciprocal_lattice, use_walls
+use procedures_property_inquirers, only: periodicity_is_xyz, periodicity_is_xy, &
+    apply_external_field, use_permittivity, use_reciprocal_lattice, use_walls
 
 implicit none
 
@@ -61,6 +61,10 @@ interface environment_destroy
     module procedure :: destroy_all
 end interface environment_destroy
 
+interface environment_check
+    module procedure :: check_consistency
+end interface environment_check
+
 contains
 
     subroutine create_all(environment, input_data, prefix)
@@ -91,6 +95,8 @@ contains
         call environment_create(environment%walls_potential, walls_used, &
             environment%periodic_box, floor_penetration, input_data, prefix)
         call environment_destroy(floor_penetration)
+
+        call environment_check(environment%periodic_box, environment%walls_potential)
     end subroutine create_all
 
     subroutine destroy_all(environment)
@@ -408,5 +414,17 @@ contains
         call walls_potential%destroy()
         if (allocated(walls_potential)) deallocate(walls_potential)
     end subroutine destroy_walls_potential
+
+    subroutine check_consistency(periodic_box, walls_potential)
+        class(Abstract_Periodic_Box), intent(in) :: periodic_box
+        class(Abstract_Walls_Potential), intent(in) :: walls_potential
+
+        if (periodicity_is_xyz(periodic_box) .and. use_walls(walls_potential)) then
+            call warning_continue("environment_check: periodicity is XYZ but walls are used.")
+        end if
+        if (periodicity_is_xy(periodic_box) .and. .not.use_walls(walls_potential)) then
+            call warning_continue("environment_check: periodicity is XY but walls are not used.")
+        end if
+    end subroutine check_consistency
 
 end module procedures_environment_factory

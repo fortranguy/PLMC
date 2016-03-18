@@ -83,6 +83,9 @@
 		<Unit filename="modules/common/module_plmc_iterations.f90">
 			<Option weight="2" />
 		</Unit>
+		<Unit filename="modules/common/module_string_wrapper.f90">
+			<Option weight="2" />
+		</Unit>
 		<Unit filename="modules/common/procedures_checks.f90">
 			<Option weight="1" />
 		</Unit>
@@ -143,9 +146,6 @@
 		<Unit filename="modules/environment/class_walls_potential_visitor.f90">
 			<Option weight="5" />
 		</Unit>
-		<Unit filename="modules/environment/class_wave_vector_norm.f90">
-			<Option weight="4" />
-		</Unit>
 		<Unit filename="modules/environment/procedures_environment_factory.f90">
 			<Option weight="9" />
 		</Unit>
@@ -154,6 +154,12 @@
 		</Unit>
 		<Unit filename="modules/environment/types_environment_wrapper.f90">
 			<Option weight="5" />
+		</Unit>
+		<Unit filename="modules/long_interactions/class_dlc_structures.f90">
+			<Option weight="6" />
+		</Unit>
+		<Unit filename="modules/long_interactions/class_dlc_visitor.f90">
+			<Option weight="7" />
 		</Unit>
 		<Unit filename="modules/long_interactions/class_dlc_weight.f90">
 			<Option weight="4" />
@@ -185,8 +191,8 @@
 		<Unit filename="modules/long_interactions/class_ewald_surf_mixture.f90">
 			<Option weight="7" />
 		</Unit>
-		<Unit filename="modules/long_interactions/procedures_ewald_micro.f90">
-			<Option weight="1" />
+		<Unit filename="modules/long_interactions/procedures_dlc_factory.f90">
+			<Option weight="8" />
 		</Unit>
 		<Unit filename="modules/long_interactions/procedures_ewald_real_factory.f90">
 			<Option weight="9" />
@@ -202,6 +208,9 @@
 		</Unit>
 		<Unit filename="modules/long_interactions/procedures_long_interactions_factory.f90">
 			<Option weight="10" />
+		</Unit>
+		<Unit filename="modules/long_interactions/procedures_long_interactions_micro.f90">
+			<Option weight="1" />
 		</Unit>
 		<Unit filename="modules/long_interactions/types_long_interactions_wrapper.f90">
 			<Option weight="8" />
@@ -320,8 +329,11 @@
 		<Unit filename="modules/writers/class_energy_writer.f90">
 			<Option weight="2" />
 		</Unit>
+		<Unit filename="modules/writers/class_line_writer.f90">
+			<Option weight="3" />
+		</Unit>
 		<Unit filename="modules/writers/class_triangle_writer.f90">
-			<Option weight="2" />
+			<Option weight="3" />
 		</Unit>
 		<Unit filename="modules/writers/procedures_writers_factory.f90">
 			<Option weight="10" />

@@ -5,7 +5,7 @@ use data_constants, only: num_dimensions, PI
 use procedures_errors, only: error_exit
 use procedures_checks, only: check_positive, check_potential_domain
 use class_permittivity, only: Abstract_Permittivity
-use procedures_ewald_micro, only: ewald_real_B, ewald_real_C
+use procedures_long_interactions_micro, only: ewald_real_B, ewald_real_C
 use types_potential_domain, only: Long_Potential_Domain
 use class_ewald_convergence_parameter, only: Abstract_Ewald_Convergence_Parameter
 

@@ -143,8 +143,8 @@ contains
         call triangle_observables_add(energies, real_energies)
         call destroy_triangle_nodes(real_energies)
 
-        long_mixture_energy = long_interactions%reci_visitor%visit() + &
-                              long_interactions%surf_mixture%visit()
+        long_mixture_energy = long_interactions%reci_visitor%visit() + long_interactions%&
+            surf_mixture%visit() - long_interactions%dlc_visitor%visit()
 
         call visit_long_self(self_energies, long_interactions%self_components)
         call triangle_observables_add(energies, -self_energies)

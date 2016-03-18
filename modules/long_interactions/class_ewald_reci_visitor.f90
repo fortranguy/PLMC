@@ -7,7 +7,7 @@ use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use class_ewald_reci_weight, only: Abstract_Ewald_Reci_Weight
 use class_ewald_reci_structure, only: Abstract_Ewald_Reci_Structure
-use procedures_ewald_micro, only: set_fourier, reci_number_1_sym, reci_number_2_sym
+use procedures_long_interactions_micro, only: set_fourier, reci_number_1_sym, reci_number_2_sym
 
 implicit none
 
@@ -74,21 +74,24 @@ contains
     !> \[
     !>      U = \sum_{\vec{k}} w_\alpha(\vec{k}) |S(\vec{k})|^2
     !> \]
+    !> where \( w_\alpha(\vec{k}) \) is [[Abstract_Ewald_Reci_Weight]]
+    !> and \( S(\vec{k}) \) is [[Abstract_Ewald_Reci_Structure]].
     pure real(DP) function Abstract_visit(this) result(energy)
         class(Abstract_Ewald_Reci_Visitor), intent(in) :: this
 
         integer :: n_1, n_2, n_3
 
         energy = 0._DP
-        do n_3 = -this%reci_numbers(3), this%reci_numbers(3)
-        do n_2 = -this%reci_numbers(2), this%reci_numbers(2)
-        do n_1 = -this%reci_numbers(1), this%reci_numbers(1)
-            if (n_1**2 + n_2**2 + n_3**2 > this%reci_numbers(1)**2) cycle
-            energy = energy + this%weight%get(n_1, n_2, n_3) * real(this%structure%&
-                get(n_1, n_2, n_3) * conjg(this%structure%get(n_1, n_2, n_3)), DP)
+        do n_3 = 0, this%reci_numbers(3)
+            do n_2 = -reci_number_2_sym(this%reci_numbers, n_3), this%reci_numbers(2)
+                do n_1 = -reci_number_1_sym(this%reci_numbers, n_3, n_2), this%reci_numbers(1)
+                    if (n_1**2 + n_2**2 + n_3**2 > this%reci_numbers(1)**2) cycle
+                    energy = energy + this%weight%get(n_1, n_2, n_3) * real(this%structure%&
+                        get(n_1, n_2, n_3) * conjg(this%structure%get(n_1, n_2, n_3)), DP)
+                end do
+            end do
         end do
-        end do
-        end do
+        energy = 2._DP * energy ! symmetry: half wave vectors -> double energy
     end function Abstract_visit
 
     !> Energy delta when a particle of coordinates \( (\vec{x}, \vec{\mu}) \) moves.
@@ -166,7 +169,7 @@ contains
                 end do
             end do
         end do
-        delta_energy = 4._DP * delta_energy ! half wave vector (symmetry) -> double energy
+        delta_energy = 4._DP * delta_energy ! symmetry: half wave vectors -> double energy
     end function Abstract_visit_move
 
     !> Energy delta when a particle of coordinates \( (\vec{x}, \vec{\mu}) \) rotates.
@@ -227,7 +230,7 @@ contains
                 end do
             end do
         end do
-        delta_energy = 2._DP * delta_energy ! half wave vector (symmetry) -> double energy
+        delta_energy = 2._DP * delta_energy ! symmetry: half wave vectors -> double energy
     end function Abstract_visit_rotation
 
     pure real(DP) function Abstract_visit_add(this, i_component, particle) result(delta_energy)
@@ -303,7 +306,7 @@ contains
                 end do
             end do
         end do
-        delta_energy = 2._DP * delta_energy ! half wave vector (symmetry) -> double energy
+        delta_energy = 2._DP * delta_energy ! symmetry: half wave vectors -> double energy
     end function Abstract_visit_exchange
 
     !> Energy delta when 2 particles of coordinates \( (\vec{x}_1, \vec{\mu}_1) \) and
@@ -383,7 +386,7 @@ contains
                 end do
             end do
         end do
-        delta_energy = 4._DP * delta_energy ! half wave vector (symmetry) -> double energy
+        delta_energy = 4._DP * delta_energy ! symmetry: half wave vectors -> double energy
     end function Abstract_visit_switch
 !end implementation Abstract_Ewald_Reci_Visitor
 
