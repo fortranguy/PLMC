@@ -41,6 +41,7 @@ implicit none
 
     call plmc_create(post_data, command_argument_count())
     call environment_create(parallelepiped_domain, .true., periodic_box, post_data, "Density.")
+    call plmc_destroy(post_data)
 
     num_inside_sum = 0
     do i_snap = 1, num_snaps
