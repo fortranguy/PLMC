@@ -220,7 +220,7 @@ contains
         if (allocated(field_expression)) deallocate(field_expression)
     end subroutine destroy_field_expression
 
-    subroutine create_parallelepiped_domain(parallelepiped_domain, needed,periodic_box, &
+    subroutine create_parallelepiped_domain(parallelepiped_domain, needed, periodic_box, &
         input_data, prefix)
         class(Abstract_Parallelepiped_Domain), allocatable, intent(out) :: parallelepiped_domain
         logical, intent(in) :: needed
