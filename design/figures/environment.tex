@@ -1,0 +1,115 @@
+\documentclass{standalone}
+
+\input figures/figures.sty
+
+\begin{document}
+
+    \begin{tikzpicture}
+        \begin{package}{Environment}
+
+            \begin{scope}[opacity=1]
+                \begin{abstractclass}[text width=\largeTextWidth]{PeriodicBox}{0, 0}
+                    \operation{setSize(size\type{double[3]})}
+                    \operation{getSize()\type{double[3]}}
+                    \operation{distance(position1\type{double[3]},
+                                        position2\type{double[3]})\type{double}}
+                    \operation{vector(position1\type{double[3]},
+                                        position2\type{double[3]})\type{double[3]}}
+                    \operation[0]{folded(position\type{double[3]})\type{double[3]}}
+                \end{abstractclass}
+
+                \def\operationsImplementation{
+                    \operation{folded(position\type{double[3]})\type{double[3]}}
+                }
+                \begin{comment}
+                    \begin{class}[text width=\largeTextWidth]{XYZPeriodicBox}{0, -4.5}
+                        \inherit{PeriodicBox}
+                        \operationsImplementation{}
+                    \end{class}
+
+                    \begin{class}[text width=\largeTextWidth]{XYPeriodicBox}{0, -6.5}
+                        \inherit{PeriodicBox}
+                        \operationsImplementation{}
+                    \end{class}
+                \end{comment}
+            \end{scope}
+
+            \begin{scope}[shift={($(PeriodicBox.north) + (-11 cm, 6 cm)$)}, opacity=1]
+                \begin{abstractclass}[text width=\mediumTextWidth]{ParallelepipedDomain}{0, 0}
+                    \operation{construct(periodicBox\type{PeriodicBox}, origin\type{double[3]},
+                                            size\type{double[3]})}
+                    \operation{destroy()}
+                    \operation{getVolume()}
+                    \operation{getVertices(iVertex\type{int[3]})\type{double[3]}}
+                    \operation{isInside(position\type{double[3]})\type{bool}}
+                    \operation{randomPosition()\type{double[3]}}
+                \end{abstractclass}
+            \end{scope}
+
+            \begin{scope}[shift={($(ParallelepipedDomain.north) + (11 cm, 0 cm)$)}, opacity=1]
+                \begin{abstractclass}[text width=\mediumTextWidth]{ReciprocalLattice}{0, 0}
+                    \operation{contruct(periodicBox\type{PeriodicBox}, numbers\type{int[3]})}
+                    \operation{destroy()}
+                    \operation{getNumbers()\type{int[3]}}
+                \end{abstractclass}
+                \begin{comment}
+                \begin{class}[text width=\mediumTextWidth]{NullReciprocalLattice}{0, -4}
+                    \inherit{ReciprocalLattice}
+                \end{class}
+                \end{comment}
+            \end{scope}
+
+            \begin{scope}[shift={($(PeriodicBox.north) + (-10 cm, 0 cm)$)}, opacity=1]
+                \begin{abstractclass}[text width=\smallTextWidth]{Temperature}{0, 0}
+                    \operation{set(temperature\type{double})}
+                    \operation{getTemperature()\type{double}}
+                \end{abstractclass}
+                % Parallel Tempering?
+            \end{scope}
+
+            \begin{scope}[shift={($(Temperature.north) + (-8 cm, 0 cm)$)}, opacity=1]
+                \begin{abstractclass}[text width=\mediumTextWidth]{FieldExpression}{0, 0}
+                    \operation{get(position\type{double[3]})\type{double[3]}}
+                \end{abstractclass}
+            \end{scope}
+
+            \begin{scope}[shift={($(ParallelepipedDomain.north)!0.5!
+                                    (FieldExpression.north) + (0 cm, 8.5 cm)$)}, opacity=1]
+                \begin{abstractclass}[text width=\mediumTextWidth]{ExternalField}{0, 0}
+                    \operation{construct(parallelepipedDomain\type{ParallelepipedDomain},
+                        fieldExpression\type{FieldExpression})}
+                    \operation{destroy()}
+                    \operation{get(position\type{double[3]})\type{double[3]}}
+                \end{abstractclass}
+            \end{scope}
+
+            \begin{scope}[shift={($(ExternalField.north) + (10 cm, 0 cm)$)}, opacity=1]
+                \begin{abstractclass}[text width=\mediumTextWidth]{WallsPotential}{0, 0}
+                    \operation{construct(periodicBox\type{PeriodicBox}, gap\type{double},
+                        floorPenetration\type{FloorPenetration})}
+                    \operation{destroy()}
+                    \operation{getGap()}
+                    \operation{visit(overlap\type{bool}, energy\type{double}, position\type{double[3]},
+                        pairPotential\type{PairPotential})}
+                \end{abstractclass}
+            \end{scope}
+
+            \begin{scope}[shift={($(WallsPotential.south) + (10 cm, 2 cm)$)}, opacity=1]
+                \begin{abstractclass}[text width=\mediumTextWidth]{FloorPenetration}{0, 0}
+                    \operation{meet(overlap\type{bool}, shortestVectorFromFloor\type{double[3]},
+                        positionFromFloor\type{double[3]})}
+                \end{abstractclass}
+            \end{scope}
+
+        \end{package}
+
+        \begin{scope}[on background layer]
+            \aggregation{ParallelepipedDomain}{periodicBox}{1}{PeriodicBox}
+            \aggregation{ReciprocalLattice}{periodicBox}{1}{PeriodicBox}
+            \composition{ExternalField}{parallelepipedDomain}{1}{ParallelepipedDomain}
+            \composition{ExternalField}{fieldExpression}{1}{FieldExpression}
+            \composition{WallsPotential}{floorPenetration}{1}{FloorPenetration}
+        \end{scope}
+    \end{tikzpicture}
+
+\end{document}
