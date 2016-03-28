@@ -18,7 +18,7 @@ contains
     elemental pure subroutine triangle_observables_init(energies)
         type(Concrete_Line_Observables), intent(inout) :: energies
 
-        energies%with_components = 0._DP
+        energies%line = 0._DP
     end subroutine triangle_observables_init
 
     pure subroutine add_line(energies, energies_i)
@@ -27,8 +27,8 @@ contains
 
         integer :: i_component
         do i_component = 1, size(energies)
-            energies(i_component)%with_components(i_component) = energies(i_component)%&
-                with_components(i_component) + energies_i(i_component)
+            energies(i_component)%line(i_component) = energies(i_component)%line(i_component) + &
+                energies_i(i_component)
         end do
     end subroutine add_line
 
@@ -36,7 +36,7 @@ contains
         type(Concrete_Line_Observables), intent(inout) :: energies
         type(Concrete_Line_Observables), intent(in) :: energies_i
 
-        energies%with_components = energies%with_components + energies_i%with_components
+        energies%line = energies%line + energies_i%line
     end subroutine add_triangle
 
 end module procedures_triangle_observables

@@ -13,7 +13,8 @@ use types_mixture_wrapper, only: Mixture_Wrapper
 use class_pair_potential, only: Abstract_Pair_Potential
 use class_short_pairs_visitor, only: Abstract_Short_Pairs_Visitor
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
-use types_long_interactions_wrapper, only: Ewald_Self_Component_Wrapper, Long_Interactions_Wrapper
+use types_dipolar_interactions_wrapper, only: DES_Self_Component_Wrapper, &
+    Dipolar_Interactions_Wrapper
 use types_line_observables, only: Concrete_Line_Observables
 use types_observables_wrapper, only: Observables_Wrapper
 use procedures_observables_factory, only: create_triangle_nodes, destroy_triangle_nodes
@@ -29,21 +30,21 @@ interface plmc_visit
     module procedure :: visit_all
     module procedure :: visit_walls
     module procedure :: visit_short
-    module procedure :: visit_long
+    module procedure :: visit_dipolar
 end interface plmc_visit
 
 contains
 
-    subroutine visit_all(observables, mixture, short_interactions, long_interactions)
+    subroutine visit_all(observables, mixture, short_interactions, dipolar_interactions)
         type(Observables_Wrapper), intent(inout) :: observables
         type(Mixture_Wrapper), intent(in) :: mixture
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
-        type(Long_Interactions_Wrapper), intent(in) :: long_interactions
+        type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
 
         call plmc_visit(observables%walls_energies, mixture%components, short_interactions)
         call plmc_visit(observables%short_energies, mixture%components, short_interactions)
-        call plmc_visit(observables%long_energies, observables%long_mixture_energy, mixture%&
-            components, long_interactions)
+        call plmc_visit(observables%dipolar_energies, observables%dipolar_mixture_energy, mixture%&
+            components, dipolar_interactions)
     end subroutine visit_all
 
     subroutine visit_walls(walls_energies, components, short_interactions)
@@ -58,8 +59,9 @@ contains
         do i_component = 1, size(components)
             associate(energy_i => walls_energies(i_component), &
                 positions_i => components(i_component)%positions, &
-                pair_i => short_interactions%wall_pairs(i_component)%pair_potential)
-                call short_interactions%walls_visitor%visit(overlap, energy_i, positions_i, pair_i)
+                potential_i => short_interactions%wall_pairs(i_component)%potential)
+                call short_interactions%walls_visitor%visit(overlap, energy_i, positions_i, &
+                    potential_i)
             end associate
             if (overlap) then
                 call error_exit("visit_walls: component "//string%get(i_component)//&
@@ -87,11 +89,12 @@ contains
         type(Concrete_Number_to_String) :: string
 
         do i_component = 1, size(components)
-            associate(energy_i => energies(i_component)%with_components(i_component), &
+            associate(energy_i => energies(i_component)%line(i_component), &
                 positions_i => components(i_component)%positions, &
-                pair_i => short_interactions%components_pairs(i_component)%&
-                    with_components(i_component)%pair_potential)
-            call short_interactions%components_visitor%visit(overlap, energy_i, positions_i, pair_i)
+                potential_i => short_interactions%components_pairs(i_component)%line(i_component)%&
+                    potential)
+            call short_interactions%components_visitor%visit(overlap, energy_i, positions_i, &
+                potential_i)
             end associate
             if (overlap) then
                 call error_exit("visit_short_intra: component "//string%get(i_component)//&
@@ -111,13 +114,13 @@ contains
 
         do j_component = 1, size(components)
             do i_component = 1, j_component - 1
-                associate(energy_ij => energies(j_component)%with_components(i_component), &
+                associate(energy_ij => energies(j_component)%line(i_component), &
                     positions_i => components(i_component)%positions, &
                     positions_j => components(j_component)%positions, &
-                    pair_ij => short_interactions%components_pairs(j_component)%&
-                        with_components(i_component)%pair_potential)
+                    potential_ij => short_interactions%components_pairs(j_component)%&
+                        line(i_component)%potential)
                     call short_interactions%components_visitor%visit(overlap, energy_ij, &
-                        positions_i, positions_j, pair_ij)
+                        positions_i, positions_j, potential_ij)
                 end associate
                 if (overlap) then
                     call error_exit("visit_short_inter: components "//string%get(i_component)//&
@@ -127,11 +130,12 @@ contains
         end do
     end subroutine visit_short_inter
 
-    pure subroutine visit_long(energies, long_mixture_energy, components, long_interactions)
+    pure subroutine visit_dipolar(energies, dipolar_mixture_energy, components, &
+        dipolar_interactions)
         type(Concrete_Line_Observables), intent(inout) :: energies(:)
-        real(DP), intent(out) :: long_mixture_energy
+        real(DP), intent(out) :: dipolar_mixture_energy
         type(Component_Wrapper), intent(in) :: components(:)
-        type(Long_Interactions_Wrapper), intent(in) :: long_interactions
+        type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
 
         type(Concrete_Line_Observables) :: real_energies(size(components))
         real(DP) :: self_energies(size(components))
@@ -139,77 +143,77 @@ contains
         call triangle_observables_init(energies)
 
         call create_triangle_nodes(real_energies)
-        call visit_long_real(real_energies, components, long_interactions)
+        call visit_des_real(real_energies, components, dipolar_interactions)
         call triangle_observables_add(energies, real_energies)
         call destroy_triangle_nodes(real_energies)
 
-        long_mixture_energy = long_interactions%reci_visitor%visit() + long_interactions%&
-            surf_mixture%visit() - long_interactions%dlc_visitor%visit()
+        dipolar_mixture_energy = dipolar_interactions%reci_visitor%visit() + dipolar_interactions%&
+            surf_mixture%visit() - dipolar_interactions%dlc_visitor%visit()
 
-        call visit_long_self(self_energies, long_interactions%self_components)
+        call visit_des_self(self_energies, dipolar_interactions%self_components)
         call triangle_observables_add(energies, -self_energies)
-    end subroutine visit_long
+    end subroutine visit_dipolar
 
-    pure subroutine visit_long_real(energies, components, long_interactions)
+    pure subroutine visit_des_real(energies, components, dipolar_interactions)
         type(Concrete_Line_Observables), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
-        type(Long_Interactions_Wrapper), intent(in) :: long_interactions
+        type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
 
-        call visit_long_real_intra(energies, components, long_interactions)
-        call visit_long_real_inter(energies, components, long_interactions)
-    end subroutine visit_long_real
+        call visit_des_real_intra(energies, components, dipolar_interactions)
+        call visit_des_real_inter(energies, components, dipolar_interactions)
+    end subroutine visit_des_real
 
-    pure subroutine visit_long_real_intra(energies, components, long_interactions)
+    pure subroutine visit_des_real_intra(energies, components, dipolar_interactions)
         type(Concrete_Line_Observables), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
-        type(Long_Interactions_Wrapper), intent(in) :: long_interactions
+        type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
 
         integer :: i_component
 
         do i_component = 1, size(components)
-            associate(energy_i => energies(i_component)%with_components(i_component), &
+            associate(energy_i => energies(i_component)%line(i_component), &
                     positions_i => components(i_component)%positions, &
                     dipolar_moments_i => components(i_component)%dipolar_moments, &
-                    pair_i => long_interactions%real_pairs(i_component)%&
-                        with_components(i_component)%real_pair)
-                call long_interactions%real_visitor%visit(energy_i, positions_i, &
-                    dipolar_moments_i, pair_i)
+                    potential_i => dipolar_interactions%real_pairs(i_component)%line(i_component)%&
+                        potential)
+                call dipolar_interactions%real_visitor%visit(energy_i, positions_i, &
+                    dipolar_moments_i, potential_i)
             end associate
         end do
-    end subroutine visit_long_real_intra
+    end subroutine visit_des_real_intra
 
-    pure subroutine visit_long_real_inter(energies, components, long_interactions)
+    pure subroutine visit_des_real_inter(energies, components, dipolar_interactions)
         type(Concrete_Line_Observables), intent(inout) :: energies(:)
         type(Component_Wrapper), intent(in) :: components(:)
-        type(Long_Interactions_Wrapper), intent(in) :: long_interactions
+        type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
 
         integer :: i_component, j_component
 
         do j_component = 1, size(components)
             do i_component = 1, j_component - 1
-                associate(energy_ij => energies(j_component)%with_components(i_component), &
+                associate(energy_ij => energies(j_component)%line(i_component), &
                     positions_i => components(i_component)%positions, &
                     dipolar_moments_i => components(i_component)%dipolar_moments, &
                     positions_j => components(j_component)%positions, &
                     dipolar_moments_j => components(j_component)%dipolar_moments, &
-                    pair_ij => long_interactions%real_pairs(j_component)%&
-                        with_components(i_component)%real_pair)
-                    call long_interactions%real_visitor%visit(energy_ij, positions_i, &
-                        dipolar_moments_i, positions_j, dipolar_moments_j, pair_ij)
+                    potential_ij => dipolar_interactions%real_pairs(j_component)%line(i_component)%&
+                        potential)
+                    call dipolar_interactions%real_visitor%visit(energy_ij, positions_i, &
+                        dipolar_moments_i, positions_j, dipolar_moments_j, potential_ij)
                 end associate
             end do
         end do
-    end subroutine visit_long_real_inter
+    end subroutine visit_des_real_inter
 
-    pure subroutine visit_long_self(energies, ewald_self_components)
+    pure subroutine visit_des_self(energies, self_components)
         real(DP), intent(out) :: energies(:)
-        type(Ewald_Self_Component_Wrapper), intent(in) :: ewald_self_components(:)
+        type(DES_Self_Component_Wrapper), intent(in) :: self_components(:)
 
         integer :: i_component
 
         do i_component = 1, size(energies)
-            energies(i_component) = ewald_self_components(i_component)%self%visit()
+            energies(i_component) = self_components(i_component)%component%visit()
         end do
-    end subroutine visit_long_self
+    end subroutine visit_des_self
 
 end module procedures_plmc_visit

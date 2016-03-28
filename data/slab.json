@@ -1,0 +1,194 @@
+{
+    "Environment": {
+        "Box": {
+            "periodicity": "XY",
+            "size": [12.0, 12.0, 18.0]
+        },
+        "Thermostat": {
+            "temperature": 1.0
+        },
+        "External Field": {
+            "apply": false
+        },
+        "Permittivity": {
+            "use": true,
+            "value": 1.0
+        },
+        "Reciprocal Lattice": {
+            "use": true,
+            "numbers": [8, 8, 12]
+        },
+        "Walls": {
+            "use": true,
+            "name": "flat",
+            "gap": 14.0
+        }
+    },
+    "Mixture": {
+        "number of components": 3,
+        "Component 1": {
+            "number": 250,
+            "minimum distance": 0.8,
+            "is dipolar": true,
+            "moment norm": 1.0,
+            "can exchange": false,
+            "initial positions": "positions_1.in",
+            "initial orientations": "orientations_1.in",
+            "With Walls": {
+                "minimum distance": 0.8
+            }
+        },
+        "Component 2": {
+            "number": 250,
+            "minimum distance": 0.8,
+            "is dipolar": true,
+            "moment norm": 2.0,
+            "can exchange": false,
+            "initial positions": "positions_2.in",
+            "initial orientations": "orientations_2.in",
+            "With Walls": {
+                "minimum distance": 0.8
+            }
+        },
+        "Component 3": {
+            "number": 250,
+            "minimum distance": 0.8,
+            "is dipolar": true,
+            "moment norm": 1.0,
+            "can exchange": false,
+            "initial positions": "positions_3.in",
+            "initial orientations": "orientations_3.in",
+            "With Walls": {
+                "minimum distance": 0.8
+            }
+        },
+        "Inter 12": {
+            "minimum distance": 0.8
+        },
+        "Inter 13": {
+            "minimum distance": 0.8
+        },
+        "Inter 23": {
+            "minimum distance": 0.8
+        }
+    },
+    "Short Interactions": {
+        "Component 1": {
+            "name": "LJ",
+            "tabulated": false,
+            "epsilon": 1.0,
+            "sigma": 1.0,
+            "maximum distance": 2.5,
+            "With Walls": {
+                "name": "LJ",
+                "tabulated": false,
+                "epsilon": 1.0,
+                "sigma": 1.0,
+                "maximum distance": 2.5
+            }
+        },
+        "Component 2": {
+            "name": "LJ",
+            "tabulated": false,
+            "epsilon": 1.0,
+            "sigma": 1.0,
+            "maximum distance": 2.5,
+            "With Walls": {
+                "name": "LJ",
+                "tabulated": false,
+                "epsilon": 1.0,
+                "sigma": 1.0,
+                "maximum distance": 2.5
+            }
+        },
+        "Component 3": {
+            "name": "LJ",
+            "tabulated": false,
+            "epsilon": 1.0,
+            "sigma": 1.0,
+            "maximum distance": 2.5,
+            "With Walls": {
+                "name": "LJ",
+                "tabulated": false,
+                "epsilon": 1.0,
+                "sigma": 1.0,
+                "maximum distance": 2.5
+            }
+        },
+        "Inter 12": {
+            "name": "LJ",
+            "tabulated": false,
+            "epsilon": 1.0,
+            "sigma": 1.0,
+            "maximum distance": 2.5
+        },
+        "Inter 13": {
+            "name": "LJ",
+            "tabulated": false,
+            "epsilon": 1.0,
+            "sigma": 1.0,
+            "maximum distance": 2.5
+        },
+        "Inter 23": {
+            "name": "LJ",
+            "tabulated": false,
+            "epsilon": 1.0,
+            "sigma": 1.0,
+            "maximum distance": 2.5
+        },
+        "Cells": {
+            "data structure": "list"
+        }
+    },
+    "Dipolar Interactions": {
+        "alpha times box edge": 7.0,
+        "Real": {
+            "tabulated": true,
+            "delta distance": 1.0e-4,
+            "max distance over box edge": 0.5
+        }
+    },
+    "Changes": {
+        "number of tuning steps": 50,
+        "Components": {
+            "increase factor": 1.05,
+            "maximum increase factor": 1.5,
+            "accumulation period": 10,
+            "wanted success ratio": 0.75,
+            "tolerance": 0.01
+        },
+        "Component 1": {
+            "Small Move": {
+                "delta": [0.3, 0.3, 0.3]
+            },
+            "Small Rotation": {
+                "delta": 1.0
+            }
+        },
+        "Component 2": {
+            "Small Move": {
+                "delta": [0.3, 0.3, 0.3]
+            },
+            "Small Rotation": {
+                "delta": 1.0
+            }
+        },
+        "Component 3": {
+            "Small Move": {
+                "delta": [0.3, 0.3, 0.3]
+            },
+            "Small Rotation": {
+                "delta": 1.0
+            }
+        }
+    },
+    "Monte Carlo": {
+        "number of steps": 100
+    },
+    "Output": {
+        "Coordinates": {
+            "write": true,
+            "period": 10
+        }
+    }
+}

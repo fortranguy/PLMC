@@ -20,8 +20,8 @@ contains
         do i_component = 1, size(deltas)
             j_observable = maxval([i_actor, i_component])
             i_observable = minval([i_actor, i_component])
-            energies(j_observable)%with_components(i_observable) = energies(j_observable)%&
-                with_components(i_observable) + deltas(i_component)
+            energies(j_observable)%line(i_observable) = energies(j_observable)%&
+                line(i_observable) + deltas(i_component)
         end do
     end subroutine update_energies
 

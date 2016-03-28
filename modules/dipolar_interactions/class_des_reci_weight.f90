@@ -1,22 +1,22 @@
-module class_ewald_reci_weight
+module class_des_reci_weight
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions, PI
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_permittivity, only: Abstract_Permittivity
 use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
-use class_ewald_convergence_parameter, only: Abstract_Ewald_Convergence_Parameter
+use class_des_convergence_parameter, only: Abstract_DES_Convergence_Parameter
 
 implicit none
 
 private
 
-    type, abstract, public :: Abstract_Ewald_Reci_Weight
+    type, abstract, public :: Abstract_DES_Reci_Weight
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
         integer :: reci_numbers(num_dimensions)
         real(DP) :: permittivity
-        class(Abstract_Ewald_Convergence_Parameter), pointer :: alpha => null()
+        class(Abstract_DES_Convergence_Parameter), pointer :: alpha => null()
         real(DP), allocatable :: weight(:, :, :)
     contains
         procedure :: construct => Abstract_construct
@@ -25,31 +25,31 @@ private
         procedure :: get_reci_numbers => Abstract_get_reci_numbers
         procedure :: get => Abstract_get
         procedure, private :: set => Abstract_set
-    end type Abstract_Ewald_Reci_Weight
+    end type Abstract_DES_Reci_Weight
 
-    type, extends(Abstract_Ewald_Reci_Weight), public :: Concrete_Ewald_Reci_Weight
+    type, extends(Abstract_DES_Reci_Weight), public :: Concrete_DES_Reci_Weight
 
-    end type Concrete_Ewald_Reci_Weight
+    end type Concrete_DES_Reci_Weight
 
-    type, extends(Abstract_Ewald_Reci_Weight), public :: Null_Ewald_Reci_Weight
+    type, extends(Abstract_DES_Reci_Weight), public :: Null_DES_Reci_Weight
     contains
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
         procedure :: reset => Null_set
         procedure :: get_reci_numbers => Null_get_reci_numbers
         procedure :: get => Null_get
-    end type Null_Ewald_Reci_Weight
+    end type Null_DES_Reci_Weight
 
 contains
 
-!implementation Abstract_Ewald_Reci_Weight
+!implementation Abstract_DES_Reci_Weight
 
     subroutine Abstract_construct(this, periodic_box, permittivity, reciprocal_lattice, alpha)
-        class(Abstract_Ewald_Reci_Weight), intent(out) :: this
+        class(Abstract_DES_Reci_Weight), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Permittivity), intent(in) :: permittivity
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
-        class(Abstract_Ewald_Convergence_Parameter), target, intent(in) :: alpha
+        class(Abstract_DES_Convergence_Parameter), target, intent(in) :: alpha
 
         this%periodic_box => periodic_box
         this%reci_numbers = reciprocal_lattice%get_numbers()
@@ -62,7 +62,7 @@ contains
     end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
-        class(Abstract_Ewald_Reci_Weight), intent(inout) :: this
+        class(Abstract_DES_Reci_Weight), intent(inout) :: this
 
         if (allocated(this%weight)) deallocate(this%weight)
         this%alpha => null()
@@ -70,7 +70,7 @@ contains
     end subroutine Abstract_destroy
 
     pure subroutine Abstract_set(this)
-        class(Abstract_Ewald_Reci_Weight), intent(inout) :: this
+        class(Abstract_DES_Reci_Weight), intent(inout) :: this
 
         integer :: n_1, n_2, n_3
         real(DP), dimension(num_dimensions) :: box_size, wave_vector
@@ -100,7 +100,7 @@ contains
     end subroutine Abstract_set
 
     pure function Abstract_get_reci_numbers(this) result(reci_numbers)
-        class(Abstract_Ewald_Reci_Weight), intent(in) :: this
+        class(Abstract_DES_Reci_Weight), intent(in) :: this
         integer :: reci_numbers(num_dimensions)
 
         reci_numbers = this%reci_numbers
@@ -114,44 +114,44 @@ contains
     !>          \end{cases}
     !> \]
     pure real(DP) function Abstract_get(this, n_1, n_2, n_3) result(weight)
-        class(Abstract_Ewald_Reci_Weight), intent(in) :: this
+        class(Abstract_DES_Reci_Weight), intent(in) :: this
         integer, intent(in) :: n_1, n_2, n_3
 
         weight = this%weight(abs(n_1), abs(n_2), abs(n_3))
     end function Abstract_get
 
-!end implementation Abstract_Ewald_Reci_Weight
+!end implementation Abstract_DES_Reci_Weight
 
-!implementation Null_Ewald_Reci_Weight
+!implementation Null_DES_Reci_Weight
 
     subroutine Null_construct(this, periodic_box, permittivity, reciprocal_lattice, alpha)
-        class(Null_Ewald_Reci_Weight), intent(out) :: this
+        class(Null_DES_Reci_Weight), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Permittivity), intent(in) :: permittivity
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
-        class(Abstract_Ewald_Convergence_Parameter), target, intent(in) :: alpha
+        class(Abstract_DES_Convergence_Parameter), target, intent(in) :: alpha
     end subroutine Null_construct
 
     subroutine Null_destroy(this)
-        class(Null_Ewald_Reci_Weight), intent(inout) :: this
+        class(Null_DES_Reci_Weight), intent(inout) :: this
     end subroutine Null_destroy
 
     pure subroutine Null_set(this)
-        class(Null_Ewald_Reci_Weight), intent(inout) :: this
+        class(Null_DES_Reci_Weight), intent(inout) :: this
     end subroutine Null_set
 
     pure function Null_get_reci_numbers(this) result(reci_numbers)
-        class(Null_Ewald_Reci_Weight), intent(in) :: this
+        class(Null_DES_Reci_Weight), intent(in) :: this
         integer :: reci_numbers(num_dimensions)
         reci_numbers = 0
     end function Null_get_reci_numbers
 
     pure real(DP) function Null_get(this, n_1, n_2, n_3) result(weight)
-        class(Null_Ewald_Reci_Weight), intent(in) :: this
+        class(Null_DES_Reci_Weight), intent(in) :: this
         integer, intent(in) :: n_1, n_2, n_3
         weight = 0._DP
     end function Null_get
 
-!end implementation Null_Ewald_Reci_Weight
+!end implementation Null_DES_Reci_Weight
 
-end module class_ewald_reci_weight
+end module class_des_reci_weight

@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions, max_word_length, real_zero
 use procedures_errors, only: warning_continue, error_exit
 use types_potential_domain, only: Abstract_Potential_Domain, Short_Potential_Domain, &
-    Long_Potential_Domain
+    Dipolar_Potential_Domain
 
 implicit none
 
@@ -27,7 +27,7 @@ end interface check_positive
 
 interface check_potential_domain
     module procedure :: check_short_potential_domain
-    module procedure :: check_long_potential_domain
+    module procedure :: check_dipolar_potential_domain
 end interface check_potential_domain
 
 contains
@@ -198,13 +198,13 @@ contains
         call check_potential_domain_core(context, domain, domain%max)
     end subroutine check_short_potential_domain
 
-    subroutine check_long_potential_domain(context, domain, box_edge)
+    subroutine check_dipolar_potential_domain(context, domain, box_edge)
         character(len=*), intent(in) :: context
-        type(Long_Potential_Domain), intent(in) :: domain
+        type(Dipolar_Potential_Domain), intent(in) :: domain
         real(DP), intent(in) :: box_edge
 
         call check_potential_domain_core(context, domain, domain%max_over_box*box_edge)
-    end subroutine check_long_potential_domain
+    end subroutine check_dipolar_potential_domain
 
     subroutine check_potential_domain_core(context, domain, domain_max)
         character(len=*), intent(in) :: context

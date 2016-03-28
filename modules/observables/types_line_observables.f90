@@ -7,7 +7,7 @@ implicit none
 private
 
     type, public :: Concrete_Line_Observables
-        real(DP), allocatable :: with_components(:)
+        real(DP), allocatable :: line(:)
     end type Concrete_Line_Observables
 
 end module types_line_observables

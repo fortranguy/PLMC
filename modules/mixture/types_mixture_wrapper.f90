@@ -9,11 +9,11 @@ implicit none
 private
 
     type, public :: Minimum_Distance_Wrapper
-        class(Abstract_Minimum_Distance), allocatable :: min_distance
+        class(Abstract_Minimum_Distance), allocatable :: distance
     end type Minimum_Distance_Wrapper
 
     type, public :: Minimum_Distances_Wrapper
-        type(Minimum_Distance_Wrapper), allocatable :: with_components(:)
+        type(Minimum_Distance_Wrapper), allocatable :: line(:)
     end type Minimum_Distances_Wrapper
 
     type, public :: Mixture_Wrapper

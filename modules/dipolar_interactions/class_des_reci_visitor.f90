@@ -1,24 +1,24 @@
-module class_ewald_reci_visitor
+module class_des_reci_visitor
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions, PI
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use types_temporary_particle, only: Concrete_Temporary_Particle
-use class_ewald_reci_weight, only: Abstract_Ewald_Reci_Weight
-use class_ewald_reci_structure, only: Abstract_Ewald_Reci_Structure
-use procedures_long_interactions_micro, only: set_fourier, reci_number_1_sym, reci_number_2_sym
+use class_des_reci_weight, only: Abstract_DES_Reci_Weight
+use class_des_reci_structure, only: Abstract_DES_Reci_Structure
+use procedures_dipolar_interactions_micro, only: set_fourier, reci_number_1_sym, reci_number_2_sym
 
 implicit none
 
 private
 
-    type, abstract, public :: Abstract_Ewald_Reci_Visitor
+    type, abstract, public :: Abstract_DES_Reci_Visitor
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
         integer :: reci_numbers(num_dimensions)
-        class(Abstract_Ewald_Reci_Weight), pointer :: weight => null()
-        class(Abstract_Ewald_Reci_Structure), pointer :: structure => null()
+        class(Abstract_DES_Reci_Weight), pointer :: weight => null()
+        class(Abstract_DES_Reci_Structure), pointer :: structure => null()
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
@@ -29,13 +29,13 @@ private
         procedure :: visit_remove => Abstract_visit_remove
         procedure :: visit_switch => Abstract_visit_switch
         procedure, private :: visit_exchange => Abstract_visit_exchange
-    end type Abstract_Ewald_Reci_Visitor
+    end type Abstract_DES_Reci_Visitor
 
-    type, extends(Abstract_Ewald_Reci_Visitor), public :: Concrete_Ewald_Reci_Visitor
+    type, extends(Abstract_DES_Reci_Visitor), public :: Concrete_DES_Reci_Visitor
 
-    end type Concrete_Ewald_Reci_Visitor
+    end type Concrete_DES_Reci_Visitor
 
-    type, extends(Abstract_Ewald_Reci_Visitor), public :: Null_Ewald_Reci_Visitor
+    type, extends(Abstract_DES_Reci_Visitor), public :: Null_DES_Reci_Visitor
     contains
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
@@ -44,18 +44,18 @@ private
         procedure :: visit_rotation => Null_visit_rotation
         procedure :: visit_switch => Null_visit_switch
         procedure, private :: visit_exchange => Null_visit_exchange
-    end type Null_Ewald_Reci_Visitor
+    end type Null_DES_Reci_Visitor
 
 contains
 
-!implementation Abstract_Ewald_Reci_Visitor
+!implementation Abstract_DES_Reci_Visitor
 
     subroutine Abstract_construct(this, periodic_box, reciprocal_lattice, weight, structure)
-        class(Abstract_Ewald_Reci_Visitor), intent(out) :: this
+        class(Abstract_DES_Reci_Visitor), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
-        class(Abstract_Ewald_Reci_Weight), target, intent(in) :: weight
-        class(Abstract_Ewald_Reci_Structure), target, intent(in) :: structure
+        class(Abstract_DES_Reci_Weight), target, intent(in) :: weight
+        class(Abstract_DES_Reci_Structure), target, intent(in) :: structure
 
         this%periodic_box => periodic_box
         this%reci_numbers = reciprocal_lattice%get_numbers()
@@ -64,7 +64,7 @@ contains
     end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
-        class(Abstract_Ewald_Reci_Visitor), intent(inout) :: this
+        class(Abstract_DES_Reci_Visitor), intent(inout) :: this
 
         this%structure => null()
         this%weight => null()
@@ -74,10 +74,10 @@ contains
     !> \[
     !>      U = \sum_{\vec{k}} w_\alpha(\vec{k}) |S(\vec{k})|^2
     !> \]
-    !> where \( w_\alpha(\vec{k}) \) is [[Abstract_Ewald_Reci_Weight]]
-    !> and \( S(\vec{k}) \) is [[Abstract_Ewald_Reci_Structure]].
+    !> where \( w_\alpha(\vec{k}) \) is [[Abstract_DES_Reci_Weight]]
+    !> and \( S(\vec{k}) \) is [[Abstract_DES_Reci_Structure]].
     pure real(DP) function Abstract_visit(this) result(energy)
-        class(Abstract_Ewald_Reci_Visitor), intent(in) :: this
+        class(Abstract_DES_Reci_Visitor), intent(in) :: this
 
         integer :: n_1, n_2, n_3
 
@@ -109,7 +109,7 @@ contains
     !> \]
     pure real(DP) function Abstract_visit_move(this, i_component, new_position, old) &
         result(delta_energy)
-        class(Abstract_Ewald_Reci_Visitor), intent(in) :: this
+        class(Abstract_DES_Reci_Visitor), intent(in) :: this
         integer, intent(in) :: i_component
         real(DP), intent(in) :: new_position(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
@@ -182,7 +182,7 @@ contains
     !> \]
     pure real(DP) function Abstract_visit_rotation(this, i_component, new_dipolar_moment, old) &
         result(delta_energy)
-        class(Abstract_Ewald_Reci_Visitor), intent(in) :: this
+        class(Abstract_DES_Reci_Visitor), intent(in) :: this
         integer, intent(in) :: i_component
         real(DP), intent(in) :: new_dipolar_moment(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
@@ -234,7 +234,7 @@ contains
     end function Abstract_visit_rotation
 
     pure real(DP) function Abstract_visit_add(this, i_component, particle) result(delta_energy)
-        class(Abstract_Ewald_Reci_Visitor), intent(in) :: this
+        class(Abstract_DES_Reci_Visitor), intent(in) :: this
         integer, intent(in) :: i_component
         type(Concrete_Temporary_Particle), intent(in) :: particle
 
@@ -242,7 +242,7 @@ contains
     end function Abstract_visit_add
 
     pure real(DP) function Abstract_visit_remove(this, i_component, particle) result(delta_energy)
-        class(Abstract_Ewald_Reci_Visitor), intent(in) :: this
+        class(Abstract_DES_Reci_Visitor), intent(in) :: this
         integer, intent(in) :: i_component
         type(Concrete_Temporary_Particle), intent(in) :: particle
 
@@ -259,7 +259,7 @@ contains
     !> \]
     pure real(DP) function Abstract_visit_exchange(this, i_component, particle, signed) &
         result(delta_energy)
-        class(Abstract_Ewald_Reci_Visitor), intent(in) :: this
+        class(Abstract_DES_Reci_Visitor), intent(in) :: this
         integer, intent(in) :: i_component
         type(Concrete_Temporary_Particle), intent(in) :: particle
         real(DP), intent(in) :: signed
@@ -326,7 +326,7 @@ contains
     !> \]
     pure real(DP) function Abstract_visit_switch(this, ij_components, particles) &
         result(delta_energy)
-        class(Abstract_Ewald_Reci_Visitor), intent(in) :: this
+        class(Abstract_DES_Reci_Visitor), intent(in) :: this
         integer, intent(in) :: ij_components(:)
         type(Concrete_Temporary_Particle), intent(in) :: particles(:)
 
@@ -388,30 +388,30 @@ contains
         end do
         delta_energy = 4._DP * delta_energy ! symmetry: half wave vectors -> double energy
     end function Abstract_visit_switch
-!end implementation Abstract_Ewald_Reci_Visitor
+!end implementation Abstract_DES_Reci_Visitor
 
-!implementation Null_Ewald_Reci_Visitor
+!implementation Null_DES_Reci_Visitor
 
     subroutine Null_construct(this, periodic_box, reciprocal_lattice, weight, structure)
-        class(Null_Ewald_Reci_Visitor), intent(out) :: this
+        class(Null_DES_Reci_Visitor), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
-        class(Abstract_Ewald_Reci_Weight), target, intent(in) :: weight
-        class(Abstract_Ewald_Reci_Structure), target, intent(in) :: structure
+        class(Abstract_DES_Reci_Weight), target, intent(in) :: weight
+        class(Abstract_DES_Reci_Structure), target, intent(in) :: structure
     end subroutine Null_construct
 
     subroutine Null_destroy(this)
-        class(Null_Ewald_Reci_Visitor), intent(inout) :: this
+        class(Null_DES_Reci_Visitor), intent(inout) :: this
     end subroutine Null_destroy
 
     pure real(DP) function Null_visit(this) result(energy)
-        class(Null_Ewald_Reci_Visitor), intent(in) :: this
+        class(Null_DES_Reci_Visitor), intent(in) :: this
         energy = 0._DP
     end function Null_visit
 
     pure real(DP) function Null_visit_move(this, i_component, new_position, old) &
         result(delta_energy)
-        class(Null_Ewald_Reci_Visitor), intent(in) :: this
+        class(Null_DES_Reci_Visitor), intent(in) :: this
         integer, intent(in) :: i_component
         real(DP), intent(in) :: new_position(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
@@ -420,7 +420,7 @@ contains
 
     pure real(DP) function Null_visit_rotation(this, i_component, new_dipolar_moment, old) &
         result(delta_energy)
-        class(Null_Ewald_Reci_Visitor), intent(in) :: this
+        class(Null_DES_Reci_Visitor), intent(in) :: this
         integer, intent(in) :: i_component
         real(DP), intent(in) :: new_dipolar_moment(:)
         type(Concrete_Temporary_Particle), intent(in) :: old
@@ -429,7 +429,7 @@ contains
 
     pure real(DP) function Null_visit_exchange(this, i_component, particle, signed) &
         result(delta_energy)
-        class(Null_Ewald_Reci_Visitor), intent(in) :: this
+        class(Null_DES_Reci_Visitor), intent(in) :: this
         integer, intent(in) :: i_component
         type(Concrete_Temporary_Particle), intent(in) :: particle
         real(DP), intent(in) :: signed
@@ -437,12 +437,12 @@ contains
     end function Null_visit_exchange
 
     pure real(DP) function Null_visit_switch(this, ij_components, particles) result(delta_energy)
-        class(Null_Ewald_Reci_Visitor), intent(in) :: this
+        class(Null_DES_Reci_Visitor), intent(in) :: this
         integer, intent(in) :: ij_components(:)
         type(Concrete_Temporary_Particle), intent(in) :: particles(:)
         delta_energy = 0._DP
     end function Null_visit_switch
 
-!end implementation Null_Ewald_Reci_Visitor
+!end implementation Null_DES_Reci_Visitor
 
-end module class_ewald_reci_visitor
+end module class_des_reci_visitor

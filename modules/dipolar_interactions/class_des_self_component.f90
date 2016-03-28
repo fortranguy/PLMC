@@ -1,19 +1,19 @@
-module class_ewald_self_component
+module class_des_self_component
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: PI
 use class_permittivity, only: Abstract_Permittivity
 use class_component_dipolar_moments, only: Abstract_Component_Dipolar_Moments
-use class_ewald_convergence_parameter, only: Abstract_Ewald_Convergence_Parameter
+use class_des_convergence_parameter, only: Abstract_DES_Convergence_Parameter
 
 implicit none
 
 private
 
-    type, abstract, public :: Abstract_Ewald_Self_Component
+    type, abstract, public :: Abstract_DES_Self_Component
     private
         class(Abstract_Permittivity), pointer :: permittivity => null()
-        class(Abstract_Ewald_Convergence_Parameter), pointer :: alpha => null()
+        class(Abstract_DES_Convergence_Parameter), pointer :: alpha => null()
         real(DP) :: apha_cube
         real(DP) :: factor_denominator
         class(Abstract_Component_Dipolar_Moments), pointer :: component_dipolar_moment => null()
@@ -24,30 +24,30 @@ private
         procedure :: visit => Abstract_visit
         procedure, private :: set => Abstract_set
         procedure, private :: meet => Abstract_meet
-    end type Abstract_Ewald_Self_Component
+    end type Abstract_DES_Self_Component
 
-    type, extends(Abstract_Ewald_Self_Component), public :: Concrete_Ewald_Self_Component
+    type, extends(Abstract_DES_Self_Component), public :: Concrete_DES_Self_Component
 
-    end type Concrete_Ewald_Self_Component
+    end type Concrete_DES_Self_Component
 
-    type, extends(Abstract_Ewald_Self_Component), public :: Null_Ewald_Self_Component
+    type, extends(Abstract_DES_Self_Component), public :: Null_DES_Self_Component
     contains
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
         procedure :: reset => Null_set
         procedure :: visit => Null_visit
         procedure, private :: meet => Null_meet
-    end type Null_Ewald_Self_Component
+    end type Null_DES_Self_Component
 
 contains
 
-!implementation Abstract_Ewald_Self_Component
+!implementation Abstract_DES_Self_Component
 
     subroutine Abstract_construct(this, permittivity, component_dipolar_moment, alpha)
-        class(Abstract_Ewald_Self_Component), intent(out) :: this
+        class(Abstract_DES_Self_Component), intent(out) :: this
         class(Abstract_Permittivity), target, intent(in) :: permittivity
         class(Abstract_Component_Dipolar_Moments), target, intent(in) :: component_dipolar_moment
-        class(Abstract_Ewald_Convergence_Parameter), target, intent(in) :: alpha
+        class(Abstract_DES_Convergence_Parameter), target, intent(in) :: alpha
 
         this%permittivity => permittivity
         this%component_dipolar_moment => component_dipolar_moment
@@ -56,14 +56,14 @@ contains
     end subroutine Abstract_construct
 
     subroutine Abstract_set(this)
-        class(Abstract_Ewald_Self_Component), intent(inout) :: this
+        class(Abstract_DES_Self_Component), intent(inout) :: this
 
         this%apha_cube = this%alpha%get()**3
         this%factor_denominator = 6._DP * this%permittivity%get() * PI**(3._DP/2._DP)
     end subroutine Abstract_set
 
     subroutine Abstract_destroy(this)
-        class(Abstract_Ewald_Self_Component), intent(inout) :: this
+        class(Abstract_DES_Self_Component), intent(inout) :: this
 
         this%alpha => null()
         this%component_dipolar_moment => null()
@@ -71,7 +71,7 @@ contains
     end subroutine Abstract_destroy
 
     pure real(DP) function Abstract_visit(this) result(energy)
-        class(Abstract_Ewald_Self_Component), intent(in) :: this
+        class(Abstract_DES_Self_Component), intent(in) :: this
 
         integer :: i_particle
 
@@ -83,42 +83,42 @@ contains
 
     !> \[ u(\mu) = \frac{\alpha^3}{6\epsilon\pi^{3/2}} \vec{\mu}\cdot\vec{\mu} \]
     pure real(DP) function Abstract_meet(this, moment) result(energy)
-        class(Abstract_Ewald_Self_Component), intent(in) :: this
+        class(Abstract_DES_Self_Component), intent(in) :: this
         real(DP), intent(in) :: moment(:)
 
         energy = this%apha_cube/this%factor_denominator * dot_product(moment, moment)
     end function Abstract_meet
 
-!end implementation Abstract_Ewald_Self_Component
+!end implementation Abstract_DES_Self_Component
 
-!implementation Null_Ewald_Self_Component
+!implementation Null_DES_Self_Component
 
     subroutine Null_construct(this, permittivity, component_dipolar_moment, alpha)
-        class(Null_Ewald_Self_Component), intent(out) :: this
+        class(Null_DES_Self_Component), intent(out) :: this
         class(Abstract_Permittivity), target, intent(in) :: permittivity
         class(Abstract_Component_Dipolar_Moments), target, intent(in) :: component_dipolar_moment
-        class(Abstract_Ewald_Convergence_Parameter), target, intent(in) :: alpha
+        class(Abstract_DES_Convergence_Parameter), target, intent(in) :: alpha
     end subroutine Null_construct
 
     subroutine Null_set(this)
-        class(Null_Ewald_Self_Component), intent(inout) :: this
+        class(Null_DES_Self_Component), intent(inout) :: this
     end subroutine Null_set
 
     subroutine Null_destroy(this)
-        class(Null_Ewald_Self_Component), intent(inout) :: this
+        class(Null_DES_Self_Component), intent(inout) :: this
     end subroutine Null_destroy
 
     pure real(DP) function Null_visit(this) result(energy)
-        class(Null_Ewald_Self_Component), intent(in) :: this
+        class(Null_DES_Self_Component), intent(in) :: this
         energy = 0._DP
     end function Null_visit
 
     pure real(DP) function Null_meet(this, moment) result(self)
-        class(Null_Ewald_Self_Component), intent(in) :: this
+        class(Null_DES_Self_Component), intent(in) :: this
         real(DP), intent(in) :: moment(:)
         self = 0._DP
     end function Null_meet
 
-!end implementation Null_Ewald_Self_Component
+!end implementation Null_DES_Self_Component
 
-end module class_ewald_self_component
+end module class_des_self_component

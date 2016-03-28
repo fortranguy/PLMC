@@ -19,7 +19,7 @@ use class_moved_positions, only: Concrete_Moved_Positions
 use class_rotated_orientations, only: Concrete_Rotated_Orientations
 use class_component_exchange, only: Abstract_Component_Exchange, Concrete_Component_Exchange
 use class_pair_potential, only: Abstract_Pair_Potential, Null_Pair_Potential
-use class_ewald_real_pair, only: Abstract_Ewald_Real_Pair, Null_Ewald_Real_Pair
+use class_des_real_pair, only: Abstract_DES_Real_Pair, Null_DES_Real_Pair
 
 implicit none
 
@@ -67,7 +67,7 @@ end interface component_can_exchange
 interface components_interact
     module procedure :: components_interact_from_min_distance
     module procedure :: components_interact_from_pair_potential
-    module procedure :: components_interact_from_ewald_real_pair
+    module procedure :: components_interact_from_des_real_pair
 end interface components_interact
 
 contains
@@ -192,10 +192,10 @@ contains
         end select
     end function components_interact_from_pair_potential
 
-    pure logical function component_interacts_with_wall(wall_pair) result(component_interacts)
-        class(Abstract_Pair_Potential), intent(in) :: wall_pair
+    pure logical function component_interacts_with_wall(wall_potential) result(component_interacts)
+        class(Abstract_Pair_Potential), intent(in) :: wall_potential
 
-        select type (wall_pair)
+        select type (wall_potential)
             type is (Null_Pair_Potential)
                 component_interacts = .false.
             class default
@@ -203,17 +203,17 @@ contains
         end select
     end function component_interacts_with_wall
 
-    pure logical function components_interact_from_ewald_real_pair(ewald_real_pair) &
+    pure logical function components_interact_from_des_real_pair(real_potential) &
         result(components_interact)
-        class(Abstract_Ewald_Real_Pair), intent(in) :: ewald_real_pair
+        class(Abstract_DES_Real_Pair), intent(in) :: real_potential
 
-        select type (ewald_real_pair)
-            type is (Null_Ewald_Real_Pair)
+        select type (real_potential)
+            type is (Null_DES_Real_Pair)
                 components_interact = .false.
             class default
                 components_interact = .true.
         end select
-    end function components_interact_from_ewald_real_pair
+    end function components_interact_from_des_real_pair
 
     pure logical function component_has_positions(partcles_positions)
         class(Abstract_Component_Coordinates), intent(in) :: partcles_positions

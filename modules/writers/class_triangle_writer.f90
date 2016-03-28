@@ -12,7 +12,7 @@ implicit none
 private
 
     type, public :: Concrete_Line_Selector
-        logical, allocatable :: with_components(:)
+        logical, allocatable :: line(:)
     end type Concrete_Line_Selector
 
     type :: Strings_Wrapper
@@ -74,7 +74,7 @@ contains
         do j_component = 1, size(this%strings)
             allocate(this%strings(j_component)%with_component(j_component))
             do i_component = 1, size(this%strings(j_component)%with_component)
-                if (selector(j_component)%with_components(i_component)) then
+                if (selector(j_component)%line(i_component)) then
                     allocate(Concrete_Number_to_String :: this%strings(j_component)%&
                         with_component(i_component)%string)
                     legend = legend//"    "//string%get(i_component)//"<->"//string%get(j_component)
@@ -113,7 +113,7 @@ contains
             do i_component = 1, size(this%strings(j_component)%with_component)
                 associate(string_ij => this%strings(j_component)%with_component(i_component)%&
                     string, energy_ij => triangle(j_component)%&
-                    with_components(i_component))
+                    line(i_component))
                     string = string//string_ij%get(energy_ij)
                 end associate
             end do

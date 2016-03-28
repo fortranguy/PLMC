@@ -108,7 +108,7 @@
             "data structure": "list"
         }
     },
-    "Long Interactions": {
+    "Dipolar Interactions": {
         "alpha times box edge": 7.0,
         "Real": {
             "tabulated": true,
