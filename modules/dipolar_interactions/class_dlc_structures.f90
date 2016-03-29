@@ -6,7 +6,7 @@ use class_periodic_box, only: Abstract_Periodic_Box
 use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use types_component_wrapper, only: Component_Wrapper
 use types_temporary_particle, only: Concrete_Temporary_Particle
-use procedures_long_interactions_micro, only: set_fourier, set_exp_kz, reci_number_1_sym
+use procedures_dipolar_interactions_micro, only: set_fourier, set_exp_kz, reci_number_1_sym
 
 implicit none
 
@@ -66,9 +66,9 @@ contains
         allocate(this%are_dipolar(size(are_dipolar)))
         this%are_dipolar = are_dipolar
         allocate(this%structure_p(-this%reci_numbers(1):this%reci_numbers(1), &
-                                  -this%reci_numbers(2):this%reci_numbers(2)))
+                                                      0:this%reci_numbers(2)))
         allocate(this%structure_m(-this%reci_numbers(1):this%reci_numbers(1), &
-                                  -this%reci_numbers(2):this%reci_numbers(2)))
+                                                      0:this%reci_numbers(2)))
         call this%set()
     end subroutine Abstract_construct
 
@@ -109,23 +109,25 @@ contains
                 call set_fourier(fourier_position_1, this%reci_numbers(1), wave_1_x_position(1))
                 call set_fourier(fourier_position_2, this%reci_numbers(2), wave_1_x_position(2))
                 call set_exp_kz(exp_kz_tab, surface_size, position(3))
-                do n_2 = -this%reci_numbers(2), this%reci_numbers(2)
+                do n_2 = 0, this%reci_numbers(2)
                     wave_vector(2) = 2._DP*PI * real(n_2, DP) / surface_size(2)
-                do n_1 = -this%reci_numbers(1), this%reci_numbers(1)
-                    wave_vector(1) = 2._DP*PI * real(n_1, DP) / surface_size(1)
+                    do n_1 = -reci_number_1_sym(this%reci_numbers, 0, n_2), this%reci_numbers(1)
+                        wave_vector(1) = 2._DP*PI * real(n_1, DP) / surface_size(1)
 
-                    if (n_1**2 + n_2**2 > this%reci_numbers(1)**2) cycle
+                        if (n_1**2 + n_2**2 > this%reci_numbers(1)**2) cycle
 
-                    fourier_position = fourier_position_1(n_1) * fourier_position_2(n_2)
-                    exp_kz = exp_kz_tab(abs(n_1), abs(n_2))
-                    wave_dot_moment_12 = dot_product(wave_vector, dipolar_moment(1:2))
-                    wave_x_moment_3 = norm2(wave_vector) * dipolar_moment(3)
+                        fourier_position = fourier_position_1(n_1) * fourier_position_2(n_2)
+                        exp_kz = exp_kz_tab(abs(n_1), abs(n_2))
+                        wave_dot_moment_12 = dot_product(wave_vector, dipolar_moment(1:2))
+                        wave_x_moment_3 = norm2(wave_vector) * dipolar_moment(3)
 
-                    this%structure_p(n_1, n_2) = this%structure_p(n_1, n_2) + &
-                        cmplx(+wave_x_moment_3, wave_dot_moment_12, DP) * fourier_position * exp_kz
-                    this%structure_m(n_1, n_2) = this%structure_m(n_1, n_2) + &
-                        cmplx(-wave_x_moment_3, wave_dot_moment_12, DP) * fourier_position / exp_kz
-                end do
+                        this%structure_p(n_1, n_2) = this%structure_p(n_1, n_2) + &
+                            cmplx(+wave_x_moment_3, wave_dot_moment_12, DP) * &
+                            fourier_position * exp_kz
+                        this%structure_m(n_1, n_2) = this%structure_m(n_1, n_2) + &
+                            cmplx(-wave_x_moment_3, wave_dot_moment_12, DP) * &
+                            fourier_position / exp_kz
+                    end do
                 end do
             end do
         end do

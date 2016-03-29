@@ -1,7 +1,7 @@
 module procedures_plmc_factory
 
 use data_wrappers_prefix, only:environment_prefix, mixture_prefix, changes_prefix, &
-    short_interactions_prefix, long_interactions_prefix, writers_prefix
+    short_interactions_prefix, dipolar_interactions_prefix, writers_prefix
 use json_module, only: json_file
 use procedures_command_arguments, only: set_filename_from_argument
 use class_periodic_box, only: Abstract_Periodic_Box
@@ -13,8 +13,9 @@ use procedures_mixture_factory, only: mixture_create, mixture_destroy
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use procedures_short_interactions_factory, only: short_interactions_create, &
     short_interactions_destroy
-use types_long_interactions_wrapper, only: Long_Interactions_Wrapper
-use procedures_long_interactions_factory, only: long_interactions_create, long_interactions_destroy
+use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
+use procedures_dipolar_interactions_factory, only: dipolar_interactions_create, &
+    dipolar_interactions_destroy
 use module_changes_success, only: Concrete_Changes_Success, Concrete_Changes_Counter, &
     Concrete_Switch_Counters, &
     changes_counter_reset, changes_counter_set, switches_counters_reset, switches_counters_set
@@ -42,7 +43,7 @@ interface plmc_create
     module procedure :: create_environment
     module procedure :: create_mixture
     module procedure :: create_short_interactions
-    module procedure :: create_long_interactions
+    module procedure :: create_dipolar_interactions
     module procedure :: create_changes
     module procedure :: create_metropolis
     module procedure :: create_observables
@@ -60,7 +61,7 @@ interface plmc_destroy
     module procedure :: destroy_observables
     module procedure :: destroy_metropolis
     module procedure :: destroy_changes
-    module procedure :: destroy_long_interactions
+    module procedure :: destroy_dipolar_interactions
     module procedure :: destroy_short_interactions
     module procedure :: destroy_mixture
     module procedure :: destroy_environment
@@ -127,21 +128,21 @@ contains
         call short_interactions_destroy(short_interactions)
     end subroutine destroy_short_interactions
 
-    subroutine create_long_interactions(long_interactions, environment, mixture, input_data)
-        type(Long_Interactions_Wrapper), intent(out) :: long_interactions
+    subroutine create_dipolar_interactions(dipolar_interactions, environment, mixture, input_data)
+        type(Dipolar_Interactions_Wrapper), intent(out) :: dipolar_interactions
         type(Environment_Wrapper), intent(in) :: environment
         type(Mixture_Wrapper), intent(in) :: mixture
         type(json_file), intent(inout) :: input_data
 
-        call long_interactions_create(long_interactions, environment, mixture, input_data, &
-            long_interactions_prefix)
-    end subroutine create_long_interactions
+        call dipolar_interactions_create(dipolar_interactions, environment, mixture, input_data, &
+            dipolar_interactions_prefix)
+    end subroutine create_dipolar_interactions
 
-    subroutine destroy_long_interactions(long_interactions)
-        type(Long_Interactions_Wrapper), intent(inout) :: long_interactions
+    subroutine destroy_dipolar_interactions(dipolar_interactions)
+        type(Dipolar_Interactions_Wrapper), intent(inout) :: dipolar_interactions
 
-        call long_interactions_destroy(long_interactions)
-    end subroutine destroy_long_interactions
+        call dipolar_interactions_destroy(dipolar_interactions)
+    end subroutine destroy_dipolar_interactions
 
     subroutine create_changes(changes, periodic_box, components, input_data)
         type(Changes_Wrapper), intent(out) :: changes
@@ -185,13 +186,14 @@ contains
         call metropolis_algorithms_create(metropolis, environment, components, changes%components)
     end subroutine create_metropolis
 
-    subroutine set_metropolis(metropolis, mixture, short_interactions, long_interactions)
+    subroutine set_metropolis(metropolis, mixture, short_interactions, dipolar_interactions)
         type(Metropolis_Algorithms_Wrapper), intent(inout) :: metropolis
         type(Mixture_Wrapper), intent(in) :: mixture
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
-        type(Long_Interactions_Wrapper), intent(in) :: long_interactions
+        type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
 
-        call metropolis_algorithms_set(metropolis, mixture, short_interactions, long_interactions)
+        call metropolis_algorithms_set(metropolis, mixture, short_interactions, &
+            dipolar_interactions)
     end subroutine set_metropolis
 
     subroutine destroy_metropolis(metropolis)
@@ -223,18 +225,18 @@ contains
         call observables_destroy(observables)
     end subroutine destroy_observables
 
-    subroutine create_writers(writers, components, short_interactions, long_interactions, changes, &
-        input_data)
+    subroutine create_writers(writers, components, short_interactions, dipolar_interactions, &
+        changes, input_data)
         type(Writers_Wrapper), intent(out) :: writers
         type(Component_Wrapper), intent(in) :: components(:)
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
-        type(Long_Interactions_Wrapper), intent(in) :: long_interactions
+        type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
         type(Changes_Wrapper), intent(in) :: changes
         type(json_file), intent(inout) :: input_data
 
         call writers_create(writers, components, short_interactions%wall_pairs, &
-            short_interactions%components_pairs, long_interactions%real_pairs, changes%components, &
-            input_data, writers_prefix)
+            short_interactions%components_pairs, dipolar_interactions%real_pairs, changes%&
+            components, input_data, writers_prefix)
     end subroutine create_writers
 
     subroutine destroy_writers(writers)

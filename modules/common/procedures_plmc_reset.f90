@@ -1,7 +1,7 @@
 module procedures_plmc_reset
 
 use class_mixture_total_moment, only: Abstract_Mixture_Total_Moment
-use types_long_interactions_wrapper, only: Ewald_Real_Pairs_Wrapper, Long_Interactions_Wrapper
+use types_dipolar_interactions_wrapper, only: DES_Real_Pairs_Wrapper, Dipolar_Interactions_Wrapper
 
 implicit none
 
@@ -10,8 +10,8 @@ public :: plmc_reset
 
 interface plmc_reset
     module procedure :: reset_total_moments
-    module procedure :: reset_long
-    module procedure :: reset_long_real
+    module procedure :: reset_dipolar
+    module procedure :: reset_dipolar_real
 end interface plmc_reset
 
 contains
@@ -23,26 +23,26 @@ contains
     end subroutine reset_total_moments
 
     !> Some quantities may need to be reset to reflect the current configuration.
-    subroutine reset_long(long_interactions)
-        type(Long_Interactions_Wrapper), intent(inout) :: long_interactions
+    subroutine reset_dipolar(dipolar_interactions)
+        type(Dipolar_Interactions_Wrapper), intent(inout) :: dipolar_interactions
 
-        call plmc_reset(long_interactions%real_pairs)
-        call long_interactions%reci_weight%reset()
-        call long_interactions%reci_structure%reset()
-        call long_interactions%dlc_weight%reset()
-        call long_interactions%dlc_structures%reset()
-    end subroutine reset_long
+        call plmc_reset(dipolar_interactions%real_pairs)
+        call dipolar_interactions%reci_weight%reset()
+        call dipolar_interactions%reci_structure%reset()
+        call dipolar_interactions%dlc_weight%reset()
+        call dipolar_interactions%dlc_structures%reset()
+    end subroutine reset_dipolar
 
-    subroutine reset_long_real(real_pairs)
-        type(Ewald_Real_Pairs_Wrapper), intent(inout) :: real_pairs(:)
+    subroutine reset_dipolar_real(real_pairs)
+        type(DES_Real_Pairs_Wrapper), intent(inout) :: real_pairs(:)
 
         integer :: i_component, j_component
 
         do j_component = 1, size(real_pairs)
-            do i_component = 1, size(real_pairs(j_component)%with_components)
-                call real_pairs(j_component)%with_components(i_component)%real_pair%reset()
+            do i_component = 1, size(real_pairs(j_component)%line)
+                call real_pairs(j_component)%line(i_component)%potential%reset()
             end do
         end do
-    end subroutine reset_long_real
+    end subroutine reset_dipolar_real
 
 end module procedures_plmc_reset

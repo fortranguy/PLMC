@@ -10,11 +10,11 @@ implicit none
 private
 
     type, public :: Pair_Potential_Wrapper
-        class(Abstract_Pair_Potential), allocatable :: pair_potential
+        class(Abstract_Pair_Potential), allocatable :: potential
     end type Pair_Potential_Wrapper
 
     type, public :: Pair_Potentials_Wrapper
-        type(Pair_Potential_Wrapper), allocatable :: with_components(:)
+        type(Pair_Potential_Wrapper), allocatable :: line(:)
     end type Pair_Potentials_Wrapper
 
     type, public :: Short_Interactions_Wrapper

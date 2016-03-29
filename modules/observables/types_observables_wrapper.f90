@@ -16,8 +16,8 @@ private
         type(Concrete_Line_Observables), allocatable :: switches_successes(:)
         type(Concrete_Line_Observables), allocatable :: short_energies(:)
         real(DP), allocatable :: walls_energies(:)
-        type(Concrete_Line_Observables), allocatable :: long_energies(:)
-        real(DP) :: long_mixture_energy
+        type(Concrete_Line_Observables), allocatable :: dipolar_energies(:)
+        real(DP) :: dipolar_mixture_energy
         real(DP), allocatable :: field_energies(:)
     end type Observables_Wrapper
 

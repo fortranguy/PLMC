@@ -7,7 +7,7 @@ use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use class_dlc_weight, only: Abstract_DLC_Weight
 use class_dlc_structures, only: Abstract_DLC_Structures
-use procedures_long_interactions_micro, only: set_fourier, set_exp_kz, reci_number_1_sym
+use procedures_dipolar_interactions_micro, only: set_fourier, set_exp_kz, reci_number_1_sym
 
 implicit none
 

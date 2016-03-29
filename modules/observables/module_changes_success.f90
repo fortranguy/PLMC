@@ -26,7 +26,7 @@ public :: changes_counter_reset, changes_counter_set, switches_counters_reset, s
     end type Concrete_Changes_Success
 
     type, public :: Concrete_Switch_Counters
-        type(Concrete_Change_Counter), allocatable :: with_components(:)
+        type(Concrete_Change_Counter), allocatable :: line(:)
     end type Concrete_Switch_Counters
 
 contains
@@ -42,7 +42,7 @@ contains
     pure elemental subroutine switches_counters_reset(switches_counters)
         type(Concrete_Switch_Counters), intent(inout) :: switches_counters
 
-        call reset(switches_counters%with_components)
+        call reset(switches_counters%line)
     end subroutine switches_counters_reset
 
     pure elemental subroutine reset(changes_counter)
@@ -65,7 +65,7 @@ contains
         type(Concrete_Line_Observables), intent(inout) :: switches_successes
         type(Concrete_Switch_Counters), intent(in) :: switches_counters
 
-        switches_successes%with_components = get_ratio(switches_counters%with_components)
+        switches_successes%line = get_ratio(switches_counters%line)
     end subroutine switches_counters_set
 
     pure elemental real(DP) function get_ratio(change_counter)

@@ -36,8 +36,8 @@ contains
         call writers%walls%write(i_step, observables%walls_energies)
         call writers%switches%write(i_step, observables%switches_successes)
         call writers%short_energies%write(i_step, observables%short_energies)
-        call writers%long_energies%write(i_step, observables%long_energies)
-        call writers%long_mixture_energy%write(i_step, observables%long_mixture_energy)
+        call writers%dipolar_energies%write(i_step, observables%dipolar_energies)
+        call writers%dipolar_mixture_energy%write(i_step, observables%dipolar_mixture_energy)
     end subroutine write_observables
 
 end module procedures_plmc_write

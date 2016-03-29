@@ -131,11 +131,11 @@ contains
         allocate(pairs(size(min_distances)))
         do i_component = 1, size(pairs)
             pair_prefix = prefix//"Component "//string%get(i_component)//".With Walls."
-            associate (min_distance => min_distances(i_component)%min_distance, &
-                interact_i => components_interact(min_distances(i_component)%min_distance))
+            associate (min_distance => min_distances(i_component)%distance, &
+                interact_i => components_interact(min_distances(i_component)%distance))
                 interact = interact .and. interact_i
                 call short_interactions_create(expression, interact_i, input_data, pair_prefix)
-                call short_interactions_create(pairs(i_component)%pair_potential, min_distance, &
+                call short_interactions_create(pairs(i_component)%potential, min_distance, &
                     interact_i, expression, input_data, pair_prefix)
             end associate
             deallocate(pair_prefix)
@@ -193,7 +193,7 @@ contains
             do i_component = 1, size(cells, 1)
                 j_pair = maxval([i_component, j_component])
                 i_pair = minval([i_component, j_component])
-                associate (pair_ij => pairs(j_pair)%with_components(i_pair)%pair_potential)
+                associate (pair_ij => pairs(j_pair)%line(i_pair)%potential)
                     call cells(i_component, j_component)%construct(list, periodic_box, &
                         components(i_component)%positions, pair_ij)
                 end associate
@@ -266,23 +266,21 @@ contains
         interact = .true.
         allocate(pairs(size(min_distances)))
         do j_component = 1, size(pairs)
-            allocate(pairs(j_component)%with_components(j_component))
-            do i_component = 1, size(pairs(j_component)%with_components)
+            allocate(pairs(j_component)%line(j_component))
+            do i_component = 1, size(pairs(j_component)%line)
                 if (i_component == j_component) then
                     pair_prefix = prefix//"Component "//string%get(i_component)//"."
                 else
                     pair_prefix = prefix//"Inter "//string%get(i_component)//&
                         string%get(j_component)//"."
                 end if
-                associate (min_distance => min_distances(j_component)%with_components(i_component)%&
-                        min_distance)
+                associate (min_distance => min_distances(j_component)%line(i_component)%distance)
                     interact_ij = components_interact(min_distance)
                     interact = interact .and. interact_ij
                     call short_interactions_create(expression, interact_ij, input_data, &
                         pair_prefix)
-                    call short_interactions_create(pairs(j_component)%&
-                        with_components(i_component)%pair_potential, min_distance, interact_ij, &
-                        expression, input_data, pair_prefix)
+                    call short_interactions_create(pairs(j_component)%line(i_component)%potential, &
+                        min_distance, interact_ij, expression, input_data, pair_prefix)
                 end associate
                 deallocate(pair_prefix)
                 call short_interactions_destroy(expression)
@@ -297,7 +295,7 @@ contains
 
         if (allocated(pairs)) then
             do i_component = size(pairs), 1, -1
-                call short_interactions_destroy(pairs(i_component)%with_components)
+                call short_interactions_destroy(pairs(i_component)%line)
             end do
             deallocate(pairs)
         end if
@@ -310,7 +308,7 @@ contains
 
         if (allocated(pairs)) then
             do i_component = size(pairs), 1, -1
-                call short_interactions_destroy(pairs(i_component)%pair_potential)
+                call short_interactions_destroy(pairs(i_component)%potential)
             end do
             deallocate(pairs)
         end if

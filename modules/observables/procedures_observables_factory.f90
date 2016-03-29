@@ -45,13 +45,13 @@ contains
         call observables_create(observables%walls_energies, size(components))
         call observables_create(observables%field_energies, size(components))
         call observables_create(observables%short_energies, size(components))
-        call observables_create(observables%long_energies, size(components))
+        call observables_create(observables%dipolar_energies, size(components))
     end subroutine create_all
 
     pure subroutine destroy_all(observables)
         type(Observables_Wrapper), intent(inout) :: observables
 
-        call observables_destroy(observables%long_energies)
+        call observables_destroy(observables%dipolar_energies)
         call observables_destroy(observables%short_energies)
         call observables_destroy(observables%field_energies)
         call observables_destroy(observables%walls_energies)
@@ -87,7 +87,7 @@ contains
 
         allocate(counters(num_components))
         do i_counter = 1, size(counters)
-            allocate(counters(i_counter)%with_components(i_counter))
+            allocate(counters(i_counter)%line(i_counter))
         end do
         call switches_counters_reset(counters)
     end subroutine create_switches_counters
@@ -99,8 +99,8 @@ contains
 
         if (allocated(counters)) then
             do i_counter = size(counters), 1, -1
-                if (allocated(counters(i_counter)%with_components)) then
-                    deallocate(counters(i_counter)%with_components)
+                if (allocated(counters(i_counter)%line)) then
+                    deallocate(counters(i_counter)%line)
                 end if
             end do
             deallocate(counters)
@@ -142,8 +142,8 @@ contains
 
         integer :: i_component
         do i_component = 1, size(triangle)
-            allocate(triangle(i_component)%with_components(i_component))
-            triangle(i_component)%with_components = 0._DP
+            allocate(triangle(i_component)%line(i_component))
+            triangle(i_component)%line = 0._DP
         end do
     end subroutine create_triangle_nodes
 
@@ -153,8 +153,8 @@ contains
         integer :: i_component
 
         do i_component = size(triangle), 1, -1
-            if (allocated(triangle(i_component)%with_components)) then
-                deallocate(triangle(i_component)%with_components)
+            if (allocated(triangle(i_component)%line)) then
+                deallocate(triangle(i_component)%line)
             end if
         end do
     end subroutine destroy_triangle_nodes

@@ -8,7 +8,7 @@ use types_component_wrapper, only: Component_Wrapper
 use types_mixture_wrapper, only: Mixture_Wrapper
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
-use types_long_interactions_wrapper, only: Long_Interactions_Wrapper
+use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
 use class_tower_sampler, only: Abstract_Tower_Sampler, Concrete_Tower_Sampler, Null_Tower_Sampler
 use class_one_particle_change, only: Abstract_One_Particle_Change, &
     Concrete_One_Particle_Move, Concrete_One_Particle_Rotation, Null_One_Particle_Change
@@ -174,18 +174,18 @@ contains
         end if
     end subroutine destroy_switch
 
-    subroutine set_all(metropolis_algorithms, mixture, short_interactions, long_interactions)
+    subroutine set_all(metropolis_algorithms, mixture, short_interactions, dipolar_interactions)
         type(Metropolis_Algorithms_Wrapper), intent(inout) :: metropolis_algorithms
         type(Mixture_Wrapper), intent(in) :: mixture
         type(Short_Interactions_Wrapper), intent(in) :: short_interactions
-        type(Long_Interactions_Wrapper), intent(in) :: long_interactions
+        type(Dipolar_Interactions_Wrapper), intent(in) :: dipolar_interactions
 
         call metropolis_algorithms%one_particle_move%set_candidates(mixture, short_interactions, &
-            long_interactions)
+            dipolar_interactions)
         call metropolis_algorithms%one_particle_rotation%set_candidates(mixture, &
-            short_interactions, long_interactions)
+            short_interactions, dipolar_interactions)
         call metropolis_algorithms%two_particles_switch%set_candidates(mixture%components, &
-            short_interactions, long_interactions)
+            short_interactions, dipolar_interactions)
     end subroutine set_all
 
 end module procedures_metropolis_algorithms_factory

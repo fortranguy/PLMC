@@ -18,8 +18,8 @@ private
     type, public :: Writers_Wrapper
         type(Component_Writers_Wrapper), allocatable :: components(:)
         class(Abstract_Line_Writer), allocatable :: walls
-        class(Abstract_Triangle_Writer), allocatable :: switches, short_energies, long_energies
-        class(Abstract_Energy_Writer), allocatable :: long_mixture_energy
+        class(Abstract_Triangle_Writer), allocatable :: switches, short_energies, dipolar_energies
+        class(Abstract_Energy_Writer), allocatable :: dipolar_mixture_energy
     end type Writers_Wrapper
 
 end module types_writers_wrapper

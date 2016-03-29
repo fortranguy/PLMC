@@ -1,11 +1,11 @@
-module procedures_long_interactions_micro
+module procedures_dipolar_interactions_micro
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions, PI
 
 implicit none
 private
-public :: ewald_real_B, ewald_real_C, reci_number_1_sym, reci_number_2_sym, set_fourier, set_exp_kz
+public :: des_real_B, des_real_C, reci_number_1_sym, reci_number_2_sym, set_fourier, set_exp_kz
 
 contains
 
@@ -29,28 +29,28 @@ contains
     !>      B(r) = \frac{\mathrm{erfc}(\alpha r)}{r^3} +
     !>           2\frac{\alpha}{\sqrt{\pi}}\frac{e^{-\alpha^2 r^2}}{r^2}
     !> \]
-    pure function ewald_real_B(alpha, r)
-        real(DP) :: ewald_real_B
+    pure function des_real_B(alpha, r)
+        real(DP) :: des_real_B
         real(DP), intent(in) :: alpha
         real(DP), intent(in) :: r
 
-        ewald_real_B = erfc(alpha*r)/r**3 + 2._DP*alpha/sqrt(PI) * exp(-alpha**2*r**2) / r**2
-    end function ewald_real_B
+        des_real_B = erfc(alpha*r)/r**3 + 2._DP*alpha/sqrt(PI) * exp(-alpha**2*r**2) / r**2
+    end function des_real_B
 
     !> \[
     !>      C(r) = 3\frac{\mathrm{erfc}(\alpha r)}{r^5} +
     !>            2\frac{\alpha}{\sqrt{\pi}}\left(2\alpha^2 + \frac{3}{r^2}\right)
     !>                                     \frac{e^{-\alpha^2 r^2}}{r^2}
     !> \]
-    pure function ewald_real_C(alpha, r)
-        real(DP) :: ewald_real_C
+    pure function des_real_C(alpha, r)
+        real(DP) :: des_real_C
         real(DP), intent(in) :: alpha
         real(DP), intent(in) :: r
 
-        ewald_real_C = 3._DP*erfc(alpha*r)/r**5 + &
+        des_real_C = 3._DP*erfc(alpha*r)/r**5 + &
                        2._DP*alpha/sqrt(PI) * (2._DP*alpha**2+3._DP/r**2) * &
                                               exp(-alpha**2*r**2) / r**2
-    end function ewald_real_C
+    end function des_real_C
 
     !> Symmetry: half wave vectors in do loop: reci_number_1
     pure integer function reci_number_1_sym(reci_numbers, n_3, n_2)
@@ -112,4 +112,4 @@ contains
         end do
     end subroutine set_exp_kz
 
-end module procedures_long_interactions_micro
+end module procedures_dipolar_interactions_micro
