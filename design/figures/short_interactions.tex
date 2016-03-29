@@ -5,91 +5,78 @@
 \begin{document}
 
     \begin{tikzpicture}
-        \begin{package}{Short range interactions}
 
-            \begin{scope}[opacity=1]
-                \begin{abstractclass}[text width=\mediumTextWidth]{ComponentPotential}{0, 0}
-                    \operation{construct(periodicBox\type{PeriodicBox}, positions\type{ComponentCoordinates})}
-                    \operation{destroy()}
-                    \operation{visit(overlap\type{bool}, energy\type{double}, particle\type{Particle},
-                        pairPotential\type{PairPotential})}
-                \end{abstractclass}
-            \end{scope}
+        \begin{package}{Short interactions}
 
-            \begin{scope}[shift={($(ComponentPotential.north) + (-12 cm, 0 cm)$)}, opacity=1]
-                \begin{abstractclass}[text width=\largeTextWidth]{VisitableCells}{0, 0}
-                    \operation{construct(mold\type{VisitableList}, periodicBox\type{PeriodicBox},
-                                            positions\type{ComponentCoordinates},
-                                            pairPotential\type{PairPotential})}
-                    \operation{destroy()}
-                    \operation{visit(overlap\type{bool}, energy\type{double}, particle\type{Particle})}
-                    \operation{move(from\type{Particle}, to\type{Particle})}
-                    \operation{add(particle\type{Particle})}
-                    \operation{remove(particle\type{Particle})}
-                \end{abstractclass}
-
-                \def\operationsImplementation{}
-                \begin{comment}
-                    \begin{class}[text width=\largeTextWidth]{XYZPBCVisitableCells}{0, -5.5}
-                        \inherit{VisitableCells}
-                        \operationsImplementation{}
-                    \end{class}
-
-                    \begin{class}[text width=\largeTextWidth]{XYPBCVisitableCells}{0, -7}
-                        \inherit{VisitableCells}
-                        \operationsImplementation{}
-                    \end{class}
-                \end{comment}
-            \end{scope}
-
-            \begin{scope}[shift={($(VisitableCells.south) + (-7 cm, -3 cm)$)}, opacity=1]
-                \begin{abstractclass}[text width=\mediumTextWidth]{VisitableList}{0, 0}
-                    \operation{construct(periodicBox\type{PeriodicBox})}
-                    \operation{destroy()}
-                    \operation{set(iTarger\type{int}, particle\type{Particle})}
-                    \operation{visit(overlap\type{bool}, energy\type{double}, particle\type{Particle},
-                        pairPotential\type{PairPotential})}
-                    \operation{add(particle\type{Particle})}
-                    \operation{remove(iParticle\type{int})}
-                \end{abstractclass}
-            \end{scope}
-
-            \begin{scope}[shift={($(ComponentPotential.south) + (0 cm, -2 cm)$)}, opacity=1]
+            \begin{scope}
                 \begin{abstractclass}[text width=\mediumTextWidth]{PairPotential}{0, 0}
-                    \operation{construct(potentialDomain\type{PotentialDomain},
-                        potentialExpression\type{PotentialExpression})}
-                    \operation{destroy()}
-                    \operation{getMaxDistance()}
-                    \operation{meet(overlap\type{bool}, energy\type{double}, distance\type{double})}
+                    \operation[0]{construct(domain\type{ShortPotentialDomain},
+                        expression\type{PotentialExpression})}
+                    \operation[0]{destroy()}
+                    \operation{getMaxDistance()\type{double}}
+                    \operation[0]{meet(overlap\type{bool}, energy\type{double},
+                        distance\type{double})}
                 \end{abstractclass}
             \end{scope}
 
-            \begin{scope}[shift={($(PairPotential.south) + (0 cm, -1.5 cm)$)}, opacity=1]
-            \begin{abstractclass}[text width=\mediumTextWidth]{PotentialExpression}{0, 0}
+            \begin{scope}[shift={($(PairPotential.south) + (0 cm, -1.5 cm)$)}]
+            \begin{abstractclass}[text width=\smallTextWidth]{PotentialExpression}{0, 0}
                     \operation{get(distance : double) : double}
+                \end{abstractclass}
+            \end{scope}
+
+            \begin{scope}[shift={($(PairPotential.north) + (0 cm, 6 cm)$)}]
+                \begin{abstractclass}[text width=\largeTextWidth]{ShortPairsVisitor}{0, 0}
+                    \operation{construct(periodicBox\type{\namespace{Environment}PeriodicBox})}
+                    \operation{destroy()}
+                    \operation{visitInter(overlap\type{bool}, energy\type{double},
+                        positions1\type{\namespace{Mixture}ComponentCoordinates},
+                        positions2\type{\namespace{Mixture}ComponentCoordinates},
+                        pairPotential\type{PairPotential})}
+                    \operation{visitIntra(overlap\type{bool}, energy\type{double},
+                        positions\type{\namespace{Mixture}ComponentCoordinates},
+                        pairPotential\type{PairPotential})}
+                \end{abstractclass}
+            \end{scope}
+
+            \begin{scope}[shift={($(ShortPairsVisitor.north) + (-13 cm, 0 cm)$)}]
+                \begin{abstractclass}[text width=\largeTextWidth]{VisitableCells}{0, 0}
+                    \operation{construct(listMold\type{VisitableList},
+                        periodicBox\type{\namespace{Environment}PeriodicBox},
+                        positions\type{\namespace{Mixture}ComponentCoordinates},
+                        pairPotential\type{PairPotential})}
+                    \operation{destroy()}
+                    \operation{visit(overlap\type{bool}, energy\type{double},
+                        particle\type{\namespace{Mixture}TemporaryParticle}, iExclude\type{int})}
+                    \operation{move(toPosition\type{double[3]},
+                        from\type{\namespace{Mixture}TemporaryParticle})}
+                    \operation{add(particle\type{\namespace{Mixture}TemporaryParticle})}
+                    \operation{remove(particle\type{\namespace{Mixture}TemporaryParticle})}
+                \end{abstractclass}
+            \end{scope}
+
+            \begin{scope}[shift={($(VisitableCells.south) + (0 cm, -2 cm)$)}]
+                \begin{abstractclass}[text width=\largeTextWidth]{VisitableList}{0, 0}
+                    \operation{construct(periodicBox\type{\namespace{Environment}PeriodicBox},
+                        componentPositions\type{\namespace{Mixture}ComponentCoordinates})}
+                    \operation{destroy()}
+                    \operation{set(iTarger\type{int}, iParticle\type{int})}
+                    \operation{visit(overlap\type{bool}, energy\type{double},
+                        particle\type{\namespace{Mixture}TemporaryParticle},
+                        pairPotential\type{PairPotential}, iExclude\type{int})}
+                    \operation{add(iParticle\type{int})}
+                    \operation{remove(iParticle\type{int})}
                 \end{abstractclass}
             \end{scope}
 
         \end{package}
 
         \begin{scope}[on background layer]
-            %\aggregation{ComponentPotential}{periodicBox}{1}{PeriodicBox}
-            %\aggregation{ComponentPotential}{positions}{1}{ComponentCoordinates}
-            \aggregation{ComponentPotential}{pairPotential}{1}{PairPotential}
-            %\aggregation{IntraPairInteration}{diameters}{1}{Diameters}
-            %\aggregation{IntraPairInteration}{positions}{1}{ComponentCoordinates}
-            %\aggregation{InterPairInteration}{interDiameters}{1}{InterDiameters}
-            %\aggregation{InterPairInteration}{positions}{2}{ComponentCoordinates}
-
             \aggregation{VisitableCells}{pairPotential}{1}{PairPotential}
             \composition{VisitableCells}{visitableList}{1..n}{VisitableList}
-            %\aggregation{VisitableCells}{periodicBox}{1}{PeriodicBox}
-            %\aggregation{VisitableList}{periodicBox}{1}{PeriodicBox}
-
             \composition{PairPotential}{potentialExpression}{1}{PotentialExpression}
-
-            %\aggregation{WallsPotential}{pairPotential}{1}{PairPotential}
         \end{scope}
+
     \end{tikzpicture}
 
 \end{document}
