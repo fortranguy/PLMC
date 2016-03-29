@@ -29,9 +29,8 @@ contains
         this%temperature = temperature
     end subroutine Abstract_set
 
-    pure function Abstract_get(this) result(temperature)
+    pure real(DP) function Abstract_get(this) result(temperature)
         class(Abstract_Temperature), intent(in) :: this
-        real(DP) :: temperature
 
         temperature = this%temperature
     end function Abstract_get
