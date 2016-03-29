@@ -5,16 +5,17 @@
 \begin{document}
 
     \begin{tikzpicture}
+
         \begin{package}{Component}
 
-            \begin{scope}[opacity=1]
+            \begin{scope}
                 \begin{abstractclass}[text width=\smallTextWidth]{ComponentNumber}{0, 0}
                     \operation{set(number\type{int})}
                     \operation{get()\type{int}}
                 \end{abstractclass}
             \end{scope}
 
-            \begin{scope}[shift={($(ComponentNumber.north) + (9 cm, 0)$)}, opacity=1]
+            \begin{scope}[shift={($(ComponentNumber.north) + (9 cm, 0 cm)$)}]
                 \begin{abstractclass}[text width=\mediumTextWidth]{ComponentChemicalPotential}{0, 0}
                     \operation{set(density\type{double}, excess\type{double})}
                     \operation{getDensity()\type{double}}
@@ -22,14 +23,14 @@
                 \end{abstractclass}
             \end{scope}
 
-            \begin{scope}[shift={($(ComponentNumber.north) + (0 cm, 9 cm)$)}, opacity=1]
+            \begin{scope}[shift={($(ComponentNumber.north) + (0 cm, 9 cm)$)}]
                 \begin{abstractclass}[text width=\smallTextWidth]{Coordinates}{0, 0}
                     \operation[0]{getNum()\type{int}}
                     \operation[0]{get(iParticle\type{int})\type{double[3]}}
                 \end{abstractclass}
             \end{scope}
 
-            \begin{scope}[shift={($(Coordinates.south) + (0 cm, -1.5 cm)$)}, opacity=1]
+            \begin{scope}[shift={($(Coordinates.south) + (0 cm, -1.5 cm)$)}]
                 \begin{abstractclass}[text width=\mediumTextWidth]{ComponentCoordinates}{0, 0}
                     \inherit{Coordinates}
                     \operation[0]{destroy()}
@@ -41,7 +42,7 @@
                 \end{abstractclass}
             \end{scope}
 
-            \begin{scope}[shift={($(ComponentCoordinates.north) + (11 cm, 0 cm)$)}, opacity=1]
+            \begin{scope}[shift={($(ComponentCoordinates.north) + (11 cm, 0 cm)$)}]
                 \begin{abstractclass}[text width=\mediumTextWidth]{ComponentDipolarMoments}{0, 0}
                     \inherit{Coordinates}
                     \operation{construct(norm\type{double},
@@ -59,6 +60,7 @@
             \aggregation{ComponentCoordinates}{number}{1}{ComponentNumber}
             \aggregation{ComponentDipolarMoments}{orientations}{1}{ComponentCoordinates}
         \end{scope}
+
     \end{tikzpicture}
 
 \end{document}
