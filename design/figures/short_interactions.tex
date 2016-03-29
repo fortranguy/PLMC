@@ -25,7 +25,7 @@
                 \end{abstractclass}
             \end{scope}
 
-            \begin{scope}[shift={($(PairPotential.north) + (0 cm, 6 cm)$)}]
+            \begin{scope}[shift={($(PairPotential.north) + (2 cm, 6 cm)$)}]
                 \begin{abstractclass}[text width=\largeTextWidth]{ShortPairsVisitor}{0, 0}
                     \operation{construct(periodicBox\type{PeriodicBox})}
                     \operation{destroy()}
@@ -54,7 +54,7 @@
                 \end{abstractclass}
             \end{scope}
 
-            \begin{scope}[shift={($(VisitableCells.south) + (0 cm, -2 cm)$)}]
+            \begin{scope}[shift={($(VisitableCells.south |- PairPotential.north)$)}]
                 \begin{abstractclass}[text width=\largeTextWidth]{VisitableList}{0, 0}
                     \operation{construct(periodicBox\type{PeriodicBox},
                         componentPositions\type{ComponentCoordinates})}
