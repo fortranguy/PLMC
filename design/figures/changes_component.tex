@@ -1,0 +1,54 @@
+\documentclass{standalone}
+
+\input figures/figures.sty
+
+\begin{document}
+
+    \begin{tikzpicture}
+
+        \begin{package}{Component}
+
+            \begin{scope}
+                \begin{abstractclass}[text width=\smallTextWidth]{ChangedCoordinates}{0, 0}
+                    \operation[0]{destroy()}
+                    \operation[0]{increaseDelta()}
+                    \operation[0]{decreaseDelta()}
+                    \operation[0]{getNum()\type{int}}
+                    \operation[0]{get(iParticle\type{int})\type{double[3]}}
+                \end{abstractclass}
+            \end{scope}
+
+            \begin{scope}[shift={($(ChangedCoordinates) + (0 cm, 6 cm)$)}]
+                \begin{abstractclass}[text width=\mediumTextWidth]{ChangeTuner}{0, 0}
+                    \operation{construct(changedCoordinates\type{ChangedCoordinates},
+                        parameters\type{ChangeTunerParameters})}
+                    \operation{destroy()}
+                    \operation{tune(tuned\type{bool}, iStep\type{int}, successRatio\type{double})}
+                \end{abstractclass}
+            \end{scope}
+
+            \begin{scope}[shift={($(ChangedCoordinates.north) + (8 cm, 0 cm)$)}]
+                \begin{abstractclass}[text width=\mediumTextWidth]{AbstractComponentExchange}{0, 0}
+                    \operation{construct(component\type{\namespace{Mixture}Component})}
+                    \operation{destroy()}
+                    \operation{add(particle\type{\namespace{Mixture}TemporaryParticle})}
+                    \operation{remove(iParticle\type{int})}
+                \end{abstractclass}
+            \end{scope}
+
+        \end{package}
+
+        \begin{scope}[on background layer]
+            \aggregation{ChangeTuner}{changedCoordinates}{1}{ChangedCoordinates}
+            %\aggregation{MovedPositions}{positions}{1}{ComponentCoordinates}
+            %aggregation{RotatedOrientations}{orientations}{1}{ComponentCoordinates}
+
+            %\aggregation{AbstractComponentExchange}{number}{1}{ComponentNumber}
+            %\aggregation{AbstractComponentExchange}{positions}{1}{ComponentCoordinates}
+            %\aggregation{AbstractComponentExchange}{orientations}{1}{ComponentCoordinates}
+            %\aggregation{AbstractComponentExchange}{totalMoment}{1}{ComponentTotalMoment}
+        \end{scope}
+
+    \end{tikzpicture}
+
+\end{document}
