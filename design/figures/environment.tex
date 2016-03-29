@@ -8,7 +8,7 @@
         \begin{package}{Environment}
 
             \begin{scope}
-                \begin{abstractclass}[text width=\largeTextWidth]{PeriodicBox}{0, 0}
+                \begin{abstractclass}[text width=\mediumTextWidth]{PeriodicBox}{0, 0}
                     \operation{set(size\type{double[3]})}
                     \operation{getSize()\type{double[3]}}
                     \operation{distance(position1\type{double[3]}, position2\type{double[3]})
@@ -19,7 +19,7 @@
                 \end{abstractclass}
             \end{scope}
 
-            \begin{scope}[shift={($(PeriodicBox.north) + (0 cm, 5 cm)$)}]
+            \begin{scope}[shift={($(PeriodicBox.north) + (0 cm, 6 cm)$)}]
                 \begin{abstractclass}[text width=\mediumTextWidth]{ParallelepipedDomain}{0, 0}
                     \operation{construct(periodicBox\type{PeriodicBox}, origin\type{double[3]},
                         size\type{double[3]})}
@@ -30,20 +30,15 @@
                 \end{abstractclass}
             \end{scope}
 
-            \begin{scope}[shift={($(ParallelepipedDomain.north) + (9 cm, 0 cm)$)}]
+            \begin{scope}[shift={($(PeriodicBox.north) + (11 cm, 0 cm)$)}]
                 \begin{abstractclass}[text width=\mediumTextWidth]{ReciprocalLattice}{0, 0}
                     \operation{contruct(periodicBox\type{PeriodicBox}, numbers\type{int[3]})}
                     \operation{destroy()}
                     \operation{getNumbers()\type{int[3]}}
                 \end{abstractclass}
-                \begin{comment}
-                \begin{class}[text width=\mediumTextWidth]{NullReciprocalLattice}{0, -4}
-                    \inherit{ReciprocalLattice}
-                \end{class}
-                \end{comment}
             \end{scope}
 
-            \begin{scope}[shift={($(PeriodicBox.north) + (-10 cm, 0 cm)$)}]
+            \begin{scope}[shift={($(PeriodicBox.north) + (-9 cm, 0 cm)$)}]
                 \begin{abstractclass}[text width=\smallTextWidth]{Temperature}{0, 0}
                     \operation{set(temperature\type{double})}
                     \operation{get()\type{double}}
@@ -51,15 +46,15 @@
                 % Parallel Tempering?
             \end{scope}
 
-            \begin{scope}[shift={($(PeriodicBox.north) + (10 cm, 0 cm)$)}]
+            \begin{scope}[shift={($(Temperature.north) + (0 cm, 4 cm)$)}]
                 \begin{abstractclass}[text width=\smallTextWidth]{Permittivity}{0, 0}
                     \operation{set(permittivity\type{double})}
                     \operation{get()\type{double}}
                 \end{abstractclass}
             \end{scope}
-
-            \begin{scope}[shift={($(ParallelepipedDomain.north) + (-9 cm, 0 cm)$)}]
-                \begin{abstractclass}[text width=\mediumTextWidth]{FieldExpression}{0, 0}
+            
+            \begin{scope}[shift={($(Permittivity.north) + (0 cm, 4 cm)$)}]
+                \begin{abstractclass}[text width=\smallTextWidth]{FieldExpression}{0, 0}
                     \operation{get(position\type{double[3]})\type{double[3]}}
                 \end{abstractclass}
             \end{scope}
@@ -72,22 +67,22 @@
                     \operation{get(position\type{double[3]})\type{double[3]}}
                 \end{abstractclass}
             \end{scope}
+            
+            \begin{scope}[shift={($(ReciprocalLattice.north) + (0 cm, 4 cm)$)}]
+                \begin{abstractclass}[text width=\mediumTextWidth]{FloorPenetration}{0, 0}
+                    \operation{meet(overlap\type{bool}, shortestVectorFromFloor\type{double[3]},
+                        positionFromFloor\type{double[3]})}
+                \end{abstractclass}
+            \end{scope}
 
-            \begin{scope}[shift={($(ExternalField.north) + (9 cm, 0 cm)$)}]
+            \begin{scope}[shift={($(FloorPenetration.north) + (0 cm, 6 cm)$)}]
                 \begin{abstractclass}[text width=\mediumTextWidth]{WallsPotential}{0, 0}
                     \operation{construct(periodicBox\type{PeriodicBox}, gap\type{double},
                         floorPenetration\type{FloorPenetration})}
                     \operation{destroy()}
-                    \operation{getGap()}
+                    \operation{getGap()\type{double}}
                     \operation{visit(overlap\type{bool}, energy\type{double}, position\type{double[3]},
-                        pairPotential\type{PairPotential})}
-                \end{abstractclass}
-            \end{scope}
-
-            \begin{scope}[shift={($(ReciprocalLattice.north) + (9 cm, 0 cm)$)}]
-                \begin{abstractclass}[text width=\mediumTextWidth]{FloorPenetration}{0, 0}
-                    \operation{meet(overlap\type{bool}, shortestVectorFromFloor\type{double[3]},
-                        positionFromFloor\type{double[3]})}
+                        pairPotential\type{\namespace{ShortInteractions}PairPotential})}
                 \end{abstractclass}
             \end{scope}
 
