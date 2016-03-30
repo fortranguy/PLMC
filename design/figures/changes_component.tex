@@ -6,7 +6,7 @@
 
     \begin{tikzpicture}
 
-        \begin{package}{Component}
+        \begin{package}{ChangesComponent}
 
             \begin{scope}
                 \begin{abstractclass}[text width=\smallTextWidth]{ChangedCoordinates}{0, 0}
@@ -27,26 +27,23 @@
                 \end{abstractclass}
             \end{scope}
 
-            \begin{scope}[shift={($(ChangedCoordinates.north) + (8 cm, 0 cm)$)}]
-                \begin{abstractclass}[text width=\mediumTextWidth]{AbstractComponentExchange}{0, 0}
-                    \operation{construct(component\type{\namespace{Mixture}Component})}
+            \begin{scope}[shift={($(ChangedCoordinates.north) + (6.5 cm, 0 cm)$)}]
+                \begin{abstractclass}[text width=\smallTextWidth]{ComponentExchange}{0, 0}
+                    \operation{construct(component\type{Component})}
                     \operation{destroy()}
-                    \operation{add(particle\type{\namespace{Mixture}TemporaryParticle})}
+                    \operation{add(particle\type{TemporaryParticle})}
                     \operation{remove(iParticle\type{int})}
                 \end{abstractclass}
+            \end{scope}
+            
+            \begin{scope}[shift={($(ChangeTuner.north -| ComponentExchange.north)$)}]
+                \umlnote{Import: \namespace{Mixture}Component, TemporaryParticle};
             \end{scope}
 
         \end{package}
 
         \begin{scope}[on background layer]
-            \aggregation{ChangeTuner}{changedCoordinates}{1}{ChangedCoordinates}
-            %\aggregation{MovedPositions}{positions}{1}{ComponentCoordinates}
-            %aggregation{RotatedOrientations}{orientations}{1}{ComponentCoordinates}
-
-            %\aggregation{AbstractComponentExchange}{number}{1}{ComponentNumber}
-            %\aggregation{AbstractComponentExchange}{positions}{1}{ComponentCoordinates}
-            %\aggregation{AbstractComponentExchange}{orientations}{1}{ComponentCoordinates}
-            %\aggregation{AbstractComponentExchange}{totalMoment}{1}{ComponentTotalMoment}
+            \aggregation{ChangeTuner}{\refName{changedCoordinates}}{\numRef{1}}{ChangedCoordinates}
         \end{scope}
 
     \end{tikzpicture}
