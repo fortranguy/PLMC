@@ -18,14 +18,14 @@
                 \end{class}
             \end{scope}
 
-            \begin{scope}[shift={($(Component.south) - (0 cm, 1.5 cm)$)}]
+            \begin{scope}[shift={($(Component.south) - (0 cm, 1 cm)$)}]
                 \begin{abstractclass}[text width=\smallTextWidth]{MinimumDistance}{0, 0}
                     \operation{set(minDistance\type{double})}
                     \operation{get()\type{double}}
                 \end{abstractclass}
             \end{scope}
 
-            \begin{scope}[shift={($(Component.north) + (0 cm, 7 cm)$)}]
+            \begin{scope}[shift={($(Component.north) + (0 cm, 6.5 cm)$)}]
                 \begin{abstractclass}[text width=\mediumTextWidth]{MixtureTotalMoment}{0, 0}
                     \operation{construct(components\type{Component[:]}, areDipolar\type{bool[:]})}
                     \operation{destroy()}
@@ -40,7 +40,7 @@
         \end{package}
 
         \begin{scope}[on background layer]
-            \aggregation{MixtureTotalMoment}{components}{1..n}{Component}
+            \aggregation{MixtureTotalMoment}{\refName{components}}{\numRef{1..n}}{Component}
         \end{scope}
 
     \end{tikzpicture}
