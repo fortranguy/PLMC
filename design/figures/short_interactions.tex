@@ -80,9 +80,9 @@
         \end{package}
 
         \begin{scope}[on background layer]
-            \aggregation{VisitableCells}{pairPotential}{1}{PairPotential}
-            \composition{VisitableCells}{visitableList}{1..n}{VisitableList}
-            \composition{PairPotential}{potentialExpression}{1}{PotentialExpression}
+            \aggregation{VisitableCells}{\refName{pairPotential}}{1}{PairPotential}
+            \composition{VisitableCells}{\refName{visitableList}}{1..n}{VisitableList}
+            \composition{PairPotential}{\refName{potentialExpression}}{1}{PotentialExpression}
         \end{scope}
 
     \end{tikzpicture}
