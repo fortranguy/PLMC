@@ -1,12 +1,9 @@
-\documentclass[a4paper, 12pt]{article}
+\documentclass[a4paper, 10pt]{article}
 
 \usepackage{standalone}
+\input{figures/figures.sty}
 
-\usepackage[english]{babel}
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{csquotes}
-
+\usepackage{pdflscape}
 \usepackage{biblatex}
 \bibliography{references}
 
@@ -41,6 +38,16 @@
         The notion of \emph{interface} will be fundamental. It will define the general boundaries of
         the program. But it will be the key to switch between local alternatives.
     \end{abstract}
+
+    \begin{landscape}
+        \renewcommand{\familydefault}{\sfdefault}
+        \begin{figure}[htb]
+            \centering
+            \includestandalone{figures/short_interactions}
+            \caption{Short Interactions}
+        \end{figure}
+        \renewcommand{\familydefault}{\rmdefault}
+    \end{landscape}
 
     \nocite{*}
     \printbibliography
