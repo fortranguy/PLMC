@@ -19,14 +19,14 @@
                 \end{abstractclass}
             \end{scope}
 
-            \begin{scope}[shift={($(PairPotential.south) + (0 cm, -1.5 cm)$)}]
+            \begin{scope}[shift={($(PairPotential.north) + (8 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{PotentialExpression}{0, 0}
                     \operation{get(distance : double) : double}
                 \end{abstractclass}
             \end{scope}
 
-            \begin{scope}[shift={($(PairPotential.north) + (2 cm, 6 cm)$)}]
-                \begin{abstractclass}[text width=\largeTextWidth]{ShortPairsVisitor}{0, 0}
+            \begin{scope}[shift={($(PairPotential.north) + (0 cm, 6.5 cm)$)}]
+                \begin{abstractclass}[text width=\mediumTextWidth]{ShortPairsVisitor}{0, 0}
                     \operation{construct(periodicBox\type{PeriodicBox})}
                     \operation{destroy()}
                     \operation{visitInter(overlap\type{bool}, energy\type{double},
@@ -37,25 +37,9 @@
                         positions\type{ComponentCoordinates}, pairPotential\type{PairPotential})}
                 \end{abstractclass}
             \end{scope}
-
-            \begin{scope}[shift={($(ShortPairsVisitor.north) + (-13 cm, 0 cm)$)}]
-                \begin{abstractclass}[text width=\largeTextWidth]{VisitableCells}{0, 0}
-                    \operation{construct(listMold\type{VisitableList},
-                        periodicBox\type{PeriodicBox},
-                        positions\type{ComponentCoordinates},
-                        pairPotential\type{PairPotential})}
-                    \operation{destroy()}
-                    \operation{visit(overlap\type{bool}, energy\type{double},
-                        particle\type{TemporaryParticle}, iExclude\type{int})}
-                    \operation{move(toPosition\type{double[3]},
-                        from\type{TemporaryParticle})}
-                    \operation{add(particle\type{TemporaryParticle})}
-                    \operation{remove(particle\type{TemporaryParticle})}
-                \end{abstractclass}
-            \end{scope}
-
-            \begin{scope}[shift={($(VisitableCells.south |- PairPotential.north)$)}]
-                \begin{abstractclass}[text width=\largeTextWidth]{VisitableList}{0, 0}
+            
+            \begin{scope}[shift={($(PairPotential.north) - (9 cm, 0 cm)$)}]
+                \begin{abstractclass}[text width=\mediumTextWidth]{VisitableList}{0, 0}
                     \operation{construct(periodicBox\type{PeriodicBox},
                         componentPositions\type{ComponentCoordinates})}
                     \operation{destroy()}
@@ -68,7 +52,22 @@
                 \end{abstractclass}
             \end{scope}
 
-            \begin{scope}[shift={($(PairPotential.north) + (8 cm, 0 cm)$)}]
+            \begin{scope}[shift={($(ShortPairsVisitor.north -| VisitableList)$)}]
+                \begin{abstractclass}[text width=\mediumTextWidth]{VisitableCells}{0, 0}
+                    \operation{construct(periodicBox\type{PeriodicBox},
+                        positions\type{ComponentCoordinates}, pairPotential\type{PairPotential},
+                        listMold\type{VisitableList})}
+                    \operation{destroy()}
+                    \operation{visit(overlap\type{bool}, energy\type{double},
+                        particle\type{TemporaryParticle}, iExclude\type{int})}
+                    \operation{move(toPosition\type{double[3]},
+                        from\type{TemporaryParticle})}
+                    \operation{add(particle\type{TemporaryParticle})}
+                    \operation{remove(particle\type{TemporaryParticle})}
+                \end{abstractclass}
+            \end{scope}
+
+            \begin{scope}[shift={($(ShortPairsVisitor.north -| PotentialExpression.north)$)}]
                 \umlnote {Import:
                     \begin{itemize}
                         \item \namespace{Environment}PeriodicBox
@@ -80,9 +79,9 @@
         \end{package}
 
         \begin{scope}[on background layer]
-            \aggregation{VisitableCells}{\refName{pairPotential}}{1}{PairPotential}
-            \composition{VisitableCells}{\refName{visitableList}}{1..n}{VisitableList}
-            \composition{PairPotential}{\refName{potentialExpression}}{1}{PotentialExpression}
+            \aggregation{VisitableCells}{\refName{pairPotential}}{\numRef{1}}{PairPotential}
+            \composition{VisitableCells}{\refName{visitableList}}{\numRef{1..n}}{VisitableList}
+            \composition{PairPotential}{\refName{potentialExpression}}{\numRef{1}}{PotentialExpression}
         \end{scope}
 
     \end{tikzpicture}
