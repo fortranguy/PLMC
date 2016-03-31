@@ -39,7 +39,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(DESconvergenceParameter.south) - (0 cm, 2 cm)$)}]
+        \begin{scope}[shift={($(DESconvergenceParameter.south) - (0 cm, 5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{DESselfComponent}{0, 0}
                 \operation{\procedure{construct}{permittivity\type{Permittivity},
                     dipolarMoments\type{ComponentDipolarMoments},
@@ -141,8 +141,8 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(StructureVisitor.north) + (13 cm, 0 cm)$)}]
-            \begin{abstractclass}[text width=\largeTextWidth]{StructureFactor}{0, 0}
+        \begin{scope}[shift={($(StructureVisitor.north) + (11 cm, 0 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{StructureFactor}{0, 0}
                 \operation[0]{\procedure{isDipolar}{iComponent\type{int}}\type{bool}}
                 \operation[0]{\procedure{updateMove}{iComponent\type{int},
                     newPosition\type{double[3]}, old\type{TemporaryParticle}}}
@@ -169,7 +169,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(DLCvisitor.north -| StructureFactor)$)}]
+        \begin{scope}[shift={($(DLCweight.north -| StructureFactor)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{DLCstructures}{0, 0}
                 \inherit{StructureFactor}
                 \operation{\procedure{construct}{periodicBox\type{PeriodicBox},

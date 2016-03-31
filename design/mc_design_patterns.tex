@@ -1,4 +1,6 @@
 \documentclass[a4paper, 10pt]{article}
+\usepackage[paper=A4, pagesize]{typearea}
+\usepackage{geometry}
 
 \usepackage{standalone}
 \def\buildMode{buildmissing}
@@ -6,7 +8,10 @@
 
 \usepackage{fullpage}
 \usepackage{pdflscape}
+%\usepackage{showframe}
+
 \usepackage{biblatex}
+\usepackage{graphicx}
 \bibliography{references}
 
 \title{Application of Object-Oriented Principles and Design Patterns in the architecture of
@@ -73,13 +78,18 @@
         \end{figure}
     \end{landscape}
 
-    \begin{landscape}
-        \begin{figure}[htb]
-            \centering
-            \includestandalone[mode=\buildMode]{figures/dipolar_interactions}
-            \caption{Dipolar Interactions}
-        \end{figure}
-    \end{landscape}
+    \clearpage
+    \KOMAoptions{paper=A3, pagesize}
+    \recalctypearea
+    \begin{figure}[htb]
+        \centering
+        \includestandalone[mode=\buildMode]{figures/dipolar_interactions}
+        \caption{Dipolar Interactions}
+    \end{figure}
+    \clearpage
+    \KOMAoptions{paper=A4, pagesize}
+    \restoregeometry
+    \recalctypearea
 
     \nocite{*}
     \printbibliography
