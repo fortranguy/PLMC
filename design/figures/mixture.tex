@@ -14,13 +14,6 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(ComponentNumber.north) + (7.5 cm, 0 cm)$)}]
-            \begin{abstractclass}[text width=\smallTextWidth]{MinimumDistance}{0, 0}
-                \operation{\procedure{set}{minDistance\type{double}}}
-                \operation{\procedure{get}{}\type{double}}
-            \end{abstractclass}
-        \end{scope}
-
         \begin{scope}[shift={($(ComponentNumber.north west) - (6 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{Coordinates}{0, 0}
                 \operation[0]{\procedure{getNum}{}\type{int}}
@@ -37,14 +30,6 @@
                 \operation{\procedure{get}{iParticle\type{int}}\type{double[3]}}
                 \operation{\procedure{add}{vector\type{double[3]}}}
                 \operation{\procedure{remove}{iParticle\type{int}}}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(ComponentCoordinates.north -| MinimumDistance.north)$)}]
-            \begin{abstractclass}[text width=\smallTextWidth]{ComponentChemicalPotential}{0, 0}
-                \operation{\procedure{set}{density\type{double}, excess\type{double}}}
-                \operation{\procedure{getDensity}{}\type{double}}
-                \operation{\procedure{getExcess}{}\type{double}}
             \end{abstractclass}
         \end{scope}
 
@@ -70,7 +55,7 @@
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(Component.north -| ComponentDipolarMoments.north) + (0 cm, 2 cm)$)}]
+        \begin{scope}[shift={($(ComponentCoordinates.north) + (9 cm, 0.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{MixtureTotalMoment}{0, 0}
                 \operation{\procedure{construct}{components\type{Component[:]},
                     areDipolar\type{bool[:]}}}
@@ -83,9 +68,22 @@
             \end{abstractclass}
         \end{scope}
 
+        \begin{scope}[shift={($(MixtureTotalMoment.south |- ComponentNumber)$)}]
+            \begin{abstractclass}[text width=\smallTextWidth]{MinimumDistance}{0, 0}
+                \operation{\procedure{set}{minDistance\type{double}}}
+                \operation{\procedure{get}{}\type{double}}
+            \end{abstractclass}
+        \end{scope}
 
+        \begin{scope}[shift={($(Component.north -| MixtureTotalMoment.north)$)}]
+            \begin{abstractclass}[text width=\smallTextWidth]{ComponentChemicalPotential}{0, 0}
+                \operation{\procedure{set}{density\type{double}, excess\type{double}}}
+                \operation{\procedure{getDensity}{}\type{double}}
+                \operation{\procedure{getExcess}{}\type{double}}
+            \end{abstractclass}
+        \end{scope}
 
-        \begin{scope}[shift={($(Component.north -| MinimumDistance)$)}]
+        \begin{scope}[shift={($(ComponentDipolarMoments.north |- Component.north)$)}]
             \begin{class}[text width=\smallTextWidth]{TemporaryParticle}{0, 0}
                 \attribute{i\type{int}}
                 \attribute{position\type{double[3]}}
