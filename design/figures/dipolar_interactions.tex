@@ -17,7 +17,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(DESconvergenceParameter.north) + (0 cm, 5 cm)$)}]
+        \begin{scope}[shift={($(DESconvergenceParameter.north) + (0 cm, 5.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{DESrealPair}{0, 0}
                 \operation[0]{\procedure{construct}{permittivity\type{Permittivity},
                     alpha\type{DESconvergenceParameter}, domain\type{DipolarPotentialDomain}}}
@@ -54,7 +54,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(DESconvergenceParameter.north) + (11 cm, 0 cm)$)}]
+        \begin{scope}[shift={($(DESconvergenceParameter.north) + (13 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{DESreciWeight}{0, 0}
                 \operation{\procedure{construct}{periodicBox\type{PeriodicBox},
                     permittivity\type{Permittivity}, reciprocalLattice\type{ReciprocalLattice},
@@ -66,8 +66,28 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(DESrealComponent.north -| DESreciWeight.north)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{DESreciStructure}{0, 0}
+        \begin{scope}[shift={($(DESrealComponent.north -| DESreciWeight)$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{DESreciVisitor}{0, 0}
+                \operation{\procedure{construct}{periodicBox\type{PeriodicBox},
+                    reciprocalLattice\type{ReciprocalLattice}, weight\type{DESreciWeight},
+                    structure\type{DESreciStructure}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{visit}{}\type{real}}
+                \operation{\procedure{visitMove}{iComponent\type{int}, newPosition\type{double[3]},
+                    old\type{TemporaryParticle}}\type{real}}
+                \operation{\procedure{visitRotation}{iComponent\type{int},
+                    newDipolarMoment\type{double[3]}, old\type{TemporaryParticle}}\type{real}}
+                \operation{\procedure{visitAdd}{iComponent\type{int},
+                    particle\type{TemporaryParticle}}\type{real}}
+                \operation{\procedure{visitRemove}{iComponent\type{int},
+                    particle\type{TemporaryParticle}}\type{real}}
+                \operation{\procedure{visitSwitch}{ijComponents\type{int[2]},
+                    particles\type{TemporaryParticle[2]}}\type{real}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(DESreciVisitor.north) + (13 cm, 0 cm  )$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{DESreciStructure}{0, 0}
                 \operation{\procedure{construct}{periodicBox\type{PeriodicBox},
                     reciprocalLattice\type{ReciprocalLattice}, components\type{Component[:]},
                     areDipolar\type{bool}}}
@@ -79,27 +99,11 @@
                     old\type{TemporaryParticle}}}
                 \operation{\procedure{updateRotation}{iComponent\type{int},
                     newDipolarMoment\type{double[3]}, old\type{TemporaryParticle}}}
+                \operation{\procedure{updateAdd}{iComponent\type{int},
+                    particle\type{TemporaryParticle}}}
+                \operation{\procedure{updateRemove}{iComponent\type{int},
+                    particle\type{TemporaryParticle}}}
                 \operation{\procedure{updateSwitch}{ijComponents\type{int[2]},
-                    particles\type{TemporaryParticle[2]}}}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(DESreciStructure.north) + (0 cm, 10 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{DESreciVisitor}{0, 0}
-                \operation{\procedure{construct}{periodicBox\type{PeriodicBox},
-                    reciprocalLattice\type{ReciprocalLattice}, weight\type{DESreciWeight},
-                    structure\type{DESreciStructure}}}
-                \operation{\procedure{destroy}{}}
-                \operation{\procedure{visit}{}}
-                \operation{\procedure{visitMove}{iComponent\type{int}, newPosition\type{double[3]},
-                    old\type{TemporaryParticle}}}
-                \operation{\procedure{visitRotation}{iComponent\type{int},
-                    newDipolarMoment\type{double[3]}, old\type{TemporaryParticle}}}
-                \operation{\procedure{visitAdd}{iComponent\type{int},
-                    particle\type{TemporaryParticle}}}
-                \operation{\procedure{visitRemove}{iComponent\type{int},
-                    particle\type{TemporaryParticle}}}
-                \operation{\procedure{visitSwitch}{ijComponents\type{int[2]},
                     particles\type{TemporaryParticle[2]}}}
             \end{abstractclass}
         \end{scope}
