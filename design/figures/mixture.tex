@@ -24,10 +24,9 @@
         \begin{scope}[shift={($(ComponentNumber.north) + (0 cm, 5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{ComponentCoordinates}{0, 0}
                 \inherit{Coordinates}
+                \operation[0]{\procedure{construct}{...}}
                 \operation[0]{\procedure{destroy}{}}
-                \operation{\procedure{getNum}{}\type{int}}
                 \operation[0]{\procedure{set}{iParticle\type{int}, vector\type{double[3]}}}
-                \operation{\procedure{get}{iParticle\type{int}}\type{double[3]}}
                 \operation{\procedure{add}{vector\type{double[3]}}}
                 \operation{\procedure{remove}{iParticle\type{int}}}
             \end{abstractclass}
@@ -36,12 +35,10 @@
         \begin{scope}[shift={($(Coordinates.north |- ComponentCoordinates.north)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{ComponentDipolarMoments}{0, 0}
                 \inherit{Coordinates}
-                \operation{\procedure{construct}{norm\type{double},
+                \operation{\procedure{construct}{norm\type{real},
                     orientations\type{ComponentCoordinates}}}
                 \operation{\procedure{destroy}{}}
-                \operation{\procedure{getNum}{}\type{int}}
-                \operation{\procedure{getNorm}{}\type{double}}
-                \operation{\procedure{get}{iParticle\type{int}}\type{double[3]}}
+                \operation{\procedure{getNorm}{}\type{real}}
             \end{abstractclass}
         \end{scope}
 
@@ -70,16 +67,16 @@
 
         \begin{scope}[shift={($(MixtureTotalMoment.south |- ComponentNumber)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{MinimumDistance}{0, 0}
-                \operation{\procedure{set}{minDistance\type{double}}}
-                \operation{\procedure{get}{}\type{double}}
+                \operation{\procedure{set}{minDistance\type{real}}}
+                \operation{\procedure{get}{}\type{real}}
             \end{abstractclass}
         \end{scope}
 
         \begin{scope}[shift={($(Component.north -| MixtureTotalMoment.north)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{ComponentChemicalPotential}{0, 0}
-                \operation{\procedure{set}{density\type{double}, excess\type{double}}}
-                \operation{\procedure{getDensity}{}\type{double}}
-                \operation{\procedure{getExcess}{}\type{double}}
+                \operation{\procedure{set}{density\type{real}, excess\type{real}}}
+                \operation{\procedure{getDensity}{}\type{real}}
+                \operation{\procedure{getExcess}{}\type{real}}
             \end{abstractclass}
         \end{scope}
 

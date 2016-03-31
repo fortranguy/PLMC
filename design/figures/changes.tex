@@ -23,7 +23,7 @@
                     parameters\type{ChangeTunerParameters}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{tune}{tuned\type{bool}, iStep\type{int},
-                    successRatio\type{double}}}
+                    successRatio\type{real}}}
             \end{abstractclass}
         \end{scope}
 
@@ -38,8 +38,8 @@
 
         \begin{scope}[shift={($(ChangeTuner -| ComponentExchange.north) - (0 cm, 0.5 cm)$)}]
             \begin{class}[text width=\smallTextWidth]{ChangeTuningParameters}{0, 0}
-                \attribute{increaseFactor\type{double}}
-                \attribute{increaseFactorMax\type{double}}
+                \attribute{increaseFactor\type{real}}
+                \attribute{increaseFactorMax\type{real}}
             \end{class}
         \end{scope}
 

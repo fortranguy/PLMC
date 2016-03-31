@@ -12,7 +12,7 @@
                 \operation{\procedure{set}{size\type{double[3]}}}
                 \operation{\procedure{getSize}{}\type{double[3]}}
                 \operation{\procedure{distance}{position1\type{double[3]},
-                    position2\type{double[3]}}\type{double}}
+                    position2\type{double[3]}}\type{real}}
                 \operation{\procedure{vector}{position1\type{double[3]}, position2\type{double[3]}}%
                     \type{double[3]}}
                 \operation[0]{\procedure{folded}{position\type{double[3]}}\type{double[3]}}
@@ -41,16 +41,16 @@
 
         \begin{scope}[shift={($(PeriodicBox.north) + (-8 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{Temperature}{0, 0}
-                \operation{\procedure{set}{temperature\type{double}}}
-                \operation{\procedure{get}{}\type{double}}
+                \operation{\procedure{set}{temperature\type{real}}}
+                \operation{\procedure{get}{}\type{real}}
             \end{abstractclass}
             % Parallel Tempering?
         \end{scope}
 
         \begin{scope}[shift={($(Temperature.north) + (0 cm, 3.5 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{Permittivity}{0, 0}
-                \operation{\procedure{set}{permittivity\type{double}}}
-                \operation{\procedure{get}{}\type{double}}
+                \operation{\procedure{set}{permittivity\type{real}}}
+                \operation{\procedure{get}{}\type{real}}
             \end{abstractclass}
         \end{scope}
 
@@ -71,11 +71,11 @@
 
         \begin{scope}[shift={($(ReciprocalLattice.north |- ParallelepipedDomain.north)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{WallsPotential}{0, 0}
-                \operation{\procedure{construct}{periodicBox\type{PeriodicBox}, gap\type{double},
+                \operation{\procedure{construct}{periodicBox\type{PeriodicBox}, gap\type{real},
                     floorPenetration\type{FloorPenetration}}}
                 \operation{\procedure{destroy}{}}
-                \operation{\procedure{getGap}{}\type{double}}
-                \operation{\procedure{visit}{overlap\type{bool}, energy\type{double},
+                \operation{\procedure{getGap}{}\type{real}}
+                \operation{\procedure{visit}{overlap\type{bool}, energy\type{real},
                     position\type{double[3]}, pairPotential\type{PairPotential}}}
             \end{abstractclass}
         \end{scope}

@@ -51,7 +51,7 @@
                     dipolarMoments\type{Coordinates},
                     ewaldRealPair\type{EwaldRealPair})}
                 \operation{destroy()}
-                \operation{visit(energy\type{double}, particle\type{Particle},
+                \operation{visit(energy\type{real}, particle\type{Particle},
                     ewaldRealPair\type{EwaldRealPair})}
                 \operation{visit(field\type{double[3]}, particle\type{Particle},
                     ewaldRealPair\type{EwaldRealPair})}
@@ -60,10 +60,10 @@
 
         \begin{scope}[shift={($(EwaldRealComponent.south) + (0 cm, -1.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{EwaldRealPair}{0, 0}
-                \operation{construct(domain\type{PotentialDomain}, alpha\type{double})}
+                \operation{construct(domain\type{PotentialDomain}, alpha\type{real})}
                 \operation{destroy()}
                 \operation{meet(vectorIJ\type{double[3]}, momentI\type{double[3]},
-                    momentJ\type{double[3]})\type{double}}
+                    momentJ\type{double[3]})\type{real}}
             \end{abstractclass}
         \end{scope}
 
