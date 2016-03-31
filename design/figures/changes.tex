@@ -1,0 +1,57 @@
+\documentclass{standalone}
+
+\input figures/figures.sty
+
+\renewcommand{\familydefault}{\sfdefault}
+\begin{document}
+
+    \begin{tikzpicture}
+
+        \begin{scope}
+            \begin{abstractclass}[text width=\smallTextWidth]{ChangedCoordinates}{0, 0}
+                \operation[0]{\procedure{destroy}{}}
+                \operation[0]{\procedure{increaseDelta}{}}
+                \operation[0]{\procedure{decreaseDelta}{}}
+                \operation[0]{\procedure{getNum}{}\type{int}}
+                \operation[0]{\procedure{get}{iParticle\type{int}}\type{double[3]}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(ChangedCoordinates) + (0 cm, 6.5 cm)$)}]
+            \begin{abstractclass}[text width=\smallTextWidth]{ChangeTuner}{0, 0}
+                \operation{\procedure{construct}{changedCoordinates\type{ChangedCoordinates},
+                    parameters\type{ChangeTunerParameters}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{tune}{tuned\type{bool}, iStep\type{int},
+                    successRatio\type{double}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(ChangedCoordinates.north) + (6.5 cm, 0 cm)$)}]
+            \begin{abstractclass}[text width=\smallTextWidth]{ComponentExchange}{0, 0}
+                \operation{\procedure{construct}{component\type{Component}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{add}{particle\type{TemporaryParticle}}}
+                \operation{\procedure{remove}{iParticle\type{int}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(ChangeTuner -| ComponentExchange.north) - (0 cm, 0.5 cm)$)}]
+            \begin{class}[text width=\smallTextWidth]{ChangeTuningParameters}{0, 0}
+                \attribute{increaseFactor\type{double}}
+                \attribute{increaseFactorMax\type{double}}
+            \end{class}
+        \end{scope}
+
+        \begin{scope}[shift={($(ChangeTuner.north -| ChangeTuningParameters.north)$)}]
+            \umlnote[text width=\smallTextWidth]{\import{}:\\
+                \namespace{Mixture} :: Component, TemporaryParticle};
+        \end{scope}
+
+        \begin{scope}[on background layer]
+            \aggregation{ChangeTuner}{\refName{changedCoordinates}}{\numRef{1}}{ChangedCoordinates}
+        \end{scope}
+
+    \end{tikzpicture}
+
+\end{document}
