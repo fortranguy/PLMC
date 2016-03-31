@@ -80,7 +80,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(WallsPotential.north |- ExternalField)$)}]
+        \begin{scope}[shift={($(ExternalField -| WallsPotential.north) + (0 cm, 0.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{FloorPenetration}{0, 0}
                 \operation{\procedure{meet}{overlap\type{bool},
                     shortestVectorFromFloor\type{double[3]}, positionFromFloor\type{double[3]}}}
