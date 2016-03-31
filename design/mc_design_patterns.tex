@@ -1,6 +1,7 @@
 \documentclass[a4paper, 10pt]{article}
 
 \usepackage{standalone}
+\def\buildMode{buildmissing}
 \input{figures/figures.sty}
 
 \usepackage{pdflscape}
@@ -36,17 +37,23 @@
         not well-defined in advance. Thus an effort must be made upstream.
 
         The notion of \emph{interface} will be fundamental. It will define the general boundaries of
-        the program. But it will be the key to switch between local alternatives.
+        the program. And it will be the key to switch between local alternatives.
     \end{abstract}
 
     \begin{landscape}
-        \renewcommand{\familydefault}{\sfdefault}
         \begin{figure}[htb]
             \centering
-            \includestandalone{figures/short_interactions}
-            \caption{Short Interactions}
+            \includestandalone[mode=\buildMode]{figures/environment}
+            \caption{\namespace{Environment}}
         \end{figure}
-        \renewcommand{\familydefault}{\rmdefault}
+    \end{landscape}
+
+    \begin{landscape}
+        \begin{figure}[htb]
+            \centering
+            \includestandalone[mode=\buildMode]{figures/short_interactions}
+            \caption{\namespace{Short Interactions}}
+        \end{figure}
     \end{landscape}
 
     \nocite{*}

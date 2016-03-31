@@ -2,95 +2,95 @@
 
 \input figures/figures.sty
 
+\renewcommand{\familydefault}{\sfdefault}
 \begin{document}
 
     \begin{tikzpicture}
-        \begin{package}{Environment}
 
-            \begin{scope}
-                \begin{abstractclass}[text width=\mediumTextWidth]{PeriodicBox}{0, 0}
-                    \operation{set(size\type{double[3]})}
-                    \operation{getSize()\type{double[3]}}
-                    \operation{distance(position1\type{double[3]}, position2\type{double[3]})
-                        \type{double}}
-                    \operation{vector(position1\type{double[3]}, position2\type{double[3]})
-                        \type{double[3]}}
-                    \operation[0]{folded(position\type{double[3]})\type{double[3]}}
-                \end{abstractclass}
-            \end{scope}
+        \begin{scope}
+            \begin{abstractclass}[text width=\mediumTextWidth]{PeriodicBox}{0, 0}
+                \operation{\procedure{set}{size\type{double[3]}}}
+                \operation{\procedure{getSize}{}\type{double[3]}}
+                \operation{\procedure{distance}{position1\type{double[3]},
+                    position2\type{double[3]}}\type{double}}
+                \operation{\procedure{vector}{position1\type{double[3]}, position2\type{double[3]}}%
+                    \type{double[3]}}
+                \operation[0]{\procedure{folded}{position\type{double[3]}}\type{double[3]}}
+            \end{abstractclass}
+        \end{scope}
 
-            \begin{scope}[shift={($(PeriodicBox.north) + (0 cm, 5 cm)$)}]
-                \begin{abstractclass}[text width=\mediumTextWidth]{ParallelepipedDomain}{0, 0}
-                    \operation{construct(periodicBox\type{PeriodicBox}, origin\type{double[3]},
-                        size\type{double[3]})}
-                    \operation{destroy()}
-                    \operation{getOrigin()\type{double[3]}}
-                    \operation{getSize()\type{double[3]}}
-                    \operation{isInside(position\type{double[3]})\type{bool}}
-                \end{abstractclass}
-            \end{scope}
+        \begin{scope}[shift={($(PeriodicBox.north) + (0 cm, 5 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{ParallelepipedDomain}{0, 0}
+                \operation{\procedure{construct}{periodicBox\type{PeriodicBox},
+                    origin\type{double[3]}, size\type{double[3]}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{getOrigin}{}\type{double[3]}}
+                \operation{\procedure{getSize}{}\type{double[3]}}
+                \operation{\procedure{isInside}{position\type{double[3]}}\type{bool}}
+            \end{abstractclass}
+        \end{scope}
 
-            \begin{scope}[shift={($(PeriodicBox.north) + (9 cm, 0 cm)$)}]
-                \begin{abstractclass}[text width=\mediumTextWidth]{ReciprocalLattice}{0, 0}
-                    \operation{contruct(periodicBox\type{PeriodicBox}, numbers\type{int[3]})}
-                    \operation{destroy()}
-                    \operation{getNumbers()\type{int[3]}}
-                \end{abstractclass}
-            \end{scope}
+        \begin{scope}[shift={($(PeriodicBox.north) + (9 cm, 0 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{ReciprocalLattice}{0, 0}
+                \operation{\procedure{contruct}{periodicBox\type{PeriodicBox},
+                    numbers\type{int[3]}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{getNumbers}{}\type{int[3]}}
+            \end{abstractclass}
+        \end{scope}
 
-            \begin{scope}[shift={($(PeriodicBox.north) + (-8 cm, 0 cm)$)}]
-                \begin{abstractclass}[text width=\smallTextWidth]{Temperature}{0, 0}
-                    \operation{set(temperature\type{double})}
-                    \operation{get()\type{double}}
-                \end{abstractclass}
-                % Parallel Tempering?
-            \end{scope}
+        \begin{scope}[shift={($(PeriodicBox.north) + (-8 cm, 0 cm)$)}]
+            \begin{abstractclass}[text width=\smallTextWidth]{Temperature}{0, 0}
+                \operation{\procedure{set}{temperature\type{double}}}
+                \operation{\procedure{get}{}\type{double}}
+            \end{abstractclass}
+            % Parallel Tempering?
+        \end{scope}
 
-            \begin{scope}[shift={($(Temperature.north) + (0 cm, 3.5 cm)$)}]
-                \begin{abstractclass}[text width=\smallTextWidth]{Permittivity}{0, 0}
-                    \operation{set(permittivity\type{double})}
-                    \operation{get()\type{double}}
-                \end{abstractclass}
-            \end{scope}
-            
-            \begin{scope}[shift={($(Permittivity.north) + (0 cm, 3.5 cm)$)}]
-                \begin{abstractclass}[text width=\smallTextWidth]{FieldExpression}{0, 0}
-                    \operation{get(position\type{double[3]})\type{double[3]}}
-                \end{abstractclass}
-            \end{scope}
+        \begin{scope}[shift={($(Temperature.north) + (0 cm, 3.5 cm)$)}]
+            \begin{abstractclass}[text width=\smallTextWidth]{Permittivity}{0, 0}
+                \operation{\procedure{set}{permittivity\type{double}}}
+                \operation{\procedure{get}{}\type{double}}
+            \end{abstractclass}
+        \end{scope}
 
-            \begin{scope}[shift={($(ParallelepipedDomain.north) + (0 cm, 4.5 cm)$)}]
-                \begin{abstractclass}[text width=\mediumTextWidth]{ExternalField}{0, 0}
-                    \operation{construct(parallelepipedDomain\type{ParallelepipedDomain},
-                        fieldExpression\type{FieldExpression})}
-                    \operation{destroy()}
-                    \operation{get(position\type{double[3]})\type{double[3]}}
-                \end{abstractclass}
-            \end{scope}
-            
-            \begin{scope}[shift={($(ReciprocalLattice.north) + (0 cm, 4 cm)$)}]
-                \begin{abstractclass}[text width=\mediumTextWidth]{FloorPenetration}{0, 0}
-                    \operation{meet(overlap\type{bool}, shortestVectorFromFloor\type{double[3]},
-                        positionFromFloor\type{double[3]})}
-                \end{abstractclass}
-            \end{scope}
+        \begin{scope}[shift={($(Permittivity.north) + (0 cm, 3.5 cm)$)}]
+            \begin{abstractclass}[text width=\smallTextWidth]{FieldExpression}{0, 0}
+                \operation{\procedure{get}{position\type{double[3]}}\type{double[3]}}
+            \end{abstractclass}
+        \end{scope}
 
-            \begin{scope}[shift={($(FloorPenetration.north |- ExternalField.north)$)}]
-                \begin{abstractclass}[text width=\mediumTextWidth]{WallsPotential}{0, 0}
-                    \operation{construct(periodicBox\type{PeriodicBox}, gap\type{double},
-                        floorPenetration\type{FloorPenetration})}
-                    \operation{destroy()}
-                    \operation{getGap()\type{double}}
-                    \operation{visit(overlap\type{bool}, energy\type{double},
-                        position\type{double[3]}, pairPotential\type{PairPotential})}
-                \end{abstractclass}
-            \end{scope}
-            
-            \begin{scope}[shift={($(ExternalField.north -| FieldExpression.north)$)}]
-                \umlnote{Import: \namespace{ShortInteractions}PairPotential};
-            \end{scope}
+        \begin{scope}[shift={($(ParallelepipedDomain.north) + (0 cm, 4.5 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{ExternalField}{0, 0}
+                \operation{\procedure{construct}{parallelepipedDomain\type{ParallelepipedDomain},
+                    fieldExpression\type{FieldExpression}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{get}{position\type{double[3]}}\type{double[3]}}
+            \end{abstractclass}
+        \end{scope}
 
-        \end{package}
+        \begin{scope}[shift={($(ReciprocalLattice.north |- ParallelepipedDomain.north)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{WallsPotential}{0, 0}
+                \operation{\procedure{construct}{periodicBox\type{PeriodicBox}, gap\type{double},
+                    floorPenetration\type{FloorPenetration}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{getGap}{}\type{double}}
+                \operation{\procedure{visit}{overlap\type{bool}, energy\type{double},
+                    position\type{double[3]}, pairPotential\type{PairPotential}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(WallsPotential.north |- ExternalField)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{FloorPenetration}{0, 0}
+                \operation{\procedure{meet}{overlap\type{bool},
+                    shortestVectorFromFloor\type{double[3]}, positionFromFloor\type{double[3]}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(ExternalField.north -| FieldExpression.north)$)}]
+            \umlnote[text width=\smallTextWidth]{\import{}:\\
+                \namespace{ShortInteractions} :: PairPotential};
+        \end{scope}
 
         \begin{scope}[on background layer]
             \aggregation{ParallelepipedDomain}{\refName{periodicBox}}{\numRef{1}}{PeriodicBox}
@@ -104,3 +104,4 @@
     \end{tikzpicture}
 
 \end{document}
+\renewcommand{\familydefault}{\rmdefault}

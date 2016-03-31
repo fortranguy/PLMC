@@ -4,10 +4,13 @@
 \usepackage{csquotes}
 
 \usepackage{verbatim}
-\newcommand{\type}[1]{: #1}
-\newcommand{\namespace}[1]{\emph{#1 :: }}
+\usepackage{xcolor}
+\newcommand{\type}[1]{: \texttt{#1}}
+\newcommand{\namespace}[1]{\textsc{#1}}
 \newcommand{\refName}[1]{}
 \newcommand{\numRef}[1]{}
+\newcommand{\procedure}[2]{\textcolor{blue}{#1(}{#2}\textcolor{blue}{)}}
+\def\import{\textcolor{olive}{Import}}
 
 \usepackage[simplified]{pgf-umlcd}
 \usetikzlibrary{calc, backgrounds}
