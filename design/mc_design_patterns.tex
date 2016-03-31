@@ -4,6 +4,7 @@
 \def\buildMode{buildmissing}
 \input{figures/figures.sty}
 
+\usepackage{fullpage}
 \usepackage{pdflscape}
 \usepackage{biblatex}
 \bibliography{references}
@@ -45,6 +46,14 @@
             \centering
             \includestandalone[mode=\buildMode]{figures/environment}
             \caption{\namespace{Environment}}
+        \end{figure}
+    \end{landscape}
+
+    \begin{landscape}
+        \begin{figure}[htb]
+            \centering
+            \includestandalone[mode=\buildMode]{figures/component}
+            \caption{\namespace{Component}}
         \end{figure}
     \end{landscape}
 

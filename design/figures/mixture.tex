@@ -2,42 +2,40 @@
 
 \input figures/figures.sty
 
+\renewcommand{\familydefault}{\sfdefault}
 \begin{document}
 
     \begin{tikzpicture}
 
-        \begin{package}{Mixture}
+        \begin{scope}
+            \begin{class}[text width=\mediumTextWidth]{Component}{0, 0}
+                \attribute{number\type{ComponentNumber}}
+                \attribute{positions\type{ComponentCoordinates}}
+                \attribute{orientations\type{ComponentCoordinates}}
+                \attribute{chemicalPotential\type{ComponentChemicalPotential}}
+                \attribute{dipolarMoments\type{ComponentDipolarMoments}}
+            \end{class}
+        \end{scope}
 
-            \begin{scope}
-                \begin{class}[text width=\mediumTextWidth]{Component}{0, 0}
-                    \attribute{number\type{ComponentNumber}}
-                    \attribute{positions\type{ComponentCoordinates}}
-                    \attribute{orientations\type{ComponentCoordinates}}
-                    \attribute{chemicalPotential\type{ComponentChemicalPotential}}
-                    \attribute{dipolarMoments\type{ComponentDipolarMoments}}
-                \end{class}
-            \end{scope}
+        \begin{scope}[shift={($(Component.south) - (0 cm, 1 cm)$)}]
+            \begin{abstractclass}[text width=\smallTextWidth]{MinimumDistance}{0, 0}
+                \operation{\procedure{set}{minDistance\type{double}}}
+                \operation{\procedure{get}{}\type{double}}
+            \end{abstractclass}
+        \end{scope}
 
-            \begin{scope}[shift={($(Component.south) - (0 cm, 1 cm)$)}]
-                \begin{abstractclass}[text width=\smallTextWidth]{MinimumDistance}{0, 0}
-                    \operation{set(minDistance\type{double})}
-                    \operation{get()\type{double}}
-                \end{abstractclass}
-            \end{scope}
-
-            \begin{scope}[shift={($(Component.north) + (0 cm, 6.5 cm)$)}]
-                \begin{abstractclass}[text width=\mediumTextWidth]{MixtureTotalMoment}{0, 0}
-                    \operation{construct(components\type{Component[:]}, areDipolar\type{bool[:]})}
-                    \operation{destroy()}
-                    \operation{reset()}
-                    \operation{isDipolar(iComponent\type{int})}
-                    \operation{get()}
-                    \operation{add(iComponent\type{int}, dipolarMoment\type{double[3]})}
-                    \operation{remove(iComponent\type{int}, dipolarMoment\type{double[3]})}
-                \end{abstractclass}
-            \end{scope}
-
-        \end{package}
+        \begin{scope}[shift={($(Component.north) + (0 cm, 6.5 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{MixtureTotalMoment}{0, 0}
+                \operation{\procedure{construct}{components\type{Component[:]},
+                    areDipolar\type{bool[:]}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{reset}{}}
+                \operation{\procedure{isDipolar}{iComponent\type{int}} }
+                \operation{\procedure{get}{}}
+                \operation{\procedure{add}{iComponent\type{int}, dipolarMoment\type{double[3]}}}
+                \operation{\procedure{remove}{iComponent\type{int}, dipolarMoment\type{double[3]}}}
+            \end{abstractclass}
+        \end{scope}
 
         \begin{scope}[on background layer]
             \aggregation{MixtureTotalMoment}{\refName{components}}{\numRef{1..n}}{Component}
@@ -46,3 +44,4 @@
     \end{tikzpicture}
 
 \end{document}
+\renewcommand{\familydefault}{\rmdefault}

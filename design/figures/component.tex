@@ -2,59 +2,56 @@
 
 \input figures/figures.sty
 
+\renewcommand{\familydefault}{\sfdefault}
 \begin{document}
 
     \begin{tikzpicture}
 
-        \begin{package}{Component}
+        \begin{scope}
+            \begin{abstractclass}[text width=\smallTextWidth]{Coordinates}{0, 0}
+                \operation[0]{\procedure{getNum}{}\type{int}}
+                \operation[0]{\procedure{get}{iParticle\type{int}}\type{double[3]}}
+            \end{abstractclass}
+        \end{scope}
 
-            \begin{scope}
-                \begin{abstractclass}[text width=\smallTextWidth]{Coordinates}{0, 0}
-                    \operation[0]{getNum()\type{int}}
-                    \operation[0]{get(iParticle\type{int})\type{double[3]}}
-                \end{abstractclass}
-            \end{scope}
+        \begin{scope}[shift={($(Coordinates.south) + (0 cm, -1 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{ComponentCoordinates}{0, 0}
+                \inherit{Coordinates}
+                \operation[0]{\procedure{destroy}{}}
+                \operation{\procedure{getNum}{}\type{int}}
+                \operation[0]{\procedure{set}{iParticle\type{int}, vector\type{double[3]}}}
+                \operation{\procedure{get}{iParticle\type{int}}\type{double[3]}}
+                \operation{\procedure{add}{vector\type{double[3]}}}
+                \operation{\procedure{remove}{iParticle\type{int}}}
+            \end{abstractclass}
+        \end{scope}
 
-            \begin{scope}[shift={($(Coordinates.south) + (0 cm, -1 cm)$)}]
-                \begin{abstractclass}[text width=\mediumTextWidth]{ComponentCoordinates}{0, 0}
-                    \inherit{Coordinates}
-                    \operation[0]{destroy()}
-                    \operation{getNum()\type{int}}
-                    \operation[0]{set(iParticle\type{int}, vector\type{double[3]})}
-                    \operation{get(iParticle\type{int})\type{double[3]}}
-                    \operation{add(vector\type{double[3]})}
-                    \operation{remove(iParticle\type{int})}
-                \end{abstractclass}
-            \end{scope}
+        \begin{scope}[shift={($(ComponentCoordinates.north) + (9 cm, 0 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{ComponentDipolarMoments}{0, 0}
+                \inherit{Coordinates}
+                \operation{\procedure{construct}{norm\type{double},
+                    orientations\type{ComponentCoordinates}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{getNum}{}\type{int}}
+                \operation{\procedure{getNorm}{}\type{double}}
+                \operation{\procedure{get}{iParticle\type{int}}\type{double[3]}}
+            \end{abstractclass}
+        \end{scope}
 
-            \begin{scope}[shift={($(ComponentCoordinates.north) + (9 cm, 0 cm)$)}]
-                \begin{abstractclass}[text width=\mediumTextWidth]{ComponentDipolarMoments}{0, 0}
-                    \inherit{Coordinates}
-                    \operation{construct(norm\type{double},
-                        orientations\type{ComponentCoordinates})}
-                    \operation{destroy()}
-                    \operation{getNum()\type{int}}
-                    \operation{getNorm()\type{double}}
-                    \operation{get(iParticle\type{int})\type{double[3]}}
-                \end{abstractclass}
-            \end{scope}
+        \begin{scope}[shift={($(ComponentCoordinates.south) - (0 cm, 1 cm)$)}]
+            \begin{abstractclass}[text width=\smallTextWidth]{ComponentNumber}{0, 0}
+                \operation{\procedure{set}{number\type{int}}}
+                \operation{\procedure{get}{}\type{int}}
+            \end{abstractclass}
+        \end{scope}
 
-            \begin{scope}[shift={($(ComponentCoordinates.south) - (0 cm, 1 cm)$)}]
-                \begin{abstractclass}[text width=\smallTextWidth]{ComponentNumber}{0, 0}
-                    \operation{set(number\type{int})}
-                    \operation{get()\type{int}}
-                \end{abstractclass}
-            \end{scope}
-
-            \begin{scope}[shift={($(ComponentNumber.north -| ComponentDipolarMoments.south)$)}]
-                \begin{abstractclass}[text width=\mediumTextWidth]{ComponentChemicalPotential}{0, 0}
-                    \operation{set(density\type{double}, excess\type{double})}
-                    \operation{getDensity()\type{double}}
-                    \operation{getExcess()\type{double}}
-                \end{abstractclass}
-            \end{scope}
-
-        \end{package}
+        \begin{scope}[shift={($(ComponentNumber.north -| ComponentDipolarMoments.south)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{ComponentChemicalPotential}{0, 0}
+                \operation{\procedure{set}{density\type{double}, excess\type{double}}}
+                \operation{\procedure{getDensity}{}\type{double}}
+                \operation{\procedure{getExcess}{}\type{double}}
+            \end{abstractclass}
+        \end{scope}
 
         \begin{scope}[on background layer]
             \aggregation{ComponentCoordinates}{\refName{number}}{\numRef{1}}{ComponentNumber}
@@ -65,3 +62,4 @@
     \end{tikzpicture}
 
 \end{document}
+\renewcommand{\familydefault}{\rmdefault}
