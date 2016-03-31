@@ -1,0 +1,53 @@
+\documentclass{standalone}
+
+\input figures/figures.sty
+
+\renewcommand{\familydefault}{\sfdefault}
+\begin{document}
+
+    \begin{tikzpicture}[scale=\scale, every node/.style={scale=\scale}]
+
+        \begin{scope}
+            \begin{abstractclass}[text width=\smallTextWidth]{MetropolisAlgorithm}{0, 0}
+                \operation[0]{\procedure{getNumChoices}{}\type{int}}
+                \operation[0]{\procedure{try}{observables\type{Observables}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(MetropolisAlgorithm.south) + (0 cm, -2 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{OneParticleChange}{0, 0}
+                \inherit{MetropolisAlgorithm}
+                \operation{\procedure{construct}{environment\type{Environment},
+                    changes\type{ChangesComponent[:]}, selector\type{TowerSampler}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{setCandidates}{mixture\type{Mixture},
+                    shortInteractions\type{ShortInteractions},
+                    dipolarInteractions\type{DipolarInteractions}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(OneParticleChange.north) + (9 cm, 0 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{TwoParticlesSwitch}{0, 0}
+                \inherit{MetropolisAlgorithm}
+                \operation{\procedure{construct}{environment\type{Environment},
+                    selector\type{TowerSampler}, componentsCouples\type{HeteroCouples}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{setCandidates}{components\type{Component[:]},
+                    shortInteractions\type{ShortInteractions},
+                    dipolarInteractions\type{DipolarInteractions}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(MetropolisAlgorithm.north -| TwoParticlesSwitch)$)}]
+            \umlnote[text width=\smallTextWidth]{\import{}:\\
+                \namespace{Environment} \\
+                \namespace{Mixture} :: Component \\
+                \namespace{Changes} :: ChangesComponent \\
+                \namespace{ShortInteractions} \\
+                \namespace{DipolarInteractions} \\
+                \namespace{Observables}};
+        \end{scope}
+
+    \end{tikzpicture}
+
+\end{document}
