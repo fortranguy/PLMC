@@ -49,7 +49,7 @@
         \begin{scope}[shift={($(VisitableCells.north -| ShortPairsVisitor)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{VisitableList}{0, 0}
                 \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
-                    componentPositions: \type{ComponentCoordinates}}}
+                    positions: \type{ComponentCoordinates}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{set}{iTarger: \type{int}, iParticle: \type{int}}}
                 \operation{\procedure{visit}{overlap: \type{bool}, energy: \type{real},
