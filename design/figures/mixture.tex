@@ -21,7 +21,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(ComponentNumber.north) + (0 cm, 5 cm)$)}]
+        \begin{scope}[shift={($(ComponentNumber.north) + (0 cm, 4.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{ComponentCoordinates}{0, 0}
                 \inherit{Coordinates}
                 \operation[0]{\procedure{construct}{...}}
@@ -52,7 +52,7 @@
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(ComponentCoordinates.north) + (9 cm, 0.5 cm)$)}]
+        \begin{scope}[shift={($(ComponentCoordinates.north) + (9 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{MixtureTotalMoment}{0, 0}
                 \operation{\procedure{construct}{components\type{Component[:]},
                     areDipolar\type{bool[:]}}}
@@ -65,14 +65,14 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(MixtureTotalMoment.south |- ComponentNumber)$)}]
+        \begin{scope}[shift={($(Coordinates.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{MinimumDistance}{0, 0}
                 \operation{\procedure{set}{minDistance\type{real}}}
                 \operation{\procedure{get}{}\type{real}}
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(Component.north -| MixtureTotalMoment.north)$)}]
+        \begin{scope}[shift={($(MixtureTotalMoment.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{ComponentChemicalPotential}{0, 0}
                 \operation{\procedure{set}{density\type{real}, excess\type{real}}}
                 \operation{\procedure{getDensity}{}\type{real}}
@@ -86,6 +86,15 @@
                 \attribute{position\type{double[3]}}
                 \attribute{orientation\type{double[3]}}
                 \attribute{dipolarMoment\type{double[3]}}
+            \end{class}
+        \end{scope}
+
+        \begin{scope}[shift={($(Component.north -| MixtureTotalMoment.north)$)}]
+            \begin{class}[text width=\mediumTextWidth]{Mixture}{0, 0}
+                \attribute{components\type{Component[:]}}
+                \attribute{componentsMinDistances\type{MinimumDistance[:, :]}}
+                \attribute{wallMinDistances\type{MinimumDistance[:]}}
+                \attribute{totalMoment\type{MixtureTotalMoment}}
             \end{class}
         \end{scope}
 
