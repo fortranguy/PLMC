@@ -23,8 +23,8 @@
                     alpha\type{DESconvergenceParameter}, domain\type{DipolarPotentialDomain}}}
                 \operation[0]{\procedure{destroy}{}}
                 \operation[0]{\procedure{reset}{}}
-                \operation{\procedure{meet}{vectorIJ\type{double[3]}, momentI\type{double[3]},
-                    momentJ\type{double[3]}}}
+                \operation{\procedure{meet}{vectorIJ\type{real[3]}, momentI\type{real[3]},
+                    momentJ\type{real[3]}}}
             \end{abstractclass}
         \end{scope}
 
@@ -59,12 +59,12 @@
                 \operation{\procedure{destroy}{}}
                 \operation[0]{\procedure{visit}{}\type{real}}
                 \operation[0]{\procedure{visitRotation}{iComponent\type{int},
-                    newDipolarMoment\type{double[3]},
-                    oldDipolarMoment\type{double[3]}}\type{real}}
+                    newDipolarMoment\type{real[3]},
+                    oldDipolarMoment\type{real[3]}}\type{real}}
                 \operation{\procedure{visitAdd}{iComponent\type{int},
-                    dipolarMoment\type{double[3]}}\type{real}}
+                    dipolarMoment\type{real[3]}}\type{real}}
                 \operation{\procedure{visitRemove}{iComponent\type{int},
-                    dipolarMoment\type{double[3]}}\type{real}}
+                    dipolarMoment\type{real[3]}}\type{real}}
             \end{abstractclass}
         \end{scope}
 
@@ -72,10 +72,10 @@
             \begin{abstractclass}[text width=\largeTextWidth]{StructureVisitor}{0, 0}
                 \operation[0]{\procedure{visit}{}\type{real}}
                 \operation[0]{\procedure{visitMove}{iComponent\type{int},
-                    newPosition\type{double[3]},
+                    newPosition\type{real[3]},
                     old\type{TemporaryParticle}}\type{real}}
                 \operation[0]{\procedure{visitRotation}{iComponent\type{int},
-                    newDipolarMoment\type{double[3]}, old\type{TemporaryParticle}}\type{real}}
+                    newDipolarMoment\type{real[3]}, old\type{TemporaryParticle}}\type{real}}
                 \operation[0]{\procedure{visitAdd}{iComponent\type{int},
                     particle\type{TemporaryParticle}}\type{real}}
                 \operation[0]{\procedure{visitRemove}{iComponent\type{int},
@@ -145,9 +145,9 @@
             \begin{abstractclass}[text width=\mediumTextWidth]{StructureFactor}{0, 0}
                 \operation[0]{\procedure{isDipolar}{iComponent\type{int}}\type{bool}}
                 \operation[0]{\procedure{updateMove}{iComponent\type{int},
-                    newPosition\type{double[3]}, old\type{TemporaryParticle}}}
+                    newPosition\type{real[3]}, old\type{TemporaryParticle}}}
                 \operation[0]{\procedure{updateRotation}{iComponent\type{int},
-                    newDipolarMoment\type{double[3]}, old\type{TemporaryParticle}}}
+                    newDipolarMoment\type{real[3]}, old\type{TemporaryParticle}}}
                 \operation[0]{\procedure{updateAdd}{iComponent\type{int},
                     particle\type{TemporaryParticle}}}
                 \operation[0]{\procedure{updateRemove}{iComponent\type{int},

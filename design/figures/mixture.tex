@@ -17,7 +17,7 @@
         \begin{scope}[shift={($(ComponentNumber.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{Coordinates}{0, 0}
                 \operation[0]{\procedure{getNum}{}\type{int}}
-                \operation[0]{\procedure{get}{iParticle\type{int}}\type{double[3]}}
+                \operation[0]{\procedure{get}{iParticle\type{int}}\type{real[3]}}
             \end{abstractclass}
         \end{scope}
 
@@ -26,8 +26,8 @@
                 \inherit{Coordinates}
                 \operation[0]{\procedure{construct}{...}}
                 \operation[0]{\procedure{destroy}{}}
-                \operation[0]{\procedure{set}{iParticle\type{int}, vector\type{double[3]}}}
-                \operation{\procedure{add}{vector\type{double[3]}}}
+                \operation[0]{\procedure{set}{iParticle\type{int}, vector\type{real[3]}}}
+                \operation{\procedure{add}{vector\type{real[3]}}}
                 \operation{\procedure{remove}{iParticle\type{int}}}
             \end{abstractclass}
         \end{scope}
@@ -60,8 +60,8 @@
                 \operation{\procedure{reset}{}}
                 \operation{\procedure{isDipolar}{iComponent\type{int}} }
                 \operation{\procedure{get}{}}
-                \operation{\procedure{add}{iComponent\type{int}, dipolarMoment\type{double[3]}}}
-                \operation{\procedure{remove}{iComponent\type{int}, dipolarMoment\type{double[3]}}}
+                \operation{\procedure{add}{iComponent\type{int}, dipolarMoment\type{real[3]}}}
+                \operation{\procedure{remove}{iComponent\type{int}, dipolarMoment\type{real[3]}}}
             \end{abstractclass}
         \end{scope}
 
@@ -83,9 +83,9 @@
         \begin{scope}[shift={($(Coordinates.north |- Component.north)$)}]
             \begin{class}[text width=\smallTextWidth]{TemporaryParticle}{0, 0}
                 \attribute{i\type{int}}
-                \attribute{position\type{double[3]}}
-                \attribute{orientation\type{double[3]}}
-                \attribute{dipolarMoment\type{double[3]}}
+                \attribute{position\type{real[3]}}
+                \attribute{orientation\type{real[3]}}
+                \attribute{dipolarMoment\type{real[3]}}
             \end{class}
         \end{scope}
 

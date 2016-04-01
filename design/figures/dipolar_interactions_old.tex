@@ -53,7 +53,7 @@
                 \operation{destroy()}
                 \operation{visit(energy\type{real}, particle\type{Particle},
                     ewaldRealPair\type{EwaldRealPair})}
-                \operation{visit(field\type{double[3]}, particle\type{Particle},
+                \operation{visit(field\type{real[3]}, particle\type{Particle},
                     ewaldRealPair\type{EwaldRealPair})}
             \end{abstractclass}
         \end{scope}
@@ -62,8 +62,8 @@
             \begin{abstractclass}[text width=\mediumTextWidth]{EwaldRealPair}{0, 0}
                 \operation{construct(domain\type{PotentialDomain}, alpha\type{real})}
                 \operation{destroy()}
-                \operation{meet(vectorIJ\type{double[3]}, momentI\type{double[3]},
-                    momentJ\type{double[3]})\type{real}}
+                \operation{meet(vectorIJ\type{real[3]}, momentI\type{real[3]},
+                    momentJ\type{real[3]})\type{real}}
             \end{abstractclass}
         \end{scope}
 

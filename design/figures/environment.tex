@@ -9,24 +9,24 @@
 
         \begin{scope}
             \begin{abstractclass}[text width=\mediumTextWidth]{PeriodicBox}{0, 0}
-                \operation{\procedure{set}{size\type{double[3]}}}
-                \operation{\procedure{getSize}{}\type{double[3]}}
-                \operation{\procedure{distance}{position1\type{double[3]},
-                    position2\type{double[3]}}\type{real}}
-                \operation{\procedure{vector}{position1\type{double[3]}, position2\type{double[3]}}%
-                    \type{double[3]}}
-                \operation[0]{\procedure{folded}{position\type{double[3]}}\type{double[3]}}
+                \operation{\procedure{set}{size\type{real[3]}}}
+                \operation{\procedure{getSize}{}\type{real[3]}}
+                \operation{\procedure{distance}{position1\type{real[3]},
+                    position2\type{real[3]}}\type{real}}
+                \operation{\procedure{vector}{position1\type{real[3]}, position2\type{real[3]}}%
+                    \type{real[3]}}
+                \operation[0]{\procedure{folded}{position\type{real[3]}}\type{real[3]}}
             \end{abstractclass}
         \end{scope}
 
         \begin{scope}[shift={($(PeriodicBox.north) + (0 cm, 5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{ParallelepipedDomain}{0, 0}
                 \operation{\procedure{construct}{periodicBox\type{PeriodicBox},
-                    origin\type{double[3]}, size\type{double[3]}}}
+                    origin\type{real[3]}, size\type{real[3]}}}
                 \operation{\procedure{destroy}{}}
-                \operation{\procedure{getOrigin}{}\type{double[3]}}
-                \operation{\procedure{getSize}{}\type{double[3]}}
-                \operation{\procedure{isInside}{position\type{double[3]}}\type{bool}}
+                \operation{\procedure{getOrigin}{}\type{real[3]}}
+                \operation{\procedure{getSize}{}\type{real[3]}}
+                \operation{\procedure{isInside}{position\type{real[3]}}\type{bool}}
             \end{abstractclass}
         \end{scope}
 
@@ -37,7 +37,7 @@
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{getGap}{}\type{real}}
                 \operation{\procedure{visit}{overlap\type{bool}, energy\type{real},
-                    position\type{double[3]}, pairPotential\type{PairPotential}}}
+                    position\type{real[3]}, pairPotential\type{PairPotential}}}
             \end{abstractclass}
         \end{scope}
 
@@ -53,7 +53,7 @@
         \begin{scope}[shift={($(WallsPotential.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{FloorPenetration}{0, 0}
                 \operation{\procedure{meet}{overlap\type{bool},
-                    shortestVectorFromFloor\type{double[3]}, positionFromFloor\type{double[3]}}}
+                    shortestVectorFromFloor\type{real[3]}, positionFromFloor\type{real[3]}}}
             \end{abstractclass}
         \end{scope}
 
@@ -83,7 +83,7 @@
 
         \begin{scope}[shift={($(Permittivity.north) + (0 cm, 3.5 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{FieldExpression}{0, 0}
-                \operation{\procedure{get}{position\type{double[3]}}\type{double[3]}}
+                \operation{\procedure{get}{position\type{real[3]}}\type{real[3]}}
             \end{abstractclass}
         \end{scope}
 
@@ -92,7 +92,7 @@
                 \operation{\procedure{construct}{parallelepipedDomain\type{ParallelepipedDomain},
                     fieldExpression\type{FieldExpression}}}
                 \operation{\procedure{destroy}{}}
-                \operation{\procedure{get}{position\type{double[3]}}\type{double[3]}}
+                \operation{\procedure{get}{position\type{real[3]}}\type{real[3]}}
             \end{abstractclass}
         \end{scope}
 
