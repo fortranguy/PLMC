@@ -14,14 +14,14 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(ComponentNumber.north west) - (6.5 cm, 0 cm)$)}]
+        \begin{scope}[shift={($(ComponentNumber.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{Coordinates}{0, 0}
                 \operation[0]{\procedure{getNum}{}\type{int}}
                 \operation[0]{\procedure{get}{iParticle\type{int}}\type{double[3]}}
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(ComponentNumber.north) + (0 cm, 4.5 cm)$)}]
+        \begin{scope}[shift={($(ComponentNumber.north) + (8 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{ComponentCoordinates}{0, 0}
                 \inherit{Coordinates}
                 \operation[0]{\procedure{construct}{...}}
@@ -32,7 +32,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(Coordinates.north |- ComponentCoordinates.north)$)}]
+        \begin{scope}[shift={($(ComponentCoordinates.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{ComponentDipolarMoments}{0, 0}
                 \inherit{Coordinates}
                 \operation{\procedure{construct}{norm\type{real},
@@ -80,7 +80,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(ComponentDipolarMoments.north |- Component.north)$)}]
+        \begin{scope}[shift={($(Coordinates.north |- Component.north)$)}]
             \begin{class}[text width=\smallTextWidth]{TemporaryParticle}{0, 0}
                 \attribute{i\type{int}}
                 \attribute{position\type{double[3]}}
