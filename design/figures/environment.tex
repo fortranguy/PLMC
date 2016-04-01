@@ -30,8 +30,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(PeriodicBox.north) + (9 cm, 0 cm)$)}]
-        %[shift={($(ParallelepipedDomain.north -| FloorPenetration)$)}]
+        \begin{scope}[shift={($(PeriodicBox.north) - (9 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{WallsPotential}{0, 0}
                 \operation{\procedure{construct}{periodicBox\type{PeriodicBox}, gap\type{real},
                     floorPenetration\type{FloorPenetration}}}
@@ -58,7 +57,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(PeriodicBox.north) + (-8 cm, 0 cm)$)}]
+        \begin{scope}[shift={($(PeriodicBox.north) + (8 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{Temperature}{0, 0}
                 \operation{\procedure{set}{temperature\type{real}}}
                 \operation{\procedure{get}{}\type{real}}
