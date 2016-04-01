@@ -42,11 +42,11 @@ contains
 
 !implementation Abstract_DES_Reci_Weight
 
-    subroutine Abstract_construct(this, periodic_box, permittivity, reciprocal_lattice, alpha)
+    subroutine Abstract_construct(this, periodic_box, reciprocal_lattice, permittivity, alpha)
         class(Abstract_DES_Reci_Weight), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Permittivity), intent(in) :: permittivity
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
+        class(Abstract_Permittivity), intent(in) :: permittivity
         class(Abstract_DES_Convergence_Parameter), target, intent(in) :: alpha
 
         this%periodic_box => periodic_box
@@ -115,11 +115,11 @@ contains
 
 !implementation Null_DES_Reci_Weight
 
-    subroutine Null_construct(this, periodic_box, permittivity, reciprocal_lattice, alpha)
+    subroutine Null_construct(this, periodic_box, reciprocal_lattice, permittivity, alpha)
         class(Null_DES_Reci_Weight), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Permittivity), intent(in) :: permittivity
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
+        class(Abstract_Permittivity), intent(in) :: permittivity
         class(Abstract_DES_Convergence_Parameter), target, intent(in) :: alpha
     end subroutine Null_construct
 
