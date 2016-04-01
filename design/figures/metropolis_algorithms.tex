@@ -14,7 +14,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(MetropolisAlgorithm.south) + (0 cm, -2 cm)$)}]
+        \begin{scope}[shift={($(MetropolisAlgorithm.south) + (0 cm, -2.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{OneParticleChange}{0, 0}
                 \inherit{MetropolisAlgorithm}
                 \operation{\procedure{construct}{environment\type{Environment},
@@ -38,14 +38,22 @@
             \end{abstractclass}
         \end{scope}
 
+        \begin{scope}[shift={($(OneParticleChange.south) - (0 cm, 1.5 cm)$)}]
+            \begin{class}[text width=\mediumTextWidth]{MetropolisAlgorithms}{0, 0}
+                \attribute{oneParticleMove\type{OneParticleChange}}
+                \attribute{oneParticleRotation\type{OneParticleChange}}
+                \attribute{twoParticlesSwitch\type{TwoParticlesSwitch}}
+            \end{class}
+        \end{scope}
+
         \begin{scope}[shift={($(MetropolisAlgorithm.north -| TwoParticlesSwitch)$)}]
-            \umlnote[text width=\smallTextWidth]{\import{}:\\
-                \namespace{Environment} \\
-                \namespace{Mixture} :: Component \\
+            \umlnote[text width=\mediumTextWidth]{\import{}:\\
+                \namespace{Environment} :: Environment \\
+                \namespace{Mixture} :: Mixture, Component \\
                 \namespace{Changes} :: ChangesComponent \\
-                \namespace{ShortInteractions} \\
-                \namespace{DipolarInteractions} \\
-                \namespace{Observables}};
+                \namespace{ShortInteractions} :: ShortInteractions \\
+                \namespace{DipolarInteractions} :: DipolarInteractions \\
+                \namespace{Observables} :: Observables};
         \end{scope}
 
     \end{tikzpicture}
