@@ -7,43 +7,8 @@
 
     \begin{tikzpicture}[scale=\scale, every node/.style={scale=\scale}]
 
+
         \begin{scope}
-            \begin{abstractclass}[text width=\smallTextWidth]{ChangedCoordinates}{0, 0}
-                \operation[0]{\procedure{destroy}{}}
-                \operation[0]{\procedure{increaseDelta}{}}
-                \operation[0]{\procedure{decreaseDelta}{}}
-                \operation[0]{\procedure{getNum}{}\type{int}}
-                \operation[0]{\procedure{get}{iParticle\type{int}}\type{double[3]}}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(ChangedCoordinates) + (0 cm, 6.5 cm)$)}]
-            \begin{abstractclass}[text width=\smallTextWidth]{ChangeTuner}{0, 0}
-                \operation{\procedure{construct}{changedCoordinates\type{ChangedCoordinates},
-                    parameters\type{ChangeTunerParameters}}}
-                \operation{\procedure{destroy}{}}
-                \operation{\procedure{tune}{tuned\type{bool}, iStep\type{int},
-                    successRatio\type{real}}}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(ChangedCoordinates.north) + (6.5 cm, 0 cm)$)}]
-            \begin{abstractclass}[text width=\smallTextWidth]{ComponentExchange}{0, 0}
-                \operation{\procedure{construct}{component\type{Component}}}
-                \operation{\procedure{destroy}{}}
-                \operation{\procedure{add}{particle\type{TemporaryParticle}}}
-                \operation{\procedure{remove}{iParticle\type{int}}}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(ChangeTuner -| ComponentExchange.north) - (0 cm, 0.5 cm)$)}]
-            \begin{class}[text width=\smallTextWidth]{ChangeTuningParameters}{0, 0}
-                \attribute{increaseFactor\type{real}}
-                \attribute{increaseFactorMax\type{real}}
-            \end{class}
-        \end{scope}
-
-        \begin{scope}[shift={($(ComponentExchange.north) + (7.5 cm, 0 cm)$)}]
             \begin{class}[text width=\mediumTextWidth]{ChangesComponent}{0, 0}
                 \attribute{movedPositions\type{ChangedCoordinates}}
                 \attribute{rotatedOrientations\type{ChangedCoordinates}}
@@ -53,8 +18,44 @@
             \end{class}
         \end{scope}
 
-        \begin{scope}[shift={($(ChangeTuningParameters.north -| ChangesComponent)$)}]
-            \umlnote[text width=\mediumTextWidth]{\import{}:\\
+        \begin{scope}[shift={($(ChangesComponent.north) - (7.5 cm, 0 cm)$)}]
+            \begin{abstractclass}[text width=\smallTextWidth]{ChangedCoordinates}{0, 0}
+                \operation[0]{\procedure{destroy}{}}
+                \operation[0]{\procedure{increaseDelta}{}}
+                \operation[0]{\procedure{decreaseDelta}{}}
+                \operation[0]{\procedure{getNum}{}\type{int}}
+                \operation[0]{\procedure{get}{iParticle\type{int}}\type{double[3]}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(ChangesComponent.south) - (0 cm, 1.5 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{ChangeTuner}{0, 0}
+                \operation{\procedure{construct}{changedCoordinates\type{ChangedCoordinates},
+                    parameters\type{ChangeTunerParameters}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{tune}{tuned\type{bool}, iStep\type{int},
+                    successRatio\type{real}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(ChangeTuner.north) + (7.5 cm, 0 cm)$)}]
+            \begin{abstractclass}[text width=\smallTextWidth]{ComponentExchange}{0, 0}
+                \operation{\procedure{construct}{component\type{Component}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{add}{particle\type{TemporaryParticle}}}
+                \operation{\procedure{remove}{iParticle\type{int}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(ChangedCoordinates |- ChangeTuner.north)$)}]
+            \begin{class}[text width=\smallTextWidth]{ChangeTuningParameters}{0, 0}
+                \attribute{increaseFactor\type{real}}
+                \attribute{increaseFactorMax\type{real}}
+            \end{class}
+        \end{scope}
+
+        \begin{scope}[shift={($(ChangesComponent.north -| ComponentExchange)$)}]
+            \umlnote[text width=\smallTextWidth]{\import{}:\\
                 \namespace{Mixture} :: Component, TemporaryParticle};
         \end{scope}
 

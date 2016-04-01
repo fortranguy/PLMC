@@ -17,7 +17,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(DESconvergenceParameter.north) + (0 cm, 5.5 cm)$)}]
+        \begin{scope}[shift={($(DESconvergenceParameter.north) + (0 cm, 7 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{DESrealPair}{0, 0}
                 \operation[0]{\procedure{construct}{permittivity\type{Permittivity},
                     alpha\type{DESconvergenceParameter}, domain\type{DipolarPotentialDomain}}}
@@ -39,7 +39,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(DESconvergenceParameter.south) - (0 cm, 5 cm)$)}]
+        \begin{scope}[shift={($(DESconvergenceParameter.south) - (0 cm, 4.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{DESselfComponent}{0, 0}
                 \operation{\procedure{construct}{permittivity\type{Permittivity},
                     dipolarMoments\type{ComponentDipolarMoments},
@@ -52,7 +52,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(DESselfComponent.south) - (0 cm, 1.5 cm)$)}]
+        \begin{scope}[shift={($(DESselfComponent.south) - (0 cm, 3 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{DESsurfMixture}{0, 0}
                 \operation{\procedure{construct}{periodicBox\type{PeriodicBox},
                     permittivity\type{Permittivity}, totalMoment\type{MixtureTotalMoment}}}
@@ -169,7 +169,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(DLCweight.north -| StructureFactor)$)}]
+        \begin{scope}[shift={($(DLCvisitor.north -| StructureFactor)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{DLCstructures}{0, 0}
                 \inherit{StructureFactor}
                 \operation{\procedure{construct}{periodicBox\type{PeriodicBox},
@@ -183,6 +183,23 @@
         \end{scope}
 
         \begin{scope}[shift={($(DESreciWeight.north -| DESreciStructure)$)}]
+            \begin{class}[text width=\mediumTextWidth]{DipolarInteractions}{0, 0}
+                \attribute{alpha\type{DESconvergenceParameter}}
+                \attribute{realVisitor\type{DESrealVisitor}}
+                \attribute{realComponents\type{DESrealComponent[:, :]}}
+                \attribute{realPairs\type{DESrealPairs[:, :]}}
+                \attribute{reciWeight\type{DESreciWeight}}
+                \attribute{reciStructure\type{DESreciStructure}}
+                \attribute{reciVisitor\type{DESreciVisitor}}
+                \attribute{selfComponents\type{DESselfComponent[:]}}
+                \attribute{surfMixture\type{DESsurfMixture}}
+                \attribute{dlcWeight\type{DLCweight}}
+                \attribute{dlcStructures\type{DLCstructures}}
+                \attribute{dlcVisitor\type{DLCvisitor}}
+            \end{class}
+        \end{scope}
+
+        \begin{scope}[shift={($(DESrealVisitor.north -| DipolarInteractions)$)}]
             \umlnote[text width=\mediumTextWidth]{\import{}::\\
                 \namespace{Environment} :: PeriodicBox, ReciprocalLattice, Permittivity\\
                 \namespace{Mixture} :: Component, MixtureTotalMoment, ComponentCoordinates,
