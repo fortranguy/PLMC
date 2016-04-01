@@ -31,6 +31,24 @@
         \end{scope}
 
         \begin{scope}[shift={($(PeriodicBox.north) + (9 cm, 0 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{WallsPotential}{0, 0}
+                \operation{\procedure{construct}{periodicBox\type{PeriodicBox}, gap\type{real},
+                    floorPenetration\type{FloorPenetration}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{getGap}{}\type{real}}
+                \operation{\procedure{visit}{overlap\type{bool}, energy\type{real},
+                    position\type{double[3]}, pairPotential\type{PairPotential}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(WallsPotential.south) - (0 cm, 1.5 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{FloorPenetration}{0, 0}
+                \operation{\procedure{meet}{overlap\type{bool},
+                    shortestVectorFromFloor\type{double[3]}, positionFromFloor\type{double[3]}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(ParallelepipedDomain.north -| WallsPotential)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{ReciprocalLattice}{0, 0}
                 \operation{\procedure{contruct}{periodicBox\type{PeriodicBox},
                     numbers\type{int[3]}}}
@@ -69,22 +87,15 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(ReciprocalLattice.north |- ParallelepipedDomain.north)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{WallsPotential}{0, 0}
-                \operation{\procedure{construct}{periodicBox\type{PeriodicBox}, gap\type{real},
-                    floorPenetration\type{FloorPenetration}}}
-                \operation{\procedure{destroy}{}}
-                \operation{\procedure{getGap}{}\type{real}}
-                \operation{\procedure{visit}{overlap\type{bool}, energy\type{real},
-                    position\type{double[3]}, pairPotential\type{PairPotential}}}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(ExternalField -| WallsPotential.north) + (0 cm, 0.5 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{FloorPenetration}{0, 0}
-                \operation{\procedure{meet}{overlap\type{bool},
-                    shortestVectorFromFloor\type{double[3]}, positionFromFloor\type{double[3]}}}
-            \end{abstractclass}
+        \begin{scope}[shift={($(ExternalField.north -| FloorPenetration)$)}]
+            \begin{class}[text width=\mediumTextWidth]{Environment}{0, 0}
+                \attribute{periodicBox\type{PeriodicBox}}
+                \attribute{temperature\type{Temperature}}
+                \attribute{externalField\type{ExternalField}}
+                \attribute{permittivity\type{Permittivity}}
+                \attribute{reciprocalLattice\type{ReciprocalLattice}}
+                \attribute{wallsPotential\type{WallsPotential}}
+            \end{class}
         \end{scope}
 
         \begin{scope}[shift={($(ExternalField.north -| FieldExpression.north)$)}]
