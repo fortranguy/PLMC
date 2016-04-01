@@ -31,6 +31,7 @@
         \end{scope}
 
         \begin{scope}[shift={($(PeriodicBox.north) + (9 cm, 0 cm)$)}]
+        %[shift={($(ParallelepipedDomain.north -| FloorPenetration)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{WallsPotential}{0, 0}
                 \operation{\procedure{construct}{periodicBox\type{PeriodicBox}, gap\type{real},
                     floorPenetration\type{FloorPenetration}}}
@@ -41,19 +42,19 @@
             \end{abstractclass}
         \end{scope}
 
+        \begin{scope}[shift={($(ParallelepipedDomain.north -| WallsPotential)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{WallsPotentialVisitor}{0, 0}
+                \operation{\procedure{construct}{wallsPotential\type{WallsPotential}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{visit}{overlap\type{bool}, energy\type{real},
+                    positions\type{ComponentCoordinates}, pairPotential\type{PairPotential}}}
+            \end{abstractclass}
+        \end{scope}
+
         \begin{scope}[shift={($(WallsPotential.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{FloorPenetration}{0, 0}
                 \operation{\procedure{meet}{overlap\type{bool},
                     shortestVectorFromFloor\type{double[3]}, positionFromFloor\type{double[3]}}}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(ParallelepipedDomain.north -| WallsPotential)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{ReciprocalLattice}{0, 0}
-                \operation{\procedure{contruct}{periodicBox\type{PeriodicBox},
-                    numbers\type{int[3]}}}
-                \operation{\procedure{destroy}{}}
-                \operation{\procedure{getNumbers}{}\type{int[3]}}
             \end{abstractclass}
         \end{scope}
 
@@ -63,6 +64,15 @@
                 \operation{\procedure{get}{}\type{real}}
             \end{abstractclass}
             % Parallel Tempering?
+        \end{scope}
+
+        \begin{scope}[shift={($(Temperature.south) - (0 cm, 1.5 cm)$)}]
+            \begin{abstractclass}[text width=\smallTextWidth]{ReciprocalLattice}{0, 0}
+                \operation{\procedure{contruct}{periodicBox\type{PeriodicBox},
+                    numbers\type{int[3]}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{getNumbers}{}\type{int[3]}}
+            \end{abstractclass}
         \end{scope}
 
         \begin{scope}[shift={($(Temperature.north) + (0 cm, 3.5 cm)$)}]
@@ -87,7 +97,7 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(ExternalField.north -| FloorPenetration)$)}]
+        \begin{scope}[shift={($(ExternalField.north -| WallsPotentialVisitor)$)}]
             \begin{class}[text width=\mediumTextWidth]{Environment}{0, 0}
                 \attribute{periodicBox\type{PeriodicBox}}
                 \attribute{temperature\type{Temperature}}

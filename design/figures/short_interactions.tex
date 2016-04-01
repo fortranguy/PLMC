@@ -8,50 +8,6 @@
     \begin{tikzpicture}[scale=\scale, every node/.style={scale=\scale}]
 
         \begin{scope}
-            \begin{abstractclass}[text width=\mediumTextWidth]{PairPotential}{0, 0}
-                \operation[0]{\procedure{construct}{domain\type{ShortPotentialDomain},
-                    expression\type{PotentialExpression}}}
-                \operation[0]{\procedure{destroy}{}}
-                \operation{\procedure{getMaxDistance}{}\type{real}}
-                \operation[0]{\procedure{meet}{overlap\type{bool}, energy\type{real},
-                    distance\type{real}}}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(PairPotential.north) + (8 cm, 0 cm)$)}]
-        \begin{abstractclass}[text width=\smallTextWidth]{PotentialExpression}{0, 0}
-                \operation{\procedure{get}{distance\type{real}}\type{real}}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(PairPotential.north) + (0 cm, 6.5 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{ShortPairsVisitor}{0, 0}
-                \operation{\procedure{construct}{periodicBox\type{PeriodicBox}}}
-                \operation{\procedure{destroy}{}}
-                \operation{\procedure{visitInter}{overlap\type{bool}, energy\type{real},
-                    positions1\type{ComponentCoordinates},
-                    positions2\type{ComponentCoordinates},
-                    pairPotential\type{PairPotential}}}
-                \operation{\procedure{visitIntra}{overlap\type{bool}, energy\type{real},
-                    positions\type{ComponentCoordinates}, pairPotential\type{PairPotential}}}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(PairPotential.north) - (9 cm, 0 cm)$)}]
-            \begin{abstractclass}[text width=\mediumTextWidth]{VisitableList}{0, 0}
-                \operation{\procedure{construct}{periodicBox\type{PeriodicBox},
-                    componentPositions\type{ComponentCoordinates}}}
-                \operation{\procedure{destroy}{}}
-                \operation{\procedure{set}{iTarger\type{int}, iParticle\type{int}}}
-                \operation{\procedure{visit}{overlap\type{bool}, energy\type{real},
-                    particle\type{TemporaryParticle},
-                    pairPotential\type{PairPotential}, iExclude\type{int}}}
-                \operation{\procedure{add}{iParticle\type{int}}}
-                \operation{\procedure{remove}{iParticle\type{int}}}
-            \end{abstractclass}
-        \end{scope}
-
-        \begin{scope}[shift={($(ShortPairsVisitor.north -| VisitableList)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{VisitableCells}{0, 0}
                 \operation{\procedure{construct}{periodicBox\type{PeriodicBox},
                     positions\type{ComponentCoordinates}, pairPotential\type{PairPotential},
@@ -66,9 +22,63 @@
             \end{abstractclass}
         \end{scope}
 
-        \begin{scope}[shift={($(ShortPairsVisitor.north -| PotentialExpression.north)$)}]
+        \begin{scope}[shift={($(VisitableCells.south) - (0 cm , 1.5 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{PairPotential}{0, 0}
+                \operation[0]{\procedure{construct}{domain\type{ShortPotentialDomain},
+                    expression\type{PotentialExpression}}}
+                \operation[0]{\procedure{destroy}{}}
+                \operation{\procedure{getMaxDistance}{}\type{real}}
+                \operation[0]{\procedure{meet}{overlap\type{bool}, energy\type{real},
+                    distance\type{real}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(PairPotential.north) - (9 cm, 0 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{ShortPairsVisitor}{0, 0}
+                \operation{\procedure{construct}{periodicBox\type{PeriodicBox}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{visitInter}{overlap\type{bool}, energy\type{real},
+                    positions1\type{ComponentCoordinates},
+                    positions2\type{ComponentCoordinates},
+                    pairPotential\type{PairPotential}}}
+                \operation{\procedure{visitIntra}{overlap\type{bool}, energy\type{real},
+                    positions\type{ComponentCoordinates}, pairPotential\type{PairPotential}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(VisitableCells.north -| ShortPairsVisitor)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{VisitableList}{0, 0}
+                \operation{\procedure{construct}{periodicBox\type{PeriodicBox},
+                    componentPositions\type{ComponentCoordinates}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{set}{iTarger\type{int}, iParticle\type{int}}}
+                \operation{\procedure{visit}{overlap\type{bool}, energy\type{real},
+                    particle\type{TemporaryParticle},
+                    pairPotential\type{PairPotential}, iExclude\type{int}}}
+                \operation{\procedure{add}{iParticle\type{int}}}
+                \operation{\procedure{remove}{iParticle\type{int}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(PairPotential.north) + (9 cm, 0 cm)$)}]
+            \begin{class}[text width=\mediumTextWidth]{ShortInteractions}{0, 0}
+                \attribute{componentsVisitor\type{ShortPairsVisitor}}
+                \attribute{wallsVisitor\type{WallsPotentialVisitor}}
+                \attribute{componentsPairs\type{PairPotential[:, :]}}
+                \attribute{componentsCells\type{VisitableCells[:, :]}}
+                \attribute{wallPairs\type{PairPotential[:]}}
+            \end{class}
+        \end{scope}
+
+        \begin{scope}[shift={($(VisitableCells -| ShortInteractions) - (0 cm, 1 cm)$)}]
+        \begin{abstractclass}[text width=\smallTextWidth]{PotentialExpression}{0, 0}
+                \operation{\procedure{get}{distance\type{real}}\type{real}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(VisitableCells.north -| ShortInteractions)$)}]
             \umlnote[text width=\smallTextWidth] {\import{}: \\
-                \namespace{Environment} :: PeriodicBox \\
+                \namespace{Environment} :: PeriodicBox, WallsPotentialVisitor \\
                 \namespace{Mixture} :: ComponentCoordinates, TemporaryParticle};
         \end{scope}
 
