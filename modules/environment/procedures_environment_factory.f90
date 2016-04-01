@@ -273,8 +273,8 @@ contains
         if (allocated(parallelepiped_domain)) deallocate(parallelepiped_domain)
     end subroutine destroy_parallelepiped_domain
 
-    subroutine create_external_field(external_field, field_applied, &
-        parallelepiped_domain, field_expression)
+    subroutine create_external_field(external_field, field_applied, parallelepiped_domain, &
+        field_expression)
         class(Abstract_External_Field), allocatable, intent(out) :: external_field
         logical, intent(in) :: field_applied
         class(Abstract_Parallelepiped_Domain), intent(in) :: parallelepiped_domain

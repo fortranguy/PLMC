@@ -102,7 +102,7 @@
 			<Option weight="11" />
 		</Unit>
 		<Unit filename="modules/common/procedures_plmc_reset.f90">
-			<Option weight="7" />
+			<Option weight="9" />
 		</Unit>
 		<Unit filename="modules/common/procedures_plmc_visit.f90">
 			<Option weight="9" />
@@ -169,6 +169,9 @@
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/procedures_dipolar_interactions_micro.f90">
 			<Option weight="1" />
+		</Unit>
+		<Unit filename="modules/dipolar_interactions/procedures_dipoles_field_interaction.f90">
+			<Option weight="5" />
 		</Unit>
 		<Unit filename="modules/dipolar_interactions/procedures_dlc_factory.f90">
 			<Option weight="8" />
