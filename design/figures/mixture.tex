@@ -9,15 +9,15 @@
 
         \begin{scope}
             \begin{abstractclass}[text width=\smallTextWidth]{ComponentNumber}{0, 0}
-                \operation{\procedure{set}{number\type{int}}}
-                \operation{\procedure{get}{}\type{int}}
+                \operation{\procedure{set}{number: \type{int}}}
+                \operation{\procedure{get}{}: \type{int}}
             \end{abstractclass}
         \end{scope}
 
         \begin{scope}[shift={($(ComponentNumber.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{Coordinates}{0, 0}
-                \operation[0]{\procedure{getNum}{}\type{int}}
-                \operation[0]{\procedure{get}{iParticle\type{int}}\type{real[3]}}
+                \operation[0]{\procedure{getNum}{}: \type{int}}
+                \operation[0]{\procedure{get}{iParticle: \type{int}}: \type{real[3]}}
             \end{abstractclass}
         \end{scope}
 
@@ -26,75 +26,76 @@
                 \inherit{Coordinates}
                 \operation[0]{\procedure{construct}{...}}
                 \operation[0]{\procedure{destroy}{}}
-                \operation[0]{\procedure{set}{iParticle\type{int}, vector\type{real[3]}}}
-                \operation{\procedure{add}{vector\type{real[3]}}}
-                \operation{\procedure{remove}{iParticle\type{int}}}
+                \operation[0]{\procedure{set}{iParticle: \type{int}, vector: \type{real[3]}}}
+                \operation{\procedure{add}{vector: \type{real[3]}}}
+                \operation{\procedure{remove}{iParticle: \type{int}}}
             \end{abstractclass}
         \end{scope}
 
         \begin{scope}[shift={($(ComponentCoordinates.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{ComponentDipolarMoments}{0, 0}
                 \inherit{Coordinates}
-                \operation{\procedure{construct}{norm\type{real},
-                    orientations\type{ComponentCoordinates}}}
+                \operation{\procedure{construct}{norm: \type{real},
+                    orientations: \type{ComponentCoordinates}}}
                 \operation{\procedure{destroy}{}}
-                \operation{\procedure{getNorm}{}\type{real}}
+                \operation{\procedure{getNorm}{}: \type{real}}
             \end{abstractclass}
         \end{scope}
 
         \begin{scope}[shift={($(ComponentCoordinates.north) + (0 cm, 4.5 cm)$)}]
             \begin{class}[text width=\mediumTextWidth]{Component}{0, 0}
-                \attribute{number\type{ComponentNumber}}
-                \attribute{positions\type{ComponentCoordinates}}
-                \attribute{orientations\type{ComponentCoordinates}}
-                \attribute{chemicalPotential\type{ComponentChemicalPotential}}
-                \attribute{dipolarMoments\type{ComponentDipolarMoments}}
+                \attribute{number: \type{ComponentNumber}}
+                \attribute{positions: \type{ComponentCoordinates}}
+                \attribute{orientations: \type{ComponentCoordinates}}
+                \attribute{chemicalPotential: \type{ComponentChemicalPotential}}
+                \attribute{dipolarMoments: \type{ComponentDipolarMoments}}
             \end{class}
         \end{scope}
 
         \begin{scope}[shift={($(ComponentCoordinates.north) + (9 cm, 0 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{MixtureTotalMoment}{0, 0}
-                \operation{\procedure{construct}{components\type{Component[:]},
-                    areDipolar\type{bool[:]}}}
+                \operation{\procedure{construct}{components: \type{Component[:]},
+                    areDipolar: \type{bool[:]}}}
                 \operation{\procedure{destroy}{}}
                 \operation{\procedure{reset}{}}
-                \operation{\procedure{isDipolar}{iComponent\type{int}} }
+                \operation{\procedure{isDipolar}{iComponent: \type{int}} }
                 \operation{\procedure{get}{}}
-                \operation{\procedure{add}{iComponent\type{int}, dipolarMoment\type{real[3]}}}
-                \operation{\procedure{remove}{iComponent\type{int}, dipolarMoment\type{real[3]}}}
+                \operation{\procedure{add}{iComponent: \type{int}, dipolarMoment: \type{real[3]}}}
+                \operation{\procedure{remove}{iComponent: \type{int}, dipolarMoment:
+                    \type{real[3]}}}
             \end{abstractclass}
         \end{scope}
 
         \begin{scope}[shift={($(Coordinates.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{MinimumDistance}{0, 0}
-                \operation{\procedure{set}{minDistance\type{real}}}
-                \operation{\procedure{get}{}\type{real}}
+                \operation{\procedure{set}{minDistance: \type{real}}}
+                \operation{\procedure{get}{}: \type{real}}
             \end{abstractclass}
         \end{scope}
 
         \begin{scope}[shift={($(MixtureTotalMoment.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\smallTextWidth]{ComponentChemicalPotential}{0, 0}
-                \operation{\procedure{set}{density\type{real}, excess\type{real}}}
-                \operation{\procedure{getDensity}{}\type{real}}
-                \operation{\procedure{getExcess}{}\type{real}}
+                \operation{\procedure{set}{density: \type{real}, excess: \type{real}}}
+                \operation{\procedure{getDensity}{}: \type{real}}
+                \operation{\procedure{getExcess}{}: \type{real}}
             \end{abstractclass}
         \end{scope}
 
         \begin{scope}[shift={($(Coordinates.north |- Component.north)$)}]
             \begin{class}[text width=\smallTextWidth]{TemporaryParticle}{0, 0}
-                \attribute{i\type{int}}
-                \attribute{position\type{real[3]}}
-                \attribute{orientation\type{real[3]}}
-                \attribute{dipolarMoment\type{real[3]}}
+                \attribute{i: \type{int}}
+                \attribute{position: \type{real[3]}}
+                \attribute{orientation: \type{real[3]}}
+                \attribute{dipolarMoment: \type{real[3]}}
             \end{class}
         \end{scope}
 
         \begin{scope}[shift={($(Component.north -| MixtureTotalMoment.north)$)}]
             \begin{class}[text width=\mediumTextWidth]{Mixture}{0, 0}
-                \attribute{components\type{Component[:]}}
-                \attribute{componentsMinDistances\type{MinimumDistance[:, :]}}
-                \attribute{wallMinDistances\type{MinimumDistance[:]}}
-                \attribute{totalMoment\type{MixtureTotalMoment}}
+                \attribute{components: \type{Component[:]}}
+                \attribute{componentsMinDistances: \type{MinimumDistance[:, :]}}
+                \attribute{wallMinDistances: \type{MinimumDistance[:]}}
+                \attribute{totalMoment: \type{MixtureTotalMoment}}
             \end{class}
         \end{scope}
 
