@@ -7,13 +7,14 @@ use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use types_temporary_particle, only: Concrete_Temporary_Particle
 use class_des_reci_weight, only: Abstract_DES_Reci_Weight
 use class_des_reci_structure, only: Abstract_DES_Reci_Structure
+use class_structure_visitor, only: Abstract_Structure_Visitor
 use procedures_dipolar_interactions_micro, only: set_fourier, reci_number_1_sym, reci_number_2_sym
 
 implicit none
 
 private
 
-    type, abstract, public :: Abstract_DES_Reci_Visitor
+    type, extends(Abstract_Structure_Visitor), abstract, public :: Abstract_DES_Reci_Visitor
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
         integer :: reci_numbers(num_dimensions)
