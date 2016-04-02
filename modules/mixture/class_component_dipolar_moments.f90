@@ -18,8 +18,8 @@ private
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
         procedure :: get_num => Abstract_get_num
-        procedure :: get => Abstract_get
         procedure :: get_norm => Abstract_get_norm
+        procedure :: get => Abstract_get
     end type Abstract_Component_Dipolar_Moments
 
     type, extends(Abstract_Component_Dipolar_Moments), public :: Concrete_Component_Dipolar_Moments
@@ -31,8 +31,8 @@ private
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
         procedure :: get_num => Null_get_num
-        procedure :: get => Null_get
         procedure :: get_norm => Null_get_norm
+        procedure :: get => Null_get
     end type Null_Component_Dipolar_Moments
 
 contains
@@ -61,6 +61,12 @@ contains
         num_moments = this%orientations%get_num()
     end function Abstract_get_num
 
+    pure real(DP) function Abstract_get_norm(this) result(norm)
+        class(Abstract_Component_Dipolar_Moments), intent(in) :: this
+
+        norm = this%norm
+    end function Abstract_get_norm
+
     pure function Abstract_get(this, i_particle) result(moment)
         class(Abstract_Component_Dipolar_Moments), intent(in) :: this
         integer, intent(in) :: i_particle
@@ -68,12 +74,6 @@ contains
 
         moment = this%norm * this%orientations%get(i_particle)
     end function Abstract_get
-
-    pure real(DP) function Abstract_get_norm(this) result(norm)
-        class(Abstract_Component_Dipolar_Moments), intent(in) :: this
-
-        norm = this%norm
-    end function Abstract_get_norm
 
 !end implementation Abstract_Component_Dipolar_Moments
 
@@ -94,17 +94,17 @@ contains
         num_moments = 0
     end function Null_get_num
 
+    pure real(DP) function Null_get_norm(this) result(norm)
+        class(Null_Component_Dipolar_Moments), intent(in) :: this
+        norm = 0._DP
+    end function Null_get_norm
+
     pure function Null_get(this, i_particle) result(moment)
         class(Null_Component_Dipolar_Moments), intent(in) :: this
         integer, intent(in) :: i_particle
         real(DP) :: moment(num_dimensions)
         moment = 0._DP
     end function Null_get
-
-    pure real(DP) function Null_get_norm(this) result(norm)
-        class(Null_Component_Dipolar_Moments), intent(in) :: this
-        norm = 0._DP
-    end function Null_get_norm
 
 !end implementation Null_Component_Dipolar_Moments
 

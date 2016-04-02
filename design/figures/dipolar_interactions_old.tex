@@ -1,6 +1,12 @@
-\begin{scope}[shift={($(Component.north) + (42 cm, 55 cm)$)}]
-    \begin{package}{Dipolar interactions}
-    
+\documentclass{standalone}
+
+\input figures/figures.sty
+
+\renewcommand{\familydefault}{\sfdefault}
+\begin{document}
+
+    \begin{tikzpicture}
+
         \begin{scope}[local bounding box=DipolarInteraction]
             \begin{class}[text width=\largeTextWidth]{DipolarInteractionFacade}{0, 8}
                 \operation{totalEnergy() : double}
@@ -17,7 +23,7 @@
                 \operation{soloField(particle : Particle) : double[3]}
                 \operation{testField(particle : Particle) : double[3]}
             \end{class}
-            
+
             \begin{abstractclass}[text width=\largeTextWidth]{DipolarInteraction}{0, 0}
                 \operation[0]{totalEnergy() : double}
                 \operation[0]{totalEnergyUsingField() : double}
@@ -28,7 +34,7 @@
                 \operation[0]{soloField(particle : Particle) : double[3]}
                 \operation[0]{testField(particle : Particle) : double[3]}
             \end{abstractclass}
-            
+
             \begin{abstractclass}[text width=\largeTextWidth]{ReciInteraction}{0, -6}
                 \inherit{DipolarInteraction}
                 \operation[0]{moveUpdate(old : Particle, new : Particle)}
@@ -37,30 +43,30 @@
                 \operation[0]{volumeChangeRestoration(dilatation : double)}
             \end{abstractclass}
         \end{scope}
-        
+
         \begin{scope}[shift={($(DipolarInteraction.south) + (-19.5 cm, -5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{EwaldRealComponent}{0, 0}
                 \operation{construct(periodicBox\type{PeriodicBox},
-                    componentPositions\type{ComponentCoordinates},
+                    positions\type{ComponentCoordinates},
                     dipolarMoments\type{Coordinates},
                     ewaldRealPair\type{EwaldRealPair})}
                 \operation{destroy()}
-                \operation{visit(energy\type{double}, particle\type{Particle},
+                \operation{visit(energy\type{real}, particle\type{Particle},
                     ewaldRealPair\type{EwaldRealPair})}
-                \operation{visit(field\type{double[3]}, particle\type{Particle},
+                \operation{visit(field\type{real[3]}, particle\type{Particle},
                     ewaldRealPair\type{EwaldRealPair})}
             \end{abstractclass}
         \end{scope}
 
         \begin{scope}[shift={($(EwaldRealComponent.south) + (0 cm, -1.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{EwaldRealPair}{0, 0}
-                \operation{construct(domain\type{PotentialDomain}, alpha\type{double})}
+                \operation{construct(domain\type{PotentialDomain}, alpha\type{real})}
                 \operation{destroy()}
-                \operation{meet(vectorIJ\type{double[3]}, momentI\type{double[3]},
-                    momentJ\type{double[3]})\type{double}}
+                \operation{meet(vectorIJ\type{real[3]}, momentI\type{real[3]},
+                    momentJ\type{real[3]})\type{real}}
             \end{abstractclass}
         \end{scope}
-        
+
         \begin{scope}[shift={($(DipolarInteraction.south) + (-6.5 cm, -5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{EwaldReci}{0, 0}
                 \inherit{ReciInteraction}
@@ -80,18 +86,18 @@
                 \operation{soloField(particle : Particle) : double[3]}
                 \operation{testField(particle : Particle) : double[3]}
             }
-            
+
             \begin{class}[text width=\largeTextWidth]{NullEwaldReci}{0, -2}
                 \inherit{EwaldReci}
                 \operationsImplementation{}
             \end{class}
-            
+
             \begin{class}[text width=\largeTextWidth]{EwaldReci}{0, -9}
                 \inherit{EwaldReci}
                 \operationsImplementation{}
             \end{class}
         \end{scope}
-        
+
         \begin{scope}[shift={($(DipolarInteraction.south) + (6.5 cm, -5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{DipolarLayerCorrection}{0, 0}
                 \inherit{ReciInteraction}
@@ -111,18 +117,18 @@
                 \operation{soloField(particle : Particle) : double[3]}
                 \operation{testField(particle : Particle) : double[3]}
             }
-            
+
             \begin{class}[text width=\largeTextWidth]{NullDipolarLayerCorrection}{0, -2}
                 \inherit{DipolarLayerCorrection}
                 \operationsImplementation{}
             \end{class}
-            
+
             \begin{class}[text width=\largeTextWidth]{DipolarLayerCorrection}{0, -9}
                 \inherit{DipolarLayerCorrection}
                 \operationsImplementation{}
             \end{class}
         \end{scope}
-        
+
         \begin{scope}[shift={($(DipolarInteraction.south) + (19.5 cm, -5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{EwaldSelf}{0, 0}
                 \inherit{DipolarInteraction}
@@ -138,19 +144,19 @@
                 \operation{soloField(particle : Particle) : double[3]}
                 \operation{testField(particle : Particle) : double[3]}
             }
-            
+
             \begin{class}[text width=\largeTextWidth]{NullEwaldSelf}{0, -2}
                 \inherit{EwaldSelf}
                 \operationsImplementation{}
             \end{class}
-            
+
             \begin{class}[text width=\largeTextWidth]{EwaldSelf}{0, -7}
                 \inherit{EwaldSelf}
                 \operationsImplementation{}
             \end{class}
-            
+
         \end{scope}
-        
+
         \begin{scope}[shift={($(DipolarInteraction.south) + (32.5 cm, -5 cm)$)}]
             \begin{abstractclass}[text width=\largeTextWidth]{EwaldBound}{0, 0}
                 \inherit{DipolarInteraction}
@@ -166,12 +172,12 @@
                 \operation{soloField(particle : Particle) : double[3]}
                 \operation{testField(particle : Particle) : double[3]}
             }
-            
+
             \begin{class}[text width=\largeTextWidth]{NullEwaldBound}{0, -2}
                 \inherit{EwaldBound}
                 \operationsImplementation{}
             \end{class}
-            
+
             \begin{class}[text width=\largeTextWidth]{EwaldBound}{0, -7}
                 \inherit{EwaldBound}
                 \operationsImplementation{}
@@ -204,29 +210,29 @@
                 \operationsImplementation{}
             \end{class}
         \end{scope}
-    
-    \end{package}
-\end{scope}
 
-\begin{scope}[on background layer]
-    \aggregation{DipolarInteractionFacade}{ewaldReal}{2}{EwaldRealComponent}
-    \aggregation{DipolarInteractionFacade}{ewaldReci}{2}{EwaldReci}
-    \aggregation{DipolarInteractionFacade}{dlc}{2}{DipolarLayerCorrection}
-    \aggregation{DipolarInteractionFacade}{ewaldSelf}{1}{EwaldSelf}
-    \aggregation{DipolarInteractionFacade}{ewaldBound}{2}{EwaldBound}
+        \begin{scope}[on background layer]
+            \aggregation{DipolarInteractionFacade}{ewaldReal}{2}{EwaldRealComponent}
+            \aggregation{DipolarInteractionFacade}{ewaldReci}{2}{EwaldReci}
+            \aggregation{DipolarInteractionFacade}{dlc}{2}{DipolarLayerCorrection}
+            \aggregation{DipolarInteractionFacade}{ewaldSelf}{1}{EwaldSelf}
+            \aggregation{DipolarInteractionFacade}{ewaldBound}{2}{EwaldBound}
 
-    \aggregation{DipolarInteraction}{box}{1}{PeriodicBox}
+            %\aggregation{DipolarInteraction}{box}{1}{PeriodicBox}
 
-    %\aggregation{EwaldRealComponent}{dipSpheres}{1}{DipolarSpheres}
+            %\aggregation{EwaldRealComponent}{dipSpheres}{1}{DipolarSpheres}
 
-    %\aggregation{EwaldReci}{dipSpheres}{1}{DipolarSpheres}
+            %\aggregation{EwaldReci}{dipSpheres}{1}{DipolarSpheres}
 
-    %\aggregation{DipolarLayerCorrection}{dipSpheres}{1}{DipolarSpheres}
+            %\aggregation{DipolarLayerCorrection}{dipSpheres}{1}{DipolarSpheres}
 
-    %\aggregation{EwaldSelf}{dipSpheres}{1}{DipolarSpheres}
+            %\aggregation{EwaldSelf}{dipSpheres}{1}{DipolarSpheres}
 
-    \aggregation{EwaldBound}{totalMoment}{1}{ComponentTotalMoment}
+            %\aggregation{EwaldBound}{totalMoment}{1}{ComponentTotalMoment}
 
-    \aggregation{FieldInteraction}{totalMoment}{1}{ComponentTotalMoment}
-    \aggregation{FieldInteraction}{extField}{1}{ExternalField}
-\end{scope}[on background layer]
+            %\aggregation{FieldInteraction}{totalMoment}{1}{ComponentTotalMoment}
+            %\aggregation{FieldInteraction}{extField}{1}{ExternalField}
+        \end{scope}[on background layer]
+    \end{tikzpicture}
+
+\end{document}

@@ -1,0 +1,226 @@
+\documentclass{standalone}
+
+\input figures/figures.sty
+
+\renewcommand{\familydefault}{\sfdefault}
+\begin{document}
+
+    \begin{tikzpicture}[scale=\scale, every node/.style={scale=\scale}]
+
+        \begin{scope}
+            \begin{abstractclass}[text width=\mediumTextWidth]{DESconvergenceParameter}{0, 0}
+                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
+                    alphaXbox: \type{real}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{getBoxEdge}{}: \type{real}}
+                \operation{\procedure{get}{}: \type{real}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(DESconvergenceParameter.north) + (0 cm, 7 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{DESrealPair}{0, 0}
+                \operation[0]{\procedure{construct}{permittivity: \type{Permittivity},
+                    alpha: \type{DESconvergenceParameter}, domain: \type{DipolarPotentialDomain}}}
+                \operation[0]{\procedure{destroy}{}}
+                \operation[0]{\procedure{reset}{}}
+                \operation{\procedure{meet}{vectorIJ: \type{real[3]}, momentI: \type{real[3]},
+                    momentJ: \type{real[3]}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(DESrealPair.north) + (0 cm, 6 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{DESrealComponent}{0, 0}
+                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox,
+                    positions: \type{ComponentCoordinates},
+                    dipolarMoments: \type{ComponentDipolarMoments}, realPair: \type{DESrealPair}}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{visit}{energy: \type{real}, particle:
+                    \type{TemporaryParticle}, iExclude: \type{int}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(DESconvergenceParameter.south) - (0 cm, 4.5 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{DESselfComponent}{0, 0}
+                \operation{\procedure{construct}{permittivity: \type{Permittivity},
+                    dipolarMoments: \type{ComponentDipolarMoments},
+                    alpha: \type{DESconvergenceParameter}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{reset}{}}
+                \operation{\procedure{visit}{}: \type{real}}
+                \operation{\procedure{visitAdd}{?}: \type{real}}
+                \operation{\procedure{visitRemove}{?}: \type{real}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(DESselfComponent.south) - (0 cm, 3 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{DESsurfMixture}{0, 0}
+                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
+                    permittivity: \type{Permittivity}, totalMoment: \type{MixtureTotalMoment}}}
+                \operation{\procedure{destroy}{}}
+                \operation[0]{\procedure{visit}{}: \type{real}}
+                \operation[0]{\procedure{visitRotation}{iComponent: \type{int},
+                    newDipolarMoment: \type{real[3]},
+                    oldDipolarMoment: \type{real[3]}}: \type{real}}
+                \operation{\procedure{visitAdd}{iComponent: \type{int},
+                    dipolarMoment: \type{real[3]}}: \type{real}}
+                \operation{\procedure{visitRemove}{iComponent: \type{int},
+                    dipolarMoment: \type{real[3]}}: \type{real}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(DESselfComponent.north) + (11 cm, 0 cm)$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{StructureVisitor}{0, 0}
+                \operation[0]{\procedure{visit}{}: \type{real}}
+                \operation[0]{\procedure{visitMove}{iComponent: \type{int},
+                    newPosition: \type{real[3]},
+                    old: \type{TemporaryParticle}}: \type{real}}
+                \operation[0]{\procedure{visitRotation}{iComponent: \type{int},
+                    newDipolarMoment: \type{real[3]}, old: \type{TemporaryParticle}}: \type{real}}
+                \operation[0]{\procedure{visitAdd}{iComponent: \type{int},
+                    particle: \type{TemporaryParticle}}: \type{real}}
+                \operation[0]{\procedure{visitRemove}{iComponent: \type{int},
+                    particle: \type{TemporaryParticle}}: \type{real}}
+                \operation[0]{\procedure{visitSwitch}{ijComponents: \type{int[2]},
+                    particles: \type{TemporaryParticle[2]}}: \type{real}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(DESconvergenceParameter.north -| StructureVisitor)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{DESreciVisitor}{0, 0}
+                \inherit{StructureVisitor}
+                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
+                    reciprocalLattice: \type{ReciprocalLattice}, weight: \type{DESreciWeight},
+                    structure: \type{DESreciStructure}}}
+                \operation{\procedure{destroy}{}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(DESsurfMixture.north -| StructureVisitor)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{DLCvisitor}{0, 0}
+                \inherit{StructureVisitor}
+                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
+                    reciprocalLattice: \type{ReciprocalLattice}, weight: \type{DLCweight},
+                    structures: \type{DLCstructures}}}
+                \operation{\procedure{destroy}{}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(DESrealPair.north -| DESreciVisitor)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{DESreciWeight}{0, 0}
+                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
+                    reciprocalLattice: \type{ReciprocalLattice}, permittivity: \type{Permittivity},
+                    alpha: \type{DESconvergenceParameter}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{reset}{}}
+                \operation{\procedure{get}{n1: \type{int}, n2: \type{int}, n3: \type{int}}:
+                    \type{real}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(DESrealComponent.north -| DESreciWeight)$)}]
+            \begin{abstractclass}[text width=\largeTextWidth]{DESrealVisitor}{0, 0}
+                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{visitIntra}{energy: \type{real},
+                    positions: \type{ComponentCoordinates},
+                    dipolarMoments: \type{ComponentDipolarMoments}, realPair: \type{DESrealPair}}}
+                \operation{\procedure{visitInter}{energy: \type{real},
+                    positions1: \type{ComponentCoordinates},
+                    dipolarMoments1: \type{ComponentDipolarMoments},
+                    positions2: \type{ComponentCoordinates},
+                    dipolarMoments2: \type{ComponentDipolarMoments}, realPair: \type{DESrealPair}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(DLCvisitor.south) - (0 cm, 1.5 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{DLCweight}{0, 0}
+                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
+                    reciprocalLattice: \type{ReciprocalLattice}, permittivity: \type{Permittivity}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{reset}{}}
+                \operation{\procedure{get}{n1: \type{int}, n2: \type{int}}: \type{real}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(StructureVisitor.north) + (11 cm, 0 cm)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{StructureFactor}{0, 0}
+                \operation[0]{\procedure{isDipolar}{iComponent: \type{int}}: \type{bool}}
+                \operation[0]{\procedure{updateMove}{iComponent: \type{int},
+                    newPosition: \type{real[3]}, old: \type{TemporaryParticle}}}
+                \operation[0]{\procedure{updateRotation}{iComponent: \type{int},
+                    newDipolarMoment: \type{real[3]}, old: \type{TemporaryParticle}}}
+                \operation[0]{\procedure{updateAdd}{iComponent: \type{int},
+                    particle: \type{TemporaryParticle}}}
+                \operation[0]{\procedure{updateRemove}{iComponent: \type{int},
+                    particle: \type{TemporaryParticle}}}
+                \operation[0]{\procedure{updateSwitch}{ijComponents: \type{int[2]},
+                    particles: \type{TemporaryParticle[2]}}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(DESreciVisitor.north -| StructureFactor)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{DESreciStructure}{0, 0}
+                \inherit{StructureFactor}
+                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
+                    reciprocalLattice: \type{ReciprocalLattice}, components: \type{Component[:]},
+                    areDipolar: \type{bool[:]}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{reset}{}}
+                \operation{\procedure{get}{n1: \type{int}, n2: \type{int}, n3: \type{int}}:
+                    \type{complex}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(DLCvisitor.north -| StructureFactor)$)}]
+            \begin{abstractclass}[text width=\mediumTextWidth]{DLCstructures}{0, 0}
+                \inherit{StructureFactor}
+                \operation{\procedure{construct}{periodicBox: \type{PeriodicBox},
+                    reciprocalLattice: \type{ReciprocalLattice}, components: \type{Component[:]},
+                    areDipolar: \type{bool[:]}}}
+                \operation{\procedure{destroy}{}}
+                \operation{\procedure{reset}{}}
+                \operation{\procedure{getPlus}{n1: \type{int}, n2: \type{int}}: \type{complex}}
+                \operation{\procedure{getMinus}{n1: \type{int}, n2: \type{int}}: \type{complex}}
+            \end{abstractclass}
+        \end{scope}
+
+        \begin{scope}[shift={($(DESreciWeight.north -| DESreciStructure)$)}]
+            \begin{class}[text width=\mediumTextWidth]{DipolarInteractions}{0, 0}
+                \attribute{alpha: \type{DESconvergenceParameter}}
+                \attribute{realVisitor: \type{DESrealVisitor}}
+                \attribute{realComponents: \type{DESrealComponent[:, :]}}
+                \attribute{realPairs: \type{DESrealPairs[:, :]}}
+                \attribute{reciWeight: \type{DESreciWeight}}
+                \attribute{reciStructure: \type{DESreciStructure}}
+                \attribute{reciVisitor: \type{DESreciVisitor}}
+                \attribute{selfComponents: \type{DESselfComponent[:]}}
+                \attribute{surfMixture: \type{DESsurfMixture}}
+                \attribute{dlcWeight: \type{DLCweight}}
+                \attribute{dlcStructures: \type{DLCstructures}}
+                \attribute{dlcVisitor: \type{DLCvisitor}}
+            \end{class}
+        \end{scope}
+
+        \begin{scope}[shift={($(DESrealVisitor.north -| DipolarInteractions)$)}]
+            \umlnote[text width=\mediumTextWidth]{\import{}::\\
+                \namespace{Environment} :: PeriodicBox, ReciprocalLattice, Permittivity\\
+                \namespace{Mixture} :: Component, MixtureTotalMoment, ComponentCoordinates,
+                    ComponentDipolarMoments, TemporaryParticle};
+        \end{scope}
+
+        \begin{scope}[on background layer]
+            \aggregation{DESrealComponent}{\refName{desRealPair}}{\numRef{1}}{DESrealPair}
+            \aggregation{DESrealPair}{\refName{alpha}}{\numRef{1}}{DESconvergenceParameter}
+
+            \aggregation{DESreciVisitor}{\refName{weight}}{\numRef{1}}{DESreciWeight}
+            \aggregation{DESreciVisitor}{\refName{structure}}{\numRef{1}}{DESreciStructure}
+            \aggregation{DESreciWeight}{\refName{alpha}}{\numRef{1}}{DESconvergenceParameter}
+
+            \aggregation{DESselfComponent}{\refName{alpha}}{\numRef{1}}{DESconvergenceParameter}
+            \aggregation{DLCvisitor}{\refName{weight}}{\numRef{1}}{DLCweight}
+            \aggregation{DLCvisitor}{\refName{structure}}{\numRef{1}}{DLCstructures}
+        \end{scope}
+
+    \end{tikzpicture}
+
+\end{document}

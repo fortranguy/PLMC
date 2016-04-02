@@ -22,7 +22,6 @@ private
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
         procedure :: reset => Abstract_set
-        procedure :: get_reci_numbers => Abstract_get_reci_numbers
         procedure :: get => Abstract_get
         procedure, private :: set => Abstract_set
     end type Abstract_DES_Reci_Weight
@@ -36,7 +35,6 @@ private
         procedure :: construct => Null_construct
         procedure :: destroy => Null_destroy
         procedure :: reset => Null_set
-        procedure :: get_reci_numbers => Null_get_reci_numbers
         procedure :: get => Null_get
     end type Null_DES_Reci_Weight
 
@@ -44,11 +42,11 @@ contains
 
 !implementation Abstract_DES_Reci_Weight
 
-    subroutine Abstract_construct(this, periodic_box, permittivity, reciprocal_lattice, alpha)
+    subroutine Abstract_construct(this, periodic_box, reciprocal_lattice, permittivity, alpha)
         class(Abstract_DES_Reci_Weight), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Permittivity), intent(in) :: permittivity
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
+        class(Abstract_Permittivity), intent(in) :: permittivity
         class(Abstract_DES_Convergence_Parameter), target, intent(in) :: alpha
 
         this%periodic_box => periodic_box
@@ -99,13 +97,6 @@ contains
         end do
     end subroutine Abstract_set
 
-    pure function Abstract_get_reci_numbers(this) result(reci_numbers)
-        class(Abstract_DES_Reci_Weight), intent(in) :: this
-        integer :: reci_numbers(num_dimensions)
-
-        reci_numbers = this%reci_numbers
-    end function Abstract_get_reci_numbers
-
     !> \[
     !>      w_\alpha(\vec{k}) =
     !>          \begin{cases}
@@ -124,11 +115,11 @@ contains
 
 !implementation Null_DES_Reci_Weight
 
-    subroutine Null_construct(this, periodic_box, permittivity, reciprocal_lattice, alpha)
+    subroutine Null_construct(this, periodic_box, reciprocal_lattice, permittivity, alpha)
         class(Null_DES_Reci_Weight), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Permittivity), intent(in) :: permittivity
         class(Abstract_Reciprocal_Lattice), intent(in) :: reciprocal_lattice
+        class(Abstract_Permittivity), intent(in) :: permittivity
         class(Abstract_DES_Convergence_Parameter), target, intent(in) :: alpha
     end subroutine Null_construct
 
@@ -139,12 +130,6 @@ contains
     pure subroutine Null_set(this)
         class(Null_DES_Reci_Weight), intent(inout) :: this
     end subroutine Null_set
-
-    pure function Null_get_reci_numbers(this) result(reci_numbers)
-        class(Null_DES_Reci_Weight), intent(in) :: this
-        integer :: reci_numbers(num_dimensions)
-        reci_numbers = 0
-    end function Null_get_reci_numbers
 
     pure real(DP) function Null_get(this, n_1, n_2, n_3) result(weight)
         class(Null_DES_Reci_Weight), intent(in) :: this

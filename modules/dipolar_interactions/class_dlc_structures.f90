@@ -6,13 +6,14 @@ use class_periodic_box, only: Abstract_Periodic_Box
 use class_reciprocal_lattice, only: Abstract_Reciprocal_Lattice
 use types_component_wrapper, only: Component_Wrapper
 use types_temporary_particle, only: Concrete_Temporary_Particle
+use class_structure_factor, only: Abstract_Structure_Factor
 use procedures_dipolar_interactions_micro, only: set_fourier, set_exp_kz, reci_number_1_sym
 
 implicit none
 
 private
 
-    type, abstract, public :: Abstract_DLC_Structures
+    type, extends(Abstract_Structure_Factor), abstract, public :: Abstract_DLC_Structures
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
         integer :: reci_numbers(2)

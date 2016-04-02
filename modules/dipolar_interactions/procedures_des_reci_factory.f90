@@ -92,8 +92,8 @@ contains
         else
             allocate(Null_DES_Reci_Weight :: weight)
         end if
-        call weight%construct(environment%periodic_box, environment%permittivity, environment%&
-            reciprocal_lattice, alpha)
+        call weight%construct(environment%periodic_box, environment%reciprocal_lattice, &
+            environment%permittivity, alpha)
     end subroutine create_weight
 
     subroutine destroy_weight(weight)

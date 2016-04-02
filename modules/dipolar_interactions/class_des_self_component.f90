@@ -12,11 +12,11 @@ private
 
     type, abstract, public :: Abstract_DES_Self_Component
     private
-        class(Abstract_Permittivity), pointer :: permittivity => null()
+        real(DP) :: permittivity
         class(Abstract_DES_Convergence_Parameter), pointer :: alpha => null()
         real(DP) :: apha_cube
         real(DP) :: factor_denominator
-        class(Abstract_Component_Dipolar_Moments), pointer :: component_dipolar_moment => null()
+        class(Abstract_Component_Dipolar_Moments), pointer :: component_dipolar_moments => null()
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
@@ -43,14 +43,14 @@ contains
 
 !implementation Abstract_DES_Self_Component
 
-    subroutine Abstract_construct(this, permittivity, component_dipolar_moment, alpha)
+    subroutine Abstract_construct(this, permittivity, component_dipolar_moments, alpha)
         class(Abstract_DES_Self_Component), intent(out) :: this
         class(Abstract_Permittivity), target, intent(in) :: permittivity
-        class(Abstract_Component_Dipolar_Moments), target, intent(in) :: component_dipolar_moment
+        class(Abstract_Component_Dipolar_Moments), target, intent(in) :: component_dipolar_moments
         class(Abstract_DES_Convergence_Parameter), target, intent(in) :: alpha
 
-        this%permittivity => permittivity
-        this%component_dipolar_moment => component_dipolar_moment
+        this%permittivity = permittivity%get()
+        this%component_dipolar_moments => component_dipolar_moments
         this%alpha => alpha
         call this%set()
     end subroutine Abstract_construct
@@ -59,15 +59,14 @@ contains
         class(Abstract_DES_Self_Component), intent(inout) :: this
 
         this%apha_cube = this%alpha%get()**3
-        this%factor_denominator = 6._DP * this%permittivity%get() * PI**(3._DP/2._DP)
+        this%factor_denominator = 6._DP * this%permittivity * PI**(3._DP/2._DP)
     end subroutine Abstract_set
 
     subroutine Abstract_destroy(this)
         class(Abstract_DES_Self_Component), intent(inout) :: this
 
         this%alpha => null()
-        this%component_dipolar_moment => null()
-        this%permittivity => null()
+        this%component_dipolar_moments => null()
     end subroutine Abstract_destroy
 
     pure real(DP) function Abstract_visit(this) result(energy)
@@ -76,8 +75,8 @@ contains
         integer :: i_particle
 
         energy = 0._DP
-        do i_particle = 1, this%component_dipolar_moment%get_num()
-            energy = energy + this%meet(this%component_dipolar_moment%get(i_particle))
+        do i_particle = 1, this%component_dipolar_moments%get_num()
+            energy = energy + this%meet(this%component_dipolar_moments%get(i_particle))
         end do
     end function Abstract_visit
 
@@ -93,10 +92,10 @@ contains
 
 !implementation Null_DES_Self_Component
 
-    subroutine Null_construct(this, permittivity, component_dipolar_moment, alpha)
+    subroutine Null_construct(this, permittivity, component_dipolar_moments, alpha)
         class(Null_DES_Self_Component), intent(out) :: this
         class(Abstract_Permittivity), target, intent(in) :: permittivity
-        class(Abstract_Component_Dipolar_Moments), target, intent(in) :: component_dipolar_moment
+        class(Abstract_Component_Dipolar_Moments), target, intent(in) :: component_dipolar_moments
         class(Abstract_DES_Convergence_Parameter), target, intent(in) :: alpha
     end subroutine Null_construct
 

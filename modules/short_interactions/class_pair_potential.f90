@@ -79,9 +79,8 @@ contains
 
 !implementation Abstract_Pair_Potential
 
-    pure function Abstract_get_max_distance(this) result(max_distance)
+    pure real(DP) function Abstract_get_max_distance(this) result(max_distance)
         class(Abstract_Pair_Potential), intent(in) :: this
-        real(DP) :: max_distance
 
         max_distance = this%domain%max
     end function Abstract_get_max_distance
@@ -219,9 +218,8 @@ contains
         class(Null_Pair_Potential), intent(inout) :: this
     end subroutine Null_destroy
 
-    pure function Null_get_max_distance(this) result(max_distance)
+    pure real(DP) function Null_get_max_distance(this) result(max_distance)
         class(Null_Pair_Potential), intent(in) :: this
-        real(DP) :: max_distance
         max_distance = 0._DP
     end function Null_get_max_distance
 

@@ -1,0 +1,114 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage[paper=A4, pagesize]{typearea}
+\usepackage{geometry}
+
+\usepackage{standalone}
+\def\buildMode{buildmissing}
+\input{figures/figures.sty}
+
+\usepackage{fullpage}
+\usepackage{pdflscape}
+%\usepackage{showframe}
+
+\usepackage{biblatex}
+\usepackage{graphicx}
+\bibliography{references}
+
+\title{Application of Object-Oriented Principles and Design Patterns in the architecture of
+    a Monte-Carlo simulation of liquids}
+\author{PLMC}
+\date{February 17, 2015 - \today{}}
+
+\begin{document}
+
+    \maketitle
+
+    \begin{abstract}
+        A classical Monte-Carlo simulation of liquids has a simple and well-defined structure:
+        1. Intialisation, 2. Iterations of move trial, 3. Results calculation.
+        However, some details may vary such as the geometry (e.g. Bulk / Slab),
+        the thermodynamic ensemble (e.g. Canonical / Grand canonical / Isobaric)
+        or the particles type and interactions (e.g. Hard or Soft Spheres /
+        Apolar or Dipolar Spheres).
+        This tension between constance and variability may be addressed by
+        the Object-Oriented paradigm (e.g. in Fortran, no kidding).
+        By following simple OOP principles, we notice the natural emergence of Design Patterns
+        in the architecture of our program.
+        Those patterns ensure that our simulation program will be robust yet flexible
+        to a certain extent.
+
+        However, compared to a procedural programming approach, object-oriented programming
+        may have more pitfalls.
+        For instance, the implementation is likely to be hindered if the overall design is
+        not well-defined in advance. Thus an effort must be made upstream.
+
+        The notion of \emph{interface} will be fundamental. It will define the general boundaries of
+        the program. And it will be the key to switch between local alternatives.
+    \end{abstract}
+
+    \begin{landscape}
+        \begin{figure}[htb]
+            \centering
+            \includestandalone[mode=\buildMode]{figures/environment}
+            \caption{\namespace{Environment}}
+        \end{figure}
+    \end{landscape}
+
+    \begin{landscape}
+        \begin{figure}[htb]
+            \centering
+            \includestandalone[mode=\buildMode]{figures/mixture}
+            \caption{\namespace{Mixture}}
+        \end{figure}
+    \end{landscape}
+
+    \begin{landscape}
+        \begin{figure}[htb]
+            \centering
+            \includestandalone[mode=\buildMode]{figures/changes}
+            \caption{\namespace{Changes}}
+        \end{figure}
+    \end{landscape}
+
+    \begin{landscape}
+        \begin{figure}[htb]
+            \centering
+            \includestandalone[mode=\buildMode]{figures/short_interactions}
+            \caption{\namespace{Short Interactions}}
+        \end{figure}
+    \end{landscape}
+
+    \clearpage
+    \thispagestyle{empty}
+    \KOMAoptions{paper=A3, pagesize}
+    \recalctypearea
+    \begin{figure}[htb]
+        \centering
+        \includestandalone[mode=\buildMode]{figures/dipolar_interactions}
+        \caption{\namespace{Dipolar Interactions}}
+    \end{figure}
+    \clearpage
+    \KOMAoptions{paper=A4, pagesize}
+    \restoregeometry
+    \recalctypearea
+
+    \begin{landscape}
+        \begin{figure}[htb]
+            \centering
+            \includestandalone[mode=\buildMode]{figures/observables}
+            \caption{\namespace{Observables}}
+        \end{figure}
+    \end{landscape}
+
+    \begin{landscape}
+        \begin{figure}[htb]
+            \centering
+            \includestandalone[mode=\buildMode]{figures/metropolis_algorithms}
+            \caption{\namespace{Metropolis Algorithms}}
+        \end{figure}
+    \end{landscape}
+
+    \nocite{*}
+    \printbibliography
+
+\end{document}

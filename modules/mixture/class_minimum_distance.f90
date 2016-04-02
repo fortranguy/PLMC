@@ -37,9 +37,8 @@ contains
         this%min_distance = min_distance
     end subroutine Abstract_set
 
-    pure function Abstract_get(this) result(min_distance)
+    pure real(DP) function Abstract_get(this) result(min_distance)
         class(Abstract_Minimum_Distance), intent(in) :: this
-        real(DP) :: min_distance
 
         min_distance = this%min_distance
     end function Abstract_get
@@ -53,9 +52,8 @@ contains
         real(DP), intent(in) :: min_distance
     end subroutine Null_set
 
-    pure function Null_get(this) result(min_distance)
+    pure real(DP) function Null_get(this) result(min_distance)
         class(Null_Minimum_Distance), intent(in) :: this
-        real(DP) :: min_distance
         min_distance = 0._DP
     end function Null_get
 
