@@ -49,7 +49,7 @@ implicit none
         changes, input_data)
     call plmc_destroy(input_data)
 
-    call plmc_visit(observables, mixture, short_interactions, dipolar_interactions)
+    call plmc_visit(observables, environment, mixture, short_interactions, dipolar_interactions)
     call plmc_write(-num_tuning_steps, writers, observables)
     if (num_tuning_steps > 0) write(output_unit, *) "Trying to tune changes..."
     do i_step = -num_tuning_steps + 1, 0
@@ -68,7 +68,7 @@ implicit none
     write(output_unit, *) "Iterations end."
     call plmc_reset(mixture%total_moment)
     call plmc_reset(dipolar_interactions)
-    call plmc_visit(observables, mixture, short_interactions, dipolar_interactions)
+    call plmc_visit(observables, environment, mixture, short_interactions, dipolar_interactions)
     call plmc_write(i_step-1, writers, observables)
 
     call plmc_destroy(writers)

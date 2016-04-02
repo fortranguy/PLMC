@@ -267,11 +267,11 @@ contains
         end select
     end function component_has_orientations
 
-    pure logical function component_is_dipolar_from_dipolar_moments(component_dipolar_moments) &
+    pure logical function component_is_dipolar_from_dipolar_moments(dipolar_moments) &
         result(component_is_dipolar)
-        class(Abstract_Component_Dipolar_Moments), intent(in) :: component_dipolar_moments
+        class(Abstract_Component_Dipolar_Moments), intent(in) :: dipolar_moments
 
-        select type (component_dipolar_moments)
+        select type (dipolar_moments)
             type is (Concrete_Component_Dipolar_Moments)
                 component_is_dipolar = .true.
             class default

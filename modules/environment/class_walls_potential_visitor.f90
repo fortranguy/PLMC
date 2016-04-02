@@ -46,11 +46,11 @@ contains
         this%walls_potential => null()
     end subroutine Abstract_destroy
 
-    pure subroutine Abstract_visit(this, overlap, energy, component_positions, pair_potential)
+    pure subroutine Abstract_visit(this, overlap, energy, positions, pair_potential)
         class(Abstract_Walls_Potential_Visitor), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
-        class(Abstract_Component_Coordinates), intent(in) :: component_positions
+        class(Abstract_Component_Coordinates), intent(in) :: positions
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
 
         real(DP) :: energy_i
@@ -58,8 +58,8 @@ contains
 
         overlap = .false.
         energy = 0._DP
-        do i_particle = 1, component_positions%get_num()
-            call this%walls_potential%visit(overlap, energy_i, component_positions%&
+        do i_particle = 1, positions%get_num()
+            call this%walls_potential%visit(overlap, energy_i, positions%&
                 get(i_particle), pair_potential)
             if (overlap) return
             energy = energy + energy_i
@@ -79,11 +79,11 @@ contains
         class(Null_Walls_Potential_Visitor), intent(inout) :: this
     end subroutine Null_destroy
 
-    pure subroutine Null_visit(this, overlap, energy, component_positions, pair_potential)
+    pure subroutine Null_visit(this, overlap, energy, positions, pair_potential)
         class(Null_Walls_Potential_Visitor), intent(in) :: this
         logical, intent(out) :: overlap
         real(DP), intent(out) :: energy
-        class(Abstract_Component_Coordinates), intent(in) :: component_positions
+        class(Abstract_Component_Coordinates), intent(in) :: positions
         class(Abstract_Pair_Potential), intent(in) :: pair_potential
         overlap = .false.
         energy = 0._DP

@@ -15,7 +15,7 @@ private
     type, abstract, public :: Abstract_Visitable_List
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box
-        class(Abstract_Component_Coordinates), pointer :: component_positions
+        class(Abstract_Component_Coordinates), pointer :: positions
         type(Concrete_Linkable_Node), pointer :: beginning
     contains
         procedure :: construct => Abstract_construct
@@ -57,15 +57,15 @@ contains
 
 !implementation Abstract_Visitable_List
 
-    subroutine Abstract_construct(this, periodic_box, component_positions)
+    subroutine Abstract_construct(this, periodic_box, positions)
         class(Abstract_Visitable_List), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Component_Coordinates), target, intent(in) :: component_positions
+        class(Abstract_Component_Coordinates), target, intent(in) :: positions
 
         type(Concrete_Linkable_Node), pointer :: current => null(), next => null()
 
         this%periodic_box => periodic_box
-        this%component_positions => component_positions
+        this%positions => positions
 
         allocate(this%beginning)
         current => this%beginning
@@ -80,7 +80,7 @@ contains
         class(Abstract_Visitable_List), intent(inout) :: this
 
         call deallocate_list(this%beginning)
-        this%component_positions => null()
+        this%positions => null()
         this%periodic_box => null()
     end subroutine Abstract_destroy
 
@@ -124,7 +124,7 @@ contains
             next => current%next
             if (current%i /= i_exclude) then
                 distance = this%periodic_box%distance(particle%position, &
-                    this%component_positions%get(current%i))
+                    this%positions%get(current%i))
                 call pair_potential%meet(overlap, energy_i, distance)
                 if (overlap) return
                 energy = energy + energy_i
@@ -175,15 +175,15 @@ contains
 
 !implementation Concrete_Visitable_Array
 
-    subroutine Array_construct(this, periodic_box, component_positions)
+    subroutine Array_construct(this, periodic_box, positions)
         class(Concrete_Visitable_Array), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Component_Coordinates), target, intent(in) :: component_positions
+        class(Abstract_Component_Coordinates), target, intent(in) :: positions
 
         integer :: initial_size
 
         this%periodic_box => periodic_box
-        this%component_positions => component_positions
+        this%positions => positions
         this%num_nodes = 0
         initial_size = 1
         allocate(this%nodes(initial_size))
@@ -193,7 +193,7 @@ contains
         class(Concrete_Visitable_Array), intent(inout) :: this
 
         if (allocated(this%nodes)) deallocate(this%nodes)
-        this%component_positions => null()
+        this%positions => null()
         this%periodic_box => null()
     end subroutine Array_destroy
 
@@ -226,7 +226,7 @@ contains
         energy = 0._DP
         do i_node = 1, this%num_nodes
             if (this%nodes(i_node) == i_exclude) cycle
-            distance = this%periodic_box%distance(particle%position, this%component_positions%&
+            distance = this%periodic_box%distance(particle%position, this%positions%&
                 get(this%nodes(i_node)))
             call pair_potential%meet(overlap, energy_i, distance)
             if (overlap) return
@@ -262,10 +262,10 @@ contains
 
 !implementation Null_Visitable_List
 
-    subroutine Null_construct(this, periodic_box, component_positions)
+    subroutine Null_construct(this, periodic_box, positions)
         class(Null_Visitable_List), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Component_Coordinates), target, intent(in) :: component_positions
+        class(Abstract_Component_Coordinates), target, intent(in) :: positions
     end subroutine Null_construct
 
     subroutine Null_destroy(this)

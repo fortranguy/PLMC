@@ -15,8 +15,8 @@ private
     type, abstract, public :: Abstract_DES_Real_Component
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
-        class(Abstract_Component_Coordinates), pointer :: component_positions => null()
-        class(Abstract_Component_Dipolar_Moments), pointer :: component_dipolar_moments => null()
+        class(Abstract_Component_Coordinates), pointer :: positions => null()
+        class(Abstract_Component_Dipolar_Moments), pointer :: dipolar_moments => null()
         class(Abstract_DES_Real_Pair), pointer :: des_real_pair => null()
     contains
         procedure :: construct => Abstract_construct
@@ -42,17 +42,16 @@ contains
 
 !implementation Abstract_DES_Real_Component
 
-    subroutine Abstract_construct(this, periodic_box, component_positions, &
-        component_dipolar_moments, des_real_pair)
+    subroutine Abstract_construct(this, periodic_box, positions, dipolar_moments, des_real_pair)
         class(Abstract_DES_Real_Component), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Component_Coordinates), target, intent(in) :: component_positions
-        class(Abstract_Component_Dipolar_Moments), target, intent(in) :: component_dipolar_moments
+        class(Abstract_Component_Coordinates), target, intent(in) :: positions
+        class(Abstract_Component_Dipolar_Moments), target, intent(in) :: dipolar_moments
         class(Abstract_DES_Real_Pair), target, intent(in) :: des_real_pair
 
         this%periodic_box => periodic_box
-        this%component_positions => component_positions
-        this%component_dipolar_moments => component_dipolar_moments
+        this%positions => positions
+        this%dipolar_moments => dipolar_moments
         this%des_real_pair => des_real_pair
     end subroutine Abstract_construct
 
@@ -60,8 +59,8 @@ contains
         class(Abstract_DES_Real_Component), intent(inout) :: this
 
         this%des_real_pair => null()
-        this%component_dipolar_moments => null()
-        this%component_positions => null()
+        this%dipolar_moments => null()
+        this%positions => null()
         this%periodic_box => null()
     end subroutine Abstract_destroy
 
@@ -75,12 +74,12 @@ contains
         integer :: j_particle
 
         energy = 0._DP
-        do j_particle = 1, this%component_positions%get_num()
+        do j_particle = 1, this%positions%get_num()
             if (j_particle == i_exclude) cycle
-            vector_ij = this%periodic_box%vector(particle%position, this%component_positions%&
+            vector_ij = this%periodic_box%vector(particle%position, this%positions%&
                 get(j_particle))
             energy = energy + this%des_real_pair%meet(vector_ij, particle%dipolar_moment, &
-                this%component_dipolar_moments%get(j_particle))
+                this%dipolar_moments%get(j_particle))
         end do
     end subroutine Abstract_visit_energy
 
@@ -94,12 +93,10 @@ contains
         integer :: j_particle
 
         field = 0._DP
-        do j_particle = 1, this%component_positions%get_num()
+        do j_particle = 1, this%positions%get_num()
             if (j_particle == i_exclude) cycle
-            vector_ij = this%periodic_box%vector(particle%position, this%component_positions%&
-                get(j_particle))
-            field = field + this%des_real_pair%meet(vector_ij, this%component_dipolar_moments%&
-                get(j_particle))
+            vector_ij = this%periodic_box%vector(particle%position, this%positions%get(j_particle))
+            field = field + this%des_real_pair%meet(vector_ij, this%dipolar_moments%get(j_particle))
         end do
     end subroutine Abstract_visit_field
 
@@ -107,12 +104,11 @@ contains
 
 !implementation Null_DES_Real_Component
 
-    subroutine Null_construct(this, periodic_box, component_positions, component_dipolar_moments, &
-        des_real_pair)
+    subroutine Null_construct(this, periodic_box, positions, dipolar_moments, des_real_pair)
         class(Null_DES_Real_Component), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
-        class(Abstract_Component_Coordinates), target, intent(in) :: component_positions
-        class(Abstract_Component_Dipolar_Moments), target, intent(in) :: component_dipolar_moments
+        class(Abstract_Component_Coordinates), target, intent(in) :: positions
+        class(Abstract_Component_Dipolar_Moments), target, intent(in) :: dipolar_moments
         class(Abstract_DES_Real_Pair), target, intent(in) :: des_real_pair
     end subroutine Null_construct
 

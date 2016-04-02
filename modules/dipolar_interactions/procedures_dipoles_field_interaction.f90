@@ -9,24 +9,24 @@ use types_temporary_particle, only: Concrete_Temporary_Particle
 implicit none
 
 private
-public :: dipoles_field_visit, dipoles_field_visit_move, dipoles_field_visit_rotation
+public :: dipoles_field_visit_component, dipoles_field_visit_move, dipoles_field_visit_rotation
 
 contains
 
-    pure real(DP) function dipoles_field_visit(external_field, component_dipolar_moments, &
-        component_positions) result(energy)
+    pure real(DP) function dipoles_field_visit_component(external_field, positions, &
+        dipolar_moments) result(energy)
         class(Abstract_External_Field), intent(in) :: external_field
-        class(Abstract_Component_Dipolar_Moments), intent(in) :: component_dipolar_moments
-        class(Abstract_Component_Coordinates), intent(in) :: component_positions
+        class(Abstract_Component_Coordinates), intent(in) :: positions
+        class(Abstract_Component_Dipolar_Moments), intent(in) :: dipolar_moments
 
         integer :: i_particle
 
         energy = 0
-        do i_particle = 1, component_dipolar_moments%get_num()
-            energy = energy -dot_product(component_dipolar_moments%get(i_particle), external_field%&
-                get(component_positions%get(i_particle)))
+        do i_particle = 1, dipolar_moments%get_num()
+            energy = energy - dot_product(dipolar_moments%get(i_particle), external_field%&
+                get(positions%get(i_particle)))
         end do
-    end function dipoles_field_visit
+    end function dipoles_field_visit_component
 
     pure real(DP) function dipoles_field_visit_move(external_field, new_position, old) &
         result(delta_energy)
@@ -47,5 +47,14 @@ contains
         delta_energy = -dot_product(new_dipolar_moment - old%dipolar_moment, external_field%&
             get(old%position))
     end function dipoles_field_visit_rotation
+
+    pure real(DP) function dipoles_field_visit_switch(external_field, particles) &
+        result(delta_energy)
+        class(Abstract_External_Field), intent(in) :: external_field
+        type(Concrete_Temporary_Particle), intent(in) :: particles(:)
+
+        delta_energy = dot_product(particles(2)%dipolar_moment - particles(1)%dipolar_moment, &
+            external_field%get(particles(2)%position) - external_field%get(particles(1)%position))
+    end function dipoles_field_visit_switch
 
 end module procedures_dipoles_field_interaction

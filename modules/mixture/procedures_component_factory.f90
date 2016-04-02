@@ -106,22 +106,22 @@ contains
         if (allocated(component_number)) deallocate(component_number)
     end subroutine destroy_number
 
-    subroutine create_positions(component_positions, exists, periodic_box, component_number)
-        class(Abstract_Component_Coordinates), allocatable, intent(out) :: component_positions
+    subroutine create_positions(positions, exists, periodic_box, component_number)
+        class(Abstract_Component_Coordinates), allocatable, intent(out) :: positions
         logical, intent(in) :: exists
         class(Abstract_Periodic_Box), intent(in) :: periodic_box
         class(Abstract_Component_Number), intent(in) :: component_number
 
         if (exists) then
-            allocate(Concrete_Component_Positions :: component_positions)
+            allocate(Concrete_Component_Positions :: positions)
         else
-            allocate(Null_Component_Coordinates :: component_positions)
+            allocate(Null_Component_Coordinates :: positions)
         end if
-        select type (component_positions)
+        select type (positions)
             type is (Concrete_Component_Positions)
-                call component_positions%construct(periodic_box, component_number)
+                call positions%construct(periodic_box, component_number)
             type is (Null_Component_Coordinates)
-                call component_positions%construct()
+                call positions%construct()
         end select
     end subroutine create_positions
 
@@ -176,10 +176,10 @@ contains
         deallocate(filename)
     end subroutine set_coordinates
 
-    subroutine create_dipolar_moments(component_dipolar_moments, is_dipolar, &
+    subroutine create_dipolar_moments(dipolar_moments, is_dipolar, &
         component_orientations, input_data, prefix)
         class(Abstract_Component_Dipolar_Moments), allocatable, intent(out) :: &
-            component_dipolar_moments
+            dipolar_moments
         logical, intent(in) :: is_dipolar
         class(Abstract_Component_Coordinates), intent(in) :: component_orientations
         type(json_file), intent(inout) :: input_data
@@ -193,21 +193,21 @@ contains
             data_field = prefix//"moment norm"
             call input_data%get(data_field, moment_norm, data_found)
             call check_data_found(data_field, data_found)
-            allocate(Concrete_Component_Dipolar_Moments :: component_dipolar_moments)
+            allocate(Concrete_Component_Dipolar_Moments :: dipolar_moments)
         else
             moment_norm = 0._DP
-            allocate(Null_Component_Dipolar_Moments :: component_dipolar_moments)
+            allocate(Null_Component_Dipolar_Moments :: dipolar_moments)
         end if
-        call component_dipolar_moments%construct(moment_norm, component_orientations)
+        call dipolar_moments%construct(moment_norm, component_orientations)
     end subroutine create_dipolar_moments
 
-    subroutine destroy_dipolar_moments(component_dipolar_moments)
+    subroutine destroy_dipolar_moments(dipolar_moments)
         class(Abstract_Component_Dipolar_Moments), allocatable, intent(inout) :: &
-            component_dipolar_moments
+            dipolar_moments
 
-        if (allocated(component_dipolar_moments)) then
-            call component_dipolar_moments%destroy()
-            deallocate(component_dipolar_moments)
+        if (allocated(dipolar_moments)) then
+            call dipolar_moments%destroy()
+            deallocate(dipolar_moments)
         end if
     end subroutine destroy_dipolar_moments
 
