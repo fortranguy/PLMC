@@ -14,7 +14,7 @@ private
     private
         class(Abstract_Periodic_Box), pointer :: periodic_box => null()
         real(DP) :: permittivity
-        class(Abstract_Mixture_Total_Moment), pointer :: mixture_total_moment => null()
+        class(Abstract_Mixture_Total_Moment), pointer :: total_moment => null()
     contains
         procedure :: construct => Abstract_construct
         procedure :: destroy => Abstract_destroy
@@ -74,21 +74,21 @@ contains
 
 !implementation Abstract_DES_Surf_Mixture
 
-    subroutine Abstract_construct(this, periodic_box, permittivity, mixture_total_moment)
+    subroutine Abstract_construct(this, periodic_box, permittivity, total_moment)
         class(Abstract_DES_Surf_Mixture), intent(out) :: this
         class(Abstract_Periodic_Box), target, intent(in) :: periodic_box
         class(Abstract_Permittivity), intent(in) :: permittivity
-        class(Abstract_Mixture_Total_Moment), target, intent(in) :: mixture_total_moment
+        class(Abstract_Mixture_Total_Moment), target, intent(in) :: total_moment
 
         this%periodic_box => periodic_box
         this%permittivity = permittivity%get()
-        this%mixture_total_moment => mixture_total_moment
+        this%total_moment => total_moment
     end subroutine Abstract_construct
 
     subroutine Abstract_destroy(this)
         class(Abstract_DES_Surf_Mixture), intent(inout) :: this
 
-        this%mixture_total_moment => null()
+        this%total_moment => null()
         this%periodic_box => null()
     end subroutine Abstract_destroy
 
@@ -117,7 +117,7 @@ contains
         class(Spheric_DES_Surf_Mixture), intent(in) :: this
 
         energy = 1._DP/6._DP/this%permittivity / product(this%periodic_box%get_size()) * &
-            dot_product(this%mixture_total_moment%get(), this%mixture_total_moment%get())
+            dot_product(this%total_moment%get(), this%total_moment%get())
     end function Spheric_visit
 
     !> \[
@@ -135,13 +135,13 @@ contains
         real(DP), intent(in) :: new_dipolar_moment(:), old_dipolar_moment(:)
 
         delta_energy = 0._DP
-        if (.not.this%mixture_total_moment%is_dipolar(i_component)) return
+        if (.not.this%total_moment%is_dipolar(i_component)) return
 
         delta_energy = 1._DP/6._DP/this%permittivity / product(this%periodic_box%get_size()) * &
             (dot_product(new_dipolar_moment, new_dipolar_moment) - &
              dot_product(old_dipolar_moment, old_dipolar_moment) + &
              2._DP*dot_product(new_dipolar_moment - old_dipolar_moment, &
-                this%mixture_total_moment%get() - old_dipolar_moment))
+                this%total_moment%get() - old_dipolar_moment))
     end function Spheric_visit_rotation
 
     !> \[
@@ -156,11 +156,11 @@ contains
         real(DP), intent(in) :: dipolar_moment(:), signed
 
         delta_energy = 0._DP
-        if (.not.this%mixture_total_moment%is_dipolar(i_component)) return
+        if (.not.this%total_moment%is_dipolar(i_component)) return
 
         delta_energy = 1._DP/6._DP/this%permittivity / product(this%periodic_box%get_size()) * &
             dot_product(dipolar_moment, dipolar_moment) + &
-            signed*2._DP*dot_product(dipolar_moment, this%mixture_total_moment%get())
+            signed*2._DP*dot_product(dipolar_moment, this%total_moment%get())
     end function Spheric_visit_exchange
 
 !end implementation Spheric_DES_Surf_Mixture
@@ -173,7 +173,7 @@ contains
 
         real(DP) :: total_moment(num_dimensions)
 
-        total_moment = this%mixture_total_moment%get()
+        total_moment = this%total_moment%get()
         energy = 1._DP/2._DP/this%permittivity / product(this%periodic_box%get_size()) * &
             total_moment(3)**2
     end function Rectangular_visit
@@ -193,9 +193,9 @@ contains
         real(DP) :: total_moment(num_dimensions)
 
         delta_energy = 0._DP
-        if (.not.this%mixture_total_moment%is_dipolar(i_component)) return
+        if (.not.this%total_moment%is_dipolar(i_component)) return
 
-        total_moment = this%mixture_total_moment%get()
+        total_moment = this%total_moment%get()
         delta_energy = 1._DP/2._DP/this%permittivity / product(this%periodic_box%get_size()) * &
             (new_dipolar_moment(3)**2 - old_dipolar_moment(3)**2 + &
              2._DP*(new_dipolar_moment(3) - old_dipolar_moment(3)) * &
@@ -214,9 +214,9 @@ contains
         real(DP) :: total_moment(num_dimensions)
 
         delta_energy = 0._DP
-        if (.not.this%mixture_total_moment%is_dipolar(i_component)) return
+        if (.not.this%total_moment%is_dipolar(i_component)) return
 
-        total_moment = this%mixture_total_moment%get()
+        total_moment = this%total_moment%get()
         delta_energy = 1._DP/2._DP/this%permittivity / product(this%periodic_box%get_size()) * &
             (dipolar_moment(3)**2 + &
              signed*2._DP*dipolar_moment(3) * total_moment(3))

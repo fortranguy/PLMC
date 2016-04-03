@@ -37,6 +37,7 @@ interface writers_create
     module procedure :: create_coordinates
     module procedure :: create_components_changes
     module procedure :: create_changes
+    module procedure :: create_field
     module procedure :: create_walls
     module procedure :: create_switches
     module procedure :: create_short_energies
@@ -69,8 +70,8 @@ contains
 
         logical :: are_dipolar(size(components))
 
-        !todo: field to add
         call writers_create(writers%components, components, changes, input_data, prefix)
+        call writers_create(writers%field, components, "field_energies.out")
         call writers_create(writers%walls, wall_pairs, "walls_energies.out")
         call writers_create(writers%switches, components, "switches.out")
         call writers_create(writers%short_energies, short_pairs, "short_energies.out")
@@ -88,6 +89,7 @@ contains
         call writers_destroy(writers%short_energies)
         call writers_destroy(writers%switches)
         call writers_destroy(writers%walls)
+        call writers_destroy(writers%field)
         call writers_destroy(writers%components)
     end subroutine destroy_all
 
@@ -215,21 +217,39 @@ contains
         end if
     end subroutine destroy_changes
 
+    subroutine create_field(field, components, filename)
+        class(Abstract_Line_Writer), allocatable, intent(out) :: field
+        type(Component_Wrapper), intent(in) :: components(:)
+        character(len=*), intent(in) :: filename
+
+        logical :: selector(size(components))
+        integer :: i_component
+
+        do i_component = 1, size(selector)
+            selector(i_component) = component_is_dipolar(components(i_component)%dipolar_moments)
+        end do
+
+        if (any(selector)) then
+            allocate(Concrete_Line_Writer :: field)
+        else
+            allocate(Null_Line_Writer :: field)
+        end if
+        call field%construct(filename, selector)
+    end subroutine create_field
+
     subroutine create_walls(walls, wall_pairs, filename)
         class(Abstract_Line_Writer), allocatable, intent(out) :: walls
         type(Pair_Potential_Wrapper), intent(in) :: wall_pairs(:)
         character(len=*), intent(in) :: filename
 
-        logical :: selector(size(wall_pairs)), some_components_interact
+        logical :: selector(size(wall_pairs))
         integer :: i_component
 
-        some_components_interact = .false.
         do i_component = 1, size(wall_pairs)
             selector(i_component) = component_interacts_with_wall(wall_pairs(i_component)%potential)
-            some_components_interact = some_components_interact .or. selector(i_component)
         end do
 
-        if (some_components_interact) then
+        if (any(selector)) then
             allocate(Concrete_Line_Writer :: walls)
         else
             allocate(Null_Line_Writer :: walls)

@@ -8,7 +8,12 @@
             "temperature": 1.0
         },
         "External Field": {
-            "apply": false
+            "apply": true,
+            "name": "constant",
+            "vector": [0.0, 0.0, 1.0],
+            "Parallelepiped Domain": {
+                "name": "box"
+            }
         },
         "Permittivity": {
             "use": true,
@@ -54,7 +59,7 @@
             "number": 250,
             "minimum distance": 0.8,
             "is dipolar": true,
-            "moment norm": 1.0,
+            "moment norm": 3.0,
             "can exchange": false,
             "initial positions": "positions_3.in",
             "initial orientations": "orientations_3.in",
@@ -90,7 +95,7 @@
         "Component 2": {
             "name": "LJ",
             "tabulated": false,
-            "epsilon": 1.0,
+            "epsilon": 2.0,
             "sigma": 1.0,
             "maximum distance": 2.5,
             "With Walls": {
@@ -104,7 +109,7 @@
         "Component 3": {
             "name": "LJ",
             "tabulated": false,
-            "epsilon": 1.0,
+            "epsilon": 3.0,
             "sigma": 1.0,
             "maximum distance": 2.5,
             "With Walls": {

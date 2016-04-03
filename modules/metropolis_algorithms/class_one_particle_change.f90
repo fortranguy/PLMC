@@ -8,6 +8,8 @@ use types_temporary_particle, only: Concrete_Temporary_Particle
 use types_changes_component_wrapper, only: Changes_Component_Wrapper
 use types_short_interactions_wrapper, only: Short_Interactions_Wrapper
 use types_dipolar_interactions_wrapper, only: Dipolar_Interactions_Wrapper
+use procedures_dipoles_field_interaction, only: dipoles_field_visit_move, &
+    dipoles_field_visit_rotation
 use class_tower_sampler, only: Abstract_Tower_Sampler
 use module_changes_success, only: Concrete_Changes_Counter
 use types_observables_wrapper, only: Observables_Wrapper
@@ -34,6 +36,7 @@ private
         procedure :: get_num_choices => Abstract_get_num_choices
         procedure, private :: test_metropolis => Abstract_test_metropolis
         procedure(Abstract_define_change), private, deferred :: define_change
+        procedure(Abstract_visit_field), private, deferred :: visit_field
         procedure(Abstract_visit_walls), private, deferred :: visit_walls
         procedure(Abstract_visit_short), private, deferred :: visit_short
         procedure(Abstract_visit_dipolar), private, deferred :: visit_dipolar
@@ -50,6 +53,13 @@ private
             integer, intent(in) :: i_actor
             type(Concrete_Temporary_Particle), intent(out) :: new, old
         end subroutine Abstract_define_change
+
+        subroutine Abstract_visit_field(this, delta, new, old)
+        import :: DP, Concrete_Temporary_Particle, Abstract_One_Particle_Change
+            class(Abstract_One_Particle_Change), intent(in) :: this
+            real(DP), intent(out) :: delta
+            type(Concrete_Temporary_Particle), intent(in) :: new, old
+        end subroutine Abstract_visit_field
 
         subroutine Abstract_visit_walls(this, overlap, delta, i_actor, new, old)
         import :: DP, Concrete_Temporary_Particle, Abstract_One_Particle_Change
@@ -100,6 +110,7 @@ private
     type, extends(Abstract_One_Particle_Change), public :: Concrete_One_Particle_Move
     contains
         procedure, private :: define_change => Move_define_change
+        procedure, private :: visit_field => Move_visit_field
         procedure, private :: visit_walls => Move_visit_walls
         procedure, private :: visit_short => Move_visit_short
         procedure, private :: visit_dipolar => Move_visit_dipolar
@@ -111,6 +122,7 @@ private
     type, extends(Abstract_One_Particle_Change), public :: Concrete_One_Particle_Rotation
     contains
         procedure, private :: define_change => Rotation_define_change
+        procedure, private :: visit_field => Rotation_visit_field
         procedure, private :: visit_walls => Rotation_visit_walls
         procedure, private :: visit_short => Rotation_visit_short
         procedure, private :: visit_dipolar => Rotation_visit_dipolar
@@ -128,6 +140,7 @@ private
         procedure :: try => Null_try
         procedure, private :: test_metropolis => Null_test_metropolis
         procedure, private :: define_change => Null_define_change
+        procedure, private :: visit_field => Null_visit_field
         procedure, private :: visit_walls => Null_visit_walls
         procedure, private :: visit_short => Null_visit_short
         procedure, private :: visit_dipolar => Null_visit_dipolar
@@ -187,7 +200,7 @@ contains
         type(Observables_Wrapper), intent(inout) :: observables
 
         logical :: success
-        real(DP) :: walls_delta, field_energy
+        real(DP) :: field_delta, walls_delta
         real(DP) :: short_deltas(size(observables%short_energies)), &
             dipolar_deltas(size(observables%dipolar_energies))
         real(DP) :: dipolar_mixture_delta
@@ -195,9 +208,10 @@ contains
 
         i_actor = this%selector%get()
         call this%increment_hit(observables%changes_counters(i_actor))
-        call this%test_metropolis(success, walls_delta, short_deltas, dipolar_deltas, &
+        call this%test_metropolis(success, field_delta, walls_delta, short_deltas, dipolar_deltas,&
             dipolar_mixture_delta, i_actor)
         if (success) then
+            observables%field_energies(i_actor) = observables%field_energies(i_actor) + field_delta
             observables%walls_energies(i_actor) = observables%walls_energies(i_actor) + walls_delta
             call update_energies(observables%short_energies, short_deltas, i_actor)
             call update_energies(observables%dipolar_energies, dipolar_deltas, i_actor)
@@ -207,11 +221,11 @@ contains
         end if
     end subroutine Abstract_try
 
-    subroutine Abstract_test_metropolis(this, success, walls_delta, short_deltas, dipolar_deltas, &
-        dipolar_mixture_delta, i_actor)
+    subroutine Abstract_test_metropolis(this, success, field_delta, walls_delta, short_deltas, &
+        dipolar_deltas, dipolar_mixture_delta, i_actor)
         class(Abstract_One_Particle_Change), intent(in) :: this
         logical, intent(out) :: success
-        real(DP), intent(out) :: walls_delta
+        real(DP), intent(out) :: field_delta, walls_delta
         real(DP), intent(out) :: short_deltas(:), dipolar_deltas(:)
         real(DP), intent(out) :: dipolar_mixture_delta
         integer, intent(in) :: i_actor
@@ -224,13 +238,15 @@ contains
         call this%define_change(i_actor, new, old)
 
         success = .false.
+        call this%visit_field(field_delta, new, old)
         call this%visit_walls(overlap, walls_delta, i_actor, new, old)
         if (overlap) return
         call this%visit_short(overlap, short_deltas, i_actor, new, old)
         if (overlap) return
         call this%visit_dipolar(dipolar_deltas, dipolar_mixture_delta, i_actor, new, old)
 
-        energy_delta = walls_delta + sum(short_deltas + dipolar_deltas) + dipolar_mixture_delta
+        energy_delta = field_delta + walls_delta + sum(short_deltas + dipolar_deltas) + &
+            dipolar_mixture_delta
         call random_number(rand)
         if (rand < exp(-energy_delta/this%environment%temperature%get())) then
             call this%update_actor(i_actor, new, old)
@@ -256,6 +272,14 @@ contains
         new%orientation = old%orientation
         new%dipolar_moment = old%dipolar_moment
     end subroutine Move_define_change
+
+    subroutine Move_visit_field(this, delta, new, old)
+        class(Concrete_One_Particle_Move), intent(in) :: this
+        real(DP), intent(out) :: delta
+        type(Concrete_Temporary_Particle), intent(in) :: new, old
+
+        delta = dipoles_field_visit_move(this%environment%external_field, new%position, old)
+    end subroutine Move_visit_field
 
     subroutine Move_visit_walls(this, overlap, delta, i_actor, new, old)
         class(Concrete_One_Particle_Move), intent(in) :: this
@@ -368,6 +392,15 @@ contains
             orientation
     end subroutine Rotation_define_change
 
+    subroutine Rotation_visit_field(this, delta, new, old)
+        class(Concrete_One_Particle_Rotation), intent(in) :: this
+        real(DP), intent(out) :: delta
+        type(Concrete_Temporary_Particle), intent(in) :: new, old
+
+        delta = dipoles_field_visit_rotation(this%environment%external_field, new%dipolar_moment, &
+            old)
+    end subroutine Rotation_visit_field
+
     subroutine Rotation_visit_walls(this, overlap, delta, i_actor, new, old)
         class(Concrete_One_Particle_Rotation), intent(in) :: this
         logical, intent(out) :: overlap
@@ -470,11 +503,11 @@ contains
         type(Observables_Wrapper), intent(inout) :: observables
     end subroutine Null_try
 
-    subroutine Null_test_metropolis(this, success, walls_delta, short_deltas, dipolar_deltas, &
-        dipolar_mixture_delta, i_actor)
+    subroutine Null_test_metropolis(this, success, field_delta, walls_delta, short_deltas, &
+        dipolar_deltas, dipolar_mixture_delta, i_actor)
         class(Null_One_Particle_Change), intent(in) :: this
         logical, intent(out) :: success
-        real(DP), intent(out) :: walls_delta
+        real(DP), intent(out) :: field_delta, walls_delta
         real(DP), intent(out) :: short_deltas(:), dipolar_deltas(:)
         real(DP), intent(out) :: dipolar_mixture_delta
         integer, intent(in) :: i_actor
@@ -490,6 +523,13 @@ contains
          new%i = 0; new%position = 0._DP; new%orientation = 0._DP; new%dipolar_moment = 0._DP
          old%i = 0; old%position = 0._DP; old%orientation = 0._DP; old%dipolar_moment = 0._DP
      end subroutine Null_define_change
+
+     subroutine Null_visit_field(this, delta, new, old)
+        class(Null_One_Particle_Change), intent(in) :: this
+        real(DP), intent(out) :: delta
+        type(Concrete_Temporary_Particle), intent(in) :: new, old
+        delta = 0._DP
+    end subroutine Null_visit_field
 
      subroutine Null_visit_walls(this, overlap, delta, i_actor, new, old)
          class(Null_One_Particle_Change), intent(in) :: this
