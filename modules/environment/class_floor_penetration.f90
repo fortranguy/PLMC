@@ -25,30 +25,27 @@ private
 
     end interface
 
-    type, extends(Abstract_Floor_Penetration), public :: Null_Floor_Penetration
-    contains
-        procedure :: meet => Null_meet
-    end type Null_Floor_Penetration
-
     type, extends(Abstract_Floor_Penetration), public :: Flat_Floor_Penetration
     contains
         procedure :: meet => Flat_meet
     end type Flat_Floor_Penetration
 
+    type, extends(Abstract_Floor_Penetration), public :: Centered_Block_Penetration
+    private
+        real(DP), dimension(2) :: size
+        real(DP) :: corner_radius
+        real(DP), dimension(2) :: lower_in, lower_out, upper_in, upper_out ! left centers
+    contains
+        procedure :: set => Block_set
+        procedure :: meet => Block_meet
+    end type Centered_Block_Penetration
+
+    type, extends(Abstract_Floor_Penetration), public :: Null_Floor_Penetration
+    contains
+        procedure :: meet => Null_meet
+    end type Null_Floor_Penetration
+
 contains
-
-!implementation Null_Floor_Penetration
-
-    pure subroutine Null_meet(this, overlap, shortest_vector_from_floor, position_from_floor)
-        class(Null_Floor_Penetration), intent(in) :: this
-        logical, intent(out) :: overlap
-        real(DP), intent(out) :: shortest_vector_from_floor(num_dimensions)
-        real(DP), intent(in) :: position_from_floor(num_dimensions)
-        shortest_vector_from_floor = 0._DP
-        overlap = .false.
-    end subroutine Null_meet
-
-!end implementation Null_Floor_Penetration
 
 !implementation Flat_Floor_Penetration
 
@@ -67,5 +64,33 @@ contains
     end subroutine Flat_meet
 
 !end implementation Flat_Floor_Penetration
+
+!implementation Centered_Block_Penetration
+
+    subroutine Block_set(this)
+        class(Centered_Block_Penetration), intent(out) :: this
+    end subroutine Block_set
+
+    pure subroutine Block_meet(this, overlap, shortest_vector_from_floor, position_from_floor)
+        class(Centered_Block_Penetration), intent(in) :: this
+        logical, intent(out) :: overlap
+        real(DP), intent(out) :: shortest_vector_from_floor(num_dimensions)
+        real(DP), intent(in) :: position_from_floor(num_dimensions)
+    end subroutine Block_meet
+
+!implementation Centered_Block_Penetration
+
+!implementation Null_Floor_Penetration
+
+    pure subroutine Null_meet(this, overlap, shortest_vector_from_floor, position_from_floor)
+        class(Null_Floor_Penetration), intent(in) :: this
+        logical, intent(out) :: overlap
+        real(DP), intent(out) :: shortest_vector_from_floor(num_dimensions)
+        real(DP), intent(in) :: position_from_floor(num_dimensions)
+        shortest_vector_from_floor = 0._DP
+        overlap = .false.
+    end subroutine Null_meet
+
+!end implementation Null_Floor_Penetration
 
 end module class_floor_penetration
