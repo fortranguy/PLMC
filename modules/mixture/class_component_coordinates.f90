@@ -2,7 +2,7 @@ module class_component_coordinates
 
 use, intrinsic :: iso_fortran_env, only: DP => REAL64, error_unit
 use data_constants, only: num_dimensions
-use procedures_checks, only: check_in_range, check_3d_array, check_positive, check_norm
+use procedures_checks, only: check_in_range, check_array_size, check_positive, check_norm
 use class_periodic_box, only: Abstract_Periodic_Box
 use class_component_number, only: Abstract_Component_Number
 use class_coordinates, only: Abstract_Coordinates
@@ -149,7 +149,7 @@ contains
 
         call check_in_range("Concrete_Component_Positions: set", this%number%get(), &
             "i_particle", i_particle)
-        call check_3d_array("Concrete_Component_Positions: set", "vector", vector)
+        call check_array_size("Concrete_Component_Positions: set", "vector", vector, num_dimensions)
         this%coordinates(:, i_particle) = this%periodic_box%folded(vector)
     end subroutine Positions_set
 
@@ -181,7 +181,8 @@ contains
 
         call check_in_range("Concrete_Component_Orientations: set", this%number%get(), &
             "i_particle", i_particle)
-        call check_3d_array("Concrete_Component_Orientations: set", "vector", vector)
+        call check_array_size("Concrete_Component_Orientations: set", "vector", vector, &
+            num_dimensions)
         call check_positive("Concrete_Component_Orientations: set", "norm2(vector)", norm2(vector))
         call check_norm("Concrete_Component_Orientations: set", "vector", vector)
         this%coordinates(:, i_particle) = vector / norm2(vector)

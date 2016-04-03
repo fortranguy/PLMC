@@ -4,7 +4,7 @@ use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
 use class_periodic_box, only: Abstract_Periodic_Box
 use procedures_errors, only: error_exit
-use procedures_checks, only: check_3d_array, check_positive
+use procedures_checks, only: check_array_size, check_positive
 
 implicit none
 
@@ -54,9 +54,9 @@ contains
         real(DP), intent(in) :: origin(:), size(:)
 
         this%periodic_box => periodic_box
-        call check_3d_array("Abstract_Parallelepiped_Domain", "origin", origin)
+        call check_array_size("Abstract_Parallelepiped_Domain", "origin", origin, num_dimensions)
         this%origin = this%periodic_box%folded(origin)
-        call check_3d_array("Abstract_Parallelepiped_Domain", "size", size)
+        call check_array_size("Abstract_Parallelepiped_Domain", "size", size, num_dimensions)
         call check_positive("Abstract_Parallelepiped_Domain", "size", size)
         this%size = size
 

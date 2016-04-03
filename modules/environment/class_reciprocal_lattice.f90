@@ -3,7 +3,7 @@ module class_reciprocal_lattice
 use, intrinsic :: iso_fortran_env, only: DP => REAL64
 use data_constants, only: num_dimensions
 use procedures_errors, only: warning_continue, error_exit
-use procedures_checks, only: check_3d_array, check_positive
+use procedures_checks, only: check_array_size, check_positive
 use class_periodic_box, only: Abstract_Periodic_Box
 
 implicit none
@@ -53,7 +53,7 @@ contains
         real(DP) :: real_size(num_dimensions)
         real(DP) :: real_zx_ratio, reci_zx_ratio
 
-        call check_3d_array("Abstract_Reciprocal_Lattice", "numbers", numbers)
+        call check_array_size("Abstract_Reciprocal_Lattice", "numbers", numbers, num_dimensions)
         call check_positive("Abstract_Reciprocal_Lattice", "numbers", numbers)
         if (numbers(1) /= numbers(2)) then
             call warning_continue("Abstract_Reciprocal_Lattice: "//&

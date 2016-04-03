@@ -52,6 +52,7 @@
 
         \begin{scope}[shift={($(WallsPotential.south) - (0 cm, 1.5 cm)$)}]
             \begin{abstractclass}[text width=\mediumTextWidth]{FloorPenetration}{0, 0}
+                \operation{\procedure{getMinDepth}{}: \type{real}}
                 \operation{\procedure{meet}{overlap: \type{bool},
                     shortestVectorFromFloor: \type{real[3]}, positionFromFloor: \type{real[3]}}}
             \end{abstractclass}
