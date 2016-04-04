@@ -14,9 +14,8 @@ private
         type(Concrete_Changes_Success), allocatable :: changes_sucesses(:)
         type(Concrete_Switch_Counters), allocatable :: switches_counters(:)
         type(Concrete_Line_Observables), allocatable :: switches_successes(:)
-        type(Concrete_Line_Observables), allocatable :: short_energies(:)
         real(DP), allocatable :: field_energies(:), walls_energies(:)
-        type(Concrete_Line_Observables), allocatable :: dipolar_energies(:)
+        type(Concrete_Line_Observables), allocatable :: short_energies(:), dipolar_energies(:)
         real(DP) :: dipolar_mixture_energy
     end type Observables_Wrapper
 
