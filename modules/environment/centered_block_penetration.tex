@@ -41,8 +41,12 @@
             node[below left] {$L_\text{i}$}
             --++ (0, -\cornerRadius);
 
-        \draw [->] (0, \sizeZ/2) -- node[below]{$x/2$} ++ (\sizeX/2, 0);
-        \draw [<->] (\sizeX/2 + \cornerRadius + \sizeX/8, 0) -- node[left] {$z$} ++ (0, \sizeZ);
+        \draw[->] (0, \sizeZ/2) -- node[below]{$x/2$} ++ (\sizeX/2, 0);
+        \draw[<->] (\sizeX/2 + \cornerRadius + \sizeX/8, 0) -- node[left] {$z$} ++ (0, \sizeZ);
+
+        \draw (0, 0) node[below left] {$O$};
+        \draw[->] (0, 0) -- (1, 0) node[below] {$\vec{e}_x$};
+        \draw[->] (0, 0) -- (0, 1) node[left] {$\vec{e}_z$};
     \end{tikzpicture}
 
 \end{document}
